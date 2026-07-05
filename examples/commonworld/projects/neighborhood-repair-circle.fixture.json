@@ -1,0 +1,99 @@
+{
+  "schema_version": 1,
+  "id": "neighborhood-repair-circle-fixture",
+  "title": "Neighborhood Repair Circle fixture",
+  "summary": "Synthetic local repair Commons fixture used to validate place-like projects, approximate locations and mixed aspect profiles.",
+  "sphere": "place",
+  "aspects": [
+    {
+      "id": "repair",
+      "label": "Repair",
+      "description": "People maintain and repair shared or private goods instead of replacing them.",
+      "color_token": "aspect.repair",
+      "icon_token": "icon.tool",
+      "weight": 0.5,
+      "confidence": 0.6,
+      "evidence": [
+        {
+          "type": "fixture",
+          "label": "Synthetic commonworld fixture",
+          "retrieved_at": "2026-07-05",
+          "note": "Not a public catalog claim."
+        }
+      ]
+    },
+    {
+      "id": "education",
+      "label": "Education",
+      "description": "Repair knowledge is shared through peer learning.",
+      "color_token": "aspect.education",
+      "icon_token": "icon.book-open",
+      "weight": 0.3,
+      "confidence": 0.55,
+      "evidence": [
+        {
+          "type": "fixture",
+          "label": "Synthetic commonworld fixture",
+          "retrieved_at": "2026-07-05"
+        }
+      ]
+    },
+    {
+      "id": "mutual-aid",
+      "label": "Mutual aid",
+      "description": "The project model represents practical help across a local community.",
+      "color_token": "aspect.mutual-aid",
+      "icon_token": "icon.hands",
+      "weight": 0.2,
+      "confidence": 0.5,
+      "evidence": [
+        {
+          "type": "fixture",
+          "label": "Synthetic commonworld fixture",
+          "retrieved_at": "2026-07-05"
+        }
+      ]
+    }
+  ],
+  "location": {
+    "mode": "approximate",
+    "label": "Hamburg, Germany; city-level synthetic fixture",
+    "precision": "city",
+    "coordinates": {
+      "lat": 53.55,
+      "lon": 10.0
+    },
+    "accuracy_meters_min": 5000,
+    "privacy_note": "Approximate city-level coordinate for validation only; not an exact venue."
+  },
+  "provenance": {
+    "sources": [
+      {
+        "type": "fixture",
+        "label": "Synthetic commonworld fixture",
+        "retrieved_at": "2026-07-05",
+        "note": "Created to validate location privacy and mixed-node aspect behavior."
+      }
+    ],
+    "summary": "Fixture entry; it must not be shown as a real public catalog item."
+  },
+  "curation": {
+    "state": "fixture",
+    "reviewed_by": "commonworld seed curator",
+    "reviewed_at": "2026-07-05",
+    "notes": "Synthetic test data for contract validation."
+  },
+  "links": [
+    {
+      "type": "documentation",
+      "label": "commonworld masterplan",
+      "url": "https://github.com/heimgewebe/commonworld/blob/main/docs/blueprints/commonworld-masterplan.md"
+    }
+  ],
+  "handoff": {
+    "enabled": false,
+    "requirements": [
+      "No handoff action because this is synthetic fixture data."
+    ]
+  }
+}

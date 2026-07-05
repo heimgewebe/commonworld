@@ -1,0 +1,102 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://commonworld.net/contracts/commonworld/aspect.schema.json",
+  "title": "Commonworld project aspect",
+  "description": "Weighted semantic aspect for a CommonProject. Color is only a visual token; label, icon, confidence and evidence carry the meaning.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "id",
+    "label",
+    "color_token",
+    "icon_token",
+    "weight",
+    "confidence",
+    "evidence"
+  ],
+  "properties": {
+    "id": {
+      "type": "string",
+      "pattern": "^[a-z][a-z0-9-]{1,63}$",
+      "description": "Stable aspect key within a project."
+    },
+    "label": {
+      "type": "string",
+      "minLength": 2,
+      "maxLength": 80
+    },
+    "description": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 500
+    },
+    "color_token": {
+      "type": "string",
+      "pattern": "^aspect\\.[a-z][a-z0-9-]*$",
+      "description": "Design token, not the only semantic carrier."
+    },
+    "icon_token": {
+      "type": "string",
+      "pattern": "^icon\\.[a-z][a-z0-9-]*$",
+      "description": "Icon token used with text so color is not the only carrier."
+    },
+    "weight": {
+      "type": "number",
+      "minimum": 0,
+      "maximum": 1,
+      "description": "Profile weight for the mixed-node ring. Project-level validation requires the sum to be 1.0."
+    },
+    "confidence": {
+      "type": "number",
+      "minimum": 0,
+      "maximum": 1,
+      "description": "Curation confidence for this aspect claim."
+    },
+    "evidence": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "$ref": "#/$defs/evidence"
+      }
+    }
+  },
+  "$defs": {
+    "evidence": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "type",
+        "label"
+      ],
+      "properties": {
+        "type": {
+          "type": "string",
+          "enum": [
+            "official-source",
+            "public-registry",
+            "manual-curation",
+            "fixture",
+            "derived"
+          ]
+        },
+        "label": {
+          "type": "string",
+          "minLength": 2,
+          "maxLength": 160
+        },
+        "url": {
+          "type": "string",
+          "format": "uri"
+        },
+        "retrieved_at": {
+          "type": "string",
+          "format": "date"
+        },
+        "note": {
+          "type": "string",
+          "maxLength": 500
+        }
+      }
+    }
+  }
+}

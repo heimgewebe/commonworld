@@ -1,0 +1,108 @@
+{
+  "schema_version": 1,
+  "id": "openstreetmap",
+  "title": "OpenStreetMap",
+  "summary": "Community-built open map data project used as shared geographic infrastructure for many public-interest and Commons-adjacent applications.",
+  "sphere": "digital",
+  "aspects": [
+    {
+      "id": "open-data",
+      "label": "Open data",
+      "description": "The main public value is reusable map data under an open license.",
+      "color_token": "aspect.data",
+      "icon_token": "icon.map",
+      "weight": 0.45,
+      "confidence": 0.9,
+      "evidence": [
+        {
+          "type": "official-source",
+          "label": "OpenStreetMap copyright and license page",
+          "url": "https://www.openstreetmap.org/copyright",
+          "retrieved_at": "2026-07-05",
+          "note": "Used only as public provenance for this seed entry."
+        }
+      ]
+    },
+    {
+      "id": "community-mapping",
+      "label": "Community mapping",
+      "description": "The project depends on distributed public contribution and maintenance.",
+      "color_token": "aspect.community",
+      "icon_token": "icon.people",
+      "weight": 0.35,
+      "confidence": 0.85,
+      "evidence": [
+        {
+          "type": "official-source",
+          "label": "OpenStreetMap about page",
+          "url": "https://www.openstreetmap.org/about",
+          "retrieved_at": "2026-07-05"
+        }
+      ]
+    },
+    {
+      "id": "public-infrastructure",
+      "label": "Public infrastructure",
+      "description": "The data can support navigation, civic mapping and educational use.",
+      "color_token": "aspect.infrastructure",
+      "icon_token": "icon.layers",
+      "weight": 0.2,
+      "confidence": 0.7,
+      "evidence": [
+        {
+          "type": "manual-curation",
+          "label": "commonworld seed curation",
+          "retrieved_at": "2026-07-05",
+          "note": "Interpretive aspect assignment, not an endorsement claim."
+        }
+      ]
+    }
+  ],
+  "location": {
+    "mode": "hidden",
+    "label": "Global digital project",
+    "precision": "none",
+    "privacy_note": "Digital project; no single public point should be rendered."
+  },
+  "provenance": {
+    "sources": [
+      {
+        "type": "official-source",
+        "label": "OpenStreetMap about page",
+        "url": "https://www.openstreetmap.org/about",
+        "retrieved_at": "2026-07-05"
+      },
+      {
+        "type": "official-source",
+        "label": "OpenStreetMap copyright and license page",
+        "url": "https://www.openstreetmap.org/copyright",
+        "retrieved_at": "2026-07-05"
+      }
+    ],
+    "summary": "Seed entry using public official pages and conservative commonworld curation."
+  },
+  "curation": {
+    "state": "candidate",
+    "reviewed_by": "commonworld seed curator",
+    "reviewed_at": "2026-07-05",
+    "notes": "Public seed entry; no claim of affiliation or operational status beyond cited public pages."
+  },
+  "links": [
+    {
+      "type": "homepage",
+      "label": "OpenStreetMap",
+      "url": "https://www.openstreetmap.org/"
+    },
+    {
+      "type": "license",
+      "label": "Copyright and license",
+      "url": "https://www.openstreetmap.org/copyright"
+    }
+  ],
+  "handoff": {
+    "enabled": false,
+    "requirements": [
+      "No join, manage or decide action until a weltgewebe project identity exists."
+    ]
+  }
+}
