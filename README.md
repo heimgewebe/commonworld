@@ -18,3 +18,16 @@
 6. Define the safe handoff to weltgewebe.
 
 See `docs/blueprints/commonworld-masterplan.md` for the masterplan.
+
+## Mixed-node proof
+
+T002 is implemented as an isolated static proof under `proofs/mixed-node/`.
+It uses the existing `examples/commonworld/projects/*.json` seeds and does not require a Node stack, MapLibre, a backend, public submissions or a weltgewebe write path.
+
+Run it from the repository root with:
+
+```bash
+python3 -m http.server 4173
+```
+
+Then open `http://localhost:4173/proofs/mixed-node/`.

@@ -1,0 +1,75 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>commonworld mixed-node visual proof</title>
+    <link rel="stylesheet" href="./mixed-node.css" />
+  </head>
+  <body>
+    <main class="proof-shell">
+      <section class="proof-intro" aria-labelledby="proof-title">
+        <p class="eyebrow">Static visual proof · no map · no backend</p>
+        <h1 id="proof-title">Mixed nodes show profile, evidence and confidence together.</h1>
+        <p>
+          The segmented ring compresses the CommonProject aspect weights. It does not rank moral value.
+          Select a node to open the detail surface: a mobile bottom sheet or a desktop side panel with
+          matching aspect cards, labels, icon tokens, confidence and evidence.
+        </p>
+        <dl class="node-legend" aria-label="Mixed-node legend">
+          <div>
+            <dt>Color</dt>
+            <dd>Aspect family, not project quality.</dd>
+          </div>
+          <div>
+            <dt>Segment size</dt>
+            <dd>Contract profile weight, not moral rank or importance.</dd>
+          </div>
+          <div>
+            <dt>Evidence</dt>
+            <dd>Shown again in the detail surface so color never carries the claim alone.</dd>
+          </div>
+        </dl>
+      </section>
+
+      <section class="node-stage" aria-label="Seed CommonProject mixed nodes">
+        <div class="node-list" data-node-list></div>
+        <p class="load-state" data-load-state>Loading seed projects…</p>
+      </section>
+
+      <aside
+        id="project-detail"
+        class="detail-surface"
+        data-detail-surface
+        aria-labelledby="detail-title"
+        aria-live="polite"
+        tabindex="-1"
+        hidden
+      >
+        <button class="close-button" type="button" data-close-detail aria-label="Close detail panel">
+          <span aria-hidden="true">×</span>
+        </button>
+        <p class="eyebrow" data-detail-kicker>CommonProject</p>
+        <h2 id="detail-title" data-detail-title>Select a mixed node</h2>
+        <p data-detail-summary></p>
+        <dl class="detail-meta">
+          <div>
+            <dt>Sphere</dt>
+            <dd data-detail-sphere></dd>
+          </div>
+          <div>
+            <dt>Location mode</dt>
+            <dd data-detail-location></dd>
+          </div>
+          <div>
+            <dt>Curation</dt>
+            <dd data-detail-curation></dd>
+          </div>
+        </dl>
+        <div class="aspect-cards" data-aspect-cards></div>
+      </aside>
+    </main>
+
+    <script type="module" src="./mixed-node.js"></script>
+  </body>
+</html>
