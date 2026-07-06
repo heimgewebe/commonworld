@@ -1,0 +1,138 @@
+:root {
+  color-scheme: dark;
+  --surface: #101418;
+  --surface-raised: #161d23;
+  --text: #edf4ef;
+  --muted: #a8b5ae;
+  --line: rgba(237, 244, 239, 0.16);
+  --focus: #f3dc8f;
+  --accent: #82d173;
+  font-family:
+    Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  min-height: 100vh;
+  background:
+    radial-gradient(circle at 16% 12%, rgba(130, 209, 115, 0.18), transparent 26rem),
+    radial-gradient(circle at 78% 18%, rgba(108, 183, 255, 0.16), transparent 28rem),
+    #0b0f12;
+  color: var(--text);
+}
+
+.hub-shell {
+  display: grid;
+  gap: 1.5rem;
+  min-height: 100vh;
+  padding: clamp(1rem, 4vw, 3rem);
+}
+
+.hub-hero {
+  max-width: 64rem;
+}
+
+.eyebrow {
+  margin: 0 0 0.45rem;
+  color: var(--muted);
+  font-size: 0.78rem;
+  font-weight: 800;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+h1,
+h2,
+p {
+  margin-top: 0;
+}
+
+h1 {
+  max-width: 56rem;
+  font-size: clamp(2.3rem, 8vw, 5.8rem);
+  line-height: 0.94;
+  letter-spacing: -0.06em;
+}
+
+.hub-hero p:not(.eyebrow),
+.proof-card p,
+.boundary-panel li {
+  color: var(--muted);
+  line-height: 1.6;
+}
+
+.proof-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(17rem, 1fr));
+  gap: 1rem;
+}
+
+.proof-card,
+.boundary-panel {
+  border: 1px solid var(--line);
+  border-radius: 1.5rem;
+  background: rgba(16, 20, 24, 0.78);
+  box-shadow: 0 24px 80px rgba(0, 0, 0, 0.24);
+}
+
+.proof-card {
+  display: grid;
+  min-height: 18rem;
+  padding: 1.35rem;
+  color: inherit;
+  text-decoration: none;
+  transition:
+    border-color 160ms ease,
+    transform 160ms ease,
+    background 160ms ease;
+}
+
+.proof-card:hover,
+.proof-card:focus-visible {
+  border-color: var(--focus);
+  background: rgba(22, 29, 35, 0.92);
+  outline: 3px solid var(--focus);
+  outline-offset: 4px;
+  transform: translateY(-0.16rem);
+}
+
+.proof-index {
+  color: var(--accent);
+  font-weight: 900;
+  letter-spacing: 0.1em;
+}
+
+.proof-card h2 {
+  margin-bottom: 0.5rem;
+  font-size: clamp(1.5rem, 5vw, 2.6rem);
+}
+
+.proof-card span {
+  align-self: end;
+  color: var(--text);
+  font-weight: 800;
+}
+
+.boundary-panel {
+  padding: 1.35rem;
+}
+
+.boundary-panel ul {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(12rem, 1fr));
+  gap: 0.6rem;
+  margin: 1rem 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.boundary-panel li {
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  padding: 0.55rem 0.75rem;
+  background: rgba(237, 244, 239, 0.05);
+}
