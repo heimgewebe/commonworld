@@ -1,6 +1,6 @@
-.PHONY: validate validate-contracts validate-mixed-node-proof validate-map-proof validate-map-source-strategy validate-aether-proof test
+.PHONY: validate validate-contracts validate-mixed-node-proof validate-map-proof validate-map-source-strategy validate-aether-proof validate-proof-hub test
 
-validate: validate-contracts validate-mixed-node-proof validate-map-proof validate-map-source-strategy validate-aether-proof test
+validate: validate-contracts validate-mixed-node-proof validate-map-proof validate-map-source-strategy validate-aether-proof validate-proof-hub test
 
 validate-contracts:
 	python3 scripts/validate_contracts.py
@@ -16,6 +16,9 @@ validate-map-source-strategy:
 
 validate-aether-proof:
 	python3 scripts/validate_aether_proof.py
+
+validate-proof-hub:
+	python3 scripts/validate_proof_hub.py
 
 test:
 	python3 -m unittest discover -s tests -p 'test_*.py'
