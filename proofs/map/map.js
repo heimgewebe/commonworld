@@ -1,4 +1,5 @@
 const SEED_MANIFEST_URL = new URL("../mixed-node/seed-projects.json", import.meta.url);
+const MAP_SOURCE_URL = new URL("./map-source.json", import.meta.url);
 
 const ASPECT_COLORS = {
   "aspect.data": "var(--aspect-data)",
@@ -22,6 +23,8 @@ const loadState = requiredElement("[data-load-state]");
 const detailSurface = requiredElement("[data-detail-surface]");
 const closeButton = requiredElement("[data-close-detail]");
 let activeMarkerButton = null;
+let mapSourceCssPromise = null;
+let mapSourceScriptPromise = null;
 
 function requiredElement(selector) {
   const element = document.querySelector(selector);
@@ -94,6 +97,95 @@ async function loadJson(url) {
     throw new Error(`Could not load ${url}: ${response.status}`);
   }
   return response.json();
+}
+
+function requireString(value, message) {
+  if (typeof value !== "string" || value.length === 0) {
+    throw new Error(message);
+  }
+}
+
+function validateMapSource(mapSource) {
+  if (mapSource.schema_version !== 1) {
+    throw new Error("Map source must use schema_version 1.");
+  }
+  if (mapSource.mode !== "proof") {
+    throw new Error("Static map proof must use proof map source mode.");
+  }
+  requireString(mapSource.library?.script_url, "Map source missing library script_url.");
+  requireString(mapSource.library?.css_url, "Map source missing library css_url.");
+  if (!mapSource.library.script_url.endsWith("/dist/maplibre-gl.js")) {
+    throw new Error("Map source must use the allowed MapLibre browser bundle.");
+  }
+  if (!mapSource.library.css_url.endsWith("/dist/maplibre-gl.css")) {
+    throw new Error("Map source must use the allowed MapLibre CSS bundle.");
+  }
+  if (!mapSource.basemap?.style) {
+    throw new Error("Map source missing basemap style.");
+  }
+  if (!Array.isArray(mapSource.initial_view?.center) || !Number.isFinite(mapSource.initial_view?.zoom)) {
+    throw new Error("Map source missing initial view.");
+  }
+}
+
+async function loadMapSource() {
+  const mapSource = await loadJson(MAP_SOURCE_URL);
+  validateMapSource(mapSource);
+  return mapSource;
+}
+
+function loadStylesheet(cssUrl) {
+  if (mapSourceCssPromise) return mapSourceCssPromise;
+  mapSourceCssPromise = new Promise((resolve, reject) => {
+    const link = document.createElement("link");
+    link.rel = "stylesheet";
+    link.href = cssUrl;
+    link.dataset.mapSourceCss = "true";
+    link.addEventListener("load", () => resolve());
+    link.addEventListener("error", () => {
+      link.remove();
+      mapSourceCssPromise = null;
+      reject(new Error(`Could not load map source stylesheet ${cssUrl}`));
+    });
+    document.head.append(link);
+  });
+  return mapSourceCssPromise;
+}
+
+function loadScript(scriptUrl) {
+  if (window.maplibregl) return Promise.resolve(window.maplibregl);
+  if (mapSourceScriptPromise) return mapSourceScriptPromise;
+  mapSourceScriptPromise = new Promise((resolve, reject) => {
+    const script = document.createElement("script");
+    script.src = scriptUrl;
+    script.async = true;
+    script.dataset.mapSourceScript = "true";
+    script.addEventListener("load", () => {
+      if (!window.maplibregl) {
+        script.remove();
+        mapSourceScriptPromise = null;
+        reject(new Error("MapLibre did not load from the configured source."));
+        return;
+      }
+      resolve(window.maplibregl);
+    });
+    script.addEventListener("error", () => {
+      script.remove();
+      mapSourceScriptPromise = null;
+      reject(new Error(`Could not load map source script ${scriptUrl}`));
+    });
+    document.head.append(script);
+  });
+  return mapSourceScriptPromise;
+}
+
+async function ensureMapLibre(mapSource) {
+  await loadStylesheet(mapSource.library.css_url);
+  const maplibre = await loadScript(mapSource.library.script_url);
+  if (!window.maplibregl) {
+    throw new Error("MapLibre did not load from the configured source.");
+  }
+  return maplibre;
 }
 
 async function loadSeedProjects() {
@@ -217,46 +309,29 @@ function createMapMarkerElement(project) {
   return container;
 }
 
-function createMap() {
-  if (!window.maplibregl) {
-    throw new Error("MapLibre did not load from the CDN.");
-  }
-  return new window.maplibregl.Map({
+function createMap(mapSource, maplibre) {
+  return new maplibre.Map({
     container: "map",
-    style: {
-      version: 8,
-      sources: {
-        "carto-dark-matter": {
-          type: "raster",
-          tiles: ["https://a.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}@2x.png"],
-          tileSize: 256,
-          attribution: "© OpenStreetMap contributors © CARTO",
-        },
-      },
-      layers: [
-        {
-          id: "carto-dark-matter-layer",
-          type: "raster",
-          source: "carto-dark-matter",
-        },
-      ],
-    },
-    center: [10.4515, 51.1657],
-    zoom: 5,
+    style: mapSource.basemap.style,
+    center: mapSource.initial_view.center,
+    zoom: mapSource.initial_view.zoom,
   });
 }
 
 async function initMap() {
   try {
-    const map = createMap();
-    map.addControl(new window.maplibregl.NavigationControl(), "top-right");
+    const mapSource = await loadMapSource();
+    loadState.textContent = mapSource.disclosure;
+    const maplibre = await ensureMapLibre(mapSource);
+    const map = createMap(mapSource, maplibre);
+    map.addControl(new maplibre.NavigationControl(), "top-right");
     const projects = await loadSeedProjects();
     const renderableProjects = projects.filter(isMapRenderable);
     const skippedProjects = projects.filter((project) => !isMapRenderable(project));
 
     for (const project of renderableProjects) {
       const { lon, lat } = project.location.coordinates;
-      new window.maplibregl.Marker({ element: createMapMarkerElement(project) }).setLngLat([lon, lat]).addTo(map);
+      new maplibre.Marker({ element: createMapMarkerElement(project) }).setLngLat([lon, lat]).addTo(map);
     }
 
     loadState.textContent = `Map ready. ${renderableProjects.length} location-safe node rendered. ${skippedProjects.length} hidden digital node skipped.`;
