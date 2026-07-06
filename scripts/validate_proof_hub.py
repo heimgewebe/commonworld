@@ -9,7 +9,7 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[1]
 
 PROOF_LINKS = {
-    "mixed-node": "./proofs/mixed-node/",
+    "project-profile": "./proofs/mixed-node/",
     "map": "./proofs/map/",
     "aether": "./proofs/aether/",
 }
@@ -40,9 +40,10 @@ def validate_proof_hub(root: Path = ROOT) -> list[str]:
 
     required_html_tokens = (
         "COMMONWORLD-ATLAS-V1-T007",
-        "Mixed node",
+        "Project profile",
         "Map",
         "Aether",
+        "Understand one CommonProject",
         "No backend",
         "No public submissions",
         "No user accounts",
