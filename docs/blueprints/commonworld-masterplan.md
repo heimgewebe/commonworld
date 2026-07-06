@@ -91,12 +91,13 @@ Circle packing is allowed only when the data is actually hierarchical. Network r
 
 ### Phase 2: Static visual proof
 
-- SvelteKit app
+- isolated static proof before app-stack commitment
 - mixed node marker
 - aspect cards
 - mobile bottom sheet
 - desktop side panel
-- fixture data
+- fixture data loaded from the CommonProject examples
+- no MapLibre route, backend, submissions or weltgewebe write path
 
 ### Phase 3: Map proof
 
