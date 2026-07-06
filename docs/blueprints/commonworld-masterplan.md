@@ -101,6 +101,8 @@ Circle packing is allowed only when the data is actually hierarchical. Network r
 
 ### Phase 3: Map proof
 
+Map source strategy: `docs/blueprints/map-source-strategy.md` defines proof, staging and production map-source boundaries before commonworld adopts shared basemap infrastructure.
+
 - privacy-aware static map proof
 - hidden digital projects skipped from map rendering
 - approximate locations shown with visible privacy halo

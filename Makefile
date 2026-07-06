@@ -1,6 +1,6 @@
-.PHONY: validate validate-contracts validate-mixed-node-proof validate-map-proof test
+.PHONY: validate validate-contracts validate-mixed-node-proof validate-map-proof validate-map-source-strategy test
 
-validate: validate-contracts validate-mixed-node-proof validate-map-proof test
+validate: validate-contracts validate-mixed-node-proof validate-map-proof validate-map-source-strategy test
 
 validate-contracts:
 	python3 scripts/validate_contracts.py
@@ -10,6 +10,9 @@ validate-mixed-node-proof:
 
 validate-map-proof:
 	python3 scripts/validate_map_proof.py
+
+validate-map-source-strategy:
+	python3 scripts/validate_map_source_strategy.py
 
 test:
 	python3 -m unittest discover -s tests -p 'test_*.py'

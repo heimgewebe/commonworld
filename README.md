@@ -44,3 +44,8 @@ python3 -m http.server 4173
 ```
 
 Then open `http://localhost:4173/proofs/map/`.
+
+## Map source strategy
+
+T004 is documented in `docs/blueprints/map-source-strategy.md`.
+commonworld does not operate a second tile infrastructure; it should consume a shared heimgewebe basemap when production map sourcing is ready.
