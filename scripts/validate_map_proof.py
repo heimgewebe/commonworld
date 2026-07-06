@@ -138,6 +138,8 @@ def validate_map_proof(root: Path = ROOT) -> list[str]:
         "data-detail-privacy",
         "MapLibre",
         "maplibre-gl.js",
+        "loads MapLibre from a CDN",
+        "raster map tiles from CARTO",
     )
     for token in required_html_tokens:
         if token not in html:

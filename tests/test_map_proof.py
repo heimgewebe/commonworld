@@ -81,5 +81,11 @@ class MapProofTests(unittest.TestCase):
         self.assertIn("transform: translate(-50%, -50%)", css)
 
 
+    def test_map_proof_ui_discloses_external_dependencies(self) -> None:
+        html = (proof_dir(ROOT) / "index.html").read_text(encoding="utf-8")
+        self.assertIn("loads MapLibre from a CDN", html)
+        self.assertIn("raster map tiles from CARTO", html)
+
+
 if __name__ == "__main__":
     unittest.main()
