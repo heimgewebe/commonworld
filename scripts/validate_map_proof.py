@@ -35,6 +35,7 @@ def expected_proof_files(root: Path = ROOT) -> tuple[Path, ...]:
         directory / "index.html",
         directory / "map.css",
         directory / "map.js",
+        directory / "map-source.json",
         directory / "README.md",
     )
 
@@ -83,6 +84,52 @@ def validate_map_projection(projects: list[dict[str, Any]]) -> list[str]:
         if not fixture_projection.requires_halo:
             errors.append("neighborhood-repair-circle-fixture must require an approximate-location halo")
 
+    return errors
+
+
+def map_source_path(root: Path = ROOT) -> Path:
+    return proof_dir(root) / "map-source.json"
+
+
+def validate_map_source_config(root: Path = ROOT) -> list[str]:
+    errors: list[str] = []
+    path = map_source_path(root)
+    if not path.is_file():
+        return ["missing map source config: proofs/map/map-source.json"]
+    map_source = load_json(path)
+
+    if map_source.get("schema_version") != 1:
+        errors.append("map source config must use schema_version 1")
+    if map_source.get("mode") != "proof":
+        errors.append("map source config must use proof mode")
+
+    library = map_source.get("library", {})
+    script_url = library.get("script_url", "")
+    css_url = library.get("css_url", "")
+    if not script_url.endswith("/dist/maplibre-gl.js"):
+        errors.append("map source config must declare the allowed MapLibre browser bundle")
+    if not css_url.endswith("/dist/maplibre-gl.css"):
+        errors.append("map source config must declare the allowed MapLibre CSS bundle")
+
+    basemap = map_source.get("basemap", {})
+    if basemap.get("kind") != "raster-style":
+        errors.append("map source config must use raster-style basemap kind for the static proof")
+    if not basemap.get("provider_terms_url"):
+        errors.append("map source config must include provider_terms_url")
+    if "cache" not in basemap.get("cache_policy", "").casefold():
+        errors.append("map source config must include cache policy")
+
+    style = basemap.get("style", {})
+    if style.get("version") != 8:
+        errors.append("map source config basemap style must be MapLibre style version 8")
+    if not style.get("sources") or not style.get("layers"):
+        errors.append("map source config must include basemap style sources and layers")
+
+    disclosure = map_source.get("disclosure", "")
+    if "loads MapLibre from a CDN" not in disclosure or "raster map tiles from CARTO" not in disclosure:
+        errors.append("map source config must carry the proof external dependency disclosure")
+    if "Basemap choice must not change CommonProject location privacy projection" not in map_source.get("privacy_notes", ""):
+        errors.append("map source config must preserve the privacy projection boundary")
     return errors
 
 
@@ -137,13 +184,16 @@ def validate_map_proof(root: Path = ROOT) -> list[str]:
         "data-detail-surface",
         "data-detail-privacy",
         "MapLibre",
-        "maplibre-gl.js",
         "loads MapLibre from a CDN",
         "raster map tiles from CARTO",
     )
     for token in required_html_tokens:
         if token not in html:
             errors.append(f"map proof HTML missing {token}")
+    forbidden_provider_fragments = ("maplibre-gl@", "carto-dark-matter")
+    for fragment in forbidden_provider_fragments:
+        if fragment in html:
+            errors.append(f"map proof HTML must not hard-code provider detail {fragment}; use map-source.json")
 
     required_css_tokens = (
         ".map-container",
@@ -165,8 +215,14 @@ def validate_map_proof(root: Path = ROOT) -> list[str]:
         errors.append("map proof CSS must not hide the approximate halo behind the map")
 
     required_js_tokens = (
+        "MAP_SOURCE_URL",
+        "./map-source.json",
+        "loadMapSource",
+        "loadStylesheet",
+        "loadScript",
+        "ensureMapLibre",
         "window.maplibregl",
-        "MapLibre did not load from the CDN.",
+        "MapLibre did not load from the configured source.",
         "SEED_MANIFEST_URL",
         "../mixed-node/seed-projects.json",
         "isMapRenderable",
@@ -177,7 +233,9 @@ def validate_map_proof(root: Path = ROOT) -> list[str]:
         "setExpandedMarkerButton",
         "aria-controls",
         "aria-expanded",
-        "try {\n    const map = createMap();",
+        "try {\n    const mapSource = await loadMapSource();",
+        "createMap(mapSource, maplibre)",
+        "mapSource.basemap.style",
         "Number.isFinite(coordinates?.lat)",
         "Number.isFinite(coordinates?.lon)",
     )
@@ -186,7 +244,11 @@ def validate_map_proof(root: Path = ROOT) -> list[str]:
             errors.append(f"map proof JS missing {token}")
     if "maplibre-gl.esm.js" in js:
         errors.append("map proof JS must not import the missing MapLibre ESM bundle")
+    for fragment in ("maplibre-gl@", "carto-dark-matter"):
+        if fragment in js:
+            errors.append(f"map proof JS must not hard-code provider detail {fragment}; use map-source.json")
 
+    errors.extend(validate_map_source_config(root))
     errors.extend(validate_scope_text(readme, html, js))
     errors.extend(validate_map_projection(load_projects(root)))
     return errors
