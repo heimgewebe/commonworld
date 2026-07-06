@@ -1,0 +1,62 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>commonworld privacy-aware map proof</title>
+    <link rel="stylesheet" href="https://unpkg.com/maplibre-gl@3.6.2/dist/maplibre-gl.css" />
+    <link rel="stylesheet" href="../mixed-node/mixed-node.css" />
+    <link rel="stylesheet" href="./map.css" />
+  </head>
+  <body>
+    <main class="map-shell">
+      <div id="map" class="map-container" aria-label="Privacy-aware CommonProject map"></div>
+
+      <section class="map-overlay-top" aria-labelledby="map-proof-title">
+        <p class="eyebrow">Phase 3 · Static map proof</p>
+        <h1 id="map-proof-title">Location privacy decides what reaches the map.</h1>
+        <p>
+          Hidden digital projects are skipped. Approximate places use a city-level marker with a privacy halo.
+          Exact places would render without the halo. This MapLibre proof does not create a backend or submission flow.
+        </p>
+        <p class="load-state" data-load-state>Loading map and seed projects…</p>
+      </section>
+
+      <aside
+        id="project-detail"
+        class="detail-surface"
+        data-detail-surface
+        aria-labelledby="detail-title"
+        aria-live="polite"
+        role="region"
+        tabindex="-1"
+        hidden
+      >
+        <button class="close-button" type="button" data-close-detail aria-label="Close detail panel">
+          <span aria-hidden="true">×</span>
+        </button>
+        <p class="eyebrow" data-detail-kicker>CommonProject</p>
+        <h2 id="detail-title" data-detail-title>Select a mapped mixed node</h2>
+        <p data-detail-summary></p>
+        <dl class="detail-meta">
+          <div>
+            <dt>Sphere</dt>
+            <dd data-detail-sphere></dd>
+          </div>
+          <div>
+            <dt>Location mode</dt>
+            <dd data-detail-location></dd>
+          </div>
+          <div>
+            <dt>Privacy</dt>
+            <dd data-detail-privacy></dd>
+          </div>
+        </dl>
+        <div class="aspect-cards" data-aspect-cards></div>
+      </aside>
+    </main>
+
+    <script src="https://unpkg.com/maplibre-gl@3.6.2/dist/maplibre-gl.js"></script>
+    <script type="module" src="./map.js"></script>
+  </body>
+</html>

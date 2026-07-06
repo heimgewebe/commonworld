@@ -13,8 +13,8 @@
 1. Define the `CommonProject` contract.
 2. Add curated seed projects.
 3. Prove the mixed-node marker and detail-panel interaction.
-4. Add a MapLibre map proof.
-5. Add the focused digital Commons / Aether view.
+4. Add a privacy-aware MapLibre map proof.
+5. Add the focused digital Commons view.
 6. Define the safe handoff to weltgewebe.
 
 See `docs/blueprints/commonworld-masterplan.md` for the masterplan.
@@ -31,3 +31,16 @@ python3 -m http.server 4173
 ```
 
 Then open `http://localhost:4173/proofs/mixed-node/`.
+
+## Map proof
+
+T003 is implemented as an isolated static proof under `proofs/map/`.
+It uses MapLibre GL JS from a CDN and a public CARTO raster basemap to prove that the `CommonProject` location privacy contract controls what may appear on a map.
+
+Run it from the repository root with:
+
+```bash
+python3 -m http.server 4173
+```
+
+Then open `http://localhost:4173/proofs/map/`.

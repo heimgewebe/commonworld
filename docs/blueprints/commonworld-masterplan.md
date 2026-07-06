@@ -101,6 +101,10 @@ Circle packing is allowed only when the data is actually hierarchical. Network r
 
 ### Phase 3: Map proof
 
+- privacy-aware static map proof
+- hidden digital projects skipped from map rendering
+- approximate locations shown with visible privacy halo
+
 - MapLibre route
 - seed markers
 - clusters
