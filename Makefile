@@ -1,6 +1,18 @@
-.PHONY: validate validate-contracts validate-mixed-node-proof validate-map-proof validate-map-source-strategy validate-aether-proof validate-proof-hub validate-mobile-atlas-shift validate-mobile-atlas-shift-doctrine test
+.PHONY: validate $(VALIDATE_TARGETS)
 
-validate: validate-contracts validate-mixed-node-proof validate-map-proof validate-map-source-strategy validate-aether-proof validate-proof-hub validate-mobile-atlas-shift validate-mobile-atlas-shift-doctrine test
+VALIDATE_TARGETS = \
+	validate-contracts \
+	validate-mixed-node-proof \
+	validate-map-proof \
+	validate-map-source-strategy \
+	validate-aether-proof \
+	validate-proof-hub \
+	validate-mobile-atlas-shift \
+	validate-mobile-atlas-shift-doctrine \
+	validate-projection-contract \
+	test
+
+validate: $(VALIDATE_TARGETS)
 
 validate-contracts:
 	python3 scripts/validate_contracts.py
@@ -25,6 +37,9 @@ validate-mobile-atlas-shift:
 
 validate-mobile-atlas-shift-doctrine:
 	python3 scripts/validate_mobile_atlas_shift_doctrine.py
+
+validate-projection-contract:
+	python3 scripts/validate_projection_contract.py
 
 test:
 	python3 -m unittest discover -s tests -p 'test_*.py'

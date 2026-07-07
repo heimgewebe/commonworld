@@ -24,7 +24,7 @@ def load_projects(root: Path = ROOT) -> list[dict[str, Any]]:
     return [load_json(path) for path in iter_project_examples(root)]
 
 def is_aether_project(project: dict[str, Any]) -> bool:
-    return project.get('sphere') == 'digital' or project.get('location', {}).get('mode') == 'hidden'
+    return bool(project.get('projections', {}).get('aether'))
 
 def aether_projects(root: Path = ROOT) -> list[dict[str, Any]]:
     return [project for project in load_projects(root) if is_aether_project(project)]
@@ -33,11 +33,19 @@ def validate_aether_projection(projects: list[dict[str, Any]]) -> list[str]:
     errors: list[str] = []
     aether_project_list = [project for project in projects if is_aether_project(project)]
     if not aether_project_list:
-        errors.append('aether proof must have at least one digital or hidden-location project')
+        errors.append('aether proof must have at least one project with projections.aether')
         return errors
     by_id = {project['id']: project for project in aether_project_list}
     if 'openstreetmap' not in by_id:
         errors.append('openstreetmap must appear in the Aether proof')
+    hybrid_aether_projects = [project for project in aether_project_list if project.get('sphere') == 'hybrid']
+    if not hybrid_aether_projects:
+        errors.append('at least one hybrid project must appear in the Aether proof via projections.aether')
+    if not any(
+        project.get('projections', {}).get('aether', {}).get('ortssignal') is True
+        for project in hybrid_aether_projects
+    ):
+        errors.append('at least one hybrid Aether projection must expose Ortssignal')
     if 'neighborhood-repair-circle-fixture' in by_id:
         errors.append('place fixture must stay out of the Aether proof')
     for project in aether_project_list:
@@ -52,9 +60,9 @@ def validate_aether_projection(projects: list[dict[str, Any]]) -> list[str]:
 
 def validate_proof_surface(html: str, css: str, js: str, readme: str) -> list[str]:
     errors: list[str] = []
-    html_tokens = ('Focused digital Commons proof','data-breadcrumb','data-aether-list','data-aether-count','data-active-branch','data-active-handoff','one active branch','no hairball','no map route','weltgewebe write path')
+    html_tokens = ('Focused Aether Commons proof','data-breadcrumb','data-aether-list','data-aether-count','data-active-branch','data-active-handoff','one active branch','no hairball','no map route','weltgewebe write path')
     css_tokens = ('.aether-shell','.aether-breadcrumb','.branch-rail','.active-branch','.aether-card','.evidence-pill','.handoff-lock')
-    js_tokens = ('SEED_MANIFEST_URL','../mixed-node/seed-projects.json','filterAetherProjects','project.sphere === "digital"','project.location?.mode === "hidden"','sortAetherProjects','setActiveBranch','aria-current','aria-expanded','handoffLabel','Locked until weltgewebe project identity exists','renderSources')
+    js_tokens = ('SEED_MANIFEST_URL','../mixed-node/seed-projects.json','filterAetherProjects','projections?.aether','Ortssignal','sortAetherProjects','setActiveBranch','aria-current','aria-expanded','handoffLabel','Locked until weltgewebe project identity exists','renderSources')
     for token in html_tokens:
         if token not in html:
             errors.append(f'aether proof HTML missing {token}')

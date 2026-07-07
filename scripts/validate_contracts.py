@@ -60,10 +60,54 @@ def semantic_errors(project: dict[str, Any]) -> list[str]:
         errors.append(f"aspect weights must sum to 1.0, got {weight_sum:.3f}")
 
     location = project.get("location", {})
-    if location.get("mode") == "hidden" and "coordinates" in location:
+    location_mode = location.get("mode")
+    projections = project.get("projections", {})
+    projection_keys = set(projections)
+    map_projection = projections.get("map", {})
+    profile_projection = projections.get("profile", {})
+    sphere = project.get("sphere")
+
+    if "profile" not in projection_keys:
+        errors.append("all projects must include a profile projection")
+
+    if location_mode == "hidden" and "map" in projection_keys:
+        errors.append("hidden locations must not expose a map projection")
+
+    if sphere == "place":
+        if "map" not in projection_keys:
+            errors.append("place projects must include a map projection")
+        if "aether" in projection_keys:
+            errors.append("place projects must not include an aether projection; use hybrid when a digital extension exists")
+
+    if sphere == "digital":
+        if "aether" not in projection_keys:
+            errors.append("digital projects must include an aether projection")
+        if "map" in projection_keys:
+            errors.append("digital projects must not include a map projection; use hybrid when a map anchor exists")
+
+    if sphere == "hybrid":
+        if "aether" not in projection_keys:
+            errors.append("hybrid projects must include an aether projection")
+        if location_mode in {"exact", "approximate"} and "map" not in projection_keys:
+            errors.append("location-safe hybrid projects must include a map projection")
+
+    if map_projection:
+        appearance = map_projection.get("appearance")
+        location_claim = map_projection.get("location_claim")
+        if location_mode == "approximate" and location_claim != "approximate":
+            errors.append("approximate locations must use approximate map location_claim")
+        if appearance == "approximate-halo" and location_claim != "approximate":
+            errors.append("approximate-halo must use approximate location_claim")
+        if appearance == "local-marker" and location_claim != "exact":
+            errors.append("local-marker must use exact location_claim")
+
+    if project.get("handoff", {}).get("enabled") is False and profile_projection.get("handoff_state") == "available":
+        errors.append("disabled handoff must not have available profile handoff_state")
+
+    if location_mode == "hidden" and "coordinates" in location:
         errors.append("hidden locations must not include coordinates")
 
-    if location.get("mode") == "exact" and location.get("precision") != "exact":
+    if location_mode == "exact" and location.get("precision") != "exact":
         errors.append("exact locations must use precision exact")
 
     curation = project.get("curation", {})
@@ -82,7 +126,6 @@ def semantic_errors(project: dict[str, Any]) -> list[str]:
         errors.append("disabled handoff must not expose action fields")
 
     return errors
-
 
 def validate_project(
     project: dict[str, Any],
