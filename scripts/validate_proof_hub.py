@@ -49,6 +49,12 @@ def validate_proof_hub(root: Path = ROOT) -> list[str]:
         "No user accounts",
         "No weltgewebe write path",
         "No governance or handoff action",
+        "Curation states",
+        "Fixture",
+        "Candidate",
+        "Curated",
+        "Archived",
+        "Trust state is visible before action",
     )
     for token in required_html_tokens:
         if token not in html:
@@ -71,6 +77,7 @@ def validate_proof_hub(root: Path = ROOT) -> list[str]:
         ".hub-hero",
         ".proof-grid",
         ".proof-card",
+        ".trust-panel",
         ".boundary-panel",
         ":focus-visible",
     )

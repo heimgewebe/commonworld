@@ -62,7 +62,7 @@ def validate_proof_surface(html: str, css: str, js: str, readme: str) -> list[st
     errors: list[str] = []
     html_tokens = ('Focused Aether Commons proof','data-breadcrumb','data-aether-list','data-aether-count','data-active-branch','data-active-handoff','one active branch','no hairball','no map route','weltgewebe write path')
     css_tokens = ('.aether-shell','.aether-breadcrumb','.branch-rail','.active-branch','.aether-card','.evidence-pill','.handoff-lock')
-    js_tokens = ('SEED_MANIFEST_URL','../mixed-node/seed-projects.json','filterAetherProjects','projections?.aether','Ortssignal','sortAetherProjects','setActiveBranch','aria-current','aria-expanded','handoffLabel','Locked until weltgewebe project identity exists','renderSources')
+    js_tokens = ('SEED_MANIFEST_URL','../mixed-node/seed-projects.json','filterAetherProjects','projections?.aether','Ortssignal','curationStateLabel','curationBadgeLabel','Curation:','sortAetherProjects','setActiveBranch','aria-current','aria-expanded','handoffLabel','Locked until weltgewebe project identity exists','renderSources')
     for token in html_tokens:
         if token not in html:
             errors.append(f'aether proof HTML missing {token}')

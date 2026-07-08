@@ -80,7 +80,8 @@ body {
   pointer-events: none;
 }
 
-.privacy-badge {
+.privacy-badge,
+.curation-badge {
   position: absolute;
   z-index: 2;
   top: calc(50% + 2.7rem);
@@ -132,4 +133,8 @@ body {
     max-height: 82vh;
     border-radius: 1.5rem 1.5rem 0 0;
   }
+}
+
+.curation-badge {
+  top: calc(50% + 4.45rem);
 }

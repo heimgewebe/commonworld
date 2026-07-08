@@ -59,6 +59,18 @@ function sortAetherProjects(projects) {
   return [...projects].sort((left, right) => left.title.localeCompare(right.title, "en", { sensitivity: "base" }));
 }
 
+function curationStateLabel(project) {
+  const state = project.curation?.state || "unreviewed";
+  if (state === "fixture") return "Synthetic fixture";
+  return state;
+}
+
+function curationBadgeLabel(project) {
+  const state = curationStateLabel(project);
+  if (state === "Synthetic fixture") return state;
+  return `Curation: ${state}`;
+}
+
 function iconFor(aspect) {
   return ICON_GLYPHS[aspect.icon_token] || aspect.icon_token;
 }
@@ -92,7 +104,7 @@ function renderBranchButton(project) {
   const meta = document.createElement("span");
   const projection = project.projections?.aether;
   const signal = projection?.ortssignal ? " · Ortssignal" : "";
-  meta.textContent = `${projection?.stream || "aether"}${signal} · ${project.sphere || "unknown"} / ${project.location?.mode || "hidden"}`;
+  meta.textContent = `${projection?.stream || "aether"}${signal} · ${project.sphere || "unknown"} / ${project.location?.mode || "hidden"} · ${curationBadgeLabel(project)}`;
 
   button.append(title, meta);
   button.addEventListener("click", () => setActiveBranch(project, button));
@@ -144,7 +156,7 @@ function setActiveBranch(project, sourceButton) {
   activeSummary.textContent = project.summary;
   activeSphere.textContent = project.sphere || "unknown";
   activeLocation.textContent = `${project.location?.mode || "hidden"} / ${project.location?.precision || "none"}`;
-  activeCuration.textContent = project.curation?.state || "unreviewed";
+  activeCuration.textContent = curationStateLabel(project);
   activeHandoff.innerHTML = "";
   const lock = document.createElement("span");
   lock.className = "handoff-lock";

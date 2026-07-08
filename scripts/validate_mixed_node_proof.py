@@ -288,11 +288,17 @@ def validate_proof(root: Path = ROOT) -> list[str]:
         return errors
 
     projects = load_projects(root)
-    if any(project.get("curation", {}).get("state") == "fixture" for project in projects):
+    curation_states = {project.get("curation", {}).get("state") for project in projects}
+    if "fixture" in curation_states:
         if "Synthetic fixture" not in js:
             errors.append("fixture projects must render the Synthetic fixture label")
         if ".node-badge" not in css:
             errors.append("fixture label must have node-badge CSS")
+    if any(state and state != "fixture" for state in curation_states):
+        if "Curation:" not in js:
+            errors.append("non-fixture projects must render a curation state badge")
+        if "curationBadgeLabel" not in js:
+            errors.append("mixed-node proof must use curationBadgeLabel")
 
     errors.extend(validate_token_coverage(projects, css, js))
 
