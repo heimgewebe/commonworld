@@ -78,8 +78,9 @@ function gradientFor(project) {
 
 function isMapRenderable(project) {
   const coordinates = project.location?.coordinates;
+  const mode = project.location?.mode;
   return (
-    project.location?.mode !== "hidden" &&
+    (mode === "exact" || mode === "approximate") &&
     Number.isFinite(coordinates?.lat) &&
     Number.isFinite(coordinates?.lon)
   );
@@ -352,7 +353,9 @@ async function initMap() {
       new maplibre.Marker({ element: createMapMarkerElement(project) }).setLngLat([lon, lat]).addTo(map);
     }
 
-    loadState.textContent = `Map ready. ${renderableProjects.length} location-safe node rendered. ${skippedProjects.length} hidden node skipped.`;
+    const renderedLabel = renderableProjects.length === 1 ? "node" : "nodes";
+    const skippedLabel = skippedProjects.length === 1 ? "project" : "projects";
+    loadState.textContent = `Map ready. ${renderableProjects.length} location-safe ${renderedLabel} rendered. ${skippedProjects.length} non-map ${skippedLabel} skipped.`;
   } catch (error) {
     loadState.textContent = error.message;
     loadState.dataset.error = "true";

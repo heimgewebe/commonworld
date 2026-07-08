@@ -99,6 +99,10 @@ body {
   white-space: nowrap;
 }
 
+.privacy-badge--approximate {
+  border-style: dashed;
+}
+
 .privacy-badge--exact {
   border-style: solid;
 }
