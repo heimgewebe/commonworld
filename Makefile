@@ -14,6 +14,7 @@ VALIDATE_TARGETS = \
 	validate-projection-contract \
 	validate-source-curation-policy \
 	validate-weltgewebe-handoff-contract \
+	validate-runtime-scale-boundary \
 	test
 
 validate: $(VALIDATE_TARGETS)
@@ -56,6 +57,9 @@ validate-source-curation-policy:
 
 validate-weltgewebe-handoff-contract:
 	python3 scripts/validate_weltgewebe_handoff_contract.py
+
+validate-runtime-scale-boundary:
+	python3 scripts/validate_runtime_scale_boundary.py
 
 test:
 	python3 -m unittest discover -s tests -p 'test_*.py'

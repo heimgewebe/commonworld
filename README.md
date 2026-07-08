@@ -58,3 +58,7 @@ commonworld does not operate a second tile infrastructure; it should consume a s
 ## weltgewebe handoff contract
 
 T008 is documented in `docs/blueprints/weltgewebe-handoff-contract.md`. The handoff is a read-only continuation link to an explicitly known weltgewebe project, not a join, manage, submit, decide or implicit-auth path.
+
+## Runtime and scale boundary
+
+T009 is documented in `docs/blueprints/runtime-scale-boundary.md`. Phase 7 stays plan-before-build: future API, search, spatial index, import candidate and review surfaces must remain read-only until their authority and privacy gates are explicit.
