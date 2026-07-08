@@ -52,6 +52,7 @@ Then open `http://localhost:4173/proofs/map/`.
 ## Map source strategy
 
 T004 is documented in `docs/blueprints/map-source-strategy.md`.
+T005 is implemented by `proofs/map/map-source.json`, which keeps proof-only MapLibre and CARTO details behind a single replaceable boundary.
 commonworld does not operate a second tile infrastructure; it should consume a shared heimgewebe basemap when production map sourcing is ready.
 
 ## weltgewebe handoff contract
