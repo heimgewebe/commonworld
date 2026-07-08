@@ -19,6 +19,7 @@ VALIDATE_TARGETS = \
 	validate-catalog-export-contract \
 	validate-catalog-api-contract \
 	validate-catalog-api-route-fixtures \
+	validate-search-index-input-contract \
 	test
 
 validate: $(VALIDATE_TARGETS)
@@ -78,6 +79,9 @@ validate-catalog-api-contract:
 validate-catalog-api-route-fixtures:
 	python3 scripts/generate_catalog_api_route_fixtures.py --check
 	python3 scripts/validate_catalog_api_route_fixtures.py
+
+validate-search-index-input-contract:
+	python3 scripts/validate_search_index_input_contract.py
 
 generate-catalog-export:
 	python3 scripts/generate_catalog_export.py

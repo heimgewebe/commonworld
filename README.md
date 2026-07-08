@@ -75,3 +75,7 @@ T012 is documented in `docs/blueprints/catalog-api-contract.md` and anchored by 
 ## Static catalog API route fixtures
 
 T013 is documented in `docs/blueprints/catalog-api-route-fixtures.md` and implemented by `scripts/generate_catalog_api_route_fixtures.py`. It generates `examples/commonworld/catalog-api-route-fixtures.sample.json`, a deterministic static fixture for the T012 read-only GET routes without introducing an API server, database, ingestion worker, submissions or write path.
+
+## Search index input contract
+
+T014 is documented in `docs/blueprints/search-index-input-contract.md` and anchored by `contracts/commonworld/search-index-input.contract.json`. It defines allowed future search input fields and deterministic rebuild policy without introducing a search service, vector database, crawler, ingestion worker, submissions or write path.
