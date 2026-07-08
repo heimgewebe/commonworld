@@ -20,10 +20,15 @@ class ProofCard:
     href: str
     role: str
     texts: list[str] = field(default_factory=list)
+    headings: list[str] = field(default_factory=list)
 
     @property
     def visible_text(self) -> str:
         return " ".join(text for text in self.texts if text)
+
+    @property
+    def heading_text(self) -> str:
+        return " ".join(text for text in self.headings if text)
 
 
 class ProofCardParser(HTMLParser):
@@ -32,8 +37,12 @@ class ProofCardParser(HTMLParser):
         self.cards: dict[str, ProofCard] = {}
         self.duplicates: set[str] = set()
         self.current_proof_id: str | None = None
+        self.in_heading = False
 
     def handle_starttag(self, tag: str, attrs: list[tuple[str, str | None]]) -> None:
+        if tag == "h2" and self.current_proof_id:
+            self.in_heading = True
+            return
         if tag != "a":
             return
         values = dict(attrs)
@@ -53,11 +62,17 @@ class ProofCardParser(HTMLParser):
             return
         text = " ".join(data.split())
         if text:
-            self.cards[self.current_proof_id].texts.append(text)
+            card = self.cards[self.current_proof_id]
+            card.texts.append(text)
+            if self.in_heading:
+                card.headings.append(text)
 
     def handle_endtag(self, tag: str) -> None:
+        if tag == "h2":
+            self.in_heading = False
         if tag == "a":
             self.current_proof_id = None
+            self.in_heading = False
 
 
 def extract_proof_cards(html: str) -> tuple[dict[str, ProofCard], set[str]]:
@@ -89,8 +104,11 @@ def validate_proof_hub(root: Path = ROOT) -> list[str]:
     errors.extend(registry_errors)
     surfaces = [] if registry_errors else load_proof_surfaces(root)
     proof_cards, duplicate_proof_links = extract_proof_cards(html)
+    registered_proof_ids = {surface["id"] for surface in surfaces}
     for duplicate_id in sorted(duplicate_proof_links):
         errors.append(f"proof hub duplicate data-proof-link: {duplicate_id}")
+    for extra_id in sorted(set(proof_cards) - registered_proof_ids):
+        errors.append(f"proof hub unregistered data-proof-link: {extra_id}")
     for surface in surfaces:
         proof_id = surface["id"]
         expected_href = surface["href"]
@@ -104,9 +122,11 @@ def validate_proof_hub(root: Path = ROOT) -> list[str]:
                 errors.append(f"proof hub href mismatch for {proof_id}: expected {expected_href}, got {card.href}")
             if card.role != expected_role:
                 errors.append(f"proof hub role mismatch for {proof_id}: expected {expected_role}, got {card.role}")
+            if card.heading_text != expected_title:
+                errors.append(
+                    f"proof hub heading mismatch for {proof_id}: expected {expected_title}, got {card.heading_text}"
+                )
             visible_text = card.visible_text
-            if expected_title not in visible_text:
-                errors.append(f"proof hub title mismatch for {proof_id}: expected visible title {expected_title}")
             if expected_role not in visible_text:
                 errors.append(f"proof hub visible role missing for {proof_id}: expected {expected_role}")
         target_index = root / surface["target_index"]

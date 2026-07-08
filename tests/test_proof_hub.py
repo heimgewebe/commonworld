@@ -47,6 +47,7 @@ class ProofHubTests(unittest.TestCase):
         self.assertEqual(set(), duplicates)
         self.assertEqual("./proofs/map/", cards["map"].href)
         self.assertEqual("render location-safe CommonProjects", cards["map"].role)
+        self.assertEqual("Map", cards["map"].heading_text)
         self.assertIn("Map", cards["map"].visible_text)
         self.assertIn("render location-safe CommonProjects", cards["map"].visible_text)
 
@@ -96,17 +97,36 @@ class ProofHubTests(unittest.TestCase):
             errors,
         )
 
-    def test_hub_rejects_missing_visible_surface_title(self) -> None:
+    def test_hub_rejects_heading_drift_even_when_title_appears_elsewhere(self) -> None:
         with tempfile.TemporaryDirectory() as tmp_dir:
             tmp_root = self.copy_valid_root(tmp_dir)
             html_path = tmp_root / "index.html"
             html = html_path.read_text(encoding="utf-8")
-            html = html.replace("<h2>Map</h2>", "<h2>Atlas surface</h2>", 1)
+            html = html.replace("<h2>Aether</h2>", "<h2>Digital surface</h2>", 1)
             html_path.write_text(html, encoding="utf-8")
 
             errors = validate_proof_hub(tmp_root)
 
-        self.assertIn("proof hub title mismatch for map: expected visible title Map", errors)
+        self.assertIn("proof hub heading mismatch for aether: expected Aether, got Digital surface", errors)
+
+    def test_hub_rejects_unregistered_proof_card(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp_dir:
+            tmp_root = self.copy_valid_root(tmp_dir)
+            html_path = tmp_root / "index.html"
+            html = html_path.read_text(encoding="utf-8")
+            anchor = '      <section class="trust-panel"'
+            extra_card = (
+                '<a class="proof-card" href="./proofs/extra/" '
+                'data-proof-link="extra" data-proof-role="extra">'
+                '<h2>Extra</h2><p>Role: extra</p></a>'
+            )
+            self.assertIn(anchor, html)
+            html = html.replace(anchor, f"        {extra_card}{anchor}", 1)
+            html_path.write_text(html, encoding="utf-8")
+
+            errors = validate_proof_hub(tmp_root)
+
+        self.assertIn("proof hub unregistered data-proof-link: extra", errors)
 
     def test_hub_rejects_duplicate_data_proof_link(self) -> None:
         with tempfile.TemporaryDirectory() as tmp_dir:
