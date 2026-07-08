@@ -1,0 +1,253 @@
+{
+  "schema_version": 1,
+  "kind": "commonworld.static_catalog_api_route_fixtures",
+  "task": "COMMONWORLD-ATLAS-V1-T013",
+  "status": "static-fixture-only",
+  "source_contract": "contracts/commonworld/catalog-api.contract.json",
+  "source_export": "examples/commonworld/catalog-export.sample.json",
+  "boundary": {
+    "implementation": "no API server",
+    "persistence": "no database",
+    "ingestion": "no ingestion worker",
+    "access": "public-read-only",
+    "write_behavior": "no writes, no submissions, no publication side effects",
+    "authority": "static route fixture only; generated catalog export and CommonProject files remain authoritative"
+  },
+  "fixtures": [
+    {
+      "id": "catalog-export",
+      "method": "GET",
+      "route_path_template": "/catalog/v1/catalog-export",
+      "request_path": "/catalog/v1/catalog-export",
+      "status": 200,
+      "access": "public-read-only",
+      "auth_required": false,
+      "writes": false,
+      "submissions": false,
+      "source": "generated static catalog export",
+      "response_shape": "commonworld.static_catalog_export",
+      "body": {
+        "schema_version": 1,
+        "kind": "commonworld.static_catalog_export",
+        "scope": "proof",
+        "source_manifest_path": "examples/commonworld/seed-projects.json",
+        "entries": [
+          {
+            "id": "neighborhood-repair-circle-fixture",
+            "project_path": "examples/commonworld/projects/neighborhood-repair-circle.fixture.json",
+            "curation_state": "fixture",
+            "location_mode": "approximate",
+            "profile_handoff_state": "locked"
+          },
+          {
+            "id": "openstreetmap",
+            "project_path": "examples/commonworld/projects/openstreetmap.json",
+            "curation_state": "candidate",
+            "location_mode": "hidden",
+            "profile_handoff_state": "locked"
+          },
+          {
+            "id": "osm-hamburg-hybrid-fixture",
+            "project_path": "examples/commonworld/projects/osm-hamburg-hybrid.fixture.json",
+            "curation_state": "fixture",
+            "location_mode": "approximate",
+            "profile_handoff_state": "locked"
+          },
+          {
+            "id": "solidarity-kitchen-fixture",
+            "project_path": "examples/commonworld/projects/solidarity-kitchen.fixture.json",
+            "curation_state": "fixture",
+            "location_mode": "exact",
+            "profile_handoff_state": "locked"
+          }
+        ],
+        "boundary": {
+          "access": "read-only",
+          "write_behavior": "no writes, no submissions, no publication side effects",
+          "authority": "derived projection only; CommonProject files remain the catalog claim source"
+        }
+      }
+    },
+    {
+      "id": "catalog-project-list",
+      "method": "GET",
+      "route_path_template": "/catalog/v1/projects",
+      "request_path": "/catalog/v1/projects",
+      "status": 200,
+      "access": "public-read-only",
+      "auth_required": false,
+      "writes": false,
+      "submissions": false,
+      "source": "generated static catalog export",
+      "response_shape": "project summary list",
+      "body": {
+        "schema_version": 1,
+        "kind": "commonworld.catalog_project_list",
+        "source_export_path": "examples/commonworld/catalog-export.sample.json",
+        "count": 4,
+        "projects": [
+          {
+            "id": "neighborhood-repair-circle-fixture",
+            "project_path": "examples/commonworld/projects/neighborhood-repair-circle.fixture.json",
+            "curation_state": "fixture",
+            "location_mode": "approximate",
+            "profile_handoff_state": "locked"
+          },
+          {
+            "id": "openstreetmap",
+            "project_path": "examples/commonworld/projects/openstreetmap.json",
+            "curation_state": "candidate",
+            "location_mode": "hidden",
+            "profile_handoff_state": "locked"
+          },
+          {
+            "id": "osm-hamburg-hybrid-fixture",
+            "project_path": "examples/commonworld/projects/osm-hamburg-hybrid.fixture.json",
+            "curation_state": "fixture",
+            "location_mode": "approximate",
+            "profile_handoff_state": "locked"
+          },
+          {
+            "id": "solidarity-kitchen-fixture",
+            "project_path": "examples/commonworld/projects/solidarity-kitchen.fixture.json",
+            "curation_state": "fixture",
+            "location_mode": "exact",
+            "profile_handoff_state": "locked"
+          }
+        ],
+        "boundary": {
+          "access": "public-read-only",
+          "write_behavior": "no writes, no submissions, no publication side effects"
+        }
+      }
+    },
+    {
+      "id": "catalog-project-detail",
+      "method": "GET",
+      "route_path_template": "/catalog/v1/projects/{project_id}",
+      "request_path": "/catalog/v1/projects/neighborhood-repair-circle-fixture",
+      "path_params": {
+        "project_id": "neighborhood-repair-circle-fixture"
+      },
+      "status": 200,
+      "access": "public-read-only",
+      "auth_required": false,
+      "writes": false,
+      "submissions": false,
+      "source": "accepted CommonProject data",
+      "response_shape": "CommonProject",
+      "body_source_project_path": "examples/commonworld/projects/neighborhood-repair-circle.fixture.json",
+      "body": {
+        "schema_version": 2,
+        "id": "neighborhood-repair-circle-fixture",
+        "title": "Neighborhood Repair Circle fixture",
+        "summary": "Synthetic local repair Commons fixture used to validate place-like projects, approximate locations and mixed aspect profiles.",
+        "sphere": "place",
+        "aspects": [
+          {
+            "id": "repair",
+            "label": "Repair",
+            "description": "People maintain and repair shared or private goods instead of replacing them.",
+            "color_token": "aspect.repair",
+            "icon_token": "icon.tool",
+            "weight": 0.5,
+            "confidence": 0.6,
+            "evidence": [
+              {
+                "type": "fixture",
+                "label": "Synthetic commonworld fixture",
+                "retrieved_at": "2026-07-05",
+                "note": "Not a public catalog claim."
+              }
+            ]
+          },
+          {
+            "id": "education",
+            "label": "Education",
+            "description": "Repair knowledge is shared through peer learning.",
+            "color_token": "aspect.education",
+            "icon_token": "icon.book-open",
+            "weight": 0.3,
+            "confidence": 0.55,
+            "evidence": [
+              {
+                "type": "fixture",
+                "label": "Synthetic commonworld fixture",
+                "retrieved_at": "2026-07-05"
+              }
+            ]
+          },
+          {
+            "id": "mutual-aid",
+            "label": "Mutual aid",
+            "description": "The project model represents practical help across a local community.",
+            "color_token": "aspect.mutual-aid",
+            "icon_token": "icon.hands",
+            "weight": 0.2,
+            "confidence": 0.5,
+            "evidence": [
+              {
+                "type": "fixture",
+                "label": "Synthetic commonworld fixture",
+                "retrieved_at": "2026-07-05"
+              }
+            ]
+          }
+        ],
+        "location": {
+          "mode": "approximate",
+          "label": "Hamburg, Germany; city-level synthetic fixture",
+          "precision": "city",
+          "coordinates": {
+            "lat": 53.55,
+            "lon": 10.0
+          },
+          "accuracy_meters_min": 5000,
+          "privacy_note": "Approximate city-level coordinate for validation only; not an exact venue."
+        },
+        "provenance": {
+          "sources": [
+            {
+              "type": "fixture",
+              "label": "Synthetic commonworld fixture",
+              "retrieved_at": "2026-07-05",
+              "note": "Created to validate location privacy and mixed-node aspect behavior."
+            }
+          ],
+          "summary": "Fixture entry; it must not be shown as a real public catalog item."
+        },
+        "curation": {
+          "state": "fixture",
+          "reviewed_by": "commonworld seed curator",
+          "reviewed_at": "2026-07-05",
+          "notes": "Synthetic test data for contract validation."
+        },
+        "links": [
+          {
+            "type": "documentation",
+            "label": "commonworld masterplan",
+            "url": "https://github.com/heimgewebe/commonworld/blob/main/docs/blueprints/commonworld-masterplan.md"
+          }
+        ],
+        "handoff": {
+          "enabled": false,
+          "requirements": [
+            "No handoff action because this is synthetic fixture data."
+          ]
+        },
+        "projections": {
+          "map": {
+            "appearance": "approximate-halo",
+            "location_claim": "approximate",
+            "note": "Local fixture appears on Karte only with deliberate city-level blur."
+          },
+          "profile": {
+            "mode": "focus-state",
+            "preserves_previous_projection": true,
+            "handoff_state": "locked"
+          }
+        }
+      }
+    }
+  ]
+}
