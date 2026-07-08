@@ -1,0 +1,104 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>commonworld static search proof</title>
+    <link rel="stylesheet" href="../mixed-node/mixed-node.css" />
+    <link rel="stylesheet" href="./search.css" />
+  </head>
+  <body>
+    <main class="search-shell">
+      <section class="search-intro" aria-labelledby="search-proof-title">
+        <p class="eyebrow">COMMONWORLD-ATLAS-V1-T016 · Static search proof</p>
+        <h1 id="search-proof-title">Search can be useful before it becomes runtime.</h1>
+        <p>
+          This static proof loads the generated search index input sample and filters it in the browser.
+          It does not create a search endpoint, search service, database, vector store, crawler, account system,
+          public submissions or weltgewebe write path.
+        </p>
+        <dl class="search-rules" aria-label="Search proof rules">
+          <div>
+            <dt>Input</dt>
+            <dd>Only T014 allowed fields from <code>search-index-input.sample.json</code>.</dd>
+          </div>
+          <div>
+            <dt>Runtime</dt>
+            <dd>No server, no database, no crawler and no API route.</dd>
+          </div>
+          <div>
+            <dt>Action</dt>
+            <dd>Project cards are read-only previews, not join, manage or submit actions.</dd>
+          </div>
+        </dl>
+        <p class="load-state" data-load-state aria-live="polite">Loading static search input…</p>
+      </section>
+
+      <section class="search-panel" aria-labelledby="search-controls-title">
+        <div class="search-controls">
+          <div>
+            <p class="eyebrow">Filter</p>
+            <h2 id="search-controls-title">Find catalog entries by public fields.</h2>
+          </div>
+          <label class="search-field">
+            <span>Search term</span>
+            <input
+              type="search"
+              data-search-query
+              autocomplete="off"
+              placeholder="Try repair, Hamburg, open data or fixture"
+              aria-describedby="search-result-count"
+            />
+          </label>
+          <div class="filter-row" aria-label="Search filters">
+            <label>
+              <span>Curation</span>
+              <select data-curation-filter>
+                <option value="all">All curation states</option>
+              </select>
+            </label>
+            <label>
+              <span>Location mode</span>
+              <select data-location-filter>
+                <option value="all">All location modes</option>
+              </select>
+            </label>
+            <button type="button" data-reset-search>Reset filters</button>
+          </div>
+          <p id="search-result-count" class="result-count" data-result-count>0 entries</p>
+        </div>
+
+        <div class="result-grid" data-result-grid aria-live="polite"></div>
+      </section>
+    </main>
+
+    <template data-result-template>
+      <article class="search-card">
+        <p class="card-kicker" data-card-kicker></p>
+        <h3 data-card-title></h3>
+        <p data-card-summary></p>
+        <div class="aspect-list" data-card-aspects></div>
+        <dl class="card-meta">
+          <div>
+            <dt>Curation</dt>
+            <dd data-card-curation></dd>
+          </div>
+          <div>
+            <dt>Location</dt>
+            <dd data-card-location></dd>
+          </div>
+          <div>
+            <dt>Handoff</dt>
+            <dd data-card-handoff></dd>
+          </div>
+          <div>
+            <dt>Source path</dt>
+            <dd><code data-card-path></code></dd>
+          </div>
+        </dl>
+      </article>
+    </template>
+
+    <script type="module" src="./search.js"></script>
+  </body>
+</html>

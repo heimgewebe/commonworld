@@ -11,7 +11,7 @@ from typing import Any
 ROOT = Path(__file__).resolve().parents[1]
 
 PROOF_SURFACES_PATH = "proofs/proof-surfaces.json"
-REQUIRED_SURFACE_IDS = ["project-profile", "map", "aether"]
+REQUIRED_SURFACE_IDS = ["project-profile", "map", "aether", "search"]
 
 
 def proof_surfaces_path(root: Path = ROOT) -> Path:
@@ -75,7 +75,7 @@ def validate_proof_surface_registry(root: Path = ROOT) -> list[str]:
             elif not (root / target_index).is_file():
                 errors.append(f"proof surface registry target missing for {surface_id}: {target_index}")
     if actual_ids != REQUIRED_SURFACE_IDS:
-        errors.append("proof surface registry must list project-profile, map and aether in hub order")
+        errors.append("proof surface registry must list project-profile, map, aether and search in hub order")
     return errors
 
 

@@ -21,6 +21,13 @@
       "href": "./proofs/aether/",
       "target_index": "proofs/aether/index.html",
       "role": "focus digital, hidden-location and hybrid Aether projections"
+    },
+    {
+      "id": "search",
+      "title": "Search",
+      "href": "./proofs/search/",
+      "target_index": "proofs/search/index.html",
+      "role": "filter static search index input"
     }
   ]
 }

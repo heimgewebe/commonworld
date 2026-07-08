@@ -23,7 +23,7 @@ class ProofSurfaceRegistryTests(unittest.TestCase):
         self.assertEqual([], validate_proof_surface_registry(ROOT))
 
     def test_load_proof_surfaces_reads_registered_surfaces(self) -> None:
-        self.assertEqual(["project-profile", "map", "aether"], [surface["id"] for surface in load_proof_surfaces(ROOT)])
+        self.assertEqual(["project-profile", "map", "aether", "search"], [surface["id"] for surface in load_proof_surfaces(ROOT)])
 
     def test_load_proof_surfaces_rejects_invalid_registry(self) -> None:
         with tempfile.TemporaryDirectory() as tmp_dir:
