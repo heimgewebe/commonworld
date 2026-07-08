@@ -45,10 +45,11 @@ class MapSourceStrategyTests(unittest.TestCase):
         self.assertIn("Tile cache operations", text)
         self.assertIn("A separate operational map service", text)
 
-    def test_strategy_requires_t005_config_followup(self) -> None:
+    def test_strategy_records_t005_static_config_implementation(self) -> None:
         text = (ROOT / "docs" / "blueprints" / "map-source-strategy.md").read_text(encoding="utf-8")
-        self.assertIn("T005 should introduce a small map source config", text)
+        self.assertIn("COMMONWORLD-ATLAS-V1-T005 is implemented by `proofs/map/map-source.json`", text)
         self.assertIn("single replaceable boundary", text)
+        self.assertIn("still avoids backend work, tile hosting, public write paths and weltgewebe handoff logic", text)
 
 
 if __name__ == "__main__":

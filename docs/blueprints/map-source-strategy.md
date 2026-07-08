@@ -2,6 +2,7 @@
 
 Status: accepted
 Task: COMMONWORLD-ATLAS-V1-T004
+Implementation marker: COMMONWORLD-ATLAS-V1-T005 is implemented by `proofs/map/map-source.json` for static proofs.
 Owner layer: commonworld atlas semantics, heimgewebe shared map infrastructure
 
 ## Decision
@@ -83,8 +84,8 @@ heimgewebe shared basemap service
   -> consumed by commonworld for public atlas discovery
 ```
 
-## Follow-up work
+## Implemented static proof config
 
-T005 should introduce a small map source config for static proofs. That config should keep the current proof working while moving hard-coded provider details behind a single replaceable boundary.
+T005 is implemented by `proofs/map/map-source.json` for static proofs. The config keeps the current proof working while moving provider details behind a single replaceable boundary.
 
-T005 must still avoid backend work, tile hosting, public write paths and weltgewebe handoff logic.
+The static proof config still avoids backend work, tile hosting, public write paths and weltgewebe handoff logic.

@@ -25,7 +25,9 @@ REQUIRED_PHRASES = (
     "failure mode copy",
     "Privacy projection remains independent from basemap choice",
     "weltgewebe remains the action, participation and administration layer",
-    "T005 should introduce a small map source config",
+    "COMMONWORLD-ATLAS-V1-T005 is implemented by `proofs/map/map-source.json`",
+    "single replaceable boundary",
+    "still avoids backend work, tile hosting, public write paths and weltgewebe handoff logic",
 )
 
 FORBIDDEN_PHRASES = (
