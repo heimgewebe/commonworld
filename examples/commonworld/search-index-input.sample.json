@@ -1,0 +1,116 @@
+{
+  "schema_version": 1,
+  "kind": "commonworld.static_search_index_input",
+  "task": "COMMONWORLD-ATLAS-V1-T015",
+  "status": "static-sample-only",
+  "scope": "proof",
+  "source_contract": "contracts/commonworld/search-index-input.contract.json",
+  "source_export": "examples/commonworld/catalog-export.sample.json",
+  "entry_count": 4,
+  "boundary": {
+    "implementation": "no search service",
+    "persistence": "no database or vector store",
+    "ingestion": "no crawler or live ingestion worker",
+    "access": "derived-read-only",
+    "write_behavior": "no writes, no submissions, no publication side effects",
+    "authority": "derived search input only; CommonProject files remain authoritative"
+  },
+  "entries": [
+    {
+      "id": "neighborhood-repair-circle-fixture",
+      "title": "Neighborhood Repair Circle fixture",
+      "summary": "Synthetic local repair Commons fixture used to validate place-like projects, approximate locations and mixed aspect profiles.",
+      "aspects": [
+        {
+          "id": "repair",
+          "label": "Repair"
+        },
+        {
+          "id": "education",
+          "label": "Education"
+        },
+        {
+          "id": "mutual-aid",
+          "label": "Mutual aid"
+        }
+      ],
+      "curation_state": "fixture",
+      "location_label": "Hamburg, Germany; city-level synthetic fixture",
+      "location_mode": "approximate",
+      "project_path": "examples/commonworld/projects/neighborhood-repair-circle.fixture.json",
+      "profile_handoff_state": "locked"
+    },
+    {
+      "id": "openstreetmap",
+      "title": "OpenStreetMap",
+      "summary": "Community-built open map data project used as shared geographic infrastructure for many public-interest and Commons-adjacent applications.",
+      "aspects": [
+        {
+          "id": "open-data",
+          "label": "Open data"
+        },
+        {
+          "id": "community-mapping",
+          "label": "Community mapping"
+        },
+        {
+          "id": "public-infrastructure",
+          "label": "Public infrastructure"
+        }
+      ],
+      "curation_state": "candidate",
+      "location_label": "Global digital project",
+      "location_mode": "hidden",
+      "project_path": "examples/commonworld/projects/openstreetmap.json",
+      "profile_handoff_state": "locked"
+    },
+    {
+      "id": "osm-hamburg-hybrid-fixture",
+      "title": "OSM Hamburg hybrid fixture",
+      "summary": "Synthetic hybrid Commons fixture representing a local OpenStreetMap community relation with digital mapping infrastructure.",
+      "aspects": [
+        {
+          "id": "open-data",
+          "label": "Open data"
+        },
+        {
+          "id": "community-mapping",
+          "label": "Community mapping"
+        },
+        {
+          "id": "public-infrastructure",
+          "label": "Public infrastructure"
+        }
+      ],
+      "curation_state": "fixture",
+      "location_label": "Hamburg, Germany; city-level synthetic hybrid fixture",
+      "location_mode": "approximate",
+      "project_path": "examples/commonworld/projects/osm-hamburg-hybrid.fixture.json",
+      "profile_handoff_state": "locked"
+    },
+    {
+      "id": "solidarity-kitchen-fixture",
+      "title": "Solidarity Kitchen fixture",
+      "summary": "Synthetic exact-place Commons fixture used to validate explicit venue-level map rendering without an approximate privacy halo.",
+      "aspects": [
+        {
+          "id": "mutual-aid",
+          "label": "Mutual aid"
+        },
+        {
+          "id": "community-care",
+          "label": "Community care"
+        },
+        {
+          "id": "learning",
+          "label": "Shared learning"
+        }
+      ],
+      "curation_state": "fixture",
+      "location_label": "Hamburg synthetic venue fixture",
+      "location_mode": "exact",
+      "project_path": "examples/commonworld/projects/solidarity-kitchen.fixture.json",
+      "profile_handoff_state": "locked"
+    }
+  ]
+}

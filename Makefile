@@ -1,4 +1,4 @@
-.PHONY: validate generate-catalog-export generate-catalog-api-route-fixtures $(VALIDATE_TARGETS)
+.PHONY: validate generate-catalog-export generate-catalog-api-route-fixtures generate-search-index-input $(VALIDATE_TARGETS)
 
 VALIDATE_TARGETS = \
 	validate-contracts \
@@ -20,6 +20,7 @@ VALIDATE_TARGETS = \
 	validate-catalog-api-contract \
 	validate-catalog-api-route-fixtures \
 	validate-search-index-input-contract \
+	validate-search-index-input \
 	test
 
 validate: $(VALIDATE_TARGETS)
@@ -83,11 +84,18 @@ validate-catalog-api-route-fixtures:
 validate-search-index-input-contract:
 	python3 scripts/validate_search_index_input_contract.py
 
+validate-search-index-input:
+	python3 scripts/generate_search_index_input.py --check
+	python3 scripts/validate_search_index_input.py
+
 generate-catalog-export:
 	python3 scripts/generate_catalog_export.py
 
 generate-catalog-api-route-fixtures:
 	python3 scripts/generate_catalog_api_route_fixtures.py
+
+generate-search-index-input:
+	python3 scripts/generate_search_index_input.py
 
 test:
 	python3 -m unittest discover -s tests -p 'test_*.py'
