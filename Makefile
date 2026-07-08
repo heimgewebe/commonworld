@@ -7,6 +7,7 @@ VALIDATE_TARGETS = \
 	validate-map-proof \
 	validate-map-source-strategy \
 	validate-aether-proof \
+	validate-proof-surfaces \
 	validate-proof-hub \
 	validate-mobile-atlas-shift \
 	validate-mobile-atlas-shift-doctrine \
@@ -33,6 +34,9 @@ validate-map-source-strategy:
 
 validate-aether-proof:
 	python3 scripts/validate_aether_proof.py
+
+validate-proof-surfaces:
+	python3 scripts/validate_proof_surfaces.py
 
 validate-proof-hub:
 	python3 scripts/validate_proof_hub.py
