@@ -13,6 +13,7 @@
     "sphere",
     "aspects",
     "location",
+    "projections",
     "provenance",
     "curation",
     "links"
@@ -20,7 +21,7 @@
   "properties": {
     "schema_version": {
       "type": "integer",
-      "const": 1
+      "const": 2
     },
     "id": {
       "type": "string",
@@ -70,6 +71,9 @@
     },
     "handoff": {
       "$ref": "#/$defs/handoff"
+    },
+    "projections": {
+      "$ref": "#/$defs/projections"
     }
   },
   "$defs": {
@@ -392,6 +396,130 @@
           }
         }
       ]
+    },
+    "projections": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "profile"
+      ],
+      "properties": {
+        "map": {
+          "$ref": "#/$defs/map_projection"
+        },
+        "aether": {
+          "$ref": "#/$defs/aether_projection"
+        },
+        "profile": {
+          "$ref": "#/$defs/profile_projection"
+        }
+      },
+      "anyOf": [
+        {
+          "required": [
+            "map"
+          ]
+        },
+        {
+          "required": [
+            "aether"
+          ]
+        }
+      ]
+    },
+    "map_projection": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "appearance",
+        "location_claim"
+      ],
+      "properties": {
+        "appearance": {
+          "type": "string",
+          "enum": [
+            "local-marker",
+            "approximate-halo",
+            "hybrid-code-pillar"
+          ]
+        },
+        "location_claim": {
+          "type": "string",
+          "enum": [
+            "exact",
+            "approximate"
+          ]
+        },
+        "note": {
+          "type": "string",
+          "maxLength": 300
+        }
+      }
+    },
+    "aether_projection": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "appearance",
+        "stream",
+        "ortssignal"
+      ],
+      "properties": {
+        "appearance": {
+          "type": "string",
+          "enum": [
+            "digital-card",
+            "hidden-location-card",
+            "hybrid-card"
+          ]
+        },
+        "stream": {
+          "type": "string",
+          "enum": [
+            "knowledge-data",
+            "infrastructure",
+            "education",
+            "culture",
+            "mutual-aid",
+            "repair"
+          ]
+        },
+        "ortssignal": {
+          "type": "boolean"
+        },
+        "note": {
+          "type": "string",
+          "maxLength": 300
+        }
+      }
+    },
+    "profile_projection": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "mode",
+        "preserves_previous_projection"
+      ],
+      "properties": {
+        "mode": {
+          "type": "string",
+          "const": "focus-state"
+        },
+        "preserves_previous_projection": {
+          "type": "boolean"
+        },
+        "handoff_state": {
+          "type": "string",
+          "enum": [
+            "locked",
+            "available"
+          ]
+        },
+        "note": {
+          "type": "string",
+          "maxLength": 300
+        }
+      }
     }
   }
 }

@@ -52,7 +52,7 @@ async function loadSeedProjects() {
 }
 
 function filterAetherProjects(projects) {
-  return projects.filter((project) => project.sphere === "digital" || project.location?.mode === "hidden");
+  return projects.filter((project) => project.projections?.aether);
 }
 
 function sortAetherProjects(projects) {
@@ -90,7 +90,9 @@ function renderBranchButton(project) {
   const title = document.createElement("strong");
   title.textContent = project.title;
   const meta = document.createElement("span");
-  meta.textContent = `${project.sphere || "unknown"} · ${project.location?.mode || "hidden"} / ${project.location?.precision || "none"}`;
+  const projection = project.projections?.aether;
+  const signal = projection?.ortssignal ? " · Ortssignal" : "";
+  meta.textContent = `${projection?.stream || "aether"}${signal} · ${project.sphere || "unknown"} / ${project.location?.mode || "hidden"}`;
 
   button.append(title, meta);
   button.addEventListener("click", () => setActiveBranch(project, button));
@@ -161,7 +163,7 @@ async function initAether() {
   branchButtons = projects.map(renderBranchButton);
   branchList.replaceChildren(...branchButtons);
   branchCount.textContent = `${projects.length} focus branch${projects.length === 1 ? "" : "es"}`;
-  loadState.textContent = `${projects.length} digital Commons branch${projects.length === 1 ? "" : "es"} loaded without map placement.`;
+  loadState.textContent = `${projects.length} Aether branch${projects.length === 1 ? "" : "es"} loaded from explicit aether projections without forced map placement.`;
   setActiveBranch(projects[0], branchButtons[0]);
 }
 
