@@ -12,6 +12,7 @@ from scripts.validate_mixed_node_proof import (
     validate_proof,
 )
 from scripts.validate_seed_manifest import expected_seed_paths, seed_manifest_path
+from scripts.proof_shared import SHARED_JS_REL
 
 
 class MixedNodeProofTests(unittest.TestCase):
@@ -129,21 +130,24 @@ class MixedNodeProofTests(unittest.TestCase):
         projects = load_projects(ROOT)
         self.assertTrue(any(project["curation"]["state"] == "fixture" for project in projects))
 
-        directory = proof_dir(ROOT)
-        js = (directory / "mixed-node.js").read_text(encoding="utf-8")
-        css = (directory / "mixed-node.css").read_text(encoding="utf-8")
-        self.assertIn("Synthetic fixture", js)
+        # The fixture label is produced by the shared curationBadgeLabel helper; the
+        # proof supplies the badge rendering surface (.node-badge) and the wiring.
+        shared_js = (ROOT / SHARED_JS_REL).read_text(encoding="utf-8")
+        js = (proof_dir(ROOT) / "mixed-node.js").read_text(encoding="utf-8")
+        css = (proof_dir(ROOT) / "mixed-node.css").read_text(encoding="utf-8")
+        self.assertIn("Synthetic fixture", shared_js)
+        self.assertIn("curationBadgeLabel", js)
         self.assertIn(".node-badge", css)
 
     def test_fixture_marker_is_required_when_fixture_seed_exists(self) -> None:
         with tempfile.TemporaryDirectory() as tmp_dir:
             tmp_root = self.copy_valid_root(tmp_dir)
-            js_path = proof_dir(tmp_root) / "mixed-node.js"
-            js_path.write_text(js_path.read_text(encoding="utf-8").replace("Synthetic fixture", "Synthetic sample"), encoding="utf-8")
+            shared_path = tmp_root / SHARED_JS_REL
+            shared_path.write_text(shared_path.read_text(encoding="utf-8").replace("Synthetic fixture", "Synthetic sample"), encoding="utf-8")
 
             errors = validate_proof(tmp_root)
 
-        self.assertIn("fixture projects must render the Synthetic fixture label", errors)
+        self.assertIn("shared curationStateLabel must render the Synthetic fixture label", errors)
 
     def test_token_coverage_requires_css_custom_properties(self) -> None:
         with tempfile.TemporaryDirectory() as tmp_dir:
@@ -168,24 +172,24 @@ class MixedNodeProofTests(unittest.TestCase):
     def test_token_coverage_requires_js_icon_mapping(self) -> None:
         with tempfile.TemporaryDirectory() as tmp_dir:
             tmp_root = self.copy_valid_root(tmp_dir)
-            js_path = proof_dir(tmp_root) / "mixed-node.js"
-            js_text = js_path.read_text(encoding="utf-8").replace("  \"icon.map\": \"⌖\",\n", "")
-            js_path.write_text(js_text, encoding="utf-8")
+            shared_path = tmp_root / SHARED_JS_REL
+            shared_text = shared_path.read_text(encoding="utf-8").replace("  \"icon.map\": \"⌖\",\n", "")
+            shared_path.write_text(shared_text, encoding="utf-8")
 
             errors = validate_proof(tmp_root)
 
-        self.assertIn("proof JS icon mapping missing icon.map", errors)
+        self.assertIn("shared aspect module ICON_GLYPHS missing icon.map", errors)
 
     def test_token_coverage_requires_exact_color_mapping_value(self) -> None:
         with tempfile.TemporaryDirectory() as tmp_dir:
             tmp_root = self.copy_valid_root(tmp_dir)
-            js_path = proof_dir(tmp_root) / "mixed-node.js"
-            js_text = js_path.read_text(encoding="utf-8").replace("\"aspect.data\": \"var(--aspect-data)\"", "\"aspect.data\": \"var(--aspect-repair)\"")
-            js_path.write_text(js_text, encoding="utf-8")
+            shared_path = tmp_root / SHARED_JS_REL
+            shared_text = shared_path.read_text(encoding="utf-8").replace("\"aspect.data\": \"var(--aspect-data)\"", "\"aspect.data\": \"var(--aspect-repair)\"")
+            shared_path.write_text(shared_text, encoding="utf-8")
 
             errors = validate_proof(tmp_root)
 
-        self.assertTrue(any("proof JS color mapping" in error and "aspect.data" in error for error in errors))
+        self.assertIn("shared aspect module ASPECT_COLORS missing aspect.data", errors)
 
 
 if __name__ == "__main__":

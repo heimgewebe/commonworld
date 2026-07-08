@@ -1,23 +1,17 @@
-const SEED_MANIFEST_URL = new URL("../../examples/commonworld/seed-projects.json", import.meta.url);
+import {
+  aspectColor,
+  buildSegments,
+  curationBadgeLabel,
+  curationStateLabel,
+  formatConfidence,
+  formatPercent,
+  gradientFor,
+  iconFor,
+  loadJson,
+  loadSeedProjects,
+} from "../shared/aspects.js";
+
 const MAP_SOURCE_URL = new URL("./map-source.json", import.meta.url);
-
-const ASPECT_COLORS = {
-  "aspect.data": "var(--aspect-data)",
-  "aspect.community": "var(--aspect-community)",
-  "aspect.infrastructure": "var(--aspect-infrastructure)",
-  "aspect.repair": "var(--aspect-repair)",
-  "aspect.education": "var(--aspect-education)",
-  "aspect.mutual-aid": "var(--aspect-mutual-aid)",
-};
-
-const ICON_GLYPHS = {
-  "icon.map": "⌖",
-  "icon.people": "◌",
-  "icon.layers": "▣",
-  "icon.tool": "⚒",
-  "icon.book-open": "◇",
-  "icon.hands": "∞",
-};
 
 const loadState = requiredElement("[data-load-state]");
 const detailSurface = requiredElement("[data-detail-surface]");
@@ -34,48 +28,6 @@ function requiredElement(selector) {
   return element;
 }
 
-function sortAspects(aspects) {
-  return [...aspects].sort((left, right) => {
-    const byWeight = right.weight - left.weight;
-    if (byWeight !== 0) return byWeight;
-    const byLabel = left.label.localeCompare(right.label, "en", { sensitivity: "base" });
-    if (byLabel !== 0) return byLabel;
-    return left.id.localeCompare(right.id, "en", { sensitivity: "base" });
-  });
-}
-
-function buildSegments(project) {
-  const ordered = sortAspects(project.aspects);
-  let cursor = 0;
-  return ordered.map((aspect, index) => {
-    const start = cursor;
-    const end = index === ordered.length - 1 ? 1 : cursor + aspect.weight;
-    cursor = end;
-    return { aspect, start, end, span: end - start };
-  });
-}
-
-function aspectColor(aspect) {
-  return ASPECT_COLORS[aspect.color_token] || "var(--line)";
-}
-
-function iconFor(aspect) {
-  return ICON_GLYPHS[aspect.icon_token] || aspect.icon_token;
-}
-
-function formatPercent(value) {
-  const percent = value * 100;
-  if (percent > 0 && percent < 1) return "<1%";
-  if (percent < 10 && !Number.isInteger(percent)) return `${percent.toFixed(1)}%`;
-  return `${Math.round(percent)}%`;
-}
-
-function gradientFor(project) {
-  return `conic-gradient(${buildSegments(project)
-    .map(({ aspect, start, end }) => `${aspectColor(aspect)} ${start}turn ${end}turn`)
-    .join(", ")})`;
-}
-
 function isMapRenderable(project) {
   const coordinates = project.location?.coordinates;
   const mode = project.location?.mode;
@@ -90,26 +42,6 @@ function privacyLabel(project) {
   if (project.location.mode === "approximate") return "Approximate location";
   if (project.location.mode === "exact") return "Exact location";
   return "Hidden location";
-}
-
-function curationStateLabel(project) {
-  const state = project.curation?.state || "unreviewed";
-  if (state === "fixture") return "Synthetic fixture";
-  return state;
-}
-
-function curationBadgeLabel(project) {
-  const state = curationStateLabel(project);
-  if (state === "Synthetic fixture") return state;
-  return `Curation: ${state}`;
-}
-
-async function loadJson(url) {
-  const response = await fetch(url);
-  if (!response.ok) {
-    throw new Error(`Could not load ${url}: ${response.status}`);
-  }
-  return response.json();
 }
 
 function requireString(value, message) {
@@ -201,16 +133,6 @@ async function ensureMapLibre(mapSource) {
   return maplibre;
 }
 
-async function loadSeedProjects() {
-  const manifest = await loadJson(SEED_MANIFEST_URL);
-  if (!Array.isArray(manifest.project_paths)) {
-    throw new Error("Seed manifest must contain project_paths.");
-  }
-  return Promise.all(
-    manifest.project_paths.map((projectPath) => loadJson(new URL(projectPath, SEED_MANIFEST_URL))),
-  );
-}
-
 function renderEvidence(aspect) {
   const list = document.createElement("ul");
   list.className = "evidence-list";
@@ -243,7 +165,7 @@ function renderAspectCard(segment) {
 
   const confidence = document.createElement("span");
   confidence.className = "confidence";
-  confidence.textContent = `${formatPercent(aspect.confidence)} confidence`;
+  confidence.textContent = formatConfidence(aspect.confidence);
   heading.append(confidence);
 
   const description = document.createElement("p");

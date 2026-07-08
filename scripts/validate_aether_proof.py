@@ -7,6 +7,7 @@ ROOT = Path(__file__).resolve().parents[1]
 if str(ROOT) not in sys.path:
     sys.path.insert(0, str(ROOT))
 from scripts.validate_contracts import iter_project_examples, validate_all
+from scripts.proof_shared import assert_shared_imports, validate_shared_module
 import json
 
 def load_json(path: Path) -> Any:
@@ -62,7 +63,7 @@ def validate_proof_surface(html: str, css: str, js: str, readme: str) -> list[st
     errors: list[str] = []
     html_tokens = ('Focused Aether Commons proof','data-breadcrumb','data-aether-list','data-aether-count','data-active-branch','data-active-handoff','one active branch','no hairball','no map route','weltgewebe write path')
     css_tokens = ('.aether-shell','.aether-breadcrumb','.branch-rail','.active-branch','.aether-card','.evidence-pill','.handoff-lock')
-    js_tokens = ('SEED_MANIFEST_URL','../../examples/commonworld/seed-projects.json','filterAetherProjects','projections?.aether','Ortssignal','curationStateLabel','curationBadgeLabel','Curation:','sortAetherProjects','setActiveBranch','aria-current','aria-expanded','handoffLabel','Locked until weltgewebe project identity exists','renderSources')
+    js_tokens = ('filterAetherProjects','projections?.aether','Ortssignal','curationStateLabel','curationBadgeLabel','sortAetherProjects','setActiveBranch','aria-current','aria-expanded','handoffLabel','Locked until weltgewebe project identity exists','renderSources')
     for token in html_tokens:
         if token not in html:
             errors.append(f'aether proof HTML missing {token}')
@@ -94,6 +95,21 @@ def validate_aether_proof(root: Path = ROOT) -> list[str]:
     js = (directory / 'aether.js').read_text(encoding='utf-8')
     readme = (directory / 'README.md').read_text(encoding='utf-8')
     errors.extend(validate_proof_surface(html, css, js, readme))
+    errors.extend(validate_shared_module(root))
+    errors.extend(
+        assert_shared_imports(
+            js,
+            (
+                'curationBadgeLabel',
+                'curationStateLabel',
+                'formatConfidence',
+                'formatPercent',
+                'iconFor',
+                'loadSeedProjects',
+            ),
+            'aether proof JS',
+        )
+    )
     errors.extend(validate_aether_projection(load_projects(root)))
     return errors
 

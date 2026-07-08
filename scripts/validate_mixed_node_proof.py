@@ -16,6 +16,12 @@ if str(ROOT) not in sys.path:
 
 from scripts.validate_contracts import iter_project_examples, validate_all
 from scripts.validate_seed_manifest import expected_seed_paths, seed_manifest_path, validate_seed_manifest
+from scripts.proof_shared import (
+    assert_shared_imports,
+    extract_const_object_block,
+    read_shared_js,
+    validate_shared_module,
+)
 
 WEIGHT_TOLERANCE = 0.001
 
@@ -100,28 +106,10 @@ def _contains_css_custom_property(css: str, variable: str) -> bool:
     return re.search(rf"(?m)^\s*{re.escape(variable)}\s*:", css) is not None
 
 
-def _extract_const_object_block(source: str, declaration: str) -> str:
-    start = source.find(declaration)
-    if start < 0:
-        return ""
-    brace_start = source.find("{", start)
-    if brace_start < 0:
-        return ""
-    depth = 0
-    for index, character in enumerate(source[brace_start:], start=brace_start):
-        if character == "{":
-            depth += 1
-        elif character == "}":
-            depth -= 1
-            if depth == 0:
-                return source[brace_start : index + 1]
-    return ""
-
-
-def validate_token_coverage(projects: list[dict[str, Any]], css: str, js: str) -> list[str]:
+def validate_token_coverage(projects: list[dict[str, Any]], css: str, shared_js: str) -> list[str]:
     errors: list[str] = []
-    color_mapping = _extract_const_object_block(js, "const ASPECT_COLORS")
-    icon_mapping = _extract_const_object_block(js, "const ICON_GLYPHS")
+    color_mapping = extract_const_object_block(shared_js, "export const ASPECT_COLORS")
+    icon_mapping = extract_const_object_block(shared_js, "export const ICON_GLYPHS")
     seen_color_tokens: set[str] = set()
     seen_icon_tokens: set[str] = set()
 
@@ -193,6 +181,9 @@ def validate_proof(root: Path = ROOT) -> list[str]:
 
     errors.extend(validate_seed_manifest(root))
 
+    errors.extend(validate_shared_module(root))
+    shared_js = read_shared_js(root)
+
     directory = proof_dir(root)
     html = (directory / "index.html").read_text(encoding="utf-8")
     css = (directory / "mixed-node.css").read_text(encoding="utf-8")
@@ -207,19 +198,30 @@ def validate_proof(root: Path = ROOT) -> list[str]:
     if "prefers-reduced-motion" not in css:
         errors.append("proof CSS must include prefers-reduced-motion")
 
+    # Shared aspect/seed logic lives in proofs/shared/aspects.js; assert the proof
+    # is wired to it rather than restating each function body as a literal.
+    errors.extend(
+        assert_shared_imports(
+            js,
+            (
+                "aspectColor",
+                "buildSegments",
+                "curationBadgeLabel",
+                "formatConfidence",
+                "formatPercent",
+                "gradientFor",
+                "iconFor",
+                "loadSeedProjects",
+            ),
+            "mixed-node proof JS",
+        )
+    )
+
     required_js_names = (
-        "SEED_MANIFEST_URL",
-        "ASPECT_COLORS",
-        "ICON_GLYPHS",
         "requiredElement",
-        "sortAspects",
-        "buildSegments",
         "renderEvidence",
-        "formatPercent",
-        "formatConfidence",
         "setExpandedButton",
         "closeDetail",
-        "loadSeedProjects",
     )
     for required_js_name in required_js_names:
         if required_js_name not in js:
@@ -251,19 +253,16 @@ def validate_proof(root: Path = ROOT) -> list[str]:
         return errors
 
     projects = load_projects(root)
+    # Curation labels are produced by the shared curationBadgeLabel helper (import
+    # asserted above, label text asserted in validate_shared_module). Here we only
+    # check the proof-specific rendering surface for the badge.
     curation_states = {project.get("curation", {}).get("state") for project in projects}
-    if "fixture" in curation_states:
-        if "Synthetic fixture" not in js:
-            errors.append("fixture projects must render the Synthetic fixture label")
-        if ".node-badge" not in css:
-            errors.append("fixture label must have node-badge CSS")
-    if any(state and state != "fixture" for state in curation_states):
-        if "Curation:" not in js:
-            errors.append("non-fixture projects must render a curation state badge")
-        if "curationBadgeLabel" not in js:
-            errors.append("mixed-node proof must use curationBadgeLabel")
+    if "fixture" in curation_states and ".node-badge" not in css:
+        errors.append("fixture label must have node-badge CSS")
+    if "curationBadgeLabel" not in js:
+        errors.append("mixed-node proof must render curation badges via curationBadgeLabel")
 
-    errors.extend(validate_token_coverage(projects, css, js))
+    errors.extend(validate_token_coverage(projects, css, shared_js))
 
     for project in projects:
         try:

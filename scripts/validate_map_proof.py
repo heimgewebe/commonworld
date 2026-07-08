@@ -14,6 +14,7 @@ if str(ROOT) not in sys.path:
 
 from scripts.validate_contracts import iter_project_examples, validate_all
 from scripts.validate_mixed_node_proof import load_json
+from scripts.proof_shared import assert_shared_imports, validate_shared_module
 
 
 @dataclass(frozen=True)
@@ -172,8 +173,6 @@ def validate_scope_text(readme: str, html: str, js: str, css: str) -> list[str]:
         errors.append("map proof CSS missing .privacy-badge--approximate")
     if "privacy-badge--exact" not in css:
         errors.append("map proof CSS missing .privacy-badge--exact")
-    if "Seed manifest must contain project_paths." not in js:
-        errors.append("map proof JS must validate the seed manifest project_paths list")
 
     return errors
 
@@ -243,8 +242,6 @@ def validate_map_proof(root: Path = ROOT) -> list[str]:
         "ensureMapLibre",
         "window.maplibregl",
         "MapLibre did not load from the configured source.",
-        "SEED_MANIFEST_URL",
-        "../../examples/commonworld/seed-projects.json",
         "isMapRenderable",
         '(mode === "exact" || mode === "approximate")',
         "approximate-halo",
@@ -272,6 +269,25 @@ def validate_map_proof(root: Path = ROOT) -> list[str]:
         if fragment in js:
             errors.append(f"map proof JS must not hard-code provider detail {fragment}; use map-source.json")
 
+    errors.extend(validate_shared_module(root))
+    errors.extend(
+        assert_shared_imports(
+            js,
+            (
+                "aspectColor",
+                "buildSegments",
+                "curationBadgeLabel",
+                "curationStateLabel",
+                "formatConfidence",
+                "formatPercent",
+                "gradientFor",
+                "iconFor",
+                "loadJson",
+                "loadSeedProjects",
+            ),
+            "map proof JS",
+        )
+    )
     errors.extend(validate_map_source_config(root))
     errors.extend(validate_scope_text(readme, html, js, css))
     errors.extend(validate_map_projection(load_projects(root)))

@@ -1,13 +1,11 @@
-const SEED_MANIFEST_URL = new URL("../../examples/commonworld/seed-projects.json", import.meta.url);
-
-const ICON_GLYPHS = {
-  "icon.map": "⌖",
-  "icon.people": "◌",
-  "icon.layers": "▣",
-  "icon.tool": "⚒",
-  "icon.book-open": "◇",
-  "icon.hands": "∞",
-};
+import {
+  curationBadgeLabel,
+  curationStateLabel,
+  formatConfidence,
+  formatPercent,
+  iconFor,
+  loadSeedProjects,
+} from "../shared/aspects.js";
 
 function requiredElement(selector) {
   const element = document.querySelector(selector);
@@ -33,50 +31,12 @@ const activeSources = requiredElement("[data-active-sources]");
 let activeBranchButton = null;
 let branchButtons = [];
 
-async function loadJson(url) {
-  const response = await fetch(url);
-  if (!response.ok) {
-    throw new Error(`Could not load ${url}: ${response.status}`);
-  }
-  return response.json();
-}
-
-async function loadSeedProjects() {
-  const manifest = await loadJson(SEED_MANIFEST_URL);
-  if (!Array.isArray(manifest.project_paths)) {
-    throw new Error("Seed manifest must contain project_paths.");
-  }
-  return Promise.all(
-    manifest.project_paths.map((projectPath) => loadJson(new URL(projectPath, SEED_MANIFEST_URL))),
-  );
-}
-
 function filterAetherProjects(projects) {
   return projects.filter((project) => project.projections?.aether);
 }
 
 function sortAetherProjects(projects) {
   return [...projects].sort((left, right) => left.title.localeCompare(right.title, "en", { sensitivity: "base" }));
-}
-
-function curationStateLabel(project) {
-  const state = project.curation?.state || "unreviewed";
-  if (state === "fixture") return "Synthetic fixture";
-  return state;
-}
-
-function curationBadgeLabel(project) {
-  const state = curationStateLabel(project);
-  if (state === "Synthetic fixture") return state;
-  return `Curation: ${state}`;
-}
-
-function iconFor(aspect) {
-  return ICON_GLYPHS[aspect.icon_token] || aspect.icon_token;
-}
-
-function formatPercent(value) {
-  return `${Math.round(value * 100)}%`;
 }
 
 function setActiveButton(nextButton) {
@@ -126,7 +86,7 @@ function renderAspectCard(aspect) {
 
   const confidence = document.createElement("span");
   confidence.className = "confidence";
-  confidence.textContent = `${formatPercent(aspect.confidence)} confidence`;
+  confidence.textContent = formatConfidence(aspect.confidence);
   heading.append(confidence);
 
   const description = document.createElement("p");
