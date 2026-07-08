@@ -5,6 +5,7 @@ from pathlib import Path
 
 from scripts.validate_contracts import ROOT
 from scripts.validate_proof_hub import (
+    extract_proof_cards,
     extract_proof_links,
     validate_proof_hub,
 )
@@ -28,6 +29,8 @@ class ProofHubTests(unittest.TestCase):
             with self.subTest(proof_id=surface["id"]):
                 self.assertIn(f'data-proof-link="{surface["id"]}"', html)
                 self.assertIn(f'href="{surface["href"]}"', html)
+                self.assertIn(f'data-proof-role="{surface["role"]}"', html)
+                self.assertIn(f'Role: {surface["role"]}', html)
 
     def test_extract_proof_links_pairs_data_proof_link_and_href(self) -> None:
         html = '<a data-proof-link="map" href="./proofs/map/"></a>'
@@ -35,17 +38,75 @@ class ProofHubTests(unittest.TestCase):
         self.assertEqual({"map": "./proofs/map/"}, links)
         self.assertEqual(set(), duplicates)
 
+    def test_extract_proof_cards_reads_href_role_and_visible_text(self) -> None:
+        html = (
+            '<a data-proof-link="map" data-proof-role="render location-safe CommonProjects" href="./proofs/map/">'
+            '<h2>Map</h2><p>Role: render location-safe CommonProjects</p></a>'
+        )
+        cards, duplicates = extract_proof_cards(html)
+        self.assertEqual(set(), duplicates)
+        self.assertEqual("./proofs/map/", cards["map"].href)
+        self.assertEqual("render location-safe CommonProjects", cards["map"].role)
+        self.assertIn("Map", cards["map"].visible_text)
+        self.assertIn("render location-safe CommonProjects", cards["map"].visible_text)
+
     def test_hub_rejects_swapped_surface_hrefs(self) -> None:
         with tempfile.TemporaryDirectory() as tmp_dir:
             tmp_root = self.copy_valid_root(tmp_dir)
             html_path = tmp_root / "index.html"
             html = html_path.read_text(encoding="utf-8")
-            html = html.replace('href="./proofs/map/" data-proof-link="map"', 'href="./proofs/aether/" data-proof-link="map"')
+            html = html.replace('href="./proofs/map/"', 'href="./proofs/aether/"', 1)
             html_path.write_text(html, encoding="utf-8")
 
             errors = validate_proof_hub(tmp_root)
 
         self.assertIn("proof hub href mismatch for map: expected ./proofs/map/, got ./proofs/aether/", errors)
+
+    def test_hub_rejects_swapped_surface_roles(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp_dir:
+            tmp_root = self.copy_valid_root(tmp_dir)
+            html_path = tmp_root / "index.html"
+            html = html_path.read_text(encoding="utf-8")
+            html = html.replace(
+                'data-proof-role="render location-safe CommonProjects"',
+                'data-proof-role="focus digital, hidden-location and hybrid Aether projections"',
+                1,
+            )
+            html_path.write_text(html, encoding="utf-8")
+
+            errors = validate_proof_hub(tmp_root)
+
+        self.assertIn(
+            "proof hub role mismatch for map: expected render location-safe CommonProjects, got focus digital, hidden-location and hybrid Aether projections",
+            errors,
+        )
+
+    def test_hub_rejects_missing_visible_surface_role(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp_dir:
+            tmp_root = self.copy_valid_root(tmp_dir)
+            html_path = tmp_root / "index.html"
+            html = html_path.read_text(encoding="utf-8")
+            html = html.replace("Role: render location-safe CommonProjects", "Registry-backed surface", 1)
+            html_path.write_text(html, encoding="utf-8")
+
+            errors = validate_proof_hub(tmp_root)
+
+        self.assertIn(
+            "proof hub visible role missing for map: expected render location-safe CommonProjects",
+            errors,
+        )
+
+    def test_hub_rejects_missing_visible_surface_title(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp_dir:
+            tmp_root = self.copy_valid_root(tmp_dir)
+            html_path = tmp_root / "index.html"
+            html = html_path.read_text(encoding="utf-8")
+            html = html.replace("<h2>Map</h2>", "<h2>Atlas surface</h2>", 1)
+            html_path.write_text(html, encoding="utf-8")
+
+            errors = validate_proof_hub(tmp_root)
+
+        self.assertIn("proof hub title mismatch for map: expected visible title Map", errors)
 
     def test_hub_rejects_duplicate_data_proof_link(self) -> None:
         with tempfile.TemporaryDirectory() as tmp_dir:

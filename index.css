@@ -113,6 +113,14 @@ h1 {
   font-size: clamp(1.5rem, 5vw, 2.6rem);
 }
 
+.proof-role {
+  color: var(--text);
+  font-size: 0.82rem;
+  font-weight: 800;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
 .proof-card span {
   align-self: end;
   color: var(--text);
