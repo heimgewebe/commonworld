@@ -45,6 +45,22 @@ class CatalogExportContractTests(unittest.TestCase):
             errors,
         )
 
+
+    def test_source_manifest_paths_must_stay_inside_projects_dir(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp_dir:
+            tmp_root = self.copy_contract_surface(tmp_dir)
+            path = tmp_root / "examples" / "commonworld" / "seed-projects.json"
+            manifest = json.loads(path.read_text(encoding="utf-8"))
+            manifest["project_paths"] = ["../catalog-export.sample.json"]
+            path.write_text(json.dumps(manifest, indent=2) + "\n", encoding="utf-8")
+
+            errors = validate_catalog_export_contract(tmp_root)
+
+        self.assertIn(
+            "catalog export source manifest project_paths entries must stay inside examples/commonworld/projects",
+            errors,
+        )
+
     def test_public_scope_requires_curated_entries(self) -> None:
         with tempfile.TemporaryDirectory() as tmp_dir:
             tmp_root = self.copy_contract_surface(tmp_dir)

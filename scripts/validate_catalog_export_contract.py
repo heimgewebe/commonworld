@@ -60,10 +60,27 @@ def project_entry_for(path: Path, root: Path) -> dict[str, str]:
     }
 
 
-def expected_entries_from_seed_manifest(root: Path = ROOT) -> list[dict[str, str]]:
+def expected_entries_from_seed_manifest(root: Path = ROOT) -> tuple[list[dict[str, str]], list[str]]:
+    errors: list[str] = []
     manifest = load_json(root / SEED_MANIFEST_PATH.relative_to(ROOT))
-    manifest_dir = root / "examples" / "commonworld"
-    return [project_entry_for((manifest_dir / project_path).resolve(), root) for project_path in manifest["project_paths"]]
+    manifest_dir = (root / "examples" / "commonworld").resolve()
+    projects_dir = (manifest_dir / "projects").resolve()
+    entries: list[dict[str, str]] = []
+    for project_path in manifest.get("project_paths", []):
+        if not isinstance(project_path, str):
+            errors.append("catalog export source manifest project_paths entries must be strings")
+            continue
+        candidate = (manifest_dir / project_path).resolve()
+        try:
+            candidate.relative_to(projects_dir)
+        except ValueError:
+            errors.append("catalog export source manifest project_paths entries must stay inside examples/commonworld/projects")
+            continue
+        if not candidate.is_file():
+            errors.append(f"catalog export source manifest references missing project file: {project_path}")
+            continue
+        entries.append(project_entry_for(candidate, root.resolve()))
+    return entries, errors
 
 
 def validate_catalog_export_contract(root: Path = ROOT) -> list[str]:
@@ -100,8 +117,9 @@ def validate_catalog_export_contract(root: Path = ROOT) -> list[str]:
     if sample.get("source_manifest_path") != "examples/commonworld/seed-projects.json":
         errors.append("catalog export sample must point at examples/commonworld/seed-projects.json")
 
-    expected_entries = expected_entries_from_seed_manifest(root)
-    if sample.get("entries") != expected_entries:
+    expected_entries, manifest_errors = expected_entries_from_seed_manifest(root)
+    errors.extend(manifest_errors)
+    if not manifest_errors and sample.get("entries") != expected_entries:
         errors.append("catalog export sample entries must deterministically mirror seed manifest project order and public metadata")
 
     boundary = sample.get("boundary", {})
