@@ -172,7 +172,7 @@ def semantic_errors(project: dict[str, Any]) -> list[str]:
         if not handoff.get("url"):
             errors.append("handoff actions require explicit weltgewebe URL")
         action_label = handoff.get("action_label", "").casefold()
-        forbidden_action_terms = ("join", "manage", "decide", "administer", "submit")
+        forbidden_action_terms = ("join", "manage", "decide", "administer", "submit", "coordinate")
         if any(term in action_label for term in forbidden_action_terms):
             errors.append("handoff action_label must stay neutral until authorization is modeled")
     if curation_state == "archived" and handoff and handoff.get("enabled") is True:

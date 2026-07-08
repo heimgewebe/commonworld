@@ -40,6 +40,7 @@ def validate_weltgewebe_handoff_contract(root: Path = ROOT) -> list[str]:
         "Fixture and candidate entries must not expose enabled handoffs",
         "Handoff labels must stay neutral until authorization is modeled",
         "join",
+        "coordinate",
         "manage",
         "decide",
         "administer",

@@ -52,7 +52,7 @@ An enabled handoff must be explicit:
 - Archived entries must not expose enabled handoffs.
 - Fixture and candidate entries must not expose enabled handoffs.
 - Handoff labels must stay neutral until authorization is modeled.
-- Forbidden neutral-label breakouts include `join`, `manage`, `decide`, `administer` and `submit`.
+- Forbidden neutral-label breakouts include `join`, `coordinate`, `manage`, `decide`, `administer` and `submit`.
 
 ## Auth and responsibility boundary
 

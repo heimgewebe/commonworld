@@ -141,37 +141,39 @@ class CommonProjectContractTests(unittest.TestCase):
         )
 
     def test_enabled_handoff_label_must_stay_neutral(self) -> None:
-        project = copy.deepcopy(project_examples_by_id()["openstreetmap"])
-        project["curation"] = {
-            "state": "curated",
-            "reviewed_by": "commonworld-review",
-            "reviewed_at": "2026-07-08",
-        }
-        project["provenance"]["sources"] = [
-            {
-                "type": "official-source",
-                "label": "OpenStreetMap",
-                "url": "https://www.openstreetmap.org/",
-                "retrieved_at": "2026-07-08",
-            },
-            {
-                "type": "public-registry",
-                "label": "Wikidata",
-                "url": "https://www.wikidata.org/wiki/Q936",
-                "retrieved_at": "2026-07-08",
-            },
-        ]
-        project["handoff"] = {
-            "enabled": True,
-            "system": "weltgewebe",
-            "project_id": "openstreetmap",
-            "action_label": "Join in weltgewebe",
-            "url": "https://example.org/weltgewebe/projects/openstreetmap",
-        }
-        self.assertIn(
-            "handoff action_label must stay neutral until authorization is modeled",
-            self.validate_example(project),
-        )
+        for action_label in ("Join in weltgewebe", "Coordinate in weltgewebe"):
+            with self.subTest(action_label=action_label):
+                project = copy.deepcopy(project_examples_by_id()["openstreetmap"])
+                project["curation"] = {
+                    "state": "curated",
+                    "reviewed_by": "commonworld-review",
+                    "reviewed_at": "2026-07-08",
+                }
+                project["provenance"]["sources"] = [
+                    {
+                        "type": "official-source",
+                        "label": "OpenStreetMap",
+                        "url": "https://www.openstreetmap.org/",
+                        "retrieved_at": "2026-07-08",
+                    },
+                    {
+                        "type": "public-registry",
+                        "label": "Wikidata",
+                        "url": "https://www.wikidata.org/wiki/Q936",
+                        "retrieved_at": "2026-07-08",
+                    },
+                ]
+                project["handoff"] = {
+                    "enabled": True,
+                    "system": "weltgewebe",
+                    "project_id": "openstreetmap",
+                    "action_label": action_label,
+                    "url": "https://example.org/weltgewebe/projects/openstreetmap",
+                }
+                self.assertIn(
+                    "handoff action_label must stay neutral until authorization is modeled",
+                    self.validate_example(project),
+                )
 
     def test_hidden_hybrid_can_keep_aether_without_map(self) -> None:
         project = copy.deepcopy(project_examples_by_id()["osm-hamburg-hybrid-fixture"])
