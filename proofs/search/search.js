@@ -38,6 +38,7 @@ const curationFilter = requiredElement("[data-curation-filter]");
 const locationFilter = requiredElement("[data-location-filter]");
 const resetButton = requiredElement("[data-reset-search]");
 const resultCount = requiredElement("[data-result-count]");
+const rankingNote = requiredElement("[data-ranking-note]");
 const resultGrid = requiredElement("[data-result-grid]");
 const loadState = requiredElement("[data-load-state]");
 const resultTemplate = requiredElement("[data-result-template]");
@@ -47,20 +48,46 @@ function normalise(value) {
   return String(value || "").toLocaleLowerCase("en");
 }
 
-function entrySearchText(entry) {
-  return normalise(
-    [
-      entry.id,
-      entry.title,
-      entry.summary,
-      entry.curation_state,
-      entry.location_label,
-      entry.location_mode,
-      entry.project_path,
-      entry.profile_handoff_state,
-      ...(entry.aspects || []).flatMap((aspect) => [aspect.id, aspect.label]),
-    ].join(" "),
-  );
+function searchableFields(entry) {
+  return [
+    { field: "title", label: "Title", value: entry.title, weight: 40 },
+    { field: "summary", label: "Summary", value: entry.summary, weight: 20 },
+    { field: "aspect", label: "Aspect", value: (entry.aspects || []).flatMap((aspect) => [aspect.id, aspect.label]).join(" "), weight: 24 },
+    { field: "location", label: "Location", value: [entry.location_label, entry.location_mode].join(" "), weight: 12 },
+    { field: "curation", label: "Curation", value: entry.curation_state, weight: 8 },
+    { field: "source", label: "Source path", value: entry.project_path, weight: 4 },
+    { field: "handoff", label: "Handoff state", value: entry.profile_handoff_state, weight: 2 },
+  ];
+}
+
+function explainMatch(entry, query) {
+  const cleanQuery = normalise(query.trim());
+  if (cleanQuery === "") {
+    return {
+      matches: true,
+      score: 0,
+      reasons: [{ field: "all", label: "All entries", weight: 0 }],
+    };
+  }
+  const terms = cleanQuery.split(/\s+/).filter(Boolean);
+  const reasons = [];
+  let score = 0;
+  for (const field of searchableFields(entry)) {
+    const haystack = normalise(field.value);
+    const matchedTerms = terms.filter((term) => haystack.includes(term));
+    if (matchedTerms.length === 0) continue;
+    const termFactor = matchedTerms.length / terms.length;
+    const exactBoost = haystack === cleanQuery ? 1.5 : 1;
+    const contribution = Math.round(field.weight * termFactor * exactBoost);
+    reasons.push({
+      field: field.field,
+      label: field.label,
+      weight: contribution,
+      terms: matchedTerms,
+    });
+    score += contribution;
+  }
+  return { matches: reasons.length > 0, score, reasons };
 }
 
 function validateEntry(entry, index) {
@@ -121,13 +148,20 @@ function populateFilters() {
   locationFilter.append(...uniqueValues("location_mode").map(optionFor));
 }
 
-function entryMatches(entry) {
-  const query = normalise(queryInput.value.trim());
+function rankedEntry(entry) {
   const curation = curationFilter.value;
   const location = locationFilter.value;
-  if (curation !== "all" && entry.curation_state !== curation) return false;
-  if (location !== "all" && entry.location_mode !== location) return false;
-  return query === "" || entrySearchText(entry).includes(query);
+  if (curation !== "all" && entry.curation_state !== curation) return null;
+  if (location !== "all" && entry.location_mode !== location) return null;
+  const explanation = explainMatch(entry, queryInput.value);
+  if (!explanation.matches) return null;
+  return { entry, ...explanation };
+}
+
+function rankResults(left, right) {
+  const byScore = right.score - left.score;
+  if (byScore !== 0) return byScore;
+  return left.entry.title.localeCompare(right.entry.title, "en", { sensitivity: "base" });
 }
 
 function renderAspectPill(aspect) {
@@ -137,12 +171,29 @@ function renderAspectPill(aspect) {
   return pill;
 }
 
-function renderCard(entry) {
+function renderReasonPill(reason) {
+  const pill = document.createElement("span");
+  pill.className = "reason-pill";
+  const terms = reason.terms?.length ? `: ${reason.terms.join(", ")}` : "";
+  pill.textContent = `${reason.label}${terms}`;
+  return pill;
+}
+
+function renderCard(result) {
+  const { entry, score, reasons } = result;
   const fragment = resultTemplate.content.cloneNode(true);
   fragment.querySelector("[data-card-kicker]").textContent = `${entry.id} · ${entry.location_mode}`;
   fragment.querySelector("[data-card-title]").textContent = entry.title;
   fragment.querySelector("[data-card-summary]").textContent = entry.summary;
   fragment.querySelector("[data-card-aspects]").replaceChildren(...entry.aspects.map(renderAspectPill));
+  const scorePill = document.createElement("span");
+  scorePill.className = "score-pill";
+  scorePill.textContent = score === 0 ? "unranked browse" : `${score} local proof points`;
+  fragment.querySelector("[data-card-score]").replaceChildren(scorePill);
+  const reasonList = document.createElement("span");
+  reasonList.className = "reason-list";
+  reasonList.replaceChildren(...reasons.map(renderReasonPill));
+  fragment.querySelector("[data-card-reasons]").replaceChildren(reasonList);
   fragment.querySelector("[data-card-curation]").textContent = entry.curation_state;
   fragment.querySelector("[data-card-location]").textContent = `${entry.location_label} / ${entry.location_mode}`;
   fragment.querySelector("[data-card-handoff]").textContent = entry.profile_handoff_state;
@@ -151,8 +202,12 @@ function renderCard(entry) {
 }
 
 function renderResults() {
-  const matches = entries.filter(entryMatches);
+  const matches = entries.map(rankedEntry).filter(Boolean).sort(rankResults);
+  const hasQuery = queryInput.value.trim() !== "";
   resultCount.textContent = `${matches.length} of ${entries.length} static search input ${entries.length === 1 ? "entry" : "entries"}`;
+  rankingNote.textContent = hasQuery
+    ? "Ranked locally by transparent match reasons; this is not a server ranking or authority signal."
+    : "Browse mode: entries are unranked until a search term is entered.";
   if (matches.length === 0) {
     const empty = document.createElement("p");
     empty.className = "empty-state";

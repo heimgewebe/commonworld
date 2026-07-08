@@ -30,6 +30,10 @@
             <dt>Action</dt>
             <dd>Project cards are read-only previews, not join, manage or submit actions.</dd>
           </div>
+          <div>
+            <dt>Ranking</dt>
+            <dd>Results show local match reasons and a transparent proof score, not hidden authority.</dd>
+          </div>
         </dl>
         <p class="load-state" data-load-state aria-live="polite">Loading static search input…</p>
       </section>
@@ -66,6 +70,7 @@
             <button type="button" data-reset-search>Reset filters</button>
           </div>
           <p id="search-result-count" class="result-count" data-result-count>0 entries</p>
+          <p class="ranking-note" data-ranking-note>Match reasons appear after a search term is entered.</p>
         </div>
 
         <div class="result-grid" data-result-grid aria-live="polite"></div>
@@ -79,6 +84,14 @@
         <p data-card-summary></p>
         <div class="aspect-list" data-card-aspects></div>
         <dl class="card-meta">
+          <div>
+            <dt>Proof score</dt>
+            <dd data-card-score></dd>
+          </div>
+          <div>
+            <dt>Matched fields</dt>
+            <dd data-card-reasons></dd>
+          </div>
           <div>
             <dt>Curation</dt>
             <dd data-card-curation></dd>
