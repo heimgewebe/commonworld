@@ -16,6 +16,7 @@ VALIDATE_TARGETS = \
 	validate-weltgewebe-handoff-contract \
 	validate-runtime-scale-boundary \
 	validate-catalog-export-contract \
+	validate-catalog-api-contract \
 	test
 
 validate: $(VALIDATE_TARGETS)
@@ -65,6 +66,9 @@ validate-runtime-scale-boundary:
 validate-catalog-export-contract:
 	python3 scripts/generate_catalog_export.py --check
 	python3 scripts/validate_catalog_export_contract.py
+
+validate-catalog-api-contract:
+	python3 scripts/validate_catalog_api_contract.py
 
 generate-catalog-export:
 	python3 scripts/generate_catalog_export.py

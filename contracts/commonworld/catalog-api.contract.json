@@ -1,0 +1,65 @@
+{
+  "schema_version": 1,
+  "kind": "commonworld.read_only_catalog_api_contract",
+  "task": "COMMONWORLD-ATLAS-V1-T012",
+  "status": "contract-only",
+  "source_contract": "contracts/commonworld/catalog-export.schema.json",
+  "boundary": {
+    "implementation": "no API server",
+    "persistence": "no database",
+    "ingestion": "no ingestion worker",
+    "access": "public-read-only",
+    "write_behavior": "no writes, no submissions, no publication side effects",
+    "authority": "delivery contract only; generated static catalog export and CommonProject files remain authoritative"
+  },
+  "routes": [
+    {
+      "id": "catalog-export",
+      "method": "GET",
+      "path": "/catalog/v1/catalog-export",
+      "description": "Read-only delivery shape for the generated static catalog export payload.",
+      "source": "generated static catalog export",
+      "access": "public-read-only",
+      "auth_required": false,
+      "writes": false,
+      "submissions": false,
+      "response_shape": "commonworld.static_catalog_export"
+    },
+    {
+      "id": "catalog-project-list",
+      "method": "GET",
+      "path": "/catalog/v1/projects",
+      "description": "Read-only project list derived from accepted CommonProject data or the generated static catalog export.",
+      "source": "generated static catalog export",
+      "access": "public-read-only",
+      "auth_required": false,
+      "writes": false,
+      "submissions": false,
+      "response_shape": "project summary list"
+    },
+    {
+      "id": "catalog-project-detail",
+      "method": "GET",
+      "path": "/catalog/v1/projects/{project_id}",
+      "description": "Read-only project detail for one known CommonProject identifier.",
+      "source": "accepted CommonProject data",
+      "access": "public-read-only",
+      "auth_required": false,
+      "writes": false,
+      "submissions": false,
+      "response_shape": "CommonProject"
+    }
+  ],
+  "forbidden": [
+    "DELETE",
+    "PATCH",
+    "POST",
+    "PUT",
+    "database requirement",
+    "import mutation path",
+    "public submissions",
+    "review write path",
+    "server implementation",
+    "weltgewebe write path"
+  ]
+}
