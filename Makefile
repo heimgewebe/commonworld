@@ -1,4 +1,4 @@
-.PHONY: validate generate-catalog-export $(VALIDATE_TARGETS)
+.PHONY: validate generate-catalog-export generate-catalog-api-route-fixtures $(VALIDATE_TARGETS)
 
 VALIDATE_TARGETS = \
 	validate-contracts \
@@ -17,6 +17,7 @@ VALIDATE_TARGETS = \
 	validate-runtime-scale-boundary \
 	validate-catalog-export-contract \
 	validate-catalog-api-contract \
+	validate-catalog-api-route-fixtures \
 	test
 
 validate: $(VALIDATE_TARGETS)
@@ -70,8 +71,15 @@ validate-catalog-export-contract:
 validate-catalog-api-contract:
 	python3 scripts/validate_catalog_api_contract.py
 
+validate-catalog-api-route-fixtures:
+	python3 scripts/generate_catalog_api_route_fixtures.py --check
+	python3 scripts/validate_catalog_api_route_fixtures.py
+
 generate-catalog-export:
 	python3 scripts/generate_catalog_export.py
+
+generate-catalog-api-route-fixtures:
+	python3 scripts/generate_catalog_api_route_fixtures.py
 
 test:
 	python3 -m unittest discover -s tests -p 'test_*.py'

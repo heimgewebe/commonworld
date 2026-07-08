@@ -71,3 +71,7 @@ T011 is implemented by `scripts/generate_catalog_export.py`, which deterministic
 ## Read-only catalog API contract
 
 T012 is documented in `docs/blueprints/catalog-api-contract.md` and anchored by `contracts/commonworld/catalog-api.contract.json`. It defines future read-only GET delivery routes without introducing an API server, database, ingestion worker, submissions or write path.
+
+## Static catalog API route fixtures
+
+T013 is documented in `docs/blueprints/catalog-api-route-fixtures.md` and implemented by `scripts/generate_catalog_api_route_fixtures.py`. It generates `examples/commonworld/catalog-api-route-fixtures.sample.json`, a deterministic static fixture for the T012 read-only GET routes without introducing an API server, database, ingestion worker, submissions or write path.
