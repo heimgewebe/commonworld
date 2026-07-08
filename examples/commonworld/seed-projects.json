@@ -1,0 +1,8 @@
+{
+  "schema_version": 1,
+  "project_paths": [
+    "projects/neighborhood-repair-circle.fixture.json",
+    "projects/openstreetmap.json",
+    "projects/osm-hamburg-hybrid.fixture.json"
+  ]
+}

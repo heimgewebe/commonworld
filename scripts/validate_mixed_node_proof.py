@@ -37,7 +37,7 @@ def proof_dir(root: Path = ROOT) -> Path:
 
 
 def seed_manifest_path(root: Path = ROOT) -> Path:
-    return proof_dir(root) / "seed-projects.json"
+    return root / "examples" / "commonworld" / "seed-projects.json"
 
 
 def expected_proof_files(root: Path = ROOT) -> tuple[Path, ...]:
@@ -47,7 +47,6 @@ def expected_proof_files(root: Path = ROOT) -> tuple[Path, ...]:
         directory / "mixed-node.css",
         directory / "mixed-node.js",
         directory / "README.md",
-        seed_manifest_path(root),
     )
 
 
@@ -97,12 +96,15 @@ def build_segments(project: dict[str, Any]) -> list[Segment]:
 
 
 def expected_seed_paths(root: Path = ROOT) -> list[str]:
-    return [f"../../{path.relative_to(root).as_posix()}" for path in iter_project_examples(root)]
+    manifest_directory = seed_manifest_path(root).parent
+    return [path.relative_to(manifest_directory).as_posix() for path in iter_project_examples(root)]
 
 
 def validate_seed_manifest(root: Path = ROOT) -> list[str]:
     errors: list[str] = []
     manifest_path = seed_manifest_path(root)
+    if not manifest_path.is_file():
+        return [f"missing shared seed manifest: {manifest_path.relative_to(root)}"]
     try:
         manifest = load_json(manifest_path)
     except json.JSONDecodeError:
@@ -236,10 +238,11 @@ def validate_proof(root: Path = ROOT) -> list[str]:
     css = (directory / "mixed-node.css").read_text(encoding="utf-8")
     js = (directory / "mixed-node.js").read_text(encoding="utf-8")
 
-    manifest_text = seed_manifest_path(root).read_text(encoding="utf-8")
+    manifest_path = seed_manifest_path(root)
+    manifest_text = manifest_path.read_text(encoding="utf-8") if manifest_path.is_file() else ""
     for seed_path in expected_seed_paths(root):
         if seed_path not in manifest_text:
-            errors.append(f"proof seed manifest does not load seed example {seed_path}")
+            errors.append(f"shared seed manifest does not load seed example {seed_path}")
 
     if "prefers-reduced-motion" not in css:
         errors.append("proof CSS must include prefers-reduced-motion")

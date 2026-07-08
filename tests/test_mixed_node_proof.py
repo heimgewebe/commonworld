@@ -41,6 +41,23 @@ class MixedNodeProofTests(unittest.TestCase):
 
         self.assertTrue(any("aspect weights must sum to 1.0" in error for error in errors))
 
+
+    def test_seed_manifest_lives_in_shared_examples_area(self) -> None:
+        self.assertEqual(
+            ROOT / "examples" / "commonworld" / "seed-projects.json",
+            seed_manifest_path(ROOT),
+        )
+        self.assertFalse((proof_dir(ROOT) / "seed-projects.json").exists())
+
+    def test_missing_shared_seed_manifest_reports_error(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp_dir:
+            tmp_root = self.copy_valid_root(tmp_dir)
+            seed_manifest_path(tmp_root).unlink()
+
+            errors = validate_proof(tmp_root)
+
+        self.assertIn("missing shared seed manifest: examples/commonworld/seed-projects.json", errors)
+
     def test_seed_manifest_schema_version_is_current(self) -> None:
         manifest = json.loads(seed_manifest_path(ROOT).read_text(encoding="utf-8"))
         self.assertEqual(1, manifest["schema_version"])

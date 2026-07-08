@@ -1,8 +1,0 @@
-{
-  "schema_version": 1,
-  "project_paths": [
-    "../../examples/commonworld/projects/neighborhood-repair-circle.fixture.json",
-    "../../examples/commonworld/projects/openstreetmap.json",
-    "../../examples/commonworld/projects/osm-hamburg-hybrid.fixture.json"
-  ]
-}

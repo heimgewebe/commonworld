@@ -227,7 +227,7 @@ def validate_map_proof(root: Path = ROOT) -> list[str]:
         "window.maplibregl",
         "MapLibre did not load from the configured source.",
         "SEED_MANIFEST_URL",
-        "../mixed-node/seed-projects.json",
+        "../../examples/commonworld/seed-projects.json",
         "isMapRenderable",
         "project.location?.mode !== \"hidden\"",
         "approximate-halo",

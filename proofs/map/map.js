@@ -1,4 +1,4 @@
-const SEED_MANIFEST_URL = new URL("../mixed-node/seed-projects.json", import.meta.url);
+const SEED_MANIFEST_URL = new URL("../../examples/commonworld/seed-projects.json", import.meta.url);
 const MAP_SOURCE_URL = new URL("./map-source.json", import.meta.url);
 
 const ASPECT_COLORS = {
