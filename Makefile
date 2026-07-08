@@ -2,6 +2,7 @@
 
 VALIDATE_TARGETS = \
 	validate-contracts \
+	validate-seed-manifest \
 	validate-mixed-node-proof \
 	validate-map-proof \
 	validate-map-source-strategy \
@@ -17,6 +18,9 @@ validate: $(VALIDATE_TARGETS)
 
 validate-contracts:
 	python3 scripts/validate_contracts.py
+
+validate-seed-manifest:
+	python3 scripts/validate_seed_manifest.py
 
 validate-mixed-node-proof:
 	python3 scripts/validate_mixed_node_proof.py

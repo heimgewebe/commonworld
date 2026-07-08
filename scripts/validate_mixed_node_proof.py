@@ -15,6 +15,7 @@ if str(ROOT) not in sys.path:
     sys.path.insert(0, str(ROOT))
 
 from scripts.validate_contracts import iter_project_examples, validate_all
+from scripts.validate_seed_manifest import expected_seed_paths, seed_manifest_path, validate_seed_manifest
 
 WEIGHT_TOLERANCE = 0.001
 
@@ -34,10 +35,6 @@ class Segment:
 
 def proof_dir(root: Path = ROOT) -> Path:
     return root / "proofs" / "mixed-node"
-
-
-def seed_manifest_path(root: Path = ROOT) -> Path:
-    return root / "examples" / "commonworld" / "seed-projects.json"
 
 
 def expected_proof_files(root: Path = ROOT) -> tuple[Path, ...]:
@@ -93,43 +90,6 @@ def build_segments(project: dict[str, Any]) -> list[Segment]:
         )
         cursor = end
     return segments
-
-
-def expected_seed_paths(root: Path = ROOT) -> list[str]:
-    manifest_directory = seed_manifest_path(root).parent
-    return [path.relative_to(manifest_directory).as_posix() for path in iter_project_examples(root)]
-
-
-def validate_seed_manifest(root: Path = ROOT) -> list[str]:
-    errors: list[str] = []
-    manifest_path = seed_manifest_path(root)
-    if not manifest_path.is_file():
-        return [f"missing shared seed manifest: {manifest_path.relative_to(root)}"]
-    try:
-        manifest = load_json(manifest_path)
-    except json.JSONDecodeError:
-        return ["seed-projects.json is not valid JSON"]
-
-    if manifest.get("schema_version") != 1:
-        errors.append("seed-projects.json must use schema_version 1")
-
-    project_paths = manifest.get("project_paths")
-    expected_paths = expected_seed_paths(root)
-    if project_paths != expected_paths:
-        errors.append("seed-projects.json must list all project examples in deterministic order")
-
-    if isinstance(project_paths, list):
-        for project_path in project_paths:
-            if not isinstance(project_path, str):
-                errors.append("seed-projects.json project_paths entries must be strings")
-                continue
-            referenced_path = (manifest_path.parent / project_path).resolve()
-            if not referenced_path.is_file():
-                errors.append(f"seed-projects.json references missing seed file: {project_path}")
-    else:
-        errors.append("seed-projects.json must contain a project_paths list")
-
-    return errors
 
 
 def _contains_string_literal(source: str, value: str) -> bool:

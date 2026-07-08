@@ -7,12 +7,11 @@ from pathlib import Path
 from scripts.validate_contracts import ROOT
 from scripts.validate_mixed_node_proof import (
     build_segments,
-    expected_seed_paths,
     load_projects,
     proof_dir,
-    seed_manifest_path,
     validate_proof,
 )
+from scripts.validate_seed_manifest import expected_seed_paths, seed_manifest_path
 
 
 class MixedNodeProofTests(unittest.TestCase):
