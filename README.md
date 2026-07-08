@@ -19,6 +19,10 @@
 
 See `docs/blueprints/commonworld-masterplan.md` for the masterplan.
 
+## Proof hub
+
+The root `index.html` is the static proof hub. Its proof cards consume `proofs/proof-surfaces.json`: `title`, `href` and the user-facing `role` metadata must stay paired with each card's `data-proof-link` and visible role text. `scripts/validate_proof_hub.py` enforces that the hub does not drift from the registry.
+
 ## Mixed-node proof
 
 T002 is implemented as an isolated static proof under `proofs/mixed-node/`.
