@@ -1,4 +1,4 @@
-.PHONY: validate $(VALIDATE_TARGETS)
+.PHONY: validate generate-catalog-export $(VALIDATE_TARGETS)
 
 VALIDATE_TARGETS = \
 	validate-contracts \
@@ -63,7 +63,11 @@ validate-runtime-scale-boundary:
 	python3 scripts/validate_runtime_scale_boundary.py
 
 validate-catalog-export-contract:
+	python3 scripts/generate_catalog_export.py --check
 	python3 scripts/validate_catalog_export_contract.py
+
+generate-catalog-export:
+	python3 scripts/generate_catalog_export.py
 
 test:
 	python3 -m unittest discover -s tests -p 'test_*.py'

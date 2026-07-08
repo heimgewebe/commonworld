@@ -66,3 +66,4 @@ T009 is documented in `docs/blueprints/runtime-scale-boundary.md`. Phase 7 stays
 ## Static catalog export contract
 
 T010 is documented in `docs/blueprints/catalog-export-contract.md` and anchored by `contracts/commonworld/catalog-export.schema.json`. It defines a read-only static export before any API server, database, ingestion worker or write path is introduced.
+T011 is implemented by `scripts/generate_catalog_export.py`, which deterministically regenerates `examples/commonworld/catalog-export.sample.json` from the seed manifest.
