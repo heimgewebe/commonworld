@@ -62,3 +62,7 @@ T008 is documented in `docs/blueprints/weltgewebe-handoff-contract.md`. The hand
 ## Runtime and scale boundary
 
 T009 is documented in `docs/blueprints/runtime-scale-boundary.md`. Phase 7 stays plan-before-build: future API, search, spatial index, import candidate and review surfaces must remain read-only until their authority and privacy gates are explicit.
+
+## Static catalog export contract
+
+T010 is documented in `docs/blueprints/catalog-export-contract.md` and anchored by `contracts/commonworld/catalog-export.schema.json`. It defines a read-only static export before any API server, database, ingestion worker or write path is introduced.

@@ -1,0 +1,118 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://commonworld.net/contracts/commonworld/catalog-export.schema.json",
+  "title": "Commonworld static catalog export",
+  "description": "Read-only static projection of CommonProject catalog entries for proof and future catalog delivery surfaces.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "kind",
+    "scope",
+    "source_manifest_path",
+    "entries",
+    "boundary"
+  ],
+  "properties": {
+    "schema_version": {
+      "type": "integer",
+      "const": 1
+    },
+    "kind": {
+      "type": "string",
+      "const": "commonworld.static_catalog_export"
+    },
+    "scope": {
+      "type": "string",
+      "enum": [
+        "proof",
+        "public"
+      ]
+    },
+    "source_manifest_path": {
+      "type": "string",
+      "const": "examples/commonworld/seed-projects.json"
+    },
+    "entries": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "$ref": "#/$defs/entry"
+      }
+    },
+    "boundary": {
+      "$ref": "#/$defs/boundary"
+    }
+  },
+  "$defs": {
+    "entry": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "id",
+        "project_path",
+        "curation_state",
+        "location_mode",
+        "profile_handoff_state"
+      ],
+      "properties": {
+        "id": {
+          "type": "string",
+          "pattern": "^[a-z][a-z0-9-]{2,95}$"
+        },
+        "project_path": {
+          "type": "string",
+          "pattern": "^examples/commonworld/projects/[a-z0-9-]+(\\.fixture)?\\.json$"
+        },
+        "curation_state": {
+          "type": "string",
+          "enum": [
+            "candidate",
+            "curated",
+            "fixture",
+            "archived"
+          ]
+        },
+        "location_mode": {
+          "type": "string",
+          "enum": [
+            "hidden",
+            "approximate",
+            "exact"
+          ]
+        },
+        "profile_handoff_state": {
+          "type": "string",
+          "enum": [
+            "none",
+            "locked",
+            "available"
+          ]
+        }
+      }
+    },
+    "boundary": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "access",
+        "write_behavior",
+        "authority"
+      ],
+      "properties": {
+        "access": {
+          "type": "string",
+          "const": "read-only"
+        },
+        "write_behavior": {
+          "type": "string",
+          "const": "no writes, no submissions, no publication side effects"
+        },
+        "authority": {
+          "type": "string",
+          "const": "derived projection only; CommonProject files remain the catalog claim source"
+        }
+      }
+    }
+  }
+}

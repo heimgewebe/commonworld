@@ -15,6 +15,7 @@ VALIDATE_TARGETS = \
 	validate-source-curation-policy \
 	validate-weltgewebe-handoff-contract \
 	validate-runtime-scale-boundary \
+	validate-catalog-export-contract \
 	test
 
 validate: $(VALIDATE_TARGETS)
@@ -60,6 +61,9 @@ validate-weltgewebe-handoff-contract:
 
 validate-runtime-scale-boundary:
 	python3 scripts/validate_runtime_scale_boundary.py
+
+validate-catalog-export-contract:
+	python3 scripts/validate_catalog_export_contract.py
 
 test:
 	python3 -m unittest discover -s tests -p 'test_*.py'
