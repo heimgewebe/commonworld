@@ -10,6 +10,7 @@ VALIDATE_TARGETS = \
 	validate-mobile-atlas-shift \
 	validate-mobile-atlas-shift-doctrine \
 	validate-projection-contract \
+	validate-source-curation-policy \
 	test
 
 validate: $(VALIDATE_TARGETS)
@@ -40,6 +41,9 @@ validate-mobile-atlas-shift-doctrine:
 
 validate-projection-contract:
 	python3 scripts/validate_projection_contract.py
+
+validate-source-curation-policy:
+	python3 scripts/validate_source_curation_policy.py
 
 test:
 	python3 -m unittest discover -s tests -p 'test_*.py'

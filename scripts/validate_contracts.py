@@ -19,6 +19,18 @@ PROJECT_EXAMPLES_DIR = ROOT / "examples" / "commonworld" / "projects"
 WEIGHT_TOLERANCE = 0.001
 
 
+def validate_source_requirements(source: dict[str, Any], context: str) -> list[str]:
+    errors: list[str] = []
+    source_type = source.get("type")
+    if source_type in {"official-source", "public-registry"}:
+        if not source.get("url") or not source.get("retrieved_at"):
+            errors.append(f"{context}: {source_type} sources need url and retrieved_at")
+    if source_type in {"manual-curation", "derived"}:
+        if not source.get("note"):
+            errors.append(f"{context}: {source_type} sources need note")
+    return errors
+
+
 class ContractValidationError(Exception):
     """Raised when a commonworld contract or fixture is invalid."""
 
@@ -111,19 +123,49 @@ def semantic_errors(project: dict[str, Any]) -> list[str]:
         errors.append("exact locations must use precision exact")
 
     curation = project.get("curation", {})
+    curation_state = curation.get("state")
     provenance_sources = project.get("provenance", {}).get("sources", [])
-    if curation.get("state") == "fixture":
-        if not any(source.get("type") == "fixture" for source in provenance_sources):
+    source_types = [source.get("type") for source in provenance_sources]
+    non_fixture_sources = [source for source in provenance_sources if source.get("type") != "fixture"]
+
+    if curation_state == "fixture":
+        if not any(source_type == "fixture" for source_type in source_types):
             errors.append("fixture entries need fixture provenance")
+        if any(source_type != "fixture" for source_type in source_types):
+            errors.append("fixture entries must not mix fixture and non-fixture provenance")
     else:
-        if not all(source.get("type") != "fixture" for source in provenance_sources):
+        if any(source_type == "fixture" for source_type in source_types):
             errors.append("non-fixture entries must not rely on fixture provenance")
+
+    if curation_state in {"candidate", "curated", "archived"}:
+        if not curation.get("reviewed_by") or not curation.get("reviewed_at"):
+            errors.append("candidate, curated and archived entries need reviewed_by and reviewed_at")
+        if not non_fixture_sources:
+            errors.append("candidate, curated and archived entries need non-fixture provenance")
+
+    if curation_state == "curated":
+        if len(non_fixture_sources) < 2:
+            errors.append("curated entries need at least two non-fixture sources")
+        if non_fixture_sources and all(source.get("type") == "derived" for source in non_fixture_sources):
+            errors.append("curated entries must not rely only on derived sources")
+
+    for index, source in enumerate(provenance_sources):
+        errors.extend(validate_source_requirements(source, f"provenance.sources[{index}]"))
+
+    for aspect in project.get("aspects", []):
+        aspect_id = aspect.get("id", "<unknown>")
+        for index, source in enumerate(aspect.get("evidence", [])):
+            errors.extend(validate_source_requirements(source, f"aspects[{aspect_id}].evidence[{index}]"))
 
     handoff = project.get("handoff")
     if handoff and not handoff.get("enabled") and any(
         key in handoff for key in ("project_id", "url", "action_label")
     ):
         errors.append("disabled handoff must not expose action fields")
+    if handoff and handoff.get("enabled") is True and curation_state != "curated":
+        errors.append("handoff actions require curated curation state")
+    if curation_state == "archived" and handoff and handoff.get("enabled") is True:
+        errors.append("archived entries must not expose handoff actions")
 
     return errors
 
