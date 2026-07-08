@@ -4,7 +4,7 @@ import tempfile
 import unittest
 from pathlib import Path
 
-from scripts.generate_catalog_export import build_catalog_export, stable_json
+from scripts.generate_catalog_export import build_catalog_export, main, stable_json
 from scripts.validate_contracts import ROOT
 
 
@@ -32,6 +32,25 @@ class CatalogExportGeneratorTests(unittest.TestCase):
             manifest["project_paths"],
             [entry["project_path"].removeprefix("examples/commonworld/") for entry in export["entries"]],
         )
+
+
+    def test_check_uses_output_relative_to_supplied_root(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp_dir:
+            tmp_root = self.copy_examples(tmp_dir)
+
+            result = main(["--root", str(tmp_root), "--check"])
+
+        self.assertEqual(0, result)
+
+    def test_check_detects_stale_output_in_supplied_root(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp_dir:
+            tmp_root = self.copy_examples(tmp_dir)
+            output_path = tmp_root / "examples" / "commonworld" / "catalog-export.sample.json"
+            output_path.write_text("{}\n", encoding="utf-8")
+
+            result = main(["--root", str(tmp_root), "--check"])
+
+        self.assertEqual(1, result)
 
     def test_generator_rejects_paths_outside_projects_dir(self) -> None:
         with tempfile.TemporaryDirectory() as tmp_dir:

@@ -11,7 +11,7 @@ from typing import Any
 
 ROOT = Path(__file__).resolve().parents[1]
 SEED_MANIFEST_PATH = ROOT / "examples" / "commonworld" / "seed-projects.json"
-DEFAULT_OUTPUT_PATH = ROOT / "examples" / "commonworld" / "catalog-export.sample.json"
+DEFAULT_OUTPUT_PATH = Path("examples/commonworld/catalog-export.sample.json")
 
 BOUNDARY = {
     "access": "read-only",
@@ -98,7 +98,7 @@ def main(argv: list[str] | None = None) -> int:
         "--output",
         type=Path,
         default=DEFAULT_OUTPUT_PATH,
-        help="Output file. Defaults to examples/commonworld/catalog-export.sample.json.",
+        help="Output file relative to --root unless absolute. Defaults to examples/commonworld/catalog-export.sample.json.",
     )
     parser.add_argument("--check", action="store_true", help="Fail if the output file is not up to date.")
     args = parser.parse_args(argv)
