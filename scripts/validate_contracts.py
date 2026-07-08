@@ -162,8 +162,19 @@ def semantic_errors(project: dict[str, Any]) -> list[str]:
         key in handoff for key in ("project_id", "url", "action_label")
     ):
         errors.append("disabled handoff must not expose action fields")
-    if handoff and handoff.get("enabled") is True and curation_state != "curated":
-        errors.append("handoff actions require curated curation state")
+    if handoff and handoff.get("enabled") is True:
+        if curation_state != "curated":
+            errors.append("handoff actions require curated curation state")
+        if handoff.get("system") != "weltgewebe":
+            errors.append("handoff actions must target weltgewebe")
+        if not handoff.get("project_id"):
+            errors.append("handoff actions require weltgewebe project_id")
+        if not handoff.get("url"):
+            errors.append("handoff actions require explicit weltgewebe URL")
+        action_label = handoff.get("action_label", "").casefold()
+        forbidden_action_terms = ("join", "manage", "decide", "administer", "submit", "coordinate")
+        if any(term in action_label for term in forbidden_action_terms):
+            errors.append("handoff action_label must stay neutral until authorization is modeled")
     if curation_state == "archived" and handoff and handoff.get("enabled") is True:
         errors.append("archived entries must not expose handoff actions")
 

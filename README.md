@@ -53,3 +53,7 @@ Then open `http://localhost:4173/proofs/map/`.
 
 T004 is documented in `docs/blueprints/map-source-strategy.md`.
 commonworld does not operate a second tile infrastructure; it should consume a shared heimgewebe basemap when production map sourcing is ready.
+
+## weltgewebe handoff contract
+
+T008 is documented in `docs/blueprints/weltgewebe-handoff-contract.md`. The handoff is a read-only continuation link to an explicitly known weltgewebe project, not a join, manage, submit, decide or implicit-auth path.
