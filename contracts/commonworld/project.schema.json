@@ -391,7 +391,8 @@
             "required": [
               "system",
               "project_id",
-              "action_label"
+              "action_label",
+              "url"
             ]
           }
         }

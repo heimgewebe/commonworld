@@ -133,6 +133,37 @@ class SourceCurationPolicyTests(unittest.TestCase):
         }
         self.assertIn("handoff actions require curated curation state", self.validate_example(project))
 
+    def test_enabled_handoff_requires_explicit_weltgewebe_target(self) -> None:
+        project = copy.deepcopy(project_examples_by_id()["openstreetmap"])
+        project["curation"] = {
+            "state": "curated",
+            "reviewed_by": "commonworld-review",
+            "reviewed_at": "2026-07-08",
+        }
+        project["provenance"]["sources"] = [
+            {
+                "type": "official-source",
+                "label": "OpenStreetMap",
+                "url": "https://www.openstreetmap.org/",
+                "retrieved_at": "2026-07-08",
+            },
+            {
+                "type": "public-registry",
+                "label": "Wikidata",
+                "url": "https://www.wikidata.org/wiki/Q936",
+                "retrieved_at": "2026-07-08",
+            },
+        ]
+        project["handoff"] = {
+            "enabled": True,
+            "system": "weltgewebe",
+            "project_id": "osm",
+            "action_label": "Open in weltgewebe",
+        }
+        errors = self.validate_example(project)
+        self.assertTrue(any("'url' is a required property" in error for error in errors))
+        self.assertIn("handoff actions require explicit weltgewebe URL", errors)
+
     def test_archived_entries_do_not_expose_handoff_actions(self) -> None:
         project = copy.deepcopy(project_examples_by_id()["openstreetmap"])
         project["curation"]["state"] = "archived"

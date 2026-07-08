@@ -13,6 +13,7 @@ VALIDATE_TARGETS = \
 	validate-mobile-atlas-shift-doctrine \
 	validate-projection-contract \
 	validate-source-curation-policy \
+	validate-weltgewebe-handoff-contract \
 	test
 
 validate: $(VALIDATE_TARGETS)
@@ -52,6 +53,9 @@ validate-projection-contract:
 
 validate-source-curation-policy:
 	python3 scripts/validate_source_curation_policy.py
+
+validate-weltgewebe-handoff-contract:
+	python3 scripts/validate_weltgewebe_handoff_contract.py
 
 test:
 	python3 -m unittest discover -s tests -p 'test_*.py'
