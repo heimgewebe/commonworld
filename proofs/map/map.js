@@ -312,10 +312,10 @@ function createMapMarkerElement(project) {
   button.addEventListener("click", () => openDetail(project, button));
   container.append(button);
 
-  if (project.location.mode === "approximate") {
+  if (project.location.mode === "approximate" || project.location.mode === "exact") {
     const badge = document.createElement("span");
-    badge.className = "privacy-badge";
-    badge.textContent = "Approximate";
+    badge.className = `privacy-badge privacy-badge--${project.location.mode}`;
+    badge.textContent = project.location.mode === "exact" ? "Exact" : "Approximate";
     container.append(badge);
   }
 

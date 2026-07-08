@@ -29,6 +29,21 @@ class MapProofTests(unittest.TestCase):
         self.assertTrue(projection.renderable)
         self.assertTrue(projection.requires_halo)
 
+    def test_exact_seed_fixture_is_renderable_without_halo(self) -> None:
+        projects = {project["id"]: project for project in load_projects(ROOT)}
+        projection = classify_project(projects["solidarity-kitchen-fixture"])
+        self.assertTrue(projection.renderable)
+        self.assertEqual("exact", projection.mode)
+        self.assertFalse(projection.requires_halo)
+
+    def test_map_js_labels_exact_and_approximate_privacy_modes(self) -> None:
+        js = (proof_dir(ROOT) / "map.js").read_text(encoding="utf-8")
+        css = (proof_dir(ROOT) / "map.css").read_text(encoding="utf-8")
+        self.assertIn('project.location.mode === "exact"', js)
+        self.assertIn('privacy-badge--${project.location.mode}', js)
+        self.assertIn('project.location.mode === "exact" ? "Exact" : "Approximate"', js)
+        self.assertIn(".privacy-badge--exact", css)
+
     def test_missing_hidden_filter_fails_validation(self) -> None:
         with tempfile.TemporaryDirectory() as tmp_dir:
             tmp_root = self.copy_valid_root(tmp_dir)
