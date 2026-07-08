@@ -99,6 +99,14 @@ body {
   white-space: nowrap;
 }
 
+.privacy-badge--approximate {
+  border-style: dashed;
+}
+
+.privacy-badge--exact {
+  border-style: solid;
+}
+
 .map-shell .detail-surface {
   position: absolute;
   top: 1rem;

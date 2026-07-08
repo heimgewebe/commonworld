@@ -1,0 +1,110 @@
+{
+  "schema_version": 2,
+  "id": "solidarity-kitchen-fixture",
+  "title": "Solidarity Kitchen fixture",
+  "summary": "Synthetic exact-place Commons fixture used to validate explicit venue-level map rendering without an approximate privacy halo.",
+  "sphere": "place",
+  "aspects": [
+    {
+      "id": "mutual-aid",
+      "label": "Mutual aid",
+      "description": "People coordinate practical support around shared meals and supplies.",
+      "color_token": "aspect.mutual-aid",
+      "icon_token": "icon.hands",
+      "weight": 0.45,
+      "confidence": 0.58,
+      "evidence": [
+        {
+          "type": "fixture",
+          "label": "Synthetic commonworld fixture",
+          "retrieved_at": "2026-07-08",
+          "note": "Not a public catalog claim."
+        }
+      ]
+    },
+    {
+      "id": "community-care",
+      "label": "Community care",
+      "description": "The project model represents a local care relation anchored to a visible place.",
+      "color_token": "aspect.community",
+      "icon_token": "icon.people",
+      "weight": 0.35,
+      "confidence": 0.55,
+      "evidence": [
+        {
+          "type": "fixture",
+          "label": "Synthetic commonworld fixture",
+          "retrieved_at": "2026-07-08"
+        }
+      ]
+    },
+    {
+      "id": "learning",
+      "label": "Shared learning",
+      "description": "Kitchen routines are documented and taught peer-to-peer.",
+      "color_token": "aspect.education",
+      "icon_token": "icon.book-open",
+      "weight": 0.2,
+      "confidence": 0.5,
+      "evidence": [
+        {
+          "type": "fixture",
+          "label": "Synthetic commonworld fixture",
+          "retrieved_at": "2026-07-08"
+        }
+      ]
+    }
+  ],
+  "location": {
+    "mode": "exact",
+    "label": "Hamburg synthetic venue fixture",
+    "precision": "exact",
+    "coordinates": {
+      "lat": 53.5572,
+      "lon": 9.992
+    },
+    "privacy_note": "Exact coordinate is synthetic fixture data only; it is not a real venue claim."
+  },
+  "provenance": {
+    "sources": [
+      {
+        "type": "fixture",
+        "label": "Synthetic commonworld fixture",
+        "retrieved_at": "2026-07-08",
+        "note": "Created to validate exact-location rendering distinct from approximate and hidden modes."
+      }
+    ],
+    "summary": "Fixture entry; it must not be shown as a real public catalog item."
+  },
+  "curation": {
+    "state": "fixture",
+    "reviewed_by": "commonworld seed curator",
+    "reviewed_at": "2026-07-08",
+    "notes": "Synthetic test data for exact-place map projection validation."
+  },
+  "links": [
+    {
+      "type": "documentation",
+      "label": "commonworld masterplan",
+      "url": "https://github.com/heimgewebe/commonworld/blob/main/docs/blueprints/commonworld-masterplan.md"
+    }
+  ],
+  "handoff": {
+    "enabled": false,
+    "requirements": [
+      "No handoff action because this is synthetic fixture data."
+    ]
+  },
+  "projections": {
+    "map": {
+      "appearance": "local-marker",
+      "location_claim": "exact",
+      "note": "Exact marker is allowed only because this is synthetic fixture data."
+    },
+    "profile": {
+      "mode": "focus-state",
+      "preserves_previous_projection": true,
+      "handoff_state": "locked"
+    }
+  }
+}

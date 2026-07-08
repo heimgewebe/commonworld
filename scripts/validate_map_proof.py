@@ -81,8 +81,19 @@ def validate_map_projection(projects: list[dict[str, Any]]) -> list[str]:
     if fixture_projection:
         if not fixture_projection.renderable:
             errors.append("neighborhood-repair-circle-fixture must be renderable in the map proof")
+        if fixture_projection.mode != "approximate":
+            errors.append("neighborhood-repair-circle-fixture must use approximate map mode")
         if not fixture_projection.requires_halo:
             errors.append("neighborhood-repair-circle-fixture must require an approximate-location halo")
+
+    exact_fixture_projection = projections.get("solidarity-kitchen-fixture")
+    if exact_fixture_projection:
+        if not exact_fixture_projection.renderable:
+            errors.append("solidarity-kitchen-fixture must be renderable in the map proof")
+        if exact_fixture_projection.mode != "exact":
+            errors.append("solidarity-kitchen-fixture must use exact map mode")
+        if exact_fixture_projection.requires_halo:
+            errors.append("solidarity-kitchen-fixture must not require an approximate-location halo")
 
     return errors
 
@@ -133,7 +144,7 @@ def validate_map_source_config(root: Path = ROOT) -> list[str]:
     return errors
 
 
-def validate_scope_text(readme: str, html: str, js: str) -> list[str]:
+def validate_scope_text(readme: str, html: str, js: str, css: str) -> list[str]:
     errors: list[str] = []
     forbidden_terms = (
         "public submissions",
@@ -151,10 +162,16 @@ def validate_scope_text(readme: str, html: str, js: str) -> list[str]:
         errors.append("map proof HTML must explain hidden digital projects are skipped")
     if "location privacy" not in html.casefold():
         errors.append("map proof HTML must describe location privacy")
-    if "isMapRenderable" not in js or 'mode !== "hidden"' not in js:
-        errors.append("map proof JS must include an explicit hidden-location filter")
+    if "isMapRenderable" not in js or '(mode === "exact" || mode === "approximate")' not in js:
+        errors.append("map proof JS must allowlist exact and approximate location modes")
     if "approximate-halo" not in js:
         errors.append("map proof JS must add approximate-halo for approximate locations")
+    if 'project.location?.mode !== "hidden"' in js:
+        errors.append("map proof JS must not render by merely excluding hidden locations")
+    if "privacy-badge--approximate" not in css:
+        errors.append("map proof CSS missing .privacy-badge--approximate")
+    if "privacy-badge--exact" not in css:
+        errors.append("map proof CSS missing .privacy-badge--exact")
     if "Seed manifest must contain project_paths." not in js:
         errors.append("map proof JS must validate the seed manifest project_paths list")
 
@@ -229,7 +246,7 @@ def validate_map_proof(root: Path = ROOT) -> list[str]:
         "SEED_MANIFEST_URL",
         "../../examples/commonworld/seed-projects.json",
         "isMapRenderable",
-        "project.location?.mode !== \"hidden\"",
+        '(mode === "exact" || mode === "approximate")',
         "approximate-halo",
         "privacy-badge",
         "curation-badge",
@@ -256,7 +273,7 @@ def validate_map_proof(root: Path = ROOT) -> list[str]:
             errors.append(f"map proof JS must not hard-code provider detail {fragment}; use map-source.json")
 
     errors.extend(validate_map_source_config(root))
-    errors.extend(validate_scope_text(readme, html, js))
+    errors.extend(validate_scope_text(readme, html, js, css))
     errors.extend(validate_map_projection(load_projects(root)))
     return errors
 
