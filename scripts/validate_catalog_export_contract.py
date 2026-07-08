@@ -6,11 +6,14 @@ from __future__ import annotations
 import json
 import sys
 from pathlib import Path
-from typing import Any
 
 from jsonschema import Draft202012Validator
 
 ROOT = Path(__file__).resolve().parents[1]
+if str(ROOT) not in sys.path:
+    sys.path.insert(0, str(ROOT))
+
+from scripts.generate_catalog_export import build_catalog_export, stable_json
 DOC_PATH = ROOT / "docs" / "blueprints" / "catalog-export-contract.md"
 SCHEMA_PATH = ROOT / "contracts" / "commonworld" / "catalog-export.schema.json"
 SAMPLE_PATH = ROOT / "examples" / "commonworld" / "catalog-export.sample.json"
@@ -32,7 +35,10 @@ REQUIRED_DOC_PHRASES = (
     "must not contain secrets, credentials, account state, role state or private review notes",
     "must not create a public submission route",
     "must not create a weltgewebe write path",
-    "deterministic static export generator or a proof-only export file",
+    "COMMONWORLD-ATLAS-V1-T011 is implemented by `scripts/generate_catalog_export.py`",
+    "make generate-catalog-export",
+    "make validate",
+    "does not introduce API runtime, database selection, ingestion workers or public write paths",
 )
 
 FORBIDDEN_DOC_PHRASES = (
@@ -43,44 +49,9 @@ FORBIDDEN_DOC_PHRASES = (
 )
 
 
-def load_json(path: Path) -> Any:
+def load_json(path: Path):
     with path.open(encoding="utf-8") as handle:
         return json.load(handle)
-
-
-def project_entry_for(path: Path, root: Path) -> dict[str, str]:
-    project = load_json(path)
-    profile = project.get("projections", {}).get("profile", {})
-    return {
-        "id": project["id"],
-        "project_path": path.relative_to(root).as_posix(),
-        "curation_state": project.get("curation", {}).get("state", ""),
-        "location_mode": project.get("location", {}).get("mode", ""),
-        "profile_handoff_state": profile.get("handoff_state", "none"),
-    }
-
-
-def expected_entries_from_seed_manifest(root: Path = ROOT) -> tuple[list[dict[str, str]], list[str]]:
-    errors: list[str] = []
-    manifest = load_json(root / SEED_MANIFEST_PATH.relative_to(ROOT))
-    manifest_dir = (root / "examples" / "commonworld").resolve()
-    projects_dir = (manifest_dir / "projects").resolve()
-    entries: list[dict[str, str]] = []
-    for project_path in manifest.get("project_paths", []):
-        if not isinstance(project_path, str):
-            errors.append("catalog export source manifest project_paths entries must be strings")
-            continue
-        candidate = (manifest_dir / project_path).resolve()
-        try:
-            candidate.relative_to(projects_dir)
-        except ValueError:
-            errors.append("catalog export source manifest project_paths entries must stay inside examples/commonworld/projects")
-            continue
-        if not candidate.is_file():
-            errors.append(f"catalog export source manifest references missing project file: {project_path}")
-            continue
-        entries.append(project_entry_for(candidate, root.resolve()))
-    return entries, errors
 
 
 def validate_catalog_export_contract(root: Path = ROOT) -> list[str]:
@@ -117,10 +88,14 @@ def validate_catalog_export_contract(root: Path = ROOT) -> list[str]:
     if sample.get("source_manifest_path") != "examples/commonworld/seed-projects.json":
         errors.append("catalog export sample must point at examples/commonworld/seed-projects.json")
 
-    expected_entries, manifest_errors = expected_entries_from_seed_manifest(root)
+    expected_export, manifest_errors = build_catalog_export(root)
     errors.extend(manifest_errors)
-    if not manifest_errors and sample.get("entries") != expected_entries:
+    if not manifest_errors and sample != expected_export:
+        errors.append("catalog export sample must match deterministic generator output")
+    if not manifest_errors and sample.get("entries") != expected_export.get("entries"):
         errors.append("catalog export sample entries must deterministically mirror seed manifest project order and public metadata")
+    if not manifest_errors and sample_path.read_text(encoding="utf-8") != stable_json(expected_export):
+        errors.append("catalog export sample JSON formatting must match deterministic generator output")
 
     boundary = sample.get("boundary", {})
     if boundary.get("access") != "read-only":

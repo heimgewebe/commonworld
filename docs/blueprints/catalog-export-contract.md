@@ -47,6 +47,8 @@ The export is derived. It does not decide whether a project is valid, curated, j
 
 Source curation remains with CommonProject files and their curation policy. Participation, administration and review write effects remain outside commonworld's static export surface.
 
-## Next safe implementation
+## Implemented proof export generator
 
-The next implementation slice may add a deterministic static export generator or a proof-only export file. It should still avoid API runtime, database selection, ingestion workers and public write paths.
+COMMONWORLD-ATLAS-V1-T011 is implemented by `scripts/generate_catalog_export.py` and `examples/commonworld/catalog-export.sample.json`.
+
+The generator deterministically derives the proof export from `examples/commonworld/seed-projects.json` and the referenced CommonProject files. `make generate-catalog-export` rewrites the proof export, while `make validate` checks that the committed export is up to date. It does not introduce API runtime, database selection, ingestion workers or public write paths.
