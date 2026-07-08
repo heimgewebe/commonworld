@@ -1,22 +1,13 @@
-const SEED_MANIFEST_URL = new URL("../../examples/commonworld/seed-projects.json", import.meta.url);
-
-const ASPECT_COLORS = {
-  "aspect.data": "var(--aspect-data)",
-  "aspect.community": "var(--aspect-community)",
-  "aspect.infrastructure": "var(--aspect-infrastructure)",
-  "aspect.repair": "var(--aspect-repair)",
-  "aspect.education": "var(--aspect-education)",
-  "aspect.mutual-aid": "var(--aspect-mutual-aid)",
-};
-
-const ICON_GLYPHS = {
-  "icon.map": "⌖",
-  "icon.people": "◌",
-  "icon.layers": "▣",
-  "icon.tool": "⚒",
-  "icon.book-open": "◇",
-  "icon.hands": "∞",
-};
+import {
+  aspectColor,
+  buildSegments,
+  curationBadgeLabel,
+  formatConfidence,
+  formatPercent,
+  gradientFor,
+  iconFor,
+  loadSeedProjects,
+} from "../shared/aspects.js";
 
 function requiredElement(selector) {
   const element = document.querySelector(selector);
@@ -32,50 +23,6 @@ const detailSurface = requiredElement("[data-detail-surface]");
 const closeButton = requiredElement("[data-close-detail]");
 let activeNodeButton = null;
 
-function sortAspects(aspects) {
-  return [...aspects].sort((left, right) => {
-    const byWeight = right.weight - left.weight;
-    if (byWeight !== 0) return byWeight;
-    const byLabel = left.label.localeCompare(right.label, "en", { sensitivity: "base" });
-    if (byLabel !== 0) return byLabel;
-    return left.id.localeCompare(right.id, "en", { sensitivity: "base" });
-  });
-}
-
-function buildSegments(project) {
-  const ordered = sortAspects(project.aspects);
-  let cursor = 0;
-
-  return ordered.map((aspect, index) => {
-    const start = cursor;
-    const end = index === ordered.length - 1 ? 1 : cursor + aspect.weight;
-    cursor = end;
-    return { aspect, start, end, span: end - start };
-  });
-}
-
-function aspectColor(aspect) {
-  return ASPECT_COLORS[aspect.color_token] || "var(--line)";
-}
-
-function gradientFor(project) {
-  const parts = buildSegments(project).map(({ aspect, start, end }) => {
-    return `${aspectColor(aspect)} ${start}turn ${end}turn`;
-  });
-  return `conic-gradient(${parts.join(", ")})`;
-}
-
-function formatPercent(value) {
-  const percent = value * 100;
-  if (percent > 0 && percent < 1) return "<1%";
-  if (percent < 10 && !Number.isInteger(percent)) return `${percent.toFixed(1)}%`;
-  return `${Math.round(percent)}%`;
-}
-
-function formatConfidence(value) {
-  return `${Math.round(value * 100)}% confidence`;
-}
-
 function evidenceText(evidence) {
   return evidence
     .map((item) => {
@@ -89,12 +36,6 @@ function setExpandedButton(nextButton) {
   for (const button of nodeList.querySelectorAll(".mixed-node")) {
     button.setAttribute("aria-expanded", button === nextButton ? "true" : "false");
   }
-}
-
-function curationBadgeLabel(project) {
-  const state = project.curation?.state || "unreviewed";
-  if (state === "fixture") return "Synthetic fixture";
-  return `Curation: ${state}`;
 }
 
 function renderNode(project) {
@@ -144,10 +85,6 @@ function renderNode(project) {
   }
 
   return wrapper;
-}
-
-function iconFor(aspect) {
-  return ICON_GLYPHS[aspect.icon_token] || aspect.icon_token;
 }
 
 function renderEvidence(aspect) {
@@ -218,21 +155,6 @@ function closeDetail(options = {}) {
     activeNodeButton.focus();
   }
   activeNodeButton = null;
-}
-
-async function loadJson(url) {
-  const response = await fetch(url);
-  if (!response.ok) {
-    throw new Error(`Could not load ${url}: ${response.status}`);
-  }
-  return response.json();
-}
-
-async function loadSeedProjects() {
-  const manifest = await loadJson(SEED_MANIFEST_URL); if (!Array.isArray(manifest.project_paths)) { throw new Error("Seed manifest must contain project_paths."); }
-  return Promise.all(
-    manifest.project_paths.map((projectPath) => loadJson(new URL(projectPath, SEED_MANIFEST_URL))),
-  );
 }
 
 async function init() {
