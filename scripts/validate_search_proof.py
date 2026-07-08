@@ -25,6 +25,10 @@ REQUIRED_HTML_TOKENS = (
     "data-reset-search",
     "data-result-grid",
     "data-result-template",
+    "data-ranking-note",
+    "data-card-score",
+    "data-card-reasons",
+    "transparent proof score",
     "search-index-input.sample.json",
     "No server, no database, no crawler and no API route.",
     "not join, manage or submit actions",
@@ -44,8 +48,14 @@ REQUIRED_JS_TOKENS = (
     "private_review_notes",
     "validateSearchInput",
     "entry_count",
+    "searchableFields",
+    "explainMatch",
+    "rankResults",
     "data-search-query",
     "data-result-grid",
+    "data-ranking-note",
+    "data-card-score",
+    "data-card-reasons",
     "addEventListener(\"input\"",
     "addEventListener(\"change\"",
 )
@@ -60,12 +70,16 @@ REQUIRED_CSS_TOKENS = (
     ".result-grid",
     ".search-card",
     ".aspect-pill",
+    ".reason-pill",
+    ".score-pill",
     ":focus-visible",
 )
 REQUIRED_README_TOKENS = (
     "COMMONWORLD-ATLAS-V1-T016",
     "search-index-input.sample.json",
     "does not introduce a search endpoint",
+    "transparent match reasons",
+    "not a server ranking",
     "vector database",
     "public submissions",
     "weltgewebe write path",
@@ -138,6 +152,10 @@ def validate_search_proof(root: Path = ROOT) -> list[str]:
         errors.append("search proof must expose source project_path for traceability")
     if "data-card-handoff" not in html or "profile_handoff_state" not in js:
         errors.append("search proof must expose profile_handoff_state as read-only marker")
+    if "data-card-score" not in html or "local proof points" not in js:
+        errors.append("search proof must expose a local proof score without server ranking")
+    if "data-card-reasons" not in html or "renderReasonPill" not in js:
+        errors.append("search proof must expose transparent match reasons")
 
     return errors
 

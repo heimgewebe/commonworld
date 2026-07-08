@@ -99,7 +99,8 @@
   font-weight: 800;
 }
 
-.result-count {
+.result-count,
+.ranking-note {
   margin: 0;
 }
 
@@ -131,6 +132,8 @@
 }
 
 .aspect-pill,
+.reason-pill,
+.score-pill,
 .empty-state {
   border: 1px solid var(--line);
   border-radius: 999px;
@@ -148,6 +151,21 @@
 .card-meta {
   grid-template-columns: 1fr;
   margin: 0;
+}
+
+.reason-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.35rem;
+}
+
+.reason-pill {
+  font-size: 0.78rem;
+}
+
+.score-pill {
+  display: inline-block;
+  font-weight: 800;
 }
 
 .card-meta code,

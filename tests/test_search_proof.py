@@ -59,6 +59,26 @@ class StaticSearchProofTests(unittest.TestCase):
 
         self.assertIn("search proof must expose source project_path for traceability", errors)
 
+    def test_search_proof_requires_match_reasons(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp_dir:
+            tmp_root = self.copy_surface(tmp_dir)
+            path = tmp_root / "proofs" / "search" / "index.html"
+            path.write_text(path.read_text(encoding="utf-8").replace("data-card-reasons", "data-card-explanation", 1), encoding="utf-8")
+
+            errors = validate_search_proof(tmp_root)
+
+        self.assertIn("search proof must expose transparent match reasons", errors)
+
+    def test_search_proof_requires_local_score(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp_dir:
+            tmp_root = self.copy_surface(tmp_dir)
+            path = tmp_root / "proofs" / "search" / "search.js"
+            path.write_text(path.read_text(encoding="utf-8").replace("local proof points", "server score", 1), encoding="utf-8")
+
+            errors = validate_search_proof(tmp_root)
+
+        self.assertIn("search proof must expose a local proof score without server ranking", errors)
+
 
 if __name__ == "__main__":
     unittest.main()
