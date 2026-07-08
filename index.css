@@ -60,6 +60,7 @@ h1 {
 
 .hub-hero p:not(.eyebrow),
 .proof-card p,
+.trust-panel li,
 .boundary-panel li {
   color: var(--muted);
   line-height: 1.6;
@@ -72,6 +73,7 @@ h1 {
 }
 
 .proof-card,
+.trust-panel,
 .boundary-panel {
   border: 1px solid var(--line);
   border-radius: 1.5rem;
@@ -117,10 +119,12 @@ h1 {
   font-weight: 800;
 }
 
+.trust-panel,
 .boundary-panel {
   padding: 1.35rem;
 }
 
+.trust-panel ul,
 .boundary-panel ul {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(12rem, 1fr));
@@ -130,9 +134,24 @@ h1 {
   list-style: none;
 }
 
+.trust-panel li,
 .boundary-panel li {
   border: 1px solid var(--line);
   border-radius: 999px;
   padding: 0.55rem 0.75rem;
   background: rgba(237, 244, 239, 0.05);
+}
+
+.trust-panel li {
+  display: grid;
+  gap: 0.25rem;
+  border-radius: 1rem;
+}
+
+.trust-panel strong {
+  color: var(--text);
+}
+
+.trust-panel span {
+  color: var(--muted);
 }

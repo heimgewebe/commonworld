@@ -91,8 +91,10 @@ function setExpandedButton(nextButton) {
   }
 }
 
-function fixtureLabel(project) {
-  return project.curation?.state === "fixture" ? "Synthetic fixture" : "";
+function curationBadgeLabel(project) {
+  const state = project.curation?.state || "unreviewed";
+  if (state === "fixture") return "Synthetic fixture";
+  return `Curation: ${state}`;
 }
 
 function renderNode(project) {
@@ -107,12 +109,12 @@ function renderNode(project) {
   button.setAttribute("aria-controls", "project-detail");
   button.setAttribute("aria-expanded", "false");
 
-  const syntheticLabel = fixtureLabel(project);
+  const curationBadge = curationBadgeLabel(project);
   const accessibilityParts = [
     `${project.title}: ${segments
       .map(({ aspect }) => `${aspect.label}, ${formatPercent(aspect.weight)}`)
       .join(", ")}.`,
-    syntheticLabel ? `${syntheticLabel}.` : "",
+    curationBadge ? `${curationBadge}.` : "",
     "Open details.",
   ].filter(Boolean);
   button.setAttribute("aria-label", accessibilityParts.join(" "));
@@ -134,10 +136,10 @@ function renderNode(project) {
 
   wrapper.append(button, aspectSummary);
 
-  if (syntheticLabel) {
+  if (curationBadge) {
     const badge = document.createElement("p");
     badge.className = "node-badge";
-    badge.textContent = syntheticLabel;
+    badge.textContent = curationBadge;
     wrapper.append(badge);
   }
 

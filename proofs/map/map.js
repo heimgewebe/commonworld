@@ -91,6 +91,18 @@ function privacyLabel(project) {
   return "Hidden location";
 }
 
+function curationStateLabel(project) {
+  const state = project.curation?.state || "unreviewed";
+  if (state === "fixture") return "Synthetic fixture";
+  return state;
+}
+
+function curationBadgeLabel(project) {
+  const state = curationStateLabel(project);
+  if (state === "Synthetic fixture") return state;
+  return `Curation: ${state}`;
+}
+
 async function loadJson(url) {
   const response = await fetch(url);
   if (!response.ok) {
@@ -256,6 +268,7 @@ function openDetail(project, sourceButton) {
   detailSurface.querySelector("[data-detail-sphere]").textContent = project.sphere;
   detailSurface.querySelector("[data-detail-location]").textContent = `${project.location.mode} / ${project.location.precision}`;
   detailSurface.querySelector("[data-detail-privacy]").textContent = project.location.privacy_note || privacyLabel(project);
+  detailSurface.querySelector("[data-detail-curation]").textContent = curationStateLabel(project);
   detailSurface.querySelector("[data-aspect-cards]").replaceChildren(...buildSegments(project).map(renderAspectCard));
   detailSurface.focus();
 }
@@ -287,7 +300,7 @@ function createMapMarkerElement(project) {
   button.style.setProperty("--ring", gradientFor(project));
   button.setAttribute("aria-controls", "project-detail");
   button.setAttribute("aria-expanded", "false");
-  button.setAttribute("aria-label", `${project.title}. ${privacyLabel(project)}. Open details.`);
+  button.setAttribute("aria-label", `${project.title}. ${privacyLabel(project)}. ${curationBadgeLabel(project)}. Open details.`);
 
   const core = document.createElement("span");
   core.className = "mixed-node-core";
@@ -305,6 +318,11 @@ function createMapMarkerElement(project) {
     badge.textContent = "Approximate";
     container.append(badge);
   }
+
+  const curationBadge = document.createElement("span");
+  curationBadge.className = "curation-badge";
+  curationBadge.textContent = curationBadgeLabel(project);
+  container.append(curationBadge);
 
   return container;
 }
@@ -334,7 +352,7 @@ async function initMap() {
       new maplibre.Marker({ element: createMapMarkerElement(project) }).setLngLat([lon, lat]).addTo(map);
     }
 
-    loadState.textContent = `Map ready. ${renderableProjects.length} location-safe node rendered. ${skippedProjects.length} hidden digital node skipped.`;
+    loadState.textContent = `Map ready. ${renderableProjects.length} location-safe node rendered. ${skippedProjects.length} hidden node skipped.`;
   } catch (error) {
     loadState.textContent = error.message;
     loadState.dataset.error = "true";
