@@ -83,3 +83,10 @@ A stale generated search input artifact must fail validation until regenerated. 
 ## Next safe implementation
 
 A later slice may add a deterministic generated search input sample. It should still avoid a search endpoint, database choice, vector store, crawler, ingestion worker and public write path.
+
+
+## Implemented proof search input generator
+
+COMMONWORLD-ATLAS-V1-T015 is implemented by `scripts/generate_search_index_input.py` and `examples/commonworld/search-index-input.sample.json`.
+
+The generator deterministically derives the proof search input from the static catalog export and referenced CommonProject files. `make generate-search-index-input` rewrites the sample, while `make validate` checks that the committed sample is up to date. It exposes only the T014 allowed fields and does not introduce a search endpoint, database, vector store, crawler, ingestion worker or public write path.

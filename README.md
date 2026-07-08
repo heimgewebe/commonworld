@@ -79,3 +79,7 @@ T013 is documented in `docs/blueprints/catalog-api-route-fixtures.md` and implem
 ## Search index input contract
 
 T014 is documented in `docs/blueprints/search-index-input-contract.md` and anchored by `contracts/commonworld/search-index-input.contract.json`. It defines allowed future search input fields and deterministic rebuild policy without introducing a search service, vector database, crawler, ingestion worker, submissions or write path.
+
+## Static search index input sample
+
+T015 is implemented by `scripts/generate_search_index_input.py` and `examples/commonworld/search-index-input.sample.json`. It deterministically projects the T014 allowed fields from committed CommonProject data and the static catalog export without introducing a search endpoint, search service, vector database, crawler, ingestion worker, submissions or write path.
