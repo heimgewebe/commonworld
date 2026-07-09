@@ -119,3 +119,7 @@ test:
 .PHONY: capture-proof-hub-browser-smoke
 capture-proof-hub-browser-smoke:
 	python3 scripts/smoke_proof_hub_browser.py
+
+.PHONY: smoke-pages-live
+smoke-pages-live:
+	python3 scripts/smoke_pages_live.py
