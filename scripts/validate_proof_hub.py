@@ -129,6 +129,10 @@ def validate_proof_hub(root: Path = ROOT) -> list[str]:
             visible_text = card.visible_text
             if expected_role not in visible_text:
                 errors.append(f"proof hub visible role missing for {proof_id}: expected {expected_role}")
+            if "Surface type" not in visible_text:
+                errors.append(f"proof hub surface type missing for {proof_id}")
+            if "Evidence mode" not in visible_text:
+                errors.append(f"proof hub evidence mode missing for {proof_id}")
         target_index = root / surface["target_index"]
         if not target_index.is_file():
             errors.append(f"proof hub link target missing: {target_index.relative_to(root)}")
@@ -155,6 +159,18 @@ def validate_proof_hub(root: Path = ROOT) -> list[str]:
         "Curated",
         "Archived",
         "Trust state is visible before action",
+        "Surface taxonomy",
+        "Different proofs answer different questions.",
+        "Visual explanation",
+        "Location rendering",
+        "Projection focus",
+        "Static data-quality check",
+        "Surface type",
+        "Evidence mode",
+        "Static fixture profile",
+        "Static map plus offline smoke",
+        "Static Aether branch",
+        "Search input and query fixtures",
     )
     for token in required_html_tokens:
         if token not in html:
@@ -178,6 +194,8 @@ def validate_proof_hub(root: Path = ROOT) -> list[str]:
         ".proof-grid",
         ".proof-card",
         ".proof-role",
+        ".proof-classification",
+        ".surface-taxonomy",
         ".trust-panel",
         ".boundary-panel",
         ":focus-visible",
