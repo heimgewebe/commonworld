@@ -13,3 +13,5 @@ python3 -m http.server 4173
 Then open `http://localhost:4173/proofs/search/`.
 
 T017 adds explainable local match reasons. The score is a browser-only proof aid, not a server ranking, curation decision or authority signal.
+
+T018 adds `examples/commonworld/search-query-fixtures.sample.json`, a static query fixture set for representative searches such as repair, open data, Hamburg, mutual aid and exact venue lookup. These fixtures test quality drift without adding a search runtime.
