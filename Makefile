@@ -123,3 +123,7 @@ capture-proof-hub-browser-smoke:
 .PHONY: smoke-pages-live
 smoke-pages-live:
 	python3 scripts/smoke_pages_live.py
+
+.PHONY: check-pages-dns-target
+check-pages-dns-target:
+	python3 scripts/check_pages_dns_target.py
