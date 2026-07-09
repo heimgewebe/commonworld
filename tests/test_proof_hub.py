@@ -140,6 +140,39 @@ class ProofHubTests(unittest.TestCase):
 
         self.assertIn("proof hub duplicate data-proof-link: map", errors)
 
+    def test_hub_requires_surface_taxonomy_panel(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp_dir:
+            tmp_root = self.copy_valid_root(tmp_dir)
+            html_path = tmp_root / "index.html"
+            html = html_path.read_text(encoding="utf-8").replace("Surface taxonomy", "Surface overview", 1)
+            html_path.write_text(html, encoding="utf-8")
+
+            errors = validate_proof_hub(tmp_root)
+
+        self.assertIn("proof hub HTML missing Surface taxonomy", errors)
+
+    def test_hub_requires_card_surface_type(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp_dir:
+            tmp_root = self.copy_valid_root(tmp_dir)
+            html_path = tmp_root / "index.html"
+            html = html_path.read_text(encoding="utf-8").replace("<dt>Surface type</dt>", "<dt>Surface class</dt>", 1)
+            html_path.write_text(html, encoding="utf-8")
+
+            errors = validate_proof_hub(tmp_root)
+
+        self.assertIn("proof hub surface type missing for project-profile", errors)
+
+    def test_hub_requires_card_evidence_mode(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp_dir:
+            tmp_root = self.copy_valid_root(tmp_dir)
+            html_path = tmp_root / "index.html"
+            html = html_path.read_text(encoding="utf-8").replace("<dt>Evidence mode</dt>", "<dt>Evidence source</dt>", 1)
+            html_path.write_text(html, encoding="utf-8")
+
+            errors = validate_proof_hub(tmp_root)
+
+        self.assertIn("proof hub evidence mode missing for project-profile", errors)
+
 
 if __name__ == "__main__":
     unittest.main()

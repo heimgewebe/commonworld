@@ -60,6 +60,7 @@ h1 {
 
 .hub-hero p:not(.eyebrow),
 .proof-card p,
+.surface-taxonomy li,
 .trust-panel li,
 .boundary-panel li {
   color: var(--muted);
@@ -132,6 +133,7 @@ h1 {
   padding: 1.35rem;
 }
 
+.surface-taxonomy ul,
 .trust-panel ul,
 .boundary-panel ul {
   display: grid;
@@ -142,6 +144,7 @@ h1 {
   list-style: none;
 }
 
+.surface-taxonomy li,
 .trust-panel li,
 .boundary-panel li {
   border: 1px solid var(--line);
@@ -162,4 +165,31 @@ h1 {
 
 .trust-panel span {
   color: var(--muted);
+}
+
+
+.proof-classification {
+  display: grid;
+  gap: 0.55rem;
+  margin: 0;
+}
+
+.proof-classification div {
+  border: 1px solid var(--line);
+  border-radius: 0.9rem;
+  background: rgba(255, 255, 255, 0.04);
+  padding: 0.65rem;
+}
+
+.proof-classification dt {
+  color: var(--muted);
+  font-size: 0.72rem;
+  font-weight: 800;
+  letter-spacing: 0.09em;
+  text-transform: uppercase;
+}
+
+.proof-classification dd {
+  margin: 0.25rem 0 0;
+  color: var(--text);
 }
