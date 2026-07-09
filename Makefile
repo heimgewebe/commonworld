@@ -13,6 +13,7 @@ VALIDATE_TARGETS = \
 	validate-search-query-fixtures \
 	validate-proof-surfaces \
 	validate-proof-hub \
+	validate-proof-hub-offline-smoke \
 	validate-mobile-atlas-shift \
 	validate-mobile-atlas-shift-doctrine \
 	validate-projection-contract \
@@ -63,6 +64,9 @@ validate-proof-surfaces:
 
 validate-proof-hub:
 	python3 scripts/validate_proof_hub.py
+
+validate-proof-hub-offline-smoke:
+	python3 scripts/smoke_proof_hub_offline.py >/dev/null
 
 validate-mobile-atlas-shift:
 	python3 scripts/validate_mobile_atlas_shift.py
