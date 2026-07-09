@@ -286,6 +286,28 @@ class ProofHubTests(unittest.TestCase):
 
         self.assertTrue(any(error.startswith("proof hub project preview order mismatch") for error in errors))
 
+    def test_hub_requires_visual_hierarchy_sections(self) -> None:
+        html = (ROOT / "index.html").read_text(encoding="utf-8")
+        self.assertIn('class="proof-surfaces"', html)
+        self.assertIn('class="section-heading"', html)
+        self.assertIn('id="proof-surfaces-title"', html)
+        self.assertIn("Inspect the proofs before reading the catalog.", html)
+        self.assertIn("Readable examples, not action cards.", html)
+
+    def test_hub_rejects_missing_project_preview_hierarchy_boundary(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp_dir:
+            tmp_root = self.copy_valid_root(tmp_dir)
+            html_path = tmp_root / "index.html"
+            html = html_path.read_text(encoding="utf-8").replace("They do not join, submit, manage or publish anything.", "They are examples.", 1)
+            html_path.write_text(html, encoding="utf-8")
+
+            errors = validate_proof_hub(tmp_root)
+
+        self.assertIn(
+            "proof hub project preview hierarchy token missing: They do not join, submit, manage or publish anything.",
+            errors,
+        )
+
 
 if __name__ == "__main__":
     unittest.main()

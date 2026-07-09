@@ -29,7 +29,14 @@
         </ul>
       </section>
 
-      <section class="proof-grid" aria-label="commonworld proof surfaces">
+      <section class="proof-surfaces" aria-labelledby="proof-surfaces-title">
+        <div class="section-heading">
+          <p class="eyebrow">Proof surfaces</p>
+          <h2 id="proof-surfaces-title">Inspect the proofs before reading the catalog.</h2>
+          <p>Each card opens one bounded static proof, so readers can separate explanation, map rendering, Aether projection and search checks.</p>
+        </div>
+
+        <div class="proof-grid" aria-label="commonworld proof surfaces">
         <a
           class="proof-card"
           href="./proofs/mixed-node/"
@@ -97,6 +104,7 @@
           <p>Filter the generated static search input before any search service, database or crawler exists.</p>
           <span>Enter Search proof</span>
         </a>
+        </div>
       </section>
 
       <section class="catalog-snapshot" aria-labelledby="catalog-snapshot-title" data-catalog-source="examples/commonworld/catalog-export.sample.json">
@@ -107,7 +115,7 @@
           The numbers below are derived from <code>examples/commonworld/catalog-export.sample.json</code>; they are not a live API, ranking system or publication queue.
         </p>
         <dl class="catalog-metrics" aria-label="static catalog snapshot metrics">
-          <div><dt>Entries</dt><dd data-catalog-metric="entries">4</dd></div>
+          <div class="metric-primary"><dt>Entries</dt><dd data-catalog-metric="entries">4</dd></div>
           <div><dt>Fixture</dt><dd data-catalog-metric="curation.fixture">3</dd></div>
           <div><dt>Candidate</dt><dd data-catalog-metric="curation.candidate">1</dd></div>
           <div><dt>Curated</dt><dd data-catalog-metric="curation.curated">0</dd></div>
@@ -116,6 +124,12 @@
           <div><dt>Exact location</dt><dd data-catalog-metric="location.exact">1</dd></div>
           <div><dt>Hidden location</dt><dd data-catalog-metric="location.hidden">1</dd></div>
         </dl>
+
+        <div class="section-heading project-preview-heading">
+          <p class="eyebrow">Project previews</p>
+          <h3>Readable examples, not action cards.</h3>
+          <p>These cards expose committed static search-index fields. They do not join, submit, manage or publish anything.</p>
+        </div>
 
         <div class="project-preview-grid" aria-label="static CommonProject previews" data-project-preview-source="examples/commonworld/search-index-input.sample.json">
           <article

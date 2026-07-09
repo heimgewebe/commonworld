@@ -67,10 +67,24 @@ h1 {
   line-height: 1.6;
 }
 
+.proof-surfaces {
+  display: grid;
+  gap: 1rem;
+}
+
+.section-heading {
+  max-width: 62rem;
+}
+
+.section-heading p:not(.eyebrow) {
+  color: var(--muted);
+  line-height: 1.6;
+}
+
 .proof-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(17rem, 1fr));
-  gap: 1rem;
+  grid-template-columns: repeat(auto-fit, minmax(15rem, 1fr));
+  gap: 0.7rem;
 }
 
 .proof-card,
@@ -85,8 +99,8 @@ h1 {
 
 .proof-card {
   display: grid;
-  min-height: 18rem;
-  padding: 1.35rem;
+  min-height: 16rem;
+  padding: 1.15rem;
   color: inherit;
   text-decoration: none;
   transition:
@@ -112,7 +126,7 @@ h1 {
 
 .proof-card h2 {
   margin-bottom: 0.5rem;
-  font-size: clamp(1.5rem, 5vw, 2.6rem);
+  font-size: clamp(1.35rem, 4vw, 2.2rem);
 }
 
 .proof-role {
@@ -208,9 +222,20 @@ h1 {
 
 .catalog-metrics {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(10rem, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(9rem, 1fr));
   gap: 0.7rem;
   margin: 1rem 0 0;
+}
+
+
+.metric-primary {
+  grid-column: span 2;
+}
+
+.project-preview-heading {
+  margin-top: 1.35rem;
+  padding-top: 1.1rem;
+  border-top: 1px solid var(--line);
 }
 
 .catalog-metrics div {
@@ -237,8 +262,8 @@ h1 {
 
 .project-preview-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(16rem, 1fr));
-  gap: 0.8rem;
+  grid-template-columns: repeat(auto-fit, minmax(15rem, 1fr));
+  gap: 0.7rem;
   margin-top: 1rem;
 }
 
@@ -246,11 +271,11 @@ h1 {
   border: 1px solid var(--line);
   border-radius: 1.1rem;
   background: rgba(255, 255, 255, 0.04);
-  padding: 0.9rem;
+  padding: 0.85rem;
 }
 
 .project-preview-card h3 {
-  margin: 0.6rem 0 0.45rem;
+  margin: 0.5rem 0 0.4rem;
   color: var(--text);
 }
 
