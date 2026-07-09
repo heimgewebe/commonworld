@@ -90,6 +90,23 @@ class ProofHubOfflineSmokeTests(unittest.TestCase):
 
         self.assertIn("offline hub smoke card extraction failed: missing proof card: search", errors)
 
+    def test_project_preview_order_drift_fails_smoke(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp_dir:
+            root = self.copy_valid_root(tmp_dir)
+            html_path = root / "index.html"
+            html_path.write_text(
+                html_path.read_text(encoding="utf-8").replace(
+                    'data-project-id="neighborhood-repair-circle-fixture"',
+                    'data-project-id="solidarity-kitchen-fixture"',
+                    1,
+                ),
+                encoding="utf-8",
+            )
+
+            errors = validate_offline_hub_smoke(root)
+
+        self.assertTrue(any(error.startswith("offline hub smoke project preview order mismatch") for error in errors))
+
 
 if __name__ == "__main__":
     unittest.main()

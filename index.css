@@ -234,3 +234,57 @@ h1 {
   font-size: 1.6rem;
   font-weight: 900;
 }
+
+.project-preview-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(16rem, 1fr));
+  gap: 0.8rem;
+  margin-top: 1rem;
+}
+
+.project-preview-card {
+  border: 1px solid var(--line);
+  border-radius: 1.1rem;
+  background: rgba(255, 255, 255, 0.04);
+  padding: 0.9rem;
+}
+
+.project-preview-card h3 {
+  margin: 0.6rem 0 0.45rem;
+  color: var(--text);
+}
+
+.project-preview-meta,
+.project-preview-location {
+  color: var(--muted);
+  font-size: 0.8rem;
+}
+
+.project-preview-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+  margin: 0;
+}
+
+.project-preview-meta span,
+.project-preview-aspects li {
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  padding: 0.25rem 0.45rem;
+  background: rgba(237, 244, 239, 0.05);
+}
+
+.project-preview-aspects {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.35rem;
+  margin: 0.75rem 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.project-preview-aspects li {
+  color: var(--text);
+  font-size: 0.78rem;
+}
