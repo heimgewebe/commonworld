@@ -5,9 +5,11 @@ from pathlib import Path
 
 from scripts.validate_contracts import ROOT
 from scripts.validate_proof_hub import (
+    extract_project_preview_cards,
     extract_proof_cards,
     extract_proof_links,
     load_catalog_snapshot_metrics,
+    load_project_preview_entries,
     validate_proof_hub,
 )
 from scripts.validate_proof_surfaces import load_proof_surfaces
@@ -226,6 +228,63 @@ class ProofHubTests(unittest.TestCase):
             errors = validate_proof_hub(tmp_root)
 
         self.assertIn("proof hub catalog snapshot source missing or drifted", errors)
+
+    def test_project_preview_cards_match_search_index_input(self) -> None:
+        html = (ROOT / "index.html").read_text(encoding="utf-8")
+        cards, duplicates = extract_project_preview_cards(html)
+        entries = load_project_preview_entries(ROOT)
+        self.assertEqual(set(), duplicates)
+        self.assertEqual([entry["id"] for entry in entries], list(cards))
+        for entry in entries:
+            with self.subTest(project_id=entry["id"]):
+                card = cards[entry["id"]]
+                self.assertEqual(entry["curation_state"], card.attrs["data-project-curation"])
+                self.assertEqual(entry["location_mode"], card.attrs["data-project-location-mode"])
+                self.assertEqual(entry["project_path"], card.attrs["data-project-path"])
+                self.assertIn(entry["title"], card.visible_text)
+                self.assertIn(entry["summary"], card.visible_text)
+                self.assertIn(entry["location_label"], card.visible_text)
+
+    def test_hub_rejects_project_preview_title_drift(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp_dir:
+            tmp_root = self.copy_valid_root(tmp_dir)
+            html_path = tmp_root / "index.html"
+            html = html_path.read_text(encoding="utf-8").replace("OpenStreetMap", "Open Mapping Network", 1)
+            html_path.write_text(html, encoding="utf-8")
+
+            errors = validate_proof_hub(tmp_root)
+
+        self.assertIn("proof hub project preview visible token missing for openstreetmap: OpenStreetMap", errors)
+
+    def test_hub_rejects_project_preview_source_drift(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp_dir:
+            tmp_root = self.copy_valid_root(tmp_dir)
+            html_path = tmp_root / "index.html"
+            html = html_path.read_text(encoding="utf-8").replace(
+                'data-project-preview-source="examples/commonworld/search-index-input.sample.json"',
+                'data-project-preview-source="/api/projects"',
+                1,
+            )
+            html_path.write_text(html, encoding="utf-8")
+
+            errors = validate_proof_hub(tmp_root)
+
+        self.assertIn("proof hub project preview source missing or drifted", errors)
+
+    def test_hub_rejects_project_preview_order_drift(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp_dir:
+            tmp_root = self.copy_valid_root(tmp_dir)
+            html_path = tmp_root / "index.html"
+            html = html_path.read_text(encoding="utf-8").replace(
+                'data-project-id="neighborhood-repair-circle-fixture"',
+                'data-project-id="solidarity-kitchen-fixture"',
+                1,
+            )
+            html_path.write_text(html, encoding="utf-8")
+
+            errors = validate_proof_hub(tmp_root)
+
+        self.assertTrue(any(error.startswith("proof hub project preview order mismatch") for error in errors))
 
 
 if __name__ == "__main__":

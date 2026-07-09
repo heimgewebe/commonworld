@@ -17,7 +17,7 @@ ROOT = Path(__file__).resolve().parents[1]
 if str(ROOT) not in sys.path:
     sys.path.insert(0, str(ROOT))
 
-from scripts.validate_proof_hub import extract_proof_cards, validate_proof_hub
+from scripts.validate_proof_hub import extract_project_preview_cards, extract_proof_cards, load_project_preview_entries, validate_proof_hub
 from scripts.validate_proof_surfaces import load_proof_surfaces
 
 EXPECTED_SURFACE_TYPES = {
@@ -155,6 +155,7 @@ def smoke_report(root: Path = ROOT) -> HubOfflineSmokeReport:
             "each card exposes a surface type and evidence mode",
             "taxonomy panel explains the four surface categories",
             "static catalog snapshot remains tied to the committed catalog export",
+            "static project preview cards remain tied to committed search-index input",
             "trust and boundary panels remain visible",
             "hub introduces no script, form, account or submission affordance",
         ),
@@ -185,6 +186,8 @@ def validate_offline_hub_smoke(root: Path = ROOT) -> list[str]:
         "trust-panel",
         "catalog-snapshot",
         "catalog-metrics",
+        "project-preview-grid",
+        "project-preview-card",
         "boundary-panel",
     ):
         if token not in html:
@@ -197,6 +200,8 @@ def validate_offline_hub_smoke(root: Path = ROOT) -> list[str]:
         ".proof-classification",
         ".catalog-snapshot",
         ".catalog-metrics",
+        ".project-preview-grid",
+        ".project-preview-card",
         ":focus-visible",
     ):
         if token not in css:
@@ -224,6 +229,15 @@ def validate_offline_hub_smoke(root: Path = ROOT) -> list[str]:
             errors.append(
                 f"offline hub smoke evidence mode mismatch for {proof_id}: expected {expected_evidence}, got {card.evidence_mode}"
             )
+
+    preview_cards, preview_duplicates = extract_project_preview_cards(html)
+    if preview_duplicates:
+        errors.append(f"offline hub smoke duplicate project previews: {sorted(preview_duplicates)}")
+    expected_preview_ids = [entry.get("id") for entry in load_project_preview_entries(root)]
+    if list(preview_cards.keys()) != expected_preview_ids:
+        errors.append(
+            f"offline hub smoke project preview order mismatch: expected {expected_preview_ids}, got {list(preview_cards.keys())}"
+        )
 
     report = smoke_report(root)
     if report.taxonomy_entries != tuple(EXPECTED_SURFACE_TYPES.values()):
