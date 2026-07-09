@@ -6,6 +6,7 @@ VALIDATE_TARGETS = \
 	validate-shared-aspects \
 	validate-mixed-node-proof \
 	validate-map-proof \
+	validate-map-proof-offline-smoke \
 	validate-map-source-strategy \
 	validate-aether-proof \
 	validate-search-proof \
@@ -41,6 +42,9 @@ validate-mixed-node-proof:
 
 validate-map-proof:
 	python3 scripts/validate_map_proof.py
+
+validate-map-proof-offline-smoke:
+	python3 scripts/smoke_map_proof_offline.py >/dev/null
 
 validate-map-source-strategy:
 	python3 scripts/validate_map_source_strategy.py
