@@ -28,7 +28,8 @@
 .search-rules div,
 .card-meta div,
 .search-controls,
-.search-card {
+.search-card,
+.fixture-panel {
   border: 1px solid var(--line);
   border-radius: 1.25rem;
   background: rgba(22, 29, 35, 0.82);
@@ -39,7 +40,8 @@
 .card-meta dt,
 .search-field span,
 .filter-row span,
-.card-kicker {
+.card-kicker,
+.fixture-meta {
   color: var(--muted);
   font-size: 0.75rem;
   font-weight: 800;
@@ -57,7 +59,8 @@
   gap: 1rem;
 }
 
-.search-controls {
+.search-controls,
+.fixture-panel {
   display: grid;
   gap: 1rem;
 }
@@ -70,7 +73,8 @@
 
 .search-field input,
 .filter-row select,
-.filter-row button {
+.filter-row button,
+.fixture-button {
   width: 100%;
   border: 1px solid var(--line);
   border-radius: 999px;
@@ -82,7 +86,8 @@
 
 .search-field input:focus-visible,
 .filter-row select:focus-visible,
-.filter-row button:focus-visible {
+.filter-row button:focus-visible,
+.fixture-button:focus-visible {
   outline: 3px solid var(--focus);
   outline-offset: 3px;
 }
@@ -94,9 +99,30 @@
   align-items: end;
 }
 
-.filter-row button {
+.filter-row button,
+.fixture-button {
   cursor: pointer;
   font-weight: 800;
+}
+
+.fixture-list {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(14rem, 1fr));
+  gap: 0.75rem;
+}
+
+.fixture-item {
+  display: grid;
+  gap: 0.45rem;
+}
+
+.fixture-button {
+  border-radius: 1rem;
+  text-align: left;
+}
+
+.fixture-meta {
+  margin: 0;
 }
 
 .result-count,

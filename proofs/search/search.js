@@ -1,6 +1,7 @@
 import { loadJson } from "../shared/aspects.js";
 
 const SEARCH_INPUT_URL = new URL("../../examples/commonworld/search-index-input.sample.json", import.meta.url);
+const QUERY_FIXTURES_URL = new URL("../../examples/commonworld/search-query-fixtures.sample.json", import.meta.url);
 const ALLOWED_ENTRY_KEYS = [
   "id",
   "title",
@@ -12,6 +13,9 @@ const ALLOWED_ENTRY_KEYS = [
   "project_path",
   "profile_handoff_state",
 ];
+const QUERY_FIXTURE_KIND = "commonworld.static_search_query_fixtures";
+const QUERY_FIXTURE_STATUS = "static-fixture-only";
+const QUERY_FIXTURE_TASK = "COMMONWORLD-ATLAS-V1-T018";
 const FORBIDDEN_ENTRY_KEYS = new Set([
   "coordinates",
   "lat",
@@ -39,10 +43,13 @@ const locationFilter = requiredElement("[data-location-filter]");
 const resetButton = requiredElement("[data-reset-search]");
 const resultCount = requiredElement("[data-result-count]");
 const rankingNote = requiredElement("[data-ranking-note]");
+const queryFixtureState = requiredElement("[data-query-fixture-state]");
+const queryFixtureList = requiredElement("[data-query-fixtures]");
 const resultGrid = requiredElement("[data-result-grid]");
 const loadState = requiredElement("[data-load-state]");
 const resultTemplate = requiredElement("[data-result-template]");
 let entries = [];
+let queryFixtures = [];
 
 function normalise(value) {
   return String(value || "").toLocaleLowerCase("en");
@@ -128,6 +135,63 @@ function validateSearchInput(payload) {
   }
   payload.entries.forEach(validateEntry);
   return payload.entries;
+}
+
+function validateQueryFixturePayload(payload) {
+  if (payload.kind !== QUERY_FIXTURE_KIND) {
+    throw new Error("Search proof query fixtures must use the static query fixture kind.");
+  }
+  if (payload.status !== QUERY_FIXTURE_STATUS) {
+    throw new Error("Search proof query fixtures must remain static-fixture-only.");
+  }
+  if (payload.task !== QUERY_FIXTURE_TASK) {
+    throw new Error("Search proof query fixtures must declare T018.");
+  }
+  if (payload.source_input !== "examples/commonworld/search-index-input.sample.json") {
+    throw new Error("Search proof query fixtures must point at the static search input sample.");
+  }
+  if (payload.boundary?.implementation !== "no search service") {
+    throw new Error("Search proof query fixtures must not create a search service.");
+  }
+  if (payload.boundary?.runtime_dependency !== "none" || payload.boundary?.writes !== false || payload.boundary?.submissions !== false) {
+    throw new Error("Search proof query fixtures must keep the no-runtime boundary.");
+  }
+  if (payload.boundary?.authority !== "not a ranking authority or curation decision") {
+    throw new Error("Search proof query fixtures must not become ranking authority.");
+  }
+  if (!Array.isArray(payload.fixtures)) {
+    throw new Error("Search proof query fixtures must expose a fixtures array.");
+  }
+  return payload.fixtures.map(validateQueryFixture);
+}
+
+function validateQueryFixture(fixture, index) {
+  if (!fixture || typeof fixture !== "object") {
+    throw new Error(`Search proof query fixture ${index} must be an object.`);
+  }
+  if (typeof fixture.id !== "string" || fixture.id === "") {
+    throw new Error(`Search proof query fixture ${index} needs an id.`);
+  }
+  if (typeof fixture.query !== "string" || fixture.query.trim() === "") {
+    throw new Error(`Search proof query fixture ${fixture.id} needs a query.`);
+  }
+  const filters = fixture.filters || {};
+  const curation = filters.curation || "all";
+  const location = filters.location || "all";
+  if (typeof curation !== "string" || typeof location !== "string") {
+    throw new Error(`Search proof query fixture ${fixture.id} filters must be strings.`);
+  }
+  if (!Array.isArray(fixture.expected_top_ids) || fixture.expected_top_ids.length === 0) {
+    throw new Error(`Search proof query fixture ${fixture.id} needs expected top ids.`);
+  }
+  return {
+    id: fixture.id,
+    query: fixture.query,
+    filters: { curation, location },
+    expectedTopIds: fixture.expected_top_ids,
+    minResultCount: fixture.min_result_count,
+    minTopScore: fixture.min_top_score,
+  };
 }
 
 function uniqueValues(field) {
@@ -218,12 +282,46 @@ function renderResults() {
   resultGrid.replaceChildren(...matches.map(renderCard));
 }
 
+function applyQueryFixture(fixture) {
+  queryInput.value = fixture.query;
+  curationFilter.value = fixture.filters.curation;
+  locationFilter.value = fixture.filters.location;
+  renderResults();
+  queryInput.focus();
+}
+
+function renderQueryFixture(fixture) {
+  const item = document.createElement("article");
+  item.className = "fixture-item";
+  const button = document.createElement("button");
+  button.className = "fixture-button";
+  button.type = "button";
+  button.dataset.queryFixtureId = fixture.id;
+  button.textContent = fixture.query;
+  button.addEventListener("click", () => applyQueryFixture(fixture));
+  const meta = document.createElement("p");
+  meta.className = "fixture-meta";
+  meta.textContent = `${fixture.filters.curation} / ${fixture.filters.location} · expects ${fixture.expectedTopIds.join(", ")}`;
+  item.replaceChildren(button, meta);
+  return item;
+}
+
+function renderQueryFixtures() {
+  queryFixtureList.replaceChildren(...queryFixtures.map(renderQueryFixture));
+  queryFixtureState.textContent = `${queryFixtures.length} static T018 query fixtures loaded; buttons only set local filters.`;
+}
+
 async function initSearchProof() {
-  const payload = await loadJson(SEARCH_INPUT_URL);
-  entries = validateSearchInput(payload).sort((left, right) =>
+  const [inputPayload, fixturePayload] = await Promise.all([
+    loadJson(SEARCH_INPUT_URL),
+    loadJson(QUERY_FIXTURES_URL),
+  ]);
+  entries = validateSearchInput(inputPayload).sort((left, right) =>
     left.title.localeCompare(right.title, "en", { sensitivity: "base" }),
   );
+  queryFixtures = validateQueryFixturePayload(fixturePayload);
   populateFilters();
+  renderQueryFixtures();
   queryInput.addEventListener("input", renderResults);
   curationFilter.addEventListener("change", renderResults);
   locationFilter.addEventListener("change", renderResults);

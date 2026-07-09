@@ -26,6 +26,10 @@ REQUIRED_HTML_TOKENS = (
     "data-result-grid",
     "data-result-template",
     "data-ranking-note",
+    "data-query-fixtures",
+    "data-query-fixture-state",
+    "Try these searches",
+    "Representative T018 query fixtures",
     "data-card-score",
     "data-card-reasons",
     "transparent proof score",
@@ -38,7 +42,9 @@ REQUIRED_HTML_TOKENS = (
 )
 REQUIRED_JS_TOKENS = (
     "../../examples/commonworld/search-index-input.sample.json",
+    "../../examples/commonworld/search-query-fixtures.sample.json",
     "commonworld.static_search_index_input",
+    "commonworld.static_search_query_fixtures",
     "static-sample-only",
     "no search service",
     "ALLOWED_ENTRY_KEYS",
@@ -51,6 +57,9 @@ REQUIRED_JS_TOKENS = (
     "searchableFields",
     "explainMatch",
     "rankResults",
+    "validateQueryFixturePayload",
+    "renderQueryFixtures",
+    "applyQueryFixture",
     "data-search-query",
     "data-result-grid",
     "data-ranking-note",
@@ -72,6 +81,9 @@ REQUIRED_CSS_TOKENS = (
     ".aspect-pill",
     ".reason-pill",
     ".score-pill",
+    ".fixture-panel",
+    ".fixture-button",
+    ".fixture-list",
     ":focus-visible",
 )
 REQUIRED_README_TOKENS = (
@@ -80,6 +92,7 @@ REQUIRED_README_TOKENS = (
     "does not introduce a search endpoint",
     "transparent match reasons",
     "not a server ranking",
+    "try-search buttons",
     "vector database",
     "public submissions",
     "weltgewebe write path",
@@ -156,6 +169,12 @@ def validate_search_proof(root: Path = ROOT) -> list[str]:
         errors.append("search proof must expose a local proof score without server ranking")
     if "data-card-reasons" not in html or "renderReasonPill" not in js:
         errors.append("search proof must expose transparent match reasons")
+    if "data-query-fixtures" not in html or "renderQueryFixtures" not in js:
+        errors.append("search proof must expose static query fixture buttons")
+    if "QUERY_FIXTURES_URL" not in js or "loadJson(QUERY_FIXTURES_URL)" not in js:
+        errors.append("search proof must load static T018 query fixtures through shared loadJson")
+    if "applyQueryFixture" not in js or 'button.type = "button"' not in js:
+        errors.append("search proof query fixture actions must remain local button actions")
 
     return errors
 
