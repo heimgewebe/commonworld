@@ -191,6 +191,9 @@ def validate_catalog_snapshot_panel(html: str, css: str, root: Path = ROOT) -> l
         errors.append("proof hub catalog snapshot title missing")
     if "not a live API, ranking system or publication queue" not in html:
         errors.append("proof hub catalog snapshot boundary missing")
+    for token in ("Project previews", "Readable examples, not action cards.", "They do not join, submit, manage or publish anything."):
+        if token not in html:
+            errors.append(f"proof hub project preview hierarchy token missing: {token}")
     metrics = load_catalog_snapshot_metrics(root)
     for key, label in EXPECTED_CATALOG_METRICS:
         expected = metrics[key]
@@ -338,6 +341,9 @@ def validate_proof_hub(root: Path = ROOT) -> list[str]:
         "Trust state is visible before action",
         "Surface taxonomy",
         "Different proofs answer different questions.",
+        "Proof surfaces",
+        "Inspect the proofs before reading the catalog.",
+        "Each card opens one bounded static proof",
         "Visual explanation",
         "Location rendering",
         "Projection focus",
@@ -370,6 +376,8 @@ def validate_proof_hub(root: Path = ROOT) -> list[str]:
     required_css_tokens = (
         ".hub-shell",
         ".hub-hero",
+        ".proof-surfaces",
+        ".section-heading",
         ".proof-grid",
         ".proof-card",
         ".proof-role",
@@ -377,6 +385,7 @@ def validate_proof_hub(root: Path = ROOT) -> list[str]:
         ".surface-taxonomy",
         ".catalog-snapshot",
         ".catalog-metrics",
+        ".project-preview-heading",
         ".project-preview-grid",
         ".project-preview-card",
         ".project-preview-meta",
