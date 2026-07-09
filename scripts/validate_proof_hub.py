@@ -3,7 +3,9 @@
 
 from __future__ import annotations
 
+import json
 import sys
+from collections import Counter
 from dataclasses import dataclass, field
 from html.parser import HTMLParser
 from pathlib import Path
@@ -13,6 +15,37 @@ if str(ROOT) not in sys.path:
     sys.path.insert(0, str(ROOT))
 
 from scripts.validate_proof_surfaces import load_proof_surfaces, validate_proof_surface_registry
+
+CATALOG_EXPORT_PATH = Path("examples/commonworld/catalog-export.sample.json")
+EXPECTED_CATALOG_METRICS = (
+    ("entries", "Entries"),
+    ("curation.fixture", "Fixture"),
+    ("curation.candidate", "Candidate"),
+    ("curation.curated", "Curated"),
+    ("curation.archived", "Archived"),
+    ("location.approximate", "Approximate location"),
+    ("location.exact", "Exact location"),
+    ("location.hidden", "Hidden location"),
+)
+
+
+def load_catalog_snapshot_metrics(root: Path = ROOT) -> dict[str, int]:
+    path = root / CATALOG_EXPORT_PATH
+    with path.open(encoding="utf-8") as handle:
+        export = json.load(handle)
+    entries = export.get("entries", [])
+    curation = Counter(entry.get("curation_state") for entry in entries)
+    locations = Counter(entry.get("location_mode") for entry in entries)
+    return {
+        "entries": len(entries),
+        "curation.fixture": curation.get("fixture", 0),
+        "curation.candidate": curation.get("candidate", 0),
+        "curation.curated": curation.get("curated", 0),
+        "curation.archived": curation.get("archived", 0),
+        "location.approximate": locations.get("approximate", 0),
+        "location.exact": locations.get("exact", 0),
+        "location.hidden": locations.get("hidden", 0),
+    }
 
 
 @dataclass
@@ -84,6 +117,38 @@ def extract_proof_cards(html: str) -> tuple[dict[str, ProofCard], set[str]]:
 def extract_proof_links(html: str) -> tuple[dict[str, str], set[str]]:
     cards, duplicates = extract_proof_cards(html)
     return {proof_id: card.href for proof_id, card in cards.items()}, duplicates
+
+
+
+def validate_catalog_snapshot_panel(html: str, css: str, root: Path = ROOT) -> list[str]:
+    errors: list[str] = []
+    catalog_path = root / CATALOG_EXPORT_PATH
+    if not catalog_path.is_file():
+        return [f"proof hub catalog snapshot source missing: {CATALOG_EXPORT_PATH}"]
+    if 'class="catalog-snapshot"' not in html:
+        errors.append("proof hub catalog snapshot panel missing")
+    if 'data-catalog-source="examples/commonworld/catalog-export.sample.json"' not in html:
+        errors.append("proof hub catalog snapshot source missing or drifted")
+    if "Static catalog facts before runtime." not in html:
+        errors.append("proof hub catalog snapshot title missing")
+    if "not a live API, ranking system or publication queue" not in html:
+        errors.append("proof hub catalog snapshot boundary missing")
+    metrics = load_catalog_snapshot_metrics(root)
+    for key, label in EXPECTED_CATALOG_METRICS:
+        expected = metrics[key]
+        token = f'data-catalog-metric="{key}">{expected}</'
+        expected_occurrences = 2 if key == "entries" else 1
+        actual_occurrences = html.count(token)
+        if actual_occurrences != expected_occurrences:
+            errors.append(
+                f"proof hub catalog metric mismatch for {key}: expected {expected} in {expected_occurrences} places, got {actual_occurrences}"
+            )
+        if label not in html:
+            errors.append(f"proof hub catalog metric label missing: {label}")
+    for token in (".catalog-snapshot", ".catalog-metrics"):
+        if token.startswith(".") and token not in css:
+            errors.append(f"proof hub CSS missing {token}")
+    return errors
 
 
 def validate_proof_hub(root: Path = ROOT) -> list[str]:
@@ -175,6 +240,7 @@ def validate_proof_hub(root: Path = ROOT) -> list[str]:
     for token in required_html_tokens:
         if token not in html:
             errors.append(f"proof hub HTML missing {token}")
+    errors.extend(validate_catalog_snapshot_panel(html, css, root))
 
     forbidden_terms = (
         "form action",
@@ -196,6 +262,8 @@ def validate_proof_hub(root: Path = ROOT) -> list[str]:
         ".proof-role",
         ".proof-classification",
         ".surface-taxonomy",
+        ".catalog-snapshot",
+        ".catalog-metrics",
         ".trust-panel",
         ".boundary-panel",
         ":focus-visible",

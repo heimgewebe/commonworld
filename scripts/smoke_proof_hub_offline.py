@@ -154,6 +154,7 @@ def smoke_report(root: Path = ROOT) -> HubOfflineSmokeReport:
             "all registered proof surfaces appear as visible cards",
             "each card exposes a surface type and evidence mode",
             "taxonomy panel explains the four surface categories",
+            "static catalog snapshot remains tied to the committed catalog export",
             "trust and boundary panels remain visible",
             "hub introduces no script, form, account or submission affordance",
         ),
@@ -182,6 +183,8 @@ def validate_offline_hub_smoke(root: Path = ROOT) -> list[str]:
         "proof-grid",
         "proof-card",
         "trust-panel",
+        "catalog-snapshot",
+        "catalog-metrics",
         "boundary-panel",
     ):
         if token not in html:
@@ -192,6 +195,8 @@ def validate_offline_hub_smoke(root: Path = ROOT) -> list[str]:
         ".proof-grid",
         ".proof-card",
         ".proof-classification",
+        ".catalog-snapshot",
+        ".catalog-metrics",
         ":focus-visible",
     ):
         if token not in css:
