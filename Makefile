@@ -9,6 +9,7 @@ VALIDATE_TARGETS = \
 	validate-map-source-strategy \
 	validate-aether-proof \
 	validate-search-proof \
+	validate-search-query-fixtures \
 	validate-proof-surfaces \
 	validate-proof-hub \
 	validate-mobile-atlas-shift \
@@ -49,6 +50,9 @@ validate-aether-proof:
 
 validate-search-proof:
 	python3 scripts/validate_search_proof.py
+
+validate-search-query-fixtures:
+	python3 scripts/validate_search_query_fixtures.py
 
 validate-proof-surfaces:
 	python3 scripts/validate_proof_surfaces.py
