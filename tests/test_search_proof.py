@@ -79,6 +79,36 @@ class StaticSearchProofTests(unittest.TestCase):
 
         self.assertIn("search proof must expose a local proof score without server ranking", errors)
 
+    def test_search_proof_requires_query_fixture_surface(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp_dir:
+            tmp_root = self.copy_surface(tmp_dir)
+            path = tmp_root / "proofs" / "search" / "index.html"
+            path.write_text(path.read_text(encoding="utf-8").replace("data-query-fixtures", "data-query-shortcuts", 1), encoding="utf-8")
+
+            errors = validate_search_proof(tmp_root)
+
+        self.assertIn("search proof must expose static query fixture buttons", errors)
+
+    def test_search_proof_requires_query_fixture_static_load(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp_dir:
+            tmp_root = self.copy_surface(tmp_dir)
+            path = tmp_root / "proofs" / "search" / "search.js"
+            path.write_text(path.read_text(encoding="utf-8").replace("loadJson(QUERY_FIXTURES_URL)", "loadJson(SEARCH_INPUT_URL)", 1), encoding="utf-8")
+
+            errors = validate_search_proof(tmp_root)
+
+        self.assertIn("search proof must load static T018 query fixtures through shared loadJson", errors)
+
+    def test_search_proof_query_fixture_actions_stay_buttons(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp_dir:
+            tmp_root = self.copy_surface(tmp_dir)
+            path = tmp_root / "proofs" / "search" / "search.js"
+            path.write_text(path.read_text(encoding="utf-8").replace('button.type = "button"', 'button.type = "submit"', 1), encoding="utf-8")
+
+            errors = validate_search_proof(tmp_root)
+
+        self.assertIn("search proof query fixture actions must remain local button actions", errors)
+
 
 if __name__ == "__main__":
     unittest.main()
