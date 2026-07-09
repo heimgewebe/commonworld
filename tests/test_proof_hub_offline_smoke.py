@@ -21,6 +21,7 @@ class ProofHubOfflineSmokeTests(unittest.TestCase):
         for path in ("index.html", "index.css"):
             shutil.copy2(ROOT / path, tmp_root / path)
         shutil.copytree(ROOT / "proofs", tmp_root / "proofs")
+        shutil.copytree(ROOT / "examples", tmp_root / "examples")
         return tmp_root
 
     def test_offline_hub_smoke_validates_current_hub(self) -> None:

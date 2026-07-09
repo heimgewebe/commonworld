@@ -7,6 +7,7 @@ from scripts.validate_contracts import ROOT
 from scripts.validate_proof_hub import (
     extract_proof_cards,
     extract_proof_links,
+    load_catalog_snapshot_metrics,
     validate_proof_hub,
 )
 from scripts.validate_proof_surfaces import load_proof_surfaces
@@ -21,6 +22,7 @@ class ProofHubTests(unittest.TestCase):
         for path in ("index.html", "index.css"):
             shutil.copy2(ROOT / path, tmp_root / path)
         shutil.copytree(ROOT / "proofs", tmp_root / "proofs")
+        shutil.copytree(ROOT / "examples", tmp_root / "examples")
         return tmp_root
 
     def test_proof_hub_links_all_registered_surfaces(self) -> None:
@@ -172,6 +174,58 @@ class ProofHubTests(unittest.TestCase):
             errors = validate_proof_hub(tmp_root)
 
         self.assertIn("proof hub evidence mode missing for project-profile", errors)
+
+    def test_catalog_snapshot_metrics_match_static_export(self) -> None:
+        metrics = load_catalog_snapshot_metrics(ROOT)
+        self.assertEqual(4, metrics["entries"])
+        self.assertEqual(3, metrics["curation.fixture"])
+        self.assertEqual(1, metrics["curation.candidate"])
+        self.assertEqual(0, metrics["curation.curated"])
+        self.assertEqual(0, metrics["curation.archived"])
+        self.assertEqual(2, metrics["location.approximate"])
+        self.assertEqual(1, metrics["location.exact"])
+        self.assertEqual(1, metrics["location.hidden"])
+
+    def test_hub_rejects_catalog_snapshot_count_drift(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp_dir:
+            tmp_root = self.copy_valid_root(tmp_dir)
+            html_path = tmp_root / "index.html"
+            html = html_path.read_text(encoding="utf-8").replace(
+                'data-catalog-metric="entries">4</dd>',
+                'data-catalog-metric="entries">5</dd>',
+                1,
+            )
+            html_path.write_text(html, encoding="utf-8")
+
+            errors = validate_proof_hub(tmp_root)
+
+        self.assertIn("proof hub catalog metric mismatch for entries: expected 4 in 2 places, got 1", errors)
+
+    def test_hub_rejects_missing_catalog_snapshot_boundary(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp_dir:
+            tmp_root = self.copy_valid_root(tmp_dir)
+            html_path = tmp_root / "index.html"
+            html = html_path.read_text(encoding="utf-8").replace("not a live API, ranking system or publication queue", "not dynamic", 1)
+            html_path.write_text(html, encoding="utf-8")
+
+            errors = validate_proof_hub(tmp_root)
+
+        self.assertIn("proof hub catalog snapshot boundary missing", errors)
+
+    def test_hub_rejects_catalog_snapshot_source_drift(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp_dir:
+            tmp_root = self.copy_valid_root(tmp_dir)
+            html_path = tmp_root / "index.html"
+            html = html_path.read_text(encoding="utf-8").replace(
+                'data-catalog-source="examples/commonworld/catalog-export.sample.json"',
+                'data-catalog-source="/api/catalog"',
+                1,
+            )
+            html_path.write_text(html, encoding="utf-8")
+
+            errors = validate_proof_hub(tmp_root)
+
+        self.assertIn("proof hub catalog snapshot source missing or drifted", errors)
 
 
 if __name__ == "__main__":
