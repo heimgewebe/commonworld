@@ -8,20 +8,22 @@
 - `weltgewebe` remains the deeper action, administration and participation layer.
 - The bridge between both systems is an explicit Commons catalog contract, not an implicit shared database.
 
-## Initial build order
+## Current product direction
 
-1. Define the `CommonProject` contract.
-2. Add curated seed projects.
-3. Prove the mixed-node marker and detail-panel interaction.
-4. Add a privacy-aware MapLibre map proof.
-5. Add the focused digital Commons view.
-6. Define the safe handoff to weltgewebe.
+The v1 proof program established data, privacy, projection and validation foundations. The v2 plan shifts priority from additional proofs to a real public Commons showcase:
 
-See `docs/blueprints/commonworld-masterplan.md` for the masterplan.
+1. define public inclusion and quality criteria;
+2. curate a balanced golden set of 30 to 50 real Commons;
+3. redesign the public root around discovery, collections and useful project profiles;
+4. unify local, digital and hybrid Commons in one Explore surface;
+5. keep the map optional and lazy-loaded;
+6. route suggestions and participation into explicitly owned review and weltgewebe workflows.
 
-## Proof hub
+See `docs/blueprints/commonworld-masterplan.md` for the canonical Product Plan v2. Existing proof routes remain development assets, not the intended final public information architecture.
 
-The root `index.html` is the static proof hub. Its proof cards consume `proofs/proof-surfaces.json`: `title`, `href` and the user-facing `role` metadata must stay paired with each card's `data-proof-link` and visible role text. `scripts/validate_proof_hub.py` enforces that the hub does not drift from the registry.
+## Current development proof hub
+
+Until the v2 Showcase alpha replaces it, the root `index.html` remains the static development proof hub. Its proof cards consume `proofs/proof-surfaces.json`: `title`, `href` and the user-facing `role` metadata must stay paired with each card's `data-proof-link` and visible role text. `scripts/validate_proof_hub.py` enforces that the hub does not drift from the registry.
 
 ## Mixed-node proof
 
