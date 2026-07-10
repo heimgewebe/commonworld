@@ -75,6 +75,13 @@ class MapProofBrowserSmokeTests(unittest.TestCase):
         with self.assertRaisesRegex(RuntimeError, "map browser harness failed"):
             parse_result('<pre id="result">{"error":"boom"}</pre>')
 
+    def test_harness_registers_load_listener_before_setting_src(self) -> None:
+        from scripts.smoke_map_proof_browser import HARNESS
+
+        listener = HARNESS.index("frame.addEventListener")
+        source = HARNESS.index('frame.src = "/proofs/map/"')
+        self.assertLess(listener, source)
+
 
 if __name__ == "__main__":
     unittest.main()

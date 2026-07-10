@@ -81,7 +81,7 @@ HARNESS = r'''<!doctype html>
 <html lang="en">
 <head><meta charset="utf-8"><title>map smoke pending</title></head>
 <body>
-  <iframe id="map-frame" src="/proofs/map/" width="1024" height="800"></iframe>
+  <iframe id="map-frame" width="1024" height="800"></iframe>
   <pre id="result">pending</pre>
   <script>
     const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
@@ -110,7 +110,9 @@ HARNESS = r'''<!doctype html>
       const resultNode = document.getElementById("result");
       try {
         const frame = document.getElementById("map-frame");
-        await new Promise((resolve) => frame.addEventListener("load", resolve, { once: true }));
+        const frameLoaded = new Promise((resolve) => frame.addEventListener("load", resolve, { once: true }));
+        frame.src = "/proofs/map/";
+        await frameLoaded;
         const doc = frame.contentDocument;
         const firstMarker = await waitFor(doc, ".map-marker .mixed-node");
         const markers = [...doc.querySelectorAll(".map-marker .mixed-node")];
