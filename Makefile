@@ -16,6 +16,7 @@ VALIDATE_TARGETS = \
 	validate-proof-hub-offline-smoke \
 	validate-mobile-atlas-shift \
 	validate-mobile-atlas-shift-doctrine \
+	validate-commonworld-experience-doctrine \
 	validate-projection-contract \
 	validate-source-curation-policy \
 	validate-weltgewebe-handoff-contract \
@@ -73,6 +74,9 @@ validate-mobile-atlas-shift:
 
 validate-mobile-atlas-shift-doctrine:
 	python3 scripts/validate_mobile_atlas_shift_doctrine.py
+
+validate-commonworld-experience-doctrine:
+	python3 scripts/validate_commonworld_experience_doctrine.py
 
 validate-projection-contract:
 	python3 scripts/validate_projection_contract.py

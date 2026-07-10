@@ -10,16 +10,16 @@
 
 ## Current product direction
 
-The v1 proof program established data, privacy, projection and validation foundations. The v2 plan shifts priority from additional proofs to a real public Commons showcase:
+The v1 proof program established data, privacy, projection and validation foundations. Product Plan v2.1 shifts priority toward a real, immersive Commons world with game feel but no gamification:
 
 1. define public inclusion and quality criteria;
-2. curate a balanced golden set of 30 to 50 real Commons;
-3. redesign the public root around discovery, collections and useful project profiles;
-4. unify local, digital and hybrid Commons in one Explore surface;
-5. keep the map optional and lazy-loaded;
+2. curate 8 to 12 real Commons for a playable vertical slice;
+3. build one continuous World, Near, Find and Focus experience;
+4. validate intuitive navigation, fluid interaction and reduced-motion behavior;
+5. expand the proven world to a balanced golden set of 30 to 50 real Commons;
 6. route suggestions and participation into explicitly owned review and weltgewebe workflows.
 
-See `docs/blueprints/commonworld-masterplan.md` for the canonical Product Plan v2. Existing proof routes remain development assets, not the intended final public information architecture.
+See `docs/blueprints/commonworld-masterplan.md` for Product Plan v2.1 and `docs/blueprints/commonworld-experience-doctrine.md` for the canonical interaction and visual-experience doctrine. Existing proof routes remain development assets, not the intended final public information architecture.
 
 ## Current development proof hub
 

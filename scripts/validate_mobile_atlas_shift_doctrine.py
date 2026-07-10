@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Validate the mobile Atlas Shift doctrine document."""
+"""Validate the superseded mobile Atlas Shift proof doctrine document."""
 
 from __future__ import annotations
 
@@ -11,6 +11,8 @@ DOC = ROOT / "docs" / "blueprints" / "mobile-atlas-shift-interaction-model.md"
 
 REQUIRED_TOKENS = (
     "# Mobile Atlas Shift Interaction Model",
+    "superseded for public navigation",
+    "fixed `Karte <-> Aether` switch is no longer the public navigation doctrine",
     "Karte <-> Aether",
     "`Horizont` is not a selectable mode",
     "smartphone-first",
@@ -67,7 +69,7 @@ def main() -> int:
         for error in errors:
             print(f"ERROR: {error}", file=sys.stderr)
         return 1
-    print("commonworld mobile Atlas Shift doctrine validation ok")
+    print("commonworld historical mobile Atlas Shift proof doctrine validation ok")
     return 0
 
 
