@@ -77,88 +77,75 @@ window.maplibregl = {
 };
 '''
 
-HARNESS = r'''<!doctype html>
-<html lang="en">
-<head><meta charset="utf-8"><title>map smoke pending</title></head>
-<body>
-  <iframe id="map-frame" width="1024" height="800"></iframe>
-  <pre id="result">pending</pre>
-  <script>
-    const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
-    async function waitFor(doc, selector, timeoutMs = 5000) {
-      const deadline = performance.now() + timeoutMs;
-      while (performance.now() < deadline) {
-        const element = doc.querySelector(selector);
-        if (element) return element;
-        await sleep(25);
-      }
-      throw new Error(`Timed out waiting for ${selector}`);
+HARNESS = r'''<pre id="result">pending</pre>
+<script>
+  const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
+  async function waitFor(selector, timeoutMs = 5000) {
+    const deadline = performance.now() + timeoutMs;
+    while (performance.now() < deadline) {
+      const element = document.querySelector(selector);
+      if (element) return element;
+      await sleep(25);
     }
-    async function waitForText(doc, selector, prefix, timeoutMs = 5000) {
-      const deadline = performance.now() + timeoutMs;
-      while (performance.now() < deadline) {
-        const element = doc.querySelector(selector);
-        if (element && element.textContent.startsWith(prefix)) return element;
-        await sleep(25);
-      }
-      throw new Error(`Timed out waiting for ${selector} text ${prefix}`);
+    throw new Error(`Timed out waiting for ${selector}`);
+  }
+  async function waitForText(selector, prefix, timeoutMs = 5000) {
+    const deadline = performance.now() + timeoutMs;
+    while (performance.now() < deadline) {
+      const element = document.querySelector(selector);
+      if (element && element.textContent.startsWith(prefix)) return element;
+      await sleep(25);
     }
-    async function settle(win) {
-      await new Promise((resolve) => win.requestAnimationFrame(() => win.requestAnimationFrame(resolve)));
+    throw new Error(`Timed out waiting for ${selector} text ${prefix}`);
+  }
+  async function settle() {
+    await new Promise((resolve) => requestAnimationFrame(() => requestAnimationFrame(resolve)));
+  }
+  (async () => {
+    const resultNode = document.getElementById("result");
+    try {
+      const firstMarker = await waitFor(".map-marker .mixed-node");
+      const markers = [...document.querySelectorAll(".map-marker .mixed-node")];
+      const loadState = await waitForText("[data-load-state]", "Map ready.");
+      const panel = document.querySelector("[data-detail-surface]");
+      const startedAt = performance.now();
+      firstMarker.click();
+      await settle();
+      const openElapsedMs = performance.now() - startedAt;
+      const style = getComputedStyle(panel);
+      const rect = panel.getBoundingClientRect();
+      const inViewport =
+        rect.width > 0 && rect.height > 0 && rect.right > 0 && rect.bottom > 0 &&
+        rect.left < innerWidth && rect.top < innerHeight;
+      const openSnapshot = {
+        hidden: panel.hidden,
+        opacity: style.opacity,
+        transform: style.transform,
+        transitionDuration: style.transitionDuration,
+        willChange: style.willChange,
+        inViewport,
+      };
+      document.querySelector("[data-close-detail]").click();
+      await settle();
+      const closed = panel.hidden;
+      markers[markers.length - 1].click();
+      await settle();
+      const reopened = !panel.hidden && getComputedStyle(panel).opacity === "1";
+      resultNode.textContent = JSON.stringify({
+        markerCount: markers.length,
+        loadState: loadState.textContent,
+        openElapsedMs,
+        openSnapshot,
+        closed,
+        reopened,
+      });
+      document.title = "map smoke complete";
+    } catch (error) {
+      resultNode.textContent = JSON.stringify({ error: String(error) });
+      document.title = "map smoke failed";
     }
-    (async () => {
-      const resultNode = document.getElementById("result");
-      try {
-        const frame = document.getElementById("map-frame");
-        const frameLoaded = new Promise((resolve) => frame.addEventListener("load", resolve, { once: true }));
-        frame.src = "/proofs/map/";
-        await frameLoaded;
-        const doc = frame.contentDocument;
-        const firstMarker = await waitFor(doc, ".map-marker .mixed-node");
-        const markers = [...doc.querySelectorAll(".map-marker .mixed-node")];
-        const loadState = await waitForText(doc, "[data-load-state]", "Map ready.");
-        const panel = doc.querySelector("[data-detail-surface]");
-        const startedAt = performance.now();
-        firstMarker.click();
-        await settle(frame.contentWindow);
-        const openElapsedMs = performance.now() - startedAt;
-        const style = frame.contentWindow.getComputedStyle(panel);
-        const rect = panel.getBoundingClientRect();
-        const inViewport =
-          rect.width > 0 && rect.height > 0 && rect.right > 0 && rect.bottom > 0 &&
-          rect.left < frame.contentWindow.innerWidth && rect.top < frame.contentWindow.innerHeight;
-        const openSnapshot = {
-          hidden: panel.hidden,
-          opacity: style.opacity,
-          transform: style.transform,
-          transitionDuration: style.transitionDuration,
-          willChange: style.willChange,
-          inViewport,
-        };
-        doc.querySelector("[data-close-detail]").click();
-        await settle(frame.contentWindow);
-        const closed = panel.hidden;
-        markers[markers.length - 1].click();
-        await settle(frame.contentWindow);
-        const reopened = !panel.hidden && frame.contentWindow.getComputedStyle(panel).opacity === "1";
-        resultNode.textContent = JSON.stringify({
-          markerCount: markers.length,
-          loadState: loadState.textContent,
-          openElapsedMs,
-          openSnapshot,
-          closed,
-          reopened,
-        });
-        document.title = "map smoke complete";
-      } catch (error) {
-        resultNode.textContent = JSON.stringify({ error: String(error) });
-        document.title = "map smoke failed";
-      }
-    })();
-  </script>
-</body>
-</html>
-'''
+  })();
+</script>'''
 
 
 class QuietHandler(http.server.SimpleHTTPRequestHandler):
@@ -178,7 +165,9 @@ def prepare_tree(source_root: Path, destination: Path) -> None:
     source["library"]["script_url"] = "/test-assets/dist/maplibre-gl.js"
     source["library"]["css_url"] = "/test-assets/dist/maplibre-gl.css"
     source_path.write_text(json.dumps(source, indent=2) + "\n", encoding="utf-8")
-    (destination / "map-browser-smoke.html").write_text(HARNESS, encoding="utf-8")
+    map_index = destination / "proofs" / "map" / "index.html"
+    map_html = map_index.read_text(encoding="utf-8")
+    map_index.write_text(map_html.replace("</body>", HARNESS + "\n</body>"), encoding="utf-8")
 
 
 def browser_command(browser: str, profile: Path, url: str, timeout_ms: int) -> list[str]:
@@ -259,7 +248,7 @@ def run_browser_smoke(root: Path = ROOT, timeout_seconds: int = 20) -> MapBrowse
         thread = threading.Thread(target=server.serve_forever, daemon=True)
         thread.start()
         profile = temp_root / "chrome-profile"
-        url = f"http://127.0.0.1:{server.server_port}/map-browser-smoke.html"
+        url = f"http://127.0.0.1:{server.server_port}/proofs/map/"
         try:
             completed = subprocess.run(
                 browser_command(browser, profile, url, timeout_seconds * 1000),
