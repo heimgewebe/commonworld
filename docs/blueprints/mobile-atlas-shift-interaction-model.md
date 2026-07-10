@@ -2,12 +2,15 @@
 
 ## Status
 
-- Type: product and interaction doctrine
-- Scope: commonworld public atlas surfaces
+- Type: historical proof interaction doctrine
+- Status decision: superseded for public navigation by `docs/blueprints/commonworld-experience-doctrine.md`
+- Scope: retained mobile proof only; not the v2.1 public information architecture
 - Anchor proof: `proofs/mobile-atlas-shift/`
 - Runtime boundary: static/read-only; no backend, no accounts, no public submissions, no weltgewebe write path
 
-## Decision
+## Historical decision
+
+This document remains as evidence for the mobile projection experiment. The fixed `Karte <-> Aether` switch is no longer the public navigation doctrine.
 
 commonworld is smartphone-first. The public atlas must use one primary mobile surface and switch between two projections of the same Commons world:
 

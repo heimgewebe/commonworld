@@ -1,4 +1,4 @@
-# commonworld.net Product Plan v2
+# commonworld.net Product Plan v2.1
 
 ## Status
 
@@ -6,13 +6,13 @@
 - Decision: active
 - Supersedes: the proof-first v1 masterplan
 - Product boundary: public discovery in commonworld, participation and administration in weltgewebe
-- Immediate priority: real catalog quality and a useful public website before further proof or runtime expansion
+- Immediate priority: a playable real-content vertical slice, followed by trustworthy catalog growth
 
 ## Product promise
 
-commonworld is the public showcase and discovery gateway for Commons.
+commonworld is the public showcase and discovery gateway for Commons. It should feel like entering a living world rather than opening a directory.
 
-A visitor should be able to find a Commons worth using, visiting, joining, supporting or learning from within two minutes, understand why it belongs in the catalog, and continue to the best available next place.
+A visitor should be able to orient within seconds, move fluidly through real Commons, find one worth using, visiting, joining, supporting or learning from within two minutes, understand why it belongs in the catalog, and continue to the best available next place.
 
 ```text
 commonworld = discover, explore, understand, trust, continue
@@ -54,6 +54,7 @@ These decisions remain correct:
 5. **Design mobile-first and accessibly.** The main experience must work without desktop sidebars or visual-only semantics.
 6. **Use progressive enhancement.** Core catalog browsing must work before optional map or animation code loads.
 7. **Keep automated validation.** Schemas, generated artifacts and browser interaction checks remain valuable safeguards.
+8. **Design for game feel without gamification.** Spatial continuity, direct manipulation, atmosphere and immediate feedback are product requirements; points, streaks and manipulation are prohibited.
 
 ## Decisions changed from v1
 
@@ -136,55 +137,31 @@ The candidate inbox and review effects should belong to weltgewebe or another ex
 - Publish, refresh, downgrade or archive records through a traceable process.
 - Detect stale and incomplete records.
 
-## Public information architecture
+## Public experience architecture
 
-The first coherent public product has six surfaces.
+The v2 plan initially described six conventional website surfaces. That is too page-oriented for the intended experience. Commonworld instead uses one persistent world shell with coordinated lenses and focus states.
 
-### 1. Home
+The canonical interaction doctrine is `docs/blueprints/commonworld-experience-doctrine.md`.
 
-The homepage is editorial discovery, not documentation.
+### World: the primary stage
 
-It should contain:
+`World` combines the former Home, Explore and collection entry points into one continuous discovery surface. It introduces the product through real Commons, thematic neighborhoods, landmarks and curated paths.
 
-- one clear promise;
-- a small set of direct intents such as `near me`, `use online`, `learn`, `repair and share`, `contribute`;
-- featured Commons selected by transparent editorial criteria;
-- current collections or stories;
-- a compact explanation of what qualifies as a Commons;
-- a search or explore entry;
-- no fixtures and no proof terminology.
+It must remain understandable as a list or structured document for accessibility and progressive enhancement, but the enhanced visual experience should feel spatial and explorable rather than like a card grid with separate pages.
 
-### 2. Explore
+### Near: the geographic lens
 
-Explore is the default catalog surface.
+`Near` is the optional geographic view over the same world. It retains the exact, approximate and hidden location contract. MapLibre and tiles load only when Near is opened.
 
-It combines place-based, digital and hybrid Commons in one result set and supports useful filters:
+### Find: search inside the world
 
-- what is shared;
-- what a visitor can do;
-- place or online availability;
-- theme;
-- audience;
-- language;
-- access conditions;
-- current verification state.
+`Find` is a compact overlay or command surface. It searches the same Commons and returns the same objects used in World and Near. It must not feel like a separate technical search application.
 
-Results must be readable without opening a map.
+### Focus: approach one Commons
 
-### 3. Map
+A project profile is a focus state opened from World, Near, Find or a curated path. The surrounding world remains recognizable, and closing restores the exact exploration context.
 
-Map is an optional geographic view over the same catalog.
-
-It keeps the existing privacy contract:
-
-- exact public places render exactly;
-- approximate projects render with a visible approximation signal;
-- hidden locations never become map points;
-- digital projects remain discoverable outside the map.
-
-### 4. Project profile
-
-A project profile must answer, in this order:
+The focus state answers, in this order:
 
 1. What is this Commons?
 2. What is shared or governed together?
@@ -197,35 +174,23 @@ A project profile must answer, in this order:
 9. Which sources support the description?
 10. What is the safest useful next step?
 
-Technical metadata belongs in a secondary trust section, not in the opening paragraph.
+Technical metadata belongs in a secondary trust layer.
 
-### 5. Collections and stories
+### Curated paths
 
-Collections turn a database into an inviting world.
+Collections become guided paths through the same world. They provide narrative and momentum without scores, forced completion or isolated collection silos. A visitor may leave a path for free exploration and return without losing context.
 
 Examples:
 
-- repair and share;
-- open knowledge for everyone;
-- Commons in Hamburg;
-- food and care infrastructures;
-- tools for collective work;
-- contribute online today;
-- places where neighbors make things together.
+- Repair something together;
+- Learn from open knowledge;
+- Commons around Hamburg;
+- Contribute online today;
+- Shared food and care infrastructures.
 
-Collections may be editorial, thematic, geographic or seasonal. They should explain why the projects belong together and provide multiple entry points into the catalog.
+### About and method
 
-### 6. About and method
-
-A public method page explains:
-
-- what commonworld means by Commons;
-- inclusion and exclusion criteria;
-- curation and verification;
-- privacy and location handling;
-- correction and suggestion paths;
-- the boundary to weltgewebe;
-- data and content licenses where applicable.
+Method remains a conventional readable surface because trust information benefits from stable text. It explains eligibility, curation, freshness, privacy, corrections, suggestions, licenses and the boundary to weltgewebe.
 
 ## CommonProject v3 direction
 
@@ -345,7 +310,7 @@ Search relevance is not moral rank, and editorial featuring is not a claim that 
 
 ### Golden set
 
-The first product milestone is a deliberately balanced set of 30 to 50 real Commons, not another proof.
+The first catalog-scale milestone is a deliberately balanced set of 30 to 50 real Commons. It follows the smaller playable vertical slice rather than delaying experience validation until the full set exists.
 
 The set should cover:
 
@@ -394,14 +359,21 @@ A real API, database or search service is justified only when static generation 
 - partner synchronization;
 - search quality.
 
-### Performance budget
+### Experience and performance budget
 
-- no map library or tile request on the initial homepage or list view;
-- no per-frame JavaScript animation of catalog markers;
-- images must be responsive, rights-documented and lazy-loaded below the fold;
-- the main discovery path must remain usable with JavaScript disabled where practical;
-- interaction checks cover mobile and desktop browsers;
-- performance measurements use real catalog pages, not only fixtures.
+- the first interaction receives visible acknowledgement in the next rendered frame;
+- ordinary exploration introduces no long task above 50 ms on the reference mobile device;
+- spatial motion is designed for a 60 Hz frame budget and checked for dropped frames;
+- no map library or tile request occurs before the visitor opens Near;
+- no per-frame JavaScript rewriting of gradients or catalog markers;
+- no continuous scene animation while the world is idle;
+- images are responsive, rights-documented and decoded without blocking first interaction;
+- World and project summaries remain understandable without JavaScript where practical;
+- rapid open, close, reopen, interrupted motion and lens changes are browser-tested;
+- reduced-motion mode replaces spatial travel with immediate, clear state changes;
+- performance measurements use real project images and realistic catalog density, not only fixtures.
+
+The detailed rules live in `docs/blueprints/commonworld-experience-doctrine.md`.
 
 ### Language strategy
 
@@ -419,66 +391,71 @@ The interface starts bilingual in German and English, with a clear fallback stra
 
 ## Delivery phases
 
-### Phase A: Product reset
+### Phase A: Product and experience reset
 
-Goal: stop presenting the workshop as the product.
+Goal: stop presenting the workshop as the product and make the intended feeling explicit.
 
 Deliverables:
 
-- adopt this v2 plan;
+- adopt this v2.1 plan and the immersive experience doctrine;
 - define a short public Commons eligibility statement;
 - move proof and fixture language out of the root experience;
 - establish `/lab/` or repository-only ownership for existing proofs;
-- define the golden-set editorial brief;
-- freeze new API, search-ranking, projection and animation slices unless they directly unblock the public catalog.
+- define the 8–12-entry vertical-slice portfolio and the later 30–50-entry golden-set brief;
+- freeze API, ranking and visualization work that does not unblock the real-content experience.
 
 Exit gate:
 
-- root information architecture approved;
+- World, Near, Find and Focus form one approved mental model;
 - fixtures cannot appear as public projects;
-- next work queue is content- and product-led.
+- game feel and anti-gamification rules are explicit;
+- the next queue is real-content and experience-led.
 
-### Phase B: Golden catalog
+### Phase B: Playable real-content vertical slice
 
-Goal: produce enough real material to design against reality.
+Goal: prove clarity, attractiveness and fluidity before scaling content or architecture.
 
 Deliverables:
 
 - CommonProject v3 draft;
+- 8–12 real reviewed Commons spanning local, digital and hybrid forms;
+- one persistent World shell;
+- one curated path;
+- Find;
+- lazy-loaded Near;
+- project Focus with preserved return state;
+- real images, continuation links and bilingual sample content;
+- reduced-motion and mobile/desktop browser coverage.
+
+Exit gate:
+
+- a first-time visitor understands the site within five seconds;
+- open, close, reopen and lens changes remain correct under rapid input;
+- the reference mobile device sustains fluid interaction with no idle animation load;
+- no proof or fixture language appears in the visitor path;
+- at least five moderated visitors find and open a relevant Commons without instruction.
+
+### Phase C: Golden world and showcase alpha
+
+Goal: generalize the proven interaction model into a balanced public world.
+
+Deliverables:
+
 - 30 to 50 real reviewed entries;
-- balanced category and geography coverage report;
-- verified official links, participation modes and freshness dates;
-- representative images with rights metadata;
-- five editorial collections.
+- five curated paths;
+- balanced category, geography, language and action coverage;
+- complete project profiles with verified links, freshness and image rights;
+- public method surface;
+- production-ready World, Near, Find and Focus;
+- German and English interface foundation.
 
 Exit gate:
 
 - zero fixture entries in the public catalog;
 - every public entry answers the ten profile questions;
 - at least 80 percent of entries reach `verified` state;
-- a visitor can find a relevant project in a moderated user test.
-
-### Phase C: Showcase alpha
-
-Goal: replace the proof hub with a coherent public website.
-
-Deliverables:
-
-- new homepage;
-- Explore list and filters;
-- real project profiles;
-- collection pages;
-- optional lazy-loaded map;
-- German and English interface foundation;
-- public method page;
-- outbound continuation links.
-
-Exit gate:
-
-- homepage contains only real public content;
-- core browsing works on mobile without loading MapLibre;
-- project opening, filtering and continuation are browser-tested;
-- five first-time visitors can explain what commonworld offers and find one useful Commons.
+- users can freely leave and re-enter paths without losing context;
+- the core world remains clear and fluid at golden-set density.
 
 ### Phase D: Public beta and growth
 
@@ -540,18 +517,18 @@ Exit gate:
 
 The next implementation sequence is:
 
-1. Define the public Commons eligibility statement and catalog quality checklist.
-2. Draft CommonProject v3 around usefulness, access, freshness and stewardship.
-3. Select the 30 to 50-entry golden-set portfolio before collecting individual records.
-4. Curate the first ten real entries end to end and identify schema gaps.
-5. Design one real project profile using those entries, not fixtures.
-6. Design the root homepage around visitor intents and editorial collections.
-7. Build Explore as the shared list/search surface for local, digital and hybrid Commons.
-8. Move current proof surfaces behind a development-lab boundary.
-9. Add the lazy map view over the same Explore results.
-10. Add bilingual interface structure and content-language metadata.
-11. Test with first-time visitors and stewards.
-12. Only then decide whether runtime search, imports or additional visualization are needed.
+1. Adopt and validate the immersive experience doctrine.
+2. Define the public Commons eligibility statement and catalog quality checklist.
+3. Draft CommonProject v3 around usefulness, access, freshness, stewardship, images and next actions.
+4. Select the 8–12-entry vertical-slice portfolio before designing the public shell.
+5. Curate those entries end to end and identify schema gaps.
+6. Prototype one continuous World -> Focus -> Return loop with real content.
+7. Add one curated path and Find inside the same shell.
+8. Add Near as a lazy-loaded lens over the same objects.
+9. Measure clarity, rapid interaction, frame behavior and reduced-motion handling on mobile and desktop.
+10. Correct the interaction model before expanding to the 30–50-entry golden set.
+11. Move current proof surfaces behind a development-lab boundary.
+12. Scale content, paths and bilingual presentation only after the vertical slice passes.
 
 ## Work explicitly paused
 
@@ -566,7 +543,9 @@ Until the Golden catalog and Showcase alpha exit gates are reached, do not prior
 - automatic global crawling;
 - public direct-to-catalog submissions;
 - a second curation backend beside weltgewebe;
-- visualization work that does not improve discovery or understanding of real entries.
+- decorative or experimental visualization that does not improve orientation, discovery, understanding or direct manipulation of real entries.
+
+This pause does not prohibit purposeful motion or visual atmosphere required by the immersive experience doctrine.
 
 ## Success measures
 
@@ -596,9 +575,14 @@ Until the Golden catalog and Showcase alpha exit gates are reached, do not prior
 - privacy incidents;
 - unreviewed-publication incidents, target zero.
 
-### Performance and access
+### Experience, performance and access
 
-- core mobile browsing without map load;
+- five-second orientation success;
+- no-instruction open, close and return success;
+- rapid-interaction correctness;
+- dropped-frame and long-task measurements on the reference mobile device;
+- World load without map traffic;
+- preserved state across World, Near, Find and Focus;
 - browser interaction pass rate;
 - keyboard and screen-reader task success;
 - reduced-motion compliance;
@@ -606,4 +590,4 @@ Until the Golden catalog and Showcase alpha exit gates are reached, do not prior
 
 ## North-star acceptance test
 
-A person with no prior Commons vocabulary arrives on commonworld, recognizes several concrete possibilities, finds one project relevant to their place or interests, understands what is shared and what they can do, sees why the record is trustworthy, and reaches a useful next step without encountering proof terminology, synthetic fixtures or administrative complexity.
+A person with no prior Commons vocabulary enters commonworld and immediately recognizes a living world of possibilities. Without instruction, they move through it, approach one real Commons, understand what is shared and what they can do, see why the record is trustworthy, reach a useful next step, and return to the same place without friction, proof terminology, synthetic fixtures or administrative complexity.
