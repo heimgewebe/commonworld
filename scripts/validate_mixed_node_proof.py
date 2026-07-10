@@ -43,6 +43,10 @@ def proof_dir(root: Path = ROOT) -> Path:
     return root / "proofs" / "mixed-node"
 
 
+def shared_visuals_path(root: Path = ROOT) -> Path:
+    return root / "proofs" / "shared" / "mixed-node-visuals.css"
+
+
 def expected_proof_files(root: Path = ROOT) -> tuple[Path, ...]:
     directory = proof_dir(root)
     return (
@@ -50,6 +54,7 @@ def expected_proof_files(root: Path = ROOT) -> tuple[Path, ...]:
         directory / "mixed-node.css",
         directory / "mixed-node.js",
         directory / "README.md",
+        shared_visuals_path(root),
     )
 
 
@@ -187,6 +192,7 @@ def validate_proof(root: Path = ROOT) -> list[str]:
     directory = proof_dir(root)
     html = (directory / "index.html").read_text(encoding="utf-8")
     css = (directory / "mixed-node.css").read_text(encoding="utf-8")
+    shared_css = shared_visuals_path(root).read_text(encoding="utf-8")
     js = (directory / "mixed-node.js").read_text(encoding="utf-8")
 
     manifest_path = seed_manifest_path(root)
@@ -240,6 +246,8 @@ def validate_proof(root: Path = ROOT) -> list[str]:
         'aria-hidden="true"',
         'data-state="closed"',
         "data-sheet-grip",
+        '../shared/mixed-node-visuals.css',
+        'class="mixed-node-proof"',
     )
     for required_html_token in required_html_tokens:
         if required_html_token not in html:
@@ -305,7 +313,17 @@ def validate_proof(root: Path = ROOT) -> list[str]:
     if "curationBadgeLabel" not in js:
         errors.append("mixed-node proof must render curation badges via curationBadgeLabel")
 
-    errors.extend(validate_token_coverage(projects, css, shared_js))
+    required_shared_css_tokens = (
+        ".mixed-node",
+        ".mixed-node-core",
+        ".detail-surface",
+        ".aspect-card",
+    )
+    for token in required_shared_css_tokens:
+        if token not in shared_css:
+            errors.append(f"shared mixed-node visuals CSS missing {token}")
+
+    errors.extend(validate_token_coverage(projects, css + "\n" + shared_css, shared_js))
 
     for project in projects:
         try:

@@ -116,6 +116,10 @@ generate-search-index-input:
 test:
 	python3 -m unittest discover -s tests -p 'test_*.py'
 
+.PHONY: smoke-map-browser
+smoke-map-browser:
+	python3 scripts/smoke_map_proof_browser.py
+
 .PHONY: capture-proof-hub-browser-smoke
 capture-proof-hub-browser-smoke:
 	python3 scripts/smoke_proof_hub_browser.py

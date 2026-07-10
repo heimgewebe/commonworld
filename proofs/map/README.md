@@ -33,3 +33,7 @@ http://localhost:4173/proofs/map/
 - `exact` projects with coordinates would render as mixed-node markers without the halo.
 - Projects without renderable coordinates are skipped.
 - Hidden digital commons are deferred to a later digital proof instead of being forced onto the map.
+
+## Browser interaction smoke
+
+Run `make smoke-map-browser` to load a temporary local copy in headless Chrome. The smoke replaces MapLibre and raster tiles with a DOM-only stub, clicks real marker buttons, and verifies that the detail panel is visible, motion-free, closable and reopenable. This keeps external network speed out of the interaction regression check.

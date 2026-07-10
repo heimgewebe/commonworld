@@ -30,6 +30,10 @@ def proof_dir(root: Path = ROOT) -> Path:
     return root / "proofs" / "map"
 
 
+def shared_visuals_path(root: Path = ROOT) -> Path:
+    return root / "proofs" / "shared" / "mixed-node-visuals.css"
+
+
 def expected_proof_files(root: Path = ROOT) -> tuple[Path, ...]:
     directory = proof_dir(root)
     return (
@@ -38,6 +42,7 @@ def expected_proof_files(root: Path = ROOT) -> tuple[Path, ...]:
         directory / "map.js",
         directory / "map-source.json",
         directory / "README.md",
+        shared_visuals_path(root),
     )
 
 
@@ -192,6 +197,7 @@ def validate_map_proof(root: Path = ROOT) -> list[str]:
     html = (directory / "index.html").read_text(encoding="utf-8")
     css = (directory / "map.css").read_text(encoding="utf-8")
     js = (directory / "map.js").read_text(encoding="utf-8")
+    shared_css = shared_visuals_path(root).read_text(encoding="utf-8")
     readme = (directory / "README.md").read_text(encoding="utf-8")
 
     required_html_tokens = (
@@ -203,10 +209,15 @@ def validate_map_proof(root: Path = ROOT) -> list[str]:
         "MapLibre",
         "loads MapLibre from a CDN",
         "raster map tiles from CARTO",
+        '../shared/mixed-node-visuals.css',
+        'class="map-proof"',
     )
     for token in required_html_tokens:
         if token not in html:
             errors.append(f"map proof HTML missing {token}")
+    if '../mixed-node/mixed-node.css' in html:
+        errors.append("map proof must not import mixed-node proof implementation CSS")
+
     forbidden_provider_fragments = ("maplibre-gl@", "carto-dark-matter")
     for fragment in forbidden_provider_fragments:
         if fragment in html:
@@ -226,12 +237,23 @@ def validate_map_proof(root: Path = ROOT) -> list[str]:
         "top: 50%",
         "left: 50%",
         "transform: translate(-50%, -50%)",
+        "opacity: 1",
+        "transform: none",
+        "transition: none",
+        "will-change: auto",
     )
     for token in required_css_tokens:
         if token not in css:
             errors.append(f"map proof CSS missing {token}")
     if "z-index: -1" in css:
         errors.append("map proof CSS must not hide the approximate halo behind the map")
+
+    for token in (".mixed-node", ".mixed-node-core", ".detail-surface", ".aspect-card"):
+        if token not in shared_css:
+            errors.append(f"shared mixed-node visuals CSS missing {token}")
+    for forbidden in ('data-open="true"', "opacity: 0", "translate3d", "will-change: transform, opacity"):
+        if forbidden in shared_css:
+            errors.append(f"shared mixed-node visuals CSS must not carry proof motion token {forbidden}")
 
     required_js_tokens = (
         "MAP_SOURCE_URL",

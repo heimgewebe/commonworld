@@ -118,6 +118,10 @@ body {
   width: min(34rem, calc(100vw - 2rem));
   max-height: none;
   border-radius: 1.5rem;
+  opacity: 1;
+  transform: none;
+  transition: none;
+  will-change: auto;
 }
 
 .maplibregl-ctrl-top-right {

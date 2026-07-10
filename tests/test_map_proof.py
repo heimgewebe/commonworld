@@ -116,6 +116,34 @@ class MapProofTests(unittest.TestCase):
         self.assertIn("loads MapLibre from a CDN", html)
         self.assertIn("raster map tiles from CARTO", html)
 
+    def test_map_imports_shared_visuals_not_mixed_node_implementation_css(self) -> None:
+        html = (proof_dir(ROOT) / "index.html").read_text(encoding="utf-8")
+        css = (proof_dir(ROOT) / "map.css").read_text(encoding="utf-8")
+        shared_css = (ROOT / "proofs" / "shared" / "mixed-node-visuals.css").read_text(encoding="utf-8")
+
+        self.assertIn('../shared/mixed-node-visuals.css', html)
+        self.assertNotIn('../mixed-node/mixed-node.css', html)
+        for token in ("opacity: 1", "transform: none", "transition: none", "will-change: auto"):
+            self.assertIn(token, css)
+        for token in ('data-open="true"', "opacity: 0", "translate3d", "will-change: transform, opacity"):
+            self.assertNotIn(token, shared_css)
+
+    def test_old_mixed_node_stylesheet_coupling_fails_validation(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp_dir:
+            tmp_root = self.copy_valid_root(tmp_dir)
+            html_path = proof_dir(tmp_root) / "index.html"
+            html_path.write_text(
+                html_path.read_text(encoding="utf-8").replace(
+                    '../shared/mixed-node-visuals.css',
+                    '../mixed-node/mixed-node.css',
+                ),
+                encoding="utf-8",
+            )
+
+            errors = validate_map_proof(tmp_root)
+
+        self.assertIn("map proof must not import mixed-node proof implementation CSS", errors)
+
 
 if __name__ == "__main__":
     unittest.main()
