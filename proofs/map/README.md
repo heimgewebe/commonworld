@@ -36,4 +36,4 @@ http://localhost:4173/proofs/map/
 
 ## Browser interaction smoke
 
-Run `make smoke-map-browser` to load a temporary local copy in headless Chrome. The smoke replaces MapLibre and raster tiles with a DOM-only stub, clicks real marker buttons, and verifies that the detail panel is visible, motion-free, closable and reopenable. This keeps external network speed out of the interaction regression check.
+Run `make smoke-map-browser` to load a temporary local copy in Playwright-managed headless Chromium. The smoke replaces MapLibre and raster tiles with a DOM-only stub, clicks real marker buttons, and verifies that the detail panel is visible, motion-free, closable and reopenable. This keeps external network speed out of the interaction regression check.

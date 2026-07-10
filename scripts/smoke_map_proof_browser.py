@@ -1,22 +1,18 @@
 #!/usr/bin/env python3
-"""Headless Chrome interaction smoke for the static map proof.
+"""Playwright interaction smoke for the static map proof.
 
 The smoke serves a temporary copy of the proof, replaces MapLibre and tile work
 with a local DOM-only stub, clicks real marker buttons, and verifies that the map
-panel is visible, motion-free, closable and reopenable. It is an operator-facing
-browser check rather than a default CI browser dependency.
+panel is visible, motion-free, closable and reopenable.
 """
 
 from __future__ import annotations
 
 import argparse
 import functools
-import html
 import http.server
 import json
-import re
 import shutil
-import subprocess
 import sys
 import tempfile
 import threading
@@ -25,17 +21,12 @@ from pathlib import Path
 from typing import Any
 
 ROOT = Path(__file__).resolve().parents[1]
-if str(ROOT) not in sys.path:
-    sys.path.insert(0, str(ROOT))
-
-from scripts.smoke_proof_hub_browser import BROWSER_ENV, find_browser
-RESULT_PATTERN = re.compile(r'<pre id="result">(.*?)</pre>', re.DOTALL)
 
 
 @dataclass(frozen=True)
 class MapBrowserSmokeReceipt:
     smoke_id: str
-    browser_binary: str
+    browser_version: str
     marker_count: int
     load_state: str
     panel_opacity: str
@@ -52,7 +43,8 @@ class MapBrowserSmokeReceipt:
 BOUNDARY = (
     "temporary local proof copy",
     "MapLibre and raster tiles replaced by a DOM-only local stub",
-    "no external network required",
+    "Playwright-managed Chromium",
+    "no external map network required",
     "no deploy, DNS, backend, submission or weltgewebe write path",
 )
 
@@ -77,76 +69,6 @@ window.maplibregl = {
 };
 '''
 
-HARNESS = r'''<pre id="result">pending</pre>
-<script>
-  const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
-  async function waitFor(selector, timeoutMs = 5000) {
-    const deadline = performance.now() + timeoutMs;
-    while (performance.now() < deadline) {
-      const element = document.querySelector(selector);
-      if (element) return element;
-      await sleep(25);
-    }
-    throw new Error(`Timed out waiting for ${selector}`);
-  }
-  async function waitForText(selector, prefix, timeoutMs = 5000) {
-    const deadline = performance.now() + timeoutMs;
-    while (performance.now() < deadline) {
-      const element = document.querySelector(selector);
-      if (element && element.textContent.startsWith(prefix)) return element;
-      await sleep(25);
-    }
-    throw new Error(`Timed out waiting for ${selector} text ${prefix}`);
-  }
-  async function settle() {
-    await new Promise((resolve) => requestAnimationFrame(() => requestAnimationFrame(resolve)));
-  }
-  (async () => {
-    const resultNode = document.getElementById("result");
-    try {
-      const firstMarker = await waitFor(".map-marker .mixed-node");
-      const markers = [...document.querySelectorAll(".map-marker .mixed-node")];
-      const loadState = await waitForText("[data-load-state]", "Map ready.");
-      const panel = document.querySelector("[data-detail-surface]");
-      const startedAt = performance.now();
-      firstMarker.click();
-      await settle();
-      const openElapsedMs = performance.now() - startedAt;
-      const style = getComputedStyle(panel);
-      const rect = panel.getBoundingClientRect();
-      const inViewport =
-        rect.width > 0 && rect.height > 0 && rect.right > 0 && rect.bottom > 0 &&
-        rect.left < innerWidth && rect.top < innerHeight;
-      const openSnapshot = {
-        hidden: panel.hidden,
-        opacity: style.opacity,
-        transform: style.transform,
-        transitionDuration: style.transitionDuration,
-        willChange: style.willChange,
-        inViewport,
-      };
-      document.querySelector("[data-close-detail]").click();
-      await settle();
-      const closed = panel.hidden;
-      markers[markers.length - 1].click();
-      await settle();
-      const reopened = !panel.hidden && getComputedStyle(panel).opacity === "1";
-      resultNode.textContent = JSON.stringify({
-        markerCount: markers.length,
-        loadState: loadState.textContent,
-        openElapsedMs,
-        openSnapshot,
-        closed,
-        reopened,
-      });
-      document.title = "map smoke complete";
-    } catch (error) {
-      resultNode.textContent = JSON.stringify({ error: String(error) });
-      document.title = "map smoke failed";
-    }
-  })();
-</script>'''
-
 
 class QuietHandler(http.server.SimpleHTTPRequestHandler):
     def log_message(self, _format: str, *args: object) -> None:
@@ -165,46 +87,6 @@ def prepare_tree(source_root: Path, destination: Path) -> None:
     source["library"]["script_url"] = "/test-assets/dist/maplibre-gl.js"
     source["library"]["css_url"] = "/test-assets/dist/maplibre-gl.css"
     source_path.write_text(json.dumps(source, indent=2) + "\n", encoding="utf-8")
-    map_index = destination / "proofs" / "map" / "index.html"
-    map_html = map_index.read_text(encoding="utf-8")
-    map_index.write_text(map_html.replace("</body>", HARNESS + "\n</body>"), encoding="utf-8")
-
-
-def browser_command(browser: str, profile: Path, url: str, timeout_ms: int) -> list[str]:
-    return [
-        browser,
-        "--headless=new",
-        "--no-sandbox",
-        "--disable-gpu",
-        "--disable-dev-shm-usage",
-        "--disable-background-networking",
-        "--disable-default-apps",
-        "--disable-extensions",
-        "--disable-sync",
-        "--disable-component-update",
-        "--metrics-recording-only",
-        "--no-first-run",
-        "--no-default-browser-check",
-        "--run-all-compositor-stages-before-draw",
-        f"--virtual-time-budget={timeout_ms}",
-        f"--user-data-dir={profile}",
-        "--dump-dom",
-        url,
-    ]
-
-
-def parse_result(dom: str) -> dict[str, Any]:
-    match = RESULT_PATTERN.search(dom)
-    if not match:
-        raise RuntimeError("browser output did not contain map smoke result")
-    payload = html.unescape(match.group(1)).strip()
-    try:
-        result = json.loads(payload)
-    except json.JSONDecodeError as error:
-        raise RuntimeError(f"map smoke result is not valid JSON: {payload[:240]}") from error
-    if result.get("error"):
-        raise RuntimeError(f"map browser harness failed: {result['error']}")
-    return result
 
 
 def validate_result(result: dict[str, Any]) -> list[str]:
@@ -236,45 +118,14 @@ def validate_result(result: dict[str, Any]) -> list[str]:
     return errors
 
 
-def run_browser_smoke(root: Path = ROOT, timeout_seconds: int = 20) -> MapBrowserSmokeReceipt:
-    browser = find_browser()
-    if not browser:
-        raise RuntimeError(f"no supported browser found; set {BROWSER_ENV}")
-    with tempfile.TemporaryDirectory(prefix="commonworld-map-browser-") as temp_dir:
-        temp_root = Path(temp_dir)
-        prepare_tree(root, temp_root)
-        handler = functools.partial(QuietHandler, directory=str(temp_root))
-        server = http.server.ThreadingHTTPServer(("127.0.0.1", 0), handler)
-        thread = threading.Thread(target=server.serve_forever, daemon=True)
-        thread.start()
-        profile = temp_root / "chrome-profile"
-        url = f"http://127.0.0.1:{server.server_port}/proofs/map/"
-        try:
-            completed = subprocess.run(
-                browser_command(browser, profile, url, timeout_seconds * 1000),
-                stdout=subprocess.PIPE,
-                stderr=subprocess.PIPE,
-                text=True,
-                timeout=timeout_seconds + 10,
-                check=False,
-            )
-        except subprocess.TimeoutExpired as error:
-            raise RuntimeError(f"map browser smoke timed out after {timeout_seconds}s") from error
-        finally:
-            server.shutdown()
-            server.server_close()
-            thread.join(timeout=2)
-    if completed.returncode != 0:
-        stderr_tail = "\n".join(completed.stderr.splitlines()[-12:])
-        raise RuntimeError(f"map browser smoke failed rc={completed.returncode}; stderr_tail={stderr_tail}")
-    result = parse_result(completed.stdout)
+def receipt_from_result(browser_version: str, result: dict[str, Any]) -> MapBrowserSmokeReceipt:
     errors = validate_result(result)
     if errors:
         raise RuntimeError("map browser smoke validation failed: " + "; ".join(errors))
     snapshot = result["openSnapshot"]
     return MapBrowserSmokeReceipt(
         smoke_id="commonworld.map-proof.browser-interaction-smoke.v1",
-        browser_binary=browser,
+        browser_version=browser_version,
         marker_count=result["markerCount"],
         load_state=result["loadState"],
         panel_opacity=snapshot["opacity"],
@@ -289,8 +140,83 @@ def run_browser_smoke(root: Path = ROOT, timeout_seconds: int = 20) -> MapBrowse
     )
 
 
+def run_browser_smoke(root: Path = ROOT, timeout_seconds: int = 20) -> MapBrowserSmokeReceipt:
+    try:
+        from playwright.sync_api import sync_playwright
+    except ImportError as error:
+        raise RuntimeError("Playwright is not installed; install requirements-dev.txt") from error
+
+    with tempfile.TemporaryDirectory(prefix="commonworld-map-browser-") as temp_dir:
+        temp_root = Path(temp_dir)
+        prepare_tree(root, temp_root)
+        handler = functools.partial(QuietHandler, directory=str(temp_root))
+        server = http.server.ThreadingHTTPServer(("127.0.0.1", 0), handler)
+        thread = threading.Thread(target=server.serve_forever, daemon=True)
+        thread.start()
+        url = f"http://127.0.0.1:{server.server_port}/proofs/map/"
+        try:
+            with sync_playwright() as playwright:
+                browser = playwright.chromium.launch(headless=True)
+                page = browser.new_page(viewport={"width": 1024, "height": 800})
+                page.set_default_timeout(timeout_seconds * 1000)
+                page.goto(url, wait_until="networkidle")
+                page.wait_for_function(
+                    "document.querySelector('[data-load-state]')?.textContent.startsWith('Map ready.')"
+                )
+                markers = page.locator(".map-marker .mixed-node")
+                marker_count = markers.count()
+                started_at = page.evaluate("performance.now()")
+                markers.first.click()
+                page.wait_for_function("document.querySelector('[data-detail-surface]')?.hidden === false")
+                page.evaluate("new Promise(resolve => requestAnimationFrame(() => requestAnimationFrame(resolve)))")
+                open_elapsed_ms = page.evaluate("performance.now()") - started_at
+                snapshot = page.locator("[data-detail-surface]").evaluate(
+                    """panel => {
+                      const style = getComputedStyle(panel);
+                      const rect = panel.getBoundingClientRect();
+                      return {
+                        hidden: panel.hidden,
+                        opacity: style.opacity,
+                        transform: style.transform,
+                        transitionDuration: style.transitionDuration,
+                        willChange: style.willChange,
+                        inViewport:
+                          rect.width > 0 && rect.height > 0 && rect.right > 0 && rect.bottom > 0 &&
+                          rect.left < innerWidth && rect.top < innerHeight,
+                      };
+                    }"""
+                )
+                page.locator("[data-close-detail]").click()
+                page.wait_for_function("document.querySelector('[data-detail-surface]')?.hidden === true")
+                closed = page.locator("[data-detail-surface]").evaluate("panel => panel.hidden")
+                markers.last.click()
+                page.wait_for_function("document.querySelector('[data-detail-surface]')?.hidden === false")
+                reopened = page.locator("[data-detail-surface]").evaluate(
+                    "panel => !panel.hidden && getComputedStyle(panel).opacity === '1'"
+                )
+                load_state = page.locator("[data-load-state]").inner_text()
+                browser_version = browser.version
+                browser.close()
+        except Exception as error:
+            raise RuntimeError(f"map Playwright smoke failed: {error}") from error
+        finally:
+            server.shutdown()
+            server.server_close()
+            thread.join(timeout=2)
+
+    result = {
+        "markerCount": marker_count,
+        "loadState": load_state,
+        "openElapsedMs": open_elapsed_ms,
+        "openSnapshot": snapshot,
+        "closed": closed,
+        "reopened": reopened,
+    }
+    return receipt_from_result(browser_version, result)
+
+
 def main() -> int:
-    parser = argparse.ArgumentParser(description="Run the local headless-browser interaction smoke for the map proof.")
+    parser = argparse.ArgumentParser(description="Run the Playwright interaction smoke for the map proof.")
     parser.add_argument("--timeout-seconds", type=int, default=20)
     args = parser.parse_args()
     try:
