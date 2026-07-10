@@ -191,6 +191,53 @@ class MixedNodeProofTests(unittest.TestCase):
 
         self.assertIn("shared aspect module ASPECT_COLORS missing aspect.data", errors)
 
+    def test_detail_surface_motion_contract_is_visible(self) -> None:
+        directory = proof_dir(ROOT)
+        html = (directory / "index.html").read_text(encoding="utf-8")
+        css = (directory / "mixed-node.css").read_text(encoding="utf-8")
+        js = (directory / "mixed-node.js").read_text(encoding="utf-8")
+
+        for token in ('data-state="closed"', 'aria-hidden="true"', "data-sheet-grip"):
+            with self.subTest(html_token=token):
+                self.assertIn(token, html)
+
+        for token in ("--sheet-drag-y", 'data-open="true"', 'data-state="dragging"', "translate3d", "touch-action: none"):
+            with self.subTest(css_token=token):
+                self.assertIn(token, css)
+
+        for token in (
+            "requestAnimationFrame",
+            "transitionend",
+            'event.propertyName !== "transform"',
+            'event.target.closest("[data-close-detail]")',
+            "pointerdown",
+            "pointermove",
+            "setPointerCapture",
+            "swipeCloseThreshold",
+        ):
+            with self.subTest(js_token=token):
+                self.assertIn(token, js)
+
+    def test_motion_contract_requires_swipe_handler_tokens(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp_dir:
+            tmp_root = self.copy_valid_root(tmp_dir)
+            js_path = proof_dir(tmp_root) / "mixed-node.js"
+            js_path.write_text(js_path.read_text(encoding="utf-8").replace("pointermove", "pointerdrag"), encoding="utf-8")
+
+            errors = validate_proof(tmp_root)
+
+        self.assertIn("proof JS missing motion behavior token pointermove", errors)
+
+    def test_motion_contract_requires_sheet_transform_token(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp_dir:
+            tmp_root = self.copy_valid_root(tmp_dir)
+            css_path = proof_dir(tmp_root) / "mixed-node.css"
+            css_path.write_text(css_path.read_text(encoding="utf-8").replace("translate3d", "translate"), encoding="utf-8")
+
+            errors = validate_proof(tmp_root)
+
+        self.assertIn("proof CSS missing motion behavior token translate3d", errors)
+
 
 if __name__ == "__main__":
     unittest.main()

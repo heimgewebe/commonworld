@@ -221,7 +221,12 @@ def validate_proof(root: Path = ROOT) -> list[str]:
         "requiredElement",
         "renderEvidence",
         "setExpandedButton",
+        "setDetailState",
+        "finishClose",
         "closeDetail",
+        "beginSheetDrag",
+        "moveSheetDrag",
+        "endSheetDrag",
     )
     for required_js_name in required_js_names:
         if required_js_name not in js:
@@ -232,6 +237,9 @@ def validate_proof(root: Path = ROOT) -> list[str]:
         "data-detail-surface",
         'tabindex="-1"',
         'aria-live="polite"',
+        'aria-hidden="true"',
+        'data-state="closed"',
+        "data-sheet-grip",
     )
     for required_html_token in required_html_tokens:
         if required_html_token not in html:
@@ -248,6 +256,41 @@ def validate_proof(root: Path = ROOT) -> list[str]:
     for token in required_js_a11y_tokens:
         if token not in js:
             errors.append(f"proof JS missing accessibility behavior token {token}")
+
+
+    required_motion_css_tokens = (
+        "--sheet-drag-y",
+        'data-open="true"',
+        'data-state="dragging"',
+        "translate3d",
+        "will-change: transform, opacity",
+        "cubic-bezier(0.16, 1, 0.3, 1)",
+        "touch-action: none",
+    )
+    for token in required_motion_css_tokens:
+        if token not in css:
+            errors.append(f"proof CSS missing motion behavior token {token}")
+
+    required_motion_js_tokens = (
+        "window.matchMedia",
+        "prefers-reduced-motion",
+        "requestAnimationFrame",
+        "dataset.open",
+        "aria-hidden",
+        "transitionend",
+        'event.propertyName !== "transform"',
+        'event.target.closest("[data-close-detail]")',
+        "pointerdown",
+        "pointermove",
+        "pointerup",
+        "pointercancel",
+        "setPointerCapture",
+        "releasePointerCapture",
+        "swipeCloseThreshold",
+    )
+    for token in required_motion_js_tokens:
+        if token not in js:
+            errors.append(f"proof JS missing motion behavior token {token}")
 
     if errors:
         return errors
