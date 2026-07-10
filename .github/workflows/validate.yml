@@ -16,5 +16,9 @@ jobs:
           python-version: "3.12"
       - name: Install validation dependencies
         run: python -m pip install -r requirements-dev.txt
+      - name: Install Chromium for browser smoke
+        run: python -m playwright install --with-deps chromium
       - name: Validate contracts and examples
         run: make validate
+      - name: Run map browser interaction smoke
+        run: make smoke-map-browser

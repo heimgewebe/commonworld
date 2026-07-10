@@ -152,7 +152,7 @@ class MixedNodeProofTests(unittest.TestCase):
     def test_token_coverage_requires_css_custom_properties(self) -> None:
         with tempfile.TemporaryDirectory() as tmp_dir:
             tmp_root = self.copy_valid_root(tmp_dir)
-            css_path = proof_dir(tmp_root) / "mixed-node.css"
+            css_path = tmp_root / "proofs" / "shared" / "mixed-node-visuals.css"
             css_text = css_path.read_text(encoding="utf-8").replace("--aspect-data:", "--aspectdatum:")
             css_path.write_text(css_text, encoding="utf-8")
 
@@ -237,6 +237,20 @@ class MixedNodeProofTests(unittest.TestCase):
             errors = validate_proof(tmp_root)
 
         self.assertIn("proof CSS missing motion behavior token translate3d", errors)
+
+    def test_shared_visuals_are_separate_from_proof_motion(self) -> None:
+        directory = proof_dir(ROOT)
+        html = (directory / "index.html").read_text(encoding="utf-8")
+        proof_css = (directory / "mixed-node.css").read_text(encoding="utf-8")
+        shared_css = (ROOT / "proofs" / "shared" / "mixed-node-visuals.css").read_text(encoding="utf-8")
+
+        self.assertIn('../shared/mixed-node-visuals.css', html)
+        self.assertIn('class="mixed-node-proof"', html)
+        for token in (".mixed-node", ".mixed-node-core", ".aspect-card"):
+            self.assertIn(token, shared_css)
+        for token in ('data-open="true"', "translate3d", "will-change: transform, opacity"):
+            self.assertIn(token, proof_css)
+            self.assertNotIn(token, shared_css)
 
 
 if __name__ == "__main__":
