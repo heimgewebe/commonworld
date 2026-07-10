@@ -21,7 +21,12 @@ const nodeList = requiredElement("[data-node-list]");
 const loadState = requiredElement("[data-load-state]");
 const detailSurface = requiredElement("[data-detail-surface]");
 const closeButton = requiredElement("[data-close-detail]");
+const sheetGrip = requiredElement("[data-sheet-grip]");
+const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)");
+const swipeCloseThreshold = 84;
 let activeNodeButton = null;
+let closeTimer = null;
+let dragState = null;
 
 function evidenceText(evidence) {
   return evidence
@@ -131,10 +136,41 @@ function renderAspectCard(segment) {
   return card;
 }
 
+function setDetailState(state) {
+  detailSurface.dataset.state = state;
+}
+
+function setDragOffset(offset) {
+  detailSurface.style.setProperty("--sheet-drag-y", `${Math.max(0, Math.round(offset))}px`);
+}
+
+function resetDragOffset() {
+  detailSurface.style.removeProperty("--sheet-drag-y");
+}
+
+function finishClose(restoreFocus) {
+  window.clearTimeout(closeTimer);
+  closeTimer = null;
+  resetDragOffset();
+  detailSurface.hidden = true;
+  detailSurface.removeAttribute("data-open");
+  detailSurface.setAttribute("aria-hidden", "true");
+  setDetailState("closed");
+  setExpandedButton(null);
+  if (restoreFocus && activeNodeButton) {
+    activeNodeButton.focus();
+  }
+  activeNodeButton = null;
+}
+
 function openDetail(project, sourceButton) {
   activeNodeButton = sourceButton;
   setExpandedButton(sourceButton);
+  window.clearTimeout(closeTimer);
+  resetDragOffset();
   detailSurface.hidden = false;
+  detailSurface.setAttribute("aria-hidden", "false");
+  setDetailState("opening");
   detailSurface.querySelector("[data-detail-kicker]").textContent = `${project.id} · ${project.location.label}`;
   detailSurface.querySelector("[data-detail-title]").textContent = project.title;
   detailSurface.querySelector("[data-detail-summary]").textContent = project.summary;
@@ -144,17 +180,88 @@ function openDetail(project, sourceButton) {
 
   const cards = detailSurface.querySelector("[data-aspect-cards]");
   cards.replaceChildren(...buildSegments(project).map(renderAspectCard));
-  detailSurface.focus();
+
+  requestAnimationFrame(() => {
+    detailSurface.dataset.open = "true";
+    setDetailState("open");
+    detailSurface.focus();
+  });
 }
 
 function closeDetail(options = {}) {
   const restoreFocus = options.restoreFocus !== false;
-  detailSurface.hidden = true;
-  setExpandedButton(null);
-  if (restoreFocus && activeNodeButton) {
-    activeNodeButton.focus();
+  if (detailSurface.hidden || detailSurface.dataset.state === "closing") {
+    return;
   }
-  activeNodeButton = null;
+  setDetailState("closing");
+  detailSurface.removeAttribute("data-open");
+  if (reduceMotion.matches) {
+    finishClose(restoreFocus);
+    return;
+  }
+  closeTimer = window.setTimeout(() => finishClose(restoreFocus), 320);
+}
+
+function shouldStartSheetDrag(event) {
+  if (detailSurface.hidden || event.pointerType === "mouse" || event.target.closest("[data-close-detail]")) {
+    return false;
+  }
+  const bounds = detailSurface.getBoundingClientRect();
+  return event.target === sheetGrip || event.clientY <= bounds.top + 72;
+}
+
+function beginSheetDrag(event) {
+  if (!shouldStartSheetDrag(event)) {
+    return;
+  }
+  dragState = {
+    pointerId: event.pointerId,
+    startY: event.clientY,
+    lastY: event.clientY,
+    startedAt: performance.now(),
+  };
+  setDetailState("dragging");
+  detailSurface.setPointerCapture(event.pointerId);
+}
+
+function moveSheetDrag(event) {
+  if (!dragState || dragState.pointerId !== event.pointerId) {
+    return;
+  }
+  const offset = Math.max(0, event.clientY - dragState.startY);
+  dragState.lastY = event.clientY;
+  setDragOffset(offset);
+  if (offset > 4) {
+    event.preventDefault();
+  }
+}
+
+function endSheetDrag(event) {
+  if (!dragState || dragState.pointerId !== event.pointerId) {
+    return;
+  }
+  const offset = Math.max(0, dragState.lastY - dragState.startY);
+  const elapsed = Math.max(1, performance.now() - dragState.startedAt);
+  const velocity = offset / elapsed;
+  dragState = null;
+  if (detailSurface.hasPointerCapture(event.pointerId)) {
+    detailSurface.releasePointerCapture(event.pointerId);
+  }
+  if (offset >= swipeCloseThreshold || velocity > 0.45) {
+    closeDetail();
+    return;
+  }
+  setDetailState("open");
+  resetDragOffset();
+}
+
+function cancelSheetDrag(event) {
+  if (!dragState || dragState.pointerId !== event.pointerId) {
+    return;
+  }
+  dragState = null;
+  setDetailState("open");
+  resetDragOffset();
 }
 
 async function init() {
@@ -164,6 +271,16 @@ async function init() {
 }
 
 closeButton.addEventListener("click", () => closeDetail());
+detailSurface.addEventListener("transitionend", (event) => {
+  if (event.target !== detailSurface || event.propertyName !== "transform" || detailSurface.dataset.state !== "closing") {
+    return;
+  }
+  finishClose(true);
+});
+detailSurface.addEventListener("pointerdown", beginSheetDrag);
+detailSurface.addEventListener("pointermove", moveSheetDrag);
+detailSurface.addEventListener("pointerup", endSheetDrag);
+detailSurface.addEventListener("pointercancel", cancelSheetDrag);
 document.addEventListener("keydown", (event) => {
   if (event.key === "Escape" && !detailSurface.hidden) {
     closeDetail();
