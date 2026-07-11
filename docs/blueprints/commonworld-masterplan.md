@@ -383,6 +383,56 @@ lokal          → konkrete öffentliche Geometrien und Marker
 Fokus          → vollständiger Datensatz
 ```
 
+### Kanonischer Aggregations- und Zoomvertrag
+
+Die ausführbare Ableitungsregel liegt in `contracts/commonworld/aggregation-zoom.contract.json`. Sie beschreibt keine zweite Katalogwahrheit und keine API. Sie legt ausschließlich fest, wie derselbe CommonProject-v3-Bestand für unterschiedliche semantische Ebenen zusammengefasst oder wieder aufgelöst wird.
+
+#### Zähleinheit und Mehrfachverortung
+
+Gezählt wird immer die stabile Commons-Identität `CommonProject.id`, niemals die Zahl ihrer Marker, Anker oder Darstellungen. Ein Commons mit mehreren Ankern zählt in einem räumlichen Aggregat höchstens einmal. Berührt dieselbe Identität mehrere räumliche Aggregate, darf sie in jedem betroffenen Aggregat einmal vorkommen; globale Summen werden wieder nach Identität dedupliziert. Themenverteilungen zählen dieselbe Identität je Thema und Aggregat höchstens einmal. Ihre Summe kann deshalb größer als die Zahl der Commons sein.
+
+Ein hybrides Commons bleibt ebenfalls eine Identität. Geografische und digitale Darstellung sind zwei Kanäle desselben Datensatzes, keine zwei Katalogeinträge.
+
+#### Dichte und räumlicher Umfang
+
+Die erste kanonische Intensitätsgröße für geografische Felder ist die Zahl aktuell belegter, öffentlicher Commons-Identitäten je `10.000 km²` tatsächlich untersuchter Fläche. In diese Dichte gehen nur `listed`, `verified` oder `featured` sowie `active` oder `seasonal` ein. Pausierte, unbekannte, beendete oder redaktionell veraltete Commons können weiterhin sichtbar sein, erhöhen aber die Aktualitätsdichte nicht.
+
+Räumlicher Umfang bleibt eine eigene Geometrieaussage. Eine große Fläche darf nicht allein deshalb dieselbe Intensität erhalten wie viele eigenständige Commons. Rohzahlen geografischer Anker, Beliebtheit, moralische Qualität und redaktionelle Hervorhebung sind keine Dichtewerte.
+
+#### Datenabdeckung statt falscher Null
+
+Jedes räumliche Aggregat unterscheidet:
+
+- `assessed`: systematisch untersucht; null Commons kann belegte geringe Dichte bedeuten;
+- `partial`: nur teilweise untersucht; jede Zahl ist eine Untergrenze und es wird keine normalisierte Dichte behauptet;
+- `unassessed`: keine ausreichende Abdeckungsgrundlage; null bedeutet unbekannt, nicht leer.
+
+`assessed` und `partial` benötigen einen nachvollziehbaren Abdeckungsbeleg. Eine normalisierte geografische Dichte ist nur für `assessed` zulässig. Datenabdeckung darf niemals aus dem bloßen Fehlen von Katalogeinträgen abgeleitet werden. Textur, Muster und Textalternative tragen diese Aussage gemeinsam; Farbe allein genügt nicht.
+
+Für die digitale Sphäre wird keine Fläche in Quadratkilometern erfunden. Ihre Abdeckung unterscheidet einen benannten kuratierten Untersuchungsraum, einen nur teilweise untersuchten Raum und einen unbekannten Raum. Globale Vollständigkeit darf nur behauptet werden, wenn das zugrunde liegende Universum ausdrücklich definiert und belegt ist.
+
+#### Unsicherheit und Datenschutz
+
+Exakte öffentliche Geometrie wird unverändert weitergereicht. Ungefähre Lage behält ihre veröffentlichte Geometrie und die angegebene Mindestunsicherheit; kein Aggregat darf sie nachträglich schärfen. Verborgene Lage gelangt weder in räumliche Buckets noch in geografische Cluster oder Geometrien. Sie darf nur in nicht räumlichen Gesamtaussagen vorkommen. Kleine Aggregate werden unterdrückt oder gröber gefasst, wenn ihre Kombination eine verborgene Lage rückerschließen ließe.
+
+#### Clusterauflösung
+
+Regionale Cluster zählen eindeutige Commons-Identitäten, nicht Marker. Beim Eintritt in die lokale Ebene lösen sich semantische Cluster in einzelne öffentliche Identitäten auf. Dort sind nur noch kurzlebige Kollisionsgruppen zulässig, wenn Symbole auf dem Bildschirm tatsächlich unlesbar überlappen. Solche Gruppen müssen ihre Mitgliedsidentitäten offenlegen und verändern die Zählung nicht.
+
+#### Ebenenvertrag
+
+| Ebene | Gelieferte Datenform | Bewusst ausgeschlossen |
+| --- | --- | --- |
+| Erde | Abdeckungsfelder, normalisierte Dichtefelder, Themenverteilungen, Zusammenfassung der digitalen Sphäre | Einzelmarker, Einzelfäden, vollständige Datensätze |
+| Großregion | regionale Aggregate, Abdeckung, Themenverteilungen, belegte Netzwerkzusammenfassungen | unbegrenzte Namensmengen, vollständige Datensätze, abgeleitete Netzwerke |
+| Region | eindeutige Identitätscluster, öffentliche Flächen, ungefähre Zonen, belegte Beziehungszusammenfassungen | verborgene Geometrie, markerbasierte Zählung |
+| Lokal | Identitätskurzformen, öffentliche Marker und Flächen, ungefähre Zonen, belegte Fäden | semantische Cluster, erfundene Beziehungen, verborgene Geometrie |
+| Fokus | genau ein vollständiger CommonProject-Datensatz mit allen öffentlichen Darstellungen derselben Identität | doppelter Hybrid-Eintrag, mehrere gleichzeitige Fokusse, UI-Felder im Katalog |
+
+Für die digitale Sphäre gilt dieselbe Bewegung: Gesamtsphäre → Themenfeld → Netzwerk → einzelne Identität. Keine dieser Ebenen erzeugt geografische Koordinaten. Globus und lineare Ansicht verwenden bei gleichen Filtern dieselbe Identitätsmenge und dieselbe Ableitung.
+
+Der Vertrag definiert zusätzlich transportneutrale Pflichtfelder. Ein Abdeckungsfeld trägt Bucket, Abdeckungszustand, Beobachtungszeit und Belege. Ein Dichtefeld trägt eindeutige Identitätszahl, untersuchte Fläche, normalisierte Dichte und Themenverteilung. Cluster führen ihre eindeutigen Mitgliedsidentitäten, damit sie deterministisch aufgelöst werden können. Großräumige Netzwerkzusammenfassungen liefern dagegen nur Kennung, eindeutige Anzahl, belegte Relationszahl und Themenverteilung – keine vollständige öffentliche Mitgliederliste. Kurzformen verweisen auf `CommonProject.id` und enthalten nur öffentliche Darstellungen. Beziehungen führen beide Identitäten, Typ und Quellen. Der Fokus enthält genau einen vollständigen CommonProject-v3-Datensatz. Diese Formen sind keine URL-, API- oder Engine-Festlegung.
+
 ### Datenwahrheit
 
 - Visualisierung wird aus Katalogdaten abgeleitet.

@@ -1,12 +1,15 @@
-.PHONY: validate validate-canonical-plan validate-contracts validate-public-shell test smoke-pages-live check-pages-dns-target
+.PHONY: validate validate-canonical-plan validate-contracts validate-semantic-zoom validate-public-shell test smoke-pages-live check-pages-dns-target
 
-validate: validate-canonical-plan validate-contracts validate-public-shell test
+validate: validate-canonical-plan validate-contracts validate-semantic-zoom validate-public-shell test
 
 validate-canonical-plan:
 	python3 scripts/validate_canonical_plan.py
 
 validate-contracts:
 	python3 scripts/validate_contracts.py
+
+validate-semantic-zoom:
+	python3 scripts/validate_semantic_zoom.py
 
 validate-public-shell:
 	python3 scripts/validate_public_shell.py

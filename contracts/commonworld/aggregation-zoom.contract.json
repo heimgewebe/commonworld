@@ -1,0 +1,485 @@
+{
+  "schema_version": 1,
+  "title": "Commonworld aggregation and semantic zoom contract",
+  "description": "Canonical transport-neutral derivation rules from CommonProject v3 into geographic and digital semantic-zoom views. This is a presentation contract, never editorial catalog truth or an API definition.",
+  "source_contract": {
+    "id": "https://commonworld.net/contracts/commonworld/project.schema.json",
+    "schema_version": 3,
+    "identity_key": "CommonProject.id"
+  },
+  "aggregation_unit": {
+    "name": "commonproject_identity",
+    "bucket_count_rule": "one_identity_at_most_once_per_bucket",
+    "global_count_rule": "one_identity_at_most_once_in_global_totals",
+    "multi_anchor_rule": "anchors_select_spatial_buckets_but_never_multiply_identity_count_within_one_bucket",
+    "theme_count_rule": "one_identity_at_most_once_per_theme_per_bucket",
+    "theme_totals_may_exceed_identity_total": true,
+    "hybrid_rule": "one_identity_with_geographic_and_digital_representations"
+  },
+  "publication_eligibility": {
+    "public_curation_states": [
+      "listed",
+      "verified",
+      "featured",
+      "stale"
+    ],
+    "density_curation_states": [
+      "listed",
+      "verified",
+      "featured"
+    ],
+    "density_activity_states": [
+      "active",
+      "seasonal"
+    ],
+    "excluded_public_curation_states": [
+      "candidate",
+      "archived"
+    ],
+    "visible_but_not_density_activity_states": [
+      "paused",
+      "unknown",
+      "ended"
+    ],
+    "stale_visible_but_not_density": true
+  },
+  "intensity": {
+    "geographic_basis": "current_public_identity_density",
+    "unit": "unique_identities_per_10000_assessed_km2",
+    "normalization_area": "assessed_surface_km2",
+    "spatial_extent_is_separate_geometry_signal": true,
+    "theme_distribution_is_not_collapsed_to_one_dominant_type": true,
+    "forbidden_meanings": [
+      "popularity",
+      "moral_quality",
+      "editorial_rank",
+      "raw_anchor_count"
+    ],
+    "density_allowed_for_coverage_states": [
+      "assessed"
+    ],
+    "partial_coverage_output": "lower_bound_identity_count_without_density",
+    "unassessed_coverage_output": "unknown_without_zero_or_density"
+  },
+  "coverage": {
+    "states": [
+      "assessed",
+      "partial",
+      "unassessed"
+    ],
+    "zero_interpretation": {
+      "assessed": "supported_low_density",
+      "partial": "catalog_lower_bound_only",
+      "unassessed": "unknown_not_zero"
+    },
+    "evidence_required_for": [
+      "assessed",
+      "partial"
+    ],
+    "must_not_infer_from_catalog_absence": true,
+    "primary_visual_channel": "texture",
+    "non_color_channel": "label_and_pattern"
+  },
+  "uncertainty_and_privacy": {
+    "exact": "pass_public_geometry_without_added_uncertainty",
+    "approximate": "pass_public_geometry_and_minimum_uncertainty_without_sharpening",
+    "hidden": "exclude_from_spatial_buckets_and_geometry_but_allow_nonspatial_totals",
+    "aggregate_must_not_enable_reverse_inference": true,
+    "small_count_suppression_required_when_privacy_would_be_weakened": true
+  },
+  "clusters": {
+    "aggregation_member_key": "CommonProject.id",
+    "count_rule": "unique_identity_count_not_anchor_count",
+    "semantic_clusters_allowed_through_level": "region",
+    "semantic_clusters_dissolve_on_entry_to": "local",
+    "local_exception": "transient_screen_collision_group_only",
+    "transient_group_must_expose_member_identity_ids": true,
+    "hidden_locations_never_join_geographic_clusters": true
+  },
+  "relations": {
+    "no_inferred_relations": true,
+    "aggregate_only_evidenced_source_relations": true,
+    "local_threads_require_known_visible_endpoints": true,
+    "hidden_endpoint_must_not_be_relocated_or_revealed": true
+  },
+  "levels": [
+    {
+      "id": "planet",
+      "question": "Where are Commons worldwide evidenced, how dense are current public identities, and which themes occur?",
+      "outputs": [
+        "coverage_fields",
+        "density_fields",
+        "theme_distributions",
+        "digital_sphere_summary"
+      ],
+      "forbidden": [
+        "individual_markers",
+        "individual_threads",
+        "full_records",
+        "raw_anchor_counts"
+      ],
+      "identity_detail": "none",
+      "shape_refs": [
+        "coverage_field",
+        "density_field",
+        "theme_distribution",
+        "digital_coverage_summary"
+      ]
+    },
+    {
+      "id": "macroregion",
+      "question": "Which countries, landscapes, and transregional contexts contain evidenced concentrations?",
+      "outputs": [
+        "regional_aggregates",
+        "coverage_fields",
+        "theme_distributions",
+        "evidenced_network_summaries"
+      ],
+      "forbidden": [
+        "full_records",
+        "unbounded_project_names",
+        "inferred_networks"
+      ],
+      "identity_detail": "none",
+      "shape_refs": [
+        "coverage_field",
+        "density_field",
+        "theme_distribution",
+        "network_summary"
+      ]
+    },
+    {
+      "id": "region",
+      "question": "Which local concentrations, public extents, and regional networks exist here?",
+      "outputs": [
+        "unique_identity_clusters",
+        "public_extent_geometries",
+        "approximate_zones",
+        "evidenced_relation_summaries",
+        "selected_identity_labels"
+      ],
+      "forbidden": [
+        "full_records",
+        "hidden_geometry",
+        "anchor_based_cluster_counts"
+      ],
+      "identity_detail": "selected_summaries",
+      "shape_refs": [
+        "identity_cluster",
+        "public_representation",
+        "relation_summary",
+        "identity_summary"
+      ]
+    },
+    {
+      "id": "local",
+      "question": "Which concrete Commons and evidenced relations can be reached or inspected here?",
+      "outputs": [
+        "identity_summaries",
+        "public_anchor_markers",
+        "public_extent_geometries",
+        "approximate_zones",
+        "evidenced_threads",
+        "transient_collision_groups"
+      ],
+      "forbidden": [
+        "semantic_clusters",
+        "hidden_geometry",
+        "invented_relations"
+      ],
+      "identity_detail": "all_readable_public_identities",
+      "shape_refs": [
+        "identity_summary",
+        "public_representation",
+        "relation_summary",
+        "collision_group"
+      ]
+    },
+    {
+      "id": "focus",
+      "question": "What is this Commons, what can be done there, how reliable are the claims, and where can the visitor continue?",
+      "outputs": [
+        "one_complete_commonproject_record",
+        "all_public_representations_for_same_identity",
+        "provenance",
+        "uncertainty",
+        "links"
+      ],
+      "forbidden": [
+        "multiple_focused_identities",
+        "duplicate_hybrid_records",
+        "presentation_only_catalog_fields"
+      ],
+      "identity_detail": "exactly_one_complete_record",
+      "shape_refs": [
+        "focus_record"
+      ]
+    }
+  ],
+  "digital_levels": [
+    {
+      "id": "sphere",
+      "outputs": [
+        "theme_distributions",
+        "reach_distributions",
+        "evidenced_network_summaries"
+      ],
+      "forbidden": [
+        "invented_coordinates",
+        "individual_geographic_markers"
+      ],
+      "shape_refs": [
+        "digital_coverage_summary",
+        "theme_distribution",
+        "reach_distribution",
+        "network_summary"
+      ]
+    },
+    {
+      "id": "field",
+      "outputs": [
+        "theme_clusters",
+        "network_clusters",
+        "coverage_status"
+      ],
+      "forbidden": [
+        "invented_coordinates",
+        "full_records"
+      ],
+      "shape_refs": [
+        "digital_coverage_summary",
+        "theme_distribution",
+        "network_summary"
+      ]
+    },
+    {
+      "id": "network",
+      "outputs": [
+        "identity_summaries",
+        "evidenced_relations"
+      ],
+      "forbidden": [
+        "invented_coordinates",
+        "inferred_relations"
+      ],
+      "shape_refs": [
+        "identity_summary",
+        "relation_summary"
+      ]
+    },
+    {
+      "id": "identity",
+      "outputs": [
+        "one_complete_commonproject_record",
+        "all_public_representations_for_same_identity"
+      ],
+      "forbidden": [
+        "duplicate_hybrid_records",
+        "invented_coordinates"
+      ],
+      "shape_refs": [
+        "focus_record"
+      ]
+    }
+  ],
+  "cross_view_invariants": {
+    "same_filters_same_identity_set": true,
+    "linear_view_uses_same_derived_result": true,
+    "focus_record_is_source_commonproject": true,
+    "no_manual_zoom_assignment_in_commonproject": true,
+    "no_renderer_specific_pixels_or_engine_types": true
+  },
+  "digital_coverage": {
+    "states": [
+      "curated_scope",
+      "partial_scope",
+      "unknown_scope"
+    ],
+    "must_name_assessed_universe": true,
+    "must_not_claim_global_completeness_without_defined_universe": true,
+    "must_not_infer_from_catalog_absence": true,
+    "no_geographic_area_denominator": true
+  },
+  "output_shapes": {
+    "coverage_field": {
+      "required": [
+        "bucket_id",
+        "coverage_state",
+        "observed_at",
+        "evidence_refs"
+      ],
+      "coverage_state_source": "coverage.states",
+      "evidence_required_for": [
+        "assessed",
+        "partial"
+      ],
+      "forbidden": [
+        "density_when_partial",
+        "density_when_unassessed",
+        "zero_inferred_from_absence"
+      ]
+    },
+    "density_field": {
+      "required": [
+        "bucket_id",
+        "unique_identity_count",
+        "assessed_surface_km2",
+        "identities_per_10000_km2",
+        "theme_identity_counts"
+      ],
+      "allowed_coverage_states": [
+        "assessed"
+      ],
+      "identity_key": "CommonProject.id",
+      "theme_count_unit": "unique_identity_per_theme",
+      "forbidden": [
+        "raw_anchor_count",
+        "popularity",
+        "quality_score",
+        "spatial_extent_as_density"
+      ]
+    },
+    "identity_cluster": {
+      "required": [
+        "cluster_id",
+        "member_identity_ids",
+        "unique_identity_count",
+        "public_geometry"
+      ],
+      "member_key": "CommonProject.id",
+      "member_ids_unique": true,
+      "count_equals_member_identity_count": true,
+      "forbidden": [
+        "anchor_ids_as_members",
+        "hidden_geometry",
+        "inferred_members"
+      ]
+    },
+    "identity_summary": {
+      "required": [
+        "project_id",
+        "title",
+        "kind",
+        "themes",
+        "activity_status",
+        "curation_state",
+        "public_representations"
+      ],
+      "project_id_source": "CommonProject.id",
+      "full_record_forbidden": true
+    },
+    "public_representation": {
+      "variants": [
+        "exact_anchor",
+        "approximate_anchor",
+        "public_extent",
+        "digital_presence"
+      ],
+      "common_required": [
+        "project_id",
+        "representation_kind"
+      ],
+      "approximate_requires": [
+        "public_geometry",
+        "uncertainty_meters_min"
+      ],
+      "exact_or_extent_requires": [
+        "public_geometry"
+      ],
+      "digital_requires": [
+        "reach"
+      ],
+      "forbidden": [
+        "hidden_geometry",
+        "invented_coordinate",
+        "separate_hybrid_identity"
+      ]
+    },
+    "relation_summary": {
+      "required": [
+        "source_project_id",
+        "target_project_id",
+        "relation_type",
+        "source_ids"
+      ],
+      "identity_key": "CommonProject.id",
+      "source_ids_required": true,
+      "forbidden": [
+        "inferred_relation",
+        "relocated_hidden_endpoint"
+      ]
+    },
+    "collision_group": {
+      "required": [
+        "member_identity_ids",
+        "unique_identity_count",
+        "reason"
+      ],
+      "reason_const": "screen_collision",
+      "transient": true,
+      "member_ids_unique": true,
+      "forbidden": [
+        "semantic_aggregation",
+        "anchor_count"
+      ]
+    },
+    "focus_record": {
+      "required": [
+        "commonproject"
+      ],
+      "commonproject_schema_version": 3,
+      "exactly_one_identity": true,
+      "project_id_source": "CommonProject.id",
+      "forbidden": [
+        "duplicate_hybrid_record",
+        "presentation_only_catalog_fields"
+      ]
+    },
+    "digital_coverage_summary": {
+      "required": [
+        "coverage_state",
+        "scope_label",
+        "observed_at",
+        "evidence_refs"
+      ],
+      "coverage_state_source": "digital_coverage.states",
+      "evidence_required_for": [
+        "curated_scope",
+        "partial_scope"
+      ],
+      "unknown_scope_must_not_claim_assessed_universe": true,
+      "geographic_area_forbidden": true,
+      "global_completeness_requires_defined_universe": true
+    },
+    "theme_distribution": {
+      "required": [
+        "theme",
+        "unique_identity_count"
+      ],
+      "identity_key": "CommonProject.id",
+      "counts_are_not_mutually_exclusive": true
+    },
+    "reach_distribution": {
+      "required": [
+        "reach",
+        "unique_identity_count"
+      ],
+      "identity_key": "CommonProject.id"
+    },
+    "network_summary": {
+      "required": [
+        "summary_id",
+        "unique_identity_count",
+        "evidenced_relation_count",
+        "theme_identity_counts"
+      ],
+      "member_key": "CommonProject.id",
+      "member_identity_ids_forbidden": true,
+      "forbidden": [
+        "inferred_relation",
+        "anchor_count",
+        "public_member_list_at_aggregate_level"
+      ]
+    }
+  }
+}
