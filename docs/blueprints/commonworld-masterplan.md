@@ -415,6 +415,25 @@ Nicht zum redaktionellen Kern gehören:
 - Animationsparameter;
 - Suchindexformen.
 
+### Fachliche Fallmatrix für CommonProject v3
+
+Der Vertrag wird vor jeder Renderingentscheidung gegen eine nichtöffentliche Fallmatrix geprüft. Sie bildet reale Anforderungen ab, ist aber kein öffentlicher Beispielkatalog und behauptet keine konkreten Commons als verifiziert.
+
+Abgedeckt werden mindestens:
+
+- ein veröffentlichter konkreter Ort;
+- eine belegte ausgedehnte Fläche;
+- eine absichtlich ungefähre Lage mit öffentlicher Geometrie und Mindestunsicherheit;
+- eine verborgene Lage ohne veröffentlichte Geometrie;
+- ein vollständig digitales Commons ohne erfundene Koordinate;
+- ein regional verteiltes Commons;
+- mehrere geografische Anker unter einer gemeinsamen Identität;
+- ein hybrides Commons mit geografischer und digitaler Präsenz;
+- eine Beziehung mit Verweis auf dieselbe Provenienz wie der Katalogdatensatz;
+- ein pausierter Betrieb unabhängig von einem veralteten redaktionellen Prüfzustand.
+
+Geografische Anker, digitale Präsenz, Betriebszustand und Beziehungen tragen Quellenverweise auf die gemeinsame Provenienz. Exakte und ungefähre Anker benötigen eine veröffentlichbare Geometrie; verborgene Anker dürfen keine Geometrie enthalten. `activity.status` beschreibt den belegten Betriebszustand. `curation.state` beschreibt dagegen Publikations- und Prüfqualität. Beide Aussagen dürfen nicht miteinander gleichgesetzt werden.
+
 ## Qualitäts- und Publikationszustände
 
 - `candidate`: geprüft werden, nicht im Hauptkatalog;

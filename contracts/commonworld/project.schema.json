@@ -14,6 +14,7 @@
     "themes",
     "actions",
     "presence",
+    "activity",
     "provenance",
     "curation",
     "links"
@@ -57,17 +58,7 @@
       "uniqueItems": true,
       "items": {
         "type": "string",
-        "enum": [
-          "visit",
-          "use",
-          "borrow",
-          "learn",
-          "contribute",
-          "volunteer",
-          "donate",
-          "contact",
-          "replicate"
-        ]
+        "enum": ["visit", "use", "borrow", "learn", "contribute", "volunteer", "donate", "contact", "replicate"]
       }
     },
     "presence": {
@@ -95,12 +86,19 @@
     },
     "handoff": {
       "$ref": "#/$defs/handoff"
+    },
+    "activity": {
+      "$ref": "#/$defs/activity"
     }
   },
   "allOf": [
     {
       "if": {
-        "properties": {"kind": {"const": "geographic"}},
+        "properties": {
+          "kind": {
+            "const": "geographic"
+          }
+        },
         "required": ["kind"]
       },
       "then": {
@@ -108,12 +106,14 @@
           "presence": {
             "properties": {
               "geographic": {
-                "properties": {
-                  "mode": {"enum": ["exact", "approximate", "hidden"]}
-                }
+                "minItems": 1
               },
               "digital": {
-                "properties": {"available": {"const": false}}
+                "properties": {
+                  "available": {
+                    "const": false
+                  }
+                }
               }
             }
           }
@@ -122,7 +122,11 @@
     },
     {
       "if": {
-        "properties": {"kind": {"const": "digital"}},
+        "properties": {
+          "kind": {
+            "const": "digital"
+          }
+        },
         "required": ["kind"]
       },
       "then": {
@@ -130,12 +134,20 @@
           "presence": {
             "properties": {
               "geographic": {
-                "properties": {
-                  "mode": {"enum": ["hidden", "not-applicable"]}
+                "items": {
+                  "properties": {
+                    "mode": {
+                      "const": "hidden"
+                    }
+                  }
                 }
               },
               "digital": {
-                "properties": {"available": {"const": true}}
+                "properties": {
+                  "available": {
+                    "const": true
+                  }
+                }
               }
             }
           }
@@ -144,7 +156,11 @@
     },
     {
       "if": {
-        "properties": {"kind": {"const": "hybrid"}},
+        "properties": {
+          "kind": {
+            "const": "hybrid"
+          }
+        },
         "required": ["kind"]
       },
       "then": {
@@ -152,12 +168,14 @@
           "presence": {
             "properties": {
               "geographic": {
-                "properties": {
-                  "mode": {"enum": ["exact", "approximate", "hidden"]}
-                }
+                "minItems": 1
               },
               "digital": {
-                "properties": {"available": {"const": true}}
+                "properties": {
+                  "available": {
+                    "const": true
+                  }
+                }
               }
             }
           }
@@ -172,96 +190,67 @@
       "required": ["geographic", "digital"],
       "properties": {
         "geographic": {
-          "$ref": "#/$defs/geographicPresence"
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/geographicLocation"
+          }
         },
         "digital": {
           "$ref": "#/$defs/digitalPresence"
         }
       }
     },
-    "geographicPresence": {
-      "type": "object",
-      "additionalProperties": false,
-      "required": ["mode", "label"],
-      "properties": {
-        "mode": {
-          "type": "string",
-          "enum": ["exact", "approximate", "hidden", "not-applicable"]
-        },
-        "label": {
-          "type": "string",
-          "minLength": 2,
-          "maxLength": 180
-        },
-        "geometry": {
-          "$ref": "#/$defs/publicGeometry"
-        },
-        "accuracy_meters_min": {
-          "type": "integer",
-          "minimum": 1
-        },
-        "privacy_note": {
-          "type": "string",
-          "maxLength": 500
-        }
-      },
-      "allOf": [
+    "publicGeometry": {
+      "oneOf": [
         {
-          "if": {
-            "properties": {"mode": {"const": "exact"}},
-            "required": ["mode"]
-          },
-          "then": {
-            "required": ["geometry"],
-            "not": {"required": ["accuracy_meters_min"]}
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["type", "coordinates"],
+          "properties": {
+            "type": {
+              "const": "Point"
+            },
+            "coordinates": {
+              "$ref": "#/$defs/position"
+            }
           }
         },
         {
-          "if": {
-            "properties": {"mode": {"const": "approximate"}},
-            "required": ["mode"]
-          },
-          "then": {
-            "required": ["accuracy_meters_min"]
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["type", "coordinates"],
+          "properties": {
+            "type": {
+              "const": "Polygon"
+            },
+            "coordinates": {
+              "$ref": "#/$defs/polygonCoordinates"
+            }
           }
         },
         {
-          "if": {
-            "properties": {"mode": {"enum": ["hidden", "not-applicable"]}},
-            "required": ["mode"]
-          },
-          "then": {
-            "not": {
-              "anyOf": [
-                {"required": ["geometry"]},
-                {"required": ["accuracy_meters_min"]}
-              ]
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["type", "coordinates"],
+          "properties": {
+            "type": {
+              "const": "MultiPolygon"
+            },
+            "coordinates": {
+              "$ref": "#/$defs/multiPolygonCoordinates"
             }
           }
         }
       ]
     },
-    "publicGeometry": {
-      "type": "object",
-      "additionalProperties": false,
-      "required": ["type", "coordinates"],
-      "properties": {
-        "type": {
-          "type": "string",
-          "enum": ["Point", "Polygon", "MultiPolygon"]
-        },
-        "coordinates": {
-          "type": "array",
-          "minItems": 1
-        }
-      }
-    },
     "digitalPresence": {
       "type": "object",
       "additionalProperties": false,
-      "required": ["available"],
+      "required": ["available", "source_ids"],
       "properties": {
-        "available": {"type": "boolean"},
+        "available": {
+          "type": "boolean"
+        },
         "reach": {
           "type": "string",
           "enum": ["global", "regional", "network", "restricted"]
@@ -270,20 +259,39 @@
           "type": "string",
           "minLength": 2,
           "maxLength": 180
+        },
+        "source_ids": {
+          "type": "array",
+          "minItems": 1,
+          "uniqueItems": true,
+          "items": {
+            "type": "string",
+            "pattern": "^[a-z][a-z0-9-]{2,95}$"
+          }
         }
       },
       "allOf": [
         {
           "if": {
-            "properties": {"available": {"const": true}},
+            "properties": {
+              "available": {
+                "const": true
+              }
+            },
             "required": ["available"]
           },
-          "then": {"required": ["reach", "label"]},
+          "then": {
+            "required": ["reach", "label"]
+          },
           "else": {
             "not": {
               "anyOf": [
-                {"required": ["reach"]},
-                {"required": ["label"]}
+                {
+                  "required": ["reach"]
+                },
+                {
+                  "required": ["label"]
+                }
               ]
             }
           }
@@ -293,7 +301,7 @@
     "relation": {
       "type": "object",
       "additionalProperties": false,
-      "required": ["target_id", "type", "source_url"],
+      "required": ["target_id", "type", "source_ids"],
       "properties": {
         "target_id": {
           "type": "string",
@@ -301,18 +309,20 @@
         },
         "type": {
           "type": "string",
-          "enum": [
-            "part-of",
-            "operated-by",
-            "chapter-of",
-            "cooperates-with",
-            "depends-on",
-            "local-digital-link"
-          ]
+          "enum": ["part-of", "operated-by", "chapter-of", "cooperates-with", "depends-on", "local-digital-link"]
         },
-        "source_url": {
+        "source_ids": {
+          "type": "array",
+          "minItems": 1,
+          "uniqueItems": true,
+          "items": {
+            "type": "string",
+            "pattern": "^[a-z][a-z0-9-]{2,95}$"
+          }
+        },
+        "note": {
           "type": "string",
-          "format": "uri"
+          "maxLength": 500
         }
       }
     },
@@ -324,7 +334,9 @@
         "sources": {
           "type": "array",
           "minItems": 1,
-          "items": {"$ref": "#/$defs/source"}
+          "items": {
+            "$ref": "#/$defs/source"
+          }
         },
         "uncertainty_note": {
           "type": "string",
@@ -394,10 +406,16 @@
       "allOf": [
         {
           "if": {
-            "properties": {"state": {"enum": ["listed", "verified", "featured", "stale", "archived"]}},
+            "properties": {
+              "state": {
+                "enum": ["listed", "verified", "featured", "stale", "archived"]
+              }
+            },
             "required": ["state"]
           },
-          "then": {"required": ["reviewed_by"]}
+          "then": {
+            "required": ["reviewed_by"]
+          }
         }
       ]
     },
@@ -408,16 +426,7 @@
       "properties": {
         "type": {
           "type": "string",
-          "enum": [
-            "homepage",
-            "visit",
-            "use",
-            "contribute",
-            "contact",
-            "documentation",
-            "license",
-            "source"
-          ]
+          "enum": ["homepage", "visit", "use", "contribute", "contact", "documentation", "license", "source"]
         },
         "label": {
           "type": "string",
@@ -435,8 +444,13 @@
       "additionalProperties": false,
       "required": ["enabled"],
       "properties": {
-        "enabled": {"type": "boolean"},
-        "system": {"type": "string", "const": "weltgewebe"},
+        "enabled": {
+          "type": "boolean"
+        },
+        "system": {
+          "type": "string",
+          "const": "weltgewebe"
+        },
         "project_id": {
           "type": "string",
           "minLength": 3,
@@ -455,22 +469,197 @@
       "allOf": [
         {
           "if": {
-            "properties": {"enabled": {"const": true}},
+            "properties": {
+              "enabled": {
+                "const": true
+              }
+            },
             "required": ["enabled"]
           },
-          "then": {"required": ["system", "project_id", "label", "url"]},
+          "then": {
+            "required": ["system", "project_id", "label", "url"]
+          },
           "else": {
             "not": {
               "anyOf": [
-                {"required": ["system"]},
-                {"required": ["project_id"]},
-                {"required": ["label"]},
-                {"required": ["url"]}
+                {
+                  "required": ["system"]
+                },
+                {
+                  "required": ["project_id"]
+                },
+                {
+                  "required": ["label"]
+                },
+                {
+                  "required": ["url"]
+                }
               ]
             }
           }
         }
       ]
+    },
+    "geographicLocation": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "mode", "label", "source_ids"],
+      "properties": {
+        "id": {
+          "type": "string",
+          "pattern": "^[a-z][a-z0-9-]{2,95}$"
+        },
+        "mode": {
+          "type": "string",
+          "enum": ["exact", "approximate", "hidden"]
+        },
+        "label": {
+          "type": "string",
+          "minLength": 2,
+          "maxLength": 180
+        },
+        "geometry": {
+          "$ref": "#/$defs/publicGeometry"
+        },
+        "uncertainty_meters_min": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "privacy_note": {
+          "type": "string",
+          "minLength": 10,
+          "maxLength": 500
+        },
+        "source_ids": {
+          "type": "array",
+          "minItems": 1,
+          "uniqueItems": true,
+          "items": {
+            "type": "string",
+            "pattern": "^[a-z][a-z0-9-]{2,95}$"
+          }
+        }
+      },
+      "allOf": [
+        {
+          "if": {
+            "properties": {
+              "mode": {
+                "const": "exact"
+              }
+            },
+            "required": ["mode"]
+          },
+          "then": {
+            "required": ["geometry"],
+            "not": {
+              "required": ["uncertainty_meters_min"]
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "mode": {
+                "const": "approximate"
+              }
+            },
+            "required": ["mode"]
+          },
+          "then": {
+            "required": ["geometry", "uncertainty_meters_min"]
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "mode": {
+                "const": "hidden"
+              }
+            },
+            "required": ["mode"]
+          },
+          "then": {
+            "required": ["privacy_note"],
+            "not": {
+              "anyOf": [
+                {
+                  "required": ["geometry"]
+                },
+                {
+                  "required": ["uncertainty_meters_min"]
+                }
+              ]
+            }
+          }
+        }
+      ]
+    },
+    "position": {
+      "type": "array",
+      "prefixItems": [
+        {
+          "type": "number",
+          "minimum": -180,
+          "maximum": 180
+        },
+        {
+          "type": "number",
+          "minimum": -90,
+          "maximum": 90
+        }
+      ],
+      "minItems": 2,
+      "maxItems": 2
+    },
+    "linearRing": {
+      "type": "array",
+      "minItems": 4,
+      "items": {
+        "$ref": "#/$defs/position"
+      }
+    },
+    "polygonCoordinates": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "$ref": "#/$defs/linearRing"
+      }
+    },
+    "multiPolygonCoordinates": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "$ref": "#/$defs/polygonCoordinates"
+      }
+    },
+    "activity": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["status", "observed_at", "source_ids"],
+      "properties": {
+        "status": {
+          "type": "string",
+          "enum": ["active", "paused", "seasonal", "unknown", "ended"]
+        },
+        "observed_at": {
+          "type": "string",
+          "format": "date"
+        },
+        "source_ids": {
+          "type": "array",
+          "minItems": 1,
+          "uniqueItems": true,
+          "items": {
+            "type": "string",
+            "pattern": "^[a-z][a-z0-9-]{2,95}$"
+          }
+        },
+        "note": {
+          "type": "string",
+          "maxLength": 500
+        }
+      }
     }
   }
 }
