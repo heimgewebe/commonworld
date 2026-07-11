@@ -1,0 +1,274 @@
+{
+  "schema_version": 1,
+  "kind": "commonworld_renderer_engine_spike",
+  "status": "measured_recommendation_not_engine_commitment",
+  "measured_at": "2026-07-11",
+  "repository_base_commit": "9d27231e774dd72e02a8a6f3ba1f515e8543d391",
+  "contract_bindings": {
+    "commonproject_schema_version": 3,
+    "aggregation_zoom_schema_version": 1,
+    "visual_semantics_schema_version": 1
+  },
+  "method": {
+    "candidate_versions": {
+      "maplibre_gl_js": "5.24.0",
+      "cesium_js": "1.143.0",
+      "three_js": "0.185.1",
+      "deck_gl": "9.3.6"
+    },
+    "build": {
+      "bundler": "esbuild 0.25.6",
+      "format": "esm",
+      "target": "es2022",
+      "minified": true,
+      "gzip_measurement": true
+    },
+    "browser": "Google Chrome stable headless",
+    "webgl_renderer": "ANGLE SwiftShader software WebGL",
+    "profiles": {
+      "desktop": {
+        "css_width": 1280,
+        "css_height": 800,
+        "device_scale_factor": 1,
+        "touch": false
+      },
+      "mobile_emulated": {
+        "css_width": 390,
+        "css_height": 844,
+        "device_scale_factor": 2,
+        "touch": true
+      }
+    },
+    "workload": {
+      "deterministic_seed": 20260711,
+      "point_count": 5000,
+      "line_count": 200,
+      "polygon_count": 20,
+      "measured_rotation_frames": 120,
+      "same_generated_geographic_workload_for_all_candidates": true
+    },
+    "common_shell_proofs": {
+      "keyboard_buttons": 4,
+      "deep_link_query_parsed": true,
+      "linear_fallback_items": 10,
+      "canvas_accessible_name_present": true,
+      "prefers_reduced_motion_observed": true
+    },
+    "limitations": {
+      "physical_mobile_device_tested": false,
+      "hardware_gpu_tested": false,
+      "software_webgl_results_are_relative_not_production_fps": true,
+      "network_tiles_and_basemap_excluded": true,
+      "semantic_hatching_and_uncertainty_halo_not_fully_implemented": true,
+      "digital_outer_sphere_not_proven_in_maplibre": true,
+      "screen_reader_end_to_end_not_tested": true,
+      "real_catalog_data_not_used": true,
+      "no_public_spike_fixture": true,
+      "state_restoration_end_to_end_not_tested": true,
+      "idle_and_hidden_tab_pause_not_tested": true
+    }
+  },
+  "measurements": {
+    "maplibre_gl_js": {
+      "bundle_js_bytes": 1048186,
+      "bundle_gzip_bytes": 284802,
+      "extra_static_assets_bytes": 0,
+      "desktop": {
+        "mean_frame_ms": 30.223,
+        "p95_frame_ms": 33.4,
+        "fps": 33.09,
+        "heap_used_bytes": 20805412
+      },
+      "mobile_emulated": {
+        "mean_frame_ms": 32.254,
+        "p95_frame_ms": 33.4,
+        "fps": 31.0,
+        "heap_used_bytes": 20718588
+      },
+      "fatal_runtime_errors": 0,
+      "notes": [
+        "native globe projection exercised",
+        "one desktop favicon 404 was non-engine noise"
+      ]
+    },
+    "cesium_js": {
+      "bundle_js_bytes": 4148445,
+      "bundle_gzip_bytes": 1113604,
+      "extra_static_assets_bytes": 7316528,
+      "desktop": {
+        "mean_frame_ms": 91.505,
+        "p95_frame_ms": 100.1,
+        "fps": 10.93,
+        "heap_used_bytes": 26319272
+      },
+      "mobile_emulated": {
+        "mean_frame_ms": 89.037,
+        "p95_frame_ms": 100.1,
+        "fps": 11.23,
+        "heap_used_bytes": 35957629
+      },
+      "fatal_runtime_errors": 0,
+      "notes": [
+        "corrected rerun after harness Material type fix is authoritative",
+        "one desktop favicon 404 was non-engine noise"
+      ]
+    },
+    "three_js": {
+      "bundle_js_bytes": 552969,
+      "bundle_gzip_bytes": 140167,
+      "extra_static_assets_bytes": 0,
+      "desktop": {
+        "mean_frame_ms": 55.006,
+        "p95_frame_ms": 66.7,
+        "fps": 18.18,
+        "heap_used_bytes": 5866342
+      },
+      "mobile_emulated": {
+        "mean_frame_ms": 55.556,
+        "p95_frame_ms": 66.7,
+        "fps": 18.0,
+        "heap_used_bytes": 6505218
+      },
+      "fatal_runtime_errors": 0,
+      "notes": [
+        "custom globe geometry, projection and geographic behavior implemented by spike code",
+        "smallest measured bundle"
+      ]
+    },
+    "deck_gl": {
+      "bundle_js_bytes": 688762,
+      "bundle_gzip_bytes": 198430,
+      "extra_static_assets_bytes": 0,
+      "desktop": {
+        "mean_frame_ms": 50.529,
+        "p95_frame_ms": 66.6,
+        "fps": 19.79,
+        "heap_used_bytes": 8115024
+      },
+      "mobile_emulated": {
+        "mean_frame_ms": 46.784,
+        "p95_frame_ms": 50.1,
+        "fps": 21.37,
+        "heap_used_bytes": 8734425
+      },
+      "fatal_runtime_errors": 0,
+      "notes": [
+        "GlobeView is documented as experimental",
+        "documented rotation and high-zoom limitations conflict with Commonworld local and focus needs"
+      ]
+    }
+  },
+  "capability_assessment": {
+    "maplibre_gl_js": {
+      "globe_and_geographic_semantic_zoom": "strong",
+      "geojson_points_lines_polygons": "strong",
+      "tile_and_large_catalog_path": "strong",
+      "custom_coverage_texture_and_uncertainty_halo": "requires_narrow_proof",
+      "digital_outer_sphere": "not_proven",
+      "engineering_burden": "medium",
+      "current_disposition": "conditional_primary_candidate"
+    },
+    "three_js": {
+      "globe_and_geographic_semantic_zoom": "manual",
+      "geojson_points_lines_polygons": "manual",
+      "tile_and_large_catalog_path": "manual_high_burden",
+      "custom_coverage_texture_and_uncertainty_halo": "flexible_but_manual",
+      "digital_outer_sphere": "strong_custom_candidate",
+      "engineering_burden": "high",
+      "current_disposition": "specialist_overlay_or_fallback_candidate"
+    },
+    "cesium_js": {
+      "globe_and_geographic_semantic_zoom": "strong",
+      "geojson_points_lines_polygons": "strong",
+      "tile_and_large_catalog_path": "strong",
+      "custom_coverage_texture_and_uncertainty_halo": "possible_with_engine_specific_work",
+      "digital_outer_sphere": "possible_with_engine_specific_work",
+      "engineering_burden": "medium_high",
+      "current_disposition": "reject_for_current_phase_cost_and_workload_mismatch"
+    },
+    "deck_gl": {
+      "globe_and_geographic_semantic_zoom": "documented_experimental_and_limited",
+      "geojson_points_lines_polygons": "mixed_layer_support",
+      "tile_and_large_catalog_path": "strong_in_supported_views",
+      "custom_coverage_texture_and_uncertainty_halo": "layer_dependent",
+      "digital_outer_sphere": "not_proven",
+      "engineering_burden": "medium",
+      "current_disposition": "reject_as_primary_until_globe_contract_matures"
+    }
+  },
+  "color_vision_check": {
+    "simulator": "daltonlens Machado2009 severity 1.0",
+    "normal_minimum_delta_e": 19.497,
+    "protan_minimum_delta_e": 6.58,
+    "deutan_minimum_delta_e": 2.91,
+    "tritan_minimum_delta_e": 6.505,
+    "conclusion": "family_color_alone_is_not_reliable",
+    "required_non_color_channels": [
+      "family_glyph",
+      "explicit_text_label",
+      "geometry_or_list_context"
+    ],
+    "distance_metric": "colorspacious perceptual deltaE via CAM02-UCS"
+  },
+  "recommendation": {
+    "engine_selected": false,
+    "primary_candidate": "maplibre_gl_js",
+    "decision": "advance_maplibre_to_bounded_phase2_globe_proof",
+    "reason": [
+      "highest measured frame rate on both standardized profiles",
+      "native globe projection and geospatial style pipeline",
+      "direct fit with semantic zoom and GeoJSON-derived public geometries",
+      "substantially smaller delivery than Cesium for the measured scope"
+    ],
+    "conditions_before_engine_commitment": [
+      "prove assessed_partial_unassessed interior textures without channel collision",
+      "prove approximate-location dashed boundary and uncertainty halo",
+      "prove or falsify a digital outer sphere without duplicating catalog identity",
+      "run physical mobile Safari and Chrome tests on hardware GPU",
+      "prove idle pause, hidden-tab pause, reduced motion and state restoration",
+      "prove keyboard and screen-reader parity with the linear view",
+      "retest with realistic vector-tile aggregation rather than one in-memory GeoJSON set"
+    ],
+    "fallback_if_outer_sphere_fails": "evaluate a narrowly isolated Three.js overlay before reconsidering the primary globe engine",
+    "forbidden_interpretations": [
+      "MapLibre is already the canonical production engine",
+      "software WebGL FPS predicts physical-device FPS",
+      "color alone satisfies the visual semantics contract",
+      "research harness or synthetic records may be published as product content"
+    ]
+  },
+  "evidence_artifacts": {
+    "archive_role": "local_non_product_research_archive",
+    "archive_sha256": "70106b8f1f0f2ad253290482a03e564bca629ed9497ac1916308ef073fde7f04",
+    "authoritative_results_sha256": "9123110eca19a227691478a7cb05a63f8b71a458f0c031afa5cafaa9087985c1",
+    "color_vision_results_sha256": "90186f8eec7701435c2eb52424c4e077859b516cd3d6724906f7846890368fbe",
+    "repository_contains_raw_harness": false,
+    "repository_contains_screenshots": false
+  },
+  "official_sources": [
+    {
+      "id": "maplibre_gl_js",
+      "url": "https://maplibre.org/maplibre-gl-js/docs/",
+      "checked_at": "2026-07-11",
+      "role": "official_documentation"
+    },
+    {
+      "id": "cesium_viewer",
+      "url": "https://cesium.com/learn/cesiumjs/ref-doc/Viewer.html",
+      "checked_at": "2026-07-11",
+      "role": "official_documentation"
+    },
+    {
+      "id": "three_js",
+      "url": "https://threejs.org/docs/",
+      "checked_at": "2026-07-11",
+      "role": "official_documentation"
+    },
+    {
+      "id": "deck_gl_globe_view",
+      "url": "https://deck.gl/docs/api-reference/core/globe-view",
+      "checked_at": "2026-07-11",
+      "role": "official_documentation"
+    }
+  ]
+}

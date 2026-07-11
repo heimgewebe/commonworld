@@ -440,6 +440,16 @@ Vor der Engine-Entscheidung wird ein begrenzter Technikvergleich durchgeführt. 
 
 Eine 3D- oder WebGL-Technik ist für den Globus wahrscheinlich, aber nicht allein wegen visueller Wirkung gesetzt. Die einfachste tragfähige Lösung gewinnt.
 
+### Gemessener Renderer-Engine-Spike
+
+Der ausführbare Forschungsbeleg liegt in `docs/research/renderer-engine-spike.result.json`; die lesbare Auswertung liegt daneben. Der Spike vom 11. Juli 2026 vergleicht MapLibre GL JS 5.24.0, CesiumJS 1.143.0, Three.js 0.185.1 und deck.gl 9.3.6 unter derselben synthetischen GeoJSON-Last. Roh-Harness, Screenshots und Messprotokolle bleiben außerhalb des Produkt-Repositories und sind über SHA-256 gebunden.
+
+MapLibre erreicht auf beiden standardisierten Software-WebGL-Profilen die höchste gemessene Bildrate und passt mit nativer Globusprojektion sowie geospatialem Stilpfad am direktesten zum semantischen Zoom. Es wird deshalb als **konditionaler Primärkandidat** in einen begrenzten Phase-2-Globusbeweis überführt. Das ist keine Engine-Festlegung.
+
+Three.js bleibt ein möglicher Spezialpfad für eine eng isolierte digitale Außensphäre, falls diese im MapLibre-Beweis nicht tragfähig ist. Cesium ist für den aktuellen Scope zu schwer und unter der gemessenen Last zu langsam. deck.gl wird wegen der dokumentierten experimentellen GlobeView- und Hochzoomgrenzen nicht als Primärpfad verfolgt.
+
+Vor jeder Engine-Festlegung sind zwingend zu beweisen: Abdeckungsmuster, Unsicherheitsränder und Halos, digitale Außensphäre ohne Identitätsdopplung, physische Mobilhardware, Pausen- und Reduced-Motion-Verhalten, Tastatur- und Screenreader-Parität sowie realistische Vektorkachel-Aggregation. Die Farbseh-Simulation bestätigt zusätzlich: Farbe allein darf keine Commons-Familie tragen; Symbol, Text und linearer Kontext bleiben Pflicht.
+
 ### Aggregation
 
 Die ferne Ansicht lädt keine Einzelobjektmenge. Daten werden maßstabsabhängig geliefert:
