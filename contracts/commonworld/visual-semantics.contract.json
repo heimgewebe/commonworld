@@ -1,0 +1,315 @@
+{
+  "schema_version": 1,
+  "title": "Commonworld visual semantics and privacy release contract",
+  "description": "Canonical, renderer-neutral rules for family hue, density lightness, coverage texture, location uncertainty and privacy-sensitive aggregation. This contract derives presentation semantics from CommonProject v3 and the semantic zoom contract; it is not catalog truth, an API or an engine choice.",
+  "source_contracts": {
+    "commonproject": {
+      "id": "https://commonworld.net/contracts/commonworld/project.schema.json",
+      "schema_version": 3
+    },
+    "aggregation_zoom": {
+      "path": "contracts/commonworld/aggregation-zoom.contract.json",
+      "schema_version": 1
+    }
+  },
+  "channel_separation": {
+    "hue": "commons_family",
+    "lightness": "normalized_current_density",
+    "interior_texture": "coverage_state",
+    "boundary_and_halo": "location_precision_and_uncertainty",
+    "geometry": "published_spatial_form",
+    "text": "explicit_semantic_label_and_numeric_value",
+    "color_never_only_channel": true,
+    "one_primary_meaning_per_visual_channel": true,
+    "family_pattern_forbidden_to_reserve_texture_for_coverage": true,
+    "red_green_good_bad_semantics_forbidden": true,
+    "moral_quality_or_rank_forbidden": true
+  },
+  "family_taxonomy": {
+    "taxonomy_version": 1,
+    "assignment_rule": "assign_at_most_one_evidence_reasoned_primary_family_and_up_to_two_secondary_families_from_curated_theme_meaning_and_public_purpose",
+    "assignment_location": "versioned_presentation_taxonomy_outside_commonproject_records",
+    "minimum_families_per_identity": 1,
+    "maximum_families_per_identity": 3,
+    "unclassified_theme_blocks_dominant_hue": true,
+    "families": [
+      {
+        "id": "ecology_land",
+        "hue_role": "teal_green",
+        "label_key": "visual.family.ecology_land",
+        "semantic_scope": [
+          "land",
+          "water",
+          "biodiversity",
+          "food_growing",
+          "ecological_stewardship"
+        ],
+        "non_color": {
+          "glyph_role": "land_contour",
+          "text_label_required": true
+        },
+        "palette_tokens": {
+          "fill_seed_light_surface": "#007A5E",
+          "fill_seed_dark_surface": "#4FD1A1"
+        }
+      },
+      {
+        "id": "knowledge_data",
+        "hue_role": "blue",
+        "label_key": "visual.family.knowledge_data",
+        "semantic_scope": [
+          "knowledge",
+          "data",
+          "software",
+          "education",
+          "documentation"
+        ],
+        "non_color": {
+          "glyph_role": "open_book_or_data",
+          "text_label_required": true
+        },
+        "palette_tokens": {
+          "fill_seed_light_surface": "#005A9C",
+          "fill_seed_dark_surface": "#6CB6FF"
+        }
+      },
+      {
+        "id": "making_infrastructure",
+        "hue_role": "amber_orange",
+        "label_key": "visual.family.making_infrastructure",
+        "semantic_scope": [
+          "tools",
+          "repair",
+          "production",
+          "workshops",
+          "communications_infrastructure"
+        ],
+        "non_color": {
+          "glyph_role": "tool_or_network",
+          "text_label_required": true
+        },
+        "palette_tokens": {
+          "fill_seed_light_surface": "#9A5A00",
+          "fill_seed_dark_surface": "#F3B64A"
+        }
+      },
+      {
+        "id": "care_provision",
+        "hue_role": "plum_magenta",
+        "label_key": "visual.family.care_provision",
+        "semantic_scope": [
+          "care",
+          "food_sharing",
+          "housing",
+          "health",
+          "mutual_aid"
+        ],
+        "non_color": {
+          "glyph_role": "support_or_provision",
+          "text_label_required": true
+        },
+        "palette_tokens": {
+          "fill_seed_light_surface": "#9B4F7A",
+          "fill_seed_dark_surface": "#E69AC8"
+        }
+      }
+    ],
+    "composition": {
+      "dominant_share_min": 0.6,
+      "dominant_margin_min": 0.2,
+      "mixed_style_id": "mixed_cross_domain",
+      "mixed_hue_role": "neutral",
+      "mixed_non_color": "ordered_family_glyphs_and_explicit_mixed_label",
+      "no_hue_blending": true,
+      "top_family_count_exposed": 2,
+      "mixed_fill_seed_light_surface": "#5F6368",
+      "mixed_fill_seed_dark_surface": "#A7AFBD",
+      "applies_to": "aggregate_primary_family_identity_counts",
+      "identity_without_defensible_primary": "mixed_cross_domain",
+      "identity_secondary_families_use_non_color_glyphs": true
+    },
+    "palette_rules": {
+      "reference_light_surface": "#FFFFFF",
+      "reference_dark_surface": "#111827",
+      "minimum_non_text_contrast_ratio": 3.0,
+      "fill_seed_is_not_text_color": true,
+      "every_density_lightness_band_requires_contrast_test": true,
+      "family_distinction_still_requires_glyph_and_text": true
+    },
+    "primary_family_required_when_defensible": true,
+    "secondary_families_max": 2,
+    "numeric_identity_family_weights_forbidden": true
+  },
+  "density_legend": {
+    "basis": "unique_identities_per_10000_assessed_km2",
+    "eligible_coverage_state": "assessed",
+    "raw_numeric_value_required": true,
+    "assessed_surface_required": true,
+    "positive_sample_minimum_buckets": 20,
+    "weighting": "assessed_surface_km2",
+    "zero_band": {
+      "id": "supported_zero",
+      "meaning": "assessed_area_with_zero_eligible_current_identities"
+    },
+    "positive_bands": [
+      {
+        "id": "positive_low",
+        "upper_weighted_quantile": 0.25
+      },
+      {
+        "id": "positive_middle",
+        "upper_weighted_quantile": 0.75
+      },
+      {
+        "id": "positive_high",
+        "upper_weighted_quantile": 0.95
+      },
+      {
+        "id": "positive_exceptional",
+        "upper_weighted_quantile": 1.0
+      }
+    ],
+    "threshold_rules": {
+      "computed_from_positive_assessed_buckets_only": true,
+      "frozen_in_catalog_snapshot_metadata": true,
+      "same_thresholds_across_geographic_zoom_levels_for_snapshot": true,
+      "numeric_thresholds_visible_in_legend": true,
+      "duplicate_thresholds_collapse_adjacent_bands": true,
+      "threshold_rounding_must_not_change_raw_values": true,
+      "cross_snapshot_recalibration_must_be_labeled": true,
+      "weighted_quantile_rule": "smallest_value_whose_cumulative_assessed_surface_reaches_or_exceeds_quantile_times_total_weight"
+    },
+    "visual_channel": "monotonic_lightness_within_family_hue",
+    "insufficient_sample_output": "raw_numeric_value_without_comparative_band",
+    "forbidden": [
+      "saturation_as_quality",
+      "popularity",
+      "moral_rank",
+      "red_green_good_bad",
+      "unlabeled_cross_snapshot_threshold_change"
+    ],
+    "calibration_population": {
+      "grid": "non_overlapping_equal_area_reference_cells",
+      "nominal_cell_area_km2": 10000,
+      "threshold_population_id_required": true,
+      "nested_display_buckets_excluded_from_threshold_sample": true
+    }
+  },
+  "coverage_semantics": {
+    "text_label_required": true,
+    "states": [
+      {
+        "id": "assessed",
+        "interior_texture_role": "solid_or_none",
+        "meaning": "systematically_assessed"
+      },
+      {
+        "id": "partial",
+        "interior_texture_role": "sparse_diagonal_broken_hatch",
+        "meaning": "partial_lower_bound_only"
+      },
+      {
+        "id": "unassessed",
+        "interior_texture_role": "open_dot_grid",
+        "meaning": "unknown_not_zero"
+      }
+    ],
+    "texture_roles_must_be_distinct": true,
+    "privacy_withheld_is_not_coverage_state": true,
+    "catalog_absence_must_not_select_texture": true,
+    "color_must_not_encode_coverage": true
+  },
+  "uncertainty_semantics": {
+    "text_label_required": true,
+    "modes": [
+      {
+        "id": "exact",
+        "boundary_role": "solid_boundary",
+        "halo_role": "none"
+      },
+      {
+        "id": "public_extent",
+        "boundary_role": "solid_extent_boundary",
+        "halo_role": "none"
+      },
+      {
+        "id": "approximate",
+        "boundary_role": "dashed_boundary",
+        "halo_role": "graduated_uncertainty_halo",
+        "halo_minimum_radius_source": "uncertainty_meters_min"
+      },
+      {
+        "id": "hidden",
+        "boundary_role": "none",
+        "halo_role": "none",
+        "spatial_geometry_forbidden": true
+      }
+    ],
+    "coverage_uses_interior_uncertainty_uses_boundary": true,
+    "approximate_geometry_must_not_be_sharpened": true,
+    "hidden_location_has_no_map_substitute": true
+  },
+  "privacy_release": {
+    "policy_version": 1,
+    "applies_to": [
+      "privacy_sensitive_approximate_spatial_aggregates",
+      "filtered_nonspatial_totals_that_include_hidden_locations",
+      "privacy_sensitive_attribute_subcounts"
+    ],
+    "exact_public_geometry_exempt": true,
+    "hidden_spatial_aggregation_forbidden": true,
+    "k_anonymity_min": 5,
+    "k_rationale": [
+      "prevents_direct_release_of_singletons_pairs_triads_and_quartets",
+      "retains_utility_for_sparse_catalogs_by_coarsening_before_suppression",
+      "applies_only_where_publication_or_filtering_could_weaken_location_privacy"
+    ],
+    "coarsen_before_suppress": true,
+    "coarsening_target": "nearest_parent_bucket_meeting_all_release_guards",
+    "if_no_parent_meets_guards": "withhold_numeric_value_and_show_privacy_notice",
+    "approximate_bucket_minimum_diameter_factor": 2.0,
+    "approximate_bucket_rule": "bucket_effective_diameter_must_be_at_least_factor_times_maximum_contributor_uncertainty_meters_min",
+    "subcounts_require_k": true,
+    "filter_complements_require_k": true,
+    "differencing_protection": "if_selected_or_complement_is_below_k_coarsen_or_withhold_both_numeric_values",
+    "raw_member_ids_forbidden": true,
+    "noise_addition_in_phase1": false,
+    "formal_anonymity_guarantee": false,
+    "human_review_required_before_sensitive_publication": true
+  },
+  "case_matrix": {
+    "path": "tests/cases/visual-semantics.real-cases.json",
+    "visibility": "repository_test_only_not_product_content",
+    "public_repository_visibility_acknowledged": true,
+    "not_catalog_truth": true,
+    "not_verification_of_named_project_for_publication": true,
+    "no_exact_private_coordinates": true,
+    "source_references_required": true,
+    "required_archetypes": [
+      "digital_global_without_coordinate",
+      "exact_public_local_anchor",
+      "public_extent_or_multi_project_land",
+      "distributed_hybrid_network",
+      "mixed_family_composition",
+      "speculative_relation_exclusion",
+      "approximate_privacy_coarsening",
+      "hidden_nonspatial_only",
+      "coverage_state_distinction"
+    ],
+    "source_review": {
+      "checked_at_required": true,
+      "future_date_forbidden": true,
+      "official_primary_sources_required": true,
+      "refresh_before_public_catalog_use": true,
+      "network_fetch_in_ci": false,
+      "stale_source_never_becomes_catalog_claim": true
+    }
+  },
+  "renderer_boundary": {
+    "no_engine_choice": true,
+    "no_pixel_sizes": true,
+    "no_shader_or_dom_type": true,
+    "no_public_fixture_generation": true,
+    "renderer_must_preserve_all_semantic_channels": true
+  }
+}

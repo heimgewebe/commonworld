@@ -1,0 +1,398 @@
+{
+  "schema_version": 1,
+  "title": "Source-derived visual semantics research cases",
+  "purpose": "Exercise Commonworld visual and privacy semantics against recognizable real-world Commons patterns without creating public catalog entries.",
+  "visibility": {
+    "repository_test_only_not_product_content": true,
+    "public_repository_visibility_acknowledged": true,
+    "excluded_from_public_shell": true,
+    "not_catalog_truth": true,
+    "not_publication_verification": true
+  },
+  "checked_at": "2026-07-11",
+  "sources": {
+    "wikimedia_projects": {
+      "url": "https://wikimediafoundation.org/what-we-do/wikimedia-projects/",
+      "source_kind": "official_project_operator",
+      "evidence_summary": "Wikipedia is described as a free collaborative encyclopedia written in hundreds of languages by volunteers around the world."
+    },
+    "openstreetmap_about": {
+      "url": "https://www.openstreetmap.org/about",
+      "source_kind": "official_project_site",
+      "evidence_summary": "OpenStreetMap describes globally contributed and maintained open map data built from local knowledge."
+    },
+    "repair_cafe_visit": {
+      "url": "https://www.repaircafe.org/en/visit/",
+      "source_kind": "official_network_directory",
+      "evidence_summary": "The official visit surface presents local Repair Cafes as places that can be found and visited."
+    },
+    "foodsharing_map": {
+      "url": "https://foodsharing.de/karte",
+      "source_kind": "official_project_map",
+      "evidence_summary": "The official map is the discovery surface for local foodsharing places such as Fairteiler."
+    },
+    "freifunk_community": {
+      "url": "https://freifunk.net/wie-mache-ich-mit/community-finden/",
+      "source_kind": "official_network_site",
+      "evidence_summary": "Freifunk lists local communities, uses community metadata for a map and API, and invites participation through a router at home."
+    },
+    "nyc_mesh_map": {
+      "url": "https://www.nycmesh.net/map",
+      "source_kind": "official_network_map",
+      "evidence_summary": "NYC Mesh distinguishes install locations, potential nodes and several connection types, including explicitly speculative connections."
+    },
+    "clt_brussels": {
+      "url": "https://www.cltb.be/en/",
+      "source_kind": "official_organization_site",
+      "evidence_summary": "Community Land Trust Brussels presents multiple housing projects, shared gardens and community spaces under a common organization."
+    }
+  },
+  "cases": [
+    {
+      "id": "wikipedia-global-knowledge",
+      "source_refs": [
+        "wikimedia_projects"
+      ],
+      "research_claim": "A globally available collaborative knowledge Commons has no meaningful single geographic coordinate.",
+      "archetypes": [
+        "digital_global_without_coordinate",
+        "coverage_state_distinction"
+      ],
+      "project_pattern": "single_digital_identity_global_reach",
+      "location_modes": [
+        "not_applicable"
+      ],
+      "expected_composition": "knowledge_data",
+      "coverage_state": "unassessed",
+      "expected_channels": {
+        "hue": "knowledge_data",
+        "lightness": "none_without_comparable_assessed_density",
+        "interior_texture": "open_dot_grid",
+        "boundary_and_halo": "none"
+      },
+      "forbidden": [
+        "invented_headquarters_marker",
+        "geographic_density_denominator",
+        "global_completeness_claim_without_defined_universe"
+      ],
+      "family_assignment": {
+        "primary_family": "knowledge_data",
+        "secondary_families": []
+      }
+    },
+    {
+      "id": "openstreetmap-distributed-open-data",
+      "source_refs": [
+        "openstreetmap_about"
+      ],
+      "research_claim": "A globally maintained open-data Commons combines knowledge and technical infrastructure without becoming a single map point.",
+      "archetypes": [
+        "digital_global_without_coordinate",
+        "distributed_hybrid_network",
+        "mixed_family_composition"
+      ],
+      "project_pattern": "distributed_digital_identity_with_local_communities",
+      "location_modes": [
+        "not_applicable",
+        "separate_public_local_community_anchors"
+      ],
+      "expected_composition": "knowledge_data",
+      "coverage_state": "partial",
+      "expected_channels": {
+        "hue": "knowledge_data",
+        "lightness": "none_for_partial_coverage",
+        "interior_texture": "sparse_diagonal_broken_hatch",
+        "boundary_and_halo": "none_for_global_identity"
+      },
+      "forbidden": [
+        "single_false_global_marker",
+        "anchor_count_as_commons_count",
+        "unlabeled_coverage_completeness"
+      ],
+      "family_assignment": {
+        "primary_family": "knowledge_data",
+        "secondary_families": [
+          "making_infrastructure"
+        ]
+      }
+    },
+    {
+      "id": "repair-cafe-public-venue",
+      "source_refs": [
+        "repair_cafe_visit"
+      ],
+      "research_claim": "A local repair event or venue can be represented by an exact published anchor while the wider movement remains an aggregate network context.",
+      "archetypes": [
+        "exact_public_local_anchor",
+        "coverage_state_distinction"
+      ],
+      "project_pattern": "local_repair_identity_inside_wider_network",
+      "location_modes": [
+        "exact"
+      ],
+      "expected_composition": "making_infrastructure",
+      "coverage_state": "assessed",
+      "expected_channels": {
+        "hue": "making_infrastructure",
+        "lightness": "eligible_for_snapshot_density_band",
+        "interior_texture": "solid_or_none",
+        "boundary_and_halo": "solid_boundary"
+      },
+      "privacy_scenario": {
+        "mode": "exact",
+        "identity_count": 1,
+        "expected_decision": "release_exact_public"
+      },
+      "forbidden": [
+        "movement_member_count_as_local_density",
+        "care_quality_rank_from_color",
+        "network_identity_duplicated_for_each_event"
+      ],
+      "family_assignment": {
+        "primary_family": "making_infrastructure",
+        "secondary_families": [
+          "care_provision"
+        ]
+      }
+    },
+    {
+      "id": "foodsharing-fairteiler-public-anchor",
+      "source_refs": [
+        "foodsharing_map"
+      ],
+      "research_claim": "A publicly discoverable food-sharing point is a concrete local anchor whose availability and coverage must remain distinct from its thematic family.",
+      "archetypes": [
+        "exact_public_local_anchor",
+        "coverage_state_distinction"
+      ],
+      "project_pattern": "public_local_provision_point",
+      "location_modes": [
+        "exact"
+      ],
+      "expected_composition": "care_provision",
+      "coverage_state": "partial",
+      "expected_channels": {
+        "hue": "care_provision",
+        "lightness": "none_for_partial_coverage",
+        "interior_texture": "sparse_diagonal_broken_hatch",
+        "boundary_and_halo": "solid_boundary"
+      },
+      "privacy_scenario": {
+        "mode": "exact",
+        "identity_count": 1,
+        "expected_decision": "release_exact_public"
+      },
+      "forbidden": [
+        "partial_coverage_shown_as_low_density",
+        "food_supply_quality_score",
+        "network_and_local_point_collapsed_without_identity_evidence"
+      ],
+      "family_assignment": {
+        "primary_family": "care_provision",
+        "secondary_families": [
+          "ecology_land"
+        ]
+      }
+    },
+    {
+      "id": "freifunk-distributed-home-router-network",
+      "source_refs": [
+        "freifunk_community"
+      ],
+      "research_claim": "A community network has local groups and distributed infrastructure, while home installations require an explicit publication decision rather than inferred map consent.",
+      "archetypes": [
+        "distributed_hybrid_network",
+        "mixed_family_composition",
+        "hidden_nonspatial_only"
+      ],
+      "project_pattern": "local_communities_with_privacy_variable_infrastructure",
+      "location_modes": [
+        "exact",
+        "approximate",
+        "hidden"
+      ],
+      "expected_composition": "mixed_cross_domain",
+      "coverage_state": "partial",
+      "expected_channels": {
+        "hue": "mixed_cross_domain",
+        "lightness": "none_for_partial_coverage",
+        "interior_texture": "sparse_diagonal_broken_hatch",
+        "boundary_and_halo": "per_published_location_mode"
+      },
+      "privacy_scenario": {
+        "mode": "hidden",
+        "identity_count": 12,
+        "expected_decision": "nonspatial_only"
+      },
+      "forbidden": [
+        "home_router_location_inferred_from_network_membership",
+        "raw_router_count_as_commons_density",
+        "hidden_node_geometry"
+      ],
+      "family_assignment": {
+        "primary_family": null,
+        "mixed_families": [
+          "knowledge_data",
+          "making_infrastructure"
+        ]
+      }
+    },
+    {
+      "id": "nyc-mesh-evidenced-versus-speculative-links",
+      "source_refs": [
+        "nyc_mesh_map"
+      ],
+      "research_claim": "A mesh map can contain installed and potential nodes plus evidenced and speculative connections; Commonworld may render only relations supported as catalog evidence.",
+      "archetypes": [
+        "distributed_hybrid_network",
+        "mixed_family_composition",
+        "speculative_relation_exclusion"
+      ],
+      "project_pattern": "public_network_map_with_relation_statuses",
+      "location_modes": [
+        "exact",
+        "approximate"
+      ],
+      "expected_composition": "making_infrastructure",
+      "coverage_state": "partial",
+      "expected_relation_policy": {
+        "evidenced_connections": "eligible",
+        "potential_nodes": "candidate_not_current_density",
+        "speculative_connections": "exclude"
+      },
+      "expected_channels": {
+        "hue": "making_infrastructure",
+        "lightness": "none_for_partial_coverage",
+        "interior_texture": "sparse_diagonal_broken_hatch",
+        "boundary_and_halo": "per_published_location_mode"
+      },
+      "forbidden": [
+        "speculative_connection_as_faden",
+        "potential_node_as_active_identity",
+        "private_rooftop_inference"
+      ],
+      "family_assignment": {
+        "primary_family": "making_infrastructure",
+        "secondary_families": [
+          "knowledge_data"
+        ]
+      }
+    },
+    {
+      "id": "community-land-trust-multiple-projects",
+      "source_refs": [
+        "clt_brussels"
+      ],
+      "research_claim": "A land trust and its separately named housing projects need explicit identity boundaries; shared gardens and project sites may have public extents without collapsing the whole organization into one polygon.",
+      "archetypes": [
+        "public_extent_or_multi_project_land",
+        "exact_public_local_anchor",
+        "mixed_family_composition"
+      ],
+      "project_pattern": "organization_with_multiple_public_project_identities_and_extents",
+      "location_modes": [
+        "exact",
+        "public_extent"
+      ],
+      "expected_composition": "care_provision",
+      "coverage_state": "assessed",
+      "expected_channels": {
+        "hue": "care_provision",
+        "lightness": "eligible_for_snapshot_density_band",
+        "interior_texture": "solid_or_none",
+        "boundary_and_halo": "solid_extent_boundary"
+      },
+      "forbidden": [
+        "organization_and_projects_automatically_collapsed",
+        "shared_garden_extent_as_housing_density",
+        "one_large_extent_counted_as_many_commons"
+      ],
+      "family_assignment": {
+        "primary_family": "care_provision",
+        "secondary_families": [
+          "ecology_land"
+        ]
+      }
+    },
+    {
+      "id": "privacy-sensitive-approximate-cluster",
+      "source_refs": [
+        "freifunk_community",
+        "nyc_mesh_map"
+      ],
+      "research_claim": "A sparse cluster of approximate home-based infrastructure must coarsen before release and must resist filter differencing; the case contains no coordinates and makes no claim about either source project's publication practice.",
+      "archetypes": [
+        "approximate_privacy_coarsening",
+        "hidden_nonspatial_only",
+        "coverage_state_distinction"
+      ],
+      "project_pattern": "source_derived_privacy_stress_case_not_named_catalog_record",
+      "location_modes": [
+        "approximate"
+      ],
+      "expected_composition": "mixed_cross_domain",
+      "coverage_state": "partial",
+      "expected_channels": {
+        "hue": "mixed_cross_domain",
+        "lightness": "none_for_partial_coverage",
+        "interior_texture": "sparse_diagonal_broken_hatch",
+        "boundary_and_halo": "dashed_boundary_and_graduated_uncertainty_halo"
+      },
+      "privacy_scenarios": [
+        {
+          "id": "child-below-k",
+          "mode": "approximate",
+          "identity_count": 4,
+          "filter_complement_count": 9,
+          "bucket_effective_diameter_m": 2000,
+          "maximum_uncertainty_meters_min": 500,
+          "parent_available": true,
+          "expected_decision": "coarsen"
+        },
+        {
+          "id": "parent-meets-k",
+          "mode": "approximate",
+          "identity_count": 7,
+          "filter_complement_count": 8,
+          "bucket_effective_diameter_m": 3000,
+          "maximum_uncertainty_meters_min": 500,
+          "parent_available": false,
+          "expected_decision": "release_aggregate"
+        },
+        {
+          "id": "bucket-too-fine",
+          "mode": "approximate",
+          "identity_count": 8,
+          "filter_complement_count": 8,
+          "bucket_effective_diameter_m": 600,
+          "maximum_uncertainty_meters_min": 500,
+          "parent_available": true,
+          "expected_decision": "coarsen"
+        },
+        {
+          "id": "filter-complement-below-k",
+          "mode": "approximate",
+          "identity_count": 9,
+          "filter_complement_count": 3,
+          "bucket_effective_diameter_m": 3000,
+          "maximum_uncertainty_meters_min": 500,
+          "parent_available": false,
+          "expected_decision": "withhold_selected_and_complement"
+        }
+      ],
+      "forbidden": [
+        "exact_private_coordinates",
+        "release_count_below_five",
+        "filter_difference_reidentification",
+        "uncertainty_halo_smaller_than_declared_minimum"
+      ],
+      "family_assignment": {
+        "primary_family": null,
+        "mixed_families": [
+          "knowledge_data",
+          "making_infrastructure"
+        ]
+      }
+    }
+  ]
+}
