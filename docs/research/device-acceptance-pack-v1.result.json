@@ -1,0 +1,160 @@
+{
+  "schema_version": 1,
+  "kind": "commonworld_device_acceptance_pack_v1",
+  "status": "pack_ready_physical_execution_pending",
+  "prepared_at": "2026-07-11",
+  "repository_base_commit": "8a9b2344a16433254001487c7cc813d3df061d47",
+  "scope": {
+    "public_surface_changed": false,
+    "synthetic_data_only": true,
+    "raw_harness_in_repository": false,
+    "screenshots_in_repository": false,
+    "node_dependencies_in_repository": false,
+    "device_endpoint_published_in_repository": false,
+    "tailnet_only_service_installed": true,
+    "direct_tailnet_endpoint_verified": true,
+    "magic_dns_verified": false
+  },
+  "virtualized_linear_view": {
+    "parity_dataset_identities": 5000,
+    "scale_dataset_identities": 50000,
+    "fixed_row_height_px": 52,
+    "overscan_rows": 7,
+    "maximum_rendered_rows": 17,
+    "maximum_allowed_rows": 25,
+    "last_entry_index": 49999,
+    "search_last_entry_pass": true,
+    "home_end_navigation_pass": true,
+    "identity_selection_parity_pass": true,
+    "dom_bound_pass": true,
+    "real_catalog_data_tested": false
+  },
+  "preparation_measurement": {
+    "environment": "headless Chrome ANGLE/SwiftShader software WebGL",
+    "viewport": {
+      "width": 390,
+      "height": 844,
+      "device_scale_factor": 2,
+      "mobile_emulation": true,
+      "touch_emulation": true
+    },
+    "runs_per_scale": 3,
+    "planet_median_fps": 45.60310101128192,
+    "local_median_fps": 59.99999999999999,
+    "planet_max_p95_frame_ms": 23.299999952316284,
+    "local_max_p95_frame_ms": 17.19999998807907,
+    "relative_not_physical_device_fps": true,
+    "console_errors": 0
+  },
+  "acceptance_package": {
+    "release_manifest_sha256": "4902bf3777c9700eb54da10fb16aa491b135480655bc6171ff724e460b3c3916",
+    "release_files": {
+      "server.mjs": {
+        "bytes": 49647,
+        "sha256": "6885bdeb0b4359c538f5271a09815d40609bd8e8fc91547a9e73bfbbb3611091"
+      },
+      "dist/index.html": {
+        "bytes": 8667,
+        "sha256": "39241c7183995ebbbd74e877acab2334bcd1ae31355690f776946ef53221fc70"
+      },
+      "dist/app.js": {
+        "bytes": 1069726,
+        "sha256": "976f42192916f7ea3e23b389e10b3ce2860dff3337dd9b93fdf38e3ddd0d2262"
+      },
+      "dist/app.css": {
+        "bytes": 69939,
+        "sha256": "3f1950959649e58019fa90fc6349e058975624ad389afc8f896e91c7ac631cf0"
+      },
+      "dist/bundle-sizes.json": {
+        "bytes": 244,
+        "sha256": "ba6e2b450d7e1430896bc19d8894ce176253f5db171fed1ded75f786b40de37d"
+      }
+    },
+    "bundle_sizes": {
+      "browser_js_gzip_bytes": 292234,
+      "browser_css_gzip_bytes": 10054,
+      "server_bundle_gzip_bytes": 16914,
+      "browser_total_output_bytes": 1139665
+    },
+    "receipt_contract": {
+      "maximum_body_bytes": 1000000,
+      "file_mode": "0600",
+      "fixed_manual_check_inventory": true,
+      "virtual_list_bound_required": true,
+      "engine_authorization_forbidden": true,
+      "production_architecture_authorization_forbidden": true,
+      "same_origin_required": true,
+      "maximum_receipt_files": 100
+    },
+    "security_headers": {
+      "content_security_policy": true,
+      "same_origin_connect_only": true,
+      "same_origin_or_blob_workers_only": true,
+      "frame_ancestors_none": true,
+      "referrer_policy_no_referrer": true,
+      "content_type_nosniff": true,
+      "sensors_and_payment_disabled": true
+    },
+    "service": {
+      "unit": "commonworld-device-acceptance.service",
+      "binding_scope": "tailscale_ipv4_only",
+      "active": true,
+      "restart_count": 0,
+      "loopback_listener": false,
+      "public_ingress": false,
+      "result_directory_private": true,
+      "no_new_privileges": true,
+      "protect_system_strict": true,
+      "protect_home_read_only": true,
+      "private_tmp": true,
+      "restricted_address_families": [
+        "AF_UNIX",
+        "AF_INET",
+        "AF_INET6"
+      ],
+      "authentication_boundary": "tailnet_membership_only",
+      "application_authentication": false,
+      "state_snapshot_checked_at": "2026-07-11",
+      "continuous_health_not_claimed": true
+    }
+  },
+  "manual_acceptance_gate": {
+    "required_checks": [
+      "touch_rotation_zoom",
+      "coverage_patterns",
+      "uncertainty_halo_boundary",
+      "digital_sphere",
+      "shared_selection",
+      "background_roundtrip",
+      "assistive_technology",
+      "reduced_motion"
+    ],
+    "all_checks_pending": true,
+    "physical_mobile_safari_tested": false,
+    "physical_mobile_chrome_tested": false,
+    "hardware_gpu_tested": false,
+    "real_voiceover_or_talkback_tested": false,
+    "real_background_tab_roundtrip_tested": false
+  },
+  "decision": {
+    "engine_selected": false,
+    "production_architecture_authorized": false,
+    "next_action": "execute_physical_device_and_assistive_technology_acceptance",
+    "forbidden_interpretations": [
+      "The service installation selects MapLibre as the production engine",
+      "Mobile emulation proves physical mobile performance",
+      "Accessibility-tree checks prove VoiceOver or TalkBack usability",
+      "The 50000-item synthetic list proves real-catalog search quality",
+      "A stored receipt automatically authorizes production architecture"
+    ]
+  },
+  "evidence_artifacts": {
+    "archive_sha256": "be7b673e30bfe4e124f6d21c068962cd1450760568e235b9e28763e0ce811b22",
+    "preparation_proof_sha256": "3241ac53bf1e9c9044c10a4ca508bbd9dc11eca52e402009b00911ee109108f0",
+    "installed_service_proof_sha256": "60372bcc86a10cbf0758729e07ea490cdbf99b480f9abe4af6173534528ccb0b",
+    "manifest_sha256": "8986c58d4660e34bf807796530da27bc3d7cc036ed13a75aeeccc930bed4d396",
+    "virtual_list_screenshot_sha256": "e9edd3c778b2b74d8fdf4ee8e66952902acf7fef2d589e80acac060b4f7f7123",
+    "acceptance_panel_screenshot_sha256": "3d6c7d80c156fa6e98c20f8cdf82fed2ebcceba33a550451bdf32123fb6aa47c",
+    "archive_role": "local_non_product_research_archive"
+  }
+}

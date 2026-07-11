@@ -460,6 +460,14 @@ Lokal nachgewiesen sind semantische Muster, Unsicherheitshalo und gestrichelter 
 
 Bis diese Sperren geschlossen sind, gelten `engine_selected = false` und `production_architecture_authorized = false`. Der nächste zulässige Schritt ist ausschließlich eine physische Geräte- und Assistenztechnik-Abnahme.
 
+### Virtualisierte Parallelansicht und Geräte-Abnahmepaket
+
+Die lineare Parallelansicht muss große Kataloge bedienen, ohne für jede Identität gleichzeitig ein DOM-Element anzulegen. Der vorbereitete Belastungsbeweis hält bei 50.000 synthetischen Identitäten höchstens 17 Zeilen gleichzeitig im Seitenbaum; die aus Fensterhöhe und Puffer berechnete Obergrenze beträgt 25. Suche, Home/End-Navigation und der letzte Eintrag funktionieren. Ein getrennter 5.000er Modus wahrt dieselbe Auswahl zwischen Globus und Liste. Reale Katalogsuche ist damit noch nicht bewertet.
+
+Das nichtöffentliche Geräte-Abnahmepaket läuft als Tailnet-only-Benutzerdienst mit synthetischen Daten. Es kombiniert Globus, digitale Sphäre, semantische Muster, virtualisierte Liste, drei lokale Messläufe, acht manuelle Prüfpunkte und einen fail-closed Belegempfänger. Der Endpunkt, Screenshots, Harness, Node-Abhängigkeiten und Gerätebelege bleiben außerhalb des öffentlichen Repositories.
+
+Die Vorbereitung ersetzt keine physische Abnahme. Safari und Chrome auf realer Mobilhardware, Hardware-GPU, VoiceOver oder TalkBack, echter Hintergrundtab-Rundlauf sowie Reduced Motion müssen am Gerät geprüft werden. Bis dahin bleiben `engine_selected = false` und `production_architecture_authorized = false`.
+
 ### Aggregation
 
 Die ferne Ansicht lädt keine Einzelobjektmenge. Daten werden maßstabsabhängig geliefert:
