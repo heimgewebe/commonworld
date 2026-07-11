@@ -213,6 +213,75 @@ Eine dunkle Region bedeutet nicht automatisch, dass dort keine Commons existiere
 
 Diese Unterscheidung ist Teil der Hauptvisualisierung, nicht nur einer Fußnote.
 
+### Kalibrierter visueller Semantikvertrag
+
+Der ausführbare Vertrag liegt in `contracts/commonworld/visual-semantics.contract.json`. Er wählt keine Rendering-Engine und schreibt keine Darstellungsfelder in CommonProject zurück. Er legt fest, welche Bedeutung ein späterer Renderer unverändert erhalten muss.
+
+#### Vier Commons-Familien
+
+| Familie | Farbrolle | Fülltoken hell / dunkel | Sachlicher Kern | Gleichwertiger Nicht-Farb-Kanal |
+| --- | --- | --- | --- | --- |
+| `ecology_land` | Teal/Grün | `#007A5E` / `#4FD1A1` | Land, Wasser, Biodiversität, Anbau und ökologische Pflege | Land-/Kontursymbol und Textlabel |
+| `knowledge_data` | Blau | `#005A9C` / `#6CB6FF` | Wissen, Daten, Software, Bildung und Dokumentation | Buch-/Datensymbol und Textlabel |
+| `making_infrastructure` | Amber/Orange | `#9A5A00` / `#F3B64A` | Werkzeuge, Reparatur, Produktion, Werkstätten und Kommunikationsinfrastruktur | Werkzeug-/Netzsymbol und Textlabel |
+| `care_provision` | Pflaume/Magenta | `#9B4F7A` / `#E69AC8` | Fürsorge, Lebensmittelteilung, Wohnen, Gesundheit und gegenseitige Hilfe | Versorgungs-/Unterstützungssymbol und Textlabel |
+
+Ein Commons erhält höchstens eine begründete Primärfamilie und bis zu zwei Sekundärfamilien. Diese Zuordnung wird aus kuratierten Themen und dem belegten öffentlichen Zweck abgeleitet, nicht aus dem gewünschten Aussehen. Sie liegt in einer versionierten Darstellungstaxonomie außerhalb des CommonProject-Datensatzes. Prozentgewichte für einzelne Commons sind verboten. Kann keine Primärfamilie sachlich begründet werden, erscheint die Identität als `mixed_cross_domain`: neutraler Farbton (`#5F6368` auf heller und `#A7AFBD` auf dunkler Fläche), explizites Mischlabel und die Symbole der beteiligten Familien. Sekundärfamilien erscheinen ebenfalls nur über Symbol und Text, nicht als vermischter Farbton.
+
+Die Schwellen 60 Prozent Anteil und 20 Prozentpunkte Vorsprung gelten ausschließlich für gemessene Aggregate eindeutiger Primärfamilien, niemals für redaktionell erfundene Identitätsgewichte. Semantische Farbtöne werden nicht vermischt.
+
+Die Fülltokens erreichen auf den Referenzflächen Weiß (`#FFFFFF`) und Dunkelblau (`#111827`) mindestens ein Kontrastverhältnis von 3:1. Sie sind keine Textfarben. Jede daraus abgeleitete Dichte-Helligkeitsstufe muss denselben Nicht-Text-Kontrast erneut bestehen; Beschriftung und Fokusindikator verwenden eigene zugängliche Kontrasttokens.
+
+#### Strikte Kanaltrennung
+
+```text
+Farbton       = Commons-Familie
+Helligkeit    = normalisierte aktuelle Dichte
+Innenmuster   = Datenabdeckung
+Rand und Halo = Ortsgenauigkeit und Unsicherheit
+Geometrie     = veröffentlichte räumliche Form
+Text          = ausdrückliche Bedeutung und Rohwert
+```
+
+Familien erhalten deshalb kein eigenes Muster. Das Muster bleibt ausschließlich für Datenabdeckung reserviert. Farbe ist nie der einzige Bedeutungsträger; Familie, Abdeckung, Unsicherheit und Zahlenwert benötigen jeweils eine Textalternative.
+
+#### Dichtelegende
+
+Der unveränderte Rohwert `eindeutige aktuelle Commons je 10.000 km² vollständig untersuchter Fläche` und die untersuchte Fläche bleiben immer sichtbar. Null bildet ein eigenes Band und ist nur für `assessed` zulässig.
+
+Positive Vergleichsbänder werden erst gebildet, wenn mindestens 20 geeignete, vollständig untersuchte Referenzzellen vorliegen. Die Kalibrierung verwendet genau eine nicht überlappende, flächentreue Referenzpopulation mit nominell 10.000 km² je Zelle. Verschachtelte Darstellungs-Buckets verschiedener Zoomstufen dürfen nicht erneut in die Schwellenberechnung eingehen. Die Referenzpopulation erhält im Snapshot eine eindeutige Kennung. Die Schwellen entstehen als nach untersuchter Fläche gewichtete Quantile der positiven Werte. Für jede Quantilstufe gilt der kleinste Dichtewert, bei dem die kumulierte untersuchte Fläche die Zielquote erreicht oder überschreitet:
+
+- bis 25 Prozent: `positive_low`;
+- bis 75 Prozent: `positive_middle`;
+- bis 95 Prozent: `positive_high`;
+- darüber: `positive_exceptional`.
+
+Die numerischen Schwellen werden im Katalog-Snapshot eingefroren, in der Legende offengelegt und für alle geografischen Zoomstufen desselben Snapshots verwendet. Doppelte Schwellen lassen benachbarte Bänder zusammenfallen. Bei zu kleiner Vergleichsmenge erscheint nur der Rohwert ohne relative Farbklassifikation. Helligkeit zeigt Dichte; Sättigung zeigt weder Qualität noch Beliebtheit.
+
+#### Abdeckung und Unsicherheit
+
+- `assessed`: kein Innenmuster beziehungsweise geschlossene Fläche;
+- `partial`: lockere unterbrochene Diagonalschraffur, nur Untergrenze;
+- `unassessed`: offenes Punktraster, unbekannt statt null;
+- exakter Punkt: durchgezogener Rand ohne Halo;
+- öffentliche Fläche: durchgezogener Flächenrand ohne Halo;
+- ungefähre Lage: gestrichelter Rand und gradueller Halo mindestens in der veröffentlichten Mindestunsicherheit;
+- verborgene Lage: keine Geometrie und kein ersatzweise erfundener Kartenpunkt.
+
+Damit können Abdeckung und Ortsunsicherheit gleichzeitig sichtbar sein, ohne dass dasselbe Muster zwei Aussagen trägt.
+
+#### Datenschutzschwelle
+
+Öffentlich und exakt freigegebene Geometrie benötigt keine nachträgliche Mengenverschleierung. Verborgene Lage wird niemals räumlich aggregiert. Für datenschutzsensitive ungefähre Aggregate, gefilterte nicht räumliche Summen mit verborgenen Orten und sensible Untergruppen gilt dagegen mindestens `k=5` eindeutige Identitäten.
+
+Vor einer Unterdrückung wird zum nächsten Elternraum vergröbert, der alle Regeln erfüllt. Ein ungefähres Aggregat darf außerdem keinen wirksamen Durchmesser unter dem Zweifachen der größten enthaltenen Mindestunsicherheit besitzen. Erfüllt kein Elternraum die Regeln, wird der Zahlenwert zurückgehalten und die Zurückhaltung erklärt.
+
+Filter dürfen keine kleine Restgruppe verraten: Liegt entweder die ausgewählte Gruppe oder ihr Komplement unter fünf, werden beide Zahlen gemeinsam vergröbert oder zurückgehalten. Mitgliederlisten werden nie mit ausgeliefert. `k=5` ist eine konservative Produktschwelle, keine formale Anonymitätsgarantie; sensible Veröffentlichungen benötigen zusätzlich menschliche Prüfung. Ein Rauschverfahren wird in Phase 1 nicht vorgetäuscht.
+
+#### Quellengestützte Fallmatrix
+
+`tests/cases/visual-semantics.real-cases.json` prüft diese Regeln an quellengestützten Mustern wie globalen Wissensprojekten, lokalen Repair- und Foodsharing-Orten, verteilten Community-Netzen sowie mehreren Land-Trust-Projekten. Die Datei ist im öffentlichen Repository lesbar, wird aber nicht in die Produktoberfläche eingebaut. Sie ist weder Katalogwahrheit noch Publikationsprüfung der genannten Projekte und enthält keine exakten privaten Koordinaten. Die offiziellen Primärquellen wurden am 11. Juli 2026 geprüft. Vor jeder späteren Verwendung als öffentlicher Katalogfall müssen sie erneut geprüft werden; CI führt bewusst keine störanfälligen Netzwerkabrufe aus.
+
 ## Digitale Commons-Sphäre
 
 Die digitale Commons-Sphäre umgibt die Erde in der Totalen. Sie integriert Commons ohne sinnvollen geografischen Mittelpunkt in dieselbe Oberfläche.
