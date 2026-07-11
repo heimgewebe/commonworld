@@ -1,0 +1,147 @@
+{
+  "schema_version": 1,
+  "kind": "commonworld_digital_sphere_presentation_contract",
+  "description": "Renderer-neutral rules for the layered digital Commons sphere and its side-on layer view. This contract derives presentation from CommonProject truth and must never create a second catalog ontology.",
+  "catalog_boundary": {
+    "source_identity": "CommonProject.id",
+    "layer_membership_source": "derived_from_existing_topics_families_and_public_digital_presence",
+    "manual_catalog_layer_field_forbidden": true,
+    "invented_geographic_coordinates_forbidden": true,
+    "persistent_render_path_coordinates_forbidden": true,
+    "hybrid_identity_duplication_forbidden": true
+  },
+  "layer_model": {
+    "order": [
+      "knowledge_data",
+      "software_infrastructure",
+      "media_culture",
+      "learning_education",
+      "communication_networks",
+      "mixed_other"
+    ],
+    "layers": [
+      {
+        "id": "knowledge_data",
+        "label_de": "Wissen und offene Daten",
+        "derived_from": ["knowledge", "open-data", "research", "documentation"]
+      },
+      {
+        "id": "software_infrastructure",
+        "label_de": "Freie Software und Infrastruktur",
+        "derived_from": ["free-software", "open-source", "infrastructure", "platform"]
+      },
+      {
+        "id": "media_culture",
+        "label_de": "Offene Medien und Kultur",
+        "derived_from": ["open-media", "culture", "archives", "creative-commons"]
+      },
+      {
+        "id": "learning_education",
+        "label_de": "Freies Lernen und Bildung",
+        "derived_from": ["education", "open-educational-resources", "learning"]
+      },
+      {
+        "id": "communication_networks",
+        "label_de": "Kommunikation und Netze",
+        "derived_from": ["communication", "community-network", "federation", "protocol"]
+      },
+      {
+        "id": "mixed_other",
+        "label_de": "Gemischte und weitere digitale Commons",
+        "derived_from": ["fallback_for_multiple_or_unmapped_topics"]
+      }
+    ],
+    "membership_rule": "one_primary_presentation_layer_per_visible_representation_with_optional_cross_layer_relations",
+    "layer_count_is_presentation_configuration_not_catalog_truth": true
+  },
+  "stream_model": {
+    "primary_geometry": "layered_glyph_paths_around_globe",
+    "isolated_point_cloud_as_primary_representation_forbidden": true,
+    "glyph_cycle": [
+      "short_common_name_fragment",
+      "binary_fragment_derived_from_stable_identity"
+    ],
+    "binary_fragment_semantics": "deterministic_visual_encoding_not_project_payload_or_quality_score",
+    "name_fragment_must_remain_human_readable": true,
+    "paths_are_ephemeral_presentation": true,
+    "individual_identity_may_repeat_visually_but_counts_once": true,
+    "relations_require_catalog_evidence": true
+  },
+  "globe_mode": {
+    "outer_shell": true,
+    "shell_must_extend_beyond_visible_earth_rim": true,
+    "initial_view_shell_visible": true,
+    "further_zoom_out_reveals_complete_enclosure": true,
+    "center_fade": {
+      "enabled": true,
+      "purpose": "keep_the_commons_world_readable",
+      "minimum_opacity_at_view_center": 0.0,
+      "maximum_opacity_near_outer_rim": 1.0,
+      "fade_is_screen_space_visibility_not_catalog_data": true
+    },
+    "zoom_fade": {
+      "overview_visible_through_zoom": 1.8,
+      "fade_until_zoom": 2.6,
+      "local_hidden_from_zoom": 2.6,
+      "monotonic_fade_required": true
+    },
+    "motion": {
+      "continuous_rotation_forbidden": true,
+      "stop_on_interaction_focus_hidden_page_or_reduced_motion": true
+    }
+  },
+  "interaction": {
+    "sphere_edge_hit_target": {
+      "available_in_initial_view": true,
+      "shape": "annulus_around_visible_globe",
+      "minimum_css_px": 24,
+      "must_not_block_globe_center_interaction": true,
+      "accessible_name_de": "Digitale Commons-Schichten öffnen"
+    },
+    "open_action": "transition_to_side_layer_view",
+    "reduced_motion_open_action": "instant_state_change_without_camera_animation",
+    "browser_history_and_deep_link_required": true,
+    "close_action_returns_to_previous_globe_state": true
+  },
+  "side_layer_view": {
+    "camera_relation": "side_on",
+    "layers_stacked": true,
+    "layer_order_matches_layer_model": true,
+    "earth_remains_quiet_orientation_reference": true,
+    "same_surface_not_separate_application": true,
+    "same_identity_ids_as_globe_mode": true,
+    "layer_selection_filters_without_changing_identity_truth": true,
+    "focus_opens_same_commonproject_record": true,
+    "linear_equivalent_required": true
+  },
+  "selection_parity": {
+    "definition_de": "Wird ein Commons im Globus, in der digitalen Sphäre, in der Schichtansicht, in der Suche oder in der linearen Ansicht ausgewählt, bleibt überall dieselbe CommonProject-ID ausgewählt und dasselbe Fokuspanel sichtbar.",
+    "single_selected_identity": true,
+    "same_id_across_globe_sphere_side_view_search_and_linear": true,
+    "view_change_must_preserve_selection": true,
+    "hybrid_geographic_and_digital_representations_focus_together": true,
+    "plain_language_test_de": "Ein Commons in einer Ansicht auswählen, in eine andere Ansicht wechseln und prüfen, ob dort derselbe Name markiert bleibt und dasselbe Fokuspanel geöffnet ist."
+  },
+  "accessibility": {
+    "sphere_is_not_only_visual": true,
+    "layer_buttons_and_linear_identity_list_required": true,
+    "keyboard_path_required": true,
+    "screen_reader_path_required": true,
+    "voiceover_physical_test_currently_proven": false,
+    "unproven_screen_reader_must_be_reported_as_open_not_pass": true,
+    "reduced_motion_state_equivalence_required": true,
+    "glyph_streams_aria_hidden_when_equivalent_text_exists": true
+  },
+  "performance_and_privacy": {
+    "bounded_visible_glyph_count_required": true,
+    "offscreen_or_hidden_layers_pause": true,
+    "raw_member_ids_must_not_be_exposed_by_aggregate_glyph_streams": true,
+    "hidden_location_never_encoded_in_glyph_or_path": true,
+    "no_telemetry_required": true
+  },
+  "decision_boundary": {
+    "engine_selected": false,
+    "production_architecture_authorized": false,
+    "next_proof": "non_public_layered_sphere_and_side_view_prototype_then_physical_acceptance"
+  }
+}

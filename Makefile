@@ -1,6 +1,6 @@
-.PHONY: validate validate-canonical-plan validate-contracts validate-semantic-zoom validate-visual-semantics validate-renderer-spike validate-maplibre-phase2-proof validate-device-acceptance-pack validate-device-acceptance-rerun validate-public-shell test smoke-pages-live check-pages-dns-target
+.PHONY: validate validate-canonical-plan validate-contracts validate-semantic-zoom validate-visual-semantics validate-renderer-spike validate-maplibre-phase2-proof validate-device-acceptance-pack validate-device-acceptance-rerun validate-digital-sphere validate-layered-digital-sphere-proof validate-public-shell test smoke-pages-live check-pages-dns-target
 
-validate: validate-canonical-plan validate-contracts validate-semantic-zoom validate-visual-semantics validate-renderer-spike validate-maplibre-phase2-proof validate-device-acceptance-pack validate-device-acceptance-rerun validate-public-shell test
+validate: validate-canonical-plan validate-contracts validate-semantic-zoom validate-visual-semantics validate-renderer-spike validate-maplibre-phase2-proof validate-device-acceptance-pack validate-device-acceptance-rerun validate-digital-sphere validate-layered-digital-sphere-proof validate-public-shell test
 
 validate-canonical-plan:
 	python3 scripts/validate_canonical_plan.py
@@ -25,6 +25,12 @@ validate-device-acceptance-pack:
 
 validate-device-acceptance-rerun:
 	python3 scripts/validate_device_acceptance_rerun.py
+
+validate-digital-sphere:
+	python3 scripts/validate_digital_sphere.py
+
+validate-layered-digital-sphere-proof:
+	python3 scripts/validate_layered_digital_sphere_proof.py
 
 validate-public-shell:
 	python3 scripts/validate_public_shell.py

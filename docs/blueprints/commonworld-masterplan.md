@@ -300,22 +300,39 @@ Digitale Commons erhalten keine erfundenen Koordinaten.
 
 ### Erscheinung
 
-- Die Sphäre liegt räumlich außerhalb der Erde.
-- Zeichen sind am äußeren Rand deutlicher und blenden zur Blickmitte hin aus, damit die Erde lesbar bleibt.
+- Die Sphäre liegt räumlich außerhalb der Erde und umschließt sie in der Totalen vollständig.
+- Sie besteht aus übereinanderliegenden Bahnschichten verschiedener digitaler Commons-Arten, nicht primär aus isolierten Punkten.
+- Die Bahnen wechseln zwischen kurzen lesbaren Namensfragmenten und Binärfragmenten, die deterministisch aus der stabilen Commons-Identität abgeleitet werden.
+- Binärfragmente sind ausschließlich visuelle Zeichen. Sie behaupten weder echten Projektcode noch Inhaltsmenge, Aktivität, Qualität oder Rang.
+- Zeichen sind am äußeren Rand deutlicher und blenden zur Blickmitte hin aus, damit die Erde und die geografischen Commons lesbar bleiben.
+- Beim Hineinzoomen in den Globus blendet die digitale Sphäre monoton aus und verschwindet vor der lokalen Ansicht vollständig.
 - Sie bewegt sich höchstens sehr langsam und stoppt bei Interaktion, Fokus, unsichtbarer Seite und reduzierter Bewegung.
-- Die ganze Sphäre ist als Ebene auswählbar.
-- Einzelne Zeichen sind nur dann Zahlen, wenn sie tatsächlich eine definierte Zahl ausdrücken. Andernfalls werden abstrakte digitale Zeichen, kurze Namen oder Symbole verwendet.
+- Eine ringförmige Zielzone am sichtbaren Sphärenrand ist bereits in der Ausgangsansicht anklickbar und besitzt zusätzlich eine klar beschriftete Schaltfläche.
 
-### Eigener semantischer Zoom
+### Vorläufige Darstellungsschichten
+
+Die erste Präsentationskonfiguration unterscheidet:
+
+1. Wissen und offene Daten;
+2. freie Software und Infrastruktur;
+3. offene Medien und Kultur;
+4. freies Lernen und Bildung;
+5. Kommunikation und Netze;
+6. gemischte und weitere digitale Commons.
+
+Diese Schichten sind keine zweite Katalogontologie und keine manuell gepflegten Projektfelder. Sie werden aus vorhandenen Themen, Commons-Familien und belegter digitaler Präsenz abgeleitet. Die konkrete Zahl und Benennung bleibt als Präsentationskonfiguration überprüfbar, während `CommonProject.id` die einzige Identitätswahrheit bleibt.
+
+### Eigener semantischer Zoom und Seitenansicht
 
 ```text
 digitale Gesamtsphäre
-→ thematische Felder und Netzwerke
+→ geschichtete Bahnen und belegte Netzwerke
+→ seitliche Ansicht der übereinanderliegenden Schichten
 → kleinere Zusammenhänge
 → einzelne digitale Commons
 ```
 
-Die Erde bleibt dabei als ruhiger Bezug sichtbar. Es wird keine getrennte digitale Nebenanwendung geöffnet.
+Beim Klick auf den Sphärenrand wechselt dieselbe Oberfläche in eine Seitenansicht. Die Schichten liegen dort übereinander; die Erde bleibt als gedämpfter Bezug sichtbar. Browser-Zurück, Deep Link und Schließen führen zum vorherigen Globuszustand zurück. Bei reduzierter Bewegung erfolgt der Zustandswechsel ohne Kamerafahrt. Es wird keine getrennte digitale Nebenanwendung geöffnet.
 
 ## Hybride Commons
 
@@ -405,6 +422,12 @@ Die lineare Ansicht verwendet dieselben Filter und dieselbe Ergebnismenge. Sie e
 
 Die lineare Ansicht ist kein zweites Produkt und keine abweichende Datenwahrheit.
 
+### Dieselbe Auswahl in allen Ansichten
+
+Die interne Bezeichnung „Auswahlparität“ bedeutet lediglich: Wird ein Commons im Globus, in der digitalen Sphäre, in der Seitenansicht, in der Suche oder in der linearen Ansicht ausgewählt, bleibt überall dieselbe `CommonProject.id` aktiv und dasselbe Fokuspanel sichtbar.
+
+Der verständliche Prüfschritt lautet: Ein Commons in einer Ansicht auswählen, in eine andere Ansicht wechseln und kontrollieren, ob dort derselbe Name markiert bleibt. Ein automatisierter Test ersetzt dabei nicht die physische Prüfung durch einen Nutzer.
+
 ## Bewegung und Flüssigkeit
 
 Bewegung dient nur:
@@ -454,11 +477,11 @@ Vor jeder Engine-Festlegung sind zwingend zu beweisen: Abdeckungsmuster, Unsiche
 
 Der maschinenlesbare Beleg liegt in `docs/research/maplibre-phase2-globe-proof.result.json`; die lesbare Auswertung liegt daneben. Der nichtöffentliche Beweis bestätigt MapLibre für geografischen Globus, Abdeckungsfelder, Unsicherheitsgeometrien, Zustandswiederherstellung, Vektorkacheln und eine abstrakte digitale Sphäre im selben WebGL-Kontext.
 
-Die digitale Sphäre ist ein nativer MapLibre-Custom-Layer. Sie verwendet flüchtige Clip-Space-Vektoren, ignoriert die geografische Kartenprojektion, persistiert keine Darstellungskoordinate und verbindet geografische sowie digitale Darstellung ausschließlich über dieselbe CommonProject-ID. Eine zusätzliche Three.js-Laufzeitabhängigkeit war im begrenzten Beweis nicht erforderlich.
+Im damaligen Phase-2-Beweis war die digitale Sphäre ein nativer, punktbasierter MapLibre-Custom-Layer. Er verwendete flüchtige Clip-Space-Vektoren, ignorierte die geografische Kartenprojektion, persistierte keine Darstellungskoordinate und verband geografische sowie digitale Darstellung ausschließlich über dieselbe CommonProject-ID. Eine zusätzliche Three.js-Laufzeitabhängigkeit war dort nicht erforderlich. Diese punktbasierte Darstellung ist ein historischer Technikbeleg und wurde als Zielbild durch die unten festgelegte geschichtete Bahnsphäre v3 abgelöst.
 
 Lokal nachgewiesen sind semantische Muster, Unsicherheitshalo und gestrichelter Rand, Identitätsdeduplizierung, Deep-Link-Wiederherstellung, lineare Datenparität, Tastaturpfad, Accessibility-Tree, Reduced Motion, Leerlaufpause, ein begrenzter Browser-Lifecycle-Freeze sowie drei wiederholte Software-WebGL-Messungen. Nicht nachgewiesen sind physische Mobilhardware, Hardware-GPU, reale VoiceOver-/TalkBack-Sitzung, vollständiger Hintergrundtab-Rundlauf und produktionsnahe Listenvirtualisierung.
 
-Bis diese Sperren geschlossen sind, gelten `engine_selected = false` und `production_architecture_authorized = false`. Der nächste zulässige Schritt ist ausschließlich eine physische Geräte- und Assistenztechnik-Abnahme.
+Der damalige Beweis ließ `engine_selected = false` und `production_architecture_authorized = false` und autorisierte als Folgeschritt nur eine weitere nichtöffentliche Geräte- und Assistenztechnikprüfung. Die aktuelle Folgeentscheidung steht im Abschnitt zur geschichteten Sphäre v3.
 
 ### Virtualisierte Parallelansicht und Geräte-Abnahmepaket
 
@@ -475,6 +498,14 @@ Der erste physische Apple-WebKit-Lauf schließt die Geräteabnahme nicht. Der ge
 Abnahmepaket v2 koppelt die digitale Hülle an den projizierten Erdradius. In der Totalen beträgt ihr Radius das 1,2-Fache der Erde; beim Hineinzoomen wächst sie mit dem Globus und wird vor der Lokalansicht ausgeblendet. Der neue Belegvertrag verlangt genau drei automatische Messläufe, vollständig bearbeitete Prüfpunkte, mindestens zehn Sekunden gemessene Hintergrundzeit, aktives und animationsfrei belegtes Reduced Motion sowie eine Notiz bei jedem fehlgeschlagenen Feld. Unvollständige Läufe können nicht gespeichert werden.
 
 Ein erneuter physischer Apple-WebKit-Lauf und danach ein unabhängiger Android-Chrome-Lauf bleiben Pflicht. Bis zur Auswertung beider Belege gelten weiterhin `engine_selected = false` und `production_architecture_authorized = false`.
+
+### Geschichtete digitale Sphäre v1 und Abnahmepaket v3
+
+Der maschinenlesbare Präsentationsvertrag liegt in `contracts/commonworld/digital-sphere.contract.json`; der normalisierte Forschungsbeleg liegt in `docs/research/layered-digital-sphere-v1.result.json`. Der zugrunde liegende Nutzerbeleg war unvollständig: drei automatische Messläufe sowie die physische Prüfung derselben Auswahl und von VoiceOver oder TalkBack fehlten. Die darin beschriebene Sphärenidee wurde deshalb als Produktentwurf übernommen, nicht als bestandene Geräteabnahme.
+
+Der nichtöffentliche v3-Prototyp ersetzt die bisherige Punktwolke durch sechs SVG-Bahnen aus Namens- und Binärfragmenten über dem MapLibre-Globus. Die Bahnen blenden zur Mitte aus, umschließen die Erde in der Totalen, sind bei Zoom 2,2 ungefähr halb sichtbar und ab Zoom 2,6 verborgen. Ein Klick auf die ringförmige Randzone öffnet sechs übereinanderliegende Schichten in Seitenansicht. Eine dort gewählte synthetische Commons-ID blieb in der linearen Ansicht identisch ausgewählt.
+
+Die große standardisierte Darstellung erreichte unter Software-WebGL nur rund 22 Bilder pro Sekunde in der Totalen und 27 Bilder pro Sekunde lokal. Das ist ein offener Optimierungsbefund. Ebenso offen bleiben physische Apple-WebKit- und Android-Chrome-Läufe, VoiceOver oder TalkBack, reale Katalogableitung sowie Lesbarkeit bei echten Commons-Namen. Bis dahin gelten weiterhin `engine_selected = false` und `production_architecture_authorized = false`.
 
 ### Aggregation
 
