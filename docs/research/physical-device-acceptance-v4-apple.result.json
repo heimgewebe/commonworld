@@ -1,0 +1,150 @@
+{
+  "schema_version": 1,
+  "kind": "commonworld_physical_device_acceptance_v4_apple",
+  "status": "apple_webkit_v4_accepted_for_prototype_performance_and_interaction",
+  "recorded_at": "2026-07-11",
+  "repository_base_commit": "23a5ace5104ba06410ddc3177a1b87615a103d5b",
+  "raw_receipt": {
+    "sha256": "6a0c4d2897ffb438756535694ba13ad04ab1f373d25247451ef20a4a6e9e8805",
+    "size_bytes": 10669,
+    "acceptance_version": 4,
+    "schema_version": 4,
+    "overall_verdict": "incomplete",
+    "completion_errors": [
+      "2 manuelle Prüfung(en) sind noch offen."
+    ],
+    "started_at": "2026-07-11T17:45:01.456Z",
+    "completed_at": "2026-07-11T17:48:46.958Z",
+    "raw_file_in_repository": false,
+    "private_session_id_published": false,
+    "raw_user_agent_published": false
+  },
+  "environment": {
+    "browser_family": "Apple WebKit Safari",
+    "hardware_gpu": true,
+    "gpu_family": "Apple GPU",
+    "touch_capable": true,
+    "touch_points": 5,
+    "viewport_width_css_px": 1180,
+    "viewport_height_css_px": 701,
+    "device_pixel_ratio": 2,
+    "map_pixel_ratio": 1.5,
+    "reduced_motion_at_start": true,
+    "reduced_motion_at_completion": true
+  },
+  "automatic": {
+    "runs": 3,
+    "benchmark_version": 4,
+    "planet_median_fps": 50.47672462141715,
+    "local_median_fps": 50.93378607808757,
+    "planet_max_p95_frame_ms": 25.000000000029104,
+    "local_max_p95_frame_ms": 23,
+    "minimum_median_fps": 30,
+    "performance_gate_pass": true,
+    "planet_pass": true,
+    "local_pass": true,
+    "idle_pass": true,
+    "idle_observation_ms": 1500,
+    "idle_map_render_delta": 0,
+    "idle_overlay_render_delta": 0,
+    "idle_overlay_update_call_delta": 0,
+    "idle_state_write_delta": 0,
+    "digital_sphere_globe_relative": true,
+    "digital_sphere_layer_count": 6,
+    "digital_sphere_complete_enclosure": true,
+    "digital_sphere_overview_visible": true,
+    "digital_sphere_local_hidden": true,
+    "virtual_list_dom_bound_pass": true
+  },
+  "manual_raw": {
+    "pass": [
+      "touch_rotation_zoom",
+      "coverage_patterns",
+      "uncertainty_halo_boundary",
+      "digital_sphere",
+      "shared_selection",
+      "background_roundtrip"
+    ],
+    "not_run": [
+      "assistive_technology",
+      "reduced_motion"
+    ],
+    "background_longest_hidden_ms": 32608,
+    "reduced_motion_preference_active": true,
+    "reduced_motion_last_motion_duration_ms": null
+  },
+  "policy_evaluation": {
+    "required_manual_checks": [
+      "touch_rotation_zoom",
+      "coverage_patterns",
+      "uncertainty_halo_boundary",
+      "digital_sphere",
+      "shared_selection",
+      "background_roundtrip",
+      "reduced_motion"
+    ],
+    "optional_manual_checks": [
+      "assistive_technology"
+    ],
+    "assistive_technology": {
+      "status": "waived_by_product_owner",
+      "scope": "non_public_prototype_acceptance_only",
+      "screen_reader_product_support_claimed": false,
+      "physical_screen_reader_test_required_for_this_prototype": false,
+      "waiver_source": "user_message_after_receipt_upload_2026-07-11",
+      "waiver_normalized": "voiceover_not_required_for_non_public_prototype"
+    },
+    "reduced_motion": {
+      "status": "accepted_by_active_preference_and_product_owner_attestation",
+      "preference_active_at_start_and_completion": true,
+      "product_owner_attested_working": true,
+      "raw_machine_duration_missing": true,
+      "raw_receipt_mutated": false,
+      "v5_future_receipts_capture_zero_duration_automatically": true,
+      "attestation_source": "user_message_after_receipt_upload_2026-07-11",
+      "attestation_normalized": "movement_reduction_works"
+    },
+    "all_prototype_required_manual_checks_satisfied": true
+  },
+  "normalized_verdict": {
+    "apple_webkit_performance": "pass",
+    "apple_webkit_interaction": "pass",
+    "background_roundtrip": "pass",
+    "reduced_motion": "pass_by_attestation_with_machine_gap_disclosed",
+    "assistive_technology": "waived_not_passed",
+    "screen_reader_support": "not_claimed",
+    "apple_webkit_v4_prototype_acceptance": "pass"
+  },
+  "remaining_gates": {
+    "physical_android_chrome_v5": "open",
+    "real_catalog_layer_derivation": "open",
+    "real_name_density_and_legibility": "open",
+    "focus_panel_selection_parity": "open",
+    "side_on_camera_transition": "open"
+  },
+  "decision": {
+    "engine_selected": false,
+    "production_architecture_authorized": false,
+    "apple_webkit_v4_rerun_required": false,
+    "screen_reader_test_required_for_prototype_acceptance": false,
+    "next_action": "run_v5_on_android_chrome_then_real_data_focus_and_side_camera_proof"
+  },
+  "acceptance_v5_release": {
+    "installed_manifest_sha256": "3e4eb9b92e21357a87368a674609e5b49199fad6ed75963bbfad1aa20a8280f5",
+    "acceptance_version": 5,
+    "receipt_schema_version": 5,
+    "assistive_technology_default": "waived",
+    "reduced_motion_self_triggered_machine_proof": true,
+    "service_active_at_check": true,
+    "service_restart_count_at_check": 0,
+    "continuous_health_not_claimed": true
+  },
+  "evidence_artifacts": {
+    "v5_archive_sha256": "87175f3059ad9c7d9aeb8a260dc3381d8a182f9e186817a76b82d68714f9147d",
+    "v5_installed_proof_sha256": "2dac4b14174a973624da46b12f8b934dd85340d7a0148c2fba5273b1ddafa31c",
+    "v5_installed_screenshot_sha256": "9b183d461ce97f72d93968c3ed97355498ac6514478b08366ef9d5b7b21c936c",
+    "v5_preparation_proof_sha256": "001aa5a70261700f84ecf84b2509d596145e8c6e9ee9bfe9c351e6501798a068",
+    "v5_archive_manifest_sha256": "a76d2fb556101385f7196b4a876ef3c9193e7c99988b62983b35ac2f531ebde3",
+    "role": "local_non_product_research_archive"
+  }
+}
