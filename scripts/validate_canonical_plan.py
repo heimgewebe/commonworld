@@ -25,6 +25,7 @@ REQUIRED_PLAN_TOKENS = (
     "Textur      = Datenabdeckung oder Unsicherheit",
     "### Kalibrierter visueller Semantikvertrag",
     "### Gemessener Renderer-Engine-Spike",
+    "### Begrenzter MapLibre-Phase-2-Globusbeweis",
     "## Digitale Commons-Sphäre",
     "Digitale Commons erhalten keine erfundenen Koordinaten.",
     "## Hybride Commons",
@@ -72,7 +73,12 @@ FORBIDDEN_CONTRACT_PROPERTIES = (
 
 EXPECTED_BLUEPRINT_FILES = {"commonworld-masterplan.md"}
 EXPECTED_OPS_FILES = {"pages-dns.md"}
-EXPECTED_RESEARCH_FILES = {"renderer-engine-spike.md", "renderer-engine-spike.result.json"}
+EXPECTED_RESEARCH_FILES = {
+    "maplibre-phase2-globe-proof.md",
+    "maplibre-phase2-globe-proof.result.json",
+    "renderer-engine-spike.md",
+    "renderer-engine-spike.result.json",
+}
 EXPECTED_CONTRACT_FILES = {"aggregation-zoom.contract.json", "project.schema.json", "visual-semantics.contract.json"}
 EXPECTED_SCRIPT_FILES = {
     "__init__.py",
@@ -82,6 +88,7 @@ EXPECTED_SCRIPT_FILES = {
     "validate_contracts.py",
     "validate_public_shell.py",
     "validate_renderer_spike.py",
+    "validate_maplibre_phase2_proof.py",
     "validate_semantic_zoom.py",
     "validate_visual_semantics.py",
 }
@@ -92,6 +99,7 @@ EXPECTED_TEST_FILES = {
     "test_pages_live_smoke.py",
     "test_public_shell.py",
     "test_renderer_spike.py",
+    "test_maplibre_phase2_proof.py",
     "test_semantic_zoom.py",
     "test_visual_semantics.py",
 }

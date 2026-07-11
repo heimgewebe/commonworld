@@ -450,6 +450,16 @@ Three.js bleibt ein möglicher Spezialpfad für eine eng isolierte digitale Auß
 
 Vor jeder Engine-Festlegung sind zwingend zu beweisen: Abdeckungsmuster, Unsicherheitsränder und Halos, digitale Außensphäre ohne Identitätsdopplung, physische Mobilhardware, Pausen- und Reduced-Motion-Verhalten, Tastatur- und Screenreader-Parität sowie realistische Vektorkachel-Aggregation. Die Farbseh-Simulation bestätigt zusätzlich: Farbe allein darf keine Commons-Familie tragen; Symbol, Text und linearer Kontext bleiben Pflicht.
 
+### Begrenzter MapLibre-Phase-2-Globusbeweis
+
+Der maschinenlesbare Beleg liegt in `docs/research/maplibre-phase2-globe-proof.result.json`; die lesbare Auswertung liegt daneben. Der nichtöffentliche Beweis bestätigt MapLibre für geografischen Globus, Abdeckungsfelder, Unsicherheitsgeometrien, Zustandswiederherstellung, Vektorkacheln und eine abstrakte digitale Sphäre im selben WebGL-Kontext.
+
+Die digitale Sphäre ist ein nativer MapLibre-Custom-Layer. Sie verwendet flüchtige Clip-Space-Vektoren, ignoriert die geografische Kartenprojektion, persistiert keine Darstellungskoordinate und verbindet geografische sowie digitale Darstellung ausschließlich über dieselbe CommonProject-ID. Eine zusätzliche Three.js-Laufzeitabhängigkeit war im begrenzten Beweis nicht erforderlich.
+
+Lokal nachgewiesen sind semantische Muster, Unsicherheitshalo und gestrichelter Rand, Identitätsdeduplizierung, Deep-Link-Wiederherstellung, lineare Datenparität, Tastaturpfad, Accessibility-Tree, Reduced Motion, Leerlaufpause, ein begrenzter Browser-Lifecycle-Freeze sowie drei wiederholte Software-WebGL-Messungen. Nicht nachgewiesen sind physische Mobilhardware, Hardware-GPU, reale VoiceOver-/TalkBack-Sitzung, vollständiger Hintergrundtab-Rundlauf und produktionsnahe Listenvirtualisierung.
+
+Bis diese Sperren geschlossen sind, gelten `engine_selected = false` und `production_architecture_authorized = false`. Der nächste zulässige Schritt ist ausschließlich eine physische Geräte- und Assistenztechnik-Abnahme.
+
 ### Aggregation
 
 Die ferne Ansicht lädt keine Einzelobjektmenge. Daten werden maßstabsabhängig geliefert:

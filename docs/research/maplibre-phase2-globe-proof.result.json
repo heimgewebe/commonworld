@@ -1,0 +1,385 @@
+{
+  "schema_version": 1,
+  "kind": "commonworld_maplibre_phase2_globe_proof",
+  "status": "local_gates_pass_physical_acceptance_blocked",
+  "measured_at": "2026-07-11",
+  "repository_base_commit": "314b06a04016e8f87a930e092ca77b6d0a33c6fb",
+  "versions": {
+    "maplibre_gl_js": "5.24.0",
+    "geojson_vt": "6.1.0",
+    "vt_pbf": "4.3.0",
+    "esbuild": "0.25.6",
+    "puppeteer_core": "24.12.1"
+  },
+  "workload": {
+    "deterministic_seed": 20260711,
+    "unique_identities": 5000,
+    "geographic_representations": 4000,
+    "digital_representations": 2000,
+    "hybrid_identities": 1000,
+    "approximate_zones": 235,
+    "coverage_buckets": 24,
+    "relations": 320,
+    "linear_identity_items": 5000,
+    "vector_tile_requests": 92,
+    "vector_tile_bytes": 792403,
+    "vector_tile_zooms": [
+      1,
+      2,
+      3,
+      4,
+      5,
+      6
+    ]
+  },
+  "bundle": {
+    "js_bytes": 1055763,
+    "js_gzip_bytes": 287358,
+    "css_bytes": 69939,
+    "css_gzip_bytes": 10054,
+    "total_output_bytes": 1125702
+  },
+  "gate_results": {
+    "coverage_assessed_solid_density": {
+      "status": "pass",
+      "evidence": {
+        "rendered_features": 23,
+        "layer": "coverage-assessed"
+      }
+    },
+    "coverage_partial_broken_hatch": {
+      "status": "pass",
+      "evidence": {
+        "pattern": "coverage-partial-hatch",
+        "layer": "coverage-partial"
+      }
+    },
+    "coverage_unassessed_dot_grid": {
+      "status": "pass",
+      "evidence": {
+        "pattern": "coverage-unassessed-dots",
+        "layer": "coverage-unassessed"
+      }
+    },
+    "approximate_location_boundary_and_halo": {
+      "status": "pass",
+      "evidence": {
+        "rendered_features": 8,
+        "layers": [
+          "uncertainty-halo",
+          "uncertainty-boundary"
+        ],
+        "radius_source": "uncertainty_meters_min"
+      }
+    },
+    "realistic_vector_tile_path": {
+      "status": "pass",
+      "evidence": {
+        "source_type": "vector",
+        "requests": 92,
+        "bytes": 792403,
+        "zooms": [
+          1,
+          2,
+          3,
+          4,
+          5,
+          6
+        ]
+      }
+    },
+    "identity_deduplication": {
+      "status": "pass",
+      "evidence": {
+        "unique_identities": 5000,
+        "geographic_representations": 4000,
+        "digital_representations": 2000,
+        "union_identities": 5000,
+        "hybrid_identities": 1000
+      }
+    },
+    "maplibre_native_abstract_digital_sphere": {
+      "status": "pass",
+      "evidence": {
+        "kind": "maplibre_custom_gl_abstract_sphere",
+        "pointCount": 2000,
+        "usesMapProjection": false,
+        "usesGeographicCoordinates": false,
+        "placementPersistedToCatalog": false,
+        "sharesIdentityIds": true
+      },
+      "boundary": "custom_gl_clip_space_ephemeral_vectors_not_map_projection_or_catalog_coordinates"
+    },
+    "deep_link_state_restoration": {
+      "status": "pass",
+      "evidence": {
+        "before": {
+          "lng": 44.5,
+          "lat": 23.25,
+          "z": 5.25,
+          "bearing": 17,
+          "pitch": 0,
+          "selected": "common-00003"
+        },
+        "after": {
+          "lng": 44.5,
+          "lat": 23.25,
+          "z": 5.25,
+          "bearing": 17,
+          "pitch": 0,
+          "selected": "common-00003"
+        }
+      }
+    },
+    "linear_identity_and_selection_parity": {
+      "status": "pass",
+      "evidence": {
+        "visible": true,
+        "itemCount": 5000,
+        "selectedCount": 1,
+        "selectedId": "common-00003",
+        "toggleExpanded": "true"
+      },
+      "production_virtualization": "not_proven"
+    },
+    "keyboard_navigation": {
+      "status": "pass",
+      "evidence": {
+        "before": {
+          "lng": 44.5,
+          "lat": 23.25,
+          "z": 5.25,
+          "bearing": 17,
+          "pitch": 0,
+          "selected": "common-00003"
+        },
+        "afterRight": {
+          "lng": 49.5,
+          "lat": 23.25,
+          "z": 5.25,
+          "bearing": 17,
+          "pitch": 0,
+          "selected": "common-00003"
+        },
+        "afterHome": {
+          "lng": 10,
+          "lat": 20,
+          "z": 1.35,
+          "bearing": 0,
+          "pitch": 0,
+          "selected": "common-00003"
+        }
+      }
+    },
+    "accessibility_tree_structure": {
+      "status": "pass",
+      "evidence": {
+        "nodeCount": 30065,
+        "roles": [
+          "InlineTextBox",
+          "ListMarker",
+          "RootWebArea",
+          "StaticText",
+          "application",
+          "button",
+          "complementary",
+          "generic",
+          "heading",
+          "list",
+          "listitem",
+          "main",
+          "none",
+          "paragraph",
+          "region",
+          "strong"
+        ],
+        "hasGlobeName": true,
+        "hasLinearViewName": true,
+        "hasFirstIdentity": true,
+        "hasLastIdentity": true
+      },
+      "real_screen_reader_session": "not_tested"
+    },
+    "reduced_motion_state_equivalence": {
+      "status": "pass",
+      "evidence": {
+        "reducedMotion": true,
+        "duration": 0,
+        "state": {
+          "lng": 44.5,
+          "lat": 23.25,
+          "z": 5.25,
+          "bearing": 17,
+          "pitch": 0,
+          "selected": null
+        }
+      }
+    },
+    "idle_render_pause": {
+      "status": "pass",
+      "evidence": {
+        "mapRenderDelta": 0,
+        "overlayRenderDelta": 0
+      }
+    },
+    "browser_lifecycle_freeze": {
+      "status": "pass_bounded_transition_frame",
+      "evidence": {
+        "supported": true,
+        "error": null,
+        "before": {
+          "map": 38,
+          "overlay": 36,
+          "time": 1014
+        },
+        "after": {
+          "map": 39,
+          "overlay": 37,
+          "time": 3019.099999964237,
+          "paused": true
+        },
+        "renderDelta": {
+          "map": 1,
+          "overlay": 1
+        },
+        "wallWaitMs": 2000
+      },
+      "acceptance": "no continuous rendering during freeze; at most one map and one custom-layer frame across freeze/resume transition"
+    },
+    "visibility_handler_pause_and_resume": {
+      "status": "pass_application_handler_only",
+      "evidence": {
+        "method": "application_handler_direct",
+        "protocolError": "ProtocolError: Protocol error (Emulation.setPageVisibilityState): 'Emulation.setPageVisibilityState' wasn't found",
+        "hiddenState": {
+          "paused": true,
+          "reason": "hidden",
+          "overlay": 47
+        },
+        "visibleState": {
+          "paused": false,
+          "reason": null,
+          "transitions": [
+            {
+              "state": "hidden",
+              "source": "deterministic-test",
+              "at": 3883.100000023842
+            },
+            {
+              "state": "visible",
+              "source": "deterministic-test",
+              "at": 4385.100000023842
+            }
+          ]
+        }
+      },
+      "real_background_tab_roundtrip": "not_tested"
+    },
+    "physical_mobile_safari": {
+      "status": "blocked_no_connected_device"
+    },
+    "physical_mobile_chrome": {
+      "status": "blocked_no_connected_device"
+    },
+    "hardware_gpu_performance": {
+      "status": "blocked_not_measured"
+    },
+    "real_screen_reader_session": {
+      "status": "blocked_not_measured"
+    }
+  },
+  "performance": {
+    "environment": "headless Chrome ANGLE/SwiftShader software WebGL",
+    "browser": "Chrome/150.0.7871.46",
+    "relative_not_physical_device_fps": true,
+    "runs_per_profile_and_level": 3,
+    "summary": {
+      "desktop": {
+        "planet": {
+          "runs": 3,
+          "min_fps": 54.812040379396905,
+          "median_fps": 55.144524608546206,
+          "max_fps": 55.63540266153426
+        },
+        "local": {
+          "runs": 3,
+          "min_fps": 60.34699522289135,
+          "median_fps": 60.4747266031135,
+          "max_fps": 60.48387096919559
+        }
+      },
+      "mobile_emulated": {
+        "planet": {
+          "runs": 3,
+          "min_fps": 44.485634847867004,
+          "median_fps": 44.97919712173335,
+          "max_fps": 45.17732098506835
+        },
+        "local": {
+          "runs": 3,
+          "min_fps": 60.419918432747494,
+          "median_fps": 60.48996874793993,
+          "max_fps": 60.5326876509677
+        }
+      }
+    }
+  },
+  "decision": {
+    "engine_selected": false,
+    "production_architecture_authorized": false,
+    "maplibre_primary_candidate_retained": true,
+    "maplibre_native_custom_layer_candidate_retained": true,
+    "three_js_runtime_dependency_required": false,
+    "next_action": "physical_device_and_assistive_technology_acceptance",
+    "forbidden_interpretations": [
+      "MapLibre is the production engine",
+      "The native custom layer is production architecture",
+      "SwiftShader FPS predicts mobile hardware FPS",
+      "The synthetic catalog may be published",
+      "Accessibility-tree presence proves VoiceOver or TalkBack usability"
+    ]
+  },
+  "limitations": {
+    "physical_mobile_devices_tested": false,
+    "hardware_gpu_tested": false,
+    "voiceover_or_talkback_tested": false,
+    "real_background_tab_roundtrip_tested": false,
+    "public_proof_published": false,
+    "real_catalog_records_used": false,
+    "linear_list_virtualization_proven": false,
+    "software_webgl_results_are_relative": true
+  },
+  "official_sources": [
+    {
+      "id": "maplibre_custom_layer",
+      "url": "https://maplibre.org/maplibre-gl-js/docs/API/interfaces/CustomLayerInterface/",
+      "checked_at": "2026-07-11"
+    },
+    {
+      "id": "maplibre_globe_custom_layer_example",
+      "url": "https://maplibre.org/maplibre-gl-js/docs/examples/add-a-simple-custom-layer-on-a-globe/",
+      "checked_at": "2026-07-11"
+    },
+    {
+      "id": "maplibre_style_layers",
+      "url": "https://maplibre.org/maplibre-style-spec/layers/",
+      "checked_at": "2026-07-11"
+    }
+  ],
+  "gate_summary": {
+    "pass_or_bounded_pass": 15,
+    "blocked": 4,
+    "total": 19
+  },
+  "evidence_artifacts": {
+    "archive_role": "local_non_product_research_archive",
+    "archive_sha256": "198b4f3d3e36074cfc9773374ac3403cf90ae6c705c29d36ed2ff7537898b22f",
+    "authoritative_results_sha256": "ac574f124763c3c69a41fca656dcb09a6805d894f49224219aaee3d9b9eb9441",
+    "normalized_result_sha256": "360139fb40dc5dceac8a3dbb94e6082121cffaa203051a2341944f1dcd54e25e",
+    "image_integrity_sha256": "fa7ec48a166786f6a94ae4590e5846a4ffc9dcb9506f2e4f91a16adb208866fb",
+    "manifest_sha256": "838c70a076f07499893068e34ac6d6862fc6cca71a2e045ba3434645e0a7a8ce",
+    "repository_contains_raw_harness": false,
+    "repository_contains_screenshots": false,
+    "repository_contains_node_dependencies": false
+  }
+}
