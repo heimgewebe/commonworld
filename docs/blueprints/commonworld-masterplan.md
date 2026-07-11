@@ -1,593 +1,515 @@
-# commonworld.net Product Plan v2.1
+# Commonworld — kanonischer Globusplan
 
 ## Status
 
-- Type: canonical product and delivery plan
-- Decision: active
-- Supersedes: the proof-first v1 masterplan
-- Product boundary: public discovery in commonworld, participation and administration in weltgewebe
-- Immediate priority: a playable real-content vertical slice, followed by trustworthy catalog growth
+- Typ: kanonischer Produkt-, UI- und Umsetzungsplan
+- Entscheidung: verbindlich
+- Öffentliche Oberfläche: ein zoombarer Globus mit digitaler Commons-Sphäre
+- Produktgrenze: Commonworld dient der Entdeckung; Weltgewebe trägt Beteiligung, Koordination und Verwaltung
+- Frühere konkurrierende UI- und Proof-Doktrinen sind nicht mehr aktiv
 
-## Product promise
+Dieser Plan ist die einzige Produktwahrheit des Repositories. Untergeordnete Verträge und Implementierungen müssen ihm dienen und dürfen keine konkurrierende Navigation oder Metapher einführen.
 
-commonworld is the public showcase and discovery gateway for Commons. It should feel like entering a living world rather than opening a directory.
+## Zweck
 
-A visitor should be able to orient within seconds, move fluidly through real Commons, find one worth using, visiting, joining, supporting or learning from within two minutes, understand why it belongs in the catalog, and continue to the best available next place.
+Commonworld bringt möglichst viele gute Commons unter ein gemeinsames öffentliches Schaufenster und macht ihre weltweite, regionale, lokale und digitale Verteilung verständlich.
 
-```text
-commonworld = discover, explore, understand, trust, continue
-weltgewebe   = propose, join, coordinate, administer, decide
-```
-
-commonworld must bring many good Commons under one coherent public roof without pretending that all Commons are the same, forcing digital projects onto a map, or creating a competing administration system beside weltgewebe.
-
-## Product diagnosis
-
-The v1 program established useful technical foundations:
-
-- a versioned `CommonProject` contract;
-- provenance and curation states;
-- privacy-aware location modes;
-- static map, search, profile and digital-projection proofs;
-- a read-only boundary toward weltgewebe;
-- deterministic generators, validators and browser checks.
-
-But the product sequence became inverted.
-
-The public site currently explains proofs, fixtures, contracts and boundaries while the catalog contains only four entries, three of them synthetic fixtures, one candidate and no curated public Commons. The implementation has more machinery for projecting and validating entries than real entries worth discovering.
-
-The v2 plan corrects that imbalance:
+Die Grundbewegung ist zwingend:
 
 ```text
-v1 emphasis: prove the system before filling the world
-v2 emphasis: build a trustworthy world while keeping only the system needed to serve it
+Erde
+→ Großregion
+→ Region
+→ lokaler Zusammenhang
+→ einzelnes Commons
 ```
 
-## Decisions retained from v1
+Die Oberfläche beginnt deshalb nicht mit Textkarten, Kategorien oder einem Dashboard, sondern mit der Erde als Ganzem. Mit jeder Annäherung steigt die räumliche und sachliche Genauigkeit.
 
-These decisions remain correct:
-
-1. **Separate public discovery from administration.** Commonworld stays read-oriented; weltgewebe owns participation and write authority.
-2. **Keep provenance visible.** Public claims need sources, review state and freshness.
-3. **Respect location privacy.** Exact, approximate and hidden locations remain explicit.
-4. **Stay static-first.** A generated static site is sufficient until real catalog scale proves otherwise.
-5. **Design mobile-first and accessibly.** The main experience must work without desktop sidebars or visual-only semantics.
-6. **Use progressive enhancement.** Core catalog browsing must work before optional map or animation code loads.
-7. **Keep automated validation.** Schemas, generated artifacts and browser interaction checks remain valuable safeguards.
-8. **Design for game feel without gamification.** Spatial continuity, direct manipulation, atmosphere and immediate feedback are product requirements; points, streaks and manipulation are prohibited.
-
-## Decisions changed from v1
-
-### The public website is not a proof hub
-
-Proofs are development instruments, not the public product.
-
-They may remain available under a clearly secondary `/lab/` or repository-only route, but the root website must present real Commons, useful discovery paths and human-readable project profiles. Task identifiers, fixture counts, implementation boundaries and test terminology must not dominate the public entry page.
-
-### The map is a view, not the product spine
-
-A map is useful for place-based Commons, but many Commons are digital, distributed, regional or intentionally location-hidden. The primary catalog must therefore be browseable as cards and lists. The map is an optional projection opened when geography is relevant.
-
-On mobile, list and collection discovery should load first. MapLibre and tiles should load only after the user opens the map.
-
-### Aether is not a primary public navigation concept
-
-The v1 Aether proof correctly avoided fake coordinates for digital Commons, but the name and separate mode add conceptual overhead.
-
-Digital, hidden-location and hybrid Commons should appear in the same catalog, search and collections as place-based Commons. A later visual treatment may remain as an experiment, but public navigation should use ordinary language such as:
-
-- online;
-- near me;
-- places;
-- networks;
-- knowledge;
-- tools;
-- care;
-- food;
-- repair.
-
-### Weighted aspect rings are optional, not foundational
-
-The mixed-node ring is a useful visual experiment, but precise aspect weights and confidence values create editorial effort and apparent mathematical certainty that may not help visitors decide what to do next.
-
-V2 treats the ring as an optional secondary visualization. The public catalog is based first on plain-language themes, shared resources, participation modes and verified evidence. Numeric weights must not be required merely to make a project publishable.
-
-### Search follows real content
-
-Search quality cannot be proven meaningfully against three fixtures and one candidate. Search contracts and fixtures may remain, but new search engineering stops until the catalog has enough real, diverse entries to expose actual discovery problems.
-
-### Growth requires a candidate path
-
-Permanent rejection of all public suggestions would prevent the catalog from growing beyond a small editorial list. Commonworld still must not publish unreviewed submissions directly, but it needs a low-risk suggestion path:
+## Produktgrenze
 
 ```text
-visitor suggestion -> candidate inbox -> human review -> curated catalog -> public build
+Commonworld = entdecken, einordnen, verstehen, weitergehen
+Weltgewebe  = vorschlagen, teilnehmen, koordinieren, verwalten, entscheiden
 ```
 
-The candidate inbox and review effects should belong to weltgewebe or another explicitly owned curation surface. Commonworld only displays accepted public records.
+Commonworld bleibt ohne Konto lesbar. Schreibende Vorgänge, Projektpflege, Mitgliedschaft und Entscheidungen gehören nicht in diese Oberfläche. Ein Übergang zu Weltgewebe ist ein klar bezeichneter Link in eine andere Verantwortungsebene.
 
-## Primary audiences and jobs
+## Die eine öffentliche Oberfläche
 
-### Curious newcomer
+Commonworld besitzt eine zentrale Vollbildoberfläche. Sie besteht aus:
 
-- Show me what Commons are through concrete examples.
-- Help me see possibilities I did not know existed.
-- Let me browse without understanding specialist vocabulary.
+1. dem Globus beziehungsweise dem aktuellen geografischen Ausschnitt;
+2. der digitalen Commons-Sphäre;
+3. einer semantischen Commons-Überlagerung;
+4. Suche, Filter und Menü;
+5. einer knappen Orts- und Zoomorientierung;
+6. einem Fokuspanel für genau ein ausgewähltes Commons;
+7. einer gleichwertigen linearen Ansicht.
 
-### Local seeker
+Es gibt keine vorgeschaltete Marketing-Startseite, keinen öffentlichen Proof-Hub und keine voneinander getrennten Hauptprodukte für Karte, Suche oder digitale Commons.
 
-- Show me Commons near a place.
-- Tell me whether I can visit, use, borrow, repair, learn or meet there.
-- Give me current access information and the official next link.
+## Grundaufbau
 
-### Online participant
+```text
+┌────────────────────────────────────────────────────────┐
+│ commonworld                                   Suche     │
+│                                               Filter    │
+│                                               Menü      │
+│                                                        │
+│              digitale Commons-Sphäre                   │
+│         · 0 · 1 · Zeichen · Namen · 0 · 1 ·           │
+│                                                        │
+│                    ┌──────────┐                        │
+│                    │  Erde    │                        │
+│                    │          │                        │
+│                    └──────────┘                        │
+│                                                        │
+│ Erde › Europa › Deutschland › Hamburg     −  +  ◉     │
+│                                           Liste         │
+└────────────────────────────────────────────────────────┘
+```
 
-- Show me digital Commons I can use or contribute to from anywhere.
-- Let me filter by language, skill level, contribution type and topic.
+Dauerhaft sichtbar sind nur Elemente mit einer unverzichtbaren Funktion:
 
-### Commons steward
+- **Commonworld-Zeichen:** Identität.
+- **Suche:** direkte Navigation zu Commons, Ort oder Thema.
+- **Filter:** Reduktion der sichtbaren Welt nach einer Absicht.
+- **Menü:** Methode, Sprache, Datenschutz, Vorschlagsweg und Projektinformationen.
+- **Ortslinie:** aktuelle räumliche Einordnung und gezieltes Herauszoomen.
+- **Zoom und Globus-Reset:** alternative Bedienung neben Mausrad, Pinch und Doppeltipp.
+- **Lineare Ansicht:** gleichwertiger Zugang ohne räumliche oder grafische Voraussetzung.
 
-- Represent my Commons accurately.
-- Suggest corrections or updates.
-- Understand how catalog inclusion and verification work.
+Kein weiteres dauerhaftes Bedienelement wird eingeführt, solange seine Notwendigkeit nicht aus einer konkreten Aufgabe folgt.
 
-### Curator
+## Semantischer Zoom
 
-- Compare candidate evidence.
-- Publish, refresh, downgrade or archive records through a traceable process.
-- Detect stale and incomplete records.
+Zoom verändert nicht nur den Maßstab. Jede Ebene beantwortet eine andere Frage und verwendet dafür eine andere Darstellungsform.
 
-## Public experience architecture
+### Stufe 1 — Erde
 
-The v2 plan initially described six conventional website surfaces. That is too page-oriented for the intended experience. Commonworld instead uses one persistent world shell with coordinated lenses and focus states.
+Frage:
 
-The canonical interaction doctrine is `docs/blueprints/commonworld-experience-doctrine.md`.
+> Wo sind Commons weltweit belegt, wie dicht sind sie und welche groben Arten treten auf?
 
-### World: the primary stage
+Sichtbar:
 
-`World` combines the former Home, Explore and collection entry points into one continuous discovery surface. It introduces the product through real Commons, thematic neighborhoods, landmarks and curated paths.
+- die vollständige Erde;
+- großräumige, aggregierte Commons-Felder;
+- wenige geografische Bezeichnungen;
+- die digitale Commons-Sphäre;
+- Datenabdeckung als eigene, von Commons-Dichte unterscheidbare Aussage.
 
-It must remain understandable as a list or structured document for accessibility and progressive enhancement, but the enhanced visual experience should feel spatial and explorable rather than like a card grid with separate pages.
+Nicht sichtbar:
 
-### Near: the geographic lens
+- einzelne Projektmarker;
+- kleinteilige Grenzen;
+- Fäden zwischen Einzelprojekten;
+- unlesbare Namensmengen.
 
-`Near` is the optional geographic view over the same world. It retains the exact, approximate and hidden location contract. MapLibre and tiles load only when Near is opened.
+Ein Klick oder Doppeltipp auf einen Bereich führt mit einer kurzen, unterbrechbaren Kamerafahrt zur nächsten sachlich sinnvollen Ebene.
 
-### Find: search inside the world
+### Stufe 2 — Großregion
 
-`Find` is a compact overlay or command surface. It searches the same Commons and returns the same objects used in World and Near. It must not feel like a separate technical search application.
+Beispiele: Europa, Westafrika, Südostasien.
 
-### Focus: approach one Commons
+Frage:
 
-A project profile is a focus state opened from World, Near, Find or a curated path. The surrounding world remains recognizable, and closing restores the exact exploration context.
+> In welchen Ländern, Landschaftsräumen und überregionalen Zusammenhängen verdichten sich Commons?
 
-The focus state answers, in this order:
+Sichtbar:
 
-1. What is this Commons?
-2. What is shared or governed together?
-3. What can I do here?
-4. Who is it for?
-5. Is it active and how recently was it verified?
-6. Where or how is it available?
-7. What conditions, costs, hours or prerequisites apply?
-8. Who stewards it and under what governance or license?
-9. Which sources support the description?
-10. What is the safest useful next step?
+- feinere Dichte- und Artenfelder;
+- Länder und bedeutende Regionen;
+- überregionale Commons-Strukturen;
+- aggregierte Netzwerke, sofern sie sachlich belegt sind.
 
-Technical metadata belongs in a secondary trust layer.
+### Stufe 3 — Region
 
-### Curated paths
+Beispiele: Norddeutschland, Alpenregion, Großraum Nairobi.
 
-Collections become guided paths through the same world. They provide narrative and momentum without scores, forced completion or isolated collection silos. A visitor may leave a path for free exploration and return without losing context.
+Frage:
 
-Examples:
+> Welche lokalen Ballungen, Flächen und regionalen Netzwerke bestehen hier?
 
-- Repair something together;
-- Learn from open knowledge;
-- Commons around Hamburg;
-- Contribute online today;
-- Shared food and care infrastructures.
+Sichtbar:
 
-### About and method
+- lokale Cluster;
+- räumlich ausgedehnte Commons;
+- erste benannte, bedeutende Commons;
+- belegte regionale Beziehungen.
 
-Method remains a conventional readable surface because trust information benefits from stable text. It explains eligibility, curation, freshness, privacy, corrections, suggestions, licenses and the boundary to weltgewebe.
+### Stufe 4 — Lokal
 
-## CommonProject v3 direction
+Beispiele: Hamburg, Altona, ein ländlicher Kreis.
 
-The existing schema is optimized for proofs and visual projections. V3 should be catalog-centered.
+Frage:
 
-### Required public identity
+> Welche konkreten Commons und Beziehungen kann ich hier erreichen oder untersuchen?
 
-- stable id;
-- canonical name;
-- short promise or one-line description;
-- full summary;
-- primary language and available languages;
-- official links;
-- representative image with source and rights information.
+Sichtbar:
 
-### Commons substance
+- **Marker** für konkrete öffentliche Anker;
+- **Flächen** für tatsächlich räumlich ausgedehnte Commons;
+- **diffuse Zonen** für absichtlich ungefähre Verortung;
+- **Fäden** für belegte Beziehungen;
+- **Cluster** nur dort, wo Einzelobjekte noch nicht lesbar sind.
 
-- what resource, capability or space is held or produced in common;
-- governance or stewardship form;
-- access or contribution rights;
-- relevant licenses;
-- thematic tags;
-- project form: place, digital service, network, collection, infrastructure or hybrid.
+Einzelne Commons sind nun direkt auswählbar.
 
-### Visitor usefulness
+### Stufe 5 — Fokus
 
-- supported actions such as visit, use, borrow, learn, contribute, volunteer, donate, contact or replicate;
-- intended audiences;
-- access conditions and costs;
-- opening hours or availability where relevant;
-- required skills, membership or equipment;
-- contact and next-step links.
+Frage:
 
-### Status and freshness
+> Was ist dieses Commons, was kann ich dort tun, wie belastbar sind die Angaben und wie gehe ich weiter?
 
-- operational status: active, seasonal, paused, unknown or ended;
-- last verified date;
-- verification method;
-- next review date;
-- known limitations or uncertainty.
+Genau ein Commons wird fokussiert. Der räumliche Kontext bleibt sichtbar. Beim Schließen werden Rotation, Zoom, Mittelpunkt, Filter und Auswahlkontext exakt wiederhergestellt.
 
-### Place and reach
+## Visuelle Semantik der Erdoberfläche
 
-- exact, approximate or hidden location mode;
-- public location label;
-- service area or geographic reach;
-- online availability;
-- coordinates only when publication is appropriate.
+Jede visuelle Eigenschaft trägt genau eine Hauptaussage.
 
-### Trust
+```text
+Farbton     = Commons-Art
+Intensität  = belegter Umfang oder belegte Dichte
+Geometrie   = räumliche Form und Genauigkeit
+Textur      = Datenabdeckung oder Unsicherheit
+```
 
-- provenance sources;
-- curator and review date;
-- catalog state;
-- correction history or audit reference;
-- explicit uncertainty notes.
+### Farbton
 
-### Relationships
+Es gibt wenige stabile Hauptfamilien. Die endgültige Taxonomie wird erst anhand realer Commons festgelegt. Sie muss unter anderem Natur/Land, Wissen/Daten, Werkzeuge/Produktion sowie Fürsorge/Versorgung unterscheidbar machen.
 
-- part of;
-- operated by;
-- local chapter of;
-- depends on;
-- related or similar Commons.
+Farbe ist nie der einzige Bedeutungsträger. Legende, Beschriftung, Muster und zugängliche Textalternative führen dieselbe Information.
 
-Relationships remain descriptive until a real need justifies a graph interface.
+### Intensität
 
-### Derived presentation, not source data
+Intensität bezeichnet nur eine klar definierte aggregierte Größe. Sie darf nicht zugleich Beliebtheit, moralische Qualität und Projektzahl suggerieren.
 
-These fields should be derived by the presentation layer where possible rather than authored into every entry:
+Jede Ansicht muss offenlegen, ob die Intensität auf:
 
-- map versus list projection;
-- visual marker appearance;
-- profile focus behavior;
-- search document shape;
-- optional mixed-node representation.
+- Zahl verifizierter Commons;
+- räumlichem Umfang;
+- Aktivität;
+- oder einer anderen belegten Größe
 
-## Inclusion and quality model
+beruht.
 
-Commonworld should maximize useful coverage without lowering trust. It therefore needs separate eligibility, verification and editorial prominence.
+### Geometrie
 
-### Eligibility gate
+- scharfer Marker: veröffentlichter konkreter Anker;
+- klar begrenzte Fläche: belegte öffentliche Geometrie;
+- diffuse Zone: absichtlich ungefähre Lage;
+- Faden: belegte Beziehung zwischen bekannten Endpunkten;
+- kein Geometrieobjekt: Ort verborgen oder nicht sinnvoll.
 
-A record is eligible when:
+### Datenlücken
 
-- a shared resource, infrastructure, knowledge base, space or capability genuinely exists;
-- collective stewardship, open contribution, shared governance or public-use rights are materially present;
-- the project is not merely a conventional vendor directory entry;
-- at least one reliable public source supports identity and purpose;
-- publication does not violate location or participant privacy.
+Eine dunkle Region bedeutet nicht automatisch, dass dort keine Commons existieren. Die Oberfläche unterscheidet mindestens:
 
-### Catalog states
+- belegte geringe Dichte;
+- fehlende oder unzureichende Daten;
+- absichtlich verborgene Lage.
 
-- `candidate`: plausible, not public in the main catalog;
-- `listed`: public identity and basic usefulness verified from at least one strong source;
-- `verified`: identity, activity, access and stewardship checked from multiple sources or directly confirmed;
-- `featured`: verified and selected editorially for clarity, usefulness, diversity or exemplary practice;
-- `stale`: public record needs refresh and is visibly marked or temporarily suppressed;
-- `archived`: retained for continuity but no longer presented as active.
+Diese Unterscheidung ist Teil der Hauptvisualisierung, nicht nur einer Fußnote.
 
-Synthetic fixtures remain test data outside the public catalog.
+## Digitale Commons-Sphäre
 
-### No universal Commons score
+Die digitale Commons-Sphäre umgibt die Erde in der Totalen. Sie integriert Commons ohne sinnvollen geografischen Mittelpunkt in dieselbe Oberfläche.
 
-Commonworld must not compress quality into one opaque number. Quality is shown through separate evidence:
+### Zweck
 
-- verification state;
-- freshness;
-- source quality;
-- profile completeness;
-- access clarity;
-- editorial feature label.
+Sie steht für:
 
-Search relevance is not moral rank, and editorial featuring is not a claim that one Commons is universally better than another.
+- vollständig digitale Commons;
+- weltweit zugängliche Commons;
+- verteilte Netzwerke;
+- Commons mit verborgener Lage;
+- hybride Commons mit digitalem Anteil.
 
-## Catalog growth strategy
+Digitale Commons erhalten keine erfundenen Koordinaten.
 
-### Golden set
+### Erscheinung
 
-The first catalog-scale milestone is a deliberately balanced set of 30 to 50 real Commons. It follows the smaller playable vertical slice rather than delaying experience validation until the full set exists.
+- Die Sphäre liegt räumlich außerhalb der Erde.
+- Zeichen sind am äußeren Rand deutlicher und blenden zur Blickmitte hin aus, damit die Erde lesbar bleibt.
+- Sie bewegt sich höchstens sehr langsam und stoppt bei Interaktion, Fokus, unsichtbarer Seite und reduzierter Bewegung.
+- Die ganze Sphäre ist als Ebene auswählbar.
+- Einzelne Zeichen sind nur dann Zahlen, wenn sie tatsächlich eine definierte Zahl ausdrücken. Andernfalls werden abstrakte digitale Zeichen, kurze Namen oder Symbole verwendet.
 
-The set should cover:
+### Eigener semantischer Zoom
 
-- local and digital Commons;
-- small and large projects;
-- established and emerging forms;
-- several countries and languages;
-- knowledge, software, data, repair, food, land, culture, care and shared infrastructure;
-- multiple participation modes.
+```text
+digitale Gesamtsphäre
+→ thematische Felder und Netzwerke
+→ kleinere Zusammenhänge
+→ einzelne digitale Commons
+```
 
-Every golden-set entry must be human-reviewed and complete enough to make a useful decision.
+Die Erde bleibt dabei als ruhiger Bezug sichtbar. Es wird keine getrennte digitale Nebenanwendung geöffnet.
 
-### Source portfolio
+## Hybride Commons
 
-Growth should combine:
+Ein hybrides Commons besitzt eine Identität, nicht zwei doppelte Einträge.
 
-1. official project websites;
-2. public registries and movement directories;
-3. partner-provided feeds with clear licensing and stewardship;
-4. manual editorial discovery;
-5. visitor suggestions routed into review, never directly published.
+Es kann haben:
 
-Imports create candidates, not catalog truth.
+- einen oder mehrere geografische Anker;
+- einen digitalen Anteil in der Sphäre;
+- einen belegten Faden zwischen diesen Darstellungen.
 
-### Refresh cycle
+Beim Fokus werden alle zugehörigen Darstellungen gemeinsam hervorgehoben. Ein Faden erscheint nur bei sachlich dokumentierter Beziehung.
 
-Each public record receives a next-review date based on volatility:
+## Suche
 
-- active local services: frequent review;
-- stable digital infrastructure: slower review;
-- event-based or seasonal Commons: date-aware review;
-- unreachable or contradictory sources: immediate downgrade to stale.
+Die Suche ist jederzeit über die Lupe erreichbar und öffnet eine kompakte Ebene über der unveränderten Welt.
 
-## Technical delivery model
+Sie findet:
 
-### Static-generated first
+- Commons;
+- Orte und Regionen;
+- Themen;
+- Tätigkeiten und Nutzungsmöglichkeiten.
 
-The next public product should still be generated from versioned accepted content. This keeps hosting simple, pages fast and catalog changes reviewable.
+Ein Ergebnis führt je nach Typ:
 
-A real API, database or search service is justified only when static generation fails a measured need such as:
+- zu einem Commons-Fokus;
+- zu einer geografischen Kameraposition;
+- zu einem hervorgehobenen Themenfeld;
+- oder zur digitalen Sphäre.
 
-- build duration;
-- catalog volume;
-- freshness latency;
-- editorial workflow;
-- partner synchronization;
-- search quality.
+Die Suche besitzt eine lineare Ergebnisliste und darf die Welt nicht durch eine separate Suchanwendung ersetzen.
 
-### Experience and performance budget
+## Filter
 
-- the first interaction receives visible acknowledgement in the next rendered frame;
-- ordinary exploration introduces no long task above 50 ms on the reference mobile device;
-- spatial motion is designed for a 60 Hz frame budget and checked for dropped frames;
-- no map library or tile request occurs before the visitor opens Near;
-- no per-frame JavaScript rewriting of gradients or catalog markers;
-- no continuous scene animation while the world is idle;
-- images are responsive, rights-documented and decoded without blocking first interaction;
-- World and project summaries remain understandable without JavaScript where practical;
-- rapid open, close, reopen, interrupted motion and lens changes are browser-tested;
-- reduced-motion mode replaces spatial travel with immediate, clear state changes;
-- performance measurements use real project images and realistic catalog density, not only fixtures.
+Filter beantworten menschliche Fragen:
 
-The detailed rules live in `docs/blueprints/commonworld-experience-doctrine.md`.
+- Welche Art von Commons interessiert mich?
+- Was möchte ich tun?
+- Suche ich vor Ort, online oder beides?
+- Welche Sprache, Zugangsform oder Aktualität brauche ich?
 
-### Language strategy
+Filter verändern die sichtbare Welt unmittelbar, ohne ungefragten Kamerasprung. Nicht passende Objekte treten zurück; aktive Filter bleiben klar sichtbar und mit einer Handlung zurücksetzbar.
 
-The interface starts bilingual in German and English, with a clear fallback strategy. Project records declare content language and available official languages. Machine translation must be marked and must not replace the original source text silently.
+## Fokuspanel
 
-### Accessibility
+Das Fokuspanel zeigt zuerst Nutzen, dann Vertrauen.
 
-- keyboard-complete navigation;
-- visible focus;
-- semantic headings and landmarks;
-- text alternatives for images and non-text visualizations;
-- no color-only meaning;
-- reduced-motion support;
-- readable plain language before specialist terms.
+Reihenfolge:
 
-## Delivery phases
+1. Name und klarer Ein-Satz-Überblick;
+2. was gemeinsam getragen, genutzt oder geschaffen wird;
+3. mögliche Handlungen wie besuchen, nutzen, lernen oder beitragen;
+4. Ort, Reichweite oder Online-Verfügbarkeit;
+5. Bedingungen, Zeiten, Kosten und Voraussetzungen;
+6. Trägerschaft und Governance;
+7. Aktualität, Quellen und Unsicherheit;
+8. offizielle Weiterleitung oder klarer Übergang zu Weltgewebe.
 
-### Phase A: Product and experience reset
+Auf kleinen Bildschirmen ist es ein von unten öffnendes Panel oder eine vollständige Fokusansicht. Auf großen Bildschirmen liegt es seitlich. Es gibt immer genau einen Fokus und genau eine eindeutige Schließen-/Zurückhandlung.
 
-Goal: stop presenting the workshop as the product and make the intended feeling explicit.
+## Orientierung und Rückkehr
 
-Deliverables:
+Notwendig sind:
 
-- adopt this v2.1 plan and the immersive experience doctrine;
-- define a short public Commons eligibility statement;
-- move proof and fixture language out of the root experience;
-- establish `/lab/` or repository-only ownership for existing proofs;
-- define the 8–12-entry vertical-slice portfolio and the later 30–50-entry golden-set brief;
-- freeze API, ranking and visualization work that does not unblock the real-content experience.
+- eine anklickbare Ortslinie wie `Erde › Europa › Deutschland › Hamburg`;
+- Zoom-Schaltflächen zusätzlich zu Gesten;
+- ein Globus-Reset zur Erdtotale;
+- Browser-Zurück und -Vorwärts;
+- stabile Deep Links für Regionen, Filter und Commons;
+- vollständige Wiederherstellung des vorherigen Zustands nach Fokus oder Suche.
 
-Exit gate:
+Der Globus dreht sich nicht dauerhaft automatisch.
 
-- World, Near, Find and Focus form one approved mental model;
-- fixtures cannot appear as public projects;
-- game feel and anti-gamification rules are explicit;
-- the next queue is real-content and experience-led.
+## Lineare Parallelansicht
 
-### Phase B: Playable real-content vertical slice
+Der Globus ist die Hauptansicht, aber nie der einzige Zugang.
 
-Goal: prove clarity, attractiveness and fluidity before scaling content or architecture.
+Die lineare Ansicht verwendet dieselben Filter und dieselbe Ergebnismenge. Sie ermöglicht:
 
-Deliverables:
+- vollständige Tastaturbedienung;
+- Screenreader-Navigation;
+- Nutzung ohne 3D-Beschleunigung;
+- direkte Projektlinks;
+- Suchmaschinenzugriff;
+- Nutzung auf schwachen Geräten oder bei eingeschränkter Bewegung.
 
-- CommonProject v3 draft;
-- 8–12 real reviewed Commons spanning local, digital and hybrid forms;
-- one persistent World shell;
-- one curated path;
-- Find;
-- lazy-loaded Near;
-- project Focus with preserved return state;
-- real images, continuation links and bilingual sample content;
-- reduced-motion and mobile/desktop browser coverage.
+Die lineare Ansicht ist kein zweites Produkt und keine abweichende Datenwahrheit.
 
-Exit gate:
+## Bewegung und Flüssigkeit
 
-- a first-time visitor understands the site within five seconds;
-- open, close, reopen and lens changes remain correct under rapid input;
-- the reference mobile device sustains fluid interaction with no idle animation load;
-- no proof or fixture language appears in the visitor path;
-- at least five moderated visitors find and open a relevant Commons without instruction.
+Bewegung dient nur:
 
-### Phase C: Golden world and showcase alpha
+1. der Bestätigung einer Eingabe;
+2. der Orientierung zwischen Maßstabsebenen;
+3. dem Zusammenhang zwischen Objekt und Fokus.
 
-Goal: generalize the proven interaction model into a balanced public world.
+Regeln:
 
-Deliverables:
+- Eingaben erhalten im nächsten gerenderten Frame eine sichtbare Reaktion.
+- Kamerafahrten sind kurz, unterbrechbar und stoppen bei neuer Eingabe.
+- Im Ruhezustand läuft keine rechenintensive Daueranimation.
+- Keine per Frame neu berechneten Farbverläufe oder Tausende DOM-Marker.
+- Keine großflächigen dauerhaft animierten Blur- oder Filterflächen.
+- Reduzierte Bewegung erhält dieselben Zustände ohne räumliche Reise.
+- Unsichtbare Tabs pausieren Rendering und Netzwerkaktivität soweit möglich.
 
-- 30 to 50 real reviewed entries;
-- five curated paths;
-- balanced category, geography, language and action coverage;
-- complete project profiles with verified links, freshness and image rights;
-- public method surface;
-- production-ready World, Near, Find and Focus;
-- German and English interface foundation.
+## Rendering- und Datenstrategie
 
-Exit gate:
+Die Technik folgt dem Plan und wird nicht vorab zum Produkt erklärt.
 
-- zero fixture entries in the public catalog;
-- every public entry answers the ten profile questions;
-- at least 80 percent of entries reach `verified` state;
-- users can freely leave and re-enter paths without losing context;
-- the core world remains clear and fluid at golden-set density.
+### Rendering
 
-### Phase D: Public beta and growth
+Vor der Engine-Entscheidung wird ein begrenzter Technikvergleich durchgeführt. Er misst mindestens:
 
-Goal: expand coverage without losing trust.
+- flüssige Rotation und semantischen Zoom;
+- Layer für Dichte, Flächen, Fäden, Marker und digitale Sphäre;
+- mobile Leistung;
+- Barrierefreiheits- und lineare Fallbackmöglichkeiten;
+- Deep Links und Zustandswiederherstellung;
+- Anbieter- und Infrastrukturabhängigkeit.
 
-Deliverables:
+Eine 3D- oder WebGL-Technik ist für den Globus wahrscheinlich, aber nicht allein wegen visueller Wirkung gesetzt. Die einfachste tragfähige Lösung gewinnt.
 
-- 150 to 300 real entries;
-- suggestion-to-candidate path owned by a review surface;
-- stale-record detection;
-- correction path for stewards and visitors;
-- improved search based on observed queries;
-- related Commons and collection recommendations;
-- public catalog health indicators.
+### Aggregation
 
-Exit gate:
+Die ferne Ansicht lädt keine Einzelobjektmenge. Daten werden maßstabsabhängig geliefert:
 
-- no unreviewed suggestion reaches publication;
-- freshness target is met;
-- search no-result and abandonment rates are measured;
-- catalog balance is reviewed rather than assumed.
+```text
+planetar       → aggregierte Felder
+Großregion     → regionale Aggregate
+Region         → Cluster, Flächen und Netzwerke
+lokal          → konkrete öffentliche Geometrien und Marker
+Fokus          → vollständiger Datensatz
+```
 
-### Phase E: Federated scale
+### Datenwahrheit
 
-Goal: reach broad coverage through trustworthy partners and reusable public data.
+- Visualisierung wird aus Katalogdaten abgeleitet.
+- Darstellungskoordinaten, Farben und Zoomzustände sind keine redaktionell gepflegte Parallelwahrheit.
+- Jede öffentliche Behauptung besitzt Provenienz und Aktualität.
+- Imports erzeugen Kandidaten, niemals automatische Veröffentlichung.
+- Fehlende Daten werden nicht als fehlende Commons ausgegeben.
 
-Deliverables:
+## CommonProject-Kern
 
-- partner import adapters that create candidates;
-- deduplication and identity matching;
-- clear data and content licensing;
-- read-only public export or API when consumers exist;
-- thousands of entries only after review capacity and freshness controls scale with them.
+Der öffentliche Datensatz muss mindestens abbilden:
 
-Exit gate:
+- stabile Identität;
+- Titel und verständliche Kurzbeschreibung;
+- Art: geografisch, digital oder hybrid;
+- Themen und mögliche Handlungen;
+- geografische Präsenz mit exakter, ungefährer, verborgener oder nicht anwendbarer Lage;
+- digitale Reichweite;
+- belegte Beziehungen;
+- öffentliche Links;
+- Quellen, Aktualität und Prüfzustand;
+- optionalen expliziten Weltgewebe-Übergang.
 
-- ingestion volume cannot outrun human or accountable partner verification;
-- failures degrade to stale or candidate states, never silent publication;
-- commonworld remains a coherent product rather than a raw aggregator.
+Nicht zum redaktionellen Kern gehören:
 
-### Phase F: Weltgewebe continuation
+- UI-Projektionen;
+- manuell gepflegte Zoomstufen;
+- scheinpräzise Aspektgewichte;
+- Kartenmarker-Stile;
+- Animationsparameter;
+- Suchindexformen.
 
-Goal: connect discovery to collective action without merging authority boundaries.
+## Qualitäts- und Publikationszustände
 
-Deliverables:
+- `candidate`: geprüft werden, nicht im Hauptkatalog;
+- `listed`: Identität und Grundnutzen belegt;
+- `verified`: Aktivität, Zugang und Trägerschaft ausreichend geprüft;
+- `featured`: verifiziert und redaktionell hervorgehoben;
+- `stale`: Aktualität unzureichend;
+- `archived`: nicht als aktiv dargestellt.
 
-- explicit handoff for Commons represented in weltgewebe;
-- suggestion, claiming and stewardship workflows owned by weltgewebe;
-- preserved return path to the public profile;
-- no implicit cross-system permissions.
+Es gibt keinen universellen Commons-Score und keine moralische Rangliste.
 
-Exit gate:
+## Kanonische Umsetzungsfolge
 
-- every write action has one clear owner;
-- commonworld remains safely browseable without an account;
-- users understand when they leave discovery and enter participation.
+### Phase 0 — Repository-Neuausrichtung
 
-## Immediate work queue
+- diesen Plan als einzige Produktwahrheit setzen;
+- alte Proofs, konkurrierende Doktrinen, generierte Beispielprodukte und vorzeitige API-/Sucharchitektur entfernen;
+- öffentliche Proof-Seite durch einen ehrlichen, plan-konformen Platzhalter ersetzen;
+- CI auf den verbleibenden Kern reduzieren.
 
-The next implementation sequence is:
+### Phase 1 — Daten- und Renderingvertrag
 
-1. Adopt and validate the immersive experience doctrine.
-2. Define the public Commons eligibility statement and catalog quality checklist.
-3. Draft CommonProject v3 around usefulness, access, freshness, stewardship, images and next actions.
-4. Select the 8–12-entry vertical-slice portfolio before designing the public shell.
-5. Curate those entries end to end and identify schema gaps.
-6. Prototype one continuous World -> Focus -> Return loop with real content.
-7. Add one curated path and Find inside the same shell.
-8. Add Near as a lazy-loaded lens over the same objects.
-9. Measure clarity, rapid interaction, frame behavior and reduced-motion handling on mobile and desktop.
-10. Correct the interaction model before expanding to the 30–50-entry golden set.
-11. Move current proof surfaces behind a development-lab boundary.
-12. Scale content, paths and bilingual presentation only after the vertical slice passes.
+- CommonProject v3 mit realen Anforderungen härten;
+- Aggregations- und Zoomvertrag definieren;
+- Farb-, Dichte-, Unsicherheits- und Datenabdeckungssemantik mit realen Beispielen prüfen;
+- Engine-Spike durchführen und messen;
+- einen nichtöffentlichen Testsatz für alle Geometrie- und Privatsphärenfälle anlegen.
 
-## Work explicitly paused
+### Phase 2 — Globusgrundkörper
 
-Until the Golden catalog and Showcase alpha exit gates are reached, do not prioritize:
+- rotierbare Erdtotale;
+- semantischer Zoom und Kamerarückkehr;
+- statische, klar erklärte Aggregationsfelder;
+- Suche, Filter, Ortslinie, Reset und lineare Ansicht als Grundgerüst;
+- Reduced-Motion- und Tastaturpfad.
 
-- new Aether-specific interaction work;
-- animated mixed-node ring reveals;
-- new API route fixtures;
-- new search scoring or vector search;
-- spatial databases;
-- separate commonworld accounts;
-- automatic global crawling;
-- public direct-to-catalog submissions;
-- a second curation backend beside weltgewebe;
-- decorative or experimental visualization that does not improve orientation, discovery, understanding or direct manipulation of real entries.
+### Phase 3 — Reale Vertikalprobe
 
-This pause does not prohibit purposeful motion or visual atmosphere required by the immersive experience doctrine.
+- 8–12 reale, geprüfte Commons;
+- planetare bis lokale Darstellung derselben Daten;
+- Marker, Flächen, diffuse Zonen und belegte Fäden;
+- Fokuspanel und Weiterleitungen;
+- Tests auf Mobilgerät und Desktop.
 
-## Success measures
+### Phase 4 — Digitale Sphäre und Hybridität
 
-### Catalog health
+- digitale Gesamtsphäre;
+- thematischer digitaler Zoom;
+- hybride Identität mit lokalen und digitalen Darstellungen;
+- keine erfundenen Koordinaten und keine doppelte Projektidentität.
 
-- count of real public entries;
-- share verified and fresh;
-- geographic, language and thematic balance;
-- stale and archived rate;
-- profile completeness;
-- source and image-rights completeness.
+### Phase 5 — Katalogwachstum
 
-### Visitor usefulness
+- 30–50 ausgewogene Commons;
+- redaktionelle und Partner-Kandidatenwege;
+- Aktualitätskontrolle;
+- belastbare Suche und Filter aus realem Nutzungsverhalten;
+- Skalierung erst nach gemessenen Engpässen.
 
-- time to first relevant project;
-- successful search or browse sessions;
-- no-result rate;
-- project-profile completion;
-- continuation clicks to official resources or weltgewebe;
-- return visits and collection exploration.
+### Phase 6 — Weltgewebe-Übergang
 
-### Trust
+- explizite Übergänge für bekannte Weltgewebe-Projekte;
+- kein implizites Login oder Berechtigungsversprechen;
+- klare Rückkehr zu Commonworld.
 
-- correction turnaround;
-- visible freshness;
-- source coverage;
-- privacy incidents;
-- unreviewed-publication incidents, target zero.
+## Nichtziele bis zum Nachweis eines Bedarfs
 
-### Experience, performance and access
+- kein öffentlicher Proof-Hub;
+- keine getrennte digitale Nebenanwendung;
+- keine klassische Karten-Startseite statt Globus;
+- keine Commonworld-Konten;
+- kein eigenes Administrationssystem;
+- keine direkte ungeprüfte Veröffentlichung;
+- keine vorzeitige API-, Vektorsearch- oder Spatial-Database-Architektur;
+- keine dauernd animierten Marker oder dekorativen Fäden;
+- keine manuell gepflegten Aspektprozente als Publikationspflicht;
+- keine zweite Katalogwahrheit neben dem kanonischen CommonProject-Datensatz.
 
-- five-second orientation success;
-- no-instruction open, close and return success;
-- rapid-interaction correctness;
-- dropped-frame and long-task measurements on the reference mobile device;
-- World load without map traffic;
-- preserved state across World, Near, Find and Focus;
-- browser interaction pass rate;
-- keyboard and screen-reader task success;
-- reduced-motion compliance;
-- measured page and image budgets.
+## Abnahmekriterien
 
-## North-star acceptance test
+Der erste öffentliche Globus ist erst akzeptiert, wenn:
 
-A person with no prior Commons vocabulary enters commonworld and immediately recognizes a living world of possibilities. Without instruction, they move through it, approach one real Commons, understand what is shared and what they can do, see why the record is trustworthy, reach a useful next step, and return to the same place without friction, proof terminology, synthetic fixtures or administrative complexity.
+1. die Erdtotale ohne Erklärung als globaler Commons-Einstieg verstanden wird;
+2. Rotation, Zoom, Auswahl und Rückkehr ohne Anleitung funktionieren;
+3. jede Zoomstufe eine sachlich passende Informationsdichte zeigt;
+4. Farbe, Intensität, Geometrie und Datenabdeckung eindeutig unterscheidbar sind;
+5. digitale Commons ohne falsche Kartenposition erreichbar sind;
+6. ein hybrides Commons als eine Identität erscheint;
+7. Suche und Filter den räumlichen Kontext erhalten;
+8. Fokuspanel und Deep Link denselben Datensatz zeigen;
+9. die lineare Ansicht vollständig gleichwertig bleibt;
+10. mobile Interaktion, Tastatur, Reduced Motion und schwächere Geräte tragfähig sind;
+11. keine synthetischen Fixtures als reale Commons erscheinen;
+12. Commonworld keine schreibende Zuständigkeit von Weltgewebe übernimmt.
+
+## Leitregel
+
+> Der Globus liefert den Überblick. Der Zoom liefert Genauigkeit. Die Darstellung folgt belegten Daten. Jedes Element muss Orientierung, Auswahl, Verständnis oder Weitergehen ermöglichen — sonst wird es entfernt.
