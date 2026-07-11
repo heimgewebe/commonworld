@@ -186,7 +186,8 @@ def validate_digital_sphere(root: Path = ROOT) -> list[str]:
         "layer_buttons_and_linear_identity_list_required",
         "keyboard_path_required",
         "screen_reader_path_required",
-        "unproven_screen_reader_must_be_reported_as_open_not_pass",
+        "unproven_screen_reader_must_never_be_reported_as_pass",
+        "physical_screen_reader_test_waived_by_product_owner",
         "reduced_motion_state_equivalence_required",
         "glyph_streams_aria_hidden_when_equivalent_text_exists",
     ):
@@ -194,6 +195,12 @@ def validate_digital_sphere(root: Path = ROOT) -> list[str]:
             errors.append(f"digital accessibility invariant must be true: {invariant}")
     if accessibility.get("voiceover_physical_test_currently_proven") is not False:
         errors.append("VoiceOver physical proof must remain false until actually tested")
+    if accessibility.get("physical_screen_reader_test_required_for_non_public_prototype_acceptance") is not False:
+        errors.append("physical screenreader test must remain optional for non-public prototype acceptance")
+    if accessibility.get("screen_reader_product_support_claimed") is not False:
+        errors.append("screenreader product support must not be claimed")
+    if accessibility.get("physical_screen_reader_waiver_scope") != "non_public_prototype_acceptance_only":
+        errors.append("physical screenreader waiver scope mismatch")
 
     performance = contract.get("performance_and_privacy", {})
     for invariant in (
@@ -217,7 +224,7 @@ def validate_digital_sphere(root: Path = ROOT) -> list[str]:
     if decision != {
         "engine_selected": False,
         "production_architecture_authorized": False,
-        "next_proof": "physical_v4_acceptance_then_real_data_focus_and_side_camera_proof",
+        "next_proof": "physical_android_v5_acceptance_then_real_data_focus_and_side_camera_proof",
     }:
         errors.append("digital sphere decision boundary mismatch")
 

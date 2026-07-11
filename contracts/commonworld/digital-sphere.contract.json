@@ -128,9 +128,13 @@
     "keyboard_path_required": true,
     "screen_reader_path_required": true,
     "voiceover_physical_test_currently_proven": false,
-    "unproven_screen_reader_must_be_reported_as_open_not_pass": true,
     "reduced_motion_state_equivalence_required": true,
-    "glyph_streams_aria_hidden_when_equivalent_text_exists": true
+    "glyph_streams_aria_hidden_when_equivalent_text_exists": true,
+    "unproven_screen_reader_must_never_be_reported_as_pass": true,
+    "physical_screen_reader_test_required_for_non_public_prototype_acceptance": false,
+    "physical_screen_reader_test_waived_by_product_owner": true,
+    "screen_reader_product_support_claimed": false,
+    "physical_screen_reader_waiver_scope": "non_public_prototype_acceptance_only"
   },
   "performance_and_privacy": {
     "bounded_visible_glyph_count_required": true,
@@ -147,6 +151,6 @@
   "decision_boundary": {
     "engine_selected": false,
     "production_architecture_authorized": false,
-    "next_proof": "physical_v4_acceptance_then_real_data_focus_and_side_camera_proof"
+    "next_proof": "physical_android_v5_acceptance_then_real_data_focus_and_side_camera_proof"
   }
 }

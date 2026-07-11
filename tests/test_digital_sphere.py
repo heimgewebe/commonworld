@@ -66,7 +66,10 @@ class DigitalSphereContractTests(unittest.TestCase):
     def test_voiceover_remains_unproven(self) -> None:
         accessibility = self.contract["accessibility"]
         self.assertFalse(accessibility["voiceover_physical_test_currently_proven"])
-        self.assertTrue(accessibility["unproven_screen_reader_must_be_reported_as_open_not_pass"])
+        self.assertTrue(accessibility["unproven_screen_reader_must_never_be_reported_as_pass"])
+        self.assertFalse(accessibility["physical_screen_reader_test_required_for_non_public_prototype_acceptance"])
+        self.assertTrue(accessibility["physical_screen_reader_test_waived_by_product_owner"])
+        self.assertFalse(accessibility["screen_reader_product_support_claimed"])
 
     def test_validator_rejects_catalog_layer_field(self) -> None:
         errors = self.errors_after(lambda contract: contract["catalog_boundary"].update({"manual_catalog_layer_field_forbidden": False}))
@@ -107,6 +110,18 @@ class DigitalSphereContractTests(unittest.TestCase):
     def test_validator_rejects_fake_voiceover_proof(self) -> None:
         errors = self.errors_after(lambda contract: contract["accessibility"].update({"voiceover_physical_test_currently_proven": True}))
         self.assertTrue(any("VoiceOver physical proof" in error for error in errors))
+
+    def test_validator_rejects_required_screenreader_for_prototype(self) -> None:
+        errors = self.errors_after(lambda contract: contract["accessibility"].update({"physical_screen_reader_test_required_for_non_public_prototype_acceptance": True}))
+        self.assertTrue(any("optional for non-public prototype" in error for error in errors))
+
+    def test_validator_rejects_screenreader_support_claim(self) -> None:
+        errors = self.errors_after(lambda contract: contract["accessibility"].update({"screen_reader_product_support_claimed": True}))
+        self.assertTrue(any("product support" in error for error in errors))
+
+    def test_validator_rejects_broad_screenreader_waiver(self) -> None:
+        errors = self.errors_after(lambda contract: contract["accessibility"].update({"physical_screen_reader_waiver_scope": "all_products"}))
+        self.assertTrue(any("waiver scope" in error for error in errors))
 
     def test_validator_rejects_unbounded_glyph_count(self) -> None:
         errors = self.errors_after(lambda contract: contract["performance_and_privacy"].update({"bounded_visible_glyph_count_required": False}))

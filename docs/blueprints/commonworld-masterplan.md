@@ -515,7 +515,19 @@ v4 ersetzt die vollständige 360-Grad-Drehung bei Zoom 6 durch eine kleine lokal
 
 Im gleichen Software-WebGL-Interaktionspaket stieg v4 gegenüber v3 von 21,81 auf 34,12 FPS planetar und von 21,92 auf 56,92 FPS lokal. Der Vergleich umfasst alle v4-Optimierungen einschließlich der internen Pixeldichte 1,5 statt 2 und isoliert deren Einzelanteile nicht. URL-Zustandsschreibvorgänge sanken von 183 auf 3, unveränderte SVG-Geometrieschreibvorgänge von 385 auf 0. Der installierte v4-Dienst erreichte im Drei-Lauf-Profil 47,54 FPS planetar und 56,12 FPS lokal bei null Leerlaufrendern. Diese Softwarebelege autorisieren keine Produktionsentscheidung.
 
-Als Nächstes sind drei vollständige v4-Läufe auf dem physischen Apple-WebKit-Gerät und danach auf Android Chrome erforderlich. Hintergrundtab, VoiceOver oder TalkBack, Reduced Motion, reale Katalogableitung, Fokuspanel-Parität und seitliche Kamerafahrt bleiben ebenfalls offen. Bis dahin gelten `engine_selected = false` und `production_architecture_authorized = false`.
+Der folgende physische Apple-WebKit-v4-Beleg ersetzt diese offene Apple-Prüfung. Android Chrome, reale Katalogableitung, Fokuspanel-Parität und seitliche Kamerafahrt bleiben offen. Bis zu deren Auswertung gelten `engine_selected = false` und `production_architecture_authorized = false`.
+
+### Physischer Apple-WebKit-v4-Beleg und Abnahmepaket v5
+
+Der normalisierte physische Beleg liegt in `docs/research/physical-device-acceptance-v4-apple.result.json`; der Rohbeleg bleibt unverändert außerhalb des Repositories. Drei v4-Messläufe erreichten im Median 50,48 Bilder pro Sekunde planetar und 50,93 Bilder pro Sekunde lokal. Das 30-FPS-Gate, die geschichtete digitale Sphäre, dieselbe Auswahl, die visuellen Semantiken und ein 32,608 Sekunden langer Hintergrundrundlauf sind bestanden. Im Leerlauffenster entstanden weder Karten- noch Sphären- oder URL-Zustandsaktivitäten.
+
+Der Rohbeleg blieb formal unvollständig, weil Screenreader und Reduced Motion im damaligen Formular nicht abgeschlossen wurden. Reduced Motion war beim Start und Abschluss systemweit aktiv; der Nutzer bestätigte anschließend ausdrücklich, dass die animationsfreie Bedienung funktioniert. Die normalisierte Wertung akzeptiert diesen Punkt mit offengelegter Maschinenlücke, ohne einen fehlenden Zeitwert nachträglich zu erfinden.
+
+Ein physischer Screenreader-Test ist nach Produktentscheidung für diese nichtöffentliche Prototypabnahme kein Freigabekriterium. Dieser Verzicht ist kein Screenreader-PASS und keine Behauptung produktionsreifer VoiceOver-, TalkBack- oder allgemeiner Screenreader-Unterstützung. Semantische Bedienelemente, Tastaturpfad, lineare Textalternative und identische Commons-Identität bleiben verpflichtend.
+
+Abnahmepaket v5 bildet diese Entscheidung maschinenlesbar ab: sieben manuelle Punkte bleiben Pflicht, der Screenreader-Punkt ist optional und als `Entfällt` vorbelegt. Beim Bestätigen von Reduced Motion löst v5 selbst eine Sofortbewegung aus und speichert künftig den Maschinenwert `0 ms`. Der installierte v5-Dienst ist an das Manifest `3e4eb9b92e21357a87368a674609e5b49199fad6ed75963bbfad1aa20a8280f5` gebunden.
+
+Als nächster physischer Gegencheck bleibt Android Chrome offen. Danach folgen reale Schichtableitung, Lesbarkeit echter Commons-Namen, vollständige Fokuspanel-Parität und die räumliche seitliche Kamerafahrt. Bis dahin gelten weiterhin `engine_selected = false` und `production_architecture_authorized = false`.
 
 ### Aggregation
 
