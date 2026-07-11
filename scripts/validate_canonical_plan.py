@@ -28,6 +28,9 @@ REQUIRED_PLAN_TOKENS = (
     "### Begrenzter MapLibre-Phase-2-Globusbeweis",
     "### Virtualisierte Parallelansicht und Geräte-Abnahmepaket",
     "### Erster physischer Gerätefund und Abnahmepaket v2",
+    "### Geschichtete digitale Sphäre v1 und Abnahmepaket v3",
+    "### Vorläufige Darstellungsschichten",
+    "### Dieselbe Auswahl in allen Ansichten",
     "## Digitale Commons-Sphäre",
     "Digitale Commons erhalten keine erfundenen Koordinaten.",
     "## Hybride Commons",
@@ -80,12 +83,14 @@ EXPECTED_RESEARCH_FILES = {
     "device-acceptance-pack-v1.result.json",
     "device-acceptance-rerun-v2.md",
     "device-acceptance-rerun-v2.result.json",
+    "layered-digital-sphere-v1.md",
+    "layered-digital-sphere-v1.result.json",
     "maplibre-phase2-globe-proof.md",
     "maplibre-phase2-globe-proof.result.json",
     "renderer-engine-spike.md",
     "renderer-engine-spike.result.json",
 }
-EXPECTED_CONTRACT_FILES = {"aggregation-zoom.contract.json", "project.schema.json", "visual-semantics.contract.json"}
+EXPECTED_CONTRACT_FILES = {"aggregation-zoom.contract.json", "digital-sphere.contract.json", "project.schema.json", "visual-semantics.contract.json"}
 EXPECTED_SCRIPT_FILES = {
     "__init__.py",
     "check_pages_dns_target.py",
@@ -97,6 +102,8 @@ EXPECTED_SCRIPT_FILES = {
     "validate_maplibre_phase2_proof.py",
     "validate_device_acceptance_pack.py",
     "validate_device_acceptance_rerun.py",
+    "validate_digital_sphere.py",
+    "validate_layered_digital_sphere_proof.py",
     "validate_semantic_zoom.py",
     "validate_visual_semantics.py",
 }
@@ -110,6 +117,8 @@ EXPECTED_TEST_FILES = {
     "test_maplibre_phase2_proof.py",
     "test_device_acceptance_pack.py",
     "test_device_acceptance_rerun.py",
+    "test_digital_sphere.py",
+    "test_layered_digital_sphere_proof.py",
     "test_semantic_zoom.py",
     "test_visual_semantics.py",
 }

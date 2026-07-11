@@ -1,0 +1,151 @@
+{
+  "schema_version": 1,
+  "kind": "commonworld_layered_digital_sphere_proof_v1",
+  "status": "non_public_prototype_installed_physical_acceptance_pending",
+  "proved_at": "2026-07-11",
+  "repository_base_commit": "c32156148e846e33009905affa29f00a465daf0e",
+  "source_input": {
+    "kind": "incomplete_physical_receipt_used_as_design_input",
+    "automatic_performance_runs": 0,
+    "shared_selection": "not_run",
+    "voiceover_or_talkback": "not_run",
+    "background_roundtrip": "pass_with_33305ms_evidence",
+    "reduced_motion": "pass_with_active_preference_and_zero_duration_move",
+    "acceptance_claimed": false,
+    "raw_receipt_in_repository": false,
+    "raw_receipt_sha256_available_to_operator": false
+  },
+  "canonical_contract": {
+    "path": "contracts/commonworld/digital-sphere.contract.json",
+    "layer_count": 6,
+    "layers": [
+      "knowledge_data",
+      "software_infrastructure",
+      "media_culture",
+      "learning_education",
+      "communication_networks",
+      "mixed_other"
+    ],
+    "layer_membership": "derived_presentation_not_catalog_truth",
+    "primary_geometry": "layered_glyph_paths_around_globe",
+    "glyph_cycle": [
+      "short_common_name_fragment",
+      "binary_fragment_derived_from_stable_identity"
+    ],
+    "binary_meaning": "deterministic_visual_encoding_not_payload_or_quality",
+    "invented_coordinates": false,
+    "persistent_render_path_coordinates": false
+  },
+  "prototype": {
+    "public_surface_changed": false,
+    "synthetic_data_only": true,
+    "renderer": "maplibre_globe_plus_svg_glyph_path_overlay",
+    "point_cloud_primary": false,
+    "canvas_count": 1,
+    "svg_text_paths": 6,
+    "all_synthetic_layers_nonempty": true,
+    "same_identity_ids": true,
+    "geographic_coordinates_for_digital_layer": false,
+    "telemetry": false
+  },
+  "globe_behavior": {
+    "earth_radius_px": 182.9080932901216,
+    "inner_shell_ratio": 1.2,
+    "inner_shell_radius_px": 219.48971194814592,
+    "outer_shell_ratio": 1.42,
+    "outer_shell_radius_px": 259.72949247197266,
+    "center_fade": true,
+    "complete_enclosure_at_zoom": 1.35,
+    "full_visibility_through_zoom": 1.8,
+    "half_visibility_at_zoom": 2.2,
+    "hidden_from_zoom": 2.6,
+    "measured_hidden_at_zoom": 3.0,
+    "monotonic_fade": true
+  },
+  "interaction": {
+    "sphere_edge_annulus_opens_side_view": true,
+    "side_view_layer_bands": 6,
+    "all_side_view_bands_nonempty": true,
+    "deep_link_query": "digital=layers",
+    "browser_history_supported": true,
+    "return_to_globe_supported": true,
+    "reduced_motion_transition": "instant_state_change",
+    "side_on_camera_transition_proven": false
+  },
+  "selection_parity": {
+    "plain_definition": "same CommonProject ID, name and focus across views",
+    "selected_id": "common-00002",
+    "side_view_selected_id": "common-00002",
+    "linear_view_selected_id": "common-00002",
+    "selection_label": "Proof identity 2",
+    "automated_identity_and_label_pass": true,
+    "focus_panel_present_in_prototype": false,
+    "full_selection_parity_pass": false,
+    "physical_user_tested": false
+  },
+  "accessibility": {
+    "decorative_glyph_streams_aria_hidden": true,
+    "sphere_edge_accessible_name": "Digitale Commons-Schichten öffnen",
+    "side_layer_buttons_present": true,
+    "linear_equivalent_present": true,
+    "keyboard_automated_path_pass": true,
+    "accessibility_tree_pass": true,
+    "voiceover_physical_tested": false,
+    "talkback_physical_tested": false
+  },
+  "measurements": {
+    "software_webgl_relative_only": true,
+    "small_profile": {
+      "viewport": "default_headless_800x600_dpr1",
+      "runs": 3,
+      "planet_median_fps": 47.48338081581823,
+      "local_median_fps": 60.01500375093773,
+      "planet_max_p95_frame_ms": 23.400000035762787,
+      "local_max_p95_frame_ms": 17.19999998807907
+    },
+    "large_profile": {
+      "viewport": "1180x701_dpr2",
+      "runs": 3,
+      "planet_median_fps": 22.364276795248824,
+      "local_median_fps": 27.247956403269754,
+      "planet_max_p95_frame_ms": 49.59999996423721,
+      "local_max_p95_frame_ms": 40.0
+    },
+    "large_profile_optimization_required": true,
+    "physical_device_fps_claimed": false
+  },
+  "installed_service": {
+    "release_manifest_sha256": "a9f850c98dcf7b845cf7c7e17a1d7273a68393783aa0b70d280b214588b1fe6c",
+    "acceptance_version": 3,
+    "receipt_schema_version": 3,
+    "active_at_check": true,
+    "restart_count_at_check": 0,
+    "tailnet_only": true,
+    "private_endpoint_published_in_repository": false,
+    "continuous_health_not_claimed": true
+  },
+  "open_gates": {
+    "physical_apple_webkit_rerun": true,
+    "physical_android_chrome_run": true,
+    "voiceover_or_talkback": true,
+    "large_profile_performance_optimization": true,
+    "real_catalog_layer_derivation": true,
+    "real_name_density_and_legibility": true,
+    "focus_panel_selection_parity": true,
+    "side_on_camera_transition": true
+  },
+  "decision": {
+    "engine_selected": false,
+    "production_architecture_authorized": false,
+    "next_action": "physically_review_layered_v3_then_optimize_large_profile_and_validate_real_derivation"
+  },
+  "evidence_artifacts": {
+    "archive_sha256": "8204e0007e52276cd30b5f323f56ca74b770da46665d1331fd3701d012f1f3e6",
+    "installed_proof_sha256": "c8b8e7fd6bba758fb9c4911bd9c67c7eb3485b5b5c46ae291e95e661eb18bdcd",
+    "overview_screenshot_sha256": "9f858abc64fb6a5052ba3f3ac6ab20c8de8f41e301d871584ed899d48f8050cd",
+    "side_view_screenshot_sha256": "6037f8c8287dd9808a8d006139e4783e8682b9eeb2d6a24947d58ba6edecc6ad",
+    "archive_manifest_sha256": "eb22906f6574b82199c69fa559b0099f07e63457ac40ffdb037adfb7887e0cab",
+    "design_input_review_sha256": "4fac1c316de32a2090a4f5b7ea7a16f36d4859d5ce3d4e17de0865d793189daa",
+    "role": "local_non_product_research_archive"
+  }
+}
