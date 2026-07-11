@@ -112,6 +112,22 @@ class DigitalSphereContractTests(unittest.TestCase):
         errors = self.errors_after(lambda contract: contract["performance_and_privacy"].update({"bounded_visible_glyph_count_required": False}))
         self.assertTrue(any("performance/privacy invariant" in error for error in errors))
 
+    def test_validator_rejects_repeated_unchanged_geometry(self) -> None:
+        errors = self.errors_after(lambda contract: contract["performance_and_privacy"].update({"unchanged_glyph_geometry_must_not_be_rewritten": False}))
+        self.assertTrue(any("performance/privacy invariant" in error for error in errors))
+
+    def test_validator_rejects_uncoalesced_state_writes(self) -> None:
+        errors = self.errors_after(lambda contract: contract["performance_and_privacy"].update({"navigation_state_writes_must_be_coalesced": False}))
+        self.assertTrue(any("performance/privacy invariant" in error for error in errors))
+
+    def test_validator_rejects_idle_overlay_rendering(self) -> None:
+        errors = self.errors_after(lambda contract: contract["performance_and_privacy"].update({"settled_idle_overlay_render_delta_max": 1}))
+        self.assertTrue(any("idle overlay-render bound" in error for error in errors))
+
+    def test_validator_rejects_unbound_benchmark(self) -> None:
+        errors = self.errors_after(lambda contract: contract["performance_and_privacy"].update({"benchmark_requires_browser_frame_alignment_and_map_render_confirmation": False}))
+        self.assertTrue(any("performance/privacy invariant" in error for error in errors))
+
     def test_validator_rejects_engine_selection(self) -> None:
         errors = self.errors_after(lambda contract: contract["decision_boundary"].update({"engine_selected": True}))
         self.assertTrue(any("decision boundary" in error for error in errors))

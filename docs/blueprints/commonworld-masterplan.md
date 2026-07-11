@@ -505,7 +505,17 @@ Der maschinenlesbare Präsentationsvertrag liegt in `contracts/commonworld/digit
 
 Der nichtöffentliche v3-Prototyp ersetzt die bisherige Punktwolke durch sechs SVG-Bahnen aus Namens- und Binärfragmenten über dem MapLibre-Globus. Die Bahnen blenden zur Mitte aus, umschließen die Erde in der Totalen, sind bei Zoom 2,2 ungefähr halb sichtbar und ab Zoom 2,6 verborgen. Ein Klick auf die ringförmige Randzone öffnet sechs übereinanderliegende Schichten in Seitenansicht. Eine dort gewählte synthetische Commons-ID blieb in der linearen Ansicht identisch ausgewählt.
 
-Die große standardisierte Darstellung erreichte unter Software-WebGL nur rund 22 Bilder pro Sekunde in der Totalen und 27 Bilder pro Sekunde lokal. Das ist ein offener Optimierungsbefund. Ebenso offen bleiben physische Apple-WebKit- und Android-Chrome-Läufe, VoiceOver oder TalkBack, reale Katalogableitung sowie Lesbarkeit bei echten Commons-Namen. Bis dahin gelten weiterhin `engine_selected = false` und `production_architecture_authorized = false`.
+Die große standardisierte Darstellung erreichte im damaligen v3-Softwarebeweis nur rund 22 Bilder pro Sekunde in der Totalen und 27 Bilder pro Sekunde lokal. Ein späterer physischer v3-Lauf bestätigte einen realen Leistungsfehler, verwendete aber eine nicht direkt mit v4 vergleichbare Messung. Der aktuelle Nachlauf steht im folgenden Abschnitt. Physische Apple-WebKit- und Android-Chrome-Läufe, VoiceOver oder TalkBack, reale Katalogableitung sowie Lesbarkeit bei echten Commons-Namen bleiben offen.
+
+### Physischer v3-Leistungsfund und Abnahmepaket v4
+
+Der normalisierte Beleg liegt in `docs/research/device-acceptance-performance-v4.result.json`; die lesbare Auswertung liegt daneben. Der physische v3-Beleg enthält nur einen von drei Leistungsläufen. Er bestätigt 8,81 FPS in der Totalen und 4,42 FPS lokal sowie fünf manuell bestandene Punkte. Hintergrundtab, Assistenztechnik und der konkrete Reduced-Motion-Schritt blieben offen. Die hohen Renderzähler enthalten die Benchmarkarbeit selbst und beweisen keinen Dauerloop.
+
+v4 ersetzt die vollständige 360-Grad-Drehung bei Zoom 6 durch eine kleine lokale Bewegung. Jeder Messschritt beginnt auf einem Browserframe und wird erst nach einem bestätigten MapLibre-Render gezählt. Deep-Link-Schreibvorgänge werden gebündelt; identische oder lokal verborgene SVG-Bahnen werden nicht erneut geschrieben; die interne Kartenauflösung ist im nichtöffentlichen Paket auf Faktor 1,5 begrenzt. Ein 1,5-Sekunden-Leerlauffenster muss höchstens zwei Kartenrender und null Sphärenrender enthalten. Ein automatischer Leistungsfehler bleibt ein speicherbarer `fail` und kann nicht durch manuelle Häkchen verdeckt werden.
+
+Im gleichen Software-WebGL-Interaktionspaket stieg v4 gegenüber v3 von 21,81 auf 34,12 FPS planetar und von 21,92 auf 56,92 FPS lokal. Der Vergleich umfasst alle v4-Optimierungen einschließlich der internen Pixeldichte 1,5 statt 2 und isoliert deren Einzelanteile nicht. URL-Zustandsschreibvorgänge sanken von 183 auf 3, unveränderte SVG-Geometrieschreibvorgänge von 385 auf 0. Der installierte v4-Dienst erreichte im Drei-Lauf-Profil 47,54 FPS planetar und 56,12 FPS lokal bei null Leerlaufrendern. Diese Softwarebelege autorisieren keine Produktionsentscheidung.
+
+Als Nächstes sind drei vollständige v4-Läufe auf dem physischen Apple-WebKit-Gerät und danach auf Android Chrome erforderlich. Hintergrundtab, VoiceOver oder TalkBack, Reduced Motion, reale Katalogableitung, Fokuspanel-Parität und seitliche Kamerafahrt bleiben ebenfalls offen. Bis dahin gelten `engine_selected = false` und `production_architecture_authorized = false`.
 
 ### Aggregation
 

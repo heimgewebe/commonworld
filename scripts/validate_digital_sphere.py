@@ -202,15 +202,22 @@ def validate_digital_sphere(root: Path = ROOT) -> list[str]:
         "raw_member_ids_must_not_be_exposed_by_aggregate_glyph_streams",
         "hidden_location_never_encoded_in_glyph_or_path",
         "no_telemetry_required",
+        "unchanged_glyph_geometry_must_not_be_rewritten",
+        "navigation_state_writes_must_be_coalesced",
+        "benchmark_requires_browser_frame_alignment_and_map_render_confirmation",
     ):
         if performance.get(invariant) is not True:
             errors.append(f"digital performance/privacy invariant must be true: {invariant}")
+    if performance.get("settled_idle_map_render_delta_max") != 2:
+        errors.append("settled idle map-render bound must be 2")
+    if performance.get("settled_idle_overlay_render_delta_max") != 0:
+        errors.append("settled idle overlay-render bound must be 0")
 
     decision = contract.get("decision_boundary", {})
     if decision != {
         "engine_selected": False,
         "production_architecture_authorized": False,
-        "next_proof": "non_public_layered_sphere_and_side_view_prototype_then_physical_acceptance",
+        "next_proof": "physical_v4_acceptance_then_real_data_focus_and_side_camera_proof",
     }:
         errors.append("digital sphere decision boundary mismatch")
 

@@ -1,0 +1,175 @@
+{
+  "schema_version": 1,
+  "kind": "commonworld_device_acceptance_performance_v4",
+  "status": "v4_installed_physical_rerun_pending",
+  "recorded_at": "2026-07-11",
+  "repository_base_commit": "bdfde23189617a06dc1b82250f049e0d1ec7afab",
+  "physical_v3_receipt": {
+    "raw_receipt_sha256": "e7b20d1d923ed43201b5b173c4bd1f7f717a6f3fcd7bcdc9c1c4826ee07fddaf",
+    "raw_receipt_size_bytes": 4880,
+    "raw_receipt_in_repository": false,
+    "raw_receipt_mounted_to_operator_runtime": false,
+    "acceptance_version": 3,
+    "overall_verdict": "incomplete",
+    "automatic_runs_completed": 1,
+    "automatic_runs_required": 3,
+    "manual_pass": [
+      "touch_rotation_zoom",
+      "coverage_patterns",
+      "uncertainty_halo_boundary",
+      "digital_sphere",
+      "shared_selection"
+    ],
+    "manual_open": [
+      "background_roundtrip",
+      "assistive_technology",
+      "reduced_motion"
+    ],
+    "environment": {
+      "browser_family": "Apple WebKit Safari",
+      "hardware_gpu": true,
+      "viewport_width_css_px": 1180,
+      "viewport_height_css_px": 684,
+      "device_pixel_ratio": 2
+    },
+    "single_run": {
+      "planet_fps": 8.813160987074031,
+      "planet_mean_frame_ms": 113.46666666666667,
+      "local_fps": 4.422169811320755,
+      "local_mean_frame_ms": 226.13333333333333,
+      "map_render_count": 510,
+      "sphere_render_count": 509
+    },
+    "interpretation": {
+      "performance_failure_real": true,
+      "continuous_idle_rendering_proven": false,
+      "render_counts_include_benchmark_work": true,
+      "directly_comparable_to_v4_measurement": false
+    }
+  },
+  "diagnosis": {
+    "v3_local_profile": "full_360_degree_bearing_rotation_at_zoom_6",
+    "v3_timing": "generic_browser_animation_frame_not_confirmed_map_render",
+    "immediate_navigation_state_write_on_moveend": true,
+    "unchanged_svg_paths_rewritten_on_map_render": true,
+    "full_device_pixel_ratio": 2,
+    "idle_loop_found": false
+  },
+  "v4_changes": {
+    "benchmark_version": 4,
+    "planet_profile": "90_frame_90_degree_overview_bearing",
+    "local_profile": "90_frame_bounded_local_micro_pan",
+    "browser_frame_aligned": true,
+    "map_render_event_confirmed": true,
+    "navigation_state_write_debounce_ms": 140,
+    "unchanged_svg_geometry_cache": true,
+    "hidden_local_sphere_skips_path_updates": true,
+    "map_pixel_ratio_cap": 1.5,
+    "acceptance_panel_hidden_during_measurement": true,
+    "idle_observation_ms": 1500,
+    "minimum_median_fps": 30,
+    "maximum_idle_map_renders": 2,
+    "maximum_idle_overlay_renders": 0,
+    "automatic_failure_is_receipted": true
+  },
+  "same_workload_ab": {
+    "environment": "headless_chrome_software_webgl_1180x684_dpr2",
+    "single_run_frames_per_profile": 90,
+    "v3": {
+      "map_pixel_ratio": 2,
+      "planet_fps": 21.808136880348588,
+      "local_fps": 21.922346200102112,
+      "planet_p95_frame_ms": 61.69999990463293,
+      "local_p95_frame_ms": 53.399999928475154,
+      "overlay_geometry_writes": 385,
+      "navigation_state_writes": 183,
+      "idle_map_render_delta": 0,
+      "idle_overlay_render_delta": 0
+    },
+    "v4": {
+      "map_pixel_ratio": 1.5,
+      "planet_fps": 34.116755118438306,
+      "local_fps": 56.918795841811686,
+      "planet_p95_frame_ms": 39.4999999523161,
+      "local_p95_frame_ms": 18.200000047683716,
+      "overlay_geometry_writes": 0,
+      "navigation_state_writes": 3,
+      "idle_map_render_delta": 0,
+      "idle_overlay_render_delta": 0
+    },
+    "improvement": {
+      "planet_fps_ratio": 1.5644048506124826,
+      "local_fps_ratio": 2.5963824912840106,
+      "navigation_state_write_reduction_percent": 98.36065573770492,
+      "overlay_geometry_write_reduction_percent": 100.0
+    },
+    "physical_device_claimed": false
+  },
+  "v4_preparation_proof": {
+    "environment": "headless_chrome_software_webgl_1180x684_dpr2",
+    "map_pixel_ratio": 1.5,
+    "runs": 3,
+    "planet_median_fps": 48.24961126583753,
+    "local_median_fps": 56.338028089977385,
+    "planet_max_p95_frame_ms": 39.40000007152548,
+    "local_max_p95_frame_ms": 19.40000007152412,
+    "performance_gate_pass": true,
+    "idle_map_render_delta": 0,
+    "idle_overlay_render_delta": 0,
+    "idle_state_write_delta": 0,
+    "physical_device_tested": false
+  },
+  "v4_installed_proof": {
+    "release_manifest_sha256": "6516be94b78c1b432c92b0d2ec1b248bbe8d18f4ca8d2af92a8963bd96daad89",
+    "acceptance_version": 4,
+    "receipt_schema_version": 4,
+    "service_active_at_check": true,
+    "service_restart_count_at_check": 0,
+    "tailnet_only": true,
+    "private_endpoint_in_repository": false,
+    "runs": 3,
+    "planet_median_fps": 47.54358162127196,
+    "local_median_fps": 56.12372163134722,
+    "planet_max_p95_frame_ms": 38.89999997615814,
+    "local_max_p95_frame_ms": 18.700000023840403,
+    "performance_gate_pass": true,
+    "idle_map_render_delta": 0,
+    "idle_overlay_render_delta": 0,
+    "idle_state_write_delta": 0,
+    "same_identity_and_label_between_side_and_linear": true,
+    "virtual_list_total": 50000,
+    "virtual_list_maximum_rows": 15,
+    "virtual_list_theoretical_bound": 23,
+    "physical_device_tested": false,
+    "continuous_health_not_claimed": true
+  },
+  "open_gates": {
+    "physical_apple_webkit_v4_three_runs": true,
+    "physical_android_chrome_v4_three_runs": true,
+    "background_roundtrip": true,
+    "voiceover_or_talkback": true,
+    "reduced_motion_physical_action": true,
+    "real_catalog_layer_derivation": true,
+    "real_name_density_and_legibility": true,
+    "focus_panel_selection_parity": true,
+    "side_on_camera_transition": true
+  },
+  "decision": {
+    "engine_selected": false,
+    "production_architecture_authorized": false,
+    "v4_physical_rerun_required": true,
+    "next_action": "run_complete_v4_receipt_on_apple_webkit_then_android_chrome_and_review"
+  },
+  "evidence_artifacts": {
+    "archive_sha256": "a0475f929b9eba749a524f4928c8cd9a3aa115e9b7143c3de3c60d2ccbca8cce",
+    "physical_v3_review_sha256": "5c99791d100197beb23f9d3900ad6a7d2b53d2278b851fa9179452e45e5abd12",
+    "same_workload_ab_sha256": "2d96aa7d8b484c0c428d28d3633f8f804b74c7f11065d85132dd6b54595c2eeb",
+    "installed_proof_sha256": "93d854562179a93a0675e755b6c38e715e75450d411a7cfac573398bb37f78e2",
+    "preparation_proof_sha256": "2947c4de8dc3285a37b87f003cb45976f6e40a60e5312b089d006c92858db248",
+    "archive_manifest_sha256": "b497145d91d22ee130ab731aac0e5dcd8e2359dd86d49b2fd2c02e584cecaffc",
+    "overview_screenshot_sha256": "2ab1bf6c6a1fba18c7d5d4f42edf06bfe7eb6b344ff4ff0def3eeb59a4a35fff",
+    "side_view_screenshot_sha256": "9f9424c53a3cfb9d61ec765b0cea09ece16cbcef4e5fa0722b604e1c15626c1a",
+    "acceptance_screenshot_sha256": "a55729189cbf5f2dd858e66c34883e587ac7365dd6ef05d669013c095c577e4f",
+    "role": "local_non_product_research_archive"
+  }
+}

@@ -137,11 +137,16 @@
     "offscreen_or_hidden_layers_pause": true,
     "raw_member_ids_must_not_be_exposed_by_aggregate_glyph_streams": true,
     "hidden_location_never_encoded_in_glyph_or_path": true,
-    "no_telemetry_required": true
+    "no_telemetry_required": true,
+    "unchanged_glyph_geometry_must_not_be_rewritten": true,
+    "navigation_state_writes_must_be_coalesced": true,
+    "settled_idle_map_render_delta_max": 2,
+    "settled_idle_overlay_render_delta_max": 0,
+    "benchmark_requires_browser_frame_alignment_and_map_render_confirmation": true
   },
   "decision_boundary": {
     "engine_selected": false,
     "production_architecture_authorized": false,
-    "next_proof": "non_public_layered_sphere_and_side_view_prototype_then_physical_acceptance"
+    "next_proof": "physical_v4_acceptance_then_real_data_focus_and_side_camera_proof"
   }
 }
