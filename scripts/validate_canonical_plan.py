@@ -92,6 +92,10 @@ EXPECTED_TEST_FILES = {
     "test_visual_semantics.py",
 }
 EXPECTED_WORKFLOW_FILES = {"validate.yml"}
+REQUIRED_CHECK_CATALOG = {
+    "schema_version": 1,
+    "required_checks": ["contracts"],
+}
 
 
 def validate_canonical_plan(root: Path = ROOT) -> list[str]:
@@ -151,9 +155,27 @@ def validate_canonical_plan(root: Path = ROOT) -> list[str]:
     if "playwright" in requirements.casefold():
         errors.append("Playwright dependency must not remain after proof reset")
 
+    required_checks_path = root / ".github" / "grabowski-required-checks.json"
+    if not required_checks_path.is_file():
+        errors.append("missing Grabowski required-check catalog")
+    else:
+        try:
+            required_checks = json.loads(required_checks_path.read_text(encoding="utf-8"))
+        except json.JSONDecodeError as error:
+            errors.append(f"Grabowski required-check catalog is invalid JSON: {error}")
+        else:
+            if required_checks != REQUIRED_CHECK_CATALOG:
+                errors.append(
+                    "Grabowski required-check catalog must require exactly the contracts check"
+                )
+
     workflow = root / ".github" / "workflows" / "validate.yml"
-    if workflow.is_file() and "playwright" in workflow.read_text(encoding="utf-8").casefold():
-        errors.append("validation workflow must not install or run Playwright after proof reset")
+    if workflow.is_file():
+        workflow_text = workflow.read_text(encoding="utf-8")
+        if "playwright" in workflow_text.casefold():
+            errors.append("validation workflow must not install or run Playwright after proof reset")
+        if "  contracts:\n" not in workflow_text:
+            errors.append("validation workflow must expose the required contracts job")
 
     return errors
 
