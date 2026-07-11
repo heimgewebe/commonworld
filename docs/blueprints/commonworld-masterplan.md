@@ -468,6 +468,14 @@ Das nichtöffentliche Geräte-Abnahmepaket läuft als Tailnet-only-Benutzerdiens
 
 Die Vorbereitung ersetzt keine physische Abnahme. Safari und Chrome auf realer Mobilhardware, Hardware-GPU, VoiceOver oder TalkBack, echter Hintergrundtab-Rundlauf sowie Reduced Motion müssen am Gerät geprüft werden. Bis dahin bleiben `engine_selected = false` und `production_architecture_authorized = false`.
 
+### Erster physischer Gerätefund und Abnahmepaket v2
+
+Der erste physische Apple-WebKit-Lauf schließt die Geräteabnahme nicht. Der gespeicherte Beleg enthält keine der drei verpflichtenden automatischen Messungen, weist Reduced Motion als inaktiv aus und bindet den Hintergrundrundlauf nicht an ein gemessenes Zeitintervall. Seine Notiz bestätigt außerdem einen Darstellungsfehler: Die digitale Sphäre blieb bildschirmfest gleich groß, statt den Globus räumlich zu umgeben. Der Lauf gilt deshalb als abgelehnter Fehlerfund; eine Engine- oder Architekturfreigabe ist unzulässig.
+
+Abnahmepaket v2 koppelt die digitale Hülle an den projizierten Erdradius. In der Totalen beträgt ihr Radius das 1,2-Fache der Erde; beim Hineinzoomen wächst sie mit dem Globus und wird vor der Lokalansicht ausgeblendet. Der neue Belegvertrag verlangt genau drei automatische Messläufe, vollständig bearbeitete Prüfpunkte, mindestens zehn Sekunden gemessene Hintergrundzeit, aktives und animationsfrei belegtes Reduced Motion sowie eine Notiz bei jedem fehlgeschlagenen Feld. Unvollständige Läufe können nicht gespeichert werden.
+
+Ein erneuter physischer Apple-WebKit-Lauf und danach ein unabhängiger Android-Chrome-Lauf bleiben Pflicht. Bis zur Auswertung beider Belege gelten weiterhin `engine_selected = false` und `production_architecture_authorized = false`.
+
 ### Aggregation
 
 Die ferne Ansicht lädt keine Einzelobjektmenge. Daten werden maßstabsabhängig geliefert:

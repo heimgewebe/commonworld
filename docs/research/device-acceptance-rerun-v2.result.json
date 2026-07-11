@@ -1,0 +1,88 @@
+{
+  "schema_version": 1,
+  "kind": "commonworld_device_acceptance_rerun_v2",
+  "status": "first_physical_run_rejected_rerun_required",
+  "reviewed_at": "2026-07-11",
+  "repository_base_commit": "e958560c8cd6373548af4fbf97a51a90f95d6c64",
+  "scope": {
+    "public_surface_changed": false,
+    "synthetic_data_only": true,
+    "raw_receipt_in_repository": false,
+    "device_identifier_in_repository": false,
+    "private_endpoint_in_repository": false,
+    "screenshots_in_repository": false,
+    "tailnet_service_updated": true
+  },
+  "first_physical_run": {
+    "device_class": "Apple WebKit touch device with hardware WebGL2",
+    "manual_checks_marked_pass": 8,
+    "automatic_performance_runs": 0,
+    "reduced_motion_active": false,
+    "background_interval_machine_verified": false,
+    "digital_sphere_observation": "screen_fixed_size_instead_of_globe_relative_shell",
+    "manual_note_conflict": true,
+    "accepted": false,
+    "receipt_sha256": "08966f7fa788e6f4dd96735844f254d379320c5f0c864cb23ddecad18596b320"
+  },
+  "findings": [
+    {
+      "id": "three_automatic_runs_missing",
+      "severity": "blocking"
+    },
+    {
+      "id": "reduced_motion_not_active",
+      "severity": "blocking"
+    },
+    {
+      "id": "digital_sphere_screen_fixed",
+      "severity": "blocking"
+    },
+    {
+      "id": "manual_pass_conflicts_with_note",
+      "severity": "blocking"
+    },
+    {
+      "id": "background_interval_not_machine_bound",
+      "severity": "nonblocking"
+    }
+  ],
+  "remediation_v2": {
+    "release_manifest_sha256": "2378646d2755aefbf5f56ac2a3e93407ac025960a4b02042e7731d985deaaa69",
+    "supersedes_release_manifest_sha256": "4902bf3777c9700eb54da10fb16aa491b135480655bc6171ff724e460b3c3916",
+    "receipt_schema_version": 2,
+    "digital_sphere_globe_relative": true,
+    "overview_shell_ratio": 1.2,
+    "overview_earth_radius_px": 188.4158305875921,
+    "overview_shell_radius_px": 226.09899670511052,
+    "local_sphere_hidden": true,
+    "automatic_runs_required": 3,
+    "all_manual_checks_must_be_complete": true,
+    "background_minimum_hidden_ms": 10000,
+    "reduced_motion_runtime_evidence_required": true,
+    "failed_check_requires_note": true,
+    "incomplete_save_blocked": true,
+    "service_active_at_check": true,
+    "continuous_health_not_claimed": true
+  },
+  "rerun_gate": {
+    "apple_webkit_rerun_pending": true,
+    "android_chrome_independent_run_pending": true,
+    "hardware_gpu_review_pending": true,
+    "assistive_technology_review_pending": true,
+    "real_background_roundtrip_pending": true
+  },
+  "decision": {
+    "engine_selected": false,
+    "production_architecture_authorized": false,
+    "next_action": "rerun_physical_acceptance_with_v2_then_review_receipt"
+  },
+  "evidence_artifacts": {
+    "v2_archive_sha256": "068ecc3050d5900b34a1f80990ba9ce18131fd35924ced4652dd73b31a5a773c",
+    "v2_preparation_proof_sha256": "79ebd4f8de00bd9d8f97aeafea6120c5aa631cd25a0cc4e4c53b754784bbd52b",
+    "v2_installed_service_proof_sha256": "574bf5d04bfc7e9238eabf7e4f931229b5b4b48e547fff072713eaf8768474a3",
+    "first_receipt_review_sha256": "ec35a118b30e4618583a6149227217c0ad2d6bcc6cad428091521b8d6603ec5c",
+    "first_receipt_sha256": "08966f7fa788e6f4dd96735844f254d379320c5f0c864cb23ddecad18596b320",
+    "v2_manifest_sha256": "66aa23a5d700ec7d35a40436483a1e5e711cf2a011df4bd020580629adc971a9",
+    "archive_role": "local_non_product_research_archive"
+  }
+}

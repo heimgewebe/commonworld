@@ -27,6 +27,7 @@ REQUIRED_PLAN_TOKENS = (
     "### Gemessener Renderer-Engine-Spike",
     "### Begrenzter MapLibre-Phase-2-Globusbeweis",
     "### Virtualisierte Parallelansicht und Geräte-Abnahmepaket",
+    "### Erster physischer Gerätefund und Abnahmepaket v2",
     "## Digitale Commons-Sphäre",
     "Digitale Commons erhalten keine erfundenen Koordinaten.",
     "## Hybride Commons",
@@ -77,6 +78,8 @@ EXPECTED_OPS_FILES = {"pages-dns.md"}
 EXPECTED_RESEARCH_FILES = {
     "device-acceptance-pack-v1.md",
     "device-acceptance-pack-v1.result.json",
+    "device-acceptance-rerun-v2.md",
+    "device-acceptance-rerun-v2.result.json",
     "maplibre-phase2-globe-proof.md",
     "maplibre-phase2-globe-proof.result.json",
     "renderer-engine-spike.md",
@@ -93,6 +96,7 @@ EXPECTED_SCRIPT_FILES = {
     "validate_renderer_spike.py",
     "validate_maplibre_phase2_proof.py",
     "validate_device_acceptance_pack.py",
+    "validate_device_acceptance_rerun.py",
     "validate_semantic_zoom.py",
     "validate_visual_semantics.py",
 }
@@ -105,6 +109,7 @@ EXPECTED_TEST_FILES = {
     "test_renderer_spike.py",
     "test_maplibre_phase2_proof.py",
     "test_device_acceptance_pack.py",
+    "test_device_acceptance_rerun.py",
     "test_semantic_zoom.py",
     "test_visual_semantics.py",
 }
