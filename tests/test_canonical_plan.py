@@ -39,6 +39,38 @@ class CanonicalPlanTests(unittest.TestCase):
 
         self.assertTrue(any(error.startswith("active blueprint inventory mismatch") for error in errors))
 
+    def test_required_check_catalog_is_required(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp_dir:
+            root = self.copy_repository_core(tmp_dir)
+            (root / ".github" / "grabowski-required-checks.json").unlink()
+
+            errors = validate_canonical_plan(root)
+
+        self.assertIn("missing Grabowski required-check catalog", errors)
+
+    def test_required_check_catalog_must_match_workflow_job(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp_dir:
+            root = self.copy_repository_core(tmp_dir)
+            path = root / ".github" / "grabowski-required-checks.json"
+            path.write_text('{"schema_version": 1, "required_checks": ["validate"]}\n', encoding="utf-8")
+
+            errors = validate_canonical_plan(root)
+
+        self.assertIn(
+            "Grabowski required-check catalog must require exactly the contracts check",
+            errors,
+        )
+
+    def test_validation_workflow_must_keep_contracts_job(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp_dir:
+            root = self.copy_repository_core(tmp_dir)
+            path = root / ".github" / "workflows" / "validate.yml"
+            path.write_text(path.read_text(encoding="utf-8").replace("  contracts:\n", "  renamed:\n"), encoding="utf-8")
+
+            errors = validate_canonical_plan(root)
+
+        self.assertIn("validation workflow must expose the required contracts job", errors)
+
     def test_obsolete_proof_directory_is_rejected(self) -> None:
         with tempfile.TemporaryDirectory() as tmp_dir:
             root = self.copy_repository_core(tmp_dir)
