@@ -426,7 +426,26 @@
       "restored_exact": true,
       "url": "?digital=layers&focus=meta-wiki-reference",
       "selected_id": "meta-wiki-reference",
-      "focus_id": "meta-wiki-reference"
+      "focus_id": "meta-wiki-reference",
+      "restored_state_after_browser_back": {
+        "center_lng": 10.0,
+        "center_lat": 20.0,
+        "zoom": 1.35,
+        "bearing": 0.0,
+        "pitch": 0.0,
+        "padding": {
+          "top": 0,
+          "right": 0,
+          "bottom": 0,
+          "left": 0
+        },
+        "filters": [],
+        "search_query": "",
+        "selected_id": "meta-wiki-reference",
+        "focus_id": "meta-wiki-reference",
+        "digital_mode": "globe"
+      },
+      "browser_back_restored_exact": true
     },
     "reduced_motion_transition": {
       "source_state": {
@@ -501,7 +520,26 @@
       "restored_exact": true,
       "url": "?digital=layers&focus=meta-wiki-reference",
       "selected_id": "meta-wiki-reference",
-      "focus_id": "meta-wiki-reference"
+      "focus_id": "meta-wiki-reference",
+      "restored_state_after_browser_back": {
+        "center_lng": 10.0,
+        "center_lat": 20.0,
+        "zoom": 1.35,
+        "bearing": 0.0,
+        "pitch": 0.0,
+        "padding": {
+          "top": 0,
+          "right": 0,
+          "bottom": 0,
+          "left": 0
+        },
+        "filters": [],
+        "search_query": "",
+        "selected_id": "meta-wiki-reference",
+        "focus_id": "meta-wiki-reference",
+        "digital_mode": "globe"
+      },
+      "browser_back_restored_exact": true
     },
     "layer_stack_layout": {
       "spatial_relation": "beside_damped_globe",
@@ -550,7 +588,8 @@
         "reduced_motion_command": "maplibre.jumpTo",
         "reduced_motion_duration_ms": 0,
         "reduced_motion_exact_restore": true,
-        "css_only_shift": false
+        "css_only_shift": false,
+        "browser_back_exact_restore": true
       },
       "virtual_list": {
         "total_items": 50000,

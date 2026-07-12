@@ -49,7 +49,7 @@ Die geografische Auswahl ist für diesen Referenzsatz nicht anwendbar, weil alle
 
 Die Seitenansicht ist kein unabhängiger Modus. Der Beleg modelliert eine MapLibre-Kamerafahrt mit gespeichertem Ausgangszustand, `bearing`, `pitch`, `zoom` und `padding`. Der Schichtstapel liegt seitlich neben dem gedämpften Globus. Neue Eingaben unterbrechen die Fahrt.
 
-Schließen und Browser-Zurück stellen den vorherigen Zustand exakt wieder her. Bei `prefers-reduced-motion: reduce` wird dieselbe Zielwahrheit mit `maplibre.jumpTo` und `0 ms` erreicht: gleiche Auswahl, gleiche URL und gleicher Fokus.
+Schließen und Browser-Zurück werden getrennt geprüft und stellen jeweils den vorherigen Zustand exakt wieder her. Bei `prefers-reduced-motion: reduce` wird dieselbe Zielwahrheit mit `maplibre.jumpTo` und `0 ms` erreicht: gleiche Auswahl, gleiche URL und gleicher Fokus.
 
 ## Leistung und Leerlauf
 

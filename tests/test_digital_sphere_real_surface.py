@@ -173,6 +173,15 @@ class DigitalSphereRealSurfaceTests(unittest.TestCase):
         self.assertEqual(1, len({path["focus_panel_hash"] for path in paths}))
         self.assertTrue(all(path["active_focus_count"] == 1 for path in paths))
 
+    def test_validator_rejects_manual_or_unbound_layer_derivation(self) -> None:
+        errors = self.errors_after_result(
+            lambda result: result["layer_derivation"].update(
+                {"source_identity": "manual-layer", "manual_catalog_layer_field": True}
+            )
+        )
+        self.assertTrue(any("source identity" in error for error in errors))
+        self.assertTrue(any("manual catalog layer" in error for error in errors))
+
     def test_side_camera_uses_maplibre_target_and_exact_restore(self) -> None:
         transition = camera_transition(reduced_motion=False)
         self.assertEqual("maplibre.easeTo", transition["maplibre_command"])
@@ -183,6 +192,8 @@ class DigitalSphereRealSurfaceTests(unittest.TestCase):
         self.assertNotEqual(transition["source_state"]["padding"], transition["target_state"]["padding"])
         self.assertEqual(transition["source_state"], transition["restored_state_after_close"])
         self.assertTrue(transition["restored_exact"])
+        self.assertEqual(transition["source_state"], transition["restored_state_after_browser_back"])
+        self.assertTrue(transition["browser_back_restored_exact"])
 
     def test_reduced_motion_reaches_same_target_in_zero_ms(self) -> None:
         normal = camera_transition(reduced_motion=False)
@@ -206,6 +217,7 @@ class DigitalSphereRealSurfaceTests(unittest.TestCase):
         self.assertEqual(260, proof["camera"]["animated_duration_ms"])
         self.assertEqual(0, proof["camera"]["reduced_motion_duration_ms"])
         self.assertTrue(proof["camera"]["animated_exact_restore"])
+        self.assertTrue(proof["camera"]["browser_back_exact_restore"])
         self.assertEqual(50000, proof["virtual_list"]["total_items"])
         self.assertTrue(proof["performance"]["gate_pass"])
         self.assertEqual([], proof["console_errors"])

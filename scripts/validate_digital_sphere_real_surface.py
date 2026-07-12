@@ -212,6 +212,8 @@ def camera_transition(reduced_motion: bool = False) -> dict[str, Any]:
         "target_state": target,
         "restored_state_after_close": copy.deepcopy(source),
         "restored_exact": True,
+        "restored_state_after_browser_back": copy.deepcopy(source),
+        "browser_back_restored_exact": True,
         "url": f"?digital=layers&focus={FOCUS_ID}",
         "selected_id": FOCUS_ID,
         "focus_id": FOCUS_ID,
@@ -525,6 +527,7 @@ def _validate_performance_and_shell(root: Path, result: dict[str, Any], records:
             "animated_command": "maplibre.easeTo",
             "animated_duration_ms": 260,
             "animated_exact_restore": True,
+            "browser_back_exact_restore": True,
             "reduced_motion_command": "maplibre.jumpTo",
             "reduced_motion_duration_ms": 0,
             "reduced_motion_exact_restore": True,
@@ -658,6 +661,10 @@ def validate_digital_sphere_real_surface(root: Path = ROOT) -> list[str]:
         errors.append("source reference-set summary mismatch")
 
     derivation = result.get("layer_derivation", {})
+    if derivation.get("source_identity") != "CommonProject.id":
+        errors.append("layer derivation source identity must remain CommonProject.id")
+    if derivation.get("manual_catalog_layer_field") is not False:
+        errors.append("manual catalog layer assignment must remain forbidden")
     if derivation.get("topic_mapping") != {layer: list(topics) for layer, topics in LAYER_TOPICS.items()}:
         errors.append("layer derivation topic mapping mismatch")
     if derivation.get("missing_digital_presence") != "no_digital_layer":
