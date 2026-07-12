@@ -220,11 +220,81 @@ def validate_digital_sphere(root: Path = ROOT) -> list[str]:
     if performance.get("settled_idle_overlay_render_delta_max") != 0:
         errors.append("settled idle overlay-render bound must be 0")
 
+    real_surface = contract.get("real_surface_v1", {})
+    if real_surface.get("reference_set_path") != "tests/cases/digital-sphere.reference-projects.json":
+        errors.append("real-surface reference set path mismatch")
+    if real_surface.get("reference_projects_are_public_catalog") is not False:
+        errors.append("real-surface references must not be public catalog truth")
+    if real_surface.get("commonproject_schema_version") != 3:
+        errors.append("real-surface references must bind to CommonProject v3")
+    derivation = real_surface.get("layer_derivation", {})
+    if derivation != {
+        "source_identity": "CommonProject.id",
+        "requires_digital_presence_available": True,
+        "missing_digital_presence_result": "no_digital_layer",
+        "unique_highest_topic_score_result": "selected_layer",
+        "tie_or_unmapped_result": "mixed_other",
+        "manual_layer_override_forbidden": True,
+    }:
+        errors.append("real-surface layer derivation contract mismatch")
+    names = real_surface.get("name_presentation", {})
+    if names.get("visible_name_limit_per_layer") != 2:
+        errors.append("real-surface visible name limit must be 2 per layer")
+    if names.get("orbit_label_max_chars") != 18:
+        errors.append("real-surface orbit label length must be bounded at 18 characters")
+    for invariant in (
+        "visible_orbit_labels_must_have_accessible_full_text",
+        "side_view_uses_full_commonproject_title",
+        "focus_panel_uses_full_commonproject_title",
+        "different_full_names_must_not_share_visible_short_label",
+        "binary_fragments_aria_hidden_and_decorative",
+        "source_backed_reference_names_precede_synthetic_load_names",
+    ):
+        if names.get(invariant) is not True:
+            errors.append(f"real-surface name invariant must be true: {invariant}")
+    focus = real_surface.get("focus_panel", {})
+    if focus.get("single_shared_panel") is not True or focus.get("second_data_copy_forbidden") is not True:
+        errors.append("real-surface focus panel must be single and source-derived")
+    if focus.get("source") != "same_commonproject_v3_record":
+        errors.append("real-surface focus panel source mismatch")
+    if focus.get("required_fields") != [
+        "full_name",
+        "summary",
+        "commons_kind",
+        "themes",
+        "actions",
+        "digital_presence",
+        "official_links",
+        "sources",
+        "curation",
+        "reference_dataset_notice",
+    ]:
+        errors.append("real-surface focus panel required fields mismatch")
+    if focus.get("reference_dataset_notice_required") is not True:
+        errors.append("real-surface focus panel must require a reference dataset notice")
+    camera = real_surface.get("side_camera", {})
+    if camera.get("animated_command") != "maplibre.easeTo":
+        errors.append("real-surface side camera must use MapLibre easeTo for animated motion")
+    if camera.get("reduced_motion_command") != "maplibre.jumpTo" or camera.get("reduced_motion_duration_ms") != 0:
+        errors.append("real-surface reduced-motion camera must use MapLibre jumpTo with 0 ms")
+    for invariant in (
+        "maplibre_camera_required",
+        "css_only_shift_forbidden",
+        "save_complete_previous_state",
+        "target_requires_bearing_pitch_zoom_and_padding",
+        "new_input_interrupts_transition",
+        "close_and_browser_back_restore_exact_previous_state",
+        "layer_stack_beside_damped_globe",
+        "independent_mode_forbidden",
+    ):
+        if camera.get(invariant) is not True:
+            errors.append(f"real-surface side-camera invariant must be true: {invariant}")
+
     decision = contract.get("decision_boundary", {})
     if decision != {
         "engine_selected": False,
         "production_architecture_authorized": False,
-        "next_proof": "physical_android_v5_acceptance_then_real_data_focus_and_side_camera_proof",
+        "next_proof": "physical_android_v6_acceptance_then_editorial_catalog_process",
     }:
         errors.append("digital sphere decision boundary mismatch")
 

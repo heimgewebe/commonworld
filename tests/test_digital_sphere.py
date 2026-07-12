@@ -71,6 +71,25 @@ class DigitalSphereContractTests(unittest.TestCase):
         self.assertTrue(accessibility["physical_screen_reader_test_waived_by_product_owner"])
         self.assertFalse(accessibility["screen_reader_product_support_claimed"])
 
+    def test_real_surface_contract_binds_references_without_catalog_publication(self) -> None:
+        real_surface = self.contract["real_surface_v1"]
+        self.assertEqual("tests/cases/digital-sphere.reference-projects.json", real_surface["reference_set_path"])
+        self.assertFalse(real_surface["reference_projects_are_public_catalog"])
+        self.assertEqual("no_digital_layer", real_surface["layer_derivation"]["missing_digital_presence_result"])
+        self.assertEqual("mixed_other", real_surface["layer_derivation"]["tie_or_unmapped_result"])
+
+    def test_real_surface_focus_and_camera_are_source_derived(self) -> None:
+        real_surface = self.contract["real_surface_v1"]
+        self.assertTrue(real_surface["focus_panel"]["single_shared_panel"])
+        self.assertEqual("same_commonproject_v3_record", real_surface["focus_panel"]["source"])
+        self.assertEqual("maplibre.easeTo", real_surface["side_camera"]["animated_command"])
+        self.assertEqual("maplibre.jumpTo", real_surface["side_camera"]["reduced_motion_command"])
+        self.assertEqual(0, real_surface["side_camera"]["reduced_motion_duration_ms"])
+        self.assertEqual(
+            "physical_android_v6_acceptance_then_editorial_catalog_process",
+            self.contract["decision_boundary"]["next_proof"],
+        )
+
     def test_validator_rejects_catalog_layer_field(self) -> None:
         errors = self.errors_after(lambda contract: contract["catalog_boundary"].update({"manual_catalog_layer_field_forbidden": False}))
         self.assertTrue(any("catalog boundary" in error for error in errors))
@@ -142,6 +161,14 @@ class DigitalSphereContractTests(unittest.TestCase):
     def test_validator_rejects_unbound_benchmark(self) -> None:
         errors = self.errors_after(lambda contract: contract["performance_and_privacy"].update({"benchmark_requires_browser_frame_alignment_and_map_render_confirmation": False}))
         self.assertTrue(any("performance/privacy invariant" in error for error in errors))
+
+    def test_validator_rejects_real_surface_catalog_publication(self) -> None:
+        errors = self.errors_after(lambda contract: contract["real_surface_v1"].update({"reference_projects_are_public_catalog": True}))
+        self.assertTrue(any("public catalog" in error for error in errors))
+
+    def test_validator_rejects_css_only_side_camera(self) -> None:
+        errors = self.errors_after(lambda contract: contract["real_surface_v1"]["side_camera"].update({"css_only_shift_forbidden": False}))
+        self.assertTrue(any("side-camera invariant" in error for error in errors))
 
     def test_validator_rejects_engine_selection(self) -> None:
         errors = self.errors_after(lambda contract: contract["decision_boundary"].update({"engine_selected": True}))

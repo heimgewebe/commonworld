@@ -1,0 +1,603 @@
+{
+  "schema_version": 1,
+  "kind": "commonworld_digital_sphere_real_surface_v1",
+  "status": "private_v6_browser_reference_surface_validated_physical_android_open",
+  "checked_at": "2026-07-12",
+  "source_reference_set": {
+    "path": "tests/cases/digital-sphere.reference-projects.json",
+    "record_count": 12,
+    "commonproject_schema_version": 3,
+    "records_schema_v3_valid": true,
+    "published_catalog": false,
+    "public_shell_content": false
+  },
+  "layer_derivation": {
+    "source_identity": "CommonProject.id",
+    "topic_mapping": {
+      "knowledge_data": [
+        "knowledge",
+        "open-data",
+        "research",
+        "documentation"
+      ],
+      "software_infrastructure": [
+        "free-software",
+        "open-source",
+        "infrastructure",
+        "platform"
+      ],
+      "media_culture": [
+        "open-media",
+        "culture",
+        "archives",
+        "creative-commons"
+      ],
+      "learning_education": [
+        "education",
+        "open-educational-resources",
+        "learning"
+      ],
+      "communication_networks": [
+        "communication",
+        "community-network",
+        "federation",
+        "protocol"
+      ]
+    },
+    "missing_digital_presence": "no_digital_layer",
+    "unique_highest_topic_score": "select_that_layer",
+    "tie_or_unmapped": "mixed_other",
+    "manual_catalog_layer_field": false
+  },
+  "layer_coverage": [
+    {
+      "id": "knowledge_data",
+      "count": 2,
+      "project_ids": [
+        "wikipedia-reference",
+        "wikidata-reference"
+      ]
+    },
+    {
+      "id": "software_infrastructure",
+      "count": 2,
+      "project_ids": [
+        "debian-reference",
+        "libreoffice-reference"
+      ]
+    },
+    {
+      "id": "media_culture",
+      "count": 2,
+      "project_ids": [
+        "wikimedia-commons-reference",
+        "wikisource-reference"
+      ]
+    },
+    {
+      "id": "learning_education",
+      "count": 2,
+      "project_ids": [
+        "wikibooks-reference",
+        "wikiversity-reference"
+      ]
+    },
+    {
+      "id": "communication_networks",
+      "count": 2,
+      "project_ids": [
+        "freifunk-reference",
+        "mastodon-reference"
+      ]
+    },
+    {
+      "id": "mixed_other",
+      "count": 2,
+      "project_ids": [
+        "openstreetmap-reference",
+        "meta-wiki-reference"
+      ]
+    }
+  ],
+  "name_presentation": {
+    "visible_name_limit_per_layer": 2,
+    "orbit_label_max_chars": 18,
+    "visible_by_layer": [
+      {
+        "layer": "knowledge_data",
+        "visible_name_count": 2,
+        "visible_names": [
+          {
+            "project_id": "wikipedia-reference",
+            "visible_text": "WIKIPEDIA",
+            "accessible_full_text": "Wikipedia"
+          },
+          {
+            "project_id": "wikidata-reference",
+            "visible_text": "WIKIDATA",
+            "accessible_full_text": "Wikidata"
+          }
+        ]
+      },
+      {
+        "layer": "software_infrastructure",
+        "visible_name_count": 2,
+        "visible_names": [
+          {
+            "project_id": "debian-reference",
+            "visible_text": "DEBIAN",
+            "accessible_full_text": "Debian"
+          },
+          {
+            "project_id": "libreoffice-reference",
+            "visible_text": "LIBREOFFICE",
+            "accessible_full_text": "LibreOffice"
+          }
+        ]
+      },
+      {
+        "layer": "media_culture",
+        "visible_name_count": 2,
+        "visible_names": [
+          {
+            "project_id": "wikimedia-commons-reference",
+            "visible_text": "WIKIMEDIA COMMONS",
+            "accessible_full_text": "Wikimedia Commons"
+          },
+          {
+            "project_id": "wikisource-reference",
+            "visible_text": "WIKISOURCE",
+            "accessible_full_text": "Wikisource"
+          }
+        ]
+      },
+      {
+        "layer": "learning_education",
+        "visible_name_count": 2,
+        "visible_names": [
+          {
+            "project_id": "wikibooks-reference",
+            "visible_text": "WIKIBOOKS",
+            "accessible_full_text": "Wikibooks"
+          },
+          {
+            "project_id": "wikiversity-reference",
+            "visible_text": "WIKIVERSITY",
+            "accessible_full_text": "Wikiversity"
+          }
+        ]
+      },
+      {
+        "layer": "communication_networks",
+        "visible_name_count": 2,
+        "visible_names": [
+          {
+            "project_id": "freifunk-reference",
+            "visible_text": "FREIFUNK",
+            "accessible_full_text": "Freifunk"
+          },
+          {
+            "project_id": "mastodon-reference",
+            "visible_text": "MASTODON",
+            "accessible_full_text": "Mastodon"
+          }
+        ]
+      },
+      {
+        "layer": "mixed_other",
+        "visible_name_count": 2,
+        "visible_names": [
+          {
+            "project_id": "openstreetmap-reference",
+            "visible_text": "OPENSTREETMAP",
+            "accessible_full_text": "OpenStreetMap"
+          },
+          {
+            "project_id": "meta-wiki-reference",
+            "visible_text": "META-WIKI COMMU...",
+            "accessible_full_text": "Meta-Wiki Community Coordination and Documentation"
+          }
+        ]
+      }
+    ],
+    "meta_wiki_visible_text": "META-WIKI COMMU...",
+    "meta_wiki_accessible_full_text": "Meta-Wiki Community Coordination and Documentation",
+    "side_view_full_names_source": "CommonProject.title",
+    "focus_panel_full_name_source": "CommonProject.title",
+    "binary_fragments": [
+      {
+        "project_id": "wikipedia-reference",
+        "fragment": "0011000110010011",
+        "aria_hidden": true,
+        "role": "decorative"
+      },
+      {
+        "project_id": "wikidata-reference",
+        "fragment": "1011101100000011",
+        "aria_hidden": true,
+        "role": "decorative"
+      },
+      {
+        "project_id": "debian-reference",
+        "fragment": "0010010000001110",
+        "aria_hidden": true,
+        "role": "decorative"
+      },
+      {
+        "project_id": "libreoffice-reference",
+        "fragment": "0001110101100011",
+        "aria_hidden": true,
+        "role": "decorative"
+      },
+      {
+        "project_id": "wikimedia-commons-reference",
+        "fragment": "1111100001110010",
+        "aria_hidden": true,
+        "role": "decorative"
+      },
+      {
+        "project_id": "wikisource-reference",
+        "fragment": "0011101101110110",
+        "aria_hidden": true,
+        "role": "decorative"
+      },
+      {
+        "project_id": "wikibooks-reference",
+        "fragment": "0101010001010111",
+        "aria_hidden": true,
+        "role": "decorative"
+      },
+      {
+        "project_id": "wikiversity-reference",
+        "fragment": "1010011001111010",
+        "aria_hidden": true,
+        "role": "decorative"
+      },
+      {
+        "project_id": "freifunk-reference",
+        "fragment": "1001100001001100",
+        "aria_hidden": true,
+        "role": "decorative"
+      },
+      {
+        "project_id": "mastodon-reference",
+        "fragment": "1010001000110110",
+        "aria_hidden": true,
+        "role": "decorative"
+      },
+      {
+        "project_id": "openstreetmap-reference",
+        "fragment": "0010010111100010",
+        "aria_hidden": true,
+        "role": "decorative"
+      },
+      {
+        "project_id": "meta-wiki-reference",
+        "fragment": "1010000101000100",
+        "aria_hidden": true,
+        "role": "decorative"
+      }
+    ]
+  },
+  "focus_panel": {
+    "source": "same_commonproject_v3_record",
+    "second_data_copy": false,
+    "selected_id": "meta-wiki-reference",
+    "focus_panel_hash": "2863c9ed8f1f66c816f5c257e4adc390bce81379d8ea4cec9051569a6457c065",
+    "fields": [
+      "full_name",
+      "summary",
+      "commons_kind",
+      "themes",
+      "actions",
+      "digital_presence",
+      "official_links",
+      "sources",
+      "curation",
+      "reference_dataset_notice"
+    ],
+    "reference_dataset_notice": "Nichtoeffentlicher Referenzdatensatz; keine Commonworld-Katalogveroeffentlichung."
+  },
+  "selection_parity": {
+    "single_focus": true,
+    "active_focus_count": 1,
+    "view_switch_preserves_focus": true,
+    "paths": [
+      {
+        "path": "digital_sphere_edge",
+        "selected_id": "meta-wiki-reference",
+        "focus_panel_hash": "2863c9ed8f1f66c816f5c257e4adc390bce81379d8ea4cec9051569a6457c065",
+        "active_focus_count": 1,
+        "url": "?digital=layers&focus=meta-wiki-reference"
+      },
+      {
+        "path": "layer_button",
+        "selected_id": "meta-wiki-reference",
+        "focus_panel_hash": "2863c9ed8f1f66c816f5c257e4adc390bce81379d8ea4cec9051569a6457c065",
+        "active_focus_count": 1,
+        "url": "?digital=layers&focus=meta-wiki-reference"
+      },
+      {
+        "path": "linear_view",
+        "selected_id": "meta-wiki-reference",
+        "focus_panel_hash": "2863c9ed8f1f66c816f5c257e4adc390bce81379d8ea4cec9051569a6457c065",
+        "active_focus_count": 1,
+        "url": "?digital=layers&focus=meta-wiki-reference"
+      },
+      {
+        "path": "search",
+        "selected_id": "meta-wiki-reference",
+        "focus_panel_hash": "2863c9ed8f1f66c816f5c257e4adc390bce81379d8ea4cec9051569a6457c065",
+        "active_focus_count": 1,
+        "url": "?digital=layers&focus=meta-wiki-reference"
+      },
+      {
+        "path": "deep_link",
+        "selected_id": "meta-wiki-reference",
+        "focus_panel_hash": "2863c9ed8f1f66c816f5c257e4adc390bce81379d8ea4cec9051569a6457c065",
+        "active_focus_count": 1,
+        "url": "?digital=layers&focus=meta-wiki-reference"
+      },
+      {
+        "path": "browser_back",
+        "selected_id": "meta-wiki-reference",
+        "focus_panel_hash": "2863c9ed8f1f66c816f5c257e4adc390bce81379d8ea4cec9051569a6457c065",
+        "active_focus_count": 1,
+        "url": "?focus=meta-wiki-reference"
+      }
+    ],
+    "geographic_representation": {
+      "applicable": false,
+      "reason": "all_reference_records_are_fully_digital_without_public_geographic_geometry",
+      "project_coordinates_created": false
+    }
+  },
+  "side_camera": {
+    "standard_transition": {
+      "source_state": {
+        "center_lng": 10.0,
+        "center_lat": 20.0,
+        "zoom": 1.35,
+        "bearing": 0.0,
+        "pitch": 0.0,
+        "padding": {
+          "top": 0,
+          "right": 0,
+          "bottom": 0,
+          "left": 0
+        },
+        "filters": [],
+        "search_query": "",
+        "selected_id": "meta-wiki-reference",
+        "focus_id": "meta-wiki-reference",
+        "digital_mode": "globe"
+      },
+      "saved_state_keys": [
+        "bearing",
+        "center_lat",
+        "center_lng",
+        "digital_mode",
+        "filters",
+        "focus_id",
+        "padding",
+        "pitch",
+        "search_query",
+        "selected_id",
+        "zoom"
+      ],
+      "maplibre_command": "maplibre.easeTo",
+      "duration_ms": 260,
+      "target_state": {
+        "center_lng": 10.0,
+        "center_lat": 20.0,
+        "zoom": 1.23,
+        "bearing": 24.0,
+        "pitch": 36.0,
+        "padding": {
+          "top": 0,
+          "right": 519,
+          "bottom": 0,
+          "left": 0
+        },
+        "filters": [],
+        "search_query": "",
+        "selected_id": "meta-wiki-reference",
+        "focus_id": "meta-wiki-reference",
+        "digital_mode": "layers"
+      },
+      "restored_state_after_close": {
+        "center_lng": 10.0,
+        "center_lat": 20.0,
+        "zoom": 1.35,
+        "bearing": 0.0,
+        "pitch": 0.0,
+        "padding": {
+          "top": 0,
+          "right": 0,
+          "bottom": 0,
+          "left": 0
+        },
+        "filters": [],
+        "search_query": "",
+        "selected_id": "meta-wiki-reference",
+        "focus_id": "meta-wiki-reference",
+        "digital_mode": "globe"
+      },
+      "restored_exact": true,
+      "url": "?digital=layers&focus=meta-wiki-reference",
+      "selected_id": "meta-wiki-reference",
+      "focus_id": "meta-wiki-reference"
+    },
+    "reduced_motion_transition": {
+      "source_state": {
+        "center_lng": 10.0,
+        "center_lat": 20.0,
+        "zoom": 1.35,
+        "bearing": 0.0,
+        "pitch": 0.0,
+        "padding": {
+          "top": 0,
+          "right": 0,
+          "bottom": 0,
+          "left": 0
+        },
+        "filters": [],
+        "search_query": "",
+        "selected_id": "meta-wiki-reference",
+        "focus_id": "meta-wiki-reference",
+        "digital_mode": "globe"
+      },
+      "saved_state_keys": [
+        "bearing",
+        "center_lat",
+        "center_lng",
+        "digital_mode",
+        "filters",
+        "focus_id",
+        "padding",
+        "pitch",
+        "search_query",
+        "selected_id",
+        "zoom"
+      ],
+      "maplibre_command": "maplibre.jumpTo",
+      "duration_ms": 0,
+      "target_state": {
+        "center_lng": 10.0,
+        "center_lat": 20.0,
+        "zoom": 1.23,
+        "bearing": 24.0,
+        "pitch": 36.0,
+        "padding": {
+          "top": 0,
+          "right": 519,
+          "bottom": 0,
+          "left": 0
+        },
+        "filters": [],
+        "search_query": "",
+        "selected_id": "meta-wiki-reference",
+        "focus_id": "meta-wiki-reference",
+        "digital_mode": "layers"
+      },
+      "restored_state_after_close": {
+        "center_lng": 10.0,
+        "center_lat": 20.0,
+        "zoom": 1.35,
+        "bearing": 0.0,
+        "pitch": 0.0,
+        "padding": {
+          "top": 0,
+          "right": 0,
+          "bottom": 0,
+          "left": 0
+        },
+        "filters": [],
+        "search_query": "",
+        "selected_id": "meta-wiki-reference",
+        "focus_id": "meta-wiki-reference",
+        "digital_mode": "globe"
+      },
+      "restored_exact": true,
+      "url": "?digital=layers&focus=meta-wiki-reference",
+      "selected_id": "meta-wiki-reference",
+      "focus_id": "meta-wiki-reference"
+    },
+    "layer_stack_layout": {
+      "spatial_relation": "beside_damped_globe",
+      "independent_mode": false,
+      "earth_opacity": 0.38,
+      "layers_stacked": true
+    },
+    "interruptible": true,
+    "map_stop_called_on_new_input": true
+  },
+  "rendering_performance": {
+    "v4_software_profile_floor": {
+      "source": "docs/research/device-acceptance-performance-v4.result.json:v4_installed_proof",
+      "runs": 3,
+      "planet_median_fps": 47.54358162127196,
+      "local_median_fps": 56.12372163134722,
+      "idle_map_render_delta": 0,
+      "idle_overlay_render_delta": 0,
+      "idle_state_write_delta": 0,
+      "performance_gate_pass": true
+    },
+    "new_browser_fps_claimed": true,
+    "public_runtime_changed": false,
+    "continuous_idle_rendering": false,
+    "idle_observation_ms": 1500,
+    "idle_map_render_delta": 0,
+    "idle_overlay_render_delta": 0,
+    "visible_orbit_names_total": 12,
+    "synthetic_load_identity_test": {
+      "synthetic_identity_count": 50000,
+      "synthetic_reference_name_displacement": false,
+      "synthetic_identities_public_catalog": false
+    },
+    "regression_excluded_as_far_as_local_harness_allows": true,
+    "private_v6_browser_proof": {
+      "kind": "normalized_private_acceptance_release_summary",
+      "release_id": "20260712-v6-c67f8cabef4b",
+      "release_manifest_sha256": "c67f8cabef4b7e79141ae861a73adf8b77043c43cfa477bc6237587bdfbe95e6",
+      "release_server_tested": true,
+      "browser_test_status": "pass",
+      "source_backed_reference_projects": 12,
+      "camera": {
+        "animated_command": "maplibre.easeTo",
+        "animated_duration_ms": 260,
+        "animated_exact_restore": true,
+        "reduced_motion_command": "maplibre.jumpTo",
+        "reduced_motion_duration_ms": 0,
+        "reduced_motion_exact_restore": true,
+        "css_only_shift": false
+      },
+      "virtual_list": {
+        "total_items": 50000,
+        "maximum_rendered_rows": 15,
+        "theoretical_maximum_rows": 23,
+        "pass": true
+      },
+      "performance": {
+        "runs": 3,
+        "planet_median_fps": 32.276574333484454,
+        "local_median_fps": 56.95121165002101,
+        "minimum_median_fps": 30,
+        "gate_pass": true
+      },
+      "idle": {
+        "observation_ms": 1500,
+        "map_render_delta": 0,
+        "overlay_render_delta": 0,
+        "state_write_delta": 0
+      },
+      "console_errors": [],
+      "raw_private_artifacts_published": false,
+      "screenshots_published": false,
+      "physical_device_tested": false,
+      "engine_selected": false,
+      "production_architecture_authorized": false,
+      "viewport": {
+        "width": 1180,
+        "height": 684,
+        "device_scale_factor": 2
+      }
+    }
+  },
+  "public_shell": {
+    "reference_data_in_index_html": false,
+    "public_shell_changed": false
+  },
+  "acceptance_boundaries": {
+    "source_backed_reference_projects_are_published_catalog": false,
+    "editorial_catalog_admission_separate_process": true,
+    "physical_android_chrome_checked": false,
+    "screenreader_prototype_scope": "waived_not_passed",
+    "raw_receipts_or_private_endpoints_published": false
+  },
+  "decision": {
+    "engine_selected": false,
+    "production_architecture_authorized": false,
+    "next_action": "physical_android_chrome_v6_then_editorial_catalog_process"
+  }
+}

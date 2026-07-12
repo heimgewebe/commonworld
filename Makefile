@@ -1,6 +1,6 @@
-.PHONY: validate validate-canonical-plan validate-contracts validate-semantic-zoom validate-visual-semantics validate-renderer-spike validate-maplibre-phase2-proof validate-device-acceptance-pack validate-device-acceptance-rerun validate-digital-sphere validate-layered-digital-sphere-proof validate-device-acceptance-performance-v4 validate-physical-device-acceptance-v4-apple validate-public-shell test smoke-pages-live check-pages-dns-target
+.PHONY: validate validate-canonical-plan validate-contracts validate-semantic-zoom validate-visual-semantics validate-renderer-spike validate-maplibre-phase2-proof validate-device-acceptance-pack validate-device-acceptance-rerun validate-digital-sphere validate-layered-digital-sphere-proof validate-digital-sphere-real-surface validate-device-acceptance-performance-v4 validate-physical-device-acceptance-v4-apple validate-public-shell test smoke-pages-live check-pages-dns-target
 
-validate: validate-canonical-plan validate-contracts validate-semantic-zoom validate-visual-semantics validate-renderer-spike validate-maplibre-phase2-proof validate-device-acceptance-pack validate-device-acceptance-rerun validate-digital-sphere validate-layered-digital-sphere-proof validate-device-acceptance-performance-v4 validate-physical-device-acceptance-v4-apple validate-public-shell test
+validate: validate-canonical-plan validate-contracts validate-semantic-zoom validate-visual-semantics validate-renderer-spike validate-maplibre-phase2-proof validate-device-acceptance-pack validate-device-acceptance-rerun validate-digital-sphere validate-layered-digital-sphere-proof validate-digital-sphere-real-surface validate-device-acceptance-performance-v4 validate-physical-device-acceptance-v4-apple validate-public-shell test
 
 validate-canonical-plan:
 	python3 scripts/validate_canonical_plan.py
@@ -31,6 +31,9 @@ validate-digital-sphere:
 
 validate-layered-digital-sphere-proof:
 	python3 scripts/validate_layered_digital_sphere_proof.py
+
+validate-digital-sphere-real-surface:
+	python3 scripts/validate_digital_sphere_real_surface.py
 
 validate-device-acceptance-performance-v4:
 	python3 scripts/validate_device_acceptance_performance_v4.py
