@@ -60,7 +60,7 @@ class PagesLiveSmokeTests(unittest.TestCase):
 
     def test_catalog_boundary_drift_fails(self) -> None:
         catalog = json.loads(self.valid_catalog())
-        catalog["publication"]["engine_selected"] = True
+        catalog["publication"]["engine_selected"] = False
         fetch = LiveFetch(
             requested_url="https://commonworld.net/catalog/catalog.json",
             final_url="https://commonworld.net/catalog/catalog.json",

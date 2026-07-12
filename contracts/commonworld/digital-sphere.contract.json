@@ -229,8 +229,10 @@
     }
   },
   "decision_boundary": {
-    "engine_selected": false,
+    "engine_selected": true,
+    "selected_engine": "maplibre_gl_js",
     "production_architecture_authorized": false,
-    "next_proof": "renderer_selection_decision_against_public_seed_catalog"
+    "public_runtime_uses_selected_engine": false,
+    "next_proof": "public_maplibre_globe_vertical_slice_with_seed_catalog"
   }
 }

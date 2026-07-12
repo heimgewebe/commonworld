@@ -105,8 +105,10 @@ def validate_public_catalog(root: Path = ROOT) -> list[str]:
         "public": True,
         "source_policy": "official-sources-only",
         "curation_state": "listed",
-        "engine_selected": False,
+        "engine_selected": True,
+        "selected_engine": "maplibre_gl_js",
         "production_architecture_authorized": False,
+        "public_runtime_uses_selected_engine": False,
     }
     if manifest.get("schema_version") != 1 or manifest.get("kind") != "commonworld_public_catalog":
         errors.append("public catalog manifest schema or kind mismatch")

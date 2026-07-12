@@ -292,9 +292,11 @@ def validate_digital_sphere(root: Path = ROOT) -> list[str]:
 
     decision = contract.get("decision_boundary", {})
     if decision != {
-        "engine_selected": False,
+        "engine_selected": True,
+        "selected_engine": "maplibre_gl_js",
         "production_architecture_authorized": False,
-        "next_proof": "renderer_selection_decision_against_public_seed_catalog",
+        "public_runtime_uses_selected_engine": False,
+        "next_proof": "public_maplibre_globe_vertical_slice_with_seed_catalog",
     }:
         errors.append("digital sphere decision boundary mismatch")
 

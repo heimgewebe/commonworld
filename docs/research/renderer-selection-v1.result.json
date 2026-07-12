@@ -1,0 +1,160 @@
+{
+  "schema_version": 1,
+  "kind": "commonworld_renderer_selection_v1",
+  "status": "maplibre_selected_production_architecture_open",
+  "decided_at": "2026-07-12",
+  "repository_base_commit": "1df26e4c921aa22fd982ef81a3b8e3f15e171dd4",
+  "evidence_bindings": [
+    {
+      "path": "docs/research/renderer-engine-spike.result.json",
+      "sha256": "3871accbb94aef453fbf239ab92570679039a1c9445e707d2e07f3c6439ad3d2"
+    },
+    {
+      "path": "docs/research/maplibre-phase2-globe-proof.result.json",
+      "sha256": "93b9be0d335703690ad2a5425f8e1e4c88c0647aa52ce170168f2eeb9c501803"
+    },
+    {
+      "path": "docs/research/device-acceptance-performance-v4.result.json",
+      "sha256": "9884a3ceadec7984b5194528839633ff3fa803f0b4b5f2a8d1684942c5d6d694"
+    },
+    {
+      "path": "docs/research/physical-device-acceptance-v4-apple.result.json",
+      "sha256": "7618f90619971134cb123fa298eb459d143f9c96aa23f9d1a5a71a93e48d331a"
+    },
+    {
+      "path": "docs/research/digital-sphere-real-surface-v1.result.json",
+      "sha256": "ec56c56b2f104a6fc148e0f228aaa22be0f760d14c5a34b28cc3936fea526e5b"
+    },
+    {
+      "path": "contracts/commonworld/aggregation-zoom.contract.json",
+      "sha256": "6e5848660e507a77b68bca99745fbfbd6a29d4f2e7e14c9c6768b98b28064a63"
+    },
+    {
+      "path": "contracts/commonworld/visual-semantics.contract.json",
+      "sha256": "2a5ad2f8115744d2495141a327c5051b0c6b1bb6d336b0f5423d6f736879644b"
+    },
+    {
+      "path": "contracts/commonworld/project.schema.json",
+      "sha256": "e768e6293320b0ea374cf5193a3e3941f893fb12a71eb7d0df911788954d48d1"
+    },
+    {
+      "path": "contracts/commonworld/digital-sphere.contract.json",
+      "sha256": "7e0a286ecd0928d292cd6292d8eea2e961dc1d174920fbfcb882d65bf2658ef4"
+    },
+    {
+      "path": "contracts/commonworld/renderer-selection.contract.json",
+      "sha256": "15c76c0875d42e4f670f6513d97804cf0805a054057cf74c0f99798f6432fd8a"
+    },
+    {
+      "path": "catalog/catalog.json",
+      "sha256": "3d5764606f4d9131515e1ae38639f262c5b10c95f09e20a51aa9cc42e574834f"
+    }
+  ],
+  "candidate_comparison": {
+    "source": "docs/research/renderer-engine-spike.result.json",
+    "tested_versions": {
+      "maplibre_gl_js": "5.24.0",
+      "cesium_js": "1.143.0",
+      "three_js": "0.185.1",
+      "deck_gl": "9.3.6"
+    },
+    "maplibre_fastest_profiles": [
+      "desktop",
+      "mobile_emulated"
+    ],
+    "maplibre_fps": {
+      "desktop": 33.09,
+      "mobile_emulated": 31.0
+    },
+    "maplibre_gzip_bytes": 284802,
+    "fatal_runtime_errors": 0
+  },
+  "resolved_selection_conditions": {
+    "coverage_patterns": "pass",
+    "uncertainty_boundary_and_halo": "pass",
+    "realistic_vector_tiles": "pass",
+    "digital_sphere_without_catalog_coordinates": "pass",
+    "identity_deduplication": "pass",
+    "deep_link_and_state_restoration": "pass",
+    "reduced_motion_equivalence": "pass",
+    "idle_pause": "pass",
+    "physical_apple_webkit_hardware_gpu": "pass",
+    "real_name_density": "pass",
+    "shared_focus_panel": "pass",
+    "maplibre_side_camera_and_browser_back_restore": "pass",
+    "large_linear_view_virtualization": "pass",
+    "public_catalog_schema_and_layer_derivation": "pass"
+  },
+  "public_catalog_alignment": {
+    "manifest_path": "catalog/catalog.json",
+    "entry_count": 10,
+    "commonproject_schema_version": 3,
+    "all_records_digital": true,
+    "all_geographic_presence_empty": true,
+    "manual_layer_fields_present": false,
+    "layer_coverage": {
+      "knowledge_data": [
+        "wikidata",
+        "wikipedia"
+      ],
+      "software_infrastructure": [
+        "debian",
+        "libreoffice"
+      ],
+      "media_culture": [
+        "wikimedia-commons"
+      ],
+      "learning_education": [
+        "wikibooks",
+        "wikiversity"
+      ],
+      "communication_networks": [
+        "freifunk",
+        "mastodon"
+      ],
+      "mixed_other": [
+        "openstreetmap"
+      ]
+    }
+  },
+  "selection": {
+    "engine_selected": true,
+    "selected_engine": "maplibre_gl_js",
+    "selected_package": "maplibre-gl",
+    "selected_tested_version": "5.24.0",
+    "primary_responsibilities": [
+      "globe_projection",
+      "camera_and_semantic_zoom",
+      "geographic_vector_sources",
+      "geographic_style_layers",
+      "feature_query_and_picking"
+    ],
+    "digital_sphere_strategy": "bounded_synchronized_svg_overlay",
+    "three_js_runtime_dependency_required": false,
+    "production_architecture_authorized": false,
+    "public_runtime_uses_selected_engine": false,
+    "next_proof": "public_maplibre_globe_vertical_slice_with_seed_catalog"
+  },
+  "open_gates": {
+    "physical_android_chrome_hardware": "open_release_compatibility_gate_not_engine_selection_blocker",
+    "public_maplibre_vertical_slice": "required_next",
+    "tile_and_basemap_provider": "open",
+    "csp_and_worker_delivery": "open",
+    "screen_reader_product_support": "not_claimed"
+  },
+  "forbidden_interpretations": [
+    "production architecture is authorized",
+    "the current public shell already runs MapLibre",
+    "Android Chrome has been physically accepted",
+    "screen reader product support has passed",
+    "the digital sphere may create geographic catalog coordinates",
+    "Three.js is an approved runtime dependency",
+    "a floating CDN version may be used for production"
+  ],
+  "official_source_recheck": {
+    "checked_at": "2026-07-12",
+    "maplibre_docs_current_install_example": "maplibre-gl@^5.24.0",
+    "maplibre_globe_and_custom_layer_docs_available": true,
+    "deck_gl_globe_view_still_marked_experimental": true
+  }
+}
