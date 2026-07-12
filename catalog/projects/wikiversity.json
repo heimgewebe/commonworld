@@ -1,0 +1,69 @@
+{
+  "schema_version": 3,
+  "id": "wikiversity",
+  "title": "Wikiversity",
+  "summary": "Eine offene Plattform für freie Lernressourcen, Kurse und gemeinschaftliche Bildungsprojekte in vielen Sprachen.",
+  "kind": "digital",
+  "themes": [
+    "learning",
+    "education"
+  ],
+  "actions": [
+    "use",
+    "learn",
+    "contribute"
+  ],
+  "presence": {
+    "geographic": [],
+    "digital": {
+      "available": true,
+      "reach": "global",
+      "label": "Freie Lernressourcen und gemeinschaftliche Bildungsprojekte",
+      "source_ids": [
+        "wikimedia-projects"
+      ]
+    }
+  },
+  "activity": {
+    "status": "active",
+    "observed_at": "2026-07-12",
+    "source_ids": [
+      "wikimedia-projects"
+    ],
+    "note": "Die offizielle Projektseite war am Prüftag erreichbar und beschrieb aktuelle Nutzung oder Mitwirkung."
+  },
+  "provenance": {
+    "sources": [
+      {
+        "id": "wikimedia-projects",
+        "type": "official-source",
+        "label": "Wikimedia projects",
+        "url": "https://www.wikimedia.org/",
+        "retrieved_at": "2026-07-12",
+        "note": "Die offizielle Wikimedia-Übersicht führt Wikiversity als Sammlung freier Lernressourcen."
+      }
+    ]
+  },
+  "curation": {
+    "state": "listed",
+    "reviewed_by": "Commonworld editorial review",
+    "reviewed_at": "2026-07-12",
+    "next_review_at": "2026-10-12",
+    "notes": "Erster öffentlicher Commonworld-Startdatensatz; Identität, Zweck, digitale Präsenz und offizielle Quelle wurden redaktionell geprüft."
+  },
+  "links": [
+    {
+      "type": "homepage",
+      "label": "Wikiversity – offizielle Seite",
+      "url": "https://www.wikiversity.org/"
+    },
+    {
+      "type": "source",
+      "label": "Wikimedia projects",
+      "url": "https://www.wikimedia.org/"
+    }
+  ],
+  "handoff": {
+    "enabled": false
+  }
+}

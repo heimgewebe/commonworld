@@ -1,0 +1,70 @@
+{
+  "schema_version": 3,
+  "id": "debian",
+  "title": "Debian",
+  "summary": "Ein gemeinschaftlich entwickeltes freies Betriebssystem mit offenem Paketarchiv, öffentlicher Dokumentation und weltweiter Mitwirkung.",
+  "kind": "digital",
+  "themes": [
+    "free-software",
+    "infrastructure"
+  ],
+  "actions": [
+    "use",
+    "learn",
+    "contribute",
+    "donate"
+  ],
+  "presence": {
+    "geographic": [],
+    "digital": {
+      "available": true,
+      "reach": "global",
+      "label": "Freies Betriebssystem und weltweite Projektinfrastruktur",
+      "source_ids": [
+        "debian-about"
+      ]
+    }
+  },
+  "activity": {
+    "status": "active",
+    "observed_at": "2026-07-12",
+    "source_ids": [
+      "debian-about"
+    ],
+    "note": "Die offizielle Projektseite war am Prüftag erreichbar und beschrieb aktuelle Nutzung oder Mitwirkung."
+  },
+  "provenance": {
+    "sources": [
+      {
+        "id": "debian-about",
+        "type": "official-source",
+        "label": "About Debian",
+        "url": "https://www.debian.org/intro/about",
+        "retrieved_at": "2026-07-12",
+        "note": "Die offizielle Projektseite beschreibt Debian als Zusammenschluss von Menschen, die gemeinsam ein freies Betriebssystem entwickeln."
+      }
+    ]
+  },
+  "curation": {
+    "state": "listed",
+    "reviewed_by": "Commonworld editorial review",
+    "reviewed_at": "2026-07-12",
+    "next_review_at": "2026-10-12",
+    "notes": "Erster öffentlicher Commonworld-Startdatensatz; Identität, Zweck, digitale Präsenz und offizielle Quelle wurden redaktionell geprüft."
+  },
+  "links": [
+    {
+      "type": "homepage",
+      "label": "Debian – offizielle Seite",
+      "url": "https://www.debian.org/"
+    },
+    {
+      "type": "source",
+      "label": "About Debian",
+      "url": "https://www.debian.org/intro/about"
+    }
+  ],
+  "handoff": {
+    "enabled": false
+  }
+}

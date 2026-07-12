@@ -231,12 +231,13 @@ class DigitalSphereRealSurfaceTests(unittest.TestCase):
         errors = self.errors_after_result(mutate)
         self.assertTrue(any("private v6 browser proof" in error for error in errors))
 
-    def test_public_shell_contains_no_reference_project_data(self) -> None:
+    def test_public_shell_contains_no_reference_fixture_data(self) -> None:
         html = (ROOT / "index.html").read_text(encoding="utf-8")
-        for reference_set_token in (record["id"] for record in self.records):
-            self.assertNotIn(reference_set_token, html)
-        for title in (record["title"] for record in self.records):
-            self.assertNotIn(title, html)
+        for record in self.records:
+            self.assertNotIn(record["id"], html)
+            self.assertNotIn(record["summary"], html)
+            self.assertNotIn(record["activity"]["note"], html)
+            self.assertNotIn(record["curation"]["notes"], html)
 
     def test_validator_rejects_engine_selection(self) -> None:
         errors = self.errors_after_result(lambda result: result["decision"].update({"engine_selected": True}))

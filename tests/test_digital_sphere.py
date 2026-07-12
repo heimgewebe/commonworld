@@ -86,7 +86,7 @@ class DigitalSphereContractTests(unittest.TestCase):
         self.assertEqual("maplibre.jumpTo", real_surface["side_camera"]["reduced_motion_command"])
         self.assertEqual(0, real_surface["side_camera"]["reduced_motion_duration_ms"])
         self.assertEqual(
-            "physical_android_v6_acceptance_then_editorial_catalog_process",
+            "renderer_selection_decision_against_public_seed_catalog",
             self.contract["decision_boundary"]["next_proof"],
         )
 

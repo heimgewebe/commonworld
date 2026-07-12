@@ -1,0 +1,26 @@
+{
+  "schema_version": 1,
+  "kind": "commonworld_public_catalog",
+  "published_at": "2026-07-12",
+  "language": "de",
+  "entry_count": 10,
+  "project_files": [
+    "projects/debian.json",
+    "projects/freifunk.json",
+    "projects/libreoffice.json",
+    "projects/mastodon.json",
+    "projects/openstreetmap.json",
+    "projects/wikibooks.json",
+    "projects/wikidata.json",
+    "projects/wikimedia-commons.json",
+    "projects/wikipedia.json",
+    "projects/wikiversity.json"
+  ],
+  "publication": {
+    "public": true,
+    "source_policy": "official-sources-only",
+    "curation_state": "listed",
+    "engine_selected": false,
+    "production_architecture_authorized": false
+  }
+}

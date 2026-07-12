@@ -294,7 +294,7 @@ def validate_digital_sphere(root: Path = ROOT) -> list[str]:
     if decision != {
         "engine_selected": False,
         "production_architecture_authorized": False,
-        "next_proof": "physical_android_v6_acceptance_then_editorial_catalog_process",
+        "next_proof": "renderer_selection_decision_against_public_seed_catalog",
     }:
         errors.append("digital sphere decision boundary mismatch")
 

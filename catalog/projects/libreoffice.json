@@ -1,0 +1,70 @@
+{
+  "schema_version": 3,
+  "id": "libreoffice",
+  "title": "LibreOffice",
+  "summary": "Eine freie und quelloffene Office-Suite, die von einer internationalen Gemeinschaft entwickelt, dokumentiert und übersetzt wird.",
+  "kind": "digital",
+  "themes": [
+    "open-source",
+    "free-software"
+  ],
+  "actions": [
+    "use",
+    "learn",
+    "contribute",
+    "donate"
+  ],
+  "presence": {
+    "geographic": [],
+    "digital": {
+      "available": true,
+      "reach": "global",
+      "label": "Freie Office-Suite und offene Mitwirkungswege",
+      "source_ids": [
+        "libreoffice-home"
+      ]
+    }
+  },
+  "activity": {
+    "status": "active",
+    "observed_at": "2026-07-12",
+    "source_ids": [
+      "libreoffice-home"
+    ],
+    "note": "Die offizielle Projektseite war am Prüftag erreichbar und beschrieb aktuelle Nutzung oder Mitwirkung."
+  },
+  "provenance": {
+    "sources": [
+      {
+        "id": "libreoffice-home",
+        "type": "official-source",
+        "label": "LibreOffice",
+        "url": "https://www.libreoffice.org/",
+        "retrieved_at": "2026-07-12",
+        "note": "Die offizielle Seite beschreibt LibreOffice als quelloffene Office-Suite, die von einer weltweiten Gemeinschaft entwickelt wird."
+      }
+    ]
+  },
+  "curation": {
+    "state": "listed",
+    "reviewed_by": "Commonworld editorial review",
+    "reviewed_at": "2026-07-12",
+    "next_review_at": "2026-10-12",
+    "notes": "Erster öffentlicher Commonworld-Startdatensatz; Identität, Zweck, digitale Präsenz und offizielle Quelle wurden redaktionell geprüft."
+  },
+  "links": [
+    {
+      "type": "homepage",
+      "label": "LibreOffice – offizielle Seite",
+      "url": "https://www.libreoffice.org/"
+    },
+    {
+      "type": "source",
+      "label": "LibreOffice",
+      "url": "https://www.libreoffice.org/"
+    }
+  ],
+  "handoff": {
+    "enabled": false
+  }
+}

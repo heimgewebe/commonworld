@@ -237,6 +237,10 @@ figcaption {
     grid-row: 2 / span 2;
     min-height: 38rem;
   }
+
+  .catalog {
+    grid-column: 1 / -1;
+  }
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -245,4 +249,78 @@ figcaption {
   *::after {
     scroll-behavior: auto !important;
   }
+}
+
+.catalog {
+  display: grid;
+  gap: 1.35rem;
+  padding-top: 0.5rem;
+}
+
+.catalog-heading {
+  max-width: 48rem;
+}
+
+.catalog-heading h2 {
+  margin-bottom: 0.7rem;
+  font-size: clamp(1.8rem, 4vw, 3rem);
+  letter-spacing: -0.035em;
+}
+
+.catalog-heading > p:last-child,
+.catalog-meta {
+  color: var(--muted);
+  line-height: 1.65;
+}
+
+.catalog-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 16rem), 1fr));
+  gap: 0.9rem;
+}
+
+.catalog-card {
+  min-height: 15rem;
+  padding: 1.25rem;
+  display: flex;
+  flex-direction: column;
+  border: 1px solid var(--line);
+  border-radius: 1.15rem;
+  background: rgba(13, 28, 25, 0.62);
+}
+
+.catalog-kind {
+  margin-bottom: 0.75rem;
+  color: var(--green);
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.catalog-card h3 {
+  margin: 0 0 0.65rem;
+  font-size: 1.35rem;
+}
+
+.catalog-card > p:not(.catalog-kind) {
+  color: var(--muted);
+  line-height: 1.55;
+}
+
+.catalog-card a,
+.catalog-meta a {
+  color: #bce8cf;
+  text-underline-offset: 0.2em;
+}
+
+.catalog-card a {
+  width: fit-content;
+  margin-top: auto;
+  font-weight: 700;
+}
+
+.catalog-meta {
+  margin: 0;
+  font-size: 0.86rem;
 }

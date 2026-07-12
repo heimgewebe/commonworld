@@ -16,8 +16,10 @@ REQUIRED_HTML = (
     'class="globe-stage"',
     'class="digital-sphere"',
     "Erde → Großregion → Region → lokaler Zusammenhang → Commons",
-    "Der kanonische Globus wird aufgebaut.",
-    "semantische Zoomstufen",
+    "Der Globus erhält reale Katalogdaten.",
+    "10 geprüfte Startdatensätze",
+    "Erste öffentliche Commons",
+    'id="catalog"',
 )
 
 FORBIDDEN_HTML = (
@@ -39,6 +41,8 @@ REQUIRED_CSS = (
     ".digital-sphere",
     ".globe",
     ".field-one",
+    ".catalog-grid",
+    ".catalog-card",
     "@media (min-width: 58rem)",
     "@media (prefers-reduced-motion: reduce)",
 )

@@ -1,0 +1,71 @@
+{
+  "schema_version": 3,
+  "id": "freifunk",
+  "title": "Freifunk",
+  "summary": "Eine nicht-kommerzielle Initiative für freie, gemeinschaftlich aufgebaute Kommunikationsnetze und offene digitale Infrastruktur.",
+  "kind": "digital",
+  "themes": [
+    "communication",
+    "community-network"
+  ],
+  "actions": [
+    "use",
+    "learn",
+    "contribute",
+    "volunteer",
+    "donate"
+  ],
+  "presence": {
+    "geographic": [],
+    "digital": {
+      "available": true,
+      "reach": "network",
+      "label": "Freie Community-Netze und Beteiligungsinformationen",
+      "source_ids": [
+        "freifunk-overview"
+      ]
+    }
+  },
+  "activity": {
+    "status": "active",
+    "observed_at": "2026-07-12",
+    "source_ids": [
+      "freifunk-overview"
+    ],
+    "note": "Die offizielle Projektseite war am Prüftag erreichbar und beschrieb aktuelle Nutzung oder Mitwirkung."
+  },
+  "provenance": {
+    "sources": [
+      {
+        "id": "freifunk-overview",
+        "type": "official-source",
+        "label": "Freifunk – Worum geht es?",
+        "url": "https://freifunk.net/worum-geht-es/",
+        "retrieved_at": "2026-07-12",
+        "note": "Die offizielle Seite beschreibt Freifunk als nicht-kommerzielle Initiative für freie Funknetzwerke und freie Infrastrukturen."
+      }
+    ]
+  },
+  "curation": {
+    "state": "listed",
+    "reviewed_by": "Commonworld editorial review",
+    "reviewed_at": "2026-07-12",
+    "next_review_at": "2026-10-12",
+    "notes": "Erster öffentlicher Commonworld-Startdatensatz; Identität, Zweck, digitale Präsenz und offizielle Quelle wurden redaktionell geprüft."
+  },
+  "links": [
+    {
+      "type": "homepage",
+      "label": "Freifunk – offizielle Seite",
+      "url": "https://freifunk.net/"
+    },
+    {
+      "type": "source",
+      "label": "Freifunk – Worum geht es?",
+      "url": "https://freifunk.net/worum-geht-es/"
+    }
+  ],
+  "handoff": {
+    "enabled": false
+  }
+}
