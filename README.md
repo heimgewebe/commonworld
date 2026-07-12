@@ -23,7 +23,7 @@ Commonworld führt keine eigene Mitgliedschaft, Projektverwaltung oder ungeprüf
 
 ## Aktueller Stand
 
-Die öffentliche Seite ist ein ehrlicher Platzhalter für den kanonischen Globus. Die nächste Phase definiert und misst den Daten- und Renderingvertrag, bevor eine Globe-Engine festgelegt wird.
+Die öffentliche Seite zeigt den ersten quellengebundenen Startkatalog mit zehn digitalen Commons. Die Einträge sind CommonProject-v3-Datensätze unter `catalog/`; eine Globe-Engine ist weiterhin nicht festgelegt.
 
 ## Validierung
 

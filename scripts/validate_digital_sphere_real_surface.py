@@ -347,18 +347,26 @@ def _v4_floor(root: Path) -> dict[str, Any]:
 
 
 def _public_shell_contains_reference_data(root: Path, records: list[dict[str, Any]]) -> list[str]:
+    """Detect leakage of the test fixture, not independently curated public identities.
+
+    A real project name or official URL may later enter the public catalog through a
+    separate editorial record. Reference-only IDs, summaries and fixture notices may not.
+    """
     html_path = root / "index.html"
     if not html_path.is_file():
         return ["missing index.html for public-shell leakage check"]
     html = html_path.read_text(encoding="utf-8")
     leaks = []
     for record in records:
-        for token in (record["id"], record["title"]):
-            if token in html:
+        fixture_tokens = [
+            record.get("id"),
+            record.get("summary"),
+            record.get("activity", {}).get("note"),
+            record.get("curation", {}).get("notes"),
+        ]
+        for token in fixture_tokens:
+            if isinstance(token, str) and token and token in html:
                 leaks.append(token)
-        for link in record.get("links", []):
-            if isinstance(link, dict) and link.get("url") in html:
-                leaks.append(link["url"])
     return leaks
 
 
@@ -582,9 +590,9 @@ def _validate_performance_and_shell(root: Path, result: dict[str, Any], records:
     public_shell = result.get("public_shell", {})
     leaks = _public_shell_contains_reference_data(root, records)
     if leaks:
-        errors.append(f"public shell contains reference data: {sorted(leaks)}")
+        errors.append(f"public shell contains reference-fixture data: {sorted(leaks)}")
     if public_shell.get("reference_data_in_index_html") is not False or public_shell.get("public_shell_changed") is not False:
-        errors.append("public shell must stay free of reference data and runtime changes")
+        errors.append("real-surface proof must state that its reference fixture did not change the public shell")
     return errors
 
 

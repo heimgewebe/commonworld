@@ -652,6 +652,12 @@ Abgedeckt werden mindestens:
 
 Geografische Anker, digitale Präsenz, Betriebszustand und Beziehungen tragen Quellenverweise auf die gemeinsame Provenienz. Exakte und ungefähre Anker benötigen eine veröffentlichbare Geometrie; verborgene Anker dürfen keine Geometrie enthalten. `activity.status` beschreibt den belegten Betriebszustand. `curation.state` beschreibt dagegen Publikations- und Prüfqualität. Beide Aussagen dürfen nicht miteinander gleichgesetzt werden.
 
+### Erster öffentlicher Startkatalog v1
+
+Der erste öffentliche Bestand liegt unter `catalog/` und umfasst zehn digitale CommonProject-v3-Identitäten. Die Einträge wurden am 12. Juli 2026 anhand offizieller Projektquellen redaktionell in den Zustand `listed` gesetzt. Sie sind von den nichtöffentlichen Referenz- und Lastdaten unter `tests/` strikt getrennt.
+
+Der Startbestand deckt alle sechs digitalen Darstellungsschichten ab, ohne ein Schichtfeld in den Katalog zu schreiben. Vollständig digitale Commons haben eine leere geografische Präsenz und erhalten keine erfundenen Koordinaten. `catalog/catalog.json` bildet das öffentliche Verzeichnis; die statische lineare Ansicht auf der Startseite wird aus denselben Identitäten geprüft. Die Veröffentlichung wählt keine Globe-Engine und autorisiert keine Produktionsarchitektur.
+
 ## Qualitäts- und Publikationszustände
 
 - `candidate`: geprüft werden, nicht im Hauptkatalog;

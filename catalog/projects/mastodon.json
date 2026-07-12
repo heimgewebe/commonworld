@@ -1,0 +1,71 @@
+{
+  "schema_version": 3,
+  "id": "mastodon",
+  "title": "Mastodon",
+  "summary": "Eine freie, quelloffene und föderierte Software für soziale Netzwerke, deren unabhängige Server miteinander kommunizieren können.",
+  "kind": "digital",
+  "themes": [
+    "communication",
+    "federation",
+    "protocol"
+  ],
+  "actions": [
+    "use",
+    "learn",
+    "contribute",
+    "donate"
+  ],
+  "presence": {
+    "geographic": [],
+    "digital": {
+      "available": true,
+      "reach": "network",
+      "label": "Föderierte soziale Kommunikation über unabhängige Server",
+      "source_ids": [
+        "mastodon-home"
+      ]
+    }
+  },
+  "activity": {
+    "status": "active",
+    "observed_at": "2026-07-12",
+    "source_ids": [
+      "mastodon-home"
+    ],
+    "note": "Die offizielle Projektseite war am Prüftag erreichbar und beschrieb aktuelle Nutzung oder Mitwirkung."
+  },
+  "provenance": {
+    "sources": [
+      {
+        "id": "mastodon-home",
+        "type": "official-source",
+        "label": "Mastodon",
+        "url": "https://joinmastodon.org/",
+        "retrieved_at": "2026-07-12",
+        "note": "Die offizielle Seite beschreibt Mastodon als freie, quelloffene, dezentrale und interoperable soziale Plattform."
+      }
+    ]
+  },
+  "curation": {
+    "state": "listed",
+    "reviewed_by": "Commonworld editorial review",
+    "reviewed_at": "2026-07-12",
+    "next_review_at": "2026-10-12",
+    "notes": "Erster öffentlicher Commonworld-Startdatensatz; Identität, Zweck, digitale Präsenz und offizielle Quelle wurden redaktionell geprüft."
+  },
+  "links": [
+    {
+      "type": "homepage",
+      "label": "Mastodon – offizielle Seite",
+      "url": "https://joinmastodon.org/"
+    },
+    {
+      "type": "source",
+      "label": "Mastodon",
+      "url": "https://joinmastodon.org/"
+    }
+  ],
+  "handoff": {
+    "enabled": false
+  }
+}

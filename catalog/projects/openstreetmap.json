@@ -1,0 +1,70 @@
+{
+  "schema_version": 3,
+  "id": "openstreetmap",
+  "title": "OpenStreetMap",
+  "summary": "Eine weltweite, gemeinschaftlich gepflegte offene Kartendatenbank, deren Daten frei genutzt und verbessert werden können.",
+  "kind": "digital",
+  "themes": [
+    "open-data",
+    "infrastructure"
+  ],
+  "actions": [
+    "use",
+    "learn",
+    "contribute",
+    "donate"
+  ],
+  "presence": {
+    "geographic": [],
+    "digital": {
+      "available": true,
+      "reach": "global",
+      "label": "Weltweite offene Kartendaten und gemeinschaftliche Bearbeitung",
+      "source_ids": [
+        "openstreetmap-about"
+      ]
+    }
+  },
+  "activity": {
+    "status": "active",
+    "observed_at": "2026-07-12",
+    "source_ids": [
+      "openstreetmap-about"
+    ],
+    "note": "Die offizielle Projektseite war am Prüftag erreichbar und beschrieb aktuelle Nutzung oder Mitwirkung."
+  },
+  "provenance": {
+    "sources": [
+      {
+        "id": "openstreetmap-about",
+        "type": "official-source",
+        "label": "About OpenStreetMap",
+        "url": "https://www.openstreetmap.org/about",
+        "retrieved_at": "2026-07-12",
+        "note": "Die offizielle Seite beschreibt OpenStreetMap als gemeinschaftlich gepflegte, weltweit nutzbare offene Kartendatenbank."
+      }
+    ]
+  },
+  "curation": {
+    "state": "listed",
+    "reviewed_by": "Commonworld editorial review",
+    "reviewed_at": "2026-07-12",
+    "next_review_at": "2026-10-12",
+    "notes": "Erster öffentlicher Commonworld-Startdatensatz; Identität, Zweck, digitale Präsenz und offizielle Quelle wurden redaktionell geprüft."
+  },
+  "links": [
+    {
+      "type": "homepage",
+      "label": "OpenStreetMap – offizielle Seite",
+      "url": "https://www.openstreetmap.org/"
+    },
+    {
+      "type": "source",
+      "label": "About OpenStreetMap",
+      "url": "https://www.openstreetmap.org/about"
+    }
+  ],
+  "handoff": {
+    "enabled": false
+  }
+}
