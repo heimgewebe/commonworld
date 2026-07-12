@@ -527,7 +527,17 @@ Ein physischer Screenreader-Test ist nach Produktentscheidung für diese nichtö
 
 Abnahmepaket v5 bildet diese Entscheidung maschinenlesbar ab: sieben manuelle Punkte bleiben Pflicht, der Screenreader-Punkt ist optional und als `Entfällt` vorbelegt. Beim Bestätigen von Reduced Motion löst v5 selbst eine Sofortbewegung aus und speichert künftig den Maschinenwert `0 ms`. Der installierte v5-Dienst ist an das Manifest `3e4eb9b92e21357a87368a674609e5b49199fad6ed75963bbfad1aa20a8280f5` gebunden.
 
-Als nächster physischer Gegencheck bleibt Android Chrome offen. Danach folgen reale Schichtableitung, Lesbarkeit echter Commons-Namen, vollständige Fokuspanel-Parität und die räumliche seitliche Kamerafahrt. Bis dahin gelten weiterhin `engine_selected = false` und `production_architecture_authorized = false`.
+Als nächster physischer Gegencheck bleibt Android Chrome offen. Bis dahin gelten weiterhin `engine_selected = false` und `production_architecture_authorized = false`.
+
+### Reale digitale Oberfläche v1
+
+Der technische Beleg liegt in `docs/research/digital-sphere-real-surface-v1.result.json`; die lesbare Auswertung liegt daneben. Zwölf quellengebundene CommonProject-v3-Referenzen belegen deterministisch alle sechs digitalen Schichten. Sie dienen ausschließlich der Ableitung, Lesbarkeit und Interaktionsprüfung und sind weder öffentlicher Commonworld-Katalog noch redaktionelle Aufnahmeentscheidung. Vollständig digitale Commons erhalten keine erfundenen geografischen Koordinaten.
+
+Pro Schicht bleibt die sichtbare Namenszahl begrenzt. Reale Referenznamen haben Vorrang vor synthetischen Lastidentitäten; gekürzte Bahnlabels behalten eindeutigen zugänglichen Volltext. Genau ein gemeinsames Fokuspanel wird direkt aus derselben `CommonProject.id` abgeleitet und bleibt über Sphärenrand, Schichtbutton, lineare Ansicht, Suche, Deep Link und Browser-Zurück identisch.
+
+Die Seitenansicht bleibt ein Zustand desselben Globus. Sie speichert den vollständigen Ausgangszustand, fährt MapLibre mit Bearing, Pitch, Zoom und Padding seitlich und stellt beim Schließen oder Browser-Zurück den vorherigen Zustand exakt wieder her. Neue Eingaben unterbrechen die Fahrt. Bei `prefers-reduced-motion: reduce` wird derselbe Zielzustand mit `jumpTo` in `0 ms` erreicht.
+
+Der öffentliche Repo-Slice ändert keine öffentliche Runtime. Der private Acceptance-Release v6 beweist diese Verträge im Browser: quellengebundene Ableitung, begrenzte Namensdichte, gemeinsames Fokuspanel, echte MapLibre-Seitenfahrt, Reduced Motion, 50.000er-Virtualisierung, Leerlauf und Software-WebGL-Leistung. Android Chrome bleibt als physischer Gegencheck offen; der entfallene Screenreader-Test ist kein PASS. `engine_selected = false` und `production_architecture_authorized = false` bleiben zwingend.
 
 ### Aggregation
 

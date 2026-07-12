@@ -23,32 +23,58 @@
       {
         "id": "knowledge_data",
         "label_de": "Wissen und offene Daten",
-        "derived_from": ["knowledge", "open-data", "research", "documentation"]
+        "derived_from": [
+          "knowledge",
+          "open-data",
+          "research",
+          "documentation"
+        ]
       },
       {
         "id": "software_infrastructure",
         "label_de": "Freie Software und Infrastruktur",
-        "derived_from": ["free-software", "open-source", "infrastructure", "platform"]
+        "derived_from": [
+          "free-software",
+          "open-source",
+          "infrastructure",
+          "platform"
+        ]
       },
       {
         "id": "media_culture",
         "label_de": "Offene Medien und Kultur",
-        "derived_from": ["open-media", "culture", "archives", "creative-commons"]
+        "derived_from": [
+          "open-media",
+          "culture",
+          "archives",
+          "creative-commons"
+        ]
       },
       {
         "id": "learning_education",
         "label_de": "Freies Lernen und Bildung",
-        "derived_from": ["education", "open-educational-resources", "learning"]
+        "derived_from": [
+          "education",
+          "open-educational-resources",
+          "learning"
+        ]
       },
       {
         "id": "communication_networks",
         "label_de": "Kommunikation und Netze",
-        "derived_from": ["communication", "community-network", "federation", "protocol"]
+        "derived_from": [
+          "communication",
+          "community-network",
+          "federation",
+          "protocol"
+        ]
       },
       {
         "id": "mixed_other",
         "label_de": "Gemischte und weitere digitale Commons",
-        "derived_from": ["fallback_for_multiple_or_unmapped_topics"]
+        "derived_from": [
+          "fallback_for_multiple_or_unmapped_topics"
+        ]
       }
     ],
     "membership_rule": "one_primary_presentation_layer_per_visible_representation_with_optional_cross_layer_relations",
@@ -148,9 +174,63 @@
     "settled_idle_overlay_render_delta_max": 0,
     "benchmark_requires_browser_frame_alignment_and_map_render_confirmation": true
   },
+  "real_surface_v1": {
+    "reference_set_path": "tests/cases/digital-sphere.reference-projects.json",
+    "reference_projects_are_public_catalog": false,
+    "commonproject_schema_version": 3,
+    "layer_derivation": {
+      "source_identity": "CommonProject.id",
+      "requires_digital_presence_available": true,
+      "missing_digital_presence_result": "no_digital_layer",
+      "unique_highest_topic_score_result": "selected_layer",
+      "tie_or_unmapped_result": "mixed_other",
+      "manual_layer_override_forbidden": true
+    },
+    "name_presentation": {
+      "visible_name_limit_per_layer": 2,
+      "orbit_label_max_chars": 18,
+      "visible_orbit_labels_must_have_accessible_full_text": true,
+      "side_view_uses_full_commonproject_title": true,
+      "focus_panel_uses_full_commonproject_title": true,
+      "different_full_names_must_not_share_visible_short_label": true,
+      "binary_fragments_aria_hidden_and_decorative": true,
+      "source_backed_reference_names_precede_synthetic_load_names": true
+    },
+    "focus_panel": {
+      "single_shared_panel": true,
+      "source": "same_commonproject_v3_record",
+      "second_data_copy_forbidden": true,
+      "required_fields": [
+        "full_name",
+        "summary",
+        "commons_kind",
+        "themes",
+        "actions",
+        "digital_presence",
+        "official_links",
+        "sources",
+        "curation",
+        "reference_dataset_notice"
+      ],
+      "reference_dataset_notice_required": true
+    },
+    "side_camera": {
+      "maplibre_camera_required": true,
+      "css_only_shift_forbidden": true,
+      "save_complete_previous_state": true,
+      "animated_command": "maplibre.easeTo",
+      "reduced_motion_command": "maplibre.jumpTo",
+      "reduced_motion_duration_ms": 0,
+      "new_input_interrupts_transition": true,
+      "close_and_browser_back_restore_exact_previous_state": true,
+      "layer_stack_beside_damped_globe": true,
+      "independent_mode_forbidden": true,
+      "target_requires_bearing_pitch_zoom_and_padding": true
+    }
+  },
   "decision_boundary": {
     "engine_selected": false,
     "production_architecture_authorized": false,
-    "next_proof": "physical_android_v5_acceptance_then_real_data_focus_and_side_camera_proof"
+    "next_proof": "physical_android_v6_acceptance_then_editorial_catalog_process"
   }
 }
