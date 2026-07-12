@@ -8,6 +8,7 @@ import {
   deriveLayer,
   searchFromState,
   sphereOpacityForZoom,
+  sphereStartOffset,
   stateFromSearch,
 } from '../../assets/commonworld-core.mjs';
 
@@ -32,6 +33,18 @@ test('binary fragments are stable visual encodings', () => {
   assert.equal(binaryFragment('wikipedia'), binaryFragment('wikipedia'));
   assert.notEqual(binaryFragment('wikipedia'), binaryFragment('wikidata'));
   assert.match(binaryFragment('debian'), /^[01]{12}$/);
+});
+
+test('digital sphere offsets wrap all catalog labels into the visible path band', () => {
+  const recordsPerLayer = [2, 2, 1, 2, 2, 1];
+  const offsets = recordsPerLayer.flatMap((count, layerIndex) =>
+    Array.from({ length: count }, (_, recordIndex) => sphereStartOffset(layerIndex, recordIndex, count)),
+  );
+  assert.equal(offsets.length, 10);
+  assert.ok(offsets.every((offset) => offset >= 8 && offset < 80));
+  assert.ok(Math.abs(sphereStartOffset(3, 1, 2) - 64.88) < 0.0001);
+  assert.ok(Math.abs(sphereStartOffset(5, 0, 1) - 18.8) < 0.0001);
+  assert.equal(sphereStartOffset(-1, -1, 0), 8);
 });
 
 test('deep-link state accepts known identities and clamps camera', () => {

@@ -46,6 +46,14 @@ export function binaryFragment(identifier, length = 12) {
   return bits.slice(0, length);
 }
 
+export function sphereStartOffset(layerIndex, recordIndex, recordCount) {
+  const count = Number.isInteger(recordCount) && recordCount > 0 ? recordCount : 1;
+  const layer = Number.isInteger(layerIndex) && layerIndex >= 0 ? layerIndex : 0;
+  const index = Number.isInteger(recordIndex) && recordIndex >= 0 ? recordIndex : 0;
+  const normalized = ((index / count + layer * 0.43) % 1 + 1) % 1;
+  return Number((8 + normalized * 72).toFixed(4));
+}
+
 export function cameraFromSearch(search = '') {
   const parameters = new URLSearchParams(search.startsWith('?') ? search.slice(1) : search);
   return {

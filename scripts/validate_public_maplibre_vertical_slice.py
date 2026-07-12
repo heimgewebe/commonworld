@@ -258,6 +258,8 @@ def validate_public_maplibre_vertical_slice(root: Path = ROOT) -> list[str]:
     for identifier in EXPECTED_IDS:
         if identifier in app or identifier in core:
             errors.append(f"public runtime code hardcodes catalog identity instead of loading it: {identifier}")
+    if "sphereStartOffset(layerIndex, recordIndex, records.length)" not in app:
+        errors.append("public runtime must use the tested bounded digital-sphere offset helper")
 
     required_html = (
         '<script src="./assets/vendor/maplibre-gl.js" defer></script>',

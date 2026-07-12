@@ -6,6 +6,7 @@ import {
   mapCamera,
   searchFromState,
   sphereOpacityForZoom,
+  sphereStartOffset,
   stateFromSearch,
 } from './commonworld-core.mjs';
 
@@ -96,7 +97,7 @@ function renderSphere() {
       });
       const path = createSvgElement('textPath', {
         href: `#sphere-path-${layerIndex + 1}`,
-        startOffset: `${8 + ((recordIndex + layerIndex * 0.43) * 84) / Math.max(1, records.length)}%`,
+        startOffset: `${sphereStartOffset(layerIndex, recordIndex, records.length)}%`,
       });
       const name = createSvgElement('tspan', { class: 'sphere-name' });
       name.textContent = record.title;

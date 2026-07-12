@@ -1,7 +1,7 @@
 {
   "schema_version": 1,
   "kind": "commonworld_public_maplibre_vertical_slice_result",
-  "tested_at": "2026-07-12T13:27:21.066Z",
+  "tested_at": "2026-07-12T21:09:29.559Z",
   "base_commit": "97b57cbc1c8ca16b157f9678228b2ea070613ff5",
   "runtime": {
     "engine": "maplibre_gl_js",
@@ -14,8 +14,8 @@
     "geographic_commons_in_scope": false
   },
   "validation": {
-    "python_tests": 326,
-    "javascript_tests": 7,
+    "python_tests": 327,
+    "javascript_tests": 8,
     "make_validate": "PASS",
     "git_diff_check": "PASS",
     "deterministic_rebuild": "PASS",
@@ -26,9 +26,9 @@
     "renderer": "WebKit WebGL",
     "verdict": "PASS",
     "evidence_path": "/home/alex/.local/state/grabowski/evidence/commonworld/public-maplibre-globe-v1/browser-proof.json",
-    "evidence_sha256": "f53662f2f4da81866025193fe0cbb2f06b33022e7d610ab71cf9c62540f35f08",
+    "evidence_sha256": "9606f6c2fa6b670ab22ec3c46fdde3cc7c4d2ff7ccdc043a2be843ca158eff40",
     "screenshot_path": "/home/alex/.local/state/grabowski/evidence/commonworld/public-maplibre-globe-v1/browser-proof.png",
-    "screenshot_sha256": "2dfbbfc13ce4e15a41bd01962d05abea961d01077a442204c560f7f4e3fc11da",
+    "screenshot_sha256": "a34d383547d5865c2c5522c50e02ae87601fa975bcc6974e488bb1eed347b341",
     "assertions": {
       "runtime_ready": true,
       "map_canvas_and_webgl": true,
@@ -40,20 +40,22 @@
       "idle_overlay_render_delta": 0,
       "unexpected_resource_origins": 0,
       "uncaught_exceptions": 0,
-      "focus_returned_after_close": true
+      "focus_returned_after_close": true,
+      "ten_sphere_labels_painted": true
     },
     "standard_motion": {
       "verdict": "PASS",
       "evidence_path": "/home/alex/.local/state/grabowski/evidence/commonworld/public-maplibre-globe-v1/browser-proof-standard-motion.json",
-      "evidence_sha256": "11047c44387e7135bcede919f25d292563905bebf9d798b2077196f155fa0b0c",
+      "evidence_sha256": "a2c4cb3d072cf440228912c64dccaa66fadd5e840e4cb52dfa0c5854276e7834",
       "screenshot_path": "/home/alex/.local/state/grabowski/evidence/commonworld/public-maplibre-globe-v1/browser-proof-standard-motion.png",
-      "screenshot_sha256": "e327b38f0270fb31869497b57495c121f281c22a5882faff2aef16b9c50bd789",
+      "screenshot_sha256": "a51ae53c0b2bfe2825becf4acb83fd3fc56ac02820362baf0589dae3be41458a",
       "close_camera_command": "easeTo",
       "open_camera_command": "easeTo",
       "duration_ms": 260,
       "idle_map_render_delta": 0,
       "idle_overlay_render_delta": 0,
-      "focus_returned_after_close": true
+      "focus_returned_after_close": true,
+      "ten_sphere_labels_painted": true
     }
   },
   "evidence_bindings": [
@@ -83,11 +85,11 @@
     },
     {
       "path": "assets/commonworld-core.mjs",
-      "sha256": "946d2405e4d979e28c79964d0ef146e34a8fcc49df5a31a3a3783e96d060d288"
+      "sha256": "ea4a5479096c46d1d70457f645e8c4ae53822cf55a3ff19e3bd64002aeed5c89"
     },
     {
       "path": "assets/commonworld-app.js",
-      "sha256": "06c8ea4cf5bd2e2670c9c0d3150ea928f863fd2181f530502a111686dbd08aec"
+      "sha256": "7ce907a186dc9e01517674e09b682d85e60868f77557cd0525506cabdfa90d45"
     },
     {
       "path": "index.html",
