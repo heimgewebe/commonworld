@@ -259,7 +259,7 @@ def validate_maplibre_phase2_proof(root: Path = ROOT) -> list[str]:
     if result.get("gate_summary") != {"pass_or_bounded_pass": 15, "blocked": 4, "total": 19}:
         errors.append("MapLibre Phase-2 gate summary mismatch")
 
-    for relative in ("node_modules", "screenshots", "spikes", "proofs", "maplibre-phase2-harness"):
+    for relative in ("screenshots", "spikes", "proofs", "maplibre-phase2-harness"):
         if (root / relative).exists():
             errors.append(f"temporary Phase-2 harness must not enter product repository: {relative}")
     for public_file in ("index.html", "404.html"):

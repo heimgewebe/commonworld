@@ -3,14 +3,18 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <meta
-      name="description"
-      content="Commonworld macht Commons weltweit, regional, lokal und digital auf einem gemeinsamen Globus sichtbar."
-    />
+    <meta name="color-scheme" content="dark" />
+    <meta name="referrer" content="strict-origin-when-cross-origin" />
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' data: blob: https://tiles.openfreemap.org; connect-src 'self' https://tiles.openfreemap.org; font-src 'self' data: https://tiles.openfreemap.org; worker-src 'self' blob:; child-src blob:; object-src 'none'; base-uri 'self'; form-action 'none';" />
+    <meta name="description" content="Commonworld macht Commons weltweit, regional, lokal und digital auf einem gemeinsamen Globus sichtbar." />
     <title>commonworld — Commons entdecken</title>
+    <link rel="stylesheet" href="./assets/vendor/maplibre-gl.css" />
     <link rel="stylesheet" href="./index.css" />
+    <script src="./assets/vendor/maplibre-gl.js" defer></script>
+    <script type="module" src="./assets/commonworld-app.js"></script>
   </head>
   <body>
+    <a class="skip-link" href="#catalog">Zur linearen Commons-Ansicht springen</a>
     <main class="shell">
       <header class="brand" aria-label="commonworld">
         <span class="brand-mark" aria-hidden="true"></span>
@@ -20,108 +24,166 @@
       <section class="intro" aria-labelledby="title">
         <p class="kicker">Commons weltweit entdecken</p>
         <h1 id="title">Die gemeinsame Welt wird sichtbar.</h1>
-        <p class="lede">
-          Commonworld entsteht als zoombarer Globus: von weltweiten Commons-Feldern über Regionen und lokale
-          Zusammenhänge bis zum einzelnen Commons. Eine digitale Sphäre verbindet ortsunabhängige und hybride
-          Commons mit derselben Oberfläche.
-        </p>
+        <p class="lede">Drehe und zoome den Globus. Die digitale Sphäre zeigt ortsunabhängige Commons, ohne ihnen erfundene Orte zu geben. Jede Auswahl bleibt im Globus, in den Schichten und in der linearen Ansicht dieselbe CommonProject-ID.</p>
       </section>
 
-      <figure class="globe-stage" aria-labelledby="globe-caption">
-        <div class="digital-sphere" aria-hidden="true">
-          <span>0</span><span>1</span><span>◌</span><span>+</span><span>1</span><span>0</span><span>◇</span><span>1</span>
-        </div>
-        <div class="globe" aria-hidden="true">
-          <span class="field field-one"></span>
-          <span class="field field-two"></span>
-          <span class="field field-three"></span>
-        </div>
+      <figure class="globe-stage" aria-labelledby="globe-caption" data-runtime-state="loading" data-map-renders="0" data-overlay-renders="0">
+        <div id="map" class="globe-map" role="application" aria-label="Interaktiver Commonworld-Globus"></div>
+        <svg id="digital-sphere" class="digital-sphere" viewBox="0 0 640 640" role="group" aria-labelledby="sphere-title">
+          <title id="sphere-title">Digitale Commons-Sphäre mit sechs abgeleiteten Schichten</title>
+          <defs>
+            <radialGradient id="sphere-center-fade">
+              <stop offset="0%" stop-color="black" />
+              <stop offset="58%" stop-color="black" />
+              <stop offset="78%" stop-color="white" />
+              <stop offset="100%" stop-color="white" />
+            </radialGradient>
+            <mask id="sphere-mask"><rect width="640" height="640" fill="url(#sphere-center-fade)" /></mask>
+            <g id="sphere-paths" fill="none">
+              <circle id="sphere-path-1" cx="320" cy="320" r="268" />
+              <circle id="sphere-path-2" cx="320" cy="320" r="252" />
+              <circle id="sphere-path-3" cx="320" cy="320" r="236" />
+              <circle id="sphere-path-4" cx="320" cy="320" r="220" />
+              <circle id="sphere-path-5" cx="320" cy="320" r="204" />
+              <circle id="sphere-path-6" cx="320" cy="320" r="188" />
+            </g>
+          </defs>
+          <g id="sphere-streams" mask="url(#sphere-mask)" aria-hidden="true"></g>
+          <circle id="sphere-edge-control" class="sphere-edge-control" cx="320" cy="320" r="276" fill="none" stroke="transparent" stroke-width="28" pointer-events="stroke" role="button" tabindex="0" aria-label="Digitale Commons-Schichten öffnen"></circle>
+        </svg>
+        <button id="layer-view-button" class="layer-view-button" type="button" aria-controls="layer-panel" aria-expanded="false">Digitale Schichten</button>
+        <p id="map-status" class="map-status" role="status">Interaktiver Globus wird geladen. Die lineare Ansicht bleibt jederzeit verfügbar.</p>
+        <noscript><p class="map-status map-status-static">JavaScript ist deaktiviert. Alle zehn Commons sind in der linearen Ansicht vollständig erreichbar.</p></noscript>
+
+        <aside id="layer-panel" class="layer-panel" aria-labelledby="layer-title" hidden>
+          <div class="panel-heading">
+            <div><p class="kicker">Digitale Sphäre</p><h2 id="layer-title">Sechs Schichten, zehn Identitäten</h2></div>
+            <button id="layer-close" class="icon-button" type="button" aria-label="Schichtansicht schließen">×</button>
+          </div>
+          <p>Die Schichten werden aus Themen und digitaler Präsenz abgeleitet. Sie sind keine zweite Katalogwahrheit.</p>
+          <div id="layer-buttons" class="layer-buttons" aria-label="Digitale Schichten filtern"></div>
+          <div id="layer-projects" class="layer-projects" aria-label="Commons in der gewählten Schicht"></div>
+        </aside>
         <figcaption id="globe-caption">Erde → Großregion → Region → lokaler Zusammenhang → Commons</figcaption>
       </figure>
 
       <section class="status" aria-labelledby="status-title">
-        <h2 id="status-title">Die Globe-Engine steht fest.</h2>
-        <p>
-          MapLibre GL JS wird den Globus, die Kamera und den semantischen Zoom tragen. Die öffentliche Seite bleibt
-          bis zum ersten interaktiven Vertikalschnitt bewusst statisch; alle zehn Katalogeinträge sind weiterhin in
-          der gleichwertigen linearen Ansicht erreichbar.
-        </p>
+        <h2 id="status-title">Der erste interaktive Globus ist gebaut.</h2>
+        <p>MapLibre GL JS 5.24.0 trägt Globus, Kamera und semantischen Zoom. OpenFreeMap liefert die Basiskarte; die zehn digitalen Commons bleiben bewusst ohne geografische Koordinaten und sind vollständig in der linearen Ansicht erreichbar.</p>
+      </section>
+
+      <section id="project-focus" class="project-focus" tabindex="-1" aria-labelledby="focus-title" hidden>
+        <div class="panel-heading"><div><p id="focus-kind" class="kicker"></p><h2 id="focus-title"></h2></div><button id="focus-close" class="icon-button" type="button" aria-label="Fokus schließen">×</button></div>
+        <p id="focus-summary" class="focus-summary"></p>
+        <div class="focus-grid">
+          <section><h3>Themen</h3><ul id="focus-themes"></ul></section>
+          <section><h3>Möglichkeiten</h3><ul id="focus-actions"></ul></section>
+          <section><h3>Digitale Präsenz</h3><p id="focus-digital"></p></section>
+          <section><h3>Offizielle Links</h3><ul id="focus-links"></ul></section>
+          <section><h3>Quellen</h3><ul id="focus-sources"></ul></section>
+          <section><h3>Kuration</h3><p id="focus-curation"></p></section>
+        </div>
       </section>
 
       <section class="catalog" id="catalog" aria-labelledby="catalog-title">
         <div class="catalog-heading">
           <p class="kicker">10 geprüfte Startdatensätze</p>
           <h2 id="catalog-title">Erste öffentliche Commons</h2>
-          <p>
-            Diese Einträge sind keine Testdaten. Sie wurden am 12. Juli 2026 anhand offizieller Projektquellen
-            redaktionell gelistet. Digitale Commons erhalten dabei keine erfundenen Orte.
-          </p>
+          <p>Diese Einträge werden direkt aus dem kanonischen öffentlichen Katalog gerendert. Digitale Commons erhalten keine erfundenen Orte.</p>
         </div>
         <div class="catalog-grid">
         <article class="catalog-card" id="project-debian" data-commonproject-id="debian">
           <p class="catalog-kind">Digital · Freie Software und Infrastruktur</p>
           <h3>Debian</h3>
           <p>Ein gemeinschaftlich entwickeltes freies Betriebssystem mit offenem Paketarchiv, öffentlicher Dokumentation und weltweiter Mitwirkung.</p>
-          <a href="https://www.debian.org/" rel="external">Offizielle Seite <span aria-hidden="true">↗</span></a>
+          <div class="catalog-actions">
+            <button class="catalog-select" type="button" data-commonproject-id="debian" aria-pressed="false">Im Fokus öffnen</button>
+            <a href="https://www.debian.org/" rel="external noreferrer">Offizielle Seite <span aria-hidden="true">↗</span></a>
+          </div>
         </article>
         <article class="catalog-card" id="project-freifunk" data-commonproject-id="freifunk">
           <p class="catalog-kind">Digital · Kommunikation und Netze</p>
           <h3>Freifunk</h3>
           <p>Eine nicht-kommerzielle Initiative für freie, gemeinschaftlich aufgebaute Kommunikationsnetze und offene digitale Infrastruktur.</p>
-          <a href="https://freifunk.net/" rel="external">Offizielle Seite <span aria-hidden="true">↗</span></a>
+          <div class="catalog-actions">
+            <button class="catalog-select" type="button" data-commonproject-id="freifunk" aria-pressed="false">Im Fokus öffnen</button>
+            <a href="https://freifunk.net/" rel="external noreferrer">Offizielle Seite <span aria-hidden="true">↗</span></a>
+          </div>
         </article>
         <article class="catalog-card" id="project-libreoffice" data-commonproject-id="libreoffice">
           <p class="catalog-kind">Digital · Freie Software und Infrastruktur</p>
           <h3>LibreOffice</h3>
           <p>Eine freie und quelloffene Office-Suite, die von einer internationalen Gemeinschaft entwickelt, dokumentiert und übersetzt wird.</p>
-          <a href="https://www.libreoffice.org/" rel="external">Offizielle Seite <span aria-hidden="true">↗</span></a>
+          <div class="catalog-actions">
+            <button class="catalog-select" type="button" data-commonproject-id="libreoffice" aria-pressed="false">Im Fokus öffnen</button>
+            <a href="https://www.libreoffice.org/" rel="external noreferrer">Offizielle Seite <span aria-hidden="true">↗</span></a>
+          </div>
         </article>
         <article class="catalog-card" id="project-mastodon" data-commonproject-id="mastodon">
           <p class="catalog-kind">Digital · Kommunikation und Netze</p>
           <h3>Mastodon</h3>
           <p>Eine freie, quelloffene und föderierte Software für soziale Netzwerke, deren unabhängige Server miteinander kommunizieren können.</p>
-          <a href="https://joinmastodon.org/" rel="external">Offizielle Seite <span aria-hidden="true">↗</span></a>
+          <div class="catalog-actions">
+            <button class="catalog-select" type="button" data-commonproject-id="mastodon" aria-pressed="false">Im Fokus öffnen</button>
+            <a href="https://joinmastodon.org/" rel="external noreferrer">Offizielle Seite <span aria-hidden="true">↗</span></a>
+          </div>
         </article>
         <article class="catalog-card" id="project-openstreetmap" data-commonproject-id="openstreetmap">
           <p class="catalog-kind">Digital · Gemischte und weitere digitale Commons</p>
           <h3>OpenStreetMap</h3>
           <p>Eine weltweite, gemeinschaftlich gepflegte offene Kartendatenbank, deren Daten frei genutzt und verbessert werden können.</p>
-          <a href="https://www.openstreetmap.org/" rel="external">Offizielle Seite <span aria-hidden="true">↗</span></a>
+          <div class="catalog-actions">
+            <button class="catalog-select" type="button" data-commonproject-id="openstreetmap" aria-pressed="false">Im Fokus öffnen</button>
+            <a href="https://www.openstreetmap.org/" rel="external noreferrer">Offizielle Seite <span aria-hidden="true">↗</span></a>
+          </div>
         </article>
         <article class="catalog-card" id="project-wikibooks" data-commonproject-id="wikibooks">
           <p class="catalog-kind">Digital · Freies Lernen und Bildung</p>
           <h3>Wikibooks</h3>
           <p>Eine offene Sammlung frei nutzbarer Lehr-, Lern- und Sachbücher, die gemeinschaftlich geschrieben und verbessert werden.</p>
-          <a href="https://www.wikibooks.org/" rel="external">Offizielle Seite <span aria-hidden="true">↗</span></a>
+          <div class="catalog-actions">
+            <button class="catalog-select" type="button" data-commonproject-id="wikibooks" aria-pressed="false">Im Fokus öffnen</button>
+            <a href="https://www.wikibooks.org/" rel="external noreferrer">Offizielle Seite <span aria-hidden="true">↗</span></a>
+          </div>
         </article>
         <article class="catalog-card" id="project-wikidata" data-commonproject-id="wikidata">
           <p class="catalog-kind">Digital · Wissen und offene Daten</p>
           <h3>Wikidata</h3>
           <p>Eine freie, gemeinschaftlich gepflegte Wissensdatenbank, die strukturierte Daten für Menschen, Wikimedia-Projekte und weitere Anwendungen bereitstellt.</p>
-          <a href="https://www.wikidata.org/" rel="external">Offizielle Seite <span aria-hidden="true">↗</span></a>
+          <div class="catalog-actions">
+            <button class="catalog-select" type="button" data-commonproject-id="wikidata" aria-pressed="false">Im Fokus öffnen</button>
+            <a href="https://www.wikidata.org/" rel="external noreferrer">Offizielle Seite <span aria-hidden="true">↗</span></a>
+          </div>
         </article>
         <article class="catalog-card" id="project-wikimedia-commons" data-commonproject-id="wikimedia-commons">
           <p class="catalog-kind">Digital · Offene Medien und Kultur</p>
           <h3>Wikimedia Commons</h3>
           <p>Eine freie, gemeinschaftlich aufgebaute Sammlung von Bildern, Audio, Video und anderen Mediendateien zur Wiederverwendung.</p>
-          <a href="https://commons.wikimedia.org/" rel="external">Offizielle Seite <span aria-hidden="true">↗</span></a>
+          <div class="catalog-actions">
+            <button class="catalog-select" type="button" data-commonproject-id="wikimedia-commons" aria-pressed="false">Im Fokus öffnen</button>
+            <a href="https://commons.wikimedia.org/" rel="external noreferrer">Offizielle Seite <span aria-hidden="true">↗</span></a>
+          </div>
         </article>
         <article class="catalog-card" id="project-wikipedia" data-commonproject-id="wikipedia">
           <p class="catalog-kind">Digital · Wissen und offene Daten</p>
           <h3>Wikipedia</h3>
           <p>Eine gemeinschaftlich erstellte, frei zugängliche Enzyklopädie in vielen Sprachen, deren Inhalte von Freiwilligen geschrieben und gepflegt werden.</p>
-          <a href="https://www.wikipedia.org/" rel="external">Offizielle Seite <span aria-hidden="true">↗</span></a>
+          <div class="catalog-actions">
+            <button class="catalog-select" type="button" data-commonproject-id="wikipedia" aria-pressed="false">Im Fokus öffnen</button>
+            <a href="https://www.wikipedia.org/" rel="external noreferrer">Offizielle Seite <span aria-hidden="true">↗</span></a>
+          </div>
         </article>
         <article class="catalog-card" id="project-wikiversity" data-commonproject-id="wikiversity">
           <p class="catalog-kind">Digital · Freies Lernen und Bildung</p>
           <h3>Wikiversity</h3>
           <p>Eine offene Plattform für freie Lernressourcen, Kurse und gemeinschaftliche Bildungsprojekte in vielen Sprachen.</p>
-          <a href="https://www.wikiversity.org/" rel="external">Offizielle Seite <span aria-hidden="true">↗</span></a>
+          <div class="catalog-actions">
+            <button class="catalog-select" type="button" data-commonproject-id="wikiversity" aria-pressed="false">Im Fokus öffnen</button>
+            <a href="https://www.wikiversity.org/" rel="external noreferrer">Offizielle Seite <span aria-hidden="true">↗</span></a>
+          </div>
         </article>
         </div>
-        <p class="catalog-meta">
-          Kanonische Daten: <a href="./catalog/catalog.json">öffentlichen Katalog öffnen</a> · Nächste Quellenprüfung: 12. Oktober 2026
-        </p>
+        <p class="catalog-meta">Kanonische Daten: <a href="./catalog/catalog.json">öffentlichen Katalog öffnen</a> · Nächste Quellenprüfung: 12. Oktober 2026</p>
       </section>
     </main>
   </body>

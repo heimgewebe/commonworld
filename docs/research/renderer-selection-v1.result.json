@@ -38,16 +38,8 @@
       "sha256": "e768e6293320b0ea374cf5193a3e3941f893fb12a71eb7d0df911788954d48d1"
     },
     {
-      "path": "contracts/commonworld/digital-sphere.contract.json",
-      "sha256": "7e0a286ecd0928d292cd6292d8eea2e961dc1d174920fbfcb882d65bf2658ef4"
-    },
-    {
       "path": "contracts/commonworld/renderer-selection.contract.json",
       "sha256": "15c76c0875d42e4f670f6513d97804cf0805a054057cf74c0f99798f6432fd8a"
-    },
-    {
-      "path": "catalog/catalog.json",
-      "sha256": "3d5764606f4d9131515e1ae38639f262c5b10c95f09e20a51aa9cc42e574834f"
     }
   ],
   "candidate_comparison": {
@@ -144,7 +136,7 @@
   },
   "forbidden_interpretations": [
     "production architecture is authorized",
-    "the current public shell already runs MapLibre",
+    "the renderer decision alone established a public MapLibre runtime",
     "Android Chrome has been physically accepted",
     "screen reader product support has passed",
     "the digital sphere may create geographic catalog coordinates",

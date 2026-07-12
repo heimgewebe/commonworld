@@ -32,9 +32,7 @@ EVIDENCE_PATHS = (
     "contracts/commonworld/aggregation-zoom.contract.json",
     "contracts/commonworld/visual-semantics.contract.json",
     "contracts/commonworld/project.schema.json",
-    "contracts/commonworld/digital-sphere.contract.json",
     "contracts/commonworld/renderer-selection.contract.json",
-    "catalog/catalog.json",
 )
 EXPECTED_DECISION = {
     "engine_selected": True,
@@ -50,7 +48,7 @@ EXPECTED_PUBLICATION = {
     "engine_selected": True,
     "production_architecture_authorized": False,
     "selected_engine": "maplibre_gl_js",
-    "public_runtime_uses_selected_engine": False,
+    "public_runtime_uses_selected_engine": True,
 }
 EXPECTED_LAYER_COVERAGE = {
     "knowledge_data": ["wikidata", "wikipedia"],
@@ -94,7 +92,7 @@ REQUIRED_RESOLVED_CONDITIONS = {
 }
 REQUIRED_FORBIDDEN_INTERPRETATIONS = {
     "production architecture is authorized",
-    "the current public shell already runs MapLibre",
+    "the renderer decision alone established a public MapLibre runtime",
     "Android Chrome has been physically accepted",
     "screen reader product support has passed",
     "the digital sphere may create geographic catalog coordinates",
@@ -234,8 +232,10 @@ def validate_renderer_selection(root: Path = ROOT) -> list[str]:
         errors.append("renderer integration model mismatch")
     if contract.get("decision_boundary") != EXPECTED_DECISION:
         errors.append("renderer selection decision boundary mismatch")
-    if digital_contract.get("decision_boundary") != EXPECTED_DECISION:
-        errors.append("digital sphere and renderer selection decisions differ")
+    digital_decision = _mapping(digital_contract.get("decision_boundary", {}))
+    for key in ("engine_selected", "selected_engine", "production_architecture_authorized"):
+        if digital_decision.get(key) != EXPECTED_DECISION[key]:
+            errors.append(f"digital sphere and renderer selection decisions differ: {key}")
     if _string_set(contract.get("selection_reasons", [])) != REQUIRED_REASONS:
         errors.append("renderer selection reasons are incomplete or changed")
 
@@ -477,7 +477,7 @@ def validate_renderer_selection(root: Path = ROOT) -> list[str]:
     if selection.get("production_architecture_authorized") is not False:
         errors.append("renderer selection must not authorize production architecture")
     if selection.get("public_runtime_uses_selected_engine") is not False:
-        errors.append("renderer selection must not claim the static public shell already uses MapLibre")
+        errors.append("renderer selection result must remain historical and must not claim runtime integration")
     if selection.get("next_proof") != EXPECTED_DECISION["next_proof"]:
         errors.append("renderer selection next proof mismatch")
 
@@ -503,13 +503,7 @@ def validate_renderer_selection(root: Path = ROOT) -> list[str]:
     }:
         errors.append("renderer official-source recheck summary mismatch")
 
-    # No runtime is introduced by a selection-only slice.
-    for relative in ("package.json", "package-lock.json", "node_modules"):
-        if (root / relative).exists():
-            errors.append(f"renderer decision slice must not introduce runtime dependency yet: {relative}")
-    public_html = (root / "index.html").read_text(encoding="utf-8") if (root / "index.html").is_file() else ""
-    if "maplibre-gl.js" in public_html or "unpkg.com/maplibre" in public_html or "<script" in public_html:
-        errors.append("renderer decision slice must keep the public runtime static")
+    # Runtime integration is validated by the separate public vertical-slice contract.
 
     report = (root / REPORT_PATH).read_text(encoding="utf-8")
     for token in (

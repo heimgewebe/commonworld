@@ -664,7 +664,15 @@ MapLibre GL JS `5.24.0` ist die kanonische Primärengine für Globusprojektion, 
 
 Die geschichtete digitale Sphäre bleibt zunächst ein begrenztes, mit MapLibre synchronisiertes SVG-Overlay derselben Oberfläche. Sie bezieht ihre Identitäten ausschließlich aus `CommonProject.id`, erzeugt keine geografischen Katalogkoordinaten und besitzt keinen unabhängigen Kamerazustand. Eine zusätzliche Three.js-Laufzeit und ein zweiter unabhängiger WebGL-Kontext sind nicht autorisiert.
 
-Die Engine ist gewählt, die Produktionsarchitektur jedoch nicht freigegeben. Die aktuelle öffentliche Seite bleibt statisch. Vor der Runtime-Freigabe folgen ein öffentlicher MapLibre-Vertikalschnitt mit dem Startkatalog, ein Android-Chrome-Hardwaregegencheck, eine Anbieter- und Attributionentscheidung, CSP-/Worker-Härtung, ein exakt gepinnter Dependency-Lock sowie öffentliche lineare und barrierearme Parität.
+Die Enginewahl allein gab die Produktionsarchitektur und die öffentliche Runtime noch nicht frei. Zum Zeitpunkt dieser Entscheidung blieb die öffentliche Seite statisch; Runtimeintegration, Anbieter, CSP, Lockfile und Geräteprüfung waren eigene nachfolgende Beweise.
+
+### Erster öffentlicher MapLibre-Vertikalschnitt v1
+
+Der erste Runtime-Schnitt verwendet exakt `maplibre-gl@5.24.0` mit Lockfile und lokal ausgelieferten Browserdateien. Es gibt einen MapLibre-Globus und keinen zweiten WebGL-Globus. Die Basiskarte stammt vorläufig von der öffentlichen OpenFreeMap-Instanz; der Style liegt als kontrollierter Snapshot im Repository und nennt OpenFreeMap, OpenMapTiles und OpenStreetMap. Da für die öffentliche Instanz kein Betriebsversprechen beansprucht wird, bleibt eine spätere Produktionsanbieterentscheidung ausdrücklich offen.
+
+Die zehn vorhandenen digitalen CommonProject-Identitäten bleiben die einzige Datenquelle. Sie erscheinen in der linearen Ansicht, im gemeinsamen Fokuspanel und in einer begrenzten SVG-Sphäre mit sechs aus Katalogthemen abgeleiteten Schichten. Keine dieser Darstellungen erzeugt geografische Koordinaten oder eine zweite Katalogwahrheit. Deep Links und Browser-Zurück stellen Kamera, Schicht und Auswahl wieder her. Standardbewegungen nutzen eine kurze `easeTo`-Fahrt; bei Reduced Motion wird derselbe Zustand mit `jumpTo` ohne Dauer hergestellt.
+
+Der aktuelle Vertrag liegt in `contracts/commonworld/public-maplibre-vertical-slice.contract.json`. CSP erlaubt ausschließlich lokale Skripte und Styles sowie Kartenressourcen von `tiles.openfreemap.org`; Worker dürfen nur lokal beziehungsweise als `blob:` entstehen. Bei Kartenfehlern bleiben Katalog, Auswahl und Fokus linear nutzbar. Die Produktionsarchitektur, Android-spezifische Reduced-Motion-Abnahme und Screenreader-Produkttauglichkeit werden weiterhin nicht behauptet. Ein physischer Android-Chrome-Lauf bleibt vor dem Merge Releasegate.
 
 ## Qualitäts- und Publikationszustände
 

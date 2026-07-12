@@ -6,6 +6,7 @@ from pathlib import Path
 
 from scripts.validate_renderer_selection import (
     CONTRACT_PATH,
+    DIGITAL_CONTRACT_PATH,
     EVIDENCE_PATHS,
     REPORT_PATH,
     RESULT_PATH,
@@ -20,7 +21,9 @@ class RendererSelectionTests(unittest.TestCase):
         paths = set(EVIDENCE_PATHS) | {
             str(RESULT_PATH),
             str(REPORT_PATH),
+            str(DIGITAL_CONTRACT_PATH),
             "index.html",
+            "catalog/catalog.json",
         }
         for relative in paths:
             source = ROOT / relative
@@ -94,7 +97,7 @@ class RendererSelectionTests(unittest.TestCase):
 
             errors = validate_renderer_selection(root)
 
-        self.assertTrue(any("static public shell" in error for error in errors))
+        self.assertTrue(any("must remain historical" in error for error in errors))
 
     def test_malformed_nested_spike_is_reported_without_crashing(self) -> None:
         with tempfile.TemporaryDirectory() as tmp_dir:
@@ -203,14 +206,14 @@ class RendererSelectionTests(unittest.TestCase):
 
         self.assertTrue(any("version policy" in error for error in errors))
 
-    def test_validator_rejects_runtime_dependency_in_decision_slice(self) -> None:
+    def test_runtime_integration_is_validated_by_the_separate_vertical_slice(self) -> None:
         with tempfile.TemporaryDirectory() as tmp_dir:
             root = self.copy_selection_core(tmp_dir)
             (root / "package.json").write_text('{"dependencies":{"maplibre-gl":"5.24.0"}}\n', encoding="utf-8")
 
             errors = validate_renderer_selection(root)
 
-        self.assertTrue(any("must not introduce runtime dependency yet" in error for error in errors))
+        self.assertFalse(any("runtime dependency" in error for error in errors))
 
 
 if __name__ == "__main__":

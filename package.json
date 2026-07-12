@@ -1,0 +1,13 @@
+{
+  "name": "commonworld-public-runtime",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Deterministic public MapLibre vertical slice for commonworld.net",
+  "scripts": {
+    "build": "python3 scripts/build_public_runtime.py && python3 scripts/render_public_shell.py",
+    "test": "node --test tests/js/*.test.mjs"
+  },
+  "dependencies": {
+    "maplibre-gl": "5.24.0"
+  }
+}

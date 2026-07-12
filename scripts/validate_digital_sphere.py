@@ -295,8 +295,8 @@ def validate_digital_sphere(root: Path = ROOT) -> list[str]:
         "engine_selected": True,
         "selected_engine": "maplibre_gl_js",
         "production_architecture_authorized": False,
-        "public_runtime_uses_selected_engine": False,
-        "next_proof": "public_maplibre_globe_vertical_slice_with_seed_catalog",
+        "public_runtime_uses_selected_engine": True,
+        "next_proof": "physical_android_chrome_public_runtime_acceptance",
     }:
         errors.append("digital sphere decision boundary mismatch")
 
