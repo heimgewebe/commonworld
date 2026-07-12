@@ -33,6 +33,7 @@ REQUIRED_PLAN_TOKENS = (
     "### Physischer Apple-WebKit-v4-Beleg und Abnahmepaket v5",
     "### Reale digitale Oberfläche v1",
     "### Erster öffentlicher Startkatalog v1",
+    "### Kanonische Rendererentscheidung v1",
     "### Vorläufige Darstellungsschichten",
     "### Dieselbe Auswahl in allen Ansichten",
     "## Digitale Commons-Sphäre",
@@ -99,8 +100,10 @@ EXPECTED_RESEARCH_FILES = {
     "maplibre-phase2-globe-proof.result.json",
     "renderer-engine-spike.md",
     "renderer-engine-spike.result.json",
+    "renderer-selection-v1.md",
+    "renderer-selection-v1.result.json",
 }
-EXPECTED_CONTRACT_FILES = {"aggregation-zoom.contract.json", "digital-sphere.contract.json", "project.schema.json", "visual-semantics.contract.json"}
+EXPECTED_CONTRACT_FILES = {"aggregation-zoom.contract.json", "digital-sphere.contract.json", "project.schema.json", "renderer-selection.contract.json", "visual-semantics.contract.json"}
 EXPECTED_SCRIPT_FILES = {
     "__init__.py",
     "check_pages_dns_target.py",
@@ -110,6 +113,7 @@ EXPECTED_SCRIPT_FILES = {
     "validate_public_catalog.py",
     "validate_public_shell.py",
     "validate_renderer_spike.py",
+    "validate_renderer_selection.py",
     "validate_maplibre_phase2_proof.py",
     "validate_device_acceptance_pack.py",
     "validate_device_acceptance_rerun.py",
@@ -129,6 +133,7 @@ EXPECTED_TEST_FILES = {
     "test_public_catalog.py",
     "test_public_shell.py",
     "test_renderer_spike.py",
+    "test_renderer_selection.py",
     "test_maplibre_phase2_proof.py",
     "test_device_acceptance_pack.py",
     "test_device_acceptance_rerun.py",

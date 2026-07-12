@@ -86,7 +86,7 @@ class DigitalSphereContractTests(unittest.TestCase):
         self.assertEqual("maplibre.jumpTo", real_surface["side_camera"]["reduced_motion_command"])
         self.assertEqual(0, real_surface["side_camera"]["reduced_motion_duration_ms"])
         self.assertEqual(
-            "renderer_selection_decision_against_public_seed_catalog",
+            "public_maplibre_globe_vertical_slice_with_seed_catalog",
             self.contract["decision_boundary"]["next_proof"],
         )
 
@@ -170,8 +170,8 @@ class DigitalSphereContractTests(unittest.TestCase):
         errors = self.errors_after(lambda contract: contract["real_surface_v1"]["side_camera"].update({"css_only_shift_forbidden": False}))
         self.assertTrue(any("side-camera invariant" in error for error in errors))
 
-    def test_validator_rejects_engine_selection(self) -> None:
-        errors = self.errors_after(lambda contract: contract["decision_boundary"].update({"engine_selected": True}))
+    def test_validator_rejects_engine_selection_rollback(self) -> None:
+        errors = self.errors_after(lambda contract: contract["decision_boundary"].update({"engine_selected": False}))
         self.assertTrue(any("decision boundary" in error for error in errors))
 
 

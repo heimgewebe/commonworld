@@ -23,7 +23,7 @@ Commonworld führt keine eigene Mitgliedschaft, Projektverwaltung oder ungeprüf
 
 ## Aktueller Stand
 
-Die öffentliche Seite zeigt den ersten quellengebundenen Startkatalog mit zehn digitalen Commons. Die Einträge sind CommonProject-v3-Datensätze unter `catalog/`; eine Globe-Engine ist weiterhin nicht festgelegt.
+Die öffentliche Seite zeigt den ersten quellengebundenen Startkatalog mit zehn digitalen Commons. MapLibre GL JS 5.24.0 ist als kanonische Primärengine gewählt; die öffentliche Seite ist noch statisch und die Produktionsarchitektur bleibt bis zum ersten MapLibre-Vertikalschnitt gesperrt.
 
 ## Validierung
 

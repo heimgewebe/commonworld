@@ -20,7 +20,9 @@
     "public": true,
     "source_policy": "official-sources-only",
     "curation_state": "listed",
-    "engine_selected": false,
-    "production_architecture_authorized": false
+    "engine_selected": true,
+    "production_architecture_authorized": false,
+    "selected_engine": "maplibre_gl_js",
+    "public_runtime_uses_selected_engine": false
   }
 }

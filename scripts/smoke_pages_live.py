@@ -26,7 +26,8 @@ REQUIRED_TOKENS = (
     "Die gemeinsame Welt wird sichtbar.",
     'class="globe-stage"',
     'class="digital-sphere"',
-    "Der Globus erhält reale Katalogdaten.",
+    "Die Globe-Engine steht fest.",
+    "MapLibre GL JS wird den Globus",
     "10 geprüfte Startdatensätze",
     'id="catalog"',
     './catalog/catalog.json',
@@ -51,8 +52,10 @@ EXPECTED_PUBLICATION = {
     "public": True,
     "source_policy": "official-sources-only",
     "curation_state": "listed",
-    "engine_selected": False,
+    "engine_selected": True,
     "production_architecture_authorized": False,
+    "selected_engine": "maplibre_gl_js",
+    "public_runtime_uses_selected_engine": False,
 }
 
 

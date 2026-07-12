@@ -656,7 +656,15 @@ Geografische Anker, digitale Präsenz, Betriebszustand und Beziehungen tragen Qu
 
 Der erste öffentliche Bestand liegt unter `catalog/` und umfasst zehn digitale CommonProject-v3-Identitäten. Die Einträge wurden am 12. Juli 2026 anhand offizieller Projektquellen redaktionell in den Zustand `listed` gesetzt. Sie sind von den nichtöffentlichen Referenz- und Lastdaten unter `tests/` strikt getrennt.
 
-Der Startbestand deckt alle sechs digitalen Darstellungsschichten ab, ohne ein Schichtfeld in den Katalog zu schreiben. Vollständig digitale Commons haben eine leere geografische Präsenz und erhalten keine erfundenen Koordinaten. `catalog/catalog.json` bildet das öffentliche Verzeichnis; die statische lineare Ansicht auf der Startseite wird aus denselben Identitäten geprüft. Die Veröffentlichung wählt keine Globe-Engine und autorisiert keine Produktionsarchitektur.
+Der Startbestand deckt alle sechs digitalen Darstellungsschichten ab, ohne ein Schichtfeld in den Katalog zu schreiben. Vollständig digitale Commons haben eine leere geografische Präsenz und erhalten keine erfundenen Koordinaten. `catalog/catalog.json` bildet das öffentliche Verzeichnis; die statische lineare Ansicht auf der Startseite wird aus denselben Identitäten geprüft. Der Katalog selbst bleibt rendererneutral; die nachfolgende Engineentscheidung ändert keine Katalogwahrheit.
+
+### Kanonische Rendererentscheidung v1
+
+MapLibre GL JS `5.24.0` ist die kanonische Primärengine für Globusprojektion, Kamera, semantischen Zoom, geografische Vektorquellen und Style-Layer. Die Entscheidung stützt sich auf den Vierer-Spike, den MapLibre-Phase-2-Beweis, die v4-Leistungsoptimierungen, den physischen Apple-WebKit-Hardwarelauf, die reale digitale Oberfläche und den öffentlichen Startkatalog. Der ausführbare Vertrag liegt in `contracts/commonworld/renderer-selection.contract.json`; die hashgebundene Auswertung liegt in `docs/research/renderer-selection-v1.result.json`.
+
+Die geschichtete digitale Sphäre bleibt zunächst ein begrenztes, mit MapLibre synchronisiertes SVG-Overlay derselben Oberfläche. Sie bezieht ihre Identitäten ausschließlich aus `CommonProject.id`, erzeugt keine geografischen Katalogkoordinaten und besitzt keinen unabhängigen Kamerazustand. Eine zusätzliche Three.js-Laufzeit und ein zweiter unabhängiger WebGL-Kontext sind nicht autorisiert.
+
+Die Engine ist gewählt, die Produktionsarchitektur jedoch nicht freigegeben. Die aktuelle öffentliche Seite bleibt statisch. Vor der Runtime-Freigabe folgen ein öffentlicher MapLibre-Vertikalschnitt mit dem Startkatalog, ein Android-Chrome-Hardwaregegencheck, eine Anbieter- und Attributionentscheidung, CSP-/Worker-Härtung, ein exakt gepinnter Dependency-Lock sowie öffentliche lineare und barrierearme Parität.
 
 ## Qualitäts- und Publikationszustände
 
