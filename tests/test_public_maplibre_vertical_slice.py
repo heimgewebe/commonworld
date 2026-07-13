@@ -152,6 +152,21 @@ class PublicMapLibreVerticalSliceTests(unittest.TestCase):
             errors = validate_public_maplibre_vertical_slice(root)
         self.assertTrue(any("bounded digital-sphere offset helper" in error for error in errors))
 
+    def test_rejects_cooperative_gestures_that_block_one_finger_touch(self) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            root = self.copy_slice(directory)
+            path = root / "assets/commonworld-app.js"
+            path.write_text(
+                path.read_text(encoding="utf-8").replace(
+                    "    renderWorldCopies: false,\n",
+                    "    cooperativeGestures: true,\n    renderWorldCopies: false,\n",
+                    1,
+                ),
+                encoding="utf-8",
+            )
+            errors = validate_public_maplibre_vertical_slice(root)
+        self.assertTrue(any("one-finger touch movement" in error for error in errors))
+
     def test_rejects_nondeterministic_shell_drift(self) -> None:
         with tempfile.TemporaryDirectory() as directory:
             root = self.copy_slice(directory)

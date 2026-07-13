@@ -260,6 +260,8 @@ def validate_public_maplibre_vertical_slice(root: Path = ROOT) -> list[str]:
             errors.append(f"public runtime code hardcodes catalog identity instead of loading it: {identifier}")
     if "sphereStartOffset(layerIndex, recordIndex, records.length)" not in app:
         errors.append("public runtime must use the tested bounded digital-sphere offset helper")
+    if re.search(r"cooperativeGestures\s*:\s*true", app):
+        errors.append("public mobile globe must allow one-finger touch movement; cooperativeGestures may not be enabled")
 
     required_html = (
         '<script src="./assets/vendor/maplibre-gl.js" defer></script>',

@@ -26,9 +26,9 @@
     "renderer": "WebKit WebGL",
     "verdict": "PASS",
     "evidence_path": "/home/alex/.local/state/grabowski/evidence/commonworld/public-maplibre-globe-v1/browser-proof.json",
-    "evidence_sha256": "9606f6c2fa6b670ab22ec3c46fdde3cc7c4d2ff7ccdc043a2be843ca158eff40",
+    "evidence_sha256": "911f87d07c9eccfc4510638a4a306641a219509e13b435760184c87f33571e1a",
     "screenshot_path": "/home/alex/.local/state/grabowski/evidence/commonworld/public-maplibre-globe-v1/browser-proof.png",
-    "screenshot_sha256": "a34d383547d5865c2c5522c50e02ae87601fa975bcc6974e488bb1eed347b341",
+    "screenshot_sha256": "2dfbbfc13ce4e15a41bd01962d05abea961d01077a442204c560f7f4e3fc11da",
     "assertions": {
       "runtime_ready": true,
       "map_canvas_and_webgl": true,
@@ -46,9 +46,9 @@
     "standard_motion": {
       "verdict": "PASS",
       "evidence_path": "/home/alex/.local/state/grabowski/evidence/commonworld/public-maplibre-globe-v1/browser-proof-standard-motion.json",
-      "evidence_sha256": "a2c4cb3d072cf440228912c64dccaa66fadd5e840e4cb52dfa0c5854276e7834",
+      "evidence_sha256": "759401e9560e85a60eaccb85e32f4324f72cda372b9da32c64c466bd1b64084f",
       "screenshot_path": "/home/alex/.local/state/grabowski/evidence/commonworld/public-maplibre-globe-v1/browser-proof-standard-motion.png",
-      "screenshot_sha256": "a51ae53c0b2bfe2825becf4acb83fd3fc56ac02820362baf0589dae3be41458a",
+      "screenshot_sha256": "f579f8ef73b223b25966ecac6d3ecf4d95614c8a7f1887408d054b52b8c09289",
       "close_camera_command": "easeTo",
       "open_camera_command": "easeTo",
       "duration_ms": 260,
@@ -89,7 +89,7 @@
     },
     {
       "path": "assets/commonworld-app.js",
-      "sha256": "7ce907a186dc9e01517674e09b682d85e60868f77557cd0525506cabdfa90d45"
+      "sha256": "78b5019f1fd7059c3627b776046e39803a5a36fff1477cdb2e325d235e19c691"
     },
     {
       "path": "index.html",

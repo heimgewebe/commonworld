@@ -344,7 +344,6 @@ function createMap() {
     minZoom: 0.35,
     maxZoom: 8,
     attributionControl: true,
-    cooperativeGestures: true,
     renderWorldCopies: false,
     fadeDuration: reducedMotion.matches ? 0 : 120,
   });
