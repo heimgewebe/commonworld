@@ -92,6 +92,27 @@ async function normalScenario() {
   assert(await run.page.locator('#text-view').isVisible(), 'normal: skip link did not switch to text');
   assert((await run.page.locator('body').getAttribute('data-presentation')) === 'text', 'normal: presentation did not become text');
 
+  await run.page.locator('#settings-toggle').focus();
+  await run.page.locator('#settings-toggle').click();
+  assert(await run.page.locator('#settings-panel').isVisible(), 'normal: settings panel did not open');
+  assert((await run.page.locator('#settings-panel').getAttribute('aria-modal')) === 'false', 'normal: non-modal settings contract changed');
+  assert((await run.page.locator('#text-view').getAttribute('inert')) === null, 'normal: settings incorrectly block background navigation');
+  await run.page.keyboard.press('Escape');
+  assert(await run.page.locator('#settings-panel').isHidden(), 'normal: settings panel did not close with Escape');
+  assert((await run.page.evaluate(() => document.activeElement?.id)) === 'settings-toggle', 'normal: settings focus was not restored');
+
+  await run.page.locator('#commons-search').fill('Debian');
+  await run.page.waitForTimeout(220);
+  const debianTrigger = run.page.locator('#project-debian .catalog-select');
+  await debianTrigger.click();
+  assert(await run.page.locator('#project-focus').isVisible(), 'normal: project focus did not open');
+  assert((await run.page.evaluate(() => document.activeElement?.id)) === 'project-focus', 'normal: project focus did not receive focus');
+  await run.page.locator('#commons-search').focus();
+  assert((await run.page.evaluate(() => document.activeElement?.id)) === 'commons-search', 'normal: project focus incorrectly blocks background navigation');
+  await run.page.keyboard.press('Escape');
+  assert(await run.page.locator('#project-focus').isHidden(), 'normal: project focus did not close with Escape');
+  assert(await debianTrigger.evaluate((node) => document.activeElement === node), 'normal: project focus did not restore its trigger');
+
   await run.page.locator('#commons-search').fill('kein-solches-commons');
   await run.page.waitForTimeout(220);
   await run.page.locator('#settings-toggle').click();
