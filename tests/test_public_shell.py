@@ -24,7 +24,7 @@ class PublicShellTests(unittest.TestCase):
 
             errors = validate_public_shell(root)
 
-        self.assertIn("public shell contains obsolete or unsafe token: proof", errors)
+        self.assertIn("public shell contains obsolete or unsafe token: proof hub", errors)
 
     def test_public_shell_requires_digital_sphere(self) -> None:
         with tempfile.TemporaryDirectory() as tmp_dir:
@@ -36,9 +36,12 @@ class PublicShellTests(unittest.TestCase):
 
         self.assertIn('public shell missing required token: class="digital-sphere"', errors)
 
-    def test_public_shell_has_no_script_or_form(self) -> None:
+    def test_public_shell_uses_local_scripts_and_no_form(self) -> None:
         html = (ROOT / "index.html").read_text(encoding="utf-8").casefold()
-        self.assertNotIn("<script", html)
+        self.assertIn('<script src="./assets/vendor/maplibre-gl.js" defer></script>', html)
+        self.assertIn('<script type="module" src="./assets/commonworld-app.js"></script>', html)
+        self.assertNotIn("unpkg.com", html)
+        self.assertNotIn("cdn.jsdelivr.net", html)
         self.assertNotIn("<form", html)
 
 

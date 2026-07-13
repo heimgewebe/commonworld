@@ -179,12 +179,14 @@ class RendererSpikeTests(unittest.TestCase):
             temporary.cleanup()
         self.assertTrue(any("fatal runtime errors" in error for error in errors))
 
-    def test_raw_harness_is_not_in_repository(self) -> None:
+    def test_raw_spike_harness_is_not_in_repository(self) -> None:
         evidence = self.result["evidence_artifacts"]
         self.assertFalse(evidence["repository_contains_raw_harness"])
         self.assertFalse(evidence["repository_contains_screenshots"])
-        for name in ("package.json", "package-lock.json", "node_modules", "screenshots", "spikes"):
+        for name in ("screenshots", "spikes"):
             self.assertFalse((ROOT / name).exists())
+        self.assertTrue((ROOT / "package.json").is_file())
+        self.assertTrue((ROOT / "package-lock.json").is_file())
 
 
 if __name__ == "__main__":

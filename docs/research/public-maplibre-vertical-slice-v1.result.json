@@ -1,0 +1,127 @@
+{
+  "schema_version": 1,
+  "kind": "commonworld_public_maplibre_vertical_slice_result",
+  "tested_at": "2026-07-12T21:09:29.559Z",
+  "base_commit": "97b57cbc1c8ca16b157f9678228b2ea070613ff5",
+  "runtime": {
+    "engine": "maplibre_gl_js",
+    "version": "5.24.0",
+    "dependency": "maplibre-gl@5.24.0",
+    "lockfile_version": 3,
+    "basemap_provider": "OpenFreeMap public instance",
+    "production_provider_commitment": false,
+    "catalog_entry_count": 10,
+    "geographic_commons_in_scope": false
+  },
+  "validation": {
+    "python_tests": 327,
+    "javascript_tests": 8,
+    "make_validate": "PASS",
+    "git_diff_check": "PASS",
+    "deterministic_rebuild": "PASS",
+    "npm_audit_high_or_critical": 0
+  },
+  "browser_proof": {
+    "environment": "Google Chrome headless with SwiftShader WebGL",
+    "renderer": "WebKit WebGL",
+    "verdict": "PASS",
+    "evidence_path": "/home/alex/.local/state/grabowski/evidence/commonworld/public-maplibre-globe-v1/browser-proof.json",
+    "evidence_sha256": "911f87d07c9eccfc4510638a4a306641a219509e13b435760184c87f33571e1a",
+    "screenshot_path": "/home/alex/.local/state/grabowski/evidence/commonworld/public-maplibre-globe-v1/browser-proof.png",
+    "screenshot_sha256": "2dfbbfc13ce4e15a41bd01962d05abea961d01077a442204c560f7f4e3fc11da",
+    "assertions": {
+      "runtime_ready": true,
+      "map_canvas_and_webgl": true,
+      "ten_catalog_identities": true,
+      "deep_link_focus": true,
+      "browser_back_restored": true,
+      "reduced_motion_jump_to_zero_ms": true,
+      "idle_map_render_delta": 0,
+      "idle_overlay_render_delta": 0,
+      "unexpected_resource_origins": 0,
+      "uncaught_exceptions": 0,
+      "focus_returned_after_close": true,
+      "ten_sphere_labels_painted": true
+    },
+    "standard_motion": {
+      "verdict": "PASS",
+      "evidence_path": "/home/alex/.local/state/grabowski/evidence/commonworld/public-maplibre-globe-v1/browser-proof-standard-motion.json",
+      "evidence_sha256": "759401e9560e85a60eaccb85e32f4324f72cda372b9da32c64c466bd1b64084f",
+      "screenshot_path": "/home/alex/.local/state/grabowski/evidence/commonworld/public-maplibre-globe-v1/browser-proof-standard-motion.png",
+      "screenshot_sha256": "f579f8ef73b223b25966ecac6d3ecf4d95614c8a7f1887408d054b52b8c09289",
+      "close_camera_command": "easeTo",
+      "open_camera_command": "easeTo",
+      "duration_ms": 260,
+      "idle_map_render_delta": 0,
+      "idle_overlay_render_delta": 0,
+      "focus_returned_after_close": true,
+      "ten_sphere_labels_painted": true
+    }
+  },
+  "evidence_bindings": [
+    {
+      "path": "package.json",
+      "sha256": "4ac1eb08d34770f1e6437c6b7d1d29b1b0a8ae7f92dd11c7fe3633a4a34ab2f4"
+    },
+    {
+      "path": "package-lock.json",
+      "sha256": "200e9aa6325cd1030f7e1ef4c0b7dddf028290090c85444aa0f1baf337183ac6"
+    },
+    {
+      "path": "assets/vendor/maplibre-gl.js",
+      "sha256": "45a9b07a9189ce56054c620a947ccf41e291e58c95e9b61533b740aaa65ee5cb"
+    },
+    {
+      "path": "assets/vendor/maplibre-gl.css",
+      "sha256": "ab1e70d59ec40465bae7e7030da2f3ccf28133fd502e62bd598eefbadfd7a732"
+    },
+    {
+      "path": "assets/vendor/MAPLIBRE-LICENSE.txt",
+      "sha256": "ee5fc05a0677eaf69601d2c7db0d9ecd6cc27c3abc1d0733bc9ed34707cf8ef2"
+    },
+    {
+      "path": "assets/map/openfreemap-liberty.json",
+      "sha256": "74a4e3f2eacd4242dd2235b50ab6e14d0285e5e3bde07de2753949ec7f776a18"
+    },
+    {
+      "path": "assets/commonworld-core.mjs",
+      "sha256": "ea4a5479096c46d1d70457f645e8c4ae53822cf55a3ff19e3bd64002aeed5c89"
+    },
+    {
+      "path": "assets/commonworld-app.js",
+      "sha256": "78b5019f1fd7059c3627b776046e39803a5a36fff1477cdb2e325d235e19c691"
+    },
+    {
+      "path": "index.html",
+      "sha256": "4816d992a9df11464f2451e7f617fcc3680c4c3586720b79fb3cc9386991543c"
+    },
+    {
+      "path": "index.css",
+      "sha256": "b675ea379fe7e3b1cac260d05e471a75e282d69c69fb4d489f554d6489835cc1"
+    },
+    {
+      "path": "catalog/catalog.json",
+      "sha256": "3f254e47c63448a03766860e69aba6595853555c6d42da3a3646b47b064ba509"
+    },
+    {
+      "path": "contracts/commonworld/public-maplibre-vertical-slice.contract.json",
+      "sha256": "fa3ff389a89f4572a9c01cab02e2b83acd4b7236c4a609c84bbc23024546c4a0"
+    }
+  ],
+  "release_gates": {
+    "desktop_chrome_browser_smoke": "PASS",
+    "physical_android_chrome": "REQUIRED_BEFORE_MERGE",
+    "android_reduced_motion": "NOT_CLAIMED",
+    "screen_reader_product_support": "NOT_CLAIMED",
+    "github_required_check": "PENDING",
+    "live_pages_smoke": "PENDING_AFTER_MERGE"
+  },
+  "decision_boundary": {
+    "engine_selected": true,
+    "selected_engine": "maplibre_gl_js",
+    "public_runtime_uses_selected_engine": true,
+    "production_architecture_authorized": false,
+    "production_provider_selected": false
+  },
+  "verdict": "IMPLEMENTED_AWAITING_PHYSICAL_ANDROID_GATE"
+}

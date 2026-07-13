@@ -232,7 +232,7 @@
     "engine_selected": true,
     "selected_engine": "maplibre_gl_js",
     "production_architecture_authorized": false,
-    "public_runtime_uses_selected_engine": false,
-    "next_proof": "public_maplibre_globe_vertical_slice_with_seed_catalog"
+    "public_runtime_uses_selected_engine": true,
+    "next_proof": "physical_android_chrome_public_runtime_acceptance"
   }
 }

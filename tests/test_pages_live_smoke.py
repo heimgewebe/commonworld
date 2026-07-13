@@ -1,3 +1,4 @@
+import hashlib
 import json
 import unittest
 
@@ -9,6 +10,7 @@ from scripts.smoke_pages_live import (
     REQUIRED_TOKENS,
     validate_catalog_fetch,
     validate_live_fetch,
+    validate_runtime_asset_fetch,
 )
 
 
@@ -104,6 +106,41 @@ class PagesLiveSmokeTests(unittest.TestCase):
             body=self.valid_body() + " Domain parked. ",
         )
         self.assertIn("live Pages contains forbidden delivery token: Domain parked.", validate_live_fetch(fetch))
+
+    def test_runtime_asset_hash_and_delivery_pass(self) -> None:
+        body = "x" * 128
+        fetch = LiveFetch(
+            requested_url="https://commonworld.net/assets/commonworld-app.js",
+            final_url="https://commonworld.net/assets/commonworld-app.js",
+            status=200,
+            content_type="text/javascript; charset=utf-8",
+            body=body,
+        )
+        self.assertEqual(
+            [],
+            validate_runtime_asset_fetch(
+                fetch,
+                minimum_bytes=100,
+                allowed_content_types=("javascript",),
+                expected_sha256=hashlib.sha256(body.encode()).hexdigest(),
+            ),
+        )
+
+    def test_runtime_asset_hash_drift_fails(self) -> None:
+        fetch = LiveFetch(
+            requested_url="https://commonworld.net/assets/commonworld-app.js",
+            final_url="https://commonworld.net/assets/commonworld-app.js",
+            status=200,
+            content_type="text/javascript",
+            body="changed runtime",
+        )
+        errors = validate_runtime_asset_fetch(
+            fetch,
+            minimum_bytes=1,
+            allowed_content_types=("javascript",),
+            expected_sha256="0" * 64,
+        )
+        self.assertTrue(any("hash mismatch" in error for error in errors))
 
 
 if __name__ == "__main__":

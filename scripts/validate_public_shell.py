@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Validate the honest public placeholder for the canonical globe."""
+"""Validate the public Commonworld shell and progressive runtime surface."""
 
 from __future__ import annotations
 
@@ -14,37 +14,53 @@ REQUIRED_HTML = (
     "Commons weltweit entdecken",
     "Die gemeinsame Welt wird sichtbar.",
     'class="globe-stage"',
+    'class="globe-map"',
     'class="digital-sphere"',
+    'id="sphere-edge-control"',
+    'id="layer-panel"',
+    'id="project-focus"',
+    'href="#catalog"',
     "Erde → Großregion → Region → lokaler Zusammenhang → Commons",
-    "Die Globe-Engine steht fest.",
-    "MapLibre GL JS wird den Globus",
+    "Der erste interaktive Globus ist gebaut.",
+    "MapLibre GL JS 5.24.0",
+    "OpenFreeMap liefert die Basiskarte",
     "10 geprüfte Startdatensätze",
     "Erste öffentliche Commons",
     'id="catalog"',
+    '<script src="./assets/vendor/maplibre-gl.js" defer></script>',
+    '<script type="module" src="./assets/commonworld-app.js"></script>',
+    '<meta http-equiv="Content-Security-Policy"',
 )
 
 FORBIDDEN_HTML = (
-    "proof",
+    "proof hub",
     "fixture",
     "aether",
     "atlas shift",
     "game feel",
     "gamification",
-    "data-project",
-    "<script",
     "<form",
     "/proofs/",
     "/api/",
+    "unpkg.com",
+    "cdn.jsdelivr.net",
+    "cdnjs.cloudflare.com",
+    "three.js",
+    "'unsafe-inline'",
+    "'unsafe-eval'",
 )
 
 REQUIRED_CSS = (
     ".globe-stage",
+    ".globe-map",
     ".digital-sphere",
-    ".globe",
-    ".field-one",
+    ".sphere-edge-control",
+    ".layer-panel",
+    ".project-focus",
     ".catalog-grid",
     ".catalog-card",
-    "@media (min-width: 58rem)",
+    ":focus-visible",
+    "@media (min-width: 62rem)",
     "@media (prefers-reduced-motion: reduce)",
 )
 

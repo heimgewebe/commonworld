@@ -23,6 +23,6 @@
     "engine_selected": true,
     "production_architecture_authorized": false,
     "selected_engine": "maplibre_gl_js",
-    "public_runtime_uses_selected_engine": false
+    "public_runtime_uses_selected_engine": true
   }
 }

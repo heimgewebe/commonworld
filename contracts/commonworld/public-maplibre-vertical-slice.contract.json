@@ -1,0 +1,172 @@
+{
+  "schema_version": 1,
+  "kind": "commonworld_public_maplibre_vertical_slice_contract",
+  "implemented_at": "2026-07-12",
+  "renderer": {
+    "engine": "maplibre_gl_js",
+    "package": "maplibre-gl",
+    "version": "5.24.0",
+    "exact_dependency_required": true,
+    "lockfile": "package-lock.json",
+    "lockfile_version": 3,
+    "local_browser_assets": [
+      {
+        "path": "assets/vendor/maplibre-gl.js",
+        "sha256": "45a9b07a9189ce56054c620a947ccf41e291e58c95e9b61533b740aaa65ee5cb"
+      },
+      {
+        "path": "assets/vendor/maplibre-gl.css",
+        "sha256": "ab1e70d59ec40465bae7e7030da2f3ccf28133fd502e62bd598eefbadfd7a732"
+      }
+    ],
+    "floating_cdn_forbidden": true,
+    "one_primary_globe_canvas": true,
+    "three_js_runtime_authorized": false,
+    "second_independent_globe_authorized": false,
+    "license_file": {
+      "path": "assets/vendor/MAPLIBRE-LICENSE.txt",
+      "sha256": "ee5fc05a0677eaf69601d2c7db0d9ecd6cc27c3abc1d0733bc9ed34707cf8ef2",
+      "copied_verbatim_from": "node_modules/maplibre-gl/LICENSE.txt"
+    }
+  },
+  "basemap": {
+    "provider": "OpenFreeMap public instance",
+    "style_snapshot_path": "assets/map/openfreemap-liberty.json",
+    "style_snapshot_sha256": "74a4e3f2eacd4242dd2235b50ab6e14d0285e5e3bde07de2753949ec7f776a18",
+    "upstream_style_url": "https://tiles.openfreemap.org/styles/liberty",
+    "allowed_runtime_origin": "https://tiles.openfreemap.org",
+    "attribution_required": [
+      "OpenFreeMap",
+      "OpenMapTiles",
+      "OpenStreetMap"
+    ],
+    "api_key_required": false,
+    "service_level_agreement_claimed": false,
+    "failure_behavior": "keep_linear_catalog_and_focus_available_with_degraded_map_status",
+    "production_provider_commitment": false
+  },
+  "catalog": {
+    "manifest": "catalog/catalog.json",
+    "only_data_source": true,
+    "entry_count": 10,
+    "commonproject_ids": [
+      "debian",
+      "freifunk",
+      "libreoffice",
+      "mastodon",
+      "openstreetmap",
+      "wikibooks",
+      "wikidata",
+      "wikimedia-commons",
+      "wikipedia",
+      "wikiversity"
+    ],
+    "all_records_digital": true,
+    "geographic_presence_required_empty": true,
+    "fabricated_coordinates_forbidden": true,
+    "geographic_commons_in_scope": false
+  },
+  "digital_sphere": {
+    "implementation": "bounded_synchronized_svg_overlay",
+    "identity_source": "CommonProject.id",
+    "layer_membership": "derived_from_catalog_themes_and_digital_presence",
+    "layer_count": 6,
+    "same_identity_in_linear_layer_focus_and_sphere": true,
+    "binary_fragments_are_deterministic_visual_encoding_only": true,
+    "center_fade": true,
+    "zoom_fade": {
+      "overview_visible_through": 1.8,
+      "local_hidden_from": 2.6
+    },
+    "continuous_rotation": false,
+    "unchanged_geometry_rewrites_forbidden": true
+  },
+  "navigation": {
+    "deep_link_parameters": [
+      "lng",
+      "lat",
+      "z",
+      "b",
+      "p",
+      "view",
+      "layer",
+      "project"
+    ],
+    "browser_back_restores_state": true,
+    "camera_history_writes_coalesced_ms": 180,
+    "side_layer_standard_command": "maplibre.easeTo",
+    "side_layer_standard_duration_ms": 260,
+    "reduced_motion_command": "maplibre.jumpTo",
+    "reduced_motion_duration_ms": 0
+  },
+  "accessibility": {
+    "skip_link_to_linear_catalog": true,
+    "keyboard_layer_controls": true,
+    "linear_catalog_complete_without_javascript": true,
+    "shared_focus_panel": true,
+    "selection_parity_by_commonproject_id": true,
+    "screen_reader_product_support_claimed": false,
+    "focus_returns_to_trigger_or_linear_fallback_on_close": true
+  },
+  "content_security_policy": {
+    "delivery": "html_meta_for_static_github_pages",
+    "default_src": [
+      "'self'"
+    ],
+    "script_src": [
+      "'self'"
+    ],
+    "style_src": [
+      "'self'"
+    ],
+    "connect_src": [
+      "'self'",
+      "https://tiles.openfreemap.org"
+    ],
+    "img_src": [
+      "'self'",
+      "data:",
+      "blob:",
+      "https://tiles.openfreemap.org"
+    ],
+    "font_src": [
+      "'self'",
+      "data:",
+      "https://tiles.openfreemap.org"
+    ],
+    "worker_src": [
+      "'self'",
+      "blob:"
+    ],
+    "object_src": [
+      "'none'"
+    ],
+    "inline_script_authorized": false,
+    "inline_style_authorized": false
+  },
+  "performance": {
+    "settled_idle_map_render_delta_max": 2,
+    "settled_idle_overlay_render_delta_max": 0,
+    "overlay_render_count_exposed_for_acceptance": true,
+    "map_render_count_exposed_for_acceptance": true,
+    "no_telemetry": true
+  },
+  "release_gates": {
+    "deterministic_build_and_tests": "pass",
+    "public_shell_and_catalog_validation": "pass",
+    "desktop_chrome_browser_smoke": "pass_swiftshader_webgl",
+    "physical_android_chrome": "required_before_merge",
+    "android_reduced_motion": "not_claimed",
+    "screen_reader_product_support": "not_claimed",
+    "github_required_check": "pending",
+    "live_pages_smoke": "pending_after_merge"
+  },
+  "decision_boundary": {
+    "engine_selected": true,
+    "selected_engine": "maplibre_gl_js",
+    "public_runtime_uses_selected_engine": true,
+    "production_architecture_authorized": false,
+    "production_provider_selected": false,
+    "screen_reader_product_support_claimed": false
+  }
+}

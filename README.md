@@ -23,7 +23,7 @@ Commonworld führt keine eigene Mitgliedschaft, Projektverwaltung oder ungeprüf
 
 ## Aktueller Stand
 
-Die öffentliche Seite zeigt den ersten quellengebundenen Startkatalog mit zehn digitalen Commons. MapLibre GL JS 5.24.0 ist als kanonische Primärengine gewählt; die öffentliche Seite ist noch statisch und die Produktionsarchitektur bleibt bis zum ersten MapLibre-Vertikalschnitt gesperrt.
+Die öffentliche Seite enthält den ersten interaktiven MapLibre-Globus und den quellengebundenen Startkatalog mit zehn digitalen Commons. Dieselben CommonProject-Identitäten erscheinen in der linearen Ansicht, im Fokuspanel und in der synchronisierten digitalen SVG-Sphäre. Die Produktionsarchitektur, ein belastbarer Produktions-Kartenanbieter, Android-spezifische Reduced-Motion-Abnahme und Screenreader-Produkttauglichkeit bleiben ausdrücklich offen.
 
 ## Validierung
 

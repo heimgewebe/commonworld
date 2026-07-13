@@ -225,9 +225,6 @@ def validate_renderer_spike(root: Path = ROOT) -> list[str]:
             errors.append(f"official source binding mismatch: {source_id}")
 
     forbidden_repo_paths = (
-        root / "package.json",
-        root / "package-lock.json",
-        root / "node_modules",
         root / "screenshots",
         root / "spikes",
     )
