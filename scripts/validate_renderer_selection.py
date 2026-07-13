@@ -41,12 +41,11 @@ EXPECTED_DECISION = {
     "public_runtime_uses_selected_engine": False,
     "next_proof": "public_maplibre_globe_vertical_slice_with_seed_catalog",
 }
-EXPECTED_PUBLICATION = {
+EXPECTED_RENDERER_PUBLICATION = {
     "public": True,
     "source_policy": "official-sources-only",
     "curation_state": "listed",
     "engine_selected": True,
-    "production_architecture_authorized": False,
     "selected_engine": "maplibre_gl_js",
     "public_runtime_uses_selected_engine": True,
 }
@@ -422,7 +421,8 @@ def validate_renderer_selection(root: Path = ROOT) -> list[str]:
         errors.append("renderer selection requires the installed v4 performance and idle proof")
 
     # Public catalog alignment.
-    if catalog.get("publication") != EXPECTED_PUBLICATION:
+    publication = _mapping(catalog.get("publication", {}))
+    if any(publication.get(key) != expected for key, expected in EXPECTED_RENDERER_PUBLICATION.items()):
         errors.append("public catalog renderer publication boundary mismatch")
     records = _catalog_records(root, catalog)
     if catalog.get("entry_count") != 10 or len(records) != 10:

@@ -108,6 +108,18 @@ class PublicCatalogTests(unittest.TestCase):
 
         self.assertTrue(any("derived German layer label" in error for error in errors))
 
+    def test_production_delivery_boundary_cannot_regress(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp_dir:
+            root = self.copy_public_catalog(tmp_dir)
+            path = root / "catalog" / "catalog.json"
+            manifest = json.loads(path.read_text(encoding="utf-8"))
+            manifest["publication"]["production_architecture_authorized"] = False
+            path.write_text(json.dumps(manifest, indent=2) + "\n", encoding="utf-8")
+
+            errors = validate_public_catalog(root)
+
+        self.assertIn("public catalog publication boundary mismatch", errors)
+
     def test_non_official_source_is_rejected(self) -> None:
         with tempfile.TemporaryDirectory() as tmp_dir:
             root = self.copy_public_catalog(tmp_dir)

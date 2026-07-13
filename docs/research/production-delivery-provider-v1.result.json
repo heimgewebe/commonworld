@@ -1,0 +1,64 @@
+{
+  "schema_version": 1,
+  "kind": "commonworld_production_delivery_provider_result",
+  "task_id": "COMMONWORLD-PUBLIC-GLOBE-V1-T003",
+  "evaluated_at": "2026-07-13",
+  "verdict": "pass",
+  "decision": "authorize_github_pages_with_noncritical_openfreemap_best_effort_boundary",
+  "authority_id": "commonworld-project-operator",
+  "contract_path": "contracts/commonworld/production-delivery-provider.contract.json",
+  "acceptance": [
+    {
+      "id": "production-current-state",
+      "status": "pass",
+      "evidence": "GitHub Pages, DNS, CSP, runtime origins, style snapshot, attribution and live public delivery were re-read."
+    },
+    {
+      "id": "production-provider-criteria",
+      "status": "pass",
+      "evidence": "Public OpenFreeMap, self-hosted OpenFreeMap, MapTiler Custom and Protomaps/PMTiles were compared on the required axes."
+    },
+    {
+      "id": "production-decision",
+      "status": "pass",
+      "evidence": "The Commonworld project operator authorized a bounded static production architecture and a noncritical best-effort provider boundary."
+    },
+    {
+      "id": "production-failure-path",
+      "status": "pass",
+      "evidence": "Provider, rate-limit, freshness, Pages, DNS and rollback behavior are explicit."
+    },
+    {
+      "id": "production-no-implicit-migration",
+      "status": "pass",
+      "evidence": "No provider migration, backend or data-ingestion change is authorized."
+    }
+  ],
+  "live_observation": {
+    "public_url": "https://commonworld.net/",
+    "http_status": 200,
+    "catalog_entry_count": 10,
+    "runtime_provider_origin": "https://tiles.openfreemap.org",
+    "repository_commit": "92c6993b8c1cac07caf0771c6071de9ca4721047"
+  },
+  "selected_boundary": {
+    "delivery": "github_pages_static",
+    "basemap": "openfreemap_public_instance",
+    "basemap_critical": false,
+    "sla_claimed": false,
+    "degraded_mode": "linear catalog, selection and focus remain available"
+  },
+  "migration_authorized": false,
+  "does_not_establish": [
+    "provider SLA",
+    "automatic failover",
+    "backend readiness",
+    "unbounded production capacity",
+    "future runtime correctness"
+  ],
+  "historical_evidence_preservation": {
+    "predecessor_contract_mutated": false,
+    "catalog_snapshot": "docs/research/evidence/public-maplibre-vertical-slice-v1.catalog.json",
+    "catalog_snapshot_sha256": "3f254e47c63448a03766860e69aba6595853555c6d42da3a3646b47b064ba509"
+  }
+}
