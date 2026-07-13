@@ -1,6 +1,9 @@
-.PHONY: validate validate-canonical-plan validate-contracts validate-semantic-zoom validate-visual-semantics validate-renderer-spike validate-maplibre-phase2-proof validate-device-acceptance-pack validate-device-acceptance-rerun validate-digital-sphere validate-layered-digital-sphere-proof validate-digital-sphere-real-surface validate-device-acceptance-performance-v4 validate-physical-device-acceptance-v4-apple validate-public-catalog validate-renderer-selection validate-public-maplibre-vertical-slice validate-production-delivery-provider validate-public-shell test-js test smoke-pages-live check-pages-dns-target
+.PHONY: validate validate-current-state browser-smoke validate-canonical-plan validate-contracts validate-semantic-zoom validate-visual-semantics validate-renderer-spike validate-maplibre-phase2-proof validate-device-acceptance-pack validate-device-acceptance-rerun validate-digital-sphere validate-layered-digital-sphere-proof validate-digital-sphere-real-surface validate-device-acceptance-performance-v4 validate-physical-device-acceptance-v4-apple validate-public-catalog validate-renderer-selection validate-public-maplibre-vertical-slice validate-production-delivery-provider validate-public-shell test-js test smoke-pages-live check-pages-dns-target
 
-validate: validate-canonical-plan validate-contracts validate-semantic-zoom validate-visual-semantics validate-renderer-spike validate-maplibre-phase2-proof validate-device-acceptance-pack validate-device-acceptance-rerun validate-digital-sphere validate-layered-digital-sphere-proof validate-digital-sphere-real-surface validate-device-acceptance-performance-v4 validate-physical-device-acceptance-v4-apple validate-public-catalog validate-renderer-selection validate-public-maplibre-vertical-slice validate-production-delivery-provider validate-public-shell test-js test
+validate: validate-current-state validate-canonical-plan validate-contracts validate-semantic-zoom validate-visual-semantics validate-renderer-spike validate-maplibre-phase2-proof validate-device-acceptance-pack validate-device-acceptance-rerun validate-digital-sphere validate-layered-digital-sphere-proof validate-digital-sphere-real-surface validate-device-acceptance-performance-v4 validate-physical-device-acceptance-v4-apple validate-public-catalog validate-renderer-selection validate-public-maplibre-vertical-slice validate-production-delivery-provider validate-public-shell test-js test
+
+validate-current-state:
+	python3 scripts/validate_current_state.py
 
 validate-canonical-plan:
 	python3 scripts/validate_canonical_plan.py
@@ -67,3 +70,6 @@ smoke-pages-live:
 
 check-pages-dns-target:
 	python3 scripts/check_pages_dns_target.py
+
+browser-smoke:
+	npm run smoke:browser

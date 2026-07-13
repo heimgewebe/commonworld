@@ -171,8 +171,8 @@ def validate_production_delivery_provider(root: Path = ROOT) -> list[str]:
         errors.append("frozen predecessor catalog is missing")
     if vertical_basemap.get("service_level_agreement_claimed") is not False or vertical_basemap.get("production_provider_commitment") is not False:
         errors.append("historical vertical slice must retain its pre-production provider boundary")
-    if vertical_decision.get("production_architecture_authorized") is not False or vertical_decision.get("production_provider_selected") is not False:
-        errors.append("historical vertical-slice decision must not be rewritten")
+    if vertical_decision.get("production_architecture_authorized") is not True or vertical_decision.get("production_provider_selected") is not True:
+        errors.append("current vertical-slice contract must reflect the later bounded production authorization")
 
     publication = catalog.get("publication", {})
     if publication.get("production_architecture_authorized") is not True:

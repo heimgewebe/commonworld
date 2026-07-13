@@ -16,6 +16,9 @@ REQUIRED_HTML = (
     'id="commons-search"',
     'id="settings-toggle"',
     'id="settings-panel"',
+    'id="catalog-bootstrap"',
+    'id="globe-results"',
+    'role="region"',
     'data-presentation-choice="globe"',
     'data-presentation-choice="text"',
     'id="globe-surface"',
@@ -30,6 +33,8 @@ REQUIRED_HTML = (
     'id="project-focus"',
     'href="./catalog/catalog.json"',
     'href="./contracts/commonworld/project.schema.json"',
+    'href="./method.html"',
+    'href="./contracts/commonworld/current-state.contract.json"',
     'type="application/json"',
     'Keine API-Laufzeit, kein Schreibweg und keine eigenständige CLI.',
     '<script src="./assets/vendor/maplibre-gl.js" defer></script>',
@@ -76,6 +81,9 @@ REQUIRED_CSS = (
     '.text-view',
     '.noscript-catalog',
     '.project-focus',
+    '.globe-results',
+    '.method-page',
+    '.maplibregl-ctrl-group button',
     '.catalog-grid',
     '.catalog-card',
     ':focus-visible',
@@ -88,13 +96,17 @@ def validate_public_shell(root: Path = ROOT) -> list[str]:
     errors: list[str] = []
     html_path = root / 'index.html'
     css_path = root / 'index.css'
+    method_path = root / 'method.html'
     if not html_path.is_file():
         return ['missing public index.html']
     if not css_path.is_file():
         return ['missing public index.css']
+    if not method_path.is_file():
+        return ['missing public method.html']
 
     html = html_path.read_text(encoding='utf-8')
     css = css_path.read_text(encoding='utf-8')
+    method = method_path.read_text(encoding='utf-8')
     lowered = html.casefold()
     for token in REQUIRED_HTML:
         if token not in html:
@@ -111,6 +123,20 @@ def validate_public_shell(root: Path = ROOT) -> list[str]:
     text_position = html.find('id="text-view"')
     if globe_position < 0 or text_position < 0 or globe_position >= text_position:
         errors.append('globe surface must precede the alternate text surface')
+    for token in (
+        'Methode, Abdeckung und Datenschutz',
+        'keine vollständige Weltstatistik',
+        'keine Konten, eigene Telemetrie, Cookies oder schreibende API',
+        'AGPL-3.0-only',
+        'CC0-1.0',
+        'ohne Gewährleistung',
+        'https://github.com/heimgewebe/commonworld',
+        './contracts/commonworld/current-state.contract.json',
+    ):
+        if token not in method:
+            errors.append(f'public method surface missing required token: {token}')
+    if "<script" in method.casefold():
+        errors.append('public method surface must remain script-free')
     return errors
 
 

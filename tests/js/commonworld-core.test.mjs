@@ -7,6 +7,7 @@ import {
   cameraFromSearch,
   deriveLayer,
   filterRecords,
+  mapFailurePolicy,
   searchFromState,
   sphereLayout,
   sphereOpacityForZoom,
@@ -106,6 +107,12 @@ test('sphere layout follows the padded visible globe center and zoom', () => {
   const projected = sphereLayout({ width: 1000, height: 700, zoom: 1.15, padding: { right: 400 }, center: { x: 301.25, y: 348.5 } });
   assert.equal(projected.x, 301.25);
   assert.equal(projected.y, 348.5);
+});
+
+test('map failure policy preserves the style for isolated errors and replaces it only after provider readback failure', () => {
+  assert.deepEqual(mapFailurePolicy(), { degraded: true, replaceStyle: false });
+  assert.deepEqual(mapFailurePolicy({ providerReadbackFailed: false }), { degraded: true, replaceStyle: false });
+  assert.deepEqual(mapFailurePolicy({ providerReadbackFailed: true }), { degraded: true, replaceStyle: true });
 });
 
 test('digital sphere fade is monotonic and bounded', () => {

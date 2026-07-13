@@ -83,6 +83,7 @@ def render_cards(records: list[dict], *, interactive: bool = True) -> str:
 
 def render_shell(root: Path = ROOT) -> str:
     records = load_records(root)
+    bootstrap = html.escape(json.dumps(records, ensure_ascii=False, separators=(",", ":")))
     paths = "\n".join(
         f'              <circle id="sphere-path-{index}" cx="320" cy="320" r="{radius}" />'
         for index, radius in enumerate((268, 252, 236, 220, 204, 188), start=1)
@@ -109,6 +110,7 @@ def render_shell(root: Path = ROOT) -> str:
   </head>
   <body data-presentation="globe">
     <a class="skip-link" href="#text-view">Zur Textansicht springen</a>
+    <template id="catalog-bootstrap">{bootstrap}</template>
     <main class="app-shell">
       <header class="topbar">
         <a class="brand" href="./" aria-label="commonworld – Globus zurücksetzen">
@@ -126,7 +128,7 @@ def render_shell(root: Path = ROOT) -> str:
 
       <section id="globe-surface" class="globe-surface" aria-label="Commonworld-Globus">
         <figure class="globe-stage" aria-labelledby="globe-caption" data-runtime-state="loading" data-map-renders="0" data-overlay-renders="0">
-          <div id="map" class="globe-map" role="application" aria-label="Interaktiver Commonworld-Globus"></div>
+          <div id="map" class="globe-map" role="region" aria-label="Interaktiver Commonworld-Globus"></div>
           <svg id="digital-sphere" class="digital-sphere" viewBox="0 0 640 640" role="group" aria-labelledby="sphere-title">
             <title id="sphere-title">Digitale Commons-Sphäre mit sechs abgeleiteten Schichten</title>
             <defs>
@@ -155,6 +157,7 @@ def render_shell(root: Path = ROOT) -> str:
           </div>
 
           <p id="map-status" class="map-status" role="status">Globus wird geladen. Die Textansicht bleibt verfügbar.</p>
+          <p id="globe-results" class="globe-results" role="status">10 Commons im aktuellen Katalog.</p>
 
           <aside id="layer-panel" class="layer-panel" aria-labelledby="layer-title" hidden>
             <div class="panel-heading">
@@ -210,9 +213,12 @@ def render_shell(root: Path = ROOT) -> str:
           <ul>
             <li><a href="./catalog/catalog.json" type="application/json">Öffentliches Katalogmanifest</a></li>
             <li><a href="./contracts/commonworld/project.schema.json" type="application/schema+json">CommonProject-Schema</a></li>
-            <li><a href="./docs/blueprints/commonworld-masterplan.md">Methode und Produktgrenze</a></li>
+            <li><a href="./method.html">Methode, Abdeckung und Datenschutz</a></li>
+            <li><a href="./contracts/commonworld/current-state.contract.json" type="application/json">Aktueller Betriebsstand</a></li>
+            <li><a href="./LICENSE">Code-Lizenz</a> · <a href="./LICENSE-DATA.md">Datenlizenz</a></li>
           </ul>
           <p>Statische, lesende JSON-Oberfläche. Keine API-Laufzeit, kein Schreibweg und keine eigenständige CLI.</p>
+          <p class="legal-note">© 2026 Commonworld contributors. Der Code wird ohne Gewährleistung unter AGPL-3.0-only weitergegeben. <a href="https://github.com/heimgewebe/commonworld" rel="external noreferrer">Quellcode</a> · <a href="./LICENSE">Lizenztext</a></p>
         </section>
       </aside>
 
@@ -245,10 +251,43 @@ def render_shell(root: Path = ROOT) -> str:
 '''
 
 
+def render_method(root: Path = ROOT) -> str:
+    manifest = json.loads((root / "catalog/catalog.json").read_text(encoding="utf-8"))
+    count = manifest["entry_count"]
+    return f"""<!doctype html>
+<html lang="de">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="color-scheme" content="dark" />
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; style-src 'self'; img-src 'self' data:; object-src 'none'; base-uri 'self'; form-action 'none';" />
+    <meta name="description" content="Methode, Abdeckung, Datenschutz und Betriebsgrenzen von Commonworld." />
+    <title>Commonworld — Methode und Grenzen</title>
+    <link rel="icon" href="./assets/commonworld-mark.svg" type="image/svg+xml" />
+    <link rel="stylesheet" href="./index.css" />
+  </head>
+  <body class="method-page">
+    <main>
+      <p class="kicker">Commonworld</p>
+      <h1>Methode, Abdeckung und Datenschutz</h1>
+      <p><a href="./">Zurück zum Globus</a></p>
+      <section><h2>Was Commonworld zeigt</h2><p>Commonworld veröffentlicht kuratierte Commons als eine gemeinsame Entdeckungsoberfläche. Der aktuelle Startkatalog enthält {count} digitale Commons. Er ist ein begrenzter redaktioneller Ausschnitt und keine vollständige Weltstatistik.</p></section>
+      <section><h2>Daten und Quellen</h2><p>Jeder Eintrag besitzt eine stabile <code>CommonProject.id</code>, Quellen, Abrufdaten, Aktivitäts- und Kurationsangaben. Die JSON-Dateien sind dieselbe Datenwahrheit wie Globus und Textansicht. Fehlende Katalogeinträge bedeuten nicht, dass in einer Region keine Commons existieren.</p></section>
+      <section><h2>Orte und Privatsphäre</h2><p>Digitale Commons erhalten keine erfundenen Kartenkoordinaten. Künftige geografische Angaben dürfen exakt, angenähert oder verborgen sein. Verborgene Orte werden weder veröffentlicht noch aus anderen Angaben rekonstruiert.</p></section>
+      <section><h2>Technischer Betrieb</h2><p>Die Seite läuft statisch über GitHub Pages. MapLibre wird lokal ausgeliefert. Die Basiskarte kommt von der öffentlichen OpenFreeMap-Instanz als nichtkritische Best-effort-Abhängigkeit ohne behauptetes SLA. Bei Kartenfehlern bleiben Katalog und Textansicht verfügbar.</p></section>
+      <section><h2>Datenschutz</h2><p>Commonworld besitzt keine Konten, eigene Telemetrie, Cookies oder schreibende API. Kartenabrufe gehen direkt an OpenFreeMap; dort kann technisch die IP-Adresse verarbeitet und zeitweise zur Sicherheit protokolliert werden.</p></section>
+      <section><h2>Barrierefreiheit</h2><p>Textansicht, Tastaturpfad, reduzierte Bewegung und No-JavaScript-Katalog sind vorhanden. Eine vollständige Screenreader-Produkttauglichkeit oder WCAG-Konformität wird noch nicht behauptet.</p></section>
+      <section><h2>Lizenzen und maschinenlesbare Grenzen</h2><p>© 2026 Commonworld contributors. Der <a href="https://github.com/heimgewebe/commonworld" rel="external noreferrer">Commonworld-Quellcode</a> wird ohne Gewährleistung unter AGPL-3.0-only bereitgestellt; der <a href="./LICENSE">vollständige Lizenztext</a> ist öffentlich. Von Commonworld erstellte Katalogdaten stehen unter CC0-1.0. Fremde Marken, Karten- und Quelldaten behalten ihre eigenen Rechte. Der <a href="./contracts/commonworld/current-state.contract.json">aktuelle Betriebsstand</a>, das <a href="./catalog/catalog.json">Katalogmanifest</a> und das <a href="./contracts/commonworld/project.schema.json">Datenschema</a> sind öffentlich lesbar.</p></section>
+    </main>
+  </body>
+</html>
+"""
+
+
 def main() -> int:
-    target = ROOT / "index.html"
-    target.write_text(render_shell(ROOT), encoding="utf-8")
-    print("commonworld globe-first shell rendered from public catalog")
+    (ROOT / "index.html").write_text(render_shell(ROOT), encoding="utf-8")
+    (ROOT / "method.html").write_text(render_method(ROOT), encoding="utf-8")
+    print("commonworld globe-first shell and method page rendered from public contracts")
     return 0
 
 

@@ -149,6 +149,10 @@ export function mapCamera(map) {
   };
 }
 
+export function mapFailurePolicy({ providerReadbackFailed = false } = {}) {
+  return Object.freeze({ degraded: true, replaceStyle: providerReadbackFailed === true });
+}
+
 export function sphereOpacityForZoom(zoom) {
   const value = finite(zoom, DEFAULT_CAMERA.zoom);
   if (value <= 1.8) return 1;
