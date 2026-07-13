@@ -6,7 +6,9 @@ import {
   binaryFragment,
   cameraFromSearch,
   deriveLayer,
+  filterRecords,
   searchFromState,
+  sphereLayout,
   sphereOpacityForZoom,
   sphereStartOffset,
   stateFromSearch,
@@ -47,10 +49,12 @@ test('digital sphere offsets wrap all catalog labels into the visible path band'
   assert.equal(sphereStartOffset(-1, -1, 0), 8);
 });
 
-test('deep-link state accepts known identities and clamps camera', () => {
-  const state = stateFromSearch('?project=debian&view=layers&layer=software_infrastructure&lng=999&lat=-999&z=99&p=99', ['debian']);
+test('deep-link state accepts surface, search, identity and clamped camera', () => {
+  const state = stateFromSearch('?surface=text&q=open%20data&project=debian&view=layers&layer=software_infrastructure&lng=999&lat=-999&z=99&p=99', ['debian']);
   assert.equal(state.project, 'debian');
   assert.equal(state.view, 'layers');
+  assert.equal(state.surface, 'text');
+  assert.equal(state.query, 'open data');
   assert.equal(state.layer, 'software_infrastructure');
   assert.deepEqual(state.camera, { lng: 180, lat: -85, zoom: 8, bearing: 0, pitch: 70 });
 });
@@ -59,22 +63,49 @@ test('unknown identities and malformed numbers fail closed', () => {
   const state = stateFromSearch('?project=unknown&layer=unknown&lng=nope', ['debian']);
   assert.equal(state.project, null);
   assert.equal(state.layer, null);
+  assert.equal(state.surface, 'globe');
   assert.equal(state.camera.lng, DEFAULT_CAMERA.lng);
   assert.deepEqual(cameraFromSearch(''), DEFAULT_CAMERA);
 });
 
-test('serialized state roundtrips selection and view', () => {
+test('serialized state roundtrips selection, view, surface and query', () => {
   const search = searchFromState({
     camera: { lng: 13.4049, lat: 52.52, zoom: 3.456, bearing: 4.2, pitch: 25 },
     project: 'debian',
     layer: 'software_infrastructure',
     view: 'layers',
+    surface: 'text',
+    query: 'freie Software',
   });
   const state = stateFromSearch(search, ['debian']);
   assert.equal(state.project, 'debian');
   assert.equal(state.layer, 'software_infrastructure');
   assert.equal(state.view, 'layers');
+  assert.equal(state.surface, 'text');
+  assert.equal(state.query, 'freie Software');
   assert.equal(state.camera.zoom, 3.46);
+});
+
+test('record filtering keeps one shared search and layer truth', () => {
+  const records = [
+    { id: 'a', title: 'Offene Karte', summary: 'Weltweite Daten', themes: ['open-data'], actions: ['use'], presence: { digital: { available: true } } },
+    { id: 'b', title: 'Freie Schule', summary: 'Lernen', themes: ['education'], actions: ['learn'], presence: { digital: { available: true } } },
+  ];
+  assert.deepEqual(filterRecords(records, { query: 'karte' }).map(({ id }) => id), ['a']);
+  assert.deepEqual(filterRecords(records, { layer: 'learning_education' }).map(({ id }) => id), ['b']);
+  assert.deepEqual(filterRecords(records, { query: 'daten', layer: 'knowledge_data' }).map(({ id }) => id), ['a']);
+});
+
+test('sphere layout follows the padded visible globe center and zoom', () => {
+  const normal = sphereLayout({ width: 1000, height: 700, zoom: 1.15, padding: {} });
+  const side = sphereLayout({ width: 1000, height: 700, zoom: 1.55, padding: { left: 36, right: 420, top: 36, bottom: 36 }, sideView: true });
+  assert.deepEqual(normal, { x: 500, y: 350, diameter: 686 });
+  assert.equal(side.x, 308);
+  assert.equal(side.y, 350);
+  assert.equal(side.diameter, 522.24);
+  const projected = sphereLayout({ width: 1000, height: 700, zoom: 1.15, padding: { right: 400 }, center: { x: 301.25, y: 348.5 } });
+  assert.equal(projected.x, 301.25);
+  assert.equal(projected.y, 348.5);
 });
 
 test('digital sphere fade is monotonic and bounded', () => {

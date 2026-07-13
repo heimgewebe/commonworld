@@ -23,22 +23,27 @@ EXPECTED_CATALOG_ENTRY_COUNT = 10
 
 REQUIRED_TOKENS = (
     "<title>commonworld — Commons entdecken</title>",
-    "Commons weltweit entdecken",
-    "Die gemeinsame Welt wird sichtbar.",
+    'class="topbar"',
+    'id="commons-search"',
+    'id="settings-toggle"',
+    'id="globe-surface"',
     'class="globe-stage"',
     'class="globe-map"',
     'class="digital-sphere"',
     'id="sphere-edge-control"',
+    'id="layer-stack-visual"',
     'id="layer-panel"',
+    'id="text-view"',
+    'id="settings-panel"',
+    'data-presentation-choice="globe"',
+    'data-presentation-choice="text"',
     'id="project-focus"',
-    "Der erste interaktive Globus ist gebaut.",
-    "MapLibre GL JS 5.24.0",
-    "OpenFreeMap liefert die Basiskarte",
-    "10 geprüfte Startdatensätze",
     'id="catalog"',
     './catalog/catalog.json',
+    './contracts/commonworld/project.schema.json',
     './assets/vendor/maplibre-gl.js',
     './assets/commonworld-app.js',
+    './assets/commonworld-mark.svg',
 )
 
 FORBIDDEN_TOKENS = (
@@ -71,6 +76,17 @@ EXPECTED_PUBLICATION = {
     "public_runtime_uses_selected_engine": True,
     "production_delivery": "github_pages_static",
     "basemap_provider_boundary": "openfreemap_public_best_effort_noncritical",
+}
+
+EXPECTED_MACHINE_SURFACE = {
+    "access": "static_read_only",
+    "manifest": "catalog/catalog.json",
+    "project_base": "catalog/projects/",
+    "project_schema": "contracts/commonworld/project.schema.json",
+    "identity_field": "CommonProject.id",
+    "api_runtime": False,
+    "write_path": False,
+    "standalone_cli": False,
 }
 
 RUNTIME_ASSETS = (
@@ -119,6 +135,7 @@ class PagesLiveSmokeReceipt:
     catalog_entry_count: int
     catalog_project_files: tuple[str, ...]
     catalog_publication: dict[str, object]
+    catalog_machine_surface: dict[str, object]
     runtime_assets: tuple[RuntimeAssetReceipt, ...]
 
 
@@ -211,6 +228,8 @@ def validate_catalog_fetch(fetch: LiveFetch) -> list[str]:
         errors.append(f"live catalog must contain {EXPECTED_CATALOG_ENTRY_COUNT} entries")
     if catalog.get("publication") != EXPECTED_PUBLICATION:
         errors.append("live catalog publication boundary mismatch")
+    if catalog.get("machine_surface") != EXPECTED_MACHINE_SURFACE:
+        errors.append("live catalog machine-readable surface boundary mismatch")
     return errors
 
 
@@ -277,7 +296,7 @@ def run_live_smoke(url: str | None = None, timeout_seconds: int = 20, insecure: 
     if parse_errors:
         raise RuntimeError("live Pages smoke failed:\n- " + "\n- ".join(parse_errors))
     return PagesLiveSmokeReceipt(
-        smoke_id="commonworld.pages-live.public-maplibre.v5",
+        smoke_id="commonworld.pages-live.globe-first.v6",
         requested_url=page.requested_url,
         final_url=page.final_url,
         status=page.status,
@@ -293,6 +312,7 @@ def run_live_smoke(url: str | None = None, timeout_seconds: int = 20, insecure: 
         catalog_entry_count=int(catalog["entry_count"]),
         catalog_project_files=tuple(catalog["project_files"]),
         catalog_publication=dict(catalog["publication"]),
+        catalog_machine_surface=dict(catalog["machine_surface"]),
         runtime_assets=tuple(asset_receipts),
     )
 

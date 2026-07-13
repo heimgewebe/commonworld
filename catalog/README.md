@@ -16,3 +16,6 @@
 ```bash
 make validate-public-catalog
 ```
+## Maschinenlesbarer Zugang
+
+`catalog/catalog.json` ist zugleich der stabile Einstieg in die statische, ausschließlich lesende Maschinenoberfläche. `machine_surface` benennt Manifest, Projektpfad und CommonProject-Schema sowie die explizite Grenze: keine API-Laufzeit, kein Schreibweg und keine eigenständige CLI. Die Einzeldateien liegen unter `catalog/projects/<CommonProject.id>.json`. Der vollständige Vertrag steht in `docs/ops/machine-readable-surface.md`.

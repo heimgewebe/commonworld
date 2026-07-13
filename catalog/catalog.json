@@ -26,5 +26,15 @@
     "public_runtime_uses_selected_engine": true,
     "production_delivery": "github_pages_static",
     "basemap_provider_boundary": "openfreemap_public_best_effort_noncritical"
+  },
+  "machine_surface": {
+    "access": "static_read_only",
+    "manifest": "catalog/catalog.json",
+    "project_base": "catalog/projects/",
+    "project_schema": "contracts/commonworld/project.schema.json",
+    "identity_field": "CommonProject.id",
+    "api_runtime": false,
+    "write_path": false,
+    "standalone_cli": false
   }
 }

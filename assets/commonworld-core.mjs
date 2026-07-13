@@ -21,6 +21,7 @@ const finite = (value, fallback) => {
   return Number.isFinite(number) ? number : fallback;
 };
 const clamp = (value, minimum, maximum) => Math.min(maximum, Math.max(minimum, value));
+const rounded = (value, digits) => Number(value.toFixed(digits));
 
 export function deriveLayer(record) {
   const digital = record?.presence?.digital;
@@ -65,6 +66,10 @@ export function cameraFromSearch(search = '') {
   };
 }
 
+export function normalizeQuery(value) {
+  return String(value ?? '').trim().replace(/\s+/g, ' ').slice(0, 120);
+}
+
 export function stateFromSearch(search = '', knownProjectIds = []) {
   const parameters = new URLSearchParams(search.startsWith('?') ? search.slice(1) : search);
   const known = new Set(knownProjectIds);
@@ -75,23 +80,62 @@ export function stateFromSearch(search = '', knownProjectIds = []) {
     project: project && known.has(project) ? project : null,
     layer: LAYERS.some((entry) => entry.id === layer) ? layer : null,
     view: parameters.get('view') === 'layers' ? 'layers' : 'globe',
+    surface: parameters.get('surface') === 'text' ? 'text' : 'globe',
+    query: normalizeQuery(parameters.get('q')),
   };
 }
 
-const rounded = (value, digits) => Number(value.toFixed(digits)).toString();
+const serializedNumber = (value, digits) => rounded(value, digits).toString();
 
 export function searchFromState(state) {
   const parameters = new URLSearchParams();
   const camera = state?.camera ?? DEFAULT_CAMERA;
-  parameters.set('lng', rounded(clamp(finite(camera.lng, DEFAULT_CAMERA.lng), -180, 180), 4));
-  parameters.set('lat', rounded(clamp(finite(camera.lat, DEFAULT_CAMERA.lat), -85, 85), 4));
-  parameters.set('z', rounded(clamp(finite(camera.zoom, DEFAULT_CAMERA.zoom), 0, 8), 2));
-  if (Math.abs(finite(camera.bearing, 0)) >= 0.05) parameters.set('b', rounded(clamp(finite(camera.bearing, 0), -180, 180), 1));
-  if (Math.abs(finite(camera.pitch, 0)) >= 0.05) parameters.set('p', rounded(clamp(finite(camera.pitch, 0), 0, 70), 1));
+  parameters.set('lng', serializedNumber(clamp(finite(camera.lng, DEFAULT_CAMERA.lng), -180, 180), 4));
+  parameters.set('lat', serializedNumber(clamp(finite(camera.lat, DEFAULT_CAMERA.lat), -85, 85), 4));
+  parameters.set('z', serializedNumber(clamp(finite(camera.zoom, DEFAULT_CAMERA.zoom), 0, 8), 2));
+  if (Math.abs(finite(camera.bearing, 0)) >= 0.05) parameters.set('b', serializedNumber(clamp(finite(camera.bearing, 0), -180, 180), 1));
+  if (Math.abs(finite(camera.pitch, 0)) >= 0.05) parameters.set('p', serializedNumber(clamp(finite(camera.pitch, 0), 0, 70), 1));
   if (state?.view === 'layers') parameters.set('view', 'layers');
+  if (state?.surface === 'text') parameters.set('surface', 'text');
   if (state?.layer && LAYERS.some((entry) => entry.id === state.layer)) parameters.set('layer', state.layer);
   if (state?.project) parameters.set('project', state.project);
+  const query = normalizeQuery(state?.query);
+  if (query) parameters.set('q', query);
   return `?${parameters.toString()}`;
+}
+
+export function filterRecords(records, state = {}) {
+  const query = normalizeQuery(state.query).toLocaleLowerCase('de');
+  return (Array.isArray(records) ? records : []).filter((record) => {
+    if (state.layer && deriveLayer(record) !== state.layer) return false;
+    if (!query) return true;
+    const searchable = [record?.title, record?.summary, ...(record?.themes ?? []), ...(record?.actions ?? [])]
+      .filter(Boolean)
+      .join(' ')
+      .toLocaleLowerCase('de');
+    return searchable.includes(query);
+  });
+}
+
+export function sphereLayout({ width, height, zoom = DEFAULT_CAMERA.zoom, padding = {}, center = null, sideView = false } = {}) {
+  const stageWidth = Math.max(1, finite(width, 1));
+  const stageHeight = Math.max(1, finite(height, 1));
+  const left = clamp(finite(padding.left, 0), 0, stageWidth - 1);
+  const right = clamp(finite(padding.right, 0), 0, stageWidth - left - 1);
+  const top = clamp(finite(padding.top, 0), 0, stageHeight - 1);
+  const bottom = clamp(finite(padding.bottom, 0), 0, stageHeight - top - 1);
+  const availableWidth = Math.max(1, stageWidth - left - right);
+  const availableHeight = Math.max(1, stageHeight - top - bottom);
+  const fallbackX = left + availableWidth / 2;
+  const fallbackY = top + availableHeight / 2;
+  const x = clamp(finite(center?.x, fallbackX), 0, stageWidth);
+  const y = clamp(finite(center?.y, fallbackY), 0, stageHeight);
+  const scale = 2 ** (clamp(finite(zoom, DEFAULT_CAMERA.zoom), 0, 8) - DEFAULT_CAMERA.zoom);
+  const minimum = Math.min(stageWidth, stageHeight) * (sideView ? 0.22 : 0.36);
+  const maximum = Math.min(stageWidth, stageHeight) * 1.6;
+  const base = Math.min(availableWidth, availableHeight) * (sideView ? 0.96 : 0.98);
+  const diameter = clamp(sideView ? base : base * scale, minimum, maximum);
+  return { x: rounded(x, 2), y: rounded(y, 2), diameter: rounded(diameter, 2) };
 }
 
 export function mapCamera(map) {

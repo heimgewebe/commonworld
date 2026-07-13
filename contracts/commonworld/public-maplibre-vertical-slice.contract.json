@@ -1,7 +1,7 @@
 {
   "schema_version": 1,
   "kind": "commonworld_public_maplibre_vertical_slice_contract",
-  "implemented_at": "2026-07-12",
+  "implemented_at": "2026-07-13",
   "renderer": {
     "engine": "maplibre_gl_js",
     "package": "maplibre-gl",
@@ -79,7 +79,24 @@
       "local_hidden_from": 2.6
     },
     "continuous_rotation": false,
-    "unchanged_geometry_rewrites_forbidden": true
+    "unchanged_geometry_rewrites_forbidden": true,
+    "geometry_anchor": "maplibre_projected_camera_center",
+    "geometry_inputs": [
+      "stage_bounds",
+      "maplibre_center_projection",
+      "maplibre_padding",
+      "maplibre_zoom"
+    ],
+    "screen_fixed_center_forbidden": true,
+    "side_view_keeps_overlay_attached": true,
+    "geometry_acceptance_data_attributes": [
+      "data-map-projected-center-x",
+      "data-map-projected-center-y",
+      "data-sphere-x",
+      "data-sphere-y",
+      "data-sphere-size"
+    ],
+    "side_view_visual": "six_stacked_elliptical_layers_beside_subdued_globe"
   },
   "navigation": {
     "deep_link_parameters": [
@@ -89,15 +106,23 @@
       "b",
       "p",
       "view",
+      "surface",
       "layer",
-      "project"
+      "project",
+      "q"
     ],
     "browser_back_restores_state": true,
     "camera_history_writes_coalesced_ms": 180,
     "side_layer_standard_command": "maplibre.easeTo",
     "side_layer_standard_duration_ms": 260,
     "reduced_motion_command": "maplibre.jumpTo",
-    "reduced_motion_duration_ms": 0
+    "reduced_motion_duration_ms": 0,
+    "presentation_preference_storage": "localStorage:commonworld.presentation",
+    "search_and_layer_filter_shared_across_surfaces": true,
+    "side_layer_responsive_padding": {
+      "wide": "right_panel",
+      "narrow": "bottom_sheet"
+    }
   },
   "accessibility": {
     "skip_link_to_linear_catalog": true,
@@ -106,7 +131,9 @@
     "shared_focus_panel": true,
     "selection_parity_by_commonproject_id": true,
     "screen_reader_product_support_claimed": false,
-    "focus_returns_to_trigger_or_linear_fallback_on_close": true
+    "focus_returns_to_trigger_or_linear_fallback_on_close": true,
+    "skip_link_to_text_surface": true,
+    "text_surface_does_not_require_webgl": true
   },
   "content_security_policy": {
     "delivery": "html_meta_for_static_github_pages",
@@ -159,7 +186,9 @@
     "android_reduced_motion": "not_claimed",
     "screen_reader_product_support": "not_claimed",
     "github_required_check": "pending",
-    "live_pages_smoke": "pending_after_merge"
+    "live_pages_smoke": "pending_after_merge",
+    "physical_android_chrome_previous_public_runtime": "pass_operator_attestation",
+    "physical_android_chrome_current_globe_first_surface": "required_before_merge"
   },
   "decision_boundary": {
     "engine_selected": true,
@@ -168,5 +197,29 @@
     "production_architecture_authorized": false,
     "production_provider_selected": false,
     "screen_reader_product_support_claimed": false
+  },
+  "surface": {
+    "default": "globe",
+    "root_globe_first": true,
+    "full_viewport_globe": true,
+    "marketing_intro_before_globe_forbidden": true,
+    "single_settings_gear": true,
+    "presentation_choices": [
+      "globe",
+      "text"
+    ],
+    "same_catalog_filter_selection_and_focus_state": true,
+    "text_surface_requires_webgl": false,
+    "text_surface_independent_scroll_region": true,
+    "no_javascript_catalog_overlay": true
+  },
+  "machine_surface": {
+    "access": "static_read_only",
+    "manifest": "catalog/catalog.json",
+    "project_base": "catalog/projects/",
+    "schema": "contracts/commonworld/project.schema.json",
+    "api_runtime": false,
+    "write_path": false,
+    "standalone_cli": false
   }
 }

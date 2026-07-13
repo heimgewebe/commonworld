@@ -118,6 +118,18 @@ def validate_public_catalog(root: Path = ROOT) -> list[str]:
         errors.append("public catalog language must be de")
     if manifest.get("publication") != expected_publication:
         errors.append("public catalog publication boundary mismatch")
+    expected_machine_surface = {
+        "access": "static_read_only",
+        "manifest": "catalog/catalog.json",
+        "project_base": "catalog/projects/",
+        "project_schema": "contracts/commonworld/project.schema.json",
+        "identity_field": "CommonProject.id",
+        "api_runtime": False,
+        "write_path": False,
+        "standalone_cli": False,
+    }
+    if manifest.get("machine_surface") != expected_machine_surface:
+        errors.append("public catalog machine-readable surface boundary mismatch")
 
     try:
         published_at = date.fromisoformat(manifest["published_at"])
@@ -291,11 +303,15 @@ def validate_public_catalog(root: Path = ROOT) -> list[str]:
     shell = shell_path.read_text(encoding="utf-8")
     cards = CARD_PATTERN.findall(shell)
     card_ids = [identifier for identifier, _body in cards]
-    card_bodies = {identifier: body for identifier, body in cards}
-    if sorted(card_ids) != sorted(identifiers) or len(card_ids) != len(set(card_ids)):
-        errors.append("public shell card identities must match the public catalog exactly once")
+    card_bodies: dict[str, list[str]] = {}
+    for identifier, body in cards:
+        card_bodies.setdefault(identifier, []).append(body)
+    if sorted(card_ids) != sorted(identifiers + identifiers) or any(card_ids.count(identifier) != 2 for identifier in identifiers):
+        errors.append("public shell card identities must match the public catalog once in Text and once in the no-JavaScript fallback")
     if './catalog/catalog.json' not in shell:
         errors.append("public shell must link to the canonical public catalog manifest")
+    if './contracts/commonworld/project.schema.json' not in shell:
+        errors.append("public shell must link to the CommonProject schema")
     for record in records:
         identifier = record.get("id")
         title = record.get("title")
@@ -303,7 +319,7 @@ def validate_public_catalog(root: Path = ROOT) -> list[str]:
         homepage = _homepage(record)
         if not all(isinstance(value, str) for value in (identifier, title, summary, homepage)):
             continue
-        card = card_bodies.get(identifier, "")
+        bodies = card_bodies.get(identifier, [])
         layer = record_layers.get(identifier)
         layer_label = layer_labels.get(layer)
         expected_values = [
@@ -314,8 +330,8 @@ def validate_public_catalog(root: Path = ROOT) -> list[str]:
         if isinstance(layer_label, str):
             expected_values.append((f"Digital · {html.escape(layer_label)}", "derived German layer label"))
         for value, label in expected_values:
-            if value not in card:
-                errors.append(f"public shell is missing {label} for {identifier}")
+            if not bodies or any(value not in body for body in bodies):
+                errors.append(f"public shell is missing {label} for {identifier} in at least one text projection")
 
     return errors
 

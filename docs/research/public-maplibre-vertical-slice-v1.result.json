@@ -1,8 +1,9 @@
 {
   "schema_version": 1,
   "kind": "commonworld_public_maplibre_vertical_slice_result",
-  "tested_at": "2026-07-12T21:09:29.559Z",
-  "base_commit": "97b57cbc1c8ca16b157f9678228b2ea070613ff5",
+  "tested_at": "2026-07-13T11:23:45.406732+00:00",
+  "base_commit": "3684c79e751e7584aadd500781fc2219ae91d098",
+  "implementation_task": "COMMONWORLD-PUBLIC-GLOBE-V1-T004",
   "runtime": {
     "engine": "maplibre_gl_js",
     "version": "5.24.0",
@@ -11,51 +12,229 @@
     "basemap_provider": "OpenFreeMap public instance",
     "production_provider_commitment": false,
     "catalog_entry_count": 10,
-    "geographic_commons_in_scope": false
+    "geographic_commons_in_scope": false,
+    "default_surface": "globe",
+    "alternate_surface": "text",
+    "machine_surface": "static_read_only_json"
   },
   "validation": {
-    "python_tests": 327,
-    "javascript_tests": 8,
+    "python_tests": 338,
+    "javascript_tests": 10,
     "make_validate": "PASS",
     "git_diff_check": "PASS",
     "deterministic_rebuild": "PASS",
     "npm_audit_high_or_critical": 0
   },
   "browser_proof": {
-    "environment": "Google Chrome headless with SwiftShader WebGL",
-    "renderer": "WebKit WebGL",
+    "environment": "Google Chrome headless with SwiftShader WebGL via Playwright",
     "verdict": "PASS",
-    "evidence_path": "/home/alex/.local/state/grabowski/evidence/commonworld/public-maplibre-globe-v1/browser-proof.json",
-    "evidence_sha256": "911f87d07c9eccfc4510638a4a306641a219509e13b435760184c87f33571e1a",
-    "screenshot_path": "/home/alex/.local/state/grabowski/evidence/commonworld/public-maplibre-globe-v1/browser-proof.png",
-    "screenshot_sha256": "2dfbbfc13ce4e15a41bd01962d05abea961d01077a442204c560f7f4e3fc11da",
+    "evidence_path": "/home/alex/.local/state/grabowski/evidence/commonworld/globe-first-surface-v1/browser-acceptance.json",
+    "evidence_sha256": "ec64cbfd030414e095a0e3575880f49ae39de3414c6e99d24df3daa5f70d00d2",
     "assertions": {
-      "runtime_ready": true,
-      "map_canvas_and_webgl": true,
-      "ten_catalog_identities": true,
-      "deep_link_focus": true,
-      "browser_back_restored": true,
+      "globe_first_root": true,
+      "one_settings_gear": true,
+      "shared_search_selection_and_focus": true,
+      "sphere_center_matches_maplibre_projection": true,
+      "side_sphere_fits_free_region": true,
+      "six_layer_side_visual": true,
+      "responsive_wide_right_padding": true,
+      "responsive_narrow_bottom_padding": true,
       "reduced_motion_jump_to_zero_ms": true,
-      "idle_map_render_delta": 0,
-      "idle_overlay_render_delta": 0,
+      "idle_map_render_delta_max": 0,
+      "idle_overlay_render_delta_max": 0,
       "unexpected_resource_origins": 0,
       "uncaught_exceptions": 0,
-      "focus_returned_after_close": true,
-      "ten_sphere_labels_painted": true
+      "console_errors": 0,
+      "visible_focus_return_after_surface_switch": true,
+      "full_text_surface_scrollable": true,
+      "no_javascript_catalog_scrollable": true
     },
-    "standard_motion": {
-      "verdict": "PASS",
-      "evidence_path": "/home/alex/.local/state/grabowski/evidence/commonworld/public-maplibre-globe-v1/browser-proof-standard-motion.json",
-      "evidence_sha256": "759401e9560e85a60eaccb85e32f4324f72cda372b9da32c64c466bd1b64084f",
-      "screenshot_path": "/home/alex/.local/state/grabowski/evidence/commonworld/public-maplibre-globe-v1/browser-proof-standard-motion.png",
-      "screenshot_sha256": "f579f8ef73b223b25966ecac6d3ecf4d95614c8a7f1887408d054b52b8c09289",
-      "close_camera_command": "easeTo",
-      "open_camera_command": "easeTo",
-      "duration_ms": 260,
-      "idle_map_render_delta": 0,
-      "idle_overlay_render_delta": 0,
-      "focus_returned_after_close": true,
-      "ten_sphere_labels_painted": true
+    "scenarios": [
+      {
+        "id": "desktop",
+        "viewport": {
+          "width": 1440,
+          "height": 1000
+        },
+        "verdict": "PASS",
+        "initial_sphere": {
+          "x": 720,
+          "y": 500,
+          "size": 980,
+          "projected_x": 720,
+          "projected_y": 500
+        },
+        "side_sphere": {
+          "x": 510,
+          "y": 500,
+          "size": 890.88,
+          "projected_x": 510,
+          "projected_y": 500
+        },
+        "layer_stack_items": 6,
+        "layer_stack_opacity": 1,
+        "open_camera_command": "easeTo",
+        "close_camera_command": "easeTo",
+        "camera_duration_ms": 260,
+        "visible_text_cards_after_search": 1,
+        "selected_project_after_roundtrip": "debian",
+        "project_cleared_after_focus_close": true,
+        "focus_return_target_after_close": "globe-reset",
+        "full_text_card_count": 10,
+        "text_scroll_before": 0,
+        "text_scroll_after": 874,
+        "text_client_height": 1000,
+        "text_scroll_height": 1874,
+        "idle_map_render_delta": 0,
+        "idle_overlay_render_delta": 0,
+        "page_error_count": 0,
+        "console_error_count": 0,
+        "resource_origins": [
+          "http://127.0.0.1:4190",
+          "https://tiles.openfreemap.org"
+        ],
+        "screenshots": {
+          "globe": {
+            "path": "/home/alex/.local/state/grabowski/evidence/commonworld/globe-first-surface-v1/desktop-globe.png",
+            "sha256": "1b14d2b20ed016d75bebb8dd07992d5b32ac1e289b85dd89e773f3e5c9545c45"
+          },
+          "layers": {
+            "path": "/home/alex/.local/state/grabowski/evidence/commonworld/globe-first-surface-v1/desktop-layers.png",
+            "sha256": "3025752987ad052819979bbcf6a1a7b31166e863fa89b413b5cb26157a6e0f49"
+          }
+        }
+      },
+      {
+        "id": "ipad",
+        "viewport": {
+          "width": 1180,
+          "height": 820
+        },
+        "verdict": "PASS",
+        "initial_sphere": {
+          "x": 590,
+          "y": 410,
+          "size": 803.6,
+          "projected_x": 590,
+          "projected_y": 410
+        },
+        "side_sphere": {
+          "x": 380,
+          "y": 410,
+          "size": 660.48,
+          "projected_x": 380,
+          "projected_y": 410
+        },
+        "layer_stack_items": 6,
+        "layer_stack_opacity": 1,
+        "open_camera_command": "easeTo",
+        "close_camera_command": "easeTo",
+        "camera_duration_ms": 260,
+        "visible_text_cards_after_search": 1,
+        "selected_project_after_roundtrip": "debian",
+        "project_cleared_after_focus_close": true,
+        "focus_return_target_after_close": "globe-reset",
+        "full_text_card_count": 10,
+        "text_scroll_before": 0,
+        "text_scroll_after": 1017,
+        "text_client_height": 820,
+        "text_scroll_height": 1837,
+        "idle_map_render_delta": 0,
+        "idle_overlay_render_delta": 0,
+        "page_error_count": 0,
+        "console_error_count": 0,
+        "resource_origins": [
+          "http://127.0.0.1:4190",
+          "https://tiles.openfreemap.org"
+        ],
+        "screenshots": {
+          "globe": {
+            "path": "/home/alex/.local/state/grabowski/evidence/commonworld/globe-first-surface-v1/ipad-globe.png",
+            "sha256": "30b40b092e90c190f5289354dd41fb7966582e3ec7685297dc8a78cb36af8731"
+          },
+          "layers": {
+            "path": "/home/alex/.local/state/grabowski/evidence/commonworld/globe-first-surface-v1/ipad-layers.png",
+            "sha256": "73e0b8e1e2a9a2e72525420d3431e67076c44c8f66165caf77b5f41010487b25"
+          }
+        }
+      },
+      {
+        "id": "mobile",
+        "viewport": {
+          "width": 390,
+          "height": 844
+        },
+        "verdict": "PASS",
+        "initial_sphere": {
+          "x": 195,
+          "y": 422,
+          "size": 382.2,
+          "projected_x": 195,
+          "projected_y": 422
+        },
+        "side_sphere": {
+          "x": 195,
+          "y": 183.24,
+          "size": 282.7,
+          "projected_x": 195,
+          "projected_y": 183.24
+        },
+        "layer_stack_items": 6,
+        "layer_stack_opacity": 1,
+        "open_camera_command": "easeTo",
+        "close_camera_command": "easeTo",
+        "camera_duration_ms": 260,
+        "visible_text_cards_after_search": 1,
+        "selected_project_after_roundtrip": "debian",
+        "project_cleared_after_focus_close": true,
+        "focus_return_target_after_close": "globe-reset",
+        "full_text_card_count": 10,
+        "text_scroll_before": 280,
+        "text_scroll_after": 2900,
+        "text_client_height": 844,
+        "text_scroll_height": 3744,
+        "idle_map_render_delta": 0,
+        "idle_overlay_render_delta": 0,
+        "page_error_count": 0,
+        "console_error_count": 0,
+        "resource_origins": [
+          "http://127.0.0.1:4190",
+          "https://tiles.openfreemap.org"
+        ],
+        "screenshots": {
+          "globe": {
+            "path": "/home/alex/.local/state/grabowski/evidence/commonworld/globe-first-surface-v1/mobile-globe.png",
+            "sha256": "64961abf2a70663eab301235688a3fd50ccda292f7d7c857ff5cd5a08552dd22"
+          },
+          "layers": {
+            "path": "/home/alex/.local/state/grabowski/evidence/commonworld/globe-first-surface-v1/mobile-layers.png",
+            "sha256": "14be7d6656562976f45871af366ba8f96218959827b5de39238344a5e278ad80"
+          }
+        }
+      }
+    ],
+    "reduced_motion": {
+      "command": "jumpTo",
+      "duration_ms": 0,
+      "verdict": "PASS"
+    },
+    "no_javascript": {
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "card_count": 10,
+      "scroll": {
+        "before": 0,
+        "after": 2196,
+        "clientHeight": 844,
+        "scrollHeight": 3040
+      },
+      "screenshot": {
+        "path": "/home/alex/.local/state/grabowski/evidence/commonworld/globe-first-surface-v1/mobile-no-javascript.png",
+        "sha256": "be639214f95ebcd0cb07386fee48302cd2c29e8ab356f2ff301fe7bb57f64de3"
+      },
+      "verdict": "PASS"
     }
   },
   "evidence_bindings": [
@@ -85,32 +264,60 @@
     },
     {
       "path": "assets/commonworld-core.mjs",
-      "sha256": "ea4a5479096c46d1d70457f645e8c4ae53822cf55a3ff19e3bd64002aeed5c89"
+      "sha256": "311f292f67b186376ebe53b53a5683205b39c80bb98baff19b1cd59df111007f"
     },
     {
       "path": "assets/commonworld-app.js",
-      "sha256": "78b5019f1fd7059c3627b776046e39803a5a36fff1477cdb2e325d235e19c691"
+      "sha256": "8b186a72827a6a5707daf60893ed16640ea24e0040b69e9ff665f4ca87d94c73"
+    },
+    {
+      "path": "assets/commonworld-mark.svg",
+      "sha256": "05905a6e42f8e4eb7d3e7618994e7d2c2fd49ea1a7f50039271c61080a6622a6"
     },
     {
       "path": "index.html",
-      "sha256": "4816d992a9df11464f2451e7f617fcc3680c4c3586720b79fb3cc9386991543c"
+      "sha256": "ca2cde3ea3155051887a9d82efb95f07e11379bf332179903a7a444da9a9dddc"
     },
     {
       "path": "index.css",
-      "sha256": "b675ea379fe7e3b1cac260d05e471a75e282d69c69fb4d489f554d6489835cc1"
+      "sha256": "fcb6e45bd69899e04180be4a931322faafd023b073687233691b5d3498efe6a5"
     },
     {
-      "path": "docs/research/evidence/public-maplibre-vertical-slice-v1.catalog.json",
-      "sha256": "3f254e47c63448a03766860e69aba6595853555c6d42da3a3646b47b064ba509"
+      "path": "catalog/catalog.json",
+      "sha256": "8d8733da0266917bcdcf8b2d8ea765c63f6fe87cae6a3f4c1015c3127b1cb461"
     },
     {
       "path": "contracts/commonworld/public-maplibre-vertical-slice.contract.json",
-      "sha256": "fa3ff389a89f4572a9c01cab02e2b83acd4b7236c4a609c84bbc23024546c4a0"
+      "sha256": "4c0a29496d1406eb49fac74ba6a34235c4c459cf3caa4291129d95ce13ae3e2c"
+    },
+    {
+      "path": "docs/ops/machine-readable-surface.md",
+      "sha256": "33d081489c3809066126e3cebd194e8c5f9faf4a9367f83d83280a848f30043d"
+    },
+    {
+      "path": "scripts/render_public_shell.py",
+      "sha256": "b06c40adcef91991f7f7e2e73f59cc8338285c7dadade183b7c2ad79c4270aed"
+    },
+    {
+      "path": "scripts/validate_public_shell.py",
+      "sha256": "da6e1747b0ac539936b64972888149b95a5676d08d9354c3e213d49e2ec55d6a"
+    },
+    {
+      "path": "scripts/validate_public_catalog.py",
+      "sha256": "b74b247923483f2c055a28248de5c5f3b9d322828eebbbd690c3cab92422c21b"
+    },
+    {
+      "path": "scripts/validate_public_maplibre_vertical_slice.py",
+      "sha256": "366356ab835c52e9db160d6156ef97acd8cfe5639ce50ab764c3a1c890f08ed2"
+    },
+    {
+      "path": "tests/js/commonworld-core.test.mjs",
+      "sha256": "8d59ebd24887d9d5028303a84d4c06b792d675986e37c4dad9681887f9c1a16f"
     }
   ],
   "release_gates": {
-    "desktop_chrome_browser_smoke": "PASS",
-    "physical_android_chrome": "REQUIRED_BEFORE_MERGE",
+    "automated_desktop_ipad_mobile_browser_matrix": "PASS",
+    "physical_android_chrome_current_globe_first_surface": "REQUIRED_BEFORE_MERGE",
     "android_reduced_motion": "NOT_CLAIMED",
     "screen_reader_product_support": "NOT_CLAIMED",
     "github_required_check": "PENDING",
@@ -121,16 +328,10 @@
     "selected_engine": "maplibre_gl_js",
     "public_runtime_uses_selected_engine": true,
     "production_architecture_authorized": false,
-    "production_provider_selected": false
+    "production_provider_selected": false,
+    "screen_reader_product_support_claimed": false,
+    "backend_api_authorized": false,
+    "standalone_cli_authorized": false
   },
-  "verdict": "IMPLEMENTED_AWAITING_PHYSICAL_ANDROID_GATE",
-  "evidence_binding_migrations": [
-    {
-      "migrated_at": "2026-07-13",
-      "from": "catalog/catalog.json",
-      "to": "docs/research/evidence/public-maplibre-vertical-slice-v1.catalog.json",
-      "sha256": "3f254e47c63448a03766860e69aba6595853555c6d42da3a3646b47b064ba509",
-      "reason": "Preserve the exact release-evidence bytes before the live catalog publication boundary advanced."
-    }
-  ]
+  "verdict": "IMPLEMENTED_AWAITING_PHYSICAL_ANDROID_GATE"
 }

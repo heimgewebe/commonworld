@@ -171,7 +171,7 @@ class PublicMapLibreVerticalSliceTests(unittest.TestCase):
         with tempfile.TemporaryDirectory() as directory:
             root = self.copy_slice(directory)
             path = root / "index.html"
-            path.write_text(path.read_text(encoding="utf-8").replace("Erste öffentliche Commons", "Andere Überschrift", 1), encoding="utf-8")
+            path.write_text(path.read_text(encoding="utf-8").replace("Commons direkt durchsuchen", "Andere Überschrift", 1), encoding="utf-8")
             errors = validate_public_maplibre_vertical_slice(root)
         self.assertTrue(any("deterministic catalog-derived shell" in error for error in errors))
 
@@ -182,7 +182,7 @@ class PublicMapLibreVerticalSliceTests(unittest.TestCase):
                 root,
                 CONTRACT_PATH,
                 lambda value: value["release_gates"].update(
-                    {"physical_android_chrome": "pass", "screen_reader_product_support": "pass"}
+                    {"physical_android_chrome_current_globe_first_surface": "pass", "screen_reader_product_support": "pass"}
                 ),
             )
             errors = validate_public_maplibre_vertical_slice(root)
