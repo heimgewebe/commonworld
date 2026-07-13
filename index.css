@@ -294,6 +294,7 @@ a {
 .sphere-edge-control {
   pointer-events: stroke;
   cursor: pointer;
+  touch-action: manipulation;
 }
 
 .sphere-edge-control:focus {
@@ -895,14 +896,10 @@ a {
 
 .digital-sphere {
   transition:
-    left 760ms cubic-bezier(0.22, 1, 0.36, 1),
-    top 760ms cubic-bezier(0.22, 1, 0.36, 1),
-    width 760ms cubic-bezier(0.22, 1, 0.36, 1),
-    height 760ms cubic-bezier(0.22, 1, 0.36, 1),
     opacity 360ms linear,
     filter 760ms cubic-bezier(0.22, 1, 0.36, 1),
     transform 760ms cubic-bezier(0.22, 1, 0.36, 1);
-  will-change: left, top, width, height, opacity, transform;
+  will-change: opacity, transform, filter;
 }
 
 #sphere-rings use {

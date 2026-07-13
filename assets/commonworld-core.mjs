@@ -119,7 +119,7 @@ export function filterRecords(records, state = {}) {
   });
 }
 
-export function sphereLayout({ width, height, padding = {}, center = null, sideView = false } = {}) {
+export function sphereLayout({ width, height, zoom = DEFAULT_CAMERA.zoom, padding = {}, center = null, sideView = false } = {}) {
   const stageWidth = Math.max(1, finite(width, 1));
   const stageHeight = Math.max(1, finite(height, 1));
   const left = clamp(finite(padding.left, 0), 0, stageWidth - 1);
@@ -133,9 +133,9 @@ export function sphereLayout({ width, height, padding = {}, center = null, sideV
   const x = sideView ? stageWidth / 2 : clamp(finite(center?.x, fallbackX), 0, stageWidth);
   const y = sideView ? stageHeight / 2 : clamp(finite(center?.y, fallbackY), 0, stageHeight);
   const shortestSide = Math.min(stageWidth, stageHeight);
-  const diameter = sideView
-    ? clamp(Math.min(stageWidth * 0.94, stageHeight * 0.88), shortestSide * 0.48, Math.max(stageWidth, stageHeight))
-    : clamp(shortestSide * 0.98, shortestSide * 0.36, shortestSide * 1.6);
+  const scale = 2 ** (clamp(finite(zoom, DEFAULT_CAMERA.zoom), 0, 8) - DEFAULT_CAMERA.zoom);
+  const overviewBase = Math.min(availableWidth, availableHeight) * 0.98;
+  const diameter = clamp(overviewBase * scale, shortestSide * 0.36, shortestSide * 1.6);
   return { x: rounded(x, 2), y: rounded(y, 2), diameter: rounded(diameter, 2) };
 }
 

@@ -135,6 +135,24 @@ async function layerJourneyScenario({ mobile = false } = {}) {
 
   const before = await run.page.locator('#digital-sphere').boundingBox();
   assert(before, 'layer journey: sphere has no initial geometry');
+  const zoomInBox = await run.page.locator('.maplibregl-ctrl-zoom-in').boundingBox();
+  assert(zoomInBox, 'layer journey: zoom-in control has no geometry');
+  if (mobile) await run.page.touchscreen.tap(zoomInBox.x + zoomInBox.width / 2, zoomInBox.y + zoomInBox.height / 2);
+  else await run.page.mouse.click(zoomInBox.x + zoomInBox.width / 2, zoomInBox.y + zoomInBox.height / 2);
+  await run.page.waitForTimeout(520);
+  const afterZoom = await run.page.locator('#digital-sphere').boundingBox();
+  assert(afterZoom && afterZoom.width > before.width * 1.18, `layer journey: sphere did not scale with globe zoom (${before.width} -> ${afterZoom?.width})`);
+  const zoomOutBox = await run.page.locator('.maplibregl-ctrl-zoom-out').boundingBox();
+  assert(zoomOutBox, 'layer journey: zoom-out control has no geometry');
+  if (mobile) await run.page.touchscreen.tap(zoomOutBox.x + zoomOutBox.width / 2, zoomOutBox.y + zoomOutBox.height / 2);
+  else await run.page.mouse.click(zoomOutBox.x + zoomOutBox.width / 2, zoomOutBox.y + zoomOutBox.height / 2);
+  assert((await run.page.locator('.globe-stage').getAttribute('data-view-phase')) === 'overview', 'layer journey: scaled sphere stole the zoom-out control and opened layers');
+  await run.page.waitForFunction((targetWidth) => {
+    const width = document.querySelector('#digital-sphere')?.getBoundingClientRect().width ?? 0;
+    return Math.abs(width - targetWidth) <= 2;
+  }, before.width);
+  const restoredScale = await run.page.locator('#digital-sphere').boundingBox();
+  assert(restoredScale && Math.abs(restoredScale.width - before.width) <= 2, `layer journey: sphere scale did not return with globe zoom (${before.width} -> ${restoredScale?.width})`);
   const mapBox = await run.page.locator('#map').boundingBox();
   assert(mapBox, 'layer journey: map has no geometry');
   await run.page.mouse.move(mapBox.x + mapBox.width * 0.55, mapBox.y + mapBox.height * 0.52);
@@ -148,9 +166,14 @@ async function layerJourneyScenario({ mobile = false } = {}) {
 
   const sphereBox = await run.page.locator('#digital-sphere').boundingBox();
   assert(sphereBox, 'layer journey: clickable sphere geometry missing');
-  await run.page.mouse.click(sphereBox.x + sphereBox.width * 0.93125, sphereBox.y + sphereBox.height * 0.5);
+  if (mobile) await run.page.touchscreen.tap(sphereBox.x + sphereBox.width * 0.93125, sphereBox.y + sphereBox.height * 0.5);
+  else await run.page.mouse.click(sphereBox.x + sphereBox.width * 0.93125, sphereBox.y + sphereBox.height * 0.5);
   assert((await run.page.locator('.globe-stage').getAttribute('data-view-phase')) === 'entering-layers', 'layer journey: animated entry phase missing');
+  assert(await run.page.locator('#layer-panel').isHidden(), 'layer journey: description panel obscures the camera flight');
+  const enteringSphere = await run.page.locator('#digital-sphere').boundingBox();
+  assert(enteringSphere, 'layer journey: transforming sphere is not visible during camera flight');
   await run.page.waitForSelector('.globe-stage[data-view-phase="layers"]');
+  assert(await run.page.locator('#layer-panel').isVisible(), 'layer journey: description panel did not appear after camera flight');
   const mapOpacity = Number(await run.page.locator('#map').evaluate((node) => getComputedStyle(node).opacity));
   assert(mapOpacity <= 0.02, `layer journey: globe remains visible beside layers (${mapOpacity})`);
   assert(await run.page.locator('#map').getAttribute('inert') !== null, 'layer journey: invisible globe remains keyboard reachable');
@@ -181,6 +204,7 @@ async function layerJourneyScenario({ mobile = false } = {}) {
 
   await run.page.locator('#layer-close').click();
   assert((await run.page.locator('.globe-stage').getAttribute('data-view-phase')) === 'leaving-layers', 'layer journey: return phase missing');
+  assert(await run.page.locator('#layer-panel').isHidden(), 'layer journey: description panel obscures the return camera flight');
   await run.page.waitForSelector('.globe-stage[data-view-phase="overview"]');
   const restoredOpacity = Number(await run.page.locator('#map').evaluate((node) => getComputedStyle(node).opacity));
   assert(restoredOpacity >= 0.98, `layer journey: globe did not return (${restoredOpacity})`);

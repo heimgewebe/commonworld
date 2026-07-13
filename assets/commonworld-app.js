@@ -79,6 +79,8 @@ const runtime = {
   viewTransitionTimer: null,
   viewTransitionCleanup: null,
   layerReturnTarget: null,
+  spherePointerStart: null,
+  lastSpherePointerActivation: 0,
   applyingHistory: false,
   mapReady: false,
   mapRenderCount: 0,
@@ -430,6 +432,7 @@ function updateSphereGeometry() {
   const geometry = sphereLayout({
     width: rect.width,
     height: rect.height,
+    zoom: runtime.map.getZoom(),
     padding,
     center: projected,
     sideView,
@@ -445,6 +448,7 @@ function updateSphereGeometry() {
   elements.stage.dataset.sphereX = String(geometry.x);
   elements.stage.dataset.sphereY = String(geometry.y);
   elements.stage.dataset.sphereSize = String(geometry.diameter);
+  elements.stage.dataset.mapZoom = String(Number(runtime.map.getZoom().toFixed(4)));
 }
 
 function layerCamera(camera = null) {
@@ -499,15 +503,16 @@ function setViewPhase(phase) {
 }
 
 function showLayerState() {
-  const visible = runtime.state.surface === 'globe' && (runtime.state.view === 'layers' || runtime.viewPhase !== 'overview');
+  const journeyActive = runtime.state.surface === 'globe' && (runtime.state.view === 'layers' || runtime.viewPhase !== 'overview');
+  const panelVisible = runtime.state.surface === 'globe' && runtime.viewPhase === 'layers';
   const transformed = runtime.state.surface === 'globe' && runtime.state.view === 'layers';
   elements.stage.classList.toggle('layer-view-open', transformed);
   elements.stage.classList.toggle('layer-view-settled', runtime.viewPhase === 'layers');
-  elements.layerPanel.hidden = !visible;
+  elements.layerPanel.hidden = !panelVisible;
   elements.layerToggle.setAttribute('aria-expanded', String(runtime.state.view === 'layers'));
-  elements.map.toggleAttribute('inert', visible);
-  elements.layerToggle.toggleAttribute('inert', visible);
-  if (visible) {
+  elements.map.toggleAttribute('inert', journeyActive);
+  elements.layerToggle.toggleAttribute('inert', journeyActive);
+  if (journeyActive) {
     elements.map.setAttribute('aria-hidden', 'true');
     elements.layerToggle.setAttribute('aria-hidden', 'true');
     elements.sphereEdge.setAttribute('aria-hidden', 'true');
@@ -647,6 +652,57 @@ function applyDeepLink(search, { initial = false } = {}) {
   if (initial) writeHistory('replace');
 }
 
+
+function activateSphereEdge(event) {
+  if (Number.isFinite(event?.clientX) && Number.isFinite(event?.clientY)) {
+    const mapControl = [...document.querySelectorAll('.maplibregl-ctrl button')].find((button) => {
+      const rect = button.getBoundingClientRect();
+      return event.clientX >= rect.left && event.clientX <= rect.right && event.clientY >= rect.top && event.clientY <= rect.bottom;
+    });
+    if (mapControl) {
+      event.preventDefault();
+      event.stopPropagation();
+      elements.stage.dataset.forwardedMapControl = mapControl.getAttribute('aria-label') ?? mapControl.getAttribute('title') ?? 'unknown';
+      mapControl.click();
+      return;
+    }
+  }
+  delete elements.stage.dataset.forwardedMapControl;
+  openLayerView({ trigger: elements.sphereEdge });
+}
+
+function beginSpherePointer(event) {
+  if (event.button !== undefined && event.button !== 0) return;
+  runtime.spherePointerStart = {
+    pointerId: event.pointerId,
+    x: event.clientX,
+    y: event.clientY,
+    at: performance.now(),
+  };
+  event.currentTarget.setPointerCapture?.(event.pointerId);
+}
+
+function endSpherePointer(event) {
+  const start = runtime.spherePointerStart;
+  runtime.spherePointerStart = null;
+  if (!start || start.pointerId !== event.pointerId) return;
+  const distance = Math.hypot(event.clientX - start.x, event.clientY - start.y);
+  const elapsed = performance.now() - start.at;
+  if (distance > 12 || elapsed > 700) return;
+  runtime.lastSpherePointerActivation = performance.now();
+  activateSphereEdge(event);
+}
+
+function cancelSpherePointer() {
+  runtime.spherePointerStart = null;
+}
+
+function activateSphereFallbackClick(event) {
+  if (runtime.state.view === 'layers' || runtime.viewPhase !== 'overview') return;
+  if (performance.now() - runtime.lastSpherePointerActivation < 500) return;
+  activateSphereEdge(event);
+}
+
 function wireControls() {
   elements.skipLink.addEventListener('click', (event) => {
     event.preventDefault();
@@ -655,7 +711,10 @@ function wireControls() {
   });
   elements.layerToggle.addEventListener('click', () => (runtime.state.view === 'layers' ? closeLayerView() : openLayerView({ trigger: elements.layerToggle })));
   elements.layerClose.addEventListener('click', () => closeLayerView());
-  elements.sphereEdge.addEventListener('click', () => openLayerView({ trigger: elements.sphereEdge }));
+  elements.sphereEdge.addEventListener('pointerdown', beginSpherePointer);
+  elements.sphereEdge.addEventListener('pointerup', endSpherePointer);
+  elements.sphereEdge.addEventListener('pointercancel', cancelSpherePointer);
+  elements.sphereEdge.addEventListener('click', activateSphereFallbackClick);
   elements.sphereEdge.addEventListener('keydown', (event) => {
     if (event.key === 'Enter' || event.key === ' ') {
       event.preventDefault();

@@ -99,19 +99,21 @@ test('record filtering keeps one shared search and layer truth', () => {
   assert.deepEqual(filterRecords(records, { query: 'daten', layer: 'knowledge_data' }).map(({ id }) => id), ['a']);
 });
 
-test('sphere layout keeps one stable overview extent and centers the full-screen side view', () => {
-  const normal = sphereLayout({ width: 1000, height: 700, padding: {} });
-  const rotatedEquivalent = sphereLayout({ width: 1000, height: 700, padding: {}, center: { x: 498.2, y: 351.4 } });
-  const side = sphereLayout({ width: 1000, height: 700, padding: { left: 36, right: 420, top: 36, bottom: 36 }, center: { x: 308, y: 350 }, sideView: true });
+test('sphere layout follows globe zoom, ignores rotation and centers the full-screen side view', () => {
+  const normal = sphereLayout({ width: 1000, height: 700, zoom: DEFAULT_CAMERA.zoom, padding: {} });
+  const rotatedEquivalent = sphereLayout({ width: 1000, height: 700, zoom: DEFAULT_CAMERA.zoom, padding: {}, center: { x: 498.2, y: 351.4 } });
+  const zoomed = sphereLayout({ width: 1000, height: 700, zoom: DEFAULT_CAMERA.zoom + 0.5, padding: {} });
+  const side = sphereLayout({ width: 1000, height: 700, zoom: DEFAULT_CAMERA.zoom + 0.72, padding: { left: 36, right: 420, top: 36, bottom: 36 }, center: { x: 308, y: 350 }, sideView: true });
   assert.deepEqual(normal, { x: 500, y: 350, diameter: 686 });
   assert.equal(rotatedEquivalent.diameter, normal.diameter);
+  assert(zoomed.diameter > normal.diameter * 1.4);
   assert.equal(side.x, 500);
   assert.equal(side.y, 350);
-  assert.equal(side.diameter, 616);
+  assert.equal(side.diameter, 878.15);
   const projected = sphereLayout({ width: 1000, height: 700, padding: { right: 400 }, center: { x: 301.25, y: 348.5 } });
   assert.equal(projected.x, 301.25);
   assert.equal(projected.y, 348.5);
-  assert.equal(projected.diameter, normal.diameter);
+  assert.equal(projected.diameter, 588);
 });
 
 test('digital layer camera performs a bounded journey without changing identity', () => {
