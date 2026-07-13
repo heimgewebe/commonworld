@@ -166,8 +166,13 @@ async function layerJourneyScenario({ mobile = false } = {}) {
 
   const sphereBox = await run.page.locator('#digital-sphere').boundingBox();
   assert(sphereBox, 'layer journey: clickable sphere geometry missing');
-  if (mobile) await run.page.touchscreen.tap(sphereBox.x + sphereBox.width * 0.93125, sphereBox.y + sphereBox.height * 0.5);
-  else await run.page.mouse.click(sphereBox.x + sphereBox.width * 0.93125, sphereBox.y + sphereBox.height * 0.5);
+  const globeDiameter = Number(await run.page.locator('.globe-stage').getAttribute('data-globe-diameter'));
+  const innermostLayerDiameter = sphereBox.width * (276 / 320);
+  assert(innermostLayerDiameter > globeDiameter, `layer journey: digital shell intersects globe (${innermostLayerDiameter} <= ${globeDiameter})`);
+  const edgeX = sphereBox.x + sphereBox.width * 0.85134;
+  const edgeY = sphereBox.y + sphereBox.height * 0.14866;
+  if (mobile) await run.page.touchscreen.tap(edgeX, edgeY);
+  else await run.page.mouse.click(edgeX, edgeY);
   assert((await run.page.locator('.globe-stage').getAttribute('data-view-phase')) === 'entering-layers', 'layer journey: animated entry phase missing');
   assert(await run.page.locator('#layer-panel').isHidden(), 'layer journey: description panel obscures the camera flight');
   const enteringSphere = await run.page.locator('#digital-sphere').boundingBox();
@@ -226,7 +231,7 @@ async function interruptedLayerJourneyScenario() {
   await run.page.waitForTimeout(820);
   const sphereBox = await run.page.locator('#digital-sphere').boundingBox();
   assert(sphereBox, 'interrupted journey: sphere geometry missing');
-  await run.page.mouse.click(sphereBox.x + sphereBox.width * 0.93125, sphereBox.y + sphereBox.height * 0.5);
+  await run.page.mouse.click(sphereBox.x + sphereBox.width * 0.85134, sphereBox.y + sphereBox.height * 0.14866);
   await run.page.waitForTimeout(150);
   assert((await run.page.locator('.globe-stage').getAttribute('data-view-phase')) === 'entering-layers', 'interrupted journey: entry phase missing');
   await run.page.keyboard.press('Escape');

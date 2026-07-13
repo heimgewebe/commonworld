@@ -86,7 +86,7 @@ def render_shell(root: Path = ROOT) -> str:
     bootstrap = html.escape(json.dumps(records, ensure_ascii=False, separators=(",", ":")))
     paths = "\n".join(
         f'              <circle id="sphere-path-{index}" cx="320" cy="320" r="{radius}" />'
-        for index, radius in enumerate((268, 252, 236, 220, 204, 188), start=1)
+        for index, radius in enumerate((316, 308, 300, 292, 284, 276), start=1)
     )
     cards = render_cards(records)
     noscript_cards = render_cards(records, interactive=False)
@@ -152,7 +152,7 @@ def render_shell(root: Path = ROOT) -> str:
               <use href="#sphere-path-6"></use>
             </g>
             <g id="sphere-streams" mask="url(#sphere-mask)" aria-hidden="true"></g>
-            <circle id="sphere-edge-control" class="sphere-edge-control" cx="320" cy="320" r="276" fill="none" stroke="transparent" stroke-width="28" pointer-events="stroke" role="button" tabindex="0" aria-label="Digitale Commons-Schichten öffnen"></circle>
+            <circle id="sphere-edge-control" class="sphere-edge-control" cx="320" cy="320" r="318" fill="none" stroke="transparent" stroke-width="20" pointer-events="stroke" role="button" tabindex="0" aria-label="Digitale Commons-Schichten öffnen"></circle>
           </svg>
           <div id="layer-stack-visual" class="layer-stack-visual" aria-hidden="true"></div>
 

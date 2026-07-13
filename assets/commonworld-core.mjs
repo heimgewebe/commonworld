@@ -135,8 +135,14 @@ export function sphereLayout({ width, height, zoom = DEFAULT_CAMERA.zoom, paddin
   const shortestSide = Math.min(stageWidth, stageHeight);
   const scale = 2 ** (clamp(finite(zoom, DEFAULT_CAMERA.zoom), 0, 8) - DEFAULT_CAMERA.zoom);
   const overviewBase = Math.min(availableWidth, availableHeight) * 0.98;
-  const diameter = clamp(overviewBase * scale, shortestSide * 0.36, shortestSide * 1.6);
-  return { x: rounded(x, 2), y: rounded(y, 2), diameter: rounded(diameter, 2) };
+  const globeDiameter = clamp(overviewBase * scale, shortestSide * 0.36, shortestSide * 1.6);
+  const diameter = sideView ? globeDiameter : globeDiameter * 1.18;
+  return {
+    x: rounded(x, 2),
+    y: rounded(y, 2),
+    diameter: rounded(diameter, 2),
+    globeDiameter: rounded(globeDiameter, 2),
+  };
 }
 
 export function digitalLayerCamera(camera = DEFAULT_CAMERA) {

@@ -448,6 +448,7 @@ function updateSphereGeometry() {
   elements.stage.dataset.sphereX = String(geometry.x);
   elements.stage.dataset.sphereY = String(geometry.y);
   elements.stage.dataset.sphereSize = String(geometry.diameter);
+  elements.stage.dataset.globeDiameter = String(geometry.globeDiameter);
   elements.stage.dataset.mapZoom = String(Number(runtime.map.getZoom().toFixed(4)));
 }
 
@@ -746,9 +747,9 @@ function wireControls() {
   });
   document.addEventListener('keydown', (event) => {
     if (event.key !== 'Escape') return;
-    if (!elements.settingsPanel.hidden) closeSettings();
+    if (runtime.viewPhase !== 'overview' || runtime.state.view === 'layers') closeLayerView();
+    else if (!elements.settingsPanel.hidden) closeSettings();
     else if (!elements.focus.hidden) clearProject();
-    else if (runtime.state.view === 'layers') closeLayerView();
   });
   window.addEventListener('popstate', () => applyDeepLink(location.search));
   window.addEventListener('resize', () => {
