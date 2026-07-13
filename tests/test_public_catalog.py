@@ -80,7 +80,7 @@ class PublicCatalogTests(unittest.TestCase):
 
             errors = validate_public_catalog(root)
 
-        self.assertIn("public shell card identities must match the public catalog exactly once", errors)
+        self.assertIn("public shell card identities must match the public catalog once in Text and once in the no-JavaScript fallback", errors)
 
     def test_manual_presentation_layer_is_rejected(self) -> None:
         with tempfile.TemporaryDirectory() as tmp_dir:

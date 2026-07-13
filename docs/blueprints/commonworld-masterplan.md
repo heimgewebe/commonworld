@@ -674,6 +674,16 @@ Die zehn vorhandenen digitalen CommonProject-Identitäten bleiben die einzige Da
 
 Der aktuelle Vertrag liegt in `contracts/commonworld/public-maplibre-vertical-slice.contract.json`. CSP erlaubt ausschließlich lokale Skripte und Styles sowie Kartenressourcen von `tiles.openfreemap.org`; Worker dürfen nur lokal beziehungsweise als `blob:` entstehen. Bei Kartenfehlern bleiben Katalog, Auswahl und Fokus linear nutzbar. Der physische Android-Chrome-Releasegate ist bestanden. Android-spezifische Reduced-Motion-Abnahme und Screenreader-Produkttauglichkeit werden weiterhin nicht behauptet.
 
+### Globe-first Oberfläche v1
+
+Die Root-Oberfläche beginnt unmittelbar mit einem bildschirmfüllenden Globus. Einleitungstext, Entwicklungsstatus und der lange Katalog stehen nicht mehr vor oder neben der Erde. Dauerhaft sichtbar bleiben Commonworld-Zeichen, Suche und genau ein Zahnrad für allgemeine Einstellungen. Suche und Schichtfilter bleiben direkte Entdeckungswerkzeuge und werden nicht im Zahnrad versteckt.
+
+Das Zahnrad wechselt zwischen `Globus` und `Text`. Beide Darstellungen verwenden denselben Katalog, Suchbegriff, Schichtfilter, Fokus und dieselbe `CommonProject.id`. Der Wechsel ist ein Darstellungswechsel innerhalb einer Anwendung, kein zweites Produkt. Die URL trägt den teilbaren Zustand; die bevorzugte Darstellung darf zusätzlich lokal im Browser gespeichert werden. Die Textansicht benötigt kein WebGL und die vollständige No-JavaScript-Liste bleibt erhalten. Daraus wird keine Screenreader-Produkttauglichkeit oder WCAG-Konformität abgeleitet.
+
+Die digitale Sphäre ist geometrisch an MapLibre gebunden. Ihr sichtbarer Mittelpunkt wird aus der Projektion des aktuellen Kartenmittelpunkts bestimmt; Größe und Versatz berücksichtigen Kartenmaß, Viewport und MapLibre-Padding. Ein bildschirmfestes unabhängiges Zentrieren ist verboten. Dadurch bleiben Erde und Sphäre auch während der seitlichen Schichtfahrt zusammen. Die berechnete Geometrie wird für Browserabnahmen als Datenattribut offengelegt.
+
+`catalog/catalog.json`, die Projektdateien unter `catalog/projects/` und `contracts/commonworld/project.schema.json` bilden die statische, ausschließlich lesende Maschinenoberfläche. Sie ist keine laufende API und besitzt keinen Schreibweg. Eine eigenständige CLI bleibt ohne belegten wiederkehrenden Anwendungsfall ausgeschlossen. Die Betriebsgrenze steht in `docs/ops/machine-readable-surface.md`.
+
 ### Begrenzte Produktions- und Anbieterentscheidung v1
 
 GitHub Pages ist für den heutigen statischen, kontolosen Commonworld-Katalog als Produktionsauslieferung autorisiert. Diese Freigabe umfasst keine Backend-, Konto- oder sensiblen Transaktionsfunktionen und behauptet kein SLA. Die dokumentierten Größen-, Deployment-, Bandbreiten- und Rate-Limit-Grenzen bleiben operative Schwellen.

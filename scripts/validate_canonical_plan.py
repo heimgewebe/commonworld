@@ -35,6 +35,7 @@ REQUIRED_PLAN_TOKENS = (
     "### Erster öffentlicher Startkatalog v1",
     "### Kanonische Rendererentscheidung v1",
     "### Erster öffentlicher MapLibre-Vertikalschnitt v1",
+    "### Globe-first Oberfläche v1",
     "### Begrenzte Produktions- und Anbieterentscheidung v1",
     "### Vorläufige Darstellungsschichten",
     "### Dieselbe Auswahl in allen Ansichten",
@@ -84,7 +85,7 @@ FORBIDDEN_CONTRACT_PROPERTIES = (
 )
 
 EXPECTED_BLUEPRINT_FILES = {"commonworld-masterplan.md"}
-EXPECTED_OPS_FILES = {"pages-dns.md"}
+EXPECTED_OPS_FILES = {"machine-readable-surface.md", "pages-dns.md"}
 EXPECTED_RESEARCH_FILES = {
     "device-acceptance-pack-v1.md",
     "device-acceptance-pack-v1.result.json",

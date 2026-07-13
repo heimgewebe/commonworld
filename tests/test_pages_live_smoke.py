@@ -4,6 +4,7 @@ import unittest
 
 from scripts.smoke_pages_live import (
     EXPECTED_CATALOG_ENTRY_COUNT,
+    EXPECTED_MACHINE_SURFACE,
     EXPECTED_PUBLICATION,
     LiveFetch,
     MIN_BODY_BYTES,
@@ -27,6 +28,7 @@ class PagesLiveSmokeTests(unittest.TestCase):
                 "entry_count": EXPECTED_CATALOG_ENTRY_COUNT,
                 "project_files": [f"projects/project-{index:02d}.json" for index in range(EXPECTED_CATALOG_ENTRY_COUNT)],
                 "publication": EXPECTED_PUBLICATION,
+                "machine_surface": EXPECTED_MACHINE_SURFACE,
             }
         )
 
@@ -95,6 +97,18 @@ class PagesLiveSmokeTests(unittest.TestCase):
             body=json.dumps(catalog),
         )
         self.assertIn("live catalog publication boundary mismatch", validate_catalog_fetch(fetch))
+
+    def test_machine_surface_drift_fails(self) -> None:
+        catalog = json.loads(self.valid_catalog())
+        catalog["machine_surface"]["write_path"] = True
+        fetch = LiveFetch(
+            requested_url="https://commonworld.net/catalog/catalog.json",
+            final_url="https://commonworld.net/catalog/catalog.json",
+            status=200,
+            content_type="application/json",
+            body=json.dumps(catalog),
+        )
+        self.assertIn("live catalog machine-readable surface boundary mismatch", validate_catalog_fetch(fetch))
 
     def test_catalog_count_drift_fails(self) -> None:
         catalog = json.loads(self.valid_catalog())

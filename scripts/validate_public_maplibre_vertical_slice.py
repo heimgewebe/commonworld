@@ -128,6 +128,30 @@ def validate_public_maplibre_vertical_slice(root: Path = ROOT) -> list[str]:
     if result.get("verdict") != "IMPLEMENTED_AWAITING_PHYSICAL_ANDROID_GATE":
         errors.append("public MapLibre result must retain the physical Android blocker")
     bindings = result.get("evidence_bindings") if isinstance(result.get("evidence_bindings"), list) else []
+    expected_binding_paths = {
+        "package.json",
+        "package-lock.json",
+        "assets/vendor/maplibre-gl.js",
+        "assets/vendor/maplibre-gl.css",
+        "assets/vendor/MAPLIBRE-LICENSE.txt",
+        "assets/map/openfreemap-liberty.json",
+        "assets/commonworld-core.mjs",
+        "assets/commonworld-app.js",
+        "assets/commonworld-mark.svg",
+        "index.html",
+        "index.css",
+        "catalog/catalog.json",
+        "contracts/commonworld/public-maplibre-vertical-slice.contract.json",
+        "docs/ops/machine-readable-surface.md",
+        "scripts/render_public_shell.py",
+        "scripts/validate_public_shell.py",
+        "scripts/validate_public_catalog.py",
+        "scripts/validate_public_maplibre_vertical_slice.py",
+        "tests/js/commonworld-core.test.mjs",
+    }
+    binding_paths = {binding.get("path") for binding in bindings if isinstance(binding, dict)}
+    if binding_paths != expected_binding_paths or len(bindings) != len(expected_binding_paths):
+        errors.append("public MapLibre result evidence binding inventory mismatch")
     for binding in bindings:
         if not isinstance(binding, dict) or not isinstance(binding.get("path"), str):
             errors.append("public MapLibre result contains malformed evidence binding")
@@ -137,18 +161,77 @@ def validate_public_maplibre_vertical_slice(root: Path = ROOT) -> list[str]:
             errors.append(f"public MapLibre result evidence hash mismatch: {binding.get('path')}")
     browser = result.get("browser_proof", {}) if isinstance(result.get("browser_proof"), dict) else {}
     assertions = browser.get("assertions", {}) if isinstance(browser.get("assertions"), dict) else {}
+    expected_assertions = {
+        "globe_first_root": True,
+        "one_settings_gear": True,
+        "shared_search_selection_and_focus": True,
+        "visible_focus_return_after_surface_switch": True,
+        "full_text_surface_scrollable": True,
+        "no_javascript_catalog_scrollable": True,
+        "sphere_center_matches_maplibre_projection": True,
+        "side_sphere_fits_free_region": True,
+        "six_layer_side_visual": True,
+        "responsive_wide_right_padding": True,
+        "responsive_narrow_bottom_padding": True,
+        "reduced_motion_jump_to_zero_ms": True,
+        "idle_map_render_delta_max": 0,
+        "idle_overlay_render_delta_max": 0,
+        "unexpected_resource_origins": 0,
+        "uncaught_exceptions": 0,
+        "console_errors": 0,
+    }
+    if browser.get("verdict") != "PASS" or assertions != expected_assertions:
+        errors.append("public MapLibre globe-first browser proof result mismatch")
+    scenarios = browser.get("scenarios") if isinstance(browser.get("scenarios"), list) else []
+    if [item.get("id") for item in scenarios if isinstance(item, dict)] != ["desktop", "ipad", "mobile"]:
+        errors.append("public MapLibre browser scenario inventory mismatch")
+    for item in scenarios:
+        if not isinstance(item, dict):
+            errors.append("public MapLibre browser scenario is malformed")
+            continue
+        initial = item.get("initial_sphere", {}) if isinstance(item.get("initial_sphere"), dict) else {}
+        side = item.get("side_sphere", {}) if isinstance(item.get("side_sphere"), dict) else {}
+        if (
+            item.get("verdict") != "PASS"
+            or item.get("layer_stack_items") != 6
+            or item.get("layer_stack_opacity") != 1
+            or item.get("visible_text_cards_after_search") != 1
+            or item.get("selected_project_after_roundtrip") != "debian"
+            or item.get("project_cleared_after_focus_close") is not True
+            or item.get("focus_return_target_after_close") != "globe-reset"
+            or item.get("full_text_card_count") != 10
+            or item.get("text_scroll_after", 0) <= item.get("text_scroll_before", 0)
+            or item.get("text_scroll_height", 0) <= item.get("text_client_height", 0)
+            or item.get("idle_map_render_delta") != 0
+            or item.get("idle_overlay_render_delta") != 0
+            or item.get("page_error_count") != 0
+            or item.get("console_error_count") != 0
+            or item.get("open_camera_command") != "easeTo"
+            or item.get("close_camera_command") != "easeTo"
+            or item.get("camera_duration_ms") != 260
+            or initial.get("x") != initial.get("projected_x")
+            or initial.get("y") != initial.get("projected_y")
+            or side.get("x") != side.get("projected_x")
+            or side.get("y") != side.get("projected_y")
+            or not isinstance(initial.get("size"), (int, float))
+            or not isinstance(side.get("size"), (int, float))
+            or side.get("size") >= initial.get("size")
+        ):
+            errors.append(f"public MapLibre browser scenario mismatch: {item.get('id')}")
+    reduced = browser.get("reduced_motion", {}) if isinstance(browser.get("reduced_motion"), dict) else {}
+    if reduced != {"command": "jumpTo", "duration_ms": 0, "verdict": "PASS"}:
+        errors.append("public MapLibre reduced-motion browser proof mismatch")
+    no_javascript = browser.get("no_javascript", {}) if isinstance(browser.get("no_javascript"), dict) else {}
+    no_js_scroll = no_javascript.get("scroll", {}) if isinstance(no_javascript.get("scroll"), dict) else {}
     if (
-        browser.get("verdict") != "PASS"
-        or assertions.get("idle_map_render_delta") != 0
-        or assertions.get("idle_overlay_render_delta") != 0
-        or assertions.get("focus_returned_after_close") is not True
+        no_javascript.get("verdict") != "PASS"
+        or no_javascript.get("card_count") != 10
+        or no_js_scroll.get("after", 0) <= no_js_scroll.get("before", 0)
+        or no_js_scroll.get("scrollHeight", 0) <= no_js_scroll.get("clientHeight", 0)
     ):
-        errors.append("public MapLibre browser proof result mismatch")
-    standard_motion = browser.get("standard_motion", {}) if isinstance(browser.get("standard_motion"), dict) else {}
-    if standard_motion.get("verdict") != "PASS" or standard_motion.get("close_camera_command") != "easeTo" or standard_motion.get("open_camera_command") != "easeTo" or standard_motion.get("duration_ms") != 260 or standard_motion.get("focus_returned_after_close") is not True:
-        errors.append("public MapLibre standard-motion browser proof mismatch")
-    if result.get("release_gates", {}).get("physical_android_chrome") != "REQUIRED_BEFORE_MERGE":
-        errors.append("public MapLibre result must retain physical Android as a pre-merge gate")
+        errors.append("public no-JavaScript catalog browser proof mismatch")
+    if result.get("release_gates", {}).get("physical_android_chrome_current_globe_first_surface") != "REQUIRED_BEFORE_MERGE":
+        errors.append("public Globe-first result must retain current physical Android as a pre-merge gate")
     renderer = contract.get("renderer", {}) if isinstance(contract.get("renderer"), dict) else {}
     if renderer.get("engine") != "maplibre_gl_js" or renderer.get("package") != "maplibre-gl" or renderer.get("version") != "5.24.0":
         errors.append("public runtime must use exactly MapLibre GL JS 5.24.0")
@@ -230,6 +313,18 @@ def validate_public_maplibre_vertical_slice(root: Path = ROOT) -> list[str]:
     }
     if any(publication.get(key) != expected for key, expected in expected_runtime_publication.items()):
         errors.append("public catalog runtime publication boundary mismatch")
+    expected_machine_surface = {
+        "access": "static_read_only",
+        "manifest": "catalog/catalog.json",
+        "project_base": "catalog/projects/",
+        "project_schema": "contracts/commonworld/project.schema.json",
+        "identity_field": "CommonProject.id",
+        "api_runtime": False,
+        "write_path": False,
+        "standalone_cli": False,
+    }
+    if manifest.get("machine_surface") != expected_machine_surface:
+        errors.append("public catalog machine-readable surface boundary mismatch")
     records = _catalog_records(root, manifest)
     identifiers = [record.get("id") for record in records]
     if identifiers != EXPECTED_IDS or contract.get("catalog", {}).get("commonproject_ids") != EXPECTED_IDS:
@@ -270,10 +365,17 @@ def validate_public_maplibre_vertical_slice(root: Path = ROOT) -> list[str]:
         'id="digital-sphere"',
         'id="sphere-edge-control"',
         'id="layer-panel"',
+        'id="layer-stack-visual"',
         'id="project-focus"',
-        'href="#catalog"',
-        "Der erste interaktive Globus ist gebaut.",
-        "OpenFreeMap liefert die Basiskarte",
+        'id="globe-surface"',
+        'id="text-view"',
+        'id="settings-toggle"',
+        'id="settings-panel"',
+        'id="commons-search"',
+        'data-presentation-choice="globe"',
+        'data-presentation-choice="text"',
+        'href="./catalog/catalog.json"',
+        'href="./contracts/commonworld/project.schema.json"',
     )
     for token in required_html:
         if token not in html:
@@ -310,6 +412,11 @@ def validate_public_maplibre_vertical_slice(root: Path = ROOT) -> list[str]:
         "setProjection({ type: 'globe' })",
         "runtime.map.easeTo",
         "runtime.map.jumpTo",
+        "runtime.map.project(runtime.map.getCenter())",
+        "runtime.map.getPadding()",
+        "sphereLayout({",
+        "setPresentation(",
+        "filterRecords(",
         "window.addEventListener('popstate'",
         "setTimeout(() => writeHistory('replace'), 180)",
         "presence?.geographic?.length",
@@ -318,18 +425,26 @@ def validate_public_maplibre_vertical_slice(root: Path = ROOT) -> list[str]:
     for token in required_app:
         if token not in app:
             errors.append(f"public runtime application missing contract token: {token}")
-    for token in ("deriveLayer", "binaryFragment", "stateFromSearch", "searchFromState", "sphereOpacityForZoom"):
+    for token in ("deriveLayer", "binaryFragment", "stateFromSearch", "searchFromState", "filterRecords", "sphereLayout", "sphereOpacityForZoom"):
         if f"function {token}" not in core:
             errors.append(f"public runtime core missing function: {token}")
     if "requestAnimationFrame" in app or "setInterval" in app:
         errors.append("public runtime must not introduce a continuous animation loop")
 
     required_css = (
+        ".topbar",
+        ".globe-surface",
         ".digital-sphere",
+        "--sphere-x",
+        "--sphere-y",
+        "--sphere-size",
         ".sphere-edge-control",
         ".layer-panel",
+        ".settings-panel",
+        ".text-view",
         ".project-focus",
         ".catalog-grid",
+        "@media (max-width: 48rem)",
         "@media (prefers-reduced-motion: reduce)",
         ":focus-visible",
     )
@@ -345,6 +460,58 @@ def validate_public_maplibre_vertical_slice(root: Path = ROOT) -> list[str]:
         if rendered != html:
             errors.append("index.html does not match the deterministic catalog-derived shell render")
 
+    surface = contract.get("surface", {}) if isinstance(contract.get("surface"), dict) else {}
+    if surface != {
+        "default": "globe",
+        "root_globe_first": True,
+        "full_viewport_globe": True,
+        "marketing_intro_before_globe_forbidden": True,
+        "single_settings_gear": True,
+        "presentation_choices": ["globe", "text"],
+        "same_catalog_filter_selection_and_focus_state": True,
+        "text_surface_requires_webgl": False,
+        "text_surface_independent_scroll_region": True,
+        "no_javascript_catalog_overlay": True,
+    }:
+        errors.append("public globe-first surface contract mismatch")
+    digital_surface = contract.get("digital_sphere", {}) if isinstance(contract.get("digital_sphere"), dict) else {}
+    for key, expected in {
+        "geometry_anchor": "maplibre_projected_camera_center",
+        "screen_fixed_center_forbidden": True,
+        "side_view_keeps_overlay_attached": True,
+    }.items():
+        if digital_surface.get(key) != expected:
+            errors.append(f"public digital-sphere synchrony contract mismatch: {key}")
+    if digital_surface.get("geometry_inputs") != ["stage_bounds", "maplibre_center_projection", "maplibre_padding", "maplibre_zoom"]:
+        errors.append("public digital-sphere geometry inputs mismatch")
+    if digital_surface.get("geometry_acceptance_data_attributes") != [
+        "data-map-projected-center-x",
+        "data-map-projected-center-y",
+        "data-sphere-x",
+        "data-sphere-y",
+        "data-sphere-size",
+    ]:
+        errors.append("public digital-sphere geometry acceptance attributes mismatch")
+    if digital_surface.get("side_view_visual") != "six_stacked_elliptical_layers_beside_subdued_globe":
+        errors.append("public digital-sphere side-layer visual mismatch")
+    navigation = contract.get("navigation", {}) if isinstance(contract.get("navigation"), dict) else {}
+    if navigation.get("deep_link_parameters") != ["lng", "lat", "z", "b", "p", "view", "surface", "layer", "project", "q"]:
+        errors.append("public globe/text deep-link parameters mismatch")
+    if navigation.get("search_and_layer_filter_shared_across_surfaces") is not True:
+        errors.append("public globe/text discovery state must remain shared")
+    if navigation.get("side_layer_responsive_padding") != {"wide": "right_panel", "narrow": "bottom_sheet"}:
+        errors.append("public side-layer responsive padding contract mismatch")
+    machine_surface = contract.get("machine_surface", {}) if isinstance(contract.get("machine_surface"), dict) else {}
+    if machine_surface != {
+        "access": "static_read_only",
+        "manifest": "catalog/catalog.json",
+        "project_base": "catalog/projects/",
+        "schema": "contracts/commonworld/project.schema.json",
+        "api_runtime": False,
+        "write_path": False,
+        "standalone_cli": False,
+    }:
+        errors.append("public machine-readable surface contract mismatch")
     accessibility = contract.get("accessibility", {}) if isinstance(contract.get("accessibility"), dict) else {}
     if accessibility.get("focus_returns_to_trigger_or_linear_fallback_on_close") is not True:
         errors.append("public MapLibre focus-return accessibility contract mismatch")
@@ -360,8 +527,10 @@ def validate_public_maplibre_vertical_slice(root: Path = ROOT) -> list[str]:
     }:
         errors.append("public MapLibre vertical-slice decision boundary mismatch")
     release_gates = contract.get("release_gates", {}) if isinstance(contract.get("release_gates"), dict) else {}
-    if release_gates.get("physical_android_chrome") != "required_before_merge":
-        errors.append("physical Android Chrome must remain a merge release gate")
+    if release_gates.get("physical_android_chrome_previous_public_runtime") != "pass_operator_attestation":
+        errors.append("previous public Android Chrome operator attestation must remain recorded")
+    if release_gates.get("physical_android_chrome_current_globe_first_surface") != "required_before_merge":
+        errors.append("current Globe-first physical Android Chrome must remain a merge release gate")
     if release_gates.get("android_reduced_motion") != "not_claimed":
         errors.append("Android reduced-motion support must not be claimed")
     if release_gates.get("screen_reader_product_support") != "not_claimed":
