@@ -5,6 +5,7 @@ import {
   deriveLayer,
   filterRecords,
   mapCamera,
+  mapFailurePolicy,
   normalizeQuery,
   searchFromState,
   sphereLayout,
@@ -659,7 +660,10 @@ function createMap() {
     updateSphereGeometry();
   });
   runtime.map.on('moveend', scheduleCameraHistory);
-  runtime.map.on('error', (event) => degradeMap(event?.error ?? event));
+  runtime.map.on('error', (event) => {
+    const policy = mapFailurePolicy({ providerReadbackFailed: false });
+    degradeMap(event?.error ?? event, { replaceStyle: policy.replaceStyle });
+  });
   runtime.map.on('load', () => {
     runtime.mapReady = true;
     runtime.map.setProjection({ type: 'globe' });
@@ -679,14 +683,15 @@ function createMap() {
   }
 }
 
-function degradeMap(error) {
+function degradeMap(error, { replaceStyle = true } = {}) {
   runtime.mapDegraded = true;
   if (!runtime.providerErrorLogged) {
     runtime.providerErrorLogged = true;
     console.warn('Commonworld map provider degraded; switching to local fallback style', error);
   }
-  if (runtime.map && !runtime.providerFallbackApplied) {
+  if (replaceStyle && runtime.map && !runtime.providerFallbackApplied) {
     runtime.providerFallbackApplied = true;
+    elements.stage.dataset.providerFallback = 'true';
     try { runtime.map.setStyle(LOCAL_FALLBACK_STYLE); } catch { /* The text surface remains available. */ }
   }
   refreshStatus();
@@ -699,7 +704,8 @@ async function verifyMapProvider(timeoutMs = 4000) {
     const response = await fetch('https://tiles.openfreemap.org/planet', { signal: controller.signal, headers: { Accept: 'application/json' } });
     if (!response.ok) throw new Error(`OpenFreeMap HTTP ${response.status}`);
   } catch (error) {
-    degradeMap(error);
+    const policy = mapFailurePolicy({ providerReadbackFailed: true });
+    degradeMap(error, { replaceStyle: policy.replaceStyle });
   } finally {
     window.clearTimeout(timeout);
   }

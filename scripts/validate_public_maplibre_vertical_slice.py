@@ -440,6 +440,7 @@ def validate_public_maplibre_vertical_slice(root: Path = ROOT) -> list[str]:
         "bootstrapRecords()",
         "verifyMapProvider",
         "degradeMap",
+        "mapFailurePolicy",
         "LOCAL_FALLBACK_STYLE",
         "elements.skipLink.addEventListener('click'",
     )
