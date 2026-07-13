@@ -157,9 +157,12 @@ def validate_public_maplibre_vertical_slice(root: Path = ROOT) -> list[str]:
         if not isinstance(binding, dict) or not isinstance(binding.get("path"), str):
             errors.append("public MapLibre result contains malformed evidence binding")
             continue
+        relative = binding["path"]
         digest = binding.get("sha256")
+        if not (root / relative).is_file():
+            errors.append(f"public MapLibre historical evidence path is missing: {relative}")
         if not isinstance(digest, str) or not re.fullmatch(r"[0-9a-f]{64}", digest):
-            errors.append(f"public MapLibre historical result contains invalid evidence hash: {binding.get('path')}")
+            errors.append(f"public MapLibre historical result contains invalid evidence hash: {relative}")
     # These bindings describe the immutable pre-merge evidence set. Current files are
     # validated below and by current-state.contract.json; later legitimate changes must
     # not be compared byte-for-byte with the historical snapshot.

@@ -3,6 +3,7 @@
 
 from __future__ import annotations
 
+import hashlib
 import json
 import sys
 from pathlib import Path
@@ -16,6 +17,10 @@ VERTICAL_SLICE_PATH = Path("contracts/commonworld/public-maplibre-vertical-slice
 
 def _load(root: Path, relative: Path) -> dict:
     return json.loads((root / relative).read_text(encoding="utf-8"))
+
+
+def _sha256(path: Path) -> str:
+    return hashlib.sha256(path.read_bytes()).hexdigest()
 
 
 def validate_current_state(root: Path = ROOT) -> list[str]:
@@ -124,17 +129,24 @@ def validate_current_state(root: Path = ROOT) -> list[str]:
             errors.append(f"vertical-slice current boundary mismatch: {key}")
 
     historical = state.get("historical_evidence", [])
-    paths = {entry.get("path") for entry in historical if isinstance(entry, dict)}
-    expected_paths = {
-        "contracts/commonworld/renderer-selection.contract.json",
-        "contracts/commonworld/digital-sphere.contract.json",
-        "docs/research/public-maplibre-vertical-slice-v1.result.json",
+    actual_historical = {
+        entry.get("path"): entry.get("sha256")
+        for entry in historical
+        if isinstance(entry, dict) and isinstance(entry.get("path"), str)
     }
-    if paths != expected_paths:
-        errors.append("current-state historical evidence inventory mismatch")
-    for relative in paths:
-        if not isinstance(relative, str) or not (root / relative).is_file():
+    expected_historical = {
+        "contracts/commonworld/renderer-selection.contract.json": "15c76c0875d42e4f670f6513d97804cf0805a054057cf74c0f99798f6432fd8a",
+        "contracts/commonworld/digital-sphere.contract.json": "616d2e4ce880f9997c4c7c7bf7ef621ac779325ffac24b53b8d802c694003029",
+        "docs/research/public-maplibre-vertical-slice-v1.result.json": "8f60b0baec90520a9e1b961c7d5453c0fe87da29f7ecf9132836475ff4cb95e6",
+    }
+    if actual_historical != expected_historical:
+        errors.append("current-state historical evidence inventory or digest mismatch")
+    for relative, digest in expected_historical.items():
+        path = root / relative
+        if not path.is_file():
             errors.append(f"current-state historical evidence missing: {relative}")
+        elif _sha256(path) != digest:
+            errors.append(f"current-state historical evidence was rewritten: {relative}")
 
     licensing = state.get("licensing", {})
     if licensing != {

@@ -51,6 +51,14 @@ class CurrentStateTests(unittest.TestCase):
             errors = validate_current_state(root)
         self.assertTrue(any("precedence" in error for error in errors))
 
+    def test_rejects_rewritten_historical_evidence(self) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            root = self.copy_current_state(directory)
+            path = root / "docs/research/public-maplibre-vertical-slice-v1.result.json"
+            path.write_text(path.read_text(encoding="utf-8") + "\n", encoding="utf-8")
+            errors = validate_current_state(root)
+        self.assertTrue(any("historical evidence was rewritten" in error for error in errors))
+
     def test_rejects_missing_data_licence(self) -> None:
         with tempfile.TemporaryDirectory() as directory:
             root = self.copy_current_state(directory)

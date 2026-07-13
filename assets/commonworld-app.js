@@ -687,7 +687,7 @@ function degradeMap(error, { replaceStyle = true } = {}) {
   runtime.mapDegraded = true;
   if (!runtime.providerErrorLogged) {
     runtime.providerErrorLogged = true;
-    console.warn('Commonworld map provider degraded; switching to local fallback style', error);
+    console.warn('Commonworld map provider degraded', error);
   }
   if (replaceStyle && runtime.map && !runtime.providerFallbackApplied) {
     runtime.providerFallbackApplied = true;
