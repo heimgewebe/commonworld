@@ -7,7 +7,6 @@ export const DEFAULT_CAMERA = Object.freeze({
 });
 
 export const DIGITAL_LAYER_TRANSITION_MS = 760;
-export const DIGITAL_LAYER_SETTLE_BUFFER_MS = 120;
 
 export const LAYERS = Object.freeze([
   Object.freeze({ id: 'knowledge_data', label: 'Wissen und offene Daten', themes: ['knowledge', 'open-data', 'research', 'documentation'] }),

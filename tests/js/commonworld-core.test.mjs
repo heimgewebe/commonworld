@@ -2,7 +2,6 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import {
   DEFAULT_CAMERA,
-  DIGITAL_LAYER_SETTLE_BUFFER_MS,
   DIGITAL_LAYER_TRANSITION_MS,
   LAYERS,
   binaryFragment,
@@ -117,7 +116,6 @@ test('sphere layout keeps one stable overview extent and centers the full-screen
 
 test('digital layer camera performs a bounded journey without changing identity', () => {
   assert.equal(DIGITAL_LAYER_TRANSITION_MS, 760);
-  assert.equal(DIGITAL_LAYER_SETTLE_BUFFER_MS, 120);
   assert.deepEqual(digitalLayerCamera({ lng: 13.4, lat: 52.5, zoom: 1.2, bearing: 170, pitch: 0 }), {
     center: [13.4, 52.5],
     zoom: 1.95,

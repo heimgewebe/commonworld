@@ -1,6 +1,5 @@
 import {
   DEFAULT_CAMERA,
-  DIGITAL_LAYER_SETTLE_BUFFER_MS,
   DIGITAL_LAYER_TRANSITION_MS,
   LAYERS,
   binaryFragment,
@@ -78,6 +77,7 @@ const runtime = {
   previousGlobeCamera: null,
   viewPhase: 'overview',
   viewTransitionTimer: null,
+  viewTransitionCleanup: null,
   layerReturnTarget: null,
   applyingHistory: false,
   mapReady: false,
@@ -471,6 +471,23 @@ function applyCamera(camera, { instant = false, duration = 260 } = {}) {
 function clearViewTransition() {
   window.clearTimeout(runtime.viewTransitionTimer);
   runtime.viewTransitionTimer = null;
+  runtime.viewTransitionCleanup?.();
+  runtime.viewTransitionCleanup = null;
+}
+
+function scheduleViewTransition(phase, duration, options = {}) {
+  let completed = false;
+  const complete = () => {
+    if (completed) return;
+    completed = true;
+    finishViewTransition(phase, options);
+  };
+  const onTransitionEnd = (event) => {
+    if (event.target === elements.map && event.propertyName === 'opacity') complete();
+  };
+  elements.map.addEventListener('transitionend', onTransitionEnd);
+  runtime.viewTransitionCleanup = () => elements.map.removeEventListener('transitionend', onTransitionEnd);
+  runtime.viewTransitionTimer = window.setTimeout(complete, Math.max(2000, duration * 3));
 }
 
 function setViewPhase(phase) {
@@ -531,7 +548,7 @@ function openLayerView({ historyMode = 'push', cameraState = null, instant = fal
   showLayerState();
   renderLayerPanel();
   if (runtime.mapReady) applyCamera(layerCamera(cameraState), { instant: duration === 0, duration });
-  if (duration) runtime.viewTransitionTimer = window.setTimeout(() => finishViewTransition('layers'), duration + DIGITAL_LAYER_SETTLE_BUFFER_MS);
+  if (duration) scheduleViewTransition('layers', duration);
   else finishViewTransition('layers');
   if (historyMode) writeHistory(historyMode);
 }
@@ -549,7 +566,7 @@ function closeLayerView({ historyMode = 'push', cameraState = null, preserveLaye
   }
   renderDiscoveryState();
   if (runtime.mapReady) applyCamera(cameraState ?? runtime.previousGlobeCamera ?? runtime.state.camera, { instant: duration === 0, duration });
-  if (wasOpen && duration) runtime.viewTransitionTimer = window.setTimeout(() => finishViewTransition('overview', { restoreFocus }), duration + DIGITAL_LAYER_SETTLE_BUFFER_MS);
+  if (wasOpen && duration) scheduleViewTransition('overview', duration, { restoreFocus });
   else finishViewTransition('overview', { restoreFocus: wasOpen && restoreFocus });
   if (historyMode) writeHistory(historyMode);
 }
