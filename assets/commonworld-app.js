@@ -1,5 +1,6 @@
 import {
   DEFAULT_CAMERA,
+  DIGITAL_LAYER_SETTLE_BUFFER_MS,
   DIGITAL_LAYER_TRANSITION_MS,
   LAYERS,
   binaryFragment,
@@ -530,7 +531,7 @@ function openLayerView({ historyMode = 'push', cameraState = null, instant = fal
   showLayerState();
   renderLayerPanel();
   if (runtime.mapReady) applyCamera(layerCamera(cameraState), { instant: duration === 0, duration });
-  if (duration) runtime.viewTransitionTimer = window.setTimeout(() => finishViewTransition('layers'), duration);
+  if (duration) runtime.viewTransitionTimer = window.setTimeout(() => finishViewTransition('layers'), duration + DIGITAL_LAYER_SETTLE_BUFFER_MS);
   else finishViewTransition('layers');
   if (historyMode) writeHistory(historyMode);
 }
@@ -548,7 +549,7 @@ function closeLayerView({ historyMode = 'push', cameraState = null, preserveLaye
   }
   renderDiscoveryState();
   if (runtime.mapReady) applyCamera(cameraState ?? runtime.previousGlobeCamera ?? runtime.state.camera, { instant: duration === 0, duration });
-  if (wasOpen && duration) runtime.viewTransitionTimer = window.setTimeout(() => finishViewTransition('overview', { restoreFocus }), duration);
+  if (wasOpen && duration) runtime.viewTransitionTimer = window.setTimeout(() => finishViewTransition('overview', { restoreFocus }), duration + DIGITAL_LAYER_SETTLE_BUFFER_MS);
   else finishViewTransition('overview', { restoreFocus: wasOpen && restoreFocus });
   if (historyMode) writeHistory(historyMode);
 }
