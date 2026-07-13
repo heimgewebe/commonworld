@@ -1,0 +1,62 @@
+{
+  "schema_version": 1,
+  "kind": "commonworld_current_public_state",
+  "current_as_of": "2026-07-13",
+  "precedence": {
+    "current_operational_truth": "this contract",
+    "catalog_truth": "catalog/catalog.json and the referenced CommonProject records",
+    "historical_evidence": "research results and decision-time contracts remain evidence for their original decision but do not override this current state"
+  },
+  "public_surface": {
+    "url": "https://commonworld.net/",
+    "default_presentation": "globe",
+    "equivalent_text_presentation": true,
+    "no_javascript_catalog": true,
+    "machine_surface": "static_read_only"
+  },
+  "renderer": {
+    "selected": true,
+    "engine": "maplibre_gl_js",
+    "version": "5.24.0",
+    "public_runtime_uses_selected_engine": true
+  },
+  "production": {
+    "architecture_authorized": true,
+    "delivery": "github_pages_static",
+    "basemap_provider_selected": true,
+    "basemap_provider": "openfreemap_public_best_effort_noncritical",
+    "provider_sla_claimed": false,
+    "automatic_failover": false,
+    "backend": false,
+    "accounts": false,
+    "write_path": false
+  },
+  "release_gates": {
+    "deterministic_build_and_tests": "pass",
+    "public_shell_and_catalog_validation": "pass",
+    "physical_android_chrome_current_globe_first_surface": "pass_operator_attestation",
+    "github_required_check": "pass",
+    "live_pages_smoke": "pass",
+    "android_reduced_motion": "not_claimed",
+    "screen_reader_product_support": "not_claimed"
+  },
+  "historical_evidence": [
+    {
+      "path": "contracts/commonworld/renderer-selection.contract.json",
+      "scope": "engine decision before production authorization"
+    },
+    {
+      "path": "contracts/commonworld/digital-sphere.contract.json",
+      "scope": "digital-sphere proof before public production authorization"
+    },
+    {
+      "path": "docs/research/public-maplibre-vertical-slice-v1.result.json",
+      "scope": "pre-merge vertical-slice evidence"
+    }
+  ],
+  "licensing": {
+    "code": "AGPL-3.0-only",
+    "catalogue_data": "CC0-1.0",
+    "third_party_assets_retain_their_own_licences": true
+  }
+}

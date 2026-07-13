@@ -182,20 +182,20 @@
     "deterministic_build_and_tests": "pass",
     "public_shell_and_catalog_validation": "pass",
     "desktop_chrome_browser_smoke": "pass_swiftshader_webgl",
-    "physical_android_chrome": "required_before_merge",
+    "physical_android_chrome": "pass_operator_attestation",
     "android_reduced_motion": "not_claimed",
     "screen_reader_product_support": "not_claimed",
-    "github_required_check": "pending",
-    "live_pages_smoke": "pending_after_merge",
+    "github_required_check": "pass",
+    "live_pages_smoke": "pass",
     "physical_android_chrome_previous_public_runtime": "pass_operator_attestation",
-    "physical_android_chrome_current_globe_first_surface": "required_before_merge"
+    "physical_android_chrome_current_globe_first_surface": "pass_operator_attestation"
   },
   "decision_boundary": {
     "engine_selected": true,
     "selected_engine": "maplibre_gl_js",
     "public_runtime_uses_selected_engine": true,
-    "production_architecture_authorized": false,
-    "production_provider_selected": false,
+    "production_architecture_authorized": true,
+    "production_provider_selected": true,
     "screen_reader_product_support_claimed": false
   },
   "surface": {

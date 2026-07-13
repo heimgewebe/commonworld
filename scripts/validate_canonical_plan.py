@@ -110,15 +110,17 @@ EXPECTED_RESEARCH_FILES = {
     "renderer-selection-v1.md",
     "renderer-selection-v1.result.json",
 }
-EXPECTED_CONTRACT_FILES = {"aggregation-zoom.contract.json", "digital-sphere.contract.json", "production-delivery-provider.contract.json", "project.schema.json", "public-maplibre-vertical-slice.contract.json", "renderer-selection.contract.json", "visual-semantics.contract.json"}
+EXPECTED_CONTRACT_FILES = {"current-state.contract.json", "aggregation-zoom.contract.json", "digital-sphere.contract.json", "production-delivery-provider.contract.json", "project.schema.json", "public-maplibre-vertical-slice.contract.json", "renderer-selection.contract.json", "visual-semantics.contract.json"}
 EXPECTED_SCRIPT_FILES = {
     "__init__.py",
     "build_public_runtime.py",
     "check_pages_dns_target.py",
+    "smoke_public_browser.mjs",
     "render_public_shell.py",
     "smoke_pages_live.py",
     "validate_canonical_plan.py",
     "validate_contracts.py",
+    "validate_current_state.py",
     "validate_production_delivery_provider.py",
     "validate_public_catalog.py",
     "validate_public_maplibre_vertical_slice.py",
@@ -139,6 +141,7 @@ EXPECTED_SCRIPT_FILES = {
 EXPECTED_TEST_FILES = {
     "test_canonical_plan.py",
     "test_contracts.py",
+    "test_current_state.py",
     "test_pages_dns_target.py",
     "test_pages_live_smoke.py",
     "test_production_delivery_provider.py",
@@ -221,7 +224,17 @@ def validate_canonical_plan(root: Path = ROOT) -> list[str]:
 
     requirements = (root / "requirements-dev.txt").read_text(encoding="utf-8") if (root / "requirements-dev.txt").is_file() else ""
     if "playwright" in requirements.casefold():
-        errors.append("Playwright dependency must not remain after proof reset")
+        errors.append("Playwright must remain a Node development dependency, not a Python dependency")
+    package_path = root / "package.json"
+    try:
+        package = json.loads(package_path.read_text(encoding="utf-8"))
+    except (OSError, json.JSONDecodeError) as error:
+        errors.append(f"package.json is invalid: {error}")
+    else:
+        if package.get("devDependencies") != {"playwright": "1.61.1"}:
+            errors.append("package.json must pin exactly Playwright 1.61.1 for the browser gate")
+        if package.get("scripts", {}).get("smoke:browser") != "node scripts/smoke_public_browser.mjs":
+            errors.append("package.json must expose the bounded browser smoke command")
 
     required_checks_path = root / ".github" / "grabowski-required-checks.json"
     if not required_checks_path.is_file():
@@ -240,8 +253,9 @@ def validate_canonical_plan(root: Path = ROOT) -> list[str]:
     workflow = root / ".github" / "workflows" / "validate.yml"
     if workflow.is_file():
         workflow_text = workflow.read_text(encoding="utf-8")
-        if "playwright" in workflow_text.casefold():
-            errors.append("validation workflow must not install or run Playwright after proof reset")
+        for token in ("playwright install --with-deps chromium", "npm run smoke:browser"):
+            if token not in workflow_text:
+                errors.append(f"validation workflow missing real browser gate: {token}")
         if "  contracts:\n" not in workflow_text:
             errors.append("validation workflow must expose the required contracts job")
 

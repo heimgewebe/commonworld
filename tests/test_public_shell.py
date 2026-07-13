@@ -11,6 +11,7 @@ class PublicShellTests(unittest.TestCase):
         root = Path(tmp_dir)
         shutil.copy2(ROOT / "index.html", root / "index.html")
         shutil.copy2(ROOT / "index.css", root / "index.css")
+        shutil.copy2(ROOT / "method.html", root / "method.html")
         return root
 
     def test_public_shell_validates(self) -> None:
@@ -43,6 +44,14 @@ class PublicShellTests(unittest.TestCase):
         self.assertNotIn("unpkg.com", html)
         self.assertNotIn("cdn.jsdelivr.net", html)
         self.assertNotIn("<form", html)
+
+    def test_public_shell_requires_human_readable_method_boundary(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp_dir:
+            root = self.copy_shell(tmp_dir)
+            path = root / "method.html"
+            path.write_text(path.read_text(encoding="utf-8").replace("keine vollständige Weltstatistik", "vollständig"), encoding="utf-8")
+            errors = validate_public_shell(root)
+        self.assertTrue(any("keine vollständige Weltstatistik" in error for error in errors))
 
 
 if __name__ == "__main__":

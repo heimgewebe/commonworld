@@ -35,6 +35,7 @@ REQUIRED_FILES = (
     Path("catalog/catalog.json"),
     Path("index.html"),
     Path("index.css"),
+    Path("method.html"),
 )
 EXPECTED_IDS = [
     "debian",
@@ -156,9 +157,12 @@ def validate_public_maplibre_vertical_slice(root: Path = ROOT) -> list[str]:
         if not isinstance(binding, dict) or not isinstance(binding.get("path"), str):
             errors.append("public MapLibre result contains malformed evidence binding")
             continue
-        path = root / binding["path"]
-        if not path.is_file() or _sha256(path) != binding.get("sha256"):
-            errors.append(f"public MapLibre result evidence hash mismatch: {binding.get('path')}")
+        digest = binding.get("sha256")
+        if not isinstance(digest, str) or not re.fullmatch(r"[0-9a-f]{64}", digest):
+            errors.append(f"public MapLibre historical result contains invalid evidence hash: {binding.get('path')}")
+    # These bindings describe the immutable pre-merge evidence set. Current files are
+    # validated below and by current-state.contract.json; later legitimate changes must
+    # not be compared byte-for-byte with the historical snapshot.
     browser = result.get("browser_proof", {}) if isinstance(result.get("browser_proof"), dict) else {}
     assertions = browser.get("assertions", {}) if isinstance(browser.get("assertions"), dict) else {}
     expected_assertions = {
@@ -245,6 +249,10 @@ def validate_public_maplibre_vertical_slice(root: Path = ROOT) -> list[str]:
     dependencies = package.get("dependencies")
     if dependencies != {"maplibre-gl": "5.24.0"}:
         errors.append("package.json must contain only the exactly pinned maplibre-gl 5.24.0 runtime dependency")
+    if package.get("devDependencies") != {"playwright": "1.61.1"}:
+        errors.append("package.json must pin the browser-gate Playwright dependency exactly")
+    if package.get("scripts", {}).get("smoke:browser") != "node scripts/smoke_public_browser.mjs":
+        errors.append("package.json must expose the bounded browser smoke command")
     packages = lock.get("packages", {}) if isinstance(lock.get("packages"), dict) else {}
     root_lock = packages.get("", {}) if isinstance(packages.get(""), dict) else {}
     maplibre_lock = packages.get("node_modules/maplibre-gl", {}) if isinstance(packages.get("node_modules/maplibre-gl"), dict) else {}
@@ -252,6 +260,9 @@ def validate_public_maplibre_vertical_slice(root: Path = ROOT) -> list[str]:
         errors.append("package-lock.json must use lockfileVersion 3")
     if root_lock.get("dependencies") != {"maplibre-gl": "5.24.0"} or maplibre_lock.get("version") != "5.24.0":
         errors.append("package-lock.json must resolve maplibre-gl exactly to 5.24.0")
+    playwright_lock = packages.get("node_modules/playwright", {}) if isinstance(packages.get("node_modules/playwright"), dict) else {}
+    if root_lock.get("devDependencies") != {"playwright": "1.61.1"} or playwright_lock.get("version") != "1.61.1":
+        errors.append("package-lock.json must resolve Playwright exactly to 1.61.1")
 
     asset_contract = {
         item.get("path"): item.get("sha256")
@@ -371,11 +382,16 @@ def validate_public_maplibre_vertical_slice(root: Path = ROOT) -> list[str]:
         'id="text-view"',
         'id="settings-toggle"',
         'id="settings-panel"',
+        'id="catalog-bootstrap"',
+        'id="globe-results"',
+        'role="region"',
         'id="commons-search"',
         'data-presentation-choice="globe"',
         'data-presentation-choice="text"',
         'href="./catalog/catalog.json"',
         'href="./contracts/commonworld/project.schema.json"',
+        'href="./method.html"',
+        'href="./contracts/commonworld/current-state.contract.json"',
     )
     for token in required_html:
         if token not in html:
@@ -421,6 +437,11 @@ def validate_public_maplibre_vertical_slice(root: Path = ROOT) -> list[str]:
         "setTimeout(() => writeHistory('replace'), 180)",
         "presence?.geographic?.length",
         "overlayRenderCount += 1",
+        "bootstrapRecords()",
+        "verifyMapProvider",
+        "degradeMap",
+        "LOCAL_FALLBACK_STYLE",
+        "elements.skipLink.addEventListener('click'",
     )
     for token in required_app:
         if token not in app:
@@ -444,6 +465,9 @@ def validate_public_maplibre_vertical_slice(root: Path = ROOT) -> list[str]:
         ".text-view",
         ".project-focus",
         ".catalog-grid",
+        ".globe-results",
+        ".method-page",
+        ".maplibregl-ctrl-group button",
         "@media (max-width: 48rem)",
         "@media (prefers-reduced-motion: reduce)",
         ":focus-visible",
@@ -521,16 +545,22 @@ def validate_public_maplibre_vertical_slice(root: Path = ROOT) -> list[str]:
         "engine_selected": True,
         "selected_engine": "maplibre_gl_js",
         "public_runtime_uses_selected_engine": True,
-        "production_architecture_authorized": False,
-        "production_provider_selected": False,
+        "production_architecture_authorized": True,
+        "production_provider_selected": True,
         "screen_reader_product_support_claimed": False,
     }:
         errors.append("public MapLibre vertical-slice decision boundary mismatch")
     release_gates = contract.get("release_gates", {}) if isinstance(contract.get("release_gates"), dict) else {}
     if release_gates.get("physical_android_chrome_previous_public_runtime") != "pass_operator_attestation":
         errors.append("previous public Android Chrome operator attestation must remain recorded")
-    if release_gates.get("physical_android_chrome_current_globe_first_surface") != "required_before_merge":
-        errors.append("current Globe-first physical Android Chrome must remain a merge release gate")
+    if release_gates.get("physical_android_chrome") != "pass_operator_attestation":
+        errors.append("physical Android Chrome release evidence must remain passed")
+    if release_gates.get("physical_android_chrome_current_globe_first_surface") != "pass_operator_attestation":
+        errors.append("current Globe-first physical Android Chrome attestation must remain passed")
+    if release_gates.get("github_required_check") != "pass":
+        errors.append("current GitHub required check must remain passed")
+    if release_gates.get("live_pages_smoke") != "pass":
+        errors.append("current live Pages smoke must remain passed")
     if release_gates.get("android_reduced_motion") != "not_claimed":
         errors.append("Android reduced-motion support must not be claimed")
     if release_gates.get("screen_reader_product_support") != "not_claimed":

@@ -1,8 +1,10 @@
 # Agent rules for commonworld
 
-## Canonical source
+## Canonical sources
 
-`docs/blueprints/commonworld-masterplan.md` is the only active product, UI and delivery plan.
+`docs/blueprints/commonworld-masterplan.md` is the only active long-term product and UI plan.
+
+`contracts/commonworld/current-state.contract.json` is the compact authority for the present operational, renderer, production, release-gate and licensing state. It takes precedence over contrary values in historical research results and decision-time contracts. Historical files remain evidence for the decision they originally recorded and must not silently become current truth.
 
 Do not reintroduce removed parallel interface architectures, competing navigation doctrines or a conventional list-first/map-first product without first changing the canonical plan.
 
@@ -36,14 +38,26 @@ Commonworld stays readable without an account and does not create a second admin
 - No exact location unless publication is explicit and appropriate.
 - No relation thread without evidence.
 - No animation without an orientation or state-change purpose.
+- Search, settings and the Text alternative must remain truthful when dynamic catalog or basemap requests fail.
+- Do not claim provider SLA, backend readiness, screen-reader product support or WCAG conformance without current evidence.
 
-## Engineering order
+## Verification and change order
 
-1. Canonical data and aggregation contracts.
-2. Measured globe-rendering spike.
-3. Accessible globe shell and semantic zoom.
-4. Real 8–12 Commons vertical slice.
-5. Digital sphere and hybrid representation.
-6. Catalog growth and only then measured runtime scaling.
+Every public-runtime change must preserve:
+
+1. deterministic `npm run build` output;
+2. `make validate` contract and regression checks;
+3. the real `npm run smoke:browser` scenarios for normal, catalog-failure, provider-failure and method surfaces;
+4. a complete published diff and head/tree/diff-bound review before merge;
+5. exact live Pages readback after merge.
+
+Product order:
+
+1. Current truth and failure-safe shell.
+2. Real geographic and hybrid vertical slice.
+3. Intent-oriented discovery.
+4. Static machine-surface and findability scaling.
+5. Balanced catalog growth and explicit Weltgewebe handoff.
+6. Physical screen-reader product evidence.
 
 Prefer deletion over maintaining obsolete parallel abstractions.

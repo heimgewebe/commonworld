@@ -14,10 +14,13 @@ import {
 } from './commonworld-core.mjs';
 
 const SVG_NS = 'http://www.w3.org/2000/svg';
+const LOCAL_FALLBACK_STYLE = Object.freeze({ version: 8, sources: {}, layers: [{ id: 'commonworld-fallback', type: 'background', paint: { 'background-color': '#0d2426' } }] });
 const PRESENTATION_STORAGE_KEY = 'commonworld.presentation';
 const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
 const elements = {
   body: document.body,
+  skipLink: document.querySelector('.skip-link'),
+  bootstrap: document.querySelector('#catalog-bootstrap'),
   globeSurface: document.querySelector('#globe-surface'),
   textView: document.querySelector('#text-view'),
   textCount: document.querySelector('#text-count'),
@@ -26,6 +29,7 @@ const elements = {
   stage: document.querySelector('.globe-stage'),
   map: document.querySelector('#map'),
   mapStatus: document.querySelector('#map-status'),
+  globeResults: document.querySelector('#globe-results'),
   sphere: document.querySelector('#digital-sphere'),
   sphereStreams: document.querySelector('#sphere-streams'),
   sphereEdge: document.querySelector('#sphere-edge-control'),
@@ -77,11 +81,28 @@ const runtime = {
   focusReturnTarget: null,
   settingsReturnTarget: null,
   resizeObserver: null,
+  catalogDegraded: false,
+  mapDegraded: false,
+  providerFallbackApplied: false,
+  providerErrorLogged: false,
 };
 
 function setStatus(message, state = 'loading') {
   elements.stage.dataset.runtimeState = state;
   elements.mapStatus.textContent = message;
+}
+
+function refreshStatus() {
+  const failures = [];
+  if (runtime.catalogDegraded) failures.push('Der Netzabruf des Katalogs ist fehlgeschlagen; die eingebettete, buildgebundene Fassung bleibt bedienbar.');
+  if (runtime.mapDegraded) failures.push('Die Basiskarte ist vorübergehend nicht erreichbar; Globuszustand und Textansicht bleiben verfügbar.');
+  if (failures.length) {
+    setStatus(failures.join(' '), 'degraded');
+  } else if (runtime.mapReady) {
+    setStatus('Globus bereit. Ziehen zum Drehen, Pinch oder Tasten zum Zoomen.', 'ready');
+  } else {
+    setStatus('Globus wird geladen. Die Textansicht bleibt verfügbar.', 'loading');
+  }
 }
 
 function storedPresentation() {
@@ -100,18 +121,20 @@ function persistPresentation(surface) {
   }
 }
 
-async function fetchJson(url) {
-  const response = await fetch(url, { credentials: 'same-origin', headers: { Accept: 'application/json' } });
-  if (!response.ok) throw new Error(`${url}: HTTP ${response.status}`);
-  return response.json();
+async function fetchJson(url, timeoutMs = 5000) {
+  const controller = new AbortController();
+  const timeout = window.setTimeout(() => controller.abort(), timeoutMs);
+  try {
+    const response = await fetch(url, { credentials: 'same-origin', headers: { Accept: 'application/json' }, signal: controller.signal });
+    if (!response.ok) throw new Error(`${url}: HTTP ${response.status}`);
+    return response.json();
+  } finally {
+    window.clearTimeout(timeout);
+  }
 }
 
-async function loadRecords() {
-  const manifest = await fetchJson('./catalog/catalog.json');
-  if (!Array.isArray(manifest.project_files) || manifest.project_files.length !== manifest.entry_count) {
-    throw new Error('Katalogmanifest und Eintragszahl stimmen nicht überein.');
-  }
-  const records = await Promise.all(manifest.project_files.map((path) => fetchJson(`./catalog/${path}`)));
+function validateRecords(records) {
+  if (!Array.isArray(records) || records.length === 0) throw new Error('Der Katalog enthält keine Einträge.');
   const ids = new Set();
   for (const record of records) {
     if (!record || typeof record.id !== 'string' || ids.has(record.id)) throw new Error('Ungültige oder doppelte CommonProject-ID.');
@@ -119,6 +142,24 @@ async function loadRecords() {
     ids.add(record.id);
   }
   return records;
+}
+
+function bootstrapRecords() {
+  const text = elements.bootstrap?.content?.textContent ?? '';
+  return validateRecords(JSON.parse(text));
+}
+
+async function loadRecords() {
+  const manifest = await fetchJson('./catalog/catalog.json');
+  if (!Array.isArray(manifest.project_files) || manifest.project_files.length !== manifest.entry_count) {
+    throw new Error('Katalogmanifest und Eintragszahl stimmen nicht überein.');
+  }
+  return validateRecords(await Promise.all(manifest.project_files.map((path) => fetchJson(`./catalog/${path}`))));
+}
+
+function installRecords(records) {
+  runtime.records = records;
+  runtime.recordsById = new Map(records.map((record) => [record.id, record]));
 }
 
 function createSvgElement(name, attributes = {}) {
@@ -288,6 +329,11 @@ function renderDiscoveryState() {
   renderTextView();
   updateSphereResultVisibility();
   updateSelectionMarks();
+  const count = visibleRecords().length;
+  elements.globeResults.textContent = count === 0
+    ? 'Keine Commons entsprechen dieser Suche oder Schichtauswahl.'
+    : `${count} ${count === 1 ? 'Commons' : 'Commons'} in der aktuellen Auswahl.`;
+  elements.globeResults.toggleAttribute('data-empty', count === 0);
   elements.search.value = runtime.state.query;
   elements.searchClear.hidden = runtime.state.query.length === 0;
 }
@@ -534,6 +580,11 @@ function applyDeepLink(search, { initial = false } = {}) {
 }
 
 function wireControls() {
+  elements.skipLink.addEventListener('click', (event) => {
+    event.preventDefault();
+    setPresentation('text');
+    elements.textView.focus({ preventScroll: true });
+  });
   elements.layerToggle.addEventListener('click', () => (runtime.state.view === 'layers' ? closeLayerView() : openLayerView()));
   elements.layerClose.addEventListener('click', () => closeLayerView());
   elements.sphereEdge.addEventListener('click', () => openLayerView());
@@ -582,7 +633,8 @@ function wireControls() {
 function createMap() {
   if (runtime.map) return;
   if (!window.maplibregl?.Map) {
-    setStatus('Der Globus ist gerade nicht verfügbar. Die Textansicht bleibt vollständig nutzbar.', 'failed');
+    runtime.mapDegraded = true;
+    refreshStatus();
     setPresentation('text', { historyMode: 'replace', persist: false });
     return;
   }
@@ -607,19 +659,17 @@ function createMap() {
     updateSphereGeometry();
   });
   runtime.map.on('moveend', scheduleCameraHistory);
-  runtime.map.on('error', (event) => {
-    console.warn('Commonworld map provider error', event?.error ?? event);
-    setStatus('Die Basiskarte ist vorübergehend nicht erreichbar. Globuszustand und Textansicht bleiben verfügbar.', 'degraded');
-  });
+  runtime.map.on('error', (event) => degradeMap(event?.error ?? event));
   runtime.map.on('load', () => {
     runtime.mapReady = true;
     runtime.map.setProjection({ type: 'globe' });
     setSphereOpacity();
     updateSphereGeometry();
-    setStatus('Globus bereit. Ziehen zum Drehen, Pinch oder Tasten zum Zoomen.', 'ready');
+    refreshStatus();
     if (runtime.state.view === 'layers') openLayerView({ historyMode: null, cameraState: runtime.state.camera });
     else applyCamera(runtime.state.camera, { instant: true });
   });
+  void verifyMapProvider();
   if ('ResizeObserver' in window) {
     runtime.resizeObserver = new ResizeObserver(() => {
       runtime.map?.resize();
@@ -629,23 +679,60 @@ function createMap() {
   }
 }
 
+function degradeMap(error) {
+  runtime.mapDegraded = true;
+  if (!runtime.providerErrorLogged) {
+    runtime.providerErrorLogged = true;
+    console.warn('Commonworld map provider degraded; switching to local fallback style', error);
+  }
+  if (runtime.map && !runtime.providerFallbackApplied) {
+    runtime.providerFallbackApplied = true;
+    try { runtime.map.setStyle(LOCAL_FALLBACK_STYLE); } catch { /* The text surface remains available. */ }
+  }
+  refreshStatus();
+}
+
+async function verifyMapProvider(timeoutMs = 4000) {
+  const controller = new AbortController();
+  const timeout = window.setTimeout(() => controller.abort(), timeoutMs);
+  try {
+    const response = await fetch('https://tiles.openfreemap.org/planet', { signal: controller.signal, headers: { Accept: 'application/json' } });
+    if (!response.ok) throw new Error(`OpenFreeMap HTTP ${response.status}`);
+  } catch (error) {
+    degradeMap(error);
+  } finally {
+    window.clearTimeout(timeout);
+  }
+}
+
 function ensureMap() {
   if (!runtime.map) createMap();
 }
 
 async function boot() {
   try {
-    runtime.records = await loadRecords();
-    runtime.recordsById = new Map(runtime.records.map((record) => [record.id, record]));
+    const embedded = bootstrapRecords();
+    installRecords(embedded);
     renderSphere();
     renderLayerStack();
     wireControls();
     applyDeepLink(location.search, { initial: true });
     renderDiscoveryState();
     document.documentElement.classList.add('runtime-ready');
+
+    try {
+      const fetched = await loadRecords();
+      if (JSON.stringify(fetched) !== JSON.stringify(embedded)) {
+        throw new Error('Netzkatalog und buildgebundener Katalog unterscheiden sich.');
+      }
+    } catch (error) {
+      runtime.catalogDegraded = true;
+      console.warn('Commonworld catalogue verification degraded; using build-bound bootstrap', error);
+      refreshStatus();
+    }
   } catch (error) {
     console.error(error);
-    setStatus('Commonworld konnte den öffentlichen Katalog nicht laden.', 'failed');
+    setStatus('Commonworld konnte auch den buildgebundenen Katalog nicht lesen.', 'failed');
     elements.body.dataset.presentation = 'text';
     elements.globeSurface.hidden = true;
     elements.textView.hidden = false;

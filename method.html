@@ -1,0 +1,27 @@
+<!doctype html>
+<html lang="de">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="color-scheme" content="dark" />
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; style-src 'self'; img-src 'self' data:; object-src 'none'; base-uri 'self'; form-action 'none';" />
+    <meta name="description" content="Methode, Abdeckung, Datenschutz und Betriebsgrenzen von Commonworld." />
+    <title>Commonworld — Methode und Grenzen</title>
+    <link rel="icon" href="./assets/commonworld-mark.svg" type="image/svg+xml" />
+    <link rel="stylesheet" href="./index.css" />
+  </head>
+  <body class="method-page">
+    <main>
+      <p class="kicker">Commonworld</p>
+      <h1>Methode, Abdeckung und Datenschutz</h1>
+      <p><a href="./">Zurück zum Globus</a></p>
+      <section><h2>Was Commonworld zeigt</h2><p>Commonworld veröffentlicht kuratierte Commons als eine gemeinsame Entdeckungsoberfläche. Der aktuelle Startkatalog enthält 10 digitale Commons. Er ist ein begrenzter redaktioneller Ausschnitt und keine vollständige Weltstatistik.</p></section>
+      <section><h2>Daten und Quellen</h2><p>Jeder Eintrag besitzt eine stabile <code>CommonProject.id</code>, Quellen, Abrufdaten, Aktivitäts- und Kurationsangaben. Die JSON-Dateien sind dieselbe Datenwahrheit wie Globus und Textansicht. Fehlende Katalogeinträge bedeuten nicht, dass in einer Region keine Commons existieren.</p></section>
+      <section><h2>Orte und Privatsphäre</h2><p>Digitale Commons erhalten keine erfundenen Kartenkoordinaten. Künftige geografische Angaben dürfen exakt, angenähert oder verborgen sein. Verborgene Orte werden weder veröffentlicht noch aus anderen Angaben rekonstruiert.</p></section>
+      <section><h2>Technischer Betrieb</h2><p>Die Seite läuft statisch über GitHub Pages. MapLibre wird lokal ausgeliefert. Die Basiskarte kommt von der öffentlichen OpenFreeMap-Instanz als nichtkritische Best-effort-Abhängigkeit ohne behauptetes SLA. Bei Kartenfehlern bleiben Katalog und Textansicht verfügbar.</p></section>
+      <section><h2>Datenschutz</h2><p>Commonworld besitzt keine Konten, eigene Telemetrie, Cookies oder schreibende API. Kartenabrufe gehen direkt an OpenFreeMap; dort kann technisch die IP-Adresse verarbeitet und zeitweise zur Sicherheit protokolliert werden.</p></section>
+      <section><h2>Barrierefreiheit</h2><p>Textansicht, Tastaturpfad, reduzierte Bewegung und No-JavaScript-Katalog sind vorhanden. Eine vollständige Screenreader-Produkttauglichkeit oder WCAG-Konformität wird noch nicht behauptet.</p></section>
+      <section><h2>Lizenzen und maschinenlesbare Grenzen</h2><p>© 2026 Commonworld contributors. Der <a href="https://github.com/heimgewebe/commonworld" rel="external noreferrer">Commonworld-Quellcode</a> wird ohne Gewährleistung unter AGPL-3.0-only bereitgestellt; der <a href="./LICENSE">vollständige Lizenztext</a> ist öffentlich. Von Commonworld erstellte Katalogdaten stehen unter CC0-1.0. Fremde Marken, Karten- und Quelldaten behalten ihre eigenen Rechte. Der <a href="./contracts/commonworld/current-state.contract.json">aktuelle Betriebsstand</a>, das <a href="./catalog/catalog.json">Katalogmanifest</a> und das <a href="./contracts/commonworld/project.schema.json">Datenschema</a> sind öffentlich lesbar.</p></section>
+    </main>
+  </body>
+</html>
