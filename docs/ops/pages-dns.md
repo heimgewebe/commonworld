@@ -72,3 +72,13 @@ The delivery smoke is read-only. It verifies that the canonical Commonworld shel
 ## Change boundary
 
 This document does not authorize DNS mutation. Any future DNS or Pages change must preserve the canonical domain, HTTPS delivery and the one public Commonworld surface.
+
+## Bounded production authorization
+
+GitHub Pages is authorized as the production delivery path for the current static, account-free Commonworld catalog. The authorization excludes backends, accounts, sensitive transactions and any claimed service-level agreement.
+
+Operational limits from the official GitHub Pages contract remain visible: the published site must stay within 1 GiB, deployments must finish within 10 minutes, the 100 GiB monthly bandwidth value is a soft limit, and rate limiting can occur. Approaching any of these boundaries reopens the delivery decision.
+
+The basemap is a separate noncritical dependency. `tiles.openfreemap.org` is authorized only as best effort without an SLA or continuity guarantee. If it is unavailable, the complete linear catalog, project selection and focus content must remain usable and the map must report a degraded state.
+
+The machine-readable decision and its failure/rollback boundary are in `contracts/commonworld/production-delivery-provider.contract.json`. Provider migration, self-hosting, backend introduction or automatic failover require a separate reviewed task.

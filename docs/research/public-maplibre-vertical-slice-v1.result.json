@@ -100,7 +100,7 @@
       "sha256": "b675ea379fe7e3b1cac260d05e471a75e282d69c69fb4d489f554d6489835cc1"
     },
     {
-      "path": "catalog/catalog.json",
+      "path": "docs/research/evidence/public-maplibre-vertical-slice-v1.catalog.json",
       "sha256": "3f254e47c63448a03766860e69aba6595853555c6d42da3a3646b47b064ba509"
     },
     {
@@ -123,5 +123,14 @@
     "production_architecture_authorized": false,
     "production_provider_selected": false
   },
-  "verdict": "IMPLEMENTED_AWAITING_PHYSICAL_ANDROID_GATE"
+  "verdict": "IMPLEMENTED_AWAITING_PHYSICAL_ANDROID_GATE",
+  "evidence_binding_migrations": [
+    {
+      "migrated_at": "2026-07-13",
+      "from": "catalog/catalog.json",
+      "to": "docs/research/evidence/public-maplibre-vertical-slice-v1.catalog.json",
+      "sha256": "3f254e47c63448a03766860e69aba6595853555c6d42da3a3646b47b064ba509",
+      "reason": "Preserve the exact release-evidence bytes before the live catalog publication boundary advanced."
+    }
+  ]
 }

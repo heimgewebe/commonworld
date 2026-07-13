@@ -1,0 +1,165 @@
+{
+  "schema_version": 1,
+  "kind": "commonworld_production_delivery_provider_contract",
+  "decided_at": "2026-07-13",
+  "status": "authorized_bounded_production",
+  "authority": {
+    "id": "commonworld-project-operator",
+    "name": "Commonworld project operator",
+    "decision_source": "Operator instruction on 2026-07-13 to execute COMMONWORLD-PUBLIC-GLOBE-V1-T003"
+  },
+  "scope": {
+    "public_url": "https://commonworld.net/",
+    "repository": "heimgewebe/commonworld",
+    "observed_commit": "92c6993b8c1cac07caf0771c6071de9ca4721047",
+    "product_shape": "static_public_discovery_catalog_with_maplibre_globe",
+    "backend_authorized": false,
+    "accounts_authorized": false,
+    "sensitive_transactions_authorized": false,
+    "predecessor_contract": "contracts/commonworld/public-maplibre-vertical-slice.contract.json",
+    "predecessor_catalog_snapshot": "docs/research/evidence/public-maplibre-vertical-slice-v1.catalog.json"
+  },
+  "delivery": {
+    "selected": "github_pages_static",
+    "production_authorized": true,
+    "source_branch": "main",
+    "source_path": "/",
+    "custom_domain": "commonworld.net",
+    "https_required": true,
+    "operational_owner": "heimgewebe/commonworld maintainers",
+    "published_site_size_limit_gib": 1,
+    "deployment_timeout_minutes": 10,
+    "soft_bandwidth_limit_gib_per_month": 100,
+    "rate_limiting_possible": true,
+    "service_level_agreement_claimed": false,
+    "official_limit_source": "https://docs.github.com/en/pages/getting-started-with-github-pages/github-pages-limits"
+  },
+  "basemap": {
+    "selected": "openfreemap_public_instance",
+    "runtime_origin": "https://tiles.openfreemap.org",
+    "production_authorized": true,
+    "critical_dependency": false,
+    "service_level": "best_effort_without_sla",
+    "service_level_agreement_claimed": false,
+    "warranty_claimed": false,
+    "personalized_support_claimed": false,
+    "api_key_required": false,
+    "registration_required": false,
+    "request_limit_claimed": false,
+    "continuity_guarantee_claimed": false,
+    "data_freshness_guarantee_claimed": false,
+    "attribution_required": [
+      "OpenFreeMap",
+      "OpenMapTiles",
+      "OpenStreetMap"
+    ],
+    "privacy_boundary": {
+      "accounts": false,
+      "cookies": false,
+      "regular_ip_logging_claimed": false,
+      "temporary_security_logging_possible": true,
+      "temporary_security_log_retention_days_max": 30,
+      "cloudflare_processing_possible": true,
+      "commonworld_proxy_in_use": false
+    },
+    "official_sources": [
+      "https://openfreemap.org/",
+      "https://openfreemap.org/privacy/",
+      "https://openfreemap.org/terms/",
+      "https://openfreemap.org/quick_start/"
+    ]
+  },
+  "option_comparison": [
+    {
+      "id": "openfreemap_public_instance",
+      "decision": "selected_now",
+      "sla": "none",
+      "direct_cost": "no_usage_fee_claimed",
+      "privacy": "no_accounts_or_cookies; bounded incident logging possible",
+      "attribution": "required",
+      "rate_limit": "no_limit_claimed_by_provider; no contractual guarantee",
+      "observability": "external reachability and browser failure only",
+      "fallback": "linear catalog remains primary degraded mode",
+      "data_freshness": "provider-managed without Commonworld guarantee",
+      "operational_burden": "low"
+    },
+    {
+      "id": "openfreemap_self_hosted",
+      "decision": "not_selected_revisit_option",
+      "sla": "operator-owned",
+      "direct_cost": "storage_compute_bandwidth_and_operations",
+      "privacy": "operator-controlled",
+      "attribution": "required",
+      "rate_limit": "operator-controlled",
+      "observability": "operator-controlled",
+      "fallback": "requires separately designed redundant delivery",
+      "data_freshness": "operator-owned import cadence",
+      "operational_burden": "high"
+    },
+    {
+      "id": "maptiler_custom_cloud",
+      "decision": "not_selected_procurement_option",
+      "sla": "99.9_percent_on_custom_plan",
+      "direct_cost": "paid_custom_contract",
+      "privacy": "requires legal and data-processing review",
+      "attribution": "plan_and_data_dependent",
+      "rate_limit": "contractual quota",
+      "observability": "vendor-dependent",
+      "fallback": "requires separate provider abstraction",
+      "data_freshness": "vendor-managed",
+      "operational_burden": "medium"
+    },
+    {
+      "id": "protomaps_pmtiles_self_hosted",
+      "decision": "not_selected_revisit_option",
+      "sla": "operator_or_cdn_owned",
+      "direct_cost": "object_storage_cdn_and_pipeline",
+      "privacy": "operator_or_cdn_controlled",
+      "attribution": "required",
+      "rate_limit": "operator_or_cdn_controlled",
+      "observability": "operator_or_cdn controlled",
+      "fallback": "static archive rollback possible after separate implementation",
+      "data_freshness": "operator-owned archive refresh",
+      "operational_burden": "medium_to_high"
+    }
+  ],
+  "failure_contract": {
+    "provider_outage": "show_degraded_map_status_keep_linear_catalog_search_selection_and_focus_available",
+    "rate_limiting": "show_degraded_map_status_do_not_retry_storm_keep_non_map_paths_available",
+    "stale_tiles": "do_not_claim_currentness_record_provider_freshness_as_unknown",
+    "pages_failure": "check_github_pages_status_and_last_deployment_then_rollback_to_previous_known_good_commit_if_release_caused_failure",
+    "dns_failure": "verify_authoritative_and_recursive_dns_against_docs_ops_pages_dns_contract_before_mutation",
+    "rollback": "revert_to_previous_known_good_repository_commit_and_redeploy_pages",
+    "backend_failover": "not_applicable_no_backend_authorized"
+  },
+  "monitoring": {
+    "pages_live_check": "make smoke-pages-live",
+    "dns_check": "make check-pages-dns-target",
+    "provider_check": "browser and operational smoke must confirm tiles.openfreemap.org reachability without converting reachability into an SLA claim",
+    "telemetry": "none"
+  },
+  "reevaluation_triggers": [
+    "monthly bandwidth approaches the GitHub Pages 100 GiB soft limit",
+    "the published site approaches 1 GiB",
+    "a contractual uptime target or support response becomes necessary",
+    "a data-processing agreement or stricter privacy control becomes necessary",
+    "repeated provider outages materially impair discovery",
+    "OpenFreeMap changes terms, privacy behavior, attribution or public-instance continuity",
+    "tile freshness becomes a product-critical statement",
+    "Commonworld introduces a backend, accounts or sensitive transactions"
+  ],
+  "migration": {
+    "authorized": false,
+    "requires_separate_reviewed_task": true,
+    "provider_abstraction_required_before_dual_provider_fallback": true
+  },
+  "does_not_establish": [
+    "GitHub Pages SLA",
+    "OpenFreeMap SLA or continuity guarantee",
+    "cross-provider automatic failover",
+    "backend readiness",
+    "paid-provider procurement",
+    "self-hosted tile operations",
+    "future traffic capacity"
+  ]
+}

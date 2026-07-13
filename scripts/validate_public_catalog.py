@@ -107,7 +107,9 @@ def validate_public_catalog(root: Path = ROOT) -> list[str]:
         "curation_state": "listed",
         "engine_selected": True,
         "selected_engine": "maplibre_gl_js",
-        "production_architecture_authorized": False,
+        "production_architecture_authorized": True,
+        "production_delivery": "github_pages_static",
+        "basemap_provider_boundary": "openfreemap_public_best_effort_noncritical",
         "public_runtime_uses_selected_engine": True,
     }
     if manifest.get("schema_version") != 1 or manifest.get("kind") != "commonworld_public_catalog":

@@ -220,16 +220,15 @@ def validate_public_maplibre_vertical_slice(root: Path = ROOT) -> list[str]:
             errors.append(f"map style missing required attribution: {token}")
 
     publication = manifest.get("publication", {}) if isinstance(manifest.get("publication"), dict) else {}
-    expected_publication = {
+    expected_runtime_publication = {
         "public": True,
         "source_policy": "official-sources-only",
         "curation_state": "listed",
         "engine_selected": True,
-        "production_architecture_authorized": False,
         "selected_engine": "maplibre_gl_js",
         "public_runtime_uses_selected_engine": True,
     }
-    if publication != expected_publication:
+    if any(publication.get(key) != expected for key, expected in expected_runtime_publication.items()):
         errors.append("public catalog runtime publication boundary mismatch")
     records = _catalog_records(root, manifest)
     identifiers = [record.get("id") for record in records]

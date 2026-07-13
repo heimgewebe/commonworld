@@ -668,11 +668,17 @@ Die Enginewahl allein gab die Produktionsarchitektur und die öffentliche Runtim
 
 ### Erster öffentlicher MapLibre-Vertikalschnitt v1
 
-Der erste Runtime-Schnitt verwendet exakt `maplibre-gl@5.24.0` mit Lockfile und lokal ausgelieferten Browserdateien. Es gibt einen MapLibre-Globus und keinen zweiten WebGL-Globus. Die Basiskarte stammt vorläufig von der öffentlichen OpenFreeMap-Instanz; der Style liegt als kontrollierter Snapshot im Repository und nennt OpenFreeMap, OpenMapTiles und OpenStreetMap. Da für die öffentliche Instanz kein Betriebsversprechen beansprucht wird, bleibt eine spätere Produktionsanbieterentscheidung ausdrücklich offen.
+Der erste Runtime-Schnitt verwendet exakt `maplibre-gl@5.24.0` mit Lockfile und lokal ausgelieferten Browserdateien. Es gibt einen MapLibre-Globus und keinen zweiten WebGL-Globus. Die Basiskarte stammt von der öffentlichen OpenFreeMap-Instanz; der Style liegt als kontrollierter Snapshot im Repository und nennt OpenFreeMap, OpenMapTiles und OpenStreetMap. Der nachfolgende Produktionsvertrag autorisiert diese Instanz ausschließlich als nichtkritische Best-effort-Abhängigkeit ohne beanspruchtes Betriebsversprechen.
 
 Die zehn vorhandenen digitalen CommonProject-Identitäten bleiben die einzige Datenquelle. Sie erscheinen in der linearen Ansicht, im gemeinsamen Fokuspanel und in einer begrenzten SVG-Sphäre mit sechs aus Katalogthemen abgeleiteten Schichten. Keine dieser Darstellungen erzeugt geografische Koordinaten oder eine zweite Katalogwahrheit. Deep Links und Browser-Zurück stellen Kamera, Schicht und Auswahl wieder her. Standardbewegungen nutzen eine kurze `easeTo`-Fahrt; bei Reduced Motion wird derselbe Zustand mit `jumpTo` ohne Dauer hergestellt.
 
-Der aktuelle Vertrag liegt in `contracts/commonworld/public-maplibre-vertical-slice.contract.json`. CSP erlaubt ausschließlich lokale Skripte und Styles sowie Kartenressourcen von `tiles.openfreemap.org`; Worker dürfen nur lokal beziehungsweise als `blob:` entstehen. Bei Kartenfehlern bleiben Katalog, Auswahl und Fokus linear nutzbar. Die Produktionsarchitektur, Android-spezifische Reduced-Motion-Abnahme und Screenreader-Produkttauglichkeit werden weiterhin nicht behauptet. Ein physischer Android-Chrome-Lauf bleibt vor dem Merge Releasegate.
+Der aktuelle Vertrag liegt in `contracts/commonworld/public-maplibre-vertical-slice.contract.json`. CSP erlaubt ausschließlich lokale Skripte und Styles sowie Kartenressourcen von `tiles.openfreemap.org`; Worker dürfen nur lokal beziehungsweise als `blob:` entstehen. Bei Kartenfehlern bleiben Katalog, Auswahl und Fokus linear nutzbar. Der physische Android-Chrome-Releasegate ist bestanden. Android-spezifische Reduced-Motion-Abnahme und Screenreader-Produkttauglichkeit werden weiterhin nicht behauptet.
+
+### Begrenzte Produktions- und Anbieterentscheidung v1
+
+GitHub Pages ist für den heutigen statischen, kontolosen Commonworld-Katalog als Produktionsauslieferung autorisiert. Diese Freigabe umfasst keine Backend-, Konto- oder sensiblen Transaktionsfunktionen und behauptet kein SLA. Die dokumentierten Größen-, Deployment-, Bandbreiten- und Rate-Limit-Grenzen bleiben operative Schwellen.
+
+Die öffentliche OpenFreeMap-Instanz ist als Kartenlieferant ausgewählt, aber ausdrücklich nicht kritisch: Es werden weder SLA, Gewährleistung, Fortbestand noch personalisierte Unterstützung behauptet. Bei einem Kartenfehler bleiben die vollständige lineare Ansicht, Auswahl und Fokusinformationen verfügbar; die Oberfläche zeigt den degradierten Kartenzustand. Ein Anbieterwechsel, Selbsthosting, ein Backend oder automatisches Failover benötigen jeweils einen eigenen geprüften Implementierungsball. Der ausführbare Vertrag liegt in `contracts/commonworld/production-delivery-provider.contract.json`; Auswertung und Quellen stehen unter `docs/research/production-delivery-provider-v1.*`.
 
 ## Qualitäts- und Publikationszustände
 
