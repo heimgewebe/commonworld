@@ -72,6 +72,30 @@ class PagesLiveSmokeTests(unittest.TestCase):
         )
         self.assertIn("live catalog publication boundary mismatch", validate_catalog_fetch(fetch))
 
+    def test_old_preproduction_boundary_fails(self) -> None:
+        catalog = json.loads(self.valid_catalog())
+        catalog["publication"]["production_architecture_authorized"] = False
+        fetch = LiveFetch(
+            requested_url="https://commonworld.net/catalog/catalog.json",
+            final_url="https://commonworld.net/catalog/catalog.json",
+            status=200,
+            content_type="application/json",
+            body=json.dumps(catalog),
+        )
+        self.assertIn("live catalog publication boundary mismatch", validate_catalog_fetch(fetch))
+
+    def test_missing_production_delivery_boundary_fails(self) -> None:
+        catalog = json.loads(self.valid_catalog())
+        del catalog["publication"]["production_delivery"]
+        fetch = LiveFetch(
+            requested_url="https://commonworld.net/catalog/catalog.json",
+            final_url="https://commonworld.net/catalog/catalog.json",
+            status=200,
+            content_type="application/json",
+            body=json.dumps(catalog),
+        )
+        self.assertIn("live catalog publication boundary mismatch", validate_catalog_fetch(fetch))
+
     def test_catalog_count_drift_fails(self) -> None:
         catalog = json.loads(self.valid_catalog())
         catalog["project_files"].pop()
