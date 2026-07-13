@@ -6,6 +6,8 @@ export const DEFAULT_CAMERA = Object.freeze({
   pitch: 0,
 });
 
+export const DIGITAL_LAYER_TRANSITION_MS = 760;
+
 export const LAYERS = Object.freeze([
   Object.freeze({ id: 'knowledge_data', label: 'Wissen und offene Daten', themes: ['knowledge', 'open-data', 'research', 'documentation'] }),
   Object.freeze({ id: 'software_infrastructure', label: 'Freie Software und Infrastruktur', themes: ['free-software', 'open-source', 'infrastructure', 'platform'] }),
@@ -117,7 +119,7 @@ export function filterRecords(records, state = {}) {
   });
 }
 
-export function sphereLayout({ width, height, zoom = DEFAULT_CAMERA.zoom, padding = {}, center = null, sideView = false } = {}) {
+export function sphereLayout({ width, height, padding = {}, center = null, sideView = false } = {}) {
   const stageWidth = Math.max(1, finite(width, 1));
   const stageHeight = Math.max(1, finite(height, 1));
   const left = clamp(finite(padding.left, 0), 0, stageWidth - 1);
@@ -128,14 +130,28 @@ export function sphereLayout({ width, height, zoom = DEFAULT_CAMERA.zoom, paddin
   const availableHeight = Math.max(1, stageHeight - top - bottom);
   const fallbackX = left + availableWidth / 2;
   const fallbackY = top + availableHeight / 2;
-  const x = clamp(finite(center?.x, fallbackX), 0, stageWidth);
-  const y = clamp(finite(center?.y, fallbackY), 0, stageHeight);
-  const scale = 2 ** (clamp(finite(zoom, DEFAULT_CAMERA.zoom), 0, 8) - DEFAULT_CAMERA.zoom);
-  const minimum = Math.min(stageWidth, stageHeight) * (sideView ? 0.22 : 0.36);
-  const maximum = Math.min(stageWidth, stageHeight) * 1.6;
-  const base = Math.min(availableWidth, availableHeight) * (sideView ? 0.96 : 0.98);
-  const diameter = clamp(sideView ? base : base * scale, minimum, maximum);
+  const x = sideView ? stageWidth / 2 : clamp(finite(center?.x, fallbackX), 0, stageWidth);
+  const y = sideView ? stageHeight / 2 : clamp(finite(center?.y, fallbackY), 0, stageHeight);
+  const shortestSide = Math.min(stageWidth, stageHeight);
+  const diameter = sideView
+    ? clamp(Math.min(stageWidth * 0.94, stageHeight * 0.88), shortestSide * 0.48, Math.max(stageWidth, stageHeight))
+    : clamp(shortestSide * 0.98, shortestSide * 0.36, shortestSide * 1.6);
   return { x: rounded(x, 2), y: rounded(y, 2), diameter: rounded(diameter, 2) };
+}
+
+export function digitalLayerCamera(camera = DEFAULT_CAMERA) {
+  const bearing = finite(camera?.bearing, DEFAULT_CAMERA.bearing);
+  const normalizedBearing = ((((bearing + 18) + 180) % 360) + 360) % 360 - 180;
+  return {
+    center: [
+      clamp(finite(camera?.lng, DEFAULT_CAMERA.lng), -180, 180),
+      clamp(finite(camera?.lat, DEFAULT_CAMERA.lat), -85, 85),
+    ],
+    zoom: clamp(Math.max(1.95, finite(camera?.zoom, DEFAULT_CAMERA.zoom) + 0.72), 0, 8),
+    bearing: rounded(normalizedBearing, 1),
+    pitch: 52,
+    padding: { top: 0, right: 0, bottom: 0, left: 0 },
+  };
 }
 
 export function mapCamera(map) {

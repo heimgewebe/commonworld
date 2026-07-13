@@ -1,8 +1,10 @@
 import {
   DEFAULT_CAMERA,
+  DIGITAL_LAYER_TRANSITION_MS,
   LAYERS,
   binaryFragment,
   deriveLayer,
+  digitalLayerCamera,
   filterRecords,
   mapCamera,
   mapFailurePolicy,
@@ -73,6 +75,9 @@ const runtime = {
     query: '',
   },
   previousGlobeCamera: null,
+  viewPhase: 'overview',
+  viewTransitionTimer: null,
+  layerReturnTarget: null,
   applyingHistory: false,
   mapReady: false,
   mapRenderCount: 0,
@@ -340,10 +345,11 @@ function renderDiscoveryState() {
 }
 
 function currentUrlState() {
-  return {
-    ...runtime.state,
-    camera: runtime.mapReady ? mapCamera(runtime.map) : runtime.state.camera,
-  };
+  const preserveOverviewCamera = (runtime.state.view === 'layers' || runtime.viewPhase === 'leaving-layers') && runtime.previousGlobeCamera;
+  const camera = preserveOverviewCamera
+    ? runtime.previousGlobeCamera
+    : (runtime.mapReady ? mapCamera(runtime.map) : runtime.state.camera);
+  return { ...runtime.state, camera };
 }
 
 function writeHistory(mode = 'replace') {
@@ -408,7 +414,8 @@ function setQuery(value, { historyMode = 'replace' } = {}) {
 }
 
 function setSphereOpacity() {
-  const opacity = runtime.mapReady ? sphereOpacityForZoom(runtime.map.getZoom()) : 1;
+  const immersive = runtime.state.view === 'layers' || runtime.viewPhase !== 'overview';
+  const opacity = immersive ? 1 : (runtime.mapReady ? sphereOpacityForZoom(runtime.map.getZoom()) : 1);
   elements.sphere.style.setProperty('--sphere-opacity', String(opacity));
   elements.sphere.toggleAttribute('data-hidden-local', opacity === 0);
 }
@@ -418,13 +425,13 @@ function updateSphereGeometry() {
   const rect = elements.stage.getBoundingClientRect();
   const projected = runtime.map.project(runtime.map.getCenter());
   const padding = typeof runtime.map.getPadding === 'function' ? runtime.map.getPadding() : {};
+  const sideView = runtime.state.view === 'layers' || runtime.viewPhase !== 'overview';
   const geometry = sphereLayout({
     width: rect.width,
     height: rect.height,
-    zoom: runtime.map.getZoom(),
     padding,
     center: projected,
-    sideView: runtime.state.view === 'layers',
+    sideView,
   });
   elements.stage.style.setProperty('--sphere-x', `${geometry.x}px`);
   elements.stage.style.setProperty('--sphere-y', `${geometry.y}px`);
@@ -439,33 +446,12 @@ function updateSphereGeometry() {
   elements.stage.dataset.sphereSize = String(geometry.diameter);
 }
 
-function layerCamera() {
-  const current = mapCamera(runtime.map);
-  const panelRect = elements.layerPanel.getBoundingClientRect();
-  const mobileSheet = window.matchMedia('(max-width: 48rem)').matches;
-  const padding = mobileSheet
-    ? {
-        top: 36,
-        right: 36,
-        bottom: Math.min(Math.max(220, panelRect.height + 24), elements.stage.clientHeight * 0.62),
-        left: 36,
-      }
-    : {
-        top: 36,
-        right: Math.min(Math.max(260, panelRect.width) + 24, elements.stage.clientWidth * 0.58),
-        bottom: 36,
-        left: 36,
-      };
-  return {
-    center: [current.lng, current.lat],
-    zoom: Math.max(current.zoom, 1.55),
-    bearing: 22,
-    pitch: 34,
-    padding,
-  };
+function layerCamera(camera = null) {
+  const current = camera ?? (runtime.mapReady ? mapCamera(runtime.map) : runtime.state.camera);
+  return digitalLayerCamera(current);
 }
 
-function applyCamera(camera, { instant = false } = {}) {
+function applyCamera(camera, { instant = false, duration = 260 } = {}) {
   if (!runtime.map) return;
   const options = {
     center: camera.center ?? [camera.lng, camera.lat],
@@ -476,37 +462,94 @@ function applyCamera(camera, { instant = false } = {}) {
   };
   const useJump = instant || reducedMotion.matches;
   elements.stage.dataset.lastCameraCommand = useJump ? 'jumpTo' : 'easeTo';
-  elements.stage.dataset.lastCameraDuration = useJump ? '0' : '260';
+  elements.stage.dataset.lastCameraDuration = useJump ? '0' : String(duration);
   if (useJump) runtime.map.jumpTo(options);
-  else runtime.map.easeTo({ ...options, duration: 260, essential: false });
+  else runtime.map.easeTo({ ...options, duration, essential: false });
+}
+
+function clearViewTransition() {
+  window.clearTimeout(runtime.viewTransitionTimer);
+  runtime.viewTransitionTimer = null;
+}
+
+function setViewPhase(phase) {
+  const allowed = new Set(['overview', 'entering-layers', 'layers', 'leaving-layers']);
+  runtime.viewPhase = allowed.has(phase) ? phase : 'overview';
+  elements.stage.dataset.viewPhase = runtime.viewPhase;
+  setSphereOpacity();
+  updateSphereGeometry();
 }
 
 function showLayerState() {
-  const open = runtime.state.view === 'layers' && runtime.state.surface === 'globe';
-  elements.stage.classList.toggle('layer-view-open', open);
-  elements.layerPanel.hidden = !open;
-  elements.layerToggle.setAttribute('aria-expanded', String(open));
+  const visible = runtime.state.surface === 'globe' && (runtime.state.view === 'layers' || runtime.viewPhase !== 'overview');
+  const transformed = runtime.state.surface === 'globe' && runtime.state.view === 'layers';
+  elements.stage.classList.toggle('layer-view-open', transformed);
+  elements.stage.classList.toggle('layer-view-settled', runtime.viewPhase === 'layers');
+  elements.layerPanel.hidden = !visible;
+  elements.layerToggle.setAttribute('aria-expanded', String(runtime.state.view === 'layers'));
+  elements.map.toggleAttribute('inert', visible);
+  elements.layerToggle.toggleAttribute('inert', visible);
+  if (visible) {
+    elements.map.setAttribute('aria-hidden', 'true');
+    elements.layerToggle.setAttribute('aria-hidden', 'true');
+    elements.sphereEdge.setAttribute('aria-hidden', 'true');
+    elements.sphereEdge.setAttribute('tabindex', '-1');
+  } else {
+    elements.map.removeAttribute('aria-hidden');
+    elements.layerToggle.removeAttribute('aria-hidden');
+    elements.sphereEdge.removeAttribute('aria-hidden');
+    elements.sphereEdge.setAttribute('tabindex', '0');
+    elements.layerPanel.removeAttribute('data-closing');
+  }
 }
 
-function openLayerView({ historyMode = 'push', cameraState = null } = {}) {
-  if (runtime.state.view !== 'layers') runtime.previousGlobeCamera = runtime.mapReady ? mapCamera(runtime.map) : runtime.state.camera;
+function finishViewTransition(phase, { restoreFocus = false } = {}) {
+  clearViewTransition();
+  setViewPhase(phase);
+  showLayerState();
+  if (phase === 'layers') elements.layerClose.focus({ preventScroll: true });
+  if (phase === 'overview' && restoreFocus) {
+    (runtime.layerReturnTarget ?? elements.layerToggle).focus({ preventScroll: true });
+    runtime.layerReturnTarget = null;
+  }
+}
+
+function openLayerView({ historyMode = 'push', cameraState = null, instant = false, trigger = document.activeElement } = {}) {
+  if (cameraState) runtime.previousGlobeCamera = { ...cameraState };
+  else if (runtime.state.view !== 'layers') runtime.previousGlobeCamera = runtime.mapReady ? mapCamera(runtime.map) : runtime.state.camera;
+  if (runtime.state.view !== 'layers') {
+    runtime.layerReturnTarget = trigger === elements.sphereEdge
+      ? elements.sphereEdge
+      : (trigger instanceof HTMLElement ? trigger : elements.layerToggle);
+  }
   runtime.state.view = 'layers';
+  clearViewTransition();
+  const duration = instant || cameraState || reducedMotion.matches ? 0 : DIGITAL_LAYER_TRANSITION_MS;
+  setViewPhase(duration ? 'entering-layers' : 'layers');
+  elements.layerPanel.removeAttribute('data-closing');
   showLayerState();
   renderLayerPanel();
-  updateSphereGeometry();
-  if (runtime.mapReady) {
-    const target = cameraState ? { ...cameraState, padding: layerCamera().padding } : layerCamera();
-    applyCamera(target, { instant: Boolean(cameraState) });
-  }
+  if (runtime.mapReady) applyCamera(layerCamera(cameraState), { instant: duration === 0, duration });
+  if (duration) runtime.viewTransitionTimer = window.setTimeout(() => finishViewTransition('layers'), duration);
+  else finishViewTransition('layers');
   if (historyMode) writeHistory(historyMode);
 }
 
-function closeLayerView({ historyMode = 'push', cameraState = null, preserveLayer = false } = {}) {
+function closeLayerView({ historyMode = 'push', cameraState = null, preserveLayer = false, instant = false, restoreFocus = true } = {}) {
+  const wasOpen = runtime.state.view === 'layers' || runtime.viewPhase !== 'overview';
   runtime.state.view = 'globe';
   if (!preserveLayer) runtime.state.layer = null;
-  showLayerState();
+  clearViewTransition();
+  const duration = instant || reducedMotion.matches ? 0 : DIGITAL_LAYER_TRANSITION_MS;
+  if (wasOpen && duration) {
+    elements.layerPanel.dataset.closing = 'true';
+    setViewPhase('leaving-layers');
+    showLayerState();
+  }
   renderDiscoveryState();
-  if (runtime.mapReady) applyCamera(cameraState ?? runtime.previousGlobeCamera ?? runtime.state.camera, { instant: reducedMotion.matches });
+  if (runtime.mapReady) applyCamera(cameraState ?? runtime.previousGlobeCamera ?? runtime.state.camera, { instant: duration === 0, duration });
+  if (wasOpen && duration) runtime.viewTransitionTimer = window.setTimeout(() => finishViewTransition('overview', { restoreFocus }), duration);
+  else finishViewTransition('overview', { restoreFocus: wasOpen && restoreFocus });
   if (historyMode) writeHistory(historyMode);
 }
 
@@ -537,6 +580,9 @@ function setPresentation(surface, { historyMode = 'push', persist = true } = {})
   elements.body.dataset.presentation = runtime.state.surface;
   elements.globeSurface.hidden = runtime.state.surface !== 'globe';
   elements.textView.hidden = runtime.state.surface !== 'text';
+  clearViewTransition();
+  if (runtime.state.surface === 'text') setViewPhase('overview');
+  else if (runtime.state.view === 'layers') setViewPhase('layers');
   showLayerState();
   updatePresentationControls();
   if (persist) persistPresentation(runtime.state.surface);
@@ -551,8 +597,11 @@ function setPresentation(surface, { historyMode = 'push', persist = true } = {})
 }
 
 function resetGlobe() {
+  clearViewTransition();
   runtime.previousGlobeCamera = null;
+  runtime.layerReturnTarget = null;
   runtime.state.view = 'globe';
+  setViewPhase('overview');
   runtime.state.layer = null;
   runtime.state.camera = { ...DEFAULT_CAMERA };
   showLayerState();
@@ -570,8 +619,8 @@ function applyDeepLink(search, { initial = false } = {}) {
   setPresentation(next.surface, { historyMode: null, persist: false });
   if (runtime.mapReady) {
     applyCamera(next.camera, { instant: true });
-    if (next.view === 'layers') openLayerView({ historyMode: null, cameraState: next.camera });
-    else closeLayerView({ historyMode: null, cameraState: next.camera, preserveLayer: true });
+    if (next.view === 'layers') openLayerView({ historyMode: null, cameraState: next.camera, instant: true });
+    else closeLayerView({ historyMode: null, cameraState: next.camera, preserveLayer: true, instant: true, restoreFocus: false });
   } else {
     showLayerState();
   }
@@ -586,13 +635,13 @@ function wireControls() {
     setPresentation('text');
     elements.textView.focus({ preventScroll: true });
   });
-  elements.layerToggle.addEventListener('click', () => (runtime.state.view === 'layers' ? closeLayerView() : openLayerView()));
+  elements.layerToggle.addEventListener('click', () => (runtime.state.view === 'layers' ? closeLayerView() : openLayerView({ trigger: elements.layerToggle })));
   elements.layerClose.addEventListener('click', () => closeLayerView());
-  elements.sphereEdge.addEventListener('click', () => openLayerView());
+  elements.sphereEdge.addEventListener('click', () => openLayerView({ trigger: elements.sphereEdge }));
   elements.sphereEdge.addEventListener('keydown', (event) => {
     if (event.key === 'Enter' || event.key === ' ') {
       event.preventDefault();
-      openLayerView();
+      openLayerView({ trigger: elements.sphereEdge });
     }
   });
   elements.globeReset.addEventListener('click', resetGlobe);
@@ -670,7 +719,7 @@ function createMap() {
     setSphereOpacity();
     updateSphereGeometry();
     refreshStatus();
-    if (runtime.state.view === 'layers') openLayerView({ historyMode: null, cameraState: runtime.state.camera });
+    if (runtime.state.view === 'layers') openLayerView({ historyMode: null, cameraState: runtime.state.camera, instant: true });
     else applyCamera(runtime.state.camera, { instant: true });
   });
   void verifyMapProvider();

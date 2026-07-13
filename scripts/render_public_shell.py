@@ -127,7 +127,7 @@ def render_shell(root: Path = ROOT) -> str:
       </header>
 
       <section id="globe-surface" class="globe-surface" aria-label="Commonworld-Globus">
-        <figure class="globe-stage" aria-labelledby="globe-caption" data-runtime-state="loading" data-map-renders="0" data-overlay-renders="0">
+        <figure class="globe-stage" aria-labelledby="globe-caption" data-runtime-state="loading" data-view-phase="overview" data-map-renders="0" data-overlay-renders="0">
           <div id="map" class="globe-map" role="region" aria-label="Interaktiver Commonworld-Globus"></div>
           <svg id="digital-sphere" class="digital-sphere" viewBox="0 0 640 640" role="group" aria-labelledby="sphere-title">
             <title id="sphere-title">Digitale Commons-Sphäre mit sechs abgeleiteten Schichten</title>
@@ -143,6 +143,14 @@ def render_shell(root: Path = ROOT) -> str:
 {paths}
               </g>
             </defs>
+            <g id="sphere-rings" aria-hidden="true">
+              <use href="#sphere-path-1"></use>
+              <use href="#sphere-path-2"></use>
+              <use href="#sphere-path-3"></use>
+              <use href="#sphere-path-4"></use>
+              <use href="#sphere-path-5"></use>
+              <use href="#sphere-path-6"></use>
+            </g>
             <g id="sphere-streams" mask="url(#sphere-mask)" aria-hidden="true"></g>
             <circle id="sphere-edge-control" class="sphere-edge-control" cx="320" cy="320" r="276" fill="none" stroke="transparent" stroke-width="28" pointer-events="stroke" role="button" tabindex="0" aria-label="Digitale Commons-Schichten öffnen"></circle>
           </svg>
@@ -161,10 +169,10 @@ def render_shell(root: Path = ROOT) -> str:
 
           <aside id="layer-panel" class="layer-panel" aria-labelledby="layer-title" hidden>
             <div class="panel-heading">
-              <div><p class="kicker">Digitale Sphäre</p><h2 id="layer-title">Sechs Schichten</h2></div>
+              <div><p class="kicker">Digitale Sphäre</p><h2 id="layer-title">Seitenansicht derselben sechs Schichten</h2></div>
               <button id="layer-close" class="icon-button" type="button" aria-label="Schichtansicht schließen">×</button>
             </div>
-            <p>Ortsunabhängige Commons bleiben Teil derselben Welt, ohne erfundene Kartenorte.</p>
+            <p>Die Kamera fährt aus der Totalen in dieselben Ringe. Kreisflächen aus der Draufsicht werden als gestaffelte Ebenen von der Seite lesbar.</p>
             <div id="layer-buttons" class="layer-buttons" aria-label="Digitale Schichten filtern"></div>
             <div id="layer-projects" class="layer-projects" aria-label="Commons in der gewählten Schicht"></div>
           </aside>
