@@ -66,9 +66,11 @@ EXPECTED_PUBLICATION = {
     "source_policy": "official-sources-only",
     "curation_state": "listed",
     "engine_selected": True,
-    "production_architecture_authorized": False,
+    "production_architecture_authorized": True,
     "selected_engine": "maplibre_gl_js",
     "public_runtime_uses_selected_engine": True,
+    "production_delivery": "github_pages_static",
+    "basemap_provider_boundary": "openfreemap_public_best_effort_noncritical",
 }
 
 RUNTIME_ASSETS = (
@@ -275,7 +277,7 @@ def run_live_smoke(url: str | None = None, timeout_seconds: int = 20, insecure: 
     if parse_errors:
         raise RuntimeError("live Pages smoke failed:\n- " + "\n- ".join(parse_errors))
     return PagesLiveSmokeReceipt(
-        smoke_id="commonworld.pages-live.public-maplibre.v4",
+        smoke_id="commonworld.pages-live.public-maplibre.v5",
         requested_url=page.requested_url,
         final_url=page.final_url,
         status=page.status,
