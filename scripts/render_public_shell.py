@@ -97,12 +97,8 @@ def render_shell(root: Path = ROOT) -> str:
         f'              <ellipse id="sphere-path-{index}" cx="320" cy="320" rx="{rx}" ry="{ry}" transform="rotate({rotation} 320 320)" />'
         for index, (_, rx, ry, rotation) in enumerate(ORBIT_PROFILES, start=1)
     )
-    side_paths = "\n".join(
-        f'              <path id="sphere-side-path-{index}" d="M -80 320 Q 320 {306 + (index % 3) * 7} 720 320" />'
-        for index in range(1, len(ORBIT_PROFILES) + 1)
-    )
     uses = "\n".join(
-        f'              <use href="#sphere-path-{index}" class="sphere-layer-track" data-layer-id="{layer_id}" role="button" tabindex="-1" aria-label="{html.escape(LAYER_LABELS[layer_id])} auswählen"></use>'
+        f'              <use href="#sphere-path-{index}" class="sphere-layer-guide" data-layer-id="{layer_id}"></use>'
         for index, (layer_id, _, _, _) in enumerate(ORBIT_PROFILES, start=1)
     )
     cards = render_cards(records)
@@ -147,7 +143,7 @@ def render_shell(root: Path = ROOT) -> str:
         <figure class="globe-stage" aria-labelledby="globe-caption" data-runtime-state="loading" data-view-phase="overview" data-map-renders="0" data-overlay-renders="0">
           <div id="map" class="globe-map" role="region" aria-label="Interaktiver Commonworld-Globus"></div>
           <svg id="digital-sphere" class="digital-sphere" viewBox="0 0 640 640" role="group" aria-labelledby="sphere-title">
-            <title id="sphere-title">Orbitales Commons-Netz mit sechs abgeleiteten Schichten</title>
+            <title id="sphere-title">Digitale Commons-Sphäre aus Namen und deren Binärcode</title>
             <defs>
               <radialGradient id="sphere-center-fade">
                 <stop offset="0%" stop-color="black" />
@@ -158,13 +154,12 @@ def render_shell(root: Path = ROOT) -> str:
               <mask id="sphere-mask"><rect width="640" height="640" fill="url(#sphere-center-fade)" /></mask>
               <g id="sphere-paths" fill="none">
 {paths}
-{side_paths}
               </g>
             </defs>
             <g id="sphere-rings">
 {uses}
             </g>
-            <g id="sphere-streams" mask="url(#sphere-mask)"></g>
+            <g id="sphere-streams" mask="url(#sphere-mask)" aria-hidden="true"></g>
             <circle id="sphere-edge-control" class="sphere-edge-control" cx="320" cy="320" r="318" fill="none" stroke="transparent" stroke-width="20" pointer-events="stroke" role="button" tabindex="0" aria-label="Digitale Commons-Schichten öffnen"></circle>
           </svg>
           <div id="layer-stack-visual" class="layer-stack-visual" aria-hidden="true"></div>
@@ -182,7 +177,7 @@ def render_shell(root: Path = ROOT) -> str:
 
           <aside id="layer-panel" class="layer-panel" aria-labelledby="layer-title" hidden>
             <h2 id="layer-title" class="visually-hidden">Digitale Commons aus der Nähe</h2>
-            <p class="visually-hidden">Dieselben Commons erscheinen als Schriftzüge auf sechs Bahnen und bleiben beim Nahflug direkt auswählbar.</p>
+            <p class="visually-hidden">Dieselben Commons erscheinen mit ihren Namen und Binärcodes auf sechs horizontal wischbaren Bahnen.</p>
             <div class="layer-panel-controls">
               <button id="layer-search-toggle" class="icon-button layer-search-toggle" type="button" aria-label="Commons suchen und Bahnen filtern" aria-controls="layer-discovery" aria-expanded="false">⌕</button>
               <button id="layer-close" class="icon-button layer-close" type="button" aria-label="Zur Globusansicht zurückkehren">×</button>
@@ -192,6 +187,7 @@ def render_shell(root: Path = ROOT) -> str:
               <div class="layer-search-field"><span aria-hidden="true">⌕</span><input id="layer-search" type="search" inputmode="search" autocomplete="off" placeholder="Commons suchen" /></div>
               <div id="layer-buttons" class="layer-buttons"></div>
             </div>
+            <div id="layer-track-deck" class="layer-track-deck" aria-label="Horizontal wischbare digitale Commons-Bahnen"></div>
             <div id="layer-projects" class="layer-projects" hidden></div>
           </aside>
 

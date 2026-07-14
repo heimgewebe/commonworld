@@ -6,6 +6,7 @@ import {
   LAYERS,
   ORBIT_PROFILES,
   binaryFragment,
+  binaryName,
   cameraFromSearch,
   deriveLayer,
   digitalLayerCamera,
@@ -13,14 +14,11 @@ import {
   globeHorizonCoordinates,
   mapFailurePolicy,
   projectedGlobeCircle,
+  ribbonRepeatCount,
   searchFromState,
   sphereDetailLevel,
-  sphereLabelLayout,
-  sphereLayerRowY,
   sphereLayout,
-  sphereProjectScale,
   sphereOpacityForGlobeRatio,
-  sphereStartOffset,
   stateFromSearch,
 } from '../../assets/commonworld-core.mjs';
 
@@ -47,17 +45,15 @@ test('binary fragments are stable visual encodings', () => {
   assert.match(binaryFragment('debian'), /^[01]{12}$/);
 });
 
-test('digital sphere offsets wrap all catalog labels into the visible path band', () => {
-  const recordsPerLayer = [2, 2, 1, 2, 2, 1];
-  const offsets = recordsPerLayer.flatMap((count, layerIndex) =>
-    Array.from({ length: count }, (_, recordIndex) => sphereStartOffset(layerIndex, recordIndex, count)),
-  );
-  assert.equal(offsets.length, 10);
-  assert.ok(offsets.every((offset) => offset >= 8 && offset < 80));
-  assert.ok(Math.abs(sphereStartOffset(3, 1, 2) - 64.88) < 0.0001);
-  assert.ok(Math.abs(sphereStartOffset(5, 0, 1) - 18.8) < 0.0001);
-  assert.equal(sphereStartOffset(-1, -1, 0), 8);
+test('digital ribbons encode the actual UTF-8 Commons names', () => {
+  assert.equal(binaryName('A'), '01000001');
+  assert.equal(binaryName('ä'), '11000011 10100100');
+  assert.equal(binaryName('Debian').split(' ').length, 6);
+  assert.equal(ribbonRepeatCount(1), 6);
+  assert.equal(ribbonRepeatCount(2), 6);
+  assert.equal(ribbonRepeatCount(10), 2);
 });
+
 
 test('orbital profiles remain distinct semantic paths rather than copied circles', () => {
   assert.equal(ORBIT_PROFILES.length, LAYERS.length);
@@ -66,43 +62,12 @@ test('orbital profiles remain distinct semantic paths rather than copied circles
   assert(ORBIT_PROFILES.every(({ rx, ry }) => rx >= 286 && ry >= 268));
 });
 
-test('sphere projects keep one upright identity across stacked and focused tracks', () => {
-  const first = sphereLabelLayout(0, 0, 2);
-  const second = sphereLabelLayout(0, 1, 2);
-  const lower = sphereLabelLayout(5, 0, 1);
-  assert.notEqual(first.overviewX, second.overviewX);
-  assert.notEqual(first.overviewY, second.overviewY);
-  assert.notEqual(first.sideX, second.sideX);
-  assert.equal(first.sideY, 210);
-  assert.equal(lower.sideY, 450);
-  assert.equal(first.focusedSideY, 320);
-  assert(first.focusedSideX < second.focusedSideX);
-  assert.equal('overviewRotation' in first, false);
-  assert.equal('overviewDx' in first, false);
-  for (const layout of [first, second, lower]) {
-    for (const value of Object.values(layout)) assert(Number.isFinite(value));
-  }
-  assert.deepEqual(LAYERS.map((_, index) => sphereLayerRowY(index)), [210, 258, 306, 354, 402, 450]);
-  assert(LAYERS.every(({ trackLabel }) => typeof trackLabel === 'string' && trackLabel.length > 0));
-  const counts = [2, 2, 1, 2, 2, 1];
-  const sidePoints = counts.flatMap((count, layerIndex) =>
-    Array.from({ length: count }, (_, recordIndex) => sphereLabelLayout(layerIndex, recordIndex, count)),
-  );
-  const separations = sidePoints.flatMap((left, leftIndex) =>
-    sidePoints.slice(leftIndex + 1).map((right) => Math.hypot(left.sideX - right.sideX, left.sideY - right.sideY)),
-  );
-  assert(Math.min(...separations) >= 48, 'stacked tracks must remain cleanly separated');
-});
-
-test('sphere detail and inverse scale preserve screen-readable names', () => {
+test('sphere detail levels remain stable for overview and close-up rendering', () => {
   assert.equal(sphereDetailLevel({ diameter: 300 }), 'micro');
   assert.equal(sphereDetailLevel({ diameter: 500 }), 'compact');
   assert.equal(sphereDetailLevel({ diameter: 800 }), 'names');
   assert.equal(sphereDetailLevel({ diameter: 300, sideView: true }), 'close');
-  const renderedNamePixels = (diameter, level) => 12 * sphereProjectScale(diameter, level) * diameter / 640;
-  assert.ok(Math.abs(renderedNamePixels(640, 'names') - 12.5) < 0.01);
-  assert.ok(Math.abs(renderedNamePixels(1280, 'names') - 12.5) < 0.01);
-  assert.ok(Math.abs(renderedNamePixels(2300, 'close') - 20.5) < 0.01);
+  assert(LAYERS.every(({ trackLabel }) => typeof trackLabel === 'string' && trackLabel.length > 0));
 });
 
 test('deep-link state accepts surface, search, identity and clamped camera', () => {
@@ -182,27 +147,27 @@ test('sphere layout follows measured globe geometry and keeps stacked side track
   const rotatedEquivalent = sphereLayout({ width: 1000, height: 700, globe: { x: 498.2, y: 351.4, diameter: 600 } });
   const zoomed = sphereLayout({ width: 1000, height: 700, globe: { x: 500, y: 350, diameter: 900 } });
   const side = sphereLayout({ width: 1000, height: 700, padding: { left: 36, right: 420, top: 36, bottom: 36 }, sideView: true });
-  assert.deepEqual(normal, { x: 500, y: 350, diameter: 708, globeDiameter: 600 });
+  assert.deepEqual(normal, { x: 500, y: 350, diameter: 792, globeDiameter: 600 });
   assert.equal(rotatedEquivalent.diameter, normal.diameter);
   assert(zoomed.diameter > normal.diameter * 1.4);
   assert(normal.diameter * (276 / 320) > normal.globeDiameter, 'innermost digital layer must remain outside the globe');
-  assert.deepEqual(side, { x: 500, y: 364, diameter: 1350, globeDiameter: 1350 });
-  assert(side.diameter > 1000 * 1.3, 'side tracks must remain cropped beyond the horizontal viewport');
-  assert(side.y > 700 * 0.5 && side.y < 700 * 0.55, 'stacked tracks must stay vertically centered');
+  assert.deepEqual(side, { x: 80, y: 406, diameter: 2050, globeDiameter: 2050 });
+  assert(side.diameter > 1000 * 2, 'side journey must move through a cropped enlargement of the text sphere');
+  assert(side.x < 1000 * 0.1 && side.y > 700 * 0.55, 'side journey must approach the enlarged sphere from the left');
   const projected = sphereLayout({ width: 1000, height: 700, padding: { right: 400 }, globe: { x: 301.25, y: 348.5, diameter: 588 } });
   assert.equal(projected.x, 301.25);
   assert.equal(projected.y, 348.5);
-  assert.equal(projected.diameter, 693.84);
+  assert.equal(projected.diameter, 776.16);
   assert.equal(projected.globeDiameter, 588);
 });
 
 test('digital layer camera performs a bounded journey without changing identity', () => {
-  assert.equal(DIGITAL_LAYER_TRANSITION_MS, 760);
+  assert.equal(DIGITAL_LAYER_TRANSITION_MS, 1080);
   assert.deepEqual(digitalLayerCamera({ lng: 13.4, lat: 52.5, zoom: 1.2, bearing: 170, pitch: 0 }), {
     center: [13.4, 52.5],
-    zoom: 1.95,
-    bearing: -172,
-    pitch: 52,
+    zoom: 2.25,
+    bearing: -162,
+    pitch: 58,
     padding: { top: 0, right: 0, bottom: 0, left: 0 },
   });
 });

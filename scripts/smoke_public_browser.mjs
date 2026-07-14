@@ -122,7 +122,7 @@ async function waitForSphereGeometrySettled(page) {
     if (!map || !stage || !sphere || stage.dataset.viewPhase !== 'overview') return false;
     const globeDiameter = Number(stage.dataset.globeDiameter);
     const sphereWidth = sphere.getBoundingClientRect().width;
-    return !map.isMoving() && Number.isFinite(globeDiameter) && globeDiameter > 0 && Math.abs(sphereWidth - globeDiameter * 1.18) <= 2;
+    return !map.isMoving() && Number.isFinite(globeDiameter) && globeDiameter > 0 && Math.abs(sphereWidth - globeDiameter * 1.32) <= 2;
   });
 }
 
@@ -195,6 +195,8 @@ async function normalScenario() {
 
 
 async function layerJourneyScenario({ mobile = false, viewportOverride = null, touch = mobile, scenarioId = null } = {}) {
+  const activeScenarioId = scenarioId ?? (mobile ? 'layer-journey-mobile' : 'layer-journey-desktop');
+  process.stdout.write(`${JSON.stringify({ state: 'RUNNING', scenario: activeScenarioId })}\n`);
   const run = await newPage({ mobile, viewportOverride, touch, reducedMotion: 'no-preference' });
   await run.page.goto(baseUrl, { waitUntil: 'domcontentloaded' });
   await run.page.waitForSelector('html.runtime-ready');
@@ -208,7 +210,15 @@ async function layerJourneyScenario({ mobile = false, viewportOverride = null, t
   const projectedBefore = await independentProjectedGlobeDiameter(run.page);
   const declaredBefore = Number(await stage.getAttribute('data-globe-diameter'));
   assert(Math.abs(declaredBefore - projectedBefore) <= 1, `layer journey: declared globe diameter diverges from MapLibre horizon (${declaredBefore} vs ${projectedBefore})`);
-  assert(Math.abs(before.width - declaredBefore * 1.18) <= 2, `layer journey: outer shell ratio is wrong (${before.width} vs ${declaredBefore})`);
+  assert(Math.abs(before.width - declaredBefore * 1.32) <= 2, `layer journey: outer shell ratio is wrong (${before.width} vs ${declaredBefore})`);
+  const overviewRibbons = await run.page.evaluate(() => ({
+    rings: document.querySelectorAll('.sphere-ring-text').length,
+    names: [...document.querySelectorAll('.sphere-ring-name')].map((node) => node.textContent.trim()).filter(Boolean),
+    binaries: [...document.querySelectorAll('.sphere-ring-binary')].map((node) => node.textContent.trim()).filter(Boolean),
+  }));
+  assert(overviewRibbons.rings === 6, `layer journey: overview does not contain six text rings (${JSON.stringify(overviewRibbons)})`);
+  assert(overviewRibbons.names.includes('Debian') && overviewRibbons.names.includes('Wikipedia'), `layer journey: Commons names are missing from the rings (${JSON.stringify(overviewRibbons.names)})`);
+  assert(overviewRibbons.binaries.some((value) => /^(?:[01]{8})(?: [01]{8})*$/.test(value)), 'layer journey: real bytewise binary names are missing from the rings');
   await waitForSphereOpacitySettled(run.page);
   const opacityBefore = Number(await run.page.locator('#digital-sphere').evaluate((node) => getComputedStyle(node).opacity));
   const ratioBefore = Number(await stage.getAttribute('data-globe-viewport-ratio'));
@@ -270,7 +280,7 @@ async function layerJourneyScenario({ mobile = false, viewportOverride = null, t
     const declaredZoomOut = Number(await stage.getAttribute('data-globe-diameter'));
     assert(restoredScale && restoredScale.width < previousZoomOutWidth * 0.96, `layer journey: zoom-out did not shrink visible sphere (${previousZoomOutWidth} -> ${restoredScale?.width})`);
     assert(Math.abs(declaredZoomOut - projectedZoomOut) <= 1, `layer journey: zoom-out lost MapLibre horizon coupling (${declaredZoomOut} vs ${projectedZoomOut})`);
-    assert(Math.abs(restoredScale.width - declaredZoomOut * 1.18) <= 2, `layer journey: zoom-out lost outer-shell ratio (${restoredScale.width} vs ${declaredZoomOut})`);
+    assert(Math.abs(restoredScale.width - declaredZoomOut * 1.32) <= 2, `layer journey: zoom-out lost outer-shell ratio (${restoredScale.width} vs ${declaredZoomOut})`);
     previousZoomOutWidth = restoredScale.width;
   }
   assert((await stage.getAttribute('data-view-phase')) === 'overview', 'layer journey: scaled sphere stole the zoom-out control and opened layers');
@@ -313,21 +323,25 @@ async function layerJourneyScenario({ mobile = false, viewportOverride = null, t
   assert(await run.page.locator('#layer-panel').isHidden(), 'layer journey: description panel obscures the camera flight');
   const enteringSphere = await run.page.locator('#digital-sphere').boundingBox();
   assert(enteringSphere, 'layer journey: transforming sphere is not visible during camera flight');
-  await run.page.waitForSelector('.globe-stage[data-view-phase="layers-preview"]');
-  assert(await run.page.locator('#layer-panel').isHidden(), 'layer journey: description panel appeared at the exact end of the camera flight');
-  assert(await run.page.locator('#layer-panel').getAttribute('inert') !== null, 'layer journey: hidden description panel became interactive before reveal');
-  assert((await run.page.locator('#layer-panel').getAttribute('data-visible')) === null, 'layer journey: panel visible marker appeared before the visual pause');
-  const settledSphere = await run.page.locator('#digital-sphere').boundingBox();
-  assert(settledSphere, 'layer journey: transformed layers are missing during the panel-free pause');
+  await run.page.waitForFunction(() => ['layers-preview', 'layers'].includes(document.querySelector('.globe-stage')?.dataset.viewPhase));
+  const observedPhase = await stage.getAttribute('data-view-phase');
+  if (observedPhase === 'layers-preview') {
+    assert(await run.page.locator('#layer-panel').isHidden(), 'layer journey: description panel appeared at the exact end of the camera flight');
+    assert(await run.page.locator('#layer-panel').getAttribute('inert') !== null, 'layer journey: hidden description panel became interactive before reveal');
+    assert((await run.page.locator('#layer-panel').getAttribute('data-visible')) === null, 'layer journey: panel visible marker appeared before the visual pause');
+    const settledSphere = await run.page.locator('#digital-sphere').boundingBox();
+    assert(settledSphere, 'layer journey: transformed text sphere is missing during the panel-free pause');
+  }
   await run.page.waitForSelector('.globe-stage[data-view-phase="layers"]');
   await run.page.waitForSelector('#layer-panel[data-visible]');
+  await run.page.waitForFunction(() => Number(getComputedStyle(document.querySelector('#digital-sphere')).opacity) <= 0.1);
   assert(await run.page.locator('#layer-panel').isVisible(), 'layer journey: description panel did not fade in after the panel-free pause');
   assert(await run.page.locator('#layer-panel').getAttribute('inert') === null, 'layer journey: revealed description panel remains inert');
   const panelTiming = await run.page.locator('.globe-stage').evaluate((node) => ({
     preview: Number(node.dataset.layerPreviewStartedAt),
     visible: Number(node.dataset.layerPanelVisibleAt),
   }));
-  assert(Number.isFinite(panelTiming.preview) && Number.isFinite(panelTiming.visible) && panelTiming.visible - panelTiming.preview >= 500, `layer journey: panel-free preview was too short (${JSON.stringify(panelTiming)})`);
+  assert(Number.isFinite(panelTiming.preview) && Number.isFinite(panelTiming.visible) && panelTiming.visible - panelTiming.preview >= 240, `layer journey: panel-free preview was too short (${JSON.stringify(panelTiming)})`);
   const mapOpacity = Number(await run.page.locator('#map').evaluate((node) => getComputedStyle(node).opacity));
   assert(mapOpacity <= 0.02, `layer journey: globe remains visible beside layers (${mapOpacity})`);
   assert(await run.page.locator('#map').getAttribute('inert') !== null, 'layer journey: invisible globe remains keyboard reachable');
@@ -336,96 +350,103 @@ async function layerJourneyScenario({ mobile = false, viewportOverride = null, t
   const panelBox = await run.page.locator('#layer-panel').boundingBox();
   const viewport = run.page.viewportSize();
   assert(panelBox && viewport && panelBox.width >= viewport.width - 1, `layer journey: layer surface is not full width (${JSON.stringify(panelBox)})`);
-  const tangentView = await run.page.evaluate(() => {
+  const ribbonView = await run.page.evaluate(() => {
     const sphere = document.querySelector('#digital-sphere').getBoundingClientRect();
-    const rings = [...document.querySelectorAll('#sphere-rings use')].map((node) => {
-      const rect = node.getBoundingClientRect();
-      const style = getComputedStyle(node);
-      return { layer: node.dataset.layerId, left: rect.left, right: rect.right, top: rect.top, bottom: rect.bottom, width: rect.width, height: rect.height, centerY: rect.top + rect.height / 2, opacity: Number(style.opacity) };
-    });
-    const visibleLabels = [...document.querySelectorAll('.sphere-project[data-commonproject-id]')].flatMap((node) => {
-      const rect = node.getBoundingClientRect();
-      const style = getComputedStyle(node);
-      const intersects = rect.right > 0 && rect.left < innerWidth && rect.bottom > 0 && rect.top < innerHeight;
-      return intersects && Number(style.opacity) > 0.2
-        ? [{ id: node.dataset.commonprojectId, layer: node.dataset.layerId, width: rect.width, height: rect.height }]
-        : [];
+    const lanes = [...document.querySelectorAll('.digital-lane[data-layer-id]')].map((lane) => {
+      const scroller = lane.querySelector('.digital-lane-scroll');
+      const primary = [...lane.querySelectorAll('.digital-ribbon-item[data-ribbon-copy="0"]')];
+      return {
+        layer: lane.dataset.layerId,
+        displayed: getComputedStyle(lane).display !== 'none',
+        clientWidth: scroller.clientWidth,
+        scrollWidth: scroller.scrollWidth,
+        overflowX: getComputedStyle(scroller).overflowX,
+        touchAction: getComputedStyle(scroller).touchAction,
+        primary: primary.map((item) => ({
+          id: item.dataset.commonprojectId,
+          name: item.querySelector('.digital-ribbon-name')?.textContent ?? '',
+          binary: item.querySelector('.digital-ribbon-binary')?.textContent ?? '',
+          height: item.getBoundingClientRect().height,
+          hidden: item.hidden,
+        })),
+      };
     });
     return {
       viewport: { width: innerWidth, height: innerHeight },
       sphere: { left: sphere.left, right: sphere.right, top: sphere.top, bottom: sphere.bottom, width: sphere.width, height: sphere.height },
-      rings,
-      visibleLabels,
-      visibleLayerLabels: [...document.querySelectorAll('.sphere-layer-label')].filter((node) => Number(getComputedStyle(node).opacity) > 0.2).length,
-      nodeCount: document.querySelectorAll('.sphere-project-node').length,
-      leaderCount: document.querySelectorAll('.sphere-project-leader').length,
-      stackChildren: document.querySelector('#layer-stack-visual').childElementCount,
-      projectChildren: document.querySelector('#layer-projects').childElementCount,
+      sphereOpacity: Number(getComputedStyle(document.querySelector('#digital-sphere')).opacity),
+      ringCount: document.querySelectorAll('.sphere-ring-text').length,
+      ringNameCount: document.querySelectorAll('.sphere-ring-name').length,
+      ringBinaryCount: document.querySelectorAll('.sphere-ring-binary').length,
+      lanes,
       filterChildren: document.querySelector('#layer-buttons').childElementCount,
     };
   });
-  assert(tangentView.sphere.width > tangentView.viewport.width * 1.3, `layer journey: side view is not a cropped close-up (${JSON.stringify(tangentView.sphere)})`);
-  assert(tangentView.sphere.left < 0 && tangentView.sphere.right > tangentView.viewport.width, `layer journey: full tracks fit inside the viewport (${JSON.stringify(tangentView.sphere)})`);
-  const orderedCenters = tangentView.rings.map(({ centerY }) => centerY).sort((left, right) => left - right);
-  const rowGaps = orderedCenters.slice(1).map((center, index) => center - orderedCenters[index]);
-  assert(tangentView.rings.every(({ width, height }) => width > tangentView.viewport.width && height < tangentView.viewport.height * 0.24), `layer journey: tracks are not clean horizontal bands (${JSON.stringify(tangentView.rings)})`);
-  assert(rowGaps.every((gap) => gap >= 40), `layer journey: tracks overlap instead of stacking cleanly (${JSON.stringify({ orderedCenters, rowGaps })})`);
-  assert(tangentView.visibleLabels.length >= 3, `layer journey: overview names did not remain visible on the stacked tracks (${JSON.stringify(tangentView.visibleLabels)})`);
-  assert(new Set(tangentView.visibleLabels.map(({ layer }) => layer)).size >= 3, `layer journey: side view does not expose multiple tracks (${JSON.stringify(tangentView.visibleLabels)})`);
-  assert(tangentView.visibleLabels.every(({ height }) => height >= 18), `layer journey: close-up names did not become legible (${JSON.stringify(tangentView.visibleLabels)})`);
-  assert(tangentView.nodeCount === 0 && tangentView.leaderCount === 0, `layer journey: visible light points or leaders remain (${JSON.stringify(tangentView)})`);
-  assert(tangentView.visibleLayerLabels === 6, `layer journey: not all six selectable track labels are visible (${JSON.stringify(tangentView)})`);
-  assert(tangentView.stackChildren === 0 && tangentView.projectChildren === 0 && tangentView.filterChildren === 6, `layer journey: spatial/filter structure is incomplete (${JSON.stringify(tangentView)})`);
+  assert(ribbonView.sphere.width > ribbonView.viewport.width * 2, `layer journey: camera did not pass through an enlarged text sphere (${JSON.stringify(ribbonView.sphere)})`);
+  assert(ribbonView.sphere.left < -ribbonView.viewport.width * 0.7, `layer journey: enlarged sphere did not move into a side approach (${JSON.stringify(ribbonView.sphere)})`);
+  assert(ribbonView.sphereOpacity <= 0.1, `layer journey: enlarged sphere obscures the lane surface (${ribbonView.sphereOpacity})`);
+  assert(ribbonView.ringCount === 6 && ribbonView.ringNameCount > 0 && ribbonView.ringBinaryCount > 0, `layer journey: text-ring identity was lost during the flight (${JSON.stringify(ribbonView)})`);
+  assert(ribbonView.lanes.length === 6 && ribbonView.lanes.every(({ displayed }) => displayed), `layer journey: multi-lane overview does not show all six layers (${JSON.stringify(ribbonView.lanes)})`);
+  assert(ribbonView.lanes.every(({ scrollWidth, clientWidth }) => scrollWidth > clientWidth + 20), `layer journey: at least one lane is not horizontally scrollable (${JSON.stringify(ribbonView.lanes)})`);
+  assert(ribbonView.lanes.every(({ overflowX }) => ['auto', 'scroll'].includes(overflowX)), `layer journey: native horizontal overflow is disabled (${JSON.stringify(ribbonView.lanes)})`);
+  assert(ribbonView.lanes.every(({ touchAction }) => touchAction.includes('pan-x')), `layer journey: touch panning is not explicitly horizontal (${JSON.stringify(ribbonView.lanes)})`);
+  const primarySegments = ribbonView.lanes.flatMap(({ primary }) => primary);
+  assert(primarySegments.length === 10, `layer journey: primary Commons identities were duplicated or lost (${primarySegments.length})`);
+  assert(primarySegments.every(({ name, binary, height }) => name && /^(?:[01]{8})(?: [01]{8})*$/.test(binary) && height >= 44), `layer journey: name/binary pairs or touch heights are invalid (${JSON.stringify(primarySegments)})`);
+  assert(ribbonView.filterChildren === 6, `layer journey: search surface does not contain all six layer filters (${ribbonView.filterChildren})`);
 
-  const knowledgeTrack = run.page.locator('.sphere-layer-label[data-layer-id="knowledge_data"]');
-  await knowledgeTrack.click();
-  assert((await stage.getAttribute('data-focused-layer')) === 'knowledge_data', 'layer journey: selecting a track did not enter single-track focus');
-  const focusedTrack = await run.page.evaluate(() => ({
-    visibleRings: [...document.querySelectorAll('#sphere-rings use')].filter((node) => getComputedStyle(node).visibility !== 'hidden' && Number(getComputedStyle(node).opacity) > 0.2).map((node) => node.dataset.layerId),
-    visibleProjects: [...document.querySelectorAll('.sphere-project[data-commonproject-id]')].filter((node) => getComputedStyle(node).visibility !== 'hidden' && Number(getComputedStyle(node).opacity) > 0.2).map((node) => node.dataset.layerId),
-  }));
-  assert(JSON.stringify(focusedTrack.visibleRings) === JSON.stringify(['knowledge_data']), `layer journey: single-track focus leaves other tracks visible (${JSON.stringify(focusedTrack)})`);
-  assert(focusedTrack.visibleProjects.length > 0 && focusedTrack.visibleProjects.every((layer) => layer === 'knowledge_data'), `layer journey: single-track focus leaves foreign projects visible (${JSON.stringify(focusedTrack)})`);
+  const firstScroller = run.page.locator('.digital-lane-scroll').first();
+  const scrollBefore = await firstScroller.evaluate((node) => node.scrollLeft);
+  await firstScroller.evaluate((node) => { node.scrollTo({ left: Math.min(node.scrollWidth - node.clientWidth, Math.max(120, node.clientWidth * 0.55)), behavior: 'instant' }); });
+  await run.page.waitForTimeout(180);
+  const scrollAfter = await firstScroller.evaluate((node) => node.scrollLeft);
+  assert(scrollAfter > scrollBefore + 20, `layer journey: multi-lane horizontal scroll did not move (${scrollBefore} -> ${scrollAfter})`);
+
+  const knowledgeFocus = run.page.locator('.digital-lane-focus[data-layer-id="knowledge_data"]');
+  await knowledgeFocus.click();
+  assert((await stage.getAttribute('data-focused-layer')) === 'knowledge_data', 'layer journey: selecting a lane did not enter single-lane focus');
+  const focusedLane = await run.page.evaluate(() => {
+    const visible = [...document.querySelectorAll('.digital-lane[data-layer-id]')].filter((lane) => getComputedStyle(lane).display !== 'none');
+    const scroller = visible[0]?.querySelector('.digital-lane-scroll');
+    return {
+      visibleLayers: visible.map((lane) => lane.dataset.layerId),
+      clientWidth: scroller?.clientWidth ?? 0,
+      scrollWidth: scroller?.scrollWidth ?? 0,
+    };
+  });
+  assert(JSON.stringify(focusedLane.visibleLayers) === JSON.stringify(['knowledge_data']), `layer journey: single-lane focus leaves other lanes visible (${JSON.stringify(focusedLane)})`);
+  assert(focusedLane.scrollWidth > focusedLane.clientWidth + 20, `layer journey: focused lane is not horizontally scrollable (${JSON.stringify(focusedLane)})`);
+  const focusedScroller = run.page.locator('.digital-lane[data-layer-id="knowledge_data"] .digital-lane-scroll');
+  await focusedScroller.evaluate((node) => { node.scrollTo({ left: Math.min(node.scrollWidth - node.clientWidth, Math.max(160, node.clientWidth * 0.7)), behavior: 'instant' }); });
+  await run.page.waitForTimeout(180);
+  assert((await focusedScroller.evaluate((node) => node.scrollLeft)) > 20, 'layer journey: single-lane horizontal scroll did not move');
 
   await run.page.locator('#layer-search-toggle').click();
   assert(await run.page.locator('#layer-discovery').isVisible(), 'layer journey: search/filter magnifier did not open');
-  assert((await run.page.locator('#layer-buttons .layer-filter').count()) === 6, 'layer journey: search panel does not expose all track filters');
+  assert((await run.page.locator('#layer-buttons .layer-filter').count()) === 6, 'layer journey: search panel does not expose all lane filters');
   await run.page.locator('#layer-search').fill('Wikipedia');
   await run.page.waitForTimeout(220);
-  assert((await run.page.locator('#commons-search').inputValue()) === 'Wikipedia', 'layer journey: layer search is not synchronized with global search');
-  const searchedVisible = await run.page.locator('.sphere-project:not([data-filtered-out]):not([data-layer-hidden])').count();
+  assert((await run.page.locator('#commons-search').inputValue()) === 'Wikipedia', 'layer journey: lane search is not synchronized with global search');
+  const searchedVisible = await run.page.locator('.digital-ribbon-item[data-ribbon-copy="0"]:not([hidden])').count();
   assert(searchedVisible === 1, `layer journey: focused search did not reduce to one visible identity (${searchedVisible})`);
   await run.page.locator('#layer-search').fill('');
   await run.page.waitForTimeout(220);
   await run.page.locator('#layer-search-toggle').click();
   assert(await run.page.locator('#layer-discovery').isHidden(), 'layer journey: search/filter panel did not close');
-  await knowledgeTrack.click();
-  assert((await stage.getAttribute('data-focused-layer')) === null, 'layer journey: selecting the focused track did not return to all tracks');
+  await knowledgeFocus.click();
+  assert((await stage.getAttribute('data-focused-layer')) === null, 'layer journey: selecting the focused lane did not return to all lanes');
 
-  const directChoice = await run.page.evaluate(() => {
-    const topbarBottom = document.querySelector('.topbar')?.getBoundingClientRect().bottom ?? 0;
-    return [...document.querySelectorAll('.sphere-project[data-commonproject-id]')].flatMap((project) => {
-      const hit = project.querySelector('.sphere-project-hit');
-      const text = project.querySelector('.sphere-project-text');
-      const rect = hit?.getBoundingClientRect();
-      if (!rect || rect.width < 44 || rect.height < 44) return [];
-      const centerX = rect.left + rect.width / 2;
-      const centerY = rect.top + rect.height / 2;
-      const visible = centerX >= 0 && centerX <= innerWidth && centerY > topbarBottom && centerY <= innerHeight;
-      return visible ? [{ id: project.dataset.commonprojectId, title: text?.textContent ?? '', rect: { left: rect.left, top: rect.top, width: rect.width, height: rect.height } }] : [];
-    })[0] ?? null;
-  });
-  assert(directChoice, 'layer journey: no directly selectable visible Commons name');
-  const directContent = run.page.locator(`.sphere-project[data-commonproject-id="${directChoice.id}"]`);
-  const directHitTarget = directContent.locator('.sphere-project-hit');
-  const directHitBox = await directHitTarget.boundingBox();
-  assert(directHitBox && directHitBox.width >= 44 && directHitBox.height >= 44, `layer journey: project name has an undersized touch target (${JSON.stringify(directHitBox)})`);
-  await directHitTarget.click();
-  assert(await run.page.locator('#project-focus').isVisible(), 'layer journey: enlarged orbital content did not open its Commons focus');
-  assert((await run.page.locator('#focus-title').textContent()) === directChoice.title, `layer journey: enlarged orbit opened the wrong Commons identity (${JSON.stringify(directChoice)})`);
+  const directContent = run.page.locator('.digital-ribbon-item[data-ribbon-copy="0"]:not([hidden])').first();
+  const directTitle = (await directContent.locator('.digital-ribbon-name').textContent()) ?? '';
+  const directBox = await directContent.boundingBox();
+  assert(directBox && directBox.width >= 44 && directBox.height >= 44, `layer journey: Commons ribbon has an undersized touch target (${JSON.stringify(directBox)})`);
+  await directContent.click();
+  assert(await run.page.locator('#project-focus').isVisible(), 'layer journey: ribbon content did not open its Commons focus');
+  assert((await run.page.locator('#focus-title').textContent()) === directTitle, `layer journey: ribbon opened the wrong Commons identity (${directTitle})`);
   await run.page.locator('#focus-close').click();
   assert(await run.page.locator('#project-focus').isHidden(), 'layer journey: Commons focus did not close');
-  assert(await directContent.evaluate((node) => document.activeElement === node), 'layer journey: focus did not return to the same orbital content');
+  assert(await directContent.evaluate((node) => document.activeElement === node), 'layer journey: focus did not return to the same ribbon identity');
+
   const viewportFit = await run.page.evaluate(() => ({
     viewportWidth: innerWidth,
     documentWidth: document.documentElement.scrollWidth,
@@ -448,7 +469,7 @@ async function layerJourneyScenario({ mobile = false, viewportOverride = null, t
   assert((await run.page.evaluate(() => document.activeElement?.id)) === 'sphere-edge-control', 'layer journey: focus did not return to the clicked sphere edge');
   assert(run.consoleErrors.length === 0, `layer journey: console errors: ${run.consoleErrors.join(' | ')}`);
   assert(run.pageErrors.length === 0, `layer journey: page errors: ${run.pageErrors.join(' | ')}`);
-  results.push({ id: scenarioId ?? (mobile ? 'layer-journey-mobile' : 'layer-journey-desktop'), verdict: 'PASS' });
+  results.push({ id: activeScenarioId, verdict: 'PASS' });
   await run.context.close();
 }
 

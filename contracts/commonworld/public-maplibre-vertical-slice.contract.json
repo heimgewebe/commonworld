@@ -72,7 +72,6 @@
     "layer_membership": "derived_from_catalog_themes_and_digital_presence",
     "layer_count": 6,
     "same_identity_in_linear_layer_focus_and_sphere": true,
-    "binary_fragments_are_deterministic_visual_encoding_only": true,
     "center_fade": true,
     "continuous_rotation": false,
     "unchanged_geometry_rewrites_forbidden": true,
@@ -95,15 +94,19 @@
       "data-globe-geometry-source",
       "data-globe-viewport-ratio"
     ],
-    "side_view_visual": "cropped_tangent_content_tracks_from_overview_without_globe",
+    "side_view_visual": "swipeable_horizontal_name_binary_lanes_after_text_sphere_flight",
     "scale_fade": {
       "overview_visible_through_globe_viewport_ratio": 1.05,
       "fade_until_globe_viewport_ratio": 2.1,
       "local_hidden_from_globe_viewport_ratio": 2.1
     },
-    "side_view_reuses_overview_content_elements": true,
     "complete_rings_visible": false,
-    "substitute_cards_or_filters": false
+    "overview_ring_content": "commons_name_then_utf8_binary_name",
+    "side_view_identity_source": "same_CommonProject_records_not_same_DOM_elements",
+    "multi_lane_horizontal_swipe": true,
+    "single_lane_horizontal_swipe": true,
+    "card_substitution": false,
+    "search_and_filter_always_available": true
   },
   "navigation": {
     "deep_link_parameters": [
@@ -121,14 +124,14 @@
     "browser_back_restores_state": true,
     "camera_history_writes_coalesced_ms": 180,
     "side_layer_standard_command": "maplibre.easeTo",
-    "side_layer_standard_duration_ms": 260,
+    "side_layer_standard_duration_ms": 1080,
     "reduced_motion_command": "maplibre.jumpTo",
     "reduced_motion_duration_ms": 0,
     "presentation_preference_storage": "localStorage:commonworld.presentation",
     "search_and_layer_filter_shared_across_surfaces": true,
     "side_layer_responsive_padding": {
-      "wide": "full_viewport_tangent_crop",
-      "narrow": "full_viewport_tangent_crop"
+      "wide": "full_viewport_swipe_lanes",
+      "narrow": "full_viewport_swipe_lanes"
     }
   },
   "accessibility": {

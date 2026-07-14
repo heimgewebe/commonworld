@@ -1,5 +1,6 @@
 import {
   DEFAULT_CAMERA,
+  binaryName,
   DIGITAL_LAYER_TRANSITION_MS,
   LAYERS,
   deriveLayer,
@@ -10,12 +11,10 @@ import {
   mapFailurePolicy,
   normalizeQuery,
   projectedGlobeCircle,
+  ribbonRepeatCount,
   searchFromState,
   sphereDetailLevel,
-  sphereLabelLayout,
-  sphereLayerRowY,
   sphereLayout,
-  sphereProjectScale,
   sphereOpacityForGlobeRatio,
   stateFromSearch,
 } from './commonworld-core.mjs';
@@ -50,6 +49,7 @@ const elements = {
   layerSearch: document.querySelector('#layer-search'),
   layerButtons: document.querySelector('#layer-buttons'),
   layerProjects: document.querySelector('#layer-projects'),
+  layerDeck: document.querySelector('#layer-track-deck'),
   globeReset: document.querySelector('#globe-reset'),
   search: document.querySelector('#commons-search'),
   searchClear: document.querySelector('#search-clear'),
@@ -104,6 +104,7 @@ const runtime = {
   mapDegraded: false,
   providerFallbackApplied: false,
   providerErrorLogged: false,
+  laneResizeObserver: null,
 };
 
 function setStatus(message, state = 'loading') {
@@ -187,8 +188,45 @@ function createSvgElement(name, attributes = {}) {
   return element;
 }
 
-function projectHitWidth(title) {
-  return Math.max(48, Math.min(190, String(title).length * 7.4 + 24));
+function groupedDigitalRecords(records = runtime.records) {
+  const grouped = new Map(LAYERS.map((layer) => [layer.id, []]));
+  for (const record of records) grouped.get(deriveLayer(record))?.push(record);
+  return grouped;
+}
+
+function appendRingSequence(textPath, records, repeatCount) {
+  for (let copy = 0; copy < repeatCount; copy += 1) {
+    for (const record of records) {
+      const name = createSvgElement('tspan', { class: 'sphere-ring-name' });
+      name.textContent = `  ${record.title}  `;
+      const binary = createSvgElement('tspan', { class: 'sphere-ring-binary' });
+      binary.textContent = `${binaryName(record.title)}   `;
+      textPath.append(name, binary);
+    }
+  }
+}
+
+function renderSphereRibbons(records = runtime.records) {
+  elements.sphereStreams.replaceChildren();
+  const grouped = groupedDigitalRecords(records);
+  LAYERS.forEach((layer, layerIndex) => {
+    const source = grouped.get(layer.id) ?? [];
+    const displayRecords = source.length ? source : [{ title: layer.trackLabel }];
+    const text = createSvgElement('text', {
+      class: 'sphere-ring-text',
+      'data-layer-id': layer.id,
+    });
+    const textPath = createSvgElement('textPath', {
+      href: `#sphere-path-${layerIndex + 1}`,
+      startOffset: `${(layerIndex * 11 + 3) % 100}%`,
+    });
+    appendRingSequence(textPath, displayRecords, ribbonRepeatCount(displayRecords.length, 10));
+    text.append(textPath);
+    text.toggleAttribute('data-empty', source.length === 0);
+    elements.sphereStreams.append(text);
+  });
+  runtime.overlayRenderCount += 1;
+  elements.stage.dataset.overlayRenders = String(runtime.overlayRenderCount);
 }
 
 function selectLayerTrack(layerId) {
@@ -199,84 +237,76 @@ function selectLayerTrack(layerId) {
   setLayer(nextLayer);
 }
 
-function renderSphere() {
-  elements.sphereStreams.replaceChildren();
-  const grouped = new Map(LAYERS.map((layer) => [layer.id, []]));
-  for (const record of runtime.records) grouped.get(deriveLayer(record))?.push(record);
-  LAYERS.forEach((layer, layerIndex) => {
-    const rowY = sphereLayerRowY(layerIndex);
-    const layerLabel = createSvgElement('text', {
-      class: 'sphere-layer-label',
-      'data-layer-id': layer.id,
-      x: '205',
-      y: String(rowY - 10),
-      role: 'button',
-      tabindex: '-1',
-      focusable: 'true',
-      'aria-label': `${layer.label} auswählen`,
-    });
-    layerLabel.textContent = layer.trackLabel;
-    layerLabel.style.setProperty('--layer-label-y', `${rowY - 10}px`);
-    layerLabel.addEventListener('click', () => {
-      if (runtime.viewPhase === 'layers') selectLayerTrack(layer.id);
-    });
-    layerLabel.addEventListener('keydown', (event) => {
-      if (runtime.viewPhase !== 'layers' || !['Enter', ' '].includes(event.key)) return;
-      event.preventDefault();
-      selectLayerTrack(layer.id);
-    });
-    elements.sphereStreams.append(layerLabel);
+function createRibbonSegment(record, copyIndex) {
+  const segment = document.createElement('button');
+  segment.type = 'button';
+  segment.className = 'digital-ribbon-item';
+  segment.dataset.commonprojectId = record.id;
+  segment.dataset.ribbonCopy = String(copyIndex);
+  segment.setAttribute('aria-label', `${record.title} öffnen`);
+  if (copyIndex > 0) segment.setAttribute('tabindex', '-1');
+  const name = document.createElement('span');
+  name.className = 'digital-ribbon-name';
+  name.textContent = record.title;
+  const binary = document.createElement('span');
+  binary.className = 'digital-ribbon-binary';
+  binary.textContent = binaryName(record.title);
+  segment.append(name, binary);
+  segment.addEventListener('click', () => selectProject(record.id, { trigger: segment }));
+  return segment;
+}
 
-    const records = grouped.get(layer.id) ?? [];
-    records.forEach((record, recordIndex) => {
-      const project = createSvgElement('g', {
-        class: 'sphere-project sphere-label',
-        'data-commonproject-id': record.id,
-        'data-layer-id': layer.id,
-        'data-priority': String(recordIndex === 0),
-        role: 'button',
-        tabindex: '-1',
-        focusable: 'true',
-        'aria-label': `${record.title} öffnen`,
-      });
-      const layout = sphereLabelLayout(layerIndex, recordIndex, records.length);
-      project.style.setProperty('--project-overview-x', `${layout.overviewX}px`);
-      project.style.setProperty('--project-overview-y', `${layout.overviewY}px`);
-      project.style.setProperty('--project-side-x', `${layout.sideX}px`);
-      project.style.setProperty('--project-side-y', `${layout.sideY}px`);
-      project.style.setProperty('--project-focus-x', `${layout.focusedSideX}px`);
-      project.style.setProperty('--project-focus-y', `${layout.focusedSideY}px`);
-      const hitWidth = projectHitWidth(record.title);
-      const hit = createSvgElement('rect', {
-        class: 'sphere-project-hit',
-        x: String(-hitWidth / 2),
-        y: '-18',
-        width: String(hitWidth),
-        height: '36',
-        rx: '8',
-        'aria-hidden': 'true',
-      });
-      const text = createSvgElement('text', {
-        class: 'sphere-project-text sphere-name',
-        x: '0',
-        y: '0',
-        'text-anchor': 'middle',
-      });
-      text.textContent = record.title;
-      project.append(hit, text);
-      project.addEventListener('click', () => {
-        if (runtime.viewPhase === 'layers') selectProject(record.id, { trigger: project });
-      });
-      project.addEventListener('keydown', (event) => {
-        if (runtime.viewPhase !== 'layers' || !['Enter', ' '].includes(event.key)) return;
-        event.preventDefault();
-        selectProject(record.id, { trigger: project });
-      });
-      elements.sphereStreams.append(project);
-    });
+function updateLaneOverflow() {
+  elements.layerDeck.querySelectorAll('.digital-lane-scroll').forEach((scroller) => {
+    scroller.toggleAttribute('data-overflowing', scroller.scrollWidth > scroller.clientWidth + 2);
   });
-  runtime.overlayRenderCount += 1;
-  elements.stage.dataset.overlayRenders = String(runtime.overlayRenderCount);
+}
+
+function renderLayerDeck() {
+  elements.layerDeck.replaceChildren();
+  const grouped = groupedDigitalRecords();
+  for (const layer of LAYERS) {
+    const records = grouped.get(layer.id) ?? [];
+    const lane = document.createElement('section');
+    lane.className = 'digital-lane';
+    lane.dataset.layerId = layer.id;
+    lane.setAttribute('aria-label', layer.label);
+
+    const focus = document.createElement('button');
+    focus.type = 'button';
+    focus.className = 'digital-lane-focus';
+    focus.dataset.layerId = layer.id;
+    focus.setAttribute('aria-pressed', 'false');
+    focus.innerHTML = `<span>${layer.trackLabel}</span><small>${records.length} Commons</small>`;
+    focus.addEventListener('click', () => selectLayerTrack(layer.id));
+
+    const scroller = document.createElement('div');
+    scroller.className = 'digital-lane-scroll';
+    scroller.dataset.layerId = layer.id;
+    scroller.tabIndex = 0;
+    scroller.setAttribute('role', 'region');
+    scroller.setAttribute('aria-label', `${layer.label} horizontal durchblättern`);
+    const content = document.createElement('div');
+    content.className = 'digital-lane-content';
+    const repeats = ribbonRepeatCount(records.length, 10);
+    for (let copy = 0; copy < repeats; copy += 1) {
+      for (const record of records) content.append(createRibbonSegment(record, copy));
+    }
+    scroller.append(content);
+    lane.append(focus, scroller);
+    elements.layerDeck.append(lane);
+  }
+  runtime.laneResizeObserver?.disconnect();
+  if ('ResizeObserver' in window) {
+    runtime.laneResizeObserver = new ResizeObserver(updateLaneOverflow);
+    elements.layerDeck.querySelectorAll('.digital-lane-scroll').forEach((scroller) => runtime.laneResizeObserver.observe(scroller));
+  }
+  window.requestAnimationFrame(updateLaneOverflow);
+}
+
+function renderSphere() {
+  renderSphereRibbons(runtime.records);
+  renderLayerDeck();
 }
 
 function renderLayerStack() {
@@ -329,25 +359,24 @@ function renderTextView() {
 }
 
 function updateSphereResultVisibility() {
-  const visibleIds = new Set(visibleRecords().map(({ id }) => id));
-  const queryIds = runtime.state.query
-    ? new Set(recordsMatchingQuery().map(({ id }) => id))
-    : new Set();
+  const visible = visibleRecords();
+  const visibleIds = new Set(visible.map(({ id }) => id));
   const focusedLayer = runtime.state.view === 'layers' ? runtime.state.layer : null;
   if (focusedLayer) elements.stage.dataset.focusedLayer = focusedLayer;
   else delete elements.stage.dataset.focusedLayer;
-  elements.sphere.querySelectorAll('.sphere-project[data-commonproject-id]').forEach((project) => {
-    project.toggleAttribute('data-filtered-out', !visibleIds.has(project.dataset.commonprojectId));
-    project.toggleAttribute('data-query-match', queryIds.has(project.dataset.commonprojectId));
-    project.classList.toggle('is-layer-focused', focusedLayer === project.dataset.layerId);
-    project.toggleAttribute('data-layer-hidden', Boolean(focusedLayer && focusedLayer !== project.dataset.layerId));
+  renderSphereRibbons(visible);
+  elements.layerDeck.querySelectorAll('.digital-ribbon-item[data-commonproject-id]').forEach((segment) => {
+    segment.hidden = !visibleIds.has(segment.dataset.commonprojectId);
   });
-  elements.sphere.querySelectorAll('[data-layer-id].sphere-layer-track, [data-layer-id].sphere-layer-label').forEach((track) => {
-    const selected = focusedLayer === track.dataset.layerId;
-    track.classList.toggle('is-layer-focused', selected);
-    track.toggleAttribute('data-layer-hidden', Boolean(focusedLayer && !selected));
-    track.setAttribute('aria-pressed', String(selected));
+  elements.layerDeck.querySelectorAll('.digital-lane[data-layer-id]').forEach((lane) => {
+    const selected = focusedLayer === lane.dataset.layerId;
+    const primaryVisible = [...lane.querySelectorAll('.digital-ribbon-item[data-ribbon-copy="0"]')].filter((segment) => !segment.hidden).length;
+    lane.classList.toggle('is-focused', selected);
+    lane.toggleAttribute('data-layer-hidden', Boolean(focusedLayer && !selected));
+    lane.toggleAttribute('data-empty', primaryVisible === 0);
+    lane.querySelector('.digital-lane-focus')?.setAttribute('aria-pressed', String(selected));
   });
+  window.requestAnimationFrame(updateLaneOverflow);
 }
 
 function replaceList(container, values) {
@@ -451,7 +480,7 @@ function isVisibleFocusTarget(target) {
 function visibleProjectTrigger(identifier) {
   const escaped = CSS.escape(identifier);
   const candidates = [
-    ...document.querySelectorAll(`.sphere-label[data-commonproject-id="${escaped}"], .catalog-select[data-commonproject-id="${escaped}"]`),
+    ...document.querySelectorAll(`.digital-ribbon-item[data-commonproject-id="${escaped}"], .catalog-select[data-commonproject-id="${escaped}"]`),
   ];
   return candidates.find(isVisibleFocusTarget) ?? null;
 }
@@ -471,8 +500,13 @@ function clearProject({ historyMode = 'push', restoreFocus = true } = {}) {
 }
 
 function setLayer(layer, { historyMode = 'push' } = {}) {
-  runtime.state.layer = LAYERS.some(({ id }) => id === layer) ? layer : null;
+  const nextLayer = LAYERS.some(({ id }) => id === layer) ? layer : null;
+  if (runtime.state.project && nextLayer && deriveLayer(runtime.recordsById.get(runtime.state.project)) !== nextLayer) runtime.state.project = null;
+  runtime.state.layer = nextLayer;
   renderDiscoveryState();
+  if (runtime.state.view === 'layers' && nextLayer) {
+    window.requestAnimationFrame(() => elements.layerDeck.querySelector(`.digital-lane[data-layer-id="${CSS.escape(nextLayer)}"] .digital-lane-scroll`)?.focus({ preventScroll: true }));
+  }
   if (historyMode) writeHistory(historyMode);
 }
 
@@ -537,25 +571,18 @@ function updateSphereGeometry() {
   elements.stage.dataset.globeDiameter = String(geometry.globeDiameter);
   elements.stage.dataset.globeGeometrySource = sideView ? 'side-view-layout' : 'maplibre-projected-horizon';
   const detailLevel = sphereDetailLevel({ diameter: geometry.diameter, sideView });
-  const projectScale = sphereProjectScale(geometry.diameter, detailLevel);
   elements.sphere.dataset.detailLevel = detailLevel;
-  elements.sphere.style.setProperty('--project-scale', String(projectScale));
-  const trackMode = sideView ? 'side' : 'overview';
-  if (elements.sphere.dataset.trackMode !== trackMode) {
-    elements.sphere.querySelectorAll('.sphere-layer-track[data-layer-id]').forEach((track, index) => {
-      track.setAttribute('href', `#sphere-${sideView ? 'side-' : ''}path-${index + 1}`);
-    });
-    elements.sphere.dataset.trackMode = trackMode;
-  }
   elements.stage.dataset.sphereDetailLevel = detailLevel;
-  elements.stage.dataset.sphereProjectScale = String(projectScale);
   elements.stage.dataset.mapZoom = String(Number(runtime.map.getZoom().toFixed(4)));
   setSphereOpacity({ globeDiameter: geometry.globeDiameter, rect });
 }
 
 function layerCamera(camera = null) {
   const current = camera ?? (runtime.mapReady ? mapCamera(runtime.map) : runtime.state.camera);
-  return digitalLayerCamera(current);
+  return {
+    ...digitalLayerCamera(current),
+    offset: [-Math.min(240, window.innerWidth * 0.18), 0],
+  };
 }
 
 function applyCamera(camera, { instant = false, duration = 260 } = {}) {
@@ -566,6 +593,7 @@ function applyCamera(camera, { instant = false, duration = 260 } = {}) {
     bearing: camera.bearing,
     pitch: camera.pitch,
     padding: camera.padding ?? { top: 0, right: 0, bottom: 0, left: 0 },
+    offset: camera.offset ?? [0, 0],
   };
   const useJump = instant || reducedMotion.matches;
   elements.stage.dataset.lastCameraCommand = useJump ? 'jumpTo' : 'easeTo';
@@ -648,11 +676,9 @@ function showLayerState() {
   elements.layerPanel.toggleAttribute('data-visible', panelVisible);
   elements.layerPanel.toggleAttribute('inert', !panelVisible);
   elements.layerToggle.setAttribute('aria-expanded', String(runtime.state.view === 'layers'));
-  elements.sphere.querySelectorAll('.sphere-project[data-commonproject-id], .sphere-layer-track[data-layer-id], .sphere-layer-label[data-layer-id]').forEach((control) => {
-    const interactive = runtime.viewPhase === 'layers';
-    control.setAttribute('tabindex', interactive ? '0' : '-1');
-    control.toggleAttribute('aria-hidden', !interactive);
-  });
+  elements.layerDeck.toggleAttribute('inert', !panelVisible);
+  elements.layerDeck.setAttribute('aria-hidden', String(!panelVisible));
+  elements.sphere.setAttribute('aria-hidden', String(runtime.viewPhase === 'layers'));
   elements.map.toggleAttribute('inert', journeyActive);
   elements.layerToggle.toggleAttribute('inert', journeyActive);
   if (journeyActive) {
@@ -687,7 +713,7 @@ function finishViewTransition(phase, { restoreFocus = false, revealImmediately =
         showLayerState();
         elements.layerClose.focus({ preventScroll: true });
       });
-    }, 520);
+    }, 280);
   } else if (phase === 'layers' && revealImmediately) {
     runtime.layerPanelReady = true;
     showLayerState();
@@ -924,16 +950,6 @@ function wireControls() {
       else elements.globeReset.focus({ preventScroll: true });
     });
   }
-  elements.sphere.querySelectorAll('.sphere-layer-track[data-layer-id]').forEach((track) => {
-    track.addEventListener('click', () => {
-      if (runtime.viewPhase === 'layers') selectLayerTrack(track.dataset.layerId);
-    });
-    track.addEventListener('keydown', (event) => {
-      if (runtime.viewPhase !== 'layers' || !['Enter', ' '].includes(event.key)) return;
-      event.preventDefault();
-      selectLayerTrack(track.dataset.layerId);
-    });
-  });
   document.querySelectorAll('.catalog-select').forEach((button) => {
     button.addEventListener('click', () => selectProject(button.dataset.commonprojectId));
   });

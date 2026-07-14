@@ -366,8 +366,9 @@ def validate_public_maplibre_vertical_slice(root: Path = ROOT) -> list[str]:
     for identifier in EXPECTED_IDS:
         if identifier in app or identifier in core:
             errors.append(f"public runtime code hardcodes catalog identity instead of loading it: {identifier}")
-    if "sphereLabelLayout(layerIndex, recordIndex, records.length)" not in app:
-        errors.append("public runtime must use the tested identity-preserving sphere-label layout helper")
+    for token in ("renderSphereRibbons(runtime.records);", "renderLayerDeck();", "binaryName(record.title)", "ribbonRepeatCount(records.length, 10)"):
+        if token not in app:
+            errors.append(f"public runtime must use the tested text-ribbon lane architecture: {token}")
     if re.search(r"cooperativeGestures\s*:\s*true", app):
         errors.append("public mobile globe must allow one-finger touch movement; cooperativeGestures may not be enabled")
 
@@ -380,6 +381,8 @@ def validate_public_maplibre_vertical_slice(root: Path = ROOT) -> list[str]:
         'id="sphere-edge-control"',
         'id="layer-panel"',
         'id="layer-stack-visual"',
+        'id="layer-track-deck"',
+        'id="layer-search-toggle"',
         'id="project-focus"',
         'id="globe-surface"',
         'id="text-view"',
@@ -449,18 +452,24 @@ def validate_public_maplibre_vertical_slice(root: Path = ROOT) -> list[str]:
         "mapFailurePolicy",
         "LOCAL_FALLBACK_STYLE",
         "elements.skipLink.addEventListener('click'",
+        "renderSphereRibbons(",
+        "renderLayerDeck(",
+        "overflowing",
     )
     for token in required_app:
         if token not in app:
             errors.append(f"public runtime application missing contract token: {token}")
-    for token in ("deriveLayer", "binaryFragment", "sphereLabelLayout", "stateFromSearch", "searchFromState", "filterRecords", "globeHorizonCoordinates", "projectedGlobeCircle", "sphereLayout", "sphereOpacityForGlobeRatio"):
+    for token in ("deriveLayer", "binaryFragment", "binaryName", "ribbonRepeatCount", "stateFromSearch", "searchFromState", "filterRecords", "globeHorizonCoordinates", "projectedGlobeCircle", "sphereLayout", "sphereOpacityForGlobeRatio"):
         if f"function {token}" not in core:
             errors.append(f"public runtime core missing function: {token}")
     if "setInterval" in app:
         errors.append("public runtime must not introduce an interval animation loop")
     animation_frame_calls = app.count("requestAnimationFrame")
-    if animation_frame_calls > 1 or (animation_frame_calls == 1 and "window.requestAnimationFrame(() =>" not in app):
-        errors.append("public runtime may use only one explicit one-shot animation frame for staged panel reveal")
+    if animation_frame_calls > 4:
+        errors.append("public runtime may use at most four one-shot animation frames for lane measurement, focus and staged reveal")
+    for token in ("window.requestAnimationFrame(updateLaneOverflow)", "window.requestAnimationFrame(() =>"):
+        if token not in app:
+            errors.append(f"public runtime one-shot animation-frame contract missing token: {token}")
     if "zoom: runtime.map.getZoom()" in app:
         errors.append("public digital-sphere geometry must not use MapLibre zoom as a direct size input")
     if "sphereOpacityForZoom" in app or "sphereOpacityForZoom" in core:
@@ -474,6 +483,11 @@ def validate_public_maplibre_vertical_slice(root: Path = ROOT) -> list[str]:
         "--sphere-y",
         "--sphere-size",
         ".sphere-edge-control",
+        ".sphere-ring-text",
+        ".layer-track-deck",
+        ".digital-lane-scroll",
+        "overflow-x: auto",
+        "touch-action: pan-x",
         ".layer-panel",
         ".settings-panel",
         ".text-view",
@@ -539,12 +553,16 @@ def validate_public_maplibre_vertical_slice(root: Path = ROOT) -> list[str]:
         "data-globe-viewport-ratio",
     ]:
         errors.append("public digital-sphere geometry acceptance attributes mismatch")
-    if digital_surface.get("side_view_visual") != "cropped_tangent_content_tracks_from_overview_without_globe":
+    if digital_surface.get("side_view_visual") != "swipeable_horizontal_name_binary_lanes_after_text_sphere_flight":
         errors.append("public digital-sphere side-layer visual mismatch")
     for key, expected in {
-        "side_view_reuses_overview_content_elements": True,
+        "overview_ring_content": "commons_name_then_utf8_binary_name",
+        "side_view_identity_source": "same_CommonProject_records_not_same_DOM_elements",
+        "multi_lane_horizontal_swipe": True,
+        "single_lane_horizontal_swipe": True,
         "complete_rings_visible": False,
-        "substitute_cards_or_filters": False,
+        "card_substitution": False,
+        "search_and_filter_always_available": True,
     }.items():
         if digital_surface.get(key) != expected:
             errors.append(f"public digital-sphere close-up contract mismatch: {key}")
@@ -553,7 +571,9 @@ def validate_public_maplibre_vertical_slice(root: Path = ROOT) -> list[str]:
         errors.append("public globe/text deep-link parameters mismatch")
     if navigation.get("search_and_layer_filter_shared_across_surfaces") is not True:
         errors.append("public globe/text discovery state must remain shared")
-    if navigation.get("side_layer_responsive_padding") != {"wide": "full_viewport_tangent_crop", "narrow": "full_viewport_tangent_crop"}:
+    if navigation.get("side_layer_standard_duration_ms") != 1080:
+        errors.append("public side-layer camera duration mismatch")
+    if navigation.get("side_layer_responsive_padding") != {"wide": "full_viewport_swipe_lanes", "narrow": "full_viewport_swipe_lanes"}:
         errors.append("public side-layer responsive padding contract mismatch")
     machine_surface = contract.get("machine_surface", {}) if isinstance(contract.get("machine_surface"), dict) else {}
     if machine_surface != {

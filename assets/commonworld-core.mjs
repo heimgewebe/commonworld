@@ -6,7 +6,7 @@ export const DEFAULT_CAMERA = Object.freeze({
   pitch: 0,
 });
 
-export const DIGITAL_LAYER_TRANSITION_MS = 760;
+export const DIGITAL_LAYER_TRANSITION_MS = 1080;
 
 export const LAYERS = Object.freeze([
   Object.freeze({ id: 'knowledge_data', label: 'Wissen und offene Daten', trackLabel: 'Wissen', themes: ['knowledge', 'open-data', 'research', 'documentation'] }),
@@ -47,6 +47,18 @@ export function deriveLayer(record) {
   return winners.length === 1 ? winners[0].id : 'mixed_other';
 }
 
+
+export function binaryName(value) {
+  return [...new TextEncoder().encode(String(value ?? ''))]
+    .map((byte) => byte.toString(2).padStart(8, '0'))
+    .join(' ');
+}
+
+export function ribbonRepeatCount(recordCount, minimumSegments = 12) {
+  const count = Number.isInteger(recordCount) && recordCount > 0 ? recordCount : 1;
+  const minimum = Number.isInteger(minimumSegments) && minimumSegments > 0 ? minimumSegments : 12;
+  return clamp(Math.ceil(minimum / count), 2, 6);
+}
 export function binaryFragment(identifier, length = 12) {
   let hash = 2166136261;
   for (const character of String(identifier)) {
@@ -58,49 +70,6 @@ export function binaryFragment(identifier, length = 12) {
   return bits.slice(0, length);
 }
 
-export function sphereStartOffset(layerIndex, recordIndex, recordCount) {
-  const count = Number.isInteger(recordCount) && recordCount > 0 ? recordCount : 1;
-  const layer = Number.isInteger(layerIndex) && layerIndex >= 0 ? layerIndex : 0;
-  const index = Number.isInteger(recordIndex) && recordIndex >= 0 ? recordIndex : 0;
-  const normalized = ((index / count + layer * 0.43) % 1 + 1) % 1;
-  return Number((8 + normalized * 72).toFixed(4));
-}
-
-
-function orbitalPoint(profile, angleDegrees) {
-  const angle = angleDegrees * Math.PI / 180;
-  const rotation = profile.rotation * Math.PI / 180;
-  const localX = Math.cos(angle) * profile.rx;
-  const localY = Math.sin(angle) * profile.ry;
-  return {
-    x: 320 + localX * Math.cos(rotation) - localY * Math.sin(rotation),
-    y: 320 + localX * Math.sin(rotation) + localY * Math.cos(rotation),
-  };
-}
-
-export function sphereLayerRowY(layerIndex) {
-  const layer = Number.isInteger(layerIndex) ? clamp(layerIndex, 0, LAYERS.length - 1) : 0;
-  return 210 + layer * 48;
-}
-
-export function sphereLabelLayout(layerIndex, recordIndex, recordCount) {
-  const layer = Number.isInteger(layerIndex) ? clamp(layerIndex, 0, LAYERS.length - 1) : 0;
-  const count = Number.isInteger(recordCount) && recordCount > 0 ? recordCount : 1;
-  const index = Number.isInteger(recordIndex) ? clamp(recordIndex, 0, count - 1) : 0;
-  const profile = ORBIT_PROFILES[layer];
-  const overviewAngle = sphereStartOffset(layer, index, count) * 3.6 - 90;
-  const overview = orbitalPoint(profile, overviewAngle);
-  const sideX = count === 1 ? 350 : 285 + index * (130 / Math.max(1, count - 1));
-  const focusedSideX = count === 1 ? 320 : 185 + index * (270 / Math.max(1, count - 1));
-  return Object.freeze({
-    overviewX: rounded(overview.x, 2),
-    overviewY: rounded(overview.y, 2),
-    sideX: rounded(sideX, 2),
-    sideY: sphereLayerRowY(layer),
-    focusedSideX: rounded(focusedSideX, 2),
-    focusedSideY: 320,
-  });
-}
 
 export function sphereDetailLevel({ diameter, sideView = false } = {}) {
   if (sideView) return 'close';
@@ -110,11 +79,6 @@ export function sphereDetailLevel({ diameter, sideView = false } = {}) {
   return 'names';
 }
 
-export function sphereProjectScale(diameter, detailLevel = 'names') {
-  const size = Math.max(1, finite(diameter, 640));
-  const targetPixels = detailLevel === 'close' ? 20.5 : detailLevel === 'compact' ? 11.5 : detailLevel === 'micro' ? 10.5 : 12.5;
-  return rounded((targetPixels / 12) * (640 / size), 5);
-}
 
 export function cameraFromSearch(search = '') {
   const parameters = new URLSearchParams(search.startsWith('?') ? search.slice(1) : search);
@@ -241,10 +205,10 @@ export function sphereLayout({ width, height, padding = {}, globe = null, sideVi
   const fallbackY = top + availableHeight / 2;
   const shortestSide = Math.min(stageWidth, stageHeight);
   if (sideView) {
-    const diameter = Math.max(stageWidth * 1.35, stageHeight * 1.1);
+    const diameter = Math.max(stageWidth * 2.05, stageHeight * 2.25);
     return {
-      x: rounded(stageWidth / 2, 2),
-      y: rounded(stageHeight * 0.52, 2),
+      x: rounded(stageWidth * 0.08, 2),
+      y: rounded(stageHeight * 0.58, 2),
       diameter: rounded(diameter, 2),
       globeDiameter: rounded(diameter, 2),
     };
@@ -257,22 +221,22 @@ export function sphereLayout({ width, height, padding = {}, globe = null, sideVi
   return {
     x: rounded(x, 2),
     y: rounded(y, 2),
-    diameter: rounded(globeDiameter * 1.18, 2),
+    diameter: rounded(globeDiameter * 1.32, 2),
     globeDiameter: rounded(globeDiameter, 2),
   };
 }
 
 export function digitalLayerCamera(camera = DEFAULT_CAMERA) {
   const bearing = finite(camera?.bearing, DEFAULT_CAMERA.bearing);
-  const normalizedBearing = ((((bearing + 18) + 180) % 360) + 360) % 360 - 180;
+  const normalizedBearing = ((((bearing + 28) + 180) % 360) + 360) % 360 - 180;
   return {
     center: [
       clamp(finite(camera?.lng, DEFAULT_CAMERA.lng), -180, 180),
       clamp(finite(camera?.lat, DEFAULT_CAMERA.lat), -85, 85),
     ],
-    zoom: clamp(Math.max(1.95, finite(camera?.zoom, DEFAULT_CAMERA.zoom) + 0.72), 0, 8),
+    zoom: clamp(Math.max(2.15, finite(camera?.zoom, DEFAULT_CAMERA.zoom) + 1.05), 0, 8),
     bearing: rounded(normalizedBearing, 1),
-    pitch: 52,
+    pitch: 58,
     padding: { top: 0, right: 0, bottom: 0, left: 0 },
   };
 }
