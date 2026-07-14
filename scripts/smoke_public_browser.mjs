@@ -234,21 +234,26 @@ async function layerJourneyScenario({ mobile = false } = {}) {
 
   const zoomOutBox = await run.page.locator('.maplibregl-ctrl-zoom-out').boundingBox();
   assert(zoomOutBox, 'layer journey: zoom-out control has no geometry');
+  let previousZoomOutWidth = afterSecondZoom.width;
+  let restoredScale = null;
   for (let index = 0; index < 2; index += 1) {
     if (mobile) await run.page.touchscreen.tap(zoomOutBox.x + zoomOutBox.width / 2, zoomOutBox.y + zoomOutBox.height / 2);
     else await run.page.mouse.click(zoomOutBox.x + zoomOutBox.width / 2, zoomOutBox.y + zoomOutBox.height / 2);
     await run.page.waitForTimeout(700);
+    restoredScale = await run.page.locator('#digital-sphere').boundingBox();
+    const projectedZoomOut = await independentProjectedGlobeDiameter(run.page);
+    const declaredZoomOut = Number(await stage.getAttribute('data-globe-diameter'));
+    assert(restoredScale && restoredScale.width < previousZoomOutWidth * 0.96, `layer journey: zoom-out did not shrink visible sphere (${previousZoomOutWidth} -> ${restoredScale?.width})`);
+    assert(Math.abs(declaredZoomOut - projectedZoomOut) <= 1, `layer journey: zoom-out lost MapLibre horizon coupling (${declaredZoomOut} vs ${projectedZoomOut})`);
+    assert(Math.abs(restoredScale.width - declaredZoomOut * 1.18) <= 2, `layer journey: zoom-out lost outer-shell ratio (${restoredScale.width} vs ${declaredZoomOut})`);
+    previousZoomOutWidth = restoredScale.width;
   }
   assert((await stage.getAttribute('data-view-phase')) === 'overview', 'layer journey: scaled sphere stole the zoom-out control and opened layers');
-  await run.page.waitForFunction((targetWidth) => {
-    const width = document.querySelector('#digital-sphere')?.getBoundingClientRect().width ?? 0;
-    return Math.abs(width - targetWidth) <= 2;
-  }, before.width);
-  const restoredScale = await run.page.locator('#digital-sphere').boundingBox();
-  assert(restoredScale && Math.abs(restoredScale.width - before.width) <= 2, `layer journey: sphere scale did not return after two zoom steps (${before.width} -> ${restoredScale?.width})`);
+  assert(restoredScale, 'layer journey: sphere disappeared after zoom-out');
   await waitForSphereOpacitySettled(run.page);
   const opacityRestored = Number(await run.page.locator('#digital-sphere').evaluate((node) => getComputedStyle(node).opacity));
-  assert(opacityRestored === opacityBefore, `layer journey: sphere opacity did not return with visible globe scale (${opacityBefore} -> ${opacityRestored})`);
+  const ratioRestored = Number(await stage.getAttribute('data-globe-viewport-ratio'));
+  assert(Math.abs(opacityRestored - sphereOpacityForGlobeRatio(ratioRestored)) <= 0.01, `layer journey: zoom-out opacity does not follow visible globe ratio (${opacityRestored} at ${ratioRestored})`);
 
   const mapBox = await run.page.locator('#map').boundingBox();
   assert(mapBox, 'layer journey: map has no geometry');
