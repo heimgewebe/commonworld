@@ -38,7 +38,7 @@
         <figure class="globe-stage" aria-labelledby="globe-caption" data-runtime-state="loading" data-view-phase="overview" data-map-renders="0" data-overlay-renders="0">
           <div id="map" class="globe-map" role="region" aria-label="Interaktiver Commonworld-Globus"></div>
           <svg id="digital-sphere" class="digital-sphere" viewBox="0 0 640 640" role="group" aria-labelledby="sphere-title">
-            <title id="sphere-title">Digitale Commons-Sphäre mit sechs abgeleiteten Schichten</title>
+            <title id="sphere-title">Orbitales Commons-Netz mit sechs abgeleiteten Schichten</title>
             <defs>
               <radialGradient id="sphere-center-fade">
                 <stop offset="0%" stop-color="black" />
@@ -48,21 +48,21 @@
               </radialGradient>
               <mask id="sphere-mask"><rect width="640" height="640" fill="url(#sphere-center-fade)" /></mask>
               <g id="sphere-paths" fill="none">
-              <circle id="sphere-path-1" cx="320" cy="320" r="316" />
-              <circle id="sphere-path-2" cx="320" cy="320" r="308" />
-              <circle id="sphere-path-3" cx="320" cy="320" r="300" />
-              <circle id="sphere-path-4" cx="320" cy="320" r="292" />
-              <circle id="sphere-path-5" cx="320" cy="320" r="284" />
-              <circle id="sphere-path-6" cx="320" cy="320" r="276" />
+              <ellipse id="sphere-path-1" cx="320" cy="320" rx="316" ry="300" transform="rotate(-8 320 320)" />
+              <ellipse id="sphere-path-2" cx="320" cy="320" rx="310" ry="282" transform="rotate(20 320 320)" />
+              <ellipse id="sphere-path-3" cx="320" cy="320" rx="304" ry="268" transform="rotate(43 320 320)" />
+              <ellipse id="sphere-path-4" cx="320" cy="320" rx="298" ry="288" transform="rotate(-31 320 320)" />
+              <ellipse id="sphere-path-5" cx="320" cy="320" rx="292" ry="274" transform="rotate(63 320 320)" />
+              <ellipse id="sphere-path-6" cx="320" cy="320" rx="286" ry="294" transform="rotate(-62 320 320)" />
               </g>
             </defs>
             <g id="sphere-rings" aria-hidden="true">
-              <use href="#sphere-path-1"></use>
-              <use href="#sphere-path-2"></use>
-              <use href="#sphere-path-3"></use>
-              <use href="#sphere-path-4"></use>
-              <use href="#sphere-path-5"></use>
-              <use href="#sphere-path-6"></use>
+              <use href="#sphere-path-1" data-layer-id="knowledge_data"></use>
+              <use href="#sphere-path-2" data-layer-id="software_infrastructure"></use>
+              <use href="#sphere-path-3" data-layer-id="media_culture"></use>
+              <use href="#sphere-path-4" data-layer-id="learning_education"></use>
+              <use href="#sphere-path-5" data-layer-id="communication_networks"></use>
+              <use href="#sphere-path-6" data-layer-id="mixed_other"></use>
             </g>
             <g id="sphere-streams" mask="url(#sphere-mask)"></g>
             <circle id="sphere-edge-control" class="sphere-edge-control" cx="320" cy="320" r="318" fill="none" stroke="transparent" stroke-width="20" pointer-events="stroke" role="button" tabindex="0" aria-label="Digitale Commons-Schichten öffnen"></circle>
@@ -82,7 +82,7 @@
 
           <aside id="layer-panel" class="layer-panel" aria-labelledby="layer-title" hidden>
             <h2 id="layer-title" class="visually-hidden">Digitale Commons aus der Nähe</h2>
-            <p class="visually-hidden">Dieselben Commons, die in der Totalen klein auf den Ringen liegen, sind nun als angeschnittene Inhaltsbahnen vergrößert.</p>
+            <p class="visually-hidden">Dieselben Commons erscheinen als Lichtpunkte auf sechs Orbits und bleiben beim Nahflug direkt auswählbar.</p>
             <button id="layer-close" class="icon-button layer-close" type="button" aria-label="Zur Globusansicht zurückkehren">×</button>
             <div id="layer-buttons" class="layer-buttons" hidden></div>
             <div id="layer-projects" class="layer-projects" hidden></div>

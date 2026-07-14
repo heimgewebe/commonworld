@@ -355,13 +355,30 @@ async function layerJourneyScenario({ mobile = false, viewportOverride = null, t
   assert(new Set(tangentView.visibleLabels.map(({ layer }) => layer)).size >= 3, `layer journey: close-up does not expose multiple content tracks (${JSON.stringify(tangentView.visibleLabels)})`);
   assert(tangentView.visibleLabels.every(({ height }) => height >= 18), `layer journey: close-up contents did not become legible (${JSON.stringify(tangentView.visibleLabels)})`);
   assert(tangentView.stackChildren === 0 && tangentView.projectChildren === 0 && tangentView.filterChildren === 0, `layer journey: substitute labels, cards or filters remain in the spatial view (${JSON.stringify(tangentView)})`);
-  const directContent = run.page.locator('.sphere-label[data-commonproject-id="debian"]');
-  await directContent.click();
-  assert(await run.page.locator('#project-focus').isVisible(), 'layer journey: enlarged track content did not open its Commons focus');
-  assert((await run.page.locator('#focus-title').textContent()) === 'Debian', 'layer journey: enlarged track opened the wrong Commons identity');
+  const directChoice = await run.page.evaluate(() => {
+    const topbarBottom = document.querySelector('.topbar')?.getBoundingClientRect().bottom ?? 0;
+    return [...document.querySelectorAll('.sphere-project[data-commonproject-id]')].flatMap((project) => {
+      const hit = project.querySelector('.sphere-project-hit');
+      const text = project.querySelector('.sphere-project-text');
+      const rect = hit?.getBoundingClientRect();
+      if (!rect || rect.width < 44 || rect.height < 44) return [];
+      const centerX = rect.left + rect.width / 2;
+      const centerY = rect.top + rect.height / 2;
+      const visible = centerX >= 0 && centerX <= innerWidth && centerY > topbarBottom && centerY <= innerHeight;
+      return visible ? [{ id: project.dataset.commonprojectId, title: text?.textContent ?? '', rect: { left: rect.left, top: rect.top, width: rect.width, height: rect.height } }] : [];
+    })[0] ?? null;
+  });
+  assert(directChoice, 'layer journey: no directly selectable visible Commons light point');
+  const directContent = run.page.locator(`.sphere-project[data-commonproject-id="${directChoice.id}"]`);
+  const directHitTarget = directContent.locator('.sphere-project-hit');
+  const directHitBox = await directHitTarget.boundingBox();
+  assert(directHitBox && directHitBox.width >= 44 && directHitBox.height >= 44, `layer journey: project light point has an undersized touch target (${JSON.stringify(directHitBox)})`);
+  await directHitTarget.click();
+  assert(await run.page.locator('#project-focus').isVisible(), 'layer journey: enlarged orbital content did not open its Commons focus');
+  assert((await run.page.locator('#focus-title').textContent()) === directChoice.title, `layer journey: enlarged orbit opened the wrong Commons identity (${JSON.stringify(directChoice)})`);
   await run.page.locator('#focus-close').click();
   assert(await run.page.locator('#project-focus').isHidden(), 'layer journey: Commons focus did not close');
-  assert(await directContent.evaluate((node) => document.activeElement === node), 'layer journey: focus did not return to the same content track');
+  assert(await directContent.evaluate((node) => document.activeElement === node), 'layer journey: focus did not return to the same orbital content');
   const viewportFit = await run.page.evaluate(() => ({
     viewportWidth: innerWidth,
     documentWidth: document.documentElement.scrollWidth,
@@ -535,8 +552,9 @@ try {
   await catalogueFailureScenario();
   await providerFailureScenario();
   await methodScenario();
-  process.stdout.write(`${JSON.stringify({ verdict: 'PASS', scenarios: results })}\n`);
 } finally {
   await browser.close();
-  await new Promise((resolve) => server.close(resolve));
+  server.closeAllConnections?.();
+  await new Promise((resolve, reject) => server.close((error) => (error ? reject(error) : resolve())));
 }
+process.stdout.write(`${JSON.stringify({ verdict: 'PASS', scenarios: results })}\n`);

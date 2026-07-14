@@ -2,7 +2,6 @@ import {
   DEFAULT_CAMERA,
   DIGITAL_LAYER_TRANSITION_MS,
   LAYERS,
-  binaryFragment,
   deriveLayer,
   digitalLayerCamera,
   filterRecords,
@@ -12,8 +11,10 @@ import {
   normalizeQuery,
   projectedGlobeCircle,
   searchFromState,
+  sphereDetailLevel,
   sphereLabelLayout,
   sphereLayout,
+  sphereProjectScale,
   sphereOpacityForGlobeRatio,
   stateFromSearch,
 } from './commonworld-core.mjs';
@@ -181,6 +182,27 @@ function createSvgElement(name, attributes = {}) {
   return element;
 }
 
+function sphereTextAnchor(directionX) {
+  if (directionX > 0.28) return 'start';
+  if (directionX < -0.28) return 'end';
+  return 'middle';
+}
+
+function configureSphereProject(project, sideView = false) {
+  const mode = sideView ? 'side' : 'overview';
+  const directionX = Number(project.dataset[`${mode}Dx`] ?? 0);
+  const directionY = Number(project.dataset[`${mode}Dy`] ?? -1);
+  const leaderLength = sideView ? 22 : 18;
+  const labelDistance = sideView ? 30 : 26;
+  const leader = project.querySelector('.sphere-project-leader');
+  const text = project.querySelector('.sphere-project-text');
+  leader?.setAttribute('x2', String(Number((directionX * leaderLength).toFixed(2))));
+  leader?.setAttribute('y2', String(Number((directionY * leaderLength).toFixed(2))));
+  text?.setAttribute('x', String(Number((directionX * labelDistance).toFixed(2))));
+  text?.setAttribute('y', String(Number((directionY * labelDistance).toFixed(2))));
+  text?.setAttribute('text-anchor', sphereTextAnchor(directionX));
+}
+
 function renderSphere() {
   elements.sphereStreams.replaceChildren();
   const grouped = new Map(LAYERS.map((layer) => [layer.id, []]));
@@ -188,36 +210,67 @@ function renderSphere() {
   LAYERS.forEach((layer, layerIndex) => {
     const records = grouped.get(layer.id) ?? [];
     records.forEach((record, recordIndex) => {
-      const text = createSvgElement('text', {
-        class: 'sphere-label',
+      const project = createSvgElement('g', {
+        class: 'sphere-project sphere-label',
         'data-commonproject-id': record.id,
         'data-layer-id': layer.id,
+        'data-priority': String(recordIndex === 0),
         role: 'button',
         tabindex: '-1',
+        focusable: 'true',
         'aria-label': `${record.title} öffnen`,
       });
       const layout = sphereLabelLayout(layerIndex, recordIndex, records.length);
-      text.style.setProperty('--label-overview-x', `${layout.overviewX}px`);
-      text.style.setProperty('--label-overview-y', `${layout.overviewY}px`);
-      text.style.setProperty('--label-overview-rotation', `${layout.overviewRotation}deg`);
-      text.style.setProperty('--label-side-x', `${layout.sideX}px`);
-      text.style.setProperty('--label-side-y', `${layout.sideY}px`);
-      const name = createSvgElement('tspan', { class: 'sphere-name' });
-      name.textContent = record.title;
-      const binary = createSvgElement('tspan', { class: 'sphere-binary', dx: '8' });
-      binary.textContent = binaryFragment(record.id);
-      text.append(name, binary);
-      text.addEventListener('click', () => {
-        if (runtime.viewPhase === 'layers') selectProject(record.id, { trigger: text });
+      project.style.setProperty('--project-overview-x', `${layout.overviewX}px`);
+      project.style.setProperty('--project-overview-y', `${layout.overviewY}px`);
+      project.style.setProperty('--project-side-x', `${layout.sideX}px`);
+      project.style.setProperty('--project-side-y', `${layout.sideY}px`);
+      project.dataset.overviewDx = String(layout.overviewDx);
+      project.dataset.overviewDy = String(layout.overviewDy);
+      project.dataset.sideDx = String(layout.sideDx);
+      project.dataset.sideDy = String(layout.sideDy);
+      const hit = createSvgElement('circle', {
+        class: 'sphere-project-hit',
+        cx: '0',
+        cy: '0',
+        r: '13',
+        'aria-hidden': 'true',
       });
-      text.addEventListener('keydown', (event) => {
+      const leader = createSvgElement('line', {
+        class: 'sphere-project-leader',
+        x1: '0',
+        y1: '0',
+        x2: '0',
+        y2: '-18',
+        'aria-hidden': 'true',
+      });
+      const node = createSvgElement('circle', {
+        class: 'sphere-project-node',
+        cx: '0',
+        cy: '0',
+        r: '3.4',
+        'aria-hidden': 'true',
+      });
+      const text = createSvgElement('text', {
+        class: 'sphere-project-text sphere-name',
+        x: '0',
+        y: '-26',
+      });
+      text.textContent = record.title;
+      project.append(hit, leader, node, text);
+      configureSphereProject(project, false);
+      project.addEventListener('click', () => {
+        if (runtime.viewPhase === 'layers') selectProject(record.id, { trigger: project });
+      });
+      project.addEventListener('keydown', (event) => {
         if (runtime.viewPhase !== 'layers' || !['Enter', ' '].includes(event.key)) return;
         event.preventDefault();
-        selectProject(record.id, { trigger: text });
+        selectProject(record.id, { trigger: project });
       });
-      elements.sphereStreams.append(text);
+      elements.sphereStreams.append(project);
     });
   });
+  elements.sphere.dataset.projectMode = 'overview';
   runtime.overlayRenderCount += 1;
   elements.stage.dataset.overlayRenders = String(runtime.overlayRenderCount);
 }
@@ -272,8 +325,12 @@ function renderTextView() {
 
 function updateSphereResultVisibility() {
   const visibleIds = new Set(visibleRecords().map(({ id }) => id));
-  elements.sphere.querySelectorAll('.sphere-label[data-commonproject-id]').forEach((label) => {
-    label.toggleAttribute('data-filtered-out', !visibleIds.has(label.dataset.commonprojectId));
+  const queryIds = runtime.state.query
+    ? new Set(recordsMatchingQuery().map(({ id }) => id))
+    : new Set();
+  elements.sphere.querySelectorAll('.sphere-project[data-commonproject-id]').forEach((project) => {
+    project.toggleAttribute('data-filtered-out', !visibleIds.has(project.dataset.commonprojectId));
+    project.toggleAttribute('data-query-match', queryIds.has(project.dataset.commonprojectId));
   });
 }
 
@@ -462,6 +519,17 @@ function updateSphereGeometry() {
   elements.stage.dataset.sphereSize = String(geometry.diameter);
   elements.stage.dataset.globeDiameter = String(geometry.globeDiameter);
   elements.stage.dataset.globeGeometrySource = sideView ? 'side-view-layout' : 'maplibre-projected-horizon';
+  const detailLevel = sphereDetailLevel({ diameter: geometry.diameter, sideView });
+  const projectScale = sphereProjectScale(geometry.diameter, detailLevel);
+  elements.sphere.dataset.detailLevel = detailLevel;
+  elements.sphere.style.setProperty('--project-scale', String(projectScale));
+  const projectMode = sideView ? 'side' : 'overview';
+  if (elements.sphere.dataset.projectMode !== projectMode) {
+    elements.sphere.querySelectorAll('.sphere-project[data-commonproject-id]').forEach((project) => configureSphereProject(project, sideView));
+    elements.sphere.dataset.projectMode = projectMode;
+  }
+  elements.stage.dataset.sphereDetailLevel = detailLevel;
+  elements.stage.dataset.sphereProjectScale = String(projectScale);
   elements.stage.dataset.mapZoom = String(Number(runtime.map.getZoom().toFixed(4)));
   setSphereOpacity({ globeDiameter: geometry.globeDiameter, rect });
 }

@@ -268,37 +268,85 @@ a {
   visibility: hidden;
 }
 
-#sphere-paths circle {
-  stroke: rgba(112, 181, 223, 0.17);
-  stroke-width: 1;
+#sphere-paths ellipse {
+  fill: none;
 }
 
-.sphere-label {
-  fill: rgba(195, 231, 248, 0.74);
-  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
-  font-size: 11px;
-  letter-spacing: 0.045em;
-  text-anchor: middle;
-  dominant-baseline: central;
+.sphere-project {
+  color: rgba(195, 231, 248, 0.78);
   transform-box: view-box;
   transform-origin: 0 0;
-  transform: translate(var(--label-overview-x), var(--label-overview-y)) rotate(var(--label-overview-rotation));
+  transform: translate(var(--project-overview-x), var(--project-overview-y)) scale(var(--project-scale, 1));
+  opacity: 0.9;
+  pointer-events: none;
   transition:
     transform 760ms cubic-bezier(0.22, 1, 0.36, 1),
-    opacity 120ms linear,
-    fill 120ms linear,
-    font-size 120ms linear;
+    opacity 180ms linear,
+    color 180ms linear;
 }
 
-.sphere-label[data-layer-id="knowledge_data"] { fill: rgba(112, 181, 223, 0.84); }
-.sphere-label[data-layer-id="software_infrastructure"] { fill: rgba(103, 210, 154, 0.84); }
-.sphere-label[data-layer-id="media_culture"] { fill: rgba(224, 173, 105, 0.84); }
-.sphere-label[data-layer-id="learning_education"] { fill: rgba(197, 158, 232, 0.84); }
-.sphere-label[data-layer-id="communication_networks"] { fill: rgba(116, 216, 207, 0.84); }
-.sphere-label[data-layer-id="mixed_other"] { fill: rgba(220, 228, 224, 0.72); }
-.sphere-label[data-filtered-out] { opacity: 0.08; }
-.sphere-label.is-selected { fill: var(--focus); font-size: 13px; }
-.sphere-binary { opacity: 0.46; }
+.sphere-project-hit {
+  fill: transparent;
+  pointer-events: none;
+}
+
+.sphere-project-node {
+  fill: currentColor;
+  stroke: rgba(4, 14, 12, 0.88);
+  stroke-width: 1.25;
+  vector-effect: non-scaling-stroke;
+  filter: drop-shadow(0 0 3px currentColor);
+  transform-box: fill-box;
+  transform-origin: center;
+  transition: transform 180ms ease, fill 180ms ease;
+}
+
+.sphere-project-leader {
+  stroke: currentColor;
+  stroke-width: 1;
+  stroke-linecap: round;
+  vector-effect: non-scaling-stroke;
+  opacity: 0.54;
+  transition: opacity 180ms ease;
+}
+
+.sphere-project-text {
+  fill: currentColor;
+  font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  font-size: 12px;
+  font-weight: 690;
+  letter-spacing: 0.005em;
+  dominant-baseline: central;
+  paint-order: stroke;
+  stroke: rgba(4, 14, 12, 0.94);
+  stroke-width: 2.6px;
+  stroke-linejoin: round;
+  transition: opacity 180ms ease, fill 180ms ease;
+}
+
+.sphere-project[data-layer-id="knowledge_data"] { color: rgba(123, 195, 238, 0.94); }
+.sphere-project[data-layer-id="software_infrastructure"] { color: rgba(112, 225, 165, 0.94); }
+.sphere-project[data-layer-id="media_culture"] { color: rgba(239, 183, 109, 0.94); }
+.sphere-project[data-layer-id="learning_education"] { color: rgba(207, 169, 239, 0.94); }
+.sphere-project[data-layer-id="communication_networks"] { color: rgba(124, 226, 216, 0.94); }
+.sphere-project[data-layer-id="mixed_other"] { color: rgba(226, 235, 231, 0.84); }
+.sphere-project[data-filtered-out] { opacity: 0.07; }
+.sphere-project.is-selected { color: var(--focus); opacity: 1; }
+.sphere-project.is-selected .sphere-project-node { transform: scale(1.55); }
+
+.digital-sphere[data-detail-level="micro"] .sphere-project-text,
+.digital-sphere[data-detail-level="micro"] .sphere-project-leader,
+.digital-sphere[data-detail-level="compact"] .sphere-project:not([data-priority="true"]):not([data-query-match]):not(.is-selected) .sphere-project-text,
+.digital-sphere[data-detail-level="compact"] .sphere-project:not([data-priority="true"]):not([data-query-match]):not(.is-selected) .sphere-project-leader {
+  opacity: 0;
+}
+
+.digital-sphere[data-detail-level="micro"] .sphere-project[data-query-match] .sphere-project-text,
+.digital-sphere[data-detail-level="micro"] .sphere-project[data-query-match] .sphere-project-leader,
+.digital-sphere[data-detail-level="micro"] .sphere-project.is-selected .sphere-project-text,
+.digital-sphere[data-detail-level="micro"] .sphere-project.is-selected .sphere-project-leader {
+  opacity: 1;
+}
 
 .sphere-edge-control {
   pointer-events: stroke;
@@ -913,17 +961,25 @@ a {
 
 #sphere-rings use {
   fill: none;
-  stroke: rgba(112, 181, 223, 0.17);
-  stroke-width: 1;
+  stroke: rgba(112, 181, 223, 0.18);
+  stroke-width: 1.05;
+  stroke-linecap: round;
   transform-box: view-box;
   transform-origin: 320px 320px;
   vector-effect: non-scaling-stroke;
   transition:
     transform 760ms cubic-bezier(0.22, 1, 0.36, 1),
-    fill 520ms ease,
     stroke 520ms ease,
-    stroke-width 520ms ease;
+    stroke-width 520ms ease,
+    opacity 520ms ease;
 }
+
+#sphere-rings use[data-layer-id="knowledge_data"] { stroke: rgba(123, 195, 238, 0.34); }
+#sphere-rings use[data-layer-id="software_infrastructure"] { stroke: rgba(112, 225, 165, 0.3); stroke-dasharray: 1 7; }
+#sphere-rings use[data-layer-id="media_culture"] { stroke: rgba(239, 183, 109, 0.28); stroke-dasharray: 12 10; }
+#sphere-rings use[data-layer-id="learning_education"] { stroke: rgba(207, 169, 239, 0.3); stroke-dasharray: 4 8; }
+#sphere-rings use[data-layer-id="communication_networks"] { stroke: rgba(124, 226, 216, 0.3); stroke-dasharray: 18 9 2 9; }
+#sphere-rings use[data-layer-id="mixed_other"] { stroke: rgba(226, 235, 231, 0.22); stroke-dasharray: 2 11; }
 
 #sphere-streams {
   transition: opacity 320ms ease;
@@ -1142,19 +1198,14 @@ a {
   stroke-width: 1.35;
 }
 
-.globe-stage.layer-view-open .sphere-label {
-  transform: translate(var(--label-side-x), var(--label-side-y));
-  font-size: 10px;
-  font-weight: 720;
-  letter-spacing: 0.035em;
-  paint-order: stroke;
-  stroke: rgba(4, 14, 12, 0.82);
-  stroke-width: 0.85px;
-  stroke-linejoin: round;
+.globe-stage.layer-view-open .sphere-project {
+  transform: translate(var(--project-side-x), var(--project-side-y)) scale(var(--project-scale, 1));
+  opacity: 1;
 }
 
-.globe-stage.layer-view-open .sphere-binary {
-  display: none;
+.globe-stage.layer-view-open .sphere-project-text {
+  font-weight: 730;
+  stroke-width: 3.2px;
 }
 
 .globe-stage.layer-view-open .sphere-edge-control {
@@ -1163,19 +1214,33 @@ a {
 }
 
 .globe-stage.layer-view-settled .digital-sphere {
-  pointer-events: auto;
+  pointer-events: none;
 }
 
-.globe-stage.layer-view-settled .sphere-label {
+.globe-stage.layer-view-settled .sphere-project {
   cursor: pointer;
-  pointer-events: visiblePainted;
+  pointer-events: none;
 }
 
-.globe-stage.layer-view-settled .sphere-label:focus {
-  fill: var(--focus);
+.globe-stage.layer-view-settled .sphere-project-hit,
+.globe-stage.layer-view-settled .sphere-project-node,
+.globe-stage.layer-view-settled .sphere-project-leader,
+.globe-stage.layer-view-settled .sphere-project-text {
+  pointer-events: all;
+}
+
+.globe-stage.layer-view-settled .sphere-project:focus {
+  color: var(--focus);
   outline: none;
-  stroke: rgba(5, 16, 14, 0.96);
-  stroke-width: 1.2px;
+}
+
+.globe-stage.layer-view-settled .sphere-project:focus .sphere-project-node {
+  transform: scale(1.5);
+}
+
+.globe-stage.layer-view-settled .sphere-project:focus .sphere-project-text {
+  stroke: rgba(5, 16, 14, 0.98);
+  stroke-width: 3.6px;
 }
 
 .layer-stack-visual {

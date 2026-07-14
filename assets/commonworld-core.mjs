@@ -17,6 +17,15 @@ export const LAYERS = Object.freeze([
   Object.freeze({ id: 'mixed_other', label: 'Gemischte und weitere digitale Commons', themes: [] }),
 ]);
 
+export const ORBIT_PROFILES = Object.freeze([
+  Object.freeze({ rx: 316, ry: 300, rotation: -8 }),
+  Object.freeze({ rx: 310, ry: 282, rotation: 20 }),
+  Object.freeze({ rx: 304, ry: 268, rotation: 43 }),
+  Object.freeze({ rx: 298, ry: 288, rotation: -31 }),
+  Object.freeze({ rx: 292, ry: 274, rotation: 63 }),
+  Object.freeze({ rx: 286, ry: 294, rotation: -62 }),
+]);
+
 const finite = (value, fallback) => {
   if (value === null || value === undefined || value === '') return fallback;
   const number = Number(value);
@@ -58,25 +67,66 @@ export function sphereStartOffset(layerIndex, recordIndex, recordCount) {
 }
 
 
+function orbitalPoint(profile, angleDegrees) {
+  const angle = angleDegrees * Math.PI / 180;
+  const rotation = profile.rotation * Math.PI / 180;
+  const localX = Math.cos(angle) * profile.rx;
+  const localY = Math.sin(angle) * profile.ry;
+  return {
+    x: 320 + localX * Math.cos(rotation) - localY * Math.sin(rotation),
+    y: 320 + localX * Math.sin(rotation) + localY * Math.cos(rotation),
+  };
+}
+
+function outwardDirection(point) {
+  const x = point.x - 320;
+  const y = point.y - 320;
+  const length = Math.max(1, Math.hypot(x, y));
+  return { x: x / length, y: y / length };
+}
+
+function upperOrbitAngle(profile) {
+  const rotation = profile.rotation * Math.PI / 180;
+  const coefficientX = Math.sin(rotation) * profile.rx;
+  const coefficientY = Math.cos(rotation) * profile.ry;
+  return (Math.atan2(coefficientY, coefficientX) + Math.PI) * 180 / Math.PI;
+}
+
 export function sphereLabelLayout(layerIndex, recordIndex, recordCount) {
   const layer = Number.isInteger(layerIndex) ? clamp(layerIndex, 0, LAYERS.length - 1) : 0;
   const count = Number.isInteger(recordCount) && recordCount > 0 ? recordCount : 1;
   const index = Number.isInteger(recordIndex) ? clamp(recordIndex, 0, count - 1) : 0;
-  const offset = sphereStartOffset(layer, index, count);
-  const angleDegrees = offset * 3.6 - 90;
-  const angle = angleDegrees * Math.PI / 180;
-  const radius = 316 - layer * 8;
-  const overviewX = 320 + Math.cos(angle) * radius;
-  const overviewY = 320 + Math.sin(angle) * radius;
-  const sideX = count === 1 ? 320 : 285 + index * (70 / Math.max(1, count - 1));
-  const sideY = 9 + layer * 11;
+  const profile = ORBIT_PROFILES[layer];
+  const overviewAngle = sphereStartOffset(layer, index, count) * 3.6 - 90;
+  const overview = orbitalPoint(profile, overviewAngle);
+  const overviewDirection = outwardDirection(overview);
+  const sideSpread = (layer - (LAYERS.length - 1) / 2) * 10.8 + (index - (count - 1) / 2) * 4;
+  const side = orbitalPoint(profile, upperOrbitAngle(profile) + sideSpread);
+  const sideDirection = outwardDirection(side);
   return Object.freeze({
-    overviewX: rounded(overviewX, 2),
-    overviewY: rounded(overviewY, 2),
-    overviewRotation: rounded(angleDegrees + 90, 2),
-    sideX: rounded(sideX, 2),
-    sideY: rounded(sideY, 2),
+    overviewX: rounded(overview.x, 2),
+    overviewY: rounded(overview.y, 2),
+    overviewDx: rounded(overviewDirection.x, 4),
+    overviewDy: rounded(overviewDirection.y, 4),
+    sideX: rounded(side.x, 2),
+    sideY: rounded(side.y, 2),
+    sideDx: rounded(sideDirection.x, 4),
+    sideDy: rounded(sideDirection.y, 4),
   });
+}
+
+export function sphereDetailLevel({ diameter, sideView = false } = {}) {
+  if (sideView) return 'close';
+  const size = Math.max(0, finite(diameter, 0));
+  if (size < 360) return 'micro';
+  if (size < 620) return 'compact';
+  return 'names';
+}
+
+export function sphereProjectScale(diameter, detailLevel = 'names') {
+  const size = Math.max(1, finite(diameter, 640));
+  const targetPixels = detailLevel === 'close' ? 20.5 : detailLevel === 'compact' ? 11.5 : detailLevel === 'micro' ? 10.5 : 12.5;
+  return rounded((targetPixels / 12) * (640 / size), 5);
 }
 
 export function cameraFromSearch(search = '') {

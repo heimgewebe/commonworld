@@ -4,6 +4,7 @@ import {
   DEFAULT_CAMERA,
   DIGITAL_LAYER_TRANSITION_MS,
   LAYERS,
+  ORBIT_PROFILES,
   binaryFragment,
   cameraFromSearch,
   deriveLayer,
@@ -13,8 +14,10 @@ import {
   mapFailurePolicy,
   projectedGlobeCircle,
   searchFromState,
+  sphereDetailLevel,
   sphereLabelLayout,
   sphereLayout,
+  sphereProjectScale,
   sphereOpacityForGlobeRatio,
   sphereStartOffset,
   stateFromSearch,
@@ -55,19 +58,47 @@ test('digital sphere offsets wrap all catalog labels into the visible path band'
   assert.equal(sphereStartOffset(-1, -1, 0), 8);
 });
 
-test('sphere labels keep one identity between overview rings and tangent tracks', () => {
+test('orbital profiles remain distinct semantic paths rather than copied circles', () => {
+  assert.equal(ORBIT_PROFILES.length, LAYERS.length);
+  assert.equal(new Set(ORBIT_PROFILES.map(({ rotation }) => rotation)).size, LAYERS.length);
+  assert(ORBIT_PROFILES.every(({ rx, ry }) => rx !== ry));
+  assert(ORBIT_PROFILES.every(({ rx, ry }) => rx >= 286 && ry >= 268));
+});
+
+test('sphere projects keep one upright identity between overview orbits and close-up arcs', () => {
   const first = sphereLabelLayout(0, 0, 2);
   const second = sphereLabelLayout(0, 1, 2);
   const lower = sphereLabelLayout(5, 0, 1);
   assert.notEqual(first.overviewX, second.overviewX);
   assert.notEqual(first.overviewY, second.overviewY);
-  assert.equal(first.sideY, 9);
-  assert.equal(lower.sideY, 64);
-  assert(first.sideX < second.sideX);
-  assert.equal(lower.sideX, 320);
+  assert.notEqual(first.sideX, second.sideX);
+  assert(first.sideY < 70);
+  assert(lower.sideY < 70);
+  assert.equal('overviewRotation' in first, false);
   for (const layout of [first, second, lower]) {
     for (const value of Object.values(layout)) assert(Number.isFinite(value));
+    assert.ok(Math.abs(Math.hypot(layout.overviewDx, layout.overviewDy) - 1) < 0.001);
+    assert.ok(Math.abs(Math.hypot(layout.sideDx, layout.sideDy) - 1) < 0.001);
   }
+  const counts = [2, 2, 1, 2, 2, 1];
+  const sidePoints = counts.flatMap((count, layerIndex) =>
+    Array.from({ length: count }, (_, recordIndex) => sphereLabelLayout(layerIndex, recordIndex, count)),
+  );
+  const separations = sidePoints.flatMap((left, leftIndex) =>
+    sidePoints.slice(leftIndex + 1).map((right) => Math.hypot(left.sideX - right.sideX, left.sideY - right.sideY)),
+  );
+  assert(Math.min(...separations) > 10, 'close-up project positions must leave room for separate touch targets');
+});
+
+test('sphere detail and inverse scale preserve screen-readable names', () => {
+  assert.equal(sphereDetailLevel({ diameter: 300 }), 'micro');
+  assert.equal(sphereDetailLevel({ diameter: 500 }), 'compact');
+  assert.equal(sphereDetailLevel({ diameter: 800 }), 'names');
+  assert.equal(sphereDetailLevel({ diameter: 300, sideView: true }), 'close');
+  const renderedNamePixels = (diameter, level) => 12 * sphereProjectScale(diameter, level) * diameter / 640;
+  assert.ok(Math.abs(renderedNamePixels(640, 'names') - 12.5) < 0.01);
+  assert.ok(Math.abs(renderedNamePixels(1280, 'names') - 12.5) < 0.01);
+  assert.ok(Math.abs(renderedNamePixels(2300, 'close') - 20.5) < 0.01);
 });
 
 test('deep-link state accepts surface, search, identity and clamped camera', () => {
