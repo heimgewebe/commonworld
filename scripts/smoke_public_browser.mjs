@@ -61,11 +61,11 @@ const executablePath = process.env.PLAYWRIGHT_CHROMIUM_EXECUTABLE_PATH || (exist
 const browser = await chromium.launch({ headless: true, executablePath });
 const results = [];
 
-async function newPage({ mobile = false, reducedMotion = 'reduce' } = {}) {
+async function newPage({ mobile = false, viewportOverride = null, touch = mobile, reducedMotion = 'reduce' } = {}) {
   const context = await browser.newContext({
-    viewport: mobile ? { width: 390, height: 844 } : { width: 1280, height: 800 },
+    viewport: viewportOverride ?? (mobile ? { width: 390, height: 844 } : { width: 1280, height: 800 }),
     isMobile: mobile,
-    hasTouch: mobile,
+    hasTouch: touch,
     deviceScaleFactor: 1,
     reducedMotion,
   });
@@ -111,6 +111,18 @@ async function waitForSphereOpacitySettled(page) {
     const visible = Number(style.opacity);
     const target = Number(style.getPropertyValue('--sphere-opacity'));
     return Number.isFinite(visible) && Number.isFinite(target) && Math.abs(visible - target) <= 0.01;
+  });
+}
+
+async function waitForSphereGeometrySettled(page) {
+  await page.waitForFunction(() => {
+    const map = window.__commonworldTestMap;
+    const stage = document.querySelector('.globe-stage');
+    const sphere = document.querySelector('#digital-sphere');
+    if (!map || !stage || !sphere || stage.dataset.viewPhase !== 'overview') return false;
+    const globeDiameter = Number(stage.dataset.globeDiameter);
+    const sphereWidth = sphere.getBoundingClientRect().width;
+    return !map.isMoving() && Number.isFinite(globeDiameter) && globeDiameter > 0 && Math.abs(sphereWidth - globeDiameter * 1.18) <= 2;
   });
 }
 
@@ -182,8 +194,8 @@ async function normalScenario() {
 }
 
 
-async function layerJourneyScenario({ mobile = false } = {}) {
-  const run = await newPage({ mobile, reducedMotion: 'no-preference' });
+async function layerJourneyScenario({ mobile = false, viewportOverride = null, touch = mobile, scenarioId = null } = {}) {
+  const run = await newPage({ mobile, viewportOverride, touch, reducedMotion: 'no-preference' });
   await run.page.goto(baseUrl, { waitUntil: 'domcontentloaded' });
   await run.page.waitForSelector('html.runtime-ready');
   await run.page.waitForFunction(() => Number(document.querySelector('.globe-stage')?.dataset.sphereSize ?? 0) > 0);
@@ -207,7 +219,7 @@ async function layerJourneyScenario({ mobile = false } = {}) {
   const activateZoomIn = async () => {
     if (mobile) await run.page.touchscreen.tap(zoomInBox.x + zoomInBox.width / 2, zoomInBox.y + zoomInBox.height / 2);
     else await run.page.mouse.click(zoomInBox.x + zoomInBox.width / 2, zoomInBox.y + zoomInBox.height / 2);
-    await run.page.waitForTimeout(700);
+    await waitForSphereGeometrySettled(run.page);
   };
   await activateZoomIn();
   const afterFirstZoom = await run.page.locator('#digital-sphere').boundingBox();
@@ -239,7 +251,7 @@ async function layerJourneyScenario({ mobile = false } = {}) {
   for (let index = 0; index < 2; index += 1) {
     if (mobile) await run.page.touchscreen.tap(zoomOutBox.x + zoomOutBox.width / 2, zoomOutBox.y + zoomOutBox.height / 2);
     else await run.page.mouse.click(zoomOutBox.x + zoomOutBox.width / 2, zoomOutBox.y + zoomOutBox.height / 2);
-    await run.page.waitForTimeout(700);
+    await waitForSphereGeometrySettled(run.page);
     restoredScale = await run.page.locator('#digital-sphere').boundingBox();
     const projectedZoomOut = await independentProjectedGlobeDiameter(run.page);
     const declaredZoomOut = Number(await stage.getAttribute('data-globe-diameter'));
@@ -282,14 +294,27 @@ async function layerJourneyScenario({ mobile = false } = {}) {
   assert(innermostLayerDiameter > globeDiameter, `layer journey: digital shell intersects globe (${innermostLayerDiameter} <= ${globeDiameter})`);
   const edgeX = sphereBox.x + sphereBox.width * 0.85134;
   const edgeY = sphereBox.y + sphereBox.height * 0.14866;
-  if (mobile) await run.page.touchscreen.tap(edgeX, edgeY);
+  if (touch) await run.page.touchscreen.tap(edgeX, edgeY);
   else await run.page.mouse.click(edgeX, edgeY);
   assert((await run.page.locator('.globe-stage').getAttribute('data-view-phase')) === 'entering-layers', 'layer journey: animated entry phase missing');
   assert(await run.page.locator('#layer-panel').isHidden(), 'layer journey: description panel obscures the camera flight');
   const enteringSphere = await run.page.locator('#digital-sphere').boundingBox();
   assert(enteringSphere, 'layer journey: transforming sphere is not visible during camera flight');
+  await run.page.waitForSelector('.globe-stage[data-view-phase="layers-preview"]');
+  assert(await run.page.locator('#layer-panel').isHidden(), 'layer journey: description panel appeared at the exact end of the camera flight');
+  assert(await run.page.locator('#layer-panel').getAttribute('inert') !== null, 'layer journey: hidden description panel became interactive before reveal');
+  assert((await run.page.locator('#layer-panel').getAttribute('data-visible')) === null, 'layer journey: panel visible marker appeared before the visual pause');
+  const settledSphere = await run.page.locator('#digital-sphere').boundingBox();
+  assert(settledSphere, 'layer journey: transformed layers are missing during the panel-free pause');
   await run.page.waitForSelector('.globe-stage[data-view-phase="layers"]');
-  assert(await run.page.locator('#layer-panel').isVisible(), 'layer journey: description panel did not appear after camera flight');
+  await run.page.waitForSelector('#layer-panel[data-visible]');
+  assert(await run.page.locator('#layer-panel').isVisible(), 'layer journey: description panel did not fade in after the panel-free pause');
+  assert(await run.page.locator('#layer-panel').getAttribute('inert') === null, 'layer journey: revealed description panel remains inert');
+  const panelTiming = await run.page.locator('.globe-stage').evaluate((node) => ({
+    preview: Number(node.dataset.layerPreviewStartedAt),
+    visible: Number(node.dataset.layerPanelVisibleAt),
+  }));
+  assert(Number.isFinite(panelTiming.preview) && Number.isFinite(panelTiming.visible) && panelTiming.visible - panelTiming.preview >= 500, `layer journey: panel-free preview was too short (${JSON.stringify(panelTiming)})`);
   const mapOpacity = Number(await run.page.locator('#map').evaluate((node) => getComputedStyle(node).opacity));
   assert(mapOpacity <= 0.02, `layer journey: globe remains visible beside layers (${mapOpacity})`);
   assert(await run.page.locator('#map').getAttribute('inert') !== null, 'layer journey: invisible globe remains keyboard reachable');
@@ -298,15 +323,45 @@ async function layerJourneyScenario({ mobile = false } = {}) {
   const panelBox = await run.page.locator('#layer-panel').boundingBox();
   const viewport = run.page.viewportSize();
   assert(panelBox && viewport && panelBox.width >= viewport.width - 1, `layer journey: layer surface is not full width (${JSON.stringify(panelBox)})`);
-  const transformedRing = await run.page.locator('#sphere-rings use').first().evaluate((node) => getComputedStyle(node).transform);
-  assert(transformedRing !== 'none', 'layer journey: source ring did not transform into a side-view ellipse');
-  assert(await run.page.locator('.layer-stack-item').first().isVisible(), 'layer journey: side-view labels missing');
-  const alignment = await run.page.evaluate(() => [...document.querySelectorAll('#sphere-rings use')].map((ring, index) => {
-    const ringRect = ring.getBoundingClientRect();
-    const labelRect = document.querySelectorAll('.layer-stack-item')[index].getBoundingClientRect();
-    return Math.abs((ringRect.top + ringRect.height / 2) - (labelRect.top + labelRect.height / 2));
-  }));
-  assert(alignment.every((delta) => delta <= 42), `layer journey: labels no longer belong to their source rings (${JSON.stringify(alignment)})`);
+  const tangentView = await run.page.evaluate(() => {
+    const sphere = document.querySelector('#digital-sphere').getBoundingClientRect();
+    const rings = [...document.querySelectorAll('#sphere-rings use')].map((node) => {
+      const rect = node.getBoundingClientRect();
+      return { left: rect.left, right: rect.right, top: rect.top, bottom: rect.bottom };
+    });
+    const visibleLabels = [...document.querySelectorAll('.sphere-label[data-commonproject-id]')].flatMap((node) => {
+      const rect = node.getBoundingClientRect();
+      const style = getComputedStyle(node);
+      const intersects = rect.right > 0 && rect.left < innerWidth && rect.bottom > 0 && rect.top < innerHeight;
+      return intersects && Number(style.opacity) > 0.2
+        ? [{ id: node.dataset.commonprojectId, layer: node.dataset.layerId, width: rect.width, height: rect.height }]
+        : [];
+    });
+    return {
+      viewport: { width: innerWidth, height: innerHeight },
+      sphere: { left: sphere.left, right: sphere.right, top: sphere.top, bottom: sphere.bottom, width: sphere.width, height: sphere.height },
+      rings,
+      visibleLabels,
+      stackChildren: document.querySelector('#layer-stack-visual').childElementCount,
+      projectChildren: document.querySelector('#layer-projects').childElementCount,
+      filterChildren: document.querySelector('#layer-buttons').childElementCount,
+    };
+  });
+  assert(tangentView.sphere.width > tangentView.viewport.width * 2, `layer journey: camera did not zoom into the sphere (${JSON.stringify(tangentView.sphere)})`);
+  assert(tangentView.sphere.left < -tangentView.viewport.width * 0.45 && tangentView.sphere.right > tangentView.viewport.width * 1.45, `layer journey: full rings could still fit inside the viewport (${JSON.stringify(tangentView.sphere)})`);
+  assert(tangentView.sphere.top < tangentView.viewport.height * 0.3 && tangentView.sphere.bottom > tangentView.viewport.height * 2, `layer journey: sphere is not cropped as a close tangent view (${JSON.stringify(tangentView.sphere)})`);
+  assert(tangentView.rings.every(({ left, right, bottom }) => left < 0 && right > tangentView.viewport.width && bottom > tangentView.viewport.height), `layer journey: a complete ring remains visible (${JSON.stringify(tangentView.rings)})`);
+  assert(tangentView.visibleLabels.length >= 3, `layer journey: overview contents did not remain visible on the enlarged tracks (${JSON.stringify(tangentView.visibleLabels)})`);
+  assert(new Set(tangentView.visibleLabels.map(({ layer }) => layer)).size >= 3, `layer journey: close-up does not expose multiple content tracks (${JSON.stringify(tangentView.visibleLabels)})`);
+  assert(tangentView.visibleLabels.every(({ height }) => height >= 18), `layer journey: close-up contents did not become legible (${JSON.stringify(tangentView.visibleLabels)})`);
+  assert(tangentView.stackChildren === 0 && tangentView.projectChildren === 0 && tangentView.filterChildren === 0, `layer journey: substitute labels, cards or filters remain in the spatial view (${JSON.stringify(tangentView)})`);
+  const directContent = run.page.locator('.sphere-label[data-commonproject-id="debian"]');
+  await directContent.click();
+  assert(await run.page.locator('#project-focus').isVisible(), 'layer journey: enlarged track content did not open its Commons focus');
+  assert((await run.page.locator('#focus-title').textContent()) === 'Debian', 'layer journey: enlarged track opened the wrong Commons identity');
+  await run.page.locator('#focus-close').click();
+  assert(await run.page.locator('#project-focus').isHidden(), 'layer journey: Commons focus did not close');
+  assert(await directContent.evaluate((node) => document.activeElement === node), 'layer journey: focus did not return to the same content track');
   const viewportFit = await run.page.evaluate(() => ({
     viewportWidth: innerWidth,
     documentWidth: document.documentElement.scrollWidth,
@@ -316,7 +371,7 @@ async function layerJourneyScenario({ mobile = false } = {}) {
     }),
   }));
   assert(viewportFit.documentWidth <= viewportFit.viewportWidth + 1, `layer journey: horizontal overflow (${JSON.stringify(viewportFit)})`);
-  if (mobile) assert(viewportFit.controls.every(({ width, height }) => width >= 44 && height >= 44), `layer journey: undersized mobile layer control (${JSON.stringify(viewportFit.controls)})`);
+  if (touch) assert(viewportFit.controls.every(({ width, height }) => width >= 44 && height >= 44), `layer journey: undersized mobile layer control (${JSON.stringify(viewportFit.controls)})`);
 
   await run.page.locator('#layer-close').click();
   assert((await run.page.locator('.globe-stage').getAttribute('data-view-phase')) === 'leaving-layers', 'layer journey: return phase missing');
@@ -329,7 +384,7 @@ async function layerJourneyScenario({ mobile = false } = {}) {
   assert((await run.page.evaluate(() => document.activeElement?.id)) === 'sphere-edge-control', 'layer journey: focus did not return to the clicked sphere edge');
   assert(run.consoleErrors.length === 0, `layer journey: console errors: ${run.consoleErrors.join(' | ')}`);
   assert(run.pageErrors.length === 0, `layer journey: page errors: ${run.pageErrors.join(' | ')}`);
-  results.push({ id: mobile ? 'layer-journey-mobile' : 'layer-journey-desktop', verdict: 'PASS' });
+  results.push({ id: scenarioId ?? (mobile ? 'layer-journey-mobile' : 'layer-journey-desktop'), verdict: 'PASS' });
   await run.context.close();
 }
 
@@ -445,6 +500,8 @@ try {
   await normalScenario();
   await layerJourneyScenario();
   await layerJourneyScenario({ mobile: true });
+  await layerJourneyScenario({ viewportOverride: { width: 1024, height: 1366 }, touch: true, scenarioId: 'layer-journey-ipad-portrait' });
+  await layerJourneyScenario({ viewportOverride: { width: 1366, height: 1024 }, touch: true, scenarioId: 'layer-journey-ipad-landscape' });
   await interruptedLayerJourneyScenario();
   await reducedMotionLayerScenario();
   await catalogueFailureScenario();

@@ -95,12 +95,15 @@
       "data-globe-geometry-source",
       "data-globe-viewport-ratio"
     ],
-    "side_view_visual": "six_stacked_elliptical_layers_fullscreen_without_globe",
+    "side_view_visual": "cropped_tangent_content_tracks_from_overview_without_globe",
     "scale_fade": {
       "overview_visible_through_globe_viewport_ratio": 1.05,
       "fade_until_globe_viewport_ratio": 2.1,
       "local_hidden_from_globe_viewport_ratio": 2.1
-    }
+    },
+    "side_view_reuses_overview_content_elements": true,
+    "complete_rings_visible": false,
+    "substitute_cards_or_filters": false
   },
   "navigation": {
     "deep_link_parameters": [
@@ -124,8 +127,8 @@
     "presentation_preference_storage": "localStorage:commonworld.presentation",
     "search_and_layer_filter_shared_across_surfaces": true,
     "side_layer_responsive_padding": {
-      "wide": "right_panel",
-      "narrow": "bottom_sheet"
+      "wide": "full_viewport_tangent_crop",
+      "narrow": "full_viewport_tangent_crop"
     }
   },
   "accessibility": {

@@ -151,7 +151,7 @@ def render_shell(root: Path = ROOT) -> str:
               <use href="#sphere-path-5"></use>
               <use href="#sphere-path-6"></use>
             </g>
-            <g id="sphere-streams" mask="url(#sphere-mask)" aria-hidden="true"></g>
+            <g id="sphere-streams" mask="url(#sphere-mask)"></g>
             <circle id="sphere-edge-control" class="sphere-edge-control" cx="320" cy="320" r="318" fill="none" stroke="transparent" stroke-width="20" pointer-events="stroke" role="button" tabindex="0" aria-label="Digitale Commons-Schichten öffnen"></circle>
           </svg>
           <div id="layer-stack-visual" class="layer-stack-visual" aria-hidden="true"></div>
@@ -168,13 +168,11 @@ def render_shell(root: Path = ROOT) -> str:
           <p id="globe-results" class="globe-results" role="status">10 Commons im aktuellen Katalog.</p>
 
           <aside id="layer-panel" class="layer-panel" aria-labelledby="layer-title" hidden>
-            <div class="panel-heading">
-              <div><p class="kicker">Digitale Sphäre</p><h2 id="layer-title">Seitenansicht derselben sechs Schichten</h2></div>
-              <button id="layer-close" class="icon-button" type="button" aria-label="Schichtansicht schließen">×</button>
-            </div>
-            <p>Die Kamera fährt aus der Totalen in dieselben Ringe. Kreisflächen aus der Draufsicht werden als gestaffelte Ebenen von der Seite lesbar.</p>
-            <div id="layer-buttons" class="layer-buttons" aria-label="Digitale Schichten filtern"></div>
-            <div id="layer-projects" class="layer-projects" aria-label="Commons in der gewählten Schicht"></div>
+            <h2 id="layer-title" class="visually-hidden">Digitale Commons aus der Nähe</h2>
+            <p class="visually-hidden">Dieselben Commons, die in der Totalen klein auf den Ringen liegen, sind nun als angeschnittene Inhaltsbahnen vergrößert.</p>
+            <button id="layer-close" class="icon-button layer-close" type="button" aria-label="Zur Globusansicht zurückkehren">×</button>
+            <div id="layer-buttons" class="layer-buttons" hidden></div>
+            <div id="layer-projects" class="layer-projects" hidden></div>
           </aside>
 
           <figcaption id="globe-caption" class="visually-hidden">Erde → Großregion → Region → lokaler Zusammenhang → Commons</figcaption>

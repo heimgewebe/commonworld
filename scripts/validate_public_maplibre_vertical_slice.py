@@ -366,8 +366,8 @@ def validate_public_maplibre_vertical_slice(root: Path = ROOT) -> list[str]:
     for identifier in EXPECTED_IDS:
         if identifier in app or identifier in core:
             errors.append(f"public runtime code hardcodes catalog identity instead of loading it: {identifier}")
-    if "sphereStartOffset(layerIndex, recordIndex, records.length)" not in app:
-        errors.append("public runtime must use the tested bounded digital-sphere offset helper")
+    if "sphereLabelLayout(layerIndex, recordIndex, records.length)" not in app:
+        errors.append("public runtime must use the tested identity-preserving sphere-label layout helper")
     if re.search(r"cooperativeGestures\s*:\s*true", app):
         errors.append("public mobile globe must allow one-finger touch movement; cooperativeGestures may not be enabled")
 
@@ -453,11 +453,14 @@ def validate_public_maplibre_vertical_slice(root: Path = ROOT) -> list[str]:
     for token in required_app:
         if token not in app:
             errors.append(f"public runtime application missing contract token: {token}")
-    for token in ("deriveLayer", "binaryFragment", "stateFromSearch", "searchFromState", "filterRecords", "globeHorizonCoordinates", "projectedGlobeCircle", "sphereLayout", "sphereOpacityForGlobeRatio"):
+    for token in ("deriveLayer", "binaryFragment", "sphereLabelLayout", "stateFromSearch", "searchFromState", "filterRecords", "globeHorizonCoordinates", "projectedGlobeCircle", "sphereLayout", "sphereOpacityForGlobeRatio"):
         if f"function {token}" not in core:
             errors.append(f"public runtime core missing function: {token}")
-    if "requestAnimationFrame" in app or "setInterval" in app:
-        errors.append("public runtime must not introduce a continuous animation loop")
+    if "setInterval" in app:
+        errors.append("public runtime must not introduce an interval animation loop")
+    animation_frame_calls = app.count("requestAnimationFrame")
+    if animation_frame_calls > 1 or (animation_frame_calls == 1 and "window.requestAnimationFrame(() =>" not in app):
+        errors.append("public runtime may use only one explicit one-shot animation frame for staged panel reveal")
     if "zoom: runtime.map.getZoom()" in app:
         errors.append("public digital-sphere geometry must not use MapLibre zoom as a direct size input")
     if "sphereOpacityForZoom" in app or "sphereOpacityForZoom" in core:
@@ -536,14 +539,21 @@ def validate_public_maplibre_vertical_slice(root: Path = ROOT) -> list[str]:
         "data-globe-viewport-ratio",
     ]:
         errors.append("public digital-sphere geometry acceptance attributes mismatch")
-    if digital_surface.get("side_view_visual") != "six_stacked_elliptical_layers_fullscreen_without_globe":
+    if digital_surface.get("side_view_visual") != "cropped_tangent_content_tracks_from_overview_without_globe":
         errors.append("public digital-sphere side-layer visual mismatch")
+    for key, expected in {
+        "side_view_reuses_overview_content_elements": True,
+        "complete_rings_visible": False,
+        "substitute_cards_or_filters": False,
+    }.items():
+        if digital_surface.get(key) != expected:
+            errors.append(f"public digital-sphere close-up contract mismatch: {key}")
     navigation = contract.get("navigation", {}) if isinstance(contract.get("navigation"), dict) else {}
     if navigation.get("deep_link_parameters") != ["lng", "lat", "z", "b", "p", "view", "surface", "layer", "project", "q"]:
         errors.append("public globe/text deep-link parameters mismatch")
     if navigation.get("search_and_layer_filter_shared_across_surfaces") is not True:
         errors.append("public globe/text discovery state must remain shared")
-    if navigation.get("side_layer_responsive_padding") != {"wide": "right_panel", "narrow": "bottom_sheet"}:
+    if navigation.get("side_layer_responsive_padding") != {"wide": "full_viewport_tangent_crop", "narrow": "full_viewport_tangent_crop"}:
         errors.append("public side-layer responsive padding contract mismatch")
     machine_surface = contract.get("machine_surface", {}) if isinstance(contract.get("machine_surface"), dict) else {}
     if machine_surface != {

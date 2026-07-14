@@ -278,7 +278,16 @@ a {
   font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
   font-size: 11px;
   letter-spacing: 0.045em;
-  transition: opacity 120ms linear, fill 120ms linear, font-size 120ms linear;
+  text-anchor: middle;
+  dominant-baseline: central;
+  transform-box: view-box;
+  transform-origin: 0 0;
+  transform: translate(var(--label-overview-x), var(--label-overview-y)) rotate(var(--label-overview-rotation));
+  transition:
+    transform 760ms cubic-bezier(0.22, 1, 0.36, 1),
+    opacity 120ms linear,
+    fill 120ms linear,
+    font-size 120ms linear;
 }
 
 .sphere-label[data-layer-id="knowledge_data"] { fill: rgba(112, 181, 223, 0.84); }
@@ -926,6 +935,7 @@ a {
   filter: blur(0.2rem) saturate(0.55);
 }
 
+.globe-stage[data-view-phase="layers-preview"] .globe-map,
 .globe-stage[data-view-phase="layers"] .globe-map {
   opacity: 0;
   transform: scale(1.3);
@@ -937,55 +947,6 @@ a {
   opacity: 1;
   transform: scale(1);
   filter: none;
-}
-
-.globe-stage.layer-view-open .digital-sphere {
-  opacity: 1;
-  transform: translate(-50%, -50%) scale(1.04);
-  filter: drop-shadow(0 0 2.8rem rgba(73, 159, 209, 0.34));
-}
-
-.globe-stage[data-view-phase="layers"] .digital-sphere {
-  transform: translate(-50%, -50%) scale(1);
-}
-
-.globe-stage.layer-view-open #sphere-streams {
-  opacity: 0;
-}
-
-.globe-stage.layer-view-open #sphere-rings use {
-  stroke-width: 2.4;
-}
-
-.globe-stage.layer-view-open #sphere-rings use:nth-child(1) {
-  transform: translateY(-165px) scaleY(0.2);
-  fill: rgba(112, 181, 223, 0.09);
-  stroke: rgba(112, 181, 223, 0.86);
-}
-.globe-stage.layer-view-open #sphere-rings use:nth-child(2) {
-  transform: translateY(-99px) scaleY(0.2);
-  fill: rgba(103, 210, 154, 0.09);
-  stroke: rgba(103, 210, 154, 0.86);
-}
-.globe-stage.layer-view-open #sphere-rings use:nth-child(3) {
-  transform: translateY(-33px) scaleY(0.2);
-  fill: rgba(224, 173, 105, 0.09);
-  stroke: rgba(224, 173, 105, 0.86);
-}
-.globe-stage.layer-view-open #sphere-rings use:nth-child(4) {
-  transform: translateY(33px) scaleY(0.2);
-  fill: rgba(197, 158, 232, 0.09);
-  stroke: rgba(197, 158, 232, 0.86);
-}
-.globe-stage.layer-view-open #sphere-rings use:nth-child(5) {
-  transform: translateY(99px) scaleY(0.2);
-  fill: rgba(116, 216, 207, 0.09);
-  stroke: rgba(116, 216, 207, 0.86);
-}
-.globe-stage.layer-view-open #sphere-rings use:nth-child(6) {
-  transform: translateY(165px) scaleY(0.2);
-  fill: rgba(220, 228, 224, 0.07);
-  stroke: rgba(220, 228, 224, 0.72);
 }
 
 .globe-stage.layer-view-open .orientation-bar,
@@ -1037,7 +998,18 @@ a {
   background:
     linear-gradient(180deg, rgba(5, 16, 14, 0.9), rgba(5, 16, 14, 0.12) 24%, rgba(5, 16, 14, 0.08) 68%, rgba(5, 16, 14, 0.94));
   box-shadow: none;
+  opacity: 0;
+  visibility: hidden;
   pointer-events: none;
+  transition:
+    opacity 260ms ease,
+    visibility 0s linear 260ms;
+}
+
+.layer-panel[data-visible] {
+  opacity: 1;
+  visibility: visible;
+  transition-delay: 0s;
 }
 
 .layer-panel[data-closing] {
@@ -1138,6 +1110,97 @@ a {
   .layer-stack-item span {
     max-width: 14rem;
   }
+}
+
+/* Immersive tangent zoom: the overview content itself becomes the close-up tracks. */
+.digital-sphere {
+  transition:
+    left 760ms cubic-bezier(0.22, 1, 0.36, 1),
+    top 760ms cubic-bezier(0.22, 1, 0.36, 1),
+    width 760ms cubic-bezier(0.22, 1, 0.36, 1),
+    height 760ms cubic-bezier(0.22, 1, 0.36, 1),
+    opacity 360ms linear,
+    filter 760ms cubic-bezier(0.22, 1, 0.36, 1),
+    transform 760ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.globe-stage.layer-view-open .digital-sphere,
+.globe-stage[data-view-phase="layers-preview"] .digital-sphere,
+.globe-stage[data-view-phase="layers"] .digital-sphere {
+  opacity: 1;
+  transform: translate(-50%, -50%);
+  filter: drop-shadow(0 0 2.8rem rgba(73, 159, 209, 0.34));
+}
+
+.globe-stage.layer-view-open #sphere-streams {
+  opacity: 1;
+}
+
+.globe-stage.layer-view-open #sphere-rings use {
+  transform: none !important;
+  fill: none !important;
+  stroke-width: 1.35;
+}
+
+.globe-stage.layer-view-open .sphere-label {
+  transform: translate(var(--label-side-x), var(--label-side-y));
+  font-size: 10px;
+  font-weight: 720;
+  letter-spacing: 0.035em;
+  paint-order: stroke;
+  stroke: rgba(4, 14, 12, 0.82);
+  stroke-width: 0.85px;
+  stroke-linejoin: round;
+}
+
+.globe-stage.layer-view-open .sphere-binary {
+  display: none;
+}
+
+.globe-stage.layer-view-open .sphere-edge-control {
+  opacity: 0;
+  pointer-events: none;
+}
+
+.globe-stage.layer-view-settled .digital-sphere {
+  pointer-events: auto;
+}
+
+.globe-stage.layer-view-settled .sphere-label {
+  cursor: pointer;
+  pointer-events: visiblePainted;
+}
+
+.globe-stage.layer-view-settled .sphere-label:focus {
+  fill: var(--focus);
+  outline: none;
+  stroke: rgba(5, 16, 14, 0.96);
+  stroke-width: 1.2px;
+}
+
+.layer-stack-visual {
+  display: none;
+}
+
+.layer-panel {
+  background: transparent;
+  box-shadow: none;
+  backdrop-filter: none;
+}
+
+.layer-panel .layer-close {
+  position: absolute;
+  z-index: 5;
+  top: max(0.9rem, env(safe-area-inset-top));
+  right: max(0.9rem, env(safe-area-inset-right));
+  pointer-events: auto;
+  background: rgba(5, 16, 14, 0.82);
+  backdrop-filter: blur(0.7rem);
+}
+
+.layer-panel .layer-buttons,
+.layer-panel .layer-projects {
+  display: none !important;
 }
 
 @media (prefers-reduced-motion: reduce) {

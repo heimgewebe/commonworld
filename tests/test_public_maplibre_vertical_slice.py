@@ -138,19 +138,19 @@ class PublicMapLibreVerticalSliceTests(unittest.TestCase):
             errors = validate_public_maplibre_vertical_slice(root)
         self.assertTrue(any("hardcodes catalog identity" in error for error in errors))
 
-    def test_rejects_unbounded_digital_sphere_offsets(self) -> None:
+    def test_rejects_bypassing_identity_preserving_sphere_label_layout(self) -> None:
         with tempfile.TemporaryDirectory() as directory:
             root = self.copy_slice(directory)
             path = root / "assets/commonworld-app.js"
             path.write_text(
                 path.read_text(encoding="utf-8").replace(
-                    "sphereStartOffset(layerIndex, recordIndex, records.length)",
-                    "8 + ((recordIndex + layerIndex * 0.43) * 84) / Math.max(1, records.length)",
+                    "sphereLabelLayout(layerIndex, recordIndex, records.length)",
+                    "{ overviewX: 320, overviewY: 320, overviewRotation: 0, sideX: 320, sideY: 320 }",
                 ),
                 encoding="utf-8",
             )
             errors = validate_public_maplibre_vertical_slice(root)
-        self.assertTrue(any("bounded digital-sphere offset helper" in error for error in errors))
+        self.assertTrue(any("identity-preserving sphere-label layout helper" in error for error in errors))
 
     def test_rejects_cooperative_gestures_that_block_one_finger_touch(self) -> None:
         with tempfile.TemporaryDirectory() as directory:

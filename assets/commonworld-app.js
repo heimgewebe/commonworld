@@ -12,9 +12,9 @@ import {
   normalizeQuery,
   projectedGlobeCircle,
   searchFromState,
+  sphereLabelLayout,
   sphereLayout,
   sphereOpacityForGlobeRatio,
-  sphereStartOffset,
   stateFromSearch,
 } from './commonworld-core.mjs';
 
@@ -80,6 +80,8 @@ const runtime = {
   viewPhase: 'overview',
   viewTransitionTimer: null,
   viewTransitionCleanup: null,
+  layerPanelRevealTimer: null,
+  layerPanelReady: false,
   layerReturnTarget: null,
   spherePointerStart: null,
   lastSpherePointerActivation: 0,
@@ -190,17 +192,29 @@ function renderSphere() {
         class: 'sphere-label',
         'data-commonproject-id': record.id,
         'data-layer-id': layer.id,
+        role: 'button',
+        tabindex: '-1',
+        'aria-label': `${record.title} öffnen`,
       });
-      const path = createSvgElement('textPath', {
-        href: `#sphere-path-${layerIndex + 1}`,
-        startOffset: `${sphereStartOffset(layerIndex, recordIndex, records.length)}%`,
-      });
+      const layout = sphereLabelLayout(layerIndex, recordIndex, records.length);
+      text.style.setProperty('--label-overview-x', `${layout.overviewX}px`);
+      text.style.setProperty('--label-overview-y', `${layout.overviewY}px`);
+      text.style.setProperty('--label-overview-rotation', `${layout.overviewRotation}deg`);
+      text.style.setProperty('--label-side-x', `${layout.sideX}px`);
+      text.style.setProperty('--label-side-y', `${layout.sideY}px`);
       const name = createSvgElement('tspan', { class: 'sphere-name' });
       name.textContent = record.title;
       const binary = createSvgElement('tspan', { class: 'sphere-binary', dx: '8' });
       binary.textContent = binaryFragment(record.id);
-      path.append(name, binary);
-      text.append(path);
+      text.append(name, binary);
+      text.addEventListener('click', () => {
+        if (runtime.viewPhase === 'layers') selectProject(record.id, { trigger: text });
+      });
+      text.addEventListener('keydown', (event) => {
+        if (runtime.viewPhase !== 'layers' || !['Enter', ' '].includes(event.key)) return;
+        event.preventDefault();
+        selectProject(record.id, { trigger: text });
+      });
       elements.sphereStreams.append(text);
     });
   });
@@ -210,17 +224,6 @@ function renderSphere() {
 
 function renderLayerStack() {
   elements.layerStack.replaceChildren();
-  for (const layer of LAYERS) {
-    const item = document.createElement('div');
-    item.className = 'layer-stack-item';
-    item.dataset.layerId = layer.id;
-    const label = document.createElement('span');
-    label.textContent = layer.label;
-    const count = document.createElement('small');
-    count.textContent = String(runtime.records.filter((record) => deriveLayer(record) === layer.id).length);
-    item.append(label, count);
-    elements.layerStack.append(item);
-  }
 }
 
 function layerForRecord(record) {
@@ -252,21 +255,8 @@ function renderLayerButtons(container) {
 }
 
 function renderLayerPanel() {
-  renderLayerButtons(elements.layerButtons);
+  elements.layerButtons.replaceChildren();
   elements.layerProjects.replaceChildren();
-  for (const record of visibleRecords()) {
-    const button = document.createElement('button');
-    button.type = 'button';
-    button.className = 'layer-project';
-    button.dataset.commonprojectId = record.id;
-    const name = document.createElement('span');
-    name.textContent = record.title;
-    const layerName = document.createElement('small');
-    layerName.textContent = layerForRecord(record)?.label ?? 'Digital';
-    button.append(name, layerName);
-    button.addEventListener('click', () => selectProject(record.id));
-    elements.layerProjects.append(button);
-  }
 }
 
 function renderTextView() {
@@ -329,7 +319,7 @@ function updateSelectionMarks() {
   document.querySelectorAll('[data-commonproject-id]').forEach((element) => {
     const selected = element.dataset.commonprojectId === runtime.state.project;
     element.classList.toggle('is-selected', selected);
-    if (element.matches('button')) element.setAttribute('aria-pressed', String(selected));
+    if (element.matches('button') || element.getAttribute('role') === 'button') element.setAttribute('aria-pressed', String(selected));
     if (element.matches('.catalog-card')) element.toggleAttribute('data-selected', selected);
   });
   updateFocusPanel();
@@ -371,7 +361,7 @@ function scheduleCameraHistory() {
 
 function selectProject(identifier, { historyMode = 'push', focus = true, trigger = document.activeElement } = {}) {
   if (!runtime.recordsById.has(identifier)) return;
-  if (trigger instanceof HTMLElement && !elements.focus.contains(trigger)) runtime.focusReturnTarget = trigger;
+  if (trigger instanceof Element && !elements.focus.contains(trigger)) runtime.focusReturnTarget = trigger;
   runtime.state.project = identifier;
   runtime.state.layer = deriveLayer(runtime.recordsById.get(identifier));
   renderDiscoveryState();
@@ -380,13 +370,14 @@ function selectProject(identifier, { historyMode = 'push', focus = true, trigger
 }
 
 function isVisibleFocusTarget(target) {
-  return target instanceof HTMLElement && target.isConnected && target.getClientRects().length > 0 && !target.closest('[hidden]');
+  return target instanceof Element && typeof target.focus === 'function' && target.isConnected && target.getClientRects().length > 0 && !target.closest('[hidden]');
 }
+
 
 function visibleProjectTrigger(identifier) {
   const escaped = CSS.escape(identifier);
   const candidates = [
-    ...document.querySelectorAll(`.layer-project[data-commonproject-id="${escaped}"], .catalog-select[data-commonproject-id="${escaped}"]`),
+    ...document.querySelectorAll(`.sphere-label[data-commonproject-id="${escaped}"], .catalog-select[data-commonproject-id="${escaped}"]`),
   ];
   return candidates.find(isVisibleFocusTarget) ?? null;
 }
@@ -499,6 +490,8 @@ function applyCamera(camera, { instant = false, duration = 260 } = {}) {
 function clearViewTransition() {
   window.clearTimeout(runtime.viewTransitionTimer);
   runtime.viewTransitionTimer = null;
+  window.clearTimeout(runtime.layerPanelRevealTimer);
+  runtime.layerPanelRevealTimer = null;
   runtime.viewTransitionCleanup?.();
   runtime.viewTransitionCleanup = null;
 }
@@ -519,21 +512,34 @@ function scheduleViewTransition(phase, duration, options = {}) {
 }
 
 function setViewPhase(phase) {
-  const allowed = new Set(['overview', 'entering-layers', 'layers', 'leaving-layers']);
+  const allowed = new Set(['overview', 'entering-layers', 'layers-preview', 'layers', 'leaving-layers']);
   runtime.viewPhase = allowed.has(phase) ? phase : 'overview';
   elements.stage.dataset.viewPhase = runtime.viewPhase;
+  elements.stage.dataset.viewPhaseStartedAt = String(performance.now());
+  if (runtime.viewPhase === 'layers-preview') {
+    elements.stage.dataset.layerPreviewStartedAt = elements.stage.dataset.viewPhaseStartedAt;
+    delete elements.stage.dataset.layerPanelVisibleAt;
+  }
   updateSphereGeometry();
   if (!runtime.mapReady) setSphereOpacity();
 }
 
 function showLayerState() {
   const journeyActive = runtime.state.surface === 'globe' && (runtime.state.view === 'layers' || runtime.viewPhase !== 'overview');
-  const panelVisible = runtime.state.surface === 'globe' && runtime.viewPhase === 'layers';
+  const panelMounted = runtime.state.surface === 'globe' && runtime.viewPhase === 'layers';
+  const panelVisible = panelMounted && runtime.layerPanelReady;
   const transformed = runtime.state.surface === 'globe' && runtime.state.view === 'layers';
   elements.stage.classList.toggle('layer-view-open', transformed);
-  elements.stage.classList.toggle('layer-view-settled', runtime.viewPhase === 'layers');
-  elements.layerPanel.hidden = !panelVisible;
+  elements.stage.classList.toggle('layer-view-settled', runtime.viewPhase === 'layers-preview' || runtime.viewPhase === 'layers');
+  elements.layerPanel.hidden = !panelMounted;
+  elements.layerPanel.toggleAttribute('data-visible', panelVisible);
+  elements.layerPanel.toggleAttribute('inert', !panelVisible);
   elements.layerToggle.setAttribute('aria-expanded', String(runtime.state.view === 'layers'));
+  elements.sphere.querySelectorAll('.sphere-label[data-commonproject-id]').forEach((label) => {
+    const interactive = runtime.viewPhase === 'layers';
+    label.setAttribute('tabindex', interactive ? '0' : '-1');
+    label.toggleAttribute('aria-hidden', !interactive);
+  });
   elements.map.toggleAttribute('inert', journeyActive);
   elements.layerToggle.toggleAttribute('inert', journeyActive);
   if (journeyActive) {
@@ -550,11 +556,30 @@ function showLayerState() {
   }
 }
 
-function finishViewTransition(phase, { restoreFocus = false } = {}) {
+function finishViewTransition(phase, { restoreFocus = false, revealImmediately = false } = {}) {
   clearViewTransition();
+  runtime.layerPanelReady = false;
   setViewPhase(phase);
   showLayerState();
-  if (phase === 'layers') elements.layerClose.focus({ preventScroll: true });
+  if (phase === 'layers-preview') {
+    runtime.layerPanelRevealTimer = window.setTimeout(() => {
+      runtime.layerPanelRevealTimer = null;
+      if (runtime.viewPhase !== 'layers-preview' || runtime.state.view !== 'layers') return;
+      setViewPhase('layers');
+      showLayerState();
+      window.requestAnimationFrame(() => {
+        if (runtime.viewPhase !== 'layers' || runtime.state.view !== 'layers') return;
+        runtime.layerPanelReady = true;
+        elements.stage.dataset.layerPanelVisibleAt = String(performance.now());
+        showLayerState();
+        elements.layerClose.focus({ preventScroll: true });
+      });
+    }, 520);
+  } else if (phase === 'layers' && revealImmediately) {
+    runtime.layerPanelReady = true;
+    showLayerState();
+    elements.layerClose.focus({ preventScroll: true });
+  }
   if (phase === 'overview' && restoreFocus) {
     (runtime.layerReturnTarget ?? elements.layerToggle).focus({ preventScroll: true });
     runtime.layerReturnTarget = null;
@@ -577,13 +602,14 @@ function openLayerView({ historyMode = 'push', cameraState = null, instant = fal
   showLayerState();
   renderLayerPanel();
   if (runtime.mapReady) applyCamera(layerCamera(cameraState), { instant: duration === 0, duration });
-  if (duration) scheduleViewTransition('layers', duration);
-  else finishViewTransition('layers');
+  if (duration) scheduleViewTransition('layers-preview', duration);
+  else finishViewTransition('layers', { revealImmediately: true });
   if (historyMode) writeHistory(historyMode);
 }
 
 function closeLayerView({ historyMode = 'push', cameraState = null, preserveLayer = false, instant = false, restoreFocus = true } = {}) {
   const wasOpen = runtime.state.view === 'layers' || runtime.viewPhase !== 'overview';
+  runtime.layerPanelReady = false;
   runtime.state.view = 'globe';
   if (!preserveLayer) runtime.state.layer = null;
   clearViewTransition();

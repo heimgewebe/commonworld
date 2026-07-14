@@ -13,6 +13,7 @@ import {
   mapFailurePolicy,
   projectedGlobeCircle,
   searchFromState,
+  sphereLabelLayout,
   sphereLayout,
   sphereOpacityForGlobeRatio,
   sphereStartOffset,
@@ -52,6 +53,21 @@ test('digital sphere offsets wrap all catalog labels into the visible path band'
   assert.ok(Math.abs(sphereStartOffset(3, 1, 2) - 64.88) < 0.0001);
   assert.ok(Math.abs(sphereStartOffset(5, 0, 1) - 18.8) < 0.0001);
   assert.equal(sphereStartOffset(-1, -1, 0), 8);
+});
+
+test('sphere labels keep one identity between overview rings and tangent tracks', () => {
+  const first = sphereLabelLayout(0, 0, 2);
+  const second = sphereLabelLayout(0, 1, 2);
+  const lower = sphereLabelLayout(5, 0, 1);
+  assert.notEqual(first.overviewX, second.overviewX);
+  assert.notEqual(first.overviewY, second.overviewY);
+  assert.equal(first.sideY, 9);
+  assert.equal(lower.sideY, 64);
+  assert(first.sideX < second.sideX);
+  assert.equal(lower.sideX, 320);
+  for (const layout of [first, second, lower]) {
+    for (const value of Object.values(layout)) assert(Number.isFinite(value));
+  }
 });
 
 test('deep-link state accepts surface, search, identity and clamped camera', () => {
@@ -126,7 +142,7 @@ test('projected globe circle uses the rendered horizon rather than MapLibre zoom
   assert.equal(projectedGlobeCircle({ center, horizon: horizon.slice(0, 3) }), null);
 });
 
-test('sphere layout follows measured globe geometry and centers the full-screen side view', () => {
+test('sphere layout follows measured globe geometry and crops a tangent side-view patch', () => {
   const normal = sphereLayout({ width: 1000, height: 700, globe: { x: 500, y: 350, diameter: 600 } });
   const rotatedEquivalent = sphereLayout({ width: 1000, height: 700, globe: { x: 498.2, y: 351.4, diameter: 600 } });
   const zoomed = sphereLayout({ width: 1000, height: 700, globe: { x: 500, y: 350, diameter: 900 } });
@@ -136,9 +152,12 @@ test('sphere layout follows measured globe geometry and centers the full-screen 
   assert(zoomed.diameter > normal.diameter * 1.4);
   assert(normal.diameter * (276 / 320) > normal.globeDiameter, 'innermost digital layer must remain outside the globe');
   assert.equal(side.x, 500);
-  assert.equal(side.y, 350);
-  assert.equal(side.diameter, 880);
-  assert.equal(side.globeDiameter, 880);
+  assert.equal(side.y, 1289.63);
+  assert.equal(side.diameter, 2300);
+  assert.equal(side.globeDiameter, 2300);
+  assert(side.diameter > 1000 * 2, 'side-view sphere must extend beyond both horizontal viewport edges');
+  assert(side.y - side.diameter / 2 < 700 * 0.25, 'outer tangent must enter near the upper viewport quarter');
+  assert(side.y > 700, 'sphere center must remain below the visible viewport');
   const projected = sphereLayout({ width: 1000, height: 700, padding: { right: 400 }, globe: { x: 301.25, y: 348.5, diameter: 588 } });
   assert.equal(projected.x, 301.25);
   assert.equal(projected.y, 348.5);

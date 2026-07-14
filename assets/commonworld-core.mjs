@@ -57,6 +57,28 @@ export function sphereStartOffset(layerIndex, recordIndex, recordCount) {
   return Number((8 + normalized * 72).toFixed(4));
 }
 
+
+export function sphereLabelLayout(layerIndex, recordIndex, recordCount) {
+  const layer = Number.isInteger(layerIndex) ? clamp(layerIndex, 0, LAYERS.length - 1) : 0;
+  const count = Number.isInteger(recordCount) && recordCount > 0 ? recordCount : 1;
+  const index = Number.isInteger(recordIndex) ? clamp(recordIndex, 0, count - 1) : 0;
+  const offset = sphereStartOffset(layer, index, count);
+  const angleDegrees = offset * 3.6 - 90;
+  const angle = angleDegrees * Math.PI / 180;
+  const radius = 316 - layer * 8;
+  const overviewX = 320 + Math.cos(angle) * radius;
+  const overviewY = 320 + Math.sin(angle) * radius;
+  const sideX = count === 1 ? 320 : 285 + index * (70 / Math.max(1, count - 1));
+  const sideY = 9 + layer * 11;
+  return Object.freeze({
+    overviewX: rounded(overviewX, 2),
+    overviewY: rounded(overviewY, 2),
+    overviewRotation: rounded(angleDegrees + 90, 2),
+    sideX: rounded(sideX, 2),
+    sideY: rounded(sideY, 2),
+  });
+}
+
 export function cameraFromSearch(search = '') {
   const parameters = new URLSearchParams(search.startsWith('?') ? search.slice(1) : search);
   return {
@@ -182,10 +204,12 @@ export function sphereLayout({ width, height, padding = {}, globe = null, sideVi
   const fallbackY = top + availableHeight / 2;
   const shortestSide = Math.min(stageWidth, stageHeight);
   if (sideView) {
-    const diameter = Math.min(Math.max(stageWidth, stageHeight) * 0.88, shortestSide * 1.6);
+    const diameter = Math.max(stageWidth * 2.3, stageHeight * 2.35);
+    const outerTrackTargetY = stageHeight * 0.22;
+    const outerTrackRadiusRatio = 316 / 640;
     return {
       x: rounded(stageWidth / 2, 2),
-      y: rounded(stageHeight / 2, 2),
+      y: rounded(outerTrackTargetY + diameter * outerTrackRadiusRatio, 2),
       diameter: rounded(diameter, 2),
       globeDiameter: rounded(diameter, 2),
     };
