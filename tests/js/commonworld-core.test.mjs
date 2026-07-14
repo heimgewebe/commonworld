@@ -16,6 +16,7 @@ import {
   searchFromState,
   sphereDetailLevel,
   sphereLabelLayout,
+  sphereLayerRowY,
   sphereLayout,
   sphereProjectScale,
   sphereOpacityForGlobeRatio,
@@ -65,21 +66,24 @@ test('orbital profiles remain distinct semantic paths rather than copied circles
   assert(ORBIT_PROFILES.every(({ rx, ry }) => rx >= 286 && ry >= 268));
 });
 
-test('sphere projects keep one upright identity between overview orbits and close-up arcs', () => {
+test('sphere projects keep one upright identity across stacked and focused tracks', () => {
   const first = sphereLabelLayout(0, 0, 2);
   const second = sphereLabelLayout(0, 1, 2);
   const lower = sphereLabelLayout(5, 0, 1);
   assert.notEqual(first.overviewX, second.overviewX);
   assert.notEqual(first.overviewY, second.overviewY);
   assert.notEqual(first.sideX, second.sideX);
-  assert(first.sideY < 70);
-  assert(lower.sideY < 70);
+  assert.equal(first.sideY, 210);
+  assert.equal(lower.sideY, 450);
+  assert.equal(first.focusedSideY, 320);
+  assert(first.focusedSideX < second.focusedSideX);
   assert.equal('overviewRotation' in first, false);
+  assert.equal('overviewDx' in first, false);
   for (const layout of [first, second, lower]) {
     for (const value of Object.values(layout)) assert(Number.isFinite(value));
-    assert.ok(Math.abs(Math.hypot(layout.overviewDx, layout.overviewDy) - 1) < 0.001);
-    assert.ok(Math.abs(Math.hypot(layout.sideDx, layout.sideDy) - 1) < 0.001);
   }
+  assert.deepEqual(LAYERS.map((_, index) => sphereLayerRowY(index)), [210, 258, 306, 354, 402, 450]);
+  assert(LAYERS.every(({ trackLabel }) => typeof trackLabel === 'string' && trackLabel.length > 0));
   const counts = [2, 2, 1, 2, 2, 1];
   const sidePoints = counts.flatMap((count, layerIndex) =>
     Array.from({ length: count }, (_, recordIndex) => sphereLabelLayout(layerIndex, recordIndex, count)),
@@ -87,7 +91,7 @@ test('sphere projects keep one upright identity between overview orbits and clos
   const separations = sidePoints.flatMap((left, leftIndex) =>
     sidePoints.slice(leftIndex + 1).map((right) => Math.hypot(left.sideX - right.sideX, left.sideY - right.sideY)),
   );
-  assert(Math.min(...separations) > 10, 'close-up project positions must leave room for separate touch targets');
+  assert(Math.min(...separations) >= 48, 'stacked tracks must remain cleanly separated');
 });
 
 test('sphere detail and inverse scale preserve screen-readable names', () => {
@@ -173,7 +177,7 @@ test('projected globe circle uses the rendered horizon rather than MapLibre zoom
   assert.equal(projectedGlobeCircle({ center, horizon: horizon.slice(0, 3) }), null);
 });
 
-test('sphere layout follows measured globe geometry and crops a tangent side-view patch', () => {
+test('sphere layout follows measured globe geometry and keeps stacked side tracks cropped', () => {
   const normal = sphereLayout({ width: 1000, height: 700, globe: { x: 500, y: 350, diameter: 600 } });
   const rotatedEquivalent = sphereLayout({ width: 1000, height: 700, globe: { x: 498.2, y: 351.4, diameter: 600 } });
   const zoomed = sphereLayout({ width: 1000, height: 700, globe: { x: 500, y: 350, diameter: 900 } });
@@ -182,13 +186,9 @@ test('sphere layout follows measured globe geometry and crops a tangent side-vie
   assert.equal(rotatedEquivalent.diameter, normal.diameter);
   assert(zoomed.diameter > normal.diameter * 1.4);
   assert(normal.diameter * (276 / 320) > normal.globeDiameter, 'innermost digital layer must remain outside the globe');
-  assert.equal(side.x, 500);
-  assert.equal(side.y, 1289.63);
-  assert.equal(side.diameter, 2300);
-  assert.equal(side.globeDiameter, 2300);
-  assert(side.diameter > 1000 * 2, 'side-view sphere must extend beyond both horizontal viewport edges');
-  assert(side.y - side.diameter / 2 < 700 * 0.25, 'outer tangent must enter near the upper viewport quarter');
-  assert(side.y > 700, 'sphere center must remain below the visible viewport');
+  assert.deepEqual(side, { x: 500, y: 364, diameter: 1350, globeDiameter: 1350 });
+  assert(side.diameter > 1000 * 1.3, 'side tracks must remain cropped beyond the horizontal viewport');
+  assert(side.y > 700 * 0.5 && side.y < 700 * 0.55, 'stacked tracks must stay vertically centered');
   const projected = sphereLayout({ width: 1000, height: 700, padding: { right: 400 }, globe: { x: 301.25, y: 348.5, diameter: 588 } });
   assert.equal(projected.x, 301.25);
   assert.equal(projected.y, 348.5);

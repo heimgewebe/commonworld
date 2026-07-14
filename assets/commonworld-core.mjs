@@ -9,12 +9,12 @@ export const DEFAULT_CAMERA = Object.freeze({
 export const DIGITAL_LAYER_TRANSITION_MS = 760;
 
 export const LAYERS = Object.freeze([
-  Object.freeze({ id: 'knowledge_data', label: 'Wissen und offene Daten', themes: ['knowledge', 'open-data', 'research', 'documentation'] }),
-  Object.freeze({ id: 'software_infrastructure', label: 'Freie Software und Infrastruktur', themes: ['free-software', 'open-source', 'infrastructure', 'platform'] }),
-  Object.freeze({ id: 'media_culture', label: 'Offene Medien und Kultur', themes: ['open-media', 'culture', 'archives', 'creative-commons'] }),
-  Object.freeze({ id: 'learning_education', label: 'Freies Lernen und Bildung', themes: ['education', 'open-educational-resources', 'learning'] }),
-  Object.freeze({ id: 'communication_networks', label: 'Kommunikation und Netze', themes: ['communication', 'community-network', 'federation', 'protocol'] }),
-  Object.freeze({ id: 'mixed_other', label: 'Gemischte und weitere digitale Commons', themes: [] }),
+  Object.freeze({ id: 'knowledge_data', label: 'Wissen und offene Daten', trackLabel: 'Wissen', themes: ['knowledge', 'open-data', 'research', 'documentation'] }),
+  Object.freeze({ id: 'software_infrastructure', label: 'Freie Software und Infrastruktur', trackLabel: 'Software', themes: ['free-software', 'open-source', 'infrastructure', 'platform'] }),
+  Object.freeze({ id: 'media_culture', label: 'Offene Medien und Kultur', trackLabel: 'Medien', themes: ['open-media', 'culture', 'archives', 'creative-commons'] }),
+  Object.freeze({ id: 'learning_education', label: 'Freies Lernen und Bildung', trackLabel: 'Lernen', themes: ['education', 'open-educational-resources', 'learning'] }),
+  Object.freeze({ id: 'communication_networks', label: 'Kommunikation und Netze', trackLabel: 'Netze', themes: ['communication', 'community-network', 'federation', 'protocol'] }),
+  Object.freeze({ id: 'mixed_other', label: 'Gemischte und weitere digitale Commons', trackLabel: 'Weitere', themes: [] }),
 ]);
 
 export const ORBIT_PROFILES = Object.freeze([
@@ -78,18 +78,9 @@ function orbitalPoint(profile, angleDegrees) {
   };
 }
 
-function outwardDirection(point) {
-  const x = point.x - 320;
-  const y = point.y - 320;
-  const length = Math.max(1, Math.hypot(x, y));
-  return { x: x / length, y: y / length };
-}
-
-function upperOrbitAngle(profile) {
-  const rotation = profile.rotation * Math.PI / 180;
-  const coefficientX = Math.sin(rotation) * profile.rx;
-  const coefficientY = Math.cos(rotation) * profile.ry;
-  return (Math.atan2(coefficientY, coefficientX) + Math.PI) * 180 / Math.PI;
+export function sphereLayerRowY(layerIndex) {
+  const layer = Number.isInteger(layerIndex) ? clamp(layerIndex, 0, LAYERS.length - 1) : 0;
+  return 210 + layer * 48;
 }
 
 export function sphereLabelLayout(layerIndex, recordIndex, recordCount) {
@@ -99,19 +90,15 @@ export function sphereLabelLayout(layerIndex, recordIndex, recordCount) {
   const profile = ORBIT_PROFILES[layer];
   const overviewAngle = sphereStartOffset(layer, index, count) * 3.6 - 90;
   const overview = orbitalPoint(profile, overviewAngle);
-  const overviewDirection = outwardDirection(overview);
-  const sideSpread = (layer - (LAYERS.length - 1) / 2) * 10.8 + (index - (count - 1) / 2) * 4;
-  const side = orbitalPoint(profile, upperOrbitAngle(profile) + sideSpread);
-  const sideDirection = outwardDirection(side);
+  const sideX = count === 1 ? 350 : 285 + index * (130 / Math.max(1, count - 1));
+  const focusedSideX = count === 1 ? 320 : 185 + index * (270 / Math.max(1, count - 1));
   return Object.freeze({
     overviewX: rounded(overview.x, 2),
     overviewY: rounded(overview.y, 2),
-    overviewDx: rounded(overviewDirection.x, 4),
-    overviewDy: rounded(overviewDirection.y, 4),
-    sideX: rounded(side.x, 2),
-    sideY: rounded(side.y, 2),
-    sideDx: rounded(sideDirection.x, 4),
-    sideDy: rounded(sideDirection.y, 4),
+    sideX: rounded(sideX, 2),
+    sideY: sphereLayerRowY(layer),
+    focusedSideX: rounded(focusedSideX, 2),
+    focusedSideY: 320,
   });
 }
 
@@ -254,12 +241,10 @@ export function sphereLayout({ width, height, padding = {}, globe = null, sideVi
   const fallbackY = top + availableHeight / 2;
   const shortestSide = Math.min(stageWidth, stageHeight);
   if (sideView) {
-    const diameter = Math.max(stageWidth * 2.3, stageHeight * 2.35);
-    const outerTrackTargetY = stageHeight * 0.22;
-    const outerTrackRadiusRatio = 316 / 640;
+    const diameter = Math.max(stageWidth * 1.35, stageHeight * 1.1);
     return {
       x: rounded(stageWidth / 2, 2),
-      y: rounded(outerTrackTargetY + diameter * outerTrackRadiusRatio, 2),
+      y: rounded(stageHeight * 0.52, 2),
       diameter: rounded(diameter, 2),
       globeDiameter: rounded(diameter, 2),
     };

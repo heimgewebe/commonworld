@@ -54,15 +54,21 @@
               <ellipse id="sphere-path-4" cx="320" cy="320" rx="298" ry="288" transform="rotate(-31 320 320)" />
               <ellipse id="sphere-path-5" cx="320" cy="320" rx="292" ry="274" transform="rotate(63 320 320)" />
               <ellipse id="sphere-path-6" cx="320" cy="320" rx="286" ry="294" transform="rotate(-62 320 320)" />
+              <path id="sphere-side-path-1" d="M -80 320 Q 320 313 720 320" />
+              <path id="sphere-side-path-2" d="M -80 320 Q 320 320 720 320" />
+              <path id="sphere-side-path-3" d="M -80 320 Q 320 306 720 320" />
+              <path id="sphere-side-path-4" d="M -80 320 Q 320 313 720 320" />
+              <path id="sphere-side-path-5" d="M -80 320 Q 320 320 720 320" />
+              <path id="sphere-side-path-6" d="M -80 320 Q 320 306 720 320" />
               </g>
             </defs>
-            <g id="sphere-rings" aria-hidden="true">
-              <use href="#sphere-path-1" data-layer-id="knowledge_data"></use>
-              <use href="#sphere-path-2" data-layer-id="software_infrastructure"></use>
-              <use href="#sphere-path-3" data-layer-id="media_culture"></use>
-              <use href="#sphere-path-4" data-layer-id="learning_education"></use>
-              <use href="#sphere-path-5" data-layer-id="communication_networks"></use>
-              <use href="#sphere-path-6" data-layer-id="mixed_other"></use>
+            <g id="sphere-rings">
+              <use href="#sphere-path-1" class="sphere-layer-track" data-layer-id="knowledge_data" role="button" tabindex="-1" aria-label="Wissen und offene Daten auswählen"></use>
+              <use href="#sphere-path-2" class="sphere-layer-track" data-layer-id="software_infrastructure" role="button" tabindex="-1" aria-label="Freie Software und Infrastruktur auswählen"></use>
+              <use href="#sphere-path-3" class="sphere-layer-track" data-layer-id="media_culture" role="button" tabindex="-1" aria-label="Offene Medien und Kultur auswählen"></use>
+              <use href="#sphere-path-4" class="sphere-layer-track" data-layer-id="learning_education" role="button" tabindex="-1" aria-label="Freies Lernen und Bildung auswählen"></use>
+              <use href="#sphere-path-5" class="sphere-layer-track" data-layer-id="communication_networks" role="button" tabindex="-1" aria-label="Kommunikation und Netze auswählen"></use>
+              <use href="#sphere-path-6" class="sphere-layer-track" data-layer-id="mixed_other" role="button" tabindex="-1" aria-label="Gemischte und weitere digitale Commons auswählen"></use>
             </g>
             <g id="sphere-streams" mask="url(#sphere-mask)"></g>
             <circle id="sphere-edge-control" class="sphere-edge-control" cx="320" cy="320" r="318" fill="none" stroke="transparent" stroke-width="20" pointer-events="stroke" role="button" tabindex="0" aria-label="Digitale Commons-Schichten öffnen"></circle>
@@ -82,9 +88,16 @@
 
           <aside id="layer-panel" class="layer-panel" aria-labelledby="layer-title" hidden>
             <h2 id="layer-title" class="visually-hidden">Digitale Commons aus der Nähe</h2>
-            <p class="visually-hidden">Dieselben Commons erscheinen als Lichtpunkte auf sechs Orbits und bleiben beim Nahflug direkt auswählbar.</p>
-            <button id="layer-close" class="icon-button layer-close" type="button" aria-label="Zur Globusansicht zurückkehren">×</button>
-            <div id="layer-buttons" class="layer-buttons" hidden></div>
+            <p class="visually-hidden">Dieselben Commons erscheinen als Schriftzüge auf sechs Bahnen und bleiben beim Nahflug direkt auswählbar.</p>
+            <div class="layer-panel-controls">
+              <button id="layer-search-toggle" class="icon-button layer-search-toggle" type="button" aria-label="Commons suchen und Bahnen filtern" aria-controls="layer-discovery" aria-expanded="false">⌕</button>
+              <button id="layer-close" class="icon-button layer-close" type="button" aria-label="Zur Globusansicht zurückkehren">×</button>
+            </div>
+            <div id="layer-discovery" class="layer-discovery" hidden>
+              <label for="layer-search">Commons in den digitalen Bahnen suchen</label>
+              <div class="layer-search-field"><span aria-hidden="true">⌕</span><input id="layer-search" type="search" inputmode="search" autocomplete="off" placeholder="Commons suchen" /></div>
+              <div id="layer-buttons" class="layer-buttons"></div>
+            </div>
             <div id="layer-projects" class="layer-projects" hidden></div>
           </aside>
 

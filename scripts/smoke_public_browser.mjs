@@ -217,8 +217,21 @@ async function layerJourneyScenario({ mobile = false, viewportOverride = null, t
   const zoomInBox = await run.page.locator('.maplibregl-ctrl-zoom-in').boundingBox();
   assert(zoomInBox, 'layer journey: zoom-in control has no geometry');
   const activateZoomIn = async () => {
+    const previousSize = Number(await stage.getAttribute('data-sphere-size'));
     if (mobile) await run.page.touchscreen.tap(zoomInBox.x + zoomInBox.width / 2, zoomInBox.y + zoomInBox.height / 2);
     else await run.page.mouse.click(zoomInBox.x + zoomInBox.width / 2, zoomInBox.y + zoomInBox.height / 2);
+    await run.page.waitForFunction((size) => Number(document.querySelector('.globe-stage')?.dataset.sphereSize ?? 0) !== size, previousSize);
+    const synchronousGeometry = await run.page.evaluate(() => {
+      const stage = document.querySelector('.globe-stage');
+      const sphere = document.querySelector('#digital-sphere');
+      return {
+        rendered: sphere.getBoundingClientRect().width,
+        declared: Number(stage.dataset.sphereSize),
+        transitionProperty: getComputedStyle(sphere).transitionProperty,
+      };
+    });
+    assert(Math.abs(synchronousGeometry.rendered - synchronousGeometry.declared) <= 2, `layer journey: digital sphere trails the moving globe (${JSON.stringify(synchronousGeometry)})`);
+    assert(!synchronousGeometry.transitionProperty.split(',').map((value) => value.trim()).some((value) => ['width', 'height', 'left', 'top'].includes(value)), `layer journey: overview geometry still animates behind the globe (${JSON.stringify(synchronousGeometry)})`);
     await waitForSphereGeometrySettled(run.page);
   };
   await activateZoomIn();
@@ -327,9 +340,10 @@ async function layerJourneyScenario({ mobile = false, viewportOverride = null, t
     const sphere = document.querySelector('#digital-sphere').getBoundingClientRect();
     const rings = [...document.querySelectorAll('#sphere-rings use')].map((node) => {
       const rect = node.getBoundingClientRect();
-      return { left: rect.left, right: rect.right, top: rect.top, bottom: rect.bottom };
+      const style = getComputedStyle(node);
+      return { layer: node.dataset.layerId, left: rect.left, right: rect.right, top: rect.top, bottom: rect.bottom, width: rect.width, height: rect.height, centerY: rect.top + rect.height / 2, opacity: Number(style.opacity) };
     });
-    const visibleLabels = [...document.querySelectorAll('.sphere-label[data-commonproject-id]')].flatMap((node) => {
+    const visibleLabels = [...document.querySelectorAll('.sphere-project[data-commonproject-id]')].flatMap((node) => {
       const rect = node.getBoundingClientRect();
       const style = getComputedStyle(node);
       const intersects = rect.right > 0 && rect.left < innerWidth && rect.bottom > 0 && rect.top < innerHeight;
@@ -342,19 +356,52 @@ async function layerJourneyScenario({ mobile = false, viewportOverride = null, t
       sphere: { left: sphere.left, right: sphere.right, top: sphere.top, bottom: sphere.bottom, width: sphere.width, height: sphere.height },
       rings,
       visibleLabels,
+      visibleLayerLabels: [...document.querySelectorAll('.sphere-layer-label')].filter((node) => Number(getComputedStyle(node).opacity) > 0.2).length,
+      nodeCount: document.querySelectorAll('.sphere-project-node').length,
+      leaderCount: document.querySelectorAll('.sphere-project-leader').length,
       stackChildren: document.querySelector('#layer-stack-visual').childElementCount,
       projectChildren: document.querySelector('#layer-projects').childElementCount,
       filterChildren: document.querySelector('#layer-buttons').childElementCount,
     };
   });
-  assert(tangentView.sphere.width > tangentView.viewport.width * 2, `layer journey: camera did not zoom into the sphere (${JSON.stringify(tangentView.sphere)})`);
-  assert(tangentView.sphere.left < -tangentView.viewport.width * 0.45 && tangentView.sphere.right > tangentView.viewport.width * 1.45, `layer journey: full rings could still fit inside the viewport (${JSON.stringify(tangentView.sphere)})`);
-  assert(tangentView.sphere.top < tangentView.viewport.height * 0.3 && tangentView.sphere.bottom > tangentView.viewport.height * 2, `layer journey: sphere is not cropped as a close tangent view (${JSON.stringify(tangentView.sphere)})`);
-  assert(tangentView.rings.every(({ left, right, bottom }) => left < 0 && right > tangentView.viewport.width && bottom > tangentView.viewport.height), `layer journey: a complete ring remains visible (${JSON.stringify(tangentView.rings)})`);
-  assert(tangentView.visibleLabels.length >= 3, `layer journey: overview contents did not remain visible on the enlarged tracks (${JSON.stringify(tangentView.visibleLabels)})`);
-  assert(new Set(tangentView.visibleLabels.map(({ layer }) => layer)).size >= 3, `layer journey: close-up does not expose multiple content tracks (${JSON.stringify(tangentView.visibleLabels)})`);
-  assert(tangentView.visibleLabels.every(({ height }) => height >= 18), `layer journey: close-up contents did not become legible (${JSON.stringify(tangentView.visibleLabels)})`);
-  assert(tangentView.stackChildren === 0 && tangentView.projectChildren === 0 && tangentView.filterChildren === 0, `layer journey: substitute labels, cards or filters remain in the spatial view (${JSON.stringify(tangentView)})`);
+  assert(tangentView.sphere.width > tangentView.viewport.width * 1.3, `layer journey: side view is not a cropped close-up (${JSON.stringify(tangentView.sphere)})`);
+  assert(tangentView.sphere.left < 0 && tangentView.sphere.right > tangentView.viewport.width, `layer journey: full tracks fit inside the viewport (${JSON.stringify(tangentView.sphere)})`);
+  const orderedCenters = tangentView.rings.map(({ centerY }) => centerY).sort((left, right) => left - right);
+  const rowGaps = orderedCenters.slice(1).map((center, index) => center - orderedCenters[index]);
+  assert(tangentView.rings.every(({ width, height }) => width > tangentView.viewport.width && height < tangentView.viewport.height * 0.24), `layer journey: tracks are not clean horizontal bands (${JSON.stringify(tangentView.rings)})`);
+  assert(rowGaps.every((gap) => gap >= 40), `layer journey: tracks overlap instead of stacking cleanly (${JSON.stringify({ orderedCenters, rowGaps })})`);
+  assert(tangentView.visibleLabels.length >= 3, `layer journey: overview names did not remain visible on the stacked tracks (${JSON.stringify(tangentView.visibleLabels)})`);
+  assert(new Set(tangentView.visibleLabels.map(({ layer }) => layer)).size >= 3, `layer journey: side view does not expose multiple tracks (${JSON.stringify(tangentView.visibleLabels)})`);
+  assert(tangentView.visibleLabels.every(({ height }) => height >= 18), `layer journey: close-up names did not become legible (${JSON.stringify(tangentView.visibleLabels)})`);
+  assert(tangentView.nodeCount === 0 && tangentView.leaderCount === 0, `layer journey: visible light points or leaders remain (${JSON.stringify(tangentView)})`);
+  assert(tangentView.visibleLayerLabels === 6, `layer journey: not all six selectable track labels are visible (${JSON.stringify(tangentView)})`);
+  assert(tangentView.stackChildren === 0 && tangentView.projectChildren === 0 && tangentView.filterChildren === 6, `layer journey: spatial/filter structure is incomplete (${JSON.stringify(tangentView)})`);
+
+  const knowledgeTrack = run.page.locator('.sphere-layer-label[data-layer-id="knowledge_data"]');
+  await knowledgeTrack.click();
+  assert((await stage.getAttribute('data-focused-layer')) === 'knowledge_data', 'layer journey: selecting a track did not enter single-track focus');
+  const focusedTrack = await run.page.evaluate(() => ({
+    visibleRings: [...document.querySelectorAll('#sphere-rings use')].filter((node) => getComputedStyle(node).visibility !== 'hidden' && Number(getComputedStyle(node).opacity) > 0.2).map((node) => node.dataset.layerId),
+    visibleProjects: [...document.querySelectorAll('.sphere-project[data-commonproject-id]')].filter((node) => getComputedStyle(node).visibility !== 'hidden' && Number(getComputedStyle(node).opacity) > 0.2).map((node) => node.dataset.layerId),
+  }));
+  assert(JSON.stringify(focusedTrack.visibleRings) === JSON.stringify(['knowledge_data']), `layer journey: single-track focus leaves other tracks visible (${JSON.stringify(focusedTrack)})`);
+  assert(focusedTrack.visibleProjects.length > 0 && focusedTrack.visibleProjects.every((layer) => layer === 'knowledge_data'), `layer journey: single-track focus leaves foreign projects visible (${JSON.stringify(focusedTrack)})`);
+
+  await run.page.locator('#layer-search-toggle').click();
+  assert(await run.page.locator('#layer-discovery').isVisible(), 'layer journey: search/filter magnifier did not open');
+  assert((await run.page.locator('#layer-buttons .layer-filter').count()) === 6, 'layer journey: search panel does not expose all track filters');
+  await run.page.locator('#layer-search').fill('Wikipedia');
+  await run.page.waitForTimeout(220);
+  assert((await run.page.locator('#commons-search').inputValue()) === 'Wikipedia', 'layer journey: layer search is not synchronized with global search');
+  const searchedVisible = await run.page.locator('.sphere-project:not([data-filtered-out]):not([data-layer-hidden])').count();
+  assert(searchedVisible === 1, `layer journey: focused search did not reduce to one visible identity (${searchedVisible})`);
+  await run.page.locator('#layer-search').fill('');
+  await run.page.waitForTimeout(220);
+  await run.page.locator('#layer-search-toggle').click();
+  assert(await run.page.locator('#layer-discovery').isHidden(), 'layer journey: search/filter panel did not close');
+  await knowledgeTrack.click();
+  assert((await stage.getAttribute('data-focused-layer')) === null, 'layer journey: selecting the focused track did not return to all tracks');
+
   const directChoice = await run.page.evaluate(() => {
     const topbarBottom = document.querySelector('.topbar')?.getBoundingClientRect().bottom ?? 0;
     return [...document.querySelectorAll('.sphere-project[data-commonproject-id]')].flatMap((project) => {
@@ -368,11 +415,11 @@ async function layerJourneyScenario({ mobile = false, viewportOverride = null, t
       return visible ? [{ id: project.dataset.commonprojectId, title: text?.textContent ?? '', rect: { left: rect.left, top: rect.top, width: rect.width, height: rect.height } }] : [];
     })[0] ?? null;
   });
-  assert(directChoice, 'layer journey: no directly selectable visible Commons light point');
+  assert(directChoice, 'layer journey: no directly selectable visible Commons name');
   const directContent = run.page.locator(`.sphere-project[data-commonproject-id="${directChoice.id}"]`);
   const directHitTarget = directContent.locator('.sphere-project-hit');
   const directHitBox = await directHitTarget.boundingBox();
-  assert(directHitBox && directHitBox.width >= 44 && directHitBox.height >= 44, `layer journey: project light point has an undersized touch target (${JSON.stringify(directHitBox)})`);
+  assert(directHitBox && directHitBox.width >= 44 && directHitBox.height >= 44, `layer journey: project name has an undersized touch target (${JSON.stringify(directHitBox)})`);
   await directHitTarget.click();
   assert(await run.page.locator('#project-focus').isVisible(), 'layer journey: enlarged orbital content did not open its Commons focus');
   assert((await run.page.locator('#focus-title').textContent()) === directChoice.title, `layer journey: enlarged orbit opened the wrong Commons identity (${JSON.stringify(directChoice)})`);
@@ -558,3 +605,4 @@ try {
   await new Promise((resolve, reject) => server.close((error) => (error ? reject(error) : resolve())));
 }
 process.stdout.write(`${JSON.stringify({ verdict: 'PASS', scenarios: results })}\n`);
+process.exit(0);

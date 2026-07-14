@@ -13,6 +13,7 @@ import {
   searchFromState,
   sphereDetailLevel,
   sphereLabelLayout,
+  sphereLayerRowY,
   sphereLayout,
   sphereProjectScale,
   sphereOpacityForGlobeRatio,
@@ -38,11 +39,15 @@ const elements = {
   globeResults: document.querySelector('#globe-results'),
   sphere: document.querySelector('#digital-sphere'),
   sphereStreams: document.querySelector('#sphere-streams'),
+  sphereRings: document.querySelector('#sphere-rings'),
   sphereEdge: document.querySelector('#sphere-edge-control'),
   layerStack: document.querySelector('#layer-stack-visual'),
   layerToggle: document.querySelector('#layer-view-button'),
   layerPanel: document.querySelector('#layer-panel'),
   layerClose: document.querySelector('#layer-close'),
+  layerSearchToggle: document.querySelector('#layer-search-toggle'),
+  layerDiscovery: document.querySelector('#layer-discovery'),
+  layerSearch: document.querySelector('#layer-search'),
   layerButtons: document.querySelector('#layer-buttons'),
   layerProjects: document.querySelector('#layer-projects'),
   globeReset: document.querySelector('#globe-reset'),
@@ -182,25 +187,16 @@ function createSvgElement(name, attributes = {}) {
   return element;
 }
 
-function sphereTextAnchor(directionX) {
-  if (directionX > 0.28) return 'start';
-  if (directionX < -0.28) return 'end';
-  return 'middle';
+function projectHitWidth(title) {
+  return Math.max(48, Math.min(190, String(title).length * 7.4 + 24));
 }
 
-function configureSphereProject(project, sideView = false) {
-  const mode = sideView ? 'side' : 'overview';
-  const directionX = Number(project.dataset[`${mode}Dx`] ?? 0);
-  const directionY = Number(project.dataset[`${mode}Dy`] ?? -1);
-  const leaderLength = sideView ? 22 : 18;
-  const labelDistance = sideView ? 30 : 26;
-  const leader = project.querySelector('.sphere-project-leader');
-  const text = project.querySelector('.sphere-project-text');
-  leader?.setAttribute('x2', String(Number((directionX * leaderLength).toFixed(2))));
-  leader?.setAttribute('y2', String(Number((directionY * leaderLength).toFixed(2))));
-  text?.setAttribute('x', String(Number((directionX * labelDistance).toFixed(2))));
-  text?.setAttribute('y', String(Number((directionY * labelDistance).toFixed(2))));
-  text?.setAttribute('text-anchor', sphereTextAnchor(directionX));
+function selectLayerTrack(layerId) {
+  const nextLayer = runtime.state.layer === layerId ? null : layerId;
+  if (runtime.state.project && nextLayer && deriveLayer(runtime.recordsById.get(runtime.state.project)) !== nextLayer) {
+    runtime.state.project = null;
+  }
+  setLayer(nextLayer);
 }
 
 function renderSphere() {
@@ -208,6 +204,29 @@ function renderSphere() {
   const grouped = new Map(LAYERS.map((layer) => [layer.id, []]));
   for (const record of runtime.records) grouped.get(deriveLayer(record))?.push(record);
   LAYERS.forEach((layer, layerIndex) => {
+    const rowY = sphereLayerRowY(layerIndex);
+    const layerLabel = createSvgElement('text', {
+      class: 'sphere-layer-label',
+      'data-layer-id': layer.id,
+      x: '205',
+      y: String(rowY - 10),
+      role: 'button',
+      tabindex: '-1',
+      focusable: 'true',
+      'aria-label': `${layer.label} auswählen`,
+    });
+    layerLabel.textContent = layer.trackLabel;
+    layerLabel.style.setProperty('--layer-label-y', `${rowY - 10}px`);
+    layerLabel.addEventListener('click', () => {
+      if (runtime.viewPhase === 'layers') selectLayerTrack(layer.id);
+    });
+    layerLabel.addEventListener('keydown', (event) => {
+      if (runtime.viewPhase !== 'layers' || !['Enter', ' '].includes(event.key)) return;
+      event.preventDefault();
+      selectLayerTrack(layer.id);
+    });
+    elements.sphereStreams.append(layerLabel);
+
     const records = grouped.get(layer.id) ?? [];
     records.forEach((record, recordIndex) => {
       const project = createSvgElement('g', {
@@ -225,40 +244,26 @@ function renderSphere() {
       project.style.setProperty('--project-overview-y', `${layout.overviewY}px`);
       project.style.setProperty('--project-side-x', `${layout.sideX}px`);
       project.style.setProperty('--project-side-y', `${layout.sideY}px`);
-      project.dataset.overviewDx = String(layout.overviewDx);
-      project.dataset.overviewDy = String(layout.overviewDy);
-      project.dataset.sideDx = String(layout.sideDx);
-      project.dataset.sideDy = String(layout.sideDy);
-      const hit = createSvgElement('circle', {
+      project.style.setProperty('--project-focus-x', `${layout.focusedSideX}px`);
+      project.style.setProperty('--project-focus-y', `${layout.focusedSideY}px`);
+      const hitWidth = projectHitWidth(record.title);
+      const hit = createSvgElement('rect', {
         class: 'sphere-project-hit',
-        cx: '0',
-        cy: '0',
-        r: '13',
-        'aria-hidden': 'true',
-      });
-      const leader = createSvgElement('line', {
-        class: 'sphere-project-leader',
-        x1: '0',
-        y1: '0',
-        x2: '0',
-        y2: '-18',
-        'aria-hidden': 'true',
-      });
-      const node = createSvgElement('circle', {
-        class: 'sphere-project-node',
-        cx: '0',
-        cy: '0',
-        r: '3.4',
+        x: String(-hitWidth / 2),
+        y: '-18',
+        width: String(hitWidth),
+        height: '36',
+        rx: '8',
         'aria-hidden': 'true',
       });
       const text = createSvgElement('text', {
         class: 'sphere-project-text sphere-name',
         x: '0',
-        y: '-26',
+        y: '0',
+        'text-anchor': 'middle',
       });
       text.textContent = record.title;
-      project.append(hit, leader, node, text);
-      configureSphereProject(project, false);
+      project.append(hit, text);
       project.addEventListener('click', () => {
         if (runtime.viewPhase === 'layers') selectProject(record.id, { trigger: project });
       });
@@ -270,7 +275,6 @@ function renderSphere() {
       elements.sphereStreams.append(project);
     });
   });
-  elements.sphere.dataset.projectMode = 'overview';
   runtime.overlayRenderCount += 1;
   elements.stage.dataset.overlayRenders = String(runtime.overlayRenderCount);
 }
@@ -308,8 +312,9 @@ function renderLayerButtons(container) {
 }
 
 function renderLayerPanel() {
-  elements.layerButtons.replaceChildren();
+  renderLayerButtons(elements.layerButtons);
   elements.layerProjects.replaceChildren();
+  elements.layerSearch.value = runtime.state.query;
 }
 
 function renderTextView() {
@@ -328,9 +333,20 @@ function updateSphereResultVisibility() {
   const queryIds = runtime.state.query
     ? new Set(recordsMatchingQuery().map(({ id }) => id))
     : new Set();
+  const focusedLayer = runtime.state.view === 'layers' ? runtime.state.layer : null;
+  if (focusedLayer) elements.stage.dataset.focusedLayer = focusedLayer;
+  else delete elements.stage.dataset.focusedLayer;
   elements.sphere.querySelectorAll('.sphere-project[data-commonproject-id]').forEach((project) => {
     project.toggleAttribute('data-filtered-out', !visibleIds.has(project.dataset.commonprojectId));
     project.toggleAttribute('data-query-match', queryIds.has(project.dataset.commonprojectId));
+    project.classList.toggle('is-layer-focused', focusedLayer === project.dataset.layerId);
+    project.toggleAttribute('data-layer-hidden', Boolean(focusedLayer && focusedLayer !== project.dataset.layerId));
+  });
+  elements.sphere.querySelectorAll('[data-layer-id].sphere-layer-track, [data-layer-id].sphere-layer-label').forEach((track) => {
+    const selected = focusedLayer === track.dataset.layerId;
+    track.classList.toggle('is-layer-focused', selected);
+    track.toggleAttribute('data-layer-hidden', Boolean(focusedLayer && !selected));
+    track.setAttribute('aria-pressed', String(selected));
   });
 }
 
@@ -393,6 +409,7 @@ function renderDiscoveryState() {
     : `${count} ${count === 1 ? 'Commons' : 'Commons'} in der aktuellen Auswahl.`;
   elements.globeResults.toggleAttribute('data-empty', count === 0);
   elements.search.value = runtime.state.query;
+  elements.layerSearch.value = runtime.state.query;
   elements.searchClear.hidden = runtime.state.query.length === 0;
 }
 
@@ -523,10 +540,12 @@ function updateSphereGeometry() {
   const projectScale = sphereProjectScale(geometry.diameter, detailLevel);
   elements.sphere.dataset.detailLevel = detailLevel;
   elements.sphere.style.setProperty('--project-scale', String(projectScale));
-  const projectMode = sideView ? 'side' : 'overview';
-  if (elements.sphere.dataset.projectMode !== projectMode) {
-    elements.sphere.querySelectorAll('.sphere-project[data-commonproject-id]').forEach((project) => configureSphereProject(project, sideView));
-    elements.sphere.dataset.projectMode = projectMode;
+  const trackMode = sideView ? 'side' : 'overview';
+  if (elements.sphere.dataset.trackMode !== trackMode) {
+    elements.sphere.querySelectorAll('.sphere-layer-track[data-layer-id]').forEach((track, index) => {
+      track.setAttribute('href', `#sphere-${sideView ? 'side-' : ''}path-${index + 1}`);
+    });
+    elements.sphere.dataset.trackMode = trackMode;
   }
   elements.stage.dataset.sphereDetailLevel = detailLevel;
   elements.stage.dataset.sphereProjectScale = String(projectScale);
@@ -629,10 +648,10 @@ function showLayerState() {
   elements.layerPanel.toggleAttribute('data-visible', panelVisible);
   elements.layerPanel.toggleAttribute('inert', !panelVisible);
   elements.layerToggle.setAttribute('aria-expanded', String(runtime.state.view === 'layers'));
-  elements.sphere.querySelectorAll('.sphere-label[data-commonproject-id]').forEach((label) => {
+  elements.sphere.querySelectorAll('.sphere-project[data-commonproject-id], .sphere-layer-track[data-layer-id], .sphere-layer-label[data-layer-id]').forEach((control) => {
     const interactive = runtime.viewPhase === 'layers';
-    label.setAttribute('tabindex', interactive ? '0' : '-1');
-    label.toggleAttribute('aria-hidden', !interactive);
+    control.setAttribute('tabindex', interactive ? '0' : '-1');
+    control.toggleAttribute('aria-hidden', !interactive);
   });
   elements.map.toggleAttribute('inert', journeyActive);
   elements.layerToggle.toggleAttribute('inert', journeyActive);
@@ -693,6 +712,7 @@ function openLayerView({ historyMode = 'push', cameraState = null, instant = fal
   const duration = instant || cameraState || reducedMotion.matches ? 0 : DIGITAL_LAYER_TRANSITION_MS;
   setViewPhase(duration ? 'entering-layers' : 'layers');
   elements.layerPanel.removeAttribute('data-closing');
+  closeLayerDiscovery();
   showLayerState();
   renderLayerPanel();
   if (runtime.mapReady) applyCamera(layerCamera(cameraState), { instant: duration === 0, duration });
@@ -704,6 +724,7 @@ function openLayerView({ historyMode = 'push', cameraState = null, instant = fal
 function closeLayerView({ historyMode = 'push', cameraState = null, preserveLayer = false, instant = false, restoreFocus = true } = {}) {
   const wasOpen = runtime.state.view === 'layers' || runtime.viewPhase !== 'overview';
   runtime.layerPanelReady = false;
+  closeLayerDiscovery();
   runtime.state.view = 'globe';
   if (!preserveLayer) runtime.state.layer = null;
   clearViewTransition();
@@ -718,6 +739,22 @@ function closeLayerView({ historyMode = 'push', cameraState = null, preserveLaye
   if (wasOpen && duration) scheduleViewTransition('overview', duration, { restoreFocus });
   else finishViewTransition('overview', { restoreFocus: wasOpen && restoreFocus });
   if (historyMode) writeHistory(historyMode);
+}
+
+function closeLayerDiscovery({ restoreFocus = false } = {}) {
+  elements.layerDiscovery.hidden = true;
+  elements.layerSearchToggle.setAttribute('aria-expanded', 'false');
+  if (restoreFocus) elements.layerSearchToggle.focus({ preventScroll: true });
+}
+
+function toggleLayerDiscovery() {
+  const opening = elements.layerDiscovery.hidden;
+  elements.layerDiscovery.hidden = !opening;
+  elements.layerSearchToggle.setAttribute('aria-expanded', String(opening));
+  if (opening) {
+    renderLayerPanel();
+    elements.layerSearch.focus({ preventScroll: true });
+  }
 }
 
 function closeSettings({ restoreFocus = true } = {}) {
@@ -855,6 +892,8 @@ function wireControls() {
   });
   elements.layerToggle.addEventListener('click', () => (runtime.state.view === 'layers' ? closeLayerView() : openLayerView({ trigger: elements.layerToggle })));
   elements.layerClose.addEventListener('click', () => closeLayerView());
+  elements.layerSearchToggle.addEventListener('click', toggleLayerDiscovery);
+  elements.layerSearch.addEventListener('input', () => setQuery(elements.layerSearch.value));
   elements.sphereEdge.addEventListener('pointerdown', beginSpherePointer);
   elements.sphereEdge.addEventListener('pointerup', endSpherePointer);
   elements.sphereEdge.addEventListener('pointercancel', cancelSpherePointer);
@@ -885,12 +924,23 @@ function wireControls() {
       else elements.globeReset.focus({ preventScroll: true });
     });
   }
+  elements.sphere.querySelectorAll('.sphere-layer-track[data-layer-id]').forEach((track) => {
+    track.addEventListener('click', () => {
+      if (runtime.viewPhase === 'layers') selectLayerTrack(track.dataset.layerId);
+    });
+    track.addEventListener('keydown', (event) => {
+      if (runtime.viewPhase !== 'layers' || !['Enter', ' '].includes(event.key)) return;
+      event.preventDefault();
+      selectLayerTrack(track.dataset.layerId);
+    });
+  });
   document.querySelectorAll('.catalog-select').forEach((button) => {
     button.addEventListener('click', () => selectProject(button.dataset.commonprojectId));
   });
   document.addEventListener('keydown', (event) => {
     if (event.key !== 'Escape') return;
-    if (runtime.viewPhase !== 'overview' || runtime.state.view === 'layers') closeLayerView();
+    if (!elements.layerDiscovery.hidden) closeLayerDiscovery({ restoreFocus: true });
+    else if (runtime.viewPhase !== 'overview' || runtime.state.view === 'layers') closeLayerView();
     else if (!elements.settingsPanel.hidden) closeSettings();
     else if (!elements.focus.hidden) clearProject();
   });
@@ -928,7 +978,12 @@ function createMap() {
     elements.stage.dataset.mapRenders = String(runtime.mapRenderCount);
     updateSphereGeometry();
   });
-  runtime.map.on('moveend', scheduleCameraHistory);
+  runtime.map.on('movestart', () => { elements.stage.dataset.mapMoving = 'true'; });
+  runtime.map.on('moveend', () => {
+    delete elements.stage.dataset.mapMoving;
+    updateSphereGeometry();
+    scheduleCameraHistory();
+  });
   runtime.map.on('error', (event) => {
     const policy = mapFailurePolicy({ providerReadbackFailed: false });
     degradeMap(event?.error ?? event, { replaceStyle: policy.replaceStyle });

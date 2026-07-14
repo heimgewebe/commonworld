@@ -97,8 +97,12 @@ def render_shell(root: Path = ROOT) -> str:
         f'              <ellipse id="sphere-path-{index}" cx="320" cy="320" rx="{rx}" ry="{ry}" transform="rotate({rotation} 320 320)" />'
         for index, (_, rx, ry, rotation) in enumerate(ORBIT_PROFILES, start=1)
     )
+    side_paths = "\n".join(
+        f'              <path id="sphere-side-path-{index}" d="M -80 320 Q 320 {306 + (index % 3) * 7} 720 320" />'
+        for index in range(1, len(ORBIT_PROFILES) + 1)
+    )
     uses = "\n".join(
-        f'              <use href="#sphere-path-{index}" data-layer-id="{layer_id}"></use>'
+        f'              <use href="#sphere-path-{index}" class="sphere-layer-track" data-layer-id="{layer_id}" role="button" tabindex="-1" aria-label="{html.escape(LAYER_LABELS[layer_id])} auswählen"></use>'
         for index, (layer_id, _, _, _) in enumerate(ORBIT_PROFILES, start=1)
     )
     cards = render_cards(records)
@@ -154,9 +158,10 @@ def render_shell(root: Path = ROOT) -> str:
               <mask id="sphere-mask"><rect width="640" height="640" fill="url(#sphere-center-fade)" /></mask>
               <g id="sphere-paths" fill="none">
 {paths}
+{side_paths}
               </g>
             </defs>
-            <g id="sphere-rings" aria-hidden="true">
+            <g id="sphere-rings">
 {uses}
             </g>
             <g id="sphere-streams" mask="url(#sphere-mask)"></g>
@@ -177,9 +182,16 @@ def render_shell(root: Path = ROOT) -> str:
 
           <aside id="layer-panel" class="layer-panel" aria-labelledby="layer-title" hidden>
             <h2 id="layer-title" class="visually-hidden">Digitale Commons aus der Nähe</h2>
-            <p class="visually-hidden">Dieselben Commons erscheinen als Lichtpunkte auf sechs Orbits und bleiben beim Nahflug direkt auswählbar.</p>
-            <button id="layer-close" class="icon-button layer-close" type="button" aria-label="Zur Globusansicht zurückkehren">×</button>
-            <div id="layer-buttons" class="layer-buttons" hidden></div>
+            <p class="visually-hidden">Dieselben Commons erscheinen als Schriftzüge auf sechs Bahnen und bleiben beim Nahflug direkt auswählbar.</p>
+            <div class="layer-panel-controls">
+              <button id="layer-search-toggle" class="icon-button layer-search-toggle" type="button" aria-label="Commons suchen und Bahnen filtern" aria-controls="layer-discovery" aria-expanded="false">⌕</button>
+              <button id="layer-close" class="icon-button layer-close" type="button" aria-label="Zur Globusansicht zurückkehren">×</button>
+            </div>
+            <div id="layer-discovery" class="layer-discovery" hidden>
+              <label for="layer-search">Commons in den digitalen Bahnen suchen</label>
+              <div class="layer-search-field"><span aria-hidden="true">⌕</span><input id="layer-search" type="search" inputmode="search" autocomplete="off" placeholder="Commons suchen" /></div>
+              <div id="layer-buttons" class="layer-buttons"></div>
+            </div>
             <div id="layer-projects" class="layer-projects" hidden></div>
           </aside>
 
