@@ -119,7 +119,57 @@ export function filterRecords(records, state = {}) {
   });
 }
 
-export function sphereLayout({ width, height, zoom = DEFAULT_CAMERA.zoom, padding = {}, center = null, sideView = false } = {}) {
+const HORIZON_BEARINGS = Object.freeze([0, 45, 90, 135, 180, 225, 270, 315]);
+
+export function globeHorizonCoordinates(center = DEFAULT_CAMERA, angularDistanceDegrees = 89.994) {
+  const radians = Math.PI / 180;
+  const latitude = clamp(finite(center?.lat, DEFAULT_CAMERA.lat), -85.051129, 85.051129) * radians;
+  const longitude = finite(center?.lng, DEFAULT_CAMERA.lng) * radians;
+  const distance = clamp(finite(angularDistanceDegrees, 89.994), 1, 89.9999) * radians;
+  return HORIZON_BEARINGS.map((bearingDegrees) => {
+    const bearing = bearingDegrees * radians;
+    const destinationLatitude = Math.asin(
+      Math.sin(latitude) * Math.cos(distance)
+      + Math.cos(latitude) * Math.sin(distance) * Math.cos(bearing),
+    );
+    const destinationLongitude = longitude + Math.atan2(
+      Math.sin(bearing) * Math.sin(distance) * Math.cos(latitude),
+      Math.cos(distance) - Math.sin(latitude) * Math.sin(destinationLatitude),
+    );
+    return {
+      lng: rounded((((destinationLongitude / radians + 540) % 360) + 360) % 360 - 180, 6),
+      lat: rounded(destinationLatitude / radians, 6),
+    };
+  });
+}
+
+export function projectedGlobeCircle({ center = null, horizon = [] } = {}) {
+  const x = finite(center?.x, Number.NaN);
+  const y = finite(center?.y, Number.NaN);
+  if (!Number.isFinite(x) || !Number.isFinite(y)) return null;
+  const radii = (Array.isArray(horizon) ? horizon : [])
+    .map((point) => {
+      const projectedX = finite(point?.x, Number.NaN);
+      const projectedY = finite(point?.y, Number.NaN);
+      return Number.isFinite(projectedX) && Number.isFinite(projectedY)
+        ? Math.hypot(projectedX - x, projectedY - y)
+        : Number.NaN;
+    })
+    .filter((radius) => Number.isFinite(radius) && radius > 0)
+    .sort((left, right) => left - right);
+  if (radii.length < 4) return null;
+  const middle = Math.floor(radii.length / 2);
+  const radius = radii.length % 2
+    ? radii[middle]
+    : (radii[middle - 1] + radii[middle]) / 2;
+  return {
+    x: rounded(x, 2),
+    y: rounded(y, 2),
+    diameter: rounded(radius * 2, 2),
+  };
+}
+
+export function sphereLayout({ width, height, padding = {}, globe = null, sideView = false } = {}) {
   const stageWidth = Math.max(1, finite(width, 1));
   const stageHeight = Math.max(1, finite(height, 1));
   const left = clamp(finite(padding.left, 0), 0, stageWidth - 1);
@@ -130,17 +180,25 @@ export function sphereLayout({ width, height, zoom = DEFAULT_CAMERA.zoom, paddin
   const availableHeight = Math.max(1, stageHeight - top - bottom);
   const fallbackX = left + availableWidth / 2;
   const fallbackY = top + availableHeight / 2;
-  const x = sideView ? stageWidth / 2 : clamp(finite(center?.x, fallbackX), 0, stageWidth);
-  const y = sideView ? stageHeight / 2 : clamp(finite(center?.y, fallbackY), 0, stageHeight);
   const shortestSide = Math.min(stageWidth, stageHeight);
-  const scale = 2 ** (clamp(finite(zoom, DEFAULT_CAMERA.zoom), 0, 8) - DEFAULT_CAMERA.zoom);
-  const overviewBase = Math.min(availableWidth, availableHeight) * 0.98;
-  const globeDiameter = clamp(overviewBase * scale, shortestSide * 0.36, shortestSide * 1.6);
-  const diameter = sideView ? globeDiameter : globeDiameter * 1.18;
+  if (sideView) {
+    const diameter = Math.min(Math.max(stageWidth, stageHeight) * 0.88, shortestSide * 1.6);
+    return {
+      x: rounded(stageWidth / 2, 2),
+      y: rounded(stageHeight / 2, 2),
+      diameter: rounded(diameter, 2),
+      globeDiameter: rounded(diameter, 2),
+    };
+  }
+  const x = clamp(finite(globe?.x, fallbackX), 0, stageWidth);
+  const y = clamp(finite(globe?.y, fallbackY), 0, stageHeight);
+  const fallbackGlobeDiameter = Math.min(availableWidth, availableHeight) * 0.88;
+  const maximumSafeDiameter = Math.hypot(stageWidth, stageHeight) * 2.5;
+  const globeDiameter = clamp(finite(globe?.diameter, fallbackGlobeDiameter), 1, maximumSafeDiameter);
   return {
     x: rounded(x, 2),
     y: rounded(y, 2),
-    diameter: rounded(diameter, 2),
+    diameter: rounded(globeDiameter * 1.18, 2),
     globeDiameter: rounded(globeDiameter, 2),
   };
 }
@@ -175,9 +233,9 @@ export function mapFailurePolicy({ providerReadbackFailed = false } = {}) {
   return Object.freeze({ degraded: true, replaceStyle: providerReadbackFailed === true });
 }
 
-export function sphereOpacityForZoom(zoom) {
-  const value = finite(zoom, DEFAULT_CAMERA.zoom);
-  if (value <= 1.8) return 1;
-  if (value >= 2.6) return 0;
-  return Number(((2.6 - value) / 0.8).toFixed(4));
+export function sphereOpacityForGlobeRatio(globeViewportRatio) {
+  const value = finite(globeViewportRatio, 0);
+  if (value <= 1.05) return 1;
+  if (value >= 2.1) return 0;
+  return Number(((2.1 - value) / 1.05).toFixed(4));
 }

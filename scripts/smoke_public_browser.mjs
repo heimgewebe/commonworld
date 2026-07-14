@@ -4,6 +4,7 @@ import { readFile, stat } from 'node:fs/promises';
 import path from 'node:path';
 import process from 'node:process';
 import { chromium } from 'playwright';
+import { globeHorizonCoordinates, sphereOpacityForGlobeRatio } from '../assets/commonworld-core.mjs';
 
 const ROOT = process.cwd();
 const MIME = new Map([
@@ -68,6 +69,27 @@ async function newPage({ mobile = false, reducedMotion = 'reduce' } = {}) {
     deviceScaleFactor: 1,
     reducedMotion,
   });
+  await context.addInitScript(() => {
+    let maplibreValue;
+    Object.defineProperty(window, 'maplibregl', {
+      configurable: true,
+      get() { return maplibreValue; },
+      set(value) {
+        if (value?.Map && !value.Map.__commonworldCaptured) {
+          const OriginalMap = value.Map;
+          class CapturedMap extends OriginalMap {
+            constructor(...arguments_) {
+              super(...arguments_);
+              window.__commonworldTestMap = this;
+            }
+          }
+          CapturedMap.__commonworldCaptured = true;
+          value.Map = CapturedMap;
+        }
+        maplibreValue = value;
+      },
+    });
+  });
   const page = await context.newPage();
   const consoleErrors = [];
   const consoleWarnings = [];
@@ -78,6 +100,40 @@ async function newPage({ mobile = false, reducedMotion = 'reduce' } = {}) {
   });
   page.on('pageerror', (error) => pageErrors.push(error.message));
   return { context, page, consoleErrors, consoleWarnings, pageErrors };
+}
+
+
+async function waitForSphereOpacitySettled(page) {
+  await page.waitForFunction(() => {
+    const sphere = document.querySelector('#digital-sphere');
+    if (!sphere) return false;
+    const style = getComputedStyle(sphere);
+    const visible = Number(style.opacity);
+    const target = Number(style.getPropertyValue('--sphere-opacity'));
+    return Number.isFinite(visible) && Number.isFinite(target) && Math.abs(visible - target) <= 0.01;
+  });
+}
+
+async function independentProjectedGlobeDiameter(page) {
+  const center = await page.evaluate(() => {
+    const map = window.__commonworldTestMap;
+    if (!map) return null;
+    const value = map.getCenter();
+    return { lng: value.lng, lat: value.lat };
+  });
+  assert(center, 'browser proof: captured MapLibre instance missing');
+  const horizon = globeHorizonCoordinates(center);
+  return page.evaluate((coordinates) => {
+    const map = window.__commonworldTestMap;
+    const projectedCenter = map.project(map.getCenter());
+    const radii = coordinates
+      .map(({ lng, lat }) => map.project([lng, lat]))
+      .map((point) => Math.hypot(point.x - projectedCenter.x, point.y - projectedCenter.y))
+      .sort((left, right) => left - right);
+    const middle = Math.floor(radii.length / 2);
+    const radius = (radii[middle - 1] + radii[middle]) / 2;
+    return radius * 2;
+  }, horizon);
 }
 
 async function normalScenario() {
@@ -135,34 +191,84 @@ async function layerJourneyScenario({ mobile = false } = {}) {
 
   const before = await run.page.locator('#digital-sphere').boundingBox();
   assert(before, 'layer journey: sphere has no initial geometry');
+  const stage = run.page.locator('.globe-stage');
+  assert((await stage.getAttribute('data-globe-geometry-source')) === 'maplibre-projected-horizon', 'layer journey: sphere does not use MapLibre horizon geometry');
+  const projectedBefore = await independentProjectedGlobeDiameter(run.page);
+  const declaredBefore = Number(await stage.getAttribute('data-globe-diameter'));
+  assert(Math.abs(declaredBefore - projectedBefore) <= 1, `layer journey: declared globe diameter diverges from MapLibre horizon (${declaredBefore} vs ${projectedBefore})`);
+  assert(Math.abs(before.width - declaredBefore * 1.18) <= 2, `layer journey: outer shell ratio is wrong (${before.width} vs ${declaredBefore})`);
+  await waitForSphereOpacitySettled(run.page);
+  const opacityBefore = Number(await run.page.locator('#digital-sphere').evaluate((node) => getComputedStyle(node).opacity));
+  const ratioBefore = Number(await stage.getAttribute('data-globe-viewport-ratio'));
+  assert(Math.abs(opacityBefore - sphereOpacityForGlobeRatio(ratioBefore)) <= 0.01, `layer journey: initial opacity does not follow visible globe ratio (${opacityBefore} at ${ratioBefore})`);
+
   const zoomInBox = await run.page.locator('.maplibregl-ctrl-zoom-in').boundingBox();
   assert(zoomInBox, 'layer journey: zoom-in control has no geometry');
-  if (mobile) await run.page.touchscreen.tap(zoomInBox.x + zoomInBox.width / 2, zoomInBox.y + zoomInBox.height / 2);
-  else await run.page.mouse.click(zoomInBox.x + zoomInBox.width / 2, zoomInBox.y + zoomInBox.height / 2);
-  await run.page.waitForTimeout(520);
-  const afterZoom = await run.page.locator('#digital-sphere').boundingBox();
-  assert(afterZoom && afterZoom.width > before.width * 1.18, `layer journey: sphere did not scale with globe zoom (${before.width} -> ${afterZoom?.width})`);
+  const activateZoomIn = async () => {
+    if (mobile) await run.page.touchscreen.tap(zoomInBox.x + zoomInBox.width / 2, zoomInBox.y + zoomInBox.height / 2);
+    else await run.page.mouse.click(zoomInBox.x + zoomInBox.width / 2, zoomInBox.y + zoomInBox.height / 2);
+    await run.page.waitForTimeout(700);
+  };
+  await activateZoomIn();
+  const afterFirstZoom = await run.page.locator('#digital-sphere').boundingBox();
+  const projectedFirstZoom = await independentProjectedGlobeDiameter(run.page);
+  const declaredFirstZoom = Number(await stage.getAttribute('data-globe-diameter'));
+  assert(afterFirstZoom && afterFirstZoom.width > before.width * 1.18, `layer journey: first zoom did not enlarge sphere (${before.width} -> ${afterFirstZoom?.width})`);
+  assert(Math.abs(declaredFirstZoom - projectedFirstZoom) <= 1, `layer journey: first zoom lost MapLibre horizon coupling (${declaredFirstZoom} vs ${projectedFirstZoom})`);
+  await waitForSphereOpacitySettled(run.page);
+  const opacityFirstZoom = Number(await run.page.locator('#digital-sphere').evaluate((node) => getComputedStyle(node).opacity));
+  const ratioFirstZoom = Number(await stage.getAttribute('data-globe-viewport-ratio'));
+  assert(Math.abs(opacityFirstZoom - sphereOpacityForGlobeRatio(ratioFirstZoom)) <= 0.01, `layer journey: first zoom opacity does not follow visible globe ratio (${opacityFirstZoom} at ${ratioFirstZoom})`);
+
+  await activateZoomIn();
+  const afterSecondZoom = await run.page.locator('#digital-sphere').boundingBox();
+  const projectedSecondZoom = await independentProjectedGlobeDiameter(run.page);
+  const declaredSecondZoom = Number(await stage.getAttribute('data-globe-diameter'));
+  assert(afterSecondZoom && afterSecondZoom.width > afterFirstZoom.width * 1.12, `layer journey: second zoom hit an artificial size ceiling (${afterFirstZoom.width} -> ${afterSecondZoom?.width})`);
+  assert(Math.abs(declaredSecondZoom - projectedSecondZoom) <= 1, `layer journey: second zoom lost MapLibre horizon coupling (${declaredSecondZoom} vs ${projectedSecondZoom})`);
+  await waitForSphereOpacitySettled(run.page);
+  const opacitySecondZoom = Number(await run.page.locator('#digital-sphere').evaluate((node) => getComputedStyle(node).opacity));
+  const ratioSecondZoom = Number(await stage.getAttribute('data-globe-viewport-ratio'));
+  assert(Math.abs(opacitySecondZoom - sphereOpacityForGlobeRatio(ratioSecondZoom)) <= 0.01, `layer journey: second zoom opacity does not follow visible globe ratio (${opacitySecondZoom} at ${ratioSecondZoom})`);
+  assert(opacitySecondZoom <= opacityFirstZoom, `layer journey: opacity increased while visible globe grew (${opacityFirstZoom} -> ${opacitySecondZoom})`);
+
   const zoomOutBox = await run.page.locator('.maplibregl-ctrl-zoom-out').boundingBox();
   assert(zoomOutBox, 'layer journey: zoom-out control has no geometry');
-  if (mobile) await run.page.touchscreen.tap(zoomOutBox.x + zoomOutBox.width / 2, zoomOutBox.y + zoomOutBox.height / 2);
-  else await run.page.mouse.click(zoomOutBox.x + zoomOutBox.width / 2, zoomOutBox.y + zoomOutBox.height / 2);
-  assert((await run.page.locator('.globe-stage').getAttribute('data-view-phase')) === 'overview', 'layer journey: scaled sphere stole the zoom-out control and opened layers');
+  for (let index = 0; index < 2; index += 1) {
+    if (mobile) await run.page.touchscreen.tap(zoomOutBox.x + zoomOutBox.width / 2, zoomOutBox.y + zoomOutBox.height / 2);
+    else await run.page.mouse.click(zoomOutBox.x + zoomOutBox.width / 2, zoomOutBox.y + zoomOutBox.height / 2);
+    await run.page.waitForTimeout(700);
+  }
+  assert((await stage.getAttribute('data-view-phase')) === 'overview', 'layer journey: scaled sphere stole the zoom-out control and opened layers');
   await run.page.waitForFunction((targetWidth) => {
     const width = document.querySelector('#digital-sphere')?.getBoundingClientRect().width ?? 0;
     return Math.abs(width - targetWidth) <= 2;
   }, before.width);
   const restoredScale = await run.page.locator('#digital-sphere').boundingBox();
-  assert(restoredScale && Math.abs(restoredScale.width - before.width) <= 2, `layer journey: sphere scale did not return with globe zoom (${before.width} -> ${restoredScale?.width})`);
+  assert(restoredScale && Math.abs(restoredScale.width - before.width) <= 2, `layer journey: sphere scale did not return after two zoom steps (${before.width} -> ${restoredScale?.width})`);
+  await waitForSphereOpacitySettled(run.page);
+  const opacityRestored = Number(await run.page.locator('#digital-sphere').evaluate((node) => getComputedStyle(node).opacity));
+  assert(opacityRestored === opacityBefore, `layer journey: sphere opacity did not return with visible globe scale (${opacityBefore} -> ${opacityRestored})`);
+
   const mapBox = await run.page.locator('#map').boundingBox();
   assert(mapBox, 'layer journey: map has no geometry');
-  await run.page.mouse.move(mapBox.x + mapBox.width * 0.55, mapBox.y + mapBox.height * 0.52);
+  const zoomNumberBeforeRotation = Number(await stage.getAttribute('data-map-zoom'));
+  const projectedBeforeRotation = await independentProjectedGlobeDiameter(run.page);
+  await run.page.mouse.move(mapBox.x + mapBox.width * 0.5, mapBox.y + mapBox.height * 0.5);
   await run.page.mouse.down();
-  await run.page.mouse.move(mapBox.x + mapBox.width * 0.7, mapBox.y + mapBox.height * 0.52, { steps: 8 });
+  await run.page.mouse.move(mapBox.x + mapBox.width * 0.8, mapBox.y + mapBox.height * 0.35, { steps: 15 });
   await run.page.mouse.up();
-  await run.page.waitForTimeout(180);
+  await run.page.waitForTimeout(500);
   const afterRotation = await run.page.locator('#digital-sphere').boundingBox();
+  const zoomNumberAfterRotation = Number(await stage.getAttribute('data-map-zoom'));
+  const projectedAfterRotation = await independentProjectedGlobeDiameter(run.page);
   assert(afterRotation, 'layer journey: sphere disappeared after rotation');
-  assert(Math.abs(afterRotation.width - before.width) <= 1, `layer journey: sphere extent changed on rotation (${before.width} -> ${afterRotation.width})`);
+  assert(Math.abs(projectedAfterRotation - projectedBeforeRotation) <= 1, `layer journey: MapLibre horizon changed unexpectedly during rotation (${projectedBeforeRotation} -> ${projectedAfterRotation})`);
+  assert(Math.abs(afterRotation.width - restoredScale.width) <= 2, `layer journey: sphere followed internal zoom normalization instead of visible globe (${restoredScale.width} -> ${afterRotation.width}; MapLibre zoom ${zoomNumberBeforeRotation} -> ${zoomNumberAfterRotation})`);
+  await waitForSphereOpacitySettled(run.page);
+  const opacityAfterRotation = Number(await run.page.locator('#digital-sphere').evaluate((node) => getComputedStyle(node).opacity));
+  assert(opacityAfterRotation === opacityRestored, `layer journey: sphere opacity followed internal zoom normalization during rotation (${opacityRestored} -> ${opacityAfterRotation})`);
+
 
   const sphereBox = await run.page.locator('#digital-sphere').boundingBox();
   assert(sphereBox, 'layer journey: clickable sphere geometry missing');

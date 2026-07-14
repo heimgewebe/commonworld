@@ -431,7 +431,10 @@ def validate_public_maplibre_vertical_slice(root: Path = ROOT) -> list[str]:
         "setProjection({ type: 'globe' })",
         "runtime.map.easeTo",
         "runtime.map.jumpTo",
-        "runtime.map.project(runtime.map.getCenter())",
+        "runtime.map.project(center)",
+        "runtime.map.project([lng, lat])",
+        "globeHorizonCoordinates(center)",
+        "projectedGlobeCircle({ center: projectedCenter, horizon })",
         "runtime.map.getPadding()",
         "sphereLayout({",
         "setPresentation(",
@@ -450,11 +453,15 @@ def validate_public_maplibre_vertical_slice(root: Path = ROOT) -> list[str]:
     for token in required_app:
         if token not in app:
             errors.append(f"public runtime application missing contract token: {token}")
-    for token in ("deriveLayer", "binaryFragment", "stateFromSearch", "searchFromState", "filterRecords", "sphereLayout", "sphereOpacityForZoom"):
+    for token in ("deriveLayer", "binaryFragment", "stateFromSearch", "searchFromState", "filterRecords", "globeHorizonCoordinates", "projectedGlobeCircle", "sphereLayout", "sphereOpacityForGlobeRatio"):
         if f"function {token}" not in core:
             errors.append(f"public runtime core missing function: {token}")
     if "requestAnimationFrame" in app or "setInterval" in app:
         errors.append("public runtime must not introduce a continuous animation loop")
+    if "zoom: runtime.map.getZoom()" in app:
+        errors.append("public digital-sphere geometry must not use MapLibre zoom as a direct size input")
+    if "sphereOpacityForZoom" in app or "sphereOpacityForZoom" in core:
+        errors.append("public digital-sphere visibility must not use MapLibre zoom normalization")
 
     required_css = (
         ".topbar",
@@ -504,23 +511,32 @@ def validate_public_maplibre_vertical_slice(root: Path = ROOT) -> list[str]:
         errors.append("public globe-first surface contract mismatch")
     digital_surface = contract.get("digital_sphere", {}) if isinstance(contract.get("digital_sphere"), dict) else {}
     for key, expected in {
-        "geometry_anchor": "maplibre_projected_camera_center",
+        "geometry_anchor": "maplibre_projected_globe_horizon",
         "screen_fixed_center_forbidden": True,
         "side_view_keeps_overlay_attached": True,
     }.items():
         if digital_surface.get(key) != expected:
             errors.append(f"public digital-sphere synchrony contract mismatch: {key}")
-    if digital_surface.get("geometry_inputs") != ["stage_bounds", "maplibre_center_projection", "maplibre_padding", "maplibre_zoom"]:
+    if digital_surface.get("geometry_inputs") != ["stage_bounds", "maplibre_center_projection", "maplibre_horizon_projection", "maplibre_padding"]:
         errors.append("public digital-sphere geometry inputs mismatch")
+    if digital_surface.get("scale_fade") != {
+        "overview_visible_through_globe_viewport_ratio": 1.05,
+        "fade_until_globe_viewport_ratio": 2.1,
+        "local_hidden_from_globe_viewport_ratio": 2.1,
+    }:
+        errors.append("public digital-sphere scale-fade contract mismatch")
     if digital_surface.get("geometry_acceptance_data_attributes") != [
         "data-map-projected-center-x",
         "data-map-projected-center-y",
         "data-sphere-x",
         "data-sphere-y",
         "data-sphere-size",
+        "data-globe-diameter",
+        "data-globe-geometry-source",
+        "data-globe-viewport-ratio",
     ]:
         errors.append("public digital-sphere geometry acceptance attributes mismatch")
-    if digital_surface.get("side_view_visual") != "six_stacked_elliptical_layers_beside_subdued_globe":
+    if digital_surface.get("side_view_visual") != "six_stacked_elliptical_layers_fullscreen_without_globe":
         errors.append("public digital-sphere side-layer visual mismatch")
     navigation = contract.get("navigation", {}) if isinstance(contract.get("navigation"), dict) else {}
     if navigation.get("deep_link_parameters") != ["lng", "lat", "z", "b", "p", "view", "surface", "layer", "project", "q"]:

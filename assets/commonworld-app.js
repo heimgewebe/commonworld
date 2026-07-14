@@ -6,12 +6,14 @@ import {
   deriveLayer,
   digitalLayerCamera,
   filterRecords,
+  globeHorizonCoordinates,
   mapCamera,
   mapFailurePolicy,
   normalizeQuery,
+  projectedGlobeCircle,
   searchFromState,
   sphereLayout,
-  sphereOpacityForZoom,
+  sphereOpacityForGlobeRatio,
   sphereStartOffset,
   stateFromSearch,
 } from './commonworld-core.mjs';
@@ -416,25 +418,44 @@ function setQuery(value, { historyMode = 'replace' } = {}) {
   if (historyMode) runtime.searchTimer = window.setTimeout(() => writeHistory(historyMode), 150);
 }
 
-function setSphereOpacity() {
+function setSphereOpacity({ globeDiameter = null, rect = null } = {}) {
   const immersive = runtime.state.view === 'layers' || runtime.viewPhase !== 'overview';
-  const opacity = immersive ? 1 : (runtime.mapReady ? sphereOpacityForZoom(runtime.map.getZoom()) : 1);
+  let globeViewportRatio = 0;
+  let opacity = 1;
+  if (!immersive && runtime.mapReady) {
+    const bounds = rect ?? elements.stage.getBoundingClientRect();
+    const suppliedDiameter = globeDiameter !== null && globeDiameter !== undefined
+      ? Number(globeDiameter)
+      : Number.NaN;
+    const measuredDiameter = Number.isFinite(suppliedDiameter)
+      ? suppliedDiameter
+      : Number(elements.stage.dataset.globeDiameter ?? 0);
+    globeViewportRatio = measuredDiameter / Math.max(1, Math.min(bounds.width, bounds.height));
+    opacity = sphereOpacityForGlobeRatio(globeViewportRatio);
+  }
   elements.sphere.style.setProperty('--sphere-opacity', String(opacity));
   elements.sphere.toggleAttribute('data-hidden-local', opacity === 0);
+  elements.stage.dataset.globeViewportRatio = String(Number(globeViewportRatio.toFixed(4)));
+}
+
+function projectedGlobeGeometry(center, projectedCenter) {
+  const horizon = globeHorizonCoordinates(center).map(({ lng, lat }) => runtime.map.project([lng, lat]));
+  return projectedGlobeCircle({ center: projectedCenter, horizon });
 }
 
 function updateSphereGeometry() {
   if (!runtime.mapReady || elements.globeSurface.hidden) return;
   const rect = elements.stage.getBoundingClientRect();
-  const projected = runtime.map.project(runtime.map.getCenter());
   const padding = typeof runtime.map.getPadding === 'function' ? runtime.map.getPadding() : {};
   const sideView = runtime.state.view === 'layers' || runtime.viewPhase !== 'overview';
+  const center = runtime.map.getCenter();
+  const projectedCenter = runtime.map.project(center);
+  const globe = sideView ? null : projectedGlobeGeometry(center, projectedCenter);
   const geometry = sphereLayout({
     width: rect.width,
     height: rect.height,
-    zoom: runtime.map.getZoom(),
     padding,
-    center: projected,
+    globe,
     sideView,
   });
   elements.stage.style.setProperty('--sphere-x', `${geometry.x}px`);
@@ -443,13 +464,15 @@ function updateSphereGeometry() {
   elements.sphere.style.setProperty('--sphere-x', `${geometry.x}px`);
   elements.sphere.style.setProperty('--sphere-y', `${geometry.y}px`);
   elements.sphere.style.setProperty('--sphere-size', `${geometry.diameter}px`);
-  elements.stage.dataset.mapProjectedCenterX = String(Number(projected.x.toFixed(2)));
-  elements.stage.dataset.mapProjectedCenterY = String(Number(projected.y.toFixed(2)));
+  elements.stage.dataset.mapProjectedCenterX = String(Number(projectedCenter.x.toFixed(2)));
+  elements.stage.dataset.mapProjectedCenterY = String(Number(projectedCenter.y.toFixed(2)));
   elements.stage.dataset.sphereX = String(geometry.x);
   elements.stage.dataset.sphereY = String(geometry.y);
   elements.stage.dataset.sphereSize = String(geometry.diameter);
   elements.stage.dataset.globeDiameter = String(geometry.globeDiameter);
+  elements.stage.dataset.globeGeometrySource = sideView ? 'side-view-layout' : 'maplibre-projected-horizon';
   elements.stage.dataset.mapZoom = String(Number(runtime.map.getZoom().toFixed(4)));
+  setSphereOpacity({ globeDiameter: geometry.globeDiameter, rect });
 }
 
 function layerCamera(camera = null) {
@@ -499,8 +522,8 @@ function setViewPhase(phase) {
   const allowed = new Set(['overview', 'entering-layers', 'layers', 'leaving-layers']);
   runtime.viewPhase = allowed.has(phase) ? phase : 'overview';
   elements.stage.dataset.viewPhase = runtime.viewPhase;
-  setSphereOpacity();
   updateSphereGeometry();
+  if (!runtime.mapReady) setSphereOpacity();
 }
 
 function showLayerState() {
@@ -783,7 +806,6 @@ function createMap() {
   runtime.map.on('render', () => {
     runtime.mapRenderCount += 1;
     elements.stage.dataset.mapRenders = String(runtime.mapRenderCount);
-    setSphereOpacity();
     updateSphereGeometry();
   });
   runtime.map.on('moveend', scheduleCameraHistory);
@@ -794,7 +816,6 @@ function createMap() {
   runtime.map.on('load', () => {
     runtime.mapReady = true;
     runtime.map.setProjection({ type: 'globe' });
-    setSphereOpacity();
     updateSphereGeometry();
     refreshStatus();
     if (runtime.state.view === 'layers') openLayerView({ historyMode: null, cameraState: runtime.state.camera, instant: true });

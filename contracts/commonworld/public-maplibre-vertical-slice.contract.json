@@ -74,18 +74,14 @@
     "same_identity_in_linear_layer_focus_and_sphere": true,
     "binary_fragments_are_deterministic_visual_encoding_only": true,
     "center_fade": true,
-    "zoom_fade": {
-      "overview_visible_through": 1.8,
-      "local_hidden_from": 2.6
-    },
     "continuous_rotation": false,
     "unchanged_geometry_rewrites_forbidden": true,
-    "geometry_anchor": "maplibre_projected_camera_center",
+    "geometry_anchor": "maplibre_projected_globe_horizon",
     "geometry_inputs": [
       "stage_bounds",
       "maplibre_center_projection",
-      "maplibre_padding",
-      "maplibre_zoom"
+      "maplibre_horizon_projection",
+      "maplibre_padding"
     ],
     "screen_fixed_center_forbidden": true,
     "side_view_keeps_overlay_attached": true,
@@ -94,9 +90,17 @@
       "data-map-projected-center-y",
       "data-sphere-x",
       "data-sphere-y",
-      "data-sphere-size"
+      "data-sphere-size",
+      "data-globe-diameter",
+      "data-globe-geometry-source",
+      "data-globe-viewport-ratio"
     ],
-    "side_view_visual": "six_stacked_elliptical_layers_beside_subdued_globe"
+    "side_view_visual": "six_stacked_elliptical_layers_fullscreen_without_globe",
+    "scale_fade": {
+      "overview_visible_through_globe_viewport_ratio": 1.05,
+      "fade_until_globe_viewport_ratio": 2.1,
+      "local_hidden_from_globe_viewport_ratio": 2.1
+    }
   },
   "navigation": {
     "deep_link_parameters": [

@@ -9,10 +9,12 @@ import {
   deriveLayer,
   digitalLayerCamera,
   filterRecords,
+  globeHorizonCoordinates,
   mapFailurePolicy,
+  projectedGlobeCircle,
   searchFromState,
   sphereLayout,
-  sphereOpacityForZoom,
+  sphereOpacityForGlobeRatio,
   sphereStartOffset,
   stateFromSearch,
 } from '../../assets/commonworld-core.mjs';
@@ -99,21 +101,45 @@ test('record filtering keeps one shared search and layer truth', () => {
   assert.deepEqual(filterRecords(records, { query: 'daten', layer: 'knowledge_data' }).map(({ id }) => id), ['a']);
 });
 
-test('sphere layout follows globe zoom, ignores rotation and centers the full-screen side view', () => {
-  const normal = sphereLayout({ width: 1000, height: 700, zoom: DEFAULT_CAMERA.zoom, padding: {} });
-  const rotatedEquivalent = sphereLayout({ width: 1000, height: 700, zoom: DEFAULT_CAMERA.zoom, padding: {}, center: { x: 498.2, y: 351.4 } });
-  const zoomed = sphereLayout({ width: 1000, height: 700, zoom: DEFAULT_CAMERA.zoom + 0.5, padding: {} });
-  const side = sphereLayout({ width: 1000, height: 700, zoom: DEFAULT_CAMERA.zoom + 0.72, padding: { left: 36, right: 420, top: 36, bottom: 36 }, center: { x: 308, y: 350 }, sideView: true });
-  const globeDiameter = 686;
-  assert.deepEqual(normal, { x: 500, y: 350, diameter: 809.48, globeDiameter: 686 });
+test('globe horizon coordinates stay ninety degrees from the current map center', () => {
+  const horizon = globeHorizonCoordinates({ lng: 8, lat: 24 });
+  assert.equal(horizon.length, 8);
+  const radians = Math.PI / 180;
+  const center = { lng: 8 * radians, lat: 24 * radians };
+  for (const point of horizon) {
+    const longitude = point.lng * radians;
+    const latitude = point.lat * radians;
+    const cosineDistance = Math.sin(center.lat) * Math.sin(latitude)
+      + Math.cos(center.lat) * Math.cos(latitude) * Math.cos(longitude - center.lng);
+    const distance = Math.acos(Math.max(-1, Math.min(1, cosineDistance))) / radians;
+    assert.ok(Math.abs(distance - 89.994) < 0.001);
+  }
+});
+
+test('projected globe circle uses the rendered horizon rather than MapLibre zoom numbers', () => {
+  const center = { x: 195, y: 422 };
+  const horizon = [
+    { x: 195, y: 250.82 }, { x: 316.04, y: 300.96 }, { x: 366.18, y: 422 }, { x: 316.04, y: 543.04 },
+    { x: 195, y: 593.18 }, { x: 73.96, y: 543.04 }, { x: 23.82, y: 422 }, { x: 73.96, y: 300.96 },
+  ];
+  assert.deepEqual(projectedGlobeCircle({ center, horizon }), { x: 195, y: 422, diameter: 342.36 });
+  assert.equal(projectedGlobeCircle({ center, horizon: horizon.slice(0, 3) }), null);
+});
+
+test('sphere layout follows measured globe geometry and centers the full-screen side view', () => {
+  const normal = sphereLayout({ width: 1000, height: 700, globe: { x: 500, y: 350, diameter: 600 } });
+  const rotatedEquivalent = sphereLayout({ width: 1000, height: 700, globe: { x: 498.2, y: 351.4, diameter: 600 } });
+  const zoomed = sphereLayout({ width: 1000, height: 700, globe: { x: 500, y: 350, diameter: 900 } });
+  const side = sphereLayout({ width: 1000, height: 700, padding: { left: 36, right: 420, top: 36, bottom: 36 }, sideView: true });
+  assert.deepEqual(normal, { x: 500, y: 350, diameter: 708, globeDiameter: 600 });
   assert.equal(rotatedEquivalent.diameter, normal.diameter);
   assert(zoomed.diameter > normal.diameter * 1.4);
-  assert(normal.diameter * (276 / 320) > globeDiameter, 'innermost digital layer must remain outside the globe');
+  assert(normal.diameter * (276 / 320) > normal.globeDiameter, 'innermost digital layer must remain outside the globe');
   assert.equal(side.x, 500);
   assert.equal(side.y, 350);
-  assert.equal(side.diameter, 878.15);
-  assert.equal(side.globeDiameter, 878.15);
-  const projected = sphereLayout({ width: 1000, height: 700, padding: { right: 400 }, center: { x: 301.25, y: 348.5 } });
+  assert.equal(side.diameter, 880);
+  assert.equal(side.globeDiameter, 880);
+  const projected = sphereLayout({ width: 1000, height: 700, padding: { right: 400 }, globe: { x: 301.25, y: 348.5, diameter: 588 } });
   assert.equal(projected.x, 301.25);
   assert.equal(projected.y, 348.5);
   assert.equal(projected.diameter, 693.84);
@@ -137,9 +163,9 @@ test('map failure policy preserves the style for isolated errors and replaces it
   assert.deepEqual(mapFailurePolicy({ providerReadbackFailed: true }), { degraded: true, replaceStyle: true });
 });
 
-test('digital sphere fade is monotonic and bounded', () => {
-  assert.equal(sphereOpacityForZoom(1.8), 1);
-  assert.equal(sphereOpacityForZoom(2.2), 0.5);
-  assert.equal(sphereOpacityForZoom(2.6), 0);
-  assert.ok(sphereOpacityForZoom(2.1) > sphereOpacityForZoom(2.4));
+test('digital sphere fade follows visible globe scale instead of MapLibre zoom normalization', () => {
+  assert.equal(sphereOpacityForGlobeRatio(1.05), 1);
+  assert.equal(sphereOpacityForGlobeRatio(1.575), 0.5);
+  assert.equal(sphereOpacityForGlobeRatio(2.1), 0);
+  assert.ok(sphereOpacityForGlobeRatio(1.4) > sphereOpacityForGlobeRatio(1.8));
 });
