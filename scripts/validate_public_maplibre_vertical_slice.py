@@ -366,8 +366,9 @@ def validate_public_maplibre_vertical_slice(root: Path = ROOT) -> list[str]:
     for identifier in EXPECTED_IDS:
         if identifier in app or identifier in core:
             errors.append(f"public runtime code hardcodes catalog identity instead of loading it: {identifier}")
-    if "sphereStartOffset(layerIndex, recordIndex, records.length)" not in app:
-        errors.append("public runtime must use the tested bounded digital-sphere offset helper")
+    for token in ("renderSphereRibbons(runtime.records);", "renderLayerDeck();", "binaryName(record.title)", "ribbonRepeatCount(records.length, 10)"):
+        if token not in app:
+            errors.append(f"public runtime must use the tested text-ribbon lane architecture: {token}")
     if re.search(r"cooperativeGestures\s*:\s*true", app):
         errors.append("public mobile globe must allow one-finger touch movement; cooperativeGestures may not be enabled")
 
@@ -380,6 +381,8 @@ def validate_public_maplibre_vertical_slice(root: Path = ROOT) -> list[str]:
         'id="sphere-edge-control"',
         'id="layer-panel"',
         'id="layer-stack-visual"',
+        'id="layer-track-deck"',
+        'id="layer-search-toggle"',
         'id="project-focus"',
         'id="globe-surface"',
         'id="text-view"',
@@ -431,7 +434,10 @@ def validate_public_maplibre_vertical_slice(root: Path = ROOT) -> list[str]:
         "setProjection({ type: 'globe' })",
         "runtime.map.easeTo",
         "runtime.map.jumpTo",
-        "runtime.map.project(runtime.map.getCenter())",
+        "runtime.map.project(center)",
+        "runtime.map.project([lng, lat])",
+        "globeHorizonCoordinates(center)",
+        "projectedGlobeCircle({ center: projectedCenter, horizon })",
         "runtime.map.getPadding()",
         "sphereLayout({",
         "setPresentation(",
@@ -446,15 +452,28 @@ def validate_public_maplibre_vertical_slice(root: Path = ROOT) -> list[str]:
         "mapFailurePolicy",
         "LOCAL_FALLBACK_STYLE",
         "elements.skipLink.addEventListener('click'",
+        "renderSphereRibbons(",
+        "renderLayerDeck(",
+        "overflowing",
     )
     for token in required_app:
         if token not in app:
             errors.append(f"public runtime application missing contract token: {token}")
-    for token in ("deriveLayer", "binaryFragment", "stateFromSearch", "searchFromState", "filterRecords", "sphereLayout", "sphereOpacityForZoom"):
+    for token in ("deriveLayer", "binaryFragment", "binaryName", "ribbonRepeatCount", "stateFromSearch", "searchFromState", "filterRecords", "globeHorizonCoordinates", "projectedGlobeCircle", "sphereLayout", "sphereOpacityForGlobeRatio"):
         if f"function {token}" not in core:
             errors.append(f"public runtime core missing function: {token}")
-    if "requestAnimationFrame" in app or "setInterval" in app:
-        errors.append("public runtime must not introduce a continuous animation loop")
+    if "setInterval" in app:
+        errors.append("public runtime must not introduce an interval animation loop")
+    animation_frame_calls = app.count("requestAnimationFrame")
+    if animation_frame_calls > 4:
+        errors.append("public runtime may use at most four one-shot animation frames for lane measurement, focus and staged reveal")
+    for token in ("window.requestAnimationFrame(updateLaneOverflow)", "window.requestAnimationFrame(() =>"):
+        if token not in app:
+            errors.append(f"public runtime one-shot animation-frame contract missing token: {token}")
+    if "zoom: runtime.map.getZoom()" in app:
+        errors.append("public digital-sphere geometry must not use MapLibre zoom as a direct size input")
+    if "sphereOpacityForZoom" in app or "sphereOpacityForZoom" in core:
+        errors.append("public digital-sphere visibility must not use MapLibre zoom normalization")
 
     required_css = (
         ".topbar",
@@ -464,6 +483,11 @@ def validate_public_maplibre_vertical_slice(root: Path = ROOT) -> list[str]:
         "--sphere-y",
         "--sphere-size",
         ".sphere-edge-control",
+        ".sphere-ring-text",
+        ".layer-track-deck",
+        ".digital-lane-scroll",
+        "overflow-x: auto",
+        "touch-action: pan-x",
         ".layer-panel",
         ".settings-panel",
         ".text-view",
@@ -504,30 +528,52 @@ def validate_public_maplibre_vertical_slice(root: Path = ROOT) -> list[str]:
         errors.append("public globe-first surface contract mismatch")
     digital_surface = contract.get("digital_sphere", {}) if isinstance(contract.get("digital_sphere"), dict) else {}
     for key, expected in {
-        "geometry_anchor": "maplibre_projected_camera_center",
+        "geometry_anchor": "maplibre_projected_globe_horizon",
         "screen_fixed_center_forbidden": True,
         "side_view_keeps_overlay_attached": True,
     }.items():
         if digital_surface.get(key) != expected:
             errors.append(f"public digital-sphere synchrony contract mismatch: {key}")
-    if digital_surface.get("geometry_inputs") != ["stage_bounds", "maplibre_center_projection", "maplibre_padding", "maplibre_zoom"]:
+    if digital_surface.get("geometry_inputs") != ["stage_bounds", "maplibre_center_projection", "maplibre_horizon_projection", "maplibre_padding"]:
         errors.append("public digital-sphere geometry inputs mismatch")
+    if digital_surface.get("scale_fade") != {
+        "overview_visible_through_globe_viewport_ratio": 1.05,
+        "fade_until_globe_viewport_ratio": 2.1,
+        "local_hidden_from_globe_viewport_ratio": 2.1,
+    }:
+        errors.append("public digital-sphere scale-fade contract mismatch")
     if digital_surface.get("geometry_acceptance_data_attributes") != [
         "data-map-projected-center-x",
         "data-map-projected-center-y",
         "data-sphere-x",
         "data-sphere-y",
         "data-sphere-size",
+        "data-globe-diameter",
+        "data-globe-geometry-source",
+        "data-globe-viewport-ratio",
     ]:
         errors.append("public digital-sphere geometry acceptance attributes mismatch")
-    if digital_surface.get("side_view_visual") != "six_stacked_elliptical_layers_beside_subdued_globe":
+    if digital_surface.get("side_view_visual") != "swipeable_horizontal_name_binary_lanes_after_text_sphere_flight":
         errors.append("public digital-sphere side-layer visual mismatch")
+    for key, expected in {
+        "overview_ring_content": "commons_name_then_utf8_binary_name",
+        "side_view_identity_source": "same_CommonProject_records_not_same_DOM_elements",
+        "multi_lane_horizontal_swipe": True,
+        "single_lane_horizontal_swipe": True,
+        "complete_rings_visible": False,
+        "card_substitution": False,
+        "search_and_filter_always_available": True,
+    }.items():
+        if digital_surface.get(key) != expected:
+            errors.append(f"public digital-sphere close-up contract mismatch: {key}")
     navigation = contract.get("navigation", {}) if isinstance(contract.get("navigation"), dict) else {}
     if navigation.get("deep_link_parameters") != ["lng", "lat", "z", "b", "p", "view", "surface", "layer", "project", "q"]:
         errors.append("public globe/text deep-link parameters mismatch")
     if navigation.get("search_and_layer_filter_shared_across_surfaces") is not True:
         errors.append("public globe/text discovery state must remain shared")
-    if navigation.get("side_layer_responsive_padding") != {"wide": "right_panel", "narrow": "bottom_sheet"}:
+    if navigation.get("side_layer_standard_duration_ms") != 1080:
+        errors.append("public side-layer camera duration mismatch")
+    if navigation.get("side_layer_responsive_padding") != {"wide": "full_viewport_swipe_lanes", "narrow": "full_viewport_swipe_lanes"}:
         errors.append("public side-layer responsive padding contract mismatch")
     machine_surface = contract.get("machine_surface", {}) if isinstance(contract.get("machine_surface"), dict) else {}
     if machine_surface != {

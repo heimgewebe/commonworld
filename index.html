@@ -35,10 +35,10 @@
       </header>
 
       <section id="globe-surface" class="globe-surface" aria-label="Commonworld-Globus">
-        <figure class="globe-stage" aria-labelledby="globe-caption" data-runtime-state="loading" data-map-renders="0" data-overlay-renders="0">
+        <figure class="globe-stage" aria-labelledby="globe-caption" data-runtime-state="loading" data-view-phase="overview" data-map-renders="0" data-overlay-renders="0">
           <div id="map" class="globe-map" role="region" aria-label="Interaktiver Commonworld-Globus"></div>
           <svg id="digital-sphere" class="digital-sphere" viewBox="0 0 640 640" role="group" aria-labelledby="sphere-title">
-            <title id="sphere-title">Digitale Commons-Sphäre mit sechs abgeleiteten Schichten</title>
+            <title id="sphere-title">Digitale Commons-Sphäre aus Namen und deren Binärcode</title>
             <defs>
               <radialGradient id="sphere-center-fade">
                 <stop offset="0%" stop-color="black" />
@@ -48,16 +48,24 @@
               </radialGradient>
               <mask id="sphere-mask"><rect width="640" height="640" fill="url(#sphere-center-fade)" /></mask>
               <g id="sphere-paths" fill="none">
-              <circle id="sphere-path-1" cx="320" cy="320" r="268" />
-              <circle id="sphere-path-2" cx="320" cy="320" r="252" />
-              <circle id="sphere-path-3" cx="320" cy="320" r="236" />
-              <circle id="sphere-path-4" cx="320" cy="320" r="220" />
-              <circle id="sphere-path-5" cx="320" cy="320" r="204" />
-              <circle id="sphere-path-6" cx="320" cy="320" r="188" />
+              <ellipse id="sphere-path-1" cx="320" cy="320" rx="316" ry="300" transform="rotate(-8 320 320)" />
+              <ellipse id="sphere-path-2" cx="320" cy="320" rx="310" ry="282" transform="rotate(20 320 320)" />
+              <ellipse id="sphere-path-3" cx="320" cy="320" rx="304" ry="268" transform="rotate(43 320 320)" />
+              <ellipse id="sphere-path-4" cx="320" cy="320" rx="298" ry="288" transform="rotate(-31 320 320)" />
+              <ellipse id="sphere-path-5" cx="320" cy="320" rx="292" ry="274" transform="rotate(63 320 320)" />
+              <ellipse id="sphere-path-6" cx="320" cy="320" rx="286" ry="294" transform="rotate(-62 320 320)" />
               </g>
             </defs>
+            <g id="sphere-rings">
+              <use href="#sphere-path-1" class="sphere-layer-guide" data-layer-id="knowledge_data"></use>
+              <use href="#sphere-path-2" class="sphere-layer-guide" data-layer-id="software_infrastructure"></use>
+              <use href="#sphere-path-3" class="sphere-layer-guide" data-layer-id="media_culture"></use>
+              <use href="#sphere-path-4" class="sphere-layer-guide" data-layer-id="learning_education"></use>
+              <use href="#sphere-path-5" class="sphere-layer-guide" data-layer-id="communication_networks"></use>
+              <use href="#sphere-path-6" class="sphere-layer-guide" data-layer-id="mixed_other"></use>
+            </g>
             <g id="sphere-streams" mask="url(#sphere-mask)" aria-hidden="true"></g>
-            <circle id="sphere-edge-control" class="sphere-edge-control" cx="320" cy="320" r="276" fill="none" stroke="transparent" stroke-width="28" pointer-events="stroke" role="button" tabindex="0" aria-label="Digitale Commons-Schichten öffnen"></circle>
+            <circle id="sphere-edge-control" class="sphere-edge-control" cx="320" cy="320" r="318" fill="none" stroke="transparent" stroke-width="20" pointer-events="stroke" role="button" tabindex="0" aria-label="Digitale Commons-Schichten öffnen"></circle>
           </svg>
           <div id="layer-stack-visual" class="layer-stack-visual" aria-hidden="true"></div>
 
@@ -73,13 +81,19 @@
           <p id="globe-results" class="globe-results" role="status">10 Commons im aktuellen Katalog.</p>
 
           <aside id="layer-panel" class="layer-panel" aria-labelledby="layer-title" hidden>
-            <div class="panel-heading">
-              <div><p class="kicker">Digitale Sphäre</p><h2 id="layer-title">Sechs Schichten</h2></div>
-              <button id="layer-close" class="icon-button" type="button" aria-label="Schichtansicht schließen">×</button>
+            <h2 id="layer-title" class="visually-hidden">Digitale Commons aus der Nähe</h2>
+            <p class="visually-hidden">Dieselben Commons erscheinen mit ihren Namen und Binärcodes auf sechs horizontal wischbaren Bahnen.</p>
+            <div class="layer-panel-controls">
+              <button id="layer-search-toggle" class="icon-button layer-search-toggle" type="button" aria-label="Commons suchen und Bahnen filtern" aria-controls="layer-discovery" aria-expanded="false">⌕</button>
+              <button id="layer-close" class="icon-button layer-close" type="button" aria-label="Zur Globusansicht zurückkehren">×</button>
             </div>
-            <p>Ortsunabhängige Commons bleiben Teil derselben Welt, ohne erfundene Kartenorte.</p>
-            <div id="layer-buttons" class="layer-buttons" aria-label="Digitale Schichten filtern"></div>
-            <div id="layer-projects" class="layer-projects" aria-label="Commons in der gewählten Schicht"></div>
+            <div id="layer-discovery" class="layer-discovery" hidden>
+              <label for="layer-search">Commons in den digitalen Bahnen suchen</label>
+              <div class="layer-search-field"><span aria-hidden="true">⌕</span><input id="layer-search" type="search" inputmode="search" autocomplete="off" placeholder="Commons suchen" /></div>
+              <div id="layer-buttons" class="layer-buttons"></div>
+            </div>
+            <div id="layer-track-deck" class="layer-track-deck" aria-label="Horizontal wischbare digitale Commons-Bahnen"></div>
+            <div id="layer-projects" class="layer-projects" hidden></div>
           </aside>
 
           <figcaption id="globe-caption" class="visually-hidden">Erde → Großregion → Region → lokaler Zusammenhang → Commons</figcaption>

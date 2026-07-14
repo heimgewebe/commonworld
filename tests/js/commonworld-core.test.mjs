@@ -2,16 +2,23 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import {
   DEFAULT_CAMERA,
+  DIGITAL_LAYER_TRANSITION_MS,
   LAYERS,
+  ORBIT_PROFILES,
   binaryFragment,
+  binaryName,
   cameraFromSearch,
   deriveLayer,
+  digitalLayerCamera,
   filterRecords,
+  globeHorizonCoordinates,
   mapFailurePolicy,
+  projectedGlobeCircle,
+  ribbonRepeatCount,
   searchFromState,
+  sphereDetailLevel,
   sphereLayout,
-  sphereOpacityForZoom,
-  sphereStartOffset,
+  sphereOpacityForGlobeRatio,
   stateFromSearch,
 } from '../../assets/commonworld-core.mjs';
 
@@ -38,16 +45,29 @@ test('binary fragments are stable visual encodings', () => {
   assert.match(binaryFragment('debian'), /^[01]{12}$/);
 });
 
-test('digital sphere offsets wrap all catalog labels into the visible path band', () => {
-  const recordsPerLayer = [2, 2, 1, 2, 2, 1];
-  const offsets = recordsPerLayer.flatMap((count, layerIndex) =>
-    Array.from({ length: count }, (_, recordIndex) => sphereStartOffset(layerIndex, recordIndex, count)),
-  );
-  assert.equal(offsets.length, 10);
-  assert.ok(offsets.every((offset) => offset >= 8 && offset < 80));
-  assert.ok(Math.abs(sphereStartOffset(3, 1, 2) - 64.88) < 0.0001);
-  assert.ok(Math.abs(sphereStartOffset(5, 0, 1) - 18.8) < 0.0001);
-  assert.equal(sphereStartOffset(-1, -1, 0), 8);
+test('digital ribbons encode the actual UTF-8 Commons names', () => {
+  assert.equal(binaryName('A'), '01000001');
+  assert.equal(binaryName('ä'), '11000011 10100100');
+  assert.equal(binaryName('Debian').split(' ').length, 6);
+  assert.equal(ribbonRepeatCount(1), 6);
+  assert.equal(ribbonRepeatCount(2), 6);
+  assert.equal(ribbonRepeatCount(10), 2);
+});
+
+
+test('orbital profiles remain distinct semantic paths rather than copied circles', () => {
+  assert.equal(ORBIT_PROFILES.length, LAYERS.length);
+  assert.equal(new Set(ORBIT_PROFILES.map(({ rotation }) => rotation)).size, LAYERS.length);
+  assert(ORBIT_PROFILES.every(({ rx, ry }) => rx !== ry));
+  assert(ORBIT_PROFILES.every(({ rx, ry }) => rx >= 286 && ry >= 268));
+});
+
+test('sphere detail levels remain stable for overview and close-up rendering', () => {
+  assert.equal(sphereDetailLevel({ diameter: 300 }), 'micro');
+  assert.equal(sphereDetailLevel({ diameter: 500 }), 'compact');
+  assert.equal(sphereDetailLevel({ diameter: 800 }), 'names');
+  assert.equal(sphereDetailLevel({ diameter: 300, sideView: true }), 'close');
+  assert(LAYERS.every(({ trackLabel }) => typeof trackLabel === 'string' && trackLabel.length > 0));
 });
 
 test('deep-link state accepts surface, search, identity and clamped camera', () => {
@@ -97,16 +117,59 @@ test('record filtering keeps one shared search and layer truth', () => {
   assert.deepEqual(filterRecords(records, { query: 'daten', layer: 'knowledge_data' }).map(({ id }) => id), ['a']);
 });
 
-test('sphere layout follows the padded visible globe center and zoom', () => {
-  const normal = sphereLayout({ width: 1000, height: 700, zoom: 1.15, padding: {} });
-  const side = sphereLayout({ width: 1000, height: 700, zoom: 1.55, padding: { left: 36, right: 420, top: 36, bottom: 36 }, sideView: true });
-  assert.deepEqual(normal, { x: 500, y: 350, diameter: 686 });
-  assert.equal(side.x, 308);
-  assert.equal(side.y, 350);
-  assert.equal(side.diameter, 522.24);
-  const projected = sphereLayout({ width: 1000, height: 700, zoom: 1.15, padding: { right: 400 }, center: { x: 301.25, y: 348.5 } });
+test('globe horizon coordinates stay ninety degrees from the current map center', () => {
+  const horizon = globeHorizonCoordinates({ lng: 8, lat: 24 });
+  assert.equal(horizon.length, 8);
+  const radians = Math.PI / 180;
+  const center = { lng: 8 * radians, lat: 24 * radians };
+  for (const point of horizon) {
+    const longitude = point.lng * radians;
+    const latitude = point.lat * radians;
+    const cosineDistance = Math.sin(center.lat) * Math.sin(latitude)
+      + Math.cos(center.lat) * Math.cos(latitude) * Math.cos(longitude - center.lng);
+    const distance = Math.acos(Math.max(-1, Math.min(1, cosineDistance))) / radians;
+    assert.ok(Math.abs(distance - 89.994) < 0.001);
+  }
+});
+
+test('projected globe circle uses the rendered horizon rather than MapLibre zoom numbers', () => {
+  const center = { x: 195, y: 422 };
+  const horizon = [
+    { x: 195, y: 250.82 }, { x: 316.04, y: 300.96 }, { x: 366.18, y: 422 }, { x: 316.04, y: 543.04 },
+    { x: 195, y: 593.18 }, { x: 73.96, y: 543.04 }, { x: 23.82, y: 422 }, { x: 73.96, y: 300.96 },
+  ];
+  assert.deepEqual(projectedGlobeCircle({ center, horizon }), { x: 195, y: 422, diameter: 342.36 });
+  assert.equal(projectedGlobeCircle({ center, horizon: horizon.slice(0, 3) }), null);
+});
+
+test('sphere layout follows measured globe geometry and keeps stacked side tracks cropped', () => {
+  const normal = sphereLayout({ width: 1000, height: 700, globe: { x: 500, y: 350, diameter: 600 } });
+  const rotatedEquivalent = sphereLayout({ width: 1000, height: 700, globe: { x: 498.2, y: 351.4, diameter: 600 } });
+  const zoomed = sphereLayout({ width: 1000, height: 700, globe: { x: 500, y: 350, diameter: 900 } });
+  const side = sphereLayout({ width: 1000, height: 700, padding: { left: 36, right: 420, top: 36, bottom: 36 }, sideView: true });
+  assert.deepEqual(normal, { x: 500, y: 350, diameter: 792, globeDiameter: 600 });
+  assert.equal(rotatedEquivalent.diameter, normal.diameter);
+  assert(zoomed.diameter > normal.diameter * 1.4);
+  assert(normal.diameter * (276 / 320) > normal.globeDiameter, 'innermost digital layer must remain outside the globe');
+  assert.deepEqual(side, { x: 80, y: 406, diameter: 2050, globeDiameter: 2050 });
+  assert(side.diameter > 1000 * 2, 'side journey must move through a cropped enlargement of the text sphere');
+  assert(side.x < 1000 * 0.1 && side.y > 700 * 0.55, 'side journey must approach the enlarged sphere from the left');
+  const projected = sphereLayout({ width: 1000, height: 700, padding: { right: 400 }, globe: { x: 301.25, y: 348.5, diameter: 588 } });
   assert.equal(projected.x, 301.25);
   assert.equal(projected.y, 348.5);
+  assert.equal(projected.diameter, 776.16);
+  assert.equal(projected.globeDiameter, 588);
+});
+
+test('digital layer camera performs a bounded journey without changing identity', () => {
+  assert.equal(DIGITAL_LAYER_TRANSITION_MS, 1080);
+  assert.deepEqual(digitalLayerCamera({ lng: 13.4, lat: 52.5, zoom: 1.2, bearing: 170, pitch: 0 }), {
+    center: [13.4, 52.5],
+    zoom: 2.25,
+    bearing: -162,
+    pitch: 58,
+    padding: { top: 0, right: 0, bottom: 0, left: 0 },
+  });
 });
 
 test('map failure policy preserves the style for isolated errors and replaces it only after provider readback failure', () => {
@@ -115,9 +178,9 @@ test('map failure policy preserves the style for isolated errors and replaces it
   assert.deepEqual(mapFailurePolicy({ providerReadbackFailed: true }), { degraded: true, replaceStyle: true });
 });
 
-test('digital sphere fade is monotonic and bounded', () => {
-  assert.equal(sphereOpacityForZoom(1.8), 1);
-  assert.equal(sphereOpacityForZoom(2.2), 0.5);
-  assert.equal(sphereOpacityForZoom(2.6), 0);
-  assert.ok(sphereOpacityForZoom(2.1) > sphereOpacityForZoom(2.4));
+test('digital sphere fade follows visible globe scale instead of MapLibre zoom normalization', () => {
+  assert.equal(sphereOpacityForGlobeRatio(1.05), 1);
+  assert.equal(sphereOpacityForGlobeRatio(1.575), 0.5);
+  assert.equal(sphereOpacityForGlobeRatio(2.1), 0);
+  assert.ok(sphereOpacityForGlobeRatio(1.4) > sphereOpacityForGlobeRatio(1.8));
 });

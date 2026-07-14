@@ -1,16 +1,21 @@
 import {
   DEFAULT_CAMERA,
+  binaryName,
+  DIGITAL_LAYER_TRANSITION_MS,
   LAYERS,
-  binaryFragment,
   deriveLayer,
+  digitalLayerCamera,
   filterRecords,
+  globeHorizonCoordinates,
   mapCamera,
   mapFailurePolicy,
   normalizeQuery,
+  projectedGlobeCircle,
+  ribbonRepeatCount,
   searchFromState,
+  sphereDetailLevel,
   sphereLayout,
-  sphereOpacityForZoom,
-  sphereStartOffset,
+  sphereOpacityForGlobeRatio,
   stateFromSearch,
 } from './commonworld-core.mjs';
 
@@ -33,13 +38,18 @@ const elements = {
   globeResults: document.querySelector('#globe-results'),
   sphere: document.querySelector('#digital-sphere'),
   sphereStreams: document.querySelector('#sphere-streams'),
+  sphereRings: document.querySelector('#sphere-rings'),
   sphereEdge: document.querySelector('#sphere-edge-control'),
   layerStack: document.querySelector('#layer-stack-visual'),
   layerToggle: document.querySelector('#layer-view-button'),
   layerPanel: document.querySelector('#layer-panel'),
   layerClose: document.querySelector('#layer-close'),
+  layerSearchToggle: document.querySelector('#layer-search-toggle'),
+  layerDiscovery: document.querySelector('#layer-discovery'),
+  layerSearch: document.querySelector('#layer-search'),
   layerButtons: document.querySelector('#layer-buttons'),
   layerProjects: document.querySelector('#layer-projects'),
+  layerDeck: document.querySelector('#layer-track-deck'),
   globeReset: document.querySelector('#globe-reset'),
   search: document.querySelector('#commons-search'),
   searchClear: document.querySelector('#search-clear'),
@@ -73,6 +83,14 @@ const runtime = {
     query: '',
   },
   previousGlobeCamera: null,
+  viewPhase: 'overview',
+  viewTransitionTimer: null,
+  viewTransitionCleanup: null,
+  layerPanelRevealTimer: null,
+  layerPanelReady: false,
+  layerReturnTarget: null,
+  spherePointerStart: null,
+  lastSpherePointerActivation: 0,
   applyingHistory: false,
   mapReady: false,
   mapRenderCount: 0,
@@ -86,6 +104,7 @@ const runtime = {
   mapDegraded: false,
   providerFallbackApplied: false,
   providerErrorLogged: false,
+  laneResizeObserver: null,
 };
 
 function setStatus(message, state = 'loading') {
@@ -169,48 +188,129 @@ function createSvgElement(name, attributes = {}) {
   return element;
 }
 
-function renderSphere() {
-  elements.sphereStreams.replaceChildren();
+function groupedDigitalRecords(records = runtime.records) {
   const grouped = new Map(LAYERS.map((layer) => [layer.id, []]));
-  for (const record of runtime.records) grouped.get(deriveLayer(record))?.push(record);
+  for (const record of records) grouped.get(deriveLayer(record))?.push(record);
+  return grouped;
+}
+
+function appendRingSequence(textPath, records, repeatCount) {
+  for (let copy = 0; copy < repeatCount; copy += 1) {
+    for (const record of records) {
+      const name = createSvgElement('tspan', { class: 'sphere-ring-name' });
+      name.textContent = `  ${record.title}  `;
+      const binary = createSvgElement('tspan', { class: 'sphere-ring-binary' });
+      binary.textContent = `${binaryName(record.title)}   `;
+      textPath.append(name, binary);
+    }
+  }
+}
+
+function renderSphereRibbons(records = runtime.records) {
+  elements.sphereStreams.replaceChildren();
+  const grouped = groupedDigitalRecords(records);
   LAYERS.forEach((layer, layerIndex) => {
-    const records = grouped.get(layer.id) ?? [];
-    records.forEach((record, recordIndex) => {
-      const text = createSvgElement('text', {
-        class: 'sphere-label',
-        'data-commonproject-id': record.id,
-        'data-layer-id': layer.id,
-      });
-      const path = createSvgElement('textPath', {
-        href: `#sphere-path-${layerIndex + 1}`,
-        startOffset: `${sphereStartOffset(layerIndex, recordIndex, records.length)}%`,
-      });
-      const name = createSvgElement('tspan', { class: 'sphere-name' });
-      name.textContent = record.title;
-      const binary = createSvgElement('tspan', { class: 'sphere-binary', dx: '8' });
-      binary.textContent = binaryFragment(record.id);
-      path.append(name, binary);
-      text.append(path);
-      elements.sphereStreams.append(text);
+    const source = grouped.get(layer.id) ?? [];
+    const displayRecords = source.length ? source : [{ title: layer.trackLabel }];
+    const text = createSvgElement('text', {
+      class: 'sphere-ring-text',
+      'data-layer-id': layer.id,
     });
+    const textPath = createSvgElement('textPath', {
+      href: `#sphere-path-${layerIndex + 1}`,
+      startOffset: `${(layerIndex * 11 + 3) % 100}%`,
+    });
+    appendRingSequence(textPath, displayRecords, ribbonRepeatCount(displayRecords.length, 10));
+    text.append(textPath);
+    text.toggleAttribute('data-empty', source.length === 0);
+    elements.sphereStreams.append(text);
   });
   runtime.overlayRenderCount += 1;
   elements.stage.dataset.overlayRenders = String(runtime.overlayRenderCount);
 }
 
+function selectLayerTrack(layerId) {
+  const nextLayer = runtime.state.layer === layerId ? null : layerId;
+  if (runtime.state.project && nextLayer && deriveLayer(runtime.recordsById.get(runtime.state.project)) !== nextLayer) {
+    runtime.state.project = null;
+  }
+  setLayer(nextLayer);
+}
+
+function createRibbonSegment(record, copyIndex) {
+  const segment = document.createElement('button');
+  segment.type = 'button';
+  segment.className = 'digital-ribbon-item';
+  segment.dataset.commonprojectId = record.id;
+  segment.dataset.ribbonCopy = String(copyIndex);
+  segment.setAttribute('aria-label', `${record.title} öffnen`);
+  if (copyIndex > 0) segment.setAttribute('tabindex', '-1');
+  const name = document.createElement('span');
+  name.className = 'digital-ribbon-name';
+  name.textContent = record.title;
+  const binary = document.createElement('span');
+  binary.className = 'digital-ribbon-binary';
+  binary.textContent = binaryName(record.title);
+  segment.append(name, binary);
+  segment.addEventListener('click', () => selectProject(record.id, { trigger: segment }));
+  return segment;
+}
+
+function updateLaneOverflow() {
+  elements.layerDeck.querySelectorAll('.digital-lane-scroll').forEach((scroller) => {
+    scroller.toggleAttribute('data-overflowing', scroller.scrollWidth > scroller.clientWidth + 2);
+  });
+}
+
+function renderLayerDeck() {
+  elements.layerDeck.replaceChildren();
+  const grouped = groupedDigitalRecords();
+  for (const layer of LAYERS) {
+    const records = grouped.get(layer.id) ?? [];
+    const lane = document.createElement('section');
+    lane.className = 'digital-lane';
+    lane.dataset.layerId = layer.id;
+    lane.setAttribute('aria-label', layer.label);
+
+    const focus = document.createElement('button');
+    focus.type = 'button';
+    focus.className = 'digital-lane-focus';
+    focus.dataset.layerId = layer.id;
+    focus.setAttribute('aria-pressed', 'false');
+    focus.innerHTML = `<span>${layer.trackLabel}</span><small>${records.length} Commons</small>`;
+    focus.addEventListener('click', () => selectLayerTrack(layer.id));
+
+    const scroller = document.createElement('div');
+    scroller.className = 'digital-lane-scroll';
+    scroller.dataset.layerId = layer.id;
+    scroller.tabIndex = 0;
+    scroller.setAttribute('role', 'region');
+    scroller.setAttribute('aria-label', `${layer.label} horizontal durchblättern`);
+    const content = document.createElement('div');
+    content.className = 'digital-lane-content';
+    const repeats = ribbonRepeatCount(records.length, 10);
+    for (let copy = 0; copy < repeats; copy += 1) {
+      for (const record of records) content.append(createRibbonSegment(record, copy));
+    }
+    scroller.append(content);
+    lane.append(focus, scroller);
+    elements.layerDeck.append(lane);
+  }
+  runtime.laneResizeObserver?.disconnect();
+  if ('ResizeObserver' in window) {
+    runtime.laneResizeObserver = new ResizeObserver(updateLaneOverflow);
+    elements.layerDeck.querySelectorAll('.digital-lane-scroll').forEach((scroller) => runtime.laneResizeObserver.observe(scroller));
+  }
+  window.requestAnimationFrame(updateLaneOverflow);
+}
+
+function renderSphere() {
+  renderSphereRibbons(runtime.records);
+  renderLayerDeck();
+}
+
 function renderLayerStack() {
   elements.layerStack.replaceChildren();
-  for (const layer of LAYERS) {
-    const item = document.createElement('div');
-    item.className = 'layer-stack-item';
-    item.dataset.layerId = layer.id;
-    const label = document.createElement('span');
-    label.textContent = layer.label;
-    const count = document.createElement('small');
-    count.textContent = String(runtime.records.filter((record) => deriveLayer(record) === layer.id).length);
-    item.append(label, count);
-    elements.layerStack.append(item);
-  }
 }
 
 function layerForRecord(record) {
@@ -244,19 +344,7 @@ function renderLayerButtons(container) {
 function renderLayerPanel() {
   renderLayerButtons(elements.layerButtons);
   elements.layerProjects.replaceChildren();
-  for (const record of visibleRecords()) {
-    const button = document.createElement('button');
-    button.type = 'button';
-    button.className = 'layer-project';
-    button.dataset.commonprojectId = record.id;
-    const name = document.createElement('span');
-    name.textContent = record.title;
-    const layerName = document.createElement('small');
-    layerName.textContent = layerForRecord(record)?.label ?? 'Digital';
-    button.append(name, layerName);
-    button.addEventListener('click', () => selectProject(record.id));
-    elements.layerProjects.append(button);
-  }
+  elements.layerSearch.value = runtime.state.query;
 }
 
 function renderTextView() {
@@ -271,10 +359,24 @@ function renderTextView() {
 }
 
 function updateSphereResultVisibility() {
-  const visibleIds = new Set(visibleRecords().map(({ id }) => id));
-  elements.sphere.querySelectorAll('.sphere-label[data-commonproject-id]').forEach((label) => {
-    label.toggleAttribute('data-filtered-out', !visibleIds.has(label.dataset.commonprojectId));
+  const visible = visibleRecords();
+  const visibleIds = new Set(visible.map(({ id }) => id));
+  const focusedLayer = runtime.state.view === 'layers' ? runtime.state.layer : null;
+  if (focusedLayer) elements.stage.dataset.focusedLayer = focusedLayer;
+  else delete elements.stage.dataset.focusedLayer;
+  renderSphereRibbons(visible);
+  elements.layerDeck.querySelectorAll('.digital-ribbon-item[data-commonproject-id]').forEach((segment) => {
+    segment.hidden = !visibleIds.has(segment.dataset.commonprojectId);
   });
+  elements.layerDeck.querySelectorAll('.digital-lane[data-layer-id]').forEach((lane) => {
+    const selected = focusedLayer === lane.dataset.layerId;
+    const primaryVisible = [...lane.querySelectorAll('.digital-ribbon-item[data-ribbon-copy="0"]')].filter((segment) => !segment.hidden).length;
+    lane.classList.toggle('is-focused', selected);
+    lane.toggleAttribute('data-layer-hidden', Boolean(focusedLayer && !selected));
+    lane.toggleAttribute('data-empty', primaryVisible === 0);
+    lane.querySelector('.digital-lane-focus')?.setAttribute('aria-pressed', String(selected));
+  });
+  window.requestAnimationFrame(updateLaneOverflow);
 }
 
 function replaceList(container, values) {
@@ -319,7 +421,7 @@ function updateSelectionMarks() {
   document.querySelectorAll('[data-commonproject-id]').forEach((element) => {
     const selected = element.dataset.commonprojectId === runtime.state.project;
     element.classList.toggle('is-selected', selected);
-    if (element.matches('button')) element.setAttribute('aria-pressed', String(selected));
+    if (element.matches('button') || element.getAttribute('role') === 'button') element.setAttribute('aria-pressed', String(selected));
     if (element.matches('.catalog-card')) element.toggleAttribute('data-selected', selected);
   });
   updateFocusPanel();
@@ -336,14 +438,16 @@ function renderDiscoveryState() {
     : `${count} ${count === 1 ? 'Commons' : 'Commons'} in der aktuellen Auswahl.`;
   elements.globeResults.toggleAttribute('data-empty', count === 0);
   elements.search.value = runtime.state.query;
+  elements.layerSearch.value = runtime.state.query;
   elements.searchClear.hidden = runtime.state.query.length === 0;
 }
 
 function currentUrlState() {
-  return {
-    ...runtime.state,
-    camera: runtime.mapReady ? mapCamera(runtime.map) : runtime.state.camera,
-  };
+  const preserveOverviewCamera = (runtime.state.view === 'layers' || runtime.viewPhase === 'leaving-layers') && runtime.previousGlobeCamera;
+  const camera = preserveOverviewCamera
+    ? runtime.previousGlobeCamera
+    : (runtime.mapReady ? mapCamera(runtime.map) : runtime.state.camera);
+  return { ...runtime.state, camera };
 }
 
 function writeHistory(mode = 'replace') {
@@ -360,7 +464,7 @@ function scheduleCameraHistory() {
 
 function selectProject(identifier, { historyMode = 'push', focus = true, trigger = document.activeElement } = {}) {
   if (!runtime.recordsById.has(identifier)) return;
-  if (trigger instanceof HTMLElement && !elements.focus.contains(trigger)) runtime.focusReturnTarget = trigger;
+  if (trigger instanceof Element && !elements.focus.contains(trigger)) runtime.focusReturnTarget = trigger;
   runtime.state.project = identifier;
   runtime.state.layer = deriveLayer(runtime.recordsById.get(identifier));
   renderDiscoveryState();
@@ -369,13 +473,14 @@ function selectProject(identifier, { historyMode = 'push', focus = true, trigger
 }
 
 function isVisibleFocusTarget(target) {
-  return target instanceof HTMLElement && target.isConnected && target.getClientRects().length > 0 && !target.closest('[hidden]');
+  return target instanceof Element && typeof target.focus === 'function' && target.isConnected && target.getClientRects().length > 0 && !target.closest('[hidden]');
 }
+
 
 function visibleProjectTrigger(identifier) {
   const escaped = CSS.escape(identifier);
   const candidates = [
-    ...document.querySelectorAll(`.layer-project[data-commonproject-id="${escaped}"], .catalog-select[data-commonproject-id="${escaped}"]`),
+    ...document.querySelectorAll(`.digital-ribbon-item[data-commonproject-id="${escaped}"], .catalog-select[data-commonproject-id="${escaped}"]`),
   ];
   return candidates.find(isVisibleFocusTarget) ?? null;
 }
@@ -395,8 +500,13 @@ function clearProject({ historyMode = 'push', restoreFocus = true } = {}) {
 }
 
 function setLayer(layer, { historyMode = 'push' } = {}) {
-  runtime.state.layer = LAYERS.some(({ id }) => id === layer) ? layer : null;
+  const nextLayer = LAYERS.some(({ id }) => id === layer) ? layer : null;
+  if (runtime.state.project && nextLayer && deriveLayer(runtime.recordsById.get(runtime.state.project)) !== nextLayer) runtime.state.project = null;
+  runtime.state.layer = nextLayer;
   renderDiscoveryState();
+  if (runtime.state.view === 'layers' && nextLayer) {
+    window.requestAnimationFrame(() => elements.layerDeck.querySelector(`.digital-lane[data-layer-id="${CSS.escape(nextLayer)}"] .digital-lane-scroll`)?.focus({ preventScroll: true }));
+  }
   if (historyMode) writeHistory(historyMode);
 }
 
@@ -407,24 +517,45 @@ function setQuery(value, { historyMode = 'replace' } = {}) {
   if (historyMode) runtime.searchTimer = window.setTimeout(() => writeHistory(historyMode), 150);
 }
 
-function setSphereOpacity() {
-  const opacity = runtime.mapReady ? sphereOpacityForZoom(runtime.map.getZoom()) : 1;
+function setSphereOpacity({ globeDiameter = null, rect = null } = {}) {
+  const immersive = runtime.state.view === 'layers' || runtime.viewPhase !== 'overview';
+  let globeViewportRatio = 0;
+  let opacity = 1;
+  if (!immersive && runtime.mapReady) {
+    const bounds = rect ?? elements.stage.getBoundingClientRect();
+    const suppliedDiameter = globeDiameter !== null && globeDiameter !== undefined
+      ? Number(globeDiameter)
+      : Number.NaN;
+    const measuredDiameter = Number.isFinite(suppliedDiameter)
+      ? suppliedDiameter
+      : Number(elements.stage.dataset.globeDiameter ?? 0);
+    globeViewportRatio = measuredDiameter / Math.max(1, Math.min(bounds.width, bounds.height));
+    opacity = sphereOpacityForGlobeRatio(globeViewportRatio);
+  }
   elements.sphere.style.setProperty('--sphere-opacity', String(opacity));
   elements.sphere.toggleAttribute('data-hidden-local', opacity === 0);
+  elements.stage.dataset.globeViewportRatio = String(Number(globeViewportRatio.toFixed(4)));
+}
+
+function projectedGlobeGeometry(center, projectedCenter) {
+  const horizon = globeHorizonCoordinates(center).map(({ lng, lat }) => runtime.map.project([lng, lat]));
+  return projectedGlobeCircle({ center: projectedCenter, horizon });
 }
 
 function updateSphereGeometry() {
   if (!runtime.mapReady || elements.globeSurface.hidden) return;
   const rect = elements.stage.getBoundingClientRect();
-  const projected = runtime.map.project(runtime.map.getCenter());
   const padding = typeof runtime.map.getPadding === 'function' ? runtime.map.getPadding() : {};
+  const sideView = runtime.state.view === 'layers' || runtime.viewPhase !== 'overview';
+  const center = runtime.map.getCenter();
+  const projectedCenter = runtime.map.project(center);
+  const globe = sideView ? null : projectedGlobeGeometry(center, projectedCenter);
   const geometry = sphereLayout({
     width: rect.width,
     height: rect.height,
-    zoom: runtime.map.getZoom(),
     padding,
-    center: projected,
-    sideView: runtime.state.view === 'layers',
+    globe,
+    sideView,
   });
   elements.stage.style.setProperty('--sphere-x', `${geometry.x}px`);
   elements.stage.style.setProperty('--sphere-y', `${geometry.y}px`);
@@ -432,40 +563,29 @@ function updateSphereGeometry() {
   elements.sphere.style.setProperty('--sphere-x', `${geometry.x}px`);
   elements.sphere.style.setProperty('--sphere-y', `${geometry.y}px`);
   elements.sphere.style.setProperty('--sphere-size', `${geometry.diameter}px`);
-  elements.stage.dataset.mapProjectedCenterX = String(Number(projected.x.toFixed(2)));
-  elements.stage.dataset.mapProjectedCenterY = String(Number(projected.y.toFixed(2)));
+  elements.stage.dataset.mapProjectedCenterX = String(Number(projectedCenter.x.toFixed(2)));
+  elements.stage.dataset.mapProjectedCenterY = String(Number(projectedCenter.y.toFixed(2)));
   elements.stage.dataset.sphereX = String(geometry.x);
   elements.stage.dataset.sphereY = String(geometry.y);
   elements.stage.dataset.sphereSize = String(geometry.diameter);
+  elements.stage.dataset.globeDiameter = String(geometry.globeDiameter);
+  elements.stage.dataset.globeGeometrySource = sideView ? 'side-view-layout' : 'maplibre-projected-horizon';
+  const detailLevel = sphereDetailLevel({ diameter: geometry.diameter, sideView });
+  elements.sphere.dataset.detailLevel = detailLevel;
+  elements.stage.dataset.sphereDetailLevel = detailLevel;
+  elements.stage.dataset.mapZoom = String(Number(runtime.map.getZoom().toFixed(4)));
+  setSphereOpacity({ globeDiameter: geometry.globeDiameter, rect });
 }
 
-function layerCamera() {
-  const current = mapCamera(runtime.map);
-  const panelRect = elements.layerPanel.getBoundingClientRect();
-  const mobileSheet = window.matchMedia('(max-width: 48rem)').matches;
-  const padding = mobileSheet
-    ? {
-        top: 36,
-        right: 36,
-        bottom: Math.min(Math.max(220, panelRect.height + 24), elements.stage.clientHeight * 0.62),
-        left: 36,
-      }
-    : {
-        top: 36,
-        right: Math.min(Math.max(260, panelRect.width) + 24, elements.stage.clientWidth * 0.58),
-        bottom: 36,
-        left: 36,
-      };
+function layerCamera(camera = null) {
+  const current = camera ?? (runtime.mapReady ? mapCamera(runtime.map) : runtime.state.camera);
   return {
-    center: [current.lng, current.lat],
-    zoom: Math.max(current.zoom, 1.55),
-    bearing: 22,
-    pitch: 34,
-    padding,
+    ...digitalLayerCamera(current),
+    offset: [-Math.min(240, window.innerWidth * 0.18), 0],
   };
 }
 
-function applyCamera(camera, { instant = false } = {}) {
+function applyCamera(camera, { instant = false, duration = 260 } = {}) {
   if (!runtime.map) return;
   const options = {
     center: camera.center ?? [camera.lng, camera.lat],
@@ -473,41 +593,197 @@ function applyCamera(camera, { instant = false } = {}) {
     bearing: camera.bearing,
     pitch: camera.pitch,
     padding: camera.padding ?? { top: 0, right: 0, bottom: 0, left: 0 },
+    offset: camera.offset ?? [0, 0],
   };
   const useJump = instant || reducedMotion.matches;
   elements.stage.dataset.lastCameraCommand = useJump ? 'jumpTo' : 'easeTo';
-  elements.stage.dataset.lastCameraDuration = useJump ? '0' : '260';
+  elements.stage.dataset.lastCameraDuration = useJump ? '0' : String(duration);
   if (useJump) runtime.map.jumpTo(options);
-  else runtime.map.easeTo({ ...options, duration: 260, essential: false });
+  else runtime.map.easeTo({ ...options, duration, essential: false });
+}
+
+function clearViewTransition() {
+  window.clearTimeout(runtime.viewTransitionTimer);
+  runtime.viewTransitionTimer = null;
+  window.clearTimeout(runtime.layerPanelRevealTimer);
+  runtime.layerPanelRevealTimer = null;
+  runtime.viewTransitionCleanup?.();
+  runtime.viewTransitionCleanup = null;
+}
+
+function scheduleViewTransition(phase, duration, options = {}) {
+  let completed = false;
+  const expectedOpacity = phase === 'overview' ? 1 : 0;
+  const visualTargetReached = () => Math.abs(Number.parseFloat(getComputedStyle(elements.map).opacity) - expectedOpacity) <= 0.02;
+  const complete = () => {
+    if (completed) return;
+    completed = true;
+    finishViewTransition(phase, options);
+  };
+  const completeIfReady = () => {
+    if (!visualTargetReached()) return false;
+    complete();
+    return true;
+  };
+  const onTransitionEnd = (event) => {
+    if (event.target === elements.map && event.propertyName === 'opacity') completeIfReady();
+  };
+  elements.map.addEventListener('transitionend', onTransitionEnd);
+  runtime.viewTransitionCleanup = () => elements.map.removeEventListener('transitionend', onTransitionEnd);
+  runtime.viewTransitionTimer = window.setTimeout(() => {
+    if (completed) return;
+    const animations = typeof elements.map.getAnimations === 'function' ? elements.map.getAnimations() : [];
+    for (const animation of animations) {
+      try {
+        animation.finish();
+      } catch {
+        // A cancelled transition is settled by the no-transition fallback below.
+      }
+    }
+    if (completeIfReady()) return;
+    const previousTransition = elements.map.style.transition;
+    const previousOpacity = elements.map.style.opacity;
+    elements.map.style.transition = 'none';
+    elements.map.style.opacity = String(expectedOpacity);
+    void elements.map.offsetWidth;
+    complete();
+    elements.map.style.opacity = previousOpacity;
+    elements.map.style.transition = previousTransition;
+  }, Math.max(2000, duration * 3));
+}
+
+function setViewPhase(phase) {
+  const allowed = new Set(['overview', 'entering-layers', 'layers-preview', 'layers', 'leaving-layers']);
+  runtime.viewPhase = allowed.has(phase) ? phase : 'overview';
+  elements.stage.dataset.viewPhase = runtime.viewPhase;
+  elements.stage.dataset.viewPhaseStartedAt = String(performance.now());
+  if (runtime.viewPhase === 'layers-preview') {
+    elements.stage.dataset.layerPreviewStartedAt = elements.stage.dataset.viewPhaseStartedAt;
+    delete elements.stage.dataset.layerPanelVisibleAt;
+  }
+  if (runtime.viewPhase === 'leaving-layers') {
+    elements.stage.dataset.layerReturnStartedAt = elements.stage.dataset.viewPhaseStartedAt;
+  }
+  updateSphereGeometry();
+  if (!runtime.mapReady) setSphereOpacity();
 }
 
 function showLayerState() {
-  const open = runtime.state.view === 'layers' && runtime.state.surface === 'globe';
-  elements.stage.classList.toggle('layer-view-open', open);
-  elements.layerPanel.hidden = !open;
-  elements.layerToggle.setAttribute('aria-expanded', String(open));
+  const journeyActive = runtime.state.surface === 'globe' && (runtime.state.view === 'layers' || runtime.viewPhase !== 'overview');
+  const panelMounted = runtime.state.surface === 'globe' && runtime.viewPhase === 'layers';
+  const panelVisible = panelMounted && runtime.layerPanelReady;
+  const transformed = runtime.state.surface === 'globe' && runtime.state.view === 'layers';
+  elements.stage.classList.toggle('layer-view-open', transformed);
+  elements.stage.classList.toggle('layer-view-settled', runtime.viewPhase === 'layers-preview' || runtime.viewPhase === 'layers');
+  elements.layerPanel.hidden = !panelMounted;
+  elements.layerPanel.toggleAttribute('data-visible', panelVisible);
+  elements.layerPanel.toggleAttribute('inert', !panelVisible);
+  elements.layerToggle.setAttribute('aria-expanded', String(runtime.state.view === 'layers'));
+  elements.layerDeck.toggleAttribute('inert', !panelVisible);
+  elements.layerDeck.setAttribute('aria-hidden', String(!panelVisible));
+  elements.sphere.setAttribute('aria-hidden', String(runtime.viewPhase === 'layers'));
+  elements.map.toggleAttribute('inert', journeyActive);
+  elements.layerToggle.toggleAttribute('inert', journeyActive);
+  if (journeyActive) {
+    elements.map.setAttribute('aria-hidden', 'true');
+    elements.layerToggle.setAttribute('aria-hidden', 'true');
+    elements.sphereEdge.setAttribute('aria-hidden', 'true');
+    elements.sphereEdge.setAttribute('tabindex', '-1');
+  } else {
+    elements.map.removeAttribute('aria-hidden');
+    elements.layerToggle.removeAttribute('aria-hidden');
+    elements.sphereEdge.removeAttribute('aria-hidden');
+    elements.sphereEdge.setAttribute('tabindex', '0');
+    elements.layerPanel.removeAttribute('data-closing');
+  }
 }
 
-function openLayerView({ historyMode = 'push', cameraState = null } = {}) {
-  if (runtime.state.view !== 'layers') runtime.previousGlobeCamera = runtime.mapReady ? mapCamera(runtime.map) : runtime.state.camera;
+function finishViewTransition(phase, { restoreFocus = false, revealImmediately = false } = {}) {
+  clearViewTransition();
+  runtime.layerPanelReady = false;
+  setViewPhase(phase);
+  showLayerState();
+  if (phase === 'layers-preview') {
+    runtime.layerPanelRevealTimer = window.setTimeout(() => {
+      runtime.layerPanelRevealTimer = null;
+      if (runtime.viewPhase !== 'layers-preview' || runtime.state.view !== 'layers') return;
+      setViewPhase('layers');
+      showLayerState();
+      window.requestAnimationFrame(() => {
+        if (runtime.viewPhase !== 'layers' || runtime.state.view !== 'layers') return;
+        runtime.layerPanelReady = true;
+        elements.stage.dataset.layerPanelVisibleAt = String(performance.now());
+        showLayerState();
+        elements.layerClose.focus({ preventScroll: true });
+      });
+    }, 280);
+  } else if (phase === 'layers' && revealImmediately) {
+    runtime.layerPanelReady = true;
+    showLayerState();
+    elements.layerClose.focus({ preventScroll: true });
+  }
+  if (phase === 'overview' && restoreFocus) {
+    (runtime.layerReturnTarget ?? elements.layerToggle).focus({ preventScroll: true });
+    runtime.layerReturnTarget = null;
+  }
+}
+
+function openLayerView({ historyMode = 'push', cameraState = null, instant = false, trigger = document.activeElement } = {}) {
+  if (cameraState) runtime.previousGlobeCamera = { ...cameraState };
+  else if (runtime.state.view !== 'layers') runtime.previousGlobeCamera = runtime.mapReady ? mapCamera(runtime.map) : runtime.state.camera;
+  if (runtime.state.view !== 'layers') {
+    runtime.layerReturnTarget = trigger === elements.sphereEdge
+      ? elements.sphereEdge
+      : (trigger instanceof HTMLElement ? trigger : elements.layerToggle);
+  }
   runtime.state.view = 'layers';
+  clearViewTransition();
+  const duration = instant || cameraState || reducedMotion.matches ? 0 : DIGITAL_LAYER_TRANSITION_MS;
+  setViewPhase(duration ? 'entering-layers' : 'layers');
+  elements.layerPanel.removeAttribute('data-closing');
+  closeLayerDiscovery();
   showLayerState();
   renderLayerPanel();
-  updateSphereGeometry();
-  if (runtime.mapReady) {
-    const target = cameraState ? { ...cameraState, padding: layerCamera().padding } : layerCamera();
-    applyCamera(target, { instant: Boolean(cameraState) });
-  }
+  if (runtime.mapReady) applyCamera(layerCamera(cameraState), { instant: duration === 0, duration });
+  if (duration) scheduleViewTransition('layers-preview', duration);
+  else finishViewTransition('layers', { revealImmediately: true });
   if (historyMode) writeHistory(historyMode);
 }
 
-function closeLayerView({ historyMode = 'push', cameraState = null, preserveLayer = false } = {}) {
+function closeLayerView({ historyMode = 'push', cameraState = null, preserveLayer = false, instant = false, restoreFocus = true } = {}) {
+  const wasOpen = runtime.state.view === 'layers' || runtime.viewPhase !== 'overview';
+  runtime.layerPanelReady = false;
+  closeLayerDiscovery();
   runtime.state.view = 'globe';
   if (!preserveLayer) runtime.state.layer = null;
-  showLayerState();
+  clearViewTransition();
+  const duration = instant || reducedMotion.matches ? 0 : DIGITAL_LAYER_TRANSITION_MS;
+  if (wasOpen && duration) {
+    elements.layerPanel.dataset.closing = 'true';
+    setViewPhase('leaving-layers');
+    showLayerState();
+  }
   renderDiscoveryState();
-  if (runtime.mapReady) applyCamera(cameraState ?? runtime.previousGlobeCamera ?? runtime.state.camera, { instant: reducedMotion.matches });
+  if (runtime.mapReady) applyCamera(cameraState ?? runtime.previousGlobeCamera ?? runtime.state.camera, { instant: duration === 0, duration });
+  if (wasOpen && duration) scheduleViewTransition('overview', duration, { restoreFocus });
+  else finishViewTransition('overview', { restoreFocus: wasOpen && restoreFocus });
   if (historyMode) writeHistory(historyMode);
+}
+
+function closeLayerDiscovery({ restoreFocus = false } = {}) {
+  elements.layerDiscovery.hidden = true;
+  elements.layerSearchToggle.setAttribute('aria-expanded', 'false');
+  if (restoreFocus) elements.layerSearchToggle.focus({ preventScroll: true });
+}
+
+function toggleLayerDiscovery() {
+  const opening = elements.layerDiscovery.hidden;
+  elements.layerDiscovery.hidden = !opening;
+  elements.layerSearchToggle.setAttribute('aria-expanded', String(opening));
+  if (opening) {
+    renderLayerPanel();
+    elements.layerSearch.focus({ preventScroll: true });
+  }
 }
 
 function closeSettings({ restoreFocus = true } = {}) {
@@ -537,6 +813,9 @@ function setPresentation(surface, { historyMode = 'push', persist = true } = {})
   elements.body.dataset.presentation = runtime.state.surface;
   elements.globeSurface.hidden = runtime.state.surface !== 'globe';
   elements.textView.hidden = runtime.state.surface !== 'text';
+  clearViewTransition();
+  if (runtime.state.surface === 'text') setViewPhase('overview');
+  else if (runtime.state.view === 'layers') setViewPhase('layers');
   showLayerState();
   updatePresentationControls();
   if (persist) persistPresentation(runtime.state.surface);
@@ -551,8 +830,11 @@ function setPresentation(surface, { historyMode = 'push', persist = true } = {})
 }
 
 function resetGlobe() {
+  clearViewTransition();
   runtime.previousGlobeCamera = null;
+  runtime.layerReturnTarget = null;
   runtime.state.view = 'globe';
+  setViewPhase('overview');
   runtime.state.layer = null;
   runtime.state.camera = { ...DEFAULT_CAMERA };
   showLayerState();
@@ -570,8 +852,8 @@ function applyDeepLink(search, { initial = false } = {}) {
   setPresentation(next.surface, { historyMode: null, persist: false });
   if (runtime.mapReady) {
     applyCamera(next.camera, { instant: true });
-    if (next.view === 'layers') openLayerView({ historyMode: null, cameraState: next.camera });
-    else closeLayerView({ historyMode: null, cameraState: next.camera, preserveLayer: true });
+    if (next.view === 'layers') openLayerView({ historyMode: null, cameraState: next.camera, instant: true });
+    else closeLayerView({ historyMode: null, cameraState: next.camera, preserveLayer: true, instant: true, restoreFocus: false });
   } else {
     showLayerState();
   }
@@ -580,19 +862,75 @@ function applyDeepLink(search, { initial = false } = {}) {
   if (initial) writeHistory('replace');
 }
 
+
+function activateSphereEdge(event) {
+  if (Number.isFinite(event?.clientX) && Number.isFinite(event?.clientY)) {
+    const mapControl = [...document.querySelectorAll('.maplibregl-ctrl button')].find((button) => {
+      const rect = button.getBoundingClientRect();
+      return event.clientX >= rect.left && event.clientX <= rect.right && event.clientY >= rect.top && event.clientY <= rect.bottom;
+    });
+    if (mapControl) {
+      event.preventDefault();
+      event.stopPropagation();
+      elements.stage.dataset.forwardedMapControl = mapControl.getAttribute('aria-label') ?? mapControl.getAttribute('title') ?? 'unknown';
+      mapControl.click();
+      return;
+    }
+  }
+  delete elements.stage.dataset.forwardedMapControl;
+  openLayerView({ trigger: elements.sphereEdge });
+}
+
+function beginSpherePointer(event) {
+  if (event.button !== undefined && event.button !== 0) return;
+  runtime.spherePointerStart = {
+    pointerId: event.pointerId,
+    x: event.clientX,
+    y: event.clientY,
+    at: performance.now(),
+  };
+  event.currentTarget.setPointerCapture?.(event.pointerId);
+}
+
+function endSpherePointer(event) {
+  const start = runtime.spherePointerStart;
+  runtime.spherePointerStart = null;
+  if (!start || start.pointerId !== event.pointerId) return;
+  const distance = Math.hypot(event.clientX - start.x, event.clientY - start.y);
+  const elapsed = performance.now() - start.at;
+  if (distance > 12 || elapsed > 700) return;
+  runtime.lastSpherePointerActivation = performance.now();
+  activateSphereEdge(event);
+}
+
+function cancelSpherePointer() {
+  runtime.spherePointerStart = null;
+}
+
+function activateSphereFallbackClick(event) {
+  if (runtime.state.view === 'layers' || runtime.viewPhase !== 'overview') return;
+  if (performance.now() - runtime.lastSpherePointerActivation < 500) return;
+  activateSphereEdge(event);
+}
+
 function wireControls() {
   elements.skipLink.addEventListener('click', (event) => {
     event.preventDefault();
     setPresentation('text');
     elements.textView.focus({ preventScroll: true });
   });
-  elements.layerToggle.addEventListener('click', () => (runtime.state.view === 'layers' ? closeLayerView() : openLayerView()));
+  elements.layerToggle.addEventListener('click', () => (runtime.state.view === 'layers' ? closeLayerView() : openLayerView({ trigger: elements.layerToggle })));
   elements.layerClose.addEventListener('click', () => closeLayerView());
-  elements.sphereEdge.addEventListener('click', () => openLayerView());
+  elements.layerSearchToggle.addEventListener('click', toggleLayerDiscovery);
+  elements.layerSearch.addEventListener('input', () => setQuery(elements.layerSearch.value));
+  elements.sphereEdge.addEventListener('pointerdown', beginSpherePointer);
+  elements.sphereEdge.addEventListener('pointerup', endSpherePointer);
+  elements.sphereEdge.addEventListener('pointercancel', cancelSpherePointer);
+  elements.sphereEdge.addEventListener('click', activateSphereFallbackClick);
   elements.sphereEdge.addEventListener('keydown', (event) => {
     if (event.key === 'Enter' || event.key === ' ') {
       event.preventDefault();
-      openLayerView();
+      openLayerView({ trigger: elements.sphereEdge });
     }
   });
   elements.globeReset.addEventListener('click', resetGlobe);
@@ -620,9 +958,10 @@ function wireControls() {
   });
   document.addEventListener('keydown', (event) => {
     if (event.key !== 'Escape') return;
-    if (!elements.settingsPanel.hidden) closeSettings();
+    if (!elements.layerDiscovery.hidden) closeLayerDiscovery({ restoreFocus: true });
+    else if (runtime.viewPhase !== 'overview' || runtime.state.view === 'layers') closeLayerView();
+    else if (!elements.settingsPanel.hidden) closeSettings();
     else if (!elements.focus.hidden) clearProject();
-    else if (runtime.state.view === 'layers') closeLayerView();
   });
   window.addEventListener('popstate', () => applyDeepLink(location.search));
   window.addEventListener('resize', () => {
@@ -656,10 +995,14 @@ function createMap() {
   runtime.map.on('render', () => {
     runtime.mapRenderCount += 1;
     elements.stage.dataset.mapRenders = String(runtime.mapRenderCount);
-    setSphereOpacity();
     updateSphereGeometry();
   });
-  runtime.map.on('moveend', scheduleCameraHistory);
+  runtime.map.on('movestart', () => { elements.stage.dataset.mapMoving = 'true'; });
+  runtime.map.on('moveend', () => {
+    delete elements.stage.dataset.mapMoving;
+    updateSphereGeometry();
+    scheduleCameraHistory();
+  });
   runtime.map.on('error', (event) => {
     const policy = mapFailurePolicy({ providerReadbackFailed: false });
     degradeMap(event?.error ?? event, { replaceStyle: policy.replaceStyle });
@@ -667,10 +1010,9 @@ function createMap() {
   runtime.map.on('load', () => {
     runtime.mapReady = true;
     runtime.map.setProjection({ type: 'globe' });
-    setSphereOpacity();
     updateSphereGeometry();
     refreshStatus();
-    if (runtime.state.view === 'layers') openLayerView({ historyMode: null, cameraState: runtime.state.camera });
+    if (runtime.state.view === 'layers') openLayerView({ historyMode: null, cameraState: runtime.state.camera, instant: true });
     else applyCamera(runtime.state.camera, { instant: true });
   });
   void verifyMapProvider();

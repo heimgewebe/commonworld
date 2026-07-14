@@ -6,13 +6,24 @@ export const DEFAULT_CAMERA = Object.freeze({
   pitch: 0,
 });
 
+export const DIGITAL_LAYER_TRANSITION_MS = 1080;
+
 export const LAYERS = Object.freeze([
-  Object.freeze({ id: 'knowledge_data', label: 'Wissen und offene Daten', themes: ['knowledge', 'open-data', 'research', 'documentation'] }),
-  Object.freeze({ id: 'software_infrastructure', label: 'Freie Software und Infrastruktur', themes: ['free-software', 'open-source', 'infrastructure', 'platform'] }),
-  Object.freeze({ id: 'media_culture', label: 'Offene Medien und Kultur', themes: ['open-media', 'culture', 'archives', 'creative-commons'] }),
-  Object.freeze({ id: 'learning_education', label: 'Freies Lernen und Bildung', themes: ['education', 'open-educational-resources', 'learning'] }),
-  Object.freeze({ id: 'communication_networks', label: 'Kommunikation und Netze', themes: ['communication', 'community-network', 'federation', 'protocol'] }),
-  Object.freeze({ id: 'mixed_other', label: 'Gemischte und weitere digitale Commons', themes: [] }),
+  Object.freeze({ id: 'knowledge_data', label: 'Wissen und offene Daten', trackLabel: 'Wissen', themes: ['knowledge', 'open-data', 'research', 'documentation'] }),
+  Object.freeze({ id: 'software_infrastructure', label: 'Freie Software und Infrastruktur', trackLabel: 'Software', themes: ['free-software', 'open-source', 'infrastructure', 'platform'] }),
+  Object.freeze({ id: 'media_culture', label: 'Offene Medien und Kultur', trackLabel: 'Medien', themes: ['open-media', 'culture', 'archives', 'creative-commons'] }),
+  Object.freeze({ id: 'learning_education', label: 'Freies Lernen und Bildung', trackLabel: 'Lernen', themes: ['education', 'open-educational-resources', 'learning'] }),
+  Object.freeze({ id: 'communication_networks', label: 'Kommunikation und Netze', trackLabel: 'Netze', themes: ['communication', 'community-network', 'federation', 'protocol'] }),
+  Object.freeze({ id: 'mixed_other', label: 'Gemischte und weitere digitale Commons', trackLabel: 'Weitere', themes: [] }),
+]);
+
+export const ORBIT_PROFILES = Object.freeze([
+  Object.freeze({ rx: 316, ry: 300, rotation: -8 }),
+  Object.freeze({ rx: 310, ry: 282, rotation: 20 }),
+  Object.freeze({ rx: 304, ry: 268, rotation: 43 }),
+  Object.freeze({ rx: 298, ry: 288, rotation: -31 }),
+  Object.freeze({ rx: 292, ry: 274, rotation: 63 }),
+  Object.freeze({ rx: 286, ry: 294, rotation: -62 }),
 ]);
 
 const finite = (value, fallback) => {
@@ -36,6 +47,18 @@ export function deriveLayer(record) {
   return winners.length === 1 ? winners[0].id : 'mixed_other';
 }
 
+
+export function binaryName(value) {
+  return [...new TextEncoder().encode(String(value ?? ''))]
+    .map((byte) => byte.toString(2).padStart(8, '0'))
+    .join(' ');
+}
+
+export function ribbonRepeatCount(recordCount, minimumSegments = 12) {
+  const count = Number.isInteger(recordCount) && recordCount > 0 ? recordCount : 1;
+  const minimum = Number.isInteger(minimumSegments) && minimumSegments > 0 ? minimumSegments : 12;
+  return clamp(Math.ceil(minimum / count), 2, 6);
+}
 export function binaryFragment(identifier, length = 12) {
   let hash = 2166136261;
   for (const character of String(identifier)) {
@@ -47,13 +70,15 @@ export function binaryFragment(identifier, length = 12) {
   return bits.slice(0, length);
 }
 
-export function sphereStartOffset(layerIndex, recordIndex, recordCount) {
-  const count = Number.isInteger(recordCount) && recordCount > 0 ? recordCount : 1;
-  const layer = Number.isInteger(layerIndex) && layerIndex >= 0 ? layerIndex : 0;
-  const index = Number.isInteger(recordIndex) && recordIndex >= 0 ? recordIndex : 0;
-  const normalized = ((index / count + layer * 0.43) % 1 + 1) % 1;
-  return Number((8 + normalized * 72).toFixed(4));
+
+export function sphereDetailLevel({ diameter, sideView = false } = {}) {
+  if (sideView) return 'close';
+  const size = Math.max(0, finite(diameter, 0));
+  if (size < 360) return 'micro';
+  if (size < 620) return 'compact';
+  return 'names';
 }
+
 
 export function cameraFromSearch(search = '') {
   const parameters = new URLSearchParams(search.startsWith('?') ? search.slice(1) : search);
@@ -117,7 +142,57 @@ export function filterRecords(records, state = {}) {
   });
 }
 
-export function sphereLayout({ width, height, zoom = DEFAULT_CAMERA.zoom, padding = {}, center = null, sideView = false } = {}) {
+const HORIZON_BEARINGS = Object.freeze([0, 45, 90, 135, 180, 225, 270, 315]);
+
+export function globeHorizonCoordinates(center = DEFAULT_CAMERA, angularDistanceDegrees = 89.994) {
+  const radians = Math.PI / 180;
+  const latitude = clamp(finite(center?.lat, DEFAULT_CAMERA.lat), -85.051129, 85.051129) * radians;
+  const longitude = finite(center?.lng, DEFAULT_CAMERA.lng) * radians;
+  const distance = clamp(finite(angularDistanceDegrees, 89.994), 1, 89.9999) * radians;
+  return HORIZON_BEARINGS.map((bearingDegrees) => {
+    const bearing = bearingDegrees * radians;
+    const destinationLatitude = Math.asin(
+      Math.sin(latitude) * Math.cos(distance)
+      + Math.cos(latitude) * Math.sin(distance) * Math.cos(bearing),
+    );
+    const destinationLongitude = longitude + Math.atan2(
+      Math.sin(bearing) * Math.sin(distance) * Math.cos(latitude),
+      Math.cos(distance) - Math.sin(latitude) * Math.sin(destinationLatitude),
+    );
+    return {
+      lng: rounded((((destinationLongitude / radians + 540) % 360) + 360) % 360 - 180, 6),
+      lat: rounded(destinationLatitude / radians, 6),
+    };
+  });
+}
+
+export function projectedGlobeCircle({ center = null, horizon = [] } = {}) {
+  const x = finite(center?.x, Number.NaN);
+  const y = finite(center?.y, Number.NaN);
+  if (!Number.isFinite(x) || !Number.isFinite(y)) return null;
+  const radii = (Array.isArray(horizon) ? horizon : [])
+    .map((point) => {
+      const projectedX = finite(point?.x, Number.NaN);
+      const projectedY = finite(point?.y, Number.NaN);
+      return Number.isFinite(projectedX) && Number.isFinite(projectedY)
+        ? Math.hypot(projectedX - x, projectedY - y)
+        : Number.NaN;
+    })
+    .filter((radius) => Number.isFinite(radius) && radius > 0)
+    .sort((left, right) => left - right);
+  if (radii.length < 4) return null;
+  const middle = Math.floor(radii.length / 2);
+  const radius = radii.length % 2
+    ? radii[middle]
+    : (radii[middle - 1] + radii[middle]) / 2;
+  return {
+    x: rounded(x, 2),
+    y: rounded(y, 2),
+    diameter: rounded(radius * 2, 2),
+  };
+}
+
+export function sphereLayout({ width, height, padding = {}, globe = null, sideView = false } = {}) {
   const stageWidth = Math.max(1, finite(width, 1));
   const stageHeight = Math.max(1, finite(height, 1));
   const left = clamp(finite(padding.left, 0), 0, stageWidth - 1);
@@ -128,14 +203,42 @@ export function sphereLayout({ width, height, zoom = DEFAULT_CAMERA.zoom, paddin
   const availableHeight = Math.max(1, stageHeight - top - bottom);
   const fallbackX = left + availableWidth / 2;
   const fallbackY = top + availableHeight / 2;
-  const x = clamp(finite(center?.x, fallbackX), 0, stageWidth);
-  const y = clamp(finite(center?.y, fallbackY), 0, stageHeight);
-  const scale = 2 ** (clamp(finite(zoom, DEFAULT_CAMERA.zoom), 0, 8) - DEFAULT_CAMERA.zoom);
-  const minimum = Math.min(stageWidth, stageHeight) * (sideView ? 0.22 : 0.36);
-  const maximum = Math.min(stageWidth, stageHeight) * 1.6;
-  const base = Math.min(availableWidth, availableHeight) * (sideView ? 0.96 : 0.98);
-  const diameter = clamp(sideView ? base : base * scale, minimum, maximum);
-  return { x: rounded(x, 2), y: rounded(y, 2), diameter: rounded(diameter, 2) };
+  const shortestSide = Math.min(stageWidth, stageHeight);
+  if (sideView) {
+    const diameter = Math.max(stageWidth * 2.05, stageHeight * 2.25);
+    return {
+      x: rounded(stageWidth * 0.08, 2),
+      y: rounded(stageHeight * 0.58, 2),
+      diameter: rounded(diameter, 2),
+      globeDiameter: rounded(diameter, 2),
+    };
+  }
+  const x = clamp(finite(globe?.x, fallbackX), 0, stageWidth);
+  const y = clamp(finite(globe?.y, fallbackY), 0, stageHeight);
+  const fallbackGlobeDiameter = Math.min(availableWidth, availableHeight) * 0.88;
+  const maximumSafeDiameter = Math.hypot(stageWidth, stageHeight) * 2.5;
+  const globeDiameter = clamp(finite(globe?.diameter, fallbackGlobeDiameter), 1, maximumSafeDiameter);
+  return {
+    x: rounded(x, 2),
+    y: rounded(y, 2),
+    diameter: rounded(globeDiameter * 1.32, 2),
+    globeDiameter: rounded(globeDiameter, 2),
+  };
+}
+
+export function digitalLayerCamera(camera = DEFAULT_CAMERA) {
+  const bearing = finite(camera?.bearing, DEFAULT_CAMERA.bearing);
+  const normalizedBearing = ((((bearing + 28) + 180) % 360) + 360) % 360 - 180;
+  return {
+    center: [
+      clamp(finite(camera?.lng, DEFAULT_CAMERA.lng), -180, 180),
+      clamp(finite(camera?.lat, DEFAULT_CAMERA.lat), -85, 85),
+    ],
+    zoom: clamp(Math.max(2.15, finite(camera?.zoom, DEFAULT_CAMERA.zoom) + 1.05), 0, 8),
+    bearing: rounded(normalizedBearing, 1),
+    pitch: 58,
+    padding: { top: 0, right: 0, bottom: 0, left: 0 },
+  };
 }
 
 export function mapCamera(map) {
@@ -153,9 +256,9 @@ export function mapFailurePolicy({ providerReadbackFailed = false } = {}) {
   return Object.freeze({ degraded: true, replaceStyle: providerReadbackFailed === true });
 }
 
-export function sphereOpacityForZoom(zoom) {
-  const value = finite(zoom, DEFAULT_CAMERA.zoom);
-  if (value <= 1.8) return 1;
-  if (value >= 2.6) return 0;
-  return Number(((2.6 - value) / 0.8).toFixed(4));
+export function sphereOpacityForGlobeRatio(globeViewportRatio) {
+  const value = finite(globeViewportRatio, 0);
+  if (value <= 1.05) return 1;
+  if (value >= 2.1) return 0;
+  return Number(((2.1 - value) / 1.05).toFixed(4));
 }

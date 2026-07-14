@@ -18,6 +18,15 @@ LAYER_LABELS = {
     "mixed_other": "Gemischte und weitere digitale Commons",
 }
 
+ORBIT_PROFILES = (
+    ("knowledge_data", 316, 300, -8),
+    ("software_infrastructure", 310, 282, 20),
+    ("media_culture", 304, 268, 43),
+    ("learning_education", 298, 288, -31),
+    ("communication_networks", 292, 274, 63),
+    ("mixed_other", 286, 294, -62),
+)
+
 THEME_LAYERS = {
     "knowledge_data": {"knowledge", "open-data", "research", "documentation"},
     "software_infrastructure": {"free-software", "open-source", "infrastructure", "platform"},
@@ -85,8 +94,12 @@ def render_shell(root: Path = ROOT) -> str:
     records = load_records(root)
     bootstrap = html.escape(json.dumps(records, ensure_ascii=False, separators=(",", ":")))
     paths = "\n".join(
-        f'              <circle id="sphere-path-{index}" cx="320" cy="320" r="{radius}" />'
-        for index, radius in enumerate((268, 252, 236, 220, 204, 188), start=1)
+        f'              <ellipse id="sphere-path-{index}" cx="320" cy="320" rx="{rx}" ry="{ry}" transform="rotate({rotation} 320 320)" />'
+        for index, (_, rx, ry, rotation) in enumerate(ORBIT_PROFILES, start=1)
+    )
+    uses = "\n".join(
+        f'              <use href="#sphere-path-{index}" class="sphere-layer-guide" data-layer-id="{layer_id}"></use>'
+        for index, (layer_id, _, _, _) in enumerate(ORBIT_PROFILES, start=1)
     )
     cards = render_cards(records)
     noscript_cards = render_cards(records, interactive=False)
@@ -127,10 +140,10 @@ def render_shell(root: Path = ROOT) -> str:
       </header>
 
       <section id="globe-surface" class="globe-surface" aria-label="Commonworld-Globus">
-        <figure class="globe-stage" aria-labelledby="globe-caption" data-runtime-state="loading" data-map-renders="0" data-overlay-renders="0">
+        <figure class="globe-stage" aria-labelledby="globe-caption" data-runtime-state="loading" data-view-phase="overview" data-map-renders="0" data-overlay-renders="0">
           <div id="map" class="globe-map" role="region" aria-label="Interaktiver Commonworld-Globus"></div>
           <svg id="digital-sphere" class="digital-sphere" viewBox="0 0 640 640" role="group" aria-labelledby="sphere-title">
-            <title id="sphere-title">Digitale Commons-Sphäre mit sechs abgeleiteten Schichten</title>
+            <title id="sphere-title">Digitale Commons-Sphäre aus Namen und deren Binärcode</title>
             <defs>
               <radialGradient id="sphere-center-fade">
                 <stop offset="0%" stop-color="black" />
@@ -143,8 +156,11 @@ def render_shell(root: Path = ROOT) -> str:
 {paths}
               </g>
             </defs>
+            <g id="sphere-rings">
+{uses}
+            </g>
             <g id="sphere-streams" mask="url(#sphere-mask)" aria-hidden="true"></g>
-            <circle id="sphere-edge-control" class="sphere-edge-control" cx="320" cy="320" r="276" fill="none" stroke="transparent" stroke-width="28" pointer-events="stroke" role="button" tabindex="0" aria-label="Digitale Commons-Schichten öffnen"></circle>
+            <circle id="sphere-edge-control" class="sphere-edge-control" cx="320" cy="320" r="318" fill="none" stroke="transparent" stroke-width="20" pointer-events="stroke" role="button" tabindex="0" aria-label="Digitale Commons-Schichten öffnen"></circle>
           </svg>
           <div id="layer-stack-visual" class="layer-stack-visual" aria-hidden="true"></div>
 
@@ -160,13 +176,19 @@ def render_shell(root: Path = ROOT) -> str:
           <p id="globe-results" class="globe-results" role="status">10 Commons im aktuellen Katalog.</p>
 
           <aside id="layer-panel" class="layer-panel" aria-labelledby="layer-title" hidden>
-            <div class="panel-heading">
-              <div><p class="kicker">Digitale Sphäre</p><h2 id="layer-title">Sechs Schichten</h2></div>
-              <button id="layer-close" class="icon-button" type="button" aria-label="Schichtansicht schließen">×</button>
+            <h2 id="layer-title" class="visually-hidden">Digitale Commons aus der Nähe</h2>
+            <p class="visually-hidden">Dieselben Commons erscheinen mit ihren Namen und Binärcodes auf sechs horizontal wischbaren Bahnen.</p>
+            <div class="layer-panel-controls">
+              <button id="layer-search-toggle" class="icon-button layer-search-toggle" type="button" aria-label="Commons suchen und Bahnen filtern" aria-controls="layer-discovery" aria-expanded="false">⌕</button>
+              <button id="layer-close" class="icon-button layer-close" type="button" aria-label="Zur Globusansicht zurückkehren">×</button>
             </div>
-            <p>Ortsunabhängige Commons bleiben Teil derselben Welt, ohne erfundene Kartenorte.</p>
-            <div id="layer-buttons" class="layer-buttons" aria-label="Digitale Schichten filtern"></div>
-            <div id="layer-projects" class="layer-projects" aria-label="Commons in der gewählten Schicht"></div>
+            <div id="layer-discovery" class="layer-discovery" hidden>
+              <label for="layer-search">Commons in den digitalen Bahnen suchen</label>
+              <div class="layer-search-field"><span aria-hidden="true">⌕</span><input id="layer-search" type="search" inputmode="search" autocomplete="off" placeholder="Commons suchen" /></div>
+              <div id="layer-buttons" class="layer-buttons"></div>
+            </div>
+            <div id="layer-track-deck" class="layer-track-deck" aria-label="Horizontal wischbare digitale Commons-Bahnen"></div>
+            <div id="layer-projects" class="layer-projects" hidden></div>
           </aside>
 
           <figcaption id="globe-caption" class="visually-hidden">Erde → Großregion → Region → lokaler Zusammenhang → Commons</figcaption>
