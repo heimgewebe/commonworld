@@ -498,17 +498,43 @@ function clearViewTransition() {
 
 function scheduleViewTransition(phase, duration, options = {}) {
   let completed = false;
+  const expectedOpacity = phase === 'overview' ? 1 : 0;
+  const visualTargetReached = () => Math.abs(Number.parseFloat(getComputedStyle(elements.map).opacity) - expectedOpacity) <= 0.02;
   const complete = () => {
     if (completed) return;
     completed = true;
     finishViewTransition(phase, options);
   };
+  const completeIfReady = () => {
+    if (!visualTargetReached()) return false;
+    complete();
+    return true;
+  };
   const onTransitionEnd = (event) => {
-    if (event.target === elements.map && event.propertyName === 'opacity') complete();
+    if (event.target === elements.map && event.propertyName === 'opacity') completeIfReady();
   };
   elements.map.addEventListener('transitionend', onTransitionEnd);
   runtime.viewTransitionCleanup = () => elements.map.removeEventListener('transitionend', onTransitionEnd);
-  runtime.viewTransitionTimer = window.setTimeout(complete, Math.max(2000, duration * 3));
+  runtime.viewTransitionTimer = window.setTimeout(() => {
+    if (completed) return;
+    const animations = typeof elements.map.getAnimations === 'function' ? elements.map.getAnimations() : [];
+    for (const animation of animations) {
+      try {
+        animation.finish();
+      } catch {
+        // A cancelled transition is settled by the no-transition fallback below.
+      }
+    }
+    if (completeIfReady()) return;
+    const previousTransition = elements.map.style.transition;
+    const previousOpacity = elements.map.style.opacity;
+    elements.map.style.transition = 'none';
+    elements.map.style.opacity = String(expectedOpacity);
+    void elements.map.offsetWidth;
+    complete();
+    elements.map.style.opacity = previousOpacity;
+    elements.map.style.transition = previousTransition;
+  }, Math.max(2000, duration * 3));
 }
 
 function setViewPhase(phase) {

@@ -389,6 +389,33 @@ async function layerJourneyScenario({ mobile = false, viewportOverride = null, t
 }
 
 
+async function delayedReturnTransitionScenario() {
+  const run = await newPage({ reducedMotion: 'no-preference' });
+  await run.page.goto(baseUrl, { waitUntil: 'domcontentloaded' });
+  await run.page.waitForSelector('html.runtime-ready');
+  await run.page.waitForFunction(() => Number(document.querySelector('.globe-stage')?.dataset.sphereSize ?? 0) > 0);
+  await run.page.waitForTimeout(820);
+  const sphereBox = await run.page.locator('#digital-sphere').boundingBox();
+  assert(sphereBox, 'delayed return: sphere geometry missing');
+  await run.page.mouse.click(sphereBox.x + sphereBox.width * 0.85134, sphereBox.y + sphereBox.height * 0.14866);
+  await run.page.waitForSelector('.globe-stage[data-view-phase="layers"]');
+  await run.page.waitForSelector('#layer-panel[data-visible]');
+  await run.page.locator('#map').evaluate((node) => { node.style.transitionDuration = '10s'; });
+  const startedAt = Date.now();
+  await run.page.locator('#layer-close').click();
+  await run.page.waitForSelector('.globe-stage[data-view-phase="overview"]');
+  const elapsed = Date.now() - startedAt;
+  const restoredOpacity = Number(await run.page.locator('#map').evaluate((node) => getComputedStyle(node).opacity));
+  assert(elapsed >= 1800, `delayed return: fallback was not exercised (${elapsed}ms)`);
+  assert(restoredOpacity >= 0.98, `delayed return: overview was declared before the globe returned (${restoredOpacity})`);
+  assert(await run.page.locator('#map').getAttribute('inert') === null, 'delayed return: returned globe remains inert');
+  assert(run.consoleErrors.length === 0, `delayed return: console errors: ${run.consoleErrors.join(' | ')}`);
+  assert(run.pageErrors.length === 0, `delayed return: page errors: ${run.pageErrors.join(' | ')}`);
+  results.push({ id: 'layer-journey-delayed-return', verdict: 'PASS', elapsedMs: elapsed });
+  await run.context.close();
+}
+
+
 async function interruptedLayerJourneyScenario() {
   const run = await newPage({ reducedMotion: 'no-preference' });
   await run.page.goto(baseUrl, { waitUntil: 'domcontentloaded' });
@@ -502,6 +529,7 @@ try {
   await layerJourneyScenario({ mobile: true });
   await layerJourneyScenario({ viewportOverride: { width: 1024, height: 1366 }, touch: true, scenarioId: 'layer-journey-ipad-portrait' });
   await layerJourneyScenario({ viewportOverride: { width: 1366, height: 1024 }, touch: true, scenarioId: 'layer-journey-ipad-landscape' });
+  await delayedReturnTransitionScenario();
   await interruptedLayerJourneyScenario();
   await reducedMotionLayerScenario();
   await catalogueFailureScenario();
