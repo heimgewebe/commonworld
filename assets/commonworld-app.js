@@ -661,6 +661,9 @@ function setViewPhase(phase) {
     elements.stage.dataset.layerPreviewStartedAt = elements.stage.dataset.viewPhaseStartedAt;
     delete elements.stage.dataset.layerPanelVisibleAt;
   }
+  if (runtime.viewPhase === 'leaving-layers') {
+    elements.stage.dataset.layerReturnStartedAt = elements.stage.dataset.viewPhaseStartedAt;
+  }
   updateSphereGeometry();
   if (!runtime.mapReady) setSphereOpacity();
 }

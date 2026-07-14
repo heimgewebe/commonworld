@@ -458,8 +458,12 @@ async function layerJourneyScenario({ mobile = false, viewportOverride = null, t
   assert(viewportFit.documentWidth <= viewportFit.viewportWidth + 1, `layer journey: horizontal overflow (${JSON.stringify(viewportFit)})`);
   if (touch) assert(viewportFit.controls.every(({ width, height }) => width >= 44 && height >= 44), `layer journey: undersized mobile layer control (${JSON.stringify(viewportFit.controls)})`);
 
+  const returnMarkerBefore = await stage.getAttribute('data-layer-return-started-at');
   await run.page.locator('#layer-close').click();
-  assert((await run.page.locator('.globe-stage').getAttribute('data-view-phase')) === 'leaving-layers', 'layer journey: return phase missing');
+  await run.page.waitForFunction((previous) => {
+    const current = document.querySelector('.globe-stage')?.dataset.layerReturnStartedAt;
+    return Boolean(current && current !== previous);
+  }, returnMarkerBefore);
   assert(await run.page.locator('#layer-panel').isHidden(), 'layer journey: description panel obscures the return camera flight');
   await run.page.waitForSelector('.globe-stage[data-view-phase="overview"]');
   const restoredOpacity = Number(await run.page.locator('#map').evaluate((node) => getComputedStyle(node).opacity));
