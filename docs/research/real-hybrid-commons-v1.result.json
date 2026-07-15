@@ -1,0 +1,224 @@
+{
+  "schema_version": 1,
+  "kind": "commonworld_real_hybrid_commons_research",
+  "checked_at": "2026-07-15",
+  "status": "verified_for_publication",
+  "sources": [
+    {
+      "id": "cltb-le-nid-official",
+      "type": "official-source",
+      "url": "https://cltb.be/en/projet/verheyden-le-nid-2/",
+      "claim": "Le Nid is the first CLTB pilot project, at Rue Verheyden 121, with seven homes, community space and a semi-public garden."
+    },
+    {
+      "id": "osm-le-nid-address",
+      "type": "public-registry",
+      "url": "https://www.openstreetmap.org/node/13966522352",
+      "claim": "The public address register resolves Rue Verheyden 121 to a point at 4.3152961, 50.8452417."
+    },
+    {
+      "id": "osm-le-nid-building",
+      "type": "public-registry",
+      "url": "https://www.openstreetmap.org/way/260066697",
+      "claim": "The public registry contains a named Le Nid apartment building with seven flats and an explicit polygon."
+    },
+    {
+      "id": "freifunk-community-directory",
+      "type": "official-source",
+      "url": "https://freifunk.net/wie-mache-ich-mit/community-finden/",
+      "claim": "Freifunk describes local communities, home routers and API-fed community metadata."
+    },
+    {
+      "id": "freifunk-hamburg-api",
+      "type": "official-source",
+      "url": "https://api.freifunk.net/data/ffSummarizedDir.json",
+      "claim": "The official API directory identifies Freifunk Hamburg, its community coordinate, homepage and current community metadata."
+    },
+    {
+      "id": "freifunk-hamburg-homepage",
+      "type": "official-source",
+      "url": "https://hamburg.freifunk.net/",
+      "claim": "Official local community homepage."
+    }
+  ],
+  "geometry_evidence": {
+    "cltb_le_nid": {
+      "address_point": [
+        4.3152961,
+        50.8452417
+      ],
+      "address_osm_node": 13966522352,
+      "building_osm_way": 260066697,
+      "building_polygon": [
+        [
+          [
+            4.31523,
+            50.845402
+          ],
+          [
+            4.3152518,
+            50.8453879
+          ],
+          [
+            4.3153147,
+            50.8453469
+          ],
+          [
+            4.3154309,
+            50.8452714
+          ],
+          [
+            4.3152259,
+            50.8451475
+          ],
+          [
+            4.3151432,
+            50.8452012
+          ],
+          [
+            4.3150783,
+            50.8452433
+          ],
+          [
+            4.3151554,
+            50.845292
+          ],
+          [
+            4.3151046,
+            50.8453244
+          ],
+          [
+            4.31523,
+            50.845402
+          ]
+        ]
+      ]
+    },
+    "freifunk_hamburg": {
+      "api_key": "hamburg",
+      "community_point": [
+        9.944545738399,
+        53.558314876911
+      ],
+      "community_label": "Hamburg",
+      "uncertainty_meters_min": 5000,
+      "private_router_geometry": "withheld"
+    }
+  },
+  "privacy_decisions": [
+    "The Freifunk API community coordinate is published only as an approximate community anchor, not as a router or coverage centroid.",
+    "Private home-router locations remain hidden and produce no map geometry.",
+    "The Le Nid polygon is used because the official project identity and public registry name agree; nearby unnamed buildings are not inferred as project extent."
+  ],
+  "does_not_establish": [
+    "catalog completeness",
+    "all Freifunk node locations",
+    "private router consent",
+    "ownership boundaries beyond the named public building polygon"
+  ],
+  "implementation_verification": {
+    "observed_at": "2026-07-15",
+    "catalog": {
+      "entry_count": 12,
+      "presence_kinds": {
+        "geographic": 1,
+        "digital": 10,
+        "hybrid": 1
+      },
+      "digital_identity_count": 11,
+      "spatial_identity_count": 2,
+      "public_map_feature_ids": [
+        "cltb-le-nid:cltb-le-nid-entrance",
+        "cltb-le-nid:cltb-le-nid-building",
+        "freifunk-hamburg:freifunk-hamburg-community-area"
+      ],
+      "hidden_router_in_geojson": false,
+      "selection_does_not_mutate_filters": true,
+      "maximum_map_zoom": 18
+    },
+    "regression": {
+      "full_validation_job": "grabowski-job-fc4741bb55cb",
+      "full_validation_receipt_sha256": "78cb6d2f1ec4223ecdb54ba6745dd81542ab67d6484731e1cde5f3563fcaeb20",
+      "python_tests": {
+        "passed": 355,
+        "failed": 0
+      },
+      "javascript_tests": {
+        "passed": 22,
+        "failed": 0
+      },
+      "make_validate": "PASS",
+      "renderer_deterministic": true,
+      "rendered_index_sha256": "9a9f48af3898ddbec66ec3bea31317f88e2ad7594d5fa0556a3a07d22f7159f3"
+    },
+    "final_browser_verification": {
+      "job": "grabowski-job-f33185b87dd4",
+      "receipt_sha256": "045ad89fed016e005c1a11d097980bce92b908609a4692b9e88651453ddd5ba4",
+      "scenarios": {
+        "passed": 12,
+        "failed": 0
+      },
+      "public_features": 3,
+      "public_identities": 2,
+      "digital_identities": 11
+    },
+    "privacy_readback": {
+      "job": "grabowski-job-f2eb2083e40c",
+      "receipt_sha256": "8d5f3d1a54f77a2cf97f6c22fda1df36c51e2f6437223a1dc2506b8dc41ba125",
+      "hidden_geometry": false,
+      "hidden_precision": false,
+      "hidden_router_in_map_diagnostics": false,
+      "private_maplibre_fields_used": false
+    },
+    "source_availability": {
+      "job": "grabowski-job-8439ca602a1b",
+      "receipt_sha256": "5b8ed2fd9f9f4fdebc5e166f0111314b45ba884005e867bba446d599df4c9ff6",
+      "checked_urls": 6,
+      "successful_http_responses": 6
+    },
+    "final_tree_validation": {
+      "job": "grabowski-job-0bdf130641c4",
+      "receipt_sha256": "2a7c8dc84f7290153e37aeb60a3d6ff76b4f9cbbf7e6d67fb1e1bde8469d5e22",
+      "python_tests": {
+        "passed": 357,
+        "failed": 0
+      },
+      "javascript_tests": {
+        "passed": 22,
+        "failed": 0
+      },
+      "browser_scenarios": {
+        "passed": 12,
+        "failed": 0
+      },
+      "make_validate": "PASS",
+      "git_diff_check": "PASS",
+      "renderer_deterministic": true,
+      "scope": "implementation, contracts and tests before evidence-binding-only update"
+    },
+    "review_remediation": {
+      "finding": "canonical current-state licensing did not expose the ODbL geometry exception",
+      "severity": "P1",
+      "status": "fixed_and_regression_tested",
+      "current_state_schema_version": 2,
+      "catalogue_data_default": "CC0-1.0",
+      "geometry_exception_licence": "ODbL-1.0",
+      "focused_validation_job": "grabowski-job-cd5217119a43",
+      "focused_validation_receipt_sha256": "74457f902f8810c4419d854b48001e12d74a5696e7f15383469e64a816e56838",
+      "semantic_focus_finding": "selected Commons lost semantic orientation when excluded by an independent search or layer filter",
+      "semantic_focus_status": "fixed_and_regression_tested",
+      "semantic_focus_validation_job": "grabowski-job-f33185b87dd4",
+      "semantic_focus_validation_receipt_sha256": "045ad89fed016e005c1a11d097980bce92b908609a4692b9e88651453ddd5ba4",
+      "live_smoke_catalog_finding": "production live smoke expected a hard-coded ten-entry catalogue while T006 publishes twelve entries",
+      "live_smoke_catalog_status": "fixed_and_regression_tested",
+      "live_smoke_catalog_validation_job": "grabowski-job-3d68f2244572",
+      "live_smoke_catalog_validation_receipt_sha256": "3e6d8cb2d346cfa9c8714d1c7cde1a419d41daacdce9881bc52797a0b240c54f",
+      "live_smoke_publication_finding": "production live smoke retained an obsolete publication source policy instead of the canonical catalogue boundary",
+      "live_smoke_publication_status": "fixed_and_regression_tested",
+      "licensing_source_id_finding": "canonical ODbL exception IDs did not resolve to the source identifiers used by Le Nid geometry",
+      "licensing_source_id_status": "fixed_and_regression_tested",
+      "codex_followup_validation_job": "grabowski-job-0bdf130641c4",
+      "codex_followup_validation_receipt_sha256": "2a7c8dc84f7290153e37aeb60a3d6ff76b4f9cbbf7e6d67fb1e1bde8469d5e22"
+    }
+  }
+}

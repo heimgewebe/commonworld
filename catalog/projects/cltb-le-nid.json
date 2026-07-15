@@ -1,0 +1,164 @@
+{
+  "schema_version": 3,
+  "id": "cltb-le-nid",
+  "title": "Le Nid",
+  "summary": "Ein gemeinschaftlich entwickeltes Wohnprojekt des Community Land Trust Brussels mit sieben Wohnungen, Gemeinschaftsraum und halböffentlichem Garten in Anderlecht.",
+  "kind": "geographic",
+  "themes": [
+    "housing",
+    "community-land",
+    "shared-space"
+  ],
+  "actions": [
+    "visit",
+    "learn",
+    "contact",
+    "replicate"
+  ],
+  "presence": {
+    "geographic": [
+      {
+        "id": "cltb-le-nid-entrance",
+        "mode": "exact",
+        "label": "Rue Verheyden 121, Anderlecht",
+        "geometry": {
+          "type": "Point",
+          "coordinates": [
+            4.3152961,
+            50.8452417
+          ]
+        },
+        "source_ids": [
+          "cltb-le-nid-official",
+          "osm-le-nid-address"
+        ]
+      },
+      {
+        "id": "cltb-le-nid-building",
+        "mode": "exact",
+        "label": "Gebäude Le Nid",
+        "geometry": {
+          "type": "Polygon",
+          "coordinates": [
+            [
+              [
+                4.31523,
+                50.845402
+              ],
+              [
+                4.3152518,
+                50.8453879
+              ],
+              [
+                4.3153147,
+                50.8453469
+              ],
+              [
+                4.3154309,
+                50.8452714
+              ],
+              [
+                4.3152259,
+                50.8451475
+              ],
+              [
+                4.3151432,
+                50.8452012
+              ],
+              [
+                4.3150783,
+                50.8452433
+              ],
+              [
+                4.3151554,
+                50.845292
+              ],
+              [
+                4.3151046,
+                50.8453244
+              ],
+              [
+                4.31523,
+                50.845402
+              ]
+            ]
+          ]
+        },
+        "source_ids": [
+          "cltb-le-nid-official",
+          "osm-le-nid-building"
+        ]
+      }
+    ],
+    "digital": {
+      "available": false,
+      "source_ids": [
+        "cltb-le-nid-official"
+      ]
+    }
+  },
+  "relations": [],
+  "activity": {
+    "status": "active",
+    "observed_at": "2026-07-15",
+    "source_ids": [
+      "cltb-le-nid-official"
+    ],
+    "note": "Die offizielle Projektseite beschreibt Le Nid als bewohntes CLTB-Pilotprojekt mit gemeinschaftlich verwalteten Räumen."
+  },
+  "provenance": {
+    "sources": [
+      {
+        "id": "cltb-le-nid-official",
+        "type": "official-source",
+        "label": "Community Land Trust Brussels – Verheyden / Le Nid",
+        "url": "https://cltb.be/en/projet/verheyden-le-nid-2/",
+        "retrieved_at": "2026-07-15",
+        "note": "Offizielle Projektseite mit Adresse, sieben Wohnungen, Gemeinschaftsraum, Garten und gemeinschaftlicher Verwaltung."
+      },
+      {
+        "id": "osm-le-nid-address",
+        "type": "public-registry",
+        "label": "OpenStreetMap – Rue Verheyden 121",
+        "url": "https://www.openstreetmap.org/node/13966522352",
+        "retrieved_at": "2026-07-15",
+        "note": "Öffentlicher Registerpunkt für die auf der offiziellen Projektseite genannte Adresse; OpenStreetMap-Daten unter ODbL 1.0."
+      },
+      {
+        "id": "osm-le-nid-building",
+        "type": "public-registry",
+        "label": "OpenStreetMap – Gebäude Le Nid",
+        "url": "https://www.openstreetmap.org/way/260066697",
+        "retrieved_at": "2026-07-15",
+        "note": "Benannte Gebäudefläche Le Nid mit sieben Wohnungen; OpenStreetMap-Daten unter ODbL 1.0."
+      }
+    ]
+  },
+  "curation": {
+    "state": "listed",
+    "reviewed_by": "Commonworld editorial review",
+    "reviewed_at": "2026-07-15",
+    "next_review_at": "2026-10-15",
+    "notes": "Identität, öffentlicher Adresseinstieg und Gebäudefläche wurden zwischen offizieller Projektseite und öffentlichem Register abgeglichen; benachbarte Flächen wurden nicht zugerechnet."
+  },
+  "links": [
+    {
+      "type": "homepage",
+      "label": "Le Nid – offizielle Projektseite",
+      "url": "https://cltb.be/en/projet/verheyden-le-nid-2/"
+    },
+    {
+      "type": "visit",
+      "label": "Öffentlicher Standort in OpenStreetMap",
+      "url": "https://www.openstreetmap.org/node/13966522352"
+    },
+    {
+      "type": "source",
+      "label": "Gebäudefläche in OpenStreetMap",
+      "url": "https://www.openstreetmap.org/way/260066697"
+    }
+  ],
+  "handoff": {
+    "enabled": false
+  }
+}

@@ -13,6 +13,7 @@ STATE_PATH = Path("contracts/commonworld/current-state.contract.json")
 CATALOG_PATH = Path("catalog/catalog.json")
 PROVIDER_PATH = Path("contracts/commonworld/production-delivery-provider.contract.json")
 VERTICAL_SLICE_PATH = Path("contracts/commonworld/public-maplibre-vertical-slice.contract.json")
+LE_NID_PATH = Path("catalog/projects/cltb-le-nid.json")
 
 
 def _load(root: Path, relative: Path) -> dict:
@@ -25,7 +26,7 @@ def _sha256(path: Path) -> str:
 
 def validate_current_state(root: Path = ROOT) -> list[str]:
     errors: list[str] = []
-    for relative in (STATE_PATH, CATALOG_PATH, PROVIDER_PATH, VERTICAL_SLICE_PATH):
+    for relative in (STATE_PATH, CATALOG_PATH, PROVIDER_PATH, VERTICAL_SLICE_PATH, LE_NID_PATH):
         if not (root / relative).is_file():
             errors.append(f"missing current-state dependency: {relative}")
     if errors:
@@ -36,10 +37,11 @@ def validate_current_state(root: Path = ROOT) -> list[str]:
         catalog = _load(root, CATALOG_PATH)
         provider = _load(root, PROVIDER_PATH)
         vertical = _load(root, VERTICAL_SLICE_PATH)
+        le_nid = _load(root, LE_NID_PATH)
     except (OSError, json.JSONDecodeError) as error:
         return [f"current-state dependency is invalid: {error}"]
 
-    if state.get("schema_version") != 1 or state.get("kind") != "commonworld_current_public_state":
+    if state.get("schema_version") != 2 or state.get("kind") != "commonworld_current_public_state":
         errors.append("current-state schema or kind mismatch")
     precedence = state.get("precedence", {})
     if precedence.get("current_operational_truth") != "this contract":
@@ -149,12 +151,39 @@ def validate_current_state(root: Path = ROOT) -> list[str]:
             errors.append(f"current-state historical evidence was rewritten: {relative}")
 
     licensing = state.get("licensing", {})
+    le_nid_registry_source_ids = sorted(
+        source.get("id")
+        for source in le_nid.get("provenance", {}).get("sources", [])
+        if isinstance(source, dict) and source.get("type") == "public-registry"
+    )
+    geographic_source_ids = {
+        source_id
+        for location in le_nid.get("presence", {}).get("geographic", [])
+        if isinstance(location, dict)
+        for source_id in location.get("source_ids", [])
+        if isinstance(source_id, str)
+    }
+    if (
+        le_nid_registry_source_ids != ["osm-le-nid-address", "osm-le-nid-building"]
+        or not set(le_nid_registry_source_ids).issubset(geographic_source_ids)
+    ):
+        errors.append("current licensing source IDs must resolve to the published Le Nid registry sources")
     if licensing != {
         "code": "AGPL-3.0-only",
-        "catalogue_data": "CC0-1.0",
+        "catalogue_data_default": "CC0-1.0",
+        "catalogue_data_exceptions": [
+            {
+                "scope": "catalog/projects/cltb-le-nid.json#presence.geographic",
+                "source_ids": ["osm-le-nid-address", "osm-le-nid-building"],
+                "licence": "ODbL-1.0",
+                "attribution": "© OpenStreetMap contributors",
+            }
+        ],
         "third_party_assets_retain_their_own_licences": True,
     }:
         errors.append("current licensing truth mismatch")
+    if state.get("current_as_of") != "2026-07-15":
+        errors.append("current-state date does not cover the mixed catalogue licensing truth")
     if not (root / "LICENSE").is_file() or not (root / "LICENSE-DATA.md").is_file():
         errors.append("declared code and data licences must exist")
 

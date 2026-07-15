@@ -1,0 +1,126 @@
+{
+  "schema_version": 1,
+  "title": "Commonworld real geographic and hybrid Commons vertical slice",
+  "source_contract": {
+    "id": "https://commonworld.net/contracts/commonworld/project.schema.json",
+    "schema_version": 3,
+    "identity_key": "CommonProject.id"
+  },
+  "catalog_validation": {
+    "production_validator": "scripts/validate_public_catalog.py",
+    "seed_regression_validator": "scripts/validate_public_seed_baseline.py",
+    "vertical_slice_validator": "scripts/validate_real_hybrid_commons.py",
+    "production_allows_kinds": [
+      "geographic",
+      "digital",
+      "hybrid"
+    ],
+    "production_source_types": [
+      "official-source",
+      "public-registry"
+    ],
+    "seed_constraints_do_not_apply_to_new_records": true
+  },
+  "cases": {
+    "exact_anchor": {
+      "project_id": "cltb-le-nid",
+      "location_id": "cltb-le-nid-entrance",
+      "mode": "exact",
+      "geometry_type": "Point"
+    },
+    "public_extent": {
+      "project_id": "cltb-le-nid",
+      "location_id": "cltb-le-nid-building",
+      "mode": "exact",
+      "geometry_type": "Polygon",
+      "registry_ref": "openstreetmap-way-260066697"
+    },
+    "approximate_anchor": {
+      "project_id": "freifunk-hamburg",
+      "location_id": "freifunk-hamburg-community-area",
+      "mode": "approximate",
+      "geometry_type": "Point",
+      "uncertainty_meters_min": 5000
+    },
+    "hidden_location": {
+      "project_id": "freifunk-hamburg",
+      "location_id": "freifunk-hamburg-private-routers",
+      "mode": "hidden",
+      "geometry_forbidden": true
+    },
+    "hybrid_identity": {
+      "project_id": "freifunk-hamburg",
+      "digital_available": true,
+      "geographic_locations": 2
+    },
+    "evidenced_relation": {
+      "source_project_id": "freifunk-hamburg",
+      "target_project_id": "freifunk",
+      "relation_type": "chapter-of"
+    }
+  },
+  "map_derivation": {
+    "source": "CommonProject.presence.geographic",
+    "geojson_source_id": "commonworld-public-representations",
+    "feature_identity_property": "project_id",
+    "feature_location_property": "location_id",
+    "representation_kinds": [
+      "exact_anchor",
+      "approximate_anchor",
+      "public_extent"
+    ],
+    "hidden_locations_excluded": true,
+    "invented_coordinates_forbidden": true,
+    "hybrid_identity_duplication_forbidden": true
+  },
+  "semantic_zoom": {
+    "levels": [
+      {
+        "id": "planet",
+        "minimum_zoom": 0,
+        "maximum_zoom_exclusive": 1.8,
+        "individual_geometries": false
+      },
+      {
+        "id": "macroregion",
+        "minimum_zoom": 1.8,
+        "maximum_zoom_exclusive": 3.4,
+        "individual_geometries": false
+      },
+      {
+        "id": "region",
+        "minimum_zoom": 3.4,
+        "maximum_zoom_exclusive": 5.5,
+        "individual_geometries": "extent_and_approximate"
+      },
+      {
+        "id": "local",
+        "minimum_zoom": 5.5,
+        "individual_geometries": "all_public",
+        "maximum_zoom_inclusive": 18
+      },
+      {
+        "id": "focus",
+        "selected_identity_required": true,
+        "identity_detail": "one_complete_commonproject"
+      }
+    ],
+    "catalog_zoom_assignment_forbidden": true,
+    "location_line_required": true,
+    "maximum_map_zoom": 18,
+    "building_inspection_zoom": 18
+  },
+  "cross_view": {
+    "surfaces": [
+      "globe",
+      "digital_sphere",
+      "text",
+      "focus"
+    ],
+    "selection_key": "CommonProject.id",
+    "same_query_same_identity_set": true,
+    "geographic_only_records_absent_from_digital_sphere": true,
+    "hybrid_records_present_in_globe_and_digital_sphere": true,
+    "selection_does_not_mutate_filters": true
+  }
+}

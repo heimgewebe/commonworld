@@ -2,6 +2,7 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import {
   DEFAULT_CAMERA,
+  MAX_MAP_ZOOM,
   DIGITAL_LAYER_TRANSITION_MS,
   LAYERS,
   ORBIT_PROFILES,
@@ -14,8 +15,14 @@ import {
   globeHorizonCoordinates,
   mapFailurePolicy,
   projectedGlobeCircle,
+  publicMapFeatureCollection,
+  evidencedRelations,
+  recordLocationSummaries,
+  recordPresentationLabel,
   ribbonRepeatCount,
   searchFromState,
+  semanticLocationLine,
+  semanticZoomLevel,
   sphereDetailLevel,
   sphereLayout,
   sphereOpacityForGlobeRatio,
@@ -77,7 +84,8 @@ test('deep-link state accepts surface, search, identity and clamped camera', () 
   assert.equal(state.surface, 'text');
   assert.equal(state.query, 'open data');
   assert.equal(state.layer, 'software_infrastructure');
-  assert.deepEqual(state.camera, { lng: 180, lat: -85, zoom: 8, bearing: 0, pitch: 70 });
+  assert.equal(MAX_MAP_ZOOM, 18);
+  assert.deepEqual(state.camera, { lng: 180, lat: -85, zoom: MAX_MAP_ZOOM, bearing: 0, pitch: 70 });
 });
 
 test('unknown identities and malformed numbers fail closed', () => {
@@ -170,6 +178,7 @@ test('digital layer camera performs a bounded journey without changing identity'
     pitch: 58,
     padding: { top: 0, right: 0, bottom: 0, left: 0 },
   });
+  assert.equal(digitalLayerCamera({ zoom: MAX_MAP_ZOOM }).zoom, 8, 'digital layer journey must remain bounded after geographic close-up');
 });
 
 test('map failure policy preserves the style for isolated errors and replaces it only after provider readback failure', () => {
@@ -183,4 +192,131 @@ test('digital sphere fade follows visible globe scale instead of MapLibre zoom n
   assert.equal(sphereOpacityForGlobeRatio(1.575), 0.5);
   assert.equal(sphereOpacityForGlobeRatio(2.1), 0);
   assert.ok(sphereOpacityForGlobeRatio(1.4) > sphereOpacityForGlobeRatio(1.8));
+});
+
+
+const geographicHybridRecords = [
+  {
+    id: 'cltb-le-nid',
+    title: 'Le Nid',
+    kind: 'geographic',
+    themes: ['housing', 'shared-space'],
+    presence: {
+      geographic: [
+        { id: 'entrance', label: 'Rue Verheyden 121', mode: 'exact', geometry: { type: 'Point', coordinates: [4.3152961, 50.8452417] }, source_ids: ['official', 'registry-point'] },
+        { id: 'building', label: 'Gebäude Le Nid', mode: 'exact', geometry: { type: 'Polygon', coordinates: [[[4.31, 50.84], [4.32, 50.84], [4.32, 50.85], [4.31, 50.84]]] }, source_ids: ['official', 'registry-polygon'] },
+      ],
+      digital: { available: false, source_ids: ['official'] },
+    },
+    relations: [],
+  },
+  {
+    id: 'freifunk',
+    title: 'Freifunk',
+    kind: 'digital',
+    themes: ['communication', 'community-network'],
+    presence: { geographic: [], digital: { available: true, reach: 'network', label: 'Community-Netze', source_ids: ['overview'] } },
+    relations: [],
+  },
+  {
+    id: 'freifunk-hamburg',
+    title: 'Freifunk Hamburg',
+    kind: 'hybrid',
+    themes: ['communication', 'community-network'],
+    presence: {
+      geographic: [
+        { id: 'community-area', label: 'Community Hamburg', mode: 'approximate', geometry: { type: 'Point', coordinates: [9.9445, 53.5583] }, uncertainty_meters_min: 5000, source_ids: ['api'] },
+        { id: 'private-routers', label: 'Private Heimrouter', mode: 'hidden', privacy_note: 'Private Routerstandorte werden nicht veröffentlicht.', source_ids: ['directory'] },
+      ],
+      digital: { available: true, reach: 'regional', label: 'Hamburger Community-Netz', source_ids: ['api'] },
+    },
+    relations: [{ type: 'chapter-of', target_id: 'freifunk', source_ids: ['api'], note: 'Lokale Freifunk-Community.' }],
+  },
+];
+
+test('public map derivation preserves CommonProject identity and excludes hidden geometry', () => {
+  const collection = publicMapFeatureCollection(geographicHybridRecords);
+  assert.equal(collection.type, 'FeatureCollection');
+  assert.equal(collection.features.length, 3);
+  assert.deepEqual(collection.features.map(({ properties }) => properties.project_id), ['cltb-le-nid', 'cltb-le-nid', 'freifunk-hamburg']);
+  assert.deepEqual(collection.features.map(({ properties }) => properties.representation_kind), ['exact_anchor', 'public_extent', 'approximate_anchor']);
+  assert.equal(collection.features.some(({ properties }) => properties.location_id === 'private-routers'), false);
+  const approximate = collection.features.find(({ properties }) => properties.representation_kind === 'approximate_anchor');
+  assert.equal(approximate.properties.uncertainty_meters_min, 5000);
+  assert.deepEqual(approximate.geometry.coordinates, [9.9445, 53.5583]);
+});
+
+test('map filtering uses the same visible identity set without multiplying hybrid identities', () => {
+  const collection = publicMapFeatureCollection(geographicHybridRecords, new Set(['freifunk-hamburg']));
+  assert.equal(collection.features.length, 1);
+  assert.equal(collection.features[0].properties.project_id, 'freifunk-hamburg');
+  assert.equal(new Set(collection.features.map(({ properties }) => properties.project_id)).size, 1);
+});
+
+
+test('digital layer filtering excludes geographic-only identities but retains hybrid identities', () => {
+  assert.deepEqual(
+    filterRecords(geographicHybridRecords, { layer: 'communication_networks' }).map(({ id }) => id),
+    ['freifunk', 'freifunk-hamburg'],
+  );
+  assert.deepEqual(
+    filterRecords(geographicHybridRecords, { layer: 'mixed_other' }).map(({ id }) => id),
+    [],
+  );
+});
+
+test('only evidenced relations to known identities are projected', () => {
+  const records = structuredClone(geographicHybridRecords);
+  records[2].relations.push({ type: 'cooperates-with', target_id: 'missing', source_ids: ['api'] });
+  assert.deepEqual(evidencedRelations(records), [{
+    source_project_id: 'freifunk-hamburg',
+    source_title: 'Freifunk Hamburg',
+    target_project_id: 'freifunk',
+    target_title: 'Freifunk',
+    relation_type: 'chapter-of',
+    source_ids: ['api'],
+    note: 'Lokale Freifunk-Community.',
+  }]);
+});
+
+test('semantic zoom remains presentation logic from planet to focus', () => {
+  assert.equal(semanticZoomLevel(1.15), 'planet');
+  assert.equal(semanticZoomLevel(2.2), 'macroregion');
+  assert.equal(semanticZoomLevel(4.2), 'region');
+  assert.equal(semanticZoomLevel(6.2), 'local');
+  assert.equal(semanticZoomLevel(1.15, 'freifunk-hamburg'), 'focus');
+  assert.deepEqual(semanticLocationLine({ zoom: 4.2, records: geographicHybridRecords }), {
+    level: 'region',
+    crumbs: ['Erde', 'Region'],
+    summary: '2 räumlich belegte Commons · öffentliche Flächen und ungefähre Orte',
+  });
+  assert.deepEqual(semanticLocationLine({ zoom: 1.15, records: geographicHybridRecords, selectedProjectId: 'freifunk-hamburg' }), {
+    level: 'focus',
+    crumbs: ['Erde', 'Commons', 'Freifunk Hamburg'],
+    summary: 'Hybrid · 1 öffentlicher Ort · 1 verborgener Ort',
+  });
+  assert.deepEqual(semanticLocationLine({
+    zoom: 1.15,
+    records: [geographicHybridRecords[0]],
+    selectedProjectId: 'freifunk-hamburg',
+    selectedRecord: geographicHybridRecords[2],
+  }), {
+    level: 'focus',
+    crumbs: ['Erde', 'Commons', 'Freifunk Hamburg'],
+    summary: 'Hybrid · 1 öffentlicher Ort · 1 verborgener Ort',
+  });
+});
+
+test('presentation and location labels explain geographic, digital and hybrid truth', () => {
+  assert.equal(recordPresentationLabel(geographicHybridRecords[0]), 'Geografisch');
+  assert.equal(recordPresentationLabel(geographicHybridRecords[1]), 'Digital · Kommunikation und Netze');
+  assert.equal(recordPresentationLabel(geographicHybridRecords[2]), 'Hybrid · Kommunikation und Netze');
+  assert.deepEqual(recordLocationSummaries(geographicHybridRecords[0]), [
+    'Rue Verheyden 121 · exakter öffentlicher Punkt',
+    'Gebäude Le Nid · öffentliche Fläche',
+  ]);
+  assert.deepEqual(recordLocationSummaries(geographicHybridRecords[2]), [
+    'Community Hamburg · ungefähr, mindestens 5 km Unschärfe',
+    'Private Heimrouter · Ort verborgen',
+  ]);
 });

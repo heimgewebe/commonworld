@@ -17,6 +17,7 @@ class CurrentStateTests(unittest.TestCase):
             "contracts/commonworld/renderer-selection.contract.json",
             "contracts/commonworld/digital-sphere.contract.json",
             "catalog/catalog.json",
+            "catalog/projects/cltb-le-nid.json",
             "docs/research/public-maplibre-vertical-slice-v1.result.json",
             "LICENSE",
             "LICENSE-DATA.md",
@@ -58,6 +59,28 @@ class CurrentStateTests(unittest.TestCase):
             path.write_text(path.read_text(encoding="utf-8") + "\n", encoding="utf-8")
             errors = validate_current_state(root)
         self.assertTrue(any("historical evidence was rewritten" in error for error in errors))
+
+    def test_rejects_missing_odbl_catalogue_exception(self) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            root = self.copy_current_state(directory)
+            path = root / "contracts/commonworld/current-state.contract.json"
+            value = json.loads(path.read_text(encoding="utf-8"))
+            value["licensing"]["catalogue_data_exceptions"] = []
+            path.write_text(json.dumps(value), encoding="utf-8")
+            errors = validate_current_state(root)
+        self.assertTrue(any("licensing truth" in error for error in errors))
+
+        with tempfile.TemporaryDirectory() as directory:
+            root = self.copy_current_state(directory)
+            path = root / "contracts/commonworld/current-state.contract.json"
+            value = json.loads(path.read_text(encoding="utf-8"))
+            value["licensing"]["catalogue_data_exceptions"][0]["source_ids"] = [
+                "osm-node-13966522352",
+                "osm-way-260066697",
+            ]
+            path.write_text(json.dumps(value), encoding="utf-8")
+            errors = validate_current_state(root)
+        self.assertTrue(any("licensing truth" in error for error in errors))
 
     def test_rejects_missing_data_licence(self) -> None:
         with tempfile.TemporaryDirectory() as directory:

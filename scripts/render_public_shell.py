@@ -51,6 +51,28 @@ def homepage(record: dict) -> str:
     return values[0]
 
 
+def presentation_label(record: dict) -> str:
+    kind = record.get("kind")
+    if kind == "geographic":
+        return "Geografisch"
+    label = LAYER_LABELS[derive_layer(record)]
+    return f"Hybrid · {label}" if kind == "hybrid" else f"Digital · {label}"
+
+
+def location_summary(record: dict) -> str:
+    locations = record.get("presence", {}).get("geographic", [])
+    if not isinstance(locations, list) or not locations:
+        return "Ortsunabhängige digitale Präsenz"
+    public_count = sum(1 for location in locations if location.get("mode") != "hidden" and location.get("geometry"))
+    hidden_count = sum(1 for location in locations if location.get("mode") == "hidden")
+    parts = []
+    if public_count:
+        parts.append(f"{public_count} {'öffentlicher Ort' if public_count == 1 else 'öffentliche Orte'}")
+    if hidden_count:
+        parts.append(f"{hidden_count} {'verborgener Ort' if hidden_count == 1 else 'verborgene Orte'}")
+    return " · ".join(parts) or "Keine öffentliche Geometrie"
+
+
 def load_records(root: Path = ROOT) -> list[dict]:
     manifest = json.loads((root / "catalog/catalog.json").read_text(encoding="utf-8"))
     records = [
@@ -68,7 +90,8 @@ def render_cards(records: list[dict], *, interactive: bool = True) -> str:
         identifier = html.escape(record["id"], quote=True)
         title = html.escape(record["title"])
         summary = html.escape(record["summary"])
-        label = html.escape(LAYER_LABELS[derive_layer(record)])
+        label = html.escape(presentation_label(record))
+        place = html.escape(location_summary(record))
         url = html.escape(homepage(record), quote=True)
         action = (
             f'              <button class="catalog-select" type="button" '
@@ -78,9 +101,10 @@ def render_cards(records: list[dict], *, interactive: bool = True) -> str:
         )
         cards.append(
             f'''          <article class="catalog-card" id="project-{identifier}" data-commonproject-id="{identifier}">
-            <p class="catalog-kind">Digital · {label}</p>
+            <p class="catalog-kind">{label}</p>
             <h2>{title}</h2>
             <p>{summary}</p>
+            <p class="catalog-location">{place}</p>
             <div class="catalog-actions">
 {action}              <a href="{url}" rel="external noreferrer">Offizielle Seite <span aria-hidden="true">↗</span></a>
               <a href="./catalog/projects/{identifier}.json" type="application/json">JSON</a>
@@ -169,11 +193,12 @@ def render_shell(root: Path = ROOT) -> str:
           <div class="orientation-bar" aria-label="Globusorientierung">
             <button id="globe-reset" type="button">Erde</button>
             <span aria-hidden="true">›</span>
-            <span>Gesamtansicht</span>
+            <span id="semantic-level">Gesamtansicht</span>
+            <span id="semantic-summary" class="semantic-summary">Räumlich belegte Commons werden aus dem Katalog abgeleitet.</span>
           </div>
 
           <p id="map-status" class="map-status" role="status">Globus wird geladen. Die Textansicht bleibt verfügbar.</p>
-          <p id="globe-results" class="globe-results" role="status">10 Commons im aktuellen Katalog.</p>
+          <p id="globe-results" class="globe-results" role="status">{len(records)} Commons im aktuellen Katalog.</p>
 
           <aside id="layer-panel" class="layer-panel" aria-labelledby="layer-title" hidden>
             <h2 id="layer-title" class="visually-hidden">Digitale Commons aus der Nähe</h2>
@@ -200,7 +225,7 @@ def render_shell(root: Path = ROOT) -> str:
           <p class="kicker">Textansicht</p>
           <h1 id="text-title">Commons direkt durchsuchen</h1>
           <p>Dieselben Identitäten, Filter und Auswahlen wie im Globus – ohne räumliche Darstellung.</p>
-          <p id="text-count" class="text-count">10 Commons</p>
+          <p id="text-count" class="text-count">{len(records)} Commons</p>
         </header>
         <div class="text-layout">
           <aside class="text-filters" aria-labelledby="text-filter-title">
@@ -250,7 +275,9 @@ def render_shell(root: Path = ROOT) -> str:
         <div class="focus-grid">
           <section><h3>Themen</h3><ul id="focus-themes"></ul></section>
           <section><h3>Möglichkeiten</h3><ul id="focus-actions"></ul></section>
+          <section><h3>Orte</h3><ul id="focus-locations"></ul></section>
           <section><h3>Digitale Präsenz</h3><p id="focus-digital"></p></section>
+          <section><h3>Beziehungen</h3><ul id="focus-relations"></ul></section>
           <section><h3>Offizielle Links</h3><ul id="focus-links"></ul></section>
           <section><h3>Quellen</h3><ul id="focus-sources"></ul></section>
           <section><h3>Kuration</h3><p id="focus-curation"></p></section>
@@ -293,9 +320,9 @@ def render_method(root: Path = ROOT) -> str:
       <p class="kicker">Commonworld</p>
       <h1>Methode, Abdeckung und Datenschutz</h1>
       <p><a href="./">Zurück zum Globus</a></p>
-      <section><h2>Was Commonworld zeigt</h2><p>Commonworld veröffentlicht kuratierte Commons als eine gemeinsame Entdeckungsoberfläche. Der aktuelle Startkatalog enthält {count} digitale Commons. Er ist ein begrenzter redaktioneller Ausschnitt und keine vollständige Weltstatistik.</p></section>
+      <section><h2>Was Commonworld zeigt</h2><p>Commonworld veröffentlicht kuratierte Commons als eine gemeinsame Entdeckungsoberfläche. Der aktuelle Startkatalog enthält {count} Commons mit digitaler, geografischer oder hybrider Präsenz. Er ist ein begrenzter redaktioneller Ausschnitt und keine vollständige Weltstatistik.</p></section>
       <section><h2>Daten und Quellen</h2><p>Jeder Eintrag besitzt eine stabile <code>CommonProject.id</code>, Quellen, Abrufdaten, Aktivitäts- und Kurationsangaben. Die JSON-Dateien sind dieselbe Datenwahrheit wie Globus und Textansicht. Fehlende Katalogeinträge bedeuten nicht, dass in einer Region keine Commons existieren.</p></section>
-      <section><h2>Orte und Privatsphäre</h2><p>Digitale Commons erhalten keine erfundenen Kartenkoordinaten. Künftige geografische Angaben dürfen exakt, angenähert oder verborgen sein. Verborgene Orte werden weder veröffentlicht noch aus anderen Angaben rekonstruiert.</p></section>
+      <section><h2>Orte und Privatsphäre</h2><p>Digitale Commons erhalten keine erfundenen Kartenkoordinaten. Geografische Angaben können exakt, angenähert oder verborgen sein. Verborgene Orte erhalten keine Geometrie und werden nicht aus anderen Angaben rekonstruiert.</p></section>
       <section><h2>Technischer Betrieb</h2><p>Die Seite läuft statisch über GitHub Pages. MapLibre wird lokal ausgeliefert. Die Basiskarte kommt von der öffentlichen OpenFreeMap-Instanz als nichtkritische Best-effort-Abhängigkeit ohne behauptetes SLA. Bei Kartenfehlern bleiben Katalog und Textansicht verfügbar.</p></section>
       <section><h2>Datenschutz</h2><p>Commonworld besitzt keine Konten, eigene Telemetrie, Cookies oder schreibende API. Kartenabrufe gehen direkt an OpenFreeMap; dort kann technisch die IP-Adresse verarbeitet und zeitweise zur Sicherheit protokolliert werden.</p></section>
       <section><h2>Barrierefreiheit</h2><p>Textansicht, Tastaturpfad, reduzierte Bewegung und No-JavaScript-Katalog sind vorhanden. Eine vollständige Screenreader-Produkttauglichkeit oder WCAG-Konformität wird noch nicht behauptet.</p></section>

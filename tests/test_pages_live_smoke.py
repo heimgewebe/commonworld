@@ -4,6 +4,7 @@ import unittest
 
 from scripts.smoke_pages_live import (
     EXPECTED_CATALOG_ENTRY_COUNT,
+    EXPECTED_CATALOG_PROJECT_FILES,
     EXPECTED_MACHINE_SURFACE,
     EXPECTED_PUBLICATION,
     LiveFetch,
@@ -26,7 +27,7 @@ class PagesLiveSmokeTests(unittest.TestCase):
                 "schema_version": 1,
                 "kind": "commonworld_public_catalog",
                 "entry_count": EXPECTED_CATALOG_ENTRY_COUNT,
-                "project_files": [f"projects/project-{index:02d}.json" for index in range(EXPECTED_CATALOG_ENTRY_COUNT)],
+                "project_files": list(EXPECTED_CATALOG_PROJECT_FILES),
                 "publication": EXPECTED_PUBLICATION,
                 "machine_surface": EXPECTED_MACHINE_SURFACE,
             }
@@ -110,7 +111,7 @@ class PagesLiveSmokeTests(unittest.TestCase):
         )
         self.assertIn("live catalog machine-readable surface boundary mismatch", validate_catalog_fetch(fetch))
 
-    def test_catalog_count_drift_fails(self) -> None:
+    def test_catalog_count_or_identity_drift_fails(self) -> None:
         catalog = json.loads(self.valid_catalog())
         catalog["project_files"].pop()
         fetch = LiveFetch(
@@ -122,6 +123,20 @@ class PagesLiveSmokeTests(unittest.TestCase):
         )
         self.assertIn(
             f"live catalog must contain {EXPECTED_CATALOG_ENTRY_COUNT} entries",
+            validate_catalog_fetch(fetch),
+        )
+
+        catalog = json.loads(self.valid_catalog())
+        catalog["project_files"] = sorted(["projects/not-canonical.json", *catalog["project_files"][1:]])
+        fetch = LiveFetch(
+            requested_url="https://commonworld.net/catalog/catalog.json",
+            final_url="https://commonworld.net/catalog/catalog.json",
+            status=200,
+            content_type="application/json",
+            body=json.dumps(catalog),
+        )
+        self.assertIn(
+            "live catalog project_files do not match the checked-out canonical catalog",
             validate_catalog_fetch(fetch),
         )
 

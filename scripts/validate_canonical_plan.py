@@ -99,6 +99,8 @@ EXPECTED_RESEARCH_FILES = {
     "physical-device-acceptance-v4-apple.result.json",
     "production-delivery-provider-v1.md",
     "production-delivery-provider-v1.result.json",
+    "real-hybrid-commons-v1.md",
+    "real-hybrid-commons-v1.result.json",
     "public-maplibre-vertical-slice-v1.md",
     "public-maplibre-vertical-slice-v1.result.json",
     "layered-digital-sphere-v1.md",
@@ -110,7 +112,7 @@ EXPECTED_RESEARCH_FILES = {
     "renderer-selection-v1.md",
     "renderer-selection-v1.result.json",
 }
-EXPECTED_CONTRACT_FILES = {"current-state.contract.json", "aggregation-zoom.contract.json", "digital-sphere.contract.json", "production-delivery-provider.contract.json", "project.schema.json", "public-maplibre-vertical-slice.contract.json", "renderer-selection.contract.json", "visual-semantics.contract.json"}
+EXPECTED_CONTRACT_FILES = {"current-state.contract.json", "aggregation-zoom.contract.json", "digital-sphere.contract.json", "production-delivery-provider.contract.json", "project.schema.json", "public-maplibre-vertical-slice.contract.json", "real-hybrid-commons.contract.json", "renderer-selection.contract.json", "visual-semantics.contract.json"}
 EXPECTED_SCRIPT_FILES = {
     "__init__.py",
     "build_public_runtime.py",
@@ -124,6 +126,8 @@ EXPECTED_SCRIPT_FILES = {
     "validate_production_delivery_provider.py",
     "validate_public_catalog.py",
     "validate_public_maplibre_vertical_slice.py",
+    "validate_public_seed_baseline.py",
+    "validate_real_hybrid_commons.py",
     "validate_public_shell.py",
     "validate_renderer_spike.py",
     "validate_renderer_selection.py",
@@ -147,6 +151,8 @@ EXPECTED_TEST_FILES = {
     "test_production_delivery_provider.py",
     "test_public_catalog.py",
     "test_public_maplibre_vertical_slice.py",
+    "test_public_seed_baseline.py",
+    "test_real_hybrid_commons.py",
     "test_public_shell.py",
     "test_renderer_spike.py",
     "test_renderer_selection.py",

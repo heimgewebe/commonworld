@@ -1,5 +1,6 @@
 import {
   DEFAULT_CAMERA,
+  MAX_MAP_ZOOM,
   binaryName,
   DIGITAL_LAYER_TRANSITION_MS,
   LAYERS,
@@ -10,9 +11,14 @@ import {
   mapCamera,
   mapFailurePolicy,
   normalizeQuery,
+  evidencedRelations,
+  publicMapFeatureCollection,
+  recordLocationSummaries,
+  recordPresentationLabel,
   projectedGlobeCircle,
   ribbonRepeatCount,
   searchFromState,
+  semanticLocationLine,
   sphereDetailLevel,
   sphereLayout,
   sphereOpacityForGlobeRatio,
@@ -22,6 +28,8 @@ import {
 const SVG_NS = 'http://www.w3.org/2000/svg';
 const LOCAL_FALLBACK_STYLE = Object.freeze({ version: 8, sources: {}, layers: [{ id: 'commonworld-fallback', type: 'background', paint: { 'background-color': '#0d2426' } }] });
 const PRESENTATION_STORAGE_KEY = 'commonworld.presentation';
+const PUBLIC_MAP_SOURCE_ID = 'commonworld-public-representations';
+const PUBLIC_MAP_LAYER_IDS = Object.freeze(['commonworld-public-extents', 'commonworld-approximate-anchors', 'commonworld-exact-anchors']);
 const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
 const elements = {
   body: document.body,
@@ -36,6 +44,8 @@ const elements = {
   map: document.querySelector('#map'),
   mapStatus: document.querySelector('#map-status'),
   globeResults: document.querySelector('#globe-results'),
+  semanticLevel: document.querySelector('#semantic-level'),
+  semanticSummary: document.querySelector('#semantic-summary'),
   sphere: document.querySelector('#digital-sphere'),
   sphereStreams: document.querySelector('#sphere-streams'),
   sphereRings: document.querySelector('#sphere-rings'),
@@ -64,7 +74,9 @@ const elements = {
   focusKind: document.querySelector('#focus-kind'),
   focusThemes: document.querySelector('#focus-themes'),
   focusActions: document.querySelector('#focus-actions'),
+  focusLocations: document.querySelector('#focus-locations'),
   focusDigital: document.querySelector('#focus-digital'),
+  focusRelations: document.querySelector('#focus-relations'),
   focusLinks: document.querySelector('#focus-links'),
   focusSources: document.querySelector('#focus-sources'),
   focusCuration: document.querySelector('#focus-curation'),
@@ -105,6 +117,7 @@ const runtime = {
   providerFallbackApplied: false,
   providerErrorLogged: false,
   laneResizeObserver: null,
+  mapInteractionsBound: false,
 };
 
 function setStatus(message, state = 'loading') {
@@ -158,7 +171,18 @@ function validateRecords(records) {
   const ids = new Set();
   for (const record of records) {
     if (!record || typeof record.id !== 'string' || ids.has(record.id)) throw new Error('Ungültige oder doppelte CommonProject-ID.');
-    if (record?.presence?.geographic?.length) throw new Error(`Digitale Katalogidentität ${record.id} enthält unerlaubte Geodaten.`);
+    if (!['geographic', 'digital', 'hybrid'].includes(record.kind)) throw new Error(`CommonProject ${record.id} besitzt eine unbekannte Präsenzart.`);
+    const locations = record?.presence?.geographic;
+    if (!Array.isArray(locations)) throw new Error(`CommonProject ${record.id} besitzt keine gültige Ortsliste.`);
+    for (const location of locations) {
+      if (!location || !['exact', 'approximate', 'hidden'].includes(location.mode)) throw new Error(`CommonProject ${record.id} besitzt einen ungültigen Ortsmodus.`);
+      if (location.mode === 'hidden') {
+        if ('geometry' in location || 'uncertainty_meters_min' in location) throw new Error(`Verborgener Ort ${location.id} darf keine Geometrie oder Ersatzgenauigkeit enthalten.`);
+        continue;
+      }
+      if (!location.geometry || !['Point', 'Polygon', 'MultiPolygon'].includes(location.geometry.type)) throw new Error(`Öffentlicher Ort ${location.id} besitzt keine unterstützte Geometrie.`);
+      if (location.mode === 'approximate' && !(Number(location.uncertainty_meters_min) > 0)) throw new Error(`Ungefährer Ort ${location.id} muss seine Mindestunschärfe nennen.`);
+    }
     ids.add(record.id);
   }
   return records;
@@ -190,7 +214,9 @@ function createSvgElement(name, attributes = {}) {
 
 function groupedDigitalRecords(records = runtime.records) {
   const grouped = new Map(LAYERS.map((layer) => [layer.id, []]));
-  for (const record of records) grouped.get(deriveLayer(record))?.push(record);
+  for (const record of records) {
+    if (record?.presence?.digital?.available === true) grouped.get(deriveLayer(record))?.push(record);
+  }
   return grouped;
 }
 
@@ -325,6 +351,91 @@ function recordsMatchingQuery() {
   return filterRecords(runtime.records, { query: runtime.state.query });
 }
 
+function currentPublicMapData() {
+  return publicMapFeatureCollection(runtime.records, new Set(visibleRecords().map(({ id }) => id)));
+}
+
+function updatePublicMapData() {
+  if (!runtime.mapReady || !runtime.map) return;
+  const source = runtime.map.getSource(PUBLIC_MAP_SOURCE_ID);
+  if (!source || typeof source.setData !== 'function') return;
+  const data = currentPublicMapData();
+  source.setData(data);
+  elements.stage.dataset.publicMapFeatures = String(data.features.length);
+  elements.stage.dataset.publicMapProjectIds = String(new Set(data.features.map(({ properties }) => properties.project_id)).size);
+  elements.stage.dataset.publicMapFeatureIds = data.features.map(({ id }) => id).join(',');
+  elements.stage.dataset.publicMapLocationIds = data.features.map(({ properties }) => properties.location_id).join(',');
+}
+
+function ensurePublicMapLayers() {
+  if (!runtime.map || !runtime.map.isStyleLoaded()) return;
+  if (!runtime.map.getSource(PUBLIC_MAP_SOURCE_ID)) {
+    runtime.map.addSource(PUBLIC_MAP_SOURCE_ID, { type: 'geojson', data: currentPublicMapData() });
+  }
+  if (!runtime.map.getLayer('commonworld-public-extents')) {
+    runtime.map.addLayer({
+      id: 'commonworld-public-extents',
+      type: 'fill',
+      source: PUBLIC_MAP_SOURCE_ID,
+      minzoom: 3.4,
+      filter: ['==', ['get', 'representation_kind'], 'public_extent'],
+      paint: {
+        'fill-color': '#76c7a4',
+        'fill-opacity': 0.32,
+        'fill-outline-color': '#d7f4e8',
+      },
+    });
+  }
+  if (!runtime.map.getLayer('commonworld-approximate-anchors')) {
+    runtime.map.addLayer({
+      id: 'commonworld-approximate-anchors',
+      type: 'circle',
+      source: PUBLIC_MAP_SOURCE_ID,
+      minzoom: 3.4,
+      filter: ['==', ['get', 'representation_kind'], 'approximate_anchor'],
+      paint: {
+        'circle-radius': ['interpolate', ['linear'], ['zoom'], 3.4, 7, 8, 12],
+        'circle-color': '#e8b96d',
+        'circle-opacity': 0.78,
+        'circle-stroke-color': '#fff2d4',
+        'circle-stroke-width': 1.5,
+        'circle-blur': 0.18,
+      },
+    });
+  }
+  if (!runtime.map.getLayer('commonworld-exact-anchors')) {
+    runtime.map.addLayer({
+      id: 'commonworld-exact-anchors',
+      type: 'circle',
+      source: PUBLIC_MAP_SOURCE_ID,
+      minzoom: 5.5,
+      filter: ['==', ['get', 'representation_kind'], 'exact_anchor'],
+      paint: {
+        'circle-radius': ['interpolate', ['linear'], ['zoom'], 5.5, 6, 8, 10],
+        'circle-color': '#8bd9f5',
+        'circle-opacity': 0.94,
+        'circle-stroke-color': '#e5f8ff',
+        'circle-stroke-width': 1.5,
+      },
+    });
+  }
+  updatePublicMapData();
+}
+
+function updateSemanticLocationLine() {
+  const zoom = runtime.mapReady ? runtime.map.getZoom() : runtime.state.camera.zoom;
+  const line = semanticLocationLine({
+    zoom,
+    records: visibleRecords(),
+    selectedProjectId: runtime.state.project,
+    selectedRecord: runtime.state.project ? runtime.recordsById.get(runtime.state.project) ?? null : null,
+  });
+  elements.stage.dataset.semanticLevel = line.level;
+  elements.semanticLevel.textContent = line.crumbs.at(-1) ?? 'Gesamtansicht';
+  elements.semanticSummary.textContent = line.summary;
+  elements.semanticSummary.setAttribute('aria-label', line.crumbs.join(' nach '));
+}
+
 function renderLayerButtons(container) {
   container.replaceChildren();
   const queryMatches = recordsMatchingQuery();
@@ -408,10 +519,20 @@ function updateFocusPanel() {
   if (!record) return;
   elements.focusTitle.textContent = record.title;
   elements.focusSummary.textContent = record.summary;
-  elements.focusKind.textContent = `Digital · ${layerForRecord(record)?.label ?? 'Weitere Commons'}`;
+  elements.focusKind.textContent = recordPresentationLabel(record);
   replaceList(elements.focusThemes, record.themes ?? []);
   replaceList(elements.focusActions, record.actions ?? []);
-  elements.focusDigital.textContent = record?.presence?.digital?.label ?? 'Digitale Präsenz';
+  replaceList(elements.focusLocations, recordLocationSummaries(record));
+  const digital = record?.presence?.digital;
+  elements.focusDigital.textContent = digital?.available
+    ? (digital.label ?? 'Digitale Präsenz veröffentlicht')
+    : 'Keine digitale Präsenz veröffentlicht.';
+  const relationLabels = evidencedRelations(runtime.records)
+    .filter(({ source_project_id }) => source_project_id === record.id)
+    .map(({ relation_type, target_title }) => relation_type === 'chapter-of'
+      ? `Teil von ${target_title}`
+      : `${relation_type} · ${target_title}`);
+  replaceList(elements.focusRelations, relationLabels.length ? relationLabels : ['Keine belegte Beziehung veröffentlicht.']);
   replaceLinks(elements.focusLinks, record.links ?? []);
   replaceLinks(elements.focusSources, record?.provenance?.sources ?? []);
   elements.focusCuration.textContent = `Redaktionell geprüft am ${record?.curation?.reviewed_at ?? 'unbekannt'}; nächste Prüfung ${record?.curation?.next_review_at ?? 'offen'}.`;
@@ -425,12 +546,14 @@ function updateSelectionMarks() {
     if (element.matches('.catalog-card')) element.toggleAttribute('data-selected', selected);
   });
   updateFocusPanel();
+  updateSemanticLocationLine();
 }
 
 function renderDiscoveryState() {
   renderLayerPanel();
   renderTextView();
   updateSphereResultVisibility();
+  updatePublicMapData();
   updateSelectionMarks();
   const count = visibleRecords().length;
   elements.globeResults.textContent = count === 0
@@ -466,7 +589,6 @@ function selectProject(identifier, { historyMode = 'push', focus = true, trigger
   if (!runtime.recordsById.has(identifier)) return;
   if (trigger instanceof Element && !elements.focus.contains(trigger)) runtime.focusReturnTarget = trigger;
   runtime.state.project = identifier;
-  runtime.state.layer = deriveLayer(runtime.recordsById.get(identifier));
   renderDiscoveryState();
   if (historyMode) writeHistory(historyMode);
   if (focus) elements.focus.focus({ preventScroll: true });
@@ -970,6 +1092,24 @@ function wireControls() {
   });
 }
 
+function bindPublicMapInteractions() {
+  if (!runtime.map || runtime.mapInteractionsBound) return;
+  runtime.mapInteractionsBound = true;
+  runtime.map.on('click', (event) => {
+    const layers = PUBLIC_MAP_LAYER_IDS.filter((identifier) => runtime.map.getLayer(identifier));
+    if (!layers.length) return;
+    const feature = runtime.map.queryRenderedFeatures(event.point, { layers })[0];
+    const identifier = feature?.properties?.project_id;
+    if (typeof identifier === 'string') selectProject(identifier, { trigger: elements.map });
+  });
+  runtime.map.on('mousemove', (event) => {
+    const layers = PUBLIC_MAP_LAYER_IDS.filter((identifier) => runtime.map.getLayer(identifier));
+    const interactive = layers.length > 0 && runtime.map.queryRenderedFeatures(event.point, { layers }).length > 0;
+    runtime.map.getCanvas().style.cursor = interactive ? 'pointer' : '';
+  });
+  runtime.map.on('mouseleave', () => { runtime.map.getCanvas().style.cursor = ''; });
+}
+
 function createMap() {
   if (runtime.map) return;
   if (!window.maplibregl?.Map) {
@@ -986,12 +1126,13 @@ function createMap() {
     bearing: runtime.state.camera.bearing,
     pitch: runtime.state.camera.pitch,
     minZoom: 0.35,
-    maxZoom: 8,
+    maxZoom: MAX_MAP_ZOOM,
     attributionControl: true,
     renderWorldCopies: false,
     fadeDuration: reducedMotion.matches ? 0 : 120,
   });
   runtime.map.addControl(new window.maplibregl.NavigationControl({ visualizePitch: true, showCompass: true }), 'bottom-right');
+  bindPublicMapInteractions();
   runtime.map.on('render', () => {
     runtime.mapRenderCount += 1;
     elements.stage.dataset.mapRenders = String(runtime.mapRenderCount);
@@ -1001,16 +1142,25 @@ function createMap() {
   runtime.map.on('moveend', () => {
     delete elements.stage.dataset.mapMoving;
     updateSphereGeometry();
+    updateSemanticLocationLine();
     scheduleCameraHistory();
   });
   runtime.map.on('error', (event) => {
     const policy = mapFailurePolicy({ providerReadbackFailed: false });
     degradeMap(event?.error ?? event, { replaceStyle: policy.replaceStyle });
   });
+  runtime.map.on('styledata', () => {
+    if (runtime.mapReady) ensurePublicMapLayers();
+  });
+  runtime.map.on('idle', () => {
+    if (runtime.mapReady && !runtime.map.getSource(PUBLIC_MAP_SOURCE_ID)) ensurePublicMapLayers();
+  });
   runtime.map.on('load', () => {
     runtime.mapReady = true;
     runtime.map.setProjection({ type: 'globe' });
+    ensurePublicMapLayers();
     updateSphereGeometry();
+    updateSemanticLocationLine();
     refreshStatus();
     if (runtime.state.view === 'layers') openLayerView({ historyMode: null, cameraState: runtime.state.camera, instant: true });
     else applyCamera(runtime.state.camera, { instant: true });

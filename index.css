@@ -309,14 +309,26 @@ a {
   bottom: max(0.9rem, env(safe-area-inset-bottom));
   display: flex;
   align-items: center;
+  flex-wrap: wrap;
   gap: 0.45rem;
+  max-width: min(46rem, calc(100% - 1.7rem));
   padding: 0.35rem 0.5rem;
   border: 1px solid var(--line);
-  border-radius: 999px;
+  border-radius: 1rem;
   background: rgba(6, 18, 15, 0.83);
   color: var(--muted);
   font-size: 0.78rem;
   backdrop-filter: blur(0.75rem);
+}
+
+.semantic-summary {
+  max-width: min(30rem, 56vw);
+  overflow: hidden;
+  padding-right: 0.35rem;
+  color: #d1ddd6;
+  line-height: 1.35;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .orientation-bar button {
@@ -705,6 +717,13 @@ a {
   line-height: 1.52;
 }
 
+.catalog-card .catalog-location {
+  margin-top: 0.35rem;
+  padding-top: 0.6rem;
+  border-top: 1px solid var(--line);
+  font-size: 0.78rem;
+}
+
 .catalog-actions {
   display: flex;
   flex-wrap: wrap;
@@ -829,7 +848,17 @@ a {
   }
 
   .orientation-bar {
+    right: 0.55rem;
     bottom: max(0.65rem, env(safe-area-inset-bottom));
+    max-width: none;
+  }
+
+  .semantic-summary {
+    flex: 1 0 100%;
+    max-width: none;
+    padding: 0 0.5rem 0.25rem;
+    font-size: 0.68rem;
+    white-space: normal;
   }
 
   .text-layout {

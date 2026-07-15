@@ -1,7 +1,7 @@
 {
-  "schema_version": 1,
+  "schema_version": 2,
   "kind": "commonworld_current_public_state",
-  "current_as_of": "2026-07-13",
+  "current_as_of": "2026-07-15",
   "precedence": {
     "current_operational_truth": "this contract",
     "catalog_truth": "catalog/catalog.json and the referenced CommonProject records",
@@ -59,7 +59,18 @@
   ],
   "licensing": {
     "code": "AGPL-3.0-only",
-    "catalogue_data": "CC0-1.0",
+    "catalogue_data_default": "CC0-1.0",
+    "catalogue_data_exceptions": [
+      {
+        "scope": "catalog/projects/cltb-le-nid.json#presence.geographic",
+        "source_ids": [
+          "osm-le-nid-address",
+          "osm-le-nid-building"
+        ],
+        "licence": "ODbL-1.0",
+        "attribution": "© OpenStreetMap contributors"
+      }
+    ],
     "third_party_assets_retain_their_own_licences": true
   }
 }
