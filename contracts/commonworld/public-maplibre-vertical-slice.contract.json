@@ -273,6 +273,7 @@
         "id": "commonworld-approximate-anchors",
         "type": "circle",
         "minimum_zoom": 3.4,
+        "maximum_zoom": 5.5,
         "representation_kind": "approximate_anchor"
       },
       {

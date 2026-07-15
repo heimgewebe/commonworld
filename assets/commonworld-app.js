@@ -392,6 +392,7 @@ function ensurePublicMapLayers() {
       type: 'circle',
       source: PUBLIC_MAP_SOURCE_ID,
       minzoom: 3.4,
+      maxzoom: 5.5,
       filter: ['==', ['get', 'representation_kind'], 'approximate_anchor'],
       paint: {
         'circle-radius': ['interpolate', ['linear'], ['zoom'], 3.4, 7, 8, 12],

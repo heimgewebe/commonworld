@@ -580,7 +580,7 @@ def validate_public_maplibre_vertical_slice(root: Path = ROOT) -> list[str]:
         "project_identity_count": 2,
         "layers": [
             {"id": "commonworld-public-extents", "type": "fill", "minimum_zoom": 3.4, "representation_kind": "public_extent"},
-            {"id": "commonworld-approximate-anchors", "type": "circle", "minimum_zoom": 3.4, "representation_kind": "approximate_anchor"},
+            {"id": "commonworld-approximate-anchors", "type": "circle", "minimum_zoom": 3.4, "maximum_zoom": 5.5, "representation_kind": "approximate_anchor"},
             {"id": "commonworld-exact-anchors", "type": "circle", "minimum_zoom": 5.5, "representation_kind": "exact_anchor"},
         ],
         "hidden_locations_excluded": True,
