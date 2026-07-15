@@ -167,6 +167,38 @@ function cloneCoordinates(value) {
 
 const EARTH_RADIUS_METERS = 6371008.8;
 const UNCERTAINTY_ZONE_VERTEX_COUNT = 64;
+export const PUBLIC_MAP_COLLECTION_CACHE_LIMIT = 64;
+const EMPTY_CATALOG_RECORDS = Object.freeze([]);
+const catalogProjectionCache = new WeakMap();
+
+function freezeCatalogSnapshot(value) {
+  if (!value || typeof value !== 'object') return value;
+  const pending = [value];
+  const seen = new WeakSet();
+  while (pending.length > 0) {
+    const current = pending.pop();
+    if (!current || typeof current !== 'object' || seen.has(current)) continue;
+    seen.add(current);
+    for (const child of Object.values(current)) {
+      if (child && typeof child === 'object') pending.push(child);
+    }
+    Object.freeze(current);
+  }
+  return value;
+}
+
+export function geodesicDistanceMeters(origin, destination) {
+  if (!Array.isArray(origin) || origin.length !== 2 || !origin.every(Number.isFinite)) return Number.NaN;
+  if (!Array.isArray(destination) || destination.length !== 2 || !destination.every(Number.isFinite)) return Number.NaN;
+  const radians = Math.PI / 180;
+  const originLatitude = origin[1] * radians;
+  const destinationLatitude = destination[1] * radians;
+  const latitudeDelta = (destination[1] - origin[1]) * radians;
+  const longitudeDelta = (destination[0] - origin[0]) * radians;
+  const haversine = Math.sin(latitudeDelta / 2) ** 2
+    + Math.cos(originLatitude) * Math.cos(destinationLatitude) * Math.sin(longitudeDelta / 2) ** 2;
+  return 2 * EARTH_RADIUS_METERS * Math.asin(Math.sqrt(clamp(haversine, 0, 1)));
+}
 
 function approximateUncertaintyZone(location) {
   const center = location?.geometry?.coordinates;
@@ -201,56 +233,120 @@ function publicGeometry(location, representationKind) {
   };
 }
 
-export function publicMapFeatureCollection(records, visibleProjectIds = null) {
-  const visible = visibleProjectIds instanceof Set ? visibleProjectIds : null;
-  const features = [];
-  for (const record of Array.isArray(records) ? records : []) {
-    if (!record?.id || (visible && !visible.has(record.id))) continue;
-    const locations = Array.isArray(record?.presence?.geographic) ? record.presence.geographic : [];
-    for (const location of locations) {
-      if (!location || location.mode === 'hidden' || !location.geometry) continue;
-      const representationKind = geometryRepresentationKind(location);
-      if (!representationKind) continue;
-      features.push({
-        type: 'Feature',
-        id: `${record.id}:${location.id}`,
-        geometry: publicGeometry(location, representationKind),
-        properties: {
-          project_id: record.id,
-          location_id: location.id,
-          title: record.title ?? record.id,
-          project_kind: record.kind ?? 'geographic',
-          location_label: location.label ?? record.title ?? record.id,
-          location_mode: location.mode,
-          representation_kind: representationKind,
-          uncertainty_meters_min: location.mode === 'approximate' ? finite(location.uncertainty_meters_min, 0) : 0,
-        },
-      });
-    }
-  }
-  return { type: 'FeatureCollection', features };
+function publicMapFeature(record, location) {
+  const representationKind = geometryRepresentationKind(location);
+  if (!representationKind) return null;
+  return Object.freeze({
+    type: 'Feature',
+    id: record.id + ':' + location.id,
+    geometry: freezeCatalogSnapshot(publicGeometry(location, representationKind)),
+    properties: Object.freeze({
+      project_id: record.id,
+      location_id: location.id,
+      title: record.title ?? record.id,
+      project_kind: record.kind ?? 'geographic',
+      location_label: location.label ?? record.title ?? record.id,
+      location_mode: location.mode,
+      representation_kind: representationKind,
+      uncertainty_meters_min: location.mode === 'approximate' ? finite(location.uncertainty_meters_min, 0) : 0,
+    }),
+  });
 }
 
-export function evidencedRelations(records) {
-  const values = Array.isArray(records) ? records : [];
-  const byId = new Map(values.filter((record) => record?.id).map((record) => [record.id, record]));
+function featureCollection(features) {
+  return Object.freeze({ type: 'FeatureCollection', features: Object.freeze(features) });
+}
+
+function buildEvidencedRelations(records, recordsById) {
   const relations = [];
-  for (const record of values) {
+  for (const record of records) {
     for (const relation of Array.isArray(record?.relations) ? record.relations : []) {
-      const target = byId.get(relation?.target_id);
+      const target = recordsById.get(relation?.target_id);
       if (!target || !Array.isArray(relation?.source_ids) || relation.source_ids.length === 0) continue;
-      relations.push({
+      relations.push(Object.freeze({
         source_project_id: record.id,
         source_title: record.title ?? record.id,
         target_project_id: target.id,
         target_title: target.title ?? target.id,
         relation_type: relation.type,
-        source_ids: [...relation.source_ids],
+        source_ids: Object.freeze([...relation.source_ids]),
         note: relation.note ?? '',
-      });
+      }));
     }
   }
-  return relations;
+  return Object.freeze(relations);
+}
+
+function buildCatalogProjection(records) {
+  const recordsById = new Map(records.filter((record) => record?.id).map((record) => [record.id, record]));
+  const projectIds = records.filter((record) => record?.id).map((record) => record.id);
+  const featuresByProjectId = new Map();
+  const allFeatures = [];
+  for (const record of records) {
+    if (!record?.id) continue;
+    const projectFeatures = [];
+    const locations = Array.isArray(record?.presence?.geographic) ? record.presence.geographic : [];
+    for (const location of locations) {
+      if (!location || location.mode === 'hidden' || !location.geometry) continue;
+      const feature = publicMapFeature(record, location);
+      if (!feature) continue;
+      projectFeatures.push(feature);
+      allFeatures.push(feature);
+    }
+    featuresByProjectId.set(record.id, Object.freeze(projectFeatures));
+  }
+
+  const collections = new Map([['*', featureCollection(allFeatures)]]);
+  const relations = buildEvidencedRelations(records, recordsById);
+
+  function collectionFor(visibleProjectIds = null) {
+    if (visibleProjectIds === null || visibleProjectIds === undefined) return collections.get('*');
+    const requested = visibleProjectIds instanceof Set
+      ? visibleProjectIds
+      : new Set(Array.isArray(visibleProjectIds) ? visibleProjectIds : []);
+    const visibleIds = projectIds.filter((identifier) => requested.has(identifier));
+    const key = 'ids:' + visibleIds.join('\u001f');
+    const cached = collections.get(key);
+    if (cached) {
+      collections.delete(key);
+      collections.set(key, cached);
+      return cached;
+    }
+    const features = visibleIds.flatMap((identifier) => featuresByProjectId.get(identifier) ?? []);
+    const collection = featureCollection(features);
+    while (collections.size >= PUBLIC_MAP_COLLECTION_CACHE_LIMIT) {
+      const oldest = [...collections.keys()].find((candidate) => candidate !== '*');
+      if (!oldest) break;
+      collections.delete(oldest);
+    }
+    collections.set(key, collection);
+    return collection;
+  }
+
+  return Object.freeze({
+    recordsById,
+    relations,
+    publicMapFeatureCollection: collectionFor,
+  });
+}
+
+export function prepareCatalogProjection(records) {
+  const values = Array.isArray(records) ? records : EMPTY_CATALOG_RECORDS;
+  let projection = catalogProjectionCache.get(values);
+  if (!projection) {
+    freezeCatalogSnapshot(values);
+    projection = buildCatalogProjection(values);
+    catalogProjectionCache.set(values, projection);
+  }
+  return projection;
+}
+
+export function publicMapFeatureCollection(records, visibleProjectIds = null) {
+  return prepareCatalogProjection(records).publicMapFeatureCollection(visibleProjectIds);
+}
+
+export function evidencedRelations(records) {
+  return prepareCatalogProjection(records).relations;
 }
 
 function formattedUncertainty(meters) {

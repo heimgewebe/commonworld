@@ -17,6 +17,9 @@ import {
   projectedGlobeCircle,
   publicMapFeatureCollection,
   evidencedRelations,
+  geodesicDistanceMeters,
+  prepareCatalogProjection,
+  PUBLIC_MAP_COLLECTION_CACHE_LIMIT,
   recordLocationSummaries,
   recordPresentationLabel,
   ribbonRepeatCount,
@@ -247,27 +250,62 @@ test('public map derivation preserves CommonProject identity and excludes hidden
   const uncertaintyRing = approximate.geometry.coordinates[0];
   assert.equal(uncertaintyRing.length, 65);
   assert.deepEqual(uncertaintyRing[0], uncertaintyRing.at(-1));
-  const toRadians = (value) => value * Math.PI / 180;
   const center = [9.9445, 53.5583];
   for (const coordinate of uncertaintyRing.slice(0, -1)) {
-    const latitudeDelta = toRadians(coordinate[1] - center[1]);
-    const longitudeDelta = toRadians(coordinate[0] - center[0]);
-    const centerLatitude = toRadians(center[1]);
-    const coordinateLatitude = toRadians(coordinate[1]);
-    const haversine = Math.sin(latitudeDelta / 2) ** 2
-      + Math.cos(centerLatitude) * Math.cos(coordinateLatitude) * Math.sin(longitudeDelta / 2) ** 2;
-    const distance = 2 * 6371008.8 * Math.asin(Math.sqrt(haversine));
-    assert(Math.abs(distance - 5000) <= 1, `uncertainty zone radius drifted: ${distance}`);
+    const distance = geodesicDistanceMeters(center, coordinate);
+    assert(Math.abs(distance - 5000) <= 1, 'uncertainty zone radius drifted: ' + distance);
   }
 });
 
 test('map filtering uses the same visible identity set without multiplying hybrid identities', () => {
-  const collection = publicMapFeatureCollection(geographicHybridRecords, new Set(['freifunk-hamburg']));
+  const visible = new Set(['freifunk-hamburg']);
+  const collection = publicMapFeatureCollection(geographicHybridRecords, visible);
+  assert.strictEqual(collection, publicMapFeatureCollection(geographicHybridRecords, ['freifunk-hamburg']));
   assert.equal(collection.features.length, 1);
   assert.equal(collection.features[0].properties.project_id, 'freifunk-hamburg');
   assert.equal(new Set(collection.features.map(({ properties }) => properties.project_id)).size, 1);
 });
 
+test('catalog projection precomputes 250 approximate Commons and keeps its filter cache bounded', () => {
+  assert.equal(PUBLIC_MAP_COLLECTION_CACHE_LIMIT, 64);
+  const records = Array.from({ length: 250 }, (_, index) => ({
+    id: 'regional-common-' + String(index).padStart(4, '0'),
+    title: 'Regional Common ' + index,
+    kind: 'hybrid',
+    presence: {
+      geographic: [{
+        id: 'area-' + index,
+        label: 'Region ' + index,
+        mode: 'approximate',
+        geometry: { type: 'Point', coordinates: [8 + index / 1000, 50 + index / 1000] },
+        uncertainty_meters_min: 5000,
+      }],
+      digital: { available: true },
+    },
+    relations: [],
+  }));
+  const projection = prepareCatalogProjection(records);
+  const all = projection.publicMapFeatureCollection();
+  assert.equal(all.features.length, 250);
+  assert(Object.isFrozen(records));
+  assert(Object.isFrozen(records[0].presence.geographic[0].geometry.coordinates));
+  assert(Object.isFrozen(all));
+  assert(Object.isFrozen(all.features));
+  assert(Object.isFrozen(all.features[0].geometry.coordinates[0]));
+  assert.strictEqual(all, projection.publicMapFeatureCollection());
+  assert.strictEqual(all, publicMapFeatureCollection(records));
+
+  const visibleIds = records.filter((_, index) => index % 5 === 0).map(({ id }) => id);
+  const subset = projection.publicMapFeatureCollection(visibleIds);
+  assert.equal(subset.features.length, 50);
+  assert.strictEqual(subset, projection.publicMapFeatureCollection([...visibleIds].reverse()));
+
+  const firstFiltered = projection.publicMapFeatureCollection([records[0].id]);
+  for (let index = 1; index <= PUBLIC_MAP_COLLECTION_CACHE_LIMIT; index += 1) {
+    projection.publicMapFeatureCollection([records[index].id]);
+  }
+  assert.notStrictEqual(firstFiltered, projection.publicMapFeatureCollection([records[0].id]));
+});
 
 test('digital layer filtering excludes geographic-only identities but retains hybrid identities', () => {
   assert.deepEqual(
@@ -283,7 +321,9 @@ test('digital layer filtering excludes geographic-only identities but retains hy
 test('only evidenced relations to known identities are projected', () => {
   const records = structuredClone(geographicHybridRecords);
   records[2].relations.push({ type: 'cooperates-with', target_id: 'missing', source_ids: ['api'] });
-  assert.deepEqual(evidencedRelations(records), [{
+  const relations = evidencedRelations(records);
+  assert.strictEqual(relations, prepareCatalogProjection(records).relations);
+  assert.deepEqual(relations, [{
     source_project_id: 'freifunk-hamburg',
     source_title: 'Freifunk Hamburg',
     target_project_id: 'freifunk',

@@ -501,6 +501,7 @@ async function realHybridCommonsScenario() {
       semanticText: document.querySelector('#semantic-summary')?.textContent ?? '',
       featureIds: stage.dataset.publicMapFeatureIds?.split(',').filter(Boolean) ?? [],
       locationIds: stage.dataset.publicMapLocationIds?.split(',').filter(Boolean) ?? [],
+      mapUpdateCount: Number(stage.dataset.publicMapUpdates ?? -1),
       sourceType: style.sources?.['commonworld-public-representations']?.type ?? null,
       layers: style.layers
         .filter(({ id }) => id.startsWith('commonworld-'))
@@ -560,6 +561,7 @@ async function realHybridCommonsScenario() {
     await run.page.waitForSelector('#project-focus:not([hidden])');
   };
 
+  const updatesBeforeSelection = Number(await run.page.locator('.globe-stage').getAttribute('data-public-map-updates'));
   await activateMapIdentity({
     coordinates: [9.944545738399, 53.558314876911],
     zoom: 4.6,
@@ -567,6 +569,8 @@ async function realHybridCommonsScenario() {
     expectedLevel: 'region',
   });
   assert((await run.page.locator('#focus-title').textContent()) === 'Freifunk Hamburg', 'real hybrid: approximate map click selected the wrong identity');
+  const updatesAfterSelection = Number(await run.page.locator('.globe-stage').getAttribute('data-public-map-updates'));
+  assert(updatesAfterSelection === updatesBeforeSelection, 'real hybrid: selecting a project resent unchanged GeoJSON to MapLibre');
   assert((await run.page.locator('#focus-kind').textContent()) === 'Hybrid · Kommunikation und Netze', 'real hybrid: hybrid presentation label mismatch');
   const hamburgLocations = (await run.page.locator('#focus-locations').textContent()) ?? '';
   assert(hamburgLocations.includes('mindestens 5 km Unschärfe') && hamburgLocations.includes('Ort verborgen'), 'real hybrid: approximate and hidden location truth missing');
@@ -630,7 +634,7 @@ async function realHybridCommonsScenario() {
   assert(await run.page.locator('#project-cltb-le-nid[data-selected]').isVisible(), 'real hybrid: text surface lost the selected CommonProject identity');
   assert(run.consoleErrors.length === 0, 'real hybrid: console errors: ' + run.consoleErrors.join(' | '));
   assert(run.pageErrors.length === 0, 'real hybrid: page errors: ' + run.pageErrors.join(' | '));
-  results.push({ id: 'real-hybrid-commons', verdict: 'PASS', publicFeatures: 3, publicIdentities: 2, digitalIdentities: 11 });
+  results.push({ id: 'real-hybrid-commons', verdict: 'PASS', publicFeatures: 3, publicIdentities: 2, digitalIdentities: 11, unchangedMapUpdatesSkipped: true });
   await run.context.close();
 }
 

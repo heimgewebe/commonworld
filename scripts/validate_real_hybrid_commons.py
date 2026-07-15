@@ -175,6 +175,15 @@ def validate_real_hybrid_commons(root: Path = ROOT) -> list[str]:
         or map_contract.get("invented_coordinates_forbidden") is not True
     ):
         errors.append("T006 hidden-location or invented-coordinate protection missing")
+    if map_contract.get("runtime_projection") != {
+        "catalog_snapshot_frozen_after_install": True,
+        "approximate_zones_precomputed_per_catalog_install": True,
+        "relations_precomputed_per_catalog_install": True,
+        "feature_collection_cache_entries_max": 64,
+        "identical_projection_reuses_object_identity": True,
+        "unchanged_geojson_must_not_call_set_data": True,
+    }:
+        errors.append("T006 scalable runtime projection contract mismatch")
     semantic_zoom = contract.get("semantic_zoom", {})
     if semantic_zoom.get("catalog_zoom_assignment_forbidden") is not True:
         errors.append("T006 semantic zoom must remain presentation-only")
@@ -194,6 +203,8 @@ def validate_real_hybrid_commons(root: Path = ROOT) -> list[str]:
         errors.append("T006 cross-view identity key mismatch")
     if cross_view.get("selection_does_not_mutate_filters") is not True:
         errors.append("T006 project selection must remain independent from discovery filters")
+    if cross_view.get("selection_filter_semantics") != "selection is independent of current filter state":
+        errors.append("T006 selection/filter independence wording mismatch")
 
     files = set(manifest.get("project_files", []))
     for identifier in ("cltb-le-nid", "freifunk-hamburg"):
@@ -332,6 +343,8 @@ def validate_real_hybrid_commons(root: Path = ROOT) -> list[str]:
     for token in (
         "publicMapFeatureCollection",
         "evidencedRelations",
+        "geodesicDistanceMeters",
+        "prepareCatalogProjection",
         "recordLocationSummaries",
         "recordPresentationLabel",
         "semanticLocationLine",
@@ -346,7 +359,9 @@ def validate_real_hybrid_commons(root: Path = ROOT) -> list[str]:
         "commonworld-public-extents",
         "commonworld-approximate-zones",
         "commonworld-exact-anchors",
-        "publicMapFeatureCollection",
+        "prepareCatalogProjection",
+        "lastPublicMapData",
+        "publicMapUpdates",
         "semanticLocationLine",
         "MAX_MAP_ZOOM",
     ):
@@ -378,21 +393,47 @@ def validate_real_hybrid_commons(root: Path = ROOT) -> list[str]:
         or catalog_evidence.get("public_map_feature_ids") != expected_feature_ids
         or catalog_evidence.get("hidden_router_in_geojson") is not False
         or catalog_evidence.get("selection_does_not_mutate_filters") is not True
+        or catalog_evidence.get("selection_filter_semantics")
+        != "selection is independent of current filter state"
+        or catalog_evidence.get("runtime_projection")
+        != {
+            "catalog_snapshot_frozen_after_install": True,
+            "approximate_zones_precomputed_per_catalog_install": True,
+            "relations_precomputed_per_catalog_install": True,
+            "feature_collection_cache_entries_max": 64,
+            "identical_projection_reuses_object_identity": True,
+            "unchanged_geojson_set_data_skipped": True,
+        }
         or catalog_evidence.get("maximum_map_zoom") != 18
         or browser_evidence.get("scenarios") != {"passed": 12, "failed": 0}
-        or browser_evidence.get("receipt_sha256") != "045ad89fed016e005c1a11d097980bce92b908609a4692b9e88651453ddd5ba4"
+        or browser_evidence.get("job") != "grabowski-job-8d1f5a844751"
+        or browser_evidence.get("receipt_sha256") != "ac6385ab35d9ea055e76ec66b53f23c13d7b0c0fdf1a8addc327a205fc7f4276"
+        or browser_evidence.get("unchanged_map_updates_skipped") is not True
         or privacy_evidence.get("hidden_geometry") is not False
         or privacy_evidence.get("hidden_precision") is not False
         or privacy_evidence.get("hidden_router_in_map_diagnostics") is not False
         or privacy_evidence.get("private_maplibre_fields_used") is not False
-        or regression_evidence.get("python_tests") != {"passed": 355, "failed": 0}
-        or regression_evidence.get("javascript_tests") != {"passed": 22, "failed": 0}
+        or regression_evidence.get("full_validation_job") != "grabowski-job-a16f9861eadc"
+        or regression_evidence.get("full_validation_receipt_sha256") != "002e20893de7351802408dedc6046e67681d3314b8aadcbf64b3cba1baeb4ee4"
+        or regression_evidence.get("python_tests") != {"passed": 357, "failed": 0}
+        or regression_evidence.get("javascript_tests") != {"passed": 23, "failed": 0}
+        or regression_evidence.get("scalability_probe") != {
+            "approximate_commons": 250,
+            "public_features": 250,
+            "cache_entries_max": 64,
+            "elapsed_ms_observed": 13.455793,
+            "verdict": "PASS",
+        }
         or regression_evidence.get("make_validate") != "PASS"
         or source_evidence.get("successful_http_responses") != 6
-        or final_tree_evidence.get("receipt_sha256") != "2a7c8dc84f7290153e37aeb60a3d6ff76b4f9cbbf7e6d67fb1e1bde8469d5e22"
+        or final_tree_evidence.get("job") != "grabowski-job-a16f9861eadc"
+        or final_tree_evidence.get("receipt_sha256") != "002e20893de7351802408dedc6046e67681d3314b8aadcbf64b3cba1baeb4ee4"
         or final_tree_evidence.get("python_tests") != {"passed": 357, "failed": 0}
-        or final_tree_evidence.get("javascript_tests") != {"passed": 22, "failed": 0}
+        or final_tree_evidence.get("javascript_tests") != {"passed": 23, "failed": 0}
         or final_tree_evidence.get("browser_scenarios") != {"passed": 12, "failed": 0}
+        or final_tree_evidence.get("browser_job") != "grabowski-job-8d1f5a844751"
+        or final_tree_evidence.get("browser_receipt_sha256") != "ac6385ab35d9ea055e76ec66b53f23c13d7b0c0fdf1a8addc327a205fc7f4276"
+        or final_tree_evidence.get("unchanged_map_updates_skipped") is not True
         or final_tree_evidence.get("make_validate") != "PASS"
         or final_tree_evidence.get("git_diff_check") != "PASS"
         or final_tree_evidence.get("renderer_deterministic") is not True
@@ -409,6 +450,15 @@ def validate_real_hybrid_commons(root: Path = ROOT) -> list[str]:
         != "fixed_and_regression_tested"
         or verification.get("review_remediation", {}).get("licensing_source_id_status")
         != "fixed_and_regression_tested"
+        or verification.get("review_remediation", {}).get("scalability_status")
+        != "fixed_and_regression_tested"
+        or verification.get("review_remediation", {}).get("scalability_probe_commons") != 250
+        or verification.get("review_remediation", {}).get("scalability_validation_receipt_sha256")
+        != "002e20893de7351802408dedc6046e67681d3314b8aadcbf64b3cba1baeb4ee4"
+        or verification.get("review_remediation", {}).get("scalability_browser_receipt_sha256")
+        != "ac6385ab35d9ea055e76ec66b53f23c13d7b0c0fdf1a8addc327a205fc7f4276"
+        or verification.get("review_remediation", {}).get("gigantic_catalog_nonclaim")
+        != "segmented delivery, spatial indexes, clustering or vector tiles remain a later architecture step"
         or verification.get("review_remediation", {}).get("codex_followup_validation_receipt_sha256")
         != "2a7c8dc84f7290153e37aeb60a3d6ff76b4f9cbbf7e6d67fb1e1bde8469d5e22"
     ):

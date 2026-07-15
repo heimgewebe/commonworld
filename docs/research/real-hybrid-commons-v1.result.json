@@ -134,33 +134,50 @@
       ],
       "hidden_router_in_geojson": false,
       "selection_does_not_mutate_filters": true,
-      "maximum_map_zoom": 18
+      "maximum_map_zoom": 18,
+      "selection_filter_semantics": "selection is independent of current filter state",
+      "runtime_projection": {
+        "catalog_snapshot_frozen_after_install": true,
+        "approximate_zones_precomputed_per_catalog_install": true,
+        "relations_precomputed_per_catalog_install": true,
+        "feature_collection_cache_entries_max": 64,
+        "identical_projection_reuses_object_identity": true,
+        "unchanged_geojson_set_data_skipped": true
+      }
     },
     "regression": {
-      "full_validation_job": "grabowski-job-fc4741bb55cb",
-      "full_validation_receipt_sha256": "78cb6d2f1ec4223ecdb54ba6745dd81542ab67d6484731e1cde5f3563fcaeb20",
+      "full_validation_job": "grabowski-job-a16f9861eadc",
+      "full_validation_receipt_sha256": "002e20893de7351802408dedc6046e67681d3314b8aadcbf64b3cba1baeb4ee4",
       "python_tests": {
-        "passed": 355,
+        "passed": 357,
         "failed": 0
       },
       "javascript_tests": {
-        "passed": 22,
+        "passed": 23,
         "failed": 0
       },
       "make_validate": "PASS",
       "renderer_deterministic": true,
-      "rendered_index_sha256": "9a9f48af3898ddbec66ec3bea31317f88e2ad7594d5fa0556a3a07d22f7159f3"
+      "rendered_index_sha256": "9a9f48af3898ddbec66ec3bea31317f88e2ad7594d5fa0556a3a07d22f7159f3",
+      "scalability_probe": {
+        "approximate_commons": 250,
+        "public_features": 250,
+        "cache_entries_max": 64,
+        "elapsed_ms_observed": 13.455793,
+        "verdict": "PASS"
+      }
     },
     "final_browser_verification": {
-      "job": "grabowski-job-f33185b87dd4",
-      "receipt_sha256": "045ad89fed016e005c1a11d097980bce92b908609a4692b9e88651453ddd5ba4",
+      "job": "grabowski-job-8d1f5a844751",
+      "receipt_sha256": "ac6385ab35d9ea055e76ec66b53f23c13d7b0c0fdf1a8addc327a205fc7f4276",
       "scenarios": {
         "passed": 12,
         "failed": 0
       },
       "public_features": 3,
       "public_identities": 2,
-      "digital_identities": 11
+      "digital_identities": 11,
+      "unchanged_map_updates_skipped": true
     },
     "privacy_readback": {
       "job": "grabowski-job-f2eb2083e40c",
@@ -177,14 +194,14 @@
       "successful_http_responses": 6
     },
     "final_tree_validation": {
-      "job": "grabowski-job-0bdf130641c4",
-      "receipt_sha256": "2a7c8dc84f7290153e37aeb60a3d6ff76b4f9cbbf7e6d67fb1e1bde8469d5e22",
+      "job": "grabowski-job-a16f9861eadc",
+      "receipt_sha256": "002e20893de7351802408dedc6046e67681d3314b8aadcbf64b3cba1baeb4ee4",
       "python_tests": {
         "passed": 357,
         "failed": 0
       },
       "javascript_tests": {
-        "passed": 22,
+        "passed": 23,
         "failed": 0
       },
       "browser_scenarios": {
@@ -194,7 +211,10 @@
       "make_validate": "PASS",
       "git_diff_check": "PASS",
       "renderer_deterministic": true,
-      "scope": "implementation, contracts and tests before evidence-binding-only update"
+      "scope": "implementation, contracts and tests before evidence-binding-only update",
+      "browser_job": "grabowski-job-8d1f5a844751",
+      "browser_receipt_sha256": "ac6385ab35d9ea055e76ec66b53f23c13d7b0c0fdf1a8addc327a205fc7f4276",
+      "unchanged_map_updates_skipped": true
     },
     "review_remediation": {
       "finding": "canonical current-state licensing did not expose the ODbL geometry exception",
@@ -218,7 +238,16 @@
       "licensing_source_id_finding": "canonical ODbL exception IDs did not resolve to the source identifiers used by Le Nid geometry",
       "licensing_source_id_status": "fixed_and_regression_tested",
       "codex_followup_validation_job": "grabowski-job-0bdf130641c4",
-      "codex_followup_validation_receipt_sha256": "2a7c8dc84f7290153e37aeb60a3d6ff76b4f9cbbf7e6d67fb1e1bde8469d5e22"
+      "codex_followup_validation_receipt_sha256": "2a7c8dc84f7290153e37aeb60a3d6ff76b4f9cbbf7e6d67fb1e1bde8469d5e22",
+      "scalability_finding": "uncertainty zones and relations were recomputed in the render path and unchanged GeoJSON was resent to MapLibre",
+      "scalability_status": "fixed_and_regression_tested",
+      "scalability_strategy": "immutable per-catalog projection with bounded feature-collection cache and identity-based setData suppression",
+      "scalability_probe_commons": 250,
+      "scalability_validation_job": "grabowski-job-a16f9861eadc",
+      "scalability_validation_receipt_sha256": "002e20893de7351802408dedc6046e67681d3314b8aadcbf64b3cba1baeb4ee4",
+      "scalability_browser_job": "grabowski-job-8d1f5a844751",
+      "scalability_browser_receipt_sha256": "ac6385ab35d9ea055e76ec66b53f23c13d7b0c0fdf1a8addc327a205fc7f4276",
+      "gigantic_catalog_nonclaim": "segmented delivery, spatial indexes, clustering or vector tiles remain a later architecture step"
     }
   }
 }

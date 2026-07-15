@@ -31,3 +31,10 @@ Diese Vertikalscheibe erweitert den bisherigen rein digitalen Startkatalog um zw
 ## Prüfgrenzen
 
 Der allgemeine Produktionsvalidator erlaubt geografische, digitale und hybride Datensätze mit offiziellen Quellen oder öffentlichen Registern. Ein eigener Seed-Validator bewahrt die ursprünglichen zehn rein digitalen Startdatensätze. Ein dritter Validator bindet die T006-Fälle und Datenschutzinvarianten.
+
+
+## Skalierbare Laufzeitprojektion
+
+Die öffentliche Kartenprojektion wird beim Installieren eines Katalogstandes einmalig im Arbeitsspeicher vorbereitet. Dabei entstehen die Unsicherheitszonen, der Beziehungsindex, die Zuordnung öffentlicher Kartenobjekte zu `CommonProject.id` und eine unveränderliche Katalogmomentaufnahme. Filterzustände nutzen einen auf 64 FeatureCollections begrenzten Cache. Identische Projektionen behalten dieselbe Objektidentität; MapLibre erhält deshalb nur dann `setData`, wenn sich die abgeleiteten Kartendaten tatsächlich geändert haben. Die vorberechneten Formen werden bewusst nicht in `CommonProject` zurückgeschrieben: Der Katalog bleibt die einzige dauerhafte Wahrheit, die Kartenformen bleiben nachvollziehbare Ableitungen.
+
+Diese Härtung beseitigt den derzeitigen Hot Path, ist aber noch nicht die endgültige Auslieferungsarchitektur für einen gigantischen Katalog. Der statische Prototyp bettet den vollständigen Katalog und zwei vollständige Kartenlisten in die HTML-Seite ein. Bei der nächsten Größenordnung muss die Veröffentlichung deshalb in gebaute, räumlich segmentierte Daten, Such- und Raumindizes, Clustering beziehungsweise Vektorkacheln und bedarfsgeladenes Rendering übergehen. T006 behauptet diese spätere Skalierungsstufe ausdrücklich noch nicht.

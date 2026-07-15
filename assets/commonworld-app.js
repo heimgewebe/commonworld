@@ -11,8 +11,7 @@ import {
   mapCamera,
   mapFailurePolicy,
   normalizeQuery,
-  evidencedRelations,
-  publicMapFeatureCollection,
+  prepareCatalogProjection,
   recordLocationSummaries,
   recordPresentationLabel,
   projectedGlobeCircle,
@@ -86,6 +85,10 @@ const runtime = {
   map: null,
   records: [],
   recordsById: new Map(),
+  catalogProjection: null,
+  visibleRecordsCache: null,
+  lastPublicMapData: null,
+  publicMapUpdateCount: 0,
   state: {
     camera: { ...DEFAULT_CAMERA },
     project: null,
@@ -203,7 +206,11 @@ async function loadRecords() {
 
 function installRecords(records) {
   runtime.records = records;
-  runtime.recordsById = new Map(records.map((record) => [record.id, record]));
+  runtime.catalogProjection = prepareCatalogProjection(records);
+  runtime.recordsById = runtime.catalogProjection.recordsById;
+  runtime.visibleRecordsCache = null;
+  runtime.lastPublicMapData = null;
+  runtime.publicMapUpdateCount = 0;
 }
 
 function createSvgElement(name, attributes = {}) {
@@ -344,7 +351,11 @@ function layerForRecord(record) {
 }
 
 function visibleRecords() {
-  return filterRecords(runtime.records, runtime.state);
+  const key = (runtime.state.layer ?? '') + '\u001f' + normalizeQuery(runtime.state.query);
+  if (runtime.visibleRecordsCache?.key === key) return runtime.visibleRecordsCache.records;
+  const records = filterRecords(runtime.records, runtime.state);
+  runtime.visibleRecordsCache = { key, records };
+  return records;
 }
 
 function recordsMatchingQuery() {
@@ -352,7 +363,18 @@ function recordsMatchingQuery() {
 }
 
 function currentPublicMapData() {
-  return publicMapFeatureCollection(runtime.records, new Set(visibleRecords().map(({ id }) => id)));
+  if (!runtime.catalogProjection) return Object.freeze({ type: 'FeatureCollection', features: Object.freeze([]) });
+  const filtering = Boolean(runtime.state.layer || normalizeQuery(runtime.state.query));
+  const visibleProjectIds = filtering ? visibleRecords().map(({ id }) => id) : null;
+  return runtime.catalogProjection.publicMapFeatureCollection(visibleProjectIds);
+}
+
+function publishPublicMapDiagnostics(data) {
+  elements.stage.dataset.publicMapFeatures = String(data.features.length);
+  elements.stage.dataset.publicMapProjectIds = String(new Set(data.features.map(({ properties }) => properties.project_id)).size);
+  elements.stage.dataset.publicMapFeatureIds = data.features.map(({ id }) => id).join(',');
+  elements.stage.dataset.publicMapLocationIds = data.features.map(({ properties }) => properties.location_id).join(',');
+  elements.stage.dataset.publicMapUpdates = String(runtime.publicMapUpdateCount);
 }
 
 function updatePublicMapData() {
@@ -360,17 +382,21 @@ function updatePublicMapData() {
   const source = runtime.map.getSource(PUBLIC_MAP_SOURCE_ID);
   if (!source || typeof source.setData !== 'function') return;
   const data = currentPublicMapData();
-  source.setData(data);
-  elements.stage.dataset.publicMapFeatures = String(data.features.length);
-  elements.stage.dataset.publicMapProjectIds = String(new Set(data.features.map(({ properties }) => properties.project_id)).size);
-  elements.stage.dataset.publicMapFeatureIds = data.features.map(({ id }) => id).join(',');
-  elements.stage.dataset.publicMapLocationIds = data.features.map(({ properties }) => properties.location_id).join(',');
+  if (runtime.lastPublicMapData !== data) {
+    source.setData(data);
+    runtime.lastPublicMapData = data;
+    runtime.publicMapUpdateCount += 1;
+  }
+  publishPublicMapDiagnostics(data);
 }
 
 function ensurePublicMapLayers() {
   if (!runtime.map || !runtime.map.isStyleLoaded()) return;
   if (!runtime.map.getSource(PUBLIC_MAP_SOURCE_ID)) {
-    runtime.map.addSource(PUBLIC_MAP_SOURCE_ID, { type: 'geojson', data: currentPublicMapData() });
+    const data = currentPublicMapData();
+    runtime.map.addSource(PUBLIC_MAP_SOURCE_ID, { type: 'geojson', data });
+    runtime.lastPublicMapData = data;
+    publishPublicMapDiagnostics(data);
   }
   if (!runtime.map.getLayer('commonworld-public-extents')) {
     runtime.map.addLayer({
@@ -524,7 +550,7 @@ function updateFocusPanel() {
   elements.focusDigital.textContent = digital?.available
     ? (digital.label ?? 'Digitale Präsenz veröffentlicht')
     : 'Keine digitale Präsenz veröffentlicht.';
-  const relationLabels = evidencedRelations(runtime.records)
+  const relationLabels = (runtime.catalogProjection?.relations ?? [])
     .filter(({ source_project_id }) => source_project_id === record.id)
     .map(({ relation_type, target_title }) => relation_type === 'chapter-of'
       ? `Teil von ${target_title}`
