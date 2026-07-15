@@ -270,11 +270,12 @@
         "representation_kind": "public_extent"
       },
       {
-        "id": "commonworld-approximate-anchors",
-        "type": "circle",
+        "id": "commonworld-approximate-zones",
+        "type": "fill",
         "minimum_zoom": 3.4,
-        "maximum_zoom": 5.5,
-        "representation_kind": "approximate_anchor"
+        "representation_kind": "approximate_zone",
+        "uncertainty_radius_source": "uncertainty_meters_min",
+        "local_zoom_selectable": true
       },
       {
         "id": "commonworld-exact-anchors",

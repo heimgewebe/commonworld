@@ -66,7 +66,7 @@
     "feature_location_property": "location_id",
     "representation_kinds": [
       "exact_anchor",
-      "approximate_anchor",
+      "approximate_zone",
       "public_extent"
     ],
     "hidden_locations_excluded": true,

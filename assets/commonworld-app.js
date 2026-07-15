@@ -29,7 +29,7 @@ const SVG_NS = 'http://www.w3.org/2000/svg';
 const LOCAL_FALLBACK_STYLE = Object.freeze({ version: 8, sources: {}, layers: [{ id: 'commonworld-fallback', type: 'background', paint: { 'background-color': '#0d2426' } }] });
 const PRESENTATION_STORAGE_KEY = 'commonworld.presentation';
 const PUBLIC_MAP_SOURCE_ID = 'commonworld-public-representations';
-const PUBLIC_MAP_LAYER_IDS = Object.freeze(['commonworld-public-extents', 'commonworld-approximate-anchors', 'commonworld-exact-anchors']);
+const PUBLIC_MAP_LAYER_IDS = Object.freeze(['commonworld-public-extents', 'commonworld-approximate-zones', 'commonworld-exact-anchors']);
 const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
 const elements = {
   body: document.body,
@@ -386,21 +386,17 @@ function ensurePublicMapLayers() {
       },
     });
   }
-  if (!runtime.map.getLayer('commonworld-approximate-anchors')) {
+  if (!runtime.map.getLayer('commonworld-approximate-zones')) {
     runtime.map.addLayer({
-      id: 'commonworld-approximate-anchors',
-      type: 'circle',
+      id: 'commonworld-approximate-zones',
+      type: 'fill',
       source: PUBLIC_MAP_SOURCE_ID,
       minzoom: 3.4,
-      maxzoom: 5.5,
-      filter: ['==', ['get', 'representation_kind'], 'approximate_anchor'],
+      filter: ['==', ['get', 'representation_kind'], 'approximate_zone'],
       paint: {
-        'circle-radius': ['interpolate', ['linear'], ['zoom'], 3.4, 7, 8, 12],
-        'circle-color': '#e8b96d',
-        'circle-opacity': 0.78,
-        'circle-stroke-color': '#fff2d4',
-        'circle-stroke-width': 1.5,
-        'circle-blur': 0.18,
+        'fill-color': '#e8b96d',
+        'fill-opacity': ['interpolate', ['linear'], ['zoom'], 3.4, 0.2, 5.5, 0.24, 12, 0.15, 18, 0.1],
+        'fill-outline-color': 'rgba(255, 242, 212, 0.48)',
       },
     });
   }

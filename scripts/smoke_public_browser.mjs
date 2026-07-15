@@ -518,7 +518,7 @@ async function realHybridCommonsScenario() {
   assert(!initial.locationIds.includes('freifunk-hamburg-private-routers'), 'real hybrid: hidden router location leaked into map diagnostics');
   assert(initial.sourceType === 'geojson', 'real hybrid: MapLibre source is not a GeoJSON source: ' + JSON.stringify(initial));
   assert(initial.layers.some(({ id, type, minzoom }) => id === 'commonworld-public-extents' && type === 'fill' && minzoom === 3.4), 'real hybrid: public extent layer missing');
-  assert(initial.layers.some(({ id, type, minzoom, maxzoom }) => id === 'commonworld-approximate-anchors' && type === 'circle' && minzoom === 3.4 && maxzoom === 5.5), 'real hybrid: approximate anchor layer must stop before local zoom');
+  assert(initial.layers.some(({ id, type, minzoom, maxzoom }) => id === 'commonworld-approximate-zones' && type === 'fill' && minzoom === 3.4 && maxzoom === undefined), 'real hybrid: approximate uncertainty zone must remain visible through local zoom');
   assert(initial.layers.some(({ id, type, minzoom }) => id === 'commonworld-exact-anchors' && type === 'circle' && minzoom === 5.5), 'real hybrid: exact anchor layer missing');
   assert(initial.ringNames.includes('Freifunk Hamburg'), 'real hybrid: hybrid identity missing from digital sphere');
   assert(!initial.ringNames.includes('Le Nid'), 'real hybrid: geographic-only identity leaked into digital sphere');
@@ -563,7 +563,7 @@ async function realHybridCommonsScenario() {
   await activateMapIdentity({
     coordinates: [9.944545738399, 53.558314876911],
     zoom: 4.6,
-    layerId: 'commonworld-approximate-anchors',
+    layerId: 'commonworld-approximate-zones',
     expectedLevel: 'region',
   });
   assert((await run.page.locator('#focus-title').textContent()) === 'Freifunk Hamburg', 'real hybrid: approximate map click selected the wrong identity');
@@ -581,15 +581,16 @@ async function realHybridCommonsScenario() {
   await run.page.waitForFunction(() => document.querySelector('.globe-stage')?.dataset.publicMapFeatures === '3');
   await run.page.locator('#focus-close').click();
   assert(await run.page.evaluate(() => document.activeElement === window.__commonworldTestMap?.getCanvas()), 'real hybrid: closing a map-selected focus did not restore focus to the map canvas');
-  await run.page.evaluate(() => {
-    window.__commonworldTestMap.jumpTo({ center: [9.944545738399, 53.558314876911], zoom: 6.2, bearing: 0, pitch: 0 });
+  await activateMapIdentity({
+    coordinates: [9.944545738399, 53.558314876911],
+    zoom: 6.2,
+    layerId: 'commonworld-approximate-zones',
+    expectedLevel: 'local',
   });
-  await run.page.waitForFunction(() => {
-    const map = window.__commonworldTestMap;
-    if (!map || map.isMoving()) return false;
-    const target = [9.944545738399, 53.558314876911];
-    return map.queryRenderedFeatures(map.project(target), { layers: ['commonworld-approximate-anchors'] }).length === 0;
-  });
+  assert((await run.page.locator('#focus-title').textContent()) === 'Freifunk Hamburg', 'real hybrid: local uncertainty-zone click lost the hybrid identity');
+  assert(((await run.page.locator('#focus-locations').textContent()) ?? '').includes('mindestens 5 km Unschärfe'), 'real hybrid: local uncertainty zone lost its minimum-radius truth');
+  await run.page.locator('#focus-close').click();
+  assert(await run.page.evaluate(() => document.activeElement === window.__commonworldTestMap?.getCanvas()), 'real hybrid: local uncertainty-zone focus did not restore map focus');
 
   await activateMapIdentity({
     coordinates: [4.3152961, 50.8452417],

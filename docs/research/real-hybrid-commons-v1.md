@@ -18,7 +18,7 @@ Diese Vertikalscheibe erweitert den bisherigen rein digitalen Startkatalog um zw
 
 - Exakte Punkte werden als `exact_anchor` abgeleitet.
 - Exakte Polygone und Mehrfachpolygone werden als `public_extent` abgeleitet.
-- Ungefähre öffentliche Geometrien werden als `approximate_anchor` abgeleitet und behalten `uncertainty_meters_min`.
+- Ungefähre öffentliche Punkte werden als `approximate_zone` mit einem geodätisch abgeleiteten Mindestradius aus `uncertainty_meters_min` veröffentlicht; die Quellkoordinate wird nicht als lokaler Punktmarker dargestellt.
 - Verborgene Orte erzeugen niemals GeoJSON, Marker, Fläche oder Ersatzkoordinate.
 - Jede Kartenrepräsentation trägt `project_id = CommonProject.id`.
 - Eine hybride Identität bleibt eine Identität, auch wenn sie geografisch und digital sichtbar ist.

@@ -239,11 +239,26 @@ test('public map derivation preserves CommonProject identity and excludes hidden
   assert.equal(collection.type, 'FeatureCollection');
   assert.equal(collection.features.length, 3);
   assert.deepEqual(collection.features.map(({ properties }) => properties.project_id), ['cltb-le-nid', 'cltb-le-nid', 'freifunk-hamburg']);
-  assert.deepEqual(collection.features.map(({ properties }) => properties.representation_kind), ['exact_anchor', 'public_extent', 'approximate_anchor']);
+  assert.deepEqual(collection.features.map(({ properties }) => properties.representation_kind), ['exact_anchor', 'public_extent', 'approximate_zone']);
   assert.equal(collection.features.some(({ properties }) => properties.location_id === 'private-routers'), false);
-  const approximate = collection.features.find(({ properties }) => properties.representation_kind === 'approximate_anchor');
+  const approximate = collection.features.find(({ properties }) => properties.representation_kind === 'approximate_zone');
   assert.equal(approximate.properties.uncertainty_meters_min, 5000);
-  assert.deepEqual(approximate.geometry.coordinates, [9.9445, 53.5583]);
+  assert.equal(approximate.geometry.type, 'Polygon');
+  const uncertaintyRing = approximate.geometry.coordinates[0];
+  assert.equal(uncertaintyRing.length, 65);
+  assert.deepEqual(uncertaintyRing[0], uncertaintyRing.at(-1));
+  const toRadians = (value) => value * Math.PI / 180;
+  const center = [9.9445, 53.5583];
+  for (const coordinate of uncertaintyRing.slice(0, -1)) {
+    const latitudeDelta = toRadians(coordinate[1] - center[1]);
+    const longitudeDelta = toRadians(coordinate[0] - center[0]);
+    const centerLatitude = toRadians(center[1]);
+    const coordinateLatitude = toRadians(coordinate[1]);
+    const haversine = Math.sin(latitudeDelta / 2) ** 2
+      + Math.cos(centerLatitude) * Math.cos(coordinateLatitude) * Math.sin(longitudeDelta / 2) ** 2;
+    const distance = 2 * 6371008.8 * Math.asin(Math.sqrt(haversine));
+    assert(Math.abs(distance - 5000) <= 1, `uncertainty zone radius drifted: ${distance}`);
+  }
 });
 
 test('map filtering uses the same visible identity set without multiplying hybrid identities', () => {

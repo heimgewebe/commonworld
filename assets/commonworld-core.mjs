@@ -154,8 +154,8 @@ export function recordPresentationLabel(record) {
 }
 
 function geometryRepresentationKind(location) {
-  if (location?.mode === 'approximate') return 'approximate_anchor';
   const type = location?.geometry?.type;
+  if (location?.mode === 'approximate' && type === 'Point' && finite(location?.uncertainty_meters_min, 0) > 0) return 'approximate_zone';
   if (location?.mode === 'exact' && type === 'Point') return 'exact_anchor';
   if (location?.mode === 'exact' && (type === 'Polygon' || type === 'MultiPolygon')) return 'public_extent';
   return null;
@@ -163,6 +163,42 @@ function geometryRepresentationKind(location) {
 
 function cloneCoordinates(value) {
   return Array.isArray(value) ? value.map(cloneCoordinates) : value;
+}
+
+const EARTH_RADIUS_METERS = 6371008.8;
+const UNCERTAINTY_ZONE_VERTEX_COUNT = 64;
+
+function approximateUncertaintyZone(location) {
+  const center = location?.geometry?.coordinates;
+  const radiusMeters = finite(location?.uncertainty_meters_min, 0);
+  if (!Array.isArray(center) || center.length !== 2 || !center.every(Number.isFinite) || radiusMeters <= 0) return null;
+  const longitude = center[0] * Math.PI / 180;
+  const latitude = center[1] * Math.PI / 180;
+  const angularDistance = radiusMeters / EARTH_RADIUS_METERS;
+  const ring = [];
+  for (let index = 0; index < UNCERTAINTY_ZONE_VERTEX_COUNT; index += 1) {
+    const bearing = 2 * Math.PI * index / UNCERTAINTY_ZONE_VERTEX_COUNT;
+    const targetLatitude = Math.asin(
+      Math.sin(latitude) * Math.cos(angularDistance)
+      + Math.cos(latitude) * Math.sin(angularDistance) * Math.cos(bearing),
+    );
+    const targetLongitude = longitude + Math.atan2(
+      Math.sin(bearing) * Math.sin(angularDistance) * Math.cos(latitude),
+      Math.cos(angularDistance) - Math.sin(latitude) * Math.sin(targetLatitude),
+    );
+    const longitudeDegrees = ((targetLongitude * 180 / Math.PI + 540) % 360) - 180;
+    ring.push([longitudeDegrees, targetLatitude * 180 / Math.PI]);
+  }
+  ring.push([...ring[0]]);
+  return { type: 'Polygon', coordinates: [ring] };
+}
+
+function publicGeometry(location, representationKind) {
+  if (representationKind === 'approximate_zone') return approximateUncertaintyZone(location);
+  return {
+    type: location.geometry.type,
+    coordinates: cloneCoordinates(location.geometry.coordinates),
+  };
 }
 
 export function publicMapFeatureCollection(records, visibleProjectIds = null) {
@@ -178,10 +214,7 @@ export function publicMapFeatureCollection(records, visibleProjectIds = null) {
       features.push({
         type: 'Feature',
         id: `${record.id}:${location.id}`,
-        geometry: {
-          type: location.geometry.type,
-          coordinates: cloneCoordinates(location.geometry.coordinates),
-        },
+        geometry: publicGeometry(location, representationKind),
         properties: {
           project_id: record.id,
           location_id: location.id,

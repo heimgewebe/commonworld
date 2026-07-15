@@ -4,6 +4,7 @@
 from __future__ import annotations
 
 import json
+import math
 import subprocess
 import sys
 from pathlib import Path
@@ -27,6 +28,18 @@ def _location(record: dict, identifier: str) -> dict | None:
         (value for value in values if isinstance(value, dict) and value.get("id") == identifier),
         None,
     )
+
+
+def _haversine_meters(left: list[float], right: list[float]) -> float:
+    longitude_1, latitude_1 = map(math.radians, left)
+    longitude_2, latitude_2 = map(math.radians, right)
+    latitude_delta = latitude_2 - latitude_1
+    longitude_delta = longitude_2 - longitude_1
+    value = (
+        math.sin(latitude_delta / 2) ** 2
+        + math.cos(latitude_1) * math.cos(latitude_2) * math.sin(longitude_delta / 2) ** 2
+    )
+    return 2 * 6371008.8 * math.asin(math.sqrt(value))
 
 
 def _node_projection(root: Path) -> tuple[dict | None, str | None]:
@@ -268,8 +281,28 @@ def validate_real_hybrid_commons(root: Path = ROOT) -> list[str]:
         ]
         if [feature.get("id") for feature in features] != expected_feature_ids:
             errors.append(
-                "T006 public GeoJSON must contain exactly the reviewed point, extent and approximate anchor"
+                "T006 public GeoJSON must contain exactly the reviewed point, extent and approximate uncertainty zone"
             )
+        approximate_feature = next(
+            (
+                feature
+                for feature in features
+                if feature.get("properties", {}).get("location_id")
+                == "freifunk-hamburg-community-area"
+            ),
+            None,
+        )
+        approximate_geometry = (approximate_feature or {}).get("geometry", {})
+        approximate_ring = (approximate_geometry.get("coordinates") or [[]])[0]
+        if (
+            not approximate_feature
+            or approximate_feature.get("properties", {}).get("representation_kind") != "approximate_zone"
+            or approximate_geometry.get("type") != "Polygon"
+            or len(approximate_ring) != 65
+            or approximate_ring[0] != approximate_ring[-1]
+            or any(abs(_haversine_meters(expected_hamburg, coordinate) - 5000) > 1 for coordinate in approximate_ring[:-1])
+        ):
+            errors.append("T006 approximate location must derive one closed five-kilometre uncertainty zone")
         if any(
             feature.get("properties", {}).get("location_id")
             == "freifunk-hamburg-private-routers"
@@ -311,7 +344,7 @@ def validate_real_hybrid_commons(root: Path = ROOT) -> list[str]:
     for token in (
         "commonworld-public-representations",
         "commonworld-public-extents",
-        "commonworld-approximate-anchors",
+        "commonworld-approximate-zones",
         "commonworld-exact-anchors",
         "publicMapFeatureCollection",
         "semanticLocationLine",
