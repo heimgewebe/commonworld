@@ -54,7 +54,7 @@ class PublicCatalogTests(unittest.TestCase):
 
             errors = validate_public_catalog(root)
 
-        self.assertTrue(any("must be explicitly listed" in error for error in errors))
+        self.assertTrue(any("must be in a public curation state" in error for error in errors))
 
     def test_unknown_source_reference_is_rejected(self) -> None:
         with tempfile.TemporaryDirectory() as tmp_dir:
@@ -89,7 +89,7 @@ class PublicCatalogTests(unittest.TestCase):
 
             errors = validate_public_catalog(root)
 
-        self.assertTrue(any("must not store a presentation layer" in error for error in errors))
+        self.assertTrue(any("must not store presentation or zoom assignments" in error for error in errors))
 
     def test_public_shell_wrong_layer_label_is_rejected(self) -> None:
         with tempfile.TemporaryDirectory() as tmp_dir:
@@ -106,7 +106,7 @@ class PublicCatalogTests(unittest.TestCase):
 
             errors = validate_public_catalog(root)
 
-        self.assertTrue(any("derived German layer label" in error for error in errors))
+        self.assertTrue(any("derived German presentation label" in error for error in errors))
 
     def test_production_delivery_boundary_cannot_regress(self) -> None:
         with tempfile.TemporaryDirectory() as tmp_dir:
@@ -131,7 +131,42 @@ class PublicCatalogTests(unittest.TestCase):
 
             errors = validate_public_catalog(root)
 
-        self.assertTrue(any("must use official sources only" in error for error in errors))
+        self.assertTrue(any("must use official or public-registry sources" in error for error in errors))
+
+    def test_public_registry_source_is_allowed(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp_dir:
+            root = self.copy_public_catalog(tmp_dir)
+            self.mutate_project(
+                root,
+                "debian",
+                lambda record: record["provenance"]["sources"][0].update({"type": "public-registry"}),
+            )
+
+            errors = validate_public_catalog(root)
+
+        self.assertFalse(any("must use official or public-registry sources" in error for error in errors))
+
+    def test_unknown_relation_target_is_rejected(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp_dir:
+            root = self.copy_public_catalog(tmp_dir)
+            self.mutate_project(
+                root,
+                "freifunk-hamburg",
+                lambda record: record["relations"][0].update({"target_id": "missing-commonproject"}),
+            )
+
+            errors = validate_public_catalog(root)
+
+        self.assertTrue(any("relation target is not a published CommonProject" in error for error in errors))
+
+    def test_semantic_zoom_assignment_is_rejected_from_catalog_data(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp_dir:
+            root = self.copy_public_catalog(tmp_dir)
+            self.mutate_project(root, "cltb-le-nid", lambda record: record.update({"semantic_zoom": "local"}))
+
+            errors = validate_public_catalog(root)
+
+        self.assertTrue(any("must not store presentation or zoom assignments" in error for error in errors))
 
 
 if __name__ == "__main__":

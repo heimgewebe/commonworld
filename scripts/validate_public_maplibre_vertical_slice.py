@@ -37,8 +37,22 @@ REQUIRED_FILES = (
     Path("index.css"),
     Path("method.html"),
 )
-EXPECTED_IDS = [
+EXPECTED_SEED_IDS = [
     "debian",
+    "freifunk",
+    "libreoffice",
+    "mastodon",
+    "openstreetmap",
+    "wikibooks",
+    "wikidata",
+    "wikimedia-commons",
+    "wikipedia",
+    "wikiversity",
+]
+EXPECTED_IDS = [
+    "cltb-le-nid",
+    "debian",
+    "freifunk-hamburg",
     "freifunk",
     "libreoffice",
     "mastodon",
@@ -319,7 +333,7 @@ def validate_public_maplibre_vertical_slice(root: Path = ROOT) -> list[str]:
     publication = manifest.get("publication", {}) if isinstance(manifest.get("publication"), dict) else {}
     expected_runtime_publication = {
         "public": True,
-        "source_policy": "official-sources-only",
+        "source_policy": "official-and-public-registry-sources",
         "curation_state": "listed",
         "engine_selected": True,
         "selected_engine": "maplibre_gl_js",
@@ -341,19 +355,29 @@ def validate_public_maplibre_vertical_slice(root: Path = ROOT) -> list[str]:
         errors.append("public catalog machine-readable surface boundary mismatch")
     records = _catalog_records(root, manifest)
     identifiers = [record.get("id") for record in records]
-    if identifiers != EXPECTED_IDS or contract.get("catalog", {}).get("commonproject_ids") != EXPECTED_IDS:
-        errors.append("public MapLibre runtime must use exactly the ten canonical catalog identities")
-    if len(records) != 10 or manifest.get("entry_count") != 10:
-        errors.append("public MapLibre runtime requires exactly ten catalog records")
+    catalog_contract = contract.get("catalog", {}) if isinstance(contract.get("catalog"), dict) else {}
+    if identifiers != EXPECTED_IDS or catalog_contract.get("commonproject_ids") != EXPECTED_IDS:
+        errors.append("public MapLibre runtime must use the twelve canonical catalog identities")
+    if len(records) != 12 or manifest.get("entry_count") != 12 or catalog_contract.get("entry_count") != 12:
+        errors.append("public MapLibre runtime requires exactly twelve catalog records")
+    records_by_id = {record.get("id"): record for record in records if isinstance(record.get("id"), str)}
+    baseline = manifest.get("seed_baseline", {}) if isinstance(manifest.get("seed_baseline"), dict) else {}
+    if baseline.get("project_ids") != EXPECTED_SEED_IDS or catalog_contract.get("seed_baseline_ids") != EXPECTED_SEED_IDS:
+        errors.append("public MapLibre runtime seed baseline identity mismatch")
+    presence_kinds = {kind: sum(1 for record in records if record.get("kind") == kind) for kind in ("geographic", "digital", "hybrid")}
+    if presence_kinds != {"geographic": 1, "digital": 10, "hybrid": 1} or catalog_contract.get("presence_kinds") != presence_kinds:
+        errors.append("public MapLibre runtime mixed-presence distribution mismatch")
+    for identifier in EXPECTED_SEED_IDS:
+        record = records_by_id.get(identifier, {})
+        presence = record.get("presence", {}) if isinstance(record.get("presence"), dict) else {}
+        if record.get("kind") != "digital":
+            errors.append(f"vertical-slice seed record must remain digital: {identifier}")
+        if presence.get("geographic") != []:
+            errors.append(f"vertical-slice seed record must not contain geographic coordinates: {identifier}")
     for record in records:
         identifier = record.get("id")
-        if record.get("kind") != "digital":
-            errors.append(f"vertical-slice catalog record must remain digital: {identifier}")
-        presence = record.get("presence", {}) if isinstance(record.get("presence"), dict) else {}
-        if presence.get("geographic") != []:
-            errors.append(f"vertical-slice catalog record must not contain geographic coordinates: {identifier}")
-        if any(key in record for key in ("layer", "derived_layer", "presentation_layer")):
-            errors.append(f"vertical-slice catalog record must not store presentation-layer truth: {identifier}")
+        if any(key in record for key in ("layer", "derived_layer", "presentation_layer", "semantic_zoom")):
+            errors.append(f"vertical-slice catalog record must not store presentation or semantic-zoom truth: {identifier}")
 
     html = (root / "index.html").read_text(encoding="utf-8")
     css = (root / "index.css").read_text(encoding="utf-8")
@@ -377,6 +401,10 @@ def validate_public_maplibre_vertical_slice(root: Path = ROOT) -> list[str]:
         '<script type="module" src="./assets/commonworld-app.js"></script>',
         'href="./assets/vendor/maplibre-gl.css"',
         'id="map"',
+        'id="semantic-level"',
+        'id="semantic-summary"',
+        'id="focus-locations"',
+        'id="focus-relations"',
         'id="digital-sphere"',
         'id="sphere-edge-control"',
         'id="layer-panel"',
@@ -444,7 +472,10 @@ def validate_public_maplibre_vertical_slice(root: Path = ROOT) -> list[str]:
         "filterRecords(",
         "window.addEventListener('popstate'",
         "setTimeout(() => writeHistory('replace'), 180)",
-        "presence?.geographic?.length",
+        "PUBLIC_MAP_SOURCE_ID",
+        "publicMapFeatureCollection",
+        "ensurePublicMapLayers",
+        "semanticLocationLine",
         "overlayRenderCount += 1",
         "bootstrapRecords()",
         "verifyMapProvider",
@@ -459,7 +490,7 @@ def validate_public_maplibre_vertical_slice(root: Path = ROOT) -> list[str]:
     for token in required_app:
         if token not in app:
             errors.append(f"public runtime application missing contract token: {token}")
-    for token in ("deriveLayer", "binaryFragment", "binaryName", "ribbonRepeatCount", "stateFromSearch", "searchFromState", "filterRecords", "globeHorizonCoordinates", "projectedGlobeCircle", "sphereLayout", "sphereOpacityForGlobeRatio"):
+    for token in ("deriveLayer", "binaryFragment", "binaryName", "ribbonRepeatCount", "stateFromSearch", "searchFromState", "filterRecords", "globeHorizonCoordinates", "projectedGlobeCircle", "sphereLayout", "sphereOpacityForGlobeRatio", "publicMapFeatureCollection", "evidencedRelations", "recordLocationSummaries", "recordPresentationLabel", "semanticLocationLine", "semanticZoomLevel"):
         if f"function {token}" not in core:
             errors.append(f"public runtime core missing function: {token}")
     if "setInterval" in app:
@@ -526,6 +557,42 @@ def validate_public_maplibre_vertical_slice(root: Path = ROOT) -> list[str]:
         "no_javascript_catalog_overlay": True,
     }:
         errors.append("public globe-first surface contract mismatch")
+    expected_catalog_contract = {
+        "manifest": "catalog/catalog.json",
+        "only_data_source": True,
+        "entry_count": 12,
+        "commonproject_ids": EXPECTED_IDS,
+        "presence_kinds": {"geographic": 1, "digital": 10, "hybrid": 1},
+        "seed_baseline_ids": EXPECTED_SEED_IDS,
+        "fabricated_coordinates_forbidden": True,
+        "hidden_locations_have_no_geometry": True,
+        "geographic_commons_in_scope": True,
+        "relations_require_known_commonproject_targets": True,
+    }
+    if contract.get("catalog") != expected_catalog_contract:
+        errors.append("public MapLibre mixed-presence catalog contract mismatch")
+    expected_geographic_surface = {
+        "source_id": "commonworld-public-representations",
+        "source_type": "derived_geojson",
+        "identity_property": "project_id",
+        "location_property": "location_id",
+        "feature_count": 3,
+        "project_identity_count": 2,
+        "layers": [
+            {"id": "commonworld-public-extents", "type": "fill", "minimum_zoom": 3.4, "representation_kind": "public_extent"},
+            {"id": "commonworld-approximate-zones", "type": "fill", "minimum_zoom": 3.4, "representation_kind": "approximate_zone", "uncertainty_radius_source": "uncertainty_meters_min", "local_zoom_selectable": True},
+            {"id": "commonworld-exact-anchors", "type": "circle", "minimum_zoom": 5.5, "representation_kind": "exact_anchor"},
+        ],
+        "hidden_locations_excluded": True,
+        "search_filters_same_source": True,
+        "map_click_selects_commonproject_id": True,
+        "style_replacement_restores_layers": True,
+        "semantic_zoom_levels": ["planet", "macroregion", "region", "local", "focus"],
+        "semantic_zoom_catalog_assignment_forbidden": True,
+        "location_line": True,
+    }
+    if contract.get("geographic_surface") != expected_geographic_surface:
+        errors.append("public MapLibre geographic surface contract mismatch")
     digital_surface = contract.get("digital_sphere", {}) if isinstance(contract.get("digital_sphere"), dict) else {}
     for key, expected in {
         "geometry_anchor": "maplibre_projected_globe_horizon",
@@ -563,6 +630,8 @@ def validate_public_maplibre_vertical_slice(root: Path = ROOT) -> list[str]:
         "complete_rings_visible": False,
         "card_substitution": False,
         "search_and_filter_always_available": True,
+        "geographic_only_records_excluded": True,
+        "hybrid_records_included": True,
     }.items():
         if digital_surface.get(key) != expected:
             errors.append(f"public digital-sphere close-up contract mismatch: {key}")

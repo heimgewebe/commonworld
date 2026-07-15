@@ -1,11 +1,13 @@
 {
   "schema_version": 1,
   "kind": "commonworld_public_catalog",
-  "published_at": "2026-07-12",
+  "published_at": "2026-07-15",
   "language": "de",
-  "entry_count": 10,
+  "entry_count": 12,
   "project_files": [
+    "projects/cltb-le-nid.json",
     "projects/debian.json",
+    "projects/freifunk-hamburg.json",
     "projects/freifunk.json",
     "projects/libreoffice.json",
     "projects/mastodon.json",
@@ -18,7 +20,7 @@
   ],
   "publication": {
     "public": true,
-    "source_policy": "official-sources-only",
+    "source_policy": "official-and-public-registry-sources",
     "curation_state": "listed",
     "engine_selected": true,
     "production_architecture_authorized": true,
@@ -36,5 +38,21 @@
     "api_runtime": false,
     "write_path": false,
     "standalone_cli": false
+  },
+  "catalog_profile": "curated-public-mixed-presence-v1",
+  "seed_baseline": {
+    "published_at": "2026-07-12",
+    "project_ids": [
+      "debian",
+      "freifunk",
+      "libreoffice",
+      "mastodon",
+      "openstreetmap",
+      "wikibooks",
+      "wikidata",
+      "wikimedia-commons",
+      "wikipedia",
+      "wikiversity"
+    ]
   }
 }

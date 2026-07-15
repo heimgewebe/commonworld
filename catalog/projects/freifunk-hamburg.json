@@ -1,0 +1,133 @@
+{
+  "schema_version": 3,
+  "id": "freifunk-hamburg",
+  "title": "Freifunk Hamburg",
+  "summary": "Eine lokale Freifunk-Community, die ein gemeinschaftlich getragenes digitales Netz in Hamburg betreibt und Beteiligung, offene Infrastruktur und freie Kommunikation verbindet.",
+  "kind": "hybrid",
+  "themes": [
+    "communication",
+    "community-network",
+    "infrastructure"
+  ],
+  "actions": [
+    "use",
+    "learn",
+    "contribute",
+    "volunteer",
+    "contact",
+    "replicate"
+  ],
+  "presence": {
+    "geographic": [
+      {
+        "id": "freifunk-hamburg-community-area",
+        "mode": "approximate",
+        "label": "Community Hamburg",
+        "geometry": {
+          "type": "Point",
+          "coordinates": [
+            9.944545738399,
+            53.558314876911
+          ]
+        },
+        "uncertainty_meters_min": 5000,
+        "privacy_note": "Die veröffentlichte API-Koordinate beschreibt nur eine ungefähre Community-Verortung und weder Netzabdeckung noch Routerstandorte.",
+        "source_ids": [
+          "freifunk-hamburg-api"
+        ]
+      },
+      {
+        "id": "freifunk-hamburg-private-routers",
+        "mode": "hidden",
+        "label": "Private Heimrouter",
+        "privacy_note": "Private Routerstandorte werden nicht veröffentlicht und nicht aus Karten, Kontaktadressen oder Community-Metadaten rekonstruiert.",
+        "source_ids": [
+          "freifunk-community-directory"
+        ]
+      }
+    ],
+    "digital": {
+      "available": true,
+      "reach": "regional",
+      "label": "Hamburger Freifunk-Community-Netz und Beteiligungsinformationen",
+      "source_ids": [
+        "freifunk-hamburg-api",
+        "freifunk-hamburg-homepage"
+      ]
+    }
+  },
+  "relations": [
+    {
+      "target_id": "freifunk",
+      "type": "chapter-of",
+      "source_ids": [
+        "freifunk-community-directory",
+        "freifunk-hamburg-api"
+      ],
+      "note": "Freifunk Hamburg wird im offiziellen Freifunk-Communityverzeichnis als lokale Community geführt."
+    }
+  ],
+  "activity": {
+    "status": "active",
+    "observed_at": "2026-07-15",
+    "source_ids": [
+      "freifunk-hamburg-api"
+    ],
+    "note": "Das offizielle Freifunk-API-Verzeichnis lieferte am Prüftag aktuelle Community-Metadaten und einen jüngsten Änderungszeitpunkt."
+  },
+  "provenance": {
+    "sources": [
+      {
+        "id": "freifunk-community-directory",
+        "type": "official-source",
+        "label": "Freifunk – Community finden",
+        "url": "https://freifunk.net/wie-mache-ich-mit/community-finden/",
+        "retrieved_at": "2026-07-15",
+        "note": "Offizielle Übersicht zu lokalen Communities, Heimroutern und API-gespeisten Metainformationen."
+      },
+      {
+        "id": "freifunk-hamburg-api",
+        "type": "official-source",
+        "label": "Freifunk API – Community Hamburg",
+        "url": "https://api.freifunk.net/data/ffSummarizedDir.json",
+        "retrieved_at": "2026-07-15",
+        "note": "Offizielles API-Verzeichnis; verwendet wird ausschließlich der Eintrag mit dem Schlüssel hamburg. Die Koordinate wird mit mindestens fünf Kilometern Unschärfe veröffentlicht."
+      },
+      {
+        "id": "freifunk-hamburg-homepage",
+        "type": "official-source",
+        "label": "Freifunk Hamburg – offizielle Community-Seite",
+        "url": "https://hamburg.freifunk.net/",
+        "retrieved_at": "2026-07-15",
+        "note": "Offizielle lokale Community-Seite."
+      }
+    ]
+  },
+  "curation": {
+    "state": "listed",
+    "reviewed_by": "Commonworld editorial review",
+    "reviewed_at": "2026-07-15",
+    "next_review_at": "2026-10-15",
+    "notes": "Community-Verortung bewusst angenähert; private Router bleiben ohne Geometrie. Die lokale Identität bleibt über chapter-of mit dem bestehenden Freifunk-Datensatz verbunden."
+  },
+  "links": [
+    {
+      "type": "homepage",
+      "label": "Freifunk Hamburg – offizielle Seite",
+      "url": "https://hamburg.freifunk.net/"
+    },
+    {
+      "type": "use",
+      "label": "Freifunk Hamburg – öffentliche Netzkarte",
+      "url": "https://map.hamburg.freifunk.net/"
+    },
+    {
+      "type": "source",
+      "label": "Freifunk – Communityverzeichnis",
+      "url": "https://freifunk.net/wie-mache-ich-mit/community-finden/"
+    }
+  ],
+  "handoff": {
+    "enabled": false
+  }
+}

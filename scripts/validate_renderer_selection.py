@@ -43,7 +43,7 @@ EXPECTED_DECISION = {
 }
 EXPECTED_RENDERER_PUBLICATION = {
     "public": True,
-    "source_policy": "official-sources-only",
+    "source_policy": "official-and-public-registry-sources",
     "curation_state": "listed",
     "engine_selected": True,
     "selected_engine": "maplibre_gl_js",
@@ -57,6 +57,7 @@ EXPECTED_LAYER_COVERAGE = {
     "communication_networks": ["freifunk", "mastodon"],
     "mixed_other": ["openstreetmap"],
 }
+EXPECTED_SEED_IDS = sorted(identifier for values in EXPECTED_LAYER_COVERAGE.values() for identifier in values)
 EXPECTED_SOURCES = {
     "maplibre_docs": "https://maplibre.org/maplibre-gl-js/docs/",
     "maplibre_custom_layer": "https://maplibre.org/maplibre-gl-js/docs/API/interfaces/CustomLayerInterface/",
@@ -425,18 +426,25 @@ def validate_renderer_selection(root: Path = ROOT) -> list[str]:
     if any(publication.get(key) != expected for key, expected in EXPECTED_RENDERER_PUBLICATION.items()):
         errors.append("public catalog renderer publication boundary mismatch")
     records = _catalog_records(root, catalog)
-    if catalog.get("entry_count") != 10 or len(records) != 10:
-        errors.append("renderer selection requires exactly ten public seed records")
+    records_by_id = {record.get("id"): record for record in records if isinstance(record.get("id"), str)}
+    baseline = _mapping(catalog.get("seed_baseline", {}))
+    baseline_ids = baseline.get("project_ids")
+    if baseline_ids != EXPECTED_SEED_IDS:
+        errors.append("renderer selection seed baseline identities differ from the historical decision")
+        baseline_ids = EXPECTED_SEED_IDS
+    seed_records = [records_by_id[identifier] for identifier in baseline_ids if identifier in records_by_id]
+    if len(seed_records) != 10:
+        errors.append("renderer selection requires exactly ten preserved public seed records")
     actual_coverage: dict[str, list[str]] = defaultdict(list)
-    for record in records:
+    for record in seed_records:
         identifier = record.get("id")
         if record.get("kind") != "digital":
             errors.append(f"public seed record must remain digital: {identifier}")
         presence = record.get("presence", {})
         if not isinstance(presence, dict) or presence.get("geographic") != []:
             errors.append(f"public seed record must not gain geographic presence: {identifier}")
-        if any(name in record for name in ("layer", "derived_layer", "presentation_layer")):
-            errors.append(f"public seed record must not store renderer layer truth: {identifier}")
+        if any(name in record for name in ("layer", "derived_layer", "presentation_layer", "semantic_zoom")):
+            errors.append(f"public seed record must not store renderer or zoom truth: {identifier}")
         layer = derive_digital_layer(record, digital_contract)
         if isinstance(identifier, str) and isinstance(layer, str):
             actual_coverage[layer].append(identifier)

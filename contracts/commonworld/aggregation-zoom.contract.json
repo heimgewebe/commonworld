@@ -371,7 +371,7 @@
     "public_representation": {
       "variants": [
         "exact_anchor",
-        "approximate_anchor",
+        "approximate_zone",
         "public_extent",
         "digital_presence"
       ],

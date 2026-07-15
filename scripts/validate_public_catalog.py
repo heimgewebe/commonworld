@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Validate the public Commonworld seed catalog and its linear shell projection."""
+"""Validate the scalable public Commonworld catalog and its text projections."""
 
 from __future__ import annotations
 
@@ -20,7 +20,9 @@ from scripts.validate_contracts import validation_errors
 CATALOG_PATH = Path("catalog/catalog.json")
 PROJECT_DIRECTORY = Path("catalog/projects")
 DIGITAL_CONTRACT_PATH = Path("contracts/commonworld/digital-sphere.contract.json")
-PUBLIC_STATES = {"listed"}
+PUBLIC_STATES = {"listed", "verified", "featured"}
+PUBLIC_ACTIVITY_STATES = {"active", "paused", "seasonal"}
+PUBLIC_SOURCE_TYPES = {"official-source", "public-registry"}
 FORBIDDEN_PUBLIC_TEXT = ("reference-only", "test-only", "synthetic", "acceptance-only")
 CARD_PATTERN = re.compile(
     r'<article class="catalog-card"[^>]*data-commonproject-id="([a-z][a-z0-9-]{2,95})"[^>]*>(.*?)</article>',
@@ -78,6 +80,24 @@ def _homepage(record: dict) -> str | None:
     return homepages[0] if len(homepages) == 1 and isinstance(homepages[0], str) else None
 
 
+def _card_label(record: dict, layer_labels: dict[str, str], contract: dict) -> str:
+    kind = record.get("kind")
+    if kind == "geographic":
+        return "Geografisch"
+    layer = derive_digital_layer(record, contract)
+    label = layer_labels.get(layer, "Digitale Commons")
+    return f"Hybrid · {label}" if kind == "hybrid" else f"Digital · {label}"
+
+
+def _parse_date(value: object) -> date | None:
+    if not isinstance(value, str):
+        return None
+    try:
+        return date.fromisoformat(value)
+    except ValueError:
+        return None
+
+
 def validate_public_catalog(root: Path = ROOT) -> list[str]:
     errors: list[str] = []
     manifest_path = root / CATALOG_PATH
@@ -103,19 +123,21 @@ def validate_public_catalog(root: Path = ROOT) -> list[str]:
 
     expected_publication = {
         "public": True,
-        "source_policy": "official-sources-only",
+        "source_policy": "official-and-public-registry-sources",
         "curation_state": "listed",
         "engine_selected": True,
-        "selected_engine": "maplibre_gl_js",
         "production_architecture_authorized": True,
+        "selected_engine": "maplibre_gl_js",
+        "public_runtime_uses_selected_engine": True,
         "production_delivery": "github_pages_static",
         "basemap_provider_boundary": "openfreemap_public_best_effort_noncritical",
-        "public_runtime_uses_selected_engine": True,
     }
     if manifest.get("schema_version") != 1 or manifest.get("kind") != "commonworld_public_catalog":
         errors.append("public catalog manifest schema or kind mismatch")
     if manifest.get("language") != "de":
         errors.append("public catalog language must be de")
+    if manifest.get("catalog_profile") != "curated-public-mixed-presence-v1":
+        errors.append("public catalog profile must allow curated mixed presence")
     if manifest.get("publication") != expected_publication:
         errors.append("public catalog publication boundary mismatch")
     expected_machine_surface = {
@@ -131,11 +153,19 @@ def validate_public_catalog(root: Path = ROOT) -> list[str]:
     if manifest.get("machine_surface") != expected_machine_surface:
         errors.append("public catalog machine-readable surface boundary mismatch")
 
-    try:
-        published_at = date.fromisoformat(manifest["published_at"])
-    except (KeyError, TypeError, ValueError):
-        published_at = None
+    published_at = _parse_date(manifest.get("published_at"))
+    if published_at is None:
         errors.append("public catalog published_at must be an ISO date")
+
+    seed_baseline = manifest.get("seed_baseline")
+    if not isinstance(seed_baseline, dict):
+        errors.append("public catalog must declare its preserved seed baseline")
+    else:
+        seed_ids = seed_baseline.get("project_ids")
+        if not isinstance(seed_ids, list) or seed_ids != sorted(seed_ids) or len(seed_ids) != len(set(seed_ids)):
+            errors.append("public catalog seed baseline project_ids must be a sorted unique list")
+        if _parse_date(seed_baseline.get("published_at")) is None:
+            errors.append("public catalog seed baseline published_at must be an ISO date")
 
     raw_files = manifest.get("project_files")
     if not isinstance(raw_files, list):
@@ -153,8 +183,8 @@ def validate_public_catalog(root: Path = ROOT) -> list[str]:
         errors.append("public catalog project_files must be sorted")
     if len(normalized_files) != len(set(normalized_files)):
         errors.append("public catalog project_files must be unique")
-    if not 8 <= len(normalized_files) <= 12:
-        errors.append("public seed catalog must contain between 8 and 12 projects")
+    if not 1 <= len(normalized_files) <= 10000:
+        errors.append("public catalog must contain between 1 and 10000 projects")
     if manifest.get("entry_count") != len(normalized_files):
         errors.append("public catalog entry_count must match project_files")
 
@@ -169,13 +199,10 @@ def validate_public_catalog(root: Path = ROOT) -> list[str]:
     records: list[dict] = []
     identifiers: list[str] = []
     titles: list[str] = []
-    layer_ids: list[str] = []
-    record_layers: dict[str, str] = {}
     layer_labels = {
         entry.get("id"): entry.get("label_de")
         for entry in contract.get("layer_model", {}).get("layers", [])
     }
-    expected_layers = set(contract.get("layer_model", {}).get("order", []))
 
     for relative in safe_files:
         path = root / "catalog" / Path(*relative.parts)
@@ -203,102 +230,80 @@ def validate_public_catalog(root: Path = ROOT) -> list[str]:
         for message in validation_errors(record, root):
             errors.append(f"public catalog project {relative.name} invalid: {message}")
 
-        if record.get("kind") != "digital":
-            errors.append(f"public seed project {relative.name} must be digital")
-        presence = record.get("presence", {})
-        if not isinstance(presence, dict):
-            presence = {}
-        digital = presence.get("digital", {})
-        if not isinstance(digital, dict):
-            digital = {}
-        if presence.get("geographic") != []:
-            errors.append(f"digital public seed project {relative.name} must not contain geographic locations")
-        if digital.get("available") is not True:
-            errors.append(f"public seed project {relative.name} must have an available digital presence")
-        if any(key in record for key in ("layer", "derived_layer", "presentation_layer")):
-            errors.append(f"public seed project {relative.name} must not store a presentation layer")
-        if record.get("relations") not in (None, []):
-            errors.append(f"public seed project {relative.name} must not publish unreviewed relations")
-        if record.get("handoff") != {"enabled": False}:
-            errors.append(f"public seed project {relative.name} must keep Weltgewebe handoff disabled")
+        if record.get("kind") not in {"geographic", "digital", "hybrid"}:
+            errors.append(f"public catalog project {relative.name} has unsupported kind")
+        if any(key in record for key in ("layer", "derived_layer", "presentation_layer", "semantic_zoom")):
+            errors.append(f"public catalog project {relative.name} must not store presentation or zoom assignments")
 
-        curation = record.get("curation", {})
-        if not isinstance(curation, dict):
-            curation = {}
+        curation = record.get("curation", {}) if isinstance(record.get("curation"), dict) else {}
         if curation.get("state") not in PUBLIC_STATES:
-            errors.append(f"public seed project {relative.name} must be explicitly listed")
+            errors.append(f"public catalog project {relative.name} must be in a public curation state")
         if curation.get("reviewed_by") != "Commonworld editorial review":
-            errors.append(f"public seed project {relative.name} must name the editorial reviewer")
-        try:
-            reviewed_at = date.fromisoformat(curation["reviewed_at"])
-            next_review_at = date.fromisoformat(curation["next_review_at"])
-            if published_at and reviewed_at != published_at:
-                errors.append(f"public seed project {relative.name} review date must equal catalog publication date")
+            errors.append(f"public catalog project {relative.name} must name the editorial reviewer")
+        reviewed_at = _parse_date(curation.get("reviewed_at"))
+        next_review_at = _parse_date(curation.get("next_review_at"))
+        if reviewed_at is None or next_review_at is None:
+            errors.append(f"public catalog project {relative.name} has invalid curation dates")
+        else:
             if next_review_at <= reviewed_at:
-                errors.append(f"public seed project {relative.name} next review must follow editorial review")
-        except (KeyError, TypeError, ValueError):
-            errors.append(f"public seed project {relative.name} has invalid curation dates")
+                errors.append(f"public catalog project {relative.name} next review must follow editorial review")
+            if published_at and reviewed_at > published_at:
+                errors.append(f"public catalog project {relative.name} review date must not be after catalog publication")
 
-        activity = record.get("activity", {})
-        if not isinstance(activity, dict):
-            activity = {}
-        if activity.get("status") != "active":
-            errors.append(f"public seed project {relative.name} must have directly observed active status")
-        try:
-            observed_at = date.fromisoformat(activity["observed_at"])
-            if published_at and observed_at != published_at:
-                errors.append(f"public seed project {relative.name} activity observation must equal publication date")
-        except (KeyError, TypeError, ValueError):
-            errors.append(f"public seed project {relative.name} has invalid activity date")
+        activity = record.get("activity", {}) if isinstance(record.get("activity"), dict) else {}
+        if activity.get("status") not in PUBLIC_ACTIVITY_STATES:
+            errors.append(f"public catalog project {relative.name} must have a publishable observed activity state")
+        observed_at = _parse_date(activity.get("observed_at"))
+        if observed_at is None:
+            errors.append(f"public catalog project {relative.name} has invalid activity date")
+        elif published_at and observed_at > published_at:
+            errors.append(f"public catalog project {relative.name} activity observation must not be after catalog publication")
 
-        provenance = record.get("provenance", {})
-        if not isinstance(provenance, dict):
-            provenance = {}
-        sources = provenance.get("sources", [])
-        if not isinstance(sources, list):
-            sources = []
+        provenance = record.get("provenance", {}) if isinstance(record.get("provenance"), dict) else {}
+        sources = provenance.get("sources", []) if isinstance(provenance.get("sources"), list) else []
         if not sources:
-            errors.append(f"public seed project {relative.name} must include provenance")
+            errors.append(f"public catalog project {relative.name} must include provenance")
         for source in sources:
             if not isinstance(source, dict):
-                errors.append(f"public seed project {relative.name} contains a malformed source")
+                errors.append(f"public catalog project {relative.name} contains a malformed source")
                 continue
-            if source.get("type") != "official-source":
-                errors.append(f"public seed project {relative.name} must use official sources only")
+            if source.get("type") not in PUBLIC_SOURCE_TYPES:
+                errors.append(f"public catalog project {relative.name} must use official or public-registry sources")
             if not _is_https_url(source.get("url")):
-                errors.append(f"public seed project {relative.name} source URL must use HTTPS")
-            try:
-                retrieved_at = date.fromisoformat(source["retrieved_at"])
-                if published_at and retrieved_at != published_at:
-                    errors.append(f"public seed project {relative.name} source retrieval must equal publication date")
-            except (KeyError, TypeError, ValueError):
-                errors.append(f"public seed project {relative.name} has invalid source retrieval date")
+                errors.append(f"public catalog project {relative.name} source URL must use HTTPS")
+            retrieved_at = _parse_date(source.get("retrieved_at"))
+            if retrieved_at is None:
+                errors.append(f"public catalog project {relative.name} has invalid source retrieval date")
+            elif published_at and retrieved_at > published_at:
+                errors.append(f"public catalog project {relative.name} source retrieval must not be after catalog publication")
 
         homepage = _homepage(record)
         if homepage is None or not _is_https_url(homepage):
-            errors.append(f"public seed project {relative.name} must have exactly one HTTPS homepage")
+            errors.append(f"public catalog project {relative.name} must have exactly one HTTPS homepage")
 
         searchable_text = json.dumps(record, ensure_ascii=False).casefold()
         for forbidden in FORBIDDEN_PUBLIC_TEXT:
             if forbidden in searchable_text:
-                errors.append(f"public seed project {relative.name} contains test-only language: {forbidden}")
-
-        layer = derive_digital_layer(record, contract)
-        if layer is None:
-            errors.append(f"public seed project {relative.name} has no derived digital layer")
-        else:
-            layer_ids.append(layer)
-            if isinstance(identifier, str):
-                record_layers[identifier] = layer
+                errors.append(f"public catalog project {relative.name} contains test-only language: {forbidden}")
 
     if len(identifiers) != len(set(identifiers)):
         errors.append("public catalog CommonProject ids must be unique")
     if len(titles) != len(set(titles)):
         errors.append("public catalog titles must be unique")
-    if set(layer_ids) != expected_layers:
-        errors.append(
-            f"public seed catalog must cover every digital presentation layer: expected {sorted(expected_layers)}, got {sorted(set(layer_ids))}"
-        )
+
+    known_ids = set(identifiers)
+    for record in records:
+        for relation in record.get("relations", []) if isinstance(record.get("relations"), list) else []:
+            target_id = relation.get("target_id") if isinstance(relation, dict) else None
+            if target_id not in known_ids:
+                errors.append(f"public catalog project {record.get('id')} relation target is not a published CommonProject: {target_id}")
+            if target_id == record.get("id"):
+                errors.append(f"public catalog project {record.get('id')} must not relate to itself")
+
+    if isinstance(seed_baseline, dict) and isinstance(seed_baseline.get("project_ids"), list):
+        missing_seed = sorted(set(seed_baseline["project_ids"]) - known_ids)
+        if missing_seed:
+            errors.append(f"public catalog is missing preserved seed identities: {missing_seed}")
 
     shell = shell_path.read_text(encoding="utf-8")
     cards = CARD_PATTERN.findall(shell)
@@ -320,15 +325,12 @@ def validate_public_catalog(root: Path = ROOT) -> list[str]:
         if not all(isinstance(value, str) for value in (identifier, title, summary, homepage)):
             continue
         bodies = card_bodies.get(identifier, [])
-        layer = record_layers.get(identifier)
-        layer_label = layer_labels.get(layer)
         expected_values = [
             (html.escape(title), "title"),
             (html.escape(summary), "summary"),
             (f'href="{html.escape(homepage, quote=True)}"', "homepage"),
+            (html.escape(_card_label(record, layer_labels, contract)), "derived German presentation label"),
         ]
-        if isinstance(layer_label, str):
-            expected_values.append((f"Digital · {html.escape(layer_label)}", "derived German layer label"))
         for value, label in expected_values:
             if not bodies or any(value not in body for body in bodies):
                 errors.append(f"public shell is missing {label} for {identifier} in at least one text projection")
@@ -342,7 +344,7 @@ def main() -> int:
         for error in errors:
             print(f"ERROR: {error}", file=sys.stderr)
         return 1
-    print("commonworld public seed catalog validation ok")
+    print("commonworld scalable public catalog validation ok")
     return 0
 
 

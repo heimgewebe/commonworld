@@ -6,7 +6,9 @@ export const DEFAULT_CAMERA = Object.freeze({
   pitch: 0,
 });
 
+export const MAX_MAP_ZOOM = 18;
 export const DIGITAL_LAYER_TRANSITION_MS = 1080;
+const DIGITAL_LAYER_MAX_ZOOM = 8;
 
 export const LAYERS = Object.freeze([
   Object.freeze({ id: 'knowledge_data', label: 'Wissen und offene Daten', trackLabel: 'Wissen', themes: ['knowledge', 'open-data', 'research', 'documentation'] }),
@@ -85,7 +87,7 @@ export function cameraFromSearch(search = '') {
   return {
     lng: clamp(finite(parameters.get('lng'), DEFAULT_CAMERA.lng), -180, 180),
     lat: clamp(finite(parameters.get('lat'), DEFAULT_CAMERA.lat), -85, 85),
-    zoom: clamp(finite(parameters.get('z'), DEFAULT_CAMERA.zoom), 0, 8),
+    zoom: clamp(finite(parameters.get('z'), DEFAULT_CAMERA.zoom), 0, MAX_MAP_ZOOM),
     bearing: clamp(finite(parameters.get('b'), DEFAULT_CAMERA.bearing), -180, 180),
     pitch: clamp(finite(parameters.get('p'), DEFAULT_CAMERA.pitch), 0, 70),
   };
@@ -117,7 +119,7 @@ export function searchFromState(state) {
   const camera = state?.camera ?? DEFAULT_CAMERA;
   parameters.set('lng', serializedNumber(clamp(finite(camera.lng, DEFAULT_CAMERA.lng), -180, 180), 4));
   parameters.set('lat', serializedNumber(clamp(finite(camera.lat, DEFAULT_CAMERA.lat), -85, 85), 4));
-  parameters.set('z', serializedNumber(clamp(finite(camera.zoom, DEFAULT_CAMERA.zoom), 0, 8), 2));
+  parameters.set('z', serializedNumber(clamp(finite(camera.zoom, DEFAULT_CAMERA.zoom), 0, MAX_MAP_ZOOM), 2));
   if (Math.abs(finite(camera.bearing, 0)) >= 0.05) parameters.set('b', serializedNumber(clamp(finite(camera.bearing, 0), -180, 180), 1));
   if (Math.abs(finite(camera.pitch, 0)) >= 0.05) parameters.set('p', serializedNumber(clamp(finite(camera.pitch, 0), 0, 70), 1));
   if (state?.view === 'layers') parameters.set('view', 'layers');
@@ -132,7 +134,7 @@ export function searchFromState(state) {
 export function filterRecords(records, state = {}) {
   const query = normalizeQuery(state.query).toLocaleLowerCase('de');
   return (Array.isArray(records) ? records : []).filter((record) => {
-    if (state.layer && deriveLayer(record) !== state.layer) return false;
+    if (state.layer && (record?.presence?.digital?.available !== true || deriveLayer(record) !== state.layer)) return false;
     if (!query) return true;
     const searchable = [record?.title, record?.summary, ...(record?.themes ?? []), ...(record?.actions ?? [])]
       .filter(Boolean)
@@ -140,6 +142,282 @@ export function filterRecords(records, state = {}) {
       .toLocaleLowerCase('de');
     return searchable.includes(query);
   });
+}
+
+export function recordPresentationLabel(record) {
+  const kind = record?.kind;
+  const layer = deriveLayer(record);
+  if (kind === 'hybrid') return `Hybrid${layer ? ` · ${LAYERS.find(({ id }) => id === layer)?.label ?? 'Digitale Commons'}` : ''}`;
+  if (kind === 'geographic') return 'Geografisch';
+  if (kind === 'digital') return `Digital${layer ? ` · ${LAYERS.find(({ id }) => id === layer)?.label ?? 'Digitale Commons'}` : ''}`;
+  return 'Commons';
+}
+
+function geometryRepresentationKind(location) {
+  const type = location?.geometry?.type;
+  if (location?.mode === 'approximate' && type === 'Point' && finite(location?.uncertainty_meters_min, 0) > 0) return 'approximate_zone';
+  if (location?.mode === 'exact' && type === 'Point') return 'exact_anchor';
+  if (location?.mode === 'exact' && (type === 'Polygon' || type === 'MultiPolygon')) return 'public_extent';
+  return null;
+}
+
+function cloneCoordinates(value) {
+  return Array.isArray(value) ? value.map(cloneCoordinates) : value;
+}
+
+const EARTH_RADIUS_METERS = 6371008.8;
+const UNCERTAINTY_ZONE_VERTEX_COUNT = 64;
+export const PUBLIC_MAP_COLLECTION_CACHE_LIMIT = 64;
+const EMPTY_CATALOG_RECORDS = Object.freeze([]);
+const catalogProjectionCache = new WeakMap();
+
+function freezeCatalogSnapshot(value) {
+  if (!value || typeof value !== 'object') return value;
+  const pending = [value];
+  const seen = new WeakSet();
+  while (pending.length > 0) {
+    const current = pending.pop();
+    if (!current || typeof current !== 'object' || seen.has(current)) continue;
+    seen.add(current);
+    for (const child of Object.values(current)) {
+      if (child && typeof child === 'object') pending.push(child);
+    }
+    Object.freeze(current);
+  }
+  return value;
+}
+
+export function geodesicDistanceMeters(origin, destination) {
+  if (!Array.isArray(origin) || origin.length !== 2 || !origin.every(Number.isFinite)) return Number.NaN;
+  if (!Array.isArray(destination) || destination.length !== 2 || !destination.every(Number.isFinite)) return Number.NaN;
+  const radians = Math.PI / 180;
+  const originLatitude = origin[1] * radians;
+  const destinationLatitude = destination[1] * radians;
+  const latitudeDelta = (destination[1] - origin[1]) * radians;
+  const longitudeDelta = (destination[0] - origin[0]) * radians;
+  const haversine = Math.sin(latitudeDelta / 2) ** 2
+    + Math.cos(originLatitude) * Math.cos(destinationLatitude) * Math.sin(longitudeDelta / 2) ** 2;
+  return 2 * EARTH_RADIUS_METERS * Math.asin(Math.sqrt(clamp(haversine, 0, 1)));
+}
+
+function approximateUncertaintyZone(location) {
+  const center = location?.geometry?.coordinates;
+  const radiusMeters = finite(location?.uncertainty_meters_min, 0);
+  if (!Array.isArray(center) || center.length !== 2 || !center.every(Number.isFinite) || radiusMeters <= 0) return null;
+  const longitude = center[0] * Math.PI / 180;
+  const latitude = center[1] * Math.PI / 180;
+  const angularDistance = radiusMeters / EARTH_RADIUS_METERS;
+  const ring = [];
+  for (let index = 0; index < UNCERTAINTY_ZONE_VERTEX_COUNT; index += 1) {
+    const bearing = 2 * Math.PI * index / UNCERTAINTY_ZONE_VERTEX_COUNT;
+    const targetLatitude = Math.asin(
+      Math.sin(latitude) * Math.cos(angularDistance)
+      + Math.cos(latitude) * Math.sin(angularDistance) * Math.cos(bearing),
+    );
+    const targetLongitude = longitude + Math.atan2(
+      Math.sin(bearing) * Math.sin(angularDistance) * Math.cos(latitude),
+      Math.cos(angularDistance) - Math.sin(latitude) * Math.sin(targetLatitude),
+    );
+    const longitudeDegrees = ((targetLongitude * 180 / Math.PI + 540) % 360) - 180;
+    ring.push([longitudeDegrees, targetLatitude * 180 / Math.PI]);
+  }
+  ring.push([...ring[0]]);
+  return { type: 'Polygon', coordinates: [ring] };
+}
+
+function publicGeometry(location, representationKind) {
+  if (representationKind === 'approximate_zone') return approximateUncertaintyZone(location);
+  return {
+    type: location.geometry.type,
+    coordinates: cloneCoordinates(location.geometry.coordinates),
+  };
+}
+
+function publicMapFeature(record, location) {
+  const representationKind = geometryRepresentationKind(location);
+  if (!representationKind) return null;
+  return Object.freeze({
+    type: 'Feature',
+    id: record.id + ':' + location.id,
+    geometry: freezeCatalogSnapshot(publicGeometry(location, representationKind)),
+    properties: Object.freeze({
+      project_id: record.id,
+      location_id: location.id,
+      title: record.title ?? record.id,
+      project_kind: record.kind ?? 'geographic',
+      location_label: location.label ?? record.title ?? record.id,
+      location_mode: location.mode,
+      representation_kind: representationKind,
+      uncertainty_meters_min: location.mode === 'approximate' ? finite(location.uncertainty_meters_min, 0) : 0,
+    }),
+  });
+}
+
+function featureCollection(features) {
+  return Object.freeze({ type: 'FeatureCollection', features: Object.freeze(features) });
+}
+
+function buildEvidencedRelations(records, recordsById) {
+  const relations = [];
+  for (const record of records) {
+    for (const relation of Array.isArray(record?.relations) ? record.relations : []) {
+      const target = recordsById.get(relation?.target_id);
+      if (!target || !Array.isArray(relation?.source_ids) || relation.source_ids.length === 0) continue;
+      relations.push(Object.freeze({
+        source_project_id: record.id,
+        source_title: record.title ?? record.id,
+        target_project_id: target.id,
+        target_title: target.title ?? target.id,
+        relation_type: relation.type,
+        source_ids: Object.freeze([...relation.source_ids]),
+        note: relation.note ?? '',
+      }));
+    }
+  }
+  return Object.freeze(relations);
+}
+
+function buildCatalogProjection(records) {
+  const recordsById = new Map(records.filter((record) => record?.id).map((record) => [record.id, record]));
+  const projectIds = records.filter((record) => record?.id).map((record) => record.id);
+  const featuresByProjectId = new Map();
+  const allFeatures = [];
+  for (const record of records) {
+    if (!record?.id) continue;
+    const projectFeatures = [];
+    const locations = Array.isArray(record?.presence?.geographic) ? record.presence.geographic : [];
+    for (const location of locations) {
+      if (!location || location.mode === 'hidden' || !location.geometry) continue;
+      const feature = publicMapFeature(record, location);
+      if (!feature) continue;
+      projectFeatures.push(feature);
+      allFeatures.push(feature);
+    }
+    featuresByProjectId.set(record.id, Object.freeze(projectFeatures));
+  }
+
+  const collections = new Map([['*', featureCollection(allFeatures)]]);
+  const relations = buildEvidencedRelations(records, recordsById);
+
+  function collectionFor(visibleProjectIds = null) {
+    if (visibleProjectIds === null || visibleProjectIds === undefined) return collections.get('*');
+    const requested = visibleProjectIds instanceof Set
+      ? visibleProjectIds
+      : new Set(Array.isArray(visibleProjectIds) ? visibleProjectIds : []);
+    const visibleIds = projectIds.filter((identifier) => requested.has(identifier));
+    const key = 'ids:' + visibleIds.join('\u001f');
+    const cached = collections.get(key);
+    if (cached) {
+      collections.delete(key);
+      collections.set(key, cached);
+      return cached;
+    }
+    const features = visibleIds.flatMap((identifier) => featuresByProjectId.get(identifier) ?? []);
+    const collection = featureCollection(features);
+    while (collections.size >= PUBLIC_MAP_COLLECTION_CACHE_LIMIT) {
+      const oldest = [...collections.keys()].find((candidate) => candidate !== '*');
+      if (!oldest) break;
+      collections.delete(oldest);
+    }
+    collections.set(key, collection);
+    return collection;
+  }
+
+  return Object.freeze({
+    recordsById,
+    relations,
+    publicMapFeatureCollection: collectionFor,
+  });
+}
+
+export function prepareCatalogProjection(records) {
+  const values = Array.isArray(records) ? records : EMPTY_CATALOG_RECORDS;
+  let projection = catalogProjectionCache.get(values);
+  if (!projection) {
+    freezeCatalogSnapshot(values);
+    projection = buildCatalogProjection(values);
+    catalogProjectionCache.set(values, projection);
+  }
+  return projection;
+}
+
+export function publicMapFeatureCollection(records, visibleProjectIds = null) {
+  return prepareCatalogProjection(records).publicMapFeatureCollection(visibleProjectIds);
+}
+
+export function evidencedRelations(records) {
+  return prepareCatalogProjection(records).relations;
+}
+
+function formattedUncertainty(meters) {
+  const value = Math.max(0, finite(meters, 0));
+  if (value >= 1000 && value % 1000 === 0) return `${value / 1000} km`;
+  return `${Math.round(value)} m`;
+}
+
+export function recordLocationSummaries(record) {
+  const locations = Array.isArray(record?.presence?.geographic) ? record.presence.geographic : [];
+  return locations.map((location) => {
+    const label = location?.label ?? 'Ort';
+    if (location?.mode === 'hidden') return `${label} · Ort verborgen`;
+    if (location?.mode === 'approximate') return `${label} · ungefähr, mindestens ${formattedUncertainty(location.uncertainty_meters_min)} Unschärfe`;
+    const type = location?.geometry?.type;
+    if (type === 'Polygon' || type === 'MultiPolygon') return `${label} · öffentliche Fläche`;
+    return `${label} · exakter öffentlicher Punkt`;
+  });
+}
+
+export function semanticZoomLevel(zoom, selectedProjectId = null) {
+  if (selectedProjectId) return 'focus';
+  const value = clamp(finite(zoom, DEFAULT_CAMERA.zoom), 0, MAX_MAP_ZOOM);
+  if (value < 1.8) return 'planet';
+  if (value < 3.4) return 'macroregion';
+  if (value < 5.5) return 'region';
+  return 'local';
+}
+
+function spatialIdentityCount(records) {
+  return (Array.isArray(records) ? records : []).filter((record) =>
+    (Array.isArray(record?.presence?.geographic) ? record.presence.geographic : []).some((location) => location?.mode !== 'hidden' && location?.geometry),
+  ).length;
+}
+
+function focusSpatialSummary(record) {
+  const locations = Array.isArray(record?.presence?.geographic) ? record.presence.geographic : [];
+  if (record?.kind === 'digital' && locations.length === 0) return 'Digital · Ortsunabhängige digitale Präsenz';
+  const visible = locations.filter((location) => location?.mode !== 'hidden' && location?.geometry).length;
+  const hidden = locations.filter((location) => location?.mode === 'hidden').length;
+  const kind = record?.kind === 'hybrid' ? 'Hybrid' : record?.kind === 'geographic' ? 'Geografisch' : 'Digital';
+  const publicLabel = `${visible} ${visible === 1 ? 'öffentlicher Ort' : 'öffentliche Orte'}`;
+  const hiddenLabel = `${hidden} ${hidden === 1 ? 'verborgener Ort' : 'verborgene Orte'}`;
+  return hidden ? `${kind} · ${publicLabel} · ${hiddenLabel}` : `${kind} · ${publicLabel}`;
+}
+
+export function semanticLocationLine({
+  zoom = DEFAULT_CAMERA.zoom,
+  records = [],
+  selectedProjectId = null,
+  selectedRecord = null,
+} = {}) {
+  const selected = selectedProjectId
+    ? (selectedRecord?.id === selectedProjectId
+      ? selectedRecord
+      : (Array.isArray(records) ? records : []).find(({ id }) => id === selectedProjectId))
+    : null;
+  const level = semanticZoomLevel(zoom, selected?.id ?? null);
+  if (selected) {
+    return {
+      level,
+      crumbs: ['Erde', 'Commons', selected.title ?? selected.id],
+      summary: focusSpatialSummary(selected),
+    };
+  }
+  const count = spatialIdentityCount(records);
+  const countLabel = `${count} räumlich belegte Commons`;
+  if (level === 'planet') return { level, crumbs: ['Erde', 'Gesamtansicht'], summary: countLabel };
+  if (level === 'macroregion') return { level, crumbs: ['Erde', 'Großregion'], summary: `${countLabel} · regionale Zusammenhänge` };
+  if (level === 'region') return { level, crumbs: ['Erde', 'Region'], summary: `${countLabel} · öffentliche Flächen und ungefähre Orte` };
+  return { level, crumbs: ['Erde', 'Lokaler Zusammenhang'], summary: `${countLabel} · öffentliche Punkte, Flächen und Beziehungen` };
 }
 
 const HORIZON_BEARINGS = Object.freeze([0, 45, 90, 135, 180, 225, 270, 315]);
@@ -234,7 +512,7 @@ export function digitalLayerCamera(camera = DEFAULT_CAMERA) {
       clamp(finite(camera?.lng, DEFAULT_CAMERA.lng), -180, 180),
       clamp(finite(camera?.lat, DEFAULT_CAMERA.lat), -85, 85),
     ],
-    zoom: clamp(Math.max(2.15, finite(camera?.zoom, DEFAULT_CAMERA.zoom) + 1.05), 0, 8),
+    zoom: clamp(Math.max(2.15, finite(camera?.zoom, DEFAULT_CAMERA.zoom) + 1.05), 0, DIGITAL_LAYER_MAX_ZOOM),
     bearing: rounded(normalizedBearing, 1),
     pitch: 58,
     padding: { top: 0, right: 0, bottom: 0, left: 0 },

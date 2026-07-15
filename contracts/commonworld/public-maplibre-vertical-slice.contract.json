@@ -48,8 +48,27 @@
   "catalog": {
     "manifest": "catalog/catalog.json",
     "only_data_source": true,
-    "entry_count": 10,
+    "entry_count": 12,
     "commonproject_ids": [
+      "cltb-le-nid",
+      "debian",
+      "freifunk-hamburg",
+      "freifunk",
+      "libreoffice",
+      "mastodon",
+      "openstreetmap",
+      "wikibooks",
+      "wikidata",
+      "wikimedia-commons",
+      "wikipedia",
+      "wikiversity"
+    ],
+    "presence_kinds": {
+      "geographic": 1,
+      "digital": 10,
+      "hybrid": 1
+    },
+    "seed_baseline_ids": [
       "debian",
       "freifunk",
       "libreoffice",
@@ -61,10 +80,10 @@
       "wikipedia",
       "wikiversity"
     ],
-    "all_records_digital": true,
-    "geographic_presence_required_empty": true,
     "fabricated_coordinates_forbidden": true,
-    "geographic_commons_in_scope": false
+    "hidden_locations_have_no_geometry": true,
+    "geographic_commons_in_scope": true,
+    "relations_require_known_commonproject_targets": true
   },
   "digital_sphere": {
     "implementation": "bounded_synchronized_svg_overlay",
@@ -106,7 +125,9 @@
     "multi_lane_horizontal_swipe": true,
     "single_lane_horizontal_swipe": true,
     "card_substitution": false,
-    "search_and_filter_always_available": true
+    "search_and_filter_always_available": true,
+    "geographic_only_records_excluded": true,
+    "hybrid_records_included": true
   },
   "navigation": {
     "deep_link_parameters": [
@@ -143,7 +164,9 @@
     "screen_reader_product_support_claimed": false,
     "focus_returns_to_trigger_or_linear_fallback_on_close": true,
     "skip_link_to_text_surface": true,
-    "text_surface_does_not_require_webgl": true
+    "text_surface_does_not_require_webgl": true,
+    "location_and_relation_focus_sections": true,
+    "semantic_location_line": true
   },
   "content_security_policy": {
     "delivery": "html_meta_for_static_github_pages",
@@ -231,5 +254,48 @@
     "api_runtime": false,
     "write_path": false,
     "standalone_cli": false
+  },
+  "geographic_surface": {
+    "source_id": "commonworld-public-representations",
+    "source_type": "derived_geojson",
+    "identity_property": "project_id",
+    "location_property": "location_id",
+    "feature_count": 3,
+    "project_identity_count": 2,
+    "layers": [
+      {
+        "id": "commonworld-public-extents",
+        "type": "fill",
+        "minimum_zoom": 3.4,
+        "representation_kind": "public_extent"
+      },
+      {
+        "id": "commonworld-approximate-zones",
+        "type": "fill",
+        "minimum_zoom": 3.4,
+        "representation_kind": "approximate_zone",
+        "uncertainty_radius_source": "uncertainty_meters_min",
+        "local_zoom_selectable": true
+      },
+      {
+        "id": "commonworld-exact-anchors",
+        "type": "circle",
+        "minimum_zoom": 5.5,
+        "representation_kind": "exact_anchor"
+      }
+    ],
+    "hidden_locations_excluded": true,
+    "search_filters_same_source": true,
+    "map_click_selects_commonproject_id": true,
+    "style_replacement_restores_layers": true,
+    "semantic_zoom_levels": [
+      "planet",
+      "macroregion",
+      "region",
+      "local",
+      "focus"
+    ],
+    "semantic_zoom_catalog_assignment_forbidden": true,
+    "location_line": true
   }
 }

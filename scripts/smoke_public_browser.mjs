@@ -153,7 +153,7 @@ async function normalScenario() {
   await run.page.goto(baseUrl, { waitUntil: 'domcontentloaded' });
   await run.page.waitForSelector('html.runtime-ready');
   assert(await run.page.locator('#globe-surface').isVisible(), 'normal: globe is not visible');
-  assert((await run.page.locator('#globe-results').textContent())?.includes('10 Commons'), 'normal: result count missing');
+  assert((await run.page.locator('#globe-results').textContent())?.includes('12 Commons'), 'normal: result count missing');
 
   await run.page.locator('.skip-link').focus();
   await run.page.keyboard.press('Enter');
@@ -175,6 +175,7 @@ async function normalScenario() {
   await debianTrigger.click();
   assert(await run.page.locator('#project-focus').isVisible(), 'normal: project focus did not open');
   assert((await run.page.evaluate(() => document.activeElement?.id)) === 'project-focus', 'normal: project focus did not receive focus');
+  assert(((await run.page.locator('#semantic-summary').textContent()) ?? '') === 'Digital · Ortsunabhängige digitale Präsenz', 'normal: digital-only focus lost its location-independent truth');
   await run.page.locator('#commons-search').focus();
   assert((await run.page.evaluate(() => document.activeElement?.id)) === 'commons-search', 'normal: project focus incorrectly blocks background navigation');
   await run.page.keyboard.press('Escape');
@@ -391,7 +392,7 @@ async function layerJourneyScenario({ mobile = false, viewportOverride = null, t
   assert(ribbonView.lanes.every(({ overflowX }) => ['auto', 'scroll'].includes(overflowX)), `layer journey: native horizontal overflow is disabled (${JSON.stringify(ribbonView.lanes)})`);
   assert(ribbonView.lanes.every(({ touchAction }) => touchAction.includes('pan-x')), `layer journey: touch panning is not explicitly horizontal (${JSON.stringify(ribbonView.lanes)})`);
   const primarySegments = ribbonView.lanes.flatMap(({ primary }) => primary);
-  assert(primarySegments.length === 10, `layer journey: primary Commons identities were duplicated or lost (${primarySegments.length})`);
+  assert(primarySegments.length === 11, `layer journey: primary Commons identities were duplicated or lost (${primarySegments.length})`);
   assert(primarySegments.every(({ name, binary, height }) => name && /^(?:[01]{8})(?: [01]{8})*$/.test(binary) && height >= 44), `layer journey: name/binary pairs or touch heights are invalid (${JSON.stringify(primarySegments)})`);
   assert(ribbonView.filterChildren === 6, `layer journey: search surface does not contain all six layer filters (${ribbonView.filterChildren})`);
 
@@ -474,6 +475,166 @@ async function layerJourneyScenario({ mobile = false, viewportOverride = null, t
   assert(run.consoleErrors.length === 0, `layer journey: console errors: ${run.consoleErrors.join(' | ')}`);
   assert(run.pageErrors.length === 0, `layer journey: page errors: ${run.pageErrors.join(' | ')}`);
   results.push({ id: activeScenarioId, verdict: 'PASS' });
+  await run.context.close();
+}
+
+
+async function realHybridCommonsScenario() {
+  process.stdout.write(JSON.stringify({ state: 'RUNNING', scenario: 'real-hybrid-commons' }) + '\n');
+  const run = await newPage({ viewportOverride: { width: 1024, height: 768 }, reducedMotion: 'reduce' });
+  await run.page.goto(baseUrl, { waitUntil: 'domcontentloaded' });
+  await run.page.waitForSelector('html.runtime-ready');
+  await run.page.waitForFunction(() => {
+    const stage = document.querySelector('.globe-stage');
+    const map = window.__commonworldTestMap;
+    return stage?.dataset.publicMapFeatures === '3'
+      && stage?.dataset.publicMapProjectIds === '2'
+      && Boolean(map?.getSource('commonworld-public-representations'));
+  });
+
+  const initial = await run.page.evaluate(() => {
+    const stage = document.querySelector('.globe-stage');
+    const map = window.__commonworldTestMap;
+    const style = map.getStyle();
+    return {
+      semanticLevel: stage.dataset.semanticLevel,
+      semanticText: document.querySelector('#semantic-summary')?.textContent ?? '',
+      featureIds: stage.dataset.publicMapFeatureIds?.split(',').filter(Boolean) ?? [],
+      locationIds: stage.dataset.publicMapLocationIds?.split(',').filter(Boolean) ?? [],
+      mapUpdateCount: Number(stage.dataset.publicMapUpdates ?? -1),
+      sourceType: style.sources?.['commonworld-public-representations']?.type ?? null,
+      layers: style.layers
+        .filter(({ id }) => id.startsWith('commonworld-'))
+        .map(({ id, type, minzoom, maxzoom }) => ({ id, type, minzoom, maxzoom })),
+      ringNames: [...document.querySelectorAll('.sphere-ring-name')].map((node) => node.textContent.trim()),
+    };
+  });
+  assert(initial.semanticLevel === 'planet', 'real hybrid: initial semantic level is not planet');
+  assert(initial.semanticText.includes('2 räumlich belegte Commons'), 'real hybrid: spatial summary is missing');
+  assert(JSON.stringify(initial.featureIds) === JSON.stringify([
+    'cltb-le-nid:cltb-le-nid-entrance',
+    'cltb-le-nid:cltb-le-nid-building',
+    'freifunk-hamburg:freifunk-hamburg-community-area',
+  ]), 'real hybrid: public map feature identities differ from reviewed data: ' + JSON.stringify(initial));
+  assert(!initial.locationIds.includes('freifunk-hamburg-private-routers'), 'real hybrid: hidden router location leaked into map diagnostics');
+  assert(initial.sourceType === 'geojson', 'real hybrid: MapLibre source is not a GeoJSON source: ' + JSON.stringify(initial));
+  assert(initial.layers.some(({ id, type, minzoom }) => id === 'commonworld-public-extents' && type === 'fill' && minzoom === 3.4), 'real hybrid: public extent layer missing');
+  assert(initial.layers.some(({ id, type, minzoom, maxzoom }) => id === 'commonworld-approximate-zones' && type === 'fill' && minzoom === 3.4 && maxzoom === undefined), 'real hybrid: approximate uncertainty zone must remain visible through local zoom');
+  assert(initial.layers.some(({ id, type, minzoom }) => id === 'commonworld-exact-anchors' && type === 'circle' && minzoom === 5.5), 'real hybrid: exact anchor layer missing');
+  assert(initial.ringNames.includes('Freifunk Hamburg'), 'real hybrid: hybrid identity missing from digital sphere');
+  assert(!initial.ringNames.includes('Le Nid'), 'real hybrid: geographic-only identity leaked into digital sphere');
+
+  await run.page.locator('#sphere-edge-control').focus();
+  await run.page.keyboard.press('Enter');
+  await run.page.waitForSelector('.globe-stage[data-view-phase="layers"]');
+  const digitalPrimaryIds = await run.page.locator('.digital-ribbon-item[data-ribbon-copy="0"]').evaluateAll((nodes) => nodes.map((node) => node.dataset.commonprojectId));
+  assert(digitalPrimaryIds.length === 11, 'real hybrid: digital lane identity count mismatch: ' + digitalPrimaryIds.length);
+  assert(digitalPrimaryIds.includes('freifunk-hamburg'), 'real hybrid: hybrid identity missing from digital lanes');
+  assert(!digitalPrimaryIds.includes('cltb-le-nid'), 'real hybrid: geographic-only identity leaked into digital lanes');
+  await run.page.locator('#layer-close').click();
+  await run.page.waitForSelector('.globe-stage[data-view-phase="overview"]');
+
+  await run.page.locator('#commons-search').fill('Le Nid');
+  await run.page.waitForFunction(() => document.querySelector('.globe-stage')?.dataset.publicMapFeatures === '2');
+  assert((await run.page.locator('.globe-stage').getAttribute('data-public-map-project-ids')) === '1', 'real hybrid: search did not reduce map identities');
+  assert((await run.page.locator('#globe-results').textContent())?.includes('1 Commons'), 'real hybrid: shared search count mismatch');
+  await run.page.locator('#commons-search').fill('');
+  await run.page.waitForFunction(() => document.querySelector('.globe-stage')?.dataset.publicMapFeatures === '3');
+
+  const activateMapIdentity = async ({ coordinates, zoom, layerId, expectedLevel }) => {
+    await run.page.evaluate(({ coordinates: target, zoom: targetZoom }) => {
+      window.__commonworldTestMap.jumpTo({ center: target, zoom: targetZoom, bearing: 0, pitch: 0 });
+    }, { coordinates, zoom });
+    await run.page.waitForFunction((level) => document.querySelector('.globe-stage')?.dataset.semanticLevel === level, expectedLevel);
+    await run.page.waitForFunction(({ target, layer }) => {
+      const map = window.__commonworldTestMap;
+      if (!map || map.isMoving() || !map.getLayer(layer)) return false;
+      return map.queryRenderedFeatures(map.project(target), { layers: [layer] }).length > 0;
+    }, { target: coordinates, layer: layerId });
+    const point = await run.page.evaluate((target) => {
+      const map = window.__commonworldTestMap;
+      const projected = map.project(target);
+      const rect = map.getCanvas().getBoundingClientRect();
+      return { x: rect.left + projected.x, y: rect.top + projected.y };
+    }, coordinates);
+    await run.page.mouse.click(point.x, point.y);
+    await run.page.waitForSelector('#project-focus:not([hidden])');
+  };
+
+  const updatesBeforeSelection = Number(await run.page.locator('.globe-stage').getAttribute('data-public-map-updates'));
+  await activateMapIdentity({
+    coordinates: [9.944545738399, 53.558314876911],
+    zoom: 4.6,
+    layerId: 'commonworld-approximate-zones',
+    expectedLevel: 'region',
+  });
+  assert((await run.page.locator('#focus-title').textContent()) === 'Freifunk Hamburg', 'real hybrid: approximate map click selected the wrong identity');
+  const updatesAfterSelection = Number(await run.page.locator('.globe-stage').getAttribute('data-public-map-updates'));
+  assert(updatesAfterSelection === updatesBeforeSelection, 'real hybrid: selecting a project resent unchanged GeoJSON to MapLibre');
+  assert((await run.page.locator('#focus-kind').textContent()) === 'Hybrid · Kommunikation und Netze', 'real hybrid: hybrid presentation label mismatch');
+  const hamburgLocations = (await run.page.locator('#focus-locations').textContent()) ?? '';
+  assert(hamburgLocations.includes('mindestens 5 km Unschärfe') && hamburgLocations.includes('Ort verborgen'), 'real hybrid: approximate and hidden location truth missing');
+  assert(((await run.page.locator('#focus-relations').textContent()) ?? '').includes('Teil von Freifunk'), 'real hybrid: evidenced parent relation missing');
+  assert((await run.page.locator('.globe-stage').getAttribute('data-semantic-level')) === 'focus', 'real hybrid: selected identity did not enter semantic focus');
+  await run.page.locator('#commons-search').fill('Le Nid');
+  await run.page.waitForFunction(() => document.querySelector('.globe-stage')?.dataset.publicMapFeatures === '2');
+  assert((await run.page.locator('#focus-title').textContent()) === 'Freifunk Hamburg', 'real hybrid: filtering replaced or cleared the selected identity');
+  assert((await run.page.locator('.globe-stage').getAttribute('data-semantic-level')) === 'focus', 'real hybrid: filtered selected identity lost semantic focus');
+  assert(((await run.page.locator('#semantic-summary').textContent()) ?? '').startsWith('Hybrid'), 'real hybrid: semantic line no longer describes the filtered selected identity');
+  await run.page.locator('#commons-search').fill('');
+  await run.page.waitForFunction(() => document.querySelector('.globe-stage')?.dataset.publicMapFeatures === '3');
+  await run.page.locator('#focus-close').click();
+  assert(await run.page.evaluate(() => document.activeElement === window.__commonworldTestMap?.getCanvas()), 'real hybrid: closing a map-selected focus did not restore focus to the map canvas');
+  await activateMapIdentity({
+    coordinates: [9.944545738399, 53.558314876911],
+    zoom: 6.2,
+    layerId: 'commonworld-approximate-zones',
+    expectedLevel: 'local',
+  });
+  assert((await run.page.locator('#focus-title').textContent()) === 'Freifunk Hamburg', 'real hybrid: local uncertainty-zone click lost the hybrid identity');
+  assert(((await run.page.locator('#focus-locations').textContent()) ?? '').includes('mindestens 5 km Unschärfe'), 'real hybrid: local uncertainty zone lost its minimum-radius truth');
+  await run.page.locator('#focus-close').click();
+  assert(await run.page.evaluate(() => document.activeElement === window.__commonworldTestMap?.getCanvas()), 'real hybrid: local uncertainty-zone focus did not restore map focus');
+
+  await activateMapIdentity({
+    coordinates: [4.3152961, 50.8452417],
+    zoom: 6.2,
+    layerId: 'commonworld-exact-anchors',
+    expectedLevel: 'local',
+  });
+  assert((await run.page.locator('#focus-title').textContent()) === 'Le Nid', 'real hybrid: exact map click selected the wrong identity');
+  assert((await run.page.locator('#focus-kind').textContent()) === 'Geografisch', 'real hybrid: geographic presentation label mismatch');
+  const leNidLocations = (await run.page.locator('#focus-locations').textContent()) ?? '';
+  assert(leNidLocations.includes('exakter öffentlicher Punkt') && leNidLocations.includes('öffentliche Fläche'), 'real hybrid: point and extent truth missing from focus');
+  const leNidCoordinates = [4.3152961, 50.8452417];
+  await run.page.evaluate((target) => {
+    window.__commonworldTestMap.jumpTo({ center: target, zoom: 18, bearing: 0, pitch: 0 });
+  }, leNidCoordinates);
+  await run.page.waitForFunction(() => {
+    const map = window.__commonworldTestMap;
+    if (!map || map.isMoving() || !map.getLayer('commonworld-public-extents')) return false;
+    const canvas = map.getCanvas();
+    const viewport = [[0, 0], [canvas.clientWidth, canvas.clientHeight]];
+    return map.queryRenderedFeatures(viewport, { layers: ['commonworld-public-extents'] })
+      .some(({ properties }) => properties?.project_id === 'cltb-le-nid');
+  });
+  const renderedExtent = await run.page.evaluate(() => {
+    const map = window.__commonworldTestMap;
+    const canvas = map.getCanvas();
+    const viewport = [[0, 0], [canvas.clientWidth, canvas.clientHeight]];
+    return map.queryRenderedFeatures(viewport, { layers: ['commonworld-public-extents'] })
+      .some(({ properties }) => properties?.project_id === 'cltb-le-nid');
+  });
+  assert(renderedExtent, 'real hybrid: reviewed Le Nid public extent is not rendered through MapLibre at building zoom');
+
+  await run.page.locator('#settings-toggle').click();
+  await run.page.getByRole('radio', { name: /Text/ }).click();
+  assert(await run.page.locator('#text-view').isVisible(), 'real hybrid: text surface did not open');
+  assert((await run.page.locator('body').getAttribute('data-presentation')) === 'text', 'real hybrid: presentation state did not become text');
+  assert(await run.page.locator('#project-cltb-le-nid[data-selected]').isVisible(), 'real hybrid: text surface lost the selected CommonProject identity');
+  assert(run.consoleErrors.length === 0, 'real hybrid: console errors: ' + run.consoleErrors.join(' | '));
+  assert(run.pageErrors.length === 0, 'real hybrid: page errors: ' + run.pageErrors.join(' | '));
+  results.push({ id: 'real-hybrid-commons', verdict: 'PASS', publicFeatures: 3, publicIdentities: 2, digitalIdentities: 11, unchangedMapUpdatesSkipped: true });
   await run.context.close();
 }
 
@@ -614,6 +775,7 @@ async function methodScenario() {
 
 try {
   await normalScenario();
+  await realHybridCommonsScenario();
   await layerJourneyScenario();
   await layerJourneyScenario({ mobile: true });
   await layerJourneyScenario({ viewportOverride: { width: 1024, height: 1366 }, touch: true, scenarioId: 'layer-journey-ipad-portrait' });

@@ -19,7 +19,9 @@ ROOT = Path(__file__).resolve().parents[1]
 URL_ENV = "COMMONWORLD_PAGES_URL"
 MIN_BODY_BYTES = 10_000
 CATALOG_RELATIVE_URL = "catalog/catalog.json"
-EXPECTED_CATALOG_ENTRY_COUNT = 10
+_EXPECTED_CATALOG = json.loads((ROOT / CATALOG_RELATIVE_URL).read_text(encoding="utf-8"))
+EXPECTED_CATALOG_PROJECT_FILES = tuple(_EXPECTED_CATALOG["project_files"])
+EXPECTED_CATALOG_ENTRY_COUNT = int(_EXPECTED_CATALOG["entry_count"])
 
 REQUIRED_TOKENS = (
     "<title>commonworld — Commons entdecken</title>",
@@ -66,28 +68,8 @@ FORBIDDEN_TOKENS = (
     "'unsafe-eval'",
 )
 
-EXPECTED_PUBLICATION = {
-    "public": True,
-    "source_policy": "official-sources-only",
-    "curation_state": "listed",
-    "engine_selected": True,
-    "production_architecture_authorized": True,
-    "selected_engine": "maplibre_gl_js",
-    "public_runtime_uses_selected_engine": True,
-    "production_delivery": "github_pages_static",
-    "basemap_provider_boundary": "openfreemap_public_best_effort_noncritical",
-}
-
-EXPECTED_MACHINE_SURFACE = {
-    "access": "static_read_only",
-    "manifest": "catalog/catalog.json",
-    "project_base": "catalog/projects/",
-    "project_schema": "contracts/commonworld/project.schema.json",
-    "identity_field": "CommonProject.id",
-    "api_runtime": False,
-    "write_path": False,
-    "standalone_cli": False,
-}
+EXPECTED_PUBLICATION = dict(_EXPECTED_CATALOG["publication"])
+EXPECTED_MACHINE_SURFACE = dict(_EXPECTED_CATALOG["machine_surface"])
 
 RUNTIME_ASSETS = (
     ("assets/vendor/maplibre-gl.js", 1_000_000, ("javascript", "text/plain", "application/octet-stream")),
@@ -226,6 +208,8 @@ def validate_catalog_fetch(fetch: LiveFetch) -> list[str]:
         errors.append("live catalog project_files must be sorted and unique")
     if catalog.get("entry_count") != EXPECTED_CATALOG_ENTRY_COUNT or len(files) != EXPECTED_CATALOG_ENTRY_COUNT:
         errors.append(f"live catalog must contain {EXPECTED_CATALOG_ENTRY_COUNT} entries")
+    if tuple(files) != EXPECTED_CATALOG_PROJECT_FILES:
+        errors.append("live catalog project_files do not match the checked-out canonical catalog")
     if catalog.get("publication") != EXPECTED_PUBLICATION:
         errors.append("live catalog publication boundary mismatch")
     if catalog.get("machine_surface") != EXPECTED_MACHINE_SURFACE:
