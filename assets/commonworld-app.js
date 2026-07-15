@@ -1100,7 +1100,7 @@ function bindPublicMapInteractions() {
     if (!layers.length) return;
     const feature = runtime.map.queryRenderedFeatures(event.point, { layers })[0];
     const identifier = feature?.properties?.project_id;
-    if (typeof identifier === 'string') selectProject(identifier, { trigger: elements.map });
+    if (typeof identifier === 'string') selectProject(identifier, { trigger: runtime.map.getCanvas() });
   });
   runtime.map.on('mousemove', (event) => {
     const layers = PUBLIC_MAP_LAYER_IDS.filter((identifier) => runtime.map.getLayer(identifier));

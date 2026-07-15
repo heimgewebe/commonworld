@@ -290,6 +290,11 @@ test('semantic zoom remains presentation logic from planet to focus', () => {
     crumbs: ['Erde', 'Region'],
     summary: '2 räumlich belegte Commons · öffentliche Flächen und ungefähre Orte',
   });
+  assert.deepEqual(semanticLocationLine({ zoom: 1.15, records: geographicHybridRecords, selectedProjectId: 'freifunk' }), {
+    level: 'focus',
+    crumbs: ['Erde', 'Commons', 'Freifunk'],
+    summary: 'Digital · Ortsunabhängige digitale Präsenz',
+  });
   assert.deepEqual(semanticLocationLine({ zoom: 1.15, records: geographicHybridRecords, selectedProjectId: 'freifunk-hamburg' }), {
     level: 'focus',
     crumbs: ['Erde', 'Commons', 'Freifunk Hamburg'],

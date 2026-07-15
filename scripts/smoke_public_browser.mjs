@@ -175,6 +175,7 @@ async function normalScenario() {
   await debianTrigger.click();
   assert(await run.page.locator('#project-focus').isVisible(), 'normal: project focus did not open');
   assert((await run.page.evaluate(() => document.activeElement?.id)) === 'project-focus', 'normal: project focus did not receive focus');
+  assert(((await run.page.locator('#semantic-summary').textContent()) ?? '') === 'Digital · Ortsunabhängige digitale Präsenz', 'normal: digital-only focus lost its location-independent truth');
   await run.page.locator('#commons-search').focus();
   assert((await run.page.evaluate(() => document.activeElement?.id)) === 'commons-search', 'normal: project focus incorrectly blocks background navigation');
   await run.page.keyboard.press('Escape');
@@ -579,6 +580,7 @@ async function realHybridCommonsScenario() {
   await run.page.locator('#commons-search').fill('');
   await run.page.waitForFunction(() => document.querySelector('.globe-stage')?.dataset.publicMapFeatures === '3');
   await run.page.locator('#focus-close').click();
+  assert(await run.page.evaluate(() => document.activeElement === window.__commonworldTestMap?.getCanvas()), 'real hybrid: closing a map-selected focus did not restore focus to the map canvas');
 
   await activateMapIdentity({
     coordinates: [4.3152961, 50.8452417],

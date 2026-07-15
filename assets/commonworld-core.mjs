@@ -255,6 +255,7 @@ function spatialIdentityCount(records) {
 
 function focusSpatialSummary(record) {
   const locations = Array.isArray(record?.presence?.geographic) ? record.presence.geographic : [];
+  if (record?.kind === 'digital' && locations.length === 0) return 'Digital · Ortsunabhängige digitale Präsenz';
   const visible = locations.filter((location) => location?.mode !== 'hidden' && location?.geometry).length;
   const hidden = locations.filter((location) => location?.mode === 'hidden').length;
   const kind = record?.kind === 'hybrid' ? 'Hybrid' : record?.kind === 'geographic' ? 'Geografisch' : 'Digital';
