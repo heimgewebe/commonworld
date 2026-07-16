@@ -548,6 +548,10 @@ async function layerJourneyScenario({ mobile = false, viewportOverride = null, t
   assert(innermostLayerDiameter > globeDiameter, `layer journey: digital shell intersects globe (${innermostLayerDiameter} <= ${globeDiameter})`);
   const edgeX = sphereBox.x + sphereBox.width * 0.85134;
   const edgeY = sphereBox.y + sphereBox.height * 0.14866;
+  const overviewUrlCamera = Object.fromEntries(
+    ['lng', 'lat', 'z', 'b', 'p'].map((key) => [key, new URL(run.page.url()).searchParams.get(key)]),
+  );
+  assert(['lng', 'lat', 'z'].every((key) => overviewUrlCamera[key] !== null), 'layer journey: overview URL lacks required camera parameters ' + JSON.stringify(overviewUrlCamera));
   await run.page.evaluate(() => {
     const stageNode = document.querySelector('.globe-stage');
     const panelNode = document.querySelector('#layer-panel');
@@ -746,6 +750,10 @@ async function layerJourneyScenario({ mobile = false, viewportOverride = null, t
   });
   await run.page.locator('#layer-close').click();
   await run.page.waitForSelector('.globe-stage[data-view-phase="preparing-overview"]');
+  const preparingOverviewUrlCamera = Object.fromEntries(
+    ['lng', 'lat', 'z', 'b', 'p'].map((key) => [key, new URL(run.page.url()).searchParams.get(key)]),
+  );
+  assert(JSON.stringify(preparingOverviewUrlCamera) === JSON.stringify(overviewUrlCamera), 'layer journey: return preparation serialized the side camera instead of preserving the overview camera ' + JSON.stringify({ overviewUrlCamera, preparingOverviewUrlCamera }));
   assert((await stage.getAttribute('data-globe-geometry-source')) === 'side-view-layout', 'layer journey: return preparation left side layout too early');
   assert(await run.page.locator('#layer-panel').isHidden(), 'layer journey: description panel did not close before return preparation');
   await run.page.waitForSelector('.globe-stage[data-view-phase="leaving-layers"]');
