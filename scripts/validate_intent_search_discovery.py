@@ -286,7 +286,7 @@ def validate_intent_search_discovery(root: Path = ROOT) -> list[str]:
             errors.append(f"T007 research evidence hash mismatch: {relative}")
     if verification.get("catalog_projects_sha256") != catalog_digest(root):
         errors.append("T007 catalog evidence hash mismatch")
-    if verification.get("browser", {}).get("receipt_sha256") != "9d05ae9ec7a3467c4d22b46b6d5cda682d7b7459442f9521d2f2473d9345bf1e":
+    if verification.get("browser", {}).get("receipt_sha256") != "60920e36bf0f017acfab642501675cf7721aeba7f2c35ad5bf8c822fb6e85fe1":
         errors.append("T007 browser receipt binding mismatch")
     if result.get("does_not_establish") != NONCLAIMS:
         errors.append("T007 research nonclaims mismatch")

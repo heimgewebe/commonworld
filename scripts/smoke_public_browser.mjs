@@ -775,6 +775,7 @@ async function intentSearchDiscoveryScenario() {
   await run.page.keyboard.press('Home');
   assert((await run.page.evaluate(() => document.activeElement?.closest('.discovery-result')?.dataset.commonprojectId)) === 'debian', 'intent search: Home did not return to the first result');
 
+  await run.page.waitForFunction(() => Boolean(window.__commonworldTestMap) && !window.__commonworldTestMap.isMoving());
   const queryCamera = await mapCamera();
   await run.page.locator('#commons-search').fill('Anderlecht');
   await run.page.waitForFunction(() => document.querySelectorAll('.discovery-result').length === 1);
@@ -791,6 +792,7 @@ async function intentSearchDiscoveryScenario() {
 
   await run.page.locator('#commons-search').fill('');
   await run.page.waitForTimeout(220);
+  await run.page.waitForFunction(() => Boolean(window.__commonworldTestMap) && !window.__commonworldTestMap.isMoving());
   const filterCamera = await mapCamera();
   await run.page.locator('#filter-presence').selectOption('hybrid');
   await run.page.waitForFunction(() => document.querySelectorAll('.discovery-result').length === 1);
