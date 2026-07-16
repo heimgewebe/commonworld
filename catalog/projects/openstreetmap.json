@@ -62,6 +62,38 @@
       "type": "source",
       "label": "About OpenStreetMap",
       "url": "https://www.openstreetmap.org/about"
+    },
+    {
+      "type": "use",
+      "label": "OpenStreetMap öffnen",
+      "url": "https://www.openstreetmap.org/",
+      "source_ids": [
+        "openstreetmap-about"
+      ]
+    },
+    {
+      "type": "learn",
+      "label": "OpenStreetMap lernen",
+      "url": "https://learnosm.org/en/",
+      "source_ids": [
+        "openstreetmap-about"
+      ]
+    },
+    {
+      "type": "contribute",
+      "label": "OpenStreetMap verbessern",
+      "url": "https://www.openstreetmap.org/fixthemap",
+      "source_ids": [
+        "openstreetmap-about"
+      ]
+    },
+    {
+      "type": "donate",
+      "label": "OpenStreetMap unterstützen",
+      "url": "https://supporting.openstreetmap.org/",
+      "source_ids": [
+        "openstreetmap-about"
+      ]
     }
   ],
   "handoff": {

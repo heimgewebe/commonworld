@@ -16,6 +16,7 @@ import {
   mapFailurePolicy,
   projectedGlobeCircle,
   publicMapFeatureCollection,
+  publicProjectNavigationTarget,
   evidencedRelations,
   geodesicDistanceMeters,
   prepareCatalogProjection,
@@ -80,27 +81,35 @@ test('sphere detail levels remain stable for overview and close-up rendering', (
   assert(LAYERS.every(({ trackLabel }) => typeof trackLabel === 'string' && trackLabel.length > 0));
 });
 
-test('deep-link state accepts surface, search, identity and clamped camera', () => {
-  const state = stateFromSearch('?surface=text&q=open%20data&project=debian&view=layers&layer=software_infrastructure&lng=999&lat=-999&z=99&p=99', ['debian']);
+test('deep-link state accepts surface, search, identity, filters and clamped camera', () => {
+  const state = stateFromSearch('?surface=text&q=open%20data&project=debian&view=layers&layer=software_infrastructure&presence=digital&action=contribute&language=de&access=public&freshness=current&curation=listed&lng=999&lat=-999&z=99&p=99', ['debian']);
   assert.equal(state.project, 'debian');
   assert.equal(state.view, 'layers');
   assert.equal(state.surface, 'text');
   assert.equal(state.query, 'open data');
   assert.equal(state.layer, 'software_infrastructure');
+  assert.deepEqual(
+    { presence: state.presence, action: state.action, language: state.language, access: state.access, freshness: state.freshness, curation: state.curation },
+    { presence: 'digital', action: 'contribute', language: 'de', access: 'public', freshness: 'current', curation: 'listed' },
+  );
   assert.equal(MAX_MAP_ZOOM, 18);
   assert.deepEqual(state.camera, { lng: 180, lat: -85, zoom: MAX_MAP_ZOOM, bearing: 0, pitch: 70 });
 });
 
-test('unknown identities and malformed numbers fail closed', () => {
-  const state = stateFromSearch('?project=unknown&layer=unknown&lng=nope', ['debian']);
+test('unknown identities, filters and malformed numbers fail closed', () => {
+  const state = stateFromSearch('?project=unknown&layer=unknown&presence=space&action=hack&language=../../private&access=secret&freshness=future&curation=hidden&lng=nope', ['debian']);
   assert.equal(state.project, null);
   assert.equal(state.layer, null);
   assert.equal(state.surface, 'globe');
+  assert.deepEqual(
+    { presence: state.presence, action: state.action, language: state.language, access: state.access, freshness: state.freshness, curation: state.curation },
+    { presence: null, action: null, language: null, access: null, freshness: null, curation: null },
+  );
   assert.equal(state.camera.lng, DEFAULT_CAMERA.lng);
   assert.deepEqual(cameraFromSearch(''), DEFAULT_CAMERA);
 });
 
-test('serialized state roundtrips selection, view, surface and query', () => {
+test('serialized state roundtrips selection, view, surface, query and filters', () => {
   const search = searchFromState({
     camera: { lng: 13.4049, lat: 52.52, zoom: 3.456, bearing: 4.2, pitch: 25 },
     project: 'debian',
@@ -108,6 +117,12 @@ test('serialized state roundtrips selection, view, surface and query', () => {
     view: 'layers',
     surface: 'text',
     query: 'freie Software',
+    presence: 'digital',
+    action: 'learn',
+    language: 'unknown',
+    access: 'unknown',
+    freshness: 'stale',
+    curation: 'verified',
   });
   const state = stateFromSearch(search, ['debian']);
   assert.equal(state.project, 'debian');
@@ -115,6 +130,10 @@ test('serialized state roundtrips selection, view, surface and query', () => {
   assert.equal(state.view, 'layers');
   assert.equal(state.surface, 'text');
   assert.equal(state.query, 'freie Software');
+  assert.deepEqual(
+    { presence: state.presence, action: state.action, language: state.language, access: state.access, freshness: state.freshness, curation: state.curation },
+    { presence: 'digital', action: 'learn', language: 'unknown', access: 'unknown', freshness: 'stale', curation: 'verified' },
+  );
   assert.equal(state.camera.zoom, 3.46);
 });
 
@@ -255,6 +274,21 @@ test('public map derivation preserves CommonProject identity and excludes hidden
     const distance = geodesicDistanceMeters(center, coordinate);
     assert(Math.abs(distance - 5000) <= 1, 'uncertainty zone radius drifted: ' + distance);
   }
+});
+
+test('public project navigation targets use only published geometry and keep digital Commons coordinate-free', () => {
+  const collection = publicMapFeatureCollection(geographicHybridRecords);
+  const leNid = publicProjectNavigationTarget(collection, 'cltb-le-nid');
+  assert.equal(leNid.kind, 'bounds');
+  assert.deepEqual(leNid.bounds, [[4.31, 50.84], [4.32, 50.85]]);
+  const hamburg = publicProjectNavigationTarget(collection, 'freifunk-hamburg');
+  assert.equal(hamburg.kind, 'bounds');
+  assert(hamburg.bounds[0][0] < 9.9445);
+  assert(hamburg.bounds[1][0] > 9.9445);
+  assert.equal(publicProjectNavigationTarget(collection, 'freifunk'), null);
+  assert.equal(publicProjectNavigationTarget(collection, 'private-routers'), null);
+  assert(Object.isFrozen(leNid));
+  assert(Object.isFrozen(leNid.bounds));
 });
 
 test('map filtering uses the same visible identity set without multiplying hybrid identities', () => {

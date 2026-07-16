@@ -97,6 +97,24 @@ export function normalizeQuery(value) {
   return String(value ?? '').trim().replace(/\s+/g, ' ').slice(0, 120);
 }
 
+export const INTENT_FILTER_VALUES = Object.freeze({
+  presence: Object.freeze(['geographic', 'digital', 'hybrid']),
+  action: Object.freeze(['visit', 'use', 'borrow', 'learn', 'contribute', 'volunteer', 'donate', 'contact', 'replicate']),
+  access: Object.freeze(['public', 'membership', 'restricted', 'unknown']),
+  freshness: Object.freeze(['current', 'stale', 'unknown']),
+  curation: Object.freeze(['listed', 'verified', 'featured', 'unknown']),
+});
+
+const filterParameter = (parameters, name) => {
+  const value = parameters.get(name);
+  return INTENT_FILTER_VALUES[name]?.includes(value) ? value : null;
+};
+
+const languageFilterParameter = (parameters) => {
+  const value = parameters.get('language');
+  return value === 'unknown' || /^[a-z]{2,3}(?:-[A-Z]{2})?$/.test(value ?? '') ? value : null;
+};
+
 export function stateFromSearch(search = '', knownProjectIds = []) {
   const parameters = new URLSearchParams(search.startsWith('?') ? search.slice(1) : search);
   const known = new Set(knownProjectIds);
@@ -109,6 +127,12 @@ export function stateFromSearch(search = '', knownProjectIds = []) {
     view: parameters.get('view') === 'layers' ? 'layers' : 'globe',
     surface: parameters.get('surface') === 'text' ? 'text' : 'globe',
     query: normalizeQuery(parameters.get('q')),
+    presence: filterParameter(parameters, 'presence'),
+    action: filterParameter(parameters, 'action'),
+    language: languageFilterParameter(parameters),
+    access: filterParameter(parameters, 'access'),
+    freshness: filterParameter(parameters, 'freshness'),
+    curation: filterParameter(parameters, 'curation'),
   };
 }
 
@@ -128,19 +152,299 @@ export function searchFromState(state) {
   if (state?.project) parameters.set('project', state.project);
   const query = normalizeQuery(state?.query);
   if (query) parameters.set('q', query);
-  return `?${parameters.toString()}`;
+  for (const name of ['presence', 'action', 'access', 'freshness', 'curation']) {
+    const value = state?.[name];
+    if (INTENT_FILTER_VALUES[name].includes(value)) parameters.set(name, value);
+  }
+  const language = state?.language;
+  if (language === 'unknown' || /^[a-z]{2,3}(?:-[A-Z]{2})?$/.test(language ?? '')) {
+    parameters.set('language', language);
+  }
+  return '?' + parameters.toString();
+}
+
+export const INTENT_SEARCH_RESULT_LIMIT = 50;
+export const INTENT_SEARCH_CACHE_LIMIT = 128;
+
+const ACTION_INTENT_TERMS = Object.freeze({
+  use: Object.freeze(['nutzen', 'verwenden', 'ausprobieren']),
+  learn: Object.freeze(['lernen', 'wissen', 'bildung', 'informieren']),
+  contribute: Object.freeze(['mitmachen', 'beitragen', 'beteiligen']),
+  volunteer: Object.freeze(['ehrenamt', 'ehrenamtlich', 'helfen']),
+  donate: Object.freeze(['spenden', 'unterstützen']),
+  visit: Object.freeze(['besuchen', 'vor ort']),
+  contact: Object.freeze(['kontakt', 'kontaktieren']),
+  replicate: Object.freeze(['nachmachen', 'übertragen', 'gründen']),
+  borrow: Object.freeze(['ausleihen', 'leihen']),
+});
+
+const THEME_INTENT_TERMS = Object.freeze({
+  knowledge: Object.freeze(['wissen']),
+  'open-data': Object.freeze(['offene daten', 'freie daten']),
+  research: Object.freeze(['forschung']),
+  documentation: Object.freeze(['dokumentation']),
+  'free-software': Object.freeze(['freie software']),
+  'open-source': Object.freeze(['open source', 'quelloffen']),
+  infrastructure: Object.freeze(['infrastruktur']),
+  platform: Object.freeze(['plattform']),
+  'open-media': Object.freeze(['offene medien', 'freie medien']),
+  culture: Object.freeze(['kultur']),
+  archives: Object.freeze(['archive', 'archiv']),
+  'creative-commons': Object.freeze(['creative commons', 'freie inhalte']),
+  education: Object.freeze(['bildung']),
+  'open-educational-resources': Object.freeze(['freie bildungsmaterialien', 'offene lernmaterialien']),
+  learning: Object.freeze(['lernen']),
+  communication: Object.freeze(['kommunikation']),
+  'community-network': Object.freeze(['gemeinschaftsnetz', 'community netz']),
+  federation: Object.freeze(['föderation', 'föderiert']),
+  protocol: Object.freeze(['protokoll']),
+  housing: Object.freeze(['wohnen', 'wohnraum']),
+  'community-land': Object.freeze(['gemeinschaftsland', 'gemeinschaftlicher boden']),
+  'shared-space': Object.freeze(['gemeinschaftsraum', 'gemeinsamer raum']),
+});
+
+const KIND_INTENT_TERMS = Object.freeze({
+  digital: Object.freeze(['digital', 'online', 'ortsunabhängig']),
+  geographic: Object.freeze(['geografisch', 'vor ort', 'lokal']),
+  hybrid: Object.freeze(['hybrid', 'online und vor ort', 'beides']),
+});
+
+const FIELD_WEIGHTS = Object.freeze({
+  title: 120,
+  location: 100,
+  action: 85,
+  kind: 70,
+  theme: 65,
+  digital: 55,
+  summary: 45,
+  link: 35,
+});
+
+export function normalizeSearchText(value) {
+  return String(value ?? '')
+    .toLocaleLowerCase('de')
+    .replace(/ß/g, 'ss')
+    .normalize('NFKD')
+    .replace(/\p{M}+/gu, '')
+    .replace(/&/g, ' und ')
+    .replace(/[^\p{L}\p{N}]+/gu, ' ')
+    .trim()
+    .replace(/\s+/g, ' ');
+}
+
+export function searchTokens(value) {
+  const normalized = normalizeSearchText(value);
+  return normalized ? normalized.split(' ') : [];
+}
+
+function publicGeographicLocations(record) {
+  return (record?.presence?.geographic ?? []).filter((location) => location?.mode !== 'hidden');
+}
+
+function vocabularyValues(value, vocabulary) {
+  return [value, ...(vocabulary[value] ?? [])];
+}
+
+function recordSearchFields(record) {
+  const fields = [];
+  const append = (field, reason, values) => {
+    const clean = values.flat().filter((value) => typeof value === 'string' && value.trim());
+    if (clean.length) fields.push({ field, reason, values: clean });
+  };
+  append('title', 'Name', [record?.title]);
+  append('summary', 'Beschreibung', [record?.summary]);
+  append('theme', 'Thema', (record?.themes ?? []).flatMap((theme) => vocabularyValues(theme, THEME_INTENT_TERMS)));
+  append('action', 'Möglichkeit', (record?.actions ?? []).flatMap((action) => vocabularyValues(action, ACTION_INTENT_TERMS)));
+  append('kind', 'Präsenz', vocabularyValues(record?.kind, KIND_INTENT_TERMS));
+  append('location', 'Ort', publicGeographicLocations(record).map(({ label }) => label));
+  append('digital', 'Digitale Präsenz', [record?.presence?.digital?.label, record?.presence?.digital?.reach]);
+  append('link', 'Offizieller Link', (record?.links ?? []).map(({ label, type }) => [label, type]));
+  return fields;
+}
+
+function recordLanguageValues(record) {
+  if (Array.isArray(record?.languages)) return record.languages.filter((value) => typeof value === 'string');
+  return Array.isArray(record?.languages?.codes) ? record.languages.codes.filter((value) => typeof value === 'string') : [];
+}
+
+function recordAccessValue(record) {
+  if (typeof record?.access === 'string') return record.access;
+  return typeof record?.access?.type === 'string' ? record.access.type : null;
+}
+
+function recordFreshness(record, today) {
+  const nextReview = record?.curation?.next_review_at;
+  const activity = record?.activity?.status;
+  if (typeof nextReview !== 'string' || typeof activity !== 'string') return 'unknown';
+  if (nextReview < today || !['active', 'seasonal'].includes(activity)) return 'stale';
+  return 'current';
+}
+
+export function recordMatchesIntentFilters(record, filters = {}, today = new Date().toISOString().slice(0, 10)) {
+  if (filters.layer && (record?.presence?.digital?.available !== true || deriveLayer(record) !== filters.layer)) return false;
+  if (filters.presence === 'geographic' && publicGeographicLocations(record).length === 0) return false;
+  if (filters.presence === 'digital' && record?.presence?.digital?.available !== true) return false;
+  if (filters.presence === 'hybrid' && !(publicGeographicLocations(record).length > 0 && record?.presence?.digital?.available === true)) return false;
+  if (filters.action && !(record?.actions ?? []).includes(filters.action)) return false;
+  if (filters.language) {
+    const languages = recordLanguageValues(record);
+    if (filters.language === 'unknown' ? languages.length !== 0 : !languages.includes(filters.language)) return false;
+  }
+  if (filters.access) {
+    const access = recordAccessValue(record);
+    if (filters.access === 'unknown' ? access !== null : access !== filters.access) return false;
+  }
+  if (filters.freshness && recordFreshness(record, today) !== filters.freshness) return false;
+  if (filters.curation && record?.curation?.state !== filters.curation) return false;
+  return true;
+}
+
+function lowerBound(values, target) {
+  let low = 0;
+  let high = values.length;
+  while (low < high) {
+    const middle = Math.floor((low + high) / 2);
+    if (values[middle] < target) low = middle + 1;
+    else high = middle;
+  }
+  return low;
+}
+
+function freezeSearchResult(result) {
+  return Object.freeze({
+    ...result,
+    reasons: Object.freeze([...result.reasons]),
+  });
+}
+
+export function prepareIntentSearchIndex(records, { cacheLimit = INTENT_SEARCH_CACHE_LIMIT } = {}) {
+  const sourceRecords = Array.isArray(records) ? records : [];
+  const recordsById = new Map(sourceRecords.map((record) => [record.id, record]));
+  const postings = new Map();
+  const normalizedTitles = new Map();
+  const boundedCacheLimit = Math.max(1, Number.isInteger(cacheLimit) ? cacheLimit : INTENT_SEARCH_CACHE_LIMIT);
+  const cache = new Map();
+
+  for (const record of sourceRecords) {
+    normalizedTitles.set(record.id, normalizeSearchText(record.title));
+    for (const { field, reason, values } of recordSearchFields(record)) {
+      const weight = FIELD_WEIGHTS[field] ?? 1;
+      const uniqueTokens = new Set(values.flatMap(searchTokens));
+      for (const token of uniqueTokens) {
+        let byProject = postings.get(token);
+        if (!byProject) {
+          byProject = new Map();
+          postings.set(token, byProject);
+        }
+        const previous = byProject.get(record.id);
+        if (!previous || previous.score < weight) byProject.set(record.id, Object.freeze({ score: weight, reason }));
+      }
+    }
+  }
+
+  const sortedTerms = Object.freeze([...postings.keys()].sort());
+
+  const postingsForToken = (token) => {
+    const exact = postings.get(token);
+    if (exact) return exact;
+    if (token.length < 2) return null;
+    const combined = new Map();
+    for (let index = lowerBound(sortedTerms, token); index < sortedTerms.length; index += 1) {
+      const term = sortedTerms[index];
+      if (!term.startsWith(token)) break;
+      for (const [identifier, match] of postings.get(term)) {
+        const previous = combined.get(identifier);
+        if (!previous || previous.score < match.score) combined.set(identifier, match);
+      }
+    }
+    return combined.size ? combined : null;
+  };
+
+  const search = ({ query = '', filters = {}, limit = INTENT_SEARCH_RESULT_LIMIT, today = new Date().toISOString().slice(0, 10) } = {}) => {
+    const normalizedQuery = normalizeSearchText(query);
+    const boundedLimit = Math.max(1, Math.min(200, Number.isInteger(limit) ? limit : INTENT_SEARCH_RESULT_LIMIT));
+    const cacheKey = JSON.stringify([normalizedQuery, filters, boundedLimit, today]);
+    if (cache.has(cacheKey)) return cache.get(cacheKey);
+
+    const queryGroups = [];
+    for (const token of [...new Set(searchTokens(normalizedQuery))]) {
+      const group = postingsForToken(token);
+      if (group) queryGroups.push(group);
+    }
+
+    let candidates = null;
+    if (normalizedQuery && queryGroups.length === 0) candidates = new Map();
+    else if (queryGroups.length) {
+      candidates = new Map([...queryGroups[0]].map(([identifier, match]) => [identifier, { score: match.score, reasons: new Set([match.reason]) }]));
+      for (const group of queryGroups.slice(1)) {
+        for (const [identifier, candidate] of candidates) {
+          const match = group.get(identifier);
+          if (!match) candidates.delete(identifier);
+          else {
+            candidate.score += match.score;
+            candidate.reasons.add(match.reason);
+          }
+        }
+      }
+    }
+
+    const selectedRecords = candidates === null
+      ? sourceRecords.map((record) => ({ record, score: 0, reasons: new Set() }))
+      : [...candidates].map(([identifier, candidate]) => ({ record: recordsById.get(identifier), ...candidate }));
+
+    const results = selectedRecords
+      .filter(({ record }) => record && recordMatchesIntentFilters(record, filters, today))
+      .map(({ record, score, reasons }) => {
+        const title = normalizedTitles.get(record.id) ?? '';
+        const phraseBonus = normalizedQuery && title === normalizedQuery ? 300 : (normalizedQuery && title.startsWith(normalizedQuery) ? 160 : 0);
+        return freezeSearchResult({ id: record.id, record, score: score + phraseBonus, reasons: [...reasons] });
+      })
+      .sort((left, right) => right.score - left.score || left.record.title.localeCompare(right.record.title, 'de') || left.id.localeCompare(right.id))
+      .slice(0, boundedLimit);
+
+    const frozen = Object.freeze(results);
+    cache.set(cacheKey, frozen);
+    if (cache.size > boundedCacheLimit) cache.delete(cache.keys().next().value);
+    return frozen;
+  };
+
+  return Object.freeze({
+    indexedRecordCount: sourceRecords.length,
+    indexedTermCount: postings.size,
+    cacheLimit: boundedCacheLimit,
+    recordsById,
+    search,
+    matchingRecords(options = {}) {
+      return Object.freeze(search(options).map(({ record }) => record));
+    },
+    cacheSize() {
+      return cache.size;
+    },
+  });
 }
 
 export function filterRecords(records, state = {}) {
-  const query = normalizeQuery(state.query).toLocaleLowerCase('de');
+  if (state.searchIndex?.matchingRecords) {
+    return state.searchIndex.matchingRecords({
+      query: state.query,
+      filters: {
+        layer: state.layer ?? null,
+        presence: state.presence ?? null,
+        action: state.action ?? null,
+        language: state.language ?? null,
+        access: state.access ?? null,
+        freshness: state.freshness ?? null,
+        curation: state.curation ?? null,
+      },
+      limit: Math.max(INTENT_SEARCH_RESULT_LIMIT, state.limit ?? INTENT_SEARCH_RESULT_LIMIT),
+      today: state.today,
+    });
+  }
+  const query = normalizeSearchText(normalizeQuery(state.query));
   return (Array.isArray(records) ? records : []).filter((record) => {
-    if (state.layer && (record?.presence?.digital?.available !== true || deriveLayer(record) !== state.layer)) return false;
+    if (!recordMatchesIntentFilters(record, state, state.today)) return false;
     if (!query) return true;
-    const searchable = [record?.title, record?.summary, ...(record?.themes ?? []), ...(record?.actions ?? [])]
-      .filter(Boolean)
-      .join(' ')
-      .toLocaleLowerCase('de');
-    return searchable.includes(query);
+    return recordSearchFields(record).some(({ values }) => normalizeSearchText(values.join(' ')).includes(query));
   });
 }
 
@@ -343,6 +647,44 @@ export function prepareCatalogProjection(records) {
 
 export function publicMapFeatureCollection(records, visibleProjectIds = null) {
   return prepareCatalogProjection(records).publicMapFeatureCollection(visibleProjectIds);
+}
+
+export function publicProjectNavigationTarget(publicMapData, projectId) {
+  const features = Array.isArray(publicMapData?.features) ? publicMapData.features : [];
+  const coordinates = [];
+  const collect = (value) => {
+    if (!Array.isArray(value)) return;
+    if (value.length >= 2 && Number.isFinite(Number(value[0])) && Number.isFinite(Number(value[1]))) {
+      coordinates.push([Number(value[0]), Number(value[1])]);
+      return;
+    }
+    for (const nested of value) collect(nested);
+  };
+  for (const feature of features) {
+    if (feature?.properties?.project_id !== projectId) continue;
+    collect(feature?.geometry?.coordinates);
+  }
+  if (coordinates.length === 0) return null;
+  let west = coordinates[0][0];
+  let east = coordinates[0][0];
+  let south = coordinates[0][1];
+  let north = coordinates[0][1];
+  for (const [longitude, latitude] of coordinates.slice(1)) {
+    west = Math.min(west, longitude);
+    east = Math.max(east, longitude);
+    south = Math.min(south, latitude);
+    north = Math.max(north, latitude);
+  }
+  if (west === east && south === north) {
+    return Object.freeze({ kind: 'point', center: Object.freeze([west, south]), zoom: 15 });
+  }
+  return Object.freeze({
+    kind: 'bounds',
+    bounds: Object.freeze([
+      Object.freeze([west, south]),
+      Object.freeze([east, north]),
+    ]),
+  });
 }
 
 export function evidencedRelations(records) {

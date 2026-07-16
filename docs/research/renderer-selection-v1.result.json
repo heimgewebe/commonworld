@@ -35,7 +35,7 @@
     },
     {
       "path": "contracts/commonworld/project.schema.json",
-      "sha256": "e768e6293320b0ea374cf5193a3e3941f893fb12a71eb7d0df911788954d48d1"
+      "sha256": "9cacef6c1c2fbcbe50f3e04d74a71712a2fbf0e9c8c8358d4d0675dfb1d7eff5"
     },
     {
       "path": "contracts/commonworld/renderer-selection.contract.json",

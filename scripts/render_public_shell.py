@@ -9,6 +9,8 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
 
+ACTION_LINK_TYPES = {"visit", "use", "borrow", "learn", "contribute", "volunteer", "donate", "contact", "replicate"}
+
 LAYER_LABELS = {
     "knowledge_data": "Wissen und offene Daten",
     "software_infrastructure": "Freie Software und Infrastruktur",
@@ -93,6 +95,17 @@ def render_cards(records: list[dict], *, interactive: bool = True) -> str:
         label = html.escape(presentation_label(record))
         place = html.escape(location_summary(record))
         url = html.escape(homepage(record), quote=True)
+        action_links = "\n".join(
+            '              <a class="catalog-action-link" data-action-type="{}" href="{}" rel="external noreferrer">{} <span aria-hidden="true">↗</span></a>'.format(
+                html.escape(link["type"], quote=True),
+                html.escape(link["url"], quote=True),
+                html.escape(link["label"]),
+            )
+            for link in record.get("links", [])
+            if link.get("type") in ACTION_LINK_TYPES and link.get("type") in record.get("actions", [])
+        )
+        if action_links:
+            action_links += "\n"
         action = (
             f'              <button class="catalog-select" type="button" '
             f'data-commonproject-id="{identifier}" aria-pressed="false">Öffnen</button>\n'
@@ -106,7 +119,7 @@ def render_cards(records: list[dict], *, interactive: bool = True) -> str:
             <p>{summary}</p>
             <p class="catalog-location">{place}</p>
             <div class="catalog-actions">
-{action}              <a href="{url}" rel="external noreferrer">Offizielle Seite <span aria-hidden="true">↗</span></a>
+{action}{action_links}              <a href="{url}" rel="external noreferrer">Offizielle Seite <span aria-hidden="true">↗</span></a>
               <a href="./catalog/projects/{identifier}.json" type="application/json">JSON</a>
             </div>
           </article>'''
@@ -154,14 +167,38 @@ def render_shell(root: Path = ROOT) -> str:
           <span class="brand-mark" aria-hidden="true"></span>
           <span>commonworld</span>
         </a>
-        <div class="search-control" role="search">
-          <label class="visually-hidden" for="commons-search">Commons suchen</label>
-          <span class="search-symbol" aria-hidden="true">⌕</span>
-          <input id="commons-search" type="search" inputmode="search" autocomplete="off" placeholder="Commons suchen" />
-          <button id="search-clear" class="search-clear" type="button" aria-label="Suche leeren" hidden>×</button>
+        <div class="discovery-control">
+          <div class="search-control" role="search">
+            <label class="visually-hidden" for="commons-search">Commons suchen</label>
+            <span class="search-symbol" aria-hidden="true">⌕</span>
+            <input id="commons-search" type="search" inputmode="search" autocomplete="off" placeholder="Was möchtest du tun oder finden?" aria-controls="discovery-list" aria-expanded="false" />
+            <button id="search-clear" class="search-clear" type="button" aria-label="Suche leeren" hidden>×</button>
+          </div>
+          <button id="filter-toggle" class="icon-button filter-toggle" type="button" aria-label="Suchergebnisse und Filter öffnen" aria-controls="discovery-panel" aria-expanded="false"><span aria-hidden="true">≡</span><span class="filter-toggle-label">Filter</span></button>
         </div>
         <button id="settings-toggle" class="icon-button settings-toggle" type="button" aria-label="Einstellungen öffnen" aria-controls="settings-panel" aria-expanded="false"><span aria-hidden="true">⚙</span></button>
       </header>
+
+      <section id="discovery-panel" class="discovery-panel" aria-labelledby="discovery-title" hidden>
+        <div class="discovery-heading">
+          <div><p class="kicker">Entdecken</p><h2 id="discovery-title">Passende Commons</h2></div>
+          <button id="discovery-close" class="icon-button" type="button" aria-label="Suchergebnisse schließen">×</button>
+        </div>
+        <div class="intent-filter-grid" aria-label="Commons filtern">
+          <label><span>Präsenz</span><select id="filter-presence" data-intent-filter="presence"><option value="">Alle Formen</option><option value="geographic">Vor Ort</option><option value="digital">Digital</option><option value="hybrid">Hybrid</option></select></label>
+          <label><span>Aktion</span><select id="filter-action" data-intent-filter="action"><option value="">Alle Aktionen</option><option value="use">Nutzen</option><option value="borrow">Ausleihen</option><option value="learn">Lernen</option><option value="contribute">Mitmachen</option><option value="volunteer">Ehrenamtlich helfen</option><option value="donate">Spenden</option><option value="visit">Besuchen</option><option value="contact">Kontaktieren</option><option value="replicate">Übertragen</option></select></label>
+          <label><span>Sprache</span><select id="filter-language" data-intent-filter="language"><option value="">Alle Angaben</option><option value="de">Deutsch</option><option value="unknown">Nicht angegeben</option></select></label>
+          <label><span>Zugang</span><select id="filter-access" data-intent-filter="access"><option value="">Alle Zugänge</option><option value="public">Öffentlich</option><option value="membership">Mitgliedschaft</option><option value="restricted">Beschränkt</option><option value="unknown">Nicht angegeben</option></select></label>
+          <label><span>Aktualität</span><select id="filter-freshness" data-intent-filter="freshness"><option value="">Jede Aktualität</option><option value="current">Aktuell geprüft</option><option value="stale">Prüfung fällig</option><option value="unknown">Nicht angegeben</option></select></label>
+          <label><span>Kuration</span><select id="filter-curation" data-intent-filter="curation"><option value="">Jeder Status</option><option value="listed">Gelistet</option><option value="verified">Verifiziert</option><option value="featured">Hervorgehoben</option><option value="unknown">Nicht angegeben</option></select></label>
+        </div>
+        <div class="discovery-summary-row">
+          <p id="discovery-count" class="discovery-count" role="status">{len(records)} Commons</p>
+          <button id="filter-clear" class="quiet-button" type="button">Filter zurücksetzen</button>
+        </div>
+        <p id="discovery-empty" class="discovery-empty" hidden>Keine Commons entsprechen dieser Suche und Filterkombination.</p>
+        <ol id="discovery-list" class="discovery-list" aria-label="Rangfolge der Commons-Suchergebnisse"></ol>
+      </section>
 
       <section id="globe-surface" class="globe-surface" aria-label="Commonworld-Globus">
         <figure class="globe-stage" aria-labelledby="globe-caption" data-runtime-state="loading" data-view-phase="overview" data-map-renders="0" data-overlay-renders="0">
@@ -229,7 +266,8 @@ def render_shell(root: Path = ROOT) -> str:
         </header>
         <div class="text-layout">
           <aside class="text-filters" aria-labelledby="text-filter-title">
-            <h2 id="text-filter-title">Digitale Schichten</h2>
+            <h2 id="text-filter-title">Filter und Schichten</h2>
+            <button class="quiet-button text-discovery-open" type="button" data-open-discovery>Suchfilter öffnen</button>
             <div id="text-layer-buttons" class="layer-buttons"></div>
             <p class="machine-note">Maschinenlesbar: <a href="./catalog/catalog.json" type="application/json">Katalogmanifest</a> · <a href="./contracts/commonworld/project.schema.json" type="application/schema+json">Datenschema</a></p>
           </aside>

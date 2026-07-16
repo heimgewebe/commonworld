@@ -12,9 +12,11 @@ import {
   mapFailurePolicy,
   normalizeQuery,
   prepareCatalogProjection,
+  prepareIntentSearchIndex,
   recordLocationSummaries,
   recordPresentationLabel,
   projectedGlobeCircle,
+  publicProjectNavigationTarget,
   ribbonRepeatCount,
   searchFromState,
   semanticLocationLine,
@@ -29,6 +31,8 @@ const LOCAL_FALLBACK_STYLE = Object.freeze({ version: 8, sources: {}, layers: [{
 const PRESENTATION_STORAGE_KEY = 'commonworld.presentation';
 const PUBLIC_MAP_SOURCE_ID = 'commonworld-public-representations';
 const PUBLIC_MAP_LAYER_IDS = Object.freeze(['commonworld-public-extents', 'commonworld-approximate-zones', 'commonworld-exact-anchors']);
+const ACTION_LINK_TYPES = new Set(['visit', 'use', 'borrow', 'learn', 'contribute', 'volunteer', 'donate', 'contact', 'replicate']);
+const INTENT_FILTER_NAMES = Object.freeze(['presence', 'action', 'language', 'access', 'freshness', 'curation']);
 const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
 const elements = {
   body: document.body,
@@ -62,6 +66,15 @@ const elements = {
   globeReset: document.querySelector('#globe-reset'),
   search: document.querySelector('#commons-search'),
   searchClear: document.querySelector('#search-clear'),
+  filterToggle: document.querySelector('#filter-toggle'),
+  discoveryPanel: document.querySelector('#discovery-panel'),
+  discoveryClose: document.querySelector('#discovery-close'),
+  discoveryCount: document.querySelector('#discovery-count'),
+  discoveryEmpty: document.querySelector('#discovery-empty'),
+  discoveryList: document.querySelector('#discovery-list'),
+  filterClear: document.querySelector('#filter-clear'),
+  filterSelects: [...document.querySelectorAll('[data-intent-filter]')],
+  discoveryOpenButtons: [...document.querySelectorAll('[data-open-discovery]')],
   settingsToggle: document.querySelector('#settings-toggle'),
   settingsPanel: document.querySelector('#settings-panel'),
   settingsClose: document.querySelector('#settings-close'),
@@ -86,6 +99,7 @@ const runtime = {
   records: [],
   recordsById: new Map(),
   catalogProjection: null,
+  searchIndex: null,
   visibleRecordsCache: null,
   lastPublicMapData: null,
   publicMapUpdateCount: 0,
@@ -96,6 +110,12 @@ const runtime = {
     view: 'globe',
     surface: 'globe',
     query: '',
+    presence: null,
+    action: null,
+    language: null,
+    access: null,
+    freshness: null,
+    curation: null,
   },
   previousGlobeCamera: null,
   viewPhase: 'overview',
@@ -114,6 +134,8 @@ const runtime = {
   searchTimer: null,
   focusReturnTarget: null,
   settingsReturnTarget: null,
+  discoveryReturnTarget: null,
+  pendingSpatialProject: null,
   resizeObserver: null,
   catalogDegraded: false,
   mapDegraded: false,
@@ -207,7 +229,10 @@ async function loadRecords() {
 function installRecords(records) {
   runtime.records = records;
   runtime.catalogProjection = prepareCatalogProjection(records);
+  runtime.searchIndex = prepareIntentSearchIndex(records);
   runtime.recordsById = runtime.catalogProjection.recordsById;
+  elements.stage.dataset.searchIndexedRecords = String(runtime.searchIndex.indexedRecordCount);
+  elements.stage.dataset.searchIndexedTerms = String(runtime.searchIndex.indexedTermCount);
   runtime.visibleRecordsCache = null;
   runtime.lastPublicMapData = null;
   runtime.publicMapUpdateCount = 0;
@@ -350,21 +375,31 @@ function layerForRecord(record) {
   return LAYERS.find(({ id }) => id === deriveLayer(record));
 }
 
+function discoveryCacheKey() {
+  return [runtime.state.layer, runtime.state.query, ...INTENT_FILTER_NAMES.map((name) => runtime.state[name])]
+    .map((value) => value ?? '')
+    .join('\u001f');
+}
+
 function visibleRecords() {
-  const key = (runtime.state.layer ?? '') + '\u001f' + normalizeQuery(runtime.state.query);
+  const key = discoveryCacheKey();
   if (runtime.visibleRecordsCache?.key === key) return runtime.visibleRecordsCache.records;
-  const records = filterRecords(runtime.records, runtime.state);
+  const records = filterRecords(runtime.records, { ...runtime.state, searchIndex: runtime.searchIndex });
   runtime.visibleRecordsCache = { key, records };
   return records;
 }
 
 function recordsMatchingQuery() {
-  return filterRecords(runtime.records, { query: runtime.state.query });
+  return filterRecords(runtime.records, { ...runtime.state, layer: null, searchIndex: runtime.searchIndex });
+}
+
+function hasIntentFilters() {
+  return INTENT_FILTER_NAMES.some((name) => Boolean(runtime.state[name]));
 }
 
 function currentPublicMapData() {
   if (!runtime.catalogProjection) return Object.freeze({ type: 'FeatureCollection', features: Object.freeze([]) });
-  const filtering = Boolean(runtime.state.layer || normalizeQuery(runtime.state.query));
+  const filtering = Boolean(runtime.state.layer || normalizeQuery(runtime.state.query) || hasIntentFilters());
   const visibleProjectIds = filtering ? visibleRecords().map(({ id }) => id) : null;
   return runtime.catalogProjection.publicMapFeatureCollection(visibleProjectIds);
 }
@@ -481,14 +516,129 @@ function renderLayerPanel() {
   elements.layerSearch.value = runtime.state.query;
 }
 
+function openDiscovery({ trigger = document.activeElement, focusFirst = false } = {}) {
+  if (trigger instanceof Element && !elements.discoveryPanel.contains(trigger)) runtime.discoveryReturnTarget = trigger;
+  elements.discoveryPanel.hidden = false;
+  elements.filterToggle.setAttribute('aria-expanded', 'true');
+  elements.search.setAttribute('aria-expanded', 'true');
+  if (focusFirst) elements.discoveryList.querySelector('.discovery-result-main')?.focus({ preventScroll: true });
+}
+
+function closeDiscovery({ restoreFocus = false } = {}) {
+  elements.discoveryPanel.hidden = true;
+  elements.filterToggle.setAttribute('aria-expanded', 'false');
+  elements.search.setAttribute('aria-expanded', 'false');
+  if (restoreFocus && runtime.discoveryReturnTarget instanceof Element && runtime.discoveryReturnTarget.isConnected) {
+    runtime.discoveryReturnTarget.focus({ preventScroll: true });
+  }
+  runtime.discoveryReturnTarget = null;
+}
+
+function syncIntentFilterControls() {
+  for (const select of elements.filterSelects) {
+    select.value = runtime.state[select.dataset.intentFilter] ?? '';
+  }
+  elements.filterClear.disabled = !hasIntentFilters();
+}
+
+function setIntentFilter(name, value, { historyMode = 'push' } = {}) {
+  const select = elements.filterSelects.find((candidate) => candidate.dataset.intentFilter === name);
+  if (!select) return;
+  const allowed = [...select.options].some((option) => option.value === value);
+  runtime.state[name] = allowed && value ? value : null;
+  renderDiscoveryState();
+  if (historyMode) writeHistory(historyMode);
+}
+
+function clearIntentFilters({ historyMode = 'push' } = {}) {
+  for (const name of INTENT_FILTER_NAMES) runtime.state[name] = null;
+  renderDiscoveryState();
+  if (historyMode) writeHistory(historyMode);
+}
+
+function directActionLinks(record) {
+  const actions = new Set(Array.isArray(record?.actions) ? record.actions : []);
+  return (Array.isArray(record?.links) ? record.links : []).filter((link) => (
+    link && ACTION_LINK_TYPES.has(link.type) && actions.has(link.type) && typeof link.url === 'string' && link.url.startsWith('https://')
+  ));
+}
+
+function resultLocationLabel(record) {
+  const locations = Array.isArray(record?.presence?.geographic) ? record.presence.geographic : [];
+  const publicCount = locations.filter((location) => location?.mode !== 'hidden' && location?.geometry).length;
+  if (publicCount > 0) return publicCount === 1 ? '1 öffentlicher Ort' : String(publicCount) + ' öffentliche Orte';
+  return record?.presence?.digital?.available ? 'Ortsunabhängige digitale Präsenz' : 'Keine öffentliche Geometrie';
+}
+
+function createDiscoveryResult(record, position) {
+  const item = document.createElement('li');
+  item.className = 'discovery-result';
+  item.dataset.commonprojectId = record.id;
+
+  const main = document.createElement('button');
+  main.type = 'button';
+  main.className = 'discovery-result-main';
+  main.dataset.commonprojectId = record.id;
+  main.setAttribute('aria-label', String(position + 1) + '. ' + record.title + ' öffnen');
+
+  const rank = document.createElement('span');
+  rank.className = 'discovery-result-rank';
+  rank.textContent = String(position + 1);
+  const copy = document.createElement('span');
+  copy.className = 'discovery-result-copy';
+  const title = document.createElement('strong');
+  title.textContent = record.title;
+  const meta = document.createElement('span');
+  meta.className = 'discovery-result-meta';
+  meta.textContent = recordPresentationLabel(record) + ' · ' + resultLocationLabel(record);
+  const summary = document.createElement('span');
+  summary.className = 'discovery-result-summary';
+  summary.textContent = record.summary;
+  copy.append(title, meta, summary);
+  main.append(rank, copy);
+  main.addEventListener('click', () => selectProject(record.id, { trigger: main, navigateSpatial: true }));
+  item.append(main);
+
+  const actions = directActionLinks(record);
+  if (actions.length) {
+    const links = document.createElement('div');
+    links.className = 'discovery-result-actions';
+    for (const link of actions) {
+      const anchor = document.createElement('a');
+      anchor.href = link.url;
+      anchor.rel = 'external noreferrer';
+      anchor.dataset.actionType = link.type;
+      anchor.textContent = link.label;
+      links.append(anchor);
+    }
+    item.append(links);
+  }
+  return item;
+}
+
+function renderDiscoveryResults() {
+  const records = visibleRecords();
+  elements.discoveryList.replaceChildren(...records.map(createDiscoveryResult));
+  const count = records.length;
+  elements.discoveryCount.textContent = String(count) + ' Commons';
+  elements.discoveryEmpty.hidden = count !== 0;
+  elements.discoveryList.hidden = count === 0;
+}
+
 function renderTextView() {
-  const visibleIds = new Set(visibleRecords().map(({ id }) => id));
+  const visible = visibleRecords();
+  const visibleIds = new Set(visible.map(({ id }) => id));
+  const catalog = document.querySelector('#catalog');
   document.querySelectorAll('.catalog-card[data-commonproject-id]').forEach((card) => {
     card.hidden = !visibleIds.has(card.dataset.commonprojectId);
   });
+  for (const record of visible) {
+    const card = catalog?.querySelector('.catalog-card[data-commonproject-id="' + CSS.escape(record.id) + '"]');
+    if (card) catalog.append(card);
+  }
   renderLayerButtons(elements.textLayerButtons);
   const count = visibleIds.size;
-  elements.textCount.textContent = `${count} ${count === 1 ? 'Commons' : 'Commons'}`;
+  elements.textCount.textContent = String(count) + ' Commons';
   elements.textEmpty.hidden = count !== 0;
 }
 
@@ -575,13 +725,15 @@ function updateSelectionMarks() {
 function renderDiscoveryState() {
   renderLayerPanel();
   renderTextView();
+  renderDiscoveryResults();
+  syncIntentFilterControls();
   updateSphereResultVisibility();
   updatePublicMapData();
   updateSelectionMarks();
   const count = visibleRecords().length;
   elements.globeResults.textContent = count === 0
-    ? 'Keine Commons entsprechen dieser Suche oder Schichtauswahl.'
-    : `${count} ${count === 1 ? 'Commons' : 'Commons'} in der aktuellen Auswahl.`;
+    ? 'Keine Commons entsprechen dieser Suche oder Filterauswahl.'
+    : String(count) + ' Commons in der aktuellen Auswahl.';
   elements.globeResults.toggleAttribute('data-empty', count === 0);
   elements.search.value = runtime.state.query;
   elements.layerSearch.value = runtime.state.query;
@@ -608,11 +760,57 @@ function scheduleCameraHistory() {
   runtime.historyTimer = window.setTimeout(() => writeHistory('replace'), 180);
 }
 
-function selectProject(identifier, { historyMode = 'push', focus = true, trigger = document.activeElement } = {}) {
+function performSpatialNavigation(identifier) {
+  const publicMapData = runtime.catalogProjection?.publicMapFeatureCollection() ?? { type: 'FeatureCollection', features: [] };
+  const target = publicProjectNavigationTarget(publicMapData, identifier);
+  runtime.pendingSpatialProject = null;
+  if (!target) {
+    elements.stage.dataset.lastSpatialResult = 'coordinate-free:' + identifier;
+    return false;
+  }
+
+  closeDiscovery({ restoreFocus: false });
+  if (runtime.state.surface !== 'globe') setPresentation('globe', { historyMode: null });
+  if (runtime.state.view === 'layers' || runtime.viewPhase !== 'overview') {
+    closeLayerView({ historyMode: null, instant: true, restoreFocus: false });
+  }
+  ensureMap();
+  if (!runtime.mapReady) {
+    runtime.pendingSpatialProject = identifier;
+    elements.stage.dataset.lastSpatialResult = 'pending:' + identifier;
+    return true;
+  }
+
+  const duration = reducedMotion.matches ? 0 : 520;
+  if (target.kind === 'point') {
+    applyCamera({
+      center: target.center,
+      zoom: target.zoom,
+      bearing: 0,
+      pitch: 0,
+      padding: { top: 96, right: 56, bottom: 72, left: 56 },
+    }, { instant: duration === 0, duration });
+  } else {
+    elements.stage.dataset.lastCameraCommand = duration === 0 ? 'fitBounds-instant' : 'fitBounds';
+    elements.stage.dataset.lastCameraDuration = String(duration);
+    runtime.map.fitBounds(target.bounds, {
+      padding: { top: 112, right: 72, bottom: 88, left: 72 },
+      maxZoom: 15,
+      duration,
+      essential: false,
+    });
+  }
+  elements.stage.dataset.lastSpatialResult = target.kind + ':' + identifier;
+  return true;
+}
+
+function selectProject(identifier, { historyMode = 'push', focus = true, trigger = document.activeElement, navigateSpatial = false } = {}) {
   if (!runtime.recordsById.has(identifier)) return;
   if (trigger instanceof Element && !elements.focus.contains(trigger)) runtime.focusReturnTarget = trigger;
+  if (!elements.discoveryPanel.hidden) closeDiscovery({ restoreFocus: false });
   runtime.state.project = identifier;
   renderDiscoveryState();
+  if (navigateSpatial) performSpatialNavigation(identifier);
   if (historyMode) writeHistory(historyMode);
   if (focus) elements.focus.focus({ preventScroll: true });
 }
@@ -1003,6 +1201,8 @@ function applyDeepLink(search, { initial = false } = {}) {
     showLayerState();
   }
   renderDiscoveryState();
+  if (next.query || hasIntentFilters()) openDiscovery({ trigger: elements.search });
+  else closeDiscovery({ restoreFocus: false });
   runtime.applyingHistory = false;
   if (initial) writeHistory('replace');
 }
@@ -1080,7 +1280,40 @@ function wireControls() {
   });
   elements.globeReset.addEventListener('click', resetGlobe);
   elements.focusClose.addEventListener('click', () => clearProject());
-  elements.search.addEventListener('input', () => setQuery(elements.search.value));
+  elements.filterToggle.addEventListener('click', () => {
+    if (elements.discoveryPanel.hidden) openDiscovery({ trigger: elements.filterToggle });
+    else closeDiscovery({ restoreFocus: true });
+  });
+  elements.discoveryClose.addEventListener('click', () => closeDiscovery({ restoreFocus: true }));
+  for (const button of elements.discoveryOpenButtons) {
+    button.addEventListener('click', () => openDiscovery({ trigger: button }));
+  }
+  for (const select of elements.filterSelects) {
+    select.addEventListener('change', () => setIntentFilter(select.dataset.intentFilter, select.value));
+  }
+  elements.filterClear.addEventListener('click', () => clearIntentFilters());
+  elements.search.addEventListener('input', () => {
+    openDiscovery({ trigger: elements.search });
+    setQuery(elements.search.value);
+  });
+  elements.search.addEventListener('keydown', (event) => {
+    if (event.key !== 'ArrowDown') return;
+    event.preventDefault();
+    openDiscovery({ trigger: elements.search, focusFirst: true });
+  });
+  elements.discoveryList.addEventListener('keydown', (event) => {
+    if (!['ArrowDown', 'ArrowUp', 'Home', 'End'].includes(event.key)) return;
+    const results = [...elements.discoveryList.querySelectorAll('.discovery-result-main')];
+    if (!results.length) return;
+    const current = results.indexOf(document.activeElement);
+    let next = current;
+    if (event.key === 'Home') next = 0;
+    else if (event.key === 'End') next = results.length - 1;
+    else if (event.key === 'ArrowDown') next = Math.min(results.length - 1, Math.max(0, current + 1));
+    else next = Math.max(0, current <= 0 ? 0 : current - 1);
+    event.preventDefault();
+    results[next].focus({ preventScroll: true });
+  });
   elements.searchClear.addEventListener('click', () => {
     setQuery('', { historyMode: 'push' });
     elements.search.focus();
@@ -1099,11 +1332,12 @@ function wireControls() {
     });
   }
   document.querySelectorAll('.catalog-select').forEach((button) => {
-    button.addEventListener('click', () => selectProject(button.dataset.commonprojectId));
+    button.addEventListener('click', () => selectProject(button.dataset.commonprojectId, { trigger: button, navigateSpatial: true }));
   });
   document.addEventListener('keydown', (event) => {
     if (event.key !== 'Escape') return;
-    if (!elements.layerDiscovery.hidden) closeLayerDiscovery({ restoreFocus: true });
+    if (!elements.discoveryPanel.hidden) closeDiscovery({ restoreFocus: true });
+    else if (!elements.layerDiscovery.hidden) closeLayerDiscovery({ restoreFocus: true });
     else if (runtime.viewPhase !== 'overview' || runtime.state.view === 'layers') closeLayerView();
     else if (!elements.settingsPanel.hidden) closeSettings();
     else if (!elements.focus.hidden) clearProject();
@@ -1187,6 +1421,7 @@ function createMap() {
     refreshStatus();
     if (runtime.state.view === 'layers') openLayerView({ historyMode: null, cameraState: runtime.state.camera, instant: true });
     else applyCamera(runtime.state.camera, { instant: true });
+    if (runtime.pendingSpatialProject) performSpatialNavigation(runtime.pendingSpatialProject);
   });
   void verifyMapProvider();
   if ('ResizeObserver' in window) {

@@ -10,8 +10,7 @@
   ],
   "actions": [
     "use",
-    "learn",
-    "contribute"
+    "learn"
   ],
   "presence": {
     "geographic": [],
@@ -61,6 +60,22 @@
       "type": "source",
       "label": "Wikimedia projects",
       "url": "https://www.wikimedia.org/"
+    },
+    {
+      "type": "use",
+      "label": "Wikibooks öffnen",
+      "url": "https://www.wikibooks.org/",
+      "source_ids": [
+        "wikimedia-projects"
+      ]
+    },
+    {
+      "type": "learn",
+      "label": "In freien Wikibooks lernen",
+      "url": "https://www.wikibooks.org/",
+      "source_ids": [
+        "wikimedia-projects"
+      ]
     }
   ],
   "handoff": {

@@ -12,8 +12,7 @@
   "actions": [
     "use",
     "learn",
-    "contribute",
-    "donate"
+    "contribute"
   ],
   "presence": {
     "geographic": [],
@@ -63,6 +62,30 @@
       "type": "source",
       "label": "Mastodon",
       "url": "https://joinmastodon.org/"
+    },
+    {
+      "type": "use",
+      "label": "Mastodon-Server auswählen",
+      "url": "https://joinmastodon.org/servers",
+      "source_ids": [
+        "mastodon-home"
+      ]
+    },
+    {
+      "type": "learn",
+      "label": "Mastodon-Dokumentation",
+      "url": "https://docs.joinmastodon.org/",
+      "source_ids": [
+        "mastodon-home"
+      ]
+    },
+    {
+      "type": "contribute",
+      "label": "Mastodon-Quellcode und Beiträge",
+      "url": "https://github.com/mastodon/mastodon",
+      "source_ids": [
+        "mastodon-home"
+      ]
     }
   ],
   "handoff": {

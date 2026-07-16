@@ -14,8 +14,7 @@
     "learn",
     "contribute",
     "volunteer",
-    "contact",
-    "replicate"
+    "contact"
   ],
   "presence": {
     "geographic": [
@@ -117,17 +116,69 @@
       "url": "https://hamburg.freifunk.net/"
     },
     {
-      "type": "use",
-      "label": "Freifunk Hamburg – öffentliche Netzkarte",
-      "url": "https://map.hamburg.freifunk.net/"
-    },
-    {
       "type": "source",
       "label": "Freifunk – Communityverzeichnis",
       "url": "https://freifunk.net/wie-mache-ich-mit/community-finden/"
+    },
+    {
+      "type": "use",
+      "label": "Öffentliche Netzkarte öffnen",
+      "url": "https://map.hamburg.freifunk.net/",
+      "source_ids": [
+        "freifunk-hamburg-homepage"
+      ]
+    },
+    {
+      "type": "learn",
+      "label": "Freifunk Hamburg kennenlernen",
+      "url": "https://hamburg.freifunk.net/",
+      "source_ids": [
+        "freifunk-hamburg-homepage"
+      ]
+    },
+    {
+      "type": "contribute",
+      "label": "Bei Freifunk Hamburg mitmachen",
+      "url": "https://hamburg.freifunk.net/mitmachen",
+      "source_ids": [
+        "freifunk-hamburg-homepage"
+      ]
+    },
+    {
+      "type": "volunteer",
+      "label": "Ehrenamtlich bei Freifunk Hamburg helfen",
+      "url": "https://hamburg.freifunk.net/mitmachen",
+      "source_ids": [
+        "freifunk-hamburg-homepage"
+      ]
+    },
+    {
+      "type": "contact",
+      "label": "Freifunk Hamburg kontaktieren",
+      "url": "https://hamburg.freifunk.net/kontakt",
+      "source_ids": [
+        "freifunk-hamburg-homepage"
+      ]
     }
   ],
   "handoff": {
     "enabled": false
+  },
+  "languages": {
+    "codes": [
+      "de"
+    ],
+    "source_ids": [
+      "freifunk-hamburg-homepage"
+    ],
+    "note": "Die veröffentlichte Hamburger Community-Seite und ihre Beteiligungswege sind deutschsprachig."
+  },
+  "access": {
+    "type": "public",
+    "source_ids": [
+      "freifunk-hamburg-homepage",
+      "freifunk-hamburg-api"
+    ],
+    "note": "Öffentliche Community-Informationen und öffentliche Netzkarte; private Routerstandorte bleiben verborgen."
   }
 }

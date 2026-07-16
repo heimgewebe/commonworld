@@ -10,8 +10,7 @@
   ],
   "actions": [
     "use",
-    "learn",
-    "contribute"
+    "learn"
   ],
   "presence": {
     "geographic": [],
@@ -61,6 +60,22 @@
       "type": "source",
       "label": "Wikimedia projects",
       "url": "https://www.wikimedia.org/"
+    },
+    {
+      "type": "use",
+      "label": "Wikiversity öffnen",
+      "url": "https://www.wikiversity.org/",
+      "source_ids": [
+        "wikimedia-projects"
+      ]
+    },
+    {
+      "type": "learn",
+      "label": "In Wikiversity lernen",
+      "url": "https://www.wikiversity.org/",
+      "source_ids": [
+        "wikimedia-projects"
+      ]
     }
   ],
   "handoff": {
