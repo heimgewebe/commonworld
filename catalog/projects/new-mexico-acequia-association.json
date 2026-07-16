@@ -1,0 +1,148 @@
+{
+  "schema_version": 3,
+  "id": "new-mexico-acequia-association",
+  "title": "New Mexico Acequia Association",
+  "summary": "Ein Verband in New Mexico, der gemeinschaftlich verwaltete Bewässerungskanäle, demokratische Wasserverwaltung, traditionelle Landwirtschaft und die Handlungsfähigkeit lokaler Acequia-Gemeinschaften unterstützt.",
+  "kind": "hybrid",
+  "themes": [
+    "water",
+    "irrigation",
+    "agriculture",
+    "commons-governance",
+    "food"
+  ],
+  "actions": [
+    "learn",
+    "contribute",
+    "contact"
+  ],
+  "presence": {
+    "geographic": [
+      {
+        "id": "nmaa-new-mexico",
+        "mode": "hidden",
+        "label": "New Mexico – landesweiter Verbandsbezug",
+        "privacy_note": "Keine künstliche Projektgeometrie: Der Bundesstaatbezug bleibt ohne Punkt; Kanäle, Parzellen und private Wasserinfrastruktur werden nicht rekonstruiert.",
+        "source_ids": [
+          "nmaa-home"
+        ]
+      },
+      {
+        "id": "nmaa-acequias",
+        "mode": "hidden",
+        "label": "Einzelne Acequias, Parzellen und private Wasserinfrastruktur",
+        "privacy_note": "Einzelne Kanäle, Parzellen, Tore und private Nutzungsorte werden nicht aus Verbandsmaterial rekonstruiert.",
+        "source_ids": [
+          "nmaa-home"
+        ]
+      }
+    ],
+    "digital": {
+      "available": true,
+      "reach": "regional",
+      "label": "Öffentliche Bildungs-, Organisations- und Beteiligungsinformationen",
+      "source_ids": [
+        "nmaa-home"
+      ]
+    }
+  },
+  "activity": {
+    "status": "active",
+    "observed_at": "2026-07-16",
+    "source_ids": [
+      "nmaa-home"
+    ],
+    "note": "Die offizielle Projektseite war am Prüftag erreichbar und beschrieb laufende Arbeit sowie öffentliche Nutzungs- oder Beteiligungswege."
+  },
+  "provenance": {
+    "sources": [
+      {
+        "id": "nmaa-home",
+        "type": "official-source",
+        "label": "New Mexico Acequia Association",
+        "url": "https://lasacequias.org/",
+        "retrieved_at": "2026-07-16",
+        "note": "Offizielle Seite des Verbands zum Schutz gemeinschaftlich verwalteter Bewässerungssysteme, Wasserrechte, Landwirtschaft und lokaler Selbstverwaltung."
+      },
+      {
+        "id": "nmaa-about",
+        "type": "official-source",
+        "label": "New Mexico Acequia Association – Auftrag",
+        "url": "https://lasacequias.org/about-us/",
+        "retrieved_at": "2026-07-16",
+        "note": "Offizielle projektnahe Seite, die den verlinkten öffentlichen Handlungs- oder Informationsweg belegt."
+      },
+      {
+        "id": "nmaa-membership",
+        "type": "official-source",
+        "label": "New Mexico Acequia Association – Mitgliedschaft",
+        "url": "https://lasacequias.org/become-a-member/",
+        "retrieved_at": "2026-07-16",
+        "note": "Offizielle projektnahe Seite, die den verlinkten öffentlichen Handlungs- oder Informationsweg belegt."
+      }
+    ]
+  },
+  "curation": {
+    "state": "listed",
+    "reviewed_by": "Commonworld editorial review",
+    "reviewed_at": "2026-07-16",
+    "next_review_at": "2026-10-16",
+    "notes": "Keine künstliche Geometrie; der Bundesstaatbezug bleibt ohne Punkt; einzelne Wasserwege und Grundstücke bleiben aus Datenschutz- und Sicherheitsgründen verborgen."
+  },
+  "links": [
+    {
+      "type": "homepage",
+      "label": "New Mexico Acequia Association – offizielle Seite",
+      "url": "https://lasacequias.org/"
+    },
+    {
+      "type": "source",
+      "label": "New Mexico Acequia Association",
+      "url": "https://lasacequias.org/"
+    },
+    {
+      "type": "learn",
+      "label": "Acequias und gemeinschaftliche Wasserverwaltung verstehen",
+      "url": "https://lasacequias.org/about-us/",
+      "source_ids": [
+        "nmaa-about"
+      ]
+    },
+    {
+      "type": "contribute",
+      "label": "Programme und Beteiligungswege öffnen",
+      "url": "https://lasacequias.org/become-a-member/",
+      "source_ids": [
+        "nmaa-membership"
+      ]
+    },
+    {
+      "type": "contact",
+      "label": "New Mexico Acequia Association kontaktieren",
+      "url": "https://lasacequias.org/",
+      "source_ids": [
+        "nmaa-home"
+      ]
+    }
+  ],
+  "handoff": {
+    "enabled": false
+  },
+  "languages": {
+    "codes": [
+      "en",
+      "es"
+    ],
+    "source_ids": [
+      "nmaa-home"
+    ],
+    "note": "Die angegebenen Sprachen sind auf den geprüften offiziellen Projektseiten öffentlich verfügbar."
+  },
+  "access": {
+    "type": "membership",
+    "source_ids": [
+      "nmaa-home"
+    ],
+    "note": "Die Zugangsform wurde konservativ aus den veröffentlichten Nutzungs- und Beteiligungswegen abgeleitet."
+  }
+}

@@ -1,0 +1,102 @@
+{
+  "schema_version": 3,
+  "id": "enspiral",
+  "title": "Enspiral",
+  "summary": "Ein in Aotearoa Neuseeland entstandenes kollaboratives Netzwerk, das gemeinschaftliche Unternehmensformen, geteilte Ressourcen und offen dokumentierte Werkzeuge für dezentrale Zusammenarbeit entwickelt.",
+  "kind": "digital",
+  "themes": [
+    "commons-governance",
+    "cooperative-economy",
+    "open-knowledge",
+    "network"
+  ],
+  "actions": [
+    "learn",
+    "contribute"
+  ],
+  "presence": {
+    "geographic": [],
+    "digital": {
+      "available": true,
+      "reach": "network",
+      "label": "Offene Dokumentation und kollaboratives Netzwerk",
+      "source_ids": [
+        "enspiral-home"
+      ]
+    }
+  },
+  "activity": {
+    "status": "active",
+    "observed_at": "2026-07-16",
+    "source_ids": [
+      "enspiral-home"
+    ],
+    "note": "Die offizielle Projektseite war am Prüftag erreichbar und beschrieb laufende Arbeit sowie öffentliche Nutzungs- oder Beteiligungswege."
+  },
+  "provenance": {
+    "sources": [
+      {
+        "id": "enspiral-home",
+        "type": "official-source",
+        "label": "Enspiral – offizielle Seite",
+        "url": "https://www.enspiral.com/",
+        "retrieved_at": "2026-07-16",
+        "note": "Offizielle Seite des in Aotearoa Neuseeland entstandenen kollaborativen Netzwerks mit offener Dokumentation und Beteiligungsinformationen."
+      }
+    ]
+  },
+  "curation": {
+    "state": "listed",
+    "reviewed_by": "Commonworld editorial review",
+    "reviewed_at": "2026-07-16",
+    "next_review_at": "2026-10-16",
+    "notes": "Der belegte Ursprung in Aotearoa Neuseeland wird im Vielfaltsvertrag geführt; das Netzwerk erhält keine erfundene Zentralkoordinate."
+  },
+  "links": [
+    {
+      "type": "homepage",
+      "label": "Enspiral – offizielle Seite",
+      "url": "https://www.enspiral.com/"
+    },
+    {
+      "type": "source",
+      "label": "Enspiral – offizielle Seite",
+      "url": "https://www.enspiral.com/"
+    },
+    {
+      "type": "learn",
+      "label": "Enspiral und seine Arbeitsweise kennenlernen",
+      "url": "https://www.enspiral.com/",
+      "source_ids": [
+        "enspiral-home"
+      ]
+    },
+    {
+      "type": "contribute",
+      "label": "Beteiligungswege im Enspiral-Netzwerk öffnen",
+      "url": "https://www.enspiral.com/",
+      "source_ids": [
+        "enspiral-home"
+      ]
+    }
+  ],
+  "handoff": {
+    "enabled": false
+  },
+  "languages": {
+    "codes": [
+      "en"
+    ],
+    "source_ids": [
+      "enspiral-home"
+    ],
+    "note": "Die angegebenen Sprachen sind auf den geprüften offiziellen Projektseiten öffentlich verfügbar."
+  },
+  "access": {
+    "type": "public",
+    "source_ids": [
+      "enspiral-home"
+    ],
+    "note": "Die Zugangsform wurde konservativ aus den veröffentlichten Nutzungs- und Beteiligungswegen abgeleitet."
+  }
+}

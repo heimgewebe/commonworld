@@ -19,6 +19,16 @@ ROOT = Path(__file__).resolve().parents[1]
 URL_ENV = "COMMONWORLD_PAGES_URL"
 MIN_BODY_BYTES = 10_000
 CATALOG_RELATIVE_URL = "catalog/catalog.json"
+PROPOSAL_RELATIVE_URL = "propose.html"
+PROPOSAL_REQUIRED_TOKENS = (
+    "<title>Commonworld — Commons vorschlagen</title>",
+    "id=\"commons-proposal-form\"",
+    "id=\"proposal-status\"",
+    "id=\"proposal-download\"",
+    "./assets/commonworld-proposal.js",
+    "./contracts/commonworld/editorial-review.contract.json",
+    "nicht automatisch veröffentlicht",
+)
 _EXPECTED_CATALOG = json.loads((ROOT / CATALOG_RELATIVE_URL).read_text(encoding="utf-8"))
 EXPECTED_CATALOG_PROJECT_FILES = tuple(_EXPECTED_CATALOG["project_files"])
 EXPECTED_CATALOG_ENTRY_COUNT = int(_EXPECTED_CATALOG["entry_count"])
@@ -46,6 +56,7 @@ REQUIRED_TOKENS = (
     './assets/vendor/maplibre-gl.js',
     './assets/commonworld-app.js',
     './assets/commonworld-mark.svg',
+    './propose.html',
 )
 
 FORBIDDEN_TOKENS = (
@@ -75,6 +86,8 @@ RUNTIME_ASSETS = (
     ("assets/vendor/maplibre-gl.js", 1_000_000, ("javascript", "text/plain", "application/octet-stream")),
     ("assets/vendor/maplibre-gl.css", 60_000, ("text/css", "text/plain")),
     ("assets/commonworld-app.js", 10_000, ("javascript", "text/plain", "application/octet-stream")),
+    ("assets/commonworld-proposal.js", 8_000, ("javascript", "text/plain", "application/octet-stream")),
+    ("assets/proposal.css", 2_000, ("text/css", "text/plain")),
     ("assets/map/openfreemap-liberty.json", 40_000, ("application/json", "text/plain")),
 )
 
@@ -109,6 +122,12 @@ class PagesLiveSmokeReceipt:
     body_bytes: int
     required_tokens: tuple[str, ...]
     forbidden_tokens_absent: tuple[str, ...]
+    proposal_requested_url: str
+    proposal_final_url: str
+    proposal_status: int
+    proposal_content_type: str
+    proposal_body_bytes: int
+    proposal_required_tokens: tuple[str, ...]
     catalog_requested_url: str
     catalog_final_url: str
     catalog_status: int
@@ -172,6 +191,23 @@ def validate_live_fetch(fetch: LiveFetch) -> list[str]:
     for token in FORBIDDEN_TOKENS:
         if token.casefold() in body_lower:
             errors.append(f"live Pages contains forbidden delivery token: {token}")
+    return errors
+
+
+def validate_proposal_fetch(fetch: LiveFetch) -> list[str]:
+    errors: list[str] = []
+    if fetch.status != 200:
+        errors.append(f"live proposal page status must be 200, got {fetch.status}")
+    if "text/html" not in fetch.content_type.casefold():
+        errors.append(f"live proposal page content-type must include text/html, got {fetch.content_type!r}")
+    if len(fetch.body.encode("utf-8")) < 8_000:
+        errors.append("live proposal page body too small")
+    for token in PROPOSAL_REQUIRED_TOKENS:
+        if token not in fetch.body:
+            errors.append(f"live proposal page missing token: {token}")
+    for forbidden in ("client_secret", "api_key", "Authorization: Bearer", "method=\"post\""):
+        if forbidden.casefold() in fetch.body.casefold():
+            errors.append(f"live proposal page contains forbidden token: {forbidden}")
     return errors
 
 
@@ -242,6 +278,10 @@ def run_live_smoke(url: str | None = None, timeout_seconds: int = 20, insecure: 
     page = fetch_live_url(url or default_url(ROOT), timeout_seconds=timeout_seconds, insecure=insecure)
     errors = validate_live_fetch(page)
 
+    proposal_url = urljoin(page.final_url, PROPOSAL_RELATIVE_URL)
+    proposal_fetch = fetch_live_url(proposal_url, timeout_seconds=timeout_seconds, insecure=insecure)
+    errors.extend(validate_proposal_fetch(proposal_fetch))
+
     catalog_url = urljoin(page.final_url, CATALOG_RELATIVE_URL)
     catalog_fetch = fetch_live_url(catalog_url, timeout_seconds=timeout_seconds, insecure=insecure, accept="application/json")
     errors.extend(validate_catalog_fetch(catalog_fetch))
@@ -280,7 +320,7 @@ def run_live_smoke(url: str | None = None, timeout_seconds: int = 20, insecure: 
     if parse_errors:
         raise RuntimeError("live Pages smoke failed:\n- " + "\n- ".join(parse_errors))
     return PagesLiveSmokeReceipt(
-        smoke_id="commonworld.pages-live.globe-first.v6",
+        smoke_id="commonworld.pages-live.globe-first-and-proposal.v7",
         requested_url=page.requested_url,
         final_url=page.final_url,
         status=page.status,
@@ -288,6 +328,12 @@ def run_live_smoke(url: str | None = None, timeout_seconds: int = 20, insecure: 
         body_bytes=len(page.body.encode("utf-8")),
         required_tokens=REQUIRED_TOKENS,
         forbidden_tokens_absent=FORBIDDEN_TOKENS,
+        proposal_requested_url=proposal_fetch.requested_url,
+        proposal_final_url=proposal_fetch.final_url,
+        proposal_status=proposal_fetch.status,
+        proposal_content_type=proposal_fetch.content_type,
+        proposal_body_bytes=len(proposal_fetch.body.encode("utf-8")),
+        proposal_required_tokens=PROPOSAL_REQUIRED_TOKENS,
         catalog_requested_url=catalog_fetch.requested_url,
         catalog_final_url=catalog_fetch.final_url,
         catalog_status=catalog_fetch.status,

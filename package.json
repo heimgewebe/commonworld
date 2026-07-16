@@ -4,14 +4,15 @@
   "private": true,
   "description": "Deterministic public MapLibre vertical slice for commonworld.net",
   "scripts": {
-    "build": "python3 scripts/build_public_runtime.py && python3 scripts/render_public_shell.py",
+    "build": "python3 scripts/build_public_runtime.py && python3 scripts/render_public_shell.py && python3 scripts/render_proposal_page.py",
     "test": "node --test tests/js/*.test.mjs",
-    "smoke:browser": "node scripts/smoke_public_browser.mjs"
+    "smoke:browser": "node scripts/smoke_public_browser.mjs && node scripts/smoke_proposal_browser.mjs"
   },
   "dependencies": {
     "maplibre-gl": "5.24.0"
   },
   "devDependencies": {
     "playwright": "1.61.1"
-  }
+  },
+  "type": "module"
 }

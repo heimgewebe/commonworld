@@ -1,0 +1,112 @@
+{
+  "schema_version": 3,
+  "id": "g0v",
+  "title": "g0v",
+  "summary": "Eine offene Civic-Tech-Gemeinschaft aus Taiwan, die öffentliche Probleme kollaborativ bearbeitet und Ergebnisse, Quellcode und Dokumentation als frei zugängliche digitale Gemeingüter veröffentlicht.",
+  "kind": "digital",
+  "themes": [
+    "civic-tech",
+    "open-source",
+    "open-data",
+    "commons-governance"
+  ],
+  "actions": [
+    "learn",
+    "contribute"
+  ],
+  "presence": {
+    "geographic": [],
+    "digital": {
+      "available": true,
+      "reach": "network",
+      "label": "Offene Civic-Tech-Projekte, Daten und kollaborative Arbeitsräume",
+      "source_ids": [
+        "g0v-manifesto",
+        "g0v-home"
+      ]
+    }
+  },
+  "activity": {
+    "status": "active",
+    "observed_at": "2026-07-16",
+    "source_ids": [
+      "g0v-manifesto"
+    ],
+    "note": "Die offizielle Projektseite war am Prüftag erreichbar und beschrieb laufende Arbeit sowie öffentliche Nutzungs- oder Beteiligungswege."
+  },
+  "provenance": {
+    "sources": [
+      {
+        "id": "g0v-home",
+        "type": "official-source",
+        "label": "g0v international homepage",
+        "url": "https://g0v.tw/intl/en/",
+        "retrieved_at": "2026-07-16",
+        "note": "Offizielle internationale Projektseite mit aktuellen Einstiegs- und Beteiligungswegen."
+      },
+      {
+        "id": "g0v-manifesto",
+        "type": "official-source",
+        "label": "g0v Manifesto",
+        "url": "https://g0v.tw/intl/en/manifesto/",
+        "retrieved_at": "2026-07-16",
+        "note": "Offizielles Manifest zu Offenheit, Zusammenarbeit, Selbstorganisation und frei zugänglichen Ergebnissen."
+      }
+    ]
+  },
+  "curation": {
+    "state": "listed",
+    "reviewed_by": "Commonworld editorial review",
+    "reviewed_at": "2026-07-16",
+    "next_review_at": "2026-10-16",
+    "notes": "Als digitales Commons ohne erfundene Kartenkoordinate veröffentlicht; Taiwan wird nur im Vielfaltsvertrag, nicht als Projektstandort, geführt."
+  },
+  "links": [
+    {
+      "type": "homepage",
+      "label": "g0v – offizielle Seite",
+      "url": "https://g0v.tw/intl/en/"
+    },
+    {
+      "type": "source",
+      "label": "g0v Manifesto",
+      "url": "https://g0v.tw/intl/en/manifesto/"
+    },
+    {
+      "type": "learn",
+      "label": "Manifest und Arbeitsweise von g0v lesen",
+      "url": "https://g0v.tw/intl/en/manifesto/",
+      "source_ids": [
+        "g0v-manifesto"
+      ]
+    },
+    {
+      "type": "contribute",
+      "label": "An offenen g0v-Projekten mitwirken",
+      "url": "https://g0v.tw/intl/en/",
+      "source_ids": [
+        "g0v-manifesto"
+      ]
+    }
+  ],
+  "handoff": {
+    "enabled": false
+  },
+  "languages": {
+    "codes": [
+      "zh",
+      "en"
+    ],
+    "source_ids": [
+      "g0v-manifesto"
+    ],
+    "note": "Die angegebenen Sprachen sind auf den geprüften offiziellen Projektseiten öffentlich verfügbar."
+  },
+  "access": {
+    "type": "public",
+    "source_ids": [
+      "g0v-manifesto"
+    ],
+    "note": "Die Zugangsform wurde konservativ aus den veröffentlichten Nutzungs- und Beteiligungswegen abgeleitet."
+  }
+}

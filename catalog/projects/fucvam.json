@@ -1,0 +1,127 @@
+{
+  "schema_version": 3,
+  "id": "fucvam",
+  "title": "FUCVAM",
+  "summary": "Die uruguayische Föderation von Wohnungsgenossenschaften auf Gegenseitigkeit verbindet gemeinschaftliches Bodeneigentum, demokratische Selbstverwaltung und gegenseitige Hilfe beim Aufbau und Erhalt von Wohnraum.",
+  "kind": "geographic",
+  "themes": [
+    "housing",
+    "community-land",
+    "mutual-aid",
+    "commons-governance"
+  ],
+  "actions": [
+    "learn",
+    "contribute"
+  ],
+  "presence": {
+    "geographic": [
+      {
+        "id": "fucvam-uruguay",
+        "mode": "hidden",
+        "label": "Uruguay – landesweite Föderation",
+        "privacy_note": "Keine künstliche Projektgeometrie: Der landesweite Organisationsbezug bleibt ohne Punkt; Genossenschaften, Wohnungen und Bewohneradressen werden nicht rekonstruiert.",
+        "source_ids": [
+          "fucvam-home"
+        ]
+      },
+      {
+        "id": "fucvam-homes",
+        "mode": "hidden",
+        "label": "Einzelne Wohnungen und Bewohneradressen",
+        "privacy_note": "Wohnungen, Grundstücke und Bewohneradressen werden nicht aus Föderationsangaben rekonstruiert oder veröffentlicht.",
+        "source_ids": [
+          "fucvam-home"
+        ]
+      }
+    ],
+    "digital": {
+      "available": false,
+      "source_ids": [
+        "fucvam-home"
+      ]
+    }
+  },
+  "activity": {
+    "status": "active",
+    "observed_at": "2026-07-16",
+    "source_ids": [
+      "fucvam-home"
+    ],
+    "note": "Die offizielle Projektseite war am Prüftag erreichbar und beschrieb laufende Arbeit sowie öffentliche Nutzungs- oder Beteiligungswege."
+  },
+  "provenance": {
+    "sources": [
+      {
+        "id": "fucvam-home",
+        "type": "official-source",
+        "label": "FUCVAM – offizielle Seite",
+        "url": "https://www.fucvam.org.uy/",
+        "retrieved_at": "2026-07-16",
+        "note": "Offizielle Seite der uruguayischen Föderation gegenseitiger Hilfe-Wohnungsgenossenschaften mit aktuellen Aktivitäten und Organisationsinformationen."
+      },
+      {
+        "id": "fucvam-affiliation",
+        "type": "official-source",
+        "label": "FUCVAM – Aufnahme neuer Genossenschaften",
+        "url": "https://www.fucvam.org.uy/afiliacion-de-nuevas-cooperativas/",
+        "retrieved_at": "2026-07-16",
+        "note": "Offizielle projektnahe Seite, die den verlinkten öffentlichen Handlungs- oder Informationsweg belegt."
+      }
+    ]
+  },
+  "curation": {
+    "state": "listed",
+    "reviewed_by": "Commonworld editorial review",
+    "reviewed_at": "2026-07-16",
+    "next_review_at": "2026-10-16",
+    "notes": "Keine künstliche Geometrie; Uruguay wird nur als belegter Organisationsraum geführt; einzelne Genossenschaften und Wohnungen bleiben verborgen."
+  },
+  "links": [
+    {
+      "type": "homepage",
+      "label": "FUCVAM – offizielle Seite",
+      "url": "https://www.fucvam.org.uy/"
+    },
+    {
+      "type": "source",
+      "label": "FUCVAM – offizielle Seite",
+      "url": "https://www.fucvam.org.uy/"
+    },
+    {
+      "type": "learn",
+      "label": "Modell und Arbeit von FUCVAM kennenlernen",
+      "url": "https://www.fucvam.org.uy/",
+      "source_ids": [
+        "fucvam-home"
+      ]
+    },
+    {
+      "type": "contribute",
+      "label": "Aufnahmebedingungen für Wohnungsgenossenschaften prüfen",
+      "url": "https://www.fucvam.org.uy/afiliacion-de-nuevas-cooperativas/",
+      "source_ids": [
+        "fucvam-affiliation"
+      ]
+    }
+  ],
+  "handoff": {
+    "enabled": false
+  },
+  "languages": {
+    "codes": [
+      "es"
+    ],
+    "source_ids": [
+      "fucvam-home"
+    ],
+    "note": "Die angegebenen Sprachen sind auf den geprüften offiziellen Projektseiten öffentlich verfügbar."
+  },
+  "access": {
+    "type": "membership",
+    "source_ids": [
+      "fucvam-home"
+    ],
+    "note": "Die Zugangsform wurde konservativ aus den veröffentlichten Nutzungs- und Beteiligungswegen abgeleitet."
+  }
+}

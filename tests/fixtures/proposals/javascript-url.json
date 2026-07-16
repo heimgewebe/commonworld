@@ -1,0 +1,32 @@
+{
+  "schema_version": 1,
+  "kind": "commonworld_commons_proposal",
+  "proposal_id": "cw-20260716t120000z-example-commons",
+  "submitted_at": "2026-07-16T12:00:00Z",
+  "status": "submitted",
+  "project": {
+    "name": "Example Commons",
+    "description": "Eine gemeinschaftlich verwaltete Initiative mit offen belegten Regeln, öffentlichen Quellen und einem realen Beteiligungsweg.",
+    "official_website": "javascript:alert(1)",
+    "commons_type": "other",
+    "presence_kind": "hybrid",
+    "region": "Norddeutschland",
+    "actions": [
+      {
+        "type": "learn",
+        "url": "https://example.org/commons/about"
+      }
+    ],
+    "sources": [
+      "https://example.org/commons/governance"
+    ],
+    "sensitive_location_risk": false,
+    "location_precision": "country_or_region_only",
+    "editorial_note": "Keine privaten Orte enthalten."
+  },
+  "consent": {
+    "public_issue_acknowledged": true,
+    "processing_agreed": true,
+    "no_sensitive_data_confirmed": true
+  }
+}

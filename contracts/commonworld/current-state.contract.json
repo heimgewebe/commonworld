@@ -1,7 +1,7 @@
 {
   "schema_version": 2,
   "kind": "commonworld_current_public_state",
-  "current_as_of": "2026-07-15",
+  "current_as_of": "2026-07-16",
   "precedence": {
     "current_operational_truth": "this contract",
     "catalog_truth": "catalog/catalog.json and the referenced CommonProject records",
@@ -72,5 +72,13 @@
       }
     ],
     "third_party_assets_retain_their_own_licences": true
+  },
+  "proposal_path": {
+    "public_url": "https://commonworld.net/propose.html",
+    "input": "public_github_issue_prefill_or_local_json_download",
+    "commonworld_storage": false,
+    "automatic_catalog_publication": false,
+    "editorial_contract": "contracts/commonworld/editorial-review.contract.json",
+    "proposal_schema": "contracts/commonworld/proposal.schema.json"
   }
 }

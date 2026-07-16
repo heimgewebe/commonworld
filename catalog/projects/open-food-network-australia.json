@@ -1,0 +1,135 @@
+{
+  "schema_version": 3,
+  "id": "open-food-network-australia",
+  "title": "Open Food Network Australia",
+  "summary": "Eine gemeinnützige australische Gemeinschaft und quelloffene Plattform, mit der Produzenten und Lebensmittelinitiativen kurze, transparente und gemeinschaftlich kontrollierte Versorgungsketten organisieren können.",
+  "kind": "digital",
+  "themes": [
+    "food",
+    "platform",
+    "open-source",
+    "cooperative-economy"
+  ],
+  "actions": [
+    "use",
+    "learn",
+    "contribute"
+  ],
+  "presence": {
+    "geographic": [],
+    "digital": {
+      "available": true,
+      "reach": "regional",
+      "label": "Quelloffene Plattform für gemeinschaftliche Lebensmittelnetzwerke",
+      "source_ids": [
+        "ofn-au-home"
+      ]
+    }
+  },
+  "activity": {
+    "status": "active",
+    "observed_at": "2026-07-16",
+    "source_ids": [
+      "ofn-au-home"
+    ],
+    "note": "Die offizielle Projektseite war am Prüftag erreichbar und beschrieb laufende Arbeit sowie öffentliche Nutzungs- oder Beteiligungswege."
+  },
+  "provenance": {
+    "sources": [
+      {
+        "id": "ofn-au-home",
+        "type": "official-source",
+        "label": "Open Food Network Australia",
+        "url": "https://openfoodnetwork.org.au/",
+        "retrieved_at": "2026-07-16",
+        "note": "Offizielle australische Seite der gemeinnützigen, quelloffenen Lebensmittelplattform mit Nutzungs- und Mitwirkungswegen."
+      },
+      {
+        "id": "ofn-au-platform",
+        "type": "official-source",
+        "label": "Open Food Network Australia – Plattform",
+        "url": "https://openfoodnetwork.org.au/",
+        "retrieved_at": "2026-07-16",
+        "note": "Offizielle projektnahe Seite, die den verlinkten öffentlichen Handlungs- oder Informationsweg belegt."
+      },
+      {
+        "id": "ofn-au-about",
+        "type": "official-source",
+        "label": "Open Food Network Australia – über die Organisation",
+        "url": "https://about.openfoodnetwork.org.au/about-us/",
+        "retrieved_at": "2026-07-16",
+        "note": "Offizielle projektnahe Seite, die den verlinkten öffentlichen Handlungs- oder Informationsweg belegt."
+      },
+      {
+        "id": "ofn-au-join",
+        "type": "official-source",
+        "label": "Open Food Network Australia – mitwirken",
+        "url": "https://about.openfoodnetwork.org.au/join-us/",
+        "retrieved_at": "2026-07-16",
+        "note": "Offizielle projektnahe Seite, die den verlinkten öffentlichen Handlungs- oder Informationsweg belegt."
+      }
+    ]
+  },
+  "curation": {
+    "state": "listed",
+    "reviewed_by": "Commonworld editorial review",
+    "reviewed_at": "2026-07-16",
+    "next_review_at": "2026-10-16",
+    "notes": "Als digitale australische Plattform ohne künstliche Ortsgeometrie veröffentlicht."
+  },
+  "links": [
+    {
+      "type": "homepage",
+      "label": "Open Food Network Australia – offizielle Seite",
+      "url": "https://openfoodnetwork.org.au/"
+    },
+    {
+      "type": "source",
+      "label": "Open Food Network Australia",
+      "url": "https://openfoodnetwork.org.au/"
+    },
+    {
+      "type": "use",
+      "label": "Open Food Network Australia nutzen",
+      "url": "https://openfoodnetwork.org.au/",
+      "source_ids": [
+        "ofn-au-platform"
+      ]
+    },
+    {
+      "type": "learn",
+      "label": "Plattform und Gemeinschaft kennenlernen",
+      "url": "https://about.openfoodnetwork.org.au/about-us/",
+      "source_ids": [
+        "ofn-au-about"
+      ]
+    },
+    {
+      "type": "contribute",
+      "label": "Open Food Network Australia unterstützen",
+      "url": "https://about.openfoodnetwork.org.au/join-us/",
+      "source_ids": [
+        "ofn-au-join"
+      ]
+    }
+  ],
+  "handoff": {
+    "enabled": false
+  },
+  "languages": {
+    "codes": [
+      "en"
+    ],
+    "source_ids": [
+      "ofn-au-home"
+    ],
+    "note": "Die angegebenen Sprachen sind auf den geprüften offiziellen Projektseiten öffentlich verfügbar."
+  },
+  "access": {
+    "type": "public",
+    "source_ids": [
+      "ofn-au-home"
+    ],
+    "note": "Die Zugangsform wurde konservativ aus den veröffentlichten Nutzungs- und Beteiligungswegen abgeleitet."
+  }
+}

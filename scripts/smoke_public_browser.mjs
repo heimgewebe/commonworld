@@ -87,8 +87,10 @@ async function loadExpectedDigitalProjection() {
     const record = JSON.parse(await readFile(path.join(ROOT, 'catalog', projectFile), 'utf8'));
     catalogIds.push(record.id);
     if (record.actions?.includes('contribute')) contributionIds.push(record.id);
-    if (record.kind === 'hybrid') hybridIds.push(record.id);
-    if (record.kind === 'hybrid' && record.actions?.includes('volunteer')) hybridVolunteerIds.push(record.id);
+    const hasPublicGeographicPresence = (record.presence?.geographic ?? []).some((location) => location?.mode !== 'hidden' && Boolean(location?.geometry));
+    const hasPublicDigitalPresence = record.presence?.digital?.available === true;
+    if (hasPublicGeographicPresence && hasPublicDigitalPresence) hybridIds.push(record.id);
+    if (hasPublicGeographicPresence && hasPublicDigitalPresence && record.actions?.includes('volunteer')) hybridVolunteerIds.push(record.id);
     for (const location of record.presence?.geographic ?? []) {
       if (location?.mode === 'hidden' || !location?.geometry) continue;
       publicFeatureCount += 1;
@@ -1125,7 +1127,7 @@ async function intentSearchDiscoveryScenario() {
   assert(await run.page.locator('#discovery-list').isHidden(), 'intent search: empty result list remains exposed');
 
   await run.page.locator('#commons-search').fill('');
-  await run.page.waitForTimeout(220);
+  await run.page.waitForFunction((count) => document.querySelectorAll('.discovery-result').length === count, expectedDigitalProjection.catalogEntryCount);
   await run.page.waitForFunction(() => Boolean(window.__commonworldTestMap) && !window.__commonworldTestMap.isMoving());
   const filterCamera = await mapCamera();
   await run.page.locator('#filter-presence').selectOption('hybrid');
@@ -1173,7 +1175,7 @@ async function intentSearchDiscoveryScenario() {
   await run.page.locator('#focus-close').click();
 
   await run.page.locator('#commons-search').fill('');
-  await run.page.waitForTimeout(220);
+  await run.page.waitForFunction((count) => document.querySelectorAll('.discovery-result').length === count, expectedDigitalProjection.catalogEntryCount);
   await run.page.locator('#filter-presence').selectOption('hybrid');
   await run.page.waitForFunction((count) => document.querySelectorAll('.discovery-result').length === count, expectedDigitalProjection.hybridIds.length);
   await run.page.locator('#discovery-close').click();

@@ -9,9 +9,11 @@ from scripts.smoke_pages_live import (
     EXPECTED_PUBLICATION,
     LiveFetch,
     MIN_BODY_BYTES,
+    PROPOSAL_REQUIRED_TOKENS,
     REQUIRED_TOKENS,
     validate_catalog_fetch,
     validate_live_fetch,
+    validate_proposal_fetch,
     validate_runtime_asset_fetch,
 )
 
@@ -42,6 +44,30 @@ class PagesLiveSmokeTests(unittest.TestCase):
             body=self.valid_body(),
         )
         self.assertEqual([], validate_live_fetch(fetch))
+
+    def test_public_proposal_page_passes(self) -> None:
+        body = "\n".join(PROPOSAL_REQUIRED_TOKENS)
+        body += " " * max(0, 8_010 - len(body.encode("utf-8")))
+        fetch = LiveFetch(
+            requested_url="https://commonworld.net/propose.html",
+            final_url="https://commonworld.net/propose.html",
+            status=200,
+            content_type="text/html; charset=utf-8",
+            body=body,
+        )
+        self.assertEqual([], validate_proposal_fetch(fetch))
+
+    def test_public_proposal_page_missing_no_auto_publish_fails(self) -> None:
+        body = "\n".join(token for token in PROPOSAL_REQUIRED_TOKENS if token != "nicht automatisch veröffentlicht")
+        body += " " * max(0, 8_010 - len(body.encode("utf-8")))
+        fetch = LiveFetch(
+            requested_url="https://commonworld.net/propose.html",
+            final_url="https://commonworld.net/propose.html",
+            status=200,
+            content_type="text/html; charset=utf-8",
+            body=body,
+        )
+        self.assertIn("live proposal page missing token: nicht automatisch veröffentlicht", validate_proposal_fetch(fetch))
 
     def test_public_catalog_passes(self) -> None:
         fetch = LiveFetch(

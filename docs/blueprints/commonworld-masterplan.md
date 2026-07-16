@@ -790,3 +790,17 @@ Der erste öffentliche Globus ist erst akzeptiert, wenn:
 ## Leitregel
 
 > Der Globus liefert den Überblick. Der Zoom liefert Genauigkeit. Die Darstellung folgt belegten Daten. Jedes Element muss Orientierung, Auswahl, Verständnis oder Weitergehen ermöglichen — sonst wird es entfernt.
+
+### Phase 5 – Vorschlags- und Redaktionsweg v1
+
+Stand 2026-07-16:
+
+- Der öffentliche Katalog umfasst mindestens 30 redaktionell geprüfte Commons; 30 ist eine Untergrenze, kein zukünftiges Maximum.
+- `propose.html` bereitet auf der statischen GitHub-Pages-Oberfläche einen öffentlichen GitHub-Kandidaten vor oder erzeugt lokal eine validierte JSON-Datei.
+- Commonworld erhebt kein eigenes Kontaktfeld, speichert keinen Vorschlagsinhalt und veröffentlicht nie automatisch.
+- Der Vorschlagsstatus beginnt bei `submitted`. Übergänge, Prüfmerkmale und strukturierte Ablehnungsgründe stehen in `contracts/commonworld/editorial-review.contract.json`.
+- Private Adressen, exakte sensible Koordinaten, Router, Dächer, Haushalte und Funkstrecken sind fail-closed ausgeschlossen.
+- Die Veröffentlichung bleibt an `catalog/catalog.json`, `catalog/projects/*.json`, das CommonProject-Schema, Repository-Review und CI gebunden.
+- Der Vielfaltsvertrag deckt Asien, Lateinamerika, Ozeanien, südliche Hemisphäre sowie Wasser, Saatgut/Ernährung, Gesundheit, Energie, Boden/Wohnen, Werkzeuge/Fertigung und Gemeinschaftsnetze durch veröffentlichte Identitäten ab.
+
+Architekturentscheidung: Der statische GitHub-Issue-Weg wird einem eigenen Backend vorgezogen. Er nutzt GitHub-Konto, Spam- und Plattformgrenzen, hält Secrets aus dem Client und erhält die lesende Commonworld-Grenze. Nachteil: Der bevorzugte Eingang ist öffentlich und setzt für das Absenden ein GitHub-Konto voraus; der lokale JSON-Download ist der datensparsame Alternativpfad.

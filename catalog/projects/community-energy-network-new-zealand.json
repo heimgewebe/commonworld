@@ -1,0 +1,154 @@
+{
+  "schema_version": 3,
+  "id": "community-energy-network-new-zealand",
+  "title": "Community Energy Network New Zealand",
+  "summary": "Ein neuseeländisches Netzwerk lokaler, bürgergetragener Energieinitiativen, das Wissen, Zusammenarbeit und gemeinschaftliche Kontrolle erneuerbarer Energie- und Effizienzprojekte verbindet.",
+  "kind": "hybrid",
+  "themes": [
+    "energy",
+    "renewable-energy",
+    "community-ownership",
+    "network"
+  ],
+  "actions": [
+    "learn",
+    "contribute",
+    "contact"
+  ],
+  "presence": {
+    "geographic": [
+      {
+        "id": "cen-new-zealand",
+        "mode": "hidden",
+        "label": "Aotearoa Neuseeland – landesweites Netzwerk",
+        "privacy_note": "Keine künstliche Projektgeometrie: Der Länderbezug bleibt ohne Punkt; Energieanlagen, Wohnungen und Mitgliedsstandorte werden nicht rekonstruiert.",
+        "source_ids": [
+          "cen-nz-home"
+        ]
+      },
+      {
+        "id": "cen-member-sites",
+        "mode": "hidden",
+        "label": "Lokale Anlagen und Mitgliedsstandorte",
+        "privacy_note": "Einzelne Anlagen, Haushalte und Mitgliedsstandorte werden nicht aus Netzwerkangaben rekonstruiert.",
+        "source_ids": [
+          "cen-nz-home"
+        ]
+      }
+    ],
+    "digital": {
+      "available": true,
+      "reach": "regional",
+      "label": "Netzwerk, Wissensaustausch und Beteiligungsinformationen",
+      "source_ids": [
+        "cen-nz-home"
+      ]
+    }
+  },
+  "activity": {
+    "status": "active",
+    "observed_at": "2026-07-16",
+    "source_ids": [
+      "cen-nz-home"
+    ],
+    "note": "Die offizielle Projektseite war am Prüftag erreichbar und beschrieb laufende Arbeit sowie öffentliche Nutzungs- oder Beteiligungswege."
+  },
+  "provenance": {
+    "sources": [
+      {
+        "id": "cen-nz-home",
+        "type": "official-source",
+        "label": "Community Energy Network – offizielle Seite",
+        "url": "https://www.communityenergy.org.nz/",
+        "retrieved_at": "2026-07-16",
+        "note": "Offizielle Seite des neuseeländischen Netzwerks gemeinschaftlicher Energieinitiativen mit Mitgliedern, Projekten und Beteiligungswegen."
+      },
+      {
+        "id": "cen-about",
+        "type": "official-source",
+        "label": "Community Energy Network – über das Netzwerk",
+        "url": "https://www.communityenergy.org.nz/about-us/",
+        "retrieved_at": "2026-07-16",
+        "note": "Offizielle projektnahe Seite, die den verlinkten öffentlichen Handlungs- oder Informationsweg belegt."
+      },
+      {
+        "id": "cen-join",
+        "type": "official-source",
+        "label": "Community Energy Network – Mitgliedschaft",
+        "url": "https://www.communityenergy.org.nz/about-us/join-us/",
+        "retrieved_at": "2026-07-16",
+        "note": "Offizielle projektnahe Seite, die den verlinkten öffentlichen Handlungs- oder Informationsweg belegt."
+      },
+      {
+        "id": "cen-home",
+        "type": "official-source",
+        "label": "Community Energy Network – offizielle Seite",
+        "url": "https://www.communityenergy.org.nz/",
+        "retrieved_at": "2026-07-16",
+        "note": "Offizielle projektnahe Seite, die den verlinkten öffentlichen Handlungs- oder Informationsweg belegt."
+      }
+    ]
+  },
+  "curation": {
+    "state": "listed",
+    "reviewed_by": "Commonworld editorial review",
+    "reviewed_at": "2026-07-16",
+    "next_review_at": "2026-10-16",
+    "notes": "Keine künstliche Geometrie; landesweiter Bezug statt Anlagenkarte; lokale Projekte benötigen vor genauer Veröffentlichung eine eigene Prüfung."
+  },
+  "links": [
+    {
+      "type": "homepage",
+      "label": "Community Energy Network New Zealand – offizielle Seite",
+      "url": "https://www.communityenergy.org.nz/"
+    },
+    {
+      "type": "source",
+      "label": "Community Energy Network – offizielle Seite",
+      "url": "https://www.communityenergy.org.nz/"
+    },
+    {
+      "type": "learn",
+      "label": "Gemeinschaftsenergie in Neuseeland kennenlernen",
+      "url": "https://www.communityenergy.org.nz/about-us/",
+      "source_ids": [
+        "cen-about"
+      ]
+    },
+    {
+      "type": "contribute",
+      "label": "Mitgliedschaft und Beteiligung prüfen",
+      "url": "https://www.communityenergy.org.nz/about-us/join-us/",
+      "source_ids": [
+        "cen-join"
+      ]
+    },
+    {
+      "type": "contact",
+      "label": "Community Energy Network kontaktieren",
+      "url": "https://www.communityenergy.org.nz/",
+      "source_ids": [
+        "cen-home"
+      ]
+    }
+  ],
+  "handoff": {
+    "enabled": false
+  },
+  "languages": {
+    "codes": [
+      "en"
+    ],
+    "source_ids": [
+      "cen-nz-home"
+    ],
+    "note": "Die angegebenen Sprachen sind auf den geprüften offiziellen Projektseiten öffentlich verfügbar."
+  },
+  "access": {
+    "type": "membership",
+    "source_ids": [
+      "cen-nz-home"
+    ],
+    "note": "Die Zugangsform wurde konservativ aus den veröffentlichten Nutzungs- und Beteiligungswegen abgeleitet."
+  }
+}
