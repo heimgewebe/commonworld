@@ -234,6 +234,35 @@ async function startupAndRingOrbitScenario() {
   assert((await run.page.evaluate(() => window.__commonworldTestMap?.getProjection?.()?.type)) === 'globe', 'startup: active projection changed after map calibration');
   await waitForSphereOpacitySettled(run.page);
 
+  const geometryBeforeRepaint = await run.page.evaluate(() => {
+    const stage = document.querySelector('.globe-stage');
+    return {
+      mapRenders: Number(stage?.dataset.mapRenders ?? 0),
+      geometryCommits: Number(stage?.dataset.sphereGeometryCommits ?? 0),
+    };
+  });
+  await run.page.evaluate(async () => {
+    const map = window.__commonworldTestMap;
+    for (let index = 0; index < 6; index += 1) {
+      map.triggerRepaint();
+      await new Promise((resolve) => requestAnimationFrame(resolve));
+    }
+  });
+  await run.page.waitForFunction(
+    (before) => Number(document.querySelector('.globe-stage')?.dataset.mapRenders ?? 0) > before,
+    geometryBeforeRepaint.mapRenders,
+  );
+  await run.page.waitForTimeout(120);
+  const geometryAfterRepaint = await run.page.evaluate(() => {
+    const stage = document.querySelector('.globe-stage');
+    return {
+      mapRenders: Number(stage?.dataset.mapRenders ?? 0),
+      geometryCommits: Number(stage?.dataset.sphereGeometryCommits ?? 0),
+    };
+  });
+  assert(geometryAfterRepaint.mapRenders > geometryBeforeRepaint.mapRenders, 'geometry cache: test repaints did not reach MapLibre');
+  assert(geometryAfterRepaint.geometryCommits === geometryBeforeRepaint.geometryCommits, 'geometry cache: unchanged repaints rewrote sphere geometry ' + JSON.stringify({ geometryBeforeRepaint, geometryAfterRepaint }));
+
   const removedHint = await run.page.evaluate(() => ({
     actionPath: document.querySelector('#sphere-action-path') !== null,
     actionGuide: document.querySelector('.sphere-action-guide') !== null,
@@ -323,7 +352,7 @@ async function startupAndRingOrbitScenario() {
 
   assert(run.consoleErrors.length === 0, 'startup: console errors: ' + run.consoleErrors.join(' | '));
   assert(run.pageErrors.length === 0, 'startup: page errors: ' + run.pageErrors.join(' | '));
-  results.push({ id: 'startup-and-ring-orbits', verdict: 'PASS', directGlobeProjection: true, hiddenUntilCalibrated: true, outerHintRemoved: true, uniqueRingIdentities: allIds.length, movingRingMatrix: movedRing });
+  results.push({ id: 'startup-and-ring-orbits', verdict: 'PASS', directGlobeProjection: true, hiddenUntilCalibrated: true, outerHintRemoved: true, uniqueRingIdentities: allIds.length, movingRingMatrix: movedRing, unchangedGeometryRepaintSkipped: true });
   await run.context.close();
 }
 
@@ -529,7 +558,8 @@ async function layerJourneyScenario({ mobile = false, viewportOverride = null, t
   await run.page.mouse.down();
   await run.page.mouse.move(mapBox.x + mapBox.width * 0.8, mapBox.y + mapBox.height * 0.35, { steps: 15 });
   await run.page.mouse.up();
-  await run.page.waitForTimeout(500);
+  await run.page.waitForFunction(() => window.__commonworldTestMap?.isMoving() === false);
+  await run.page.waitForTimeout(240);
   const afterRotation = await run.page.locator('#digital-sphere').boundingBox();
   const zoomNumberAfterRotation = Number(await stage.getAttribute('data-map-zoom'));
   const projectedAfterRotation = await independentProjectedGlobeDiameter(run.page);
@@ -548,6 +578,24 @@ async function layerJourneyScenario({ mobile = false, viewportOverride = null, t
   assert(innermostLayerDiameter > globeDiameter, `layer journey: digital shell intersects globe (${innermostLayerDiameter} <= ${globeDiameter})`);
   const edgeX = sphereBox.x + sphereBox.width * 0.85134;
   const edgeY = sphereBox.y + sphereBox.height * 0.14866;
+  if (!touch) {
+    const edgeControl = run.page.locator('#sphere-edge-control');
+    await run.page.keyboard.press('Tab');
+    await edgeControl.focus();
+    const keyboardFocusAppearance = await run.page.evaluate(() => {
+      const control = document.querySelector('#sphere-edge-control');
+      const indicatorStyle = getComputedStyle(document.querySelector('.sphere-edge-focus'));
+      return {
+        focusVisible: control.matches(':focus-visible'),
+        indicatorDisplay: indicatorStyle.display,
+        stroke: indicatorStyle.stroke,
+        strokeWidth: Number.parseFloat(indicatorStyle.strokeWidth),
+        strokeDasharray: indicatorStyle.strokeDasharray,
+      };
+    });
+    assert(keyboardFocusAppearance.focusVisible && keyboardFocusAppearance.indicatorDisplay !== 'none', 'edge control: keyboard focus indicator is not visible on the displayed sphere ' + JSON.stringify(keyboardFocusAppearance));
+    assert(keyboardFocusAppearance.stroke !== 'rgba(0, 0, 0, 0)' && keyboardFocusAppearance.strokeWidth <= 2.1 && keyboardFocusAppearance.strokeDasharray !== 'none', 'edge control: keyboard focus indicator is missing or too dominant ' + JSON.stringify(keyboardFocusAppearance));
+  }
   const overviewUrlCamera = Object.fromEntries(
     ['lng', 'lat', 'z', 'b', 'p'].map((key) => [key, new URL(run.page.url()).searchParams.get(key)]),
   );
@@ -585,6 +633,22 @@ async function layerJourneyScenario({ mobile = false, viewportOverride = null, t
   });
   if (touch) await run.page.touchscreen.tap(edgeX, edgeY);
   else await run.page.mouse.click(edgeX, edgeY);
+  if (touch) {
+    const touchFocusAppearance = await run.page.evaluate(() => {
+      const control = document.querySelector('#sphere-edge-control');
+      const controlStyle = getComputedStyle(control);
+      const indicatorStyle = getComputedStyle(document.querySelector('.sphere-edge-focus'));
+      return {
+        active: document.activeElement === control,
+        focusVisible: control.matches(':focus-visible'),
+        controlStroke: controlStyle.stroke,
+        controlStrokeWidth: controlStyle.strokeWidth,
+        indicatorDisplay: indicatorStyle.display,
+      };
+    });
+    assert(!touchFocusAppearance.focusVisible, 'edge control: touch focus modality was misclassified ' + JSON.stringify(touchFocusAppearance));
+    assert(touchFocusAppearance.controlStroke === 'rgba(0, 0, 0, 0)' && touchFocusAppearance.indicatorDisplay === 'none', 'edge control: touch activation exposed a visible selection ring ' + JSON.stringify(touchFocusAppearance));
+  }
   assert((await run.page.locator('.globe-stage').getAttribute('data-view-phase')) === 'entering-layers', 'layer journey: animated entry phase missing');
   assert((await stage.getAttribute('data-globe-geometry-source')) === 'maplibre-projected-horizon', 'layer journey: entering flight abandoned the MapLibre horizon geometry');
   assert(await run.page.locator('#layer-panel').isHidden(), 'layer journey: description panel obscures the camera flight');
@@ -965,6 +1029,17 @@ async function intentSearchDiscoveryScenario() {
     && Math.abs(left.lat - right.lat) < 0.0001
     && Math.abs(left.zoom - right.zoom) < 0.0001
   );
+  const stableMapCamera = async () => {
+    for (let attempt = 0; attempt < 12; attempt += 1) {
+      await run.page.waitForFunction(() => Boolean(window.__commonworldTestMap) && !window.__commonworldTestMap.isMoving());
+      const before = await mapCamera();
+      await run.page.waitForTimeout(120);
+      const after = await mapCamera();
+      const still = await run.page.evaluate(() => window.__commonworldTestMap?.isMoving() === false);
+      if (still && sameCamera(before, after)) return after;
+    }
+    throw new Error('intent search: map camera did not reach a stable state');
+  };
   const resultIds = () => run.page.locator('.discovery-result').evaluateAll((nodes) => nodes.map((node) => node.dataset.commonprojectId));
 
   await run.page.locator('#commons-search').fill('ich möchte mitmachen');
@@ -993,12 +1068,12 @@ async function intentSearchDiscoveryScenario() {
   await run.page.keyboard.press('Home');
   assert((await run.page.evaluate(() => document.activeElement?.closest('.discovery-result')?.dataset.commonprojectId)) === 'debian', 'intent search: Home did not return to the first result');
 
-  await run.page.waitForFunction(() => Boolean(window.__commonworldTestMap) && !window.__commonworldTestMap.isMoving());
-  const queryCamera = await mapCamera();
+  const queryCamera = await stableMapCamera();
   await run.page.locator('#commons-search').fill('Anderlecht');
   await run.page.waitForFunction(() => document.querySelectorAll('.discovery-result').length === 1);
   assert(JSON.stringify(await resultIds()) === JSON.stringify(['cltb-le-nid']), 'intent search: public place did not resolve to Le Nid');
-  assert(sameCamera(queryCamera, await mapCamera()), 'intent search: typing a place moved the map before activation');
+  const typedCamera = await stableMapCamera();
+  assert(sameCamera(queryCamera, typedCamera), 'intent search: typing a place moved the map before activation');
 
   await run.page.locator('#commons-search').fill('private heimrouter');
   await run.page.waitForFunction(() => document.querySelector('#discovery-empty')?.hidden === false);

@@ -496,8 +496,8 @@ def validate_public_maplibre_vertical_slice(root: Path = ROOT) -> list[str]:
     if "setInterval" in app:
         errors.append("public runtime must not introduce an interval animation loop")
     animation_frame_calls = app.count("requestAnimationFrame")
-    if animation_frame_calls > 4:
-        errors.append("public runtime may use at most four one-shot animation frames for lane measurement, focus and staged reveal")
+    if animation_frame_calls > 5:
+        errors.append("public runtime may use at most five one-shot animation frames for lane measurement, focus, staged reveal and pointer hit-test coalescing")
     for token in ("window.requestAnimationFrame(updateLaneOverflow)", "window.requestAnimationFrame(() =>"):
         if token not in app:
             errors.append(f"public runtime one-shot animation-frame contract missing token: {token}")

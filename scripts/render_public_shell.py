@@ -223,6 +223,7 @@ def render_shell(root: Path = ROOT) -> str:
 {planes}
             </g>
             <circle id="sphere-edge-control" class="sphere-edge-control" cx="320" cy="320" r="309" fill="none" stroke="transparent" stroke-width="34" pointer-events="stroke" role="button" tabindex="0" aria-label="Digitale Ebenen öffnen. Antippen oder Eingabetaste drücken."></circle>
+            <circle class="sphere-edge-focus" cx="320" cy="320" r="309" aria-hidden="true"></circle>
           </svg>
           <div id="layer-stack-visual" class="layer-stack-visual" aria-hidden="true"></div>
 
