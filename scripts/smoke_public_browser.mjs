@@ -419,7 +419,17 @@ async function normalScenario() {
   assert(await run.page.locator('#text-view').isVisible(), 'normal: skip link did not switch to text');
   assert((await run.page.locator('body').getAttribute('data-presentation')) === 'text', 'normal: presentation did not become text');
 
+  await run.page.keyboard.press('Tab');
   await run.page.locator('#settings-toggle').focus();
+  const keyboardFocusAppearance = await run.page.locator('#settings-toggle').evaluate((node) => {
+    const style = getComputedStyle(node);
+    return {
+      modality: document.documentElement.dataset.inputModality,
+      outlineStyle: style.outlineStyle,
+      outlineWidth: Number.parseFloat(style.outlineWidth),
+    };
+  });
+  assert(keyboardFocusAppearance.modality === 'keyboard' && keyboardFocusAppearance.outlineStyle !== 'none' && keyboardFocusAppearance.outlineWidth > 0, 'normal: keyboard focus indicator was removed ' + JSON.stringify(keyboardFocusAppearance));
   await run.page.locator('#settings-toggle').click();
   assert(await run.page.locator('#settings-panel').isVisible(), 'normal: settings panel did not open');
   assert((await run.page.locator('#settings-panel').getAttribute('aria-modal')) === 'false', 'normal: non-modal settings contract changed');
@@ -682,6 +692,19 @@ async function layerJourneyScenario({ mobile = false, viewportOverride = null, t
   assert(firstPanelEntry && phaseLog.indexOf(firstPanelEntry) > sideIndex && firstPanelEntry.phase === 'layers' && firstPanelEntry.source === 'side-view-layout', `layer journey: panel became visible before the side layout was stable (${JSON.stringify({ firstPanelEntry, phaseLog })})`);
   assert((await stage.getAttribute('data-globe-geometry-source')) === 'side-view-layout', 'layer journey: settled layers view is missing the side layout geometry');
   await run.page.waitForSelector('#layer-panel[data-visible]');
+  if (touch) {
+    const closeFocusAppearance = await run.page.locator('#layer-close').evaluate((node) => {
+      const style = getComputedStyle(node);
+      return {
+        active: document.activeElement === node,
+        modality: document.documentElement.dataset.inputModality,
+        outlineStyle: style.outlineStyle,
+        outlineWidth: Number.parseFloat(style.outlineWidth),
+      };
+    });
+    assert(closeFocusAppearance.active && closeFocusAppearance.modality === 'pointer', 'layer journey: touch-opened close control lost pointer modality ' + JSON.stringify(closeFocusAppearance));
+    assert(closeFocusAppearance.outlineStyle === 'none' || closeFocusAppearance.outlineWidth === 0, 'layer journey: touch-opened close control exposed a focus ring ' + JSON.stringify(closeFocusAppearance));
+  }
   await run.page.waitForFunction(() => Number(getComputedStyle(document.querySelector('#digital-sphere')).opacity) <= 0.1);
   assert(await run.page.locator('#layer-panel').isVisible(), 'layer journey: description panel did not appear after the stable end state');
   assert(await run.page.locator('#layer-panel').getAttribute('inert') === null, 'layer journey: revealed description panel remains inert');
@@ -1016,6 +1039,7 @@ async function intentSearchDiscoveryScenario() {
     const stage = document.querySelector('.globe-stage');
     return stage?.dataset.searchIndexedRecords === '12'
       && Number(stage?.dataset.searchIndexedTerms ?? 0) > 0
+      && stage?.dataset.visualReady === 'true'
       && Boolean(window.__commonworldTestMap);
   });
 
@@ -1073,7 +1097,7 @@ async function intentSearchDiscoveryScenario() {
   await run.page.waitForFunction(() => document.querySelectorAll('.discovery-result').length === 1);
   assert(JSON.stringify(await resultIds()) === JSON.stringify(['cltb-le-nid']), 'intent search: public place did not resolve to Le Nid');
   const typedCamera = await stableMapCamera();
-  assert(sameCamera(queryCamera, typedCamera), 'intent search: typing a place moved the map before activation');
+  assert(sameCamera(queryCamera, typedCamera), 'intent search: typing a place moved the map before activation ' + JSON.stringify({ queryCamera, typedCamera }));
 
   await run.page.locator('#commons-search').fill('private heimrouter');
   await run.page.waitForFunction(() => document.querySelector('#discovery-empty')?.hidden === false);
@@ -1172,9 +1196,23 @@ async function intentSearchLayoutScenario({ viewportOverride, scenarioId }) {
   assert(geometry.panel.top >= -1 && geometry.panel.bottom <= geometry.height + 1, scenarioId + ': discovery panel exceeds the viewport');
   assert(geometry.scrollWidth <= geometry.width + 1, scenarioId + ': document has horizontal overflow');
   assert(geometry.minimumControlHeight >= 44, scenarioId + ': a filter or result control is below the 44px touch target');
+  const curationSelect = run.page.locator('[data-intent-filter="curation"]');
+  await curationSelect.tap();
+  await run.page.waitForTimeout(40);
+  const selectFocusAppearance = await curationSelect.evaluate((node) => {
+    const style = getComputedStyle(node);
+    return {
+      active: document.activeElement === node,
+      modality: document.documentElement.dataset.inputModality,
+      outlineStyle: style.outlineStyle,
+      outlineWidth: Number.parseFloat(style.outlineWidth),
+    };
+  });
+  assert(selectFocusAppearance.modality === 'pointer', scenarioId + ': tapped select did not retain pointer modality ' + JSON.stringify(selectFocusAppearance));
+  assert(selectFocusAppearance.outlineStyle === 'none' || selectFocusAppearance.outlineWidth === 0, scenarioId + ': tapped select exposed a focus ring ' + JSON.stringify(selectFocusAppearance));
   assert(run.consoleErrors.every((message) => message.includes('Failed to load resource')), scenarioId + ': unexpected console errors: ' + run.consoleErrors.join(' | '));
   assert(run.pageErrors.length === 0, scenarioId + ': page errors: ' + run.pageErrors.join(' | '));
-  results.push({ id: scenarioId, verdict: 'PASS', minimumControlHeight: geometry.minimumControlHeight });
+  results.push({ id: scenarioId, verdict: 'PASS', minimumControlHeight: geometry.minimumControlHeight, touchFocusRingsHidden: true });
   await run.context.close();
 }
 

@@ -151,6 +151,7 @@ const runtime = {
   publicMapInteractiveLayerIds: null,
   pointerHitTestFrame: null,
   pointerHitTestPoint: null,
+  inputModality: null,
 };
 
 function setStylePropertyIfChanged(element, name, value) {
@@ -186,6 +187,27 @@ function setStageSizeIfChanged(width, height) {
   if (current && Math.abs(current.width - next.width) < 0.25 && Math.abs(current.height - next.height) < 0.25) return false;
   runtime.stageSize = next;
   return true;
+}
+
+function setInputModality(modality) {
+  const next = modality === 'keyboard' ? 'keyboard' : 'pointer';
+  if (runtime.inputModality === next) return;
+  runtime.inputModality = next;
+  document.documentElement.dataset.inputModality = next;
+  syncSphereKeyboardFocus();
+}
+
+function installInputModalityTracking() {
+  const usePointerModality = () => setInputModality('pointer');
+  const useKeyboardModality = (event) => {
+    if (event.metaKey || event.ctrlKey || event.altKey) return;
+    setInputModality('keyboard');
+  };
+  document.addEventListener('pointerdown', usePointerModality, { capture: true, passive: true });
+  document.addEventListener('touchstart', usePointerModality, { capture: true, passive: true });
+  document.addEventListener('mousedown', usePointerModality, { capture: true, passive: true });
+  document.addEventListener('keydown', useKeyboardModality, true);
+  setInputModality(window.matchMedia('(pointer: coarse)').matches ? 'pointer' : 'keyboard');
 }
 
 function setStatus(message, state = 'loading') {
@@ -1380,7 +1402,7 @@ function activateSphereEdge(event) {
 }
 
 function syncSphereKeyboardFocus() {
-  const visible = elements.sphereEdge.matches(':focus-visible');
+  const visible = runtime.inputModality === 'keyboard' && document.activeElement === elements.sphereEdge;
   elements.sphereFocus.style.display = visible ? 'inline' : 'none';
 }
 
@@ -1669,6 +1691,7 @@ function ensureMap() {
 }
 
 async function boot() {
+  installInputModalityTracking();
   try {
     const embedded = bootstrapRecords();
     installRecords(embedded);

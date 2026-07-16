@@ -56,6 +56,10 @@ a {
   outline-offset: 0.18rem;
 }
 
+html[data-input-modality="pointer"] :focus {
+  outline: none;
+}
+
 .visually-hidden {
   position: absolute !important;
   width: 1px !important;
@@ -1485,7 +1489,7 @@ a {
   mask-image: linear-gradient(90deg, transparent 0, black 1.1rem, black calc(100% - 1.5rem), transparent 100%);
 }
 
-.digital-lane-scroll:focus-visible {
+html:not([data-input-modality="pointer"]) .digital-lane-scroll:focus-visible {
   outline: 2px solid var(--focus);
   outline-offset: -3px;
 }
@@ -1526,12 +1530,12 @@ a {
 }
 
 .digital-ribbon-item:hover .digital-ribbon-name,
-.digital-ribbon-item:focus-visible .digital-ribbon-name,
-.digital-ribbon-item.is-selected .digital-ribbon-name {
+.digital-ribbon-item.is-selected .digital-ribbon-name,
+html:not([data-input-modality="pointer"]) .digital-ribbon-item:focus-visible .digital-ribbon-name {
   color: var(--focus);
 }
 
-.digital-ribbon-item:focus-visible {
+html:not([data-input-modality="pointer"]) .digital-ribbon-item:focus-visible {
   outline: 2px solid var(--focus);
   outline-offset: 0.25rem;
 }
