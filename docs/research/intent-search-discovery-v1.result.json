@@ -48,7 +48,7 @@
       "contracts/commonworld/project.schema.json": "9cacef6c1c2fbcbe50f3e04d74a71712a2fbf0e9c8c8358d4d0675dfb1d7eff5",
       "contracts/commonworld/intent-search-discovery.contract.json": "ebc29ba3e7f7d285c076262fa49b49e2f8841086d03237e6afe5f5b07bd3e4c3",
       "scripts/render_public_shell.py": "8f7f3bd181ac1ca1b95acd109a70fa32c58001953a327fa5f3c0cd4495628cd0",
-      "scripts/smoke_public_browser.mjs": "a08884b8a736c71c4f3c3408281ad903eabcc0afd368e26e83e9aa39b75db208",
+      "scripts/smoke_public_browser.mjs": "f406275988acee1adda0d7b025d486247382e8a46692c2286232c69db7ed24ff",
       "scripts/validate_public_catalog.py": "8c15cfb267f72335c92f25cf7db18489716672b408837d80428e0b9e5f9f636f",
       "index.css": "d7399d0b06adb138613ada2b5882dd319a4d2b5879e40b882d297f604de71ce5",
       "index.html": "786c9bc527fcd07d187b1d48cec76e3814e1a6aba10563f5b496fd67c76f0e3e"

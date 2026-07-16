@@ -749,7 +749,8 @@ async function layerJourneyScenario({ mobile = false, viewportOverride = null, t
   assert((await stage.getAttribute('data-globe-geometry-source')) === 'side-view-layout', 'layer journey: return preparation left side layout too early');
   assert(await run.page.locator('#layer-panel').isHidden(), 'layer journey: description panel did not close before return preparation');
   await run.page.waitForSelector('.globe-stage[data-view-phase="leaving-layers"]');
-  assert((await stage.getAttribute('data-view-phase')) === 'leaving-layers', 'layer journey: return flight phase missing');
+  // The phase can complete between Playwright observing the selector and this assertion on fast CI runners.
+  // The phase log below proves that leaving-layers occurred and carried the invisible geometry switch.
   assert((await stage.getAttribute('data-globe-geometry-source')) === 'maplibre-projected-horizon', 'layer journey: return flight did not mirror back to the MapLibre horizon geometry');
   assert(await run.page.locator('#layer-panel').isHidden(), 'layer journey: description panel obscures the return camera flight');
   const returnCommands = await run.page.evaluate(() => window.__commonworldCameraCommands ?? []);
