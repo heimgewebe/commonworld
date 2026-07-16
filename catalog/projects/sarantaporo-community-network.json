@@ -1,0 +1,175 @@
+{
+  "schema_version": 3,
+  "id": "sarantaporo-community-network",
+  "title": "Sarantaporo.gr Community Network",
+  "summary": "Ein gemeinschaftlich aufgebautes und betriebenes Funknetz in ländlichen Dörfern der Region Elassona, das offene Konnektivität, digitale Bildung und lokale Selbstorganisation verbindet.",
+  "kind": "hybrid",
+  "themes": [
+    "communication",
+    "community-network",
+    "digital-literacy",
+    "rural-infrastructure"
+  ],
+  "actions": [
+    "use",
+    "learn",
+    "contribute",
+    "volunteer",
+    "donate",
+    "contact"
+  ],
+  "presence": {
+    "geographic": [
+      {
+        "id": "sarantaporo-elassona-region",
+        "mode": "approximate",
+        "label": "Dörfer der Region Elassona, Thessalien",
+        "geometry": {
+          "type": "Point",
+          "coordinates": [
+            22.05,
+            40.06
+          ]
+        },
+        "uncertainty_meters_min": 40000,
+        "privacy_note": "Der Punkt bezeichnet nur die öffentlich beschriebene Region und keine Haushalts-, Router- oder Funkstandorte.",
+        "source_ids": [
+          "sarantaporo-about"
+        ]
+      },
+      {
+        "id": "sarantaporo-household-nodes",
+        "mode": "hidden",
+        "label": "Private Haushaltsknoten",
+        "privacy_note": "Private Haushaltsknoten werden nicht aus Karten oder Projektinformationen rekonstruiert.",
+        "source_ids": [
+          "sarantaporo-network"
+        ]
+      }
+    ],
+    "digital": {
+      "available": true,
+      "source_ids": [
+        "sarantaporo-about",
+        "sarantaporo-network"
+      ],
+      "reach": "regional",
+      "label": "Regionales Gemeinschaftsnetz, offene Projektinformationen und digitale Bildungsarbeit"
+    }
+  },
+  "activity": {
+    "status": "active",
+    "observed_at": "2026-07-16",
+    "source_ids": [
+      "sarantaporo-about"
+    ],
+    "note": "Die offizielle Seite war am Prüftag erreichbar und veröffentlichte aktuelle Projektinformationen, Seminare, Kontakt- und Unterstützungswege."
+  },
+  "provenance": {
+    "sources": [
+      {
+        "id": "sarantaporo-about",
+        "type": "official-source",
+        "label": "Sarantaporo.gr – About us",
+        "url": "https://www.sarantaporo.gr/en/about-us",
+        "retrieved_at": "2026-07-16",
+        "note": "Offizielle Beschreibung des gemeinschaftlichen Funknetzes, seiner Dörfer, Bildungsarbeit und Commons-Ausrichtung."
+      },
+      {
+        "id": "sarantaporo-network",
+        "type": "official-source",
+        "label": "Sarantaporo.gr – Community network",
+        "url": "https://www.sarantaporo.gr/en/community-network",
+        "retrieved_at": "2026-07-16",
+        "note": "Offizielle Erklärung der gemeinschaftlichen Eigentums- und Betriebsweise der Infrastruktur."
+      }
+    ]
+  },
+  "curation": {
+    "state": "listed",
+    "reviewed_by": "Commonworld editorial review",
+    "reviewed_at": "2026-07-16",
+    "next_review_at": "2026-10-16",
+    "notes": "Die Kartendarstellung bleibt regional; private Knoten und einzelne Anschlüsse werden nicht veröffentlicht."
+  },
+  "links": [
+    {
+      "type": "homepage",
+      "label": "Sarantaporo.gr – offizielle Seite",
+      "url": "https://www.sarantaporo.gr/en/"
+    },
+    {
+      "type": "source",
+      "label": "Über Sarantaporo.gr",
+      "url": "https://www.sarantaporo.gr/en/about-us"
+    },
+    {
+      "type": "use",
+      "label": "Das Gemeinschaftsnetz kennenlernen und nutzen",
+      "url": "https://www.sarantaporo.gr/en/community-network",
+      "source_ids": [
+        "sarantaporo-network"
+      ]
+    },
+    {
+      "type": "learn",
+      "label": "Das Netzmodell verstehen",
+      "url": "https://www.sarantaporo.gr/en/community-network",
+      "source_ids": [
+        "sarantaporo-network"
+      ]
+    },
+    {
+      "type": "contribute",
+      "label": "Gemeinschaft und Infrastruktur unterstützen",
+      "url": "https://www.sarantaporo.gr/en/about-us",
+      "source_ids": [
+        "sarantaporo-about"
+      ]
+    },
+    {
+      "type": "volunteer",
+      "label": "Bei Sarantaporo.gr mitwirken",
+      "url": "https://www.sarantaporo.gr/en/about-us",
+      "source_ids": [
+        "sarantaporo-about"
+      ]
+    },
+    {
+      "type": "donate",
+      "label": "Sarantaporo.gr unterstützen",
+      "url": "https://www.sarantaporo.gr/en/about-us",
+      "source_ids": [
+        "sarantaporo-about"
+      ]
+    },
+    {
+      "type": "contact",
+      "label": "Sarantaporo.gr kontaktieren",
+      "url": "https://www.sarantaporo.gr/en/contact-us",
+      "source_ids": [
+        "sarantaporo-about"
+      ]
+    }
+  ],
+  "handoff": {
+    "enabled": false
+  },
+  "languages": {
+    "codes": [
+      "el",
+      "en"
+    ],
+    "source_ids": [
+      "sarantaporo-about"
+    ],
+    "note": "Die angegebenen Sprachen sind auf den geprüften offiziellen Projektseiten öffentlich verfügbar."
+  },
+  "access": {
+    "type": "public",
+    "source_ids": [
+      "sarantaporo-about"
+    ],
+    "note": "Die Zugangsform wurde aus den veröffentlichten Nutzungs- und Beteiligungswegen abgeleitet."
+  }
+}

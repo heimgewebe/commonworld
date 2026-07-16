@@ -356,17 +356,25 @@ def validate_public_maplibre_vertical_slice(root: Path = ROOT) -> list[str]:
     records = _catalog_records(root, manifest)
     identifiers = [record.get("id") for record in records]
     catalog_contract = contract.get("catalog", {}) if isinstance(contract.get("catalog"), dict) else {}
-    if identifiers != EXPECTED_IDS or catalog_contract.get("commonproject_ids") != EXPECTED_IDS:
-        errors.append("public MapLibre runtime must use the twelve canonical catalog identities")
-    if len(records) != 12 or manifest.get("entry_count") != 12 or catalog_contract.get("entry_count") != 12:
-        errors.append("public MapLibre runtime requires exactly twelve catalog records")
+    manifest_ids = [
+        Path(relative).stem
+        for relative in manifest.get("project_files", [])
+        if isinstance(relative, str)
+    ]
+    if identifiers != manifest_ids or len(set(identifiers)) != len(identifiers):
+        errors.append("public MapLibre runtime must load each manifest identity exactly once")
+    if len(records) != manifest.get("entry_count"):
+        errors.append("public MapLibre runtime record count must match the catalog manifest")
+    if not set(EXPECTED_IDS).issubset(identifiers):
+        errors.append("public MapLibre runtime lost a reviewed vertical-slice identity")
     records_by_id = {record.get("id"): record for record in records if isinstance(record.get("id"), str)}
     baseline = manifest.get("seed_baseline", {}) if isinstance(manifest.get("seed_baseline"), dict) else {}
     if baseline.get("project_ids") != EXPECTED_SEED_IDS or catalog_contract.get("seed_baseline_ids") != EXPECTED_SEED_IDS:
         errors.append("public MapLibre runtime seed baseline identity mismatch")
     presence_kinds = {kind: sum(1 for record in records if record.get("kind") == kind) for kind in ("geographic", "digital", "hybrid")}
-    if presence_kinds != {"geographic": 1, "digital": 10, "hybrid": 1} or catalog_contract.get("presence_kinds") != presence_kinds:
-        errors.append("public MapLibre runtime mixed-presence distribution mismatch")
+    minimum_presence_kinds = catalog_contract.get("minimum_presence_kinds", {})
+    if any(presence_kinds[kind] < minimum_presence_kinds.get(kind, 0) for kind in presence_kinds):
+        errors.append("public MapLibre runtime no longer satisfies the mixed-presence minimum")
     for identifier in EXPECTED_SEED_IDS:
         record = records_by_id.get(identifier, {})
         presence = record.get("presence", {}) if isinstance(record.get("presence"), dict) else {}
@@ -387,7 +395,7 @@ def validate_public_maplibre_vertical_slice(root: Path = ROOT) -> list[str]:
     for token in FORBIDDEN_RUNTIME_TOKENS:
         if token.casefold() in combined:
             errors.append(f"public runtime contains forbidden dependency or telemetry token: {token}")
-    for identifier in EXPECTED_IDS:
+    for identifier in identifiers:
         if identifier in app or identifier in core:
             errors.append(f"public runtime code hardcodes catalog identity instead of loading it: {identifier}")
     for token in ("renderSphereRibbons(runtime.records);", "renderLayerDeck();", "binaryName(record.title)", "ribbonRepeatCount(records.length, 10)"):
@@ -560,9 +568,10 @@ def validate_public_maplibre_vertical_slice(root: Path = ROOT) -> list[str]:
     expected_catalog_contract = {
         "manifest": "catalog/catalog.json",
         "only_data_source": True,
-        "entry_count": 12,
-        "commonproject_ids": EXPECTED_IDS,
-        "presence_kinds": {"geographic": 1, "digital": 10, "hybrid": 1},
+        "entry_count_source": "manifest.entry_count",
+        "commonproject_ids_source": "manifest.project_files[].CommonProject.id",
+        "required_vertical_slice_ids": EXPECTED_IDS,
+        "minimum_presence_kinds": {"geographic": 1, "digital": 10, "hybrid": 1},
         "seed_baseline_ids": EXPECTED_SEED_IDS,
         "fabricated_coordinates_forbidden": True,
         "hidden_locations_have_no_geometry": True,
@@ -576,8 +585,8 @@ def validate_public_maplibre_vertical_slice(root: Path = ROOT) -> list[str]:
         "source_type": "derived_geojson",
         "identity_property": "project_id",
         "location_property": "location_id",
-        "feature_count": 3,
-        "project_identity_count": 2,
+        "feature_count_source": "derived_public_geometry",
+        "project_identity_count_source": "derived_public_geometry",
         "layers": [
             {"id": "commonworld-public-extents", "type": "fill", "minimum_zoom": 3.4, "representation_kind": "public_extent"},
             {"id": "commonworld-approximate-zones", "type": "fill", "minimum_zoom": 3.4, "representation_kind": "approximate_zone", "uncertainty_radius_source": "uncertainty_meters_min", "local_zoom_selectable": True},

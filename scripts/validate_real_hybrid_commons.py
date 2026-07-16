@@ -290,9 +290,15 @@ def validate_real_hybrid_commons(root: Path = ROOT) -> list[str]:
             "cltb-le-nid:cltb-le-nid-building",
             "freifunk-hamburg:freifunk-hamburg-community-area",
         ]
-        if [feature.get("id") for feature in features] != expected_feature_ids:
+        reviewed_features = [
+            feature
+            for feature in features
+            if feature.get("properties", {}).get("project_id")
+            in {"cltb-le-nid", "freifunk-hamburg"}
+        ]
+        if [feature.get("id") for feature in reviewed_features] != expected_feature_ids:
             errors.append(
-                "T006 public GeoJSON must contain exactly the reviewed point, extent and approximate uncertainty zone"
+                "T006 public GeoJSON must preserve the reviewed point, extent and approximate uncertainty zone"
             )
         approximate_feature = next(
             (
@@ -320,12 +326,6 @@ def validate_real_hybrid_commons(root: Path = ROOT) -> list[str]:
             for feature in features
         ):
             errors.append("T006 hidden router location leaked into public GeoJSON")
-        if any(
-            feature.get("properties", {}).get("project_id")
-            not in {"cltb-le-nid", "freifunk-hamburg"}
-            for feature in features
-        ):
-            errors.append("T006 public GeoJSON contains an unexpected project identity")
         projected_relations = projection.get("relations", [])
         if not any(
             relation.get("source_project_id") == "freifunk-hamburg"

@@ -48,8 +48,9 @@
   "catalog": {
     "manifest": "catalog/catalog.json",
     "only_data_source": true,
-    "entry_count": 12,
-    "commonproject_ids": [
+    "entry_count_source": "manifest.entry_count",
+    "commonproject_ids_source": "manifest.project_files[].CommonProject.id",
+    "required_vertical_slice_ids": [
       "cltb-le-nid",
       "debian",
       "freifunk-hamburg",
@@ -63,7 +64,7 @@
       "wikipedia",
       "wikiversity"
     ],
-    "presence_kinds": {
+    "minimum_presence_kinds": {
       "geographic": 1,
       "digital": 10,
       "hybrid": 1
@@ -260,8 +261,6 @@
     "source_type": "derived_geojson",
     "identity_property": "project_id",
     "location_property": "location_id",
-    "feature_count": 3,
-    "project_identity_count": 2,
     "layers": [
       {
         "id": "commonworld-public-extents",
@@ -296,6 +295,8 @@
       "focus"
     ],
     "semantic_zoom_catalog_assignment_forbidden": true,
-    "location_line": true
+    "location_line": true,
+    "feature_count_source": "derived_public_geometry",
+    "project_identity_count_source": "derived_public_geometry"
   }
 }

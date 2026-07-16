@@ -1,22 +1,30 @@
 {
   "schema_version": 1,
   "kind": "commonworld_public_catalog",
-  "published_at": "2026-07-15",
+  "published_at": "2026-07-16",
   "language": "de",
-  "entry_count": 12,
+  "entry_count": 20,
   "project_files": [
     "projects/cltb-le-nid.json",
     "projects/debian.json",
+    "projects/edinburgh-tool-library.json",
     "projects/freifunk-hamburg.json",
     "projects/freifunk.json",
+    "projects/granby-four-streets-clt.json",
+    "projects/guifi-net.json",
     "projects/libreoffice.json",
     "projects/mastodon.json",
+    "projects/nyc-mesh.json",
+    "projects/open-source-ecology.json",
     "projects/openstreetmap.json",
+    "projects/prinzessinnengarten-kollektiv.json",
+    "projects/sarantaporo-community-network.json",
     "projects/wikibooks.json",
     "projects/wikidata.json",
     "projects/wikimedia-commons.json",
     "projects/wikipedia.json",
-    "projects/wikiversity.json"
+    "projects/wikiversity.json",
+    "projects/zenzeleni-community-networks.json"
   ],
   "publication": {
     "public": true,
