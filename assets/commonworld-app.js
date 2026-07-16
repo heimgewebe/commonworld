@@ -55,6 +55,7 @@ const elements = {
   sphere: document.querySelector('#digital-sphere'),
   sphereRings: document.querySelector('#sphere-rings'),
   sphereEdge: document.querySelector('#sphere-edge-control'),
+  sphereFocus: document.querySelector('.sphere-edge-focus'),
   layerStack: document.querySelector('#layer-stack-visual'),
   layerToggle: document.querySelector('#layer-view-button'),
   layerPanel: document.querySelector('#layer-panel'),
@@ -145,7 +146,39 @@ const runtime = {
   providerErrorLogged: false,
   laneResizeObserver: null,
   mapInteractionsBound: false,
+  stageSize: null,
+  sphereGeometryCommitCount: 0,
+  publicMapInteractiveLayerIds: null,
+  pointerHitTestFrame: null,
+  pointerHitTestPoint: null,
 };
+
+function setStylePropertyIfChanged(element, name, value) {
+  if (element.style.getPropertyValue(name) === value) return false;
+  element.style.setProperty(name, value);
+  return true;
+}
+
+function setDatasetIfChanged(element, name, value) {
+  const serialized = String(value);
+  if (element.dataset[name] === serialized) return false;
+  element.dataset[name] = serialized;
+  return true;
+}
+
+function setAttributePresenceIfChanged(element, name, present) {
+  if (element.hasAttribute(name) === present) return false;
+  element.toggleAttribute(name, present);
+  return true;
+}
+
+function currentStageSize() {
+  if (runtime.stageSize?.width > 0 && runtime.stageSize?.height > 0) return runtime.stageSize;
+  return {
+    width: Math.max(1, elements.stage.clientWidth),
+    height: Math.max(1, elements.stage.clientHeight),
+  };
+}
 
 function setStatus(message, state = 'loading') {
   elements.stage.dataset.runtimeState = state;
@@ -492,6 +525,7 @@ function ensurePublicMapLayers() {
     });
   }
   updatePublicMapData();
+  runtime.publicMapInteractiveLayerIds = PUBLIC_MAP_LAYER_IDS.filter((identifier) => runtime.map.getLayer(identifier));
 }
 
 function updateSemanticLocationLine() {
@@ -878,12 +912,12 @@ function setQuery(value, { historyMode = 'replace' } = {}) {
   if (historyMode) runtime.searchTimer = window.setTimeout(() => writeHistory(historyMode), 150);
 }
 
-function setSphereOpacity({ globeDiameter = null, rect = null } = {}) {
+function setSphereOpacity({ globeDiameter = null, size = null } = {}) {
   const immersive = runtime.state.view === 'layers' || runtime.viewPhase !== 'overview';
   let globeViewportRatio = 0;
   let opacity = 1;
   if (!immersive && runtime.mapReady) {
-    const bounds = rect ?? elements.stage.getBoundingClientRect();
+    const bounds = size ?? currentStageSize();
     const suppliedDiameter = globeDiameter !== null && globeDiameter !== undefined
       ? Number(globeDiameter)
       : Number.NaN;
@@ -893,9 +927,10 @@ function setSphereOpacity({ globeDiameter = null, rect = null } = {}) {
     globeViewportRatio = measuredDiameter / Math.max(1, Math.min(bounds.width, bounds.height));
     opacity = sphereOpacityForGlobeRatio(globeViewportRatio);
   }
-  elements.sphere.style.setProperty('--sphere-opacity', String(opacity));
-  elements.sphere.toggleAttribute('data-hidden-local', opacity === 0);
-  elements.stage.dataset.globeViewportRatio = String(Number(globeViewportRatio.toFixed(4)));
+  let visualChanged = setStylePropertyIfChanged(elements.sphere, '--sphere-opacity', String(opacity));
+  visualChanged = setAttributePresenceIfChanged(elements.sphere, 'data-hidden-local', opacity === 0) || visualChanged;
+  setDatasetIfChanged(elements.stage, 'globeViewportRatio', Number(globeViewportRatio.toFixed(4)));
+  return visualChanged;
 }
 
 function projectedGlobeGeometry(center, projectedCenter) {
@@ -905,7 +940,7 @@ function projectedGlobeGeometry(center, projectedCenter) {
 
 function updateSphereGeometry() {
   if (!runtime.mapReady || elements.globeSurface.hidden) return;
-  const rect = elements.stage.getBoundingClientRect();
+  const size = currentStageSize();
   const padding = typeof runtime.map.getPadding === 'function' ? runtime.map.getPadding() : {};
   // Camera flights keep the MapLibre-projected overview geometry; side layout is
   // used only after entry has settled and during invisible return preparation.
@@ -914,30 +949,38 @@ function updateSphereGeometry() {
   const projectedCenter = runtime.map.project(center);
   const globe = sideView ? null : projectedGlobeGeometry(center, projectedCenter);
   const geometry = sphereLayout({
-    width: rect.width,
-    height: rect.height,
+    width: size.width,
+    height: size.height,
     padding,
     globe,
     sideView,
   });
-  elements.stage.style.setProperty('--sphere-x', `${geometry.x}px`);
-  elements.stage.style.setProperty('--sphere-y', `${geometry.y}px`);
-  elements.stage.style.setProperty('--sphere-size', `${geometry.diameter}px`);
-  elements.sphere.style.setProperty('--sphere-x', `${geometry.x}px`);
-  elements.sphere.style.setProperty('--sphere-y', `${geometry.y}px`);
-  elements.sphere.style.setProperty('--sphere-size', `${geometry.diameter}px`);
-  elements.stage.dataset.mapProjectedCenterX = String(Number(projectedCenter.x.toFixed(2)));
-  elements.stage.dataset.mapProjectedCenterY = String(Number(projectedCenter.y.toFixed(2)));
-  elements.stage.dataset.sphereX = String(geometry.x);
-  elements.stage.dataset.sphereY = String(geometry.y);
-  elements.stage.dataset.sphereSize = String(geometry.diameter);
-  elements.stage.dataset.globeDiameter = String(geometry.globeDiameter);
-  elements.stage.dataset.globeGeometrySource = sideView ? 'side-view-layout' : 'maplibre-projected-horizon';
+  const x = String(geometry.x) + 'px';
+  const y = String(geometry.y) + 'px';
+  const diameter = String(geometry.diameter) + 'px';
+  let visualChanged = false;
+  visualChanged = setStylePropertyIfChanged(elements.stage, '--sphere-x', x) || visualChanged;
+  visualChanged = setStylePropertyIfChanged(elements.stage, '--sphere-y', y) || visualChanged;
+  visualChanged = setStylePropertyIfChanged(elements.stage, '--sphere-size', diameter) || visualChanged;
+  visualChanged = setStylePropertyIfChanged(elements.sphere, '--sphere-x', x) || visualChanged;
+  visualChanged = setStylePropertyIfChanged(elements.sphere, '--sphere-y', y) || visualChanged;
+  visualChanged = setStylePropertyIfChanged(elements.sphere, '--sphere-size', diameter) || visualChanged;
+  setDatasetIfChanged(elements.stage, 'mapProjectedCenterX', Number(projectedCenter.x.toFixed(2)));
+  setDatasetIfChanged(elements.stage, 'mapProjectedCenterY', Number(projectedCenter.y.toFixed(2)));
+  setDatasetIfChanged(elements.stage, 'sphereX', geometry.x);
+  setDatasetIfChanged(elements.stage, 'sphereY', geometry.y);
+  setDatasetIfChanged(elements.stage, 'sphereSize', geometry.diameter);
+  setDatasetIfChanged(elements.stage, 'globeDiameter', geometry.globeDiameter);
+  setDatasetIfChanged(elements.stage, 'globeGeometrySource', sideView ? 'side-view-layout' : 'maplibre-projected-horizon');
   const detailLevel = sphereDetailLevel({ diameter: geometry.diameter, sideView });
-  elements.sphere.dataset.detailLevel = detailLevel;
-  elements.stage.dataset.sphereDetailLevel = detailLevel;
-  elements.stage.dataset.mapZoom = String(Number(runtime.map.getZoom().toFixed(4)));
-  setSphereOpacity({ globeDiameter: geometry.globeDiameter, rect });
+  visualChanged = setDatasetIfChanged(elements.sphere, 'detailLevel', detailLevel) || visualChanged;
+  setDatasetIfChanged(elements.stage, 'sphereDetailLevel', detailLevel);
+  setDatasetIfChanged(elements.stage, 'mapZoom', Number(runtime.map.getZoom().toFixed(4)));
+  visualChanged = setSphereOpacity({ globeDiameter: geometry.globeDiameter, size }) || visualChanged;
+  if (visualChanged) {
+    runtime.sphereGeometryCommitCount += 1;
+    setDatasetIfChanged(elements.stage, 'sphereGeometryCommits', runtime.sphereGeometryCommitCount);
+  }
 }
 
 function layerCamera(camera = null) {
@@ -1328,8 +1371,14 @@ function activateSphereEdge(event) {
   openLayerView({ trigger: elements.sphereEdge });
 }
 
+function syncSphereKeyboardFocus() {
+  const visible = elements.sphereEdge.matches(':focus-visible');
+  elements.sphereFocus.style.display = visible ? 'inline' : 'none';
+}
+
 function beginSpherePointer(event) {
   if (event.button !== undefined && event.button !== 0) return;
+  elements.sphereFocus.style.display = 'none';
   runtime.spherePointerStart = {
     pointerId: event.pointerId,
     x: event.clientX,
@@ -1374,7 +1423,10 @@ function wireControls() {
   elements.sphereEdge.addEventListener('pointerup', endSpherePointer);
   elements.sphereEdge.addEventListener('pointercancel', cancelSpherePointer);
   elements.sphereEdge.addEventListener('click', activateSphereFallbackClick);
+  elements.sphereEdge.addEventListener('focus', syncSphereKeyboardFocus);
+  elements.sphereEdge.addEventListener('blur', () => { elements.sphereFocus.style.display = 'none'; });
   elements.sphereEdge.addEventListener('keydown', (event) => {
+    syncSphereKeyboardFocus();
     if (event.key === 'Enter' || event.key === ' ') {
       event.preventDefault();
       openLayerView({ trigger: elements.sphereEdge });
@@ -1446,27 +1498,53 @@ function wireControls() {
   });
   window.addEventListener('popstate', () => applyDeepLink(location.search));
   window.addEventListener('resize', () => {
+    if (runtime.resizeObserver) return;
+    runtime.stageSize = null;
     runtime.map?.resize();
     updateSphereGeometry();
   });
+}
+
+function interactivePublicMapLayers() {
+  if (runtime.publicMapInteractiveLayerIds !== null) return runtime.publicMapInteractiveLayerIds;
+  runtime.publicMapInteractiveLayerIds = PUBLIC_MAP_LAYER_IDS.filter((identifier) => runtime.map.getLayer(identifier));
+  return runtime.publicMapInteractiveLayerIds;
+}
+
+function updateMapPointerCursor() {
+  runtime.pointerHitTestFrame = null;
+  const point = runtime.pointerHitTestPoint;
+  runtime.pointerHitTestPoint = null;
+  if (!point || !runtime.map) return;
+  const layers = interactivePublicMapLayers();
+  const interactive = layers.length > 0 && runtime.map.queryRenderedFeatures(point, { layers }).length > 0;
+  const cursor = interactive ? 'pointer' : '';
+  const canvas = runtime.map.getCanvas();
+  if (canvas.style.cursor !== cursor) canvas.style.cursor = cursor;
 }
 
 function bindPublicMapInteractions() {
   if (!runtime.map || runtime.mapInteractionsBound) return;
   runtime.mapInteractionsBound = true;
   runtime.map.on('click', (event) => {
-    const layers = PUBLIC_MAP_LAYER_IDS.filter((identifier) => runtime.map.getLayer(identifier));
+    const layers = interactivePublicMapLayers();
     if (!layers.length) return;
     const feature = runtime.map.queryRenderedFeatures(event.point, { layers })[0];
     const identifier = feature?.properties?.project_id;
     if (typeof identifier === 'string') selectProject(identifier, { trigger: runtime.map.getCanvas() });
   });
   runtime.map.on('mousemove', (event) => {
-    const layers = PUBLIC_MAP_LAYER_IDS.filter((identifier) => runtime.map.getLayer(identifier));
-    const interactive = layers.length > 0 && runtime.map.queryRenderedFeatures(event.point, { layers }).length > 0;
-    runtime.map.getCanvas().style.cursor = interactive ? 'pointer' : '';
+    runtime.pointerHitTestPoint = { x: event.point.x, y: event.point.y };
+    if (runtime.pointerHitTestFrame === null) {
+      runtime.pointerHitTestFrame = window.requestAnimationFrame(updateMapPointerCursor);
+    }
   });
-  runtime.map.on('mouseleave', () => { runtime.map.getCanvas().style.cursor = ''; });
+  runtime.map.on('mouseleave', () => {
+    if (runtime.pointerHitTestFrame !== null) window.cancelAnimationFrame(runtime.pointerHitTestFrame);
+    runtime.pointerHitTestFrame = null;
+    runtime.pointerHitTestPoint = null;
+    runtime.map.getCanvas().style.cursor = '';
+  });
 }
 
 function createMap() {
@@ -1510,6 +1588,7 @@ function createMap() {
     degradeMap(event?.error ?? event, { replaceStyle: policy.replaceStyle });
   });
   runtime.map.on('styledata', () => {
+    runtime.publicMapInteractiveLayerIds = null;
     if (runtime.mapReady) ensurePublicMapLayers();
   });
   runtime.map.on('idle', () => {
@@ -1537,7 +1616,11 @@ function createMap() {
   });
   void verifyMapProvider();
   if ('ResizeObserver' in window) {
-    runtime.resizeObserver = new ResizeObserver(() => {
+    runtime.resizeObserver = new ResizeObserver(([entry]) => {
+      const box = entry?.contentRect;
+      runtime.stageSize = box
+        ? { width: Math.max(1, box.width), height: Math.max(1, box.height) }
+        : null;
       runtime.map?.resize();
       updateSphereGeometry();
     });

@@ -272,7 +272,6 @@ a {
   transform: translate(-50%, -50%);
   opacity: var(--sphere-opacity);
   pointer-events: none;
-  filter: drop-shadow(0 0 1.4rem rgba(73, 159, 209, 0.2));
   transition: opacity 160ms linear;
 }
 
@@ -292,10 +291,18 @@ a {
 }
 
 .sphere-edge-control:focus {
-  stroke: var(--focus);
-  stroke-width: 8;
   outline: none;
 }
+
+.sphere-edge-focus {
+  fill: none;
+  stroke: rgba(103, 210, 154, 0.58);
+  stroke-width: 2;
+  stroke-dasharray: 1 12;
+  display: none;
+  pointer-events: none;
+}
+
 
 .layer-view-button {
   position: absolute;
@@ -468,7 +475,6 @@ a {
 
 .globe-stage.layer-view-open .digital-sphere {
   opacity: 0.12;
-  filter: drop-shadow(0 0 1.2rem rgba(73, 159, 209, 0.18));
 }
 
 .layer-stack-visual {
@@ -910,18 +916,11 @@ a {
 /* One spatial object: stable overview sphere and a full-screen side-view journey. */
 .globe-map {
   transform-origin: 50% 50%;
-  transition:
-    opacity 760ms cubic-bezier(0.22, 1, 0.36, 1),
-    filter 760ms cubic-bezier(0.22, 1, 0.36, 1);
-  will-change: opacity, filter;
+  transition: opacity 760ms cubic-bezier(0.22, 1, 0.36, 1);
 }
 
 .digital-sphere {
-  transition:
-    opacity 360ms linear,
-    filter 760ms cubic-bezier(0.22, 1, 0.36, 1),
-    transform 760ms cubic-bezier(0.22, 1, 0.36, 1);
-  will-change: opacity, transform, filter;
+  transition: opacity 360ms linear;
 }
 
 #sphere-rings use {
@@ -973,20 +972,17 @@ a {
 .globe-stage[data-view-phase="preparing-overview"] .globe-map {
   opacity: 0;
   transform: none;
-  filter: blur(0.2rem) saturate(0.55);
 }
 
 .globe-stage[data-view-phase="layers"] .globe-map {
   opacity: 0;
   transform: none;
-  filter: blur(0.2rem) saturate(0.55);
   pointer-events: none;
 }
 
 .globe-stage[data-view-phase="leaving-layers"] .globe-map {
   opacity: 1;
   transform: none;
-  filter: none;
 }
 
 .globe-stage.layer-view-open .orientation-bar,
@@ -1284,16 +1280,12 @@ a {
 .sphere-ring-text[data-empty] { opacity: 0.08; }
 
 .digital-sphere {
-  transition: opacity 160ms linear, filter 260ms ease;
-  will-change: left, top, width, height, opacity, transform, filter;
+  transition: opacity 160ms linear;
 }
 
 .globe-map {
   transform-origin: 50% 50%;
-  transition:
-    opacity 1080ms cubic-bezier(0.16, 1, 0.3, 1),
-    filter 1080ms cubic-bezier(0.16, 1, 0.3, 1);
-  will-change: opacity, filter;
+  transition: opacity 1080ms cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 /* During camera flights the sphere follows the MapLibre projection synchronously;
@@ -1302,7 +1294,8 @@ a {
 .globe-stage[data-view-phase="settling-layers"] .digital-sphere,
 .globe-stage[data-view-phase="preparing-overview"] .digital-sphere,
 .globe-stage[data-view-phase="leaving-layers"] .digital-sphere {
-  transition: opacity 360ms linear, filter 260ms ease;
+  transition: opacity 360ms linear;
+  will-change: opacity;
 }
 
 .globe-stage[data-view-phase="entering-layers"] .globe-map,
@@ -1310,37 +1303,33 @@ a {
 .globe-stage[data-view-phase="preparing-overview"] .globe-map {
   opacity: 0;
   transform: none;
-  filter: blur(0.1rem) saturate(0.72) brightness(0.78);
+  will-change: opacity;
 }
 
 .globe-stage[data-view-phase="layers"] .globe-map {
   opacity: 0;
   transform: none;
-  filter: blur(0.1rem) saturate(0.72) brightness(0.78);
   pointer-events: none;
 }
 
 .globe-stage[data-view-phase="leaving-layers"] .globe-map {
   opacity: 1;
   transform: none;
-  filter: none;
+  will-change: opacity;
 }
 
 .globe-stage[data-view-phase="entering-layers"] .digital-sphere {
   opacity: 1;
-  filter: drop-shadow(0 0 3.4rem rgba(73, 159, 209, 0.42));
 }
 
 .globe-stage[data-view-phase="settling-layers"] .digital-sphere,
 .globe-stage[data-view-phase="preparing-overview"] .digital-sphere {
   opacity: 0;
-  filter: blur(0.12rem);
   pointer-events: none;
 }
 
 .globe-stage[data-view-phase="layers"] .digital-sphere {
   opacity: 0.06;
-  filter: blur(0.12rem);
   pointer-events: none;
 }
 
