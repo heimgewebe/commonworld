@@ -1,0 +1,179 @@
+{
+  "schema_version": 3,
+  "id": "edinburgh-tool-library",
+  "title": "Edinburgh Tool Library",
+  "summary": "Eine gemeinschaftlich und überwiegend ehrenamtlich getragene Werkzeugbibliothek, die Werkzeuge verleiht, Reparatur und praktische Fähigkeiten vermittelt und lokale Gemeinschaftsprojekte unterstützt.",
+  "kind": "geographic",
+  "themes": [
+    "tool-sharing",
+    "repair",
+    "circular-economy",
+    "skills"
+  ],
+  "actions": [
+    "visit",
+    "borrow",
+    "learn",
+    "volunteer",
+    "donate",
+    "contact"
+  ],
+  "presence": {
+    "geographic": [
+      {
+        "id": "etl-meadowbank",
+        "mode": "approximate",
+        "label": "Meadowbank Tool Library Hub, Edinburgh",
+        "geometry": {
+          "type": "Point",
+          "coordinates": [
+            -3.1655,
+            55.9562
+          ]
+        },
+        "uncertainty_meters_min": 1000,
+        "privacy_note": "Der Punkt bezeichnet den öffentlich beworbenen Hub nur angenähert und keine privaten Adressen.",
+        "source_ids": [
+          "etl-locations"
+        ]
+      },
+      {
+        "id": "etl-portobello",
+        "mode": "approximate",
+        "label": "Portobello Tool Library, Edinburgh",
+        "geometry": {
+          "type": "Point",
+          "coordinates": [
+            -3.1143,
+            55.9535
+          ]
+        },
+        "uncertainty_meters_min": 1000,
+        "privacy_note": "Der Punkt bezeichnet den öffentlich beworbenen Standort nur angenähert und keine privaten Adressen.",
+        "source_ids": [
+          "etl-locations"
+        ]
+      }
+    ],
+    "digital": {
+      "available": false,
+      "source_ids": [
+        "etl-about"
+      ]
+    }
+  },
+  "activity": {
+    "status": "active",
+    "observed_at": "2026-07-16",
+    "source_ids": [
+      "etl-about"
+    ],
+    "note": "Die offizielle Seite war am Prüftag erreichbar und veröffentlichte aktuelle Standorte, Ausleihzeiten und Beteiligungswege."
+  },
+  "provenance": {
+    "sources": [
+      {
+        "id": "etl-about",
+        "type": "official-source",
+        "label": "Edinburgh Tool Library – About us",
+        "url": "https://edinburghtoollibrary.org.uk/about/",
+        "retrieved_at": "2026-07-16",
+        "note": "Offizielle Beschreibung der Werkzeugausleihe, Werkstätten, Bildungsangebote und ehrenamtlichen Gemeinschaft."
+      },
+      {
+        "id": "etl-locations",
+        "type": "official-source",
+        "label": "Edinburgh Tool Library – Find us",
+        "url": "https://edinburghtoollibrary.org.uk/about/find-us/",
+        "retrieved_at": "2026-07-16",
+        "note": "Offizielle Liste der öffentlich angebotenen Standorte und Öffnungszeiten."
+      }
+    ]
+  },
+  "curation": {
+    "state": "listed",
+    "reviewed_by": "Commonworld editorial review",
+    "reviewed_at": "2026-07-16",
+    "next_review_at": "2026-10-16",
+    "notes": "Nur öffentlich beworbene Hubs werden angenähert dargestellt; Ausleihe erfolgt nach den veröffentlichten Mitgliedschaftsregeln."
+  },
+  "links": [
+    {
+      "type": "homepage",
+      "label": "Edinburgh Tool Library – offizielle Seite",
+      "url": "https://edinburghtoollibrary.org.uk/"
+    },
+    {
+      "type": "source",
+      "label": "Über die Werkzeugbibliothek",
+      "url": "https://edinburghtoollibrary.org.uk/about/"
+    },
+    {
+      "type": "visit",
+      "label": "Standorte und Öffnungszeiten",
+      "url": "https://edinburghtoollibrary.org.uk/about/find-us/",
+      "source_ids": [
+        "etl-locations"
+      ]
+    },
+    {
+      "type": "borrow",
+      "label": "Mitglied werden und Werkzeuge ausleihen",
+      "url": "https://edinburghtoollibrary.org.uk/join/",
+      "source_ids": [
+        "etl-about"
+      ]
+    },
+    {
+      "type": "learn",
+      "label": "Werkstätten und gemeinsames Lernen entdecken",
+      "url": "https://edinburghtoollibrary.org.uk/about/",
+      "source_ids": [
+        "etl-about"
+      ]
+    },
+    {
+      "type": "volunteer",
+      "label": "Ehrenamtlich mitarbeiten",
+      "url": "https://edinburghtoollibrary.org.uk/volunteer/",
+      "source_ids": [
+        "etl-about"
+      ]
+    },
+    {
+      "type": "donate",
+      "label": "Werkzeuge oder Unterstützung beitragen",
+      "url": "https://edinburghtoollibrary.org.uk/",
+      "source_ids": [
+        "etl-about"
+      ]
+    },
+    {
+      "type": "contact",
+      "label": "Edinburgh Tool Library kontaktieren",
+      "url": "https://edinburghtoollibrary.org.uk/about/find-us/",
+      "source_ids": [
+        "etl-locations"
+      ]
+    }
+  ],
+  "handoff": {
+    "enabled": false
+  },
+  "languages": {
+    "codes": [
+      "en"
+    ],
+    "source_ids": [
+      "etl-about"
+    ],
+    "note": "Die angegebenen Sprachen sind auf den geprüften offiziellen Projektseiten öffentlich verfügbar."
+  },
+  "access": {
+    "type": "membership",
+    "source_ids": [
+      "etl-about"
+    ],
+    "note": "Die Zugangsform wurde aus den veröffentlichten Nutzungs- und Beteiligungswegen abgeleitet."
+  }
+}

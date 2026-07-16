@@ -1,0 +1,165 @@
+{
+  "schema_version": 3,
+  "id": "open-source-ecology",
+  "title": "Open Source Ecology",
+  "summary": "Ein globales Open-Hardware-Projekt, das frei nutzbare Baupläne für industrielle Werkzeuge entwickelt und sie an der Factor e Farm in Missouri praktisch erprobt, dokumentiert und lehrt.",
+  "kind": "hybrid",
+  "themes": [
+    "open-source",
+    "open-hardware",
+    "distributed-manufacturing",
+    "education"
+  ],
+  "actions": [
+    "use",
+    "learn",
+    "contribute",
+    "donate",
+    "contact",
+    "replicate"
+  ],
+  "presence": {
+    "geographic": [
+      {
+        "id": "ose-factor-e-farm-region",
+        "mode": "approximate",
+        "label": "Factor e Farm bei Maysville, Missouri",
+        "geometry": {
+          "type": "Point",
+          "coordinates": [
+            -94.36,
+            39.89
+          ]
+        },
+        "uncertainty_meters_min": 15000,
+        "privacy_note": "Der Punkt bezeichnet nur die öffentlich beschriebene Region des Entwicklungsorts und keine privaten Gebäude- oder Aufenthaltsdetails.",
+        "source_ids": [
+          "ose-factor-e-farm"
+        ]
+      }
+    ],
+    "digital": {
+      "available": true,
+      "source_ids": [
+        "ose-home",
+        "ose-factor-e-farm"
+      ],
+      "reach": "global",
+      "label": "Frei zugängliche Maschinenentwürfe, Dokumentation und globale kollaborative Entwicklung"
+    }
+  },
+  "activity": {
+    "status": "active",
+    "observed_at": "2026-07-16",
+    "source_ids": [
+      "ose-home"
+    ],
+    "note": "Die offizielle Projektseite war am Prüftag erreichbar und veröffentlichte aktuelle Programme, offene Entwürfe sowie Beteiligungs- und Unterstützungswege."
+  },
+  "provenance": {
+    "sources": [
+      {
+        "id": "ose-home",
+        "type": "official-source",
+        "label": "Open Source Ecology – official homepage",
+        "url": "https://www.opensourceecology.org/",
+        "retrieved_at": "2026-07-16",
+        "note": "Offizielle Projektseite zu offenen Maschinenentwürfen, aktuellen Programmen und Beteiligungsmöglichkeiten."
+      },
+      {
+        "id": "ose-factor-e-farm",
+        "type": "official-source",
+        "label": "Open Source Ecology – About Factor e Farm",
+        "url": "https://www.opensourceecology.org/about-factor-e-farm/",
+        "retrieved_at": "2026-07-16",
+        "note": "Offizielle Beschreibung des öffentlich benannten Entwicklungs- und Lernorts in Missouri."
+      }
+    ]
+  },
+  "curation": {
+    "state": "listed",
+    "reviewed_by": "Commonworld editorial review",
+    "reviewed_at": "2026-07-16",
+    "next_review_at": "2026-10-16",
+    "notes": "Die digitale Wissensbasis ist global; der physische Ort wird nur regional angenähert und nicht als frei zugänglicher Besuchsort behauptet."
+  },
+  "links": [
+    {
+      "type": "homepage",
+      "label": "Open Source Ecology – offizielle Seite",
+      "url": "https://www.opensourceecology.org/"
+    },
+    {
+      "type": "source",
+      "label": "Über Factor e Farm",
+      "url": "https://www.opensourceecology.org/about-factor-e-farm/"
+    },
+    {
+      "type": "use",
+      "label": "Offene Baupläne und Maschinenprojekte nutzen",
+      "url": "https://wiki.opensourceecology.org/",
+      "source_ids": [
+        "ose-home"
+      ]
+    },
+    {
+      "type": "learn",
+      "label": "Kurse, Dokumentation und Projektwissen entdecken",
+      "url": "https://www.opensourceecology.org/",
+      "source_ids": [
+        "ose-home"
+      ]
+    },
+    {
+      "type": "contribute",
+      "label": "Bei Open Source Ecology mitarbeiten",
+      "url": "https://www.opensourceecology.org/community/",
+      "source_ids": [
+        "ose-home"
+      ]
+    },
+    {
+      "type": "donate",
+      "label": "Open Source Ecology unterstützen",
+      "url": "https://wiki.opensourceecology.org/wiki/Support_OSE",
+      "source_ids": [
+        "ose-home"
+      ]
+    },
+    {
+      "type": "contact",
+      "label": "Open Source Ecology kontaktieren",
+      "url": "https://www.opensourceecology.org/contact/",
+      "source_ids": [
+        "ose-home"
+      ]
+    },
+    {
+      "type": "replicate",
+      "label": "Entwürfe nachbauen und weiterentwickeln",
+      "url": "https://wiki.opensourceecology.org/",
+      "source_ids": [
+        "ose-home"
+      ]
+    }
+  ],
+  "handoff": {
+    "enabled": false
+  },
+  "languages": {
+    "codes": [
+      "en"
+    ],
+    "source_ids": [
+      "ose-home"
+    ],
+    "note": "Die angegebenen Sprachen sind auf den geprüften offiziellen Projektseiten öffentlich verfügbar."
+  },
+  "access": {
+    "type": "public",
+    "source_ids": [
+      "ose-home"
+    ],
+    "note": "Die Zugangsform wurde aus den veröffentlichten Nutzungs- und Beteiligungswegen abgeleitet."
+  }
+}

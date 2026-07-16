@@ -87,6 +87,7 @@ FORBIDDEN_CONTRACT_PROPERTIES = (
 EXPECTED_BLUEPRINT_FILES = {"commonworld-masterplan.md"}
 EXPECTED_OPS_FILES = {"machine-readable-surface.md", "pages-dns.md"}
 EXPECTED_RESEARCH_FILES = {
+    "catalog-growth-balanced-v1.md",
     "device-acceptance-pack-v1.md",
     "device-acceptance-pack-v1.result.json",
     "device-acceptance-rerun-v2.md",

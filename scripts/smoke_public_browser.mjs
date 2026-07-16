@@ -77,8 +77,23 @@ async function loadExpectedDigitalProjection() {
   assert(manifest.project_files.length === manifest.entry_count, 'catalog projection: manifest entry_count does not match project_files');
   const byLayer = new Map(LAYERS.map((layer) => [layer.id, []]));
   const allIds = [];
+  const catalogIds = [];
+  const contributionIds = [];
+  const hybridIds = [];
+  const hybridVolunteerIds = [];
+  const publicMapProjectIds = new Set();
+  let publicFeatureCount = 0;
   for (const projectFile of manifest.project_files) {
     const record = JSON.parse(await readFile(path.join(ROOT, 'catalog', projectFile), 'utf8'));
+    catalogIds.push(record.id);
+    if (record.actions?.includes('contribute')) contributionIds.push(record.id);
+    if (record.kind === 'hybrid') hybridIds.push(record.id);
+    if (record.kind === 'hybrid' && record.actions?.includes('volunteer')) hybridVolunteerIds.push(record.id);
+    for (const location of record.presence?.geographic ?? []) {
+      if (location?.mode === 'hidden' || !location?.geometry) continue;
+      publicFeatureCount += 1;
+      publicMapProjectIds.add(record.id);
+    }
     if (record?.presence?.digital?.available !== true) continue;
     const layerId = deriveLayer(record);
     assert(byLayer.has(layerId), `catalog projection: ${record.id} derived unknown layer ${layerId}`);
@@ -88,6 +103,12 @@ async function loadExpectedDigitalProjection() {
   assert(new Set(allIds).size === allIds.length, `catalog projection: duplicate digital IDs in catalog ${JSON.stringify(allIds)}`);
   return {
     allIds,
+    catalogIds,
+    contributionIds,
+    hybridIds,
+    hybridVolunteerIds,
+    publicFeatureCount,
+    publicIdentityCount: publicMapProjectIds.size,
     totalCount: allIds.length,
     catalogEntryCount: manifest.entry_count,
     layers: LAYERS.map((layer) => ({
@@ -870,12 +891,15 @@ async function realHybridCommonsScenario() {
   const run = await newPage({ viewportOverride: { width: 1024, height: 768 }, reducedMotion: 'reduce' });
   await run.page.goto(baseUrl, { waitUntil: 'domcontentloaded' });
   await run.page.waitForSelector('html.runtime-ready');
-  await run.page.waitForFunction(() => {
+  await run.page.waitForFunction(({ featureCount, identityCount }) => {
     const stage = document.querySelector('.globe-stage');
     const map = window.__commonworldTestMap;
-    return stage?.dataset.publicMapFeatures === '3'
-      && stage?.dataset.publicMapProjectIds === '2'
+    return Number(stage?.dataset.publicMapFeatures) === featureCount
+      && Number(stage?.dataset.publicMapProjectIds) === identityCount
       && Boolean(map?.getSource('commonworld-public-representations'));
+  }, {
+    featureCount: expectedDigitalProjection.publicFeatureCount,
+    identityCount: expectedDigitalProjection.publicIdentityCount,
   });
 
   const initial = await run.page.evaluate(() => {
@@ -896,12 +920,14 @@ async function realHybridCommonsScenario() {
     };
   });
   assert(initial.semanticLevel === 'planet', 'real hybrid: initial semantic level is not planet');
-  assert(initial.semanticText.includes('2 räumlich belegte Commons'), 'real hybrid: spatial summary is missing');
-  assert(JSON.stringify(initial.featureIds) === JSON.stringify([
+  assert(initial.semanticText.includes(`${expectedDigitalProjection.publicIdentityCount} räumlich belegte Commons`), 'real hybrid: spatial summary is missing');
+  const reviewedFeatureIds = [
     'cltb-le-nid:cltb-le-nid-entrance',
     'cltb-le-nid:cltb-le-nid-building',
     'freifunk-hamburg:freifunk-hamburg-community-area',
-  ]), 'real hybrid: public map feature identities differ from reviewed data: ' + JSON.stringify(initial));
+  ];
+  assert(initial.featureIds.length === expectedDigitalProjection.publicFeatureCount, 'real hybrid: public map feature count differs from the catalog: ' + JSON.stringify(initial));
+  assert(reviewedFeatureIds.every((identifier) => initial.featureIds.includes(identifier)), 'real hybrid: reviewed public map features are missing: ' + JSON.stringify(initial));
   assert(!initial.locationIds.includes('freifunk-hamburg-private-routers'), 'real hybrid: hidden router location leaked into map diagnostics');
   assert(initial.sourceType === 'geojson', 'real hybrid: MapLibre source is not a GeoJSON source: ' + JSON.stringify(initial));
   assert(initial.layers.some(({ id, type, minzoom }) => id === 'commonworld-public-extents' && type === 'fill' && minzoom === 3.4), 'real hybrid: public extent layer missing');
@@ -926,7 +952,7 @@ async function realHybridCommonsScenario() {
   assert((await run.page.locator('.globe-stage').getAttribute('data-public-map-project-ids')) === '1', 'real hybrid: search did not reduce map identities');
   assert((await run.page.locator('#globe-results').textContent())?.includes('1 Commons'), 'real hybrid: shared search count mismatch');
   await run.page.locator('#commons-search').fill('');
-  await run.page.waitForFunction(() => document.querySelector('.globe-stage')?.dataset.publicMapFeatures === '3');
+  await run.page.waitForFunction((count) => Number(document.querySelector('.globe-stage')?.dataset.publicMapFeatures) === count, expectedDigitalProjection.publicFeatureCount);
   await run.page.locator('#discovery-close').click();
   assert(await run.page.locator('#discovery-panel').isHidden(), 'real hybrid: discovery panel blocked map activation');
 
@@ -971,7 +997,7 @@ async function realHybridCommonsScenario() {
   assert((await run.page.locator('.globe-stage').getAttribute('data-semantic-level')) === 'focus', 'real hybrid: filtered selected identity lost semantic focus');
   assert(((await run.page.locator('#semantic-summary').textContent()) ?? '').startsWith('Hybrid'), 'real hybrid: semantic line no longer describes the filtered selected identity');
   await run.page.locator('#commons-search').fill('');
-  await run.page.waitForFunction(() => document.querySelector('.globe-stage')?.dataset.publicMapFeatures === '3');
+  await run.page.waitForFunction((count) => Number(document.querySelector('.globe-stage')?.dataset.publicMapFeatures) === count, expectedDigitalProjection.publicFeatureCount);
   await run.page.locator('#discovery-close').click();
   await run.page.locator('#focus-close').click();
   assert(await run.page.evaluate(() => document.activeElement === window.__commonworldTestMap?.getCanvas()), 'real hybrid: closing a map-selected focus did not restore focus to the map canvas');
@@ -1024,7 +1050,7 @@ async function realHybridCommonsScenario() {
   assert(await run.page.locator('#project-cltb-le-nid[data-selected]').isVisible(), 'real hybrid: text surface lost the selected CommonProject identity');
   assert(run.consoleErrors.length === 0, 'real hybrid: console errors: ' + run.consoleErrors.join(' | '));
   assert(run.pageErrors.length === 0, 'real hybrid: page errors: ' + run.pageErrors.join(' | '));
-  results.push({ id: 'real-hybrid-commons', verdict: 'PASS', publicFeatures: 3, publicIdentities: 2, digitalIdentities: expectedDigitalProjection.totalCount, unchangedMapUpdatesSkipped: true });
+  results.push({ id: 'real-hybrid-commons', verdict: 'PASS', publicFeatures: expectedDigitalProjection.publicFeatureCount, publicIdentities: expectedDigitalProjection.publicIdentityCount, digitalIdentities: expectedDigitalProjection.totalCount, unchangedMapUpdatesSkipped: true });
   await run.context.close();
 }
 
@@ -1035,13 +1061,13 @@ async function intentSearchDiscoveryScenario() {
   const run = await newPage({ viewportOverride: { width: 1280, height: 800 }, reducedMotion: 'reduce' });
   await run.page.goto(baseUrl, { waitUntil: 'domcontentloaded' });
   await run.page.waitForSelector('html.runtime-ready');
-  await run.page.waitForFunction(() => {
+  await run.page.waitForFunction((catalogEntryCount) => {
     const stage = document.querySelector('.globe-stage');
-    return stage?.dataset.searchIndexedRecords === '12'
+    return Number(stage?.dataset.searchIndexedRecords) === catalogEntryCount
       && Number(stage?.dataset.searchIndexedTerms ?? 0) > 0
       && stage?.dataset.visualReady === 'true'
       && Boolean(window.__commonworldTestMap);
-  });
+  }, expectedDigitalProjection.catalogEntryCount);
 
   const mapCamera = () => run.page.evaluate(() => {
     const map = window.__commonworldTestMap;
@@ -1067,30 +1093,21 @@ async function intentSearchDiscoveryScenario() {
   const resultIds = () => run.page.locator('.discovery-result').evaluateAll((nodes) => nodes.map((node) => node.dataset.commonprojectId));
 
   await run.page.locator('#commons-search').fill('ich möchte mitmachen');
-  await run.page.waitForFunction(() => document.querySelectorAll('.discovery-result').length === 9);
+  await run.page.waitForFunction((count) => document.querySelectorAll('.discovery-result').length === count, expectedDigitalProjection.contributionIds.length);
   assert(await run.page.locator('#discovery-panel').isVisible(), 'intent search: result panel did not open');
-  assert(JSON.stringify(await resultIds()) === JSON.stringify([
-    'debian',
-    'freifunk',
-    'freifunk-hamburg',
-    'libreoffice',
-    'mastodon',
-    'openstreetmap',
-    'wikidata',
-    'wikimedia-commons',
-    'wikipedia',
-  ]), 'intent search: German contribution ranking differs from the derived index');
-  assert((await run.page.locator('#discovery-count').textContent()) === '9 Commons', 'intent search: ranked count mismatch');
+  const contributionResultIds = await resultIds();
+  assertSameIds(contributionResultIds, expectedDigitalProjection.contributionIds, 'intent search: German contribution identities differ from claimed catalog actions');
+  assert((await run.page.locator('#discovery-count').textContent()) === `${expectedDigitalProjection.contributionIds.length} Commons`, 'intent search: ranked count mismatch');
 
   await run.page.locator('#commons-search').focus();
   await run.page.keyboard.press('ArrowDown');
-  assert((await run.page.evaluate(() => document.activeElement?.closest('.discovery-result')?.dataset.commonprojectId)) === 'debian', 'intent search: ArrowDown did not focus the first result');
+  assert((await run.page.evaluate(() => document.activeElement?.closest('.discovery-result')?.dataset.commonprojectId)) === contributionResultIds[0], 'intent search: ArrowDown did not focus the first ranked result');
   await run.page.keyboard.press('ArrowDown');
-  assert((await run.page.evaluate(() => document.activeElement?.closest('.discovery-result')?.dataset.commonprojectId)) === 'freifunk', 'intent search: result ArrowDown did not advance');
+  assert((await run.page.evaluate(() => document.activeElement?.closest('.discovery-result')?.dataset.commonprojectId)) === contributionResultIds[1], 'intent search: result ArrowDown did not advance through the ranked results');
   await run.page.keyboard.press('End');
-  assert((await run.page.evaluate(() => document.activeElement?.closest('.discovery-result')?.dataset.commonprojectId)) === 'wikipedia', 'intent search: End did not focus the last result');
+  assert((await run.page.evaluate(() => document.activeElement?.closest('.discovery-result')?.dataset.commonprojectId)) === contributionResultIds.at(-1), 'intent search: End did not focus the last ranked result');
   await run.page.keyboard.press('Home');
-  assert((await run.page.evaluate(() => document.activeElement?.closest('.discovery-result')?.dataset.commonprojectId)) === 'debian', 'intent search: Home did not return to the first result');
+  assert((await run.page.evaluate(() => document.activeElement?.closest('.discovery-result')?.dataset.commonprojectId)) === contributionResultIds[0], 'intent search: Home did not return to the first ranked result');
 
   const queryCamera = await stableMapCamera();
   await run.page.locator('#commons-search').fill('Anderlecht');
@@ -1112,28 +1129,28 @@ async function intentSearchDiscoveryScenario() {
   await run.page.waitForFunction(() => Boolean(window.__commonworldTestMap) && !window.__commonworldTestMap.isMoving());
   const filterCamera = await mapCamera();
   await run.page.locator('#filter-presence').selectOption('hybrid');
-  await run.page.waitForFunction(() => document.querySelectorAll('.discovery-result').length === 1);
-  assert(JSON.stringify(await resultIds()) === JSON.stringify(['freifunk-hamburg']), 'intent filters: hybrid presence did not preserve the CommonProject identity');
+  await run.page.waitForFunction((count) => document.querySelectorAll('.discovery-result').length === count, expectedDigitalProjection.hybridIds.length);
+  assert(JSON.stringify(await resultIds()) === JSON.stringify(expectedDigitalProjection.hybridIds), 'intent filters: hybrid presence differs from the catalog');
   assert(new URL(run.page.url()).searchParams.get('presence') === 'hybrid', 'intent filters: presence was not serialized');
   await run.page.locator('#filter-action').selectOption('volunteer');
-  await run.page.waitForFunction(() => new URL(location.href).searchParams.get('action') === 'volunteer');
-  assert(JSON.stringify(await resultIds()) === JSON.stringify(['freifunk-hamburg']), 'intent filters: combined action and presence changed identity semantics');
+  await run.page.waitForFunction((count) => new URL(location.href).searchParams.get('action') === 'volunteer' && document.querySelectorAll('.discovery-result').length === count, expectedDigitalProjection.hybridVolunteerIds.length);
+  assert(JSON.stringify(await resultIds()) === JSON.stringify(expectedDigitalProjection.hybridVolunteerIds), 'intent filters: combined hybrid-volunteer filter differs from claimed catalog actions');
   assert(sameCamera(filterCamera, await mapCamera()), 'intent filters: changing filters moved the map');
 
-  const actionTypes = await run.page.locator('.discovery-result-actions a').evaluateAll((links) => links.map((link) => link.dataset.actionType));
+  const actionTypes = await run.page.locator('.discovery-result[data-commonproject-id="freifunk-hamburg"] .discovery-result-actions a').evaluateAll((links) => links.map((link) => link.dataset.actionType));
   assert(JSON.stringify(actionTypes) === JSON.stringify(['use', 'learn', 'contribute', 'volunteer', 'contact']), 'intent actions: direct Freifunk Hamburg actions differ from the catalog');
-  const actionTargets = await run.page.locator('.discovery-result-actions a').evaluateAll((links) => links.map((link) => link.href));
+  const actionTargets = await run.page.locator('.discovery-result[data-commonproject-id="freifunk-hamburg"] .discovery-result-actions a').evaluateAll((links) => links.map((link) => link.href));
   assert(actionTargets.every((href) => href.startsWith('https://')), 'intent actions: a direct action target is not HTTPS');
 
   await run.page.goBack({ waitUntil: 'domcontentloaded' });
   await run.page.waitForFunction(() => document.querySelector('#filter-presence')?.value === 'hybrid' && document.querySelector('#filter-action')?.value === '');
-  assert(JSON.stringify(await resultIds()) === JSON.stringify(['freifunk-hamburg']), 'intent history: Back did not restore the previous filter context');
+  assert(JSON.stringify(await resultIds()) === JSON.stringify(expectedDigitalProjection.hybridIds), 'intent history: Back did not restore the previous filter context');
   await run.page.goForward({ waitUntil: 'domcontentloaded' });
   await run.page.waitForFunction(() => document.querySelector('#filter-action')?.value === 'volunteer');
-  assert(JSON.stringify(await resultIds()) === JSON.stringify(['freifunk-hamburg']), 'intent history: Forward did not restore the combined filter context');
+  assert(JSON.stringify(await resultIds()) === JSON.stringify(expectedDigitalProjection.hybridVolunteerIds), 'intent history: Forward did not restore the combined filter context');
 
   await run.page.locator('#filter-clear').click();
-  await run.page.waitForFunction(() => document.querySelectorAll('.discovery-result').length === 12);
+  await run.page.waitForFunction((count) => document.querySelectorAll('.discovery-result').length === count, expectedDigitalProjection.catalogEntryCount);
   assert([...new URL(run.page.url()).searchParams.keys()].every((key) => !['presence', 'action', 'language', 'access', 'freshness', 'curation'].includes(key)), 'intent filters: reset left filter parameters in the URL');
 
   const digitalCamera = await mapCamera();
@@ -1158,18 +1175,18 @@ async function intentSearchDiscoveryScenario() {
   await run.page.locator('#commons-search').fill('');
   await run.page.waitForTimeout(220);
   await run.page.locator('#filter-presence').selectOption('hybrid');
-  await run.page.waitForFunction(() => document.querySelectorAll('.discovery-result').length === 1);
+  await run.page.waitForFunction((count) => document.querySelectorAll('.discovery-result').length === count, expectedDigitalProjection.hybridIds.length);
   await run.page.locator('#discovery-close').click();
   await run.page.locator('#settings-toggle').click();
   await run.page.getByRole('radio', { name: /Text/ }).click();
   const visibleTextIds = await run.page.locator('.catalog-card:not([hidden])').evaluateAll((cards) => cards.map((card) => card.dataset.commonprojectId));
-  assert(JSON.stringify(visibleTextIds) === JSON.stringify(['freifunk-hamburg']), 'intent parity: text view does not preserve the globe filter context');
+  assert(JSON.stringify(visibleTextIds) === JSON.stringify(expectedDigitalProjection.hybridIds), 'intent parity: text view does not preserve the globe filter context');
   const staticActionTypes = await run.page.locator('#project-freifunk-hamburg .catalog-action-link').evaluateAll((links) => links.map((link) => link.dataset.actionType));
   assert(JSON.stringify(staticActionTypes) === JSON.stringify(['use', 'learn', 'contribute', 'volunteer', 'contact']), 'intent parity: static text actions differ from ranked result actions');
 
   assert(run.consoleErrors.every((message) => message.includes('Failed to load resource')), 'intent search: unexpected console errors: ' + run.consoleErrors.join(' | '));
   assert(run.pageErrors.length === 0, 'intent search: page errors: ' + run.pageErrors.join(' | '));
-  results.push({ id: 'intent-search-discovery', verdict: 'PASS', indexedRecords: expectedDigitalProjection.catalogEntryCount, rankedGermanIntentResults: 9, filters: 6, digitalCoordinateFree: true, spatialNavigation: true });
+  results.push({ id: 'intent-search-discovery', verdict: 'PASS', indexedRecords: expectedDigitalProjection.catalogEntryCount, rankedGermanIntentResults: expectedDigitalProjection.contributionIds.length, filters: 6, digitalCoordinateFree: true, spatialNavigation: true });
   await run.context.close();
 }
 

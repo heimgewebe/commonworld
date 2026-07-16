@@ -1,0 +1,153 @@
+{
+  "schema_version": 3,
+  "id": "prinzessinnengarten-kollektiv",
+  "title": "Prinzessinnengarten Kollektiv Berlin",
+  "summary": "Ein öffentlich zugänglicher Gemeinschaftsgarten in Berlin-Neukölln, in dem Nachbarn gemeinsam gärtnern, Wissen teilen und urbane Biodiversität sowie ökologische Bildung pflegen.",
+  "kind": "geographic",
+  "themes": [
+    "urban-gardening",
+    "biodiversity",
+    "environmental-education",
+    "shared-space"
+  ],
+  "actions": [
+    "visit",
+    "learn",
+    "contribute",
+    "volunteer",
+    "contact"
+  ],
+  "presence": {
+    "geographic": [
+      {
+        "id": "prinzessinnengarten-neukoelln",
+        "mode": "approximate",
+        "label": "Gemeinschaftsgarten auf dem Neuen St. Jacobi Friedhof",
+        "geometry": {
+          "type": "Point",
+          "coordinates": [
+            13.4309,
+            52.4672
+          ]
+        },
+        "uncertainty_meters_min": 1500,
+        "privacy_note": "Der Punkt bezeichnet nur den öffentlich beschriebenen Gartenbereich in Berlin-Neukölln und keine privaten Flächen oder Aufenthaltsorte.",
+        "source_ids": [
+          "prinzessinnengarten-about"
+        ]
+      }
+    ],
+    "digital": {
+      "available": false,
+      "source_ids": [
+        "prinzessinnengarten-about"
+      ]
+    }
+  },
+  "activity": {
+    "status": "active",
+    "observed_at": "2026-07-16",
+    "source_ids": [
+      "prinzessinnengarten-about"
+    ],
+    "note": "Die offizielle Projektseite war am Prüftag erreichbar und beschrieb laufende offene Garten-, Bildungs- und Beteiligungsangebote."
+  },
+  "provenance": {
+    "sources": [
+      {
+        "id": "prinzessinnengarten-about",
+        "type": "official-source",
+        "label": "Prinzessinnengarten Kollektiv – Über uns",
+        "url": "https://prinzessinnengarten-kollektiv.net/ueber-uns/",
+        "retrieved_at": "2026-07-16",
+        "note": "Offizielle Beschreibung des Gemeinschaftsgartens, seiner offenen Gartenarbeitstage sowie Bildungs- und Beteiligungsangebote."
+      },
+      {
+        "id": "prinzessinnengarten-contact",
+        "type": "official-source",
+        "label": "Prinzessinnengarten Kollektiv – Kontakt",
+        "url": "https://prinzessinnengarten-kollektiv.net/kontakt/",
+        "retrieved_at": "2026-07-16",
+        "note": "Offizielle Kontaktseite des Kollektivs."
+      }
+    ]
+  },
+  "curation": {
+    "state": "listed",
+    "reviewed_by": "Commonworld editorial review",
+    "reviewed_at": "2026-07-16",
+    "next_review_at": "2026-10-16",
+    "notes": "Der Kartenpunkt ist bewusst angenähert; er zeigt den öffentlich benannten Gartenstandort, nicht einzelne Nutzungsflächen oder Personen."
+  },
+  "links": [
+    {
+      "type": "homepage",
+      "label": "Prinzessinnengarten Kollektiv – offizielle Seite",
+      "url": "https://prinzessinnengarten-kollektiv.net/"
+    },
+    {
+      "type": "source",
+      "label": "Über das Kollektiv und den Garten",
+      "url": "https://prinzessinnengarten-kollektiv.net/ueber-uns/"
+    },
+    {
+      "type": "visit",
+      "label": "Gemeinschaftsgarten kennenlernen und besuchen",
+      "url": "https://prinzessinnengarten-kollektiv.net/ueber-uns/",
+      "source_ids": [
+        "prinzessinnengarten-about"
+      ]
+    },
+    {
+      "type": "learn",
+      "label": "Bildungs- und Gartenarbeit kennenlernen",
+      "url": "https://prinzessinnengarten-kollektiv.net/ueber-uns/",
+      "source_ids": [
+        "prinzessinnengarten-about"
+      ]
+    },
+    {
+      "type": "contribute",
+      "label": "Bei offenen Gartenarbeitstagen mitmachen",
+      "url": "https://prinzessinnengarten-kollektiv.net/ueber-uns/",
+      "source_ids": [
+        "prinzessinnengarten-about"
+      ]
+    },
+    {
+      "type": "volunteer",
+      "label": "Das Kollektiv praktisch unterstützen",
+      "url": "https://prinzessinnengarten-kollektiv.net/ueber-uns/",
+      "source_ids": [
+        "prinzessinnengarten-about"
+      ]
+    },
+    {
+      "type": "contact",
+      "label": "Prinzessinnengarten kontaktieren",
+      "url": "https://prinzessinnengarten-kollektiv.net/kontakt/",
+      "source_ids": [
+        "prinzessinnengarten-contact"
+      ]
+    }
+  ],
+  "handoff": {
+    "enabled": false
+  },
+  "languages": {
+    "codes": [
+      "de"
+    ],
+    "source_ids": [
+      "prinzessinnengarten-about"
+    ],
+    "note": "Die angegebenen Sprachen sind auf den geprüften offiziellen Projektseiten öffentlich verfügbar."
+  },
+  "access": {
+    "type": "public",
+    "source_ids": [
+      "prinzessinnengarten-about"
+    ],
+    "note": "Die Zugangsform wurde aus den veröffentlichten Nutzungs- und Beteiligungswegen abgeleitet."
+  }
+}

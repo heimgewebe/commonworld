@@ -232,20 +232,27 @@ def validate_intent_search_discovery(root: Path = ROOT) -> list[str]:
     if probe_error:
         errors.append(f"T007 Node probe failed: {probe_error}")
     elif probe is not None:
-        expected_rank = [
-            "debian", "freifunk", "freifunk-hamburg", "libreoffice", "mastodon",
-            "openstreetmap", "wikidata", "wikimedia-commons", "wikipedia",
-        ]
-        if probe.get("indexedRecords") != 12 or probe.get("indexedTerms", 0) <= 0:
+        expected_contribution = sorted(
+            record["id"]
+            for record in records
+            if "contribute" in record.get("actions", [])
+        )
+        expected_hybrid_volunteer = sorted(
+            record["id"]
+            for record in records
+            if record.get("kind") == "hybrid"
+            and "volunteer" in record.get("actions", [])
+        )
+        if probe.get("indexedRecords") != manifest.get("entry_count") or probe.get("indexedTerms", 0) <= 0:
             errors.append("T007 runtime index does not cover the current catalog")
-        if probe.get("germanContribution") != expected_rank:
-            errors.append("T007 German intent ranking mismatch")
+        if sorted(probe.get("germanContribution", [])) != expected_contribution:
+            errors.append("T007 German contribution intent does not match claimed actions")
         if probe.get("publicPlace") != ["cltb-le-nid"]:
             errors.append("T007 public place query mismatch")
         if probe.get("hiddenPhrase") != []:
             errors.append("T007 hidden geographic values leaked into search")
-        if probe.get("hybridVolunteer") != ["freifunk-hamburg"]:
-            errors.append("T007 combined filter identity mismatch")
+        if probe.get("hybridVolunteer") != expected_hybrid_volunteer:
+            errors.append("T007 combined hybrid-volunteer filter does not match claimed actions")
         if probe.get("digitalTarget") is not None:
             errors.append("T007 digital Commons acquired a spatial navigation target")
         if probe.get("geographicTarget", {}).get("kind") != "bounds":

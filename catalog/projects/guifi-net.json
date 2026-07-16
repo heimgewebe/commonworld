@@ -1,0 +1,167 @@
+{
+  "schema_version": 3,
+  "id": "guifi-net",
+  "title": "guifi.net",
+  "summary": "Ein offenes, freies und neutrales Telekommunikationsnetz, dessen Infrastruktur als Gemeingut gemeinschaftlich aufgebaut, genutzt und von unterschiedlichen Teilnehmern gleichberechtigt weiterentwickelt wird.",
+  "kind": "hybrid",
+  "themes": [
+    "communication",
+    "community-network",
+    "infrastructure",
+    "commons-governance"
+  ],
+  "actions": [
+    "use",
+    "learn",
+    "contribute",
+    "replicate",
+    "contact"
+  ],
+  "presence": {
+    "geographic": [
+      {
+        "id": "guifi-catalonia-region",
+        "mode": "approximate",
+        "label": "Historischer Schwerpunkt in Katalonien",
+        "geometry": {
+          "type": "Point",
+          "coordinates": [
+            1.7,
+            41.75
+          ]
+        },
+        "uncertainty_meters_min": 175000,
+        "privacy_note": "Der Punkt ist eine grobe regionale Orientierung und weder Netzabdeckung noch Standort einzelner Knoten.",
+        "source_ids": [
+          "guifi-commons"
+        ]
+      },
+      {
+        "id": "guifi-private-nodes",
+        "mode": "hidden",
+        "label": "Private und nicht öffentlich geprüfte Netzknoten",
+        "privacy_note": "Einzelne private Anschlüsse und nicht öffentlich geprüfte Knoten werden nicht aus der Netzplattform rekonstruiert.",
+        "source_ids": [
+          "guifi-network-guide"
+        ]
+      }
+    ],
+    "digital": {
+      "available": true,
+      "source_ids": [
+        "guifi-commons",
+        "guifi-network-guide"
+      ],
+      "reach": "network",
+      "label": "Digitale Netzverwaltung, Dokumentation und gemeinschaftliche Telekommunikationsinfrastruktur"
+    }
+  },
+  "activity": {
+    "status": "active",
+    "observed_at": "2026-07-16",
+    "source_ids": [
+      "guifi-commons"
+    ],
+    "note": "Die offiziellen guifi.net-Seiten waren am Prüftag erreichbar und beschrieben das fortbestehende gemeinsame Netz sowie seine aktuelle Verwaltungsplattform."
+  },
+  "provenance": {
+    "sources": [
+      {
+        "id": "guifi-commons",
+        "type": "official-source",
+        "label": "Fundació Guifi.net – Commons Network",
+        "url": "https://fundacio.guifi.net/page/red",
+        "retrieved_at": "2026-07-16",
+        "note": "Offizielle Beschreibung der offenen, freien und neutralen Telekommunikationsinfrastruktur als Gemeingut."
+      },
+      {
+        "id": "guifi-network-guide",
+        "type": "official-source",
+        "label": "network.guifi.net – User guide",
+        "url": "https://network.guifi.net/en",
+        "retrieved_at": "2026-07-16",
+        "note": "Offizielle Plattform und Dokumentation zum Aufbau und zur gemeinschaftlichen Verwaltung der Netzinfrastruktur."
+      }
+    ]
+  },
+  "curation": {
+    "state": "listed",
+    "reviewed_by": "Commonworld editorial review",
+    "reviewed_at": "2026-07-16",
+    "next_review_at": "2026-10-16",
+    "notes": "Die geografische Darstellung ist absichtlich grob; sie behauptet weder vollständige Abdeckung noch einzelne Knotenstandorte."
+  },
+  "links": [
+    {
+      "type": "homepage",
+      "label": "guifi.net – offizielle Einführung",
+      "url": "https://landing.guifi.net/en/"
+    },
+    {
+      "type": "source",
+      "label": "Die guifi.net-Infrastruktur als Gemeingut",
+      "url": "https://fundacio.guifi.net/page/red"
+    },
+    {
+      "type": "use",
+      "label": "Öffentliche Netzplattform öffnen",
+      "url": "https://network.guifi.net/en",
+      "source_ids": [
+        "guifi-network-guide"
+      ]
+    },
+    {
+      "type": "learn",
+      "label": "Offenes, freies und neutrales Netz verstehen",
+      "url": "https://fundacio.guifi.net/page/red",
+      "source_ids": [
+        "guifi-commons"
+      ]
+    },
+    {
+      "type": "contribute",
+      "label": "Am gemeinsamen Netz mitwirken",
+      "url": "https://network.guifi.net/en",
+      "source_ids": [
+        "guifi-network-guide"
+      ]
+    },
+    {
+      "type": "replicate",
+      "label": "Eigene gemeinschaftliche Netzinfrastruktur aufbauen",
+      "url": "https://network.guifi.net/en/node/70380",
+      "source_ids": [
+        "guifi-network-guide"
+      ]
+    },
+    {
+      "type": "contact",
+      "label": "Fundació Guifi.net kontaktieren",
+      "url": "https://landing.guifi.net/en/",
+      "source_ids": [
+        "guifi-commons"
+      ]
+    }
+  ],
+  "handoff": {
+    "enabled": false
+  },
+  "languages": {
+    "codes": [
+      "ca",
+      "es",
+      "en"
+    ],
+    "source_ids": [
+      "guifi-commons"
+    ],
+    "note": "Die angegebenen Sprachen sind auf den geprüften offiziellen Projektseiten öffentlich verfügbar."
+  },
+  "access": {
+    "type": "public",
+    "source_ids": [
+      "guifi-commons"
+    ],
+    "note": "Die Zugangsform wurde aus den veröffentlichten Nutzungs- und Beteiligungswegen abgeleitet."
+  }
+}

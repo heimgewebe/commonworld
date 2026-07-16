@@ -1,0 +1,174 @@
+{
+  "schema_version": 3,
+  "id": "nyc-mesh",
+  "title": "NYC Mesh",
+  "summary": "Ein von Freiwilligen getragenes Gemeinschaftsnetz in New York City, das bezahlbaren Internetzugang, digitale Selbstbestimmung und gemeinsam aufgebaute lokale Infrastruktur verbindet.",
+  "kind": "hybrid",
+  "themes": [
+    "communication",
+    "community-network",
+    "infrastructure",
+    "digital-equity"
+  ],
+  "actions": [
+    "use",
+    "learn",
+    "contribute",
+    "volunteer",
+    "donate",
+    "contact"
+  ],
+  "presence": {
+    "geographic": [
+      {
+        "id": "nycmesh-city-area",
+        "mode": "approximate",
+        "label": "New York City",
+        "geometry": {
+          "type": "Point",
+          "coordinates": [
+            -73.9857,
+            40.7484
+          ]
+        },
+        "uncertainty_meters_min": 25000,
+        "privacy_note": "Der Punkt bezeichnet nur den öffentlichen Wirkungsraum der Community und keine Dach-, Wohnungs- oder Antennenstandorte.",
+        "source_ids": [
+          "nycmesh-home"
+        ]
+      },
+      {
+        "id": "nycmesh-member-sites",
+        "mode": "hidden",
+        "label": "Private Mitglieder- und Dachstandorte",
+        "privacy_note": "Private Anschluss- und Dachstandorte werden nicht aus Karten, Formularen oder Netzdaten rekonstruiert.",
+        "source_ids": [
+          "nycmesh-overview"
+        ]
+      }
+    ],
+    "digital": {
+      "available": true,
+      "source_ids": [
+        "nycmesh-home",
+        "nycmesh-overview"
+      ],
+      "reach": "network",
+      "label": "Gemeinschaftsnetz, offene Dokumentation und digitale Zusammenarbeit für New York City"
+    }
+  },
+  "activity": {
+    "status": "active",
+    "observed_at": "2026-07-16",
+    "source_ids": [
+      "nycmesh-home"
+    ],
+    "note": "Die offizielle Seite und Projektdokumentation waren am Prüftag erreichbar und veröffentlichten aktive Anschluss-, Unterstützungs- und Freiwilligenwege."
+  },
+  "provenance": {
+    "sources": [
+      {
+        "id": "nycmesh-home",
+        "type": "official-source",
+        "label": "NYC Mesh – official homepage",
+        "url": "https://www.nycmesh.net/",
+        "retrieved_at": "2026-07-16",
+        "note": "Offizielle Beschreibung des gemeinschaftlich getragenen Netzes und seiner Nutzungs-, Spenden- und Beteiligungswege."
+      },
+      {
+        "id": "nycmesh-overview",
+        "type": "official-source",
+        "label": "NYC Mesh Wiki – Overview",
+        "url": "https://wiki.nycmesh.net/books/1-introduction/page/nyc-mesh-overview",
+        "retrieved_at": "2026-07-16",
+        "note": "Offizielle Projektdokumentation zur gemeinschaftlichen Wartung und Erweiterung des Netzes."
+      }
+    ]
+  },
+  "curation": {
+    "state": "listed",
+    "reviewed_by": "Commonworld editorial review",
+    "reviewed_at": "2026-07-16",
+    "next_review_at": "2026-10-16",
+    "notes": "Die Karte zeigt nur den groben Stadtbezug. Potenzielle oder aktive private Knoten werden nicht in Commonworld übernommen."
+  },
+  "links": [
+    {
+      "type": "homepage",
+      "label": "NYC Mesh – offizielle Seite",
+      "url": "https://www.nycmesh.net/"
+    },
+    {
+      "type": "source",
+      "label": "NYC Mesh kennenlernen",
+      "url": "https://wiki.nycmesh.net/books/1-introduction/page/nyc-mesh-overview"
+    },
+    {
+      "type": "use",
+      "label": "Verbindung mit NYC Mesh anfragen",
+      "url": "https://www.nycmesh.net/join",
+      "source_ids": [
+        "nycmesh-home"
+      ]
+    },
+    {
+      "type": "learn",
+      "label": "Dokumentation und Funktionsweise lesen",
+      "url": "https://wiki.nycmesh.net/books/1-introduction/page/nyc-mesh-overview",
+      "source_ids": [
+        "nycmesh-overview"
+      ]
+    },
+    {
+      "type": "contribute",
+      "label": "Das Netz gemeinsam erweitern",
+      "url": "https://www.nycmesh.net/volunteer",
+      "source_ids": [
+        "nycmesh-home"
+      ]
+    },
+    {
+      "type": "volunteer",
+      "label": "Bei NYC Mesh ehrenamtlich helfen",
+      "url": "https://www.nycmesh.net/volunteer",
+      "source_ids": [
+        "nycmesh-home"
+      ]
+    },
+    {
+      "type": "donate",
+      "label": "NYC Mesh unterstützen",
+      "url": "https://www.nycmesh.net/donate",
+      "source_ids": [
+        "nycmesh-home"
+      ]
+    },
+    {
+      "type": "contact",
+      "label": "Unterstützung und Kontakt",
+      "url": "https://www.nycmesh.net/support",
+      "source_ids": [
+        "nycmesh-home"
+      ]
+    }
+  ],
+  "handoff": {
+    "enabled": false
+  },
+  "languages": {
+    "codes": [
+      "en"
+    ],
+    "source_ids": [
+      "nycmesh-home"
+    ],
+    "note": "Die angegebenen Sprachen sind auf den geprüften offiziellen Projektseiten öffentlich verfügbar."
+  },
+  "access": {
+    "type": "membership",
+    "source_ids": [
+      "nycmesh-home"
+    ],
+    "note": "Die Zugangsform wurde aus den veröffentlichten Nutzungs- und Beteiligungswegen abgeleitet."
+  }
+}

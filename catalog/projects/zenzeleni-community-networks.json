@@ -1,0 +1,165 @@
+{
+  "schema_version": 3,
+  "id": "zenzeleni-community-networks",
+  "title": "Zenzeleni Community Networks",
+  "summary": "Ein von lokalen Genossenschaften getragenes Gemeinschaftsnetz im ländlichen Eastern Cape, das bezahlbare Konnektivität bereitstellt und Einnahmen sowie Verantwortung in den Gemeinden hält.",
+  "kind": "hybrid",
+  "themes": [
+    "communication",
+    "community-network",
+    "cooperative",
+    "digital-equity"
+  ],
+  "actions": [
+    "use",
+    "learn",
+    "contribute",
+    "replicate",
+    "contact"
+  ],
+  "presence": {
+    "geographic": [
+      {
+        "id": "zenzeleni-mankosi-zithulele",
+        "mode": "approximate",
+        "label": "Mankosi und Zithulele, Eastern Cape",
+        "geometry": {
+          "type": "Point",
+          "coordinates": [
+            29.15,
+            -31.2
+          ]
+        },
+        "uncertainty_meters_min": 60000,
+        "privacy_note": "Der Punkt bezeichnet nur die öffentlich benannte ländliche Wirkungsregion und keine Haushalte, Hotspots oder Funkstandorte.",
+        "source_ids": [
+          "zenzeleni-home"
+        ]
+      },
+      {
+        "id": "zenzeleni-private-links",
+        "mode": "hidden",
+        "label": "Private Haushalts- und Geschäftsanschlüsse",
+        "privacy_note": "Private Anschlussorte und Funkstrecken werden nicht aus Kontakt- oder Netzinformationen abgeleitet.",
+        "source_ids": [
+          "zenzeleni-model"
+        ]
+      }
+    ],
+    "digital": {
+      "available": true,
+      "source_ids": [
+        "zenzeleni-home",
+        "zenzeleni-model"
+      ],
+      "reach": "network",
+      "label": "Kooperativ betriebenes regionales Internetnetz und öffentliches Wissen zum Aufbau weiterer Gemeinschaftsnetze"
+    }
+  },
+  "activity": {
+    "status": "active",
+    "observed_at": "2026-07-16",
+    "source_ids": [
+      "zenzeleni-home"
+    ],
+    "note": "Die offizielle Seite war am Prüftag erreichbar und veröffentlichte aktive Verbindungs-, Partnerschafts- und Replikationswege."
+  },
+  "provenance": {
+    "sources": [
+      {
+        "id": "zenzeleni-home",
+        "type": "official-source",
+        "label": "Zenzeleni Community Networks – official homepage",
+        "url": "https://zenzeleni.net/",
+        "retrieved_at": "2026-07-16",
+        "note": "Offizielle Beschreibung des gemeinschaftseigenen drahtlosen Internetdienstes in ländlichen Gemeinden Südafrikas."
+      },
+      {
+        "id": "zenzeleni-model",
+        "type": "official-source",
+        "label": "Zenzeleni – Our Model",
+        "url": "https://zenzeleni.net/our-model/",
+        "retrieved_at": "2026-07-16",
+        "note": "Offizielle Darstellung der kooperativen Eigentums-, Betriebs- und Reinvestitionsstruktur."
+      }
+    ]
+  },
+  "curation": {
+    "state": "listed",
+    "reviewed_by": "Commonworld editorial review",
+    "reviewed_at": "2026-07-16",
+    "next_review_at": "2026-10-16",
+    "notes": "Die regionale Koordinate ist bewusst grob; private Anschlüsse, Hotspots und Funkstrecken bleiben verborgen."
+  },
+  "links": [
+    {
+      "type": "homepage",
+      "label": "Zenzeleni Community Networks – offizielle Seite",
+      "url": "https://zenzeleni.net/"
+    },
+    {
+      "type": "source",
+      "label": "Das kooperative Zenzeleni-Modell",
+      "url": "https://zenzeleni.net/our-model/"
+    },
+    {
+      "type": "use",
+      "label": "Mit Zenzeleni verbinden",
+      "url": "https://zenzeleni.net/get-connected/",
+      "source_ids": [
+        "zenzeleni-home"
+      ]
+    },
+    {
+      "type": "learn",
+      "label": "Eigentum, Betrieb und Reinvestition verstehen",
+      "url": "https://zenzeleni.net/our-model/",
+      "source_ids": [
+        "zenzeleni-model"
+      ]
+    },
+    {
+      "type": "contribute",
+      "label": "Als Partner oder Gemeinde mitwirken",
+      "url": "https://zenzeleni.net/get-connected/",
+      "source_ids": [
+        "zenzeleni-home"
+      ]
+    },
+    {
+      "type": "replicate",
+      "label": "Eine neue lokale Genossenschaft anstoßen",
+      "url": "https://zenzeleni.net/get-connected/",
+      "source_ids": [
+        "zenzeleni-home"
+      ]
+    },
+    {
+      "type": "contact",
+      "label": "Zenzeleni kontaktieren",
+      "url": "https://zenzeleni.net/get-connected/",
+      "source_ids": [
+        "zenzeleni-home"
+      ]
+    }
+  ],
+  "handoff": {
+    "enabled": false
+  },
+  "languages": {
+    "codes": [
+      "en"
+    ],
+    "source_ids": [
+      "zenzeleni-home"
+    ],
+    "note": "Die angegebenen Sprachen sind auf den geprüften offiziellen Projektseiten öffentlich verfügbar."
+  },
+  "access": {
+    "type": "membership",
+    "source_ids": [
+      "zenzeleni-home"
+    ],
+    "note": "Die Zugangsform wurde aus den veröffentlichten Nutzungs- und Beteiligungswegen abgeleitet."
+  }
+}

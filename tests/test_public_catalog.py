@@ -168,6 +168,53 @@ class PublicCatalogTests(unittest.TestCase):
 
         self.assertTrue(any("must not store presentation or zoom assignments" in error for error in errors))
 
+    def test_growth_catalog_preserves_real_world_balance(self) -> None:
+        manifest = json.loads((ROOT / "catalog" / "catalog.json").read_text(encoding="utf-8"))
+        records = [
+            json.loads((ROOT / "catalog" / relative).read_text(encoding="utf-8"))
+            for relative in manifest["project_files"]
+        ]
+        identifiers = {record["id"] for record in records}
+        expected_growth = {
+            "edinburgh-tool-library",
+            "granby-four-streets-clt",
+            "guifi-net",
+            "nyc-mesh",
+            "open-source-ecology",
+            "prinzessinnengarten-kollektiv",
+            "sarantaporo-community-network",
+            "zenzeleni-community-networks",
+        }
+        public_points = [
+            location["geometry"]["coordinates"]
+            for record in records
+            for location in record.get("presence", {}).get("geographic", [])
+            if location.get("mode") != "hidden"
+            and location.get("geometry", {}).get("type") == "Point"
+        ]
+        spatial_identities = {
+            record["id"]
+            for record in records
+            if any(
+                location.get("mode") != "hidden" and location.get("geometry")
+                for location in record.get("presence", {}).get("geographic", [])
+            )
+        }
+        kind_counts = {
+            kind: sum(record.get("kind") == kind for record in records)
+            for kind in ("geographic", "digital", "hybrid")
+        }
+
+        self.assertEqual(20, manifest["entry_count"])
+        self.assertTrue(expected_growth.issubset(identifiers))
+        self.assertGreaterEqual(len(spatial_identities), 10)
+        self.assertGreaterEqual(kind_counts["geographic"], 4)
+        self.assertGreaterEqual(kind_counts["hybrid"], 6)
+        self.assertTrue(any(longitude < -30 for longitude, _ in public_points))
+        self.assertTrue(any(latitude < 0 for _, latitude in public_points))
+        self.assertTrue(any("borrow" in record.get("actions", []) for record in records))
+        self.assertGreaterEqual(sum("replicate" in record.get("actions", []) for record in records), 3)
+
 
 if __name__ == "__main__":
     unittest.main()

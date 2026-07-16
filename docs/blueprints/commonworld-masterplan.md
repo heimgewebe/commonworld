@@ -743,6 +743,8 @@ Es gibt keinen universellen Commons-Score und keine moralische Rangliste.
 
 ### Phase 5 — Katalogwachstum
 
+Zwischenstand 16. Juli 2026: 20 geprüfte Commons, davon 10 räumlich sichtbar; acht neue Einträge erweitern Commons-Arten, Nordamerika und die südliche Hemisphäre. Die verbleibende Lücke zu 30–50 Einträgen und die fehlenden Kandidatenwege bleiben ausdrücklich offen.
+
 - 30–50 ausgewogene Commons;
 - redaktionelle und Partner-Kandidatenwege;
 - Aktualitätskontrolle;

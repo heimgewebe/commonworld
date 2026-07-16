@@ -1,0 +1,144 @@
+{
+  "schema_version": 3,
+  "id": "granby-four-streets-clt",
+  "title": "Granby Four Streets Community Land Trust",
+  "summary": "Ein von Bewohnern getragener Community Land Trust in Liverpool, der dauerhaft bezahlbaren Wohnraum, Gemeinschaftsräume, Begrünung und lokale wirtschaftliche Aktivitäten im Quartier sichert.",
+  "kind": "geographic",
+  "themes": [
+    "housing",
+    "community-land",
+    "shared-space",
+    "neighbourhood"
+  ],
+  "actions": [
+    "visit",
+    "learn",
+    "contribute",
+    "contact"
+  ],
+  "presence": {
+    "geographic": [
+      {
+        "id": "granby-four-streets-area",
+        "mode": "approximate",
+        "label": "Granby Four Streets, Liverpool",
+        "geometry": {
+          "type": "Point",
+          "coordinates": [
+            -2.9547,
+            53.3934
+          ]
+        },
+        "uncertainty_meters_min": 1500,
+        "privacy_note": "Der Punkt bezeichnet das öffentlich benannte Quartier und keine einzelne Wohnung oder Bewohneradresse.",
+        "source_ids": [
+          "granby-about"
+        ]
+      }
+    ],
+    "digital": {
+      "available": false,
+      "source_ids": [
+        "granby-about"
+      ]
+    }
+  },
+  "activity": {
+    "status": "active",
+    "observed_at": "2026-07-16",
+    "source_ids": [
+      "granby-about"
+    ],
+    "note": "Die offizielle Seite war am Prüftag erreichbar und beschrieb aktive Wohn-, Gemeinschafts- und Quartiersarbeit."
+  },
+  "provenance": {
+    "sources": [
+      {
+        "id": "granby-about",
+        "type": "official-source",
+        "label": "Granby Four Streets CLT – About",
+        "url": "https://www.granby4streetsclt.co.uk/about",
+        "retrieved_at": "2026-07-16",
+        "note": "Offizielle Darstellung des Community Land Trust, seiner Wohnhäuser, Gemeinschaftsräume, Begrünung und des Straßenmarkts."
+      },
+      {
+        "id": "granby-clt",
+        "type": "official-source",
+        "label": "Granby Four Streets CLT – What is a CLT",
+        "url": "https://www.granby4streetsclt.co.uk/whats-a-clt",
+        "retrieved_at": "2026-07-16",
+        "note": "Offizielle Erklärung des dauerhaft gemeinschaftlich gebundenen Boden- und Wohnmodells."
+      }
+    ]
+  },
+  "curation": {
+    "state": "listed",
+    "reviewed_by": "Commonworld editorial review",
+    "reviewed_at": "2026-07-16",
+    "next_review_at": "2026-10-16",
+    "notes": "Die Quartiersverortung bleibt grob und veröffentlicht keine Wohnungs- oder Personendaten."
+  },
+  "links": [
+    {
+      "type": "homepage",
+      "label": "Granby Four Streets CLT – offizielle Seite",
+      "url": "https://www.granby4streetsclt.co.uk/"
+    },
+    {
+      "type": "source",
+      "label": "Über Granby Four Streets CLT",
+      "url": "https://www.granby4streetsclt.co.uk/about"
+    },
+    {
+      "type": "visit",
+      "label": "Quartier, Winter Garden und Straßenmarkt kennenlernen",
+      "url": "https://www.granby4streetsclt.co.uk/about",
+      "source_ids": [
+        "granby-about"
+      ]
+    },
+    {
+      "type": "learn",
+      "label": "Community Land Trust verstehen",
+      "url": "https://www.granby4streetsclt.co.uk/whats-a-clt",
+      "source_ids": [
+        "granby-clt"
+      ]
+    },
+    {
+      "type": "contribute",
+      "label": "Mit Granby Four Streets zusammenarbeiten",
+      "url": "https://www.granby4streetsclt.co.uk/about",
+      "source_ids": [
+        "granby-about"
+      ]
+    },
+    {
+      "type": "contact",
+      "label": "Granby Four Streets CLT kontaktieren",
+      "url": "https://www.granby4streetsclt.co.uk/about",
+      "source_ids": [
+        "granby-about"
+      ]
+    }
+  ],
+  "handoff": {
+    "enabled": false
+  },
+  "languages": {
+    "codes": [
+      "en"
+    ],
+    "source_ids": [
+      "granby-about"
+    ],
+    "note": "Die angegebenen Sprachen sind auf den geprüften offiziellen Projektseiten öffentlich verfügbar."
+  },
+  "access": {
+    "type": "public",
+    "source_ids": [
+      "granby-about"
+    ],
+    "note": "Die Zugangsform wurde aus den veröffentlichten Nutzungs- und Beteiligungswegen abgeleitet."
+  }
+}
