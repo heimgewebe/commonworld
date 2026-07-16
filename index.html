@@ -59,7 +59,7 @@
       </section>
 
       <section id="globe-surface" class="globe-surface" aria-label="Commonworld-Globus">
-        <figure class="globe-stage" aria-labelledby="globe-caption" data-runtime-state="loading" data-view-phase="overview" data-map-renders="0" data-overlay-renders="0">
+        <figure class="globe-stage" aria-labelledby="globe-caption" data-runtime-state="loading" data-visual-ready="false" data-view-phase="overview" data-map-renders="0" data-overlay-renders="0">
           <div id="map" class="globe-map" role="region" aria-label="Interaktiver Commonworld-Globus"></div>
           <svg id="digital-sphere" class="digital-sphere" viewBox="0 0 640 640" role="group" aria-labelledby="sphere-title">
             <title id="sphere-title">Digitale Commons-Sphäre aus Namen und deren Binärcode</title>
@@ -71,6 +71,7 @@
                 <stop offset="100%" stop-color="white" />
               </radialGradient>
               <mask id="sphere-mask"><rect width="640" height="640" fill="url(#sphere-center-fade)" /></mask>
+              <path id="sphere-action-path" d="M 320 15 A 305 305 0 1 1 319.99 15" />
               <g id="sphere-paths" fill="none">
               <ellipse id="sphere-path-1" cx="320" cy="320" rx="316" ry="300" transform="rotate(-8 320 320)" />
               <ellipse id="sphere-path-2" cx="320" cy="320" rx="310" ry="282" transform="rotate(20 320 320)" />
@@ -89,7 +90,9 @@
               <use href="#sphere-path-6" class="sphere-layer-guide" data-layer-id="mixed_other"></use>
             </g>
             <g id="sphere-streams" mask="url(#sphere-mask)" aria-hidden="true"></g>
-            <circle id="sphere-edge-control" class="sphere-edge-control" cx="320" cy="320" r="318" fill="none" stroke="transparent" stroke-width="20" pointer-events="stroke" role="button" tabindex="0" aria-label="Digitale Commons-Schichten öffnen"></circle>
+            <circle class="sphere-action-guide" cx="320" cy="320" r="309" aria-hidden="true"></circle>
+            <text class="sphere-action-text" aria-hidden="true"><textPath href="#sphere-action-path" startOffset="1%">DIGITALE EBENEN ÖFFNEN · ANTIPPEN · DIGITALE EBENEN ÖFFNEN · ANTIPPEN · DIGITALE EBENEN ÖFFNEN · ANTIPPEN ·</textPath></text>
+            <circle id="sphere-edge-control" class="sphere-edge-control" cx="320" cy="320" r="309" fill="none" stroke="transparent" stroke-width="34" pointer-events="stroke" role="button" tabindex="0" aria-label="Digitale Ebenen öffnen. Antippen oder Eingabetaste drücken."></circle>
           </svg>
           <div id="layer-stack-visual" class="layer-stack-visual" aria-hidden="true"></div>
 

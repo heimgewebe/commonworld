@@ -79,6 +79,7 @@ async function newPage({ mobile = false, viewportOverride = null, touch = mobile
           const OriginalMap = value.Map;
           class CapturedMap extends OriginalMap {
             constructor(...arguments_) {
+              window.__commonworldTestMapOptions = arguments_[0];
               super(...arguments_);
               window.__commonworldTestMap = this;
             }
@@ -147,6 +148,73 @@ async function independentProjectedGlobeDiameter(page) {
     return radius * 2;
   }, horizon);
 }
+
+async function startupAndAffordanceScenario() {
+  process.stdout.write(`${JSON.stringify({ state: 'RUNNING', scenario: 'startup-and-ring-affordance' })}\n`);
+  const run = await newPage({ viewportOverride: { width: 1280, height: 800 }, reducedMotion: 'no-preference' });
+  await run.page.route('**/assets/map/openfreemap-liberty.json', async (route) => {
+    await new Promise((resolve) => setTimeout(resolve, 650));
+    await route.continue();
+  });
+  await run.page.goto(baseUrl, { waitUntil: 'domcontentloaded' });
+  await run.page.waitForSelector('html.runtime-ready');
+  await run.page.waitForFunction(() => Boolean(window.__commonworldTestMap));
+
+  const loadingVisual = await run.page.evaluate(() => {
+    const stage = document.querySelector('.globe-stage');
+    const sphere = document.querySelector('#digital-sphere');
+    const canvas = document.querySelector('.maplibregl-canvas');
+    return {
+      visualReady: stage?.dataset.visualReady,
+      sphereOpacity: Number(getComputedStyle(sphere).opacity),
+      spherePointerEvents: getComputedStyle(sphere).pointerEvents,
+      canvasOpacity: canvas ? Number(getComputedStyle(canvas).opacity) : null,
+      projection: window.__commonworldTestMapOptions?.projection?.type ?? null,
+    };
+  });
+  assert(loadingVisual.visualReady === 'false', 'startup: visual became ready before map calibration ' + JSON.stringify(loadingVisual));
+  assert(loadingVisual.sphereOpacity === 0 && loadingVisual.spherePointerEvents === 'none', 'startup: uncalibrated digital sphere was exposed ' + JSON.stringify(loadingVisual));
+  assert(loadingVisual.canvasOpacity === 0, 'startup: uncalibrated globe canvas was exposed ' + JSON.stringify(loadingVisual));
+  assert(loadingVisual.projection === 'globe', 'startup: map did not start directly in globe projection ' + JSON.stringify(loadingVisual));
+
+  await run.page.waitForFunction(() => document.querySelector('.globe-stage')?.dataset.visualReady === 'true');
+  await run.page.waitForFunction(() => Number(document.querySelector('.globe-stage')?.dataset.sphereSize ?? 0) > 0);
+  assert((await run.page.evaluate(() => window.__commonworldTestMap?.getProjection?.()?.type)) === 'globe', 'startup: active projection changed after map calibration');
+  await waitForSphereOpacitySettled(run.page);
+
+  const affordance = await run.page.evaluate(() => {
+    const text = document.querySelector('.sphere-action-text');
+    const guide = document.querySelector('.sphere-action-guide');
+    const control = document.querySelector('#sphere-edge-control');
+    return {
+      text: text?.textContent?.replace(/\s+/g, ' ').trim() ?? '',
+      textFill: getComputedStyle(text).fill,
+      textOpacity: Number(getComputedStyle(text).opacity),
+      guideStroke: getComputedStyle(guide).stroke,
+      ariaLabel: control?.getAttribute('aria-label') ?? '',
+      hitWidth: Number(control?.getAttribute('stroke-width')),
+    };
+  });
+  assert(affordance.text.includes('DIGITALE EBENEN ÖFFNEN') && affordance.text.includes('ANTIPPEN'), 'affordance: outer instruction is missing ' + JSON.stringify(affordance));
+  assert(affordance.textOpacity >= 0.75, 'affordance: outer instruction is too faint ' + JSON.stringify(affordance));
+  assert(affordance.ariaLabel.includes('Antippen') && affordance.ariaLabel.includes('Eingabetaste'), 'affordance: accessible instruction is incomplete ' + JSON.stringify(affordance));
+  assert(affordance.hitWidth >= 34, 'affordance: edge hit target was not enlarged ' + JSON.stringify(affordance));
+
+  await run.page.locator('#sphere-edge-control').focus();
+  await run.page.waitForTimeout(600);
+  const focused = await run.page.evaluate(() => ({
+    active: document.querySelector('#digital-sphere')?.dataset.affordanceActive,
+    textFill: getComputedStyle(document.querySelector('.sphere-action-text')).fill,
+    guideWidth: Number.parseFloat(getComputedStyle(document.querySelector('.sphere-action-guide')).strokeWidth),
+    ringWidth: Number.parseFloat(getComputedStyle(document.querySelector('#sphere-rings use')).strokeWidth),
+  }));
+  assert(focused.active === 'true' && focused.textFill !== affordance.textFill && focused.guideWidth >= 1.99 && focused.ringWidth >= 1.49, 'affordance: focus does not visibly activate the rings ' + JSON.stringify({ affordance, focused }));
+  assert(run.consoleErrors.length === 0, 'startup: console errors: ' + run.consoleErrors.join(' | '));
+  assert(run.pageErrors.length === 0, 'startup: page errors: ' + run.pageErrors.join(' | '));
+  results.push({ id: 'startup-and-ring-affordance', verdict: 'PASS', directGlobeProjection: true, hiddenUntilCalibrated: true, staticOuterInstruction: true });
+  await run.context.close();
+}
+
 
 async function normalScenario() {
   const run = await newPage();
@@ -322,6 +390,20 @@ async function layerJourneyScenario({ mobile = false, viewportOverride = null, t
   else await run.page.mouse.click(edgeX, edgeY);
   assert((await run.page.locator('.globe-stage').getAttribute('data-view-phase')) === 'entering-layers', 'layer journey: animated entry phase missing');
   assert(await run.page.locator('#layer-panel').isHidden(), 'layer journey: description panel obscures the camera flight');
+  const flightComposition = await run.page.evaluate(() => {
+    const map = document.querySelector('#map');
+    const style = getComputedStyle(map);
+    const stage = document.querySelector('.globe-stage');
+    return {
+      transform: style.transform,
+      transitionProperties: style.transitionProperty.split(',').map((value) => value.trim()),
+      duration: Number(stage.dataset.lastCameraDuration),
+      phase: stage.dataset.viewPhase,
+    };
+  });
+  assert(['none', 'matrix(1, 0, 0, 1, 0, 0)'].includes(flightComposition.transform), 'layer journey: CSS still applies a competing map zoom ' + JSON.stringify(flightComposition));
+  assert(!flightComposition.transitionProperties.includes('transform'), 'layer journey: map transform remains part of the camera flight ' + JSON.stringify(flightComposition));
+  assert(flightComposition.duration === 1080, 'layer journey: camera and sphere no longer share the transition duration ' + JSON.stringify(flightComposition));
   const enteringSphere = await run.page.locator('#digital-sphere').boundingBox();
   assert(enteringSphere, 'layer journey: transforming sphere is not visible during camera flight');
   await run.page.waitForFunction(() => ['layers-preview', 'layers'].includes(document.querySelector('.globe-stage')?.dataset.viewPhase));
@@ -693,6 +775,7 @@ async function intentSearchDiscoveryScenario() {
   await run.page.keyboard.press('Home');
   assert((await run.page.evaluate(() => document.activeElement?.closest('.discovery-result')?.dataset.commonprojectId)) === 'debian', 'intent search: Home did not return to the first result');
 
+  await run.page.waitForFunction(() => Boolean(window.__commonworldTestMap) && !window.__commonworldTestMap.isMoving());
   const queryCamera = await mapCamera();
   await run.page.locator('#commons-search').fill('Anderlecht');
   await run.page.waitForFunction(() => document.querySelectorAll('.discovery-result').length === 1);
@@ -709,6 +792,7 @@ async function intentSearchDiscoveryScenario() {
 
   await run.page.locator('#commons-search').fill('');
   await run.page.waitForTimeout(220);
+  await run.page.waitForFunction(() => Boolean(window.__commonworldTestMap) && !window.__commonworldTestMap.isMoving());
   const filterCamera = await mapCamera();
   await run.page.locator('#filter-presence').selectOption('hybrid');
   await run.page.waitForFunction(() => document.querySelectorAll('.discovery-result').length === 1);
@@ -936,6 +1020,7 @@ async function methodScenario() {
 }
 
 try {
+  await startupAndAffordanceScenario();
   await normalScenario();
   await intentSearchDiscoveryScenario();
   await intentSearchLayoutScenario({ viewportOverride: { width: 1024, height: 1366 }, scenarioId: 'intent-search-ipad-portrait' });
