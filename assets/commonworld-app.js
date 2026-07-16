@@ -755,7 +755,11 @@ function renderDiscoveryState() {
 }
 
 function currentUrlState() {
-  const preserveOverviewCamera = (runtime.state.view === 'layers' || runtime.viewPhase === 'leaving-layers') && runtime.previousGlobeCamera;
+  const preserveOverviewCamera = (
+    runtime.state.view === 'layers'
+    || runtime.viewPhase === 'preparing-overview'
+    || runtime.viewPhase === 'leaving-layers'
+  ) && runtime.previousGlobeCamera;
   const camera = preserveOverviewCamera
     ? runtime.previousGlobeCamera
     : (runtime.mapReady ? mapCamera(runtime.map) : runtime.state.camera);
