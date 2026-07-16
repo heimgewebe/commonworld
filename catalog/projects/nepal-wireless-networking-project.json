@@ -1,0 +1,146 @@
+{
+  "schema_version": 3,
+  "id": "nepal-wireless-networking-project",
+  "title": "Nepal Wireless Networking Project",
+  "summary": "Ein von lokalen Gemeinschaften und E-Networking Research and Development getragenes ländliches Kommunikationsnetz in Nepal, das gemeinsam gewartete Funkinfrastruktur, Bildung und lokale Dienste verbindet.",
+  "kind": "hybrid",
+  "themes": [
+    "communication",
+    "community-network",
+    "rural-infrastructure",
+    "education"
+  ],
+  "actions": [
+    "learn",
+    "contribute",
+    "contact"
+  ],
+  "presence": {
+    "geographic": [
+      {
+        "id": "nepal-wireless-country",
+        "mode": "hidden",
+        "label": "Nepal – landesweiter Bezug",
+        "privacy_note": "Keine künstliche Projektgeometrie: Der Länderbezug bleibt ohne Punkt; Funkabdeckung, Router-, Dach- und Haushaltsstandorte werden nicht rekonstruiert.",
+        "source_ids": [
+          "enrd-home"
+        ]
+      },
+      {
+        "id": "nepal-wireless-nodes",
+        "mode": "hidden",
+        "label": "Funkknoten, Dächer und Haushaltsanschlüsse",
+        "privacy_note": "Private und sicherheitsrelevante Netzstandorte werden nicht aus Projektkarten, Fotos oder Kontaktangaben rekonstruiert.",
+        "source_ids": [
+          "enrd-home"
+        ]
+      }
+    ],
+    "digital": {
+      "available": true,
+      "reach": "regional",
+      "label": "Gemeinschaftsnetz, Projektinformationen und digitale Dienste",
+      "source_ids": [
+        "enrd-home"
+      ]
+    }
+  },
+  "activity": {
+    "status": "active",
+    "observed_at": "2026-07-16",
+    "source_ids": [
+      "enrd-home"
+    ],
+    "note": "Die offizielle Projektseite war am Prüftag erreichbar und beschrieb laufende Arbeit sowie öffentliche Nutzungs- oder Beteiligungswege."
+  },
+  "provenance": {
+    "sources": [
+      {
+        "id": "enrd-home",
+        "type": "official-source",
+        "label": "E-Networking Research and Development",
+        "url": "https://enrd.org.np/",
+        "retrieved_at": "2026-07-16",
+        "note": "Offizielle Seite der nepalesischen Organisation hinter gemeinschaftlichen ländlichen Funk- und Bildungsnetzen mit Projekt- und Kontaktinformationen."
+      },
+      {
+        "id": "enrd-nepal-wireless",
+        "type": "official-source",
+        "label": "ENRD – Nepal Wireless Project",
+        "url": "https://enrd.org.np/projects-2/project-3/",
+        "retrieved_at": "2026-07-16",
+        "note": "Offizielle projektnahe Seite, die den verlinkten öffentlichen Handlungs- oder Informationsweg belegt."
+      },
+      {
+        "id": "enrd-community-training",
+        "type": "official-source",
+        "label": "ENRD – lokale Netzpflege und Ausbildung",
+        "url": "https://enrd.org.np/projects-2/empowering-mountain-community-to-maintain-and-build-wireless-network/",
+        "retrieved_at": "2026-07-16",
+        "note": "Offizielle projektnahe Seite, die den verlinkten öffentlichen Handlungs- oder Informationsweg belegt."
+      }
+    ]
+  },
+  "curation": {
+    "state": "listed",
+    "reviewed_by": "Commonworld editorial review",
+    "reviewed_at": "2026-07-16",
+    "next_review_at": "2026-10-16",
+    "notes": "Keine künstliche Geometrie; Nepal nur als belegter Länderbezug; einzelne Dörfer, Funkstrecken, Router und Dächer bleiben aus dem öffentlichen Datensatz ausgeschlossen."
+  },
+  "links": [
+    {
+      "type": "homepage",
+      "label": "Nepal Wireless Networking Project – offizielle Seite",
+      "url": "https://enrd.org.np/"
+    },
+    {
+      "type": "source",
+      "label": "E-Networking Research and Development",
+      "url": "https://enrd.org.np/"
+    },
+    {
+      "type": "learn",
+      "label": "Nepal Wireless und ENRD kennenlernen",
+      "url": "https://enrd.org.np/projects-2/project-3/",
+      "source_ids": [
+        "enrd-nepal-wireless"
+      ]
+    },
+    {
+      "type": "contribute",
+      "label": "Projekt- und Unterstützungswege von ENRD öffnen",
+      "url": "https://enrd.org.np/projects-2/empowering-mountain-community-to-maintain-and-build-wireless-network/",
+      "source_ids": [
+        "enrd-community-training"
+      ]
+    },
+    {
+      "type": "contact",
+      "label": "ENRD kontaktieren",
+      "url": "https://enrd.org.np/",
+      "source_ids": [
+        "enrd-home"
+      ]
+    }
+  ],
+  "handoff": {
+    "enabled": false
+  },
+  "languages": {
+    "codes": [
+      "en"
+    ],
+    "source_ids": [
+      "enrd-home"
+    ],
+    "note": "Die angegebenen Sprachen sind auf den geprüften offiziellen Projektseiten öffentlich verfügbar."
+  },
+  "access": {
+    "type": "public",
+    "source_ids": [
+      "enrd-home"
+    ],
+    "note": "Die Zugangsform wurde konservativ aus den veröffentlichten Nutzungs- und Beteiligungswegen abgeleitet."
+  }
+}

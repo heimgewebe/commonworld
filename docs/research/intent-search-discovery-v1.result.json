@@ -47,13 +47,13 @@
       "assets/commonworld-app.js": "d6ac7cab113bf4c0a62f47ada4b85c5822af3b87ba41880cac1ab3fb9acd3242",
       "contracts/commonworld/project.schema.json": "9cacef6c1c2fbcbe50f3e04d74a71712a2fbf0e9c8c8358d4d0675dfb1d7eff5",
       "contracts/commonworld/intent-search-discovery.contract.json": "ebc29ba3e7f7d285c076262fa49b49e2f8841086d03237e6afe5f5b07bd3e4c3",
-      "scripts/render_public_shell.py": "b86712686134bf1f27142caa425524fa1487c474293714e52609f314fe456854",
-      "scripts/smoke_public_browser.mjs": "1bb1f713e03308558ba2bcd549381f5257d82b626e250e065604c0ffbd5c7fd8",
+      "scripts/render_public_shell.py": "0d70839bff418b1b0669316c1487ee62afe97e19af923748140f7a31ec9f4eb1",
+      "scripts/smoke_public_browser.mjs": "4b80c1930e5299bcb5bf313feb359ea59b62842de10894ca81e24217e7d8fcba",
       "scripts/validate_public_catalog.py": "8c15cfb267f72335c92f25cf7db18489716672b408837d80428e0b9e5f9f636f",
       "index.css": "6e8eb0728515473ffe51ecbc77d25d075cc6f50457e76ae8ad8327fb64922e27",
-      "index.html": "ec1070d27b94bb0383f0e6a6c978953412eff222ae2a265d6a04f2875a8dd04e"
+      "index.html": "dc61aaf8edd019416c113bff5298926441c46fd8b6f822323dd1fdc289a1f4fd"
     },
-    "catalog_projects_sha256": "e567b21df9223b8332baf4956ffc7cca7c9d4c8066ee495ea9069c458b2b2be7"
+    "catalog_projects_sha256": "b467b962c76a30145cabe443a8848d36ef3cdafb0e62acb6de84cd5b3eec9f53"
   },
   "does_not_establish": [
     "semantic AI or LLM search",

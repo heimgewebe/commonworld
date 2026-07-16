@@ -182,8 +182,8 @@ def validate_current_state(root: Path = ROOT) -> list[str]:
         "third_party_assets_retain_their_own_licences": True,
     }:
         errors.append("current licensing truth mismatch")
-    if state.get("current_as_of") != "2026-07-15":
-        errors.append("current-state date does not cover the mixed catalogue licensing truth")
+    if state.get("current_as_of") != "2026-07-16":
+        errors.append("current-state date does not cover the Phase 5 catalogue and proposal truth")
     if not (root / "LICENSE").is_file() or not (root / "LICENSE-DATA.md").is_file():
         errors.append("declared code and data licences must exist")
 

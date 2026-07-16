@@ -54,3 +54,16 @@ Operator-Prüfungen:
 make smoke-pages-live
 make check-pages-dns-target
 ```
+
+## Öffentlicher Vorschlags- und Redaktionsweg
+
+`propose.html` ist ein statisches, datensparsames Vorschlagsformular. Es validiert Eingaben im Browser, speichert bei Commonworld keine Formulardaten und bereitet entweder ein öffentliches GitHub-Issue oder einen lokalen JSON-Download vor. Ein Vorschlag ist nur ein Kandidat und verändert niemals automatisch `catalog/projects/*.json`.
+
+Maschinenlesbare Grenzen:
+
+- `contracts/commonworld/proposal.schema.json`
+- `contracts/commonworld/proposal-path.contract.json`
+- `contracts/commonworld/editorial-review.contract.json`
+- `contracts/commonworld/catalog-diversity.contract.json`
+
+Die Katalogaufnahme erfordert weiterhin einen separat geprüften Repository-Commit, den bestehenden CommonProject-Vertrag und eine gesetzte Wiedervorlagefrist.

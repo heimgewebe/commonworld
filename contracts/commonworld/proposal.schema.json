@@ -1,0 +1,173 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://commonworld.net/contracts/commonworld/proposal.schema.json",
+  "title": "Commonworld Commons Proposal v1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "kind",
+    "proposal_id",
+    "submitted_at",
+    "status",
+    "project",
+    "consent"
+  ],
+  "properties": {
+    "schema_version": {
+      "const": 1
+    },
+    "kind": {
+      "const": "commonworld_commons_proposal"
+    },
+    "proposal_id": {
+      "type": "string",
+      "pattern": "^cw-[0-9]{8}t[0-9]{6}z-[a-z0-9-]{3,48}$"
+    },
+    "submitted_at": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "status": {
+      "const": "submitted"
+    },
+    "project": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "name",
+        "description",
+        "official_website",
+        "commons_type",
+        "presence_kind",
+        "region",
+        "actions",
+        "sources",
+        "sensitive_location_risk",
+        "location_precision"
+      ],
+      "properties": {
+        "name": {
+          "type": "string",
+          "minLength": 2,
+          "maxLength": 140
+        },
+        "description": {
+          "type": "string",
+          "minLength": 40,
+          "maxLength": 800
+        },
+        "official_website": {
+          "type": "string",
+          "format": "uri",
+          "maxLength": 300
+        },
+        "commons_type": {
+          "type": "string",
+          "enum": [
+            "knowledge",
+            "software",
+            "culture",
+            "food-seeds",
+            "water",
+            "energy",
+            "housing-land",
+            "health-care",
+            "tools-repair",
+            "community-network",
+            "other"
+          ]
+        },
+        "presence_kind": {
+          "type": "string",
+          "enum": [
+            "geographic",
+            "digital",
+            "hybrid"
+          ]
+        },
+        "region": {
+          "type": "string",
+          "minLength": 2,
+          "maxLength": 120
+        },
+        "actions": {
+          "type": "array",
+          "minItems": 1,
+          "maxItems": 3,
+          "uniqueItems": true,
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "type",
+              "url"
+            ],
+            "properties": {
+              "type": {
+                "type": "string",
+                "enum": [
+                  "visit",
+                  "use",
+                  "borrow",
+                  "learn",
+                  "contribute",
+                  "volunteer",
+                  "donate",
+                  "contact",
+                  "replicate"
+                ]
+              },
+              "url": {
+                "type": "string",
+                "format": "uri",
+                "maxLength": 300
+              }
+            }
+          }
+        },
+        "sources": {
+          "type": "array",
+          "minItems": 1,
+          "maxItems": 5,
+          "uniqueItems": true,
+          "items": {
+            "type": "string",
+            "format": "uri",
+            "maxLength": 300
+          }
+        },
+        "sensitive_location_risk": {
+          "type": "boolean"
+        },
+        "location_precision": {
+          "const": "country_or_region_only"
+        },
+        "editorial_note": {
+          "type": "string",
+          "maxLength": 500
+        }
+      }
+    },
+    "consent": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "public_issue_acknowledged",
+        "processing_agreed",
+        "no_sensitive_data_confirmed"
+      ],
+      "properties": {
+        "public_issue_acknowledged": {
+          "const": true
+        },
+        "processing_agreed": {
+          "const": true
+        },
+        "no_sensitive_data_confirmed": {
+          "const": true
+        }
+      }
+    }
+  }
+}

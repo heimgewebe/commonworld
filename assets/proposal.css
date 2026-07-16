@@ -1,0 +1,94 @@
+body.proposal-page {
+  min-height: 100vh;
+  margin: 0;
+  background: radial-gradient(circle at top, rgba(49, 98, 112, 0.22), transparent 42%), #071013;
+  color: #f4f7f4;
+  font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+}
+
+.proposal-page main {
+  width: min(54rem, calc(100% - 2rem));
+  margin: 0 auto;
+  padding: max(2rem, env(safe-area-inset-top)) 0 max(4rem, env(safe-area-inset-bottom));
+}
+
+.proposal-page a { color: #b8e5dd; }
+.proposal-page h1 { max-width: 16ch; font-size: clamp(2.15rem, 7vw, 4.5rem); line-height: 0.98; margin: 0.25rem 0 1rem; }
+.proposal-page h2 { margin-top: 0; }
+.proposal-page .kicker { letter-spacing: 0.16em; text-transform: uppercase; font-size: 0.76rem; color: #9fb9b4; }
+
+.proposal-intro,
+.proposal-form fieldset,
+.proposal-contracts {
+  margin: 1.25rem 0;
+  padding: clamp(1rem, 3vw, 1.5rem);
+  border: 1px solid rgba(203, 234, 227, 0.2);
+  border-radius: 1rem;
+  background: rgba(7, 22, 25, 0.86);
+  box-shadow: 0 1rem 3rem rgba(0, 0, 0, 0.18);
+}
+
+.proposal-form { display: grid; gap: 0.25rem; }
+.proposal-form fieldset { display: grid; gap: 1rem; min-width: 0; }
+.proposal-form legend { padding: 0 0.5rem; font-weight: 700; font-size: 1.2rem; }
+.proposal-form label { display: grid; gap: 0.4rem; min-width: 0; }
+.proposal-form label > span:first-child { font-weight: 650; }
+.proposal-form input,
+.proposal-form textarea,
+.proposal-form select {
+  box-sizing: border-box;
+  width: 100%;
+  min-height: 2.9rem;
+  padding: 0.72rem 0.82rem;
+  border: 1px solid rgba(213, 237, 232, 0.28);
+  border-radius: 0.7rem;
+  background: #0b1b1e;
+  color: inherit;
+  font: inherit;
+}
+.proposal-form textarea { resize: vertical; }
+.proposal-form input:focus-visible,
+.proposal-form textarea:focus-visible,
+.proposal-form select:focus-visible,
+.proposal-form button:focus-visible,
+.proposal-page a:focus-visible {
+  outline: 3px solid #b8e5dd;
+  outline-offset: 3px;
+}
+.proposal-form small { color: #b7c9c6; line-height: 1.45; }
+.proposal-grid,
+.proposal-action-row { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 0.9rem; }
+.proposal-action-row { padding-top: 0.85rem; border-top: 1px solid rgba(203, 234, 227, 0.12); }
+.proposal-form .check-row { grid-template-columns: 1.4rem minmax(0, 1fr); align-items: start; }
+.proposal-form .check-row input { width: 1.2rem; min-height: 1.2rem; margin-top: 0.15rem; }
+.proposal-controls { display: flex; flex-wrap: wrap; gap: 0.75rem; align-items: center; }
+.proposal-controls button {
+  min-height: 3rem;
+  padding: 0.72rem 1rem;
+  border: 1px solid rgba(213, 237, 232, 0.35);
+  border-radius: 999px;
+  font: inherit;
+  font-weight: 700;
+  cursor: pointer;
+}
+.proposal-primary { background: #d8eee8; color: #071013; }
+.proposal-page .quiet-button { background: #0b1b1e; color: inherit; }
+.proposal-errors { padding: 1rem; border: 2px solid #ffb4a7; border-radius: 0.8rem; background: rgba(104, 24, 20, 0.42); }
+.proposal-errors ul { margin-bottom: 0; }
+.proposal-status { min-height: 1.6em; font-weight: 650; }
+.proposal-fallback { padding: 0.85rem 1rem; border-left: 4px solid #b8e5dd; background: rgba(184, 229, 221, 0.08); }
+.proposal-contracts ul { display: grid; gap: 0.6rem; padding-left: 1.2rem; }
+.honeypot { position: absolute !important; left: -10000px !important; width: 1px !important; height: 1px !important; overflow: hidden !important; }
+
+@media (max-width: 42rem) {
+  .proposal-grid,
+  .proposal-action-row { grid-template-columns: 1fr; }
+  .proposal-page main { width: min(100% - 1rem, 54rem); }
+  .proposal-intro,
+  .proposal-form fieldset,
+  .proposal-contracts { border-radius: 0.75rem; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .proposal-page *, .proposal-page *::before, .proposal-page *::after { scroll-behavior: auto !important; transition-duration: 0.001ms !important; animation-duration: 0.001ms !important; animation-iteration-count: 1 !important; }
+}

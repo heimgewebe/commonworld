@@ -1,0 +1,81 @@
+{
+  "schema_version": 1,
+  "kind": "commonworld_editorial_review_contract",
+  "current_as_of": "2026-07-16",
+  "statuses": [
+    "submitted",
+    "needs_information",
+    "under_review",
+    "accepted",
+    "rejected",
+    "withdrawn",
+    "published",
+    "superseded"
+  ],
+  "transitions": {
+    "submitted": [
+      "needs_information",
+      "under_review",
+      "withdrawn"
+    ],
+    "needs_information": [
+      "submitted",
+      "under_review",
+      "rejected",
+      "withdrawn"
+    ],
+    "under_review": [
+      "needs_information",
+      "accepted",
+      "rejected",
+      "withdrawn"
+    ],
+    "accepted": [
+      "published",
+      "superseded"
+    ],
+    "published": [
+      "superseded"
+    ],
+    "rejected": [],
+    "withdrawn": [],
+    "superseded": []
+  },
+  "review_checks": [
+    "project_exists",
+    "official_or_primary_near_source",
+    "commons_character_supported",
+    "action_links_are_real_paths",
+    "private_locations_not_reconstructable",
+    "location_precision_justified",
+    "identity_is_unique",
+    "publication_is_legally_and_privacy_acceptable",
+    "next_review_date_set",
+    "rejection_reason_structured_when_rejected"
+  ],
+  "rejection_reason_codes": [
+    "not_a_commons",
+    "insufficient_sources",
+    "duplicate",
+    "private_location_risk",
+    "commercial_listing_only",
+    "project_inactive",
+    "action_claim_unverified",
+    "out_of_scope"
+  ],
+  "decision_record": {
+    "structured_reason_required_for_rejection": true,
+    "free_text_may_supplement": true,
+    "reviewer_and_reviewed_at_required": true
+  },
+  "publication_boundary": {
+    "proposal_is_not_catalog_record": true,
+    "automatic_publication": false,
+    "catalog_change_requires_reviewed_repository_commit": true,
+    "published_record_must_validate_against": "contracts/commonworld/project.schema.json"
+  },
+  "freshness": {
+    "next_review_at_required_for_acceptance": true,
+    "stale_entries_remain_explicit": true
+  }
+}

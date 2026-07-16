@@ -1,0 +1,129 @@
+{
+  "schema_version": 3,
+  "id": "bioleft",
+  "title": "Bioleft",
+  "summary": "Eine gemeinschaftliche Initiative in Argentinien, die Saatgut, agronomisches Wissen und partizipative Pflanzenzüchtung über offene Vereinbarungen zwischen Produzenten, Forschern und weiteren Beteiligten teilt.",
+  "kind": "hybrid",
+  "themes": [
+    "seeds",
+    "food",
+    "agriculture",
+    "open-knowledge",
+    "commons-governance"
+  ],
+  "actions": [
+    "learn",
+    "contribute"
+  ],
+  "presence": {
+    "geographic": [
+      {
+        "id": "bioleft-argentina",
+        "mode": "hidden",
+        "label": "Argentinien – landesweiter Bezug",
+        "privacy_note": "Keine künstliche Projektgeometrie: Der öffentlich belegte Länderbezug bleibt ohne Punkt; Felder, Betriebe und Wohnorte werden nicht rekonstruiert.",
+        "source_ids": [
+          "bioleft-home"
+        ]
+      }
+    ],
+    "digital": {
+      "available": true,
+      "reach": "regional",
+      "label": "Offene Saatgutvereinbarungen, Wissen und Netzwerkkommunikation",
+      "source_ids": [
+        "bioleft-home"
+      ]
+    }
+  },
+  "activity": {
+    "status": "active",
+    "observed_at": "2026-07-16",
+    "source_ids": [
+      "bioleft-home"
+    ],
+    "note": "Die offizielle Projektseite war am Prüftag erreichbar und beschrieb laufende Arbeit sowie öffentliche Nutzungs- oder Beteiligungswege."
+  },
+  "provenance": {
+    "sources": [
+      {
+        "id": "bioleft-home",
+        "type": "official-source",
+        "label": "Bioleft – offizielle Seite",
+        "url": "https://www.bioleft.org/es/",
+        "retrieved_at": "2026-07-16",
+        "note": "Offizielle Projektseite zur gemeinschaftlichen, offenen Saatgutentwicklung und zum Austausch in Argentinien."
+      },
+      {
+        "id": "bioleft-about",
+        "type": "official-source",
+        "label": "Bioleft – Selbstbeschreibung",
+        "url": "https://www.bioleft.org/es/acerca-de-bioleft/",
+        "retrieved_at": "2026-07-16",
+        "note": "Offizielle projektnahe Seite, die den verlinkten öffentlichen Handlungs- oder Informationsweg belegt."
+      },
+      {
+        "id": "bioleft-platform",
+        "type": "official-source",
+        "label": "Bioleft – Plattform und Austausch",
+        "url": "https://www.bioleft.org/es/plataforma/",
+        "retrieved_at": "2026-07-16",
+        "note": "Offizielle projektnahe Seite, die den verlinkten öffentlichen Handlungs- oder Informationsweg belegt."
+      }
+    ]
+  },
+  "curation": {
+    "state": "listed",
+    "reviewed_by": "Commonworld editorial review",
+    "reviewed_at": "2026-07-16",
+    "next_review_at": "2026-10-16",
+    "notes": "Keine künstliche Geometrie; nur der belegte Länderbezug wird geführt; Felder, Betriebe und Teilnehmende bleiben ohne Geometrie."
+  },
+  "links": [
+    {
+      "type": "homepage",
+      "label": "Bioleft – offizielle Seite",
+      "url": "https://www.bioleft.org/es/"
+    },
+    {
+      "type": "source",
+      "label": "Bioleft – offizielle Seite",
+      "url": "https://www.bioleft.org/es/"
+    },
+    {
+      "type": "learn",
+      "label": "Bioleft und offene Saatgutentwicklung kennenlernen",
+      "url": "https://www.bioleft.org/es/acerca-de-bioleft/",
+      "source_ids": [
+        "bioleft-about"
+      ]
+    },
+    {
+      "type": "contribute",
+      "label": "Kontakt- und Beteiligungswege von Bioleft öffnen",
+      "url": "https://www.bioleft.org/es/plataforma/",
+      "source_ids": [
+        "bioleft-platform"
+      ]
+    }
+  ],
+  "handoff": {
+    "enabled": false
+  },
+  "languages": {
+    "codes": [
+      "es"
+    ],
+    "source_ids": [
+      "bioleft-home"
+    ],
+    "note": "Die angegebenen Sprachen sind auf den geprüften offiziellen Projektseiten öffentlich verfügbar."
+  },
+  "access": {
+    "type": "public",
+    "source_ids": [
+      "bioleft-home"
+    ],
+    "note": "Die Zugangsform wurde konservativ aus den veröffentlichten Nutzungs- und Beteiligungswegen abgeleitet."
+  }
+}

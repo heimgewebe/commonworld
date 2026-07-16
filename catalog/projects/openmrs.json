@@ -1,0 +1,135 @@
+{
+  "schema_version": 3,
+  "id": "openmrs",
+  "title": "OpenMRS",
+  "summary": "Eine weltweite Open-Source-Gemeinschaft, die ein frei verfügbares, anpassbares medizinisches Informationssystem gemeinschaftlich entwickelt und Wissen für lokale Gesundheitsversorgung offen teilt.",
+  "kind": "digital",
+  "themes": [
+    "health",
+    "open-source",
+    "software-infrastructure",
+    "open-knowledge"
+  ],
+  "actions": [
+    "use",
+    "learn",
+    "contribute"
+  ],
+  "presence": {
+    "geographic": [],
+    "digital": {
+      "available": true,
+      "reach": "global",
+      "label": "Freie medizinische Software, Dokumentation und weltweite Zusammenarbeit",
+      "source_ids": [
+        "openmrs-home"
+      ]
+    }
+  },
+  "activity": {
+    "status": "active",
+    "observed_at": "2026-07-16",
+    "source_ids": [
+      "openmrs-home"
+    ],
+    "note": "Die offizielle Projektseite war am Prüftag erreichbar und beschrieb laufende Arbeit sowie öffentliche Nutzungs- oder Beteiligungswege."
+  },
+  "provenance": {
+    "sources": [
+      {
+        "id": "openmrs-home",
+        "type": "official-source",
+        "label": "OpenMRS – offizielle Seite",
+        "url": "https://openmrs.org/",
+        "retrieved_at": "2026-07-16",
+        "note": "Offizielle Seite der weltweiten Open-Source-Gemeinschaft für frei verfügbare medizinische Informationssysteme mit Dokumentations- und Mitwirkungswegen."
+      },
+      {
+        "id": "openmrs-download",
+        "type": "official-source",
+        "label": "OpenMRS – Download",
+        "url": "https://openmrs.org/download/",
+        "retrieved_at": "2026-07-16",
+        "note": "Offizielle projektnahe Seite, die den verlinkten öffentlichen Handlungs- oder Informationsweg belegt."
+      },
+      {
+        "id": "openmrs-about",
+        "type": "official-source",
+        "label": "OpenMRS – über die Gemeinschaft",
+        "url": "https://openmrs.org/about/",
+        "retrieved_at": "2026-07-16",
+        "note": "Offizielle projektnahe Seite, die den verlinkten öffentlichen Handlungs- oder Informationsweg belegt."
+      },
+      {
+        "id": "openmrs-involved",
+        "type": "official-source",
+        "label": "OpenMRS – mitwirken",
+        "url": "https://openmrs.org/get-involved/",
+        "retrieved_at": "2026-07-16",
+        "note": "Offizielle projektnahe Seite, die den verlinkten öffentlichen Handlungs- oder Informationsweg belegt."
+      }
+    ]
+  },
+  "curation": {
+    "state": "listed",
+    "reviewed_by": "Commonworld editorial review",
+    "reviewed_at": "2026-07-16",
+    "next_review_at": "2026-10-16",
+    "notes": "Die Software wird digital dargestellt; Kliniken, Patienten und Installationen erhalten keinerlei Geometrie oder personenbezogene Angaben."
+  },
+  "links": [
+    {
+      "type": "homepage",
+      "label": "OpenMRS – offizielle Seite",
+      "url": "https://openmrs.org/"
+    },
+    {
+      "type": "source",
+      "label": "OpenMRS – offizielle Seite",
+      "url": "https://openmrs.org/"
+    },
+    {
+      "type": "use",
+      "label": "OpenMRS herunterladen und einsetzen",
+      "url": "https://openmrs.org/download/",
+      "source_ids": [
+        "openmrs-download"
+      ]
+    },
+    {
+      "type": "learn",
+      "label": "OpenMRS-Dokumentation und Gemeinschaft kennenlernen",
+      "url": "https://openmrs.org/about/",
+      "source_ids": [
+        "openmrs-about"
+      ]
+    },
+    {
+      "type": "contribute",
+      "label": "Bei OpenMRS mitwirken",
+      "url": "https://openmrs.org/get-involved/",
+      "source_ids": [
+        "openmrs-involved"
+      ]
+    }
+  ],
+  "handoff": {
+    "enabled": false
+  },
+  "languages": {
+    "codes": [
+      "en"
+    ],
+    "source_ids": [
+      "openmrs-home"
+    ],
+    "note": "Die angegebenen Sprachen sind auf den geprüften offiziellen Projektseiten öffentlich verfügbar."
+  },
+  "access": {
+    "type": "public",
+    "source_ids": [
+      "openmrs-home"
+    ],
+    "note": "Die Zugangsform wurde konservativ aus den veröffentlichten Nutzungs- und Beteiligungswegen abgeleitet."
+  }
+}

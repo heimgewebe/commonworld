@@ -1,0 +1,155 @@
+{
+  "schema_version": 3,
+  "id": "som-energia",
+  "title": "Som Energia",
+  "summary": "Eine gemeinnützige Energiegenossenschaft in Spanien, deren Mitglieder erneuerbare Energieversorgung, gemeinschaftliche Erzeugungsprojekte und lokale Gruppen demokratisch tragen und weiterentwickeln.",
+  "kind": "hybrid",
+  "themes": [
+    "energy",
+    "renewable-energy",
+    "cooperative-economy",
+    "commons-governance"
+  ],
+  "actions": [
+    "use",
+    "learn",
+    "contribute"
+  ],
+  "presence": {
+    "geographic": [
+      {
+        "id": "som-energia-spain",
+        "mode": "hidden",
+        "label": "Spanien – landesweiter Genossenschaftsbezug",
+        "privacy_note": "Keine künstliche Projektgeometrie: Der Länderbezug bleibt ohne Punkt; Erzeugungsanlagen, Anschlüsse und Mitgliedsadressen werden nicht rekonstruiert.",
+        "source_ids": [
+          "som-energia-home"
+        ]
+      },
+      {
+        "id": "som-energia-private-sites",
+        "mode": "hidden",
+        "label": "Private Anschlüsse und nicht einzeln geprüfte Anlagen",
+        "privacy_note": "Private Anschlüsse und nicht einzeln redaktionell geprüfte Anlagen werden nicht aus Projektkarten rekonstruiert.",
+        "source_ids": [
+          "som-energia-home"
+        ]
+      }
+    ],
+    "digital": {
+      "available": true,
+      "reach": "regional",
+      "label": "Mitgliederportal, Projektinformationen und lokale Gruppen",
+      "source_ids": [
+        "som-energia-home"
+      ]
+    }
+  },
+  "activity": {
+    "status": "active",
+    "observed_at": "2026-07-16",
+    "source_ids": [
+      "som-energia-home"
+    ],
+    "note": "Die offizielle Projektseite war am Prüftag erreichbar und beschrieb laufende Arbeit sowie öffentliche Nutzungs- oder Beteiligungswege."
+  },
+  "provenance": {
+    "sources": [
+      {
+        "id": "som-energia-home",
+        "type": "official-source",
+        "label": "Som Energia – offizielle Seite",
+        "url": "https://www.somenergia.coop/es",
+        "retrieved_at": "2026-07-16",
+        "note": "Offizielle Seite der gemeinnützigen Genossenschaft für erneuerbare Energie, demokratische Mitgliedschaft und gemeinschaftliche Erzeugungsprojekte."
+      },
+      {
+        "id": "som-membership",
+        "type": "official-source",
+        "label": "Som Energia – Mitglied werden",
+        "url": "https://www.somenergia.coop/es/cooperativa/asociarse",
+        "retrieved_at": "2026-07-16",
+        "note": "Offizielle projektnahe Seite, die den verlinkten öffentlichen Handlungs- oder Informationsweg belegt."
+      },
+      {
+        "id": "som-about",
+        "type": "official-source",
+        "label": "Som Energia – über die Genossenschaft",
+        "url": "https://www.somenergia.coop/es/cooperativa/sobre-nosotros",
+        "retrieved_at": "2026-07-16",
+        "note": "Offizielle projektnahe Seite, die den verlinkten öffentlichen Handlungs- oder Informationsweg belegt."
+      },
+      {
+        "id": "som-local-groups",
+        "type": "official-source",
+        "label": "Som Energia – lokale Gruppen",
+        "url": "https://www.somenergia.coop/es/cooperativa/grupos-locales/",
+        "retrieved_at": "2026-07-16",
+        "note": "Offizielle projektnahe Seite, die den verlinkten öffentlichen Handlungs- oder Informationsweg belegt."
+      }
+    ]
+  },
+  "curation": {
+    "state": "listed",
+    "reviewed_by": "Commonworld editorial review",
+    "reviewed_at": "2026-07-16",
+    "next_review_at": "2026-10-16",
+    "notes": "Keine künstliche Geometrie; Länderbezug, Netzabdeckung und Anlagenstandorte werden nicht als Punkte behauptet."
+  },
+  "links": [
+    {
+      "type": "homepage",
+      "label": "Som Energia – offizielle Seite",
+      "url": "https://www.somenergia.coop/es"
+    },
+    {
+      "type": "source",
+      "label": "Som Energia – offizielle Seite",
+      "url": "https://www.somenergia.coop/es"
+    },
+    {
+      "type": "use",
+      "label": "Angebote und Mitgliedschaft von Som Energia prüfen",
+      "url": "https://www.somenergia.coop/es/cooperativa/asociarse",
+      "source_ids": [
+        "som-membership"
+      ]
+    },
+    {
+      "type": "learn",
+      "label": "Genossenschaft und Energieprojekte kennenlernen",
+      "url": "https://www.somenergia.coop/es/cooperativa/sobre-nosotros",
+      "source_ids": [
+        "som-about"
+      ]
+    },
+    {
+      "type": "contribute",
+      "label": "Lokale Gruppen und Beteiligung öffnen",
+      "url": "https://www.somenergia.coop/es/cooperativa/grupos-locales/",
+      "source_ids": [
+        "som-local-groups"
+      ]
+    }
+  ],
+  "handoff": {
+    "enabled": false
+  },
+  "languages": {
+    "codes": [
+      "ca",
+      "es"
+    ],
+    "source_ids": [
+      "som-energia-home"
+    ],
+    "note": "Die angegebenen Sprachen sind auf den geprüften offiziellen Projektseiten öffentlich verfügbar."
+  },
+  "access": {
+    "type": "membership",
+    "source_ids": [
+      "som-energia-home"
+    ],
+    "note": "Die Zugangsform wurde konservativ aus den veröffentlichten Nutzungs- und Beteiligungswegen abgeleitet."
+  }
+}

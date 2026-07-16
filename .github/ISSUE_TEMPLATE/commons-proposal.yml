@@ -1,0 +1,105 @@
+name: Commons vorschlagen
+description: Einen öffentlichen, redaktionell zu prüfenden Commons-Kandidaten einreichen
+title: "[Commons-Vorschlag] "
+labels:
+  - catalog-candidate
+  - editorial-review
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Dieser Eingang ist **öffentlich**. Ein Vorschlag wird nicht automatisch veröffentlicht.
+        Keine privaten Adressen, Koordinaten, E-Mail-Adressen, Telefonnummern, Haushalts-, Dach-, Router- oder Funkstreckenangaben eintragen.
+  - type: input
+    id: name
+    attributes:
+      label: Name des Commons
+    validations:
+      required: true
+  - type: textarea
+    id: description
+    attributes:
+      label: Kurzbeschreibung
+      description: Gemeinschaftliche Verwaltung, geteilte Ressource und belegbarer Zweck.
+    validations:
+      required: true
+  - type: input
+    id: website
+    attributes:
+      label: Offizielle HTTPS-Website
+      placeholder: https://…
+    validations:
+      required: true
+  - type: dropdown
+    id: commons_type
+    attributes:
+      label: Commons-Art
+      options:
+        - Wissen und Daten
+        - Software und Infrastruktur
+        - Kultur und Medien
+        - Saatgut und Ernährung
+        - Wasser und Bewässerung
+        - Energie
+        - Boden und Wohnen
+        - Pflege und Gesundheit
+        - Werkzeuge, Reparatur und Fertigung
+        - Gemeinschaftsnetz
+        - Andere
+    validations:
+      required: true
+  - type: dropdown
+    id: presence
+    attributes:
+      label: Präsenz
+      options:
+        - geografisch
+        - digital
+        - hybrid
+    validations:
+      required: true
+  - type: input
+    id: region
+    attributes:
+      label: Grobe Region
+      description: Nur Land, Großregion oder öffentlich unproblematische Stadt. Keine Adresse oder Koordinate.
+    validations:
+      required: true
+  - type: textarea
+    id: actions
+    attributes:
+      label: Belegte Handlungswege
+      description: Pro Zeile Aktion und direkte HTTPS-Adresse, zum Beispiel „lernen — https://…“.
+    validations:
+      required: true
+  - type: textarea
+    id: sources
+    attributes:
+      label: Offizielle oder primärnahe Quellen
+      description: Eine HTTPS-Adresse pro Zeile; mindestens eine Quelle.
+    validations:
+      required: true
+  - type: dropdown
+    id: sensitive
+    attributes:
+      label: Betrifft der Vorschlag möglicherweise private oder sensible Orte?
+      options:
+        - Nein
+        - Ja – besonders streng prüfen
+    validations:
+      required: true
+  - type: checkboxes
+    id: consent
+    attributes:
+      label: Öffentlichkeit und Einwilligung
+      options:
+        - label: Mir ist bewusst, dass dieses Issue öffentlich ist.
+          required: true
+        - label: Ich willige in die redaktionelle Verarbeitung der Angaben ein.
+          required: true
+        - label: Ich habe keine privaten Adressen, Koordinaten oder Kontaktdaten eingetragen.
+          required: true
+  - type: markdown
+    attributes:
+      value: |
+        Redaktioneller Startstatus: `submitted`. Aufnahme oder Ablehnung erfolgt nach dem maschinenlesbaren Redaktionsvertrag und einem separaten Repository-Review.

@@ -52,6 +52,7 @@ REQUIRED_PLAN_TOKENS = (
     "### Phase 3 — Reale Vertikalprobe",
     "### Phase 4 — Digitale Sphäre und Hybridität",
     "### Phase 5 — Katalogwachstum",
+    "### Phase 5 – Vorschlags- und Redaktionsweg v1",
     "### Phase 6 — Weltgewebe-Übergang",
     "Der Globus liefert den Überblick. Der Zoom liefert Genauigkeit.",
 )
@@ -115,15 +116,18 @@ EXPECTED_RESEARCH_FILES = {
     "renderer-selection-v1.md",
     "renderer-selection-v1.result.json",
 }
-EXPECTED_CONTRACT_FILES = {"current-state.contract.json", "aggregation-zoom.contract.json", "digital-sphere.contract.json", "production-delivery-provider.contract.json", "project.schema.json", "public-maplibre-vertical-slice.contract.json", "real-hybrid-commons.contract.json", "intent-search-discovery.contract.json", "renderer-selection.contract.json", "visual-semantics.contract.json"}
+EXPECTED_CONTRACT_FILES = {"catalog-diversity.contract.json", "editorial-review.contract.json", "proposal-path.contract.json", "proposal.schema.json", "current-state.contract.json", "aggregation-zoom.contract.json", "digital-sphere.contract.json", "production-delivery-provider.contract.json", "project.schema.json", "public-maplibre-vertical-slice.contract.json", "real-hybrid-commons.contract.json", "intent-search-discovery.contract.json", "renderer-selection.contract.json", "visual-semantics.contract.json"}
 EXPECTED_SCRIPT_FILES = {
     "__init__.py",
     "build_public_runtime.py",
     "check_pages_dns_target.py",
     "smoke_public_browser.mjs",
     "render_public_shell.py",
+    "render_proposal_page.py",
+    "smoke_proposal_browser.mjs",
     "smoke_pages_live.py",
     "validate_canonical_plan.py",
+    "validate_proposal_path.py",
     "validate_contracts.py",
     "validate_current_state.py",
     "validate_production_delivery_provider.py",
@@ -148,6 +152,7 @@ EXPECTED_SCRIPT_FILES = {
 }
 EXPECTED_TEST_FILES = {
     "test_canonical_plan.py",
+    "test_proposal_path.py",
     "test_contracts.py",
     "test_current_state.py",
     "test_pages_dns_target.py",
@@ -244,7 +249,7 @@ def validate_canonical_plan(root: Path = ROOT) -> list[str]:
     else:
         if package.get("devDependencies") != {"playwright": "1.61.1"}:
             errors.append("package.json must pin exactly Playwright 1.61.1 for the browser gate")
-        if package.get("scripts", {}).get("smoke:browser") != "node scripts/smoke_public_browser.mjs":
+        if package.get("scripts", {}).get("smoke:browser") != "node scripts/smoke_public_browser.mjs && node scripts/smoke_proposal_browser.mjs":
             errors.append("package.json must expose the bounded browser smoke command")
 
     required_checks_path = root / ".github" / "grabowski-required-checks.json"

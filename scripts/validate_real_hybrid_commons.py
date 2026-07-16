@@ -145,7 +145,7 @@ def validate_real_hybrid_commons(root: Path = ROOT) -> list[str]:
     }
     if (
         current_state.get("schema_version") != 2
-        or current_state.get("current_as_of") != "2026-07-15"
+        or current_state.get("current_as_of") != "2026-07-16"
         or current_state.get("licensing") != expected_licensing
     ):
         errors.append("T006 canonical current-state licensing does not preserve the ODbL geometry exception")

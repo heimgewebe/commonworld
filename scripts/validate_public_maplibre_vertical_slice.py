@@ -268,7 +268,7 @@ def validate_public_maplibre_vertical_slice(root: Path = ROOT) -> list[str]:
         errors.append("package.json must contain only the exactly pinned maplibre-gl 5.24.0 runtime dependency")
     if package.get("devDependencies") != {"playwright": "1.61.1"}:
         errors.append("package.json must pin the browser-gate Playwright dependency exactly")
-    if package.get("scripts", {}).get("smoke:browser") != "node scripts/smoke_public_browser.mjs":
+    if package.get("scripts", {}).get("smoke:browser") != "node scripts/smoke_public_browser.mjs && node scripts/smoke_proposal_browser.mjs":
         errors.append("package.json must expose the bounded browser smoke command")
     packages = lock.get("packages", {}) if isinstance(lock.get("packages"), dict) else {}
     root_lock = packages.get("", {}) if isinstance(packages.get(""), dict) else {}

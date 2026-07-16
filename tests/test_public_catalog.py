@@ -205,7 +205,7 @@ class PublicCatalogTests(unittest.TestCase):
             for kind in ("geographic", "digital", "hybrid")
         }
 
-        self.assertEqual(20, manifest["entry_count"])
+        self.assertGreaterEqual(manifest["entry_count"], 30)
         self.assertTrue(expected_growth.issubset(identifiers))
         self.assertGreaterEqual(len(spatial_identities), 10)
         self.assertGreaterEqual(kind_counts["geographic"], 4)
