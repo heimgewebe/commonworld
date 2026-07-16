@@ -1029,6 +1029,17 @@ async function intentSearchDiscoveryScenario() {
     && Math.abs(left.lat - right.lat) < 0.0001
     && Math.abs(left.zoom - right.zoom) < 0.0001
   );
+  const stableMapCamera = async () => {
+    for (let attempt = 0; attempt < 12; attempt += 1) {
+      await run.page.waitForFunction(() => Boolean(window.__commonworldTestMap) && !window.__commonworldTestMap.isMoving());
+      const before = await mapCamera();
+      await run.page.waitForTimeout(120);
+      const after = await mapCamera();
+      const still = await run.page.evaluate(() => window.__commonworldTestMap?.isMoving() === false);
+      if (still && sameCamera(before, after)) return after;
+    }
+    throw new Error('intent search: map camera did not reach a stable state');
+  };
   const resultIds = () => run.page.locator('.discovery-result').evaluateAll((nodes) => nodes.map((node) => node.dataset.commonprojectId));
 
   await run.page.locator('#commons-search').fill('ich möchte mitmachen');
@@ -1057,12 +1068,12 @@ async function intentSearchDiscoveryScenario() {
   await run.page.keyboard.press('Home');
   assert((await run.page.evaluate(() => document.activeElement?.closest('.discovery-result')?.dataset.commonprojectId)) === 'debian', 'intent search: Home did not return to the first result');
 
-  await run.page.waitForFunction(() => Boolean(window.__commonworldTestMap) && !window.__commonworldTestMap.isMoving());
-  const queryCamera = await mapCamera();
+  const queryCamera = await stableMapCamera();
   await run.page.locator('#commons-search').fill('Anderlecht');
   await run.page.waitForFunction(() => document.querySelectorAll('.discovery-result').length === 1);
   assert(JSON.stringify(await resultIds()) === JSON.stringify(['cltb-le-nid']), 'intent search: public place did not resolve to Le Nid');
-  assert(sameCamera(queryCamera, await mapCamera()), 'intent search: typing a place moved the map before activation');
+  const typedCamera = await stableMapCamera();
+  assert(sameCamera(queryCamera, typedCamera), 'intent search: typing a place moved the map before activation');
 
   await run.page.locator('#commons-search').fill('private heimrouter');
   await run.page.waitForFunction(() => document.querySelector('#discovery-empty')?.hidden === false);

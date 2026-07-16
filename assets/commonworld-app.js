@@ -180,6 +180,14 @@ function currentStageSize() {
   };
 }
 
+function setStageSizeIfChanged(width, height) {
+  const next = { width: Math.max(1, width), height: Math.max(1, height) };
+  const current = runtime.stageSize;
+  if (current && Math.abs(current.width - next.width) < 0.25 && Math.abs(current.height - next.height) < 0.25) return false;
+  runtime.stageSize = next;
+  return true;
+}
+
 function setStatus(message, state = 'loading') {
   elements.stage.dataset.runtimeState = state;
   elements.mapStatus.textContent = message;
@@ -1555,6 +1563,8 @@ function createMap() {
     setPresentation('text', { historyMode: 'replace', persist: false });
     return;
   }
+  const initialStageBounds = elements.stage.getBoundingClientRect();
+  setStageSizeIfChanged(initialStageBounds.width, initialStageBounds.height);
   runtime.map = new window.maplibregl.Map({
     container: elements.map,
     style: './assets/map/openfreemap-liberty.json',
@@ -1618,9 +1628,7 @@ function createMap() {
   if ('ResizeObserver' in window) {
     runtime.resizeObserver = new ResizeObserver(([entry]) => {
       const box = entry?.contentRect;
-      runtime.stageSize = box
-        ? { width: Math.max(1, box.width), height: Math.max(1, box.height) }
-        : null;
+      if (!box || !setStageSizeIfChanged(box.width, box.height)) return;
       runtime.map?.resize();
       updateSphereGeometry();
     });
