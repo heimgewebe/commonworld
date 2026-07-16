@@ -114,6 +114,24 @@ class DigitalSphereContractTests(unittest.TestCase):
         errors = self.errors_after(lambda contract: contract["globe_mode"]["zoom_fade"].update({"fade_until_zoom": 1.5}))
         self.assertTrue(any("zoom-fade" in error or "zoom fade" in error for error in errors))
 
+    def test_ring_orbit_motion_stays_css_bound_and_reduced_motion_safe(self) -> None:
+        motion = self.contract["globe_mode"]["motion"]
+        self.assertTrue(motion["continuous_whole_sphere_rotation_forbidden"])
+        orbit = motion["ring_orbit_animation"]
+        self.assertTrue(orbit["per_frame_javascript_forbidden"])
+        self.assertTrue(orbit["reduced_motion_stops_orbit"])
+        self.assertEqual("ringOrbitDuration", orbit["duration_function"])
+        bounds = orbit["duration_bounds_seconds"]
+        self.assertEqual({"minimum": 24, "maximum": 96}, bounds)
+
+    def test_validator_rejects_per_frame_javascript_orbit(self) -> None:
+        errors = self.errors_after(lambda contract: contract["globe_mode"]["motion"]["ring_orbit_animation"].update({"per_frame_javascript_forbidden": False}))
+        self.assertTrue(any("motion boundary" in error for error in errors))
+
+    def test_validator_rejects_orbit_that_ignores_reduced_motion(self) -> None:
+        errors = self.errors_after(lambda contract: contract["globe_mode"]["motion"]["ring_orbit_animation"].update({"reduced_motion_stops_orbit": False}))
+        self.assertTrue(any("motion boundary" in error for error in errors))
+
     def test_validator_rejects_blocking_globe_center(self) -> None:
         errors = self.errors_after(lambda contract: contract["interaction"]["sphere_edge_hit_target"].update({"must_not_block_globe_center_interaction": False}))
         self.assertTrue(any("hit-target" in error for error in errors))

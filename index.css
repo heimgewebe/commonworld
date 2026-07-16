@@ -297,42 +297,6 @@ a {
   outline: none;
 }
 
-.sphere-action-guide {
-  fill: none;
-  stroke: rgba(194, 236, 212, 0.5);
-  stroke-width: 1.15;
-  vector-effect: non-scaling-stroke;
-  pointer-events: none;
-  transition: stroke 180ms ease, stroke-width 180ms ease, opacity 180ms ease;
-}
-
-.sphere-action-text {
-  fill: rgba(220, 245, 232, 0.82);
-  font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-  font-size: 8.2px;
-  font-weight: 760;
-  letter-spacing: 0.14em;
-  paint-order: stroke;
-  stroke: rgba(3, 13, 11, 0.9);
-  stroke-width: 1.25px;
-  pointer-events: none;
-  transition: fill 180ms ease, opacity 180ms ease;
-}
-
-.digital-sphere[data-affordance-active="true"] .sphere-action-guide {
-  stroke: var(--focus);
-  stroke-width: 2;
-}
-
-.digital-sphere[data-affordance-active="true"] .sphere-action-text {
-  fill: var(--focus);
-}
-
-.digital-sphere[data-affordance-active="true"] #sphere-rings use {
-  stroke-width: 1.5;
-  opacity: 1;
-}
-
 .layer-view-button {
   position: absolute;
   z-index: 18;
@@ -965,14 +929,36 @@ a {
   stroke: rgba(112, 181, 223, 0.18);
   stroke-width: 1.05;
   stroke-linecap: round;
-  transform-box: view-box;
-  transform-origin: 320px 320px;
   vector-effect: non-scaling-stroke;
   transition:
-    transform 760ms cubic-bezier(0.22, 1, 0.36, 1),
     stroke 520ms ease,
     stroke-width 520ms ease,
     opacity 520ms ease;
+}
+
+/* Each ring plane orbits the globe center as one coherent SVG group. */
+@keyframes sphere-ring-orbit {
+  from {
+    transform: rotate(var(--ring-orbit-start-angle, 0deg));
+  }
+
+  to {
+    transform: rotate(calc(var(--ring-orbit-start-angle, 0deg) + var(--ring-orbit-direction, 1) * 360deg));
+  }
+}
+
+.sphere-ring-plane {
+  transform-box: view-box;
+  transform-origin: 320px 320px;
+  transform: rotate(var(--ring-orbit-start-angle, 0deg));
+  animation: sphere-ring-orbit var(--ring-orbit-duration, 240s) linear infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .sphere-ring-plane {
+    animation: none;
+    transform: rotate(var(--ring-orbit-start-angle, 0deg));
+  }
 }
 
 #sphere-rings use[data-layer-id="knowledge_data"] { stroke: rgba(123, 195, 238, 0.34); }
@@ -982,17 +968,14 @@ a {
 #sphere-rings use[data-layer-id="communication_networks"] { stroke: rgba(124, 226, 216, 0.3); stroke-dasharray: 18 9 2 9; }
 #sphere-rings use[data-layer-id="mixed_other"] { stroke: rgba(226, 235, 231, 0.22); stroke-dasharray: 2 11; }
 
-#sphere-streams {
-  transition: opacity 320ms ease;
-}
-
-.globe-stage[data-view-phase="entering-layers"] .globe-map {
+.globe-stage[data-view-phase="entering-layers"] .globe-map,
+.globe-stage[data-view-phase="settling-layers"] .globe-map,
+.globe-stage[data-view-phase="preparing-overview"] .globe-map {
   opacity: 0;
   transform: none;
   filter: blur(0.2rem) saturate(0.55);
 }
 
-.globe-stage[data-view-phase="layers-preview"] .globe-map,
 .globe-stage[data-view-phase="layers"] .globe-map {
   opacity: 0;
   transform: none;
@@ -1313,25 +1296,23 @@ a {
   will-change: opacity, filter;
 }
 
+/* During camera flights the sphere follows the MapLibre projection synchronously;
+   geometry must not be re-animated by CSS on top of the map movement. */
 .globe-stage[data-view-phase="entering-layers"] .digital-sphere,
+.globe-stage[data-view-phase="settling-layers"] .digital-sphere,
+.globe-stage[data-view-phase="preparing-overview"] .digital-sphere,
 .globe-stage[data-view-phase="leaving-layers"] .digital-sphere {
-  transition:
-    left 1080ms cubic-bezier(0.16, 1, 0.3, 1),
-    top 1080ms cubic-bezier(0.16, 1, 0.3, 1),
-    width 1080ms cubic-bezier(0.16, 1, 0.3, 1),
-    height 1080ms cubic-bezier(0.16, 1, 0.3, 1),
-    opacity 360ms linear,
-    filter 1080ms cubic-bezier(0.16, 1, 0.3, 1),
-    transform 1080ms cubic-bezier(0.16, 1, 0.3, 1);
+  transition: opacity 360ms linear, filter 260ms ease;
 }
 
-.globe-stage[data-view-phase="entering-layers"] .globe-map {
+.globe-stage[data-view-phase="entering-layers"] .globe-map,
+.globe-stage[data-view-phase="settling-layers"] .globe-map,
+.globe-stage[data-view-phase="preparing-overview"] .globe-map {
   opacity: 0;
   transform: none;
   filter: blur(0.1rem) saturate(0.72) brightness(0.78);
 }
 
-.globe-stage[data-view-phase="layers-preview"] .globe-map,
 .globe-stage[data-view-phase="layers"] .globe-map {
   opacity: 0;
   transform: none;
@@ -1350,9 +1331,11 @@ a {
   filter: drop-shadow(0 0 3.4rem rgba(73, 159, 209, 0.42));
 }
 
-.globe-stage[data-view-phase="layers-preview"] .digital-sphere {
-  opacity: 0.72;
-  filter: drop-shadow(0 0 4rem rgba(73, 159, 209, 0.36));
+.globe-stage[data-view-phase="settling-layers"] .digital-sphere,
+.globe-stage[data-view-phase="preparing-overview"] .digital-sphere {
+  opacity: 0;
+  filter: blur(0.12rem);
+  pointer-events: none;
 }
 
 .globe-stage[data-view-phase="layers"] .digital-sphere {

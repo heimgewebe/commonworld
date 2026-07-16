@@ -24,6 +24,11 @@ import {
   recordLocationSummaries,
   recordPresentationLabel,
   ribbonRepeatCount,
+  RING_ORBIT_MIN_DURATION_S,
+  RING_ORBIT_MAX_DURATION_S,
+  ringOrbitDirection,
+  ringOrbitDuration,
+  ringOrbitStartAngle,
   searchFromState,
   semanticLocationLine,
   semanticZoomLevel,
@@ -65,6 +70,30 @@ test('digital ribbons encode the actual UTF-8 Commons names', () => {
   assert.equal(ribbonRepeatCount(10), 2);
 });
 
+
+test('ring orbit duration is deterministic, monotonic and bounded', () => {
+  assert.equal(ringOrbitDuration(3), ringOrbitDuration(3), 'same entry count must yield the same duration');
+  assert.ok(ringOrbitDuration(1) < ringOrbitDuration(3), '1 < 3');
+  assert.ok(ringOrbitDuration(3) < ringOrbitDuration(10), '3 < 10');
+  for (let count = 1; count < 48; count += 1) {
+    assert.ok(ringOrbitDuration(count) <= ringOrbitDuration(count + 1), `monotonic at ${count}`);
+  }
+  assert.equal(ringOrbitDuration(1), RING_ORBIT_MIN_DURATION_S, 'one entry receives the exact minimum duration');
+  assert.equal(RING_ORBIT_MIN_DURATION_S, 24);
+  assert.equal(RING_ORBIT_MAX_DURATION_S, 96);
+  assert.equal(ringOrbitDuration(10000), RING_ORBIT_MAX_DURATION_S, 'large counts saturate at the cap');
+  assert.equal(ringOrbitDuration(100000), ringOrbitDuration(10000), 'cap is flat beyond saturation');
+  assert.equal(ringOrbitDuration(0), ringOrbitDuration(1), 'empty rings fall back to the slowest small-ring pace');
+  assert.equal(ringOrbitDuration('nonsense'), ringOrbitDuration(1), 'invalid input fails closed to the fallback');
+});
+
+test('ring orbit direction and start angle are deterministic presentation parameters', () => {
+  assert.deepEqual([0, 1, 2, 3, 4, 5].map(ringOrbitDirection), [1, -1, 1, -1, 1, -1]);
+  const angles = [0, 1, 2, 3, 4, 5].map(ringOrbitStartAngle);
+  assert.deepEqual(angles, [0, 1, 2, 3, 4, 5].map(ringOrbitStartAngle), 'start angles are deterministic');
+  assert.equal(new Set(angles).size, 6, 'start angles stay distinct across the six rings');
+  assert.ok(angles.every((value) => value >= 0 && value < 360));
+});
 
 test('orbital profiles remain distinct semantic paths rather than copied circles', () => {
   assert.equal(ORBIT_PROFILES.length, LAYERS.length);

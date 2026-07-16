@@ -112,8 +112,22 @@
       "monotonic_fade_required": true
     },
     "motion": {
-      "continuous_rotation_forbidden": true,
-      "stop_on_interaction_focus_hidden_page_or_reduced_motion": true
+      "continuous_whole_sphere_rotation_forbidden": true,
+      "ring_orbit_animation": {
+        "enabled": true,
+        "purpose": "orientation_signal_that_ring_planes_carry_digital_layers",
+        "implementation": "css_transform_keyframes_only",
+        "per_frame_javascript_forbidden": true,
+        "duration_function": "ringOrbitDuration",
+        "duration_bounds_seconds": {
+          "minimum": 24,
+          "maximum": 96
+        },
+        "duration_monotonic_in_entry_count": true,
+        "deterministic_start_angles_required": true,
+        "alternating_directions_allowed": true,
+        "reduced_motion_stops_orbit": true
+      }
     }
   },
   "interaction": {

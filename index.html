@@ -71,7 +71,6 @@
                 <stop offset="100%" stop-color="white" />
               </radialGradient>
               <mask id="sphere-mask"><rect width="640" height="640" fill="url(#sphere-center-fade)" /></mask>
-              <path id="sphere-action-path" d="M 320 15 A 305 305 0 1 1 319.99 15" />
               <g id="sphere-paths" fill="none">
               <ellipse id="sphere-path-1" cx="320" cy="320" rx="316" ry="300" transform="rotate(-8 320 320)" />
               <ellipse id="sphere-path-2" cx="320" cy="320" rx="310" ry="282" transform="rotate(20 320 320)" />
@@ -81,17 +80,26 @@
               <ellipse id="sphere-path-6" cx="320" cy="320" rx="286" ry="294" transform="rotate(-62 320 320)" />
               </g>
             </defs>
-            <g id="sphere-rings">
-              <use href="#sphere-path-1" class="sphere-layer-guide" data-layer-id="knowledge_data"></use>
-              <use href="#sphere-path-2" class="sphere-layer-guide" data-layer-id="software_infrastructure"></use>
-              <use href="#sphere-path-3" class="sphere-layer-guide" data-layer-id="media_culture"></use>
-              <use href="#sphere-path-4" class="sphere-layer-guide" data-layer-id="learning_education"></use>
-              <use href="#sphere-path-5" class="sphere-layer-guide" data-layer-id="communication_networks"></use>
-              <use href="#sphere-path-6" class="sphere-layer-guide" data-layer-id="mixed_other"></use>
+            <g id="sphere-rings" mask="url(#sphere-mask)" aria-hidden="true">
+              <g class="sphere-ring-plane" data-layer-id="knowledge_data" data-ring-index="0">
+                <use href="#sphere-path-1" class="sphere-layer-guide" data-layer-id="knowledge_data"></use>
+              </g>
+              <g class="sphere-ring-plane" data-layer-id="software_infrastructure" data-ring-index="1">
+                <use href="#sphere-path-2" class="sphere-layer-guide" data-layer-id="software_infrastructure"></use>
+              </g>
+              <g class="sphere-ring-plane" data-layer-id="media_culture" data-ring-index="2">
+                <use href="#sphere-path-3" class="sphere-layer-guide" data-layer-id="media_culture"></use>
+              </g>
+              <g class="sphere-ring-plane" data-layer-id="learning_education" data-ring-index="3">
+                <use href="#sphere-path-4" class="sphere-layer-guide" data-layer-id="learning_education"></use>
+              </g>
+              <g class="sphere-ring-plane" data-layer-id="communication_networks" data-ring-index="4">
+                <use href="#sphere-path-5" class="sphere-layer-guide" data-layer-id="communication_networks"></use>
+              </g>
+              <g class="sphere-ring-plane" data-layer-id="mixed_other" data-ring-index="5">
+                <use href="#sphere-path-6" class="sphere-layer-guide" data-layer-id="mixed_other"></use>
+              </g>
             </g>
-            <g id="sphere-streams" mask="url(#sphere-mask)" aria-hidden="true"></g>
-            <circle class="sphere-action-guide" cx="320" cy="320" r="309" aria-hidden="true"></circle>
-            <text class="sphere-action-text" aria-hidden="true"><textPath href="#sphere-action-path" startOffset="1%">DIGITALE EBENEN ÖFFNEN · ANTIPPEN · DIGITALE EBENEN ÖFFNEN · ANTIPPEN · DIGITALE EBENEN ÖFFNEN · ANTIPPEN ·</textPath></text>
             <circle id="sphere-edge-control" class="sphere-edge-control" cx="320" cy="320" r="309" fill="none" stroke="transparent" stroke-width="34" pointer-events="stroke" role="button" tabindex="0" aria-label="Digitale Ebenen öffnen. Antippen oder Eingabetaste drücken."></circle>
           </svg>
           <div id="layer-stack-visual" class="layer-stack-visual" aria-hidden="true"></div>

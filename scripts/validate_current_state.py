@@ -138,7 +138,7 @@ def validate_current_state(root: Path = ROOT) -> list[str]:
     }
     expected_historical = {
         "contracts/commonworld/renderer-selection.contract.json": "15c76c0875d42e4f670f6513d97804cf0805a054057cf74c0f99798f6432fd8a",
-        "contracts/commonworld/digital-sphere.contract.json": "616d2e4ce880f9997c4c7c7bf7ef621ac779325ffac24b53b8d802c694003029",
+        "contracts/commonworld/digital-sphere.contract.json": "f0aaab7c259880b8cffc849d0e305d35a64f59ee76638e06da33a843ec28af7c",
         "docs/research/public-maplibre-vertical-slice-v1.result.json": "8f60b0baec90520a9e1b961c7d5453c0fe87da29f7ecf9132836475ff4cb95e6",
     }
     if actual_historical != expected_historical:
