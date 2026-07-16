@@ -24,16 +24,17 @@
       "hidden_location_query_results": 0
     },
     "browser": {
-      "job": "grabowski-job-cb12b0681249",
-      "receipt_sha256": "4ba985ed993b33e632a3f313d5132225df11a85f9fc99dfb4ef8ddcf90c52cc7",
-      "scenarios_passed": 15,
+      "job": "grabowski-job-2aff86d215aa",
+      "receipt_sha256": "9d05ae9ec7a3467c4d22b46b6d5cda682d7b7459442f9521d2f2473d9345bf1e",
+      "scenarios_passed": 16,
       "scenarios_failed": 0,
       "intent_scenarios": [
         "intent-search-discovery",
         "intent-search-ipad-portrait",
         "intent-search-ipad-landscape"
       ],
-      "minimum_touch_target_css_px": 44
+      "minimum_touch_target_css_px": 44,
+      "startup_and_affordance_scenario": "startup-and-ring-affordance"
     },
     "targeted_tests": {
       "intent_core_job": "grabowski-job-f481b2855fbf",
@@ -43,14 +44,14 @@
     },
     "file_evidence": {
       "assets/commonworld-core.mjs": "58d1d9e5f3fd3e5235a1385be976d3c388973160aa9246259a11f45d0523bfb3",
-      "assets/commonworld-app.js": "02c4e133a3b8d17897b0e699fe0e24e8fde03d0439a6cc944d57cf53c0cd6829",
+      "assets/commonworld-app.js": "8878eb2eabf31d9bbedec954ec5967ee7cd02150bdbb2be8c2cdb15b7cfa18c4",
       "contracts/commonworld/project.schema.json": "9cacef6c1c2fbcbe50f3e04d74a71712a2fbf0e9c8c8358d4d0675dfb1d7eff5",
       "contracts/commonworld/intent-search-discovery.contract.json": "ebc29ba3e7f7d285c076262fa49b49e2f8841086d03237e6afe5f5b07bd3e4c3",
-      "scripts/render_public_shell.py": "e009b643a21c3674dd27ac3b7f15f27a37841512b76ee29062a64250a34fadba",
-      "scripts/smoke_public_browser.mjs": "660ab4a2c1014fe89e6480390a5cf59408e2f0633b2a88d38b6e5ed3ae6a5502",
+      "scripts/render_public_shell.py": "a721d9ed49d73b13e2291b72e400d8d9c809147083cd6b83337e799c8ea7a88b",
+      "scripts/smoke_public_browser.mjs": "64b1305ecbacd1844a27d3337baa58d3e4236517457ec797cc32b50366efb840",
       "scripts/validate_public_catalog.py": "8c15cfb267f72335c92f25cf7db18489716672b408837d80428e0b9e5f9f636f",
-      "index.css": "857cef2336ea203939445c695b908a29a77c2245cff9c9f5fbeb4636255d91c5",
-      "index.html": "5096b88c3f0b0d6ae47ef2615d195afbff7746227c13288a953612d157e2b901"
+      "index.css": "2244cf1b4fac2b90f693a47afc2cfae546f8bcf97a110a4bc4f0982cd2b839a0",
+      "index.html": "43aaf9f3742dbd3f0afdcec8c9898c9e8bfeff793200d75799eb2c65058425cd"
     },
     "catalog_projects_sha256": "35af8f4f3f2aad1ff008c1de719d3ba0ad49929f4e04c9625b33aba45032f5e9"
   },

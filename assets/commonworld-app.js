@@ -928,6 +928,11 @@ function layerCamera(camera = null) {
   };
 }
 
+function smoothCameraEasing(progress) {
+  const remaining = 1 - Math.min(1, Math.max(0, progress));
+  return 1 - remaining * remaining * remaining * remaining;
+}
+
 function applyCamera(camera, { instant = false, duration = 260 } = {}) {
   if (!runtime.map) return;
   const options = {
@@ -942,7 +947,7 @@ function applyCamera(camera, { instant = false, duration = 260 } = {}) {
   elements.stage.dataset.lastCameraCommand = useJump ? 'jumpTo' : 'easeTo';
   elements.stage.dataset.lastCameraDuration = useJump ? '0' : String(duration);
   if (useJump) runtime.map.jumpTo(options);
-  else runtime.map.easeTo({ ...options, duration, essential: false });
+  else runtime.map.easeTo({ ...options, duration, easing: smoothCameraEasing, essential: false });
 }
 
 function clearViewTransition() {
@@ -1258,6 +1263,10 @@ function activateSphereFallbackClick(event) {
   activateSphereEdge(event);
 }
 
+function setSphereAffordanceActive(active) {
+  elements.sphere.dataset.affordanceActive = active ? 'true' : 'false';
+}
+
 function wireControls() {
   elements.skipLink.addEventListener('click', (event) => {
     event.preventDefault();
@@ -1268,6 +1277,12 @@ function wireControls() {
   elements.layerClose.addEventListener('click', () => closeLayerView());
   elements.layerSearchToggle.addEventListener('click', toggleLayerDiscovery);
   elements.layerSearch.addEventListener('input', () => setQuery(elements.layerSearch.value));
+  elements.sphereEdge.addEventListener('pointerenter', () => setSphereAffordanceActive(true));
+  elements.sphereEdge.addEventListener('pointerleave', () => {
+    if (document.activeElement !== elements.sphereEdge) setSphereAffordanceActive(false);
+  });
+  elements.sphereEdge.addEventListener('focus', () => setSphereAffordanceActive(true));
+  elements.sphereEdge.addEventListener('blur', () => setSphereAffordanceActive(false));
   elements.sphereEdge.addEventListener('pointerdown', beginSpherePointer);
   elements.sphereEdge.addEventListener('pointerup', endSpherePointer);
   elements.sphereEdge.addEventListener('pointercancel', cancelSpherePointer);
@@ -1386,6 +1401,7 @@ function createMap() {
     maxZoom: MAX_MAP_ZOOM,
     attributionControl: true,
     renderWorldCopies: false,
+    projection: { type: 'globe' },
     fadeDuration: reducedMotion.matches ? 0 : 120,
   });
   runtime.map.addControl(new window.maplibregl.NavigationControl({ visualizePitch: true, showCompass: true }), 'bottom-right');
@@ -1411,16 +1427,25 @@ function createMap() {
   });
   runtime.map.on('idle', () => {
     if (runtime.mapReady && !runtime.map.getSource(PUBLIC_MAP_SOURCE_ID)) ensurePublicMapLayers();
+    if (runtime.mapReady && elements.stage.dataset.visualReady !== 'true') {
+      updateSphereGeometry();
+      elements.stage.dataset.visualReady = 'true';
+    }
   });
   runtime.map.on('load', () => {
     runtime.mapReady = true;
     runtime.map.setProjection({ type: 'globe' });
     ensurePublicMapLayers();
+    if (runtime.state.view === 'layers') openLayerView({ historyMode: null, cameraState: runtime.state.camera, instant: true });
+    else applyCamera(runtime.state.camera, { instant: true });
     updateSphereGeometry();
     updateSemanticLocationLine();
     refreshStatus();
-    if (runtime.state.view === 'layers') openLayerView({ historyMode: null, cameraState: runtime.state.camera, instant: true });
-    else applyCamera(runtime.state.camera, { instant: true });
+    window.setTimeout(() => {
+      if (!runtime.mapReady || elements.stage.dataset.visualReady === 'true') return;
+      updateSphereGeometry();
+      elements.stage.dataset.visualReady = 'true';
+    }, 1200);
     if (runtime.pendingSpatialProject) performSpatialNavigation(runtime.pendingSpatialProject);
   });
   void verifyMapProvider();
