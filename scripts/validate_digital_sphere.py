@@ -125,8 +125,19 @@ def validate_digital_sphere(root: Path = ROOT) -> list[str]:
     elif not (numeric[0] < numeric[1] == numeric[2]):
         errors.append("digital sphere zoom fade must end exactly where local hiding begins")
     if globe.get("motion") != {
-        "continuous_rotation_forbidden": True,
-        "stop_on_interaction_focus_hidden_page_or_reduced_motion": True,
+        "continuous_whole_sphere_rotation_forbidden": True,
+        "ring_orbit_animation": {
+            "enabled": True,
+            "purpose": "orientation_signal_that_ring_planes_carry_digital_layers",
+            "implementation": "css_transform_keyframes_only",
+            "per_frame_javascript_forbidden": True,
+            "duration_function": "ringOrbitDuration",
+            "duration_bounds_seconds": {"minimum": 24, "maximum": 96},
+            "duration_monotonic_in_entry_count": True,
+            "deterministic_start_angles_required": True,
+            "alternating_directions_allowed": True,
+            "reduced_motion_stops_orbit": True,
+        },
     }:
         errors.append("digital sphere motion boundary mismatch")
 

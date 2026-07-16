@@ -134,8 +134,10 @@ def render_shell(root: Path = ROOT) -> str:
         f'              <ellipse id="sphere-path-{index}" cx="320" cy="320" rx="{rx}" ry="{ry}" transform="rotate({rotation} 320 320)" />'
         for index, (_, rx, ry, rotation) in enumerate(ORBIT_PROFILES, start=1)
     )
-    uses = "\n".join(
-        f'              <use href="#sphere-path-{index}" class="sphere-layer-guide" data-layer-id="{layer_id}"></use>'
+    planes = "\n".join(
+        f'              <g class="sphere-ring-plane" data-layer-id="{layer_id}" data-ring-index="{index - 1}">\n'
+        f'                <use href="#sphere-path-{index}" class="sphere-layer-guide" data-layer-id="{layer_id}"></use>\n'
+        f'              </g>'
         for index, (layer_id, _, _, _) in enumerate(ORBIT_PROFILES, start=1)
     )
     cards = render_cards(records)
@@ -213,17 +215,13 @@ def render_shell(root: Path = ROOT) -> str:
                 <stop offset="100%" stop-color="white" />
               </radialGradient>
               <mask id="sphere-mask"><rect width="640" height="640" fill="url(#sphere-center-fade)" /></mask>
-              <path id="sphere-action-path" d="M 320 15 A 305 305 0 1 1 319.99 15" />
               <g id="sphere-paths" fill="none">
 {paths}
               </g>
             </defs>
-            <g id="sphere-rings">
-{uses}
+            <g id="sphere-rings" mask="url(#sphere-mask)" aria-hidden="true">
+{planes}
             </g>
-            <g id="sphere-streams" mask="url(#sphere-mask)" aria-hidden="true"></g>
-            <circle class="sphere-action-guide" cx="320" cy="320" r="309" aria-hidden="true"></circle>
-            <text class="sphere-action-text" aria-hidden="true"><textPath href="#sphere-action-path" startOffset="1%">DIGITALE EBENEN ÖFFNEN · ANTIPPEN · DIGITALE EBENEN ÖFFNEN · ANTIPPEN · DIGITALE EBENEN ÖFFNEN · ANTIPPEN ·</textPath></text>
             <circle id="sphere-edge-control" class="sphere-edge-control" cx="320" cy="320" r="309" fill="none" stroke="transparent" stroke-width="34" pointer-events="stroke" role="button" tabindex="0" aria-label="Digitale Ebenen öffnen. Antippen oder Eingabetaste drücken."></circle>
           </svg>
           <div id="layer-stack-visual" class="layer-stack-visual" aria-hidden="true"></div>

@@ -61,6 +61,28 @@ export function ribbonRepeatCount(recordCount, minimumSegments = 12) {
   const minimum = Number.isInteger(minimumSegments) && minimumSegments > 0 ? minimumSegments : 12;
   return clamp(Math.ceil(minimum / count), 2, 6);
 }
+
+export const RING_ORBIT_MIN_DURATION_S = 24;
+export const RING_ORBIT_MAX_DURATION_S = 96;
+const RING_ORBIT_SATURATION_COUNT = 48;
+
+export function ringOrbitDuration(entryCount) {
+  const count = Number.isInteger(entryCount) && entryCount > 0 ? entryCount : 1;
+  const boundedCount = clamp(count, 1, RING_ORBIT_SATURATION_COUNT);
+  const scale = boundedCount === 1 ? 0 : Math.log(boundedCount) / Math.log(RING_ORBIT_SATURATION_COUNT);
+  const seconds = RING_ORBIT_MIN_DURATION_S + (RING_ORBIT_MAX_DURATION_S - RING_ORBIT_MIN_DURATION_S) * scale;
+  return rounded(clamp(seconds, RING_ORBIT_MIN_DURATION_S, RING_ORBIT_MAX_DURATION_S), 2);
+}
+
+export function ringOrbitDirection(ringIndex) {
+  const index = Number.isInteger(ringIndex) && ringIndex >= 0 ? ringIndex : 0;
+  return index % 2 === 0 ? 1 : -1;
+}
+
+export function ringOrbitStartAngle(ringIndex) {
+  const index = Number.isInteger(ringIndex) && ringIndex >= 0 ? ringIndex : 0;
+  return (index * 61) % 360;
+}
 export function binaryFragment(identifier, length = 12) {
   let hash = 2166136261;
   for (const character of String(identifier)) {

@@ -49,7 +49,7 @@
     {
       "path": "contracts/commonworld/digital-sphere.contract.json",
       "scope": "digital-sphere proof before public production authorization",
-      "sha256": "616d2e4ce880f9997c4c7c7bf7ef621ac779325ffac24b53b8d802c694003029"
+      "sha256": "f0aaab7c259880b8cffc849d0e305d35a64f59ee76638e06da33a843ec28af7c"
     },
     {
       "path": "docs/research/public-maplibre-vertical-slice-v1.result.json",

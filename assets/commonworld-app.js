@@ -18,6 +18,9 @@ import {
   projectedGlobeCircle,
   publicProjectNavigationTarget,
   ribbonRepeatCount,
+  ringOrbitDirection,
+  ringOrbitDuration,
+  ringOrbitStartAngle,
   searchFromState,
   semanticLocationLine,
   sphereDetailLevel,
@@ -50,7 +53,6 @@ const elements = {
   semanticLevel: document.querySelector('#semantic-level'),
   semanticSummary: document.querySelector('#semantic-summary'),
   sphere: document.querySelector('#digital-sphere'),
-  sphereStreams: document.querySelector('#sphere-streams'),
   sphereRings: document.querySelector('#sphere-rings'),
   sphereEdge: document.querySelector('#sphere-edge-control'),
   layerStack: document.querySelector('#layer-stack-visual'),
@@ -119,9 +121,9 @@ const runtime = {
   },
   previousGlobeCamera: null,
   viewPhase: 'overview',
-  viewTransitionTimer: null,
+  cameraFlightGeneration: 0,
+  cameraFlightCleanup: null,
   viewTransitionCleanup: null,
-  layerPanelRevealTimer: null,
   layerPanelReady: false,
   layerReturnTarget: null,
   spherePointerStart: null,
@@ -252,36 +254,48 @@ function groupedDigitalRecords(records = runtime.records) {
   return grouped;
 }
 
-function appendRingSequence(textPath, records, repeatCount) {
-  for (let copy = 0; copy < repeatCount; copy += 1) {
-    for (const record of records) {
-      const name = createSvgElement('tspan', { class: 'sphere-ring-name' });
-      name.textContent = `  ${record.title}  `;
-      const binary = createSvgElement('tspan', { class: 'sphere-ring-binary' });
-      binary.textContent = `${binaryName(record.title)}   `;
-      textPath.append(name, binary);
-    }
+function appendRingSequence(textPath, records) {
+  for (const record of records) {
+    const name = createSvgElement('tspan', { class: 'sphere-ring-name', 'data-commonproject-id': record.id });
+    name.textContent = `  ${record.title}  `;
+    const binary = createSvgElement('tspan', { class: 'sphere-ring-binary' });
+    binary.textContent = `${binaryName(record.title)}   `;
+    textPath.append(name, binary);
   }
 }
 
 function renderSphereRibbons(records = runtime.records) {
-  elements.sphereStreams.replaceChildren();
   const grouped = groupedDigitalRecords(records);
   LAYERS.forEach((layer, layerIndex) => {
+    const plane = elements.sphereRings.querySelector(`.sphere-ring-plane[data-layer-id="${CSS.escape(layer.id)}"]`);
+    if (!plane) return;
     const source = grouped.get(layer.id) ?? [];
-    const displayRecords = source.length ? source : [{ title: layer.trackLabel }];
+    const orbitDuration = ringOrbitDuration(source.length);
+    plane.dataset.entryCount = String(source.length);
+    plane.dataset.orbitDuration = String(orbitDuration);
+    plane.style.setProperty('--ring-orbit-duration', `${orbitDuration}s`);
+    plane.style.setProperty('--ring-orbit-direction', String(ringOrbitDirection(layerIndex)));
+    plane.style.setProperty('--ring-orbit-start-angle', `${ringOrbitStartAngle(layerIndex)}deg`);
     const text = createSvgElement('text', {
       class: 'sphere-ring-text',
       'data-layer-id': layer.id,
+      'data-entry-count': String(source.length),
     });
     const textPath = createSvgElement('textPath', {
       href: `#sphere-path-${layerIndex + 1}`,
       startOffset: `${(layerIndex * 11 + 3) % 100}%`,
     });
-    appendRingSequence(textPath, displayRecords, ribbonRepeatCount(displayRecords.length, 10));
+    if (source.length) {
+      appendRingSequence(textPath, source);
+    } else {
+      const placeholder = createSvgElement('tspan', { class: 'sphere-ring-placeholder' });
+      placeholder.textContent = `  ${layer.trackLabel} · keine sichtbaren Einträge  `;
+      textPath.append(placeholder);
+    }
     text.append(textPath);
     text.toggleAttribute('data-empty', source.length === 0);
-    elements.sphereStreams.append(text);
+    plane.querySelector('.sphere-ring-text')?.remove();
+    plane.append(text);
   });
   runtime.overlayRenderCount += 1;
   elements.stage.dataset.overlayRenders = String(runtime.overlayRenderCount);
@@ -889,7 +903,9 @@ function updateSphereGeometry() {
   if (!runtime.mapReady || elements.globeSurface.hidden) return;
   const rect = elements.stage.getBoundingClientRect();
   const padding = typeof runtime.map.getPadding === 'function' ? runtime.map.getPadding() : {};
-  const sideView = runtime.state.view === 'layers' || runtime.viewPhase !== 'overview';
+  // Camera flights keep the MapLibre-projected overview geometry; side layout is
+  // used only after entry has settled and during invisible return preparation.
+  const sideView = runtime.viewPhase === 'layers' || runtime.viewPhase === 'preparing-overview';
   const center = runtime.map.getCenter();
   const projectedCenter = runtime.map.project(center);
   const globe = sideView ? null : projectedGlobeGeometry(center, projectedCenter);
@@ -951,65 +967,126 @@ function applyCamera(camera, { instant = false, duration = 260 } = {}) {
 }
 
 function clearViewTransition() {
-  window.clearTimeout(runtime.viewTransitionTimer);
-  runtime.viewTransitionTimer = null;
-  window.clearTimeout(runtime.layerPanelRevealTimer);
-  runtime.layerPanelRevealTimer = null;
+  runtime.cameraFlightGeneration += 1;
+  runtime.cameraFlightCleanup?.();
+  runtime.cameraFlightCleanup = null;
   runtime.viewTransitionCleanup?.();
   runtime.viewTransitionCleanup = null;
 }
 
-function scheduleViewTransition(phase, duration, options = {}) {
+function startCameraFlight(camera, { instant = false, duration = 260, onSettled = () => {} } = {}) {
+  clearViewTransition();
+  const generation = runtime.cameraFlightGeneration;
+  const map = runtime.map;
+  if (!map) {
+    if (generation === runtime.cameraFlightGeneration) onSettled();
+    return;
+  }
   let completed = false;
-  const expectedOpacity = phase === 'overview' ? 1 : 0;
-  const visualTargetReached = () => Math.abs(Number.parseFloat(getComputedStyle(elements.map).opacity) - expectedOpacity) <= 0.02;
   const complete = () => {
-    if (completed) return;
+    if (completed || generation !== runtime.cameraFlightGeneration) return;
     completed = true;
-    finishViewTransition(phase, options);
+    runtime.cameraFlightCleanup?.();
+    runtime.cameraFlightCleanup = null;
+    onSettled();
   };
-  const completeIfReady = () => {
-    if (!visualTargetReached()) return false;
-    complete();
-    return true;
+  const onMoveEnd = () => complete();
+  map.once('moveend', onMoveEnd);
+  // Fallback only for a MapLibre moveend that never arrives.
+  const fallbackTimer = window.setTimeout(complete, Math.max(2000, duration * 3));
+  runtime.cameraFlightCleanup = () => {
+    map.off('moveend', onMoveEnd);
+    window.clearTimeout(fallbackTimer);
+  };
+  applyCamera(camera, { instant, duration });
+  if (typeof map.isMoving === 'function' && !map.isMoving()) complete();
+}
+
+function sphereVisualOpacity() {
+  const value = Number.parseFloat(getComputedStyle(elements.sphere).opacity);
+  return Number.isFinite(value) ? value : 0;
+}
+
+function forceSphereOpacity(visible) {
+  const previousTransition = elements.sphere.style.transition;
+  const previousOpacity = elements.sphere.style.opacity;
+  elements.sphere.style.transition = 'none';
+  elements.sphere.style.opacity = visible ? '1' : '0';
+  void elements.sphere.offsetWidth;
+  window.setTimeout(() => {
+    elements.sphere.style.transition = previousTransition;
+    elements.sphere.style.opacity = previousOpacity;
+  }, 0);
+}
+
+function waitForSphereOpacity({ visible = false, hiddenOpacity = 0.08, fallbackMs = 720, onSettled = () => {} } = {}) {
+  const generation = runtime.cameraFlightGeneration;
+  let completed = false;
+  const targetReached = () => (visible ? sphereVisualOpacity() >= 0.98 : sphereVisualOpacity() <= hiddenOpacity);
+  const complete = () => {
+    if (completed || generation !== runtime.cameraFlightGeneration) return;
+    completed = true;
+    runtime.viewTransitionCleanup?.();
+    runtime.viewTransitionCleanup = null;
+    onSettled();
   };
   const onTransitionEnd = (event) => {
-    if (event.target === elements.map && event.propertyName === 'opacity') completeIfReady();
+    if (event.target === elements.sphere && event.propertyName === 'opacity' && targetReached()) complete();
   };
-  elements.map.addEventListener('transitionend', onTransitionEnd);
-  runtime.viewTransitionCleanup = () => elements.map.removeEventListener('transitionend', onTransitionEnd);
-  runtime.viewTransitionTimer = window.setTimeout(() => {
-    if (completed) return;
-    const animations = typeof elements.map.getAnimations === 'function' ? elements.map.getAnimations() : [];
-    for (const animation of animations) {
-      try {
-        animation.finish();
-      } catch {
-        // A cancelled transition is settled by the no-transition fallback below.
-      }
-    }
-    if (completeIfReady()) return;
-    const previousTransition = elements.map.style.transition;
-    const previousOpacity = elements.map.style.opacity;
-    elements.map.style.transition = 'none';
-    elements.map.style.opacity = String(expectedOpacity);
-    void elements.map.offsetWidth;
+  elements.sphere.addEventListener('transitionend', onTransitionEnd);
+  const fallbackTimer = window.setTimeout(() => {
+    if (!targetReached()) forceSphereOpacity(visible);
     complete();
-    elements.map.style.opacity = previousOpacity;
-    elements.map.style.transition = previousTransition;
-  }, Math.max(2000, duration * 3));
+  }, fallbackMs);
+  runtime.viewTransitionCleanup = () => {
+    elements.sphere.removeEventListener('transitionend', onTransitionEnd);
+    window.clearTimeout(fallbackTimer);
+  };
+  window.setTimeout(() => {
+    if (targetReached()) complete();
+  }, 0);
+}
+
+function settleLayerViewAfterCamera() {
+  waitForSphereOpacity({
+    hiddenOpacity: 0.08,
+    onSettled: () => finishViewTransition('layers'),
+  });
+  setViewPhase('settling-layers');
+  showLayerState();
+}
+
+function startOverviewReturnCamera(targetCamera, duration, restoreFocus) {
+  setViewPhase('leaving-layers');
+  showLayerState();
+  startCameraFlight(targetCamera, {
+    duration,
+    onSettled: () => finishViewTransition('overview', { restoreFocus }),
+  });
+}
+
+function prepareOverviewReturn(targetCamera, duration, restoreFocus) {
+  waitForSphereOpacity({
+    hiddenOpacity: 0.02,
+    onSettled: () => startOverviewReturnCamera(targetCamera, duration, restoreFocus),
+  });
+  setViewPhase('preparing-overview');
+  showLayerState();
 }
 
 function setViewPhase(phase) {
-  const allowed = new Set(['overview', 'entering-layers', 'layers-preview', 'layers', 'leaving-layers']);
+  const allowed = new Set(['overview', 'entering-layers', 'settling-layers', 'layers', 'preparing-overview', 'leaving-layers']);
   runtime.viewPhase = allowed.has(phase) ? phase : 'overview';
   elements.stage.dataset.viewPhase = runtime.viewPhase;
   elements.stage.dataset.viewPhaseStartedAt = String(performance.now());
-  if (runtime.viewPhase === 'layers-preview') {
-    elements.stage.dataset.layerPreviewStartedAt = elements.stage.dataset.viewPhaseStartedAt;
+  if (runtime.viewPhase === 'entering-layers') {
     delete elements.stage.dataset.layerPanelVisibleAt;
+    delete elements.stage.dataset.layerSettlingStartedAt;
   }
-  if (runtime.viewPhase === 'leaving-layers') {
+  if (runtime.viewPhase === 'settling-layers') {
+    elements.stage.dataset.layerSettlingStartedAt = elements.stage.dataset.viewPhaseStartedAt;
+  }
+  if (runtime.viewPhase === 'preparing-overview' || runtime.viewPhase === 'leaving-layers') {
     elements.stage.dataset.layerReturnStartedAt = elements.stage.dataset.viewPhaseStartedAt;
   }
   updateSphereGeometry();
@@ -1020,9 +1097,8 @@ function showLayerState() {
   const journeyActive = runtime.state.surface === 'globe' && (runtime.state.view === 'layers' || runtime.viewPhase !== 'overview');
   const panelMounted = runtime.state.surface === 'globe' && runtime.viewPhase === 'layers';
   const panelVisible = panelMounted && runtime.layerPanelReady;
-  const transformed = runtime.state.surface === 'globe' && runtime.state.view === 'layers';
-  elements.stage.classList.toggle('layer-view-open', transformed);
-  elements.stage.classList.toggle('layer-view-settled', runtime.viewPhase === 'layers-preview' || runtime.viewPhase === 'layers');
+  elements.stage.classList.toggle('layer-view-open', journeyActive);
+  elements.stage.classList.toggle('layer-view-settled', runtime.viewPhase === 'layers');
   elements.layerPanel.hidden = !panelMounted;
   elements.layerPanel.toggleAttribute('data-visible', panelVisible);
   elements.layerPanel.toggleAttribute('inert', !panelVisible);
@@ -1046,29 +1122,19 @@ function showLayerState() {
   }
 }
 
-function finishViewTransition(phase, { restoreFocus = false, revealImmediately = false } = {}) {
+function finishViewTransition(phase, { restoreFocus = false } = {}) {
   clearViewTransition();
   runtime.layerPanelReady = false;
   setViewPhase(phase);
   showLayerState();
-  if (phase === 'layers-preview') {
-    runtime.layerPanelRevealTimer = window.setTimeout(() => {
-      runtime.layerPanelRevealTimer = null;
-      if (runtime.viewPhase !== 'layers-preview' || runtime.state.view !== 'layers') return;
-      setViewPhase('layers');
+  if (phase === 'layers') {
+    window.requestAnimationFrame(() => {
+      if (runtime.viewPhase !== 'layers' || runtime.state.view !== 'layers') return;
+      runtime.layerPanelReady = true;
+      elements.stage.dataset.layerPanelVisibleAt = String(performance.now());
       showLayerState();
-      window.requestAnimationFrame(() => {
-        if (runtime.viewPhase !== 'layers' || runtime.state.view !== 'layers') return;
-        runtime.layerPanelReady = true;
-        elements.stage.dataset.layerPanelVisibleAt = String(performance.now());
-        showLayerState();
-        elements.layerClose.focus({ preventScroll: true });
-      });
-    }, 280);
-  } else if (phase === 'layers' && revealImmediately) {
-    runtime.layerPanelReady = true;
-    showLayerState();
-    elements.layerClose.focus({ preventScroll: true });
+      elements.layerClose.focus({ preventScroll: true });
+    });
   }
   if (phase === 'overview' && restoreFocus) {
     (runtime.layerReturnTarget ?? elements.layerToggle).focus({ preventScroll: true });
@@ -1086,35 +1152,62 @@ function openLayerView({ historyMode = 'push', cameraState = null, instant = fal
   }
   runtime.state.view = 'layers';
   clearViewTransition();
-  const duration = instant || cameraState || reducedMotion.matches ? 0 : DIGITAL_LAYER_TRANSITION_MS;
-  setViewPhase(duration ? 'entering-layers' : 'layers');
+  const duration = instant || cameraState || reducedMotion.matches || !runtime.mapReady ? 0 : DIGITAL_LAYER_TRANSITION_MS;
   elements.layerPanel.removeAttribute('data-closing');
   closeLayerDiscovery();
-  showLayerState();
   renderLayerPanel();
-  if (runtime.mapReady) applyCamera(layerCamera(cameraState), { instant: duration === 0, duration });
-  if (duration) scheduleViewTransition('layers-preview', duration);
-  else finishViewTransition('layers', { revealImmediately: true });
+  if (runtime.mapReady) {
+    const targetCamera = layerCamera(cameraState);
+    if (duration) {
+      setViewPhase('entering-layers');
+      showLayerState();
+      startCameraFlight(targetCamera, {
+        duration,
+        onSettled: settleLayerViewAfterCamera,
+      });
+    } else {
+      startCameraFlight(targetCamera, {
+        instant: true,
+        duration: 0,
+        onSettled: () => finishViewTransition('layers'),
+      });
+    }
+  } else if (duration) {
+    setViewPhase('entering-layers');
+    showLayerState();
+  } else {
+    finishViewTransition('layers');
+  }
   if (historyMode) writeHistory(historyMode);
 }
 
 function closeLayerView({ historyMode = 'push', cameraState = null, preserveLayer = false, instant = false, restoreFocus = true } = {}) {
   const wasOpen = runtime.state.view === 'layers' || runtime.viewPhase !== 'overview';
+  const currentPhase = runtime.viewPhase;
   runtime.layerPanelReady = false;
   closeLayerDiscovery();
   runtime.state.view = 'globe';
   if (!preserveLayer) runtime.state.layer = null;
   clearViewTransition();
-  const duration = instant || reducedMotion.matches ? 0 : DIGITAL_LAYER_TRANSITION_MS;
-  if (wasOpen && duration) {
-    elements.layerPanel.dataset.closing = 'true';
-    setViewPhase('leaving-layers');
-    showLayerState();
-  }
+  const duration = instant || reducedMotion.matches || !runtime.mapReady ? 0 : DIGITAL_LAYER_TRANSITION_MS;
   renderDiscoveryState();
-  if (runtime.mapReady) applyCamera(cameraState ?? runtime.previousGlobeCamera ?? runtime.state.camera, { instant: duration === 0, duration });
-  if (wasOpen && duration) scheduleViewTransition('overview', duration, { restoreFocus });
-  else finishViewTransition('overview', { restoreFocus: wasOpen && restoreFocus });
+  const targetCamera = cameraState ?? runtime.previousGlobeCamera ?? runtime.state.camera;
+  if (wasOpen && runtime.mapReady && duration) {
+    elements.layerPanel.dataset.closing = 'true';
+    if (currentPhase === 'layers' || currentPhase === 'preparing-overview') {
+      prepareOverviewReturn(targetCamera, duration, restoreFocus);
+    } else {
+      startOverviewReturnCamera(targetCamera, duration, restoreFocus);
+    }
+  } else if (runtime.mapReady) {
+    startCameraFlight(targetCamera, {
+      instant: true,
+      duration: 0,
+      onSettled: () => finishViewTransition('overview', { restoreFocus: wasOpen && restoreFocus }),
+    });
+  } else {
+    finishViewTransition('overview', { restoreFocus: wasOpen && restoreFocus });
+  }
   if (historyMode) writeHistory(historyMode);
 }
 
@@ -1263,10 +1356,6 @@ function activateSphereFallbackClick(event) {
   activateSphereEdge(event);
 }
 
-function setSphereAffordanceActive(active) {
-  elements.sphere.dataset.affordanceActive = active ? 'true' : 'false';
-}
-
 function wireControls() {
   elements.skipLink.addEventListener('click', (event) => {
     event.preventDefault();
@@ -1277,12 +1366,6 @@ function wireControls() {
   elements.layerClose.addEventListener('click', () => closeLayerView());
   elements.layerSearchToggle.addEventListener('click', toggleLayerDiscovery);
   elements.layerSearch.addEventListener('input', () => setQuery(elements.layerSearch.value));
-  elements.sphereEdge.addEventListener('pointerenter', () => setSphereAffordanceActive(true));
-  elements.sphereEdge.addEventListener('pointerleave', () => {
-    if (document.activeElement !== elements.sphereEdge) setSphereAffordanceActive(false);
-  });
-  elements.sphereEdge.addEventListener('focus', () => setSphereAffordanceActive(true));
-  elements.sphereEdge.addEventListener('blur', () => setSphereAffordanceActive(false));
   elements.sphereEdge.addEventListener('pointerdown', beginSpherePointer);
   elements.sphereEdge.addEventListener('pointerup', endSpherePointer);
   elements.sphereEdge.addEventListener('pointercancel', cancelSpherePointer);

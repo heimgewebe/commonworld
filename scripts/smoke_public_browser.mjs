@@ -4,7 +4,7 @@ import { readFile, stat } from 'node:fs/promises';
 import path from 'node:path';
 import process from 'node:process';
 import { chromium } from 'playwright';
-import { globeHorizonCoordinates, sphereOpacityForGlobeRatio } from '../assets/commonworld-core.mjs';
+import { deriveLayer, globeHorizonCoordinates, LAYERS, ringOrbitDuration, sphereOpacityForGlobeRatio } from '../assets/commonworld-core.mjs';
 
 const ROOT = process.cwd();
 const MIME = new Map([
@@ -61,6 +61,45 @@ const executablePath = process.env.PLAYWRIGHT_CHROMIUM_EXECUTABLE_PATH || (exist
 const browser = await chromium.launch({ headless: true, executablePath });
 const results = [];
 
+function sortedIds(values) {
+  return [...values].sort((left, right) => left.localeCompare(right));
+}
+
+function assertSameIds(actual, expected, label) {
+  const actualSorted = sortedIds(actual);
+  const expectedSorted = sortedIds(expected);
+  assert(JSON.stringify(actualSorted) === JSON.stringify(expectedSorted), `${label}: expected ${JSON.stringify(expectedSorted)} but found ${JSON.stringify(actualSorted)}`);
+}
+
+async function loadExpectedDigitalProjection() {
+  const manifest = JSON.parse(await readFile(path.join(ROOT, 'catalog/catalog.json'), 'utf8'));
+  assert(Array.isArray(manifest.project_files), 'catalog projection: manifest project_files missing');
+  assert(manifest.project_files.length === manifest.entry_count, 'catalog projection: manifest entry_count does not match project_files');
+  const byLayer = new Map(LAYERS.map((layer) => [layer.id, []]));
+  const allIds = [];
+  for (const projectFile of manifest.project_files) {
+    const record = JSON.parse(await readFile(path.join(ROOT, 'catalog', projectFile), 'utf8'));
+    if (record?.presence?.digital?.available !== true) continue;
+    const layerId = deriveLayer(record);
+    assert(byLayer.has(layerId), `catalog projection: ${record.id} derived unknown layer ${layerId}`);
+    byLayer.get(layerId).push(record.id);
+    allIds.push(record.id);
+  }
+  assert(new Set(allIds).size === allIds.length, `catalog projection: duplicate digital IDs in catalog ${JSON.stringify(allIds)}`);
+  return {
+    allIds,
+    totalCount: allIds.length,
+    catalogEntryCount: manifest.entry_count,
+    layers: LAYERS.map((layer) => ({
+      id: layer.id,
+      ids: byLayer.get(layer.id),
+      count: byLayer.get(layer.id).length,
+    })),
+  };
+}
+
+const expectedDigitalProjection = await loadExpectedDigitalProjection();
+
 async function newPage({ mobile = false, viewportOverride = null, touch = mobile, reducedMotion = 'reduce' } = {}) {
   const context = await browser.newContext({
     viewport: viewportOverride ?? (mobile ? { width: 390, height: 844 } : { width: 1280, height: 800 }),
@@ -80,8 +119,21 @@ async function newPage({ mobile = false, viewportOverride = null, touch = mobile
           class CapturedMap extends OriginalMap {
             constructor(...arguments_) {
               window.__commonworldTestMapOptions = arguments_[0];
+              window.__commonworldCameraCommands = [];
               super(...arguments_);
               window.__commonworldTestMap = this;
+            }
+
+            easeTo(options) {
+              window.__commonworldCameraCommands ??= [];
+              window.__commonworldCameraCommands.push({ command: 'easeTo', duration: options?.duration ?? null, at: performance.now() });
+              return super.easeTo(options);
+            }
+
+            jumpTo(options) {
+              window.__commonworldCameraCommands ??= [];
+              window.__commonworldCameraCommands.push({ command: 'jumpTo', duration: 0, at: performance.now() });
+              return super.jumpTo(options);
             }
           }
           CapturedMap.__commonworldCaptured = true;
@@ -149,8 +201,8 @@ async function independentProjectedGlobeDiameter(page) {
   }, horizon);
 }
 
-async function startupAndAffordanceScenario() {
-  process.stdout.write(`${JSON.stringify({ state: 'RUNNING', scenario: 'startup-and-ring-affordance' })}\n`);
+async function startupAndRingOrbitScenario() {
+  process.stdout.write(`${JSON.stringify({ state: 'RUNNING', scenario: 'startup-and-ring-orbits' })}\n`);
   const run = await newPage({ viewportOverride: { width: 1280, height: 800 }, reducedMotion: 'no-preference' });
   await run.page.route('**/assets/map/openfreemap-liberty.json', async (route) => {
     await new Promise((resolve) => setTimeout(resolve, 650));
@@ -182,36 +234,146 @@ async function startupAndAffordanceScenario() {
   assert((await run.page.evaluate(() => window.__commonworldTestMap?.getProjection?.()?.type)) === 'globe', 'startup: active projection changed after map calibration');
   await waitForSphereOpacitySettled(run.page);
 
-  const affordance = await run.page.evaluate(() => {
-    const text = document.querySelector('.sphere-action-text');
-    const guide = document.querySelector('.sphere-action-guide');
+  const removedHint = await run.page.evaluate(() => ({
+    actionPath: document.querySelector('#sphere-action-path') !== null,
+    actionGuide: document.querySelector('.sphere-action-guide') !== null,
+    actionText: document.querySelector('.sphere-action-text') !== null,
+    affordanceAttribute: document.querySelector('#digital-sphere')?.hasAttribute('data-affordance-active') ?? false,
+    hintText: document.querySelector('#digital-sphere')?.textContent?.includes('DIGITALE EBENEN ÖFFNEN') ?? false,
+  }));
+  assert(Object.values(removedHint).every((value) => value === false), 'outer hint: removed affordance markup is still present ' + JSON.stringify(removedHint));
+
+  const edgeControl = await run.page.evaluate(() => {
     const control = document.querySelector('#sphere-edge-control');
     return {
-      text: text?.textContent?.replace(/\s+/g, ' ').trim() ?? '',
-      textFill: getComputedStyle(text).fill,
-      textOpacity: Number(getComputedStyle(text).opacity),
-      guideStroke: getComputedStyle(guide).stroke,
       ariaLabel: control?.getAttribute('aria-label') ?? '',
+      tabindex: control?.getAttribute('tabindex') ?? '',
       hitWidth: Number(control?.getAttribute('stroke-width')),
     };
   });
-  assert(affordance.text.includes('DIGITALE EBENEN ÖFFNEN') && affordance.text.includes('ANTIPPEN'), 'affordance: outer instruction is missing ' + JSON.stringify(affordance));
-  assert(affordance.textOpacity >= 0.75, 'affordance: outer instruction is too faint ' + JSON.stringify(affordance));
-  assert(affordance.ariaLabel.includes('Antippen') && affordance.ariaLabel.includes('Eingabetaste'), 'affordance: accessible instruction is incomplete ' + JSON.stringify(affordance));
-  assert(affordance.hitWidth >= 34, 'affordance: edge hit target was not enlarged ' + JSON.stringify(affordance));
+  assert(edgeControl.ariaLabel.includes('Antippen') && edgeControl.ariaLabel.includes('Eingabetaste'), 'edge control: accessible instruction is incomplete ' + JSON.stringify(edgeControl));
+  assert(edgeControl.tabindex === '0' && edgeControl.hitWidth >= 34, 'edge control: keyboard path or hit target was lost ' + JSON.stringify(edgeControl));
 
-  await run.page.locator('#sphere-edge-control').focus();
-  await run.page.waitForTimeout(600);
-  const focused = await run.page.evaluate(() => ({
-    active: document.querySelector('#digital-sphere')?.dataset.affordanceActive,
-    textFill: getComputedStyle(document.querySelector('.sphere-action-text')).fill,
-    guideWidth: Number.parseFloat(getComputedStyle(document.querySelector('.sphere-action-guide')).strokeWidth),
-    ringWidth: Number.parseFloat(getComputedStyle(document.querySelector('#sphere-rings use')).strokeWidth),
+  const rings = await run.page.evaluate(() => {
+    return [...document.querySelectorAll('#sphere-rings .sphere-ring-plane')].map((plane) => {
+      const style = getComputedStyle(plane);
+      const names = [...plane.querySelectorAll('.sphere-ring-name[data-commonproject-id]')].map((node) => node.dataset.commonprojectId);
+      return {
+        layer: plane.dataset.layerId,
+        entryCount: Number(plane.dataset.entryCount),
+        orbitDuration: Number(plane.dataset.orbitDuration),
+        directionVariable: plane.style.getPropertyValue('--ring-orbit-direction').trim(),
+        startAngleVariable: plane.style.getPropertyValue('--ring-orbit-start-angle').trim(),
+        animationName: style.animationName,
+        animationDurationSeconds: Number.parseFloat(style.animationDuration),
+        animationIterationCount: style.animationIterationCount,
+        animationPlayState: style.animationPlayState,
+        hasGuide: plane.querySelector('use.sphere-layer-guide') !== null,
+        placeholderCount: plane.querySelectorAll('.sphere-ring-placeholder').length,
+        placeholderIds: [...plane.querySelectorAll('.sphere-ring-placeholder')].filter((node) => node.dataset.commonprojectId).length,
+        ids: names,
+      };
+    });
+  });
+  assert(rings.length === expectedDigitalProjection.layers.length, `ring orbits: expected canonical ring planes (${rings.length})`);
+  const allIds = rings.flatMap(({ ids }) => ids);
+  assert(allIds.length === expectedDigitalProjection.totalCount && new Set(allIds).size === expectedDigitalProjection.totalCount, `ring orbits: catalog entries are duplicated or missing across rings (${JSON.stringify(allIds)})`);
+  assertSameIds(allIds, expectedDigitalProjection.allIds, 'ring orbits: global digital identity set');
+  for (const ring of rings) {
+    const expectedLayer = expectedDigitalProjection.layers.find(({ id }) => id === ring.layer);
+    assert(expectedLayer, `ring orbits: rendered unknown layer ${ring.layer}`);
+    assert(ring.hasGuide, `ring orbits: ${ring.layer} lost its orbit guide`);
+    assert(Number.isFinite(ring.entryCount) && ring.entryCount === expectedLayer.count && ring.ids.length === expectedLayer.count, `ring orbits: ${ring.layer} entry count diverges from catalog identities ${JSON.stringify({ ring, expectedLayer })}`);
+    assertSameIds(ring.ids, expectedLayer.ids, `ring orbits: ${ring.layer} identity set`);
+    assert(new Set(ring.ids).size === ring.ids.length, `ring orbits: ${ring.layer} repeats an identity ${JSON.stringify(ring.ids)}`);
+    if (ring.entryCount === 0) {
+      assert(ring.placeholderCount === 1 && ring.placeholderIds === 0, `ring orbits: empty ${ring.layer} needs a non-identity placeholder ${JSON.stringify(ring)}`);
+    } else {
+      assert(ring.placeholderCount === 0, `ring orbits: populated ${ring.layer} must not show a placeholder`);
+    }
+    assert(Math.abs(ring.orbitDuration - ringOrbitDuration(ring.entryCount)) <= 0.01, `ring orbits: ${ring.layer} duration diverges from ringOrbitDuration ${JSON.stringify(ring)}`);
+    assert(ring.animationName === 'sphere-ring-orbit', `ring orbits: ${ring.layer} is not driven by the shared CSS orbit animation ${JSON.stringify(ring)}`);
+    assert(Math.abs(ring.animationDurationSeconds - ring.orbitDuration) <= 0.5, `ring orbits: ${ring.layer} CSS duration diverges from its declared duration ${JSON.stringify(ring)}`);
+    assert(ring.animationIterationCount === 'infinite' && ring.animationPlayState === 'running', `ring orbits: ${ring.layer} does not orbit continuously ${JSON.stringify(ring)}`);
+  }
+  const directions = rings.map(({ directionVariable }) => directionVariable);
+  assert(directions.every((value) => value === '1' || value === '-1'), `ring orbits: directions must be deterministic units (${JSON.stringify(directions)})`);
+  assert(new Set(directions).size === 2, `ring orbits: directions must alternate (${JSON.stringify(directions)})`);
+  assert(new Set(rings.map(({ startAngleVariable }) => startAngleVariable)).size === rings.length, 'ring orbits: start angles must stay distinct');
+
+  const ringMatricesBefore = await run.page.evaluate(() => [...document.querySelectorAll('#sphere-rings .sphere-ring-plane')].map((plane) => {
+    const matrix = plane.getCTM?.();
+    return {
+      layer: plane.dataset.layerId,
+      transform: getComputedStyle(plane).transform,
+      ctm: matrix ? [matrix.a, matrix.b, matrix.c, matrix.d, matrix.e, matrix.f].map((value) => value.toFixed(5)).join(',') : null,
+    };
   }));
-  assert(focused.active === 'true' && focused.textFill !== affordance.textFill && focused.guideWidth >= 1.99 && focused.ringWidth >= 1.49, 'affordance: focus does not visibly activate the rings ' + JSON.stringify({ affordance, focused }));
+  await run.page.waitForTimeout(520);
+  const ringMatricesAfter = await run.page.evaluate(() => [...document.querySelectorAll('#sphere-rings .sphere-ring-plane')].map((plane) => {
+    const matrix = plane.getCTM?.();
+    return {
+      layer: plane.dataset.layerId,
+      transform: getComputedStyle(plane).transform,
+      ctm: matrix ? [matrix.a, matrix.b, matrix.c, matrix.d, matrix.e, matrix.f].map((value) => value.toFixed(5)).join(',') : null,
+    };
+  }));
+  const movedRing = ringMatricesBefore.some((before, index) => before.transform !== ringMatricesAfter[index]?.transform);
+  assert(movedRing, `ring orbits: no ring transform matrix changed under normal motion (${JSON.stringify({ before: ringMatricesBefore, after: ringMatricesAfter })})`);
+
   assert(run.consoleErrors.length === 0, 'startup: console errors: ' + run.consoleErrors.join(' | '));
   assert(run.pageErrors.length === 0, 'startup: page errors: ' + run.pageErrors.join(' | '));
-  results.push({ id: 'startup-and-ring-affordance', verdict: 'PASS', directGlobeProjection: true, hiddenUntilCalibrated: true, staticOuterInstruction: true });
+  results.push({ id: 'startup-and-ring-orbits', verdict: 'PASS', directGlobeProjection: true, hiddenUntilCalibrated: true, outerHintRemoved: true, uniqueRingIdentities: allIds.length, movingRingMatrix: movedRing });
+  await run.context.close();
+}
+
+async function reducedMotionRingScenario() {
+  process.stdout.write(`${JSON.stringify({ state: 'RUNNING', scenario: 'ring-orbits-reduced-motion' })}\n`);
+  const run = await newPage({ reducedMotion: 'reduce' });
+  await run.page.goto(baseUrl, { waitUntil: 'domcontentloaded' });
+  await run.page.waitForSelector('html.runtime-ready');
+  const rings = await run.page.evaluate(() => (
+    [...document.querySelectorAll('#sphere-rings .sphere-ring-plane')].map((plane) => {
+      const style = getComputedStyle(plane);
+      return {
+        layer: plane.dataset.layerId,
+        entryCount: plane.dataset.entryCount,
+        animationName: style.animationName,
+        animationDurationSeconds: Number.parseFloat(style.animationDuration),
+      };
+    })
+  ));
+  assert(rings.length === expectedDigitalProjection.layers.length, `reduced motion rings: expected canonical ring planes (${rings.length})`);
+  for (const ring of rings) {
+    assert(ring.entryCount !== undefined, `reduced motion rings: ${ring.layer} lost its entry count`);
+    const stopped = ring.animationName === 'none' || ring.animationDurationSeconds <= 0.001;
+    assert(stopped, `reduced motion rings: ${ring.layer} keeps orbiting (${JSON.stringify(ring)})`);
+  }
+  const matricesBefore = await run.page.evaluate(() => [...document.querySelectorAll('#sphere-rings .sphere-ring-plane')].map((plane) => {
+    const matrix = plane.getCTM?.();
+    return {
+      layer: plane.dataset.layerId,
+      transform: getComputedStyle(plane).transform,
+      ctm: matrix ? [matrix.a, matrix.b, matrix.c, matrix.d, matrix.e, matrix.f].map((value) => value.toFixed(5)).join(',') : null,
+    };
+  }));
+  await run.page.waitForTimeout(520);
+  const matricesAfter = await run.page.evaluate(() => [...document.querySelectorAll('#sphere-rings .sphere-ring-plane')].map((plane) => {
+    const matrix = plane.getCTM?.();
+    return {
+      layer: plane.dataset.layerId,
+      transform: getComputedStyle(plane).transform,
+      ctm: matrix ? [matrix.a, matrix.b, matrix.c, matrix.d, matrix.e, matrix.f].map((value) => value.toFixed(5)).join(',') : null,
+    };
+  }));
+  const moved = matricesBefore.some((before, index) => before.transform !== matricesAfter[index]?.transform);
+  assert(!moved, `reduced motion rings: ring transform changed despite disabled animation (${JSON.stringify({ before: matricesBefore, after: matricesAfter })})`);
+  await run.page.locator('#sphere-edge-control').focus();
+  await run.page.keyboard.press('Enter');
+  await run.page.waitForSelector('.globe-stage[data-view-phase="layers"]');
+  await run.page.waitForSelector('#layer-panel[data-visible]');
+  assert(run.pageErrors.length === 0, `reduced motion rings: page errors: ${run.pageErrors.join(' | ')}`);
+  results.push({ id: 'ring-orbits-reduced-motion', verdict: 'PASS' });
   await run.context.close();
 }
 
@@ -221,7 +383,7 @@ async function normalScenario() {
   await run.page.goto(baseUrl, { waitUntil: 'domcontentloaded' });
   await run.page.waitForSelector('html.runtime-ready');
   assert(await run.page.locator('#globe-surface').isVisible(), 'normal: globe is not visible');
-  assert((await run.page.locator('#globe-results').textContent())?.includes('12 Commons'), 'normal: result count missing');
+  assert((await run.page.locator('#globe-results').textContent())?.includes(`${expectedDigitalProjection.catalogEntryCount} Commons`), 'normal: result count missing');
 
   await run.page.locator('.skip-link').focus();
   await run.page.keyboard.press('Enter');
@@ -285,7 +447,7 @@ async function layerJourneyScenario({ mobile = false, viewportOverride = null, t
     names: [...document.querySelectorAll('.sphere-ring-name')].map((node) => node.textContent.trim()).filter(Boolean),
     binaries: [...document.querySelectorAll('.sphere-ring-binary')].map((node) => node.textContent.trim()).filter(Boolean),
   }));
-  assert(overviewRibbons.rings === 6, `layer journey: overview does not contain six text rings (${JSON.stringify(overviewRibbons)})`);
+  assert(overviewRibbons.rings === expectedDigitalProjection.layers.length, `layer journey: overview does not contain all text rings (${JSON.stringify(overviewRibbons)})`);
   assert(overviewRibbons.names.includes('Debian') && overviewRibbons.names.includes('Wikipedia'), `layer journey: Commons names are missing from the rings (${JSON.stringify(overviewRibbons.names)})`);
   assert(overviewRibbons.binaries.some((value) => /^(?:[01]{8})(?: [01]{8})*$/.test(value)), 'layer journey: real bytewise binary names are missing from the rings');
   await waitForSphereOpacitySettled(run.page);
@@ -386,9 +548,41 @@ async function layerJourneyScenario({ mobile = false, viewportOverride = null, t
   assert(innermostLayerDiameter > globeDiameter, `layer journey: digital shell intersects globe (${innermostLayerDiameter} <= ${globeDiameter})`);
   const edgeX = sphereBox.x + sphereBox.width * 0.85134;
   const edgeY = sphereBox.y + sphereBox.height * 0.14866;
+  await run.page.evaluate(() => {
+    const stageNode = document.querySelector('.globe-stage');
+    const panelNode = document.querySelector('#layer-panel');
+    const sphereNode = document.querySelector('#digital-sphere');
+    window.__commonworldCameraCommands = [];
+    window.__commonworldPhaseLog = [];
+    window.__commonworldPhaseObserver?.disconnect?.();
+    const snapshot = (reason) => ({
+      reason,
+      phase: stageNode.dataset.viewPhase,
+      source: stageNode.dataset.globeGeometrySource,
+      moving: window.__commonworldTestMap?.isMoving() ?? null,
+      sphereOpacity: Number(getComputedStyle(sphereNode).opacity),
+      panelVisible: panelNode?.hasAttribute('data-visible') ?? false,
+      panelHidden: panelNode?.hidden ?? null,
+      commandCount: window.__commonworldCameraCommands?.length ?? 0,
+      at: performance.now(),
+    });
+    window.__commonworldPhaseLog.push(snapshot('initial'));
+    window.__commonworldPhaseObserver = new MutationObserver((mutations) => {
+      window.__commonworldPhaseLog.push(snapshot(mutations.map((mutation) => `${mutation.target.id || mutation.target.className}:${mutation.attributeName}`).join('|')));
+    });
+    window.__commonworldPhaseObserver.observe(stageNode, {
+      attributes: true,
+      attributeFilter: ['data-view-phase', 'data-globe-geometry-source', 'data-layer-panel-visible-at', 'data-last-camera-command', 'data-last-camera-duration'],
+    });
+    window.__commonworldPhaseObserver.observe(panelNode, {
+      attributes: true,
+      attributeFilter: ['data-visible', 'hidden', 'data-closing', 'inert'],
+    });
+  });
   if (touch) await run.page.touchscreen.tap(edgeX, edgeY);
   else await run.page.mouse.click(edgeX, edgeY);
   assert((await run.page.locator('.globe-stage').getAttribute('data-view-phase')) === 'entering-layers', 'layer journey: animated entry phase missing');
+  assert((await stage.getAttribute('data-globe-geometry-source')) === 'maplibre-projected-horizon', 'layer journey: entering flight abandoned the MapLibre horizon geometry');
   assert(await run.page.locator('#layer-panel').isHidden(), 'layer journey: description panel obscures the camera flight');
   const flightComposition = await run.page.evaluate(() => {
     const map = document.querySelector('#map');
@@ -398,35 +592,34 @@ async function layerJourneyScenario({ mobile = false, viewportOverride = null, t
       transform: style.transform,
       transitionProperties: style.transitionProperty.split(',').map((value) => value.trim()),
       duration: Number(stage.dataset.lastCameraDuration),
+      command: stage.dataset.lastCameraCommand,
       phase: stage.dataset.viewPhase,
     };
   });
   assert(['none', 'matrix(1, 0, 0, 1, 0, 0)'].includes(flightComposition.transform), 'layer journey: CSS still applies a competing map zoom ' + JSON.stringify(flightComposition));
   assert(!flightComposition.transitionProperties.includes('transform'), 'layer journey: map transform remains part of the camera flight ' + JSON.stringify(flightComposition));
-  assert(flightComposition.duration === 1080, 'layer journey: camera and sphere no longer share the transition duration ' + JSON.stringify(flightComposition));
+  assert(flightComposition.command === 'easeTo' && flightComposition.duration === 1080, 'layer journey: MapLibre is not the single camera authority for the flight ' + JSON.stringify(flightComposition));
+  const openingCommands = await run.page.evaluate(() => window.__commonworldCameraCommands ?? []);
+  assert(openingCommands.length === 1 && openingCommands[0].command === 'easeTo', `layer journey: opening issued multiple camera commands (${JSON.stringify(openingCommands)})`);
   const enteringSphere = await run.page.locator('#digital-sphere').boundingBox();
   assert(enteringSphere, 'layer journey: transforming sphere is not visible during camera flight');
-  await run.page.waitForFunction(() => ['layers-preview', 'layers'].includes(document.querySelector('.globe-stage')?.dataset.viewPhase));
-  const observedPhase = await stage.getAttribute('data-view-phase');
-  if (observedPhase === 'layers-preview') {
-    assert(await run.page.locator('#layer-panel').isHidden(), 'layer journey: description panel appeared at the exact end of the camera flight');
-    assert(await run.page.locator('#layer-panel').getAttribute('inert') !== null, 'layer journey: hidden description panel became interactive before reveal');
-    assert((await run.page.locator('#layer-panel').getAttribute('data-visible')) === null, 'layer journey: panel visible marker appeared before the visual pause');
-    const settledSphere = await run.page.locator('#digital-sphere').boundingBox();
-    assert(settledSphere, 'layer journey: transformed text sphere is missing during the panel-free pause');
-  }
   await run.page.waitForSelector('.globe-stage[data-view-phase="layers"]');
+  const phaseLog = await run.page.evaluate(() => window.__commonworldPhaseLog);
+  assert(phaseLog.every((entry) => entry.phase !== 'entering-layers' || entry.source === 'maplibre-projected-horizon'), `layer journey: side layout appeared while the camera was still flying (${JSON.stringify(phaseLog)})`);
+  assert(phaseLog.some((entry) => entry.phase === 'settling-layers' && entry.source === 'maplibre-projected-horizon' && entry.moving === false), `layer journey: post-move settling phase is missing or still moving (${JSON.stringify(phaseLog)})`);
+  const firstSideEntry = phaseLog.find((entry) => entry.source === 'side-view-layout');
+  assert(firstSideEntry && firstSideEntry.phase === 'layers' && firstSideEntry.moving === false && firstSideEntry.sphereOpacity <= 0.1, `layer journey: side layout was not entered after moveend with invisible sphere (${JSON.stringify(firstSideEntry)})`);
+  const sideIndex = phaseLog.indexOf(firstSideEntry);
+  const firstPanelEntry = phaseLog.find((entry) => entry.panelVisible);
+  assert(firstPanelEntry && phaseLog.indexOf(firstPanelEntry) > sideIndex && firstPanelEntry.phase === 'layers' && firstPanelEntry.source === 'side-view-layout', `layer journey: panel became visible before the side layout was stable (${JSON.stringify({ firstPanelEntry, phaseLog })})`);
+  assert((await stage.getAttribute('data-globe-geometry-source')) === 'side-view-layout', 'layer journey: settled layers view is missing the side layout geometry');
   await run.page.waitForSelector('#layer-panel[data-visible]');
   await run.page.waitForFunction(() => Number(getComputedStyle(document.querySelector('#digital-sphere')).opacity) <= 0.1);
-  assert(await run.page.locator('#layer-panel').isVisible(), 'layer journey: description panel did not fade in after the panel-free pause');
+  assert(await run.page.locator('#layer-panel').isVisible(), 'layer journey: description panel did not appear after the stable end state');
   assert(await run.page.locator('#layer-panel').getAttribute('inert') === null, 'layer journey: revealed description panel remains inert');
-  const panelTiming = await run.page.locator('.globe-stage').evaluate((node) => ({
-    preview: Number(node.dataset.layerPreviewStartedAt),
-    visible: Number(node.dataset.layerPanelVisibleAt),
-  }));
-  assert(Number.isFinite(panelTiming.preview) && Number.isFinite(panelTiming.visible) && panelTiming.visible - panelTiming.preview >= 240, `layer journey: panel-free preview was too short (${JSON.stringify(panelTiming)})`);
-  const mapOpacity = Number(await run.page.locator('#map').evaluate((node) => getComputedStyle(node).opacity));
-  assert(mapOpacity <= 0.02, `layer journey: globe remains visible beside layers (${mapOpacity})`);
+  const panelVisibleAt = Number(await run.page.locator('.globe-stage').evaluate((node) => node.dataset.layerPanelVisibleAt));
+  assert(Number.isFinite(panelVisibleAt), 'layer journey: panel reveal is not bound to the settled end state');
+  await run.page.waitForFunction(() => Number(getComputedStyle(document.querySelector('#map')).opacity) <= 0.02);
   assert(await run.page.locator('#map').getAttribute('inert') !== null, 'layer journey: invisible globe remains keyboard reachable');
   assert((await run.page.locator('#map').getAttribute('aria-hidden')) === 'true', 'layer journey: invisible globe remains in the accessibility tree');
   assert((await run.page.locator('#sphere-edge-control').getAttribute('tabindex')) === '-1', 'layer journey: old sphere trigger remains reachable inside side view');
@@ -469,14 +662,20 @@ async function layerJourneyScenario({ mobile = false, viewportOverride = null, t
   assert(ribbonView.sphere.left < -ribbonView.viewport.width * 0.7, `layer journey: enlarged sphere did not move into a side approach (${JSON.stringify(ribbonView.sphere)})`);
   assert(ribbonView.sphereOpacity <= 0.1, `layer journey: enlarged sphere obscures the lane surface (${ribbonView.sphereOpacity})`);
   assert(ribbonView.ringCount === 6 && ribbonView.ringNameCount > 0 && ribbonView.ringBinaryCount > 0, `layer journey: text-ring identity was lost during the flight (${JSON.stringify(ribbonView)})`);
-  assert(ribbonView.lanes.length === 6 && ribbonView.lanes.every(({ displayed }) => displayed), `layer journey: multi-lane overview does not show all six layers (${JSON.stringify(ribbonView.lanes)})`);
+  assert(ribbonView.lanes.length === expectedDigitalProjection.layers.length && ribbonView.lanes.every(({ displayed }) => displayed), `layer journey: multi-lane overview does not show all layers (${JSON.stringify(ribbonView.lanes)})`);
   assert(ribbonView.lanes.every(({ scrollWidth, clientWidth }) => scrollWidth > clientWidth + 20), `layer journey: at least one lane is not horizontally scrollable (${JSON.stringify(ribbonView.lanes)})`);
   assert(ribbonView.lanes.every(({ overflowX }) => ['auto', 'scroll'].includes(overflowX)), `layer journey: native horizontal overflow is disabled (${JSON.stringify(ribbonView.lanes)})`);
   assert(ribbonView.lanes.every(({ touchAction }) => touchAction.includes('pan-x')), `layer journey: touch panning is not explicitly horizontal (${JSON.stringify(ribbonView.lanes)})`);
+  for (const lane of ribbonView.lanes) {
+    const expectedLayer = expectedDigitalProjection.layers.find(({ id }) => id === lane.layer);
+    assert(expectedLayer, `layer journey: rendered unknown lane ${lane.layer}`);
+    assertSameIds(lane.primary.map(({ id }) => id), expectedLayer.ids, `layer journey: ${lane.layer} primary identity set`);
+  }
   const primarySegments = ribbonView.lanes.flatMap(({ primary }) => primary);
-  assert(primarySegments.length === 11, `layer journey: primary Commons identities were duplicated or lost (${primarySegments.length})`);
+  assert(primarySegments.length === expectedDigitalProjection.totalCount, `layer journey: primary Commons identities were duplicated or lost (${primarySegments.length})`);
+  assertSameIds(primarySegments.map(({ id }) => id), expectedDigitalProjection.allIds, 'layer journey: primary digital identity set');
   assert(primarySegments.every(({ name, binary, height }) => name && /^(?:[01]{8})(?: [01]{8})*$/.test(binary) && height >= 44), `layer journey: name/binary pairs or touch heights are invalid (${JSON.stringify(primarySegments)})`);
-  assert(ribbonView.filterChildren === 6, `layer journey: search surface does not contain all six layer filters (${ribbonView.filterChildren})`);
+  assert(ribbonView.filterChildren === expectedDigitalProjection.layers.length, `layer journey: search surface does not contain all layer filters (${ribbonView.filterChildren})`);
 
   const firstScroller = run.page.locator('.digital-lane-scroll').first();
   const scrollBefore = await firstScroller.evaluate((node) => node.scrollLeft);
@@ -506,7 +705,7 @@ async function layerJourneyScenario({ mobile = false, viewportOverride = null, t
 
   await run.page.locator('#layer-search-toggle').click();
   assert(await run.page.locator('#layer-discovery').isVisible(), 'layer journey: search/filter magnifier did not open');
-  assert((await run.page.locator('#layer-buttons .layer-filter').count()) === 6, 'layer journey: search panel does not expose all lane filters');
+  assert((await run.page.locator('#layer-buttons .layer-filter').count()) === expectedDigitalProjection.layers.length, 'layer journey: search panel does not expose all lane filters');
   await run.page.locator('#layer-search').fill('Wikipedia');
   await run.page.waitForTimeout(220);
   assert((await run.page.locator('#commons-search').inputValue()) === 'Wikipedia', 'layer journey: lane search is not synchronized with global search');
@@ -541,16 +740,26 @@ async function layerJourneyScenario({ mobile = false, viewportOverride = null, t
   assert(viewportFit.documentWidth <= viewportFit.viewportWidth + 1, `layer journey: horizontal overflow (${JSON.stringify(viewportFit)})`);
   if (touch) assert(viewportFit.controls.every(({ width, height }) => width >= 44 && height >= 44), `layer journey: undersized mobile layer control (${JSON.stringify(viewportFit.controls)})`);
 
-  const returnMarkerBefore = await stage.getAttribute('data-layer-return-started-at');
+  await run.page.evaluate(() => {
+    window.__commonworldCameraCommands = [];
+    window.__commonworldPhaseLog = [];
+  });
   await run.page.locator('#layer-close').click();
-  await run.page.waitForFunction((previous) => {
-    const current = document.querySelector('.globe-stage')?.dataset.layerReturnStartedAt;
-    return Boolean(current && current !== previous);
-  }, returnMarkerBefore);
+  await run.page.waitForSelector('.globe-stage[data-view-phase="preparing-overview"]');
+  assert((await stage.getAttribute('data-globe-geometry-source')) === 'side-view-layout', 'layer journey: return preparation left side layout too early');
+  assert(await run.page.locator('#layer-panel').isHidden(), 'layer journey: description panel did not close before return preparation');
+  await run.page.waitForSelector('.globe-stage[data-view-phase="leaving-layers"]');
+  // The phase can complete between Playwright observing the selector and this assertion on fast CI runners.
+  // The phase log below proves that leaving-layers occurred and carried the invisible geometry switch.
+  assert((await stage.getAttribute('data-globe-geometry-source')) === 'maplibre-projected-horizon', 'layer journey: return flight did not mirror back to the MapLibre horizon geometry');
   assert(await run.page.locator('#layer-panel').isHidden(), 'layer journey: description panel obscures the return camera flight');
+  const returnCommands = await run.page.evaluate(() => window.__commonworldCameraCommands ?? []);
+  assert(returnCommands.length === 1 && returnCommands[0].command === 'easeTo', `layer journey: closing issued multiple camera commands (${JSON.stringify(returnCommands)})`);
+  const returnPhaseLog = await run.page.evaluate(() => window.__commonworldPhaseLog);
+  const firstReturnOverviewGeometry = returnPhaseLog.find((entry) => entry.source === 'maplibre-projected-horizon');
+  assert(firstReturnOverviewGeometry && firstReturnOverviewGeometry.phase === 'leaving-layers' && firstReturnOverviewGeometry.sphereOpacity <= 0.1, `layer journey: return geometry changed while the sphere was visible (${JSON.stringify({ firstReturnOverviewGeometry, returnPhaseLog })})`);
   await run.page.waitForSelector('.globe-stage[data-view-phase="overview"]');
-  const restoredOpacity = Number(await run.page.locator('#map').evaluate((node) => getComputedStyle(node).opacity));
-  assert(restoredOpacity >= 0.98, `layer journey: globe did not return (${restoredOpacity})`);
+  await run.page.waitForFunction(() => Number(getComputedStyle(document.querySelector('#map')).opacity) >= 0.98);
   assert(await run.page.locator('#map').getAttribute('inert') === null, 'layer journey: returned globe remains inert');
   assert((await run.page.locator('#sphere-edge-control').getAttribute('tabindex')) === '0', 'layer journey: sphere trigger was not restored');
   assert((await run.page.evaluate(() => document.activeElement?.id)) === 'sphere-edge-control', 'layer journey: focus did not return to the clicked sphere edge');
@@ -610,7 +819,8 @@ async function realHybridCommonsScenario() {
   await run.page.keyboard.press('Enter');
   await run.page.waitForSelector('.globe-stage[data-view-phase="layers"]');
   const digitalPrimaryIds = await run.page.locator('.digital-ribbon-item[data-ribbon-copy="0"]').evaluateAll((nodes) => nodes.map((node) => node.dataset.commonprojectId));
-  assert(digitalPrimaryIds.length === 11, 'real hybrid: digital lane identity count mismatch: ' + digitalPrimaryIds.length);
+  assert(digitalPrimaryIds.length === expectedDigitalProjection.totalCount, 'real hybrid: digital lane identity count mismatch: ' + digitalPrimaryIds.length);
+  assertSameIds(digitalPrimaryIds, expectedDigitalProjection.allIds, 'real hybrid: digital lane identity set');
   assert(digitalPrimaryIds.includes('freifunk-hamburg'), 'real hybrid: hybrid identity missing from digital lanes');
   assert(!digitalPrimaryIds.includes('cltb-le-nid'), 'real hybrid: geographic-only identity leaked into digital lanes');
   await run.page.locator('#layer-close').click();
@@ -719,7 +929,7 @@ async function realHybridCommonsScenario() {
   assert(await run.page.locator('#project-cltb-le-nid[data-selected]').isVisible(), 'real hybrid: text surface lost the selected CommonProject identity');
   assert(run.consoleErrors.length === 0, 'real hybrid: console errors: ' + run.consoleErrors.join(' | '));
   assert(run.pageErrors.length === 0, 'real hybrid: page errors: ' + run.pageErrors.join(' | '));
-  results.push({ id: 'real-hybrid-commons', verdict: 'PASS', publicFeatures: 3, publicIdentities: 2, digitalIdentities: 11, unchangedMapUpdatesSkipped: true });
+  results.push({ id: 'real-hybrid-commons', verdict: 'PASS', publicFeatures: 3, publicIdentities: 2, digitalIdentities: expectedDigitalProjection.totalCount, unchangedMapUpdatesSkipped: true });
   await run.context.close();
 }
 
@@ -852,7 +1062,7 @@ async function intentSearchDiscoveryScenario() {
 
   assert(run.consoleErrors.every((message) => message.includes('Failed to load resource')), 'intent search: unexpected console errors: ' + run.consoleErrors.join(' | '));
   assert(run.pageErrors.length === 0, 'intent search: page errors: ' + run.pageErrors.join(' | '));
-  results.push({ id: 'intent-search-discovery', verdict: 'PASS', indexedRecords: 12, rankedGermanIntentResults: 9, filters: 6, digitalCoordinateFree: true, spatialNavigation: true });
+  results.push({ id: 'intent-search-discovery', verdict: 'PASS', indexedRecords: expectedDigitalProjection.catalogEntryCount, rankedGermanIntentResults: 9, filters: 6, digitalCoordinateFree: true, spatialNavigation: true });
   await run.context.close();
 }
 
@@ -885,29 +1095,30 @@ async function intentSearchLayoutScenario({ viewportOverride, scenarioId }) {
   await run.context.close();
 }
 
-async function delayedReturnTransitionScenario() {
+async function moveendBoundReturnScenario() {
   const run = await newPage({ reducedMotion: 'no-preference' });
   await run.page.goto(baseUrl, { waitUntil: 'domcontentloaded' });
   await run.page.waitForSelector('html.runtime-ready');
   await run.page.waitForFunction(() => Number(document.querySelector('.globe-stage')?.dataset.sphereSize ?? 0) > 0);
   await run.page.waitForTimeout(820);
   const sphereBox = await run.page.locator('#digital-sphere').boundingBox();
-  assert(sphereBox, 'delayed return: sphere geometry missing');
+  assert(sphereBox, 'moveend return: sphere geometry missing');
   await run.page.mouse.click(sphereBox.x + sphereBox.width * 0.85134, sphereBox.y + sphereBox.height * 0.14866);
   await run.page.waitForSelector('.globe-stage[data-view-phase="layers"]');
   await run.page.waitForSelector('#layer-panel[data-visible]');
+  // An artificially slow CSS opacity transition must not delay the sequence:
+  // completion is bound to the MapLibre moveend, not to transitionend.
   await run.page.locator('#map').evaluate((node) => { node.style.transitionDuration = '10s'; });
   const startedAt = Date.now();
   await run.page.locator('#layer-close').click();
   await run.page.waitForSelector('.globe-stage[data-view-phase="overview"]');
   const elapsed = Date.now() - startedAt;
-  const restoredOpacity = Number(await run.page.locator('#map').evaluate((node) => getComputedStyle(node).opacity));
-  assert(elapsed >= 1800, `delayed return: fallback was not exercised (${elapsed}ms)`);
-  assert(restoredOpacity >= 0.98, `delayed return: overview was declared before the globe returned (${restoredOpacity})`);
-  assert(await run.page.locator('#map').getAttribute('inert') === null, 'delayed return: returned globe remains inert');
-  assert(run.consoleErrors.length === 0, `delayed return: console errors: ${run.consoleErrors.join(' | ')}`);
-  assert(run.pageErrors.length === 0, `delayed return: page errors: ${run.pageErrors.join(' | ')}`);
-  results.push({ id: 'layer-journey-delayed-return', verdict: 'PASS', elapsedMs: elapsed });
+  assert(elapsed < 5000, `moveend return: completion waited for CSS instead of the MapLibre moveend (${elapsed}ms)`);
+  assert(await run.page.evaluate(() => window.__commonworldTestMap?.isMoving() === false), 'moveend return: overview was declared while MapLibre was still moving');
+  assert(await run.page.locator('#map').getAttribute('inert') === null, 'moveend return: returned globe remains inert');
+  assert(run.consoleErrors.length === 0, `moveend return: console errors: ${run.consoleErrors.join(' | ')}`);
+  assert(run.pageErrors.length === 0, `moveend return: page errors: ${run.pageErrors.join(' | ')}`);
+  results.push({ id: 'layer-journey-moveend-return', verdict: 'PASS', elapsedMs: elapsed });
   await run.context.close();
 }
 
@@ -924,7 +1135,12 @@ async function interruptedLayerJourneyScenario() {
   await run.page.waitForTimeout(150);
   assert((await run.page.locator('.globe-stage').getAttribute('data-view-phase')) === 'entering-layers', 'interrupted journey: entry phase missing');
   await run.page.keyboard.press('Escape');
-  assert((await run.page.locator('.globe-stage').getAttribute('data-view-phase')) === 'leaving-layers', 'interrupted journey: escape did not reverse the camera');
+  await run.page.waitForFunction(() => {
+    const phase = document.querySelector('.globe-stage')?.dataset.viewPhase;
+    return phase === 'leaving-layers' || phase === 'overview';
+  });
+  const escapePhase = await run.page.locator('.globe-stage').getAttribute('data-view-phase');
+  assert(escapePhase !== 'preparing-overview', 'interrupted journey: escape used the return preparation instead of replacing the running camera');
   await run.page.waitForSelector('.globe-stage[data-view-phase="overview"]');
   await run.page.waitForTimeout(80);
   assert(await run.page.locator('#layer-panel').isHidden(), 'interrupted journey: stale full-screen layer panel remains');
@@ -1020,7 +1236,8 @@ async function methodScenario() {
 }
 
 try {
-  await startupAndAffordanceScenario();
+  await startupAndRingOrbitScenario();
+  await reducedMotionRingScenario();
   await normalScenario();
   await intentSearchDiscoveryScenario();
   await intentSearchLayoutScenario({ viewportOverride: { width: 1024, height: 1366 }, scenarioId: 'intent-search-ipad-portrait' });
@@ -1030,7 +1247,7 @@ try {
   await layerJourneyScenario({ mobile: true });
   await layerJourneyScenario({ viewportOverride: { width: 1024, height: 1366 }, touch: true, scenarioId: 'layer-journey-ipad-portrait' });
   await layerJourneyScenario({ viewportOverride: { width: 1366, height: 1024 }, touch: true, scenarioId: 'layer-journey-ipad-landscape' });
-  await delayedReturnTransitionScenario();
+  await moveendBoundReturnScenario();
   await interruptedLayerJourneyScenario();
   await reducedMotionLayerScenario();
   await catalogueFailureScenario();
