@@ -12,8 +12,7 @@
   "actions": [
     "visit",
     "learn",
-    "contact",
-    "replicate"
+    "contact"
   ],
   "presence": {
     "geographic": [
@@ -148,14 +147,33 @@
       "url": "https://cltb.be/en/projet/verheyden-le-nid-2/"
     },
     {
-      "type": "visit",
-      "label": "Öffentlicher Standort in OpenStreetMap",
-      "url": "https://www.openstreetmap.org/node/13966522352"
-    },
-    {
       "type": "source",
       "label": "Gebäudefläche in OpenStreetMap",
       "url": "https://www.openstreetmap.org/way/260066697"
+    },
+    {
+      "type": "visit",
+      "label": "Öffentlicher Standort in OpenStreetMap",
+      "url": "https://www.openstreetmap.org/node/13966522352",
+      "source_ids": [
+        "osm-le-nid-address"
+      ]
+    },
+    {
+      "type": "learn",
+      "label": "Le Nid kennenlernen",
+      "url": "https://cltb.be/en/projet/verheyden-le-nid-2/",
+      "source_ids": [
+        "cltb-le-nid-official"
+      ]
+    },
+    {
+      "type": "contact",
+      "label": "Community Land Trust Brussels kontaktieren",
+      "url": "https://cltb.be/contact/",
+      "source_ids": [
+        "cltb-le-nid-official"
+      ]
     }
   ],
   "handoff": {

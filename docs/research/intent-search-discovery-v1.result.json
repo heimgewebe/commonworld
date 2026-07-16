@@ -1,0 +1,66 @@
+{
+  "schema_version": 1,
+  "kind": "commonworld_intent_search_discovery_research",
+  "checked_at": "2026-07-16",
+  "status": "verified_for_publication",
+  "implementation_verification": {
+    "catalog": {
+      "entry_count": 12,
+      "identity_key": "CommonProject.id",
+      "persistent_search_document": false,
+      "filters": [
+        "presence",
+        "action",
+        "language",
+        "access",
+        "freshness",
+        "curation"
+      ]
+    },
+    "query_engine": {
+      "one_time_inverted_index": true,
+      "bounded_query_cache_entries": 128,
+      "synthetic_probe_records": 50000,
+      "hidden_location_query_results": 0
+    },
+    "browser": {
+      "job": "grabowski-job-cb12b0681249",
+      "receipt_sha256": "4ba985ed993b33e632a3f313d5132225df11a85f9fc99dfb4ef8ddcf90c52cc7",
+      "scenarios_passed": 15,
+      "scenarios_failed": 0,
+      "intent_scenarios": [
+        "intent-search-discovery",
+        "intent-search-ipad-portrait",
+        "intent-search-ipad-landscape"
+      ],
+      "minimum_touch_target_css_px": 44
+    },
+    "targeted_tests": {
+      "intent_core_job": "grabowski-job-f481b2855fbf",
+      "intent_core_receipt_sha256": "835c665602713e11f7d74f09ad3b2243c2613fbf49d86d59020f2cab30091d58",
+      "catalog_validator_job": "grabowski-job-c4e9242c6e14",
+      "catalog_validator_receipt_sha256": "9b810b4faada0d3065041091d1c001e550086f1014b5110e4687244dbc79e50f"
+    },
+    "file_evidence": {
+      "assets/commonworld-core.mjs": "58d1d9e5f3fd3e5235a1385be976d3c388973160aa9246259a11f45d0523bfb3",
+      "assets/commonworld-app.js": "02c4e133a3b8d17897b0e699fe0e24e8fde03d0439a6cc944d57cf53c0cd6829",
+      "contracts/commonworld/project.schema.json": "9cacef6c1c2fbcbe50f3e04d74a71712a2fbf0e9c8c8358d4d0675dfb1d7eff5",
+      "contracts/commonworld/intent-search-discovery.contract.json": "ebc29ba3e7f7d285c076262fa49b49e2f8841086d03237e6afe5f5b07bd3e4c3",
+      "scripts/render_public_shell.py": "e009b643a21c3674dd27ac3b7f15f27a37841512b76ee29062a64250a34fadba",
+      "scripts/smoke_public_browser.mjs": "660ab4a2c1014fe89e6480390a5cf59408e2f0633b2a88d38b6e5ed3ae6a5502",
+      "scripts/validate_public_catalog.py": "8c15cfb267f72335c92f25cf7db18489716672b408837d80428e0b9e5f9f636f",
+      "index.css": "857cef2336ea203939445c695b908a29a77c2245cff9c9f5fbeb4636255d91c5",
+      "index.html": "5096b88c3f0b0d6ae47ef2615d195afbff7746227c13288a953612d157e2b901"
+    },
+    "catalog_projects_sha256": "35af8f4f3f2aad1ff008c1de719d3ba0ad49929f4e04c9625b33aba45032f5e9"
+  },
+  "does_not_establish": [
+    "semantic AI or LLM search",
+    "inferred project capabilities or locations",
+    "complete language or access metadata",
+    "catalog completeness",
+    "million-scale delivery architecture",
+    "server-side search",
+    "WCAG conformance"
+  ]
+}

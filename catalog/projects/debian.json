@@ -62,6 +62,38 @@
       "type": "source",
       "label": "About Debian",
       "url": "https://www.debian.org/intro/about"
+    },
+    {
+      "type": "use",
+      "label": "Debian herunterladen und nutzen",
+      "url": "https://www.debian.org/distrib/",
+      "source_ids": [
+        "debian-about"
+      ]
+    },
+    {
+      "type": "learn",
+      "label": "Debian-Dokumentation",
+      "url": "https://www.debian.org/doc/",
+      "source_ids": [
+        "debian-about"
+      ]
+    },
+    {
+      "type": "contribute",
+      "label": "Bei Debian mithelfen",
+      "url": "https://www.debian.org/intro/help",
+      "source_ids": [
+        "debian-about"
+      ]
+    },
+    {
+      "type": "donate",
+      "label": "Debian unterstützen",
+      "url": "https://www.debian.org/donations",
+      "source_ids": [
+        "debian-about"
+      ]
     }
   ],
   "handoff": {

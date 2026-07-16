@@ -62,6 +62,38 @@
       "type": "source",
       "label": "Wikimedia projects",
       "url": "https://www.wikimedia.org/"
+    },
+    {
+      "type": "use",
+      "label": "Wikimedia Commons öffnen",
+      "url": "https://commons.wikimedia.org/",
+      "source_ids": [
+        "wikimedia-projects"
+      ]
+    },
+    {
+      "type": "learn",
+      "label": "Wikimedia Commons kennenlernen",
+      "url": "https://commons.wikimedia.org/wiki/Commons:Welcome",
+      "source_ids": [
+        "wikimedia-projects"
+      ]
+    },
+    {
+      "type": "contribute",
+      "label": "Zu Wikimedia Commons beitragen",
+      "url": "https://commons.wikimedia.org/wiki/Commons:First_steps",
+      "source_ids": [
+        "wikimedia-projects"
+      ]
+    },
+    {
+      "type": "donate",
+      "label": "Wikimedia unterstützen",
+      "url": "https://donate.wikimedia.org/",
+      "source_ids": [
+        "wikimedia-projects"
+      ]
     }
   ],
   "handoff": {

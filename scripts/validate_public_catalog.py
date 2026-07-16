@@ -23,6 +23,7 @@ DIGITAL_CONTRACT_PATH = Path("contracts/commonworld/digital-sphere.contract.json
 PUBLIC_STATES = {"listed", "verified", "featured"}
 PUBLIC_ACTIVITY_STATES = {"active", "paused", "seasonal"}
 PUBLIC_SOURCE_TYPES = {"official-source", "public-registry"}
+ACTION_LINK_TYPES = {"visit", "use", "borrow", "learn", "contribute", "volunteer", "donate", "contact", "replicate"}
 FORBIDDEN_PUBLIC_TEXT = ("reference-only", "test-only", "synthetic", "acceptance-only")
 CARD_PATTERN = re.compile(
     r'<article class="catalog-card"[^>]*data-commonproject-id="([a-z][a-z0-9-]{2,95})"[^>]*>(.*?)</article>',
@@ -276,6 +277,58 @@ def validate_public_catalog(root: Path = ROOT) -> list[str]:
                 errors.append(f"public catalog project {relative.name} has invalid source retrieval date")
             elif published_at and retrieved_at > published_at:
                 errors.append(f"public catalog project {relative.name} source retrieval must not be after catalog publication")
+
+        source_ids = {
+            source.get("id")
+            for source in sources
+            if isinstance(source, dict) and isinstance(source.get("id"), str)
+        }
+        actions = record.get("actions", []) if isinstance(record.get("actions"), list) else []
+        action_set = {action for action in actions if isinstance(action, str)}
+        links = record.get("links", []) if isinstance(record.get("links"), list) else []
+        action_links: dict[str, list[dict]] = {}
+        for link_entry in links:
+            if not isinstance(link_entry, dict):
+                continue
+            link_type = link_entry.get("type")
+            if link_type not in ACTION_LINK_TYPES:
+                continue
+            action_links.setdefault(link_type, []).append(link_entry)
+            if link_type not in action_set:
+                errors.append(
+                    f"public catalog project {relative.name} publishes action link {link_type} without claiming that action"
+                )
+            if not _is_https_url(link_entry.get("url")):
+                errors.append(f"public catalog project {relative.name} action link {link_type} must use HTTPS")
+            link_source_ids = link_entry.get("source_ids")
+            if not isinstance(link_source_ids, list) or not link_source_ids:
+                errors.append(
+                    f"public catalog project {relative.name} action link {link_type} must be source-bound"
+                )
+            elif not set(link_source_ids).issubset(source_ids):
+                errors.append(
+                    f"public catalog project {relative.name} action link {link_type} references unknown sources"
+                )
+        for action in sorted(action_set):
+            matching_links = action_links.get(action, [])
+            if len(matching_links) != 1:
+                errors.append(
+                    f"public catalog project {relative.name} action {action} must have exactly one direct action link"
+                )
+
+        for evidence_name in ("languages", "access"):
+            evidence = record.get(evidence_name)
+            if evidence is None:
+                continue
+            evidence_source_ids = evidence.get("source_ids") if isinstance(evidence, dict) else None
+            if not isinstance(evidence_source_ids, list) or not evidence_source_ids:
+                errors.append(
+                    f"public catalog project {relative.name} {evidence_name} evidence must be source-bound"
+                )
+            elif not set(evidence_source_ids).issubset(source_ids):
+                errors.append(
+                    f"public catalog project {relative.name} {evidence_name} evidence references unknown sources"
+                )
 
         homepage = _homepage(record)
         if homepage is None or not _is_https_url(homepage):

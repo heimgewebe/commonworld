@@ -12,8 +12,7 @@
     "use",
     "learn",
     "contribute",
-    "volunteer",
-    "donate"
+    "volunteer"
   ],
   "presence": {
     "geographic": [],
@@ -63,6 +62,38 @@
       "type": "source",
       "label": "Freifunk – Worum geht es?",
       "url": "https://freifunk.net/worum-geht-es/"
+    },
+    {
+      "type": "use",
+      "label": "Eine Freifunk-Community finden",
+      "url": "https://freifunk.net/wie-mache-ich-mit/",
+      "source_ids": [
+        "freifunk-overview"
+      ]
+    },
+    {
+      "type": "learn",
+      "label": "Freifunk kennenlernen",
+      "url": "https://freifunk.net/worum-geht-es/",
+      "source_ids": [
+        "freifunk-overview"
+      ]
+    },
+    {
+      "type": "contribute",
+      "label": "Bei Freifunk mitmachen",
+      "url": "https://freifunk.net/wie-mache-ich-mit/",
+      "source_ids": [
+        "freifunk-overview"
+      ]
+    },
+    {
+      "type": "volunteer",
+      "label": "Ehrenamtlich bei Freifunk helfen",
+      "url": "https://freifunk.net/wie-mache-ich-mit/",
+      "source_ids": [
+        "freifunk-overview"
+      ]
     }
   ],
   "handoff": {

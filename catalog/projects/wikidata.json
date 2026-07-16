@@ -62,6 +62,38 @@
       "type": "source",
       "label": "Wikimedia projects",
       "url": "https://www.wikimedia.org/"
+    },
+    {
+      "type": "use",
+      "label": "Wikidata öffnen",
+      "url": "https://www.wikidata.org/",
+      "source_ids": [
+        "wikimedia-projects"
+      ]
+    },
+    {
+      "type": "learn",
+      "label": "Wikidata-Einführung",
+      "url": "https://www.wikidata.org/wiki/Wikidata:Introduction",
+      "source_ids": [
+        "wikimedia-projects"
+      ]
+    },
+    {
+      "type": "contribute",
+      "label": "Zu Wikidata beitragen",
+      "url": "https://www.wikidata.org/wiki/Wikidata:Contribute",
+      "source_ids": [
+        "wikimedia-projects"
+      ]
+    },
+    {
+      "type": "donate",
+      "label": "Wikimedia unterstützen",
+      "url": "https://donate.wikimedia.org/",
+      "source_ids": [
+        "wikimedia-projects"
+      ]
     }
   ],
   "handoff": {

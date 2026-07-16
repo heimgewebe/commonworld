@@ -1,0 +1,112 @@
+{
+  "schema_version": 1,
+  "kind": "commonworld_intent_search_discovery_contract",
+  "title": "Commonworld intent-oriented search and discovery",
+  "source_contract": {
+    "id": "https://commonworld.net/contracts/commonworld/project.schema.json",
+    "schema_version": 3,
+    "identity_key": "CommonProject.id"
+  },
+  "truth_boundary": {
+    "catalog_is_only_persistent_project_truth": true,
+    "persistent_search_document_forbidden": true,
+    "runtime_index_is_derived_and_ephemeral": true,
+    "hidden_geographic_values_excluded_from_index": true,
+    "invented_project_facts_forbidden": true
+  },
+  "query_engine": {
+    "language": "de",
+    "normalization": [
+      "unicode_nfkd",
+      "diacritic_fold",
+      "sharp_s_fold",
+      "punctuation_fold",
+      "lowercase"
+    ],
+    "transparent_vocabulary": true,
+    "one_time_inverted_index": true,
+    "deterministic_ranking": true,
+    "bounded_query_cache_entries": 128,
+    "default_result_limit": 50
+  },
+  "result_surface": {
+    "count_required": true,
+    "empty_state_required": true,
+    "ordered_results_required": true,
+    "keyboard_navigation": [
+      "ArrowDown",
+      "ArrowUp",
+      "Home",
+      "End",
+      "Escape"
+    ],
+    "minimum_touch_target_css_px": 44
+  },
+  "filters": [
+    "presence",
+    "action",
+    "language",
+    "access",
+    "freshness",
+    "curation"
+  ],
+  "filter_semantics": {
+    "identity_key": "CommonProject.id",
+    "missing_language_or_access_is_unknown": true,
+    "filter_changes_do_not_move_camera": true,
+    "selection_is_independent_from_filter_state": true
+  },
+  "spatial_navigation": {
+    "source": "derived public GeoJSON only",
+    "geographic_activation_moves_to_public_representation": true,
+    "digital_activation_remains_coordinate_free": true,
+    "hidden_locations_never_produce_navigation_targets": true,
+    "query_or_filter_changes_never_move_camera": true
+  },
+  "action_links": {
+    "one_direct_link_per_claimed_action": true,
+    "same_type_as_claimed_action": true,
+    "https_required": true,
+    "source_ids_required": true,
+    "unknown_source_ids_forbidden": true
+  },
+  "url_state": {
+    "query_and_filters_roundtrip": true,
+    "back_forward_restores_context": true,
+    "unknown_values_fail_closed": true
+  },
+  "cross_view": {
+    "surfaces": [
+      "globe",
+      "digital_sphere",
+      "text",
+      "focus"
+    ],
+    "same_query_and_filters_same_identity_order": true,
+    "static_text_actions_derive_from_same_links": true
+  },
+  "scalability": {
+    "probe_record_count": 50000,
+    "catalog_scanned_once_per_index_build": true,
+    "queries_use_inverted_index": true,
+    "million_scale_delivery_claimed": false,
+    "server_side_search_claimed": false
+  },
+  "browser_evidence": {
+    "script": "scripts/smoke_public_browser.mjs",
+    "required_scenarios": [
+      "intent-search-discovery",
+      "intent-search-ipad-portrait",
+      "intent-search-ipad-landscape"
+    ]
+  },
+  "nonclaims": [
+    "semantic AI or LLM search",
+    "inferred project capabilities or locations",
+    "complete language or access metadata",
+    "catalog completeness",
+    "million-scale delivery architecture",
+    "server-side search",
+    "WCAG conformance"
+  ]
+}

@@ -62,6 +62,38 @@
       "type": "source",
       "label": "LibreOffice",
       "url": "https://www.libreoffice.org/"
+    },
+    {
+      "type": "use",
+      "label": "LibreOffice herunterladen",
+      "url": "https://www.libreoffice.org/download/",
+      "source_ids": [
+        "libreoffice-home"
+      ]
+    },
+    {
+      "type": "learn",
+      "label": "LibreOffice-Dokumentation",
+      "url": "https://documentation.libreoffice.org/en/english-documentation/",
+      "source_ids": [
+        "libreoffice-home"
+      ]
+    },
+    {
+      "type": "contribute",
+      "label": "LibreOffice verbessern",
+      "url": "https://www.libreoffice.org/improve-it/",
+      "source_ids": [
+        "libreoffice-home"
+      ]
+    },
+    {
+      "type": "donate",
+      "label": "LibreOffice unterstützen",
+      "url": "https://www.libreoffice.org/donate/",
+      "source_ids": [
+        "libreoffice-home"
+      ]
     }
   ],
   "handoff": {
