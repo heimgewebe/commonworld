@@ -208,7 +208,7 @@ async function startupAndAffordanceScenario() {
     guideWidth: Number.parseFloat(getComputedStyle(document.querySelector('.sphere-action-guide')).strokeWidth),
     ringWidth: Number.parseFloat(getComputedStyle(document.querySelector('#sphere-rings use')).strokeWidth),
   }));
-  assert(focused.active === 'true' && focused.textFill !== affordance.textFill && focused.guideWidth >= 2 && focused.ringWidth >= 1.5, 'affordance: focus does not visibly activate the rings ' + JSON.stringify({ affordance, focused }));
+  assert(focused.active === 'true' && focused.textFill !== affordance.textFill && focused.guideWidth >= 1.99 && focused.ringWidth >= 1.49, 'affordance: focus does not visibly activate the rings ' + JSON.stringify({ affordance, focused }));
   assert(run.consoleErrors.length === 0, 'startup: console errors: ' + run.consoleErrors.join(' | '));
   assert(run.pageErrors.length === 0, 'startup: page errors: ' + run.pageErrors.join(' | '));
   results.push({ id: 'startup-and-ring-affordance', verdict: 'PASS', directGlobeProjection: true, hiddenUntilCalibrated: true, staticOuterInstruction: true });

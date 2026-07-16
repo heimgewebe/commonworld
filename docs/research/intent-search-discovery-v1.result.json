@@ -24,8 +24,8 @@
       "hidden_location_query_results": 0
     },
     "browser": {
-      "job": "grabowski-job-1930c0d546fb",
-      "receipt_sha256": "60920e36bf0f017acfab642501675cf7721aeba7f2c35ad5bf8c822fb6e85fe1",
+      "job": "grabowski-job-263848a385cc",
+      "receipt_sha256": "abf7a1f353935dd34999dd9898c2ec69f0c263bbcfd55af178e6461c5ebf7301",
       "scenarios_passed": 16,
       "scenarios_failed": 0,
       "intent_scenarios": [
@@ -48,7 +48,7 @@
       "contracts/commonworld/project.schema.json": "9cacef6c1c2fbcbe50f3e04d74a71712a2fbf0e9c8c8358d4d0675dfb1d7eff5",
       "contracts/commonworld/intent-search-discovery.contract.json": "ebc29ba3e7f7d285c076262fa49b49e2f8841086d03237e6afe5f5b07bd3e4c3",
       "scripts/render_public_shell.py": "a721d9ed49d73b13e2291b72e400d8d9c809147083cd6b83337e799c8ea7a88b",
-      "scripts/smoke_public_browser.mjs": "e6c5fbd7be2dbad6fa9a5a2b11ff53d06752371075cfd44bd9b748e48a08ceea",
+      "scripts/smoke_public_browser.mjs": "673152a6a958f6e69eaa7e295bb82bc5f10fda40f9320f241317f0a073890694",
       "scripts/validate_public_catalog.py": "8c15cfb267f72335c92f25cf7db18489716672b408837d80428e0b9e5f9f636f",
       "index.css": "2244cf1b4fac2b90f693a47afc2cfae546f8bcf97a110a4bc4f0982cd2b839a0",
       "index.html": "43aaf9f3742dbd3f0afdcec8c9898c9e8bfeff793200d75799eb2c65058425cd"
