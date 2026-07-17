@@ -10,6 +10,8 @@ body.proposal-page {
   width: min(54rem, calc(100% - 2rem));
   margin: 0 auto;
   padding: max(2rem, env(safe-area-inset-top)) 0 max(4rem, env(safe-area-inset-bottom));
+  overflow-wrap: anywhere;
+  hyphens: auto;
 }
 
 .proposal-page a { color: #b8e5dd; }
@@ -30,7 +32,7 @@ body.proposal-page {
 
 .proposal-form { display: grid; gap: 0.25rem; }
 .proposal-form fieldset { display: grid; gap: 1rem; min-width: 0; }
-.proposal-form legend { padding: 0 0.5rem; font-weight: 700; font-size: 1.2rem; }
+.proposal-form legend { max-inline-size: 100%; padding: 0 0.5rem; font-weight: 700; font-size: 1.2rem; }
 .proposal-form label { display: grid; gap: 0.4rem; min-width: 0; }
 .proposal-form label > span:first-child { font-weight: 650; }
 .proposal-form input,
@@ -69,6 +71,8 @@ body.proposal-page {
   border-radius: 999px;
   font: inherit;
   font-weight: 700;
+  max-inline-size: 100%;
+  overflow-wrap: anywhere;
   cursor: pointer;
 }
 .proposal-primary { background: #d8eee8; color: #071013; }
@@ -77,8 +81,8 @@ body.proposal-page {
 .proposal-errors ul { margin-bottom: 0; }
 .proposal-status { min-height: 1.6em; font-weight: 650; }
 .proposal-fallback { padding: 0.85rem 1rem; border-left: 4px solid #b8e5dd; background: rgba(184, 229, 221, 0.08); }
-.proposal-contracts ul { display: grid; gap: 0.3rem; padding-left: 1.2rem; }
-.proposal-contracts a { display: inline-flex; align-items: center; min-height: 2.75rem; padding-block: 0.2rem; }
+.proposal-contracts ul { display: grid; gap: 0.5rem; padding-left: 1.2rem; }
+.proposal-contracts a { display: flex; align-items: center; min-block-size: var(--minimum-touch-target, 44px); padding: 0.45rem 0.35rem; overflow-wrap: anywhere; }
 .honeypot { position: absolute !important; left: -10000px !important; width: 1px !important; height: 1px !important; overflow: hidden !important; }
 
 @media (max-width: 42rem) {

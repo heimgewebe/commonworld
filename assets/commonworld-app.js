@@ -136,6 +136,7 @@ const runtime = {
   historyTimer: null,
   searchTimer: null,
   focusReturnTarget: null,
+  activeOverlay: null,
   settingsReturnTarget: null,
   discoveryReturnTarget: null,
   pendingSpatialProject: null,
@@ -594,22 +595,42 @@ function renderLayerPanel() {
   elements.layerSearch.value = runtime.state.query;
 }
 
+function selectedProjectRecord() {
+  return runtime.state.project ? runtime.recordsById.get(runtime.state.project) ?? null : null;
+}
+
+function renderPrimaryOverlayState(record = selectedProjectRecord()) {
+  const discoveryOpen = runtime.activeOverlay === 'discovery';
+  const settingsOpen = runtime.activeOverlay === 'settings';
+  const focusVisible = Boolean(record) && runtime.activeOverlay === null;
+
+  elements.discoveryPanel.hidden = !discoveryOpen;
+  elements.settingsPanel.hidden = !settingsOpen;
+  elements.filterToggle.setAttribute('aria-expanded', String(discoveryOpen));
+  elements.search.setAttribute('aria-expanded', String(discoveryOpen));
+  elements.settingsToggle.setAttribute('aria-expanded', String(settingsOpen));
+  elements.focus.hidden = !focusVisible;
+  elements.focus.toggleAttribute('inert', !focusVisible);
+  if (focusVisible) elements.focus.removeAttribute('aria-hidden');
+  else elements.focus.setAttribute('aria-hidden', 'true');
+}
+
+function setActiveOverlay(nextOverlay) {
+  runtime.activeOverlay = nextOverlay === 'discovery' || nextOverlay === 'settings' ? nextOverlay : null;
+  renderPrimaryOverlayState();
+}
+
 function openDiscovery({ trigger = document.activeElement, focusFirst = false } = {}) {
-  if (!elements.settingsPanel.hidden) closeSettings({ restoreFocus: false });
+  if (runtime.activeOverlay === 'settings') runtime.settingsReturnTarget = null;
   if (trigger instanceof Element && !elements.discoveryPanel.contains(trigger)) runtime.discoveryReturnTarget = trigger;
-  elements.discoveryPanel.hidden = false;
-  elements.filterToggle.setAttribute('aria-expanded', 'true');
-  elements.search.setAttribute('aria-expanded', 'true');
-  syncFocusPanelVisibility();
+  setActiveOverlay('discovery');
   if (focusFirst) elements.discoveryList.querySelector('.discovery-result-main')?.focus({ preventScroll: true });
 }
 
 function closeDiscovery({ restoreFocus = false } = {}) {
-  elements.discoveryPanel.hidden = true;
-  elements.filterToggle.setAttribute('aria-expanded', 'false');
-  elements.search.setAttribute('aria-expanded', 'false');
-  syncFocusPanelVisibility();
-  if (restoreFocus && runtime.discoveryReturnTarget instanceof Element && runtime.discoveryReturnTarget.isConnected) {
+  const wasOpen = runtime.activeOverlay === 'discovery';
+  if (wasOpen) setActiveOverlay(null);
+  if (restoreFocus && wasOpen && runtime.discoveryReturnTarget instanceof Element && runtime.discoveryReturnTarget.isConnected) {
     runtime.discoveryReturnTarget.focus({ preventScroll: true });
   }
   runtime.discoveryReturnTarget = null;
@@ -767,18 +788,9 @@ function replaceLinks(container, links) {
   }
 }
 
-function focusPanelSuppressed() {
-  return !elements.discoveryPanel.hidden || !elements.settingsPanel.hidden;
-}
-
-function syncFocusPanelVisibility() {
-  const record = runtime.state.project ? runtime.recordsById.get(runtime.state.project) : null;
-  elements.focus.hidden = !record || focusPanelSuppressed();
-}
-
 function updateFocusPanel() {
-  const record = runtime.state.project ? runtime.recordsById.get(runtime.state.project) : null;
-  syncFocusPanelVisibility();
+  const record = selectedProjectRecord();
+  renderPrimaryOverlayState(record);
   if (!record) return;
   elements.focusTitle.textContent = record.title;
   elements.focusSummary.textContent = record.summary;
@@ -1317,19 +1329,16 @@ function toggleLayerDiscovery() {
 }
 
 function closeSettings({ restoreFocus = true } = {}) {
-  elements.settingsPanel.hidden = true;
-  elements.settingsToggle.setAttribute('aria-expanded', 'false');
-  syncFocusPanelVisibility();
-  if (restoreFocus) (runtime.settingsReturnTarget ?? elements.settingsToggle).focus({ preventScroll: true });
+  const wasOpen = runtime.activeOverlay === 'settings';
+  if (wasOpen) setActiveOverlay(null);
+  if (restoreFocus && wasOpen) (runtime.settingsReturnTarget ?? elements.settingsToggle).focus({ preventScroll: true });
   runtime.settingsReturnTarget = null;
 }
 
-function openSettings() {
-  runtime.settingsReturnTarget = document.activeElement instanceof HTMLElement ? document.activeElement : elements.settingsToggle;
-  if (!elements.discoveryPanel.hidden) closeDiscovery({ restoreFocus: false });
-  elements.settingsPanel.hidden = false;
-  elements.settingsToggle.setAttribute('aria-expanded', 'true');
-  syncFocusPanelVisibility();
+function openSettings({ trigger = elements.settingsToggle } = {}) {
+  runtime.settingsReturnTarget = trigger instanceof HTMLElement && trigger.isConnected ? trigger : elements.settingsToggle;
+  runtime.discoveryReturnTarget = null;
+  setActiveOverlay('settings');
   elements.settingsClose.focus({ preventScroll: true });
 }
 
@@ -1480,8 +1489,8 @@ function wireControls() {
   elements.globeReset.addEventListener('click', resetGlobe);
   elements.focusClose.addEventListener('click', () => clearProject());
   elements.filterToggle.addEventListener('click', () => {
-    if (elements.discoveryPanel.hidden) openDiscovery({ trigger: elements.filterToggle });
-    else closeDiscovery({ restoreFocus: true });
+    if (runtime.activeOverlay === 'discovery') closeDiscovery({ restoreFocus: true });
+    else openDiscovery({ trigger: elements.filterToggle });
   });
   elements.discoveryClose.addEventListener('click', () => closeDiscovery({ restoreFocus: true }));
   for (const button of elements.discoveryOpenButtons) {
@@ -1518,8 +1527,8 @@ function wireControls() {
     elements.search.focus();
   });
   elements.settingsToggle.addEventListener('click', () => {
-    if (elements.settingsPanel.hidden) openSettings();
-    else closeSettings();
+    if (runtime.activeOverlay === 'settings') closeSettings();
+    else openSettings({ trigger: elements.settingsToggle });
   });
   elements.settingsClose.addEventListener('click', () => closeSettings());
   for (const button of elements.presentationButtons) {
@@ -1535,9 +1544,9 @@ function wireControls() {
   });
   document.addEventListener('keydown', (event) => {
     if (event.key !== 'Escape') return;
-    if (!elements.settingsPanel.hidden) closeSettings();
+    if (runtime.activeOverlay === 'settings') closeSettings();
+    else if (runtime.activeOverlay === 'discovery') closeDiscovery({ restoreFocus: true });
     else if (!elements.focus.hidden) clearProject();
-    else if (!elements.discoveryPanel.hidden) closeDiscovery({ restoreFocus: true });
     else if (!elements.layerDiscovery.hidden) closeLayerDiscovery({ restoreFocus: true });
     else if (runtime.viewPhase !== 'overview' || runtime.state.view === 'layers') closeLayerView();
   });
