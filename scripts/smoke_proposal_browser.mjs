@@ -42,14 +42,25 @@ for (const profile of [
   { name: 'mobile', viewport: { width: 390, height: 844 }, mobile: true },
   { name: 'ipad-portrait', viewport: { width: 820, height: 1180 }, mobile: true },
   { name: 'ipad-landscape', viewport: { width: 1180, height: 820 }, mobile: true },
+  { name: 'mobile-text-200', viewport: { width: 390, height: 844 }, mobile: true, fontScale: 200 },
 ]) {
   const context = await browser.newContext({ viewport: profile.viewport, isMobile: profile.mobile, hasTouch: profile.mobile, reducedMotion: 'reduce' });
   const page = await context.newPage();
   const pageErrors = []; page.on('pageerror', (error) => pageErrors.push(String(error)));
+  if (profile.fontScale) {
+    await page.route('**/index.css', async (route) => {
+      const response = await route.fetch();
+      await route.fulfill({ response, body: `${await response.text()}
+html { font-size: ${profile.fontScale}% !important; }
+` });
+    });
+  }
   await page.goto(`${baseUrl}/propose.html`, { waitUntil: 'networkidle' });
   assert(await page.getByRole('heading', { name: 'Ein Commons vorschlagen' }).isVisible(), `${profile.name}: heading missing`);
   assert(await page.getByRole('button', { name: 'Öffentliches GitHub-Issue vorbereiten' }).isVisible(), `${profile.name}: submit missing`);
-  const backBox = await page.locator('.secondary-back-link').boundingBox();
+  const backLink = page.locator('.secondary-back-link');
+  await backLink.waitFor({ state: 'visible' });
+  const backBox = await backLink.boundingBox();
   assert(backBox && backBox.width >= 44 && backBox.height >= 44, `${profile.name}: back navigation is an undersized touch target ${JSON.stringify(backBox)}`);
   const contractLinkBoxes = await page.locator('.proposal-contracts a').evaluateAll((nodes) => nodes.map((node) => {
     const rect = node.getBoundingClientRect();
@@ -58,6 +69,12 @@ for (const profile of [
   assert(contractLinkBoxes.length === 4 && contractLinkBoxes.every(({ width, height }) => width >= 44 && height >= 44), `${profile.name}: proposal contract navigation has undersized touch targets ${JSON.stringify(contractLinkBoxes)}`);
   const overflow = await page.evaluate(() => document.documentElement.scrollWidth - document.documentElement.clientWidth);
   assert(overflow <= 1, `${profile.name}: horizontal overflow ${overflow}`);
+  if (profile.fontScale) {
+    const skipLink = page.locator('.skip-link');
+    await skipLink.focus();
+    const skipBox = await skipLink.boundingBox();
+    assert(skipBox && skipBox.x >= 0 && skipBox.x + skipBox.width <= profile.viewport.width + 1, `${profile.name}: focused skip link overflows the viewport ${JSON.stringify(skipBox)}`);
+  }
   assert(await page.locator('form fieldset').count() === 4, `${profile.name}: semantic fieldsets missing`);
   assert(pageErrors.length === 0, `${profile.name}: page errors ${pageErrors.join('; ')}`);
   results.push(profile.name);

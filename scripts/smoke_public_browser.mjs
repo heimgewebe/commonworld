@@ -179,6 +179,21 @@ async function newPage({ mobile = false, viewportOverride = null, touch = mobile
 }
 
 
+async function primaryOverlayState(page) {
+  return page.evaluate(() => {
+    const discovery = document.querySelector('#discovery-panel');
+    const settings = document.querySelector('#settings-panel');
+    const focus = document.querySelector('#project-focus');
+    return {
+      discoveryVisible: !discovery.hidden,
+      settingsVisible: !settings.hidden,
+      focusVisible: !focus.hidden,
+      focusInert: focus.hasAttribute('inert'),
+      focusAriaHidden: focus.getAttribute('aria-hidden'),
+    };
+  });
+}
+
 async function waitForSphereOpacitySettled(page) {
   await page.waitForFunction(() => {
     const sphere = document.querySelector('#digital-sphere');
@@ -472,6 +487,8 @@ async function normalScenario() {
   await run.page.locator('#settings-toggle').click();
   assert(await run.page.locator('#discovery-panel').isHidden(), 'normal: opening settings left discovery stacked underneath');
   assert(await run.page.locator('#settings-panel').isVisible(), 'normal: settings panel did not open');
+  const settingsOnlyState = await primaryOverlayState(run.page);
+  assert(settingsOnlyState.settingsVisible && !settingsOnlyState.discoveryVisible && !settingsOnlyState.focusVisible, 'normal: primary overlay invariant failed while settings opened ' + JSON.stringify(settingsOnlyState));
   assert((await run.page.locator('#settings-panel').getAttribute('aria-modal')) === 'false', 'normal: non-modal settings contract changed');
   assert((await run.page.locator('#text-view').getAttribute('inert')) === null, 'normal: settings incorrectly block background navigation');
   await run.page.keyboard.press('Escape');
@@ -483,11 +500,15 @@ async function normalScenario() {
   const debianTrigger = run.page.locator('#project-debian .catalog-select');
   await debianTrigger.click();
   assert(await run.page.locator('#project-focus').isVisible(), 'normal: project focus did not open');
+  const focusOnlyState = await primaryOverlayState(run.page);
+  assert(focusOnlyState.focusVisible && !focusOnlyState.discoveryVisible && !focusOnlyState.settingsVisible && !focusOnlyState.focusInert && focusOnlyState.focusAriaHidden === null, 'normal: visible project focus kept suppressed accessibility state ' + JSON.stringify(focusOnlyState));
   assert((await run.page.evaluate(() => document.activeElement?.id)) === 'project-focus', 'normal: project focus did not receive focus');
   assert(((await run.page.locator('#semantic-summary').textContent()) ?? '') === 'Digital · Ortsunabhängige digitale Präsenz', 'normal: digital-only focus lost its location-independent truth');
   await run.page.locator('#filter-toggle').click();
   assert(await run.page.locator('#discovery-panel').isVisible(), 'normal: discovery did not open over a selected project');
   assert(await run.page.locator('#project-focus').isHidden(), 'normal: selected project obscured discovery results');
+  const discoveryOnlyState = await primaryOverlayState(run.page);
+  assert(discoveryOnlyState.discoveryVisible && !discoveryOnlyState.settingsVisible && !discoveryOnlyState.focusVisible && discoveryOnlyState.focusInert && discoveryOnlyState.focusAriaHidden === 'true', 'normal: discovery did not exclusively suppress project focus ' + JSON.stringify(discoveryOnlyState));
   assert(new URL(run.page.url()).searchParams.get('project') === 'debian', 'normal: hiding focus for discovery cleared the selected project context');
   await run.page.keyboard.press('Escape');
   assert(await run.page.locator('#discovery-panel').isHidden(), 'normal: Escape did not close discovery before the preserved project focus');
@@ -495,6 +516,8 @@ async function normalScenario() {
   await run.page.locator('#settings-toggle').click();
   assert(await run.page.locator('#settings-panel').isVisible(), 'normal: settings did not open over a selected project');
   assert(await run.page.locator('#project-focus').isHidden(), 'normal: selected project obscured settings');
+  const selectedSettingsOnlyState = await primaryOverlayState(run.page);
+  assert(selectedSettingsOnlyState.settingsVisible && !selectedSettingsOnlyState.discoveryVisible && !selectedSettingsOnlyState.focusVisible && selectedSettingsOnlyState.focusInert && selectedSettingsOnlyState.focusAriaHidden === 'true', 'normal: settings did not exclusively suppress project focus ' + JSON.stringify(selectedSettingsOnlyState));
   assert(new URL(run.page.url()).searchParams.get('project') === 'debian', 'normal: hiding focus for settings cleared the selected project context');
   await run.page.keyboard.press('Escape');
   assert(await run.page.locator('#settings-panel').isHidden(), 'normal: Escape did not close settings before the preserved project focus');
@@ -1412,17 +1435,35 @@ async function providerFailureScenario() {
 }
 
 async function methodScenario() {
-  const run = await newPage({ mobile: true });
-  const response = await run.page.goto(`${baseUrl}/method.html`, { waitUntil: 'domcontentloaded' });
-  assert(response?.status() === 200, 'method: page is not served');
-  assert((await run.page.locator('h1').textContent()) === 'Methode, Abdeckung und Datenschutz', 'method: heading mismatch');
-  assert((await run.page.locator('main').textContent())?.includes('keine vollständige Weltstatistik'), 'method: coverage boundary missing');
-  const backBox = await run.page.locator('.secondary-back-link').boundingBox();
-  assert(backBox && backBox.width >= 44 && backBox.height >= 44, `method: back navigation is an undersized touch target (${JSON.stringify(backBox)})`);
-  assert(run.consoleErrors.length === 0, `method: console errors: ${run.consoleErrors.join(' | ')}`);
-  assert(run.pageErrors.length === 0, `method: page errors: ${run.pageErrors.join(' | ')}`);
-  results.push({ id: 'method', verdict: 'PASS' });
-  await run.context.close();
+  for (const profile of [
+    { id: 'desktop', mobile: false, viewportOverride: { width: 1280, height: 800 }, fontScale: null },
+    { id: 'mobile', mobile: true, viewportOverride: { width: 390, height: 844 }, fontScale: null },
+    { id: 'mobile-text-200', mobile: true, viewportOverride: { width: 390, height: 844 }, fontScale: 200 },
+  ]) {
+    const run = await newPage({ mobile: profile.mobile, viewportOverride: profile.viewportOverride });
+    if (profile.fontScale) {
+      await run.page.route('**/index.css', async (route) => {
+        const response = await route.fetch();
+        await route.fulfill({ response, body: `${await response.text()}
+html { font-size: ${profile.fontScale}% !important; }
+` });
+      });
+    }
+    const response = await run.page.goto(`${baseUrl}/method.html`, { waitUntil: 'domcontentloaded' });
+    assert(response?.status() === 200, `method ${profile.id}: page is not served`);
+    assert((await run.page.locator('h1').textContent()) === 'Methode, Abdeckung und Datenschutz', `method ${profile.id}: heading mismatch`);
+    assert((await run.page.locator('main').textContent())?.includes('keine vollständige Weltstatistik'), `method ${profile.id}: coverage boundary missing`);
+    const backLink = run.page.locator('.secondary-back-link');
+    await backLink.waitFor({ state: 'visible' });
+    const backBox = await backLink.boundingBox();
+    assert(backBox && backBox.width >= 44 && backBox.height >= 44, `method ${profile.id}: back navigation is an undersized touch target (${JSON.stringify(backBox)})`);
+    const overflow = await run.page.evaluate(() => document.documentElement.scrollWidth - document.documentElement.clientWidth);
+    assert(overflow <= 1, `method ${profile.id}: horizontal overflow ${overflow}`);
+    assert(run.consoleErrors.length === 0, `method ${profile.id}: console errors: ${run.consoleErrors.join(' | ')}`);
+    assert(run.pageErrors.length === 0, `method ${profile.id}: page errors: ${run.pageErrors.join(' | ')}`);
+    results.push({ id: `method-${profile.id}`, verdict: 'PASS' });
+    await run.context.close();
+  }
 }
 
 try {
