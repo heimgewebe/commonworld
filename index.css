@@ -51,6 +51,25 @@ a {
   text-underline-offset: 0.2em;
 }
 
+.secondary-back-link {
+  display: inline-flex;
+  align-items: center;
+  min-height: 2.75rem;
+  padding: 0.45rem 0.78rem;
+  border: 1px solid var(--line-strong);
+  border-radius: 999px;
+  background: rgba(7, 22, 18, 0.92);
+  color: #c2ecd4;
+  font-weight: 720;
+  line-height: 1.2;
+  text-decoration: none;
+}
+
+.secondary-back-link:hover {
+  border-color: var(--green);
+  color: #edf4ef;
+}
+
 :focus-visible {
   outline: 0.19rem solid var(--focus);
   outline-offset: 0.18rem;

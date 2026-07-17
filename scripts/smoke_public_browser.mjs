@@ -485,6 +485,20 @@ async function normalScenario() {
   assert(await run.page.locator('#project-focus').isVisible(), 'normal: project focus did not open');
   assert((await run.page.evaluate(() => document.activeElement?.id)) === 'project-focus', 'normal: project focus did not receive focus');
   assert(((await run.page.locator('#semantic-summary').textContent()) ?? '') === 'Digital · Ortsunabhängige digitale Präsenz', 'normal: digital-only focus lost its location-independent truth');
+  await run.page.locator('#filter-toggle').click();
+  assert(await run.page.locator('#discovery-panel').isVisible(), 'normal: discovery did not open over a selected project');
+  assert(await run.page.locator('#project-focus').isHidden(), 'normal: selected project obscured discovery results');
+  assert(new URL(run.page.url()).searchParams.get('project') === 'debian', 'normal: hiding focus for discovery cleared the selected project context');
+  await run.page.keyboard.press('Escape');
+  assert(await run.page.locator('#discovery-panel').isHidden(), 'normal: Escape did not close discovery before the preserved project focus');
+  assert(await run.page.locator('#project-focus').isVisible(), 'normal: preserved project focus did not return after discovery closed');
+  await run.page.locator('#settings-toggle').click();
+  assert(await run.page.locator('#settings-panel').isVisible(), 'normal: settings did not open over a selected project');
+  assert(await run.page.locator('#project-focus').isHidden(), 'normal: selected project obscured settings');
+  assert(new URL(run.page.url()).searchParams.get('project') === 'debian', 'normal: hiding focus for settings cleared the selected project context');
+  await run.page.keyboard.press('Escape');
+  assert(await run.page.locator('#settings-panel').isHidden(), 'normal: Escape did not close settings before the preserved project focus');
+  assert(await run.page.locator('#project-focus').isVisible(), 'normal: preserved project focus did not return after settings closed');
   await run.page.locator('#commons-search').focus();
   assert((await run.page.evaluate(() => document.activeElement?.id)) === 'commons-search', 'normal: project focus incorrectly blocks background navigation');
   await run.page.keyboard.press('Escape');
@@ -1398,11 +1412,13 @@ async function providerFailureScenario() {
 }
 
 async function methodScenario() {
-  const run = await newPage();
+  const run = await newPage({ mobile: true });
   const response = await run.page.goto(`${baseUrl}/method.html`, { waitUntil: 'domcontentloaded' });
   assert(response?.status() === 200, 'method: page is not served');
   assert((await run.page.locator('h1').textContent()) === 'Methode, Abdeckung und Datenschutz', 'method: heading mismatch');
   assert((await run.page.locator('main').textContent())?.includes('keine vollständige Weltstatistik'), 'method: coverage boundary missing');
+  const backBox = await run.page.locator('.secondary-back-link').boundingBox();
+  assert(backBox && backBox.width >= 44 && backBox.height >= 44, `method: back navigation is an undersized touch target (${JSON.stringify(backBox)})`);
   assert(run.consoleErrors.length === 0, `method: console errors: ${run.consoleErrors.join(' | ')}`);
   assert(run.pageErrors.length === 0, `method: page errors: ${run.pageErrors.join(' | ')}`);
   results.push({ id: 'method', verdict: 'PASS' });

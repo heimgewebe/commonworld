@@ -600,6 +600,7 @@ function openDiscovery({ trigger = document.activeElement, focusFirst = false } 
   elements.discoveryPanel.hidden = false;
   elements.filterToggle.setAttribute('aria-expanded', 'true');
   elements.search.setAttribute('aria-expanded', 'true');
+  syncFocusPanelVisibility();
   if (focusFirst) elements.discoveryList.querySelector('.discovery-result-main')?.focus({ preventScroll: true });
 }
 
@@ -607,6 +608,7 @@ function closeDiscovery({ restoreFocus = false } = {}) {
   elements.discoveryPanel.hidden = true;
   elements.filterToggle.setAttribute('aria-expanded', 'false');
   elements.search.setAttribute('aria-expanded', 'false');
+  syncFocusPanelVisibility();
   if (restoreFocus && runtime.discoveryReturnTarget instanceof Element && runtime.discoveryReturnTarget.isConnected) {
     runtime.discoveryReturnTarget.focus({ preventScroll: true });
   }
@@ -765,9 +767,18 @@ function replaceLinks(container, links) {
   }
 }
 
+function focusPanelSuppressed() {
+  return !elements.discoveryPanel.hidden || !elements.settingsPanel.hidden;
+}
+
+function syncFocusPanelVisibility() {
+  const record = runtime.state.project ? runtime.recordsById.get(runtime.state.project) : null;
+  elements.focus.hidden = !record || focusPanelSuppressed();
+}
+
 function updateFocusPanel() {
   const record = runtime.state.project ? runtime.recordsById.get(runtime.state.project) : null;
-  elements.focus.hidden = !record;
+  syncFocusPanelVisibility();
   if (!record) return;
   elements.focusTitle.textContent = record.title;
   elements.focusSummary.textContent = record.summary;
@@ -1308,6 +1319,7 @@ function toggleLayerDiscovery() {
 function closeSettings({ restoreFocus = true } = {}) {
   elements.settingsPanel.hidden = true;
   elements.settingsToggle.setAttribute('aria-expanded', 'false');
+  syncFocusPanelVisibility();
   if (restoreFocus) (runtime.settingsReturnTarget ?? elements.settingsToggle).focus({ preventScroll: true });
   runtime.settingsReturnTarget = null;
 }
@@ -1317,6 +1329,7 @@ function openSettings() {
   if (!elements.discoveryPanel.hidden) closeDiscovery({ restoreFocus: false });
   elements.settingsPanel.hidden = false;
   elements.settingsToggle.setAttribute('aria-expanded', 'true');
+  syncFocusPanelVisibility();
   elements.settingsClose.focus({ preventScroll: true });
 }
 
