@@ -436,6 +436,20 @@ async function normalScenario() {
   await run.page.waitForSelector('html.runtime-ready');
   assert(await run.page.locator('#globe-surface').isVisible(), 'normal: globe is not visible');
   assert((await run.page.locator('#globe-results').textContent())?.includes(`${expectedDigitalProjection.catalogEntryCount} Commons`), 'normal: result count missing');
+  const topbarGeometry = await run.page.evaluate(() => {
+    const topbar = document.querySelector('.topbar');
+    const bar = topbar.getBoundingClientRect();
+    return {
+      bar: { top: bar.top, bottom: bar.bottom },
+      children: [...topbar.children].map((node) => {
+        const rect = node.getBoundingClientRect();
+        return { className: node.className, top: rect.top, bottom: rect.bottom, width: rect.width, height: rect.height };
+      }),
+    };
+  });
+  assert(topbarGeometry.children.every(({ top, bottom }) => top >= topbarGeometry.bar.top - 1 && bottom <= topbarGeometry.bar.bottom + 1), `normal: topbar child escaped into a second row (${JSON.stringify(topbarGeometry)})`);
+  const proposalGeometry = topbarGeometry.children.find(({ className }) => className === 'proposal-link');
+  assert(proposalGeometry?.width >= 44 && proposalGeometry?.height >= 44, `normal: proposal link is not a full touch target (${JSON.stringify(proposalGeometry)})`);
 
   await run.page.locator('.skip-link').focus();
   await run.page.keyboard.press('Enter');
@@ -453,7 +467,10 @@ async function normalScenario() {
     };
   });
   assert(keyboardFocusAppearance.modality === 'keyboard' && keyboardFocusAppearance.outlineStyle !== 'none' && keyboardFocusAppearance.outlineWidth > 0, 'normal: keyboard focus indicator was removed ' + JSON.stringify(keyboardFocusAppearance));
+  await run.page.locator('#filter-toggle').click();
+  assert(await run.page.locator('#discovery-panel').isVisible(), 'normal: discovery panel did not open before settings');
   await run.page.locator('#settings-toggle').click();
+  assert(await run.page.locator('#discovery-panel').isHidden(), 'normal: opening settings left discovery stacked underneath');
   assert(await run.page.locator('#settings-panel').isVisible(), 'normal: settings panel did not open');
   assert((await run.page.locator('#settings-panel').getAttribute('aria-modal')) === 'false', 'normal: non-modal settings contract changed');
   assert((await run.page.locator('#text-view').getAttribute('inert')) === null, 'normal: settings incorrectly block background navigation');
@@ -839,8 +856,9 @@ async function layerJourneyScenario({ mobile = false, viewportOverride = null, t
   await directContent.click();
   assert(await run.page.locator('#project-focus').isVisible(), 'layer journey: ribbon content did not open its Commons focus');
   assert((await run.page.locator('#focus-title').textContent()) === directTitle, `layer journey: ribbon opened the wrong Commons identity (${directTitle})`);
-  await run.page.locator('#focus-close').click();
-  assert(await run.page.locator('#project-focus').isHidden(), 'layer journey: Commons focus did not close');
+  await run.page.keyboard.press('Escape');
+  assert(await run.page.locator('#project-focus').isHidden(), 'layer journey: Escape did not close the topmost Commons focus');
+  assert(await run.page.locator('#layer-panel').isVisible(), 'layer journey: Escape closed the layer surface behind the visible Commons focus');
   assert(await directContent.evaluate((node) => document.activeElement === node), 'layer journey: focus did not return to the same ribbon identity');
 
   const viewportFit = await run.page.evaluate(() => ({
@@ -1342,7 +1360,23 @@ async function providerFailureScenario() {
   assert(await run.page.locator('#map-status').isVisible(), 'provider failure: mobile degraded status hidden');
   assert((await run.page.locator('#map-status').textContent())?.includes('Basiskarte'), 'provider failure: degraded status unclear');
 
-  const touchSelectors = ['.brand', '#settings-toggle', '#globe-reset', '.maplibregl-ctrl-group button'];
+  const topbarFit = await run.page.evaluate(() => {
+    const topbar = document.querySelector('.topbar');
+    const bar = topbar.getBoundingClientRect();
+    return {
+      viewportWidth: innerWidth,
+      documentWidth: document.documentElement.scrollWidth,
+      bar: { top: bar.top, bottom: bar.bottom },
+      children: [...topbar.children].map((node) => {
+        const rect = node.getBoundingClientRect();
+        return { className: node.className, left: rect.left, right: rect.right, top: rect.top, bottom: rect.bottom };
+      }),
+    };
+  });
+  assert(topbarFit.documentWidth <= topbarFit.viewportWidth + 1, `provider failure: mobile topbar caused horizontal overflow (${JSON.stringify(topbarFit)})`);
+  assert(topbarFit.children.every(({ left, right, top, bottom }) => left >= -1 && right <= topbarFit.viewportWidth + 1 && top >= topbarFit.bar.top - 1 && bottom <= topbarFit.bar.bottom + 1), `provider failure: mobile topbar child escaped its single row or viewport (${JSON.stringify(topbarFit)})`);
+
+  const touchSelectors = ['.brand', '.proposal-link', '#settings-toggle', '#globe-reset', '.maplibregl-ctrl-group button'];
   for (const selector of touchSelectors) {
     const boxes = await run.page.locator(selector).evaluateAll((nodes) => nodes.filter((node) => node.getClientRects().length).map((node) => {
       const rect = node.getBoundingClientRect();

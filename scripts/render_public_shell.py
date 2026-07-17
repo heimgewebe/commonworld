@@ -178,7 +178,7 @@ def render_shell(root: Path = ROOT) -> str:
           </div>
           <button id="filter-toggle" class="icon-button filter-toggle" type="button" aria-label="Suchergebnisse und Filter öffnen" aria-controls="discovery-panel" aria-expanded="false"><span aria-hidden="true">≡</span><span class="filter-toggle-label">Filter</span></button>
         </div>
-        <a class="proposal-link" href="./propose.html">Commons vorschlagen</a>
+        <a class="proposal-link" href="./propose.html"><span class="proposal-symbol" aria-hidden="true">+</span><span class="proposal-label">Commons vorschlagen</span></a>
         <button id="settings-toggle" class="icon-button settings-toggle" type="button" aria-label="Einstellungen öffnen" aria-controls="settings-panel" aria-expanded="false"><span aria-hidden="true">⚙</span></button>
       </header>
 
