@@ -595,6 +595,7 @@ function renderLayerPanel() {
 }
 
 function openDiscovery({ trigger = document.activeElement, focusFirst = false } = {}) {
+  if (!elements.settingsPanel.hidden) closeSettings({ restoreFocus: false });
   if (trigger instanceof Element && !elements.discoveryPanel.contains(trigger)) runtime.discoveryReturnTarget = trigger;
   elements.discoveryPanel.hidden = false;
   elements.filterToggle.setAttribute('aria-expanded', 'true');
@@ -1313,6 +1314,7 @@ function closeSettings({ restoreFocus = true } = {}) {
 
 function openSettings() {
   runtime.settingsReturnTarget = document.activeElement instanceof HTMLElement ? document.activeElement : elements.settingsToggle;
+  if (!elements.discoveryPanel.hidden) closeDiscovery({ restoreFocus: false });
   elements.settingsPanel.hidden = false;
   elements.settingsToggle.setAttribute('aria-expanded', 'true');
   elements.settingsClose.focus({ preventScroll: true });
@@ -1520,11 +1522,11 @@ function wireControls() {
   });
   document.addEventListener('keydown', (event) => {
     if (event.key !== 'Escape') return;
-    if (!elements.discoveryPanel.hidden) closeDiscovery({ restoreFocus: true });
+    if (!elements.settingsPanel.hidden) closeSettings();
+    else if (!elements.focus.hidden) clearProject();
+    else if (!elements.discoveryPanel.hidden) closeDiscovery({ restoreFocus: true });
     else if (!elements.layerDiscovery.hidden) closeLayerDiscovery({ restoreFocus: true });
     else if (runtime.viewPhase !== 'overview' || runtime.state.view === 'layers') closeLayerView();
-    else if (!elements.settingsPanel.hidden) closeSettings();
-    else if (!elements.focus.hidden) clearProject();
   });
   window.addEventListener('popstate', () => applyDeepLink(location.search));
   window.addEventListener('resize', () => {
