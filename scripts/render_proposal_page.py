@@ -44,7 +44,7 @@ def render() -> str:
     <main>
       <p class="kicker">Commonworld-Redaktion</p>
       <h1>Ein Commons vorschlagen</h1>
-      <p><a href="./">Zurück zum Globus</a></p>
+      <p><a class="secondary-back-link" href="./">← Zurück zum Globus</a></p>
       <section class="proposal-intro" aria-labelledby="proposal-process-title">
         <h2 id="proposal-process-title">Was danach passiert</h2>
         <p>Der Vorschlag wird <strong>nicht automatisch veröffentlicht</strong>. Commonworld prüft Identität, Quellen, Commons-Eigenschaft, Handlungswege, Ortsgenauigkeit, Datenschutz und Aktualität. Erst ein separat geprüfter Repository-Commit kann einen Katalogeintrag veröffentlichen.</p>

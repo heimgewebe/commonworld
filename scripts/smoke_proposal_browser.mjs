@@ -49,6 +49,13 @@ for (const profile of [
   await page.goto(`${baseUrl}/propose.html`, { waitUntil: 'networkidle' });
   assert(await page.getByRole('heading', { name: 'Ein Commons vorschlagen' }).isVisible(), `${profile.name}: heading missing`);
   assert(await page.getByRole('button', { name: 'Öffentliches GitHub-Issue vorbereiten' }).isVisible(), `${profile.name}: submit missing`);
+  const backBox = await page.locator('.secondary-back-link').boundingBox();
+  assert(backBox && backBox.width >= 44 && backBox.height >= 44, `${profile.name}: back navigation is an undersized touch target ${JSON.stringify(backBox)}`);
+  const contractLinkBoxes = await page.locator('.proposal-contracts a').evaluateAll((nodes) => nodes.map((node) => {
+    const rect = node.getBoundingClientRect();
+    return { width: rect.width, height: rect.height };
+  }));
+  assert(contractLinkBoxes.length === 4 && contractLinkBoxes.every(({ width, height }) => width >= 44 && height >= 44), `${profile.name}: proposal contract navigation has undersized touch targets ${JSON.stringify(contractLinkBoxes)}`);
   const overflow = await page.evaluate(() => document.documentElement.scrollWidth - document.documentElement.clientWidth);
   assert(overflow <= 1, `${profile.name}: horizontal overflow ${overflow}`);
   assert(await page.locator('form fieldset').count() === 4, `${profile.name}: semantic fieldsets missing`);

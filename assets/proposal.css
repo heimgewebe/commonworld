@@ -77,7 +77,8 @@ body.proposal-page {
 .proposal-errors ul { margin-bottom: 0; }
 .proposal-status { min-height: 1.6em; font-weight: 650; }
 .proposal-fallback { padding: 0.85rem 1rem; border-left: 4px solid #b8e5dd; background: rgba(184, 229, 221, 0.08); }
-.proposal-contracts ul { display: grid; gap: 0.6rem; padding-left: 1.2rem; }
+.proposal-contracts ul { display: grid; gap: 0.3rem; padding-left: 1.2rem; }
+.proposal-contracts a { display: inline-flex; align-items: center; min-height: 2.75rem; padding-block: 0.2rem; }
 .honeypot { position: absolute !important; left: -10000px !important; width: 1px !important; height: 1px !important; overflow: hidden !important; }
 
 @media (max-width: 42rem) {
