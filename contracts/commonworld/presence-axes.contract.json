@@ -1,20 +1,15 @@
 {
   "schema_version": 1,
-  "title": "Commonworld real geographic and hybrid Commons vertical slice",
+  "title": "Commonworld presence axes vertical slice",
   "source_contract": {
     "id": "https://commonworld.net/contracts/commonworld/project.schema.json",
-    "schema_version": 3,
+    "schema_version": 4,
     "identity_key": "CommonProject.id"
   },
   "catalog_validation": {
     "production_validator": "scripts/validate_public_catalog.py",
     "seed_regression_validator": "scripts/validate_public_seed_baseline.py",
-    "vertical_slice_validator": "scripts/validate_real_hybrid_commons.py",
-    "production_allows_kinds": [
-      "geographic",
-      "digital",
-      "hybrid"
-    ],
+    "vertical_slice_validator": "scripts/validate_presence_axes.py",
     "production_source_types": [
       "official-source",
       "public-registry"
@@ -48,7 +43,7 @@
       "mode": "hidden",
       "geometry_forbidden": true
     },
-    "hybrid_identity": {
+    "dual_presence_same_identity": {
       "project_id": "freifunk-hamburg",
       "digital_available": true,
       "geographic_locations": 2
@@ -71,7 +66,7 @@
     ],
     "hidden_locations_excluded": true,
     "invented_coordinates_forbidden": true,
-    "hybrid_identity_duplication_forbidden": true,
+    "dual_presence_duplication_forbidden": true,
     "runtime_projection": {
       "catalog_snapshot_frozen_after_install": true,
       "approximate_zones_precomputed_per_catalog_install": true,
@@ -128,7 +123,7 @@
     "selection_key": "CommonProject.id",
     "same_query_same_identity_set": true,
     "geographic_only_records_absent_from_digital_sphere": true,
-    "hybrid_records_present_in_globe_and_digital_sphere": true,
+    "dual_presence_records_present_in_globe_and_digital_sphere": true,
     "selection_does_not_mutate_filters": true,
     "selection_filter_semantics": "selection is independent of current filter state"
   }

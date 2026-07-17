@@ -1,9 +1,8 @@
 {
-  "schema_version": 3,
+  "schema_version": 4,
   "id": "enspiral",
   "title": "Enspiral",
   "summary": "Ein in Aotearoa Neuseeland entstandenes kollaboratives Netzwerk, das gemeinschaftliche Unternehmensformen, geteilte Ressourcen und offen dokumentierte Werkzeuge für dezentrale Zusammenarbeit entwickelt.",
-  "kind": "digital",
   "themes": [
     "commons-governance",
     "cooperative-economy",

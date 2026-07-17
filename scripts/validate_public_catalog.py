@@ -15,6 +15,7 @@ ROOT = Path(__file__).resolve().parents[1]
 if str(ROOT) not in sys.path:
     sys.path.insert(0, str(ROOT))
 
+from scripts.render_public_shell import public_locations
 from scripts.validate_contracts import validation_errors
 
 CATALOG_PATH = Path("catalog/catalog.json")
@@ -82,12 +83,18 @@ def _homepage(record: dict) -> str | None:
 
 
 def _card_label(record: dict, layer_labels: dict[str, str], contract: dict) -> str:
-    kind = record.get("kind")
-    if kind == "geographic":
-        return "Geografisch"
+    has_geo = bool(public_locations(record))
+    has_dig = record.get("presence", {}).get("digital", {}).get("available", False)
+
+    if has_geo and not has_dig:
+        return "Vor Ort"
+    if not has_geo and not has_dig:
+        return "Commons"
     layer = derive_digital_layer(record, contract)
     label = layer_labels.get(layer, "Digitale Commons")
-    return f"Hybrid · {label}" if kind == "hybrid" else f"Digital · {label}"
+    if has_geo and has_dig:
+        return f"Vor Ort · Digital · {label}"
+    return f"Digital · {label}"
 
 
 def _parse_date(value: object) -> date | None:
@@ -231,8 +238,7 @@ def validate_public_catalog(root: Path = ROOT) -> list[str]:
         for message in validation_errors(record, root):
             errors.append(f"public catalog project {relative.name} invalid: {message}")
 
-        if record.get("kind") not in {"geographic", "digital", "hybrid"}:
-            errors.append(f"public catalog project {relative.name} has unsupported kind")
+
         if any(key in record for key in ("layer", "derived_layer", "presentation_layer", "semantic_zoom")):
             errors.append(f"public catalog project {relative.name} must not store presentation or zoom assignments")
 

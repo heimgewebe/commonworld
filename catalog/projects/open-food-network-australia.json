@@ -1,9 +1,8 @@
 {
-  "schema_version": 3,
+  "schema_version": 4,
   "id": "open-food-network-australia",
   "title": "Open Food Network Australia",
   "summary": "Eine gemeinnützige australische Gemeinschaft und quelloffene Plattform, mit der Produzenten und Lebensmittelinitiativen kurze, transparente und gemeinschaftlich kontrollierte Versorgungsketten organisieren können.",
-  "kind": "digital",
   "themes": [
     "food",
     "platform",

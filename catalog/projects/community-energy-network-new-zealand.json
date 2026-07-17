@@ -1,9 +1,8 @@
 {
-  "schema_version": 3,
+  "schema_version": 4,
   "id": "community-energy-network-new-zealand",
   "title": "Community Energy Network New Zealand",
   "summary": "Ein neuseeländisches Netzwerk lokaler, bürgergetragener Energieinitiativen, das Wissen, Zusammenarbeit und gemeinschaftliche Kontrolle erneuerbarer Energie- und Effizienzprojekte verbindet.",
-  "kind": "hybrid",
   "themes": [
     "energy",
     "renewable-energy",

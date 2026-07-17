@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Validate CommonProject v3 against its non-public real-world case matrix."""
+"""Validate CommonProject v4 against its non-public real-world case matrix."""
 
 from __future__ import annotations
 
@@ -22,11 +22,10 @@ def load_schema(root: Path = ROOT) -> dict:
 
 def base_record() -> dict:
     return {
-        "schema_version": 3,
+        "schema_version": 4,
         "id": "shared-repair-place",
         "title": "Shared Repair Place",
         "summary": "A public Commons where people share tools, repair objects and learn practical skills together.",
-        "kind": "geographic",
         "themes": ["repair", "shared-tools"],
         "actions": ["visit", "borrow", "learn", "contribute"],
         "presence": {
@@ -118,7 +117,7 @@ def representative_records() -> tuple[dict, ...]:
     }
 
     digital = copy.deepcopy(exact_place)
-    digital.update({"id": "open-knowledge-network", "title": "Open Knowledge Network", "kind": "digital"})
+    digital.update({"id": "open-knowledge-network", "title": "Open Knowledge Network"})
     digital["presence"] = {
         "geographic": [],
         "digital": {
@@ -164,9 +163,9 @@ def representative_records() -> tuple[dict, ...]:
         },
     ]
 
-    hybrid = copy.deepcopy(exact_place)
-    hybrid.update({"id": "local-digital-mapping-network", "title": "Local Digital Mapping Network", "kind": "hybrid"})
-    hybrid["presence"]["geographic"][0] = {
+    dual_presence = copy.deepcopy(exact_place)
+    dual_presence.update({"id": "local-digital-mapping-network", "title": "Local Digital Mapping Network"})
+    dual_presence["presence"]["geographic"][0] = {
         "id": "hamburg-region",
         "mode": "approximate",
         "label": "Hamburg region",
@@ -174,14 +173,14 @@ def representative_records() -> tuple[dict, ...]:
         "uncertainty_meters_min": 5000,
         "source_ids": ["official-website"],
     }
-    hybrid["presence"]["digital"] = {
+    dual_presence["presence"]["digital"] = {
         "available": True,
         "reach": "network",
         "label": "Distributed online mapping network",
         "source_ids": ["official-website"],
     }
 
-    related = copy.deepcopy(hybrid)
+    related = copy.deepcopy(dual_presence)
     related.update({"id": "mapping-chapter", "title": "Mapping Chapter"})
     related["provenance"]["sources"].append(
         _source("network-directory", "https://example.org/network-directory")
@@ -218,7 +217,7 @@ def representative_records() -> tuple[dict, ...]:
         digital,
         regional,
         multiple_anchors,
-        hybrid,
+        dual_presence,
         related,
         paused_stale,
     )
@@ -319,12 +318,12 @@ def validation_errors(record: dict, root: Path = ROOT) -> list[str]:
 def validate_contracts(root: Path = ROOT) -> list[str]:
     path = root / SCHEMA_PATH.relative_to(ROOT)
     if not path.is_file():
-        return ["missing CommonProject v3 schema"]
+        return ["missing CommonProject v4 schema"]
     try:
         schema = load_schema(root)
         Draft202012Validator.check_schema(schema)
     except Exception as error:
-        return [f"invalid CommonProject v3 schema: {error}"]
+        return [f"invalid CommonProject v4 schema: {error}"]
 
     errors: list[str] = []
     for record in representative_records():
@@ -339,7 +338,7 @@ def main() -> int:
         for error in errors:
             print(f"ERROR: {error}", file=sys.stderr)
         return 1
-    print("commonworld CommonProject v3 contract and case-matrix validation ok")
+    print("commonworld CommonProject v4 contract and case-matrix validation ok")
     return 0
 
 

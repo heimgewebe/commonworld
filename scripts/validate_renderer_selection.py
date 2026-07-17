@@ -23,6 +23,12 @@ RESULT_PATH = Path("docs/research/renderer-selection-v1.result.json")
 REPORT_PATH = Path("docs/research/renderer-selection-v1.md")
 CATALOG_PATH = Path("catalog/catalog.json")
 
+HISTORICAL_EVIDENCE_SNAPSHOTS = {
+    "contracts/commonworld/aggregation-zoom.contract.json": "docs/research/renderer-selection-v1.evidence/aggregation-zoom.contract.json",
+    "contracts/commonworld/visual-semantics.contract.json": "docs/research/renderer-selection-v1.evidence/visual-semantics.contract.json",
+    "contracts/commonworld/project.schema.json": "docs/research/renderer-selection-v1.evidence/project.schema.json",
+}
+
 EVIDENCE_PATHS = (
     "docs/research/renderer-engine-spike.result.json",
     "docs/research/maplibre-phase2-globe-proof.result.json",
@@ -160,7 +166,14 @@ def _catalog_records(root: Path, catalog: dict[str, Any]) -> list[dict[str, Any]
 
 def validate_renderer_selection(root: Path = ROOT) -> list[str]:
     errors: list[str] = []
-    required = (CONTRACT_PATH, DIGITAL_CONTRACT_PATH, RESULT_PATH, REPORT_PATH, CATALOG_PATH)
+    required = (
+        CONTRACT_PATH,
+        DIGITAL_CONTRACT_PATH,
+        RESULT_PATH,
+        REPORT_PATH,
+        CATALOG_PATH,
+        *(Path(path) for path in HISTORICAL_EVIDENCE_SNAPSHOTS.values()),
+    )
     for relative in required:
         if not (root / relative).is_file():
             errors.append(f"missing renderer selection file: {relative}")
@@ -319,7 +332,11 @@ def validate_renderer_selection(root: Path = ROOT) -> list[str]:
         if not path.is_file():
             errors.append(f"renderer evidence file missing: {relative}")
             continue
-        actual = _sha256(path)
+        evidence_path = root / HISTORICAL_EVIDENCE_SNAPSHOTS.get(relative, relative)
+        if not evidence_path.is_file():
+            errors.append(f"renderer evidence snapshot missing: {evidence_path.relative_to(root)}")
+            continue
+        actual = _sha256(evidence_path)
         if binding_map.get(relative) != actual:
             errors.append(f"renderer evidence hash mismatch: {relative}")
 
@@ -438,8 +455,7 @@ def validate_renderer_selection(root: Path = ROOT) -> list[str]:
     actual_coverage: dict[str, list[str]] = defaultdict(list)
     for record in seed_records:
         identifier = record.get("id")
-        if record.get("kind") != "digital":
-            errors.append(f"public seed record must remain digital: {identifier}")
+
         presence = record.get("presence", {})
         if not isinstance(presence, dict) or presence.get("geographic") != []:
             errors.append(f"public seed record must not gain geographic presence: {identifier}")

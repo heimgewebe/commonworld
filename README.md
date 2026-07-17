@@ -4,7 +4,7 @@
 
 ## Kanonische Produktentscheidung
 
-Commonworld beginnt mit dem vollständigen Globus. Durch Rotation, Auswahl und semantischen Zoom verdichten sich belegte Commons-Daten zu Regionen, lokalen Flächen, Beziehungen und konkreten Commons. Eine auswählbare digitale Sphäre integriert digitale und hybride Commons ohne erfundene Koordinaten.
+Commonworld beginnt mit dem vollständigen Globus. Durch Rotation, Auswahl und semantischen Zoom verdichten sich belegte Commons-Daten zu Regionen, lokalen Flächen, Beziehungen und konkreten Commons. Eine auswählbare digitale Sphäre integriert digitale Präsenzen ohne erfundene Koordinaten.
 
 Der kanonische Produktplan ist:
 

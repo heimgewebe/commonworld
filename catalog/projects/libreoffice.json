@@ -1,9 +1,8 @@
 {
-  "schema_version": 3,
+  "schema_version": 4,
   "id": "libreoffice",
   "title": "LibreOffice",
   "summary": "Eine freie und quelloffene Office-Suite, die von einer internationalen Gemeinschaft entwickelt, dokumentiert und übersetzt wird.",
-  "kind": "digital",
   "themes": [
     "open-source",
     "free-software"

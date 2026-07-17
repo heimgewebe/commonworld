@@ -2,7 +2,6 @@ const MAX = Object.freeze({ name: 140, description: 800, region: 120, note: 500,
 const ISSUE_BASE = "https://github.com/heimgewebe/commonworld/issues/new";
 const ACTION_TYPES = new Set(["visit", "use", "borrow", "learn", "contribute", "volunteer", "donate", "contact", "replicate"]);
 const COMMONS_TYPES = new Set(["knowledge", "software", "culture", "food-seeds", "water", "energy", "housing-land", "health-care", "tools-repair", "community-network", "other"]);
-const PRESENCE_TYPES = new Set(["geographic", "digital", "hybrid"]);
 const SENSITIVE_PATTERN = /(?:\b(?:latitude|longitude|coordinates?|gps|street|straße|strasse|avenue|road|router|roof|dach|wohnung|apartment|household|haushalt)\b|[-+]?\d{1,3}\.\d{3,}\s*[,;/ ]\s*[-+]?\d{1,3}\.\d{3,})/iu;
 const CONTACT_PATTERN = /(?:\b[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}\b|(?:\+?\d[\d\s()/.-]{7,}\d))/iu;
 const ACTIVE_CONTENT_PATTERN = /(?:<\s*script\b|javascript\s*:|data\s*:\s*text\/html|on(?:error|load|click)\s*=)/iu;
@@ -47,17 +46,23 @@ export function validateProposal(proposal, knownTitles = [], knownHosts = []) {
 
   const project = proposal.project;
   if (!project || typeof project !== "object" || Array.isArray(project)) return [...errors, "Projekt: Angaben fehlen."];
-  const allowedProject = new Set(["name", "description", "official_website", "commons_type", "presence_kind", "region", "actions", "sources", "sensitive_location_risk", "location_precision", "editorial_note"]);
+  const allowedProject = new Set(["name", "description", "official_website", "commons_type", "presence_geographic", "presence_digital", "region", "actions", "sources", "sensitive_location_risk", "location_precision", "editorial_note"]);
   for (const key of Object.keys(project)) if (!allowedProject.has(key)) errors.push(`Projekt: unbekanntes Feld ${key}.`);
   validateText(errors, "Name", project.name, 2, MAX.name);
   validateText(errors, "Beschreibung", project.description, 40, MAX.description);
-  validateText(errors, "Region", project.region, 2, MAX.region);
-  if (containsSensitiveLocation(project.region)) errors.push("Region: nur Land, Großregion oder Stadt nennen; keine Adresse oder Koordinate.");
+  if (project.presence_geographic === true) {
+    validateText(errors, "Region", project.region, 2, MAX.region);
+    if (containsSensitiveLocation(project.region)) errors.push("Region: nur Land, Großregion oder Stadt nennen; keine Adresse oder Koordinate.");
+    if (project.location_precision !== "country_or_region_only") errors.push("Ortsgenauigkeit: nur Land oder grobe Region ist zulässig.");
+  } else {
+    if (Object.prototype.hasOwnProperty.call(project, "region")) errors.push("Region: bei rein digitaler Präsenz nicht angeben.");
+    if (Object.prototype.hasOwnProperty.call(project, "location_precision")) errors.push("Ortsgenauigkeit: bei rein digitaler Präsenz nicht angeben.");
+  }
   if (project.editorial_note) validateText(errors, "Redaktioneller Hinweis", project.editorial_note, 0, MAX.note);
   if (!isSafeHttpsUrl(project.official_website)) errors.push("Offizielle Website: nur eine gültige HTTPS-Adresse ist erlaubt.");
   if (!COMMONS_TYPES.has(project.commons_type)) errors.push("Commons-Art: unbekannter Wert.");
-  if (!PRESENCE_TYPES.has(project.presence_kind)) errors.push("Präsenz: unbekannter Wert.");
-  if (project.location_precision !== "country_or_region_only") errors.push("Ortsgenauigkeit: nur Land oder grobe Region ist zulässig.");
+  if (typeof project.presence_geographic !== "boolean" || typeof project.presence_digital !== "boolean") errors.push("Präsenz: Boolean-Werte erforderlich.");
+  if (!project.presence_geographic && !project.presence_digital) errors.push("Präsenz: mindestens eine Option (Vor Ort oder Digital) muss gewählt werden.");
   if (typeof project.sensitive_location_risk !== "boolean") errors.push("Sensibilitätsangabe: erforderlich.");
 
   if (!Array.isArray(project.actions) || project.actions.length < 1 || project.actions.length > 3) {
@@ -112,12 +117,15 @@ export function proposalFromFields(fields, now = new Date()) {
       description: fields.description.trim(),
       official_website: fields.official_website.trim(),
       commons_type: fields.commons_type,
-      presence_kind: fields.presence_kind,
-      region: fields.region.trim(),
+      presence_geographic: Boolean(fields.presence_geographic),
+      presence_digital: Boolean(fields.presence_digital),
+      ...(fields.presence_geographic ? {
+        region: fields.region.trim(),
+        location_precision: "country_or_region_only",
+      } : {}),
       actions,
       sources,
-      sensitive_location_risk: Boolean(fields.sensitive_location_risk),
-      location_precision: "country_or_region_only",
+      sensitive_location_risk: fields.presence_geographic ? Boolean(fields.sensitive_location_risk) : false,
       ...(fields.editorial_note.trim() ? { editorial_note: fields.editorial_note.trim() } : {}),
     },
     consent: {
@@ -144,8 +152,8 @@ export function buildIssueBody(proposal) {
     `**Vorschlags-ID:** \`${proposal.proposal_id}\``,
     `**Name:** ${markdown(project.name)}`,
     `**Commons-Art:** ${markdown(project.commons_type)}`,
-    `**Präsenz:** ${markdown(project.presence_kind)}`,
-    `**Grobe Region:** ${markdown(project.region)}`,
+    `**Präsenz:** ${project.presence_geographic && project.presence_digital ? 'Vor Ort und Digital' : (project.presence_geographic ? 'Geografisch (Vor Ort)' : 'Digital')}`,
+    `**Grobe Region:** ${project.presence_geographic ? markdown(project.region) : "nicht zutreffend (nur digital)"}`,
     `**Offizielle Website:** ${project.official_website}`,
     `**Möglicherweise sensible Orte:** ${project.sensitive_location_risk ? "ja – redaktionell besonders prüfen" : "nein angegeben"}`,
     "",
@@ -218,7 +226,8 @@ function readFields(form) {
     description: form.elements.description.value,
     official_website: form.elements.official_website.value,
     commons_type: form.elements.commons_type.value,
-    presence_kind: form.elements.presence_kind.value,
+    presence_geographic: form.elements.presence_geographic.checked,
+    presence_digital: form.elements.presence_digital.checked,
     region: form.elements.region.value,
     actions,
     sources: form.elements.sources.value,
@@ -249,6 +258,22 @@ function init() {
   const download = document.getElementById("proposal-download");
   const catalog = getCatalogIndex();
   let lastProposal = null;
+  const geographicToggle = form.elements.presence_geographic;
+  const region = form.elements.region;
+  const sensitiveLocation = form.elements.sensitive_location_risk;
+
+  function syncGeographicFields() {
+    const enabled = geographicToggle.checked;
+    region.required = enabled;
+    region.disabled = !enabled;
+    sensitiveLocation.disabled = !enabled;
+    document.getElementById("proposal-region-field")?.toggleAttribute("data-disabled", !enabled);
+    document.getElementById("proposal-sensitive-location-field")?.toggleAttribute("data-disabled", !enabled);
+    if (!enabled) sensitiveLocation.checked = false;
+  }
+
+  geographicToggle.addEventListener("change", syncGeographicFields);
+  syncGeographicFields();
 
   function validateCurrent() {
     if (!catalog) return { proposal: null, errors: ["Der öffentliche Katalogindex konnte nicht sicher geladen werden. Bitte die Seite neu laden."] };

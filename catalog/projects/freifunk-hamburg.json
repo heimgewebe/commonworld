@@ -1,9 +1,8 @@
 {
-  "schema_version": 3,
+  "schema_version": 4,
   "id": "freifunk-hamburg",
   "title": "Freifunk Hamburg",
   "summary": "Eine lokale Freifunk-Community, die ein gemeinschaftlich getragenes digitales Netz in Hamburg betreibt und Beteiligung, offene Infrastruktur und freie Kommunikation verbindet.",
-  "kind": "hybrid",
   "themes": [
     "communication",
     "community-network",

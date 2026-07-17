@@ -2,7 +2,7 @@
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "https://commonworld.net/contracts/commonworld/project.schema.json",
   "title": "CommonProject",
-  "description": "Canonical public Commons record for the Commonworld globe. Presence is expressed on two independent axes (geographic and digital) inside presence; visual projections are derived from this record and are not catalog truth.",
+  "description": "Canonical public Commons record for the Commonworld globe. Visual projections are derived from this record and are not catalog truth.",
   "type": "object",
   "additionalProperties": false,
   "required": [
@@ -10,6 +10,7 @@
     "id",
     "title",
     "summary",
+    "kind",
     "themes",
     "actions",
     "presence",
@@ -21,7 +22,7 @@
   "properties": {
     "schema_version": {
       "type": "integer",
-      "const": 4
+      "const": 3
     },
     "id": {
       "type": "string",
@@ -36,6 +37,14 @@
       "type": "string",
       "minLength": 20,
       "maxLength": 500
+    },
+    "kind": {
+      "type": "string",
+      "enum": [
+        "geographic",
+        "digital",
+        "hybrid"
+      ]
     },
     "themes": {
       "type": "array",
@@ -102,6 +111,104 @@
       "$ref": "#/$defs/accessEvidence"
     }
   },
+  "allOf": [
+    {
+      "if": {
+        "properties": {
+          "kind": {
+            "const": "geographic"
+          }
+        },
+        "required": [
+          "kind"
+        ]
+      },
+      "then": {
+        "properties": {
+          "presence": {
+            "properties": {
+              "geographic": {
+                "minItems": 1
+              },
+              "digital": {
+                "properties": {
+                  "available": {
+                    "const": false
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "kind": {
+            "const": "digital"
+          }
+        },
+        "required": [
+          "kind"
+        ]
+      },
+      "then": {
+        "properties": {
+          "presence": {
+            "properties": {
+              "geographic": {
+                "items": {
+                  "properties": {
+                    "mode": {
+                      "const": "hidden"
+                    }
+                  }
+                }
+              },
+              "digital": {
+                "properties": {
+                  "available": {
+                    "const": true
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "kind": {
+            "const": "hybrid"
+          }
+        },
+        "required": [
+          "kind"
+        ]
+      },
+      "then": {
+        "properties": {
+          "presence": {
+            "properties": {
+              "geographic": {
+                "minItems": 1
+              },
+              "digital": {
+                "properties": {
+                  "available": {
+                    "const": true
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  ],
   "$defs": {
     "presence": {
       "type": "object",
@@ -120,27 +227,7 @@
         "digital": {
           "$ref": "#/$defs/digitalPresence"
         }
-      },
-      "anyOf": [
-        {
-          "properties": {
-            "geographic": {
-              "minItems": 1
-            }
-          }
-        },
-        {
-          "properties": {
-            "digital": {
-              "properties": {
-                "available": {
-                  "const": true
-                }
-              }
-            }
-          }
-        }
-      ]
+      }
     },
     "publicGeometry": {
       "oneOf": [

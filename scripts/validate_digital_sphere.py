@@ -51,7 +51,7 @@ def validate_digital_sphere(root: Path = ROOT) -> list[str]:
         "manual_catalog_layer_field_forbidden": True,
         "invented_geographic_coordinates_forbidden": True,
         "persistent_render_path_coordinates_forbidden": True,
-        "hybrid_identity_duplication_forbidden": True,
+        "dual_presence_duplication_forbidden": True,
     }
     if boundary != expected_boundary:
         errors.append("digital sphere catalog boundary mismatch")
@@ -180,7 +180,7 @@ def validate_digital_sphere(root: Path = ROOT) -> list[str]:
         "single_selected_identity",
         "same_id_across_globe_sphere_side_view_search_and_linear",
         "view_change_must_preserve_selection",
-        "hybrid_geographic_and_digital_representations_focus_together",
+        "dual_presence_geographic_and_digital_representations_focus_together",
     ):
         if parity.get(invariant) is not True:
             errors.append(f"selection parity invariant must be true: {invariant}")
@@ -271,7 +271,8 @@ def validate_digital_sphere(root: Path = ROOT) -> list[str]:
     if focus.get("required_fields") != [
         "full_name",
         "summary",
-        "commons_kind",
+        "has_geographic_presence",
+        "has_digital_presence",
         "themes",
         "actions",
         "digital_presence",

@@ -1,9 +1,8 @@
 {
-  "schema_version": 3,
+  "schema_version": 4,
   "id": "openstreetmap",
   "title": "OpenStreetMap",
   "summary": "Eine weltweite, gemeinschaftlich gepflegte offene Kartendatenbank, deren Daten frei genutzt und verbessert werden können.",
-  "kind": "digital",
   "themes": [
     "open-data",
     "infrastructure"

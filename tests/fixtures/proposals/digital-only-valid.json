@@ -1,17 +1,16 @@
 {
   "schema_version": 1,
   "kind": "commonworld_commons_proposal",
-  "proposal_id": "cw-20260716t120000z-example-commons",
+  "proposal_id": "cw-20260716t120000z-digital-only-test",
   "submitted_at": "2026-07-16T12:00:00Z",
   "status": "submitted",
   "project": {
-    "name": "Example Commons",
+    "name": "Digital Only Test Commons",
     "description": "Eine gemeinschaftlich verwaltete Initiative mit offen belegten Regeln, öffentlichen Quellen und einem realen Beteiligungsweg.",
     "official_website": "https://example.org/commons",
     "commons_type": "other",
-    "presence_geographic": true,
+    "presence_geographic": false,
     "presence_digital": true,
-    "region": "Norddeutschland",
     "actions": [
       {
         "type": "learn",
@@ -22,7 +21,6 @@
       "https://example.org/commons/governance"
     ],
     "sensitive_location_risk": false,
-    "location_precision": "country_or_region_only",
     "editorial_note": "Keine privaten Orte enthalten."
   },
   "consent": {

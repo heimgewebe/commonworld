@@ -9,7 +9,8 @@
     "description": "Eine gemeinschaftlich verwaltete Initiative mit offen belegten Regeln, öffentlichen Quellen und einem realen Beteiligungsweg.",
     "official_website": "https://example.org/commons",
     "commons_type": "other",
-    "presence_kind": "hybrid",
+    "presence_geographic": false,
+    "presence_digital": true,
     "region": "Norddeutschland",
     "actions": [
       {

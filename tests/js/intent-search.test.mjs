@@ -14,14 +14,14 @@ const records = [
     id: 'freifunk-hamburg',
     title: 'Freifunk Hamburg',
     summary: 'Gemeinschaftlich getragenes digitales Netz in Hamburg.',
-    kind: 'hybrid',
+
     themes: ['communication', 'community-network', 'infrastructure'],
     actions: ['use', 'learn', 'contribute', 'volunteer', 'contact'],
     languages: { codes: ['de'], source_ids: ['homepage'] },
     access: { type: 'public' },
     presence: {
       geographic: [
-        { id: 'community', mode: 'approximate', label: 'Community Hamburg' },
+        { id: 'community', mode: 'approximate', label: 'Community Hamburg', geometry: {type: 'Point', coordinates: [10, 53]}, uncertainty_meters_min: 5000 },
         { id: 'private', mode: 'hidden', label: 'Private Heimrouter' },
       ],
       digital: { available: true, reach: 'regional', label: 'Hamburger Community-Netz' },
@@ -38,7 +38,7 @@ const records = [
     themes: ['housing', 'community-land', 'shared-space'],
     actions: ['visit', 'learn', 'contact', 'replicate'],
     presence: {
-      geographic: [{ id: 'entrance', mode: 'exact', label: 'Rue Verheyden 121, Anderlecht' }],
+      geographic: [{ id: 'entrance', mode: 'exact', label: 'Rue Verheyden 121, Anderlecht', geometry: {type: 'Point', coordinates: [4.3, 50.8]} }],
       digital: { available: false },
     },
     activity: { status: 'active' },
@@ -83,7 +83,7 @@ test('multiple meaningful query terms intersect and title matches rank determini
 
 test('intent filters preserve identity and treat absent language or access as unknown', () => {
   const index = prepareIntentSearchIndex(records);
-  assert.deepEqual(index.search({ filters: { presence: 'hybrid' } }).map(({ id }) => id), ['freifunk-hamburg']);
+  assert.deepEqual(index.search({ filters: { presence: ['geographic', 'digital'] } }).map(({ id }) => id), ['freifunk-hamburg']);
   assert.deepEqual(index.search({ filters: { action: 'donate' } }).map(({ id }) => id), ['debian']);
   assert.deepEqual(index.search({ filters: { language: 'de' } }).map(({ id }) => id), ['freifunk-hamburg']);
   assert.deepEqual(index.search({ filters: { language: 'unknown' } }).map(({ id }) => id), ['debian', 'le-nid']);

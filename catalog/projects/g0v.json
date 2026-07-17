@@ -1,9 +1,8 @@
 {
-  "schema_version": 3,
+  "schema_version": 4,
   "id": "g0v",
   "title": "g0v",
   "summary": "Eine offene Civic-Tech-Gemeinschaft aus Taiwan, die öffentliche Probleme kollaborativ bearbeitet und Ergebnisse, Quellcode und Dokumentation als frei zugängliche digitale Gemeingüter veröffentlicht.",
-  "kind": "digital",
   "themes": [
     "civic-tech",
     "open-source",

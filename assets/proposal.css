@@ -58,6 +58,8 @@ body.proposal-page {
   outline-offset: 3px;
 }
 .proposal-form small { color: #b7c9c6; line-height: 1.45; }
+.proposal-form [data-disabled] { opacity: 0.58; }
+.proposal-form input:disabled { cursor: not-allowed; }
 .proposal-grid,
 .proposal-action-row { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 0.9rem; }
 .proposal-action-row { padding-top: 0.85rem; border-top: 1px solid rgba(203, 234, 227, 0.12); }

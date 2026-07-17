@@ -8,7 +8,7 @@
     "manual_catalog_layer_field_forbidden": true,
     "invented_geographic_coordinates_forbidden": true,
     "persistent_render_path_coordinates_forbidden": true,
-    "dual_presence_duplication_forbidden": true
+    "hybrid_identity_duplication_forbidden": true
   },
   "layer_model": {
     "order": [
@@ -159,7 +159,7 @@
     "single_selected_identity": true,
     "same_id_across_globe_sphere_side_view_search_and_linear": true,
     "view_change_must_preserve_selection": true,
-    "dual_presence_geographic_and_digital_representations_focus_together": true,
+    "hybrid_geographic_and_digital_representations_focus_together": true,
     "plain_language_test_de": "Ein Commons in einer Ansicht auswählen, in eine andere Ansicht wechseln und prüfen, ob dort derselbe Name markiert bleibt und dasselbe Fokuspanel geöffnet ist."
   },
   "accessibility": {
@@ -217,8 +217,7 @@
       "required_fields": [
         "full_name",
         "summary",
-        "has_geographic_presence",
-        "has_digital_presence",
+        "commons_kind",
         "themes",
         "actions",
         "digital_presence",

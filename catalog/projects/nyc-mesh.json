@@ -1,9 +1,8 @@
 {
-  "schema_version": 3,
+  "schema_version": 4,
   "id": "nyc-mesh",
   "title": "NYC Mesh",
   "summary": "Ein von Freiwilligen getragenes Gemeinschaftsnetz in New York City, das bezahlbaren Internetzugang, digitale Selbstbestimmung und gemeinsam aufgebaute lokale Infrastruktur verbindet.",
-  "kind": "hybrid",
   "themes": [
     "communication",
     "community-network",

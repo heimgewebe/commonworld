@@ -1,9 +1,8 @@
 {
-  "schema_version": 3,
+  "schema_version": 4,
   "id": "freifunk",
   "title": "Freifunk",
   "summary": "Eine nicht-kommerzielle Initiative für freie, gemeinschaftlich aufgebaute Kommunikationsnetze und offene digitale Infrastruktur.",
-  "kind": "digital",
   "themes": [
     "communication",
     "community-network"

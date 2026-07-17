@@ -11,10 +11,11 @@
   },
   "records": [
     {
-      "schema_version": 4,
+      "schema_version": 3,
       "id": "wikipedia-reference",
       "title": "Wikipedia",
       "summary": "Source-backed reference record for testing a globally available collaborative knowledge project without inventing a geographic coordinate.",
+      "kind": "digital",
       "themes": ["knowledge", "documentation"],
       "actions": ["use", "learn", "contribute"],
       "presence": {"geographic": [], "digital": {"available": true, "reach": "global", "label": "Free encyclopedia available online", "source_ids": ["wikimedia-projects"]}},
@@ -25,10 +26,11 @@
       "handoff": {"enabled": false}
     },
     {
-      "schema_version": 4,
+      "schema_version": 3,
       "id": "wikidata-reference",
       "title": "Wikidata",
       "summary": "Source-backed reference record for testing an open global knowledge base with a concise name and no fabricated physical location.",
+      "kind": "digital",
       "themes": ["knowledge", "open-data"],
       "actions": ["use", "learn", "contribute"],
       "presence": {"geographic": [], "digital": {"available": true, "reach": "global", "label": "Free knowledge base available online", "source_ids": ["wikimedia-projects"]}},
@@ -39,10 +41,11 @@
       "handoff": {"enabled": false}
     },
     {
-      "schema_version": 4,
+      "schema_version": 3,
       "id": "debian-reference",
       "title": "Debian",
       "summary": "Source-backed reference record for testing a free operating-system project in the software and shared infrastructure layer.",
+      "kind": "digital",
       "themes": ["free-software", "infrastructure"],
       "actions": ["use", "learn", "contribute", "donate"],
       "presence": {"geographic": [], "digital": {"available": true, "reach": "global", "label": "Free operating system and project infrastructure", "source_ids": ["debian-about"]}},
@@ -53,10 +56,11 @@
       "handoff": {"enabled": false}
     },
     {
-      "schema_version": 4,
+      "schema_version": 3,
       "id": "libreoffice-reference",
       "title": "LibreOffice",
       "summary": "Source-backed reference record for testing a community-created open-source office suite with a medium-length project name.",
+      "kind": "digital",
       "themes": ["open-source", "free-software"],
       "actions": ["use", "learn", "contribute", "donate"],
       "presence": {"geographic": [], "digital": {"available": true, "reach": "global", "label": "Open-source office suite available online", "source_ids": ["libreoffice-home"]}},
@@ -67,10 +71,11 @@
       "handoff": {"enabled": false}
     },
     {
-      "schema_version": 4,
+      "schema_version": 3,
       "id": "wikimedia-commons-reference",
       "title": "Wikimedia Commons",
       "summary": "Source-backed reference record for testing an open media collection whose longer name must remain readable in bounded glyph streams.",
+      "kind": "digital",
       "themes": ["open-media", "creative-commons"],
       "actions": ["use", "learn", "contribute"],
       "presence": {"geographic": [], "digital": {"available": true, "reach": "global", "label": "Free media collection available online", "source_ids": ["wikimedia-projects"]}},
@@ -81,10 +86,11 @@
       "handoff": {"enabled": false}
     },
     {
-      "schema_version": 4,
+      "schema_version": 3,
       "id": "wikisource-reference",
       "title": "Wikisource",
       "summary": "Source-backed reference record for testing a free-content library in the open media, archives and culture presentation layer.",
+      "kind": "digital",
       "themes": ["archives", "culture"],
       "actions": ["use", "learn", "contribute"],
       "presence": {"geographic": [], "digital": {"available": true, "reach": "global", "label": "Free-content library available online", "source_ids": ["wikimedia-projects"]}},
@@ -95,10 +101,11 @@
       "handoff": {"enabled": false}
     },
     {
-      "schema_version": 4,
+      "schema_version": 3,
       "id": "wikibooks-reference",
       "title": "Wikibooks",
       "summary": "Source-backed reference record for testing freely available textbook and learning material names in the education layer.",
+      "kind": "digital",
       "themes": ["education", "open-educational-resources"],
       "actions": ["use", "learn", "contribute"],
       "presence": {"geographic": [], "digital": {"available": true, "reach": "global", "label": "Free textbooks available online", "source_ids": ["wikimedia-projects"]}},
@@ -109,10 +116,11 @@
       "handoff": {"enabled": false}
     },
     {
-      "schema_version": 4,
+      "schema_version": 3,
       "id": "wikiversity-reference",
       "title": "Wikiversity",
       "summary": "Source-backed reference record for testing a free learning-resource project in the education and collaborative learning layer.",
+      "kind": "digital",
       "themes": ["learning", "education"],
       "actions": ["use", "learn", "contribute"],
       "presence": {"geographic": [], "digital": {"available": true, "reach": "global", "label": "Free learning resources available online", "source_ids": ["wikimedia-projects"]}},
@@ -123,10 +131,11 @@
       "handoff": {"enabled": false}
     },
     {
-      "schema_version": 4,
+      "schema_version": 3,
       "id": "freifunk-reference",
       "title": "Freifunk",
       "summary": "Source-backed reference record for testing a non-commercial initiative for free community communication networks.",
+      "kind": "digital",
       "themes": ["communication", "community-network"],
       "actions": ["use", "learn", "contribute", "volunteer", "donate"],
       "presence": {"geographic": [], "digital": {"available": true, "reach": "network", "label": "Community network information and participation online", "source_ids": ["freifunk-about"]}},
@@ -137,10 +146,11 @@
       "handoff": {"enabled": false}
     },
     {
-      "schema_version": 4,
+      "schema_version": 3,
       "id": "mastodon-reference",
       "title": "Mastodon",
       "summary": "Source-backed reference record for testing a decentralized interoperable communication platform in the federation layer.",
+      "kind": "digital",
       "themes": ["communication", "federation", "protocol"],
       "actions": ["use", "learn", "contribute", "donate"],
       "presence": {"geographic": [], "digital": {"available": true, "reach": "network", "label": "Federated social communication software and network", "source_ids": ["mastodon-home"]}},
@@ -151,10 +161,11 @@
       "handoff": {"enabled": false}
     },
     {
-      "schema_version": 4,
+      "schema_version": 3,
       "id": "openstreetmap-reference",
       "title": "OpenStreetMap",
       "summary": "Source-backed reference record for testing a cross-domain open-data and infrastructure project that must derive to the mixed layer on a score tie.",
+      "kind": "digital",
       "themes": ["open-data", "infrastructure"],
       "actions": ["use", "learn", "contribute", "donate"],
       "presence": {"geographic": [], "digital": {"available": true, "reach": "global", "label": "Community-maintained open map data", "source_ids": ["openstreetmap-about"]}},
@@ -165,10 +176,11 @@
       "handoff": {"enabled": false}
     },
     {
-      "schema_version": 4,
+      "schema_version": 3,
       "id": "meta-wiki-reference",
       "title": "Meta-Wiki Community Coordination and Documentation",
       "summary": "Source-backed long-name stress record for a cross-domain coordination and documentation project that must remain readable without becoming catalog truth.",
+      "kind": "digital",
       "themes": ["documentation", "communication"],
       "actions": ["use", "learn", "contribute"],
       "presence": {"geographic": [], "digital": {"available": true, "reach": "global", "label": "Community coordination and documentation online", "source_ids": ["wikimedia-projects"]}},

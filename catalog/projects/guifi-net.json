@@ -1,9 +1,8 @@
 {
-  "schema_version": 3,
+  "schema_version": 4,
   "id": "guifi-net",
   "title": "guifi.net",
   "summary": "Ein offenes, freies und neutrales Telekommunikationsnetz, dessen Infrastruktur als Gemeingut gemeinschaftlich aufgebaut, genutzt und von unterschiedlichen Teilnehmern gleichberechtigt weiterentwickelt wird.",
-  "kind": "hybrid",
   "themes": [
     "communication",
     "community-network",

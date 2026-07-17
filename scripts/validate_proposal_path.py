@@ -93,9 +93,9 @@ def validate(root: Path = ROOT) -> list[str]:
     if "sessionStorage" not in script or "60_000" not in script: errors.append("proposal client lacks bounded repeated-preparation control")
     if "window.open" not in script or "downloadJson" not in script: errors.append("proposal client lacks GitHub handoff or JSON fallback")
 
-    valid = load("tests/fixtures/proposals/valid.json")
-    if validate_fixture(valid, schema): errors.append("valid proposal fixture is rejected")
-    for fixture in ("missing-source.json", "javascript-url.json", "private-coordinates.json"):
+    for fixture in ("valid.json", "digital-only-valid.json"):
+        if validate_fixture(load(f"tests/fixtures/proposals/{fixture}"), schema): errors.append(f"valid proposal fixture is rejected: {fixture}")
+    for fixture in ("missing-source.json", "javascript-url.json", "private-coordinates.json", "geographic-missing-region.json"):
         if not validate_fixture(load(f"tests/fixtures/proposals/{fixture}"), schema): errors.append(f"invalid proposal fixture accepted: {fixture}")
     return errors
 

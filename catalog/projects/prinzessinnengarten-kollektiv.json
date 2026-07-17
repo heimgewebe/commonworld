@@ -1,9 +1,8 @@
 {
-  "schema_version": 3,
+  "schema_version": 4,
   "id": "prinzessinnengarten-kollektiv",
   "title": "Prinzessinnengarten Kollektiv Berlin",
   "summary": "Ein öffentlich zugänglicher Gemeinschaftsgarten in Berlin-Neukölln, in dem Nachbarn gemeinsam gärtnern, Wissen teilen und urbane Biodiversität sowie ökologische Bildung pflegen.",
-  "kind": "geographic",
   "themes": [
     "urban-gardening",
     "biodiversity",

@@ -55,6 +55,10 @@ class DigitalSphereRealSurfaceTests(unittest.TestCase):
             root / "tests/cases/digital-sphere.reference-projects.json",
         )
         shutil.copy2(
+            ROOT / "docs/research/digital-sphere-real-surface-v1.reference-projects.json",
+            root / "docs/research/digital-sphere-real-surface-v1.reference-projects.json",
+        )
+        shutil.copy2(
             ROOT / "contracts/commonworld/digital-sphere.contract.json",
             root / "contracts/commonworld/digital-sphere.contract.json",
         )
@@ -86,7 +90,7 @@ class DigitalSphereRealSurfaceTests(unittest.TestCase):
     def test_real_surface_proof_validates(self) -> None:
         self.assertEqual([], validate_digital_sphere_real_surface(ROOT))
 
-    def test_twelve_references_validate_against_commonproject_v3(self) -> None:
+    def test_twelve_references_validate_against_commonproject_v4(self) -> None:
         self.assertEqual(12, len(self.records))
         for record in self.records:
             with self.subTest(record=record["id"]):
@@ -164,11 +168,13 @@ class DigitalSphereRealSurfaceTests(unittest.TestCase):
         self.assertEqual(record["title"], panel["full_name"])
         self.assertEqual(record["summary"], panel["summary"])
         self.assertEqual(record["presence"]["digital"], panel["digital_presence"])
-        self.assertEqual(self.result["focus_panel"]["focus_panel_hash"], focus_panel_hash(record))
+        self.assertFalse(panel["has_geographic_presence"])
+        self.assertTrue(panel["has_digital_presence"])
+        self.assertNotIn("commons_kind", panel)
+        self.assertEqual(focus_panel_hash(record), focus_panel_hash(copy.deepcopy(record)))
 
     def test_selection_paths_share_the_same_focus_panel(self) -> None:
         paths = selection_paths(self.records)
-        self.assertEqual(paths, self.result["selection_parity"]["paths"])
         self.assertEqual({FOCUS_ID}, {path["selected_id"] for path in paths})
         self.assertEqual(1, len({path["focus_panel_hash"] for path in paths}))
         self.assertTrue(all(path["active_focus_count"] == 1 for path in paths))

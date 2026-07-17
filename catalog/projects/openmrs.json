@@ -1,9 +1,8 @@
 {
-  "schema_version": 3,
+  "schema_version": 4,
   "id": "openmrs",
   "title": "OpenMRS",
   "summary": "Eine weltweite Open-Source-Gemeinschaft, die ein frei verfügbares, anpassbares medizinisches Informationssystem gemeinschaftlich entwickelt und Wissen für lokale Gesundheitsversorgung offen teilt.",
-  "kind": "digital",
   "themes": [
     "health",
     "open-source",

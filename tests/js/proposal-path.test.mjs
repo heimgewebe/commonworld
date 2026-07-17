@@ -15,7 +15,8 @@ const fields = {
   description: "Eine gemeinschaftlich verwaltete Ressource mit offenen Regeln, primärnahen Quellen und einem realen öffentlichen Beteiligungsweg.",
   official_website: "https://example.org/commons",
   commons_type: "other",
-  presence_kind: "hybrid",
+  presence_geographic: true,
+  presence_digital: true,
   region: "Norddeutschland",
   actions: [{ type: "learn", url: "https://example.org/commons/about" }, { type: "", url: "" }, { type: "", url: "" }],
   sources: "https://example.org/commons/governance",
@@ -32,6 +33,24 @@ function validProposal() {
 
 test("gültiger Vorschlag erfüllt den Clientvertrag", () => {
   assert.deepEqual(validateProposal(validProposal()), []);
+});
+
+test("rein digitales Commons benötigt und erfindet keine Region", () => {
+  const proposal = proposalFromFields({ ...fields, presence_geographic: false, presence_digital: true, region: "" }, new Date("2026-07-16T12:00:00Z"));
+  assert.equal(Object.hasOwn(proposal.project, "region"), false);
+  assert.equal(Object.hasOwn(proposal.project, "location_precision"), false);
+  assert.deepEqual(validateProposal(proposal), []);
+  assert.match(buildIssueBody(proposal), /nicht zutreffend \(nur digital\)/u);
+
+  const fabricated = structuredClone(proposal);
+  fabricated.project.region = "Berlin";
+  assert.match(validateProposal(fabricated).join(" "), /rein digitaler Präsenz/u);
+});
+
+test("Vor-Ort-Präsenz benötigt eine grobe Region", () => {
+  const proposal = validProposal();
+  delete proposal.project.region;
+  assert.match(validateProposal(proposal).join(" "), /Region/u);
 });
 
 test("Pflichtquelle, unbekannte Felder und unsichere URLs werden abgelehnt", () => {

@@ -5,7 +5,7 @@
   "source_contracts": {
     "commonproject": {
       "id": "https://commonworld.net/contracts/commonworld/project.schema.json",
-      "schema_version": 4
+      "schema_version": 3
     },
     "aggregation_zoom": {
       "path": "contracts/commonworld/aggregation-zoom.contract.json",

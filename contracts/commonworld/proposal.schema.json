@@ -39,12 +39,11 @@
         "description",
         "official_website",
         "commons_type",
-        "presence_kind",
-        "region",
+        "presence_geographic",
+        "presence_digital",
         "actions",
         "sources",
-        "sensitive_location_risk",
-        "location_precision"
+        "sensitive_location_risk"
       ],
       "properties": {
         "name": {
@@ -78,13 +77,11 @@
             "other"
           ]
         },
-        "presence_kind": {
-          "type": "string",
-          "enum": [
-            "geographic",
-            "digital",
-            "hybrid"
-          ]
+        "presence_geographic": {
+          "type": "boolean"
+        },
+        "presence_digital": {
+          "type": "boolean"
         },
         "region": {
           "type": "string",
@@ -147,7 +144,61 @@
           "type": "string",
           "maxLength": 500
         }
-      }
+      },
+      "allOf": [
+        {
+          "anyOf": [
+            {
+              "properties": {
+                "presence_geographic": {
+                  "const": true
+                }
+              }
+            },
+            {
+              "properties": {
+                "presence_digital": {
+                  "const": true
+                }
+              }
+            }
+          ]
+        },
+        {
+          "if": {
+            "properties": {
+              "presence_geographic": {
+                "const": true
+              }
+            },
+            "required": [
+              "presence_geographic"
+            ]
+          },
+          "then": {
+            "required": [
+              "region",
+              "location_precision"
+            ]
+          },
+          "else": {
+            "not": {
+              "anyOf": [
+                {
+                  "required": [
+                    "region"
+                  ]
+                },
+                {
+                  "required": [
+                    "location_precision"
+                  ]
+                }
+              ]
+            }
+          }
+        }
+      ]
     },
     "consent": {
       "type": "object",

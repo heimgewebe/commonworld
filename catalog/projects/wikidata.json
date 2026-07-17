@@ -1,9 +1,8 @@
 {
-  "schema_version": 3,
+  "schema_version": 4,
   "id": "wikidata",
   "title": "Wikidata",
   "summary": "Eine freie, gemeinschaftlich gepflegte Wissensdatenbank, die strukturierte Daten für Menschen, Wikimedia-Projekte und weitere Anwendungen bereitstellt.",
-  "kind": "digital",
   "themes": [
     "knowledge",
     "open-data"

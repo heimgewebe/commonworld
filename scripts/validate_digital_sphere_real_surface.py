@@ -21,6 +21,8 @@ from scripts.validate_contracts import validation_errors
 RESULT = ROOT / "docs" / "research" / "digital-sphere-real-surface-v1.result.json"
 REPORT = ROOT / "docs" / "research" / "digital-sphere-real-surface-v1.md"
 REFERENCE_SET = ROOT / "tests" / "cases" / "digital-sphere.reference-projects.json"
+HISTORICAL_REFERENCE_SET = ROOT / "docs" / "research" / "digital-sphere-real-surface-v1.reference-projects.json"
+HISTORICAL_REFERENCE_SHA256 = "8e40c1566e02266be5930b660ad1ea678c1473cddfde63e057f11b582f5663ed"
 DIGITAL_CONTRACT = ROOT / "contracts" / "commonworld" / "digital-sphere.contract.json"
 V4_PERFORMANCE_RESULT = ROOT / "docs" / "research" / "device-acceptance-performance-v4.result.json"
 
@@ -67,6 +69,16 @@ def load_reference_set(root: Path = ROOT) -> dict[str, Any]:
 
 def load_records(root: Path = ROOT) -> list[dict[str, Any]]:
     data = load_reference_set(root)
+    records = data.get("records", [])
+    return [record for record in records if isinstance(record, dict)]
+
+
+def load_historical_reference_set(root: Path = ROOT) -> dict[str, Any]:
+    return _load_json(_path(root, HISTORICAL_REFERENCE_SET))
+
+
+def load_historical_records(root: Path = ROOT) -> list[dict[str, Any]]:
+    data = load_historical_reference_set(root)
     records = data.get("records", [])
     return [record for record in records if isinstance(record, dict)]
 
@@ -149,7 +161,8 @@ def focus_panel(record: dict[str, Any]) -> dict[str, Any]:
         "project_id": record["id"],
         "full_name": record["title"],
         "summary": record["summary"],
-        "commons_kind": record["kind"],
+        "has_geographic_presence": bool(record.get("presence", {}).get("geographic", [])),
+        "has_digital_presence": record.get("presence", {}).get("digital", {}).get("available") is True,
         "themes": list(record["themes"]),
         "actions": list(record["actions"]),
         "digital_presence": copy.deepcopy(record["presence"]["digital"]),
@@ -160,6 +173,14 @@ def focus_panel(record: dict[str, Any]) -> dict[str, Any]:
     }
 
 
+def historical_focus_panel(record: dict[str, Any]) -> dict[str, Any]:
+    panel = focus_panel(record)
+    panel.pop("has_geographic_presence")
+    panel.pop("has_digital_presence")
+    panel["commons_kind"] = record["kind"]
+    return panel
+
+
 def stable_hash(value: Any) -> str:
     encoded = json.dumps(value, ensure_ascii=False, sort_keys=True, separators=(",", ":")).encode("utf-8")
     return hashlib.sha256(encoded).hexdigest()
@@ -167,6 +188,10 @@ def stable_hash(value: Any) -> str:
 
 def focus_panel_hash(record: dict[str, Any]) -> str:
     return stable_hash(focus_panel(record))
+
+
+def historical_focus_panel_hash(record: dict[str, Any]) -> str:
+    return stable_hash(historical_focus_panel(record))
 
 
 def source_camera_state() -> dict[str, Any]:
@@ -220,9 +245,9 @@ def camera_transition(reduced_motion: bool = False) -> dict[str, Any]:
     }
 
 
-def selection_paths(records: list[dict[str, Any]]) -> list[dict[str, Any]]:
+def selection_paths(records: list[dict[str, Any]], *, historical: bool = False) -> list[dict[str, Any]]:
     record = next(item for item in records if item["id"] == FOCUS_ID)
-    panel_hash = focus_panel_hash(record)
+    panel_hash = historical_focus_panel_hash(record) if historical else focus_panel_hash(record)
     paths = (
         "digital_sphere_edge",
         "layer_button",
@@ -381,8 +406,7 @@ def _validate_reference_records(root: Path, records: list[dict[str, Any]]) -> li
         record_id = record.get("id", "<missing>")
         for message in validation_errors(record, root):
             errors.append(f"reference record {record_id} invalid: {message}")
-        if record.get("kind") != "digital":
-            errors.append(f"reference record {record_id} must remain fully digital")
+
         digital = record.get("presence", {}).get("digital", {})
         if not isinstance(digital, dict) or digital.get("available") is not True:
             errors.append(f"reference record {record_id} must have digital presence")
@@ -456,7 +480,7 @@ def _validate_focus_and_selection(result: dict[str, Any], records: list[dict[str
     focus_record = next((record for record in records if record["id"] == FOCUS_ID), None)
     if focus_record is None:
         return ["focus reference record missing"]
-    expected_hash = focus_panel_hash(focus_record)
+    expected_hash = historical_focus_panel_hash(focus_record)
     focus = result.get("focus_panel", {})
     required_fields = [
         "full_name", "summary", "commons_kind", "themes", "actions",
@@ -471,7 +495,7 @@ def _validate_focus_and_selection(result: dict[str, Any], records: list[dict[str
     if "Referenzdatensatz" not in str(focus.get("reference_dataset_notice", "")):
         errors.append("focus panel must clearly mark the non-public reference dataset")
 
-    expected_paths = selection_paths(records)
+    expected_paths = selection_paths(records, historical=True)
     selection = result.get("selection_parity", {})
     if selection.get("paths") != expected_paths:
         errors.append("selection parity paths must keep the same id and focus panel hash")
@@ -618,7 +642,7 @@ def _validate_boundaries(result: dict[str, Any]) -> list[str]:
 
 def validate_digital_sphere_real_surface(root: Path = ROOT) -> list[str]:
     errors: list[str] = []
-    required = (RESULT, REPORT, REFERENCE_SET, DIGITAL_CONTRACT, V4_PERFORMANCE_RESULT)
+    required = (RESULT, REPORT, REFERENCE_SET, HISTORICAL_REFERENCE_SET, DIGITAL_CONTRACT, V4_PERFORMANCE_RESULT)
     for path in required:
         if not _path(root, path).is_file():
             errors.append(f"missing required real-surface file: {path.relative_to(ROOT)}")
@@ -628,7 +652,9 @@ def validate_digital_sphere_real_surface(root: Path = ROOT) -> list[str]:
     try:
         result = load_result(root)
         reference_set = load_reference_set(root)
-        records = load_records(root)
+        current_records = load_records(root)
+        historical_reference_set = load_historical_reference_set(root)
+        records = load_historical_records(root)
     except (OSError, json.JSONDecodeError) as error:
         return [f"invalid real-surface proof input: {error}"]
 
@@ -656,7 +682,30 @@ def validate_digital_sphere_real_surface(root: Path = ROOT) -> list[str]:
     if contract_topics != dict(LAYER_TOPICS):
         errors.append("digital sphere contract topic mapping does not match real-surface derivation")
 
-    errors.extend(_validate_reference_records(root, records))
+    errors.extend(_validate_reference_records(root, current_records))
+    for record in current_records:
+        if record.get("schema_version") != 4 or "kind" in record:
+            errors.append(f"current reference record must use CommonProject v4 without kind: {record.get('id')}")
+
+    historical_path = _path(root, HISTORICAL_REFERENCE_SET)
+    if hashlib.sha256(historical_path.read_bytes()).hexdigest() != HISTORICAL_REFERENCE_SHA256:
+        errors.append("historical digital-sphere reference snapshot was rewritten")
+    if historical_reference_set.get("kind") != reference_set.get("kind"):
+        errors.append("historical and current reference-set identities differ")
+    current_by_id = {record.get("id"): record for record in current_records}
+    historical_by_id = {record.get("id"): record for record in records}
+    if set(current_by_id) != set(historical_by_id):
+        errors.append("current reference migration changed the identity set")
+    else:
+        for identifier, historical in historical_by_id.items():
+            current = copy.deepcopy(current_by_id[identifier])
+            historical_copy = copy.deepcopy(historical)
+            current.pop("schema_version", None)
+            historical_copy.pop("schema_version", None)
+            historical_copy.pop("kind", None)
+            if current != historical_copy:
+                errors.append(f"current reference migration changed data beyond schema_version and kind: {identifier}")
+
     source = result.get("source_reference_set", {})
     if source != {
         "path": "tests/cases/digital-sphere.reference-projects.json",
@@ -686,7 +735,7 @@ def validate_digital_sphere_real_surface(root: Path = ROOT) -> list[str]:
     errors.extend(_validate_name_presentation(result, records))
     errors.extend(_validate_focus_and_selection(result, records))
     errors.extend(_validate_camera(result))
-    errors.extend(_validate_performance_and_shell(root, result, records))
+    errors.extend(_validate_performance_and_shell(root, result, current_records))
     errors.extend(_validate_boundaries(result))
 
     report = _report_text(root)

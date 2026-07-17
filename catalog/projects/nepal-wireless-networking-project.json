@@ -1,9 +1,8 @@
 {
-  "schema_version": 3,
+  "schema_version": 4,
   "id": "nepal-wireless-networking-project",
   "title": "Nepal Wireless Networking Project",
   "summary": "Ein von lokalen Gemeinschaften und E-Networking Research and Development getragenes ländliches Kommunikationsnetz in Nepal, das gemeinsam gewartete Funkinfrastruktur, Bildung und lokale Dienste verbindet.",
-  "kind": "hybrid",
   "themes": [
     "communication",
     "community-network",

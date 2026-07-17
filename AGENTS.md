@@ -21,7 +21,7 @@ Commonworld stays readable without an account and does not create a second admin
 
 - Start from the complete globe.
 - Use semantic zoom: planet, macroregion, region, local, focus.
-- Keep geographic, digital and hybrid Commons in one coherent surface.
+- Keep geographic and digital Commons in one coherent surface.
 - Never invent coordinates for digital or hidden-location Commons.
 - Keep hue, intensity, geometry and data coverage semantically distinct.
 - Distinguish missing data from low Commons density.
@@ -54,7 +54,7 @@ Every public-runtime change must preserve:
 Product order:
 
 1. Current truth and failure-safe shell.
-2. Real geographic and hybrid vertical slice.
+2. Real geographic and digital vertical slice.
 3. Intent-oriented discovery.
 4. Static machine-surface and findability scaling.
 5. Balanced catalog growth and explicit Weltgewebe handoff.

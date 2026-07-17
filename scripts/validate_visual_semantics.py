@@ -239,12 +239,12 @@ def validate_visual_semantics(root: Path = ROOT) -> list[str]:
     if contract.get("schema_version") != 1:
         errors.append("visual semantics schema_version must be 1")
     sources = contract.get("source_contracts", {})
-    if sources.get("commonproject", {}).get("schema_version") != 3:
-        errors.append("visual semantics must bind to CommonProject v3")
+    if sources.get("commonproject", {}).get("schema_version") != 4:
+        errors.append("visual semantics must bind to CommonProject v4")
     if sources.get("aggregation_zoom", {}).get("schema_version") != 1:
         errors.append("visual semantics must bind to aggregation zoom v1")
-    if project_schema.get("properties", {}).get("schema_version", {}).get("const") != 3:
-        errors.append("loaded CommonProject schema must remain version 3")
+    if project_schema.get("properties", {}).get("schema_version", {}).get("const") != 4:
+        errors.append("loaded CommonProject schema must remain version 4")
     if zoom_contract.get("schema_version") != 1:
         errors.append("loaded aggregation zoom contract must remain version 1")
 

@@ -200,16 +200,22 @@ class PublicCatalogTests(unittest.TestCase):
                 for location in record.get("presence", {}).get("geographic", [])
             )
         }
-        kind_counts = {
-            kind: sum(record.get("kind") == kind for record in records)
-            for kind in ("geographic", "digital", "hybrid")
-        }
+        kind_counts = {"geographic": 0, "digital": 0, "dual": 0}
+        for record in records:
+            geo = bool(record.get("presence", {}).get("geographic"))
+            dig = record.get("presence", {}).get("digital", {}).get("available") is True
+            if geo and dig:
+                kind_counts["dual"] += 1
+            elif geo:
+                kind_counts["geographic"] += 1
+            elif dig:
+                kind_counts["digital"] += 1
 
         self.assertGreaterEqual(manifest["entry_count"], 30)
         self.assertTrue(expected_growth.issubset(identifiers))
         self.assertGreaterEqual(len(spatial_identities), 10)
         self.assertGreaterEqual(kind_counts["geographic"], 4)
-        self.assertGreaterEqual(kind_counts["hybrid"], 6)
+        self.assertGreaterEqual(kind_counts["dual"], 6)
         self.assertTrue(any(longitude < -30 for longitude, _ in public_points))
         self.assertTrue(any(latitude < 0 for _, latitude in public_points))
         self.assertTrue(any("borrow" in record.get("actions", []) for record in records))

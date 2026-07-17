@@ -76,8 +76,7 @@ def validate_public_seed_baseline(root: Path = ROOT) -> list[str]:
             continue
         if record.get("id") != identifier:
             errors.append(f"public seed project file must retain identity: {identifier}")
-        if record.get("kind") != "digital":
-            errors.append(f"public seed project {identifier} must remain digital")
+
         presence = record.get("presence", {}) if isinstance(record.get("presence"), dict) else {}
         digital = presence.get("digital", {}) if isinstance(presence.get("digital"), dict) else {}
         if presence.get("geographic") != []:

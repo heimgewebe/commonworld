@@ -63,6 +63,7 @@ class MapLibrePhase2ProofTests(unittest.TestCase):
         self.assertEqual(5000, evidence["unique_identities"])
         self.assertEqual(4000, evidence["geographic_representations"])
         self.assertEqual(2000, evidence["digital_representations"])
+        # Historical benchmark field name retained for evidence compatibility.
         self.assertEqual(1000, evidence["hybrid_identities"])
         self.assertEqual(5000, evidence["union_identities"])
 

@@ -1,9 +1,8 @@
 {
-  "schema_version": 3,
+  "schema_version": 4,
   "id": "new-mexico-acequia-association",
   "title": "New Mexico Acequia Association",
   "summary": "Ein Verband in New Mexico, der gemeinschaftlich verwaltete Bewässerungskanäle, demokratische Wasserverwaltung, traditionelle Landwirtschaft und die Handlungsfähigkeit lokaler Acequia-Gemeinschaften unterstützt.",
-  "kind": "hybrid",
   "themes": [
     "water",
     "irrigation",

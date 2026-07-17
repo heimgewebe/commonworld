@@ -1,9 +1,8 @@
 {
-  "schema_version": 3,
+  "schema_version": 4,
   "id": "debian",
   "title": "Debian",
   "summary": "Ein gemeinschaftlich entwickeltes freies Betriebssystem mit offenem Paketarchiv, öffentlicher Dokumentation und weltweiter Mitwirkung.",
-  "kind": "digital",
   "themes": [
     "free-software",
     "infrastructure"

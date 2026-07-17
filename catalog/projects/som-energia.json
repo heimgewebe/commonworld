@@ -1,9 +1,8 @@
 {
-  "schema_version": 3,
+  "schema_version": 4,
   "id": "som-energia",
   "title": "Som Energia",
   "summary": "Eine gemeinnützige Energiegenossenschaft in Spanien, deren Mitglieder erneuerbare Energieversorgung, gemeinschaftliche Erzeugungsprojekte und lokale Gruppen demokratisch tragen und weiterentwickeln.",
-  "kind": "hybrid",
   "themes": [
     "energy",
     "renewable-energy",
