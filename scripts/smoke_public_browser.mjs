@@ -1094,10 +1094,20 @@ async function layerJourneyScenario({ mobile = false, viewportOverride = null, t
   assert(viewportFit.documentWidth <= viewportFit.viewportWidth + 1, `layer journey: horizontal overflow (${JSON.stringify(viewportFit)})`);
   if (touch) assert(viewportFit.controls.every(({ width, height }) => width >= 44 && height >= 44), `layer journey: undersized mobile layer control (${JSON.stringify(viewportFit.controls)})`);
 
-  await run.page.evaluate(() => {
+  await run.page.evaluate((delayReturnFocus) => {
     window.__commonworldCameraCommands = [];
     window.__commonworldPhaseLog = [];
-  });
+    if (!delayReturnFocus) return;
+    const stage = document.querySelector('.globe-stage');
+    const edge = document.querySelector('#sphere-edge-control');
+    const observer = new MutationObserver(() => {
+      if (stage.dataset.viewPhase !== 'overview') return;
+      observer.disconnect();
+      edge.setAttribute('inert', '');
+      window.setTimeout(() => edge.removeAttribute('inert'), 80);
+    });
+    observer.observe(stage, { attributes: true, attributeFilter: ['data-view-phase'] });
+  }, touch);
   await run.page.locator('#layer-close').click();
   await run.page.waitForSelector('.globe-stage[data-view-phase="preparing-overview"]');
   const preparingOverviewUrlCamera = Object.fromEntries(
@@ -1120,6 +1130,7 @@ async function layerJourneyScenario({ mobile = false, viewportOverride = null, t
   await run.page.waitForFunction(() => Number(getComputedStyle(document.querySelector('#map')).opacity) >= 0.98);
   assert(await run.page.locator('#map').getAttribute('inert') === null, 'layer journey: returned globe remains inert');
   assert((await run.page.locator('#sphere-edge-control').getAttribute('tabindex')) === '0', 'layer journey: sphere trigger was not restored');
+  await run.page.waitForFunction(() => document.activeElement?.id === 'sphere-edge-control');
   assert((await run.page.evaluate(() => document.activeElement?.id)) === 'sphere-edge-control', 'layer journey: focus did not return to the clicked sphere edge');
   assert(run.consoleErrors.length === 0, `layer journey: console errors: ${run.consoleErrors.join(' | ')}`);
   assert(run.pageErrors.length === 0, `layer journey: page errors: ${run.pageErrors.join(' | ')}`);

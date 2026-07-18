@@ -151,6 +151,7 @@ const runtime = {
   viewTransitionCleanup: null,
   layerPanelReady: false,
   layerReturnTarget: null,
+  layerReturnFocusTimer: null,
   spherePointerStart: null,
   lastSpherePointerActivation: 0,
   applyingHistory: false,
@@ -1441,6 +1442,8 @@ function clearViewTransition() {
   runtime.cameraFlightCleanup = null;
   runtime.viewTransitionCleanup?.();
   runtime.viewTransitionCleanup = null;
+  window.clearTimeout(runtime.layerReturnFocusTimer);
+  runtime.layerReturnFocusTimer = null;
 }
 
 function startCameraFlight(camera, { instant = false, duration = 260, onSettled = () => {} } = {}) {
@@ -1594,6 +1597,31 @@ function showLayerState() {
   }
 }
 
+const LAYER_RETURN_FOCUS_RETRY_DELAYS_MS = [0, 50, 150, 400];
+
+function restoreLayerReturnFocus() {
+  const target = runtime.layerReturnTarget instanceof Element && runtime.layerReturnTarget.isConnected
+    ? runtime.layerReturnTarget
+    : elements.layerToggle;
+  runtime.layerReturnTarget = null;
+  let attempt = 0;
+  const tryFocus = () => {
+    runtime.layerReturnFocusTimer = null;
+    if (document.activeElement === target) return;
+    const active = document.activeElement;
+    const userSelectedAnotherTarget = active !== document.body
+      && active !== document.documentElement
+      && isVisibleFocusTarget(active);
+    if (attempt > 0 && userSelectedAnotherTarget) return;
+    if (isVisibleFocusTarget(target)) target.focus({ preventScroll: true });
+    if (document.activeElement === target) return;
+    attempt += 1;
+    if (attempt >= LAYER_RETURN_FOCUS_RETRY_DELAYS_MS.length) return;
+    runtime.layerReturnFocusTimer = window.setTimeout(tryFocus, LAYER_RETURN_FOCUS_RETRY_DELAYS_MS[attempt]);
+  };
+  runtime.layerReturnFocusTimer = window.setTimeout(tryFocus, LAYER_RETURN_FOCUS_RETRY_DELAYS_MS[attempt]);
+}
+
 function finishViewTransition(phase, { restoreFocus = false } = {}) {
   clearViewTransition();
   runtime.layerPanelReady = false;
@@ -1611,10 +1639,7 @@ function finishViewTransition(phase, { restoreFocus = false } = {}) {
       }
     });
   }
-  if (phase === 'overview' && restoreFocus) {
-    (runtime.layerReturnTarget ?? elements.layerToggle).focus({ preventScroll: true });
-    runtime.layerReturnTarget = null;
-  }
+  if (phase === 'overview' && restoreFocus) restoreLayerReturnFocus();
 }
 
 function openLayerView({ historyMode = 'push', cameraState = null, instant = false, trigger = document.activeElement } = {}) {
