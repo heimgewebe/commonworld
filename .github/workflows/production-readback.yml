@@ -1,0 +1,59 @@
+name: production-readback
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  deployments: read
+
+concurrency:
+  group: commonworld-production-readback-${{ github.sha }}
+  cancel-in-progress: false
+
+jobs:
+  verify-exact-pages-deployment:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - name: Check out exact commit
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.sha }}
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Verify exact Pages deployment and public content
+        id: readback
+        continue-on-error: true
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+          COMMONWORLD_PAGES_URL: https://commonworld.net/
+        run: >-
+          python3 scripts/verify_pages_deployment.py
+          --repository "${{ github.repository }}"
+          --sha "${{ github.sha }}"
+          --receipt artifacts/commonworld-pages-production-readback.json
+          --deployment-timeout-seconds 600
+          --deployment-poll-seconds 10
+          --live-timeout-seconds 5
+          --live-retry-delays-seconds 0,30,90
+
+      - name: Upload production readback receipt
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: commonworld-pages-production-readback-${{ github.sha }}
+          path: artifacts/commonworld-pages-production-readback.json
+          if-no-files-found: error
+          retention-days: 30
+
+      - name: Enforce production readback result
+        if: always() && steps.readback.outcome != 'success'
+        run: exit 1

@@ -699,6 +699,12 @@ GitHub Pages ist für den heutigen statischen, kontolosen Commonworld-Katalog al
 
 Die öffentliche OpenFreeMap-Instanz ist als Kartenlieferant ausgewählt, aber ausdrücklich nicht kritisch: Es werden weder SLA, Gewährleistung, Fortbestand noch personalisierte Unterstützung behauptet. Bei einem Kartenfehler bleiben die vollständige lineare Ansicht, Auswahl und Fokusinformationen verfügbar; die Oberfläche zeigt den degradierten Kartenzustand. Ein Anbieterwechsel, Selbsthosting, ein Backend oder automatisches Failover benötigen jeweils einen eigenen geprüften Implementierungsball. Der ausführbare Vertrag liegt in `contracts/commonworld/production-delivery-provider.contract.json`; Auswertung und Quellen stehen unter `docs/research/production-delivery-provider-v1.*`.
 
+### Commitgebundener Produktions-Readback v1
+
+Ein erfolgreicher GitHub-Pages-Status allein gilt nicht als Beweis, dass der neue Stand bereits öffentlich ausgeliefert wird. Nach jedem Push auf `main` wartet ein eigener Read-only-Workflow auf ein `github-pages`-Deployment mit exakt demselben Commit-SHA und führt danach den bestehenden hashgebundenen Live-Smoke gegen `commonworld.net` aus. Veraltete erfolgreiche Deployments werden nicht akzeptiert.
+
+Deployment-Warten, Dateiabrufe und CDN-Propagation sind zeitlich begrenzt. Der maschinenlesbare Beleg enthält Commit, Deployment-ID, beobachtete Zustände, Versuche und den vollständigen Live-Smoke-Beleg. Auch ein Fehlschlag hinterlässt einen Beleg. Die Prüfung autorisiert weder automatisches Rollback noch DNS-Mutation, Anbieterwechsel, SLA oder automatisches Failover; diese Entscheidungen bleiben eigene geprüfte Aufgaben.
+
 ## Qualitäts- und Publikationszustände
 
 - `candidate`: geprüft werden, nicht im Hauptkatalog;

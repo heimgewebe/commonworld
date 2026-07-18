@@ -15,6 +15,8 @@ class ProductionDeliveryProviderTests(unittest.TestCase):
         "assets/map/openfreemap-liberty.json",
         "catalog/catalog.json",
         "docs/ops/pages-dns.md",
+        ".github/workflows/production-readback.yml",
+        "scripts/verify_pages_deployment.py",
         "docs/research/evidence/public-maplibre-vertical-slice-v1.catalog.json",
     )
 
@@ -56,6 +58,33 @@ class ProductionDeliveryProviderTests(unittest.TestCase):
             self.mutate_json(root, self.REQUIRED[0], lambda value: value["failure_contract"].update({"provider_outage": "map_unavailable"}))
             errors = validate_production_delivery_provider(root)
         self.assertIn("provider outage must preserve the linear catalog", errors)
+
+    def test_production_readback_must_remain_exact_and_bounded(self) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            root = self.copy_contract(directory)
+            self.mutate_json(
+                root,
+                self.REQUIRED[0],
+                lambda value: value["monitoring"]["pages_production_readback"].update(
+                    {"commit_binding": "latest_successful", "automatic_rollback": True}
+                ),
+            )
+            errors = validate_production_delivery_provider(root)
+        self.assertIn("production readback boundary mismatch: commit_binding", errors)
+        self.assertIn("production readback boundary mismatch: automatic_rollback", errors)
+
+    def test_production_readback_retry_schedule_is_bounded(self) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            root = self.copy_contract(directory)
+            self.mutate_json(
+                root,
+                self.REQUIRED[0],
+                lambda value: value["monitoring"]["pages_production_readback"].update(
+                    {"live_retry_delays_seconds": [0, 30, 90, 180]}
+                ),
+            )
+            errors = validate_production_delivery_provider(root)
+        self.assertIn("production readback boundary mismatch: live_retry_delays_seconds", errors)
 
     def test_migration_requires_separate_task(self) -> None:
         with tempfile.TemporaryDirectory() as directory:

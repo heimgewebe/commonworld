@@ -38,6 +38,7 @@ REQUIRED_PLAN_TOKENS = (
     "### Globe-first Oberfläche v1",
     "### Hierarchische digitale Ringbündel v1",
     "### Begrenzte Produktions- und Anbieterentscheidung v1",
+    "### Commitgebundener Produktions-Readback v1",
     "### Vorläufige Darstellungsschichten",
     "### Dieselbe Auswahl in allen Ansichten",
     "## Digitale Commons-Sphäre",
@@ -135,6 +136,7 @@ EXPECTED_SCRIPT_FILES = {
     "validate_contracts.py",
     "validate_current_state.py",
     "validate_production_delivery_provider.py",
+    "verify_pages_deployment.py",
     "validate_public_catalog.py",
     "validate_public_maplibre_vertical_slice.py",
     "validate_public_seed_baseline.py",
@@ -164,6 +166,7 @@ EXPECTED_TEST_FILES = {
     "test_pages_dns_target.py",
     "test_pages_live_smoke.py",
     "test_production_delivery_provider.py",
+    "test_verify_pages_deployment.py",
     "test_public_catalog.py",
     "test_public_maplibre_vertical_slice.py",
     "test_public_seed_baseline.py",
@@ -183,7 +186,7 @@ EXPECTED_TEST_FILES = {
     "test_semantic_zoom.py",
     "test_visual_semantics.py",
 }
-EXPECTED_WORKFLOW_FILES = {"validate.yml"}
+EXPECTED_WORKFLOW_FILES = {"production-readback.yml", "validate.yml"}
 REQUIRED_CHECK_CATALOG = {
     "schema_version": 1,
     "required_checks": ["contracts"],

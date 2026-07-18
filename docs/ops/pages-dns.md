@@ -64,10 +64,28 @@ make smoke-pages-live
 Expected receipt id:
 
 ```text
-commonworld.pages-live.canonical-shell.v2
+commonworld.pages-live.globe-first-and-proposal.v7
 ```
 
 The delivery smoke is read-only. It verifies that the canonical Commonworld shell is served and rejects parking, login, backend and removed-development content.
+
+## Automated exact-commit production readback
+
+Every push to `main` also starts `.github/workflows/production-readback.yml`. The workflow does not treat a green Pages build as sufficient proof. It waits at most 600 seconds for a `github-pages` deployment whose SHA is the exact commit checked out by the workflow. Older successful deployments are ignored.
+
+After that exact deployment reports success, the workflow reuses `scripts/smoke_pages_live.py`. The existing smoke compares the public shell, proposal page, catalog and runtime assets with the checked-out commit. Each automated file request is bounded to five seconds. The existing smoke checks the shell, proposal page, catalog and six runtime assets; the orchestrator additionally binds `index.html`, `propose.html` and `catalog/catalog.json` byte-for-byte to the checked-out commit. CDN propagation is retried only as three complete cycles with the fixed delays `0, 30, 90` seconds. Together with the inner one-retry-per-URL limit, even twelve public files consuming their full request windows remain inside the 20-minute workflow boundary. There is no unbounded retry.
+
+The machine-readable artifact is retained for 30 days under the receipt id:
+
+```text
+commonworld.pages-production-readback.v1
+```
+
+The JSON receipt records the expected commit, selected deployment id and state, deployment observations, live attempts and the complete nested live-smoke receipt. It is uploaded even when the workflow fails.
+
+A red readback does not authorize DNS mutation, provider migration or automatic recovery. There is no automatic rollback. Operators must distinguish a deployment failure, CDN propagation, DNS failure and a client-network problem before applying the separately reviewed rollback contract.
+
+The same workflow can be started manually with `workflow_dispatch`; it still binds itself to the exact commit selected by GitHub Actions.
 
 ## Change boundary
 
