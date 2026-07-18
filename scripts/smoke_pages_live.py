@@ -5,10 +5,12 @@ from __future__ import annotations
 
 import argparse
 import hashlib
+import http.client
 import json
 import os
 import ssl
 import sys
+import time
 import urllib.error
 import urllib.request
 from dataclasses import asdict, dataclass
@@ -18,6 +20,9 @@ from urllib.parse import urljoin
 ROOT = Path(__file__).resolve().parents[1]
 URL_ENV = "COMMONWORLD_PAGES_URL"
 MIN_BODY_BYTES = 10_000
+MAX_RETRY_COUNT = 1
+RETRY_DELAY_SECONDS = 0.5
+RETRYABLE_HTTP_STATUSES = frozenset({429, 500, 502, 503, 504})
 CATALOG_RELATIVE_URL = "catalog/catalog.json"
 PROPOSAL_RELATIVE_URL = "propose.html"
 PROPOSAL_REQUIRED_TOKENS = (
@@ -93,12 +98,30 @@ RUNTIME_ASSETS = (
 
 
 @dataclass(frozen=True)
+class FetchAttemptReceipt:
+    attempt: int
+    outcome: str
+    status: int | None
+    final_url: str | None
+    error_type: str | None
+    duration_ms: int
+    retryable: bool
+
+
+class LiveFetchError(RuntimeError):
+    def __init__(self, message: str, attempts: list[FetchAttemptReceipt]) -> None:
+        self.attempts = tuple(attempts)
+        super().__init__(f"{message}; attempts={_attempts_summary(attempts)}")
+
+
+@dataclass(frozen=True)
 class LiveFetch:
     requested_url: str
     final_url: str
     status: int
     content_type: str
     body: str
+    attempts: tuple[FetchAttemptReceipt, ...] = ()
 
 
 @dataclass(frozen=True)
@@ -110,6 +133,7 @@ class RuntimeAssetReceipt:
     content_type: str
     body_bytes: int
     sha256: str
+    attempts: tuple[FetchAttemptReceipt, ...]
 
 
 @dataclass(frozen=True)
@@ -120,6 +144,7 @@ class PagesLiveSmokeReceipt:
     status: int
     content_type: str
     body_bytes: int
+    page_attempts: tuple[FetchAttemptReceipt, ...]
     required_tokens: tuple[str, ...]
     forbidden_tokens_absent: tuple[str, ...]
     proposal_requested_url: str
@@ -127,11 +152,13 @@ class PagesLiveSmokeReceipt:
     proposal_status: int
     proposal_content_type: str
     proposal_body_bytes: int
+    proposal_attempts: tuple[FetchAttemptReceipt, ...]
     proposal_required_tokens: tuple[str, ...]
     catalog_requested_url: str
     catalog_final_url: str
     catalog_status: int
     catalog_content_type: str
+    catalog_attempts: tuple[FetchAttemptReceipt, ...]
     catalog_kind: str
     catalog_entry_count: int
     catalog_project_files: tuple[str, ...]
@@ -151,29 +178,141 @@ def default_url(root: Path = ROOT) -> str:
     return "https://heimgewebe.github.io/commonworld/"
 
 
+def _duration_ms(started_at: float) -> int:
+    return max(0, round((time.monotonic() - started_at) * 1000))
+
+
+def _attempts_summary(attempts: list[FetchAttemptReceipt]) -> str:
+    return json.dumps([asdict(attempt) for attempt in attempts], sort_keys=True, separators=(",", ":"))
+
+
 def fetch_live_url(
     url: str,
     timeout_seconds: int = 20,
     insecure: bool = False,
     accept: str = "text/html,application/xhtml+xml",
+    retry_count: int = MAX_RETRY_COUNT,
+    retry_delay_seconds: float = RETRY_DELAY_SECONDS,
 ) -> LiveFetch:
+    if retry_count not in (0, 1):
+        raise ValueError("retry_count must be 0 or 1")
+    if retry_delay_seconds < 0:
+        raise ValueError("retry_delay_seconds must be non-negative")
+
     request = urllib.request.Request(
         url,
-        headers={"User-Agent": "commonworld-pages-live-smoke/4.0", "Accept": accept},
+        headers={"User-Agent": "commonworld-pages-live-smoke/5.0", "Accept": accept},
     )
     context = ssl._create_unverified_context() if insecure else None
-    try:
-        with urllib.request.urlopen(request, timeout=timeout_seconds, context=context) as response:
-            raw = response.read()
-            return LiveFetch(
-                requested_url=url,
-                final_url=response.geturl(),
-                status=int(response.status),
-                content_type=response.headers.get("content-type", ""),
-                body=raw.decode(response.headers.get_content_charset() or "utf-8", errors="strict"),
+    attempts: list[FetchAttemptReceipt] = []
+
+    for attempt_number in range(1, retry_count + 2):
+        started_at = time.monotonic()
+        try:
+            with urllib.request.urlopen(request, timeout=timeout_seconds, context=context) as response:
+                raw = response.read()
+                status = int(response.status)
+                final_url = response.geturl()
+                content_type = response.headers.get("content-type", "")
+                charset = response.headers.get_content_charset() or "utf-8"
+        except urllib.error.HTTPError as error:
+            status = int(error.code)
+            retryable = status in RETRYABLE_HTTP_STATUSES
+            attempts.append(
+                FetchAttemptReceipt(
+                    attempt=attempt_number,
+                    outcome="http_error",
+                    status=status,
+                    final_url=error.geturl(),
+                    error_type=type(error).__name__,
+                    duration_ms=_duration_ms(started_at),
+                    retryable=retryable,
+                )
             )
-    except (urllib.error.URLError, UnicodeDecodeError) as error:
-        raise RuntimeError(f"live Pages fetch failed for {url}: {error}") from error
+            error.close()
+            if retryable and attempt_number <= retry_count:
+                time.sleep(retry_delay_seconds)
+                continue
+            raise LiveFetchError(
+                f"live Pages fetch failed for {url}: HTTP {status}", attempts
+            ) from error
+        except (urllib.error.URLError, http.client.HTTPException, OSError) as error:
+            attempts.append(
+                FetchAttemptReceipt(
+                    attempt=attempt_number,
+                    outcome="transport_error",
+                    status=None,
+                    final_url=None,
+                    error_type=type(error).__name__,
+                    duration_ms=_duration_ms(started_at),
+                    retryable=True,
+                )
+            )
+            if attempt_number <= retry_count:
+                time.sleep(retry_delay_seconds)
+                continue
+            raise LiveFetchError(
+                f"live Pages fetch failed for {url}: {type(error).__name__}", attempts
+            ) from error
+
+        if status in RETRYABLE_HTTP_STATUSES:
+            attempts.append(
+                FetchAttemptReceipt(
+                    attempt=attempt_number,
+                    outcome="http_error",
+                    status=status,
+                    final_url=final_url,
+                    error_type="HTTPStatus",
+                    duration_ms=_duration_ms(started_at),
+                    retryable=True,
+                )
+            )
+            if attempt_number <= retry_count:
+                time.sleep(retry_delay_seconds)
+                continue
+            raise LiveFetchError(
+                f"live Pages fetch failed for {url}: HTTP {status}", attempts
+            )
+
+        try:
+            body = raw.decode(charset, errors="strict")
+        except UnicodeDecodeError as error:
+            attempts.append(
+                FetchAttemptReceipt(
+                    attempt=attempt_number,
+                    outcome="decode_error",
+                    status=status,
+                    final_url=final_url,
+                    error_type=type(error).__name__,
+                    duration_ms=_duration_ms(started_at),
+                    retryable=False,
+                )
+            )
+            raise LiveFetchError(
+                f"live Pages fetch failed for {url}: UnicodeDecodeError", attempts
+            ) from error
+
+        attempts.append(
+            FetchAttemptReceipt(
+                attempt=attempt_number,
+                outcome="success",
+                status=status,
+                final_url=final_url,
+                error_type=None,
+                duration_ms=_duration_ms(started_at),
+                retryable=False,
+            )
+        )
+        return LiveFetch(
+            requested_url=url,
+            final_url=final_url,
+            status=status,
+            content_type=content_type,
+            body=body,
+            attempts=tuple(attempts),
+        )
+
+    raise AssertionError("bounded live fetch loop exhausted unexpectedly")
 
 
 def validate_live_fetch(fetch: LiveFetch) -> list[str]:
@@ -274,22 +413,49 @@ def validate_runtime_asset_fetch(
     return errors
 
 
-def run_live_smoke(url: str | None = None, timeout_seconds: int = 20, insecure: bool = False) -> PagesLiveSmokeReceipt:
-    page = fetch_live_url(url or default_url(ROOT), timeout_seconds=timeout_seconds, insecure=insecure)
+def run_live_smoke(
+    url: str | None = None,
+    timeout_seconds: int = 20,
+    insecure: bool = False,
+    retry_count: int = MAX_RETRY_COUNT,
+) -> PagesLiveSmokeReceipt:
+    page = fetch_live_url(
+        url or default_url(ROOT),
+        timeout_seconds=timeout_seconds,
+        insecure=insecure,
+        retry_count=retry_count,
+    )
     errors = validate_live_fetch(page)
 
     proposal_url = urljoin(page.final_url, PROPOSAL_RELATIVE_URL)
-    proposal_fetch = fetch_live_url(proposal_url, timeout_seconds=timeout_seconds, insecure=insecure)
+    proposal_fetch = fetch_live_url(
+        proposal_url,
+        timeout_seconds=timeout_seconds,
+        insecure=insecure,
+        retry_count=retry_count,
+    )
     errors.extend(validate_proposal_fetch(proposal_fetch))
 
     catalog_url = urljoin(page.final_url, CATALOG_RELATIVE_URL)
-    catalog_fetch = fetch_live_url(catalog_url, timeout_seconds=timeout_seconds, insecure=insecure, accept="application/json")
+    catalog_fetch = fetch_live_url(
+        catalog_url,
+        timeout_seconds=timeout_seconds,
+        insecure=insecure,
+        accept="application/json",
+        retry_count=retry_count,
+    )
     errors.extend(validate_catalog_fetch(catalog_fetch))
 
     asset_receipts: list[RuntimeAssetReceipt] = []
     for relative, minimum_bytes, content_types in RUNTIME_ASSETS:
         asset_url = urljoin(page.final_url, relative)
-        asset_fetch = fetch_live_url(asset_url, timeout_seconds=timeout_seconds, insecure=insecure, accept="*/*")
+        asset_fetch = fetch_live_url(
+            asset_url,
+            timeout_seconds=timeout_seconds,
+            insecure=insecure,
+            accept="*/*",
+            retry_count=retry_count,
+        )
         local_path = ROOT / relative
         expected_sha256 = hashlib.sha256(local_path.read_bytes()).hexdigest()
         errors.extend(
@@ -310,6 +476,7 @@ def run_live_smoke(url: str | None = None, timeout_seconds: int = 20, insecure: 
                 content_type=asset_fetch.content_type,
                 body_bytes=len(raw),
                 sha256=hashlib.sha256(raw).hexdigest(),
+                attempts=asset_fetch.attempts,
             )
         )
 
@@ -320,12 +487,13 @@ def run_live_smoke(url: str | None = None, timeout_seconds: int = 20, insecure: 
     if parse_errors:
         raise RuntimeError("live Pages smoke failed:\n- " + "\n- ".join(parse_errors))
     return PagesLiveSmokeReceipt(
-        smoke_id="commonworld.pages-live.globe-first-and-proposal.v7",
+        smoke_id="commonworld.pages-live.globe-first-and-proposal.v8",
         requested_url=page.requested_url,
         final_url=page.final_url,
         status=page.status,
         content_type=page.content_type,
         body_bytes=len(page.body.encode("utf-8")),
+        page_attempts=page.attempts,
         required_tokens=REQUIRED_TOKENS,
         forbidden_tokens_absent=FORBIDDEN_TOKENS,
         proposal_requested_url=proposal_fetch.requested_url,
@@ -333,11 +501,13 @@ def run_live_smoke(url: str | None = None, timeout_seconds: int = 20, insecure: 
         proposal_status=proposal_fetch.status,
         proposal_content_type=proposal_fetch.content_type,
         proposal_body_bytes=len(proposal_fetch.body.encode("utf-8")),
+        proposal_attempts=proposal_fetch.attempts,
         proposal_required_tokens=PROPOSAL_REQUIRED_TOKENS,
         catalog_requested_url=catalog_fetch.requested_url,
         catalog_final_url=catalog_fetch.final_url,
         catalog_status=catalog_fetch.status,
         catalog_content_type=catalog_fetch.content_type,
+        catalog_attempts=catalog_fetch.attempts,
         catalog_kind=str(catalog["kind"]),
         catalog_entry_count=int(catalog["entry_count"]),
         catalog_project_files=tuple(catalog["project_files"]),
@@ -352,9 +522,15 @@ def main() -> int:
     parser.add_argument("--url", default=None)
     parser.add_argument("--timeout-seconds", type=int, default=20)
     parser.add_argument("--insecure", action="store_true")
+    parser.add_argument("--retry-count", type=int, choices=(0, 1), default=MAX_RETRY_COUNT)
     args = parser.parse_args()
     try:
-        receipt = run_live_smoke(args.url, timeout_seconds=args.timeout_seconds, insecure=args.insecure)
+        receipt = run_live_smoke(
+            args.url,
+            timeout_seconds=args.timeout_seconds,
+            insecure=args.insecure,
+            retry_count=args.retry_count,
+        )
     except RuntimeError as error:
         print(f"ERROR: {error}", file=sys.stderr)
         return 1
