@@ -85,7 +85,16 @@ class PublicCatalogTests(unittest.TestCase):
     def test_manual_presentation_layer_is_rejected(self) -> None:
         with tempfile.TemporaryDirectory() as tmp_dir:
             root = self.copy_public_catalog(tmp_dir)
-            self.mutate_project(root, "openstreetmap", lambda record: record.update({"presentation_layer": "mixed_other", "digital_path": "sphere"}))
+            self.mutate_project(root, "openstreetmap", lambda record: record.update({"presentation_layer": "mixed_other"}))
+
+            errors = validate_public_catalog(root)
+
+        self.assertTrue(any("must not store presentation or zoom assignments" in error for error in errors))
+
+    def test_manual_digital_path_is_rejected_independently(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp_dir:
+            root = self.copy_public_catalog(tmp_dir)
+            self.mutate_project(root, "openstreetmap", lambda record: record.update({"digital_path": "sphere"}))
 
             errors = validate_public_catalog(root)
 

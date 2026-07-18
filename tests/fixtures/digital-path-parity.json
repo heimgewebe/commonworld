@@ -1,0 +1,17 @@
+[
+  {"name":"canonical","value":"sphere/communication_networks","valid":true,"path":["sphere","communication_networks"]},
+  {"name":"empty-root","value":"","valid":true,"path":["sphere"]},
+  {"name":"null-root","value":null,"valid":true,"path":["sphere"]},
+  {"name":"trailing-slash","value":"sphere/communication_networks/","valid":false,"path":["sphere"]},
+  {"name":"internal-empty","value":"sphere//communication_networks","valid":false,"path":["sphere"]},
+  {"name":"internal-space","value":"sphere/ /communication_networks","valid":false,"path":["sphere"]},
+  {"name":"encoded-space","value":"sphere/%20/communication_networks","valid":false,"path":["sphere"]},
+  {"name":"internal-tab","value":"sphere/\t/communication_networks","valid":false,"path":["sphere"]},
+  {"name":"internal-newline","value":"sphere/\n/communication_networks","valid":false,"path":["sphere"]},
+  {"name":"leading-segment-space","value":"sphere/ communication_networks","valid":false,"path":["sphere"]},
+  {"name":"trailing-segment-space","value":"sphere/communication_networks ","valid":false,"path":["sphere"]},
+  {"name":"array-canonical","value":["sphere","communication_networks"],"valid":true,"path":["sphere","communication_networks"]},
+  {"name":"array-empty","value":["sphere","","communication_networks"],"valid":false,"path":["sphere"]},
+  {"name":"array-space","value":["sphere"," ","communication_networks"],"valid":false,"path":["sphere"]},
+  {"name":"array-leading-space","value":["sphere"," communication_networks"],"valid":false,"path":["sphere"]}
+]

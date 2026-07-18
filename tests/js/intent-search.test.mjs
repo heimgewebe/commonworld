@@ -121,10 +121,18 @@ test('one-time index handles fifty thousand identities without per-query catalog
   const queryStarted = performance.now();
   const result = index.search({ query: 'leuchtturmbegriff' });
   const queryMs = performance.now() - queryStarted;
+  const catalogueScansBeforeCompleteQuery = index.fullCatalogueScanCount();
+  const completeStarted = performance.now();
+  const complete = index.matchingRecords({ query: 'gemeinschaftliche infrastruktur' });
+  const completeMs = performance.now() - completeStarted;
   assert.equal(index.indexedRecordCount, 50_000);
   assert.deepEqual(result.map(({ id }) => id), ['common-49999']);
+  assert.equal(complete.length, 49_999);
+  assert.equal(index.fullCatalogueScanCount(), catalogueScansBeforeCompleteQuery, 'complete indexed query scanned the source catalogue');
+  assert.equal(index.search({ query: 'gemeinschaftliche infrastruktur' }).length, 50);
   assert(buildMs < 8_000, 'index build unexpectedly slow: ' + buildMs.toFixed(1) + ' ms');
   assert(queryMs < 250, 'indexed query unexpectedly slow: ' + queryMs.toFixed(1) + ' ms');
+  process.stdout.write(`# 50k intent index: build ${buildMs.toFixed(1)} ms; complete postings result ${complete.length} in ${completeMs.toFixed(1)} ms\n`);
 });
 
 test('borrow remains a first-class German intent and action filter value', () => {

@@ -217,14 +217,14 @@ export function normalizeDigitalPath(value = '', { taxonomy = DIGITAL_TAXONOMY }
     pathKey: serializeDigitalPath(root),
     nodeId: root[0],
   });
-  const raw = Array.isArray(value)
-    ? value
-    : String(value ?? '').trim().split('/').filter(Boolean);
-  if (!raw.length) {
+  const isArray = Array.isArray(value);
+  const serialized = isArray ? null : String(value ?? '');
+  // Only an absent/empty value denotes the root; every explicit slash must separate two canonical segments.
+  if (!isArray && serialized === '') {
     return Object.freeze({ valid: true, reason: 'root', path: root, pathKey: serializeDigitalPath(root), nodeId: root[0] });
   }
-  const parts = raw.map((part) => String(part ?? '').trim()).filter(Boolean);
-  if (!parts.length) return Object.freeze({ valid: true, reason: 'root', path: root, pathKey: serializeDigitalPath(root), nodeId: root[0] });
+  const parts = isArray ? value.map((part) => String(part ?? '')) : serialized.split('/');
+  if (!parts.length || parts.some((part) => part.length === 0 || part !== part.trim())) return fail('empty-or-whitespace-segment');
   if (parts.some((part) => part === '.' || part === '..' || !DIGITAL_ID_PATTERN.test(part))) return fail('invalid-segment');
   if (parts[0] !== (taxonomy.root_id ?? DIGITAL_ROOT_ID)) return fail('wrong-root');
 
@@ -1029,6 +1029,7 @@ export function prepareIntentSearchIndex(records, { cacheLimit = INTENT_SEARCH_C
   const normalizedTitles = new Map();
   const boundedCacheLimit = Math.max(1, Number.isInteger(cacheLimit) ? cacheLimit : INTENT_SEARCH_CACHE_LIMIT);
   const cache = new Map();
+  let fullCatalogueScanCount = 0;
 
   for (const record of sourceRecords) {
     normalizedTitles.set(record.id, normalizeSearchText(record.title));
@@ -1065,10 +1066,10 @@ export function prepareIntentSearchIndex(records, { cacheLimit = INTENT_SEARCH_C
     return combined.size ? combined : null;
   };
 
-  const search = ({ query = '', filters = {}, limit = INTENT_SEARCH_RESULT_LIMIT, today = new Date().toISOString().slice(0, 10) } = {}) => {
+  const search = ({ query = '', filters = {}, limit = INTENT_SEARCH_RESULT_LIMIT, all = false, today = new Date().toISOString().slice(0, 10) } = {}) => {
     const normalizedQuery = normalizeSearchText(query);
-    const boundedLimit = Math.max(1, Math.min(200, Number.isInteger(limit) ? limit : INTENT_SEARCH_RESULT_LIMIT));
-    const cacheKey = JSON.stringify([normalizedQuery, filters, boundedLimit, today]);
+    const boundedLimit = all ? Infinity : Math.max(1, Math.min(200, Number.isInteger(limit) ? limit : INTENT_SEARCH_RESULT_LIMIT));
+    const cacheKey = JSON.stringify([normalizedQuery, filters, all ? 'all' : boundedLimit, today]);
     if (cache.has(cacheKey)) return cache.get(cacheKey);
 
     const queryGroups = [];
@@ -1093,6 +1094,7 @@ export function prepareIntentSearchIndex(records, { cacheLimit = INTENT_SEARCH_C
       }
     }
 
+    if (candidates === null) fullCatalogueScanCount += 1;
     const selectedRecords = candidates === null
       ? sourceRecords.map((record) => ({ record, score: 0, reasons: new Set() }))
       : [...candidates].map(([identifier, candidate]) => ({ record: recordsById.get(identifier), ...candidate }));
@@ -1104,8 +1106,9 @@ export function prepareIntentSearchIndex(records, { cacheLimit = INTENT_SEARCH_C
         const phraseBonus = normalizedQuery && title === normalizedQuery ? 300 : (normalizedQuery && title.startsWith(normalizedQuery) ? 160 : 0);
         return freezeSearchResult({ id: record.id, record, score: score + phraseBonus, reasons: [...reasons] });
       })
-      .sort((left, right) => right.score - left.score || left.record.title.localeCompare(right.record.title, 'de') || left.id.localeCompare(right.id))
-      .slice(0, boundedLimit);
+      .sort((left, right) => right.score - left.score || left.record.title.localeCompare(right.record.title, 'de') || left.id.localeCompare(right.id));
+
+    if (Number.isFinite(boundedLimit)) results.splice(boundedLimit);
 
     const frozen = Object.freeze(results);
     cache.set(cacheKey, frozen);
@@ -1120,10 +1123,13 @@ export function prepareIntentSearchIndex(records, { cacheLimit = INTENT_SEARCH_C
     recordsById,
     search,
     matchingRecords(options = {}) {
-      return Object.freeze(search(options).map(({ record }) => record));
+      return Object.freeze(search({ ...options, all: options.all !== false }).map(({ record }) => record));
     },
     cacheSize() {
       return cache.size;
+    },
+    fullCatalogueScanCount() {
+      return fullCatalogueScanCount;
     },
   });
 }
@@ -1142,7 +1148,7 @@ export function filterRecords(records, state = {}) {
         freshness: state.freshness ?? null,
         curation: state.curation ?? null,
       },
-      limit: Math.max(INTENT_SEARCH_RESULT_LIMIT, state.limit ?? INTENT_SEARCH_RESULT_LIMIT),
+      all: true,
       today: state.today,
     });
   }

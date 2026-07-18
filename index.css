@@ -1995,6 +1995,18 @@ html:not([data-input-modality="pointer"]) .digital-ribbon-item:focus-visible {
   list-style: none;
 }
 
+.result-continuation,
+.identity-show-more {
+  min-height: 44px;
+  margin-top: 0.85rem;
+}
+
+.identity-presentation-status {
+  margin: 0.6rem 0 0;
+  color: var(--muted);
+  font-size: 0.82rem;
+}
+
 .discovery-result {
   overflow: hidden;
   border: 1px solid var(--line);

@@ -241,6 +241,7 @@ def render_shell(root: Path = ROOT) -> str:
         </div>
         <p id="discovery-empty" class="discovery-empty" hidden>Keine Commons entsprechen dieser Suche und Filterkombination.</p>
         <ol id="discovery-list" class="discovery-list" aria-label="Rangfolge der Commons-Suchergebnisse"></ol>
+        <button id="discovery-show-text" class="quiet-button result-continuation" type="button" hidden>Alle Treffer in der Textansicht anzeigen</button>
       </section>
 
       <section id="globe-surface" class="globe-surface" aria-label="Commonworld-Globus">
@@ -321,6 +322,7 @@ def render_shell(root: Path = ROOT) -> str:
             <div id="catalog" class="catalog-grid" aria-live="polite">
 {cards}
             </div>
+            <button id="text-show-more" class="quiet-button result-continuation" type="button" hidden>Weitere Commons anzeigen</button>
           </div>
         </div>
       </section>

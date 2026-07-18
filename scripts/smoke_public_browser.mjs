@@ -1056,8 +1056,8 @@ async function layerJourneyScenario({ mobile = false, viewportOverride = null, t
   assert(JSON.stringify(preparingOverviewUrlCamera) === JSON.stringify(overviewUrlCamera), 'layer journey: return preparation serialized the side camera instead of preserving the overview camera ' + JSON.stringify({ overviewUrlCamera, preparingOverviewUrlCamera }));
   assert((await stage.getAttribute('data-globe-geometry-source')) === 'side-view-layout', 'layer journey: return preparation left side layout too early');
   assert(await run.page.locator('#layer-panel').isHidden(), 'layer journey: description panel did not close before return preparation');
-  await run.page.waitForSelector('.globe-stage[data-view-phase="leaving-layers"]');
-  // The phase can complete between Playwright observing the selector and this assertion on fast CI runners.
+  await run.page.waitForFunction(() => ['leaving-layers', 'overview'].includes(document.querySelector('.globe-stage')?.dataset.viewPhase));
+  // The transient phase can complete before Playwright observes it; the phase log below remains the strict proof.
   // The phase log below proves that leaving-layers occurred and carried the invisible geometry switch.
   assert((await stage.getAttribute('data-globe-geometry-source')) === 'maplibre-projected-horizon', 'layer journey: return flight did not mirror back to the MapLibre horizon geometry');
   assert(await run.page.locator('#layer-panel').isHidden(), 'layer journey: description panel obscures the return camera flight');
@@ -1538,6 +1538,11 @@ async function legacyLayerAndAtomicFocusScenario() {
   await legacyRun.page.waitForFunction(() => new URL(location.href).searchParams.get('digital_path') === 'sphere/communication_networks');
   selectedParameters = new URL(legacyRun.page.url()).searchParams;
   assert(!selectedParameters.has('layer'), 'legacy layer: Forward restored a mixed legacy/path state');
+  await legacyRun.page.goto(`${baseUrl}/?surface=text&layer=communication_networks&digital_path=sphere/%20/communication_networks`, { waitUntil: 'domcontentloaded' });
+  await legacyRun.page.waitForSelector('html.runtime-ready');
+  const invalidExplicitParameters = new URL(legacyRun.page.url()).searchParams;
+  assert(!invalidExplicitParameters.has('layer') && !invalidExplicitParameters.has('digital_path'), 'invalid explicit path: legacy layer or partial path survived fail-closed canonicalization');
+  assert((await legacyRun.page.locator('.catalog-card:not([hidden])').count()) === expectedDigitalProjection.catalogEntryCount, 'invalid explicit path: root result truth was filtered');
   assert(legacyRun.consoleErrors.length === 0, `legacy layer: console errors: ${legacyRun.consoleErrors.join(' | ')}`);
   assert(legacyRun.pageErrors.length === 0, `legacy layer: page errors: ${legacyRun.pageErrors.join(' | ')}`);
   await legacyRun.context.close();
@@ -1549,6 +1554,13 @@ async function legacyLayerAndAtomicFocusScenario() {
   await focusRun.page.locator('.digital-ribbon-item[data-commonproject-id="wikipedia"][data-ribbon-copy="0"]').click();
   assert(await focusRun.page.locator('#project-focus').isVisible(), 'atomic focus: Wikipedia focus did not open');
   assert(new URL(focusRun.page.url()).searchParams.get('project') === 'wikipedia', 'atomic focus: Wikipedia was not written to history');
+
+  await focusRun.page.keyboard.press('Escape');
+  assert(await focusRun.page.locator('#project-focus').isHidden(), 'atomic focus: Escape did not close the project overlay');
+  const wikipediaTrigger = focusRun.page.locator('.digital-ribbon-item[data-commonproject-id="wikipedia"][data-ribbon-copy="0"]');
+  await wikipediaTrigger.focus();
+  await focusRun.page.keyboard.press('Enter');
+  assert(await focusRun.page.locator('#project-focus').isVisible(), 'atomic focus: keyboard activation did not reopen Wikipedia');
 
   // Exercise the direct state regression without pretending the covered control receives a pointer interaction.
   await focusRun.page.locator('.digital-lane-focus[data-digital-path="sphere/communication_networks"]').evaluate((node) => node.click());
@@ -1574,6 +1586,15 @@ async function legacyLayerAndAtomicFocusScenario() {
   assert(await focusRun.page.locator('#project-focus').isVisible(), 'atomic focus: Back did not restore Wikipedia focus');
   assert((await focusRun.page.locator('#focus-title').textContent()) === 'Wikipedia', 'atomic focus: Back restored the wrong project');
 
+  await focusRun.page.goForward();
+  await focusRun.page.waitForFunction(() => new URL(location.href).searchParams.get('digital_path') === 'sphere/communication_networks' && !new URL(location.href).searchParams.has('project'));
+  await focusRun.page.waitForFunction(() => (
+    document.activeElement?.matches('.digital-lane-focus, .digital-lane-scroll, .digital-breadcrumb-item')
+    && document.activeElement.getClientRects().length > 0
+    && !document.activeElement.closest('[hidden], [inert], [aria-hidden="true"]')
+  ));
+  assert(await focusRun.page.locator('#project-focus').isHidden(), 'atomic focus: Forward left the project panel visible');
+
   await focusRun.page.goto(`${baseUrl}/?view=layers&digital_path=sphere/communication_networks&project=wikipedia`, { waitUntil: 'domcontentloaded' });
   await focusRun.page.waitForSelector('html.runtime-ready');
   await focusRun.page.waitForFunction(() => document.querySelector('.globe-stage')?.dataset.digitalPath === 'sphere/communication_networks');
@@ -1582,8 +1603,96 @@ async function legacyLayerAndAtomicFocusScenario() {
   assert(!invalidCombination.has('project') && await focusRun.page.locator('#project-focus').isHidden(), 'atomic focus: invalid direct combination retained foreign project focus');
   assert(focusRun.consoleErrors.length === 0, `atomic focus: console errors: ${focusRun.consoleErrors.join(' | ')}`);
   assert(focusRun.pageErrors.length === 0, `atomic focus: page errors: ${focusRun.pageErrors.join(' | ')}`);
-  results.push({ id: 'legacy-layer-and-atomic-focus', verdict: 'PASS' });
   await focusRun.context.close();
+
+  const textFocusRun = await newPage({ reducedMotion: 'reduce' });
+  await textFocusRun.page.goto(`${baseUrl}/?surface=text&view=layers&project=wikipedia`, { waitUntil: 'domcontentloaded' });
+  await textFocusRun.page.waitForSelector('html.runtime-ready');
+  assert(await textFocusRun.page.locator('#project-focus').isVisible(), 'text atomic focus: Wikipedia focus did not open');
+  const textHierarchy = textFocusRun.page.locator('#text-layer-buttons .layer-filter[data-digital-path="sphere/communication_networks"]');
+  await textHierarchy.focus();
+  await textFocusRun.page.keyboard.press('Enter');
+  await textFocusRun.page.waitForFunction(() => new URL(location.href).searchParams.get('digital_path') === 'sphere/communication_networks' && !new URL(location.href).searchParams.has('project'));
+  await textFocusRun.page.waitForFunction(() => document.activeElement?.matches('#text-layer-breadcrumb .digital-breadcrumb-item, #text-layer-buttons .layer-filter') && document.activeElement.getClientRects().length > 0);
+  assert(await textFocusRun.page.locator('#project-focus').isHidden(), 'text atomic focus: incompatible path retained project overlay');
+  assert(await textFocusRun.page.locator('#text-layer-breadcrumb .digital-breadcrumb-item[aria-current="page"]').isVisible(), 'text atomic focus: current breadcrumb is not visible');
+  assert(textFocusRun.pageErrors.length === 0, `text atomic focus: page errors: ${textFocusRun.pageErrors.join(' | ')}`);
+  await textFocusRun.context.close();
+  results.push({ id: 'legacy-layer-and-atomic-focus', verdict: 'PASS', backForwardFocus: true, textHierarchyFocus: true, keyboardPath: true });
+}
+
+async function syntheticCatalogueTruthScenario() {
+  process.stdout.write(`${JSON.stringify({ state: 'RUNNING', scenario: 'synthetic-catalogue-truth' })}\n`);
+  for (const size of [500, 5000]) {
+    const run = await newPage({ reducedMotion: 'reduce' });
+    await run.page.goto(baseUrl, { waitUntil: 'domcontentloaded' });
+    await run.page.waitForSelector('html.runtime-ready');
+    await run.page.waitForFunction(() => document.querySelector('.globe-stage')?.dataset.publicMapProjectIds !== undefined);
+    const installed = await run.page.evaluate((count) => {
+      const records = Array.from({ length: count }, (_, index) => ({
+        schema_version: 4,
+        id: `synthetic-${String(index).padStart(5, '0')}`,
+        title: `Synthetic Commons ${index}`,
+        summary: 'Gemeinschaftliche synthetische Infrastruktur für die isolierte Runtime-Prüfung.',
+        themes: ['communication', 'community-network'],
+        actions: ['learn'],
+        presence: {
+          geographic: [{ id: `place-${index}`, mode: 'exact', label: `Testort ${index}`, geometry: { type: 'Point', coordinates: [8 + (index % 100) / 1000, 50 + (index % 100) / 1000] } }],
+          digital: { available: true, reach: 'global', label: 'Synthetische digitale Präsenz' },
+        },
+        activity: { status: 'active' },
+        curation: { state: 'listed', next_review_at: '2027-01-01' },
+        links: [],
+      }));
+      return window.__commonworldInstallSyntheticRecordsForTest(records);
+    }, size);
+    assert(installed.records === size && installed.treeIdentities === size, `synthetic ${size}: installation lost identities ${JSON.stringify(installed)}`);
+    await run.page.waitForFunction((count) => document.querySelector('.globe-stage')?.dataset.publicMapProjectIds === String(count), size);
+    assert((await run.page.locator('#globe-results').textContent()) === `${size} Commons in der aktuellen Auswahl.`, `synthetic ${size}: semantic count is capped`);
+
+    const sphereEdge = run.page.locator('#sphere-edge-control');
+    await sphereEdge.focus();
+    await run.page.keyboard.press('Enter');
+    await run.page.waitForSelector('.globe-stage[data-view-phase="layers"]');
+    await run.page.waitForSelector('#layer-panel[data-visible]:not([inert])');
+
+    const field = run.page.locator('.digital-lane-focus[data-digital-path="sphere/communication_networks"]');
+    await field.focus();
+    await run.page.keyboard.press('Enter');
+    await run.page.waitForFunction(() => document.querySelector('.globe-stage')?.dataset.digitalPath === 'sphere/communication_networks');
+    const network = run.page.locator('.digital-lane-focus[data-digital-path="sphere/communication_networks/community_networks"]');
+    await network.focus();
+    await run.page.keyboard.press('Enter');
+    await run.page.waitForFunction(() => document.querySelector('.globe-stage')?.dataset.digitalPath === 'sphere/communication_networks/community_networks');
+    await run.page.waitForFunction(() => document.querySelectorAll('.digital-ribbon-item[data-ribbon-copy="0"]').length === 48);
+    const initialIds = await run.page.locator('.digital-ribbon-item[data-ribbon-copy="0"]').evaluateAll((nodes) => nodes.map((node) => node.dataset.commonprojectId));
+    assert(new Set(initialIds).size === 48, `synthetic ${size}: initial ring identities duplicate`);
+    const ringMore = run.page.locator('.identity-show-more');
+    const ringMoreBox = await ringMore.boundingBox();
+    assert(ringMoreBox && ringMoreBox.height >= 44, `synthetic ${size}: ring continuation touch target is undersized`);
+    await ringMore.click();
+    await run.page.waitForFunction(() => document.querySelectorAll('.digital-ribbon-item[data-ribbon-copy="0"]').length === 96);
+    const continuedIds = await run.page.locator('.digital-ribbon-item[data-ribbon-copy="0"]').evaluateAll((nodes) => nodes.map((node) => node.dataset.commonprojectId));
+    assert(new Set(continuedIds).size === 96, `synthetic ${size}: continued ring identities duplicate`);
+    assert(await run.page.locator('.identity-show-more').evaluate((node) => node === document.activeElement), `synthetic ${size}: ring continuation lost focus`);
+
+    await run.page.locator('#filter-toggle').click();
+    assert((await run.page.locator('.discovery-result').count()) === 50, `synthetic ${size}: discovery preview is not bounded at 50`);
+    assert((await run.page.locator('#discovery-count').textContent()) === `50 von ${size} Commons als Vorschau`, `synthetic ${size}: discovery total is not truthful`);
+    await run.page.locator('#discovery-show-text').click();
+    await run.page.waitForFunction((count) => document.querySelector('#text-count')?.textContent === `48 von ${count} Commons angezeigt`, size);
+    assert((await run.page.locator('.catalog-card:not([hidden])').count()) === 48, `synthetic ${size}: initial text window is not bounded at 48`);
+    const textMoreBox = await run.page.locator('#text-show-more').boundingBox();
+    assert(textMoreBox && textMoreBox.height >= 44, `synthetic ${size}: text continuation touch target is undersized`);
+    await run.page.locator('#text-show-more').click();
+    await run.page.waitForFunction(() => document.querySelectorAll('.catalog-card:not([hidden])').length === 96);
+    const textIds = await run.page.locator('.catalog-card:not([hidden])').evaluateAll((nodes) => nodes.map((node) => node.dataset.commonprojectId));
+    assert(new Set(textIds).size === 96, `synthetic ${size}: continued text identities duplicate`);
+    assert((await run.page.locator('#text-count').textContent()) === `96 von ${size} Commons angezeigt`, `synthetic ${size}: text continuation count drifted`);
+    assert(run.pageErrors.length === 0, `synthetic ${size}: page errors: ${run.pageErrors.join(' | ')}`);
+    await run.context.close();
+  }
+  results.push({ id: 'synthetic-catalogue-truth', verdict: 'PASS', sizes: [500, 5000], preview: 48, increment: 48 });
 }
 
 async function catalogueFailureScenario() {
@@ -1703,6 +1812,7 @@ try {
   await interruptedLayerJourneyScenario();
   await reducedMotionLayerScenario();
   await legacyLayerAndAtomicFocusScenario();
+  await syntheticCatalogueTruthScenario();
   await catalogueFailureScenario();
   await providerFailureScenario();
   await methodScenario();

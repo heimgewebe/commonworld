@@ -1,4 +1,6 @@
+import json
 import unittest
+from pathlib import Path
 
 from scripts.digital_taxonomy import derive_project_path, load_taxonomy, normalize_path
 from scripts.validate_digital_ring_taxonomy import ROOT, validate_digital_ring_taxonomy
@@ -44,6 +46,14 @@ class DigitalRingTaxonomyTest(unittest.TestCase):
         self.assertTrue(normalize_path("sphere/communication_networks/community_networks", self.taxonomy)["valid"])
         self.assertEqual(normalize_path("sphere/../catalog", self.taxonomy)["path"], ["sphere"])
         self.assertFalse(normalize_path("sphere/../catalog", self.taxonomy)["valid"])
+
+    def test_normalize_path_matches_shared_fail_closed_parity_fixtures(self):
+        fixtures = json.loads((Path(__file__).parent / "fixtures/digital-path-parity.json").read_text(encoding="utf-8"))
+        for fixture in fixtures:
+            with self.subTest(fixture["name"]):
+                normalized = normalize_path(fixture["value"], self.taxonomy)
+                self.assertEqual(normalized["valid"], fixture["valid"])
+                self.assertEqual(normalized["path"], fixture["path"])
 
 
 if __name__ == "__main__":

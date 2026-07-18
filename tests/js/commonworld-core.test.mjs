@@ -188,8 +188,22 @@ test('digital path normalization roundtrips canonical paths and fails closed on 
   assert.equal(normalizeDigitalPath('sphere/nope').valid, false);
 });
 
-test('digital tree visible nodes stay bounded for synthetic 500 and 5000 record sets', () => {
-  for (const size of [500, 5000]) {
+test('digital path normalization matches the shared fail-closed parity fixtures', () => {
+  const fixtures = JSON.parse(readFileSync(new URL('../fixtures/digital-path-parity.json', import.meta.url), 'utf8'));
+  for (const fixture of fixtures) {
+    const normalized = normalizeDigitalPath(fixture.value);
+    assert.equal(normalized.valid, fixture.valid, fixture.name);
+    assert.deepEqual(normalized.path, fixture.path, fixture.name);
+  }
+  for (const encodedSegment of ['%20', '%09', '%0A']) {
+    const encodedWhitespace = stateFromSearch(`?layer=communication_networks&digital_path=sphere/${encodedSegment}/communication_networks`);
+    assert.equal(encodedWhitespace.layer, null, encodedSegment);
+    assert.deepEqual(encodedWhitespace.digitalPath, DIGITAL_ROOT_PATH, encodedSegment);
+  }
+});
+
+test('digital tree keeps full identity truth behind repeatable 48-item presentation windows', () => {
+  for (const size of [500, 5000, 50000]) {
     const records = Array.from({ length: size }, (_, index) => ({
       id: `synthetic-digital-${String(index).padStart(4, '0')}`,
       title: `Synthetic Digital ${index}`,
@@ -211,6 +225,13 @@ test('digital tree visible nodes stay bounded for synthetic 500 and 5000 record 
     assert.equal(community.children.length, Math.ceil(size / 2));
     assert.equal(boundedCommunity.children.length, 48);
     assert.equal(tree.nodesByPath.get('sphere/communication_networks/community_networks').identityCount, Math.ceil(size / 2));
+    let presented = 0;
+    while (presented < Math.ceil(size / 2)) {
+      presented = Math.min(presented + 48, Math.ceil(size / 2));
+      const continued = visibleDigitalNodes(tree, ['sphere', 'communication_networks', 'community_networks'], { identityLimit: presented });
+      assert.equal(continued.children.length, presented);
+      assert.equal(new Set(continued.children.map(({ projectId }) => projectId)).size, presented);
+    }
     assert.equal(root.children.length < tree.nodesByPath.size, true);
     assert.equal(communication.children.length < tree.nodesByPath.size, true);
   }

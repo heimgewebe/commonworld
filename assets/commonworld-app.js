@@ -46,6 +46,8 @@ const PUBLIC_MAP_LAYER_IDS = Object.freeze(['commonworld-public-extents', 'commo
 const ACTION_LINK_TYPES = new Set(['visit', 'use', 'borrow', 'learn', 'contribute', 'volunteer', 'donate', 'contact', 'replicate']);
 const INTENT_FILTER_NAMES = Object.freeze(['presence', 'action', 'language', 'access', 'freshness', 'curation']);
 const DIGITAL_IDENTITY_DOM_LIMIT = 48;
+const TEXT_IDENTITY_DOM_LIMIT = 48;
+const DISCOVERY_RESULT_PREVIEW_LIMIT = 50;
 const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
 const elements = {
   body: document.body,
@@ -58,6 +60,7 @@ const elements = {
   textLayerBreadcrumb: document.querySelector('#text-layer-breadcrumb'),
   textLayerCurrent: document.querySelector('#text-layer-current'),
   textLayerButtons: document.querySelector('#text-layer-buttons'),
+  textShowMore: document.querySelector('#text-show-more'),
   stage: document.querySelector('.globe-stage'),
   map: document.querySelector('#map'),
   mapStatus: document.querySelector('#map-status'),
@@ -89,6 +92,7 @@ const elements = {
   discoveryCount: document.querySelector('#discovery-count'),
   discoveryEmpty: document.querySelector('#discovery-empty'),
   discoveryList: document.querySelector('#discovery-list'),
+  discoveryShowText: document.querySelector('#discovery-show-text'),
   filterClear: document.querySelector('#filter-clear'),
   filterSelects: [...document.querySelectorAll('[data-intent-filter]')],
   discoveryOpenButtons: [...document.querySelectorAll('[data-open-discovery]')],
@@ -170,6 +174,11 @@ const runtime = {
   pointerHitTestFrame: null,
   pointerHitTestPoint: null,
   inputModality: null,
+  pendingHierarchyFocusPath: null,
+  hierarchyFocusTimer: null,
+  presentationKey: null,
+  identityPresentationLimit: DIGITAL_IDENTITY_DOM_LIMIT,
+  textPresentationLimit: TEXT_IDENTITY_DOM_LIMIT,
 };
 
 function setStylePropertyIfChanged(element, name, value) {
@@ -324,6 +333,7 @@ function installRecords(records) {
   runtime.unfilteredPathRecordsCache = null;
   runtime.lastPublicMapData = null;
   runtime.publicMapUpdateCount = 0;
+  runtime.presentationKey = null;
 }
 
 function createSvgElement(name, attributes = {}) {
@@ -366,8 +376,17 @@ function unfilteredPathRecords() {
   return records;
 }
 
+function syncPresentationBudgets() {
+  const key = discoveryCacheKey();
+  if (runtime.presentationKey === key) return;
+  runtime.presentationKey = key;
+  runtime.identityPresentationLimit = DIGITAL_IDENTITY_DOM_LIMIT;
+  runtime.textPresentationLimit = TEXT_IDENTITY_DOM_LIMIT;
+}
+
 function visibleDigitalView(records = visibleRecords()) {
-  return visibleDigitalNodes(treeForRecords(records), currentDigitalPath(), { identityLimit: DIGITAL_IDENTITY_DOM_LIMIT });
+  syncPresentationBudgets();
+  return visibleDigitalNodes(treeForRecords(records), currentDigitalPath(), { identityLimit: runtime.identityPresentationLimit });
 }
 
 function appendRingSequence(textPath, records, { prefix = '' } = {}) {
@@ -521,12 +540,37 @@ function renderLayerDeck() {
     scroller.setAttribute('aria-label', `${node.label} horizontal durchblättern`);
     const content = document.createElement('div');
     content.className = 'digital-lane-content';
-    const repeats = ribbonRepeatCount(records.length, 10);
+    const repeats = identityLevel ? 1 : ribbonRepeatCount(records.length, 10);
     for (let copy = 0; copy < repeats; copy += 1) {
       for (const record of records) content.append(createRibbonSegment(record, copy));
     }
     scroller.append(content);
     lane.append(focus, scroller);
+    if (identityLevel) {
+      const shown = records.length;
+      const status = document.createElement('p');
+      status.className = 'identity-presentation-status';
+      status.setAttribute('role', 'status');
+      status.textContent = `${shown} von ${node.identityCount} Commons angezeigt`;
+      lane.append(status);
+      if (shown < node.identityCount) {
+        const more = document.createElement('button');
+        more.type = 'button';
+        more.className = 'quiet-button identity-show-more';
+        more.dataset.digitalPath = node.pathKey;
+        const increment = Math.min(DIGITAL_IDENTITY_DOM_LIMIT, node.identityCount - shown);
+        more.textContent = `Weitere ${increment} anzeigen`;
+        more.setAttribute('aria-label', `Weitere ${increment} Commons in ${node.label} anzeigen`);
+        more.addEventListener('click', () => {
+          runtime.identityPresentationLimit += DIGITAL_IDENTITY_DOM_LIMIT;
+          renderDiscoveryState();
+          queueMicrotask(() => {
+            document.querySelector(`.identity-show-more[data-digital-path="${CSS.escape(node.pathKey)}"]`)?.focus({ preventScroll: true });
+          });
+        });
+        lane.append(more);
+      }
+    }
     elements.layerDeck.append(lane);
   }
   runtime.laneResizeObserver?.disconnect();
@@ -862,29 +906,85 @@ function createDiscoveryResult(record, position) {
 
 function renderDiscoveryResults() {
   const records = visibleRecords();
-  elements.discoveryList.replaceChildren(...records.map(createDiscoveryResult));
-  const count = records.length;
-  elements.discoveryCount.textContent = String(count) + ' Commons';
-  elements.discoveryEmpty.hidden = count !== 0;
-  elements.discoveryList.hidden = count === 0;
+  const preview = records.slice(0, DISCOVERY_RESULT_PREVIEW_LIMIT);
+  elements.discoveryList.replaceChildren(...preview.map(createDiscoveryResult));
+  const total = records.length;
+  elements.discoveryCount.textContent = total > preview.length
+    ? `${preview.length} von ${total} Commons als Vorschau`
+    : String(total) + ' Commons';
+  elements.discoveryEmpty.hidden = total !== 0;
+  elements.discoveryList.hidden = total === 0;
+  elements.discoveryShowText.hidden = total <= preview.length;
+  elements.discoveryShowText.textContent = total > preview.length ? `Alle ${total} Treffer in der Textansicht anzeigen` : '';
+}
+
+function createRuntimeCatalogCard(record) {
+  const card = document.createElement('article');
+  card.className = 'catalog-card';
+  card.id = `project-${record.id}`;
+  card.dataset.commonprojectId = record.id;
+  const kind = document.createElement('p');
+  kind.className = 'catalog-kind';
+  kind.textContent = recordPresentationLabel(record);
+  const title = document.createElement('h2');
+  title.textContent = record.title;
+  const summary = document.createElement('p');
+  summary.textContent = record.summary;
+  const location = document.createElement('p');
+  location.className = 'catalog-location';
+  location.textContent = resultLocationLabel(record);
+  const actions = document.createElement('div');
+  actions.className = 'catalog-actions';
+  const open = document.createElement('button');
+  open.className = 'catalog-select';
+  open.type = 'button';
+  open.dataset.commonprojectId = record.id;
+  open.setAttribute('aria-pressed', 'false');
+  open.textContent = 'Öffnen';
+  open.addEventListener('click', () => selectProject(record.id, { trigger: open, navigateSpatial: true }));
+  actions.append(open);
+  for (const link of directActionLinks(record)) {
+    const anchor = document.createElement('a');
+    anchor.className = 'catalog-action-link';
+    anchor.dataset.actionType = link.type;
+    anchor.href = link.url;
+    anchor.rel = 'external noreferrer';
+    anchor.textContent = link.label;
+    actions.append(anchor);
+  }
+  card.append(kind, title, summary, location, actions);
+  return card;
 }
 
 function renderTextView() {
   const visible = visibleRecords();
-  const visibleIds = new Set(visible.map(({ id }) => id));
+  syncPresentationBudgets();
+  const presented = visible.slice(0, runtime.textPresentationLimit);
+  const visibleIds = new Set(presented.map(({ id }) => id));
   const catalog = document.querySelector('#catalog');
+  for (const record of presented) {
+    if (!catalog?.querySelector(`.catalog-card[data-commonproject-id="${CSS.escape(record.id)}"]`)) catalog?.append(createRuntimeCatalogCard(record));
+  }
   document.querySelectorAll('.catalog-card[data-commonproject-id]').forEach((card) => {
     card.hidden = !visibleIds.has(card.dataset.commonprojectId);
   });
-  for (const record of visible) {
+  for (const record of presented) {
     const card = catalog?.querySelector('.catalog-card[data-commonproject-id="' + CSS.escape(record.id) + '"]');
     if (card) catalog.append(card);
   }
   renderLayerButtons(elements.textLayerButtons);
   renderDigitalBreadcrumb(elements.textLayerBreadcrumb, elements.textLayerCurrent);
-  const count = visibleIds.size;
-  elements.textCount.textContent = String(count) + ' Commons';
-  elements.textEmpty.hidden = count !== 0;
+  const total = visible.length;
+  elements.textCount.textContent = presented.length < total
+    ? `${presented.length} von ${total} Commons angezeigt`
+    : String(total) + ' Commons';
+  elements.textEmpty.hidden = total !== 0;
+  elements.textShowMore.hidden = presented.length >= total;
+  if (presented.length < total) {
+    const increment = Math.min(TEXT_IDENTITY_DOM_LIMIT, total - presented.length);
+    elements.textShowMore.textContent = `Weitere ${increment} Commons anzeigen`;
+    elements.textShowMore.setAttribute('aria-label', `Weitere ${increment} von insgesamt ${total} Commons anzeigen`);
+  }
 }
 
 function updateSphereResultVisibility() {
@@ -1069,7 +1169,12 @@ function selectProject(identifier, { historyMode = 'push', focus = true, trigger
 }
 
 function isVisibleFocusTarget(target) {
-  return target instanceof Element && typeof target.focus === 'function' && target.isConnected && target.getClientRects().length > 0 && !target.closest('[hidden]');
+  return target instanceof Element
+    && typeof target.focus === 'function'
+    && target.isConnected
+    && target.getClientRects().length > 0
+    && !target.matches(':disabled, input[type="hidden"]')
+    && !target.closest('[hidden], [inert], [aria-hidden="true"]');
 }
 
 
@@ -1102,21 +1207,58 @@ function projectMatchesDigitalState(identifier, state = runtime.state) {
   return digitalPathContainsRecord(state.digitalPath ?? DIGITAL_ROOT_PATH, record);
 }
 
+function hierarchyFocusSurfaceReady() {
+  if (runtime.state.surface === 'text') return !elements.textView.hidden;
+  return runtime.state.view === 'layers'
+    && runtime.viewPhase === 'layers'
+    && elements.layerPanel.hasAttribute('data-visible')
+    && !elements.layerPanel.hidden
+    && !elements.layerPanel.hasAttribute('inert');
+}
+
 function focusVisibleHierarchyControl(pathKey) {
-  const selectors = runtime.state.view === 'layers'
-    ? [
-        `.digital-lane[data-digital-path="${CSS.escape(pathKey)}"] .digital-lane-scroll`,
-        '#layer-breadcrumb .digital-breadcrumb-item[aria-current="page"]',
-        '#layer-close',
-      ]
-    : [
-        '#text-layer-breadcrumb .digital-breadcrumb-item[aria-current="page"]',
-        '#commons-search',
-      ];
+  const textSelectors = [
+    '#text-layer-breadcrumb .digital-breadcrumb-item[aria-current="page"]',
+    `#text-layer-buttons .layer-filter[data-digital-path="${CSS.escape(pathKey)}"]`,
+    '#text-layer-buttons .layer-filter',
+  ];
+  const globeSelectors = [
+    `.digital-lane[data-digital-path="${CSS.escape(pathKey)}"] .digital-lane-focus`,
+    `.digital-lane[data-digital-path="${CSS.escape(pathKey)}"] .digital-lane-scroll`,
+    '#layer-breadcrumb .digital-breadcrumb-item[aria-current="page"]',
+    '#layer-close',
+  ];
+  const fallbackSelectors = runtime.state.surface === 'text'
+    ? ['[data-open-discovery]', '#text-view']
+    : ['#globe-reset'];
+  const selectors = runtime.state.surface === 'text'
+    ? [...textSelectors, ...globeSelectors, ...fallbackSelectors]
+    : [...globeSelectors, ...textSelectors, ...fallbackSelectors];
   const target = selectors
     .map((selector) => document.querySelector(selector))
     .find(isVisibleFocusTarget);
   target?.focus({ preventScroll: true });
+  return target ?? null;
+}
+
+function flushPendingHierarchyFocus() {
+  const pathKey = runtime.pendingHierarchyFocusPath;
+  if (!pathKey || !hierarchyFocusSurfaceReady()) return null;
+  const target = focusVisibleHierarchyControl(pathKey);
+  if (!target) return null;
+  runtime.pendingHierarchyFocusPath = null;
+  window.clearTimeout(runtime.hierarchyFocusTimer);
+  runtime.hierarchyFocusTimer = null;
+  return target;
+}
+
+function scheduleHierarchyFocus(pathKey) {
+  runtime.pendingHierarchyFocusPath = pathKey;
+  window.clearTimeout(runtime.hierarchyFocusTimer);
+  runtime.hierarchyFocusTimer = window.setTimeout(() => {
+    runtime.hierarchyFocusTimer = null;
+    flushPendingHierarchyFocus();
+  }, 0);
 }
 
 function setDigitalPath(path, { historyMode = 'push' } = {}) {
@@ -1135,9 +1277,7 @@ function setDigitalPath(path, { historyMode = 'push' } = {}) {
   runtime.visibleRecordsCache = null;
   renderDiscoveryState();
   if (closesProject || runtime.state.view === 'layers') {
-    window.requestAnimationFrame(() => {
-      focusVisibleHierarchyControl(normalized.pathKey);
-    });
+    scheduleHierarchyFocus(normalized.pathKey);
   }
   if (historyMode) writeHistory(historyMode);
 }
@@ -1428,7 +1568,7 @@ function finishViewTransition(phase, { restoreFocus = false } = {}) {
       runtime.layerPanelReady = true;
       elements.stage.dataset.layerPanelVisibleAt = String(performance.now());
       showLayerState();
-      elements.layerClose.focus({ preventScroll: true });
+      if (!flushPendingHierarchyFocus()) elements.layerClose.focus({ preventScroll: true });
     });
   }
   if (phase === 'overview' && restoreFocus) {
@@ -1581,6 +1721,7 @@ function resetGlobe() {
 }
 
 function applyDeepLink(search, { initial = false } = {}) {
+  const previousFocus = document.activeElement;
   const next = stateFromSearch(search, runtime.records.map(({ id }) => id));
   if (initial && !new URLSearchParams(search).has('surface')) next.surface = storedPresentation();
   runtime.applyingHistory = true;
@@ -1607,6 +1748,9 @@ function applyDeepLink(search, { initial = false } = {}) {
   runtime.applyingHistory = false;
   if (initial) writeHistory('replace');
   else if (runtime.state.project) elements.focus.focus({ preventScroll: true });
+  else if (!isVisibleFocusTarget(previousFocus)) {
+    scheduleHierarchyFocus(serializeDigitalPath(runtime.state.digitalPath));
+  }
 }
 
 
@@ -1696,6 +1840,20 @@ function wireControls() {
     else openDiscovery({ trigger: elements.filterToggle });
   });
   elements.discoveryClose.addEventListener('click', () => closeDiscovery({ restoreFocus: true }));
+  elements.discoveryShowText.addEventListener('click', () => {
+    closeDiscovery({ restoreFocus: false });
+    setPresentation('text');
+    elements.textView.focus({ preventScroll: true });
+  });
+  elements.textShowMore.addEventListener('click', () => {
+    const firstNewIndex = runtime.textPresentationLimit;
+    runtime.textPresentationLimit += TEXT_IDENTITY_DOM_LIMIT;
+    renderDiscoveryState();
+    queueMicrotask(() => {
+      if (isVisibleFocusTarget(elements.textShowMore)) elements.textShowMore.focus({ preventScroll: true });
+      else document.querySelectorAll('.catalog-card:not([hidden]) .catalog-select')[firstNewIndex]?.focus({ preventScroll: true });
+    });
+  });
   for (const button of elements.discoveryOpenButtons) {
     button.addEventListener('click', () => openDiscovery({ trigger: button }));
   }
@@ -1929,6 +2087,18 @@ async function boot() {
     renderSphere();
     renderLayerStack();
     wireControls();
+    if (navigator.webdriver && ['127.0.0.1', 'localhost'].includes(location.hostname)) {
+      window.__commonworldInstallSyntheticRecordsForTest = (records) => {
+        installRecords(validateRecords(records));
+        runtime.state.project = null;
+        runtime.state.layer = null;
+        runtime.state.digitalPath = DIGITAL_ROOT_PATH;
+        runtime.state.query = '';
+        for (const name of INTENT_FILTER_NAMES) runtime.state[name] = null;
+        renderDiscoveryState();
+        return Object.freeze({ records: runtime.records.length, treeIdentities: runtime.digitalTree.identityIds.length });
+      };
+    }
     applyDeepLink(location.search, { initial: true });
     renderDiscoveryState();
     document.documentElement.classList.add('runtime-ready');

@@ -63,9 +63,12 @@ def serialize_path(path: list[str] | tuple[str, ...] | str | None) -> str:
 def normalize_path(value: object, taxonomy: dict[str, Any]) -> dict[str, Any]:
     root = [taxonomy.get("root_id", ROOT_ID)]
     fail = {"valid": False, "path": root, "path_key": serialize_path(root), "node_id": root[0]}
-    parts = [str(part).strip() for part in value] if isinstance(value, list) else [part for part in str(value or "").strip().split("/") if part]
-    if not parts:
+    # Only an absent/empty value denotes the root; every explicit slash must separate two canonical segments.
+    if not isinstance(value, list) and str(value or "") == "":
         return {"valid": True, "path": root, "path_key": serialize_path(root), "node_id": root[0]}
+    parts = [str(part) for part in value] if isinstance(value, list) else str(value or "").split("/")
+    if not parts or any(not part or part != part.strip() for part in parts):
+        return fail
     if any(part in {".", ".."} or not ID_PATTERN.fullmatch(part) for part in parts):
         return fail
     nodes = node_map(taxonomy)
