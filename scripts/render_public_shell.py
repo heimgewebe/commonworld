@@ -334,7 +334,8 @@ def render_shell(root: Path = ROOT) -> str:
         </div>
       </section>
 
-      <aside id="settings-panel" class="settings-panel" role="dialog" aria-modal="true" aria-labelledby="settings-title" hidden>
+      <aside id="settings-panel" class="settings-panel" role="dialog" aria-modal="true" aria-labelledby="settings-title" aria-describedby="settings-description" hidden>
+        <p id="settings-description" class="visually-hidden">Darstellung wählen und Informationen zu Daten, Methode und Lizenzen öffnen.</p>
         <div class="panel-heading">
           <div><p class="kicker">Einstellungen</p><h2 id="settings-title">Darstellung</h2></div>
           <button id="settings-close" class="icon-button" type="button" aria-label="Einstellungen schließen">×</button>
