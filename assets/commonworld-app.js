@@ -1256,14 +1256,10 @@ function focusVisibleHierarchyControl(pathKey) {
     `.digital-lane[data-digital-path="${CSS.escape(pathKey)}"] .digital-lane-focus`,
     `.digital-lane[data-digital-path="${CSS.escape(pathKey)}"] .digital-lane-scroll`,
     '#layer-breadcrumb .digital-breadcrumb-item[aria-current="page"]',
-    '#layer-close',
   ];
-  const fallbackSelectors = runtime.state.surface === 'text'
-    ? ['[data-open-discovery]', '#text-view']
-    : ['#globe-reset'];
   const selectors = runtime.state.surface === 'text'
-    ? [...textSelectors, ...globeSelectors, ...fallbackSelectors]
-    : [...globeSelectors, ...textSelectors, ...fallbackSelectors];
+    ? [...textSelectors, ...globeSelectors]
+    : [...globeSelectors, ...textSelectors];
   const target = selectors
     .map((selector) => document.querySelector(selector))
     .find(isVisibleFocusTarget);
@@ -1282,32 +1278,16 @@ function flushPendingHierarchyFocus() {
   return target;
 }
 
-const HIERARCHY_FOCUS_RETRY_DELAYS_MS = [0, 50, 150, 400, 900, 1800];
+const HIERARCHY_FOCUS_RETRY_DELAYS_MS = [0, 50, 150, 400, 900, 1800, 3600];
 
-function isVisibleHierarchyFocusTarget(target = document.activeElement) {
-  return isVisibleFocusTarget(target)
-    && target.matches('.digital-lane-focus, .digital-lane-scroll, .digital-breadcrumb-item, .layer-filter, #layer-close');
-}
-
-function scheduleHierarchyFocus(pathKey, verificationAttempt = 0) {
+function scheduleHierarchyFocus(pathKey) {
   runtime.pendingHierarchyFocusPath = pathKey;
   window.clearTimeout(runtime.hierarchyFocusTimer);
   let attempt = 0;
   const tryFocus = () => {
     runtime.hierarchyFocusTimer = null;
     if (runtime.pendingHierarchyFocusPath !== pathKey) return;
-    const target = flushPendingHierarchyFocus();
-    if (target) {
-      window.setTimeout(() => {
-        if (runtime.state.project || serializeDigitalPath(currentDigitalPath()) !== pathKey) return;
-        if (isVisibleHierarchyFocusTarget()) return;
-        const active = document.activeElement;
-        if (active && active !== document.body && isVisibleFocusTarget(active)) return;
-        if (verificationAttempt >= 2) return;
-        scheduleHierarchyFocus(pathKey, verificationAttempt + 1);
-      }, 50);
-      return;
-    }
+    if (flushPendingHierarchyFocus()) return;
     attempt += 1;
     if (attempt >= HIERARCHY_FOCUS_RETRY_DELAYS_MS.length) return;
     runtime.hierarchyFocusTimer = window.setTimeout(tryFocus, HIERARCHY_FOCUS_RETRY_DELAYS_MS[attempt]);
@@ -1625,7 +1605,10 @@ function finishViewTransition(phase, { restoreFocus = false } = {}) {
       runtime.layerPanelReady = true;
       elements.stage.dataset.layerPanelVisibleAt = String(performance.now());
       showLayerState();
-      if (!flushPendingHierarchyFocus()) elements.layerClose.focus({ preventScroll: true });
+      if (!flushPendingHierarchyFocus()) {
+        elements.layerClose.focus({ preventScroll: true });
+        if (runtime.pendingHierarchyFocusPath) scheduleHierarchyFocus(runtime.pendingHierarchyFocusPath);
+      }
     });
   }
   if (phase === 'overview' && restoreFocus) {
@@ -1728,12 +1711,17 @@ function trapSettingsFocus(event) {
   const first = targets[0];
   const last = targets.at(-1);
   const active = document.activeElement;
-  if (event.shiftKey && (active === first || !elements.settingsPanel.contains(active))) {
+  if (!elements.settingsPanel.contains(active)) {
+    event.preventDefault();
+    (event.shiftKey ? last : first).focus({ preventScroll: true });
+    return true;
+  }
+  if (event.shiftKey && active === first) {
     event.preventDefault();
     last.focus({ preventScroll: true });
     return true;
   }
-  if (!event.shiftKey && (active === last || !elements.settingsPanel.contains(active))) {
+  if (!event.shiftKey && active === last) {
     event.preventDefault();
     first.focus({ preventScroll: true });
     return true;
@@ -2000,7 +1988,7 @@ function wireControls() {
   });
   window.addEventListener('popstate', () => applyDeepLink(location.search));
   window.addEventListener('resize', () => {
-    updateOrientationBarClearance();
+    if (!runtime.orientationResizeObserver) updateOrientationBarClearance();
     if (runtime.resizeObserver) return;
     runtime.stageSize = null;
     runtime.map?.resize();

@@ -605,14 +605,47 @@ async function normalScenario() {
   assert(settingsOnlyState.settingsVisible && !settingsOnlyState.discoveryVisible && !settingsOnlyState.focusVisible, 'normal: primary overlay invariant failed while settings opened ' + JSON.stringify(settingsOnlyState));
   assert(settingsOnlyState.settingsModal === 'true', 'normal: settings are not exposed as a modal dialog');
   assert(settingsOnlyState.skipInert && settingsOnlyState.topbarInert && settingsOnlyState.globeInert && settingsOnlyState.textInert, 'normal: settings left background surfaces interactive ' + JSON.stringify(settingsOnlyState));
-  const settingsLinkHeights = await run.page.locator('#settings-panel a').evaluateAll((nodes) => nodes.map((node) => node.getBoundingClientRect().height));
-  assert(settingsLinkHeights.length > 0 && settingsLinkHeights.every((height) => height >= 44), `normal: settings contain undersized touch links (${JSON.stringify(settingsLinkHeights)})`);
+  assert((await run.page.evaluate(() => document.activeElement?.id)) === 'settings-close', 'normal: settings did not establish an initial focus target');
+  const settingsAccessibility = await run.page.evaluate(() => {
+    const panel = document.querySelector('#settings-panel');
+    const describedBy = panel.getAttribute('aria-describedby');
+    const selector = 'a[href], button:not([disabled]), input:not([disabled]):not([type="hidden"]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])';
+    const controls = [...panel.querySelectorAll(selector)].map((node) => ({
+      label: node.id || node.getAttribute('aria-label') || node.textContent.trim().slice(0, 40),
+      height: node.getBoundingClientRect().height,
+    }));
+    const background = [...document.querySelectorAll(selector)]
+      .filter((node) => !panel.contains(node) && node.getClientRects().length > 0)
+      .map((node) => ({
+        label: node.id || node.getAttribute('aria-label') || node.textContent.trim().slice(0, 40),
+        inertAncestor: Boolean(node.closest('[inert]')),
+      }));
+    return {
+      controls,
+      background,
+      describedBy,
+      description: describedBy ? document.getElementById(describedBy)?.textContent.trim() ?? '' : '',
+    };
+  });
+  assert(settingsAccessibility.controls.length > 0 && settingsAccessibility.controls.every(({ height }) => height >= 44), `normal: settings contain undersized focus targets (${JSON.stringify(settingsAccessibility.controls)})`);
+  assert(settingsAccessibility.background.length > 0 && settingsAccessibility.background.every(({ inertAncestor }) => inertAncestor), `normal: visible background focus target lacks an inert ancestor (${JSON.stringify(settingsAccessibility.background)})`);
+  assert(settingsAccessibility.describedBy === 'settings-description' && settingsAccessibility.description.length > 0, `normal: settings dialog lacks a usable description (${JSON.stringify(settingsAccessibility)})`);
   const lastSettingsLink = run.page.locator('#settings-panel a').last();
   await lastSettingsLink.focus();
   await run.page.keyboard.press('Tab');
   assert((await run.page.evaluate(() => document.activeElement?.id)) === 'settings-close', 'normal: settings focus escaped after the last control');
   await run.page.keyboard.press('Shift+Tab');
   assert(await lastSettingsLink.evaluate((node) => document.activeElement === node), 'normal: reverse settings focus did not wrap to the final control');
+  await run.page.evaluate(() => {
+    const probe = document.createElement('button');
+    probe.id = 'settings-focus-escape-probe';
+    probe.textContent = 'probe';
+    document.body.append(probe);
+    probe.focus();
+  });
+  await run.page.keyboard.press('Tab');
+  assert((await run.page.evaluate(() => document.activeElement?.id)) === 'settings-close', 'normal: settings did not recover focus from an injected outside target');
+  await run.page.evaluate(() => document.querySelector('#settings-focus-escape-probe')?.remove());
   await run.page.keyboard.press('Escape');
   assert(await run.page.locator('#settings-panel').isHidden(), 'normal: settings panel did not close with Escape');
   assert((await run.page.evaluate(() => document.activeElement?.id)) === 'settings-toggle', 'normal: settings focus was not restored');
@@ -1620,6 +1653,17 @@ async function legacyLayerAndAtomicFocusScenario() {
   assert(await focusRun.page.locator('#project-focus').isVisible(), 'atomic focus: Back did not restore Wikipedia focus');
   assert((await focusRun.page.locator('#focus-title').textContent()) === 'Wikipedia', 'atomic focus: Back restored the wrong project');
 
+  await focusRun.page.evaluate(() => {
+    const selector = '#layer-track-deck .digital-lane-focus, #layer-track-deck .digital-lane-scroll, #layer-breadcrumb .digital-breadcrumb-item';
+    const hideTargets = () => document.querySelectorAll(selector).forEach((node) => node.setAttribute('hidden', ''));
+    const observer = new MutationObserver(hideTargets);
+    observer.observe(document.documentElement, { childList: true, subtree: true });
+    hideTargets();
+    window.setTimeout(() => {
+      observer.disconnect();
+      document.querySelectorAll(selector).forEach((node) => node.removeAttribute('hidden'));
+    }, 240);
+  });
   await focusRun.page.goForward();
   await focusRun.page.waitForFunction(() => new URL(location.href).searchParams.get('digital_path') === 'sphere/communication_networks' && !new URL(location.href).searchParams.has('project'));
   await focusRun.page.waitForFunction(() => (
