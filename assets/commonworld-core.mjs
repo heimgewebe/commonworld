@@ -36,9 +36,12 @@ const finite = (value, fallback) => {
 const clamp = (value, minimum, maximum) => Math.min(maximum, Math.max(minimum, value));
 const rounded = (value, digits) => Number(value.toFixed(digits));
 
+export function hasDigitalPresence(record) {
+  return record?.presence?.digital?.available === true;
+}
+
 export function deriveLayer(record) {
-  const digital = record?.presence?.digital;
-  if (!digital || digital.available !== true) return null;
+  if (!hasDigitalPresence(record)) return null;
   const themes = new Set(Array.isArray(record.themes) ? record.themes : []);
   const scores = LAYERS.filter((layer) => layer.id !== 'mixed_other').map((layer) => ({
     id: layer.id,
@@ -238,6 +241,7 @@ const PRESENCE_INTENT_TERMS = Object.freeze({
   digital: Object.freeze(['digital', 'online', 'ortsunabhängig']),
   geographic: Object.freeze(['geografisch', 'vor ort', 'lokal']),
 });
+const COMBINED_PRESENCE_INTENT_TERMS = Object.freeze(['beides', 'vor ort und digital']);
 
 const FIELD_WEIGHTS = Object.freeze({
   title: 120,
@@ -332,12 +336,17 @@ function recordSearchFields(record) {
   append('theme', 'Thema', (record?.themes ?? []).flatMap((theme) => vocabularyValues(theme, THEME_INTENT_TERMS)));
   append('action', 'Möglichkeit', (record?.actions ?? []).flatMap((action) => vocabularyValues(action, ACTION_INTENT_TERMS)));
 
-  const kinds = [];
-  if (publicGeographicLocations(record).length > 0) kinds.push('geographic');
-  if (record?.presence?.digital?.available === true) kinds.push('digital');
-  append('presence', 'Präsenz', kinds.flatMap(k => vocabularyValues(k, PRESENCE_INTENT_TERMS)));
+  const geographicLocations = publicGeographicLocations(record);
+  const isGeographic = geographicLocations.length > 0;
+  const isDigital = hasDigitalPresence(record);
+  const axes = [];
+  if (isGeographic) axes.push('geographic');
+  if (isDigital) axes.push('digital');
+  const presenceTerms = axes.flatMap((axis) => vocabularyValues(axis, PRESENCE_INTENT_TERMS));
+  if (isGeographic && isDigital) presenceTerms.push(...COMBINED_PRESENCE_INTENT_TERMS);
+  append('presence', 'Präsenz', presenceTerms);
 
-  append('location', 'Ort', publicGeographicLocations(record).map(({ label }) => label));
+  append('location', 'Ort', geographicLocations.map(({ label }) => label));
   append('digital', 'Digitale Präsenz', [record?.presence?.digital?.label, record?.presence?.digital?.reach]);
   append('link', 'Offizieller Link', (record?.links ?? []).map(({ label, type }) => [label, type]));
   return fields;
@@ -362,11 +371,11 @@ function recordFreshness(record, today) {
 }
 
 export function recordMatchesIntentFilters(record, filters = {}, today = new Date().toISOString().slice(0, 10)) {
-  if (filters.layer && (record?.presence?.digital?.available !== true || deriveLayer(record) !== filters.layer)) return false;
+  if (filters.layer && deriveLayer(record) !== filters.layer) return false;
 
   if (Array.isArray(filters.presence) && filters.presence.length > 0) {
     if (filters.presence.includes('geographic') && publicGeographicLocations(record).length === 0) return false;
-    if (filters.presence.includes('digital') && record?.presence?.digital?.available !== true) return false;
+    if (filters.presence.includes('digital') && !hasDigitalPresence(record)) return false;
   }
 
   if (filters.action && !(record?.actions ?? []).includes(filters.action)) return false;
@@ -534,7 +543,7 @@ export function filterRecords(records, state = {}) {
 
 export function recordPresentationLabel(record) {
   const isGeo = publicGeographicLocations(record).length > 0;
-  const isDigital = record?.presence?.digital?.available === true;
+  const isDigital = hasDigitalPresence(record);
   const layer = deriveLayer(record);
   const digitalLabel = `Digital${layer ? ` · ${LAYERS.find(({ id }) => id === layer)?.label ?? 'Digitale Commons'}` : ''}`;
 
@@ -799,31 +808,30 @@ export function semanticZoomLevel(zoom, selectedProjectId = null) {
 }
 
 function spatialIdentityCount(records) {
-  return (Array.isArray(records) ? records : []).filter((record) =>
-    (Array.isArray(record?.presence?.geographic) ? record.presence.geographic : []).some((location) => location?.mode !== 'hidden' && location?.geometry),
-  ).length;
+  return (Array.isArray(records) ? records : []).filter((record) => publicGeographicLocations(record).length > 0).length;
 }
 
 function focusSpatialSummary(record) {
   const locations = Array.isArray(record?.presence?.geographic) ? record.presence.geographic : [];
-  const isGeo = publicGeographicLocations(record).length > 0;
-  const isDigital = record?.presence?.digital?.available === true;
+  const publicLocations = publicGeographicLocations(record);
+  const isGeo = publicLocations.length > 0;
+  const isDigital = hasDigitalPresence(record);
   if (isDigital && locations.length === 0) return 'Digital · Ortsunabhängige digitale Präsenz';
 
-  const visible = publicGeographicLocations(record).length;
+  const visible = publicLocations.length;
   const hidden = locations.filter((location) => location?.mode === 'hidden').length;
 
-  let kindLabel = 'Commons';
-  if (isGeo && isDigital) kindLabel = 'Vor Ort · Digital';
-  else if (isGeo) kindLabel = 'Vor Ort';
-  else if (isDigital) kindLabel = 'Digital';
-  else if (hidden > 0) kindLabel = 'Verborgene Orte';
+  let presenceLabel = 'Commons';
+  if (isGeo && isDigital) presenceLabel = 'Vor Ort · Digital';
+  else if (isGeo) presenceLabel = 'Vor Ort';
+  else if (isDigital) presenceLabel = 'Digital';
+  else if (hidden > 0) presenceLabel = 'Verborgene Orte';
 
-  if (visible === 0) return `${kindLabel} · ${hidden} ${hidden === 1 ? 'verborgener Ort' : 'verborgene Orte'}`;
+  if (visible === 0) return `${presenceLabel} · ${hidden} ${hidden === 1 ? 'verborgener Ort' : 'verborgene Orte'}`;
 
   const publicLabel = `${visible} ${visible === 1 ? 'öffentlicher Ort' : 'öffentliche Orte'}`;
   const hiddenLabel = `${hidden} ${hidden === 1 ? 'verborgener Ort' : 'verborgene Orte'}`;
-  return hidden ? `${kindLabel} · ${publicLabel} · ${hiddenLabel}` : `${kindLabel} · ${publicLabel}`;
+  return hidden ? `${presenceLabel} · ${publicLabel} · ${hiddenLabel}` : `${presenceLabel} · ${publicLabel}`;
 }
 
 export function semanticLocationLine({

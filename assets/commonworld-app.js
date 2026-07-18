@@ -8,6 +8,7 @@ import {
   digitalLayerCamera,
   filterRecords,
   globeHorizonCoordinates,
+  hasDigitalPresence,
   mapCamera,
   mapFailurePolicy,
   normalizeQuery,
@@ -268,7 +269,7 @@ function validateRecords(records) {
     if (Object.prototype.hasOwnProperty.call(record, 'kind')) throw new Error(`CommonProject ${record.id} enthält das entfernte Feld kind.`);
     const locations = record?.presence?.geographic;
     if (!Array.isArray(locations)) throw new Error(`CommonProject ${record.id} besitzt keine gültige Ortsliste.`);
-    const isDigital = record?.presence?.digital?.available === true;
+    const isDigital = hasDigitalPresence(record);
     const hasClaimedPresence = locations.length > 0 || isDigital;
     if (!hasClaimedPresence) throw new Error(`CommonProject ${record.id} besitzt keine belegte Präsenz.`);
     for (const location of locations) {
@@ -318,7 +319,8 @@ function createSvgElement(name, attributes = {}) {
 function groupedDigitalRecords(records = runtime.records) {
   const grouped = new Map(LAYERS.map((layer) => [layer.id, []]));
   for (const record of records) {
-    if (record?.presence?.digital?.available === true) grouped.get(deriveLayer(record))?.push(record);
+    const layer = deriveLayer(record);
+    if (layer) grouped.get(layer)?.push(record);
   }
   return grouped;
 }
@@ -687,7 +689,7 @@ function directActionLinks(record) {
 function resultLocationLabel(record) {
   const publicCount = publicGeographicLocations(record).length;
   if (publicCount > 0) return publicCount === 1 ? '1 öffentlicher Ort' : String(publicCount) + ' öffentliche Orte';
-  const isDigital = record?.presence?.digital?.available === true;
+  const isDigital = hasDigitalPresence(record);
   return isDigital ? 'Ortsunabhängige digitale Präsenz' : 'Keine öffentliche Geometrie';
 }
 

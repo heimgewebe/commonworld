@@ -13,6 +13,7 @@ import {
   digitalLayerCamera,
   filterRecords,
   globeHorizonCoordinates,
+  hasDigitalPresence,
   mapFailurePolicy,
   projectedGlobeCircle,
   publicGeographicLocations,
@@ -55,6 +56,13 @@ test('layer derivation uses catalog themes without overrides', () => {
   assert.equal(deriveLayer({ themes: ['knowledge', 'open-data'], presence: { digital: { available: true } } }), 'knowledge_data');
   assert.equal(deriveLayer({ themes: ['open-data', 'infrastructure'], presence: { digital: { available: true } } }), 'mixed_other');
   assert.equal(deriveLayer({ themes: ['education'], presence: { digital: { available: false } } }), null);
+});
+
+test('digital presence is derived from the explicit availability flag only', () => {
+  assert.equal(hasDigitalPresence({ presence: { digital: { available: true } } }), true);
+  assert.equal(hasDigitalPresence({ presence: { digital: { available: false } } }), false);
+  assert.equal(hasDigitalPresence({ presence: { digital: { label: 'Nur Beschreibung' } } }), false);
+  assert.equal(hasDigitalPresence(null), false);
 });
 
 test('binary fragments are stable visual encodings', () => {
@@ -443,7 +451,14 @@ test('semantic zoom remains presentation logic from planet to focus', () => {
   assert.equal(semanticZoomLevel(4.2), 'region');
   assert.equal(semanticZoomLevel(6.2), 'local');
   assert.equal(semanticZoomLevel(1.15, 'freifunk-hamburg'), 'focus');
-  assert.deepEqual(semanticLocationLine({ zoom: 4.2, records: presenceAxisRecords }), {
+  const recordsWithMalformedGeometry = [...presenceAxisRecords, {
+    id: 'malformed-location',
+    presence: {
+      geographic: [{ mode: 'exact', geometry: { type: 'Point', coordinates: [true, false] } }],
+      digital: { available: false },
+    },
+  }];
+  assert.deepEqual(semanticLocationLine({ zoom: 4.2, records: recordsWithMalformedGeometry }), {
     level: 'region',
     crumbs: ['Erde', 'Region'],
     summary: '2 räumlich belegte Commons · öffentliche Flächen und ungefähre Orte',
