@@ -229,6 +229,12 @@ async function primaryOverlayState(page) {
       focusVisible: !focus.hidden,
       focusInert: focus.hasAttribute('inert'),
       focusAriaHidden: focus.getAttribute('aria-hidden'),
+      skipInert: document.querySelector('.skip-link').hasAttribute('inert'),
+      topbarInert: document.querySelector('.topbar').hasAttribute('inert'),
+      globeInert: document.querySelector('#globe-surface').hasAttribute('inert'),
+      textInert: document.querySelector('#text-view').hasAttribute('inert'),
+      discoveryInert: discovery.hasAttribute('inert'),
+      settingsModal: settings.getAttribute('aria-modal'),
     };
   });
 }
@@ -597,11 +603,21 @@ async function normalScenario() {
   assert(await run.page.locator('#settings-panel').isVisible(), 'normal: settings panel did not open');
   const settingsOnlyState = await primaryOverlayState(run.page);
   assert(settingsOnlyState.settingsVisible && !settingsOnlyState.discoveryVisible && !settingsOnlyState.focusVisible, 'normal: primary overlay invariant failed while settings opened ' + JSON.stringify(settingsOnlyState));
-  assert((await run.page.locator('#settings-panel').getAttribute('aria-modal')) === 'false', 'normal: non-modal settings contract changed');
-  assert((await run.page.locator('#text-view').getAttribute('inert')) === null, 'normal: settings incorrectly block background navigation');
+  assert(settingsOnlyState.settingsModal === 'true', 'normal: settings are not exposed as a modal dialog');
+  assert(settingsOnlyState.skipInert && settingsOnlyState.topbarInert && settingsOnlyState.globeInert && settingsOnlyState.textInert, 'normal: settings left background surfaces interactive ' + JSON.stringify(settingsOnlyState));
+  const settingsLinkHeights = await run.page.locator('#settings-panel a').evaluateAll((nodes) => nodes.map((node) => node.getBoundingClientRect().height));
+  assert(settingsLinkHeights.length > 0 && settingsLinkHeights.every((height) => height >= 44), `normal: settings contain undersized touch links (${JSON.stringify(settingsLinkHeights)})`);
+  const lastSettingsLink = run.page.locator('#settings-panel a').last();
+  await lastSettingsLink.focus();
+  await run.page.keyboard.press('Tab');
+  assert((await run.page.evaluate(() => document.activeElement?.id)) === 'settings-close', 'normal: settings focus escaped after the last control');
+  await run.page.keyboard.press('Shift+Tab');
+  assert(await lastSettingsLink.evaluate((node) => document.activeElement === node), 'normal: reverse settings focus did not wrap to the final control');
   await run.page.keyboard.press('Escape');
   assert(await run.page.locator('#settings-panel').isHidden(), 'normal: settings panel did not close with Escape');
   assert((await run.page.evaluate(() => document.activeElement?.id)) === 'settings-toggle', 'normal: settings focus was not restored');
+  const settingsClosedState = await primaryOverlayState(run.page);
+  assert(!settingsClosedState.skipInert && !settingsClosedState.topbarInert && !settingsClosedState.globeInert && !settingsClosedState.textInert, 'normal: settings left background surfaces inert after close ' + JSON.stringify(settingsClosedState));
 
   await run.page.locator('#commons-search').fill('Debian');
   await run.page.waitForTimeout(220);
@@ -618,6 +634,7 @@ async function normalScenario() {
   assert(await run.page.locator('#project-focus').isHidden(), 'normal: selected project obscured discovery results');
   const discoveryOnlyState = await primaryOverlayState(run.page);
   assert(discoveryOnlyState.discoveryVisible && !discoveryOnlyState.settingsVisible && !discoveryOnlyState.focusVisible && discoveryOnlyState.focusInert && discoveryOnlyState.focusAriaHidden === 'true', 'normal: discovery did not exclusively suppress project focus ' + JSON.stringify(discoveryOnlyState));
+  assert(discoveryOnlyState.globeInert && discoveryOnlyState.textInert, 'normal: discovery left obscured content interactive ' + JSON.stringify(discoveryOnlyState));
   assert(new URL(run.page.url()).searchParams.get('project') === 'debian', 'normal: hiding focus for discovery cleared the selected project context');
   await run.page.keyboard.press('Escape');
   assert(await run.page.locator('#discovery-panel').isHidden(), 'normal: Escape did not close discovery before the preserved project focus');
@@ -1842,6 +1859,85 @@ async function syntheticCatalogueTruthScenario() {
   results.push({ id: 'synthetic-catalogue-truth', verdict: 'PASS', sizes: [500, 5000], preview: 48, increment: 48 });
 }
 
+async function liveUiHardeningScenario() {
+  for (const profile of [
+    { id: '320x568', width: 320, height: 568 },
+    { id: '390x844', width: 390, height: 844 },
+  ]) {
+    const run = await newPage({ mobile: true, viewportOverride: { width: profile.width, height: profile.height }, touch: true });
+    await run.page.goto(baseUrl, { waitUntil: 'domcontentloaded' });
+    await run.page.waitForSelector('html.runtime-ready');
+    await run.page.waitForSelector('.maplibregl-ctrl-attrib a');
+    const geometry = await run.page.evaluate(() => {
+      const orientation = document.querySelector('.orientation-bar').getBoundingClientRect();
+      const attribution = document.querySelector('.maplibregl-ctrl-attrib').getBoundingClientRect();
+      const links = [...document.querySelectorAll('.maplibregl-ctrl-attrib a')].map((link) => {
+        const rect = link.getBoundingClientRect();
+        const x = rect.left + rect.width / 2;
+        const y = rect.top + rect.height / 2;
+        const hit = document.elementFromPoint(x, y);
+        return {
+          label: link.textContent.trim(),
+          rect: { left: rect.left, top: rect.top, right: rect.right, bottom: rect.bottom },
+          centerHitsLink: hit === link || link.contains(hit),
+        };
+      });
+      return {
+        orientation: { top: orientation.top, bottom: orientation.bottom },
+        attribution: { top: attribution.top, bottom: attribution.bottom },
+        links,
+      };
+    });
+    assert(geometry.attribution.bottom <= geometry.orientation.top - 1, `live UI ${profile.id}: attribution overlaps orientation bar (${JSON.stringify(geometry)})`);
+    assert(geometry.links.length >= 4 && geometry.links.every(({ centerHitsLink }) => centerHitsLink), `live UI ${profile.id}: attribution link center is covered (${JSON.stringify(geometry.links)})`);
+    assert(run.consoleErrors.length === 0, `live UI ${profile.id}: console errors: ${run.consoleErrors.join(' | ')}`);
+    assert(run.pageErrors.length === 0, `live UI ${profile.id}: page errors: ${run.pageErrors.join(' | ')}`);
+    await run.context.close();
+  }
+
+  const run = await newPage({ viewportOverride: { width: 844, height: 390 }, touch: true, reducedMotion: 'reduce' });
+  await run.page.goto(baseUrl, { waitUntil: 'domcontentloaded' });
+  await run.page.waitForSelector('html.runtime-ready');
+  await run.page.locator('#layer-view-button').click();
+  await run.page.waitForSelector('.globe-stage[data-view-phase="layers"]');
+  await run.page.waitForSelector('#layer-panel[data-visible]:not([inert])');
+  const layout = await run.page.evaluate(() => {
+    const rect = (node) => {
+      const box = node.getBoundingClientRect();
+      return { top: box.top, bottom: box.bottom, height: box.height };
+    };
+    const deck = document.querySelector('#layer-track-deck');
+    const lanes = [...document.querySelectorAll('.digital-lane')].map((lane) => ({
+      lane: rect(lane),
+      focus: rect(lane.querySelector('.digital-lane-focus')),
+      scroll: rect(lane.querySelector('.digital-lane-scroll')),
+    }));
+    const overlaps = lanes.slice(0, -1).map((lane, index) => ({
+      focus: Math.max(0, lane.focus.bottom - lanes[index + 1].focus.top),
+      scroll: Math.max(0, lane.scroll.bottom - lanes[index + 1].scroll.top),
+    }));
+    const orientation = document.querySelector('.orientation-bar');
+    const globeReset = document.querySelector('#globe-reset');
+    return {
+      deck: { clientHeight: deck.clientHeight, scrollHeight: deck.scrollHeight, overflowY: getComputedStyle(deck).overflowY },
+      lanes,
+      overlaps,
+      orientationInert: orientation.hasAttribute('inert'),
+      orientationAriaHidden: orientation.getAttribute('aria-hidden'),
+      globeResetSuppressed: Boolean(globeReset.closest('[inert]')),
+    };
+  });
+  assert(layout.lanes.length === expectedDigitalProjection.fields.length, `live UI landscape: unexpected lane count (${JSON.stringify(layout)})`);
+  assert(layout.lanes.every(({ lane, focus, scroll }) => lane.height >= 47.5 && focus.height >= 44 && scroll.height >= 44), `live UI landscape: lane controls are clipped (${JSON.stringify(layout.lanes)})`);
+  assert(layout.overlaps.every(({ focus, scroll }) => focus <= 0.5 && scroll <= 0.5), `live UI landscape: adjacent controls overlap (${JSON.stringify(layout.overlaps)})`);
+  assert(layout.deck.scrollHeight > layout.deck.clientHeight && ['auto', 'scroll'].includes(layout.deck.overflowY), `live UI landscape: compressed lanes did not become vertically scrollable (${JSON.stringify(layout.deck)})`);
+  assert(layout.orientationInert && layout.orientationAriaHidden === 'true' && layout.globeResetSuppressed, `live UI landscape: hidden globe orientation remains keyboard interactive (${JSON.stringify(layout)})`);
+  assert(run.consoleErrors.length === 0, `live UI landscape: console errors: ${run.consoleErrors.join(' | ')}`);
+  assert(run.pageErrors.length === 0, `live UI landscape: page errors: ${run.pageErrors.join(' | ')}`);
+  results.push({ id: 'live-ui-hardening', verdict: 'PASS' });
+  await run.context.close();
+}
+
 async function catalogueFailureScenario() {
   const run = await newPage();
   await run.page.route('**/catalog/catalog.json', (route) => route.abort('failed'));
@@ -1935,6 +2031,8 @@ html { font-size: ${profile.fontScale}% !important; }
     assert(backBox && backBox.width >= 44 && backBox.height >= 44, `method ${profile.id}: back navigation is an undersized touch target (${JSON.stringify(backBox)})`);
     const overflow = await run.page.evaluate(() => document.documentElement.scrollWidth - document.documentElement.clientWidth);
     assert(overflow <= 1, `method ${profile.id}: horizontal overflow ${overflow}`);
+    const methodLinkHeights = await run.page.locator('main a').evaluateAll((nodes) => nodes.map((node) => node.getBoundingClientRect().height));
+    assert(methodLinkHeights.length > 0 && methodLinkHeights.every((height) => height >= 44), `method ${profile.id}: undersized touch link (${JSON.stringify(methodLinkHeights)})`);
     assert(run.consoleErrors.length === 0, `method ${profile.id}: console errors: ${run.consoleErrors.join(' | ')}`);
     assert(run.pageErrors.length === 0, `method ${profile.id}: page errors: ${run.pageErrors.join(' | ')}`);
     results.push({ id: `method-${profile.id}`, verdict: 'PASS' });
@@ -1962,6 +2060,7 @@ try {
   await validEmptyDigitalPathScenario();
   await externalLinkSafetyScenario();
   await syntheticCatalogueTruthScenario();
+  await liveUiHardeningScenario();
   await catalogueFailureScenario();
   await providerFailureScenario();
   await methodScenario();
