@@ -703,7 +703,7 @@ Die öffentliche OpenFreeMap-Instanz ist als Kartenlieferant ausgewählt, aber a
 
 Ein erfolgreicher GitHub-Pages-Status allein gilt nicht als Beweis, dass der neue Stand bereits öffentlich ausgeliefert wird. Nach jedem Push auf `main` wartet ein eigener Read-only-Workflow auf ein `github-pages`-Deployment mit exakt demselben Commit-SHA und führt danach den bestehenden hashgebundenen Live-Smoke gegen `commonworld.net` aus. Veraltete erfolgreiche Deployments werden nicht akzeptiert.
 
-Deployment-Warten, Dateiabrufe und CDN-Propagation sind zeitlich begrenzt. Der maschinenlesbare Beleg enthält Commit, Deployment-ID, beobachtete Zustände, Versuche und den vollständigen Live-Smoke-Beleg. Auch ein Fehlschlag hinterlässt einen Beleg. Die Prüfung autorisiert weder automatisches Rollback noch DNS-Mutation, Anbieterwechsel, SLA oder automatisches Failover; diese Entscheidungen bleiben eigene geprüfte Aufgaben.
+Deployment-Warten, Dateiabrufe und CDN-Propagation sind zeitlich begrenzt. Der maschinenlesbare Beleg enthält Commit, Deployment-ID, beobachtete Zustände, Versuche und den vollständigen Live-Smoke-Beleg. Auch ein Fehlschlag hinterlässt einen Beleg. Wird der geprüfte Commit währenddessen durch einen neueren `main`-Stand überholt, endet der alte Lauf ausdrücklich als `superseded`: ohne falschen Produktionsalarm und ohne Livebehauptung für den alten Stand. Die Prüfung autorisiert weder automatisches Rollback noch DNS-Mutation, Anbieterwechsel, SLA oder automatisches Failover; diese Entscheidungen bleiben eigene geprüfte Aufgaben.
 
 ## Qualitäts- und Publikationszustände
 

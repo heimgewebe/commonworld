@@ -39,6 +39,7 @@ jobs:
           python3 scripts/verify_pages_deployment.py
           --repository "${{ github.repository }}"
           --sha "${{ github.sha }}"
+          --source-ref main
           --receipt artifacts/commonworld-pages-production-readback.json
           --deployment-timeout-seconds 600
           --deployment-poll-seconds 10

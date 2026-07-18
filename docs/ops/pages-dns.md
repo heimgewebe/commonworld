@@ -85,7 +85,9 @@ The JSON receipt records the expected commit, selected deployment id and state, 
 
 A red readback does not authorize DNS mutation, provider migration or automatic recovery. There is no automatic rollback. Operators must distinguish a deployment failure, CDN propagation, DNS failure and a client-network problem before applying the separately reviewed rollback contract.
 
-The same workflow can be started manually with `workflow_dispatch`; it still binds itself to the exact commit selected by GitHub Actions.
+Rapid consecutive pushes are handled explicitly. The workflow reads the current `main` SHA before waiting, again after the exact deployment succeeds, and once more after a failed live verification. If a newer commit has superseded the run, the receipt uses verdict `superseded`, records when the change was observed, exits without a false production failure and makes no live claim for the older commit. The newer push starts its own exact readback.
+
+The same workflow can be started manually with `workflow_dispatch`; it still binds itself to the exact commit selected by GitHub Actions and compares that commit with the current `main` source ref.
 
 ## Change boundary
 

@@ -167,6 +167,7 @@ def validate_production_delivery_provider(root: Path = ROOT) -> list[str]:
         "workflow": PRODUCTION_READBACK_WORKFLOW.as_posix(),
         "trigger": ["push_to_main", "workflow_dispatch"],
         "deployment_environment": "github-pages",
+        "source_ref": "main",
         "commit_binding": "exact_sha",
         "deployment_timeout_seconds": 600,
         "deployment_poll_seconds": 10,
@@ -176,6 +177,7 @@ def validate_production_delivery_provider(root: Path = ROOT) -> list[str]:
         "receipt_id": "commonworld.pages-production-readback.v1",
         "receipt_artifact_retention_days": 30,
         "automatic_rollback": False,
+        "superseded_result": "receipt_without_live_claim_and_non_failure_exit",
     }
     for key, expected in expected_readback.items():
         if readback.get(key) != expected:

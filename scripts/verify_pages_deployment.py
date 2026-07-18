@@ -88,6 +88,9 @@ class ProductionReadbackReceipt:
     receipt_id: str
     repository: str
     expected_sha: str
+    source_ref: str
+    repository_head_sha: str | None
+    superseded_at: str | None
     environment: str
     requested_url: str
     started_at: str
@@ -157,6 +160,16 @@ def select_exact_deployment(
         "created_at": str(selected.get("created_at", "")),
         "updated_at": str(selected.get("updated_at", "")),
     }
+
+
+def current_repository_head(api_get: Callable[[str], object], source_ref: str) -> str:
+    response = api_get(f"commits/{urllib.parse.quote(source_ref, safe='')}")
+    if not isinstance(response, dict) or not isinstance(response.get("sha"), str):
+        raise RuntimeError("GitHub commit response must contain a SHA")
+    sha = str(response["sha"]).lower()
+    if len(sha) != 40 or any(character not in "0123456789abcdef" for character in sha):
+        raise RuntimeError("GitHub commit response contains an invalid SHA")
+    return sha
 
 
 def latest_deployment_state(statuses: object) -> str:
@@ -327,14 +340,18 @@ def run_live_smoke_with_retry(
     if not delays or delays[0] != 0 or any(delay < 0 for delay in delays):
         raise ValueError("live retry delays must be non-negative and start with zero")
     errors: list[str] = []
+    last_receipt: PagesLiveSmokeReceipt | None = None
+    last_exact_public_files: tuple[ExactPublicFileReceipt, ...] = ()
     for attempt, delay in enumerate(delays, start=1):
         if delay:
             sleeper(float(delay))
         try:
             receipt = live_smoke(url, timeout_seconds=timeout_seconds, insecure=False)
+            last_receipt = receipt
             exact_result = exact_file_check(receipt.final_url, timeout_seconds)
+            last_exact_public_files = exact_result.receipts
         except (OSError, RuntimeError) as error:
-            errors.append(str(error))
+            errors.append(f"cycle {attempt}: {error}")
             continue
         if exact_result.verdict == "pass":
             return LiveWaitResult(
@@ -344,13 +361,13 @@ def run_live_smoke_with_retry(
                 receipt=receipt,
                 exact_public_files=exact_result.receipts,
             )
-        errors.extend(exact_result.errors)
+        errors.extend(f"cycle {attempt}: {error}" for error in exact_result.errors)
     return LiveWaitResult(
         verdict="fail",
         attempts=len(delays),
         errors=tuple(errors),
-        receipt=None,
-        exact_public_files=(),
+        receipt=last_receipt,
+        exact_public_files=last_exact_public_files,
     )
 
 
@@ -361,6 +378,7 @@ def run_production_readback(
     token: str,
     url: str,
     environment: str = DEFAULT_ENVIRONMENT,
+    source_ref: str = "main",
     deployment_timeout_seconds: int = DEFAULT_DEPLOYMENT_TIMEOUT_SECONDS,
     deployment_poll_seconds: int = DEFAULT_DEPLOYMENT_POLL_SECONDS,
     live_timeout_seconds: int = DEFAULT_LIVE_TIMEOUT_SECONDS,
@@ -368,6 +386,7 @@ def run_production_readback(
     api_get: Callable[[str], object] | None = None,
     live_smoke: Callable[..., PagesLiveSmokeReceipt] = run_live_smoke,
     exact_file_check: Callable[[str, int], ExactPublicFilesResult] = verify_exact_public_files,
+    head_sha: Callable[[], str] | None = None,
     sleeper: Callable[[float], None] = time.sleep,
     monotonic: Callable[[], float] = time.monotonic,
     now: Callable[[], str] = utc_now,
@@ -380,34 +399,53 @@ def run_production_readback(
         errors.append("expected SHA must be a full 40-character hexadecimal commit id")
     if not token:
         errors.append("GitHub token is required")
+    if not source_ref:
+        errors.append("source ref is required")
 
+    repository_head_sha: str | None = None
+    superseded_at: str | None = None
     deployment_result = DeploymentWaitResult("fail", None, None, 0, (), None)
     live_result = LiveWaitResult("fail", 0, (), None, ())
     if not errors:
         request = api_get or (lambda endpoint: github_api_get(repository, endpoint, token))
+        read_head = head_sha or (lambda: current_repository_head(request, source_ref))
         try:
-            deployment_result = wait_for_exact_deployment(
-                expected_sha=expected_sha,
-                environment=environment,
-                timeout_seconds=deployment_timeout_seconds,
-                poll_seconds=deployment_poll_seconds,
-                api_get=request,
-                sleeper=sleeper,
-                monotonic=monotonic,
-                now=now,
-            )
-        except (RuntimeError, ValueError) as error:
-            deployment_result = DeploymentWaitResult(
-                verdict="fail",
-                deployment=None,
-                state=None,
-                attempts=0,
-                observations=(),
-                error=str(error),
-            )
-        if deployment_result.error:
-            errors.append(deployment_result.error)
-        if deployment_result.verdict == "pass":
+            repository_head_sha = read_head()
+        except RuntimeError as error:
+            errors.append(str(error))
+        if not errors and repository_head_sha != expected_sha:
+            superseded_at = "before_deployment"
+        if not errors and superseded_at is None:
+            try:
+                deployment_result = wait_for_exact_deployment(
+                    expected_sha=expected_sha,
+                    environment=environment,
+                    timeout_seconds=deployment_timeout_seconds,
+                    poll_seconds=deployment_poll_seconds,
+                    api_get=request,
+                    sleeper=sleeper,
+                    monotonic=monotonic,
+                    now=now,
+                )
+            except (RuntimeError, ValueError) as error:
+                deployment_result = DeploymentWaitResult(
+                    verdict="fail",
+                    deployment=None,
+                    state=None,
+                    attempts=0,
+                    observations=(),
+                    error=str(error),
+                )
+            if deployment_result.error:
+                errors.append(deployment_result.error)
+        if not errors and deployment_result.verdict == "pass":
+            try:
+                repository_head_sha = read_head()
+            except RuntimeError as error:
+                errors.append(str(error))
+            if not errors and repository_head_sha != expected_sha:
+                superseded_at = "after_deployment"
+        if not errors and deployment_result.verdict == "pass" and superseded_at is None:
             try:
                 live_result = run_live_smoke_with_retry(
                     url=url,
@@ -420,19 +458,30 @@ def run_production_readback(
             except ValueError as error:
                 live_result = LiveWaitResult("fail", 0, (str(error),), None, ())
             if live_result.verdict != "pass":
-                errors.append("public Pages content did not match the exact checked-out commit")
+                try:
+                    repository_head_sha = read_head()
+                except RuntimeError as error:
+                    errors.append(str(error))
+                if not errors and repository_head_sha != expected_sha:
+                    superseded_at = "during_live_verification"
+                else:
+                    errors.append("public Pages content did not match the exact checked-out commit")
 
+    verdict = "superseded" if superseded_at is not None else ("pass" if not errors else "fail")
     return ProductionReadbackReceipt(
         schema_version=1,
         kind="commonworld_pages_production_readback",
         receipt_id="commonworld.pages-production-readback.v1",
         repository=repository,
         expected_sha=expected_sha,
+        source_ref=source_ref,
+        repository_head_sha=repository_head_sha,
+        superseded_at=superseded_at,
         environment=environment,
         requested_url=url,
         started_at=started_at,
         completed_at=now(),
-        verdict="pass" if not errors else "fail",
+        verdict=verdict,
         deployment_timeout_seconds=deployment_timeout_seconds,
         deployment_poll_seconds=deployment_poll_seconds,
         deployment_attempts=deployment_result.attempts,
@@ -460,6 +509,7 @@ def unexpected_failure_receipt(
     repository: str,
     expected_sha: str,
     environment: str,
+    source_ref: str,
     url: str,
     deployment_timeout_seconds: int,
     deployment_poll_seconds: int,
@@ -474,6 +524,9 @@ def unexpected_failure_receipt(
         receipt_id="commonworld.pages-production-readback.v1",
         repository=repository,
         expected_sha=expected_sha,
+        source_ref=source_ref,
+        repository_head_sha=None,
+        superseded_at=None,
         environment=environment,
         requested_url=url,
         started_at=timestamp,
@@ -522,6 +575,7 @@ def main() -> int:
     parser.add_argument("--sha", default=os.environ.get("GITHUB_SHA", ""))
     parser.add_argument("--url", default=os.environ.get("COMMONWORLD_PAGES_URL", "https://commonworld.net/"))
     parser.add_argument("--environment", default=DEFAULT_ENVIRONMENT)
+    parser.add_argument("--source-ref", default="main")
     parser.add_argument("--receipt", type=Path, default=Path("artifacts/commonworld-pages-production-readback.json"))
     parser.add_argument("--deployment-timeout-seconds", type=int, default=DEFAULT_DEPLOYMENT_TIMEOUT_SECONDS)
     parser.add_argument("--deployment-poll-seconds", type=int, default=DEFAULT_DEPLOYMENT_POLL_SECONDS)
@@ -539,6 +593,7 @@ def main() -> int:
             token=os.environ.get("GITHUB_TOKEN", ""),
             url=args.url,
             environment=args.environment,
+            source_ref=args.source_ref,
             deployment_timeout_seconds=args.deployment_timeout_seconds,
             deployment_poll_seconds=args.deployment_poll_seconds,
             live_timeout_seconds=args.live_timeout_seconds,
@@ -550,6 +605,7 @@ def main() -> int:
             repository=args.repository,
             expected_sha=args.sha.lower(),
             environment=args.environment,
+            source_ref=args.source_ref,
             url=args.url,
             deployment_timeout_seconds=args.deployment_timeout_seconds,
             deployment_poll_seconds=args.deployment_poll_seconds,
@@ -558,7 +614,7 @@ def main() -> int:
         )
     write_receipt(args.receipt, receipt)
     print(json.dumps(asdict(receipt), indent=2, sort_keys=True))
-    return 0 if receipt.verdict == "pass" else 1
+    return 0 if receipt.verdict in {"pass", "superseded"} else 1
 
 
 if __name__ == "__main__":
