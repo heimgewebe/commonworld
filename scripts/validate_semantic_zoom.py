@@ -102,8 +102,8 @@ def validate_semantic_zoom(root: Path = ROOT) -> list[str]:
     if contract.get("schema_version") != 1:
         errors.append("aggregation zoom schema_version must be 1")
     source = contract.get("source_contract", {})
-    if source.get("schema_version") != 3 or source.get("identity_key") != "CommonProject.id":
-        errors.append("aggregation zoom contract must bind to CommonProject v3 identity")
+    if source.get("schema_version") != 4 or source.get("identity_key") != "CommonProject.id":
+        errors.append("aggregation zoom contract must bind to CommonProject v4 identity")
 
     aggregation = contract.get("aggregation_unit", {})
     expected_aggregation = {
@@ -112,7 +112,7 @@ def validate_semantic_zoom(root: Path = ROOT) -> list[str]:
         "global_count_rule": "one_identity_at_most_once_in_global_totals",
         "multi_anchor_rule": "anchors_select_spatial_buckets_but_never_multiply_identity_count_within_one_bucket",
         "theme_count_rule": "one_identity_at_most_once_per_theme_per_bucket",
-        "hybrid_rule": "one_identity_with_geographic_and_digital_representations",
+        "dual_presence_rule": "one_identity_with_geographic_and_digital_representations",
     }
     for key, expected in expected_aggregation.items():
         if aggregation.get(key) != expected:

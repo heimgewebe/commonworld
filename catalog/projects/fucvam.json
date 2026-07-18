@@ -1,9 +1,8 @@
 {
-  "schema_version": 3,
+  "schema_version": 4,
   "id": "fucvam",
   "title": "FUCVAM",
   "summary": "Die uruguayische Föderation von Wohnungsgenossenschaften auf Gegenseitigkeit verbindet gemeinschaftliches Bodeneigentum, demokratische Selbstverwaltung und gegenseitige Hilfe beim Aufbau und Erhalt von Wohnraum.",
-  "kind": "geographic",
   "themes": [
     "housing",
     "community-land",

@@ -1,9 +1,8 @@
 {
-  "schema_version": 3,
+  "schema_version": 4,
   "id": "bioleft",
   "title": "Bioleft",
   "summary": "Eine gemeinschaftliche Initiative in Argentinien, die Saatgut, agronomisches Wissen und partizipative Pflanzenzüchtung über offene Vereinbarungen zwischen Produzenten, Forschern und weiteren Beteiligten teilt.",
-  "kind": "hybrid",
   "themes": [
     "seeds",
     "food",

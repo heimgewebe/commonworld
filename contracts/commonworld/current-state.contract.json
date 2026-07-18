@@ -1,7 +1,7 @@
 {
   "schema_version": 2,
   "kind": "commonworld_current_public_state",
-  "current_as_of": "2026-07-16",
+  "current_as_of": "2026-07-17",
   "precedence": {
     "current_operational_truth": "this contract",
     "catalog_truth": "catalog/catalog.json and the referenced CommonProject records",
@@ -47,7 +47,7 @@
       "sha256": "15c76c0875d42e4f670f6513d97804cf0805a054057cf74c0f99798f6432fd8a"
     },
     {
-      "path": "contracts/commonworld/digital-sphere.contract.json",
+      "path": "docs/research/digital-sphere-v1.contract.json",
       "scope": "digital-sphere proof before public production authorization",
       "sha256": "f0aaab7c259880b8cffc849d0e305d35a64f59ee76638e06da33a843ec28af7c"
     },

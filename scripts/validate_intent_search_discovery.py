@@ -12,6 +12,7 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[1]
 CONTRACT = Path("contracts/commonworld/intent-search-discovery.contract.json")
 RESULT = Path("docs/research/intent-search-discovery-v1.result.json")
+EXPECTED_RESULT_SHA256 = "7085139444d298e41a3bc9fbda4af3e6e75c02f2c90cc173e52c48deab34245f"
 FILTERS = ["presence", "action", "language", "access", "freshness", "curation"]
 ACTIONS = {"visit", "use", "borrow", "learn", "contribute", "volunteer", "donate", "contact", "replicate"}
 NONCLAIMS = [
@@ -23,18 +24,6 @@ NONCLAIMS = [
     "server-side search",
     "WCAG conformance",
 ]
-HASHED_PATHS = [
-    "assets/commonworld-core.mjs",
-    "assets/commonworld-app.js",
-    "contracts/commonworld/project.schema.json",
-    "contracts/commonworld/intent-search-discovery.contract.json",
-    "scripts/render_public_shell.py",
-    "scripts/smoke_public_browser.mjs",
-    "scripts/validate_public_catalog.py",
-    "index.css",
-    "index.html",
-]
-
 
 def load(path: Path) -> dict:
     return json.loads(path.read_text(encoding="utf-8"))
@@ -42,16 +31,6 @@ def load(path: Path) -> dict:
 
 def sha256(path: Path) -> str:
     return hashlib.sha256(path.read_bytes()).hexdigest()
-
-
-def catalog_digest(root: Path) -> str:
-    digest = hashlib.sha256()
-    for path in sorted((root / "catalog/projects").glob("*.json")):
-        digest.update(path.name.encode("utf-8"))
-        digest.update(b"\0")
-        digest.update(path.read_bytes())
-        digest.update(b"\0")
-    return digest.hexdigest()
 
 
 def node_probe(root: Path) -> tuple[dict | None, str | None]:
@@ -72,7 +51,7 @@ const ids = (query, filters = {}) => filterRecords(records, { query, ...filters,
 const mapData = publicMapFeatureCollection(records);
 const serialized = searchFromState({
   camera: { lng: 9.9, lat: 53.5, zoom: 4, bearing: 0, pitch: 0 },
-  query: 'mitmachen', presence: 'hybrid', action: 'volunteer', language: 'de',
+  query: 'mitmachen', presence: ['geographic', 'digital'], action: 'volunteer', language: 'de',
   access: 'public', freshness: 'current', curation: 'listed',
 });
 const roundtrip = stateFromSearch(serialized, records.map((record) => record.id));
@@ -80,7 +59,7 @@ const synthetic = Array.from({ length: 50000 }, (_, position) => ({
   id: 'common-' + String(position).padStart(5, '0'),
   title: 'Commons ' + position,
   summary: position === 49999 ? 'Ein seltener Leuchtturmbegriff.' : 'Gemeinschaftliche Infrastruktur.',
-  kind: 'digital', themes: ['infrastructure'], actions: ['use'],
+  themes: ['infrastructure'], actions: ['use'],
   presence: { geographic: [], digital: { available: true, reach: 'global', label: 'Digitale Präsenz' } },
   activity: { status: 'active' }, curation: { state: 'listed', next_review_at: '2027-01-01' }, links: [],
 }));
@@ -91,7 +70,7 @@ console.log(JSON.stringify({
   germanContribution: ids('ich möchte mitmachen'),
   publicPlace: ids('Anderlecht'),
   hiddenPhrase: ids('private heimrouter'),
-  hybridVolunteer: ids('', { presence: 'hybrid', action: 'volunteer' }),
+  dualPresenceVolunteer: ids('', { presence: ['geographic', 'digital'], action: 'volunteer' }),
   digitalTarget: publicProjectNavigationTarget(mapData, 'debian'),
   geographicTarget: publicProjectNavigationTarget(mapData, 'cltb-le-nid'),
   hiddenTarget: publicProjectNavigationTarget(mapData, 'freifunk-hamburg-private-routers'),
@@ -154,7 +133,7 @@ def validate_intent_search_discovery(root: Path = ROOT) -> list[str]:
         errors.append("T007 contract identity mismatch")
     if contract.get("source_contract") != {
         "id": "https://commonworld.net/contracts/commonworld/project.schema.json",
-        "schema_version": 3,
+        "schema_version": 4,
         "identity_key": "CommonProject.id",
     }:
         errors.append("T007 source contract binding mismatch")
@@ -237,10 +216,11 @@ def validate_intent_search_discovery(root: Path = ROOT) -> list[str]:
             for record in records
             if "contribute" in record.get("actions", [])
         )
-        expected_hybrid_volunteer = sorted(
+        expected_dual_presence_volunteer = sorted(
             record["id"]
             for record in records
-            if record.get("kind") == "hybrid"
+            if bool(record.get("presence", {}).get("geographic"))
+            and record.get("presence", {}).get("digital", {}).get("available") is True
             and "volunteer" in record.get("actions", [])
         )
         if probe.get("indexedRecords") != manifest.get("entry_count") or probe.get("indexedTerms", 0) <= 0:
@@ -251,8 +231,8 @@ def validate_intent_search_discovery(root: Path = ROOT) -> list[str]:
             errors.append("T007 public place query mismatch")
         if probe.get("hiddenPhrase") != []:
             errors.append("T007 hidden geographic values leaked into search")
-        if probe.get("hybridVolunteer") != expected_hybrid_volunteer:
-            errors.append("T007 combined hybrid-volunteer filter does not match claimed actions")
+        if probe.get("dualPresenceVolunteer") != expected_dual_presence_volunteer:
+            errors.append("T007 combined dual_presence-volunteer filter does not match claimed actions")
         if probe.get("digitalTarget") is not None:
             errors.append("T007 digital Commons acquired a spatial navigation target")
         if probe.get("geographicTarget", {}).get("kind") != "bounds":
@@ -260,7 +240,7 @@ def validate_intent_search_discovery(root: Path = ROOT) -> list[str]:
         if probe.get("hiddenTarget") is not None:
             errors.append("T007 hidden location acquired a navigation target")
         if probe.get("roundtrip") != {
-            "query": "mitmachen", "presence": "hybrid", "action": "volunteer",
+            "query": "mitmachen", "presence": ["geographic", "digital"], "action": "volunteer",
             "language": "de", "access": "public", "freshness": "current", "curation": "listed",
         }:
             errors.append("T007 query/filter URL roundtrip mismatch")
@@ -287,12 +267,8 @@ def validate_intent_search_discovery(root: Path = ROOT) -> list[str]:
     if result.get("checked_at") != "2026-07-16" or result.get("status") != "verified_for_publication":
         errors.append("T007 research result status mismatch")
     verification = result.get("implementation_verification", {})
-    evidence = verification.get("file_evidence", {})
-    for relative in HASHED_PATHS:
-        if evidence.get(relative) != sha256(root / relative):
-            errors.append(f"T007 research evidence hash mismatch: {relative}")
-    if verification.get("catalog_projects_sha256") != catalog_digest(root):
-        errors.append("T007 catalog evidence hash mismatch")
+    if sha256(root / RESULT) != EXPECTED_RESULT_SHA256:
+        errors.append("T007 historical research result was rewritten")
     if verification.get("browser", {}).get("receipt_sha256") != "abf7a1f353935dd34999dd9898c2ec69f0c263bbcfd55af178e6461c5ebf7301":
         errors.append("T007 browser receipt binding mismatch")
     if result.get("does_not_establish") != NONCLAIMS:

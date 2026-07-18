@@ -1,9 +1,8 @@
 {
-  "schema_version": 3,
+  "schema_version": 4,
   "id": "edinburgh-tool-library",
   "title": "Edinburgh Tool Library",
   "summary": "Eine gemeinschaftlich und überwiegend ehrenamtlich getragene Werkzeugbibliothek, die Werkzeuge verleiht, Reparatur und praktische Fähigkeiten vermittelt und lokale Gemeinschaftsprojekte unterstützt.",
-  "kind": "geographic",
   "themes": [
     "tool-sharing",
     "repair",

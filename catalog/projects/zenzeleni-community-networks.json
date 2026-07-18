@@ -1,9 +1,8 @@
 {
-  "schema_version": 3,
+  "schema_version": 4,
   "id": "zenzeleni-community-networks",
   "title": "Zenzeleni Community Networks",
   "summary": "Ein von lokalen Genossenschaften getragenes Gemeinschaftsnetz im ländlichen Eastern Cape, das bezahlbare Konnektivität bereitstellt und Einnahmen sowie Verantwortung in den Gemeinden hält.",
-  "kind": "hybrid",
   "themes": [
     "communication",
     "community-network",

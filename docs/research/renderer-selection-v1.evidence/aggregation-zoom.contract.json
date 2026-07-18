@@ -4,7 +4,7 @@
   "description": "Canonical transport-neutral derivation rules from CommonProject v3 into geographic and digital semantic-zoom views. This is a presentation contract, never editorial catalog truth or an API definition.",
   "source_contract": {
     "id": "https://commonworld.net/contracts/commonworld/project.schema.json",
-    "schema_version": 4,
+    "schema_version": 3,
     "identity_key": "CommonProject.id"
   },
   "aggregation_unit": {
@@ -14,7 +14,7 @@
     "multi_anchor_rule": "anchors_select_spatial_buckets_but_never_multiply_identity_count_within_one_bucket",
     "theme_count_rule": "one_identity_at_most_once_per_theme_per_bucket",
     "theme_totals_may_exceed_identity_total": true,
-    "dual_presence_rule": "one_identity_with_geographic_and_digital_representations"
+    "hybrid_rule": "one_identity_with_geographic_and_digital_representations"
   },
   "publication_eligibility": {
     "public_curation_states": [
@@ -207,7 +207,7 @@
       ],
       "forbidden": [
         "multiple_focused_identities",
-        "duplicate_dual_presence_records",
+        "duplicate_hybrid_records",
         "presentation_only_catalog_fields"
       ],
       "identity_detail": "exactly_one_complete_record",
@@ -274,7 +274,7 @@
         "all_public_representations_for_same_identity"
       ],
       "forbidden": [
-        "duplicate_dual_presence_records",
+        "duplicate_hybrid_records",
         "invented_coordinates"
       ],
       "shape_refs": [
@@ -392,7 +392,7 @@
       "forbidden": [
         "hidden_geometry",
         "invented_coordinate",
-        "separate_dual_presence_identity"
+        "separate_hybrid_identity"
       ]
     },
     "relation_summary": {
@@ -431,7 +431,7 @@
       "exactly_one_identity": true,
       "project_id_source": "CommonProject.id",
       "forbidden": [
-        "duplicate_dual_presence_record",
+        "duplicate_hybrid_record",
         "presentation_only_catalog_fields"
       ]
     },

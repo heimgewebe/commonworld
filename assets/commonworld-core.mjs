@@ -36,9 +36,12 @@ const finite = (value, fallback) => {
 const clamp = (value, minimum, maximum) => Math.min(maximum, Math.max(minimum, value));
 const rounded = (value, digits) => Number(value.toFixed(digits));
 
+export function hasDigitalPresence(record) {
+  return record?.presence?.digital?.available === true;
+}
+
 export function deriveLayer(record) {
-  const digital = record?.presence?.digital;
-  if (!digital || digital.available !== true) return null;
+  if (!hasDigitalPresence(record)) return null;
   const themes = new Set(Array.isArray(record.themes) ? record.themes : []);
   const scores = LAYERS.filter((layer) => layer.id !== 'mixed_other').map((layer) => ({
     id: layer.id,
@@ -120,7 +123,7 @@ export function normalizeQuery(value) {
 }
 
 export const INTENT_FILTER_VALUES = Object.freeze({
-  presence: Object.freeze(['geographic', 'digital', 'hybrid']),
+  presence: Object.freeze(['geographic', 'digital']),
   action: Object.freeze(['visit', 'use', 'borrow', 'learn', 'contribute', 'volunteer', 'donate', 'contact', 'replicate']),
   access: Object.freeze(['public', 'membership', 'restricted', 'unknown']),
   freshness: Object.freeze(['current', 'stale', 'unknown']),
@@ -137,11 +140,17 @@ const languageFilterParameter = (parameters) => {
   return value === 'unknown' || /^[a-z]{2,3}(?:-[A-Z]{2})?$/.test(value ?? '') ? value : null;
 };
 
+function normalizedPresenceFilters(values) {
+  const requested = new Set(Array.isArray(values) ? values : []);
+  return INTENT_FILTER_VALUES.presence.filter((value) => requested.has(value));
+}
+
 export function stateFromSearch(search = '', knownProjectIds = []) {
   const parameters = new URLSearchParams(search.startsWith('?') ? search.slice(1) : search);
   const known = new Set(knownProjectIds);
   const project = parameters.get('project');
   const layer = parameters.get('layer');
+  const presence = normalizedPresenceFilters(parameters.getAll('presence'));
   return {
     camera: cameraFromSearch(search),
     project: project && known.has(project) ? project : null,
@@ -149,7 +158,7 @@ export function stateFromSearch(search = '', knownProjectIds = []) {
     view: parameters.get('view') === 'layers' ? 'layers' : 'globe',
     surface: parameters.get('surface') === 'text' ? 'text' : 'globe',
     query: normalizeQuery(parameters.get('q')),
-    presence: filterParameter(parameters, 'presence'),
+    presence: Object.freeze(presence),
     action: filterParameter(parameters, 'action'),
     language: languageFilterParameter(parameters),
     access: filterParameter(parameters, 'access'),
@@ -174,9 +183,12 @@ export function searchFromState(state) {
   if (state?.project) parameters.set('project', state.project);
   const query = normalizeQuery(state?.query);
   if (query) parameters.set('q', query);
-  for (const name of ['presence', 'action', 'access', 'freshness', 'curation']) {
+  for (const name of ['action', 'access', 'freshness', 'curation']) {
     const value = state?.[name];
     if (INTENT_FILTER_VALUES[name].includes(value)) parameters.set(name, value);
+  }
+  for (const presence of normalizedPresenceFilters(state?.presence)) {
+    parameters.append('presence', presence);
   }
   const language = state?.language;
   if (language === 'unknown' || /^[a-z]{2,3}(?:-[A-Z]{2})?$/.test(language ?? '')) {
@@ -225,17 +237,17 @@ const THEME_INTENT_TERMS = Object.freeze({
   'shared-space': Object.freeze(['gemeinschaftsraum', 'gemeinsamer raum']),
 });
 
-const KIND_INTENT_TERMS = Object.freeze({
+const PRESENCE_INTENT_TERMS = Object.freeze({
   digital: Object.freeze(['digital', 'online', 'ortsunabhängig']),
   geographic: Object.freeze(['geografisch', 'vor ort', 'lokal']),
-  hybrid: Object.freeze(['hybrid', 'online und vor ort', 'beides']),
 });
+const COMBINED_PRESENCE_INTENT_TERMS = Object.freeze(['beides', 'vor ort und digital']);
 
 const FIELD_WEIGHTS = Object.freeze({
   title: 120,
   location: 100,
   action: 85,
-  kind: 70,
+  presence: 70,
   theme: 65,
   digital: 55,
   summary: 45,
@@ -259,8 +271,54 @@ export function searchTokens(value) {
   return normalized ? normalized.split(' ') : [];
 }
 
-function publicGeographicLocations(record) {
-  return (record?.presence?.geographic ?? []).filter((location) => location?.mode !== 'hidden');
+function validPosition(value) {
+  return Array.isArray(value)
+    && value.length === 2
+    && value.every((number) => Number.isFinite(number))
+    && value[0] >= -180 && value[0] <= 180
+    && value[1] >= -90 && value[1] <= 90;
+}
+
+function validLinearRing(value) {
+  return Array.isArray(value)
+    && value.length >= 4
+    && value.every(validPosition)
+    && value[0][0] === value.at(-1)[0]
+    && value[0][1] === value.at(-1)[1];
+}
+
+function validGeometryCoordinates(type, coordinates) {
+  if (type === 'Point') return validPosition(coordinates);
+  if (type === 'Polygon') return Array.isArray(coordinates) && coordinates.length > 0 && coordinates.every(validLinearRing);
+  if (type === 'MultiPolygon') {
+    return Array.isArray(coordinates)
+      && coordinates.length > 0
+      && coordinates.every((polygon) => Array.isArray(polygon) && polygon.length > 0 && polygon.every(validLinearRing));
+  }
+  return false;
+}
+
+export function publicGeographicRepresentationKind(location) {
+  if (!location || typeof location !== 'object' || location.mode === 'hidden') return null;
+  const type = location?.geometry?.type;
+  const coordinates = location?.geometry?.coordinates;
+  if (!validGeometryCoordinates(type, coordinates)) return null;
+  if (location.mode === 'approximate') {
+    return type === 'Point' && Number.isFinite(location.uncertainty_meters_min) && location.uncertainty_meters_min > 0
+      ? 'approximate_zone'
+      : null;
+  }
+  if (location.mode !== 'exact') return null;
+  if (type === 'Point') return 'exact_anchor';
+  if (type === 'Polygon' || type === 'MultiPolygon') return 'public_extent';
+  return null;
+}
+
+export function publicGeographicLocations(record) {
+  const locations = record?.presence?.geographic;
+  return Array.isArray(locations)
+    ? locations.filter((location) => publicGeographicRepresentationKind(location) !== null)
+    : [];
 }
 
 function vocabularyValues(value, vocabulary) {
@@ -277,8 +335,18 @@ function recordSearchFields(record) {
   append('summary', 'Beschreibung', [record?.summary]);
   append('theme', 'Thema', (record?.themes ?? []).flatMap((theme) => vocabularyValues(theme, THEME_INTENT_TERMS)));
   append('action', 'Möglichkeit', (record?.actions ?? []).flatMap((action) => vocabularyValues(action, ACTION_INTENT_TERMS)));
-  append('kind', 'Präsenz', vocabularyValues(record?.kind, KIND_INTENT_TERMS));
-  append('location', 'Ort', publicGeographicLocations(record).map(({ label }) => label));
+
+  const geographicLocations = publicGeographicLocations(record);
+  const isGeographic = geographicLocations.length > 0;
+  const isDigital = hasDigitalPresence(record);
+  const axes = [];
+  if (isGeographic) axes.push('geographic');
+  if (isDigital) axes.push('digital');
+  const presenceTerms = axes.flatMap((axis) => vocabularyValues(axis, PRESENCE_INTENT_TERMS));
+  if (isGeographic && isDigital) presenceTerms.push(...COMBINED_PRESENCE_INTENT_TERMS);
+  append('presence', 'Präsenz', presenceTerms);
+
+  append('location', 'Ort', geographicLocations.map(({ label }) => label));
   append('digital', 'Digitale Präsenz', [record?.presence?.digital?.label, record?.presence?.digital?.reach]);
   append('link', 'Offizieller Link', (record?.links ?? []).map(({ label, type }) => [label, type]));
   return fields;
@@ -303,10 +371,13 @@ function recordFreshness(record, today) {
 }
 
 export function recordMatchesIntentFilters(record, filters = {}, today = new Date().toISOString().slice(0, 10)) {
-  if (filters.layer && (record?.presence?.digital?.available !== true || deriveLayer(record) !== filters.layer)) return false;
-  if (filters.presence === 'geographic' && publicGeographicLocations(record).length === 0) return false;
-  if (filters.presence === 'digital' && record?.presence?.digital?.available !== true) return false;
-  if (filters.presence === 'hybrid' && !(publicGeographicLocations(record).length > 0 && record?.presence?.digital?.available === true)) return false;
+  if (filters.layer && deriveLayer(record) !== filters.layer) return false;
+
+  if (Array.isArray(filters.presence) && filters.presence.length > 0) {
+    if (filters.presence.includes('geographic') && publicGeographicLocations(record).length === 0) return false;
+    if (filters.presence.includes('digital') && !hasDigitalPresence(record)) return false;
+  }
+
   if (filters.action && !(record?.actions ?? []).includes(filters.action)) return false;
   if (filters.language) {
     const languages = recordLanguageValues(record);
@@ -471,21 +542,18 @@ export function filterRecords(records, state = {}) {
 }
 
 export function recordPresentationLabel(record) {
-  const kind = record?.kind;
+  const isGeo = publicGeographicLocations(record).length > 0;
+  const isDigital = hasDigitalPresence(record);
   const layer = deriveLayer(record);
-  if (kind === 'hybrid') return `Hybrid${layer ? ` · ${LAYERS.find(({ id }) => id === layer)?.label ?? 'Digitale Commons'}` : ''}`;
-  if (kind === 'geographic') return 'Geografisch';
-  if (kind === 'digital') return `Digital${layer ? ` · ${LAYERS.find(({ id }) => id === layer)?.label ?? 'Digitale Commons'}` : ''}`;
+  const digitalLabel = `Digital${layer ? ` · ${LAYERS.find(({ id }) => id === layer)?.label ?? 'Digitale Commons'}` : ''}`;
+
+  if (isGeo && isDigital) return `Vor Ort · ${digitalLabel}`;
+  if (isGeo) return 'Vor Ort';
+  if (isDigital) return digitalLabel;
   return 'Commons';
 }
 
-function geometryRepresentationKind(location) {
-  const type = location?.geometry?.type;
-  if (location?.mode === 'approximate' && type === 'Point' && finite(location?.uncertainty_meters_min, 0) > 0) return 'approximate_zone';
-  if (location?.mode === 'exact' && type === 'Point') return 'exact_anchor';
-  if (location?.mode === 'exact' && (type === 'Polygon' || type === 'MultiPolygon')) return 'public_extent';
-  return null;
-}
+
 
 function cloneCoordinates(value) {
   return Array.isArray(value) ? value.map(cloneCoordinates) : value;
@@ -560,7 +628,7 @@ function publicGeometry(location, representationKind) {
 }
 
 function publicMapFeature(record, location) {
-  const representationKind = geometryRepresentationKind(location);
+  const representationKind = publicGeographicRepresentationKind(location);
   if (!representationKind) return null;
   return Object.freeze({
     type: 'Feature',
@@ -570,7 +638,6 @@ function publicMapFeature(record, location) {
       project_id: record.id,
       location_id: location.id,
       title: record.title ?? record.id,
-      project_kind: record.kind ?? 'geographic',
       location_label: location.label ?? record.title ?? record.id,
       location_mode: location.mode,
       representation_kind: representationKind,
@@ -741,20 +808,30 @@ export function semanticZoomLevel(zoom, selectedProjectId = null) {
 }
 
 function spatialIdentityCount(records) {
-  return (Array.isArray(records) ? records : []).filter((record) =>
-    (Array.isArray(record?.presence?.geographic) ? record.presence.geographic : []).some((location) => location?.mode !== 'hidden' && location?.geometry),
-  ).length;
+  return (Array.isArray(records) ? records : []).filter((record) => publicGeographicLocations(record).length > 0).length;
 }
 
 function focusSpatialSummary(record) {
   const locations = Array.isArray(record?.presence?.geographic) ? record.presence.geographic : [];
-  if (record?.kind === 'digital' && locations.length === 0) return 'Digital · Ortsunabhängige digitale Präsenz';
-  const visible = locations.filter((location) => location?.mode !== 'hidden' && location?.geometry).length;
+  const publicLocations = publicGeographicLocations(record);
+  const isGeo = publicLocations.length > 0;
+  const isDigital = hasDigitalPresence(record);
+  if (isDigital && locations.length === 0) return 'Digital · Ortsunabhängige digitale Präsenz';
+
+  const visible = publicLocations.length;
   const hidden = locations.filter((location) => location?.mode === 'hidden').length;
-  const kind = record?.kind === 'hybrid' ? 'Hybrid' : record?.kind === 'geographic' ? 'Geografisch' : 'Digital';
+
+  let presenceLabel = 'Commons';
+  if (isGeo && isDigital) presenceLabel = 'Vor Ort · Digital';
+  else if (isGeo) presenceLabel = 'Vor Ort';
+  else if (isDigital) presenceLabel = 'Digital';
+  else if (hidden > 0) presenceLabel = 'Verborgene Orte';
+
+  if (visible === 0) return `${presenceLabel} · ${hidden} ${hidden === 1 ? 'verborgener Ort' : 'verborgene Orte'}`;
+
   const publicLabel = `${visible} ${visible === 1 ? 'öffentlicher Ort' : 'öffentliche Orte'}`;
   const hiddenLabel = `${hidden} ${hidden === 1 ? 'verborgener Ort' : 'verborgene Orte'}`;
-  return hidden ? `${kind} · ${publicLabel} · ${hiddenLabel}` : `${kind} · ${publicLabel}`;
+  return hidden ? `${presenceLabel} · ${publicLabel} · ${hiddenLabel}` : `${presenceLabel} · ${publicLabel}`;
 }
 
 export function semanticLocationLine({

@@ -141,9 +141,9 @@ class SemanticZoomContractTests(unittest.TestCase):
         }
         self.assertEqual(("digital",), identity_channels(record))
 
-    def test_hybrid_is_one_identity_with_two_channels(self) -> None:
+    def test_dual_presence_is_one_identity_with_two_channels(self) -> None:
         record = base_record()
-        record["kind"] = "hybrid"
+        record["presence"] = {"digital": {"available": True}, "geographic": [{"mode": "approximate", "id": "1", "geometry": {"type": "Point", "coordinates": [0,0]}, "uncertainty_meters_min": 100}]}; record.pop("kind", None)
         record["presence"]["digital"] = {
             "available": True,
             "reach": "network",

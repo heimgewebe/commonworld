@@ -23,12 +23,12 @@ class PublicSeedBaselineTests(unittest.TestCase):
     def test_seed_baseline_validates(self) -> None:
         self.assertEqual([], validate_public_seed_baseline(ROOT))
 
-    def test_seed_kind_drift_is_rejected(self) -> None:
+    def test_seed_geographic_drift_is_rejected(self) -> None:
         with tempfile.TemporaryDirectory() as tmp_dir:
             root = self.copy_catalog(tmp_dir)
-            self.mutate(root, "debian", lambda record: record.update({"kind": "hybrid"}))
+            self.mutate(root, "debian", lambda record: record.setdefault("presence", {}).update({"geographic": [{"mode": "exact", "geometry": {"type": "Point", "coordinates": [0, 0]}}]}))
             errors = validate_public_seed_baseline(root)
-        self.assertTrue(any("must remain digital" in error for error in errors))
+        self.assertTrue(any("must remain without geographic locations" in error for error in errors))
 
     def test_seed_geography_or_relation_is_rejected(self) -> None:
         with tempfile.TemporaryDirectory() as tmp_dir:

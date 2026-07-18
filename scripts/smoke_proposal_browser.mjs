@@ -28,7 +28,8 @@ async function fillValid(page, name = 'Browser Test Commons') {
   await page.getByLabel('Kurze Beschreibung').fill('Eine gemeinschaftlich verwaltete Ressource mit offenen Regeln, offiziellen Quellen und einem realen öffentlichen Beteiligungsweg.');
   await page.getByLabel('Offizielle Website').fill('https://example.net/commons');
   await page.getByLabel('Commons-Art').selectOption('other');
-  await page.getByLabel('Präsenz').selectOption('hybrid');
+  await page.getByRole('checkbox', { name: 'Vor Ort', exact: true }).check();
+  await page.getByRole('checkbox', { name: 'Digital', exact: true }).check();
   await page.getByLabel('Grobe Region oder Ort').fill('Norddeutschland');
   await page.getByLabel('HTTPS-Link').first().fill('https://example.net/commons/about');
   await page.getByLabel('Primärnahe Quellen').fill('https://example.net/commons/governance');
@@ -75,7 +76,9 @@ html { font-size: ${profile.fontScale}% !important; }
     const skipBox = await skipLink.boundingBox();
     assert(skipBox && skipBox.x >= 0 && skipBox.x + skipBox.width <= profile.viewport.width + 1, `${profile.name}: focused skip link overflows the viewport ${JSON.stringify(skipBox)}`);
   }
-  assert(await page.locator('form fieldset').count() === 4, `${profile.name}: semantic fieldsets missing`);
+  const fieldsetLegends = await page.locator('form fieldset > legend').allTextContents();
+  assert(JSON.stringify(fieldsetLegends) === JSON.stringify(['Projekt', 'Präsenz', 'Belegte Handlungswege', 'Quellen und Hinweise', 'Einwilligung und Öffentlichkeit']), `${profile.name}: semantic fieldsets differ ${JSON.stringify(fieldsetLegends)}`);
+  assert(await page.locator('input[name="region"]').isDisabled(), `${profile.name}: geographic region is active without Vor Ort`);
   assert(pageErrors.length === 0, `${profile.name}: page errors ${pageErrors.join('; ')}`);
   results.push(profile.name);
   await context.close();
@@ -91,6 +94,24 @@ html { font-size: ${profile.fontScale}% !important; }
   await page.getByText('GitHub wurde geöffnet.').waitFor();
   assert((await page.getByRole('link', { name: 'GitHub direkt öffnen' }).getAttribute('href')).includes('body='), 'success: structured issue body missing');
   results.push('success-message');
+  await context.close();
+}
+
+{
+  const context = await browser.newContext({ viewport: { width: 1024, height: 768 }, reducedMotion: 'reduce' });
+  await context.addInitScript(() => { window.open = () => ({ opener: window }); });
+  const page = await context.newPage();
+  await page.goto(`${baseUrl}/propose.html`, { waitUntil: 'networkidle' });
+  await fillValid(page, 'Digital Only Test Commons');
+  await page.getByRole('checkbox', { name: 'Vor Ort', exact: true }).uncheck();
+  const region = page.locator('input[name="region"]');
+  assert(await region.isDisabled(), 'digital-only: region remained editable');
+  assert(await region.getAttribute('required') === null, 'digital-only: region remained required');
+  await page.getByRole('button', { name: 'Öffentliches GitHub-Issue vorbereiten' }).click();
+  await page.getByText('GitHub wurde geöffnet.').waitFor();
+  const issueUrl = new URL(await page.getByRole('link', { name: 'GitHub direkt öffnen' }).getAttribute('href'));
+  assert(issueUrl.searchParams.get('body').includes('nicht zutreffend (nur digital)'), 'digital-only: issue body invented a region');
+  results.push('digital-only-without-region');
   await context.close();
 }
 
@@ -143,6 +164,19 @@ html { font-size: ${profile.fontScale}% !important; }
   assert(await page.getByRole('alert').isVisible(), 'privacy-invalid: error surface missing');
   assert((await page.getByRole('alert').textContent()).includes('keine Adresse oder Koordinate'), 'privacy-invalid: fail-closed reason missing');
   results.push('privacy-fail-closed');
+  await context.close();
+}
+
+{
+  const context = await browser.newContext({ viewport: { width: 1280, height: 900 } });
+  const page = await context.newPage();
+  await page.goto(`${baseUrl}/propose.html`, { waitUntil: 'networkidle' });
+  await fillValid(page, 'No Presence Test');
+  await page.getByRole('checkbox', { name: 'Vor Ort', exact: true }).uncheck();
+  await page.getByRole('checkbox', { name: 'Digital', exact: true }).uncheck();
+  await page.getByRole('button', { name: 'Öffentliches GitHub-Issue vorbereiten' }).click();
+  assert(await page.getByRole('alert').isVisible(), 'presence-missing: error surface missing');
+  results.push('presence-missing-fail-closed');
   await context.close();
 }
 

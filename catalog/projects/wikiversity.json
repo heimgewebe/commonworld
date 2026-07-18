@@ -1,9 +1,8 @@
 {
-  "schema_version": 3,
+  "schema_version": 4,
   "id": "wikiversity",
   "title": "Wikiversity",
   "summary": "Eine offene Plattform für freie Lernressourcen, Kurse und gemeinschaftliche Bildungsprojekte in vielen Sprachen.",
-  "kind": "digital",
   "themes": [
     "learning",
     "education"

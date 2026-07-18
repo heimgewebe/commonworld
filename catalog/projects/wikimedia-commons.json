@@ -1,9 +1,8 @@
 {
-  "schema_version": 3,
+  "schema_version": 4,
   "id": "wikimedia-commons",
   "title": "Wikimedia Commons",
   "summary": "Eine freie, gemeinschaftlich aufgebaute Sammlung von Bildern, Audio, Video und anderen Mediendateien zur Wiederverwendung.",
-  "kind": "digital",
   "themes": [
     "open-media",
     "creative-commons"

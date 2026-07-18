@@ -53,19 +53,80 @@ def homepage(record: dict) -> str:
     return values[0]
 
 
+def _valid_position(value: object) -> bool:
+    return (
+        isinstance(value, list)
+        and len(value) == 2
+        and all(isinstance(number, (int, float)) and not isinstance(number, bool) for number in value)
+        and -180 <= value[0] <= 180
+        and -90 <= value[1] <= 90
+    )
+
+
+def _valid_ring(value: object) -> bool:
+    return (
+        isinstance(value, list)
+        and len(value) >= 4
+        and all(_valid_position(position) for position in value)
+        and value[0] == value[-1]
+    )
+
+
+def _public_location(location: object) -> bool:
+    if not isinstance(location, dict) or location.get("mode") == "hidden":
+        return False
+    geometry = location.get("geometry")
+    if not isinstance(geometry, dict):
+        return False
+    geometry_type = geometry.get("type")
+    coordinates = geometry.get("coordinates")
+    valid_geometry = (
+        (geometry_type == "Point" and _valid_position(coordinates))
+        or (geometry_type == "Polygon" and isinstance(coordinates, list) and bool(coordinates) and all(_valid_ring(ring) for ring in coordinates))
+        or (
+            geometry_type == "MultiPolygon"
+            and isinstance(coordinates, list)
+            and bool(coordinates)
+            and all(isinstance(polygon, list) and bool(polygon) and all(_valid_ring(ring) for ring in polygon) for polygon in coordinates)
+        )
+    )
+    if not valid_geometry:
+        return False
+    if location.get("mode") == "approximate":
+        uncertainty = location.get("uncertainty_meters_min")
+        return (
+            geometry_type == "Point"
+            and isinstance(uncertainty, (int, float))
+            and not isinstance(uncertainty, bool)
+            and uncertainty > 0
+        )
+    return location.get("mode") == "exact"
+
+
+def public_locations(record: dict) -> list[dict]:
+    locations = record.get("presence", {}).get("geographic", [])
+    if not isinstance(locations, list):
+        return []
+    return [location for location in locations if _public_location(location)]
+
+
 def presentation_label(record: dict) -> str:
-    kind = record.get("kind")
-    if kind == "geographic":
-        return "Geografisch"
-    label = LAYER_LABELS[derive_layer(record)]
-    return f"Hybrid · {label}" if kind == "hybrid" else f"Digital · {label}"
+    has_geo = bool(public_locations(record))
+    has_digital = record.get("presence", {}).get("digital", {}).get("available") is True
+    if has_geo and has_digital:
+        return f"Vor Ort · Digital · {LAYER_LABELS[derive_layer(record)]}"
+    if has_geo:
+        return "Vor Ort"
+    if has_digital:
+        return f"Digital · {LAYER_LABELS[derive_layer(record)]}"
+    return "Commons"
 
 
 def location_summary(record: dict) -> str:
     locations = record.get("presence", {}).get("geographic", [])
     if not isinstance(locations, list) or not locations:
         return "Ortsunabhängige digitale Präsenz"
-    public_count = sum(1 for location in locations if location.get("mode") != "hidden" and location.get("geometry"))
+    public_count = len(public_locations(record))
     hidden_count = sum(1 for location in locations if location.get("mode") == "hidden")
     parts = []
     if public_count:
@@ -188,7 +249,7 @@ def render_shell(root: Path = ROOT) -> str:
           <button id="discovery-close" class="icon-button" type="button" aria-label="Suchergebnisse schließen">×</button>
         </div>
         <div class="intent-filter-grid" aria-label="Commons filtern">
-          <label><span>Präsenz</span><select id="filter-presence" data-intent-filter="presence"><option value="">Alle Formen</option><option value="geographic">Vor Ort</option><option value="digital">Digital</option><option value="hybrid">Hybrid</option></select></label>
+          <fieldset class="filter-presence-group"><legend>Präsenz</legend><label><input type="checkbox" id="filter-presence-geographic" name="presence" value="geographic" data-intent-filter="presence"> Vor Ort</label><label><input type="checkbox" id="filter-presence-digital" name="presence" value="digital" data-intent-filter="presence"> Digital</label></fieldset>
           <label><span>Aktion</span><select id="filter-action" data-intent-filter="action"><option value="">Alle Aktionen</option><option value="use">Nutzen</option><option value="borrow">Ausleihen</option><option value="learn">Lernen</option><option value="contribute">Mitmachen</option><option value="volunteer">Ehrenamtlich helfen</option><option value="donate">Spenden</option><option value="visit">Besuchen</option><option value="contact">Kontaktieren</option><option value="replicate">Übertragen</option></select></label>
           <label><span>Sprache</span><select id="filter-language" data-intent-filter="language"><option value="">Alle Angaben</option><option value="de">Deutsch</option><option value="unknown">Nicht angegeben</option></select></label>
           <label><span>Zugang</span><select id="filter-access" data-intent-filter="access"><option value="">Alle Zugänge</option><option value="public">Öffentlich</option><option value="membership">Mitgliedschaft</option><option value="restricted">Beschränkt</option><option value="unknown">Nicht angegeben</option></select></label>
@@ -312,7 +373,7 @@ def render_shell(root: Path = ROOT) -> str:
       </aside>
 
       <section id="project-focus" class="project-focus" tabindex="-1" aria-labelledby="focus-title" hidden>
-        <div class="panel-heading"><div><p id="focus-kind" class="kicker"></p><h2 id="focus-title"></h2></div><button id="focus-close" class="icon-button" type="button" aria-label="Fokus schließen">×</button></div>
+        <div class="panel-heading"><div><p id="focus-presence" class="kicker"></p><h2 id="focus-title"></h2></div><button id="focus-close" class="icon-button" type="button" aria-label="Fokus schließen">×</button></div>
         <p id="focus-summary" class="focus-summary"></p>
         <div class="focus-grid">
           <section><h3>Themen</h3><ul id="focus-themes"></ul></section>
@@ -362,7 +423,7 @@ def render_method(root: Path = ROOT) -> str:
       <p class="kicker">Commonworld</p>
       <h1>Methode, Abdeckung und Datenschutz</h1>
       <p><a class="secondary-back-link" href="./">← Zurück zum Globus</a></p>
-      <section><h2>Was Commonworld zeigt</h2><p>Commonworld veröffentlicht kuratierte Commons als eine gemeinsame Entdeckungsoberfläche. Der aktuelle Startkatalog enthält {count} Commons mit digitaler, geografischer oder hybrider Präsenz. Er ist ein begrenzter redaktioneller Ausschnitt und keine vollständige Weltstatistik.</p></section>
+      <section><h2>Was Commonworld zeigt</h2><p>Commonworld veröffentlicht kuratierte Commons als eine gemeinsame Entdeckungsoberfläche. Der aktuelle Startkatalog enthält {count} Commons mit digitaler und/oder öffentlich verortbarer Präsenz. Er ist ein begrenzter redaktioneller Ausschnitt und keine vollständige Weltstatistik.</p></section>
       <section><h2>Daten und Quellen</h2><p>Jeder Eintrag besitzt eine stabile <code>CommonProject.id</code>, Quellen, Abrufdaten, Aktivitäts- und Kurationsangaben. Die JSON-Dateien sind dieselbe Datenwahrheit wie Globus und Textansicht. Fehlende Katalogeinträge bedeuten nicht, dass in einer Region keine Commons existieren.</p></section>
       <section><h2>Vorschläge und Redaktion</h2><p>Über <a href="./propose.html">Commons vorschlagen</a> können öffentliche Kandidaten vorbereitet werden. Commonworld speichert das Formular nicht. Der bevorzugte Eingang ist ein öffentliches GitHub-Issue; alternativ entsteht eine lokale JSON-Datei. Vorschläge werden nie automatisch veröffentlicht. Die Redaktion prüft Identität, primärnahe Quellen, Commons-Eigenschaft, Handlungswege, Datenschutz, Ortsgenauigkeit, Dubletten und Aktualität nach dem <a href="./contracts/commonworld/editorial-review.contract.json">Redaktionsvertrag</a>.</p></section>
       <section><h2>Orte und Privatsphäre</h2><p>Digitale Commons erhalten keine erfundenen Kartenkoordinaten. Geografische Angaben können exakt, angenähert oder verborgen sein. Verborgene Orte erhalten keine Geometrie und werden nicht aus anderen Angaben rekonstruiert.</p></section>

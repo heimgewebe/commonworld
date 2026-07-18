@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Validate the T006 real geographic and hybrid Commons vertical slice."""
+"""Validate the T006 presence axes vertical slice."""
 
 from __future__ import annotations
 
@@ -10,7 +10,7 @@ import sys
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
-CONTRACT_PATH = Path("contracts/commonworld/real-hybrid-commons.contract.json")
+CONTRACT_PATH = Path("contracts/commonworld/presence-axes.contract.json")
 RESEARCH_PATH = Path("docs/research/real-hybrid-commons-v1.result.json")
 CURRENT_STATE_PATH = Path("contracts/commonworld/current-state.contract.json")
 EXPECTED_PROJECTS = ("cltb-le-nid", "freifunk-hamburg", "freifunk")
@@ -77,7 +77,7 @@ console.log(JSON.stringify({
         return None, f"invalid Node projection output: {error}"
 
 
-def validate_real_hybrid_commons(root: Path = ROOT) -> list[str]:
+def validate_presence_axes(root: Path = ROOT) -> list[str]:
     errors: list[str] = []
     required_files = {
         "contract": root / CONTRACT_PATH,
@@ -145,21 +145,20 @@ def validate_real_hybrid_commons(root: Path = ROOT) -> list[str]:
     }
     if (
         current_state.get("schema_version") != 2
-        or current_state.get("current_as_of") != "2026-07-16"
+        or current_state.get("current_as_of") != "2026-07-17"
         or current_state.get("licensing") != expected_licensing
     ):
         errors.append("T006 canonical current-state licensing does not preserve the ODbL geometry exception")
     if contract.get("source_contract") != {
         "id": "https://commonworld.net/contracts/commonworld/project.schema.json",
-        "schema_version": 3,
+        "schema_version": 4,
         "identity_key": "CommonProject.id",
     }:
         errors.append("T006 source contract binding mismatch")
     if contract.get("catalog_validation") != {
         "production_validator": "scripts/validate_public_catalog.py",
         "seed_regression_validator": "scripts/validate_public_seed_baseline.py",
-        "vertical_slice_validator": "scripts/validate_real_hybrid_commons.py",
-        "production_allows_kinds": ["geographic", "digital", "hybrid"],
+        "vertical_slice_validator": "scripts/validate_presence_axes.py",
         "production_source_types": ["official-source", "public-registry"],
         "seed_constraints_do_not_apply_to_new_records": True,
     }:
@@ -173,8 +172,9 @@ def validate_real_hybrid_commons(root: Path = ROOT) -> list[str]:
     if (
         map_contract.get("hidden_locations_excluded") is not True
         or map_contract.get("invented_coordinates_forbidden") is not True
+        or map_contract.get("dual_presence_duplication_forbidden") is not True
     ):
-        errors.append("T006 hidden-location or invented-coordinate protection missing")
+        errors.append("T006 hidden-location, invented-coordinate or duplication protection missing")
     if map_contract.get("runtime_projection") != {
         "catalog_snapshot_frozen_after_install": True,
         "approximate_zones_precomputed_per_catalog_install": True,
@@ -212,13 +212,13 @@ def validate_real_hybrid_commons(root: Path = ROOT) -> list[str]:
             errors.append(f"T006 public catalog is missing {identifier}")
 
     hamburg = records["freifunk-hamburg"]
-    if le_nid.get("kind") != "geographic":
+    if not le_nid.get("presence", {}).get("geographic") or le_nid.get("presence", {}).get("digital", {}).get("available"):
         errors.append("T006 Le Nid must be one geographic CommonProject")
     if (
-        hamburg.get("kind") != "hybrid"
+        not hamburg.get("presence", {}).get("geographic")
         or hamburg.get("presence", {}).get("digital", {}).get("available") is not True
     ):
-        errors.append("T006 Freifunk Hamburg must be one hybrid CommonProject with digital presence")
+        errors.append("T006 Freifunk Hamburg must be one dual-presence CommonProject with digital presence")
 
     exact = _location(le_nid, "cltb-le-nid-entrance")
     extent = _location(le_nid, "cltb-le-nid-building")
@@ -469,12 +469,12 @@ def validate_real_hybrid_commons(root: Path = ROOT) -> list[str]:
 
 
 def main() -> int:
-    errors = validate_real_hybrid_commons(ROOT)
+    errors = validate_presence_axes(ROOT)
     if errors:
         for error in errors:
             print(f"ERROR: {error}", file=sys.stderr)
         return 1
-    print("commonworld real geographic and hybrid Commons validation ok")
+    print("commonworld presence axes vertical slice validation ok")
     return 0
 
 

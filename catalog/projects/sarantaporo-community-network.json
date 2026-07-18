@@ -1,9 +1,8 @@
 {
-  "schema_version": 3,
+  "schema_version": 4,
   "id": "sarantaporo-community-network",
   "title": "Sarantaporo.gr Community Network",
   "summary": "Ein gemeinschaftlich aufgebautes und betriebenes Funknetz in ländlichen Dörfern der Region Elassona, das offene Konnektivität, digitale Bildung und lokale Selbstorganisation verbindet.",
-  "kind": "hybrid",
   "themes": [
     "communication",
     "community-network",

@@ -1,9 +1,8 @@
 {
-  "schema_version": 3,
+  "schema_version": 4,
   "id": "wikipedia",
   "title": "Wikipedia",
   "summary": "Eine gemeinschaftlich erstellte, frei zugängliche Enzyklopädie in vielen Sprachen, deren Inhalte von Freiwilligen geschrieben und gepflegt werden.",
-  "kind": "digital",
   "themes": [
     "knowledge",
     "documentation"

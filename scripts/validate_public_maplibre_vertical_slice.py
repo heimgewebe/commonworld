@@ -115,6 +115,59 @@ def _catalog_records(root: Path, manifest: dict) -> list[dict]:
     return records
 
 
+def _valid_position(value: object) -> bool:
+    return (
+        isinstance(value, list)
+        and len(value) == 2
+        and all(isinstance(number, (int, float)) and not isinstance(number, bool) for number in value)
+        and -180 <= value[0] <= 180
+        and -90 <= value[1] <= 90
+    )
+
+
+def _valid_ring(value: object) -> bool:
+    return (
+        isinstance(value, list)
+        and len(value) >= 4
+        and all(_valid_position(position) for position in value)
+        and value[0] == value[-1]
+    )
+
+
+def _publicly_mappable(record: dict) -> bool:
+    presence = record.get("presence", {}) if isinstance(record.get("presence"), dict) else {}
+    locations = presence.get("geographic", [])
+    if not isinstance(locations, list):
+        return False
+    for location in locations:
+        if not isinstance(location, dict) or location.get("mode") == "hidden":
+            continue
+        geometry = location.get("geometry")
+        if not isinstance(geometry, dict):
+            continue
+        geometry_type = geometry.get("type")
+        coordinates = geometry.get("coordinates")
+        valid_geometry = (
+            (geometry_type == "Point" and _valid_position(coordinates))
+            or (geometry_type == "Polygon" and isinstance(coordinates, list) and bool(coordinates) and all(_valid_ring(ring) for ring in coordinates))
+            or (
+                geometry_type == "MultiPolygon"
+                and isinstance(coordinates, list)
+                and bool(coordinates)
+                and all(isinstance(polygon, list) and bool(polygon) and all(_valid_ring(ring) for ring in polygon) for polygon in coordinates)
+            )
+        )
+        if not valid_geometry:
+            continue
+        if location.get("mode") == "approximate":
+            uncertainty = location.get("uncertainty_meters_min")
+            if geometry_type != "Point" or not isinstance(uncertainty, (int, float)) or isinstance(uncertainty, bool) or uncertainty <= 0:
+                continue
+        if location.get("mode") in {"exact", "approximate"}:
+            return True
+    return False
+
+
 def validate_public_maplibre_vertical_slice(root: Path = ROOT) -> list[str]:
     errors: list[str] = []
     for relative in REQUIRED_FILES:
@@ -371,15 +424,26 @@ def validate_public_maplibre_vertical_slice(root: Path = ROOT) -> list[str]:
     baseline = manifest.get("seed_baseline", {}) if isinstance(manifest.get("seed_baseline"), dict) else {}
     if baseline.get("project_ids") != EXPECTED_SEED_IDS or catalog_contract.get("seed_baseline_ids") != EXPECTED_SEED_IDS:
         errors.append("public MapLibre runtime seed baseline identity mismatch")
-    presence_kinds = {kind: sum(1 for record in records if record.get("kind") == kind) for kind in ("geographic", "digital", "hybrid")}
-    minimum_presence_kinds = catalog_contract.get("minimum_presence_kinds", {})
-    if any(presence_kinds[kind] < minimum_presence_kinds.get(kind, 0) for kind in presence_kinds):
-        errors.append("public MapLibre runtime no longer satisfies the mixed-presence minimum")
+    projection_coverage = {
+        "globe_eligible_identities": 0,
+        "digital_eligible_identities": 0,
+        "cross_surface_identities": 0,
+    }
+    for record in records:
+        globe_eligible = _publicly_mappable(record)
+        digital_eligible = record.get("presence", {}).get("digital", {}).get("available") is True
+        if globe_eligible:
+            projection_coverage["globe_eligible_identities"] += 1
+        if digital_eligible:
+            projection_coverage["digital_eligible_identities"] += 1
+        if globe_eligible and digital_eligible:
+            projection_coverage["cross_surface_identities"] += 1
+    minimum_projection_coverage = catalog_contract.get("minimum_projection_coverage", {})
+    if any(projection_coverage[name] < minimum_projection_coverage.get(name, 0) for name in projection_coverage):
+        errors.append("public MapLibre runtime no longer satisfies minimum projection coverage")
     for identifier in EXPECTED_SEED_IDS:
         record = records_by_id.get(identifier, {})
         presence = record.get("presence", {}) if isinstance(record.get("presence"), dict) else {}
-        if record.get("kind") != "digital":
-            errors.append(f"vertical-slice seed record must remain digital: {identifier}")
         if presence.get("geographic") != []:
             errors.append(f"vertical-slice seed record must not contain geographic coordinates: {identifier}")
     for record in records:
@@ -571,7 +635,11 @@ def validate_public_maplibre_vertical_slice(root: Path = ROOT) -> list[str]:
         "entry_count_source": "manifest.entry_count",
         "commonproject_ids_source": "manifest.project_files[].CommonProject.id",
         "required_vertical_slice_ids": EXPECTED_IDS,
-        "minimum_presence_kinds": {"geographic": 1, "digital": 10, "hybrid": 1},
+        "minimum_projection_coverage": {
+            "globe_eligible_identities": 1,
+            "digital_eligible_identities": 10,
+            "cross_surface_identities": 1,
+        },
         "seed_baseline_ids": EXPECTED_SEED_IDS,
         "fabricated_coordinates_forbidden": True,
         "hidden_locations_have_no_geometry": True,
@@ -579,7 +647,7 @@ def validate_public_maplibre_vertical_slice(root: Path = ROOT) -> list[str]:
         "relations_require_known_commonproject_targets": True,
     }
     if contract.get("catalog") != expected_catalog_contract:
-        errors.append("public MapLibre mixed-presence catalog contract mismatch")
+        errors.append("public MapLibre projection-coverage catalog contract mismatch")
     expected_geographic_surface = {
         "source_id": "commonworld-public-representations",
         "source_type": "derived_geojson",
@@ -640,7 +708,7 @@ def validate_public_maplibre_vertical_slice(root: Path = ROOT) -> list[str]:
         "card_substitution": False,
         "search_and_filter_always_available": True,
         "geographic_only_records_excluded": True,
-        "hybrid_records_included": True,
+        "dual_presence_records_included": True,
     }.items():
         if digital_surface.get(key) != expected:
             errors.append(f"public digital-sphere close-up contract mismatch: {key}")

@@ -60,7 +60,7 @@ class IntentSearchDiscoveryTests(unittest.TestCase):
             root = self.copy_slice(directory)
 
             def add_target(record: dict) -> None:
-                record["kind"] = "hybrid"
+                record["presence"] = {"digital": {"available": True}, "geographic": [{"mode": "approximate", "id": "1", "geometry": {"type": "Point", "coordinates": [0,0]}, "uncertainty_meters_min": 100}]}; record.pop("kind", None)
                 record["presence"]["geographic"] = [
                     {
                         "id": "invented-debian-office",

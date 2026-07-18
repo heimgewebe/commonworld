@@ -1,9 +1,8 @@
 {
-  "schema_version": 3,
+  "schema_version": 4,
   "id": "wikibooks",
   "title": "Wikibooks",
   "summary": "Eine offene Sammlung frei nutzbarer Lehr-, Lern- und Sachbücher, die gemeinschaftlich geschrieben und verbessert werden.",
-  "kind": "digital",
   "themes": [
     "education",
     "open-educational-resources"

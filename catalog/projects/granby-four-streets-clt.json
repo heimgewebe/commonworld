@@ -1,9 +1,8 @@
 {
-  "schema_version": 3,
+  "schema_version": 4,
   "id": "granby-four-streets-clt",
   "title": "Granby Four Streets Community Land Trust",
   "summary": "Ein von Bewohnern getragener Community Land Trust in Liverpool, der dauerhaft bezahlbaren Wohnraum, Gemeinschaftsräume, Begrünung und lokale wirtschaftliche Aktivitäten im Quartier sichert.",
-  "kind": "geographic",
   "themes": [
     "housing",
     "community-land",

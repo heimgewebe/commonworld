@@ -64,11 +64,6 @@
       "wikipedia",
       "wikiversity"
     ],
-    "minimum_presence_kinds": {
-      "geographic": 1,
-      "digital": 10,
-      "hybrid": 1
-    },
     "seed_baseline_ids": [
       "debian",
       "freifunk",
@@ -84,7 +79,12 @@
     "fabricated_coordinates_forbidden": true,
     "hidden_locations_have_no_geometry": true,
     "geographic_commons_in_scope": true,
-    "relations_require_known_commonproject_targets": true
+    "relations_require_known_commonproject_targets": true,
+    "minimum_projection_coverage": {
+      "globe_eligible_identities": 1,
+      "digital_eligible_identities": 10,
+      "cross_surface_identities": 1
+    }
   },
   "digital_sphere": {
     "implementation": "bounded_synchronized_svg_overlay",
@@ -128,7 +128,7 @@
     "card_substitution": false,
     "search_and_filter_always_available": true,
     "geographic_only_records_excluded": true,
-    "hybrid_records_included": true
+    "dual_presence_records_included": true
   },
   "navigation": {
     "deep_link_parameters": [

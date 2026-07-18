@@ -37,20 +37,9 @@ class ContractTests(unittest.TestCase):
             with self.subTest(record=record["id"]):
                 self.assertEqual([], validation_errors(record))
 
-    def test_digital_record_rejects_exact_geographic_anchor(self) -> None:
-        record = copy.deepcopy(base_record())
-        record["kind"] = "digital"
-        record["presence"]["digital"] = {
-            "available": True,
-            "reach": "global",
-            "label": "Available worldwide",
-            "source_ids": ["official-website"],
-        }
-        self.assertTrue(validation_errors(record))
 
     def test_fully_digital_record_uses_no_invented_coordinate(self) -> None:
         record = copy.deepcopy(base_record())
-        record["kind"] = "digital"
         record["presence"] = {
             "geographic": [],
             "digital": {

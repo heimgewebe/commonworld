@@ -8,6 +8,7 @@ from scripts.validate_renderer_selection import (
     CONTRACT_PATH,
     DIGITAL_CONTRACT_PATH,
     EVIDENCE_PATHS,
+    HISTORICAL_EVIDENCE_SNAPSHOTS,
     REPORT_PATH,
     RESULT_PATH,
     ROOT,
@@ -18,7 +19,7 @@ from scripts.validate_renderer_selection import (
 class RendererSelectionTests(unittest.TestCase):
     def copy_selection_core(self, tmp_dir: str) -> Path:
         root = Path(tmp_dir)
-        paths = set(EVIDENCE_PATHS) | {
+        paths = set(EVIDENCE_PATHS) | set(HISTORICAL_EVIDENCE_SNAPSHOTS.values()) | {
             str(RESULT_PATH),
             str(REPORT_PATH),
             str(DIGITAL_CONTRACT_PATH),

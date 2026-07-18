@@ -13,8 +13,11 @@ import {
   digitalLayerCamera,
   filterRecords,
   globeHorizonCoordinates,
+  hasDigitalPresence,
   mapFailurePolicy,
   projectedGlobeCircle,
+  publicGeographicLocations,
+  publicGeographicRepresentationKind,
   publicMapFeatureCollection,
   publicProjectNavigationTarget,
   evidencedRelations,
@@ -53,6 +56,13 @@ test('layer derivation uses catalog themes without overrides', () => {
   assert.equal(deriveLayer({ themes: ['knowledge', 'open-data'], presence: { digital: { available: true } } }), 'knowledge_data');
   assert.equal(deriveLayer({ themes: ['open-data', 'infrastructure'], presence: { digital: { available: true } } }), 'mixed_other');
   assert.equal(deriveLayer({ themes: ['education'], presence: { digital: { available: false } } }), null);
+});
+
+test('digital presence is derived from the explicit availability flag only', () => {
+  assert.equal(hasDigitalPresence({ presence: { digital: { available: true } } }), true);
+  assert.equal(hasDigitalPresence({ presence: { digital: { available: false } } }), false);
+  assert.equal(hasDigitalPresence({ presence: { digital: { label: 'Nur Beschreibung' } } }), false);
+  assert.equal(hasDigitalPresence(null), false);
 });
 
 test('binary fragments are stable visual encodings', () => {
@@ -119,7 +129,7 @@ test('deep-link state accepts surface, search, identity, filters and clamped cam
   assert.equal(state.layer, 'software_infrastructure');
   assert.deepEqual(
     { presence: state.presence, action: state.action, language: state.language, access: state.access, freshness: state.freshness, curation: state.curation },
-    { presence: 'digital', action: 'contribute', language: 'de', access: 'public', freshness: 'current', curation: 'listed' },
+    { presence: ['digital'], action: 'contribute', language: 'de', access: 'public', freshness: 'current', curation: 'listed' },
   );
   assert.equal(MAX_MAP_ZOOM, 18);
   assert.deepEqual(state.camera, { lng: 180, lat: -85, zoom: MAX_MAP_ZOOM, bearing: 0, pitch: 70 });
@@ -132,10 +142,22 @@ test('unknown identities, filters and malformed numbers fail closed', () => {
   assert.equal(state.surface, 'globe');
   assert.deepEqual(
     { presence: state.presence, action: state.action, language: state.language, access: state.access, freshness: state.freshness, curation: state.curation },
-    { presence: null, action: null, language: null, access: null, freshness: null, curation: null },
+    { presence: [], action: null, language: null, access: null, freshness: null, curation: null },
   );
   assert.equal(state.camera.lng, DEFAULT_CAMERA.lng);
   assert.deepEqual(cameraFromSearch(''), DEFAULT_CAMERA);
+});
+
+test('presence URL state discards unknown values and serializes both axes once in canonical order', () => {
+  const parsed = stateFromSearch('?presence=digital&presence=hybrid&presence=geographic&presence=digital');
+  assert.deepEqual(parsed.presence, ['geographic', 'digital']);
+
+  const search = searchFromState({
+    camera: DEFAULT_CAMERA,
+    presence: ['digital', 'geographic', 'digital', 'hybrid'],
+  });
+  const parameters = new URLSearchParams(search.slice(1));
+  assert.deepEqual(parameters.getAll('presence'), ['geographic', 'digital']);
 });
 
 test('serialized state roundtrips selection, view, surface, query and filters', () => {
@@ -146,7 +168,7 @@ test('serialized state roundtrips selection, view, surface, query and filters', 
     view: 'layers',
     surface: 'text',
     query: 'freie Software',
-    presence: 'digital',
+    presence: ['digital'],
     action: 'learn',
     language: 'unknown',
     access: 'unknown',
@@ -161,7 +183,7 @@ test('serialized state roundtrips selection, view, surface, query and filters', 
   assert.equal(state.query, 'freie Software');
   assert.deepEqual(
     { presence: state.presence, action: state.action, language: state.language, access: state.access, freshness: state.freshness, curation: state.curation },
-    { presence: 'digital', action: 'learn', language: 'unknown', access: 'unknown', freshness: 'stale', curation: 'verified' },
+    { presence: ['digital'], action: 'learn', language: 'unknown', access: 'unknown', freshness: 'stale', curation: 'verified' },
   );
   assert.equal(state.camera.zoom, 3.46);
 });
@@ -246,11 +268,11 @@ test('digital sphere fade follows visible globe scale instead of MapLibre zoom n
 });
 
 
-const geographicHybridRecords = [
+const presenceAxisRecords = [
   {
     id: 'cltb-le-nid',
     title: 'Le Nid',
-    kind: 'geographic',
+
     themes: ['housing', 'shared-space'],
     presence: {
       geographic: [
@@ -264,7 +286,7 @@ const geographicHybridRecords = [
   {
     id: 'freifunk',
     title: 'Freifunk',
-    kind: 'digital',
+
     themes: ['communication', 'community-network'],
     presence: { geographic: [], digital: { available: true, reach: 'network', label: 'Community-Netze', source_ids: ['overview'] } },
     relations: [],
@@ -272,7 +294,7 @@ const geographicHybridRecords = [
   {
     id: 'freifunk-hamburg',
     title: 'Freifunk Hamburg',
-    kind: 'hybrid',
+
     themes: ['communication', 'community-network'],
     presence: {
       geographic: [
@@ -285,8 +307,34 @@ const geographicHybridRecords = [
   },
 ];
 
+test('public geographic truth rejects malformed, hidden and privacy-breaking geometry', () => {
+  const validExact = { mode: 'exact', geometry: { type: 'Point', coordinates: [8, 50] } };
+  const validApproximate = { mode: 'approximate', geometry: { type: 'Point', coordinates: [8, 50] }, uncertainty_meters_min: 1000 };
+  assert.equal(publicGeographicRepresentationKind(validExact), 'exact_anchor');
+  assert.equal(publicGeographicRepresentationKind(validApproximate), 'approximate_zone');
+  assert.equal(publicGeographicRepresentationKind({ mode: 'hidden', geometry: validExact.geometry }), null);
+  assert.equal(publicGeographicRepresentationKind({ mode: 'exact', geometry: { type: 'Point', coordinates: [181, 50] } }), null);
+  assert.equal(publicGeographicRepresentationKind({ mode: 'exact', geometry: { type: 'Point', coordinates: ['8', 50] } }), null);
+  assert.equal(publicGeographicRepresentationKind({ mode: 'approximate', geometry: { type: 'Point', coordinates: [8, 50] }, uncertainty_meters_min: 0 }), null);
+  assert.equal(publicGeographicRepresentationKind({ mode: 'approximate', geometry: { type: 'Polygon', coordinates: [[[8, 50], [9, 50], [9, 51], [8, 50]]] }, uncertainty_meters_min: 1000 }), null);
+
+  const hiddenOnly = {
+    id: 'hidden-only',
+    title: 'Hidden only',
+    themes: [],
+    presence: {
+      geographic: [{ id: 'private', mode: 'hidden', label: 'Private place' }],
+      digital: { available: false },
+    },
+  };
+  assert.deepEqual(publicGeographicLocations(hiddenOnly), []);
+  assert.deepEqual(publicMapFeatureCollection([hiddenOnly]).features, []);
+  assert.deepEqual(filterRecords([hiddenOnly], { presence: ['geographic'] }), []);
+  assert.equal(recordPresentationLabel(hiddenOnly), 'Commons');
+});
+
 test('public map derivation preserves CommonProject identity and excludes hidden geometry', () => {
-  const collection = publicMapFeatureCollection(geographicHybridRecords);
+  const collection = publicMapFeatureCollection(presenceAxisRecords);
   assert.equal(collection.type, 'FeatureCollection');
   assert.equal(collection.features.length, 3);
   assert.deepEqual(collection.features.map(({ properties }) => properties.project_id), ['cltb-le-nid', 'cltb-le-nid', 'freifunk-hamburg']);
@@ -306,7 +354,7 @@ test('public map derivation preserves CommonProject identity and excludes hidden
 });
 
 test('public project navigation targets use only published geometry and keep digital Commons coordinate-free', () => {
-  const collection = publicMapFeatureCollection(geographicHybridRecords);
+  const collection = publicMapFeatureCollection(presenceAxisRecords);
   const leNid = publicProjectNavigationTarget(collection, 'cltb-le-nid');
   assert.equal(leNid.kind, 'bounds');
   assert.deepEqual(leNid.bounds, [[4.31, 50.84], [4.32, 50.85]]);
@@ -320,10 +368,10 @@ test('public project navigation targets use only published geometry and keep dig
   assert(Object.isFrozen(leNid.bounds));
 });
 
-test('map filtering uses the same visible identity set without multiplying hybrid identities', () => {
+test('map filtering uses the same visible identity set without multiplying dual presence identities', () => {
   const visible = new Set(['freifunk-hamburg']);
-  const collection = publicMapFeatureCollection(geographicHybridRecords, visible);
-  assert.strictEqual(collection, publicMapFeatureCollection(geographicHybridRecords, ['freifunk-hamburg']));
+  const collection = publicMapFeatureCollection(presenceAxisRecords, visible);
+  assert.strictEqual(collection, publicMapFeatureCollection(presenceAxisRecords, ['freifunk-hamburg']));
   assert.equal(collection.features.length, 1);
   assert.equal(collection.features[0].properties.project_id, 'freifunk-hamburg');
   assert.equal(new Set(collection.features.map(({ properties }) => properties.project_id)).size, 1);
@@ -334,7 +382,7 @@ test('catalog projection precomputes 250 approximate Commons and keeps its filte
   const records = Array.from({ length: 250 }, (_, index) => ({
     id: 'regional-common-' + String(index).padStart(4, '0'),
     title: 'Regional Common ' + index,
-    kind: 'hybrid',
+
     presence: {
       geographic: [{
         id: 'area-' + index,
@@ -370,19 +418,19 @@ test('catalog projection precomputes 250 approximate Commons and keeps its filte
   assert.notStrictEqual(firstFiltered, projection.publicMapFeatureCollection([records[0].id]));
 });
 
-test('digital layer filtering excludes geographic-only identities but retains hybrid identities', () => {
+test('digital layer filtering excludes geographic-only identities but retains dual presence identities', () => {
   assert.deepEqual(
-    filterRecords(geographicHybridRecords, { layer: 'communication_networks' }).map(({ id }) => id),
+    filterRecords(presenceAxisRecords, { layer: 'communication_networks' }).map(({ id }) => id),
     ['freifunk', 'freifunk-hamburg'],
   );
   assert.deepEqual(
-    filterRecords(geographicHybridRecords, { layer: 'mixed_other' }).map(({ id }) => id),
+    filterRecords(presenceAxisRecords, { layer: 'mixed_other' }).map(({ id }) => id),
     [],
   );
 });
 
 test('only evidenced relations to known identities are projected', () => {
-  const records = structuredClone(geographicHybridRecords);
+  const records = structuredClone(presenceAxisRecords);
   records[2].relations.push({ type: 'cooperates-with', target_id: 'missing', source_ids: ['api'] });
   const relations = evidencedRelations(records);
   assert.strictEqual(relations, prepareCatalogProjection(records).relations);
@@ -403,42 +451,49 @@ test('semantic zoom remains presentation logic from planet to focus', () => {
   assert.equal(semanticZoomLevel(4.2), 'region');
   assert.equal(semanticZoomLevel(6.2), 'local');
   assert.equal(semanticZoomLevel(1.15, 'freifunk-hamburg'), 'focus');
-  assert.deepEqual(semanticLocationLine({ zoom: 4.2, records: geographicHybridRecords }), {
+  const recordsWithMalformedGeometry = [...presenceAxisRecords, {
+    id: 'malformed-location',
+    presence: {
+      geographic: [{ mode: 'exact', geometry: { type: 'Point', coordinates: [true, false] } }],
+      digital: { available: false },
+    },
+  }];
+  assert.deepEqual(semanticLocationLine({ zoom: 4.2, records: recordsWithMalformedGeometry }), {
     level: 'region',
     crumbs: ['Erde', 'Region'],
     summary: '2 räumlich belegte Commons · öffentliche Flächen und ungefähre Orte',
   });
-  assert.deepEqual(semanticLocationLine({ zoom: 1.15, records: geographicHybridRecords, selectedProjectId: 'freifunk' }), {
+  assert.deepEqual(semanticLocationLine({ zoom: 1.15, records: presenceAxisRecords, selectedProjectId: 'freifunk' }), {
     level: 'focus',
     crumbs: ['Erde', 'Commons', 'Freifunk'],
     summary: 'Digital · Ortsunabhängige digitale Präsenz',
   });
-  assert.deepEqual(semanticLocationLine({ zoom: 1.15, records: geographicHybridRecords, selectedProjectId: 'freifunk-hamburg' }), {
+  assert.deepEqual(semanticLocationLine({ zoom: 1.15, records: presenceAxisRecords, selectedProjectId: 'freifunk-hamburg' }), {
     level: 'focus',
     crumbs: ['Erde', 'Commons', 'Freifunk Hamburg'],
-    summary: 'Hybrid · 1 öffentlicher Ort · 1 verborgener Ort',
+    summary: 'Vor Ort · Digital · 1 öffentlicher Ort · 1 verborgener Ort',
   });
   assert.deepEqual(semanticLocationLine({
     zoom: 1.15,
-    records: [geographicHybridRecords[0]],
+    records: [presenceAxisRecords[0]],
     selectedProjectId: 'freifunk-hamburg',
-    selectedRecord: geographicHybridRecords[2],
+    selectedRecord: presenceAxisRecords[2],
   }), {
     level: 'focus',
     crumbs: ['Erde', 'Commons', 'Freifunk Hamburg'],
-    summary: 'Hybrid · 1 öffentlicher Ort · 1 verborgener Ort',
+    summary: 'Vor Ort · Digital · 1 öffentlicher Ort · 1 verborgener Ort',
   });
 });
 
-test('presentation and location labels explain geographic, digital and hybrid truth', () => {
-  assert.equal(recordPresentationLabel(geographicHybridRecords[0]), 'Geografisch');
-  assert.equal(recordPresentationLabel(geographicHybridRecords[1]), 'Digital · Kommunikation und Netze');
-  assert.equal(recordPresentationLabel(geographicHybridRecords[2]), 'Hybrid · Kommunikation und Netze');
-  assert.deepEqual(recordLocationSummaries(geographicHybridRecords[0]), [
+test('presentation and location labels explain geographic, digital and dual presence truth', () => {
+  assert.equal(recordPresentationLabel(presenceAxisRecords[0]), 'Vor Ort');
+  assert.equal(recordPresentationLabel(presenceAxisRecords[1]), 'Digital · Kommunikation und Netze');
+  assert.equal(recordPresentationLabel(presenceAxisRecords[2]), 'Vor Ort · Digital · Kommunikation und Netze');
+  assert.deepEqual(recordLocationSummaries(presenceAxisRecords[0]), [
     'Rue Verheyden 121 · exakter öffentlicher Punkt',
     'Gebäude Le Nid · öffentliche Fläche',
   ]);
-  assert.deepEqual(recordLocationSummaries(geographicHybridRecords[2]), [
+  assert.deepEqual(recordLocationSummaries(presenceAxisRecords[2]), [
     'Community Hamburg · ungefähr, mindestens 5 km Unschärfe',
     'Private Heimrouter · Ort verborgen',
   ]);

@@ -95,6 +95,8 @@ EXPECTED_RESEARCH_FILES = {
     "device-acceptance-rerun-v2.result.json",
     "digital-sphere-real-surface-v1.md",
     "digital-sphere-real-surface-v1.result.json",
+    "digital-sphere-v1.contract.json",
+    "digital-sphere-real-surface-v1.reference-projects.json",
     "device-acceptance-performance-v4.md",
     "device-acceptance-performance-v4.result.json",
     "physical-device-acceptance-v4-apple.md",
@@ -116,7 +118,7 @@ EXPECTED_RESEARCH_FILES = {
     "renderer-selection-v1.md",
     "renderer-selection-v1.result.json",
 }
-EXPECTED_CONTRACT_FILES = {"catalog-diversity.contract.json", "editorial-review.contract.json", "proposal-path.contract.json", "proposal.schema.json", "current-state.contract.json", "aggregation-zoom.contract.json", "digital-sphere.contract.json", "production-delivery-provider.contract.json", "project.schema.json", "public-maplibre-vertical-slice.contract.json", "real-hybrid-commons.contract.json", "intent-search-discovery.contract.json", "renderer-selection.contract.json", "visual-semantics.contract.json"}
+EXPECTED_CONTRACT_FILES = {"catalog-diversity.contract.json", "editorial-review.contract.json", "proposal-path.contract.json", "proposal.schema.json", "current-state.contract.json", "aggregation-zoom.contract.json", "digital-sphere.contract.json", "production-delivery-provider.contract.json", "project.schema.json", "public-maplibre-vertical-slice.contract.json", "presence-axes.contract.json", "intent-search-discovery.contract.json", "renderer-selection.contract.json", "visual-semantics.contract.json"}
 EXPECTED_SCRIPT_FILES = {
     "__init__.py",
     "build_public_runtime.py",
@@ -134,7 +136,7 @@ EXPECTED_SCRIPT_FILES = {
     "validate_public_catalog.py",
     "validate_public_maplibre_vertical_slice.py",
     "validate_public_seed_baseline.py",
-    "validate_real_hybrid_commons.py",
+    "validate_presence_axes.py",
     "validate_intent_search_discovery.py",
     "validate_public_shell.py",
     "validate_renderer_spike.py",
@@ -161,7 +163,7 @@ EXPECTED_TEST_FILES = {
     "test_public_catalog.py",
     "test_public_maplibre_vertical_slice.py",
     "test_public_seed_baseline.py",
-    "test_real_hybrid_commons.py",
+    "test_presence_axes.py",
     "test_intent_search_discovery.py",
     "test_public_shell.py",
     "test_renderer_spike.py",
@@ -235,8 +237,8 @@ def validate_canonical_plan(root: Path = ROOT) -> list[str]:
             for name in FORBIDDEN_CONTRACT_PROPERTIES:
                 if name in properties:
                     errors.append(f"CommonProject schema must not contain presentation property: {name}")
-            if properties.get("schema_version", {}).get("const") != 3:
-                errors.append("CommonProject schema_version must be 3")
+            if schema.get("properties", {}).get("schema_version", {}).get("const") != 4:
+                errors.append("CommonProject schema_version must be 4")
 
     requirements = (root / "requirements-dev.txt").read_text(encoding="utf-8") if (root / "requirements-dev.txt").is_file() else ""
     if "playwright" in requirements.casefold():

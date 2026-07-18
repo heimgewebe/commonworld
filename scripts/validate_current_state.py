@@ -138,7 +138,7 @@ def validate_current_state(root: Path = ROOT) -> list[str]:
     }
     expected_historical = {
         "contracts/commonworld/renderer-selection.contract.json": "15c76c0875d42e4f670f6513d97804cf0805a054057cf74c0f99798f6432fd8a",
-        "contracts/commonworld/digital-sphere.contract.json": "f0aaab7c259880b8cffc849d0e305d35a64f59ee76638e06da33a843ec28af7c",
+        "docs/research/digital-sphere-v1.contract.json": "f0aaab7c259880b8cffc849d0e305d35a64f59ee76638e06da33a843ec28af7c",
         "docs/research/public-maplibre-vertical-slice-v1.result.json": "8f60b0baec90520a9e1b961c7d5453c0fe87da29f7ecf9132836475ff4cb95e6",
     }
     if actual_historical != expected_historical:
@@ -182,7 +182,7 @@ def validate_current_state(root: Path = ROOT) -> list[str]:
         "third_party_assets_retain_their_own_licences": True,
     }:
         errors.append("current licensing truth mismatch")
-    if state.get("current_as_of") != "2026-07-16":
+    if state.get("current_as_of") != "2026-07-17":
         errors.append("current-state date does not cover the Phase 5 catalogue and proposal truth")
     if not (root / "LICENSE").is_file() or not (root / "LICENSE-DATA.md").is_file():
         errors.append("declared code and data licences must exist")

@@ -1,9 +1,8 @@
 {
-  "schema_version": 3,
+  "schema_version": 4,
   "id": "cltb-le-nid",
   "title": "Le Nid",
   "summary": "Ein gemeinschaftlich entwickeltes Wohnprojekt des Community Land Trust Brussels mit sieben Wohnungen, Gemeinschaftsraum und halböffentlichem Garten in Anderlecht.",
-  "kind": "geographic",
   "themes": [
     "housing",
     "community-land",

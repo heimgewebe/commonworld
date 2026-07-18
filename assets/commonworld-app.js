@@ -8,6 +8,7 @@ import {
   digitalLayerCamera,
   filterRecords,
   globeHorizonCoordinates,
+  hasDigitalPresence,
   mapCamera,
   mapFailurePolicy,
   normalizeQuery,
@@ -16,6 +17,8 @@ import {
   recordLocationSummaries,
   recordPresentationLabel,
   projectedGlobeCircle,
+  publicGeographicLocations,
+  publicGeographicRepresentationKind,
   publicProjectNavigationTarget,
   ribbonRepeatCount,
   ringOrbitDirection,
@@ -86,7 +89,7 @@ const elements = {
   focusClose: document.querySelector('#focus-close'),
   focusTitle: document.querySelector('#focus-title'),
   focusSummary: document.querySelector('#focus-summary'),
-  focusKind: document.querySelector('#focus-kind'),
+  focusPresence: document.querySelector('#focus-presence'),
   focusThemes: document.querySelector('#focus-themes'),
   focusActions: document.querySelector('#focus-actions'),
   focusLocations: document.querySelector('#focus-locations'),
@@ -262,17 +265,20 @@ function validateRecords(records) {
   const ids = new Set();
   for (const record of records) {
     if (!record || typeof record.id !== 'string' || ids.has(record.id)) throw new Error('Ungültige oder doppelte CommonProject-ID.');
-    if (!['geographic', 'digital', 'hybrid'].includes(record.kind)) throw new Error(`CommonProject ${record.id} besitzt eine unbekannte Präsenzart.`);
+    if (record.schema_version !== 4) throw new Error(`CommonProject ${record.id} verwendet nicht Schema v4.`);
+    if (Object.prototype.hasOwnProperty.call(record, 'kind')) throw new Error(`CommonProject ${record.id} enthält das entfernte Feld kind.`);
     const locations = record?.presence?.geographic;
     if (!Array.isArray(locations)) throw new Error(`CommonProject ${record.id} besitzt keine gültige Ortsliste.`);
+    const isDigital = hasDigitalPresence(record);
+    const hasClaimedPresence = locations.length > 0 || isDigital;
+    if (!hasClaimedPresence) throw new Error(`CommonProject ${record.id} besitzt keine belegte Präsenz.`);
     for (const location of locations) {
       if (!location || !['exact', 'approximate', 'hidden'].includes(location.mode)) throw new Error(`CommonProject ${record.id} besitzt einen ungültigen Ortsmodus.`);
       if (location.mode === 'hidden') {
         if ('geometry' in location || 'uncertainty_meters_min' in location) throw new Error(`Verborgener Ort ${location.id} darf keine Geometrie oder Ersatzgenauigkeit enthalten.`);
         continue;
       }
-      if (!location.geometry || !['Point', 'Polygon', 'MultiPolygon'].includes(location.geometry.type)) throw new Error(`Öffentlicher Ort ${location.id} besitzt keine unterstützte Geometrie.`);
-      if (location.mode === 'approximate' && !(Number(location.uncertainty_meters_min) > 0)) throw new Error(`Ungefährer Ort ${location.id} muss seine Mindestunschärfe nennen.`);
+      if (!publicGeographicRepresentationKind(location)) throw new Error(`Öffentlicher Ort ${location.id} besitzt keine gültige kartierbare Geometrie.`);
     }
     ids.add(record.id);
   }
@@ -313,7 +319,8 @@ function createSvgElement(name, attributes = {}) {
 function groupedDigitalRecords(records = runtime.records) {
   const grouped = new Map(LAYERS.map((layer) => [layer.id, []]));
   for (const record of records) {
-    if (record?.presence?.digital?.available === true) grouped.get(deriveLayer(record))?.push(record);
+    const layer = deriveLayer(record);
+    if (layer) grouped.get(layer)?.push(record);
   }
   return grouped;
 }
@@ -472,7 +479,10 @@ function recordsMatchingQuery() {
 }
 
 function hasIntentFilters() {
-  return INTENT_FILTER_NAMES.some((name) => Boolean(runtime.state[name]));
+  return INTENT_FILTER_NAMES.some((name) => {
+    const value = runtime.state[name];
+    return Array.isArray(value) ? value.length > 0 : Boolean(value);
+  });
 }
 
 function currentPublicMapData() {
@@ -637,17 +647,28 @@ function closeDiscovery({ restoreFocus = false } = {}) {
 }
 
 function syncIntentFilterControls() {
-  for (const select of elements.filterSelects) {
-    select.value = runtime.state[select.dataset.intentFilter] ?? '';
+  for (const control of elements.filterSelects) {
+    const value = runtime.state[control.dataset.intentFilter];
+    if (control.type === 'checkbox') {
+      control.checked = Array.isArray(value) && value.includes(control.value);
+    } else {
+      control.value = value ?? '';
+    }
   }
   elements.filterClear.disabled = !hasIntentFilters();
 }
 
 function setIntentFilter(name, value, { historyMode = 'push' } = {}) {
-  const select = elements.filterSelects.find((candidate) => candidate.dataset.intentFilter === name);
-  if (!select) return;
-  const allowed = [...select.options].some((option) => option.value === value);
-  runtime.state[name] = allowed && value ? value : null;
+  if (name === 'presence') {
+    const checkboxes = elements.filterSelects.filter(c => c.dataset.intentFilter === name);
+    const checkedValues = checkboxes.filter(c => c.checked).map(c => c.value);
+    runtime.state[name] = checkedValues.length > 0 ? Object.freeze(checkedValues) : null;
+  } else {
+    const select = elements.filterSelects.find((candidate) => candidate.dataset.intentFilter === name);
+    if (!select) return;
+    const allowed = [...select.options].some((option) => option.value === value);
+    runtime.state[name] = allowed && value ? value : null;
+  }
   renderDiscoveryState();
   if (historyMode) writeHistory(historyMode);
 }
@@ -666,10 +687,10 @@ function directActionLinks(record) {
 }
 
 function resultLocationLabel(record) {
-  const locations = Array.isArray(record?.presence?.geographic) ? record.presence.geographic : [];
-  const publicCount = locations.filter((location) => location?.mode !== 'hidden' && location?.geometry).length;
+  const publicCount = publicGeographicLocations(record).length;
   if (publicCount > 0) return publicCount === 1 ? '1 öffentlicher Ort' : String(publicCount) + ' öffentliche Orte';
-  return record?.presence?.digital?.available ? 'Ortsunabhängige digitale Präsenz' : 'Keine öffentliche Geometrie';
+  const isDigital = hasDigitalPresence(record);
+  return isDigital ? 'Ortsunabhängige digitale Präsenz' : 'Keine öffentliche Geometrie';
 }
 
 function createDiscoveryResult(record, position) {
@@ -794,7 +815,7 @@ function updateFocusPanel() {
   if (!record) return;
   elements.focusTitle.textContent = record.title;
   elements.focusSummary.textContent = record.summary;
-  elements.focusKind.textContent = recordPresentationLabel(record);
+  elements.focusPresence.textContent = recordPresentationLabel(record);
   replaceList(elements.focusThemes, record.themes ?? []);
   replaceList(elements.focusActions, record.actions ?? []);
   replaceList(elements.focusLocations, recordLocationSummaries(record));

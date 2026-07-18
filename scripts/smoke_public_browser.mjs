@@ -79,8 +79,8 @@ async function loadExpectedDigitalProjection() {
   const allIds = [];
   const catalogIds = [];
   const contributionIds = [];
-  const hybridIds = [];
-  const hybridVolunteerIds = [];
+  const dualPresenceIds = [];
+  const dualPresenceVolunteerIds = [];
   const publicMapProjectIds = new Set();
   let publicFeatureCount = 0;
   for (const projectFile of manifest.project_files) {
@@ -89,8 +89,8 @@ async function loadExpectedDigitalProjection() {
     if (record.actions?.includes('contribute')) contributionIds.push(record.id);
     const hasPublicGeographicPresence = (record.presence?.geographic ?? []).some((location) => location?.mode !== 'hidden' && Boolean(location?.geometry));
     const hasPublicDigitalPresence = record.presence?.digital?.available === true;
-    if (hasPublicGeographicPresence && hasPublicDigitalPresence) hybridIds.push(record.id);
-    if (hasPublicGeographicPresence && hasPublicDigitalPresence && record.actions?.includes('volunteer')) hybridVolunteerIds.push(record.id);
+    if (hasPublicGeographicPresence && hasPublicDigitalPresence) dualPresenceIds.push(record.id);
+    if (hasPublicGeographicPresence && hasPublicDigitalPresence && record.actions?.includes('volunteer')) dualPresenceVolunteerIds.push(record.id);
     for (const location of record.presence?.geographic ?? []) {
       if (location?.mode === 'hidden' || !location?.geometry) continue;
       publicFeatureCount += 1;
@@ -107,8 +107,8 @@ async function loadExpectedDigitalProjection() {
     allIds,
     catalogIds,
     contributionIds,
-    hybridIds,
-    hybridVolunteerIds,
+    dualPresenceIds,
+    dualPresenceVolunteerIds,
     publicFeatureCount,
     publicIdentityCount: publicMapProjectIds.size,
     totalCount: allIds.length,
@@ -498,7 +498,8 @@ async function normalScenario() {
   await run.page.locator('#commons-search').fill('Debian');
   await run.page.waitForTimeout(220);
   const debianTrigger = run.page.locator('#project-debian .catalog-select');
-  await debianTrigger.click();
+  const debianResult = run.page.locator('.discovery-result-main[data-commonproject-id="debian"]');
+  await debianResult.click();
   assert(await run.page.locator('#project-focus').isVisible(), 'normal: project focus did not open');
   const focusOnlyState = await primaryOverlayState(run.page);
   assert(focusOnlyState.focusVisible && !focusOnlyState.discoveryVisible && !focusOnlyState.settingsVisible && !focusOnlyState.focusInert && focusOnlyState.focusAriaHidden === null, 'normal: visible project focus kept suppressed accessibility state ' + JSON.stringify(focusOnlyState));
@@ -943,8 +944,8 @@ async function layerJourneyScenario({ mobile = false, viewportOverride = null, t
 }
 
 
-async function realHybridCommonsScenario() {
-  process.stdout.write(JSON.stringify({ state: 'RUNNING', scenario: 'real-hybrid-commons' }) + '\n');
+async function dualPresenceAxesScenario() {
+  process.stdout.write(JSON.stringify({ state: 'RUNNING', scenario: 'dual-presence-axes' }) + '\n');
   const run = await newPage({ viewportOverride: { width: 1024, height: 768 }, reducedMotion: 'reduce' });
   await run.page.goto(baseUrl, { waitUntil: 'domcontentloaded' });
   await run.page.waitForSelector('html.runtime-ready');
@@ -976,42 +977,42 @@ async function realHybridCommonsScenario() {
       ringNames: [...document.querySelectorAll('.sphere-ring-name')].map((node) => node.textContent.trim()),
     };
   });
-  assert(initial.semanticLevel === 'planet', 'real hybrid: initial semantic level is not planet');
-  assert(initial.semanticText.includes(`${expectedDigitalProjection.publicIdentityCount} räumlich belegte Commons`), 'real hybrid: spatial summary is missing');
+  assert(initial.semanticLevel === 'planet', 'dual presence: initial semantic level is not planet');
+  assert(initial.semanticText.includes(`${expectedDigitalProjection.publicIdentityCount} räumlich belegte Commons`), 'dual presence: spatial summary is missing');
   const reviewedFeatureIds = [
     'cltb-le-nid:cltb-le-nid-entrance',
     'cltb-le-nid:cltb-le-nid-building',
     'freifunk-hamburg:freifunk-hamburg-community-area',
   ];
-  assert(initial.featureIds.length === expectedDigitalProjection.publicFeatureCount, 'real hybrid: public map feature count differs from the catalog: ' + JSON.stringify(initial));
-  assert(reviewedFeatureIds.every((identifier) => initial.featureIds.includes(identifier)), 'real hybrid: reviewed public map features are missing: ' + JSON.stringify(initial));
-  assert(!initial.locationIds.includes('freifunk-hamburg-private-routers'), 'real hybrid: hidden router location leaked into map diagnostics');
-  assert(initial.sourceType === 'geojson', 'real hybrid: MapLibre source is not a GeoJSON source: ' + JSON.stringify(initial));
-  assert(initial.layers.some(({ id, type, minzoom }) => id === 'commonworld-public-extents' && type === 'fill' && minzoom === 3.4), 'real hybrid: public extent layer missing');
-  assert(initial.layers.some(({ id, type, minzoom, maxzoom }) => id === 'commonworld-approximate-zones' && type === 'fill' && minzoom === 3.4 && maxzoom === undefined), 'real hybrid: approximate uncertainty zone must remain visible through local zoom');
-  assert(initial.layers.some(({ id, type, minzoom }) => id === 'commonworld-exact-anchors' && type === 'circle' && minzoom === 5.5), 'real hybrid: exact anchor layer missing');
-  assert(initial.ringNames.includes('Freifunk Hamburg'), 'real hybrid: hybrid identity missing from digital sphere');
-  assert(!initial.ringNames.includes('Le Nid'), 'real hybrid: geographic-only identity leaked into digital sphere');
+  assert(initial.featureIds.length === expectedDigitalProjection.publicFeatureCount, 'dual presence: public map feature count differs from the catalog: ' + JSON.stringify(initial));
+  assert(reviewedFeatureIds.every((identifier) => initial.featureIds.includes(identifier)), 'dual presence: reviewed public map features are missing: ' + JSON.stringify(initial));
+  assert(!initial.locationIds.includes('freifunk-hamburg-private-routers'), 'dual presence: hidden router location leaked into map diagnostics');
+  assert(initial.sourceType === 'geojson', 'dual presence: MapLibre source is not a GeoJSON source: ' + JSON.stringify(initial));
+  assert(initial.layers.some(({ id, type, minzoom }) => id === 'commonworld-public-extents' && type === 'fill' && minzoom === 3.4), 'dual presence: public extent layer missing');
+  assert(initial.layers.some(({ id, type, minzoom, maxzoom }) => id === 'commonworld-approximate-zones' && type === 'fill' && minzoom === 3.4 && maxzoom === undefined), 'dual presence: approximate uncertainty zone must remain visible through local zoom');
+  assert(initial.layers.some(({ id, type, minzoom }) => id === 'commonworld-exact-anchors' && type === 'circle' && minzoom === 5.5), 'dual presence: exact anchor layer missing');
+  assert(initial.ringNames.includes('Freifunk Hamburg'), 'dual presence: dual presence identity missing from digital sphere');
+  assert(!initial.ringNames.includes('Le Nid'), 'dual presence: geographic-only identity leaked into digital sphere');
 
   await run.page.locator('#sphere-edge-control').focus();
   await run.page.keyboard.press('Enter');
   await run.page.waitForSelector('.globe-stage[data-view-phase="layers"]');
   const digitalPrimaryIds = await run.page.locator('.digital-ribbon-item[data-ribbon-copy="0"]').evaluateAll((nodes) => nodes.map((node) => node.dataset.commonprojectId));
-  assert(digitalPrimaryIds.length === expectedDigitalProjection.totalCount, 'real hybrid: digital lane identity count mismatch: ' + digitalPrimaryIds.length);
-  assertSameIds(digitalPrimaryIds, expectedDigitalProjection.allIds, 'real hybrid: digital lane identity set');
-  assert(digitalPrimaryIds.includes('freifunk-hamburg'), 'real hybrid: hybrid identity missing from digital lanes');
-  assert(!digitalPrimaryIds.includes('cltb-le-nid'), 'real hybrid: geographic-only identity leaked into digital lanes');
+  assert(digitalPrimaryIds.length === expectedDigitalProjection.totalCount, 'dual presence: digital lane identity count mismatch: ' + digitalPrimaryIds.length);
+  assertSameIds(digitalPrimaryIds, expectedDigitalProjection.allIds, 'dual presence: digital lane identity set');
+  assert(digitalPrimaryIds.includes('freifunk-hamburg'), 'dual presence: dual presence identity missing from digital lanes');
+  assert(!digitalPrimaryIds.includes('cltb-le-nid'), 'dual presence: geographic-only identity leaked into digital lanes');
   await run.page.locator('#layer-close').click();
   await run.page.waitForSelector('.globe-stage[data-view-phase="overview"]');
 
   await run.page.locator('#commons-search').fill('Le Nid');
   await run.page.waitForFunction(() => document.querySelector('.globe-stage')?.dataset.publicMapFeatures === '2');
-  assert((await run.page.locator('.globe-stage').getAttribute('data-public-map-project-ids')) === '1', 'real hybrid: search did not reduce map identities');
-  assert((await run.page.locator('#globe-results').textContent())?.includes('1 Commons'), 'real hybrid: shared search count mismatch');
+  assert((await run.page.locator('.globe-stage').getAttribute('data-public-map-project-ids')) === '1', 'dual presence: search did not reduce map identities');
+  assert((await run.page.locator('#globe-results').textContent())?.includes('1 Commons'), 'dual presence: shared search count mismatch');
   await run.page.locator('#commons-search').fill('');
   await run.page.waitForFunction((count) => Number(document.querySelector('.globe-stage')?.dataset.publicMapFeatures) === count, expectedDigitalProjection.publicFeatureCount);
   await run.page.locator('#discovery-close').click();
-  assert(await run.page.locator('#discovery-panel').isHidden(), 'real hybrid: discovery panel blocked map activation');
+  assert(await run.page.locator('#discovery-panel').isHidden(), 'dual presence: discovery panel blocked map activation');
 
   const activateMapIdentity = async ({ coordinates, zoom, layerId, expectedLevel }) => {
     await run.page.evaluate(({ coordinates: target, zoom: targetZoom }) => {
@@ -1040,34 +1041,34 @@ async function realHybridCommonsScenario() {
     layerId: 'commonworld-approximate-zones',
     expectedLevel: 'region',
   });
-  assert((await run.page.locator('#focus-title').textContent()) === 'Freifunk Hamburg', 'real hybrid: approximate map click selected the wrong identity');
+  assert((await run.page.locator('#focus-title').textContent()) === 'Freifunk Hamburg', 'dual presence: approximate map click selected the wrong identity');
   const updatesAfterSelection = Number(await run.page.locator('.globe-stage').getAttribute('data-public-map-updates'));
-  assert(updatesAfterSelection === updatesBeforeSelection, 'real hybrid: selecting a project resent unchanged GeoJSON to MapLibre');
-  assert((await run.page.locator('#focus-kind').textContent()) === 'Hybrid · Kommunikation und Netze', 'real hybrid: hybrid presentation label mismatch');
+  assert(updatesAfterSelection === updatesBeforeSelection, 'dual presence: selecting a project resent unchanged GeoJSON to MapLibre');
+  assert((await run.page.locator('#focus-presence').textContent()) === 'Vor Ort · Digital · Kommunikation und Netze', 'dual presence: dual presence presentation label mismatch');
   const hamburgLocations = (await run.page.locator('#focus-locations').textContent()) ?? '';
-  assert(hamburgLocations.includes('mindestens 5 km Unschärfe') && hamburgLocations.includes('Ort verborgen'), 'real hybrid: approximate and hidden location truth missing');
-  assert(((await run.page.locator('#focus-relations').textContent()) ?? '').includes('Teil von Freifunk'), 'real hybrid: evidenced parent relation missing');
-  assert((await run.page.locator('.globe-stage').getAttribute('data-semantic-level')) === 'focus', 'real hybrid: selected identity did not enter semantic focus');
+  assert(hamburgLocations.includes('mindestens 5 km Unschärfe') && hamburgLocations.includes('Ort verborgen'), 'dual presence: approximate and hidden location truth missing');
+  assert(((await run.page.locator('#focus-relations').textContent()) ?? '').includes('Teil von Freifunk'), 'dual presence: evidenced parent relation missing');
+  assert((await run.page.locator('.globe-stage').getAttribute('data-semantic-level')) === 'focus', 'dual presence: selected identity did not enter semantic focus');
   await run.page.locator('#commons-search').fill('Le Nid');
   await run.page.waitForFunction(() => document.querySelector('.globe-stage')?.dataset.publicMapFeatures === '2');
-  assert((await run.page.locator('#focus-title').textContent()) === 'Freifunk Hamburg', 'real hybrid: filtering replaced or cleared the selected identity');
-  assert((await run.page.locator('.globe-stage').getAttribute('data-semantic-level')) === 'focus', 'real hybrid: filtered selected identity lost semantic focus');
-  assert(((await run.page.locator('#semantic-summary').textContent()) ?? '').startsWith('Hybrid'), 'real hybrid: semantic line no longer describes the filtered selected identity');
+  assert((await run.page.locator('#focus-title').textContent()) === 'Freifunk Hamburg', 'dual presence: filtering replaced or cleared the selected identity');
+  assert((await run.page.locator('.globe-stage').getAttribute('data-semantic-level')) === 'focus', 'dual presence: filtered selected identity lost semantic focus');
+  assert(((await run.page.locator('#semantic-summary').textContent()) ?? '').startsWith('Vor Ort'), 'dual presence: semantic line no longer describes the filtered selected identity');
   await run.page.locator('#commons-search').fill('');
   await run.page.waitForFunction((count) => Number(document.querySelector('.globe-stage')?.dataset.publicMapFeatures) === count, expectedDigitalProjection.publicFeatureCount);
   await run.page.locator('#discovery-close').click();
   await run.page.locator('#focus-close').click();
-  assert(await run.page.evaluate(() => document.activeElement === window.__commonworldTestMap?.getCanvas()), 'real hybrid: closing a map-selected focus did not restore focus to the map canvas');
+  assert(await run.page.evaluate(() => document.activeElement === window.__commonworldTestMap?.getCanvas()), 'dual presence: closing a map-selected focus did not restore focus to the map canvas');
   await activateMapIdentity({
     coordinates: [9.944545738399, 53.558314876911],
     zoom: 6.2,
     layerId: 'commonworld-approximate-zones',
     expectedLevel: 'local',
   });
-  assert((await run.page.locator('#focus-title').textContent()) === 'Freifunk Hamburg', 'real hybrid: local uncertainty-zone click lost the hybrid identity');
-  assert(((await run.page.locator('#focus-locations').textContent()) ?? '').includes('mindestens 5 km Unschärfe'), 'real hybrid: local uncertainty zone lost its minimum-radius truth');
+  assert((await run.page.locator('#focus-title').textContent()) === 'Freifunk Hamburg', 'dual presence: local uncertainty-zone click lost the dual presence identity');
+  assert(((await run.page.locator('#focus-locations').textContent()) ?? '').includes('mindestens 5 km Unschärfe'), 'dual presence: local uncertainty zone lost its minimum-radius truth');
   await run.page.locator('#focus-close').click();
-  assert(await run.page.evaluate(() => document.activeElement === window.__commonworldTestMap?.getCanvas()), 'real hybrid: local uncertainty-zone focus did not restore map focus');
+  assert(await run.page.evaluate(() => document.activeElement === window.__commonworldTestMap?.getCanvas()), 'dual presence: local uncertainty-zone focus did not restore map focus');
 
   await activateMapIdentity({
     coordinates: [4.3152961, 50.8452417],
@@ -1075,10 +1076,10 @@ async function realHybridCommonsScenario() {
     layerId: 'commonworld-exact-anchors',
     expectedLevel: 'local',
   });
-  assert((await run.page.locator('#focus-title').textContent()) === 'Le Nid', 'real hybrid: exact map click selected the wrong identity');
-  assert((await run.page.locator('#focus-kind').textContent()) === 'Geografisch', 'real hybrid: geographic presentation label mismatch');
+  assert((await run.page.locator('#focus-title').textContent()) === 'Le Nid', 'dual presence: exact map click selected the wrong identity');
+  assert((await run.page.locator('#focus-presence').textContent()) === 'Vor Ort', 'dual presence: geographic presentation label mismatch');
   const leNidLocations = (await run.page.locator('#focus-locations').textContent()) ?? '';
-  assert(leNidLocations.includes('exakter öffentlicher Punkt') && leNidLocations.includes('öffentliche Fläche'), 'real hybrid: point and extent truth missing from focus');
+  assert(leNidLocations.includes('exakter öffentlicher Punkt') && leNidLocations.includes('öffentliche Fläche'), 'dual presence: point and extent truth missing from focus');
   const leNidCoordinates = [4.3152961, 50.8452417];
   await run.page.evaluate((target) => {
     window.__commonworldTestMap.jumpTo({ center: target, zoom: 18, bearing: 0, pitch: 0 });
@@ -1098,16 +1099,16 @@ async function realHybridCommonsScenario() {
     return map.queryRenderedFeatures(viewport, { layers: ['commonworld-public-extents'] })
       .some(({ properties }) => properties?.project_id === 'cltb-le-nid');
   });
-  assert(renderedExtent, 'real hybrid: reviewed Le Nid public extent is not rendered through MapLibre at building zoom');
+  assert(renderedExtent, 'dual presence: reviewed Le Nid public extent is not rendered through MapLibre at building zoom');
 
   await run.page.locator('#settings-toggle').click();
   await run.page.getByRole('radio', { name: /Text/ }).click();
-  assert(await run.page.locator('#text-view').isVisible(), 'real hybrid: text surface did not open');
-  assert((await run.page.locator('body').getAttribute('data-presentation')) === 'text', 'real hybrid: presentation state did not become text');
-  assert(await run.page.locator('#project-cltb-le-nid[data-selected]').isVisible(), 'real hybrid: text surface lost the selected CommonProject identity');
-  assert(run.consoleErrors.length === 0, 'real hybrid: console errors: ' + run.consoleErrors.join(' | '));
-  assert(run.pageErrors.length === 0, 'real hybrid: page errors: ' + run.pageErrors.join(' | '));
-  results.push({ id: 'real-hybrid-commons', verdict: 'PASS', publicFeatures: expectedDigitalProjection.publicFeatureCount, publicIdentities: expectedDigitalProjection.publicIdentityCount, digitalIdentities: expectedDigitalProjection.totalCount, unchangedMapUpdatesSkipped: true });
+  assert(await run.page.locator('#text-view').isVisible(), 'dual presence: text surface did not open');
+  assert((await run.page.locator('body').getAttribute('data-presentation')) === 'text', 'dual presence: presentation state did not become text');
+  assert(await run.page.locator('#project-cltb-le-nid[data-selected]').isVisible(), 'dual presence: text surface lost the selected CommonProject identity');
+  assert(run.consoleErrors.length === 0, 'dual presence: console errors: ' + run.consoleErrors.join(' | '));
+  assert(run.pageErrors.length === 0, 'dual presence: page errors: ' + run.pageErrors.join(' | '));
+  results.push({ id: 'dual-presence-axes', verdict: 'PASS', publicFeatures: expectedDigitalProjection.publicFeatureCount, publicIdentities: expectedDigitalProjection.publicIdentityCount, digitalIdentities: expectedDigitalProjection.totalCount, unchangedMapUpdatesSkipped: true });
   await run.context.close();
 }
 
@@ -1185,13 +1186,15 @@ async function intentSearchDiscoveryScenario() {
   await run.page.waitForFunction((count) => document.querySelectorAll('.discovery-result').length === count, expectedDigitalProjection.catalogEntryCount);
   await run.page.waitForFunction(() => Boolean(window.__commonworldTestMap) && !window.__commonworldTestMap.isMoving());
   const filterCamera = await mapCamera();
-  await run.page.locator('#filter-presence').selectOption('hybrid');
-  await run.page.waitForFunction((count) => document.querySelectorAll('.discovery-result').length === count, expectedDigitalProjection.hybridIds.length);
-  assert(JSON.stringify(await resultIds()) === JSON.stringify(expectedDigitalProjection.hybridIds), 'intent filters: hybrid presence differs from the catalog');
-  assert(new URL(run.page.url()).searchParams.get('presence') === 'hybrid', 'intent filters: presence was not serialized');
+  await run.page.locator('#filter-presence-geographic').check();
+  await run.page.locator('#filter-presence-digital').check();
+  await run.page.waitForFunction((count) => document.querySelectorAll('.discovery-result').length === count, expectedDigitalProjection.dualPresenceIds.length);
+  assert(JSON.stringify(await resultIds()) === JSON.stringify(expectedDigitalProjection.dualPresenceIds), 'intent filters: dual presence differs from the catalog');
+  const params = new URL(run.page.url()).searchParams.getAll('presence');
+  assert(params.length === 2 && params[0] === 'geographic' && params[1] === 'digital', 'intent filters: presence was not serialized correctly');
   await run.page.locator('#filter-action').selectOption('volunteer');
-  await run.page.waitForFunction((count) => new URL(location.href).searchParams.get('action') === 'volunteer' && document.querySelectorAll('.discovery-result').length === count, expectedDigitalProjection.hybridVolunteerIds.length);
-  assert(JSON.stringify(await resultIds()) === JSON.stringify(expectedDigitalProjection.hybridVolunteerIds), 'intent filters: combined hybrid-volunteer filter differs from claimed catalog actions');
+  await run.page.waitForFunction((count) => new URL(location.href).searchParams.get('action') === 'volunteer' && document.querySelectorAll('.discovery-result').length === count, expectedDigitalProjection.dualPresenceVolunteerIds.length);
+  assert(JSON.stringify(await resultIds()) === JSON.stringify(expectedDigitalProjection.dualPresenceVolunteerIds), 'intent filters: combined dual-presence-volunteer filter differs from claimed catalog actions');
   assert(sameCamera(filterCamera, await mapCamera()), 'intent filters: changing filters moved the map');
 
   const actionTypes = await run.page.locator('.discovery-result[data-commonproject-id="freifunk-hamburg"] .discovery-result-actions a').evaluateAll((links) => links.map((link) => link.dataset.actionType));
@@ -1200,11 +1203,11 @@ async function intentSearchDiscoveryScenario() {
   assert(actionTargets.every((href) => href.startsWith('https://')), 'intent actions: a direct action target is not HTTPS');
 
   await run.page.goBack({ waitUntil: 'domcontentloaded' });
-  await run.page.waitForFunction(() => document.querySelector('#filter-presence')?.value === 'hybrid' && document.querySelector('#filter-action')?.value === '');
-  assert(JSON.stringify(await resultIds()) === JSON.stringify(expectedDigitalProjection.hybridIds), 'intent history: Back did not restore the previous filter context');
+  await run.page.waitForFunction(() => document.querySelector('#filter-presence-geographic')?.checked === true && document.querySelector('#filter-presence-digital')?.checked === true && document.querySelector('#filter-action')?.value === '');
+  assert(JSON.stringify(await resultIds()) === JSON.stringify(expectedDigitalProjection.dualPresenceIds), 'intent history: Back did not restore the previous filter context');
   await run.page.goForward({ waitUntil: 'domcontentloaded' });
   await run.page.waitForFunction(() => document.querySelector('#filter-action')?.value === 'volunteer');
-  assert(JSON.stringify(await resultIds()) === JSON.stringify(expectedDigitalProjection.hybridVolunteerIds), 'intent history: Forward did not restore the combined filter context');
+  assert(JSON.stringify(await resultIds()) === JSON.stringify(expectedDigitalProjection.dualPresenceVolunteerIds), 'intent history: Forward did not restore the combined filter context');
 
   await run.page.locator('#filter-clear').click();
   await run.page.waitForFunction((count) => document.querySelectorAll('.discovery-result').length === count, expectedDigitalProjection.catalogEntryCount);
@@ -1231,13 +1234,14 @@ async function intentSearchDiscoveryScenario() {
 
   await run.page.locator('#commons-search').fill('');
   await run.page.waitForFunction((count) => document.querySelectorAll('.discovery-result').length === count, expectedDigitalProjection.catalogEntryCount);
-  await run.page.locator('#filter-presence').selectOption('hybrid');
-  await run.page.waitForFunction((count) => document.querySelectorAll('.discovery-result').length === count, expectedDigitalProjection.hybridIds.length);
+  await run.page.locator('#filter-presence-geographic').check();
+  await run.page.locator('#filter-presence-digital').check();
+  await run.page.waitForFunction((count) => document.querySelectorAll('.discovery-result').length === count, expectedDigitalProjection.dualPresenceIds.length);
   await run.page.locator('#discovery-close').click();
   await run.page.locator('#settings-toggle').click();
   await run.page.getByRole('radio', { name: /Text/ }).click();
   const visibleTextIds = await run.page.locator('.catalog-card:not([hidden])').evaluateAll((cards) => cards.map((card) => card.dataset.commonprojectId));
-  assert(JSON.stringify(visibleTextIds) === JSON.stringify(expectedDigitalProjection.hybridIds), 'intent parity: text view does not preserve the globe filter context');
+  assert(JSON.stringify(visibleTextIds) === JSON.stringify(expectedDigitalProjection.dualPresenceIds), 'intent parity: text view does not preserve the globe filter context');
   const staticActionTypes = await run.page.locator('#project-freifunk-hamburg .catalog-action-link').evaluateAll((links) => links.map((link) => link.dataset.actionType));
   assert(JSON.stringify(staticActionTypes) === JSON.stringify(['use', 'learn', 'contribute', 'volunteer', 'contact']), 'intent parity: static text actions differ from ranked result actions');
 
@@ -1473,7 +1477,7 @@ try {
   await intentSearchDiscoveryScenario();
   await intentSearchLayoutScenario({ viewportOverride: { width: 1024, height: 1366 }, scenarioId: 'intent-search-ipad-portrait' });
   await intentSearchLayoutScenario({ viewportOverride: { width: 1366, height: 1024 }, scenarioId: 'intent-search-ipad-landscape' });
-  await realHybridCommonsScenario();
+  await dualPresenceAxesScenario();
   await layerJourneyScenario();
   await layerJourneyScenario({ mobile: true });
   await layerJourneyScenario({ viewportOverride: { width: 1024, height: 1366 }, touch: true, scenarioId: 'layer-journey-ipad-portrait' });

@@ -4,7 +4,7 @@
   "title": "Commonworld intent-oriented search and discovery",
   "source_contract": {
     "id": "https://commonworld.net/contracts/commonworld/project.schema.json",
-    "schema_version": 3,
+    "schema_version": 4,
     "identity_key": "CommonProject.id"
   },
   "truth_boundary": {

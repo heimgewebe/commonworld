@@ -1,9 +1,8 @@
 {
-  "schema_version": 3,
+  "schema_version": 4,
   "id": "mastodon",
   "title": "Mastodon",
   "summary": "Eine freie, quelloffene und föderierte Software für soziale Netzwerke, deren unabhängige Server miteinander kommunizieren können.",
-  "kind": "digital",
   "themes": [
     "communication",
     "federation",

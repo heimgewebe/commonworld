@@ -1,9 +1,8 @@
 {
-  "schema_version": 3,
+  "schema_version": 4,
   "id": "open-source-ecology",
   "title": "Open Source Ecology",
   "summary": "Ein globales Open-Hardware-Projekt, das frei nutzbare Baupläne für industrielle Werkzeuge entwickelt und sie an der Factor e Farm in Missouri praktisch erprobt, dokumentiert und lehrt.",
-  "kind": "hybrid",
   "themes": [
     "open-source",
     "open-hardware",
