@@ -437,7 +437,14 @@ def run_production_readback(
                     error=str(error),
                 )
             if deployment_result.error:
-                errors.append(deployment_result.error)
+                try:
+                    repository_head_sha = read_head()
+                except RuntimeError as error:
+                    errors.extend((deployment_result.error, str(error)))
+                if not errors and repository_head_sha != expected_sha:
+                    superseded_at = "during_deployment_wait"
+                elif not errors:
+                    errors.append(deployment_result.error)
         if not errors and deployment_result.verdict == "pass":
             try:
                 repository_head_sha = read_head()

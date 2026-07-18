@@ -331,6 +331,29 @@ class PagesDeploymentReadbackTests(unittest.TestCase):
         self.assertEqual(0, receipt.live_attempts)
         self.assertEqual((), receipt.errors)
 
+    def test_deployment_failure_becomes_superseded_when_main_advanced(self) -> None:
+        heads = iter((SHA, OTHER_SHA))
+
+        def api_get(endpoint: str):
+            if endpoint.startswith("deployments?"):
+                return [deployment(30)]
+            return [{"state": "failure", "created_at": "2026-07-18T00:00:01Z"}]
+
+        receipt = run_production_readback(
+            repository="heimgewebe/commonworld",
+            expected_sha=SHA,
+            token="test-token",
+            url="https://commonworld.net/",
+            api_get=api_get,
+            head_sha=lambda: next(heads),
+            now=lambda: "2026-07-18T00:00:00Z",
+        )
+        self.assertEqual("superseded", receipt.verdict)
+        self.assertEqual("during_deployment_wait", receipt.superseded_at)
+        self.assertEqual(OTHER_SHA, receipt.repository_head_sha)
+        self.assertEqual("failure", receipt.deployment_state)
+        self.assertEqual((), receipt.errors)
+
     def test_superseded_after_deployment_skips_live_claim(self) -> None:
         heads = iter((SHA, OTHER_SHA))
 
