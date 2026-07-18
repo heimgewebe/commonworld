@@ -41,6 +41,7 @@ import {
   ringOrbitDirection,
   ringOrbitDuration,
   ringOrbitStartAngle,
+  safeExternalHttpsUrl,
   searchFromState,
   serializeDigitalPath,
   semanticLocationLine,
@@ -73,6 +74,27 @@ test('layer derivation uses catalog themes without overrides', () => {
   assert.equal(deriveLayer({ themes: ['knowledge', 'open-data'], presence: { digital: { available: true } } }), 'knowledge_data');
   assert.equal(deriveLayer({ themes: ['open-data', 'infrastructure'], presence: { digital: { available: true } } }), 'mixed_other');
   assert.equal(deriveLayer({ themes: ['education'], presence: { digital: { available: false } } }), null);
+});
+
+test('external catalogue links require canonical credential-free HTTPS URLs', () => {
+  assert.equal(safeExternalHttpsUrl('https://example.org/path?q=commons'), 'https://example.org/path?q=commons');
+  assert.equal(safeExternalHttpsUrl('https://EXAMPLE.org:443/a/../b'), 'https://example.org/b');
+  for (const value of [
+    null,
+    42,
+    '',
+    ' https://example.org',
+    'https://example.org ',
+    '/relative',
+    'http://example.org',
+    'javascript:alert(1)',
+    'data:text/html,<h1>x</h1>',
+    'https://user@example.org',
+    'https://user:secret@example.org',
+    'https://%',
+  ]) {
+    assert.equal(safeExternalHttpsUrl(value), null, String(value));
+  }
 });
 
 test('digital ring taxonomy exposes five fields and validates its legacy aliases', () => {
@@ -414,6 +436,12 @@ test('record filtering keeps one shared search and layer truth', () => {
   assert.deepEqual(filterRecords(records, { digitalPath: DIGITAL_ROOT_PATH }).map(({ id }) => id), ['a', 'b', 'c']);
   assert.deepEqual(filterRecords(records, { digitalPath: ['sphere', 'knowledge_learning_culture', 'learning_education'] }).map(({ id }) => id), ['b']);
   assert.deepEqual(filterRecords(records, { query: 'daten', digitalPath: ['sphere', 'knowledge_learning_culture', 'open_knowledge_data'] }).map(({ id }) => id), ['a']);
+  assert.deepEqual(filterRecords(records, {
+    query: 'lernen',
+    digitalPath: ['sphere', 'knowledge_learning_culture', 'learning_education'],
+    presence: ['digital'],
+    action: 'learn',
+  }).map(({ id }) => id), ['b']);
   assert.deepEqual(filterRecords(records, { layer: 'learning_education' }).map(({ id }) => id), ['b']);
 });
 

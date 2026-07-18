@@ -139,6 +139,17 @@ const finite = (value, fallback) => {
 const clamp = (value, minimum, maximum) => Math.min(maximum, Math.max(minimum, value));
 const rounded = (value, digits) => Number(value.toFixed(digits));
 
+export function safeExternalHttpsUrl(value) {
+  if (typeof value !== 'string' || value.trim() !== value) return null;
+  try {
+    const parsed = new URL(value);
+    if (parsed.protocol !== 'https:' || parsed.username || parsed.password) return null;
+    return parsed.href;
+  } catch {
+    return null;
+  }
+}
+
 export function hasDigitalPresence(record) {
   return record?.presence?.digital?.available === true;
 }

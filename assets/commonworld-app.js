@@ -28,6 +28,7 @@ import {
   ringOrbitDirection,
   ringOrbitDuration,
   ringOrbitStartAngle,
+  safeExternalHttpsUrl,
   searchFromState,
   serializeDigitalPath,
   semanticLocationLine,
@@ -846,9 +847,11 @@ function clearIntentFilters({ historyMode = 'push' } = {}) {
 
 function directActionLinks(record) {
   const actions = new Set(Array.isArray(record?.actions) ? record.actions : []);
-  return (Array.isArray(record?.links) ? record.links : []).filter((link) => (
-    link && ACTION_LINK_TYPES.has(link.type) && actions.has(link.type) && typeof link.url === 'string' && link.url.startsWith('https://')
-  ));
+  return (Array.isArray(record?.links) ? record.links : []).flatMap((link) => {
+    if (!link || !ACTION_LINK_TYPES.has(link.type) || !actions.has(link.type)) return [];
+    const url = safeExternalHttpsUrl(link.url);
+    return url ? [{ ...link, url }] : [];
+  });
 }
 
 function resultLocationLabel(record) {
@@ -1022,12 +1025,13 @@ function replaceList(container, values) {
 function replaceLinks(container, links) {
   container.replaceChildren();
   for (const link of links) {
-    if (!link || typeof link.url !== 'string' || !link.url.startsWith('https://')) continue;
+    const url = safeExternalHttpsUrl(link?.url);
+    if (!url) continue;
     const item = document.createElement('li');
     const anchor = document.createElement('a');
-    anchor.href = link.url;
+    anchor.href = url;
     anchor.rel = 'external noreferrer';
-    anchor.textContent = link.label || link.url;
+    anchor.textContent = link.label || url;
     item.append(anchor);
     container.append(item);
   }

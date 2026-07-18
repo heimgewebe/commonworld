@@ -1612,6 +1612,33 @@ async function legacyLayerAndAtomicFocusScenario() {
   ));
   assert(await focusRun.page.locator('#project-focus').isHidden(), 'atomic focus: Forward left the project panel visible');
 
+  for (let iteration = 0; iteration < 3; iteration += 1) {
+    await focusRun.page.goBack();
+    await focusRun.page.waitForFunction(() => new URL(location.href).searchParams.get('project') === 'wikipedia');
+    await focusRun.page.goForward();
+    await focusRun.page.waitForFunction(() => new URL(location.href).searchParams.get('digital_path') === 'sphere/communication_networks' && !new URL(location.href).searchParams.has('project'));
+  }
+  await focusRun.page.waitForFunction(() => {
+    const active = document.activeElement;
+    return active
+      && active !== document.body
+      && active.isConnected
+      && active.getClientRects().length > 0
+      && !active.closest('[hidden], [inert], [aria-hidden="true"]');
+  });
+  const rapidFocus = await focusRun.page.evaluate(() => {
+    const active = document.activeElement;
+    return {
+      tag: active?.tagName ?? null,
+      id: active?.id ?? null,
+      connected: active?.isConnected ?? false,
+      visible: Boolean(active?.getClientRects().length),
+      blocked: Boolean(active?.closest('[hidden], [inert], [aria-hidden="true"]')),
+      body: active === document.body,
+    };
+  });
+  assert(rapidFocus.connected && rapidFocus.visible && !rapidFocus.blocked && !rapidFocus.body, 'atomic focus: repeated Back/Forward produced an invalid target (' + JSON.stringify(rapidFocus) + ')');
+
   await focusRun.page.goto(`${baseUrl}/?view=layers&digital_path=sphere/communication_networks&project=wikipedia`, { waitUntil: 'domcontentloaded' });
   await focusRun.page.waitForSelector('html.runtime-ready');
   await focusRun.page.waitForFunction(() => document.querySelector('.globe-stage')?.dataset.digitalPath === 'sphere/communication_networks');
@@ -1656,6 +1683,54 @@ async function legacyLayerAndAtomicFocusScenario() {
   assert(textFocusRun.pageErrors.length === 0, `text atomic focus: page errors: ${textFocusRun.pageErrors.join(' | ')}`);
   await textFocusRun.context.close();
   results.push({ id: 'legacy-layer-and-atomic-focus', verdict: 'PASS', backForwardFocus: true, textHierarchyFocus: true, keyboardPath: true });
+}
+
+async function externalLinkSafetyScenario() {
+  process.stdout.write(`${JSON.stringify({ state: 'RUNNING', scenario: 'external-link-safety' })}\n`);
+  const run = await newPage({ reducedMotion: 'reduce' });
+  await run.page.goto(baseUrl, { waitUntil: 'domcontentloaded' });
+  await run.page.waitForSelector('html.runtime-ready');
+  await run.page.evaluate(() => window.__commonworldInstallSyntheticRecordsForTest([{
+    schema_version: 4,
+    id: 'link-safety',
+    title: 'Link Safety Commons',
+    summary: 'Synthetischer Datensatz für die Prüfung externer Kataloglinks.',
+    themes: ['communication', 'community-network'],
+    actions: ['visit', 'learn', 'donate'],
+    presence: {
+      geographic: [],
+      digital: { available: true, reach: 'global', label: 'Sichere digitale Präsenz' },
+    },
+    activity: { status: 'active' },
+    curation: { state: 'listed', reviewed_at: '2026-07-18', next_review_at: '2027-01-01' },
+    links: [
+      { type: 'visit', label: 'Sichere Aktion', url: 'https://EXAMPLE.org:443/a/../safe' },
+      { type: 'learn', label: 'Zugangsdaten-Link', url: 'https://user:secret@example.org/private' },
+      { type: 'donate', label: 'Whitespace-Link', url: ' https://example.org/bad' },
+      { type: 'source', label: 'Sichere Quelle', url: 'https://example.org/source' },
+    ],
+    provenance: {
+      sources: [
+        { label: 'Beleg', url: 'https://example.org/evidence' },
+        { label: 'Unsicherer Beleg', url: 'https://user@example.org/evidence' },
+      ],
+    },
+  }]));
+
+  await run.page.locator('#filter-toggle').click();
+  const discoveryLinks = run.page.locator('.discovery-result-actions a');
+  assert((await discoveryLinks.count()) === 1, 'external link safety: unsafe action links were rendered');
+  assert((await discoveryLinks.first().getAttribute('href')) === 'https://example.org/safe', 'external link safety: safe action URL was not canonicalized');
+  await run.page.locator('.discovery-result-main[data-commonproject-id="link-safety"]').click();
+  await run.page.waitForSelector('#project-focus:not([hidden])');
+  const focusHrefs = await run.page.locator('#focus-links a').evaluateAll((nodes) => nodes.map((node) => node.href));
+  assertSameIds(focusHrefs, ['https://example.org/safe', 'https://example.org/source'], 'external link safety: focus links');
+  const sourceHrefs = await run.page.locator('#focus-sources a').evaluateAll((nodes) => nodes.map((node) => node.href));
+  assertSameIds(sourceHrefs, ['https://example.org/evidence'], 'external link safety: provenance links');
+  assert(run.consoleErrors.length === 0, 'external link safety: console errors: ' + run.consoleErrors.join(' | '));
+  assert(run.pageErrors.length === 0, 'external link safety: page errors: ' + run.pageErrors.join(' | '));
+  results.push({ id: 'external-link-safety', verdict: 'PASS', canonicalHttpsOnly: true });
+  await run.context.close();
 }
 
 async function syntheticCatalogueTruthScenario() {
@@ -1849,6 +1924,7 @@ try {
   await interruptedLayerJourneyScenario();
   await reducedMotionLayerScenario();
   await legacyLayerAndAtomicFocusScenario();
+  await externalLinkSafetyScenario();
   await syntheticCatalogueTruthScenario();
   await catalogueFailureScenario();
   await providerFailureScenario();
