@@ -1282,13 +1282,37 @@ function flushPendingHierarchyFocus() {
   return target;
 }
 
-function scheduleHierarchyFocus(pathKey) {
+const HIERARCHY_FOCUS_RETRY_DELAYS_MS = [0, 50, 150, 400, 900, 1800];
+
+function isVisibleHierarchyFocusTarget(target = document.activeElement) {
+  return isVisibleFocusTarget(target)
+    && target.matches('.digital-lane-focus, .digital-lane-scroll, .digital-breadcrumb-item, .layer-filter, #layer-close');
+}
+
+function scheduleHierarchyFocus(pathKey, verificationAttempt = 0) {
   runtime.pendingHierarchyFocusPath = pathKey;
   window.clearTimeout(runtime.hierarchyFocusTimer);
-  runtime.hierarchyFocusTimer = window.setTimeout(() => {
+  let attempt = 0;
+  const tryFocus = () => {
     runtime.hierarchyFocusTimer = null;
-    flushPendingHierarchyFocus();
-  }, 0);
+    if (runtime.pendingHierarchyFocusPath !== pathKey) return;
+    const target = flushPendingHierarchyFocus();
+    if (target) {
+      window.setTimeout(() => {
+        if (runtime.state.project || serializeDigitalPath(currentDigitalPath()) !== pathKey) return;
+        if (isVisibleHierarchyFocusTarget()) return;
+        const active = document.activeElement;
+        if (active && active !== document.body && isVisibleFocusTarget(active)) return;
+        if (verificationAttempt >= 2) return;
+        scheduleHierarchyFocus(pathKey, verificationAttempt + 1);
+      }, 50);
+      return;
+    }
+    attempt += 1;
+    if (attempt >= HIERARCHY_FOCUS_RETRY_DELAYS_MS.length) return;
+    runtime.hierarchyFocusTimer = window.setTimeout(tryFocus, HIERARCHY_FOCUS_RETRY_DELAYS_MS[attempt]);
+  };
+  runtime.hierarchyFocusTimer = window.setTimeout(tryFocus, HIERARCHY_FOCUS_RETRY_DELAYS_MS[attempt]);
 }
 
 function setDigitalPath(path, { historyMode = 'push' } = {}) {
