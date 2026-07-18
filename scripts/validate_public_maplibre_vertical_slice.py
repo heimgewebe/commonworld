@@ -32,6 +32,7 @@ REQUIRED_FILES = (
     Path("assets/map/openfreemap-liberty.json"),
     Path("assets/commonworld-core.mjs"),
     Path("assets/commonworld-app.js"),
+    Path("contracts/commonworld/digital-ring-taxonomy.contract.json"),
     Path("catalog/catalog.json"),
     Path("index.html"),
     Path("index.css"),
@@ -448,7 +449,7 @@ def validate_public_maplibre_vertical_slice(root: Path = ROOT) -> list[str]:
             errors.append(f"vertical-slice seed record must not contain geographic coordinates: {identifier}")
     for record in records:
         identifier = record.get("id")
-        if any(key in record for key in ("layer", "derived_layer", "presentation_layer", "semantic_zoom")):
+        if any(key in record for key in ("layer", "derived_layer", "presentation_layer", "semantic_zoom", "digital_path")):
             errors.append(f"vertical-slice catalog record must not store presentation or semantic-zoom truth: {identifier}")
 
     html = (root / "index.html").read_text(encoding="utf-8")
@@ -480,15 +481,18 @@ def validate_public_maplibre_vertical_slice(root: Path = ROOT) -> list[str]:
         'id="digital-sphere"',
         'id="sphere-edge-control"',
         'id="layer-panel"',
+        'id="layer-breadcrumb"',
+        'id="layer-current"',
         'id="layer-stack-visual"',
         'id="layer-track-deck"',
         'id="layer-search-toggle"',
         'id="project-focus"',
         'id="globe-surface"',
         'id="text-view"',
+        'id="text-layer-breadcrumb"',
+        'id="text-layer-current"',
         'id="settings-toggle"',
         'id="settings-panel"',
-        'id="catalog-bootstrap"',
         'id="globe-results"',
         'role="region"',
         'id="commons-search"',
@@ -502,6 +506,8 @@ def validate_public_maplibre_vertical_slice(root: Path = ROOT) -> list[str]:
     for token in required_html:
         if token not in html:
             errors.append(f"public runtime shell missing token: {token}")
+    if 'id="catalog-bootstrap"' in html:
+        errors.append("public runtime shell must not expose catalog JSON as DOM text")
     if re.search(r"<script(?![^>]+src=)[^>]*>", html, re.IGNORECASE):
         errors.append("public runtime must not contain inline scripts")
     if re.search(r"\sstyle=", html, re.IGNORECASE):
@@ -542,6 +548,11 @@ def validate_public_maplibre_vertical_slice(root: Path = ROOT) -> list[str]:
         "sphereLayout({",
         "setPresentation(",
         "filterRecords(",
+        "buildDigitalPresentationTree(",
+        "visibleDigitalNodes(",
+        "setDigitalPath(",
+        "normalizeDigitalPath(",
+        "digitalPath",
         "window.addEventListener('popstate'",
         "setTimeout(() => writeHistory('replace'), 180)",
         "PUBLIC_MAP_SOURCE_ID",
@@ -549,6 +560,7 @@ def validate_public_maplibre_vertical_slice(root: Path = ROOT) -> list[str]:
         "ensurePublicMapLayers",
         "semanticLocationLine",
         "overlayRenderCount += 1",
+        "./commonworld-bootstrap-catalog.mjs",
         "bootstrapRecords()",
         "verifyMapProvider",
         "degradeMap",
@@ -562,7 +574,7 @@ def validate_public_maplibre_vertical_slice(root: Path = ROOT) -> list[str]:
     for token in required_app:
         if token not in app:
             errors.append(f"public runtime application missing contract token: {token}")
-    for token in ("deriveLayer", "binaryFragment", "binaryName", "ribbonRepeatCount", "stateFromSearch", "searchFromState", "filterRecords", "globeHorizonCoordinates", "projectedGlobeCircle", "sphereLayout", "sphereOpacityForGlobeRatio", "publicMapFeatureCollection", "evidencedRelations", "recordLocationSummaries", "recordPresentationLabel", "semanticLocationLine", "semanticZoomLevel"):
+    for token in ("deriveLayer", "validateDigitalTaxonomy", "deriveDigitalProjectPath", "buildDigitalPresentationTree", "visibleDigitalNodes", "normalizeDigitalPath", "binaryFragment", "binaryName", "ribbonRepeatCount", "stateFromSearch", "searchFromState", "filterRecords", "globeHorizonCoordinates", "projectedGlobeCircle", "sphereLayout", "sphereOpacityForGlobeRatio", "publicMapFeatureCollection", "evidencedRelations", "recordLocationSummaries", "recordPresentationLabel", "semanticLocationLine", "semanticZoomLevel"):
         if f"function {token}" not in core:
             errors.append(f"public runtime core missing function: {token}")
     if "setInterval" in app:
@@ -587,6 +599,8 @@ def validate_public_maplibre_vertical_slice(root: Path = ROOT) -> list[str]:
         "--sphere-size",
         ".sphere-edge-control",
         ".sphere-ring-text",
+        ".digital-breadcrumb",
+        ".digital-current",
         ".layer-track-deck",
         ".digital-lane-scroll",
         "overflow-x: auto",
@@ -672,6 +686,12 @@ def validate_public_maplibre_vertical_slice(root: Path = ROOT) -> list[str]:
         errors.append("public MapLibre geographic surface contract mismatch")
     digital_surface = contract.get("digital_sphere", {}) if isinstance(contract.get("digital_sphere"), dict) else {}
     for key, expected in {
+        "taxonomy_contract": "contracts/commonworld/digital-ring-taxonomy.contract.json",
+        "primary_path_membership": "derived_from_catalog_themes_and_public_digital_presence",
+        "active_navigation_parameter": "digital_path",
+        "presentation_hierarchy": "recursive_ring_bundle_tree",
+        "overview_main_bundle_count": 5,
+        "legacy_layer_count": 6,
         "geometry_anchor": "maplibre_projected_globe_horizon",
         "screen_fixed_center_forbidden": True,
         "side_view_keeps_overlay_attached": True,
@@ -697,10 +717,13 @@ def validate_public_maplibre_vertical_slice(root: Path = ROOT) -> list[str]:
         "data-globe-viewport-ratio",
     ]:
         errors.append("public digital-sphere geometry acceptance attributes mismatch")
-    if digital_surface.get("side_view_visual") != "swipeable_horizontal_name_binary_lanes_after_text_sphere_flight":
+    if digital_surface.get("side_view_visual") != "hierarchical_ring_bundle_lanes_after_text_sphere_flight":
         errors.append("public digital-sphere side-layer visual mismatch")
     for key, expected in {
         "overview_ring_content": "commons_name_then_utf8_binary_name",
+        "progressive_disclosure": "current_node_direct_children_and_parent_breadcrumb_only",
+        "parent_identity_sets_equal_child_union": True,
+        "primary_child_identity_sets_disjoint": True,
         "side_view_identity_source": "same_CommonProject_records_not_same_DOM_elements",
         "multi_lane_horizontal_swipe": True,
         "single_lane_horizontal_swipe": True,
@@ -713,9 +736,11 @@ def validate_public_maplibre_vertical_slice(root: Path = ROOT) -> list[str]:
         if digital_surface.get(key) != expected:
             errors.append(f"public digital-sphere close-up contract mismatch: {key}")
     navigation = contract.get("navigation", {}) if isinstance(contract.get("navigation"), dict) else {}
-    if navigation.get("deep_link_parameters") != ["lng", "lat", "z", "b", "p", "view", "surface", "layer", "project", "q"]:
+    if navigation.get("deep_link_parameters") != ["lng", "lat", "z", "b", "p", "view", "surface", "digital_path", "project", "q"]:
         errors.append("public globe/text deep-link parameters mismatch")
-    if navigation.get("search_and_layer_filter_shared_across_surfaces") is not True:
+    if navigation.get("legacy_deep_link_parameters") != ["layer"]:
+        errors.append("public globe/text legacy deep-link parameter mismatch")
+    if navigation.get("search_and_digital_path_filter_shared_across_surfaces") is not True:
         errors.append("public globe/text discovery state must remain shared")
     if navigation.get("side_layer_standard_duration_ms") != 1080:
         errors.append("public side-layer camera duration mismatch")

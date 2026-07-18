@@ -4,7 +4,18 @@ import { readFile, stat } from 'node:fs/promises';
 import path from 'node:path';
 import process from 'node:process';
 import { chromium } from 'playwright';
-import { deriveLayer, globeHorizonCoordinates, LAYERS, ringOrbitDuration, sphereOpacityForGlobeRatio } from '../assets/commonworld-core.mjs';
+import {
+  buildDigitalPresentationTree,
+  deriveDigitalProjectPath,
+  deriveLayer,
+  DIGITAL_RING_FIELDS,
+  DIGITAL_ROOT_PATH,
+  globeHorizonCoordinates,
+  ringOrbitDuration,
+  serializeDigitalPath,
+  sphereOpacityForGlobeRatio,
+  visibleDigitalNodes,
+} from '../assets/commonworld-core.mjs';
 
 const ROOT = process.cwd();
 const MIME = new Map([
@@ -75,8 +86,8 @@ async function loadExpectedDigitalProjection() {
   const manifest = JSON.parse(await readFile(path.join(ROOT, 'catalog/catalog.json'), 'utf8'));
   assert(Array.isArray(manifest.project_files), 'catalog projection: manifest project_files missing');
   assert(manifest.project_files.length === manifest.entry_count, 'catalog projection: manifest entry_count does not match project_files');
-  const byLayer = new Map(LAYERS.map((layer) => [layer.id, []]));
   const allIds = [];
+  const records = [];
   const catalogIds = [];
   const contributionIds = [];
   const dualPresenceIds = [];
@@ -85,6 +96,7 @@ async function loadExpectedDigitalProjection() {
   let publicFeatureCount = 0;
   for (const projectFile of manifest.project_files) {
     const record = JSON.parse(await readFile(path.join(ROOT, 'catalog', projectFile), 'utf8'));
+    records.push(record);
     catalogIds.push(record.id);
     if (record.actions?.includes('contribute')) contributionIds.push(record.id);
     const hasPublicGeographicPresence = (record.presence?.geographic ?? []).some((location) => location?.mode !== 'hidden' && Boolean(location?.geometry));
@@ -97,12 +109,40 @@ async function loadExpectedDigitalProjection() {
       publicMapProjectIds.add(record.id);
     }
     if (record?.presence?.digital?.available !== true) continue;
-    const layerId = deriveLayer(record);
-    assert(byLayer.has(layerId), `catalog projection: ${record.id} derived unknown layer ${layerId}`);
-    byLayer.get(layerId).push(record.id);
+    const derived = deriveDigitalProjectPath(record);
+    assert(derived?.status === 'classified', `catalog projection: ${record.id} did not derive a classified digital path ${JSON.stringify(derived)}`);
     allIds.push(record.id);
   }
   assert(new Set(allIds).size === allIds.length, `catalog projection: duplicate digital IDs in catalog ${JSON.stringify(allIds)}`);
+  const tree = buildDigitalPresentationTree(records);
+  const legacyLayerIds = Object.fromEntries([
+    ...new Set(records.map(deriveLayer).filter(Boolean)),
+  ].map((layer) => [layer, records.filter((record) => deriveLayer(record) === layer).map(({ id }) => id)]));
+  const rootView = visibleDigitalNodes(tree, DIGITAL_ROOT_PATH);
+  const nodes = Object.fromEntries([...tree.nodesByPath].map(([pathKey, node]) => [pathKey, {
+    id: node.id,
+    label: node.label,
+    type: node.type,
+    path: node.path,
+    pathKey: node.pathKey,
+    identityIds: [...node.identityIds],
+    identityCount: node.identityCount,
+  }]));
+  const fields = DIGITAL_RING_FIELDS.map((field) => {
+    const pathKey = serializeDigitalPath(field.path);
+    const node = tree.nodesByPath.get(pathKey);
+    assert(node, `catalog projection: missing field node ${pathKey}`);
+    return {
+      id: field.id,
+      label: field.label,
+      path: field.path,
+      pathKey,
+      ids: [...node.identityIds],
+      previewIds: [...node.identityIds].slice(0, 4),
+      ringPreviewIds: [...node.identityIds].slice(0, 2),
+      count: node.identityCount,
+    };
+  });
   return {
     allIds,
     catalogIds,
@@ -113,11 +153,10 @@ async function loadExpectedDigitalProjection() {
     publicIdentityCount: publicMapProjectIds.size,
     totalCount: allIds.length,
     catalogEntryCount: manifest.entry_count,
-    layers: LAYERS.map((layer) => ({
-      id: layer.id,
-      ids: byLayer.get(layer.id),
-      count: byLayer.get(layer.id).length,
-    })),
+    fields,
+    nodes,
+    rootChildIds: rootView.children.map((node) => node.id),
+    legacyLayerIds,
   };
 }
 
@@ -342,16 +381,15 @@ async function startupAndRingOrbitScenario() {
       };
     });
   });
-  assert(rings.length === expectedDigitalProjection.layers.length, `ring orbits: expected canonical ring planes (${rings.length})`);
-  const allIds = rings.flatMap(({ ids }) => ids);
-  assert(allIds.length === expectedDigitalProjection.totalCount && new Set(allIds).size === expectedDigitalProjection.totalCount, `ring orbits: catalog entries are duplicated or missing across rings (${JSON.stringify(allIds)})`);
-  assertSameIds(allIds, expectedDigitalProjection.allIds, 'ring orbits: global digital identity set');
+  assert(rings.length === expectedDigitalProjection.fields.length, `ring orbits: expected canonical ring planes (${rings.length})`);
+  const aggregateCount = rings.reduce((total, ring) => total + ring.entryCount, 0);
+  assert(aggregateCount === expectedDigitalProjection.totalCount, `ring orbits: aggregate count differs from catalog (${aggregateCount})`);
   for (const ring of rings) {
-    const expectedLayer = expectedDigitalProjection.layers.find(({ id }) => id === ring.layer);
+    const expectedLayer = expectedDigitalProjection.fields.find(({ id }) => id === ring.layer);
     assert(expectedLayer, `ring orbits: rendered unknown layer ${ring.layer}`);
     assert(ring.hasGuide, `ring orbits: ${ring.layer} lost its orbit guide`);
-    assert(Number.isFinite(ring.entryCount) && ring.entryCount === expectedLayer.count && ring.ids.length === expectedLayer.count, `ring orbits: ${ring.layer} entry count diverges from catalog identities ${JSON.stringify({ ring, expectedLayer })}`);
-    assertSameIds(ring.ids, expectedLayer.ids, `ring orbits: ${ring.layer} identity set`);
+    assert(Number.isFinite(ring.entryCount) && ring.entryCount === expectedLayer.count, `ring orbits: ${ring.layer} entry count diverges from catalog identities ${JSON.stringify({ ring, expectedLayer })}`);
+    assertSameIds(ring.ids, expectedLayer.ringPreviewIds, `ring orbits: ${ring.layer} preview identity set`);
     assert(new Set(ring.ids).size === ring.ids.length, `ring orbits: ${ring.layer} repeats an identity ${JSON.stringify(ring.ids)}`);
     if (ring.entryCount === 0) {
       assert(ring.placeholderCount === 1 && ring.placeholderIds === 0, `ring orbits: empty ${ring.layer} needs a non-identity placeholder ${JSON.stringify(ring)}`);
@@ -387,10 +425,80 @@ async function startupAndRingOrbitScenario() {
   }));
   const movedRing = ringMatricesBefore.some((before, index) => before.transform !== ringMatricesAfter[index]?.transform);
   assert(movedRing, `ring orbits: no ring transform matrix changed under normal motion (${JSON.stringify({ before: ringMatricesBefore, after: ringMatricesAfter })})`);
+  const idleBefore = Number(await run.page.locator('.globe-stage').getAttribute('data-overlay-renders'));
+  await run.page.waitForTimeout(650);
+  const idleAfter = Number(await run.page.locator('.globe-stage').getAttribute('data-overlay-renders'));
+  assert(idleAfter - idleBefore === 0, `ring orbits: idle overlay render delta is not zero (${idleBefore} -> ${idleAfter})`);
 
   assert(run.consoleErrors.length === 0, 'startup: console errors: ' + run.consoleErrors.join(' | '));
   assert(run.pageErrors.length === 0, 'startup: page errors: ' + run.pageErrors.join(' | '));
-  results.push({ id: 'startup-and-ring-orbits', verdict: 'PASS', directGlobeProjection: true, hiddenUntilCalibrated: true, outerHintRemoved: true, uniqueRingIdentities: allIds.length, movingRingMatrix: movedRing, unchangedGeometryRepaintSkipped: true });
+  results.push({ id: 'startup-and-ring-orbits', verdict: 'PASS', directGlobeProjection: true, hiddenUntilCalibrated: true, outerHintRemoved: true, aggregateRingIdentities: aggregateCount, movingRingMatrix: movedRing, unchangedGeometryRepaintSkipped: true });
+  await run.context.close();
+}
+
+async function syntheticDigitalPerformanceScenario() {
+  process.stdout.write(`${JSON.stringify({ state: 'RUNNING', scenario: 'synthetic-digital-performance' })}\n`);
+  const run = await newPage({ viewportOverride: { width: 1280, height: 800 }, reducedMotion: 'reduce' });
+  await run.page.goto(baseUrl, { waitUntil: 'domcontentloaded' });
+  await run.page.waitForSelector('html.runtime-ready');
+  const metrics = await run.page.evaluate(async () => {
+    const core = await import('/assets/commonworld-core.mjs');
+    const measure = (size) => {
+      const records = Array.from({ length: size }, (_, index) => ({
+        id: `synthetic-digital-${String(index).padStart(5, '0')}`,
+        title: `Synthetic Digital ${index}`,
+        summary: 'Synthetic browser performance identity.',
+        themes: index % 2 === 0 ? ['communication', 'community-network'] : ['open-data', 'infrastructure'],
+        presence: { geographic: [], digital: { available: true } },
+      }));
+      const constructionsBefore = core.digitalPresentationTreeConstructionCount();
+      const tree = core.buildDigitalPresentationTree(records);
+      core.buildDigitalPresentationTree(records);
+      core.buildDigitalPresentationTree(records);
+      core.buildDigitalPresentationTree(records);
+      const root = core.visibleDigitalNodes(tree, core.DIGITAL_ROOT_PATH);
+      const communication = core.visibleDigitalNodes(tree, ['sphere', 'communication_networks']);
+      const community = core.visibleDigitalNodes(tree, ['sphere', 'communication_networks', 'community_networks'], { identityLimit: 48 });
+      const fullCommunity = core.visibleDigitalNodes(tree, ['sphere', 'communication_networks', 'community_networks']);
+      return {
+        size,
+        treeNodeCount: tree.nodesByPath.size,
+        rootVisible: root.children.length,
+        communicationVisible: communication.children.length,
+        boundedIdentityVisible: community.children.length,
+        fullIdentityCount: fullCommunity.current.identityCount,
+        syntheticDomBudget: root.children.length + communication.children.length + community.children.length,
+        treeConstructionDelta: core.digitalPresentationTreeConstructionCount() - constructionsBefore,
+      };
+    };
+    const stage = document.querySelector('.globe-stage');
+    const overlayBefore = Number(stage?.dataset.overlayRenders ?? 0);
+    await new Promise((resolve) => setTimeout(resolve, 650));
+    const overlayAfter = Number(stage?.dataset.overlayRenders ?? 0);
+    return {
+      cases: [measure(500), measure(5000)],
+      liveRibbonDom: document.querySelectorAll('#sphere-rings .sphere-ring-plane, .digital-lane, .digital-ribbon-item').length,
+      overlayDelta: overlayAfter - overlayBefore,
+    };
+  });
+  for (const item of metrics.cases) {
+    assert(item.rootVisible <= 5, `synthetic ${item.size}: root rendered too many visible nodes (${JSON.stringify(item)})`);
+    assert(item.communicationVisible <= 3, `synthetic ${item.size}: field rendered too many child bundles (${JSON.stringify(item)})`);
+    assert(item.boundedIdentityVisible <= 48, `synthetic ${item.size}: identity level exceeded the DOM budget (${JSON.stringify(item)})`);
+    assert(item.fullIdentityCount === Math.ceil(item.size / 2), `synthetic ${item.size}: aggregate identity count was lost (${JSON.stringify(item)})`);
+    assert(item.syntheticDomBudget <= 56, `synthetic ${item.size}: visible node budget is unbounded (${JSON.stringify(item)})`);
+    assert(item.treeConstructionDelta === 1, `synthetic ${item.size}: stable record identity rebuilt the full tree (${JSON.stringify(item)})`);
+  }
+  assert(metrics.liveRibbonDom < 140, `synthetic performance: live DOM budget unexpectedly high (${JSON.stringify(metrics)})`);
+  assert(metrics.overlayDelta === 0, `synthetic performance: idle overlay render delta is not zero (${JSON.stringify(metrics)})`);
+  const queryTreeBuildsBefore = await run.page.evaluate(async () => (await import('/assets/commonworld-core.mjs')).digitalPresentationTreeConstructionCount());
+  await run.page.locator('#commons-search').fill('Wikipedia');
+  await run.page.waitForTimeout(220);
+  const queryTreeBuildsAfter = await run.page.evaluate(async () => (await import('/assets/commonworld-core.mjs')).digitalPresentationTreeConstructionCount());
+  assert(queryTreeBuildsAfter - queryTreeBuildsBefore < 4, `synthetic performance: one query action built four full trees (${queryTreeBuildsBefore} -> ${queryTreeBuildsAfter})`);
+  assert(run.consoleErrors.length === 0, `synthetic performance: console errors: ${run.consoleErrors.join(' | ')}`);
+  assert(run.pageErrors.length === 0, `synthetic performance: page errors: ${run.pageErrors.join(' | ')}`);
+  results.push({ id: 'synthetic-digital-performance', verdict: 'PASS', cases: metrics.cases, idleOverlayRenderDelta: metrics.overlayDelta });
   await run.context.close();
 }
 
@@ -410,7 +518,7 @@ async function reducedMotionRingScenario() {
       };
     })
   ));
-  assert(rings.length === expectedDigitalProjection.layers.length, `reduced motion rings: expected canonical ring planes (${rings.length})`);
+  assert(rings.length === expectedDigitalProjection.fields.length, `reduced motion rings: expected canonical ring planes (${rings.length})`);
   for (const ring of rings) {
     assert(ring.entryCount !== undefined, `reduced motion rings: ${ring.layer} lost its entry count`);
     const stopped = ring.animationName === 'none' || ring.animationDurationSeconds <= 0.001;
@@ -564,8 +672,8 @@ async function layerJourneyScenario({ mobile = false, viewportOverride = null, t
     names: [...document.querySelectorAll('.sphere-ring-name')].map((node) => node.textContent.trim()).filter(Boolean),
     binaries: [...document.querySelectorAll('.sphere-ring-binary')].map((node) => node.textContent.trim()).filter(Boolean),
   }));
-  assert(overviewRibbons.rings === expectedDigitalProjection.layers.length, `layer journey: overview does not contain all text rings (${JSON.stringify(overviewRibbons)})`);
-  assert(overviewRibbons.names.includes('Debian') && overviewRibbons.names.includes('Wikipedia'), `layer journey: Commons names are missing from the rings (${JSON.stringify(overviewRibbons.names)})`);
+  assert(overviewRibbons.rings === expectedDigitalProjection.fields.length, `layer journey: overview does not contain all text rings (${JSON.stringify(overviewRibbons)})`);
+  assert(overviewRibbons.names.includes('Debian') && overviewRibbons.names.includes('Wikidata'), `layer journey: Commons names are missing from the preview rings (${JSON.stringify(overviewRibbons.names)})`);
   assert(overviewRibbons.binaries.some((value) => /^(?:[01]{8})(?: [01]{8})*$/.test(value)), 'layer journey: real bytewise binary names are missing from the rings');
   await waitForSphereOpacitySettled(run.page);
   const opacityBefore = Number(await run.page.locator('#digital-sphere').evaluate((node) => getComputedStyle(node).opacity));
@@ -830,21 +938,22 @@ async function layerJourneyScenario({ mobile = false, viewportOverride = null, t
   assert(ribbonView.sphere.width > ribbonView.viewport.width * 2, `layer journey: camera did not pass through an enlarged text sphere (${JSON.stringify(ribbonView.sphere)})`);
   assert(ribbonView.sphere.left < -ribbonView.viewport.width * 0.7, `layer journey: enlarged sphere did not move into a side approach (${JSON.stringify(ribbonView.sphere)})`);
   assert(ribbonView.sphereOpacity <= 0.1, `layer journey: enlarged sphere obscures the lane surface (${ribbonView.sphereOpacity})`);
-  assert(ribbonView.ringCount === 6 && ribbonView.ringNameCount > 0 && ribbonView.ringBinaryCount > 0, `layer journey: text-ring identity was lost during the flight (${JSON.stringify(ribbonView)})`);
-  assert(ribbonView.lanes.length === expectedDigitalProjection.layers.length && ribbonView.lanes.every(({ displayed }) => displayed), `layer journey: multi-lane overview does not show all layers (${JSON.stringify(ribbonView.lanes)})`);
+  assert(ribbonView.ringCount === expectedDigitalProjection.fields.length && ribbonView.ringNameCount > 0 && ribbonView.ringBinaryCount > 0, `layer journey: text-ring identity was lost during the flight (${JSON.stringify(ribbonView)})`);
+  assert(ribbonView.lanes.length === expectedDigitalProjection.fields.length && ribbonView.lanes.every(({ displayed }) => displayed), `layer journey: multi-lane overview does not show all layers (${JSON.stringify(ribbonView.lanes)})`);
   assert(ribbonView.lanes.every(({ scrollWidth, clientWidth }) => scrollWidth > clientWidth + 20), `layer journey: at least one lane is not horizontally scrollable (${JSON.stringify(ribbonView.lanes)})`);
   assert(ribbonView.lanes.every(({ overflowX }) => ['auto', 'scroll'].includes(overflowX)), `layer journey: native horizontal overflow is disabled (${JSON.stringify(ribbonView.lanes)})`);
   assert(ribbonView.lanes.every(({ touchAction }) => touchAction.includes('pan-x')), `layer journey: touch panning is not explicitly horizontal (${JSON.stringify(ribbonView.lanes)})`);
   for (const lane of ribbonView.lanes) {
-    const expectedLayer = expectedDigitalProjection.layers.find(({ id }) => id === lane.layer);
+    const expectedLayer = expectedDigitalProjection.fields.find(({ id }) => id === lane.layer);
     assert(expectedLayer, `layer journey: rendered unknown lane ${lane.layer}`);
-    assertSameIds(lane.primary.map(({ id }) => id), expectedLayer.ids, `layer journey: ${lane.layer} primary identity set`);
+    assertSameIds(lane.primary.map(({ id }) => id), expectedLayer.previewIds, `layer journey: ${lane.layer} preview identity set`);
   }
   const primarySegments = ribbonView.lanes.flatMap(({ primary }) => primary);
-  assert(primarySegments.length === expectedDigitalProjection.totalCount, `layer journey: primary Commons identities were duplicated or lost (${primarySegments.length})`);
-  assertSameIds(primarySegments.map(({ id }) => id), expectedDigitalProjection.allIds, 'layer journey: primary digital identity set');
+  const expectedPreviewIds = expectedDigitalProjection.fields.flatMap(({ previewIds }) => previewIds);
+  assert(primarySegments.length === expectedPreviewIds.length, `layer journey: primary preview identities were duplicated or lost (${primarySegments.length})`);
+  assertSameIds(primarySegments.map(({ id }) => id), expectedPreviewIds, 'layer journey: primary digital preview identity set');
   assert(primarySegments.every(({ name, binary, height }) => name && /^(?:[01]{8})(?: [01]{8})*$/.test(binary) && height >= 44), `layer journey: name/binary pairs or touch heights are invalid (${JSON.stringify(primarySegments)})`);
-  assert(ribbonView.filterChildren === expectedDigitalProjection.layers.length, `layer journey: search surface does not contain all layer filters (${ribbonView.filterChildren})`);
+  assert(ribbonView.filterChildren === expectedDigitalProjection.fields.length, `layer journey: search surface does not contain all layer filters (${ribbonView.filterChildren})`);
 
   const firstScroller = run.page.locator('.digital-lane-scroll').first();
   const scrollBefore = await firstScroller.evaluate((node) => node.scrollLeft);
@@ -853,28 +962,52 @@ async function layerJourneyScenario({ mobile = false, viewportOverride = null, t
   const scrollAfter = await firstScroller.evaluate((node) => node.scrollLeft);
   assert(scrollAfter > scrollBefore + 20, `layer journey: multi-lane horizontal scroll did not move (${scrollBefore} -> ${scrollAfter})`);
 
-  const knowledgeFocus = run.page.locator('.digital-lane-focus[data-layer-id="knowledge_data"]');
+  const knowledgeFocus = run.page.locator('.digital-lane-focus[data-digital-path="sphere/knowledge_learning_culture"]');
   await knowledgeFocus.click();
-  assert((await stage.getAttribute('data-focused-layer')) === 'knowledge_data', 'layer journey: selecting a lane did not enter single-lane focus');
+  await run.page.waitForFunction(() => document.querySelector('.globe-stage')?.dataset.digitalPath === 'sphere/knowledge_learning_culture');
+  assert(new URL(run.page.url()).searchParams.get('digital_path') === 'sphere/knowledge_learning_culture', 'layer journey: field path was not written to the canonical URL');
+  let fieldLanes = await run.page.evaluate(() => [...document.querySelectorAll('.digital-lane[data-layer-id]')].map((lane) => ({
+    id: lane.dataset.layerId,
+    path: lane.dataset.digitalPath,
+    count: Number(lane.querySelector('.digital-lane-focus small')?.textContent?.match(/\d+/)?.[0] ?? 0),
+  })));
+  assert(JSON.stringify(fieldLanes.map(({ id }) => id)) === JSON.stringify(['open_knowledge_data', 'learning_education', 'media_culture']), `layer journey: field did not reveal direct child bundles (${JSON.stringify(fieldLanes)})`);
+  await run.page.goBack();
+  await run.page.waitForFunction(() => document.querySelector('.globe-stage')?.dataset.digitalPath === 'sphere');
+  assert(new URL(run.page.url()).searchParams.get('digital_path') === null, 'layer journey: Back did not restore the sphere root path');
+  await run.page.goForward();
+  await run.page.waitForFunction(() => document.querySelector('.globe-stage')?.dataset.digitalPath === 'sphere/knowledge_learning_culture');
+  fieldLanes = await run.page.evaluate(() => [...document.querySelectorAll('.digital-lane[data-layer-id]')].map((lane) => lane.dataset.layerId));
+  assert(JSON.stringify(fieldLanes) === JSON.stringify(['open_knowledge_data', 'learning_education', 'media_culture']), 'layer journey: Forward did not restore the field child bundles');
+
+  const openKnowledgeFocus = run.page.locator('.digital-lane-focus[data-digital-path="sphere/knowledge_learning_culture/open_knowledge_data"]');
+  await openKnowledgeFocus.click();
+  await run.page.waitForFunction(() => document.querySelector('.globe-stage')?.dataset.digitalPath === 'sphere/knowledge_learning_culture/open_knowledge_data');
   const focusedLane = await run.page.evaluate(() => {
     const visible = [...document.querySelectorAll('.digital-lane[data-layer-id]')].filter((lane) => getComputedStyle(lane).display !== 'none');
     const scroller = visible[0]?.querySelector('.digital-lane-scroll');
     return {
       visibleLayers: visible.map((lane) => lane.dataset.layerId),
+      focusedPath: document.querySelector('.globe-stage')?.dataset.focusedPath ?? null,
+      breadcrumb: [...document.querySelectorAll('#layer-breadcrumb .digital-breadcrumb-item')].map((node) => ({ text: node.textContent.trim(), current: node.getAttribute('aria-current') })),
       clientWidth: scroller?.clientWidth ?? 0,
       scrollWidth: scroller?.scrollWidth ?? 0,
+      ids: [...document.querySelectorAll('.digital-ribbon-item[data-ribbon-copy="0"]')].map((node) => node.dataset.commonprojectId),
     };
   });
-  assert(JSON.stringify(focusedLane.visibleLayers) === JSON.stringify(['knowledge_data']), `layer journey: single-lane focus leaves other lanes visible (${JSON.stringify(focusedLane)})`);
+  assert(JSON.stringify(focusedLane.visibleLayers) === JSON.stringify(['open_knowledge_data']), `layer journey: identity-level focus leaves other lanes visible (${JSON.stringify(focusedLane)})`);
+  assert(focusedLane.focusedPath === 'sphere/knowledge_learning_culture/open_knowledge_data', `layer journey: focused path data attribute mismatch (${JSON.stringify(focusedLane)})`);
+  assert(focusedLane.breadcrumb.at(-1)?.current === 'page' && focusedLane.breadcrumb.map(({ text }) => text).includes('Wissen, Lernen und Kultur'), `layer journey: breadcrumb did not expose parent context (${JSON.stringify(focusedLane.breadcrumb)})`);
+  assertSameIds(focusedLane.ids, expectedDigitalProjection.nodes['sphere/knowledge_learning_culture/open_knowledge_data'].identityIds, 'layer journey: identity-level direct Commons');
   assert(focusedLane.scrollWidth > focusedLane.clientWidth + 20, `layer journey: focused lane is not horizontally scrollable (${JSON.stringify(focusedLane)})`);
-  const focusedScroller = run.page.locator('.digital-lane[data-layer-id="knowledge_data"] .digital-lane-scroll');
+  const focusedScroller = run.page.locator('.digital-lane[data-layer-id="open_knowledge_data"] .digital-lane-scroll');
   await focusedScroller.evaluate((node) => { node.scrollTo({ left: Math.min(node.scrollWidth - node.clientWidth, Math.max(160, node.clientWidth * 0.7)), behavior: 'instant' }); });
   await run.page.waitForTimeout(180);
   assert((await focusedScroller.evaluate((node) => node.scrollLeft)) > 20, 'layer journey: single-lane horizontal scroll did not move');
 
   await run.page.locator('#layer-search-toggle').click();
   assert(await run.page.locator('#layer-discovery').isVisible(), 'layer journey: search/filter magnifier did not open');
-  assert((await run.page.locator('#layer-buttons .layer-filter').count()) === expectedDigitalProjection.layers.length, 'layer journey: search panel does not expose all lane filters');
+  assert((await run.page.locator('#layer-buttons .layer-filter').count()) === 0, 'layer journey: identity-level search panel must not expose unrelated bundle filters');
   await run.page.locator('#layer-search').fill('Wikipedia');
   await run.page.waitForTimeout(220);
   assert((await run.page.locator('#commons-search').inputValue()) === 'Wikipedia', 'layer journey: lane search is not synchronized with global search');
@@ -884,8 +1017,6 @@ async function layerJourneyScenario({ mobile = false, viewportOverride = null, t
   await run.page.waitForTimeout(220);
   await run.page.locator('#layer-search-toggle').click();
   assert(await run.page.locator('#layer-discovery').isHidden(), 'layer journey: search/filter panel did not close');
-  await knowledgeFocus.click();
-  assert((await stage.getAttribute('data-focused-layer')) === null, 'layer journey: selecting the focused lane did not return to all lanes');
 
   const directContent = run.page.locator('.digital-ribbon-item[data-ribbon-copy="0"]:not([hidden])').first();
   const directTitle = (await directContent.locator('.digital-ribbon-name').textContent()) ?? '';
@@ -898,6 +1029,9 @@ async function layerJourneyScenario({ mobile = false, viewportOverride = null, t
   assert(await run.page.locator('#project-focus').isHidden(), 'layer journey: Escape did not close the topmost Commons focus');
   assert(await run.page.locator('#layer-panel').isVisible(), 'layer journey: Escape closed the layer surface behind the visible Commons focus');
   assert(await directContent.evaluate((node) => document.activeElement === node), 'layer journey: focus did not return to the same ribbon identity');
+  await run.page.keyboard.press('Escape');
+  await run.page.waitForFunction(() => document.querySelector('.globe-stage')?.dataset.digitalPath === 'sphere/knowledge_learning_culture');
+  assert((await stage.getAttribute('data-focused-path')) === null, 'layer journey: Escape did not leave the identity-level focus path');
 
   const viewportFit = await run.page.evaluate(() => ({
     viewportWidth: innerWidth,
@@ -922,8 +1056,8 @@ async function layerJourneyScenario({ mobile = false, viewportOverride = null, t
   assert(JSON.stringify(preparingOverviewUrlCamera) === JSON.stringify(overviewUrlCamera), 'layer journey: return preparation serialized the side camera instead of preserving the overview camera ' + JSON.stringify({ overviewUrlCamera, preparingOverviewUrlCamera }));
   assert((await stage.getAttribute('data-globe-geometry-source')) === 'side-view-layout', 'layer journey: return preparation left side layout too early');
   assert(await run.page.locator('#layer-panel').isHidden(), 'layer journey: description panel did not close before return preparation');
-  await run.page.waitForSelector('.globe-stage[data-view-phase="leaving-layers"]');
-  // The phase can complete between Playwright observing the selector and this assertion on fast CI runners.
+  await run.page.waitForFunction(() => ['leaving-layers', 'overview'].includes(document.querySelector('.globe-stage')?.dataset.viewPhase));
+  // The transient phase can complete before Playwright observes it; the phase log below remains the strict proof.
   // The phase log below proves that leaving-layers occurred and carried the invisible geometry switch.
   assert((await stage.getAttribute('data-globe-geometry-source')) === 'maplibre-projected-horizon', 'layer journey: return flight did not mirror back to the MapLibre horizon geometry');
   assert(await run.page.locator('#layer-panel').isHidden(), 'layer journey: description panel obscures the return camera flight');
@@ -997,11 +1131,18 @@ async function dualPresenceAxesScenario() {
   await run.page.locator('#sphere-edge-control').focus();
   await run.page.keyboard.press('Enter');
   await run.page.waitForSelector('.globe-stage[data-view-phase="layers"]');
+  await run.page.locator('.digital-lane-focus[data-digital-path="sphere/communication_networks"]').click();
+  await run.page.waitForFunction(() => document.querySelector('.globe-stage')?.dataset.digitalPath === 'sphere/communication_networks');
+  await run.page.locator('.digital-lane-focus[data-digital-path="sphere/communication_networks/community_networks"]').click();
+  await run.page.waitForFunction(() => document.querySelector('.globe-stage')?.dataset.digitalPath === 'sphere/communication_networks/community_networks');
   const digitalPrimaryIds = await run.page.locator('.digital-ribbon-item[data-ribbon-copy="0"]').evaluateAll((nodes) => nodes.map((node) => node.dataset.commonprojectId));
-  assert(digitalPrimaryIds.length === expectedDigitalProjection.totalCount, 'dual presence: digital lane identity count mismatch: ' + digitalPrimaryIds.length);
-  assertSameIds(digitalPrimaryIds, expectedDigitalProjection.allIds, 'dual presence: digital lane identity set');
+  const communityNetworkIds = expectedDigitalProjection.nodes['sphere/communication_networks/community_networks'].identityIds;
+  assert(digitalPrimaryIds.length === communityNetworkIds.length, 'dual presence: digital lane identity count mismatch: ' + digitalPrimaryIds.length);
+  assertSameIds(digitalPrimaryIds, communityNetworkIds, 'dual presence: community-network digital identity set');
   assert(digitalPrimaryIds.includes('freifunk-hamburg'), 'dual presence: dual presence identity missing from digital lanes');
   assert(!digitalPrimaryIds.includes('cltb-le-nid'), 'dual presence: geographic-only identity leaked into digital lanes');
+  await run.page.locator('#layer-breadcrumb .digital-breadcrumb-item[data-digital-path="sphere"]').click();
+  await run.page.waitForFunction(() => document.querySelector('.globe-stage')?.dataset.digitalPath === 'sphere');
   await run.page.locator('#layer-close').click();
   await run.page.waitForSelector('.globe-stage[data-view-phase="overview"]');
 
@@ -1044,7 +1185,7 @@ async function dualPresenceAxesScenario() {
   assert((await run.page.locator('#focus-title').textContent()) === 'Freifunk Hamburg', 'dual presence: approximate map click selected the wrong identity');
   const updatesAfterSelection = Number(await run.page.locator('.globe-stage').getAttribute('data-public-map-updates'));
   assert(updatesAfterSelection === updatesBeforeSelection, 'dual presence: selecting a project resent unchanged GeoJSON to MapLibre');
-  assert((await run.page.locator('#focus-presence').textContent()) === 'Vor Ort · Digital · Kommunikation und Netze', 'dual presence: dual presence presentation label mismatch');
+  assert((await run.page.locator('#focus-presence').textContent()) === 'Vor Ort · Digital · Kommunikation und Netze › Gemeinschaftsnetze', 'dual presence: dual presence presentation label mismatch');
   const hamburgLocations = (await run.page.locator('#focus-locations').textContent()) ?? '';
   assert(hamburgLocations.includes('mindestens 5 km Unschärfe') && hamburgLocations.includes('Ort verborgen'), 'dual presence: approximate and hidden location truth missing');
   assert(((await run.page.locator('#focus-relations').textContent()) ?? '').includes('Teil von Freifunk'), 'dual presence: evidenced parent relation missing');
@@ -1216,11 +1357,28 @@ async function intentSearchDiscoveryScenario() {
   const digitalCamera = await mapCamera();
   await run.page.locator('#commons-search').fill('Debian');
   await run.page.waitForFunction(() => document.querySelectorAll('.discovery-result').length === 1);
+  await run.page.waitForFunction(() => new URL(location.href).searchParams.get('q') === 'Debian');
   await run.page.locator('.discovery-result-main').click();
   await run.page.waitForSelector('#project-focus:not([hidden])');
   assert((await run.page.locator('#focus-title').textContent()) === 'Debian', 'intent spatial: digital result did not open Debian');
   assert((await run.page.locator('.globe-stage').getAttribute('data-last-spatial-result')) === 'coordinate-free:debian', 'intent spatial: digital result was not kept coordinate-free');
   assert(sameCamera(digitalCamera, await mapCamera()), 'intent spatial: digital result moved the map');
+
+  await run.page.goBack();
+  await run.page.waitForFunction(() => new URL(location.href).searchParams.get('q') === 'Debian' && !new URL(location.href).searchParams.has('project'));
+  assert(await run.page.locator('#discovery-panel').isVisible(), 'intent project history: Back did not restore the search results');
+  assert(await run.page.locator('#project-focus').isHidden(), 'intent project history: Back retained the project overlay');
+
+  await run.page.goForward();
+  await run.page.waitForFunction(() => new URL(location.href).searchParams.get('q') === 'Debian' && new URL(location.href).searchParams.get('project') === 'debian');
+  await run.page.waitForFunction(() => (
+    document.activeElement === document.querySelector('#project-focus')
+    && document.activeElement.getClientRects().length > 0
+    && !document.activeElement.closest('[hidden], [inert], [aria-hidden="true"]')
+  ));
+  assert(await run.page.locator('#discovery-panel').isHidden(), 'intent project history: Forward reopened discovery over the restored project');
+  assert(await run.page.locator('#project-focus').isVisible(), 'intent project history: Forward did not restore the project overlay');
+  assert((await run.page.locator('#focus-title').textContent()) === 'Debian', 'intent project history: Forward restored the wrong project');
   await run.page.locator('#focus-close').click();
 
   await run.page.locator('#commons-search').fill('Anderlecht');
@@ -1353,9 +1511,10 @@ async function interruptedLayerJourneyScenario() {
 
 async function reducedMotionLayerScenario() {
   const run = await newPage();
-  await run.page.goto(`${baseUrl}/?view=layers&lng=13.4&lat=52.5&z=1.2`, { waitUntil: 'domcontentloaded' });
+  await run.page.goto(`${baseUrl}/?view=layers&digital_path=sphere/communication_networks/community_networks&lng=13.4&lat=52.5&z=1.2`, { waitUntil: 'domcontentloaded' });
   await run.page.waitForSelector('html.runtime-ready');
   await run.page.waitForSelector('.globe-stage[data-view-phase="layers"]');
+  await run.page.waitForFunction(() => document.querySelector('.globe-stage')?.dataset.digitalPath === 'sphere/communication_networks/community_networks');
   await run.page.waitForFunction(() => document.querySelector('.globe-stage')?.dataset.lastCameraCommand === 'jumpTo');
   assert((await run.page.locator('.globe-stage').getAttribute('data-last-camera-command')) === 'jumpTo', 'reduced motion: layer camera did not jump');
   assert((await run.page.locator('.globe-stage').getAttribute('data-last-camera-duration')) === '0', 'reduced motion: nonzero layer duration');
@@ -1363,11 +1522,289 @@ async function reducedMotionLayerScenario() {
   assert((await run.page.locator('.globe-stage').getAttribute('data-view-phase')) === 'overview', 'reduced motion: return was not immediate');
   const search = new URL(run.page.url()).searchParams;
   assert(search.get('view') === null, 'reduced motion: closed layer view persisted');
+  assert(search.get('digital_path') === 'sphere/communication_networks/community_networks', 'reduced motion: closed layer view lost digital path state');
   assert(Math.abs(Number(search.get('lng')) - 13.4) < 0.01, `reduced motion: overview longitude changed (${search.get('lng')})`);
   assert(Math.abs(Number(search.get('lat')) - 52.5) < 0.01, `reduced motion: overview latitude changed (${search.get('lat')})`);
   assert(run.pageErrors.length === 0, `reduced motion: page errors: ${run.pageErrors.join(' | ')}`);
   results.push({ id: 'layer-journey-reduced-motion', verdict: 'PASS' });
   await run.context.close();
+}
+
+async function legacyLayerAndAtomicFocusScenario() {
+  process.stdout.write(`${JSON.stringify({ state: 'RUNNING', scenario: 'legacy-layer-and-atomic-focus' })}\n`);
+  const legacyRun = await newPage({ reducedMotion: 'reduce' });
+  await legacyRun.page.goto(`${baseUrl}/?surface=text&layer=communication_networks`, { waitUntil: 'domcontentloaded' });
+  await legacyRun.page.waitForSelector('html.runtime-ready');
+  await legacyRun.page.waitForFunction(() => document.querySelector('.globe-stage')?.dataset.digitalPath === 'sphere/communication_networks/community_networks');
+  const legacyParameters = new URL(legacyRun.page.url()).searchParams;
+  assert(legacyParameters.get('layer') === 'communication_networks', 'legacy layer: canonicalization removed the legacy parameter');
+  assert(!legacyParameters.has('digital_path'), 'legacy layer: orientation path replaced the legacy filter in the URL');
+  const legacyIds = await legacyRun.page.locator('.catalog-card:not([hidden])').evaluateAll((nodes) => nodes.map((node) => node.dataset.commonprojectId));
+  assertSameIds(legacyIds, expectedDigitalProjection.legacyLayerIds.communication_networks, 'legacy layer: exact communication result set');
+  assert(legacyIds.includes('mastodon'), 'legacy layer: communication result set lost Mastodon');
+
+  await legacyRun.page.locator('#text-layer-breadcrumb .digital-breadcrumb-item[data-digital-path="sphere/communication_networks"]').click();
+  await legacyRun.page.waitForFunction(() => new URL(location.href).searchParams.get('digital_path') === 'sphere/communication_networks');
+  let selectedParameters = new URL(legacyRun.page.url()).searchParams;
+  assert(!selectedParameters.has('layer'), 'legacy layer: explicit breadcrumb selection retained the legacy layer');
+  await legacyRun.page.goBack();
+  await legacyRun.page.waitForFunction(() => new URL(location.href).searchParams.get('layer') === 'communication_networks');
+  const restoredLegacyIds = await legacyRun.page.locator('.catalog-card:not([hidden])').evaluateAll((nodes) => nodes.map((node) => node.dataset.commonprojectId));
+  assertSameIds(restoredLegacyIds, expectedDigitalProjection.legacyLayerIds.communication_networks, 'legacy layer: Back restored exact result set');
+  await legacyRun.page.goForward();
+  await legacyRun.page.waitForFunction(() => new URL(location.href).searchParams.get('digital_path') === 'sphere/communication_networks');
+  selectedParameters = new URL(legacyRun.page.url()).searchParams;
+  assert(!selectedParameters.has('layer'), 'legacy layer: Forward restored a mixed legacy/path state');
+  await legacyRun.page.goto(`${baseUrl}/?surface=text&layer=communication_networks&digital_path=sphere/%20/communication_networks`, { waitUntil: 'domcontentloaded' });
+  await legacyRun.page.waitForSelector('html.runtime-ready');
+  const invalidExplicitParameters = new URL(legacyRun.page.url()).searchParams;
+  assert(!invalidExplicitParameters.has('layer') && !invalidExplicitParameters.has('digital_path'), 'invalid explicit path: legacy layer or partial path survived fail-closed canonicalization');
+  assert((await legacyRun.page.locator('.catalog-card:not([hidden])').count()) === expectedDigitalProjection.catalogEntryCount, 'invalid explicit path: root result truth was filtered');
+  assert(legacyRun.consoleErrors.length === 0, `legacy layer: console errors: ${legacyRun.consoleErrors.join(' | ')}`);
+  assert(legacyRun.pageErrors.length === 0, `legacy layer: page errors: ${legacyRun.pageErrors.join(' | ')}`);
+  await legacyRun.context.close();
+
+  const focusRun = await newPage({ reducedMotion: 'reduce' });
+  await focusRun.page.goto(`${baseUrl}/?view=layers`, { waitUntil: 'domcontentloaded' });
+  await focusRun.page.waitForSelector('html.runtime-ready');
+  await focusRun.page.waitForSelector('.globe-stage[data-view-phase="layers"]');
+  await focusRun.page.locator('.digital-ribbon-item[data-commonproject-id="wikipedia"][data-ribbon-copy="0"]').click();
+  assert(await focusRun.page.locator('#project-focus').isVisible(), 'atomic focus: Wikipedia focus did not open');
+  assert(new URL(focusRun.page.url()).searchParams.get('project') === 'wikipedia', 'atomic focus: Wikipedia was not written to history');
+
+  await focusRun.page.keyboard.press('Escape');
+  assert(await focusRun.page.locator('#project-focus').isHidden(), 'atomic focus: Escape did not close the project overlay');
+  const wikipediaTrigger = focusRun.page.locator('.digital-ribbon-item[data-commonproject-id="wikipedia"][data-ribbon-copy="0"]');
+  await wikipediaTrigger.focus();
+  await focusRun.page.keyboard.press('Enter');
+  assert(await focusRun.page.locator('#project-focus').isVisible(), 'atomic focus: keyboard activation did not reopen Wikipedia');
+
+  // Exercise the direct state regression without pretending the covered control receives a pointer interaction.
+  await focusRun.page.locator('.digital-lane-focus[data-digital-path="sphere/communication_networks"]').evaluate((node) => node.click());
+  await focusRun.page.waitForFunction(() => document.querySelector('.globe-stage')?.dataset.digitalPath === 'sphere/communication_networks');
+  await focusRun.page.waitForFunction(() => (
+    document.activeElement?.matches('.digital-lane-scroll, .digital-breadcrumb-item')
+    && document.activeElement.getClientRects().length > 0
+  ));
+  const cleared = await focusRun.page.evaluate(() => ({
+    project: new URL(location.href).searchParams.get('project'),
+    path: new URL(location.href).searchParams.get('digital_path'),
+    focusHidden: document.querySelector('#project-focus').hidden,
+    selectedMarks: document.querySelectorAll('[data-commonproject-id].is-selected').length,
+    activeHierarchy: document.activeElement?.matches('.digital-lane-scroll, .digital-breadcrumb-item') ?? false,
+    activeVisible: Boolean(document.activeElement?.getClientRects().length),
+  }));
+  assert(cleared.project === null && cleared.path === 'sphere/communication_networks', `atomic focus: path mutation retained project state (${JSON.stringify(cleared)})`);
+  assert(cleared.focusHidden && cleared.selectedMarks === 0, `atomic focus: overlay or selection marks survived path mutation (${JSON.stringify(cleared)})`);
+  assert(cleared.activeHierarchy && cleared.activeVisible, `atomic focus: focus did not move to a visible hierarchy control (${JSON.stringify(cleared)})`);
+
+  await focusRun.page.goBack();
+  await focusRun.page.waitForFunction(() => new URL(location.href).searchParams.get('project') === 'wikipedia');
+  assert(await focusRun.page.locator('#project-focus').isVisible(), 'atomic focus: Back did not restore Wikipedia focus');
+  assert((await focusRun.page.locator('#focus-title').textContent()) === 'Wikipedia', 'atomic focus: Back restored the wrong project');
+
+  await focusRun.page.goForward();
+  await focusRun.page.waitForFunction(() => new URL(location.href).searchParams.get('digital_path') === 'sphere/communication_networks' && !new URL(location.href).searchParams.has('project'));
+  await focusRun.page.waitForFunction(() => (
+    document.activeElement?.matches('.digital-lane-focus, .digital-lane-scroll, .digital-breadcrumb-item')
+    && document.activeElement.getClientRects().length > 0
+    && !document.activeElement.closest('[hidden], [inert], [aria-hidden="true"]')
+  ));
+  assert(await focusRun.page.locator('#project-focus').isHidden(), 'atomic focus: Forward left the project panel visible');
+
+  for (let iteration = 0; iteration < 3; iteration += 1) {
+    await focusRun.page.goBack();
+    await focusRun.page.waitForFunction(() => new URL(location.href).searchParams.get('project') === 'wikipedia');
+    await focusRun.page.goForward();
+    await focusRun.page.waitForFunction(() => new URL(location.href).searchParams.get('digital_path') === 'sphere/communication_networks' && !new URL(location.href).searchParams.has('project'));
+  }
+  await focusRun.page.waitForFunction(() => {
+    const active = document.activeElement;
+    return active
+      && active !== document.body
+      && active.isConnected
+      && active.getClientRects().length > 0
+      && !active.closest('[hidden], [inert], [aria-hidden="true"]');
+  });
+  const rapidFocus = await focusRun.page.evaluate(() => {
+    const active = document.activeElement;
+    return {
+      tag: active?.tagName ?? null,
+      id: active?.id ?? null,
+      connected: active?.isConnected ?? false,
+      visible: Boolean(active?.getClientRects().length),
+      blocked: Boolean(active?.closest('[hidden], [inert], [aria-hidden="true"]')),
+      body: active === document.body,
+    };
+  });
+  assert(rapidFocus.connected && rapidFocus.visible && !rapidFocus.blocked && !rapidFocus.body, 'atomic focus: repeated Back/Forward produced an invalid target (' + JSON.stringify(rapidFocus) + ')');
+
+  await focusRun.page.goto(`${baseUrl}/?view=layers&digital_path=sphere/communication_networks&project=wikipedia`, { waitUntil: 'domcontentloaded' });
+  await focusRun.page.waitForSelector('html.runtime-ready');
+  await focusRun.page.waitForFunction(() => document.querySelector('.globe-stage')?.dataset.digitalPath === 'sphere/communication_networks');
+  const invalidCombination = new URL(focusRun.page.url()).searchParams;
+  assert(invalidCombination.get('digital_path') === 'sphere/communication_networks', 'atomic focus: invalid direct combination lost its valid path');
+  assert(!invalidCombination.has('project') && await focusRun.page.locator('#project-focus').isHidden(), 'atomic focus: invalid direct combination retained foreign project focus');
+  assert(focusRun.consoleErrors.length === 0, `atomic focus: console errors: ${focusRun.consoleErrors.join(' | ')}`);
+  assert(focusRun.pageErrors.length === 0, `atomic focus: page errors: ${focusRun.pageErrors.join(' | ')}`);
+  await focusRun.context.close();
+
+  const textFocusRun = await newPage({ reducedMotion: 'reduce' });
+  await textFocusRun.page.goto(`${baseUrl}/?surface=text&view=layers&project=wikipedia`, { waitUntil: 'domcontentloaded' });
+  await textFocusRun.page.waitForSelector('html.runtime-ready');
+  assert(await textFocusRun.page.locator('#project-focus').isVisible(), 'text atomic focus: Wikipedia focus did not open');
+  const textHierarchy = textFocusRun.page.locator('#text-layer-buttons .layer-filter[data-digital-path="sphere/communication_networks"]');
+  await textHierarchy.focus();
+  await textFocusRun.page.keyboard.press('Enter');
+  await textFocusRun.page.waitForFunction(() => new URL(location.href).searchParams.get('digital_path') === 'sphere/communication_networks' && !new URL(location.href).searchParams.has('project'));
+  await textFocusRun.page.waitForFunction(() => document.activeElement?.matches('#text-layer-breadcrumb .digital-breadcrumb-item, #text-layer-buttons .layer-filter') && document.activeElement.getClientRects().length > 0);
+  assert(await textFocusRun.page.locator('#project-focus').isHidden(), 'text atomic focus: incompatible path retained project overlay');
+  assert(await textFocusRun.page.locator('#text-layer-breadcrumb .digital-breadcrumb-item[aria-current="page"]').isVisible(), 'text atomic focus: current breadcrumb is not visible');
+  const textBundle = textFocusRun.page.locator('#text-layer-buttons .layer-filter[data-digital-path="sphere/communication_networks/community_networks"]');
+  await textBundle.focus();
+  await textFocusRun.page.keyboard.press('Enter');
+  await textFocusRun.page.waitForFunction(() => document.querySelector('.globe-stage')?.dataset.digitalPath === 'sphere/communication_networks/community_networks');
+  await textFocusRun.page.waitForFunction(() => (
+    document.activeElement?.matches('#text-layer-breadcrumb .digital-breadcrumb-item, #text-layer-buttons .layer-filter')
+    && document.activeElement.getClientRects().length > 0
+    && !document.activeElement.closest('[hidden], [inert], [aria-hidden="true"]')
+  ));
+
+  const textRootBreadcrumb = textFocusRun.page.locator('#text-layer-breadcrumb .digital-breadcrumb-item[data-digital-path="sphere"]');
+  await textRootBreadcrumb.focus();
+  await textFocusRun.page.keyboard.press('Enter');
+  await textFocusRun.page.waitForFunction(() => document.querySelector('.globe-stage')?.dataset.digitalPath === 'sphere');
+  await textFocusRun.page.waitForFunction(() => (
+    document.activeElement?.matches('#text-layer-breadcrumb .digital-breadcrumb-item, #text-layer-buttons .layer-filter')
+    && document.activeElement.getClientRects().length > 0
+    && document.activeElement !== document.body
+  ));
+
+  assert(textFocusRun.pageErrors.length === 0, `text atomic focus: page errors: ${textFocusRun.pageErrors.join(' | ')}`);
+  await textFocusRun.context.close();
+  results.push({ id: 'legacy-layer-and-atomic-focus', verdict: 'PASS', backForwardFocus: true, textHierarchyFocus: true, keyboardPath: true });
+}
+
+async function externalLinkSafetyScenario() {
+  process.stdout.write(`${JSON.stringify({ state: 'RUNNING', scenario: 'external-link-safety' })}\n`);
+  const run = await newPage({ reducedMotion: 'reduce' });
+  await run.page.goto(baseUrl, { waitUntil: 'domcontentloaded' });
+  await run.page.waitForSelector('html.runtime-ready');
+  await run.page.evaluate(() => window.__commonworldInstallSyntheticRecordsForTest([{
+    schema_version: 4,
+    id: 'link-safety',
+    title: 'Link Safety Commons',
+    summary: 'Synthetischer Datensatz für die Prüfung externer Kataloglinks.',
+    themes: ['communication', 'community-network'],
+    actions: ['visit', 'learn', 'donate'],
+    presence: {
+      geographic: [],
+      digital: { available: true, reach: 'global', label: 'Sichere digitale Präsenz' },
+    },
+    activity: { status: 'active' },
+    curation: { state: 'listed', reviewed_at: '2026-07-18', next_review_at: '2027-01-01' },
+    links: [
+      { type: 'visit', label: 'Sichere Aktion', url: 'https://EXAMPLE.org:443/a/../safe' },
+      { type: 'learn', label: 'Zugangsdaten-Link', url: 'https://user:secret@example.org/private' },
+      { type: 'donate', label: 'Whitespace-Link', url: ' https://example.org/bad' },
+      { type: 'source', label: 'Sichere Quelle', url: 'https://example.org/source' },
+    ],
+    provenance: {
+      sources: [
+        { label: 'Beleg', url: 'https://example.org/evidence' },
+        { label: 'Unsicherer Beleg', url: 'https://user@example.org/evidence' },
+      ],
+    },
+  }]));
+
+  await run.page.locator('#filter-toggle').click();
+  const discoveryLinks = run.page.locator('.discovery-result-actions a');
+  assert((await discoveryLinks.count()) === 1, 'external link safety: unsafe action links were rendered');
+  assert((await discoveryLinks.first().getAttribute('href')) === 'https://example.org/safe', 'external link safety: safe action URL was not canonicalized');
+  await run.page.locator('.discovery-result-main[data-commonproject-id="link-safety"]').click();
+  await run.page.waitForSelector('#project-focus:not([hidden])');
+  const focusHrefs = await run.page.locator('#focus-links a').evaluateAll((nodes) => nodes.map((node) => node.href));
+  assertSameIds(focusHrefs, ['https://example.org/safe', 'https://example.org/source'], 'external link safety: focus links');
+  const sourceHrefs = await run.page.locator('#focus-sources a').evaluateAll((nodes) => nodes.map((node) => node.href));
+  assertSameIds(sourceHrefs, ['https://example.org/evidence'], 'external link safety: provenance links');
+  assert(run.consoleErrors.length === 0, 'external link safety: console errors: ' + run.consoleErrors.join(' | '));
+  assert(run.pageErrors.length === 0, 'external link safety: page errors: ' + run.pageErrors.join(' | '));
+  results.push({ id: 'external-link-safety', verdict: 'PASS', canonicalHttpsOnly: true });
+  await run.context.close();
+}
+
+async function syntheticCatalogueTruthScenario() {
+  process.stdout.write(`${JSON.stringify({ state: 'RUNNING', scenario: 'synthetic-catalogue-truth' })}\n`);
+  for (const size of [500, 5000]) {
+    const run = await newPage({ reducedMotion: 'reduce' });
+    await run.page.goto(baseUrl, { waitUntil: 'domcontentloaded' });
+    await run.page.waitForSelector('html.runtime-ready');
+    await run.page.waitForFunction(() => document.querySelector('.globe-stage')?.dataset.publicMapProjectIds !== undefined);
+    const installed = await run.page.evaluate((count) => {
+      const records = Array.from({ length: count }, (_, index) => ({
+        schema_version: 4,
+        id: `synthetic-${String(index).padStart(5, '0')}`,
+        title: `Synthetic Commons ${index}`,
+        summary: 'Gemeinschaftliche synthetische Infrastruktur für die isolierte Runtime-Prüfung.',
+        themes: ['communication', 'community-network'],
+        actions: ['learn'],
+        presence: {
+          geographic: [{ id: `place-${index}`, mode: 'exact', label: `Testort ${index}`, geometry: { type: 'Point', coordinates: [8 + (index % 100) / 1000, 50 + (index % 100) / 1000] } }],
+          digital: { available: true, reach: 'global', label: 'Synthetische digitale Präsenz' },
+        },
+        activity: { status: 'active' },
+        curation: { state: 'listed', next_review_at: '2027-01-01' },
+        links: [],
+      }));
+      return window.__commonworldInstallSyntheticRecordsForTest(records);
+    }, size);
+    assert(installed.records === size && installed.treeIdentities === size, `synthetic ${size}: installation lost identities ${JSON.stringify(installed)}`);
+    await run.page.waitForFunction((count) => document.querySelector('.globe-stage')?.dataset.publicMapProjectIds === String(count), size);
+    assert((await run.page.locator('#globe-results').textContent()) === `${size} Commons in der aktuellen Auswahl.`, `synthetic ${size}: semantic count is capped`);
+
+    const sphereEdge = run.page.locator('#sphere-edge-control');
+    await sphereEdge.focus();
+    await run.page.keyboard.press('Enter');
+    await run.page.waitForSelector('.globe-stage[data-view-phase="layers"]');
+    await run.page.waitForSelector('#layer-panel[data-visible]:not([inert])');
+
+    const field = run.page.locator('.digital-lane-focus[data-digital-path="sphere/communication_networks"]');
+    await field.focus();
+    await run.page.keyboard.press('Enter');
+    await run.page.waitForFunction(() => document.querySelector('.globe-stage')?.dataset.digitalPath === 'sphere/communication_networks');
+    const network = run.page.locator('.digital-lane-focus[data-digital-path="sphere/communication_networks/community_networks"]');
+    await network.focus();
+    await run.page.keyboard.press('Enter');
+    await run.page.waitForFunction(() => document.querySelector('.globe-stage')?.dataset.digitalPath === 'sphere/communication_networks/community_networks');
+    await run.page.waitForFunction(() => document.querySelectorAll('.digital-ribbon-item[data-ribbon-copy="0"]').length === 48);
+    const initialIds = await run.page.locator('.digital-ribbon-item[data-ribbon-copy="0"]').evaluateAll((nodes) => nodes.map((node) => node.dataset.commonprojectId));
+    assert(new Set(initialIds).size === 48, `synthetic ${size}: initial ring identities duplicate`);
+    const ringMore = run.page.locator('.identity-show-more');
+    const ringMoreBox = await ringMore.boundingBox();
+    assert(ringMoreBox && ringMoreBox.height >= 44, `synthetic ${size}: ring continuation touch target is undersized`);
+    await ringMore.click();
+    await run.page.waitForFunction(() => document.querySelectorAll('.digital-ribbon-item[data-ribbon-copy="0"]').length === 96);
+    const continuedIds = await run.page.locator('.digital-ribbon-item[data-ribbon-copy="0"]').evaluateAll((nodes) => nodes.map((node) => node.dataset.commonprojectId));
+    assert(new Set(continuedIds).size === 96, `synthetic ${size}: continued ring identities duplicate`);
+    assert(await run.page.locator('.identity-show-more').evaluate((node) => node === document.activeElement), `synthetic ${size}: ring continuation lost focus`);
+
+    await run.page.locator('#filter-toggle').click();
+    assert((await run.page.locator('.discovery-result').count()) === 50, `synthetic ${size}: discovery preview is not bounded at 50`);
+    assert((await run.page.locator('#discovery-count').textContent()) === `50 von ${size} Commons als Vorschau`, `synthetic ${size}: discovery total is not truthful`);
+    await run.page.locator('#discovery-show-text').click();
+    await run.page.waitForFunction((count) => document.querySelector('#text-count')?.textContent === `48 von ${count} Commons angezeigt`, size);
+    assert((await run.page.locator('.catalog-card:not([hidden])').count()) === 48, `synthetic ${size}: initial text window is not bounded at 48`);
+    const textMoreBox = await run.page.locator('#text-show-more').boundingBox();
+    assert(textMoreBox && textMoreBox.height >= 44, `synthetic ${size}: text continuation touch target is undersized`);
+    await run.page.locator('#text-show-more').click();
+    await run.page.waitForFunction(() => document.querySelectorAll('.catalog-card:not([hidden])').length === 96);
+    const textIds = await run.page.locator('.catalog-card:not([hidden])').evaluateAll((nodes) => nodes.map((node) => node.dataset.commonprojectId));
+    assert(new Set(textIds).size === 96, `synthetic ${size}: continued text identities duplicate`);
+    assert((await run.page.locator('#text-count').textContent()) === `96 von ${size} Commons angezeigt`, `synthetic ${size}: text continuation count drifted`);
+    assert(run.pageErrors.length === 0, `synthetic ${size}: page errors: ${run.pageErrors.join(' | ')}`);
+    await run.context.close();
+  }
+  results.push({ id: 'synthetic-catalogue-truth', verdict: 'PASS', sizes: [500, 5000], preview: 48, increment: 48 });
 }
 
 async function catalogueFailureScenario() {
@@ -1473,6 +1910,7 @@ html { font-size: ${profile.fontScale}% !important; }
 try {
   await startupAndRingOrbitScenario();
   await reducedMotionRingScenario();
+  await syntheticDigitalPerformanceScenario();
   await normalScenario();
   await intentSearchDiscoveryScenario();
   await intentSearchLayoutScenario({ viewportOverride: { width: 1024, height: 1366 }, scenarioId: 'intent-search-ipad-portrait' });
@@ -1485,6 +1923,9 @@ try {
   await moveendBoundReturnScenario();
   await interruptedLayerJourneyScenario();
   await reducedMotionLayerScenario();
+  await legacyLayerAndAtomicFocusScenario();
+  await externalLinkSafetyScenario();
+  await syntheticCatalogueTruthScenario();
   await catalogueFailureScenario();
   await providerFailureScenario();
   await methodScenario();

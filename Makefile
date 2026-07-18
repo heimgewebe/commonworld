@@ -1,6 +1,6 @@
-.PHONY: validate validate-proposal-path validate-current-state browser-smoke validate-canonical-plan validate-contracts validate-semantic-zoom validate-visual-semantics validate-renderer-spike validate-maplibre-phase2-proof validate-device-acceptance-pack validate-device-acceptance-rerun validate-digital-sphere validate-layered-digital-sphere-proof validate-digital-sphere-real-surface validate-device-acceptance-performance-v4 validate-physical-device-acceptance-v4-apple validate-public-catalog validate-public-seed-baseline validate-presence-axes validate-intent-search-discovery validate-renderer-selection validate-public-maplibre-vertical-slice validate-production-delivery-provider validate-public-shell test-js test smoke-pages-live check-pages-dns-target
+.PHONY: validate validate-proposal-path validate-current-state browser-smoke validate-canonical-plan validate-contracts validate-semantic-zoom validate-visual-semantics validate-renderer-spike validate-maplibre-phase2-proof validate-device-acceptance-pack validate-device-acceptance-rerun validate-digital-sphere validate-digital-ring-taxonomy validate-layered-digital-sphere-proof validate-digital-sphere-real-surface validate-device-acceptance-performance-v4 validate-physical-device-acceptance-v4-apple validate-public-catalog validate-public-seed-baseline validate-presence-axes validate-intent-search-discovery validate-renderer-selection validate-public-maplibre-vertical-slice validate-production-delivery-provider validate-public-shell test-js test smoke-pages-live check-pages-dns-target
 
-validate: validate-proposal-path validate-current-state validate-canonical-plan validate-contracts validate-semantic-zoom validate-visual-semantics validate-renderer-spike validate-maplibre-phase2-proof validate-device-acceptance-pack validate-device-acceptance-rerun validate-digital-sphere validate-layered-digital-sphere-proof validate-digital-sphere-real-surface validate-device-acceptance-performance-v4 validate-physical-device-acceptance-v4-apple validate-public-catalog validate-public-seed-baseline validate-presence-axes validate-intent-search-discovery validate-renderer-selection validate-public-maplibre-vertical-slice validate-production-delivery-provider validate-public-shell test-js test
+validate: validate-proposal-path validate-current-state validate-canonical-plan validate-contracts validate-semantic-zoom validate-visual-semantics validate-renderer-spike validate-maplibre-phase2-proof validate-device-acceptance-pack validate-device-acceptance-rerun validate-digital-sphere validate-digital-ring-taxonomy validate-layered-digital-sphere-proof validate-digital-sphere-real-surface validate-device-acceptance-performance-v4 validate-physical-device-acceptance-v4-apple validate-public-catalog validate-public-seed-baseline validate-presence-axes validate-intent-search-discovery validate-renderer-selection validate-public-maplibre-vertical-slice validate-production-delivery-provider validate-public-shell test-js test
 
 validate-proposal-path:
 	python3 scripts/validate_proposal_path.py
@@ -34,6 +34,9 @@ validate-device-acceptance-rerun:
 
 validate-digital-sphere:
 	python3 scripts/validate_digital_sphere.py
+
+validate-digital-ring-taxonomy:
+	python3 scripts/validate_digital_ring_taxonomy.py
 
 validate-layered-digital-sphere-proof:
 	python3 scripts/validate_layered_digital_sphere_proof.py

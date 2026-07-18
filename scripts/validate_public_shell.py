@@ -16,7 +16,6 @@ REQUIRED_HTML = (
     'id="commons-search"',
     'id="settings-toggle"',
     'id="settings-panel"',
-    'id="catalog-bootstrap"',
     'id="globe-results"',
     'role="region"',
     'data-presentation-choice="globe"',
@@ -27,8 +26,12 @@ REQUIRED_HTML = (
     'class="digital-sphere"',
     'id="sphere-edge-control"',
     'id="layer-panel"',
+    'id="layer-breadcrumb"',
+    'id="layer-current"',
     'id="layer-stack-visual"',
     'id="text-view"',
+    'id="text-layer-breadcrumb"',
+    'id="text-layer-current"',
     'id="catalog"',
     'id="project-focus"',
     'href="./catalog/catalog.json"',
@@ -74,6 +77,8 @@ REQUIRED_CSS = (
     '--sphere-y',
     '--sphere-size',
     '.sphere-edge-control',
+    '.digital-breadcrumb',
+    '.digital-current',
     '.layer-panel',
     '.layer-stack-visual',
     '.layer-stack-item',
@@ -97,17 +102,25 @@ def validate_public_shell(root: Path = ROOT) -> list[str]:
     html_path = root / 'index.html'
     css_path = root / 'index.css'
     method_path = root / 'method.html'
+    bootstrap_path = root / 'assets/commonworld-bootstrap-catalog.mjs'
     if not html_path.is_file():
         return ['missing public index.html']
     if not css_path.is_file():
         return ['missing public index.css']
     if not method_path.is_file():
         return ['missing public method.html']
+    if not bootstrap_path.is_file():
+        return ['missing build-bound bootstrap catalog module']
 
     html = html_path.read_text(encoding='utf-8')
     css = css_path.read_text(encoding='utf-8')
     method = method_path.read_text(encoding='utf-8')
+    bootstrap = bootstrap_path.read_text(encoding='utf-8')
     lowered = html.casefold()
+    if 'id="catalog-bootstrap"' in html:
+        errors.append('public shell must not embed catalog JSON in the DOM')
+    if 'export const BOOTSTRAP_RECORDS = [' not in bootstrap:
+        errors.append('build-bound bootstrap catalog module missing exported records')
     for token in REQUIRED_HTML:
         if token not in html:
             errors.append(f'public shell missing required token: {token}')

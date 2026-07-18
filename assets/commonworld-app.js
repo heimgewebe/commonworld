@@ -1,16 +1,21 @@
+import { BOOTSTRAP_RECORDS } from './commonworld-bootstrap-catalog.mjs';
 import {
   DEFAULT_CAMERA,
   MAX_MAP_ZOOM,
   binaryName,
-  DIGITAL_LAYER_TRANSITION_MS,
-  LAYERS,
+  buildDigitalPresentationTree,
   deriveLayer,
+  digitalPathContainsRecord,
+  digitalPresentationTreeConstructionCount,
+  DIGITAL_LAYER_TRANSITION_MS,
+  DIGITAL_ROOT_PATH,
   digitalLayerCamera,
   filterRecords,
   globeHorizonCoordinates,
   hasDigitalPresence,
   mapCamera,
   mapFailurePolicy,
+  normalizeDigitalPath,
   normalizeQuery,
   prepareCatalogProjection,
   prepareIntentSearchIndex,
@@ -24,12 +29,15 @@ import {
   ringOrbitDirection,
   ringOrbitDuration,
   ringOrbitStartAngle,
+  safeExternalHttpsUrl,
   searchFromState,
+  serializeDigitalPath,
   semanticLocationLine,
   sphereDetailLevel,
   sphereLayout,
   sphereOpacityForGlobeRatio,
   stateFromSearch,
+  visibleDigitalNodes,
 } from './commonworld-core.mjs';
 
 const SVG_NS = 'http://www.w3.org/2000/svg';
@@ -39,16 +47,21 @@ const PUBLIC_MAP_SOURCE_ID = 'commonworld-public-representations';
 const PUBLIC_MAP_LAYER_IDS = Object.freeze(['commonworld-public-extents', 'commonworld-approximate-zones', 'commonworld-exact-anchors']);
 const ACTION_LINK_TYPES = new Set(['visit', 'use', 'borrow', 'learn', 'contribute', 'volunteer', 'donate', 'contact', 'replicate']);
 const INTENT_FILTER_NAMES = Object.freeze(['presence', 'action', 'language', 'access', 'freshness', 'curation']);
+const DIGITAL_IDENTITY_DOM_LIMIT = 48;
+const TEXT_IDENTITY_DOM_LIMIT = 48;
+const DISCOVERY_RESULT_PREVIEW_LIMIT = 50;
 const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
 const elements = {
   body: document.body,
   skipLink: document.querySelector('.skip-link'),
-  bootstrap: document.querySelector('#catalog-bootstrap'),
   globeSurface: document.querySelector('#globe-surface'),
   textView: document.querySelector('#text-view'),
   textCount: document.querySelector('#text-count'),
   textEmpty: document.querySelector('#text-empty'),
+  textLayerBreadcrumb: document.querySelector('#text-layer-breadcrumb'),
+  textLayerCurrent: document.querySelector('#text-layer-current'),
   textLayerButtons: document.querySelector('#text-layer-buttons'),
+  textShowMore: document.querySelector('#text-show-more'),
   stage: document.querySelector('.globe-stage'),
   map: document.querySelector('#map'),
   mapStatus: document.querySelector('#map-status'),
@@ -66,6 +79,8 @@ const elements = {
   layerSearchToggle: document.querySelector('#layer-search-toggle'),
   layerDiscovery: document.querySelector('#layer-discovery'),
   layerSearch: document.querySelector('#layer-search'),
+  layerBreadcrumb: document.querySelector('#layer-breadcrumb'),
+  layerCurrent: document.querySelector('#layer-current'),
   layerButtons: document.querySelector('#layer-buttons'),
   layerProjects: document.querySelector('#layer-projects'),
   layerDeck: document.querySelector('#layer-track-deck'),
@@ -78,6 +93,7 @@ const elements = {
   discoveryCount: document.querySelector('#discovery-count'),
   discoveryEmpty: document.querySelector('#discovery-empty'),
   discoveryList: document.querySelector('#discovery-list'),
+  discoveryShowText: document.querySelector('#discovery-show-text'),
   filterClear: document.querySelector('#filter-clear'),
   filterSelects: [...document.querySelectorAll('[data-intent-filter]')],
   discoveryOpenButtons: [...document.querySelectorAll('[data-open-discovery]')],
@@ -105,14 +121,17 @@ const runtime = {
   records: [],
   recordsById: new Map(),
   catalogProjection: null,
+  digitalTree: null,
   searchIndex: null,
   visibleRecordsCache: null,
+  unfilteredPathRecordsCache: null,
   lastPublicMapData: null,
   publicMapUpdateCount: 0,
   state: {
     camera: { ...DEFAULT_CAMERA },
     project: null,
     layer: null,
+    digitalPath: DIGITAL_ROOT_PATH,
     view: 'globe',
     surface: 'globe',
     query: '',
@@ -156,6 +175,11 @@ const runtime = {
   pointerHitTestFrame: null,
   pointerHitTestPoint: null,
   inputModality: null,
+  pendingHierarchyFocusPath: null,
+  hierarchyFocusTimer: null,
+  presentationKey: null,
+  identityPresentationLimit: DIGITAL_IDENTITY_DOM_LIMIT,
+  textPresentationLimit: TEXT_IDENTITY_DOM_LIMIT,
 };
 
 function setStylePropertyIfChanged(element, name, value) {
@@ -286,8 +310,7 @@ function validateRecords(records) {
 }
 
 function bootstrapRecords() {
-  const text = elements.bootstrap?.content?.textContent ?? '';
-  return validateRecords(JSON.parse(text));
+  return validateRecords(BOOTSTRAP_RECORDS);
 }
 
 async function loadRecords() {
@@ -301,13 +324,16 @@ async function loadRecords() {
 function installRecords(records) {
   runtime.records = records;
   runtime.catalogProjection = prepareCatalogProjection(records);
+  runtime.digitalTree = buildDigitalPresentationTree(records);
   runtime.searchIndex = prepareIntentSearchIndex(records);
   runtime.recordsById = runtime.catalogProjection.recordsById;
   elements.stage.dataset.searchIndexedRecords = String(runtime.searchIndex.indexedRecordCount);
   elements.stage.dataset.searchIndexedTerms = String(runtime.searchIndex.indexedTermCount);
   runtime.visibleRecordsCache = null;
+  runtime.unfilteredPathRecordsCache = null;
   runtime.lastPublicMapData = null;
   runtime.publicMapUpdateCount = 0;
+  runtime.presentationKey = null;
 }
 
 function createSvgElement(name, attributes = {}) {
@@ -316,16 +342,59 @@ function createSvgElement(name, attributes = {}) {
   return element;
 }
 
-function groupedDigitalRecords(records = runtime.records) {
-  const grouped = new Map(LAYERS.map((layer) => [layer.id, []]));
-  for (const record of records) {
-    const layer = deriveLayer(record);
-    if (layer) grouped.get(layer)?.push(record);
-  }
-  return grouped;
+function recordsForNode(node) {
+  return (node?.identityIds ?? []).map((identifier) => runtime.recordsById.get(identifier)).filter(Boolean);
 }
 
-function appendRingSequence(textPath, records) {
+function currentDigitalPath() {
+  return runtime.state.digitalPath ?? DIGITAL_ROOT_PATH;
+}
+
+function setCurrentDigitalPathDataset() {
+  elements.stage.dataset.digitalPath = serializeDigitalPath(currentDigitalPath());
+}
+
+function digitalPathFiltered() {
+  return serializeDigitalPath(currentDigitalPath()) !== serializeDigitalPath(DIGITAL_ROOT_PATH);
+}
+
+function treeForRecords(records = runtime.records) {
+  if (records === runtime.records && runtime.digitalTree) return runtime.digitalTree;
+  return buildDigitalPresentationTree(records);
+}
+
+function unfilteredPathRecords() {
+  const key = discoveryCacheKey();
+  if (runtime.unfilteredPathRecordsCache?.key === key) return runtime.unfilteredPathRecordsCache.records;
+  const records = filterRecords(runtime.records, {
+    ...runtime.state,
+    layer: null,
+    digitalPath: DIGITAL_ROOT_PATH,
+    searchIndex: runtime.searchIndex,
+  });
+  runtime.unfilteredPathRecordsCache = { key, records };
+  return records;
+}
+
+function syncPresentationBudgets() {
+  const key = discoveryCacheKey();
+  if (runtime.presentationKey === key) return;
+  runtime.presentationKey = key;
+  runtime.identityPresentationLimit = DIGITAL_IDENTITY_DOM_LIMIT;
+  runtime.textPresentationLimit = TEXT_IDENTITY_DOM_LIMIT;
+}
+
+function visibleDigitalView(records = visibleRecords()) {
+  syncPresentationBudgets();
+  return visibleDigitalNodes(treeForRecords(records), currentDigitalPath(), { identityLimit: runtime.identityPresentationLimit });
+}
+
+function appendRingSequence(textPath, records, { prefix = '' } = {}) {
+  if (prefix) {
+    const label = createSvgElement('tspan', { class: 'sphere-ring-label' });
+    label.textContent = `  ${prefix}  `;
+    textPath.append(label);
+  }
   for (const record of records) {
     const name = createSvgElement('tspan', { class: 'sphere-ring-name', 'data-commonproject-id': record.id });
     name.textContent = `  ${record.title}  `;
@@ -336,20 +405,40 @@ function appendRingSequence(textPath, records) {
 }
 
 function renderSphereRibbons(records = runtime.records) {
-  const grouped = groupedDigitalRecords(records);
-  LAYERS.forEach((layer, layerIndex) => {
-    const plane = elements.sphereRings.querySelector(`.sphere-ring-plane[data-layer-id="${CSS.escape(layer.id)}"]`);
-    if (!plane) return;
-    const source = grouped.get(layer.id) ?? [];
-    const orbitDuration = ringOrbitDuration(source.length);
-    plane.dataset.entryCount = String(source.length);
+  const view = visibleDigitalView(records);
+  const childBundles = view.children.filter((node) => node.type !== 'identity');
+  const visibleNodes = (childBundles.length ? childBundles : (view.current ? [view.current] : []))
+    .filter((node) => node.type !== 'diagnostic' || node.identityCount > 0)
+    .slice(0, 8);
+  elements.sphereRings.replaceChildren();
+  visibleNodes.forEach((node, layerIndex) => {
+    const source = recordsForNode(node).slice(0, node.type === 'field' ? 2 : 3);
+    const plane = createSvgElement('g', {
+      class: 'sphere-ring-plane',
+      'data-node-id': node.id,
+      'data-layer-id': node.id,
+      'data-digital-path': node.pathKey,
+      'data-ring-index': String(layerIndex),
+    });
+    const guide = createSvgElement('use', {
+      href: `#sphere-path-${layerIndex + 1}`,
+      class: 'sphere-layer-guide',
+      'data-node-id': node.id,
+      'data-layer-id': node.id,
+    });
+    plane.append(guide);
+    const orbitDuration = ringOrbitDuration(node.identityCount);
+    plane.dataset.entryCount = String(node.identityCount);
+    plane.dataset.identityCount = String(node.identityCount);
     plane.dataset.orbitDuration = String(orbitDuration);
     plane.style.setProperty('--ring-orbit-duration', `${orbitDuration}s`);
     plane.style.setProperty('--ring-orbit-direction', String(ringOrbitDirection(layerIndex)));
     plane.style.setProperty('--ring-orbit-start-angle', `${ringOrbitStartAngle(layerIndex)}deg`);
     const text = createSvgElement('text', {
       class: 'sphere-ring-text',
-      'data-layer-id': layer.id,
+      'data-layer-id': node.id,
+      'data-node-id': node.id,
+      'data-digital-path': node.pathKey,
       'data-entry-count': String(source.length),
     });
     const textPath = createSvgElement('textPath', {
@@ -357,27 +446,23 @@ function renderSphereRibbons(records = runtime.records) {
       startOffset: `${(layerIndex * 11 + 3) % 100}%`,
     });
     if (source.length) {
-      appendRingSequence(textPath, source);
+      appendRingSequence(textPath, source, { prefix: `${node.label} · ${node.identityCount}` });
     } else {
       const placeholder = createSvgElement('tspan', { class: 'sphere-ring-placeholder' });
-      placeholder.textContent = `  ${layer.trackLabel} · keine sichtbaren Einträge  `;
+      placeholder.textContent = `  ${node.label} · keine sichtbaren Einträge  `;
       textPath.append(placeholder);
     }
     text.append(textPath);
     text.toggleAttribute('data-empty', source.length === 0);
-    plane.querySelector('.sphere-ring-text')?.remove();
     plane.append(text);
+    elements.sphereRings.append(plane);
   });
   runtime.overlayRenderCount += 1;
   elements.stage.dataset.overlayRenders = String(runtime.overlayRenderCount);
 }
 
-function selectLayerTrack(layerId) {
-  const nextLayer = runtime.state.layer === layerId ? null : layerId;
-  if (runtime.state.project && nextLayer && deriveLayer(runtime.recordsById.get(runtime.state.project)) !== nextLayer) {
-    runtime.state.project = null;
-  }
-  setLayer(nextLayer);
+function selectDigitalBundle(path) {
+  setDigitalPath(path);
 }
 
 function createRibbonSegment(record, copyIndex) {
@@ -407,36 +492,85 @@ function updateLaneOverflow() {
 
 function renderLayerDeck() {
   elements.layerDeck.replaceChildren();
-  const grouped = groupedDigitalRecords();
-  for (const layer of LAYERS) {
-    const records = grouped.get(layer.id) ?? [];
+  const view = visibleDigitalView();
+  if (!view.current) return;
+  const identityLevel = view.children.length > 0 && view.children.every((node) => node.type === 'identity');
+  const laneNodes = identityLevel ? [view.current] : view.children.filter((node) => node.identityCount > 0 || node.type === 'identity');
+  elements.layerDeck.style.setProperty('--lane-count', String(Math.max(1, laneNodes.length)));
+  const visibleIdentityRecords = identityLevel
+    ? view.children.map((node) => runtime.recordsById.get(node.projectId)).filter(Boolean)
+    : null;
+  for (const [index, node] of laneNodes.entries()) {
+    const allRecords = visibleIdentityRecords ?? recordsForNode(node);
+    const records = identityLevel || node.type === 'identity' ? allRecords : allRecords.slice(0, 4);
     const lane = document.createElement('section');
     lane.className = 'digital-lane';
-    lane.dataset.layerId = layer.id;
-    lane.setAttribute('aria-label', layer.label);
+    lane.dataset.layerId = node.id;
+    lane.dataset.nodeId = node.id;
+    lane.dataset.digitalPath = node.pathKey;
+    lane.style.setProperty('--lane-index', String(index));
+    lane.setAttribute('aria-label', `${node.label}, ${node.identityCount} Commons`);
 
     const focus = document.createElement('button');
     focus.type = 'button';
     focus.className = 'digital-lane-focus';
-    focus.dataset.layerId = layer.id;
+    focus.dataset.layerId = node.id;
+    focus.dataset.nodeId = node.id;
+    focus.dataset.digitalPath = node.pathKey;
     focus.setAttribute('aria-pressed', 'false');
-    focus.innerHTML = `<span>${layer.trackLabel}</span><small>${records.length} Commons</small>`;
-    focus.addEventListener('click', () => selectLayerTrack(layer.id));
+    focus.setAttribute('aria-expanded', String(!identityLevel && serializeDigitalPath(currentDigitalPath()) === node.pathKey));
+    if (serializeDigitalPath(currentDigitalPath()) === node.pathKey) focus.setAttribute('aria-current', 'page');
+    const focusLabel = document.createElement('span');
+    focusLabel.textContent = node.label;
+    const count = document.createElement('small');
+    count.textContent = `${node.identityCount} Commons`;
+    focus.append(focusLabel, count);
+    focus.addEventListener('click', () => {
+      if (identityLevel) return;
+      selectDigitalBundle(node.path);
+    });
 
     const scroller = document.createElement('div');
     scroller.className = 'digital-lane-scroll';
-    scroller.dataset.layerId = layer.id;
+    scroller.dataset.layerId = node.id;
+    scroller.dataset.nodeId = node.id;
+    scroller.dataset.digitalPath = node.pathKey;
     scroller.tabIndex = 0;
     scroller.setAttribute('role', 'region');
-    scroller.setAttribute('aria-label', `${layer.label} horizontal durchblättern`);
+    scroller.setAttribute('aria-label', `${node.label} horizontal durchblättern`);
     const content = document.createElement('div');
     content.className = 'digital-lane-content';
-    const repeats = ribbonRepeatCount(records.length, 10);
+    const repeats = identityLevel ? 1 : ribbonRepeatCount(records.length, 10);
     for (let copy = 0; copy < repeats; copy += 1) {
       for (const record of records) content.append(createRibbonSegment(record, copy));
     }
     scroller.append(content);
     lane.append(focus, scroller);
+    if (identityLevel) {
+      const shown = records.length;
+      const status = document.createElement('p');
+      status.className = 'identity-presentation-status';
+      status.setAttribute('role', 'status');
+      status.textContent = `${shown} von ${node.identityCount} Commons angezeigt`;
+      lane.append(status);
+      if (shown < node.identityCount) {
+        const more = document.createElement('button');
+        more.type = 'button';
+        more.className = 'quiet-button identity-show-more';
+        more.dataset.digitalPath = node.pathKey;
+        const increment = Math.min(DIGITAL_IDENTITY_DOM_LIMIT, node.identityCount - shown);
+        more.textContent = `Weitere ${increment} anzeigen`;
+        more.setAttribute('aria-label', `Weitere ${increment} Commons in ${node.label} anzeigen`);
+        more.addEventListener('click', () => {
+          runtime.identityPresentationLimit += DIGITAL_IDENTITY_DOM_LIMIT;
+          renderDiscoveryState();
+          queueMicrotask(() => {
+            document.querySelector(`.identity-show-more[data-digital-path="${CSS.escape(node.pathKey)}"]`)?.focus({ preventScroll: true });
+          });
+        });
+        lane.append(more);
+      }
+    }
     elements.layerDeck.append(lane);
   }
   runtime.laneResizeObserver?.disconnect();
@@ -456,12 +590,8 @@ function renderLayerStack() {
   elements.layerStack.replaceChildren();
 }
 
-function layerForRecord(record) {
-  return LAYERS.find(({ id }) => id === deriveLayer(record));
-}
-
 function discoveryCacheKey() {
-  return [runtime.state.layer, runtime.state.query, ...INTENT_FILTER_NAMES.map((name) => runtime.state[name])]
+  return [runtime.state.layer, serializeDigitalPath(currentDigitalPath()), runtime.state.query, ...INTENT_FILTER_NAMES.map((name) => runtime.state[name])]
     .map((value) => value ?? '')
     .join('\u001f');
 }
@@ -475,7 +605,7 @@ function visibleRecords() {
 }
 
 function recordsMatchingQuery() {
-  return filterRecords(runtime.records, { ...runtime.state, layer: null, searchIndex: runtime.searchIndex });
+  return filterRecords(runtime.records, { ...runtime.state, layer: null, digitalPath: DIGITAL_ROOT_PATH, searchIndex: runtime.searchIndex });
 }
 
 function hasIntentFilters() {
@@ -487,7 +617,7 @@ function hasIntentFilters() {
 
 function currentPublicMapData() {
   if (!runtime.catalogProjection) return Object.freeze({ type: 'FeatureCollection', features: Object.freeze([]) });
-  const filtering = Boolean(runtime.state.layer || normalizeQuery(runtime.state.query) || hasIntentFilters());
+  const filtering = Boolean(digitalPathFiltered() || normalizeQuery(runtime.state.query) || hasIntentFilters());
   const visibleProjectIds = filtering ? visibleRecords().map(({ id }) => id) : null;
   return runtime.catalogProjection.publicMapFeatureCollection(visibleProjectIds);
 }
@@ -585,16 +715,20 @@ function updateSemanticLocationLine() {
 
 function renderLayerButtons(container) {
   container.replaceChildren();
-  const queryMatches = recordsMatchingQuery();
-  for (const layer of LAYERS) {
-    const count = queryMatches.filter((record) => deriveLayer(record) === layer.id).length;
+  const tree = treeForRecords(unfilteredPathRecords());
+  const view = visibleDigitalNodes(tree, currentDigitalPath());
+  const currentKey = view.current?.pathKey ?? serializeDigitalPath(DIGITAL_ROOT_PATH);
+  for (const node of view.children.filter((child) => child.type !== 'identity' && child.identityCount > 0)) {
     const button = document.createElement('button');
     button.type = 'button';
     button.className = 'layer-filter';
-    button.dataset.layerId = layer.id;
-    button.setAttribute('aria-pressed', String(runtime.state.layer === layer.id));
-    button.textContent = `${layer.label} · ${count}`;
-    button.addEventListener('click', () => setLayer(runtime.state.layer === layer.id ? null : layer.id));
+    button.dataset.layerId = node.id;
+    button.dataset.nodeId = node.id;
+    button.dataset.digitalPath = node.pathKey;
+    button.setAttribute('aria-pressed', String(currentKey === node.pathKey));
+    button.setAttribute('aria-expanded', 'false');
+    button.textContent = `${node.label} · ${node.identityCount}`;
+    button.addEventListener('click', () => setDigitalPath(node.path));
     container.append(button);
   }
 }
@@ -603,6 +737,37 @@ function renderLayerPanel() {
   renderLayerButtons(elements.layerButtons);
   elements.layerProjects.replaceChildren();
   elements.layerSearch.value = runtime.state.query;
+  setCurrentDigitalPathDataset();
+  renderDigitalBreadcrumb(elements.layerBreadcrumb, elements.layerCurrent);
+}
+
+function renderDigitalBreadcrumb(breadcrumbElement, currentElement) {
+  const tree = treeForRecords(unfilteredPathRecords());
+  const view = visibleDigitalNodes(tree, currentDigitalPath());
+  if (currentElement) {
+    currentElement.textContent = view.current
+      ? `${view.current.label} · ${view.current.identityCount} Commons`
+      : 'Digitale Commons-Sphäre';
+  }
+  if (breadcrumbElement) {
+    breadcrumbElement.replaceChildren();
+    for (const [index, crumb] of view.breadcrumb.entries()) {
+      if (index > 0) {
+        const separator = document.createElement('span');
+        separator.textContent = '›';
+        separator.setAttribute('aria-hidden', 'true');
+        breadcrumbElement.append(separator);
+      }
+      const button = document.createElement('button');
+      button.type = 'button';
+      button.className = 'digital-breadcrumb-item';
+      button.dataset.digitalPath = crumb.pathKey;
+      button.textContent = crumb.type === 'sphere' ? 'Sphäre' : crumb.label;
+      if (index === view.breadcrumb.length - 1) button.setAttribute('aria-current', 'page');
+      button.addEventListener('click', () => setDigitalPath(crumb.path));
+      breadcrumbElement.append(button);
+    }
+  }
 }
 
 function selectedProjectRecord() {
@@ -681,9 +846,11 @@ function clearIntentFilters({ historyMode = 'push' } = {}) {
 
 function directActionLinks(record) {
   const actions = new Set(Array.isArray(record?.actions) ? record.actions : []);
-  return (Array.isArray(record?.links) ? record.links : []).filter((link) => (
-    link && ACTION_LINK_TYPES.has(link.type) && actions.has(link.type) && typeof link.url === 'string' && link.url.startsWith('https://')
-  ));
+  return (Array.isArray(record?.links) ? record.links : []).flatMap((link) => {
+    if (!link || !ACTION_LINK_TYPES.has(link.type) || !actions.has(link.type)) return [];
+    const url = safeExternalHttpsUrl(link.url);
+    return url ? [{ ...link, url }] : [];
+  });
 }
 
 function resultLocationLabel(record) {
@@ -741,45 +908,106 @@ function createDiscoveryResult(record, position) {
 
 function renderDiscoveryResults() {
   const records = visibleRecords();
-  elements.discoveryList.replaceChildren(...records.map(createDiscoveryResult));
-  const count = records.length;
-  elements.discoveryCount.textContent = String(count) + ' Commons';
-  elements.discoveryEmpty.hidden = count !== 0;
-  elements.discoveryList.hidden = count === 0;
+  const preview = records.slice(0, DISCOVERY_RESULT_PREVIEW_LIMIT);
+  elements.discoveryList.replaceChildren(...preview.map(createDiscoveryResult));
+  const total = records.length;
+  elements.discoveryCount.textContent = total > preview.length
+    ? `${preview.length} von ${total} Commons als Vorschau`
+    : String(total) + ' Commons';
+  elements.discoveryEmpty.hidden = total !== 0;
+  elements.discoveryList.hidden = total === 0;
+  elements.discoveryShowText.hidden = total <= preview.length;
+  elements.discoveryShowText.textContent = total > preview.length ? `Alle ${total} Treffer in der Textansicht anzeigen` : '';
+}
+
+function createRuntimeCatalogCard(record) {
+  const card = document.createElement('article');
+  card.className = 'catalog-card';
+  card.id = `project-${record.id}`;
+  card.dataset.commonprojectId = record.id;
+  const kind = document.createElement('p');
+  kind.className = 'catalog-kind';
+  kind.textContent = recordPresentationLabel(record);
+  const title = document.createElement('h2');
+  title.textContent = record.title;
+  const summary = document.createElement('p');
+  summary.textContent = record.summary;
+  const location = document.createElement('p');
+  location.className = 'catalog-location';
+  location.textContent = resultLocationLabel(record);
+  const actions = document.createElement('div');
+  actions.className = 'catalog-actions';
+  const open = document.createElement('button');
+  open.className = 'catalog-select';
+  open.type = 'button';
+  open.dataset.commonprojectId = record.id;
+  open.setAttribute('aria-pressed', 'false');
+  open.textContent = 'Öffnen';
+  open.addEventListener('click', () => selectProject(record.id, { trigger: open, navigateSpatial: true }));
+  actions.append(open);
+  for (const link of directActionLinks(record)) {
+    const href = link.url;
+    if (!href.startsWith('https://')) continue;
+    const anchor = document.createElement('a');
+    anchor.className = 'catalog-action-link';
+    anchor.dataset.actionType = link.type;
+    anchor.href = href;
+    anchor.rel = 'external noreferrer';
+    anchor.textContent = link.label;
+    actions.append(anchor);
+  }
+  card.append(kind, title, summary, location, actions);
+  return card;
 }
 
 function renderTextView() {
   const visible = visibleRecords();
-  const visibleIds = new Set(visible.map(({ id }) => id));
+  syncPresentationBudgets();
+  const presented = visible.slice(0, runtime.textPresentationLimit);
+  const visibleIds = new Set(presented.map(({ id }) => id));
   const catalog = document.querySelector('#catalog');
+  for (const record of presented) {
+    if (!catalog?.querySelector(`.catalog-card[data-commonproject-id="${CSS.escape(record.id)}"]`)) catalog?.append(createRuntimeCatalogCard(record));
+  }
   document.querySelectorAll('.catalog-card[data-commonproject-id]').forEach((card) => {
     card.hidden = !visibleIds.has(card.dataset.commonprojectId);
   });
-  for (const record of visible) {
+  for (const record of presented) {
     const card = catalog?.querySelector('.catalog-card[data-commonproject-id="' + CSS.escape(record.id) + '"]');
     if (card) catalog.append(card);
   }
   renderLayerButtons(elements.textLayerButtons);
-  const count = visibleIds.size;
-  elements.textCount.textContent = String(count) + ' Commons';
-  elements.textEmpty.hidden = count !== 0;
+  renderDigitalBreadcrumb(elements.textLayerBreadcrumb, elements.textLayerCurrent);
+  const total = visible.length;
+  elements.textCount.textContent = presented.length < total
+    ? `${presented.length} von ${total} Commons angezeigt`
+    : String(total) + ' Commons';
+  elements.textEmpty.hidden = total !== 0;
+  elements.textShowMore.hidden = presented.length >= total;
+  if (presented.length < total) {
+    const increment = Math.min(TEXT_IDENTITY_DOM_LIMIT, total - presented.length);
+    elements.textShowMore.textContent = `Weitere ${increment} Commons anzeigen`;
+    elements.textShowMore.setAttribute('aria-label', `Weitere ${increment} von insgesamt ${total} Commons anzeigen`);
+  }
 }
 
 function updateSphereResultVisibility() {
   const visible = visibleRecords();
   const visibleIds = new Set(visible.map(({ id }) => id));
-  const focusedLayer = runtime.state.view === 'layers' ? runtime.state.layer : null;
-  if (focusedLayer) elements.stage.dataset.focusedLayer = focusedLayer;
-  else delete elements.stage.dataset.focusedLayer;
+  const digitalView = visibleDigitalView();
+  const identityLevel = digitalView.children.length > 0 && digitalView.children.every((node) => node.type === 'identity');
+  const focusedPath = runtime.state.view === 'layers' && identityLevel ? serializeDigitalPath(currentDigitalPath()) : null;
+  if (focusedPath && focusedPath !== serializeDigitalPath(DIGITAL_ROOT_PATH)) elements.stage.dataset.focusedPath = focusedPath;
+  else delete elements.stage.dataset.focusedPath;
   renderSphereRibbons(visible);
   elements.layerDeck.querySelectorAll('.digital-ribbon-item[data-commonproject-id]').forEach((segment) => {
     segment.hidden = !visibleIds.has(segment.dataset.commonprojectId);
   });
   elements.layerDeck.querySelectorAll('.digital-lane[data-layer-id]').forEach((lane) => {
-    const selected = focusedLayer === lane.dataset.layerId;
+    const selected = focusedPath === lane.dataset.digitalPath;
     const primaryVisible = [...lane.querySelectorAll('.digital-ribbon-item[data-ribbon-copy="0"]')].filter((segment) => !segment.hidden).length;
     lane.classList.toggle('is-focused', selected);
-    lane.toggleAttribute('data-layer-hidden', Boolean(focusedLayer && !selected));
+    lane.toggleAttribute('data-layer-hidden', false);
     lane.toggleAttribute('data-empty', primaryVisible === 0);
     lane.querySelector('.digital-lane-focus')?.setAttribute('aria-pressed', String(selected));
   });
@@ -798,12 +1026,13 @@ function replaceList(container, values) {
 function replaceLinks(container, links) {
   container.replaceChildren();
   for (const link of links) {
-    if (!link || typeof link.url !== 'string' || !link.url.startsWith('https://')) continue;
+    const url = safeExternalHttpsUrl(link?.url);
+    if (!url || !url.startsWith('https://')) continue;
     const item = document.createElement('li');
     const anchor = document.createElement('a');
-    anchor.href = link.url;
+    anchor.href = url;
     anchor.rel = 'external noreferrer';
-    anchor.textContent = link.label || link.url;
+    anchor.textContent = link.label || url;
     item.append(anchor);
     container.append(item);
   }
@@ -847,6 +1076,7 @@ function updateSelectionMarks() {
 
 function renderDiscoveryState() {
   renderLayerPanel();
+  renderLayerDeck();
   renderTextView();
   renderDiscoveryResults();
   syncIntentFilterControls();
@@ -861,6 +1091,7 @@ function renderDiscoveryState() {
   elements.search.value = runtime.state.query;
   elements.layerSearch.value = runtime.state.query;
   elements.searchClear.hidden = runtime.state.query.length === 0;
+  elements.stage.dataset.digitalTreeConstructions = String(digitalPresentationTreeConstructionCount());
 }
 
 function currentUrlState() {
@@ -943,7 +1174,12 @@ function selectProject(identifier, { historyMode = 'push', focus = true, trigger
 }
 
 function isVisibleFocusTarget(target) {
-  return target instanceof Element && typeof target.focus === 'function' && target.isConnected && target.getClientRects().length > 0 && !target.closest('[hidden]');
+  return target instanceof Element
+    && typeof target.focus === 'function'
+    && target.isConnected
+    && target.getClientRects().length > 0
+    && !target.matches(':disabled, input[type="hidden"]')
+    && !target.closest('[hidden], [inert], [aria-hidden="true"]');
 }
 
 
@@ -969,15 +1205,97 @@ function clearProject({ historyMode = 'push', restoreFocus = true } = {}) {
   }
 }
 
-function setLayer(layer, { historyMode = 'push' } = {}) {
-  const nextLayer = LAYERS.some(({ id }) => id === layer) ? layer : null;
-  if (runtime.state.project && nextLayer && deriveLayer(runtime.recordsById.get(runtime.state.project)) !== nextLayer) runtime.state.project = null;
-  runtime.state.layer = nextLayer;
+function projectMatchesDigitalState(identifier, state = runtime.state) {
+  const record = identifier ? runtime.recordsById.get(identifier) : null;
+  if (!record) return false;
+  if (state.layer) return deriveLayer(record) === state.layer;
+  return digitalPathContainsRecord(state.digitalPath ?? DIGITAL_ROOT_PATH, record);
+}
+
+function hierarchyFocusSurfaceReady() {
+  if (runtime.state.surface === 'text') return !elements.textView.hidden;
+  return runtime.state.view === 'layers'
+    && runtime.viewPhase === 'layers'
+    && elements.layerPanel.hasAttribute('data-visible')
+    && !elements.layerPanel.hidden
+    && !elements.layerPanel.hasAttribute('inert');
+}
+
+function focusVisibleHierarchyControl(pathKey) {
+  const textSelectors = [
+    '#text-layer-breadcrumb .digital-breadcrumb-item[aria-current="page"]',
+    `#text-layer-buttons .layer-filter[data-digital-path="${CSS.escape(pathKey)}"]`,
+    '#text-layer-buttons .layer-filter',
+  ];
+  const globeSelectors = [
+    `.digital-lane[data-digital-path="${CSS.escape(pathKey)}"] .digital-lane-focus`,
+    `.digital-lane[data-digital-path="${CSS.escape(pathKey)}"] .digital-lane-scroll`,
+    '#layer-breadcrumb .digital-breadcrumb-item[aria-current="page"]',
+    '#layer-close',
+  ];
+  const fallbackSelectors = runtime.state.surface === 'text'
+    ? ['[data-open-discovery]', '#text-view']
+    : ['#globe-reset'];
+  const selectors = runtime.state.surface === 'text'
+    ? [...textSelectors, ...globeSelectors, ...fallbackSelectors]
+    : [...globeSelectors, ...textSelectors, ...fallbackSelectors];
+  const target = selectors
+    .map((selector) => document.querySelector(selector))
+    .find(isVisibleFocusTarget);
+  target?.focus({ preventScroll: true });
+  return target ?? null;
+}
+
+function flushPendingHierarchyFocus() {
+  const pathKey = runtime.pendingHierarchyFocusPath;
+  if (!pathKey || !hierarchyFocusSurfaceReady()) return null;
+  const target = focusVisibleHierarchyControl(pathKey);
+  if (!target) return null;
+  runtime.pendingHierarchyFocusPath = null;
+  window.clearTimeout(runtime.hierarchyFocusTimer);
+  runtime.hierarchyFocusTimer = null;
+  return target;
+}
+
+function scheduleHierarchyFocus(pathKey) {
+  runtime.pendingHierarchyFocusPath = pathKey;
+  window.clearTimeout(runtime.hierarchyFocusTimer);
+  runtime.hierarchyFocusTimer = window.setTimeout(() => {
+    runtime.hierarchyFocusTimer = null;
+    flushPendingHierarchyFocus();
+  }, 0);
+}
+
+function setDigitalPath(path, { historyMode = 'push' } = {}) {
+  const normalized = normalizeDigitalPathForApp(path);
+  const closesProject = Boolean(runtime.state.project) && !projectMatchesDigitalState(runtime.state.project, {
+    ...runtime.state,
+    layer: null,
+    digitalPath: normalized.path,
+  });
+  runtime.state.digitalPath = normalized.path;
+  runtime.state.layer = null;
+  if (closesProject) {
+    runtime.state.project = null;
+    runtime.focusReturnTarget = null;
+  }
+  runtime.visibleRecordsCache = null;
   renderDiscoveryState();
-  if (runtime.state.view === 'layers' && nextLayer) {
-    window.requestAnimationFrame(() => elements.layerDeck.querySelector(`.digital-lane[data-layer-id="${CSS.escape(nextLayer)}"] .digital-lane-scroll`)?.focus({ preventScroll: true }));
+  if (closesProject || runtime.state.view === 'layers' || runtime.state.surface === 'text') {
+    scheduleHierarchyFocus(normalized.pathKey);
   }
   if (historyMode) writeHistory(historyMode);
+}
+
+function normalizeDigitalPathForApp(path) {
+  const normalized = normalizeDigitalPath(path);
+  if (!normalized.valid) return { path: DIGITAL_ROOT_PATH, pathKey: serializeDigitalPath(DIGITAL_ROOT_PATH) };
+  const tree = runtime.digitalTree ?? treeForRecords(runtime.records);
+  const current = tree.nodesByPath.get(normalized.pathKey);
+  if (!current || (current.type !== 'sphere' && current.identityCount === 0)) {
+    return { path: DIGITAL_ROOT_PATH, pathKey: serializeDigitalPath(DIGITAL_ROOT_PATH) };
+  }
+  return normalized;
 }
 
 function setQuery(value, { historyMode = 'replace' } = {}) {
@@ -1255,7 +1573,7 @@ function finishViewTransition(phase, { restoreFocus = false } = {}) {
       runtime.layerPanelReady = true;
       elements.stage.dataset.layerPanelVisibleAt = String(performance.now());
       showLayerState();
-      elements.layerClose.focus({ preventScroll: true });
+      if (!flushPendingHierarchyFocus()) elements.layerClose.focus({ preventScroll: true });
     });
   }
   if (phase === 'overview' && restoreFocus) {
@@ -1309,7 +1627,7 @@ function closeLayerView({ historyMode = 'push', cameraState = null, preserveLaye
   runtime.layerPanelReady = false;
   closeLayerDiscovery();
   runtime.state.view = 'globe';
-  if (!preserveLayer) runtime.state.layer = null;
+  runtime.state.layer = null;
   clearViewTransition();
   const duration = instant || reducedMotion.matches || !runtime.mapReady ? 0 : DIGITAL_LAYER_TRANSITION_MS;
   renderDiscoveryState();
@@ -1399,6 +1717,7 @@ function resetGlobe() {
   runtime.state.view = 'globe';
   setViewPhase('overview');
   runtime.state.layer = null;
+  runtime.state.digitalPath = DIGITAL_ROOT_PATH;
   runtime.state.camera = { ...DEFAULT_CAMERA };
   showLayerState();
   renderDiscoveryState();
@@ -1407,10 +1726,18 @@ function resetGlobe() {
 }
 
 function applyDeepLink(search, { initial = false } = {}) {
+  const previousFocus = document.activeElement;
   const next = stateFromSearch(search, runtime.records.map(({ id }) => id));
   if (initial && !new URLSearchParams(search).has('surface')) next.surface = storedPresentation();
   runtime.applyingHistory = true;
   runtime.state = next;
+  runtime.state.digitalPath = normalizeDigitalPathForApp(next.digitalPath).path;
+  if (runtime.state.project && !projectMatchesDigitalState(runtime.state.project, runtime.state)) {
+    runtime.state.project = null;
+    runtime.focusReturnTarget = null;
+  }
+  runtime.visibleRecordsCache = null;
+  runtime.unfilteredPathRecordsCache = null;
   elements.search.value = next.query;
   setPresentation(next.surface, { historyMode: null, persist: false });
   if (runtime.mapReady) {
@@ -1421,10 +1748,14 @@ function applyDeepLink(search, { initial = false } = {}) {
     showLayerState();
   }
   renderDiscoveryState();
-  if (next.query || hasIntentFilters()) openDiscovery({ trigger: elements.search });
+  if ((next.query || hasIntentFilters()) && !runtime.state.project) openDiscovery({ trigger: elements.search });
   else closeDiscovery({ restoreFocus: false });
   runtime.applyingHistory = false;
   if (initial) writeHistory('replace');
+  else if (runtime.state.project) elements.focus.focus({ preventScroll: true });
+  else if (!isVisibleFocusTarget(previousFocus)) {
+    scheduleHierarchyFocus(serializeDigitalPath(runtime.state.digitalPath));
+  }
 }
 
 
@@ -1514,6 +1845,20 @@ function wireControls() {
     else openDiscovery({ trigger: elements.filterToggle });
   });
   elements.discoveryClose.addEventListener('click', () => closeDiscovery({ restoreFocus: true }));
+  elements.discoveryShowText.addEventListener('click', () => {
+    closeDiscovery({ restoreFocus: false });
+    setPresentation('text');
+    elements.textView.focus({ preventScroll: true });
+  });
+  elements.textShowMore.addEventListener('click', () => {
+    const firstNewIndex = runtime.textPresentationLimit;
+    runtime.textPresentationLimit += TEXT_IDENTITY_DOM_LIMIT;
+    renderDiscoveryState();
+    queueMicrotask(() => {
+      if (isVisibleFocusTarget(elements.textShowMore)) elements.textShowMore.focus({ preventScroll: true });
+      else document.querySelectorAll('.catalog-card:not([hidden]) .catalog-select')[firstNewIndex]?.focus({ preventScroll: true });
+    });
+  });
   for (const button of elements.discoveryOpenButtons) {
     button.addEventListener('click', () => openDiscovery({ trigger: button }));
   }
@@ -1569,6 +1914,10 @@ function wireControls() {
     else if (runtime.activeOverlay === 'discovery') closeDiscovery({ restoreFocus: true });
     else if (!elements.focus.hidden) clearProject();
     else if (!elements.layerDiscovery.hidden) closeLayerDiscovery({ restoreFocus: true });
+    else if ((runtime.viewPhase !== 'overview' || runtime.state.view === 'layers') && digitalPathFiltered()) {
+      const view = visibleDigitalNodes(runtime.digitalTree ?? treeForRecords(runtime.records), currentDigitalPath());
+      setDigitalPath(view.parent?.path ?? DIGITAL_ROOT_PATH);
+    }
     else if (runtime.viewPhase !== 'overview' || runtime.state.view === 'layers') closeLayerView();
   });
   window.addEventListener('popstate', () => applyDeepLink(location.search));
@@ -1743,6 +2092,18 @@ async function boot() {
     renderSphere();
     renderLayerStack();
     wireControls();
+    if (navigator.webdriver && ['127.0.0.1', 'localhost'].includes(location.hostname)) {
+      window.__commonworldInstallSyntheticRecordsForTest = (records) => {
+        installRecords(validateRecords(records));
+        runtime.state.project = null;
+        runtime.state.layer = null;
+        runtime.state.digitalPath = DIGITAL_ROOT_PATH;
+        runtime.state.query = '';
+        for (const name of INTENT_FILTER_NAMES) runtime.state[name] = null;
+        renderDiscoveryState();
+        return Object.freeze({ records: runtime.records.length, treeIdentities: runtime.digitalTree.identityIds.length });
+      };
+    }
     applyDeepLink(location.search, { initial: true });
     renderDiscoveryState();
     document.documentElement.classList.add('runtime-ready');

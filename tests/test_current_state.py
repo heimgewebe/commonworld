@@ -13,6 +13,7 @@ class CurrentStateTests(unittest.TestCase):
         paths = (
             "contracts/commonworld/current-state.contract.json",
             "contracts/commonworld/public-maplibre-vertical-slice.contract.json",
+            "contracts/commonworld/digital-ring-taxonomy.contract.json",
             "contracts/commonworld/production-delivery-provider.contract.json",
             "contracts/commonworld/renderer-selection.contract.json",
             "contracts/commonworld/digital-sphere.contract.json",

@@ -1,0 +1,146 @@
+{
+  "schema_version": 1,
+  "kind": "commonworld_digital_ring_bundle_taxonomy",
+  "version": "digital-ring-bundles-v1",
+  "description": "Renderer-neutral recursive presentation taxonomy for digital Commonworld ring bundles. It derives one primary navigation path per digital CommonProject identity from public digital presence and catalog themes, without adding presentation fields to catalog records.",
+  "binds_contracts": {
+    "digital_sphere": "contracts/commonworld/digital-sphere.contract.json",
+    "aggregation_zoom": "contracts/commonworld/aggregation-zoom.contract.json",
+    "catalog_identity": "CommonProject.id"
+  },
+  "version_rule": "Minor versions may add explicit themes and child nodes; existing stable ids, parent paths and legacy aliases remain valid until a new major version.",
+  "levels": [
+    "sphere",
+    "field",
+    "network",
+    "identity"
+  ],
+  "root_id": "sphere",
+  "unknown_theme_node_id": "unclassified_future_theme",
+  "main_field_order": [
+    "knowledge_learning_culture",
+    "software_tools_production",
+    "communication_networks",
+    "provision_land_ecology",
+    "cooperation_self_organization"
+  ],
+  "known_current_digital_themes": [
+    "agriculture",
+    "civic-tech",
+    "commons-governance",
+    "communication",
+    "community-network",
+    "community-ownership",
+    "cooperative",
+    "cooperative-economy",
+    "creative-commons",
+    "digital-equity",
+    "digital-literacy",
+    "distributed-manufacturing",
+    "documentation",
+    "education",
+    "energy",
+    "federation",
+    "food",
+    "free-software",
+    "health",
+    "infrastructure",
+    "irrigation",
+    "knowledge",
+    "learning",
+    "network",
+    "open-data",
+    "open-educational-resources",
+    "open-hardware",
+    "open-knowledge",
+    "open-media",
+    "open-source",
+    "platform",
+    "protocol",
+    "renewable-energy",
+    "rural-infrastructure",
+    "seeds",
+    "software-infrastructure",
+    "water"
+  ],
+  "nodes": [
+    { "id": "sphere", "parent_id": null, "type": "sphere", "label_de": "Digitale Commons-Sphäre", "order": 0, "themes": [] },
+    { "id": "knowledge_learning_culture", "parent_id": "sphere", "type": "field", "label_de": "Wissen, Lernen und Kultur", "order": 0, "themes": [] },
+    { "id": "software_tools_production", "parent_id": "sphere", "type": "field", "label_de": "Software, Werkzeuge und Produktion", "order": 1, "themes": [] },
+    { "id": "communication_networks", "parent_id": "sphere", "type": "field", "label_de": "Kommunikation und Netze", "order": 2, "themes": [] },
+    { "id": "provision_land_ecology", "parent_id": "sphere", "type": "field", "label_de": "Versorgung, Land und Ökologie", "order": 3, "themes": [] },
+    { "id": "cooperation_self_organization", "parent_id": "sphere", "type": "field", "label_de": "Kooperation und Selbstorganisation", "order": 4, "themes": [] },
+    { "id": "unclassified_future_theme", "parent_id": "sphere", "type": "diagnostic", "label_de": "Unklassifizierte neue Themen", "order": 90, "themes": [] },
+
+    { "id": "open_knowledge_data", "parent_id": "knowledge_learning_culture", "type": "network", "label_de": "Offenes Wissen und Daten", "order": 0, "themes": ["knowledge", "open-data", "open-knowledge", "documentation", "research"] },
+    { "id": "learning_education", "parent_id": "knowledge_learning_culture", "type": "network", "label_de": "Lernen und Bildung", "order": 1, "themes": ["education", "learning", "open-educational-resources", "digital-literacy", "environmental-education"] },
+    { "id": "media_culture", "parent_id": "knowledge_learning_culture", "type": "network", "label_de": "Medien, Archive und Kultur", "order": 2, "themes": ["open-media", "creative-commons", "culture", "archives"] },
+    { "id": "knowledge_learning_bridge", "parent_id": "knowledge_learning_culture", "type": "interface", "label_de": "Wissens- und Lernbrücke", "order": 3, "themes": [] },
+
+    { "id": "free_software", "parent_id": "software_tools_production", "type": "network", "label_de": "Freie Software und Infrastruktur", "order": 0, "themes": ["free-software", "open-source", "software-infrastructure", "infrastructure"] },
+    { "id": "open_hardware_production", "parent_id": "software_tools_production", "type": "network", "label_de": "Offene Hardware und Produktion", "order": 1, "themes": ["open-hardware", "distributed-manufacturing"] },
+    { "id": "shared_platforms_tools", "parent_id": "software_tools_production", "type": "network", "label_de": "Plattformen und geteilte Werkzeuge", "order": 2, "themes": ["platform", "shared-tools", "tool-sharing", "repair", "circular-economy", "skills"] },
+    { "id": "knowledge_software_bridge", "parent_id": "software_tools_production", "type": "interface", "label_de": "Daten- und Softwarebrücke", "order": 3, "themes": [] },
+
+    { "id": "community_networks", "parent_id": "communication_networks", "type": "network", "label_de": "Gemeinschaftsnetze", "order": 0, "themes": ["communication", "community-network", "rural-infrastructure", "digital-equity"] },
+    { "id": "federated_protocols", "parent_id": "communication_networks", "type": "network", "label_de": "Föderation und Protokolle", "order": 1, "themes": ["federation", "protocol"] },
+    { "id": "network_coordination", "parent_id": "communication_networks", "type": "network", "label_de": "Vernetzte Koordination", "order": 2, "themes": ["network"] },
+
+    { "id": "food_seed_agriculture", "parent_id": "provision_land_ecology", "type": "network", "label_de": "Saatgut, Ernährung und Landwirtschaft", "order": 0, "themes": ["seeds", "food", "agriculture"] },
+    { "id": "water_irrigation", "parent_id": "provision_land_ecology", "type": "network", "label_de": "Wasser und Bewässerung", "order": 1, "themes": ["water", "irrigation"] },
+    { "id": "renewable_energy", "parent_id": "provision_land_ecology", "type": "network", "label_de": "Erneuerbare Energie", "order": 2, "themes": ["energy", "renewable-energy"] },
+    { "id": "health_software", "parent_id": "provision_land_ecology", "type": "interface", "label_de": "Offene Gesundheitsversorgung", "order": 3, "themes": ["health"] },
+    { "id": "land_ecology", "parent_id": "provision_land_ecology", "type": "network", "label_de": "Land, Stadtgrün und Ökologie", "order": 4, "themes": ["urban-gardening", "biodiversity", "community-land"] },
+    { "id": "food_distribution_platforms", "parent_id": "provision_land_ecology", "type": "interface", "label_de": "Ernährungsplattformen", "order": 5, "themes": [] },
+    { "id": "energy_cooperatives", "parent_id": "provision_land_ecology", "type": "interface", "label_de": "Energiegenossenschaften", "order": 6, "themes": [] },
+    { "id": "watershed_food_systems", "parent_id": "provision_land_ecology", "type": "interface", "label_de": "Wasser- und Ernährungssysteme", "order": 7, "themes": [] },
+
+    { "id": "cooperative_governance", "parent_id": "cooperation_self_organization", "type": "network", "label_de": "Gemeinschaftliche Governance und Genossenschaften", "order": 0, "themes": ["commons-governance", "community-ownership", "cooperative-economy", "cooperative"] },
+    { "id": "civic_technology", "parent_id": "cooperation_self_organization", "type": "interface", "label_de": "Civic Tech und Selbstorganisation", "order": 1, "themes": ["civic-tech"] },
+    { "id": "mutual_local_self_help", "parent_id": "cooperation_self_organization", "type": "network", "label_de": "Nachbarschaft und gegenseitige Hilfe", "order": 2, "themes": ["mutual-aid", "neighbourhood"] }
+  ],
+  "compound_rules": [
+    { "id": "food_seed_system", "all_themes": ["seeds", "food", "agriculture"], "target_node_id": "food_seed_agriculture", "reason": "seed, food and agriculture evidence forms one provision bundle" },
+    { "id": "open_data_infrastructure", "all_themes": ["open-data", "infrastructure"], "target_node_id": "knowledge_software_bridge", "reason": "open data whose public utility is infrastructure" },
+    { "id": "community_network_infrastructure", "all_themes": ["communication", "community-network"], "target_node_id": "community_networks", "reason": "digital communication commons organized as community networks" },
+    { "id": "food_platform", "all_themes": ["food", "platform"], "target_node_id": "food_distribution_platforms", "reason": "food commons mediated by an open platform" },
+    { "id": "energy_cooperative", "all_themes": ["energy", "cooperative-economy"], "target_node_id": "energy_cooperatives", "reason": "energy provision organized cooperatively" },
+    { "id": "community_owned_energy", "all_themes": ["energy", "community-ownership"], "target_node_id": "energy_cooperatives", "reason": "energy provision held through community ownership" },
+    { "id": "water_food", "all_themes": ["water", "food"], "target_node_id": "watershed_food_systems", "reason": "water governance tied to food and agriculture" },
+    { "id": "open_source_hardware_production", "all_themes": ["open-source", "open-hardware", "distributed-manufacturing"], "target_node_id": "open_hardware_production", "reason": "open source ecology combines software, hardware and distributed production" },
+    { "id": "health_open_software", "all_themes": ["health", "open-source"], "target_node_id": "health_software", "reason": "health provision implemented as open software" },
+    { "id": "civic_tech_open_data", "all_themes": ["civic-tech", "open-data"], "target_node_id": "civic_technology", "reason": "civic technology coordinates data, code and governance" }
+  ],
+  "tie_rules": [
+    { "id": "knowledge_learning_same_field", "candidate_node_ids": ["learning_education", "open_knowledge_data"], "target_node_id": "knowledge_learning_bridge", "reason": "equal knowledge and learning themes share the knowledge field" },
+    { "id": "knowledge_software_cross_field", "candidate_node_ids": ["free_software", "open_knowledge_data"], "target_node_id": "knowledge_software_bridge", "reason": "equal data and software evidence becomes an explicit interface bundle" },
+    { "id": "food_water_same_field", "candidate_node_ids": ["food_seed_agriculture", "water_irrigation"], "target_node_id": "watershed_food_systems", "reason": "equal food and water evidence shares the provision field" }
+  ],
+  "same_field_tie_fallbacks": {
+    "knowledge_learning_culture": "knowledge_learning_bridge",
+    "software_tools_production": "knowledge_software_bridge",
+    "provision_land_ecology": "watershed_food_systems"
+  },
+  "legacy_layer_aliases": [
+    { "alias": "knowledge_data", "target_path": ["sphere", "knowledge_learning_culture", "open_knowledge_data"], "reason": "legacy six-layer knowledge/data links" },
+    { "alias": "software_infrastructure", "target_path": ["sphere", "software_tools_production", "free_software"], "reason": "legacy six-layer software/infrastructure links" },
+    { "alias": "media_culture", "target_path": ["sphere", "knowledge_learning_culture", "media_culture"], "reason": "legacy six-layer media/culture links" },
+    { "alias": "learning_education", "target_path": ["sphere", "knowledge_learning_culture", "learning_education"], "reason": "legacy six-layer learning links" },
+    { "alias": "communication_networks", "target_path": ["sphere", "communication_networks", "community_networks"], "reason": "legacy six-layer communication links" },
+    { "alias": "mixed_other", "target_path": ["sphere"], "broad_alias_without_filter": true, "reason": "legacy broad fallback cannot be a durable public bundle" }
+  ],
+  "runtime_requirements": {
+    "canonical_url_parameter": "digital_path",
+    "legacy_layer_parameter": "preserved_as_filter_until_explicit_digital_path_selection",
+    "invalid_path_behavior": "fail_closed_to_sphere_root_without_partial_filter",
+    "primary_membership": "one_path_per_digital_commonproject_id",
+    "child_identity_sets_disjoint_for_primary_membership": true,
+    "parent_identity_set_equals_union_of_direct_children": true,
+    "progressive_disclosure": "render_current_node_direct_children_and_breadcrumb_only",
+    "identity_nodes_derive_from_commonproject_id": true,
+    "unknown_future_themes_are_diagnostic_not_public_rest_bucket": true,
+    "known_current_themes_must_not_route_to_unclassified": true,
+    "legacy_mixed_other_is_not_a_public_rest_category": true,
+    "catalog_presentation_fields_forbidden": true
+  }
+}

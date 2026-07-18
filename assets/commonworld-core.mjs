@@ -19,6 +19,107 @@ export const LAYERS = Object.freeze([
   Object.freeze({ id: 'mixed_other', label: 'Gemischte und weitere digitale Commons', trackLabel: 'Weitere', themes: [] }),
 ]);
 
+export const DIGITAL_TAXONOMY_VERSION = 'digital-ring-bundles-v1';
+export const DIGITAL_ROOT_ID = 'sphere';
+export const DIGITAL_ROOT_PATH = Object.freeze([DIGITAL_ROOT_ID]);
+const DIGITAL_UNCLASSIFIED_NODE_ID = 'unclassified_future_theme';
+const DIGITAL_ID_PATTERN = /^[a-z][a-z0-9_-]{0,95}$/;
+
+const deepFreeze = (value) => {
+  if (!value || typeof value !== 'object' || Object.isFrozen(value)) return value;
+  Object.freeze(value);
+  for (const child of Object.values(value)) deepFreeze(child);
+  return value;
+};
+
+export const DIGITAL_TAXONOMY = deepFreeze({
+  schema_version: 1,
+  kind: 'commonworld_digital_ring_bundle_taxonomy',
+  version: DIGITAL_TAXONOMY_VERSION,
+  version_rule: 'Minor versions may add explicit themes and child nodes; existing stable ids, parent paths and legacy aliases remain valid until a new major version.',
+  levels: ['sphere', 'field', 'network', 'identity'],
+  root_id: DIGITAL_ROOT_ID,
+  unknown_theme_node_id: DIGITAL_UNCLASSIFIED_NODE_ID,
+  nodes: [
+    { id: DIGITAL_ROOT_ID, parent_id: null, type: 'sphere', label_de: 'Digitale Commons-Sphäre', order: 0, themes: [] },
+    { id: 'knowledge_learning_culture', parent_id: DIGITAL_ROOT_ID, type: 'field', label_de: 'Wissen, Lernen und Kultur', order: 0, themes: [] },
+    { id: 'software_tools_production', parent_id: DIGITAL_ROOT_ID, type: 'field', label_de: 'Software, Werkzeuge und Produktion', order: 1, themes: [] },
+    { id: 'communication_networks', parent_id: DIGITAL_ROOT_ID, type: 'field', label_de: 'Kommunikation und Netze', order: 2, themes: [] },
+    { id: 'provision_land_ecology', parent_id: DIGITAL_ROOT_ID, type: 'field', label_de: 'Versorgung, Land und Ökologie', order: 3, themes: [] },
+    { id: 'cooperation_self_organization', parent_id: DIGITAL_ROOT_ID, type: 'field', label_de: 'Kooperation und Selbstorganisation', order: 4, themes: [] },
+    { id: DIGITAL_UNCLASSIFIED_NODE_ID, parent_id: DIGITAL_ROOT_ID, type: 'diagnostic', label_de: 'Unklassifizierte neue Themen', order: 90, themes: [] },
+
+    { id: 'open_knowledge_data', parent_id: 'knowledge_learning_culture', type: 'network', label_de: 'Offenes Wissen und Daten', order: 0, themes: ['knowledge', 'open-data', 'open-knowledge', 'documentation', 'research'] },
+    { id: 'learning_education', parent_id: 'knowledge_learning_culture', type: 'network', label_de: 'Lernen und Bildung', order: 1, themes: ['education', 'learning', 'open-educational-resources', 'digital-literacy', 'environmental-education'] },
+    { id: 'media_culture', parent_id: 'knowledge_learning_culture', type: 'network', label_de: 'Medien, Archive und Kultur', order: 2, themes: ['open-media', 'creative-commons', 'culture', 'archives'] },
+    { id: 'knowledge_learning_bridge', parent_id: 'knowledge_learning_culture', type: 'interface', label_de: 'Wissens- und Lernbrücke', order: 3, themes: [] },
+
+    { id: 'free_software', parent_id: 'software_tools_production', type: 'network', label_de: 'Freie Software und Infrastruktur', order: 0, themes: ['free-software', 'open-source', 'software-infrastructure', 'infrastructure'] },
+    { id: 'open_hardware_production', parent_id: 'software_tools_production', type: 'network', label_de: 'Offene Hardware und Produktion', order: 1, themes: ['open-hardware', 'distributed-manufacturing'] },
+    { id: 'shared_platforms_tools', parent_id: 'software_tools_production', type: 'network', label_de: 'Plattformen und geteilte Werkzeuge', order: 2, themes: ['platform', 'shared-tools', 'tool-sharing', 'repair', 'circular-economy', 'skills'] },
+    { id: 'knowledge_software_bridge', parent_id: 'software_tools_production', type: 'interface', label_de: 'Daten- und Softwarebrücke', order: 3, themes: [] },
+
+    { id: 'community_networks', parent_id: 'communication_networks', type: 'network', label_de: 'Gemeinschaftsnetze', order: 0, themes: ['communication', 'community-network', 'rural-infrastructure', 'digital-equity'] },
+    { id: 'federated_protocols', parent_id: 'communication_networks', type: 'network', label_de: 'Föderation und Protokolle', order: 1, themes: ['federation', 'protocol'] },
+    { id: 'network_coordination', parent_id: 'communication_networks', type: 'network', label_de: 'Vernetzte Koordination', order: 2, themes: ['network'] },
+
+    { id: 'food_seed_agriculture', parent_id: 'provision_land_ecology', type: 'network', label_de: 'Saatgut, Ernährung und Landwirtschaft', order: 0, themes: ['seeds', 'food', 'agriculture'] },
+    { id: 'water_irrigation', parent_id: 'provision_land_ecology', type: 'network', label_de: 'Wasser und Bewässerung', order: 1, themes: ['water', 'irrigation'] },
+    { id: 'renewable_energy', parent_id: 'provision_land_ecology', type: 'network', label_de: 'Erneuerbare Energie', order: 2, themes: ['energy', 'renewable-energy'] },
+    { id: 'health_software', parent_id: 'provision_land_ecology', type: 'interface', label_de: 'Offene Gesundheitsversorgung', order: 3, themes: ['health'] },
+    { id: 'land_ecology', parent_id: 'provision_land_ecology', type: 'network', label_de: 'Land, Stadtgrün und Ökologie', order: 4, themes: ['urban-gardening', 'biodiversity', 'community-land'] },
+    { id: 'food_distribution_platforms', parent_id: 'provision_land_ecology', type: 'interface', label_de: 'Ernährungsplattformen', order: 5, themes: [] },
+    { id: 'energy_cooperatives', parent_id: 'provision_land_ecology', type: 'interface', label_de: 'Energiegenossenschaften', order: 6, themes: [] },
+    { id: 'watershed_food_systems', parent_id: 'provision_land_ecology', type: 'interface', label_de: 'Wasser- und Ernährungssysteme', order: 7, themes: [] },
+
+    { id: 'cooperative_governance', parent_id: 'cooperation_self_organization', type: 'network', label_de: 'Gemeinschaftliche Governance und Genossenschaften', order: 0, themes: ['commons-governance', 'community-ownership', 'cooperative-economy', 'cooperative'] },
+    { id: 'civic_technology', parent_id: 'cooperation_self_organization', type: 'interface', label_de: 'Civic Tech und Selbstorganisation', order: 1, themes: ['civic-tech'] },
+    { id: 'mutual_local_self_help', parent_id: 'cooperation_self_organization', type: 'network', label_de: 'Nachbarschaft und gegenseitige Hilfe', order: 2, themes: ['mutual-aid', 'neighbourhood'] },
+  ],
+  compound_rules: [
+    { id: 'food_seed_system', all_themes: ['seeds', 'food', 'agriculture'], target_node_id: 'food_seed_agriculture', reason: 'seed, food and agriculture evidence forms one provision bundle' },
+    { id: 'open_data_infrastructure', all_themes: ['open-data', 'infrastructure'], target_node_id: 'knowledge_software_bridge', reason: 'open data whose public utility is infrastructure' },
+    { id: 'community_network_infrastructure', all_themes: ['communication', 'community-network'], target_node_id: 'community_networks', reason: 'digital communication commons organized as community networks' },
+    { id: 'food_platform', all_themes: ['food', 'platform'], target_node_id: 'food_distribution_platforms', reason: 'food commons mediated by an open platform' },
+    { id: 'energy_cooperative', all_themes: ['energy', 'cooperative-economy'], target_node_id: 'energy_cooperatives', reason: 'energy provision organized cooperatively' },
+    { id: 'community_owned_energy', all_themes: ['energy', 'community-ownership'], target_node_id: 'energy_cooperatives', reason: 'energy provision held through community ownership' },
+    { id: 'water_food', all_themes: ['water', 'food'], target_node_id: 'watershed_food_systems', reason: 'water governance tied to food and agriculture' },
+    { id: 'open_source_hardware_production', all_themes: ['open-source', 'open-hardware', 'distributed-manufacturing'], target_node_id: 'open_hardware_production', reason: 'open source ecology combines software, hardware and distributed production' },
+    { id: 'health_open_software', all_themes: ['health', 'open-source'], target_node_id: 'health_software', reason: 'health provision implemented as open software' },
+    { id: 'civic_tech_open_data', all_themes: ['civic-tech', 'open-data'], target_node_id: 'civic_technology', reason: 'civic technology coordinates data, code and governance' },
+  ],
+  tie_rules: [
+    { id: 'knowledge_learning_same_field', candidate_node_ids: ['learning_education', 'open_knowledge_data'], target_node_id: 'knowledge_learning_bridge', reason: 'equal knowledge and learning themes share the knowledge field' },
+    { id: 'knowledge_software_cross_field', candidate_node_ids: ['free_software', 'open_knowledge_data'], target_node_id: 'knowledge_software_bridge', reason: 'equal data and software evidence becomes an explicit interface bundle' },
+    { id: 'food_water_same_field', candidate_node_ids: ['food_seed_agriculture', 'water_irrigation'], target_node_id: 'watershed_food_systems', reason: 'equal food and water evidence shares the provision field' },
+  ],
+  same_field_tie_fallbacks: {
+    knowledge_learning_culture: 'knowledge_learning_bridge',
+    software_tools_production: 'knowledge_software_bridge',
+    provision_land_ecology: 'watershed_food_systems',
+  },
+  legacy_layer_aliases: [
+    { alias: 'knowledge_data', target_path: ['sphere', 'knowledge_learning_culture', 'open_knowledge_data'], reason: 'legacy six-layer knowledge/data links' },
+    { alias: 'software_infrastructure', target_path: ['sphere', 'software_tools_production', 'free_software'], reason: 'legacy six-layer software/infrastructure links' },
+    { alias: 'media_culture', target_path: ['sphere', 'knowledge_learning_culture', 'media_culture'], reason: 'legacy six-layer media/culture links' },
+    { alias: 'learning_education', target_path: ['sphere', 'knowledge_learning_culture', 'learning_education'], reason: 'legacy six-layer learning links' },
+    { alias: 'communication_networks', target_path: ['sphere', 'communication_networks', 'community_networks'], reason: 'legacy six-layer communication links' },
+    { alias: 'mixed_other', target_path: ['sphere'], broad_alias_without_filter: true, reason: 'legacy broad fallback cannot be a durable public bundle' },
+  ],
+});
+
+export const DIGITAL_RING_FIELDS = Object.freeze(
+  DIGITAL_TAXONOMY.nodes
+    .filter((node) => node.parent_id === DIGITAL_ROOT_ID && node.type === 'field')
+    .sort((left, right) => left.order - right.order)
+    .map((node) => Object.freeze({
+      id: node.id,
+      label: node.label_de,
+      trackLabel: node.label_de.split(',')[0],
+      path: Object.freeze([DIGITAL_ROOT_ID, node.id]),
+    })),
+);
+
 export const ORBIT_PROFILES = Object.freeze([
   Object.freeze({ rx: 316, ry: 300, rotation: -8 }),
   Object.freeze({ rx: 310, ry: 282, rotation: 20 }),
@@ -26,6 +127,8 @@ export const ORBIT_PROFILES = Object.freeze([
   Object.freeze({ rx: 298, ry: 288, rotation: -31 }),
   Object.freeze({ rx: 292, ry: 274, rotation: 63 }),
   Object.freeze({ rx: 286, ry: 294, rotation: -62 }),
+  Object.freeze({ rx: 280, ry: 262, rotation: 78 }),
+  Object.freeze({ rx: 274, ry: 284, rotation: -77 }),
 ]);
 
 const finite = (value, fallback) => {
@@ -35,6 +138,17 @@ const finite = (value, fallback) => {
 };
 const clamp = (value, minimum, maximum) => Math.min(maximum, Math.max(minimum, value));
 const rounded = (value, digits) => Number(value.toFixed(digits));
+
+export function safeExternalHttpsUrl(value) {
+  if (typeof value !== 'string' || value.trim() !== value) return null;
+  try {
+    const parsed = new URL(value);
+    if (parsed.protocol !== 'https:' || parsed.username || parsed.password) return null;
+    return parsed.href;
+  } catch {
+    return null;
+  }
+}
 
 export function hasDigitalPresence(record) {
   return record?.presence?.digital?.available === true;
@@ -50,6 +164,478 @@ export function deriveLayer(record) {
   const maximum = Math.max(0, ...scores.map(({ score }) => score));
   const winners = scores.filter(({ score }) => score === maximum && score > 0);
   return winners.length === 1 ? winners[0].id : 'mixed_other';
+}
+
+function digitalNodeMap(taxonomy = DIGITAL_TAXONOMY) {
+  return new Map((taxonomy.nodes ?? []).map((node) => [node.id, node]));
+}
+
+function digitalChildrenByParent(taxonomy = DIGITAL_TAXONOMY) {
+  const children = new Map();
+  for (const node of taxonomy.nodes ?? []) {
+    if (node.parent_id === null || node.parent_id === undefined) continue;
+    if (!children.has(node.parent_id)) children.set(node.parent_id, []);
+    children.get(node.parent_id).push(node);
+  }
+  for (const values of children.values()) {
+    values.sort((left, right) => left.order - right.order || left.id.localeCompare(right.id));
+  }
+  return children;
+}
+
+function digitalThemeMap(taxonomy = DIGITAL_TAXONOMY) {
+  const map = new Map();
+  for (const node of taxonomy.nodes ?? []) {
+    for (const theme of Array.isArray(node.themes) ? node.themes : []) {
+      map.set(theme, node.id);
+    }
+  }
+  return map;
+}
+
+function digitalParentPath(nodeId, taxonomy = DIGITAL_TAXONOMY) {
+  const nodes = digitalNodeMap(taxonomy);
+  const path = [];
+  let current = nodes.get(nodeId);
+  const seen = new Set();
+  while (current) {
+    if (seen.has(current.id)) return null;
+    seen.add(current.id);
+    path.unshift(current.id);
+    if (current.parent_id === null || current.parent_id === undefined) break;
+    current = nodes.get(current.parent_id);
+  }
+  return path[0] === taxonomy.root_id ? Object.freeze(path) : null;
+}
+
+export function serializeDigitalPath(path = DIGITAL_ROOT_PATH) {
+  const parts = Array.isArray(path) ? path : String(path ?? '').split('/');
+  const cleaned = parts.map((part) => String(part ?? '').trim()).filter(Boolean);
+  return cleaned.length ? cleaned.join('/') : DIGITAL_ROOT_ID;
+}
+
+export function digitalPathFromLegacyLayer(layerId, taxonomy = DIGITAL_TAXONOMY) {
+  const alias = (taxonomy.legacy_layer_aliases ?? []).find((entry) => entry.alias === layerId);
+  return alias ? Object.freeze([...alias.target_path]) : null;
+}
+
+export function normalizeDigitalPath(value = '', { taxonomy = DIGITAL_TAXONOMY } = {}) {
+  const root = Object.freeze([taxonomy.root_id ?? DIGITAL_ROOT_ID]);
+  const fail = (reason) => Object.freeze({
+    valid: false,
+    reason,
+    path: root,
+    pathKey: serializeDigitalPath(root),
+    nodeId: root[0],
+  });
+  const isArray = Array.isArray(value);
+  const serialized = isArray ? null : String(value ?? '');
+  // Only an absent/empty value denotes the root; every explicit slash must separate two canonical segments.
+  if (!isArray && serialized === '') {
+    return Object.freeze({ valid: true, reason: 'root', path: root, pathKey: serializeDigitalPath(root), nodeId: root[0] });
+  }
+  const parts = isArray ? value.map((part) => String(part ?? '')) : serialized.split('/');
+  if (!parts.length || parts.some((part) => part.length === 0 || part !== part.trim())) return fail('empty-or-whitespace-segment');
+  if (parts.some((part) => part === '.' || part === '..' || !DIGITAL_ID_PATTERN.test(part))) return fail('invalid-segment');
+  if (parts[0] !== (taxonomy.root_id ?? DIGITAL_ROOT_ID)) return fail('wrong-root');
+
+  const nodes = digitalNodeMap(taxonomy);
+  let current = nodes.get(parts[0]);
+  if (!current) return fail('missing-root');
+  for (const part of parts.slice(1)) {
+    const next = nodes.get(part);
+    if (!next || next.parent_id !== current.id) return fail('unknown-child');
+    current = next;
+  }
+  const path = Object.freeze([...parts]);
+  return Object.freeze({
+    valid: true,
+    reason: 'matched',
+    path,
+    pathKey: serializeDigitalPath(path),
+    nodeId: current.id,
+  });
+}
+
+function explicitFieldIds(taxonomy = DIGITAL_TAXONOMY) {
+  return (taxonomy.nodes ?? [])
+    .filter((node) => node.parent_id === taxonomy.root_id && node.type === 'field')
+    .sort((left, right) => left.order - right.order)
+    .map((node) => node.id);
+}
+
+export function validateDigitalTaxonomy(taxonomy = DIGITAL_TAXONOMY) {
+  const errors = [];
+  if (taxonomy.schema_version !== 1) errors.push('digital taxonomy schema_version must be 1');
+  if (taxonomy.kind !== 'commonworld_digital_ring_bundle_taxonomy') errors.push('digital taxonomy kind mismatch');
+  if (taxonomy.version !== DIGITAL_TAXONOMY_VERSION) errors.push('digital taxonomy version mismatch');
+  if (!Array.isArray(taxonomy.levels) || taxonomy.levels.join('>') !== 'sphere>field>network>identity') errors.push('digital taxonomy levels must be sphere > field > network > identity');
+  const nodes = Array.isArray(taxonomy.nodes) ? taxonomy.nodes : [];
+  if (!nodes.length) errors.push('digital taxonomy nodes must be a non-empty array');
+  const nodeIds = nodes.map((node) => node?.id);
+  if (new Set(nodeIds).size !== nodeIds.length) errors.push('digital taxonomy node ids must be unique');
+  const nodeMap = digitalNodeMap(taxonomy);
+  const roots = nodes.filter((node) => node.parent_id === null);
+  if (roots.length !== 1 || roots[0]?.id !== taxonomy.root_id || roots[0]?.type !== 'sphere') errors.push('digital taxonomy must have exactly one sphere root');
+  for (const node of nodes) {
+    if (!DIGITAL_ID_PATTERN.test(node.id ?? '')) errors.push(`digital taxonomy node id is not stable ASCII: ${node.id}`);
+    if (!['sphere', 'field', 'network', 'interface', 'diagnostic'].includes(node.type)) errors.push(`digital taxonomy node has invalid type: ${node.id}`);
+    if (typeof node.label_de !== 'string' || !node.label_de.trim()) errors.push(`digital taxonomy node lacks German label: ${node.id}`);
+    if (!Number.isInteger(node.order) || node.order < 0) errors.push(`digital taxonomy node lacks stable order: ${node.id}`);
+    if (node.parent_id !== null && !nodeMap.has(node.parent_id)) errors.push(`digital taxonomy node has missing parent: ${node.id}`);
+  }
+  for (const [parentId, children] of digitalChildrenByParent(taxonomy)) {
+    const orders = children.map((node) => node.order);
+    if (new Set(orders).size !== orders.length) errors.push(`digital taxonomy sibling order is not unique below ${parentId}`);
+  }
+  for (const node of nodes) {
+    const seen = new Set();
+    let current = node;
+    while (current?.parent_id !== null && current?.parent_id !== undefined) {
+      if (seen.has(current.id)) {
+        errors.push(`digital taxonomy contains a cycle at ${node.id}`);
+        break;
+      }
+      seen.add(current.id);
+      current = nodeMap.get(current.parent_id);
+    }
+  }
+  const fieldIds = explicitFieldIds(taxonomy);
+  if (fieldIds.join('|') !== 'knowledge_learning_culture|software_tools_production|communication_networks|provision_land_ecology|cooperation_self_organization') {
+    errors.push('digital taxonomy must expose exactly the five canonical main fields');
+  }
+
+  const themeOwners = new Map();
+  for (const node of nodes) {
+    for (const theme of Array.isArray(node.themes) ? node.themes : []) {
+      if (themeOwners.has(theme)) errors.push(`digital taxonomy theme has multiple owners: ${theme}`);
+      themeOwners.set(theme, node.id);
+    }
+  }
+  const compoundThemes = new Set();
+  for (const rule of taxonomy.compound_rules ?? []) {
+    if (!DIGITAL_ID_PATTERN.test(rule.id ?? '')) errors.push(`digital taxonomy compound rule id is invalid: ${rule.id}`);
+    if (!nodeMap.has(rule.target_node_id)) errors.push(`digital taxonomy compound rule targets missing node: ${rule.id}`);
+    const allThemes = Array.isArray(rule.all_themes) ? rule.all_themes : [];
+    if (!allThemes.length) errors.push(`digital taxonomy compound rule has no themes: ${rule.id}`);
+    for (const theme of allThemes) {
+      if (!themeOwners.has(theme)) errors.push(`digital taxonomy compound rule references unknown theme: ${rule.id}:${theme}`);
+      compoundThemes.add(theme);
+    }
+  }
+  const tieKeys = new Set();
+  for (const rule of taxonomy.tie_rules ?? []) {
+    if (!DIGITAL_ID_PATTERN.test(rule.id ?? '')) errors.push(`digital taxonomy tie rule id is invalid: ${rule.id}`);
+    if (!nodeMap.has(rule.target_node_id)) errors.push(`digital taxonomy tie rule targets missing node: ${rule.id}`);
+    const candidates = Array.isArray(rule.candidate_node_ids) ? [...rule.candidate_node_ids].sort() : [];
+    if (candidates.length < 2 || candidates.some((id) => !nodeMap.has(id))) errors.push(`digital taxonomy tie rule candidates are invalid: ${rule.id}`);
+    const key = candidates.join('|');
+    if (tieKeys.has(key)) errors.push(`digital taxonomy duplicate tie rule candidate set: ${key}`);
+    tieKeys.add(key);
+  }
+  const aliases = Array.isArray(taxonomy.legacy_layer_aliases) ? taxonomy.legacy_layer_aliases : [];
+  const aliasIds = aliases.map((alias) => alias?.alias);
+  if (new Set(aliasIds).size !== aliasIds.length) errors.push('digital taxonomy legacy aliases must be unique');
+  for (const alias of aliases) {
+    if (!LAYERS.some(({ id }) => id === alias.alias)) errors.push(`digital taxonomy legacy alias is not an old layer id: ${alias.alias}`);
+    const normalized = normalizeDigitalPath(alias.target_path, { taxonomy });
+    if (!normalized.valid) errors.push(`digital taxonomy legacy alias target is invalid: ${alias.alias}`);
+    if (typeof alias.reason !== 'string' || !alias.reason.trim()) errors.push(`digital taxonomy legacy alias lacks reason: ${alias.alias}`);
+    if (alias.alias === 'mixed_other' && (normalized.pathKey !== taxonomy.root_id || alias.broad_alias_without_filter !== true)) {
+      errors.push('digital taxonomy legacy mixed_other alias must orient to the unfiltered root');
+    }
+  }
+  for (const layer of LAYERS) {
+    if (!aliases.some((alias) => alias.alias === layer.id)) errors.push(`digital taxonomy missing legacy alias for ${layer.id}`);
+  }
+  if (!nodeMap.has(taxonomy.unknown_theme_node_id)) errors.push('digital taxonomy unknown-theme diagnostic node is missing');
+  return Object.freeze(errors);
+}
+
+function candidateFieldId(nodeId, taxonomy = DIGITAL_TAXONOMY) {
+  const nodes = digitalNodeMap(taxonomy);
+  let current = nodes.get(nodeId);
+  while (current && current.parent_id !== null && current.parent_id !== taxonomy.root_id) current = nodes.get(current.parent_id);
+  return current?.type === 'field' ? current.id : null;
+}
+
+function addCandidate(candidates, nodeId, score, matchedThemes, source) {
+  const existing = candidates.get(nodeId);
+  if (!existing || existing.score < score) {
+    const previousThemes = existing ? [...existing.matchedThemes] : [];
+    const previousSources = existing ? [...existing.sources] : [];
+    candidates.set(nodeId, { nodeId, score, matchedThemes: new Set([...previousThemes, ...matchedThemes]), sources: new Set([...previousSources, source]) });
+    return;
+  }
+  if (source.startsWith('theme:') && [...existing.sources].every((entry) => entry.startsWith('theme:'))) {
+    existing.score += score;
+    for (const theme of matchedThemes) existing.matchedThemes.add(theme);
+    existing.sources.add(source);
+    return;
+  }
+  if (existing.score === score) {
+    for (const theme of matchedThemes) existing.matchedThemes.add(theme);
+    existing.sources.add(source);
+  }
+}
+
+function freezeDerivation(result) {
+  return Object.freeze({
+    ...result,
+    path: result.path ? Object.freeze([...result.path]) : null,
+    unknownThemes: Object.freeze([...(result.unknownThemes ?? [])]),
+    matchedThemes: Object.freeze([...(result.matchedThemes ?? [])]),
+    candidateNodeIds: Object.freeze([...(result.candidateNodeIds ?? [])]),
+  });
+}
+
+export function deriveDigitalProjectPath(record, { taxonomy = DIGITAL_TAXONOMY } = {}) {
+  if (!hasDigitalPresence(record)) return null;
+  const rawThemes = Array.isArray(record?.themes) ? record.themes : [];
+  const themes = Object.freeze([...new Set(rawThemes.filter((theme) => typeof theme === 'string'))].sort());
+  const themeMap = digitalThemeMap(taxonomy);
+  const unknownThemes = themes.filter((theme) => !themeMap.has(theme));
+  const candidates = new Map();
+
+  for (const theme of themes) {
+    const nodeId = themeMap.get(theme);
+    if (nodeId) addCandidate(candidates, nodeId, 1, [theme], `theme:${theme}`);
+  }
+  const themeSet = new Set(themes);
+  for (const rule of taxonomy.compound_rules ?? []) {
+    const allThemes = Array.isArray(rule.all_themes) ? rule.all_themes : [];
+    if (allThemes.length && allThemes.every((theme) => themeSet.has(theme))) {
+      addCandidate(candidates, rule.target_node_id, allThemes.length + 1, allThemes, `compound:${rule.id}`);
+    }
+  }
+  if (candidates.size === 0) {
+    const path = digitalParentPath(taxonomy.unknown_theme_node_id, taxonomy) ?? DIGITAL_ROOT_PATH;
+    return freezeDerivation({
+      status: 'unclassified',
+      reason: 'no-known-digital-theme',
+      path,
+      pathKey: serializeDigitalPath(path),
+      nodeId: taxonomy.unknown_theme_node_id,
+      matchedThemes: [],
+      unknownThemes,
+      candidateNodeIds: [],
+    });
+  }
+
+  const maximum = Math.max(...[...candidates.values()].map(({ score }) => score));
+  let winners = [...candidates.values()].filter(({ score }) => score === maximum);
+  if (winners.length > 1) {
+    const winnerIds = winners.map(({ nodeId }) => nodeId).sort();
+    const exactTie = (taxonomy.tie_rules ?? []).find((rule) => {
+      const candidatesForRule = [...(rule.candidate_node_ids ?? [])].sort();
+      return candidatesForRule.length === winnerIds.length && candidatesForRule.every((id, index) => id === winnerIds[index]);
+    });
+    if (exactTie) {
+      const matched = [...new Set(winners.flatMap(({ matchedThemes }) => [...matchedThemes]))].sort();
+      winners = [{ nodeId: exactTie.target_node_id, score: maximum, matchedThemes: new Set(matched), sources: new Set([`tie:${exactTie.id}`]) }];
+    } else {
+      const fields = [...new Set(winnerIds.map((nodeId) => candidateFieldId(nodeId, taxonomy)).filter(Boolean))];
+      const fallback = fields.length === 1 ? taxonomy.same_field_tie_fallbacks?.[fields[0]] : null;
+      if (fallback) {
+        const matched = [...new Set(winners.flatMap(({ matchedThemes }) => [...matchedThemes]))].sort();
+        winners = [{ nodeId: fallback, score: maximum, matchedThemes: new Set(matched), sources: new Set([`same-field:${fields[0]}`]) }];
+      }
+    }
+  }
+  if (winners.length !== 1) {
+    const path = digitalParentPath(taxonomy.unknown_theme_node_id, taxonomy) ?? DIGITAL_ROOT_PATH;
+    return freezeDerivation({
+      status: 'unclassified',
+      reason: 'unresolved-theme-tie',
+      path,
+      pathKey: serializeDigitalPath(path),
+      nodeId: taxonomy.unknown_theme_node_id,
+      matchedThemes: [],
+      unknownThemes,
+      candidateNodeIds: winners.map(({ nodeId }) => nodeId).sort(),
+    });
+  }
+  const winner = winners[0];
+  const path = digitalParentPath(winner.nodeId, taxonomy) ?? DIGITAL_ROOT_PATH;
+  return freezeDerivation({
+    status: unknownThemes.length ? 'classified_with_unknown_theme_diagnostic' : 'classified',
+    reason: [...winner.sources].sort().join('+'),
+    path,
+    pathKey: serializeDigitalPath(path),
+    nodeId: winner.nodeId,
+    matchedThemes: [...winner.matchedThemes].sort(),
+    unknownThemes,
+    candidateNodeIds: [winner.nodeId],
+  });
+}
+
+export function digitalPathContainsRecord(path, record, { taxonomy = DIGITAL_TAXONOMY } = {}) {
+  const normalized = normalizeDigitalPath(path, { taxonomy });
+  if (!normalized.valid || normalized.path.length === 1) return true;
+  if (!hasDigitalPresence(record)) return false;
+  const derived = deriveDigitalProjectPath(record, { taxonomy });
+  if (!derived?.path) return false;
+  return normalized.path.every((segment, index) => derived.path[index] === segment);
+}
+
+function freezeDigitalTreeNode(node) {
+  node.identityIds = Object.freeze([...node.identityIds].sort());
+  node.directIdentityIds = Object.freeze([...node.directIdentityIds].sort());
+  node.children = Object.freeze(node.children);
+  node.identityCount = node.identityIds.length;
+  node.directIdentityCount = node.directIdentityIds.length;
+  node.childIdentityCount = new Set(node.children.flatMap((child) => child.identityIds)).size;
+  return Object.freeze(node);
+}
+
+const digitalTreeCache = new WeakMap();
+let digitalTreeConstructionCount = 0;
+
+export function digitalPresentationTreeConstructionCount() {
+  return digitalTreeConstructionCount;
+}
+
+export function buildDigitalPresentationTree(records = [], { taxonomy = DIGITAL_TAXONOMY } = {}) {
+  const sourceRecords = Array.isArray(records) ? records : [];
+  let treesByTaxonomy = digitalTreeCache.get(sourceRecords);
+  const cached = treesByTaxonomy?.get(taxonomy);
+  if (cached) return cached;
+  digitalTreeConstructionCount += 1;
+  const nodeMap = digitalNodeMap(taxonomy);
+  const pathById = new Map();
+  for (const node of taxonomy.nodes ?? []) {
+    pathById.set(node.id, digitalParentPath(node.id, taxonomy));
+  }
+  const treeNodes = new Map();
+  for (const node of taxonomy.nodes ?? []) {
+    const path = pathById.get(node.id);
+    if (!path) continue;
+    const pathKey = serializeDigitalPath(path);
+    const parentPath = node.parent_id === null ? null : pathById.get(node.parent_id);
+    treeNodes.set(pathKey, {
+      id: node.id,
+      nodeId: node.id,
+      type: node.type,
+      label: node.label_de,
+      order: node.order,
+      path,
+      pathKey,
+      parentId: node.parent_id,
+      parentPathKey: parentPath ? serializeDigitalPath(parentPath) : null,
+      themes: Object.freeze([...(node.themes ?? [])]),
+      identityIds: new Set(),
+      directIdentityIds: new Set(),
+      children: [],
+    });
+  }
+  const diagnostics = [];
+  const recordsById = new Map();
+  for (const record of sourceRecords) {
+    if (!record?.id || recordsById.has(record.id)) continue;
+    recordsById.set(record.id, record);
+    const derived = deriveDigitalProjectPath(record, { taxonomy });
+    if (!derived) continue;
+    const parentPathKey = derived.pathKey;
+    const parent = treeNodes.get(parentPathKey);
+    if (!parent) continue;
+    const identityPath = Object.freeze([...derived.path, record.id]);
+    const identityPathKey = serializeDigitalPath(identityPath);
+    const identityNode = {
+      id: record.id,
+      nodeId: record.id,
+      type: 'identity',
+      label: record.title ?? record.id,
+      order: 0,
+      path: identityPath,
+      pathKey: identityPathKey,
+      parentId: parent.id,
+      parentPathKey,
+      projectId: record.id,
+      themes: Object.freeze([]),
+      identityIds: new Set([record.id]),
+      directIdentityIds: new Set([record.id]),
+      children: [],
+      derivation: derived,
+    };
+    treeNodes.set(identityPathKey, identityNode);
+    parent.children.push(identityNode);
+    parent.directIdentityIds.add(record.id);
+    for (let index = 1; index <= derived.path.length; index += 1) {
+      treeNodes.get(serializeDigitalPath(derived.path.slice(0, index)))?.identityIds.add(record.id);
+    }
+    if (derived.status !== 'classified') diagnostics.push(Object.freeze({ projectId: record.id, status: derived.status, unknownThemes: derived.unknownThemes, candidateNodeIds: derived.candidateNodeIds }));
+  }
+  for (const node of treeNodes.values()) {
+    if (node.type === 'identity') continue;
+    const staticChildren = (digitalChildrenByParent(taxonomy).get(node.id) ?? [])
+      .map((child) => treeNodes.get(serializeDigitalPath(pathById.get(child.id))))
+      .filter(Boolean);
+    const identityChildren = node.children
+      .filter((child) => child.type === 'identity')
+      .sort((left, right) => left.label.localeCompare(right.label, 'de') || left.id.localeCompare(right.id));
+    node.children = [...staticChildren, ...identityChildren];
+  }
+  const frozenNodes = new Map();
+  const orderedNodes = [...treeNodes.values()].sort((left, right) => left.pathKey.localeCompare(right.pathKey));
+  for (const node of orderedNodes) frozenNodes.set(node.pathKey, freezeDigitalTreeNode(node));
+  const rootPathKey = serializeDigitalPath([taxonomy.root_id]);
+  const tree = Object.freeze({
+    taxonomyVersion: taxonomy.version,
+    rootPath: Object.freeze([taxonomy.root_id]),
+    rootPathKey,
+    nodesByPath: frozenNodes,
+    recordsById,
+    identityIds: frozenNodes.get(rootPathKey)?.identityIds ?? Object.freeze([]),
+    diagnostics: Object.freeze(diagnostics),
+  });
+  if (!treesByTaxonomy) {
+    treesByTaxonomy = new WeakMap();
+    digitalTreeCache.set(sourceRecords, treesByTaxonomy);
+  }
+  treesByTaxonomy.set(taxonomy, tree);
+  return tree;
+}
+
+export function visibleDigitalNodes(tree, currentPath = DIGITAL_ROOT_PATH, { includeEmpty = false, identityLimit = Infinity } = {}) {
+  const rootPathKey = tree?.rootPathKey ?? serializeDigitalPath(DIGITAL_ROOT_PATH);
+  const normalized = normalizeDigitalPath(currentPath);
+  const requested = normalized.valid ? normalized.pathKey : rootPathKey;
+  const current = tree?.nodesByPath?.get(requested) ?? tree?.nodesByPath?.get(rootPathKey) ?? null;
+  if (!current) return Object.freeze({ current: null, parent: null, breadcrumb: Object.freeze([]), children: Object.freeze([]) });
+  const breadcrumb = current.path
+    .map((_, index) => tree.nodesByPath.get(serializeDigitalPath(current.path.slice(0, index + 1))))
+    .filter(Boolean);
+  let children = current.children.filter((child) => includeEmpty || child.identityCount > 0 || child.type === 'identity');
+  if (
+    children.length
+    && children.every((child) => child.type === 'identity')
+    && Number.isFinite(identityLimit)
+    && identityLimit >= 0
+  ) {
+    children = children.slice(0, identityLimit);
+  }
+  return Object.freeze({
+    current,
+    parent: current.parentPathKey ? tree.nodesByPath.get(current.parentPathKey) ?? null : null,
+    breadcrumb: Object.freeze(breadcrumb),
+    children: Object.freeze(children),
+  });
+}
+
+export function digitalPathLabel(path, { taxonomy = DIGITAL_TAXONOMY, includeRoot = false } = {}) {
+  const normalized = normalizeDigitalPath(path, { taxonomy });
+  const nodes = digitalNodeMap(taxonomy);
+  const labels = normalized.path
+    .map((nodeId) => nodes.get(nodeId))
+    .filter((node) => node && (includeRoot || node.id !== taxonomy.root_id))
+    .map((node) => node.label_de);
+  return labels.join(' › ');
+}
+
+export function recordDigitalPathLabel(record, { taxonomy = DIGITAL_TAXONOMY } = {}) {
+  const derived = deriveDigitalProjectPath(record, { taxonomy });
+  if (!derived) return '';
+  return digitalPathLabel(derived.path, { taxonomy });
 }
 
 
@@ -150,11 +736,19 @@ export function stateFromSearch(search = '', knownProjectIds = []) {
   const known = new Set(knownProjectIds);
   const project = parameters.get('project');
   const layer = parameters.get('layer');
+  const requestedDigitalPath = parameters.get('digital_path');
+  const hasExplicitDigitalPath = parameters.has('digital_path');
+  const normalizedDigitalPath = hasExplicitDigitalPath ? normalizeDigitalPath(requestedDigitalPath) : null;
+  const validLayer = LAYERS.some((entry) => entry.id === layer) ? layer : null;
+  const digitalPath = hasExplicitDigitalPath
+    ? normalizedDigitalPath.path
+    : (digitalPathFromLegacyLayer(layer) ?? DIGITAL_ROOT_PATH);
   const presence = normalizedPresenceFilters(parameters.getAll('presence'));
   return {
     camera: cameraFromSearch(search),
     project: project && known.has(project) ? project : null,
-    layer: LAYERS.some((entry) => entry.id === layer) ? layer : null,
+    layer: hasExplicitDigitalPath ? null : validLayer,
+    digitalPath,
     view: parameters.get('view') === 'layers' ? 'layers' : 'globe',
     surface: parameters.get('surface') === 'text' ? 'text' : 'globe',
     query: normalizeQuery(parameters.get('q')),
@@ -179,7 +773,13 @@ export function searchFromState(state) {
   if (Math.abs(finite(camera.pitch, 0)) >= 0.05) parameters.set('p', serializedNumber(clamp(finite(camera.pitch, 0), 0, 70), 1));
   if (state?.view === 'layers') parameters.set('view', 'layers');
   if (state?.surface === 'text') parameters.set('surface', 'text');
-  if (state?.layer && LAYERS.some((entry) => entry.id === state.layer)) parameters.set('layer', state.layer);
+  const legacyLayer = LAYERS.some(({ id }) => id === state?.layer) ? state.layer : null;
+  if (legacyLayer) {
+    parameters.set('layer', legacyLayer);
+  } else {
+    const normalizedDigitalPath = normalizeDigitalPath(state?.digitalPath ?? DIGITAL_ROOT_PATH);
+    if (normalizedDigitalPath.valid && normalizedDigitalPath.path.length > 1) parameters.set('digital_path', normalizedDigitalPath.pathKey);
+  }
   if (state?.project) parameters.set('project', state.project);
   const query = normalizeQuery(state?.query);
   if (query) parameters.set('q', query);
@@ -235,6 +835,27 @@ const THEME_INTENT_TERMS = Object.freeze({
   housing: Object.freeze(['wohnen', 'wohnraum']),
   'community-land': Object.freeze(['gemeinschaftsland', 'gemeinschaftlicher boden']),
   'shared-space': Object.freeze(['gemeinschaftsraum', 'gemeinsamer raum']),
+  agriculture: Object.freeze(['landwirtschaft']),
+  seeds: Object.freeze(['saatgut']),
+  food: Object.freeze(['ernährung', 'lebensmittel']),
+  water: Object.freeze(['wasser']),
+  irrigation: Object.freeze(['bewässerung']),
+  energy: Object.freeze(['energie']),
+  'renewable-energy': Object.freeze(['erneuerbare energie']),
+  health: Object.freeze(['gesundheit']),
+  'open-knowledge': Object.freeze(['offenes wissen']),
+  'software-infrastructure': Object.freeze(['software infrastruktur']),
+  'open-hardware': Object.freeze(['offene hardware']),
+  'distributed-manufacturing': Object.freeze(['verteilte produktion']),
+  'commons-governance': Object.freeze(['commons governance', 'selbstverwaltung']),
+  'cooperative-economy': Object.freeze(['kooperative ökonomie', 'genossenschaftlich']),
+  'community-ownership': Object.freeze(['gemeinschaftseigentum']),
+  cooperative: Object.freeze(['genossenschaft']),
+  'civic-tech': Object.freeze(['civic tech', 'digitale selbstorganisation']),
+  network: Object.freeze(['netzwerk']),
+  'rural-infrastructure': Object.freeze(['ländliche infrastruktur']),
+  'digital-equity': Object.freeze(['digitaler zugang']),
+  'digital-literacy': Object.freeze(['digitale bildung']),
 });
 
 const PRESENCE_INTENT_TERMS = Object.freeze({
@@ -371,7 +992,9 @@ function recordFreshness(record, today) {
 }
 
 export function recordMatchesIntentFilters(record, filters = {}, today = new Date().toISOString().slice(0, 10)) {
-  if (filters.layer && deriveLayer(record) !== filters.layer) return false;
+  if (filters.layer) {
+    if (deriveLayer(record) !== filters.layer) return false;
+  } else if (filters.digitalPath && !digitalPathContainsRecord(filters.digitalPath, record)) return false;
 
   if (Array.isArray(filters.presence) && filters.presence.length > 0) {
     if (filters.presence.includes('geographic') && publicGeographicLocations(record).length === 0) return false;
@@ -417,6 +1040,7 @@ export function prepareIntentSearchIndex(records, { cacheLimit = INTENT_SEARCH_C
   const normalizedTitles = new Map();
   const boundedCacheLimit = Math.max(1, Number.isInteger(cacheLimit) ? cacheLimit : INTENT_SEARCH_CACHE_LIMIT);
   const cache = new Map();
+  let fullCatalogueScanCount = 0;
 
   for (const record of sourceRecords) {
     normalizedTitles.set(record.id, normalizeSearchText(record.title));
@@ -453,10 +1077,10 @@ export function prepareIntentSearchIndex(records, { cacheLimit = INTENT_SEARCH_C
     return combined.size ? combined : null;
   };
 
-  const search = ({ query = '', filters = {}, limit = INTENT_SEARCH_RESULT_LIMIT, today = new Date().toISOString().slice(0, 10) } = {}) => {
+  const search = ({ query = '', filters = {}, limit = INTENT_SEARCH_RESULT_LIMIT, all = false, today = new Date().toISOString().slice(0, 10) } = {}) => {
     const normalizedQuery = normalizeSearchText(query);
-    const boundedLimit = Math.max(1, Math.min(200, Number.isInteger(limit) ? limit : INTENT_SEARCH_RESULT_LIMIT));
-    const cacheKey = JSON.stringify([normalizedQuery, filters, boundedLimit, today]);
+    const boundedLimit = all ? Infinity : Math.max(1, Math.min(200, Number.isInteger(limit) ? limit : INTENT_SEARCH_RESULT_LIMIT));
+    const cacheKey = JSON.stringify([normalizedQuery, filters, all ? 'all' : boundedLimit, today]);
     if (cache.has(cacheKey)) return cache.get(cacheKey);
 
     const queryGroups = [];
@@ -481,6 +1105,7 @@ export function prepareIntentSearchIndex(records, { cacheLimit = INTENT_SEARCH_C
       }
     }
 
+    if (candidates === null) fullCatalogueScanCount += 1;
     const selectedRecords = candidates === null
       ? sourceRecords.map((record) => ({ record, score: 0, reasons: new Set() }))
       : [...candidates].map(([identifier, candidate]) => ({ record: recordsById.get(identifier), ...candidate }));
@@ -492,8 +1117,9 @@ export function prepareIntentSearchIndex(records, { cacheLimit = INTENT_SEARCH_C
         const phraseBonus = normalizedQuery && title === normalizedQuery ? 300 : (normalizedQuery && title.startsWith(normalizedQuery) ? 160 : 0);
         return freezeSearchResult({ id: record.id, record, score: score + phraseBonus, reasons: [...reasons] });
       })
-      .sort((left, right) => right.score - left.score || left.record.title.localeCompare(right.record.title, 'de') || left.id.localeCompare(right.id))
-      .slice(0, boundedLimit);
+      .sort((left, right) => right.score - left.score || left.record.title.localeCompare(right.record.title, 'de') || left.id.localeCompare(right.id));
+
+    if (Number.isFinite(boundedLimit)) results.splice(boundedLimit);
 
     const frozen = Object.freeze(results);
     cache.set(cacheKey, frozen);
@@ -508,10 +1134,13 @@ export function prepareIntentSearchIndex(records, { cacheLimit = INTENT_SEARCH_C
     recordsById,
     search,
     matchingRecords(options = {}) {
-      return Object.freeze(search(options).map(({ record }) => record));
+      return Object.freeze(search({ ...options, all: options.all !== false }).map(({ record }) => record));
     },
     cacheSize() {
       return cache.size;
+    },
+    fullCatalogueScanCount() {
+      return fullCatalogueScanCount;
     },
   });
 }
@@ -522,6 +1151,7 @@ export function filterRecords(records, state = {}) {
       query: state.query,
       filters: {
         layer: state.layer ?? null,
+        digitalPath: state.digitalPath ?? null,
         presence: state.presence ?? null,
         action: state.action ?? null,
         language: state.language ?? null,
@@ -529,7 +1159,7 @@ export function filterRecords(records, state = {}) {
         freshness: state.freshness ?? null,
         curation: state.curation ?? null,
       },
-      limit: Math.max(INTENT_SEARCH_RESULT_LIMIT, state.limit ?? INTENT_SEARCH_RESULT_LIMIT),
+      all: true,
       today: state.today,
     });
   }
@@ -544,8 +1174,8 @@ export function filterRecords(records, state = {}) {
 export function recordPresentationLabel(record) {
   const isGeo = publicGeographicLocations(record).length > 0;
   const isDigital = hasDigitalPresence(record);
-  const layer = deriveLayer(record);
-  const digitalLabel = `Digital${layer ? ` · ${LAYERS.find(({ id }) => id === layer)?.label ?? 'Digitale Commons'}` : ''}`;
+  const pathLabel = recordDigitalPathLabel(record);
+  const digitalLabel = `Digital${pathLabel ? ` · ${pathLabel}` : ''}`;
 
   if (isGeo && isDigital) return `Vor Ort · ${digitalLabel}`;
   if (isGeo) return 'Vor Ort';
