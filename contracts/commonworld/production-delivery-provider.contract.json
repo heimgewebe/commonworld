@@ -136,7 +136,34 @@
     "pages_live_check": "make smoke-pages-live",
     "dns_check": "make check-pages-dns-target",
     "provider_check": "browser and operational smoke must confirm tiles.openfreemap.org reachability without converting reachability into an SLA claim",
-    "telemetry": "none"
+    "telemetry": "none",
+    "pages_production_readback": {
+      "workflow": ".github/workflows/production-readback.yml",
+      "trigger": [
+        "push_to_main",
+        "workflow_dispatch"
+      ],
+      "deployment_environment": "github-pages",
+      "commit_binding": "exact_sha",
+      "deployment_timeout_seconds": 600,
+      "deployment_poll_seconds": 10,
+      "live_request_timeout_seconds": 5,
+      "live_retry_delays_seconds": [
+        0,
+        30,
+        90
+      ],
+      "receipt_id": "commonworld.pages-production-readback.v1",
+      "receipt_artifact_retention_days": 30,
+      "automatic_rollback": false,
+      "exact_public_files": [
+        "index.html",
+        "propose.html",
+        "catalog/catalog.json"
+      ],
+      "source_ref": "main",
+      "superseded_result": "receipt_without_live_claim_and_non_failure_exit"
+    }
   },
   "reevaluation_triggers": [
     "monthly bandwidth approaches the GitHub Pages 100 GiB soft limit",

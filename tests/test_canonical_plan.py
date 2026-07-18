@@ -30,6 +30,25 @@ class CanonicalPlanTests(unittest.TestCase):
 
         self.assertIn("canonical globe plan missing required token: ## Semantischer Zoom", errors)
 
+    def test_commit_bound_production_readback_is_required(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp_dir:
+            root = self.copy_repository_core(tmp_dir)
+            path = root / "docs" / "blueprints" / "commonworld-masterplan.md"
+            path.write_text(
+                path.read_text(encoding="utf-8").replace(
+                    "### Commitgebundener Produktions-Readback v1",
+                    "### Ungebundene Produktionsprüfung",
+                ),
+                encoding="utf-8",
+            )
+
+            errors = validate_canonical_plan(root)
+
+        self.assertIn(
+            "canonical globe plan missing required token: ### Commitgebundener Produktions-Readback v1",
+            errors,
+        )
+
     def test_parallel_blueprint_is_rejected(self) -> None:
         with tempfile.TemporaryDirectory() as tmp_dir:
             root = self.copy_repository_core(tmp_dir)

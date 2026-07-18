@@ -15,6 +15,8 @@ RESULT = Path("docs/research/production-delivery-provider-v1.result.json")
 STYLE = Path("assets/map/openfreemap-liberty.json")
 CATALOG = Path("catalog/catalog.json")
 PAGES_DOC = Path("docs/ops/pages-dns.md")
+PRODUCTION_READBACK_WORKFLOW = Path(".github/workflows/production-readback.yml")
+PRODUCTION_READBACK_SCRIPT = Path("scripts/verify_pages_deployment.py")
 EXPECTED_ACCEPTANCE = {
     "production-current-state",
     "production-provider-criteria",
@@ -58,7 +60,17 @@ def _style_origins(value: object) -> set[str]:
 
 def validate_production_delivery_provider(root: Path = ROOT) -> list[str]:
     errors: list[str] = []
-    required = (CONTRACT, VERTICAL, RESULT, STYLE, CATALOG, PAGES_DOC, Path("docs/research/evidence/public-maplibre-vertical-slice-v1.catalog.json"))
+    required = (
+        CONTRACT,
+        VERTICAL,
+        RESULT,
+        STYLE,
+        CATALOG,
+        PAGES_DOC,
+        PRODUCTION_READBACK_WORKFLOW,
+        PRODUCTION_READBACK_SCRIPT,
+        Path("docs/research/evidence/public-maplibre-vertical-slice-v1.catalog.json"),
+    )
     for path in required:
         if not (root / path).is_file():
             errors.append(f"missing production decision file: {path}")
@@ -149,6 +161,28 @@ def validate_production_delivery_provider(root: Path = ROOT) -> list[str]:
             errors.append(f"production failure contract missing: {key}")
     if "keep_linear_catalog" not in failure.get("provider_outage", ""):
         errors.append("provider outage must preserve the linear catalog")
+    monitoring = contract.get("monitoring", {})
+    readback = monitoring.get("pages_production_readback", {})
+    expected_readback = {
+        "workflow": PRODUCTION_READBACK_WORKFLOW.as_posix(),
+        "trigger": ["push_to_main", "workflow_dispatch"],
+        "deployment_environment": "github-pages",
+        "source_ref": "main",
+        "commit_binding": "exact_sha",
+        "deployment_timeout_seconds": 600,
+        "deployment_poll_seconds": 10,
+        "live_request_timeout_seconds": 5,
+        "live_retry_delays_seconds": [0, 30, 90],
+        "exact_public_files": ["index.html", "propose.html", "catalog/catalog.json"],
+        "receipt_id": "commonworld.pages-production-readback.v1",
+        "receipt_artifact_retention_days": 30,
+        "automatic_rollback": False,
+        "superseded_result": "receipt_without_live_claim_and_non_failure_exit",
+    }
+    for key, expected in expected_readback.items():
+        if readback.get(key) != expected:
+            errors.append(f"production readback boundary mismatch: {key}")
+
     migration = contract.get("migration", {})
     if migration.get("authorized") is not False or migration.get("requires_separate_reviewed_task") is not True:
         errors.append("production decision must not implicitly authorize migration")
@@ -191,7 +225,15 @@ def validate_production_delivery_provider(root: Path = ROOT) -> list[str]:
         errors.append("production result must not authorize migration")
 
     pages_doc = (root / PAGES_DOC).read_text(encoding="utf-8")
-    for phrase in ("Bounded production authorization", "100 GiB", "noncritical dependency", "separate reviewed task"):
+    for phrase in (
+        "Bounded production authorization",
+        "100 GiB",
+        "noncritical dependency",
+        "separate reviewed task",
+        "exact commit",
+        "commonworld.pages-production-readback.v1",
+        "no automatic rollback",
+    ):
         if phrase not in pages_doc:
             errors.append(f"Pages operations contract missing production boundary: {phrase}")
     return errors
