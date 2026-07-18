@@ -1357,11 +1357,28 @@ async function intentSearchDiscoveryScenario() {
   const digitalCamera = await mapCamera();
   await run.page.locator('#commons-search').fill('Debian');
   await run.page.waitForFunction(() => document.querySelectorAll('.discovery-result').length === 1);
+  await run.page.waitForFunction(() => new URL(location.href).searchParams.get('q') === 'Debian');
   await run.page.locator('.discovery-result-main').click();
   await run.page.waitForSelector('#project-focus:not([hidden])');
   assert((await run.page.locator('#focus-title').textContent()) === 'Debian', 'intent spatial: digital result did not open Debian');
   assert((await run.page.locator('.globe-stage').getAttribute('data-last-spatial-result')) === 'coordinate-free:debian', 'intent spatial: digital result was not kept coordinate-free');
   assert(sameCamera(digitalCamera, await mapCamera()), 'intent spatial: digital result moved the map');
+
+  await run.page.goBack();
+  await run.page.waitForFunction(() => new URL(location.href).searchParams.get('q') === 'Debian' && !new URL(location.href).searchParams.has('project'));
+  assert(await run.page.locator('#discovery-panel').isVisible(), 'intent project history: Back did not restore the search results');
+  assert(await run.page.locator('#project-focus').isHidden(), 'intent project history: Back retained the project overlay');
+
+  await run.page.goForward();
+  await run.page.waitForFunction(() => new URL(location.href).searchParams.get('q') === 'Debian' && new URL(location.href).searchParams.get('project') === 'debian');
+  await run.page.waitForFunction(() => (
+    document.activeElement === document.querySelector('#project-focus')
+    && document.activeElement.getClientRects().length > 0
+    && !document.activeElement.closest('[hidden], [inert], [aria-hidden="true"]')
+  ));
+  assert(await run.page.locator('#discovery-panel').isHidden(), 'intent project history: Forward reopened discovery over the restored project');
+  assert(await run.page.locator('#project-focus').isVisible(), 'intent project history: Forward did not restore the project overlay');
+  assert((await run.page.locator('#focus-title').textContent()) === 'Debian', 'intent project history: Forward restored the wrong project');
   await run.page.locator('#focus-close').click();
 
   await run.page.locator('#commons-search').fill('Anderlecht');

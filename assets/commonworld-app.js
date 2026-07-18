@@ -1743,7 +1743,7 @@ function applyDeepLink(search, { initial = false } = {}) {
     showLayerState();
   }
   renderDiscoveryState();
-  if (next.query || hasIntentFilters()) openDiscovery({ trigger: elements.search });
+  if ((next.query || hasIntentFilters()) && !runtime.state.project) openDiscovery({ trigger: elements.search });
   else closeDiscovery({ restoreFocus: false });
   runtime.applyingHistory = false;
   if (initial) writeHistory('replace');
