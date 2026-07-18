@@ -79,6 +79,8 @@ test('layer derivation uses catalog themes without overrides', () => {
 test('external catalogue links require canonical credential-free HTTPS URLs', () => {
   assert.equal(safeExternalHttpsUrl('https://example.org/path?q=commons'), 'https://example.org/path?q=commons');
   assert.equal(safeExternalHttpsUrl('https://EXAMPLE.org:443/a/../b'), 'https://example.org/b');
+  assert.equal(safeExternalHttpsUrl('https://xn--bcher-kva.example.com'), 'https://xn--bcher-kva.example.com/');
+  assert.equal(safeExternalHttpsUrl('https://example.org:8443/path'), 'https://example.org:8443/path');
   for (const value of [
     null,
     42,

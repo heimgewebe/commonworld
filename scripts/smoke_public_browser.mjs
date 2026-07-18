@@ -1685,6 +1685,41 @@ async function legacyLayerAndAtomicFocusScenario() {
   results.push({ id: 'legacy-layer-and-atomic-focus', verdict: 'PASS', backForwardFocus: true, textHierarchyFocus: true, keyboardPath: true });
 }
 
+async function validEmptyDigitalPathScenario() {
+  process.stdout.write(`${JSON.stringify({ state: 'RUNNING', scenario: 'valid-empty-digital-path' })}\n`);
+  const path = 'sphere/provision_land_ecology/water_irrigation';
+  const run = await newPage({ reducedMotion: 'reduce' });
+  await run.page.goto(`${baseUrl}/?surface=text&digital_path=${path}`, { waitUntil: 'domcontentloaded' });
+  await run.page.waitForSelector('html.runtime-ready');
+  await run.page.waitForFunction((expectedPath) => document.querySelector('.globe-stage')?.dataset.digitalPath === expectedPath, path);
+
+  const parameters = new URL(run.page.url()).searchParams;
+  assert(parameters.get('digital_path') === path, 'valid empty path: canonical URL discarded the taxonomy node');
+  assert((await run.page.locator('#text-layer-current').textContent()) === 'Wasser und Bewässerung · 0 Commons', 'valid empty path: current node did not expose its empty state');
+  assert((await run.page.locator('.catalog-card:not([hidden])').count()) === 0, 'valid empty path: unrelated Commons leaked into the empty node');
+  assert((await run.page.locator('#globe-results').textContent()) === 'Keine Commons entsprechen dieser Suche oder Filterauswahl.', 'valid empty path: semantic empty-state message drifted');
+  const currentCrumb = run.page.locator(`#text-layer-breadcrumb .digital-breadcrumb-item[data-digital-path="${path}"][aria-current="page"]`);
+  assert(await currentCrumb.isVisible(), 'valid empty path: current breadcrumb is not visible');
+  const crumbBox = await currentCrumb.boundingBox();
+  assert(crumbBox && crumbBox.width >= 44 && crumbBox.height >= 44, `valid empty path: breadcrumb touch target is undersized (${JSON.stringify(crumbBox)})`);
+
+  const parentPath = 'sphere/provision_land_ecology';
+  await run.page.locator(`#text-layer-breadcrumb .digital-breadcrumb-item[data-digital-path="${parentPath}"]`).click();
+  await run.page.waitForFunction((expectedPath) => new URL(location.href).searchParams.get('digital_path') === expectedPath, parentPath);
+  await run.page.goBack();
+  await run.page.waitForFunction((expectedPath) => (
+    new URL(location.href).searchParams.get('digital_path') === expectedPath
+    && document.activeElement?.matches(`#text-layer-breadcrumb .digital-breadcrumb-item[data-digital-path="${expectedPath}"]`)
+    && document.activeElement.getClientRects().length > 0
+    && !document.activeElement.closest('[hidden], [inert], [aria-hidden="true"]')
+  ), path);
+  assert(await currentCrumb.evaluate((node) => node === document.activeElement), 'valid empty path: Back did not restore hierarchy focus to the empty node');
+  assert(run.consoleErrors.length === 0, `valid empty path: console errors: ${run.consoleErrors.join(' | ')}`);
+  assert(run.pageErrors.length === 0, `valid empty path: page errors: ${run.pageErrors.join(' | ')}`);
+  results.push({ id: 'valid-empty-digital-path', verdict: 'PASS', pathStable: true, emptyState: true, breadcrumbTouchTarget: true });
+  await run.context.close();
+}
+
 async function externalLinkSafetyScenario() {
   process.stdout.write(`${JSON.stringify({ state: 'RUNNING', scenario: 'external-link-safety' })}\n`);
   const run = await newPage({ reducedMotion: 'reduce' });
@@ -1924,6 +1959,7 @@ try {
   await interruptedLayerJourneyScenario();
   await reducedMotionLayerScenario();
   await legacyLayerAndAtomicFocusScenario();
+  await validEmptyDigitalPathScenario();
   await externalLinkSafetyScenario();
   await syntheticCatalogueTruthScenario();
   await catalogueFailureScenario();

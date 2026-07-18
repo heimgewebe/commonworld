@@ -1292,7 +1292,7 @@ function normalizeDigitalPathForApp(path) {
   if (!normalized.valid) return { path: DIGITAL_ROOT_PATH, pathKey: serializeDigitalPath(DIGITAL_ROOT_PATH) };
   const tree = runtime.digitalTree ?? treeForRecords(runtime.records);
   const current = tree.nodesByPath.get(normalized.pathKey);
-  if (!current || (current.type !== 'sphere' && current.identityCount === 0)) {
+  if (!current) {
     return { path: DIGITAL_ROOT_PATH, pathKey: serializeDigitalPath(DIGITAL_ROOT_PATH) };
   }
   return normalized;
