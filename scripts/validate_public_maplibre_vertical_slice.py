@@ -493,7 +493,6 @@ def validate_public_maplibre_vertical_slice(root: Path = ROOT) -> list[str]:
         'id="text-layer-current"',
         'id="settings-toggle"',
         'id="settings-panel"',
-        'id="catalog-bootstrap"',
         'id="globe-results"',
         'role="region"',
         'id="commons-search"',
@@ -507,6 +506,8 @@ def validate_public_maplibre_vertical_slice(root: Path = ROOT) -> list[str]:
     for token in required_html:
         if token not in html:
             errors.append(f"public runtime shell missing token: {token}")
+    if 'id="catalog-bootstrap"' in html:
+        errors.append("public runtime shell must not expose catalog JSON as DOM text")
     if re.search(r"<script(?![^>]+src=)[^>]*>", html, re.IGNORECASE):
         errors.append("public runtime must not contain inline scripts")
     if re.search(r"\sstyle=", html, re.IGNORECASE):
@@ -559,6 +560,7 @@ def validate_public_maplibre_vertical_slice(root: Path = ROOT) -> list[str]:
         "ensurePublicMapLayers",
         "semanticLocationLine",
         "overlayRenderCount += 1",
+        "./commonworld-bootstrap-catalog.mjs",
         "bootstrapRecords()",
         "verifyMapProvider",
         "degradeMap",

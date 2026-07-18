@@ -1,3 +1,4 @@
+import { BOOTSTRAP_RECORDS } from './commonworld-bootstrap-catalog.mjs';
 import {
   DEFAULT_CAMERA,
   MAX_MAP_ZOOM,
@@ -53,7 +54,6 @@ const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
 const elements = {
   body: document.body,
   skipLink: document.querySelector('.skip-link'),
-  bootstrap: document.querySelector('#catalog-bootstrap'),
   globeSurface: document.querySelector('#globe-surface'),
   textView: document.querySelector('#text-view'),
   textCount: document.querySelector('#text-count'),
@@ -310,8 +310,7 @@ function validateRecords(records) {
 }
 
 function bootstrapRecords() {
-  const text = elements.bootstrap?.content?.textContent ?? '';
-  return validateRecords(JSON.parse(text));
+  return validateRecords(BOOTSTRAP_RECORDS);
 }
 
 async function loadRecords() {
