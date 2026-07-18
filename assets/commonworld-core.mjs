@@ -322,13 +322,20 @@ export function validateDigitalTaxonomy(taxonomy = DIGITAL_TAXONOMY) {
     if (tieKeys.has(key)) errors.push(`digital taxonomy duplicate tie rule candidate set: ${key}`);
     tieKeys.add(key);
   }
-  for (const alias of taxonomy.legacy_layer_aliases ?? []) {
+  const aliases = Array.isArray(taxonomy.legacy_layer_aliases) ? taxonomy.legacy_layer_aliases : [];
+  const aliasIds = aliases.map((alias) => alias?.alias);
+  if (new Set(aliasIds).size !== aliasIds.length) errors.push('digital taxonomy legacy aliases must be unique');
+  for (const alias of aliases) {
     if (!LAYERS.some(({ id }) => id === alias.alias)) errors.push(`digital taxonomy legacy alias is not an old layer id: ${alias.alias}`);
     const normalized = normalizeDigitalPath(alias.target_path, { taxonomy });
     if (!normalized.valid) errors.push(`digital taxonomy legacy alias target is invalid: ${alias.alias}`);
+    if (typeof alias.reason !== 'string' || !alias.reason.trim()) errors.push(`digital taxonomy legacy alias lacks reason: ${alias.alias}`);
+    if (alias.alias === 'mixed_other' && (normalized.pathKey !== taxonomy.root_id || alias.broad_alias_without_filter !== true)) {
+      errors.push('digital taxonomy legacy mixed_other alias must orient to the unfiltered root');
+    }
   }
   for (const layer of LAYERS) {
-    if (!(taxonomy.legacy_layer_aliases ?? []).some((alias) => alias.alias === layer.id)) errors.push(`digital taxonomy missing legacy alias for ${layer.id}`);
+    if (!aliases.some((alias) => alias.alias === layer.id)) errors.push(`digital taxonomy missing legacy alias for ${layer.id}`);
   }
   if (!nodeMap.has(taxonomy.unknown_theme_node_id)) errors.push('digital taxonomy unknown-theme diagnostic node is missing');
   return Object.freeze(errors);
@@ -470,7 +477,19 @@ function freezeDigitalTreeNode(node) {
   return Object.freeze(node);
 }
 
+const digitalTreeCache = new WeakMap();
+let digitalTreeConstructionCount = 0;
+
+export function digitalPresentationTreeConstructionCount() {
+  return digitalTreeConstructionCount;
+}
+
 export function buildDigitalPresentationTree(records = [], { taxonomy = DIGITAL_TAXONOMY } = {}) {
+  const sourceRecords = Array.isArray(records) ? records : [];
+  let treesByTaxonomy = digitalTreeCache.get(sourceRecords);
+  const cached = treesByTaxonomy?.get(taxonomy);
+  if (cached) return cached;
+  digitalTreeConstructionCount += 1;
   const nodeMap = digitalNodeMap(taxonomy);
   const pathById = new Map();
   for (const node of taxonomy.nodes ?? []) {
@@ -500,7 +519,6 @@ export function buildDigitalPresentationTree(records = [], { taxonomy = DIGITAL_
   }
   const diagnostics = [];
   const recordsById = new Map();
-  const sourceRecords = Array.isArray(records) ? records : [];
   for (const record of sourceRecords) {
     if (!record?.id || recordsById.has(record.id)) continue;
     recordsById.set(record.id, record);
@@ -550,7 +568,7 @@ export function buildDigitalPresentationTree(records = [], { taxonomy = DIGITAL_
   const orderedNodes = [...treeNodes.values()].sort((left, right) => left.pathKey.localeCompare(right.pathKey));
   for (const node of orderedNodes) frozenNodes.set(node.pathKey, freezeDigitalTreeNode(node));
   const rootPathKey = serializeDigitalPath([taxonomy.root_id]);
-  return Object.freeze({
+  const tree = Object.freeze({
     taxonomyVersion: taxonomy.version,
     rootPath: Object.freeze([taxonomy.root_id]),
     rootPathKey,
@@ -559,6 +577,12 @@ export function buildDigitalPresentationTree(records = [], { taxonomy = DIGITAL_
     identityIds: frozenNodes.get(rootPathKey)?.identityIds ?? Object.freeze([]),
     diagnostics: Object.freeze(diagnostics),
   });
+  if (!treesByTaxonomy) {
+    treesByTaxonomy = new WeakMap();
+    digitalTreeCache.set(sourceRecords, treesByTaxonomy);
+  }
+  treesByTaxonomy.set(taxonomy, tree);
+  return tree;
 }
 
 export function visibleDigitalNodes(tree, currentPath = DIGITAL_ROOT_PATH, { includeEmpty = false, identityLimit = Infinity } = {}) {
@@ -702,14 +726,17 @@ export function stateFromSearch(search = '', knownProjectIds = []) {
   const project = parameters.get('project');
   const layer = parameters.get('layer');
   const requestedDigitalPath = parameters.get('digital_path');
-  const digitalPath = requestedDigitalPath
-    ? normalizeDigitalPath(requestedDigitalPath).path
+  const hasExplicitDigitalPath = parameters.has('digital_path');
+  const normalizedDigitalPath = hasExplicitDigitalPath ? normalizeDigitalPath(requestedDigitalPath) : null;
+  const validLayer = LAYERS.some((entry) => entry.id === layer) ? layer : null;
+  const digitalPath = hasExplicitDigitalPath
+    ? normalizedDigitalPath.path
     : (digitalPathFromLegacyLayer(layer) ?? DIGITAL_ROOT_PATH);
   const presence = normalizedPresenceFilters(parameters.getAll('presence'));
   return {
     camera: cameraFromSearch(search),
     project: project && known.has(project) ? project : null,
-    layer: LAYERS.some((entry) => entry.id === layer) ? layer : null,
+    layer: hasExplicitDigitalPath ? null : validLayer,
     digitalPath,
     view: parameters.get('view') === 'layers' ? 'layers' : 'globe',
     surface: parameters.get('surface') === 'text' ? 'text' : 'globe',
@@ -735,9 +762,13 @@ export function searchFromState(state) {
   if (Math.abs(finite(camera.pitch, 0)) >= 0.05) parameters.set('p', serializedNumber(clamp(finite(camera.pitch, 0), 0, 70), 1));
   if (state?.view === 'layers') parameters.set('view', 'layers');
   if (state?.surface === 'text') parameters.set('surface', 'text');
-  const requestedDigitalPath = state?.digitalPath ?? digitalPathFromLegacyLayer(state?.layer) ?? DIGITAL_ROOT_PATH;
-  const normalizedDigitalPath = normalizeDigitalPath(requestedDigitalPath);
-  if (normalizedDigitalPath.valid && normalizedDigitalPath.path.length > 1) parameters.set('digital_path', normalizedDigitalPath.pathKey);
+  const legacyLayer = LAYERS.some(({ id }) => id === state?.layer) ? state.layer : null;
+  if (legacyLayer) {
+    parameters.set('layer', legacyLayer);
+  } else {
+    const normalizedDigitalPath = normalizeDigitalPath(state?.digitalPath ?? DIGITAL_ROOT_PATH);
+    if (normalizedDigitalPath.valid && normalizedDigitalPath.path.length > 1) parameters.set('digital_path', normalizedDigitalPath.pathKey);
+  }
   if (state?.project) parameters.set('project', state.project);
   const query = normalizeQuery(state?.query);
   if (query) parameters.set('q', query);
@@ -950,8 +981,9 @@ function recordFreshness(record, today) {
 }
 
 export function recordMatchesIntentFilters(record, filters = {}, today = new Date().toISOString().slice(0, 10)) {
-  if (filters.digitalPath && !digitalPathContainsRecord(filters.digitalPath, record)) return false;
-  if (filters.layer && deriveLayer(record) !== filters.layer) return false;
+  if (filters.layer) {
+    if (deriveLayer(record) !== filters.layer) return false;
+  } else if (filters.digitalPath && !digitalPathContainsRecord(filters.digitalPath, record)) return false;
 
   if (Array.isArray(filters.presence) && filters.presence.length > 0) {
     if (filters.presence.includes('geographic') && publicGeographicLocations(record).length === 0) return false;

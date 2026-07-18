@@ -16,6 +16,7 @@ import {
   cameraFromSearch,
   deriveDigitalProjectPath,
   deriveLayer,
+  digitalPresentationTreeConstructionCount,
   digitalPathFromLegacyLayer,
   digitalLayerCamera,
   filterRecords,
@@ -91,6 +92,16 @@ test('digital ring taxonomy exposes five fields and validates its legacy aliases
   assert.deepEqual(digitalPathFromLegacyLayer('communication_networks'), ['sphere', 'communication_networks', 'community_networks']);
   assert.deepEqual(digitalPathFromLegacyLayer('mixed_other'), ['sphere']);
   assert.equal(DIGITAL_TAXONOMY.version, 'digital-ring-bundles-v1');
+});
+
+test('digital taxonomy validation rejects duplicate and semantically broadened legacy aliases', () => {
+  const duplicate = structuredClone(DIGITAL_TAXONOMY);
+  duplicate.legacy_layer_aliases.push(structuredClone(duplicate.legacy_layer_aliases[0]));
+  assert(validateDigitalTaxonomy(duplicate).includes('digital taxonomy legacy aliases must be unique'));
+
+  const broadenedMixed = structuredClone(DIGITAL_TAXONOMY);
+  broadenedMixed.legacy_layer_aliases.find(({ alias }) => alias === 'mixed_other').target_path = ['sphere', 'knowledge_learning_culture'];
+  assert(validateDigitalTaxonomy(broadenedMixed).includes('digital taxonomy legacy mixed_other alias must orient to the unfiltered root'));
 });
 
 test('digital ring path derivation is deterministic and handles ambiguity explicitly', () => {
@@ -185,7 +196,12 @@ test('digital tree visible nodes stay bounded for synthetic 500 and 5000 record 
       themes: index % 2 === 0 ? ['communication', 'community-network'] : ['open-data', 'infrastructure'],
       presence: { geographic: [], digital: { available: true } },
     }));
+    const constructionsBefore = digitalPresentationTreeConstructionCount();
     const tree = buildDigitalPresentationTree(records);
+    assert.strictEqual(buildDigitalPresentationTree(records), tree);
+    assert(Object.isFrozen(tree));
+    assert.equal(digitalPresentationTreeConstructionCount() - constructionsBefore, 1);
+    assert.notStrictEqual(buildDigitalPresentationTree([...records]), tree);
     const root = visibleDigitalNodes(tree, DIGITAL_ROOT_PATH);
     const communication = visibleDigitalNodes(tree, ['sphere', 'communication_networks']);
     const community = visibleDigitalNodes(tree, ['sphere', 'communication_networks', 'community_networks']);
@@ -277,6 +293,36 @@ test('deep-link state accepts surface, search, identity, filters and clamped cam
   );
   assert.equal(MAX_MAP_ZOOM, 18);
   assert.deepEqual(state.camera, { lng: 180, lat: -85, zoom: MAX_MAP_ZOOM, bearing: 0, pitch: 70 });
+});
+
+test('legacy layer links preserve their exact six-layer filter and URL until explicit path selection', () => {
+  const records = loadPublicCatalogRecords();
+  for (const { id: layer } of LAYERS) {
+    const parsed = stateFromSearch(`?view=layers&layer=${layer}`);
+    const expectedIds = records.filter((record) => deriveLayer(record) === layer).map(({ id }) => id);
+    assert.equal(parsed.layer, layer);
+    assert.deepEqual(filterRecords(records, parsed).map(({ id }) => id), expectedIds, layer);
+    const parameters = new URLSearchParams(searchFromState(parsed).slice(1));
+    assert.equal(parameters.get('layer'), layer);
+    assert.equal(parameters.has('digital_path'), false);
+  }
+
+  const communication = filterRecords(records, stateFromSearch('?layer=communication_networks')).map(({ id }) => id);
+  assert(communication.includes('mastodon'));
+  const software = filterRecords(records, stateFromSearch('?layer=software_infrastructure')).map(({ id }) => id);
+  assert(software.includes('openmrs'));
+  assert(software.includes('open-food-network-australia'));
+
+  const explicit = stateFromSearch('?layer=communication_networks&digital_path=sphere/software_tools_production/free_software');
+  assert.equal(explicit.layer, null);
+  assert.deepEqual(explicit.digitalPath, ['sphere', 'software_tools_production', 'free_software']);
+  const explicitParameters = new URLSearchParams(searchFromState(explicit).slice(1));
+  assert.equal(explicitParameters.has('layer'), false);
+  assert.equal(explicitParameters.get('digital_path'), 'sphere/software_tools_production/free_software');
+
+  const invalidExplicit = stateFromSearch('?layer=communication_networks&digital_path=sphere/../catalog');
+  assert.equal(invalidExplicit.layer, null);
+  assert.deepEqual(invalidExplicit.digitalPath, DIGITAL_ROOT_PATH);
 });
 
 test('unknown identities, filters and malformed numbers fail closed', () => {

@@ -7,6 +7,7 @@ import { chromium } from 'playwright';
 import {
   buildDigitalPresentationTree,
   deriveDigitalProjectPath,
+  deriveLayer,
   DIGITAL_RING_FIELDS,
   DIGITAL_ROOT_PATH,
   globeHorizonCoordinates,
@@ -114,6 +115,9 @@ async function loadExpectedDigitalProjection() {
   }
   assert(new Set(allIds).size === allIds.length, `catalog projection: duplicate digital IDs in catalog ${JSON.stringify(allIds)}`);
   const tree = buildDigitalPresentationTree(records);
+  const legacyLayerIds = Object.fromEntries([
+    ...new Set(records.map(deriveLayer).filter(Boolean)),
+  ].map((layer) => [layer, records.filter((record) => deriveLayer(record) === layer).map(({ id }) => id)]));
   const rootView = visibleDigitalNodes(tree, DIGITAL_ROOT_PATH);
   const nodes = Object.fromEntries([...tree.nodesByPath].map(([pathKey, node]) => [pathKey, {
     id: node.id,
@@ -152,6 +156,7 @@ async function loadExpectedDigitalProjection() {
     fields,
     nodes,
     rootChildIds: rootView.children.map((node) => node.id),
+    legacyLayerIds,
   };
 }
 
@@ -446,7 +451,11 @@ async function syntheticDigitalPerformanceScenario() {
         themes: index % 2 === 0 ? ['communication', 'community-network'] : ['open-data', 'infrastructure'],
         presence: { geographic: [], digital: { available: true } },
       }));
+      const constructionsBefore = core.digitalPresentationTreeConstructionCount();
       const tree = core.buildDigitalPresentationTree(records);
+      core.buildDigitalPresentationTree(records);
+      core.buildDigitalPresentationTree(records);
+      core.buildDigitalPresentationTree(records);
       const root = core.visibleDigitalNodes(tree, core.DIGITAL_ROOT_PATH);
       const communication = core.visibleDigitalNodes(tree, ['sphere', 'communication_networks']);
       const community = core.visibleDigitalNodes(tree, ['sphere', 'communication_networks', 'community_networks'], { identityLimit: 48 });
@@ -459,6 +468,7 @@ async function syntheticDigitalPerformanceScenario() {
         boundedIdentityVisible: community.children.length,
         fullIdentityCount: fullCommunity.current.identityCount,
         syntheticDomBudget: root.children.length + communication.children.length + community.children.length,
+        treeConstructionDelta: core.digitalPresentationTreeConstructionCount() - constructionsBefore,
       };
     };
     const stage = document.querySelector('.globe-stage');
@@ -477,9 +487,15 @@ async function syntheticDigitalPerformanceScenario() {
     assert(item.boundedIdentityVisible <= 48, `synthetic ${item.size}: identity level exceeded the DOM budget (${JSON.stringify(item)})`);
     assert(item.fullIdentityCount === Math.ceil(item.size / 2), `synthetic ${item.size}: aggregate identity count was lost (${JSON.stringify(item)})`);
     assert(item.syntheticDomBudget <= 56, `synthetic ${item.size}: visible node budget is unbounded (${JSON.stringify(item)})`);
+    assert(item.treeConstructionDelta === 1, `synthetic ${item.size}: stable record identity rebuilt the full tree (${JSON.stringify(item)})`);
   }
   assert(metrics.liveRibbonDom < 140, `synthetic performance: live DOM budget unexpectedly high (${JSON.stringify(metrics)})`);
   assert(metrics.overlayDelta === 0, `synthetic performance: idle overlay render delta is not zero (${JSON.stringify(metrics)})`);
+  const queryTreeBuildsBefore = await run.page.evaluate(async () => (await import('/assets/commonworld-core.mjs')).digitalPresentationTreeConstructionCount());
+  await run.page.locator('#commons-search').fill('Wikipedia');
+  await run.page.waitForTimeout(220);
+  const queryTreeBuildsAfter = await run.page.evaluate(async () => (await import('/assets/commonworld-core.mjs')).digitalPresentationTreeConstructionCount());
+  assert(queryTreeBuildsAfter - queryTreeBuildsBefore < 4, `synthetic performance: one query action built four full trees (${queryTreeBuildsBefore} -> ${queryTreeBuildsAfter})`);
   assert(run.consoleErrors.length === 0, `synthetic performance: console errors: ${run.consoleErrors.join(' | ')}`);
   assert(run.pageErrors.length === 0, `synthetic performance: page errors: ${run.pageErrors.join(' | ')}`);
   results.push({ id: 'synthetic-digital-performance', verdict: 'PASS', cases: metrics.cases, idleOverlayRenderDelta: metrics.overlayDelta });
@@ -1497,6 +1513,79 @@ async function reducedMotionLayerScenario() {
   await run.context.close();
 }
 
+async function legacyLayerAndAtomicFocusScenario() {
+  process.stdout.write(`${JSON.stringify({ state: 'RUNNING', scenario: 'legacy-layer-and-atomic-focus' })}\n`);
+  const legacyRun = await newPage({ reducedMotion: 'reduce' });
+  await legacyRun.page.goto(`${baseUrl}/?surface=text&layer=communication_networks`, { waitUntil: 'domcontentloaded' });
+  await legacyRun.page.waitForSelector('html.runtime-ready');
+  await legacyRun.page.waitForFunction(() => document.querySelector('.globe-stage')?.dataset.digitalPath === 'sphere/communication_networks/community_networks');
+  const legacyParameters = new URL(legacyRun.page.url()).searchParams;
+  assert(legacyParameters.get('layer') === 'communication_networks', 'legacy layer: canonicalization removed the legacy parameter');
+  assert(!legacyParameters.has('digital_path'), 'legacy layer: orientation path replaced the legacy filter in the URL');
+  const legacyIds = await legacyRun.page.locator('.catalog-card:not([hidden])').evaluateAll((nodes) => nodes.map((node) => node.dataset.commonprojectId));
+  assertSameIds(legacyIds, expectedDigitalProjection.legacyLayerIds.communication_networks, 'legacy layer: exact communication result set');
+  assert(legacyIds.includes('mastodon'), 'legacy layer: communication result set lost Mastodon');
+
+  await legacyRun.page.locator('#text-layer-breadcrumb .digital-breadcrumb-item[data-digital-path="sphere/communication_networks"]').click();
+  await legacyRun.page.waitForFunction(() => new URL(location.href).searchParams.get('digital_path') === 'sphere/communication_networks');
+  let selectedParameters = new URL(legacyRun.page.url()).searchParams;
+  assert(!selectedParameters.has('layer'), 'legacy layer: explicit breadcrumb selection retained the legacy layer');
+  await legacyRun.page.goBack();
+  await legacyRun.page.waitForFunction(() => new URL(location.href).searchParams.get('layer') === 'communication_networks');
+  const restoredLegacyIds = await legacyRun.page.locator('.catalog-card:not([hidden])').evaluateAll((nodes) => nodes.map((node) => node.dataset.commonprojectId));
+  assertSameIds(restoredLegacyIds, expectedDigitalProjection.legacyLayerIds.communication_networks, 'legacy layer: Back restored exact result set');
+  await legacyRun.page.goForward();
+  await legacyRun.page.waitForFunction(() => new URL(location.href).searchParams.get('digital_path') === 'sphere/communication_networks');
+  selectedParameters = new URL(legacyRun.page.url()).searchParams;
+  assert(!selectedParameters.has('layer'), 'legacy layer: Forward restored a mixed legacy/path state');
+  assert(legacyRun.consoleErrors.length === 0, `legacy layer: console errors: ${legacyRun.consoleErrors.join(' | ')}`);
+  assert(legacyRun.pageErrors.length === 0, `legacy layer: page errors: ${legacyRun.pageErrors.join(' | ')}`);
+  await legacyRun.context.close();
+
+  const focusRun = await newPage({ reducedMotion: 'reduce' });
+  await focusRun.page.goto(`${baseUrl}/?view=layers`, { waitUntil: 'domcontentloaded' });
+  await focusRun.page.waitForSelector('html.runtime-ready');
+  await focusRun.page.waitForSelector('.globe-stage[data-view-phase="layers"]');
+  await focusRun.page.locator('.digital-ribbon-item[data-commonproject-id="wikipedia"][data-ribbon-copy="0"]').click();
+  assert(await focusRun.page.locator('#project-focus').isVisible(), 'atomic focus: Wikipedia focus did not open');
+  assert(new URL(focusRun.page.url()).searchParams.get('project') === 'wikipedia', 'atomic focus: Wikipedia was not written to history');
+
+  // Exercise the direct state regression without pretending the covered control receives a pointer interaction.
+  await focusRun.page.locator('.digital-lane-focus[data-digital-path="sphere/communication_networks"]').evaluate((node) => node.click());
+  await focusRun.page.waitForFunction(() => document.querySelector('.globe-stage')?.dataset.digitalPath === 'sphere/communication_networks');
+  await focusRun.page.waitForFunction(() => (
+    document.activeElement?.matches('.digital-lane-scroll, .digital-breadcrumb-item')
+    && document.activeElement.getClientRects().length > 0
+  ));
+  const cleared = await focusRun.page.evaluate(() => ({
+    project: new URL(location.href).searchParams.get('project'),
+    path: new URL(location.href).searchParams.get('digital_path'),
+    focusHidden: document.querySelector('#project-focus').hidden,
+    selectedMarks: document.querySelectorAll('[data-commonproject-id].is-selected').length,
+    activeHierarchy: document.activeElement?.matches('.digital-lane-scroll, .digital-breadcrumb-item') ?? false,
+    activeVisible: Boolean(document.activeElement?.getClientRects().length),
+  }));
+  assert(cleared.project === null && cleared.path === 'sphere/communication_networks', `atomic focus: path mutation retained project state (${JSON.stringify(cleared)})`);
+  assert(cleared.focusHidden && cleared.selectedMarks === 0, `atomic focus: overlay or selection marks survived path mutation (${JSON.stringify(cleared)})`);
+  assert(cleared.activeHierarchy && cleared.activeVisible, `atomic focus: focus did not move to a visible hierarchy control (${JSON.stringify(cleared)})`);
+
+  await focusRun.page.goBack();
+  await focusRun.page.waitForFunction(() => new URL(location.href).searchParams.get('project') === 'wikipedia');
+  assert(await focusRun.page.locator('#project-focus').isVisible(), 'atomic focus: Back did not restore Wikipedia focus');
+  assert((await focusRun.page.locator('#focus-title').textContent()) === 'Wikipedia', 'atomic focus: Back restored the wrong project');
+
+  await focusRun.page.goto(`${baseUrl}/?view=layers&digital_path=sphere/communication_networks&project=wikipedia`, { waitUntil: 'domcontentloaded' });
+  await focusRun.page.waitForSelector('html.runtime-ready');
+  await focusRun.page.waitForFunction(() => document.querySelector('.globe-stage')?.dataset.digitalPath === 'sphere/communication_networks');
+  const invalidCombination = new URL(focusRun.page.url()).searchParams;
+  assert(invalidCombination.get('digital_path') === 'sphere/communication_networks', 'atomic focus: invalid direct combination lost its valid path');
+  assert(!invalidCombination.has('project') && await focusRun.page.locator('#project-focus').isHidden(), 'atomic focus: invalid direct combination retained foreign project focus');
+  assert(focusRun.consoleErrors.length === 0, `atomic focus: console errors: ${focusRun.consoleErrors.join(' | ')}`);
+  assert(focusRun.pageErrors.length === 0, `atomic focus: page errors: ${focusRun.pageErrors.join(' | ')}`);
+  results.push({ id: 'legacy-layer-and-atomic-focus', verdict: 'PASS' });
+  await focusRun.context.close();
+}
+
 async function catalogueFailureScenario() {
   const run = await newPage();
   await run.page.route('**/catalog/catalog.json', (route) => route.abort('failed'));
@@ -1613,6 +1702,7 @@ try {
   await moveendBoundReturnScenario();
   await interruptedLayerJourneyScenario();
   await reducedMotionLayerScenario();
+  await legacyLayerAndAtomicFocusScenario();
   await catalogueFailureScenario();
   await providerFailureScenario();
   await methodScenario();

@@ -3,6 +3,9 @@ import {
   MAX_MAP_ZOOM,
   binaryName,
   buildDigitalPresentationTree,
+  deriveLayer,
+  digitalPathContainsRecord,
+  digitalPresentationTreeConstructionCount,
   DIGITAL_LAYER_TRANSITION_MS,
   DIGITAL_ROOT_PATH,
   digitalLayerCamera,
@@ -116,6 +119,7 @@ const runtime = {
   digitalTree: null,
   searchIndex: null,
   visibleRecordsCache: null,
+  unfilteredPathRecordsCache: null,
   lastPublicMapData: null,
   publicMapUpdateCount: 0,
   state: {
@@ -317,6 +321,7 @@ function installRecords(records) {
   elements.stage.dataset.searchIndexedRecords = String(runtime.searchIndex.indexedRecordCount);
   elements.stage.dataset.searchIndexedTerms = String(runtime.searchIndex.indexedTermCount);
   runtime.visibleRecordsCache = null;
+  runtime.unfilteredPathRecordsCache = null;
   runtime.lastPublicMapData = null;
   runtime.publicMapUpdateCount = 0;
 }
@@ -344,16 +349,21 @@ function digitalPathFiltered() {
 }
 
 function treeForRecords(records = runtime.records) {
+  if (records === runtime.records && runtime.digitalTree) return runtime.digitalTree;
   return buildDigitalPresentationTree(records);
 }
 
 function unfilteredPathRecords() {
-  return filterRecords(runtime.records, {
+  const key = discoveryCacheKey();
+  if (runtime.unfilteredPathRecordsCache?.key === key) return runtime.unfilteredPathRecordsCache.records;
+  const records = filterRecords(runtime.records, {
     ...runtime.state,
     layer: null,
     digitalPath: DIGITAL_ROOT_PATH,
     searchIndex: runtime.searchIndex,
   });
+  runtime.unfilteredPathRecordsCache = { key, records };
+  return records;
 }
 
 function visibleDigitalView(records = visibleRecords()) {
@@ -537,7 +547,7 @@ function renderLayerStack() {
 }
 
 function discoveryCacheKey() {
-  return [serializeDigitalPath(currentDigitalPath()), runtime.state.query, ...INTENT_FILTER_NAMES.map((name) => runtime.state[name])]
+  return [runtime.state.layer, serializeDigitalPath(currentDigitalPath()), runtime.state.query, ...INTENT_FILTER_NAMES.map((name) => runtime.state[name])]
     .map((value) => value ?? '')
     .join('\u001f');
 }
@@ -976,6 +986,7 @@ function renderDiscoveryState() {
   elements.search.value = runtime.state.query;
   elements.layerSearch.value = runtime.state.query;
   elements.searchClear.hidden = runtime.state.query.length === 0;
+  elements.stage.dataset.digitalTreeConstructions = String(digitalPresentationTreeConstructionCount());
 }
 
 function currentUrlState() {
@@ -1084,16 +1095,48 @@ function clearProject({ historyMode = 'push', restoreFocus = true } = {}) {
   }
 }
 
+function projectMatchesDigitalState(identifier, state = runtime.state) {
+  const record = identifier ? runtime.recordsById.get(identifier) : null;
+  if (!record) return false;
+  if (state.layer) return deriveLayer(record) === state.layer;
+  return digitalPathContainsRecord(state.digitalPath ?? DIGITAL_ROOT_PATH, record);
+}
+
+function focusVisibleHierarchyControl(pathKey) {
+  const selectors = runtime.state.view === 'layers'
+    ? [
+        `.digital-lane[data-digital-path="${CSS.escape(pathKey)}"] .digital-lane-scroll`,
+        '#layer-breadcrumb .digital-breadcrumb-item[aria-current="page"]',
+        '#layer-close',
+      ]
+    : [
+        '#text-layer-breadcrumb .digital-breadcrumb-item[aria-current="page"]',
+        '#commons-search',
+      ];
+  const target = selectors
+    .map((selector) => document.querySelector(selector))
+    .find(isVisibleFocusTarget);
+  target?.focus({ preventScroll: true });
+}
+
 function setDigitalPath(path, { historyMode = 'push' } = {}) {
   const normalized = normalizeDigitalPathForApp(path);
+  const closesProject = Boolean(runtime.state.project) && !projectMatchesDigitalState(runtime.state.project, {
+    ...runtime.state,
+    layer: null,
+    digitalPath: normalized.path,
+  });
   runtime.state.digitalPath = normalized.path;
   runtime.state.layer = null;
+  if (closesProject) {
+    runtime.state.project = null;
+    runtime.focusReturnTarget = null;
+  }
   runtime.visibleRecordsCache = null;
   renderDiscoveryState();
-  if (runtime.state.view === 'layers') {
+  if (closesProject || runtime.state.view === 'layers') {
     window.requestAnimationFrame(() => {
-      const selector = `.digital-lane[data-digital-path="${CSS.escape(normalized.pathKey)}"] .digital-lane-scroll`;
-      elements.layerDeck.querySelector(selector)?.focus({ preventScroll: true });
+      focusVisibleHierarchyControl(normalized.pathKey);
     });
   }
   if (historyMode) writeHistory(historyMode);
@@ -1543,7 +1586,12 @@ function applyDeepLink(search, { initial = false } = {}) {
   runtime.applyingHistory = true;
   runtime.state = next;
   runtime.state.digitalPath = normalizeDigitalPathForApp(next.digitalPath).path;
-  runtime.state.layer = null;
+  if (runtime.state.project && !projectMatchesDigitalState(runtime.state.project, runtime.state)) {
+    runtime.state.project = null;
+    runtime.focusReturnTarget = null;
+  }
+  runtime.visibleRecordsCache = null;
+  runtime.unfilteredPathRecordsCache = null;
   elements.search.value = next.query;
   setPresentation(next.surface, { historyMode: null, persist: false });
   if (runtime.mapReady) {
@@ -1558,6 +1606,7 @@ function applyDeepLink(search, { initial = false } = {}) {
   else closeDiscovery({ restoreFocus: false });
   runtime.applyingHistory = false;
   if (initial) writeHistory('replace');
+  else if (runtime.state.project) elements.focus.focus({ preventScroll: true });
 }
 
 

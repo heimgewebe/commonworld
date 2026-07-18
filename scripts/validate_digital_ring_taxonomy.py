@@ -430,7 +430,7 @@ def validate_digital_ring_taxonomy(root: Path = ROOT) -> list[str]:
     runtime = taxonomy.get("runtime_requirements", {}) if isinstance(taxonomy.get("runtime_requirements"), dict) else {}
     expected_runtime = {
         "canonical_url_parameter": "digital_path",
-        "legacy_layer_parameter": "deterministically_migrated",
+        "legacy_layer_parameter": "preserved_as_filter_until_explicit_digital_path_selection",
         "invalid_path_behavior": "fail_closed_to_sphere_root_without_partial_filter",
         "primary_membership": "one_path_per_digital_commonproject_id",
         "child_identity_sets_disjoint_for_primary_membership": True,

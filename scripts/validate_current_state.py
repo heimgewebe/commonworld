@@ -85,7 +85,7 @@ def validate_current_state(root: Path = ROOT) -> list[str]:
         "main_field_count": 5,
         "current_digital_identity_count": 25,
         "current_known_theme_count": 37,
-        "legacy_layer_links": "deterministically_migrated",
+        "legacy_layer_links": "preserved_as_filter_until_explicit_digital_path_selection",
         "invalid_path_behavior": "fail_closed_to_sphere_root_without_partial_filter",
         "catalog_presentation_fields_forbidden": True,
     }
