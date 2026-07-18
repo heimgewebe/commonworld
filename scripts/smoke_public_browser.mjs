@@ -33,6 +33,75 @@ function assert(condition, message) {
   if (!condition) throw new Error(message);
 }
 
+async function hierarchyFocusDiagnostic(page) {
+  return page.evaluate(() => {
+    const stage = document.querySelector('.globe-stage');
+    const panel = document.querySelector('#layer-panel');
+    const active = document.activeElement;
+    return {
+      url: location.href,
+      parameters: Object.fromEntries(new URL(location.href).searchParams),
+      stage: {
+        phase: stage?.dataset.viewPhase ?? null,
+        digitalPath: stage?.dataset.digitalPath ?? null,
+        pendingHierarchyFocusPath: stage?.dataset.pendingHierarchyFocusPath ?? null,
+        hierarchyFocusAttempt: stage?.dataset.hierarchyFocusAttempt ?? null,
+      },
+      panel: {
+        dataVisible: panel?.hasAttribute('data-visible') ?? false,
+        hidden: panel?.hidden ?? null,
+        inert: panel?.hasAttribute('inert') ?? false,
+        ariaHidden: panel?.getAttribute('aria-hidden') ?? null,
+      },
+      active: {
+        tag: active?.tagName ?? null,
+        id: active?.id ?? null,
+        className: active?.getAttribute?.('class') ?? null,
+        connected: active?.isConnected ?? false,
+        visible: Boolean(active?.getClientRects?.().length),
+        hidden: Boolean(active?.closest?.('[hidden]')),
+        inert: Boolean(active?.closest?.('[inert]')),
+        ariaHidden: Boolean(active?.closest?.('[aria-hidden="true"]')),
+      },
+    };
+  });
+}
+
+async function waitForAtomicHierarchyFocus(page, {
+  label,
+  expectedPath,
+  activeSelector,
+  requirePanel = true,
+  timeout = 30_000,
+}) {
+  try {
+    await page.waitForFunction(({ pathKey, selector, panelRequired }) => {
+      const url = new URL(location.href);
+      const stage = document.querySelector('.globe-stage');
+      const panel = document.querySelector('#layer-panel');
+      const active = document.activeElement;
+      const serializedPath = url.searchParams.get('digital_path');
+      const urlPathReady = pathKey === 'sphere' ? serializedPath === null : serializedPath === pathKey;
+      const urlReady = urlPathReady && !url.searchParams.has('project');
+      const stageReady = stage?.dataset.digitalPath === pathKey && !stage.dataset.pendingHierarchyFocusPath;
+      const panelReady = !panelRequired || (
+        panel?.hasAttribute('data-visible')
+        && !panel.hidden
+        && !panel.hasAttribute('inert')
+      );
+      const focusReady = active?.matches(selector)
+        && active.isConnected
+        && active.getClientRects().length > 0
+        && !active.closest('[hidden], [inert], [aria-hidden="true"]');
+      return urlReady && stageReady && panelReady && focusReady;
+    }, { pathKey: expectedPath, selector: activeSelector, panelRequired: requirePanel }, { timeout });
+  } catch (error) {
+    const diagnostic = await hierarchyFocusDiagnostic(page);
+    throw new Error(`${label}: timed out waiting for atomic URL, panel and focus state (${JSON.stringify(diagnostic)})`, { cause: error });
+  }
+  return hierarchyFocusDiagnostic(page);
+}
+
 function safePath(url) {
   const pathname = decodeURIComponent(new URL(url, 'http://localhost').pathname);
   const relative = pathname === '/' ? 'index.html' : pathname.replace(/^\/+/, '');
@@ -1642,11 +1711,11 @@ async function legacyLayerAndAtomicFocusScenario() {
 
   // Exercise the direct state regression without pretending the covered control receives a pointer interaction.
   await focusRun.page.locator('.digital-lane-focus[data-digital-path="sphere/communication_networks"]').evaluate((node) => node.click());
-  await focusRun.page.waitForFunction(() => document.querySelector('.globe-stage')?.dataset.digitalPath === 'sphere/communication_networks');
-  await focusRun.page.waitForFunction(() => (
-    document.activeElement?.matches('.digital-lane-scroll, .digital-breadcrumb-item')
-    && document.activeElement.getClientRects().length > 0
-  ));
+  await waitForAtomicHierarchyFocus(focusRun.page, {
+    label: 'atomic focus: direct path mutation',
+    expectedPath: 'sphere/communication_networks',
+    activeSelector: '.digital-lane-scroll, .digital-breadcrumb-item',
+  });
   const cleared = await focusRun.page.evaluate(() => ({
     project: new URL(location.href).searchParams.get('project'),
     path: new URL(location.href).searchParams.get('digital_path'),
@@ -1676,28 +1745,23 @@ async function legacyLayerAndAtomicFocusScenario() {
     }, 240);
   });
   await focusRun.page.goForward();
-  await focusRun.page.waitForFunction(() => new URL(location.href).searchParams.get('digital_path') === 'sphere/communication_networks' && !new URL(location.href).searchParams.has('project'));
-  await focusRun.page.waitForFunction(() => (
-    document.activeElement?.matches('.digital-lane-focus, .digital-lane-scroll, .digital-breadcrumb-item')
-    && document.activeElement.getClientRects().length > 0
-    && !document.activeElement.closest('[hidden], [inert], [aria-hidden="true"]')
-  ));
+  await waitForAtomicHierarchyFocus(focusRun.page, {
+    label: 'atomic focus: delayed Forward restoration',
+    expectedPath: 'sphere/communication_networks',
+    activeSelector: '.digital-lane-focus, .digital-lane-scroll, .digital-breadcrumb-item',
+  });
   assert(await focusRun.page.locator('#project-focus').isHidden(), 'atomic focus: Forward left the project panel visible');
 
   for (let iteration = 0; iteration < 3; iteration += 1) {
     await focusRun.page.goBack();
     await focusRun.page.waitForFunction(() => new URL(location.href).searchParams.get('project') === 'wikipedia');
     await focusRun.page.goForward();
-    await focusRun.page.waitForFunction(() => new URL(location.href).searchParams.get('digital_path') === 'sphere/communication_networks' && !new URL(location.href).searchParams.has('project'));
+    await waitForAtomicHierarchyFocus(focusRun.page, {
+      label: `atomic focus: repeated Forward restoration ${iteration + 1}`,
+      expectedPath: 'sphere/communication_networks',
+      activeSelector: '.digital-lane-focus, .digital-lane-scroll, .digital-breadcrumb-item',
+    });
   }
-  await focusRun.page.waitForFunction(() => {
-    const active = document.activeElement;
-    return active
-      && active !== document.body
-      && active.isConnected
-      && active.getClientRects().length > 0
-      && !active.closest('[hidden], [inert], [aria-hidden="true"]');
-  });
   const rapidFocus = await focusRun.page.evaluate(() => {
     const active = document.activeElement;
     return {
@@ -1728,33 +1792,73 @@ async function legacyLayerAndAtomicFocusScenario() {
   const textHierarchy = textFocusRun.page.locator('#text-layer-buttons .layer-filter[data-digital-path="sphere/communication_networks"]');
   await textHierarchy.focus();
   await textFocusRun.page.keyboard.press('Enter');
-  await textFocusRun.page.waitForFunction(() => new URL(location.href).searchParams.get('digital_path') === 'sphere/communication_networks' && !new URL(location.href).searchParams.has('project'));
-  await textFocusRun.page.waitForFunction(() => document.activeElement?.matches('#text-layer-breadcrumb .digital-breadcrumb-item, #text-layer-buttons .layer-filter') && document.activeElement.getClientRects().length > 0);
+  await waitForAtomicHierarchyFocus(textFocusRun.page, {
+    label: 'text atomic focus: hierarchy activation',
+    expectedPath: 'sphere/communication_networks',
+    activeSelector: '#text-layer-breadcrumb .digital-breadcrumb-item, #text-layer-buttons .layer-filter',
+    requirePanel: false,
+  });
   assert(await textFocusRun.page.locator('#project-focus').isHidden(), 'text atomic focus: incompatible path retained project overlay');
   assert(await textFocusRun.page.locator('#text-layer-breadcrumb .digital-breadcrumb-item[aria-current="page"]').isVisible(), 'text atomic focus: current breadcrumb is not visible');
   const textBundle = textFocusRun.page.locator('#text-layer-buttons .layer-filter[data-digital-path="sphere/communication_networks/community_networks"]');
   await textBundle.focus();
   await textFocusRun.page.keyboard.press('Enter');
-  await textFocusRun.page.waitForFunction(() => document.querySelector('.globe-stage')?.dataset.digitalPath === 'sphere/communication_networks/community_networks');
-  await textFocusRun.page.waitForFunction(() => (
-    document.activeElement?.matches('#text-layer-breadcrumb .digital-breadcrumb-item, #text-layer-buttons .layer-filter')
-    && document.activeElement.getClientRects().length > 0
-    && !document.activeElement.closest('[hidden], [inert], [aria-hidden="true"]')
-  ));
+  await waitForAtomicHierarchyFocus(textFocusRun.page, {
+    label: 'text atomic focus: bundle activation',
+    expectedPath: 'sphere/communication_networks/community_networks',
+    activeSelector: '#text-layer-breadcrumb .digital-breadcrumb-item, #text-layer-buttons .layer-filter',
+    requirePanel: false,
+  });
 
   const textRootBreadcrumb = textFocusRun.page.locator('#text-layer-breadcrumb .digital-breadcrumb-item[data-digital-path="sphere"]');
   await textRootBreadcrumb.focus();
   await textFocusRun.page.keyboard.press('Enter');
-  await textFocusRun.page.waitForFunction(() => document.querySelector('.globe-stage')?.dataset.digitalPath === 'sphere');
-  await textFocusRun.page.waitForFunction(() => (
-    document.activeElement?.matches('#text-layer-breadcrumb .digital-breadcrumb-item, #text-layer-buttons .layer-filter')
-    && document.activeElement.getClientRects().length > 0
-    && document.activeElement !== document.body
-  ));
+  await waitForAtomicHierarchyFocus(textFocusRun.page, {
+    label: 'text atomic focus: root activation',
+    expectedPath: 'sphere',
+    activeSelector: '#text-layer-breadcrumb .digital-breadcrumb-item, #text-layer-buttons .layer-filter',
+    requirePanel: false,
+  });
 
   assert(textFocusRun.pageErrors.length === 0, `text atomic focus: page errors: ${textFocusRun.pageErrors.join(' | ')}`);
   await textFocusRun.context.close();
   results.push({ id: 'legacy-layer-and-atomic-focus', verdict: 'PASS', backForwardFocus: true, textHierarchyFocus: true, keyboardPath: true });
+}
+
+async function historyFocusDiagnosticContractScenario() {
+  process.stdout.write(`${JSON.stringify({ state: 'RUNNING', scenario: 'history-focus-diagnostic-contract' })}\n`);
+  const run = await newPage({ reducedMotion: 'reduce' });
+  await run.page.goto(`${baseUrl}/?view=layers&digital_path=sphere/communication_networks`, { waitUntil: 'domcontentloaded' });
+  await run.page.waitForSelector('html.runtime-ready');
+  await run.page.waitForSelector('.globe-stage[data-view-phase="layers"]');
+  let diagnosticMessage = '';
+  try {
+    await waitForAtomicHierarchyFocus(run.page, {
+      label: 'history focus diagnostic contract',
+      expectedPath: 'sphere/communication_networks',
+      activeSelector: '#intentionally-missing-focus-target',
+      timeout: 50,
+    });
+  } catch (error) {
+    diagnosticMessage = error.message;
+  }
+  for (const field of [
+    'url',
+    'phase',
+    'digitalPath',
+    'dataVisible',
+    'hidden',
+    'inert',
+    'pendingHierarchyFocusPath',
+    'hierarchyFocusAttempt',
+    'active',
+  ]) {
+    assert(diagnosticMessage.includes(field), `history focus diagnostic contract missing ${field}: ${diagnosticMessage}`);
+  }
+  assert(run.consoleErrors.length === 0, `history focus diagnostic contract: console errors: ${run.consoleErrors.join(' | ')}`);
+  assert(run.pageErrors.length === 0, `history focus diagnostic contract: page errors: ${run.pageErrors.join(' | ')}`);
+  results.push({ id: 'history-focus-diagnostic-contract', verdict: 'PASS' });
+  await run.context.close();
 }
 
 async function validEmptyDigitalPathScenario() {
@@ -2112,6 +2216,7 @@ try {
   await interruptedLayerJourneyScenario();
   await reducedMotionLayerScenario();
   await legacyLayerAndAtomicFocusScenario();
+  await historyFocusDiagnosticContractScenario();
   await validEmptyDigitalPathScenario();
   await externalLinkSafetyScenario();
   await syntheticCatalogueTruthScenario();

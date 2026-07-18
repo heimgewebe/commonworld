@@ -1238,6 +1238,17 @@ function projectMatchesDigitalState(identifier, state = runtime.state) {
   return digitalPathContainsRecord(state.digitalPath ?? DIGITAL_ROOT_PATH, record);
 }
 
+function setPendingHierarchyFocus(pathKey, attempt = null) {
+  runtime.pendingHierarchyFocusPath = pathKey;
+  if (pathKey) {
+    elements.stage.dataset.pendingHierarchyFocusPath = pathKey;
+    if (Number.isInteger(attempt)) elements.stage.dataset.hierarchyFocusAttempt = String(attempt);
+    return;
+  }
+  delete elements.stage.dataset.pendingHierarchyFocusPath;
+  delete elements.stage.dataset.hierarchyFocusAttempt;
+}
+
 function hierarchyFocusSurfaceReady() {
   if (runtime.state.surface === 'text') return !elements.textView.hidden;
   return runtime.state.view === 'layers'
@@ -1245,6 +1256,23 @@ function hierarchyFocusSurfaceReady() {
     && elements.layerPanel.hasAttribute('data-visible')
     && !elements.layerPanel.hidden
     && !elements.layerPanel.hasAttribute('inert');
+}
+
+function isVisibleHierarchyFocusTarget(
+  target = document.activeElement,
+  pathKey = serializeDigitalPath(runtime.state.digitalPath),
+) {
+  if (!isVisibleFocusTarget(target)) return false;
+  if (target.matches('.digital-lane-scroll')) {
+    return target.closest('.digital-lane')?.dataset.digitalPath === pathKey;
+  }
+  if (!target.matches([
+    '.digital-lane-focus',
+    '#layer-breadcrumb .digital-breadcrumb-item',
+    '#text-layer-breadcrumb .digital-breadcrumb-item',
+    '#text-layer-buttons .layer-filter',
+  ].join(', '))) return false;
+  return target.dataset.digitalPath === pathKey || target.getAttribute('aria-current') === 'page';
 }
 
 function focusVisibleHierarchyControl(pathKey) {
@@ -1273,7 +1301,7 @@ function flushPendingHierarchyFocus() {
   if (!pathKey || !hierarchyFocusSurfaceReady()) return null;
   const target = focusVisibleHierarchyControl(pathKey);
   if (!target) return null;
-  runtime.pendingHierarchyFocusPath = null;
+  setPendingHierarchyFocus(null);
   window.clearTimeout(runtime.hierarchyFocusTimer);
   runtime.hierarchyFocusTimer = null;
   return target;
@@ -1282,14 +1310,15 @@ function flushPendingHierarchyFocus() {
 const HIERARCHY_FOCUS_RETRY_DELAYS_MS = [0, 50, 150, 400, 900, 1800, 3600];
 
 function scheduleHierarchyFocus(pathKey) {
-  runtime.pendingHierarchyFocusPath = pathKey;
-  window.clearTimeout(runtime.hierarchyFocusTimer);
   let attempt = 0;
+  setPendingHierarchyFocus(pathKey, attempt);
+  window.clearTimeout(runtime.hierarchyFocusTimer);
   const tryFocus = () => {
     runtime.hierarchyFocusTimer = null;
     if (runtime.pendingHierarchyFocusPath !== pathKey) return;
     if (flushPendingHierarchyFocus()) return;
     attempt += 1;
+    setPendingHierarchyFocus(pathKey, attempt);
     if (attempt >= HIERARCHY_FOCUS_RETRY_DELAYS_MS.length) return;
     runtime.hierarchyFocusTimer = window.setTimeout(tryFocus, HIERARCHY_FOCUS_RETRY_DELAYS_MS[attempt]);
   };
@@ -1633,7 +1662,9 @@ function finishViewTransition(phase, { restoreFocus = false } = {}) {
       runtime.layerPanelReady = true;
       elements.stage.dataset.layerPanelVisibleAt = String(performance.now());
       showLayerState();
-      if (!flushPendingHierarchyFocus()) {
+      const hierarchyTarget = flushPendingHierarchyFocus()
+        ?? (isVisibleHierarchyFocusTarget() ? document.activeElement : null);
+      if (!hierarchyTarget) {
         elements.layerClose.focus({ preventScroll: true });
         if (runtime.pendingHierarchyFocusPath) scheduleHierarchyFocus(runtime.pendingHierarchyFocusPath);
       }
@@ -1840,7 +1871,7 @@ function applyDeepLink(search, { initial = false } = {}) {
   runtime.applyingHistory = false;
   if (initial) writeHistory('replace');
   else if (runtime.state.project) elements.focus.focus({ preventScroll: true });
-  else if (!isVisibleFocusTarget(previousFocus)) {
+  else if (!isVisibleHierarchyFocusTarget(previousFocus)) {
     scheduleHierarchyFocus(serializeDigitalPath(runtime.state.digitalPath));
   }
 }
