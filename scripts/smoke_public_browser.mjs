@@ -1616,6 +1616,26 @@ async function legacyLayerAndAtomicFocusScenario() {
   await textFocusRun.page.waitForFunction(() => document.activeElement?.matches('#text-layer-breadcrumb .digital-breadcrumb-item, #text-layer-buttons .layer-filter') && document.activeElement.getClientRects().length > 0);
   assert(await textFocusRun.page.locator('#project-focus').isHidden(), 'text atomic focus: incompatible path retained project overlay');
   assert(await textFocusRun.page.locator('#text-layer-breadcrumb .digital-breadcrumb-item[aria-current="page"]').isVisible(), 'text atomic focus: current breadcrumb is not visible');
+  const textBundle = textFocusRun.page.locator('#text-layer-buttons .layer-filter[data-digital-path="sphere/communication_networks/community_networks"]');
+  await textBundle.focus();
+  await textFocusRun.page.keyboard.press('Enter');
+  await textFocusRun.page.waitForFunction(() => document.querySelector('.globe-stage')?.dataset.digitalPath === 'sphere/communication_networks/community_networks');
+  await textFocusRun.page.waitForFunction(() => (
+    document.activeElement?.matches('#text-layer-breadcrumb .digital-breadcrumb-item, #text-layer-buttons .layer-filter')
+    && document.activeElement.getClientRects().length > 0
+    && !document.activeElement.closest('[hidden], [inert], [aria-hidden="true"]')
+  ));
+
+  const textRootBreadcrumb = textFocusRun.page.locator('#text-layer-breadcrumb .digital-breadcrumb-item[data-digital-path="sphere"]');
+  await textRootBreadcrumb.focus();
+  await textFocusRun.page.keyboard.press('Enter');
+  await textFocusRun.page.waitForFunction(() => document.querySelector('.globe-stage')?.dataset.digitalPath === 'sphere');
+  await textFocusRun.page.waitForFunction(() => (
+    document.activeElement?.matches('#text-layer-breadcrumb .digital-breadcrumb-item, #text-layer-buttons .layer-filter')
+    && document.activeElement.getClientRects().length > 0
+    && document.activeElement !== document.body
+  ));
+
   assert(textFocusRun.pageErrors.length === 0, `text atomic focus: page errors: ${textFocusRun.pageErrors.join(' | ')}`);
   await textFocusRun.context.close();
   results.push({ id: 'legacy-layer-and-atomic-focus', verdict: 'PASS', backForwardFocus: true, textHierarchyFocus: true, keyboardPath: true });

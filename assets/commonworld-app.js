@@ -1276,7 +1276,7 @@ function setDigitalPath(path, { historyMode = 'push' } = {}) {
   }
   runtime.visibleRecordsCache = null;
   renderDiscoveryState();
-  if (closesProject || runtime.state.view === 'layers') {
+  if (closesProject || runtime.state.view === 'layers' || runtime.state.surface === 'text') {
     scheduleHierarchyFocus(normalized.pathKey);
   }
   if (historyMode) writeHistory(historyMode);
