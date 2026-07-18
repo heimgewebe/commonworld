@@ -311,28 +311,29 @@ Digitale Commons erhalten keine erfundenen Koordinaten.
 
 ### Vorläufige Darstellungsschichten
 
-Die erste Präsentationskonfiguration unterscheidet:
+Die erste sechsfach geschichtete Präsentationskonfiguration bleibt nur als Legacy-Kompatibilität für alte Links und historische Beweise erhalten. Neue Produktlogik nutzt stattdessen `contracts/commonworld/digital-ring-taxonomy.contract.json` als versionierte, rendererneutrale Präsentationstaxonomie außerhalb der CommonProject-Datensätze.
 
-1. Wissen und offene Daten;
-2. freie Software und Infrastruktur;
-3. offene Medien und Kultur;
-4. freies Lernen und Bildung;
-5. Kommunikation und Netze;
-6. gemischte und weitere digitale Commons.
+Die aktive digitale Übersicht unterscheidet fünf Haupt-Ringbündel:
 
-Diese Schichten sind keine zweite Katalogontologie und keine manuell gepflegten Projektfelder. Sie werden aus vorhandenen Themen, Commons-Familien und belegter digitaler Präsenz abgeleitet. Die konkrete Zahl und Benennung bleibt als Präsentationskonfiguration überprüfbar, während `CommonProject.id` die einzige Identitätswahrheit bleibt.
+1. Wissen, Lernen und Kultur;
+2. Software, Werkzeuge und Produktion;
+3. Kommunikation und Netze;
+4. Versorgung, Land und Ökologie;
+5. Kooperation und Selbstorganisation.
+
+Darunter liegen beliebig tiefe Unterbündel bis zur Identitätsebene. Die Oberfläche zeigt jeweils nur den aktuellen Knoten, seine direkten Kinder und den Elternpfad. Alle heute bekannten digitalen Katalogthemen sind ausdrücklich einer semantischen Regel oder einem Knoten zugeordnet; `mixed_other`, `other` und `root` sind keine öffentlichen Dauerablagen. Unbekannte zukünftige Themen dürfen nur als diagnostischer unklassifizierter Zustand auffallen.
 
 ### Eigener semantischer Zoom und Seitenansicht
 
 ```text
 digitale Gesamtsphäre
-→ geschichtete Bahnen und belegte Netzwerke
-→ seitliche Ansicht der übereinanderliegenden Schichten
-→ kleinere Zusammenhänge
+→ fünf Haupt-Ringbündel
+→ direkte Unterbündel
+→ Schnittstellenknoten bei belegter Mehrdeutigkeit
 → einzelne digitale Commons
 ```
 
-Beim Klick auf den Sphärenrand wechselt dieselbe Oberfläche in eine Seitenansicht. Die Schichten liegen dort übereinander; die Erde bleibt als gedämpfter Bezug sichtbar. Browser-Zurück, Deep Link und Schließen führen zum vorherigen Globuszustand zurück. Bei reduzierter Bewegung erfolgt der Zustandswechsel ohne Kamerafahrt. Es wird keine getrennte digitale Nebenanwendung geöffnet.
+Beim Klick auf den Sphärenrand wechselt dieselbe Oberfläche in eine Seitenansicht. Die Ringbündel liegen dort als hierarchische lineare Entsprechung vor; die Erde bleibt als gedämpfter Bezug sichtbar. Browser-Zurück, Deep Link, Breadcrumb und Schließen führen zum vorherigen Globuszustand oder zum Elternknoten zurück. Bei reduzierter Bewegung erfolgt derselbe Zustandswechsel ohne Kamerafahrt. Es wird keine getrennte digitale Nebenanwendung geöffnet.
 
 ## Hybride Commons
 
@@ -683,6 +684,14 @@ Das Zahnrad wechselt zwischen `Globus` und `Text`. Beide Darstellungen verwenden
 Die digitale Sphäre ist geometrisch an MapLibre gebunden. Ihr sichtbarer Mittelpunkt wird aus der Projektion des aktuellen Kartenmittelpunkts bestimmt; Größe und Versatz berücksichtigen Kartenmaß, Viewport und MapLibre-Padding. Ein bildschirmfestes unabhängiges Zentrieren ist verboten. Dadurch bleiben Erde und Sphäre auch während der seitlichen Schichtfahrt zusammen. Die berechnete Geometrie wird für Browserabnahmen als Datenattribut offengelegt.
 
 `catalog/catalog.json`, die Projektdateien unter `catalog/projects/` und `contracts/commonworld/project.schema.json` bilden die statische, ausschließlich lesende Maschinenoberfläche. Sie ist keine laufende API und besitzt keinen Schreibweg. Eine eigenständige CLI bleibt ohne belegten wiederkehrenden Anwendungsfall ausgeschlossen. Die Betriebsgrenze steht in `docs/ops/machine-readable-surface.md`.
+
+### Hierarchische digitale Ringbündel v1
+
+Die flache digitale Sechserordnung ist ab dieser Phase Legacy-Kompatibilität. Der aktive Präsentationspfad ist `digital_path` und enthält stabile ASCII-Knoten von `sphere` über ein Hauptfeld und ein Unterbündel bis zur fokussierten `CommonProject.id` über den separaten `project`-Zustand. Alte `layer`-Links werden deterministisch migriert; ungültige oder traversal-artige Werte fallen geschlossen auf die Sphärenwurzel zurück und erzeugen keinen Teilfilter.
+
+Die fünf Hauptfelder sind Wissen, Lernen und Kultur; Software, Werkzeuge und Produktion; Kommunikation und Netze; Versorgung, Land und Ökologie; Kooperation und Selbstorganisation. Jedes digitale CommonProject erhält genau einen primären Navigationspfad aus belegter digitaler Präsenz und vorhandenen Themen. Gleichstände werden nicht durch Dateireihenfolge entschieden, sondern über explizite Schnittstellenknoten oder dokumentierte gemeinsame-Eltern-Regeln. Der Katalog bleibt alleinige Inhaltswahrheit; die Taxonomie bleibt eine versionierte Präsentationsstruktur außerhalb der Datensätze.
+
+Die Sphärenübersicht zeigt nur die fünf Haupt-Ringbündel mit aggregierten Commons-Zahlen und begrenzter Vorschau. Das Öffnen zeigt jeweils direkte Unterbündel und Breadcrumb, nicht den vollständigen rekursiven Baum. Auf Identitätsebene öffnen die bestehenden Namen und Binärfragmente dasselbe Fokuspanel wie Karte, Suche und Textansicht. Die lineare Ansicht benutzt denselben Baum und dieselbe Auswahl, nicht ein zweites Datenmodell.
 
 ### Begrenzte Produktions- und Anbieterentscheidung v1
 

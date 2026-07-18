@@ -2,15 +2,16 @@ import {
   DEFAULT_CAMERA,
   MAX_MAP_ZOOM,
   binaryName,
+  buildDigitalPresentationTree,
   DIGITAL_LAYER_TRANSITION_MS,
-  LAYERS,
-  deriveLayer,
+  DIGITAL_ROOT_PATH,
   digitalLayerCamera,
   filterRecords,
   globeHorizonCoordinates,
   hasDigitalPresence,
   mapCamera,
   mapFailurePolicy,
+  normalizeDigitalPath,
   normalizeQuery,
   prepareCatalogProjection,
   prepareIntentSearchIndex,
@@ -25,11 +26,13 @@ import {
   ringOrbitDuration,
   ringOrbitStartAngle,
   searchFromState,
+  serializeDigitalPath,
   semanticLocationLine,
   sphereDetailLevel,
   sphereLayout,
   sphereOpacityForGlobeRatio,
   stateFromSearch,
+  visibleDigitalNodes,
 } from './commonworld-core.mjs';
 
 const SVG_NS = 'http://www.w3.org/2000/svg';
@@ -39,6 +42,7 @@ const PUBLIC_MAP_SOURCE_ID = 'commonworld-public-representations';
 const PUBLIC_MAP_LAYER_IDS = Object.freeze(['commonworld-public-extents', 'commonworld-approximate-zones', 'commonworld-exact-anchors']);
 const ACTION_LINK_TYPES = new Set(['visit', 'use', 'borrow', 'learn', 'contribute', 'volunteer', 'donate', 'contact', 'replicate']);
 const INTENT_FILTER_NAMES = Object.freeze(['presence', 'action', 'language', 'access', 'freshness', 'curation']);
+const DIGITAL_IDENTITY_DOM_LIMIT = 48;
 const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
 const elements = {
   body: document.body,
@@ -48,6 +52,8 @@ const elements = {
   textView: document.querySelector('#text-view'),
   textCount: document.querySelector('#text-count'),
   textEmpty: document.querySelector('#text-empty'),
+  textLayerBreadcrumb: document.querySelector('#text-layer-breadcrumb'),
+  textLayerCurrent: document.querySelector('#text-layer-current'),
   textLayerButtons: document.querySelector('#text-layer-buttons'),
   stage: document.querySelector('.globe-stage'),
   map: document.querySelector('#map'),
@@ -66,6 +72,8 @@ const elements = {
   layerSearchToggle: document.querySelector('#layer-search-toggle'),
   layerDiscovery: document.querySelector('#layer-discovery'),
   layerSearch: document.querySelector('#layer-search'),
+  layerBreadcrumb: document.querySelector('#layer-breadcrumb'),
+  layerCurrent: document.querySelector('#layer-current'),
   layerButtons: document.querySelector('#layer-buttons'),
   layerProjects: document.querySelector('#layer-projects'),
   layerDeck: document.querySelector('#layer-track-deck'),
@@ -105,6 +113,7 @@ const runtime = {
   records: [],
   recordsById: new Map(),
   catalogProjection: null,
+  digitalTree: null,
   searchIndex: null,
   visibleRecordsCache: null,
   lastPublicMapData: null,
@@ -113,6 +122,7 @@ const runtime = {
     camera: { ...DEFAULT_CAMERA },
     project: null,
     layer: null,
+    digitalPath: DIGITAL_ROOT_PATH,
     view: 'globe',
     surface: 'globe',
     query: '',
@@ -301,6 +311,7 @@ async function loadRecords() {
 function installRecords(records) {
   runtime.records = records;
   runtime.catalogProjection = prepareCatalogProjection(records);
+  runtime.digitalTree = buildDigitalPresentationTree(records);
   runtime.searchIndex = prepareIntentSearchIndex(records);
   runtime.recordsById = runtime.catalogProjection.recordsById;
   elements.stage.dataset.searchIndexedRecords = String(runtime.searchIndex.indexedRecordCount);
@@ -316,16 +327,45 @@ function createSvgElement(name, attributes = {}) {
   return element;
 }
 
-function groupedDigitalRecords(records = runtime.records) {
-  const grouped = new Map(LAYERS.map((layer) => [layer.id, []]));
-  for (const record of records) {
-    const layer = deriveLayer(record);
-    if (layer) grouped.get(layer)?.push(record);
-  }
-  return grouped;
+function recordsForNode(node) {
+  return (node?.identityIds ?? []).map((identifier) => runtime.recordsById.get(identifier)).filter(Boolean);
 }
 
-function appendRingSequence(textPath, records) {
+function currentDigitalPath() {
+  return runtime.state.digitalPath ?? DIGITAL_ROOT_PATH;
+}
+
+function setCurrentDigitalPathDataset() {
+  elements.stage.dataset.digitalPath = serializeDigitalPath(currentDigitalPath());
+}
+
+function digitalPathFiltered() {
+  return serializeDigitalPath(currentDigitalPath()) !== serializeDigitalPath(DIGITAL_ROOT_PATH);
+}
+
+function treeForRecords(records = runtime.records) {
+  return buildDigitalPresentationTree(records);
+}
+
+function unfilteredPathRecords() {
+  return filterRecords(runtime.records, {
+    ...runtime.state,
+    layer: null,
+    digitalPath: DIGITAL_ROOT_PATH,
+    searchIndex: runtime.searchIndex,
+  });
+}
+
+function visibleDigitalView(records = visibleRecords()) {
+  return visibleDigitalNodes(treeForRecords(records), currentDigitalPath(), { identityLimit: DIGITAL_IDENTITY_DOM_LIMIT });
+}
+
+function appendRingSequence(textPath, records, { prefix = '' } = {}) {
+  if (prefix) {
+    const label = createSvgElement('tspan', { class: 'sphere-ring-label' });
+    label.textContent = `  ${prefix}  `;
+    textPath.append(label);
+  }
   for (const record of records) {
     const name = createSvgElement('tspan', { class: 'sphere-ring-name', 'data-commonproject-id': record.id });
     name.textContent = `  ${record.title}  `;
@@ -336,20 +376,40 @@ function appendRingSequence(textPath, records) {
 }
 
 function renderSphereRibbons(records = runtime.records) {
-  const grouped = groupedDigitalRecords(records);
-  LAYERS.forEach((layer, layerIndex) => {
-    const plane = elements.sphereRings.querySelector(`.sphere-ring-plane[data-layer-id="${CSS.escape(layer.id)}"]`);
-    if (!plane) return;
-    const source = grouped.get(layer.id) ?? [];
-    const orbitDuration = ringOrbitDuration(source.length);
-    plane.dataset.entryCount = String(source.length);
+  const view = visibleDigitalView(records);
+  const childBundles = view.children.filter((node) => node.type !== 'identity');
+  const visibleNodes = (childBundles.length ? childBundles : (view.current ? [view.current] : []))
+    .filter((node) => node.type !== 'diagnostic' || node.identityCount > 0)
+    .slice(0, 8);
+  elements.sphereRings.replaceChildren();
+  visibleNodes.forEach((node, layerIndex) => {
+    const source = recordsForNode(node).slice(0, node.type === 'field' ? 2 : 3);
+    const plane = createSvgElement('g', {
+      class: 'sphere-ring-plane',
+      'data-node-id': node.id,
+      'data-layer-id': node.id,
+      'data-digital-path': node.pathKey,
+      'data-ring-index': String(layerIndex),
+    });
+    const guide = createSvgElement('use', {
+      href: `#sphere-path-${layerIndex + 1}`,
+      class: 'sphere-layer-guide',
+      'data-node-id': node.id,
+      'data-layer-id': node.id,
+    });
+    plane.append(guide);
+    const orbitDuration = ringOrbitDuration(node.identityCount);
+    plane.dataset.entryCount = String(node.identityCount);
+    plane.dataset.identityCount = String(node.identityCount);
     plane.dataset.orbitDuration = String(orbitDuration);
     plane.style.setProperty('--ring-orbit-duration', `${orbitDuration}s`);
     plane.style.setProperty('--ring-orbit-direction', String(ringOrbitDirection(layerIndex)));
     plane.style.setProperty('--ring-orbit-start-angle', `${ringOrbitStartAngle(layerIndex)}deg`);
     const text = createSvgElement('text', {
       class: 'sphere-ring-text',
-      'data-layer-id': layer.id,
+      'data-layer-id': node.id,
+      'data-node-id': node.id,
+      'data-digital-path': node.pathKey,
       'data-entry-count': String(source.length),
     });
     const textPath = createSvgElement('textPath', {
@@ -357,27 +417,23 @@ function renderSphereRibbons(records = runtime.records) {
       startOffset: `${(layerIndex * 11 + 3) % 100}%`,
     });
     if (source.length) {
-      appendRingSequence(textPath, source);
+      appendRingSequence(textPath, source, { prefix: `${node.label} · ${node.identityCount}` });
     } else {
       const placeholder = createSvgElement('tspan', { class: 'sphere-ring-placeholder' });
-      placeholder.textContent = `  ${layer.trackLabel} · keine sichtbaren Einträge  `;
+      placeholder.textContent = `  ${node.label} · keine sichtbaren Einträge  `;
       textPath.append(placeholder);
     }
     text.append(textPath);
     text.toggleAttribute('data-empty', source.length === 0);
-    plane.querySelector('.sphere-ring-text')?.remove();
     plane.append(text);
+    elements.sphereRings.append(plane);
   });
   runtime.overlayRenderCount += 1;
   elements.stage.dataset.overlayRenders = String(runtime.overlayRenderCount);
 }
 
-function selectLayerTrack(layerId) {
-  const nextLayer = runtime.state.layer === layerId ? null : layerId;
-  if (runtime.state.project && nextLayer && deriveLayer(runtime.recordsById.get(runtime.state.project)) !== nextLayer) {
-    runtime.state.project = null;
-  }
-  setLayer(nextLayer);
+function selectDigitalBundle(path) {
+  setDigitalPath(path);
 }
 
 function createRibbonSegment(record, copyIndex) {
@@ -407,28 +463,52 @@ function updateLaneOverflow() {
 
 function renderLayerDeck() {
   elements.layerDeck.replaceChildren();
-  const grouped = groupedDigitalRecords();
-  for (const layer of LAYERS) {
-    const records = grouped.get(layer.id) ?? [];
+  const view = visibleDigitalView();
+  if (!view.current) return;
+  const identityLevel = view.children.length > 0 && view.children.every((node) => node.type === 'identity');
+  const laneNodes = identityLevel ? [view.current] : view.children.filter((node) => node.identityCount > 0 || node.type === 'identity');
+  elements.layerDeck.style.setProperty('--lane-count', String(Math.max(1, laneNodes.length)));
+  const visibleIdentityRecords = identityLevel
+    ? view.children.map((node) => runtime.recordsById.get(node.projectId)).filter(Boolean)
+    : null;
+  for (const [index, node] of laneNodes.entries()) {
+    const allRecords = visibleIdentityRecords ?? recordsForNode(node);
+    const records = identityLevel || node.type === 'identity' ? allRecords : allRecords.slice(0, 4);
     const lane = document.createElement('section');
     lane.className = 'digital-lane';
-    lane.dataset.layerId = layer.id;
-    lane.setAttribute('aria-label', layer.label);
+    lane.dataset.layerId = node.id;
+    lane.dataset.nodeId = node.id;
+    lane.dataset.digitalPath = node.pathKey;
+    lane.style.setProperty('--lane-index', String(index));
+    lane.setAttribute('aria-label', `${node.label}, ${node.identityCount} Commons`);
 
     const focus = document.createElement('button');
     focus.type = 'button';
     focus.className = 'digital-lane-focus';
-    focus.dataset.layerId = layer.id;
+    focus.dataset.layerId = node.id;
+    focus.dataset.nodeId = node.id;
+    focus.dataset.digitalPath = node.pathKey;
     focus.setAttribute('aria-pressed', 'false');
-    focus.innerHTML = `<span>${layer.trackLabel}</span><small>${records.length} Commons</small>`;
-    focus.addEventListener('click', () => selectLayerTrack(layer.id));
+    focus.setAttribute('aria-expanded', String(!identityLevel && serializeDigitalPath(currentDigitalPath()) === node.pathKey));
+    if (serializeDigitalPath(currentDigitalPath()) === node.pathKey) focus.setAttribute('aria-current', 'page');
+    const focusLabel = document.createElement('span');
+    focusLabel.textContent = node.label;
+    const count = document.createElement('small');
+    count.textContent = `${node.identityCount} Commons`;
+    focus.append(focusLabel, count);
+    focus.addEventListener('click', () => {
+      if (identityLevel) return;
+      selectDigitalBundle(node.path);
+    });
 
     const scroller = document.createElement('div');
     scroller.className = 'digital-lane-scroll';
-    scroller.dataset.layerId = layer.id;
+    scroller.dataset.layerId = node.id;
+    scroller.dataset.nodeId = node.id;
+    scroller.dataset.digitalPath = node.pathKey;
     scroller.tabIndex = 0;
     scroller.setAttribute('role', 'region');
-    scroller.setAttribute('aria-label', `${layer.label} horizontal durchblättern`);
+    scroller.setAttribute('aria-label', `${node.label} horizontal durchblättern`);
     const content = document.createElement('div');
     content.className = 'digital-lane-content';
     const repeats = ribbonRepeatCount(records.length, 10);
@@ -456,12 +536,8 @@ function renderLayerStack() {
   elements.layerStack.replaceChildren();
 }
 
-function layerForRecord(record) {
-  return LAYERS.find(({ id }) => id === deriveLayer(record));
-}
-
 function discoveryCacheKey() {
-  return [runtime.state.layer, runtime.state.query, ...INTENT_FILTER_NAMES.map((name) => runtime.state[name])]
+  return [serializeDigitalPath(currentDigitalPath()), runtime.state.query, ...INTENT_FILTER_NAMES.map((name) => runtime.state[name])]
     .map((value) => value ?? '')
     .join('\u001f');
 }
@@ -475,7 +551,7 @@ function visibleRecords() {
 }
 
 function recordsMatchingQuery() {
-  return filterRecords(runtime.records, { ...runtime.state, layer: null, searchIndex: runtime.searchIndex });
+  return filterRecords(runtime.records, { ...runtime.state, layer: null, digitalPath: DIGITAL_ROOT_PATH, searchIndex: runtime.searchIndex });
 }
 
 function hasIntentFilters() {
@@ -487,7 +563,7 @@ function hasIntentFilters() {
 
 function currentPublicMapData() {
   if (!runtime.catalogProjection) return Object.freeze({ type: 'FeatureCollection', features: Object.freeze([]) });
-  const filtering = Boolean(runtime.state.layer || normalizeQuery(runtime.state.query) || hasIntentFilters());
+  const filtering = Boolean(digitalPathFiltered() || normalizeQuery(runtime.state.query) || hasIntentFilters());
   const visibleProjectIds = filtering ? visibleRecords().map(({ id }) => id) : null;
   return runtime.catalogProjection.publicMapFeatureCollection(visibleProjectIds);
 }
@@ -585,16 +661,20 @@ function updateSemanticLocationLine() {
 
 function renderLayerButtons(container) {
   container.replaceChildren();
-  const queryMatches = recordsMatchingQuery();
-  for (const layer of LAYERS) {
-    const count = queryMatches.filter((record) => deriveLayer(record) === layer.id).length;
+  const tree = treeForRecords(unfilteredPathRecords());
+  const view = visibleDigitalNodes(tree, currentDigitalPath());
+  const currentKey = view.current?.pathKey ?? serializeDigitalPath(DIGITAL_ROOT_PATH);
+  for (const node of view.children.filter((child) => child.type !== 'identity' && child.identityCount > 0)) {
     const button = document.createElement('button');
     button.type = 'button';
     button.className = 'layer-filter';
-    button.dataset.layerId = layer.id;
-    button.setAttribute('aria-pressed', String(runtime.state.layer === layer.id));
-    button.textContent = `${layer.label} · ${count}`;
-    button.addEventListener('click', () => setLayer(runtime.state.layer === layer.id ? null : layer.id));
+    button.dataset.layerId = node.id;
+    button.dataset.nodeId = node.id;
+    button.dataset.digitalPath = node.pathKey;
+    button.setAttribute('aria-pressed', String(currentKey === node.pathKey));
+    button.setAttribute('aria-expanded', 'false');
+    button.textContent = `${node.label} · ${node.identityCount}`;
+    button.addEventListener('click', () => setDigitalPath(node.path));
     container.append(button);
   }
 }
@@ -603,6 +683,37 @@ function renderLayerPanel() {
   renderLayerButtons(elements.layerButtons);
   elements.layerProjects.replaceChildren();
   elements.layerSearch.value = runtime.state.query;
+  setCurrentDigitalPathDataset();
+  renderDigitalBreadcrumb(elements.layerBreadcrumb, elements.layerCurrent);
+}
+
+function renderDigitalBreadcrumb(breadcrumbElement, currentElement) {
+  const tree = treeForRecords(unfilteredPathRecords());
+  const view = visibleDigitalNodes(tree, currentDigitalPath());
+  if (currentElement) {
+    currentElement.textContent = view.current
+      ? `${view.current.label} · ${view.current.identityCount} Commons`
+      : 'Digitale Commons-Sphäre';
+  }
+  if (breadcrumbElement) {
+    breadcrumbElement.replaceChildren();
+    for (const [index, crumb] of view.breadcrumb.entries()) {
+      if (index > 0) {
+        const separator = document.createElement('span');
+        separator.textContent = '›';
+        separator.setAttribute('aria-hidden', 'true');
+        breadcrumbElement.append(separator);
+      }
+      const button = document.createElement('button');
+      button.type = 'button';
+      button.className = 'digital-breadcrumb-item';
+      button.dataset.digitalPath = crumb.pathKey;
+      button.textContent = crumb.type === 'sphere' ? 'Sphäre' : crumb.label;
+      if (index === view.breadcrumb.length - 1) button.setAttribute('aria-current', 'page');
+      button.addEventListener('click', () => setDigitalPath(crumb.path));
+      breadcrumbElement.append(button);
+    }
+  }
 }
 
 function selectedProjectRecord() {
@@ -760,6 +871,7 @@ function renderTextView() {
     if (card) catalog.append(card);
   }
   renderLayerButtons(elements.textLayerButtons);
+  renderDigitalBreadcrumb(elements.textLayerBreadcrumb, elements.textLayerCurrent);
   const count = visibleIds.size;
   elements.textCount.textContent = String(count) + ' Commons';
   elements.textEmpty.hidden = count !== 0;
@@ -768,18 +880,20 @@ function renderTextView() {
 function updateSphereResultVisibility() {
   const visible = visibleRecords();
   const visibleIds = new Set(visible.map(({ id }) => id));
-  const focusedLayer = runtime.state.view === 'layers' ? runtime.state.layer : null;
-  if (focusedLayer) elements.stage.dataset.focusedLayer = focusedLayer;
-  else delete elements.stage.dataset.focusedLayer;
+  const digitalView = visibleDigitalView();
+  const identityLevel = digitalView.children.length > 0 && digitalView.children.every((node) => node.type === 'identity');
+  const focusedPath = runtime.state.view === 'layers' && identityLevel ? serializeDigitalPath(currentDigitalPath()) : null;
+  if (focusedPath && focusedPath !== serializeDigitalPath(DIGITAL_ROOT_PATH)) elements.stage.dataset.focusedPath = focusedPath;
+  else delete elements.stage.dataset.focusedPath;
   renderSphereRibbons(visible);
   elements.layerDeck.querySelectorAll('.digital-ribbon-item[data-commonproject-id]').forEach((segment) => {
     segment.hidden = !visibleIds.has(segment.dataset.commonprojectId);
   });
   elements.layerDeck.querySelectorAll('.digital-lane[data-layer-id]').forEach((lane) => {
-    const selected = focusedLayer === lane.dataset.layerId;
+    const selected = focusedPath === lane.dataset.digitalPath;
     const primaryVisible = [...lane.querySelectorAll('.digital-ribbon-item[data-ribbon-copy="0"]')].filter((segment) => !segment.hidden).length;
     lane.classList.toggle('is-focused', selected);
-    lane.toggleAttribute('data-layer-hidden', Boolean(focusedLayer && !selected));
+    lane.toggleAttribute('data-layer-hidden', false);
     lane.toggleAttribute('data-empty', primaryVisible === 0);
     lane.querySelector('.digital-lane-focus')?.setAttribute('aria-pressed', String(selected));
   });
@@ -847,6 +961,7 @@ function updateSelectionMarks() {
 
 function renderDiscoveryState() {
   renderLayerPanel();
+  renderLayerDeck();
   renderTextView();
   renderDiscoveryResults();
   syncIntentFilterControls();
@@ -969,15 +1084,30 @@ function clearProject({ historyMode = 'push', restoreFocus = true } = {}) {
   }
 }
 
-function setLayer(layer, { historyMode = 'push' } = {}) {
-  const nextLayer = LAYERS.some(({ id }) => id === layer) ? layer : null;
-  if (runtime.state.project && nextLayer && deriveLayer(runtime.recordsById.get(runtime.state.project)) !== nextLayer) runtime.state.project = null;
-  runtime.state.layer = nextLayer;
+function setDigitalPath(path, { historyMode = 'push' } = {}) {
+  const normalized = normalizeDigitalPathForApp(path);
+  runtime.state.digitalPath = normalized.path;
+  runtime.state.layer = null;
+  runtime.visibleRecordsCache = null;
   renderDiscoveryState();
-  if (runtime.state.view === 'layers' && nextLayer) {
-    window.requestAnimationFrame(() => elements.layerDeck.querySelector(`.digital-lane[data-layer-id="${CSS.escape(nextLayer)}"] .digital-lane-scroll`)?.focus({ preventScroll: true }));
+  if (runtime.state.view === 'layers') {
+    window.requestAnimationFrame(() => {
+      const selector = `.digital-lane[data-digital-path="${CSS.escape(normalized.pathKey)}"] .digital-lane-scroll`;
+      elements.layerDeck.querySelector(selector)?.focus({ preventScroll: true });
+    });
   }
   if (historyMode) writeHistory(historyMode);
+}
+
+function normalizeDigitalPathForApp(path) {
+  const normalized = normalizeDigitalPath(path);
+  if (!normalized.valid) return { path: DIGITAL_ROOT_PATH, pathKey: serializeDigitalPath(DIGITAL_ROOT_PATH) };
+  const tree = runtime.digitalTree ?? treeForRecords(runtime.records);
+  const current = tree.nodesByPath.get(normalized.pathKey);
+  if (!current || (current.type !== 'sphere' && current.identityCount === 0)) {
+    return { path: DIGITAL_ROOT_PATH, pathKey: serializeDigitalPath(DIGITAL_ROOT_PATH) };
+  }
+  return normalized;
 }
 
 function setQuery(value, { historyMode = 'replace' } = {}) {
@@ -1309,7 +1439,7 @@ function closeLayerView({ historyMode = 'push', cameraState = null, preserveLaye
   runtime.layerPanelReady = false;
   closeLayerDiscovery();
   runtime.state.view = 'globe';
-  if (!preserveLayer) runtime.state.layer = null;
+  runtime.state.layer = null;
   clearViewTransition();
   const duration = instant || reducedMotion.matches || !runtime.mapReady ? 0 : DIGITAL_LAYER_TRANSITION_MS;
   renderDiscoveryState();
@@ -1399,6 +1529,7 @@ function resetGlobe() {
   runtime.state.view = 'globe';
   setViewPhase('overview');
   runtime.state.layer = null;
+  runtime.state.digitalPath = DIGITAL_ROOT_PATH;
   runtime.state.camera = { ...DEFAULT_CAMERA };
   showLayerState();
   renderDiscoveryState();
@@ -1411,6 +1542,8 @@ function applyDeepLink(search, { initial = false } = {}) {
   if (initial && !new URLSearchParams(search).has('surface')) next.surface = storedPresentation();
   runtime.applyingHistory = true;
   runtime.state = next;
+  runtime.state.digitalPath = normalizeDigitalPathForApp(next.digitalPath).path;
+  runtime.state.layer = null;
   elements.search.value = next.query;
   setPresentation(next.surface, { historyMode: null, persist: false });
   if (runtime.mapReady) {
@@ -1569,6 +1702,10 @@ function wireControls() {
     else if (runtime.activeOverlay === 'discovery') closeDiscovery({ restoreFocus: true });
     else if (!elements.focus.hidden) clearProject();
     else if (!elements.layerDiscovery.hidden) closeLayerDiscovery({ restoreFocus: true });
+    else if ((runtime.viewPhase !== 'overview' || runtime.state.view === 'layers') && digitalPathFiltered()) {
+      const view = visibleDigitalNodes(runtime.digitalTree ?? treeForRecords(runtime.records), currentDigitalPath());
+      setDigitalPath(view.parent?.path ?? DIGITAL_ROOT_PATH);
+    }
     else if (runtime.viewPhase !== 'overview' || runtime.state.view === 'layers') closeLayerView();
   });
   window.addEventListener('popstate', () => applyDeepLink(location.search));

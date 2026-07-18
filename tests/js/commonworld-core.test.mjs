@@ -1,15 +1,22 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
+import { readFileSync } from 'node:fs';
 import {
   DEFAULT_CAMERA,
   MAX_MAP_ZOOM,
   DIGITAL_LAYER_TRANSITION_MS,
+  DIGITAL_RING_FIELDS,
+  DIGITAL_ROOT_PATH,
+  DIGITAL_TAXONOMY,
   LAYERS,
   ORBIT_PROFILES,
   binaryFragment,
   binaryName,
+  buildDigitalPresentationTree,
   cameraFromSearch,
+  deriveDigitalProjectPath,
   deriveLayer,
+  digitalPathFromLegacyLayer,
   digitalLayerCamera,
   filterRecords,
   globeHorizonCoordinates,
@@ -29,17 +36,26 @@ import {
   ribbonRepeatCount,
   RING_ORBIT_MIN_DURATION_S,
   RING_ORBIT_MAX_DURATION_S,
+  normalizeDigitalPath,
   ringOrbitDirection,
   ringOrbitDuration,
   ringOrbitStartAngle,
   searchFromState,
+  serializeDigitalPath,
   semanticLocationLine,
   semanticZoomLevel,
   sphereDetailLevel,
   sphereLayout,
   sphereOpacityForGlobeRatio,
   stateFromSearch,
+  validateDigitalTaxonomy,
+  visibleDigitalNodes,
 } from '../../assets/commonworld-core.mjs';
+
+function loadPublicCatalogRecords() {
+  const manifest = JSON.parse(readFileSync(new URL('../../catalog/catalog.json', import.meta.url), 'utf8'));
+  return manifest.project_files.map((relative) => JSON.parse(readFileSync(new URL(`../../catalog/${relative}`, import.meta.url), 'utf8')));
+}
 
 test('all six digital presentation layers remain ordered', () => {
   assert.deepEqual(LAYERS.map(({ id }) => id), [
@@ -56,6 +72,132 @@ test('layer derivation uses catalog themes without overrides', () => {
   assert.equal(deriveLayer({ themes: ['knowledge', 'open-data'], presence: { digital: { available: true } } }), 'knowledge_data');
   assert.equal(deriveLayer({ themes: ['open-data', 'infrastructure'], presence: { digital: { available: true } } }), 'mixed_other');
   assert.equal(deriveLayer({ themes: ['education'], presence: { digital: { available: false } } }), null);
+});
+
+test('digital ring taxonomy exposes five fields and validates its legacy aliases', () => {
+  assert.deepEqual(validateDigitalTaxonomy(), []);
+  assert.deepEqual(DIGITAL_RING_FIELDS.map(({ id }) => id), [
+    'knowledge_learning_culture',
+    'software_tools_production',
+    'communication_networks',
+    'provision_land_ecology',
+    'cooperation_self_organization',
+  ]);
+  assert.equal(DIGITAL_RING_FIELDS.length, 5);
+  assert.deepEqual(digitalPathFromLegacyLayer('knowledge_data'), ['sphere', 'knowledge_learning_culture', 'open_knowledge_data']);
+  assert.deepEqual(digitalPathFromLegacyLayer('software_infrastructure'), ['sphere', 'software_tools_production', 'free_software']);
+  assert.deepEqual(digitalPathFromLegacyLayer('media_culture'), ['sphere', 'knowledge_learning_culture', 'media_culture']);
+  assert.deepEqual(digitalPathFromLegacyLayer('learning_education'), ['sphere', 'knowledge_learning_culture', 'learning_education']);
+  assert.deepEqual(digitalPathFromLegacyLayer('communication_networks'), ['sphere', 'communication_networks', 'community_networks']);
+  assert.deepEqual(digitalPathFromLegacyLayer('mixed_other'), ['sphere']);
+  assert.equal(DIGITAL_TAXONOMY.version, 'digital-ring-bundles-v1');
+});
+
+test('digital ring path derivation is deterministic and handles ambiguity explicitly', () => {
+  const digital = (themes, available = true) => ({
+    id: 'case',
+    title: 'Case',
+    themes,
+    presence: { digital: { available } },
+  });
+  assert.equal(deriveDigitalProjectPath(digital(['free-software']))?.pathKey, 'sphere/software_tools_production/free_software');
+  assert.equal(deriveDigitalProjectPath(digital(['knowledge', 'education']))?.pathKey, 'sphere/knowledge_learning_culture/knowledge_learning_bridge');
+  assert.equal(deriveDigitalProjectPath(digital(['open-data', 'open-source']))?.pathKey, 'sphere/software_tools_production/knowledge_software_bridge');
+  const unknown = deriveDigitalProjectPath(digital(['future-theme']));
+  assert.equal(unknown?.status, 'unclassified');
+  assert.equal(unknown?.pathKey, 'sphere/unclassified_future_theme');
+  assert.deepEqual(unknown?.unknownThemes, ['future-theme']);
+  assert.equal(deriveDigitalProjectPath(digital(['education'], false)), null);
+  assert.equal(deriveDigitalProjectPath(digital(['open-source', 'open-data']))?.pathKey, deriveDigitalProjectPath(digital(['open-data', 'open-source']))?.pathKey);
+});
+
+test('current digital catalog identities derive exactly once without a public rest bucket', () => {
+  const records = loadPublicCatalogRecords();
+  const digitalRecords = records.filter(hasDigitalPresence);
+  assert.equal(digitalRecords.length, 25);
+  const derived = new Map(digitalRecords.map((record) => [record.id, deriveDigitalProjectPath(record)]));
+  assert.equal(derived.size, 25);
+  for (const [identifier, path] of derived) {
+    assert.equal(path.status, 'classified', identifier);
+    assert.notEqual(path.pathKey, 'sphere', identifier);
+    assert.equal(path.pathKey.includes('mixed_other'), false, identifier);
+    assert.equal(path.pathKey.includes('unclassified_future_theme'), false, identifier);
+  }
+  const reversedRecords = [...digitalRecords].reverse();
+  const reversedThemes = digitalRecords.map((record) => ({ ...record, themes: [...record.themes].reverse() }));
+  const permutedRecords = [...digitalRecords.slice(9), ...digitalRecords.slice(0, 9)];
+  const baseline = Object.fromEntries([...derived].map(([identifier, path]) => [identifier, path.pathKey]));
+  for (const variant of [reversedRecords, reversedThemes, permutedRecords]) {
+    assert.deepEqual(
+      Object.fromEntries(variant.map((record) => [record.id, deriveDigitalProjectPath(record).pathKey])),
+      baseline,
+    );
+  }
+});
+
+test('digital presentation tree aggregates parent sets as exact disjoint child unions', () => {
+  const records = loadPublicCatalogRecords();
+  const tree = buildDigitalPresentationTree(records);
+  assert.equal(tree.identityIds.length, 25);
+  const rootView = visibleDigitalNodes(tree, DIGITAL_ROOT_PATH);
+  assert.equal(rootView.children.length, 5);
+  assert.deepEqual(rootView.children.map(({ id }) => id), DIGITAL_RING_FIELDS.map(({ id }) => id));
+  const rootUnion = new Set(rootView.children.flatMap(({ identityIds }) => identityIds));
+  assert.equal(rootUnion.size, 25);
+  assert.deepEqual([...rootUnion].sort(), tree.identityIds);
+  for (const node of tree.nodesByPath.values()) {
+    const union = new Set();
+    for (const child of node.children) {
+      for (const identifier of child.identityIds) {
+        assert.equal(union.has(identifier), false, `${node.pathKey} duplicates ${identifier}`);
+        union.add(identifier);
+      }
+    }
+    if (!node.children.length) {
+      for (const identifier of node.directIdentityIds) union.add(identifier);
+    }
+    assert.deepEqual([...union].sort(), node.identityIds, node.pathKey);
+  }
+  const knowledgePath = ['sphere', 'knowledge_learning_culture'];
+  const knowledgeView = visibleDigitalNodes(tree, knowledgePath);
+  assert.deepEqual(knowledgeView.breadcrumb.map(({ id }) => id), ['sphere', 'knowledge_learning_culture']);
+  assert(knowledgeView.children.every((node) => node.parentPathKey === serializeDigitalPath(knowledgePath)));
+  assert(knowledgeView.children.length < tree.nodesByPath.size, 'progressive disclosure must not return the full recursive tree');
+});
+
+test('digital path normalization roundtrips canonical paths and fails closed on traversal', () => {
+  const path = ['sphere', 'communication_networks', 'community_networks'];
+  const key = serializeDigitalPath(path);
+  assert.equal(key, 'sphere/communication_networks/community_networks');
+  assert.deepEqual(normalizeDigitalPath(key).path, path);
+  assert.deepEqual(normalizeDigitalPath('').path, DIGITAL_ROOT_PATH);
+  assert.deepEqual(normalizeDigitalPath('sphere/../catalog').path, DIGITAL_ROOT_PATH);
+  assert.equal(normalizeDigitalPath('sphere/../catalog').valid, false);
+  assert.equal(normalizeDigitalPath('sphere/communication_networks/../../catalog').valid, false);
+  assert.equal(normalizeDigitalPath('sphere/nope').valid, false);
+});
+
+test('digital tree visible nodes stay bounded for synthetic 500 and 5000 record sets', () => {
+  for (const size of [500, 5000]) {
+    const records = Array.from({ length: size }, (_, index) => ({
+      id: `synthetic-digital-${String(index).padStart(4, '0')}`,
+      title: `Synthetic Digital ${index}`,
+      themes: index % 2 === 0 ? ['communication', 'community-network'] : ['open-data', 'infrastructure'],
+      presence: { geographic: [], digital: { available: true } },
+    }));
+    const tree = buildDigitalPresentationTree(records);
+    const root = visibleDigitalNodes(tree, DIGITAL_ROOT_PATH);
+    const communication = visibleDigitalNodes(tree, ['sphere', 'communication_networks']);
+    const community = visibleDigitalNodes(tree, ['sphere', 'communication_networks', 'community_networks']);
+    const boundedCommunity = visibleDigitalNodes(tree, ['sphere', 'communication_networks', 'community_networks'], { identityLimit: 48 });
+    assert.equal(root.children.length, 2);
+    assert(communication.children.length <= 3);
+    assert.equal(community.children.length, Math.ceil(size / 2));
+    assert.equal(boundedCommunity.children.length, 48);
+    assert.equal(tree.nodesByPath.get('sphere/communication_networks/community_networks').identityCount, Math.ceil(size / 2));
+    assert.equal(root.children.length < tree.nodesByPath.size, true);
+    assert.equal(communication.children.length < tree.nodesByPath.size, true);
+  }
 });
 
 test('digital presence is derived from the explicit availability flag only', () => {
@@ -106,10 +248,10 @@ test('ring orbit direction and start angle are deterministic presentation parame
 });
 
 test('orbital profiles remain distinct semantic paths rather than copied circles', () => {
-  assert.equal(ORBIT_PROFILES.length, LAYERS.length);
-  assert.equal(new Set(ORBIT_PROFILES.map(({ rotation }) => rotation)).size, LAYERS.length);
+  assert.ok(ORBIT_PROFILES.length >= DIGITAL_RING_FIELDS.length);
+  assert.equal(new Set(ORBIT_PROFILES.map(({ rotation }) => rotation)).size, ORBIT_PROFILES.length);
   assert(ORBIT_PROFILES.every(({ rx, ry }) => rx !== ry));
-  assert(ORBIT_PROFILES.every(({ rx, ry }) => rx >= 286 && ry >= 268));
+  assert(ORBIT_PROFILES.every(({ rx, ry }) => rx >= 274 && ry >= 262));
 });
 
 test('sphere detail levels remain stable for overview and close-up rendering', () => {
@@ -118,6 +260,7 @@ test('sphere detail levels remain stable for overview and close-up rendering', (
   assert.equal(sphereDetailLevel({ diameter: 800 }), 'names');
   assert.equal(sphereDetailLevel({ diameter: 300, sideView: true }), 'close');
   assert(LAYERS.every(({ trackLabel }) => typeof trackLabel === 'string' && trackLabel.length > 0));
+  assert(DIGITAL_RING_FIELDS.every(({ trackLabel }) => typeof trackLabel === 'string' && trackLabel.length > 0));
 });
 
 test('deep-link state accepts surface, search, identity, filters and clamped camera', () => {
@@ -127,6 +270,7 @@ test('deep-link state accepts surface, search, identity, filters and clamped cam
   assert.equal(state.surface, 'text');
   assert.equal(state.query, 'open data');
   assert.equal(state.layer, 'software_infrastructure');
+  assert.deepEqual(state.digitalPath, ['sphere', 'software_tools_production', 'free_software']);
   assert.deepEqual(
     { presence: state.presence, action: state.action, language: state.language, access: state.access, freshness: state.freshness, curation: state.curation },
     { presence: ['digital'], action: 'contribute', language: 'de', access: 'public', freshness: 'current', curation: 'listed' },
@@ -139,6 +283,7 @@ test('unknown identities, filters and malformed numbers fail closed', () => {
   const state = stateFromSearch('?project=unknown&layer=unknown&presence=space&action=hack&language=../../private&access=secret&freshness=future&curation=hidden&lng=nope', ['debian']);
   assert.equal(state.project, null);
   assert.equal(state.layer, null);
+  assert.deepEqual(state.digitalPath, DIGITAL_ROOT_PATH);
   assert.equal(state.surface, 'globe');
   assert.deepEqual(
     { presence: state.presence, action: state.action, language: state.language, access: state.access, freshness: state.freshness, curation: state.curation },
@@ -164,7 +309,7 @@ test('serialized state roundtrips selection, view, surface, query and filters', 
   const search = searchFromState({
     camera: { lng: 13.4049, lat: 52.52, zoom: 3.456, bearing: 4.2, pitch: 25 },
     project: 'debian',
-    layer: 'software_infrastructure',
+    digitalPath: ['sphere', 'software_tools_production', 'free_software'],
     view: 'layers',
     surface: 'text',
     query: 'freie Software',
@@ -176,8 +321,12 @@ test('serialized state roundtrips selection, view, surface, query and filters', 
     curation: 'verified',
   });
   const state = stateFromSearch(search, ['debian']);
+  const parameters = new URLSearchParams(search.slice(1));
+  assert.equal(parameters.get('digital_path'), 'sphere/software_tools_production/free_software');
+  assert.equal(parameters.has('layer'), false);
   assert.equal(state.project, 'debian');
-  assert.equal(state.layer, 'software_infrastructure');
+  assert.equal(state.layer, null);
+  assert.deepEqual(state.digitalPath, ['sphere', 'software_tools_production', 'free_software']);
   assert.equal(state.view, 'layers');
   assert.equal(state.surface, 'text');
   assert.equal(state.query, 'freie Software');
@@ -192,10 +341,13 @@ test('record filtering keeps one shared search and layer truth', () => {
   const records = [
     { id: 'a', title: 'Offene Karte', summary: 'Weltweite Daten', themes: ['open-data'], actions: ['use'], presence: { digital: { available: true } } },
     { id: 'b', title: 'Freie Schule', summary: 'Lernen', themes: ['education'], actions: ['learn'], presence: { digital: { available: true } } },
+    { id: 'c', title: 'Werkstatt vor Ort', summary: 'Stadtteil', themes: ['repair'], actions: ['visit'], presence: { geographic: [{ mode: 'approximate' }] } },
   ];
   assert.deepEqual(filterRecords(records, { query: 'karte' }).map(({ id }) => id), ['a']);
+  assert.deepEqual(filterRecords(records, { digitalPath: DIGITAL_ROOT_PATH }).map(({ id }) => id), ['a', 'b', 'c']);
+  assert.deepEqual(filterRecords(records, { digitalPath: ['sphere', 'knowledge_learning_culture', 'learning_education'] }).map(({ id }) => id), ['b']);
+  assert.deepEqual(filterRecords(records, { query: 'daten', digitalPath: ['sphere', 'knowledge_learning_culture', 'open_knowledge_data'] }).map(({ id }) => id), ['a']);
   assert.deepEqual(filterRecords(records, { layer: 'learning_education' }).map(({ id }) => id), ['b']);
-  assert.deepEqual(filterRecords(records, { query: 'daten', layer: 'knowledge_data' }).map(({ id }) => id), ['a']);
 });
 
 test('globe horizon coordinates stay ninety degrees from the current map center', () => {
@@ -420,11 +572,15 @@ test('catalog projection precomputes 250 approximate Commons and keeps its filte
 
 test('digital layer filtering excludes geographic-only identities but retains dual presence identities', () => {
   assert.deepEqual(
+    filterRecords(presenceAxisRecords, { digitalPath: ['sphere', 'communication_networks', 'community_networks'] }).map(({ id }) => id),
+    ['freifunk', 'freifunk-hamburg'],
+  );
+  assert.deepEqual(
     filterRecords(presenceAxisRecords, { layer: 'communication_networks' }).map(({ id }) => id),
     ['freifunk', 'freifunk-hamburg'],
   );
   assert.deepEqual(
-    filterRecords(presenceAxisRecords, { layer: 'mixed_other' }).map(({ id }) => id),
+    filterRecords(presenceAxisRecords, { digitalPath: ['sphere', 'software_tools_production'] }).map(({ id }) => id),
     [],
   );
 });
@@ -487,8 +643,8 @@ test('semantic zoom remains presentation logic from planet to focus', () => {
 
 test('presentation and location labels explain geographic, digital and dual presence truth', () => {
   assert.equal(recordPresentationLabel(presenceAxisRecords[0]), 'Vor Ort');
-  assert.equal(recordPresentationLabel(presenceAxisRecords[1]), 'Digital · Kommunikation und Netze');
-  assert.equal(recordPresentationLabel(presenceAxisRecords[2]), 'Vor Ort · Digital · Kommunikation und Netze');
+  assert.equal(recordPresentationLabel(presenceAxisRecords[1]), 'Digital · Kommunikation und Netze › Gemeinschaftsnetze');
+  assert.equal(recordPresentationLabel(presenceAxisRecords[2]), 'Vor Ort · Digital · Kommunikation und Netze › Gemeinschaftsnetze');
   assert.deepEqual(recordLocationSummaries(presenceAxisRecords[0]), [
     'Rue Verheyden 121 · exakter öffentlicher Punkt',
     'Gebäude Le Nid · öffentliche Fläche',

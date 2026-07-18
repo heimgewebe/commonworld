@@ -87,7 +87,7 @@ def validate_public_seed_baseline(root: Path = ROOT) -> list[str]:
             errors.append(f"public seed project {identifier} must remain relation-free")
         if record.get("handoff") != {"enabled": False}:
             errors.append(f"public seed project {identifier} must keep Weltgewebe handoff disabled")
-        if any(key in record for key in ("layer", "derived_layer", "presentation_layer", "semantic_zoom")):
+        if any(key in record for key in ("layer", "derived_layer", "presentation_layer", "semantic_zoom", "digital_path")):
             errors.append(f"public seed project {identifier} must not store presentation or zoom assignments")
 
         curation = record.get("curation", {}) if isinstance(record.get("curation"), dict) else {}

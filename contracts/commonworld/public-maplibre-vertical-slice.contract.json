@@ -89,8 +89,12 @@
   "digital_sphere": {
     "implementation": "bounded_synchronized_svg_overlay",
     "identity_source": "CommonProject.id",
-    "layer_membership": "derived_from_catalog_themes_and_digital_presence",
-    "layer_count": 6,
+    "taxonomy_contract": "contracts/commonworld/digital-ring-taxonomy.contract.json",
+    "primary_path_membership": "derived_from_catalog_themes_and_public_digital_presence",
+    "active_navigation_parameter": "digital_path",
+    "presentation_hierarchy": "recursive_ring_bundle_tree",
+    "overview_main_bundle_count": 5,
+    "legacy_layer_count": 6,
     "same_identity_in_linear_layer_focus_and_sphere": true,
     "center_fade": true,
     "continuous_rotation": false,
@@ -114,13 +118,16 @@
       "data-globe-geometry-source",
       "data-globe-viewport-ratio"
     ],
-    "side_view_visual": "swipeable_horizontal_name_binary_lanes_after_text_sphere_flight",
+    "side_view_visual": "hierarchical_ring_bundle_lanes_after_text_sphere_flight",
     "scale_fade": {
       "overview_visible_through_globe_viewport_ratio": 1.05,
       "fade_until_globe_viewport_ratio": 2.1,
       "local_hidden_from_globe_viewport_ratio": 2.1
     },
     "complete_rings_visible": false,
+    "progressive_disclosure": "current_node_direct_children_and_parent_breadcrumb_only",
+    "parent_identity_sets_equal_child_union": true,
+    "primary_child_identity_sets_disjoint": true,
     "overview_ring_content": "commons_name_then_utf8_binary_name",
     "side_view_identity_source": "same_CommonProject_records_not_same_DOM_elements",
     "multi_lane_horizontal_swipe": true,
@@ -139,9 +146,12 @@
       "p",
       "view",
       "surface",
-      "layer",
+      "digital_path",
       "project",
       "q"
+    ],
+    "legacy_deep_link_parameters": [
+      "layer"
     ],
     "browser_back_restores_state": true,
     "camera_history_writes_coalesced_ms": 180,
@@ -150,7 +160,7 @@
     "reduced_motion_command": "maplibre.jumpTo",
     "reduced_motion_duration_ms": 0,
     "presentation_preference_storage": "localStorage:commonworld.presentation",
-    "search_and_layer_filter_shared_across_surfaces": true,
+    "search_and_digital_path_filter_shared_across_surfaces": true,
     "side_layer_responsive_padding": {
       "wide": "full_viewport_swipe_lanes",
       "narrow": "full_viewport_swipe_lanes"

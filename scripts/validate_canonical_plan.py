@@ -36,6 +36,7 @@ REQUIRED_PLAN_TOKENS = (
     "### Kanonische Rendererentscheidung v1",
     "### Erster öffentlicher MapLibre-Vertikalschnitt v1",
     "### Globe-first Oberfläche v1",
+    "### Hierarchische digitale Ringbündel v1",
     "### Begrenzte Produktions- und Anbieterentscheidung v1",
     "### Vorläufige Darstellungsschichten",
     "### Dieselbe Auswahl in allen Ansichten",
@@ -118,11 +119,12 @@ EXPECTED_RESEARCH_FILES = {
     "renderer-selection-v1.md",
     "renderer-selection-v1.result.json",
 }
-EXPECTED_CONTRACT_FILES = {"catalog-diversity.contract.json", "editorial-review.contract.json", "proposal-path.contract.json", "proposal.schema.json", "current-state.contract.json", "aggregation-zoom.contract.json", "digital-sphere.contract.json", "production-delivery-provider.contract.json", "project.schema.json", "public-maplibre-vertical-slice.contract.json", "presence-axes.contract.json", "intent-search-discovery.contract.json", "renderer-selection.contract.json", "visual-semantics.contract.json"}
+EXPECTED_CONTRACT_FILES = {"catalog-diversity.contract.json", "editorial-review.contract.json", "proposal-path.contract.json", "proposal.schema.json", "current-state.contract.json", "aggregation-zoom.contract.json", "digital-ring-taxonomy.contract.json", "digital-sphere.contract.json", "production-delivery-provider.contract.json", "project.schema.json", "public-maplibre-vertical-slice.contract.json", "presence-axes.contract.json", "intent-search-discovery.contract.json", "renderer-selection.contract.json", "visual-semantics.contract.json"}
 EXPECTED_SCRIPT_FILES = {
     "__init__.py",
     "build_public_runtime.py",
     "check_pages_dns_target.py",
+    "digital_taxonomy.py",
     "smoke_public_browser.mjs",
     "render_public_shell.py",
     "render_proposal_page.py",
@@ -144,6 +146,7 @@ EXPECTED_SCRIPT_FILES = {
     "validate_maplibre_phase2_proof.py",
     "validate_device_acceptance_pack.py",
     "validate_device_acceptance_rerun.py",
+    "validate_digital_ring_taxonomy.py",
     "validate_device_acceptance_performance_v4.py",
     "validate_physical_device_acceptance_v4_apple.py",
     "validate_digital_sphere.py",
@@ -157,6 +160,7 @@ EXPECTED_TEST_FILES = {
     "test_proposal_path.py",
     "test_contracts.py",
     "test_current_state.py",
+    "test_digital_ring_taxonomy.py",
     "test_pages_dns_target.py",
     "test_pages_live_smoke.py",
     "test_production_delivery_provider.py",

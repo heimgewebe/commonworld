@@ -85,20 +85,20 @@ class PublicCatalogTests(unittest.TestCase):
     def test_manual_presentation_layer_is_rejected(self) -> None:
         with tempfile.TemporaryDirectory() as tmp_dir:
             root = self.copy_public_catalog(tmp_dir)
-            self.mutate_project(root, "openstreetmap", lambda record: record.update({"presentation_layer": "mixed_other"}))
+            self.mutate_project(root, "openstreetmap", lambda record: record.update({"presentation_layer": "mixed_other", "digital_path": "sphere"}))
 
             errors = validate_public_catalog(root)
 
         self.assertTrue(any("must not store presentation or zoom assignments" in error for error in errors))
 
-    def test_public_shell_wrong_layer_label_is_rejected(self) -> None:
+    def test_public_shell_wrong_digital_path_label_is_rejected(self) -> None:
         with tempfile.TemporaryDirectory() as tmp_dir:
             root = self.copy_public_catalog(tmp_dir)
             path = root / "index.html"
             path.write_text(
                 path.read_text(encoding="utf-8").replace(
-                    "Digital · Freie Software und Infrastruktur",
-                    "Digital · Falsche Schicht",
+                    "Digital · Software, Werkzeuge und Produktion › Freie Software und Infrastruktur",
+                    "Digital · Falsches Ringbündel",
                     1,
                 ),
                 encoding="utf-8",

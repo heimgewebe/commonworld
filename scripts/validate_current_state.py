@@ -13,6 +13,7 @@ STATE_PATH = Path("contracts/commonworld/current-state.contract.json")
 CATALOG_PATH = Path("catalog/catalog.json")
 PROVIDER_PATH = Path("contracts/commonworld/production-delivery-provider.contract.json")
 VERTICAL_SLICE_PATH = Path("contracts/commonworld/public-maplibre-vertical-slice.contract.json")
+DIGITAL_RING_PATH = Path("contracts/commonworld/digital-ring-taxonomy.contract.json")
 LE_NID_PATH = Path("catalog/projects/cltb-le-nid.json")
 
 
@@ -26,7 +27,7 @@ def _sha256(path: Path) -> str:
 
 def validate_current_state(root: Path = ROOT) -> list[str]:
     errors: list[str] = []
-    for relative in (STATE_PATH, CATALOG_PATH, PROVIDER_PATH, VERTICAL_SLICE_PATH, LE_NID_PATH):
+    for relative in (STATE_PATH, CATALOG_PATH, PROVIDER_PATH, VERTICAL_SLICE_PATH, DIGITAL_RING_PATH, LE_NID_PATH):
         if not (root / relative).is_file():
             errors.append(f"missing current-state dependency: {relative}")
     if errors:
@@ -37,6 +38,7 @@ def validate_current_state(root: Path = ROOT) -> list[str]:
         catalog = _load(root, CATALOG_PATH)
         provider = _load(root, PROVIDER_PATH)
         vertical = _load(root, VERTICAL_SLICE_PATH)
+        digital_ring = _load(root, DIGITAL_RING_PATH)
         le_nid = _load(root, LE_NID_PATH)
     except (OSError, json.JSONDecodeError) as error:
         return [f"current-state dependency is invalid: {error}"]
@@ -58,6 +60,43 @@ def validate_current_state(root: Path = ROOT) -> list[str]:
         "machine_surface": "static_read_only",
     }:
         errors.append("current public-surface truth mismatch")
+
+    digital_records = []
+    digital_themes = set()
+    for relative in catalog.get("project_files", []):
+        if not isinstance(relative, str) or not relative.startswith("projects/") or ".." in relative:
+            continue
+        record_path = root / "catalog" / relative
+        if not record_path.is_file():
+            continue
+        try:
+            record = json.loads(record_path.read_text(encoding="utf-8"))
+        except (OSError, json.JSONDecodeError):
+            continue
+        if record.get("presence", {}).get("digital", {}).get("available") is True:
+            digital_records.append(record)
+            digital_themes.update(theme for theme in record.get("themes", []) if isinstance(theme, str))
+        if any(key in record for key in ("layer", "derived_layer", "presentation_layer", "semantic_zoom", "digital_path")):
+            errors.append(f"current catalog record must not store presentation taxonomy fields: {relative}")
+    expected_digital_ring = {
+        "contract": "contracts/commonworld/digital-ring-taxonomy.contract.json",
+        "version": "digital-ring-bundles-v1",
+        "canonical_url_parameter": "digital_path",
+        "main_field_count": 5,
+        "current_digital_identity_count": 25,
+        "current_known_theme_count": 37,
+        "legacy_layer_links": "deterministically_migrated",
+        "invalid_path_behavior": "fail_closed_to_sphere_root_without_partial_filter",
+        "catalog_presentation_fields_forbidden": True,
+    }
+    if state.get("digital_ring_taxonomy") != expected_digital_ring:
+        errors.append("current digital ring taxonomy truth mismatch")
+    if digital_ring.get("version") != expected_digital_ring["version"]:
+        errors.append("digital ring taxonomy contract version must match current state")
+    if len([node for node in digital_ring.get("nodes", []) if node.get("parent_id") == "sphere" and node.get("type") == "field"]) != 5:
+        errors.append("digital ring taxonomy contract must expose five current fields")
+    if len(digital_records) != 25 or len(digital_themes) != 37:
+        errors.append("current catalog digital identity/theme counts do not match current state")
 
     renderer = state.get("renderer", {})
     if renderer != {
@@ -182,8 +221,8 @@ def validate_current_state(root: Path = ROOT) -> list[str]:
         "third_party_assets_retain_their_own_licences": True,
     }:
         errors.append("current licensing truth mismatch")
-    if state.get("current_as_of") != "2026-07-17":
-        errors.append("current-state date does not cover the Phase 5 catalogue and proposal truth")
+    if state.get("current_as_of") != "2026-07-18":
+        errors.append("current-state date does not cover the digital ring-bundle taxonomy truth")
     if not (root / "LICENSE").is_file() or not (root / "LICENSE-DATA.md").is_file():
         errors.append("declared code and data licences must exist")
 

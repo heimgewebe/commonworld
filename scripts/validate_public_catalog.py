@@ -16,11 +16,12 @@ if str(ROOT) not in sys.path:
     sys.path.insert(0, str(ROOT))
 
 from scripts.render_public_shell import public_locations
+from scripts.digital_taxonomy import derive_project_path, load_taxonomy, path_label
 from scripts.validate_contracts import validation_errors
 
 CATALOG_PATH = Path("catalog/catalog.json")
 PROJECT_DIRECTORY = Path("catalog/projects")
-DIGITAL_CONTRACT_PATH = Path("contracts/commonworld/digital-sphere.contract.json")
+DIGITAL_RING_CONTRACT_PATH = Path("contracts/commonworld/digital-ring-taxonomy.contract.json")
 PUBLIC_STATES = {"listed", "verified", "featured"}
 PUBLIC_ACTIVITY_STATES = {"active", "paused", "seasonal"}
 PUBLIC_SOURCE_TYPES = {"official-source", "public-registry"}
@@ -82,7 +83,7 @@ def _homepage(record: dict) -> str | None:
     return homepages[0] if len(homepages) == 1 and isinstance(homepages[0], str) else None
 
 
-def _card_label(record: dict, layer_labels: dict[str, str], contract: dict) -> str:
+def _card_label(record: dict, taxonomy: dict) -> str:
     has_geo = bool(public_locations(record))
     has_dig = record.get("presence", {}).get("digital", {}).get("available", False)
 
@@ -90,8 +91,8 @@ def _card_label(record: dict, layer_labels: dict[str, str], contract: dict) -> s
         return "Vor Ort"
     if not has_geo and not has_dig:
         return "Commons"
-    layer = derive_digital_layer(record, contract)
-    label = layer_labels.get(layer, "Digitale Commons")
+    derived = derive_project_path(record, taxonomy)
+    label = path_label(derived["path"], taxonomy) if derived else "Digitale Commons"
     if has_geo and has_dig:
         return f"Vor Ort · Digital · {label}"
     return f"Digital · {label}"
@@ -110,12 +111,12 @@ def validate_public_catalog(root: Path = ROOT) -> list[str]:
     errors: list[str] = []
     manifest_path = root / CATALOG_PATH
     project_directory = root / PROJECT_DIRECTORY
-    contract_path = root / DIGITAL_CONTRACT_PATH
+    contract_path = root / DIGITAL_RING_CONTRACT_PATH
     shell_path = root / "index.html"
 
     for path, label in (
         (manifest_path, "public catalog manifest"),
-        (contract_path, "digital sphere contract"),
+        (contract_path, "digital ring taxonomy contract"),
         (shell_path, "public shell"),
     ):
         if not path.is_file():
@@ -125,7 +126,7 @@ def validate_public_catalog(root: Path = ROOT) -> list[str]:
 
     try:
         manifest = _load_json(manifest_path)
-        contract = _load_json(contract_path)
+        contract = load_taxonomy(root)
     except (json.JSONDecodeError, OSError) as error:
         return [f"public catalog control file is invalid: {error}"]
 
@@ -207,11 +208,6 @@ def validate_public_catalog(root: Path = ROOT) -> list[str]:
     records: list[dict] = []
     identifiers: list[str] = []
     titles: list[str] = []
-    layer_labels = {
-        entry.get("id"): entry.get("label_de")
-        for entry in contract.get("layer_model", {}).get("layers", [])
-    }
-
     for relative in safe_files:
         path = root / "catalog" / Path(*relative.parts)
         if not path.is_file():
@@ -239,7 +235,7 @@ def validate_public_catalog(root: Path = ROOT) -> list[str]:
             errors.append(f"public catalog project {relative.name} invalid: {message}")
 
 
-        if any(key in record for key in ("layer", "derived_layer", "presentation_layer", "semantic_zoom")):
+        if any(key in record for key in ("layer", "derived_layer", "presentation_layer", "semantic_zoom", "digital_path")):
             errors.append(f"public catalog project {relative.name} must not store presentation or zoom assignments")
 
         curation = record.get("curation", {}) if isinstance(record.get("curation"), dict) else {}
@@ -388,7 +384,7 @@ def validate_public_catalog(root: Path = ROOT) -> list[str]:
             (html.escape(title), "title"),
             (html.escape(summary), "summary"),
             (f'href="{html.escape(homepage, quote=True)}"', "homepage"),
-            (html.escape(_card_label(record, layer_labels, contract)), "derived German presentation label"),
+            (html.escape(_card_label(record, contract)), "derived German presentation label"),
         ]
         for value, label in expected_values:
             if not bodies or any(value not in body for body in bodies):

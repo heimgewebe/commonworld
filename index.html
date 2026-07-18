@@ -79,29 +79,12 @@
               <ellipse id="sphere-path-4" cx="320" cy="320" rx="298" ry="288" transform="rotate(-31 320 320)" />
               <ellipse id="sphere-path-5" cx="320" cy="320" rx="292" ry="274" transform="rotate(63 320 320)" />
               <ellipse id="sphere-path-6" cx="320" cy="320" rx="286" ry="294" transform="rotate(-62 320 320)" />
+              <ellipse id="sphere-path-7" cx="320" cy="320" rx="280" ry="262" transform="rotate(78 320 320)" />
+              <ellipse id="sphere-path-8" cx="320" cy="320" rx="274" ry="284" transform="rotate(-77 320 320)" />
               </g>
             </defs>
-            <g id="sphere-rings" mask="url(#sphere-mask)" aria-hidden="true">
-              <g class="sphere-ring-plane" data-layer-id="knowledge_data" data-ring-index="0">
-                <use href="#sphere-path-1" class="sphere-layer-guide" data-layer-id="knowledge_data"></use>
-              </g>
-              <g class="sphere-ring-plane" data-layer-id="software_infrastructure" data-ring-index="1">
-                <use href="#sphere-path-2" class="sphere-layer-guide" data-layer-id="software_infrastructure"></use>
-              </g>
-              <g class="sphere-ring-plane" data-layer-id="media_culture" data-ring-index="2">
-                <use href="#sphere-path-3" class="sphere-layer-guide" data-layer-id="media_culture"></use>
-              </g>
-              <g class="sphere-ring-plane" data-layer-id="learning_education" data-ring-index="3">
-                <use href="#sphere-path-4" class="sphere-layer-guide" data-layer-id="learning_education"></use>
-              </g>
-              <g class="sphere-ring-plane" data-layer-id="communication_networks" data-ring-index="4">
-                <use href="#sphere-path-5" class="sphere-layer-guide" data-layer-id="communication_networks"></use>
-              </g>
-              <g class="sphere-ring-plane" data-layer-id="mixed_other" data-ring-index="5">
-                <use href="#sphere-path-6" class="sphere-layer-guide" data-layer-id="mixed_other"></use>
-              </g>
-            </g>
-            <circle id="sphere-edge-control" class="sphere-edge-control" cx="320" cy="320" r="309" fill="none" stroke="transparent" stroke-width="34" pointer-events="stroke" role="button" tabindex="0" aria-label="Digitale Ebenen öffnen. Antippen oder Eingabetaste drücken."></circle>
+            <g id="sphere-rings" mask="url(#sphere-mask)" aria-hidden="true"></g>
+            <circle id="sphere-edge-control" class="sphere-edge-control" cx="320" cy="320" r="309" fill="none" stroke="transparent" stroke-width="44" pointer-events="stroke" role="button" tabindex="0" aria-label="Digitale Ringbündel öffnen. Antippen oder Eingabetaste drücken."></circle>
             <circle class="sphere-edge-focus" cx="320" cy="320" r="309" aria-hidden="true"></circle>
           </svg>
           <div id="layer-stack-visual" class="layer-stack-visual" aria-hidden="true"></div>
@@ -120,17 +103,19 @@
 
           <aside id="layer-panel" class="layer-panel" aria-labelledby="layer-title" hidden>
             <h2 id="layer-title" class="visually-hidden">Digitale Commons aus der Nähe</h2>
-            <p class="visually-hidden">Dieselben Commons erscheinen mit ihren Namen und Binärcodes auf sechs horizontal wischbaren Bahnen.</p>
+            <p class="visually-hidden">Dieselben digitalen Commons erscheinen als hierarchische Ringbündel mit direktem Elternpfad, Namen und Binärcodes.</p>
             <div class="layer-panel-controls">
-              <button id="layer-search-toggle" class="icon-button layer-search-toggle" type="button" aria-label="Commons suchen und Bahnen filtern" aria-controls="layer-discovery" aria-expanded="false">⌕</button>
+              <button id="layer-search-toggle" class="icon-button layer-search-toggle" type="button" aria-label="Commons suchen und Ringbündel filtern" aria-controls="layer-discovery" aria-expanded="false">⌕</button>
               <button id="layer-close" class="icon-button layer-close" type="button" aria-label="Zur Globusansicht zurückkehren">×</button>
             </div>
+            <nav id="layer-breadcrumb" class="digital-breadcrumb" aria-label="Digitaler Pfad"></nav>
+            <p id="layer-current" class="digital-current" role="status">Digitale Commons-Sphäre</p>
             <div id="layer-discovery" class="layer-discovery" hidden>
-              <label for="layer-search">Commons in den digitalen Bahnen suchen</label>
+              <label for="layer-search">Commons in den digitalen Ringbündeln suchen</label>
               <div class="layer-search-field"><span aria-hidden="true">⌕</span><input id="layer-search" type="search" inputmode="search" autocomplete="off" placeholder="Commons suchen" /></div>
               <div id="layer-buttons" class="layer-buttons"></div>
             </div>
-            <div id="layer-track-deck" class="layer-track-deck" aria-label="Horizontal wischbare digitale Commons-Bahnen"></div>
+            <div id="layer-track-deck" class="layer-track-deck" aria-label="Hierarchische digitale Commons-Ringbündel"></div>
             <div id="layer-projects" class="layer-projects" hidden></div>
           </aside>
 
@@ -147,8 +132,10 @@
         </header>
         <div class="text-layout">
           <aside class="text-filters" aria-labelledby="text-filter-title">
-            <h2 id="text-filter-title">Filter und Schichten</h2>
+            <h2 id="text-filter-title">Filter und digitale Ringbündel</h2>
             <button class="quiet-button text-discovery-open" type="button" data-open-discovery>Suchfilter öffnen</button>
+            <nav id="text-layer-breadcrumb" class="digital-breadcrumb" aria-label="Digitaler Pfad in der Textansicht"></nav>
+            <p id="text-layer-current" class="digital-current" role="status">Digitale Commons-Sphäre</p>
             <div id="text-layer-buttons" class="layer-buttons"></div>
             <p class="machine-note">Maschinenlesbar: <a href="./catalog/catalog.json" type="application/json">Katalogmanifest</a> · <a href="./contracts/commonworld/project.schema.json" type="application/schema+json">Datenschema</a></p>
           </aside>
@@ -156,7 +143,7 @@
             <p id="text-empty" class="text-empty" hidden>Keine Commons entsprechen dieser Auswahl.</p>
             <div id="catalog" class="catalog-grid" aria-live="polite">
           <article class="catalog-card" id="project-bioleft" data-commonproject-id="bioleft">
-            <p class="catalog-kind">Digital · Gemischte und weitere digitale Commons</p>
+            <p class="catalog-kind">Digital · Versorgung, Land und Ökologie › Saatgut, Ernährung und Landwirtschaft</p>
             <h2>Bioleft</h2>
             <p>Eine gemeinschaftliche Initiative in Argentinien, die Saatgut, agronomisches Wissen und partizipative Pflanzenzüchtung über offene Vereinbarungen zwischen Produzenten, Forschern und weiteren Beteiligten teilt.</p>
             <p class="catalog-location">1 verborgener Ort</p>
@@ -183,7 +170,7 @@
             </div>
           </article>
           <article class="catalog-card" id="project-community-energy-network-new-zealand" data-commonproject-id="community-energy-network-new-zealand">
-            <p class="catalog-kind">Digital · Gemischte und weitere digitale Commons</p>
+            <p class="catalog-kind">Digital · Versorgung, Land und Ökologie › Energiegenossenschaften</p>
             <h2>Community Energy Network New Zealand</h2>
             <p>Ein neuseeländisches Netzwerk lokaler, bürgergetragener Energieinitiativen, das Wissen, Zusammenarbeit und gemeinschaftliche Kontrolle erneuerbarer Energie- und Effizienzprojekte verbindet.</p>
             <p class="catalog-location">2 verborgene Orte</p>
@@ -197,7 +184,7 @@
             </div>
           </article>
           <article class="catalog-card" id="project-debian" data-commonproject-id="debian">
-            <p class="catalog-kind">Digital · Freie Software und Infrastruktur</p>
+            <p class="catalog-kind">Digital · Software, Werkzeuge und Produktion › Freie Software und Infrastruktur</p>
             <h2>Debian</h2>
             <p>Ein gemeinschaftlich entwickeltes freies Betriebssystem mit offenem Paketarchiv, öffentlicher Dokumentation und weltweiter Mitwirkung.</p>
             <p class="catalog-location">Ortsunabhängige digitale Präsenz</p>
@@ -229,7 +216,7 @@
             </div>
           </article>
           <article class="catalog-card" id="project-enspiral" data-commonproject-id="enspiral">
-            <p class="catalog-kind">Digital · Gemischte und weitere digitale Commons</p>
+            <p class="catalog-kind">Digital · Kooperation und Selbstorganisation › Gemeinschaftliche Governance und Genossenschaften</p>
             <h2>Enspiral</h2>
             <p>Ein in Aotearoa Neuseeland entstandenes kollaboratives Netzwerk, das gemeinschaftliche Unternehmensformen, geteilte Ressourcen und offen dokumentierte Werkzeuge für dezentrale Zusammenarbeit entwickelt.</p>
             <p class="catalog-location">Ortsunabhängige digitale Präsenz</p>
@@ -242,7 +229,7 @@
             </div>
           </article>
           <article class="catalog-card" id="project-freifunk-hamburg" data-commonproject-id="freifunk-hamburg">
-            <p class="catalog-kind">Vor Ort · Digital · Kommunikation und Netze</p>
+            <p class="catalog-kind">Vor Ort · Digital · Kommunikation und Netze › Gemeinschaftsnetze</p>
             <h2>Freifunk Hamburg</h2>
             <p>Eine lokale Freifunk-Community, die ein gemeinschaftlich getragenes digitales Netz in Hamburg betreibt und Beteiligung, offene Infrastruktur und freie Kommunikation verbindet.</p>
             <p class="catalog-location">1 öffentlicher Ort · 1 verborgener Ort</p>
@@ -258,7 +245,7 @@
             </div>
           </article>
           <article class="catalog-card" id="project-freifunk" data-commonproject-id="freifunk">
-            <p class="catalog-kind">Digital · Kommunikation und Netze</p>
+            <p class="catalog-kind">Digital · Kommunikation und Netze › Gemeinschaftsnetze</p>
             <h2>Freifunk</h2>
             <p>Eine nicht-kommerzielle Initiative für freie, gemeinschaftlich aufgebaute Kommunikationsnetze und offene digitale Infrastruktur.</p>
             <p class="catalog-location">Ortsunabhängige digitale Präsenz</p>
@@ -286,7 +273,7 @@
             </div>
           </article>
           <article class="catalog-card" id="project-g0v" data-commonproject-id="g0v">
-            <p class="catalog-kind">Digital · Gemischte und weitere digitale Commons</p>
+            <p class="catalog-kind">Digital · Kooperation und Selbstorganisation › Civic Tech und Selbstorganisation</p>
             <h2>g0v</h2>
             <p>Eine offene Civic-Tech-Gemeinschaft aus Taiwan, die öffentliche Probleme kollaborativ bearbeitet und Ergebnisse, Quellcode und Dokumentation als frei zugängliche digitale Gemeingüter veröffentlicht.</p>
             <p class="catalog-location">Ortsunabhängige digitale Präsenz</p>
@@ -314,7 +301,7 @@
             </div>
           </article>
           <article class="catalog-card" id="project-guifi-net" data-commonproject-id="guifi-net">
-            <p class="catalog-kind">Vor Ort · Digital · Kommunikation und Netze</p>
+            <p class="catalog-kind">Vor Ort · Digital · Kommunikation und Netze › Gemeinschaftsnetze</p>
             <h2>guifi.net</h2>
             <p>Ein offenes, freies und neutrales Telekommunikationsnetz, dessen Infrastruktur als Gemeingut gemeinschaftlich aufgebaut, genutzt und von unterschiedlichen Teilnehmern gleichberechtigt weiterentwickelt wird.</p>
             <p class="catalog-location">1 öffentlicher Ort · 1 verborgener Ort</p>
@@ -330,7 +317,7 @@
             </div>
           </article>
           <article class="catalog-card" id="project-libreoffice" data-commonproject-id="libreoffice">
-            <p class="catalog-kind">Digital · Freie Software und Infrastruktur</p>
+            <p class="catalog-kind">Digital · Software, Werkzeuge und Produktion › Freie Software und Infrastruktur</p>
             <h2>LibreOffice</h2>
             <p>Eine freie und quelloffene Office-Suite, die von einer internationalen Gemeinschaft entwickelt, dokumentiert und übersetzt wird.</p>
             <p class="catalog-location">Ortsunabhängige digitale Präsenz</p>
@@ -345,7 +332,7 @@
             </div>
           </article>
           <article class="catalog-card" id="project-mastodon" data-commonproject-id="mastodon">
-            <p class="catalog-kind">Digital · Kommunikation und Netze</p>
+            <p class="catalog-kind">Digital · Kommunikation und Netze › Föderation und Protokolle</p>
             <h2>Mastodon</h2>
             <p>Eine freie, quelloffene und föderierte Software für soziale Netzwerke, deren unabhängige Server miteinander kommunizieren können.</p>
             <p class="catalog-location">Ortsunabhängige digitale Präsenz</p>
@@ -359,7 +346,7 @@
             </div>
           </article>
           <article class="catalog-card" id="project-nepal-wireless-networking-project" data-commonproject-id="nepal-wireless-networking-project">
-            <p class="catalog-kind">Digital · Kommunikation und Netze</p>
+            <p class="catalog-kind">Digital · Kommunikation und Netze › Gemeinschaftsnetze</p>
             <h2>Nepal Wireless Networking Project</h2>
             <p>Ein von lokalen Gemeinschaften und E-Networking Research and Development getragenes ländliches Kommunikationsnetz in Nepal, das gemeinsam gewartete Funkinfrastruktur, Bildung und lokale Dienste verbindet.</p>
             <p class="catalog-location">2 verborgene Orte</p>
@@ -373,7 +360,7 @@
             </div>
           </article>
           <article class="catalog-card" id="project-new-mexico-acequia-association" data-commonproject-id="new-mexico-acequia-association">
-            <p class="catalog-kind">Digital · Gemischte und weitere digitale Commons</p>
+            <p class="catalog-kind">Digital · Versorgung, Land und Ökologie › Wasser- und Ernährungssysteme</p>
             <h2>New Mexico Acequia Association</h2>
             <p>Ein Verband in New Mexico, der gemeinschaftlich verwaltete Bewässerungskanäle, demokratische Wasserverwaltung, traditionelle Landwirtschaft und die Handlungsfähigkeit lokaler Acequia-Gemeinschaften unterstützt.</p>
             <p class="catalog-location">2 verborgene Orte</p>
@@ -387,7 +374,7 @@
             </div>
           </article>
           <article class="catalog-card" id="project-nyc-mesh" data-commonproject-id="nyc-mesh">
-            <p class="catalog-kind">Vor Ort · Digital · Kommunikation und Netze</p>
+            <p class="catalog-kind">Vor Ort · Digital · Kommunikation und Netze › Gemeinschaftsnetze</p>
             <h2>NYC Mesh</h2>
             <p>Ein von Freiwilligen getragenes Gemeinschaftsnetz in New York City, das bezahlbaren Internetzugang, digitale Selbstbestimmung und gemeinsam aufgebaute lokale Infrastruktur verbindet.</p>
             <p class="catalog-location">1 öffentlicher Ort · 1 verborgener Ort</p>
@@ -404,7 +391,7 @@
             </div>
           </article>
           <article class="catalog-card" id="project-open-food-network-australia" data-commonproject-id="open-food-network-australia">
-            <p class="catalog-kind">Digital · Freie Software und Infrastruktur</p>
+            <p class="catalog-kind">Digital · Versorgung, Land und Ökologie › Ernährungsplattformen</p>
             <h2>Open Food Network Australia</h2>
             <p>Eine gemeinnützige australische Gemeinschaft und quelloffene Plattform, mit der Produzenten und Lebensmittelinitiativen kurze, transparente und gemeinschaftlich kontrollierte Versorgungsketten organisieren können.</p>
             <p class="catalog-location">Ortsunabhängige digitale Präsenz</p>
@@ -418,7 +405,7 @@
             </div>
           </article>
           <article class="catalog-card" id="project-open-source-ecology" data-commonproject-id="open-source-ecology">
-            <p class="catalog-kind">Vor Ort · Digital · Gemischte und weitere digitale Commons</p>
+            <p class="catalog-kind">Vor Ort · Digital · Software, Werkzeuge und Produktion › Offene Hardware und Produktion</p>
             <h2>Open Source Ecology</h2>
             <p>Ein globales Open-Hardware-Projekt, das frei nutzbare Baupläne für industrielle Werkzeuge entwickelt und sie an der Factor e Farm in Missouri praktisch erprobt, dokumentiert und lehrt.</p>
             <p class="catalog-location">1 öffentlicher Ort</p>
@@ -435,7 +422,7 @@
             </div>
           </article>
           <article class="catalog-card" id="project-openmrs" data-commonproject-id="openmrs">
-            <p class="catalog-kind">Digital · Freie Software und Infrastruktur</p>
+            <p class="catalog-kind">Digital · Versorgung, Land und Ökologie › Offene Gesundheitsversorgung</p>
             <h2>OpenMRS</h2>
             <p>Eine weltweite Open-Source-Gemeinschaft, die ein frei verfügbares, anpassbares medizinisches Informationssystem gemeinschaftlich entwickelt und Wissen für lokale Gesundheitsversorgung offen teilt.</p>
             <p class="catalog-location">Ortsunabhängige digitale Präsenz</p>
@@ -449,7 +436,7 @@
             </div>
           </article>
           <article class="catalog-card" id="project-openstreetmap" data-commonproject-id="openstreetmap">
-            <p class="catalog-kind">Digital · Gemischte und weitere digitale Commons</p>
+            <p class="catalog-kind">Digital · Software, Werkzeuge und Produktion › Daten- und Softwarebrücke</p>
             <h2>OpenStreetMap</h2>
             <p>Eine weltweite, gemeinschaftlich gepflegte offene Kartendatenbank, deren Daten frei genutzt und verbessert werden können.</p>
             <p class="catalog-location">Ortsunabhängige digitale Präsenz</p>
@@ -480,7 +467,7 @@
             </div>
           </article>
           <article class="catalog-card" id="project-sarantaporo-community-network" data-commonproject-id="sarantaporo-community-network">
-            <p class="catalog-kind">Vor Ort · Digital · Kommunikation und Netze</p>
+            <p class="catalog-kind">Vor Ort · Digital · Kommunikation und Netze › Gemeinschaftsnetze</p>
             <h2>Sarantaporo.gr Community Network</h2>
             <p>Ein gemeinschaftlich aufgebautes und betriebenes Funknetz in ländlichen Dörfern der Region Elassona, das offene Konnektivität, digitale Bildung und lokale Selbstorganisation verbindet.</p>
             <p class="catalog-location">1 öffentlicher Ort · 1 verborgener Ort</p>
@@ -497,7 +484,7 @@
             </div>
           </article>
           <article class="catalog-card" id="project-som-energia" data-commonproject-id="som-energia">
-            <p class="catalog-kind">Digital · Gemischte und weitere digitale Commons</p>
+            <p class="catalog-kind">Digital · Versorgung, Land und Ökologie › Energiegenossenschaften</p>
             <h2>Som Energia</h2>
             <p>Eine gemeinnützige Energiegenossenschaft in Spanien, deren Mitglieder erneuerbare Energieversorgung, gemeinschaftliche Erzeugungsprojekte und lokale Gruppen demokratisch tragen und weiterentwickeln.</p>
             <p class="catalog-location">2 verborgene Orte</p>
@@ -511,7 +498,7 @@
             </div>
           </article>
           <article class="catalog-card" id="project-wikibooks" data-commonproject-id="wikibooks">
-            <p class="catalog-kind">Digital · Freies Lernen und Bildung</p>
+            <p class="catalog-kind">Digital · Wissen, Lernen und Kultur › Lernen und Bildung</p>
             <h2>Wikibooks</h2>
             <p>Eine offene Sammlung frei nutzbarer Lehr-, Lern- und Sachbücher, die gemeinschaftlich geschrieben und verbessert werden.</p>
             <p class="catalog-location">Ortsunabhängige digitale Präsenz</p>
@@ -524,7 +511,7 @@
             </div>
           </article>
           <article class="catalog-card" id="project-wikidata" data-commonproject-id="wikidata">
-            <p class="catalog-kind">Digital · Wissen und offene Daten</p>
+            <p class="catalog-kind">Digital · Wissen, Lernen und Kultur › Offenes Wissen und Daten</p>
             <h2>Wikidata</h2>
             <p>Eine freie, gemeinschaftlich gepflegte Wissensdatenbank, die strukturierte Daten für Menschen, Wikimedia-Projekte und weitere Anwendungen bereitstellt.</p>
             <p class="catalog-location">Ortsunabhängige digitale Präsenz</p>
@@ -539,7 +526,7 @@
             </div>
           </article>
           <article class="catalog-card" id="project-wikimedia-commons" data-commonproject-id="wikimedia-commons">
-            <p class="catalog-kind">Digital · Offene Medien und Kultur</p>
+            <p class="catalog-kind">Digital · Wissen, Lernen und Kultur › Medien, Archive und Kultur</p>
             <h2>Wikimedia Commons</h2>
             <p>Eine freie, gemeinschaftlich aufgebaute Sammlung von Bildern, Audio, Video und anderen Mediendateien zur Wiederverwendung.</p>
             <p class="catalog-location">Ortsunabhängige digitale Präsenz</p>
@@ -554,7 +541,7 @@
             </div>
           </article>
           <article class="catalog-card" id="project-wikipedia" data-commonproject-id="wikipedia">
-            <p class="catalog-kind">Digital · Wissen und offene Daten</p>
+            <p class="catalog-kind">Digital · Wissen, Lernen und Kultur › Offenes Wissen und Daten</p>
             <h2>Wikipedia</h2>
             <p>Eine gemeinschaftlich erstellte, frei zugängliche Enzyklopädie in vielen Sprachen, deren Inhalte von Freiwilligen geschrieben und gepflegt werden.</p>
             <p class="catalog-location">Ortsunabhängige digitale Präsenz</p>
@@ -569,7 +556,7 @@
             </div>
           </article>
           <article class="catalog-card" id="project-wikiversity" data-commonproject-id="wikiversity">
-            <p class="catalog-kind">Digital · Freies Lernen und Bildung</p>
+            <p class="catalog-kind">Digital · Wissen, Lernen und Kultur › Lernen und Bildung</p>
             <h2>Wikiversity</h2>
             <p>Eine offene Plattform für freie Lernressourcen, Kurse und gemeinschaftliche Bildungsprojekte in vielen Sprachen.</p>
             <p class="catalog-location">Ortsunabhängige digitale Präsenz</p>
@@ -582,7 +569,7 @@
             </div>
           </article>
           <article class="catalog-card" id="project-zenzeleni-community-networks" data-commonproject-id="zenzeleni-community-networks">
-            <p class="catalog-kind">Vor Ort · Digital · Kommunikation und Netze</p>
+            <p class="catalog-kind">Vor Ort · Digital · Kommunikation und Netze › Gemeinschaftsnetze</p>
             <h2>Zenzeleni Community Networks</h2>
             <p>Ein von lokalen Genossenschaften getragenes Gemeinschaftsnetz im ländlichen Eastern Cape, das bezahlbare Konnektivität bereitstellt und Einnahmen sowie Verantwortung in den Gemeinden hält.</p>
             <p class="catalog-location">1 öffentlicher Ort · 1 verborgener Ort</p>
@@ -652,7 +639,7 @@
           <p>Der Globus benötigt JavaScript. Alle geprüften Commons und ihre Daten bleiben hier erreichbar.</p>
           <div class="catalog-grid">
           <article class="catalog-card" id="project-bioleft" data-commonproject-id="bioleft">
-            <p class="catalog-kind">Digital · Gemischte und weitere digitale Commons</p>
+            <p class="catalog-kind">Digital · Versorgung, Land und Ökologie › Saatgut, Ernährung und Landwirtschaft</p>
             <h2>Bioleft</h2>
             <p>Eine gemeinschaftliche Initiative in Argentinien, die Saatgut, agronomisches Wissen und partizipative Pflanzenzüchtung über offene Vereinbarungen zwischen Produzenten, Forschern und weiteren Beteiligten teilt.</p>
             <p class="catalog-location">1 verborgener Ort</p>
@@ -677,7 +664,7 @@
             </div>
           </article>
           <article class="catalog-card" id="project-community-energy-network-new-zealand" data-commonproject-id="community-energy-network-new-zealand">
-            <p class="catalog-kind">Digital · Gemischte und weitere digitale Commons</p>
+            <p class="catalog-kind">Digital · Versorgung, Land und Ökologie › Energiegenossenschaften</p>
             <h2>Community Energy Network New Zealand</h2>
             <p>Ein neuseeländisches Netzwerk lokaler, bürgergetragener Energieinitiativen, das Wissen, Zusammenarbeit und gemeinschaftliche Kontrolle erneuerbarer Energie- und Effizienzprojekte verbindet.</p>
             <p class="catalog-location">2 verborgene Orte</p>
@@ -690,7 +677,7 @@
             </div>
           </article>
           <article class="catalog-card" id="project-debian" data-commonproject-id="debian">
-            <p class="catalog-kind">Digital · Freie Software und Infrastruktur</p>
+            <p class="catalog-kind">Digital · Software, Werkzeuge und Produktion › Freie Software und Infrastruktur</p>
             <h2>Debian</h2>
             <p>Ein gemeinschaftlich entwickeltes freies Betriebssystem mit offenem Paketarchiv, öffentlicher Dokumentation und weltweiter Mitwirkung.</p>
             <p class="catalog-location">Ortsunabhängige digitale Präsenz</p>
@@ -720,7 +707,7 @@
             </div>
           </article>
           <article class="catalog-card" id="project-enspiral" data-commonproject-id="enspiral">
-            <p class="catalog-kind">Digital · Gemischte und weitere digitale Commons</p>
+            <p class="catalog-kind">Digital · Kooperation und Selbstorganisation › Gemeinschaftliche Governance und Genossenschaften</p>
             <h2>Enspiral</h2>
             <p>Ein in Aotearoa Neuseeland entstandenes kollaboratives Netzwerk, das gemeinschaftliche Unternehmensformen, geteilte Ressourcen und offen dokumentierte Werkzeuge für dezentrale Zusammenarbeit entwickelt.</p>
             <p class="catalog-location">Ortsunabhängige digitale Präsenz</p>
@@ -732,7 +719,7 @@
             </div>
           </article>
           <article class="catalog-card" id="project-freifunk-hamburg" data-commonproject-id="freifunk-hamburg">
-            <p class="catalog-kind">Vor Ort · Digital · Kommunikation und Netze</p>
+            <p class="catalog-kind">Vor Ort · Digital · Kommunikation und Netze › Gemeinschaftsnetze</p>
             <h2>Freifunk Hamburg</h2>
             <p>Eine lokale Freifunk-Community, die ein gemeinschaftlich getragenes digitales Netz in Hamburg betreibt und Beteiligung, offene Infrastruktur und freie Kommunikation verbindet.</p>
             <p class="catalog-location">1 öffentlicher Ort · 1 verborgener Ort</p>
@@ -747,7 +734,7 @@
             </div>
           </article>
           <article class="catalog-card" id="project-freifunk" data-commonproject-id="freifunk">
-            <p class="catalog-kind">Digital · Kommunikation und Netze</p>
+            <p class="catalog-kind">Digital · Kommunikation und Netze › Gemeinschaftsnetze</p>
             <h2>Freifunk</h2>
             <p>Eine nicht-kommerzielle Initiative für freie, gemeinschaftlich aufgebaute Kommunikationsnetze und offene digitale Infrastruktur.</p>
             <p class="catalog-location">Ortsunabhängige digitale Präsenz</p>
@@ -773,7 +760,7 @@
             </div>
           </article>
           <article class="catalog-card" id="project-g0v" data-commonproject-id="g0v">
-            <p class="catalog-kind">Digital · Gemischte und weitere digitale Commons</p>
+            <p class="catalog-kind">Digital · Kooperation und Selbstorganisation › Civic Tech und Selbstorganisation</p>
             <h2>g0v</h2>
             <p>Eine offene Civic-Tech-Gemeinschaft aus Taiwan, die öffentliche Probleme kollaborativ bearbeitet und Ergebnisse, Quellcode und Dokumentation als frei zugängliche digitale Gemeingüter veröffentlicht.</p>
             <p class="catalog-location">Ortsunabhängige digitale Präsenz</p>
@@ -799,7 +786,7 @@
             </div>
           </article>
           <article class="catalog-card" id="project-guifi-net" data-commonproject-id="guifi-net">
-            <p class="catalog-kind">Vor Ort · Digital · Kommunikation und Netze</p>
+            <p class="catalog-kind">Vor Ort · Digital · Kommunikation und Netze › Gemeinschaftsnetze</p>
             <h2>guifi.net</h2>
             <p>Ein offenes, freies und neutrales Telekommunikationsnetz, dessen Infrastruktur als Gemeingut gemeinschaftlich aufgebaut, genutzt und von unterschiedlichen Teilnehmern gleichberechtigt weiterentwickelt wird.</p>
             <p class="catalog-location">1 öffentlicher Ort · 1 verborgener Ort</p>
@@ -814,7 +801,7 @@
             </div>
           </article>
           <article class="catalog-card" id="project-libreoffice" data-commonproject-id="libreoffice">
-            <p class="catalog-kind">Digital · Freie Software und Infrastruktur</p>
+            <p class="catalog-kind">Digital · Software, Werkzeuge und Produktion › Freie Software und Infrastruktur</p>
             <h2>LibreOffice</h2>
             <p>Eine freie und quelloffene Office-Suite, die von einer internationalen Gemeinschaft entwickelt, dokumentiert und übersetzt wird.</p>
             <p class="catalog-location">Ortsunabhängige digitale Präsenz</p>
@@ -828,7 +815,7 @@
             </div>
           </article>
           <article class="catalog-card" id="project-mastodon" data-commonproject-id="mastodon">
-            <p class="catalog-kind">Digital · Kommunikation und Netze</p>
+            <p class="catalog-kind">Digital · Kommunikation und Netze › Föderation und Protokolle</p>
             <h2>Mastodon</h2>
             <p>Eine freie, quelloffene und föderierte Software für soziale Netzwerke, deren unabhängige Server miteinander kommunizieren können.</p>
             <p class="catalog-location">Ortsunabhängige digitale Präsenz</p>
@@ -841,7 +828,7 @@
             </div>
           </article>
           <article class="catalog-card" id="project-nepal-wireless-networking-project" data-commonproject-id="nepal-wireless-networking-project">
-            <p class="catalog-kind">Digital · Kommunikation und Netze</p>
+            <p class="catalog-kind">Digital · Kommunikation und Netze › Gemeinschaftsnetze</p>
             <h2>Nepal Wireless Networking Project</h2>
             <p>Ein von lokalen Gemeinschaften und E-Networking Research and Development getragenes ländliches Kommunikationsnetz in Nepal, das gemeinsam gewartete Funkinfrastruktur, Bildung und lokale Dienste verbindet.</p>
             <p class="catalog-location">2 verborgene Orte</p>
@@ -854,7 +841,7 @@
             </div>
           </article>
           <article class="catalog-card" id="project-new-mexico-acequia-association" data-commonproject-id="new-mexico-acequia-association">
-            <p class="catalog-kind">Digital · Gemischte und weitere digitale Commons</p>
+            <p class="catalog-kind">Digital · Versorgung, Land und Ökologie › Wasser- und Ernährungssysteme</p>
             <h2>New Mexico Acequia Association</h2>
             <p>Ein Verband in New Mexico, der gemeinschaftlich verwaltete Bewässerungskanäle, demokratische Wasserverwaltung, traditionelle Landwirtschaft und die Handlungsfähigkeit lokaler Acequia-Gemeinschaften unterstützt.</p>
             <p class="catalog-location">2 verborgene Orte</p>
@@ -867,7 +854,7 @@
             </div>
           </article>
           <article class="catalog-card" id="project-nyc-mesh" data-commonproject-id="nyc-mesh">
-            <p class="catalog-kind">Vor Ort · Digital · Kommunikation und Netze</p>
+            <p class="catalog-kind">Vor Ort · Digital · Kommunikation und Netze › Gemeinschaftsnetze</p>
             <h2>NYC Mesh</h2>
             <p>Ein von Freiwilligen getragenes Gemeinschaftsnetz in New York City, das bezahlbaren Internetzugang, digitale Selbstbestimmung und gemeinsam aufgebaute lokale Infrastruktur verbindet.</p>
             <p class="catalog-location">1 öffentlicher Ort · 1 verborgener Ort</p>
@@ -883,7 +870,7 @@
             </div>
           </article>
           <article class="catalog-card" id="project-open-food-network-australia" data-commonproject-id="open-food-network-australia">
-            <p class="catalog-kind">Digital · Freie Software und Infrastruktur</p>
+            <p class="catalog-kind">Digital · Versorgung, Land und Ökologie › Ernährungsplattformen</p>
             <h2>Open Food Network Australia</h2>
             <p>Eine gemeinnützige australische Gemeinschaft und quelloffene Plattform, mit der Produzenten und Lebensmittelinitiativen kurze, transparente und gemeinschaftlich kontrollierte Versorgungsketten organisieren können.</p>
             <p class="catalog-location">Ortsunabhängige digitale Präsenz</p>
@@ -896,7 +883,7 @@
             </div>
           </article>
           <article class="catalog-card" id="project-open-source-ecology" data-commonproject-id="open-source-ecology">
-            <p class="catalog-kind">Vor Ort · Digital · Gemischte und weitere digitale Commons</p>
+            <p class="catalog-kind">Vor Ort · Digital · Software, Werkzeuge und Produktion › Offene Hardware und Produktion</p>
             <h2>Open Source Ecology</h2>
             <p>Ein globales Open-Hardware-Projekt, das frei nutzbare Baupläne für industrielle Werkzeuge entwickelt und sie an der Factor e Farm in Missouri praktisch erprobt, dokumentiert und lehrt.</p>
             <p class="catalog-location">1 öffentlicher Ort</p>
@@ -912,7 +899,7 @@
             </div>
           </article>
           <article class="catalog-card" id="project-openmrs" data-commonproject-id="openmrs">
-            <p class="catalog-kind">Digital · Freie Software und Infrastruktur</p>
+            <p class="catalog-kind">Digital · Versorgung, Land und Ökologie › Offene Gesundheitsversorgung</p>
             <h2>OpenMRS</h2>
             <p>Eine weltweite Open-Source-Gemeinschaft, die ein frei verfügbares, anpassbares medizinisches Informationssystem gemeinschaftlich entwickelt und Wissen für lokale Gesundheitsversorgung offen teilt.</p>
             <p class="catalog-location">Ortsunabhängige digitale Präsenz</p>
@@ -925,7 +912,7 @@
             </div>
           </article>
           <article class="catalog-card" id="project-openstreetmap" data-commonproject-id="openstreetmap">
-            <p class="catalog-kind">Digital · Gemischte und weitere digitale Commons</p>
+            <p class="catalog-kind">Digital · Software, Werkzeuge und Produktion › Daten- und Softwarebrücke</p>
             <h2>OpenStreetMap</h2>
             <p>Eine weltweite, gemeinschaftlich gepflegte offene Kartendatenbank, deren Daten frei genutzt und verbessert werden können.</p>
             <p class="catalog-location">Ortsunabhängige digitale Präsenz</p>
@@ -954,7 +941,7 @@
             </div>
           </article>
           <article class="catalog-card" id="project-sarantaporo-community-network" data-commonproject-id="sarantaporo-community-network">
-            <p class="catalog-kind">Vor Ort · Digital · Kommunikation und Netze</p>
+            <p class="catalog-kind">Vor Ort · Digital · Kommunikation und Netze › Gemeinschaftsnetze</p>
             <h2>Sarantaporo.gr Community Network</h2>
             <p>Ein gemeinschaftlich aufgebautes und betriebenes Funknetz in ländlichen Dörfern der Region Elassona, das offene Konnektivität, digitale Bildung und lokale Selbstorganisation verbindet.</p>
             <p class="catalog-location">1 öffentlicher Ort · 1 verborgener Ort</p>
@@ -970,7 +957,7 @@
             </div>
           </article>
           <article class="catalog-card" id="project-som-energia" data-commonproject-id="som-energia">
-            <p class="catalog-kind">Digital · Gemischte und weitere digitale Commons</p>
+            <p class="catalog-kind">Digital · Versorgung, Land und Ökologie › Energiegenossenschaften</p>
             <h2>Som Energia</h2>
             <p>Eine gemeinnützige Energiegenossenschaft in Spanien, deren Mitglieder erneuerbare Energieversorgung, gemeinschaftliche Erzeugungsprojekte und lokale Gruppen demokratisch tragen und weiterentwickeln.</p>
             <p class="catalog-location">2 verborgene Orte</p>
@@ -983,7 +970,7 @@
             </div>
           </article>
           <article class="catalog-card" id="project-wikibooks" data-commonproject-id="wikibooks">
-            <p class="catalog-kind">Digital · Freies Lernen und Bildung</p>
+            <p class="catalog-kind">Digital · Wissen, Lernen und Kultur › Lernen und Bildung</p>
             <h2>Wikibooks</h2>
             <p>Eine offene Sammlung frei nutzbarer Lehr-, Lern- und Sachbücher, die gemeinschaftlich geschrieben und verbessert werden.</p>
             <p class="catalog-location">Ortsunabhängige digitale Präsenz</p>
@@ -995,7 +982,7 @@
             </div>
           </article>
           <article class="catalog-card" id="project-wikidata" data-commonproject-id="wikidata">
-            <p class="catalog-kind">Digital · Wissen und offene Daten</p>
+            <p class="catalog-kind">Digital · Wissen, Lernen und Kultur › Offenes Wissen und Daten</p>
             <h2>Wikidata</h2>
             <p>Eine freie, gemeinschaftlich gepflegte Wissensdatenbank, die strukturierte Daten für Menschen, Wikimedia-Projekte und weitere Anwendungen bereitstellt.</p>
             <p class="catalog-location">Ortsunabhängige digitale Präsenz</p>
@@ -1009,7 +996,7 @@
             </div>
           </article>
           <article class="catalog-card" id="project-wikimedia-commons" data-commonproject-id="wikimedia-commons">
-            <p class="catalog-kind">Digital · Offene Medien und Kultur</p>
+            <p class="catalog-kind">Digital · Wissen, Lernen und Kultur › Medien, Archive und Kultur</p>
             <h2>Wikimedia Commons</h2>
             <p>Eine freie, gemeinschaftlich aufgebaute Sammlung von Bildern, Audio, Video und anderen Mediendateien zur Wiederverwendung.</p>
             <p class="catalog-location">Ortsunabhängige digitale Präsenz</p>
@@ -1023,7 +1010,7 @@
             </div>
           </article>
           <article class="catalog-card" id="project-wikipedia" data-commonproject-id="wikipedia">
-            <p class="catalog-kind">Digital · Wissen und offene Daten</p>
+            <p class="catalog-kind">Digital · Wissen, Lernen und Kultur › Offenes Wissen und Daten</p>
             <h2>Wikipedia</h2>
             <p>Eine gemeinschaftlich erstellte, frei zugängliche Enzyklopädie in vielen Sprachen, deren Inhalte von Freiwilligen geschrieben und gepflegt werden.</p>
             <p class="catalog-location">Ortsunabhängige digitale Präsenz</p>
@@ -1037,7 +1024,7 @@
             </div>
           </article>
           <article class="catalog-card" id="project-wikiversity" data-commonproject-id="wikiversity">
-            <p class="catalog-kind">Digital · Freies Lernen und Bildung</p>
+            <p class="catalog-kind">Digital · Wissen, Lernen und Kultur › Lernen und Bildung</p>
             <h2>Wikiversity</h2>
             <p>Eine offene Plattform für freie Lernressourcen, Kurse und gemeinschaftliche Bildungsprojekte in vielen Sprachen.</p>
             <p class="catalog-location">Ortsunabhängige digitale Präsenz</p>
@@ -1049,7 +1036,7 @@
             </div>
           </article>
           <article class="catalog-card" id="project-zenzeleni-community-networks" data-commonproject-id="zenzeleni-community-networks">
-            <p class="catalog-kind">Vor Ort · Digital · Kommunikation und Netze</p>
+            <p class="catalog-kind">Vor Ort · Digital · Kommunikation und Netze › Gemeinschaftsnetze</p>
             <h2>Zenzeleni Community Networks</h2>
             <p>Ein von lokalen Genossenschaften getragenes Gemeinschaftsnetz im ländlichen Eastern Cape, das bezahlbare Konnektivität bereitstellt und Einnahmen sowie Verantwortung in den Gemeinden hält.</p>
             <p class="catalog-location">1 öffentlicher Ort · 1 verborgener Ort</p>

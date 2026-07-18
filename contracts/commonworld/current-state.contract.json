@@ -1,7 +1,7 @@
 {
   "schema_version": 2,
   "kind": "commonworld_current_public_state",
-  "current_as_of": "2026-07-17",
+  "current_as_of": "2026-07-18",
   "precedence": {
     "current_operational_truth": "this contract",
     "catalog_truth": "catalog/catalog.json and the referenced CommonProject records",
@@ -13,6 +13,17 @@
     "equivalent_text_presentation": true,
     "no_javascript_catalog": true,
     "machine_surface": "static_read_only"
+  },
+  "digital_ring_taxonomy": {
+    "contract": "contracts/commonworld/digital-ring-taxonomy.contract.json",
+    "version": "digital-ring-bundles-v1",
+    "canonical_url_parameter": "digital_path",
+    "main_field_count": 5,
+    "current_digital_identity_count": 25,
+    "current_known_theme_count": 37,
+    "legacy_layer_links": "deterministically_migrated",
+    "invalid_path_behavior": "fail_closed_to_sphere_root_without_partial_filter",
+    "catalog_presentation_fields_forbidden": true
   },
   "renderer": {
     "selected": true,

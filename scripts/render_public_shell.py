@@ -5,45 +5,28 @@ from __future__ import annotations
 
 import html
 import json
+import sys
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
+if str(ROOT) not in sys.path:
+    sys.path.insert(0, str(ROOT))
+
+from scripts.digital_taxonomy import derive_project_path, load_taxonomy, path_label
 
 ACTION_LINK_TYPES = {"visit", "use", "borrow", "learn", "contribute", "volunteer", "donate", "contact", "replicate"}
-
-LAYER_LABELS = {
-    "knowledge_data": "Wissen und offene Daten",
-    "software_infrastructure": "Freie Software und Infrastruktur",
-    "media_culture": "Offene Medien und Kultur",
-    "learning_education": "Freies Lernen und Bildung",
-    "communication_networks": "Kommunikation und Netze",
-    "mixed_other": "Gemischte und weitere digitale Commons",
-}
+TAXONOMY = load_taxonomy(ROOT)
 
 ORBIT_PROFILES = (
-    ("knowledge_data", 316, 300, -8),
-    ("software_infrastructure", 310, 282, 20),
-    ("media_culture", 304, 268, 43),
-    ("learning_education", 298, 288, -31),
-    ("communication_networks", 292, 274, 63),
-    ("mixed_other", 286, 294, -62),
+    (316, 300, -8),
+    (310, 282, 20),
+    (304, 268, 43),
+    (298, 288, -31),
+    (292, 274, 63),
+    (286, 294, -62),
+    (280, 262, 78),
+    (274, 284, -77),
 )
-
-THEME_LAYERS = {
-    "knowledge_data": {"knowledge", "open-data", "research", "documentation"},
-    "software_infrastructure": {"free-software", "open-source", "infrastructure", "platform"},
-    "media_culture": {"open-media", "culture", "archives", "creative-commons"},
-    "learning_education": {"education", "open-educational-resources", "learning"},
-    "communication_networks": {"communication", "community-network", "federation", "protocol"},
-}
-
-
-def derive_layer(record: dict) -> str:
-    themes = set(record.get("themes", []))
-    scores = {layer: len(themes & values) for layer, values in THEME_LAYERS.items()}
-    maximum = max(scores.values(), default=0)
-    winners = [layer for layer, score in scores.items() if score == maximum and score > 0]
-    return winners[0] if len(winners) == 1 else "mixed_other"
 
 
 def homepage(record: dict) -> str:
@@ -106,19 +89,21 @@ def _public_location(location: object) -> bool:
 def public_locations(record: dict) -> list[dict]:
     locations = record.get("presence", {}).get("geographic", [])
     if not isinstance(locations, list):
-        return []
+        return list()
     return [location for location in locations if _public_location(location)]
 
 
 def presentation_label(record: dict) -> str:
     has_geo = bool(public_locations(record))
     has_digital = record.get("presence", {}).get("digital", {}).get("available") is True
+    derivation = derive_project_path(record, TAXONOMY) if has_digital else None
+    digital_label = path_label(derivation["path"], TAXONOMY) if derivation else "Digitale Commons"
     if has_geo and has_digital:
-        return f"Vor Ort · Digital · {LAYER_LABELS[derive_layer(record)]}"
+        return f"Vor Ort · Digital · {digital_label}"
     if has_geo:
         return "Vor Ort"
     if has_digital:
-        return f"Digital · {LAYER_LABELS[derive_layer(record)]}"
+        return f"Digital · {digital_label}"
     return "Commons"
 
 
@@ -193,13 +178,7 @@ def render_shell(root: Path = ROOT) -> str:
     bootstrap = html.escape(json.dumps(records, ensure_ascii=False, separators=(",", ":")))
     paths = "\n".join(
         f'              <ellipse id="sphere-path-{index}" cx="320" cy="320" rx="{rx}" ry="{ry}" transform="rotate({rotation} 320 320)" />'
-        for index, (_, rx, ry, rotation) in enumerate(ORBIT_PROFILES, start=1)
-    )
-    planes = "\n".join(
-        f'              <g class="sphere-ring-plane" data-layer-id="{layer_id}" data-ring-index="{index - 1}">\n'
-        f'                <use href="#sphere-path-{index}" class="sphere-layer-guide" data-layer-id="{layer_id}"></use>\n'
-        f'              </g>'
-        for index, (layer_id, _, _, _) in enumerate(ORBIT_PROFILES, start=1)
+        for index, (rx, ry, rotation) in enumerate(ORBIT_PROFILES, start=1)
     )
     cards = render_cards(records)
     noscript_cards = render_cards(records, interactive=False)
@@ -281,10 +260,8 @@ def render_shell(root: Path = ROOT) -> str:
 {paths}
               </g>
             </defs>
-            <g id="sphere-rings" mask="url(#sphere-mask)" aria-hidden="true">
-{planes}
-            </g>
-            <circle id="sphere-edge-control" class="sphere-edge-control" cx="320" cy="320" r="309" fill="none" stroke="transparent" stroke-width="34" pointer-events="stroke" role="button" tabindex="0" aria-label="Digitale Ebenen öffnen. Antippen oder Eingabetaste drücken."></circle>
+            <g id="sphere-rings" mask="url(#sphere-mask)" aria-hidden="true"></g>
+            <circle id="sphere-edge-control" class="sphere-edge-control" cx="320" cy="320" r="309" fill="none" stroke="transparent" stroke-width="44" pointer-events="stroke" role="button" tabindex="0" aria-label="Digitale Ringbündel öffnen. Antippen oder Eingabetaste drücken."></circle>
             <circle class="sphere-edge-focus" cx="320" cy="320" r="309" aria-hidden="true"></circle>
           </svg>
           <div id="layer-stack-visual" class="layer-stack-visual" aria-hidden="true"></div>
@@ -303,17 +280,19 @@ def render_shell(root: Path = ROOT) -> str:
 
           <aside id="layer-panel" class="layer-panel" aria-labelledby="layer-title" hidden>
             <h2 id="layer-title" class="visually-hidden">Digitale Commons aus der Nähe</h2>
-            <p class="visually-hidden">Dieselben Commons erscheinen mit ihren Namen und Binärcodes auf sechs horizontal wischbaren Bahnen.</p>
+            <p class="visually-hidden">Dieselben digitalen Commons erscheinen als hierarchische Ringbündel mit direktem Elternpfad, Namen und Binärcodes.</p>
             <div class="layer-panel-controls">
-              <button id="layer-search-toggle" class="icon-button layer-search-toggle" type="button" aria-label="Commons suchen und Bahnen filtern" aria-controls="layer-discovery" aria-expanded="false">⌕</button>
+              <button id="layer-search-toggle" class="icon-button layer-search-toggle" type="button" aria-label="Commons suchen und Ringbündel filtern" aria-controls="layer-discovery" aria-expanded="false">⌕</button>
               <button id="layer-close" class="icon-button layer-close" type="button" aria-label="Zur Globusansicht zurückkehren">×</button>
             </div>
+            <nav id="layer-breadcrumb" class="digital-breadcrumb" aria-label="Digitaler Pfad"></nav>
+            <p id="layer-current" class="digital-current" role="status">Digitale Commons-Sphäre</p>
             <div id="layer-discovery" class="layer-discovery" hidden>
-              <label for="layer-search">Commons in den digitalen Bahnen suchen</label>
+              <label for="layer-search">Commons in den digitalen Ringbündeln suchen</label>
               <div class="layer-search-field"><span aria-hidden="true">⌕</span><input id="layer-search" type="search" inputmode="search" autocomplete="off" placeholder="Commons suchen" /></div>
               <div id="layer-buttons" class="layer-buttons"></div>
             </div>
-            <div id="layer-track-deck" class="layer-track-deck" aria-label="Horizontal wischbare digitale Commons-Bahnen"></div>
+            <div id="layer-track-deck" class="layer-track-deck" aria-label="Hierarchische digitale Commons-Ringbündel"></div>
             <div id="layer-projects" class="layer-projects" hidden></div>
           </aside>
 
@@ -330,8 +309,10 @@ def render_shell(root: Path = ROOT) -> str:
         </header>
         <div class="text-layout">
           <aside class="text-filters" aria-labelledby="text-filter-title">
-            <h2 id="text-filter-title">Filter und Schichten</h2>
+            <h2 id="text-filter-title">Filter und digitale Ringbündel</h2>
             <button class="quiet-button text-discovery-open" type="button" data-open-discovery>Suchfilter öffnen</button>
+            <nav id="text-layer-breadcrumb" class="digital-breadcrumb" aria-label="Digitaler Pfad in der Textansicht"></nav>
+            <p id="text-layer-current" class="digital-current" role="status">Digitale Commons-Sphäre</p>
             <div id="text-layer-buttons" class="layer-buttons"></div>
             <p class="machine-note">Maschinenlesbar: <a href="./catalog/catalog.json" type="application/json">Katalogmanifest</a> · <a href="./contracts/commonworld/project.schema.json" type="application/schema+json">Datenschema</a></p>
           </aside>
