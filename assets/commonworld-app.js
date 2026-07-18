@@ -54,6 +54,7 @@ const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
 const elements = {
   body: document.body,
   skipLink: document.querySelector('.skip-link'),
+  topbar: document.querySelector('.topbar'),
   globeSurface: document.querySelector('#globe-surface'),
   textView: document.querySelector('#text-view'),
   textCount: document.querySelector('#text-count'),
@@ -84,6 +85,7 @@ const elements = {
   layerButtons: document.querySelector('#layer-buttons'),
   layerProjects: document.querySelector('#layer-projects'),
   layerDeck: document.querySelector('#layer-track-deck'),
+  orientationBar: document.querySelector('.orientation-bar'),
   globeReset: document.querySelector('#globe-reset'),
   search: document.querySelector('#commons-search'),
   searchClear: document.querySelector('#search-clear'),
@@ -163,6 +165,7 @@ const runtime = {
   discoveryReturnTarget: null,
   pendingSpatialProject: null,
   resizeObserver: null,
+  orientationResizeObserver: null,
   catalogDegraded: false,
   mapDegraded: false,
   providerFallbackApplied: false,
@@ -186,6 +189,19 @@ function setStylePropertyIfChanged(element, name, value) {
   if (element.style.getPropertyValue(name) === value) return false;
   element.style.setProperty(name, value);
   return true;
+}
+
+function updateOrientationBarClearance() {
+  const height = Math.ceil(elements.orientationBar?.getBoundingClientRect().height ?? 0);
+  if (height > 0) setStylePropertyIfChanged(elements.stage, '--orientation-bar-height', `${height}px`);
+}
+
+function installOrientationBarClearanceTracking() {
+  updateOrientationBarClearance();
+  if (!('ResizeObserver' in window)) return;
+  runtime.orientationResizeObserver?.disconnect();
+  runtime.orientationResizeObserver = new ResizeObserver(updateOrientationBarClearance);
+  runtime.orientationResizeObserver.observe(elements.orientationBar);
 }
 
 function setDatasetIfChanged(element, name, value) {
@@ -774,6 +790,15 @@ function selectedProjectRecord() {
   return runtime.state.project ? runtime.recordsById.get(runtime.state.project) ?? null : null;
 }
 
+function syncPrimaryOverlayInteractivity({ discoveryOpen, settingsOpen, focusVisible }) {
+  elements.skipLink.toggleAttribute('inert', settingsOpen);
+  elements.topbar.toggleAttribute('inert', settingsOpen);
+  elements.discoveryPanel.toggleAttribute('inert', settingsOpen);
+  elements.globeSurface.toggleAttribute('inert', settingsOpen || discoveryOpen);
+  elements.textView.toggleAttribute('inert', settingsOpen || discoveryOpen);
+  elements.focus.toggleAttribute('inert', settingsOpen || discoveryOpen || !focusVisible);
+}
+
 function renderPrimaryOverlayState(record = selectedProjectRecord()) {
   const discoveryOpen = runtime.activeOverlay === 'discovery';
   const settingsOpen = runtime.activeOverlay === 'settings';
@@ -785,7 +810,7 @@ function renderPrimaryOverlayState(record = selectedProjectRecord()) {
   elements.search.setAttribute('aria-expanded', String(discoveryOpen));
   elements.settingsToggle.setAttribute('aria-expanded', String(settingsOpen));
   elements.focus.hidden = !focusVisible;
-  elements.focus.toggleAttribute('inert', !focusVisible);
+  syncPrimaryOverlayInteractivity({ discoveryOpen, settingsOpen, focusVisible });
   if (focusVisible) elements.focus.removeAttribute('aria-hidden');
   else elements.focus.setAttribute('aria-hidden', 'true');
 }
@@ -1257,13 +1282,37 @@ function flushPendingHierarchyFocus() {
   return target;
 }
 
-function scheduleHierarchyFocus(pathKey) {
+const HIERARCHY_FOCUS_RETRY_DELAYS_MS = [0, 50, 150, 400, 900, 1800];
+
+function isVisibleHierarchyFocusTarget(target = document.activeElement) {
+  return isVisibleFocusTarget(target)
+    && target.matches('.digital-lane-focus, .digital-lane-scroll, .digital-breadcrumb-item, .layer-filter, #layer-close');
+}
+
+function scheduleHierarchyFocus(pathKey, verificationAttempt = 0) {
   runtime.pendingHierarchyFocusPath = pathKey;
   window.clearTimeout(runtime.hierarchyFocusTimer);
-  runtime.hierarchyFocusTimer = window.setTimeout(() => {
+  let attempt = 0;
+  const tryFocus = () => {
     runtime.hierarchyFocusTimer = null;
-    flushPendingHierarchyFocus();
-  }, 0);
+    if (runtime.pendingHierarchyFocusPath !== pathKey) return;
+    const target = flushPendingHierarchyFocus();
+    if (target) {
+      window.setTimeout(() => {
+        if (runtime.state.project || serializeDigitalPath(currentDigitalPath()) !== pathKey) return;
+        if (isVisibleHierarchyFocusTarget()) return;
+        const active = document.activeElement;
+        if (active && active !== document.body && isVisibleFocusTarget(active)) return;
+        if (verificationAttempt >= 2) return;
+        scheduleHierarchyFocus(pathKey, verificationAttempt + 1);
+      }, 50);
+      return;
+    }
+    attempt += 1;
+    if (attempt >= HIERARCHY_FOCUS_RETRY_DELAYS_MS.length) return;
+    runtime.hierarchyFocusTimer = window.setTimeout(tryFocus, HIERARCHY_FOCUS_RETRY_DELAYS_MS[attempt]);
+  };
+  runtime.hierarchyFocusTimer = window.setTimeout(tryFocus, HIERARCHY_FOCUS_RETRY_DELAYS_MS[attempt]);
 }
 
 function setDigitalPath(path, { historyMode = 'push' } = {}) {
@@ -1548,16 +1597,19 @@ function showLayerState() {
   elements.sphere.setAttribute('aria-hidden', String(runtime.viewPhase === 'layers'));
   elements.map.toggleAttribute('inert', journeyActive);
   elements.layerToggle.toggleAttribute('inert', journeyActive);
+  elements.orientationBar.toggleAttribute('inert', journeyActive);
   if (journeyActive) {
     elements.map.setAttribute('aria-hidden', 'true');
     elements.layerToggle.setAttribute('aria-hidden', 'true');
     elements.sphereEdge.setAttribute('aria-hidden', 'true');
     elements.sphereEdge.setAttribute('tabindex', '-1');
+    elements.orientationBar.setAttribute('aria-hidden', 'true');
   } else {
     elements.map.removeAttribute('aria-hidden');
     elements.layerToggle.removeAttribute('aria-hidden');
     elements.sphereEdge.removeAttribute('aria-hidden');
     elements.sphereEdge.setAttribute('tabindex', '0');
+    elements.orientationBar.removeAttribute('aria-hidden');
     elements.layerPanel.removeAttribute('data-closing');
   }
 }
@@ -1665,6 +1717,28 @@ function toggleLayerDiscovery() {
     renderLayerPanel();
     elements.layerSearch.focus({ preventScroll: true });
   }
+}
+
+const SETTINGS_FOCUSABLE_SELECTOR = 'a[href], button:not([disabled]), input:not([disabled]):not([type=\"hidden\"]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex=\"-1\"])';
+
+function trapSettingsFocus(event) {
+  if (event.key !== 'Tab' || runtime.activeOverlay !== 'settings') return false;
+  const targets = [...elements.settingsPanel.querySelectorAll(SETTINGS_FOCUSABLE_SELECTOR)].filter(isVisibleFocusTarget);
+  if (!targets.length) return false;
+  const first = targets[0];
+  const last = targets.at(-1);
+  const active = document.activeElement;
+  if (event.shiftKey && (active === first || !elements.settingsPanel.contains(active))) {
+    event.preventDefault();
+    last.focus({ preventScroll: true });
+    return true;
+  }
+  if (!event.shiftKey && (active === last || !elements.settingsPanel.contains(active))) {
+    event.preventDefault();
+    first.focus({ preventScroll: true });
+    return true;
+  }
+  return false;
 }
 
 function closeSettings({ restoreFocus = true } = {}) {
@@ -1909,6 +1983,10 @@ function wireControls() {
     button.addEventListener('click', () => selectProject(button.dataset.commonprojectId, { trigger: button, navigateSpatial: true }));
   });
   document.addEventListener('keydown', (event) => {
+    if (event.key === 'Tab' && runtime.activeOverlay === 'settings') {
+      trapSettingsFocus(event);
+      return;
+    }
     if (event.key !== 'Escape') return;
     if (runtime.activeOverlay === 'settings') closeSettings();
     else if (runtime.activeOverlay === 'discovery') closeDiscovery({ restoreFocus: true });
@@ -1922,6 +2000,7 @@ function wireControls() {
   });
   window.addEventListener('popstate', () => applyDeepLink(location.search));
   window.addEventListener('resize', () => {
+    updateOrientationBarClearance();
     if (runtime.resizeObserver) return;
     runtime.stageSize = null;
     runtime.map?.resize();
@@ -2092,6 +2171,7 @@ async function boot() {
     renderSphere();
     renderLayerStack();
     wireControls();
+    installOrientationBarClearanceTracking();
     if (navigator.webdriver && ['127.0.0.1', 'localhost'].includes(location.hostname)) {
       window.__commonworldInstallSyntheticRecordsForTest = (records) => {
         installRecords(validateRecords(records));
