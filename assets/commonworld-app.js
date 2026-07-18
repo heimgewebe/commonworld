@@ -947,10 +947,12 @@ function createRuntimeCatalogCard(record) {
   open.addEventListener('click', () => selectProject(record.id, { trigger: open, navigateSpatial: true }));
   actions.append(open);
   for (const link of directActionLinks(record)) {
+    const href = link.url;
+    if (!href.startsWith('https://')) continue;
     const anchor = document.createElement('a');
     anchor.className = 'catalog-action-link';
     anchor.dataset.actionType = link.type;
-    anchor.href = link.url;
+    anchor.href = href;
     anchor.rel = 'external noreferrer';
     anchor.textContent = link.label;
     actions.append(anchor);
@@ -1026,7 +1028,7 @@ function replaceLinks(container, links) {
   container.replaceChildren();
   for (const link of links) {
     const url = safeExternalHttpsUrl(link?.url);
-    if (!url) continue;
+    if (!url || !url.startsWith('https://')) continue;
     const item = document.createElement('li');
     const anchor = document.createElement('a');
     anchor.href = url;
