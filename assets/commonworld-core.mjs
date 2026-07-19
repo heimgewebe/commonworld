@@ -708,7 +708,63 @@ export function normalizeQuery(value) {
   return String(value ?? '').trim().replace(/\s+/g, ' ').slice(0, 120);
 }
 
+export const COMMONS_TYPE_VALUES = Object.freeze([
+  'knowledge',
+  'software',
+  'culture',
+  'food-seeds',
+  'water',
+  'energy',
+  'housing-land',
+  'health-care',
+  'tools-repair',
+  'community-network',
+  'other',
+]);
+
+export const COMMONS_TYPE_LABELS = Object.freeze({
+  knowledge: 'Wissen und Daten',
+  software: 'Software und Infrastruktur',
+  culture: 'Kultur und Medien',
+  'food-seeds': 'Saatgut und Ernährung',
+  water: 'Wasser und Bewässerung',
+  energy: 'Energie',
+  'housing-land': 'Boden und Wohnen',
+  'health-care': 'Pflege und Gesundheit',
+  'tools-repair': 'Werkzeuge, Reparatur und Fertigung',
+  'community-network': 'Gemeinschaftsnetz',
+  other: 'Andere',
+});
+
+const COMMONS_TYPE_THEME_RULES = Object.freeze([
+  Object.freeze({ type: 'health-care', themes: Object.freeze(['health']) }),
+  Object.freeze({ type: 'energy', themes: Object.freeze(['energy', 'renewable-energy']) }),
+  Object.freeze({ type: 'water', themes: Object.freeze(['water', 'irrigation']) }),
+  Object.freeze({ type: 'food-seeds', themes: Object.freeze(['seeds', 'food', 'agriculture']) }),
+  Object.freeze({ type: 'housing-land', themes: Object.freeze(['housing', 'community-land', 'shared-space', 'urban-gardening', 'biodiversity']) }),
+  Object.freeze({ type: 'tools-repair', themes: Object.freeze(['open-hardware', 'distributed-manufacturing', 'shared-tools', 'tool-sharing', 'repair', 'circular-economy', 'skills']) }),
+  Object.freeze({ type: 'community-network', themes: Object.freeze(['communication', 'community-network', 'federation', 'protocol', 'rural-infrastructure', 'digital-equity']) }),
+  Object.freeze({ type: 'culture', themes: Object.freeze(['open-media', 'culture', 'archives', 'creative-commons']) }),
+  Object.freeze({ type: 'software', themes: Object.freeze(['free-software', 'open-source', 'software-infrastructure', 'platform', 'civic-tech']) }),
+  Object.freeze({ type: 'knowledge', themes: Object.freeze(['knowledge', 'open-data', 'open-knowledge', 'documentation', 'research', 'education', 'learning', 'open-educational-resources', 'digital-literacy', 'environmental-education']) }),
+  Object.freeze({ type: 'software', themes: Object.freeze(['infrastructure']) }),
+]);
+
+export function deriveCommonsType(record) {
+  const explicitType = record?.commons_type;
+  if (explicitType !== undefined) return COMMONS_TYPE_VALUES.includes(explicitType) ? explicitType : 'other';
+  const themes = new Set(Array.isArray(record?.themes) ? record.themes.filter((theme) => typeof theme === 'string') : []);
+  const matched = COMMONS_TYPE_THEME_RULES.find((rule) => rule.themes.some((theme) => themes.has(theme)));
+  return matched?.type ?? 'other';
+}
+
+export function commonsTypeLabel(recordOrType) {
+  const type = typeof recordOrType === 'string' ? recordOrType : deriveCommonsType(recordOrType);
+  return COMMONS_TYPE_LABELS[type] ?? COMMONS_TYPE_LABELS.other;
+}
+
 export const INTENT_FILTER_VALUES = Object.freeze({
+  commons_type: COMMONS_TYPE_VALUES,
   presence: Object.freeze(['geographic', 'digital']),
   action: Object.freeze(['visit', 'use', 'borrow', 'learn', 'contribute', 'volunteer', 'donate', 'contact', 'replicate']),
   access: Object.freeze(['public', 'membership', 'restricted', 'unknown']),
@@ -752,6 +808,7 @@ export function stateFromSearch(search = '', knownProjectIds = []) {
     view: parameters.get('view') === 'layers' ? 'layers' : 'globe',
     surface: parameters.get('surface') === 'text' ? 'text' : 'globe',
     query: normalizeQuery(parameters.get('q')),
+    commons_type: filterParameter(parameters, 'commons_type'),
     presence: Object.freeze(presence),
     action: filterParameter(parameters, 'action'),
     language: languageFilterParameter(parameters),
@@ -783,7 +840,7 @@ export function searchFromState(state) {
   if (state?.project) parameters.set('project', state.project);
   const query = normalizeQuery(state?.query);
   if (query) parameters.set('q', query);
-  for (const name of ['action', 'access', 'freshness', 'curation']) {
+  for (const name of ['commons_type', 'action', 'access', 'freshness', 'curation']) {
     const value = state?.[name];
     if (INTENT_FILTER_VALUES[name].includes(value)) parameters.set(name, value);
   }
@@ -869,6 +926,7 @@ const FIELD_WEIGHTS = Object.freeze({
   location: 100,
   action: 85,
   presence: 70,
+  commonsType: 68,
   theme: 65,
   digital: 55,
   summary: 45,
@@ -955,6 +1013,7 @@ function recordSearchFields(record) {
   append('title', 'Name', [record?.title]);
   append('summary', 'Beschreibung', [record?.summary]);
   append('theme', 'Thema', (record?.themes ?? []).flatMap((theme) => vocabularyValues(theme, THEME_INTENT_TERMS)));
+  append('commonsType', 'Commons-Art', [commonsTypeLabel(record)]);
   append('action', 'Möglichkeit', (record?.actions ?? []).flatMap((action) => vocabularyValues(action, ACTION_INTENT_TERMS)));
 
   const geographicLocations = publicGeographicLocations(record);
@@ -1001,6 +1060,7 @@ export function recordMatchesIntentFilters(record, filters = {}, today = new Dat
     if (filters.presence.includes('digital') && !hasDigitalPresence(record)) return false;
   }
 
+  if (filters.commons_type && deriveCommonsType(record) !== filters.commons_type) return false;
   if (filters.action && !(record?.actions ?? []).includes(filters.action)) return false;
   if (filters.language) {
     const languages = recordLanguageValues(record);
@@ -1152,6 +1212,7 @@ export function filterRecords(records, state = {}) {
       filters: {
         layer: state.layer ?? null,
         digitalPath: state.digitalPath ?? null,
+        commons_type: state.commons_type ?? null,
         presence: state.presence ?? null,
         action: state.action ?? null,
         language: state.language ?? null,

@@ -6,6 +6,7 @@ import process from 'node:process';
 import { chromium } from 'playwright';
 import {
   buildDigitalPresentationTree,
+  deriveCommonsType,
   deriveDigitalProjectPath,
   deriveLayer,
   DIGITAL_RING_FIELDS,
@@ -159,6 +160,7 @@ async function loadExpectedDigitalProjection() {
   const records = [];
   const catalogIds = [];
   const contributionIds = [];
+  const communityNetworkIds = [];
   const dualPresenceIds = [];
   const dualPresenceVolunteerIds = [];
   const publicMapProjectIds = new Set();
@@ -168,6 +170,7 @@ async function loadExpectedDigitalProjection() {
     records.push(record);
     catalogIds.push(record.id);
     if (record.actions?.includes('contribute')) contributionIds.push(record.id);
+    if (deriveCommonsType(record) === 'community-network') communityNetworkIds.push(record.id);
     const hasPublicGeographicPresence = (record.presence?.geographic ?? []).some((location) => location?.mode !== 'hidden' && Boolean(location?.geometry));
     const hasPublicDigitalPresence = record.presence?.digital?.available === true;
     if (hasPublicGeographicPresence && hasPublicDigitalPresence) dualPresenceIds.push(record.id);
@@ -216,6 +219,7 @@ async function loadExpectedDigitalProjection() {
     allIds,
     catalogIds,
     contributionIds,
+    communityNetworkIds,
     dualPresenceIds,
     dualPresenceVolunteerIds,
     publicFeatureCount,
@@ -1455,6 +1459,19 @@ async function intentSearchDiscoveryScenario() {
 
   await run.page.locator('#commons-search').fill('');
   await run.page.waitForFunction((count) => document.querySelectorAll('.discovery-result').length === count, expectedDigitalProjection.catalogEntryCount);
+  await run.page.locator('#filter-commons-type').selectOption('community-network');
+  await run.page.waitForFunction((count) => new URL(location.href).searchParams.get('commons_type') === 'community-network' && document.querySelectorAll('.discovery-result').length === count, expectedDigitalProjection.communityNetworkIds.length);
+  assertSameIds(await resultIds(), expectedDigitalProjection.communityNetworkIds, 'intent filters: Commons-Art differs from deterministic catalog derivation');
+  assert((await run.page.locator('.discovery-result-meta').allTextContents()).every((text) => text.includes('Gemeinschaftsnetz')), 'intent filters: Commons-Art label missing from compact result metadata');
+  await run.page.locator('#filter-commons-type').selectOption('');
+  await run.page.waitForFunction((count) => !new URL(location.href).searchParams.has('commons_type') && document.querySelectorAll('.discovery-result').length === count, expectedDigitalProjection.catalogEntryCount);
+  await run.page.goBack({ waitUntil: 'domcontentloaded' });
+  await run.page.waitForFunction((count) => document.querySelector('#filter-commons-type')?.value === 'community-network' && document.querySelectorAll('.discovery-result').length === count, expectedDigitalProjection.communityNetworkIds.length);
+  assertSameIds(await resultIds(), expectedDigitalProjection.communityNetworkIds, 'intent history: Back did not restore Commons-Art');
+  await run.page.goForward({ waitUntil: 'domcontentloaded' });
+  await run.page.waitForFunction((count) => document.querySelector('#filter-commons-type')?.value === '' && document.querySelectorAll('.discovery-result').length === count, expectedDigitalProjection.catalogEntryCount);
+  if (await run.page.locator('#discovery-panel').isHidden()) await run.page.locator('#filter-toggle').click();
+  await run.page.locator('#discovery-panel').waitFor({ state: 'visible' });
   await run.page.waitForFunction(() => Boolean(window.__commonworldTestMap) && !window.__commonworldTestMap.isMoving());
   const filterCamera = await mapCamera();
   await run.page.locator('#filter-presence-geographic').check();
@@ -1482,7 +1499,7 @@ async function intentSearchDiscoveryScenario() {
 
   await run.page.locator('#filter-clear').click();
   await run.page.waitForFunction((count) => document.querySelectorAll('.discovery-result').length === count, expectedDigitalProjection.catalogEntryCount);
-  assert([...new URL(run.page.url()).searchParams.keys()].every((key) => !['presence', 'action', 'language', 'access', 'freshness', 'curation'].includes(key)), 'intent filters: reset left filter parameters in the URL');
+  assert([...new URL(run.page.url()).searchParams.keys()].every((key) => !['commons_type', 'presence', 'action', 'language', 'access', 'freshness', 'curation'].includes(key)), 'intent filters: reset left filter parameters in the URL');
 
   const digitalCamera = await mapCamera();
   await run.page.locator('#commons-search').fill('Debian');
@@ -1535,7 +1552,7 @@ async function intentSearchDiscoveryScenario() {
 
   assert(run.consoleErrors.every((message) => message.includes('Failed to load resource')), 'intent search: unexpected console errors: ' + run.consoleErrors.join(' | '));
   assert(run.pageErrors.length === 0, 'intent search: page errors: ' + run.pageErrors.join(' | '));
-  results.push({ id: 'intent-search-discovery', verdict: 'PASS', indexedRecords: expectedDigitalProjection.catalogEntryCount, rankedGermanIntentResults: expectedDigitalProjection.contributionIds.length, filters: 6, digitalCoordinateFree: true, spatialNavigation: true });
+  results.push({ id: 'intent-search-discovery', verdict: 'PASS', indexedRecords: expectedDigitalProjection.catalogEntryCount, rankedGermanIntentResults: expectedDigitalProjection.contributionIds.length, filters: 7, digitalCoordinateFree: true, spatialNavigation: true });
   await run.context.close();
 }
 

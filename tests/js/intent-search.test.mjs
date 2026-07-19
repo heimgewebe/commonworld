@@ -84,6 +84,10 @@ test('multiple meaningful query terms intersect and title matches rank determini
 
 test('intent filters preserve identity and treat absent language or access as unknown', () => {
   const index = prepareIntentSearchIndex(records);
+  assert.deepEqual(index.search({ filters: { commons_type: 'community-network' } }).map(({ id }) => id), ['freifunk-hamburg']);
+  assert.deepEqual(index.search({ query: 'Gemeinschaftsnetz' }).map(({ id }) => id), ['freifunk-hamburg']);
+  assert.deepEqual(index.search({ filters: { commons_type: 'housing-land' } }).map(({ id }) => id), ['le-nid']);
+  assert.deepEqual(index.search({ filters: { commons_type: 'software' } }).map(({ id }) => id), ['debian']);
   assert.deepEqual(index.search({ filters: { presence: ['geographic', 'digital'] } }).map(({ id }) => id), ['freifunk-hamburg']);
   assert.deepEqual(index.search({ filters: { action: 'donate' } }).map(({ id }) => id), ['debian']);
   assert.deepEqual(index.search({ filters: { language: 'de' } }).map(({ id }) => id), ['freifunk-hamburg']);

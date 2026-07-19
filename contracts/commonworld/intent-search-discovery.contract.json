@@ -43,6 +43,7 @@
     "minimum_touch_target_css_px": 44
   },
   "filters": [
+    "commons_type",
     "presence",
     "action",
     "language",
@@ -54,7 +55,11 @@
     "identity_key": "CommonProject.id",
     "missing_language_or_access_is_unknown": true,
     "filter_changes_do_not_move_camera": true,
-    "selection_is_independent_from_filter_state": true
+    "selection_is_independent_from_filter_state": true,
+    "commons_type_values_follow_proposal_vocabulary": true,
+    "commons_type_is_deterministically_derived_from_catalog_themes_when_absent": true,
+    "commons_type_source_vocabulary": "contracts/commonworld/proposal.schema.json#/properties/project/properties/commons_type",
+    "commons_type_fallback": "other"
   },
   "spatial_navigation": {
     "source": "derived public GeoJSON only",
