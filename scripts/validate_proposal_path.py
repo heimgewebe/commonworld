@@ -11,13 +11,13 @@ from urllib.parse import urlparse
 from jsonschema import Draft202012Validator, FormatChecker
 
 try:
-    from scripts.static_surface_parser import find_css_block, parse_stylesheet_links
+    from scripts.static_surface_parser import find_css_block, find_media_block, find_media_blocks, parse_stylesheet_links
 except ModuleNotFoundError as exc:  # direct script execution puts the scripts dir on sys.path
     # Only fall back when the 'scripts' package itself is unreachable; a missing
     # dependency inside static_surface_parser must stay visible.
     if exc.name not in {"scripts", "scripts.static_surface_parser"}:
         raise
-    from static_surface_parser import find_css_block, parse_stylesheet_links
+    from static_surface_parser import find_css_block, find_media_block, find_media_blocks, parse_stylesheet_links
 
 ROOT = Path(__file__).resolve().parents[1]
 REJECTION_CODES = {
@@ -126,6 +126,30 @@ def validate(root: Path = ROOT) -> list[str]:
                 errors.append("assets/proposal.css body.proposal-page must set overscroll-behavior(-y): contain")
             if "overflow: hidden" in block or "overflow-y: hidden" in block:
                 errors.append("assets/proposal.css body.proposal-page must not reintroduce overflow-y: hidden")
+
+        forced = find_media_block(proposal_css, ("forced-colors: active",))
+        if forced is None:
+            errors.append("assets/proposal.css must define a forced-colors: active contract")
+        else:
+            block = forced[1]
+            for token in ("CanvasText", "FieldText", "ButtonText", "Highlight", ".proposal-errors", ":disabled"):
+                if token not in block:
+                    errors.append(f"proposal forced-colors contract missing token: {token}")
+
+        reduced_motion = find_media_blocks(proposal_css, ("prefers-reduced-motion: reduce",))
+        if not reduced_motion:
+            errors.append("assets/proposal.css must define a prefers-reduced-motion: reduce contract")
+        elif not any("transition: none !important" in block for _, block in reduced_motion):
+            errors.append("proposal reduced-motion contract must disable transitions")
+
+        contrast = find_media_block(proposal_css, ("prefers-contrast: more",))
+        if contrast is None:
+            errors.append("assets/proposal.css must define a prefers-contrast: more contract")
+        else:
+            block = contrast[1]
+            for token in ("outline: 4px", "border-width: 2px", "input:checked"):
+                if token not in block:
+                    errors.append(f"proposal increased-contrast contract missing token: {token}")
     for forbidden in ("api_key", "client_secret", "authorization: bearer", "innerhtml", "document.cookie"):
         if forbidden in script.casefold(): errors.append(f"proposal client contains forbidden material: {forbidden}")
     if "javascript" not in script.casefold() or "containsSensitiveLocation" not in script: errors.append("proposal client lacks explicit dangerous URL or sensitive-location checks")

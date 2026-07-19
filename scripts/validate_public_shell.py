@@ -11,6 +11,7 @@ try:
     from scripts.static_surface_parser import (
         find_css_block,
         find_media_block,
+        find_media_blocks,
         parse_presence_group,
         parse_stylesheet_links,
     )
@@ -22,6 +23,7 @@ except ModuleNotFoundError as exc:  # direct script execution puts the scripts d
     from static_surface_parser import (
         find_css_block,
         find_media_block,
+        find_media_blocks,
         parse_presence_group,
         parse_stylesheet_links,
     )
@@ -171,7 +173,36 @@ def validate_public_shell(root: Path = ROOT) -> list[str]:
     if "<script" in method.casefold():
         errors.append('public method surface must remain script-free')
 
+    errors.extend(_validate_accessibility_modes(css))
     errors.extend(_validate_ipad_landscape_wiring(root, html))
+    return errors
+
+
+def _validate_accessibility_modes(css: str) -> list[str]:
+    errors: list[str] = []
+    forced = find_media_block(css, ('forced-colors: active',))
+    if forced is None:
+        errors.append('public shell CSS must define a forced-colors: active contract')
+    else:
+        block = forced[1]
+        for token in ('CanvasText', 'ButtonText', 'Highlight', ':focus-visible', '[aria-pressed=\"true\"]', 'input:checked'):
+            if token not in block:
+                errors.append(f'public forced-colors contract missing token: {token}')
+
+    reduced_motion = find_media_blocks(css, ('prefers-reduced-motion: reduce',))
+    if not reduced_motion:
+        errors.append('public shell CSS must define a prefers-reduced-motion: reduce contract')
+    elif not any('transition: none !important' in block for _, block in reduced_motion):
+        errors.append('public reduced-motion contract must disable transitions')
+
+    contrast = find_media_block(css, ('prefers-contrast: more',))
+    if contrast is None:
+        errors.append('public shell CSS must define a prefers-contrast: more contract')
+    else:
+        block = contrast[1]
+        for token in (':focus-visible', 'outline: 4px', 'border-width: 2px', '[aria-checked=\"true\"]'):
+            if token not in block:
+                errors.append(f'public increased-contrast contract missing token: {token}')
     return errors
 
 

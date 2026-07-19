@@ -273,5 +273,49 @@ class PublicShellTests(unittest.TestCase):
         self.assertIsNotNone(find_css_block(css, ".surface .layer-discovery"))
 
 
+    def test_public_shell_requires_forced_colors_contract(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp_dir:
+            root = self.copy_shell(tmp_dir)
+            path = root / "index.css"
+            css = path.read_text(encoding="utf-8").replace(
+                "@media (forced-colors: active)",
+                "@media (forced-colors: none)",
+                1,
+            )
+            path.write_text(css, encoding="utf-8")
+            errors = validate_public_shell(root)
+            self.assertIn("public shell CSS must define a forced-colors: active contract", errors)
+
+    def test_public_shell_requires_increased_contrast_state_markers(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp_dir:
+            root = self.copy_shell(tmp_dir)
+            path = root / "index.css"
+            css = path.read_text(encoding="utf-8").replace(
+                '[aria-checked="true"]',
+                '[aria-checked="mixed"]',
+                1,
+            )
+            path.write_text(css, encoding="utf-8")
+            errors = validate_public_shell(root)
+            self.assertIn(
+                'public increased-contrast contract missing token: [aria-checked="true"]',
+                errors,
+            )
+
+
+    def test_public_shell_reduced_motion_disables_transitions(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp_dir:
+            root = self.copy_shell(tmp_dir)
+            path = root / "index.css"
+            css = path.read_text(encoding="utf-8").replace(
+                "transition: none !important",
+                "transition-duration: 0.01ms !important",
+                1,
+            )
+            path.write_text(css, encoding="utf-8")
+            errors = validate_public_shell(root)
+            self.assertIn("public reduced-motion contract must disable transitions", errors)
+
+
 if __name__ == "__main__":
     unittest.main()

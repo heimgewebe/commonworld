@@ -102,5 +102,99 @@ body.proposal-page {
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .proposal-page *, .proposal-page *::before, .proposal-page *::after { scroll-behavior: auto !important; transition-duration: 0.001ms !important; animation-duration: 0.001ms !important; animation-iteration-count: 1 !important; }
+  .proposal-page *, .proposal-page *::before, .proposal-page *::after { scroll-behavior: auto !important; transition: none !important; animation-duration: 0.001ms !important; animation-iteration-count: 1 !important; }
+}
+
+/* Proposal accessibility modes contract: T016 */
+@media (prefers-contrast: more) {
+  .proposal-intro,
+  .proposal-form fieldset,
+  .proposal-contracts,
+  .proposal-form input,
+  .proposal-form textarea,
+  .proposal-form select,
+  .proposal-controls button,
+  .proposal-errors {
+    border-width: 2px;
+  }
+
+  .proposal-form input:focus-visible,
+  .proposal-form textarea:focus-visible,
+  .proposal-form select:focus-visible,
+  .proposal-form button:focus-visible,
+  .proposal-page a:focus-visible,
+  .proposal-errors:focus-visible {
+    outline: 4px solid #b8e5dd;
+  }
+
+  .proposal-form input:checked {
+    outline: 2px solid currentColor;
+    outline-offset: 2px;
+  }
+}
+
+@media (forced-colors: active) {
+  body.proposal-page,
+  .proposal-page main,
+  .proposal-intro,
+  .proposal-form fieldset,
+  .proposal-contracts,
+  .proposal-fallback {
+    background: Canvas;
+    color: CanvasText;
+    border-color: CanvasText;
+    box-shadow: none;
+  }
+
+  .proposal-page a {
+    color: LinkText;
+  }
+
+  .proposal-form input,
+  .proposal-form textarea,
+  .proposal-form select {
+    border: 2px solid FieldText;
+    background: Field;
+    color: FieldText;
+  }
+
+  .proposal-controls button {
+    border: 2px solid ButtonText;
+    background: ButtonFace;
+    color: ButtonText;
+  }
+
+  .proposal-form input:focus-visible,
+  .proposal-form textarea:focus-visible,
+  .proposal-form select:focus-visible,
+  .proposal-form button:focus-visible,
+  .proposal-page a:focus-visible,
+  .proposal-errors:focus-visible {
+    outline: 3px solid Highlight;
+    outline-offset: 3px;
+  }
+
+  .proposal-form input:checked {
+    outline: 3px solid Highlight;
+    outline-offset: 2px;
+  }
+
+  .proposal-form [data-disabled],
+  .proposal-form :disabled {
+    border-color: GrayText;
+    color: GrayText;
+    opacity: 1;
+  }
+
+  .proposal-errors {
+    border: 3px double CanvasText;
+    background: Canvas;
+    color: CanvasText;
+  }
+
+  .proposal-status,
+  .proposal-form small,
+  .proposal-page .kicker {
+    color: CanvasText;
+  }
 }

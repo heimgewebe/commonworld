@@ -334,17 +334,20 @@ def _normalize_media_query(text: str) -> str:
     return "".join(_strip_comments(text).split()).casefold()
 
 
-def find_media_block(css: str, required_tokens: Sequence[str]) -> tuple[str, str] | None:
-    """Return the ``@media`` block whose prelude contains every required token.
-
-    This lets a caller find its target media query by its actual feature tests
-    regardless of unrelated media queries emitted before it or plain rules after.
-    Comments, whitespace and case are normalised on both sides before matching.
-    """
+def find_media_blocks(css: str, required_tokens: Sequence[str]) -> list[tuple[str, str]]:
+    """Return every ``@media`` block whose prelude contains all required tokens."""
 
     wanted = [_normalize_media_query(token) for token in required_tokens]
+    matches: list[tuple[str, str]] = []
     for selector, body in iter_css_blocks(css):
         normalized = _normalize_media_query(selector)
         if normalized.startswith("@media") and all(token in normalized for token in wanted):
-            return (selector, body)
-    return None
+            matches.append((selector, body))
+    return matches
+
+
+def find_media_block(css: str, required_tokens: Sequence[str]) -> tuple[str, str] | None:
+    """Return the first matching ``@media`` block for compatibility."""
+
+    matches = find_media_blocks(css, required_tokens)
+    return matches[0] if matches else None
