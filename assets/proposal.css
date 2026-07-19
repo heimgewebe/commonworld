@@ -4,6 +4,10 @@ body.proposal-page {
   background: radial-gradient(circle at top, rgba(49, 98, 112, 0.22), transparent 42%), #071013;
   color: #f4f7f4;
   font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  overflow-x: hidden;
+  overflow-y: auto;
+  overscroll-behavior-y: contain;
+  -webkit-overflow-scrolling: touch;
 }
 
 .proposal-page main {
