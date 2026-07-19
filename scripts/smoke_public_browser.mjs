@@ -992,6 +992,7 @@ async function layerJourneyScenario({ mobile = false, viewportOverride = null, t
   assert(enteringSphere, 'layer journey: transforming sphere is not visible during camera flight');
   await run.page.waitForSelector('.globe-stage[data-view-phase="layers"]');
   await run.page.waitForSelector('#layer-panel[data-visible]');
+  await run.page.evaluate(() => new Promise((resolve) => queueMicrotask(resolve)));
   const phaseLog = await run.page.evaluate(() => window.__commonworldPhaseLog);
   assert(phaseLog.every((entry) => entry.phase !== 'entering-layers' || entry.source === 'maplibre-projected-horizon'), `layer journey: side layout appeared while the camera was still flying (${JSON.stringify(phaseLog)})`);
   assert(phaseLog.some((entry) => entry.phase === 'settling-layers' && entry.source === 'maplibre-projected-horizon' && entry.moving === false), `layer journey: post-move settling phase is missing or still moving (${JSON.stringify(phaseLog)})`);
