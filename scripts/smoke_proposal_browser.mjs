@@ -6,6 +6,14 @@ import { chromium } from 'playwright';
 
 const ROOT = process.cwd();
 const MIME = new Map([['.html', 'text/html; charset=utf-8'], ['.css', 'text/css; charset=utf-8'], ['.js', 'text/javascript; charset=utf-8'], ['.mjs', 'text/javascript; charset=utf-8'], ['.json', 'application/json; charset=utf-8'], ['.svg', 'image/svg+xml']]);
+// Tunable constants for the iPad landscape scroll probe and geometry stability wait.
+const SCROLL_PROBE_HEIGHT_PX = 5000;
+const SCROLL_WHEEL_DELTA_PX = 4000;
+const MIN_SCROLL_Y_PX = 200;
+const STABLE_FRAME_THRESHOLD = 3;
+const GEOMETRY_EPSILON_PX = 0.5;
+const STABILITY_TIMEOUT_MS = 2000;
+const SCROLL_WAIT_TIMEOUT_MS = 5000;
 function assert(condition, message) { if (!condition) throw new Error(message); }
 function safePath(url) { const relative = decodeURIComponent(new URL(url, 'http://localhost').pathname).replace(/^\/+/, '') || 'propose.html'; const target = path.resolve(ROOT, relative); return target === ROOT || target.startsWith(`${ROOT}${path.sep}`) ? target : null; }
 const server = createServer(async (request, response) => {
@@ -180,18 +188,29 @@ html { font-size: ${profile.fontScale}% !important; }
   await context.close();
 }
 
-async function waitForStableBoundingBox(page, selector) {
-  await page.evaluate(async (sel) => {
-    return new Promise((resolve) => {
-      const el = document.querySelector(sel);
-      if (!el) return resolve();
+async function waitForStableBoundingBox(page, selector, { stableFrames = STABLE_FRAME_THRESHOLD, epsilon = GEOMETRY_EPSILON_PX, timeoutMs = STABILITY_TIMEOUT_MS } = {}) {
+  const outcome = await page.evaluate(async ({ sel, stableFrames, epsilon, timeoutMs }) => {
+    const el = document.querySelector(sel);
+    if (!el) return { ok: false, reason: 'element not found' };
+    return await new Promise((resolve) => {
       let lastRect = null;
       let stableCount = 0;
+      const near = (a, b) => Math.abs(a - b) < epsilon;
+      // A real timer guarantees termination even if requestAnimationFrame stops
+      // firing (e.g. a backgrounded or frozen page); it is cleared on success.
+      const watchdog = setTimeout(
+        () => resolve({ ok: false, reason: 'geometry did not stabilize before timeout' }),
+        timeoutMs,
+      );
+      function finish(result) {
+        clearTimeout(watchdog);
+        resolve(result);
+      }
       function check() {
         const rect = el.getBoundingClientRect();
-        if (lastRect && lastRect.width === rect.width && lastRect.height === rect.height && lastRect.x === rect.x && lastRect.y === rect.y) {
+        if (lastRect && near(lastRect.width, rect.width) && near(lastRect.height, rect.height) && near(lastRect.x, rect.x) && near(lastRect.y, rect.y)) {
           stableCount++;
-          if (stableCount > 3) return resolve();
+          if (stableCount >= stableFrames) return finish({ ok: true });
         } else {
           stableCount = 0;
           lastRect = rect;
@@ -200,7 +219,8 @@ async function waitForStableBoundingBox(page, selector) {
       }
       requestAnimationFrame(check);
     });
-  }, selector);
+  }, { sel: selector, stableFrames, epsilon, timeoutMs });
+  assert(outcome.ok, `waitForStableBoundingBox(${selector}): ${outcome.reason}`);
 }
 
 // iPad landscape CSS-pixel geometries covered by the ipad-layout.css breakpoint:
@@ -232,21 +252,29 @@ for (const viewport of IPAD_LANDSCAPE_VIEWPORTS) {
   assert(scrollInfo.bodyOverflowY === 'auto' || scrollInfo.bodyOverflowY === 'scroll', `${viewport.name}: propose.html body overflow-y is "${scrollInfo.bodyOverflowY}", expected scrollable`);
   assert(scrollInfo.horizontalOverflow <= 1, `${viewport.name}: propose.html has horizontal overflow ${scrollInfo.horizontalOverflow}`);
   
-  await page.evaluate(() => {
+  await page.evaluate((height) => {
     const probe = document.createElement('div');
     probe.id = 'test-scroll-probe';
     probe.setAttribute('aria-hidden', 'true');
-    probe.style.height = '5000px';
+    probe.style.height = `${height}px`;
     document.body.appendChild(probe);
-  });
-  
-  await page.mouse.wheel(0, 4000);
-  await page.waitForFunction(() => (window.scrollY || document.documentElement.scrollTop) > 200);
-  const scrolledY = await page.evaluate(() => window.scrollY || document.documentElement.scrollTop);
-  assert(scrolledY > 200, `${viewport.name}: propose.html did not actually scroll after a wheel gesture (scrollY ${scrolledY})`);
-  
-  await page.evaluate(() => document.getElementById('test-scroll-probe')?.remove());
-  
+  }, SCROLL_PROBE_HEIGHT_PX);
+
+  try {
+    await page.mouse.wheel(0, SCROLL_WHEEL_DELTA_PX);
+    await page.waitForFunction(
+      (minScroll) => (window.scrollY || document.documentElement.scrollTop) > minScroll,
+      MIN_SCROLL_Y_PX,
+      { timeout: SCROLL_WAIT_TIMEOUT_MS },
+    );
+    const scrolledY = await page.evaluate(() => window.scrollY || document.documentElement.scrollTop);
+    assert(scrolledY > MIN_SCROLL_Y_PX, `${viewport.name}: propose.html did not actually scroll after a wheel gesture (scrollY ${scrolledY})`);
+  } finally {
+    // Always remove the probe, even if the scroll assertion above fails.
+    await page.evaluate(() => document.getElementById('test-scroll-probe')?.remove());
+  }
+
+  // With the probe gone, prove the real submit button is reachable by scrolling.
   const ipadSubmitButton = page.getByRole('button', { name: 'Öffentliches GitHub-Issue vorbereiten' });
   await ipadSubmitButton.scrollIntoViewIfNeeded();
   assert(await ipadSubmitButton.isVisible(), `${viewport.name}: submit button unreachable by scroll`);
