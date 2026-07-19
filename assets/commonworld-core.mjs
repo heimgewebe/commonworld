@@ -7,7 +7,7 @@ export const DEFAULT_CAMERA = Object.freeze({
 });
 
 export const MAX_MAP_ZOOM = 18;
-export const DIGITAL_LAYER_TRANSITION_MS = 1080;
+export const DIGITAL_LAYER_TRANSITION_MS = 420;
 const DIGITAL_LAYER_MAX_ZOOM = 8;
 
 export const LAYERS = Object.freeze([

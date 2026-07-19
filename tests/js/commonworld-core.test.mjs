@@ -492,7 +492,7 @@ test('sphere layout follows measured globe geometry and keeps stacked side track
 });
 
 test('digital layer camera performs a bounded journey without changing identity', () => {
-  assert.equal(DIGITAL_LAYER_TRANSITION_MS, 1080);
+  assert.equal(DIGITAL_LAYER_TRANSITION_MS, 420);
   assert.deepEqual(digitalLayerCamera({ lng: 13.4, lat: 52.5, zoom: 1.2, bearing: 170, pitch: 0 }), {
     center: [13.4, 52.5],
     zoom: 2.25,

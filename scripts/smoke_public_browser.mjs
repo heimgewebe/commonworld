@@ -391,6 +391,7 @@ async function startupAndRingOrbitScenario() {
     return {
       mapRenders: Number(stage?.dataset.mapRenders ?? 0),
       geometryCommits: Number(stage?.dataset.sphereGeometryCommits ?? 0),
+      geometryEvaluations: Number(stage?.dataset.sphereGeometryEvaluations ?? 0),
     };
   });
   await run.page.evaluate(async () => {
@@ -410,9 +411,13 @@ async function startupAndRingOrbitScenario() {
     return {
       mapRenders: Number(stage?.dataset.mapRenders ?? 0),
       geometryCommits: Number(stage?.dataset.sphereGeometryCommits ?? 0),
+      geometryEvaluations: Number(stage?.dataset.sphereGeometryEvaluations ?? 0),
     };
   });
-  assert(geometryAfterRepaint.mapRenders > geometryBeforeRepaint.mapRenders, 'geometry cache: test repaints did not reach MapLibre');
+  const repaintRenderDelta = geometryAfterRepaint.mapRenders - geometryBeforeRepaint.mapRenders;
+  const repaintEvaluationDelta = geometryAfterRepaint.geometryEvaluations - geometryBeforeRepaint.geometryEvaluations;
+  assert(repaintRenderDelta > 0, 'geometry cache: test repaints did not reach MapLibre');
+  assert(repaintEvaluationDelta === 0, 'geometry sampler: idle MapLibre repaints still trigger sphere projection work ' + JSON.stringify({ geometryBeforeRepaint, geometryAfterRepaint }));
   assert(geometryAfterRepaint.geometryCommits === geometryBeforeRepaint.geometryCommits, 'geometry cache: unchanged repaints rewrote sphere geometry ' + JSON.stringify({ geometryBeforeRepaint, geometryAfterRepaint }));
 
   const removedHint = await run.page.evaluate(() => ({
@@ -931,6 +936,7 @@ async function layerJourneyScenario({ mobile = false, viewportOverride = null, t
       panelVisible: panelNode?.hasAttribute('data-visible') ?? false,
       panelHidden: panelNode?.hidden ?? null,
       commandCount: window.__commonworldCameraCommands?.length ?? 0,
+      geometryEvaluations: Number(stageNode.dataset.sphereGeometryEvaluations ?? 0),
       at: performance.now(),
     });
     window.__commonworldPhaseLog.push(snapshot('initial'));
@@ -966,7 +972,25 @@ async function layerJourneyScenario({ mobile = false, viewportOverride = null, t
   }
   assert((await run.page.locator('.globe-stage').getAttribute('data-view-phase')) === 'entering-layers', 'layer journey: animated entry phase missing');
   assert((await stage.getAttribute('data-globe-geometry-source')) === 'maplibre-projected-horizon', 'layer journey: entering flight abandoned the MapLibre horizon geometry');
-  assert(await run.page.locator('#layer-panel').isHidden(), 'layer journey: description panel obscures the camera flight');
+  await run.page.waitForSelector('.globe-stage[data-map-moving="true"]');
+  await run.page.waitForSelector('#layer-panel[data-visible]');
+  const earlyPanel = await run.page.evaluate(() => {
+    const stageNode = document.querySelector('.globe-stage');
+    const panelNode = document.querySelector('#layer-panel');
+    const phaseStartedAt = Number(stageNode?.dataset.viewPhaseStartedAt);
+    const panelVisibleAt = Number(stageNode?.dataset.layerPanelVisibleAt);
+    return {
+      hidden: panelNode?.hidden ?? null,
+      inert: panelNode?.hasAttribute('inert') ?? null,
+      latencyMs: panelVisibleAt - phaseStartedAt,
+      ringsPaused: [...document.querySelectorAll('.sphere-ring-plane')].every((ring) => getComputedStyle(ring).animationPlayState === 'paused'),
+      activeId: document.activeElement?.id ?? null,
+    };
+  });
+  assert(earlyPanel.hidden === false && earlyPanel.inert === false, 'layer journey: early panel is not a usable parallel surface ' + JSON.stringify(earlyPanel));
+  assert(Number.isFinite(earlyPanel.latencyMs) && earlyPanel.latencyMs >= 0 && earlyPanel.latencyMs <= 250, 'layer journey: panel opening latency exceeds the interaction budget ' + JSON.stringify(earlyPanel));
+  assert(earlyPanel.ringsPaused, 'layer journey: decorative ring animation still competes with the camera flight ' + JSON.stringify(earlyPanel));
+  assert(earlyPanel.activeId === 'layer-close', 'layer journey: early panel opened while focus remained in the inert globe ' + JSON.stringify(earlyPanel));
   const flightComposition = await run.page.evaluate(() => {
     const map = document.querySelector('#map');
     const style = getComputedStyle(map);
@@ -981,7 +1005,7 @@ async function layerJourneyScenario({ mobile = false, viewportOverride = null, t
   });
   assert(['none', 'matrix(1, 0, 0, 1, 0, 0)'].includes(flightComposition.transform), 'layer journey: CSS still applies a competing map zoom ' + JSON.stringify(flightComposition));
   assert(!flightComposition.transitionProperties.includes('transform'), 'layer journey: map transform remains part of the camera flight ' + JSON.stringify(flightComposition));
-  assert(flightComposition.command === 'easeTo' && flightComposition.duration === 1080, 'layer journey: MapLibre is not the single camera authority for the flight ' + JSON.stringify(flightComposition));
+  assert(flightComposition.command === 'easeTo' && flightComposition.duration === 420, 'layer journey: MapLibre is not the single camera authority for the shortened flight ' + JSON.stringify(flightComposition));
   const openingCommands = await run.page.evaluate(() => window.__commonworldCameraCommands ?? []);
   assert(openingCommands.length === 1 && openingCommands[0].command === 'easeTo', `layer journey: opening issued multiple camera commands (${JSON.stringify(openingCommands)})`);
   const enteringSphere = await run.page.locator('#digital-sphere').boundingBox();
@@ -994,7 +1018,10 @@ async function layerJourneyScenario({ mobile = false, viewportOverride = null, t
   assert(firstSideEntry && firstSideEntry.phase === 'layers' && firstSideEntry.moving === false && firstSideEntry.sphereOpacity <= 0.1, `layer journey: side layout was not entered after moveend with invisible sphere (${JSON.stringify(firstSideEntry)})`);
   const sideIndex = phaseLog.indexOf(firstSideEntry);
   const firstPanelEntry = phaseLog.find((entry) => entry.panelVisible);
-  assert(firstPanelEntry && phaseLog.indexOf(firstPanelEntry) > sideIndex && firstPanelEntry.phase === 'layers' && firstPanelEntry.source === 'side-view-layout', `layer journey: panel became visible before the side layout was stable (${JSON.stringify({ firstPanelEntry, phaseLog })})`);
+  assert(firstPanelEntry && phaseLog.indexOf(firstPanelEntry) < sideIndex && ['entering-layers', 'settling-layers'].includes(firstPanelEntry.phase) && firstPanelEntry.source === 'maplibre-projected-horizon', 'layer journey: panel did not open early while final side geometry remained deferred ' + JSON.stringify({ firstPanelEntry, phaseLog }));
+  const flightGeometryEvaluationDelta = firstSideEntry.geometryEvaluations - phaseLog[0].geometryEvaluations;
+  const maxFlightGeometryEvaluations = Math.ceil(flightComposition.duration / 32) + 3;
+  assert(flightGeometryEvaluationDelta > 0 && flightGeometryEvaluationDelta <= maxFlightGeometryEvaluations, 'layer journey: sphere projection exceeded the camera-flight budget ' + JSON.stringify({ flightGeometryEvaluationDelta, maxFlightGeometryEvaluations, phaseLog }));
   assert((await stage.getAttribute('data-globe-geometry-source')) === 'side-view-layout', 'layer journey: settled layers view is missing the side layout geometry');
   await run.page.waitForSelector('#layer-panel[data-visible]');
   if (touch) {
@@ -1014,7 +1041,7 @@ async function layerJourneyScenario({ mobile = false, viewportOverride = null, t
   assert(await run.page.locator('#layer-panel').isVisible(), 'layer journey: description panel did not appear after the stable end state');
   assert(await run.page.locator('#layer-panel').getAttribute('inert') === null, 'layer journey: revealed description panel remains inert');
   const panelVisibleAt = Number(await run.page.locator('.globe-stage').evaluate((node) => node.dataset.layerPanelVisibleAt));
-  assert(Number.isFinite(panelVisibleAt), 'layer journey: panel reveal is not bound to the settled end state');
+  assert(Number.isFinite(panelVisibleAt), 'layer journey: early panel reveal timestamp is missing');
   await run.page.waitForFunction(() => Number(getComputedStyle(document.querySelector('#map')).opacity) <= 0.02);
   assert(await run.page.locator('#map').getAttribute('inert') !== null, 'layer journey: invisible globe remains keyboard reachable');
   assert((await run.page.locator('#map').getAttribute('aria-hidden')) === 'true', 'layer journey: invisible globe remains in the accessibility tree');
