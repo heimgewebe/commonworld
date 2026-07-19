@@ -242,6 +242,53 @@ async function verifyDeferredSphereRestoration(browser, baseUrl) {
   }
 }
 
+async function verifyLayerCreatedSphereRestoration(browser, baseUrl) {
+  const context = await browser.newContext({
+    viewport: { width: 320, height: 568 },
+    isMobile: true,
+    hasTouch: true,
+    reducedMotion: 'reduce',
+  });
+  const page = await context.newPage();
+  try {
+    await page.goto(`${baseUrl}/?view=layers`, { waitUntil: 'domcontentloaded' });
+    await page.waitForSelector('html.runtime-ready');
+    await page.waitForFunction(() => document.querySelector('.globe-stage')?.dataset.viewPhase === 'layers');
+    await page.waitForSelector('#layer-panel[data-visible]');
+    await page.locator('.digital-ribbon-item[data-ribbon-copy="0"]').first().click();
+    await page.waitForSelector('#project-focus:not([hidden])');
+    await page.waitForFunction(() => document.querySelector('#sphere-edge-control')?.dataset.focusOverlapInert === 'true');
+    await page.locator('#focus-close').click();
+    await page.waitForFunction(() => document.querySelector('#project-focus').hidden);
+    let sphere = await page.evaluate(() => {
+      const edge = document.querySelector('#sphere-edge-control');
+      return {
+        ariaHidden: edge.getAttribute('aria-hidden'),
+        marker: edge.dataset.focusOverlapInert ?? null,
+        pointerEvents: getComputedStyle(edge).pointerEvents,
+        tabindex: edge.getAttribute('tabindex'),
+      };
+    });
+    assert(sphere.marker === 'true' && sphere.tabindex === '-1' && sphere.ariaHidden === 'true' && sphere.pointerEvents === 'none', `layer-created sphere block was lost: ${JSON.stringify(sphere)}`);
+    await page.locator('#layer-close').click();
+    await page.waitForFunction(() => document.querySelector('.globe-stage')?.dataset.viewPhase === 'overview');
+    await page.waitForFunction(() => document.querySelector('#sphere-edge-control')?.dataset.focusOverlapInert === undefined);
+    sphere = await page.evaluate(() => {
+      const edge = document.querySelector('#sphere-edge-control');
+      return {
+        ariaHidden: edge.getAttribute('aria-hidden'),
+        marker: edge.dataset.focusOverlapInert ?? null,
+        pointerEvents: getComputedStyle(edge).pointerEvents,
+        tabindex: edge.getAttribute('tabindex'),
+      };
+    });
+    assert(sphere.marker === null && sphere.tabindex === '0' && sphere.ariaHidden === null && sphere.pointerEvents !== 'none', `layer-created sphere block was not restored: ${JSON.stringify(sphere)}`);
+    return sphere;
+  } finally {
+    await context.close();
+  }
+}
+
 const server = createServer();
 await new Promise((resolve) => server.listen(0, '127.0.0.1', resolve));
 const baseUrl = `http://127.0.0.1:${server.address().port}`;
@@ -272,6 +319,7 @@ try {
   }
   results.push({ journeyOwnership: await verifyJourneyOwnership(browser, baseUrl) });
   results.push({ deferredSphereRestoration: await verifyDeferredSphereRestoration(browser, baseUrl) });
+  results.push({ layerCreatedSphereRestoration: await verifyLayerCreatedSphereRestoration(browser, baseUrl) });
 } finally {
   await browser.close();
   await new Promise((resolve) => server.close(resolve));

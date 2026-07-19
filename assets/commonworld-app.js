@@ -823,6 +823,12 @@ function releaseFocusOverlapTarget(target) {
     target.setAttribute('aria-hidden', 'true');
     target.style.pointerEvents = 'none';
     return true;
+  } else if (target === elements.sphereEdge && target.dataset.focusOverlapInheritedLayerJourney === 'true') {
+    target.style.pointerEvents = target.dataset.focusOverlapPreviousPointerEvents ?? '';
+    delete target.dataset.focusOverlapPreviousTabindex;
+    delete target.dataset.focusOverlapPreviousAriaHidden;
+    delete target.dataset.focusOverlapPreviousPointerEvents;
+    delete target.dataset.focusOverlapInheritedLayerJourney;
   } else {
     restoreFocusOverlapAttribute(target, 'tabindex', 'focusOverlapPreviousTabindex');
     restoreFocusOverlapAttribute(target, 'aria-hidden', 'focusOverlapPreviousAriaHidden');
@@ -871,6 +877,9 @@ function blockFocusOverlapTarget(target) {
   if (target instanceof HTMLElement) {
     target.setAttribute('inert', '');
     return;
+  }
+  if (target === elements.sphereEdge && layerJourneyActive()) {
+    target.dataset.focusOverlapInheritedLayerJourney = 'true';
   }
   target.dataset.focusOverlapPreviousTabindex = target.getAttribute('tabindex') ?? '__missing__';
   target.dataset.focusOverlapPreviousAriaHidden = target.getAttribute('aria-hidden') ?? '__missing__';
