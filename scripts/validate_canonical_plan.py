@@ -127,6 +127,7 @@ EXPECTED_SCRIPT_FILES = {
     "check_pages_dns_target.py",
     "digital_taxonomy.py",
     "smoke_public_browser.mjs",
+    "smoke_focus_overlay_browser.mjs",
     "render_public_shell.py",
     "render_proposal_page.py",
     "smoke_proposal_browser.mjs",
@@ -258,7 +259,7 @@ def validate_canonical_plan(root: Path = ROOT) -> list[str]:
     else:
         if package.get("devDependencies") != {"playwright": "1.61.1"}:
             errors.append("package.json must pin exactly Playwright 1.61.1 for the browser gate")
-        if package.get("scripts", {}).get("smoke:browser") != "node scripts/smoke_public_browser.mjs && node scripts/smoke_proposal_browser.mjs":
+        if package.get("scripts", {}).get("smoke:browser") != "node scripts/smoke_public_browser.mjs && node scripts/smoke_proposal_browser.mjs && node scripts/smoke_focus_overlay_browser.mjs":
             errors.append("package.json must expose the bounded browser smoke command")
 
     required_checks_path = root / ".github" / "grabowski-required-checks.json"
