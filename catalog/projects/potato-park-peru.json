@@ -1,0 +1,99 @@
+{
+  "schema_version": 4,
+  "id": "potato-park-peru",
+  "title": "Parque de la Papa",
+  "summary": "Ein von fünf Quechua-Gemeinschaften getragenes Gebiet bei Písac, in dem einheimische Kartoffelsorten, landwirtschaftliches Wissen, Ökosysteme und kulturelle Praxis gemeinsam erhalten werden.",
+  "themes": [
+    "seeds",
+    "agriculture",
+    "food",
+    "biodiversity",
+    "indigenous-knowledge",
+    "community-land"
+  ],
+  "actions": [
+    "visit"
+  ],
+  "presence": {
+    "geographic": [
+      {
+        "id": "potato-park-pisac-region",
+        "mode": "approximate",
+        "label": "Gemeinschaften des Kartoffelparks bei Písac, Cusco, Peru",
+        "geometry": {
+          "type": "Point",
+          "coordinates": [
+            -71.8505,
+            -13.4213
+          ]
+        },
+        "uncertainty_meters_min": 50000,
+        "privacy_note": "Der Punkt markiert nur den öffentlich beschriebenen Bezugsraum bei Písac und keine Felder, Saatgutbestände oder Wohnorte.",
+        "source_ids": [
+          "potato-park-home",
+          "pisac-wikidata"
+        ]
+      }
+    ],
+    "digital": {
+      "available": false,
+      "source_ids": [
+        "potato-park-home"
+      ]
+    }
+  },
+  "activity": {
+    "status": "active",
+    "observed_at": "2026-07-19",
+    "source_ids": [
+      "potato-park-home"
+    ],
+    "note": "Die offizielle Seite veröffentlichte 2026 laufende gemeinschaftsgeführte Besuche und Aktivitäten zur Erhaltung einheimischer Kartoffelsorten."
+  },
+  "provenance": {
+    "sources": [
+      {
+        "id": "potato-park-home",
+        "type": "official-source",
+        "label": "Parque de la Papa – offizielle Seite",
+        "url": "https://parquedelapapa.org/",
+        "retrieved_at": "2026-07-19",
+        "note": "Offizielle Seite mit den fünf Gemeinschaften, gemeinschaftsgeführter Erhaltung und aktuellen Besuchsangeboten."
+      },
+      {
+        "id": "pisac-wikidata",
+        "type": "public-registry",
+        "label": "Wikidata – Písac",
+        "url": "https://www.wikidata.org/wiki/Q950398",
+        "retrieved_at": "2026-07-19",
+        "note": "CC0-Registereintrag für den öffentlich benannten Bezugsort; nur zur groben Orientierung des größeren Gemeinschaftsgebiets."
+      }
+    ],
+    "uncertainty_note": "Die Punktgeometrie ist keine Grenze des Kartoffelparks und verrät keine einzelnen Saatgut- oder Anbauorte."
+  },
+  "curation": {
+    "state": "listed",
+    "reviewed_by": "Commonworld editorial review",
+    "reviewed_at": "2026-07-19",
+    "next_review_at": "2026-10-19",
+    "notes": "Die Auswahl stärkt eine konkrete indigene Saatgut-, Land- und Wissenspraxis in den Anden."
+  },
+  "links": [
+    {
+      "type": "homepage",
+      "label": "Parque de la Papa – offizielle Seite",
+      "url": "https://parquedelapapa.org/"
+    },
+    {
+      "type": "visit",
+      "label": "Gemeinschaftsgeführte Besuche im Kartoffelpark prüfen",
+      "url": "https://parquedelapapa.org/",
+      "source_ids": [
+        "potato-park-home"
+      ]
+    }
+  ],
+  "handoff": {
+    "enabled": false
+  }
+}

@@ -1,7 +1,7 @@
 {
   "schema_version": 2,
   "kind": "commonworld_current_public_state",
-  "current_as_of": "2026-07-18",
+  "current_as_of": "2026-07-19",
   "precedence": {
     "current_operational_truth": "this contract",
     "catalog_truth": "catalog/catalog.json and the referenced CommonProject records",
@@ -19,8 +19,8 @@
     "version": "digital-ring-bundles-v1",
     "canonical_url_parameter": "digital_path",
     "main_field_count": 5,
-    "current_digital_identity_count": 25,
-    "current_known_theme_count": 37,
+    "current_digital_identity_count": 27,
+    "current_known_theme_count": 40,
     "legacy_layer_links": "preserved_as_filter_until_explicit_digital_path_selection",
     "invalid_path_behavior": "fail_closed_to_sphere_root_without_partial_filter",
     "catalog_presentation_fields_forbidden": true

@@ -1,0 +1,95 @@
+{
+  "schema_version": 4,
+  "id": "community-baboon-sanctuary",
+  "title": "Community Baboon Sanctuary",
+  "summary": "Ein öffentlich registriertes Schutzgebiet in Belize, dessen Governance als lokale Gemeinschaften und dessen Managementverantwortung als lokale Komitees geführt werden.",
+  "themes": [
+    "conservation",
+    "commons-governance"
+  ],
+  "actions": [
+    "learn"
+  ],
+  "presence": {
+    "geographic": [
+      {
+        "id": "community-baboon-sanctuary-belize-area",
+        "mode": "approximate",
+        "label": "Belize River Valley, Belize",
+        "geometry": {
+          "type": "Point",
+          "coordinates": [
+            -88.75,
+            17.25
+          ]
+        },
+        "uncertainty_meters_min": 300000,
+        "privacy_note": "Der Punkt ist nur der grobe öffentlich registrierte Landesbezug; Schutzgebietsgrenzen, Grundstücke und einzelne Gemeinschaften werden nicht verortet.",
+        "source_ids": [
+          "community-baboon-protected-planet",
+          "belize-wikidata"
+        ]
+      }
+    ],
+    "digital": {
+      "available": false,
+      "source_ids": [
+        "community-baboon-protected-planet"
+      ]
+    }
+  },
+  "activity": {
+    "status": "active",
+    "observed_at": "2026-07-19",
+    "source_ids": [
+      "community-baboon-protected-planet"
+    ],
+    "note": "Der aktuelle Protected-Planet-Registereintrag führt das Gebiet als ausgewiesen, mit Governance durch lokale Gemeinschaften und Managementverantwortung lokaler Komitees."
+  },
+  "provenance": {
+    "sources": [
+      {
+        "id": "community-baboon-protected-planet",
+        "type": "public-registry",
+        "label": "Protected Planet – Bermudian Landing Community Baboon Sanctuary",
+        "url": "https://www.protectedplanet.net/19553",
+        "retrieved_at": "2026-07-19",
+        "note": "Aktueller öffentlicher WDPA-Registereintrag mit Schutzstatus, Governance durch lokale Gemeinschaften, Managementverantwortung lokaler Komitees und grobem Landesbezug; Eigentum, Managementplan, Wald- und Artenschutzziele sind dort nicht berichtet."
+      },
+      {
+        "id": "belize-wikidata",
+        "type": "public-registry",
+        "label": "Wikidata – Belize",
+        "url": "https://www.wikidata.org/wiki/Q242",
+        "retrieved_at": "2026-07-19",
+        "note": "CC0-Registereintrag mit einer groben Landeskoordinate; ausschließlich zur weiträumigen Orientierung verwendet."
+      }
+    ],
+    "uncertainty_note": "Es wird keine Schutzgebiets- oder Grundstücksgeometrie übernommen; der Punkt ist bewusst nur ein sehr grober Landesanker."
+  },
+  "curation": {
+    "state": "listed",
+    "reviewed_by": "Commonworld editorial review",
+    "reviewed_at": "2026-07-19",
+    "next_review_at": "2026-10-19",
+    "notes": "Aufgenommen ausschließlich mit den im öffentlichen Register belegten Aussagen zu Schutzstatus, lokaler Gemeinschafts-Governance und Managementverantwortung."
+  },
+  "links": [
+    {
+      "type": "homepage",
+      "label": "Community Baboon Sanctuary im Schutzgebietsregister",
+      "url": "https://www.protectedplanet.net/19553"
+    },
+    {
+      "type": "learn",
+      "label": "Gemeinschaftliche Schutzpraxis kennenlernen",
+      "url": "https://www.protectedplanet.net/19553",
+      "source_ids": [
+        "community-baboon-protected-planet"
+      ]
+    }
+  ],
+  "handoff": {
+    "enabled": false
+  }
+}

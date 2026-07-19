@@ -1,0 +1,99 @@
+{
+  "schema_version": 4,
+  "id": "kibera-public-space-project",
+  "title": "Kibera Public Space Project",
+  "summary": "Ein wachsendes Netz von gemeinsam mit Bewohnergruppen in Kibera entworfenen und betriebenen öffentlichen Räumen, das Hochwasservorsorge, grundlegende Dienste, Begegnung und lokale wirtschaftliche Nutzung verbindet.",
+  "themes": [
+    "shared-space",
+    "water",
+    "climate-resilience",
+    "neighbourhood",
+    "basic-services",
+    "commons-governance"
+  ],
+  "actions": [
+    "learn"
+  ],
+  "presence": {
+    "geographic": [
+      {
+        "id": "kibera-public-space-network-area",
+        "mode": "approximate",
+        "label": "Kibera, Nairobi, Kenia",
+        "geometry": {
+          "type": "Point",
+          "coordinates": [
+            36.817,
+            -1.283
+          ]
+        },
+        "uncertainty_meters_min": 25000,
+        "privacy_note": "Der Punkt bezeichnet nur den öffentlich registrierten groben Stadtbezug Nairobi und weder einzelne Räume noch beteiligte Gruppen oder Wohnorte.",
+        "source_ids": [
+          "kibera-kdi-official",
+          "nairobi-wikidata"
+        ]
+      }
+    ],
+    "digital": {
+      "available": false,
+      "source_ids": [
+        "kibera-kdi-official"
+      ]
+    }
+  },
+  "activity": {
+    "status": "active",
+    "observed_at": "2026-07-19",
+    "source_ids": [
+      "kibera-kdi-official"
+    ],
+    "note": "Die offizielle Projektseite kennzeichnet das seit 2006 aufgebaute Netzwerk als fortlaufend und weiter wachsend."
+  },
+  "provenance": {
+    "sources": [
+      {
+        "id": "kibera-kdi-official",
+        "type": "official-source",
+        "label": "KDI – Kibera Public Space Project",
+        "url": "https://www.kounkuey.org/projects/kibera_public_space_project_network",
+        "retrieved_at": "2026-07-19",
+        "note": "Offizielle Projektseite zu gemeinschaftlichem Entwurf, Partnergruppen, laufendem Netzwerk und Wirkungsfeldern."
+      },
+      {
+        "id": "nairobi-wikidata",
+        "type": "public-registry",
+        "label": "Wikidata – Nairobi",
+        "url": "https://www.wikidata.org/wiki/Q3870",
+        "retrieved_at": "2026-07-19",
+        "note": "CC0-Registereintrag mit einer groben Stadtkoordinate; nur als weiter Orientierungsanker verwendet."
+      }
+    ],
+    "uncertainty_note": "Das Netz besteht aus mehreren Räumen; die Punktgeometrie ist weder ein Standort noch eine Flächenabgrenzung."
+  },
+  "curation": {
+    "state": "listed",
+    "reviewed_by": "Commonworld editorial review",
+    "reviewed_at": "2026-07-19",
+    "next_review_at": "2026-10-19",
+    "notes": "Aufgenommen als von lokalen Gruppen mitgestaltetes und langfristig mitgetragenes Netz öffentlicher Räume, nicht als bloßes Planungsbüroprojekt."
+  },
+  "links": [
+    {
+      "type": "homepage",
+      "label": "Kibera Public Space Project",
+      "url": "https://www.kounkuey.org/projects/kibera_public_space_project_network"
+    },
+    {
+      "type": "learn",
+      "label": "Räume und Gemeinschaftspartner kennenlernen",
+      "url": "https://www.kounkuey.org/projects/kibera_public_space_project_network",
+      "source_ids": [
+        "kibera-kdi-official"
+      ]
+    }
+  ],
+  "handoff": {
+    "enabled": false
+  }
+}

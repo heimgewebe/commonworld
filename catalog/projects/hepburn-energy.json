@@ -1,0 +1,117 @@
+{
+  "schema_version": 4,
+  "id": "hepburn-energy",
+  "title": "Hepburn Energy",
+  "summary": "Eine mitgliedereigene Energiegenossenschaft im australischen Hepburn Shire, die gemeinschaftlich Windenergie betreibt und ihre lokale Erzeugung weiterentwickelt.",
+  "themes": [
+    "energy",
+    "renewable-energy",
+    "community-ownership",
+    "cooperative",
+    "energy-democracy"
+  ],
+  "actions": [
+    "learn",
+    "use"
+  ],
+  "presence": {
+    "geographic": [
+      {
+        "id": "hepburn-energy-approximate-area",
+        "mode": "approximate",
+        "label": "Hepburn Shire, Victoria, Australien",
+        "geometry": {
+          "type": "Point",
+          "coordinates": [
+            144.15,
+            -37.35
+          ]
+        },
+        "uncertainty_meters_min": 25000,
+        "privacy_note": "Der Punkt bezeichnet den groben, öffentlich registrierten Ortsbezug Daylesford und nicht einzelne Anlagen oder Grundstücke.",
+        "source_ids": [
+          "source-hepburn-official",
+          "source-daylesford-wikidata"
+        ]
+      }
+    ],
+    "digital": {
+      "available": true,
+      "reach": "regional",
+      "label": "Mitgliederportal für Mitgliedschaft und Genossenschaftsanteile",
+      "source_ids": [
+        "source-hepburn-membership"
+      ]
+    }
+  },
+  "activity": {
+    "status": "active",
+    "observed_at": "2026-07-19",
+    "source_ids": [
+      "source-hepburn-official"
+    ],
+    "note": "Die offizielle Genossenschaftsseite beschreibt den gegenwärtigen mitgliedereigenen Betrieb und die Weiterentwicklung des lokalen Energiesystems."
+  },
+  "provenance": {
+    "sources": [
+      {
+        "id": "source-hepburn-official",
+        "type": "official-source",
+        "label": "About — Hepburn Energy",
+        "url": "https://www.hepburnenergy.coop/about/",
+        "retrieved_at": "2026-07-19",
+        "note": "Offizielle Projektquelle für Beschreibung, Aktivität und den verknüpften direkten Zugang."
+      },
+      {
+        "id": "source-daylesford-wikidata",
+        "type": "public-registry",
+        "label": "Daylesford",
+        "url": "https://www.wikidata.org/wiki/Q3019340",
+        "retrieved_at": "2026-07-19",
+        "note": "CC0-Registereintrag für den groben öffentlich belegten Ortsbezug; nur zur ungefähren Orientierung verwendet."
+      },
+      {
+        "id": "source-hepburn-membership",
+        "type": "official-source",
+        "label": "Membership — Hepburn Energy",
+        "url": "https://www.hepburnenergy.coop/membership/",
+        "retrieved_at": "2026-07-19",
+        "note": "Offizieller digitaler Mitgliedschaftsweg mit Zugang zum Mitgliederportal und Verwaltung von Mitgliedschaft und Genossenschaftsanteilen."
+      }
+    ],
+    "uncertainty_note": "Die Punktgeometrie ist nur eine grobe Orientierung für den öffentlich belegten Wirkungsraum und keine exakte Standort- oder Flächenangabe."
+  },
+  "curation": {
+    "state": "listed",
+    "reviewed_by": "Commonworld editorial review",
+    "reviewed_at": "2026-07-19",
+    "next_review_at": "2026-10-19",
+    "notes": "Aufgenommen als belegte gemeinschaftliche Praxis mit eigenständigem Beitrag zur thematischen und regionalen Katalogbalance."
+  },
+  "links": [
+    {
+      "type": "homepage",
+      "label": "Hepburn Energy – offizielle Quelle",
+      "url": "https://www.hepburnenergy.coop/about/"
+    },
+    {
+      "type": "learn",
+      "label": "Genossenschaft kennenlernen",
+      "url": "https://www.hepburnenergy.coop/about/",
+      "source_ids": [
+        "source-hepburn-official"
+      ]
+    },
+    {
+      "type": "use",
+      "label": "Mitgliederportal und Mitgliedschaft nutzen",
+      "url": "https://www.hepburnenergy.coop/membership/",
+      "source_ids": [
+        "source-hepburn-membership"
+      ]
+    }
+  ],
+  "handoff": {
+    "enabled": false
+  }
+}

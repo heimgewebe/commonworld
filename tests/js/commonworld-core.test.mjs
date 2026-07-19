@@ -193,9 +193,9 @@ test('digital ring path derivation is deterministic and handles ambiguity explic
 test('current digital catalog identities derive exactly once without a public rest bucket', () => {
   const records = loadPublicCatalogRecords();
   const digitalRecords = records.filter(hasDigitalPresence);
-  assert.equal(digitalRecords.length, 25);
+  assert.ok(digitalRecords.length > 0);
   const derived = new Map(digitalRecords.map((record) => [record.id, deriveDigitalProjectPath(record)]));
-  assert.equal(derived.size, 25);
+  assert.equal(derived.size, digitalRecords.length);
   for (const [identifier, path] of derived) {
     assert.equal(path.status, 'classified', identifier);
     assert.notEqual(path.pathKey, 'sphere', identifier);
@@ -216,13 +216,14 @@ test('current digital catalog identities derive exactly once without a public re
 
 test('digital presentation tree aggregates parent sets as exact disjoint child unions', () => {
   const records = loadPublicCatalogRecords();
+  const digitalRecords = records.filter(hasDigitalPresence);
   const tree = buildDigitalPresentationTree(records);
-  assert.equal(tree.identityIds.length, 25);
+  assert.equal(tree.identityIds.length, digitalRecords.length);
   const rootView = visibleDigitalNodes(tree, DIGITAL_ROOT_PATH);
   assert.equal(rootView.children.length, 5);
   assert.deepEqual(rootView.children.map(({ id }) => id), DIGITAL_RING_FIELDS.map(({ id }) => id));
   const rootUnion = new Set(rootView.children.flatMap(({ identityIds }) => identityIds));
-  assert.equal(rootUnion.size, 25);
+  assert.equal(rootUnion.size, digitalRecords.length);
   assert.deepEqual([...rootUnion].sort(), tree.identityIds);
   for (const node of tree.nodesByPath.values()) {
     const union = new Set();

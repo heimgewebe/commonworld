@@ -63,13 +63,13 @@ export const DIGITAL_TAXONOMY = deepFreeze({
     { id: 'federated_protocols', parent_id: 'communication_networks', type: 'network', label_de: 'Föderation und Protokolle', order: 1, themes: ['federation', 'protocol'] },
     { id: 'network_coordination', parent_id: 'communication_networks', type: 'network', label_de: 'Vernetzte Koordination', order: 2, themes: ['network'] },
 
-    { id: 'food_seed_agriculture', parent_id: 'provision_land_ecology', type: 'network', label_de: 'Saatgut, Ernährung und Landwirtschaft', order: 0, themes: ['seeds', 'food', 'agriculture'] },
+    { id: 'food_seed_agriculture', parent_id: 'provision_land_ecology', type: 'network', label_de: 'Saatgut, Ernährung und Landwirtschaft', order: 0, themes: ['agriculture', 'agrobiodiversity', 'food', 'indigenous-knowledge', 'seeds'] },
     { id: 'water_irrigation', parent_id: 'provision_land_ecology', type: 'network', label_de: 'Wasser und Bewässerung', order: 1, themes: ['water', 'irrigation'] },
     { id: 'renewable_energy', parent_id: 'provision_land_ecology', type: 'network', label_de: 'Erneuerbare Energie', order: 2, themes: ['energy', 'renewable-energy'] },
     { id: 'health_software', parent_id: 'provision_land_ecology', type: 'interface', label_de: 'Offene Gesundheitsversorgung', order: 3, themes: ['health'] },
     { id: 'land_ecology', parent_id: 'provision_land_ecology', type: 'network', label_de: 'Land, Stadtgrün und Ökologie', order: 4, themes: ['urban-gardening', 'biodiversity', 'community-land'] },
     { id: 'food_distribution_platforms', parent_id: 'provision_land_ecology', type: 'interface', label_de: 'Ernährungsplattformen', order: 5, themes: [] },
-    { id: 'energy_cooperatives', parent_id: 'provision_land_ecology', type: 'interface', label_de: 'Energiegenossenschaften', order: 6, themes: [] },
+    { id: 'energy_cooperatives', parent_id: 'provision_land_ecology', type: 'interface', label_de: 'Energiegenossenschaften', order: 6, themes: ['energy-democracy'] },
     { id: 'watershed_food_systems', parent_id: 'provision_land_ecology', type: 'interface', label_de: 'Wasser- und Ernährungssysteme', order: 7, themes: [] },
 
     { id: 'cooperative_governance', parent_id: 'cooperation_self_organization', type: 'network', label_de: 'Gemeinschaftliche Governance und Genossenschaften', order: 0, themes: ['commons-governance', 'community-ownership', 'cooperative-economy', 'cooperative'] },
