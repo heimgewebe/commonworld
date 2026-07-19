@@ -61,6 +61,14 @@ def validate_current_state(root: Path = ROOT) -> list[str]:
     }:
         errors.append("current public-surface truth mismatch")
 
+    if state.get("activity_status_policy") != {
+        "public_states": ["active", "paused", "seasonal", "unknown"],
+        "unknown_semantics": "documented_practice_current_operation_not_timely_verified",
+        "unknown_review_max_days": 45,
+        "unknown_public_notice_required": True,
+    }:
+        errors.append("current public activity-status policy mismatch")
+
     digital_records = []
     digital_themes = set()
     for relative in catalog.get("project_files", []):
@@ -78,26 +86,32 @@ def validate_current_state(root: Path = ROOT) -> list[str]:
             digital_themes.update(theme for theme in record.get("themes", []) if isinstance(theme, str))
         if any(key in record for key in ("layer", "derived_layer", "presentation_layer", "semantic_zoom", "digital_path")):
             errors.append(f"current catalog record must not store presentation taxonomy fields: {relative}")
-    expected_digital_ring = {
+    digital_ring_state = state.get("digital_ring_taxonomy", {})
+    expected_digital_ring_static = {
         "contract": "contracts/commonworld/digital-ring-taxonomy.contract.json",
         "version": "digital-ring-bundles-v1",
         "canonical_url_parameter": "digital_path",
         "main_field_count": 5,
-        "current_digital_identity_count": len(digital_records),
-        "current_known_theme_count": len(digital_themes),
         "legacy_layer_links": "preserved_as_filter_until_explicit_digital_path_selection",
         "invalid_path_behavior": "fail_closed_to_sphere_root_without_partial_filter",
         "catalog_presentation_fields_forbidden": True,
     }
-    if state.get("digital_ring_taxonomy") != expected_digital_ring:
-        errors.append("current digital ring taxonomy truth mismatch")
-    if digital_ring.get("version") != expected_digital_ring["version"]:
+    for key, expected in expected_digital_ring_static.items():
+        if digital_ring_state.get(key) != expected:
+            errors.append(f"current digital ring taxonomy static truth mismatch: {key}")
+    expected_digital_ring_keys = set(expected_digital_ring_static) | {
+        "current_digital_identity_count",
+        "current_known_theme_count",
+    }
+    if set(digital_ring_state) != expected_digital_ring_keys:
+        errors.append("current digital ring taxonomy field inventory mismatch")
+    if digital_ring.get("version") != expected_digital_ring_static["version"]:
         errors.append("digital ring taxonomy contract version must match current state")
     if len([node for node in digital_ring.get("nodes", []) if node.get("parent_id") == "sphere" and node.get("type") == "field"]) != 5:
         errors.append("digital ring taxonomy contract must expose five current fields")
-    if state.get("digital_ring_taxonomy", {}).get("current_digital_identity_count") != len(digital_records):
+    if digital_ring_state.get("current_digital_identity_count") != len(digital_records):
         errors.append("current catalog digital identity count does not match current state")
-    if state.get("digital_ring_taxonomy", {}).get("current_known_theme_count") != len(digital_themes):
+    if digital_ring_state.get("current_known_theme_count") != len(digital_themes):
         errors.append("current catalog digital theme count does not match current state")
 
     renderer = state.get("renderer", {})

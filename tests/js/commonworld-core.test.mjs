@@ -36,6 +36,7 @@ import {
   geodesicDistanceMeters,
   prepareCatalogProjection,
   PUBLIC_MAP_COLLECTION_CACHE_LIMIT,
+  recordActivityNotice,
   recordLocationSummaries,
   recordPresentationLabel,
   ribbonRepeatCount,
@@ -180,6 +181,9 @@ test('digital ring path derivation is deterministic and handles ambiguity explic
     presence: { digital: { available } },
   });
   assert.equal(deriveDigitalProjectPath(digital(['free-software']))?.pathKey, 'sphere/software_tools_production/free_software');
+  assert.equal(deriveDigitalProjectPath(digital(['agrobiodiversity', 'food']))?.pathKey, 'sphere/provision_land_ecology/food_seed_agriculture');
+  assert.equal(deriveDigitalProjectPath(digital(['indigenous-knowledge']))?.pathKey, 'sphere/provision_land_ecology/food_seed_agriculture');
+  assert.equal(deriveDigitalProjectPath(digital(['energy-democracy']))?.pathKey, 'sphere/provision_land_ecology/energy_cooperatives');
   assert.equal(deriveDigitalProjectPath(digital(['knowledge', 'education']))?.pathKey, 'sphere/knowledge_learning_culture/knowledge_learning_bridge');
   assert.equal(deriveDigitalProjectPath(digital(['open-data', 'open-source']))?.pathKey, 'sphere/software_tools_production/knowledge_software_bridge');
   const unknown = deriveDigitalProjectPath(digital(['future-theme']));
@@ -188,6 +192,17 @@ test('digital ring path derivation is deterministic and handles ambiguity explic
   assert.deepEqual(unknown?.unknownThemes, ['future-theme']);
   assert.equal(deriveDigitalProjectPath(digital(['education'], false)), null);
   assert.equal(deriveDigitalProjectPath(digital(['open-source', 'open-data']))?.pathKey, deriveDigitalProjectPath(digital(['open-data', 'open-source']))?.pathKey);
+});
+
+test('unknown activity produces an explicit public notice and active records do not', () => {
+  assert.equal(recordActivityNotice({ activity: { status: 'active' } }), '');
+  assert.equal(
+    recordActivityNotice({
+      activity: { status: 'unknown', observed_at: '2026-07-19' },
+      curation: { next_review_at: '2026-08-19' },
+    }),
+    'Aktueller Betriebszustand nicht zeitnah verifiziert. Quellen geprüft am 2026-07-19; priorisierte Nachprüfung 2026-08-19.',
+  );
 });
 
 test('current digital catalog identities derive exactly once without a public rest bucket', () => {

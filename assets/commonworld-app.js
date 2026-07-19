@@ -20,6 +20,7 @@ import {
   normalizeQuery,
   prepareCatalogProjection,
   prepareIntentSearchIndex,
+  recordActivityNotice,
   recordLocationSummaries,
   recordPresentationLabel,
   projectedGlobeCircle,
@@ -1140,6 +1141,12 @@ function createRuntimeCatalogCard(record) {
   const location = document.createElement('p');
   location.className = 'catalog-location';
   location.textContent = resultLocationLabel(record);
+  const activityNoticeText = recordActivityNotice(record);
+  const activityNotice = activityNoticeText ? document.createElement('p') : null;
+  if (activityNotice) {
+    activityNotice.className = 'catalog-activity-notice';
+    activityNotice.textContent = activityNoticeText;
+  }
   const actions = document.createElement('div');
   actions.className = 'catalog-actions';
   const open = document.createElement('button');
@@ -1161,7 +1168,9 @@ function createRuntimeCatalogCard(record) {
     anchor.textContent = link.label;
     actions.append(anchor);
   }
-  card.append(kind, title, summary, location, actions);
+  card.append(kind, title, summary, location);
+  if (activityNotice) card.append(activityNotice);
+  card.append(actions);
   return card;
 }
 
@@ -1265,7 +1274,10 @@ function updateFocusPanel() {
   replaceList(elements.focusRelations, relationLabels.length ? relationLabels : ['Keine belegte Beziehung veröffentlicht.']);
   replaceLinks(elements.focusLinks, record.links ?? []);
   replaceLinks(elements.focusSources, record?.provenance?.sources ?? []);
-  elements.focusCuration.textContent = `Redaktionell geprüft am ${record?.curation?.reviewed_at ?? 'unbekannt'}; nächste Prüfung ${record?.curation?.next_review_at ?? 'offen'}.`;
+  elements.focusCuration.textContent = [
+    recordActivityNotice(record),
+    `Redaktionell geprüft am ${record?.curation?.reviewed_at ?? 'unbekannt'}; nächste Prüfung ${record?.curation?.next_review_at ?? 'offen'}.`,
+  ].filter(Boolean).join(' ');
 }
 
 function updateSelectionMarks() {

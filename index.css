@@ -816,6 +816,15 @@ html[data-input-modality="pointer"] :focus {
   font-size: 0.78rem;
 }
 
+.catalog-card .catalog-activity-notice {
+  margin: 0.45rem 0 0;
+  padding: 0.55rem 0.65rem;
+  border-left: 3px solid var(--focus);
+  background: rgba(255, 241, 173, 0.08);
+  color: var(--text);
+  font-size: 0.78rem;
+}
+
 .catalog-actions {
   display: flex;
   flex-wrap: wrap;

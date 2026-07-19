@@ -121,6 +121,17 @@ def location_summary(record: dict) -> str:
     return " · ".join(parts) or "Keine öffentliche Geometrie"
 
 
+def activity_notice(record: dict) -> str:
+    if record.get("activity", {}).get("status") != "unknown":
+        return ""
+    observed_at = record.get("activity", {}).get("observed_at", "unbekannt")
+    next_review_at = record.get("curation", {}).get("next_review_at", "offen")
+    return (
+        "Aktueller Betriebszustand nicht zeitnah verifiziert. "
+        f"Quellen geprüft am {observed_at}; priorisierte Nachprüfung {next_review_at}."
+    )
+
+
 def load_records(root: Path = ROOT) -> list[dict]:
     manifest = json.loads((root / "catalog/catalog.json").read_text(encoding="utf-8"))
     records = [
@@ -140,6 +151,8 @@ def render_cards(records: list[dict], *, interactive: bool = True) -> str:
         summary = html.escape(record["summary"])
         label = html.escape(presentation_label(record))
         place = html.escape(location_summary(record))
+        notice = html.escape(activity_notice(record))
+        notice_html = f'            <p class="catalog-activity-notice">{notice}</p>\n' if notice else ""
         url = html.escape(homepage(record), quote=True)
         action_links = "\n".join(
             '              <a class="catalog-action-link" data-action-type="{}" href="{}" rel="external noreferrer">{} <span aria-hidden="true">↗</span></a>'.format(
@@ -164,7 +177,7 @@ def render_cards(records: list[dict], *, interactive: bool = True) -> str:
             <h2>{title}</h2>
             <p>{summary}</p>
             <p class="catalog-location">{place}</p>
-            <div class="catalog-actions">
+{notice_html}            <div class="catalog-actions">
 {action}{action_links}              <a href="{url}" rel="external noreferrer">Offizielle Seite <span aria-hidden="true">↗</span></a>
               <a href="./catalog/projects/{identifier}.json" type="application/json">JSON</a>
             </div>

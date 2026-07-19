@@ -154,6 +154,15 @@ export function hasDigitalPresence(record) {
   return record?.presence?.digital?.available === true;
 }
 
+export const UNKNOWN_ACTIVITY_DISCLOSURE = 'Aktueller Betriebszustand nicht zeitnah verifiziert';
+
+export function recordActivityNotice(record) {
+  if (record?.activity?.status !== 'unknown') return '';
+  const observedAt = record?.activity?.observed_at ?? 'unbekannt';
+  const nextReviewAt = record?.curation?.next_review_at ?? 'offen';
+  return `${UNKNOWN_ACTIVITY_DISCLOSURE}. Quellen geprüft am ${observedAt}; priorisierte Nachprüfung ${nextReviewAt}.`;
+}
+
 export function deriveLayer(record) {
   if (!hasDigitalPresence(record)) return null;
   const themes = new Set(Array.isArray(record.themes) ? record.themes : []);

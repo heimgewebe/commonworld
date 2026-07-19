@@ -24,6 +24,8 @@ PROJECT_DIRECTORY = Path("catalog/projects")
 DIGITAL_RING_CONTRACT_PATH = Path("contracts/commonworld/digital-ring-taxonomy.contract.json")
 PUBLIC_STATES = {"listed", "verified", "featured"}
 PUBLIC_ACTIVITY_STATES = {"active", "paused", "seasonal", "unknown"}
+UNKNOWN_ACTIVITY_REVIEW_MAX_DAYS = 45
+UNKNOWN_ACTIVITY_DISCLOSURE = "Aktueller Betriebszustand nicht zeitnah verifiziert"
 PUBLIC_SOURCE_TYPES = {"official-source", "public-registry"}
 ACTION_LINK_TYPES = {"visit", "use", "borrow", "learn", "contribute", "volunteer", "donate", "contact", "replicate"}
 FORBIDDEN_PUBLIC_TEXT = ("reference-only", "test-only", "synthetic", "acceptance-only")
@@ -254,8 +256,21 @@ def validate_public_catalog(root: Path = ROOT) -> list[str]:
                 errors.append(f"public catalog project {relative.name} review date must not be after catalog publication")
 
         activity = record.get("activity", {}) if isinstance(record.get("activity"), dict) else {}
-        if activity.get("status") not in PUBLIC_ACTIVITY_STATES:
+        activity_status = activity.get("status")
+        if activity_status not in PUBLIC_ACTIVITY_STATES:
             errors.append(f"public catalog project {relative.name} must have a publishable observed activity state")
+        if activity_status == "unknown":
+            curation_notes = curation.get("notes")
+            if not isinstance(curation_notes, str) or UNKNOWN_ACTIVITY_DISCLOSURE not in curation_notes:
+                errors.append(
+                    f"public catalog project {relative.name} unknown activity must disclose that the current operation is not timely verified"
+                )
+            if reviewed_at is not None and next_review_at is not None:
+                review_delay_days = (next_review_at - reviewed_at).days
+                if review_delay_days > UNKNOWN_ACTIVITY_REVIEW_MAX_DAYS:
+                    errors.append(
+                        f"public catalog project {relative.name} unknown activity must be scheduled for review within {UNKNOWN_ACTIVITY_REVIEW_MAX_DAYS} days"
+                    )
         observed_at = _parse_date(activity.get("observed_at"))
         if observed_at is None:
             errors.append(f"public catalog project {relative.name} has invalid activity date")
