@@ -977,20 +977,33 @@ async function layerJourneyScenario({ mobile = false, viewportOverride = null, t
   const earlyPanel = await run.page.evaluate(() => {
     const stageNode = document.querySelector('.globe-stage');
     const panelNode = document.querySelector('#layer-panel');
-    const phaseStartedAt = Number(stageNode?.dataset.viewPhaseStartedAt);
+    const entryStartedAt = Number(stageNode?.dataset.layerEntryStartedAt);
     const panelVisibleAt = Number(stageNode?.dataset.layerPanelVisibleAt);
     return {
       hidden: panelNode?.hidden ?? null,
       inert: panelNode?.hasAttribute('inert') ?? null,
-      latencyMs: panelVisibleAt - phaseStartedAt,
+      latencyMs: panelVisibleAt - entryStartedAt,
       ringsPaused: [...document.querySelectorAll('.sphere-ring-plane')].every((ring) => getComputedStyle(ring).animationPlayState === 'paused'),
-      activeId: document.activeElement?.id ?? null,
     };
   });
   assert(earlyPanel.hidden === false && earlyPanel.inert === false, 'layer journey: early panel is not a usable parallel surface ' + JSON.stringify(earlyPanel));
   assert(Number.isFinite(earlyPanel.latencyMs) && earlyPanel.latencyMs >= 0 && earlyPanel.latencyMs <= 250, 'layer journey: panel opening latency exceeds the interaction budget ' + JSON.stringify(earlyPanel));
   assert(earlyPanel.ringsPaused, 'layer journey: decorative ring animation still competes with the camera flight ' + JSON.stringify(earlyPanel));
-  assert(earlyPanel.activeId === 'layer-close', 'layer journey: early panel opened while focus remained in the inert globe ' + JSON.stringify(earlyPanel));
+  await run.page.waitForFunction(() => document.activeElement?.id === 'layer-close');
+  const earlyFocus = await run.page.evaluate(() => {
+    const stageNode = document.querySelector('.globe-stage');
+    return {
+      activeId: document.activeElement?.id ?? null,
+      phase: stageNode?.dataset.viewPhase ?? null,
+      focusedPhase: stageNode?.dataset.layerPanelFocusedPhase ?? null,
+      latencyMs: Number(stageNode?.dataset.layerPanelFocusedAt) - Number(stageNode?.dataset.layerEntryStartedAt),
+      entryGeneration: Number(stageNode?.dataset.layerEntryGeneration),
+      focusedGeneration: Number(stageNode?.dataset.layerPanelFocusedGeneration),
+    };
+  });
+  assert(earlyFocus.activeId === 'layer-close' && ['entering-layers', 'settling-layers'].includes(earlyFocus.focusedPhase), 'layer journey: focus reached the panel only after the camera flight ' + JSON.stringify(earlyFocus));
+  assert(Number.isFinite(earlyFocus.latencyMs) && earlyFocus.latencyMs >= 0 && earlyFocus.latencyMs <= 250, 'layer journey: panel focus latency exceeds the interaction budget ' + JSON.stringify(earlyFocus));
+  assert(Number.isInteger(earlyFocus.entryGeneration) && earlyFocus.entryGeneration > 0 && earlyFocus.focusedGeneration === earlyFocus.entryGeneration, 'layer journey: early focus is not bound to the active entry generation ' + JSON.stringify(earlyFocus));
   const flightComposition = await run.page.evaluate(() => {
     const map = document.querySelector('#map');
     const style = getComputedStyle(map);
@@ -1646,8 +1659,12 @@ async function interruptedLayerJourneyScenario() {
   const sphereBox = await run.page.locator('#digital-sphere').boundingBox();
   assert(sphereBox, 'interrupted journey: sphere geometry missing');
   await run.page.mouse.click(sphereBox.x + sphereBox.width * 0.85134, sphereBox.y + sphereBox.height * 0.14866);
-  await run.page.waitForTimeout(150);
-  assert((await run.page.locator('.globe-stage').getAttribute('data-view-phase')) === 'entering-layers', 'interrupted journey: entry phase missing');
+  await run.page.waitForSelector('.globe-stage[data-view-phase="entering-layers"]');
+  const firstGeneration = Number(await run.page.locator('.globe-stage').getAttribute('data-layer-entry-generation'));
+  await run.page.setViewportSize({ width: 1180, height: 760 });
+  await run.page.waitForTimeout(80);
+  assert((await run.page.locator('.globe-stage').getAttribute('data-view-phase')) === 'entering-layers', 'interrupted journey: resize prematurely completed the entry phase');
+  assert((await run.page.locator('.globe-stage').getAttribute('data-globe-geometry-source')) === 'maplibre-projected-horizon', 'interrupted journey: resize switched to side geometry while the camera was moving');
   await run.page.keyboard.press('Escape');
   await run.page.waitForFunction(() => {
     const phase = document.querySelector('.globe-stage')?.dataset.viewPhase;
@@ -1659,9 +1676,17 @@ async function interruptedLayerJourneyScenario() {
   await run.page.waitForTimeout(80);
   assert(await run.page.locator('#layer-panel').isHidden(), 'interrupted journey: stale full-screen layer panel remains');
   assert((await run.page.locator('.globe-stage').getAttribute('data-view-phase')) === 'overview', 'interrupted journey: stale transition timer changed the final state');
-  assert((await run.page.evaluate(() => document.activeElement?.id)) === 'sphere-edge-control', 'interrupted journey: focus did not return to the sphere');
-  assert(run.pageErrors.length === 0, `interrupted journey: page errors: ${run.pageErrors.join(' | ')}`);
-  results.push({ id: 'layer-journey-interrupted', verdict: 'PASS' });
+  assert((await run.page.evaluate(() => document.activeElement?.id)) === 'sphere-edge-control', 'interrupted journey: focus did not return to the sphere before rapid reopen');
+  await run.page.locator('#layer-view-button').click();
+  await run.page.waitForSelector('.globe-stage[data-view-phase="entering-layers"]');
+  const secondGeneration = Number(await run.page.locator('.globe-stage').getAttribute('data-layer-entry-generation'));
+  assert(secondGeneration > firstGeneration, 'interrupted journey: reopened entry reused stale generation ' + JSON.stringify({ firstGeneration, secondGeneration }));
+  await run.page.waitForSelector('.globe-stage[data-view-phase="layers"]');
+  await run.page.waitForFunction(() => document.activeElement?.id === 'layer-close');
+  assert(await run.page.locator('#layer-panel').isVisible(), 'interrupted journey: rapid reopen lost the layer panel');
+  assert((await run.page.locator('.globe-stage').getAttribute('data-globe-geometry-source')) === 'side-view-layout', 'interrupted journey: rapid reopen did not finish with exact side geometry');
+  assert(run.pageErrors.length === 0, 'interrupted journey: page errors: ' + run.pageErrors.join(' | '));
+  results.push({ id: 'layer-journey-interrupted', verdict: 'PASS', resizeDuringFlight: true, rapidReopen: true });
   await run.context.close();
 }
 

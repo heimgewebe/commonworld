@@ -155,6 +155,7 @@ const runtime = {
   cameraFlightCleanup: null,
   viewTransitionCleanup: null,
   layerPanelReady: false,
+  layerPanelFocusTimer: null,
   layerReturnTarget: null,
   layerReturnFocusTimer: null,
   spherePointerStart: null,
@@ -162,7 +163,6 @@ const runtime = {
   applyingHistory: false,
   mapReady: false,
   mapRenderCount: 0,
-  mapGeometryFrame: null,
   mapGeometryLastAt: 0,
   sphereGeometryEvaluationCount: 0,
   overlayRenderCount: 0,
@@ -1610,19 +1610,13 @@ function updateSphereGeometry({ publishDiagnostics = true } = {}) {
   }
 }
 
-function scheduleSphereGeometry() {
-  if (!runtime.mapReady || runtime.mapGeometryFrame !== null) return;
-  runtime.mapGeometryFrame = window.requestAnimationFrame((timestamp) => {
-    runtime.mapGeometryFrame = null;
-    if (timestamp - runtime.mapGeometryLastAt < MAP_GEOMETRY_SAMPLE_INTERVAL_MS) return;
-    runtime.mapGeometryLastAt = timestamp;
-    updateSphereGeometry({ publishDiagnostics: runtime.mapRenderCount % MAP_DIAGNOSTIC_RENDER_INTERVAL === 0 });
-  });
+function sampleSphereGeometry(timestamp = performance.now()) {
+  if (!runtime.mapReady || timestamp - runtime.mapGeometryLastAt < MAP_GEOMETRY_SAMPLE_INTERVAL_MS) return;
+  runtime.mapGeometryLastAt = timestamp;
+  updateSphereGeometry({ publishDiagnostics: runtime.mapRenderCount % MAP_DIAGNOSTIC_RENDER_INTERVAL === 0 });
 }
 
 function flushSphereGeometry() {
-  if (runtime.mapGeometryFrame !== null) window.cancelAnimationFrame(runtime.mapGeometryFrame);
-  runtime.mapGeometryFrame = null;
   runtime.mapGeometryLastAt = performance.now();
   setDatasetIfChanged(elements.stage, 'mapRenders', runtime.mapRenderCount);
   updateSphereGeometry();
@@ -1663,6 +1657,8 @@ function clearViewTransition() {
   runtime.cameraFlightCleanup = null;
   runtime.viewTransitionCleanup?.();
   runtime.viewTransitionCleanup = null;
+  window.clearTimeout(runtime.layerPanelFocusTimer);
+  runtime.layerPanelFocusTimer = null;
   window.clearTimeout(runtime.layerReturnFocusTimer);
   runtime.layerReturnFocusTimer = null;
 }
@@ -1773,7 +1769,11 @@ function setViewPhase(phase) {
   elements.stage.dataset.viewPhase = runtime.viewPhase;
   elements.stage.dataset.viewPhaseStartedAt = String(performance.now());
   if (runtime.viewPhase === 'entering-layers') {
+    elements.stage.dataset.layerEntryStartedAt = elements.stage.dataset.viewPhaseStartedAt;
     delete elements.stage.dataset.layerPanelVisibleAt;
+    delete elements.stage.dataset.layerPanelFocusedAt;
+    delete elements.stage.dataset.layerPanelFocusedPhase;
+    delete elements.stage.dataset.layerPanelFocusedGeneration;
     delete elements.stage.dataset.layerSettlingStartedAt;
   }
   if (runtime.viewPhase === 'settling-layers') {
@@ -1821,6 +1821,7 @@ function showLayerState() {
   scheduleFocusOverlapInteractivity();
 }
 
+const LAYER_PANEL_FOCUS_RETRY_DELAYS_MS = [32, 96];
 const LAYER_RETURN_FOCUS_RETRY_DELAYS_MS = [0, 50, 150, 400];
 
 function restoreLayerReturnFocus() {
@@ -1846,6 +1847,48 @@ function restoreLayerReturnFocus() {
   runtime.layerReturnFocusTimer = window.setTimeout(tryFocus, LAYER_RETURN_FOCUS_RETRY_DELAYS_MS[attempt]);
 }
 
+function focusLayerPanelEntry() {
+  window.clearTimeout(runtime.layerPanelFocusTimer);
+  runtime.layerPanelFocusTimer = null;
+  const generation = runtime.cameraFlightGeneration;
+  const recordFocus = () => {
+    if (elements.stage.dataset.layerPanelFocusedAt) return;
+    elements.stage.dataset.layerPanelFocusedAt = String(performance.now());
+    elements.stage.dataset.layerPanelFocusedPhase = runtime.viewPhase;
+    elements.stage.dataset.layerPanelFocusedGeneration = String(generation);
+  };
+  let retryIndex = 0;
+  const tryFocus = () => {
+    runtime.layerPanelFocusTimer = null;
+    const stillRevealable = generation === runtime.cameraFlightGeneration
+      && runtime.state.surface === 'globe'
+      && runtime.state.view === 'layers'
+      && runtime.layerPanelReady
+      && ['entering-layers', 'settling-layers', 'layers'].includes(runtime.viewPhase);
+    if (!stillRevealable) return;
+    if (elements.layerPanel.contains(document.activeElement)) {
+      recordFocus();
+      return;
+    }
+    const active = document.activeElement;
+    const userSelectedAnotherTarget = retryIndex > 0
+      && active !== document.body
+      && active !== document.documentElement
+      && isVisibleFocusTarget(active);
+    if (userSelectedAnotherTarget) return;
+    elements.layerClose.focus({ preventScroll: true });
+    if (document.activeElement === elements.layerClose) {
+      recordFocus();
+      return;
+    }
+    if (retryIndex >= LAYER_PANEL_FOCUS_RETRY_DELAYS_MS.length) return;
+    const delay = LAYER_PANEL_FOCUS_RETRY_DELAYS_MS[retryIndex];
+    retryIndex += 1;
+    runtime.layerPanelFocusTimer = window.setTimeout(tryFocus, delay);
+  };
+  tryFocus();
+}
+
 function revealLayerPanel() {
   const revealable = runtime.state.surface === 'globe'
     && runtime.state.view === 'layers'
@@ -1854,9 +1897,7 @@ function revealLayerPanel() {
   runtime.layerPanelReady = true;
   if (!elements.stage.dataset.layerPanelVisibleAt) elements.stage.dataset.layerPanelVisibleAt = String(performance.now());
   showLayerState();
-  if (!elements.layerPanel.contains(document.activeElement)) {
-    elements.layerClose.focus({ preventScroll: true });
-  }
+  focusLayerPanelEntry();
   return true;
 }
 
@@ -1906,11 +1947,12 @@ function openLayerView({ historyMode = 'push', cameraState = null, instant = fal
     if (duration) {
       setViewPhase('entering-layers');
       showLayerState();
-      window.requestAnimationFrame(() => revealLayerPanel());
       startCameraFlight(targetCamera, {
         duration,
         onSettled: settleLayerViewAfterCamera,
       });
+      elements.stage.dataset.layerEntryGeneration = String(runtime.cameraFlightGeneration);
+      revealLayerPanel();
     } else {
       startCameraFlight(targetCamera, {
         instant: true,
@@ -2341,7 +2383,7 @@ function createMap() {
     if (runtime.mapRenderCount % MAP_DIAGNOSTIC_RENDER_INTERVAL === 0) {
       setDatasetIfChanged(elements.stage, 'mapRenders', runtime.mapRenderCount);
     }
-    if (runtime.map.isMoving()) scheduleSphereGeometry();
+    if (runtime.map.isMoving()) sampleSphereGeometry();
   });
   runtime.map.on('movestart', () => {
     elements.stage.dataset.mapMoving = 'true';
