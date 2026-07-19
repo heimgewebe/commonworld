@@ -1,56 +1,15 @@
-/* iPad landscape layout corrections layered after index.css. Do not duplicate index.css rules here. */
-
-/* This normalization applies intentionally on all viewports because it removes the browser-default fieldset spacing.
-   Touch targets stay at least 44px. On narrow phones flex-wrap may take effect; from tablet width up the geographic and digital options should stay side by side. */
-.intent-filter-grid > .filter-presence-group {
-  min-width: 0;
-  margin: 0;
-  padding: 0;
-  border: 0;
-  color: var(--muted);
-  font-size: 0.78rem;
-  font-weight: 700;
-}
-
-.intent-filter-grid > .filter-presence-group > legend {
-  padding: 0;
-  margin: 0 0 0.35rem;
-  font: inherit;
-  color: inherit;
-}
-
-.intent-filter-grid > .filter-presence-group > .filter-presence-options {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0.5rem;
-}
-
-.intent-filter-grid > .filter-presence-group > .filter-presence-options > label {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.4rem;
-  min-height: var(--minimum-touch-target, 44px);
-  padding: 0 0.7rem;
-  border: 1px solid var(--line-strong);
-  border-radius: 0.75rem;
-  background: #0b201b;
-  color: #edf4ef;
-  font-weight: 650;
-  font-size: 0.82rem;
-  white-space: nowrap;
-}
-
-.intent-filter-grid > .filter-presence-group > .filter-presence-options > label > input[type="checkbox"] {
-  width: 1.1rem;
-  height: 1.1rem;
-  min-width: 1.1rem;
-  margin: 0;
-  flex: none;
-}
-
+/* iPad landscape corrections layered after index.css. Shared filter rules live in index.css. */
 /* Medium-sized landscape viewports including large iPads (e.g. 1024x768, 1180x820, 1194x834, 1366x1024).
    We use CSS viewport geometry instead of device identity, User-Agent or DPR to target tablets and medium desktops. */
 @media (orientation: landscape) and (min-width: 48rem) and (max-width: 90rem) and (max-height: 65rem) {
+  .discovery-panel {
+    width: min(64rem, calc(100% - 1.5rem));
+    padding: 0.75rem;
+  }
+  .intent-filter-grid {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 0.45rem;
+  }
   .layer-discovery {
     top: calc(max(0.9rem, env(safe-area-inset-top)) + 3.35rem);
     right: auto;

@@ -4,6 +4,7 @@ import {
   MAX_MAP_ZOOM,
   binaryName,
   buildDigitalPresentationTree,
+  commonsTypeLabel,
   deriveLayer,
   digitalPathContainsRecord,
   digitalPresentationTreeConstructionCount,
@@ -46,7 +47,7 @@ const PRESENTATION_STORAGE_KEY = 'commonworld.presentation';
 const PUBLIC_MAP_SOURCE_ID = 'commonworld-public-representations';
 const PUBLIC_MAP_LAYER_IDS = Object.freeze(['commonworld-public-extents', 'commonworld-approximate-zones', 'commonworld-exact-anchors']);
 const ACTION_LINK_TYPES = new Set(['visit', 'use', 'borrow', 'learn', 'contribute', 'volunteer', 'donate', 'contact', 'replicate']);
-const INTENT_FILTER_NAMES = Object.freeze(['presence', 'action', 'language', 'access', 'freshness', 'curation']);
+const INTENT_FILTER_NAMES = Object.freeze(['commons_type', 'presence', 'action', 'language', 'access', 'freshness', 'curation']);
 const DIGITAL_IDENTITY_DOM_LIMIT = 48;
 const TEXT_IDENTITY_DOM_LIMIT = 48;
 const DISCOVERY_RESULT_PREVIEW_LIMIT = 50;
@@ -140,6 +141,7 @@ const runtime = {
     view: 'globe',
     surface: 'globe',
     query: '',
+    commons_type: null,
     presence: null,
     action: null,
     language: null,
@@ -1044,8 +1046,23 @@ function directActionLinks(record) {
 function resultLocationLabel(record) {
   const publicCount = publicGeographicLocations(record).length;
   if (publicCount > 0) return publicCount === 1 ? '1 öffentlicher Ort' : String(publicCount) + ' öffentliche Orte';
+  return hasDigitalPresence(record) ? 'Ortsunabhängige digitale Präsenz' : 'Keine öffentliche Geometrie';
+}
+
+function resultPresenceLabel(record) {
+  const isGeographic = publicGeographicLocations(record).length > 0;
   const isDigital = hasDigitalPresence(record);
-  return isDigital ? 'Ortsunabhängige digitale Präsenz' : 'Keine öffentliche Geometrie';
+  if (isGeographic && isDigital) return 'Vor Ort + digital';
+  if (isGeographic) return 'Vor Ort';
+  if (isDigital) return 'Digital';
+  return 'Präsenz nicht veröffentlicht';
+}
+
+function resultMetaLabel(record) {
+  const parts = [commonsTypeLabel(record), resultPresenceLabel(record)];
+  const publicCount = publicGeographicLocations(record).length;
+  if (publicCount > 0) parts.push(publicCount === 1 ? '1 öffentlicher Ort' : String(publicCount) + ' öffentliche Orte');
+  return parts.join(' · ');
 }
 
 function createDiscoveryResult(record, position) {
@@ -1068,7 +1085,7 @@ function createDiscoveryResult(record, position) {
   title.textContent = record.title;
   const meta = document.createElement('span');
   meta.className = 'discovery-result-meta';
-  meta.textContent = recordPresentationLabel(record) + ' · ' + resultLocationLabel(record);
+  meta.textContent = resultMetaLabel(record);
   const summary = document.createElement('span');
   summary.className = 'discovery-result-summary';
   summary.textContent = record.summary;
@@ -1115,7 +1132,7 @@ function createRuntimeCatalogCard(record) {
   card.dataset.commonprojectId = record.id;
   const kind = document.createElement('p');
   kind.className = 'catalog-kind';
-  kind.textContent = recordPresentationLabel(record);
+  kind.textContent = commonsTypeLabel(record) + ' · ' + resultPresenceLabel(record);
   const title = document.createElement('h2');
   title.textContent = record.title;
   const summary = document.createElement('p');

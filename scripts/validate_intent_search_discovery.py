@@ -13,7 +13,21 @@ ROOT = Path(__file__).resolve().parents[1]
 CONTRACT = Path("contracts/commonworld/intent-search-discovery.contract.json")
 RESULT = Path("docs/research/intent-search-discovery-v1.result.json")
 EXPECTED_RESULT_SHA256 = "7085139444d298e41a3bc9fbda4af3e6e75c02f2c90cc173e52c48deab34245f"
-FILTERS = ["presence", "action", "language", "access", "freshness", "curation"]
+FILTERS = ["commons_type", "presence", "action", "language", "access", "freshness", "curation"]
+COMMONS_TYPES = ["knowledge", "software", "culture", "food-seeds", "water", "energy", "housing-land", "health-care", "tools-repair", "community-network", "other"]
+COMMONS_TYPE_LABELS = {
+    "knowledge": "Wissen und Daten",
+    "software": "Software und Infrastruktur",
+    "culture": "Kultur und Medien",
+    "food-seeds": "Saatgut und Ernährung",
+    "water": "Wasser und Bewässerung",
+    "energy": "Energie",
+    "housing-land": "Boden und Wohnen",
+    "health-care": "Pflege und Gesundheit",
+    "tools-repair": "Werkzeuge, Reparatur und Fertigung",
+    "community-network": "Gemeinschaftsnetz",
+    "other": "Andere",
+}
 ACTIONS = {"visit", "use", "borrow", "learn", "contribute", "volunteer", "donate", "contact", "replicate"}
 NONCLAIMS = [
     "semantic AI or LLM search",
@@ -51,7 +65,7 @@ const ids = (query, filters = {}) => filterRecords(records, { query, ...filters,
 const mapData = publicMapFeatureCollection(records);
 const serialized = searchFromState({
   camera: { lng: 9.9, lat: 53.5, zoom: 4, bearing: 0, pitch: 0 },
-  query: 'mitmachen', presence: ['geographic', 'digital'], action: 'volunteer', language: 'de',
+  query: 'mitmachen', commons_type: 'community-network', presence: ['geographic', 'digital'], action: 'volunteer', language: 'de',
   access: 'public', freshness: 'current', curation: 'listed',
 });
 const roundtrip = stateFromSearch(serialized, records.map((record) => record.id));
@@ -75,7 +89,7 @@ console.log(JSON.stringify({
   geographicTarget: publicProjectNavigationTarget(mapData, 'cltb-le-nid'),
   hiddenTarget: publicProjectNavigationTarget(mapData, 'freifunk-hamburg-private-routers'),
   roundtrip: {
-    query: roundtrip.query, presence: roundtrip.presence, action: roundtrip.action,
+    query: roundtrip.query, commons_type: roundtrip.commons_type, presence: roundtrip.presence, action: roundtrip.action,
     language: roundtrip.language, access: roundtrip.access,
     freshness: roundtrip.freshness, curation: roundtrip.curation,
   },
@@ -106,6 +120,7 @@ def validate_intent_search_discovery(root: Path = ROOT) -> list[str]:
         RESULT,
         Path("docs/research/intent-search-discovery-v1.md"),
         Path("contracts/commonworld/project.schema.json"),
+        Path("contracts/commonworld/proposal.schema.json"),
         Path("assets/commonworld-core.mjs"),
         Path("assets/commonworld-app.js"),
         Path("scripts/smoke_public_browser.mjs"),
@@ -124,6 +139,7 @@ def validate_intent_search_discovery(root: Path = ROOT) -> list[str]:
         contract = load(root / CONTRACT)
         result = load(root / RESULT)
         schema = load(root / "contracts/commonworld/project.schema.json")
+        proposal_schema = load(root / "contracts/commonworld/proposal.schema.json")
         manifest = load(root / "catalog/catalog.json")
         records = [load(root / "catalog" / relative) for relative in manifest["project_files"]]
     except (OSError, KeyError, json.JSONDecodeError) as error:
@@ -147,6 +163,18 @@ def validate_intent_search_discovery(root: Path = ROOT) -> list[str]:
         errors.append("T007 truth boundary mismatch")
     if contract.get("filters") != FILTERS:
         errors.append("T007 filter contract mismatch")
+    filter_semantics = contract.get("filter_semantics", {})
+    if filter_semantics.get("commons_type_values_follow_proposal_vocabulary") is not True:
+        errors.append("T007 Commons type vocabulary binding missing")
+    if filter_semantics.get("commons_type_is_deterministically_derived_from_catalog_themes_when_absent") is not True:
+        errors.append("T007 Commons type derivation boundary missing")
+    if filter_semantics.get("commons_type_source_vocabulary") != "contracts/commonworld/proposal.schema.json#/properties/project/properties/commons_type":
+        errors.append("T007 Commons type vocabulary pointer mismatch")
+    if filter_semantics.get("commons_type_fallback") != "other":
+        errors.append("T007 Commons type fallback mismatch")
+    proposal_types = proposal_schema.get("properties", {}).get("project", {}).get("properties", {}).get("commons_type", {}).get("enum", [])
+    if proposal_types != COMMONS_TYPES:
+        errors.append("T007 Commons type filter must exactly follow the proposal vocabulary")
     if contract.get("nonclaims") != NONCLAIMS:
         errors.append("T007 nonclaims mismatch")
     scalability = contract.get("scalability", {})
@@ -240,7 +268,7 @@ def validate_intent_search_discovery(root: Path = ROOT) -> list[str]:
         if probe.get("hiddenTarget") is not None:
             errors.append("T007 hidden location acquired a navigation target")
         if probe.get("roundtrip") != {
-            "query": "mitmachen", "presence": ["geographic", "digital"], "action": "volunteer",
+            "query": "mitmachen", "commons_type": "community-network", "presence": ["geographic", "digital"], "action": "volunteer",
             "language": "de", "access": "public", "freshness": "current", "curation": "listed",
         }:
             errors.append("T007 query/filter URL roundtrip mismatch")
@@ -250,13 +278,18 @@ def validate_intent_search_discovery(root: Path = ROOT) -> list[str]:
     shell = (root / "index.html").read_text(encoding="utf-8")
     for token in (
         'id="discovery-panel"', 'id="discovery-list"', 'id="discovery-empty"',
-        'data-intent-filter="presence"', 'data-intent-filter="action"',
+        'class="filter-commons-type"', 'id="filter-commons-type"',
+        'data-intent-filter="commons_type"', 'data-intent-filter="presence"', 'data-intent-filter="action"',
         'data-intent-filter="language"', 'data-intent-filter="access"',
         'data-intent-filter="freshness"', 'data-intent-filter="curation"',
         '<option value="borrow">Ausleihen</option>', 'data-action-type=',
     ):
         if token not in shell:
             errors.append(f"T007 public shell missing token: {token}")
+    for commons_type, label in COMMONS_TYPE_LABELS.items():
+        token = f'<option value="{commons_type}">{label}</option>'
+        if shell.count(token) != 1:
+            errors.append(f"T007 public shell must emit exactly one Commons-Art option: {commons_type}")
     browser = (root / "scripts/smoke_public_browser.mjs").read_text(encoding="utf-8")
     for scenario in contract.get("browser_evidence", {}).get("required_scenarios", []):
         if scenario not in browser:

@@ -34,6 +34,7 @@ REQUIRED_HTML = (
     '<title>commonworld — Commons entdecken</title>',
     'class="topbar"',
     'id="commons-search"',
+    'id="filter-commons-type"',
     'id="settings-toggle"',
     'id="settings-panel"',
     'id="globe-results"',
@@ -182,7 +183,12 @@ def _validate_ipad_landscape_wiring(root: Path, html: str) -> list[str]:
     if not ipad_css_path.is_file():
         return ['missing assets/ipad-layout.css']
     ipad_css = ipad_css_path.read_text(encoding='utf-8')
+    index_css = (root / 'index.css').read_text(encoding='utf-8')
     render_source = render_source_path.read_text(encoding='utf-8') if render_source_path.is_file() else ''
+    if 'class="filter-commons-type"' not in render_source or 'data-intent-filter="commons_type"' not in render_source:
+        errors.append('render_public_shell.py must emit the Commons-Art filter with its compact layout hook')
+    if 'class="filter-commons-type"' not in html or '.filter-commons-type' not in index_css:
+        errors.append('public shell and index.css must preserve the Commons-Art filter layout hook')
 
     index_link = './index.css'
     ipad_link = './assets/ipad-layout.css'
@@ -211,15 +217,14 @@ def _validate_ipad_landscape_wiring(root: Path, html: str) -> list[str]:
     if render_presence.options_wrapper_count != 1 or not render_presence.has_both_checkboxes:
         errors.append('render_public_shell.py must emit the .filter-presence-options wrapper with both presence checkboxes')
 
-    if '.intent-filter-grid > .filter-presence-group' not in ipad_css or '.filter-presence-options' not in ipad_css:
-        errors.append('assets/ipad-layout.css must style the presence group and its options')
+    if '.intent-filter-grid > .filter-presence-group' not in index_css or '.filter-presence-options' not in index_css:
+        errors.append('index.css must own the shared presence group and option styles')
 
-    options_block_match = find_css_block(
-        ipad_css,
-        '.intent-filter-grid > .filter-presence-group > .filter-presence-options > label',
-    )
+    options_block_match = find_css_block(index_css, '.filter-presence-options > label')
     if options_block_match is None or not re.search(r'min-height:\s*var\(--minimum-touch-target', options_block_match[1]):
-        errors.append('assets/ipad-layout.css presence options must define a compact, touch-safe label style')
+        errors.append('index.css presence options must define a compact, touch-safe label style')
+    if '.intent-filter-grid > .filter-presence-group > .filter-presence-options > label' in ipad_css:
+        errors.append('assets/ipad-layout.css must not duplicate the shared presence option component style')
 
     target_media_tokens = (
         'orientation: landscape',

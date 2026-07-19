@@ -2,6 +2,8 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import {
+  COMMONS_TYPE_LABELS,
+  COMMONS_TYPE_VALUES,
   DEFAULT_CAMERA,
   MAX_MAP_ZOOM,
   DIGITAL_LAYER_TRANSITION_MS,
@@ -14,6 +16,8 @@ import {
   binaryName,
   buildDigitalPresentationTree,
   cameraFromSearch,
+  commonsTypeLabel,
+  deriveCommonsType,
   deriveDigitalProjectPath,
   deriveLayer,
   digitalPresentationTreeConstructionCount,
@@ -75,6 +79,46 @@ test('layer derivation uses catalog themes without overrides', () => {
   assert.equal(deriveLayer({ themes: ['open-data', 'infrastructure'], presence: { digital: { available: true } } }), 'mixed_other');
   assert.equal(deriveLayer({ themes: ['education'], presence: { digital: { available: false } } }), null);
 });
+
+test('Commons types follow the proposal vocabulary and derive from explicit theme rules', () => {
+  assert.deepEqual(COMMONS_TYPE_LABELS, {
+    knowledge: 'Wissen und Daten',
+    software: 'Software und Infrastruktur',
+    culture: 'Kultur und Medien',
+    'food-seeds': 'Saatgut und Ernährung',
+    water: 'Wasser und Bewässerung',
+    energy: 'Energie',
+    'housing-land': 'Boden und Wohnen',
+    'health-care': 'Pflege und Gesundheit',
+    'tools-repair': 'Werkzeuge, Reparatur und Fertigung',
+    'community-network': 'Gemeinschaftsnetz',
+    other: 'Andere',
+  });
+  assert.deepEqual(COMMONS_TYPE_VALUES, [
+    'knowledge', 'software', 'culture', 'food-seeds', 'water', 'energy',
+    'housing-land', 'health-care', 'tools-repair', 'community-network', 'other',
+  ]);
+  const cases = [
+    [['open-data', 'infrastructure'], 'knowledge'],
+    [['open-source', 'open-data'], 'software'],
+    [['open-media', 'creative-commons'], 'culture'],
+    [['food', 'platform', 'open-source'], 'food-seeds'],
+    [['water', 'food'], 'water'],
+    [['energy', 'network'], 'energy'],
+    [['housing', 'shared-space'], 'housing-land'],
+    [['health', 'open-source'], 'health-care'],
+    [['open-hardware', 'education'], 'tools-repair'],
+    [['communication', 'community-network'], 'community-network'],
+    [['commons-governance', 'cooperative-economy'], 'other'],
+  ];
+  for (const [themes, expected] of cases) assert.equal(deriveCommonsType({ themes }), expected, themes.join(','));
+  assert.equal(deriveCommonsType({ commons_type: 'water', themes: ['health'] }), 'water', 'an explicit valid catalog value must win');
+  assert.equal(deriveCommonsType({ commons_type: 'invalid', themes: ['health'] }), 'other', 'invalid explicit values fail closed instead of falling back to themes');
+  assert.equal(deriveCommonsType({ commons_type: null, themes: ['health'] }), 'other', 'null explicit values fail closed instead of falling back to themes');
+  assert.equal(commonsTypeLabel('community-network'), 'Gemeinschaftsnetz');
+  assert.equal(commonsTypeLabel({ themes: ['repair'] }), 'Werkzeuge, Reparatur und Fertigung');
+});
+
 
 test('external catalogue links require canonical credential-free HTTPS URLs', () => {
   assert.equal(safeExternalHttpsUrl('https://example.org/path?q=commons'), 'https://example.org/path?q=commons');
@@ -325,7 +369,7 @@ test('sphere detail levels remain stable for overview and close-up rendering', (
 });
 
 test('deep-link state accepts surface, search, identity, filters and clamped camera', () => {
-  const state = stateFromSearch('?surface=text&q=open%20data&project=debian&view=layers&layer=software_infrastructure&presence=digital&action=contribute&language=de&access=public&freshness=current&curation=listed&lng=999&lat=-999&z=99&p=99', ['debian']);
+  const state = stateFromSearch('?surface=text&q=open%20data&project=debian&view=layers&layer=software_infrastructure&commons_type=software&presence=digital&action=contribute&language=de&access=public&freshness=current&curation=listed&lng=999&lat=-999&z=99&p=99', ['debian']);
   assert.equal(state.project, 'debian');
   assert.equal(state.view, 'layers');
   assert.equal(state.surface, 'text');
@@ -333,8 +377,8 @@ test('deep-link state accepts surface, search, identity, filters and clamped cam
   assert.equal(state.layer, 'software_infrastructure');
   assert.deepEqual(state.digitalPath, ['sphere', 'software_tools_production', 'free_software']);
   assert.deepEqual(
-    { presence: state.presence, action: state.action, language: state.language, access: state.access, freshness: state.freshness, curation: state.curation },
-    { presence: ['digital'], action: 'contribute', language: 'de', access: 'public', freshness: 'current', curation: 'listed' },
+    { commons_type: state.commons_type, presence: state.presence, action: state.action, language: state.language, access: state.access, freshness: state.freshness, curation: state.curation },
+    { commons_type: 'software', presence: ['digital'], action: 'contribute', language: 'de', access: 'public', freshness: 'current', curation: 'listed' },
   );
   assert.equal(MAX_MAP_ZOOM, 18);
   assert.deepEqual(state.camera, { lng: 180, lat: -85, zoom: MAX_MAP_ZOOM, bearing: 0, pitch: 70 });
@@ -371,14 +415,14 @@ test('legacy layer links preserve their exact six-layer filter and URL until exp
 });
 
 test('unknown identities, filters and malformed numbers fail closed', () => {
-  const state = stateFromSearch('?project=unknown&layer=unknown&presence=space&action=hack&language=../../private&access=secret&freshness=future&curation=hidden&lng=nope', ['debian']);
+  const state = stateFromSearch('?project=unknown&layer=unknown&commons_type=imaginary&presence=space&action=hack&language=../../private&access=secret&freshness=future&curation=hidden&lng=nope', ['debian']);
   assert.equal(state.project, null);
   assert.equal(state.layer, null);
   assert.deepEqual(state.digitalPath, DIGITAL_ROOT_PATH);
   assert.equal(state.surface, 'globe');
   assert.deepEqual(
-    { presence: state.presence, action: state.action, language: state.language, access: state.access, freshness: state.freshness, curation: state.curation },
-    { presence: [], action: null, language: null, access: null, freshness: null, curation: null },
+    { commons_type: state.commons_type, presence: state.presence, action: state.action, language: state.language, access: state.access, freshness: state.freshness, curation: state.curation },
+    { commons_type: null, presence: [], action: null, language: null, access: null, freshness: null, curation: null },
   );
   assert.equal(state.camera.lng, DEFAULT_CAMERA.lng);
   assert.deepEqual(cameraFromSearch(''), DEFAULT_CAMERA);
@@ -404,6 +448,7 @@ test('serialized state roundtrips selection, view, surface, query and filters', 
     view: 'layers',
     surface: 'text',
     query: 'freie Software',
+    commons_type: 'software',
     presence: ['digital'],
     action: 'learn',
     language: 'unknown',
@@ -422,8 +467,8 @@ test('serialized state roundtrips selection, view, surface, query and filters', 
   assert.equal(state.surface, 'text');
   assert.equal(state.query, 'freie Software');
   assert.deepEqual(
-    { presence: state.presence, action: state.action, language: state.language, access: state.access, freshness: state.freshness, curation: state.curation },
-    { presence: ['digital'], action: 'learn', language: 'unknown', access: 'unknown', freshness: 'stale', curation: 'verified' },
+    { commons_type: state.commons_type, presence: state.presence, action: state.action, language: state.language, access: state.access, freshness: state.freshness, curation: state.curation },
+    { commons_type: 'software', presence: ['digital'], action: 'learn', language: 'unknown', access: 'unknown', freshness: 'stale', curation: 'verified' },
   );
   assert.equal(state.camera.zoom, 3.46);
 });
@@ -435,6 +480,8 @@ test('record filtering keeps one shared search and layer truth', () => {
     { id: 'c', title: 'Werkstatt vor Ort', summary: 'Stadtteil', themes: ['repair'], actions: ['visit'], presence: { geographic: [{ mode: 'approximate' }] } },
   ];
   assert.deepEqual(filterRecords(records, { query: 'karte' }).map(({ id }) => id), ['a']);
+  assert.deepEqual(filterRecords(records, { commons_type: 'knowledge' }).map(({ id }) => id), ['a', 'b']);
+  assert.deepEqual(filterRecords(records, { commons_type: 'tools-repair' }).map(({ id }) => id), ['c']);
   assert.deepEqual(filterRecords(records, { digitalPath: DIGITAL_ROOT_PATH }).map(({ id }) => id), ['a', 'b', 'c']);
   assert.deepEqual(filterRecords(records, { digitalPath: ['sphere', 'knowledge_learning_culture', 'learning_education'] }).map(({ id }) => id), ['b']);
   assert.deepEqual(filterRecords(records, { query: 'daten', digitalPath: ['sphere', 'knowledge_learning_culture', 'open_knowledge_data'] }).map(({ id }) => id), ['a']);
