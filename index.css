@@ -822,6 +822,7 @@ html[data-input-modality="pointer"] :focus {
 }
 
 .catalog-select {
+  min-height: 2.75rem;
   padding: 0.52rem 0.66rem;
   border-radius: 0.65rem;
   font-weight: 720;
@@ -1865,6 +1866,10 @@ html:not([data-input-modality="pointer"]) .digital-ribbon-item:focus-visible {
 }
 
 @media (orientation: landscape) and (max-height: 30rem) {
+  .layer-view-button {
+    right: calc(max(0.55rem, env(safe-area-inset-right)) + 3.4rem);
+  }
+
   .layer-track-deck {
     grid-template-rows: repeat(var(--lane-count, 5), minmax(48px, auto));
     align-content: start;

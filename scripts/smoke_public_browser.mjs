@@ -2054,6 +2054,62 @@ async function liveUiHardeningScenario() {
     await run.context.close();
   }
 
+  const landscapeOverview = await newPage({ mobile: true, viewportOverride: { width: 667, height: 375 }, touch: true, reducedMotion: 'reduce' });
+  await landscapeOverview.page.goto(baseUrl, { waitUntil: 'domcontentloaded' });
+  await landscapeOverview.page.waitForSelector('html.runtime-ready');
+  await landscapeOverview.page.waitForSelector('.maplibregl-ctrl-zoom-in');
+  const overviewGeometry = await landscapeOverview.page.evaluate(() => {
+    const rect = (node) => {
+      const box = node.getBoundingClientRect();
+      return {
+        left: box.left,
+        top: box.top,
+        right: box.right,
+        bottom: box.bottom,
+        width: box.width,
+        height: box.height,
+      };
+    };
+    const layer = rect(document.querySelector('#layer-view-button'));
+    const zoom = rect(document.querySelector('.maplibregl-ctrl-zoom-in'));
+    return {
+      viewport: { width: window.innerWidth, height: window.innerHeight },
+      layer,
+      zoom,
+      overlap: {
+        width: Math.max(0, Math.min(layer.right, zoom.right) - Math.max(layer.left, zoom.left)),
+        height: Math.max(0, Math.min(layer.bottom, zoom.bottom) - Math.max(layer.top, zoom.top)),
+      },
+    };
+  });
+  const overviewOverlapArea = overviewGeometry.overlap.width * overviewGeometry.overlap.height;
+  assert(overviewOverlapArea <= 0.5, `live UI 667x375: digital sphere button overlaps MapLibre zoom control (${JSON.stringify(overviewGeometry)})`);
+  assert(
+    [overviewGeometry.layer, overviewGeometry.zoom].every(({ left, top, right, bottom, width, height }) => (
+      left >= -0.5
+      && top >= -0.5
+      && right <= overviewGeometry.viewport.width + 0.5
+      && bottom <= overviewGeometry.viewport.height + 0.5
+      && width >= 44
+      && height >= 44
+    )),
+    `live UI 667x375: landscape control is clipped or undersized (${JSON.stringify(overviewGeometry)})`,
+  );
+  await landscapeOverview.page.locator('#settings-toggle').click();
+  await landscapeOverview.page.waitForSelector('#settings-panel:not([hidden])');
+  await landscapeOverview.page.locator('[data-presentation-choice="text"]').click();
+  await landscapeOverview.page.waitForSelector('#text-view:not([hidden])');
+  const catalogSelectBoxes = await landscapeOverview.page.locator('.catalog-card:not([hidden]) .catalog-select').evaluateAll((nodes) => nodes.map((node) => {
+    const box = node.getBoundingClientRect();
+    return { width: box.width, height: box.height };
+  }));
+  assert(catalogSelectBoxes.length > 0, 'live UI 667x375: no visible catalogue selection controls');
+  const minimumCatalogSelectHeight = Math.min(...catalogSelectBoxes.map(({ height }) => height));
+  assert(catalogSelectBoxes.every(({ width, height }) => width >= 44 && height >= 44), `live UI 667x375: catalogue selection control is undersized (${JSON.stringify(catalogSelectBoxes)})`);
+  assert(landscapeOverview.consoleErrors.length === 0, `live UI 667x375: console errors: ${landscapeOverview.consoleErrors.join(' | ')}`);
+  assert(landscapeOverview.pageErrors.length === 0, `live UI 667x375: page errors: ${landscapeOverview.pageErrors.join(' | ')}`);
+  await landscapeOverview.context.close();
+
   const run = await newPage({ viewportOverride: { width: 844, height: 390 }, touch: true, reducedMotion: 'reduce' });
   await run.page.goto(baseUrl, { waitUntil: 'domcontentloaded' });
   await run.page.waitForSelector('html.runtime-ready');
@@ -2093,7 +2149,18 @@ async function liveUiHardeningScenario() {
   assert(layout.orientationInert && layout.orientationAriaHidden === 'true' && layout.globeResetSuppressed, `live UI landscape: hidden globe orientation remains keyboard interactive (${JSON.stringify(layout)})`);
   assert(run.consoleErrors.length === 0, `live UI landscape: console errors: ${run.consoleErrors.join(' | ')}`);
   assert(run.pageErrors.length === 0, `live UI landscape: page errors: ${run.pageErrors.join(' | ')}`);
-  results.push({ id: 'live-ui-hardening', verdict: 'PASS' });
+  results.push({
+    id: 'live-ui-hardening',
+    verdict: 'PASS',
+    landscapeOverview: {
+      viewport: overviewGeometry.viewport,
+      overlapArea: overviewOverlapArea,
+      controlGap: overviewGeometry.zoom.left - overviewGeometry.layer.right,
+      layerControl: overviewGeometry.layer,
+      zoomControl: overviewGeometry.zoom,
+      minimumCatalogSelectHeight,
+    },
+  });
   await run.context.close();
 }
 
