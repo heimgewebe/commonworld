@@ -4,6 +4,12 @@ import unittest
 from pathlib import Path
 
 from scripts.render_public_shell import load_records, render_bootstrap_catalog
+from scripts.static_surface_parser import (
+    find_css_block,
+    find_media_block,
+    parse_presence_group,
+    parse_stylesheet_links,
+)
 from scripts.validate_public_shell import ROOT, validate_public_shell
 
 
@@ -15,6 +21,10 @@ class PublicShellTests(unittest.TestCase):
         shutil.copy2(ROOT / "method.html", root / "method.html")
         (root / "assets").mkdir()
         shutil.copy2(ROOT / "assets/commonworld-bootstrap-catalog.mjs", root / "assets/commonworld-bootstrap-catalog.mjs")
+        shutil.copy2(ROOT / "assets/ipad-layout.css", root / "assets/ipad-layout.css")
+        (root / "scripts").mkdir()
+        if (ROOT / "scripts/render_public_shell.py").exists():
+            shutil.copy2(ROOT / "scripts/render_public_shell.py", root / "scripts/render_public_shell.py")
         return root
 
     def test_public_shell_validates(self) -> None:
@@ -77,6 +87,190 @@ class PublicShellTests(unittest.TestCase):
             path.write_text(path.read_text(encoding="utf-8").replace("keine vollständige Weltstatistik", "vollständig"), encoding="utf-8")
             errors = validate_public_shell(root)
         self.assertTrue(any("keine vollständige Weltstatistik" in error for error in errors))
+
+    def test_presence_html_tolerates_formatting(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp_dir:
+            root = self.copy_shell(tmp_dir)
+            path = root / "index.html"
+            html = path.read_text(encoding="utf-8")
+            
+            # Replace nicely formatted presence group with a messy one
+            import re
+            html = re.sub(
+                r'<fieldset class="filter-presence-group">.*?</fieldset>',
+                '''<fieldset 
+                  data-extra="true" 
+                  class="extra filter-presence-group another"
+                >
+                  <legend>Presence</legend>
+                  <div class="filter-presence-options" style="display:flex">
+                    <label><input type="checkbox" id="filter-presence-geographic" checked /> Geographic</label>
+                    <label><input id="filter-presence-digital" type="checkbox" /> Digital</label>
+                  </div>
+                </fieldset>''',
+                html,
+                flags=re.DOTALL
+            )
+            path.write_text(html, encoding="utf-8")
+            errors = validate_public_shell(root)
+            self.assertEqual([], errors)
+
+    def test_stylesheet_links_tolerate_formatting(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp_dir:
+            root = self.copy_shell(tmp_dir)
+            path = root / "index.html"
+            html = path.read_text(encoding="utf-8")
+            html = html.replace('<link rel="stylesheet" href="./index.css" />', "<link href='./index.css' rel='stylesheet' data-extra='1' />")
+            html = html.replace('<link rel="stylesheet" href="./assets/ipad-layout.css" />', "<link href='./assets/ipad-layout.css' rel='stylesheet' />")
+            path.write_text(html, encoding="utf-8")
+            errors = validate_public_shell(root)
+            self.assertEqual([], errors)
+            
+    def test_extra_css_rule_after_ipad_media(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp_dir:
+            root = self.copy_shell(tmp_dir)
+            path = root / "assets/ipad-layout.css"
+            path.write_text(path.read_text(encoding="utf-8") + "\n\n.extra-trailing-rule { color: red; }\n", encoding="utf-8")
+            errors = validate_public_shell(root)
+            self.assertEqual([], errors)
+            
+    def test_negative_presence_missing_checkbox(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp_dir:
+            root = self.copy_shell(tmp_dir)
+            path = root / "index.html"
+            html = path.read_text(encoding="utf-8")
+            html = html.replace('id="filter-presence-geographic"', 'id="filter-presence-broken"')
+            path.write_text(html, encoding="utf-8")
+            errors = validate_public_shell(root)
+            self.assertIn('presence options wrapper must contain both presence checkboxes', errors)
+
+    def test_negative_missing_target_block(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp_dir:
+            root = self.copy_shell(tmp_dir)
+            path = root / "assets/ipad-layout.css"
+            css = path.read_text(encoding="utf-8")
+            # Break the discovery block
+            css = css.replace('.layer-discovery', '.layer-broken')
+            path.write_text(css, encoding="utf-8")
+            errors = validate_public_shell(root)
+            self.assertIn('tablet landscape breakpoint must override .layer-discovery geometry', errors)
+
+    def test_foreign_media_query_before_target(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp_dir:
+            root = self.copy_shell(tmp_dir)
+            path = root / "assets/ipad-layout.css"
+            css = path.read_text(encoding="utf-8")
+            # An unrelated portrait media query emitted before the tablet landscape target.
+            foreign = "@media (orientation: portrait) and (max-width: 30rem) {\n  .layer-discovery { top: 0; }\n}\n\n"
+            path.write_text(foreign + css, encoding="utf-8")
+            errors = validate_public_shell(root)
+            self.assertEqual([], errors)
+
+    def test_similarly_named_selector_is_not_matched(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp_dir:
+            root = self.copy_shell(tmp_dir)
+            path = root / "assets/ipad-layout.css"
+            css = path.read_text(encoding="utf-8")
+            # Rename the real target to a near-miss so the boundary-aware scanner rejects it.
+            css = css.replace('.layer-discovery {', '.layer-discovery-alt {')
+            path.write_text(css, encoding="utf-8")
+            errors = validate_public_shell(root)
+            self.assertIn('tablet landscape breakpoint must override .layer-discovery geometry', errors)
+
+    def test_braces_inside_css_comment_and_string_are_ignored(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp_dir:
+            root = self.copy_shell(tmp_dir)
+            path = root / "assets/ipad-layout.css"
+            css = path.read_text(encoding="utf-8")
+            decoy = '/* pseudo braces } { should not confuse the scanner */\n.decoy-content::before { content: "} { }"; }\n\n'
+            path.write_text(decoy + css, encoding="utf-8")
+            errors = validate_public_shell(root)
+            self.assertEqual([], errors)
+
+    def test_stylesheet_links_tolerate_rel_tokens_and_casing(self) -> None:
+        html = (
+            '<link href="./index.css" REL="Stylesheet preload">'
+            "<link rel='preload' href='./ignored.css'>"
+            '<link rel="stylesheet" href="./assets/ipad-layout.css" />'
+        )
+        self.assertEqual(["./index.css", "./assets/ipad-layout.css"], parse_stylesheet_links(html))
+
+    def test_presence_group_tolerates_nested_divs(self) -> None:
+        html = (
+            '<fieldset class="filter-presence-group"><legend>Presence</legend>'
+            '<div class="filter-presence-options"><div class="row">'
+            '<label><input type="checkbox" id="filter-presence-geographic"> Vor Ort</label></div>'
+            '<div class="row"><label><input type="CHECKBOX" id="filter-presence-digital"> Digital</label></div>'
+            "</div></fieldset>"
+        )
+        presence = parse_presence_group(html)
+        self.assertEqual(1, presence.fieldset_count)
+        self.assertEqual(1, presence.options_wrapper_count)
+        self.assertTrue(presence.has_legend)
+        self.assertTrue(presence.has_both_checkboxes)
+
+    def test_presence_group_missing_legend_fails(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp_dir:
+            root = self.copy_shell(tmp_dir)
+            path = root / "index.html"
+            html = path.read_text(encoding="utf-8")
+            html = html.replace("<legend>Präsenz</legend>", "")
+            path.write_text(html, encoding="utf-8")
+            errors = validate_public_shell(root)
+            self.assertIn("presence fieldset must expose a legend", errors)
+
+    def test_presence_group_duplicate_fieldset_fails(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp_dir:
+            root = self.copy_shell(tmp_dir)
+            path = root / "index.html"
+            html = path.read_text(encoding="utf-8")
+            duplicate = (
+                '<fieldset class="filter-presence-group"><legend>Präsenz</legend>'
+                '<div class="filter-presence-options">'
+                '<label><input type="checkbox" id="filter-presence-geographic"> Vor Ort</label>'
+                '<label><input type="checkbox" id="filter-presence-digital"> Digital</label>'
+                "</div></fieldset>"
+            )
+            html = html.replace("</main>", duplicate + "</main>", 1)
+            path.write_text(html, encoding="utf-8")
+            errors = validate_public_shell(root)
+            self.assertIn("index.html must define exactly one presence fieldset", errors)
+
+    def test_target_media_block_found_by_feature_tests(self) -> None:
+        css = (ROOT / "assets/ipad-layout.css").read_text(encoding="utf-8")
+        match = find_media_block(
+            css,
+            ("orientation: landscape", "min-width: 48rem", "max-width: 90rem", "max-height: 65rem"),
+        )
+        self.assertIsNotNone(match)
+        self.assertIn(".layer-discovery", match[1])
+        # A near-miss target selector must not match the real rule.
+        self.assertIsNone(find_css_block(match[1], ".layer-discovery-alt"))
+        self.assertIsNotNone(find_css_block(match[1], ".layer-discovery"))
+
+    def test_top_level_semicolon_prelude_does_not_bleed_into_target(self) -> None:
+        # A leading @charset/@import prelude ends at its semicolon and must not be
+        # absorbed into the following media query's selector.
+        css = (
+            '@charset "utf-8";\n'
+            '@import url("./tokens.css");\n'
+            "@media (orientation: landscape) and (min-width: 48rem) "
+            "and (max-width: 90rem) and (max-height: 65rem) {\n"
+            "  .layer-discovery { left: 50%; }\n"
+            "}\n"
+        )
+        match = find_media_block(
+            css,
+            ("orientation: landscape", "min-width: 48rem", "max-width: 90rem", "max-height: 65rem"),
+        )
+        self.assertIsNotNone(match)
+        self.assertIsNotNone(find_css_block(match[1], ".layer-discovery"))
+
+    def test_overbroad_descendant_selector_is_not_an_exact_target(self) -> None:
+        # A descendant selector must not be accepted as the exact target selector.
+        css = ".surface .layer-discovery { left: 50%; }\n"
+        self.assertIsNone(find_css_block(css, ".layer-discovery"))
+        self.assertIsNotNone(find_css_block(css, ".surface .layer-discovery"))
 
 
 if __name__ == "__main__":

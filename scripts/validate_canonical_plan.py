@@ -132,6 +132,7 @@ EXPECTED_SCRIPT_FILES = {
     "render_proposal_page.py",
     "smoke_proposal_browser.mjs",
     "smoke_pages_live.py",
+    "static_surface_parser.py",
     "validate_canonical_plan.py",
     "validate_proposal_path.py",
     "validate_contracts.py",

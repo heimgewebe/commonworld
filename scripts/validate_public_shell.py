@@ -7,6 +7,25 @@ import re
 import sys
 from pathlib import Path
 
+try:
+    from scripts.static_surface_parser import (
+        find_css_block,
+        find_media_block,
+        parse_presence_group,
+        parse_stylesheet_links,
+    )
+except ModuleNotFoundError as exc:  # direct script execution puts the scripts dir on sys.path
+    # Only fall back when the 'scripts' package itself is unreachable; a missing
+    # dependency inside static_surface_parser must stay visible.
+    if exc.name not in {"scripts", "scripts.static_surface_parser"}:
+        raise
+    from static_surface_parser import (
+        find_css_block,
+        find_media_block,
+        parse_presence_group,
+        parse_stylesheet_links,
+    )
+
 ROOT = Path(__file__).resolve().parents[1]
 
 REQUIRED_HTML = (
@@ -165,54 +184,60 @@ def _validate_ipad_landscape_wiring(root: Path, html: str) -> list[str]:
     ipad_css = ipad_css_path.read_text(encoding='utf-8')
     render_source = render_source_path.read_text(encoding='utf-8') if render_source_path.is_file() else ''
 
-    index_link = '<link rel="stylesheet" href="./index.css" />'
-    ipad_link = '<link rel="stylesheet" href="./assets/ipad-layout.css" />'
-    if index_link not in html or ipad_link not in html:
+    index_link = './index.css'
+    ipad_link = './assets/ipad-layout.css'
+
+    links = parse_stylesheet_links(html)
+    if index_link not in links or ipad_link not in links:
         errors.append('index.html must load index.css and assets/ipad-layout.css')
-    elif html.index(index_link) >= html.index(ipad_link):
+    elif links.index(index_link) >= links.index(ipad_link):
         errors.append('index.html must load assets/ipad-layout.css after index.css')
-    if ipad_link not in render_source:
+
+    render_links = parse_stylesheet_links(render_source)
+    if ipad_link not in render_links:
         errors.append('render_public_shell.py must emit the assets/ipad-layout.css stylesheet link')
 
-    presence_match = re.search(
-        r'<fieldset class="filter-presence-group"><legend>[^<]*</legend>'
-        r'<div class="filter-presence-options">(.*?)</div></fieldset>',
-        html,
-    )
-    if presence_match is None:
-        errors.append('presence fieldset must wrap its options in .filter-presence-options')
-    else:
-        wrapped = presence_match.group(1)
-        if 'id="filter-presence-geographic"' not in wrapped or 'id="filter-presence-digital"' not in wrapped:
-            errors.append('presence options wrapper must contain both presence checkboxes')
-    if 'class="filter-presence-options"' not in render_source:
-        errors.append('render_public_shell.py must emit the .filter-presence-options wrapper')
+    presence = parse_presence_group(html)
+    if presence.fieldset_count != 1:
+        errors.append('index.html must define exactly one presence fieldset')
+    if presence.options_wrapper_count != 1:
+        errors.append('presence fieldset must wrap its options in exactly one .filter-presence-options')
+    if not presence.has_legend:
+        errors.append('presence fieldset must expose a legend')
+    if not presence.has_both_checkboxes:
+        errors.append('presence options wrapper must contain both presence checkboxes')
+
+    render_presence = parse_presence_group(render_source)
+    if render_presence.options_wrapper_count != 1 or not render_presence.has_both_checkboxes:
+        errors.append('render_public_shell.py must emit the .filter-presence-options wrapper with both presence checkboxes')
 
     if '.intent-filter-grid > .filter-presence-group' not in ipad_css or '.filter-presence-options' not in ipad_css:
         errors.append('assets/ipad-layout.css must style the presence group and its options')
-    options_block_match = re.search(r'\.filter-presence-options > label\s*\{([^}]*)\}', ipad_css)
-    if options_block_match is None or not re.search(r'min-height:\s*var\(--minimum-touch-target', options_block_match.group(1)):
+
+    options_block_match = find_css_block(
+        ipad_css,
+        '.intent-filter-grid > .filter-presence-group > .filter-presence-options > label',
+    )
+    if options_block_match is None or not re.search(r'min-height:\s*var\(--minimum-touch-target', options_block_match[1]):
         errors.append('assets/ipad-layout.css presence options must define a compact, touch-safe label style')
 
-    breakpoint_match = re.search(
-        r'@media([^{]*)\{(.*)\}\s*$',
-        ipad_css,
-        re.DOTALL,
+    target_media_tokens = (
+        'orientation: landscape',
+        'min-width: 48rem',
+        'max-width: 90rem',
+        'max-height: 65rem',
     )
+    breakpoint_match = find_media_block(ipad_css, target_media_tokens)
     if breakpoint_match is None:
-        errors.append('assets/ipad-layout.css must define exactly one trailing breakpoint')
+        errors.append('assets/ipad-layout.css must define the tablet landscape breakpoint media query (orientation: landscape, min-width: 48rem, max-width: 90rem, max-height: 65rem) covering up to 1366x1024 while excluding very large viewports')
         return errors
-        
-    media_query = breakpoint_match.group(1)
-    if 'orientation: landscape' not in media_query or 'min-width: 48rem' not in media_query or 'max-width: 90rem' not in media_query or 'max-height: 65rem' not in media_query:
-        errors.append('assets/ipad-layout.css media query must explicitly cover up to 1366x1024 through max-width:90rem and max-height:65rem, excluding very large viewports')
-    media_block = breakpoint_match.group(2)
+    media_block = breakpoint_match[1]
 
-    discovery_match = re.search(r'\.layer-discovery\s*\{([^}]*)\}', media_block)
+    discovery_match = find_css_block(media_block, '.layer-discovery')
     if discovery_match is None:
         errors.append('tablet landscape breakpoint must override .layer-discovery geometry')
     else:
-        block = discovery_match.group(1)
+        block = discovery_match[1]
         if 'left: 50%' not in block or 'translateX(-50%)' not in block:
             errors.append('tablet landscape breakpoint must center .layer-discovery horizontally')
         if 'right: max' in block:
@@ -220,14 +245,12 @@ def _validate_ipad_landscape_wiring(root: Path, html: str) -> list[str]:
 
     if '.layer-track-deck' not in media_block:
         errors.append('tablet landscape breakpoint must reduce .layer-track-deck padding')
-    focused_lane_match = re.search(
-        r'\.globe-stage\[data-focused-path\] \.digital-lane\.is-focused\s*\{([^}]*)\}',
-        media_block,
-    )
+        
+    focused_lane_match = find_css_block(media_block, '.globe-stage[data-focused-path] .digital-lane.is-focused')
     if focused_lane_match is None:
         errors.append('tablet landscape breakpoint must reduce the focused lane min-height')
     else:
-        block = focused_lane_match.group(1)
+        block = focused_lane_match[1]
         if 'min-height' not in block:
             errors.append('tablet landscape breakpoint focused lane rule must define min-height')
         if 'min(44vh, 24rem)' in block:

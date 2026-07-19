@@ -1,7 +1,7 @@
 /* iPad landscape layout corrections layered after index.css. Do not duplicate index.css rules here. */
 
-/* Diese Normalisierung gilt absichtlich auf allen Viewports, weil sie Browser-default fieldset spacing entfernt.
-   Touchziele bleiben mindestens 44px. Auf schmalen Phones darf flex-wrap wirken; ab Tabletbreite sollen Vor Ort und Digital nebeneinander bleiben. */
+/* This normalization applies intentionally on all viewports because it removes the browser-default fieldset spacing.
+   Touch targets stay at least 44px. On narrow phones flex-wrap may take effect; from tablet width up the geographic and digital options should stay side by side. */
 .intent-filter-grid > .filter-presence-group {
   min-width: 0;
   margin: 0;
@@ -48,7 +48,8 @@
   flex: none;
 }
 
-/* Mittelgroße Querformat-Viewports einschließlich großer iPads (z.B. 1024x768, 1180x820, 1194x834, 1366x1024) */
+/* Medium-sized landscape viewports including large iPads (e.g. 1024x768, 1180x820, 1194x834, 1366x1024).
+   We use CSS viewport geometry instead of device identity, User-Agent or DPR to target tablets and medium desktops. */
 @media (orientation: landscape) and (min-width: 48rem) and (max-width: 90rem) and (max-height: 65rem) {
   .layer-discovery {
     top: calc(max(0.9rem, env(safe-area-inset-top)) + 3.35rem);

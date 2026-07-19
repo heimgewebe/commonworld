@@ -10,6 +10,15 @@ from urllib.parse import urlparse
 
 from jsonschema import Draft202012Validator, FormatChecker
 
+try:
+    from scripts.static_surface_parser import find_css_block, parse_stylesheet_links
+except ModuleNotFoundError as exc:  # direct script execution puts the scripts dir on sys.path
+    # Only fall back when the 'scripts' package itself is unreachable; a missing
+    # dependency inside static_surface_parser must stay visible.
+    if exc.name not in {"scripts", "scripts.static_surface_parser"}:
+        raise
+    from static_surface_parser import find_css_block, parse_stylesheet_links
+
 ROOT = Path(__file__).resolve().parents[1]
 REJECTION_CODES = {
     "not_a_commons", "insufficient_sources", "duplicate", "private_location_risk",
@@ -93,17 +102,20 @@ def validate(root: Path = ROOT) -> list[str]:
         errors.append("missing proposal surface: assets/proposal.css")
     else:
         proposal_css = proposal_css_path.read_text(encoding="utf-8")
-        index_link = '<link rel="stylesheet" href="./index.css" />'
-        proposal_link = '<link rel="stylesheet" href="./assets/proposal.css" />'
-        if index_link not in page or proposal_link not in page:
+        index_link = "./index.css"
+        proposal_link = "./assets/proposal.css"
+
+        links = parse_stylesheet_links(page)
+        if index_link not in links or proposal_link not in links:
             errors.append("propose.html must load index.css and assets/proposal.css")
-        elif page.index(index_link) >= page.index(proposal_link):
+        elif links.index(index_link) >= links.index(proposal_link):
             errors.append("propose.html must load assets/proposal.css after index.css")
-        body_match = re.search(r"body\.proposal-page\s*\{([^}]*)\}", proposal_css)
+
+        body_match = find_css_block(proposal_css, "body.proposal-page")
         if body_match is None:
             errors.append("assets/proposal.css must style body.proposal-page")
         else:
-            block = body_match.group(1)
+            block = body_match[1]
             if "overflow-y: auto" not in block:
                 errors.append("assets/proposal.css body.proposal-page must set overflow-y: auto")
             if "overflow-x: hidden" not in block:
