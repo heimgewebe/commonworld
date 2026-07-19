@@ -47,14 +47,45 @@ class PublicCatalogTests(unittest.TestCase):
 
         self.assertIn("public catalog project debian.json must contain a JSON object", errors)
 
-    def test_unknown_activity_status_is_allowed_for_documented_but_not_currently_verified_practice(self) -> None:
+    def test_unknown_activity_status_is_allowed_with_disclosure_and_priority_review(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp_dir:
+            root = self.copy_public_catalog(tmp_dir)
+            def mark_unknown(record: dict) -> None:
+                record["activity"].update({"status": "unknown"})
+                record["curation"].update({
+                    "next_review_at": "2026-08-12",
+                    "notes": "Aktueller Betriebszustand nicht zeitnah verifiziert; priorisierte Nachprüfung.",
+                })
+            self.mutate_project(root, "debian", mark_unknown)
+
+            errors = validate_public_catalog(root)
+
+        self.assertFalse(any("unknown activity" in error for error in errors))
+        self.assertFalse(any("must have a publishable observed activity state" in error for error in errors))
+
+    def test_unknown_activity_requires_explicit_public_disclosure(self) -> None:
         with tempfile.TemporaryDirectory() as tmp_dir:
             root = self.copy_public_catalog(tmp_dir)
             self.mutate_project(root, "debian", lambda record: record["activity"].update({"status": "unknown"}))
 
             errors = validate_public_catalog(root)
 
-        self.assertFalse(any("must have a publishable observed activity state" in error for error in errors))
+        self.assertTrue(any("unknown activity must disclose" in error for error in errors))
+
+    def test_unknown_activity_requires_review_within_45_days(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp_dir:
+            root = self.copy_public_catalog(tmp_dir)
+            def mark_unknown(record: dict) -> None:
+                record["activity"].update({"status": "unknown"})
+                record["curation"].update({
+                    "next_review_at": "2026-10-12",
+                    "notes": "Aktueller Betriebszustand nicht zeitnah verifiziert; priorisierte Nachprüfung.",
+                })
+            self.mutate_project(root, "debian", mark_unknown)
+
+            errors = validate_public_catalog(root)
+
+        self.assertTrue(any("unknown activity must be scheduled for review within 45 days" in error for error in errors))
 
     def test_invalid_activity_status_is_rejected(self) -> None:
         with tempfile.TemporaryDirectory() as tmp_dir:

@@ -14,6 +14,17 @@
     "no_javascript_catalog": true,
     "machine_surface": "static_read_only"
   },
+  "activity_status_policy": {
+    "public_states": [
+      "active",
+      "paused",
+      "seasonal",
+      "unknown"
+    ],
+    "unknown_semantics": "documented_practice_current_operation_not_timely_verified",
+    "unknown_review_max_days": 45,
+    "unknown_public_notice_required": true
+  },
   "digital_ring_taxonomy": {
     "contract": "contracts/commonworld/digital-ring-taxonomy.contract.json",
     "version": "digital-ring-bundles-v1",

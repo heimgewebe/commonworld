@@ -10,6 +10,7 @@ from scripts.validate_current_state import ROOT, validate_current_state
 class CurrentStateTests(unittest.TestCase):
     def copy_current_state(self, directory: str) -> Path:
         target = Path(directory)
+        shutil.copytree(ROOT / "catalog", target / "catalog")
         paths = (
             "contracts/commonworld/current-state.contract.json",
             "contracts/commonworld/public-maplibre-vertical-slice.contract.json",
@@ -17,8 +18,6 @@ class CurrentStateTests(unittest.TestCase):
             "contracts/commonworld/production-delivery-provider.contract.json",
             "contracts/commonworld/renderer-selection.contract.json",
             "contracts/commonworld/digital-sphere.contract.json",
-            "catalog/catalog.json",
-            "catalog/projects/cltb-le-nid.json",
             "docs/research/public-maplibre-vertical-slice-v1.result.json",
             "LICENSE",
             "LICENSE-DATA.md",
@@ -32,6 +31,37 @@ class CurrentStateTests(unittest.TestCase):
 
     def test_current_state_validates(self) -> None:
         self.assertEqual([], validate_current_state(ROOT))
+
+    def test_dynamic_digital_count_has_precise_error_without_static_mismatch(self) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            root = self.copy_current_state(directory)
+            path = root / "contracts/commonworld/current-state.contract.json"
+            value = json.loads(path.read_text(encoding="utf-8"))
+            value["digital_ring_taxonomy"]["current_digital_identity_count"] += 1
+            path.write_text(json.dumps(value), encoding="utf-8")
+            errors = validate_current_state(root)
+        self.assertIn("current catalog digital identity count does not match current state", errors)
+        self.assertFalse(any("static truth mismatch" in error for error in errors))
+
+    def test_digital_ring_state_rejects_unknown_fields(self) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            root = self.copy_current_state(directory)
+            path = root / "contracts/commonworld/current-state.contract.json"
+            value = json.loads(path.read_text(encoding="utf-8"))
+            value["digital_ring_taxonomy"]["legacy_count"] = 25
+            path.write_text(json.dumps(value), encoding="utf-8")
+            errors = validate_current_state(root)
+        self.assertIn("current digital ring taxonomy field inventory mismatch", errors)
+
+    def test_activity_status_policy_is_current_operational_truth(self) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            root = self.copy_current_state(directory)
+            path = root / "contracts/commonworld/current-state.contract.json"
+            value = json.loads(path.read_text(encoding="utf-8"))
+            value["activity_status_policy"]["unknown_review_max_days"] = 90
+            path.write_text(json.dumps(value), encoding="utf-8")
+            errors = validate_current_state(root)
+        self.assertIn("current public activity-status policy mismatch", errors)
 
     def test_rejects_regression_to_unapproved_production(self) -> None:
         with tempfile.TemporaryDirectory() as directory:
