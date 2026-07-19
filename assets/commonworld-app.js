@@ -118,6 +118,9 @@ const elements = {
   focusCuration: document.querySelector('#focus-curation'),
 };
 
+const FOCUS_OVERLAP_SELECTOR = 'a[href], button:not([disabled]), input:not([disabled]):not([type="hidden"]), select:not([disabled]), textarea:not([disabled]), summary, [role="button"], [tabindex]:not([tabindex="-1"])';
+const FOCUS_OVERLAP_MIN_RATIO = 0.5;
+
 const runtime = {
   map: null,
   records: [],
@@ -161,6 +164,9 @@ const runtime = {
   historyTimer: null,
   searchTimer: null,
   focusReturnTarget: null,
+  focusOverlapTargets: new Set(),
+  focusOverlapFrame: null,
+  focusOverlapMutationObserver: null,
   activeOverlay: null,
   settingsReturnTarget: null,
   discoveryReturnTarget: null,
@@ -791,6 +797,161 @@ function selectedProjectRecord() {
   return runtime.state.project ? runtime.recordsById.get(runtime.state.project) ?? null : null;
 }
 
+function layerJourneyActive() {
+  return runtime.state.surface === 'globe'
+    && (runtime.state.view === 'layers' || runtime.viewPhase !== 'overview');
+}
+
+function layerJourneyInteractivityRequired(target) {
+  return layerJourneyActive() && (target === elements.layerToggle || target === elements.orientationBar);
+}
+
+function restoreFocusOverlapAttribute(target, name, datasetName) {
+  const previous = target.dataset[datasetName];
+  if (previous === undefined) return;
+  if (previous === '__missing__') target.removeAttribute(name);
+  else target.setAttribute(name, previous);
+  delete target.dataset[datasetName];
+}
+
+function releaseFocusOverlapTarget(target) {
+  if (target?.dataset?.focusOverlapInert !== 'true') return false;
+  if (target instanceof HTMLElement) {
+    target.toggleAttribute('inert', layerJourneyInteractivityRequired(target));
+  } else if (target === elements.sphereEdge && layerJourneyActive()) {
+    target.setAttribute('tabindex', '-1');
+    target.setAttribute('aria-hidden', 'true');
+    target.style.pointerEvents = 'none';
+    return true;
+  } else if (target === elements.sphereEdge && target.dataset.focusOverlapInheritedLayerJourney === 'true') {
+    target.style.pointerEvents = target.dataset.focusOverlapPreviousPointerEvents ?? '';
+    delete target.dataset.focusOverlapPreviousTabindex;
+    delete target.dataset.focusOverlapPreviousAriaHidden;
+    delete target.dataset.focusOverlapPreviousPointerEvents;
+    delete target.dataset.focusOverlapInheritedLayerJourney;
+  } else {
+    restoreFocusOverlapAttribute(target, 'tabindex', 'focusOverlapPreviousTabindex');
+    restoreFocusOverlapAttribute(target, 'aria-hidden', 'focusOverlapPreviousAriaHidden');
+    target.style.pointerEvents = target.dataset.focusOverlapPreviousPointerEvents ?? '';
+    delete target.dataset.focusOverlapPreviousPointerEvents;
+  }
+  delete target.dataset.focusOverlapInert;
+  return false;
+}
+
+function clearFocusOverlapInteractivity({ cancelFrame = true } = {}) {
+  if (cancelFrame && runtime.focusOverlapFrame !== null) {
+    window.cancelAnimationFrame(runtime.focusOverlapFrame);
+    runtime.focusOverlapFrame = null;
+  }
+  for (const target of [...runtime.focusOverlapTargets]) {
+    if (!releaseFocusOverlapTarget(target)) runtime.focusOverlapTargets.delete(target);
+  }
+}
+
+function visibleViewportRect(element) {
+  if (!(element instanceof Element) || element.closest('[hidden]')) return null;
+  const style = window.getComputedStyle(element);
+  if (style.display === 'none' || style.visibility === 'hidden' || Number(style.opacity) === 0) return null;
+  const rect = element.getBoundingClientRect();
+  const left = Math.max(0, rect.left);
+  const top = Math.max(0, rect.top);
+  const right = Math.min(window.innerWidth, rect.right);
+  const bottom = Math.min(window.innerHeight, rect.bottom);
+  if (right <= left || bottom <= top) return null;
+  return { left, top, right, bottom, area: (right - left) * (bottom - top) };
+}
+
+function coveredRatio(targetRect, coverRect) {
+  const width = Math.max(0, Math.min(targetRect.right, coverRect.right) - Math.max(targetRect.left, coverRect.left));
+  const height = Math.max(0, Math.min(targetRect.bottom, coverRect.bottom) - Math.max(targetRect.top, coverRect.top));
+  return targetRect.area > 0 ? (width * height) / targetRect.area : 0;
+}
+
+function focusOverlapContainer(target) {
+  return target.closest('.maplibregl-ctrl-attrib, .maplibregl-ctrl-bottom-right, .orientation-bar') ?? target;
+}
+
+function blockFocusOverlapTarget(target) {
+  target.dataset.focusOverlapInert = 'true';
+  if (target instanceof HTMLElement) {
+    target.setAttribute('inert', '');
+    return;
+  }
+  if (target === elements.sphereEdge && layerJourneyActive()) {
+    target.dataset.focusOverlapInheritedLayerJourney = 'true';
+  }
+  target.dataset.focusOverlapPreviousTabindex = target.getAttribute('tabindex') ?? '__missing__';
+  target.dataset.focusOverlapPreviousAriaHidden = target.getAttribute('aria-hidden') ?? '__missing__';
+  target.dataset.focusOverlapPreviousPointerEvents = target.style.pointerEvents;
+  target.setAttribute('tabindex', '-1');
+  target.setAttribute('aria-hidden', 'true');
+  target.style.pointerEvents = 'none';
+}
+
+function applyFocusOverlapInteractivity() {
+  runtime.focusOverlapFrame = null;
+  const focusVisible = !elements.focus.hidden && runtime.activeOverlay === null && Boolean(selectedProjectRecord());
+  if (!focusVisible) {
+    clearFocusOverlapInteractivity({ cancelFrame: false });
+    return;
+  }
+  const focusRect = visibleViewportRect(elements.focus);
+  if (!focusRect) {
+    clearFocusOverlapInteractivity({ cancelFrame: false });
+    return;
+  }
+  const desiredTargets = new Set();
+  elements.globeSurface.querySelectorAll(FOCUS_OVERLAP_SELECTOR).forEach((target) => {
+    if (elements.focus.contains(target)) return;
+    const inertAncestor = target.closest('[inert]');
+    if (inertAncestor && inertAncestor.dataset.focusOverlapInert !== 'true') return;
+    const targetRect = visibleViewportRect(target);
+    if (!targetRect || coveredRatio(targetRect, focusRect) < FOCUS_OVERLAP_MIN_RATIO) return;
+    desiredTargets.add(focusOverlapContainer(target));
+  });
+  const normalizedTargets = new Set([...desiredTargets].filter((target) => (
+    ![...desiredTargets].some((candidate) => candidate !== target && candidate.contains(target))
+  )));
+  for (const target of normalizedTargets) {
+    if (runtime.focusOverlapTargets.has(target)) continue;
+    const inertAncestor = target.closest('[inert]');
+    if (inertAncestor && inertAncestor.dataset.focusOverlapInert !== 'true') continue;
+    blockFocusOverlapTarget(target);
+    runtime.focusOverlapTargets.add(target);
+  }
+  for (const target of [...runtime.focusOverlapTargets]) {
+    if (normalizedTargets.has(target)) continue;
+    if (!releaseFocusOverlapTarget(target)) runtime.focusOverlapTargets.delete(target);
+  }
+}
+
+function scheduleFocusOverlapInteractivity(focusVisible = !elements.focus.hidden) {
+  if (runtime.focusOverlapFrame !== null) {
+    window.cancelAnimationFrame(runtime.focusOverlapFrame);
+    runtime.focusOverlapFrame = null;
+  }
+  if (!focusVisible) {
+    clearFocusOverlapInteractivity({ cancelFrame: false });
+    return;
+  }
+  runtime.focusOverlapFrame = window.requestAnimationFrame(applyFocusOverlapInteractivity);
+}
+
+function installFocusOverlapTracking() {
+  if (!('MutationObserver' in window)) return;
+  runtime.focusOverlapMutationObserver?.disconnect();
+  runtime.focusOverlapMutationObserver = new MutationObserver(() => {
+    if (!elements.focus.hidden && runtime.activeOverlay === null) scheduleFocusOverlapInteractivity(true);
+  });
+  runtime.focusOverlapMutationObserver.observe(elements.globeSurface, {
+    subtree: true,
+    childList: true,
+    attributes: true,
+    attributeFilter: ['class', 'hidden', 'open'],
+  });
+}
+
 function syncPrimaryOverlayInteractivity({ discoveryOpen, settingsOpen, focusVisible }) {
   elements.skipLink.toggleAttribute('inert', settingsOpen);
   elements.topbar.toggleAttribute('inert', settingsOpen);
@@ -798,6 +959,7 @@ function syncPrimaryOverlayInteractivity({ discoveryOpen, settingsOpen, focusVis
   elements.globeSurface.toggleAttribute('inert', settingsOpen || discoveryOpen);
   elements.textView.toggleAttribute('inert', settingsOpen || discoveryOpen);
   elements.focus.toggleAttribute('inert', settingsOpen || discoveryOpen || !focusVisible);
+  scheduleFocusOverlapInteractivity(focusVisible && !settingsOpen && !discoveryOpen);
 }
 
 function renderPrimaryOverlayState(record = selectedProjectRecord()) {
@@ -1624,6 +1786,7 @@ function showLayerState() {
     elements.orientationBar.removeAttribute('aria-hidden');
     elements.layerPanel.removeAttribute('data-closing');
   }
+  scheduleFocusOverlapInteractivity();
 }
 
 const LAYER_RETURN_FOCUS_RETRY_DELAYS_MS = [0, 50, 150, 400];
@@ -1656,6 +1819,12 @@ function finishViewTransition(phase, { restoreFocus = false } = {}) {
   runtime.layerPanelReady = false;
   setViewPhase(phase);
   showLayerState();
+  const focusOverlapActive = !elements.focus.hidden
+    && runtime.activeOverlay === null
+    && Boolean(selectedProjectRecord());
+  if (phase === 'overview' && !focusOverlapActive) {
+    clearFocusOverlapInteractivity({ cancelFrame: false });
+  }
   if (phase === 'layers') {
     window.requestAnimationFrame(() => {
       if (runtime.viewPhase !== 'layers' || runtime.state.view !== 'layers') return;
@@ -2045,6 +2214,7 @@ function wireControls() {
   window.addEventListener('popstate', () => applyDeepLink(location.search));
   window.addEventListener('resize', () => {
     if (!runtime.orientationResizeObserver) updateOrientationBarClearance();
+    scheduleFocusOverlapInteractivity();
     if (runtime.resizeObserver) return;
     runtime.stageSize = null;
     runtime.map?.resize();
@@ -2142,6 +2312,7 @@ function createMap() {
   });
   runtime.map.on('idle', () => {
     if (runtime.mapReady && !runtime.map.getSource(PUBLIC_MAP_SOURCE_ID)) ensurePublicMapLayers();
+    scheduleFocusOverlapInteractivity();
     if (runtime.mapReady && elements.stage.dataset.visualReady !== 'true') {
       updateSphereGeometry();
       elements.stage.dataset.visualReady = 'true';
@@ -2155,6 +2326,7 @@ function createMap() {
     else applyCamera(runtime.state.camera, { instant: true });
     updateSphereGeometry();
     updateSemanticLocationLine();
+    scheduleFocusOverlapInteractivity();
     refreshStatus();
     window.setTimeout(() => {
       if (!runtime.mapReady || elements.stage.dataset.visualReady === 'true') return;
@@ -2216,6 +2388,7 @@ async function boot() {
     renderLayerStack();
     wireControls();
     installOrientationBarClearanceTracking();
+    installFocusOverlapTracking();
     if (navigator.webdriver && ['127.0.0.1', 'localhost'].includes(location.hostname)) {
       window.__commonworldInstallSyntheticRecordsForTest = (records) => {
         installRecords(validateRecords(records));
