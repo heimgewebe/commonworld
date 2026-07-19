@@ -87,6 +87,33 @@ def validate(root: Path = ROOT) -> list[str]:
     script = (root / "assets/commonworld-proposal.js").read_text(encoding="utf-8")
     for marker in ("nicht automatisch veröffentlicht", "öffentliches GitHub-Issue", "keine private Adresse", "proposal-catalog-index", "proposal-download"):
         if marker.casefold() not in page.casefold(): errors.append(f"proposal page missing marker: {marker}")
+
+    proposal_css_path = root / "assets/proposal.css"
+    if not proposal_css_path.is_file():
+        errors.append("missing proposal surface: assets/proposal.css")
+    else:
+        proposal_css = proposal_css_path.read_text(encoding="utf-8")
+        index_link = '<link rel="stylesheet" href="./index.css" />'
+        proposal_link = '<link rel="stylesheet" href="./assets/proposal.css" />'
+        if index_link not in page or proposal_link not in page:
+            errors.append("propose.html must load index.css and assets/proposal.css")
+        elif page.index(index_link) >= page.index(proposal_link):
+            errors.append("propose.html must load assets/proposal.css after index.css")
+        body_match = re.search(r"body\.proposal-page\s*\{([^}]*)\}", proposal_css)
+        if body_match is None:
+            errors.append("assets/proposal.css must style body.proposal-page")
+        else:
+            block = body_match.group(1)
+            if "overflow-y: auto" not in block:
+                errors.append("assets/proposal.css body.proposal-page must set overflow-y: auto")
+            if "overflow-x: hidden" not in block:
+                errors.append("assets/proposal.css body.proposal-page must set overflow-x: hidden")
+            if "-webkit-overflow-scrolling: touch" not in block:
+                errors.append("assets/proposal.css body.proposal-page must set -webkit-overflow-scrolling: touch")
+            if not re.search(r"overscroll-behavior(-y)?:\s*contain", block):
+                errors.append("assets/proposal.css body.proposal-page must set overscroll-behavior(-y): contain")
+            if "overflow: hidden" in block or "overflow-y: hidden" in block:
+                errors.append("assets/proposal.css body.proposal-page must not reintroduce overflow-y: hidden")
     for forbidden in ("api_key", "client_secret", "authorization: bearer", "innerhtml", "document.cookie"):
         if forbidden in script.casefold(): errors.append(f"proposal client contains forbidden material: {forbidden}")
     if "javascript" not in script.casefold() or "containsSensitiveLocation" not in script: errors.append("proposal client lacks explicit dangerous URL or sensitive-location checks")
