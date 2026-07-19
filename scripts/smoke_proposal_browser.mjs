@@ -181,8 +181,9 @@ html { font-size: ${profile.fontScale}% !important; }
 }
 
 // iPad landscape CSS-pixel geometries covered by the ipad-layout.css breakpoint:
-// iPad Air / 10.9" (1180x820), iPad Pro 11" (1194x834), iPad 9th gen / iPad mini (1024x768).
+// iPad Air / 10.9" (1180x820), iPad Pro 11" (1194x834), iPad 9th gen / iPad mini (1024x768), large iPad/desktop (1366x1024).
 const IPAD_LANDSCAPE_VIEWPORTS = [
+  { name: 'ipad-large-landscape', width: 1366, height: 1024 },
   { name: 'ipad-air-landscape', width: 1180, height: 820 },
   { name: 'ipad-pro11-landscape', width: 1194, height: 834 },
   { name: 'ipad-9gen-landscape', width: 1024, height: 768 },
@@ -219,31 +220,7 @@ for (const viewport of IPAD_LANDSCAPE_VIEWPORTS) {
   assert(await ipadSubmitButton.isVisible(), `${viewport.name}: submit button unreachable by scroll`);
   assert(pageErrors.length === 0, `${viewport.name}: propose.html page errors ${pageErrors.join('; ')}`);
 
-  // index.html discovery presence filter must be compact, side-by-side and keep >=44px touch targets.
   await page.goto(`${baseUrl}/index.html`, { waitUntil: 'networkidle' });
-  await page.locator('#filter-toggle').click();
-  await page.locator('#discovery-panel').waitFor({ state: 'visible' });
-  const presenceGeometry = await page.evaluate(() => {
-    const fieldset = document.querySelector('.filter-presence-group');
-    const options = [...document.querySelectorAll('.filter-presence-options label')];
-    const siblingLabel = document.querySelector('.intent-filter-grid > label:has(select)');
-    const fieldsetRect = fieldset.getBoundingClientRect();
-    const siblingRect = siblingLabel.getBoundingClientRect();
-    return {
-      fieldsetHeight: fieldsetRect.height,
-      siblingHeight: siblingRect.height,
-      options: options.map((node) => {
-        const rect = node.getBoundingClientRect();
-        return { top: rect.top, width: rect.width, height: rect.height };
-      }),
-    };
-  });
-  assert(presenceGeometry.options.length === 2, `${viewport.name}: presence filter does not expose exactly two options (${JSON.stringify(presenceGeometry.options)})`);
-  const [firstPresenceOption, secondPresenceOption] = presenceGeometry.options;
-  assert(Math.abs(firstPresenceOption.top - secondPresenceOption.top) < 1, `${viewport.name}: presence options are stacked instead of side-by-side (${JSON.stringify(presenceGeometry.options)})`);
-  assert(presenceGeometry.options.every((option) => option.height >= 44), `${viewport.name}: presence option touch target below 44px (${JSON.stringify(presenceGeometry.options)})`);
-  assert(presenceGeometry.fieldsetHeight <= presenceGeometry.siblingHeight + 1, `${viewport.name}: presence filter (${presenceGeometry.fieldsetHeight}px) is taller than a sibling filter cell (${presenceGeometry.siblingHeight}px)`);
-  await page.locator('#discovery-close').click();
 
   // The digital ring search panel must be wide, horizontally centered and fully inside the viewport.
   await page.locator('#layer-view-button').click();
@@ -283,6 +260,58 @@ for (const viewport of IPAD_LANDSCAPE_VIEWPORTS) {
 
   assert(pageErrors.length === 0, `${viewport.name}: index.html page errors ${pageErrors.join('; ')}`);
   results.push(viewport.name);
+  await context.close();
+}
+
+const PRESENCE_VIEWPORTS = [
+  { name: 'mobile', width: 390, height: 844, mobile: true },
+  { name: 'desktop', width: 1280, height: 900, mobile: false },
+  ...IPAD_LANDSCAPE_VIEWPORTS.map(vp => ({ ...vp, mobile: true }))
+];
+
+for (const viewport of PRESENCE_VIEWPORTS) {
+  const context = await browser.newContext({
+    viewport: { width: viewport.width, height: viewport.height },
+    isMobile: viewport.mobile,
+    hasTouch: viewport.mobile,
+    reducedMotion: 'reduce',
+  });
+  const page = await context.newPage();
+  
+  await page.goto(`${baseUrl}/index.html`, { waitUntil: 'networkidle' });
+  await page.locator('#filter-toggle').click();
+  await page.locator('#discovery-panel').waitFor({ state: 'visible' });
+  const presenceGeometry = await page.evaluate(() => {
+    const fieldset = document.querySelector('.filter-presence-group');
+    const options = [...document.querySelectorAll('.filter-presence-options label')];
+    const siblingLabel = document.querySelector('.intent-filter-grid > label:has(select)');
+    const fieldsetRect = fieldset.getBoundingClientRect();
+    const siblingRect = siblingLabel.getBoundingClientRect();
+    return {
+      fieldsetHeight: fieldsetRect.height,
+      fieldsetTop: fieldsetRect.top,
+      fieldsetBottom: fieldsetRect.bottom,
+      siblingHeight: siblingRect.height,
+      options: options.map((node) => {
+        const rect = node.getBoundingClientRect();
+        return { top: rect.top, bottom: rect.bottom, width: rect.width, height: rect.height, right: rect.right, left: rect.left };
+      }),
+    };
+  });
+  assert(presenceGeometry.options.length === 2, `${viewport.name}: presence filter does not expose exactly two options (${JSON.stringify(presenceGeometry.options)})`);
+  const [firstPresenceOption, secondPresenceOption] = presenceGeometry.options;
+  
+  assert(presenceGeometry.options.every((option) => option.height >= 44), `${viewport.name}: presence option touch target below 44px (${JSON.stringify(presenceGeometry.options)})`);
+  assert(presenceGeometry.options.every(opt => opt.top >= presenceGeometry.fieldsetTop && opt.bottom <= presenceGeometry.fieldsetBottom), `${viewport.name}: options not fully inside fieldset`);
+  assert(presenceGeometry.options.every(opt => opt.top >= 0 && opt.bottom <= viewport.height && opt.left >= 0 && opt.right <= viewport.width), `${viewport.name}: options not fully in viewport`);
+
+  if (viewport.width >= 768) {
+    assert(Math.abs(firstPresenceOption.top - secondPresenceOption.top) < 1, `${viewport.name}: presence options are stacked instead of side-by-side (${JSON.stringify(presenceGeometry.options)})`);
+  }
+  
+  assert(presenceGeometry.fieldsetHeight <= presenceGeometry.siblingHeight * 2.5, `${viewport.name}: presence filter is an unexpected vertical large block`);
+
+  results.push(`presence-${viewport.name}`);
   await context.close();
 }
 

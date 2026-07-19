@@ -1,6 +1,8 @@
 /* iPad landscape layout corrections layered after index.css. Do not duplicate index.css rules here. */
 
-.filter-presence-group {
+/* Diese Normalisierung gilt absichtlich auf allen Viewports, weil sie Browser-default fieldset spacing entfernt.
+   Touchziele bleiben mindestens 44px. Auf schmalen Phones darf flex-wrap wirken; ab Tabletbreite sollen Vor Ort und Digital nebeneinander bleiben. */
+.intent-filter-grid > .filter-presence-group {
   min-width: 0;
   margin: 0;
   padding: 0;
@@ -10,20 +12,20 @@
   font-weight: 700;
 }
 
-.filter-presence-group > legend {
+.intent-filter-grid > .filter-presence-group > legend {
   padding: 0;
   margin: 0 0 0.35rem;
   font: inherit;
   color: inherit;
 }
 
-.filter-presence-options {
+.intent-filter-grid > .filter-presence-group > .filter-presence-options {
   display: flex;
   flex-wrap: wrap;
   gap: 0.5rem;
 }
 
-.filter-presence-options label {
+.intent-filter-grid > .filter-presence-group > .filter-presence-options > label {
   display: inline-flex;
   align-items: center;
   gap: 0.4rem;
@@ -38,7 +40,7 @@
   white-space: nowrap;
 }
 
-.filter-presence-options input[type="checkbox"] {
+.intent-filter-grid > .filter-presence-group > .filter-presence-options > label > input[type="checkbox"] {
   width: 1.1rem;
   height: 1.1rem;
   min-width: 1.1rem;
@@ -46,7 +48,8 @@
   flex: none;
 }
 
-@media (orientation: landscape) and (min-width: 48rem) and (max-height: 53rem) {
+/* Mittelgroße Querformat-Viewports einschließlich großer iPads (z.B. 1024x768, 1180x820, 1194x834, 1366x1024) */
+@media (orientation: landscape) and (min-width: 48rem) and (max-width: 90rem) and (max-height: 65rem) {
   .layer-discovery {
     top: calc(max(0.9rem, env(safe-area-inset-top)) + 3.35rem);
     right: auto;
