@@ -1,0 +1,107 @@
+{
+  "schema_version": 4,
+  "id": "tribunal-aguas-valencia",
+  "title": "Tribunal de las Aguas de Valencia",
+  "summary": "Ein von Bewässerungsgemeinschaften getragenes Wassergericht in Valencia, das Nutzungsstreitigkeiten nach überlieferter Praxis öffentlich und regelmäßig verhandelt.",
+  "themes": [
+    "water",
+    "irrigation",
+    "agriculture",
+    "commons-governance",
+    "customary-law",
+    "cultural-heritage"
+  ],
+  "actions": [
+    "visit"
+  ],
+  "presence": {
+    "geographic": [
+      {
+        "id": "tribunal-aguas-valencia-approximate-area",
+        "mode": "approximate",
+        "label": "Valencia, Spanien",
+        "geometry": {
+          "type": "Point",
+          "coordinates": [
+            -0.375,
+            39.4667
+          ]
+        },
+        "uncertainty_meters_min": 20000,
+        "privacy_note": "Der Punkt bezeichnet nur den öffentlich registrierten groben Stadtbezug und bildet weder Bewässerungsflächen noch Versammlungsorte exakt ab.",
+        "source_ids": [
+          "source-tribunal-official",
+          "source-valencia-wikidata"
+        ]
+      }
+    ],
+    "digital": {
+      "available": false,
+      "source_ids": [
+        "source-tribunal-official"
+      ]
+    }
+  },
+  "activity": {
+    "status": "active",
+    "observed_at": "2026-07-19",
+    "source_ids": [
+      "source-tribunal-official"
+    ],
+    "note": "Die offizielle Seite veröffentlicht die fortlaufenden wöchentlichen öffentlichen Sitzungen des Wassergerichts."
+  },
+  "provenance": {
+    "sources": [
+      {
+        "id": "source-tribunal-official",
+        "type": "official-source",
+        "label": "Water Court of the Plain of Valencia",
+        "url": "https://tribunaldelasaguas.org/en/",
+        "retrieved_at": "2026-07-19",
+        "note": "Offizielle Projektquelle für Beschreibung, Aktivität und den verknüpften direkten Zugang."
+      },
+      {
+        "id": "source-tribunal-visits",
+        "type": "official-source",
+        "label": "Visits to the Tribunal",
+        "url": "https://tribunaldelasaguas.org/en/visits-to-the-tribunal/",
+        "retrieved_at": "2026-07-19",
+        "note": "Offizielle Projektquelle für Beschreibung, Aktivität und den verknüpften direkten Zugang."
+      },
+      {
+        "id": "source-valencia-wikidata",
+        "type": "public-registry",
+        "label": "Valencia",
+        "url": "https://www.wikidata.org/wiki/Q8818",
+        "retrieved_at": "2026-07-19",
+        "note": "CC0-Registereintrag für den groben öffentlich belegten Ortsbezug; nur zur ungefähren Orientierung verwendet."
+      }
+    ],
+    "uncertainty_note": "Die Punktgeometrie ist nur eine grobe Orientierung für den öffentlich belegten Wirkungsraum und keine exakte Standort- oder Flächenangabe."
+  },
+  "curation": {
+    "state": "listed",
+    "reviewed_by": "Commonworld editorial review",
+    "reviewed_at": "2026-07-19",
+    "next_review_at": "2026-10-19",
+    "notes": "Aufgenommen als belegte gemeinschaftliche Praxis mit eigenständigem Beitrag zur thematischen und regionalen Katalogbalance."
+  },
+  "links": [
+    {
+      "type": "homepage",
+      "label": "Tribunal de las Aguas de Valencia – offizielle Quelle",
+      "url": "https://tribunaldelasaguas.org/en/"
+    },
+    {
+      "type": "visit",
+      "label": "Öffentliche Sitzung besuchen",
+      "url": "https://tribunaldelasaguas.org/en/visits-to-the-tribunal/",
+      "source_ids": [
+        "source-tribunal-visits"
+      ]
+    }
+  ],
+  "handoff": {
+    "enabled": false
+  }
+}

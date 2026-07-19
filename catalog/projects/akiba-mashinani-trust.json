@@ -1,0 +1,99 @@
+{
+  "schema_version": 4,
+  "id": "akiba-mashinani-trust",
+  "title": "Akiba Mashinani Trust",
+  "summary": "Ein von Siedlungsgemeinschaften getragenes Finanzierungsinstrument in Kenia, das Spargruppen, Darlehen sowie gemeinschaftlich organisierte Vorhaben für Wohnraum, Sanitärversorgung und grundlegende Infrastruktur unterstützt.",
+  "themes": [
+    "community-finance",
+    "housing",
+    "community-land",
+    "savings-groups",
+    "basic-services",
+    "commons-governance"
+  ],
+  "actions": [
+    "learn"
+  ],
+  "presence": {
+    "geographic": [
+      {
+        "id": "akiba-mashinani-trust-approximate-area",
+        "mode": "approximate",
+        "label": "Kenia",
+        "geometry": {
+          "type": "Point",
+          "coordinates": [
+            38,
+            0.1
+          ]
+        },
+        "uncertainty_meters_min": 900000,
+        "privacy_note": "Der Punkt bezeichnet ausschließlich den öffentlich registrierten groben Landesbezug; Standorte einzelner Spargruppen oder Siedlungen werden nicht dargestellt.",
+        "source_ids": [
+          "source-akiba-official",
+          "source-kenya-wikidata"
+        ]
+      }
+    ],
+    "digital": {
+      "available": false,
+      "source_ids": [
+        "source-akiba-official"
+      ]
+    }
+  },
+  "activity": {
+    "status": "active",
+    "observed_at": "2026-07-19",
+    "source_ids": [
+      "source-akiba-official"
+    ],
+    "note": "Die offizielle Projektseite beschreibt die gegenwärtige Arbeit mit Sparnetzwerken und Gemeinschaftsvorhaben in mehreren kenianischen Counties."
+  },
+  "provenance": {
+    "sources": [
+      {
+        "id": "source-akiba-official",
+        "type": "official-source",
+        "label": "Akiba Mashinani Trust — Muungano wa Wanavijiji",
+        "url": "https://www.muungano.net/akibamashinanitrust",
+        "retrieved_at": "2026-07-19",
+        "note": "Offizielle Projektquelle für Beschreibung, Aktivität und den verknüpften direkten Zugang."
+      },
+      {
+        "id": "source-kenya-wikidata",
+        "type": "public-registry",
+        "label": "Kenya",
+        "url": "https://www.wikidata.org/wiki/Q114",
+        "retrieved_at": "2026-07-19",
+        "note": "CC0-Registereintrag für den groben öffentlich belegten Ortsbezug; nur zur ungefähren Orientierung verwendet."
+      }
+    ],
+    "uncertainty_note": "Die Punktgeometrie ist nur eine grobe Orientierung für den öffentlich belegten Wirkungsraum und keine exakte Standort- oder Flächenangabe."
+  },
+  "curation": {
+    "state": "listed",
+    "reviewed_by": "Commonworld editorial review",
+    "reviewed_at": "2026-07-19",
+    "next_review_at": "2026-10-19",
+    "notes": "Aufgenommen als belegte gemeinschaftliche Praxis mit eigenständigem Beitrag zur thematischen und regionalen Katalogbalance."
+  },
+  "links": [
+    {
+      "type": "homepage",
+      "label": "Akiba Mashinani Trust – offizielle Quelle",
+      "url": "https://www.muungano.net/akibamashinanitrust"
+    },
+    {
+      "type": "learn",
+      "label": "Projektansatz kennenlernen",
+      "url": "https://www.muungano.net/akibamashinanitrust",
+      "source_ids": [
+        "source-akiba-official"
+      ]
+    }
+  ],
+  "handoff": {
+    "enabled": false
+  }
+}

@@ -145,7 +145,7 @@ def validate_presence_axes(root: Path = ROOT) -> list[str]:
     }
     if (
         current_state.get("schema_version") != 2
-        or current_state.get("current_as_of") != "2026-07-18"
+        or current_state.get("current_as_of") != "2026-07-19"
         or current_state.get("licensing") != expected_licensing
     ):
         errors.append("T006 canonical current-state licensing does not preserve the ODbL geometry exception")

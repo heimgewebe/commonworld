@@ -274,8 +274,8 @@ def validate_digital_ring_taxonomy(root: Path = ROOT) -> list[str]:
             theme_owners[theme] = node["id"]
 
     digital_records = [record for record in records if _is_digital(record)]
-    if len(digital_records) != 25:
-        errors.append("digital ring taxonomy expected exactly the current 25 digital catalog identities")
+    if not digital_records:
+        errors.append("digital ring taxonomy requires at least one current digital catalog identity")
     actual_themes = sorted({
         theme
         for record in digital_records

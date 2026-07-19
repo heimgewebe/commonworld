@@ -1,0 +1,99 @@
+{
+  "schema_version": 4,
+  "id": "bali-subak-system",
+  "title": "Subak-System auf Bali",
+  "summary": "Ein von lokalen Bewässerungsgemeinschaften getragenes System, das Wasser über Tempel, Kanäle und Reisfelder verteilt und die landwirtschaftlich genutzten Landschaften gemeinschaftlich erhält.",
+  "themes": [
+    "water",
+    "irrigation",
+    "agriculture",
+    "food",
+    "commons-governance",
+    "cultural-heritage"
+  ],
+  "actions": [
+    "learn"
+  ],
+  "presence": {
+    "geographic": [
+      {
+        "id": "bali-subak-landscapes",
+        "mode": "approximate",
+        "label": "Subak-Landschaften auf Bali, Indonesien",
+        "geometry": {
+          "type": "Point",
+          "coordinates": [
+            115.07194,
+            -8.35639
+          ]
+        },
+        "uncertainty_meters_min": 100000,
+        "privacy_note": "Der Punkt bezeichnet nur den groben, öffentlich registrierten Wirkungsraum auf Bali und weder einzelne Tempel noch Felder oder Wohnorte.",
+        "source_ids": [
+          "subak-unesco",
+          "bali-wikidata"
+        ]
+      }
+    ],
+    "digital": {
+      "available": false,
+      "source_ids": [
+        "subak-unesco"
+      ]
+    }
+  },
+  "activity": {
+    "status": "active",
+    "observed_at": "2026-07-19",
+    "source_ids": [
+      "subak-unesco"
+    ],
+    "note": "Der UNESCO-Registereintrag beschreibt die Landschaften als lebendige, kontinuierlich genutzte und gemeinschaftlich erhaltene Bewässerungspraxis."
+  },
+  "provenance": {
+    "sources": [
+      {
+        "id": "subak-unesco",
+        "type": "public-registry",
+        "label": "UNESCO World Heritage Centre – Subak System",
+        "url": "https://whc.unesco.org/en/list/1194",
+        "retrieved_at": "2026-07-19",
+        "note": "Öffentlicher UNESCO-Registereintrag zur demokratischen Bewässerungsverwaltung, den fünf Landschaften und ihrer fortdauernden gemeinschaftlichen Nutzung."
+      },
+      {
+        "id": "bali-wikidata",
+        "type": "public-registry",
+        "label": "Wikidata – Bali Island",
+        "url": "https://www.wikidata.org/wiki/Q4648",
+        "retrieved_at": "2026-07-19",
+        "note": "CC0-Registereintrag mit einer groben Koordinate der Insel Bali; nur als Mittelpunkt des weiten Wirkungsraums verwendet."
+      }
+    ],
+    "uncertainty_note": "Die Punktgeometrie ist keine Abgrenzung der seriellen UNESCO-Flächen, sondern nur eine grobe Orientierung für den inselweiten Wirkungsraum."
+  },
+  "curation": {
+    "state": "listed",
+    "reviewed_by": "Commonworld editorial review",
+    "reviewed_at": "2026-07-19",
+    "next_review_at": "2026-10-19",
+    "notes": "Aufgenommen als fortbestehende gemeinschaftliche Wasser- und Landwirtschaftspraxis, nicht bloß als Kulturerbe-Ort."
+  },
+  "links": [
+    {
+      "type": "homepage",
+      "label": "Subak-System im UNESCO-Register",
+      "url": "https://whc.unesco.org/en/list/1194"
+    },
+    {
+      "type": "learn",
+      "label": "Gemeinschaftliche Bewässerung auf Bali kennenlernen",
+      "url": "https://whc.unesco.org/en/list/1194",
+      "source_ids": [
+        "subak-unesco"
+      ]
+    }
+  ],
+  "handoff": {
+    "enabled": false
+  }
+}

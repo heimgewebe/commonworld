@@ -1,0 +1,98 @@
+{
+  "schema_version": 4,
+  "id": "cano-martin-pena-clt",
+  "title": "Caño Martín Peña Community Land Trust",
+  "summary": "Ein von acht Gemeinschaften in San Juan getragener Community Land Trust, der öffentlichen Boden kollektiv hält, während Bewohner ihre Häuser besitzen und dauerhaft vor Verdrängung geschützt werden.",
+  "themes": [
+    "housing",
+    "community-land",
+    "neighbourhood",
+    "environmental-justice",
+    "commons-governance"
+  ],
+  "actions": [
+    "learn"
+  ],
+  "presence": {
+    "geographic": [
+      {
+        "id": "cano-martin-pena-san-juan",
+        "mode": "approximate",
+        "label": "Acht Gemeinschaften am Caño Martín Peña, San Juan, Puerto Rico",
+        "geometry": {
+          "type": "Point",
+          "coordinates": [
+            -66.064,
+            18.406
+          ]
+        },
+        "uncertainty_meters_min": 25000,
+        "privacy_note": "Der Punkt zeigt nur San Juan als groben öffentlichen Bezugsraum und keine Häuser, Parzellen oder Bewohnerstandorte.",
+        "source_ids": [
+          "cano-enlace-g8",
+          "san-juan-wikidata"
+        ]
+      }
+    ],
+    "digital": {
+      "available": false,
+      "source_ids": [
+        "cano-enlace-g8"
+      ]
+    }
+  },
+  "activity": {
+    "status": "unknown",
+    "observed_at": "2026-07-19",
+    "source_ids": [
+      "cano-enlace-g8"
+    ],
+    "note": "Die offizielle Seite dokumentiert die fortbestehende Struktur und Arbeitsweise; ein zeitnah datierter Beleg für den Betriebszustand im Juli 2026 fehlt, daher wird der aktuelle Status nicht behauptet."
+  },
+  "provenance": {
+    "sources": [
+      {
+        "id": "cano-enlace-g8",
+        "type": "official-source",
+        "label": "G-8 / ENLACE – Caño Martín Peña",
+        "url": "https://cano3punto7.org/index-english.html",
+        "retrieved_at": "2026-07-19",
+        "note": "Offizielle Projektseite der beteiligten Gemeinschafts- und ENLACE-Strukturen mit Beschreibung des Community Land Trust und des kollektiven Bodeneigentums."
+      },
+      {
+        "id": "san-juan-wikidata",
+        "type": "public-registry",
+        "label": "Wikidata – San Juan",
+        "url": "https://www.wikidata.org/wiki/Q41211",
+        "retrieved_at": "2026-07-19",
+        "note": "CC0-Registereintrag mit grober Stadtkoordinate; bewusst keine Parzellen- oder Hausgeometrie."
+      }
+    ],
+    "uncertainty_note": "Die tatsächlichen Land-Trust-Flächen werden nicht kartiert; die Darstellung bleibt auf Stadtebene."
+  },
+  "curation": {
+    "state": "listed",
+    "reviewed_by": "Commonworld editorial review",
+    "reviewed_at": "2026-07-19",
+    "next_review_at": "2026-10-19",
+    "notes": "Der Land Trust ist eine konkrete gemeinschaftliche Bodeninstitution; die übergeordnete ENLACE-Initiative wird nicht als eigene Identität katalogisiert."
+  },
+  "links": [
+    {
+      "type": "homepage",
+      "label": "Caño Martín Peña – offizielle Projektseite",
+      "url": "https://cano3punto7.org/index-english.html"
+    },
+    {
+      "type": "learn",
+      "label": "Den Community Land Trust kennenlernen",
+      "url": "https://cano3punto7.org/index-english.html",
+      "source_ids": [
+        "cano-enlace-g8"
+      ]
+    }
+  ],
+  "handoff": {
+    "enabled": false
+  }
+}

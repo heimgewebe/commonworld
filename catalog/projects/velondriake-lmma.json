@@ -1,0 +1,98 @@
+{
+  "schema_version": 4,
+  "id": "velondriake-lmma",
+  "title": "Velondriake Locally Managed Marine Area",
+  "summary": "Ein von Küstengemeinschaften rund um Andavadoaka gemeinsam verwaltetes Meeresgebiet, das nachhaltige Fischerei, Monitoring, Schutzflächen, Riffe und Mangroven verbindet.",
+  "themes": [
+    "marine-conservation",
+    "fisheries",
+    "biodiversity",
+    "mangroves",
+    "commons-governance"
+  ],
+  "actions": [
+    "learn"
+  ],
+  "presence": {
+    "geographic": [
+      {
+        "id": "velondriake-andavadoaka-region",
+        "mode": "approximate",
+        "label": "Küstenraum um Andavadoaka, Südwest-Madagaskar",
+        "geometry": {
+          "type": "Point",
+          "coordinates": [
+            43.238,
+            -22.0736
+          ]
+        },
+        "uncertainty_meters_min": 70000,
+        "privacy_note": "Der Punkt bezeichnet den öffentlich beschriebenen Küstenraum nur grob und keine einzelnen Dörfer, Fischgründe oder Schutzgrenzen.",
+        "source_ids": [
+          "velondriake-blue-ventures",
+          "andavadoaka-wikidata"
+        ]
+      }
+    ],
+    "digital": {
+      "available": false,
+      "source_ids": [
+        "velondriake-blue-ventures"
+      ]
+    }
+  },
+  "activity": {
+    "status": "unknown",
+    "observed_at": "2026-07-19",
+    "source_ids": [
+      "velondriake-blue-ventures"
+    ],
+    "note": "Die Partnerseite dokumentiert die gemeinschaftlich verwaltete Meereszone, liefert aber keinen hinreichend zeitnahen Aktivitätsbeleg für Juli 2026; der aktuelle Betriebszustand bleibt deshalb unbekannt."
+  },
+  "provenance": {
+    "sources": [
+      {
+        "id": "velondriake-blue-ventures",
+        "type": "official-source",
+        "label": "Blue Ventures – Velondriake",
+        "url": "https://blog.blueventures.org/en/locations/madagascar/velondriake-madagascar/",
+        "retrieved_at": "2026-07-19",
+        "note": "Offizielle Seite des langjährigen Projektpartners mit Beschreibung der ersten lokal verwalteten Meereszone Madagaskars und der gemeinschaftlichen Fischerei- und Naturschutzarbeit."
+      },
+      {
+        "id": "andavadoaka-wikidata",
+        "type": "public-registry",
+        "label": "Wikidata – Andavadoaka",
+        "url": "https://www.wikidata.org/wiki/Q4753631",
+        "retrieved_at": "2026-07-19",
+        "note": "CC0-Registereintrag für das öffentlich benannte Bezugsdorf; die Koordinate dient nur als grobe Mitte des wesentlich größeren Küstenraums."
+      }
+    ],
+    "uncertainty_note": "Die Geometrie bildet weder die Meereszone noch Nutzungs- oder Schutzgrenzen ab."
+  },
+  "curation": {
+    "state": "listed",
+    "reviewed_by": "Commonworld editorial review",
+    "reviewed_at": "2026-07-19",
+    "next_review_at": "2026-10-19",
+    "notes": "Die Identität ist die konkrete gemeinschaftlich verwaltete Meereszone, nicht der unterstützende internationale Projektpartner; nicht quellengedeckte Seegras- und Regelbehauptungen wurden ausgeschlossen."
+  },
+  "links": [
+    {
+      "type": "homepage",
+      "label": "Velondriake – offizielle Projektseite",
+      "url": "https://blog.blueventures.org/en/locations/madagascar/velondriake-madagascar/"
+    },
+    {
+      "type": "learn",
+      "label": "Velondriakes lokale Meeresverwaltung kennenlernen",
+      "url": "https://blog.blueventures.org/en/locations/madagascar/velondriake-madagascar/",
+      "source_ids": [
+        "velondriake-blue-ventures"
+      ]
+    }
+  ],
+  "handoff": {
+    "enabled": false
+  }
+}

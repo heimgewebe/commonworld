@@ -1,0 +1,98 @@
+{
+  "schema_version": 4,
+  "id": "ekuri-community-forest",
+  "title": "Ekuri Community Forest",
+  "summary": "Ein von den Gemeinden Old und New Ekuri gemeinschaftlich besessener und verwalteter Wald in Nigerias Cross River State, dessen Regeln Naturschutz, nachhaltige Nutzung und lokale Infrastruktur verbinden.",
+  "themes": [
+    "forest",
+    "biodiversity",
+    "community-land",
+    "commons-governance",
+    "restoration"
+  ],
+  "actions": [
+    "learn"
+  ],
+  "presence": {
+    "geographic": [
+      {
+        "id": "ekuri-cross-river-region",
+        "mode": "approximate",
+        "label": "Ekuri-Gemeinden, Cross River State, Nigeria",
+        "geometry": {
+          "type": "Point",
+          "coordinates": [
+            8.5,
+            5.75
+          ]
+        },
+        "uncertainty_meters_min": 250000,
+        "privacy_note": "Der Punkt zeigt nur Cross River State als öffentlich belegten groben Wirkungsraum und keine Waldgrenze, Siedlung oder Ressourcennutzung.",
+        "source_ids": [
+          "ekuri-icca-registry",
+          "cross-river-wikidata"
+        ]
+      }
+    ],
+    "digital": {
+      "available": false,
+      "source_ids": [
+        "ekuri-icca-registry"
+      ]
+    }
+  },
+  "activity": {
+    "status": "unknown",
+    "observed_at": "2026-07-19",
+    "source_ids": [
+      "ekuri-icca-registry"
+    ],
+    "note": "Der Registereintrag dokumentiert die gemeinschaftliche Waldverwaltung, ist aber kein zeitnaher Aktivitätsbeleg für Juli 2026; der aktuelle Betriebszustand bleibt deshalb unbekannt."
+  },
+  "provenance": {
+    "sources": [
+      {
+        "id": "ekuri-icca-registry",
+        "type": "public-registry",
+        "label": "ICCA Registry – Ekuri ICCA",
+        "url": "https://www.iccaregistry.org/en/explore/nigeria/ekuri-icca",
+        "retrieved_at": "2026-07-19",
+        "note": "Öffentlicher Registereintrag zu Eigentum, Fläche, Verwaltung und fortgesetzter gemeinschaftlicher Erhaltung des Ekuri-Waldes."
+      },
+      {
+        "id": "cross-river-wikidata",
+        "type": "public-registry",
+        "label": "Wikidata – Cross River State",
+        "url": "https://www.wikidata.org/wiki/Q739676",
+        "retrieved_at": "2026-07-19",
+        "note": "CC0-Registereintrag mit grober Koordinate des Bundesstaats; nicht als Lage oder Grenze des Gemeinschaftswaldes zu lesen."
+      }
+    ],
+    "uncertainty_note": "Mangels verifizierter öffentlicher Projektgeometrie wird nur der sehr grobe Bundesstaat-Bezug dargestellt."
+  },
+  "curation": {
+    "state": "listed",
+    "reviewed_by": "Commonworld editorial review",
+    "reviewed_at": "2026-07-19",
+    "next_review_at": "2026-10-19",
+    "notes": "Aufgenommen ist die konkrete gemeinschaftliche Waldverwaltung, nicht ein Naturschutz-Dachverband."
+  },
+  "links": [
+    {
+      "type": "homepage",
+      "label": "Ekuri Community Forest im ICCA-Register",
+      "url": "https://www.iccaregistry.org/en/explore/nigeria/ekuri-icca"
+    },
+    {
+      "type": "learn",
+      "label": "Die gemeinschaftliche Waldverwaltung von Ekuri kennenlernen",
+      "url": "https://www.iccaregistry.org/en/explore/nigeria/ekuri-icca",
+      "source_ids": [
+        "ekuri-icca-registry"
+      ]
+    }
+  ],
+  "handoff": {
+    "enabled": false
+  }
+}

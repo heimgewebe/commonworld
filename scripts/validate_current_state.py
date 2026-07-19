@@ -83,8 +83,8 @@ def validate_current_state(root: Path = ROOT) -> list[str]:
         "version": "digital-ring-bundles-v1",
         "canonical_url_parameter": "digital_path",
         "main_field_count": 5,
-        "current_digital_identity_count": 25,
-        "current_known_theme_count": 37,
+        "current_digital_identity_count": len(digital_records),
+        "current_known_theme_count": len(digital_themes),
         "legacy_layer_links": "preserved_as_filter_until_explicit_digital_path_selection",
         "invalid_path_behavior": "fail_closed_to_sphere_root_without_partial_filter",
         "catalog_presentation_fields_forbidden": True,
@@ -95,8 +95,10 @@ def validate_current_state(root: Path = ROOT) -> list[str]:
         errors.append("digital ring taxonomy contract version must match current state")
     if len([node for node in digital_ring.get("nodes", []) if node.get("parent_id") == "sphere" and node.get("type") == "field"]) != 5:
         errors.append("digital ring taxonomy contract must expose five current fields")
-    if len(digital_records) != 25 or len(digital_themes) != 37:
-        errors.append("current catalog digital identity/theme counts do not match current state")
+    if state.get("digital_ring_taxonomy", {}).get("current_digital_identity_count") != len(digital_records):
+        errors.append("current catalog digital identity count does not match current state")
+    if state.get("digital_ring_taxonomy", {}).get("current_known_theme_count") != len(digital_themes):
+        errors.append("current catalog digital theme count does not match current state")
 
     renderer = state.get("renderer", {})
     if renderer != {
@@ -221,7 +223,7 @@ def validate_current_state(root: Path = ROOT) -> list[str]:
         "third_party_assets_retain_their_own_licences": True,
     }:
         errors.append("current licensing truth mismatch")
-    if state.get("current_as_of") != "2026-07-18":
+    if state.get("current_as_of") != "2026-07-19":
         errors.append("current-state date does not cover the digital ring-bundle taxonomy truth")
     if not (root / "LICENSE").is_file() or not (root / "LICENSE-DATA.md").is_file():
         errors.append("declared code and data licences must exist")

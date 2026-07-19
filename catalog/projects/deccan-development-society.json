@@ -1,0 +1,127 @@
+{
+  "schema_version": 4,
+  "id": "deccan-development-society",
+  "title": "Deccan Development Society Sanghams",
+  "summary": "Ein Verbund dörflicher Vereinigungen von Dalit- und indigenen Kleinbäuerinnen in Telangana, die Saatgut, Trockenlandbau, Ernährung, Märkte, Medien und traditionelles Wissen gemeinschaftlich organisieren.",
+  "themes": [
+    "seeds",
+    "agriculture",
+    "food",
+    "agrobiodiversity",
+    "indigenous-knowledge",
+    "commons-governance"
+  ],
+  "actions": [
+    "learn",
+    "use"
+  ],
+  "presence": {
+    "geographic": [
+      {
+        "id": "dds-telangana-region",
+        "mode": "approximate",
+        "label": "Sanghams in Telangana, Indien",
+        "geometry": {
+          "type": "Point",
+          "coordinates": [
+            79.3,
+            17.9
+          ]
+        },
+        "uncertainty_meters_min": 500000,
+        "privacy_note": "Der Punkt bezeichnet nur die öffentlich genannte Region und keine Dörfer, Felder, Saatgutlager oder Wohnorte einzelner Mitglieder.",
+        "source_ids": [
+          "dds-home",
+          "telangana-wikidata"
+        ]
+      }
+    ],
+    "digital": {
+      "available": true,
+      "reach": "regional",
+      "label": "Gemeinschaftsmedien und öffentliches Videoarchiv der Sanghams",
+      "source_ids": [
+        "dds-community-media",
+        "dds-video-channel"
+      ]
+    }
+  },
+  "activity": {
+    "status": "active",
+    "observed_at": "2026-07-19",
+    "source_ids": [
+      "dds-home"
+    ],
+    "note": "Die offizielle Seite war am Prüftag erreichbar und veröffentlichte Aktivitäten der Frauen-Sanghams aus April und Juni 2026."
+  },
+  "provenance": {
+    "sources": [
+      {
+        "id": "dds-home",
+        "type": "official-source",
+        "label": "Deccan Development Society – offizielle Seite",
+        "url": "https://www.ddsindia.org/",
+        "retrieved_at": "2026-07-19",
+        "note": "Offizielle Beschreibung der dörflichen Frauen-Sanghams, ihrer Saatgut- und Ernährungsautonomie sowie aktueller Aktivitäten 2026."
+      },
+      {
+        "id": "telangana-wikidata",
+        "type": "public-registry",
+        "label": "Wikidata – Telangana",
+        "url": "https://www.wikidata.org/wiki/Q677037",
+        "retrieved_at": "2026-07-19",
+        "note": "CC0-Registereintrag mit grober Koordinate des indischen Bundesstaats Telangana; nur als weiträumiger Orientierungsanker verwendet."
+      },
+      {
+        "id": "dds-community-media",
+        "type": "official-source",
+        "label": "Deccan Development Society – Community Media",
+        "url": "https://www.ddsindia.org/community-media/",
+        "retrieved_at": "2026-07-19",
+        "note": "Offizielle Beschreibung der von Frauen aus den Sanghams getragenen gemeinschaftlichen Medienpraxis."
+      },
+      {
+        "id": "dds-video-channel",
+        "type": "official-source",
+        "label": "Deccan Development Society – Video Channel",
+        "url": "https://www.ddsindia.org/video-channel/",
+        "retrieved_at": "2026-07-19",
+        "note": "Öffentlich zugängliches Videoarchiv der gemeinschaftlichen Medienarbeit."
+      }
+    ],
+    "uncertainty_note": "Die Darstellung bleibt absichtlich auf Bundesstaatsebene und bildet keine einzelnen Sanghams, Dörfer, Felder oder Saatgutlager ab."
+  },
+  "curation": {
+    "state": "listed",
+    "reviewed_by": "Commonworld editorial review",
+    "reviewed_at": "2026-07-19",
+    "next_review_at": "2026-10-19",
+    "notes": "Ausgewählt wurde die konkrete, fortdauernde Sangham-Praxis und nicht lediglich die unterstützende NGO als Organisation."
+  },
+  "links": [
+    {
+      "type": "homepage",
+      "label": "Deccan Development Society – offizielle Seite",
+      "url": "https://www.ddsindia.org/"
+    },
+    {
+      "type": "learn",
+      "label": "Die Saatgut- und Ernährungsarbeit der Sanghams kennenlernen",
+      "url": "https://www.ddsindia.org/",
+      "source_ids": [
+        "dds-home"
+      ]
+    },
+    {
+      "type": "use",
+      "label": "Gemeinschaftsmedien ansehen",
+      "url": "https://www.ddsindia.org/video-channel/",
+      "source_ids": [
+        "dds-video-channel"
+      ]
+    }
+  ],
+  "handoff": {
+    "enabled": false
+  }
+}
