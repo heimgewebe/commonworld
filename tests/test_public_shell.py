@@ -15,6 +15,10 @@ class PublicShellTests(unittest.TestCase):
         shutil.copy2(ROOT / "method.html", root / "method.html")
         (root / "assets").mkdir()
         shutil.copy2(ROOT / "assets/commonworld-bootstrap-catalog.mjs", root / "assets/commonworld-bootstrap-catalog.mjs")
+        shutil.copy2(ROOT / "assets/ipad-layout.css", root / "assets/ipad-layout.css")
+        (root / "scripts").mkdir()
+        if (ROOT / "scripts/render_public_shell.py").exists():
+            shutil.copy2(ROOT / "scripts/render_public_shell.py", root / "scripts/render_public_shell.py")
         return root
 
     def test_public_shell_validates(self) -> None:
@@ -77,6 +81,73 @@ class PublicShellTests(unittest.TestCase):
             path.write_text(path.read_text(encoding="utf-8").replace("keine vollständige Weltstatistik", "vollständig"), encoding="utf-8")
             errors = validate_public_shell(root)
         self.assertTrue(any("keine vollständige Weltstatistik" in error for error in errors))
+
+    def test_presence_html_tolerates_formatting(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp_dir:
+            root = self.copy_shell(tmp_dir)
+            path = root / "index.html"
+            html = path.read_text(encoding="utf-8")
+            
+            # Replace nicely formatted presence group with a messy one
+            import re
+            html = re.sub(
+                r'<fieldset class="filter-presence-group">.*?</fieldset>',
+                '''<fieldset 
+                  data-extra="true" 
+                  class="extra filter-presence-group another"
+                >
+                  <legend>Presence</legend>
+                  <div class="filter-presence-options" style="display:flex">
+                    <label><input type="checkbox" id="filter-presence-geographic" checked /> Geographic</label>
+                    <label><input id="filter-presence-digital" type="checkbox" /> Digital</label>
+                  </div>
+                </fieldset>''',
+                html,
+                flags=re.DOTALL
+            )
+            path.write_text(html, encoding="utf-8")
+            errors = validate_public_shell(root)
+            self.assertEqual([], errors)
+
+    def test_stylesheet_links_tolerate_formatting(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp_dir:
+            root = self.copy_shell(tmp_dir)
+            path = root / "index.html"
+            html = path.read_text(encoding="utf-8")
+            html = html.replace('<link rel="stylesheet" href="./index.css" />', "<link href='./index.css' rel='stylesheet' data-extra='1' />")
+            html = html.replace('<link rel="stylesheet" href="./assets/ipad-layout.css" />', "<link href='./assets/ipad-layout.css' rel='stylesheet' />")
+            path.write_text(html, encoding="utf-8")
+            errors = validate_public_shell(root)
+            self.assertEqual([], errors)
+            
+    def test_extra_css_rule_after_ipad_media(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp_dir:
+            root = self.copy_shell(tmp_dir)
+            path = root / "assets/ipad-layout.css"
+            path.write_text(path.read_text(encoding="utf-8") + "\n\n.extra-trailing-rule { color: red; }\n", encoding="utf-8")
+            errors = validate_public_shell(root)
+            self.assertEqual([], errors)
+            
+    def test_negative_presence_missing_checkbox(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp_dir:
+            root = self.copy_shell(tmp_dir)
+            path = root / "index.html"
+            html = path.read_text(encoding="utf-8")
+            html = html.replace('id="filter-presence-geographic"', 'id="filter-presence-broken"')
+            path.write_text(html, encoding="utf-8")
+            errors = validate_public_shell(root)
+            self.assertIn('presence options wrapper must contain both presence checkboxes', errors)
+
+    def test_negative_missing_target_block(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp_dir:
+            root = self.copy_shell(tmp_dir)
+            path = root / "assets/ipad-layout.css"
+            css = path.read_text(encoding="utf-8")
+            # Break the discovery block
+            css = css.replace('.layer-discovery', '.layer-broken')
+            path.write_text(css, encoding="utf-8")
+            errors = validate_public_shell(root)
+            self.assertIn('tablet landscape breakpoint must override .layer-discovery geometry', errors)
 
 
 if __name__ == "__main__":

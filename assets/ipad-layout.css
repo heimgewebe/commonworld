@@ -48,7 +48,8 @@
   flex: none;
 }
 
-/* Mittelgroße Querformat-Viewports einschließlich großer iPads (z.B. 1024x768, 1180x820, 1194x834, 1366x1024) */
+/* Mittelgroße Querformat-Viewports einschließlich großer iPads (z.B. 1024x768, 1180x820, 1194x834, 1366x1024).
+   We use CSS viewport geometry instead of device identity, User-Agent or DPR to target tablets and medium desktops. */
 @media (orientation: landscape) and (min-width: 48rem) and (max-width: 90rem) and (max-height: 65rem) {
   .layer-discovery {
     top: calc(max(0.9rem, env(safe-area-inset-top)) + 3.35rem);

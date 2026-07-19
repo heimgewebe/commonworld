@@ -11,6 +11,8 @@ from urllib.parse import urlparse
 from jsonschema import Draft202012Validator, FormatChecker
 
 ROOT = Path(__file__).resolve().parents[1]
+if str(ROOT) not in sys.path:
+    sys.path.insert(0, str(ROOT))
 REJECTION_CODES = {
     "not_a_commons", "insufficient_sources", "duplicate", "private_location_risk",
     "commercial_listing_only", "project_inactive", "action_claim_unverified", "out_of_scope",
@@ -92,18 +94,139 @@ def validate(root: Path = ROOT) -> list[str]:
     if not proposal_css_path.is_file():
         errors.append("missing proposal surface: assets/proposal.css")
     else:
+        from html.parser import HTMLParser
+
+        class LinkParser(HTMLParser):
+            def __init__(self) -> None:
+                super().__init__()
+                self.links: list[str] = []
+            def handle_starttag(self, tag: str, attrs: list[tuple[str, str | None]]) -> None:
+                if tag == 'link':
+                    attr_dict = dict(attrs)
+                    if attr_dict.get('rel') == 'stylesheet' and attr_dict.get('href'):
+                        self.links.append(attr_dict['href'])
+
+        def find_css_block(css: str, prefix: str) -> tuple[str, str] | None:
+            in_string = None
+            in_comment = False
+            i = 0
+            length = len(css)
+            while i < length:
+                if in_comment:
+                    if css[i:i+2] == '*/':
+                        in_comment = False
+                        i += 2
+                    else:
+                        i += 1
+                    continue
+                if in_string:
+                    if css[i] == '\\':
+                        i += 2
+                    elif css[i] == in_string:
+                        in_string = None
+                        i += 1
+                    else:
+                        i += 1
+                    continue
+                if css[i:i+2] == '/*':
+                    in_comment = True
+                    i += 2
+                    continue
+                if css[i] in ("'", '"'):
+                    in_string = css[i]
+                    i += 1
+                    continue
+                if css[i:].startswith(prefix):
+                    start_idx = i
+                    brace_idx = -1
+                    while i < length:
+                        if in_comment:
+                            if css[i:i+2] == '*/':
+                                in_comment = False
+                                i += 2
+                            else:
+                                i += 1
+                            continue
+                        if in_string:
+                            if css[i] == '\\':
+                                i += 2
+                            elif css[i] == in_string:
+                                in_string = None
+                                i += 1
+                            else:
+                                i += 1
+                            continue
+                        if css[i:i+2] == '/*':
+                            in_comment = True
+                            i += 2
+                            continue
+                        if css[i] in ("'", '"'):
+                            in_string = css[i]
+                            i += 1
+                            continue
+                        if css[i] == '{':
+                            brace_idx = i
+                            break
+                        i += 1
+                    if brace_idx == -1:
+                        return None
+                    selector_str = css[start_idx:brace_idx].strip()
+                    block_start = brace_idx + 1
+                    brace_count = 1
+                    i = block_start
+                    while i < length:
+                        if in_comment:
+                            if css[i:i+2] == '*/':
+                                in_comment = False
+                                i += 2
+                            else:
+                                i += 1
+                            continue
+                        if in_string:
+                            if css[i] == '\\':
+                                i += 2
+                            elif css[i] == in_string:
+                                in_string = None
+                                i += 1
+                            else:
+                                i += 1
+                            continue
+                        if css[i:i+2] == '/*':
+                            in_comment = True
+                            i += 2
+                            continue
+                        if css[i] in ("'", '"'):
+                            in_string = css[i]
+                            i += 1
+                            continue
+                        if css[i] == '{':
+                            brace_count += 1
+                        elif css[i] == '}':
+                            brace_count -= 1
+                            if brace_count == 0:
+                                return (selector_str, css[block_start:i])
+                        i += 1
+                    return None
+                i += 1
+            return None
+
         proposal_css = proposal_css_path.read_text(encoding="utf-8")
-        index_link = '<link rel="stylesheet" href="./index.css" />'
-        proposal_link = '<link rel="stylesheet" href="./assets/proposal.css" />'
-        if index_link not in page or proposal_link not in page:
+        index_link = "./index.css"
+        proposal_link = "./assets/proposal.css"
+        
+        link_parser = LinkParser()
+        link_parser.feed(page)
+        
+        if index_link not in link_parser.links or proposal_link not in link_parser.links:
             errors.append("propose.html must load index.css and assets/proposal.css")
-        elif page.index(index_link) >= page.index(proposal_link):
+        elif link_parser.links.index(index_link) >= link_parser.links.index(proposal_link):
             errors.append("propose.html must load assets/proposal.css after index.css")
-        body_match = re.search(r"body\.proposal-page\s*\{([^}]*)\}", proposal_css)
+            
+        body_match = find_css_block(proposal_css, "body.proposal-page")
         if body_match is None:
             errors.append("assets/proposal.css must style body.proposal-page")
         else:
-            block = body_match.group(1)
+            block = body_match[1]
             if "overflow-y: auto" not in block:
                 errors.append("assets/proposal.css body.proposal-page must set overflow-y: auto")
             if "overflow-x: hidden" not in block:
