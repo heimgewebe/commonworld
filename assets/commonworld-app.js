@@ -1810,6 +1810,12 @@ function finishViewTransition(phase, { restoreFocus = false } = {}) {
   runtime.layerPanelReady = false;
   setViewPhase(phase);
   showLayerState();
+  const focusOverlapActive = !elements.focus.hidden
+    && runtime.activeOverlay === null
+    && Boolean(selectedProjectRecord());
+  if (phase === 'overview' && !focusOverlapActive) {
+    clearFocusOverlapInteractivity({ cancelFrame: false });
+  }
   if (phase === 'layers') {
     window.requestAnimationFrame(() => {
       if (runtime.viewPhase !== 'layers' || runtime.state.view !== 'layers') return;
