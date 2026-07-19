@@ -188,20 +188,24 @@ def _validate_ipad_landscape_wiring(root: Path, html: str) -> list[str]:
     if 'class="filter-presence-options"' not in render_source:
         errors.append('render_public_shell.py must emit the .filter-presence-options wrapper')
 
-    if '.filter-presence-group' not in ipad_css or '.filter-presence-options' not in ipad_css:
+    if '.intent-filter-grid > .filter-presence-group' not in ipad_css or '.filter-presence-options' not in ipad_css:
         errors.append('assets/ipad-layout.css must style the presence group and its options')
-    options_block_match = re.search(r'\.filter-presence-options label\s*\{([^}]*)\}', ipad_css)
+    options_block_match = re.search(r'\.filter-presence-options > label\s*\{([^}]*)\}', ipad_css)
     if options_block_match is None or not re.search(r'min-height:\s*var\(--minimum-touch-target', options_block_match.group(1)):
         errors.append('assets/ipad-layout.css presence options must define a compact, touch-safe label style')
 
     breakpoint_match = re.search(
-        r'@media[^{]*orientation:\s*landscape[^{]*min-width:\s*48rem[^{]*max-height:\s*5[0-9](\.[0-9]+)?rem[^{]*\{(.*)\}\s*$',
+        r'@media([^{]*)\{(.*)\}\s*$',
         ipad_css,
         re.DOTALL,
     )
     if breakpoint_match is None:
-        errors.append('assets/ipad-layout.css must define exactly one trailing tablet landscape breakpoint')
+        errors.append('assets/ipad-layout.css must define exactly one trailing breakpoint')
         return errors
+        
+    media_query = breakpoint_match.group(1)
+    if 'orientation: landscape' not in media_query or 'min-width: 48rem' not in media_query or 'max-width: 90rem' not in media_query or 'max-height: 65rem' not in media_query:
+        errors.append('assets/ipad-layout.css media query must explicitly cover up to 1366x1024 through max-width:90rem and max-height:65rem, excluding very large viewports')
     media_block = breakpoint_match.group(2)
 
     discovery_match = re.search(r'\.layer-discovery\s*\{([^}]*)\}', media_block)
