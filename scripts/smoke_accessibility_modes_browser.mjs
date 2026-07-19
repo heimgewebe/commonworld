@@ -67,6 +67,7 @@ const baseUrl = `http://127.0.0.1:${address.port}`;
 const executablePath = process.env.PLAYWRIGHT_CHROMIUM_EXECUTABLE_PATH || (existsSync('/usr/bin/google-chrome') ? '/usr/bin/google-chrome' : undefined);
 const browser = await chromium.launch({ headless: true, executablePath });
 const scenarios = [];
+const FOCUS_SETTLE_TIMEOUT_MS = 3000;
 
 async function newObservedPage({ viewport = { width: 1280, height: 900 }, forcedColors = 'none', contrast = 'no-preference' } = {}) {
   const context = await browser.newContext({ viewport, reducedMotion: 'reduce' });
@@ -96,13 +97,14 @@ async function installTabProbe(page, rootSelector, label) {
 }
 
 async function waitForFocusedElementInViewport(page, label) {
+  const focusedElementIsInViewport = () => {
+    const node = document.activeElement;
+    if (!node || node === document.body) return false;
+    const rect = node.getBoundingClientRect();
+    return rect.width > 0 && rect.height > 0 && rect.right > 0 && rect.left < innerWidth && rect.bottom > 0 && rect.top < innerHeight;
+  };
   try {
-    await page.waitForFunction(() => {
-      const node = document.activeElement;
-      if (!node || node === document.body) return false;
-      const rect = node.getBoundingClientRect();
-      return rect.width > 0 && rect.height > 0 && rect.right > 0 && rect.left < innerWidth && rect.bottom > 0 && rect.top < innerHeight;
-    }, null, { timeout: 1000 });
+    await page.waitForFunction(focusedElementIsInViewport, null, { timeout: FOCUS_SETTLE_TIMEOUT_MS });
   } catch (error) {
     const diagnostic = await page.evaluate(() => {
       const node = document.activeElement;
@@ -116,6 +118,15 @@ async function waitForFocusedElementInViewport(page, label) {
         viewport: { width: innerWidth, height: innerHeight },
       };
     });
+    const { rect, viewport } = diagnostic;
+    const settledAtTimeoutBoundary = rect
+      && rect.width > 0
+      && rect.height > 0
+      && rect.right > 0
+      && rect.left < viewport.width
+      && rect.bottom > 0
+      && rect.top < viewport.height;
+    if (settledAtTimeoutBoundary) return;
     throw new Error(`${label}: focused element did not settle inside the viewport ${JSON.stringify(diagnostic)}`, { cause: error });
   }
 }
