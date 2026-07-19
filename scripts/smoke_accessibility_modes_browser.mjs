@@ -67,7 +67,11 @@ const baseUrl = `http://127.0.0.1:${address.port}`;
 const executablePath = process.env.PLAYWRIGHT_CHROMIUM_EXECUTABLE_PATH || (existsSync('/usr/bin/google-chrome') ? '/usr/bin/google-chrome' : undefined);
 const browser = await chromium.launch({ headless: true, executablePath });
 const scenarios = [];
+const lateFocusSettlements = [];
 const FOCUS_SETTLE_TIMEOUT_MS = 3000;
+const FOCUS_LATE_WARNING_MS = 1000;
+const FOCUS_POLL_INTERVAL_MS = 50;
+const FOCUS_VIEWPORT_TOLERANCE_PX = 1;
 
 async function newObservedPage({ viewport = { width: 1280, height: 900 }, forcedColors = 'none', contrast = 'no-preference' } = {}) {
   const context = await browser.newContext({ viewport, reducedMotion: 'reduce' });
@@ -96,39 +100,74 @@ async function installTabProbe(page, rootSelector, label) {
   }, { selector: rootSelector, focusableSelector: FOCUSABLE_SELECTOR, probeLabel: label });
 }
 
-async function waitForFocusedElementInViewport(page, label) {
-  const focusedElementIsInViewport = () => {
+function focusRectIsViewportContained(rect, viewport, tolerance = FOCUS_VIEWPORT_TOLERANCE_PX) {
+  if (!rect || !viewport || rect.width <= 0 || rect.height <= 0) return false;
+  const horizontal = rect.width <= viewport.width + tolerance
+    ? rect.left >= -tolerance && rect.right <= viewport.width + tolerance
+    : rect.left <= tolerance && rect.right >= viewport.width - tolerance;
+  const vertical = rect.height <= viewport.height + tolerance
+    ? rect.top >= -tolerance && rect.bottom <= viewport.height + tolerance
+    : rect.top <= tolerance && rect.bottom >= viewport.height - tolerance;
+  return horizontal && vertical;
+}
+
+async function readFocusedElementDiagnostic(page) {
+  return page.evaluate(() => {
     const node = document.activeElement;
-    if (!node || node === document.body) return false;
-    const rect = node.getBoundingClientRect();
-    return rect.width > 0 && rect.height > 0 && rect.right > 0 && rect.left < innerWidth && rect.bottom > 0 && rect.top < innerHeight;
-  };
-  try {
-    await page.waitForFunction(focusedElementIsInViewport, null, { timeout: FOCUS_SETTLE_TIMEOUT_MS });
-  } catch (error) {
-    const diagnostic = await page.evaluate(() => {
-      const node = document.activeElement;
-      const rect = node?.getBoundingClientRect?.();
-      return {
-        tag: node?.tagName ?? null,
-        id: node?.id || null,
-        className: node?.getAttribute?.('class') || null,
-        probe: node?.getAttribute?.('data-a11y-tab-probe') || null,
-        rect: rect ? { left: rect.left, top: rect.top, right: rect.right, bottom: rect.bottom, width: rect.width, height: rect.height } : null,
-        viewport: { width: innerWidth, height: innerHeight },
-      };
-    });
-    const { rect, viewport } = diagnostic;
-    const settledAtTimeoutBoundary = rect
-      && rect.width > 0
-      && rect.height > 0
-      && rect.right > 0
-      && rect.left < viewport.width
-      && rect.bottom > 0
-      && rect.top < viewport.height;
-    if (settledAtTimeoutBoundary) return;
-    throw new Error(`${label}: focused element did not settle inside the viewport ${JSON.stringify(diagnostic)}`, { cause: error });
+    const sourceRect = node?.getBoundingClientRect?.();
+    const rect = sourceRect ? {
+      left: sourceRect.left,
+      top: sourceRect.top,
+      right: sourceRect.right,
+      bottom: sourceRect.bottom,
+      width: sourceRect.width,
+      height: sourceRect.height,
+    } : null;
+    return {
+      tag: node?.tagName ?? null,
+      id: node?.id || null,
+      className: node?.getAttribute?.('class') || null,
+      probe: node?.getAttribute?.('data-a11y-tab-probe') || null,
+      isBody: node === document.body,
+      rect,
+      viewport: {
+        width: document.documentElement.clientWidth,
+        height: document.documentElement.clientHeight,
+      },
+      scroll: { x: window.scrollX, y: window.scrollY },
+    };
+  });
+}
+
+async function waitForFocusedElementInViewport(page, label) {
+  const startedAt = Date.now();
+  let diagnostic = await readFocusedElementDiagnostic(page);
+  while (
+    (diagnostic.isBody || !focusRectIsViewportContained(diagnostic.rect, diagnostic.viewport))
+    && Date.now() - startedAt < FOCUS_SETTLE_TIMEOUT_MS
+  ) {
+    await page.waitForTimeout(FOCUS_POLL_INTERVAL_MS);
+    diagnostic = await readFocusedElementDiagnostic(page);
   }
+
+  const elapsedMs = Date.now() - startedAt;
+  if (!diagnostic.isBody && focusRectIsViewportContained(diagnostic.rect, diagnostic.viewport)) {
+    if (elapsedMs >= FOCUS_LATE_WARNING_MS) {
+      const warning = {
+        kind: 'late-focus-settlement',
+        label,
+        elapsedMs,
+        warningThresholdMs: FOCUS_LATE_WARNING_MS,
+        timeoutMs: FOCUS_SETTLE_TIMEOUT_MS,
+        diagnostic,
+      };
+      lateFocusSettlements.push(warning);
+      process.stderr.write(`${JSON.stringify({ state: 'WARN', ...warning })}\n`);
+    }
+    return;
+  }
+
+  throw new Error(`${label}: focused element did not settle fully inside the viewport within ${FOCUS_SETTLE_TIMEOUT_MS}ms ${JSON.stringify(diagnostic)}`);
 }
 
 async function activeFocusSnapshot(page) {
@@ -146,7 +185,7 @@ async function activeFocusSnapshot(page) {
       outlineStyle: style.outlineStyle,
       outlineWidth: Number.parseFloat(style.outlineWidth) || 0,
       rect: { left: rect.left, top: rect.top, right: rect.right, bottom: rect.bottom, width: rect.width, height: rect.height },
-      viewport: { width: innerWidth, height: innerHeight },
+      viewport: { width: document.documentElement.clientWidth, height: document.documentElement.clientHeight },
       hidden: Boolean(node.closest('[hidden], [inert], [aria-hidden="true"]')),
     };
   });
@@ -158,7 +197,7 @@ function assertFocusIntegrity(snapshot, label) {
   assert(snapshot.focusVisible, `${label}: keyboard focus is not :focus-visible ${JSON.stringify(snapshot)}`);
   assert(snapshot.outlineStyle !== 'none' && snapshot.outlineWidth >= 2, `${label}: visible focus outline missing ${JSON.stringify(snapshot)}`);
   assert(snapshot.rect.width > 0 && snapshot.rect.height > 0, `${label}: focused control has no geometry ${JSON.stringify(snapshot)}`);
-  assert(snapshot.rect.right > 0 && snapshot.rect.left < snapshot.viewport.width && snapshot.rect.bottom > 0 && snapshot.rect.top < snapshot.viewport.height, `${label}: focused control is outside the viewport ${JSON.stringify(snapshot)}`);
+  assert(focusRectIsViewportContained(snapshot.rect, snapshot.viewport), `${label}: focused control is clipped by the viewport ${JSON.stringify(snapshot)}`);
 }
 
 async function tabThroughSurface(page, rootSelector, label) {
@@ -343,4 +382,4 @@ try {
   await new Promise((resolve, reject) => server.close((error) => (error ? reject(error) : resolve())));
 }
 
-process.stdout.write(`${JSON.stringify({ verdict: 'PASS', scenarios })}\n`);
+process.stdout.write(`${JSON.stringify({ verdict: 'PASS', scenarios, lateFocusSettlements })}\n`);
