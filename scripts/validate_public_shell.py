@@ -3,6 +3,7 @@
 
 from __future__ import annotations
 
+import re
 import sys
 from pathlib import Path
 
@@ -150,6 +151,84 @@ def validate_public_shell(root: Path = ROOT) -> list[str]:
             errors.append(f'public method surface missing required token: {token}')
     if "<script" in method.casefold():
         errors.append('public method surface must remain script-free')
+
+    errors.extend(_validate_ipad_landscape_wiring(root, html))
+    return errors
+
+
+def _validate_ipad_landscape_wiring(root: Path, html: str) -> list[str]:
+    errors: list[str] = []
+    ipad_css_path = root / 'assets/ipad-layout.css'
+    render_source_path = root / 'scripts/render_public_shell.py'
+    if not ipad_css_path.is_file():
+        return ['missing assets/ipad-layout.css']
+    ipad_css = ipad_css_path.read_text(encoding='utf-8')
+    render_source = render_source_path.read_text(encoding='utf-8') if render_source_path.is_file() else ''
+
+    index_link = '<link rel="stylesheet" href="./index.css" />'
+    ipad_link = '<link rel="stylesheet" href="./assets/ipad-layout.css" />'
+    if index_link not in html or ipad_link not in html:
+        errors.append('index.html must load index.css and assets/ipad-layout.css')
+    elif html.index(index_link) >= html.index(ipad_link):
+        errors.append('index.html must load assets/ipad-layout.css after index.css')
+    if ipad_link not in render_source:
+        errors.append('render_public_shell.py must emit the assets/ipad-layout.css stylesheet link')
+
+    presence_match = re.search(
+        r'<fieldset class="filter-presence-group"><legend>[^<]*</legend>'
+        r'<div class="filter-presence-options">(.*?)</div></fieldset>',
+        html,
+    )
+    if presence_match is None:
+        errors.append('presence fieldset must wrap its options in .filter-presence-options')
+    else:
+        wrapped = presence_match.group(1)
+        if 'id="filter-presence-geographic"' not in wrapped or 'id="filter-presence-digital"' not in wrapped:
+            errors.append('presence options wrapper must contain both presence checkboxes')
+    if 'class="filter-presence-options"' not in render_source:
+        errors.append('render_public_shell.py must emit the .filter-presence-options wrapper')
+
+    if '.filter-presence-group' not in ipad_css or '.filter-presence-options' not in ipad_css:
+        errors.append('assets/ipad-layout.css must style the presence group and its options')
+    options_block_match = re.search(r'\.filter-presence-options label\s*\{([^}]*)\}', ipad_css)
+    if options_block_match is None or not re.search(r'min-height:\s*var\(--minimum-touch-target', options_block_match.group(1)):
+        errors.append('assets/ipad-layout.css presence options must define a compact, touch-safe label style')
+
+    breakpoint_match = re.search(
+        r'@media[^{]*orientation:\s*landscape[^{]*min-width:\s*48rem[^{]*max-height:\s*5[0-9](\.[0-9]+)?rem[^{]*\{(.*)\}\s*$',
+        ipad_css,
+        re.DOTALL,
+    )
+    if breakpoint_match is None:
+        errors.append('assets/ipad-layout.css must define exactly one trailing tablet landscape breakpoint')
+        return errors
+    media_block = breakpoint_match.group(2)
+
+    discovery_match = re.search(r'\.layer-discovery\s*\{([^}]*)\}', media_block)
+    if discovery_match is None:
+        errors.append('tablet landscape breakpoint must override .layer-discovery geometry')
+    else:
+        block = discovery_match.group(1)
+        if 'left: 50%' not in block or 'translateX(-50%)' not in block:
+            errors.append('tablet landscape breakpoint must center .layer-discovery horizontally')
+        if 'right: max' in block:
+            errors.append('tablet landscape breakpoint must not reintroduce right-anchored .layer-discovery geometry')
+
+    if '.layer-track-deck' not in media_block:
+        errors.append('tablet landscape breakpoint must reduce .layer-track-deck padding')
+    focused_lane_match = re.search(
+        r'\.globe-stage\[data-focused-path\] \.digital-lane\.is-focused\s*\{([^}]*)\}',
+        media_block,
+    )
+    if focused_lane_match is None:
+        errors.append('tablet landscape breakpoint must reduce the focused lane min-height')
+    else:
+        block = focused_lane_match.group(1)
+        if 'min-height' not in block:
+            errors.append('tablet landscape breakpoint focused lane rule must define min-height')
+        if 'min(44vh, 24rem)' in block:
+            errors.append('tablet landscape breakpoint must not reuse the oversized default focused lane height')
+
     return errors
 
 
