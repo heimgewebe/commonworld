@@ -1,0 +1,82 @@
+/* iPad landscape layout corrections layered after index.css. Do not duplicate index.css rules here. */
+
+/* Diese Normalisierung gilt absichtlich auf allen Viewports, weil sie Browser-default fieldset spacing entfernt.
+   Touchziele bleiben mindestens 44px. Auf schmalen Phones darf flex-wrap wirken; ab Tabletbreite sollen Vor Ort und Digital nebeneinander bleiben. */
+.intent-filter-grid > .filter-presence-group {
+  min-width: 0;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  color: var(--muted);
+  font-size: 0.78rem;
+  font-weight: 700;
+}
+
+.intent-filter-grid > .filter-presence-group > legend {
+  padding: 0;
+  margin: 0 0 0.35rem;
+  font: inherit;
+  color: inherit;
+}
+
+.intent-filter-grid > .filter-presence-group > .filter-presence-options {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.intent-filter-grid > .filter-presence-group > .filter-presence-options > label {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  min-height: var(--minimum-touch-target, 44px);
+  padding: 0 0.7rem;
+  border: 1px solid var(--line-strong);
+  border-radius: 0.75rem;
+  background: #0b201b;
+  color: #edf4ef;
+  font-weight: 650;
+  font-size: 0.82rem;
+  white-space: nowrap;
+}
+
+.intent-filter-grid > .filter-presence-group > .filter-presence-options > label > input[type="checkbox"] {
+  width: 1.1rem;
+  height: 1.1rem;
+  min-width: 1.1rem;
+  margin: 0;
+  flex: none;
+}
+
+/* Mittelgroße Querformat-Viewports einschließlich großer iPads (z.B. 1024x768, 1180x820, 1194x834, 1366x1024) */
+@media (orientation: landscape) and (min-width: 48rem) and (max-width: 90rem) and (max-height: 65rem) {
+  .layer-discovery {
+    top: calc(max(0.9rem, env(safe-area-inset-top)) + 3.35rem);
+    right: auto;
+    left: 50%;
+    width: min(85%, 42rem);
+    max-height: min(58vh, 28rem);
+    transform: translateX(-50%);
+  }
+
+  .layer-track-deck {
+    padding-block: 0;
+  }
+
+  .globe-stage[data-focused-path] .layer-track-deck {
+    grid-template-rows: minmax(0, min-content);
+    align-content: center;
+    padding-block: clamp(0.6rem, 3vh, 1.6rem);
+  }
+
+  .globe-stage[data-focused-path] .digital-lane.is-focused {
+    align-self: center;
+    min-height: min(30vh, 15rem);
+    max-height: min(34vh, 17rem);
+  }
+
+  .digital-lane-focus {
+    gap: 0.05rem;
+    padding: 0.4rem 0.65rem;
+  }
+}

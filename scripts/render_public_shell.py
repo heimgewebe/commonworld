@@ -205,6 +205,7 @@ def render_shell(root: Path = ROOT) -> str:
     <link rel="alternate" type="application/schema+json" href="./contracts/commonworld/project.schema.json" title="CommonProject-Schema" />
     <link rel="stylesheet" href="./assets/vendor/maplibre-gl.css" />
     <link rel="stylesheet" href="./index.css" />
+    <link rel="stylesheet" href="./assets/ipad-layout.css" />
     <script src="./assets/vendor/maplibre-gl.js" defer></script>
     <script type="module" src="./assets/commonworld-app.js"></script>
   </head>
@@ -235,7 +236,7 @@ def render_shell(root: Path = ROOT) -> str:
           <button id="discovery-close" class="icon-button" type="button" aria-label="Suchergebnisse schließen">×</button>
         </div>
         <div class="intent-filter-grid" aria-label="Commons filtern">
-          <fieldset class="filter-presence-group"><legend>Präsenz</legend><label><input type="checkbox" id="filter-presence-geographic" name="presence" value="geographic" data-intent-filter="presence"> Vor Ort</label><label><input type="checkbox" id="filter-presence-digital" name="presence" value="digital" data-intent-filter="presence"> Digital</label></fieldset>
+          <fieldset class="filter-presence-group"><legend>Präsenz</legend><div class="filter-presence-options"><label><input type="checkbox" id="filter-presence-geographic" name="presence" value="geographic" data-intent-filter="presence"> Vor Ort</label><label><input type="checkbox" id="filter-presence-digital" name="presence" value="digital" data-intent-filter="presence"> Digital</label></div></fieldset>
           <label><span>Aktion</span><select id="filter-action" data-intent-filter="action"><option value="">Alle Aktionen</option><option value="use">Nutzen</option><option value="borrow">Ausleihen</option><option value="learn">Lernen</option><option value="contribute">Mitmachen</option><option value="volunteer">Ehrenamtlich helfen</option><option value="donate">Spenden</option><option value="visit">Besuchen</option><option value="contact">Kontaktieren</option><option value="replicate">Übertragen</option></select></label>
           <label><span>Sprache</span><select id="filter-language" data-intent-filter="language"><option value="">Alle Angaben</option><option value="de">Deutsch</option><option value="unknown">Nicht angegeben</option></select></label>
           <label><span>Zugang</span><select id="filter-access" data-intent-filter="access"><option value="">Alle Zugänge</option><option value="public">Öffentlich</option><option value="membership">Mitgliedschaft</option><option value="restricted">Beschränkt</option><option value="unknown">Nicht angegeben</option></select></label>
