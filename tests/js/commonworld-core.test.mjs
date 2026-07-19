@@ -2,8 +2,12 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import {
+  APPROXIMATE_AGGREGATE_K,
+  COMMONS_TYPE_CODES,
+  COMMONS_TYPE_COLOR_TOKENS,
   COMMONS_TYPE_LABELS,
   COMMONS_TYPE_VALUES,
+  GEOGRAPHIC_IMPRESSION_LEVELS,
   DEFAULT_CAMERA,
   MAX_MAP_ZOOM,
   DIGITAL_LAYER_TRANSITION_MS,
@@ -32,6 +36,8 @@ import {
   publicGeographicRepresentationKind,
   publicMapFeatureCollection,
   publicProjectNavigationTarget,
+  representativeGeometryPoint,
+  representativeGeometryPoints,
   evidencedRelations,
   geodesicDistanceMeters,
   prepareCatalogProjection,
@@ -645,14 +651,79 @@ test('public geographic truth rejects malformed, hidden and privacy-breaking geo
   assert.equal(recordPresentationLabel(hiddenOnly), 'Commons');
 });
 
-test('public map derivation preserves CommonProject identity and excludes hidden geometry', () => {
+
+test('public geometry representative points are deterministic and fail closed', () => {
+  assert.deepEqual(representativeGeometryPoint({ type: 'Point', coordinates: [4, 50] }), [4, 50]);
+  assert.deepEqual(representativeGeometryPoint({
+    type: 'Polygon',
+    coordinates: [[[0, 0], [2, 0], [2, 2], [0, 2], [0, 0]]],
+  }), [1, 1]);
+  assert.deepEqual(representativeGeometryPoint({
+    type: 'Polygon',
+    coordinates: [[[0, 0], [4, 0], [4, 1], [1, 1], [1, 4], [0, 4], [0, 0]]],
+  }), [0, 0], 'concave polygon centroid outside the public extent must fall back to a public boundary point');
+  assert.deepEqual(representativeGeometryPoint({
+    type: 'Polygon',
+    coordinates: [
+      [[0, 0], [6, 0], [6, 6], [0, 6], [0, 0]],
+      [[2, 2], [4, 2], [4, 4], [2, 4], [2, 2]],
+    ],
+  }), [0, 0], 'polygon centroid inside a private hole must not become an aggregate representative');
+
+  assert.deepEqual(representativeGeometryPoint({
+    type: 'MultiPolygon',
+    coordinates: [
+      [[[0, 0], [1, 0], [1, 1], [0, 1], [0, 0]]],
+      [[[4, 4], [8, 4], [8, 8], [4, 8], [4, 4]]],
+    ],
+  }), [6, 6]);
+  assert.deepEqual(representativeGeometryPoints({
+    type: 'MultiPolygon',
+    coordinates: [
+      [[[0, 0], [1, 0], [1, 1], [0, 1], [0, 0]]],
+      [[[4, 4], [8, 4], [8, 8], [4, 8], [4, 4]]],
+    ],
+  }), [[0.5, 0.5], [6, 6]]);
+  assert.equal(representativeGeometryPoint({ type: 'Point', coordinates: [181, 0] }), null);
+  assert.equal(representativeGeometryPoint({ type: 'Polygon', coordinates: [] }), null);
+  assert.equal(representativeGeometryPoint({ type: 'LineString', coordinates: [[0, 0], [1, 1]] }), null);
+  assert.equal(representativeGeometryPoint(null), null);
+});
+
+test('public map derivation preserves local identity and emits non-interactive unassessed aggregates', () => {
   const collection = publicMapFeatureCollection(presenceAxisRecords);
   assert.equal(collection.type, 'FeatureCollection');
-  assert.equal(collection.features.length, 3);
-  assert.deepEqual(collection.features.map(({ properties }) => properties.project_id), ['cltb-le-nid', 'cltb-le-nid', 'freifunk-hamburg']);
-  assert.deepEqual(collection.features.map(({ properties }) => properties.representation_kind), ['exact_anchor', 'public_extent', 'approximate_zone']);
+  assert.equal(new Set(collection.features.map(({ id }) => id)).size, collection.features.length);
+  const localFeatures = collection.features.filter(({ properties }) => properties.project_id);
+  assert.equal(localFeatures.length, 3);
+  assert.deepEqual(localFeatures.map(({ properties }) => properties.project_id), ['cltb-le-nid', 'cltb-le-nid', 'freifunk-hamburg']);
+  assert.deepEqual(localFeatures.map(({ properties }) => properties.representation_kind), ['exact_anchor', 'public_extent', 'approximate_zone']);
+  assert.deepEqual(localFeatures.map(({ properties }) => properties.commons_type), ['housing-land', 'housing-land', 'community-network']);
+  assert.deepEqual(localFeatures.map(({ properties }) => properties.commons_type_label), ['Boden und Wohnen', 'Boden und Wohnen', 'Gemeinschaftsnetz']);
+
+  const impressions = collection.features.filter(({ properties }) => properties.representation_kind === 'aggregate_impression');
+  const summaries = collection.features.filter(({ properties }) => properties.representation_kind === 'aggregate_summary');
+  const privacyNotices = collection.features.filter(({ properties }) => properties.representation_kind === 'aggregate_privacy_notice');
+  assert.equal(impressions.length, 3);
+  assert.equal(summaries.length, 3);
+  assert.equal(privacyNotices.length, 3);
+  assert.deepEqual(new Set(impressions.map(({ properties }) => properties.semantic_level)), new Set(['planet', 'macroregion', 'region']));
+  assert.deepEqual(new Set(impressions.map(({ properties }) => properties.commons_type)), new Set(['housing-land']));
+  assert(impressions.every(({ properties }) => properties.aggregate_only === true));
+  assert(impressions.every(({ properties }) => properties.interactive === false));
+  assert(impressions.every(({ properties }) => properties.coverage_state === 'unassessed'));
+  assert(impressions.every(({ properties }) => properties.density_claim === false));
+  assert(impressions.every(({ properties }) => properties.documented_identity_count === 1));
+  assert(impressions.every(({ properties }) => properties.bucket_identity_count === 1));
+  assert(impressions.every(({ properties }) => properties.project_id === undefined));
+  assert(summaries.every(({ properties }) => properties.project_id === undefined));
+  assert(summaries.every(({ properties }) => properties.bucket_identity_count === 1));
+  assert(privacyNotices.every(({ properties }) => properties.minimum_group_size === APPROXIMATE_AGGREGATE_K));
+  assert(privacyNotices.every(({ properties }) => properties.commons_type === undefined));
+  assert(privacyNotices.every(({ properties }) => properties.project_id === undefined));
   assert.equal(collection.features.some(({ properties }) => properties.location_id === 'private-routers'), false);
-  const approximate = collection.features.find(({ properties }) => properties.representation_kind === 'approximate_zone');
+
+  const approximate = localFeatures.find(({ properties }) => properties.representation_kind === 'approximate_zone');
   assert.equal(approximate.properties.uncertainty_meters_min, 5000);
   assert.equal(approximate.geometry.type, 'Polygon');
   const uncertaintyRing = approximate.geometry.coordinates[0];
@@ -663,6 +734,96 @@ test('public map derivation preserves CommonProject identity and excludes hidden
     const distance = geodesicDistanceMeters(center, coordinate);
     assert(Math.abs(distance - 5000) <= 1, 'uncertainty zone radius drifted: ' + distance);
   }
+});
+
+test('separate MultiPolygon components contribute to each spatial bucket without multiplying identity inside one bucket', () => {
+  const record = {
+    id: 'distributed-public-extent',
+    commons_type: 'housing-land',
+    title: 'Distributed public extent',
+    presence: {
+      geographic: [{
+        id: 'distributed-extent',
+        mode: 'exact',
+        geometry: {
+          type: 'MultiPolygon',
+          coordinates: [
+            [[[0, 0], [1, 0], [1, 1], [0, 1], [0, 0]]],
+            [[[60, 20], [61, 20], [61, 21], [60, 21], [60, 20]]],
+          ],
+        },
+      }],
+      digital: { available: false },
+    },
+  };
+  const collection = publicMapFeatureCollection([record]);
+  const local = collection.features.filter(({ properties }) => properties.project_id === record.id);
+  const impressions = collection.features.filter(({ properties }) => properties.representation_kind === 'aggregate_impression');
+  assert.equal(local.length, 1, 'the published MultiPolygon remains one local geometry');
+  assert.equal(impressions.length, 6, 'two separated components appear in all three semantic grid levels');
+  assert(impressions.every(({ properties }) => properties.documented_identity_count === 1));
+  assert.equal(new Set(impressions.map(({ properties }) => properties.bucket_key)).size, 6);
+});
+
+test('aggregate buckets deduplicate one identity per type and exclude hidden locations', () => {
+  const records = [
+    {
+      id: 'knowledge-a',
+      commons_type: 'knowledge',
+      title: 'Knowledge A',
+      presence: {
+        geographic: [
+          { id: 'a-1', mode: 'exact', geometry: { type: 'Point', coordinates: [1, 1] } },
+          { id: 'a-2', mode: 'exact', geometry: { type: 'Point', coordinates: [2, 2] } },
+        ],
+        digital: { available: false },
+      },
+    },
+    {
+      id: 'knowledge-b',
+      commons_type: 'knowledge',
+      title: 'Knowledge B',
+      presence: {
+        geographic: [{ id: 'b-1', mode: 'exact', geometry: { type: 'Point', coordinates: [3, 3] } }],
+        digital: { available: false },
+      },
+    },
+    {
+      id: 'hidden-c',
+      commons_type: 'knowledge',
+      title: 'Hidden C',
+      presence: {
+        geographic: [{ id: 'c-1', mode: 'hidden', geometry: { type: 'Point', coordinates: [4, 4] } }],
+        digital: { available: false },
+      },
+    },
+  ];
+  const collection = publicMapFeatureCollection(records);
+  const knowledgeImpressions = collection.features.filter(({ properties }) => (
+    properties.representation_kind === 'aggregate_impression'
+    && properties.commons_type === 'knowledge'
+  ));
+  assert.equal(knowledgeImpressions.length, 4);
+  assert.deepEqual(
+    knowledgeImpressions.map(({ properties }) => properties.semantic_level),
+    ['planet', 'macroregion', 'region', 'region'],
+  );
+  const byBucket = new Map();
+  for (const impression of knowledgeImpressions) {
+    const current = byBucket.get(impression.properties.bucket_key) ?? [];
+    current.push(impression);
+    byBucket.set(impression.properties.bucket_key, current);
+  }
+  assert([...byBucket.values()].every((features) => features.length === 1));
+  assert.deepEqual(
+    knowledgeImpressions.map(({ properties }) => properties.documented_identity_count),
+    [2, 2, 1, 2],
+  );
+  assert.deepEqual(
+    knowledgeImpressions.map(({ properties }) => properties.bucket_identity_count),
+    [2, 2, 1, 2],
+  );
+  assert.equal(collection.features.some(({ properties }) => properties.project_id === 'hidden-c'), false);
 });
 
 test('public project navigation targets use only published geometry and keep digital Commons coordinate-free', () => {
@@ -676,6 +837,8 @@ test('public project navigation targets use only published geometry and keep dig
   assert(hamburg.bounds[1][0] > 9.9445);
   assert.equal(publicProjectNavigationTarget(collection, 'freifunk'), null);
   assert.equal(publicProjectNavigationTarget(collection, 'private-routers'), null);
+  const aggregateOnly = { features: collection.features.filter(({ properties }) => properties.aggregate_only) };
+  assert.equal(publicProjectNavigationTarget(aggregateOnly, 'cltb-le-nid'), null);
   assert(Object.isFrozen(leNid));
   assert(Object.isFrozen(leNid.bounds));
 });
@@ -684,9 +847,18 @@ test('map filtering uses the same visible identity set without multiplying dual 
   const visible = new Set(['freifunk-hamburg']);
   const collection = publicMapFeatureCollection(presenceAxisRecords, visible);
   assert.strictEqual(collection, publicMapFeatureCollection(presenceAxisRecords, ['freifunk-hamburg']));
-  assert.equal(collection.features.length, 1);
-  assert.equal(collection.features[0].properties.project_id, 'freifunk-hamburg');
-  assert.equal(new Set(collection.features.map(({ properties }) => properties.project_id)).size, 1);
+  const localFeatures = collection.features.filter(({ properties }) => properties.project_id);
+  assert.equal(localFeatures.length, 1);
+  assert.equal(localFeatures[0].properties.project_id, 'freifunk-hamburg');
+  const impressions = collection.features.filter(({ properties }) => properties.representation_kind === 'aggregate_impression');
+  const summaries = collection.features.filter(({ properties }) => properties.representation_kind === 'aggregate_summary');
+  const privacyNotices = collection.features.filter(({ properties }) => properties.representation_kind === 'aggregate_privacy_notice');
+  assert.equal(impressions.length, 0);
+  assert.equal(summaries.length, 0);
+  assert.equal(privacyNotices.length, 3);
+  assert(privacyNotices.every(({ properties }) => properties.commons_type === undefined));
+  assert(privacyNotices.every(({ properties }) => properties.bucket_identity_count === undefined));
+  assert(collection.features.filter(({ properties }) => properties.project_id).every(({ properties }) => properties.project_id === 'freifunk-hamburg'));
 });
 
 test('catalog projection precomputes 250 approximate Commons and keeps its filter cache bounded', () => {
@@ -694,7 +866,6 @@ test('catalog projection precomputes 250 approximate Commons and keeps its filte
   const records = Array.from({ length: 250 }, (_, index) => ({
     id: 'regional-common-' + String(index).padStart(4, '0'),
     title: 'Regional Common ' + index,
-
     presence: {
       geographic: [{
         id: 'area-' + index,
@@ -709,18 +880,33 @@ test('catalog projection precomputes 250 approximate Commons and keeps its filte
   }));
   const projection = prepareCatalogProjection(records);
   const all = projection.publicMapFeatureCollection();
-  assert.equal(all.features.length, 250);
+  const allLocal = all.features.filter(({ properties }) => properties.project_id);
+  const allImpressions = all.features.filter(({ properties }) => properties.representation_kind === 'aggregate_impression');
+  const allSummaries = all.features.filter(({ properties }) => properties.representation_kind === 'aggregate_summary');
+  assert.equal(allLocal.length, 250);
+  assert.equal(allImpressions.length, 3);
+  assert.equal(allSummaries.length, 3);
+  assert(allImpressions.every(({ properties }) => properties.documented_identity_count === 250));
+  assert(allImpressions.every(({ properties }) => properties.bucket_identity_count === 250));
   assert(Object.isFrozen(records));
   assert(Object.isFrozen(records[0].presence.geographic[0].geometry.coordinates));
   assert(Object.isFrozen(all));
   assert(Object.isFrozen(all.features));
-  assert(Object.isFrozen(all.features[0].geometry.coordinates[0]));
+  assert(Object.isFrozen(allLocal[0].geometry.coordinates[0]));
   assert.strictEqual(all, projection.publicMapFeatureCollection());
   assert.strictEqual(all, publicMapFeatureCollection(records));
+  assert.deepEqual(
+    all.features.filter(({ properties }) => properties.aggregate_only).map(({ id }) => id),
+    projection.publicMapFeatureCollection().features.filter(({ properties }) => properties.aggregate_only).map(({ id }) => id),
+  );
 
   const visibleIds = records.filter((_, index) => index % 5 === 0).map(({ id }) => id);
   const subset = projection.publicMapFeatureCollection(visibleIds);
-  assert.equal(subset.features.length, 50);
+  const subsetLocal = subset.features.filter(({ properties }) => properties.project_id);
+  const subsetImpressions = subset.features.filter(({ properties }) => properties.representation_kind === 'aggregate_impression');
+  assert.equal(subsetLocal.length, 50);
+  assert.equal(subsetImpressions.length, 3);
+  assert(subsetImpressions.every(({ properties }) => properties.documented_identity_count === 50));
   assert.strictEqual(subset, projection.publicMapFeatureCollection([...visibleIds].reverse()));
 
   const firstFiltered = projection.publicMapFeatureCollection([records[0].id]);
@@ -728,6 +914,104 @@ test('catalog projection precomputes 250 approximate Commons and keeps its filte
     projection.publicMapFeatureCollection([records[index].id]);
   }
   assert.notStrictEqual(firstFiltered, projection.publicMapFeatureCollection([records[0].id]));
+});
+
+test('approximate aggregate release requires five identities and exposes no member ids', () => {
+  assert.equal(APPROXIMATE_AGGREGATE_K, 5);
+  const makeRecords = (count, uncertaintyMetersMin = 5000) => Array.from({ length: count }, (_, index) => ({
+    id: 'approx-' + index,
+    commons_type: 'water',
+    title: 'Approximate ' + index,
+    presence: {
+      geographic: [{
+        id: 'approx-location-' + index,
+        mode: 'approximate',
+        geometry: { type: 'Point', coordinates: [8 + index / 10000, 50 + index / 10000] },
+        uncertainty_meters_min: uncertaintyMetersMin,
+      }],
+      digital: { available: false },
+    },
+  }));
+  const four = publicMapFeatureCollection(makeRecords(4));
+  assert.equal(four.features.filter(({ properties }) => properties.representation_kind === 'aggregate_impression').length, 0);
+  assert.equal(four.features.filter(({ properties }) => properties.representation_kind === 'aggregate_summary').length, 0);
+  assert.equal(four.features.filter(({ properties }) => properties.representation_kind === 'aggregate_privacy_notice').length, 3);
+  const five = publicMapFeatureCollection(makeRecords(5));
+  const impressions = five.features.filter(({ properties }) => properties.representation_kind === 'aggregate_impression');
+  assert.equal(impressions.length, 3);
+  assert(impressions.every(({ properties }) => properties.documented_identity_count === 5));
+  assert.equal(JSON.stringify(five).includes('approx-0'), true, 'local features retain public project identity');
+  const aggregateOnly = five.features.filter(({ properties }) => properties.aggregate_only);
+  assert.equal(JSON.stringify(aggregateOnly).includes('approx-0'), false, 'aggregate output must not expose member ids');
+});
+
+test('filtered approximate aggregates protect both selection and complement from differencing', () => {
+  const records = Array.from({ length: 10 }, (_, index) => ({
+    id: 'difference-' + index,
+    commons_type: 'water',
+    title: 'Difference ' + index,
+    presence: {
+      geographic: [{
+        id: 'difference-location-' + index,
+        mode: 'approximate',
+        geometry: { type: 'Point', coordinates: [8 + index / 10000, 50 + index / 10000] },
+        uncertainty_meters_min: 5000,
+      }],
+      digital: { available: false },
+    },
+  }));
+  const projection = prepareCatalogProjection(records);
+  const releasedFive = projection.publicMapFeatureCollection(records.slice(0, 5).map(({ id }) => id));
+  const releasedFiveImpressions = releasedFive.features.filter(({ properties }) => properties.representation_kind === 'aggregate_impression');
+  assert.equal(releasedFiveImpressions.length, 3, 'five selected and five in the complement may release');
+  assert(releasedFiveImpressions.every(({ properties }) => properties.documented_identity_count === 5));
+  assert.equal(releasedFive.features.filter(({ properties }) => properties.representation_kind === 'aggregate_privacy_notice').length, 0);
+
+  for (const selectedCount of [6, 9]) {
+    const filtered = projection.publicMapFeatureCollection(records.slice(0, selectedCount).map(({ id }) => id));
+    assert.equal(filtered.features.filter(({ properties }) => properties.representation_kind === 'aggregate_impression').length, 0, 'unsafe complement must withhold selected approximate count');
+    assert.equal(filtered.features.filter(({ properties }) => properties.representation_kind === 'aggregate_summary').length, 0);
+    const notices = filtered.features.filter(({ properties }) => properties.representation_kind === 'aggregate_privacy_notice');
+    assert.equal(notices.length, 3);
+    assert(notices.every(({ properties }) => properties.differencing_protected === true));
+    assert(notices.every(({ properties }) => properties.bucket_identity_count === undefined));
+    assert.equal(JSON.stringify(notices).includes('difference-'), false);
+  }
+});
+
+test('coarser buckets may release while fine approximate aggregates remain withheld', () => {
+  const records = Array.from({ length: 5 }, (_, index) => ({
+    id: 'coarsen-' + index,
+    commons_type: 'energy',
+    title: 'Coarsen ' + index,
+    presence: {
+      geographic: [{
+        id: 'coarsen-location-' + index,
+        mode: 'approximate',
+        geometry: { type: 'Point', coordinates: [0.01 * index, 0.01 * index] },
+        uncertainty_meters_min: 300000,
+      }],
+      digital: { available: false },
+    },
+  }));
+  const collection = publicMapFeatureCollection(records);
+  const impressions = collection.features.filter(({ properties }) => properties.representation_kind === 'aggregate_impression');
+  const privacyNotices = collection.features.filter(({ properties }) => properties.representation_kind === 'aggregate_privacy_notice');
+  assert.deepEqual(impressions.map(({ properties }) => properties.semantic_level), ['planet', 'macroregion']);
+  assert.deepEqual(privacyNotices.map(({ properties }) => properties.semantic_level), ['region']);
+});
+
+test('Commons type palette and non-colour codes match the active visual contract exactly', () => {
+  assert.deepEqual(Object.keys(COMMONS_TYPE_COLOR_TOKENS), COMMONS_TYPE_VALUES);
+  assert.deepEqual(Object.keys(COMMONS_TYPE_CODES), COMMONS_TYPE_VALUES);
+  assert.equal(new Set(Object.values(COMMONS_TYPE_COLOR_TOKENS)).size, COMMONS_TYPE_VALUES.length);
+  assert.equal(new Set(Object.values(COMMONS_TYPE_CODES)).size, COMMONS_TYPE_VALUES.length);
+  const visualContract = JSON.parse(readFileSync(new URL('../../contracts/commonworld/visual-semantics.contract.json', import.meta.url), 'utf8'));
+  const active = visualContract.classification_profiles.profiles.find(({ id }) => id === visualContract.classification_profiles.active_public_geographic_profile);
+  assert.deepEqual(active.values.map(({ id }) => id), COMMONS_TYPE_VALUES);
+  assert.deepEqual(Object.fromEntries(active.values.map(({ id, fill_seed_dark_surface }) => [id, fill_seed_dark_surface])), COMMONS_TYPE_COLOR_TOKENS);
+  assert.deepEqual(Object.fromEntries(active.values.map(({ id, code }) => [id, code])), COMMONS_TYPE_CODES);
+  assert.deepEqual(GEOGRAPHIC_IMPRESSION_LEVELS.map(({ id }) => id), ['planet', 'macroregion', 'region']);
 });
 
 test('digital layer filtering excludes geographic-only identities but retains dual presence identities', () => {

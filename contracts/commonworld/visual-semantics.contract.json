@@ -1,7 +1,7 @@
 {
   "schema_version": 1,
   "title": "Commonworld visual semantics and privacy release contract",
-  "description": "Canonical, renderer-neutral rules for family hue, density lightness, coverage texture, location uncertainty and privacy-sensitive aggregation. This contract derives presentation semantics from CommonProject v3 and the semantic zoom contract; it is not catalog truth, an API or an engine choice.",
+  "description": "Canonical, renderer-neutral rules for profile-selected classification hue, density lightness, coverage texture, location uncertainty and privacy-sensitive aggregation. This contract derives presentation semantics from CommonProject v4 and the semantic zoom contract; it is not catalog truth, an API or an engine choice.",
   "source_contracts": {
     "commonproject": {
       "id": "https://commonworld.net/contracts/commonworld/project.schema.json",
@@ -13,7 +13,7 @@
     }
   },
   "channel_separation": {
-    "hue": "commons_family",
+    "hue": "profile_selected_commons_classification",
     "lightness": "normalized_current_density",
     "interior_texture": "coverage_state",
     "boundary_and_halo": "location_precision_and_uncertainty",
@@ -24,6 +24,96 @@
     "family_pattern_forbidden_to_reserve_texture_for_coverage": true,
     "red_green_good_bad_semantics_forbidden": true,
     "moral_quality_or_rank_forbidden": true
+  },
+  "classification_profiles": {
+    "active_public_geographic_profile": "exclusive_commons_type_v1",
+    "profiles": [
+      {
+        "id": "exclusive_commons_type_v1",
+        "status": "active_public_geographic",
+        "assignment_rule": "exactly_one_commons_type_per_identity_from_the_same_vocabulary_used_by_filter_map_legend_and_text",
+        "values": [
+          {
+            "id": "knowledge",
+            "label": "Wissen und Daten",
+            "code": "WD",
+            "fill_seed_dark_surface": "#56B4E9"
+          },
+          {
+            "id": "software",
+            "label": "Software und Infrastruktur",
+            "code": "SI",
+            "fill_seed_dark_surface": "#0072B2"
+          },
+          {
+            "id": "culture",
+            "label": "Kultur und Medien",
+            "code": "KM",
+            "fill_seed_dark_surface": "#CC79A7"
+          },
+          {
+            "id": "food-seeds",
+            "label": "Saatgut und Ernährung",
+            "code": "SE",
+            "fill_seed_dark_surface": "#009E73"
+          },
+          {
+            "id": "water",
+            "label": "Wasser und Bewässerung",
+            "code": "WB",
+            "fill_seed_dark_surface": "#2EC4B6"
+          },
+          {
+            "id": "energy",
+            "label": "Energie",
+            "code": "EN",
+            "fill_seed_dark_surface": "#E69F00"
+          },
+          {
+            "id": "housing-land",
+            "label": "Boden und Wohnen",
+            "code": "BW",
+            "fill_seed_dark_surface": "#B7A36A"
+          },
+          {
+            "id": "health-care",
+            "label": "Pflege und Gesundheit",
+            "code": "PG",
+            "fill_seed_dark_surface": "#D55E00"
+          },
+          {
+            "id": "tools-repair",
+            "label": "Werkzeuge, Reparatur und Fertigung",
+            "code": "WR",
+            "fill_seed_dark_surface": "#F0C808"
+          },
+          {
+            "id": "community-network",
+            "label": "Gemeinschaftsnetz",
+            "code": "GN",
+            "fill_seed_dark_surface": "#8A7FDB"
+          },
+          {
+            "id": "other",
+            "label": "Andere",
+            "code": "AN",
+            "fill_seed_dark_surface": "#9CA3AF"
+          }
+        ],
+        "no_hue_blending": true,
+        "text_label_required": true,
+        "non_color_code_required": true,
+        "coverage_texture_reserved": true,
+        "reference_dark_surface": "#111827",
+        "minimum_non_text_contrast_ratio": 3.0
+      },
+      {
+        "id": "commons_family_v1",
+        "status": "research_and_future_assessed_aggregation",
+        "taxonomy_ref": "family_taxonomy",
+        "active_in_geographic_impressions_v1": false
+      }
+    ]
   },
   "family_taxonomy": {
     "taxonomy_version": 1,

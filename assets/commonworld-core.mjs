@@ -745,6 +745,34 @@ export const COMMONS_TYPE_LABELS = Object.freeze({
   other: 'Andere',
 });
 
+export const COMMONS_TYPE_COLOR_TOKENS = Object.freeze({
+  knowledge: '#56B4E9',
+  software: '#0072B2',
+  culture: '#CC79A7',
+  'food-seeds': '#009E73',
+  water: '#2EC4B6',
+  energy: '#E69F00',
+  'housing-land': '#B7A36A',
+  'health-care': '#D55E00',
+  'tools-repair': '#F0C808',
+  'community-network': '#8A7FDB',
+  other: '#9CA3AF',
+});
+
+export const COMMONS_TYPE_CODES = Object.freeze({
+  knowledge: 'WD',
+  software: 'SI',
+  culture: 'KM',
+  'food-seeds': 'SE',
+  water: 'WB',
+  energy: 'EN',
+  'housing-land': 'BW',
+  'health-care': 'PG',
+  'tools-repair': 'WR',
+  'community-network': 'GN',
+  other: 'AN',
+});
+
 const COMMONS_TYPE_THEME_RULES = Object.freeze([
   Object.freeze({ type: 'health-care', themes: Object.freeze(['health']) }),
   Object.freeze({ type: 'energy', themes: Object.freeze(['energy', 'renewable-energy']) }),
@@ -771,6 +799,7 @@ export function commonsTypeLabel(recordOrType) {
   const type = typeof recordOrType === 'string' ? recordOrType : deriveCommonsType(recordOrType);
   return COMMONS_TYPE_LABELS[type] ?? COMMONS_TYPE_LABELS.other;
 }
+
 
 export const INTENT_FILTER_VALUES = Object.freeze({
   commons_type: COMMONS_TYPE_VALUES,
@@ -1330,6 +1359,7 @@ function publicGeometry(location, representationKind) {
 function publicMapFeature(record, location) {
   const representationKind = publicGeographicRepresentationKind(location);
   if (!representationKind) return null;
+  const commonsType = deriveCommonsType(record);
   return Object.freeze({
     type: 'Feature',
     id: record.id + ':' + location.id,
@@ -1341,9 +1371,356 @@ function publicMapFeature(record, location) {
       location_label: location.label ?? record.title ?? record.id,
       location_mode: location.mode,
       representation_kind: representationKind,
+      commons_type: commonsType,
+      commons_type_label: commonsTypeLabel(commonsType),
+      commons_type_code: COMMONS_TYPE_CODES[commonsType],
       uncertainty_meters_min: location.mode === 'approximate' ? finite(location.uncertainty_meters_min, 0) : 0,
     }),
   });
+}
+
+export const GEOGRAPHIC_IMPRESSION_LEVELS = Object.freeze([
+  Object.freeze({ id: 'planet', gridDegrees: 30, offsetRatio: 0.09 }),
+  Object.freeze({ id: 'macroregion', gridDegrees: 10, offsetRatio: 0.09 }),
+  Object.freeze({ id: 'region', gridDegrees: 4, offsetRatio: 0.08 }),
+]);
+export const APPROXIMATE_AGGREGATE_K = 5;
+export const APPROXIMATE_BUCKET_DIAMETER_FACTOR = 2;
+
+function coordinatePair(value) {
+  if (!Array.isArray(value) || value.length < 2) return null;
+  const longitude = Number(value[0]);
+  const latitude = Number(value[1]);
+  if (!Number.isFinite(longitude) || !Number.isFinite(latitude)) return null;
+  if (longitude < -180 || longitude > 180 || latitude < -90 || latitude > 90) return null;
+  return [longitude, latitude];
+}
+
+function pointOnSegment(point, start, end, epsilon = 1e-10) {
+  const cross = (point[1] - start[1]) * (end[0] - start[0])
+    - (point[0] - start[0]) * (end[1] - start[1]);
+  if (Math.abs(cross) > epsilon) return false;
+  const squaredLength = (end[0] - start[0]) ** 2 + (end[1] - start[1]) ** 2;
+  if (squaredLength <= epsilon ** 2) {
+    return Math.hypot(point[0] - start[0], point[1] - start[1]) <= epsilon;
+  }
+  const dot = (point[0] - start[0]) * (end[0] - start[0])
+    + (point[1] - start[1]) * (end[1] - start[1]);
+  if (dot < -epsilon) return false;
+  return dot <= squaredLength + epsilon;
+}
+
+function pointInRing(point, ring) {
+  const points = Array.isArray(ring) ? ring.map(coordinatePair).filter(Boolean) : [];
+  if (!point || points.length < 3) return false;
+  let inside = false;
+  for (let currentIndex = 0, previousIndex = points.length - 1; currentIndex < points.length; previousIndex = currentIndex, currentIndex += 1) {
+    const current = points[currentIndex];
+    const previous = points[previousIndex];
+    if (pointOnSegment(point, previous, current)) return true;
+    const intersects = (current[1] > point[1]) !== (previous[1] > point[1])
+      && point[0] < ((previous[0] - current[0]) * (point[1] - current[1]))
+        / (previous[1] - current[1]) + current[0];
+    if (intersects) inside = !inside;
+  }
+  return inside;
+}
+
+function pointInPolygonCoordinates(point, coordinates) {
+  const rings = Array.isArray(coordinates) ? coordinates : [];
+  if (!pointInRing(point, rings[0])) return false;
+  return rings.slice(1).every((hole) => !pointInRing(point, hole));
+}
+
+function ringCentroid(ring) {
+  const points = Array.isArray(ring) ? ring.map(coordinatePair).filter(Boolean) : [];
+  if (points.length === 0) return null;
+  if (points.length === 1) return points[0];
+  const usable = points.length > 2
+    && points[0][0] === points.at(-1)[0]
+    && points[0][1] === points.at(-1)[1]
+    ? points.slice(0, -1)
+    : points;
+  if (usable.length === 0) return null;
+
+  let twiceArea = 0;
+  let centroidLongitude = 0;
+  let centroidLatitude = 0;
+  for (let index = 0; index < usable.length; index += 1) {
+    const current = usable[index];
+    const next = usable[(index + 1) % usable.length];
+    const cross = current[0] * next[1] - next[0] * current[1];
+    twiceArea += cross;
+    centroidLongitude += (current[0] + next[0]) * cross;
+    centroidLatitude += (current[1] + next[1]) * cross;
+  }
+  if (Math.abs(twiceArea) > 1e-12) {
+    return coordinatePair([
+      centroidLongitude / (3 * twiceArea),
+      centroidLatitude / (3 * twiceArea),
+    ]);
+  }
+  return null;
+}
+
+function polygonRepresentativePoint(coordinates) {
+  const rings = Array.isArray(coordinates) ? coordinates : [];
+  const outer = Array.isArray(rings[0]) ? rings[0].map(coordinatePair).filter(Boolean) : [];
+  if (outer.length === 0) return null;
+  const centroid = ringCentroid(outer);
+  if (centroid && pointInPolygonCoordinates(centroid, rings)) return centroid;
+  return outer[0];
+}
+
+function ringAbsoluteArea(ring) {
+  const points = Array.isArray(ring) ? ring.map(coordinatePair).filter(Boolean) : [];
+  if (points.length < 3) return 0;
+  let twiceArea = 0;
+  for (let index = 0; index < points.length; index += 1) {
+    const current = points[index];
+    const next = points[(index + 1) % points.length];
+    twiceArea += current[0] * next[1] - next[0] * current[1];
+  }
+  return Math.abs(twiceArea) / 2;
+}
+
+export function representativeGeometryPoint(geometry) {
+  if (!geometry || typeof geometry !== 'object') return null;
+  if (geometry.type === 'Point') return coordinatePair(geometry.coordinates);
+  if (geometry.type === 'Polygon') return polygonRepresentativePoint(geometry.coordinates);
+  if (geometry.type === 'MultiPolygon') {
+    const candidates = (Array.isArray(geometry.coordinates) ? geometry.coordinates : [])
+      .map((polygon) => ({
+        point: polygonRepresentativePoint(polygon),
+        area: ringAbsoluteArea(polygon?.[0]),
+      }))
+      .filter(({ point }) => point)
+      .sort((left, right) => right.area - left.area);
+    return candidates[0]?.point ?? null;
+  }
+  return null;
+}
+
+export function representativeGeometryPoints(geometry) {
+  if (!geometry || typeof geometry !== 'object') return Object.freeze([]);
+  if (geometry.type !== 'MultiPolygon') {
+    const point = representativeGeometryPoint(geometry);
+    return Object.freeze(point ? [Object.freeze(point)] : []);
+  }
+  const points = [];
+  const seen = new Set();
+  for (const polygon of Array.isArray(geometry.coordinates) ? geometry.coordinates : []) {
+    const point = polygonRepresentativePoint(polygon);
+    if (!point) continue;
+    const key = point[0] + ',' + point[1];
+    if (seen.has(key)) continue;
+    seen.add(key);
+    points.push(Object.freeze(point));
+  }
+  return Object.freeze(points);
+}
+
+function aggregateBucket(point, level) {
+  const longitudeIndex = Math.min(
+    Math.ceil(360 / level.gridDegrees) - 1,
+    Math.max(0, Math.floor((point[0] + 180) / level.gridDegrees)),
+  );
+  const latitudeIndex = Math.min(
+    Math.ceil(180 / level.gridDegrees) - 1,
+    Math.max(0, Math.floor((point[1] + 90) / level.gridDegrees)),
+  );
+  return {
+    key: `${level.id}:${longitudeIndex}:${latitudeIndex}`,
+    center: [
+      -180 + (longitudeIndex + 0.5) * level.gridDegrees,
+      -90 + (latitudeIndex + 0.5) * level.gridDegrees,
+    ],
+  };
+}
+
+function aggregateBucketEffectiveDiameterMeters(center, level) {
+  const half = level.gridDegrees / 2;
+  const horizontal = geodesicDistanceMeters(
+    [clamp(center[0] - half, -180, 180), center[1]],
+    [clamp(center[0] + half, -180, 180), center[1]],
+  );
+  const vertical = geodesicDistanceMeters(
+    [center[0], clamp(center[1] - half, -90, 90)],
+    [center[0], clamp(center[1] + half, -90, 90)],
+  );
+  return Math.min(horizontal, vertical);
+}
+
+function buildAggregateBuckets(projectIds, recordsById, representativeLocationsByProjectId, level) {
+  const buckets = new Map();
+  for (const projectId of projectIds) {
+    const record = recordsById.get(projectId);
+    if (!record) continue;
+    const commonsType = deriveCommonsType(record);
+    const projectBuckets = new Map();
+    for (const representative of representativeLocationsByProjectId.get(projectId) ?? []) {
+      const bucket = aggregateBucket(representative.point, level);
+      const current = projectBuckets.get(bucket.key) ?? {
+        center: bucket.center,
+        hasPublicGeometry: false,
+        maximumUncertaintyMeters: 0,
+      };
+      if (representative.representationKind === 'approximate_zone') {
+        current.maximumUncertaintyMeters = Math.max(
+          current.maximumUncertaintyMeters,
+          finite(representative.uncertaintyMetersMin, 0),
+        );
+      } else {
+        current.hasPublicGeometry = true;
+      }
+      projectBuckets.set(bucket.key, current);
+    }
+
+    for (const [bucketKey, projectBucket] of projectBuckets) {
+      let bucket = buckets.get(bucketKey);
+      if (!bucket) {
+        bucket = { center: projectBucket.center, contributorsByType: new Map() };
+        buckets.set(bucketKey, bucket);
+      }
+      const contributors = bucket.contributorsByType.get(commonsType) ?? new Map();
+      contributors.set(projectId, Object.freeze({
+        hasPublicGeometry: projectBucket.hasPublicGeometry,
+        maximumUncertaintyMeters: projectBucket.maximumUncertaintyMeters,
+      }));
+      bucket.contributorsByType.set(commonsType, contributors);
+    }
+  }
+  return buckets;
+}
+
+function generateAggregateFeatures(visibleProjectIds, buckets, level) {
+  const visibleIds = visibleProjectIds instanceof Set
+    ? visibleProjectIds
+    : new Set(Array.isArray(visibleProjectIds) ? visibleProjectIds : []);
+  const features = [];
+  for (const bucketKey of [...buckets.keys()].sort()) {
+    const bucket = buckets.get(bucketKey);
+    const presentTypes = COMMONS_TYPE_VALUES.filter((type) => bucket.contributorsByType.has(type));
+    const offset = level.gridDegrees * level.offsetRatio;
+    const effectiveDiameterMeters = aggregateBucketEffectiveDiameterMeters(bucket.center, level);
+    const releasedBucketIdentityIds = new Set();
+    const releasedByType = new Map();
+    let privacyWithheld = false;
+
+    for (const commonsType of presentTypes) {
+      const contributors = bucket.contributorsByType.get(commonsType);
+      const publicIds = [];
+      const approximateIds = [];
+      let referenceApproximateCount = 0;
+      let maximumUncertaintyMeters = 0;
+      for (const [projectId, contributor] of contributors) {
+        if (!contributor.hasPublicGeometry) referenceApproximateCount += 1;
+        if (!visibleIds.has(projectId)) continue;
+        if (contributor.hasPublicGeometry) publicIds.push(projectId);
+        else {
+          approximateIds.push(projectId);
+          maximumUncertaintyMeters = Math.max(
+            maximumUncertaintyMeters,
+            contributor.maximumUncertaintyMeters,
+          );
+        }
+      }
+      if (publicIds.length === 0 && approximateIds.length === 0) continue;
+      const complementApproximateCount = referenceApproximateCount - approximateIds.length;
+      const complementReleaseSafe = complementApproximateCount === 0
+        || complementApproximateCount >= APPROXIMATE_AGGREGATE_K;
+      const approximateReleaseAllowed = approximateIds.length === 0 || (
+        approximateIds.length >= APPROXIMATE_AGGREGATE_K
+        && complementReleaseSafe
+        && effectiveDiameterMeters >= APPROXIMATE_BUCKET_DIAMETER_FACTOR * maximumUncertaintyMeters
+      );
+      const releasedIds = approximateReleaseAllowed
+        ? [...publicIds, ...approximateIds]
+        : publicIds;
+      if (approximateIds.length > 0 && !approximateReleaseAllowed) privacyWithheld = true;
+      if (releasedIds.length === 0) continue;
+      releasedByType.set(commonsType, Object.freeze(releasedIds));
+      for (const projectId of releasedIds) releasedBucketIdentityIds.add(projectId);
+    }
+
+    const releasedTypes = presentTypes.filter((type) => releasedByType.has(type));
+    for (let index = 0; index < releasedTypes.length; index += 1) {
+      const commonsType = releasedTypes[index];
+      const angle = -Math.PI / 2 + 2 * Math.PI * index / releasedTypes.length;
+      const coordinates = [
+        clamp(bucket.center[0] + Math.cos(angle) * offset, -179.999, 179.999),
+        clamp(bucket.center[1] + Math.sin(angle) * offset, -89.999, 89.999),
+      ];
+      features.push(Object.freeze({
+        type: 'Feature',
+        id: 'aggregate:' + bucketKey + ':' + commonsType,
+        geometry: freezeCatalogSnapshot({ type: 'Point', coordinates }),
+        properties: Object.freeze({
+          representation_kind: 'aggregate_impression',
+          semantic_level: level.id,
+          bucket_key: bucketKey,
+          aggregate_only: true,
+          interactive: false,
+          display_basis: 'public_geometry_grid_bucket_center',
+          coverage_state: 'unassessed',
+          density_claim: false,
+          commons_type: commonsType,
+          commons_type_label: commonsTypeLabel(commonsType),
+          commons_type_code: COMMONS_TYPE_CODES[commonsType],
+          coverage_pattern_label: '··',
+          documented_identity_count: releasedByType.get(commonsType).length,
+          bucket_identity_count: releasedBucketIdentityIds.size,
+          privacy_withheld: privacyWithheld,
+        }),
+      }));
+    }
+
+    if (releasedBucketIdentityIds.size > 0) {
+      features.push(Object.freeze({
+        type: 'Feature',
+        id: 'aggregate:' + bucketKey + ':summary',
+        geometry: freezeCatalogSnapshot({ type: 'Point', coordinates: [...bucket.center] }),
+        properties: Object.freeze({
+          representation_kind: 'aggregate_summary',
+          semantic_level: level.id,
+          bucket_key: bucketKey,
+          aggregate_only: true,
+          interactive: false,
+          coverage_state: 'unassessed',
+          density_claim: false,
+          bucket_identity_count: releasedBucketIdentityIds.size,
+          privacy_withheld: privacyWithheld,
+        }),
+      }));
+    }
+
+    if (privacyWithheld) {
+      features.push(Object.freeze({
+        type: 'Feature',
+        id: 'aggregate:' + bucketKey + ':privacy-withheld',
+        geometry: freezeCatalogSnapshot({
+          type: 'Point',
+          coordinates: [
+            clamp(bucket.center[0] + offset * 0.58, -179.999, 179.999),
+            clamp(bucket.center[1] - offset * 0.58, -89.999, 89.999),
+          ],
+        }),
+        properties: Object.freeze({
+          representation_kind: 'aggregate_privacy_notice',
+          semantic_level: level.id,
+          bucket_key: bucketKey,
+          aggregate_only: true,
+          interactive: false,
+          coverage_state: 'unassessed',
+          privacy_withheld: true,
+          minimum_group_size: APPROXIMATE_AGGREGATE_K,
+          differencing_protected: true,
+          notice_label: 'Ungefähre Ortsbezüge werden nach Kleingruppen- und Differenzschutz nicht gezählt',
+        }),
+      }));
+    }
+  }
+  return features;
 }
 
 function featureCollection(features) {
@@ -1374,22 +1751,47 @@ function buildCatalogProjection(records) {
   const recordsById = new Map(records.filter((record) => record?.id).map((record) => [record.id, record]));
   const projectIds = records.filter((record) => record?.id).map((record) => record.id);
   const featuresByProjectId = new Map();
-  const allFeatures = [];
+  const representativeLocationsByProjectId = new Map();
+  const allLocalFeatures = [];
+
   for (const record of records) {
     if (!record?.id) continue;
     const projectFeatures = [];
+    const representativeLocations = [];
     const locations = Array.isArray(record?.presence?.geographic) ? record.presence.geographic : [];
     for (const location of locations) {
       if (!location || location.mode === 'hidden' || !location.geometry) continue;
       const feature = publicMapFeature(record, location);
       if (!feature) continue;
       projectFeatures.push(feature);
-      allFeatures.push(feature);
+      allLocalFeatures.push(feature);
+      for (const representativePoint of representativeGeometryPoints(location.geometry)) {
+        representativeLocations.push(Object.freeze({
+          point: representativePoint,
+          representationKind: feature.properties.representation_kind,
+          uncertaintyMetersMin: feature.properties.uncertainty_meters_min,
+        }));
+      }
     }
     featuresByProjectId.set(record.id, Object.freeze(projectFeatures));
+    representativeLocationsByProjectId.set(record.id, Object.freeze(representativeLocations));
   }
 
-  const collections = new Map([['*', featureCollection(allFeatures)]]);
+  const aggregateBucketsByLevel = new Map(GEOGRAPHIC_IMPRESSION_LEVELS.map((level) => [
+    level.id,
+    buildAggregateBuckets(projectIds, recordsById, representativeLocationsByProjectId, level),
+  ]));
+
+  function aggregatesFor(visibleIds) {
+    return GEOGRAPHIC_IMPRESSION_LEVELS.flatMap((level) => (
+      generateAggregateFeatures(visibleIds, aggregateBucketsByLevel.get(level.id), level)
+    ));
+  }
+
+  const collections = new Map([[
+    '*',
+    featureCollection([...aggregatesFor(projectIds), ...allLocalFeatures]),
+  ]]);
   const relations = buildEvidencedRelations(records, recordsById);
 
   function collectionFor(visibleProjectIds = null) {
@@ -1405,8 +1807,8 @@ function buildCatalogProjection(records) {
       collections.set(key, cached);
       return cached;
     }
-    const features = visibleIds.flatMap((identifier) => featuresByProjectId.get(identifier) ?? []);
-    const collection = featureCollection(features);
+    const localFeatures = visibleIds.flatMap((identifier) => featuresByProjectId.get(identifier) ?? []);
+    const collection = featureCollection([...aggregatesFor(visibleIds), ...localFeatures]);
     while (collections.size >= PUBLIC_MAP_COLLECTION_CACHE_LIMIT) {
       const oldest = [...collections.keys()].find((candidate) => candidate !== '*');
       if (!oldest) break;

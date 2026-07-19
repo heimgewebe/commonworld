@@ -53,6 +53,22 @@ class VisualSemanticsContractTests(unittest.TestCase):
         )
         return temporary, root
 
+    def test_public_geographic_profile_matches_filter_vocabulary_and_keeps_family_research_inactive(self) -> None:
+        profiles = self.contract["classification_profiles"]
+        self.assertEqual("exclusive_commons_type_v1", profiles["active_public_geographic_profile"])
+        active = next(profile for profile in profiles["profiles"] if profile["id"] == "exclusive_commons_type_v1")
+        self.assertEqual(
+            ["knowledge", "software", "culture", "food-seeds", "water", "energy", "housing-land", "health-care", "tools-repair", "community-network", "other"],
+            [value["id"] for value in active["values"]],
+        )
+        self.assertEqual(["WD", "SI", "KM", "SE", "WB", "EN", "BW", "PG", "WR", "GN", "AN"], [value["code"] for value in active["values"]])
+        self.assertTrue(active["no_hue_blending"])
+        self.assertTrue(active["text_label_required"])
+        self.assertTrue(active["non_color_code_required"])
+        self.assertTrue(active["coverage_texture_reserved"])
+        family = next(profile for profile in profiles["profiles"] if profile["id"] == "commons_family_v1")
+        self.assertFalse(family["active_in_geographic_impressions_v1"])
+
     def test_family_composition_uses_dominance_without_hue_blending(self) -> None:
         self.assertEqual("knowledge_data", family_composition({"knowledge_data": 7, "making_infrastructure": 3}, self.contract))
         self.assertEqual("knowledge_data", family_composition({"knowledge_data": 6, "making_infrastructure": 4}, self.contract))
