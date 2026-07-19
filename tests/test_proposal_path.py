@@ -94,5 +94,46 @@ class ProposalPathTests(unittest.TestCase):
             self.assertEqual([], MODULE.validate(root))
 
 
+    def test_validator_requires_proposal_forced_colors_contract(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp_dir:
+            root = self.copy_repo(tmp_dir)
+            path = root / "assets/proposal.css"
+            css = path.read_text(encoding="utf-8").replace(
+                "@media (forced-colors: active)",
+                "@media (forced-colors: none)",
+                1,
+            )
+            path.write_text(css, encoding="utf-8")
+            errors = MODULE.validate(root)
+            self.assertIn("assets/proposal.css must define a forced-colors: active contract", errors)
+
+    def test_validator_requires_proposal_increased_contrast_checked_state(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp_dir:
+            root = self.copy_repo(tmp_dir)
+            path = root / "assets/proposal.css"
+            css = path.read_text(encoding="utf-8").replace(
+                ".proposal-form input:checked",
+                ".proposal-form input:not(:checked)",
+                1,
+            )
+            path.write_text(css, encoding="utf-8")
+            errors = MODULE.validate(root)
+            self.assertIn("proposal increased-contrast contract missing token: input:checked", errors)
+
+
+    def test_validator_requires_proposal_reduced_motion_to_disable_transitions(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp_dir:
+            root = self.copy_repo(tmp_dir)
+            path = root / "assets/proposal.css"
+            css = path.read_text(encoding="utf-8").replace(
+                "transition: none !important",
+                "transition-duration: 0.001ms !important",
+                1,
+            )
+            path.write_text(css, encoding="utf-8")
+            errors = MODULE.validate(root)
+            self.assertIn("proposal reduced-motion contract must disable transitions", errors)
+
+
 if __name__ == "__main__":
     unittest.main()

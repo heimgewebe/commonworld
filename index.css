@@ -101,6 +101,9 @@ html[data-input-modality="pointer"] :focus {
 .skip-link {
   position: fixed;
   z-index: 100;
+  display: inline-flex;
+  align-items: center;
+  min-block-size: var(--minimum-touch-target);
   top: 0.75rem;
   left: 0.75rem;
   max-inline-size: calc(100vw - 1.5rem);
@@ -112,7 +115,8 @@ html[data-input-modality="pointer"] :focus {
   transform: translateY(-180%);
 }
 
-.skip-link:focus {
+.skip-link:focus,
+.skip-link:focus-visible {
   transform: translateY(0);
 }
 
@@ -1895,7 +1899,7 @@ html:not([data-input-modality="pointer"]) .digital-ribbon-item:focus-visible {
     scroll-behavior: auto !important;
     animation-duration: 0.01ms !important;
     animation-iteration-count: 1 !important;
-    transition-duration: 0.01ms !important;
+    transition: none !important;
   }
 }
 
@@ -2196,5 +2200,167 @@ html:not([data-input-modality="pointer"]) .digital-ribbon-item:focus-visible {
 
   .discovery-result-actions {
     padding-left: 0.85rem;
+  }
+}
+
+/* Accessibility modes contract: T016 */
+@media (prefers-contrast: more) {
+  :root {
+    --muted: #d8e3dd;
+    --line: rgba(237, 244, 239, 0.46);
+    --line-strong: rgba(237, 244, 239, 0.8);
+    --focus: #fff8cf;
+  }
+
+  :focus-visible {
+    outline: 4px solid var(--focus);
+    outline-offset: 0.22rem;
+  }
+
+  .icon-button,
+  .quiet-button,
+  .layer-view-button,
+  .layer-filter,
+  .layer-project,
+  .catalog-select,
+  .presentation-choices button,
+  .search-control,
+  .intent-filter-grid select,
+  .filter-presence-options label,
+  .discovery-result,
+  .catalog-card,
+  .catalog-action-link,
+  .discovery-result-actions a {
+    border-width: 2px;
+  }
+
+  input:checked,
+  .discovery-result.is-selected,
+  .digital-ribbon-item.is-selected,
+  .digital-lane-focus[aria-pressed="true"],
+  .layer-filter[aria-pressed="true"],
+  .layer-project[aria-pressed="true"],
+  .catalog-select[aria-pressed="true"],
+  .presentation-choices button[aria-checked="true"] {
+    outline: 2px solid currentColor;
+    outline-offset: 2px;
+  }
+}
+
+@media (forced-colors: active) {
+  :root {
+    color-scheme: light dark;
+    --muted: CanvasText;
+    --line: CanvasText;
+    --line-strong: CanvasText;
+    --surface: Canvas;
+    --surface-solid: Canvas;
+    --green: LinkText;
+    --blue: LinkText;
+    --focus: Highlight;
+  }
+
+  body,
+  .app-shell,
+  .globe-surface,
+  .globe-stage,
+  .text-view,
+  .method-page {
+    background: Canvas;
+    color: CanvasText;
+  }
+
+  a,
+  .catalog-action-link,
+  .discovery-result-actions a {
+    color: LinkText;
+  }
+
+  :focus-visible,
+  .sphere-edge-control:focus-visible,
+  .maplibregl-ctrl-group button:focus-visible {
+    outline: 3px solid Highlight !important;
+    outline-offset: 3px;
+    box-shadow: none !important;
+  }
+
+  button,
+  input,
+  select,
+  .icon-button,
+  .quiet-button,
+  .layer-view-button,
+  .layer-filter,
+  .layer-project,
+  .catalog-select,
+  .presentation-choices button,
+  .filter-presence-options label,
+  .catalog-action-link,
+  .discovery-result-actions a,
+  .maplibregl-ctrl-group button {
+    border: 2px solid ButtonText;
+    background: ButtonFace;
+    color: ButtonText;
+    box-shadow: none;
+  }
+
+  input,
+  select,
+  .search-control {
+    border: 2px solid FieldText;
+    background: Field;
+    color: FieldText;
+  }
+
+  .topbar,
+  .discovery-panel,
+  .settings-panel,
+  .project-focus,
+  .layer-panel,
+  .layer-discovery,
+  .digital-lane,
+  .discovery-result,
+  .catalog-card,
+  .orientation-bar,
+  .map-status,
+  .globe-results {
+    border-color: CanvasText;
+    background: Canvas;
+    color: CanvasText;
+    box-shadow: none;
+  }
+
+  input:checked,
+  [aria-expanded="true"],
+  [aria-pressed="true"],
+  [aria-checked="true"],
+  .discovery-result.is-selected,
+  .digital-ribbon-item.is-selected,
+  .digital-lane.is-focused {
+    outline: 3px solid Highlight;
+    outline-offset: 2px;
+  }
+
+  [disabled],
+  [aria-disabled="true"] {
+    border-color: GrayText;
+    color: GrayText;
+  }
+
+  .sphere-edge-control {
+    stroke: ButtonText;
+  }
+
+  .sphere-edge-focus {
+    stroke: Highlight;
+  }
+
+  #sphere-rings text,
+  .digital-ribbon-name,
+  .digital-ribbon-binary,
+  .discovery-result-summary,
+  .semantic-summary {
+    fill: CanvasText;
+    color: CanvasText;
   }
 }
