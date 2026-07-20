@@ -103,6 +103,44 @@ def _urls(value: object) -> list[str]:
     return found
 
 
+def _javascript_function_source(source: str, name: str) -> str:
+    marker = f"function {name}("
+    start = source.find(marker)
+    if start < 0:
+        return ""
+
+    parameter_start = source.find("(", start + len(f"function {name}"))
+    if parameter_start < 0:
+        return ""
+    parameter_depth = 0
+    parameter_end = -1
+    for index in range(parameter_start, len(source)):
+        character = source[index]
+        if character == "(":
+            parameter_depth += 1
+        elif character == ")":
+            parameter_depth -= 1
+            if parameter_depth == 0:
+                parameter_end = index
+                break
+    if parameter_end < 0:
+        return ""
+
+    opening = source.find("{", parameter_end + 1)
+    if opening < 0:
+        return ""
+    body_depth = 0
+    for index in range(opening, len(source)):
+        character = source[index]
+        if character == "{":
+            body_depth += 1
+        elif character == "}":
+            body_depth -= 1
+            if body_depth == 0:
+                return source[start:index + 1]
+    return ""
+
+
 def _catalog_records(root: Path, manifest: dict) -> list[dict]:
     records: list[dict] = []
     for relative in manifest.get("project_files", []):
@@ -468,6 +506,35 @@ def validate_public_maplibre_vertical_slice(root: Path = ROOT) -> list[str]:
             errors.append(f"public runtime must use the tested text-ribbon lane architecture: {token}")
     if re.search(r"cooperativeGestures\s*:\s*true", app):
         errors.append("public mobile globe must allow one-finger touch movement; cooperativeGestures may not be enabled")
+
+    sphere_opacity = _javascript_function_source(app, "setSphereOpacity")
+    sphere_visuals = _javascript_function_source(app, "updateSphereVisuals")
+    sphere_diagnostics = _javascript_function_source(app, "publishSphereDiagnostics")
+    sphere_sampling = _javascript_function_source(app, "sampleSphereGeometry")
+    if not all((sphere_opacity, sphere_visuals, sphere_diagnostics, sphere_sampling)):
+        errors.append("public sphere performance functions must remain statically inspectable")
+    if "elements.stage.dataset.globeDiameter" in sphere_opacity:
+        errors.append("sphere opacity must use runtime metrics instead of reading diagnostic DOM state")
+    for property_name in ("--sphere-x", "--sphere-y", "--sphere-size"):
+        if f"setStylePropertyIfChanged(elements.sphere, '{property_name}'" in sphere_visuals:
+            errors.append(f"sphere visual geometry must inherit {property_name} from the stage without duplicate writes")
+    for expression in (
+        "quantizeSpherePixel(geometry.x)",
+        "quantizeSpherePixel(geometry.y)",
+        "quantizeSpherePixel(geometry.diameter)",
+    ):
+        if expression not in sphere_visuals:
+            errors.append(f"sphere visual hot path must quantize subpixel geometry: {expression}")
+        if expression not in sphere_diagnostics:
+            errors.append(f"sphere diagnostics must publish quantized geometry: {expression}")
+    if "quantizeSpherePixel(geometry.globeDiameter)" not in sphere_diagnostics:
+        errors.append("sphere diagnostics must publish a quantized globe diameter")
+    if "runtime.sphereMetrics.globeViewportRatio = globeViewportRatio" not in sphere_opacity:
+        errors.append("sphere opacity must refresh the full-precision runtime viewport ratio on every evaluation")
+    if "Number(runtime.sphereMetrics.globeViewportRatio.toFixed(4))" not in sphere_diagnostics:
+        errors.append("sphere diagnostics must read the runtime viewport ratio and round only during publication")
+    if "sampledDiagnosticPublicationDue(" not in sphere_sampling:
+        errors.append("sphere diagnostic cadence must use the tested admitted-sample helper")
 
     required_html = (
         '<script src="./assets/vendor/maplibre-gl.js" defer></script>',

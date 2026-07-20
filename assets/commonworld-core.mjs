@@ -695,6 +695,16 @@ export function binaryFragment(identifier, length = 12) {
 }
 
 
+export function quantizeSpherePixel(value) {
+  return rounded(finite(value, 0), 2);
+}
+
+export function sampledDiagnosticPublicationDue(sampleCount, interval) {
+  if (!Number.isInteger(sampleCount) || sampleCount < 1) return false;
+  if (!Number.isInteger(interval) || interval < 1) return false;
+  return sampleCount === 1 || sampleCount % interval === 0;
+}
+
 export function sphereDetailLevel({ diameter, sideView = false } = {}) {
   if (sideView) return 'close';
   const size = Math.max(0, finite(diameter, 0));

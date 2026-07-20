@@ -323,15 +323,12 @@ html[data-input-modality="pointer"] :focus {
 
 .digital-sphere {
   --sphere-opacity: 1;
-  --sphere-x: 50%;
-  --sphere-y: 50%;
-  --sphere-size: min(78vw, 78vh);
   position: absolute;
   z-index: 4;
-  left: var(--sphere-x);
-  top: var(--sphere-y);
-  width: var(--sphere-size);
-  height: var(--sphere-size);
+  left: var(--sphere-x, 50%);
+  top: var(--sphere-y, 50%);
+  width: var(--sphere-size, min(78vw, 78vh));
+  height: var(--sphere-size, min(78vw, 78vh));
   overflow: visible;
   transform: translate(-50%, -50%);
   opacity: var(--sphere-opacity);

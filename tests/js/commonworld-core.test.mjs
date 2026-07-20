@@ -38,6 +38,7 @@ import {
   publicGeographicRepresentationKind,
   publicMapFeatureCollection,
   publicProjectNavigationTarget,
+  quantizeSpherePixel,
   representativeGeometryPoint,
   representativeGeometryPoints,
   evidencedRelations,
@@ -55,6 +56,7 @@ import {
   ringOrbitDuration,
   ringOrbitStartAngle,
   safeExternalHttpsUrl,
+  sampledDiagnosticPublicationDue,
   searchFromState,
   serializeDigitalPath,
   semanticLocationLine,
@@ -541,6 +543,24 @@ test('projected globe circle uses the rendered horizon rather than MapLibre zoom
   ];
   assert.deepEqual(projectedGlobeCircle({ center, horizon }), { x: 195, y: 422, diameter: 342.36 });
   assert.equal(projectedGlobeCircle({ center, horizon: horizon.slice(0, 3) }), null);
+});
+
+test('sphere pixel quantization suppresses imperceptible subpixel churn', () => {
+  assert.equal(quantizeSpherePixel(123.456789), 123.46);
+  assert.equal(quantizeSpherePixel(123.461), 123.46);
+  assert.equal(quantizeSpherePixel(123.466), 123.47);
+  assert.equal(quantizeSpherePixel(Number.NaN), 0);
+});
+
+test('sampled diagnostics use the admitted sample count without a zero-count publication', () => {
+  assert.deepEqual(
+    Array.from({ length: 9 }, (_, index) => index).filter((sampleCount) => (
+      sampledDiagnosticPublicationDue(sampleCount, 4)
+    )),
+    [1, 4, 8],
+  );
+  assert.equal(sampledDiagnosticPublicationDue(1, 0), false);
+  assert.equal(sampledDiagnosticPublicationDue(-1, 4), false);
 });
 
 test('sphere layout follows measured globe geometry and keeps stacked side tracks cropped', () => {
