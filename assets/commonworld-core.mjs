@@ -7,6 +7,8 @@ export const DEFAULT_CAMERA = Object.freeze({
 });
 
 export const MAX_MAP_ZOOM = 18;
+export const MAP_GEOMETRY_SAMPLE_INTERVAL_MS = 32;
+export const MAP_GEOMETRY_DIAGNOSTIC_SAMPLE_INTERVAL = 4;
 export const DIGITAL_LAYER_TRANSITION_MS = 420;
 const DIGITAL_LAYER_MAX_ZOOM = 8;
 

@@ -10,6 +10,8 @@ import {
   GEOGRAPHIC_IMPRESSION_LEVELS,
   DEFAULT_CAMERA,
   MAX_MAP_ZOOM,
+  MAP_GEOMETRY_DIAGNOSTIC_SAMPLE_INTERVAL,
+  MAP_GEOMETRY_SAMPLE_INTERVAL_MS,
   DIGITAL_LAYER_TRANSITION_MS,
   DIGITAL_RING_FIELDS,
   DIGITAL_ROOT_PATH,
@@ -561,6 +563,8 @@ test('sphere layout follows measured globe geometry and keeps stacked side track
 });
 
 test('digital layer camera performs a bounded journey without changing identity', () => {
+  assert.equal(MAP_GEOMETRY_SAMPLE_INTERVAL_MS, 32);
+  assert.equal(MAP_GEOMETRY_DIAGNOSTIC_SAMPLE_INTERVAL, 4);
   assert.equal(DIGITAL_LAYER_TRANSITION_MS, 420);
   assert.deepEqual(digitalLayerCamera({ lng: 13.4, lat: 52.5, zoom: 1.2, bearing: 170, pitch: 0 }), {
     center: [13.4, 52.5],

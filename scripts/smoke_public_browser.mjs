@@ -10,6 +10,8 @@ import {
   deriveDigitalProjectPath,
   deriveLayer,
   DIGITAL_LAYER_TRANSITION_MS,
+  MAP_GEOMETRY_DIAGNOSTIC_SAMPLE_INTERVAL,
+  MAP_GEOMETRY_SAMPLE_INTERVAL_MS,
   DIGITAL_RING_FIELDS,
   DIGITAL_ROOT_PATH,
   globeHorizonCoordinates,
@@ -432,10 +434,15 @@ async function startupAndRingOrbitScenario() {
 
   const geometryBeforeRepaint = await run.page.evaluate(() => {
     const stage = document.querySelector('.globe-stage');
+    window.__commonworldIdleRepaintRenderCount = 0;
+    window.__commonworldIdleRepaintRenderHandler = () => {
+      window.__commonworldIdleRepaintRenderCount += 1;
+    };
+    window.__commonworldTestMap.on('render', window.__commonworldIdleRepaintRenderHandler);
     return {
-      mapRenders: Number(stage?.dataset.mapRenders ?? 0),
       geometryCommits: Number(stage?.dataset.sphereGeometryCommits ?? 0),
       geometryEvaluations: Number(stage?.dataset.sphereGeometryEvaluations ?? 0),
+      diagnosticPublishes: Number(stage?.dataset.sphereGeometryDiagnosticPublishes ?? 0),
     };
   });
   await run.page.evaluate(async () => {
@@ -445,23 +452,25 @@ async function startupAndRingOrbitScenario() {
       await new Promise((resolve) => requestAnimationFrame(resolve));
     }
   });
-  await run.page.waitForFunction(
-    (before) => Number(document.querySelector('.globe-stage')?.dataset.mapRenders ?? 0) > before,
-    geometryBeforeRepaint.mapRenders,
-  );
+  await run.page.waitForFunction(() => window.__commonworldIdleRepaintRenderCount > 0);
   await run.page.waitForTimeout(120);
   const geometryAfterRepaint = await run.page.evaluate(() => {
     const stage = document.querySelector('.globe-stage');
+    const renderCount = window.__commonworldIdleRepaintRenderCount;
+    window.__commonworldTestMap.off('render', window.__commonworldIdleRepaintRenderHandler);
+    delete window.__commonworldIdleRepaintRenderHandler;
     return {
-      mapRenders: Number(stage?.dataset.mapRenders ?? 0),
+      idleRepaintRenderCount: renderCount,
       geometryCommits: Number(stage?.dataset.sphereGeometryCommits ?? 0),
       geometryEvaluations: Number(stage?.dataset.sphereGeometryEvaluations ?? 0),
+      diagnosticPublishes: Number(stage?.dataset.sphereGeometryDiagnosticPublishes ?? 0),
     };
   });
-  const repaintRenderDelta = geometryAfterRepaint.mapRenders - geometryBeforeRepaint.mapRenders;
   const repaintEvaluationDelta = geometryAfterRepaint.geometryEvaluations - geometryBeforeRepaint.geometryEvaluations;
-  assert(repaintRenderDelta > 0, 'geometry cache: test repaints did not reach MapLibre');
+  const repaintDiagnosticPublishDelta = geometryAfterRepaint.diagnosticPublishes - geometryBeforeRepaint.diagnosticPublishes;
+  assert(geometryAfterRepaint.idleRepaintRenderCount > 0, 'geometry cache: test repaints did not reach MapLibre');
   assert(repaintEvaluationDelta === 0, 'geometry sampler: idle MapLibre repaints still trigger sphere projection work ' + JSON.stringify({ geometryBeforeRepaint, geometryAfterRepaint }));
+  assert(repaintDiagnosticPublishDelta === 0, 'geometry diagnostics: idle MapLibre repaints still publish DOM metadata ' + JSON.stringify({ geometryBeforeRepaint, geometryAfterRepaint }));
   assert(geometryAfterRepaint.geometryCommits === geometryBeforeRepaint.geometryCommits, 'geometry cache: unchanged repaints rewrote sphere geometry ' + JSON.stringify({ geometryBeforeRepaint, geometryAfterRepaint }));
 
   const removedHint = await run.page.evaluate(() => ({
@@ -851,21 +860,26 @@ async function layerJourneyScenario({ mobile = false, viewportOverride = null, t
   const zoomInBox = await run.page.locator('.maplibregl-ctrl-zoom-in').boundingBox();
   assert(zoomInBox, 'layer journey: zoom-in control has no geometry');
   const activateZoomIn = async () => {
-    const previousSize = Number(await stage.getAttribute('data-sphere-size'));
+    const previousRenderedSize = await run.page.locator('#digital-sphere').evaluate((node) => node.getBoundingClientRect().width);
     if (mobile) await run.page.touchscreen.tap(zoomInBox.x + zoomInBox.width / 2, zoomInBox.y + zoomInBox.height / 2);
     else await run.page.mouse.click(zoomInBox.x + zoomInBox.width / 2, zoomInBox.y + zoomInBox.height / 2);
-    await run.page.waitForFunction((size) => Number(document.querySelector('.globe-stage')?.dataset.sphereSize ?? 0) !== size, previousSize);
+    await run.page.waitForFunction((size) => {
+      const sphere = document.querySelector('#digital-sphere');
+      return sphere && Math.abs(sphere.getBoundingClientRect().width - size) > 1;
+    }, previousRenderedSize);
     const synchronousGeometry = await run.page.evaluate(() => {
       const stage = document.querySelector('.globe-stage');
       const sphere = document.querySelector('#digital-sphere');
+      const style = getComputedStyle(sphere);
       return {
         rendered: sphere.getBoundingClientRect().width,
-        declared: Number(stage.dataset.sphereSize),
-        transitionProperty: getComputedStyle(sphere).transitionProperty,
+        visualSize: Number.parseFloat(style.getPropertyValue('--sphere-size')),
+        diagnosticSize: Number(stage.dataset.sphereSize),
+        transitionProperty: style.transitionProperty,
       };
     });
-    assert(Math.abs(synchronousGeometry.rendered - synchronousGeometry.declared) <= 2, `layer journey: digital sphere trails the moving globe (${JSON.stringify(synchronousGeometry)})`);
-    assert(!synchronousGeometry.transitionProperty.split(',').map((value) => value.trim()).some((value) => ['width', 'height', 'left', 'top'].includes(value)), `layer journey: overview geometry still animates behind the globe (${JSON.stringify(synchronousGeometry)})`);
+    assert(Number.isFinite(synchronousGeometry.visualSize) && Math.abs(synchronousGeometry.rendered - synchronousGeometry.visualSize) <= 2, 'layer journey: visual sphere geometry trails the moving globe ' + JSON.stringify(synchronousGeometry));
+    assert(!synchronousGeometry.transitionProperty.split(',').map((value) => value.trim()).some((value) => ['width', 'height', 'left', 'top'].includes(value)), 'layer journey: overview geometry still animates behind the globe ' + JSON.stringify(synchronousGeometry));
     await waitForSphereGeometrySettled(run.page);
   };
   await activateZoomIn();
@@ -976,11 +990,15 @@ async function layerJourneyScenario({ mobile = false, viewportOverride = null, t
       phase: stageNode.dataset.viewPhase,
       source: stageNode.dataset.globeGeometrySource,
       moving: window.__commonworldTestMap?.isMoving() ?? null,
+      mapMovingAttribute: stageNode.dataset.mapMoving === 'true',
       sphereOpacity: Number(getComputedStyle(sphereNode).opacity),
       panelVisible: panelNode?.hasAttribute('data-visible') ?? false,
       panelHidden: panelNode?.hidden ?? null,
+      ringCount: document.querySelectorAll('.sphere-ring-plane').length,
+      ringsPaused: [...document.querySelectorAll('.sphere-ring-plane')].every((ring) => getComputedStyle(ring).animationPlayState === 'paused'),
       commandCount: window.__commonworldCameraCommands?.length ?? 0,
       geometryEvaluations: Number(stageNode.dataset.sphereGeometryEvaluations ?? 0),
+      diagnosticPublishes: Number(stageNode.dataset.sphereGeometryDiagnosticPublishes ?? 0),
       at: performance.now(),
     });
     window.__commonworldPhaseLog.push(snapshot('initial'));
@@ -989,7 +1007,7 @@ async function layerJourneyScenario({ mobile = false, viewportOverride = null, t
     });
     window.__commonworldPhaseObserver.observe(stageNode, {
       attributes: true,
-      attributeFilter: ['data-view-phase', 'data-globe-geometry-source', 'data-layer-panel-visible-at', 'data-last-camera-command', 'data-last-camera-duration'],
+      attributeFilter: ['data-view-phase', 'data-globe-geometry-source', 'data-layer-panel-visible-at', 'data-last-camera-command', 'data-last-camera-duration', 'data-map-moving'],
     });
     window.__commonworldPhaseObserver.observe(panelNode, {
       attributes: true,
@@ -1017,22 +1035,13 @@ async function layerJourneyScenario({ mobile = false, viewportOverride = null, t
   assert((await run.page.locator('.globe-stage').getAttribute('data-view-phase')) === 'entering-layers', 'layer journey: animated entry phase missing');
   assert((await stage.getAttribute('data-globe-geometry-source')) === 'maplibre-projected-horizon', 'layer journey: entering flight abandoned the MapLibre horizon geometry');
   assert(await run.page.locator('#layer-panel').isHidden(), 'layer journey: description panel obscures the camera flight');
-  const movingRingStateHandle = await run.page.waitForFunction(() => {
-    const stageNode = document.querySelector('.globe-stage');
-    const panelNode = document.querySelector('#layer-panel');
-    const rings = [...document.querySelectorAll('.sphere-ring-plane')];
-    const state = {
-      mapMoving: stageNode?.dataset.mapMoving === 'true',
-      phase: stageNode?.dataset.viewPhase ?? null,
-      panelHidden: panelNode?.hidden ?? null,
-      ringCount: rings.length,
-      ringsPaused: rings.length > 0 && rings.every((ring) => getComputedStyle(ring).animationPlayState === 'paused'),
-    };
-    return state.mapMoving && state.ringsPaused ? state : false;
-  });
-  const movingRingState = await movingRingStateHandle.jsonValue();
-  await movingRingStateHandle.dispose();
-  assert(movingRingState.mapMoving && movingRingState.ringsPaused, 'layer journey: decorative ring pause was not observed atomically during camera movement ' + JSON.stringify(movingRingState));
+  await run.page.waitForFunction(() => window.__commonworldPhaseLog?.some((entry) => (
+    entry.mapMovingAttribute && entry.ringCount > 0 && entry.ringsPaused
+  )));
+  const movingRingState = await run.page.evaluate(() => window.__commonworldPhaseLog.find((entry) => (
+    entry.mapMovingAttribute && entry.ringCount > 0 && entry.ringsPaused
+  )));
+  assert(movingRingState.mapMovingAttribute && movingRingState.ringsPaused, 'layer journey: decorative ring pause was not recorded during camera movement ' + JSON.stringify(movingRingState));
   assert(movingRingState.phase === 'entering-layers' && movingRingState.panelHidden === true, 'layer journey: movement-bound ring pause violated the stable-panel contract ' + JSON.stringify(movingRingState));
   const flightComposition = await run.page.evaluate(() => {
     const map = document.querySelector('#map');
@@ -1065,8 +1074,17 @@ async function layerJourneyScenario({ mobile = false, viewportOverride = null, t
   const firstPanelEntry = phaseLog.find((entry) => entry.panelVisible);
   assert(firstPanelEntry && phaseLog.indexOf(firstPanelEntry) > sideIndex && firstPanelEntry.phase === 'layers' && firstPanelEntry.source === 'side-view-layout', `layer journey: panel became visible before the side layout was stable (${JSON.stringify({ firstPanelEntry, phaseLog })})`);
   const flightGeometryEvaluationDelta = firstSideEntry.geometryEvaluations - phaseLog[0].geometryEvaluations;
-  const maxFlightGeometryEvaluations = Math.ceil(DIGITAL_LAYER_TRANSITION_MS / 32) + 3;
+  const maxFlightGeometryEvaluations = Math.ceil(DIGITAL_LAYER_TRANSITION_MS / MAP_GEOMETRY_SAMPLE_INTERVAL_MS) + 3;
   assert(flightGeometryEvaluationDelta > 0 && flightGeometryEvaluationDelta <= maxFlightGeometryEvaluations, 'layer journey: sphere projection exceeded the sampled camera-flight budget ' + JSON.stringify({ flightGeometryEvaluationDelta, maxFlightGeometryEvaluations, phaseLog }));
+  const firstMovingEntry = phaseLog.find((entry) => entry.mapMovingAttribute);
+  const settlingEntry = phaseLog.find((entry) => entry.phase === 'settling-layers');
+  const movingGeometryEvaluationDelta = settlingEntry.geometryEvaluations - firstMovingEntry.geometryEvaluations;
+  const movingDiagnosticPublishDelta = settlingEntry.diagnosticPublishes - firstMovingEntry.diagnosticPublishes;
+  const maxMovingDiagnosticPublishes = Math.ceil(movingGeometryEvaluationDelta / MAP_GEOMETRY_DIAGNOSTIC_SAMPLE_INTERVAL) + 2;
+  assert(movingDiagnosticPublishDelta > 0 && movingDiagnosticPublishDelta <= maxMovingDiagnosticPublishes, 'layer journey: diagnostic publishing exceeded its movement-window budget ' + JSON.stringify({ movingDiagnosticPublishDelta, maxMovingDiagnosticPublishes, phaseLog }));
+  if (movingGeometryEvaluationDelta > 1) {
+    assert(movingDiagnosticPublishDelta < movingGeometryEvaluationDelta, 'layer journey: diagnostics still publish on every moving geometry evaluation ' + JSON.stringify({ movingDiagnosticPublishDelta, movingGeometryEvaluationDelta, phaseLog }));
+  }
   assert((await stage.getAttribute('data-globe-geometry-source')) === 'side-view-layout', 'layer journey: settled layers view is missing the side layout geometry');
   if (touch) {
     const closeFocusAppearance = await run.page.locator('#layer-close').evaluate((node) => {
