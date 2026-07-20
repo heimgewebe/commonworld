@@ -507,33 +507,52 @@ def validate_public_maplibre_vertical_slice(root: Path = ROOT) -> list[str]:
     if re.search(r"cooperativeGestures\s*:\s*true", app):
         errors.append("public mobile globe must allow one-finger touch movement; cooperativeGestures may not be enabled")
 
-    sphere_opacity = _javascript_function_source(app, "setSphereOpacity")
+    sphere_opacity = _javascript_function_source(app, "updateSphereOpacity")
     sphere_visuals = _javascript_function_source(app, "updateSphereVisuals")
     sphere_diagnostics = _javascript_function_source(app, "publishSphereDiagnostics")
     sphere_sampling = _javascript_function_source(app, "sampleSphereGeometry")
     if not all((sphere_opacity, sphere_visuals, sphere_diagnostics, sphere_sampling)):
         errors.append("public sphere performance functions must remain statically inspectable")
-    if "elements.stage.dataset.globeDiameter" in sphere_opacity:
+
+    diagnostic_dataset_read = re.compile(
+        r"\belements\s*\.\s*(?:stage|sphere)\s*\.\s*dataset\s*"
+        r"(?:\.\s*(?:globeDiameter|globeViewportRatio|sphereSize|sphereX|sphereY)\b"
+        r"|\[\s*['\"](?:globeDiameter|globeViewportRatio|sphereSize|sphereX|sphereY)['\"]\s*\])"
+    )
+    if diagnostic_dataset_read.search(sphere_opacity):
         errors.append("sphere opacity must use runtime metrics instead of reading diagnostic DOM state")
     for property_name in ("--sphere-x", "--sphere-y", "--sphere-size"):
-        if f"setStylePropertyIfChanged(elements.sphere, '{property_name}'" in sphere_visuals:
+        duplicate_sphere_write = re.compile(
+            rf"\bsetStylePropertyIfChanged\s*\(\s*elements\s*\.\s*sphere\s*,\s*['\"]{re.escape(property_name)}['\"]"
+        )
+        if duplicate_sphere_write.search(sphere_visuals):
             errors.append(f"sphere visual geometry must inherit {property_name} from the stage without duplicate writes")
-    for expression in (
-        "quantizeSpherePixel(geometry.x)",
-        "quantizeSpherePixel(geometry.y)",
-        "quantizeSpherePixel(geometry.diameter)",
-    ):
-        if expression not in sphere_visuals:
+    for property_name in ("x", "y", "diameter"):
+        quantized_geometry = re.compile(
+            rf"\bquantizeSpherePixel\s*\(\s*geometry\s*\.\s*{property_name}\s*\)"
+        )
+        expression = f"quantizeSpherePixel(geometry.{property_name})"
+        if not quantized_geometry.search(sphere_visuals):
             errors.append(f"sphere visual hot path must quantize subpixel geometry: {expression}")
-        if expression not in sphere_diagnostics:
+        if not quantized_geometry.search(sphere_diagnostics):
             errors.append(f"sphere diagnostics must publish quantized geometry: {expression}")
-    if "quantizeSpherePixel(geometry.globeDiameter)" not in sphere_diagnostics:
+    if not re.search(
+        r"\bquantizeSpherePixel\s*\(\s*geometry\s*\.\s*globeDiameter\s*\)",
+        sphere_diagnostics,
+    ):
         errors.append("sphere diagnostics must publish a quantized globe diameter")
-    if "runtime.sphereMetrics.globeViewportRatio = globeViewportRatio" not in sphere_opacity:
+    if not re.search(
+        r"\bruntime\s*\.\s*sphereMetrics\s*\.\s*globeViewportRatio\s*=\s*globeViewportRatio\s*;?",
+        sphere_opacity,
+    ):
         errors.append("sphere opacity must refresh the full-precision runtime viewport ratio on every evaluation")
-    if "Number(runtime.sphereMetrics.globeViewportRatio.toFixed(4))" not in sphere_diagnostics:
+    if not re.search(
+        r"\bNumber\s*\(\s*runtime\s*\.\s*sphereMetrics\s*\.\s*globeViewportRatio"
+        r"\s*\.\s*toFixed\s*\(\s*4\s*\)\s*\)",
+        sphere_diagnostics,
+    ):
         errors.append("sphere diagnostics must read the runtime viewport ratio and round only during publication")
-    if "sampledDiagnosticPublicationDue(" not in sphere_sampling:
+    if not re.search(r"\bsampledDiagnosticPublicationDue\s*\(", sphere_sampling):
         errors.append("sphere diagnostic cadence must use the tested admitted-sample helper")
 
     required_html = (

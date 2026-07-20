@@ -1790,7 +1790,12 @@ function setQuery(value, { historyMode = 'replace' } = {}) {
   if (historyMode) runtime.searchTimer = window.setTimeout(() => writeHistory(historyMode), 150);
 }
 
-function setSphereOpacity({ globeDiameter = null, size = null } = {}) {
+/**
+ * Refresh the sphere opacity and hidden-state attribute.
+ *
+ * @returns {boolean} true when a visible DOM property changed.
+ */
+function updateSphereOpacity({ globeDiameter = null, size = null } = {}) {
   const immersive = runtime.state.view === 'layers' || runtime.viewPhase !== 'overview';
   let globeViewportRatio = 0;
   let opacity = 1;
@@ -1825,7 +1830,7 @@ function updateSphereVisuals({ geometry, size }) {
   visualChanged = setStylePropertyIfChanged(elements.stage, '--sphere-y', y) || visualChanged;
   visualChanged = setStylePropertyIfChanged(elements.stage, '--sphere-size', diameter) || visualChanged;
   runtime.sphereMetrics.globeDiameter = geometry.globeDiameter;
-  visualChanged = setSphereOpacity({ globeDiameter: geometry.globeDiameter, size }) || visualChanged;
+  visualChanged = updateSphereOpacity({ globeDiameter: geometry.globeDiameter, size }) || visualChanged;
   return visualChanged;
 }
 
@@ -2057,7 +2062,7 @@ function setViewPhase(phase) {
     elements.stage.dataset.layerReturnStartedAt = elements.stage.dataset.viewPhaseStartedAt;
   }
   updateSphereGeometry();
-  if (!runtime.mapReady) setSphereOpacity();
+  if (!runtime.mapReady) updateSphereOpacity();
 }
 
 function showLayerState() {

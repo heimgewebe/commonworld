@@ -290,7 +290,7 @@
     "browser": {
       "schema_version": 1,
       "kind": "commonworld_catalog_delivery_browser_metrics",
-      "measured_at": "2026-07-20T12:10:30.655Z",
+      "measured_at": "2026-07-20T14:36:08.352Z",
       "cpu_throttle_rate": 4,
       "profiles": [
         {
@@ -300,22 +300,21 @@
             "height": 844
           },
           "cpu_throttle_rate": 4,
-          "runtime_ready_ms": 688,
+          "runtime_ready_ms": 679,
           "dom_node_count": 1687,
           "catalog_card_count": 41,
           "interactive_catalog_card_count": 41,
           "runtime_ready": true,
           "runtime_failed": false,
-          "dom_content_loaded_ms": 414.2000000476837,
-          "load_event_ms": 456,
+          "dom_content_loaded_ms": 408.89999985694885,
+          "load_event_ms": 448.69999980926514,
           "resource_count": 10,
-          "script_duration_ms": 753.03,
-          "task_duration_ms": 1371.36,
+          "script_duration_ms": 730.91,
+          "task_duration_ms": 1328.63,
           "bootstrap_compile": {
             "median_ms": 0.40000009536743164,
-            "p95_ms": 1,
+            "p95_ms": 0.7999999523162842,
             "samples_ms": [
-              0,
               0,
               0,
               0,
@@ -323,24 +322,25 @@
               0,
               0.09999990463256836,
               0.10000014305114746,
+              0.20000004768371582,
+              0.20000004768371582,
               0.39999985694885254,
               0.40000009536743164,
-              0.40000009536743164,
               0.5,
               0.5,
               0.5,
               0.5,
+              0.5999999046325684,
               0.7000000476837158,
               0.7999999523162842,
               0.7999999523162842,
               0.7999999523162842,
-              1,
-              1.2000000476837158
+              0.9000000953674316
             ]
           },
           "first_party_request_count": 9,
           "first_party_unique_request_count": 9,
-          "first_party_raw_bytes": 1666513,
+          "first_party_raw_bytes": 1666655,
           "first_party_requests": [
             "/",
             "/assets/commonworld-app.js",
@@ -352,7 +352,7 @@
             "/assets/vendor/maplibre-gl.js",
             "/index.css"
           ],
-          "first_party_surface_sha256": "9753432e3bfb446e1218c623d99f34eea4e9082f67f4a894e5a1b6697a227b2d",
+          "first_party_surface_sha256": "3101b598fb7035170a477df3c06a840fbc557f0a0a6900c67479a1098e37ab3e",
           "project_json_request_count": 0,
           "project_json_unique_request_count": 0,
           "project_json_requests": []
@@ -364,47 +364,47 @@
             "height": 768
           },
           "cpu_throttle_rate": 4,
-          "runtime_ready_ms": 655,
+          "runtime_ready_ms": 618,
           "dom_node_count": 1687,
           "catalog_card_count": 41,
           "interactive_catalog_card_count": 41,
           "runtime_ready": true,
           "runtime_failed": false,
-          "dom_content_loaded_ms": 374.59999990463257,
-          "load_event_ms": 410.2999999523163,
+          "dom_content_loaded_ms": 354.40000009536743,
+          "load_event_ms": 390.60000014305115,
           "resource_count": 10,
-          "script_duration_ms": 773.14,
-          "task_duration_ms": 1277.01,
+          "script_duration_ms": 732.23,
+          "task_duration_ms": 1229.4,
           "bootstrap_compile": {
             "median_ms": 0.40000009536743164,
-            "p95_ms": 1,
+            "p95_ms": 0.7999999523162842,
             "samples_ms": [
+              0,
               0.09999990463256836,
-              0.10000014305114746,
-              0.10000014305114746,
-              0.10000014305114746,
+              0.09999990463256836,
+              0.09999990463256836,
               0.10000014305114746,
               0.10000014305114746,
               0.20000004768371582,
               0.2999999523162842,
-              0.2999999523162842,
               0.39999985694885254,
+              0.39999985694885254,
+              0.40000009536743164,
               0.40000009536743164,
               0.5,
               0.5,
               0.5999999046325684,
-              0.5999999046325684,
-              0.6999998092651367,
+              0.6000001430511475,
+              0.7000000476837158,
+              0.7000000476837158,
               0.7999999523162842,
               0.7999999523162842,
-              0.7999999523162842,
-              1,
               1
             ]
           },
           "first_party_request_count": 9,
           "first_party_unique_request_count": 9,
-          "first_party_raw_bytes": 1666513,
+          "first_party_raw_bytes": 1666655,
           "first_party_requests": [
             "/",
             "/assets/commonworld-app.js",
@@ -416,7 +416,7 @@
             "/assets/vendor/maplibre-gl.js",
             "/index.css"
           ],
-          "first_party_surface_sha256": "9753432e3bfb446e1218c623d99f34eea4e9082f67f4a894e5a1b6697a227b2d",
+          "first_party_surface_sha256": "3101b598fb7035170a477df3c06a840fbc557f0a0a6900c67479a1098e37ab3e",
           "project_json_request_count": 0,
           "project_json_unique_request_count": 0,
           "project_json_requests": []
@@ -487,9 +487,9 @@
         "method-mobile-text-200"
       ],
       "catalogue_failure_blocked_requests": 0,
-      "durable_job_unit": "grabowski-job-a5abb7b6513d",
-      "job_receipt_sha256": "b1fa493500de2d56867784de6072a0e400da4827f2e0d1d58a8e3d2ed0e91786",
-      "result_sha256": "d6d86b9497a4ecd120227964ccab00c5ea7284d1c2f9a0ceafb6563ad0009c70"
+      "durable_job_unit": "grabowski-job-b7d9554b0bbe",
+      "job_receipt_sha256": "f14ce90c82f773f91c259b7e53fdad723bb910e712c4547cdd9fd1f5915b13b9",
+      "result_sha256": "fcdb5ca59fbbeccec447d2d0ffefdf2309e48af3c719283663e7ab096081a603"
     },
     "proposal_browser_smoke": {
       "verdict": "PASS",
@@ -511,9 +511,9 @@
       ],
       "cpu_throttle_rate": 4,
       "isolated_from_other_browser_jobs": true,
-      "durable_job_unit": "grabowski-job-214fb324fd3b",
-      "job_receipt_sha256": "06b7e1d7a83d60a89f1e3864568531688b46cbc7626dae81b4beb1794cfdaef0",
-      "result_sha256": "4208da8d6d84d21b8217fbd73587d23c78a83f9e29a61c1e3bc091725d1f0f34"
+      "durable_job_unit": "grabowski-job-075ef1a972e3",
+      "job_receipt_sha256": "610a0a2a99a211b4f8664441d3e5de1968dca1f876d0e9e1d58e0d3f1389479e",
+      "result_sha256": "c8caa4f1cf286a3eea0c910b4ff5dea47d5c11ea2cd683bfa937ff12dc319456"
     },
     "official_browser_runner": {
       "verdict": "PASS",
@@ -523,8 +523,8 @@
         "focus-overlay-browser-smoke",
         "accessibility-modes-browser-smoke"
       ],
-      "durable_job_unit": "grabowski-job-dd0375f64c5d",
-      "job_receipt_sha256": "75908fd8e09e037ed02878aa208cc22636918b0b80c1c27da16be5345e65d4a2"
+      "durable_job_unit": "grabowski-job-1b102d8b8375",
+      "job_receipt_sha256": "d328bc4505135302a601a5bfbe2b97fee81d5bd200e65cb1d27ca23d5ecf05ab"
     }
   }
 }

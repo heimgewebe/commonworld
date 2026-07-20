@@ -220,13 +220,43 @@ class PublicMapLibreVerticalSliceTests(unittest.TestCase):
             path.write_text(
                 path.read_text(encoding="utf-8").replace(
                     "runtime.sphereMetrics.globeDiameter",
-                    "Number(elements.stage.dataset.globeDiameter ?? 0)",
+                    "Number(elements . stage . dataset [ 'globeDiameter' ] ?? 0)",
                     1,
                 ),
                 encoding="utf-8",
             )
             errors = validate_public_maplibre_vertical_slice(root)
         self.assertTrue(any("runtime metrics instead of reading diagnostic DOM state" in error for error in errors))
+
+    def test_accepts_equivalent_sphere_validator_formatting(self) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            root = self.copy_slice(directory)
+            baseline_errors = validate_public_maplibre_vertical_slice(root)
+            path = root / "assets/commonworld-app.js"
+            source = path.read_text(encoding="utf-8")
+            source = source.replace(
+                "quantizeSpherePixel(geometry.x)",
+                "quantizeSpherePixel( geometry . x )",
+                1,
+            )
+            source = source.replace(
+                "runtime.sphereMetrics.globeViewportRatio = globeViewportRatio;",
+                "runtime . sphereMetrics . globeViewportRatio=globeViewportRatio ;",
+                1,
+            )
+            source = source.replace(
+                "Number(runtime.sphereMetrics.globeViewportRatio.toFixed(4))",
+                "Number( runtime . sphereMetrics . globeViewportRatio . toFixed( 4 ) )",
+                1,
+            )
+            source = source.replace(
+                "sampledDiagnosticPublicationDue(",
+                "sampledDiagnosticPublicationDue (",
+                1,
+            )
+            path.write_text(source, encoding="utf-8")
+            errors = validate_public_maplibre_vertical_slice(root)
+        self.assertEqual(errors, baseline_errors)
 
     def test_rejects_detached_sphere_viewport_ratio_diagnostics(self) -> None:
         with tempfile.TemporaryDirectory() as directory:

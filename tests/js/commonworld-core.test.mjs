@@ -549,7 +549,10 @@ test('sphere pixel quantization suppresses imperceptible subpixel churn', () => 
   assert.equal(quantizeSpherePixel(123.456789), 123.46);
   assert.equal(quantizeSpherePixel(123.461), 123.46);
   assert.equal(quantizeSpherePixel(123.466), 123.47);
+  assert.equal(quantizeSpherePixel(undefined), 0);
   assert.equal(quantizeSpherePixel(Number.NaN), 0);
+  assert.equal(quantizeSpherePixel(Number.POSITIVE_INFINITY), 0);
+  assert.equal(quantizeSpherePixel({}), 0);
 });
 
 test('sampled diagnostics use the admitted sample count without a zero-count publication', () => {
