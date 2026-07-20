@@ -104,42 +104,215 @@ def _urls(value: object) -> list[str]:
     return found
 
 
+# Bounded lexical scanner for named function declarations; this deliberately avoids
+# a new JavaScript parser dependency while treating non-code delimiters as opaque.
+_JAVASCRIPT_REGEX_PREFIX_KEYWORDS = frozenset({
+    "await",
+    "case",
+    "delete",
+    "do",
+    "else",
+    "in",
+    "instanceof",
+    "new",
+    "of",
+    "return",
+    "throw",
+    "typeof",
+    "void",
+    "yield",
+})
+
+
+def _javascript_identifier_character(character: str) -> bool:
+    return bool(character) and (character.isalnum() or character in "_$")
+
+
+def _javascript_regex_literal_starts(source: str, index: int) -> bool:
+    previous = index - 1
+    while previous >= 0 and source[previous].isspace():
+        previous -= 1
+    if previous < 0:
+        return True
+    if source[previous] in "([{:;,=!?&|~<>":
+        return True
+    if _javascript_identifier_character(source[previous]):
+        start = previous
+        while start >= 0 and _javascript_identifier_character(source[start]):
+            start -= 1
+        keyword = source[start + 1:previous + 1]
+        return keyword in _JAVASCRIPT_REGEX_PREFIX_KEYWORDS and (start < 0 or source[start] != ".")
+    return False
+
+
+def _javascript_quoted_end(source: str, index: int, quote: str) -> int:
+    cursor = index + 1
+    while cursor < len(source):
+        if source[cursor] == "\\":
+            cursor += 2
+        elif source[cursor] == quote:
+            return cursor + 1
+        else:
+            cursor += 1
+    return len(source)
+
+
+def _javascript_line_comment_end(source: str, index: int) -> int:
+    newline = source.find("\n", index + 2)
+    return len(source) if newline < 0 else newline + 1
+
+
+def _javascript_block_comment_end(source: str, index: int) -> int:
+    closing = source.find("*/", index + 2)
+    return len(source) if closing < 0 else closing + 2
+
+
+def _javascript_trivia_end(source: str, index: int) -> int:
+    cursor = index
+    while cursor < len(source):
+        while cursor < len(source) and source[cursor].isspace():
+            cursor += 1
+        if source.startswith("//", cursor):
+            cursor = _javascript_line_comment_end(source, cursor)
+        elif source.startswith("/*", cursor):
+            cursor = _javascript_block_comment_end(source, cursor)
+        else:
+            return cursor
+    return cursor
+
+
+def _javascript_regex_literal_end(source: str, index: int) -> int:
+    cursor = index + 1
+    in_character_class = False
+    while cursor < len(source):
+        character = source[cursor]
+        if character == "\\":
+            cursor += 2
+            continue
+        if character in "\r\n":
+            return index + 1
+        if character == "[":
+            in_character_class = True
+        elif character == "]":
+            in_character_class = False
+        elif character == "/" and not in_character_class:
+            cursor += 1
+            while cursor < len(source) and (source[cursor].isalpha() or source[cursor].isdigit()):
+                cursor += 1
+            return cursor
+        cursor += 1
+    return index + 1
+
+
+def _javascript_template_expression_end(source: str, index: int) -> int:
+    depth = 1
+    cursor = index
+    while cursor < len(source):
+        skipped = _javascript_noncode_end(source, cursor)
+        if skipped is not None:
+            cursor = skipped
+            continue
+        if source[cursor] == "{":
+            depth += 1
+        elif source[cursor] == "}":
+            depth -= 1
+            if depth == 0:
+                return cursor + 1
+        cursor += 1
+    return len(source)
+
+
+def _javascript_template_end(source: str, index: int) -> int:
+    cursor = index + 1
+    while cursor < len(source):
+        if source[cursor] == "\\":
+            cursor += 2
+        elif source[cursor] == "`":
+            return cursor + 1
+        elif source.startswith("${", cursor):
+            cursor = _javascript_template_expression_end(source, cursor + 2)
+        else:
+            cursor += 1
+    return len(source)
+
+
+def _javascript_noncode_end(source: str, index: int) -> int | None:
+    character = source[index]
+    if character in ("'", '"'):
+        return _javascript_quoted_end(source, index, character)
+    if character == "`":
+        return _javascript_template_end(source, index)
+    if source.startswith("//", index):
+        return _javascript_line_comment_end(source, index)
+    if source.startswith("/*", index):
+        return _javascript_block_comment_end(source, index)
+    if character == "/" and _javascript_regex_literal_starts(source, index):
+        return _javascript_regex_literal_end(source, index)
+    return None
+
+
+def _javascript_matching_delimiter(source: str, opening_index: int, opening: str, closing: str) -> int:
+    depth = 0
+    cursor = opening_index
+    while cursor < len(source):
+        skipped = _javascript_noncode_end(source, cursor)
+        if skipped is not None:
+            cursor = skipped
+            continue
+        if source[cursor] == opening:
+            depth += 1
+        elif source[cursor] == closing:
+            depth -= 1
+            if depth == 0:
+                return cursor
+        cursor += 1
+    return -1
+
+
+def _javascript_function_start(source: str, name: str) -> tuple[int, int]:
+    cursor = 0
+    while cursor < len(source):
+        skipped = _javascript_noncode_end(source, cursor)
+        if skipped is not None:
+            cursor = skipped
+            continue
+        if not source.startswith("function", cursor):
+            cursor += 1
+            continue
+        before = source[cursor - 1] if cursor > 0 else ""
+        after_index = cursor + len("function")
+        after = source[after_index] if after_index < len(source) else ""
+        if _javascript_identifier_character(before) or _javascript_identifier_character(after):
+            cursor += 1
+            continue
+        name_start = _javascript_trivia_end(source, after_index)
+        if not source.startswith(name, name_start):
+            cursor += 1
+            continue
+        name_end = name_start + len(name)
+        if name_end < len(source) and _javascript_identifier_character(source[name_end]):
+            cursor += 1
+            continue
+        parameter_start = _javascript_trivia_end(source, name_end)
+        if parameter_start < len(source) and source[parameter_start] == "(":
+            return cursor, parameter_start
+        cursor += 1
+    return -1, -1
+
+
 def _javascript_function_source(source: str, name: str) -> str:
-    marker = f"function {name}("
-    start = source.find(marker)
+    start, parameter_start = _javascript_function_start(source, name)
     if start < 0:
         return ""
-
-    parameter_start = source.find("(", start + len(f"function {name}"))
-    if parameter_start < 0:
-        return ""
-    parameter_depth = 0
-    parameter_end = -1
-    for index in range(parameter_start, len(source)):
-        character = source[index]
-        if character == "(":
-            parameter_depth += 1
-        elif character == ")":
-            parameter_depth -= 1
-            if parameter_depth == 0:
-                parameter_end = index
-                break
+    parameter_end = _javascript_matching_delimiter(source, parameter_start, "(", ")")
     if parameter_end < 0:
         return ""
 
-    opening = source.find("{", parameter_end + 1)
-    if opening < 0:
+    opening = _javascript_trivia_end(source, parameter_end + 1)
+    if opening >= len(source) or source[opening] != "{":
         return ""
-    body_depth = 0
-    for index in range(opening, len(source)):
-        character = source[index]
-        if character == "{":
-            body_depth += 1
-        elif character == "}":
-            body_depth -= 1
-            if body_depth == 0:
-                return source[start:index + 1]
-    return ""
+    closing = _javascript_matching_delimiter(source, opening, "{", "}")
+    return "" if closing < 0 else source[start:closing + 1]
 
 
 def _catalog_records(root: Path, manifest: dict) -> list[dict]:
