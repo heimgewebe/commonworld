@@ -6,6 +6,7 @@ import path from 'node:path';
 import process from 'node:process';
 import { writeFile } from 'node:fs/promises';
 import { chromium } from 'playwright';
+import { normalizeBootstrapForCompile } from './catalog_delivery_compile.mjs';
 
 const ROOT = process.cwd();
 const CPU_THROTTLE_RATE = 4;
@@ -58,6 +59,7 @@ const executablePath = process.env.PLAYWRIGHT_CHROMIUM_EXECUTABLE_PATH
   || (existsSync('/usr/bin/google-chrome') ? '/usr/bin/google-chrome' : undefined);
 const browser = await chromium.launch({ headless: true, executablePath });
 const bootstrapSource = await readFile(path.join(ROOT, 'assets/commonworld-bootstrap-catalog.mjs'), 'utf8');
+const normalizedBootstrapSource = normalizeBootstrapForCompile(bootstrapSource);
 
 function metricMap(metrics) {
   return Object.fromEntries(metrics.metrics.map(({ name, value }) => [name, value]));
@@ -112,8 +114,7 @@ async function measureProfile(profile) {
       resource_count: performance.getEntriesByType('resource').length,
     };
   });
-  const compileSamples = await page.evaluate((source) => {
-    const normalized = source.replace('export const BOOTSTRAP_RECORDS =', 'const BOOTSTRAP_RECORDS =');
+  const compileSamples = await page.evaluate((normalized) => {
     new Function(normalized);
     const samples = [];
     for (let index = 0; index < 21; index += 1) {
@@ -127,7 +128,7 @@ async function measureProfile(profile) {
       p95_ms: samples[Math.floor(samples.length * 0.95)],
       samples_ms: samples,
     };
-  }, bootstrapSource);
+  }, normalizedBootstrapSource);
 
   const uniqueRequests = [...new Set(firstPartyRequests)].sort();
   const requestSizes = {};

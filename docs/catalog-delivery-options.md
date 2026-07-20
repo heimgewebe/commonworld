@@ -29,6 +29,17 @@ Ein Umbau wird nicht durch eine bestimmte Zahl von Commons ausgelöst. Entscheid
 
 Eine deterministische Größenüberschreitung löst sofort eine Architekturprüfung aus. Schwankende Browserzeiten müssen in zwei aufeinanderfolgenden repräsentativen Läufen überschritten werden.
 
+## Next Actions: gemessene Umschaltschwellen
+
+- **Unter 28 KiB gzip:** Der vollständige buildgebundene Bootstrap bleibt der Normalfall.
+- **Ab 28 KiB gzip:** CI gibt eine Warnung aus. Sie blockiert nicht, verlangt aber eine erneute Messung der vier statischen Entwürfe.
+- **Über 32 KiB gzip:** Der deterministische Vertrag schlägt fehl; eine Veröffentlichung darf den Grenzwert nicht stillschweigend überschreiten.
+- **Bei steigender Parse-/Compile-Zeit:** Segmentiertes statisches JSON wird gegen den Voll-Bootstrap gemessen.
+- **Bei nicht startrelevanten Feldern:** Ein schlankes Startmodell wird geprüft, während vollständige öffentliche Projektdateien erhalten bleiben.
+- **Keine Katalogzahl als Auslöser:** Eine Migration erfolgt ausschließlich anhand gemessener Payload-, Request-, DOM- und Laufzeitwerte.
+
+Die Warnschwelle steht als `warn_bootstrap_gzip_bytes`, die harte Grenze als `max_bootstrap_gzip_bytes` im Contract. `new Function` bleibt für die Compile-Messung bewusst erhalten: Der Quelltext ist kontrollierter Build-Output, und die unveränderte Messmethode hält neue Werte mit T019 vergleichbar. Die Normalisierung wird separat streng getestet und verlangt exakt eine Exportzuweisung.
+
 ## Grenzen der Aussage
 
 Die Messung beweist die entfernten Abrufe und Bytes. Einzelne Zeitwerte hängen zusätzlich von Browser, Rechner und Scheduling ab und beweisen allein keine Beschleunigung. Die vollständigen kanonischen Projektdateien bleiben unverändert die einzige Katalogwahrheit.

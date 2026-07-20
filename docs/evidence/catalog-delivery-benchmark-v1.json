@@ -526,5 +526,10 @@
       "durable_job_unit": "grabowski-job-1b102d8b8375",
       "job_receipt_sha256": "d328bc4505135302a601a5bfbe2b97fee81d5bd200e65cb1d27ca23d5ecf05ab"
     }
+  },
+  "budget_binding": {
+    "bootstrap_gzip_bytes": 20526,
+    "warn_bootstrap_gzip_bytes": 28672,
+    "max_bootstrap_gzip_bytes": 32768
   }
 }
