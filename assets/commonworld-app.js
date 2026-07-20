@@ -147,6 +147,8 @@ const elements = {
 
 const FOCUS_OVERLAP_SELECTOR = 'a[href], button:not([disabled]), input:not([disabled]):not([type="hidden"]), select:not([disabled]), textarea:not([disabled]), summary, [role="button"], [tabindex]:not([tabindex="-1"])';
 const FOCUS_OVERLAP_MIN_RATIO = 0.5;
+const MAP_GEOMETRY_SAMPLE_INTERVAL_MS = 32;
+const MAP_DIAGNOSTIC_RENDER_INTERVAL = 4;
 
 const runtime = {
   map: null,
@@ -188,6 +190,8 @@ const runtime = {
   applyingHistory: false,
   mapReady: false,
   mapRenderCount: 0,
+  mapGeometryLastAt: 0,
+  sphereGeometryEvaluationCount: 0,
   overlayRenderCount: 0,
   historyTimer: null,
   searchTimer: null,
@@ -1802,7 +1806,7 @@ function setQuery(value, { historyMode = 'replace' } = {}) {
   if (historyMode) runtime.searchTimer = window.setTimeout(() => writeHistory(historyMode), 150);
 }
 
-function setSphereOpacity({ globeDiameter = null, size = null } = {}) {
+function setSphereOpacity({ globeDiameter = null, size = null, publishDiagnostics = true } = {}) {
   const immersive = runtime.state.view === 'layers' || runtime.viewPhase !== 'overview';
   let globeViewportRatio = 0;
   let opacity = 1;
@@ -1819,7 +1823,9 @@ function setSphereOpacity({ globeDiameter = null, size = null } = {}) {
   }
   let visualChanged = setStylePropertyIfChanged(elements.sphere, '--sphere-opacity', String(opacity));
   visualChanged = setAttributePresenceIfChanged(elements.sphere, 'data-hidden-local', opacity === 0) || visualChanged;
-  setDatasetIfChanged(elements.stage, 'globeViewportRatio', Number(globeViewportRatio.toFixed(4)));
+  if (publishDiagnostics) {
+    setDatasetIfChanged(elements.stage, 'globeViewportRatio', Number(globeViewportRatio.toFixed(4)));
+  }
   return visualChanged;
 }
 
@@ -1828,8 +1834,9 @@ function projectedGlobeGeometry(center, projectedCenter) {
   return projectedGlobeCircle({ center: projectedCenter, horizon });
 }
 
-function updateSphereGeometry() {
+function updateSphereGeometry({ publishDiagnostics = true } = {}) {
   if (!runtime.mapReady || elements.globeSurface.hidden) return;
+  runtime.sphereGeometryEvaluationCount += 1;
   const size = currentStageSize();
   const padding = typeof runtime.map.getPadding === 'function' ? runtime.map.getPadding() : {};
   // Camera flights keep the MapLibre-projected overview geometry; side layout is
@@ -1855,22 +1862,39 @@ function updateSphereGeometry() {
   visualChanged = setStylePropertyIfChanged(elements.sphere, '--sphere-x', x) || visualChanged;
   visualChanged = setStylePropertyIfChanged(elements.sphere, '--sphere-y', y) || visualChanged;
   visualChanged = setStylePropertyIfChanged(elements.sphere, '--sphere-size', diameter) || visualChanged;
-  setDatasetIfChanged(elements.stage, 'mapProjectedCenterX', Number(projectedCenter.x.toFixed(2)));
-  setDatasetIfChanged(elements.stage, 'mapProjectedCenterY', Number(projectedCenter.y.toFixed(2)));
-  setDatasetIfChanged(elements.stage, 'sphereX', geometry.x);
-  setDatasetIfChanged(elements.stage, 'sphereY', geometry.y);
-  setDatasetIfChanged(elements.stage, 'sphereSize', geometry.diameter);
-  setDatasetIfChanged(elements.stage, 'globeDiameter', geometry.globeDiameter);
-  setDatasetIfChanged(elements.stage, 'globeGeometrySource', sideView ? 'side-view-layout' : 'maplibre-projected-horizon');
+  if (publishDiagnostics) {
+    setDatasetIfChanged(elements.stage, 'mapProjectedCenterX', Number(projectedCenter.x.toFixed(2)));
+    setDatasetIfChanged(elements.stage, 'mapProjectedCenterY', Number(projectedCenter.y.toFixed(2)));
+    setDatasetIfChanged(elements.stage, 'sphereX', geometry.x);
+    setDatasetIfChanged(elements.stage, 'sphereY', geometry.y);
+    setDatasetIfChanged(elements.stage, 'sphereSize', geometry.diameter);
+    setDatasetIfChanged(elements.stage, 'globeDiameter', geometry.globeDiameter);
+    setDatasetIfChanged(elements.stage, 'globeGeometrySource', sideView ? 'side-view-layout' : 'maplibre-projected-horizon');
+  }
   const detailLevel = sphereDetailLevel({ diameter: geometry.diameter, sideView });
   visualChanged = setDatasetIfChanged(elements.sphere, 'detailLevel', detailLevel) || visualChanged;
-  setDatasetIfChanged(elements.stage, 'sphereDetailLevel', detailLevel);
-  setDatasetIfChanged(elements.stage, 'mapZoom', Number(runtime.map.getZoom().toFixed(4)));
-  visualChanged = setSphereOpacity({ globeDiameter: geometry.globeDiameter, size }) || visualChanged;
-  if (visualChanged) {
-    runtime.sphereGeometryCommitCount += 1;
-    setDatasetIfChanged(elements.stage, 'sphereGeometryCommits', runtime.sphereGeometryCommitCount);
+  if (publishDiagnostics) {
+    setDatasetIfChanged(elements.stage, 'sphereDetailLevel', detailLevel);
+    setDatasetIfChanged(elements.stage, 'mapZoom', Number(runtime.map.getZoom().toFixed(4)));
   }
+  visualChanged = setSphereOpacity({ globeDiameter: geometry.globeDiameter, size, publishDiagnostics }) || visualChanged;
+  if (visualChanged) runtime.sphereGeometryCommitCount += 1;
+  if (publishDiagnostics) {
+    setDatasetIfChanged(elements.stage, 'sphereGeometryCommits', runtime.sphereGeometryCommitCount);
+    setDatasetIfChanged(elements.stage, 'sphereGeometryEvaluations', runtime.sphereGeometryEvaluationCount);
+  }
+}
+
+function sampleSphereGeometry(timestamp = performance.now()) {
+  if (!runtime.mapReady || timestamp - runtime.mapGeometryLastAt < MAP_GEOMETRY_SAMPLE_INTERVAL_MS) return;
+  runtime.mapGeometryLastAt = timestamp;
+  updateSphereGeometry({ publishDiagnostics: runtime.mapRenderCount % MAP_DIAGNOSTIC_RENDER_INTERVAL === 0 });
+}
+
+function flushSphereGeometry() {
+  runtime.mapGeometryLastAt = performance.now();
+  setDatasetIfChanged(elements.stage, 'mapRenders', runtime.mapRenderCount);
+  updateSphereGeometry();
 }
 
 function layerCamera(camera = null) {
@@ -2267,7 +2291,7 @@ function setPresentation(surface, { historyMode = 'push', persist = true } = {})
     ensureMap();
     window.setTimeout(() => {
       runtime.map?.resize();
-      updateSphereGeometry();
+      flushSphereGeometry();
     }, 0);
   }
   if (historyMode) writeHistory(historyMode);
@@ -2494,7 +2518,7 @@ function wireControls() {
     if (runtime.resizeObserver) return;
     runtime.stageSize = null;
     runtime.map?.resize();
-    updateSphereGeometry();
+    flushSphereGeometry();
   });
 }
 
@@ -2568,13 +2592,18 @@ function createMap() {
   bindPublicMapInteractions();
   runtime.map.on('render', () => {
     runtime.mapRenderCount += 1;
-    elements.stage.dataset.mapRenders = String(runtime.mapRenderCount);
-    updateSphereGeometry();
+    if (runtime.mapRenderCount % MAP_DIAGNOSTIC_RENDER_INTERVAL === 0) {
+      setDatasetIfChanged(elements.stage, 'mapRenders', runtime.mapRenderCount);
+    }
+    if (runtime.map.isMoving()) sampleSphereGeometry();
   });
-  runtime.map.on('movestart', () => { elements.stage.dataset.mapMoving = 'true'; });
+  runtime.map.on('movestart', () => {
+    elements.stage.dataset.mapMoving = 'true';
+    runtime.mapGeometryLastAt = 0;
+  });
   runtime.map.on('moveend', () => {
     delete elements.stage.dataset.mapMoving;
-    updateSphereGeometry();
+    flushSphereGeometry();
     updateSemanticLocationLine();
     scheduleCameraHistory();
   });
@@ -2590,7 +2619,7 @@ function createMap() {
     if (runtime.mapReady && !runtime.map.getSource(PUBLIC_MAP_SOURCE_ID)) ensurePublicMapLayers();
     scheduleFocusOverlapInteractivity();
     if (runtime.mapReady && elements.stage.dataset.visualReady !== 'true') {
-      updateSphereGeometry();
+      flushSphereGeometry();
       elements.stage.dataset.visualReady = 'true';
     }
   });
@@ -2600,13 +2629,13 @@ function createMap() {
     ensurePublicMapLayers();
     if (runtime.state.view === 'layers') openLayerView({ historyMode: null, cameraState: runtime.state.camera, instant: true });
     else applyCamera(runtime.state.camera, { instant: true });
-    updateSphereGeometry();
+    flushSphereGeometry();
     updateSemanticLocationLine();
     scheduleFocusOverlapInteractivity();
     refreshStatus();
     window.setTimeout(() => {
       if (!runtime.mapReady || elements.stage.dataset.visualReady === 'true') return;
-      updateSphereGeometry();
+      flushSphereGeometry();
       elements.stage.dataset.visualReady = 'true';
     }, 1200);
     if (runtime.pendingSpatialProject) performSpatialNavigation(runtime.pendingSpatialProject);
@@ -2617,7 +2646,7 @@ function createMap() {
       const box = entry?.contentRect;
       if (!box || !setStageSizeIfChanged(box.width, box.height)) return;
       runtime.map?.resize();
-      updateSphereGeometry();
+      flushSphereGeometry();
     });
     runtime.resizeObserver.observe(elements.stage);
   }

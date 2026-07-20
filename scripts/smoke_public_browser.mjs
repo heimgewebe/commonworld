@@ -9,6 +9,7 @@ import {
   deriveCommonsType,
   deriveDigitalProjectPath,
   deriveLayer,
+  DIGITAL_LAYER_TRANSITION_MS,
   DIGITAL_RING_FIELDS,
   DIGITAL_ROOT_PATH,
   globeHorizonCoordinates,
@@ -410,7 +411,21 @@ async function startupAndRingOrbitScenario() {
   assert(loadingVisual.canvasOpacity === 0, 'startup: uncalibrated globe canvas was exposed ' + JSON.stringify(loadingVisual));
   assert(loadingVisual.projection === 'globe', 'startup: map did not start directly in globe projection ' + JSON.stringify(loadingVisual));
 
-  await run.page.waitForFunction(() => document.querySelector('.globe-stage')?.dataset.visualReady === 'true');
+  try {
+    await run.page.waitForFunction(() => document.querySelector('.globe-stage')?.dataset.visualReady === 'true');
+  } catch (error) {
+    const diagnostic = await run.page.evaluate(() => {
+      const stage = document.querySelector('.globe-stage');
+      return {
+        htmlClass: document.documentElement.className,
+        stageDataset: { ...stage?.dataset },
+        mapReady: Boolean(window.__commonworldTestMap),
+        mapMoving: window.__commonworldTestMap?.isMoving?.() ?? null,
+        mapLoaded: window.__commonworldTestMap?.loaded?.() ?? null,
+      };
+    });
+    throw new Error('startup: map calibration timed out ' + JSON.stringify({ diagnostic, consoleErrors: run.consoleErrors, pageErrors: run.pageErrors, cause: error.message }));
+  }
   await run.page.waitForFunction(() => Number(document.querySelector('.globe-stage')?.dataset.sphereSize ?? 0) > 0);
   assert((await run.page.evaluate(() => window.__commonworldTestMap?.getProjection?.()?.type)) === 'globe', 'startup: active projection changed after map calibration');
   await waitForSphereOpacitySettled(run.page);
@@ -420,6 +435,7 @@ async function startupAndRingOrbitScenario() {
     return {
       mapRenders: Number(stage?.dataset.mapRenders ?? 0),
       geometryCommits: Number(stage?.dataset.sphereGeometryCommits ?? 0),
+      geometryEvaluations: Number(stage?.dataset.sphereGeometryEvaluations ?? 0),
     };
   });
   await run.page.evaluate(async () => {
@@ -439,9 +455,13 @@ async function startupAndRingOrbitScenario() {
     return {
       mapRenders: Number(stage?.dataset.mapRenders ?? 0),
       geometryCommits: Number(stage?.dataset.sphereGeometryCommits ?? 0),
+      geometryEvaluations: Number(stage?.dataset.sphereGeometryEvaluations ?? 0),
     };
   });
-  assert(geometryAfterRepaint.mapRenders > geometryBeforeRepaint.mapRenders, 'geometry cache: test repaints did not reach MapLibre');
+  const repaintRenderDelta = geometryAfterRepaint.mapRenders - geometryBeforeRepaint.mapRenders;
+  const repaintEvaluationDelta = geometryAfterRepaint.geometryEvaluations - geometryBeforeRepaint.geometryEvaluations;
+  assert(repaintRenderDelta > 0, 'geometry cache: test repaints did not reach MapLibre');
+  assert(repaintEvaluationDelta === 0, 'geometry sampler: idle MapLibre repaints still trigger sphere projection work ' + JSON.stringify({ geometryBeforeRepaint, geometryAfterRepaint }));
   assert(geometryAfterRepaint.geometryCommits === geometryBeforeRepaint.geometryCommits, 'geometry cache: unchanged repaints rewrote sphere geometry ' + JSON.stringify({ geometryBeforeRepaint, geometryAfterRepaint }));
 
   const removedHint = await run.page.evaluate(() => ({
@@ -960,6 +980,7 @@ async function layerJourneyScenario({ mobile = false, viewportOverride = null, t
       panelVisible: panelNode?.hasAttribute('data-visible') ?? false,
       panelHidden: panelNode?.hidden ?? null,
       commandCount: window.__commonworldCameraCommands?.length ?? 0,
+      geometryEvaluations: Number(stageNode.dataset.sphereGeometryEvaluations ?? 0),
       at: performance.now(),
     });
     window.__commonworldPhaseLog.push(snapshot('initial'));
@@ -996,6 +1017,23 @@ async function layerJourneyScenario({ mobile = false, viewportOverride = null, t
   assert((await run.page.locator('.globe-stage').getAttribute('data-view-phase')) === 'entering-layers', 'layer journey: animated entry phase missing');
   assert((await stage.getAttribute('data-globe-geometry-source')) === 'maplibre-projected-horizon', 'layer journey: entering flight abandoned the MapLibre horizon geometry');
   assert(await run.page.locator('#layer-panel').isHidden(), 'layer journey: description panel obscures the camera flight');
+  const movingRingStateHandle = await run.page.waitForFunction(() => {
+    const stageNode = document.querySelector('.globe-stage');
+    const panelNode = document.querySelector('#layer-panel');
+    const rings = [...document.querySelectorAll('.sphere-ring-plane')];
+    const state = {
+      mapMoving: stageNode?.dataset.mapMoving === 'true',
+      phase: stageNode?.dataset.viewPhase ?? null,
+      panelHidden: panelNode?.hidden ?? null,
+      ringCount: rings.length,
+      ringsPaused: rings.length > 0 && rings.every((ring) => getComputedStyle(ring).animationPlayState === 'paused'),
+    };
+    return state.mapMoving && state.ringsPaused ? state : false;
+  });
+  const movingRingState = await movingRingStateHandle.jsonValue();
+  await movingRingStateHandle.dispose();
+  assert(movingRingState.mapMoving && movingRingState.ringsPaused, 'layer journey: decorative ring pause was not observed atomically during camera movement ' + JSON.stringify(movingRingState));
+  assert(movingRingState.phase === 'entering-layers' && movingRingState.panelHidden === true, 'layer journey: movement-bound ring pause violated the stable-panel contract ' + JSON.stringify(movingRingState));
   const flightComposition = await run.page.evaluate(() => {
     const map = document.querySelector('#map');
     const style = getComputedStyle(map);
@@ -1010,7 +1048,7 @@ async function layerJourneyScenario({ mobile = false, viewportOverride = null, t
   });
   assert(['none', 'matrix(1, 0, 0, 1, 0, 0)'].includes(flightComposition.transform), 'layer journey: CSS still applies a competing map zoom ' + JSON.stringify(flightComposition));
   assert(!flightComposition.transitionProperties.includes('transform'), 'layer journey: map transform remains part of the camera flight ' + JSON.stringify(flightComposition));
-  assert(flightComposition.command === 'easeTo' && flightComposition.duration === 1080, 'layer journey: MapLibre is not the single camera authority for the flight ' + JSON.stringify(flightComposition));
+  assert(flightComposition.command === 'easeTo' && flightComposition.duration === DIGITAL_LAYER_TRANSITION_MS, 'layer journey: MapLibre is not the single camera authority for the shortened flight ' + JSON.stringify(flightComposition));
   const openingCommands = await run.page.evaluate(() => window.__commonworldCameraCommands ?? []);
   assert(openingCommands.length === 1 && openingCommands[0].command === 'easeTo', `layer journey: opening issued multiple camera commands (${JSON.stringify(openingCommands)})`);
   const enteringSphere = await run.page.locator('#digital-sphere').boundingBox();
@@ -1026,6 +1064,9 @@ async function layerJourneyScenario({ mobile = false, viewportOverride = null, t
   const sideIndex = phaseLog.indexOf(firstSideEntry);
   const firstPanelEntry = phaseLog.find((entry) => entry.panelVisible);
   assert(firstPanelEntry && phaseLog.indexOf(firstPanelEntry) > sideIndex && firstPanelEntry.phase === 'layers' && firstPanelEntry.source === 'side-view-layout', `layer journey: panel became visible before the side layout was stable (${JSON.stringify({ firstPanelEntry, phaseLog })})`);
+  const flightGeometryEvaluationDelta = firstSideEntry.geometryEvaluations - phaseLog[0].geometryEvaluations;
+  const maxFlightGeometryEvaluations = Math.ceil(DIGITAL_LAYER_TRANSITION_MS / 32) + 3;
+  assert(flightGeometryEvaluationDelta > 0 && flightGeometryEvaluationDelta <= maxFlightGeometryEvaluations, 'layer journey: sphere projection exceeded the sampled camera-flight budget ' + JSON.stringify({ flightGeometryEvaluationDelta, maxFlightGeometryEvaluations, phaseLog }));
   assert((await stage.getAttribute('data-globe-geometry-source')) === 'side-view-layout', 'layer journey: settled layers view is missing the side layout geometry');
   if (touch) {
     const closeFocusAppearance = await run.page.locator('#layer-close').evaluate((node) => {
