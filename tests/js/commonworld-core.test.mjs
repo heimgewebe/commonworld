@@ -1016,35 +1016,54 @@ test('privacy suppression stays type-internal and public notices remain bucket-n
   const impressions = collection.features.filter(({ properties }) => properties.representation_kind === 'aggregate_impression');
   assert.equal(impressions.length, 6);
   assert(impressions.every(({ properties }) => properties.privacy_withheld === undefined));
+  const summaries = collection.features.filter(({ properties }) => properties.representation_kind === 'aggregate_summary');
+  assert.equal(summaries.length, 3);
+  assert(summaries.every(({ properties }) => properties.privacy_withheld === true));
   const notices = collection.features.filter(({ properties }) => properties.representation_kind === 'aggregate_privacy_notice');
   assert.equal(notices.length, 3);
   assert(notices.every(({ properties }) => properties.commons_type === undefined));
 });
 
-test('aggregate type offsets remain circular in Web Mercator at high latitude', () => {
+test('aggregate type offsets stay circular and latitude-invariant in Web Mercator', () => {
   const types = ['knowledge', 'software', 'water', 'tools-repair'];
-  const records = types.map((commonsType, index) => ({
-    id: 'polar-' + index,
-    commons_type: commonsType,
-    title: 'Polar ' + commonsType,
-    presence: {
-      geographic: [{ id: 'polar-location-' + index, mode: 'exact', geometry: { type: 'Point', coordinates: [0, 75] } }],
-      digital: { available: false },
-    },
-  }));
-  const planetFeatures = publicMapFeatureCollection(records).features.filter(
-    ({ properties }) => properties.semantic_level === 'planet',
-  );
-  const center = planetFeatures.find(({ properties }) => properties.representation_kind === 'aggregate_summary').geometry.coordinates;
-  const byType = new Map(planetFeatures
-    .filter(({ properties }) => properties.representation_kind === 'aggregate_impression')
-    .map((feature) => [feature.properties.commons_type, feature.geometry.coordinates]));
-  const east = byType.get('software');
-  const north = byType.get('water');
-  const mercatorY = (latitude) => Math.log(Math.tan(Math.PI / 4 + latitude * Math.PI / 360));
-  const horizontalRadius = Math.abs((east[0] - center[0]) * Math.PI / 180);
-  const verticalRadius = Math.abs(mercatorY(north[1]) - mercatorY(center[1]));
-  assert(Math.abs(horizontalRadius - verticalRadius) / Math.max(horizontalRadius, verticalRadius) < 1e-9);
+  const projectedRadiiAtLatitude = (latitude) => {
+    const records = types.map((commonsType, index) => ({
+      id: 'mercator-' + latitude + '-' + index,
+      commons_type: commonsType,
+      title: 'Mercator ' + commonsType,
+      presence: {
+        geographic: [{
+          id: 'mercator-location-' + latitude + '-' + index,
+          mode: 'exact',
+          geometry: { type: 'Point', coordinates: [0, latitude] },
+        }],
+        digital: { available: false },
+      },
+    }));
+    const planetFeatures = publicMapFeatureCollection(records).features.filter(
+      ({ properties }) => properties.semantic_level === 'planet',
+    );
+    const center = planetFeatures.find(
+      ({ properties }) => properties.representation_kind === 'aggregate_summary',
+    ).geometry.coordinates;
+    const byType = new Map(planetFeatures
+      .filter(({ properties }) => properties.representation_kind === 'aggregate_impression')
+      .map((feature) => [feature.properties.commons_type, feature.geometry.coordinates]));
+    const east = byType.get('software');
+    const north = byType.get('water');
+    const mercatorY = (value) => Math.log(Math.tan(Math.PI / 4 + value * Math.PI / 360));
+    return {
+      horizontal: Math.abs((east[0] - center[0]) * Math.PI / 180),
+      vertical: Math.abs(mercatorY(north[1]) - mercatorY(center[1])),
+    };
+  };
+
+  const equatorial = projectedRadiiAtLatitude(0);
+  const polar = projectedRadiiAtLatitude(75);
+  for (const radii of [equatorial, polar]) {
+    assert(Math.abs(radii.horizontal - radii.vertical) / Math.max(radii.horizontal, radii.vertical) < 1e-9);
+  }
+  assert(Math.abs(equatorial.horizontal - polar.horizontal) / equatorial.horizontal < 1e-9);
 });
 
 test('coarser buckets may release while fine approximate aggregates remain withheld', () => {
