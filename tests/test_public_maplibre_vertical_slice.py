@@ -8,6 +8,7 @@ from scripts.validate_public_maplibre_vertical_slice import (
     CONTRACT_PATH,
     REQUIRED_FILES,
     ROOT,
+    _javascript_function_source,
     validate_public_maplibre_vertical_slice,
 )
 
@@ -37,6 +38,46 @@ class PublicMapLibreVerticalSliceTests(unittest.TestCase):
 
     def test_vertical_slice_validates(self) -> None:
         self.assertEqual([], validate_public_maplibre_vertical_slice(ROOT))
+
+    def test_javascript_function_extraction_ignores_non_code_delimiters(self) -> None:
+        javascript = r'''
+const stringDecoy = "function target() { return 'wrong'; }";
+const templateDecoy = `function target() { return "template wrong"; }`;
+const regexDecoy = /function target\(\) \{ return false; \}/u;
+// function target() { return "line-comment wrong"; }
+/* function target() { return "also wrong"; } */
+function
+  target(
+    value = ")",
+    pattern = /[(){}]/u
+  ) {
+  const singleQuoted = '}';
+  const doubleQuoted = "{";
+  // A comment with a closing brace must not end the function: }
+  /* Nor may a block comment with both delimiters: { } */
+  const template = `raw } ${ { nested: `inner ${"}"}` } } tail {`;
+  return { value, pattern, template };
+}
+function after() { return false; }
+'''
+
+        extracted = _javascript_function_source(javascript, "target")
+
+        self.assertTrue(extracted.startswith("function\n  target("))
+        self.assertIn("return { value, pattern, template };", extracted)
+        self.assertNotIn("function after", extracted)
+        self.assertEqual("function after() { return false; }", _javascript_function_source(javascript, "after"))
+
+    def test_javascript_function_extraction_handles_source_start_and_declaration_comments(self) -> None:
+        javascript = "function /* declaration */ target(value = ')') /* body */ { const ratio = object.return / 2; const braces = /[{}]/u; return { ratio, braces }; } function after() {}"
+
+        self.assertEqual(
+            "function /* declaration */ target(value = ')') /* body */ { const ratio = object.return / 2; const braces = /[{}]/u; return { ratio, braces }; }",
+            _javascript_function_source(javascript, "target"),
+        )
+
+    def test_javascript_function_extraction_fails_closed_on_unterminated_body(self) -> None:
+        self.assertEqual("", _javascript_function_source("function target() { const value = '}';", "target"))
 
     def test_rejects_floating_maplibre_version(self) -> None:
         with tempfile.TemporaryDirectory() as directory:
