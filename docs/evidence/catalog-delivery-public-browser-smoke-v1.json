@@ -167,7 +167,7 @@
       }
     },
     {
-      "id": "catalogue-failure",
+      "id": "catalogue-network-blocked",
       "verdict": "PASS",
       "blockedCatalogRequests": 0
     },
@@ -192,8 +192,8 @@
   "schema_version": 1,
   "kind": "commonworld_catalog_delivery_public_browser_smoke_evidence",
   "binding": {
-    "smoke_script_sha256": "ab3bfde855547c0792cb5ce57e4e13f43d177aba6f0318cdbacf5d4c2a4685ef",
-    "smoke_runner_sha256": "89451b29ec225c4321dba1c8d3f6248eea1bc8afd97c3c856ba4c6174360682e",
+    "smoke_script_sha256": "362568593a54aa6b72ca39b02d9b56b51f9d4d5e09d920962bfbeeca204b9b59",
+    "smoke_runner_sha256": "522b99b70b1d0064b1d0a31a3a67fdc9a2e73b7408f37d1a4bb303bc360b7556",
     "first_party_surface_sha256": "3101b598fb7035170a477df3c06a840fbc557f0a0a6900c67479a1098e37ab3e",
     "scenario_ids": [
       "startup-and-ring-orbits",
@@ -217,15 +217,13 @@
       "external-link-safety",
       "synthetic-catalogue-truth",
       "live-ui-hardening",
-      "catalogue-failure",
+      "catalogue-network-blocked",
       "provider-failure",
       "method-desktop",
       "method-mobile",
       "method-mobile-text-200"
     ],
-    "freshness_rule": "The official browser smoke runner must create a fresh temporary result and validate the exact scenario set, PASS verdicts and zero catalogue requests against this hash-bound evidence.",
-    "durable_job_unit": "grabowski-job-b7d9554b0bbe",
-    "job_receipt_sha256": "f14ce90c82f773f91c259b7e53fdad723bb910e712c4547cdd9fd1f5915b13b9",
-    "result_sha256": "fcdb5ca59fbbeccec447d2d0ffefdf2309e48af3c719283663e7ab096081a603"
+    "freshness_rule": "The official runner must materialize the canonical smoke plan, create a fresh temporary public result and validate exact scenario order, PASS verdicts and zero catalogue requests against this hash-bound evidence.",
+    "smoke_plan_sha256": "6b8749928ead5ef81ee66883e6a2993e756ce083575c3569234bf70526448364"
   }
 }
