@@ -1187,6 +1187,10 @@ html[data-input-modality="pointer"] :focus {
   animation: sphere-ring-orbit var(--ring-orbit-duration, 240s) linear infinite;
 }
 
+.globe-stage[data-map-moving="true"] .sphere-ring-plane {
+  animation-play-state: paused;
+}
+
 @media (prefers-reduced-motion: reduce) {
   .sphere-ring-plane {
     animation: none;
