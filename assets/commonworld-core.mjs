@@ -1411,12 +1411,11 @@ function pointOnSegment(point, start, end, epsilon = 1e-10) {
 }
 
 function pointInRing(point, ring) {
-  const points = Array.isArray(ring) ? ring.map(coordinatePair).filter(Boolean) : [];
-  if (!point || points.length < 3) return false;
+  if (!validPosition(point) || !validLinearRing(ring)) return false;
   let inside = false;
-  for (let currentIndex = 0, previousIndex = points.length - 1; currentIndex < points.length; previousIndex = currentIndex, currentIndex += 1) {
-    const current = points[currentIndex];
-    const previous = points[previousIndex];
+  for (let currentIndex = 0, previousIndex = ring.length - 1; currentIndex < ring.length; previousIndex = currentIndex, currentIndex += 1) {
+    const current = ring[currentIndex];
+    const previous = ring[previousIndex];
     if (pointOnSegment(point, previous, current)) return true;
     const intersects = (current[1] > point[1]) !== (previous[1] > point[1])
       && point[0] < ((previous[0] - current[0]) * (point[1] - current[1]))
@@ -1593,6 +1592,21 @@ function buildAggregateBuckets(projectIds, recordsById, representativeLocationsB
   return buckets;
 }
 
+function screenCircularOffsetCoordinates(center, angle, offset) {
+  const latitudeRadians = center[1] * Math.PI / 180;
+  const longitudeScale = Math.max(Math.abs(Math.cos(latitudeRadians)), 0.05);
+  const projectedRadius = offset * Math.PI / 180 / longitudeScale;
+  const longitude = center[0] + Math.cos(angle) * projectedRadius * 180 / Math.PI;
+  const centerMercatorY = Math.log(Math.tan(Math.PI / 4 + latitudeRadians / 2));
+  const latitude = (2 * Math.atan(Math.exp(
+    centerMercatorY + Math.sin(angle) * projectedRadius,
+  )) - Math.PI / 2) * 180 / Math.PI;
+  return [
+    ((longitude + 540) % 360) - 180,
+    clamp(latitude, -89.999, 89.999),
+  ];
+}
+
 function generateAggregateFeatures(visibleProjectIds, buckets, level) {
   const visibleIds = visibleProjectIds instanceof Set
     ? visibleProjectIds
@@ -1605,7 +1619,7 @@ function generateAggregateFeatures(visibleProjectIds, buckets, level) {
     const effectiveDiameterMeters = aggregateBucketEffectiveDiameterMeters(bucket.center, level);
     const releasedBucketIdentityIds = new Set();
     const releasedByType = new Map();
-    let privacyWithheld = false;
+    const privacyWithheldByType = new Map();
 
     for (const commonsType of presentTypes) {
       const contributors = bucket.contributorsByType.get(commonsType);
@@ -1626,31 +1640,29 @@ function generateAggregateFeatures(visibleProjectIds, buckets, level) {
         }
       }
       if (publicIds.length === 0 && approximateIds.length === 0) continue;
-      const complementApproximateCount = referenceApproximateCount - approximateIds.length;
-      const complementReleaseSafe = complementApproximateCount === 0
-        || complementApproximateCount >= APPROXIMATE_AGGREGATE_K;
+      const completeApproximateCohortSelected = approximateIds.length === referenceApproximateCount;
       const approximateReleaseAllowed = approximateIds.length === 0 || (
         approximateIds.length >= APPROXIMATE_AGGREGATE_K
-        && complementReleaseSafe
+        && completeApproximateCohortSelected
         && effectiveDiameterMeters >= APPROXIMATE_BUCKET_DIAMETER_FACTOR * maximumUncertaintyMeters
       );
       const releasedIds = approximateReleaseAllowed
         ? [...publicIds, ...approximateIds]
         : publicIds;
-      if (approximateIds.length > 0 && !approximateReleaseAllowed) privacyWithheld = true;
+      const typePrivacyWithheld = approximateIds.length > 0 && !approximateReleaseAllowed;
+      // Per-type suppression remains internal: public notices stay bucket-neutral so the withheld type is not disclosed.
+      privacyWithheldByType.set(commonsType, typePrivacyWithheld);
       if (releasedIds.length === 0) continue;
       releasedByType.set(commonsType, Object.freeze(releasedIds));
       for (const projectId of releasedIds) releasedBucketIdentityIds.add(projectId);
     }
 
+    const privacyWithheld = [...privacyWithheldByType.values()].some(Boolean);
     const releasedTypes = presentTypes.filter((type) => releasedByType.has(type));
     for (let index = 0; index < releasedTypes.length; index += 1) {
       const commonsType = releasedTypes[index];
       const angle = -Math.PI / 2 + 2 * Math.PI * index / releasedTypes.length;
-      const coordinates = [
-        clamp(bucket.center[0] + Math.cos(angle) * offset, -179.999, 179.999),
-        clamp(bucket.center[1] + Math.sin(angle) * offset, -89.999, 89.999),
-      ];
+      const coordinates = screenCircularOffsetCoordinates(bucket.center, angle, offset);
       features.push(Object.freeze({
         type: 'Feature',
         id: 'aggregate:' + bucketKey + ':' + commonsType,
@@ -1670,7 +1682,6 @@ function generateAggregateFeatures(visibleProjectIds, buckets, level) {
           coverage_pattern_label: '··',
           documented_identity_count: releasedByType.get(commonsType).length,
           bucket_identity_count: releasedBucketIdentityIds.size,
-          privacy_withheld: privacyWithheld,
         }),
       }));
     }

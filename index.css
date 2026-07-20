@@ -434,6 +434,7 @@ html[data-input-modality="pointer"] :focus {
   color: var(--muted);
   font-size: 0.74rem;
   line-height: 1.35;
+  -webkit-backdrop-filter: blur(0.75rem);
   backdrop-filter: blur(0.75rem);
 }
 

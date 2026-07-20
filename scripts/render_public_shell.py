@@ -302,7 +302,7 @@ def render_shell(root: Path = ROOT) -> str:
             <summary>Kartenlegende</summary>
             <div class="legend-body">
               <p class="legend-note">Farbe und Kürzel zeigen die Commons-Art. Kreise bündeln dokumentierte öffentliche Ortsbezüge. Die Katalogabdeckung ist nicht bewertet; die Karte zeigt weder Dichte noch nachgewiesene Leere.</p>
-              <ul id="commons-type-legend" class="legend-list"></ul>
+              <ul id="commons-type-legend" class="legend-list" aria-label="Commons-Arten und Kartenzeichen"></ul>
               <ul class="legend-semantics">
                 <li><span class="legend-semantic-mark legend-semantic-mark--coverage" aria-hidden="true">··</span>Punktmuster: Katalogabdeckung nicht bewertet</li>
                 <li><span class="legend-semantic-mark legend-semantic-mark--count" aria-hidden="true">3</span>Zahl: freigegebene eindeutige Commons im Raster</li>

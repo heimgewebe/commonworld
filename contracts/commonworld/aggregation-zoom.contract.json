@@ -392,12 +392,12 @@
       "exact_points_and_public_extents": "exempt_as_already_public_geometry",
       "privacy_sensitive_approximate_subcount_k": 5,
       "approximate_bucket_minimum_diameter_factor": 2,
-      "dynamic_filters": "reapply_selection_and_complement_release_tests_against_the_same_precomputed_bucket_membership",
-      "coarsen_before_suppress": "a_coarser_level_may_release_when_k_and_diameter_pass",
+      "dynamic_filters": "derive_from_the_same_precomputed_bucket_membership_and_release_approximate_counts_only_for_the_complete_reference_cohort",
+      "coarsen_before_suppress": "a_coarser_level_may_release_when_k_diameter_and_complete_cohort_guards_pass",
       "suppressed_output": "non_numeric_neutral_privacy_notice_without_type_or_member_ids",
       "raw_member_ids": "forbidden",
-      "filter_complement": "zero_or_at_least_k_approximate_identities_per_commons_type",
-      "differencing_protection": "withhold_filtered_approximate_counts_when_either_selection_or_nonzero_complement_is_below_k"
+      "filter_complement": "filtered_partial_reference_cohorts_are_never_released_even_when_selection_and_complement_each_meet_k",
+      "differencing_protection": "withhold_filtered_approximate_counts_unless_all_reference_approximate_identities_for_the_commons_type_and_bucket_are_selected"
     }
   },
   "output_shapes": {

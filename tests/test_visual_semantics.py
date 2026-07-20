@@ -189,21 +189,23 @@ class VisualSemanticsContractTests(unittest.TestCase):
             "mode": "approximate",
             "bucket_effective_diameter_m": 3000,
             "maximum_uncertainty_meters_min": 500,
-            "filter_complement_count": 8,
+            "filter_complement_count": 0,
+            "complete_reference_cohort_selected": True,
         }
         self.assertEqual("coarsen", privacy_decision({**base, "identity_count": 4, "parent_available": True}, self.contract))
         self.assertEqual("withhold_numeric_value", privacy_decision({**base, "identity_count": 4, "parent_available": False}, self.contract))
         self.assertEqual("release_aggregate", privacy_decision({**base, "identity_count": 5, "parent_available": False}, self.contract))
         self.assertEqual(
             "withhold_selected_and_complement",
-            privacy_decision({**base, "identity_count": 9, "filter_complement_count": 3, "parent_available": False}, self.contract),
+            privacy_decision({**base, "identity_count": 9, "filter_complement_count": 3, "complete_reference_cohort_selected": False, "parent_available": False}, self.contract),
         )
 
     def test_approximate_bucket_must_not_be_finer_than_uncertainty(self) -> None:
         scenario = {
             "mode": "approximate",
             "identity_count": 8,
-            "filter_complement_count": 8,
+            "filter_complement_count": 0,
+            "complete_reference_cohort_selected": True,
             "bucket_effective_diameter_m": 999,
             "maximum_uncertainty_meters_min": 500,
             "parent_available": True,

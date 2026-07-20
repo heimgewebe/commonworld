@@ -1271,6 +1271,8 @@ async function dualPresenceAxesScenario() {
       privacyNotices: Number(stage.dataset.publicMapPrivacyNotices ?? -1),
       geographicSemanticLevels: (stage.dataset.publicMapSemanticLevels ?? '').split(',').filter(Boolean),
       interactiveLayerIds: (stage.dataset.publicMapInteractiveLayers ?? '').split(',').filter(Boolean),
+      declaredLayerOrder: (stage.dataset.publicMapLayerOrder ?? '').split(',').filter(Boolean),
+      beforeLayerId: stage.dataset.publicMapBeforeLayer ?? null,
       legendCodes: [...document.querySelectorAll('#commons-type-legend .legend-color')].map((node) => node.textContent.trim()),
       legendLabels: [...document.querySelectorAll('#commons-type-legend .legend-item')].map((node) => node.textContent.trim()),
       sourceType: style.sources?.['commonworld-public-representations']?.type ?? null,
@@ -1299,6 +1301,8 @@ async function dualPresenceAxesScenario() {
   assert(reviewedFeatureIds.every((identifier) => initial.featureIds.includes(identifier)), 'dual presence: reviewed public map features are missing: ' + JSON.stringify(initial));
   assert(!initial.locationIds.includes('freifunk-hamburg-private-routers'), 'dual presence: hidden router location leaked into map diagnostics');
   assert(initial.sourceType === 'geojson', 'dual presence: MapLibre source is not a GeoJSON source: ' + JSON.stringify(initial));
+  assertSameIds(initial.layers.map(({ id }) => id), initial.declaredLayerOrder, 'dual presence: public MapLibre layer order');
+  assert(initial.beforeLayerId === 'road_one_way_arrow', 'dual presence: public layers are not anchored below the base-map labels: ' + JSON.stringify(initial));
   assert(initial.layers.some(({ id, type, minzoom }) => id === 'commonworld-public-extents' && type === 'fill' && minzoom === 3.4), 'dual presence: public extent layer missing');
   assert(initial.layers.some(({ id, type, minzoom, maxzoom }) => id === 'commonworld-approximate-zones' && type === 'fill' && minzoom === 3.4 && maxzoom === undefined), 'dual presence: approximate uncertainty zone must remain visible through local zoom');
   assert(initial.layers.some(({ id, type, minzoom }) => id === 'commonworld-exact-anchors' && type === 'circle' && minzoom === 5.5), 'dual presence: exact anchor layer missing');

@@ -57,6 +57,16 @@ const COMMONS_TYPE_COLORS = [
   ...COMMONS_TYPE_VALUES.flatMap((type) => [type, COMMONS_TYPE_COLOR_TOKENS[type]]),
   COMMONS_TYPE_COLOR_TOKENS.other,
 ];
+const COMMONS_TYPE_TEXT_COLORS = Object.freeze([
+  'match', ['get', 'commons_type'],
+  'software', '#FFFFFF',
+  '#111827',
+]);
+const COMMONS_TYPE_TEXT_HALOS = Object.freeze([
+  'match', ['get', 'commons_type'],
+  'software', '#102426',
+  '#FFFFFF',
+]);
 
 const AGGREGATE_LAYER_CONFIGS = Object.freeze([
   Object.freeze({
@@ -770,9 +780,9 @@ function ensureAggregateImpressionLayers(config) {
         'text-ignore-placement': true,
       },
       paint: {
-        'text-color': '#FFFFFF',
-        'text-halo-color': '#102426',
-        'text-halo-width': 1.25,
+        'text-color': COMMONS_TYPE_TEXT_COLORS,
+        'text-halo-color': COMMONS_TYPE_TEXT_HALOS,
+        'text-halo-width': 1.5,
         'text-opacity': config.opacity,
       },
     });
@@ -823,6 +833,42 @@ function ensureAggregateImpressionLayers(config) {
       },
     });
   }
+}
+
+function publicMapLayerOrder() {
+  const aggregateIds = (suffix) => AGGREGATE_LAYER_CONFIGS.map((config) => `commonworld-${config.id}-${suffix}`);
+  return [
+    'commonworld-public-extents',
+    'commonworld-approximate-zones',
+    'commonworld-public-extents-outline',
+    'commonworld-approximate-zones-outline',
+    ...aggregateIds('impressions'),
+    'commonworld-exact-anchors',
+    ...aggregateIds('semantics'),
+    ...aggregateIds('impression-counts'),
+    'commonworld-regional-type-codes',
+    'commonworld-local-type-codes',
+    ...aggregateIds('privacy-withheld'),
+  ];
+}
+
+function orderPublicMapLayers() {
+  const orderedIds = publicMapLayerOrder().filter((identifier) => runtime.map.getLayer(identifier));
+  const customIds = new Set(orderedIds);
+  const styleLayers = runtime.map.getStyle()?.layers ?? [];
+  const beforeId = styleLayers.find(({ id, type }) => type === 'symbol' && !customIds.has(id))?.id;
+  const layerIds = styleLayers.map(({ id }) => id);
+  const beforeIndex = beforeId ? layerIds.indexOf(beforeId) : layerIds.length;
+  const expectedStart = beforeIndex - orderedIds.length;
+  const alreadyOrdered = expectedStart >= 0 && orderedIds.every(
+    (identifier, index) => layerIds[expectedStart + index] === identifier,
+  );
+  if (!alreadyOrdered) {
+    for (const identifier of orderedIds) runtime.map.moveLayer(identifier, beforeId);
+  }
+  elements.stage.dataset.publicMapLayerOrder = orderedIds.join(',');
+  if (beforeId) elements.stage.dataset.publicMapBeforeLayer = beforeId;
+  else delete elements.stage.dataset.publicMapBeforeLayer;
 }
 
 function ensurePublicMapLayers() {
@@ -946,6 +992,7 @@ function ensurePublicMapLayers() {
       },
     });
   }
+  orderPublicMapLayers();
   updatePublicMapData();
   runtime.publicMapInteractiveLayerIds = PUBLIC_MAP_INTERACTIVE_LAYER_IDS.filter((identifier) => runtime.map.getLayer(identifier));
   elements.stage.dataset.publicMapInteractiveLayers = runtime.publicMapInteractiveLayerIds.join(',');

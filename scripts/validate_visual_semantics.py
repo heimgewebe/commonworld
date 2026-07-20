@@ -209,10 +209,9 @@ def privacy_decision(scenario: Mapping[str, Any], contract: Mapping[str, Any]) -
 
     k = policy["k_anonymity_min"]
     count = scenario.get("identity_count", 0)
-    complement_count = scenario.get("filter_complement_count")
     if not isinstance(count, int) or count < k:
         return "coarsen" if parent_available else "withhold_numeric_value"
-    if complement_count is not None and (not isinstance(complement_count, int) or complement_count < k):
+    if scenario.get("complete_reference_cohort_selected") is not True:
         return "coarsen" if parent_available else "withhold_selected_and_complement"
     return "release_aggregate"
 
@@ -472,6 +471,7 @@ def validate_visual_semantics(root: Path = ROOT) -> list[str]:
         "coarsen_before_suppress",
         "subcounts_require_k",
         "filter_complements_require_k",
+        "arbitrary_filter_intersection_release_forbidden",
         "raw_member_ids_forbidden",
         "human_review_required_before_sensitive_publication",
     ):
@@ -481,8 +481,10 @@ def validate_visual_semantics(root: Path = ROOT) -> list[str]:
         errors.append("phase 1 must not imply a differential privacy noise mechanism")
     if privacy.get("formal_anonymity_guarantee") is not False:
         errors.append("k=5 must not be represented as a formal anonymity guarantee")
-    if privacy.get("differencing_protection") != "if_selected_or_complement_is_below_k_coarsen_or_withhold_both_numeric_values":
-        errors.append("filter differencing must protect both selected and complement counts")
+    if privacy.get("filtered_approximate_release_scope") != "complete_reference_cohort_only_per_commons_type_and_bucket":
+        errors.append("filtered approximate release must require the complete reference cohort per type and bucket")
+    if privacy.get("differencing_protection") != "filtered_approximate_counts_release_only_when_the_complete_reference_cohort_is_selected_otherwise_coarsen_or_withhold":
+        errors.append("filter differencing must forbid partial reference-cohort releases")
 
     case_contract = contract.get("case_matrix", {})
     if case_contract.get("path") != "tests/cases/visual-semantics.real-cases.json":

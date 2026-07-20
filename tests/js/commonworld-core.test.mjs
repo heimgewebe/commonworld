@@ -904,9 +904,10 @@ test('catalog projection precomputes 250 approximate Commons and keeps its filte
   const subset = projection.publicMapFeatureCollection(visibleIds);
   const subsetLocal = subset.features.filter(({ properties }) => properties.project_id);
   const subsetImpressions = subset.features.filter(({ properties }) => properties.representation_kind === 'aggregate_impression');
+  const subsetPrivacyNotices = subset.features.filter(({ properties }) => properties.representation_kind === 'aggregate_privacy_notice');
   assert.equal(subsetLocal.length, 50);
-  assert.equal(subsetImpressions.length, 3);
-  assert(subsetImpressions.every(({ properties }) => properties.documented_identity_count === 50));
+  assert.equal(subsetImpressions.length, 0);
+  assert.equal(subsetPrivacyNotices.length, 3);
   assert.strictEqual(subset, projection.publicMapFeatureCollection([...visibleIds].reverse()));
 
   const firstFiltered = projection.publicMapFeatureCollection([records[0].id]);
@@ -945,7 +946,7 @@ test('approximate aggregate release requires five identities and exposes no memb
   assert.equal(JSON.stringify(aggregateOnly).includes('approx-0'), false, 'aggregate output must not expose member ids');
 });
 
-test('filtered approximate aggregates protect both selection and complement from differencing', () => {
+test('filtered approximate aggregates release only the complete reference cohort', () => {
   const records = Array.from({ length: 10 }, (_, index) => ({
     id: 'difference-' + index,
     commons_type: 'water',
@@ -961,15 +962,19 @@ test('filtered approximate aggregates protect both selection and complement from
     },
   }));
   const projection = prepareCatalogProjection(records);
-  const releasedFive = projection.publicMapFeatureCollection(records.slice(0, 5).map(({ id }) => id));
-  const releasedFiveImpressions = releasedFive.features.filter(({ properties }) => properties.representation_kind === 'aggregate_impression');
-  assert.equal(releasedFiveImpressions.length, 3, 'five selected and five in the complement may release');
-  assert(releasedFiveImpressions.every(({ properties }) => properties.documented_identity_count === 5));
-  assert.equal(releasedFive.features.filter(({ properties }) => properties.representation_kind === 'aggregate_privacy_notice').length, 0);
+  const complete = projection.publicMapFeatureCollection(records.map(({ id }) => id));
+  const completeImpressions = complete.features.filter(({ properties }) => properties.representation_kind === 'aggregate_impression');
+  assert.equal(completeImpressions.length, 3);
+  assert(completeImpressions.every(({ properties }) => properties.documented_identity_count === 10));
 
-  for (const selectedCount of [6, 9]) {
-    const filtered = projection.publicMapFeatureCollection(records.slice(0, selectedCount).map(({ id }) => id));
-    assert.equal(filtered.features.filter(({ properties }) => properties.representation_kind === 'aggregate_impression').length, 0, 'unsafe complement must withhold selected approximate count');
+  const overlappingSelections = [
+    records.slice(0, 5).map(({ id }) => id),
+    records.slice(2, 7).map(({ id }) => id),
+    records.slice(0, 9).map(({ id }) => id),
+  ];
+  for (const visibleIds of overlappingSelections) {
+    const filtered = projection.publicMapFeatureCollection(visibleIds);
+    assert.equal(filtered.features.filter(({ properties }) => properties.representation_kind === 'aggregate_impression').length, 0);
     assert.equal(filtered.features.filter(({ properties }) => properties.representation_kind === 'aggregate_summary').length, 0);
     const notices = filtered.features.filter(({ properties }) => properties.representation_kind === 'aggregate_privacy_notice');
     assert.equal(notices.length, 3);
@@ -977,6 +982,69 @@ test('filtered approximate aggregates protect both selection and complement from
     assert(notices.every(({ properties }) => properties.bucket_identity_count === undefined));
     assert.equal(JSON.stringify(notices).includes('difference-'), false);
   }
+});
+
+test('privacy suppression stays type-internal and public notices remain bucket-neutral', () => {
+  const exactRecord = (id, commonsType, longitude) => ({
+    id,
+    commons_type: commonsType,
+    title: id,
+    presence: {
+      geographic: [{ id: id + '-location', mode: 'exact', geometry: { type: 'Point', coordinates: [longitude, 50] } }],
+      digital: { available: false },
+    },
+  });
+  const records = [
+    exactRecord('exact-knowledge', 'knowledge', 8),
+    exactRecord('exact-water', 'water', 8.001),
+    {
+      id: 'approximate-water',
+      commons_type: 'water',
+      title: 'Approximate water',
+      presence: {
+        geographic: [{
+          id: 'approximate-water-location',
+          mode: 'approximate',
+          geometry: { type: 'Point', coordinates: [8.002, 50] },
+          uncertainty_meters_min: 5000,
+        }],
+        digital: { available: false },
+      },
+    },
+  ];
+  const collection = publicMapFeatureCollection(records);
+  const impressions = collection.features.filter(({ properties }) => properties.representation_kind === 'aggregate_impression');
+  assert.equal(impressions.length, 6);
+  assert(impressions.every(({ properties }) => properties.privacy_withheld === undefined));
+  const notices = collection.features.filter(({ properties }) => properties.representation_kind === 'aggregate_privacy_notice');
+  assert.equal(notices.length, 3);
+  assert(notices.every(({ properties }) => properties.commons_type === undefined));
+});
+
+test('aggregate type offsets remain circular in Web Mercator at high latitude', () => {
+  const types = ['knowledge', 'software', 'water', 'tools-repair'];
+  const records = types.map((commonsType, index) => ({
+    id: 'polar-' + index,
+    commons_type: commonsType,
+    title: 'Polar ' + commonsType,
+    presence: {
+      geographic: [{ id: 'polar-location-' + index, mode: 'exact', geometry: { type: 'Point', coordinates: [0, 75] } }],
+      digital: { available: false },
+    },
+  }));
+  const planetFeatures = publicMapFeatureCollection(records).features.filter(
+    ({ properties }) => properties.semantic_level === 'planet',
+  );
+  const center = planetFeatures.find(({ properties }) => properties.representation_kind === 'aggregate_summary').geometry.coordinates;
+  const byType = new Map(planetFeatures
+    .filter(({ properties }) => properties.representation_kind === 'aggregate_impression')
+    .map((feature) => [feature.properties.commons_type, feature.geometry.coordinates]));
+  const east = byType.get('software');
+  const north = byType.get('water');
+  const mercatorY = (latitude) => Math.log(Math.tan(Math.PI / 4 + latitude * Math.PI / 360));
+  const horizontalRadius = Math.abs((east[0] - center[0]) * Math.PI / 180);
+  const verticalRadius = Math.abs(mercatorY(north[1]) - mercatorY(center[1]));
+  assert(Math.abs(horizontalRadius - verticalRadius) / Math.max(horizontalRadius, verticalRadius) < 1e-9);
 });
 
 test('coarser buckets may release while fine approximate aggregates remain withheld', () => {
