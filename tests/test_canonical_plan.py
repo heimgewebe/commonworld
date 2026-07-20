@@ -1,3 +1,4 @@
+import json
 import shutil
 import tempfile
 import unittest
@@ -15,6 +16,10 @@ class CanonicalPlanTests(unittest.TestCase):
             source = ROOT / directory
             if source.exists():
                 shutil.copytree(source, tmp_root / directory)
+        for directory in ("scripts", "tests"):
+            source = ROOT / directory
+            shutil.copytree(source, tmp_root / directory)
+        shutil.copy2(ROOT / "package.json", tmp_root / "package.json")
         return tmp_root
 
     def test_canonical_plan_validates(self) -> None:
@@ -79,6 +84,44 @@ class CanonicalPlanTests(unittest.TestCase):
             "Grabowski required-check catalog must require exactly the contracts check",
             errors,
         )
+
+    def test_browser_smoke_command_must_use_bound_runner(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp_dir:
+            root = self.copy_repository_core(tmp_dir)
+            path = root / "package.json"
+            package = json.loads(path.read_text(encoding="utf-8"))
+            package["scripts"]["smoke:browser"] = "node scripts/smoke_public_browser.mjs"
+            path.write_text(json.dumps(package), encoding="utf-8")
+
+            errors = validate_canonical_plan(root)
+
+        self.assertIn("package.json must expose the bound browser smoke runner", errors)
+
+    def test_browser_smoke_runner_must_validate_fresh_result(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp_dir:
+            root = self.copy_repository_core(tmp_dir)
+            path = root / "scripts" / "run_browser_smoke.py"
+            path.write_text(
+                path.read_text(encoding="utf-8").replace("'--smoke-result', str(actual)", "str(actual)"),
+                encoding="utf-8",
+            )
+
+            errors = validate_canonical_plan(root)
+
+        self.assertIn("bound browser smoke runner steps or order mismatch", errors)
+
+    def test_browser_smoke_runner_must_keep_step_order(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp_dir:
+            root = self.copy_repository_core(tmp_dir)
+            path = root / "scripts" / "run_browser_smoke.py"
+            source = path.read_text(encoding="utf-8")
+            first = "run(['node', 'scripts/smoke_proposal_browser.mjs'])"
+            second = "run(['node', 'scripts/smoke_focus_overlay_browser.mjs'])"
+            path.write_text(source.replace(first, '__SWAP__').replace(second, first).replace('__SWAP__', second), encoding="utf-8")
+
+            errors = validate_canonical_plan(root)
+
+        self.assertIn("bound browser smoke runner steps or order mismatch", errors)
 
     def test_validation_workflow_must_keep_contracts_job(self) -> None:
         with tempfile.TemporaryDirectory() as tmp_dir:

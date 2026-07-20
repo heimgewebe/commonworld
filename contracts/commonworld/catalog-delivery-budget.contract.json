@@ -1,0 +1,58 @@
+{
+  "schema_version": 1,
+  "kind": "commonworld_catalog_delivery_budget",
+  "status": "measured-and-enforced",
+  "canonical_truth": {
+    "records": "catalog/projects/*.json",
+    "manifest": "catalog/catalog.json",
+    "generated_projections": [
+      "assets/commonworld-bootstrap-catalog.mjs",
+      "index.html"
+    ],
+    "rule": "Generated projections are rebuilt from canonical CommonProject files and are never edited as catalogue truth."
+  },
+  "selected_design": {
+    "id": "build-bound-bootstrap-with-public-project-json",
+    "runtime": "The interactive shell consumes one generated build-bound module and does not refetch canonical project files during startup.",
+    "no_javascript": "The generated noscript catalogue remains in index.html.",
+    "machine_readable": "The manifest and every canonical project JSON remain public and independently addressable.",
+    "privacy": "No backend, account, telemetry, cookie or runtime write API is introduced."
+  },
+  "budgets": {
+    "max_startup_project_json_requests": 0,
+    "max_duplicate_identity_payload_count": 0,
+    "max_catalog_initial_gzip_bytes": 32768,
+    "max_bootstrap_gzip_bytes": 32768,
+    "max_bootstrap_raw_bytes_per_record": 3400,
+    "max_html_start_tags": 2200,
+    "max_browser_dom_nodes": 2200,
+    "max_runtime_ready_ms_at_4x_cpu": 1800,
+    "max_script_duration_ms_at_4x_cpu": 1600,
+    "max_task_duration_ms_at_4x_cpu": 3000,
+    "max_bootstrap_compile_p95_ms_at_4x_cpu": 5
+  },
+  "redesign_trigger": {
+    "rule": "Architecture review is required after two consecutive representative runs breach any browser budget, or one deterministic static budget is exceeded. Catalogue entry count alone is not a trigger.",
+    "candidate_designs": [
+      "generated-full-bootstrap",
+      "html-hydration",
+      "segmented-static-json",
+      "demand-loaded-read-only-static-delivery"
+    ],
+    "required_criteria": [
+      "accessibility",
+      "SEO",
+      "no-JavaScript behavior",
+      "privacy",
+      "caching",
+      "complexity",
+      "GitHub Pages compatibility"
+    ]
+  },
+  "does_not_establish": [
+    "that HTML hydration is preferred",
+    "that a backend or runtime API is justified",
+    "that one timing sample proves a speedup",
+    "permission to weaken no-JavaScript access or privacy"
+  ]
+}
