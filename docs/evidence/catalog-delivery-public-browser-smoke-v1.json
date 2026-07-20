@@ -94,7 +94,7 @@
     {
       "id": "layer-journey-moveend-return",
       "verdict": "PASS",
-      "elapsedMs": 2073
+      "elapsedMs": 1439
     },
     {
       "id": "layer-journey-interrupted",
@@ -192,9 +192,9 @@
   "schema_version": 1,
   "kind": "commonworld_catalog_delivery_public_browser_smoke_evidence",
   "binding": {
-    "smoke_script_sha256": "66328221f5fb303efafb5e9953120c88d24ae8fc670d502457985c985a626e0d",
+    "smoke_script_sha256": "d8833ee0498b9087d4280625107d5cc0d881501573bcb26f6ea91a4832531f3a",
     "smoke_runner_sha256": "89451b29ec225c4321dba1c8d3f6248eea1bc8afd97c3c856ba4c6174360682e",
-    "first_party_surface_sha256": "87945c873381e202f8ac349e742f7f08840dc37c91c1b65f37d7933ccd0a3610",
+    "first_party_surface_sha256": "9753432e3bfb446e1218c623d99f34eea4e9082f67f4a894e5a1b6697a227b2d",
     "scenario_ids": [
       "startup-and-ring-orbits",
       "ring-orbits-reduced-motion",
@@ -223,6 +223,9 @@
       "method-mobile",
       "method-mobile-text-200"
     ],
-    "freshness_rule": "The official browser smoke runner must create a fresh temporary result and validate the exact scenario set, PASS verdicts and zero catalogue requests against this hash-bound evidence."
+    "freshness_rule": "The official browser smoke runner must create a fresh temporary result and validate the exact scenario set, PASS verdicts and zero catalogue requests against this hash-bound evidence.",
+    "durable_job_unit": "grabowski-job-a5abb7b6513d",
+    "job_receipt_sha256": "b1fa493500de2d56867784de6072a0e400da4827f2e0d1d58a8e3d2ed0e91786",
+    "result_sha256": "d6d86b9497a4ecd120227964ccab00c5ea7284d1c2f9a0ceafb6563ad0009c70"
   }
 }
