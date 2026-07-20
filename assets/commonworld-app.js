@@ -33,11 +33,13 @@ import {
   publicGeographicLocations,
   publicGeographicRepresentationKind,
   publicProjectNavigationTarget,
+  quantizeSpherePixel,
   ribbonRepeatCount,
   ringOrbitDirection,
   ringOrbitDuration,
   ringOrbitStartAngle,
   safeExternalHttpsUrl,
+  sampledDiagnosticPublicationDue,
   searchFromState,
   serializeDigitalPath,
   semanticLocationLine,
@@ -194,6 +196,7 @@ const runtime = {
   mapGeometrySampleCount: 0,
   sphereGeometryEvaluationCount: 0,
   sphereGeometryDiagnosticPublishCount: 0,
+  sphereMetrics: { globeDiameter: 0, globeViewportRatio: 0 },
   overlayRenderCount: 0,
   historyTimer: null,
   searchTimer: null,
@@ -1787,7 +1790,12 @@ function setQuery(value, { historyMode = 'replace' } = {}) {
   if (historyMode) runtime.searchTimer = window.setTimeout(() => writeHistory(historyMode), 150);
 }
 
-function setSphereOpacity({ globeDiameter = null, size = null } = {}) {
+/**
+ * Refresh the sphere opacity and hidden-state attribute.
+ *
+ * @returns {boolean} true when a visible DOM property changed.
+ */
+function updateSphereOpacity({ globeDiameter = null, size = null } = {}) {
   const immersive = runtime.state.view === 'layers' || runtime.viewPhase !== 'overview';
   let globeViewportRatio = 0;
   let opacity = 1;
@@ -1798,16 +1806,14 @@ function setSphereOpacity({ globeDiameter = null, size = null } = {}) {
       : Number.NaN;
     const measuredDiameter = Number.isFinite(suppliedDiameter)
       ? suppliedDiameter
-      : Number(elements.stage.dataset.globeDiameter ?? 0);
+      : runtime.sphereMetrics.globeDiameter;
     globeViewportRatio = measuredDiameter / Math.max(1, Math.min(bounds.width, bounds.height));
     opacity = sphereOpacityForGlobeRatio(globeViewportRatio);
   }
   let visualChanged = setStylePropertyIfChanged(elements.sphere, '--sphere-opacity', String(opacity));
   visualChanged = setAttributePresenceIfChanged(elements.sphere, 'data-hidden-local', opacity === 0) || visualChanged;
-  return {
-    visualChanged,
-    globeViewportRatio: Number(globeViewportRatio.toFixed(4)),
-  };
+  runtime.sphereMetrics.globeViewportRatio = globeViewportRatio;
+  return visualChanged;
 }
 
 function projectedGlobeGeometry(center, projectedCenter) {
@@ -1816,35 +1822,36 @@ function projectedGlobeGeometry(center, projectedCenter) {
 }
 
 function updateSphereVisuals({ geometry, size }) {
-  const x = String(geometry.x) + 'px';
-  const y = String(geometry.y) + 'px';
-  const diameter = String(geometry.diameter) + 'px';
+  const x = `${quantizeSpherePixel(geometry.x)}px`;
+  const y = `${quantizeSpherePixel(geometry.y)}px`;
+  const diameter = `${quantizeSpherePixel(geometry.diameter)}px`;
   let visualChanged = false;
   visualChanged = setStylePropertyIfChanged(elements.stage, '--sphere-x', x) || visualChanged;
   visualChanged = setStylePropertyIfChanged(elements.stage, '--sphere-y', y) || visualChanged;
   visualChanged = setStylePropertyIfChanged(elements.stage, '--sphere-size', diameter) || visualChanged;
-  visualChanged = setStylePropertyIfChanged(elements.sphere, '--sphere-x', x) || visualChanged;
-  visualChanged = setStylePropertyIfChanged(elements.sphere, '--sphere-y', y) || visualChanged;
-  visualChanged = setStylePropertyIfChanged(elements.sphere, '--sphere-size', diameter) || visualChanged;
-  const opacityState = setSphereOpacity({ globeDiameter: geometry.globeDiameter, size });
-  visualChanged = opacityState.visualChanged || visualChanged;
-  return { visualChanged, globeViewportRatio: opacityState.globeViewportRatio };
+  runtime.sphereMetrics.globeDiameter = geometry.globeDiameter;
+  visualChanged = updateSphereOpacity({ globeDiameter: geometry.globeDiameter, size }) || visualChanged;
+  return visualChanged;
 }
 
-function publishSphereDiagnostics({ projectedCenter, geometry, sideView, detailLevel, globeViewportRatio }) {
+function publishSphereDiagnostics({ projectedCenter, geometry, sideView, detailLevel }) {
   runtime.sphereGeometryDiagnosticPublishCount += 1;
   setDatasetIfChanged(elements.stage, 'mapProjectedCenterX', Number(projectedCenter.x.toFixed(2)));
   setDatasetIfChanged(elements.stage, 'mapProjectedCenterY', Number(projectedCenter.y.toFixed(2)));
-  setDatasetIfChanged(elements.stage, 'sphereX', geometry.x);
-  setDatasetIfChanged(elements.stage, 'sphereY', geometry.y);
-  setDatasetIfChanged(elements.stage, 'sphereSize', geometry.diameter);
-  setDatasetIfChanged(elements.stage, 'globeDiameter', geometry.globeDiameter);
+  setDatasetIfChanged(elements.stage, 'sphereX', quantizeSpherePixel(geometry.x));
+  setDatasetIfChanged(elements.stage, 'sphereY', quantizeSpherePixel(geometry.y));
+  setDatasetIfChanged(elements.stage, 'sphereSize', quantizeSpherePixel(geometry.diameter));
+  setDatasetIfChanged(elements.stage, 'globeDiameter', quantizeSpherePixel(geometry.globeDiameter));
   setDatasetIfChanged(elements.stage, 'globeGeometrySource', sideView ? 'side-view-layout' : 'maplibre-projected-horizon');
   setDatasetIfChanged(elements.sphere, 'detailLevel', detailLevel);
   setDatasetIfChanged(elements.stage, 'sphereDetailLevel', detailLevel);
   setDatasetIfChanged(elements.stage, 'mapZoom', Number(runtime.map.getZoom().toFixed(4)));
   setDatasetIfChanged(elements.stage, 'mapRenders', runtime.mapRenderCount);
-  setDatasetIfChanged(elements.stage, 'globeViewportRatio', globeViewportRatio);
+  setDatasetIfChanged(
+    elements.stage,
+    'globeViewportRatio',
+    Number(runtime.sphereMetrics.globeViewportRatio.toFixed(4)),
+  );
   setDatasetIfChanged(elements.stage, 'sphereGeometryCommits', runtime.sphereGeometryCommitCount);
   setDatasetIfChanged(elements.stage, 'sphereGeometryEvaluations', runtime.sphereGeometryEvaluationCount);
   setDatasetIfChanged(elements.stage, 'sphereGeometryDiagnosticPublishes', runtime.sphereGeometryDiagnosticPublishCount);
@@ -1869,15 +1876,14 @@ function updateSphereGeometry({ publishDiagnostics = true } = {}) {
     sideView,
   });
   const detailLevel = sphereDetailLevel({ diameter: geometry.diameter, sideView });
-  const visualState = updateSphereVisuals({ geometry, size });
-  if (visualState.visualChanged) runtime.sphereGeometryCommitCount += 1;
+  const visualChanged = updateSphereVisuals({ geometry, size });
+  if (visualChanged) runtime.sphereGeometryCommitCount += 1;
   if (publishDiagnostics) {
     publishSphereDiagnostics({
       projectedCenter,
       geometry,
       sideView,
       detailLevel,
-      globeViewportRatio: visualState.globeViewportRatio,
     });
   }
 }
@@ -1888,8 +1894,10 @@ function sampleSphereGeometry(timestamp = performance.now()) {
   if (delta < MAP_GEOMETRY_SAMPLE_INTERVAL_MS) return;
   runtime.mapGeometryLastAt = timestamp;
   runtime.mapGeometrySampleCount += 1;
-  const publishDiagnostics = runtime.mapGeometrySampleCount === 1
-    || runtime.mapGeometrySampleCount % MAP_GEOMETRY_DIAGNOSTIC_SAMPLE_INTERVAL === 0;
+  const publishDiagnostics = sampledDiagnosticPublicationDue(
+    runtime.mapGeometrySampleCount,
+    MAP_GEOMETRY_DIAGNOSTIC_SAMPLE_INTERVAL,
+  );
   updateSphereGeometry({ publishDiagnostics });
 }
 
@@ -2054,7 +2062,7 @@ function setViewPhase(phase) {
     elements.stage.dataset.layerReturnStartedAt = elements.stage.dataset.viewPhaseStartedAt;
   }
   updateSphereGeometry();
-  if (!runtime.mapReady) setSphereOpacity();
+  if (!runtime.mapReady) updateSphereOpacity();
 }
 
 function showLayerState() {

@@ -23,6 +23,8 @@ import {
 } from '../assets/commonworld-core.mjs';
 
 const ROOT = process.cwd();
+// Allow half a CSS pixel for browser-dependent subpixel rounding of the nominal 48 px lane.
+const MIN_RENDERED_LANE_HEIGHT_PX = 47.5;
 const resultArgumentIndex = process.argv.indexOf('--result');
 const resultPath = resultArgumentIndex >= 0 ? process.argv[resultArgumentIndex + 1] : null;
 if (resultArgumentIndex >= 0 && !resultPath) throw new Error('--result requires a path');
@@ -2267,16 +2269,20 @@ async function liveUiHardeningScenario() {
   await run.page.locator('#layer-view-button').click();
   await run.page.waitForSelector('.globe-stage[data-view-phase="layers"]');
   await run.page.waitForSelector('#layer-panel[data-visible]:not([inert])');
-  await run.page.waitForFunction(() => {
-    const deck = document.querySelector('#layer-track-deck');
-    if (!deck) return false;
-    const transform = getComputedStyle(deck).transform;
-    if (transform === 'none') return true;
-    const matrix = new DOMMatrixReadOnly(transform);
-    return Math.abs(matrix.a - 1) <= 0.001
-      && Math.abs(matrix.d - 1) <= 0.001
-      && Math.abs(matrix.e) <= 0.5
-      && Math.abs(matrix.f) <= 0.5;
+  await run.page.waitForFunction(({ expectedLaneCount, minimumLaneHeightPx }) => {
+    const lanes = [...document.querySelectorAll('.digital-lane')];
+    if (lanes.length !== expectedLaneCount) return false;
+    return lanes.every((lane) => {
+      const focus = lane.querySelector('.digital-lane-focus');
+      const scroll = lane.querySelector('.digital-lane-scroll');
+      if (!focus || !scroll) return false;
+      return lane.getBoundingClientRect().height >= minimumLaneHeightPx
+        && focus.getBoundingClientRect().height >= 44
+        && scroll.getBoundingClientRect().height >= 44;
+    });
+  }, {
+    expectedLaneCount: expectedDigitalProjection.fields.length,
+    minimumLaneHeightPx: MIN_RENDERED_LANE_HEIGHT_PX,
   });
   const layout = await run.page.evaluate(() => {
     const rect = (node) => {
@@ -2305,7 +2311,7 @@ async function liveUiHardeningScenario() {
     };
   });
   assert(layout.lanes.length === expectedDigitalProjection.fields.length, `live UI landscape: unexpected lane count (${JSON.stringify(layout)})`);
-  assert(layout.lanes.every(({ lane, focus, scroll }) => lane.height >= 47.5 && focus.height >= 44 && scroll.height >= 44), `live UI landscape: lane controls are clipped (${JSON.stringify(layout.lanes)})`);
+  assert(layout.lanes.every(({ lane, focus, scroll }) => lane.height >= MIN_RENDERED_LANE_HEIGHT_PX && focus.height >= 44 && scroll.height >= 44), `live UI landscape: lane controls are clipped (${JSON.stringify(layout.lanes)})`);
   assert(layout.overlaps.every(({ focus, scroll }) => focus <= 0.5 && scroll <= 0.5), `live UI landscape: adjacent controls overlap (${JSON.stringify(layout.overlaps)})`);
   assert(layout.deck.scrollHeight > layout.deck.clientHeight && ['auto', 'scroll'].includes(layout.deck.overflowY), `live UI landscape: compressed lanes did not become vertically scrollable (${JSON.stringify(layout.deck)})`);
   assert(layout.orientationInert && layout.orientationAriaHidden === 'true' && layout.globeResetSuppressed, `live UI landscape: hidden globe orientation remains keyboard interactive (${JSON.stringify(layout)})`);
