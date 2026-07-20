@@ -2256,17 +2256,18 @@ async function liveUiHardeningScenario() {
   await run.page.locator('#layer-view-button').click();
   await run.page.waitForSelector('.globe-stage[data-view-phase="layers"]');
   await run.page.waitForSelector('#layer-panel[data-visible]:not([inert])');
-  await run.page.waitForFunction(() => {
-    const deck = document.querySelector('#layer-track-deck');
-    if (!deck) return false;
-    const transform = getComputedStyle(deck).transform;
-    if (transform === 'none') return true;
-    const matrix = new DOMMatrixReadOnly(transform);
-    return Math.abs(matrix.a - 1) <= 0.001
-      && Math.abs(matrix.d - 1) <= 0.001
-      && Math.abs(matrix.e) <= 0.5
-      && Math.abs(matrix.f) <= 0.5;
-  });
+  await run.page.waitForFunction((expectedLaneCount) => {
+    const lanes = [...document.querySelectorAll('.digital-lane')];
+    if (lanes.length !== expectedLaneCount) return false;
+    return lanes.every((lane) => {
+      const focus = lane.querySelector('.digital-lane-focus');
+      const scroll = lane.querySelector('.digital-lane-scroll');
+      if (!focus || !scroll) return false;
+      return lane.getBoundingClientRect().height >= 47.5
+        && focus.getBoundingClientRect().height >= 44
+        && scroll.getBoundingClientRect().height >= 44;
+    });
+  }, expectedDigitalProjection.fields.length);
   const layout = await run.page.evaluate(() => {
     const rect = (node) => {
       const box = node.getBoundingClientRect();
