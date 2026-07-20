@@ -3,7 +3,7 @@
 
 from __future__ import annotations
 
-import ast
+import importlib.util
 import json
 import sys
 from pathlib import Path
@@ -125,7 +125,9 @@ EXPECTED_RESEARCH_FILES = {
 EXPECTED_CONTRACT_FILES = {"catalog-delivery-budget.contract.json", "catalog-diversity.contract.json", "editorial-review.contract.json", "proposal-path.contract.json", "proposal.schema.json", "current-state.contract.json", "aggregation-zoom.contract.json", "digital-ring-taxonomy.contract.json", "digital-sphere.contract.json", "production-delivery-provider.contract.json", "project.schema.json", "public-maplibre-vertical-slice.contract.json", "presence-axes.contract.json", "intent-search-discovery.contract.json", "renderer-selection.contract.json", "visual-semantics.contract.json"}
 EXPECTED_SCRIPT_FILES = {
     "__init__.py",
+    "browser_smoke_plan.py",
     "build_public_runtime.py",
+    "catalog_delivery_compile.mjs",
     "check_pages_dns_target.py",
     "digital_taxonomy.py",
     "measure_catalog_delivery.py",
@@ -204,30 +206,44 @@ REQUIRED_CHECK_CATALOG = {
 
 
 BROWSER_SMOKE_COMMAND = "python3 scripts/run_browser_smoke.py"
-BROWSER_RUNNER_EXPECTED_STEPS = (
-    ("node", "scripts/smoke_public_browser.mjs", "--result"),
-    ("python3", "scripts/validate_catalog_delivery_budget.py", "--smoke-result"),
-    ("node", "scripts/smoke_proposal_browser.mjs"),
-    ("node", "scripts/smoke_focus_overlay_browser.mjs"),
-    ("node", "scripts/smoke_accessibility_modes_browser.mjs"),
+EXPECTED_BROWSER_SMOKE_PLAN = (
+    (
+        "public-browser-smoke",
+        ("node", "scripts/smoke_public_browser.mjs", "--result", "{public_smoke_result}"),
+        True,
+    ),
+    (
+        "catalog-delivery-evidence-validation",
+        (
+            "python3",
+            "scripts/validate_catalog_delivery_budget.py",
+            "--smoke-result",
+            "{public_smoke_result}",
+        ),
+        True,
+    ),
+    ("proposal-browser-smoke", ("node", "scripts/smoke_proposal_browser.mjs"), False),
+    ("focus-overlay-browser-smoke", ("node", "scripts/smoke_focus_overlay_browser.mjs"), False),
+    (
+        "accessibility-modes-browser-smoke",
+        ("node", "scripts/smoke_accessibility_modes_browser.mjs"),
+        False,
+    ),
 )
 
 
-def _browser_runner_steps(source: str) -> tuple[tuple[str, ...], ...]:
-    tree = ast.parse(source)
-    located_steps: list[tuple[int, tuple[str, ...]]] = []
-    for node in ast.walk(tree):
-        if not isinstance(node, ast.Call) or not isinstance(node.func, ast.Name) or node.func.id != "run":
-            continue
-        if len(node.args) != 1 or not isinstance(node.args[0], ast.List):
-            continue
-        static_arguments = tuple(
-            element.value
-            for element in node.args[0].elts
-            if isinstance(element, ast.Constant) and isinstance(element.value, str)
-        )
-        located_steps.append((node.lineno, static_arguments))
-    return tuple(arguments for _, arguments in sorted(located_steps))
+def _load_browser_smoke_plan(path: Path):
+    module_name = "_commonworld_browser_smoke_plan_validation"
+    spec = importlib.util.spec_from_file_location(module_name, path)
+    if spec is None or spec.loader is None:
+        raise ImportError("cannot create browser smoke plan module")
+    module = importlib.util.module_from_spec(spec)
+    sys.modules[module_name] = module
+    try:
+        spec.loader.exec_module(module)
+    finally:
+        sys.modules.pop(module_name, None)
+    return module
 
 
 def validate_browser_smoke_contract(root: Path, package: dict) -> list[str]:
@@ -235,16 +251,43 @@ def validate_browser_smoke_contract(root: Path, package: dict) -> list[str]:
     if package.get("scripts", {}).get("smoke:browser") != BROWSER_SMOKE_COMMAND:
         errors.append("package.json must expose the bound browser smoke runner")
     runner_path = root / "scripts" / "run_browser_smoke.py"
+    plan_path = root / "scripts" / "browser_smoke_plan.py"
     if not runner_path.is_file():
         errors.append("missing bound browser smoke runner")
         return errors
+    if not plan_path.is_file():
+        errors.append("missing canonical browser smoke plan")
+        return errors
+    runner_source = runner_path.read_text(encoding="utf-8")
     try:
-        steps = _browser_runner_steps(runner_path.read_text(encoding="utf-8"))
+        compile(runner_source, str(runner_path), "exec")
     except SyntaxError:
         errors.append("bound browser smoke runner is not valid Python")
         return errors
-    if steps != BROWSER_RUNNER_EXPECTED_STEPS:
-        errors.append("bound browser smoke runner steps or order mismatch")
+    if "materialize_browser_smoke_plan" not in runner_source:
+        errors.append("bound browser smoke runner must consume the canonical plan")
+    for forbidden in (
+        "scripts/smoke_public_browser.mjs",
+        "scripts/smoke_proposal_browser.mjs",
+        "scripts/smoke_focus_overlay_browser.mjs",
+        "scripts/smoke_accessibility_modes_browser.mjs",
+        "scripts/validate_catalog_delivery_budget.py",
+    ):
+        if forbidden in runner_source:
+            errors.append(f"bound browser smoke runner bypasses the canonical plan: {forbidden}")
+    try:
+        plan_module = _load_browser_smoke_plan(plan_path)
+        rows = tuple(
+            (step.identifier, tuple(step.argv), step.required_for_public_only)
+            for step in plan_module.CANONICAL_BROWSER_SMOKE_PLAN
+        )
+    except (ImportError, OSError, SyntaxError, AttributeError, TypeError, ValueError) as error:
+        errors.append(f"canonical browser smoke plan cannot be loaded: {error}")
+        return errors
+    if rows != EXPECTED_BROWSER_SMOKE_PLAN:
+        errors.append("canonical browser smoke plan steps, bindings or order mismatch")
+    if not callable(getattr(plan_module, "materialize_browser_smoke_plan", None)):
+        errors.append("canonical browser smoke plan cannot materialize commands")
     return errors
 
 

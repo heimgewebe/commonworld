@@ -19,6 +19,8 @@ SMOKE_EVIDENCE_PATH = ROOT / 'docs/evidence/catalog-delivery-public-browser-smok
 OPTIONS_PATH = ROOT / 'docs/catalog-delivery-options.md'
 SMOKE_SCRIPT_PATH = ROOT / 'scripts/smoke_public_browser.mjs'
 SMOKE_RUNNER_PATH = ROOT / 'scripts/run_browser_smoke.py'
+SMOKE_PLAN_PATH = ROOT / 'scripts/browser_smoke_plan.py'
+CATALOGUE_NETWORK_BLOCKED_SCENARIO = 'catalogue-network-blocked'
 
 
 def load_json(path: Path) -> dict:
@@ -48,6 +50,52 @@ def scenario_map(value: dict) -> tuple[list[str], dict[str, dict], list[str]]:
     return identifiers, scenarios, errors
 
 
+def is_number(value: object) -> bool:
+    return isinstance(value, (int, float)) and not isinstance(value, bool)
+
+
+def is_nonnegative_integer(value: object) -> bool:
+    return isinstance(value, int) and not isinstance(value, bool) and value >= 0
+
+
+def validate_blocked_catalog_requests(scenarios: dict[str, dict], label: str) -> list[str]:
+    scenario = scenarios.get(CATALOGUE_NETWORK_BLOCKED_SCENARIO)
+    if scenario is None:
+        return [f'{label} missing required scenario: {CATALOGUE_NETWORK_BLOCKED_SCENARIO}']
+    if 'blockedCatalogRequests' not in scenario:
+        return [
+            f'{label} scenario {CATALOGUE_NETWORK_BLOCKED_SCENARIO} missing blockedCatalogRequests'
+        ]
+    value = scenario['blockedCatalogRequests']
+    if not is_nonnegative_integer(value):
+        return [
+            f'{label} scenario {CATALOGUE_NETWORK_BLOCKED_SCENARIO} '
+            'blockedCatalogRequests must be a nonnegative integer'
+        ]
+    if value != 0:
+        return [f'{label} observed {value} runtime catalogue request(s)']
+    return []
+
+
+def validate_compile_samples(profile_name: str, profile: dict) -> list[str]:
+    errors: list[str] = []
+    compile_metrics = profile.get('bootstrap_compile', {})
+    samples = compile_metrics.get('samples_ms')
+    if not isinstance(samples, list) or len(samples) != 21:
+        return [f'{profile_name}: bootstrap compile samples must contain exactly 21 values']
+    if any(not is_number(value) or value < 0 for value in samples):
+        return [f'{profile_name}: bootstrap compile samples must be nonnegative numbers']
+    if samples != sorted(samples):
+        errors.append(f'{profile_name}: bootstrap compile samples must be sorted')
+    median = samples[len(samples) // 2]
+    p95 = samples[int(len(samples) * 0.95)]
+    if compile_metrics.get('median_ms') != median:
+        errors.append(f'{profile_name}: bootstrap compile median does not match raw samples')
+    if compile_metrics.get('p95_ms') != p95:
+        errors.append(f'{profile_name}: bootstrap compile p95 does not match raw samples')
+    return errors
+
+
 def validate_actual_smoke(actual: dict, expected: dict) -> list[str]:
     errors: list[str] = []
     expected_ids, _, expected_errors = scenario_map(expected)
@@ -61,8 +109,7 @@ def validate_actual_smoke(actual: dict, expected: dict) -> list[str]:
     for identifier, scenario in actual_scenarios.items():
         if scenario.get('verdict') != 'PASS':
             errors.append(f'fresh public browser smoke scenario is not PASS: {identifier}')
-    if actual_scenarios.get('catalogue-failure', {}).get('blockedCatalogRequests') != 0:
-        errors.append('fresh public browser smoke observed a runtime catalogue request')
+    errors.extend(validate_blocked_catalog_requests(actual_scenarios, 'fresh public browser smoke'))
     return errors
 
 
@@ -82,8 +129,9 @@ def first_party_surface_sha256(root: Path, requests: list[str]) -> str:
     return digest.hexdigest()
 
 
-def validate(root: Path = ROOT) -> list[str]:
+def validate(root: Path = ROOT, warnings: list[str] | None = None) -> list[str]:
     errors: list[str] = []
+    warning_messages = warnings if warnings is not None else []
     contract_path = root / CONTRACT_PATH.relative_to(ROOT)
     evidence_path = root / EVIDENCE_PATH.relative_to(ROOT)
     options_path = root / OPTIONS_PATH.relative_to(ROOT)
@@ -91,7 +139,8 @@ def validate(root: Path = ROOT) -> list[str]:
     app_path = root / 'assets/commonworld-app.js'
     smoke_script_path = root / SMOKE_SCRIPT_PATH.relative_to(ROOT)
     smoke_runner_path = root / SMOKE_RUNNER_PATH.relative_to(ROOT)
-    for path in (contract_path, evidence_path, smoke_evidence_path, options_path, app_path, smoke_script_path, smoke_runner_path):
+    smoke_plan_path = root / SMOKE_PLAN_PATH.relative_to(ROOT)
+    for path in (contract_path, evidence_path, smoke_evidence_path, options_path, app_path, smoke_script_path, smoke_runner_path, smoke_plan_path):
         if not path.is_file():
             errors.append(f'missing catalogue delivery artifact: {path.relative_to(root)}')
     if errors:
@@ -112,15 +161,40 @@ def validate(root: Path = ROOT) -> list[str]:
         'startup project JSON requests': (static['runtime_verification_fetch']['project_request_count'], budgets.get('max_startup_project_json_requests')),
         'duplicate identity payload count': (static['runtime_verification_fetch']['duplicate_identity_payload_count'], budgets.get('max_duplicate_identity_payload_count')),
         'catalogue initial gzip bytes': (static['catalog_initial_delivery']['gzip_bytes'], budgets.get('max_catalog_initial_gzip_bytes')),
-        'bootstrap gzip bytes': (static['bootstrap']['gzip_bytes'], budgets.get('max_bootstrap_gzip_bytes')),
         'bootstrap raw bytes per record': (static['bootstrap']['raw_bytes_per_record'], budgets.get('max_bootstrap_raw_bytes_per_record')),
         'HTML start tags': (static['html']['start_tag_count'], budgets.get('max_html_start_tags')),
     }
     for label, (actual, maximum) in deterministic_checks.items():
-        if not isinstance(maximum, (int, float)):
+        if not is_number(maximum):
             errors.append(f'missing numeric budget for {label}')
         elif actual > maximum:
             errors.append(f'{label} exceeds budget: {actual} > {maximum}')
+
+    actual_bootstrap_gzip = static['bootstrap']['gzip_bytes']
+    warning_bootstrap_gzip = budgets.get('warn_bootstrap_gzip_bytes')
+    maximum_bootstrap_gzip = budgets.get('max_bootstrap_gzip_bytes')
+    if not is_nonnegative_integer(warning_bootstrap_gzip):
+        errors.append('missing nonnegative integer budget for bootstrap gzip warning')
+    if not is_nonnegative_integer(maximum_bootstrap_gzip):
+        errors.append('missing nonnegative integer budget for bootstrap gzip maximum')
+    if is_nonnegative_integer(warning_bootstrap_gzip) and is_nonnegative_integer(maximum_bootstrap_gzip):
+        if warning_bootstrap_gzip > maximum_bootstrap_gzip:
+            errors.append(
+                'bootstrap gzip warning exceeds maximum: '
+                f'warn={warning_bootstrap_gzip}, max={maximum_bootstrap_gzip}'
+            )
+        elif actual_bootstrap_gzip > maximum_bootstrap_gzip:
+            errors.append(
+                'bootstrap gzip bytes exceeds budget: '
+                f'actual={actual_bootstrap_gzip}, warn={warning_bootstrap_gzip}, '
+                f'max={maximum_bootstrap_gzip}'
+            )
+        elif actual_bootstrap_gzip >= warning_bootstrap_gzip:
+            warning_messages.append(
+                'bootstrap gzip bytes entered warning range: '
+                f'actual={actual_bootstrap_gzip}, warn={warning_bootstrap_gzip}, '
+                f'max={maximum_bootstrap_gzip}'
+            )
 
     app = app_path.read_text(encoding='utf-8')
     for forbidden in ('async function loadRecords(', './catalog/catalog.json', 'manifest.project_files.map', '/catalog/projects/', "fetchJson('./catalog/"):
@@ -133,6 +207,18 @@ def validate(root: Path = ROOT) -> list[str]:
     optimized = evidence.get('optimized', {})
     if optimized.get('static') != static:
         errors.append('committed optimized static evidence does not match current generated surfaces')
+    budget_binding = evidence.get('budget_binding', {})
+    expected_budget_binding = {
+        'bootstrap_gzip_bytes': actual_bootstrap_gzip,
+        'warn_bootstrap_gzip_bytes': warning_bootstrap_gzip,
+        'max_bootstrap_gzip_bytes': maximum_bootstrap_gzip,
+    }
+    if budget_binding != expected_budget_binding:
+        errors.append(
+            'committed bootstrap budget evidence is stale: '
+            f'actual={actual_bootstrap_gzip}, warn={warning_bootstrap_gzip}, '
+            f'max={maximum_bootstrap_gzip}, evidence={budget_binding}'
+        )
     baseline_static = baseline.get('static', {})
     if baseline_static.get('runtime_verification_fetch', {}).get('project_request_count') != static['entry_count']:
         errors.append('baseline does not record one duplicate request per identity')
@@ -150,6 +236,8 @@ def validate(root: Path = ROOT) -> list[str]:
         errors.append('public browser smoke evidence is stale for the smoke script')
     if binding.get('smoke_runner_sha256') != file_sha256(smoke_runner_path):
         errors.append('public browser smoke evidence is stale for the smoke runner')
+    if binding.get('smoke_plan_sha256') != file_sha256(smoke_plan_path):
+        errors.append('public browser smoke evidence is stale for the canonical smoke plan')
     if binding.get('scenario_ids') != smoke_ids:
         errors.append('public browser smoke evidence scenario binding is stale')
     optimized_profiles = optimized.get('browser', {}).get('profiles', [])
@@ -160,11 +248,10 @@ def validate(root: Path = ROOT) -> list[str]:
     }
     if len(surface_hashes) != 1 or binding.get('first_party_surface_sha256') not in surface_hashes:
         errors.append('public browser smoke evidence is stale for the first-party surface')
-    for required_scenario in ('startup-and-ring-orbits', 'catalogue-failure', 'provider-failure', 'method-mobile', 'method-desktop'):
+    for required_scenario in ('startup-and-ring-orbits', CATALOGUE_NETWORK_BLOCKED_SCENARIO, 'provider-failure', 'method-mobile', 'method-desktop'):
         if smoke_scenarios.get(required_scenario, {}).get('verdict') != 'PASS':
             errors.append(f'public browser smoke missing PASS scenario: {required_scenario}')
-    if smoke_scenarios.get('catalogue-failure', {}).get('blockedCatalogRequests') != 0:
-        errors.append('public browser smoke observed a runtime catalogue request')
+    errors.extend(validate_blocked_catalog_requests(smoke_scenarios, 'public browser smoke'))
 
     browser = optimized.get('browser', {})
     if browser.get('cpu_throttle_rate') != 4:
@@ -182,10 +269,11 @@ def validate(root: Path = ROOT) -> list[str]:
             'bootstrap compile p95 milliseconds': (profile.get('bootstrap_compile', {}).get('p95_ms'), budgets.get('max_bootstrap_compile_p95_ms_at_4x_cpu')),
         }
         for label, (actual, maximum) in checks.items():
-            if not isinstance(actual, (int, float)) or not isinstance(maximum, (int, float)):
+            if not is_number(actual) or not is_number(maximum):
                 errors.append(f'{name}: missing numeric {label} evidence or budget')
             elif actual > maximum:
                 errors.append(f'{name}: {label} exceeds budget: {actual} > {maximum}')
+        errors.extend(validate_compile_samples(name, profile))
         if profile.get('runtime_ready') is not True or profile.get('runtime_failed') is not False:
             errors.append(f'{name}: runtime did not reach a healthy ready state')
         requests = profile.get('first_party_requests')
@@ -224,12 +312,15 @@ def main() -> int:
     parser = argparse.ArgumentParser()
     parser.add_argument('--smoke-result', type=Path)
     args = parser.parse_args()
-    errors = validate()
+    warnings: list[str] = []
+    errors = validate(warnings=warnings)
     if args.smoke_result:
         if not args.smoke_result.is_file():
             errors.append(f'fresh public browser smoke result missing: {args.smoke_result}')
         else:
             errors.extend(validate_actual_smoke(load_json(args.smoke_result), load_json(SMOKE_EVIDENCE_PATH)))
+    for warning in warnings:
+        print(f'WARNING: {warning}')
     if errors:
         for error in errors:
             print(f'ERROR: {error}')
@@ -239,7 +330,8 @@ def main() -> int:
     print(
         'catalogue delivery budget valid: '
         f"{metrics['entry_count']} records, "
-        f"{metrics['catalog_initial_delivery']['gzip_bytes']} gzip bytes, "
+        f"{metrics['catalog_initial_delivery']['gzip_bytes']} catalogue gzip bytes, "
+        f"{metrics['bootstrap']['gzip_bytes']} bootstrap gzip bytes, "
         f"{metrics['runtime_verification_fetch']['project_request_count']} startup project requests"
         f"{suffix}"
     )

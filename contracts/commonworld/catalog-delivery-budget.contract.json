@@ -29,7 +29,8 @@
     "max_runtime_ready_ms_at_4x_cpu": 1800,
     "max_script_duration_ms_at_4x_cpu": 1600,
     "max_task_duration_ms_at_4x_cpu": 3000,
-    "max_bootstrap_compile_p95_ms_at_4x_cpu": 5
+    "max_bootstrap_compile_p95_ms_at_4x_cpu": 5,
+    "warn_bootstrap_gzip_bytes": 28672
   },
   "redesign_trigger": {
     "rule": "Architecture review is required after two consecutive representative runs breach any browser budget, or one deterministic static budget is exceeded. Catalogue entry count alone is not a trigger.",

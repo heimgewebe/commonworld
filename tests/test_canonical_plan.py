@@ -97,31 +97,69 @@ class CanonicalPlanTests(unittest.TestCase):
 
         self.assertIn("package.json must expose the bound browser smoke runner", errors)
 
-    def test_browser_smoke_runner_must_validate_fresh_result(self) -> None:
+    def test_browser_smoke_plan_must_bind_public_result(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp_dir:
+            root = self.copy_repository_core(tmp_dir)
+            path = root / "scripts" / "browser_smoke_plan.py"
+            path.write_text(
+                path.read_text(encoding="utf-8").replace(
+                    '("node", "scripts/smoke_public_browser.mjs", "--result", PUBLIC_SMOKE_RESULT_TOKEN)',
+                    '("node", "scripts/smoke_public_browser.mjs", "--result")',
+                ),
+                encoding="utf-8",
+            )
+            errors = validate_canonical_plan(root)
+        self.assertIn("canonical browser smoke plan steps, bindings or order mismatch", errors)
+
+    def test_browser_smoke_plan_must_validate_fresh_result(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp_dir:
+            root = self.copy_repository_core(tmp_dir)
+            path = root / "scripts" / "browser_smoke_plan.py"
+            path.write_text(
+                path.read_text(encoding="utf-8").replace('"--smoke-result",', '"--not-smoke-result",'),
+                encoding="utf-8",
+            )
+            errors = validate_canonical_plan(root)
+        self.assertIn("canonical browser smoke plan steps, bindings or order mismatch", errors)
+
+    def test_browser_smoke_plan_must_keep_step_order(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp_dir:
+            root = self.copy_repository_core(tmp_dir)
+            path = root / "scripts" / "browser_smoke_plan.py"
+            source = path.read_text(encoding="utf-8")
+            first = 'BrowserSmokeStep("proposal-browser-smoke", ("node", "scripts/smoke_proposal_browser.mjs"))'
+            second = 'BrowserSmokeStep("focus-overlay-browser-smoke", ("node", "scripts/smoke_focus_overlay_browser.mjs"))'
+            path.write_text(
+                source.replace(first, '__SWAP__').replace(second, first).replace('__SWAP__', second),
+                encoding="utf-8",
+            )
+            errors = validate_canonical_plan(root)
+        self.assertIn("canonical browser smoke plan steps, bindings or order mismatch", errors)
+
+    def test_browser_smoke_plan_must_not_omit_step(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp_dir:
+            root = self.copy_repository_core(tmp_dir)
+            path = root / "scripts" / "browser_smoke_plan.py"
+            source = path.read_text(encoding="utf-8")
+            omitted = """BrowserSmokeStep(
+        "accessibility-modes-browser-smoke",
+        ("node", "scripts/smoke_accessibility_modes_browser.mjs"),
+    ),
+"""
+            path.write_text(source.replace(omitted, ''), encoding="utf-8")
+            errors = validate_canonical_plan(root)
+        self.assertIn("canonical browser smoke plan steps, bindings or order mismatch", errors)
+
+    def test_browser_smoke_runner_must_not_bypass_plan(self) -> None:
         with tempfile.TemporaryDirectory() as tmp_dir:
             root = self.copy_repository_core(tmp_dir)
             path = root / "scripts" / "run_browser_smoke.py"
             path.write_text(
-                path.read_text(encoding="utf-8").replace("'--smoke-result', str(actual)", "str(actual)"),
+                "import subprocess\nsubprocess.run(['node', 'scripts/smoke_public_browser.mjs'])\n",
                 encoding="utf-8",
             )
-
             errors = validate_canonical_plan(root)
-
-        self.assertIn("bound browser smoke runner steps or order mismatch", errors)
-
-    def test_browser_smoke_runner_must_keep_step_order(self) -> None:
-        with tempfile.TemporaryDirectory() as tmp_dir:
-            root = self.copy_repository_core(tmp_dir)
-            path = root / "scripts" / "run_browser_smoke.py"
-            source = path.read_text(encoding="utf-8")
-            first = "run(['node', 'scripts/smoke_proposal_browser.mjs'])"
-            second = "run(['node', 'scripts/smoke_focus_overlay_browser.mjs'])"
-            path.write_text(source.replace(first, '__SWAP__').replace(second, first).replace('__SWAP__', second), encoding="utf-8")
-
-            errors = validate_canonical_plan(root)
-
-        self.assertIn("bound browser smoke runner steps or order mismatch", errors)
+        self.assertIn("bound browser smoke runner must consume the canonical plan", errors)
 
     def test_validation_workflow_must_keep_contracts_job(self) -> None:
         with tempfile.TemporaryDirectory() as tmp_dir:

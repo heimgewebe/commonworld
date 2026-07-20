@@ -2332,7 +2332,7 @@ async function liveUiHardeningScenario() {
   await run.context.close();
 }
 
-async function catalogueFailureScenario() {
+async function catalogueNetworkBlockedScenario() {
   const run = await newPage();
   const blockedCatalogRequests = [];
   await run.page.route('**/catalog/**', (route) => {
@@ -2342,21 +2342,21 @@ async function catalogueFailureScenario() {
   await run.page.goto(baseUrl, { waitUntil: 'domcontentloaded' });
   await run.page.waitForSelector('html.runtime-ready');
   await run.page.waitForSelector('.globe-stage[data-runtime-state="ready"]');
-  assert(blockedCatalogRequests.length === 0, `catalogue failure: build-bound runtime requested canonical catalog files: ${blockedCatalogRequests.join(' | ')}`);
-  assert(await run.page.locator('.globe-stage').getAttribute('data-catalog-delivery') === 'build-bound-bootstrap', 'catalogue failure: runtime delivery mode is not build-bound');
+  assert(blockedCatalogRequests.length === 0, `catalogue network blocked: build-bound runtime requested canonical catalog files: ${blockedCatalogRequests.join(' | ')}`);
+  assert(await run.page.locator('.globe-stage').getAttribute('data-catalog-delivery') === 'build-bound-bootstrap', 'catalogue network blocked: runtime delivery mode is not build-bound');
   await run.page.locator('#commons-search').fill('Debian');
   await run.page.waitForTimeout(220);
-  assert((await run.page.locator('#globe-results').textContent())?.startsWith('1 Commons'), 'catalogue failure: embedded search did not work');
+  assert((await run.page.locator('#globe-results').textContent())?.startsWith('1 Commons'), 'catalogue network blocked: embedded search did not work');
   await run.page.locator('#settings-toggle').click();
-  assert(await run.page.locator('#settings-panel').isVisible(), 'catalogue failure: settings are dead');
+  assert(await run.page.locator('#settings-panel').isVisible(), 'catalogue network blocked: settings are dead');
   await run.page.getByRole('radio', { name: /Text/ }).click();
-  assert(await run.page.locator('#text-view').isVisible(), 'catalogue failure: text view unavailable');
-  assert(await run.page.locator('#project-debian').isVisible(), 'catalogue failure: matching static card unavailable');
-  assert(run.pageErrors.length === 0, `catalogue failure: page errors: ${run.pageErrors.join(' | ')}`);
-  assert(run.consoleErrors.length === 0, `catalogue failure: unexpected console errors: ${run.consoleErrors.join(' | ')}`);
+  assert(await run.page.locator('#text-view').isVisible(), 'catalogue network blocked: text view unavailable');
+  assert(await run.page.locator('#project-debian').isVisible(), 'catalogue network blocked: matching static card unavailable');
+  assert(run.pageErrors.length === 0, `catalogue network blocked: page errors: ${run.pageErrors.join(' | ')}`);
+  assert(run.consoleErrors.length === 0, `catalogue network blocked: unexpected console errors: ${run.consoleErrors.join(' | ')}`);
   const appWarnings = run.consoleWarnings.filter((message) => message.includes('Commonworld'));
-  assert(appWarnings.length === 0, `catalogue failure: unexpected application warnings (${appWarnings.length})`);
-  results.push({ id: 'catalogue-failure', verdict: 'PASS', blockedCatalogRequests: blockedCatalogRequests.length });
+  assert(appWarnings.length === 0, `catalogue network blocked: unexpected application warnings (${appWarnings.length})`);
+  results.push({ id: 'catalogue-network-blocked', verdict: 'PASS', blockedCatalogRequests: blockedCatalogRequests.length });
   await run.context.close();
 }
 
@@ -2463,7 +2463,7 @@ try {
   await externalLinkSafetyScenario();
   await syntheticCatalogueTruthScenario();
   await liveUiHardeningScenario();
-  await catalogueFailureScenario();
+  await catalogueNetworkBlockedScenario();
   await providerFailureScenario();
   await methodScenario();
 } catch (error) {
