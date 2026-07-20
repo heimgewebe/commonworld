@@ -5,6 +5,7 @@ from __future__ import annotations
 
 import hashlib
 import json
+from datetime import date
 import sys
 from pathlib import Path
 
@@ -237,7 +238,11 @@ def validate_current_state(root: Path = ROOT) -> list[str]:
         "third_party_assets_retain_their_own_licences": True,
     }:
         errors.append("current licensing truth mismatch")
-    if state.get("current_as_of") != "2026-07-19":
+    try:
+        current_as_of = date.fromisoformat(str(state.get("current_as_of", "")))
+    except ValueError:
+        current_as_of = None
+    if current_as_of is None or current_as_of < date(2026, 7, 19):
         errors.append("current-state date does not cover the digital ring-bundle taxonomy truth")
     if not (root / "LICENSE").is_file() or not (root / "LICENSE-DATA.md").is_file():
         errors.append("declared code and data licences must exist")

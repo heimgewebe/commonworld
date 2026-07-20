@@ -7,6 +7,7 @@ import json
 import math
 import subprocess
 import sys
+from datetime import date
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -143,9 +144,14 @@ def validate_presence_axes(root: Path = ROOT) -> list[str]:
         ],
         "third_party_assets_retain_their_own_licences": True,
     }
+    try:
+        current_as_of = date.fromisoformat(str(current_state.get("current_as_of", "")))
+    except ValueError:
+        current_as_of = None
     if (
         current_state.get("schema_version") != 2
-        or current_state.get("current_as_of") != "2026-07-19"
+        or current_as_of is None
+        or current_as_of < date(2026, 7, 19)
         or current_state.get("licensing") != expected_licensing
     ):
         errors.append("T006 canonical current-state licensing does not preserve the ODbL geometry exception")

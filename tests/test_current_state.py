@@ -32,6 +32,16 @@ class CurrentStateTests(unittest.TestCase):
     def test_current_state_validates(self) -> None:
         self.assertEqual([], validate_current_state(ROOT))
 
+    def test_current_state_rejects_date_before_ring_taxonomy(self) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            root = self.copy_current_state(directory)
+            path = root / "contracts/commonworld/current-state.contract.json"
+            value = json.loads(path.read_text(encoding="utf-8"))
+            value["current_as_of"] = "2026-07-18"
+            path.write_text(json.dumps(value), encoding="utf-8")
+            errors = validate_current_state(root)
+        self.assertIn("current-state date does not cover the digital ring-bundle taxonomy truth", errors)
+
     def test_dynamic_digital_count_has_precise_error_without_static_mismatch(self) -> None:
         with tempfile.TemporaryDirectory() as directory:
             root = self.copy_current_state(directory)

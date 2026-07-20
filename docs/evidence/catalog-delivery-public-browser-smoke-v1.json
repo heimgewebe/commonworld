@@ -1,0 +1,228 @@
+{
+  "verdict": "PASS",
+  "scenarios": [
+    {
+      "id": "startup-and-ring-orbits",
+      "verdict": "PASS",
+      "directGlobeProjection": true,
+      "hiddenUntilCalibrated": true,
+      "outerHintRemoved": true,
+      "aggregateRingIdentities": 27,
+      "movingRingMatrix": true,
+      "unchangedGeometryRepaintSkipped": true
+    },
+    {
+      "id": "ring-orbits-reduced-motion",
+      "verdict": "PASS"
+    },
+    {
+      "id": "synthetic-digital-performance",
+      "verdict": "PASS",
+      "cases": [
+        {
+          "size": 500,
+          "treeNodeCount": 529,
+          "rootVisible": 2,
+          "communicationVisible": 1,
+          "boundedIdentityVisible": 48,
+          "fullIdentityCount": 250,
+          "syntheticDomBudget": 51,
+          "treeConstructionDelta": 1
+        },
+        {
+          "size": 5000,
+          "treeNodeCount": 5029,
+          "rootVisible": 2,
+          "communicationVisible": 1,
+          "boundedIdentityVisible": 48,
+          "fullIdentityCount": 2500,
+          "syntheticDomBudget": 51,
+          "treeConstructionDelta": 1
+        }
+      ],
+      "idleOverlayRenderDelta": 0
+    },
+    {
+      "id": "normal",
+      "verdict": "PASS"
+    },
+    {
+      "id": "intent-search-discovery",
+      "verdict": "PASS",
+      "indexedRecords": 41,
+      "rankedGermanIntentResults": 26,
+      "filters": 7,
+      "digitalCoordinateFree": true,
+      "spatialNavigation": true
+    },
+    {
+      "id": "intent-search-ipad-portrait",
+      "verdict": "PASS",
+      "minimumControlHeight": 44,
+      "touchFocusRingsHidden": true
+    },
+    {
+      "id": "intent-search-ipad-landscape",
+      "verdict": "PASS",
+      "minimumControlHeight": 44,
+      "touchFocusRingsHidden": true
+    },
+    {
+      "id": "dual-presence-axes",
+      "verdict": "PASS",
+      "publicFeatures": 80,
+      "publicIdentities": 21,
+      "digitalIdentities": 27,
+      "unchangedMapUpdatesSkipped": true
+    },
+    {
+      "id": "layer-journey-desktop",
+      "verdict": "PASS"
+    },
+    {
+      "id": "layer-journey-mobile",
+      "verdict": "PASS"
+    },
+    {
+      "id": "layer-journey-ipad-portrait",
+      "verdict": "PASS"
+    },
+    {
+      "id": "layer-journey-ipad-landscape",
+      "verdict": "PASS"
+    },
+    {
+      "id": "layer-journey-moveend-return",
+      "verdict": "PASS",
+      "elapsedMs": 2073
+    },
+    {
+      "id": "layer-journey-interrupted",
+      "verdict": "PASS"
+    },
+    {
+      "id": "layer-journey-reduced-motion",
+      "verdict": "PASS"
+    },
+    {
+      "id": "legacy-layer-and-atomic-focus",
+      "verdict": "PASS",
+      "backForwardFocus": true,
+      "textHierarchyFocus": true,
+      "keyboardPath": true
+    },
+    {
+      "id": "history-focus-diagnostic-contract",
+      "verdict": "PASS"
+    },
+    {
+      "id": "valid-empty-digital-path",
+      "verdict": "PASS",
+      "pathStable": true,
+      "emptyState": true,
+      "breadcrumbTouchTarget": true
+    },
+    {
+      "id": "external-link-safety",
+      "verdict": "PASS",
+      "canonicalHttpsOnly": true
+    },
+    {
+      "id": "synthetic-catalogue-truth",
+      "verdict": "PASS",
+      "sizes": [
+        500,
+        5000
+      ],
+      "preview": 48,
+      "increment": 48
+    },
+    {
+      "id": "live-ui-hardening",
+      "verdict": "PASS",
+      "landscapeOverview": {
+        "viewport": {
+          "width": 667,
+          "height": 375
+        },
+        "overlapArea": 0,
+        "controlGap": 9.1875,
+        "layerControl": {
+          "left": 455.765625,
+          "top": 70.390625,
+          "right": 603.8125,
+          "bottom": 114.390625,
+          "width": 148.046875,
+          "height": 44
+        },
+        "zoomControl": {
+          "left": 613,
+          "top": 87.40625,
+          "right": 657,
+          "bottom": 131.40625,
+          "width": 44,
+          "height": 44
+        },
+        "minimumCatalogSelectHeight": 44
+      }
+    },
+    {
+      "id": "catalogue-failure",
+      "verdict": "PASS",
+      "blockedCatalogRequests": 0
+    },
+    {
+      "id": "provider-failure",
+      "verdict": "PASS",
+      "applicationWarnings": 1
+    },
+    {
+      "id": "method-desktop",
+      "verdict": "PASS"
+    },
+    {
+      "id": "method-mobile",
+      "verdict": "PASS"
+    },
+    {
+      "id": "method-mobile-text-200",
+      "verdict": "PASS"
+    }
+  ],
+  "schema_version": 1,
+  "kind": "commonworld_catalog_delivery_public_browser_smoke_evidence",
+  "binding": {
+    "smoke_script_sha256": "66328221f5fb303efafb5e9953120c88d24ae8fc670d502457985c985a626e0d",
+    "smoke_runner_sha256": "89451b29ec225c4321dba1c8d3f6248eea1bc8afd97c3c856ba4c6174360682e",
+    "first_party_surface_sha256": "87945c873381e202f8ac349e742f7f08840dc37c91c1b65f37d7933ccd0a3610",
+    "scenario_ids": [
+      "startup-and-ring-orbits",
+      "ring-orbits-reduced-motion",
+      "synthetic-digital-performance",
+      "normal",
+      "intent-search-discovery",
+      "intent-search-ipad-portrait",
+      "intent-search-ipad-landscape",
+      "dual-presence-axes",
+      "layer-journey-desktop",
+      "layer-journey-mobile",
+      "layer-journey-ipad-portrait",
+      "layer-journey-ipad-landscape",
+      "layer-journey-moveend-return",
+      "layer-journey-interrupted",
+      "layer-journey-reduced-motion",
+      "legacy-layer-and-atomic-focus",
+      "history-focus-diagnostic-contract",
+      "valid-empty-digital-path",
+      "external-link-safety",
+      "synthetic-catalogue-truth",
+      "live-ui-hardening",
+      "catalogue-failure",
+      "provider-failure",
+      "method-desktop",
+      "method-mobile",
+      "method-mobile-text-200"
+    ],
+    "freshness_rule": "The official browser smoke runner must create a fresh temporary result and validate the exact scenario set, PASS verdicts and zero catalogue requests against this hash-bound evidence."
+  }
+}
