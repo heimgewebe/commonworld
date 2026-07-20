@@ -600,6 +600,26 @@ html[data-input-modality="pointer"] :focus {
   color: #ffe1a8;
 }
 
+/* Keep the globe itself visually primary: explanatory status text remains
+   available to assistive technology, while only actionable/exception states
+   occupy map space. */
+.map-legend:not([open]) {
+  width: auto;
+}
+
+.semantic-summary,
+.globe-results:not([data-empty]) {
+  position: absolute !important;
+  width: 1px !important;
+  height: 1px !important;
+  padding: 0 !important;
+  margin: -1px !important;
+  overflow: hidden !important;
+  clip: rect(0, 0, 0, 0) !important;
+  white-space: nowrap !important;
+  border: 0 !important;
+}
+
 .method-page {
   min-height: 100%;
   overflow: auto;
