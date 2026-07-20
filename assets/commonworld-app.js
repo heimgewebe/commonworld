@@ -1806,7 +1806,7 @@ function setQuery(value, { historyMode = 'replace' } = {}) {
   if (historyMode) runtime.searchTimer = window.setTimeout(() => writeHistory(historyMode), 150);
 }
 
-function setSphereOpacity({ globeDiameter = null, size = null, publishDiagnostics = true } = {}) {
+function setSphereOpacity({ globeDiameter = null, size = null } = {}) {
   const immersive = runtime.state.view === 'layers' || runtime.viewPhase !== 'overview';
   let globeViewportRatio = 0;
   let opacity = 1;
@@ -1823,9 +1823,7 @@ function setSphereOpacity({ globeDiameter = null, size = null, publishDiagnostic
   }
   let visualChanged = setStylePropertyIfChanged(elements.sphere, '--sphere-opacity', String(opacity));
   visualChanged = setAttributePresenceIfChanged(elements.sphere, 'data-hidden-local', opacity === 0) || visualChanged;
-  if (publishDiagnostics) {
-    setDatasetIfChanged(elements.stage, 'globeViewportRatio', Number(globeViewportRatio.toFixed(4)));
-  }
+  setDatasetIfChanged(elements.stage, 'globeViewportRatio', Number(globeViewportRatio.toFixed(4)));
   return visualChanged;
 }
 
@@ -1865,19 +1863,17 @@ function updateSphereGeometry({ publishDiagnostics = true } = {}) {
   if (publishDiagnostics) {
     setDatasetIfChanged(elements.stage, 'mapProjectedCenterX', Number(projectedCenter.x.toFixed(2)));
     setDatasetIfChanged(elements.stage, 'mapProjectedCenterY', Number(projectedCenter.y.toFixed(2)));
-    setDatasetIfChanged(elements.stage, 'sphereX', geometry.x);
-    setDatasetIfChanged(elements.stage, 'sphereY', geometry.y);
-    setDatasetIfChanged(elements.stage, 'sphereSize', geometry.diameter);
-    setDatasetIfChanged(elements.stage, 'globeDiameter', geometry.globeDiameter);
-    setDatasetIfChanged(elements.stage, 'globeGeometrySource', sideView ? 'side-view-layout' : 'maplibre-projected-horizon');
   }
+  setDatasetIfChanged(elements.stage, 'sphereX', geometry.x);
+  setDatasetIfChanged(elements.stage, 'sphereY', geometry.y);
+  setDatasetIfChanged(elements.stage, 'sphereSize', geometry.diameter);
+  setDatasetIfChanged(elements.stage, 'globeDiameter', geometry.globeDiameter);
+  setDatasetIfChanged(elements.stage, 'globeGeometrySource', sideView ? 'side-view-layout' : 'maplibre-projected-horizon');
   const detailLevel = sphereDetailLevel({ diameter: geometry.diameter, sideView });
   visualChanged = setDatasetIfChanged(elements.sphere, 'detailLevel', detailLevel) || visualChanged;
-  if (publishDiagnostics) {
-    setDatasetIfChanged(elements.stage, 'sphereDetailLevel', detailLevel);
-    setDatasetIfChanged(elements.stage, 'mapZoom', Number(runtime.map.getZoom().toFixed(4)));
-  }
-  visualChanged = setSphereOpacity({ globeDiameter: geometry.globeDiameter, size, publishDiagnostics }) || visualChanged;
+  setDatasetIfChanged(elements.stage, 'sphereDetailLevel', detailLevel);
+  setDatasetIfChanged(elements.stage, 'mapZoom', Number(runtime.map.getZoom().toFixed(4)));
+  visualChanged = setSphereOpacity({ globeDiameter: geometry.globeDiameter, size }) || visualChanged;
   if (visualChanged) runtime.sphereGeometryCommitCount += 1;
   if (publishDiagnostics) {
     setDatasetIfChanged(elements.stage, 'sphereGeometryCommits', runtime.sphereGeometryCommitCount);
