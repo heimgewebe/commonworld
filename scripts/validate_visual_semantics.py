@@ -22,6 +22,20 @@ FAMILY_IDS = (
     "making_infrastructure",
     "care_provision",
 )
+COMMONS_TYPE_IDS = (
+    "knowledge",
+    "software",
+    "culture",
+    "food-seeds",
+    "water",
+    "energy",
+    "housing-land",
+    "health-care",
+    "tools-repair",
+    "community-network",
+    "other",
+)
+COMMONS_TYPE_CODES = ("WD", "SI", "KM", "SE", "WB", "EN", "BW", "PG", "WR", "GN", "AN")
 COVERAGE_STATES = ("assessed", "partial", "unassessed")
 UNCERTAINTY_MODES = ("exact", "public_extent", "approximate", "hidden")
 DENSITY_BANDS = (
@@ -250,7 +264,7 @@ def validate_visual_semantics(root: Path = ROOT) -> list[str]:
 
     channels = contract.get("channel_separation", {})
     expected_channels = {
-        "hue": "commons_family",
+        "hue": "profile_selected_commons_classification",
         "lightness": "normalized_current_density",
         "interior_texture": "coverage_state",
         "boundary_and_halo": "location_precision_and_uncertainty",
@@ -269,6 +283,44 @@ def validate_visual_semantics(root: Path = ROOT) -> list[str]:
     ):
         if channels.get(name) is not True:
             errors.append(f"visual channel invariant must be true: {name}")
+
+    classification_profiles = contract.get("classification_profiles", {})
+    if classification_profiles.get("active_public_geographic_profile") != "exclusive_commons_type_v1":
+        errors.append("active public geographic classification profile must be exclusive_commons_type_v1")
+    profiles = classification_profiles.get("profiles", [])
+    active_profiles = [profile for profile in profiles if profile.get("id") == "exclusive_commons_type_v1"]
+    if len(active_profiles) != 1:
+        errors.append("visual semantics must define exactly one exclusive_commons_type_v1 profile")
+    else:
+        active_profile = active_profiles[0]
+        values = active_profile.get("values", [])
+        if tuple(value.get("id") for value in values) != COMMONS_TYPE_IDS:
+            errors.append("active Commons type profile must match the canonical filter order")
+        if tuple(value.get("code") for value in values) != COMMONS_TYPE_CODES:
+            errors.append("active Commons type profile must define the canonical non-color codes")
+        if len({value.get("fill_seed_dark_surface") for value in values}) != len(COMMONS_TYPE_IDS):
+            errors.append("active Commons type profile must use distinct hue tokens")
+        if active_profile.get("no_hue_blending") is not True:
+            errors.append("active Commons type profile must forbid hue blending")
+        if active_profile.get("text_label_required") is not True or active_profile.get("non_color_code_required") is not True:
+            errors.append("active Commons type profile must require text labels and non-color codes")
+        if active_profile.get("coverage_texture_reserved") is not True:
+            errors.append("active Commons type profile must reserve texture for coverage")
+        reference_dark = active_profile.get("reference_dark_surface")
+        minimum_contrast = active_profile.get("minimum_non_text_contrast_ratio")
+        if reference_dark != "#111827" or minimum_contrast != 3.0:
+            errors.append("active Commons type profile must use the canonical dark surface contrast rule")
+        for value in values:
+            try:
+                ratio = contrast_ratio(value.get("fill_seed_dark_surface", ""), reference_dark)
+            except (TypeError, ValueError):
+                errors.append(f"Commons type {value.get('id')} must define a valid dark-surface hue token")
+            else:
+                if ratio < minimum_contrast:
+                    errors.append(f"Commons type {value.get('id')} must meet dark-surface non-text contrast")
+    family_profiles = [profile for profile in profiles if profile.get("id") == "commons_family_v1"]
+    if len(family_profiles) != 1 or family_profiles[0].get("active_in_geographic_impressions_v1") is not False:
+        errors.append("commons_family_v1 must remain an inactive research profile for geographic impressions v1")
 
     taxonomy = contract.get("family_taxonomy", {})
     families = taxonomy.get("families", [])

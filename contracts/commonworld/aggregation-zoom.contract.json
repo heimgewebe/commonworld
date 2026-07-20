@@ -300,6 +300,106 @@
     "must_not_infer_from_catalog_absence": true,
     "no_geographic_area_denominator": true
   },
+  "geographic_impressions_v1": {
+    "status": "implemented_public_geometry_catalog_excerpt",
+    "source_geometry": {
+      "allowed": [
+        "validated_public_exact_point",
+        "validated_public_approximate_point_with_uncertainty",
+        "validated_public_polygon_or_multipolygon"
+      ],
+      "hidden_locations": "excluded_before_representative_point_and_bucket_derivation",
+      "representative_point": "deterministic_public_geometry_derivative_per_published_geometry_component_for_bucket_assignment_only",
+      "aggregate_coordinates": "grid_display_centers_with_bounded_type_offsets_not_project_coordinates"
+    },
+    "spatial_buckets": {
+      "planet": {
+        "grid_degrees": 30,
+        "output": "one_bounded_impression_per_released_commons_type_plus_unique_identity_count"
+      },
+      "macroregion": {
+        "grid_degrees": 10,
+        "output": "one_bounded_impression_per_released_commons_type_plus_unique_identity_count"
+      },
+      "region": {
+        "grid_degrees": 4,
+        "output": "one_bounded_impression_per_released_commons_type_plus_unique_identity_count"
+      },
+      "identity_rule": "one_commonproject_id_at_most_once_per_bucket",
+      "ordering": "deterministic_bucket_key_then_canonical_commons_type_order",
+      "multipolygon_rule": "each_public_component_may_contribute_to_its_bucket_while_identity_remains_deduplicated_within_each_bucket"
+    },
+    "visual_semantics": {
+      "hue": "exclusive_commons_type",
+      "circle_size": "constant_within_geographic_impressions_v1_because_coverage_is_unassessed",
+      "number": "released_unique_commonproject_identity_count_in_bucket",
+      "coverage": "open_dot_pattern_and_explicit_unassessed_text_without_density_or_zero_claim",
+      "precision": {
+        "exact": "point",
+        "approximate": "uncertainty_area_with_dashed_outline",
+        "extent": "public_area_with_solid_outline"
+      },
+      "privacy_notice": "neutral_ellipsis_without_numeric_lower_bound_commons_type_hue_or_member_identity"
+    },
+    "semantic_zoom": {
+      "planet_impressions": {
+        "min_zoom": 0,
+        "max_zoom_exclusive": 2.8
+      },
+      "macroregion_impressions": {
+        "min_zoom": 1.6,
+        "max_zoom_exclusive": 4.3
+      },
+      "region_impressions": {
+        "min_zoom": 3.1,
+        "max_zoom_exclusive": 5.8
+      },
+      "public_extents_and_approximate_zones_min_zoom": 3.4,
+      "exact_anchors_min_zoom": 5.5
+    },
+    "interaction": {
+      "aggregate_features_are_noninteractive": true,
+      "aggregate_features_have_no_project_id": true,
+      "map_filter_text_share_visible_identity_set": true
+    },
+    "performance": {
+      "prepare_local_features_and_representative_points_once_per_catalog_array": true,
+      "recompute_only_when_visible_identity_set_changes": true,
+      "memoized_collection_limit": 64,
+      "skip_unchanged_map_set_data": true,
+      "prepare_aggregate_bucket_membership_once_per_catalog_array": true
+    },
+    "current_limits": [
+      "coverage_is_unassessed_catalog_excerpt",
+      "no_country_choropleths_without_source_backed_public_region_context",
+      "latitude_longitude_grid_is_not_equal_area",
+      "dateline_spanning_extents_need_future_geodesic_refinement",
+      "eleven_type_hues_require_text_labels_and_non_colour_semantics_for_accessibility"
+    ],
+    "future_aggregate_only_region_context": {
+      "requires": [
+        "explicit_public_region_identifier",
+        "source_ids",
+        "minimum_semantic_level",
+        "reviewed_small_count_rule"
+      ],
+      "hidden_labels_do_not_authorize_aggregation": true,
+      "projection_location": "derived_editorial_projection_outside_commonproject_schema",
+      "schema_extension_now": false
+    },
+    "privacy_release": {
+      "hidden_locations": "never_enter_geographic_projection",
+      "exact_points_and_public_extents": "exempt_as_already_public_geometry",
+      "privacy_sensitive_approximate_subcount_k": 5,
+      "approximate_bucket_minimum_diameter_factor": 2,
+      "dynamic_filters": "reapply_selection_and_complement_release_tests_against_the_same_precomputed_bucket_membership",
+      "coarsen_before_suppress": "a_coarser_level_may_release_when_k_and_diameter_pass",
+      "suppressed_output": "non_numeric_neutral_privacy_notice_without_type_or_member_ids",
+      "raw_member_ids": "forbidden",
+      "filter_complement": "zero_or_at_least_k_approximate_identities_per_commons_type",
+      "differencing_protection": "withhold_filtered_approximate_counts_when_either_selection_or_nonzero_complement_is_below_k"
+    }
+  },
   "output_shapes": {
     "coverage_field": {
       "required": [

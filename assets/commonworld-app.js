@@ -1,10 +1,14 @@
 import { BOOTSTRAP_RECORDS } from './commonworld-bootstrap-catalog.mjs';
 import {
+  COMMONS_TYPE_CODES,
+  COMMONS_TYPE_COLOR_TOKENS,
+  COMMONS_TYPE_VALUES,
   DEFAULT_CAMERA,
   MAX_MAP_ZOOM,
   binaryName,
   buildDigitalPresentationTree,
   commonsTypeLabel,
+  deriveCommonsType,
   deriveLayer,
   digitalPathContainsRecord,
   digitalPresentationTreeConstructionCount,
@@ -46,7 +50,28 @@ const SVG_NS = 'http://www.w3.org/2000/svg';
 const LOCAL_FALLBACK_STYLE = Object.freeze({ version: 8, sources: {}, layers: [{ id: 'commonworld-fallback', type: 'background', paint: { 'background-color': '#0d2426' } }] });
 const PRESENTATION_STORAGE_KEY = 'commonworld.presentation';
 const PUBLIC_MAP_SOURCE_ID = 'commonworld-public-representations';
-const PUBLIC_MAP_LAYER_IDS = Object.freeze(['commonworld-public-extents', 'commonworld-approximate-zones', 'commonworld-exact-anchors']);
+const PUBLIC_MAP_INTERACTIVE_LAYER_IDS = Object.freeze(['commonworld-public-extents', 'commonworld-approximate-zones', 'commonworld-exact-anchors']);
+
+const COMMONS_TYPE_COLORS = [
+  'match', ['get', 'commons_type'],
+  ...COMMONS_TYPE_VALUES.flatMap((type) => [type, COMMONS_TYPE_COLOR_TOKENS[type]]),
+  COMMONS_TYPE_COLOR_TOKENS.other,
+];
+
+const AGGREGATE_LAYER_CONFIGS = Object.freeze([
+  Object.freeze({
+    id: 'planet', semanticLevel: 'planet', minzoom: 0, maxzoom: 2.8,
+    opacity: Object.freeze(['interpolate', ['linear'], ['zoom'], 0, 0.82, 2.2, 0.82, 2.8, 0]),
+  }),
+  Object.freeze({
+    id: 'macroregion', semanticLevel: 'macroregion', minzoom: 1.6, maxzoom: 4.3,
+    opacity: Object.freeze(['interpolate', ['linear'], ['zoom'], 1.6, 0, 2, 0.84, 3.8, 0.78, 4.3, 0]),
+  }),
+  Object.freeze({
+    id: 'region', semanticLevel: 'region', minzoom: 3.1, maxzoom: 5.8,
+    opacity: Object.freeze(['interpolate', ['linear'], ['zoom'], 3.1, 0, 3.5, 0.84, 5.2, 0.76, 5.8, 0]),
+  }),
+]);
 const ACTION_LINK_TYPES = new Set(['visit', 'use', 'borrow', 'learn', 'contribute', 'volunteer', 'donate', 'contact', 'replicate']);
 const INTENT_FILTER_NAMES = Object.freeze(['commons_type', 'presence', 'action', 'language', 'access', 'freshness', 'curation']);
 const DIGITAL_IDENTITY_DOM_LIMIT = 48;
@@ -650,10 +675,24 @@ function currentPublicMapData() {
 
 function publishPublicMapDiagnostics(data) {
   elements.stage.dataset.publicMapFeatures = String(data.features.length);
-  elements.stage.dataset.publicMapProjectIds = String(new Set(data.features.map(({ properties }) => properties.project_id)).size);
+  elements.stage.dataset.publicMapProjectIds = String(new Set(
+    data.features.map(({ properties }) => properties.project_id).filter(Boolean),
+  ).size);
   elements.stage.dataset.publicMapFeatureIds = data.features.map(({ id }) => id).join(',');
-  elements.stage.dataset.publicMapLocationIds = data.features.map(({ properties }) => properties.location_id).join(',');
+  elements.stage.dataset.publicMapLocationIds = data.features
+    .map(({ properties }) => properties.location_id)
+    .filter(Boolean)
+    .join(',');
   elements.stage.dataset.publicMapUpdates = String(runtime.publicMapUpdateCount);
+  elements.stage.dataset.publicMapAggregateImpressions = String(data.features.filter(
+    ({ properties }) => properties.representation_kind === 'aggregate_impression',
+  ).length);
+  elements.stage.dataset.publicMapPrivacyNotices = String(data.features.filter(
+    ({ properties }) => properties.representation_kind === 'aggregate_privacy_notice',
+  ).length);
+  elements.stage.dataset.publicMapSemanticLevels = [...new Set(
+    data.features.map(({ properties }) => properties.semantic_level).filter(Boolean),
+  )].sort().join(',');
 }
 
 function updatePublicMapData() {
@@ -669,6 +708,123 @@ function updatePublicMapData() {
   publishPublicMapDiagnostics(data);
 }
 
+function renderMapLegend() {
+  const list = document.querySelector('#commons-type-legend');
+  if (!list) return;
+  list.replaceChildren();
+  for (const type of COMMONS_TYPE_VALUES) {
+    const item = document.createElement('li');
+    item.className = 'legend-item';
+    const swatch = document.createElement('span');
+    swatch.className = 'legend-color';
+    swatch.textContent = COMMONS_TYPE_CODES[type];
+    swatch.style.setProperty('--legend-color', COMMONS_TYPE_COLOR_TOKENS[type]);
+    swatch.setAttribute('aria-hidden', 'true');
+    item.append(swatch, document.createTextNode(commonsTypeLabel(type)));
+    list.append(item);
+  }
+}
+
+function ensureAggregateImpressionLayers(config) {
+  const prefix = 'commonworld-' + config.id;
+  const filterFor = (representationKind) => ['all',
+    ['==', ['get', 'representation_kind'], representationKind],
+    ['==', ['get', 'semantic_level'], config.semanticLevel],
+  ];
+
+  const impressionId = prefix + '-impressions';
+  if (!runtime.map.getLayer(impressionId)) {
+    runtime.map.addLayer({
+      id: impressionId,
+      type: 'circle',
+      source: PUBLIC_MAP_SOURCE_ID,
+      minzoom: config.minzoom,
+      maxzoom: config.maxzoom,
+      filter: filterFor('aggregate_impression'),
+      paint: {
+        'circle-radius': 9,
+        'circle-color': COMMONS_TYPE_COLORS,
+        'circle-opacity': config.opacity,
+        'circle-stroke-width': 1.25,
+        'circle-stroke-color': '#FFFFFF',
+        'circle-stroke-opacity': 0.72,
+      },
+    });
+  }
+
+  const semanticId = prefix + '-semantics';
+  if (!runtime.map.getLayer(semanticId)) {
+    runtime.map.addLayer({
+      id: semanticId,
+      type: 'symbol',
+      source: PUBLIC_MAP_SOURCE_ID,
+      minzoom: config.minzoom,
+      maxzoom: config.maxzoom,
+      filter: filterFor('aggregate_impression'),
+      layout: {
+        'text-field': ['concat', ['get', 'commons_type_code'], '\n', ['get', 'coverage_pattern_label']],
+        'text-size': 7.5,
+        'text-line-height': 0.72,
+        'text-letter-spacing': 0.03,
+        'text-allow-overlap': true,
+        'text-ignore-placement': true,
+      },
+      paint: {
+        'text-color': '#FFFFFF',
+        'text-halo-color': '#102426',
+        'text-halo-width': 1.25,
+        'text-opacity': config.opacity,
+      },
+    });
+  }
+
+  const countId = prefix + '-impression-counts';
+  if (!runtime.map.getLayer(countId)) {
+    runtime.map.addLayer({
+      id: countId,
+      type: 'symbol',
+      source: PUBLIC_MAP_SOURCE_ID,
+      minzoom: config.minzoom,
+      maxzoom: config.maxzoom,
+      filter: filterFor('aggregate_summary'),
+      layout: {
+        'text-field': ['to-string', ['get', 'bucket_identity_count']],
+        'text-size': 10,
+        'text-allow-overlap': false,
+      },
+      paint: {
+        'text-color': '#F5F3E9',
+        'text-halo-color': '#102426',
+        'text-halo-width': 1.5,
+        'text-opacity': config.opacity,
+      },
+    });
+  }
+
+  const privacyId = prefix + '-privacy-withheld';
+  if (!runtime.map.getLayer(privacyId)) {
+    runtime.map.addLayer({
+      id: privacyId,
+      type: 'symbol',
+      source: PUBLIC_MAP_SOURCE_ID,
+      minzoom: config.minzoom,
+      maxzoom: config.maxzoom,
+      filter: filterFor('aggregate_privacy_notice'),
+      layout: {
+        'text-field': '…',
+        'text-size': 16,
+        'text-allow-overlap': false,
+      },
+      paint: {
+        'text-color': COMMONS_TYPE_COLOR_TOKENS.other,
+        'text-halo-color': '#102426',
+        'text-halo-width': 1.5,
+        'text-opacity': config.opacity,
+      },
+    });
+  }
+}
+
 function ensurePublicMapLayers() {
   if (!runtime.map || !runtime.map.isStyleLoaded()) return;
   if (!runtime.map.getSource(PUBLIC_MAP_SOURCE_ID)) {
@@ -677,6 +833,7 @@ function ensurePublicMapLayers() {
     runtime.lastPublicMapData = data;
     publishPublicMapDiagnostics(data);
   }
+  for (const config of AGGREGATE_LAYER_CONFIGS) ensureAggregateImpressionLayers(config);
   if (!runtime.map.getLayer('commonworld-public-extents')) {
     runtime.map.addLayer({
       id: 'commonworld-public-extents',
@@ -685,9 +842,22 @@ function ensurePublicMapLayers() {
       minzoom: 3.4,
       filter: ['==', ['get', 'representation_kind'], 'public_extent'],
       paint: {
-        'fill-color': '#76c7a4',
-        'fill-opacity': 0.32,
-        'fill-outline-color': '#d7f4e8',
+        'fill-color': COMMONS_TYPE_COLORS,
+        'fill-opacity': ['interpolate', ['linear'], ['zoom'], 3.4, 0.06, 4.4, 0.3, 12, 0.24],
+      },
+    });
+  }
+  if (!runtime.map.getLayer('commonworld-public-extents-outline')) {
+    runtime.map.addLayer({
+      id: 'commonworld-public-extents-outline',
+      type: 'line',
+      source: PUBLIC_MAP_SOURCE_ID,
+      minzoom: 3.4,
+      filter: ['==', ['get', 'representation_kind'], 'public_extent'],
+      paint: {
+        'line-color': COMMONS_TYPE_COLORS,
+        'line-width': 1.5,
+        'line-opacity': ['interpolate', ['linear'], ['zoom'], 3.4, 0.25, 4.4, 0.9],
       },
     });
   }
@@ -699,9 +869,23 @@ function ensurePublicMapLayers() {
       minzoom: 3.4,
       filter: ['==', ['get', 'representation_kind'], 'approximate_zone'],
       paint: {
-        'fill-color': '#e8b96d',
-        'fill-opacity': ['interpolate', ['linear'], ['zoom'], 3.4, 0.2, 5.5, 0.24, 12, 0.15, 18, 0.1],
-        'fill-outline-color': 'rgba(255, 242, 212, 0.48)',
+        'fill-color': COMMONS_TYPE_COLORS,
+        'fill-opacity': ['interpolate', ['linear'], ['zoom'], 3.4, 0.04, 4.4, 0.2, 12, 0.14, 18, 0.09],
+      },
+    });
+  }
+  if (!runtime.map.getLayer('commonworld-approximate-zones-outline')) {
+    runtime.map.addLayer({
+      id: 'commonworld-approximate-zones-outline',
+      type: 'line',
+      source: PUBLIC_MAP_SOURCE_ID,
+      minzoom: 3.4,
+      filter: ['==', ['get', 'representation_kind'], 'approximate_zone'],
+      paint: {
+        'line-color': COMMONS_TYPE_COLORS,
+        'line-width': 2,
+        'line-dasharray': [2, 2],
+        'line-opacity': ['interpolate', ['linear'], ['zoom'], 3.4, 0.3, 4.4, 0.82],
       },
     });
   }
@@ -714,15 +898,57 @@ function ensurePublicMapLayers() {
       filter: ['==', ['get', 'representation_kind'], 'exact_anchor'],
       paint: {
         'circle-radius': ['interpolate', ['linear'], ['zoom'], 5.5, 6, 8, 10],
-        'circle-color': '#8bd9f5',
+        'circle-color': COMMONS_TYPE_COLORS,
         'circle-opacity': 0.94,
-        'circle-stroke-color': '#e5f8ff',
+        'circle-stroke-color': '#FFFFFF',
         'circle-stroke-width': 1.5,
       },
     });
   }
+  if (!runtime.map.getLayer('commonworld-regional-type-codes')) {
+    runtime.map.addLayer({
+      id: 'commonworld-regional-type-codes',
+      type: 'symbol',
+      source: PUBLIC_MAP_SOURCE_ID,
+      minzoom: 3.4,
+      filter: ['any',
+        ['==', ['get', 'representation_kind'], 'approximate_zone'],
+        ['==', ['get', 'representation_kind'], 'public_extent'],
+      ],
+      layout: {
+        'text-field': ['get', 'commons_type_code'],
+        'text-size': 8,
+        'text-allow-overlap': false,
+      },
+      paint: {
+        'text-color': '#FFFFFF',
+        'text-halo-color': '#102426',
+        'text-halo-width': 1.3,
+      },
+    });
+  }
+  if (!runtime.map.getLayer('commonworld-local-type-codes')) {
+    runtime.map.addLayer({
+      id: 'commonworld-local-type-codes',
+      type: 'symbol',
+      source: PUBLIC_MAP_SOURCE_ID,
+      minzoom: 5.5,
+      filter: ['==', ['get', 'representation_kind'], 'exact_anchor'],
+      layout: {
+        'text-field': ['get', 'commons_type_code'],
+        'text-size': 8,
+        'text-allow-overlap': false,
+      },
+      paint: {
+        'text-color': '#FFFFFF',
+        'text-halo-color': '#102426',
+        'text-halo-width': 1.3,
+      },
+    });
+  }
   updatePublicMapData();
-  runtime.publicMapInteractiveLayerIds = PUBLIC_MAP_LAYER_IDS.filter((identifier) => runtime.map.getLayer(identifier));
+  runtime.publicMapInteractiveLayerIds = PUBLIC_MAP_INTERACTIVE_LAYER_IDS.filter((identifier) => runtime.map.getLayer(identifier));
+  elements.stage.dataset.publicMapInteractiveLayers = runtime.publicMapInteractiveLayerIds.join(',');
 }
 
 function updateSemanticLocationLine() {
@@ -735,7 +961,9 @@ function updateSemanticLocationLine() {
   });
   elements.stage.dataset.semanticLevel = line.level;
   elements.semanticLevel.textContent = line.crumbs.at(-1) ?? 'Gesamtansicht';
-  elements.semanticSummary.textContent = line.summary;
+  elements.semanticSummary.textContent = line.level === 'focus'
+    ? line.summary
+    : `${line.summary} · Katalogabdeckung nicht bewertet`;
   elements.semanticSummary.setAttribute('aria-label', line.crumbs.join(' nach '));
 }
 
@@ -1174,6 +1402,23 @@ function createRuntimeCatalogCard(record) {
   return card;
 }
 
+function geographicSelectionSummary(records) {
+  const geographicRecords = records.filter((record) => publicGeographicLocations(record).length > 0);
+  if (geographicRecords.length === 0) {
+    return 'Keine räumlich öffentlich belegten Commons in dieser Auswahl. Katalogabdeckung nicht bewertet.';
+  }
+  const counts = new Map(COMMONS_TYPE_VALUES.map((type) => [type, 0]));
+  for (const record of geographicRecords) {
+    const type = deriveCommonsType(record);
+    counts.set(type, (counts.get(type) ?? 0) + 1);
+  }
+  const distribution = COMMONS_TYPE_VALUES
+    .filter((type) => (counts.get(type) ?? 0) > 0)
+    .map((type) => `${counts.get(type)} ${commonsTypeLabel(type)}`)
+    .join(', ');
+  return `${geographicRecords.length} räumlich öffentlich belegte Commons: ${distribution}. Katalogabdeckung nicht bewertet; keine Dichteaussage. Kleine Gruppen oder kleine Filterreste ungefährer Orte werden ohne Zahl und Art zurückgehalten.`;
+}
+
 function renderTextView() {
   const visible = visibleRecords();
   syncPresentationBudgets();
@@ -1193,9 +1438,10 @@ function renderTextView() {
   renderLayerButtons(elements.textLayerButtons);
   renderDigitalBreadcrumb(elements.textLayerBreadcrumb, elements.textLayerCurrent);
   const total = visible.length;
-  elements.textCount.textContent = presented.length < total
+  const countText = presented.length < total
     ? `${presented.length} von ${total} Commons angezeigt`
     : String(total) + ' Commons';
+  elements.textCount.textContent = `${countText}. ${geographicSelectionSummary(visible)}`;
   elements.textEmpty.hidden = total !== 0;
   elements.textShowMore.hidden = presented.length >= total;
   if (presented.length < total) {
@@ -1300,10 +1546,11 @@ function renderDiscoveryState() {
   updateSphereResultVisibility();
   updatePublicMapData();
   updateSelectionMarks();
-  const count = visibleRecords().length;
+  const visible = visibleRecords();
+  const count = visible.length;
   elements.globeResults.textContent = count === 0
     ? 'Keine Commons entsprechen dieser Suche oder Filterauswahl.'
-    : String(count) + ' Commons in der aktuellen Auswahl.';
+    : `${count} Commons in der aktuellen Auswahl. ${geographicSelectionSummary(visible)}`;
   elements.globeResults.toggleAttribute('data-empty', count === 0);
   elements.search.value = runtime.state.query;
   elements.layerSearch.value = runtime.state.query;
@@ -2253,7 +2500,7 @@ function wireControls() {
 
 function interactivePublicMapLayers() {
   if (runtime.publicMapInteractiveLayerIds !== null) return runtime.publicMapInteractiveLayerIds;
-  runtime.publicMapInteractiveLayerIds = PUBLIC_MAP_LAYER_IDS.filter((identifier) => runtime.map.getLayer(identifier));
+  runtime.publicMapInteractiveLayerIds = PUBLIC_MAP_INTERACTIVE_LAYER_IDS.filter((identifier) => runtime.map.getLayer(identifier));
   return runtime.publicMapInteractiveLayerIds;
 }
 
@@ -2410,6 +2657,7 @@ function ensureMap() {
 
 async function boot() {
   installInputModalityTracking();
+  renderMapLegend();
   try {
     const embedded = bootstrapRecords();
     installRecords(embedded);

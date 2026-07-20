@@ -554,7 +554,9 @@ Fokus          → vollständiger Datensatz
 
 ### Kanonischer Aggregations- und Zoomvertrag
 
-Die ausführbare Ableitungsregel liegt in `contracts/commonworld/aggregation-zoom.contract.json`. Sie beschreibt keine zweite Katalogwahrheit und keine API. Sie legt ausschließlich fest, wie derselbe CommonProject-v3-Bestand für unterschiedliche semantische Ebenen zusammengefasst oder wieder aufgelöst wird.
+Die ausführbare Ableitungsregel liegt in `contracts/commonworld/aggregation-zoom.contract.json`. Sie beschreibt keine zweite Katalogwahrheit und keine API. Sie legt ausschließlich fest, wie derselbe aktuelle CommonProject-v4-Bestand für unterschiedliche semantische Ebenen zusammengefasst oder wieder aufgelöst wird.
+
+Die erste ausführbare geografische Eindrucksebene bleibt bewusst ein Katalogauszug: Sie bündelt ausschließlich validierte öffentliche Geometrien in deterministischen 30-Grad-, 10-Grad- und 4-Grad-Rastern für Planet, Großregion und Region. Farbe bezeichnet die exklusive Commons-Art, die Zahl ausschließlich freigegebene eindeutige Commons-Identitäten; Rasterzentren sind Darstellungspositionen und keine behaupteten Projektstandorte. Ein offenes Punktmuster und Text kennzeichnen die weiterhin unbewertete Katalogabdeckung. Ungefähre Ortsaggregate werden je Filterzustand nur ab fünf Identitäten und nur in ausreichend groben Behältern numerisch freigegeben; andernfalls erscheint ausschließlich ein neutraler Datenschutzhinweis. Solange keine belegte Abdeckungsbewertung vorliegt, werden weder Dichte noch regionale Leere behauptet. Länderflächen bleiben ausgeschlossen, bis ein eigener öffentlicher, quellengebundener Regionskontext außerhalb des CommonProject-Schemas vorliegt.
 
 #### Zähleinheit und Mehrfachverortung
 

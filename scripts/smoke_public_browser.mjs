@@ -12,6 +12,7 @@ import {
   DIGITAL_RING_FIELDS,
   DIGITAL_ROOT_PATH,
   globeHorizonCoordinates,
+  publicMapFeatureCollection,
   ringOrbitDuration,
   serializeDigitalPath,
   sphereOpacityForGlobeRatio,
@@ -163,8 +164,6 @@ async function loadExpectedDigitalProjection() {
   const communityNetworkIds = [];
   const dualPresenceIds = [];
   const dualPresenceVolunteerIds = [];
-  const publicMapProjectIds = new Set();
-  let publicFeatureCount = 0;
   for (const projectFile of manifest.project_files) {
     const record = JSON.parse(await readFile(path.join(ROOT, 'catalog', projectFile), 'utf8'));
     records.push(record);
@@ -175,17 +174,30 @@ async function loadExpectedDigitalProjection() {
     const hasPublicDigitalPresence = record.presence?.digital?.available === true;
     if (hasPublicGeographicPresence && hasPublicDigitalPresence) dualPresenceIds.push(record.id);
     if (hasPublicGeographicPresence && hasPublicDigitalPresence && record.actions?.includes('volunteer')) dualPresenceVolunteerIds.push(record.id);
-    for (const location of record.presence?.geographic ?? []) {
-      if (location?.mode === 'hidden' || !location?.geometry) continue;
-      publicFeatureCount += 1;
-      publicMapProjectIds.add(record.id);
-    }
     if (record?.presence?.digital?.available !== true) continue;
     const derived = deriveDigitalProjectPath(record);
     assert(derived?.status === 'classified', `catalog projection: ${record.id} did not derive a classified digital path ${JSON.stringify(derived)}`);
     allIds.push(record.id);
   }
   assert(new Set(allIds).size === allIds.length, `catalog projection: duplicate digital IDs in catalog ${JSON.stringify(allIds)}`);
+  const publicCollection = publicMapFeatureCollection(records);
+  const publicFeatureCount = publicCollection.features.length;
+  const publicIdentityCount = new Set(
+    publicCollection.features.map(({ properties }) => properties.project_id).filter(Boolean),
+  ).size;
+  const aggregateImpressionCount = publicCollection.features.filter(
+    ({ properties }) => properties.representation_kind === 'aggregate_impression',
+  ).length;
+  const privacyNoticeCount = publicCollection.features.filter(
+    ({ properties }) => properties.representation_kind === 'aggregate_privacy_notice',
+  ).length;
+  const geographicSemanticLevels = sortedIds(new Set(
+    publicCollection.features.map(({ properties }) => properties.semantic_level).filter(Boolean),
+  ));
+  const publicFeatureCountsByIdentity = Object.fromEntries(catalogIds.map((identifier) => [
+    identifier,
+    publicMapFeatureCollection(records, new Set([identifier])).features.length,
+  ]));
   const tree = buildDigitalPresentationTree(records);
   const legacyLayerIds = Object.fromEntries([
     ...new Set(records.map(deriveLayer).filter(Boolean)),
@@ -223,7 +235,11 @@ async function loadExpectedDigitalProjection() {
     dualPresenceIds,
     dualPresenceVolunteerIds,
     publicFeatureCount,
-    publicIdentityCount: publicMapProjectIds.size,
+    publicIdentityCount,
+    aggregateImpressionCount,
+    privacyNoticeCount,
+    geographicSemanticLevels,
+    publicFeatureCountsByIdentity,
     totalCount: allIds.length,
     catalogEntryCount: manifest.entry_count,
     fields,
@@ -243,6 +259,11 @@ async function newPage({ mobile = false, viewportOverride = null, touch = mobile
     deviceScaleFactor: 1,
     reducedMotion,
   });
+  await context.route('https://tiles.openfreemap.org/fonts/**', (route) => route.fulfill({
+    status: 200,
+    contentType: 'application/x-protobuf',
+    body: Buffer.alloc(0),
+  }));
   await context.addInitScript(() => {
     let maplibreValue;
     Object.defineProperty(window, 'maplibregl', {
@@ -282,12 +303,16 @@ async function newPage({ mobile = false, viewportOverride = null, touch = mobile
   const consoleErrors = [];
   const consoleWarnings = [];
   const pageErrors = [];
+  const httpErrors = [];
   page.on('console', (message) => {
     if (message.type() === 'error') consoleErrors.push(message.text());
     if (message.type() === 'warning') consoleWarnings.push(message.text());
   });
   page.on('pageerror', (error) => pageErrors.push(error.message));
-  return { context, page, consoleErrors, consoleWarnings, pageErrors };
+  page.on('response', (response) => {
+    if (response.status() >= 400) httpErrors.push(response.status() + ' ' + response.url());
+  });
+  return { context, page, consoleErrors, consoleWarnings, pageErrors, httpErrors };
 }
 
 
@@ -509,7 +534,7 @@ async function startupAndRingOrbitScenario() {
   const idleAfter = Number(await run.page.locator('.globe-stage').getAttribute('data-overlay-renders'));
   assert(idleAfter - idleBefore === 0, `ring orbits: idle overlay render delta is not zero (${idleBefore} -> ${idleAfter})`);
 
-  assert(run.consoleErrors.length === 0, 'startup: console errors: ' + run.consoleErrors.join(' | '));
+  assert(run.consoleErrors.length === 0, 'startup: console errors: ' + run.consoleErrors.join(' | ') + '; HTTP: ' + run.httpErrors.join(' | '));
   assert(run.pageErrors.length === 0, 'startup: page errors: ' + run.pageErrors.join(' | '));
   results.push({ id: 'startup-and-ring-orbits', verdict: 'PASS', directGlobeProjection: true, hiddenUntilCalibrated: true, outerHintRemoved: true, aggregateRingIdentities: aggregateCount, movingRingMatrix: movedRing, unchangedGeometryRepaintSkipped: true });
   await run.context.close();
@@ -1236,9 +1261,18 @@ async function dualPresenceAxesScenario() {
     return {
       semanticLevel: stage.dataset.semanticLevel,
       semanticText: document.querySelector('#semantic-summary')?.textContent ?? '',
+      globeResultsText: document.querySelector('#globe-results')?.textContent ?? '',
+      legendSummary: document.querySelector('.map-legend > summary')?.textContent?.trim() ?? '',
+      legendAriaHidden: document.querySelector('.map-legend')?.getAttribute('aria-hidden'),
       featureIds: stage.dataset.publicMapFeatureIds?.split(',').filter(Boolean) ?? [],
       locationIds: stage.dataset.publicMapLocationIds?.split(',').filter(Boolean) ?? [],
       mapUpdateCount: Number(stage.dataset.publicMapUpdates ?? -1),
+      aggregateImpressions: Number(stage.dataset.publicMapAggregateImpressions ?? -1),
+      privacyNotices: Number(stage.dataset.publicMapPrivacyNotices ?? -1),
+      geographicSemanticLevels: (stage.dataset.publicMapSemanticLevels ?? '').split(',').filter(Boolean),
+      interactiveLayerIds: (stage.dataset.publicMapInteractiveLayers ?? '').split(',').filter(Boolean),
+      legendCodes: [...document.querySelectorAll('#commons-type-legend .legend-color')].map((node) => node.textContent.trim()),
+      legendLabels: [...document.querySelectorAll('#commons-type-legend .legend-item')].map((node) => node.textContent.trim()),
       sourceType: style.sources?.['commonworld-public-representations']?.type ?? null,
       layers: style.layers
         .filter(({ id }) => id.startsWith('commonworld-'))
@@ -1247,7 +1281,15 @@ async function dualPresenceAxesScenario() {
     };
   });
   assert(initial.semanticLevel === 'planet', 'dual presence: initial semantic level is not planet');
-  assert(initial.semanticText.includes(`${expectedDigitalProjection.publicIdentityCount} räumlich belegte Commons`), 'dual presence: spatial summary is missing');
+  assert(initial.semanticText.includes('Katalogabdeckung nicht bewertet'), 'dual presence: semantic coverage boundary is missing: ' + JSON.stringify(initial));
+  assert(initial.globeResultsText.includes(`${expectedDigitalProjection.publicIdentityCount} räumlich öffentlich belegte Commons`), 'dual presence: spatial text equivalent is missing: ' + JSON.stringify(initial));
+  assert(initial.globeResultsText.includes('keine Dichteaussage'), 'dual presence: spatial text equivalent implies assessed density: ' + JSON.stringify(initial));
+  assert(initial.legendSummary === 'Kartenlegende' && initial.legendAriaHidden === null, 'dual presence: accessible map legend is missing or hidden: ' + JSON.stringify(initial));
+  assert(initial.aggregateImpressions === expectedDigitalProjection.aggregateImpressionCount, 'dual presence: aggregate impression diagnostics differ from the prepared projection: ' + JSON.stringify(initial));
+  assert(initial.privacyNotices === expectedDigitalProjection.privacyNoticeCount, 'dual presence: privacy notice diagnostics differ from the prepared projection: ' + JSON.stringify(initial));
+  assertSameIds(initial.geographicSemanticLevels, expectedDigitalProjection.geographicSemanticLevels, 'dual presence: geographic semantic levels');
+  assert(initial.legendCodes.length === 11 && new Set(initial.legendCodes).size === 11, 'dual presence: legend does not expose eleven unique non-colour codes: ' + JSON.stringify(initial));
+  assert(initial.legendLabels.length === 11 && initial.legendLabels.some((label) => label.includes('Wissen und Daten')) && initial.legendLabels.some((label) => label.includes('Gemeinschaftsnetz')), 'dual presence: legend labels do not match the Commons type vocabulary: ' + JSON.stringify(initial));
   const reviewedFeatureIds = [
     'cltb-le-nid:cltb-le-nid-entrance',
     'cltb-le-nid:cltb-le-nid-building',
@@ -1260,6 +1302,23 @@ async function dualPresenceAxesScenario() {
   assert(initial.layers.some(({ id, type, minzoom }) => id === 'commonworld-public-extents' && type === 'fill' && minzoom === 3.4), 'dual presence: public extent layer missing');
   assert(initial.layers.some(({ id, type, minzoom, maxzoom }) => id === 'commonworld-approximate-zones' && type === 'fill' && minzoom === 3.4 && maxzoom === undefined), 'dual presence: approximate uncertainty zone must remain visible through local zoom');
   assert(initial.layers.some(({ id, type, minzoom }) => id === 'commonworld-exact-anchors' && type === 'circle' && minzoom === 5.5), 'dual presence: exact anchor layer missing');
+  const expectedAggregateLayers = [
+    ['planet', 0, 2.8],
+    ['macroregion', 1.6, 4.3],
+    ['region', 3.1, 5.8],
+  ];
+  for (const [level, minzoom, maxzoom] of expectedAggregateLayers) {
+    assert(initial.layers.some((layer) => layer.id === 'commonworld-' + level + '-impressions' && layer.type === 'circle' && layer.minzoom === minzoom && layer.maxzoom === maxzoom), 'dual presence: missing impression layer for ' + level + ': ' + JSON.stringify(initial.layers));
+    assert(initial.layers.some((layer) => layer.id === 'commonworld-' + level + '-semantics' && layer.type === 'symbol' && layer.minzoom === minzoom && layer.maxzoom === maxzoom), 'dual presence: missing semantic pattern/code layer for ' + level);
+    assert(initial.layers.some((layer) => layer.id === 'commonworld-' + level + '-impression-counts' && layer.type === 'symbol'), 'dual presence: missing released count layer for ' + level);
+    assert(initial.layers.some((layer) => layer.id === 'commonworld-' + level + '-privacy-withheld' && layer.type === 'symbol'), 'dual presence: missing neutral privacy layer for ' + level);
+  }
+  assert(initial.layers.some(({ id, type, minzoom }) => id === 'commonworld-local-type-codes' && type === 'symbol' && minzoom === 5.5), 'dual presence: local non-colour Commons type codes are missing');
+  assertSameIds(initial.interactiveLayerIds, [
+    'commonworld-public-extents',
+    'commonworld-approximate-zones',
+    'commonworld-exact-anchors',
+  ], 'dual presence: aggregate layers must remain noninteractive');
   assert(initial.ringNames.includes('Freifunk Hamburg'), 'dual presence: dual presence identity missing from digital sphere');
   assert(!initial.ringNames.includes('Le Nid'), 'dual presence: geographic-only identity leaked into digital sphere');
 
@@ -1282,7 +1341,7 @@ async function dualPresenceAxesScenario() {
   await run.page.waitForSelector('.globe-stage[data-view-phase="overview"]');
 
   await run.page.locator('#commons-search').fill('Le Nid');
-  await run.page.waitForFunction(() => document.querySelector('.globe-stage')?.dataset.publicMapFeatures === '2');
+  await run.page.waitForFunction((count) => Number(document.querySelector('.globe-stage')?.dataset.publicMapFeatures) === count, expectedDigitalProjection.publicFeatureCountsByIdentity['cltb-le-nid']);
   assert((await run.page.locator('.globe-stage').getAttribute('data-public-map-project-ids')) === '1', 'dual presence: search did not reduce map identities');
   assert((await run.page.locator('#globe-results').textContent())?.includes('1 Commons'), 'dual presence: shared search count mismatch');
   await run.page.locator('#commons-search').fill('');
@@ -1326,7 +1385,7 @@ async function dualPresenceAxesScenario() {
   assert(((await run.page.locator('#focus-relations').textContent()) ?? '').includes('Teil von Freifunk'), 'dual presence: evidenced parent relation missing');
   assert((await run.page.locator('.globe-stage').getAttribute('data-semantic-level')) === 'focus', 'dual presence: selected identity did not enter semantic focus');
   await run.page.locator('#commons-search').fill('Le Nid');
-  await run.page.waitForFunction(() => document.querySelector('.globe-stage')?.dataset.publicMapFeatures === '2');
+  await run.page.waitForFunction((count) => Number(document.querySelector('.globe-stage')?.dataset.publicMapFeatures) === count, expectedDigitalProjection.publicFeatureCountsByIdentity['cltb-le-nid']);
   assert((await run.page.locator('#focus-title').textContent()) === 'Freifunk Hamburg', 'dual presence: filtering replaced or cleared the selected identity');
   assert((await run.page.locator('.globe-stage').getAttribute('data-semantic-level')) === 'focus', 'dual presence: filtered selected identity lost semantic focus');
   assert(((await run.page.locator('#semantic-summary').textContent()) ?? '').startsWith('Vor Ort'), 'dual presence: semantic line no longer describes the filtered selected identity');
@@ -1989,7 +2048,9 @@ async function syntheticCatalogueTruthScenario() {
     }, size);
     assert(installed.records === size && installed.treeIdentities === size, `synthetic ${size}: installation lost identities ${JSON.stringify(installed)}`);
     await run.page.waitForFunction((count) => document.querySelector('.globe-stage')?.dataset.publicMapProjectIds === String(count), size);
-    assert((await run.page.locator('#globe-results').textContent()) === `${size} Commons in der aktuellen Auswahl.`, `synthetic ${size}: semantic count is capped`);
+    const geographicSummary = (await run.page.locator('#globe-results').textContent()) ?? '';
+    assert(geographicSummary.startsWith(`${size} Commons in der aktuellen Auswahl. ${size} räumlich öffentlich belegte Commons:`), `synthetic ${size}: identity count is capped ${geographicSummary}`);
+    assert(geographicSummary.includes(`${size} Gemeinschaftsnetz`) && geographicSummary.includes('keine Dichteaussage'), `synthetic ${size}: type distribution or coverage boundary is missing ${geographicSummary}`);
 
     const sphereEdge = run.page.locator('#sphere-edge-control');
     await sphereEdge.focus();
@@ -2021,7 +2082,7 @@ async function syntheticCatalogueTruthScenario() {
     assert((await run.page.locator('.discovery-result').count()) === 50, `synthetic ${size}: discovery preview is not bounded at 50`);
     assert((await run.page.locator('#discovery-count').textContent()) === `50 von ${size} Commons als Vorschau`, `synthetic ${size}: discovery total is not truthful`);
     await run.page.locator('#discovery-show-text').click();
-    await run.page.waitForFunction((count) => document.querySelector('#text-count')?.textContent === `48 von ${count} Commons angezeigt`, size);
+    await run.page.waitForFunction((count) => document.querySelector('#text-count')?.textContent?.startsWith('48 von ' + count + ' Commons angezeigt. ' + count + ' räumlich öffentlich belegte Commons:'), size);
     assert((await run.page.locator('.catalog-card:not([hidden])').count()) === 48, `synthetic ${size}: initial text window is not bounded at 48`);
     const textMoreBox = await run.page.locator('#text-show-more').boundingBox();
     assert(textMoreBox && textMoreBox.height >= 44, `synthetic ${size}: text continuation touch target is undersized`);
@@ -2029,7 +2090,9 @@ async function syntheticCatalogueTruthScenario() {
     await run.page.waitForFunction(() => document.querySelectorAll('.catalog-card:not([hidden])').length === 96);
     const textIds = await run.page.locator('.catalog-card:not([hidden])').evaluateAll((nodes) => nodes.map((node) => node.dataset.commonprojectId));
     assert(new Set(textIds).size === 96, `synthetic ${size}: continued text identities duplicate`);
-    assert((await run.page.locator('#text-count').textContent()) === `96 von ${size} Commons angezeigt`, `synthetic ${size}: text continuation count drifted`);
+    const continuedTextSummary = (await run.page.locator('#text-count').textContent()) ?? '';
+    assert(continuedTextSummary.startsWith('96 von ' + size + ' Commons angezeigt. ' + size + ' räumlich öffentlich belegte Commons:'), 'synthetic ' + size + ': text continuation count drifted ' + continuedTextSummary);
+    assert(continuedTextSummary.includes(size + ' Gemeinschaftsnetz') && continuedTextSummary.includes('keine Dichteaussage'), 'synthetic ' + size + ': text view lost map-equivalent type or coverage semantics ' + continuedTextSummary);
     assert(run.pageErrors.length === 0, `synthetic ${size}: page errors: ${run.pageErrors.join(' | ')}`);
     await run.context.close();
   }
