@@ -168,6 +168,36 @@ class PublicMapLibreVerticalSliceTests(unittest.TestCase):
             errors = validate_public_maplibre_vertical_slice(root)
         self.assertTrue(any("one-finger touch movement" in error for error in errors))
 
+    def test_rejects_unthrottled_sphere_diagnostic_stage_write(self) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            root = self.copy_slice(directory)
+            path = root / "assets/commonworld-app.js"
+            path.write_text(
+                path.read_text(encoding="utf-8").replace(
+                    "  runtime.sphereGeometryEvaluationCount += 1;\n",
+                    "  runtime.sphereGeometryEvaluationCount += 1;\n  setDatasetIfChanged(elements.stage, 'sphereX', 1);\n",
+                    1,
+                ),
+                encoding="utf-8",
+            )
+            errors = validate_public_maplibre_vertical_slice(root)
+        self.assertTrue(any("hot path must not write diagnostic stage datasets directly" in error for error in errors))
+
+    def test_rejects_raw_map_render_diagnostic_cadence(self) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            root = self.copy_slice(directory)
+            path = root / "assets/commonworld-app.js"
+            path.write_text(
+                path.read_text(encoding="utf-8").replace(
+                    "sampledDiagnosticPublicationDue(\n    runtime.sphereGeometryEvaluationCount,\n    MAP_DIAGNOSTIC_RENDER_INTERVAL,\n  )",
+                    "runtime.mapRenderCount % MAP_DIAGNOSTIC_RENDER_INTERVAL === 0",
+                    1,
+                ),
+                encoding="utf-8",
+            )
+            errors = validate_public_maplibre_vertical_slice(root)
+        self.assertTrue(any("geometry evaluation cadence" in error for error in errors))
+
     def test_rejects_nondeterministic_shell_drift(self) -> None:
         with tempfile.TemporaryDirectory() as directory:
             root = self.copy_slice(directory)

@@ -53,6 +53,7 @@ import {
   ringOrbitDuration,
   ringOrbitStartAngle,
   safeExternalHttpsUrl,
+  sampledDiagnosticPublicationDue,
   searchFromState,
   serializeDigitalPath,
   semanticLocationLine,
@@ -539,6 +540,17 @@ test('projected globe circle uses the rendered horizon rather than MapLibre zoom
   ];
   assert.deepEqual(projectedGlobeCircle({ center, horizon }), { x: 195, y: 422, diameter: 342.36 });
   assert.equal(projectedGlobeCircle({ center, horizon: horizon.slice(0, 3) }), null);
+});
+
+test('sampled diagnostic cadence is independent from aliased MapLibre render frames', () => {
+  const admittedRenderCounts = [1, 3, 5, 7, 9, 11, 13, 15];
+  assert.equal(admittedRenderCounts.some((renderCount) => renderCount % 4 === 0), false);
+  assert.deepEqual(
+    admittedRenderCounts.filter((_, evaluationCount) => sampledDiagnosticPublicationDue(evaluationCount, 4)),
+    [1, 9],
+  );
+  assert.equal(sampledDiagnosticPublicationDue(-1, 4), false);
+  assert.equal(sampledDiagnosticPublicationDue(0, 0), false);
 });
 
 test('sphere layout follows measured globe geometry and keeps stacked side tracks cropped', () => {

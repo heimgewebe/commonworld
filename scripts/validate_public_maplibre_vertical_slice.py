@@ -469,6 +469,18 @@ def validate_public_maplibre_vertical_slice(root: Path = ROOT) -> list[str]:
     if re.search(r"cooperativeGestures\s*:\s*true", app):
         errors.append("public mobile globe must allow one-finger touch movement; cooperativeGestures may not be enabled")
 
+    update_start = app.find("function updateSphereGeometry(")
+    update_end = app.find("\nfunction sampleSphereGeometry(", update_start)
+    update_source = app[update_start:update_end] if update_start >= 0 and update_end > update_start else ""
+    if not update_source or "setDatasetIfChanged(elements.stage" in update_source:
+        errors.append("sphere geometry hot path must not write diagnostic stage datasets directly")
+    if "if (publishDiagnostics) {\n    publishSphereGeometryDiagnostics({" not in update_source:
+        errors.append("sphere geometry diagnostics must be published only behind publishDiagnostics")
+    if app.count("publishSphereGeometryDiagnostics(") != 2:
+        errors.append("sphere geometry diagnostic helper must have exactly one guarded call site")
+    if "sampledDiagnosticPublicationDue(\n    runtime.sphereGeometryEvaluationCount,\n    MAP_DIAGNOSTIC_RENDER_INTERVAL,\n  )" not in app:
+        errors.append("sampled sphere diagnostics must use the geometry evaluation cadence instead of raw map renders")
+
     required_html = (
         '<script src="./assets/vendor/maplibre-gl.js" defer></script>',
         '<script type="module" src="./assets/commonworld-app.js"></script>',

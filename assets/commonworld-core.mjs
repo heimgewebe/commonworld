@@ -693,6 +693,14 @@ export function binaryFragment(identifier, length = 12) {
 }
 
 
+export function sampledDiagnosticPublicationDue(evaluationCount, interval) {
+  return Number.isInteger(evaluationCount)
+    && evaluationCount >= 0
+    && Number.isInteger(interval)
+    && interval > 0
+    && evaluationCount % interval === 0;
+}
+
 export function sphereDetailLevel({ diameter, sideView = false } = {}) {
   if (sideView) return 'close';
   const size = Math.max(0, finite(diameter, 0));
