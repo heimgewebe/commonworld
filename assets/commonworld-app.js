@@ -210,7 +210,6 @@ const runtime = {
   pendingSpatialProject: null,
   resizeObserver: null,
   orientationResizeObserver: null,
-  catalogDegraded: false,
   mapDegraded: false,
   providerFallbackApplied: false,
   providerErrorLogged: false,
@@ -305,7 +304,6 @@ function setStatus(message, state = 'loading') {
 
 function refreshStatus() {
   const failures = [];
-  if (runtime.catalogDegraded) failures.push('Der Netzabruf des Katalogs ist fehlgeschlagen; die eingebettete, buildgebundene Fassung bleibt bedienbar.');
   if (runtime.mapDegraded) failures.push('Die Basiskarte ist vorübergehend nicht erreichbar; Globuszustand und Textansicht bleiben verfügbar.');
   if (failures.length) {
     setStatus(failures.join(' '), 'degraded');
@@ -329,18 +327,6 @@ function persistPresentation(surface) {
     localStorage.setItem(PRESENTATION_STORAGE_KEY, surface);
   } catch {
     // Private browsing or a storage policy may reject local persistence.
-  }
-}
-
-async function fetchJson(url, timeoutMs = 5000) {
-  const controller = new AbortController();
-  const timeout = window.setTimeout(() => controller.abort(), timeoutMs);
-  try {
-    const response = await fetch(url, { credentials: 'same-origin', headers: { Accept: 'application/json' }, signal: controller.signal });
-    if (!response.ok) throw new Error(`${url}: HTTP ${response.status}`);
-    return response.json();
-  } finally {
-    window.clearTimeout(timeout);
   }
 }
 
@@ -373,14 +359,6 @@ function bootstrapRecords() {
   return validateRecords(BOOTSTRAP_RECORDS);
 }
 
-async function loadRecords() {
-  const manifest = await fetchJson('./catalog/catalog.json');
-  if (!Array.isArray(manifest.project_files) || manifest.project_files.length !== manifest.entry_count) {
-    throw new Error('Katalogmanifest und Eintragszahl stimmen nicht überein.');
-  }
-  return validateRecords(await Promise.all(manifest.project_files.map((path) => fetchJson(`./catalog/${path}`))));
-}
-
 function installRecords(records) {
   runtime.records = records;
   runtime.catalogProjection = prepareCatalogProjection(records);
@@ -389,6 +367,7 @@ function installRecords(records) {
   runtime.recordsById = runtime.catalogProjection.recordsById;
   elements.stage.dataset.searchIndexedRecords = String(runtime.searchIndex.indexedRecordCount);
   elements.stage.dataset.searchIndexedTerms = String(runtime.searchIndex.indexedTermCount);
+  elements.stage.dataset.catalogDelivery = 'build-bound-bootstrap';
   runtime.visibleRecordsCache = null;
   runtime.unfilteredPathRecordsCache = null;
   runtime.lastPublicMapData = null;
@@ -2738,16 +2717,8 @@ async function boot() {
     renderDiscoveryState();
     document.documentElement.classList.add('runtime-ready');
 
-    try {
-      const fetched = await loadRecords();
-      if (JSON.stringify(fetched) !== JSON.stringify(embedded)) {
-        throw new Error('Netzkatalog und buildgebundener Katalog unterscheiden sich.');
-      }
-    } catch (error) {
-      runtime.catalogDegraded = true;
-      console.warn('Commonworld catalogue verification degraded; using build-bound bootstrap', error);
-      refreshStatus();
-    }
+    // Build and CI compare this generated bootstrap with every canonical CommonProject.
+    // The browser therefore does not download the same 41 records a second time.
   } catch (error) {
     console.error(error);
     setStatus('Commonworld konnte auch den buildgebundenen Katalog nicht lesen.', 'failed');

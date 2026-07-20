@@ -687,6 +687,12 @@ Die digitale Sphäre ist geometrisch an MapLibre gebunden. Ihr sichtbarer Mittel
 
 `catalog/catalog.json`, die Projektdateien unter `catalog/projects/` und `contracts/commonworld/project.schema.json` bilden die statische, ausschließlich lesende Maschinenoberfläche. Sie ist keine laufende API und besitzt keinen Schreibweg. Eine eigenständige CLI bleibt ohne belegten wiederkehrenden Anwendungsfall ausgeschlossen. Die Betriebsgrenze steht in `docs/ops/machine-readable-surface.md`.
 
+### Gemessene statische Katalogauslieferung v1
+
+Die kanonischen `CommonProject`-Dateien bleiben die einzige veränderbare Katalogwahrheit. Build und CI erzeugen daraus einen vollständigen buildgebundenen Bootstrap für Karte, Suche, Filter und Fokus sowie die statischen interaktiven und No-JavaScript-Karten. Der Browser lädt die einzelnen Projektdateien beim Start nicht nochmals zur Gleichheitsprüfung; Manifest und Projekt-JSON bleiben dennoch öffentlich und direkt adressierbar.
+
+Der aktuelle Entwurf wird nicht über eine feste Katalogzahl begrenzt. Der Vertrag `contracts/commonworld/catalog-delivery-budget.contract.json` misst rohe und komprimierte Bytes, doppelte Identitätslasten, Startanfragen, DOM-Knoten und vierfach CPU-gedrosselte Browserarbeit. Eine deterministische Budgetüberschreitung oder zwei aufeinanderfolgende Browserüberschreitungen erzwingen den erneuten Vergleich von vollständigem Bootstrap, HTML-Hydration, segmentiertem statischem JSON und bedarfsgeladener schreibgeschützter Lieferung. Barrierefreiheit, SEO, No-JavaScript-Verhalten, Datenschutz, Caching, Komplexität und GitHub-Pages-Tauglichkeit bleiben gemeinsame Entscheidungskriterien.
+
 ### Hierarchische digitale Ringbündel v1
 
 Die flache digitale Sechserordnung ist ab dieser Phase Legacy-Kompatibilität. Der aktive Präsentationspfad ist `digital_path` und enthält stabile ASCII-Knoten von `sphere` über ein Hauptfeld und ein Unterbündel bis zur fokussierten `CommonProject.id` über den separaten `project`-Zustand. Gültige alte `layer`-Links bewahren ihre bisherige Sechs-Schichten-Filterung und den URL-Parameter; der daraus abgeleitete Ringpfad dient nur der visuellen Orientierung. Erst eine bewusste Ring- oder Breadcrumb-Auswahl wechselt ausschließlich auf `digital_path`. Ein explizites gültiges `digital_path` hat Vorrang; ungültige oder traversal-artige Pfadwerte fallen geschlossen auf die Sphärenwurzel zurück und erzeugen keinen Teilfilter.

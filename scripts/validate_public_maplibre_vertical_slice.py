@@ -15,6 +15,7 @@ if str(ROOT) not in sys.path:
     sys.path.insert(0, str(ROOT))
 
 from scripts.render_public_shell import render_shell
+from scripts.validate_canonical_plan import validate_browser_smoke_contract
 
 CONTRACT_PATH = Path("contracts/commonworld/public-maplibre-vertical-slice.contract.json")
 RESULT_PATH = Path("docs/research/public-maplibre-vertical-slice-v1.result.json")
@@ -360,8 +361,7 @@ def validate_public_maplibre_vertical_slice(root: Path = ROOT) -> list[str]:
         errors.append("package.json must contain only the exactly pinned maplibre-gl 5.24.0 runtime dependency")
     if package.get("devDependencies") != {"playwright": "1.61.1"}:
         errors.append("package.json must pin the browser-gate Playwright dependency exactly")
-    if package.get("scripts", {}).get("smoke:browser") != "node scripts/smoke_public_browser.mjs && node scripts/smoke_proposal_browser.mjs && node scripts/smoke_focus_overlay_browser.mjs && node scripts/smoke_accessibility_modes_browser.mjs":
-        errors.append("package.json must expose the bounded browser smoke command")
+    errors.extend(validate_browser_smoke_contract(root, package))
     packages = lock.get("packages", {}) if isinstance(lock.get("packages"), dict) else {}
     root_lock = packages.get("", {}) if isinstance(packages.get(""), dict) else {}
     maplibre_lock = packages.get("node_modules/maplibre-gl", {}) if isinstance(packages.get("node_modules/maplibre-gl"), dict) else {}
@@ -602,7 +602,6 @@ def validate_public_maplibre_vertical_slice(root: Path = ROOT) -> list[str]:
             errors.append("public runtime CSP must not authorize unsafe inline code or eval")
 
     required_app = (
-        "./catalog/catalog.json",
         "new window.maplibregl.Map",
         "setProjection({ type: 'globe' })",
         "runtime.map.easeTo",
@@ -629,6 +628,7 @@ def validate_public_maplibre_vertical_slice(root: Path = ROOT) -> list[str]:
         "overlayRenderCount += 1",
         "./commonworld-bootstrap-catalog.mjs",
         "bootstrapRecords()",
+        "dataset.catalogDelivery = 'build-bound-bootstrap'",
         "verifyMapProvider",
         "degradeMap",
         "mapFailurePolicy",

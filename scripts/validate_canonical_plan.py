@@ -3,6 +3,7 @@
 
 from __future__ import annotations
 
+import ast
 import json
 import sys
 from pathlib import Path
@@ -36,6 +37,7 @@ REQUIRED_PLAN_TOKENS = (
     "### Kanonische Rendererentscheidung v1",
     "### Erster öffentlicher MapLibre-Vertikalschnitt v1",
     "### Globe-first Oberfläche v1",
+    "### Gemessene statische Katalogauslieferung v1",
     "### Hierarchische digitale Ringbündel v1",
     "### Begrenzte Produktions- und Anbieterentscheidung v1",
     "### Commitgebundener Produktions-Readback v1",
@@ -120,12 +122,15 @@ EXPECTED_RESEARCH_FILES = {
     "renderer-selection-v1.md",
     "renderer-selection-v1.result.json",
 }
-EXPECTED_CONTRACT_FILES = {"catalog-diversity.contract.json", "editorial-review.contract.json", "proposal-path.contract.json", "proposal.schema.json", "current-state.contract.json", "aggregation-zoom.contract.json", "digital-ring-taxonomy.contract.json", "digital-sphere.contract.json", "production-delivery-provider.contract.json", "project.schema.json", "public-maplibre-vertical-slice.contract.json", "presence-axes.contract.json", "intent-search-discovery.contract.json", "renderer-selection.contract.json", "visual-semantics.contract.json"}
+EXPECTED_CONTRACT_FILES = {"catalog-delivery-budget.contract.json", "catalog-diversity.contract.json", "editorial-review.contract.json", "proposal-path.contract.json", "proposal.schema.json", "current-state.contract.json", "aggregation-zoom.contract.json", "digital-ring-taxonomy.contract.json", "digital-sphere.contract.json", "production-delivery-provider.contract.json", "project.schema.json", "public-maplibre-vertical-slice.contract.json", "presence-axes.contract.json", "intent-search-discovery.contract.json", "renderer-selection.contract.json", "visual-semantics.contract.json"}
 EXPECTED_SCRIPT_FILES = {
     "__init__.py",
     "build_public_runtime.py",
     "check_pages_dns_target.py",
     "digital_taxonomy.py",
+    "measure_catalog_delivery.py",
+    "measure_catalog_delivery_browser.mjs",
+    "run_browser_smoke.py",
     "smoke_public_browser.mjs",
     "smoke_accessibility_modes_browser.mjs",
     "smoke_focus_overlay_browser.mjs",
@@ -135,6 +140,7 @@ EXPECTED_SCRIPT_FILES = {
     "smoke_pages_live.py",
     "static_surface_parser.py",
     "validate_canonical_plan.py",
+    "validate_catalog_delivery_budget.py",
     "validate_proposal_path.py",
     "validate_contracts.py",
     "validate_current_state.py",
@@ -162,6 +168,7 @@ EXPECTED_SCRIPT_FILES = {
 }
 EXPECTED_TEST_FILES = {
     "test_canonical_plan.py",
+    "test_catalog_delivery_budget.py",
     "test_proposal_path.py",
     "test_contracts.py",
     "test_current_state.py",
@@ -194,6 +201,51 @@ REQUIRED_CHECK_CATALOG = {
     "schema_version": 1,
     "required_checks": ["contracts"],
 }
+
+
+BROWSER_SMOKE_COMMAND = "python3 scripts/run_browser_smoke.py"
+BROWSER_RUNNER_EXPECTED_STEPS = (
+    ("node", "scripts/smoke_public_browser.mjs", "--result"),
+    ("python3", "scripts/validate_catalog_delivery_budget.py", "--smoke-result"),
+    ("node", "scripts/smoke_proposal_browser.mjs"),
+    ("node", "scripts/smoke_focus_overlay_browser.mjs"),
+    ("node", "scripts/smoke_accessibility_modes_browser.mjs"),
+)
+
+
+def _browser_runner_steps(source: str) -> tuple[tuple[str, ...], ...]:
+    tree = ast.parse(source)
+    located_steps: list[tuple[int, tuple[str, ...]]] = []
+    for node in ast.walk(tree):
+        if not isinstance(node, ast.Call) or not isinstance(node.func, ast.Name) or node.func.id != "run":
+            continue
+        if len(node.args) != 1 or not isinstance(node.args[0], ast.List):
+            continue
+        static_arguments = tuple(
+            element.value
+            for element in node.args[0].elts
+            if isinstance(element, ast.Constant) and isinstance(element.value, str)
+        )
+        located_steps.append((node.lineno, static_arguments))
+    return tuple(arguments for _, arguments in sorted(located_steps))
+
+
+def validate_browser_smoke_contract(root: Path, package: dict) -> list[str]:
+    errors: list[str] = []
+    if package.get("scripts", {}).get("smoke:browser") != BROWSER_SMOKE_COMMAND:
+        errors.append("package.json must expose the bound browser smoke runner")
+    runner_path = root / "scripts" / "run_browser_smoke.py"
+    if not runner_path.is_file():
+        errors.append("missing bound browser smoke runner")
+        return errors
+    try:
+        steps = _browser_runner_steps(runner_path.read_text(encoding="utf-8"))
+    except SyntaxError:
+        errors.append("bound browser smoke runner is not valid Python")
+        return errors
+    if steps != BROWSER_RUNNER_EXPECTED_STEPS:
+        errors.append("bound browser smoke runner steps or order mismatch")
+    return errors
 
 
 def validate_canonical_plan(root: Path = ROOT) -> list[str]:
@@ -261,8 +313,7 @@ def validate_canonical_plan(root: Path = ROOT) -> list[str]:
     else:
         if package.get("devDependencies") != {"playwright": "1.61.1"}:
             errors.append("package.json must pin exactly Playwright 1.61.1 for the browser gate")
-        if package.get("scripts", {}).get("smoke:browser") != "node scripts/smoke_public_browser.mjs && node scripts/smoke_proposal_browser.mjs && node scripts/smoke_focus_overlay_browser.mjs && node scripts/smoke_accessibility_modes_browser.mjs":
-            errors.append("package.json must expose the bounded browser smoke command")
+        errors.extend(validate_browser_smoke_contract(root, package))
 
     required_checks_path = root / ".github" / "grabowski-required-checks.json"
     if not required_checks_path.is_file():

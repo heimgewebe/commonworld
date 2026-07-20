@@ -1,6 +1,6 @@
 import { createServer } from 'node:http';
 import { existsSync } from 'node:fs';
-import { readFile, stat } from 'node:fs/promises';
+import { readFile, rename, stat, writeFile } from 'node:fs/promises';
 import path from 'node:path';
 import process from 'node:process';
 import { chromium } from 'playwright';
@@ -23,6 +23,17 @@ import {
 } from '../assets/commonworld-core.mjs';
 
 const ROOT = process.cwd();
+const resultArgumentIndex = process.argv.indexOf('--result');
+const resultPath = resultArgumentIndex >= 0 ? process.argv[resultArgumentIndex + 1] : null;
+if (resultArgumentIndex >= 0 && !resultPath) throw new Error('--result requires a path');
+
+async function writeResult(result) {
+  if (!resultPath) return;
+  const target = path.resolve(resultPath);
+  const temporary = `${target}.tmp-${process.pid}`;
+  await writeFile(temporary, `${JSON.stringify(result, null, 2)}\n`, 'utf8');
+  await rename(temporary, target);
+}
 const MIME = new Map([
   ['.html', 'text/html; charset=utf-8'],
   ['.css', 'text/css; charset=utf-8'],
@@ -2318,10 +2329,16 @@ async function liveUiHardeningScenario() {
 
 async function catalogueFailureScenario() {
   const run = await newPage();
-  await run.page.route('**/catalog/catalog.json', (route) => route.abort('failed'));
+  const blockedCatalogRequests = [];
+  await run.page.route('**/catalog/**', (route) => {
+    blockedCatalogRequests.push(new URL(route.request().url()).pathname);
+    return route.abort('failed');
+  });
   await run.page.goto(baseUrl, { waitUntil: 'domcontentloaded' });
   await run.page.waitForSelector('html.runtime-ready');
-  await run.page.waitForSelector('.globe-stage[data-runtime-state="degraded"]');
+  await run.page.waitForSelector('.globe-stage[data-runtime-state="ready"]');
+  assert(blockedCatalogRequests.length === 0, `catalogue failure: build-bound runtime requested canonical catalog files: ${blockedCatalogRequests.join(' | ')}`);
+  assert(await run.page.locator('.globe-stage').getAttribute('data-catalog-delivery') === 'build-bound-bootstrap', 'catalogue failure: runtime delivery mode is not build-bound');
   await run.page.locator('#commons-search').fill('Debian');
   await run.page.waitForTimeout(220);
   assert((await run.page.locator('#globe-results').textContent())?.startsWith('1 Commons'), 'catalogue failure: embedded search did not work');
@@ -2331,10 +2348,10 @@ async function catalogueFailureScenario() {
   assert(await run.page.locator('#text-view').isVisible(), 'catalogue failure: text view unavailable');
   assert(await run.page.locator('#project-debian').isVisible(), 'catalogue failure: matching static card unavailable');
   assert(run.pageErrors.length === 0, `catalogue failure: page errors: ${run.pageErrors.join(' | ')}`);
-  assert(run.consoleErrors.every((message) => message.includes('Failed to load resource')), `catalogue failure: unexpected console errors: ${run.consoleErrors.join(' | ')}`);
+  assert(run.consoleErrors.length === 0, `catalogue failure: unexpected console errors: ${run.consoleErrors.join(' | ')}`);
   const appWarnings = run.consoleWarnings.filter((message) => message.includes('Commonworld'));
-  assert(appWarnings.length <= 2, `catalogue failure: application warning storm (${appWarnings.length})`);
-  results.push({ id: 'catalogue-failure', verdict: 'PASS', applicationWarnings: appWarnings.length });
+  assert(appWarnings.length === 0, `catalogue failure: unexpected application warnings (${appWarnings.length})`);
+  results.push({ id: 'catalogue-failure', verdict: 'PASS', blockedCatalogRequests: blockedCatalogRequests.length });
   await run.context.close();
 }
 
@@ -2418,6 +2435,7 @@ html { font-size: ${profile.fontScale}% !important; }
   }
 }
 
+let scenarioFailure = null;
 try {
   await startupAndRingOrbitScenario();
   await reducedMotionRingScenario();
@@ -2443,10 +2461,24 @@ try {
   await catalogueFailureScenario();
   await providerFailureScenario();
   await methodScenario();
+} catch (error) {
+  scenarioFailure = error;
 } finally {
   await browser.close();
   server.closeAllConnections?.();
   await new Promise((resolve, reject) => server.close((error) => (error ? reject(error) : resolve())));
 }
-process.stdout.write(`${JSON.stringify({ verdict: 'PASS', scenarios: results })}\n`);
+if (scenarioFailure) {
+  const failureResult = {
+    verdict: 'FAIL',
+    error: scenarioFailure?.stack ?? String(scenarioFailure),
+    completedScenarios: results,
+  };
+  await writeResult(failureResult);
+  process.stderr.write(`${JSON.stringify(failureResult)}\n`);
+  process.exit(1);
+}
+const passResult = { verdict: 'PASS', scenarios: results };
+await writeResult(passResult);
+process.stdout.write(`${JSON.stringify(passResult)}\n`);
 process.exit(0);

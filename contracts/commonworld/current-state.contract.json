@@ -1,7 +1,7 @@
 {
   "schema_version": 2,
   "kind": "commonworld_current_public_state",
-  "current_as_of": "2026-07-19",
+  "current_as_of": "2026-07-20",
   "precedence": {
     "current_operational_truth": "this contract",
     "catalog_truth": "catalog/catalog.json and the referenced CommonProject records",
@@ -102,5 +102,15 @@
     "automatic_catalog_publication": false,
     "editorial_contract": "contracts/commonworld/editorial-review.contract.json",
     "proposal_schema": "contracts/commonworld/proposal.schema.json"
+  },
+  "catalog_delivery": {
+    "contract": "contracts/commonworld/catalog-delivery-budget.contract.json",
+    "design": "build_bound_full_bootstrap_with_public_per_project_json",
+    "canonical_records": "catalog/projects/*.json",
+    "startup_project_json_requests": 0,
+    "runtime_catalogue_parity_check": false,
+    "build_and_ci_catalogue_parity_check": true,
+    "no_javascript_projection": "generated_static_catalogue_preserved",
+    "redesign_trigger": "measured_transfer_parse_or_dom_budget_not_entry_count_alone"
   }
 }
