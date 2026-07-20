@@ -705,6 +705,22 @@ async function normalScenario() {
   await run.page.waitForSelector('html.runtime-ready');
   assert(await run.page.locator('#globe-surface').isVisible(), 'normal: globe is not visible');
   assert((await run.page.locator('#globe-results').textContent())?.includes(`${expectedDigitalProjection.catalogEntryCount} Commons`), 'normal: result count missing');
+  const declutterGeometry = await run.page.evaluate(() => {
+    const box = (selector) => {
+      const rect = document.querySelector(selector).getBoundingClientRect();
+      return { width: rect.width, height: rect.height };
+    };
+    return {
+      results: box('#globe-results'),
+      semanticSummary: box('#semantic-summary'),
+      orientation: box('.orientation-bar'),
+      legend: box('.map-legend'),
+    };
+  });
+  assert(declutterGeometry.results.width <= 2 && declutterGeometry.results.height <= 2, `normal: result description still obscures the globe (${JSON.stringify(declutterGeometry)})`);
+  assert(declutterGeometry.semanticSummary.width <= 2 && declutterGeometry.semanticSummary.height <= 2, `normal: semantic description still expands the orientation bar (${JSON.stringify(declutterGeometry)})`);
+  assert(declutterGeometry.orientation.width < 320, `normal: compact orientation bar regressed (${JSON.stringify(declutterGeometry)})`);
+  assert(declutterGeometry.legend.width < 240, `normal: collapsed map legend is not compact (${JSON.stringify(declutterGeometry)})`);
   const topbarGeometry = await run.page.evaluate(() => {
     const topbar = document.querySelector('.topbar');
     const bar = topbar.getBoundingClientRect();
