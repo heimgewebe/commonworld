@@ -1,3 +1,4 @@
+import re
 import shutil
 import tempfile
 import unittest
@@ -21,6 +22,7 @@ class PublicShellTests(unittest.TestCase):
         shutil.copy2(ROOT / "method.html", root / "method.html")
         (root / "assets").mkdir()
         shutil.copy2(ROOT / "assets/commonworld-bootstrap-catalog.mjs", root / "assets/commonworld-bootstrap-catalog.mjs")
+        shutil.copy2(ROOT / "assets/commonworld-app.js", root / "assets/commonworld-app.js")
         shutil.copy2(ROOT / "assets/ipad-layout.css", root / "assets/ipad-layout.css")
         (root / "scripts").mkdir()
         if (ROOT / "scripts/render_public_shell.py").exists():
@@ -84,7 +86,7 @@ class PublicShellTests(unittest.TestCase):
     def test_public_shell_uses_local_scripts_and_no_form(self) -> None:
         html = (ROOT / "index.html").read_text(encoding="utf-8").casefold()
         self.assertIn('<script src="./assets/vendor/maplibre-gl.js" defer></script>', html)
-        self.assertIn('<script type="module" src="./assets/commonworld-app.js"></script>', html)
+        self.assertRegex(html, r'<script type="module" src="\./assets/commonworld-app\.js\?v=[0-9a-f]{12}"></script>')
         self.assertNotIn("unpkg.com", html)
         self.assertNotIn("cdn.jsdelivr.net", html)
         self.assertNotIn("<form", html)
@@ -129,7 +131,12 @@ class PublicShellTests(unittest.TestCase):
             root = self.copy_shell(tmp_dir)
             path = root / "index.html"
             html = path.read_text(encoding="utf-8")
-            html = html.replace('<link rel="stylesheet" href="./index.css" />', "<link href='./index.css' rel='stylesheet' data-extra='1' />")
+            html = re.sub(
+                r'<link rel="stylesheet" href="(\./index\.css\?v=[0-9a-f]{12})" />',
+                r"<link href='\1' rel='stylesheet' data-extra='1' />",
+                html,
+                count=1,
+            )
             html = html.replace('<link rel="stylesheet" href="./assets/ipad-layout.css" />', "<link href='./assets/ipad-layout.css' rel='stylesheet' />")
             path.write_text(html, encoding="utf-8")
             errors = validate_public_shell(root)

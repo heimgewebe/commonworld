@@ -1,4 +1,6 @@
+import hashlib
 import json
+import re
 import shutil
 import tempfile
 import unittest
@@ -296,6 +298,16 @@ function after() { return false; }
                 1,
             )
             path.write_text(source, encoding="utf-8")
+            app_hash = hashlib.sha256(path.read_bytes()).hexdigest()[:12]
+            index_path = root / "index.html"
+            index_html = index_path.read_text(encoding="utf-8")
+            index_html = re.sub(
+                r'(commonworld-app\.js\?v=)[0-9a-f]{12}',
+                rf'\g<1>{app_hash}',
+                index_html,
+                count=1,
+            )
+            index_path.write_text(index_html, encoding="utf-8")
             errors = validate_public_maplibre_vertical_slice(root)
         self.assertEqual(errors, baseline_errors)
 

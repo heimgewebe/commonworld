@@ -762,7 +762,7 @@ function ensureCountryMapLayers() {
       maxzoom: 5.5,
       paint: {
         'fill-color': COUNTRY_DOMINANT_COLORS,
-        'fill-opacity': ['interpolate', ['linear'], ['zoom'], 0, 0.48, 2.6, 0.44, 3.4, 0.38, 4.5, 0.28, 5.2, 0.12, 5.5, 0],
+        'fill-opacity': ['interpolate', ['linear'], ['zoom'], 0, 0.78, 2.6, 0.74, 3.4, 0.62, 4.5, 0.42, 5.2, 0.18, 5.5, 0],
       },
     }, beforeId);
   }
@@ -775,7 +775,7 @@ function ensureCountryMapLayers() {
       maxzoom: 5.5,
       paint: {
         'fill-pattern': ['image', ['get', 'composition_pattern']],
-        'fill-opacity': ['interpolate', ['linear'], ['zoom'], 0, 0.94, 2.6, 0.9, 3.4, 0.82, 4.5, 0.64, 5.2, 0.3, 5.5, 0],
+        'fill-opacity': ['interpolate', ['linear'], ['zoom'], 0, 1, 2.6, 0.98, 3.4, 0.92, 4.5, 0.72, 5.2, 0.34, 5.5, 0],
       },
     }, beforeId);
   }

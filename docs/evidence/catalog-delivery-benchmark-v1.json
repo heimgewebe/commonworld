@@ -268,8 +268,8 @@
         "gzip_bytes": 1001
       },
       "html": {
-        "raw_bytes": 149866,
-        "gzip_bytes": 21289,
+        "raw_bytes": 149920,
+        "gzip_bytes": 21320,
         "start_tag_count": 1560,
         "catalog_card_instances": 82,
         "interactive_catalog_cards": 41,
@@ -290,7 +290,7 @@
     "browser": {
       "schema_version": 1,
       "kind": "commonworld_catalog_delivery_browser_metrics",
-      "measured_at": "2026-07-21T09:40:31.154Z",
+      "measured_at": "2026-07-21T14:50:45.478Z",
       "cpu_throttle_rate": 4,
       "profiles": [
         {
@@ -300,19 +300,19 @@
             "height": 844
           },
           "cpu_throttle_rate": 4,
-          "runtime_ready_ms": 666,
+          "runtime_ready_ms": 646,
           "dom_node_count": 1687,
           "catalog_card_count": 41,
           "interactive_catalog_card_count": 41,
           "runtime_ready": true,
           "runtime_failed": false,
-          "dom_content_loaded_ms": 380.40000009536743,
-          "load_event_ms": 417.40000009536743,
+          "dom_content_loaded_ms": 372,
+          "load_event_ms": 409.2000000476837,
           "resource_count": 11,
-          "script_duration_ms": 683.83,
-          "task_duration_ms": 1424.64,
+          "script_duration_ms": 680.05,
+          "task_duration_ms": 1420.35,
           "bootstrap_compile": {
-            "median_ms": 0.39999985694885254,
+            "median_ms": 0.40000009536743164,
             "p95_ms": 0.7999999523162842,
             "samples_ms": [
               0,
@@ -322,25 +322,25 @@
               0.10000014305114746,
               0.10000014305114746,
               0.10000014305114746,
-              0.10000014305114746,
-              0.2999999523162842,
+              0.20000004768371582,
               0.2999999523162842,
               0.39999985694885254,
               0.40000009536743164,
-              0.5,
-              0.5,
+              0.40000009536743164,
               0.5,
               0.5,
               0.5999999046325684,
+              0.5999999046325684,
+              0.6000001430511475,
               0.6999998092651367,
+              0.7000000476837158,
               0.7999999523162842,
-              0.7999999523162842,
-              0.7999999523162842
+              0.8999998569488525
             ]
           },
           "first_party_request_count": 10,
           "first_party_unique_request_count": 10,
-          "first_party_raw_bytes": 1717687,
+          "first_party_raw_bytes": 1718408,
           "first_party_requests": [
             "/",
             "/assets/commonworld-app.js",
@@ -353,7 +353,7 @@
             "/assets/vendor/maplibre-gl.js",
             "/index.css"
           ],
-          "first_party_surface_sha256": "ac5acdc320c1e7dca5a1c91ae6422daadd6e8bcfc438b42f6acd04bb406d195e",
+          "first_party_surface_sha256": "2ee196210e11a2f67b1bfb03b51f738986092fbcdb2e8756c56155ba9a19c34e",
           "project_json_request_count": 0,
           "project_json_unique_request_count": 0,
           "project_json_requests": []
@@ -365,47 +365,47 @@
             "height": 768
           },
           "cpu_throttle_rate": 4,
-          "runtime_ready_ms": 569,
+          "runtime_ready_ms": 573,
           "dom_node_count": 1687,
           "catalog_card_count": 41,
           "interactive_catalog_card_count": 41,
           "runtime_ready": true,
           "runtime_failed": false,
-          "dom_content_loaded_ms": 334.5,
-          "load_event_ms": 369.2999999523163,
+          "dom_content_loaded_ms": 333.40000009536743,
+          "load_event_ms": 374,
           "resource_count": 11,
-          "script_duration_ms": 469.45,
-          "task_duration_ms": 799.9,
+          "script_duration_ms": 469.68,
+          "task_duration_ms": 807.87,
           "bootstrap_compile": {
             "median_ms": 0.5,
-            "p95_ms": 0.9000000953674316,
+            "p95_ms": 0.7999999523162842,
             "samples_ms": [
-              0,
-              0.09999990463256836,
-              0.09999990463256836,
               0.10000014305114746,
               0.10000014305114746,
               0.10000014305114746,
+              0.20000004768371582,
               0.20000004768371582,
               0.20000004768371582,
               0.2999999523162842,
               0.39999985694885254,
+              0.40000009536743164,
+              0.40000009536743164,
+              0.5,
+              0.5,
+              0.5,
               0.5,
               0.5,
               0.5999999046325684,
+              0.5999999046325684,
+              0.5999999046325684,
               0.6999998092651367,
-              0.7000000476837158,
-              0.7000000476837158,
-              0.7000000476837158,
               0.7999999523162842,
-              0.8999998569488525,
-              0.9000000953674316,
-              1
+              0.7999999523162842
             ]
           },
           "first_party_request_count": 10,
           "first_party_unique_request_count": 10,
-          "first_party_raw_bytes": 1717687,
+          "first_party_raw_bytes": 1718408,
           "first_party_requests": [
             "/",
             "/assets/commonworld-app.js",
@@ -418,7 +418,7 @@
             "/assets/vendor/maplibre-gl.js",
             "/index.css"
           ],
-          "first_party_surface_sha256": "ac5acdc320c1e7dca5a1c91ae6422daadd6e8bcfc438b42f6acd04bb406d195e",
+          "first_party_surface_sha256": "2ee196210e11a2f67b1bfb03b51f738986092fbcdb2e8756c56155ba9a19c34e",
           "project_json_request_count": 0,
           "project_json_unique_request_count": 0,
           "project_json_requests": []
@@ -459,13 +459,14 @@
   "validation": {
     "public_browser_smoke": {
       "verdict": "PASS",
-      "scenario_count": 26,
+      "scenario_count": 27,
       "scenario_ids": [
         "startup-and-ring-orbits",
         "ring-orbits-reduced-motion",
         "synthetic-digital-performance",
         "normal",
         "intent-search-discovery",
+        "android-globe-ui-alignment",
         "intent-search-ipad-portrait",
         "intent-search-ipad-landscape",
         "dual-presence-axes",
@@ -489,8 +490,8 @@
         "method-mobile-text-200"
       ],
       "catalogue_network_blocked_requests": 0,
-      "durable_task_id": "393975eb42dc4b3398e21781",
-      "result_sha256": "5b078033e74b6a2352620b81a550cb280f45999619501fbda969194975a77552"
+      "durable_task_id": "1be69da8e29141f3a0727c22",
+      "result_sha256": "b4716aa64f8a658680772dd2372f62684194f10d42aa6231325d3b5f8e91c713"
     },
     "proposal_browser_smoke": {
       "verdict": "PASS",
@@ -511,8 +512,8 @@
         "desktop-low-power"
       ],
       "cpu_throttle_rate": 4,
-      "durable_task_id": "075fff9238f646aebce8ec14",
-      "result_sha256": "86d7028466ce16a1043905bb2250ce421ebe80d25b4e05e0146b78d4c967f19a"
+      "durable_task_id": "a69389fd59e84d65a188df3c",
+      "result_sha256": "e6a3891811903d97927b9edca6c75343529e77d1d18e30b82ea36adddda6b495"
     },
     "official_browser_runner": {
       "verdict": "PASS",
@@ -522,8 +523,8 @@
         "focus-overlay-browser-smoke",
         "accessibility-modes-browser-smoke"
       ],
-      "durable_task_id": "d78cc257e64e455e8b7c7d06",
-      "lifecycle_receipt_sha256": "113502addb742a81166119e1192698bed306779650ae0f45900eeffebf1645ad"
+      "durable_task_id": "5019d73710c148ea9beaba0c",
+      "lifecycle_receipt_sha256": "08ce1e00aa14a39a3e8138a3d4612ef4b1f75e063287741100446358b47282b3"
     }
   },
   "budget_binding": {
@@ -531,5 +532,5 @@
     "warn_bootstrap_gzip_bytes": 28672,
     "max_bootstrap_gzip_bytes": 32768
   },
-  "current_surface_note": "Mobile map visibility adds no first-party request: country compositions gain a dominant-type solid base tint beneath the proportional stripe pattern, while exact public anchors use larger visible circles plus transparent hit targets from the existing public GeoJSON source."
+  "current_surface_note": "Android globe UI hardening centers a single-node CSS filter icon, disables browser-sensitive mobile SVG ring transforms while enlarging ring text, strengthens overview country tint, and content-hash versions app/CSS asset URLs so mobile browsers cannot retain stale visual code after deployment."
 }
