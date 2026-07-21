@@ -1375,7 +1375,11 @@ async function dualPresenceAxesScenario() {
       sourceType: style.sources?.['commonworld-public-representations']?.type ?? null,
       layers: style.layers
         .filter(({ id }) => id.startsWith('commonworld-'))
-        .map(({ id, type, minzoom, maxzoom }) => ({ id, type, minzoom, maxzoom })),
+        .map(({ id, type, minzoom, maxzoom }) => ({
+          id, type, minzoom, maxzoom,
+          circleRadius: type === 'circle' ? map.getPaintProperty(id, 'circle-radius') : null,
+          fillOpacity: type === 'fill' ? map.getPaintProperty(id, 'fill-opacity') : null,
+        })),
       ringNames: [...document.querySelectorAll('.sphere-ring-name')].map((node) => node.textContent.trim()),
     };
   });
@@ -1400,8 +1404,14 @@ async function dualPresenceAxesScenario() {
   assert(initial.sourceType === 'geojson', 'dual presence: MapLibre source is not a GeoJSON source: ' + JSON.stringify(initial));
   assert(initial.layers.some(({ id, type, minzoom }) => id === 'commonworld-public-extents' && type === 'fill' && minzoom === 3.4), 'dual presence: public extent layer missing');
   assert(initial.layers.some(({ id, type, minzoom, maxzoom }) => id === 'commonworld-approximate-zones' && type === 'fill' && minzoom === 3.4 && maxzoom === undefined), 'dual presence: approximate uncertainty zone must remain visible through local zoom');
-  assert(initial.layers.some(({ id, type, minzoom }) => id === 'commonworld-exact-anchors' && type === 'circle' && minzoom === 5), 'dual presence: exact anchor layer missing');
+  const exactAnchorLayer = initial.layers.find(({ id }) => id === 'commonworld-exact-anchors');
+  assert(exactAnchorLayer?.type === 'circle' && exactAnchorLayer.minzoom === 5, 'dual presence: exact anchor layer missing');
+  assert(JSON.stringify(exactAnchorLayer.circleRadius).includes('[5,7]') || JSON.stringify(exactAnchorLayer.circleRadius).includes('5,7'), 'dual presence: exact anchors are not visibly enlarged for mobile: ' + JSON.stringify(exactAnchorLayer));
+  assert(initial.layers.some(({ id, type, minzoom }) => id === 'commonworld-exact-anchor-hit-targets' && type === 'circle' && minzoom === 5), 'dual presence: exact anchor touch target layer missing');
   assert(initial.countryMapState === 'ready' && initial.countryMapFeatures > 0 && initial.countrySourceType === 'geojson', 'dual presence: country composition source is not ready: ' + JSON.stringify(initial));
+  const countryBaseLayer = initial.layers.find(({ id }) => id === 'commonworld-country-compositions-base');
+  assert(countryBaseLayer?.type === 'fill' && countryBaseLayer.minzoom === 0 && countryBaseLayer.maxzoom === 5.5, 'dual presence: mobile-safe country base tint layer missing');
+  assert(JSON.stringify(countryBaseLayer.fillOpacity).includes('0.48'), 'dual presence: country base tint is too weak or missing at globe overview: ' + JSON.stringify(countryBaseLayer));
   assert(initial.layers.some(({ id, type, minzoom, maxzoom }) => id === 'commonworld-country-compositions' && type === 'fill' && minzoom === 0 && maxzoom === 5.5), 'dual presence: land-first country composition fill layer missing');
   assert(initial.layers.some(({ id, type }) => id === 'commonworld-country-compositions-outline' && type === 'line'), 'dual presence: country composition outline layer missing');
   for (const level of ['macroregion', 'region']) {
@@ -1412,8 +1422,9 @@ async function dualPresenceAxesScenario() {
   assertSameIds(initial.interactiveLayerIds, [
     'commonworld-public-extents',
     'commonworld-approximate-zones',
+    'commonworld-exact-anchor-hit-targets',
     'commonworld-exact-anchors',
-  ], 'dual presence: only truthful published local geometry may be interactive');
+  ], 'dual presence: only truthful published local geometry and its touch target may be interactive');
   assert(initial.ringNames.includes('Freifunk Hamburg'), 'dual presence: dual presence identity missing from digital sphere');
   assert(!initial.ringNames.includes('Le Nid'), 'dual presence: geographic-only identity leaked into digital sphere');
 
@@ -1463,6 +1474,15 @@ async function dualPresenceAxesScenario() {
     await run.page.mouse.click(point.x, point.y);
     await run.page.waitForSelector('#project-focus:not([hidden])');
   };
+
+  await run.page.evaluate(() => {
+    window.__commonworldTestMap.jumpTo({ center: [10.2, 51.1], zoom: 1.2, bearing: 0, pitch: 0 });
+  });
+  await run.page.waitForFunction(() => {
+    const map = window.__commonworldTestMap;
+    if (!map || map.isMoving() || !map.getLayer('commonworld-country-compositions-base')) return false;
+    return map.queryRenderedFeatures(map.project([10.2, 51.1]), { layers: ['commonworld-country-compositions-base'] }).length > 0;
+  });
 
   await run.page.evaluate(() => {
     window.__commonworldTestMap.jumpTo({ center: [10.2, 51.1], zoom: 4.6, bearing: 0, pitch: 0 });

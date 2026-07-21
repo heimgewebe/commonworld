@@ -331,7 +331,7 @@
     },
     "visual_semantics": {
       "hue": "exclusive_commons_type",
-      "map_point_markers": "aggregate_grid_points_are_not_rendered; only exact_public_anchors_use_small_location_markers_at_local_zoom",
+      "map_point_markers": "aggregate_grid_points_are_not_rendered; only exact_public_anchors use visible location markers at local zoom, with a larger invisible hit target that changes interaction ergonomics but never geographic meaning",
       "number": "not_rendered_on_the_geographic_map; identity_counts_remain_available_only_to_derived_logic_and_textual_context_where_explicitly_allowed",
       "coverage": "explicit_unassessed_text_without_density_or_zero_claim; colour_is_not_coverage",
       "precision": {
@@ -340,7 +340,7 @@
         "extent": "public_area_with_solid_outline"
       },
       "privacy_notice": "aggregate_privacy_notices_remain_available_to_derived_logic_and_text_context_but_are_not_rendered_as_map_markers",
-      "country_composition": "discrete_commons_type_hues_as_proportional_stripes_without_hue_blending",
+      "country_composition": "discrete_commons_type_hues_as_proportional_stripes_without_hue_blending, layered over a dominant-type base tint so small/mobile globe views never lose the country signal when fine patterns become visually sub-pixel",
       "map_abbreviations": "forbidden",
       "accessible_equivalent": "full Commons-type labels in legend and text surfaces"
     },

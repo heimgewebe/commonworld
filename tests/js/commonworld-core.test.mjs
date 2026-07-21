@@ -747,17 +747,20 @@ test('country compositions derive proportional type segments only from published
   const west = collection.features.find(({ properties }) => properties.country_id === 'WST');
   const east = collection.features.find(({ properties }) => properties.country_id === 'EST');
   assert.equal(west.properties.composition_key, 'knowledge:1|water:2');
+  assert.equal(west.properties.dominant_commons_type, 'water');
   assert.equal(west.properties.documented_identity_count, 3);
   assert.equal(west.properties.commons_type_count, 2);
   assert.equal(west.properties.interactive, false);
   assert.equal(west.properties.density_claim, false);
   assert.equal(east.properties.composition_key, 'energy:1');
+  assert.equal(east.properties.dominant_commons_type, 'energy');
   assert.equal(collection.features.some(({ properties }) => properties.composition_key.includes('culture')), false);
 
   const filtered = countryCompositionFeatureCollection(records, boundaries, ['water-a']);
   assert.equal(filtered.features.length, 1);
   assert.equal(filtered.features[0].properties.country_id, 'WST');
   assert.equal(filtered.features[0].properties.composition_key, 'water:1');
+  assert.equal(filtered.features[0].properties.dominant_commons_type, 'water');
   assert.strictEqual(filtered, countryCompositionFeatureCollection(records, boundaries, new Set(['water-a'])));
 
   const coastalRecords = [
