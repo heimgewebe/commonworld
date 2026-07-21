@@ -302,8 +302,16 @@ def validate_visual_semantics(root: Path = ROOT) -> list[str]:
             errors.append("active Commons type profile must use distinct hue tokens")
         if active_profile.get("no_hue_blending") is not True:
             errors.append("active Commons type profile must forbid hue blending")
-        if active_profile.get("text_label_required") is not True or active_profile.get("non_color_code_required") is not True:
-            errors.append("active Commons type profile must require text labels and non-color codes")
+        if active_profile.get("text_label_required") is not True:
+            errors.append("active Commons type profile must require full text labels")
+        if active_profile.get("non_color_code_required") is not False:
+            errors.append("active Commons type profile must not require map abbreviations")
+        if active_profile.get("map_abbreviation_rendering") != "forbidden":
+            errors.append("active Commons type profile must forbid map abbreviation rendering")
+        if active_profile.get("accessible_text_equivalent_required") is not True:
+            errors.append("active Commons type profile must require an accessible text equivalent")
+        if active_profile.get("country_composition_rule") != "preserve_discrete_hues_as_proportional_stripes_without_blending":
+            errors.append("active Commons type profile must preserve country composition hues as proportional stripes")
         if active_profile.get("coverage_texture_reserved") is not True:
             errors.append("active Commons type profile must reserve texture for coverage")
         reference_dark = active_profile.get("reference_dark_surface")

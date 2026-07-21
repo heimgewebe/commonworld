@@ -1342,6 +1342,14 @@ async function dualPresenceAxesScenario() {
     identityCount: expectedDigitalProjection.publicIdentityCount,
   });
 
+  await run.page.waitForFunction(() => {
+    const stage = document.querySelector('.globe-stage');
+    const map = window.__commonworldTestMap;
+    return stage?.dataset.countryMapState === 'ready'
+      && Number(stage?.dataset.countryMapFeatures ?? 0) > 0
+      && Boolean(map?.getSource('commonworld-country-compositions'));
+  });
+
   const initial = await run.page.evaluate(() => {
     const stage = document.querySelector('.globe-stage');
     const map = window.__commonworldTestMap;
@@ -1359,7 +1367,10 @@ async function dualPresenceAxesScenario() {
       privacyNotices: Number(stage.dataset.publicMapPrivacyNotices ?? -1),
       geographicSemanticLevels: (stage.dataset.publicMapSemanticLevels ?? '').split(',').filter(Boolean),
       interactiveLayerIds: (stage.dataset.publicMapInteractiveLayers ?? '').split(',').filter(Boolean),
-      legendCodes: [...document.querySelectorAll('#commons-type-legend .legend-color')].map((node) => node.textContent.trim()),
+      legendSwatchText: [...document.querySelectorAll('#commons-type-legend .legend-color')].map((node) => node.textContent.trim()),
+      countryMapState: stage.dataset.countryMapState ?? '',
+      countryMapFeatures: Number(stage.dataset.countryMapFeatures ?? -1),
+      countrySourceType: style.sources?.['commonworld-country-compositions']?.type ?? null,
       legendLabels: [...document.querySelectorAll('#commons-type-legend .legend-item')].map((node) => node.textContent.trim()),
       sourceType: style.sources?.['commonworld-public-representations']?.type ?? null,
       layers: style.layers
@@ -1376,7 +1387,7 @@ async function dualPresenceAxesScenario() {
   assert(initial.aggregateImpressions === expectedDigitalProjection.aggregateImpressionCount, 'dual presence: aggregate impression diagnostics differ from the prepared projection: ' + JSON.stringify(initial));
   assert(initial.privacyNotices === expectedDigitalProjection.privacyNoticeCount, 'dual presence: privacy notice diagnostics differ from the prepared projection: ' + JSON.stringify(initial));
   assertSameIds(initial.geographicSemanticLevels, expectedDigitalProjection.geographicSemanticLevels, 'dual presence: geographic semantic levels');
-  assert(initial.legendCodes.length === 11 && new Set(initial.legendCodes).size === 11, 'dual presence: legend does not expose eleven unique non-colour codes: ' + JSON.stringify(initial));
+  assert(initial.legendSwatchText.length === 11 && initial.legendSwatchText.every((value) => value === ''), 'dual presence: far-map legend swatches must not render abbreviations: ' + JSON.stringify(initial));
   assert(initial.legendLabels.length === 11 && initial.legendLabels.some((label) => label.includes('Wissen und Daten')) && initial.legendLabels.some((label) => label.includes('Gemeinschaftsnetz')), 'dual presence: legend labels do not match the Commons type vocabulary: ' + JSON.stringify(initial));
   const reviewedFeatureIds = [
     'cltb-le-nid:cltb-le-nid-entrance',
@@ -1390,18 +1401,18 @@ async function dualPresenceAxesScenario() {
   assert(initial.layers.some(({ id, type, minzoom }) => id === 'commonworld-public-extents' && type === 'fill' && minzoom === 3.4), 'dual presence: public extent layer missing');
   assert(initial.layers.some(({ id, type, minzoom, maxzoom }) => id === 'commonworld-approximate-zones' && type === 'fill' && minzoom === 3.4 && maxzoom === undefined), 'dual presence: approximate uncertainty zone must remain visible through local zoom');
   assert(initial.layers.some(({ id, type, minzoom }) => id === 'commonworld-exact-anchors' && type === 'circle' && minzoom === 5.5), 'dual presence: exact anchor layer missing');
+  assert(initial.countryMapState === 'ready' && initial.countryMapFeatures > 0 && initial.countrySourceType === 'geojson', 'dual presence: country composition source is not ready: ' + JSON.stringify(initial));
+  assert(initial.layers.some(({ id, type, minzoom, maxzoom }) => id === 'commonworld-country-compositions' && type === 'fill' && minzoom === 0 && maxzoom === 3.8), 'dual presence: country composition fill layer missing');
+  assert(initial.layers.some(({ id, type }) => id === 'commonworld-country-compositions-outline' && type === 'line'), 'dual presence: country composition outline layer missing');
   const expectedAggregateLayers = [
-    ['planet', 0, 2.8],
     ['macroregion', 1.6, 4.3],
     ['region', 3.1, 5.8],
   ];
   for (const [level, minzoom, maxzoom] of expectedAggregateLayers) {
-    assert(initial.layers.some((layer) => layer.id === 'commonworld-' + level + '-impressions' && layer.type === 'circle' && layer.minzoom === minzoom && layer.maxzoom === maxzoom), 'dual presence: missing impression layer for ' + level + ': ' + JSON.stringify(initial.layers));
-    assert(initial.layers.some((layer) => layer.id === 'commonworld-' + level + '-semantics' && layer.type === 'symbol' && layer.minzoom === minzoom && layer.maxzoom === maxzoom), 'dual presence: missing semantic pattern/code layer for ' + level);
-    assert(initial.layers.some((layer) => layer.id === 'commonworld-' + level + '-impression-counts' && layer.type === 'symbol'), 'dual presence: missing released count layer for ' + level);
-    assert(initial.layers.some((layer) => layer.id === 'commonworld-' + level + '-privacy-withheld' && layer.type === 'symbol'), 'dual presence: missing neutral privacy layer for ' + level);
+    assert(initial.layers.some((layer) => layer.id === 'commonworld-' + level + '-impressions' && layer.type === 'circle' && layer.minzoom === minzoom && layer.maxzoom === maxzoom), 'dual presence: missing colour-only impression layer for ' + level + ': ' + JSON.stringify(initial.layers));
+    assert(initial.layers.some((layer) => layer.id === 'commonworld-' + level + '-privacy-withheld' && layer.type === 'circle'), 'dual presence: missing neutral colour-only privacy layer for ' + level);
   }
-  assert(initial.layers.some(({ id, type, minzoom }) => id === 'commonworld-local-type-codes' && type === 'symbol' && minzoom === 5.5), 'dual presence: local non-colour Commons type codes are missing');
+  assert(!initial.layers.some(({ id, type }) => type === 'symbol' && (id.includes('-semantics') || id.includes('-impression-counts') || id.includes('type-codes'))), 'dual presence: geographic map still renders code/count symbol layers: ' + JSON.stringify(initial.layers));
   assertSameIds(initial.interactiveLayerIds, [
     'commonworld-public-extents',
     'commonworld-approximate-zones',

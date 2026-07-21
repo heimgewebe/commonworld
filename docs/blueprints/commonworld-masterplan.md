@@ -545,9 +545,9 @@ Der öffentliche Repo-Slice ändert keine öffentliche Runtime. Der private Acce
 Die ferne Ansicht lädt keine Einzelobjektmenge. Daten werden maßstabsabhängig geliefert:
 
 ```text
-planetar       → aggregierte Felder
-Großregion     → regionale Aggregate
-Region         → Cluster, Flächen und Netzwerke
+planetar       → anteilig nach Commons-Arten gefärbte Länderflächen
+Großregion     → farbige regionale Aggregate ohne Kürzel
+Region         → feinere Cluster, Flächen und Netzwerke
 lokal          → konkrete öffentliche Geometrien und Marker
 Fokus          → vollständiger Datensatz
 ```
@@ -556,7 +556,7 @@ Fokus          → vollständiger Datensatz
 
 Die ausführbare Ableitungsregel liegt in `contracts/commonworld/aggregation-zoom.contract.json`. Sie beschreibt keine zweite Katalogwahrheit und keine API. Sie legt ausschließlich fest, wie derselbe aktuelle CommonProject-v4-Bestand für unterschiedliche semantische Ebenen zusammengefasst oder wieder aufgelöst wird.
 
-Die erste ausführbare geografische Eindrucksebene bleibt bewusst ein Katalogauszug: Sie bündelt ausschließlich validierte öffentliche Geometrien in deterministischen 30-Grad-, 10-Grad- und 4-Grad-Rastern für Planet, Großregion und Region. Farbe bezeichnet die exklusive Commons-Art, die Zahl ausschließlich freigegebene eindeutige Commons-Identitäten; Rasterzentren sind Darstellungspositionen und keine behaupteten Projektstandorte. Ein offenes Punktmuster und Text kennzeichnen die weiterhin unbewertete Katalogabdeckung. Ungefähre Ortsaggregate werden je Filterzustand nur ab fünf Identitäten und nur in ausreichend groben Behältern numerisch freigegeben; andernfalls erscheint ausschließlich ein neutraler Datenschutzhinweis. Solange keine belegte Abdeckungsbewertung vorliegt, werden weder Dichte noch regionale Leere behauptet. Länderflächen bleiben ausgeschlossen, bis ein eigener öffentlicher, quellengebundener Regionskontext außerhalb des CommonProject-Schemas vorliegt.
+Die ausführbare geografische Eindrucksebene bleibt bewusst ein Katalogauszug. In der Totalen werden Commons mit validierter veröffentlichter Geometrie zunächst kartografisch Ländern zugeordnet. Jedes betroffene Land erhält eine nicht interaktive Farbkomposition: Die diskreten Farben der dort belegten Commons-Arten werden als wiederholte Streifen proportional zur Zahl eindeutiger dokumentierter Commons-Identitäten verteilt. Es werden weder Kürzel noch Zahlen auf die Karte geschrieben. Die Länderzuordnung ist eine abgeleitete Darstellung auf Basis veröffentlichter Geometrie und niedrig aufgelöster Ländergrenzen, keine neue Tatsachenbehauptung im CommonProject-Datensatz. Liegt ein veröffentlichter ungefährer Küstenpunkt wegen der groben Kartengeometrie knapp außerhalb einer Landfläche, darf er ausschließlich dem nächstgelegenen Land zugeordnet werden, wenn die Distanz sowohl innerhalb seiner veröffentlichten Unschärfe als auch unter einer harten Grenze von 150 Kilometern liegt; exakte Punkte werden niemals verschoben. Beim Hineinzoomen blendet diese Länderebene aus; deterministische 10-Grad- und 4-Grad-Raster übernehmen für Großregion und Region, danach erscheinen veröffentlichte Ausdehnungen, Unsicherheitszonen und exakte Anker. Rasterzentren sind Darstellungspositionen und keine behaupteten Projektstandorte. Vollständige Commons-Art-Bezeichnungen bleiben in Legende und Textansicht zugänglich. Ungefähre Ortsaggregate werden je Filterzustand nur nach den Datenschutzregeln freigegeben; verborgene Lage fließt weder in Länderzuordnung noch in räumliche Aggregate ein. Solange keine belegte Abdeckungsbewertung vorliegt, werden weder Dichte noch regionale Leere behauptet. Ein künftig explizit quellengebundener Regionskontext bleibt nötig, um Commons ohne veröffentlichbare lokale Geometrie datenschutzgerecht auf Länder- oder Regionsebene einzubeziehen.
 
 #### Zähleinheit und Mehrfachverortung
 
