@@ -1400,24 +1400,20 @@ async function dualPresenceAxesScenario() {
   assert(initial.sourceType === 'geojson', 'dual presence: MapLibre source is not a GeoJSON source: ' + JSON.stringify(initial));
   assert(initial.layers.some(({ id, type, minzoom }) => id === 'commonworld-public-extents' && type === 'fill' && minzoom === 3.4), 'dual presence: public extent layer missing');
   assert(initial.layers.some(({ id, type, minzoom, maxzoom }) => id === 'commonworld-approximate-zones' && type === 'fill' && minzoom === 3.4 && maxzoom === undefined), 'dual presence: approximate uncertainty zone must remain visible through local zoom');
-  assert(initial.layers.some(({ id, type, minzoom }) => id === 'commonworld-exact-anchors' && type === 'circle' && minzoom === 5.5), 'dual presence: exact anchor layer missing');
+  assert(initial.layers.some(({ id, type, minzoom }) => id === 'commonworld-exact-anchors' && type === 'circle' && minzoom === 5), 'dual presence: exact anchor layer missing');
   assert(initial.countryMapState === 'ready' && initial.countryMapFeatures > 0 && initial.countrySourceType === 'geojson', 'dual presence: country composition source is not ready: ' + JSON.stringify(initial));
-  assert(initial.layers.some(({ id, type, minzoom, maxzoom }) => id === 'commonworld-country-compositions' && type === 'fill' && minzoom === 0 && maxzoom === 3.8), 'dual presence: country composition fill layer missing');
+  assert(initial.layers.some(({ id, type, minzoom, maxzoom }) => id === 'commonworld-country-compositions' && type === 'fill' && minzoom === 0 && maxzoom === 5.5), 'dual presence: land-first country composition fill layer missing');
   assert(initial.layers.some(({ id, type }) => id === 'commonworld-country-compositions-outline' && type === 'line'), 'dual presence: country composition outline layer missing');
-  const expectedAggregateLayers = [
-    ['macroregion', 1.6, 4.3],
-    ['region', 3.1, 5.8],
-  ];
-  for (const [level, minzoom, maxzoom] of expectedAggregateLayers) {
-    assert(initial.layers.some((layer) => layer.id === 'commonworld-' + level + '-impressions' && layer.type === 'circle' && layer.minzoom === minzoom && layer.maxzoom === maxzoom), 'dual presence: missing colour-only impression layer for ' + level + ': ' + JSON.stringify(initial.layers));
-    assert(initial.layers.some((layer) => layer.id === 'commonworld-' + level + '-privacy-withheld' && layer.type === 'circle'), 'dual presence: missing neutral colour-only privacy layer for ' + level);
+  for (const level of ['macroregion', 'region']) {
+    assert(!initial.layers.some((layer) => layer.id === 'commonworld-' + level + '-impressions'), 'dual presence: synthetic aggregate point layer must not be rendered for ' + level + ': ' + JSON.stringify(initial.layers));
+    assert(!initial.layers.some((layer) => layer.id === 'commonworld-' + level + '-privacy-withheld'), 'dual presence: aggregate privacy grid center must not be rendered as a location for ' + level);
   }
   assert(!initial.layers.some(({ id, type }) => type === 'symbol' && (id.includes('-semantics') || id.includes('-impression-counts') || id.includes('type-codes'))), 'dual presence: geographic map still renders code/count symbol layers: ' + JSON.stringify(initial.layers));
   assertSameIds(initial.interactiveLayerIds, [
     'commonworld-public-extents',
     'commonworld-approximate-zones',
     'commonworld-exact-anchors',
-  ], 'dual presence: aggregate layers must remain noninteractive');
+  ], 'dual presence: only truthful published local geometry may be interactive');
   assert(initial.ringNames.includes('Freifunk Hamburg'), 'dual presence: dual presence identity missing from digital sphere');
   assert(!initial.ringNames.includes('Le Nid'), 'dual presence: geographic-only identity leaked into digital sphere');
 
@@ -1467,6 +1463,16 @@ async function dualPresenceAxesScenario() {
     await run.page.mouse.click(point.x, point.y);
     await run.page.waitForSelector('#project-focus:not([hidden])');
   };
+
+  await run.page.evaluate(() => {
+    window.__commonworldTestMap.jumpTo({ center: [10.2, 51.1], zoom: 4.6, bearing: 0, pitch: 0 });
+  });
+  await run.page.waitForFunction(() => document.querySelector('.globe-stage')?.dataset.semanticLevel === 'region');
+  await run.page.waitForFunction(() => {
+    const map = window.__commonworldTestMap;
+    if (!map || map.isMoving() || !map.getLayer('commonworld-country-compositions')) return false;
+    return map.queryRenderedFeatures(map.project([10.2, 51.1]), { layers: ['commonworld-country-compositions'] }).length > 0;
+  });
 
   const updatesBeforeSelection = Number(await run.page.locator('.globe-stage').getAttribute('data-public-map-updates'));
   await activateMapIdentity({

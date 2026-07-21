@@ -63,16 +63,6 @@ const COMMONS_TYPE_COLORS = [
   COMMONS_TYPE_COLOR_TOKENS.other,
 ];
 
-const AGGREGATE_LAYER_CONFIGS = Object.freeze([
-  Object.freeze({
-    id: 'macroregion', semanticLevel: 'macroregion', minzoom: 1.6, maxzoom: 4.3,
-    opacity: Object.freeze(['interpolate', ['linear'], ['zoom'], 1.6, 0, 2, 0.84, 3.8, 0.78, 4.3, 0]),
-  }),
-  Object.freeze({
-    id: 'region', semanticLevel: 'region', minzoom: 3.1, maxzoom: 5.8,
-    opacity: Object.freeze(['interpolate', ['linear'], ['zoom'], 3.1, 0, 3.5, 0.84, 5.2, 0.76, 5.8, 0]),
-  }),
-]);
 const ACTION_LINK_TYPES = new Set(['visit', 'use', 'borrow', 'learn', 'contribute', 'volunteer', 'donate', 'contact', 'replicate']);
 const INTENT_FILTER_NAMES = Object.freeze(['commons_type', 'presence', 'action', 'language', 'access', 'freshness', 'curation']);
 const DIGITAL_IDENTITY_DOM_LIMIT = 48;
@@ -764,10 +754,10 @@ function ensureCountryMapLayers() {
       type: 'fill',
       source: COUNTRY_MAP_SOURCE_ID,
       minzoom: 0,
-      maxzoom: 3.8,
+      maxzoom: 5.5,
       paint: {
         'fill-pattern': ['image', ['get', 'composition_pattern']],
-        'fill-opacity': ['interpolate', ['linear'], ['zoom'], 0, 0.78, 2.3, 0.72, 3.1, 0.48, 3.8, 0],
+        'fill-opacity': ['interpolate', ['linear'], ['zoom'], 0, 0.84, 2.6, 0.8, 3.4, 0.72, 4.5, 0.56, 5.2, 0.26, 5.5, 0],
       },
     }, beforeId);
   }
@@ -777,11 +767,11 @@ function ensureCountryMapLayers() {
       type: 'line',
       source: COUNTRY_MAP_SOURCE_ID,
       minzoom: 0,
-      maxzoom: 3.8,
+      maxzoom: 5.5,
       paint: {
-        'line-color': 'rgba(245, 243, 233, 0.58)',
-        'line-width': ['interpolate', ['linear'], ['zoom'], 0, 0.5, 3, 1.2],
-        'line-opacity': ['interpolate', ['linear'], ['zoom'], 0, 0.75, 3.2, 0.55, 3.8, 0],
+        'line-color': 'rgba(245, 243, 233, 0.68)',
+        'line-width': ['interpolate', ['linear'], ['zoom'], 0, 0.5, 3, 1.1, 5.2, 1.4],
+        'line-opacity': ['interpolate', ['linear'], ['zoom'], 0, 0.72, 3.4, 0.6, 4.8, 0.38, 5.5, 0],
       },
     }, beforeId);
   }
@@ -853,55 +843,6 @@ function renderMapLegend() {
   }
 }
 
-function ensureAggregateImpressionLayers(config) {
-  const prefix = 'commonworld-' + config.id;
-  const filterFor = (representationKind) => ['all',
-    ['==', ['get', 'representation_kind'], representationKind],
-    ['==', ['get', 'semantic_level'], config.semanticLevel],
-  ];
-
-  const impressionId = prefix + '-impressions';
-  if (!runtime.map.getLayer(impressionId)) {
-    runtime.map.addLayer({
-      id: impressionId,
-      type: 'circle',
-      source: PUBLIC_MAP_SOURCE_ID,
-      minzoom: config.minzoom,
-      maxzoom: config.maxzoom,
-      filter: filterFor('aggregate_impression'),
-      paint: {
-        'circle-radius': ['interpolate', ['linear'], ['zoom'], config.minzoom, 6, config.maxzoom, 9],
-        'circle-color': COMMONS_TYPE_COLORS,
-        'circle-opacity': config.opacity,
-        'circle-blur': 0.12,
-        'circle-stroke-width': 1.15,
-        'circle-stroke-color': '#FFFFFF',
-        'circle-stroke-opacity': 0.62,
-      },
-    });
-  }
-
-  const privacyId = prefix + '-privacy-withheld';
-  if (!runtime.map.getLayer(privacyId)) {
-    runtime.map.addLayer({
-      id: privacyId,
-      type: 'circle',
-      source: PUBLIC_MAP_SOURCE_ID,
-      minzoom: config.minzoom,
-      maxzoom: config.maxzoom,
-      filter: filterFor('aggregate_privacy_notice'),
-      paint: {
-        'circle-radius': 4,
-        'circle-color': COMMONS_TYPE_COLOR_TOKENS.other,
-        'circle-opacity': config.opacity,
-        'circle-stroke-width': 1,
-        'circle-stroke-color': '#FFFFFF',
-        'circle-stroke-opacity': 0.5,
-      },
-    });
-  }
-}
-
 function ensurePublicMapLayers() {
   if (!runtime.map || !runtime.map.isStyleLoaded()) return;
   if (!runtime.map.getSource(PUBLIC_MAP_SOURCE_ID)) {
@@ -911,7 +852,6 @@ function ensurePublicMapLayers() {
     publishPublicMapDiagnostics(data);
   }
   ensureCountryMapLayers();
-  for (const config of AGGREGATE_LAYER_CONFIGS) ensureAggregateImpressionLayers(config);
   if (!runtime.map.getLayer('commonworld-public-extents')) {
     runtime.map.addLayer({
       id: 'commonworld-public-extents',
@@ -972,10 +912,10 @@ function ensurePublicMapLayers() {
       id: 'commonworld-exact-anchors',
       type: 'circle',
       source: PUBLIC_MAP_SOURCE_ID,
-      minzoom: 5.5,
+      minzoom: 5,
       filter: ['==', ['get', 'representation_kind'], 'exact_anchor'],
       paint: {
-        'circle-radius': ['interpolate', ['linear'], ['zoom'], 5.5, 6, 8, 10],
+        'circle-radius': ['interpolate', ['linear'], ['zoom'], 5, 4, 8, 7],
         'circle-color': COMMONS_TYPE_COLORS,
         'circle-opacity': 0.94,
         'circle-stroke-color': '#FFFFFF',

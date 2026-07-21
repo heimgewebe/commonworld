@@ -301,7 +301,7 @@
     "no_geographic_area_denominator": true
   },
   "geographic_impressions_v1": {
-    "status": "implemented_country_to_local_semantic_zoom_from_public_geometry",
+    "status": "implemented_land_first_country_to_local_semantic_zoom_from_public_geometry",
     "source_geometry": {
       "allowed": [
         "validated_public_exact_point",
@@ -310,7 +310,7 @@
       ],
       "hidden_locations": "excluded_before_representative_point_country_lookup_and_bucket_derivation",
       "representative_point": "deterministic_public_geometry_derivative_per_published_geometry_component_for_bucket_assignment_only",
-      "aggregate_coordinates": "regional_grid_display_centers_with_bounded_type_offsets_not_project_coordinates"
+      "aggregate_coordinates": "regional_grid_display_centers_retained_for_derived_logic_and_text_only_not_rendered_as_map_locations"
     },
     "spatial_buckets": {
       "planet": {
@@ -319,11 +319,11 @@
       },
       "macroregion": {
         "grid_degrees": 10,
-        "output": "one_bounded_impression_per_released_commons_type_plus_unique_identity_count"
+        "output": "one_bounded_impression_per_released_commons_type_plus_unique_identity_count_not_rendered_as_a_map_marker"
       },
       "region": {
         "grid_degrees": 4,
-        "output": "one_bounded_impression_per_released_commons_type_plus_unique_identity_count"
+        "output": "one_bounded_impression_per_released_commons_type_plus_unique_identity_count_not_rendered_as_a_map_marker"
       },
       "identity_rule": "one_commonproject_id_at_most_once_per_bucket",
       "ordering": "deterministic_bucket_key_then_canonical_commons_type_order",
@@ -331,7 +331,7 @@
     },
     "visual_semantics": {
       "hue": "exclusive_commons_type",
-      "circle_size": "constant_within_geographic_impressions_v1_because_coverage_is_unassessed",
+      "map_point_markers": "aggregate_grid_points_are_not_rendered; only exact_public_anchors_use_small_location_markers_at_local_zoom",
       "number": "not_rendered_on_the_geographic_map; identity_counts_remain_available_only_to_derived_logic_and_textual_context_where_explicitly_allowed",
       "coverage": "explicit_unassessed_text_without_density_or_zero_claim; colour_is_not_coverage",
       "precision": {
@@ -339,7 +339,7 @@
         "approximate": "uncertainty_area_with_dashed_outline",
         "extent": "public_area_with_solid_outline"
       },
-      "privacy_notice": "neutral_colour_only_marker_without_numeric_lower_bound_commons_type_hue_member_identity_or_text_glyph",
+      "privacy_notice": "aggregate_privacy_notices_remain_available_to_derived_logic_and_text_context_but_are_not_rendered_as_map_markers",
       "country_composition": "discrete_commons_type_hues_as_proportional_stripes_without_hue_blending",
       "map_abbreviations": "forbidden",
       "accessible_equivalent": "full Commons-type labels in legend and text surfaces"
@@ -347,20 +347,16 @@
     "semantic_zoom": {
       "country_compositions": {
         "min_zoom": 0,
-        "max_zoom_exclusive": 3.8,
-        "fade_starts_at_zoom": 2.3
+        "max_zoom_exclusive": 5.5,
+        "fade_starts_at_zoom": 3.4
       },
-      "macroregion_impressions": {
-        "min_zoom": 1.6,
-        "max_zoom_exclusive": 4.3
-      },
-      "region_impressions": {
-        "min_zoom": 3.1,
-        "max_zoom_exclusive": 5.8
+      "regional_aggregate_points": {
+        "map_rendering": "not_rendered_because_grid_centers_can_fall_on_water_and_do_not_represent_project_locations",
+        "derived_data": "retained_for_privacy_safe_aggregation_and_textual_context"
       },
       "public_extents_and_approximate_zones_min_zoom": 3.4,
-      "exact_anchors_min_zoom": 5.5,
-      "principle": "far_view_uses_country_composition_then_progressively_finer_regional_and_published_local_geometry"
+      "exact_anchors_min_zoom": 5.0,
+      "principle": "far_and_mid_views_use_land_aligned_country_composition_which_fades_only_as_published_local_geometry_becomes_legible; synthetic_regional_point_centers_are_never_drawn"
     },
     "interaction": {
       "aggregate_features_are_noninteractive": true,
@@ -383,7 +379,8 @@
       "latitude_longitude_grid_is_not_equal_area",
       "dateline_spanning_extents_need_future_geodesic_refinement",
       "eleven_type_hues_require_full_text_labels_and_accessible_text_equivalents",
-      "country_assignment_uses_representative_points; approximate coastal points may use a bounded nearest-country fallback within published uncertainty, while border-spanning public extents still need future intersection refinement"
+      "country_assignment_uses_representative_points; approximate coastal points may use a bounded nearest-country fallback within published uncertainty, while border-spanning public extents still need future intersection refinement",
+      "regional_grid_aggregates_are_retained_for_privacy_safe_derived_logic_but_intentionally_not_rendered_as_point_locations"
     ],
     "future_aggregate_only_region_context": {
       "requires": [
