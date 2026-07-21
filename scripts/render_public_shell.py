@@ -3,6 +3,7 @@
 
 from __future__ import annotations
 
+import hashlib
 import html
 import json
 import sys
@@ -27,6 +28,10 @@ ORBIT_PROFILES = (
     (280, 262, 78),
     (274, 284, -77),
 )
+
+
+def asset_version(relative_path: str, root: Path = ROOT) -> str:
+    return hashlib.sha256((root / relative_path).read_bytes()).hexdigest()[:12]
 
 
 def homepage(record: dict) -> str:
@@ -217,10 +222,10 @@ def render_shell(root: Path = ROOT) -> str:
     <link rel="alternate" type="application/json" href="./catalog/catalog.json" title="Commonworld-Katalog" />
     <link rel="alternate" type="application/schema+json" href="./contracts/commonworld/project.schema.json" title="CommonProject-Schema" />
     <link rel="stylesheet" href="./assets/vendor/maplibre-gl.css" />
-    <link rel="stylesheet" href="./index.css" />
+    <link rel="stylesheet" href="./index.css?v={asset_version('index.css', root)}" />
     <link rel="stylesheet" href="./assets/ipad-layout.css" />
     <script src="./assets/vendor/maplibre-gl.js" defer></script>
-    <script type="module" src="./assets/commonworld-app.js"></script>
+    <script type="module" src="./assets/commonworld-app.js?v={asset_version('assets/commonworld-app.js', root)}"></script>
   </head>
   <body data-presentation="globe">
     <a class="skip-link" href="#text-view">Zur Textansicht springen</a>
@@ -237,7 +242,7 @@ def render_shell(root: Path = ROOT) -> str:
             <input id="commons-search" type="search" inputmode="search" autocomplete="off" placeholder="Was möchtest du tun oder finden?" aria-controls="discovery-list" aria-expanded="false" />
             <button id="search-clear" class="search-clear" type="button" aria-label="Suche leeren" hidden>×</button>
           </div>
-          <button id="filter-toggle" class="icon-button filter-toggle" type="button" aria-label="Suchergebnisse und Filter öffnen" aria-controls="discovery-panel" aria-expanded="false"><span aria-hidden="true">≡</span><span class="filter-toggle-label">Filter</span></button>
+          <button id="filter-toggle" class="icon-button filter-toggle" type="button" aria-label="Suchergebnisse und Filter öffnen" aria-controls="discovery-panel" aria-expanded="false"><span class="filter-toggle-icon" aria-hidden="true"></span><span class="filter-toggle-label">Filter</span></button>
         </div>
         <a class="proposal-link" href="./propose.html"><span class="proposal-symbol" aria-hidden="true">+</span><span class="proposal-label">Commons vorschlagen</span></a>
         <button id="settings-toggle" class="icon-button settings-toggle" type="button" aria-label="Einstellungen öffnen" aria-controls="settings-panel" aria-expanded="false"><span aria-hidden="true">⚙</span></button>
@@ -436,7 +441,7 @@ def render_method(root: Path = ROOT) -> str:
     <meta name="description" content="Methode, Abdeckung, Datenschutz und Betriebsgrenzen von Commonworld." />
     <title>Commonworld — Methode und Grenzen</title>
     <link rel="icon" href="./assets/commonworld-mark.svg" type="image/svg+xml" />
-    <link rel="stylesheet" href="./index.css" />
+    <link rel="stylesheet" href="./index.css?v={asset_version('index.css', root)}" />
   </head>
   <body class="method-page">
     <main>

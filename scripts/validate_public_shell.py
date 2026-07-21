@@ -3,6 +3,7 @@
 
 from __future__ import annotations
 
+import hashlib
 import re
 import sys
 from pathlib import Path
@@ -64,7 +65,6 @@ REQUIRED_HTML = (
     'type="application/json"',
     'Keine API-Laufzeit, kein Schreibweg und keine eigenständige CLI.',
     '<script src="./assets/vendor/maplibre-gl.js" defer></script>',
-    '<script type="module" src="./assets/commonworld-app.js"></script>',
     '<meta http-equiv="Content-Security-Policy"',
 )
 
@@ -147,6 +147,13 @@ def validate_public_shell(root: Path = ROOT) -> list[str]:
     for token in REQUIRED_HTML:
         if token not in html:
             errors.append(f'public shell missing required token: {token}')
+    app_version = hashlib.sha256((root / 'assets/commonworld-app.js').read_bytes()).hexdigest()[:12]
+    css_version = hashlib.sha256(css_path.read_bytes()).hexdigest()[:12]
+    if f'<script type="module" src="./assets/commonworld-app.js?v={app_version}"></script>' not in html:
+        errors.append('public shell must load commonworld-app.js with its deterministic content hash')
+    expected_css_link = f'./index.css?v={css_version}'
+    if expected_css_link not in parse_stylesheet_links(html):
+        errors.append('public shell must load index.css with its deterministic content hash')
     for token in FORBIDDEN_HTML:
         if token.casefold() in lowered:
             errors.append(f'public shell contains obsolete or unsafe token: {token}')
@@ -221,13 +228,13 @@ def _validate_ipad_landscape_wiring(root: Path, html: str) -> list[str]:
     if 'class="filter-commons-type"' not in html or '.filter-commons-type' not in index_css:
         errors.append('public shell and index.css must preserve the Commons-Art filter layout hook')
 
-    index_link = './index.css'
+    index_links = [link for link in parse_stylesheet_links(html) if link.startswith('./index.css?v=')]
     ipad_link = './assets/ipad-layout.css'
 
     links = parse_stylesheet_links(html)
-    if index_link not in links or ipad_link not in links:
-        errors.append('index.html must load index.css and assets/ipad-layout.css')
-    elif links.index(index_link) >= links.index(ipad_link):
+    if len(index_links) != 1 or ipad_link not in links:
+        errors.append('index.html must load versioned index.css and assets/ipad-layout.css')
+    elif links.index(index_links[0]) >= links.index(ipad_link):
         errors.append('index.html must load assets/ipad-layout.css after index.css')
 
     render_links = parse_stylesheet_links(render_source)

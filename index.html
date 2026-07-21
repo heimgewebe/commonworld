@@ -12,10 +12,10 @@
     <link rel="alternate" type="application/json" href="./catalog/catalog.json" title="Commonworld-Katalog" />
     <link rel="alternate" type="application/schema+json" href="./contracts/commonworld/project.schema.json" title="CommonProject-Schema" />
     <link rel="stylesheet" href="./assets/vendor/maplibre-gl.css" />
-    <link rel="stylesheet" href="./index.css" />
+    <link rel="stylesheet" href="./index.css?v=99a4834067e9" />
     <link rel="stylesheet" href="./assets/ipad-layout.css" />
     <script src="./assets/vendor/maplibre-gl.js" defer></script>
-    <script type="module" src="./assets/commonworld-app.js"></script>
+    <script type="module" src="./assets/commonworld-app.js?v=acf3075a9907"></script>
   </head>
   <body data-presentation="globe">
     <a class="skip-link" href="#text-view">Zur Textansicht springen</a>
@@ -32,7 +32,7 @@
             <input id="commons-search" type="search" inputmode="search" autocomplete="off" placeholder="Was möchtest du tun oder finden?" aria-controls="discovery-list" aria-expanded="false" />
             <button id="search-clear" class="search-clear" type="button" aria-label="Suche leeren" hidden>×</button>
           </div>
-          <button id="filter-toggle" class="icon-button filter-toggle" type="button" aria-label="Suchergebnisse und Filter öffnen" aria-controls="discovery-panel" aria-expanded="false"><span aria-hidden="true">≡</span><span class="filter-toggle-label">Filter</span></button>
+          <button id="filter-toggle" class="icon-button filter-toggle" type="button" aria-label="Suchergebnisse und Filter öffnen" aria-controls="discovery-panel" aria-expanded="false"><span class="filter-toggle-icon" aria-hidden="true"></span><span class="filter-toggle-label">Filter</span></button>
         </div>
         <a class="proposal-link" href="./propose.html"><span class="proposal-symbol" aria-hidden="true">+</span><span class="proposal-label">Commons vorschlagen</span></a>
         <button id="settings-toggle" class="icon-button settings-toggle" type="button" aria-label="Einstellungen öffnen" aria-controls="settings-panel" aria-expanded="false"><span aria-hidden="true">⚙</span></button>

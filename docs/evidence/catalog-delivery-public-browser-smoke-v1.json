@@ -56,6 +56,20 @@
       "spatialNavigation": true
     },
     {
+      "id": "android-globe-ui-alignment",
+      "verdict": "PASS",
+      "filterCenterDeltaX": 0,
+      "filterCenterDeltaY": 0,
+      "filterButtonWidth": 44,
+      "filterButtonHeight": 44,
+      "ringAnimationName": "none",
+      "ringTransform": "none",
+      "ringTextWidth": 707.2813110351562,
+      "ringTextHeight": 10,
+      "ringTextFontSize": 17,
+      "countryRendered": 1
+    },
+    {
       "id": "intent-search-ipad-portrait",
       "verdict": "PASS",
       "minimumControlHeight": 44,
@@ -94,7 +108,7 @@
     {
       "id": "layer-journey-moveend-return",
       "verdict": "PASS",
-      "elapsedMs": 1543
+      "elapsedMs": 1525
     },
     {
       "id": "layer-journey-interrupted",
@@ -192,15 +206,16 @@
   "schema_version": 1,
   "kind": "catalog-delivery-public-browser-smoke-v1",
   "binding": {
-    "smoke_script_sha256": "362c99f628c37f6b885cc93c609c503685a6aa13e59fe22e03c74307748c7083",
+    "smoke_script_sha256": "f899f5f137c44da61230b781e8d8585997b937e22cf7a06145394f9b80b95bfb",
     "smoke_runner_sha256": "522b99b70b1d0064b1d0a31a3a67fdc9a2e73b7408f37d1a4bb303bc360b7556",
-    "first_party_surface_sha256": "ac5acdc320c1e7dca5a1c91ae6422daadd6e8bcfc438b42f6acd04bb406d195e",
+    "first_party_surface_sha256": "2ee196210e11a2f67b1bfb03b51f738986092fbcdb2e8756c56155ba9a19c34e",
     "scenario_ids": [
       "startup-and-ring-orbits",
       "ring-orbits-reduced-motion",
       "synthetic-digital-performance",
       "normal",
       "intent-search-discovery",
+      "android-globe-ui-alignment",
       "intent-search-ipad-portrait",
       "intent-search-ipad-landscape",
       "dual-presence-axes",

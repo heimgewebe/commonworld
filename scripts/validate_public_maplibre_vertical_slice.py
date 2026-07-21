@@ -730,7 +730,6 @@ def validate_public_maplibre_vertical_slice(root: Path = ROOT) -> list[str]:
 
     required_html = (
         '<script src="./assets/vendor/maplibre-gl.js" defer></script>',
-        '<script type="module" src="./assets/commonworld-app.js"></script>',
         'href="./assets/vendor/maplibre-gl.css"',
         'id="map"',
         'id="semantic-level"',
@@ -765,6 +764,14 @@ def validate_public_maplibre_vertical_slice(root: Path = ROOT) -> list[str]:
     for token in required_html:
         if token not in html:
             errors.append(f"public runtime shell missing token: {token}")
+    expected_app_version = _sha256(root / "assets/commonworld-app.js")[:12]
+    expected_css_version = _sha256(root / "index.css")[:12]
+    expected_app_tag = f'<script type="module" src="./assets/commonworld-app.js?v={expected_app_version}"></script>'
+    expected_css_tag = f'href="./index.css?v={expected_css_version}"'
+    if expected_app_tag not in html:
+        errors.append("public runtime shell must bind commonworld-app.js to its deterministic content hash")
+    if expected_css_tag not in html:
+        errors.append("public runtime shell must bind index.css to its deterministic content hash")
     if 'id="catalog-bootstrap"' in html:
         errors.append("public runtime shell must not expose catalog JSON as DOM text")
     if re.search(r"<script(?![^>]+src=)[^>]*>", html, re.IGNORECASE):

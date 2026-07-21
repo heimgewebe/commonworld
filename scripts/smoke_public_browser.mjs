@@ -1411,7 +1411,7 @@ async function dualPresenceAxesScenario() {
   assert(initial.countryMapState === 'ready' && initial.countryMapFeatures > 0 && initial.countrySourceType === 'geojson', 'dual presence: country composition source is not ready: ' + JSON.stringify(initial));
   const countryBaseLayer = initial.layers.find(({ id }) => id === 'commonworld-country-compositions-base');
   assert(countryBaseLayer?.type === 'fill' && countryBaseLayer.minzoom === 0 && countryBaseLayer.maxzoom === 5.5, 'dual presence: mobile-safe country base tint layer missing');
-  assert(JSON.stringify(countryBaseLayer.fillOpacity).includes('0.48'), 'dual presence: country base tint is too weak or missing at globe overview: ' + JSON.stringify(countryBaseLayer));
+  assert(JSON.stringify(countryBaseLayer.fillOpacity).includes('0.78'), 'dual presence: country base tint is too weak or missing at globe overview: ' + JSON.stringify(countryBaseLayer));
   assert(initial.layers.some(({ id, type, minzoom, maxzoom }) => id === 'commonworld-country-compositions' && type === 'fill' && minzoom === 0 && maxzoom === 5.5), 'dual presence: land-first country composition fill layer missing');
   assert(initial.layers.some(({ id, type }) => id === 'commonworld-country-compositions-outline' && type === 'line'), 'dual presence: country composition outline layer missing');
   for (const level of ['macroregion', 'region']) {
@@ -1738,6 +1738,74 @@ async function intentSearchDiscoveryScenario() {
   assert(run.consoleErrors.every((message) => message.includes('Failed to load resource')), 'intent search: unexpected console errors: ' + run.consoleErrors.join(' | '));
   assert(run.pageErrors.length === 0, 'intent search: page errors: ' + run.pageErrors.join(' | '));
   results.push({ id: 'intent-search-discovery', verdict: 'PASS', indexedRecords: expectedDigitalProjection.catalogEntryCount, rankedGermanIntentResults: expectedDigitalProjection.contributionIds.length, filters: 7, digitalCoordinateFree: true, spatialNavigation: true });
+  await run.context.close();
+}
+
+async function androidGlobeUiScenario() {
+  const scenarioId = 'android-globe-ui-alignment';
+  process.stdout.write(JSON.stringify({ state: 'RUNNING', scenario: scenarioId }) + '\n');
+  const run = await newPage({ mobile: true, touch: true, reducedMotion: 'no-preference' });
+  await run.page.goto(baseUrl, { waitUntil: 'domcontentloaded' });
+  await run.page.waitForSelector('html.runtime-ready');
+  await run.page.waitForFunction(() => document.querySelectorAll('.sphere-ring-text').length > 0);
+
+  const geometry = await run.page.evaluate(() => {
+    const button = document.querySelector('#filter-toggle');
+    const icon = button.querySelector('.filter-toggle-icon');
+    const buttonRect = button.getBoundingClientRect();
+    const iconRect = icon.getBoundingClientRect();
+    const ring = document.querySelector('.sphere-ring-plane');
+    const text = document.querySelector('.sphere-ring-text');
+    const textRect = text.getBoundingClientRect();
+    const ringStyle = getComputedStyle(ring);
+    const textStyle = getComputedStyle(text);
+    return {
+      filterCenterDeltaX: Math.abs((buttonRect.left + buttonRect.width / 2) - (iconRect.left + iconRect.width / 2)),
+      filterCenterDeltaY: Math.abs((buttonRect.top + buttonRect.height / 2) - (iconRect.top + iconRect.height / 2)),
+      filterButtonWidth: buttonRect.width,
+      filterButtonHeight: buttonRect.height,
+      ringAnimationName: ringStyle.animationName,
+      ringTransform: ringStyle.transform,
+      ringTextWidth: textRect.width,
+      ringTextHeight: textRect.height,
+      ringTextFontSize: Number.parseFloat(textStyle.fontSize),
+    };
+  });
+  assert(geometry.filterCenterDeltaX <= 1 && geometry.filterCenterDeltaY <= 1, scenarioId + ': filter icon is not centered ' + JSON.stringify(geometry));
+  assert(geometry.filterButtonWidth >= 44 && geometry.filterButtonHeight >= 44, scenarioId + ': filter button is below mobile touch target ' + JSON.stringify(geometry));
+  assert(geometry.ringAnimationName === 'none', scenarioId + ': mobile ring group still uses CSS orbit transform ' + JSON.stringify(geometry));
+  assert(geometry.ringTransform === 'none', scenarioId + ': mobile ring group retains a transform offset ' + JSON.stringify(geometry));
+  assert(geometry.ringTextWidth > 20 && geometry.ringTextHeight > 8 && geometry.ringTextFontSize >= 17, scenarioId + ': mobile ring text is not visibly sized ' + JSON.stringify(geometry));
+
+  await run.page.evaluate(() => new Promise((resolve) => {
+    const map = window.__commonworldTestMap;
+    map.once('render', resolve);
+    map.jumpTo({ center: [10.2, 51.1], zoom: 1.2, bearing: 0, pitch: 0 });
+    map.triggerRepaint();
+  }));
+  await run.page.waitForFunction(() => {
+    const map = window.__commonworldTestMap;
+    const stage = document.querySelector('.globe-stage');
+    return Boolean(map && !map.isMoving() && stage?.dataset.countryMapState === 'ready' && map.getLayer('commonworld-country-compositions-base'));
+  });
+  await run.page.waitForFunction(() => {
+    const map = window.__commonworldTestMap;
+    if (!map || map.isMoving()) return false;
+    return map.queryRenderedFeatures(map.project([10.2, 51.1]), { layers: ['commonworld-country-compositions-base'] }).length > 0;
+  });
+  const country = await run.page.evaluate(() => {
+    const map = window.__commonworldTestMap;
+    const opacity = map.getPaintProperty('commonworld-country-compositions-base', 'fill-opacity');
+    const rendered = map.queryRenderedFeatures(map.project([10.2, 51.1]), { layers: ['commonworld-country-compositions-base'] }).length;
+    const sourceFeatures = map.querySourceFeatures('commonworld-country-compositions').length;
+    const diagnosticsFeatures = Number.parseInt(document.querySelector('.globe-stage')?.dataset.countryMapFeatures ?? '0', 10);
+    const visibility = map.getLayoutProperty('commonworld-country-compositions-base', 'visibility') ?? 'visible';
+    return { opacity, rendered, sourceFeatures, diagnosticsFeatures, visibility, zoom: map.getZoom() };
+  });
+  assert(JSON.stringify(country.opacity).includes('0.78'), scenarioId + ': overview country tint is not strong enough ' + JSON.stringify(country));
+  assert(country.diagnosticsFeatures > 0 && country.rendered > 0, scenarioId + ': country composition is not rendered at mobile globe overview ' + JSON.stringify(country));
+  assert(run.pageErrors.length === 0, scenarioId + ': page errors: ' + run.pageErrors.join(' | '));
+  results.push({ id: scenarioId, verdict: 'PASS', ...geometry, countryRendered: country.rendered });
   await run.context.close();
 }
 
@@ -2500,6 +2568,7 @@ try {
   await syntheticDigitalPerformanceScenario();
   await normalScenario();
   await intentSearchDiscoveryScenario();
+  await androidGlobeUiScenario();
   await intentSearchLayoutScenario({ viewportOverride: { width: 1024, height: 1366 }, scenarioId: 'intent-search-ipad-portrait' });
   await intentSearchLayoutScenario({ viewportOverride: { width: 1366, height: 1024 }, scenarioId: 'intent-search-ipad-landscape' });
   await dualPresenceAxesScenario();
