@@ -126,6 +126,7 @@ EXPECTED_CONTRACT_FILES = {"catalog-delivery-budget.contract.json", "catalog-div
 EXPECTED_SCRIPT_FILES = {
     "__init__.py",
     "browser_smoke_plan.py",
+    "build_country_boundary_subset.mjs",
     "build_public_runtime.py",
     "catalog_delivery_compile.mjs",
     "check_pages_dns_target.py",

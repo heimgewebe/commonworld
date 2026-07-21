@@ -4,7 +4,7 @@
   "private": true,
   "description": "Deterministic public MapLibre vertical slice for commonworld.net",
   "scripts": {
-    "build": "python3 scripts/build_public_runtime.py && python3 scripts/render_public_shell.py && python3 scripts/render_proposal_page.py",
+    "build": "python3 scripts/build_public_runtime.py && python3 scripts/render_public_shell.py && node scripts/build_country_boundary_subset.mjs && python3 scripts/render_proposal_page.py",
     "test": "node --test tests/js/*.test.mjs",
     "smoke:browser": "python3 scripts/run_browser_smoke.py",
     "measure:catalog-browser": "node scripts/measure_catalog_delivery_browser.mjs"

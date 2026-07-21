@@ -1,0 +1,12 @@
+{
+  "dataset": "Natural Earth Admin 0 – Countries",
+  "scale": "1:110m",
+  "source_repository": "nvkelso/natural-earth-vector",
+  "source_commit": "ca96624a56bd078437bca8184e78163e5039ad19",
+  "source_path": "geojson/ne_110m_admin_0_countries.geojson",
+  "retrieved_at": "2026-07-21",
+  "sha256": "6866c877d39cba9c357620878839b336d569f8c662d3cfab4cb1dbe2d39c977f",
+  "license": "public domain",
+  "purpose": "low-resolution cartographic country lookup for derived Commonworld geographic composition",
+  "boundary_note": "Natural Earth country boundaries are cartographic representations; Commonworld does not treat them as political endorsement or authoritative jurisdictional truth."
+}

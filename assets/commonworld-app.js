@@ -1,6 +1,5 @@
 import { BOOTSTRAP_RECORDS } from './commonworld-bootstrap-catalog.mjs';
 import {
-  COMMONS_TYPE_CODES,
   COMMONS_TYPE_COLOR_TOKENS,
   COMMONS_TYPE_VALUES,
   DEFAULT_CAMERA,
@@ -54,6 +53,8 @@ const SVG_NS = 'http://www.w3.org/2000/svg';
 const LOCAL_FALLBACK_STYLE = Object.freeze({ version: 8, sources: {}, layers: [{ id: 'commonworld-fallback', type: 'background', paint: { 'background-color': '#0d2426' } }] });
 const PRESENTATION_STORAGE_KEY = 'commonworld.presentation';
 const PUBLIC_MAP_SOURCE_ID = 'commonworld-public-representations';
+const COUNTRY_MAP_SOURCE_ID = 'commonworld-country-compositions';
+const COUNTRY_BOUNDARIES_URL = './assets/map/commonworld-country-boundaries.geojson';
 const PUBLIC_MAP_INTERACTIVE_LAYER_IDS = Object.freeze(['commonworld-public-extents', 'commonworld-approximate-zones', 'commonworld-exact-anchors']);
 
 const COMMONS_TYPE_COLORS = [
@@ -63,10 +64,6 @@ const COMMONS_TYPE_COLORS = [
 ];
 
 const AGGREGATE_LAYER_CONFIGS = Object.freeze([
-  Object.freeze({
-    id: 'planet', semanticLevel: 'planet', minzoom: 0, maxzoom: 2.8,
-    opacity: Object.freeze(['interpolate', ['linear'], ['zoom'], 0, 0.82, 2.2, 0.82, 2.8, 0]),
-  }),
   Object.freeze({
     id: 'macroregion', semanticLevel: 'macroregion', minzoom: 1.6, maxzoom: 4.3,
     opacity: Object.freeze(['interpolate', ['linear'], ['zoom'], 1.6, 0, 2, 0.84, 3.8, 0.78, 4.3, 0]),
@@ -162,6 +159,9 @@ const runtime = {
   unfilteredPathRecordsCache: null,
   lastPublicMapData: null,
   publicMapUpdateCount: 0,
+  countryBoundaries: null,
+  lastCountryMapData: null,
+  countryMapUpdateCount: 0,
   state: {
     camera: { ...DEFAULT_CAMERA },
     project: null,
@@ -661,6 +661,147 @@ function currentPublicMapData() {
   return runtime.catalogProjection.publicMapFeatureCollection(visibleProjectIds);
 }
 
+function currentCountryMapData() {
+  if (!runtime.catalogProjection || !runtime.countryBoundaries) {
+    return Object.freeze({ type: 'FeatureCollection', features: Object.freeze([]) });
+  }
+  const filtering = Boolean(digitalPathFiltered() || normalizeQuery(runtime.state.query) || hasIntentFilters());
+  const visibleProjectIds = filtering ? visibleRecords().map(({ id }) => id) : null;
+  return runtime.catalogProjection.countryCompositionFeatureCollection(runtime.countryBoundaries, visibleProjectIds);
+}
+
+function parseHexColor(value) {
+  const match = /^#([0-9a-f]{6})$/i.exec(String(value ?? ''));
+  if (!match) return [156, 163, 175, 255];
+  const number = Number.parseInt(match[1], 16);
+  return [(number >> 16) & 255, (number >> 8) & 255, number & 255, 255];
+}
+
+function countryCompositionSegments(key) {
+  return String(key ?? '').split('|').map((segment) => {
+    const separator = segment.lastIndexOf(':');
+    if (separator <= 0) return null;
+    const type = segment.slice(0, separator);
+    const count = Number.parseInt(segment.slice(separator + 1), 10);
+    return COMMONS_TYPE_VALUES.includes(type) && Number.isFinite(count) && count > 0 ? [type, count] : null;
+  }).filter(Boolean);
+}
+
+function countryPatternImage(segments, width = 96, height = 16) {
+  const total = segments.reduce((sum, [, count]) => sum + count, 0);
+  const data = new Uint8Array(width * height * 4);
+  let start = 0;
+  let cumulative = 0;
+  segments.forEach(([type, count], index) => {
+    cumulative += count;
+    const end = index === segments.length - 1 ? width : Math.max(start + 1, Math.round(width * cumulative / total));
+    const [red, green, blue, alpha] = parseHexColor(COMMONS_TYPE_COLOR_TOKENS[type]);
+    for (let y = 0; y < height; y += 1) {
+      for (let x = start; x < Math.min(width, end); x += 1) {
+        const offset = (y * width + x) * 4;
+        data[offset] = red;
+        data[offset + 1] = green;
+        data[offset + 2] = blue;
+        data[offset + 3] = alpha;
+      }
+    }
+    start = Math.min(width, end);
+  });
+  return { width, height, data };
+}
+
+function ensureCountryCompositionPatterns(data) {
+  if (!runtime.map) return;
+  for (const feature of data.features ?? []) {
+    const patternName = feature?.properties?.composition_pattern;
+    if (!patternName || runtime.map.hasImage(patternName)) continue;
+    const segments = countryCompositionSegments(feature?.properties?.composition_key);
+    if (segments.length === 0) continue;
+    runtime.map.addImage(patternName, countryPatternImage(segments), { pixelRatio: 1 });
+  }
+}
+
+function publishCountryMapDiagnostics(data) {
+  elements.stage.dataset.countryMapFeatures = String(data.features.length);
+  elements.stage.dataset.countryMapIds = data.features
+    .map(({ properties }) => properties.country_id)
+    .filter(Boolean)
+    .join(',');
+  elements.stage.dataset.countryMapUpdates = String(runtime.countryMapUpdateCount);
+}
+
+function updateCountryMapData() {
+  if (!runtime.mapReady || !runtime.map || !runtime.countryBoundaries) return;
+  const source = runtime.map.getSource(COUNTRY_MAP_SOURCE_ID);
+  if (!source || typeof source.setData !== 'function') return;
+  const data = currentCountryMapData();
+  ensureCountryCompositionPatterns(data);
+  if (runtime.lastCountryMapData !== data) {
+    source.setData(data);
+    runtime.lastCountryMapData = data;
+    runtime.countryMapUpdateCount += 1;
+  }
+  publishCountryMapDiagnostics(data);
+}
+
+function firstSymbolLayerId() {
+  return runtime.map?.getStyle()?.layers?.find(({ type }) => type === 'symbol')?.id;
+}
+
+function ensureCountryMapLayers() {
+  if (!runtime.map || !runtime.map.isStyleLoaded() || !runtime.countryBoundaries) return;
+  const data = currentCountryMapData();
+  ensureCountryCompositionPatterns(data);
+  if (!runtime.map.getSource(COUNTRY_MAP_SOURCE_ID)) {
+    runtime.map.addSource(COUNTRY_MAP_SOURCE_ID, { type: 'geojson', data });
+    runtime.lastCountryMapData = data;
+    publishCountryMapDiagnostics(data);
+  }
+  const beforeId = firstSymbolLayerId();
+  if (!runtime.map.getLayer('commonworld-country-compositions')) {
+    runtime.map.addLayer({
+      id: 'commonworld-country-compositions',
+      type: 'fill',
+      source: COUNTRY_MAP_SOURCE_ID,
+      minzoom: 0,
+      maxzoom: 3.8,
+      paint: {
+        'fill-pattern': ['image', ['get', 'composition_pattern']],
+        'fill-opacity': ['interpolate', ['linear'], ['zoom'], 0, 0.78, 2.3, 0.72, 3.1, 0.48, 3.8, 0],
+      },
+    }, beforeId);
+  }
+  if (!runtime.map.getLayer('commonworld-country-compositions-outline')) {
+    runtime.map.addLayer({
+      id: 'commonworld-country-compositions-outline',
+      type: 'line',
+      source: COUNTRY_MAP_SOURCE_ID,
+      minzoom: 0,
+      maxzoom: 3.8,
+      paint: {
+        'line-color': 'rgba(245, 243, 233, 0.58)',
+        'line-width': ['interpolate', ['linear'], ['zoom'], 0, 0.5, 3, 1.2],
+        'line-opacity': ['interpolate', ['linear'], ['zoom'], 0, 0.75, 3.2, 0.55, 3.8, 0],
+      },
+    }, beforeId);
+  }
+  updateCountryMapData();
+}
+
+async function loadCountryBoundaries() {
+  if (runtime.countryBoundaries) return runtime.countryBoundaries;
+  const response = await fetch(COUNTRY_BOUNDARIES_URL, { cache: 'force-cache' });
+  if (!response.ok) throw new Error(`Ländergrenzen konnten nicht geladen werden: HTTP ${response.status}`);
+  const boundaries = await response.json();
+  if (boundaries?.type !== 'FeatureCollection' || !Array.isArray(boundaries.features)) {
+    throw new Error('Ländergrenzen haben kein gültiges GeoJSON-FeatureCollection-Format.');
+  }
+  runtime.countryBoundaries = boundaries;
+  elements.stage.dataset.countryMapState = 'ready';
+  if (runtime.mapReady) ensureCountryMapLayers();
+  return boundaries;
+}
+
 function publishPublicMapDiagnostics(data) {
   elements.stage.dataset.publicMapFeatures = String(data.features.length);
   elements.stage.dataset.publicMapProjectIds = String(new Set(
@@ -705,7 +846,6 @@ function renderMapLegend() {
     item.className = 'legend-item';
     const swatch = document.createElement('span');
     swatch.className = 'legend-color';
-    swatch.textContent = COMMONS_TYPE_CODES[type];
     swatch.style.setProperty('--legend-color', COMMONS_TYPE_COLOR_TOKENS[type]);
     swatch.setAttribute('aria-hidden', 'true');
     item.append(swatch, document.createTextNode(commonsTypeLabel(type)));
@@ -730,61 +870,13 @@ function ensureAggregateImpressionLayers(config) {
       maxzoom: config.maxzoom,
       filter: filterFor('aggregate_impression'),
       paint: {
-        'circle-radius': 9,
+        'circle-radius': ['interpolate', ['linear'], ['zoom'], config.minzoom, 6, config.maxzoom, 9],
         'circle-color': COMMONS_TYPE_COLORS,
         'circle-opacity': config.opacity,
-        'circle-stroke-width': 1.25,
+        'circle-blur': 0.12,
+        'circle-stroke-width': 1.15,
         'circle-stroke-color': '#FFFFFF',
-        'circle-stroke-opacity': 0.72,
-      },
-    });
-  }
-
-  const semanticId = prefix + '-semantics';
-  if (!runtime.map.getLayer(semanticId)) {
-    runtime.map.addLayer({
-      id: semanticId,
-      type: 'symbol',
-      source: PUBLIC_MAP_SOURCE_ID,
-      minzoom: config.minzoom,
-      maxzoom: config.maxzoom,
-      filter: filterFor('aggregate_impression'),
-      layout: {
-        'text-field': ['concat', ['get', 'commons_type_code'], '\n', ['get', 'coverage_pattern_label']],
-        'text-size': 7.5,
-        'text-line-height': 0.72,
-        'text-letter-spacing': 0.03,
-        'text-allow-overlap': true,
-        'text-ignore-placement': true,
-      },
-      paint: {
-        'text-color': '#FFFFFF',
-        'text-halo-color': '#102426',
-        'text-halo-width': 1.25,
-        'text-opacity': config.opacity,
-      },
-    });
-  }
-
-  const countId = prefix + '-impression-counts';
-  if (!runtime.map.getLayer(countId)) {
-    runtime.map.addLayer({
-      id: countId,
-      type: 'symbol',
-      source: PUBLIC_MAP_SOURCE_ID,
-      minzoom: config.minzoom,
-      maxzoom: config.maxzoom,
-      filter: filterFor('aggregate_summary'),
-      layout: {
-        'text-field': ['to-string', ['get', 'bucket_identity_count']],
-        'text-size': 10,
-        'text-allow-overlap': false,
-      },
-      paint: {
-        'text-color': '#F5F3E9',
-        'text-halo-color': '#102426',
-        'text-halo-width': 1.5,
-        'text-opacity': config.opacity,
+        'circle-stroke-opacity': 0.62,
       },
     });
   }
@@ -793,21 +885,18 @@ function ensureAggregateImpressionLayers(config) {
   if (!runtime.map.getLayer(privacyId)) {
     runtime.map.addLayer({
       id: privacyId,
-      type: 'symbol',
+      type: 'circle',
       source: PUBLIC_MAP_SOURCE_ID,
       minzoom: config.minzoom,
       maxzoom: config.maxzoom,
       filter: filterFor('aggregate_privacy_notice'),
-      layout: {
-        'text-field': '…',
-        'text-size': 16,
-        'text-allow-overlap': false,
-      },
       paint: {
-        'text-color': COMMONS_TYPE_COLOR_TOKENS.other,
-        'text-halo-color': '#102426',
-        'text-halo-width': 1.5,
-        'text-opacity': config.opacity,
+        'circle-radius': 4,
+        'circle-color': COMMONS_TYPE_COLOR_TOKENS.other,
+        'circle-opacity': config.opacity,
+        'circle-stroke-width': 1,
+        'circle-stroke-color': '#FFFFFF',
+        'circle-stroke-opacity': 0.5,
       },
     });
   }
@@ -821,6 +910,7 @@ function ensurePublicMapLayers() {
     runtime.lastPublicMapData = data;
     publishPublicMapDiagnostics(data);
   }
+  ensureCountryMapLayers();
   for (const config of AGGREGATE_LAYER_CONFIGS) ensureAggregateImpressionLayers(config);
   if (!runtime.map.getLayer('commonworld-public-extents')) {
     runtime.map.addLayer({
@@ -893,48 +983,8 @@ function ensurePublicMapLayers() {
       },
     });
   }
-  if (!runtime.map.getLayer('commonworld-regional-type-codes')) {
-    runtime.map.addLayer({
-      id: 'commonworld-regional-type-codes',
-      type: 'symbol',
-      source: PUBLIC_MAP_SOURCE_ID,
-      minzoom: 3.4,
-      filter: ['any',
-        ['==', ['get', 'representation_kind'], 'approximate_zone'],
-        ['==', ['get', 'representation_kind'], 'public_extent'],
-      ],
-      layout: {
-        'text-field': ['get', 'commons_type_code'],
-        'text-size': 8,
-        'text-allow-overlap': false,
-      },
-      paint: {
-        'text-color': '#FFFFFF',
-        'text-halo-color': '#102426',
-        'text-halo-width': 1.3,
-      },
-    });
-  }
-  if (!runtime.map.getLayer('commonworld-local-type-codes')) {
-    runtime.map.addLayer({
-      id: 'commonworld-local-type-codes',
-      type: 'symbol',
-      source: PUBLIC_MAP_SOURCE_ID,
-      minzoom: 5.5,
-      filter: ['==', ['get', 'representation_kind'], 'exact_anchor'],
-      layout: {
-        'text-field': ['get', 'commons_type_code'],
-        'text-size': 8,
-        'text-allow-overlap': false,
-      },
-      paint: {
-        'text-color': '#FFFFFF',
-        'text-halo-color': '#102426',
-        'text-halo-width': 1.3,
-      },
-    });
-  }
   updatePublicMapData();
+  updateCountryMapData();
   runtime.publicMapInteractiveLayerIds = PUBLIC_MAP_INTERACTIVE_LAYER_IDS.filter((identifier) => runtime.map.getLayer(identifier));
   elements.stage.dataset.publicMapInteractiveLayers = runtime.publicMapInteractiveLayerIds.join(',');
 }
@@ -1533,6 +1583,7 @@ function renderDiscoveryState() {
   syncIntentFilterControls();
   updateSphereResultVisibility();
   updatePublicMapData();
+  updateCountryMapData();
   updateSelectionMarks();
   const visible = visibleRecords();
   const count = visible.length;
@@ -2720,6 +2771,10 @@ async function boot() {
     }
     applyDeepLink(location.search, { initial: true });
     renderDiscoveryState();
+    void loadCountryBoundaries().catch((error) => {
+      elements.stage.dataset.countryMapState = 'failed';
+      console.warn('Commonworld country composition layer unavailable', error);
+    });
     document.documentElement.classList.add('runtime-ready');
 
     // Build and CI compare this generated bootstrap with every canonical CommonProject.

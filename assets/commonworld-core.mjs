@@ -1532,6 +1532,108 @@ export function representativeGeometryPoints(geometry) {
   return Object.freeze(points);
 }
 
+function countryGeometryContainsPoint(geometry, point) {
+  if (!geometry || !point) return false;
+  if (geometry.type === 'Polygon') return pointInPolygonCoordinates(point, geometry.coordinates);
+  if (geometry.type === 'MultiPolygon') {
+    return (Array.isArray(geometry.coordinates) ? geometry.coordinates : [])
+      .some((polygon) => pointInPolygonCoordinates(point, polygon));
+  }
+  return false;
+}
+
+const COUNTRY_APPROXIMATE_COAST_SNAP_MAX_METERS = 150000;
+
+function localMetersFromPoint(coordinate, origin) {
+  const latitudeRadians = origin[1] * Math.PI / 180;
+  let longitudeDelta = coordinate[0] - origin[0];
+  while (longitudeDelta > 180) longitudeDelta -= 360;
+  while (longitudeDelta < -180) longitudeDelta += 360;
+  return [
+    longitudeDelta * Math.cos(latitudeRadians) * 111320,
+    (coordinate[1] - origin[1]) * 110540,
+  ];
+}
+
+function pointToRingDistanceMeters(point, ring) {
+  if (!Array.isArray(ring) || ring.length < 2) return Number.POSITIVE_INFINITY;
+  let minimum = Number.POSITIVE_INFINITY;
+  for (let index = 1; index < ring.length; index += 1) {
+    const start = localMetersFromPoint(ring[index - 1], point);
+    const end = localMetersFromPoint(ring[index], point);
+    const deltaX = end[0] - start[0];
+    const deltaY = end[1] - start[1];
+    const lengthSquared = deltaX * deltaX + deltaY * deltaY;
+    const projection = lengthSquared > 0
+      ? Math.max(0, Math.min(1, -(start[0] * deltaX + start[1] * deltaY) / lengthSquared))
+      : 0;
+    const closestX = start[0] + projection * deltaX;
+    const closestY = start[1] + projection * deltaY;
+    minimum = Math.min(minimum, Math.hypot(closestX, closestY));
+  }
+  return minimum;
+}
+
+function countryGeometryDistanceMeters(geometry, point) {
+  if (countryGeometryContainsPoint(geometry, point)) return 0;
+  const polygons = geometry?.type === 'Polygon'
+    ? [geometry.coordinates]
+    : (geometry?.type === 'MultiPolygon' ? geometry.coordinates : []);
+  let minimum = Number.POSITIVE_INFINITY;
+  for (const polygon of Array.isArray(polygons) ? polygons : []) {
+    for (const ring of Array.isArray(polygon) ? polygon : []) {
+      minimum = Math.min(minimum, pointToRingDistanceMeters(point, ring));
+    }
+  }
+  return minimum;
+}
+
+function approximateCountryFallback(countryEntries, representative) {
+  if (representative?.representationKind !== 'approximate_zone') return null;
+  const publishedUncertainty = Number(representative?.uncertaintyMetersMin);
+  if (!Number.isFinite(publishedUncertainty) || publishedUncertainty <= 0) return null;
+  const maximumDistance = Math.min(publishedUncertainty, COUNTRY_APPROXIMATE_COAST_SNAP_MAX_METERS);
+  const candidates = countryEntries
+    .map((entry) => ({ entry, distance: countryGeometryDistanceMeters(entry.geometry, representative.point) }))
+    .filter(({ distance }) => Number.isFinite(distance) && distance > 0 && distance <= maximumDistance)
+    .sort((left, right) => left.distance - right.distance || left.entry.id.localeCompare(right.entry.id));
+  return candidates[0]?.entry ?? null;
+}
+
+function countryFeatureIdentifier(feature, index) {
+  const properties = feature?.properties ?? {};
+  return String(
+    feature?.id
+    ?? properties.ADM0_A3
+    ?? properties.ISO_A3
+    ?? properties.GU_A3
+    ?? properties.SOV_A3
+    ?? properties.NAME_EN
+    ?? properties.NAME
+    ?? `country-${index}`
+  );
+}
+
+function countryFeatureName(feature, identifier) {
+  const properties = feature?.properties ?? {};
+  return String(properties.NAME_EN ?? properties.NAME_LONG ?? properties.NAME ?? identifier);
+}
+
+function countryBoundaryEntries(countryBoundaries) {
+  const features = Array.isArray(countryBoundaries?.features) ? countryBoundaries.features : [];
+  return features
+    .map((feature, index) => Object.freeze({
+      id: countryFeatureIdentifier(feature, index),
+      name: countryFeatureName(feature, countryFeatureIdentifier(feature, index)),
+      geometry: feature?.geometry,
+    }))
+    .filter(({ geometry }) => geometry?.type === 'Polygon' || geometry?.type === 'MultiPolygon');
+}
+
+function countryCompositionPatternKey(segments) {
+  return segments.map(([type, count]) => `${type}:${count}`).join('|');
+}
+
 function aggregateBucket(point, level) {
   const longitudeIndex = Math.min(
     Math.ceil(360 / level.gridDegrees) - 1,
@@ -1793,6 +1895,104 @@ function buildCatalogProjection(records) {
     level.id,
     buildAggregateBuckets(projectIds, recordsById, representativeLocationsByProjectId, level),
   ]));
+  const countryProjectionCache = new WeakMap();
+
+  function countryProjectionFor(countryBoundaries) {
+    if (!countryBoundaries || typeof countryBoundaries !== 'object') return null;
+    const cached = countryProjectionCache.get(countryBoundaries);
+    if (cached) return cached;
+    const countryEntries = countryBoundaryEntries(countryBoundaries);
+    const contributorsByCountry = new Map(countryEntries.map((entry) => [entry.id, {
+      entry,
+      contributorsByType: new Map(),
+    }]));
+
+    for (const projectId of projectIds) {
+      const record = recordsById.get(projectId);
+      if (!record) continue;
+      const matchedCountryIds = new Set();
+      for (const representative of representativeLocationsByProjectId.get(projectId) ?? []) {
+        const directMatches = countryEntries.filter((entry) => countryGeometryContainsPoint(entry.geometry, representative.point));
+        if (directMatches.length > 0) {
+          for (const entry of directMatches) matchedCountryIds.add(entry.id);
+          continue;
+        }
+        const fallback = approximateCountryFallback(countryEntries, representative);
+        if (fallback) matchedCountryIds.add(fallback.id);
+      }
+      const commonsType = deriveCommonsType(record);
+      for (const countryId of matchedCountryIds) {
+        const country = contributorsByCountry.get(countryId);
+        if (!country) continue;
+        const contributors = country.contributorsByType.get(commonsType) ?? new Set();
+        contributors.add(projectId);
+        country.contributorsByType.set(commonsType, contributors);
+      }
+    }
+
+    const state = Object.freeze({
+      countries: Object.freeze([...contributorsByCountry.values()].filter(({ contributorsByType }) => contributorsByType.size > 0)),
+      collections: new Map(),
+    });
+    countryProjectionCache.set(countryBoundaries, state);
+    return state;
+  }
+
+  function countryCompositionFor(countryBoundaries, visibleProjectIds = null) {
+    const state = countryProjectionFor(countryBoundaries);
+    if (!state) return featureCollection([]);
+    const requested = visibleProjectIds === null || visibleProjectIds === undefined
+      ? null
+      : (visibleProjectIds instanceof Set ? visibleProjectIds : new Set(Array.isArray(visibleProjectIds) ? visibleProjectIds : []));
+    const key = requested === null
+      ? '*'
+      : 'ids:' + projectIds.filter((identifier) => requested.has(identifier)).join('\u001f');
+    const cached = state.collections.get(key);
+    if (cached) {
+      state.collections.delete(key);
+      state.collections.set(key, cached);
+      return cached;
+    }
+    const features = [];
+    for (const { entry, contributorsByType } of state.countries) {
+      const segments = COMMONS_TYPE_VALUES
+        .map((type) => [
+          type,
+          [...(contributorsByType.get(type) ?? [])].filter((projectId) => requested === null || requested.has(projectId)).length,
+        ])
+        .filter(([, count]) => count > 0);
+      if (segments.length === 0) continue;
+      const compositionKey = countryCompositionPatternKey(segments);
+      features.push(Object.freeze({
+        type: 'Feature',
+        id: `country-composition:${entry.id}`,
+        geometry: freezeCatalogSnapshot(entry.geometry),
+        properties: Object.freeze({
+          representation_kind: 'country_composition',
+          semantic_level: 'country',
+          country_id: entry.id,
+          country_name: entry.name,
+          aggregate_only: true,
+          interactive: false,
+          display_basis: 'published_public_geometry_with_low_resolution_country_lookup',
+          coverage_state: 'unassessed',
+          density_claim: false,
+          composition_key: compositionKey,
+          composition_pattern: `commonworld-country-${compositionKey.replace(/[^a-z0-9]+/gi, '-')}`,
+          documented_identity_count: segments.reduce((sum, [, count]) => sum + count, 0),
+          commons_type_count: segments.length,
+        }),
+      }));
+    }
+    const collection = featureCollection(features);
+    while (state.collections.size >= PUBLIC_MAP_COLLECTION_CACHE_LIMIT) {
+      const oldest = state.collections.keys().next().value;
+      if (oldest === undefined) break;
+      state.collections.delete(oldest);
+    }
+    state.collections.set(key, collection);
+    return collection;
+  }
 
   function aggregatesFor(visibleIds) {
     return GEOGRAPHIC_IMPRESSION_LEVELS.flatMap((level) => (
@@ -1834,6 +2034,7 @@ function buildCatalogProjection(records) {
     recordsById,
     relations,
     publicMapFeatureCollection: collectionFor,
+    countryCompositionFeatureCollection: countryCompositionFor,
   });
 }
 
@@ -1850,6 +2051,10 @@ export function prepareCatalogProjection(records) {
 
 export function publicMapFeatureCollection(records, visibleProjectIds = null) {
   return prepareCatalogProjection(records).publicMapFeatureCollection(visibleProjectIds);
+}
+
+export function countryCompositionFeatureCollection(records, countryBoundaries, visibleProjectIds = null) {
+  return prepareCatalogProjection(records).countryCompositionFeatureCollection(countryBoundaries, visibleProjectIds);
 }
 
 export function publicProjectNavigationTarget(publicMapData, projectId) {

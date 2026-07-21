@@ -301,12 +301,12 @@ def render_shell(root: Path = ROOT) -> str:
           <details class="map-legend">
             <summary>Kartenlegende</summary>
             <div class="legend-body">
-              <p class="legend-note">Farbe und Kürzel zeigen die Commons-Art. Kreise bündeln dokumentierte öffentliche Ortsbezüge. Die Katalogabdeckung ist nicht bewertet; die Karte zeigt weder Dichte noch nachgewiesene Leere.</p>
+              <p class="legend-note">Farben zeigen die Commons-Art. In der Weltansicht werden Länder mit den Farben der dort über veröffentlichte Ortsbezüge belegten Commons-Arten anteilig gestreift. Beim Hineinzoomen wird die Darstellung regionaler und schließlich ortsgenau. Die Katalogabdeckung ist nicht bewertet; die Karte zeigt weder Dichte noch nachgewiesene Leere.</p>
               <ul id="commons-type-legend" class="legend-list"></ul>
               <ul class="legend-semantics">
-                <li><span class="legend-semantic-mark legend-semantic-mark--coverage" aria-hidden="true">··</span>Punktmuster: Katalogabdeckung nicht bewertet</li>
-                <li><span class="legend-semantic-mark legend-semantic-mark--count" aria-hidden="true">3</span>Zahl: freigegebene eindeutige Commons im Raster</li>
-                <li><span class="legend-semantic-mark legend-semantic-mark--withheld" aria-hidden="true">…</span>Ungefähre Kleingruppe oder kleiner Filterrest: Zahl und Art aus Datenschutzgründen zurückgehalten</li>
+                <li><span class="legend-semantic-mark legend-semantic-mark--coverage" aria-hidden="true"></span>Länderstreifen: relative Verteilung der dokumentierten Commons-Arten im jeweiligen Land</li>
+                <li><span class="legend-semantic-mark legend-semantic-mark--count" aria-hidden="true"></span>Farbige Kreise: gröbere regionale Bündelung beim Hineinzoomen</li>
+                <li><span class="legend-semantic-mark legend-semantic-mark--withheld" aria-hidden="true"></span>Versteckte Ortsbezüge fließen nicht in die räumliche Darstellung ein</li>
               </ul>
               <p class="legend-precision"><strong>Ortsgenauigkeit:</strong> Punkt = exakt, gestrichelte Fläche = ungefähr, durchgezogene Fläche = veröffentlichte Ausdehnung.</p>
             </div>
