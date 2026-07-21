@@ -1963,6 +1963,7 @@ function buildCatalogProjection(records) {
         .filter(([, count]) => count > 0);
       if (segments.length === 0) continue;
       const compositionKey = countryCompositionPatternKey(segments);
+      const dominantCommonsType = segments.reduce((best, current) => current[1] > best[1] ? current : best, segments[0])[0];
       features.push(Object.freeze({
         type: 'Feature',
         id: `country-composition:${entry.id}`,
@@ -1979,6 +1980,7 @@ function buildCatalogProjection(records) {
           density_claim: false,
           composition_key: compositionKey,
           composition_pattern: `commonworld-country-${compositionKey.replace(/[^a-z0-9]+/gi, '-')}`,
+          dominant_commons_type: dominantCommonsType,
           documented_identity_count: segments.reduce((sum, [, count]) => sum + count, 0),
           commons_type_count: segments.length,
         }),

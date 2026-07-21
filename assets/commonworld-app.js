@@ -55,10 +55,15 @@ const PRESENTATION_STORAGE_KEY = 'commonworld.presentation';
 const PUBLIC_MAP_SOURCE_ID = 'commonworld-public-representations';
 const COUNTRY_MAP_SOURCE_ID = 'commonworld-country-compositions';
 const COUNTRY_BOUNDARIES_URL = './assets/map/commonworld-country-boundaries.geojson';
-const PUBLIC_MAP_INTERACTIVE_LAYER_IDS = Object.freeze(['commonworld-public-extents', 'commonworld-approximate-zones', 'commonworld-exact-anchors']);
+const PUBLIC_MAP_INTERACTIVE_LAYER_IDS = Object.freeze(['commonworld-public-extents', 'commonworld-approximate-zones', 'commonworld-exact-anchor-hit-targets', 'commonworld-exact-anchors']);
 
 const COMMONS_TYPE_COLORS = [
   'match', ['get', 'commons_type'],
+  ...COMMONS_TYPE_VALUES.flatMap((type) => [type, COMMONS_TYPE_COLOR_TOKENS[type]]),
+  COMMONS_TYPE_COLOR_TOKENS.other,
+];
+const COUNTRY_DOMINANT_COLORS = [
+  'match', ['get', 'dominant_commons_type'],
   ...COMMONS_TYPE_VALUES.flatMap((type) => [type, COMMONS_TYPE_COLOR_TOKENS[type]]),
   COMMONS_TYPE_COLOR_TOKENS.other,
 ];
@@ -748,6 +753,19 @@ function ensureCountryMapLayers() {
     publishCountryMapDiagnostics(data);
   }
   const beforeId = firstSymbolLayerId();
+  if (!runtime.map.getLayer('commonworld-country-compositions-base')) {
+    runtime.map.addLayer({
+      id: 'commonworld-country-compositions-base',
+      type: 'fill',
+      source: COUNTRY_MAP_SOURCE_ID,
+      minzoom: 0,
+      maxzoom: 5.5,
+      paint: {
+        'fill-color': COUNTRY_DOMINANT_COLORS,
+        'fill-opacity': ['interpolate', ['linear'], ['zoom'], 0, 0.48, 2.6, 0.44, 3.4, 0.38, 4.5, 0.28, 5.2, 0.12, 5.5, 0],
+      },
+    }, beforeId);
+  }
   if (!runtime.map.getLayer('commonworld-country-compositions')) {
     runtime.map.addLayer({
       id: 'commonworld-country-compositions',
@@ -757,7 +775,7 @@ function ensureCountryMapLayers() {
       maxzoom: 5.5,
       paint: {
         'fill-pattern': ['image', ['get', 'composition_pattern']],
-        'fill-opacity': ['interpolate', ['linear'], ['zoom'], 0, 0.84, 2.6, 0.8, 3.4, 0.72, 4.5, 0.56, 5.2, 0.26, 5.5, 0],
+        'fill-opacity': ['interpolate', ['linear'], ['zoom'], 0, 0.94, 2.6, 0.9, 3.4, 0.82, 4.5, 0.64, 5.2, 0.3, 5.5, 0],
       },
     }, beforeId);
   }
@@ -907,6 +925,21 @@ function ensurePublicMapLayers() {
       },
     });
   }
+  if (!runtime.map.getLayer('commonworld-exact-anchor-hit-targets')) {
+    runtime.map.addLayer({
+      id: 'commonworld-exact-anchor-hit-targets',
+      type: 'circle',
+      source: PUBLIC_MAP_SOURCE_ID,
+      minzoom: 5,
+      filter: ['==', ['get', 'representation_kind'], 'exact_anchor'],
+      paint: {
+        'circle-radius': ['interpolate', ['linear'], ['zoom'], 5, 18, 8, 22, 12, 26],
+        'circle-color': '#FFFFFF',
+        'circle-opacity': 0.01,
+        'circle-stroke-width': 0,
+      },
+    });
+  }
   if (!runtime.map.getLayer('commonworld-exact-anchors')) {
     runtime.map.addLayer({
       id: 'commonworld-exact-anchors',
@@ -915,11 +948,11 @@ function ensurePublicMapLayers() {
       minzoom: 5,
       filter: ['==', ['get', 'representation_kind'], 'exact_anchor'],
       paint: {
-        'circle-radius': ['interpolate', ['linear'], ['zoom'], 5, 4, 8, 7],
+        'circle-radius': ['interpolate', ['linear'], ['zoom'], 5, 7, 8, 10, 12, 13],
         'circle-color': COMMONS_TYPE_COLORS,
         'circle-opacity': 0.94,
         'circle-stroke-color': '#FFFFFF',
-        'circle-stroke-width': 1.5,
+        'circle-stroke-width': 2.25,
       },
     });
   }
