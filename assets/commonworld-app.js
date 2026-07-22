@@ -1509,32 +1509,22 @@ function rebuildSpatialDestinationIndex() {
       type: 'country',
       id: entry.id,
       label: entry.name,
+      contextLabel: 'Land',
       searchText: normalizeSearchText(entry.name),
     }));
   }
   for (const record of runtime.records) {
-    const publicLocations = publicGeographicLocations(record);
-    if (!publicLocations.length) continue;
-    const firstOrigin = representativeGeometryPoint(publicLocations[0].geometry);
-    if (firstOrigin) {
-      destinations.push(Object.freeze({
-        type: 'project',
-        id: `project:${record.id}`,
-        label: record.title,
-        searchText: normalizeSearchText(record.title),
-        projectId: record.id,
-        origin: Object.freeze([...firstOrigin]),
-      }));
-    }
-    for (const location of publicLocations) {
+    for (const location of publicGeographicLocations(record)) {
       const origin = representativeGeometryPoint(location.geometry);
-      if (!origin) continue;
-      const label = location.label?.trim() || record.title;
+      const label = location.label?.trim();
+      if (!origin || !label) continue;
       destinations.push(Object.freeze({
         type: 'place',
         id: `place:${record.id}:${location.id}`,
-        label: label === record.title ? record.title : `${label} · ${record.title}`,
-        searchText: normalizeSearchText(`${label} ${record.title}`),
+        label,
+        contextLabel: label === record.title ? 'Veröffentlichter Ort' : record.title,
+        searchText: normalizeSearchText(label),
+        contextSearchText: normalizeSearchText(record.title),
         projectId: record.id,
         origin: Object.freeze([...origin]),
       }));
@@ -1632,27 +1622,53 @@ function navigateToCountry(identifier) {
   return true;
 }
 
+function spatialDestinationMatchRank(entry, query) {
+  if (entry.searchText === query) return 0;
+  if (entry.searchText.startsWith(query)) return 1;
+  if (entry.searchText.split(/\s+/).some((word) => word.startsWith(query))) return 2;
+  if (entry.contextSearchText?.split(/\s+/).some((word) => word.startsWith(query))) return 3;
+  return Number.POSITIVE_INFINITY;
+}
+
+function closeSpatialDestinationResults() {
+  elements.spatialDestinationResults.replaceChildren();
+  elements.spatialDestinationSearch.setAttribute('aria-expanded', 'false');
+}
+
 function renderSpatialDestinationResults() {
   const query = normalizeSearchText(elements.spatialDestinationSearch.value);
   if (query.length < 2) {
-    elements.spatialDestinationResults.replaceChildren();
+    closeSpatialDestinationResults();
     return;
   }
   const matches = runtime.spatialDestinations
-    .filter((entry) => entry.searchText.includes(query))
-    .sort((left, right) => {
-      const leftStarts = left.searchText.startsWith(query) ? 0 : 1;
-      const rightStarts = right.searchText.startsWith(query) ? 0 : 1;
-      return leftStarts - rightStarts || left.label.localeCompare(right.label, 'de');
-    })
-    .slice(0, 8);
+    .map((entry) => ({ entry, rank: spatialDestinationMatchRank(entry, query) }))
+    .filter(({ rank }) => Number.isFinite(rank))
+    .sort((left, right) => left.rank - right.rank || left.entry.label.localeCompare(right.entry.label, 'de'))
+    .slice(0, 8)
+    .map(({ entry }) => entry);
+  elements.spatialDestinationSearch.setAttribute('aria-expanded', String(matches.length > 0));
   elements.spatialDestinationResults.replaceChildren(...matches.map((entry) => {
     const item = document.createElement('li');
+    item.className = 'spatial-destination-result';
+
+    const copy = document.createElement('div');
+    copy.className = 'spatial-destination-result-copy';
+    const title = document.createElement('strong');
+    title.textContent = entry.label;
+    const context = document.createElement('span');
+    context.textContent = entry.contextLabel;
+    copy.append(title, context);
+
+    const actions = document.createElement('div');
+    actions.className = 'spatial-destination-result-actions';
     const primary = document.createElement('button');
     primary.type = 'button';
     primary.className = 'quiet-button';
-    primary.textContent = entry.type === 'country' ? `${entry.label} · auf Globus zeigen` : `${entry.label} · auf Globus zeigen`;
+    primary.textContent = 'Auf Globus zeigen';
+    primary.setAttribute('aria-label', `${entry.label} auf dem Globus zeigen`);
     primary.addEventListener('click', () => {
+      closeSpatialDestinationResults();
       if (entry.type === 'country') navigateToCountry(entry.id);
       else performSpatialNavigation(entry.projectId);
     });
@@ -1660,13 +1676,22 @@ function renderSpatialDestinationResults() {
     filter.type = 'button';
     filter.className = 'quiet-button';
     if (entry.type === 'country') {
-      filter.textContent = 'Land filtern';
-      filter.addEventListener('click', () => setCountryFilter(entry.id));
+      filter.textContent = 'Commons anzeigen';
+      filter.setAttribute('aria-label', `Commons in ${entry.label} anzeigen`);
+      filter.addEventListener('click', () => {
+        closeSpatialDestinationResults();
+        setCountryFilter(entry.id);
+      });
     } else {
       filter.textContent = 'In der Nähe suchen';
-      filter.addEventListener('click', () => setNearbyFilter(entry.origin));
+      filter.setAttribute('aria-label', `Commons in der Nähe von ${entry.label} suchen`);
+      filter.addEventListener('click', () => {
+        closeSpatialDestinationResults();
+        setNearbyFilter(entry.origin);
+      });
     }
-    item.append(primary, filter);
+    actions.append(primary, filter);
+    item.append(copy, actions);
     return item;
   }));
 }
@@ -2945,6 +2970,26 @@ function wireControls() {
   });
   elements.useCurrentLocation.addEventListener('click', useCurrentLocation);
   elements.spatialDestinationSearch.addEventListener('input', renderSpatialDestinationResults);
+  elements.spatialDestinationSearch.addEventListener('focus', renderSpatialDestinationResults);
+  elements.spatialDestinationSearch.addEventListener('keydown', (event) => {
+    if (event.key === 'Escape') {
+      if (elements.spatialDestinationSearch.getAttribute('aria-expanded') === 'true') {
+        event.preventDefault();
+        event.stopPropagation();
+        closeSpatialDestinationResults();
+      }
+      return;
+    }
+    if (event.key !== 'ArrowDown') return;
+    const firstAction = elements.spatialDestinationResults.querySelector('button');
+    if (!firstAction) return;
+    event.preventDefault();
+    firstAction.focus({ preventScroll: true });
+  });
+  document.addEventListener('pointerdown', (event) => {
+    const container = elements.spatialDestinationSearch.closest('.spatial-destination-search');
+    if (container && !container.contains(event.target)) closeSpatialDestinationResults();
+  });
   elements.countryFilterAction.addEventListener('click', () => {
     const identifier = runtime.countryNavigationId;
     if (!identifier) return;

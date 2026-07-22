@@ -1791,7 +1791,7 @@ async function intentSearchDiscoveryScenario() {
 
 async function spatialDiscoveryFiltersScenario() {
   const privateLocation = { latitude: 52.52, longitude: 13.405 };
-  const run = await newPage({ geolocation: privateLocation, permissions: ['geolocation'] });
+  const run = await newPage({ geolocation: privateLocation, permissions: ['geolocation'], viewportOverride: { width: 1366, height: 1024 }, touch: true });
   await run.page.goto(baseUrl, { waitUntil: 'domcontentloaded' });
   await run.page.waitForSelector('html.runtime-ready');
   await run.page.waitForFunction(() => document.querySelector('.globe-stage')?.dataset.countryMapState === 'ready');
@@ -1804,6 +1804,39 @@ async function spatialDiscoveryFiltersScenario() {
   assert(await run.page.locator('#filter-sections-toggle').getAttribute('aria-expanded') === 'false', 'spatial discovery: collapsed filter aria state is wrong');
   assert(await run.page.locator('#active-filter-chips').evaluate((element) => !element.hidden && !element.closest('#filter-sections')), 'spatial discovery: active filter chip region moved into or disappeared with collapsed controls');
   await run.page.locator('#filter-sections-toggle').click();
+
+  const nearbyControlTopBeforeAutocomplete = await run.page.locator('#filter-nearby-radius').evaluate((element) => element.getBoundingClientRect().top);
+  await run.page.locator('#spatial-destination-search').fill('ham');
+  await run.page.waitForFunction(() => document.querySelectorAll('#spatial-destination-results li').length > 0);
+  const autocompleteState = await run.page.evaluate(() => {
+    const input = document.querySelector('#spatial-destination-search');
+    const results = document.querySelector('#spatial-destination-results');
+    const rows = [...results.querySelectorAll('.spatial-destination-result')];
+    return {
+      text: results.textContent?.toLocaleLowerCase('de') ?? '',
+      position: getComputedStyle(results).position,
+      expanded: input?.getAttribute('aria-expanded'),
+      rowCount: rows.length,
+      actionCounts: rows.map((row) => row.querySelectorAll('.spatial-destination-result-actions button').length),
+      touchHeights: rows.flatMap((row) => [...row.querySelectorAll('.spatial-destination-result-actions button')]).map((button) => button.getBoundingClientRect().height),
+    };
+  });
+  const nearbyControlTopAfterAutocomplete = await run.page.locator('#filter-nearby-radius').evaluate((element) => element.getBoundingClientRect().top);
+  assert(autocompleteState.text.includes('hamburg'), `spatial discovery: location-prefix autocomplete did not find Hamburg (${JSON.stringify(autocompleteState)})`);
+  assert(!autocompleteState.text.includes('sanghams'), `spatial discovery: mid-word project-title match leaked into location autocomplete (${JSON.stringify(autocompleteState)})`);
+  assert(autocompleteState.position === 'absolute', `spatial discovery: location autocomplete is not an overlay (${JSON.stringify(autocompleteState)})`);
+  assert(Math.abs(nearbyControlTopAfterAutocomplete - nearbyControlTopBeforeAutocomplete) < 1, `spatial discovery: autocomplete shifted filter layout (${nearbyControlTopBeforeAutocomplete} -> ${nearbyControlTopAfterAutocomplete})`);
+  assert(autocompleteState.expanded === 'true' && autocompleteState.rowCount > 0, `spatial discovery: autocomplete aria/result state is wrong (${JSON.stringify(autocompleteState)})`);
+  assert(autocompleteState.actionCounts.every((count) => count === 2), `spatial discovery: compact result rows do not expose exactly two actions (${JSON.stringify(autocompleteState)})`);
+  assert(autocompleteState.touchHeights.every((height) => height >= 43.5), `spatial discovery: autocomplete action touch target fell below 44px (${JSON.stringify(autocompleteState)})`);
+  await run.page.locator('#spatial-destination-search').press('ArrowDown');
+  assert(await run.page.evaluate(() => document.activeElement?.closest('.spatial-destination-result-actions') !== null), 'spatial discovery: ArrowDown did not move focus into autocomplete actions');
+  await run.page.locator('#spatial-destination-search').focus();
+  await run.page.locator('#spatial-destination-search').press('Escape');
+  assert(await run.page.locator('#spatial-destination-search').getAttribute('aria-expanded') === 'false', 'spatial discovery: Escape did not close autocomplete');
+  assert(await run.page.locator('#discovery-panel').isVisible(), 'spatial discovery: Escape from autocomplete incorrectly closed discovery panel');
+  await run.page.locator('#spatial-destination-search').fill('');
+  assert(await run.page.locator('#spatial-destination-search').getAttribute('aria-expanded') === 'false', 'spatial discovery: clearing autocomplete did not keep expanded state closed');
 
   const firstCountry = await run.page.locator('#filter-country option').evaluateAll((options) => {
     const option = options.find((candidate) => candidate.value);
@@ -1826,6 +1859,9 @@ async function spatialDiscoveryFiltersScenario() {
   await run.page.locator('#spatial-destination-search').fill('Berlin');
   await run.page.waitForFunction(() => document.querySelectorAll('#spatial-destination-results li').length > 0);
   assert((await run.page.locator('#spatial-destination-results').textContent())?.toLocaleLowerCase('de').includes('berlin'), 'spatial discovery: published Berlin destination is not searchable locally');
+  await run.page.locator('#spatial-destination-search').press('Escape');
+  assert(await run.page.locator('#spatial-destination-search').getAttribute('aria-expanded') === 'false', 'spatial discovery: Berlin autocomplete did not close before continuing to geolocation');
+  assert(await run.page.locator('#discovery-panel').isVisible(), 'spatial discovery: closing Berlin autocomplete incorrectly closed discovery panel');
 
   await run.page.locator('#use-current-location').click();
   await run.page.waitForFunction(() => document.querySelector('#geolocation-status')?.textContent.includes('Standort verwendet'));
