@@ -307,7 +307,7 @@ def render_shell(root: Path = ROOT) -> str:
             <summary>Kartenlegende</summary>
             <div class="legend-body">
               <p class="legend-note">Farben zeigen die Commons-Art. In der Weltansicht werden Länder mit den Farben der dort über veröffentlichte Ortsbezüge belegten Commons-Arten anteilig gestreift. Beim Hineinzoomen wird die Darstellung regionaler und schließlich ortsgenau. Die Katalogabdeckung ist nicht bewertet; die Karte zeigt weder Dichte noch nachgewiesene Leere.</p>
-              <ul id="commons-type-legend" class="legend-list"></ul>
+              <ul id="commons-type-legend" class="legend-list" aria-label="Commons-Arten und Kartenzeichen"></ul>
               <ul class="legend-semantics">
                 <li><span class="legend-semantic-mark legend-semantic-mark--coverage" aria-hidden="true"></span>Länderstreifen: relative Verteilung der dokumentierten Commons-Arten im jeweiligen Land</li>
                 <li><span class="legend-semantic-mark legend-semantic-mark--count" aria-hidden="true"></span>Farbige Kreise: gröbere regionale Bündelung beim Hineinzoomen</li>
