@@ -1,0 +1,124 @@
+{
+  "schema_version": 4,
+  "id": "musicbrainz",
+  "title": "MusicBrainz",
+  "summary": "Eine von einer weltweiten Gemeinschaft gepflegte offene Musik-Enzyklopädie, deren Metadaten gemeinschaftlich ergänzt, geprüft und überwiegend unter offenen Lizenzen bereitgestellt werden.",
+  "themes": [
+    "open-data",
+    "music",
+    "knowledge",
+    "open-source",
+    "commons-governance"
+  ],
+  "actions": [
+    "use",
+    "learn",
+    "contribute"
+  ],
+  "presence": {
+    "geographic": [],
+    "digital": {
+      "available": true,
+      "reach": "global",
+      "label": "Gemeinschaftlich gepflegte offene Musikmetadatenbank",
+      "source_ids": [
+        "musicbrainz-home",
+        "musicbrainz-about"
+      ]
+    }
+  },
+  "activity": {
+    "status": "active",
+    "observed_at": "2026-07-22",
+    "source_ids": [
+      "musicbrainz-home",
+      "musicbrainz-editor-stats"
+    ],
+    "note": "Die offizielle Seite lädt aktuell zur Mitwirkung ein; die Editor-Statistik vom Juli 2026 weist laufende Bearbeitungsaktivität aus."
+  },
+  "provenance": {
+    "sources": [
+      {
+        "id": "musicbrainz-home",
+        "type": "official-source",
+        "label": "MusicBrainz – Homepage",
+        "url": "https://musicbrainz.org/",
+        "retrieved_at": "2026-07-22",
+        "note": "Offizielle Beschreibung der offenen Musik-Enzyklopädie und ihrer globalen Mitwirkung."
+      },
+      {
+        "id": "musicbrainz-about",
+        "type": "official-source",
+        "label": "MusicBrainz – About",
+        "url": "https://musicbrainz.org/doc/About",
+        "retrieved_at": "2026-07-22",
+        "note": "Offizielle Erläuterung der gemeinschaftlichen Pflege und offenen Datenlizenzen."
+      },
+      {
+        "id": "musicbrainz-editor-stats",
+        "type": "official-source",
+        "label": "MusicBrainz – Editor statistics",
+        "url": "https://musicbrainz.org/statistics/editors",
+        "retrieved_at": "2026-07-22",
+        "note": "Offizielle Aktivitätsstatistik der bearbeitenden Gemeinschaft."
+      }
+    ]
+  },
+  "curation": {
+    "state": "listed",
+    "reviewed_by": "Commonworld editorial review",
+    "reviewed_at": "2026-07-22",
+    "next_review_at": "2026-10-22",
+    "notes": "Digitale Commons-Praxis; Betreiberorganisation und Gemeinschaftsdatenbank werden nicht als geografischer Punkt vermischt."
+  },
+  "links": [
+    {
+      "type": "homepage",
+      "label": "MusicBrainz – offizielle Seite",
+      "url": "https://musicbrainz.org/"
+    },
+    {
+      "type": "use",
+      "label": "MusicBrainz nutzen",
+      "url": "https://musicbrainz.org/",
+      "source_ids": [
+        "musicbrainz-home"
+      ]
+    },
+    {
+      "type": "learn",
+      "label": "Über MusicBrainz lesen",
+      "url": "https://musicbrainz.org/doc/About",
+      "source_ids": [
+        "musicbrainz-about"
+      ]
+    },
+    {
+      "type": "contribute",
+      "label": "Zu MusicBrainz beitragen",
+      "url": "https://musicbrainz.org/doc/How_to_Contribute",
+      "source_ids": [
+        "musicbrainz-home"
+      ]
+    }
+  ],
+  "handoff": {
+    "enabled": false
+  },
+  "languages": {
+    "codes": [
+      "en"
+    ],
+    "source_ids": [
+      "musicbrainz-home"
+    ],
+    "note": "Die geprüfte offizielle Hauptoberfläche ist auf Englisch verfügbar."
+  },
+  "access": {
+    "type": "public",
+    "source_ids": [
+      "musicbrainz-about"
+    ],
+    "note": "Lesender Zugang und ein großer Teil der Daten sind öffentlich und offen lizenziert."
+  }
+}

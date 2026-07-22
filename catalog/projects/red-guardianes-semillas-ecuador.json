@@ -1,0 +1,117 @@
+{
+  "schema_version": 4,
+  "id": "red-guardianes-semillas-ecuador",
+  "title": "Red de Guardianes de Semillas del Ecuador",
+  "summary": "Ein ecuadorianisches Netzwerk von Familien und Saatguthütern, das Agrobiodiversität, regeneratives Landmanagement, Saatgutwissen und gemeinschaftliches Lernen miteinander verbindet.",
+  "themes": [
+    "seeds",
+    "agriculture",
+    "agrobiodiversity",
+    "food",
+    "indigenous-knowledge",
+    "commons-governance"
+  ],
+  "actions": [
+    "learn",
+    "contribute",
+    "volunteer",
+    "contact"
+  ],
+  "presence": {
+    "geographic": [],
+    "digital": {
+      "available": true,
+      "reach": "network",
+      "label": "Digitale Lern-, Publikations- und Beteiligungsoberfläche eines landesweiten Saatgutnetzwerks",
+      "source_ids": [
+        "redsemillas-home"
+      ]
+    }
+  },
+  "activity": {
+    "status": "active",
+    "observed_at": "2026-07-22",
+    "source_ids": [
+      "redsemillas-home"
+    ],
+    "note": "Die offizielle Seite war am Prüftag aktuell erreichbar und bot laufende Programme, Publikationen und Beteiligungswege an."
+  },
+  "provenance": {
+    "sources": [
+      {
+        "id": "redsemillas-home",
+        "type": "official-source",
+        "label": "Red de Guardianes de Semillas – offizielle Seite",
+        "url": "https://redsemillas.org/",
+        "retrieved_at": "2026-07-22",
+        "note": "Offizielle Beschreibung des Familiennetzwerks, seiner Saatgutpraxis und digitalen Lern- und Beteiligungsangebote."
+      }
+    ],
+    "uncertainty_note": "Das Netzwerk ist geografisch verteilt; ohne belastbare einzelne Repräsentativgeometrie wird kein Landesmittelpunkt als Projektort ausgegeben."
+  },
+  "curation": {
+    "state": "listed",
+    "reviewed_by": "Commonworld editorial review",
+    "reviewed_at": "2026-07-22",
+    "next_review_at": "2026-10-22",
+    "notes": "Die digitale Präsenz wird ausdrücklich modelliert; dadurch entfällt der frühere Widerspruch einer geographic-only-Darstellung."
+  },
+  "links": [
+    {
+      "type": "homepage",
+      "label": "Red de Guardianes de Semillas – offizielle Seite",
+      "url": "https://redsemillas.org/"
+    },
+    {
+      "type": "learn",
+      "label": "Netzwerk und Saatgutpraxis kennenlernen",
+      "url": "https://redsemillas.org/",
+      "source_ids": [
+        "redsemillas-home"
+      ]
+    },
+    {
+      "type": "contribute",
+      "label": "Programme und Beteiligungswege entdecken",
+      "url": "https://redsemillas.org/",
+      "source_ids": [
+        "redsemillas-home"
+      ]
+    },
+    {
+      "type": "volunteer",
+      "label": "Freiwilligenangebote prüfen",
+      "url": "https://redsemillas.org/",
+      "source_ids": [
+        "redsemillas-home"
+      ]
+    },
+    {
+      "type": "contact",
+      "label": "Netzwerk kontaktieren",
+      "url": "https://redsemillas.org/",
+      "source_ids": [
+        "redsemillas-home"
+      ]
+    }
+  ],
+  "handoff": {
+    "enabled": false
+  },
+  "languages": {
+    "codes": [
+      "es"
+    ],
+    "source_ids": [
+      "redsemillas-home"
+    ],
+    "note": "Die geprüfte offizielle Hauptseite ist auf Spanisch verfügbar."
+  },
+  "access": {
+    "type": "public",
+    "source_ids": [
+      "redsemillas-home"
+    ],
+    "note": "Öffentliche Lern- und Informationsangebote sind frei erreichbar."
+  }
+}

@@ -51,14 +51,14 @@ export const DIGITAL_TAXONOMY = deepFreeze({
     { id: 'cooperation_self_organization', parent_id: DIGITAL_ROOT_ID, type: 'field', label_de: 'Kooperation und Selbstorganisation', order: 4, themes: [] },
     { id: DIGITAL_UNCLASSIFIED_NODE_ID, parent_id: DIGITAL_ROOT_ID, type: 'diagnostic', label_de: 'Unklassifizierte neue Themen', order: 90, themes: [] },
 
-    { id: 'open_knowledge_data', parent_id: 'knowledge_learning_culture', type: 'network', label_de: 'Offenes Wissen und Daten', order: 0, themes: ['knowledge', 'open-data', 'open-knowledge', 'documentation', 'research'] },
+    { id: 'open_knowledge_data', parent_id: 'knowledge_learning_culture', type: 'network', label_de: 'Offenes Wissen und Daten', order: 0, themes: ['knowledge', 'open-data', 'open-knowledge', 'documentation', 'research', 'citizen-science'] },
     { id: 'learning_education', parent_id: 'knowledge_learning_culture', type: 'network', label_de: 'Lernen und Bildung', order: 1, themes: ['education', 'learning', 'open-educational-resources', 'digital-literacy', 'environmental-education'] },
-    { id: 'media_culture', parent_id: 'knowledge_learning_culture', type: 'network', label_de: 'Medien, Archive und Kultur', order: 2, themes: ['open-media', 'creative-commons', 'culture', 'archives'] },
+    { id: 'media_culture', parent_id: 'knowledge_learning_culture', type: 'network', label_de: 'Medien, Archive und Kultur', order: 2, themes: ['open-media', 'creative-commons', 'culture', 'archives', 'music', 'public-domain'] },
     { id: 'knowledge_learning_bridge', parent_id: 'knowledge_learning_culture', type: 'interface', label_de: 'Wissens- und Lernbrücke', order: 3, themes: [] },
 
     { id: 'free_software', parent_id: 'software_tools_production', type: 'network', label_de: 'Freie Software und Infrastruktur', order: 0, themes: ['free-software', 'open-source', 'software-infrastructure', 'infrastructure'] },
     { id: 'open_hardware_production', parent_id: 'software_tools_production', type: 'network', label_de: 'Offene Hardware und Produktion', order: 1, themes: ['open-hardware', 'distributed-manufacturing'] },
-    { id: 'shared_platforms_tools', parent_id: 'software_tools_production', type: 'network', label_de: 'Plattformen und geteilte Werkzeuge', order: 2, themes: ['platform', 'shared-tools', 'tool-sharing', 'repair', 'circular-economy', 'skills'] },
+    { id: 'shared_platforms_tools', parent_id: 'software_tools_production', type: 'network', label_de: 'Plattformen und geteilte Werkzeuge', order: 2, themes: ['platform', 'shared-tools', 'tool-sharing', 'repair', 'circular-economy', 'skills', 'shared-space'] },
     { id: 'knowledge_software_bridge', parent_id: 'software_tools_production', type: 'interface', label_de: 'Daten- und Softwarebrücke', order: 3, themes: [] },
 
     { id: 'community_networks', parent_id: 'communication_networks', type: 'network', label_de: 'Gemeinschaftsnetze', order: 0, themes: ['communication', 'community-network', 'rural-infrastructure', 'digital-equity'] },
@@ -69,12 +69,12 @@ export const DIGITAL_TAXONOMY = deepFreeze({
     { id: 'water_irrigation', parent_id: 'provision_land_ecology', type: 'network', label_de: 'Wasser und Bewässerung', order: 1, themes: ['water', 'irrigation'] },
     { id: 'renewable_energy', parent_id: 'provision_land_ecology', type: 'network', label_de: 'Erneuerbare Energie', order: 2, themes: ['energy', 'renewable-energy'] },
     { id: 'health_software', parent_id: 'provision_land_ecology', type: 'interface', label_de: 'Offene Gesundheitsversorgung', order: 3, themes: ['health'] },
-    { id: 'land_ecology', parent_id: 'provision_land_ecology', type: 'network', label_de: 'Land, Stadtgrün und Ökologie', order: 4, themes: ['urban-gardening', 'biodiversity', 'community-land'] },
+    { id: 'land_ecology', parent_id: 'provision_land_ecology', type: 'network', label_de: 'Land, Stadtgrün und Ökologie', order: 4, themes: ['urban-gardening', 'biodiversity', 'community-land', 'environment'] },
     { id: 'food_distribution_platforms', parent_id: 'provision_land_ecology', type: 'interface', label_de: 'Ernährungsplattformen', order: 5, themes: [] },
     { id: 'energy_cooperatives', parent_id: 'provision_land_ecology', type: 'interface', label_de: 'Energiegenossenschaften', order: 6, themes: ['energy-democracy'] },
     { id: 'watershed_food_systems', parent_id: 'provision_land_ecology', type: 'interface', label_de: 'Wasser- und Ernährungssysteme', order: 7, themes: [] },
 
-    { id: 'cooperative_governance', parent_id: 'cooperation_self_organization', type: 'network', label_de: 'Gemeinschaftliche Governance und Genossenschaften', order: 0, themes: ['commons-governance', 'community-ownership', 'cooperative-economy', 'cooperative'] },
+    { id: 'cooperative_governance', parent_id: 'cooperation_self_organization', type: 'network', label_de: 'Gemeinschaftliche Governance und Genossenschaften', order: 0, themes: ['commons-governance', 'community-ownership', 'cooperative-economy', 'cooperative', 'volunteer-community'] },
     { id: 'civic_technology', parent_id: 'cooperation_self_organization', type: 'interface', label_de: 'Civic Tech und Selbstorganisation', order: 1, themes: ['civic-tech'] },
     { id: 'mutual_local_self_help', parent_id: 'cooperation_self_organization', type: 'network', label_de: 'Nachbarschaft und gegenseitige Hilfe', order: 2, themes: ['mutual-aid', 'neighbourhood'] },
   ],

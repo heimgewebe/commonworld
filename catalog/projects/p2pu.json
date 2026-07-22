@@ -1,0 +1,133 @@
+{
+  "schema_version": 4,
+  "id": "p2pu",
+  "title": "Peer 2 Peer University (P2PU)",
+  "summary": "Ein gemeinnütziges, gemeinschaftlich getragenes Lernnetzwerk, das freie Lernkreise und offene Lernressourcen mit Bibliotheken, Moderatoren und lokalen Gemeinschaften weltweit verbindet.",
+  "themes": [
+    "education",
+    "learning",
+    "open-educational-resources",
+    "knowledge",
+    "community-network"
+  ],
+  "actions": [
+    "use",
+    "learn",
+    "contribute",
+    "volunteer"
+  ],
+  "presence": {
+    "geographic": [],
+    "digital": {
+      "available": true,
+      "reach": "global",
+      "label": "Offene Infrastruktur und Gemeinschaft für Peer-Lernkreise",
+      "source_ids": [
+        "p2pu-about",
+        "p2pu-home"
+      ]
+    }
+  },
+  "activity": {
+    "status": "active",
+    "observed_at": "2026-07-22",
+    "source_ids": [
+      "p2pu-home",
+      "p2pu-community"
+    ],
+    "note": "Die offiziellen Seiten boten am Prüftag laufende Lernkreise, offene Ressourcen und aktive Community-Beteiligung an."
+  },
+  "provenance": {
+    "sources": [
+      {
+        "id": "p2pu-about",
+        "type": "official-source",
+        "label": "P2PU – About",
+        "url": "https://www.p2pu.org/en/about/",
+        "retrieved_at": "2026-07-22",
+        "note": "Offizielle Beschreibung des gemeinnützigen Peer-Lernnetzwerks und seines offenen Wissensansatzes."
+      },
+      {
+        "id": "p2pu-home",
+        "type": "official-source",
+        "label": "P2PU – Homepage",
+        "url": "https://www.p2pu.org/",
+        "retrieved_at": "2026-07-22",
+        "note": "Offizielle aktuelle Einstiegsseite zu Lernkreisen und Mitwirkung."
+      },
+      {
+        "id": "p2pu-community",
+        "type": "official-source",
+        "label": "P2PU Community",
+        "url": "https://community.p2pu.org/",
+        "retrieved_at": "2026-07-22",
+        "note": "Offizielle Community-Oberfläche für Austausch und Beteiligung."
+      }
+    ]
+  },
+  "curation": {
+    "state": "listed",
+    "reviewed_by": "Commonworld editorial review",
+    "reviewed_at": "2026-07-22",
+    "next_review_at": "2026-10-22",
+    "notes": "Das globale Lernnetzwerk wird nicht auf einen Organisationssitz reduziert; lokale Lernkreise bleiben eigenständige, verteilte Praxis."
+  },
+  "links": [
+    {
+      "type": "homepage",
+      "label": "P2PU – offizielle Seite",
+      "url": "https://www.p2pu.org/"
+    },
+    {
+      "type": "use",
+      "label": "P2PU-Lernangebote nutzen",
+      "url": "https://www.p2pu.org/",
+      "source_ids": [
+        "p2pu-home"
+      ]
+    },
+    {
+      "type": "learn",
+      "label": "Über P2PU lesen",
+      "url": "https://www.p2pu.org/en/about/",
+      "source_ids": [
+        "p2pu-about"
+      ]
+    },
+    {
+      "type": "contribute",
+      "label": "Zur P2PU-Community beitragen",
+      "url": "https://community.p2pu.org/",
+      "source_ids": [
+        "p2pu-community"
+      ]
+    },
+    {
+      "type": "volunteer",
+      "label": "Lernkreise und Community unterstützen",
+      "url": "https://www.p2pu.org/",
+      "source_ids": [
+        "p2pu-home"
+      ]
+    }
+  ],
+  "handoff": {
+    "enabled": false
+  },
+  "languages": {
+    "codes": [
+      "en"
+    ],
+    "source_ids": [
+      "p2pu-home"
+    ],
+    "note": "Die geprüften offiziellen Einstiegsseiten sind auf Englisch verfügbar."
+  },
+  "access": {
+    "type": "public",
+    "source_ids": [
+      "p2pu-about"
+    ],
+    "note": "Die Lernressourcen und Community-Einstiege sind öffentlich zugänglich."
+  }
+}

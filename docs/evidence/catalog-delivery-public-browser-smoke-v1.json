@@ -7,7 +7,7 @@
       "directGlobeProjection": true,
       "hiddenUntilCalibrated": true,
       "outerHintRemoved": true,
-      "aggregateRingIdentities": 27,
+      "aggregateRingIdentities": 35,
       "movingRingMatrix": true,
       "unchangedGeometryRepaintSkipped": true
     },
@@ -49,8 +49,8 @@
     {
       "id": "intent-search-discovery",
       "verdict": "PASS",
-      "indexedRecords": 41,
-      "rankedGermanIntentResults": 26,
+      "indexedRecords": 50,
+      "rankedGermanIntentResults": 34,
       "filters": 7,
       "digitalCoordinateFree": true,
       "spatialNavigation": true
@@ -64,7 +64,7 @@
       "filterButtonHeight": 44,
       "ringAnimationName": "none",
       "ringTransform": "none",
-      "ringTextWidth": 707.2813110351562,
+      "ringTextWidth": 772.234375,
       "ringTextHeight": 10,
       "ringTextFontSize": 17,
       "countryRendered": 1
@@ -84,9 +84,9 @@
     {
       "id": "dual-presence-axes",
       "verdict": "PASS",
-      "publicFeatures": 80,
-      "publicIdentities": 21,
-      "digitalIdentities": 27,
+      "publicFeatures": 91,
+      "publicIdentities": 24,
+      "digitalIdentities": 35,
       "unchangedMapUpdatesSkipped": true
     },
     {
@@ -108,7 +108,7 @@
     {
       "id": "layer-journey-moveend-return",
       "verdict": "PASS",
-      "elapsedMs": 1525
+      "elapsedMs": 1727
     },
     {
       "id": "layer-journey-interrupted",
@@ -204,11 +204,11 @@
     }
   ],
   "schema_version": 1,
-  "kind": "catalog-delivery-public-browser-smoke-v1",
+  "kind": "commonworld_catalog_delivery_public_browser_smoke_evidence",
   "binding": {
-    "smoke_script_sha256": "f899f5f137c44da61230b781e8d8585997b937e22cf7a06145394f9b80b95bfb",
+    "smoke_script_sha256": "d93fca7eeeae715127eace6e64d649c3bd56de12e6659194e1607be7f1432cde",
     "smoke_runner_sha256": "522b99b70b1d0064b1d0a31a3a67fdc9a2e73b7408f37d1a4bb303bc360b7556",
-    "first_party_surface_sha256": "2ee196210e11a2f67b1bfb03b51f738986092fbcdb2e8756c56155ba9a19c34e",
+    "first_party_surface_sha256": "2def59c78ae4696ff048702fb1e45409a383e4dd681ed0baa4675258c8673afd",
     "scenario_ids": [
       "startup-and-ring-orbits",
       "ring-orbits-reduced-motion",

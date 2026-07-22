@@ -27,6 +27,8 @@
   "known_current_digital_themes": [
     "agriculture",
     "agrobiodiversity",
+    "circular-economy",
+    "citizen-science",
     "civic-tech",
     "commons-governance",
     "communication",
@@ -42,6 +44,7 @@
     "education",
     "energy",
     "energy-democracy",
+    "environment",
     "federation",
     "food",
     "free-software",
@@ -51,6 +54,7 @@
     "irrigation",
     "knowledge",
     "learning",
+    "music",
     "network",
     "open-data",
     "open-educational-resources",
@@ -60,10 +64,16 @@
     "open-source",
     "platform",
     "protocol",
+    "public-domain",
     "renewable-energy",
+    "repair",
     "rural-infrastructure",
     "seeds",
+    "shared-space",
+    "skills",
     "software-infrastructure",
+    "tool-sharing",
+    "volunteer-community",
     "water"
   ],
   "nodes": [
@@ -134,7 +144,8 @@
         "open-data",
         "open-knowledge",
         "documentation",
-        "research"
+        "research",
+        "citizen-science"
       ]
     },
     {
@@ -161,7 +172,9 @@
         "open-media",
         "creative-commons",
         "culture",
-        "archives"
+        "archives",
+        "music",
+        "public-domain"
       ]
     },
     {
@@ -208,7 +221,8 @@
         "tool-sharing",
         "repair",
         "circular-economy",
-        "skills"
+        "skills",
+        "shared-space"
       ]
     },
     {
@@ -308,7 +322,8 @@
       "themes": [
         "urban-gardening",
         "biodiversity",
-        "community-land"
+        "community-land",
+        "environment"
       ]
     },
     {
@@ -347,7 +362,8 @@
         "commons-governance",
         "community-ownership",
         "cooperative-economy",
-        "cooperative"
+        "cooperative",
+        "volunteer-community"
       ]
     },
     {
