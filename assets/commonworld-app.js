@@ -3124,14 +3124,6 @@ function createMap() {
   });
   runtime.map.addControl(new window.maplibregl.NavigationControl({ visualizePitch: true, showCompass: true }), 'bottom-right');
   bindPublicMapInteractions();
-  const markPrivateCameraRelease = () => {
-    if (runtime.privateCameraActive) runtime.privateCameraReleasePending = true;
-  };
-  const mapCanvas = runtime.map.getCanvas();
-  mapCanvas.addEventListener('pointerdown', markPrivateCameraRelease, { passive: true });
-  mapCanvas.addEventListener('touchstart', markPrivateCameraRelease, { passive: true });
-  mapCanvas.addEventListener('wheel', markPrivateCameraRelease, { passive: true });
-  mapCanvas.addEventListener('keydown', markPrivateCameraRelease);
   runtime.map.on('render', () => {
     runtime.mapRenderCount += 1;
     if (runtime.mapMoving) sampleSphereGeometry();

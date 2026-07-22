@@ -1847,6 +1847,25 @@ async function spatialDiscoveryFiltersScenario() {
   assert(!privacyState.cameraContainsPrivateLocation, `spatial discovery: private geolocation leaked through camera URL (${JSON.stringify(privacyState)})`);
   assert(privacyState.historyNearbyOrigin === null && privacyState.historyNearbyRadiusMeters === null, `spatial discovery: private geolocation leaked into history state (${JSON.stringify(privacyState)})`);
   assert(privacyState.chipCount === 1 && privacyState.badge === '1', `spatial discovery: nearby filter chip/badge missing (${JSON.stringify(privacyState)})`);
+
+  const mapCanvas = run.page.locator('.maplibregl-canvas');
+  const mapCanvasBox = await mapCanvas.boundingBox();
+  assert(mapCanvasBox, 'spatial discovery: map canvas has no interaction bounds');
+  await run.page.mouse.move(mapCanvasBox.x + (mapCanvasBox.width / 2), mapCanvasBox.y + (mapCanvasBox.height / 2));
+  await run.page.mouse.wheel(0, -120);
+  await run.page.waitForTimeout(700);
+  const postInteractionPrivacyState = await run.page.evaluate(({ latitude, longitude }) => {
+    const url = new URL(location.href);
+    const serializedLatitude = Number(url.searchParams.get('lat'));
+    const serializedLongitude = Number(url.searchParams.get('lng'));
+    return {
+      cameraContainsPrivateLocation: Math.abs(serializedLatitude - latitude) < 0.01 && Math.abs(serializedLongitude - longitude) < 0.01,
+      historyNearbyOrigin: history.state?.commonworld?.nearbyOrigin ?? null,
+      historyNearbyRadiusMeters: history.state?.commonworld?.nearbyRadiusMeters ?? null,
+    };
+  }, privateLocation);
+  assert(!postInteractionPrivacyState.cameraContainsPrivateLocation, `spatial discovery: manual map interaction leaked private geolocation through camera URL (${JSON.stringify(postInteractionPrivacyState)})`);
+  assert(postInteractionPrivacyState.historyNearbyOrigin === null && postInteractionPrivacyState.historyNearbyRadiusMeters === null, `spatial discovery: manual map interaction leaked private nearby state into history (${JSON.stringify(postInteractionPrivacyState)})`);
   assert(run.pageErrors.length === 0, `spatial discovery: page errors: ${run.pageErrors.join(' | ')}`);
   assert(run.consoleErrors.length === 0, `spatial discovery: console errors: ${run.consoleErrors.join(' | ')}`);
   results.push({
