@@ -499,15 +499,15 @@
     },
     "proposal_browser_smoke": {
       "verdict": "PASS",
-      "durable_task_id": "7153894fc7a84882a55a4418"
+      "durable_task_id": "9a131872ef1e440fa2e1dc66"
     },
     "focus_overlay_browser_smoke": {
       "verdict": "PASS",
-      "durable_task_id": "7153894fc7a84882a55a4418"
+      "durable_task_id": "a1a44e1b19804c6f8dfc6051"
     },
     "accessibility_modes_browser_smoke": {
       "verdict": "PASS",
-      "durable_task_id": "7153894fc7a84882a55a4418"
+      "durable_task_id": "a1a44e1b19804c6f8dfc6051"
     },
     "catalog_delivery_browser_measurement": {
       "verdict": "PASS",
@@ -527,8 +527,8 @@
         "focus-overlay-browser-smoke",
         "accessibility-modes-browser-smoke"
       ],
-      "durable_task_id": "7153894fc7a84882a55a4418",
-      "lifecycle_receipt_sha256": "32f0d4b23bbd1066a40a830840abbec3399546dfc78cf212087652cb879c8e23"
+      "durable_task_id": "a1a44e1b19804c6f8dfc6051",
+      "lifecycle_receipt_sha256": "d6a711c018c3d2d3b9dcd10b37e44eb9d2e8c64e48a47ba6ad5d9110134693a4"
     }
   },
   "budget_binding": {
