@@ -1,0 +1,244 @@
+{
+  "verdict": "PASS",
+  "scenarios": [
+    {
+      "id": "startup-and-ring-orbits",
+      "verdict": "PASS",
+      "directGlobeProjection": true,
+      "hiddenUntilCalibrated": true,
+      "outerHintRemoved": true,
+      "aggregateRingIdentities": 27,
+      "movingRingMatrix": true,
+      "unchangedGeometryRepaintSkipped": true
+    },
+    {
+      "id": "ring-orbits-reduced-motion",
+      "verdict": "PASS"
+    },
+    {
+      "id": "synthetic-digital-performance",
+      "verdict": "PASS",
+      "cases": [
+        {
+          "size": 500,
+          "treeNodeCount": 529,
+          "rootVisible": 2,
+          "communicationVisible": 1,
+          "boundedIdentityVisible": 48,
+          "fullIdentityCount": 250,
+          "syntheticDomBudget": 51,
+          "treeConstructionDelta": 1
+        },
+        {
+          "size": 5000,
+          "treeNodeCount": 5029,
+          "rootVisible": 2,
+          "communicationVisible": 1,
+          "boundedIdentityVisible": 48,
+          "fullIdentityCount": 2500,
+          "syntheticDomBudget": 51,
+          "treeConstructionDelta": 1
+        }
+      ],
+      "idleOverlayRenderDelta": 0
+    },
+    {
+      "id": "normal",
+      "verdict": "PASS"
+    },
+    {
+      "id": "intent-search-discovery",
+      "verdict": "PASS",
+      "indexedRecords": 41,
+      "rankedGermanIntentResults": 26,
+      "filters": 7,
+      "digitalCoordinateFree": true,
+      "spatialNavigation": true
+    },
+    {
+      "id": "android-globe-ui-alignment",
+      "verdict": "PASS",
+      "filterCenterDeltaX": 0,
+      "filterCenterDeltaY": 0,
+      "filterButtonWidth": 44,
+      "filterButtonHeight": 44,
+      "ringAnimationName": "none",
+      "ringTransform": "none",
+      "ringTextWidth": 707.2813110351562,
+      "ringTextHeight": 10,
+      "ringTextFontSize": 17,
+      "countryRendered": 1
+    },
+    {
+      "id": "intent-search-ipad-portrait",
+      "verdict": "PASS",
+      "minimumControlHeight": 44,
+      "touchFocusRingsHidden": true
+    },
+    {
+      "id": "intent-search-ipad-landscape",
+      "verdict": "PASS",
+      "minimumControlHeight": 44,
+      "touchFocusRingsHidden": true
+    },
+    {
+      "id": "dual-presence-axes",
+      "verdict": "PASS",
+      "publicFeatures": 80,
+      "publicIdentities": 21,
+      "digitalIdentities": 27,
+      "unchangedMapUpdatesSkipped": true
+    },
+    {
+      "id": "layer-journey-desktop",
+      "verdict": "PASS"
+    },
+    {
+      "id": "layer-journey-mobile",
+      "verdict": "PASS"
+    },
+    {
+      "id": "layer-journey-ipad-portrait",
+      "verdict": "PASS"
+    },
+    {
+      "id": "layer-journey-ipad-landscape",
+      "verdict": "PASS"
+    },
+    {
+      "id": "layer-journey-moveend-return",
+      "verdict": "PASS",
+      "elapsedMs": 1633
+    },
+    {
+      "id": "layer-journey-interrupted",
+      "verdict": "PASS"
+    },
+    {
+      "id": "layer-journey-reduced-motion",
+      "verdict": "PASS"
+    },
+    {
+      "id": "legacy-layer-and-atomic-focus",
+      "verdict": "PASS",
+      "backForwardFocus": true,
+      "textHierarchyFocus": true,
+      "keyboardPath": true
+    },
+    {
+      "id": "history-focus-diagnostic-contract",
+      "verdict": "PASS"
+    },
+    {
+      "id": "valid-empty-digital-path",
+      "verdict": "PASS",
+      "pathStable": true,
+      "emptyState": true,
+      "breadcrumbTouchTarget": true
+    },
+    {
+      "id": "external-link-safety",
+      "verdict": "PASS",
+      "canonicalHttpsOnly": true
+    },
+    {
+      "id": "synthetic-catalogue-truth",
+      "verdict": "PASS",
+      "sizes": [
+        500,
+        5000
+      ],
+      "preview": 48,
+      "increment": 48
+    },
+    {
+      "id": "live-ui-hardening",
+      "verdict": "PASS",
+      "landscapeOverview": {
+        "viewport": {
+          "width": 667,
+          "height": 375
+        },
+        "overlapArea": 0,
+        "controlGap": 9.1875,
+        "layerControl": {
+          "left": 455.765625,
+          "top": 70.390625,
+          "right": 603.8125,
+          "bottom": 114.390625,
+          "width": 148.046875,
+          "height": 44
+        },
+        "zoomControl": {
+          "left": 613,
+          "top": 113.40625,
+          "right": 657,
+          "bottom": 157.40625,
+          "width": 44,
+          "height": 44
+        },
+        "minimumCatalogSelectHeight": 44
+      }
+    },
+    {
+      "id": "catalogue-network-blocked",
+      "verdict": "PASS",
+      "blockedCatalogRequests": 0
+    },
+    {
+      "id": "provider-failure",
+      "verdict": "PASS",
+      "applicationWarnings": 1
+    },
+    {
+      "id": "method-desktop",
+      "verdict": "PASS"
+    },
+    {
+      "id": "method-mobile",
+      "verdict": "PASS"
+    },
+    {
+      "id": "method-mobile-text-200",
+      "verdict": "PASS"
+    }
+  ],
+  "schema_version": 1,
+  "kind": "catalog-delivery-public-browser-smoke-v1",
+  "binding": {
+    "smoke_script_sha256": "99018bf749d9d53b469f3d5c023e6bf88b2905053f008c83d81b275a10d96e71",
+    "smoke_runner_sha256": "522b99b70b1d0064b1d0a31a3a67fdc9a2e73b7408f37d1a4bb303bc360b7556",
+    "first_party_surface_sha256": "ec87cb95a37f5f88bd7e705b4e3dea81dab755452c055e3f70d05957e7a5afa8",
+    "scenario_ids": [
+      "startup-and-ring-orbits",
+      "ring-orbits-reduced-motion",
+      "synthetic-digital-performance",
+      "normal",
+      "intent-search-discovery",
+      "android-globe-ui-alignment",
+      "intent-search-ipad-portrait",
+      "intent-search-ipad-landscape",
+      "dual-presence-axes",
+      "layer-journey-desktop",
+      "layer-journey-mobile",
+      "layer-journey-ipad-portrait",
+      "layer-journey-ipad-landscape",
+      "layer-journey-moveend-return",
+      "layer-journey-interrupted",
+      "layer-journey-reduced-motion",
+      "legacy-layer-and-atomic-focus",
+      "history-focus-diagnostic-contract",
+      "valid-empty-digital-path",
+      "external-link-safety",
+      "synthetic-catalogue-truth",
+      "live-ui-hardening",
+      "catalogue-network-blocked",
+      "provider-failure",
+      "method-desktop",
+      "method-mobile",
+      "method-mobile-text-200"
+    ],
+    "freshness_rule": "The official runner must materialize the canonical smoke plan, create a fresh temporary public result and validate exact scenario order, PASS verdicts and zero catalogue requests against this hash-bound evidence.",
+    "smoke_plan_sha256": "6b8749928ead5ef81ee66883e6a2993e756ce083575c3569234bf70526448364"
+  }
+}

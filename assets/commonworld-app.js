@@ -1,10 +1,11 @@
 import { BOOTSTRAP_RECORDS } from './commonworld-bootstrap-catalog.mjs';
 import {
-  COMMONS_TYPE_CODES,
   COMMONS_TYPE_COLOR_TOKENS,
   COMMONS_TYPE_VALUES,
   DEFAULT_CAMERA,
   MAX_MAP_ZOOM,
+  MAP_GEOMETRY_DIAGNOSTIC_SAMPLE_INTERVAL,
+  MAP_GEOMETRY_SAMPLE_INTERVAL_MS,
   binaryName,
   buildDigitalPresentationTree,
   commonsTypeLabel,
@@ -31,11 +32,13 @@ import {
   publicGeographicLocations,
   publicGeographicRepresentationKind,
   publicProjectNavigationTarget,
+  quantizeSpherePixel,
   ribbonRepeatCount,
   ringOrbitDirection,
   ringOrbitDuration,
   ringOrbitStartAngle,
   safeExternalHttpsUrl,
+  sampledDiagnosticPublicationDue,
   searchFromState,
   serializeDigitalPath,
   semanticLocationLine,
@@ -50,38 +53,21 @@ const SVG_NS = 'http://www.w3.org/2000/svg';
 const LOCAL_FALLBACK_STYLE = Object.freeze({ version: 8, sources: {}, layers: [{ id: 'commonworld-fallback', type: 'background', paint: { 'background-color': '#0d2426' } }] });
 const PRESENTATION_STORAGE_KEY = 'commonworld.presentation';
 const PUBLIC_MAP_SOURCE_ID = 'commonworld-public-representations';
-const PUBLIC_MAP_INTERACTIVE_LAYER_IDS = Object.freeze(['commonworld-public-extents', 'commonworld-approximate-zones', 'commonworld-exact-anchors']);
+const COUNTRY_MAP_SOURCE_ID = 'commonworld-country-compositions';
+const COUNTRY_BOUNDARIES_URL = './assets/map/commonworld-country-boundaries.geojson';
+const PUBLIC_MAP_INTERACTIVE_LAYER_IDS = Object.freeze(['commonworld-public-extents', 'commonworld-approximate-zones', 'commonworld-exact-anchor-hit-targets', 'commonworld-exact-anchors']);
 
 const COMMONS_TYPE_COLORS = [
   'match', ['get', 'commons_type'],
   ...COMMONS_TYPE_VALUES.flatMap((type) => [type, COMMONS_TYPE_COLOR_TOKENS[type]]),
   COMMONS_TYPE_COLOR_TOKENS.other,
 ];
-const COMMONS_TYPE_TEXT_COLORS = Object.freeze([
-  'match', ['get', 'commons_type'],
-  'software', '#FFFFFF',
-  '#111827',
-]);
-const COMMONS_TYPE_TEXT_HALOS = Object.freeze([
-  'match', ['get', 'commons_type'],
-  'software', '#102426',
-  '#FFFFFF',
-]);
+const COUNTRY_DOMINANT_COLORS = [
+  'match', ['get', 'dominant_commons_type'],
+  ...COMMONS_TYPE_VALUES.flatMap((type) => [type, COMMONS_TYPE_COLOR_TOKENS[type]]),
+  COMMONS_TYPE_COLOR_TOKENS.other,
+];
 
-const AGGREGATE_LAYER_CONFIGS = Object.freeze([
-  Object.freeze({
-    id: 'planet', semanticLevel: 'planet', minzoom: 0, maxzoom: 2.8,
-    opacity: Object.freeze(['interpolate', ['linear'], ['zoom'], 0, 0.82, 2.2, 0.82, 2.8, 0]),
-  }),
-  Object.freeze({
-    id: 'macroregion', semanticLevel: 'macroregion', minzoom: 1.6, maxzoom: 4.3,
-    opacity: Object.freeze(['interpolate', ['linear'], ['zoom'], 1.6, 0, 2, 0.84, 3.8, 0.78, 4.3, 0]),
-  }),
-  Object.freeze({
-    id: 'region', semanticLevel: 'region', minzoom: 3.1, maxzoom: 5.8,
-    opacity: Object.freeze(['interpolate', ['linear'], ['zoom'], 3.1, 0, 3.5, 0.84, 5.2, 0.76, 5.8, 0]),
-  }),
-]);
 const ACTION_LINK_TYPES = new Set(['visit', 'use', 'borrow', 'learn', 'contribute', 'volunteer', 'donate', 'contact', 'replicate']);
 const INTENT_FILTER_NAMES = Object.freeze(['commons_type', 'presence', 'action', 'language', 'access', 'freshness', 'curation']);
 const DIGITAL_IDENTITY_DOM_LIMIT = 48;
@@ -157,7 +143,6 @@ const elements = {
 
 const FOCUS_OVERLAP_SELECTOR = 'a[href], button:not([disabled]), input:not([disabled]):not([type="hidden"]), select:not([disabled]), textarea:not([disabled]), summary, [role="button"], [tabindex]:not([tabindex="-1"])';
 const FOCUS_OVERLAP_MIN_RATIO = 0.5;
-
 const runtime = {
   map: null,
   records: [],
@@ -169,6 +154,9 @@ const runtime = {
   unfilteredPathRecordsCache: null,
   lastPublicMapData: null,
   publicMapUpdateCount: 0,
+  countryBoundaries: null,
+  lastCountryMapData: null,
+  countryMapUpdateCount: 0,
   state: {
     camera: { ...DEFAULT_CAMERA },
     project: null,
@@ -198,6 +186,12 @@ const runtime = {
   applyingHistory: false,
   mapReady: false,
   mapRenderCount: 0,
+  mapMoving: false,
+  mapGeometryLastAt: 0,
+  mapGeometrySampleCount: 0,
+  sphereGeometryEvaluationCount: 0,
+  sphereGeometryDiagnosticPublishCount: 0,
+  sphereMetrics: { globeDiameter: 0, globeViewportRatio: 0 },
   overlayRenderCount: 0,
   historyTimer: null,
   searchTimer: null,
@@ -211,7 +205,6 @@ const runtime = {
   pendingSpatialProject: null,
   resizeObserver: null,
   orientationResizeObserver: null,
-  catalogDegraded: false,
   mapDegraded: false,
   providerFallbackApplied: false,
   providerErrorLogged: false,
@@ -306,7 +299,6 @@ function setStatus(message, state = 'loading') {
 
 function refreshStatus() {
   const failures = [];
-  if (runtime.catalogDegraded) failures.push('Der Netzabruf des Katalogs ist fehlgeschlagen; die eingebettete, buildgebundene Fassung bleibt bedienbar.');
   if (runtime.mapDegraded) failures.push('Die Basiskarte ist vorübergehend nicht erreichbar; Globuszustand und Textansicht bleiben verfügbar.');
   if (failures.length) {
     setStatus(failures.join(' '), 'degraded');
@@ -330,18 +322,6 @@ function persistPresentation(surface) {
     localStorage.setItem(PRESENTATION_STORAGE_KEY, surface);
   } catch {
     // Private browsing or a storage policy may reject local persistence.
-  }
-}
-
-async function fetchJson(url, timeoutMs = 5000) {
-  const controller = new AbortController();
-  const timeout = window.setTimeout(() => controller.abort(), timeoutMs);
-  try {
-    const response = await fetch(url, { credentials: 'same-origin', headers: { Accept: 'application/json' }, signal: controller.signal });
-    if (!response.ok) throw new Error(`${url}: HTTP ${response.status}`);
-    return response.json();
-  } finally {
-    window.clearTimeout(timeout);
   }
 }
 
@@ -374,14 +354,6 @@ function bootstrapRecords() {
   return validateRecords(BOOTSTRAP_RECORDS);
 }
 
-async function loadRecords() {
-  const manifest = await fetchJson('./catalog/catalog.json');
-  if (!Array.isArray(manifest.project_files) || manifest.project_files.length !== manifest.entry_count) {
-    throw new Error('Katalogmanifest und Eintragszahl stimmen nicht überein.');
-  }
-  return validateRecords(await Promise.all(manifest.project_files.map((path) => fetchJson(`./catalog/${path}`))));
-}
-
 function installRecords(records) {
   runtime.records = records;
   runtime.catalogProjection = prepareCatalogProjection(records);
@@ -390,6 +362,7 @@ function installRecords(records) {
   runtime.recordsById = runtime.catalogProjection.recordsById;
   elements.stage.dataset.searchIndexedRecords = String(runtime.searchIndex.indexedRecordCount);
   elements.stage.dataset.searchIndexedTerms = String(runtime.searchIndex.indexedTermCount);
+  elements.stage.dataset.catalogDelivery = 'build-bound-bootstrap';
   runtime.visibleRecordsCache = null;
   runtime.unfilteredPathRecordsCache = null;
   runtime.lastPublicMapData = null;
@@ -683,6 +656,161 @@ function currentPublicMapData() {
   return runtime.catalogProjection.publicMapFeatureCollection(visibleProjectIds);
 }
 
+function currentCountryMapData() {
+  if (!runtime.catalogProjection || !runtime.countryBoundaries) {
+    return Object.freeze({ type: 'FeatureCollection', features: Object.freeze([]) });
+  }
+  const filtering = Boolean(digitalPathFiltered() || normalizeQuery(runtime.state.query) || hasIntentFilters());
+  const visibleProjectIds = filtering ? visibleRecords().map(({ id }) => id) : null;
+  return runtime.catalogProjection.countryCompositionFeatureCollection(runtime.countryBoundaries, visibleProjectIds);
+}
+
+function parseHexColor(value) {
+  const match = /^#([0-9a-f]{6})$/i.exec(String(value ?? ''));
+  if (!match) return [156, 163, 175, 255];
+  const number = Number.parseInt(match[1], 16);
+  return [(number >> 16) & 255, (number >> 8) & 255, number & 255, 255];
+}
+
+function countryCompositionSegments(key) {
+  return String(key ?? '').split('|').map((segment) => {
+    const separator = segment.lastIndexOf(':');
+    if (separator <= 0) return null;
+    const type = segment.slice(0, separator);
+    const count = Number.parseInt(segment.slice(separator + 1), 10);
+    return COMMONS_TYPE_VALUES.includes(type) && Number.isFinite(count) && count > 0 ? [type, count] : null;
+  }).filter(Boolean);
+}
+
+function countryPatternImage(segments, width = 96, height = 16) {
+  const total = segments.reduce((sum, [, count]) => sum + count, 0);
+  const data = new Uint8Array(width * height * 4);
+  let start = 0;
+  let cumulative = 0;
+  segments.forEach(([type, count], index) => {
+    cumulative += count;
+    const end = index === segments.length - 1 ? width : Math.max(start + 1, Math.round(width * cumulative / total));
+    const [red, green, blue, alpha] = parseHexColor(COMMONS_TYPE_COLOR_TOKENS[type]);
+    for (let y = 0; y < height; y += 1) {
+      for (let x = start; x < Math.min(width, end); x += 1) {
+        const offset = (y * width + x) * 4;
+        data[offset] = red;
+        data[offset + 1] = green;
+        data[offset + 2] = blue;
+        data[offset + 3] = alpha;
+      }
+    }
+    start = Math.min(width, end);
+  });
+  return { width, height, data };
+}
+
+function ensureCountryCompositionPatterns(data) {
+  if (!runtime.map) return;
+  for (const feature of data.features ?? []) {
+    const patternName = feature?.properties?.composition_pattern;
+    if (!patternName || runtime.map.hasImage(patternName)) continue;
+    const segments = countryCompositionSegments(feature?.properties?.composition_key);
+    if (segments.length === 0) continue;
+    runtime.map.addImage(patternName, countryPatternImage(segments), { pixelRatio: 1 });
+  }
+}
+
+function publishCountryMapDiagnostics(data) {
+  elements.stage.dataset.countryMapFeatures = String(data.features.length);
+  elements.stage.dataset.countryMapIds = data.features
+    .map(({ properties }) => properties.country_id)
+    .filter(Boolean)
+    .join(',');
+  elements.stage.dataset.countryMapUpdates = String(runtime.countryMapUpdateCount);
+}
+
+function updateCountryMapData() {
+  if (!runtime.mapReady || !runtime.map || !runtime.countryBoundaries) return;
+  const source = runtime.map.getSource(COUNTRY_MAP_SOURCE_ID);
+  if (!source || typeof source.setData !== 'function') return;
+  const data = currentCountryMapData();
+  ensureCountryCompositionPatterns(data);
+  if (runtime.lastCountryMapData !== data) {
+    source.setData(data);
+    runtime.lastCountryMapData = data;
+    runtime.countryMapUpdateCount += 1;
+  }
+  publishCountryMapDiagnostics(data);
+}
+
+function firstSymbolLayerId() {
+  return runtime.map?.getStyle()?.layers?.find(({ type }) => type === 'symbol')?.id;
+}
+
+function ensureCountryMapLayers() {
+  if (!runtime.map || !runtime.map.isStyleLoaded() || !runtime.countryBoundaries) return;
+  const data = currentCountryMapData();
+  ensureCountryCompositionPatterns(data);
+  if (!runtime.map.getSource(COUNTRY_MAP_SOURCE_ID)) {
+    runtime.map.addSource(COUNTRY_MAP_SOURCE_ID, { type: 'geojson', data });
+    runtime.lastCountryMapData = data;
+    publishCountryMapDiagnostics(data);
+  }
+  const beforeId = firstSymbolLayerId();
+  if (!runtime.map.getLayer('commonworld-country-compositions-base')) {
+    runtime.map.addLayer({
+      id: 'commonworld-country-compositions-base',
+      type: 'fill',
+      source: COUNTRY_MAP_SOURCE_ID,
+      minzoom: 0,
+      maxzoom: 5.5,
+      paint: {
+        'fill-color': COUNTRY_DOMINANT_COLORS,
+        'fill-opacity': ['interpolate', ['linear'], ['zoom'], 0, 0.78, 2.6, 0.74, 3.4, 0.62, 4.5, 0.42, 5.2, 0.18, 5.5, 0],
+      },
+    }, beforeId);
+  }
+  if (!runtime.map.getLayer('commonworld-country-compositions')) {
+    runtime.map.addLayer({
+      id: 'commonworld-country-compositions',
+      type: 'fill',
+      source: COUNTRY_MAP_SOURCE_ID,
+      minzoom: 0,
+      maxzoom: 5.5,
+      paint: {
+        'fill-pattern': ['image', ['get', 'composition_pattern']],
+        'fill-opacity': ['interpolate', ['linear'], ['zoom'], 0, 1, 2.6, 0.98, 3.4, 0.92, 4.5, 0.72, 5.2, 0.34, 5.5, 0],
+      },
+    }, beforeId);
+  }
+  if (!runtime.map.getLayer('commonworld-country-compositions-outline')) {
+    runtime.map.addLayer({
+      id: 'commonworld-country-compositions-outline',
+      type: 'line',
+      source: COUNTRY_MAP_SOURCE_ID,
+      minzoom: 0,
+      maxzoom: 5.5,
+      paint: {
+        'line-color': 'rgba(245, 243, 233, 0.68)',
+        'line-width': ['interpolate', ['linear'], ['zoom'], 0, 0.5, 3, 1.1, 5.2, 1.4],
+        'line-opacity': ['interpolate', ['linear'], ['zoom'], 0, 0.72, 3.4, 0.6, 4.8, 0.38, 5.5, 0],
+      },
+    }, beforeId);
+  }
+  orderPublicMapLayers();
+  updateCountryMapData();
+}
+
+async function loadCountryBoundaries() {
+  if (runtime.countryBoundaries) return runtime.countryBoundaries;
+  const response = await fetch(COUNTRY_BOUNDARIES_URL, { cache: 'force-cache' });
+  if (!response.ok) throw new Error(`Ländergrenzen konnten nicht geladen werden: HTTP ${response.status}`);
+  const boundaries = await response.json();
+  if (boundaries?.type !== 'FeatureCollection' || !Array.isArray(boundaries.features)) {
+    throw new Error('Ländergrenzen haben kein gültiges GeoJSON-FeatureCollection-Format.');
+  }
+  runtime.countryBoundaries = boundaries;
+  elements.stage.dataset.countryMapState = 'ready';
+  if (runtime.mapReady) ensureCountryMapLayers();
+  return boundaries;
+}
+
 function publishPublicMapDiagnostics(data) {
   elements.stage.dataset.publicMapFeatures = String(data.features.length);
   elements.stage.dataset.publicMapProjectIds = String(new Set(
@@ -727,7 +855,6 @@ function renderMapLegend() {
     item.className = 'legend-item';
     const swatch = document.createElement('span');
     swatch.className = 'legend-color';
-    swatch.textContent = COMMONS_TYPE_CODES[type];
     swatch.style.setProperty('--legend-color', COMMONS_TYPE_COLOR_TOKENS[type]);
     swatch.setAttribute('aria-hidden', 'true');
     item.append(swatch, document.createTextNode(commonsTypeLabel(type)));
@@ -735,120 +862,17 @@ function renderMapLegend() {
   }
 }
 
-function ensureAggregateImpressionLayers(config) {
-  const prefix = 'commonworld-' + config.id;
-  const filterFor = (representationKind) => ['all',
-    ['==', ['get', 'representation_kind'], representationKind],
-    ['==', ['get', 'semantic_level'], config.semanticLevel],
-  ];
-
-  const impressionId = prefix + '-impressions';
-  if (!runtime.map.getLayer(impressionId)) {
-    runtime.map.addLayer({
-      id: impressionId,
-      type: 'circle',
-      source: PUBLIC_MAP_SOURCE_ID,
-      minzoom: config.minzoom,
-      maxzoom: config.maxzoom,
-      filter: filterFor('aggregate_impression'),
-      paint: {
-        'circle-radius': 9,
-        'circle-color': COMMONS_TYPE_COLORS,
-        'circle-opacity': config.opacity,
-        'circle-stroke-width': 1.25,
-        'circle-stroke-color': '#FFFFFF',
-        'circle-stroke-opacity': 0.72,
-      },
-    });
-  }
-
-  const semanticId = prefix + '-semantics';
-  if (!runtime.map.getLayer(semanticId)) {
-    runtime.map.addLayer({
-      id: semanticId,
-      type: 'symbol',
-      source: PUBLIC_MAP_SOURCE_ID,
-      minzoom: config.minzoom,
-      maxzoom: config.maxzoom,
-      filter: filterFor('aggregate_impression'),
-      layout: {
-        'text-field': ['concat', ['get', 'commons_type_code'], '\n', ['get', 'coverage_pattern_label']],
-        'text-size': 7.5,
-        'text-line-height': 0.72,
-        'text-letter-spacing': 0.03,
-        'text-allow-overlap': true,
-        'text-ignore-placement': true,
-      },
-      paint: {
-        'text-color': COMMONS_TYPE_TEXT_COLORS,
-        'text-halo-color': COMMONS_TYPE_TEXT_HALOS,
-        'text-halo-width': 1.5,
-        'text-opacity': config.opacity,
-      },
-    });
-  }
-
-  const countId = prefix + '-impression-counts';
-  if (!runtime.map.getLayer(countId)) {
-    runtime.map.addLayer({
-      id: countId,
-      type: 'symbol',
-      source: PUBLIC_MAP_SOURCE_ID,
-      minzoom: config.minzoom,
-      maxzoom: config.maxzoom,
-      filter: filterFor('aggregate_summary'),
-      layout: {
-        'text-field': ['to-string', ['get', 'bucket_identity_count']],
-        'text-size': 10,
-        'text-allow-overlap': false,
-      },
-      paint: {
-        'text-color': '#F5F3E9',
-        'text-halo-color': '#102426',
-        'text-halo-width': 1.5,
-        'text-opacity': config.opacity,
-      },
-    });
-  }
-
-  const privacyId = prefix + '-privacy-withheld';
-  if (!runtime.map.getLayer(privacyId)) {
-    runtime.map.addLayer({
-      id: privacyId,
-      type: 'symbol',
-      source: PUBLIC_MAP_SOURCE_ID,
-      minzoom: config.minzoom,
-      maxzoom: config.maxzoom,
-      filter: filterFor('aggregate_privacy_notice'),
-      layout: {
-        'text-field': '…',
-        'text-size': 16,
-        'text-allow-overlap': false,
-      },
-      paint: {
-        'text-color': COMMONS_TYPE_COLOR_TOKENS.other,
-        'text-halo-color': '#102426',
-        'text-halo-width': 1.5,
-        'text-opacity': config.opacity,
-      },
-    });
-  }
-}
-
 function publicMapLayerOrder() {
-  const aggregateIds = (suffix) => AGGREGATE_LAYER_CONFIGS.map((config) => `commonworld-${config.id}-${suffix}`);
   return [
+    'commonworld-country-compositions-base',
+    'commonworld-country-compositions',
+    'commonworld-country-compositions-outline',
     'commonworld-public-extents',
     'commonworld-approximate-zones',
     'commonworld-public-extents-outline',
     'commonworld-approximate-zones-outline',
-    ...aggregateIds('impressions'),
+    'commonworld-exact-anchor-hit-targets',
     'commonworld-exact-anchors',
-    ...aggregateIds('semantics'),
-    ...aggregateIds('impression-counts'),
-    'commonworld-regional-type-codes',
-    'commonworld-local-type-codes',
-    ...aggregateIds('privacy-withheld'),
   ];
 }
 
@@ -879,7 +903,7 @@ function ensurePublicMapLayers() {
     runtime.lastPublicMapData = data;
     publishPublicMapDiagnostics(data);
   }
-  for (const config of AGGREGATE_LAYER_CONFIGS) ensureAggregateImpressionLayers(config);
+  ensureCountryMapLayers();
   if (!runtime.map.getLayer('commonworld-public-extents')) {
     runtime.map.addLayer({
       id: 'commonworld-public-extents',
@@ -935,65 +959,40 @@ function ensurePublicMapLayers() {
       },
     });
   }
+  if (!runtime.map.getLayer('commonworld-exact-anchor-hit-targets')) {
+    runtime.map.addLayer({
+      id: 'commonworld-exact-anchor-hit-targets',
+      type: 'circle',
+      source: PUBLIC_MAP_SOURCE_ID,
+      minzoom: 5,
+      filter: ['==', ['get', 'representation_kind'], 'exact_anchor'],
+      paint: {
+        'circle-radius': ['interpolate', ['linear'], ['zoom'], 5, 18, 8, 22, 12, 26],
+        'circle-color': '#FFFFFF',
+        'circle-opacity': 0.01,
+        'circle-stroke-width': 0,
+      },
+    });
+  }
   if (!runtime.map.getLayer('commonworld-exact-anchors')) {
     runtime.map.addLayer({
       id: 'commonworld-exact-anchors',
       type: 'circle',
       source: PUBLIC_MAP_SOURCE_ID,
-      minzoom: 5.5,
+      minzoom: 5,
       filter: ['==', ['get', 'representation_kind'], 'exact_anchor'],
       paint: {
-        'circle-radius': ['interpolate', ['linear'], ['zoom'], 5.5, 6, 8, 10],
+        'circle-radius': ['interpolate', ['linear'], ['zoom'], 5, 7, 8, 10, 12, 13],
         'circle-color': COMMONS_TYPE_COLORS,
         'circle-opacity': 0.94,
         'circle-stroke-color': '#FFFFFF',
-        'circle-stroke-width': 1.5,
-      },
-    });
-  }
-  if (!runtime.map.getLayer('commonworld-regional-type-codes')) {
-    runtime.map.addLayer({
-      id: 'commonworld-regional-type-codes',
-      type: 'symbol',
-      source: PUBLIC_MAP_SOURCE_ID,
-      minzoom: 3.4,
-      filter: ['any',
-        ['==', ['get', 'representation_kind'], 'approximate_zone'],
-        ['==', ['get', 'representation_kind'], 'public_extent'],
-      ],
-      layout: {
-        'text-field': ['get', 'commons_type_code'],
-        'text-size': 8,
-        'text-allow-overlap': false,
-      },
-      paint: {
-        'text-color': '#FFFFFF',
-        'text-halo-color': '#102426',
-        'text-halo-width': 1.3,
-      },
-    });
-  }
-  if (!runtime.map.getLayer('commonworld-local-type-codes')) {
-    runtime.map.addLayer({
-      id: 'commonworld-local-type-codes',
-      type: 'symbol',
-      source: PUBLIC_MAP_SOURCE_ID,
-      minzoom: 5.5,
-      filter: ['==', ['get', 'representation_kind'], 'exact_anchor'],
-      layout: {
-        'text-field': ['get', 'commons_type_code'],
-        'text-size': 8,
-        'text-allow-overlap': false,
-      },
-      paint: {
-        'text-color': '#FFFFFF',
-        'text-halo-color': '#102426',
-        'text-halo-width': 1.3,
+        'circle-stroke-width': 2.25,
       },
     });
   }
   orderPublicMapLayers();
   updatePublicMapData();
+  updateCountryMapData();
   runtime.publicMapInteractiveLayerIds = PUBLIC_MAP_INTERACTIVE_LAYER_IDS.filter((identifier) => runtime.map.getLayer(identifier));
   elements.stage.dataset.publicMapInteractiveLayers = runtime.publicMapInteractiveLayerIds.join(',');
 }
@@ -1592,6 +1591,7 @@ function renderDiscoveryState() {
   syncIntentFilterControls();
   updateSphereResultVisibility();
   updatePublicMapData();
+  updateCountryMapData();
   updateSelectionMarks();
   const visible = visibleRecords();
   const count = visible.length;
@@ -1849,7 +1849,12 @@ function setQuery(value, { historyMode = 'replace' } = {}) {
   if (historyMode) runtime.searchTimer = window.setTimeout(() => writeHistory(historyMode), 150);
 }
 
-function setSphereOpacity({ globeDiameter = null, size = null } = {}) {
+/**
+ * Refresh the sphere opacity and hidden-state attribute.
+ *
+ * @returns {boolean} true when a visible DOM property changed.
+ */
+function updateSphereOpacity({ globeDiameter = null, size = null } = {}) {
   const immersive = runtime.state.view === 'layers' || runtime.viewPhase !== 'overview';
   let globeViewportRatio = 0;
   let opacity = 1;
@@ -1860,13 +1865,13 @@ function setSphereOpacity({ globeDiameter = null, size = null } = {}) {
       : Number.NaN;
     const measuredDiameter = Number.isFinite(suppliedDiameter)
       ? suppliedDiameter
-      : Number(elements.stage.dataset.globeDiameter ?? 0);
+      : runtime.sphereMetrics.globeDiameter;
     globeViewportRatio = measuredDiameter / Math.max(1, Math.min(bounds.width, bounds.height));
     opacity = sphereOpacityForGlobeRatio(globeViewportRatio);
   }
   let visualChanged = setStylePropertyIfChanged(elements.sphere, '--sphere-opacity', String(opacity));
   visualChanged = setAttributePresenceIfChanged(elements.sphere, 'data-hidden-local', opacity === 0) || visualChanged;
-  setDatasetIfChanged(elements.stage, 'globeViewportRatio', Number(globeViewportRatio.toFixed(4)));
+  runtime.sphereMetrics.globeViewportRatio = globeViewportRatio;
   return visualChanged;
 }
 
@@ -1875,8 +1880,45 @@ function projectedGlobeGeometry(center, projectedCenter) {
   return projectedGlobeCircle({ center: projectedCenter, horizon });
 }
 
-function updateSphereGeometry() {
+function updateSphereVisuals({ geometry, size }) {
+  const x = `${quantizeSpherePixel(geometry.x)}px`;
+  const y = `${quantizeSpherePixel(geometry.y)}px`;
+  const diameter = `${quantizeSpherePixel(geometry.diameter)}px`;
+  let visualChanged = false;
+  visualChanged = setStylePropertyIfChanged(elements.stage, '--sphere-x', x) || visualChanged;
+  visualChanged = setStylePropertyIfChanged(elements.stage, '--sphere-y', y) || visualChanged;
+  visualChanged = setStylePropertyIfChanged(elements.stage, '--sphere-size', diameter) || visualChanged;
+  runtime.sphereMetrics.globeDiameter = geometry.globeDiameter;
+  visualChanged = updateSphereOpacity({ globeDiameter: geometry.globeDiameter, size }) || visualChanged;
+  return visualChanged;
+}
+
+function publishSphereDiagnostics({ projectedCenter, geometry, sideView, detailLevel }) {
+  runtime.sphereGeometryDiagnosticPublishCount += 1;
+  setDatasetIfChanged(elements.stage, 'mapProjectedCenterX', Number(projectedCenter.x.toFixed(2)));
+  setDatasetIfChanged(elements.stage, 'mapProjectedCenterY', Number(projectedCenter.y.toFixed(2)));
+  setDatasetIfChanged(elements.stage, 'sphereX', quantizeSpherePixel(geometry.x));
+  setDatasetIfChanged(elements.stage, 'sphereY', quantizeSpherePixel(geometry.y));
+  setDatasetIfChanged(elements.stage, 'sphereSize', quantizeSpherePixel(geometry.diameter));
+  setDatasetIfChanged(elements.stage, 'globeDiameter', quantizeSpherePixel(geometry.globeDiameter));
+  setDatasetIfChanged(elements.stage, 'globeGeometrySource', sideView ? 'side-view-layout' : 'maplibre-projected-horizon');
+  setDatasetIfChanged(elements.sphere, 'detailLevel', detailLevel);
+  setDatasetIfChanged(elements.stage, 'sphereDetailLevel', detailLevel);
+  setDatasetIfChanged(elements.stage, 'mapZoom', Number(runtime.map.getZoom().toFixed(4)));
+  setDatasetIfChanged(elements.stage, 'mapRenders', runtime.mapRenderCount);
+  setDatasetIfChanged(
+    elements.stage,
+    'globeViewportRatio',
+    Number(runtime.sphereMetrics.globeViewportRatio.toFixed(4)),
+  );
+  setDatasetIfChanged(elements.stage, 'sphereGeometryCommits', runtime.sphereGeometryCommitCount);
+  setDatasetIfChanged(elements.stage, 'sphereGeometryEvaluations', runtime.sphereGeometryEvaluationCount);
+  setDatasetIfChanged(elements.stage, 'sphereGeometryDiagnosticPublishes', runtime.sphereGeometryDiagnosticPublishCount);
+}
+
+function updateSphereGeometry({ publishDiagnostics = true } = {}) {
   if (!runtime.mapReady || elements.globeSurface.hidden) return;
+  runtime.sphereGeometryEvaluationCount += 1;
   const size = currentStageSize();
   const padding = typeof runtime.map.getPadding === 'function' ? runtime.map.getPadding() : {};
   // Camera flights keep the MapLibre-projected overview geometry; side layout is
@@ -1892,32 +1934,35 @@ function updateSphereGeometry() {
     globe,
     sideView,
   });
-  const x = String(geometry.x) + 'px';
-  const y = String(geometry.y) + 'px';
-  const diameter = String(geometry.diameter) + 'px';
-  let visualChanged = false;
-  visualChanged = setStylePropertyIfChanged(elements.stage, '--sphere-x', x) || visualChanged;
-  visualChanged = setStylePropertyIfChanged(elements.stage, '--sphere-y', y) || visualChanged;
-  visualChanged = setStylePropertyIfChanged(elements.stage, '--sphere-size', diameter) || visualChanged;
-  visualChanged = setStylePropertyIfChanged(elements.sphere, '--sphere-x', x) || visualChanged;
-  visualChanged = setStylePropertyIfChanged(elements.sphere, '--sphere-y', y) || visualChanged;
-  visualChanged = setStylePropertyIfChanged(elements.sphere, '--sphere-size', diameter) || visualChanged;
-  setDatasetIfChanged(elements.stage, 'mapProjectedCenterX', Number(projectedCenter.x.toFixed(2)));
-  setDatasetIfChanged(elements.stage, 'mapProjectedCenterY', Number(projectedCenter.y.toFixed(2)));
-  setDatasetIfChanged(elements.stage, 'sphereX', geometry.x);
-  setDatasetIfChanged(elements.stage, 'sphereY', geometry.y);
-  setDatasetIfChanged(elements.stage, 'sphereSize', geometry.diameter);
-  setDatasetIfChanged(elements.stage, 'globeDiameter', geometry.globeDiameter);
-  setDatasetIfChanged(elements.stage, 'globeGeometrySource', sideView ? 'side-view-layout' : 'maplibre-projected-horizon');
   const detailLevel = sphereDetailLevel({ diameter: geometry.diameter, sideView });
-  visualChanged = setDatasetIfChanged(elements.sphere, 'detailLevel', detailLevel) || visualChanged;
-  setDatasetIfChanged(elements.stage, 'sphereDetailLevel', detailLevel);
-  setDatasetIfChanged(elements.stage, 'mapZoom', Number(runtime.map.getZoom().toFixed(4)));
-  visualChanged = setSphereOpacity({ globeDiameter: geometry.globeDiameter, size }) || visualChanged;
-  if (visualChanged) {
-    runtime.sphereGeometryCommitCount += 1;
-    setDatasetIfChanged(elements.stage, 'sphereGeometryCommits', runtime.sphereGeometryCommitCount);
+  const visualChanged = updateSphereVisuals({ geometry, size });
+  if (visualChanged) runtime.sphereGeometryCommitCount += 1;
+  if (publishDiagnostics) {
+    publishSphereDiagnostics({
+      projectedCenter,
+      geometry,
+      sideView,
+      detailLevel,
+    });
   }
+}
+
+function sampleSphereGeometry(timestamp = performance.now()) {
+  if (!runtime.mapReady) return;
+  const delta = timestamp - runtime.mapGeometryLastAt;
+  if (delta < MAP_GEOMETRY_SAMPLE_INTERVAL_MS) return;
+  runtime.mapGeometryLastAt = timestamp;
+  runtime.mapGeometrySampleCount += 1;
+  const publishDiagnostics = sampledDiagnosticPublicationDue(
+    runtime.mapGeometrySampleCount,
+    MAP_GEOMETRY_DIAGNOSTIC_SAMPLE_INTERVAL,
+  );
+  updateSphereGeometry({ publishDiagnostics });
+}
+
+function flushSphereGeometry() {
+  runtime.mapGeometryLastAt = performance.now();
+  updateSphereGeometry();
 }
 
 function layerCamera(camera = null) {
@@ -2076,7 +2121,7 @@ function setViewPhase(phase) {
     elements.stage.dataset.layerReturnStartedAt = elements.stage.dataset.viewPhaseStartedAt;
   }
   updateSphereGeometry();
-  if (!runtime.mapReady) setSphereOpacity();
+  if (!runtime.mapReady) updateSphereOpacity();
 }
 
 function showLayerState() {
@@ -2314,7 +2359,7 @@ function setPresentation(surface, { historyMode = 'push', persist = true } = {})
     ensureMap();
     window.setTimeout(() => {
       runtime.map?.resize();
-      updateSphereGeometry();
+      flushSphereGeometry();
     }, 0);
   }
   if (historyMode) writeHistory(historyMode);
@@ -2541,7 +2586,7 @@ function wireControls() {
     if (runtime.resizeObserver) return;
     runtime.stageSize = null;
     runtime.map?.resize();
-    updateSphereGeometry();
+    flushSphereGeometry();
   });
 }
 
@@ -2615,13 +2660,20 @@ function createMap() {
   bindPublicMapInteractions();
   runtime.map.on('render', () => {
     runtime.mapRenderCount += 1;
-    elements.stage.dataset.mapRenders = String(runtime.mapRenderCount);
-    updateSphereGeometry();
+    if (runtime.mapMoving) sampleSphereGeometry();
   });
-  runtime.map.on('movestart', () => { elements.stage.dataset.mapMoving = 'true'; });
+  runtime.map.on('movestart', () => {
+    runtime.mapMoving = true;
+    elements.stage.dataset.mapMoving = 'true';
+    // The first moving render samples immediately after this reset. Sampling here
+    // would still observe the pre-move camera and delay the first useful frame.
+    runtime.mapGeometryLastAt = 0;
+    runtime.mapGeometrySampleCount = 0;
+  });
   runtime.map.on('moveend', () => {
+    runtime.mapMoving = false;
     delete elements.stage.dataset.mapMoving;
-    updateSphereGeometry();
+    flushSphereGeometry();
     updateSemanticLocationLine();
     scheduleCameraHistory();
   });
@@ -2637,7 +2689,7 @@ function createMap() {
     if (runtime.mapReady && !runtime.map.getSource(PUBLIC_MAP_SOURCE_ID)) ensurePublicMapLayers();
     scheduleFocusOverlapInteractivity();
     if (runtime.mapReady && elements.stage.dataset.visualReady !== 'true') {
-      updateSphereGeometry();
+      flushSphereGeometry();
       elements.stage.dataset.visualReady = 'true';
     }
   });
@@ -2647,13 +2699,13 @@ function createMap() {
     ensurePublicMapLayers();
     if (runtime.state.view === 'layers') openLayerView({ historyMode: null, cameraState: runtime.state.camera, instant: true });
     else applyCamera(runtime.state.camera, { instant: true });
-    updateSphereGeometry();
+    flushSphereGeometry();
     updateSemanticLocationLine();
     scheduleFocusOverlapInteractivity();
     refreshStatus();
     window.setTimeout(() => {
       if (!runtime.mapReady || elements.stage.dataset.visualReady === 'true') return;
-      updateSphereGeometry();
+      flushSphereGeometry();
       elements.stage.dataset.visualReady = 'true';
     }, 1200);
     if (runtime.pendingSpatialProject) performSpatialNavigation(runtime.pendingSpatialProject);
@@ -2664,7 +2716,7 @@ function createMap() {
       const box = entry?.contentRect;
       if (!box || !setStageSizeIfChanged(box.width, box.height)) return;
       runtime.map?.resize();
-      updateSphereGeometry();
+      flushSphereGeometry();
     });
     runtime.resizeObserver.observe(elements.stage);
   }
@@ -2727,18 +2779,14 @@ async function boot() {
     }
     applyDeepLink(location.search, { initial: true });
     renderDiscoveryState();
+    void loadCountryBoundaries().catch((error) => {
+      elements.stage.dataset.countryMapState = 'failed';
+      console.warn('Commonworld country composition layer unavailable', error);
+    });
     document.documentElement.classList.add('runtime-ready');
 
-    try {
-      const fetched = await loadRecords();
-      if (JSON.stringify(fetched) !== JSON.stringify(embedded)) {
-        throw new Error('Netzkatalog und buildgebundener Katalog unterscheiden sich.');
-      }
-    } catch (error) {
-      runtime.catalogDegraded = true;
-      console.warn('Commonworld catalogue verification degraded; using build-bound bootstrap', error);
-      refreshStatus();
-    }
+    // Build and CI compare this generated bootstrap with every canonical CommonProject.
+    // The browser therefore does not download the same 41 records a second time.
   } catch (error) {
     console.error(error);
     setStatus('Commonworld konnte auch den buildgebundenen Katalog nicht lesen.', 'failed');

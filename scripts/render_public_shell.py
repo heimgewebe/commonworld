@@ -3,6 +3,7 @@
 
 from __future__ import annotations
 
+import hashlib
 import html
 import json
 import sys
@@ -27,6 +28,10 @@ ORBIT_PROFILES = (
     (280, 262, 78),
     (274, 284, -77),
 )
+
+
+def asset_version(relative_path: str, root: Path = ROOT) -> str:
+    return hashlib.sha256((root / relative_path).read_bytes()).hexdigest()[:12]
 
 
 def homepage(record: dict) -> str:
@@ -217,10 +222,10 @@ def render_shell(root: Path = ROOT) -> str:
     <link rel="alternate" type="application/json" href="./catalog/catalog.json" title="Commonworld-Katalog" />
     <link rel="alternate" type="application/schema+json" href="./contracts/commonworld/project.schema.json" title="CommonProject-Schema" />
     <link rel="stylesheet" href="./assets/vendor/maplibre-gl.css" />
-    <link rel="stylesheet" href="./index.css" />
+    <link rel="stylesheet" href="./index.css?v={asset_version('index.css', root)}" />
     <link rel="stylesheet" href="./assets/ipad-layout.css" />
     <script src="./assets/vendor/maplibre-gl.js" defer></script>
-    <script type="module" src="./assets/commonworld-app.js"></script>
+    <script type="module" src="./assets/commonworld-app.js?v={asset_version('assets/commonworld-app.js', root)}"></script>
   </head>
   <body data-presentation="globe">
     <a class="skip-link" href="#text-view">Zur Textansicht springen</a>
@@ -237,7 +242,7 @@ def render_shell(root: Path = ROOT) -> str:
             <input id="commons-search" type="search" inputmode="search" autocomplete="off" placeholder="Was möchtest du tun oder finden?" aria-controls="discovery-list" aria-expanded="false" />
             <button id="search-clear" class="search-clear" type="button" aria-label="Suche leeren" hidden>×</button>
           </div>
-          <button id="filter-toggle" class="icon-button filter-toggle" type="button" aria-label="Suchergebnisse und Filter öffnen" aria-controls="discovery-panel" aria-expanded="false"><span aria-hidden="true">≡</span><span class="filter-toggle-label">Filter</span></button>
+          <button id="filter-toggle" class="icon-button filter-toggle" type="button" aria-label="Suchergebnisse und Filter öffnen" aria-controls="discovery-panel" aria-expanded="false"><span class="filter-toggle-icon" aria-hidden="true"></span><span class="filter-toggle-label">Filter</span></button>
         </div>
         <a class="proposal-link" href="./propose.html"><span class="proposal-symbol" aria-hidden="true">+</span><span class="proposal-label">Commons vorschlagen</span></a>
         <button id="settings-toggle" class="icon-button settings-toggle" type="button" aria-label="Einstellungen öffnen" aria-controls="settings-panel" aria-expanded="false"><span aria-hidden="true">⚙</span></button>
@@ -301,12 +306,12 @@ def render_shell(root: Path = ROOT) -> str:
           <details class="map-legend">
             <summary>Kartenlegende</summary>
             <div class="legend-body">
-              <p class="legend-note">Farbe und Kürzel zeigen die Commons-Art. Kreise bündeln dokumentierte öffentliche Ortsbezüge. Die Katalogabdeckung ist nicht bewertet; die Karte zeigt weder Dichte noch nachgewiesene Leere.</p>
+              <p class="legend-note">Farben zeigen die Commons-Art. In der Weltansicht werden Länder mit den Farben der dort über veröffentlichte Ortsbezüge belegten Commons-Arten anteilig gestreift. Beim Hineinzoomen wird die Darstellung regionaler und schließlich ortsgenau. Die Katalogabdeckung ist nicht bewertet; die Karte zeigt weder Dichte noch nachgewiesene Leere.</p>
               <ul id="commons-type-legend" class="legend-list" aria-label="Commons-Arten und Kartenzeichen"></ul>
               <ul class="legend-semantics">
-                <li><span class="legend-semantic-mark legend-semantic-mark--coverage" aria-hidden="true">··</span>Punktmuster: Katalogabdeckung nicht bewertet</li>
-                <li><span class="legend-semantic-mark legend-semantic-mark--count" aria-hidden="true">3</span>Zahl: freigegebene eindeutige Commons im Raster</li>
-                <li><span class="legend-semantic-mark legend-semantic-mark--withheld" aria-hidden="true">…</span>Ungefähre Kleingruppe oder kleiner Filterrest: Zahl und Art aus Datenschutzgründen zurückgehalten</li>
+                <li><span class="legend-semantic-mark legend-semantic-mark--coverage" aria-hidden="true"></span>Länderstreifen: relative Verteilung der dokumentierten Commons-Arten im jeweiligen Land</li>
+                <li><span class="legend-semantic-mark legend-semantic-mark--count" aria-hidden="true"></span>Farbige Kreise: gröbere regionale Bündelung beim Hineinzoomen</li>
+                <li><span class="legend-semantic-mark legend-semantic-mark--withheld" aria-hidden="true"></span>Versteckte Ortsbezüge fließen nicht in die räumliche Darstellung ein</li>
               </ul>
               <p class="legend-precision"><strong>Ortsgenauigkeit:</strong> Punkt = exakt, gestrichelte Fläche = ungefähr, durchgezogene Fläche = veröffentlichte Ausdehnung.</p>
             </div>
@@ -436,7 +441,7 @@ def render_method(root: Path = ROOT) -> str:
     <meta name="description" content="Methode, Abdeckung, Datenschutz und Betriebsgrenzen von Commonworld." />
     <title>Commonworld — Methode und Grenzen</title>
     <link rel="icon" href="./assets/commonworld-mark.svg" type="image/svg+xml" />
-    <link rel="stylesheet" href="./index.css" />
+    <link rel="stylesheet" href="./index.css?v={asset_version('index.css', root)}" />
   </head>
   <body class="method-page">
     <main>

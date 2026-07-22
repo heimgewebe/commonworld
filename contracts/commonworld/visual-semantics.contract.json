@@ -102,10 +102,13 @@
         ],
         "no_hue_blending": true,
         "text_label_required": true,
-        "non_color_code_required": true,
+        "non_color_code_required": false,
         "coverage_texture_reserved": true,
         "reference_dark_surface": "#111827",
-        "minimum_non_text_contrast_ratio": 3.0
+        "minimum_non_text_contrast_ratio": 3.0,
+        "map_abbreviation_rendering": "forbidden",
+        "accessible_text_equivalent_required": true,
+        "country_composition_rule": "preserve_discrete_hues_as_proportional_stripes_without_blending"
       },
       {
         "id": "commons_family_v1",

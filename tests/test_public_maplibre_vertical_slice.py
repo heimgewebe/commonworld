@@ -1,4 +1,6 @@
+import hashlib
 import json
+import re
 import shutil
 import tempfile
 import unittest
@@ -8,6 +10,7 @@ from scripts.validate_public_maplibre_vertical_slice import (
     CONTRACT_PATH,
     REQUIRED_FILES,
     ROOT,
+    _javascript_function_source,
     validate_public_maplibre_vertical_slice,
 )
 
@@ -37,6 +40,46 @@ class PublicMapLibreVerticalSliceTests(unittest.TestCase):
 
     def test_vertical_slice_validates(self) -> None:
         self.assertEqual([], validate_public_maplibre_vertical_slice(ROOT))
+
+    def test_javascript_function_extraction_ignores_non_code_delimiters(self) -> None:
+        javascript = r'''
+const stringDecoy = "function target() { return 'wrong'; }";
+const templateDecoy = `function target() { return "template wrong"; }`;
+const regexDecoy = /function target\(\) \{ return false; \}/u;
+// function target() { return "line-comment wrong"; }
+/* function target() { return "also wrong"; } */
+function
+  target(
+    value = ")",
+    pattern = /[(){}]/u
+  ) {
+  const singleQuoted = '}';
+  const doubleQuoted = "{";
+  // A comment with a closing brace must not end the function: }
+  /* Nor may a block comment with both delimiters: { } */
+  const template = `raw } ${ { nested: `inner ${"}"}` } } tail {`;
+  return { value, pattern, template };
+}
+function after() { return false; }
+'''
+
+        extracted = _javascript_function_source(javascript, "target")
+
+        self.assertTrue(extracted.startswith("function\n  target("))
+        self.assertIn("return { value, pattern, template };", extracted)
+        self.assertNotIn("function after", extracted)
+        self.assertEqual("function after() { return false; }", _javascript_function_source(javascript, "after"))
+
+    def test_javascript_function_extraction_handles_source_start_and_declaration_comments(self) -> None:
+        javascript = "function /* declaration */ target(value = ')') /* body */ { const ratio = object.return / 2; const braces = /[{}]/u; return { ratio, braces }; } function after() {}"
+
+        self.assertEqual(
+            "function /* declaration */ target(value = ')') /* body */ { const ratio = object.return / 2; const braces = /[{}]/u; return { ratio, braces }; }",
+            _javascript_function_source(javascript, "target"),
+        )
+
+    def test_javascript_function_extraction_fails_closed_on_unterminated_body(self) -> None:
+        self.assertEqual("", _javascript_function_source("function target() { const value = '}';", "target"))
 
     def test_rejects_floating_maplibre_version(self) -> None:
         with tempfile.TemporaryDirectory() as directory:
@@ -167,6 +210,133 @@ class PublicMapLibreVerticalSliceTests(unittest.TestCase):
             )
             errors = validate_public_maplibre_vertical_slice(root)
         self.assertTrue(any("one-finger touch movement" in error for error in errors))
+
+    def test_rejects_raw_subpixel_sphere_visuals(self) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            root = self.copy_slice(directory)
+            path = root / "assets/commonworld-app.js"
+            path.write_text(
+                path.read_text(encoding="utf-8").replace(
+                    "`${quantizeSpherePixel(geometry.x)}px`",
+                    "String(geometry.x) + 'px'",
+                    1,
+                ),
+                encoding="utf-8",
+            )
+            errors = validate_public_maplibre_vertical_slice(root)
+        self.assertTrue(any("quantize subpixel geometry" in error for error in errors))
+
+    def test_rejects_duplicate_sphere_geometry_style_writes(self) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            root = self.copy_slice(directory)
+            path = root / "assets/commonworld-app.js"
+            path.write_text(
+                path.read_text(encoding="utf-8").replace(
+                    "  runtime.sphereMetrics.globeDiameter = geometry.globeDiameter;",
+                    "  setStylePropertyIfChanged(elements.sphere, '--sphere-x', x);\n  runtime.sphereMetrics.globeDiameter = geometry.globeDiameter;",
+                    1,
+                ),
+                encoding="utf-8",
+            )
+            errors = validate_public_maplibre_vertical_slice(root)
+        self.assertTrue(any("without duplicate writes" in error for error in errors))
+
+    def test_rejects_raw_sphere_diagnostic_geometry(self) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            root = self.copy_slice(directory)
+            path = root / "assets/commonworld-app.js"
+            path.write_text(
+                path.read_text(encoding="utf-8").replace(
+                    "setDatasetIfChanged(elements.stage, 'sphereX', quantizeSpherePixel(geometry.x));",
+                    "setDatasetIfChanged(elements.stage, 'sphereX', geometry.x);",
+                    1,
+                ),
+                encoding="utf-8",
+            )
+            errors = validate_public_maplibre_vertical_slice(root)
+        self.assertTrue(any("publish quantized geometry" in error for error in errors))
+
+    def test_rejects_sphere_metric_dom_readback(self) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            root = self.copy_slice(directory)
+            path = root / "assets/commonworld-app.js"
+            path.write_text(
+                path.read_text(encoding="utf-8").replace(
+                    "runtime.sphereMetrics.globeDiameter",
+                    "Number(elements . stage . dataset [ 'globeDiameter' ] ?? 0)",
+                    1,
+                ),
+                encoding="utf-8",
+            )
+            errors = validate_public_maplibre_vertical_slice(root)
+        self.assertTrue(any("runtime metrics instead of reading diagnostic DOM state" in error for error in errors))
+
+    def test_accepts_equivalent_sphere_validator_formatting(self) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            root = self.copy_slice(directory)
+            baseline_errors = validate_public_maplibre_vertical_slice(root)
+            path = root / "assets/commonworld-app.js"
+            source = path.read_text(encoding="utf-8")
+            source = source.replace(
+                "quantizeSpherePixel(geometry.x)",
+                "quantizeSpherePixel( geometry . x )",
+                1,
+            )
+            source = source.replace(
+                "runtime.sphereMetrics.globeViewportRatio = globeViewportRatio;",
+                "runtime . sphereMetrics . globeViewportRatio=globeViewportRatio ;",
+                1,
+            )
+            source = source.replace(
+                "Number(runtime.sphereMetrics.globeViewportRatio.toFixed(4))",
+                "Number( runtime . sphereMetrics . globeViewportRatio . toFixed( 4 ) )",
+                1,
+            )
+            source = source.replace(
+                "sampledDiagnosticPublicationDue(",
+                "sampledDiagnosticPublicationDue (",
+                1,
+            )
+            path.write_text(source, encoding="utf-8")
+            app_hash = hashlib.sha256(path.read_bytes()).hexdigest()[:12]
+            index_path = root / "index.html"
+            index_html = index_path.read_text(encoding="utf-8")
+            index_html = re.sub(
+                r'(commonworld-app\.js\?v=)[0-9a-f]{12}',
+                rf'\g<1>{app_hash}',
+                index_html,
+                count=1,
+            )
+            index_path.write_text(index_html, encoding="utf-8")
+            errors = validate_public_maplibre_vertical_slice(root)
+        self.assertEqual(errors, baseline_errors)
+
+    def test_rejects_detached_sphere_viewport_ratio_diagnostics(self) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            root = self.copy_slice(directory)
+            path = root / "assets/commonworld-app.js"
+            path.write_text(
+                path.read_text(encoding="utf-8").replace(
+                    "Number(runtime.sphereMetrics.globeViewportRatio.toFixed(4))",
+                    "Number(globeViewportRatio.toFixed(4))",
+                    1,
+                ),
+                encoding="utf-8",
+            )
+            errors = validate_public_maplibre_vertical_slice(root)
+        self.assertTrue(any("read the runtime viewport ratio" in error for error in errors))
+
+    def test_rejects_inline_sphere_diagnostic_modulo(self) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            root = self.copy_slice(directory)
+            path = root / "assets/commonworld-app.js"
+            source = path.read_text(encoding="utf-8")
+            start = source.index("  const publishDiagnostics = sampledDiagnosticPublicationDue(")
+            end = source.index("  updateSphereGeometry({ publishDiagnostics });", start)
+            source = source[:start] + "  const publishDiagnostics = runtime.mapGeometrySampleCount % MAP_GEOMETRY_DIAGNOSTIC_SAMPLE_INTERVAL === 0;\n" + source[end:]
+            path.write_text(source, encoding="utf-8")
+            errors = validate_public_maplibre_vertical_slice(root)
+        self.assertTrue(any("admitted-sample helper" in error for error in errors))
 
     def test_rejects_nondeterministic_shell_drift(self) -> None:
         with tempfile.TemporaryDirectory() as directory:

@@ -15,6 +15,7 @@ if str(ROOT) not in sys.path:
     sys.path.insert(0, str(ROOT))
 
 from scripts.render_public_shell import render_shell
+from scripts.validate_canonical_plan import validate_browser_smoke_contract
 
 CONTRACT_PATH = Path("contracts/commonworld/public-maplibre-vertical-slice.contract.json")
 RESULT_PATH = Path("docs/research/public-maplibre-vertical-slice-v1.result.json")
@@ -101,6 +102,217 @@ def _urls(value: object) -> list[str]:
     elif isinstance(value, str):
         found.extend(re.findall(r"https://[^\s\"'<>]+", value))
     return found
+
+
+# Bounded lexical scanner for named function declarations; this deliberately avoids
+# a new JavaScript parser dependency while treating non-code delimiters as opaque.
+_JAVASCRIPT_REGEX_PREFIX_KEYWORDS = frozenset({
+    "await",
+    "case",
+    "delete",
+    "do",
+    "else",
+    "in",
+    "instanceof",
+    "new",
+    "of",
+    "return",
+    "throw",
+    "typeof",
+    "void",
+    "yield",
+})
+
+
+def _javascript_identifier_character(character: str) -> bool:
+    return bool(character) and (character.isalnum() or character in "_$")
+
+
+def _javascript_regex_literal_starts(source: str, index: int) -> bool:
+    previous = index - 1
+    while previous >= 0 and source[previous].isspace():
+        previous -= 1
+    if previous < 0:
+        return True
+    if source[previous] in "([{:;,=!?&|~<>":
+        return True
+    if _javascript_identifier_character(source[previous]):
+        start = previous
+        while start >= 0 and _javascript_identifier_character(source[start]):
+            start -= 1
+        keyword = source[start + 1:previous + 1]
+        return keyword in _JAVASCRIPT_REGEX_PREFIX_KEYWORDS and (start < 0 or source[start] != ".")
+    return False
+
+
+def _javascript_quoted_end(source: str, index: int, quote: str) -> int:
+    cursor = index + 1
+    while cursor < len(source):
+        if source[cursor] == "\\":
+            cursor += 2
+        elif source[cursor] == quote:
+            return cursor + 1
+        else:
+            cursor += 1
+    return len(source)
+
+
+def _javascript_line_comment_end(source: str, index: int) -> int:
+    newline = source.find("\n", index + 2)
+    return len(source) if newline < 0 else newline + 1
+
+
+def _javascript_block_comment_end(source: str, index: int) -> int:
+    closing = source.find("*/", index + 2)
+    return len(source) if closing < 0 else closing + 2
+
+
+def _javascript_trivia_end(source: str, index: int) -> int:
+    cursor = index
+    while cursor < len(source):
+        while cursor < len(source) and source[cursor].isspace():
+            cursor += 1
+        if source.startswith("//", cursor):
+            cursor = _javascript_line_comment_end(source, cursor)
+        elif source.startswith("/*", cursor):
+            cursor = _javascript_block_comment_end(source, cursor)
+        else:
+            return cursor
+    return cursor
+
+
+def _javascript_regex_literal_end(source: str, index: int) -> int:
+    cursor = index + 1
+    in_character_class = False
+    while cursor < len(source):
+        character = source[cursor]
+        if character == "\\":
+            cursor += 2
+            continue
+        if character in "\r\n":
+            return index + 1
+        if character == "[":
+            in_character_class = True
+        elif character == "]":
+            in_character_class = False
+        elif character == "/" and not in_character_class:
+            cursor += 1
+            while cursor < len(source) and (source[cursor].isalpha() or source[cursor].isdigit()):
+                cursor += 1
+            return cursor
+        cursor += 1
+    return index + 1
+
+
+def _javascript_template_expression_end(source: str, index: int) -> int:
+    depth = 1
+    cursor = index
+    while cursor < len(source):
+        skipped = _javascript_noncode_end(source, cursor)
+        if skipped is not None:
+            cursor = skipped
+            continue
+        if source[cursor] == "{":
+            depth += 1
+        elif source[cursor] == "}":
+            depth -= 1
+            if depth == 0:
+                return cursor + 1
+        cursor += 1
+    return len(source)
+
+
+def _javascript_template_end(source: str, index: int) -> int:
+    cursor = index + 1
+    while cursor < len(source):
+        if source[cursor] == "\\":
+            cursor += 2
+        elif source[cursor] == "`":
+            return cursor + 1
+        elif source.startswith("${", cursor):
+            cursor = _javascript_template_expression_end(source, cursor + 2)
+        else:
+            cursor += 1
+    return len(source)
+
+
+def _javascript_noncode_end(source: str, index: int) -> int | None:
+    character = source[index]
+    if character in ("'", '"'):
+        return _javascript_quoted_end(source, index, character)
+    if character == "`":
+        return _javascript_template_end(source, index)
+    if source.startswith("//", index):
+        return _javascript_line_comment_end(source, index)
+    if source.startswith("/*", index):
+        return _javascript_block_comment_end(source, index)
+    if character == "/" and _javascript_regex_literal_starts(source, index):
+        return _javascript_regex_literal_end(source, index)
+    return None
+
+
+def _javascript_matching_delimiter(source: str, opening_index: int, opening: str, closing: str) -> int:
+    depth = 0
+    cursor = opening_index
+    while cursor < len(source):
+        skipped = _javascript_noncode_end(source, cursor)
+        if skipped is not None:
+            cursor = skipped
+            continue
+        if source[cursor] == opening:
+            depth += 1
+        elif source[cursor] == closing:
+            depth -= 1
+            if depth == 0:
+                return cursor
+        cursor += 1
+    return -1
+
+
+def _javascript_function_start(source: str, name: str) -> tuple[int, int]:
+    cursor = 0
+    while cursor < len(source):
+        skipped = _javascript_noncode_end(source, cursor)
+        if skipped is not None:
+            cursor = skipped
+            continue
+        if not source.startswith("function", cursor):
+            cursor += 1
+            continue
+        before = source[cursor - 1] if cursor > 0 else ""
+        after_index = cursor + len("function")
+        after = source[after_index] if after_index < len(source) else ""
+        if _javascript_identifier_character(before) or _javascript_identifier_character(after):
+            cursor += 1
+            continue
+        name_start = _javascript_trivia_end(source, after_index)
+        if not source.startswith(name, name_start):
+            cursor += 1
+            continue
+        name_end = name_start + len(name)
+        if name_end < len(source) and _javascript_identifier_character(source[name_end]):
+            cursor += 1
+            continue
+        parameter_start = _javascript_trivia_end(source, name_end)
+        if parameter_start < len(source) and source[parameter_start] == "(":
+            return cursor, parameter_start
+        cursor += 1
+    return -1, -1
+
+
+def _javascript_function_source(source: str, name: str) -> str:
+    start, parameter_start = _javascript_function_start(source, name)
+    if start < 0:
+        return ""
+    parameter_end = _javascript_matching_delimiter(source, parameter_start, "(", ")")
+    if parameter_end < 0:
+        return ""
+
+    opening = _javascript_trivia_end(source, parameter_end + 1)
+    if opening >= len(source) or source[opening] != "{":
+        return ""
+    closing = _javascript_matching_delimiter(source, opening, "{", "}")
+    return "" if closing < 0 else source[start:closing + 1]
 
 
 def _catalog_records(root: Path, manifest: dict) -> list[dict]:
@@ -322,8 +534,7 @@ def validate_public_maplibre_vertical_slice(root: Path = ROOT) -> list[str]:
         errors.append("package.json must contain only the exactly pinned maplibre-gl 5.24.0 runtime dependency")
     if package.get("devDependencies") != {"playwright": "1.61.1"}:
         errors.append("package.json must pin the browser-gate Playwright dependency exactly")
-    if package.get("scripts", {}).get("smoke:browser") != "node scripts/smoke_public_browser.mjs && node scripts/smoke_proposal_browser.mjs && node scripts/smoke_focus_overlay_browser.mjs && node scripts/smoke_accessibility_modes_browser.mjs":
-        errors.append("package.json must expose the bounded browser smoke command")
+    errors.extend(validate_browser_smoke_contract(root, package))
     packages = lock.get("packages", {}) if isinstance(lock.get("packages"), dict) else {}
     root_lock = packages.get("", {}) if isinstance(packages.get(""), dict) else {}
     maplibre_lock = packages.get("node_modules/maplibre-gl", {}) if isinstance(packages.get("node_modules/maplibre-gl"), dict) else {}
@@ -469,9 +680,56 @@ def validate_public_maplibre_vertical_slice(root: Path = ROOT) -> list[str]:
     if re.search(r"cooperativeGestures\s*:\s*true", app):
         errors.append("public mobile globe must allow one-finger touch movement; cooperativeGestures may not be enabled")
 
+    sphere_opacity = _javascript_function_source(app, "updateSphereOpacity")
+    sphere_visuals = _javascript_function_source(app, "updateSphereVisuals")
+    sphere_diagnostics = _javascript_function_source(app, "publishSphereDiagnostics")
+    sphere_sampling = _javascript_function_source(app, "sampleSphereGeometry")
+    if not all((sphere_opacity, sphere_visuals, sphere_diagnostics, sphere_sampling)):
+        errors.append("public sphere performance functions must remain statically inspectable")
+
+    diagnostic_dataset_read = re.compile(
+        r"\belements\s*\.\s*(?:stage|sphere)\s*\.\s*dataset\s*"
+        r"(?:\.\s*(?:globeDiameter|globeViewportRatio|sphereSize|sphereX|sphereY)\b"
+        r"|\[\s*['\"](?:globeDiameter|globeViewportRatio|sphereSize|sphereX|sphereY)['\"]\s*\])"
+    )
+    if diagnostic_dataset_read.search(sphere_opacity):
+        errors.append("sphere opacity must use runtime metrics instead of reading diagnostic DOM state")
+    for property_name in ("--sphere-x", "--sphere-y", "--sphere-size"):
+        duplicate_sphere_write = re.compile(
+            rf"\bsetStylePropertyIfChanged\s*\(\s*elements\s*\.\s*sphere\s*,\s*['\"]{re.escape(property_name)}['\"]"
+        )
+        if duplicate_sphere_write.search(sphere_visuals):
+            errors.append(f"sphere visual geometry must inherit {property_name} from the stage without duplicate writes")
+    for property_name in ("x", "y", "diameter"):
+        quantized_geometry = re.compile(
+            rf"\bquantizeSpherePixel\s*\(\s*geometry\s*\.\s*{property_name}\s*\)"
+        )
+        expression = f"quantizeSpherePixel(geometry.{property_name})"
+        if not quantized_geometry.search(sphere_visuals):
+            errors.append(f"sphere visual hot path must quantize subpixel geometry: {expression}")
+        if not quantized_geometry.search(sphere_diagnostics):
+            errors.append(f"sphere diagnostics must publish quantized geometry: {expression}")
+    if not re.search(
+        r"\bquantizeSpherePixel\s*\(\s*geometry\s*\.\s*globeDiameter\s*\)",
+        sphere_diagnostics,
+    ):
+        errors.append("sphere diagnostics must publish a quantized globe diameter")
+    if not re.search(
+        r"\bruntime\s*\.\s*sphereMetrics\s*\.\s*globeViewportRatio\s*=\s*globeViewportRatio\s*;?",
+        sphere_opacity,
+    ):
+        errors.append("sphere opacity must refresh the full-precision runtime viewport ratio on every evaluation")
+    if not re.search(
+        r"\bNumber\s*\(\s*runtime\s*\.\s*sphereMetrics\s*\.\s*globeViewportRatio"
+        r"\s*\.\s*toFixed\s*\(\s*4\s*\)\s*\)",
+        sphere_diagnostics,
+    ):
+        errors.append("sphere diagnostics must read the runtime viewport ratio and round only during publication")
+    if not re.search(r"\bsampledDiagnosticPublicationDue\s*\(", sphere_sampling):
+        errors.append("sphere diagnostic cadence must use the tested admitted-sample helper")
+
     required_html = (
         '<script src="./assets/vendor/maplibre-gl.js" defer></script>',
-        '<script type="module" src="./assets/commonworld-app.js"></script>',
         'href="./assets/vendor/maplibre-gl.css"',
         'id="map"',
         'id="semantic-level"',
@@ -506,6 +764,14 @@ def validate_public_maplibre_vertical_slice(root: Path = ROOT) -> list[str]:
     for token in required_html:
         if token not in html:
             errors.append(f"public runtime shell missing token: {token}")
+    expected_app_version = _sha256(root / "assets/commonworld-app.js")[:12]
+    expected_css_version = _sha256(root / "index.css")[:12]
+    expected_app_tag = f'<script type="module" src="./assets/commonworld-app.js?v={expected_app_version}"></script>'
+    expected_css_tag = f'href="./index.css?v={expected_css_version}"'
+    if expected_app_tag not in html:
+        errors.append("public runtime shell must bind commonworld-app.js to its deterministic content hash")
+    if expected_css_tag not in html:
+        errors.append("public runtime shell must bind index.css to its deterministic content hash")
     if 'id="catalog-bootstrap"' in html:
         errors.append("public runtime shell must not expose catalog JSON as DOM text")
     if re.search(r"<script(?![^>]+src=)[^>]*>", html, re.IGNORECASE):
@@ -535,7 +801,6 @@ def validate_public_maplibre_vertical_slice(root: Path = ROOT) -> list[str]:
             errors.append("public runtime CSP must not authorize unsafe inline code or eval")
 
     required_app = (
-        "./catalog/catalog.json",
         "new window.maplibregl.Map",
         "setProjection({ type: 'globe' })",
         "runtime.map.easeTo",
@@ -562,6 +827,7 @@ def validate_public_maplibre_vertical_slice(root: Path = ROOT) -> list[str]:
         "overlayRenderCount += 1",
         "./commonworld-bootstrap-catalog.mjs",
         "bootstrapRecords()",
+        "dataset.catalogDelivery = 'build-bound-bootstrap'",
         "verifyMapProvider",
         "degradeMap",
         "mapFailurePolicy",

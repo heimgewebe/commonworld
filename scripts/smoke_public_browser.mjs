@@ -1,6 +1,6 @@
 import { createServer } from 'node:http';
 import { existsSync } from 'node:fs';
-import { readFile, stat } from 'node:fs/promises';
+import { readFile, rename, stat, writeFile } from 'node:fs/promises';
 import path from 'node:path';
 import process from 'node:process';
 import { chromium } from 'playwright';
@@ -9,6 +9,9 @@ import {
   deriveCommonsType,
   deriveDigitalProjectPath,
   deriveLayer,
+  DIGITAL_LAYER_TRANSITION_MS,
+  MAP_GEOMETRY_DIAGNOSTIC_SAMPLE_INTERVAL,
+  MAP_GEOMETRY_SAMPLE_INTERVAL_MS,
   DIGITAL_RING_FIELDS,
   DIGITAL_ROOT_PATH,
   globeHorizonCoordinates,
@@ -20,6 +23,19 @@ import {
 } from '../assets/commonworld-core.mjs';
 
 const ROOT = process.cwd();
+// Allow half a CSS pixel for browser-dependent subpixel rounding of the nominal 48 px lane.
+const MIN_RENDERED_LANE_HEIGHT_PX = 47.5;
+const resultArgumentIndex = process.argv.indexOf('--result');
+const resultPath = resultArgumentIndex >= 0 ? process.argv[resultArgumentIndex + 1] : null;
+if (resultArgumentIndex >= 0 && !resultPath) throw new Error('--result requires a path');
+
+async function writeResult(result) {
+  if (!resultPath) return;
+  const target = path.resolve(resultPath);
+  const temporary = `${target}.tmp-${process.pid}`;
+  await writeFile(temporary, `${JSON.stringify(result, null, 2)}\n`, 'utf8');
+  await rename(temporary, target);
+}
 const MIME = new Map([
   ['.html', 'text/html; charset=utf-8'],
   ['.css', 'text/css; charset=utf-8'],
@@ -410,16 +426,36 @@ async function startupAndRingOrbitScenario() {
   assert(loadingVisual.canvasOpacity === 0, 'startup: uncalibrated globe canvas was exposed ' + JSON.stringify(loadingVisual));
   assert(loadingVisual.projection === 'globe', 'startup: map did not start directly in globe projection ' + JSON.stringify(loadingVisual));
 
-  await run.page.waitForFunction(() => document.querySelector('.globe-stage')?.dataset.visualReady === 'true');
+  try {
+    await run.page.waitForFunction(() => document.querySelector('.globe-stage')?.dataset.visualReady === 'true');
+  } catch (error) {
+    const diagnostic = await run.page.evaluate(() => {
+      const stage = document.querySelector('.globe-stage');
+      return {
+        htmlClass: document.documentElement.className,
+        stageDataset: { ...stage?.dataset },
+        mapReady: Boolean(window.__commonworldTestMap),
+        mapMoving: window.__commonworldTestMap?.isMoving?.() ?? null,
+        mapLoaded: window.__commonworldTestMap?.loaded?.() ?? null,
+      };
+    });
+    throw new Error('startup: map calibration timed out ' + JSON.stringify({ diagnostic, consoleErrors: run.consoleErrors, pageErrors: run.pageErrors, cause: error.message }));
+  }
   await run.page.waitForFunction(() => Number(document.querySelector('.globe-stage')?.dataset.sphereSize ?? 0) > 0);
   assert((await run.page.evaluate(() => window.__commonworldTestMap?.getProjection?.()?.type)) === 'globe', 'startup: active projection changed after map calibration');
   await waitForSphereOpacitySettled(run.page);
 
   const geometryBeforeRepaint = await run.page.evaluate(() => {
     const stage = document.querySelector('.globe-stage');
+    window.__commonworldIdleRepaintRenderCount = 0;
+    window.__commonworldIdleRepaintRenderHandler = () => {
+      window.__commonworldIdleRepaintRenderCount += 1;
+    };
+    window.__commonworldTestMap.on('render', window.__commonworldIdleRepaintRenderHandler);
     return {
-      mapRenders: Number(stage?.dataset.mapRenders ?? 0),
       geometryCommits: Number(stage?.dataset.sphereGeometryCommits ?? 0),
+      geometryEvaluations: Number(stage?.dataset.sphereGeometryEvaluations ?? 0),
+      diagnosticPublishes: Number(stage?.dataset.sphereGeometryDiagnosticPublishes ?? 0),
     };
   });
   await run.page.evaluate(async () => {
@@ -429,19 +465,25 @@ async function startupAndRingOrbitScenario() {
       await new Promise((resolve) => requestAnimationFrame(resolve));
     }
   });
-  await run.page.waitForFunction(
-    (before) => Number(document.querySelector('.globe-stage')?.dataset.mapRenders ?? 0) > before,
-    geometryBeforeRepaint.mapRenders,
-  );
+  await run.page.waitForFunction(() => window.__commonworldIdleRepaintRenderCount > 0);
   await run.page.waitForTimeout(120);
   const geometryAfterRepaint = await run.page.evaluate(() => {
     const stage = document.querySelector('.globe-stage');
+    const renderCount = window.__commonworldIdleRepaintRenderCount;
+    window.__commonworldTestMap.off('render', window.__commonworldIdleRepaintRenderHandler);
+    delete window.__commonworldIdleRepaintRenderHandler;
     return {
-      mapRenders: Number(stage?.dataset.mapRenders ?? 0),
+      idleRepaintRenderCount: renderCount,
       geometryCommits: Number(stage?.dataset.sphereGeometryCommits ?? 0),
+      geometryEvaluations: Number(stage?.dataset.sphereGeometryEvaluations ?? 0),
+      diagnosticPublishes: Number(stage?.dataset.sphereGeometryDiagnosticPublishes ?? 0),
     };
   });
-  assert(geometryAfterRepaint.mapRenders > geometryBeforeRepaint.mapRenders, 'geometry cache: test repaints did not reach MapLibre');
+  const repaintEvaluationDelta = geometryAfterRepaint.geometryEvaluations - geometryBeforeRepaint.geometryEvaluations;
+  const repaintDiagnosticPublishDelta = geometryAfterRepaint.diagnosticPublishes - geometryBeforeRepaint.diagnosticPublishes;
+  assert(geometryAfterRepaint.idleRepaintRenderCount > 0, 'geometry cache: test repaints did not reach MapLibre');
+  assert(repaintEvaluationDelta === 0, 'geometry sampler: idle MapLibre repaints still trigger sphere projection work ' + JSON.stringify({ geometryBeforeRepaint, geometryAfterRepaint }));
+  assert(repaintDiagnosticPublishDelta === 0, 'geometry diagnostics: idle MapLibre repaints still publish DOM metadata ' + JSON.stringify({ geometryBeforeRepaint, geometryAfterRepaint }));
   assert(geometryAfterRepaint.geometryCommits === geometryBeforeRepaint.geometryCommits, 'geometry cache: unchanged repaints rewrote sphere geometry ' + JSON.stringify({ geometryBeforeRepaint, geometryAfterRepaint }));
 
   const removedHint = await run.page.evaluate(() => ({
@@ -663,6 +705,22 @@ async function normalScenario() {
   await run.page.waitForSelector('html.runtime-ready');
   assert(await run.page.locator('#globe-surface').isVisible(), 'normal: globe is not visible');
   assert((await run.page.locator('#globe-results').textContent())?.includes(`${expectedDigitalProjection.catalogEntryCount} Commons`), 'normal: result count missing');
+  const declutterGeometry = await run.page.evaluate(() => {
+    const box = (selector) => {
+      const rect = document.querySelector(selector).getBoundingClientRect();
+      return { width: rect.width, height: rect.height };
+    };
+    return {
+      results: box('#globe-results'),
+      semanticSummary: box('#semantic-summary'),
+      orientation: box('.orientation-bar'),
+      legend: box('.map-legend'),
+    };
+  });
+  assert(declutterGeometry.results.width <= 2 && declutterGeometry.results.height <= 2, `normal: result description still obscures the globe (${JSON.stringify(declutterGeometry)})`);
+  assert(declutterGeometry.semanticSummary.width <= 2 && declutterGeometry.semanticSummary.height <= 2, `normal: semantic description still expands the orientation bar (${JSON.stringify(declutterGeometry)})`);
+  assert(declutterGeometry.orientation.width < 320, `normal: compact orientation bar regressed (${JSON.stringify(declutterGeometry)})`);
+  assert(declutterGeometry.legend.width < 240, `normal: collapsed map legend is not compact (${JSON.stringify(declutterGeometry)})`);
   const topbarGeometry = await run.page.evaluate(() => {
     const topbar = document.querySelector('.topbar');
     const bar = topbar.getBoundingClientRect();
@@ -831,21 +889,26 @@ async function layerJourneyScenario({ mobile = false, viewportOverride = null, t
   const zoomInBox = await run.page.locator('.maplibregl-ctrl-zoom-in').boundingBox();
   assert(zoomInBox, 'layer journey: zoom-in control has no geometry');
   const activateZoomIn = async () => {
-    const previousSize = Number(await stage.getAttribute('data-sphere-size'));
+    const previousRenderedSize = await run.page.locator('#digital-sphere').evaluate((node) => node.getBoundingClientRect().width);
     if (mobile) await run.page.touchscreen.tap(zoomInBox.x + zoomInBox.width / 2, zoomInBox.y + zoomInBox.height / 2);
     else await run.page.mouse.click(zoomInBox.x + zoomInBox.width / 2, zoomInBox.y + zoomInBox.height / 2);
-    await run.page.waitForFunction((size) => Number(document.querySelector('.globe-stage')?.dataset.sphereSize ?? 0) !== size, previousSize);
+    await run.page.waitForFunction((size) => {
+      const sphere = document.querySelector('#digital-sphere');
+      return sphere && Math.abs(sphere.getBoundingClientRect().width - size) > 1;
+    }, previousRenderedSize);
     const synchronousGeometry = await run.page.evaluate(() => {
       const stage = document.querySelector('.globe-stage');
       const sphere = document.querySelector('#digital-sphere');
+      const style = getComputedStyle(sphere);
       return {
         rendered: sphere.getBoundingClientRect().width,
-        declared: Number(stage.dataset.sphereSize),
-        transitionProperty: getComputedStyle(sphere).transitionProperty,
+        visualSize: Number.parseFloat(style.getPropertyValue('--sphere-size')),
+        diagnosticSize: Number(stage.dataset.sphereSize),
+        transitionProperty: style.transitionProperty,
       };
     });
-    assert(Math.abs(synchronousGeometry.rendered - synchronousGeometry.declared) <= 2, `layer journey: digital sphere trails the moving globe (${JSON.stringify(synchronousGeometry)})`);
-    assert(!synchronousGeometry.transitionProperty.split(',').map((value) => value.trim()).some((value) => ['width', 'height', 'left', 'top'].includes(value)), `layer journey: overview geometry still animates behind the globe (${JSON.stringify(synchronousGeometry)})`);
+    assert(Number.isFinite(synchronousGeometry.visualSize) && Math.abs(synchronousGeometry.rendered - synchronousGeometry.visualSize) <= 2, 'layer journey: visual sphere geometry trails the moving globe ' + JSON.stringify(synchronousGeometry));
+    assert(!synchronousGeometry.transitionProperty.split(',').map((value) => value.trim()).some((value) => ['width', 'height', 'left', 'top'].includes(value)), 'layer journey: overview geometry still animates behind the globe ' + JSON.stringify(synchronousGeometry));
     await waitForSphereGeometrySettled(run.page);
   };
   await activateZoomIn();
@@ -956,10 +1019,15 @@ async function layerJourneyScenario({ mobile = false, viewportOverride = null, t
       phase: stageNode.dataset.viewPhase,
       source: stageNode.dataset.globeGeometrySource,
       moving: window.__commonworldTestMap?.isMoving() ?? null,
+      mapMovingAttribute: stageNode.dataset.mapMoving === 'true',
       sphereOpacity: Number(getComputedStyle(sphereNode).opacity),
       panelVisible: panelNode?.hasAttribute('data-visible') ?? false,
       panelHidden: panelNode?.hidden ?? null,
+      ringCount: document.querySelectorAll('.sphere-ring-plane').length,
+      ringsPaused: [...document.querySelectorAll('.sphere-ring-plane')].every((ring) => getComputedStyle(ring).animationPlayState === 'paused'),
       commandCount: window.__commonworldCameraCommands?.length ?? 0,
+      geometryEvaluations: Number(stageNode.dataset.sphereGeometryEvaluations ?? 0),
+      diagnosticPublishes: Number(stageNode.dataset.sphereGeometryDiagnosticPublishes ?? 0),
       at: performance.now(),
     });
     window.__commonworldPhaseLog.push(snapshot('initial'));
@@ -968,7 +1036,7 @@ async function layerJourneyScenario({ mobile = false, viewportOverride = null, t
     });
     window.__commonworldPhaseObserver.observe(stageNode, {
       attributes: true,
-      attributeFilter: ['data-view-phase', 'data-globe-geometry-source', 'data-layer-panel-visible-at', 'data-last-camera-command', 'data-last-camera-duration'],
+      attributeFilter: ['data-view-phase', 'data-globe-geometry-source', 'data-layer-panel-visible-at', 'data-last-camera-command', 'data-last-camera-duration', 'data-map-moving'],
     });
     window.__commonworldPhaseObserver.observe(panelNode, {
       attributes: true,
@@ -996,6 +1064,14 @@ async function layerJourneyScenario({ mobile = false, viewportOverride = null, t
   assert((await run.page.locator('.globe-stage').getAttribute('data-view-phase')) === 'entering-layers', 'layer journey: animated entry phase missing');
   assert((await stage.getAttribute('data-globe-geometry-source')) === 'maplibre-projected-horizon', 'layer journey: entering flight abandoned the MapLibre horizon geometry');
   assert(await run.page.locator('#layer-panel').isHidden(), 'layer journey: description panel obscures the camera flight');
+  await run.page.waitForFunction(() => window.__commonworldPhaseLog?.some((entry) => (
+    entry.mapMovingAttribute && entry.ringCount > 0 && entry.ringsPaused
+  )));
+  const movingRingState = await run.page.evaluate(() => window.__commonworldPhaseLog.find((entry) => (
+    entry.mapMovingAttribute && entry.ringCount > 0 && entry.ringsPaused
+  )));
+  assert(movingRingState.mapMovingAttribute && movingRingState.ringsPaused, 'layer journey: decorative ring pause was not recorded during camera movement ' + JSON.stringify(movingRingState));
+  assert(movingRingState.phase === 'entering-layers' && movingRingState.panelHidden === true, 'layer journey: movement-bound ring pause violated the stable-panel contract ' + JSON.stringify(movingRingState));
   const flightComposition = await run.page.evaluate(() => {
     const map = document.querySelector('#map');
     const style = getComputedStyle(map);
@@ -1010,7 +1086,7 @@ async function layerJourneyScenario({ mobile = false, viewportOverride = null, t
   });
   assert(['none', 'matrix(1, 0, 0, 1, 0, 0)'].includes(flightComposition.transform), 'layer journey: CSS still applies a competing map zoom ' + JSON.stringify(flightComposition));
   assert(!flightComposition.transitionProperties.includes('transform'), 'layer journey: map transform remains part of the camera flight ' + JSON.stringify(flightComposition));
-  assert(flightComposition.command === 'easeTo' && flightComposition.duration === 1080, 'layer journey: MapLibre is not the single camera authority for the flight ' + JSON.stringify(flightComposition));
+  assert(flightComposition.command === 'easeTo' && flightComposition.duration === DIGITAL_LAYER_TRANSITION_MS, 'layer journey: MapLibre is not the single camera authority for the shortened flight ' + JSON.stringify(flightComposition));
   const openingCommands = await run.page.evaluate(() => window.__commonworldCameraCommands ?? []);
   assert(openingCommands.length === 1 && openingCommands[0].command === 'easeTo', `layer journey: opening issued multiple camera commands (${JSON.stringify(openingCommands)})`);
   const enteringSphere = await run.page.locator('#digital-sphere').boundingBox();
@@ -1026,6 +1102,18 @@ async function layerJourneyScenario({ mobile = false, viewportOverride = null, t
   const sideIndex = phaseLog.indexOf(firstSideEntry);
   const firstPanelEntry = phaseLog.find((entry) => entry.panelVisible);
   assert(firstPanelEntry && phaseLog.indexOf(firstPanelEntry) > sideIndex && firstPanelEntry.phase === 'layers' && firstPanelEntry.source === 'side-view-layout', `layer journey: panel became visible before the side layout was stable (${JSON.stringify({ firstPanelEntry, phaseLog })})`);
+  const flightGeometryEvaluationDelta = firstSideEntry.geometryEvaluations - phaseLog[0].geometryEvaluations;
+  const maxFlightGeometryEvaluations = Math.ceil(DIGITAL_LAYER_TRANSITION_MS / MAP_GEOMETRY_SAMPLE_INTERVAL_MS) + 3;
+  assert(flightGeometryEvaluationDelta > 0 && flightGeometryEvaluationDelta <= maxFlightGeometryEvaluations, 'layer journey: sphere projection exceeded the sampled camera-flight budget ' + JSON.stringify({ flightGeometryEvaluationDelta, maxFlightGeometryEvaluations, phaseLog }));
+  const firstMovingEntry = phaseLog.find((entry) => entry.mapMovingAttribute);
+  const settlingEntry = phaseLog.find((entry) => entry.phase === 'settling-layers');
+  const movingGeometryEvaluationDelta = settlingEntry.geometryEvaluations - firstMovingEntry.geometryEvaluations;
+  const movingDiagnosticPublishDelta = settlingEntry.diagnosticPublishes - firstMovingEntry.diagnosticPublishes;
+  const maxMovingDiagnosticPublishes = Math.ceil(movingGeometryEvaluationDelta / MAP_GEOMETRY_DIAGNOSTIC_SAMPLE_INTERVAL) + 2;
+  assert(movingDiagnosticPublishDelta > 0 && movingDiagnosticPublishDelta <= maxMovingDiagnosticPublishes, 'layer journey: diagnostic publishing exceeded its movement-window budget ' + JSON.stringify({ movingDiagnosticPublishDelta, maxMovingDiagnosticPublishes, phaseLog }));
+  if (movingGeometryEvaluationDelta > 1) {
+    assert(movingDiagnosticPublishDelta < movingGeometryEvaluationDelta, 'layer journey: diagnostics still publish on every moving geometry evaluation ' + JSON.stringify({ movingDiagnosticPublishDelta, movingGeometryEvaluationDelta, phaseLog }));
+  }
   assert((await stage.getAttribute('data-globe-geometry-source')) === 'side-view-layout', 'layer journey: settled layers view is missing the side layout geometry');
   if (touch) {
     const closeFocusAppearance = await run.page.locator('#layer-close').evaluate((node) => {
@@ -1254,6 +1342,14 @@ async function dualPresenceAxesScenario() {
     identityCount: expectedDigitalProjection.publicIdentityCount,
   });
 
+  await run.page.waitForFunction(() => {
+    const stage = document.querySelector('.globe-stage');
+    const map = window.__commonworldTestMap;
+    return stage?.dataset.countryMapState === 'ready'
+      && Number(stage?.dataset.countryMapFeatures ?? 0) > 0
+      && Boolean(map?.getSource('commonworld-country-compositions'));
+  });
+
   const initial = await run.page.evaluate(() => {
     const stage = document.querySelector('.globe-stage');
     const map = window.__commonworldTestMap;
@@ -1273,12 +1369,19 @@ async function dualPresenceAxesScenario() {
       interactiveLayerIds: (stage.dataset.publicMapInteractiveLayers ?? '').split(',').filter(Boolean),
       declaredLayerOrder: (stage.dataset.publicMapLayerOrder ?? '').split(',').filter(Boolean),
       beforeLayerId: stage.dataset.publicMapBeforeLayer ?? null,
-      legendCodes: [...document.querySelectorAll('#commons-type-legend .legend-color')].map((node) => node.textContent.trim()),
+      legendSwatchText: [...document.querySelectorAll('#commons-type-legend .legend-color')].map((node) => node.textContent.trim()),
+      countryMapState: stage.dataset.countryMapState ?? '',
+      countryMapFeatures: Number(stage.dataset.countryMapFeatures ?? -1),
+      countrySourceType: style.sources?.['commonworld-country-compositions']?.type ?? null,
       legendLabels: [...document.querySelectorAll('#commons-type-legend .legend-item')].map((node) => node.textContent.trim()),
       sourceType: style.sources?.['commonworld-public-representations']?.type ?? null,
       layers: style.layers
         .filter(({ id }) => id.startsWith('commonworld-'))
-        .map(({ id, type, minzoom, maxzoom }) => ({ id, type, minzoom, maxzoom })),
+        .map(({ id, type, minzoom, maxzoom }) => ({
+          id, type, minzoom, maxzoom,
+          circleRadius: type === 'circle' ? map.getPaintProperty(id, 'circle-radius') : null,
+          fillOpacity: type === 'fill' ? map.getPaintProperty(id, 'fill-opacity') : null,
+        })),
       ringNames: [...document.querySelectorAll('.sphere-ring-name')].map((node) => node.textContent.trim()),
     };
   });
@@ -1290,7 +1393,7 @@ async function dualPresenceAxesScenario() {
   assert(initial.aggregateImpressions === expectedDigitalProjection.aggregateImpressionCount, 'dual presence: aggregate impression diagnostics differ from the prepared projection: ' + JSON.stringify(initial));
   assert(initial.privacyNotices === expectedDigitalProjection.privacyNoticeCount, 'dual presence: privacy notice diagnostics differ from the prepared projection: ' + JSON.stringify(initial));
   assertSameIds(initial.geographicSemanticLevels, expectedDigitalProjection.geographicSemanticLevels, 'dual presence: geographic semantic levels');
-  assert(initial.legendCodes.length === 11 && new Set(initial.legendCodes).size === 11, 'dual presence: legend does not expose eleven unique non-colour codes: ' + JSON.stringify(initial));
+  assert(initial.legendSwatchText.length === 11 && initial.legendSwatchText.every((value) => value === ''), 'dual presence: far-map legend swatches must not render abbreviations: ' + JSON.stringify(initial));
   assert(initial.legendLabels.length === 11 && initial.legendLabels.some((label) => label.includes('Wissen und Daten')) && initial.legendLabels.some((label) => label.includes('Gemeinschaftsnetz')), 'dual presence: legend labels do not match the Commons type vocabulary: ' + JSON.stringify(initial));
   const reviewedFeatureIds = [
     'cltb-le-nid:cltb-le-nid-entrance',
@@ -1301,28 +1404,31 @@ async function dualPresenceAxesScenario() {
   assert(reviewedFeatureIds.every((identifier) => initial.featureIds.includes(identifier)), 'dual presence: reviewed public map features are missing: ' + JSON.stringify(initial));
   assert(!initial.locationIds.includes('freifunk-hamburg-private-routers'), 'dual presence: hidden router location leaked into map diagnostics');
   assert(initial.sourceType === 'geojson', 'dual presence: MapLibre source is not a GeoJSON source: ' + JSON.stringify(initial));
-  assertSameIds(initial.layers.map(({ id }) => id), initial.declaredLayerOrder, 'dual presence: public MapLibre layer order');
+  assert(JSON.stringify(initial.layers.map(({ id }) => id)) === JSON.stringify(initial.declaredLayerOrder), 'dual presence: public MapLibre layer order differs from the declared deterministic order: ' + JSON.stringify(initial));
   assert(initial.beforeLayerId === 'road_one_way_arrow', 'dual presence: public layers are not anchored below the base-map labels: ' + JSON.stringify(initial));
   assert(initial.layers.some(({ id, type, minzoom }) => id === 'commonworld-public-extents' && type === 'fill' && minzoom === 3.4), 'dual presence: public extent layer missing');
   assert(initial.layers.some(({ id, type, minzoom, maxzoom }) => id === 'commonworld-approximate-zones' && type === 'fill' && minzoom === 3.4 && maxzoom === undefined), 'dual presence: approximate uncertainty zone must remain visible through local zoom');
-  assert(initial.layers.some(({ id, type, minzoom }) => id === 'commonworld-exact-anchors' && type === 'circle' && minzoom === 5.5), 'dual presence: exact anchor layer missing');
-  const expectedAggregateLayers = [
-    ['planet', 0, 2.8],
-    ['macroregion', 1.6, 4.3],
-    ['region', 3.1, 5.8],
-  ];
-  for (const [level, minzoom, maxzoom] of expectedAggregateLayers) {
-    assert(initial.layers.some((layer) => layer.id === 'commonworld-' + level + '-impressions' && layer.type === 'circle' && layer.minzoom === minzoom && layer.maxzoom === maxzoom), 'dual presence: missing impression layer for ' + level + ': ' + JSON.stringify(initial.layers));
-    assert(initial.layers.some((layer) => layer.id === 'commonworld-' + level + '-semantics' && layer.type === 'symbol' && layer.minzoom === minzoom && layer.maxzoom === maxzoom), 'dual presence: missing semantic pattern/code layer for ' + level);
-    assert(initial.layers.some((layer) => layer.id === 'commonworld-' + level + '-impression-counts' && layer.type === 'symbol'), 'dual presence: missing released count layer for ' + level);
-    assert(initial.layers.some((layer) => layer.id === 'commonworld-' + level + '-privacy-withheld' && layer.type === 'symbol'), 'dual presence: missing neutral privacy layer for ' + level);
+  const exactAnchorLayer = initial.layers.find(({ id }) => id === 'commonworld-exact-anchors');
+  assert(exactAnchorLayer?.type === 'circle' && exactAnchorLayer.minzoom === 5, 'dual presence: exact anchor layer missing');
+  assert(JSON.stringify(exactAnchorLayer.circleRadius).includes('[5,7]') || JSON.stringify(exactAnchorLayer.circleRadius).includes('5,7'), 'dual presence: exact anchors are not visibly enlarged for mobile: ' + JSON.stringify(exactAnchorLayer));
+  assert(initial.layers.some(({ id, type, minzoom }) => id === 'commonworld-exact-anchor-hit-targets' && type === 'circle' && minzoom === 5), 'dual presence: exact anchor touch target layer missing');
+  assert(initial.countryMapState === 'ready' && initial.countryMapFeatures > 0 && initial.countrySourceType === 'geojson', 'dual presence: country composition source is not ready: ' + JSON.stringify(initial));
+  const countryBaseLayer = initial.layers.find(({ id }) => id === 'commonworld-country-compositions-base');
+  assert(countryBaseLayer?.type === 'fill' && countryBaseLayer.minzoom === 0 && countryBaseLayer.maxzoom === 5.5, 'dual presence: mobile-safe country base tint layer missing');
+  assert(JSON.stringify(countryBaseLayer.fillOpacity).includes('0.78'), 'dual presence: country base tint is too weak or missing at globe overview: ' + JSON.stringify(countryBaseLayer));
+  assert(initial.layers.some(({ id, type, minzoom, maxzoom }) => id === 'commonworld-country-compositions' && type === 'fill' && minzoom === 0 && maxzoom === 5.5), 'dual presence: land-first country composition fill layer missing');
+  assert(initial.layers.some(({ id, type }) => id === 'commonworld-country-compositions-outline' && type === 'line'), 'dual presence: country composition outline layer missing');
+  for (const level of ['macroregion', 'region']) {
+    assert(!initial.layers.some((layer) => layer.id === 'commonworld-' + level + '-impressions'), 'dual presence: synthetic aggregate point layer must not be rendered for ' + level + ': ' + JSON.stringify(initial.layers));
+    assert(!initial.layers.some((layer) => layer.id === 'commonworld-' + level + '-privacy-withheld'), 'dual presence: aggregate privacy grid center must not be rendered as a location for ' + level);
   }
-  assert(initial.layers.some(({ id, type, minzoom }) => id === 'commonworld-local-type-codes' && type === 'symbol' && minzoom === 5.5), 'dual presence: local non-colour Commons type codes are missing');
+  assert(!initial.layers.some(({ id, type }) => type === 'symbol' && (id.includes('-semantics') || id.includes('-impression-counts') || id.includes('type-codes'))), 'dual presence: geographic map still renders code/count symbol layers: ' + JSON.stringify(initial.layers));
   assertSameIds(initial.interactiveLayerIds, [
     'commonworld-public-extents',
     'commonworld-approximate-zones',
+    'commonworld-exact-anchor-hit-targets',
     'commonworld-exact-anchors',
-  ], 'dual presence: aggregate layers must remain noninteractive');
+  ], 'dual presence: only truthful published local geometry and its touch target may be interactive');
   assert(initial.ringNames.includes('Freifunk Hamburg'), 'dual presence: dual presence identity missing from digital sphere');
   assert(!initial.ringNames.includes('Le Nid'), 'dual presence: geographic-only identity leaked into digital sphere');
 
@@ -1372,6 +1478,25 @@ async function dualPresenceAxesScenario() {
     await run.page.mouse.click(point.x, point.y);
     await run.page.waitForSelector('#project-focus:not([hidden])');
   };
+
+  await run.page.evaluate(() => {
+    window.__commonworldTestMap.jumpTo({ center: [10.2, 51.1], zoom: 1.2, bearing: 0, pitch: 0 });
+  });
+  await run.page.waitForFunction(() => {
+    const map = window.__commonworldTestMap;
+    if (!map || map.isMoving() || !map.getLayer('commonworld-country-compositions-base')) return false;
+    return map.queryRenderedFeatures(map.project([10.2, 51.1]), { layers: ['commonworld-country-compositions-base'] }).length > 0;
+  });
+
+  await run.page.evaluate(() => {
+    window.__commonworldTestMap.jumpTo({ center: [10.2, 51.1], zoom: 4.6, bearing: 0, pitch: 0 });
+  });
+  await run.page.waitForFunction(() => document.querySelector('.globe-stage')?.dataset.semanticLevel === 'region');
+  await run.page.waitForFunction(() => {
+    const map = window.__commonworldTestMap;
+    if (!map || map.isMoving() || !map.getLayer('commonworld-country-compositions')) return false;
+    return map.queryRenderedFeatures(map.project([10.2, 51.1]), { layers: ['commonworld-country-compositions'] }).length > 0;
+  });
 
   const updatesBeforeSelection = Number(await run.page.locator('.globe-stage').getAttribute('data-public-map-updates'));
   await activateMapIdentity({
@@ -1617,6 +1742,74 @@ async function intentSearchDiscoveryScenario() {
   assert(run.consoleErrors.every((message) => message.includes('Failed to load resource')), 'intent search: unexpected console errors: ' + run.consoleErrors.join(' | '));
   assert(run.pageErrors.length === 0, 'intent search: page errors: ' + run.pageErrors.join(' | '));
   results.push({ id: 'intent-search-discovery', verdict: 'PASS', indexedRecords: expectedDigitalProjection.catalogEntryCount, rankedGermanIntentResults: expectedDigitalProjection.contributionIds.length, filters: 7, digitalCoordinateFree: true, spatialNavigation: true });
+  await run.context.close();
+}
+
+async function androidGlobeUiScenario() {
+  const scenarioId = 'android-globe-ui-alignment';
+  process.stdout.write(JSON.stringify({ state: 'RUNNING', scenario: scenarioId }) + '\n');
+  const run = await newPage({ mobile: true, touch: true, reducedMotion: 'no-preference' });
+  await run.page.goto(baseUrl, { waitUntil: 'domcontentloaded' });
+  await run.page.waitForSelector('html.runtime-ready');
+  await run.page.waitForFunction(() => document.querySelectorAll('.sphere-ring-text').length > 0);
+
+  const geometry = await run.page.evaluate(() => {
+    const button = document.querySelector('#filter-toggle');
+    const icon = button.querySelector('.filter-toggle-icon');
+    const buttonRect = button.getBoundingClientRect();
+    const iconRect = icon.getBoundingClientRect();
+    const ring = document.querySelector('.sphere-ring-plane');
+    const text = document.querySelector('.sphere-ring-text');
+    const textRect = text.getBoundingClientRect();
+    const ringStyle = getComputedStyle(ring);
+    const textStyle = getComputedStyle(text);
+    return {
+      filterCenterDeltaX: Math.abs((buttonRect.left + buttonRect.width / 2) - (iconRect.left + iconRect.width / 2)),
+      filterCenterDeltaY: Math.abs((buttonRect.top + buttonRect.height / 2) - (iconRect.top + iconRect.height / 2)),
+      filterButtonWidth: buttonRect.width,
+      filterButtonHeight: buttonRect.height,
+      ringAnimationName: ringStyle.animationName,
+      ringTransform: ringStyle.transform,
+      ringTextWidth: textRect.width,
+      ringTextHeight: textRect.height,
+      ringTextFontSize: Number.parseFloat(textStyle.fontSize),
+    };
+  });
+  assert(geometry.filterCenterDeltaX <= 1 && geometry.filterCenterDeltaY <= 1, scenarioId + ': filter icon is not centered ' + JSON.stringify(geometry));
+  assert(geometry.filterButtonWidth >= 44 && geometry.filterButtonHeight >= 44, scenarioId + ': filter button is below mobile touch target ' + JSON.stringify(geometry));
+  assert(geometry.ringAnimationName === 'none', scenarioId + ': mobile ring group still uses CSS orbit transform ' + JSON.stringify(geometry));
+  assert(geometry.ringTransform === 'none', scenarioId + ': mobile ring group retains a transform offset ' + JSON.stringify(geometry));
+  assert(geometry.ringTextWidth > 20 && geometry.ringTextHeight > 8 && geometry.ringTextFontSize >= 17, scenarioId + ': mobile ring text is not visibly sized ' + JSON.stringify(geometry));
+
+  await run.page.evaluate(() => new Promise((resolve) => {
+    const map = window.__commonworldTestMap;
+    map.once('render', resolve);
+    map.jumpTo({ center: [10.2, 51.1], zoom: 1.2, bearing: 0, pitch: 0 });
+    map.triggerRepaint();
+  }));
+  await run.page.waitForFunction(() => {
+    const map = window.__commonworldTestMap;
+    const stage = document.querySelector('.globe-stage');
+    return Boolean(map && !map.isMoving() && stage?.dataset.countryMapState === 'ready' && map.getLayer('commonworld-country-compositions-base'));
+  });
+  await run.page.waitForFunction(() => {
+    const map = window.__commonworldTestMap;
+    if (!map || map.isMoving()) return false;
+    return map.queryRenderedFeatures(map.project([10.2, 51.1]), { layers: ['commonworld-country-compositions-base'] }).length > 0;
+  });
+  const country = await run.page.evaluate(() => {
+    const map = window.__commonworldTestMap;
+    const opacity = map.getPaintProperty('commonworld-country-compositions-base', 'fill-opacity');
+    const rendered = map.queryRenderedFeatures(map.project([10.2, 51.1]), { layers: ['commonworld-country-compositions-base'] }).length;
+    const sourceFeatures = map.querySourceFeatures('commonworld-country-compositions').length;
+    const diagnosticsFeatures = Number.parseInt(document.querySelector('.globe-stage')?.dataset.countryMapFeatures ?? '0', 10);
+    const visibility = map.getLayoutProperty('commonworld-country-compositions-base', 'visibility') ?? 'visible';
+    return { opacity, rendered, sourceFeatures, diagnosticsFeatures, visibility, zoom: map.getZoom() };
+  });
+  assert(JSON.stringify(country.opacity).includes('0.78'), scenarioId + ': overview country tint is not strong enough ' + JSON.stringify(country));
+  assert(country.diagnosticsFeatures > 0 && country.rendered > 0, scenarioId + ': country composition is not rendered at mobile globe overview ' + JSON.stringify(country));
+  assert(run.pageErrors.length === 0, scenarioId + ': page errors: ' + run.pageErrors.join(' | '));
+  results.push({ id: scenarioId, verdict: 'PASS', ...geometry, countryRendered: country.rendered });
   await run.context.close();
 }
 
@@ -2201,16 +2394,20 @@ async function liveUiHardeningScenario() {
   await run.page.locator('#layer-view-button').click();
   await run.page.waitForSelector('.globe-stage[data-view-phase="layers"]');
   await run.page.waitForSelector('#layer-panel[data-visible]:not([inert])');
-  await run.page.waitForFunction(() => {
-    const deck = document.querySelector('#layer-track-deck');
-    if (!deck) return false;
-    const transform = getComputedStyle(deck).transform;
-    if (transform === 'none') return true;
-    const matrix = new DOMMatrixReadOnly(transform);
-    return Math.abs(matrix.a - 1) <= 0.001
-      && Math.abs(matrix.d - 1) <= 0.001
-      && Math.abs(matrix.e) <= 0.5
-      && Math.abs(matrix.f) <= 0.5;
+  await run.page.waitForFunction(({ expectedLaneCount, minimumLaneHeightPx }) => {
+    const lanes = [...document.querySelectorAll('.digital-lane')];
+    if (lanes.length !== expectedLaneCount) return false;
+    return lanes.every((lane) => {
+      const focus = lane.querySelector('.digital-lane-focus');
+      const scroll = lane.querySelector('.digital-lane-scroll');
+      if (!focus || !scroll) return false;
+      return lane.getBoundingClientRect().height >= minimumLaneHeightPx
+        && focus.getBoundingClientRect().height >= 44
+        && scroll.getBoundingClientRect().height >= 44;
+    });
+  }, {
+    expectedLaneCount: expectedDigitalProjection.fields.length,
+    minimumLaneHeightPx: MIN_RENDERED_LANE_HEIGHT_PX,
   });
   const layout = await run.page.evaluate(() => {
     const rect = (node) => {
@@ -2239,7 +2436,7 @@ async function liveUiHardeningScenario() {
     };
   });
   assert(layout.lanes.length === expectedDigitalProjection.fields.length, `live UI landscape: unexpected lane count (${JSON.stringify(layout)})`);
-  assert(layout.lanes.every(({ lane, focus, scroll }) => lane.height >= 47.5 && focus.height >= 44 && scroll.height >= 44), `live UI landscape: lane controls are clipped (${JSON.stringify(layout.lanes)})`);
+  assert(layout.lanes.every(({ lane, focus, scroll }) => lane.height >= MIN_RENDERED_LANE_HEIGHT_PX && focus.height >= 44 && scroll.height >= 44), `live UI landscape: lane controls are clipped (${JSON.stringify(layout.lanes)})`);
   assert(layout.overlaps.every(({ focus, scroll }) => focus <= 0.5 && scroll <= 0.5), `live UI landscape: adjacent controls overlap (${JSON.stringify(layout.overlaps)})`);
   assert(layout.deck.scrollHeight > layout.deck.clientHeight && ['auto', 'scroll'].includes(layout.deck.overflowY), `live UI landscape: compressed lanes did not become vertically scrollable (${JSON.stringify(layout.deck)})`);
   assert(layout.orientationInert && layout.orientationAriaHidden === 'true' && layout.globeResetSuppressed, `live UI landscape: hidden globe orientation remains keyboard interactive (${JSON.stringify(layout)})`);
@@ -2260,25 +2457,31 @@ async function liveUiHardeningScenario() {
   await run.context.close();
 }
 
-async function catalogueFailureScenario() {
+async function catalogueNetworkBlockedScenario() {
   const run = await newPage();
-  await run.page.route('**/catalog/catalog.json', (route) => route.abort('failed'));
+  const blockedCatalogRequests = [];
+  await run.page.route('**/catalog/**', (route) => {
+    blockedCatalogRequests.push(new URL(route.request().url()).pathname);
+    return route.abort('failed');
+  });
   await run.page.goto(baseUrl, { waitUntil: 'domcontentloaded' });
   await run.page.waitForSelector('html.runtime-ready');
-  await run.page.waitForSelector('.globe-stage[data-runtime-state="degraded"]');
+  await run.page.waitForSelector('.globe-stage[data-runtime-state="ready"]');
+  assert(blockedCatalogRequests.length === 0, `catalogue network blocked: build-bound runtime requested canonical catalog files: ${blockedCatalogRequests.join(' | ')}`);
+  assert(await run.page.locator('.globe-stage').getAttribute('data-catalog-delivery') === 'build-bound-bootstrap', 'catalogue network blocked: runtime delivery mode is not build-bound');
   await run.page.locator('#commons-search').fill('Debian');
   await run.page.waitForTimeout(220);
-  assert((await run.page.locator('#globe-results').textContent())?.startsWith('1 Commons'), 'catalogue failure: embedded search did not work');
+  assert((await run.page.locator('#globe-results').textContent())?.startsWith('1 Commons'), 'catalogue network blocked: embedded search did not work');
   await run.page.locator('#settings-toggle').click();
-  assert(await run.page.locator('#settings-panel').isVisible(), 'catalogue failure: settings are dead');
+  assert(await run.page.locator('#settings-panel').isVisible(), 'catalogue network blocked: settings are dead');
   await run.page.getByRole('radio', { name: /Text/ }).click();
-  assert(await run.page.locator('#text-view').isVisible(), 'catalogue failure: text view unavailable');
-  assert(await run.page.locator('#project-debian').isVisible(), 'catalogue failure: matching static card unavailable');
-  assert(run.pageErrors.length === 0, `catalogue failure: page errors: ${run.pageErrors.join(' | ')}`);
-  assert(run.consoleErrors.every((message) => message.includes('Failed to load resource')), `catalogue failure: unexpected console errors: ${run.consoleErrors.join(' | ')}`);
+  assert(await run.page.locator('#text-view').isVisible(), 'catalogue network blocked: text view unavailable');
+  assert(await run.page.locator('#project-debian').isVisible(), 'catalogue network blocked: matching static card unavailable');
+  assert(run.pageErrors.length === 0, `catalogue network blocked: page errors: ${run.pageErrors.join(' | ')}`);
+  assert(run.consoleErrors.length === 0, `catalogue network blocked: unexpected console errors: ${run.consoleErrors.join(' | ')}`);
   const appWarnings = run.consoleWarnings.filter((message) => message.includes('Commonworld'));
-  assert(appWarnings.length <= 2, `catalogue failure: application warning storm (${appWarnings.length})`);
-  results.push({ id: 'catalogue-failure', verdict: 'PASS', applicationWarnings: appWarnings.length });
+  assert(appWarnings.length === 0, `catalogue network blocked: unexpected application warnings (${appWarnings.length})`);
+  results.push({ id: 'catalogue-network-blocked', verdict: 'PASS', blockedCatalogRequests: blockedCatalogRequests.length });
   await run.context.close();
 }
 
@@ -2362,12 +2565,14 @@ html { font-size: ${profile.fontScale}% !important; }
   }
 }
 
+let scenarioFailure = null;
 try {
   await startupAndRingOrbitScenario();
   await reducedMotionRingScenario();
   await syntheticDigitalPerformanceScenario();
   await normalScenario();
   await intentSearchDiscoveryScenario();
+  await androidGlobeUiScenario();
   await intentSearchLayoutScenario({ viewportOverride: { width: 1024, height: 1366 }, scenarioId: 'intent-search-ipad-portrait' });
   await intentSearchLayoutScenario({ viewportOverride: { width: 1366, height: 1024 }, scenarioId: 'intent-search-ipad-landscape' });
   await dualPresenceAxesScenario();
@@ -2384,13 +2589,27 @@ try {
   await externalLinkSafetyScenario();
   await syntheticCatalogueTruthScenario();
   await liveUiHardeningScenario();
-  await catalogueFailureScenario();
+  await catalogueNetworkBlockedScenario();
   await providerFailureScenario();
   await methodScenario();
+} catch (error) {
+  scenarioFailure = error;
 } finally {
   await browser.close();
   server.closeAllConnections?.();
   await new Promise((resolve, reject) => server.close((error) => (error ? reject(error) : resolve())));
 }
-process.stdout.write(`${JSON.stringify({ verdict: 'PASS', scenarios: results })}\n`);
+if (scenarioFailure) {
+  const failureResult = {
+    verdict: 'FAIL',
+    error: scenarioFailure?.stack ?? String(scenarioFailure),
+    completedScenarios: results,
+  };
+  await writeResult(failureResult);
+  process.stderr.write(`${JSON.stringify(failureResult)}\n`);
+  process.exit(1);
+}
+const passResult = { verdict: 'PASS', scenarios: results };
+await writeResult(passResult);
+process.stdout.write(`${JSON.stringify(passResult)}\n`);
 process.exit(0);

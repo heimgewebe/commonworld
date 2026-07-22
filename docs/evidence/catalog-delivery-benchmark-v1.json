@@ -1,0 +1,536 @@
+{
+  "schema_version": 1,
+  "kind": "commonworld_catalog_delivery_benchmark_evidence",
+  "task_id": "COMMONWORLD-PUBLIC-GLOBE-V1-T019",
+  "base_commit": "68102b0575f4101e6a4275983094d33ec78a3b20",
+  "measurement_method": {
+    "static": "scripts/measure_catalog_delivery.py; deterministic raw and gzip sizes, generated/canonical identity parity, HTML tag counts and source-level startup fetch detection.",
+    "browser": "scripts/measure_catalog_delivery_browser.mjs; isolated local no-store server, external requests blocked, Chromium profiles at fourfold CPU throttling.",
+    "timing_boundary": "Timing values are representative observations, not a claimed deterministic speedup. Request and byte reductions are the primary causal evidence."
+  },
+  "baseline": {
+    "static": {
+      "schema_version": 1,
+      "kind": "commonworld_catalog_delivery_static_metrics",
+      "entry_count": 41,
+      "identity_order_sha256": "0648e9114de274482137f282bbeaeebf41330cdae7d356b0699b57f5996500cd",
+      "bootstrap": {
+        "raw_bytes": 118546,
+        "gzip_bytes": 20526,
+        "raw_bytes_per_record": 2891.37,
+        "gzip_bytes_per_record": 500.63
+      },
+      "canonical_projects": {
+        "file_count": 41,
+        "raw_bytes": 152978,
+        "gzip_bytes_individual_files": 50788
+      },
+      "manifest": {
+        "raw_bytes": 2862,
+        "gzip_bytes": 1001
+      },
+      "html": {
+        "raw_bytes": 149696,
+        "gzip_bytes": 21256,
+        "start_tag_count": 1560,
+        "catalog_card_instances": 82,
+        "interactive_catalog_cards": 41,
+        "noscript_catalogs": 1
+      },
+      "runtime_verification_fetch": {
+        "enabled": true,
+        "project_request_count": 41,
+        "duplicate_identity_payload_count": 41,
+        "raw_bytes": 155840,
+        "gzip_bytes": 51789
+      },
+      "catalog_initial_delivery": {
+        "raw_bytes": 274386,
+        "gzip_bytes": 72315
+      }
+    },
+    "browser": {
+      "schema_version": 1,
+      "kind": "commonworld_catalog_delivery_browser_metrics",
+      "measured_at": "2026-07-20T03:57:06.250Z",
+      "cpu_throttle_rate": 4,
+      "profiles": [
+        {
+          "profile": "mobile-low-power",
+          "viewport": {
+            "width": 390,
+            "height": 844
+          },
+          "cpu_throttle_rate": 4,
+          "runtime_ready_ms": 698,
+          "dom_node_count": 1687,
+          "catalog_card_count": 41,
+          "interactive_catalog_card_count": 41,
+          "runtime_ready": true,
+          "runtime_failed": false,
+          "dom_content_loaded_ms": 388.2000000476837,
+          "load_event_ms": 433.5,
+          "resource_count": 52,
+          "script_duration_ms": 725.67,
+          "task_duration_ms": 1347.98,
+          "bootstrap_compile": {
+            "median_ms": 0.20000004768371582,
+            "p95_ms": 0.8999998569488525,
+            "samples_ms": [
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0.09999990463256836,
+              0.10000014305114746,
+              0.10000014305114746,
+              0.10000014305114746,
+              0.20000004768371582,
+              0.40000009536743164,
+              0.6999998092651367,
+              0.7000000476837158,
+              0.7999999523162842,
+              0.7999999523162842,
+              0.7999999523162842,
+              0.7999999523162842,
+              0.8000001907348633,
+              0.8999998569488525,
+              0.8999998569488525
+            ]
+          },
+          "first_party_request_count": 51,
+          "first_party_unique_request_count": 51,
+          "first_party_raw_bytes": 1821095,
+          "project_json_request_count": 41,
+          "project_json_unique_request_count": 41,
+          "project_json_requests": [
+            "/catalog/projects/akiba-mashinani-trust.json",
+            "/catalog/projects/bali-subak-system.json",
+            "/catalog/projects/bioleft.json",
+            "/catalog/projects/cano-martin-pena-clt.json",
+            "/catalog/projects/cltb-le-nid.json",
+            "/catalog/projects/community-baboon-sanctuary.json",
+            "/catalog/projects/community-energy-network-new-zealand.json",
+            "/catalog/projects/debian.json",
+            "/catalog/projects/deccan-development-society.json",
+            "/catalog/projects/edinburgh-tool-library.json",
+            "/catalog/projects/ekuri-community-forest.json",
+            "/catalog/projects/enspiral.json",
+            "/catalog/projects/freifunk-hamburg.json",
+            "/catalog/projects/freifunk.json",
+            "/catalog/projects/fucvam.json",
+            "/catalog/projects/g0v.json",
+            "/catalog/projects/granby-four-streets-clt.json",
+            "/catalog/projects/guifi-net.json",
+            "/catalog/projects/hepburn-energy.json",
+            "/catalog/projects/kibera-public-space-project.json",
+            "/catalog/projects/libreoffice.json",
+            "/catalog/projects/mastodon.json",
+            "/catalog/projects/nepal-wireless-networking-project.json",
+            "/catalog/projects/new-mexico-acequia-association.json",
+            "/catalog/projects/nyc-mesh.json",
+            "/catalog/projects/open-food-network-australia.json",
+            "/catalog/projects/open-source-ecology.json",
+            "/catalog/projects/openmrs.json",
+            "/catalog/projects/openstreetmap.json",
+            "/catalog/projects/potato-park-peru.json",
+            "/catalog/projects/prinzessinnengarten-kollektiv.json",
+            "/catalog/projects/sarantaporo-community-network.json",
+            "/catalog/projects/som-energia.json",
+            "/catalog/projects/tribunal-aguas-valencia.json",
+            "/catalog/projects/velondriake-lmma.json",
+            "/catalog/projects/wikibooks.json",
+            "/catalog/projects/wikidata.json",
+            "/catalog/projects/wikimedia-commons.json",
+            "/catalog/projects/wikipedia.json",
+            "/catalog/projects/wikiversity.json",
+            "/catalog/projects/zenzeleni-community-networks.json"
+          ]
+        },
+        {
+          "profile": "desktop-low-power",
+          "viewport": {
+            "width": 1366,
+            "height": 768
+          },
+          "cpu_throttle_rate": 4,
+          "runtime_ready_ms": 627,
+          "dom_node_count": 1687,
+          "catalog_card_count": 41,
+          "interactive_catalog_card_count": 41,
+          "runtime_ready": true,
+          "runtime_failed": false,
+          "dom_content_loaded_ms": 331.59999990463257,
+          "load_event_ms": 367.89999985694885,
+          "resource_count": 52,
+          "script_duration_ms": 734.67,
+          "task_duration_ms": 1217.13,
+          "bootstrap_compile": {
+            "median_ms": 0.39999985694885254,
+            "p95_ms": 1,
+            "samples_ms": [
+              0,
+              0.09999990463256836,
+              0.09999990463256836,
+              0.09999990463256836,
+              0.09999990463256836,
+              0.09999990463256836,
+              0.10000014305114746,
+              0.10000014305114746,
+              0.10000014305114746,
+              0.20000004768371582,
+              0.39999985694885254,
+              0.5,
+              0.5,
+              0.5999999046325684,
+              0.7000000476837158,
+              0.7000000476837158,
+              0.7000000476837158,
+              0.9000000953674316,
+              1,
+              1,
+              1
+            ]
+          },
+          "first_party_request_count": 51,
+          "first_party_unique_request_count": 51,
+          "first_party_raw_bytes": 1821095,
+          "project_json_request_count": 41,
+          "project_json_unique_request_count": 41,
+          "project_json_requests": [
+            "/catalog/projects/akiba-mashinani-trust.json",
+            "/catalog/projects/bali-subak-system.json",
+            "/catalog/projects/bioleft.json",
+            "/catalog/projects/cano-martin-pena-clt.json",
+            "/catalog/projects/cltb-le-nid.json",
+            "/catalog/projects/community-baboon-sanctuary.json",
+            "/catalog/projects/community-energy-network-new-zealand.json",
+            "/catalog/projects/debian.json",
+            "/catalog/projects/deccan-development-society.json",
+            "/catalog/projects/edinburgh-tool-library.json",
+            "/catalog/projects/ekuri-community-forest.json",
+            "/catalog/projects/enspiral.json",
+            "/catalog/projects/freifunk-hamburg.json",
+            "/catalog/projects/freifunk.json",
+            "/catalog/projects/fucvam.json",
+            "/catalog/projects/g0v.json",
+            "/catalog/projects/granby-four-streets-clt.json",
+            "/catalog/projects/guifi-net.json",
+            "/catalog/projects/hepburn-energy.json",
+            "/catalog/projects/kibera-public-space-project.json",
+            "/catalog/projects/libreoffice.json",
+            "/catalog/projects/mastodon.json",
+            "/catalog/projects/nepal-wireless-networking-project.json",
+            "/catalog/projects/new-mexico-acequia-association.json",
+            "/catalog/projects/nyc-mesh.json",
+            "/catalog/projects/open-food-network-australia.json",
+            "/catalog/projects/open-source-ecology.json",
+            "/catalog/projects/openmrs.json",
+            "/catalog/projects/openstreetmap.json",
+            "/catalog/projects/potato-park-peru.json",
+            "/catalog/projects/prinzessinnengarten-kollektiv.json",
+            "/catalog/projects/sarantaporo-community-network.json",
+            "/catalog/projects/som-energia.json",
+            "/catalog/projects/tribunal-aguas-valencia.json",
+            "/catalog/projects/velondriake-lmma.json",
+            "/catalog/projects/wikibooks.json",
+            "/catalog/projects/wikidata.json",
+            "/catalog/projects/wikimedia-commons.json",
+            "/catalog/projects/wikipedia.json",
+            "/catalog/projects/wikiversity.json",
+            "/catalog/projects/zenzeleni-community-networks.json"
+          ]
+        }
+      ]
+    }
+  },
+  "optimized": {
+    "static": {
+      "schema_version": 1,
+      "kind": "commonworld_catalog_delivery_static_metrics",
+      "entry_count": 41,
+      "identity_order_sha256": "0648e9114de274482137f282bbeaeebf41330cdae7d356b0699b57f5996500cd",
+      "bootstrap": {
+        "raw_bytes": 118546,
+        "gzip_bytes": 20526,
+        "raw_bytes_per_record": 2891.37,
+        "gzip_bytes_per_record": 500.63
+      },
+      "canonical_projects": {
+        "file_count": 41,
+        "raw_bytes": 152978,
+        "gzip_bytes_individual_files": 50788
+      },
+      "manifest": {
+        "raw_bytes": 2862,
+        "gzip_bytes": 1001
+      },
+      "html": {
+        "raw_bytes": 149965,
+        "gzip_bytes": 21327,
+        "start_tag_count": 1560,
+        "catalog_card_instances": 82,
+        "interactive_catalog_cards": 41,
+        "noscript_catalogs": 1
+      },
+      "runtime_verification_fetch": {
+        "enabled": false,
+        "project_request_count": 0,
+        "duplicate_identity_payload_count": 0,
+        "raw_bytes": 0,
+        "gzip_bytes": 0
+      },
+      "catalog_initial_delivery": {
+        "raw_bytes": 118546,
+        "gzip_bytes": 20526
+      }
+    },
+    "browser": {
+      "schema_version": 1,
+      "kind": "commonworld_catalog_delivery_browser_metrics",
+      "measured_at": "2026-07-22T00:58:13.757Z",
+      "cpu_throttle_rate": 4,
+      "profiles": [
+        {
+          "profile": "mobile-low-power",
+          "viewport": {
+            "width": 390,
+            "height": 844
+          },
+          "cpu_throttle_rate": 4,
+          "runtime_ready_ms": 560,
+          "dom_node_count": 1687,
+          "catalog_card_count": 41,
+          "interactive_catalog_card_count": 41,
+          "runtime_ready": true,
+          "runtime_failed": false,
+          "dom_content_loaded_ms": 452.2999999523163,
+          "load_event_ms": 494,
+          "resource_count": 11,
+          "script_duration_ms": 274.75,
+          "task_duration_ms": 554.59,
+          "bootstrap_compile": {
+            "median_ms": 0.5,
+            "p95_ms": 0.8999998569488525,
+            "samples_ms": [
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0.09999990463256836,
+              0.10000014305114746,
+              0.10000014305114746,
+              0.2999999523162842,
+              0.5,
+              0.5,
+              0.5,
+              0.5999999046325684,
+              0.6000001430511475,
+              0.6999998092651367,
+              0.7000000476837158,
+              0.7999999523162842,
+              0.7999999523162842,
+              0.8999998569488525,
+              1.1000001430511475
+            ]
+          },
+          "first_party_request_count": 10,
+          "first_party_unique_request_count": 10,
+          "first_party_raw_bytes": 1720066,
+          "first_party_requests": [
+            "/",
+            "/assets/commonworld-app.js",
+            "/assets/commonworld-bootstrap-catalog.mjs",
+            "/assets/commonworld-core.mjs",
+            "/assets/commonworld-mark.svg",
+            "/assets/ipad-layout.css",
+            "/assets/map/commonworld-country-boundaries.geojson",
+            "/assets/vendor/maplibre-gl.css",
+            "/assets/vendor/maplibre-gl.js",
+            "/index.css"
+          ],
+          "first_party_surface_sha256": "ec87cb95a37f5f88bd7e705b4e3dea81dab755452c055e3f70d05957e7a5afa8",
+          "project_json_request_count": 0,
+          "project_json_unique_request_count": 0,
+          "project_json_requests": []
+        },
+        {
+          "profile": "desktop-low-power",
+          "viewport": {
+            "width": 1366,
+            "height": 768
+          },
+          "cpu_throttle_rate": 4,
+          "runtime_ready_ms": 592,
+          "dom_node_count": 1687,
+          "catalog_card_count": 41,
+          "interactive_catalog_card_count": 41,
+          "runtime_ready": true,
+          "runtime_failed": false,
+          "dom_content_loaded_ms": 351.5,
+          "load_event_ms": 389.60000014305115,
+          "resource_count": 11,
+          "script_duration_ms": 496.24,
+          "task_duration_ms": 839.23,
+          "bootstrap_compile": {
+            "median_ms": 0.40000009536743164,
+            "p95_ms": 0.8999998569488525,
+            "samples_ms": [
+              0.09999990463256836,
+              0.09999990463256836,
+              0.10000014305114746,
+              0.10000014305114746,
+              0.10000014305114746,
+              0.20000004768371582,
+              0.20000004768371582,
+              0.20000004768371582,
+              0.20000004768371582,
+              0.39999985694885254,
+              0.40000009536743164,
+              0.5,
+              0.5999999046325684,
+              0.5999999046325684,
+              0.6000001430511475,
+              0.6999998092651367,
+              0.7000000476837158,
+              0.7999999523162842,
+              0.7999999523162842,
+              0.8999998569488525,
+              1
+            ]
+          },
+          "first_party_request_count": 10,
+          "first_party_unique_request_count": 10,
+          "first_party_raw_bytes": 1720066,
+          "first_party_requests": [
+            "/",
+            "/assets/commonworld-app.js",
+            "/assets/commonworld-bootstrap-catalog.mjs",
+            "/assets/commonworld-core.mjs",
+            "/assets/commonworld-mark.svg",
+            "/assets/ipad-layout.css",
+            "/assets/map/commonworld-country-boundaries.geojson",
+            "/assets/vendor/maplibre-gl.css",
+            "/assets/vendor/maplibre-gl.js",
+            "/index.css"
+          ],
+          "first_party_surface_sha256": "ec87cb95a37f5f88bd7e705b4e3dea81dab755452c055e3f70d05957e7a5afa8",
+          "project_json_request_count": 0,
+          "project_json_unique_request_count": 0,
+          "project_json_requests": []
+        }
+      ]
+    }
+  },
+  "delta": {
+    "startup_project_json_requests": -41,
+    "duplicate_identity_payload_count": -41,
+    "catalog_initial_raw_bytes": -155840,
+    "catalog_initial_gzip_bytes": -51789,
+    "catalog_initial_raw_reduction_percent": 56.8,
+    "catalog_initial_gzip_reduction_percent": 71.6,
+    "first_party_request_count_by_profile": {
+      "mobile-low-power": -41,
+      "desktop-low-power": -41
+    },
+    "browser_dom_nodes_by_profile": {
+      "mobile-low-power": 0,
+      "desktop-low-power": 0
+    }
+  },
+  "selected_design": "build-bound-bootstrap-with-public-project-json",
+  "preserved": [
+    "canonical CommonProject files remain unchanged and authoritative",
+    "public manifest and per-project JSON remain addressable",
+    "generated interactive HTML cards remain available",
+    "generated no-JavaScript catalogue remains available",
+    "GitHub Pages static delivery and privacy boundary remain unchanged"
+  ],
+  "does_not_establish": [
+    "that one timing sample proves a speedup",
+    "that duplicate generated HTML should be removed now",
+    "that a backend is required",
+    "future performance after catalogue growth"
+  ],
+  "validation": {
+    "public_browser_smoke": {
+      "verdict": "PASS",
+      "scenario_count": 27,
+      "scenario_ids": [
+        "startup-and-ring-orbits",
+        "ring-orbits-reduced-motion",
+        "synthetic-digital-performance",
+        "normal",
+        "intent-search-discovery",
+        "android-globe-ui-alignment",
+        "intent-search-ipad-portrait",
+        "intent-search-ipad-landscape",
+        "dual-presence-axes",
+        "layer-journey-desktop",
+        "layer-journey-mobile",
+        "layer-journey-ipad-portrait",
+        "layer-journey-ipad-landscape",
+        "layer-journey-moveend-return",
+        "layer-journey-interrupted",
+        "layer-journey-reduced-motion",
+        "legacy-layer-and-atomic-focus",
+        "history-focus-diagnostic-contract",
+        "valid-empty-digital-path",
+        "external-link-safety",
+        "synthetic-catalogue-truth",
+        "live-ui-hardening",
+        "catalogue-network-blocked",
+        "provider-failure",
+        "method-desktop",
+        "method-mobile",
+        "method-mobile-text-200"
+      ],
+      "catalogue_network_blocked_requests": 0,
+      "durable_task_id": "a6c02c1a34234d32a8d6117d",
+      "result_sha256": "f7e97ed4f3d3ad69e985e991f30d9ac2b44719df25046e5216fa68e189736486"
+    },
+    "proposal_browser_smoke": {
+      "verdict": "PASS",
+      "durable_task_id": "4bca220a4c96467ab9da39d8"
+    },
+    "focus_overlay_browser_smoke": {
+      "verdict": "PASS",
+      "durable_task_id": "14da6faa0b9e414f9c5e06e7"
+    },
+    "accessibility_modes_browser_smoke": {
+      "verdict": "PASS",
+      "durable_task_id": "34cf6fce54b64ac185deeb11"
+    },
+    "catalog_delivery_browser_measurement": {
+      "verdict": "PASS",
+      "profiles": [
+        "mobile-low-power",
+        "desktop-low-power"
+      ],
+      "cpu_throttle_rate": 4,
+      "durable_task_id": "48de77b0fea24d0ab6efac7f",
+      "result_sha256": "61756048222b1df17dad74e05d7149f5f3df497d0ce6b6d2d2f03d47ae4184a6"
+    },
+    "official_browser_runner": {
+      "verdict": "PASS",
+      "covers": [
+        "public-browser-smoke",
+        "proposal-browser-smoke",
+        "focus-overlay-browser-smoke",
+        "accessibility-modes-browser-smoke"
+      ],
+      "durable_task_id": "5019d73710c148ea9beaba0c",
+      "lifecycle_receipt_sha256": "08ce1e00aa14a39a3e8138a3d4612ef4b1f75e063287741100446358b47282b3"
+    }
+  },
+  "budget_binding": {
+    "bootstrap_gzip_bytes": 20526,
+    "warn_bootstrap_gzip_bytes": 28672,
+    "max_bootstrap_gzip_bytes": 32768
+  },
+  "current_surface_note": "PR #114 integrates complete-reference-cohort differencing protection and deterministic public-map layer ordering into the current country-composition and mobile-hit-target surface. Country layers, public extents, approximate zones and exact anchors remain ordered below the first base-map symbol layer, while fresh low-power Chromium measurements and the canonical public smoke bind the updated first-party surface."
+}

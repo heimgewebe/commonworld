@@ -1,5 +1,6 @@
 # Commonworld — kanonischer Globusplan
 
+
 ## Status
 
 - Typ: kanonischer Produkt-, UI- und Umsetzungsplan
@@ -545,10 +546,10 @@ Der öffentliche Repo-Slice ändert keine öffentliche Runtime. Der private Acce
 Die ferne Ansicht lädt keine Einzelobjektmenge. Daten werden maßstabsabhängig geliefert:
 
 ```text
-planetar       → aggregierte Felder
-Großregion     → regionale Aggregate
-Region         → Cluster, Flächen und Netzwerke
-lokal          → konkrete öffentliche Geometrien und Marker
+planetar       → anteilig nach Commons-Arten gefärbte Länderflächen
+Großregion     → dieselben landgebundenen Länderkompositionen, ohne künstliche Mittelpunktmarker
+Region         → Länderkompositionen verblassen, veröffentlichte Flächen und Unschärfegebiete treten hervor
+lokal          → konkrete öffentliche Geometrien und deutlich erkennbare exakte Ortsmarker
 Fokus          → vollständiger Datensatz
 ```
 
@@ -556,7 +557,7 @@ Fokus          → vollständiger Datensatz
 
 Die ausführbare Ableitungsregel liegt in `contracts/commonworld/aggregation-zoom.contract.json`. Sie beschreibt keine zweite Katalogwahrheit und keine API. Sie legt ausschließlich fest, wie derselbe aktuelle CommonProject-v4-Bestand für unterschiedliche semantische Ebenen zusammengefasst oder wieder aufgelöst wird.
 
-Die erste ausführbare geografische Eindrucksebene bleibt bewusst ein Katalogauszug: Sie bündelt ausschließlich validierte öffentliche Geometrien in deterministischen 30-Grad-, 10-Grad- und 4-Grad-Rastern für Planet, Großregion und Region. Farbe bezeichnet die exklusive Commons-Art, die Zahl ausschließlich freigegebene eindeutige Commons-Identitäten; Rasterzentren sind Darstellungspositionen und keine behaupteten Projektstandorte. Ein offenes Punktmuster und Text kennzeichnen die weiterhin unbewertete Katalogabdeckung. Ungefähre Ortsaggregate werden je Filterzustand nur ab fünf Identitäten und nur in ausreichend groben Behältern numerisch freigegeben; andernfalls erscheint ausschließlich ein neutraler Datenschutzhinweis. Solange keine belegte Abdeckungsbewertung vorliegt, werden weder Dichte noch regionale Leere behauptet. Länderflächen bleiben ausgeschlossen, bis ein eigener öffentlicher, quellengebundener Regionskontext außerhalb des CommonProject-Schemas vorliegt.
+Die ausführbare geografische Eindrucksebene bleibt bewusst ein Katalogauszug. In der Totalen werden Commons mit validierter veröffentlichter Geometrie zunächst kartografisch Ländern zugeordnet. Jedes betroffene Land erhält eine nicht interaktive Farbkomposition: Die diskreten Farben der dort belegten Commons-Arten werden als wiederholte Streifen proportional zur Zahl eindeutiger dokumentierter Commons-Identitäten verteilt. Auf kleinen Globen liegt darunter eine zurückhaltende Grundtönung der häufigsten dokumentierten Commons-Art, damit die Länderinformation auch dann sichtbar bleibt, wenn die feine Streifenkomposition optisch unter die Pixelauflösung fällt; diese Grundtönung ist weder Dichte- noch Mehrheitsaussage über die reale Commons-Landschaft. Es werden weder Kürzel noch Zahlen auf die Karte geschrieben. Die Länderzuordnung ist eine abgeleitete Darstellung auf Basis veröffentlichter Geometrie und niedrig aufgelöster Ländergrenzen, keine neue Tatsachenbehauptung im CommonProject-Datensatz. Liegt ein veröffentlichter ungefährer Küstenpunkt wegen der groben Kartengeometrie knapp außerhalb einer Landfläche, darf er ausschließlich dem nächstgelegenen Land zugeordnet werden, wenn die Distanz sowohl innerhalb seiner veröffentlichten Unschärfe als auch unter einer harten Grenze von 150 Kilometern liegt; exakte Punkte werden niemals verschoben. Beim Hineinzoomen bleibt diese Länderebene bis zur Region sichtbar und verblasst erst, wenn veröffentlichte Ausdehnungen, Unsicherheitszonen und exakte Anker räumlich lesbar werden. Exakte veröffentlichte Anker werden lokal mit größeren sichtbaren Markern und einer noch größeren unsichtbaren Touch-Trefferfläche bedienbar gemacht; beides verändert weder Koordinate noch Genauigkeitsaussage. Die weiterhin deterministisch berechneten 10-Grad- und 4-Grad-Aggregate dienen Datenschutzlogik und abgeleitetem Textkontext, werden aber nicht mehr als Punkte auf der Karte gezeichnet: Ihre Rasterzentren können auf Wasser liegen und sind keine Projektstandorte. Vollständige Commons-Art-Bezeichnungen bleiben in Legende und Textansicht zugänglich. Ungefähre Ortsaggregate werden je Filterzustand nur nach den Datenschutzregeln freigegeben; verborgene Lage fließt weder in Länderzuordnung noch in räumliche Aggregate ein. Solange keine belegte Abdeckungsbewertung vorliegt, werden weder Dichte noch regionale Leere behauptet. Ein künftig explizit quellengebundener Regionskontext bleibt nötig, um Commons ohne veröffentlichbare lokale Geometrie datenschutzgerecht auf Länder- oder Regionsebene einzubeziehen.
 
 #### Zähleinheit und Mehrfachverortung
 
@@ -686,6 +687,12 @@ Das Zahnrad wechselt zwischen `Globus` und `Text`. Beide Darstellungen verwenden
 Die digitale Sphäre ist geometrisch an MapLibre gebunden. Ihr sichtbarer Mittelpunkt wird aus der Projektion des aktuellen Kartenmittelpunkts bestimmt; Größe und Versatz berücksichtigen Kartenmaß, Viewport und MapLibre-Padding. Ein bildschirmfestes unabhängiges Zentrieren ist verboten. Dadurch bleiben Erde und Sphäre auch während der seitlichen Schichtfahrt zusammen. Die berechnete Geometrie wird für Browserabnahmen als Datenattribut offengelegt.
 
 `catalog/catalog.json`, die Projektdateien unter `catalog/projects/` und `contracts/commonworld/project.schema.json` bilden die statische, ausschließlich lesende Maschinenoberfläche. Sie ist keine laufende API und besitzt keinen Schreibweg. Eine eigenständige CLI bleibt ohne belegten wiederkehrenden Anwendungsfall ausgeschlossen. Die Betriebsgrenze steht in `docs/ops/machine-readable-surface.md`.
+
+### Gemessene statische Katalogauslieferung v1
+
+Die kanonischen `CommonProject`-Dateien bleiben die einzige veränderbare Katalogwahrheit. Build und CI erzeugen daraus einen vollständigen buildgebundenen Bootstrap für Karte, Suche, Filter und Fokus sowie die statischen interaktiven und No-JavaScript-Karten. Der Browser lädt die einzelnen Projektdateien beim Start nicht nochmals zur Gleichheitsprüfung; Manifest und Projekt-JSON bleiben dennoch öffentlich und direkt adressierbar.
+
+Der aktuelle Entwurf wird nicht über eine feste Katalogzahl begrenzt. Der Vertrag `contracts/commonworld/catalog-delivery-budget.contract.json` misst rohe und komprimierte Bytes, doppelte Identitätslasten, Startanfragen, DOM-Knoten und vierfach CPU-gedrosselte Browserarbeit. Eine deterministische Budgetüberschreitung oder zwei aufeinanderfolgende Browserüberschreitungen erzwingen den erneuten Vergleich von vollständigem Bootstrap, HTML-Hydration, segmentiertem statischem JSON und bedarfsgeladener schreibgeschützter Lieferung. Barrierefreiheit, SEO, No-JavaScript-Verhalten, Datenschutz, Caching, Komplexität und GitHub-Pages-Tauglichkeit bleiben gemeinsame Entscheidungskriterien.
 
 ### Hierarchische digitale Ringbündel v1
 

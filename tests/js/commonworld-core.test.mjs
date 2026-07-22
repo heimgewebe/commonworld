@@ -10,6 +10,8 @@ import {
   GEOGRAPHIC_IMPRESSION_LEVELS,
   DEFAULT_CAMERA,
   MAX_MAP_ZOOM,
+  MAP_GEOMETRY_DIAGNOSTIC_SAMPLE_INTERVAL,
+  MAP_GEOMETRY_SAMPLE_INTERVAL_MS,
   DIGITAL_LAYER_TRANSITION_MS,
   DIGITAL_RING_FIELDS,
   DIGITAL_ROOT_PATH,
@@ -21,6 +23,7 @@ import {
   buildDigitalPresentationTree,
   cameraFromSearch,
   commonsTypeLabel,
+  countryCompositionFeatureCollection,
   deriveCommonsType,
   deriveDigitalProjectPath,
   deriveLayer,
@@ -36,6 +39,7 @@ import {
   publicGeographicRepresentationKind,
   publicMapFeatureCollection,
   publicProjectNavigationTarget,
+  quantizeSpherePixel,
   representativeGeometryPoint,
   representativeGeometryPoints,
   evidencedRelations,
@@ -53,6 +57,7 @@ import {
   ringOrbitDuration,
   ringOrbitStartAngle,
   safeExternalHttpsUrl,
+  sampledDiagnosticPublicationDue,
   searchFromState,
   serializeDigitalPath,
   semanticLocationLine,
@@ -541,6 +546,27 @@ test('projected globe circle uses the rendered horizon rather than MapLibre zoom
   assert.equal(projectedGlobeCircle({ center, horizon: horizon.slice(0, 3) }), null);
 });
 
+test('sphere pixel quantization suppresses imperceptible subpixel churn', () => {
+  assert.equal(quantizeSpherePixel(123.456789), 123.46);
+  assert.equal(quantizeSpherePixel(123.461), 123.46);
+  assert.equal(quantizeSpherePixel(123.466), 123.47);
+  assert.equal(quantizeSpherePixel(undefined), 0);
+  assert.equal(quantizeSpherePixel(Number.NaN), 0);
+  assert.equal(quantizeSpherePixel(Number.POSITIVE_INFINITY), 0);
+  assert.equal(quantizeSpherePixel({}), 0);
+});
+
+test('sampled diagnostics use the admitted sample count without a zero-count publication', () => {
+  assert.deepEqual(
+    Array.from({ length: 9 }, (_, index) => index).filter((sampleCount) => (
+      sampledDiagnosticPublicationDue(sampleCount, 4)
+    )),
+    [1, 4, 8],
+  );
+  assert.equal(sampledDiagnosticPublicationDue(1, 0), false);
+  assert.equal(sampledDiagnosticPublicationDue(-1, 4), false);
+});
+
 test('sphere layout follows measured globe geometry and keeps stacked side tracks cropped', () => {
   const normal = sphereLayout({ width: 1000, height: 700, globe: { x: 500, y: 350, diameter: 600 } });
   const rotatedEquivalent = sphereLayout({ width: 1000, height: 700, globe: { x: 498.2, y: 351.4, diameter: 600 } });
@@ -561,7 +587,9 @@ test('sphere layout follows measured globe geometry and keeps stacked side track
 });
 
 test('digital layer camera performs a bounded journey without changing identity', () => {
-  assert.equal(DIGITAL_LAYER_TRANSITION_MS, 1080);
+  assert.equal(MAP_GEOMETRY_SAMPLE_INTERVAL_MS, 32);
+  assert.equal(MAP_GEOMETRY_DIAGNOSTIC_SAMPLE_INTERVAL, 4);
+  assert.equal(DIGITAL_LAYER_TRANSITION_MS, 420);
   assert.deepEqual(digitalLayerCamera({ lng: 13.4, lat: 52.5, zoom: 1.2, bearing: 170, pitch: 0 }), {
     center: [13.4, 52.5],
     zoom: 2.25,
@@ -688,6 +716,67 @@ test('public geometry representative points are deterministic and fail closed', 
   assert.equal(representativeGeometryPoint({ type: 'Polygon', coordinates: [] }), null);
   assert.equal(representativeGeometryPoint({ type: 'LineString', coordinates: [[0, 0], [1, 1]] }), null);
   assert.equal(representativeGeometryPoint(null), null);
+});
+
+test('country compositions derive proportional type segments only from published public geometry', () => {
+  const boundaries = {
+    type: 'FeatureCollection',
+    features: [
+      {
+        type: 'Feature',
+        properties: { ADM0_A3: 'WST', NAME: 'Westland' },
+        geometry: { type: 'Polygon', coordinates: [[[0, 0], [10, 0], [10, 10], [0, 10], [0, 0]]] },
+      },
+      {
+        type: 'Feature',
+        properties: { ADM0_A3: 'EST', NAME: 'Eastland' },
+        geometry: { type: 'Polygon', coordinates: [[[10, 0], [20, 0], [20, 10], [10, 10], [10, 0]]] },
+      },
+    ],
+  };
+  const records = [
+    { id: 'knowledge-a', commons_type: 'knowledge', presence: { geographic: [{ id: 'ka', mode: 'exact', geometry: { type: 'Point', coordinates: [1, 1] } }], digital: { available: false } } },
+    { id: 'water-a', commons_type: 'water', presence: { geographic: [{ id: 'wa', mode: 'exact', geometry: { type: 'Point', coordinates: [2, 2] } }], digital: { available: false } } },
+    { id: 'water-b', commons_type: 'water', presence: { geographic: [{ id: 'wb', mode: 'exact', geometry: { type: 'Point', coordinates: [3, 3] } }], digital: { available: false } } },
+    { id: 'energy-a', commons_type: 'energy', presence: { geographic: [{ id: 'ea', mode: 'exact', geometry: { type: 'Point', coordinates: [11, 1] } }], digital: { available: false } } },
+    { id: 'hidden-a', commons_type: 'culture', presence: { geographic: [{ id: 'ha', mode: 'hidden', geometry: { type: 'Point', coordinates: [4, 4] } }], digital: { available: false } } },
+  ];
+
+  const collection = countryCompositionFeatureCollection(records, boundaries);
+  assert.equal(collection.features.length, 2);
+  const west = collection.features.find(({ properties }) => properties.country_id === 'WST');
+  const east = collection.features.find(({ properties }) => properties.country_id === 'EST');
+  assert.equal(west.properties.composition_key, 'knowledge:1|water:2');
+  assert.equal(west.properties.dominant_commons_type, 'water');
+  assert.equal(west.properties.documented_identity_count, 3);
+  assert.equal(west.properties.commons_type_count, 2);
+  assert.equal(west.properties.interactive, false);
+  assert.equal(west.properties.density_claim, false);
+  assert.equal(east.properties.composition_key, 'energy:1');
+  assert.equal(east.properties.dominant_commons_type, 'energy');
+  assert.equal(collection.features.some(({ properties }) => properties.composition_key.includes('culture')), false);
+
+  const filtered = countryCompositionFeatureCollection(records, boundaries, ['water-a']);
+  assert.equal(filtered.features.length, 1);
+  assert.equal(filtered.features[0].properties.country_id, 'WST');
+  assert.equal(filtered.features[0].properties.composition_key, 'water:1');
+  assert.equal(filtered.features[0].properties.dominant_commons_type, 'water');
+  assert.strictEqual(filtered, countryCompositionFeatureCollection(records, boundaries, new Set(['water-a'])));
+
+  const coastalRecords = [
+    {
+      id: 'coastal-approximate', commons_type: 'water',
+      presence: { geographic: [{ id: 'coast-a', mode: 'approximate', geometry: { type: 'Point', coordinates: [-0.1, 5] }, uncertainty_meters_min: 20_000 }], digital: { available: false } },
+    },
+    {
+      id: 'coastal-exact', commons_type: 'knowledge',
+      presence: { geographic: [{ id: 'coast-e', mode: 'exact', geometry: { type: 'Point', coordinates: [-0.1, 6] } }], digital: { available: false } },
+    },
+  ];
+  const coastal = countryCompositionFeatureCollection(coastalRecords, boundaries);
+  assert.equal(coastal.features.length, 1);
+  assert.equal(coastal.features[0].properties.country_id, 'WST');
+  assert.equal(coastal.features[0].properties.composition_key, 'water:1');
 });
 
 test('public map derivation preserves local identity and emits non-interactive unassessed aggregates', () => {
