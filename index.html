@@ -12,10 +12,10 @@
     <link rel="alternate" type="application/json" href="./catalog/catalog.json" title="Commonworld-Katalog" />
     <link rel="alternate" type="application/schema+json" href="./contracts/commonworld/project.schema.json" title="CommonProject-Schema" />
     <link rel="stylesheet" href="./assets/vendor/maplibre-gl.css" />
-    <link rel="stylesheet" href="./index.css?v=b824c13c096a" />
+    <link rel="stylesheet" href="./index.css?v=e2236fe798c0" />
     <link rel="stylesheet" href="./assets/ipad-layout.css" />
     <script src="./assets/vendor/maplibre-gl.js" defer></script>
-    <script type="module" src="./assets/commonworld-app.js?v=1b18df39972f"></script>
+    <script type="module" src="./assets/commonworld-app.js?v=5156e8f5f40f"></script>
   </head>
   <body data-presentation="globe">
     <a class="skip-link" href="#text-view">Zur Textansicht springen</a>
@@ -59,7 +59,7 @@
               <fieldset class="filter-presence-group"><legend>Präsenz</legend><div class="filter-presence-options"><label><input type="checkbox" id="filter-presence-geographic" name="presence" value="geographic" data-intent-filter="presence"> Vor Ort</label><label><input type="checkbox" id="filter-presence-digital" name="presence" value="digital" data-intent-filter="presence"> Digital</label></div></fieldset>
               <div class="spatial-destination-search">
                 <label for="spatial-destination-search">Ort oder Land suchen</label>
-                <input id="spatial-destination-search" type="search" inputmode="search" autocomplete="off" placeholder="Ort, Region oder Land" aria-controls="spatial-destination-results" />
+                <input id="spatial-destination-search" type="search" inputmode="search" autocomplete="off" placeholder="Ort, Region oder Land" aria-controls="spatial-destination-results" aria-expanded="false" />
                 <ul id="spatial-destination-results" class="spatial-destination-results" aria-label="Ortsvorschläge"></ul>
               </div>
               <label><span>Land</span><select id="filter-country"><option value="">Alle Länder</option></select></label>
