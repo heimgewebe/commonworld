@@ -270,9 +270,9 @@
         "gzip_bytes": 1080
       },
       "html": {
-        "raw_bytes": 182644,
-        "gzip_bytes": 24645,
-        "start_tag_count": 1887,
+        "raw_bytes": 185387,
+        "gzip_bytes": 25105,
+        "start_tag_count": 1925,
         "catalog_card_instances": 100,
         "interactive_catalog_cards": 50,
         "noscript_catalogs": 1
@@ -292,7 +292,7 @@
     "browser": {
       "schema_version": 1,
       "kind": "commonworld_catalog_delivery_browser_metrics",
-      "measured_at": "2026-07-22T05:32:04.132Z",
+      "measured_at": "2026-07-22T16:09:48.322Z",
       "cpu_throttle_rate": 4,
       "profiles": [
         {
@@ -302,20 +302,20 @@
             "height": 844
           },
           "cpu_throttle_rate": 4,
-          "runtime_ready_ms": 689,
-          "dom_node_count": 1966,
+          "runtime_ready_ms": 743,
+          "dom_node_count": 2021,
           "catalog_card_count": 50,
           "interactive_catalog_card_count": 50,
           "runtime_ready": true,
           "runtime_failed": false,
-          "dom_content_loaded_ms": 395.90000009536743,
-          "load_event_ms": 431.90000009536743,
+          "dom_content_loaded_ms": 411.39999985694885,
+          "load_event_ms": 447.89999985694885,
           "resource_count": 11,
-          "script_duration_ms": 719,
-          "task_duration_ms": 1527.76,
+          "script_duration_ms": 768.15,
+          "task_duration_ms": 2239.35,
           "bootstrap_compile": {
-            "median_ms": 0.5,
-            "p95_ms": 0.7999999523162842,
+            "median_ms": 0.10000014305114746,
+            "p95_ms": 1.2999999523162842,
             "samples_ms": [
               0,
               0,
@@ -323,26 +323,26 @@
               0,
               0,
               0.09999990463256836,
+              0.09999990463256836,
+              0.09999990463256836,
+              0.09999990463256836,
               0.10000014305114746,
               0.10000014305114746,
-              0.2999999523162842,
-              0.5,
-              0.5,
-              0.5,
-              0.5,
+              0.10000014305114746,
+              0.20000004768371582,
+              0.40000009536743164,
               0.5999999046325684,
-              0.6000001430511475,
-              0.6000001430511475,
               0.7000000476837158,
               0.7999999523162842,
               0.7999999523162842,
-              0.7999999523162842,
-              0.8999998569488525
+              1.0999999046325684,
+              1.2999999523162842,
+              1.7000000476837158
             ]
           },
           "first_party_request_count": 10,
           "first_party_unique_request_count": 10,
-          "first_party_raw_bytes": 1781776,
+          "first_party_raw_bytes": 1814523,
           "first_party_requests": [
             "/",
             "/assets/commonworld-app.js",
@@ -355,7 +355,7 @@
             "/assets/vendor/maplibre-gl.js",
             "/index.css"
           ],
-          "first_party_surface_sha256": "e55d0058cf1fec3a98ca01c8be15524b8058d3848ad91a3962b76ff46874c862",
+          "first_party_surface_sha256": "f1d7566559229eaf12960da9d99b75b58005ceb71b14e41594ab2b12912ff9ee",
           "project_json_request_count": 0,
           "project_json_unique_request_count": 0,
           "project_json_requests": []
@@ -367,39 +367,39 @@
             "height": 768
           },
           "cpu_throttle_rate": 4,
-          "runtime_ready_ms": 595,
-          "dom_node_count": 1966,
+          "runtime_ready_ms": 672,
+          "dom_node_count": 2021,
           "catalog_card_count": 50,
           "interactive_catalog_card_count": 50,
           "runtime_ready": true,
           "runtime_failed": false,
-          "dom_content_loaded_ms": 352.40000009536743,
-          "load_event_ms": 387.10000014305115,
+          "dom_content_loaded_ms": 384.60000014305115,
+          "load_event_ms": 425.10000014305115,
           "resource_count": 11,
-          "script_duration_ms": 543.56,
-          "task_duration_ms": 880.01,
+          "script_duration_ms": 536.04,
+          "task_duration_ms": 930.05,
           "bootstrap_compile": {
-            "median_ms": 0.6000001430511475,
+            "median_ms": 0.5999999046325684,
             "p95_ms": 1,
             "samples_ms": [
-              0,
-              0.09999990463256836,
-              0.09999990463256836,
               0.10000014305114746,
               0.10000014305114746,
-              0.39999985694885254,
-              0.39999985694885254,
-              0.39999985694885254,
+              0.10000014305114746,
+              0.10000014305114746,
+              0.10000014305114746,
+              0.2999999523162842,
+              0.5,
+              0.5,
+              0.5,
               0.5,
               0.5999999046325684,
-              0.6000001430511475,
-              0.6000001430511475,
-              0.7000000476837158,
-              0.7000000476837158,
+              0.5999999046325684,
+              0.6999998092651367,
               0.7000000476837158,
               0.7000000476837158,
               0.7000000476837158,
               0.7999999523162842,
+              0.8999998569488525,
               0.8999998569488525,
               1,
               1
@@ -407,7 +407,7 @@
           },
           "first_party_request_count": 10,
           "first_party_unique_request_count": 10,
-          "first_party_raw_bytes": 1781776,
+          "first_party_raw_bytes": 1814523,
           "first_party_requests": [
             "/",
             "/assets/commonworld-app.js",
@@ -420,7 +420,7 @@
             "/assets/vendor/maplibre-gl.js",
             "/index.css"
           ],
-          "first_party_surface_sha256": "e55d0058cf1fec3a98ca01c8be15524b8058d3848ad91a3962b76ff46874c862",
+          "first_party_surface_sha256": "f1d7566559229eaf12960da9d99b75b58005ceb71b14e41594ab2b12912ff9ee",
           "project_json_request_count": 0,
           "project_json_unique_request_count": 0,
           "project_json_requests": []
@@ -440,8 +440,8 @@
       "desktop-low-power": -41
     },
     "browser_dom_nodes_by_profile": {
-      "mobile-low-power": 279,
-      "desktop-low-power": 279
+      "mobile-low-power": 334,
+      "desktop-low-power": 334
     }
   },
   "selected_design": "build-bound-bootstrap-with-public-project-json",
@@ -462,13 +462,14 @@
   "validation": {
     "public_browser_smoke": {
       "verdict": "PASS",
-      "scenario_count": 27,
+      "scenario_count": 28,
       "scenario_ids": [
         "startup-and-ring-orbits",
         "ring-orbits-reduced-motion",
         "synthetic-digital-performance",
         "normal",
         "intent-search-discovery",
+        "spatial-discovery-filters",
         "android-globe-ui-alignment",
         "intent-search-ipad-portrait",
         "intent-search-ipad-landscape",
@@ -493,20 +494,20 @@
         "method-mobile-text-200"
       ],
       "catalogue_network_blocked_requests": 0,
-      "durable_task_id": "b37a7bd25e8c4e1a9d08bc9b",
-      "result_sha256": "128e7218eec889ecf6e393b9f05be5160a58e80aedf5618cb607da369584b54f"
+      "durable_task_id": "c36a7d4841b3425cb4251462",
+      "result_sha256": "ce8d795f1e54a2f82938ba0153bb9a60e85efaf47fb4ac91d3a936d4fdd9c0d0"
     },
     "proposal_browser_smoke": {
       "verdict": "PASS",
-      "durable_task_id": "4bca220a4c96467ab9da39d8"
+      "durable_task_id": "2002407823bb4d8994025221"
     },
     "focus_overlay_browser_smoke": {
       "verdict": "PASS",
-      "durable_task_id": "14da6faa0b9e414f9c5e06e7"
+      "durable_task_id": "2002407823bb4d8994025221"
     },
     "accessibility_modes_browser_smoke": {
       "verdict": "PASS",
-      "durable_task_id": "34cf6fce54b64ac185deeb11"
+      "durable_task_id": "2002407823bb4d8994025221"
     },
     "catalog_delivery_browser_measurement": {
       "verdict": "PASS",
@@ -515,8 +516,8 @@
         "desktop-low-power"
       ],
       "cpu_throttle_rate": 4,
-      "durable_task_id": "9247c0c5506f4c5cbea26818",
-      "result_sha256": "f28baf08dc1ad312fae864a10a783c756fed9911bdf44c1522a485864afc2095"
+      "durable_task_id": "4011391722a5466caf67c977",
+      "result_sha256": "f1a6e63dcedf905e3c9719d69afaa73020287666890e01f7b397c161d8faadab"
     },
     "official_browser_runner": {
       "verdict": "PASS",
@@ -526,8 +527,8 @@
         "focus-overlay-browser-smoke",
         "accessibility-modes-browser-smoke"
       ],
-      "durable_task_id": "f45103f380314963a7baab3b",
-      "lifecycle_receipt_sha256": "da909da3967d0542067cbe902acc06aa30445cc6bc0d825061f864814e91dc0d"
+      "durable_task_id": "2002407823bb4d8994025221",
+      "lifecycle_receipt_sha256": "b63a5e95bb765d8c4aba1a90c6a665ed4e51a6f22a1cba139c3ae2d55f08fd41"
     }
   },
   "budget_binding": {
@@ -535,5 +536,5 @@
     "warn_bootstrap_gzip_bytes": 28672,
     "max_bootstrap_gzip_bytes": 32768
   },
-  "current_surface_note": "Catalogue expanded from 41 to 50 canonical Commons on top of the current geographic-impression privacy and rendering hardening. Static projections, digital taxonomy and browser smoke assumptions remain catalogue-growth-safe."
+  "current_surface_note": "Current 50-Commons surface with spatial discovery filters: collapsible filter groups, active chips, country navigation/filtering, local published-place search, and ephemeral geolocation-based nearby filtering. Hidden locations remain excluded and exact user geolocation is not serialized into URL or history state."
 }

@@ -6,7 +6,7 @@
     width: min(64rem, calc(100% - 1.5rem));
     padding: 0.75rem;
   }
-  .intent-filter-grid {
+  .filter-group-controls {
     grid-template-columns: repeat(4, minmax(0, 1fr));
     gap: 0.45rem;
   }

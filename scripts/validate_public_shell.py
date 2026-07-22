@@ -255,13 +255,13 @@ def _validate_ipad_landscape_wiring(root: Path, html: str) -> list[str]:
     if render_presence.options_wrapper_count != 1 or not render_presence.has_both_checkboxes:
         errors.append('render_public_shell.py must emit the .filter-presence-options wrapper with both presence checkboxes')
 
-    if '.intent-filter-grid > .filter-presence-group' not in index_css or '.filter-presence-options' not in index_css:
+    if '.filter-group-controls > .filter-presence-group' not in index_css or '.filter-presence-options' not in index_css:
         errors.append('index.css must own the shared presence group and option styles')
 
     options_block_match = find_css_block(index_css, '.filter-presence-options > label')
     if options_block_match is None or not re.search(r'min-height:\s*var\(--minimum-touch-target', options_block_match[1]):
         errors.append('index.css presence options must define a compact, touch-safe label style')
-    if '.intent-filter-grid > .filter-presence-group > .filter-presence-options > label' in ipad_css:
+    if '.filter-group-controls > .filter-presence-group > .filter-presence-options > label' in ipad_css:
         errors.append('assets/ipad-layout.css must not duplicate the shared presence option component style')
 
     target_media_tokens = (

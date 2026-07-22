@@ -269,14 +269,23 @@ async function loadExpectedDigitalProjection() {
 
 const expectedDigitalProjection = await loadExpectedDigitalProjection();
 
-async function newPage({ mobile = false, viewportOverride = null, touch = mobile, reducedMotion = 'reduce' } = {}) {
+async function newPage({
+  mobile = false,
+  viewportOverride = null,
+  touch = mobile,
+  reducedMotion = 'reduce',
+  geolocation = null,
+  permissions = [],
+} = {}) {
   const context = await browser.newContext({
     viewport: viewportOverride ?? (mobile ? { width: 390, height: 844 } : { width: 1280, height: 800 }),
     isMobile: mobile,
     hasTouch: touch,
     deviceScaleFactor: 1,
     reducedMotion,
+    ...(geolocation ? { geolocation } : {}),
   });
+  if (permissions.length) await context.grantPermissions(permissions, { origin: baseUrl });
   await context.route('https://tiles.openfreemap.org/fonts/**', (route) => route.fulfill({
     status: 200,
     contentType: 'application/x-protobuf',
@@ -1780,6 +1789,95 @@ async function intentSearchDiscoveryScenario() {
   await run.context.close();
 }
 
+async function spatialDiscoveryFiltersScenario() {
+  const privateLocation = { latitude: 52.52, longitude: 13.405 };
+  const run = await newPage({ geolocation: privateLocation, permissions: ['geolocation'] });
+  await run.page.goto(baseUrl, { waitUntil: 'domcontentloaded' });
+  await run.page.waitForSelector('html.runtime-ready');
+  await run.page.waitForFunction(() => document.querySelector('.globe-stage')?.dataset.countryMapState === 'ready');
+
+  await run.page.locator('#filter-toggle').click();
+  assert(await run.page.locator('#discovery-panel').isVisible(), 'spatial discovery: discovery panel did not open');
+  assert(await run.page.locator('#filter-sections').isVisible(), 'spatial discovery: filter sections were not initially visible');
+  await run.page.locator('#filter-sections-toggle').click();
+  assert(await run.page.locator('#filter-sections').isHidden(), 'spatial discovery: filter sections did not collapse');
+  assert(await run.page.locator('#filter-sections-toggle').getAttribute('aria-expanded') === 'false', 'spatial discovery: collapsed filter aria state is wrong');
+  assert(await run.page.locator('#active-filter-chips').evaluate((element) => !element.hidden && !element.closest('#filter-sections')), 'spatial discovery: active filter chip region moved into or disappeared with collapsed controls');
+  await run.page.locator('#filter-sections-toggle').click();
+
+  const firstCountry = await run.page.locator('#filter-country option').evaluateAll((options) => {
+    const option = options.find((candidate) => candidate.value);
+    return option ? { id: option.value, name: option.textContent.trim() } : null;
+  });
+  assert(firstCountry?.id && firstCountry?.name, 'spatial discovery: country selector has no navigable country');
+  await run.page.locator('#spatial-destination-search').fill(firstCountry.name);
+  await run.page.waitForFunction(() => document.querySelectorAll('#spatial-destination-results li').length > 0);
+  const firstDestination = run.page.locator('#spatial-destination-results li').first();
+  await firstDestination.locator('button').first().click();
+  await run.page.waitForFunction(() => !document.querySelector('#country-navigation-context')?.hidden);
+  assert(!new URL(run.page.url()).searchParams.has('country'), 'spatial discovery: navigating to a country silently activated filtering');
+  await run.page.locator('#country-filter-action').click();
+  await run.page.waitForFunction((countryId) => new URL(location.href).searchParams.get('country') === countryId, firstCountry.id);
+  assert((await run.page.locator('#filter-toggle-count').textContent()) === '1', 'spatial discovery: country filter count badge is wrong');
+  assert(await run.page.locator('#active-filter-chips button').count() === 1, 'spatial discovery: country filter chip missing');
+  await run.page.locator('#active-filter-chips button').click();
+  await run.page.waitForFunction(() => !new URL(location.href).searchParams.has('country'));
+
+  await run.page.locator('#spatial-destination-search').fill('Berlin');
+  await run.page.waitForFunction(() => document.querySelectorAll('#spatial-destination-results li').length > 0);
+  assert((await run.page.locator('#spatial-destination-results').textContent())?.toLocaleLowerCase('de').includes('berlin'), 'spatial discovery: published Berlin destination is not searchable locally');
+
+  await run.page.locator('#use-current-location').click();
+  await run.page.waitForFunction(() => document.querySelector('#geolocation-status')?.textContent.includes('Standort verwendet'));
+  const privacyState = await run.page.evaluate(({ latitude, longitude }) => {
+    const url = new URL(location.href);
+    const serializedLatitude = Number(url.searchParams.get('lat'));
+    const serializedLongitude = Number(url.searchParams.get('lng'));
+    const state = history.state?.commonworld ?? {};
+    return {
+      hasNearbyUrlState: [...url.searchParams.keys()].some((key) => key.toLowerCase().includes('nearby')),
+      cameraContainsPrivateLocation: Math.abs(serializedLatitude - latitude) < 0.01 && Math.abs(serializedLongitude - longitude) < 0.01,
+      historyNearbyOrigin: state.nearbyOrigin ?? null,
+      historyNearbyRadiusMeters: state.nearbyRadiusMeters ?? null,
+      chipCount: document.querySelectorAll('#active-filter-chips .active-filter-chip').length,
+      badge: document.querySelector('#filter-toggle-count')?.textContent,
+    };
+  }, privateLocation);
+  assert(!privacyState.hasNearbyUrlState, `spatial discovery: private nearby state leaked into URL (${JSON.stringify(privacyState)})`);
+  assert(!privacyState.cameraContainsPrivateLocation, `spatial discovery: private geolocation leaked through camera URL (${JSON.stringify(privacyState)})`);
+  assert(privacyState.historyNearbyOrigin === null && privacyState.historyNearbyRadiusMeters === null, `spatial discovery: private geolocation leaked into history state (${JSON.stringify(privacyState)})`);
+  assert(privacyState.chipCount === 1 && privacyState.badge === '1', `spatial discovery: nearby filter chip/badge missing (${JSON.stringify(privacyState)})`);
+
+  const mapCanvas = run.page.locator('.maplibregl-canvas');
+  const mapCanvasBox = await mapCanvas.boundingBox();
+  assert(mapCanvasBox, 'spatial discovery: map canvas has no interaction bounds');
+  await run.page.mouse.move(mapCanvasBox.x + (mapCanvasBox.width / 2), mapCanvasBox.y + (mapCanvasBox.height / 2));
+  await run.page.mouse.wheel(0, -120);
+  await run.page.waitForTimeout(700);
+  const postInteractionPrivacyState = await run.page.evaluate(({ latitude, longitude }) => {
+    const url = new URL(location.href);
+    const serializedLatitude = Number(url.searchParams.get('lat'));
+    const serializedLongitude = Number(url.searchParams.get('lng'));
+    return {
+      cameraContainsPrivateLocation: Math.abs(serializedLatitude - latitude) < 0.01 && Math.abs(serializedLongitude - longitude) < 0.01,
+      historyNearbyOrigin: history.state?.commonworld?.nearbyOrigin ?? null,
+      historyNearbyRadiusMeters: history.state?.commonworld?.nearbyRadiusMeters ?? null,
+    };
+  }, privateLocation);
+  assert(!postInteractionPrivacyState.cameraContainsPrivateLocation, `spatial discovery: manual map interaction leaked private geolocation through camera URL (${JSON.stringify(postInteractionPrivacyState)})`);
+  assert(postInteractionPrivacyState.historyNearbyOrigin === null && postInteractionPrivacyState.historyNearbyRadiusMeters === null, `spatial discovery: manual map interaction leaked private nearby state into history (${JSON.stringify(postInteractionPrivacyState)})`);
+  assert(run.pageErrors.length === 0, `spatial discovery: page errors: ${run.pageErrors.join(' | ')}`);
+  assert(run.consoleErrors.length === 0, `spatial discovery: console errors: ${run.consoleErrors.join(' | ')}`);
+  results.push({
+    id: 'spatial-discovery-filters',
+    verdict: 'PASS',
+    countryNavigationSeparatedFromFiltering: true,
+    localPublishedPlaceSearch: true,
+    privateGeolocationNotSerialized: true,
+  });
+  await run.context.close();
+}
+
 async function androidGlobeUiScenario() {
   const scenarioId = 'android-globe-ui-alignment';
   process.stdout.write(JSON.stringify({ state: 'RUNNING', scenario: scenarioId }) + '\n');
@@ -2613,6 +2711,7 @@ try {
   await syntheticDigitalPerformanceScenario();
   await normalScenario();
   await intentSearchDiscoveryScenario();
+  await spatialDiscoveryFiltersScenario();
   await androidGlobeUiScenario();
   await intentSearchLayoutScenario({ viewportOverride: { width: 1024, height: 1366 }, scenarioId: 'intent-search-ipad-portrait' });
   await intentSearchLayoutScenario({ viewportOverride: { width: 1366, height: 1024 }, scenarioId: 'intent-search-ipad-landscape' });

@@ -832,6 +832,13 @@ const languageFilterParameter = (parameters) => {
   return value === 'unknown' || /^[a-z]{2,3}(?:-[A-Z]{2})?$/.test(value ?? '') ? value : null;
 };
 
+const COUNTRY_CODE_PATTERN = /^[A-Za-z0-9_-]{1,16}$/;
+
+const countryFilterParameter = (parameters) => {
+  const value = parameters.get('country');
+  return typeof value === 'string' && COUNTRY_CODE_PATTERN.test(value) ? value : null;
+};
+
 function normalizedPresenceFilters(values) {
   const requested = new Set(Array.isArray(values) ? values : []);
   return INTENT_FILTER_VALUES.presence.filter((value) => requested.has(value));
@@ -865,6 +872,9 @@ export function stateFromSearch(search = '', knownProjectIds = []) {
     access: filterParameter(parameters, 'access'),
     freshness: filterParameter(parameters, 'freshness'),
     curation: filterParameter(parameters, 'curation'),
+    country: countryFilterParameter(parameters),
+    nearbyOrigin: null,
+    nearbyRadiusMeters: null,
   };
 }
 
@@ -893,6 +903,9 @@ export function searchFromState(state) {
   for (const name of ['commons_type', 'action', 'access', 'freshness', 'curation']) {
     const value = state?.[name];
     if (INTENT_FILTER_VALUES[name].includes(value)) parameters.set(name, value);
+  }
+  if (typeof state?.country === 'string' && COUNTRY_CODE_PATTERN.test(state.country)) {
+    parameters.set('country', state.country);
   }
   for (const presence of normalizedPresenceFilters(state?.presence)) {
     parameters.append('presence', presence);
@@ -1050,6 +1063,109 @@ export function publicGeographicLocations(record) {
     : [];
 }
 
+function spatialGeometryPolygons(geometry) {
+  if (geometry?.type === 'Polygon') return [geometry.coordinates];
+  if (geometry?.type === 'MultiPolygon') return Array.isArray(geometry.coordinates) ? geometry.coordinates : [];
+  return [];
+}
+
+function anyVertexInsideGeometry(polygons, testGeometry) {
+  for (const polygon of polygons) {
+    for (const ring of Array.isArray(polygon) ? polygon : []) {
+      for (const vertex of Array.isArray(ring) ? ring : []) {
+        if (countryGeometryContainsPoint(testGeometry, vertex)) return true;
+      }
+    }
+  }
+  return false;
+}
+
+function segmentsIntersect([ax, ay], [bx, by], [cx, cy], [dx, dy]) {
+  const orientation = (px, py, qx, qy, rx, ry) => Math.sign((qx - px) * (ry - py) - (qy - py) * (rx - px));
+  const onSegment = (px, py, qx, qy, rx, ry) =>
+    Math.min(px, rx) <= qx && qx <= Math.max(px, rx) && Math.min(py, ry) <= qy && qy <= Math.max(py, ry);
+
+  const o1 = orientation(ax, ay, bx, by, cx, cy);
+  const o2 = orientation(ax, ay, bx, by, dx, dy);
+  const o3 = orientation(cx, cy, dx, dy, ax, ay);
+  const o4 = orientation(cx, cy, dx, dy, bx, by);
+
+  if (o1 !== o2 && o3 !== o4) return true;
+  if (o1 === 0 && onSegment(ax, ay, cx, cy, bx, by)) return true;
+  if (o2 === 0 && onSegment(ax, ay, dx, dy, bx, by)) return true;
+  if (o3 === 0 && onSegment(cx, cy, ax, ay, dx, dy)) return true;
+  if (o4 === 0 && onSegment(cx, cy, bx, by, dx, dy)) return true;
+  return false;
+}
+
+function ringEdges(ring) {
+  const edges = [];
+  if (!Array.isArray(ring)) return edges;
+  for (let index = 0; index < ring.length - 1; index += 1) {
+    const start = ring[index];
+    const end = ring[index + 1];
+    if (Array.isArray(start) && Array.isArray(end)) edges.push([start, end]);
+  }
+  return edges;
+}
+
+function polygonEdgesIntersect(polygonsA, polygonsB) {
+  const edgesA = polygonsA.flatMap((polygon) => (Array.isArray(polygon) ? polygon : []).flatMap(ringEdges));
+  const edgesB = polygonsB.flatMap((polygon) => (Array.isArray(polygon) ? polygon : []).flatMap(ringEdges));
+  for (const [a1, a2] of edgesA) {
+    for (const [b1, b2] of edgesB) {
+      if (segmentsIntersect(a1, a2, b1, b2)) return true;
+    }
+  }
+  return false;
+}
+
+export function locationMatchesCountryGeometry(locationGeometry, countryGeometry) {
+  if (!locationGeometry || !countryGeometry) return false;
+  if (locationGeometry.type === 'Point') {
+    return countryGeometryContainsPoint(countryGeometry, locationGeometry.coordinates);
+  }
+  if (locationGeometry.type === 'Polygon' || locationGeometry.type === 'MultiPolygon') {
+    const locationPolygons = spatialGeometryPolygons(locationGeometry);
+    const countryPolygons = spatialGeometryPolygons(countryGeometry);
+    if (anyVertexInsideGeometry(locationPolygons, countryGeometry)) return true;
+    if (anyVertexInsideGeometry(countryPolygons, locationGeometry)) return true;
+    if (polygonEdgesIntersect(locationPolygons, countryPolygons)) return true;
+    return false;
+  }
+  return false;
+}
+
+export function recordMatchesCountryGeometry(record, countryGeometry) {
+  if (!countryGeometry) return false;
+  return publicGeographicLocations(record).some((location) => {
+    const kind = publicGeographicRepresentationKind(location);
+    const geometry = kind === 'approximate_zone'
+      ? approximateUncertaintyZone(location)
+      : location.geometry;
+    return geometry ? locationMatchesCountryGeometry(geometry, countryGeometry) : false;
+  });
+}
+
+function locationDistanceMeters(location, origin) {
+  const kind = publicGeographicRepresentationKind(location);
+  if (!kind) return Number.POSITIVE_INFINITY;
+  if (kind === 'exact_anchor') return geodesicDistanceMeters(origin, location.geometry.coordinates);
+  if (kind === 'approximate_zone') {
+    const centerDistance = geodesicDistanceMeters(origin, location.geometry.coordinates);
+    const uncertaintyMeters = finite(location.uncertainty_meters_min, 0);
+    return Math.max(0, centerDistance - uncertaintyMeters);
+  }
+  if (kind === 'public_extent') return countryGeometryDistanceMeters(location.geometry, origin);
+  return Number.POSITIVE_INFINITY;
+}
+
+export function recordMatchesNearby(record, origin, radiusMeters) {
+  if (!Array.isArray(origin) || origin.length !== 2 || !origin.every(Number.isFinite)) return false;
+  if (!Number.isFinite(radiusMeters) || radiusMeters < 0) return false;
+  return publicGeographicLocations(record).some((location) => locationDistanceMeters(location, origin) <= radiusMeters);
+}
+
 function vocabularyValues(value, vocabulary) {
   return [value, ...(vocabulary[value] ?? [])];
 }
@@ -1122,6 +1238,8 @@ export function recordMatchesIntentFilters(record, filters = {}, today = new Dat
   }
   if (filters.freshness && recordFreshness(record, today) !== filters.freshness) return false;
   if (filters.curation && record?.curation?.state !== filters.curation) return false;
+  if (filters.countryGeometry && !recordMatchesCountryGeometry(record, filters.countryGeometry)) return false;
+  if (filters.nearbyOrigin && !recordMatchesNearby(record, filters.nearbyOrigin, filters.nearbyRadiusMeters)) return false;
   return true;
 }
 
@@ -1269,6 +1387,9 @@ export function filterRecords(records, state = {}) {
         access: state.access ?? null,
         freshness: state.freshness ?? null,
         curation: state.curation ?? null,
+        countryGeometry: state.countryGeometry ?? null,
+        nearbyOrigin: state.nearbyOrigin ?? null,
+        nearbyRadiusMeters: state.nearbyRadiusMeters ?? null,
       },
       all: true,
       today: state.today,
