@@ -261,7 +261,7 @@ def _validate_ipad_landscape_wiring(root: Path, html: str) -> list[str]:
     options_block_match = find_css_block(index_css, '.filter-presence-options > label')
     if options_block_match is None or not re.search(r'min-height:\s*var\(--minimum-touch-target', options_block_match[1]):
         errors.append('index.css presence options must define a compact, touch-safe label style')
-    if '.intent-filter-grid > .filter-presence-group > .filter-presence-options > label' in ipad_css:
+    if '.filter-group-controls > .filter-presence-group > .filter-presence-options > label' in ipad_css:
         errors.append('assets/ipad-layout.css must not duplicate the shared presence option component style')
 
     target_media_tokens = (
