@@ -108,7 +108,7 @@
     {
       "id": "layer-journey-moveend-return",
       "verdict": "PASS",
-      "elapsedMs": 1633
+      "elapsedMs": 1664
     },
     {
       "id": "layer-journey-interrupted",
@@ -206,7 +206,7 @@
   "schema_version": 1,
   "kind": "catalog-delivery-public-browser-smoke-v1",
   "binding": {
-    "smoke_script_sha256": "99018bf749d9d53b469f3d5c023e6bf88b2905053f008c83d81b275a10d96e71",
+    "smoke_script_sha256": "a3ab616247e1212f6e2d2c6772ad14f32661a9919eb28ab6179f5dd2b18fc694",
     "smoke_runner_sha256": "522b99b70b1d0064b1d0a31a3a67fdc9a2e73b7408f37d1a4bb303bc360b7556",
     "first_party_surface_sha256": "ec87cb95a37f5f88bd7e705b4e3dea81dab755452c055e3f70d05957e7a5afa8",
     "scenario_ids": [

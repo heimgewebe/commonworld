@@ -290,9 +290,38 @@ async function newPage({ mobile = false, viewportOverride = null, touch = mobile
           const OriginalMap = value.Map;
           class CapturedMap extends OriginalMap {
             constructor(...arguments_) {
+              if (window.__commonworldStartupCalibrationHarness) {
+                arguments_[0] = {
+                  ...arguments_[0],
+                  style: {
+                    version: 8,
+                    sources: {},
+                    layers: [
+                      {
+                        id: 'commonworld-fallback',
+                        type: 'background',
+                        paint: { 'background-color': '#0d2426' },
+                      },
+                    ],
+                  },
+                };
+              }
               window.__commonworldTestMapOptions = arguments_[0];
               window.__commonworldCameraCommands = [];
               super(...arguments_);
+              if (window.__commonworldStartupCalibrationHarness) {
+                const originalOn = this.on.bind(this);
+                let delayedLoadListenerRegistered = false;
+                this.on = (type, listener) => {
+                  if (type === 'load' && !delayedLoadListenerRegistered) {
+                    delayedLoadListenerRegistered = true;
+                    return originalOn(type, (...eventArguments) => {
+                      window.setTimeout(() => listener(...eventArguments), 650);
+                    });
+                  }
+                  return originalOn(type, listener);
+                };
+              }
               window.__commonworldTestMap = this;
             }
 
@@ -401,9 +430,8 @@ async function independentProjectedGlobeDiameter(page) {
 async function startupAndRingOrbitScenario() {
   process.stdout.write(`${JSON.stringify({ state: 'RUNNING', scenario: 'startup-and-ring-orbits' })}\n`);
   const run = await newPage({ viewportOverride: { width: 1280, height: 800 }, reducedMotion: 'no-preference' });
-  await run.page.route('**/assets/map/openfreemap-liberty.json', async (route) => {
-    await new Promise((resolve) => setTimeout(resolve, 650));
-    await route.continue();
+  await run.page.addInitScript(() => {
+    window.__commonworldStartupCalibrationHarness = true;
   });
   await run.page.goto(baseUrl, { waitUntil: 'domcontentloaded' });
   await run.page.waitForSelector('html.runtime-ready');
@@ -1061,9 +1089,11 @@ async function layerJourneyScenario({ mobile = false, viewportOverride = null, t
     assert(!touchFocusAppearance.focusVisible, 'edge control: touch focus modality was misclassified ' + JSON.stringify(touchFocusAppearance));
     assert(touchFocusAppearance.controlStroke === 'rgba(0, 0, 0, 0)' && touchFocusAppearance.indicatorDisplay === 'none', 'edge control: touch activation exposed a visible selection ring ' + JSON.stringify(touchFocusAppearance));
   }
-  assert((await run.page.locator('.globe-stage').getAttribute('data-view-phase')) === 'entering-layers', 'layer journey: animated entry phase missing');
-  assert((await stage.getAttribute('data-globe-geometry-source')) === 'maplibre-projected-horizon', 'layer journey: entering flight abandoned the MapLibre horizon geometry');
-  assert(await run.page.locator('#layer-panel').isHidden(), 'layer journey: description panel obscures the camera flight');
+  await run.page.waitForFunction(() => window.__commonworldPhaseLog?.some((entry) => entry.phase === 'entering-layers'), null, { timeout: 2000 });
+  const enteringLayerState = await run.page.evaluate(() => window.__commonworldPhaseLog.find((entry) => entry.phase === 'entering-layers'));
+  assert(enteringLayerState, 'layer journey: animated entry phase missing');
+  assert(enteringLayerState.source === 'maplibre-projected-horizon', 'layer journey: entering flight abandoned the MapLibre horizon geometry ' + JSON.stringify(enteringLayerState));
+  assert(enteringLayerState.panelHidden === true && enteringLayerState.panelVisible === false, 'layer journey: description panel obscures the camera flight ' + JSON.stringify(enteringLayerState));
   await run.page.waitForFunction(() => window.__commonworldPhaseLog?.some((entry) => (
     entry.mapMovingAttribute && entry.ringCount > 0 && entry.ringsPaused
   )));

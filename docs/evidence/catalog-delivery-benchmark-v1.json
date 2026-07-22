@@ -490,8 +490,8 @@
         "method-mobile-text-200"
       ],
       "catalogue_network_blocked_requests": 0,
-      "durable_task_id": "a6c02c1a34234d32a8d6117d",
-      "result_sha256": "f7e97ed4f3d3ad69e985e991f30d9ac2b44719df25046e5216fa68e189736486"
+      "durable_task_id": "646c60da5ba0428d8fdc26d1",
+      "result_sha256": "f81619d188400822b35d9fe5d130e0d5ad722af5cc5e99e511645136c826f240"
     },
     "proposal_browser_smoke": {
       "verdict": "PASS",
@@ -523,8 +523,8 @@
         "focus-overlay-browser-smoke",
         "accessibility-modes-browser-smoke"
       ],
-      "durable_task_id": "5019d73710c148ea9beaba0c",
-      "lifecycle_receipt_sha256": "08ce1e00aa14a39a3e8138a3d4612ef4b1f75e063287741100446358b47282b3"
+      "durable_task_id": "f45103f380314963a7baab3b",
+      "lifecycle_receipt_sha256": "da909da3967d0542067cbe902acc06aa30445cc6bc0d825061f864814e91dc0d"
     }
   },
   "budget_binding": {
