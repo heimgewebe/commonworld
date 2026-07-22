@@ -343,7 +343,7 @@
     "hidden_location_has_no_map_substitute": true
   },
   "privacy_release": {
-    "policy_version": 1,
+    "policy_version": 2,
     "applies_to": [
       "privacy_sensitive_approximate_spatial_aggregates",
       "filtered_nonspatial_totals_that_include_hidden_locations",
@@ -364,7 +364,9 @@
     "approximate_bucket_rule": "bucket_effective_diameter_must_be_at_least_factor_times_maximum_contributor_uncertainty_meters_min",
     "subcounts_require_k": true,
     "filter_complements_require_k": true,
-    "differencing_protection": "if_selected_or_complement_is_below_k_coarsen_or_withhold_both_numeric_values",
+    "arbitrary_filter_intersection_release_forbidden": true,
+    "filtered_approximate_release_scope": "complete_reference_cohort_only_per_commons_type_and_bucket",
+    "differencing_protection": "filtered_approximate_counts_release_only_when_the_complete_reference_cohort_is_selected_otherwise_coarsen_or_withhold",
     "raw_member_ids_forbidden": true,
     "noise_addition_in_phase1": false,
     "formal_anonymity_guarantee": false,

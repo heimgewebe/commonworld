@@ -32,8 +32,8 @@
         "gzip_bytes": 1080
       },
       "html": {
-        "raw_bytes": 182599,
-        "gzip_bytes": 24635,
+        "raw_bytes": 182644,
+        "gzip_bytes": 24645,
         "start_tag_count": 1887,
         "catalog_card_instances": 100,
         "interactive_catalog_cards": 50,
@@ -270,8 +270,8 @@
         "gzip_bytes": 1080
       },
       "html": {
-        "raw_bytes": 182599,
-        "gzip_bytes": 24635,
+        "raw_bytes": 182644,
+        "gzip_bytes": 24645,
         "start_tag_count": 1887,
         "catalog_card_instances": 100,
         "interactive_catalog_cards": 50,
@@ -292,7 +292,7 @@
     "browser": {
       "schema_version": 1,
       "kind": "commonworld_catalog_delivery_browser_metrics",
-      "measured_at": "2026-07-22T03:51:00.336Z",
+      "measured_at": "2026-07-22T05:32:04.132Z",
       "cpu_throttle_rate": 4,
       "profiles": [
         {
@@ -302,47 +302,47 @@
             "height": 844
           },
           "cpu_throttle_rate": 4,
-          "runtime_ready_ms": 650,
+          "runtime_ready_ms": 689,
           "dom_node_count": 1966,
           "catalog_card_count": 50,
           "interactive_catalog_card_count": 50,
           "runtime_ready": true,
           "runtime_failed": false,
-          "dom_content_loaded_ms": 376.59999990463257,
-          "load_event_ms": 411.7999999523163,
+          "dom_content_loaded_ms": 395.90000009536743,
+          "load_event_ms": 431.90000009536743,
           "resource_count": 11,
-          "script_duration_ms": 670.68,
-          "task_duration_ms": 1448.48,
+          "script_duration_ms": 719,
+          "task_duration_ms": 1527.76,
           "bootstrap_compile": {
-            "median_ms": 0.39999985694885254,
-            "p95_ms": 0.9000000953674316,
+            "median_ms": 0.5,
+            "p95_ms": 0.7999999523162842,
             "samples_ms": [
               0,
               0,
-              0.09999990463256836,
+              0,
+              0,
+              0,
               0.09999990463256836,
               0.10000014305114746,
               0.10000014305114746,
-              0.20000004768371582,
-              0.20000004768371582,
-              0.20000004768371582,
-              0.20000004768371582,
-              0.39999985694885254,
-              0.40000009536743164,
+              0.2999999523162842,
               0.5,
-              0.6999998092651367,
-              0.6999998092651367,
-              0.7000000476837158,
+              0.5,
+              0.5,
+              0.5,
+              0.5999999046325684,
+              0.6000001430511475,
+              0.6000001430511475,
               0.7000000476837158,
               0.7999999523162842,
               0.7999999523162842,
-              0.9000000953674316,
-              0.9000000953674316
+              0.7999999523162842,
+              0.8999998569488525
             ]
           },
           "first_party_request_count": 10,
           "first_party_unique_request_count": 10,
-          "first_party_raw_bytes": 1780118,
+          "first_party_raw_bytes": 1781776,
           "first_party_requests": [
             "/",
             "/assets/commonworld-app.js",
@@ -355,7 +355,7 @@
             "/assets/vendor/maplibre-gl.js",
             "/index.css"
           ],
-          "first_party_surface_sha256": "2def59c78ae4696ff048702fb1e45409a383e4dd681ed0baa4675258c8673afd",
+          "first_party_surface_sha256": "e55d0058cf1fec3a98ca01c8be15524b8058d3848ad91a3962b76ff46874c862",
           "project_json_request_count": 0,
           "project_json_unique_request_count": 0,
           "project_json_requests": []
@@ -367,47 +367,47 @@
             "height": 768
           },
           "cpu_throttle_rate": 4,
-          "runtime_ready_ms": 614,
+          "runtime_ready_ms": 595,
           "dom_node_count": 1966,
           "catalog_card_count": 50,
           "interactive_catalog_card_count": 50,
           "runtime_ready": true,
           "runtime_failed": false,
-          "dom_content_loaded_ms": 351,
-          "load_event_ms": 386.7999999523163,
+          "dom_content_loaded_ms": 352.40000009536743,
+          "load_event_ms": 387.10000014305115,
           "resource_count": 11,
-          "script_duration_ms": 523.01,
-          "task_duration_ms": 853.96,
+          "script_duration_ms": 543.56,
+          "task_duration_ms": 880.01,
           "bootstrap_compile": {
-            "median_ms": 0.5,
+            "median_ms": 0.6000001430511475,
             "p95_ms": 1,
             "samples_ms": [
+              0,
               0.09999990463256836,
               0.09999990463256836,
               0.10000014305114746,
               0.10000014305114746,
-              0.19999980926513672,
-              0.20000004768371582,
-              0.2999999523162842,
-              0.5,
-              0.5,
-              0.5,
+              0.39999985694885254,
+              0.39999985694885254,
+              0.39999985694885254,
               0.5,
               0.5999999046325684,
               0.6000001430511475,
-              0.6999998092651367,
+              0.6000001430511475,
+              0.7000000476837158,
+              0.7000000476837158,
+              0.7000000476837158,
+              0.7000000476837158,
+              0.7000000476837158,
               0.7999999523162842,
-              0.7999999523162842,
-              0.8000001907348633,
-              0.9000000953674316,
-              0.9000000953674316,
+              0.8999998569488525,
               1,
               1
             ]
           },
           "first_party_request_count": 10,
           "first_party_unique_request_count": 10,
-          "first_party_raw_bytes": 1780118,
+          "first_party_raw_bytes": 1781776,
           "first_party_requests": [
             "/",
             "/assets/commonworld-app.js",
@@ -420,7 +420,7 @@
             "/assets/vendor/maplibre-gl.js",
             "/index.css"
           ],
-          "first_party_surface_sha256": "2def59c78ae4696ff048702fb1e45409a383e4dd681ed0baa4675258c8673afd",
+          "first_party_surface_sha256": "e55d0058cf1fec3a98ca01c8be15524b8058d3848ad91a3962b76ff46874c862",
           "project_json_request_count": 0,
           "project_json_unique_request_count": 0,
           "project_json_requests": []
@@ -493,8 +493,8 @@
         "method-mobile-text-200"
       ],
       "catalogue_network_blocked_requests": 0,
-      "durable_task_id": "f0014a3ca50141b2afd3e137",
-      "result_sha256": "4ba16ebf0a2fcffeb336cff9fdcd1cc3ace9dfaf32885d729fd5f48a2260bc09"
+      "durable_task_id": "b37a7bd25e8c4e1a9d08bc9b",
+      "result_sha256": "128e7218eec889ecf6e393b9f05be5160a58e80aedf5618cb607da369584b54f"
     },
     "proposal_browser_smoke": {
       "verdict": "PASS",
@@ -515,8 +515,8 @@
         "desktop-low-power"
       ],
       "cpu_throttle_rate": 4,
-      "durable_task_id": "2b562e7ae9b145c6aa0f6b61",
-      "result_sha256": "881d0053897e93a3ecb570c2c3ac753f2545aeb57b57068086606655ced5cc20"
+      "durable_task_id": "9247c0c5506f4c5cbea26818",
+      "result_sha256": "f28baf08dc1ad312fae864a10a783c756fed9911bdf44c1522a485864afc2095"
     },
     "official_browser_runner": {
       "verdict": "PASS",
@@ -526,8 +526,8 @@
         "focus-overlay-browser-smoke",
         "accessibility-modes-browser-smoke"
       ],
-      "durable_task_id": "5019d73710c148ea9beaba0c",
-      "lifecycle_receipt_sha256": "08ce1e00aa14a39a3e8138a3d4612ef4b1f75e063287741100446358b47282b3"
+      "durable_task_id": "f45103f380314963a7baab3b",
+      "lifecycle_receipt_sha256": "da909da3967d0542067cbe902acc06aa30445cc6bc0d825061f864814e91dc0d"
     }
   },
   "budget_binding": {
@@ -535,5 +535,5 @@
     "warn_bootstrap_gzip_bytes": 28672,
     "max_bootstrap_gzip_bytes": 32768
   },
-  "current_surface_note": "Catalogue expanded from 41 to 50 canonical Commons. Static projections, digital taxonomy and browser smoke assumptions were refreshed so bounded rendering and catalogue growth remain validated without hard-coded identity names or 41-entry constants."
+  "current_surface_note": "Catalogue expanded from 41 to 50 canonical Commons on top of the current geographic-impression privacy and rendering hardening. Static projections, digital taxonomy and browser smoke assumptions remain catalogue-growth-safe."
 }

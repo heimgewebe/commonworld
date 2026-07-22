@@ -793,6 +793,7 @@ function ensureCountryMapLayers() {
       },
     }, beforeId);
   }
+  orderPublicMapLayers();
   updateCountryMapData();
 }
 
@@ -859,6 +860,39 @@ function renderMapLegend() {
     item.append(swatch, document.createTextNode(commonsTypeLabel(type)));
     list.append(item);
   }
+}
+
+function publicMapLayerOrder() {
+  return [
+    'commonworld-country-compositions-base',
+    'commonworld-country-compositions',
+    'commonworld-country-compositions-outline',
+    'commonworld-public-extents',
+    'commonworld-approximate-zones',
+    'commonworld-public-extents-outline',
+    'commonworld-approximate-zones-outline',
+    'commonworld-exact-anchor-hit-targets',
+    'commonworld-exact-anchors',
+  ];
+}
+
+function orderPublicMapLayers() {
+  const orderedIds = publicMapLayerOrder().filter((identifier) => runtime.map.getLayer(identifier));
+  const customIds = new Set(orderedIds);
+  const styleLayers = runtime.map.getStyle()?.layers ?? [];
+  const beforeId = styleLayers.find(({ id, type }) => type === 'symbol' && !customIds.has(id))?.id;
+  const layerIds = styleLayers.map(({ id }) => id);
+  const beforeIndex = beforeId ? layerIds.indexOf(beforeId) : layerIds.length;
+  const expectedStart = beforeIndex - orderedIds.length;
+  const alreadyOrdered = expectedStart >= 0 && orderedIds.every(
+    (identifier, index) => layerIds[expectedStart + index] === identifier,
+  );
+  if (!alreadyOrdered) {
+    for (const identifier of orderedIds) runtime.map.moveLayer(identifier, beforeId);
+  }
+  elements.stage.dataset.publicMapLayerOrder = orderedIds.join(',');
+  if (beforeId) elements.stage.dataset.publicMapBeforeLayer = beforeId;
+  else delete elements.stage.dataset.publicMapBeforeLayer;
 }
 
 function ensurePublicMapLayers() {
@@ -956,6 +990,7 @@ function ensurePublicMapLayers() {
       },
     });
   }
+  orderPublicMapLayers();
   updatePublicMapData();
   updateCountryMapData();
   runtime.publicMapInteractiveLayerIds = PUBLIC_MAP_INTERACTIVE_LAYER_IDS.filter((identifier) => runtime.map.getLayer(identifier));
