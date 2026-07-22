@@ -220,12 +220,83 @@ def validate(root: Path = ROOT, warnings: list[str] | None = None) -> list[str]:
             f'max={maximum_bootstrap_gzip}, evidence={budget_binding}'
         )
     baseline_static = baseline.get('static', {})
-    if baseline_static.get('runtime_verification_fetch', {}).get('project_request_count') != static['entry_count']:
+    baseline_runtime = baseline_static.get('runtime_verification_fetch', {})
+    baseline_catalog_initial = baseline_static.get('catalog_initial_delivery', {})
+    baseline_bootstrap = baseline_static.get('bootstrap', {})
+    baseline_projects = baseline_static.get('canonical_projects', {})
+    baseline_manifest = baseline_static.get('manifest', {})
+    optimized_static = optimized.get('static', {})
+    optimized_runtime = optimized_static.get('runtime_verification_fetch', {})
+    optimized_catalog_initial = optimized_static.get('catalog_initial_delivery', {})
+
+    if baseline_static.get('entry_count') != static['entry_count']:
+        errors.append('baseline static evidence does not use the current catalogue identity set')
+    if baseline_projects.get('file_count') != static['entry_count']:
+        errors.append('baseline static evidence does not cover every current canonical project file')
+    if baseline_runtime.get('enabled') is not True:
+        errors.append('baseline static evidence must model the legacy startup refetch')
+    if baseline_runtime.get('project_request_count') != static['entry_count']:
         errors.append('baseline does not record one duplicate request per identity')
-    if evidence.get('delta', {}).get('catalog_initial_gzip_bytes') != -51789:
-        errors.append('evidence does not bind the measured 51,789-byte gzip reduction')
-    if evidence.get('delta', {}).get('browser_dom_nodes_by_profile') != {'mobile-low-power': 0, 'desktop-low-power': 0}:
-        errors.append('browser evidence does not preserve DOM node cost')
+    if baseline_runtime.get('duplicate_identity_payload_count') != static['entry_count']:
+        errors.append('baseline does not record one duplicate identity payload per identity')
+
+    expected_baseline_runtime_raw = baseline_projects.get('raw_bytes', 0) + baseline_manifest.get('raw_bytes', 0)
+    expected_baseline_runtime_gzip = baseline_projects.get('gzip_bytes_individual_files', 0) + baseline_manifest.get('gzip_bytes', 0)
+    if baseline_runtime.get('raw_bytes') != expected_baseline_runtime_raw:
+        errors.append('baseline runtime refetch raw bytes are inconsistent with current canonical files')
+    if baseline_runtime.get('gzip_bytes') != expected_baseline_runtime_gzip:
+        errors.append('baseline runtime refetch gzip bytes are inconsistent with current canonical files')
+    if baseline_catalog_initial.get('raw_bytes') != baseline_bootstrap.get('raw_bytes', 0) + expected_baseline_runtime_raw:
+        errors.append('baseline catalogue initial raw bytes are internally inconsistent')
+    if baseline_catalog_initial.get('gzip_bytes') != baseline_bootstrap.get('gzip_bytes', 0) + expected_baseline_runtime_gzip:
+        errors.append('baseline catalogue initial gzip bytes are internally inconsistent')
+
+    delta = evidence.get('delta', {})
+    expected_delta = {
+        'startup_project_json_requests': optimized_runtime.get('project_request_count', 0) - baseline_runtime.get('project_request_count', 0),
+        'duplicate_identity_payload_count': optimized_runtime.get('duplicate_identity_payload_count', 0) - baseline_runtime.get('duplicate_identity_payload_count', 0),
+        'catalog_initial_raw_bytes': optimized_catalog_initial.get('raw_bytes', 0) - baseline_catalog_initial.get('raw_bytes', 0),
+        'catalog_initial_gzip_bytes': optimized_catalog_initial.get('gzip_bytes', 0) - baseline_catalog_initial.get('gzip_bytes', 0),
+    }
+    for key, expected_value in expected_delta.items():
+        if delta.get(key) != expected_value:
+            errors.append(f'evidence delta is stale for {key}: expected {expected_value}, got {delta.get(key)}')
+
+    baseline_raw = baseline_catalog_initial.get('raw_bytes')
+    baseline_gzip = baseline_catalog_initial.get('gzip_bytes')
+    if is_number(baseline_raw) and baseline_raw > 0:
+        expected_raw_reduction = round((-expected_delta['catalog_initial_raw_bytes'] / baseline_raw) * 100, 1)
+        if delta.get('catalog_initial_raw_reduction_percent') != expected_raw_reduction:
+            errors.append('catalogue initial raw reduction percentage is inconsistent with measured bytes')
+    if is_number(baseline_gzip) and baseline_gzip > 0:
+        expected_gzip_reduction = round((-expected_delta['catalog_initial_gzip_bytes'] / baseline_gzip) * 100, 1)
+        if delta.get('catalog_initial_gzip_reduction_percent') != expected_gzip_reduction:
+            errors.append('catalogue initial gzip reduction percentage is inconsistent with measured bytes')
+
+    baseline_browser_profiles = {
+        profile.get('profile'): profile
+        for profile in baseline.get('browser', {}).get('profiles', [])
+        if isinstance(profile, dict)
+    }
+    optimized_browser_profiles = {
+        profile.get('profile'): profile
+        for profile in optimized.get('browser', {}).get('profiles', [])
+        if isinstance(profile, dict)
+    }
+    expected_request_delta = {
+        name: optimized_browser_profiles[name].get('first_party_request_count', 0) - profile.get('first_party_request_count', 0)
+        for name, profile in baseline_browser_profiles.items()
+        if name in optimized_browser_profiles
+    }
+    if delta.get('first_party_request_count_by_profile') != expected_request_delta:
+        errors.append('browser request-count delta does not match recorded baseline and optimized observations')
+    expected_dom_delta = {
+        name: optimized_browser_profiles[name].get('dom_node_count', 0) - profile.get('dom_node_count', 0)
+        for name, profile in baseline_browser_profiles.items()
+        if name in optimized_browser_profiles
+    }
+    if delta.get('browser_dom_nodes_by_profile') != expected_dom_delta:
+        errors.append('browser DOM-node delta does not match recorded baseline and optimized observations')
 
     if smoke_evidence.get('verdict') != 'PASS':
         errors.append('public browser smoke evidence is not PASS')

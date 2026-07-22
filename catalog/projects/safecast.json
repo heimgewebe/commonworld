@@ -1,0 +1,133 @@
+{
+  "schema_version": 4,
+  "id": "safecast",
+  "title": "Safecast",
+  "summary": "Eine internationale, von Freiwilligen getragene Citizen-Science-Gemeinschaft, die offene Umweltmessdaten sammelt, Werkzeuge zum eigenen Messen entwickelt und ihre Daten gemeinfrei bereitstellt.",
+  "themes": [
+    "open-data",
+    "citizen-science",
+    "environment",
+    "open-hardware",
+    "commons-governance"
+  ],
+  "actions": [
+    "use",
+    "learn",
+    "contribute",
+    "volunteer",
+    "donate"
+  ],
+  "presence": {
+    "geographic": [],
+    "digital": {
+      "available": true,
+      "reach": "global",
+      "label": "Offene Umweltmessdaten, Karten, Uploads und API-Zugang",
+      "source_ids": [
+        "safecast-about"
+      ]
+    }
+  },
+  "activity": {
+    "status": "active",
+    "observed_at": "2026-07-22",
+    "source_ids": [
+      "safecast-about",
+      "safecast-news"
+    ],
+    "note": "Die offizielle Seite bot am Prüftag aktive Daten-, Upload- und API-Oberflächen; aktuelle Beiträge aus 2026 belegen laufende Projektaktivität."
+  },
+  "provenance": {
+    "sources": [
+      {
+        "id": "safecast-about",
+        "type": "official-source",
+        "label": "Safecast – About",
+        "url": "https://safecast.org/about/",
+        "retrieved_at": "2026-07-22",
+        "note": "Offizielle Beschreibung der freiwilligengetragenen Organisation, offenen Daten und partizipativen Messpraxis."
+      },
+      {
+        "id": "safecast-news",
+        "type": "official-source",
+        "label": "Safecast – News",
+        "url": "https://safecast.org/news/",
+        "retrieved_at": "2026-07-22",
+        "note": "Offizielle aktuelle Projektmeldungen aus 2026."
+      }
+    ]
+  },
+  "curation": {
+    "state": "listed",
+    "reviewed_by": "Commonworld editorial review",
+    "reviewed_at": "2026-07-22",
+    "next_review_at": "2026-10-22",
+    "notes": "Globale digitale und datenbezogene Commons-Praxis; Messorte werden nicht mit einer einzelnen Projektkoordinate verwechselt."
+  },
+  "links": [
+    {
+      "type": "homepage",
+      "label": "Safecast – offizielle Seite",
+      "url": "https://safecast.org/"
+    },
+    {
+      "type": "use",
+      "label": "Safecast-Daten nutzen",
+      "url": "https://safecast.org/data/",
+      "source_ids": [
+        "safecast-about"
+      ]
+    },
+    {
+      "type": "learn",
+      "label": "Über Safecast lesen",
+      "url": "https://safecast.org/about/",
+      "source_ids": [
+        "safecast-about"
+      ]
+    },
+    {
+      "type": "contribute",
+      "label": "Messdaten beitragen",
+      "url": "https://api.safecast.org/",
+      "source_ids": [
+        "safecast-about"
+      ]
+    },
+    {
+      "type": "volunteer",
+      "label": "Bei Safecast mitmachen",
+      "url": "https://safecast.org/join-us/",
+      "source_ids": [
+        "safecast-about"
+      ]
+    },
+    {
+      "type": "donate",
+      "label": "Safecast unterstützen",
+      "url": "https://safecast.org/donate/",
+      "source_ids": [
+        "safecast-about"
+      ]
+    }
+  ],
+  "handoff": {
+    "enabled": false
+  },
+  "languages": {
+    "codes": [
+      "en"
+    ],
+    "source_ids": [
+      "safecast-about"
+    ],
+    "note": "Die geprüfte internationale offizielle Seite ist auf Englisch verfügbar."
+  },
+  "access": {
+    "type": "public",
+    "source_ids": [
+      "safecast-about"
+    ],
+    "note": "Die veröffentlichten Umweltmessdaten sind frei zugänglich und als CC0 ausgewiesen."
+  }
+}

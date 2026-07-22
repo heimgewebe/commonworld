@@ -1,0 +1,170 @@
+{
+  "schema_version": 4,
+  "id": "brisbane-tool-library",
+  "title": "Brisbane Tool Library",
+  "summary": "Eine vollständig von Freiwilligen getragene Bibliothek der Dinge in Brisbane, die Werkzeuge und Alltagsausrüstung gemeinschaftlich verleiht und Reparatur, Wiederverwendung und praktische Fähigkeiten fördert.",
+  "themes": [
+    "tool-sharing",
+    "repair",
+    "circular-economy",
+    "skills",
+    "community-ownership"
+  ],
+  "actions": [
+    "visit",
+    "borrow",
+    "learn",
+    "volunteer",
+    "donate",
+    "contact"
+  ],
+  "presence": {
+    "geographic": [
+      {
+        "id": "brisbane-tool-library-brisbane",
+        "mode": "approximate",
+        "label": "Brisbane, Queensland – grober Stadtanker",
+        "geometry": {
+          "type": "Point",
+          "coordinates": [
+            153.0278,
+            -27.4678
+          ]
+        },
+        "uncertainty_meters_min": 10000,
+        "privacy_note": "Der Punkt bezeichnet nur Brisbane als grobe öffentliche Orientierung; die offizielle Seite nennt den aktuellen Abholstandort separat.",
+        "source_ids": [
+          "brisbane-home",
+          "brisbane-registry"
+        ]
+      }
+    ],
+    "digital": {
+      "available": true,
+      "reach": "regional",
+      "label": "Online-Inventar und Reservierung als Teil der lokalen Ausleihe",
+      "source_ids": [
+        "brisbane-memberships"
+      ]
+    }
+  },
+  "activity": {
+    "status": "active",
+    "observed_at": "2026-07-22",
+    "source_ids": [
+      "brisbane-home",
+      "brisbane-memberships"
+    ],
+    "note": "Die offiziellen Seiten nennen aktuelle Öffnungszeiten, Mitgliedschaften, Reservierung und laufende Beteiligungswege im Jahr 2026."
+  },
+  "provenance": {
+    "sources": [
+      {
+        "id": "brisbane-home",
+        "type": "official-source",
+        "label": "Brisbane Tool Library – offizielle Seite",
+        "url": "https://www.brisbanetoollibrary.org/",
+        "retrieved_at": "2026-07-22",
+        "note": "Offizielle Projektseite der lokalen Bibliothek der Dinge."
+      },
+      {
+        "id": "brisbane-memberships",
+        "type": "official-source",
+        "label": "Brisbane Tool Library – Memberships",
+        "url": "https://www.brisbanetoollibrary.org/memberships",
+        "retrieved_at": "2026-07-22",
+        "note": "Offizielle Beschreibung von Mitgliedschaft, Ausleihe und MyTurn-Reservierung."
+      },
+      {
+        "id": "brisbane-registry",
+        "type": "public-registry",
+        "label": "Wikidata – Brisbane",
+        "url": "https://www.wikidata.org/wiki/Q34932",
+        "retrieved_at": "2026-07-22",
+        "note": "Öffentlicher Registereintrag mit grober Stadtkoordinate; nicht als exakter Projektstandort verwendet."
+      }
+    ],
+    "uncertainty_note": "Die Geometrie dient nur der Stadtzuordnung und ersetzt nicht die aktuelle offizielle Standortangabe."
+  },
+  "curation": {
+    "state": "listed",
+    "reviewed_by": "Commonworld editorial review",
+    "reviewed_at": "2026-07-22",
+    "next_review_at": "2026-10-22",
+    "notes": "Als hybride Praxis modelliert, weil die reale Ausleihe eine digitale Reservierungsoberfläche verwendet."
+  },
+  "links": [
+    {
+      "type": "homepage",
+      "label": "Brisbane Tool Library – offizielle Seite",
+      "url": "https://www.brisbanetoollibrary.org/"
+    },
+    {
+      "type": "visit",
+      "label": "Standort und Öffnungszeiten prüfen",
+      "url": "https://www.brisbanetoollibrary.org/find-us/location-and-contact",
+      "source_ids": [
+        "brisbane-home"
+      ]
+    },
+    {
+      "type": "borrow",
+      "label": "Mitglied werden und Dinge ausleihen",
+      "url": "https://www.brisbanetoollibrary.org/memberships",
+      "source_ids": [
+        "brisbane-memberships"
+      ]
+    },
+    {
+      "type": "learn",
+      "label": "Über die Bibliothek der Dinge lesen",
+      "url": "https://www.brisbanetoollibrary.org/about-us/who-we-are",
+      "source_ids": [
+        "brisbane-home"
+      ]
+    },
+    {
+      "type": "volunteer",
+      "label": "Ehrenamtlich mitarbeiten",
+      "url": "https://www.brisbanetoollibrary.org/get-involved/volunteering",
+      "source_ids": [
+        "brisbane-home"
+      ]
+    },
+    {
+      "type": "donate",
+      "label": "Brisbane Tool Library unterstützen",
+      "url": "https://www.brisbanetoollibrary.org/get-involved/donate",
+      "source_ids": [
+        "brisbane-home"
+      ]
+    },
+    {
+      "type": "contact",
+      "label": "Brisbane Tool Library kontaktieren",
+      "url": "https://www.brisbanetoollibrary.org/find-us/location-and-contact",
+      "source_ids": [
+        "brisbane-home"
+      ]
+    }
+  ],
+  "handoff": {
+    "enabled": false
+  },
+  "languages": {
+    "codes": [
+      "en"
+    ],
+    "source_ids": [
+      "brisbane-home"
+    ],
+    "note": "Die geprüften offiziellen Seiten sind auf Englisch verfügbar."
+  },
+  "access": {
+    "type": "membership",
+    "source_ids": [
+      "brisbane-memberships"
+    ],
+    "note": "Ausleihe erfolgt über veröffentlichte Mitgliedschaftsmodelle; Informationen und Beteiligungswege sind öffentlich."
+  }
+}

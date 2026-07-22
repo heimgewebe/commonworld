@@ -1,0 +1,125 @@
+{
+  "schema_version": 4,
+  "id": "restarters",
+  "title": "Restarters",
+  "summary": "Ein globales Netzwerk für gemeinschaftliche Reparatur, das lokale Reparaturgruppen, Veranstaltungen, Wissen und offene Wirkungsdaten über eine gemeinsame digitale Infrastruktur verbindet.",
+  "themes": [
+    "repair",
+    "circular-economy",
+    "skills",
+    "community-network",
+    "open-data"
+  ],
+  "actions": [
+    "use",
+    "learn",
+    "contribute",
+    "volunteer"
+  ],
+  "presence": {
+    "geographic": [],
+    "digital": {
+      "available": true,
+      "reach": "global",
+      "label": "Globales Netzwerk und Plattform für gemeinschaftliche Reparatur",
+      "source_ids": [
+        "restarters-about",
+        "restarters-community"
+      ]
+    }
+  },
+  "activity": {
+    "status": "active",
+    "observed_at": "2026-07-22",
+    "source_ids": [
+      "restarters-about",
+      "restarters-community"
+    ],
+    "note": "Die offizielle Plattform und ihr Community-Forum zeigten am Prüftag laufende gemeinschaftliche Aktivität und aktuelle Reparaturpraxis."
+  },
+  "provenance": {
+    "sources": [
+      {
+        "id": "restarters-about",
+        "type": "official-source",
+        "label": "Restarters – About",
+        "url": "https://restarters.net/about",
+        "retrieved_at": "2026-07-22",
+        "note": "Offizielle Beschreibung des globalen Netzwerks für Community Repair und seiner gemeinsamen Infrastruktur."
+      },
+      {
+        "id": "restarters-community",
+        "type": "official-source",
+        "label": "Restarters Community",
+        "url": "https://talk.restarters.net/",
+        "retrieved_at": "2026-07-22",
+        "note": "Offizielles Community-Forum mit laufender öffentlicher Aktivität."
+      }
+    ]
+  },
+  "curation": {
+    "state": "listed",
+    "reviewed_by": "Commonworld editorial review",
+    "reviewed_at": "2026-07-22",
+    "next_review_at": "2026-10-22",
+    "notes": "Das Netzwerk umfasst viele lokale Gruppen; ohne eine einzelne repräsentative Ortsidentität wird kein künstlicher Kartenpunkt gesetzt."
+  },
+  "links": [
+    {
+      "type": "homepage",
+      "label": "Restarters – offizielle Seite",
+      "url": "https://restarters.net/"
+    },
+    {
+      "type": "use",
+      "label": "Restarters-Plattform nutzen",
+      "url": "https://restarters.net/",
+      "source_ids": [
+        "restarters-about"
+      ]
+    },
+    {
+      "type": "learn",
+      "label": "Über Restarters lesen",
+      "url": "https://restarters.net/about",
+      "source_ids": [
+        "restarters-about"
+      ]
+    },
+    {
+      "type": "contribute",
+      "label": "In der Restarters-Community mitwirken",
+      "url": "https://talk.restarters.net/",
+      "source_ids": [
+        "restarters-community"
+      ]
+    },
+    {
+      "type": "volunteer",
+      "label": "Gemeinschaftliche Reparatur unterstützen",
+      "url": "https://restarters.net/",
+      "source_ids": [
+        "restarters-about"
+      ]
+    }
+  ],
+  "handoff": {
+    "enabled": false
+  },
+  "languages": {
+    "codes": [
+      "en"
+    ],
+    "source_ids": [
+      "restarters-about"
+    ],
+    "note": "Die geprüften offiziellen Einstiegsseiten sind auf Englisch verfügbar."
+  },
+  "access": {
+    "type": "public",
+    "source_ids": [
+      "restarters-about"
+    ],
+    "note": "Die öffentliche Plattform und wesentliche Wissensbereiche sind frei zugänglich."
+  }
+}

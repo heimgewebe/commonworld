@@ -228,6 +228,7 @@ async function loadExpectedDigitalProjection() {
     identityIds: [...node.identityIds],
     identityCount: node.identityCount,
   }]));
+  const titleById = Object.fromEntries(records.map(({ id, title }) => [id, title]));
   const fields = DIGITAL_RING_FIELDS.map((field) => {
     const pathKey = serializeDigitalPath(field.path);
     const node = tree.nodesByPath.get(pathKey);
@@ -245,6 +246,7 @@ async function loadExpectedDigitalProjection() {
   });
   return {
     allIds,
+    titleById,
     catalogIds,
     contributionIds,
     communityNetworkIds,
@@ -907,7 +909,10 @@ async function layerJourneyScenario({ mobile = false, viewportOverride = null, t
     binaries: [...document.querySelectorAll('.sphere-ring-binary')].map((node) => node.textContent.trim()).filter(Boolean),
   }));
   assert(overviewRibbons.rings === expectedDigitalProjection.fields.length, `layer journey: overview does not contain all text rings (${JSON.stringify(overviewRibbons)})`);
-  assert(overviewRibbons.names.includes('Debian') && overviewRibbons.names.includes('Wikidata'), `layer journey: Commons names are missing from the preview rings (${JSON.stringify(overviewRibbons.names)})`);
+  const expectedOverviewNames = expectedDigitalProjection.fields.flatMap(({ ringPreviewIds }) =>
+    ringPreviewIds.map((identifier) => expectedDigitalProjection.titleById[identifier]),
+  );
+  assertSameIds(overviewRibbons.names, expectedOverviewNames, 'layer journey: preview ring Commons name set');
   assert(overviewRibbons.binaries.some((value) => /^(?:[01]{8})(?: [01]{8})*$/.test(value)), 'layer journey: real bytewise binary names are missing from the rings');
   await waitForSphereOpacitySettled(run.page);
   const opacityBefore = Number(await run.page.locator('#digital-sphere').evaluate((node) => getComputedStyle(node).opacity));
@@ -1993,7 +1998,8 @@ async function legacyLayerAndAtomicFocusScenario() {
   await legacyRun.page.waitForSelector('html.runtime-ready');
   const invalidExplicitParameters = new URL(legacyRun.page.url()).searchParams;
   assert(!invalidExplicitParameters.has('layer') && !invalidExplicitParameters.has('digital_path'), 'invalid explicit path: legacy layer or partial path survived fail-closed canonicalization');
-  assert((await legacyRun.page.locator('.catalog-card:not([hidden])').count()) === expectedDigitalProjection.catalogEntryCount, 'invalid explicit path: root result truth was filtered');
+  const invalidRootCountText = (await legacyRun.page.locator('#text-count').textContent()) ?? '';
+  assert(invalidRootCountText.includes(`${expectedDigitalProjection.catalogEntryCount} Commons`), `invalid explicit path: root result truth was filtered (${invalidRootCountText})`);
   assert(legacyRun.consoleErrors.length === 0, `legacy layer: console errors: ${legacyRun.consoleErrors.join(' | ')}`);
   assert(legacyRun.pageErrors.length === 0, `legacy layer: page errors: ${legacyRun.pageErrors.join(' | ')}`);
   await legacyRun.context.close();
@@ -2002,16 +2008,21 @@ async function legacyLayerAndAtomicFocusScenario() {
   await focusRun.page.goto(`${baseUrl}/?view=layers`, { waitUntil: 'domcontentloaded' });
   await focusRun.page.waitForSelector('html.runtime-ready');
   await focusRun.page.waitForSelector('.globe-stage[data-view-phase="layers"]');
-  await focusRun.page.locator('.digital-ribbon-item[data-commonproject-id="wikipedia"][data-ribbon-copy="0"]').click();
-  assert(await focusRun.page.locator('#project-focus').isVisible(), 'atomic focus: Wikipedia focus did not open');
-  assert(new URL(focusRun.page.url()).searchParams.get('project') === 'wikipedia', 'atomic focus: Wikipedia was not written to history');
+  const focusTrigger = focusRun.page.locator('.digital-ribbon-item[data-ribbon-copy="0"]').first();
+  const focusProjectId = await focusTrigger.getAttribute('data-commonproject-id');
+  assert(Boolean(focusProjectId), 'atomic focus: no rendered digital identity was available');
+  const focusProjectTitle = expectedDigitalProjection.titleById[focusProjectId];
+  assert(Boolean(focusProjectTitle), `atomic focus: rendered identity ${focusProjectId} is missing from canonical projection`);
+  await focusTrigger.click();
+  assert(await focusRun.page.locator('#project-focus').isVisible(), `atomic focus: ${focusProjectId} focus did not open`);
+  assert(new URL(focusRun.page.url()).searchParams.get('project') === focusProjectId, `atomic focus: ${focusProjectId} was not written to history`);
 
   await focusRun.page.keyboard.press('Escape');
   assert(await focusRun.page.locator('#project-focus').isHidden(), 'atomic focus: Escape did not close the project overlay');
-  const wikipediaTrigger = focusRun.page.locator('.digital-ribbon-item[data-commonproject-id="wikipedia"][data-ribbon-copy="0"]');
-  await wikipediaTrigger.focus();
+  const keyboardFocusTrigger = focusRun.page.locator(`.digital-ribbon-item[data-commonproject-id="${focusProjectId}"][data-ribbon-copy="0"]`);
+  await keyboardFocusTrigger.focus();
   await focusRun.page.keyboard.press('Enter');
-  assert(await focusRun.page.locator('#project-focus').isVisible(), 'atomic focus: keyboard activation did not reopen Wikipedia');
+  assert(await focusRun.page.locator('#project-focus').isVisible(), `atomic focus: keyboard activation did not reopen ${focusProjectId}`);
 
   // Exercise the direct state regression without pretending the covered control receives a pointer interaction.
   await focusRun.page.locator('.digital-lane-focus[data-digital-path="sphere/communication_networks"]').evaluate((node) => node.click());
@@ -2033,9 +2044,9 @@ async function legacyLayerAndAtomicFocusScenario() {
   assert(cleared.activeHierarchy && cleared.activeVisible, `atomic focus: focus did not move to a visible hierarchy control (${JSON.stringify(cleared)})`);
 
   await focusRun.page.goBack();
-  await focusRun.page.waitForFunction(() => new URL(location.href).searchParams.get('project') === 'wikipedia');
-  assert(await focusRun.page.locator('#project-focus').isVisible(), 'atomic focus: Back did not restore Wikipedia focus');
-  assert((await focusRun.page.locator('#focus-title').textContent()) === 'Wikipedia', 'atomic focus: Back restored the wrong project');
+  await focusRun.page.waitForFunction((projectId) => new URL(location.href).searchParams.get('project') === projectId, focusProjectId);
+  assert(await focusRun.page.locator('#project-focus').isVisible(), `atomic focus: Back did not restore ${focusProjectId} focus`);
+  assert((await focusRun.page.locator('#focus-title').textContent()) === focusProjectTitle, 'atomic focus: Back restored the wrong project');
 
   await focusRun.page.evaluate(() => {
     const selector = '#layer-track-deck .digital-lane-focus, #layer-track-deck .digital-lane-scroll, #layer-breadcrumb .digital-breadcrumb-item';
@@ -2058,7 +2069,7 @@ async function legacyLayerAndAtomicFocusScenario() {
 
   for (let iteration = 0; iteration < 3; iteration += 1) {
     await focusRun.page.goBack();
-    await focusRun.page.waitForFunction(() => new URL(location.href).searchParams.get('project') === 'wikipedia');
+    await focusRun.page.waitForFunction((projectId) => new URL(location.href).searchParams.get('project') === projectId, focusProjectId);
     await focusRun.page.goForward();
     await waitForAtomicHierarchyFocus(focusRun.page, {
       label: `atomic focus: repeated Forward restoration ${iteration + 1}`,

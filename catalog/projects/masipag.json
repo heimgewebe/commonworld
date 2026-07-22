@@ -1,0 +1,141 @@
+{
+  "schema_version": 4,
+  "id": "masipag",
+  "title": "MASIPAG",
+  "summary": "Ein von Bauern getragenes philippinisches Netzwerk, das bäuerlich erhaltenes Saatgut, agrarökologische Praxis, Ernährungssouveränität und gemeinschaftliche Wissensentwicklung verbindet.",
+  "themes": [
+    "seeds",
+    "agriculture",
+    "food",
+    "agrobiodiversity",
+    "indigenous-knowledge",
+    "commons-governance"
+  ],
+  "actions": [
+    "learn",
+    "contact",
+    "contribute"
+  ],
+  "presence": {
+    "geographic": [
+      {
+        "id": "masipag-los-banos",
+        "mode": "approximate",
+        "label": "Los Baños, Laguna – öffentlicher Organisationsbezug",
+        "geometry": {
+          "type": "Point",
+          "coordinates": [
+            121.2167,
+            14.1667
+          ]
+        },
+        "uncertainty_meters_min": 10000,
+        "privacy_note": "Der Punkt ist nur ein grober kommunaler Orientierungsanker für den öffentlich benannten Organisationsbezug und bildet weder einzelne Bauernorganisationen noch deren Flächen ab.",
+        "source_ids": [
+          "masipag-home",
+          "los-banos-registry"
+        ]
+      }
+    ],
+    "digital": {
+      "available": false,
+      "source_ids": [
+        "masipag-home"
+      ]
+    }
+  },
+  "activity": {
+    "status": "active",
+    "observed_at": "2026-07-22",
+    "source_ids": [
+      "masipag-home"
+    ],
+    "note": "Die offizielle Seite veröffentlichte 2026 aktuelle Beiträge und Aktivitäten des Netzwerks."
+  },
+  "provenance": {
+    "sources": [
+      {
+        "id": "masipag-home",
+        "type": "official-source",
+        "label": "MASIPAG – offizielle Seite",
+        "url": "https://masipag.org/",
+        "retrieved_at": "2026-07-22",
+        "note": "Offizielle aktuelle Projektseite des bäuerlich-wissenschaftlichen Netzwerks."
+      },
+      {
+        "id": "masipag-about",
+        "type": "official-source",
+        "label": "MASIPAG – About",
+        "url": "https://masipag.org/about-masipag/",
+        "retrieved_at": "2026-07-22",
+        "note": "Offizielle Beschreibung der bäuerlichen Führung, Mitgliederstruktur und Saatgutpraxis."
+      },
+      {
+        "id": "los-banos-registry",
+        "type": "public-registry",
+        "label": "Wikidata – Los Baños, Laguna",
+        "url": "https://www.wikidata.org/wiki/Q69793",
+        "retrieved_at": "2026-07-22",
+        "note": "Öffentlicher Registereintrag mit grober Koordinate der Gemeinde; nur als weiter Organisationsanker verwendet."
+      }
+    ],
+    "uncertainty_note": "Die Geometrie steht nicht für das landesweite Netzwerk oder konkrete Mitgliedsgemeinschaften."
+  },
+  "curation": {
+    "state": "listed",
+    "reviewed_by": "Commonworld editorial review",
+    "reviewed_at": "2026-07-22",
+    "next_review_at": "2026-10-22",
+    "notes": "Aktivität wurde 2026 neu belegt; die frühere Zurückstellung wegen fehlender Aktualität entfällt."
+  },
+  "links": [
+    {
+      "type": "homepage",
+      "label": "MASIPAG – offizielle Seite",
+      "url": "https://masipag.org/"
+    },
+    {
+      "type": "learn",
+      "label": "MASIPAG kennenlernen",
+      "url": "https://masipag.org/about-masipag/",
+      "source_ids": [
+        "masipag-about"
+      ]
+    },
+    {
+      "type": "contact",
+      "label": "MASIPAG kontaktieren",
+      "url": "https://masipag.org/",
+      "source_ids": [
+        "masipag-home"
+      ]
+    },
+    {
+      "type": "contribute",
+      "label": "Aktivitäten und Netzwerk verfolgen",
+      "url": "https://masipag.org/",
+      "source_ids": [
+        "masipag-home"
+      ]
+    }
+  ],
+  "handoff": {
+    "enabled": false
+  },
+  "languages": {
+    "codes": [
+      "en"
+    ],
+    "source_ids": [
+      "masipag-home"
+    ],
+    "note": "Die geprüften offiziellen Seiten sind auf Englisch verfügbar."
+  },
+  "access": {
+    "type": "public",
+    "source_ids": [
+      "masipag-home"
+    ],
+    "note": "Öffentliche Informationen zum Netzwerk und seiner Praxis sind frei zugänglich."
+  }
+}

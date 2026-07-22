@@ -152,13 +152,17 @@ class CatalogDeliveryBudgetTests(unittest.TestCase):
             root = self.copy_delivery_tree(tmp)
             contract_path = root / 'contracts/commonworld/catalog-delivery-budget.contract.json'
             contract = json.loads(contract_path.read_text(encoding='utf-8'))
-            contract['budgets']['warn_bootstrap_gzip_bytes'] = 19000
-            contract['budgets']['max_bootstrap_gzip_bytes'] = 20000
+            actual_gzip = measure(ROOT)['bootstrap']['gzip_bytes']
+            contract['budgets']['warn_bootstrap_gzip_bytes'] = actual_gzip - 2
+            contract['budgets']['max_bootstrap_gzip_bytes'] = actual_gzip - 1
             contract_path.write_text(json.dumps(contract), encoding='utf-8')
             errors = validate(root)
         self.assertTrue(
             any(
-                error.startswith('bootstrap gzip bytes exceeds budget: actual=20526, warn=19000, max=20000')
+                error.startswith(
+                    f"bootstrap gzip bytes exceeds budget: actual={actual_gzip}, "
+                    f"warn={actual_gzip - 2}, max={actual_gzip - 1}"
+                )
                 for error in errors
             )
         )
@@ -168,18 +172,35 @@ class CatalogDeliveryBudgetTests(unittest.TestCase):
             root = self.copy_delivery_tree(tmp)
             contract_path = root / 'contracts/commonworld/catalog-delivery-budget.contract.json'
             contract = json.loads(contract_path.read_text(encoding='utf-8'))
-            contract['budgets']['warn_bootstrap_gzip_bytes'] = 20000
+            actual_gzip = measure(ROOT)['bootstrap']['gzip_bytes']
+            warning_gzip = actual_gzip - 1
+            contract['budgets']['warn_bootstrap_gzip_bytes'] = warning_gzip
             contract_path.write_text(json.dumps(contract), encoding='utf-8')
             benchmark_path = root / 'docs/evidence/catalog-delivery-benchmark-v1.json'
             benchmark = json.loads(benchmark_path.read_text(encoding='utf-8'))
-            benchmark['budget_binding']['warn_bootstrap_gzip_bytes'] = 20000
+            benchmark['budget_binding']['warn_bootstrap_gzip_bytes'] = warning_gzip
             benchmark_path.write_text(json.dumps(benchmark), encoding='utf-8')
             warnings: list[str] = []
             errors = validate(root, warnings)
         self.assertEqual([], errors)
         self.assertEqual(
-            ['bootstrap gzip bytes entered warning range: actual=20526, warn=20000, max=32768'],
+            [
+                f'bootstrap gzip bytes entered warning range: actual={actual_gzip}, '
+                f'warn={warning_gzip}, max=32768'
+            ],
             warnings,
+        )
+
+    def test_validator_rejects_stale_measured_delivery_delta(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            root = self.copy_delivery_tree(tmp)
+            benchmark_path = root / 'docs/evidence/catalog-delivery-benchmark-v1.json'
+            benchmark = json.loads(benchmark_path.read_text(encoding='utf-8'))
+            benchmark['delta']['catalog_initial_gzip_bytes'] += 1
+            benchmark_path.write_text(json.dumps(benchmark), encoding='utf-8')
+            errors = validate(root)
+        self.assertTrue(
+            any(error.startswith('evidence delta is stale for catalog_initial_gzip_bytes:') for error in errors)
         )
 
     def test_validator_rejects_runtime_catalogue_refetch(self) -> None:
