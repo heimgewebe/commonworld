@@ -44,7 +44,11 @@ import {
   representativeGeometryPoints,
   evidencedRelations,
   geodesicDistanceMeters,
+  locationMatchesCountryGeometry,
+  recordMatchesCountryGeometry,
+  recordMatchesNearby,
   prepareCatalogProjection,
+  prepareIntentSearchIndex,
   PUBLIC_MAP_COLLECTION_CACHE_LIMIT,
   recordActivityNotice,
   recordLocationSummaries,
@@ -677,6 +681,158 @@ test('public geographic truth rejects malformed, hidden and privacy-breaking geo
   assert.deepEqual(publicMapFeatureCollection([hiddenOnly]).features, []);
   assert.deepEqual(filterRecords([hiddenOnly], { presence: ['geographic'] }), []);
   assert.equal(recordPresentationLabel(hiddenOnly), 'Commons');
+});
+
+test('country deep-link state roundtrips a bounded country code and preserves other deep links', () => {
+  const state = stateFromSearch('?country=WST&layer=software_infrastructure&q=open%20data', []);
+  assert.equal(state.country, 'WST');
+  const search = searchFromState({ camera: DEFAULT_CAMERA, country: 'WST', query: 'open data', layer: 'software_infrastructure' });
+  const parameters = new URLSearchParams(search.slice(1));
+  assert.equal(parameters.get('country'), 'WST');
+  assert.equal(parameters.get('layer'), 'software_infrastructure');
+  assert.equal(parameters.get('q'), 'open data');
+
+  const invalid = stateFromSearch('?country=' + encodeURIComponent('not a code!'));
+  assert.equal(invalid.country, null);
+  assert.equal(searchFromState({ camera: DEFAULT_CAMERA, country: 'not a code!' }).includes('country='), false);
+});
+
+test('ephemeral nearby origin and radius are never serialized and default to null on parse', () => {
+  const state = stateFromSearch('?lng=8&lat=50&z=3');
+  assert.equal(state.nearbyOrigin, null);
+  assert.equal(state.nearbyRadiusMeters, null);
+  const search = searchFromState({ camera: DEFAULT_CAMERA, nearbyOrigin: [8.5, 51.2], nearbyRadiusMeters: 5000 });
+  assert.equal(search.includes('nearby'), false);
+  assert.equal(search.includes('8.5'), false);
+  assert.equal(search.includes('5000'), false);
+});
+
+test('country and nearby spatial helpers only consult public geographic locations', () => {
+  const westland = { type: 'Polygon', coordinates: [[[0, 0], [10, 0], [10, 10], [0, 10], [0, 0]]] };
+  const exactPoint = { id: 'a', title: 'Exact point', presence: { geographic: [{ id: 'loc', mode: 'exact', geometry: { type: 'Point', coordinates: [5, 5] } }] } };
+  assert.equal(recordMatchesCountryGeometry(exactPoint, westland), true);
+
+  const outsidePoint = { id: 'b', title: 'Outside point', presence: { geographic: [{ id: 'loc', mode: 'exact', geometry: { type: 'Point', coordinates: [50, 50] } }] } };
+  assert.equal(recordMatchesCountryGeometry(outsidePoint, westland), false);
+
+  const overlappingPolygon = { id: 'c', title: 'Overlaps', presence: { geographic: [{ id: 'loc', mode: 'exact', geometry: { type: 'Polygon', coordinates: [[[5, 5], [15, 5], [15, 15], [5, 15], [5, 5]]] } }] } };
+  assert.equal(recordMatchesCountryGeometry(overlappingPolygon, westland), true);
+
+  const multiPolygon = { id: 'd', title: 'Multi', presence: { geographic: [{ id: 'loc', mode: 'exact', geometry: { type: 'MultiPolygon', coordinates: [[[[50, 50], [51, 50], [51, 51], [50, 51], [50, 50]]], [[[1, 1], [2, 1], [2, 2], [1, 2], [1, 1]]]] } }] } };
+  assert.equal(recordMatchesCountryGeometry(multiPolygon, westland), true);
+
+  const onlyHidden = {
+    id: 'hidden',
+    title: 'Hidden inside country',
+    presence: { geographic: [{ id: 'private', mode: 'hidden', label: 'Private', geometry: { type: 'Point', coordinates: [5, 5] } }] },
+  };
+  assert.equal(recordMatchesCountryGeometry(onlyHidden, westland), false, 'hidden locations must never be consulted for country matching');
+  assert.equal(recordMatchesNearby(onlyHidden, [5, 5], 100000), false, 'hidden locations must never be consulted for nearby matching');
+
+  assert.equal(locationMatchesCountryGeometry({ type: 'Point', coordinates: [5, 5] }, westland), true);
+  assert.equal(locationMatchesCountryGeometry({ type: 'Point', coordinates: [50, 50] }, westland), false);
+});
+
+test('locationMatchesCountryGeometry detects crossing polygons with no contained vertices', () => {
+  const horizontalBar = { type: 'Polygon', coordinates: [[[-10, -1], [10, -1], [10, 1], [-10, 1], [-10, -1]]] };
+  const verticalBar = { type: 'Polygon', coordinates: [[[-1, -10], [1, -10], [1, 10], [-1, 10], [-1, -10]]] };
+  assert.equal(locationMatchesCountryGeometry(horizontalBar, verticalBar), true, 'plus-shaped crossing polygons must be detected as overlapping even without contained vertices');
+  assert.equal(locationMatchesCountryGeometry(verticalBar, horizontalBar), true);
+
+  const disjointBar = { type: 'Polygon', coordinates: [[[20, -1], [30, -1], [30, 1], [20, 1], [20, -1]]] };
+  assert.equal(locationMatchesCountryGeometry(disjointBar, verticalBar), false);
+});
+
+test('country matching uses the published uncertainty zone for approximate locations', () => {
+  const country = { type: 'Polygon', coordinates: [[[0, 0], [1, 0], [1, 1], [0, 1], [0, 0]]] };
+  const approximateNearBorder = {
+    id: 'approx-border',
+    title: 'Approximate border location',
+    presence: { geographic: [{
+      id: 'loc',
+      mode: 'approximate',
+      geometry: { type: 'Point', coordinates: [1.05, 0.5] },
+      uncertainty_meters_min: 10000,
+    }] },
+  };
+  assert.equal(recordMatchesCountryGeometry(approximateNearBorder, country), true, 'an approximate public zone crossing the country border must match');
+
+  const approximateFarAway = {
+    id: 'approx-far',
+    title: 'Approximate far location',
+    presence: { geographic: [{
+      id: 'loc',
+      mode: 'approximate',
+      geometry: { type: 'Point', coordinates: [2, 0.5] },
+      uncertainty_meters_min: 10000,
+    }] },
+  };
+  assert.equal(recordMatchesCountryGeometry(approximateFarAway, country), false);
+});
+
+test('nearby matching handles public point, polygon and approximate-uncertainty geometries', () => {
+  const origin = [8, 50];
+  const nearPoint = { id: 'near', title: 'Near exact point', presence: { geographic: [{ id: 'loc', mode: 'exact', geometry: { type: 'Point', coordinates: [8.01, 50] } }] } };
+  const nearDistance = geodesicDistanceMeters(origin, [8.01, 50]);
+  assert.equal(recordMatchesNearby(nearPoint, origin, nearDistance + 10), true);
+  assert.equal(recordMatchesNearby(nearPoint, origin, Math.max(0, nearDistance - 10)), false);
+
+  const insidePolygon = {
+    id: 'poly',
+    title: 'Origin inside public extent',
+    presence: { geographic: [{ id: 'loc', mode: 'exact', geometry: { type: 'Polygon', coordinates: [[[7, 49], [9, 49], [9, 51], [7, 51], [7, 49]]] } }] },
+  };
+  assert.equal(recordMatchesNearby(insidePolygon, origin, 0), true, 'origin inside a public polygon must match at zero radius');
+
+  const farOrigin = [50, 50];
+  assert.equal(recordMatchesNearby(insidePolygon, farOrigin, 1), false);
+  assert.equal(recordMatchesNearby(insidePolygon, farOrigin, 5_000_000), true, 'far origin must match once radius exceeds boundary distance');
+
+  const approximate = {
+    id: 'approx',
+    title: 'Approximate location',
+    presence: { geographic: [{ id: 'loc', mode: 'approximate', geometry: { type: 'Point', coordinates: [8, 50] }, uncertainty_meters_min: 5000 }] },
+  };
+  const centerDistance = geodesicDistanceMeters(origin, [8.05, 50]);
+  const approximateFromNearby = { id: 'approx2', title: 'Approximate offset', presence: { geographic: [{ id: 'loc', mode: 'approximate', geometry: { type: 'Point', coordinates: [8.05, 50] }, uncertainty_meters_min: 5000 }] } };
+  assert.equal(recordMatchesNearby(approximateFromNearby, origin, Math.max(0, centerDistance - 5000) - 1), false);
+  assert.equal(recordMatchesNearby(approximateFromNearby, origin, Math.max(0, centerDistance - 5000) + 1), true);
+  assert.equal(recordMatchesNearby(approximate, origin, 0), true, 'origin at the approximate center is within its uncertainty radius');
+});
+
+test('country and nearby filters AND-compose with existing intent filters', () => {
+  const westland = { type: 'Polygon', coordinates: [[[0, 0], [10, 0], [10, 10], [0, 10], [0, 0]]] };
+  const records = [
+    { id: 'match', title: 'Software in Westland', themes: ['free-software'], presence: { geographic: [{ id: 'loc', mode: 'exact', geometry: { type: 'Point', coordinates: [5, 5] } }] } },
+    { id: 'wrong-type', title: 'Culture in Westland', themes: ['culture'], presence: { geographic: [{ id: 'loc', mode: 'exact', geometry: { type: 'Point', coordinates: [5, 5] } }] } },
+    { id: 'wrong-country', title: 'Software elsewhere', themes: ['free-software'], presence: { geographic: [{ id: 'loc', mode: 'exact', geometry: { type: 'Point', coordinates: [50, 50] } }] } },
+  ];
+  const byCountryAndType = filterRecords(records, { commons_type: 'software', countryGeometry: westland });
+  assert.deepEqual(byCountryAndType.map(({ id }) => id), ['match']);
+
+  const byNearbyAndType = filterRecords(records, { commons_type: 'software', nearbyOrigin: [5, 5], nearbyRadiusMeters: 1000 });
+  assert.deepEqual(byNearbyAndType.map(({ id }) => id), ['match']);
+
+  const index = prepareIntentSearchIndex(records);
+  const indexed = index.matchingRecords({ filters: { commons_type: 'software', countryGeometry: westland } });
+  assert.deepEqual(indexed.map(({ id }) => id), ['match']);
+});
+
+test('prepareIntentSearchIndex nearbyOrigin cache key preserves sub-millidegree precision', () => {
+  const records = [
+    { id: 'near-a', title: 'Close to origin A', presence: { geographic: [{ id: 'loc', mode: 'exact', geometry: { type: 'Point', coordinates: [5, 5] } }] } },
+    { id: 'near-b', title: 'Close to origin B', presence: { geographic: [{ id: 'loc', mode: 'exact', geometry: { type: 'Point', coordinates: [5.0009, 5] } }] } },
+  ];
+  const index = prepareIntentSearchIndex(records);
+  const originA = [5, 5];
+  const originB = [5.0005, 5];
+  const radius = geodesicDistanceMeters(originA, [5.0009, 5]) - 1;
+
+  const resultsA = index.matchingRecords({ filters: { nearbyOrigin: originA, nearbyRadiusMeters: radius } });
+  const resultsB = index.matchingRecords({ filters: { nearbyOrigin: originB, nearbyRadiusMeters: radius } });
+
+  assert.deepEqual(resultsA.map(({ id }) => id), ['near-a']);
+  assert.deepEqual(resultsB.map(({ id }) => id), ['near-a', 'near-b'], 'origins differing by less than 0.001 degrees must not collide in the search cache');
 });
 
 

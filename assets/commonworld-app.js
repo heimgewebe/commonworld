@@ -23,6 +23,7 @@ import {
   mapFailurePolicy,
   normalizeDigitalPath,
   normalizeQuery,
+  normalizeSearchText,
   prepareCatalogProjection,
   prepareIntentSearchIndex,
   recordActivityNotice,
@@ -33,6 +34,7 @@ import {
   publicGeographicRepresentationKind,
   publicProjectNavigationTarget,
   quantizeSpherePixel,
+  representativeGeometryPoint,
   ribbonRepeatCount,
   ringOrbitDirection,
   ringOrbitDuration,
@@ -54,6 +56,8 @@ const LOCAL_FALLBACK_STYLE = Object.freeze({ version: 8, sources: {}, layers: [{
 const PRESENTATION_STORAGE_KEY = 'commonworld.presentation';
 const PUBLIC_MAP_SOURCE_ID = 'commonworld-public-representations';
 const COUNTRY_MAP_SOURCE_ID = 'commonworld-country-compositions';
+const COUNTRY_HIT_SOURCE_ID = 'commonworld-country-navigation';
+const COUNTRY_HIT_LAYER_ID = 'commonworld-country-navigation-hit';
 const COUNTRY_BOUNDARIES_URL = './assets/map/commonworld-country-boundaries.geojson';
 const PUBLIC_MAP_INTERACTIVE_LAYER_IDS = Object.freeze(['commonworld-public-extents', 'commonworld-approximate-zones', 'commonworld-exact-anchor-hit-targets', 'commonworld-exact-anchors']);
 
@@ -113,6 +117,20 @@ const elements = {
   search: document.querySelector('#commons-search'),
   searchClear: document.querySelector('#search-clear'),
   filterToggle: document.querySelector('#filter-toggle'),
+  filterToggleCount: document.querySelector('#filter-toggle-count'),
+  filterSectionsToggle: document.querySelector('#filter-sections-toggle'),
+  filterSections: document.querySelector('#filter-sections'),
+  activeFilterChips: document.querySelector('#active-filter-chips'),
+  filterCountry: document.querySelector('#filter-country'),
+  filterNearbyRadius: document.querySelector('#filter-nearby-radius'),
+  spatialDestinationSearch: document.querySelector('#spatial-destination-search'),
+  spatialDestinationResults: document.querySelector('#spatial-destination-results'),
+  useCurrentLocation: document.querySelector('#use-current-location'),
+  geolocationStatus: document.querySelector('#geolocation-status'),
+  countryNavigationContext: document.querySelector('#country-navigation-context'),
+  countryNavigationName: document.querySelector('#country-navigation-name'),
+  countryFilterAction: document.querySelector('#country-filter-action'),
+  countryNavigationClose: document.querySelector('#country-navigation-close'),
   discoveryPanel: document.querySelector('#discovery-panel'),
   discoveryClose: document.querySelector('#discovery-close'),
   discoveryCount: document.querySelector('#discovery-count'),
@@ -172,7 +190,17 @@ const runtime = {
     access: null,
     freshness: null,
     curation: null,
+    country: null,
+    nearbyOrigin: null,
+    nearbyRadiusMeters: null,
   },
+  countryEntries: new Map(),
+  spatialDestinations: [],
+  countryNavigationId: null,
+  shareableCamera: { ...DEFAULT_CAMERA },
+  privateCameraActive: false,
+  privateCameraReleasePending: false,
+  suppressNextCameraHistory: false,
   previousGlobeCamera: null,
   viewPhase: 'overview',
   cameraFlightGeneration: 0,
@@ -203,6 +231,8 @@ const runtime = {
   settingsReturnTarget: null,
   discoveryReturnTarget: null,
   pendingSpatialProject: null,
+  pendingCountryNavigationId: null,
+  pendingPrivateLocationOrigin: null,
   resizeObserver: null,
   orientationResizeObserver: null,
   mapDegraded: false,
@@ -368,6 +398,7 @@ function installRecords(records) {
   runtime.lastPublicMapData = null;
   runtime.publicMapUpdateCount = 0;
   runtime.presentationKey = null;
+  if (runtime.countryEntries.size) rebuildSpatialDestinationIndex();
 }
 
 function createSvgElement(name, attributes = {}) {
@@ -400,12 +431,8 @@ function treeForRecords(records = runtime.records) {
 function unfilteredPathRecords() {
   const key = discoveryCacheKey();
   if (runtime.unfilteredPathRecordsCache?.key === key) return runtime.unfilteredPathRecordsCache.records;
-  const records = filterRecords(runtime.records, {
-    ...runtime.state,
-    layer: null,
-    digitalPath: DIGITAL_ROOT_PATH,
-    searchIndex: runtime.searchIndex,
-  });
+  const state = filterStateForRecords({ layer: null, digitalPath: DIGITAL_ROOT_PATH });
+  const records = state ? filterRecords(runtime.records, state) : [];
   runtime.unfilteredPathRecordsCache = { key, records };
   return records;
 }
@@ -624,8 +651,56 @@ function renderLayerStack() {
   elements.layerStack.replaceChildren();
 }
 
+function countryFeatureIdentifier(feature, index = 0) {
+  const properties = feature?.properties ?? {};
+  const candidates = [feature?.id, properties.ADM0_A3, properties.ISO_A3, properties.GU_A3, properties.SOV_A3];
+  const stable = candidates.map((value) => String(value ?? '')).find((value) => /^[A-Za-z0-9_-]{1,16}$/.test(value));
+  return stable ?? `country-${index}`;
+}
+
+function countryFeatureName(feature, identifier = '') {
+  const properties = feature?.properties ?? {};
+  return String(properties.NAME_EN ?? properties.NAME_LONG ?? properties.NAME ?? identifier);
+}
+
+function activeNearbyFilter() {
+  return Array.isArray(runtime.state.nearbyOrigin)
+    && runtime.state.nearbyOrigin.length === 2
+    && runtime.state.nearbyOrigin.every(Number.isFinite)
+    && Number.isFinite(runtime.state.nearbyRadiusMeters)
+    && runtime.state.nearbyRadiusMeters >= 0;
+}
+
+function countryGeometryForState() {
+  if (!runtime.state.country) return null;
+  return runtime.countryEntries.get(runtime.state.country)?.feature?.geometry ?? null;
+}
+
+function filterStateForRecords(overrides = {}) {
+  const countryGeometry = countryGeometryForState();
+  if (runtime.state.country && !countryGeometry) return null;
+  const nearbyActive = activeNearbyFilter();
+  return {
+    ...runtime.state,
+    ...overrides,
+    countryGeometry,
+    nearbyOrigin: nearbyActive ? runtime.state.nearbyOrigin : null,
+    nearbyRadiusMeters: nearbyActive ? runtime.state.nearbyRadiusMeters : null,
+    searchIndex: runtime.searchIndex,
+  };
+}
+
 function discoveryCacheKey() {
-  return [runtime.state.layer, serializeDigitalPath(currentDigitalPath()), runtime.state.query, ...INTENT_FILTER_NAMES.map((name) => runtime.state[name])]
+  const nearbyOrigin = activeNearbyFilter() ? runtime.state.nearbyOrigin.join(',') : '';
+  return [
+    runtime.state.layer,
+    serializeDigitalPath(currentDigitalPath()),
+    runtime.state.query,
+    ...INTENT_FILTER_NAMES.map((name) => runtime.state[name]),
+    runtime.state.country,
+    nearbyOrigin,
+    activeNearbyFilter() ? runtime.state.nearbyRadiusMeters : '',
+  ]
     .map((value) => value ?? '')
     .join('\u001f');
 }
@@ -633,13 +708,15 @@ function discoveryCacheKey() {
 function visibleRecords() {
   const key = discoveryCacheKey();
   if (runtime.visibleRecordsCache?.key === key) return runtime.visibleRecordsCache.records;
-  const records = filterRecords(runtime.records, { ...runtime.state, searchIndex: runtime.searchIndex });
+  const state = filterStateForRecords();
+  const records = state ? filterRecords(runtime.records, state) : [];
   runtime.visibleRecordsCache = { key, records };
   return records;
 }
 
 function recordsMatchingQuery() {
-  return filterRecords(runtime.records, { ...runtime.state, layer: null, digitalPath: DIGITAL_ROOT_PATH, searchIndex: runtime.searchIndex });
+  const state = filterStateForRecords({ layer: null, digitalPath: DIGITAL_ROOT_PATH });
+  return state ? filterRecords(runtime.records, state) : [];
 }
 
 function hasIntentFilters() {
@@ -649,9 +726,13 @@ function hasIntentFilters() {
   });
 }
 
+function hasSpatialFilters() {
+  return Boolean(runtime.state.country || activeNearbyFilter());
+}
+
 function currentPublicMapData() {
   if (!runtime.catalogProjection) return Object.freeze({ type: 'FeatureCollection', features: Object.freeze([]) });
-  const filtering = Boolean(digitalPathFiltered() || normalizeQuery(runtime.state.query) || hasIntentFilters());
+  const filtering = Boolean(digitalPathFiltered() || normalizeQuery(runtime.state.query) || hasIntentFilters() || hasSpatialFilters());
   const visibleProjectIds = filtering ? visibleRecords().map(({ id }) => id) : null;
   return runtime.catalogProjection.publicMapFeatureCollection(visibleProjectIds);
 }
@@ -660,7 +741,7 @@ function currentCountryMapData() {
   if (!runtime.catalogProjection || !runtime.countryBoundaries) {
     return Object.freeze({ type: 'FeatureCollection', features: Object.freeze([]) });
   }
-  const filtering = Boolean(digitalPathFiltered() || normalizeQuery(runtime.state.query) || hasIntentFilters());
+  const filtering = Boolean(digitalPathFiltered() || normalizeQuery(runtime.state.query) || hasIntentFilters() || hasSpatialFilters());
   const visibleProjectIds = filtering ? visibleRecords().map(({ id }) => id) : null;
   return runtime.catalogProjection.countryCompositionFeatureCollection(runtime.countryBoundaries, visibleProjectIds);
 }
@@ -745,6 +826,22 @@ function firstSymbolLayerId() {
 
 function ensureCountryMapLayers() {
   if (!runtime.map || !runtime.map.isStyleLoaded() || !runtime.countryBoundaries) return;
+  if (!runtime.map.getSource(COUNTRY_HIT_SOURCE_ID)) {
+    runtime.map.addSource(COUNTRY_HIT_SOURCE_ID, { type: 'geojson', data: runtime.countryBoundaries });
+  }
+  if (!runtime.map.getLayer(COUNTRY_HIT_LAYER_ID)) {
+    runtime.map.addLayer({
+      id: COUNTRY_HIT_LAYER_ID,
+      type: 'fill',
+      source: COUNTRY_HIT_SOURCE_ID,
+      minzoom: 0,
+      maxzoom: 8,
+      paint: {
+        'fill-color': '#000000',
+        'fill-opacity': 0.001,
+      },
+    }, firstSymbolLayerId());
+  }
   const data = currentCountryMapData();
   ensureCountryCompositionPatterns(data);
   if (!runtime.map.getSource(COUNTRY_MAP_SOURCE_ID)) {
@@ -805,9 +902,25 @@ async function loadCountryBoundaries() {
   if (boundaries?.type !== 'FeatureCollection' || !Array.isArray(boundaries.features)) {
     throw new Error('Ländergrenzen haben kein gültiges GeoJSON-FeatureCollection-Format.');
   }
-  runtime.countryBoundaries = boundaries;
+  const navigableFeatures = boundaries.features.map((feature, index) => {
+    const id = countryFeatureIdentifier(feature, index);
+    return {
+      ...feature,
+      properties: { ...(feature.properties ?? {}), commonworld_country_id: id },
+    };
+  });
+  runtime.countryBoundaries = { ...boundaries, features: navigableFeatures };
+  runtime.countryEntries = new Map(navigableFeatures.map((feature) => {
+    const id = feature.properties.commonworld_country_id;
+    return [id, Object.freeze({ id, name: countryFeatureName(feature, id), feature })];
+  }));
+  populateCountryFilterOptions();
+  rebuildSpatialDestinationIndex();
+  runtime.visibleRecordsCache = null;
   elements.stage.dataset.countryMapState = 'ready';
   if (runtime.mapReady) ensureCountryMapLayers();
+  renderDiscoveryState();
+  if (runtime.pendingCountryNavigationId) navigateToCountry(runtime.pendingCountryNavigationId);
   return boundaries;
 }
 
@@ -864,6 +977,7 @@ function renderMapLegend() {
 
 function publicMapLayerOrder() {
   return [
+    COUNTRY_HIT_LAYER_ID,
     'commonworld-country-compositions-base',
     'commonworld-country-compositions',
     'commonworld-country-compositions-outline',
@@ -1276,6 +1390,68 @@ function closeDiscovery({ restoreFocus = false } = {}) {
   runtime.discoveryReturnTarget = null;
 }
 
+function filterControlLabel(name, value) {
+  if (name === 'presence') return value === 'geographic' ? 'Vor Ort' : 'Digital';
+  const control = elements.filterSelects.find((candidate) => candidate.dataset.intentFilter === name && candidate.type !== 'checkbox');
+  const option = control ? [...control.options].find((candidate) => candidate.value === value) : null;
+  return option?.textContent?.trim() || String(value);
+}
+
+function activeFilterDescriptors() {
+  const descriptors = [];
+  for (const name of INTENT_FILTER_NAMES) {
+    const value = runtime.state[name];
+    if (Array.isArray(value)) {
+      for (const entry of value) descriptors.push({ key: `${name}:${entry}`, label: filterControlLabel(name, entry), name, value: entry });
+    } else if (value) descriptors.push({ key: name, label: filterControlLabel(name, value), name, value });
+  }
+  if (runtime.state.country) {
+    const entry = runtime.countryEntries.get(runtime.state.country);
+    descriptors.push({ key: 'country', label: entry?.name ?? runtime.state.country, name: 'country', value: runtime.state.country });
+  }
+  if (activeNearbyFilter()) {
+    descriptors.push({ key: 'nearby', label: `Umkreis ${Math.round(runtime.state.nearbyRadiusMeters / 1000)} km`, name: 'nearby', value: runtime.state.nearbyRadiusMeters });
+  }
+  return descriptors;
+}
+
+function removeActiveFilter(descriptor) {
+  if (descriptor.name === 'presence') {
+    const remaining = (runtime.state.presence ?? []).filter((value) => value !== descriptor.value);
+    runtime.state.presence = remaining.length ? Object.freeze(remaining) : null;
+  } else if (descriptor.name === 'country') {
+    runtime.state.country = null;
+  } else if (descriptor.name === 'nearby') {
+    runtime.state.nearbyOrigin = null;
+    runtime.state.nearbyRadiusMeters = null;
+    elements.geolocationStatus.textContent = '';
+  } else {
+    runtime.state[descriptor.name] = null;
+  }
+  runtime.visibleRecordsCache = null;
+  renderDiscoveryState();
+  writeHistory('push');
+}
+
+function renderActiveFilterChips() {
+  const descriptors = activeFilterDescriptors();
+  elements.activeFilterChips.replaceChildren(...descriptors.map((descriptor) => {
+    const chip = document.createElement('span');
+    chip.className = 'active-filter-chip';
+    const label = document.createElement('span');
+    label.textContent = descriptor.label;
+    const remove = document.createElement('button');
+    remove.type = 'button';
+    remove.textContent = '×';
+    remove.setAttribute('aria-label', `${descriptor.label} entfernen`);
+    remove.addEventListener('click', () => removeActiveFilter(descriptor));
+    chip.append(label, remove);
+    return chip;
+  }));
+  elements.filterToggleCount.textContent = String(descriptors.length);
+  elements.filterToggleCount.hidden = descriptors.length === 0;
+}
+
 function syncIntentFilterControls() {
   for (const control of elements.filterSelects) {
     const value = runtime.state[control.dataset.intentFilter];
@@ -1285,7 +1461,10 @@ function syncIntentFilterControls() {
       control.value = value ?? '';
     }
   }
-  elements.filterClear.disabled = !hasIntentFilters();
+  elements.filterCountry.value = runtime.countryEntries.has(runtime.state.country) ? runtime.state.country : '';
+  elements.filterNearbyRadius.value = Number.isFinite(runtime.state.nearbyRadiusMeters) ? String(runtime.state.nearbyRadiusMeters) : '';
+  elements.filterClear.disabled = !(hasIntentFilters() || hasSpatialFilters());
+  renderActiveFilterChips();
 }
 
 function setIntentFilter(name, value, { historyMode = 'push' } = {}) {
@@ -1305,8 +1484,239 @@ function setIntentFilter(name, value, { historyMode = 'push' } = {}) {
 
 function clearIntentFilters({ historyMode = 'push' } = {}) {
   for (const name of INTENT_FILTER_NAMES) runtime.state[name] = null;
+  runtime.state.country = null;
+  runtime.state.nearbyOrigin = null;
+  runtime.state.nearbyRadiusMeters = null;
+  elements.geolocationStatus.textContent = '';
+  runtime.visibleRecordsCache = null;
   renderDiscoveryState();
   if (historyMode) writeHistory(historyMode);
+}
+
+function populateCountryFilterOptions() {
+  const options = [new Option('Alle Länder', '')];
+  for (const entry of [...runtime.countryEntries.values()].sort((left, right) => left.name.localeCompare(right.name, 'de'))) {
+    options.push(new Option(entry.name, entry.id));
+  }
+  elements.filterCountry.replaceChildren(...options);
+  elements.filterCountry.value = runtime.countryEntries.has(runtime.state.country) ? runtime.state.country : '';
+}
+
+function rebuildSpatialDestinationIndex() {
+  const destinations = [];
+  for (const entry of runtime.countryEntries.values()) {
+    destinations.push(Object.freeze({
+      type: 'country',
+      id: entry.id,
+      label: entry.name,
+      searchText: normalizeSearchText(entry.name),
+    }));
+  }
+  for (const record of runtime.records) {
+    const publicLocations = publicGeographicLocations(record);
+    if (!publicLocations.length) continue;
+    const firstOrigin = representativeGeometryPoint(publicLocations[0].geometry);
+    if (firstOrigin) {
+      destinations.push(Object.freeze({
+        type: 'project',
+        id: `project:${record.id}`,
+        label: record.title,
+        searchText: normalizeSearchText(record.title),
+        projectId: record.id,
+        origin: Object.freeze([...firstOrigin]),
+      }));
+    }
+    for (const location of publicLocations) {
+      const origin = representativeGeometryPoint(location.geometry);
+      if (!origin) continue;
+      const label = location.label?.trim() || record.title;
+      destinations.push(Object.freeze({
+        type: 'place',
+        id: `place:${record.id}:${location.id}`,
+        label: label === record.title ? record.title : `${label} · ${record.title}`,
+        searchText: normalizeSearchText(`${label} ${record.title}`),
+        projectId: record.id,
+        origin: Object.freeze([...origin]),
+      }));
+    }
+  }
+  runtime.spatialDestinations = destinations;
+}
+
+function setCountryFilter(identifier, { historyMode = 'push' } = {}) {
+  runtime.state.country = identifier && runtime.countryEntries.has(identifier) ? identifier : null;
+  runtime.visibleRecordsCache = null;
+  renderDiscoveryState();
+  if (historyMode) writeHistory(historyMode);
+}
+
+function setNearbyFilter(origin, radiusMeters = null, { historyMode = 'push' } = {}) {
+  const validOrigin = Array.isArray(origin) && origin.length === 2 && origin.every(Number.isFinite);
+  const resolvedRadius = Number.isFinite(radiusMeters) && radiusMeters >= 0
+    ? radiusMeters
+    : (Number.isFinite(runtime.state.nearbyRadiusMeters) ? runtime.state.nearbyRadiusMeters : 25000);
+  runtime.state.nearbyOrigin = validOrigin ? Object.freeze([...origin]) : null;
+  runtime.state.nearbyRadiusMeters = validOrigin ? resolvedRadius : null;
+  runtime.visibleRecordsCache = null;
+  renderDiscoveryState();
+  if (historyMode) writeHistory(historyMode);
+}
+
+function geometryBounds(geometry) {
+  const coordinates = [];
+  const collect = (value) => {
+    if (!Array.isArray(value)) return;
+    if (value.length >= 2 && Number.isFinite(Number(value[0])) && Number.isFinite(Number(value[1]))) {
+      coordinates.push([Number(value[0]), Number(value[1])]);
+      return;
+    }
+    for (const nested of value) collect(nested);
+  };
+  collect(geometry?.coordinates);
+  if (!coordinates.length) return null;
+  let west = coordinates[0][0];
+  let east = coordinates[0][0];
+  let south = coordinates[0][1];
+  let north = coordinates[0][1];
+  for (const [longitude, latitude] of coordinates.slice(1)) {
+    west = Math.min(west, longitude);
+    east = Math.max(east, longitude);
+    south = Math.min(south, latitude);
+    north = Math.max(north, latitude);
+  }
+  return [[west, south], [east, north]];
+}
+
+function prepareGlobeForPublicNavigation() {
+  closeDiscovery({ restoreFocus: false });
+  if (runtime.privateCameraActive) runtime.privateCameraReleasePending = true;
+  if (runtime.state.surface !== 'globe') setPresentation('globe', { historyMode: null });
+  if (runtime.state.view === 'layers' || runtime.viewPhase !== 'overview') {
+    closeLayerView({ historyMode: null, instant: true, restoreFocus: false });
+  }
+  ensureMap();
+}
+
+function showCountryNavigationContext(entry) {
+  runtime.countryNavigationId = entry?.id ?? null;
+  elements.countryNavigationName.textContent = entry?.name ?? '';
+  elements.countryNavigationContext.hidden = !entry;
+}
+
+function hideCountryNavigationContext() {
+  runtime.countryNavigationId = null;
+  elements.countryNavigationContext.hidden = true;
+}
+
+function navigateToCountry(identifier) {
+  const entry = runtime.countryEntries.get(identifier);
+  if (!entry) return false;
+  prepareGlobeForPublicNavigation();
+  showCountryNavigationContext(entry);
+  if (!runtime.mapReady) {
+    runtime.pendingCountryNavigationId = identifier;
+    return true;
+  }
+  runtime.pendingCountryNavigationId = null;
+  const bounds = geometryBounds(entry.feature.geometry);
+  if (!bounds) return false;
+  const duration = reducedMotion.matches ? 0 : 520;
+  elements.stage.dataset.lastCameraCommand = duration === 0 ? 'fitBounds-instant' : 'fitBounds';
+  elements.stage.dataset.lastCameraDuration = String(duration);
+  runtime.map.fitBounds(bounds, {
+    padding: { top: 104, right: 64, bottom: 80, left: 64 },
+    maxZoom: 5.5,
+    duration,
+    essential: false,
+  });
+  return true;
+}
+
+function renderSpatialDestinationResults() {
+  const query = normalizeSearchText(elements.spatialDestinationSearch.value);
+  if (query.length < 2) {
+    elements.spatialDestinationResults.replaceChildren();
+    return;
+  }
+  const matches = runtime.spatialDestinations
+    .filter((entry) => entry.searchText.includes(query))
+    .sort((left, right) => {
+      const leftStarts = left.searchText.startsWith(query) ? 0 : 1;
+      const rightStarts = right.searchText.startsWith(query) ? 0 : 1;
+      return leftStarts - rightStarts || left.label.localeCompare(right.label, 'de');
+    })
+    .slice(0, 8);
+  elements.spatialDestinationResults.replaceChildren(...matches.map((entry) => {
+    const item = document.createElement('li');
+    const primary = document.createElement('button');
+    primary.type = 'button';
+    primary.className = 'quiet-button';
+    primary.textContent = entry.type === 'country' ? `${entry.label} · auf Globus zeigen` : `${entry.label} · auf Globus zeigen`;
+    primary.addEventListener('click', () => {
+      if (entry.type === 'country') navigateToCountry(entry.id);
+      else performSpatialNavigation(entry.projectId);
+    });
+    const filter = document.createElement('button');
+    filter.type = 'button';
+    filter.className = 'quiet-button';
+    if (entry.type === 'country') {
+      filter.textContent = 'Land filtern';
+      filter.addEventListener('click', () => setCountryFilter(entry.id));
+    } else {
+      filter.textContent = 'In der Nähe suchen';
+      filter.addEventListener('click', () => setNearbyFilter(entry.origin));
+    }
+    item.append(primary, filter);
+    return item;
+  }));
+}
+
+function navigateToPrivateLocation(origin) {
+  if (!Array.isArray(origin) || origin.length !== 2 || !origin.every(Number.isFinite)) return false;
+  closeDiscovery({ restoreFocus: false });
+  if (runtime.state.surface !== 'globe') setPresentation('globe', { historyMode: null });
+  if (runtime.state.view === 'layers' || runtime.viewPhase !== 'overview') {
+    closeLayerView({ historyMode: null, instant: true, restoreFocus: false });
+  }
+  ensureMap();
+  if (!runtime.mapReady) {
+    runtime.pendingPrivateLocationOrigin = Object.freeze([...origin]);
+    return true;
+  }
+  runtime.pendingPrivateLocationOrigin = null;
+  runtime.privateCameraActive = true;
+  runtime.suppressNextCameraHistory = true;
+  applyCamera({ center: origin, zoom: Math.max(9, runtime.map.getZoom()), bearing: 0, pitch: 0 }, {
+    instant: reducedMotion.matches,
+    duration: 520,
+  });
+  return true;
+}
+
+function useCurrentLocation() {
+  if (!navigator.geolocation) {
+    elements.geolocationStatus.textContent = 'Standortbestimmung wird von diesem Browser nicht unterstützt.';
+    return;
+  }
+  elements.geolocationStatus.textContent = 'Standort wird bestimmt …';
+  elements.useCurrentLocation.disabled = true;
+  navigator.geolocation.getCurrentPosition((position) => {
+    elements.useCurrentLocation.disabled = false;
+    const origin = [position.coords.longitude, position.coords.latitude];
+    const radius = Number.isFinite(runtime.state.nearbyRadiusMeters) ? runtime.state.nearbyRadiusMeters : 25000;
+    runtime.state.nearbyOrigin = Object.freeze(origin);
+    runtime.state.nearbyRadiusMeters = radius;
+    runtime.visibleRecordsCache = null;
+    elements.geolocationStatus.textContent = `Standort verwendet · Umkreis ${Math.round(radius / 1000)} km`;
+    renderDiscoveryState();
+    writeHistory('push');
+    navigateToPrivateLocation(origin);
+  }, (error) => {
+    elements.useCurrentLocation.disabled = false;
+    elements.geolocationStatus.textContent = error?.code === 1
+      ? 'Standortfreigabe wurde nicht erteilt.'
+      : 'Standort konnte nicht bestimmt werden.';
+  }, { enableHighAccuracy: false, timeout: 10000, maximumAge: 60000 });
 }
 
 function directActionLinks(record) {
@@ -1613,7 +2023,9 @@ function currentUrlState() {
   ) && runtime.previousGlobeCamera;
   const camera = preserveOverviewCamera
     ? runtime.previousGlobeCamera
-    : (runtime.mapReady ? mapCamera(runtime.map) : runtime.state.camera);
+    : (runtime.privateCameraActive
+      ? runtime.shareableCamera
+      : (runtime.mapReady ? mapCamera(runtime.map) : runtime.state.camera));
   return { ...runtime.state, camera };
 }
 
@@ -1621,7 +2033,8 @@ function writeHistory(mode = 'replace') {
   if (runtime.applyingHistory) return;
   const state = currentUrlState();
   const url = `${location.pathname}${searchFromState(state)}${location.hash}`;
-  history[mode === 'push' ? 'pushState' : 'replaceState']({ commonworld: state }, '', url);
+  const publicHistoryState = { ...state, nearbyOrigin: null, nearbyRadiusMeters: null };
+  history[mode === 'push' ? 'pushState' : 'replaceState']({ commonworld: publicHistoryState }, '', url);
 }
 
 function scheduleCameraHistory() {
@@ -1639,6 +2052,7 @@ function performSpatialNavigation(identifier) {
   }
 
   closeDiscovery({ restoreFocus: false });
+  if (runtime.privateCameraActive) runtime.privateCameraReleasePending = true;
   if (runtime.state.surface !== 'globe') setPresentation('globe', { historyMode: null });
   if (runtime.state.view === 'layers' || runtime.viewPhase !== 'overview') {
     closeLayerView({ historyMode: null, instant: true, restoreFocus: false });
@@ -2368,12 +2782,15 @@ function setPresentation(surface, { historyMode = 'push', persist = true } = {})
 function resetGlobe() {
   clearViewTransition();
   runtime.previousGlobeCamera = null;
+  if (runtime.privateCameraActive) runtime.privateCameraReleasePending = true;
+  runtime.pendingPrivateLocationOrigin = null;
   runtime.layerReturnTarget = null;
   runtime.state.view = 'globe';
   setViewPhase('overview');
   runtime.state.layer = null;
   runtime.state.digitalPath = DIGITAL_ROOT_PATH;
   runtime.state.camera = { ...DEFAULT_CAMERA };
+  runtime.shareableCamera = { ...DEFAULT_CAMERA };
   showLayerState();
   renderDiscoveryState();
   if (runtime.mapReady) applyCamera(DEFAULT_CAMERA);
@@ -2386,6 +2803,11 @@ function applyDeepLink(search, { initial = false } = {}) {
   if (initial && !new URLSearchParams(search).has('surface')) next.surface = storedPresentation();
   runtime.applyingHistory = true;
   runtime.state = next;
+  runtime.shareableCamera = { ...next.camera };
+  runtime.privateCameraActive = false;
+  runtime.privateCameraReleasePending = false;
+  runtime.suppressNextCameraHistory = false;
+  runtime.pendingPrivateLocationOrigin = null;
   runtime.state.digitalPath = normalizeDigitalPathForApp(next.digitalPath).path;
   if (runtime.state.project && !projectMatchesDigitalState(runtime.state.project, runtime.state)) {
     runtime.state.project = null;
@@ -2403,7 +2825,7 @@ function applyDeepLink(search, { initial = false } = {}) {
     showLayerState();
   }
   renderDiscoveryState();
-  if ((next.query || hasIntentFilters()) && !runtime.state.project) openDiscovery({ trigger: elements.search });
+  if ((next.query || hasIntentFilters() || hasSpatialFilters()) && !runtime.state.project) openDiscovery({ trigger: elements.search });
   else closeDiscovery({ restoreFocus: false });
   runtime.applyingHistory = false;
   if (initial) writeHistory('replace');
@@ -2499,6 +2921,38 @@ function wireControls() {
     if (runtime.activeOverlay === 'discovery') closeDiscovery({ restoreFocus: true });
     else openDiscovery({ trigger: elements.filterToggle });
   });
+  elements.filterSectionsToggle.addEventListener('click', () => {
+    const opening = elements.filterSections.hidden;
+    elements.filterSections.hidden = !opening;
+    elements.filterSectionsToggle.setAttribute('aria-expanded', String(opening));
+  });
+  elements.filterCountry.addEventListener('change', () => setCountryFilter(elements.filterCountry.value));
+  elements.filterNearbyRadius.addEventListener('change', () => {
+    const radius = Number(elements.filterNearbyRadius.value);
+    if (!elements.filterNearbyRadius.value || !Number.isFinite(radius)) {
+      runtime.state.nearbyOrigin = null;
+      runtime.state.nearbyRadiusMeters = null;
+      elements.geolocationStatus.textContent = '';
+    } else {
+      runtime.state.nearbyRadiusMeters = radius;
+      if (!Array.isArray(runtime.state.nearbyOrigin)) {
+        elements.geolocationStatus.textContent = 'Wähle einen veröffentlichten Ort oder verwende deinen Standort.';
+      }
+    }
+    runtime.visibleRecordsCache = null;
+    renderDiscoveryState();
+    writeHistory('push');
+  });
+  elements.useCurrentLocation.addEventListener('click', useCurrentLocation);
+  elements.spatialDestinationSearch.addEventListener('input', renderSpatialDestinationResults);
+  elements.countryFilterAction.addEventListener('click', () => {
+    const identifier = runtime.countryNavigationId;
+    if (!identifier) return;
+    setCountryFilter(identifier);
+    hideCountryNavigationContext();
+    openDiscovery({ trigger: elements.filterToggle });
+  });
+  elements.countryNavigationClose.addEventListener('click', hideCountryNavigationContext);
   elements.discoveryClose.addEventListener('click', () => closeDiscovery({ restoreFocus: true }));
   elements.discoveryShowText.addEventListener('click', () => {
     closeDiscovery({ restoreFocus: false });
@@ -2601,7 +3055,10 @@ function updateMapPointerCursor() {
   const point = runtime.pointerHitTestPoint;
   runtime.pointerHitTestPoint = null;
   if (!point || !runtime.map) return;
-  const layers = interactivePublicMapLayers();
+  const layers = [
+    ...interactivePublicMapLayers(),
+    ...(runtime.map.getLayer(COUNTRY_HIT_LAYER_ID) ? [COUNTRY_HIT_LAYER_ID] : []),
+  ];
   const interactive = layers.length > 0 && runtime.map.queryRenderedFeatures(point, { layers }).length > 0;
   const cursor = interactive ? 'pointer' : '';
   const canvas = runtime.map.getCanvas();
@@ -2612,11 +3069,20 @@ function bindPublicMapInteractions() {
   if (!runtime.map || runtime.mapInteractionsBound) return;
   runtime.mapInteractionsBound = true;
   runtime.map.on('click', (event) => {
-    const layers = interactivePublicMapLayers();
-    if (!layers.length) return;
-    const feature = runtime.map.queryRenderedFeatures(event.point, { layers })[0];
-    const identifier = feature?.properties?.project_id;
-    if (typeof identifier === 'string') selectProject(identifier, { trigger: runtime.map.getCanvas() });
+    const projectLayers = interactivePublicMapLayers();
+    const projectFeature = projectLayers.length
+      ? runtime.map.queryRenderedFeatures(event.point, { layers: projectLayers })[0]
+      : null;
+    const projectIdentifier = projectFeature?.properties?.project_id;
+    if (typeof projectIdentifier === 'string') {
+      selectProject(projectIdentifier, { trigger: runtime.map.getCanvas() });
+      return;
+    }
+    if (!runtime.map.getLayer(COUNTRY_HIT_LAYER_ID)) return;
+    const countryFeature = runtime.map.queryRenderedFeatures(event.point, { layers: [COUNTRY_HIT_LAYER_ID] })[0];
+    if (!countryFeature) return;
+    const countryIdentifier = countryFeature?.properties?.commonworld_country_id ?? countryFeatureIdentifier(countryFeature);
+    if (runtime.countryEntries.has(countryIdentifier)) navigateToCountry(countryIdentifier);
   });
   runtime.map.on('mousemove', (event) => {
     runtime.pointerHitTestPoint = { x: event.point.x, y: event.point.y };
@@ -2658,6 +3124,14 @@ function createMap() {
   });
   runtime.map.addControl(new window.maplibregl.NavigationControl({ visualizePitch: true, showCompass: true }), 'bottom-right');
   bindPublicMapInteractions();
+  const markPrivateCameraRelease = () => {
+    if (runtime.privateCameraActive) runtime.privateCameraReleasePending = true;
+  };
+  const mapCanvas = runtime.map.getCanvas();
+  mapCanvas.addEventListener('pointerdown', markPrivateCameraRelease, { passive: true });
+  mapCanvas.addEventListener('touchstart', markPrivateCameraRelease, { passive: true });
+  mapCanvas.addEventListener('wheel', markPrivateCameraRelease, { passive: true });
+  mapCanvas.addEventListener('keydown', markPrivateCameraRelease);
   runtime.map.on('render', () => {
     runtime.mapRenderCount += 1;
     if (runtime.mapMoving) sampleSphereGeometry();
@@ -2675,7 +3149,21 @@ function createMap() {
     delete elements.stage.dataset.mapMoving;
     flushSphereGeometry();
     updateSemanticLocationLine();
-    scheduleCameraHistory();
+    const suppressedPrivateFlight = runtime.suppressNextCameraHistory;
+    runtime.suppressNextCameraHistory = false;
+    if (runtime.privateCameraActive) {
+      if (runtime.privateCameraReleasePending) {
+        runtime.privateCameraActive = false;
+        runtime.privateCameraReleasePending = false;
+        runtime.shareableCamera = mapCamera(runtime.map);
+        scheduleCameraHistory();
+      }
+      return;
+    }
+    if (!suppressedPrivateFlight) {
+      runtime.shareableCamera = mapCamera(runtime.map);
+      scheduleCameraHistory();
+    }
   });
   runtime.map.on('error', (event) => {
     const policy = mapFailurePolicy({ providerReadbackFailed: false });
@@ -2709,6 +3197,8 @@ function createMap() {
       elements.stage.dataset.visualReady = 'true';
     }, 1200);
     if (runtime.pendingSpatialProject) performSpatialNavigation(runtime.pendingSpatialProject);
+    if (runtime.pendingCountryNavigationId) navigateToCountry(runtime.pendingCountryNavigationId);
+    if (runtime.pendingPrivateLocationOrigin) navigateToPrivateLocation(runtime.pendingPrivateLocationOrigin);
   });
   void verifyMapProvider();
   if ('ResizeObserver' in window) {
@@ -2773,6 +3263,9 @@ async function boot() {
         runtime.state.digitalPath = DIGITAL_ROOT_PATH;
         runtime.state.query = '';
         for (const name of INTENT_FILTER_NAMES) runtime.state[name] = null;
+        runtime.state.country = null;
+        runtime.state.nearbyOrigin = null;
+        runtime.state.nearbyRadiusMeters = null;
         renderDiscoveryState();
         return Object.freeze({ records: runtime.records.length, treeIdentities: runtime.digitalTree.identityIds.length });
       };

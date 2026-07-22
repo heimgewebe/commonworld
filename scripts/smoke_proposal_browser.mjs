@@ -344,7 +344,7 @@ for (const viewport of PRESENCE_VIEWPORTS) {
   const presenceGeometry = await page.evaluate(() => {
     const fieldset = document.querySelector('.filter-presence-group');
     const options = [...document.querySelectorAll('.filter-presence-options label')];
-    const siblingLabel = document.querySelector('.intent-filter-grid > label:has(select)');
+    const siblingLabel = document.querySelector('#filter-country')?.closest('label');
     const fieldsetRect = fieldset.getBoundingClientRect();
     const siblingRect = siblingLabel.getBoundingClientRect();
     return {

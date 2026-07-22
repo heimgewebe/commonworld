@@ -12,10 +12,10 @@
     <link rel="alternate" type="application/json" href="./catalog/catalog.json" title="Commonworld-Katalog" />
     <link rel="alternate" type="application/schema+json" href="./contracts/commonworld/project.schema.json" title="CommonProject-Schema" />
     <link rel="stylesheet" href="./assets/vendor/maplibre-gl.css" />
-    <link rel="stylesheet" href="./index.css?v=675b491f818c" />
+    <link rel="stylesheet" href="./index.css?v=b824c13c096a" />
     <link rel="stylesheet" href="./assets/ipad-layout.css" />
     <script src="./assets/vendor/maplibre-gl.js" defer></script>
-    <script type="module" src="./assets/commonworld-app.js?v=3ea31b0f145e"></script>
+    <script type="module" src="./assets/commonworld-app.js?v=e1647311693e"></script>
   </head>
   <body data-presentation="globe">
     <a class="skip-link" href="#text-view">Zur Textansicht springen</a>
@@ -32,7 +32,7 @@
             <input id="commons-search" type="search" inputmode="search" autocomplete="off" placeholder="Was möchtest du tun oder finden?" aria-controls="discovery-list" aria-expanded="false" />
             <button id="search-clear" class="search-clear" type="button" aria-label="Suche leeren" hidden>×</button>
           </div>
-          <button id="filter-toggle" class="icon-button filter-toggle" type="button" aria-label="Suchergebnisse und Filter öffnen" aria-controls="discovery-panel" aria-expanded="false"><span class="filter-toggle-icon" aria-hidden="true"></span><span class="filter-toggle-label">Filter</span></button>
+          <button id="filter-toggle" class="icon-button filter-toggle" type="button" aria-label="Suchergebnisse und Filter öffnen" aria-controls="discovery-panel" aria-expanded="false"><span class="filter-toggle-icon" aria-hidden="true"></span><span class="filter-toggle-label">Filter</span><span id="filter-toggle-count" class="filter-toggle-count" hidden>0</span></button>
         </div>
         <a class="proposal-link" href="./propose.html"><span class="proposal-symbol" aria-hidden="true">+</span><span class="proposal-label">Commons vorschlagen</span></a>
         <button id="settings-toggle" class="icon-button settings-toggle" type="button" aria-label="Einstellungen öffnen" aria-controls="settings-panel" aria-expanded="false"><span aria-hidden="true">⚙</span></button>
@@ -43,14 +43,41 @@
           <div><p class="kicker">Entdecken</p><h2 id="discovery-title">Passende Commons</h2></div>
           <button id="discovery-close" class="icon-button" type="button" aria-label="Suchergebnisse schließen">×</button>
         </div>
-        <div class="intent-filter-grid" aria-label="Commons filtern">
-          <label class="filter-commons-type"><span>Commons-Art</span><select id="filter-commons-type" data-intent-filter="commons_type"><option value="">Alle Arten</option><option value="knowledge">Wissen und Daten</option><option value="software">Software und Infrastruktur</option><option value="culture">Kultur und Medien</option><option value="food-seeds">Saatgut und Ernährung</option><option value="water">Wasser und Bewässerung</option><option value="energy">Energie</option><option value="housing-land">Boden und Wohnen</option><option value="health-care">Pflege und Gesundheit</option><option value="tools-repair">Werkzeuge, Reparatur und Fertigung</option><option value="community-network">Gemeinschaftsnetz</option><option value="other">Andere</option></select></label>
-          <fieldset class="filter-presence-group"><legend>Präsenz</legend><div class="filter-presence-options"><label><input type="checkbox" id="filter-presence-geographic" name="presence" value="geographic" data-intent-filter="presence"> Vor Ort</label><label><input type="checkbox" id="filter-presence-digital" name="presence" value="digital" data-intent-filter="presence"> Digital</label></div></fieldset>
-          <label><span>Aktion</span><select id="filter-action" data-intent-filter="action"><option value="">Alle Aktionen</option><option value="use">Nutzen</option><option value="borrow">Ausleihen</option><option value="learn">Lernen</option><option value="contribute">Mitmachen</option><option value="volunteer">Ehrenamtlich helfen</option><option value="donate">Spenden</option><option value="visit">Besuchen</option><option value="contact">Kontaktieren</option><option value="replicate">Übertragen</option></select></label>
-          <label><span>Zugang</span><select id="filter-access" data-intent-filter="access"><option value="">Alle Zugänge</option><option value="public">Öffentlich</option><option value="membership">Mitgliedschaft</option><option value="restricted">Beschränkt</option><option value="unknown">Nicht angegeben</option></select></label>
-          <label><span>Sprache</span><select id="filter-language" data-intent-filter="language"><option value="">Alle Angaben</option><option value="de">Deutsch</option><option value="unknown">Nicht angegeben</option></select></label>
-          <label><span>Aktualität</span><select id="filter-freshness" data-intent-filter="freshness"><option value="">Jede Aktualität</option><option value="current">Aktuell geprüft</option><option value="stale">Prüfung fällig</option><option value="unknown">Nicht angegeben</option></select></label>
-          <label><span>Kuration</span><select id="filter-curation" data-intent-filter="curation"><option value="">Jeder Status</option><option value="listed">Gelistet</option><option value="verified">Verifiziert</option><option value="featured">Hervorgehoben</option><option value="unknown">Nicht angegeben</option></select></label>
+        <div id="active-filter-chips" class="active-filter-chips" aria-label="Aktive Filter"></div>
+        <button id="filter-sections-toggle" class="quiet-button filter-sections-toggle" type="button" aria-controls="filter-sections" aria-expanded="true"><span class="filter-toggle-icon" aria-hidden="true"></span><span>Filter</span></button>
+        <div id="filter-sections" class="filter-sections">
+          <fieldset class="filter-group">
+            <legend>Was?</legend>
+            <div class="filter-group-controls">
+              <label class="filter-commons-type"><span>Commons-Art</span><select id="filter-commons-type" data-intent-filter="commons_type"><option value="">Alle Arten</option><option value="knowledge">Wissen und Daten</option><option value="software">Software und Infrastruktur</option><option value="culture">Kultur und Medien</option><option value="food-seeds">Saatgut und Ernährung</option><option value="water">Wasser und Bewässerung</option><option value="energy">Energie</option><option value="housing-land">Boden und Wohnen</option><option value="health-care">Pflege und Gesundheit</option><option value="tools-repair">Werkzeuge, Reparatur und Fertigung</option><option value="community-network">Gemeinschaftsnetz</option><option value="other">Andere</option></select></label>
+              <label><span>Aktion</span><select id="filter-action" data-intent-filter="action"><option value="">Alle Aktionen</option><option value="use">Nutzen</option><option value="borrow">Ausleihen</option><option value="learn">Lernen</option><option value="contribute">Mitmachen</option><option value="volunteer">Ehrenamtlich helfen</option><option value="donate">Spenden</option><option value="visit">Besuchen</option><option value="contact">Kontaktieren</option><option value="replicate">Übertragen</option></select></label>
+            </div>
+          </fieldset>
+          <fieldset class="filter-group">
+            <legend>Wo?</legend>
+            <div class="filter-group-controls">
+              <fieldset class="filter-presence-group"><legend>Präsenz</legend><div class="filter-presence-options"><label><input type="checkbox" id="filter-presence-geographic" name="presence" value="geographic" data-intent-filter="presence"> Vor Ort</label><label><input type="checkbox" id="filter-presence-digital" name="presence" value="digital" data-intent-filter="presence"> Digital</label></div></fieldset>
+              <div class="spatial-destination-search">
+                <label for="spatial-destination-search">Ort oder Land suchen</label>
+                <input id="spatial-destination-search" type="search" inputmode="search" autocomplete="off" placeholder="Ort, Region oder Land" aria-controls="spatial-destination-results" />
+                <ul id="spatial-destination-results" class="spatial-destination-results" aria-label="Ortsvorschläge"></ul>
+              </div>
+              <label><span>Land</span><select id="filter-country"><option value="">Alle Länder</option></select></label>
+              <label><span>Umkreis</span><select id="filter-nearby-radius"><option value="">Kein Umkreis</option><option value="5000">5 km</option><option value="25000">25 km</option><option value="100000">100 km</option><option value="500000">500 km</option></select></label>
+              <button id="use-current-location" class="quiet-button" type="button">Meinen Standort verwenden</button>
+              <p id="geolocation-status" class="geolocation-status" role="status"></p>
+              <p class="spatial-search-note">Die Ortssuche deckt Länder und veröffentlichte Commonworld-Orte ab, nicht eine vollständige Weltadresssuche.</p>
+            </div>
+          </fieldset>
+          <fieldset class="filter-group">
+            <legend>Weitere Filter</legend>
+            <div class="filter-group-controls">
+              <label><span>Zugang</span><select id="filter-access" data-intent-filter="access"><option value="">Alle Zugänge</option><option value="public">Öffentlich</option><option value="membership">Mitgliedschaft</option><option value="restricted">Beschränkt</option><option value="unknown">Nicht angegeben</option></select></label>
+              <label><span>Sprache</span><select id="filter-language" data-intent-filter="language"><option value="">Alle Angaben</option><option value="de">Deutsch</option><option value="unknown">Nicht angegeben</option></select></label>
+              <label><span>Aktualität</span><select id="filter-freshness" data-intent-filter="freshness"><option value="">Jede Aktualität</option><option value="current">Aktuell geprüft</option><option value="stale">Prüfung fällig</option><option value="unknown">Nicht angegeben</option></select></label>
+              <label><span>Kuration</span><select id="filter-curation" data-intent-filter="curation"><option value="">Jeder Status</option><option value="listed">Gelistet</option><option value="verified">Verifiziert</option><option value="featured">Hervorgehoben</option><option value="unknown">Nicht angegeben</option></select></label>
+            </div>
+          </fieldset>
         </div>
         <div class="discovery-summary-row">
           <p id="discovery-count" class="discovery-count" role="status">50 Commons</p>
@@ -92,6 +119,14 @@
           <div id="layer-stack-visual" class="layer-stack-visual" aria-hidden="true"></div>
 
           <button id="layer-view-button" class="layer-view-button" type="button" aria-controls="layer-panel" aria-expanded="false">Digitale Sphäre</button>
+
+          <div id="country-navigation-context" class="country-navigation-context" role="region" aria-label="Länderkontext" hidden>
+            <p id="country-navigation-name" class="country-navigation-name"></p>
+            <div class="country-navigation-actions">
+              <button id="country-filter-action" class="quiet-button" type="button">Commons in diesem Land anzeigen</button>
+              <button id="country-navigation-close" class="icon-button" type="button" aria-label="Länderkontext schließen">×</button>
+            </div>
+          </div>
 
           <div class="orientation-bar" aria-label="Globusorientierung">
             <button id="globe-reset" type="button">Erde</button>
