@@ -130,6 +130,7 @@ EXPECTED_SCRIPT_FILES = {
     "build_public_runtime.py",
     "catalog_delivery_compile.mjs",
     "check_pages_dns_target.py",
+    "commonworld_geo.py",
     "commonworld_i18n.py",
     "digital_taxonomy.py",
     "measure_catalog_delivery.py",

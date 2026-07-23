@@ -69,11 +69,13 @@ def localize_records(records: list[dict[str, Any]], locale: str = DEFAULT_LOCALE
             record["title"] = translation["title"]
         geographic = record.get("presence", {}).get("geographic", [])
         labels = translation.get("geographic_labels")
-        if not isinstance(labels, list) or len(labels) != len(geographic):
+        location_ids = {location.get("id") for location in geographic}
+        if not isinstance(labels, dict) or set(labels) != location_ids:
             raise ValueError(f"locale {normalized} geographic label coverage mismatch for {record['id']}")
-        for location, label in zip(geographic, labels, strict=True):
+        for location in geographic:
+            label = labels.get(location.get("id"))
             if not isinstance(label, str) or not label.strip():
-                raise ValueError(f"locale {normalized} has invalid geographic label for {record['id']}")
+                raise ValueError(f"locale {normalized} has invalid geographic label for {record['id']}:{location.get('id')}")
             location["label"] = label
         digital = record.get("presence", {}).get("digital", {})
         if digital.get("available") is True:
@@ -87,7 +89,8 @@ def localize_records(records: list[dict[str, Any]], locale: str = DEFAULT_LOCALE
                 link["label"] = ACTION_LABELS_EN[link_type]
         for index, source in enumerate(record.get("provenance", {}).get("sources", []), start=1):
             hostname = urlparse(source.get("url", "")).hostname or source.get("url", "")
-            source["label"] = f"Source {index} · {hostname.removeprefix('www.')}"
+            canonical_label = str(source.get("label") or "").strip()
+            source["label"] = f"{canonical_label} · {hostname.removeprefix('www.')}" if canonical_label else f"Source {index} · {hostname.removeprefix('www.')}"
         localized.append(record)
     return localized
 

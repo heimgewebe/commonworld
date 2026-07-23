@@ -18,6 +18,7 @@ from scripts.commonworld_i18n import (
     DEFAULT_LOCALE, FALLBACK_LOCALE, german_surface_links, inject_locale_navigation,
     load_locale, localize_records, normalize_locale, taxonomy_label, translate_method, translate_shell,
 )
+from scripts.commonworld_geo import public_locations
 
 ACTION_LINK_TYPES = {"visit", "use", "borrow", "learn", "contribute", "volunteer", "donate", "contact", "replicate"}
 TAXONOMY = load_taxonomy(ROOT)
@@ -44,62 +45,6 @@ def homepage(record: dict) -> str:
         raise ValueError(f"{record.get('id')}: exactly one HTTPS homepage required")
     return values[0]
 
-
-def _valid_position(value: object) -> bool:
-    return (
-        isinstance(value, list)
-        and len(value) == 2
-        and all(isinstance(number, (int, float)) and not isinstance(number, bool) for number in value)
-        and -180 <= value[0] <= 180
-        and -90 <= value[1] <= 90
-    )
-
-
-def _valid_ring(value: object) -> bool:
-    return (
-        isinstance(value, list)
-        and len(value) >= 4
-        and all(_valid_position(position) for position in value)
-        and value[0] == value[-1]
-    )
-
-
-def _public_location(location: object) -> bool:
-    if not isinstance(location, dict) or location.get("mode") == "hidden":
-        return False
-    geometry = location.get("geometry")
-    if not isinstance(geometry, dict):
-        return False
-    geometry_type = geometry.get("type")
-    coordinates = geometry.get("coordinates")
-    valid_geometry = (
-        (geometry_type == "Point" and _valid_position(coordinates))
-        or (geometry_type == "Polygon" and isinstance(coordinates, list) and bool(coordinates) and all(_valid_ring(ring) for ring in coordinates))
-        or (
-            geometry_type == "MultiPolygon"
-            and isinstance(coordinates, list)
-            and bool(coordinates)
-            and all(isinstance(polygon, list) and bool(polygon) and all(_valid_ring(ring) for ring in polygon) for polygon in coordinates)
-        )
-    )
-    if not valid_geometry:
-        return False
-    if location.get("mode") == "approximate":
-        uncertainty = location.get("uncertainty_meters_min")
-        return (
-            geometry_type == "Point"
-            and isinstance(uncertainty, (int, float))
-            and not isinstance(uncertainty, bool)
-            and uncertainty > 0
-        )
-    return location.get("mode") == "exact"
-
-
-def public_locations(record: dict) -> list[dict]:
-    locations = record.get("presence", {}).get("geographic", [])
-    if not isinstance(locations, list):
-        return list()
-    return [location for location in locations if _public_location(location)]
 
 
 def presentation_label(record: dict, locale: str = FALLBACK_LOCALE, public_geo_locations: list[dict] | None = None) -> str:

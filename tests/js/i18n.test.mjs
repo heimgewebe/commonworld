@@ -1,5 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
+import { readFileSync } from 'node:fs';
 
 import { BOOTSTRAP_RECORDS } from '../../assets/commonworld-bootstrap-catalog.mjs';
 import {
@@ -7,6 +8,7 @@ import {
   localizeCatalogRecords,
   normalizeLocale,
   taxonomyLabel,
+  text,
   themeLabel,
 } from '../../assets/commonworld-i18n.mjs';
 import { prepareIntentSearchIndex } from '../../assets/commonworld-core.mjs';
@@ -53,6 +55,38 @@ test('Theme labels are localized in both public locales instead of leaking raw k
   assert.equal(themeLabel('cultural-heritage', 'en'), 'Cultural heritage');
   assert.equal(themeLabel('research', 'de'), 'Forschung');
   assert.equal(themeLabel('archives', 'en'), 'Archives');
+});
+
+
+test('every static app t() call has an English UI entry', () => {
+  const source = readFileSync(new URL('../../assets/commonworld-app.js', import.meta.url), 'utf8');
+  const keys = [...source.matchAll(/\bt\('([^']+)'/gu)].map((match) => match[1]);
+  assert.ok(keys.length > 0);
+  for (const key of new Set(keys)) assert.notEqual(text('en', key, 'fallback'), `[missing:${key}]`, key);
+});
+
+test('missing English UI keys fail closed instead of leaking German fallback text', () => {
+  assert.equal(text('en', '__missing_test_key__', 'Deutscher Fallback'), '[missing:__missing_test_key__]');
+});
+
+test('geographic translations stay bound to location ids when canonical order changes', () => {
+  const canonical = BOOTSTRAP_RECORDS.find((record) => record.id === 'fucvam');
+  assert.ok(canonical);
+  const baseline = localizeCatalogRecords([canonical], 'en').records[0];
+  const expected = new Map(baseline.presence.geographic.map((location) => [location.id, location.label]));
+  const reordered = {
+    ...canonical,
+    presence: { ...canonical.presence, geographic: [...canonical.presence.geographic].reverse() },
+  };
+  const localized = localizeCatalogRecords([reordered], 'en').records[0];
+  for (const location of localized.presence.geographic) assert.equal(location.label, expected.get(location.id));
+});
+
+test('English localization preserves meaningful canonical source labels', () => {
+  const canonical = BOOTSTRAP_RECORDS.find((record) => record.id === 'debian');
+  assert.ok(canonical);
+  const localized = localizeCatalogRecords([canonical], 'en').records[0];
+  assert.match(localized.provenance.sources[0].label, /^About Debian · /u);
 });
 
 test('English catalog search remains bilingual through canonical German aliases', () => {

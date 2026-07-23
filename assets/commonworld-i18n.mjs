@@ -99,9 +99,18 @@ function format(template, variables = {}) {
   return String(template).replace(/\{([a-zA-Z0-9_]+)\}/g, (_, key) => String(variables[key] ?? `{${key}}`));
 }
 
+const warnedMissingUiKeys = new Set();
+
 export function text(locale, key, germanFallback, variables = {}) {
   const normalized = normalizeLocale(locale);
-  const template = normalized === 'en' ? (UI_EN[key] ?? germanFallback) : germanFallback;
+  if (normalized === 'en' && !Object.prototype.hasOwnProperty.call(UI_EN, key)) {
+    if (!warnedMissingUiKeys.has(key)) {
+      warnedMissingUiKeys.add(key);
+      console.warn(`[i18n] missing English UI key: ${key}`);
+    }
+    return `[missing:${key}]`;
+  }
+  const template = normalized === 'en' ? UI_EN[key] : germanFallback;
   return format(template, variables);
 }
 
@@ -134,7 +143,8 @@ const ACTION_LABELS_DE = Object.freeze({
 export function actionLabel(action, locale = DEFAULT_LOCALE) {
   const normalized = String(action ?? '');
   const fallback = ACTION_LABELS_DE[normalized] ?? normalized;
-  return text(locale, ACTION_LABEL_KEYS[normalized], fallback);
+  const key = ACTION_LABEL_KEYS[normalized];
+  return key ? text(locale, key, fallback) : fallback;
 }
 
 const THEME_LABELS_DE = Object.freeze({
@@ -321,9 +331,9 @@ function canonicalSearchAlias(record) {
 
 function englishTranslationSearchAlias(record, translation = {}) {
   const locations = Array.isArray(record?.presence?.geographic) ? record.presence.geographic : [];
-  const publicLocationLabels = locations.flatMap((location, index) => (
+  const publicLocationLabels = locations.flatMap((location) => (
     location?.mode !== 'hidden' && Boolean(location?.geometry)
-      ? [translation.geographic_labels?.[index] ?? location?.label]
+      ? [translation.geographic_labels?.[location?.id] ?? location?.label]
       : []
   ));
   return [
@@ -337,13 +347,14 @@ function englishTranslationSearchAlias(record, translation = {}) {
 function localizeLink(link, locale) {
   if (normalizeLocale(locale) !== 'en') return link;
   const type = String(link?.type ?? '');
-  return { ...link, label: actionLabel(type, 'en') || link?.label };
+  return ACTION_LABEL_KEYS[type] ? { ...link, label: actionLabel(type, 'en') } : link;
 }
 
 function localizeSource(source, locale, index) {
   if (normalizeLocale(locale) !== 'en') return source;
   const host = hostLabel(source?.url ?? '');
-  return { ...source, label: `${text('en', 'source', 'Quelle')} ${index + 1} · ${host}` };
+  const canonicalLabel = String(source?.label ?? '').trim();
+  return { ...source, label: canonicalLabel ? `${canonicalLabel} · ${host}` : `${text('en', 'source', 'Quelle')} ${index + 1} · ${host}` };
 }
 
 export function localizeCatalogRecords(records, locale = DEFAULT_LOCALE) {
@@ -362,9 +373,9 @@ export function localizeCatalogRecords(records, locale = DEFAULT_LOCALE) {
     const translation = translations[record?.id] ?? {};
     searchAliasesById.set(record.id, canonicalSearchAlias(record));
     const geographic = Array.isArray(record?.presence?.geographic)
-      ? record.presence.geographic.map((location, index) => ({
+      ? record.presence.geographic.map((location) => ({
           ...location,
-          label: translation.geographic_labels?.[index] ?? location.label
+          label: translation.geographic_labels?.[location?.id] ?? location.label
         }))
       : [];
     const digital = record?.presence?.digital

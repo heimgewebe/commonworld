@@ -683,6 +683,11 @@ test('public geographic truth rejects malformed, hidden and privacy-breaking geo
   assert.equal(recordPresentationLabel(hiddenOnly), 'Commons');
 });
 
+test('public geographic location validation is memoized per runtime record identity', () => {
+  const record = presenceAxisRecords[2];
+  assert.strictEqual(publicGeographicLocations(record), publicGeographicLocations(record));
+});
+
 test('country deep-link state roundtrips a bounded country code and preserves other deep links', () => {
   const state = stateFromSearch('?country=WST&layer=software_infrastructure&q=open%20data', []);
   assert.equal(state.country, 'WST');
