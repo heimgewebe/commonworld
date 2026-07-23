@@ -2987,9 +2987,9 @@ function wireControls() {
   elements.countryFilterAction.addEventListener('click', () => {
     const identifier = runtime.countryNavigationId;
     if (!identifier) return;
-    setCountryFilter(identifier);
     hideCountryNavigationContext();
     openDiscovery({ trigger: elements.filterToggle });
+    setCountryFilter(identifier);
   });
   elements.countryNavigationClose.addEventListener('click', hideCountryNavigationContext);
   elements.discoveryClose.addEventListener('click', () => closeDiscovery({ restoreFocus: true }));

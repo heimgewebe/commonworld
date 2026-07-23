@@ -1872,6 +1872,35 @@ async function spatialDiscoveryFiltersScenario() {
   await run.page.waitForFunction((countryId) => new URL(location.href).searchParams.get('country') === countryId, firstCountry.id);
   assert((await run.page.locator('#filter-toggle-count').textContent()) === '1', 'spatial discovery: country filter count badge is wrong');
   assert(await run.page.locator('#active-filter-chips button').count() === 1, 'spatial discovery: country filter chip missing');
+  const countryFilterUiState = await run.page.evaluate(() => {
+    const panel = document.querySelector('#discovery-panel');
+    const chip = document.querySelector('#active-filter-chips .active-filter-chip');
+    const button = chip?.querySelector('button');
+    const panelStyle = panel ? getComputedStyle(panel) : null;
+    const buttonStyle = button ? getComputedStyle(button) : null;
+    const buttonRect = button?.getBoundingClientRect();
+    return {
+      panelHidden: panel?.hidden ?? null,
+      panelDisplay: panelStyle?.display ?? null,
+      panelVisibility: panelStyle?.visibility ?? null,
+      chipCount: document.querySelectorAll('#active-filter-chips .active-filter-chip').length,
+      buttonDisplay: buttonStyle?.display ?? null,
+      buttonVisibility: buttonStyle?.visibility ?? null,
+      buttonWidth: buttonRect?.width ?? 0,
+      buttonHeight: buttonRect?.height ?? 0,
+    };
+  });
+  assert(
+    countryFilterUiState.panelHidden === false
+      && countryFilterUiState.panelDisplay !== 'none'
+      && countryFilterUiState.panelVisibility !== 'hidden'
+      && countryFilterUiState.chipCount === 1
+      && countryFilterUiState.buttonDisplay !== 'none'
+      && countryFilterUiState.buttonVisibility !== 'hidden'
+      && countryFilterUiState.buttonWidth >= 43.5
+      && countryFilterUiState.buttonHeight >= 43.5,
+    `spatial discovery: country filter did not reopen with a visible removable chip (${JSON.stringify(countryFilterUiState)})`,
+  );
   await run.page.locator('#active-filter-chips button').click();
   await run.page.waitForFunction(() => !new URL(location.href).searchParams.has('country'));
 

@@ -128,7 +128,7 @@
     "progressive_disclosure": "current_node_direct_children_and_parent_breadcrumb_only",
     "parent_identity_sets_equal_child_union": true,
     "primary_child_identity_sets_disjoint": true,
-    "overview_ring_content": "commons_name_then_utf8_binary_name",
+    "overview_ring_content": "commons_names_only",
     "side_view_identity_source": "same_CommonProject_records_not_same_DOM_elements",
     "multi_lane_horizontal_swipe": true,
     "single_lane_horizontal_swipe": true,
