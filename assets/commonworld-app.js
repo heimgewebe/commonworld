@@ -6,7 +6,6 @@ import {
   MAX_MAP_ZOOM,
   MAP_GEOMETRY_DIAGNOSTIC_SAMPLE_INTERVAL,
   MAP_GEOMETRY_SAMPLE_INTERVAL_MS,
-  binaryName,
   buildDigitalPresentationTree,
   commonsTypeLabel,
   deriveCommonsType,
@@ -459,9 +458,7 @@ function appendRingSequence(textPath, records, { prefix = '' } = {}) {
   for (const record of records) {
     const name = createSvgElement('tspan', { class: 'sphere-ring-name', 'data-commonproject-id': record.id });
     name.textContent = `  ${record.title}  `;
-    const binary = createSvgElement('tspan', { class: 'sphere-ring-binary' });
-    binary.textContent = `${binaryName(record.title)}   `;
-    textPath.append(name, binary);
+    textPath.append(name);
   }
 }
 
@@ -537,10 +534,7 @@ function createRibbonSegment(record, copyIndex) {
   const name = document.createElement('span');
   name.className = 'digital-ribbon-name';
   name.textContent = record.title;
-  const binary = document.createElement('span');
-  binary.className = 'digital-ribbon-binary';
-  binary.textContent = binaryName(record.title);
-  segment.append(name, binary);
+  segment.append(name);
   segment.addEventListener('click', () => selectProject(record.id, { trigger: segment }));
   return segment;
 }

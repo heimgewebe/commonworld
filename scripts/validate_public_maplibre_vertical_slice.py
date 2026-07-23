@@ -674,9 +674,12 @@ def validate_public_maplibre_vertical_slice(root: Path = ROOT) -> list[str]:
     for identifier in identifiers:
         if identifier in app or identifier in core:
             errors.append(f"public runtime code hardcodes catalog identity instead of loading it: {identifier}")
-    for token in ("renderSphereRibbons(runtime.records);", "renderLayerDeck();", "binaryName(record.title)", "ribbonRepeatCount(records.length, 10)"):
+    for token in ("renderSphereRibbons(runtime.records);", "renderLayerDeck();", "ribbonRepeatCount(records.length, 10)"):
         if token not in app:
             errors.append(f"public runtime must use the tested text-ribbon lane architecture: {token}")
+    for token in ("binaryName(record.title)", "sphere-ring-binary", "digital-ribbon-binary"):
+        if token in app or token in css:
+            errors.append(f"public text-ribbon surfaces must not render decorative binary text: {token}")
     if re.search(r"cooperativeGestures\s*:\s*true", app):
         errors.append("public mobile globe must allow one-finger touch movement; cooperativeGestures may not be enabled")
 
