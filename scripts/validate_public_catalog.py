@@ -15,7 +15,8 @@ ROOT = Path(__file__).resolve().parents[1]
 if str(ROOT) not in sys.path:
     sys.path.insert(0, str(ROOT))
 
-from scripts.render_public_shell import public_locations
+from scripts.render_public_shell import presentation_label, public_locations
+from scripts.commonworld_i18n import localize_records
 from scripts.digital_taxonomy import derive_project_path, load_taxonomy, path_label
 from scripts.validate_contracts import validation_errors
 
@@ -115,6 +116,7 @@ def validate_public_catalog(root: Path = ROOT) -> list[str]:
     project_directory = root / PROJECT_DIRECTORY
     contract_path = root / DIGITAL_RING_CONTRACT_PATH
     shell_path = root / "index.html"
+    german_shell_path = root / "de.html"
 
     for path, label in (
         (manifest_path, "public catalog manifest"),
@@ -375,35 +377,45 @@ def validate_public_catalog(root: Path = ROOT) -> list[str]:
         if missing_seed:
             errors.append(f"public catalog is missing preserved seed identities: {missing_seed}")
 
-    shell = shell_path.read_text(encoding="utf-8")
-    cards = CARD_PATTERN.findall(shell)
-    card_ids = [identifier for identifier, _body in cards]
-    card_bodies: dict[str, list[str]] = {}
-    for identifier, body in cards:
-        card_bodies.setdefault(identifier, []).append(body)
-    if sorted(card_ids) != sorted(identifiers + identifiers) or any(card_ids.count(identifier) != 2 for identifier in identifiers):
-        errors.append("public shell card identities must match the public catalog once in Text and once in the no-JavaScript fallback")
-    if './catalog/catalog.json' not in shell:
-        errors.append("public shell must link to the canonical public catalog manifest")
-    if './contracts/commonworld/project.schema.json' not in shell:
-        errors.append("public shell must link to the CommonProject schema")
-    for record in records:
-        identifier = record.get("id")
-        title = record.get("title")
-        summary = record.get("summary")
-        homepage = _homepage(record)
-        if not all(isinstance(value, str) for value in (identifier, title, summary, homepage)):
-            continue
-        bodies = card_bodies.get(identifier, [])
-        expected_values = [
-            (html.escape(title), "title"),
-            (html.escape(summary), "summary"),
-            (f'href="{html.escape(homepage, quote=True)}"', "homepage"),
-            (html.escape(_card_label(record, contract)), "derived German presentation label"),
-        ]
-        for value, label in expected_values:
-            if not bodies or any(value not in body for body in bodies):
-                errors.append(f"public shell is missing {label} for {identifier} in at least one text projection")
+    english_shell = shell_path.read_text(encoding="utf-8")
+    german_shell = german_shell_path.read_text(encoding="utf-8") if german_shell_path.is_file() else None
+    try:
+        english_records = localize_records(records, "en", root)
+    except ValueError:
+        english_records = records
+
+    projections = [("en", english_shell, english_records)]
+    if german_shell is not None:
+        projections.append(("de", german_shell, records))
+    for locale, shell, projected_records in projections:
+        cards = CARD_PATTERN.findall(shell)
+        card_ids = [identifier for identifier, _body in cards]
+        card_bodies: dict[str, list[str]] = {}
+        for identifier, body in cards:
+            card_bodies.setdefault(identifier, []).append(body)
+        if sorted(card_ids) != sorted(identifiers + identifiers) or any(card_ids.count(identifier) != 2 for identifier in identifiers):
+            errors.append('public shell card identities must match the public catalog once in Text and once in the no-JavaScript fallback' if locale == 'en' else 'German public shell card identities must match the public catalog once in Text and once in the no-JavaScript fallback')
+        if './catalog/catalog.json' not in shell:
+            errors.append(f"{locale} public shell must link to the canonical public catalog manifest")
+        if './contracts/commonworld/project.schema.json' not in shell:
+            errors.append(f"{locale} public shell must link to the CommonProject schema")
+        for record in projected_records:
+            identifier = record.get("id")
+            title = record.get("title")
+            summary = record.get("summary")
+            homepage = _homepage(record)
+            if not all(isinstance(value, str) for value in (identifier, title, summary, homepage)):
+                continue
+            bodies = card_bodies.get(identifier, [])
+            expected_values = [
+                (html.escape(title), "title"),
+                (html.escape(summary), "summary"),
+                (f'href="{html.escape(homepage, quote=True)}"', "homepage"),
+                (html.escape(presentation_label(record, locale)), f"derived {locale} presentation label"),
+            ]
+            for value, label in expected_values:
+                if not bodies or any(value not in body for body in bodies):
+                    errors.append(f"public shell is missing {label} for {identifier} in at least one text projection" if locale == 'en' else f"German public shell is missing {label} for {identifier} in at least one text projection")
 
     return errors
 

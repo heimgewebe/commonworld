@@ -894,7 +894,7 @@ def validate_public_maplibre_vertical_slice(root: Path = ROOT) -> list[str]:
             errors.append(f"public runtime CSS missing token: {token}")
 
     try:
-        rendered = render_shell(root)
+        rendered = render_shell(root, "en")
     except Exception as error:  # fail closed for malformed catalog inputs
         errors.append(f"deterministic public shell render failed: {error}")
     else:

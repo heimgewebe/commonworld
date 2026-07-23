@@ -27,11 +27,17 @@ Commonworld führt keine eigene Mitgliedschaft, Projektverwaltung oder ungeprüf
 
 ## Aktueller Stand
 
-Die öffentliche Seite läuft als statische GitHub-Pages-Anwendung. Sie verwendet MapLibre GL JS 5.24.0 und die öffentliche OpenFreeMap-Instanz als nichtkritische Best-effort-Basiskarte. Der Startkatalog enthält zehn quellengebundene digitale Commons. Dieselben `CommonProject.id` erscheinen im Globus, in der Textansicht, im Fokuspanel und in der maschinenlesbaren JSON-Oberfläche.
+Die öffentliche Seite läuft als statische GitHub-Pages-Anwendung. Sie verwendet MapLibre GL JS 5.24.0 und die öffentliche OpenFreeMap-Instanz als nichtkritische Best-effort-Basiskarte. Der öffentliche Katalog enthält quellengebundene geografische und digitale Commons. Dieselben `CommonProject.id` erscheinen im Globus, in der Textansicht, im Fokuspanel und in der maschinenlesbaren JSON-Oberfläche.
 
 Die Produktionsarchitektur und der Kartenanbieter sind für diesen begrenzten, kontolosen und statischen Umfang autorisiert. Nicht behauptet werden ein Anbieter-SLA, automatisches Failover, Backend-Bereitschaft, Android-Reduced-Motion-Abnahme, Screenreader-Produkttauglichkeit oder WCAG-Konformität.
 
 Die menschlich lesbare Methode, Abdeckungs- und Datenschutzgrenze wird als `method.html` veröffentlicht.
+
+## Internationalisierung
+
+Englisch ist die öffentliche Standardsprache (`index.html`, `method.html`, `propose.html`). Deutsch bleibt als vollständig statische Alternative über `de.html`, `method.de.html` und `propose.de.html` erreichbar. Der Sprachwechsel funktioniert daher auch ohne JavaScript.
+
+Die fachliche Katalogwahrheit bleibt ausschließlich in `catalog/projects/*.json`. Präsentationsübersetzungen liegen getrennt in `catalog/locales/<locale>.json` und dürfen nur sichtbare Texte wie Zusammenfassungen und Ortslabels ersetzen; IDs, URLs, Geometrien, Quellen, Aktivitäts- und Kurationszustände bleiben kanonisch. `npm run build` erzeugt daraus die statischen Sprachoberflächen und das Browser-Locale-Modul deterministisch neu. Die Suche indexiert in der englischen Oberfläche zusätzlich die deutschen kanonischen Präsentationstexte, damit englische und deutsche Suchbegriffe parallel nutzbar bleiben.
 
 ## Lizenzen
 

@@ -75,6 +75,21 @@ class ContractTests(unittest.TestCase):
         self.assertTrue(any("geometry" in error for error in errors))
         self.assertTrue(any("uncertainty_meters_min" in error for error in errors))
 
+    def test_approximate_location_rejects_polygon_geometry(self) -> None:
+        record = copy.deepcopy(base_record())
+        record["presence"]["geographic"][0] = {
+            "id": "approximate-area",
+            "mode": "approximate",
+            "label": "Approximate public area",
+            "geometry": {
+                "type": "Polygon",
+                "coordinates": [[[9.9, 53.4], [10.1, 53.4], [10.1, 53.6], [9.9, 53.4]]],
+            },
+            "uncertainty_meters_min": 1000,
+            "source_ids": ["official-website"],
+        }
+        self.assertTrue(any("Point" in error for error in validation_errors(record)))
+
     def test_multiple_geographic_anchors_validate_as_one_identity(self) -> None:
         record = copy.deepcopy(base_record())
         record["presence"]["geographic"].append(

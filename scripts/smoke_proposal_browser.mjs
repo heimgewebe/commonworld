@@ -32,18 +32,18 @@ const browser = await chromium.launch({ headless: true, executablePath: process.
 const results = [];
 
 async function fillValid(page, name = 'Browser Test Commons') {
-  await page.getByLabel('Name des Commons').fill(name);
-  await page.getByLabel('Kurze Beschreibung').fill('Eine gemeinschaftlich verwaltete Ressource mit offenen Regeln, offiziellen Quellen und einem realen öffentlichen Beteiligungsweg.');
-  await page.getByLabel('Offizielle Website').fill('https://example.net/commons');
-  await page.getByLabel('Commons-Art').selectOption('other');
-  await page.getByRole('checkbox', { name: 'Vor Ort', exact: true }).check();
+  await page.getByLabel('Name of the Commons').fill(name);
+  await page.getByLabel('Short description').fill('Eine gemeinschaftlich verwaltete Ressource mit offenen Regeln, offiziellen Quellen und einem realen öffentlichen Beteiligungsweg.');
+  await page.getByLabel('Official website').fill('https://example.net/commons');
+  await page.getByLabel('Commons type').selectOption('other');
+  await page.getByRole('checkbox', { name: 'On site', exact: true }).check();
   await page.getByRole('checkbox', { name: 'Digital', exact: true }).check();
-  await page.getByLabel('Grobe Region oder Ort').fill('Norddeutschland');
-  await page.getByLabel('HTTPS-Link').first().fill('https://example.net/commons/about');
-  await page.getByLabel('Primärnahe Quellen').fill('https://example.net/commons/governance');
-  await page.getByLabel('Mir ist bewusst, dass der bevorzugte GitHub-Eingang öffentlich ist.').check();
-  await page.getByLabel('Ich willige in die redaktionelle Verarbeitung der übermittelten Angaben ein.').check();
-  await page.getByLabel('Ich habe keine private Adresse, Koordinate, E-Mail-Adresse, Telefonnummer oder private Netz- und Haushaltsangabe eingetragen.').check();
+  await page.getByLabel('Broad region or place').fill('Norddeutschland');
+  await page.getByLabel('HTTPS link').first().fill('https://example.net/commons/about');
+  await page.getByLabel('Primary-near sources').fill('https://example.net/commons/governance');
+  await page.getByLabel('I understand that the preferred GitHub intake path is public.').check();
+  await page.getByLabel('I consent to editorial processing of the submitted information.').check();
+  await page.getByLabel('I have not entered a private address, coordinates, email address, phone number, or private network or household information.').check();
 }
 
 for (const profile of [
@@ -65,8 +65,8 @@ html { font-size: ${profile.fontScale}% !important; }
     });
   }
   await page.goto(`${baseUrl}/propose.html`, { waitUntil: 'networkidle' });
-  assert(await page.getByRole('heading', { name: 'Ein Commons vorschlagen' }).isVisible(), `${profile.name}: heading missing`);
-  assert(await page.getByRole('button', { name: 'Öffentliches GitHub-Issue vorbereiten' }).isVisible(), `${profile.name}: submit missing`);
+  assert(await page.getByRole('heading', { name: 'Suggest a Commons' }).isVisible(), `${profile.name}: heading missing`);
+  assert(await page.getByRole('button', { name: 'Prepare public GitHub issue' }).isVisible(), `${profile.name}: submit missing`);
   const backLink = page.locator('.secondary-back-link');
   await backLink.waitFor({ state: 'visible' });
   const backBox = await backLink.boundingBox();
@@ -85,10 +85,21 @@ html { font-size: ${profile.fontScale}% !important; }
     assert(skipBox && skipBox.x >= 0 && skipBox.x + skipBox.width <= profile.viewport.width + 1, `${profile.name}: focused skip link overflows the viewport ${JSON.stringify(skipBox)}`);
   }
   const fieldsetLegends = await page.locator('form fieldset > legend').allTextContents();
-  assert(JSON.stringify(fieldsetLegends) === JSON.stringify(['Projekt', 'Präsenz', 'Belegte Handlungswege', 'Quellen und Hinweise', 'Einwilligung und Öffentlichkeit']), `${profile.name}: semantic fieldsets differ ${JSON.stringify(fieldsetLegends)}`);
+  assert(JSON.stringify(fieldsetLegends) === JSON.stringify(['Project', 'Presence', 'Evidenced ways to engage', 'Sources and notes', 'Consent and public visibility']), `${profile.name}: semantic fieldsets differ ${JSON.stringify(fieldsetLegends)}`);
   assert(await page.locator('input[name="region"]').isDisabled(), `${profile.name}: geographic region is active without Vor Ort`);
   assert(pageErrors.length === 0, `${profile.name}: page errors ${pageErrors.join('; ')}`);
   results.push(profile.name);
+  await context.close();
+}
+
+{
+  const context = await browser.newContext({ viewport: { width: 1024, height: 768 }, reducedMotion: 'reduce' });
+  const page = await context.newPage();
+  await page.goto(`${baseUrl}/propose.de.html`, { waitUntil: 'networkidle' });
+  assert(await page.getByRole('heading', { name: 'Ein Commons vorschlagen' }).isVisible(), 'German proposal locale: heading missing');
+  assert(await page.getByRole('button', { name: 'Öffentliches GitHub-Issue vorbereiten' }).isVisible(), 'German proposal locale: submit missing');
+  assert(await page.locator('.language-switch a[href="./propose.html"][lang="en"]').count() > 0, 'German proposal locale: English switch target missing');
+  results.push('locale-german');
   await context.close();
 }
 
@@ -98,9 +109,9 @@ html { font-size: ${profile.fontScale}% !important; }
   const page = await context.newPage();
   await page.goto(`${baseUrl}/propose.html`, { waitUntil: 'networkidle' });
   await fillValid(page, 'Success Test Commons');
-  await page.getByRole('button', { name: 'Öffentliches GitHub-Issue vorbereiten' }).click();
-  await page.getByText('GitHub wurde geöffnet.').waitFor();
-  assert((await page.getByRole('link', { name: 'GitHub direkt öffnen' }).getAttribute('href')).includes('body='), 'success: structured issue body missing');
+  await page.getByRole('button', { name: 'Prepare public GitHub issue' }).click();
+  await page.getByText('GitHub was opened.').waitFor();
+  assert((await page.getByRole('link', { name: 'Open GitHub directly' }).getAttribute('href')).includes('body='), 'success: structured issue body missing');
   results.push('success-message');
   await context.close();
 }
@@ -111,14 +122,14 @@ html { font-size: ${profile.fontScale}% !important; }
   const page = await context.newPage();
   await page.goto(`${baseUrl}/propose.html`, { waitUntil: 'networkidle' });
   await fillValid(page, 'Digital Only Test Commons');
-  await page.getByRole('checkbox', { name: 'Vor Ort', exact: true }).uncheck();
+  await page.getByRole('checkbox', { name: 'On site', exact: true }).uncheck();
   const region = page.locator('input[name="region"]');
   assert(await region.isDisabled(), 'digital-only: region remained editable');
   assert(await region.getAttribute('required') === null, 'digital-only: region remained required');
-  await page.getByRole('button', { name: 'Öffentliches GitHub-Issue vorbereiten' }).click();
-  await page.getByText('GitHub wurde geöffnet.').waitFor();
-  const issueUrl = new URL(await page.getByRole('link', { name: 'GitHub direkt öffnen' }).getAttribute('href'));
-  assert(issueUrl.searchParams.get('body').includes('nicht zutreffend (nur digital)'), 'digital-only: issue body invented a region');
+  await page.getByRole('button', { name: 'Prepare public GitHub issue' }).click();
+  await page.getByText('GitHub was opened.').waitFor();
+  const issueUrl = new URL(await page.getByRole('link', { name: 'Open GitHub directly' }).getAttribute('href'));
+  assert(issueUrl.searchParams.get('body').includes('not applicable (digital only)'), 'digital-only: issue body invented a region');
   results.push('digital-only-without-region');
   await context.close();
 }
@@ -129,10 +140,10 @@ html { font-size: ${profile.fontScale}% !important; }
   const page = await context.newPage();
   await page.goto(`${baseUrl}/propose.html`, { waitUntil: 'networkidle' });
   await fillValid(page);
-  await page.getByRole('button', { name: 'Öffentliches GitHub-Issue vorbereiten' }).press('Enter');
-  await page.getByText('Der GitHub-Tab wurde blockiert.').waitFor();
-  assert(await page.getByRole('link', { name: 'GitHub direkt öffnen' }).isVisible(), 'popup-blocked: direct link missing');
-  assert(await page.getByRole('button', { name: 'Validiertes JSON herunterladen' }).isVisible(), 'popup-blocked: JSON fallback missing');
+  await page.getByRole('button', { name: 'Prepare public GitHub issue' }).press('Enter');
+  await page.getByText('The GitHub tab was blocked.').waitFor();
+  assert(await page.getByRole('link', { name: 'Open GitHub directly' }).isVisible(), 'popup-blocked: direct link missing');
+  assert(await page.getByRole('button', { name: 'Download validated JSON' }).isVisible(), 'popup-blocked: JSON fallback missing');
   results.push('keyboard-popup-blocked-fallback');
   await context.close();
 }
@@ -143,8 +154,8 @@ html { font-size: ${profile.fontScale}% !important; }
   await page.goto(`${baseUrl}/propose.html`, { waitUntil: 'networkidle' });
   await fillValid(page, 'Offline Test Commons');
   await context.setOffline(true);
-  await page.getByRole('button', { name: 'Öffentliches GitHub-Issue vorbereiten' }).click();
-  await page.getByText('Keine Netzverbindung erkannt.').waitFor();
+  await page.getByRole('button', { name: 'Prepare public GitHub issue' }).click();
+  await page.getByText('No network connection detected.').waitFor();
   results.push('offline-fallback');
   await context.close();
 }
@@ -156,8 +167,8 @@ html { font-size: ${profile.fontScale}% !important; }
   const embeddedIndex = await page.locator('#proposal-catalog-index').evaluate((node) => JSON.parse(node.textContent || '{}'));
   assert(embeddedIndex.titles.includes('Debian'), 'duplicate-index: embedded catalog JSON is invalid or incomplete');
   await fillValid(page, 'Debian');
-  await page.getByRole('button', { name: 'Öffentliches GitHub-Issue vorbereiten' }).click();
-  assert((await page.getByRole('alert').textContent()).includes('Name ist bereits'), 'duplicate-index: existing catalog title was not blocked');
+  await page.getByRole('button', { name: 'Prepare public GitHub issue' }).click();
+  assert((await page.getByRole('alert').textContent()).includes('name is already present'), 'duplicate-index: existing catalog title was not blocked');
   results.push('catalog-duplicate-fail-closed');
   await context.close();
 }
@@ -167,10 +178,10 @@ html { font-size: ${profile.fontScale}% !important; }
   const page = await context.newPage();
   await page.goto(`${baseUrl}/propose.html`, { waitUntil: 'networkidle' });
   await fillValid(page, '52.5200, 13.4050');
-  await page.getByLabel('Grobe Region oder Ort').fill('52.5200, 13.4050');
-  await page.getByRole('button', { name: 'Öffentliches GitHub-Issue vorbereiten' }).click();
+  await page.getByLabel('Broad region or place').fill('52.5200, 13.4050');
+  await page.getByRole('button', { name: 'Prepare public GitHub issue' }).click();
   assert(await page.getByRole('alert').isVisible(), 'privacy-invalid: error surface missing');
-  assert((await page.getByRole('alert').textContent()).includes('keine Adresse oder Koordinate'), 'privacy-invalid: fail-closed reason missing');
+  assert((await page.getByRole('alert').textContent()).includes('no address or coordinates'), 'privacy-invalid: fail-closed reason missing');
   results.push('privacy-fail-closed');
   await context.close();
 }
@@ -180,9 +191,9 @@ html { font-size: ${profile.fontScale}% !important; }
   const page = await context.newPage();
   await page.goto(`${baseUrl}/propose.html`, { waitUntil: 'networkidle' });
   await fillValid(page, 'No Presence Test');
-  await page.getByRole('checkbox', { name: 'Vor Ort', exact: true }).uncheck();
+  await page.getByRole('checkbox', { name: 'On site', exact: true }).uncheck();
   await page.getByRole('checkbox', { name: 'Digital', exact: true }).uncheck();
-  await page.getByRole('button', { name: 'Öffentliches GitHub-Issue vorbereiten' }).click();
+  await page.getByRole('button', { name: 'Prepare public GitHub issue' }).click();
   assert(await page.getByRole('alert').isVisible(), 'presence-missing: error surface missing');
   results.push('presence-missing-fail-closed');
   await context.close();
@@ -275,7 +286,7 @@ for (const viewport of IPAD_LANDSCAPE_VIEWPORTS) {
   }
 
   // With the probe gone, prove the real submit button is reachable by scrolling.
-  const ipadSubmitButton = page.getByRole('button', { name: 'Öffentliches GitHub-Issue vorbereiten' });
+  const ipadSubmitButton = page.getByRole('button', { name: 'Prepare public GitHub issue' });
   await ipadSubmitButton.scrollIntoViewIfNeeded();
   assert(await ipadSubmitButton.isVisible(), `${viewport.name}: submit button unreachable by scroll`);
   assert(pageErrors.length === 0, `${viewport.name}: propose.html page errors ${pageErrors.join('; ')}`);

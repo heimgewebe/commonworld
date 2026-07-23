@@ -1,3 +1,6 @@
+const ACTIVE_LOCALE = typeof document !== 'undefined' && document.documentElement?.lang === 'en' ? 'en' : 'de';
+const tr = (de, en) => ACTIVE_LOCALE === 'en' ? en : de;
+
 const MAX = Object.freeze({ name: 140, description: 800, region: 120, note: 500, url: 300 });
 const ISSUE_BASE = "https://github.com/heimgewebe/commonworld/issues/new";
 const ACTION_TYPES = new Set(["visit", "use", "borrow", "learn", "contribute", "volunteer", "donate", "contact", "replicate"]);
@@ -29,69 +32,69 @@ export function containsContactData(value) {
 }
 
 function validateText(errors, field, value, min, max) {
-  if (typeof value !== "string" || value.trim().length < min) errors.push(`${field}: zu kurz oder fehlt.`);
-  if (typeof value === "string" && value.length > max) errors.push(`${field}: höchstens ${max} Zeichen.`);
-  if (typeof value === "string" && ACTIVE_CONTENT_PATTERN.test(value)) errors.push(`${field}: aktiver HTML- oder Script-Inhalt ist nicht erlaubt.`);
-  if (typeof value === "string" && containsContactData(value)) errors.push(`${field}: keine E-Mail-Adresse oder Telefonnummer in öffentlichen Vorschlägen.`);
+  if (typeof value !== "string" || value.trim().length < min) errors.push(`${field}: ${tr("zu kurz oder fehlt.", "too short or missing.")}`);
+  if (typeof value === "string" && value.length > max) errors.push(`${field}: ${tr(`höchstens ${max} Zeichen.`, `at most ${max} characters.`)}`);
+  if (typeof value === "string" && ACTIVE_CONTENT_PATTERN.test(value)) errors.push(`${field}: ${tr("aktiver HTML- oder Script-Inhalt ist nicht erlaubt.", "active HTML or script content is not allowed.")}`);
+  if (typeof value === "string" && containsContactData(value)) errors.push(`${field}: ${tr("keine E-Mail-Adresse oder Telefonnummer in öffentlichen Vorschlägen.", "no email address or phone number in public suggestions.")}`);
 }
 
 export function validateProposal(proposal, knownTitles = [], knownHosts = []) {
   const errors = [];
-  if (!proposal || typeof proposal !== "object" || Array.isArray(proposal)) return ["Vorschlag: ungültiges Datenformat."];
+  if (!proposal || typeof proposal !== "object" || Array.isArray(proposal)) return [tr("Vorschlag: ungültiges Datenformat.", "Suggestion: invalid data format.")];
   const allowedTop = new Set(["schema_version", "kind", "proposal_id", "submitted_at", "status", "project", "consent"]);
-  for (const key of Object.keys(proposal)) if (!allowedTop.has(key)) errors.push(`Vorschlag: unbekanntes Feld ${key}.`);
-  if (proposal.schema_version !== 1 || proposal.kind !== "commonworld_commons_proposal" || proposal.status !== "submitted") errors.push("Vorschlag: Vertragskennung oder Startstatus ungültig.");
-  if (!/^cw-[0-9]{8}t[0-9]{6}z-[a-z0-9-]{3,48}$/u.test(String(proposal.proposal_id || ""))) errors.push("Vorschlag: Kennung ungültig.");
-  if (Number.isNaN(Date.parse(String(proposal.submitted_at || "")))) errors.push("Vorschlag: Zeitangabe ungültig.");
+  for (const key of Object.keys(proposal)) if (!allowedTop.has(key)) errors.push(tr(`Vorschlag: unbekanntes Feld ${key}.`, `Suggestion: unknown field ${key}.`));
+  if (proposal.schema_version !== 1 || proposal.kind !== "commonworld_commons_proposal" || proposal.status !== "submitted") errors.push(tr("Vorschlag: Vertragskennung oder Startstatus ungültig.", "Suggestion: contract identity or initial status is invalid."));
+  if (!/^cw-[0-9]{8}t[0-9]{6}z-[a-z0-9-]{3,48}$/u.test(String(proposal.proposal_id || ""))) errors.push(tr("Vorschlag: Kennung ungültig.", "Suggestion: identifier is invalid."));
+  if (Number.isNaN(Date.parse(String(proposal.submitted_at || "")))) errors.push(tr("Vorschlag: Zeitangabe ungültig.", "Suggestion: timestamp is invalid."));
 
   const project = proposal.project;
-  if (!project || typeof project !== "object" || Array.isArray(project)) return [...errors, "Projekt: Angaben fehlen."];
+  if (!project || typeof project !== "object" || Array.isArray(project)) return [...errors, tr("Projekt: Angaben fehlen.", "Project: information is missing.")];
   const allowedProject = new Set(["name", "description", "official_website", "commons_type", "presence_geographic", "presence_digital", "region", "actions", "sources", "sensitive_location_risk", "location_precision", "editorial_note"]);
-  for (const key of Object.keys(project)) if (!allowedProject.has(key)) errors.push(`Projekt: unbekanntes Feld ${key}.`);
+  for (const key of Object.keys(project)) if (!allowedProject.has(key)) errors.push(tr(`Projekt: unbekanntes Feld ${key}.`, `Project: unknown field ${key}.`));
   validateText(errors, "Name", project.name, 2, MAX.name);
-  validateText(errors, "Beschreibung", project.description, 40, MAX.description);
+  validateText(errors, tr("Beschreibung", "Description"), project.description, 40, MAX.description);
   if (project.presence_geographic === true) {
     validateText(errors, "Region", project.region, 2, MAX.region);
-    if (containsSensitiveLocation(project.region)) errors.push("Region: nur Land, Großregion oder Stadt nennen; keine Adresse oder Koordinate.");
-    if (project.location_precision !== "country_or_region_only") errors.push("Ortsgenauigkeit: nur Land oder grobe Region ist zulässig.");
+    if (containsSensitiveLocation(project.region)) errors.push(tr("Region: nur Land, Großregion oder Stadt nennen; keine Adresse oder Koordinate.", "Region: provide only a country, broad region or city; no address or coordinates."));
+    if (project.location_precision !== "country_or_region_only") errors.push(tr("Ortsgenauigkeit: nur Land oder grobe Region ist zulässig.", "Location precision: only a country or broad region is allowed."));
   } else {
-    if (Object.prototype.hasOwnProperty.call(project, "region")) errors.push("Region: bei rein digitaler Präsenz nicht angeben.");
-    if (Object.prototype.hasOwnProperty.call(project, "location_precision")) errors.push("Ortsgenauigkeit: bei rein digitaler Präsenz nicht angeben.");
+    if (Object.prototype.hasOwnProperty.call(project, "region")) errors.push(tr("Region: bei rein digitaler Präsenz nicht angeben.", "Region: do not provide one for digital-only presence."));
+    if (Object.prototype.hasOwnProperty.call(project, "location_precision")) errors.push(tr("Ortsgenauigkeit: bei rein digitaler Präsenz nicht angeben.", "Location precision: do not provide it for digital-only presence."));
   }
-  if (project.editorial_note) validateText(errors, "Redaktioneller Hinweis", project.editorial_note, 0, MAX.note);
-  if (!isSafeHttpsUrl(project.official_website)) errors.push("Offizielle Website: nur eine gültige HTTPS-Adresse ist erlaubt.");
-  if (!COMMONS_TYPES.has(project.commons_type)) errors.push("Commons-Art: unbekannter Wert.");
-  if (typeof project.presence_geographic !== "boolean" || typeof project.presence_digital !== "boolean") errors.push("Präsenz: Boolean-Werte erforderlich.");
-  if (!project.presence_geographic && !project.presence_digital) errors.push("Präsenz: mindestens eine Option (Vor Ort oder Digital) muss gewählt werden.");
-  if (typeof project.sensitive_location_risk !== "boolean") errors.push("Sensibilitätsangabe: erforderlich.");
+  if (project.editorial_note) validateText(errors, tr("Redaktioneller Hinweis", "Editorial note"), project.editorial_note, 0, MAX.note);
+  if (!isSafeHttpsUrl(project.official_website)) errors.push(tr("Offizielle Website: nur eine gültige HTTPS-Adresse ist erlaubt.", "Official website: only a valid HTTPS address is allowed."));
+  if (!COMMONS_TYPES.has(project.commons_type)) errors.push(tr("Commons-Art: unbekannter Wert.", "Commons type: unknown value."));
+  if (typeof project.presence_geographic !== "boolean" || typeof project.presence_digital !== "boolean") errors.push(tr("Präsenz: Boolean-Werte erforderlich.", "Presence: Boolean values are required."));
+  if (!project.presence_geographic && !project.presence_digital) errors.push(tr("Präsenz: mindestens eine Option (Vor Ort oder Digital) muss gewählt werden.", "Presence: choose at least one option (On site or Digital)."));
+  if (typeof project.sensitive_location_risk !== "boolean") errors.push(tr("Sensibilitätsangabe: erforderlich.", "Sensitive-location indication: required."));
 
   if (!Array.isArray(project.actions) || project.actions.length < 1 || project.actions.length > 3) {
-    errors.push("Handlungswege: ein bis drei belegte Wege sind erforderlich.");
+    errors.push(tr("Handlungswege: ein bis drei belegte Wege sind erforderlich.", "Ways to engage: one to three evidenced paths are required."));
   } else {
     const seen = new Set();
     for (const action of project.actions) {
-      if (!action || typeof action !== "object" || !ACTION_TYPES.has(action.type) || !isSafeHttpsUrl(action.url)) errors.push("Handlungswege: Typ und HTTPS-Adresse prüfen.");
+      if (!action || typeof action !== "object" || !ACTION_TYPES.has(action.type) || !isSafeHttpsUrl(action.url)) errors.push(tr("Handlungswege: Typ und HTTPS-Adresse prüfen.", "Ways to engage: check the type and HTTPS address."));
       const key = `${action?.type || ""}|${action?.url || ""}`;
-      if (seen.has(key)) errors.push("Handlungswege: Dublette entfernen.");
+      if (seen.has(key)) errors.push(tr("Handlungswege: Dublette entfernen.", "Ways to engage: remove the duplicate."));
       seen.add(key);
     }
   }
   if (!Array.isArray(project.sources) || project.sources.length < 1 || project.sources.length > 5) {
-    errors.push("Quellen: mindestens eine und höchstens fünf primärnahe HTTPS-Quellen angeben.");
+    errors.push(tr("Quellen: mindestens eine und höchstens fünf primärnahe HTTPS-Quellen angeben.", "Sources: provide at least one and at most five primary-near HTTPS sources."));
   } else {
     const unique = new Set(project.sources);
-    if (unique.size !== project.sources.length) errors.push("Quellen: Dubletten entfernen.");
-    if (project.sources.some((url) => !isSafeHttpsUrl(url))) errors.push("Quellen: nur gültige HTTPS-Adressen sind erlaubt.");
+    if (unique.size !== project.sources.length) errors.push(tr("Quellen: Dubletten entfernen.", "Sources: remove duplicates."));
+    if (project.sources.some((url) => !isSafeHttpsUrl(url))) errors.push(tr("Quellen: nur gültige HTTPS-Adressen sind erlaubt.", "Sources: only valid HTTPS addresses are allowed."));
   }
 
   const title = normalizeTitle(project.name);
-  if (knownTitles.map(normalizeTitle).includes(title)) errors.push("Dublette: dieser Name ist bereits im öffentlichen Katalog vorhanden.");
+  if (knownTitles.map(normalizeTitle).includes(title)) errors.push(tr("Dublette: dieser Name ist bereits im öffentlichen Katalog vorhanden.", "Duplicate: this name is already present in the public catalog."));
   if (isSafeHttpsUrl(project.official_website)) {
     const host = new URL(project.official_website).hostname.replace(/^www\./u, "").toLocaleLowerCase("en");
-    if (knownHosts.map((value) => String(value).replace(/^www\./u, "").toLocaleLowerCase("en")).includes(host)) errors.push("Dublette: diese offizielle Domain ist bereits im Katalog vorhanden.");
+    if (knownHosts.map((value) => String(value).replace(/^www\./u, "").toLocaleLowerCase("en")).includes(host)) errors.push(tr("Dublette: diese offizielle Domain ist bereits im Katalog vorhanden.", "Duplicate: this official domain is already present in the catalog."));
   }
   const consent = proposal.consent;
-  if (!consent || consent.public_issue_acknowledged !== true || consent.processing_agreed !== true || consent.no_sensitive_data_confirmed !== true) errors.push("Einwilligung: alle drei Bestätigungen sind erforderlich.");
+  if (!consent || consent.public_issue_acknowledged !== true || consent.processing_agreed !== true || consent.no_sensitive_data_confirmed !== true) errors.push(tr("Einwilligung: alle drei Bestätigungen sind erforderlich.", "Consent: all three confirmations are required."));
   return errors;
 }
 
@@ -145,32 +148,32 @@ export function buildIssueBody(proposal) {
   const actionLines = project.actions.map((entry) => `- ${markdown(entry.type)}: ${entry.url}`).join("\n");
   const sourceLines = project.sources.map((url) => `- ${url}`).join("\n");
   return [
-    "## Öffentlicher Commons-Vorschlag",
+    tr("## Öffentlicher Commons-Vorschlag", "## Public Commons suggestion"),
     "",
-    "> Dieser Vorschlag ist ein redaktioneller Kandidat. Er wird nicht automatisch veröffentlicht.",
+    tr("> Dieser Vorschlag ist ein redaktioneller Kandidat. Er wird nicht automatisch veröffentlicht.", "> This suggestion is an editorial candidate. It is not published automatically."),
     "",
-    `**Vorschlags-ID:** \`${proposal.proposal_id}\``,
+    `**${tr("Vorschlags-ID", "Suggestion ID")}:** \`${proposal.proposal_id}\``,
     `**Name:** ${markdown(project.name)}`,
-    `**Commons-Art:** ${markdown(project.commons_type)}`,
-    `**Präsenz:** ${project.presence_geographic && project.presence_digital ? 'Vor Ort und Digital' : (project.presence_geographic ? 'Geografisch (Vor Ort)' : 'Digital')}`,
-    `**Grobe Region:** ${project.presence_geographic ? markdown(project.region) : "nicht zutreffend (nur digital)"}`,
-    `**Offizielle Website:** ${project.official_website}`,
-    `**Möglicherweise sensible Orte:** ${project.sensitive_location_risk ? "ja – redaktionell besonders prüfen" : "nein angegeben"}`,
+    `**${tr("Commons-Art", "Commons type")}:** ${markdown(project.commons_type)}`,
+    `**${tr("Präsenz", "Presence")}:** ${project.presence_geographic && project.presence_digital ? tr('Vor Ort und Digital', 'On site and Digital') : (project.presence_geographic ? tr('Geografisch (Vor Ort)', 'Geographic (On site)') : 'Digital')}`,
+    `**${tr("Grobe Region", "Broad region")}:** ${project.presence_geographic ? markdown(project.region) : tr("nicht zutreffend (nur digital)", "not applicable (digital only)")}`,
+    `**${tr("Offizielle Website", "Official website")}:** ${project.official_website}`,
+    `**${tr("Möglicherweise sensible Orte", "Potentially sensitive locations")}:** ${project.sensitive_location_risk ? tr("ja – redaktionell besonders prüfen", "yes — apply especially strict editorial review") : tr("nein angegeben", "none indicated")}`,
     "",
-    "### Kurzbeschreibung",
+    tr("### Kurzbeschreibung", "### Short description"),
     markdown(project.description),
     "",
-    "### Vorgeschlagene Handlungswege",
+    tr("### Vorgeschlagene Handlungswege", "### Suggested ways to engage"),
     actionLines,
     "",
-    "### Primärnahe Quellen",
+    tr("### Primärnahe Quellen", "### Primary-near sources"),
     sourceLines,
-    ...(project.editorial_note ? ["", "### Redaktioneller Hinweis", markdown(project.editorial_note)] : []),
+    ...(project.editorial_note ? ["", tr("### Redaktioneller Hinweis", "### Editorial note"), markdown(project.editorial_note)] : []),
     "",
-    "### Bestätigungen",
-    "- [x] Mir ist bewusst, dass dieses Issue öffentlich ist.",
-    "- [x] Ich willige in die redaktionelle Verarbeitung dieser Angaben ein.",
-    "- [x] Der Vorschlag enthält keine privaten Adressen, Koordinaten oder Kontaktdaten.",
+    tr("### Bestätigungen", "### Confirmations"),
+    tr("- [x] Mir ist bewusst, dass dieses Issue öffentlich ist.", "- [x] I understand that this issue is public."),
+    tr("- [x] Ich willige in die redaktionelle Verarbeitung dieser Angaben ein.", "- [x] I consent to editorial processing of this information."),
+    tr("- [x] Der Vorschlag enthält keine privaten Adressen, Koordinaten oder Kontaktdaten.", "- [x] The suggestion contains no private addresses, coordinates or contact data."),
     "",
     "<!-- commonworld-proposal-v1; status=submitted; no-auto-publish -->",
   ].join("\n");
@@ -178,7 +181,7 @@ export function buildIssueBody(proposal) {
 
 export function buildIssueUrl(proposal) {
   const params = new URLSearchParams({
-    title: `[Commons-Vorschlag] ${proposal.project.name}`,
+    title: `[${tr("Commons-Vorschlag", "Commons suggestion")}] ${proposal.project.name}`,
     body: buildIssueBody(proposal),
     labels: "catalog-candidate,editorial-review",
   });
@@ -242,7 +245,7 @@ function readFields(form) {
 function renderErrors(errors, node) {
   node.replaceChildren();
   if (!errors.length) return;
-  const heading = document.createElement("strong"); heading.textContent = "Bitte korrigieren:"; node.append(heading);
+  const heading = document.createElement("strong"); heading.textContent = tr("Bitte korrigieren:", "Please correct:"); node.append(heading);
   const list = document.createElement("ul");
   for (const error of errors) { const item = document.createElement("li"); item.textContent = error; list.append(item); }
   node.append(list); node.hidden = false; node.focus();
@@ -276,8 +279,8 @@ function init() {
   syncGeographicFields();
 
   function validateCurrent() {
-    if (!catalog) return { proposal: null, errors: ["Der öffentliche Katalogindex konnte nicht sicher geladen werden. Bitte die Seite neu laden."] };
-    if (form.elements.website_confirm.value) return { proposal: null, errors: ["Automatische Einreichung blockiert."] };
+    if (!catalog) return { proposal: null, errors: [tr("Der öffentliche Katalogindex konnte nicht sicher geladen werden. Bitte die Seite neu laden.", "The public catalog index could not be loaded safely. Please reload the page.")] };
+    if (form.elements.website_confirm.value) return { proposal: null, errors: [tr("Automatische Einreichung blockiert.", "Automated submission blocked.")] };
     const proposal = proposalFromFields(readFields(form));
     return { proposal, errors: validateProposal(proposal, catalog.titles, catalog.hosts) };
   }
@@ -287,13 +290,13 @@ function init() {
     const { proposal, errors } = validateCurrent();
     if (errors.length) { renderErrors(errors, errorsNode); return; }
     const last = readLastPreparedAt();
-    if (Date.now() - last < 60_000) { renderErrors(["Mehrfachvorbereitung begrenzt: bitte eine Minute warten oder den vorhandenen GitHub-Tab verwenden."], errorsNode); return; }
+    if (Date.now() - last < 60_000) { renderErrors([tr("Mehrfachvorbereitung begrenzt: bitte eine Minute warten oder den vorhandenen GitHub-Tab verwenden.", "Repeated preparation is rate-limited: wait one minute or use the existing GitHub tab.")], errorsNode); return; }
     lastProposal = proposal;
     const issueUrl = buildIssueUrl(proposal);
     direct.href = issueUrl;
     storeLastPreparedAt(Date.now());
     if (navigator.onLine === false) {
-      statusNode.textContent = "Keine Netzverbindung erkannt. Lade den validierten JSON-Vorschlag herunter und reiche ihn später über GitHub ein.";
+      statusNode.textContent = tr("Keine Netzverbindung erkannt. Lade den validierten JSON-Vorschlag herunter und reiche ihn später über GitHub ein.", "No network connection detected. Download the validated JSON suggestion and submit it through GitHub later.");
       fallback.hidden = false;
       return;
     }
@@ -303,11 +306,11 @@ function init() {
       try { opened.opener = null; } catch { /* Cross-origin window; noopener best effort after popup detection. */ }
     }
     if (!opened) {
-      statusNode.textContent = "Der GitHub-Tab wurde blockiert. Nutze den direkten Link oder den JSON-Download.";
+      statusNode.textContent = tr("Der GitHub-Tab wurde blockiert. Nutze den direkten Link oder den JSON-Download.", "The GitHub tab was blocked. Use the direct link or the JSON download.");
       fallback.hidden = false;
       return;
     }
-    statusNode.textContent = "GitHub wurde geöffnet. Erst das Absenden des öffentlichen Issues überträgt den Vorschlag; eine Veröffentlichung im Katalog erfolgt dadurch nicht.";
+    statusNode.textContent = tr("GitHub wurde geöffnet. Erst das Absenden des öffentlichen Issues überträgt den Vorschlag; eine Veröffentlichung im Katalog erfolgt dadurch nicht.", "GitHub was opened. The suggestion is transferred only when you submit the public issue; this does not publish it in the catalog.");
     fallback.hidden = false;
   });
 
@@ -315,7 +318,7 @@ function init() {
     const result = lastProposal ? { proposal: lastProposal, errors: [] } : validateCurrent();
     if (result.errors.length) { renderErrors(result.errors, errorsNode); return; }
     downloadJson(result.proposal);
-    statusNode.textContent = "Validierte JSON-Datei lokal erstellt. Commonworld hat den Inhalt nicht gespeichert.";
+    statusNode.textContent = tr("Validierte JSON-Datei lokal erstellt. Commonworld hat den Inhalt nicht gespeichert.", "Validated JSON file created locally. Commonworld did not store its contents.");
   });
 }
 

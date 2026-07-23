@@ -95,9 +95,9 @@ class PublicShellTests(unittest.TestCase):
         with tempfile.TemporaryDirectory() as tmp_dir:
             root = self.copy_shell(tmp_dir)
             path = root / "method.html"
-            path.write_text(path.read_text(encoding="utf-8").replace("keine vollständige Weltstatistik", "vollständig"), encoding="utf-8")
+            path.write_text(path.read_text(encoding="utf-8").replace("not a complete global statistic", "complete global statistic"), encoding="utf-8")
             errors = validate_public_shell(root)
-        self.assertTrue(any("keine vollständige Weltstatistik" in error for error in errors))
+        self.assertTrue(any("not a complete global statistic" in error for error in errors))
 
     def test_presence_html_tolerates_formatting(self) -> None:
         with tempfile.TemporaryDirectory() as tmp_dir:
@@ -230,7 +230,7 @@ class PublicShellTests(unittest.TestCase):
             root = self.copy_shell(tmp_dir)
             path = root / "index.html"
             html = path.read_text(encoding="utf-8")
-            html = html.replace("<legend>Präsenz</legend>", "")
+            html = html.replace("<legend>Presence</legend>", "")
             path.write_text(html, encoding="utf-8")
             errors = validate_public_shell(root)
             self.assertIn("presence fieldset must expose a legend", errors)

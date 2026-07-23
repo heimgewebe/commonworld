@@ -1,36 +1,4 @@
-#!/usr/bin/env python3
-"""Render the static, privacy-preserving Commons proposal page."""
-from __future__ import annotations
-
-import json
-import sys
-from pathlib import Path
-from urllib.parse import urlparse
-
-ROOT = Path(__file__).resolve().parents[1]
-if str(ROOT) not in sys.path:
-    sys.path.insert(0, str(ROOT))
-
-from scripts.commonworld_i18n import FALLBACK_LOCALE, german_surface_links, inject_locale_navigation
-from scripts.proposal_i18n import translate_proposal
-
-
-
-def catalog_index() -> dict[str, list[str]]:
-    manifest = json.loads((ROOT / "catalog/catalog.json").read_text(encoding="utf-8"))
-    titles: list[str] = []
-    hosts: list[str] = []
-    for relative in manifest["project_files"]:
-        record = json.loads((ROOT / "catalog" / relative).read_text(encoding="utf-8"))
-        titles.append(record["title"])
-        homepage = next(link["url"] for link in record["links"] if link["type"] == "homepage")
-        hosts.append(urlparse(homepage).hostname or "")
-    return {"titles": sorted(titles), "hosts": sorted(set(hosts))}
-
-
-def render(locale: str = FALLBACK_LOCALE) -> str:
-    index = json.dumps(catalog_index(), ensure_ascii=False, separators=(",", ":")).replace("&", "\\u0026").replace("<", "\\u003c").replace(">", "\\u003e")
-    markup = f'''<!doctype html>
+<!doctype html>
 <html lang="de">
   <head>
     <meta charset="utf-8" />
@@ -47,11 +15,12 @@ def render(locale: str = FALLBACK_LOCALE) -> str:
   </head>
   <body class="proposal-page">
     <a class="skip-link" href="#commons-proposal-form">Zum Vorschlagsformular springen</a>
-    <script id="proposal-catalog-index" type="application/json">{index}</script>
+    <script id="proposal-catalog-index" type="application/json">{"titles":["Akiba Mashinani Trust","Bioleft","Brisbane Tool Library","Caño Martín Peña Community Land Trust","Community Baboon Sanctuary","Community Energy Network New Zealand","Debian","Deccan Development Society Sanghams","Edinburgh Tool Library","Ekuri Community Forest","Enspiral","FUCVAM","Freifunk","Freifunk Hamburg","Granby Four Streets Community Land Trust","Hepburn Energy","Kibera Public Space Project","Le Nid","LibreOffice","LibriVox","MASIPAG","Mastodon","MusicBrainz","NYC Mesh","Nepal Wireless Networking Project","New Mexico Acequia Association","Open Food Network Australia","Open Source Ecology","OpenMRS","OpenStreetMap","Parque de la Papa","Peer 2 Peer University (P2PU)","Prinzessinnengarten Kollektiv Berlin","Red de Guardianes de Semillas del Ecuador","Restarters","Root Access Hackerspace","Safecast","Sarantaporo.gr Community Network","Som Energia","Subak-System auf Bali","Tribunal de las Aguas de Valencia","Velondriake Locally Managed Marine Area","Wikibooks","Wikidata","Wikimedia Commons","Wikipedia","Wikiversity","Zenzeleni Community Networks","g0v","guifi.net"],"hosts":["blog.blueventures.org","cano3punto7.org","cltb.be","commons.wikimedia.org","edinburghtoollibrary.org.uk","enrd.org.np","freifunk.net","g0v.tw","hamburg.freifunk.net","joinmastodon.org","landing.guifi.net","lasacequias.org","librivox.org","masipag.org","musicbrainz.org","openfoodnetwork.org.au","openmrs.org","parquedelapapa.org","prinzessinnengarten-kollektiv.net","redsemillas.org","restarters.net","rootaccess.org","safecast.org","tribunaldelasaguas.org","whc.unesco.org","www.bioleft.org","www.brisbanetoollibrary.org","www.communityenergy.org.nz","www.ddsindia.org","www.debian.org","www.enspiral.com","www.fucvam.org.uy","www.granby4streetsclt.co.uk","www.hepburnenergy.coop","www.iccaregistry.org","www.kounkuey.org","www.libreoffice.org","www.muungano.net","www.nycmesh.net","www.opensourceecology.org","www.openstreetmap.org","www.p2pu.org","www.protectedplanet.net","www.sarantaporo.gr","www.somenergia.coop","www.wikibooks.org","www.wikidata.org","www.wikipedia.org","www.wikiversity.org","zenzeleni.net"]}</script>
     <main>
       <p class="kicker">Commonworld-Redaktion</p>
       <h1>Ein Commons vorschlagen</h1>
-      <p><a class="secondary-back-link" href="./">← Zurück zum Globus</a></p>
+      <p><a class="secondary-back-link" href="./de.html">← Zurück zum Globus</a></p>
+      <p class="language-switch" aria-label="Sprache wählen"><a href="./propose.html" lang="en">English</a> · <a href="./propose.de.html" lang="de" aria-current="page">Deutsch</a></p>
       <section class="proposal-intro" aria-labelledby="proposal-process-title">
         <h2 id="proposal-process-title">Was danach passiert</h2>
         <p>Der Vorschlag wird <strong>nicht automatisch veröffentlicht</strong>. Commonworld prüft Identität, Quellen, Commons-Eigenschaft, Handlungswege, Ortsgenauigkeit, Datenschutz und Aktualität. Erst ein separat geprüfter Repository-Commit kann einen Katalogeintrag veröffentlichen.</p>
@@ -101,22 +70,7 @@ def render(locale: str = FALLBACK_LOCALE) -> str:
         <div id="proposal-fallback" class="proposal-fallback" hidden><p>Der Vorschlag bleibt ein Kandidat. Er erscheint dadurch nicht im Katalog.</p><p><a id="proposal-direct-link" href="https://github.com/heimgewebe/commonworld/issues/new?template=commons-proposal.yml" rel="external noreferrer">GitHub direkt öffnen</a></p></div>
       </form>
 
-      <section class="proposal-contracts" aria-labelledby="contracts-title"><h2 id="contracts-title">Maschinenlesbare Regeln</h2><ul><li><a href="./contracts/commonworld/proposal.schema.json">Vorschlagsschema</a></li><li><a href="./contracts/commonworld/editorial-review.contract.json">Redaktions- und Statusvertrag</a></li><li><a href="./contracts/commonworld/proposal-path.contract.json">Technischer Einreichungsweg</a></li><li><a href="./method.html">Methode und Datenschutz</a></li></ul></section>
+      <section class="proposal-contracts" aria-labelledby="contracts-title"><h2 id="contracts-title">Maschinenlesbare Regeln</h2><ul><li><a href="./contracts/commonworld/proposal.schema.json">Vorschlagsschema</a></li><li><a href="./contracts/commonworld/editorial-review.contract.json">Redaktions- und Statusvertrag</a></li><li><a href="./contracts/commonworld/proposal-path.contract.json">Technischer Einreichungsweg</a></li><li><a href="./method.de.html">Methode und Datenschutz</a></li></ul></section>
     </main>
   </body>
 </html>
-'''
-    markup = translate_proposal(markup, locale)
-    markup = german_surface_links(markup, locale, 'propose')
-    return inject_locale_navigation(markup, locale, 'propose')
-
-
-def main() -> int:
-    (ROOT / "propose.html").write_text(render("en"), encoding="utf-8")
-    (ROOT / "propose.de.html").write_text(render("de"), encoding="utf-8")
-    print("commonworld localized proposal pages rendered from catalog index")
-    return 0
-
-
-if __name__ == "__main__":
-    raise SystemExit(main())

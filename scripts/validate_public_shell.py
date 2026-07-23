@@ -32,9 +32,9 @@ except ModuleNotFoundError as exc:  # direct script execution puts the scripts d
 ROOT = Path(__file__).resolve().parents[1]
 
 REQUIRED_HTML = (
-    '<html lang="de">',
+    '<html lang="en">',
     '<body data-presentation="globe">',
-    '<title>commonworld — Commons entdecken</title>',
+    '<title>commonworld — Discover Commons</title>',
     'class="topbar"',
     'id="commons-search"',
     'id="filter-commons-type"',
@@ -63,7 +63,7 @@ REQUIRED_HTML = (
     'href="./method.html"',
     'href="./contracts/commonworld/current-state.contract.json"',
     'type="application/json"',
-    'Keine API-Laufzeit, kein Schreibweg und keine eigenständige CLI.',
+    'No API runtime, no write path and no standalone CLI.',
     '<script src="./assets/vendor/maplibre-gl.js" defer></script>',
     '<meta http-equiv="Content-Security-Policy"',
 )
@@ -125,6 +125,8 @@ def validate_public_shell(root: Path = ROOT) -> list[str]:
     html_path = root / 'index.html'
     css_path = root / 'index.css'
     method_path = root / 'method.html'
+    german_html_path = root / 'de.html'
+    german_method_path = root / 'method.de.html'
     bootstrap_path = root / 'assets/commonworld-bootstrap-catalog.mjs'
     if not html_path.is_file():
         return ['missing public index.html']
@@ -132,12 +134,19 @@ def validate_public_shell(root: Path = ROOT) -> list[str]:
         return ['missing public index.css']
     if not method_path.is_file():
         return ['missing public method.html']
+    require_locale_alternates = root.resolve() == ROOT.resolve()
+    if require_locale_alternates and not german_html_path.is_file():
+        return ['missing public de.html']
+    if require_locale_alternates and not german_method_path.is_file():
+        return ['missing public method.de.html']
     if not bootstrap_path.is_file():
         return ['missing build-bound bootstrap catalog module']
 
     html = html_path.read_text(encoding='utf-8')
     css = css_path.read_text(encoding='utf-8')
     method = method_path.read_text(encoding='utf-8')
+    german_html = german_html_path.read_text(encoding='utf-8') if german_html_path.is_file() else ''
+    german_method = german_method_path.read_text(encoding='utf-8') if german_method_path.is_file() else ''
     bootstrap = bootstrap_path.read_text(encoding='utf-8')
     lowered = html.casefold()
     if 'id="catalog-bootstrap"' in html:
@@ -167,17 +176,23 @@ def validate_public_shell(root: Path = ROOT) -> list[str]:
     if globe_position < 0 or text_position < 0 or globe_position >= text_position:
         errors.append('globe surface must precede the alternate text surface')
     for token in (
-        'Methode, Abdeckung und Datenschutz',
-        'keine vollständige Weltstatistik',
-        'keine Konten, eigene Telemetrie, Cookies oder schreibende API',
+        'Method, coverage and privacy',
+        'not a complete global statistic',
+        'no accounts, first-party telemetry, cookies or write API',
         'AGPL-3.0-only',
         'CC0-1.0',
-        'ohne Gewährleistung',
+        'without warranty',
         'https://github.com/heimgewebe/commonworld',
         './contracts/commonworld/current-state.contract.json',
     ):
         if token not in method:
             errors.append(f'public method surface missing required token: {token}')
+    if require_locale_alternates:
+        for token in ('<html lang="de">', 'Commons entdecken', 'Methode, Abdeckung und Datenschutz'):
+            if token not in german_html and token not in german_method:
+                errors.append(f'German alternative surfaces missing required token: {token}')
+        if 'href="./de.html"' not in html or 'href="./"' not in german_html:
+            errors.append('public locale switch must connect English and German index surfaces')
     if "<script" in method.casefold():
         errors.append('public method surface must remain script-free')
 

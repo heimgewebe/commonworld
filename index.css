@@ -1747,7 +1747,7 @@ html[data-input-modality="pointer"] :focus {
   gap: clamp(0.3rem, 0.8vh, 0.7rem);
   padding: 0 max(0.8rem, env(safe-area-inset-right)) 0 max(0.8rem, env(safe-area-inset-left));
   opacity: 0;
-  transform: translateX(16vw) scale(0.96);
+  transform: translateX(16vw);
   transform-origin: 100% 50%;
   pointer-events: auto;
   transition: opacity 420ms ease, transform 620ms cubic-bezier(0.16, 1, 0.3, 1);
@@ -1755,7 +1755,7 @@ html[data-input-modality="pointer"] :focus {
 
 .layer-panel[data-visible] .layer-track-deck {
   opacity: 1;
-  transform: translateX(0) scale(1);
+  transform: translateX(0);
 }
 
 .digital-lane {
@@ -2137,6 +2137,13 @@ html:not([data-input-modality="pointer"]) .digital-ribbon-item:focus-visible {
   height: 1.05rem;
   min-width: 1.05rem;
   margin: 0;
+}
+.filter-presence-note {
+  display: block;
+  margin-top: 0.4rem;
+  color: var(--muted);
+  font-size: 0.72rem;
+  line-height: 1.35;
 }
 
 .filter-toggle-count {
