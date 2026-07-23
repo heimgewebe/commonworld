@@ -99,7 +99,12 @@ def taxonomy_label(node_id: str, german_fallback: str, locale: str = DEFAULT_LOC
     return load_locale(normalized, root).get("taxonomy_labels", {}).get(node_id, german_fallback)
 
 
-def replace_exact(markup: str, replacements: dict[str, str]) -> str:
+def replace_exact(markup: str, replacements: dict[str, str], *, surface: str = "markup") -> str:
+    missing = [source for source in replacements if source not in markup]
+    if missing:
+        preview = ", ".join(repr(source) for source in missing[:3])
+        suffix = "" if len(missing) <= 3 else f" (+{len(missing) - 3} more)"
+        raise ValueError(f"{surface} locale replacement contract drift: missing {preview}{suffix}")
     for source, target in replacements.items():
         markup = markup.replace(source, target)
     return markup
@@ -153,6 +158,7 @@ SHELL_REPLACEMENTS_EN = {
     '<legend>Präsenz</legend>': '<legend>Presence</legend>',
     '> Vor Ort</label>': '> On site</label>',
     '> Digital</label>': '> Digital</label>',
+    'Beide gewählt = nur Commons mit Vor-Ort- und digitaler Präsenz.': 'Both selected = only Commons with both on-site and digital presence.',
     '>Ort oder Land suchen</label>': '>Search place or country</label>',
     'placeholder="Ort, Region oder Land"': 'placeholder="Place, region or country"',
     'aria-label="Ortsvorschläge"': 'aria-label="Place suggestions"',
@@ -259,8 +265,6 @@ SHELL_REPLACEMENTS_EN = {
     '<section><h3>Kuration</h3>': '<section><h3>Curation</h3>',
     '<h1 id="noscript-title">Commonworld ohne JavaScript</h1>': '<h1 id="noscript-title">Commonworld without JavaScript</h1>',
     'Der Globus benötigt JavaScript. Alle geprüften Commons und ihre Daten bleiben hier erreichbar.': 'The globe requires JavaScript. All reviewed Commons and their data remain accessible here.',
-    '>Öffnen</button>': '>Open</button>',
-    '>Offizielle Seite <span': '>Official website <span'
 }
 
 METHOD_REPLACEMENTS_EN = {
@@ -293,11 +297,11 @@ METHOD_REPLACEMENTS_EN = {
 
 
 def translate_shell(markup: str, locale: str) -> str:
-    return replace_exact(markup, SHELL_REPLACEMENTS_EN) if normalize_locale(locale) == "en" else markup
+    return replace_exact(markup, SHELL_REPLACEMENTS_EN, surface="public shell") if normalize_locale(locale) == "en" else markup
 
 
 def translate_method(markup: str, locale: str) -> str:
-    return replace_exact(markup, METHOD_REPLACEMENTS_EN) if normalize_locale(locale) == "en" else markup
+    return replace_exact(markup, METHOD_REPLACEMENTS_EN, surface="method page") if normalize_locale(locale) == "en" else markup
 
 
 def inject_locale_navigation(markup: str, locale: str, surface: str = "index") -> str:

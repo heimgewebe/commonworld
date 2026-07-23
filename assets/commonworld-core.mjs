@@ -1,4 +1,5 @@
 import { COMMONWORLD_EN_LOCALE } from './commonworld-en-locale.mjs';
+import { FALLBACK_LOCALE, normalizeLocale } from './commonworld-i18n.mjs';
 
 export const DEFAULT_CAMERA = Object.freeze({
   lng: 8,
@@ -30,9 +31,9 @@ const DIGITAL_UNCLASSIFIED_NODE_ID = 'unclassified_future_theme';
 const DIGITAL_ID_PATTERN = /^[a-z][a-z0-9_-]{0,95}$/;
 
 
-const normalizedLocale = (locale = 'de') => String(locale ?? 'de').toLowerCase().split('-')[0] === 'en' ? 'en' : 'de';
+const normalizedLocale = (locale = FALLBACK_LOCALE) => normalizeLocale(locale, FALLBACK_LOCALE);
 const localizedValue = (locale, german, english) => normalizedLocale(locale) === 'en' ? english : german;
-const digitalNodeLabel = (node, locale = 'de') => normalizedLocale(locale) === 'en'
+const digitalNodeLabel = (node, locale = FALLBACK_LOCALE) => normalizedLocale(locale) === 'en'
   ? (COMMONWORLD_EN_LOCALE.taxonomy_labels?.[node?.id] ?? node?.label_de ?? node?.id ?? '')
   : (node?.label_de ?? node?.id ?? '');
 
@@ -167,7 +168,7 @@ export function hasDigitalPresence(record) {
 
 export const UNKNOWN_ACTIVITY_DISCLOSURE = 'Aktueller Betriebszustand nicht zeitnah verifiziert';
 
-export function recordActivityNotice(record, locale = 'de') {
+export function recordActivityNotice(record, locale = FALLBACK_LOCALE) {
   if (record?.activity?.status !== 'unknown') return '';
   const observedAt = record?.activity?.observed_at ?? localizedValue(locale, 'unbekannt', 'unknown');
   const nextReviewAt = record?.curation?.next_review_at ?? localizedValue(locale, 'offen', 'open');
@@ -516,7 +517,7 @@ export function digitalPresentationTreeConstructionCount() {
   return digitalTreeConstructionCount;
 }
 
-export function buildDigitalPresentationTree(records = [], { taxonomy = DIGITAL_TAXONOMY, locale = 'de' } = {}) {
+export function buildDigitalPresentationTree(records = [], { taxonomy = DIGITAL_TAXONOMY, locale = FALLBACK_LOCALE } = {}) {
   const sourceRecords = Array.isArray(records) ? records : [];
   const localeKey = normalizedLocale(locale);
   let treesByTaxonomy = digitalTreeCache.get(sourceRecords);
@@ -649,7 +650,7 @@ export function visibleDigitalNodes(tree, currentPath = DIGITAL_ROOT_PATH, { inc
   });
 }
 
-export function digitalPathLabel(path, { taxonomy = DIGITAL_TAXONOMY, includeRoot = false, locale = 'de' } = {}) {
+export function digitalPathLabel(path, { taxonomy = DIGITAL_TAXONOMY, includeRoot = false, locale = FALLBACK_LOCALE } = {}) {
   const normalized = normalizeDigitalPath(path, { taxonomy });
   const nodes = digitalNodeMap(taxonomy);
   const labels = normalized.path
@@ -659,7 +660,7 @@ export function digitalPathLabel(path, { taxonomy = DIGITAL_TAXONOMY, includeRoo
   return labels.join(' › ');
 }
 
-export function recordDigitalPathLabel(record, { taxonomy = DIGITAL_TAXONOMY, locale = 'de' } = {}) {
+export function recordDigitalPathLabel(record, { taxonomy = DIGITAL_TAXONOMY, locale = FALLBACK_LOCALE } = {}) {
   const derived = deriveDigitalProjectPath(record, { taxonomy });
   if (!derived) return '';
   return digitalPathLabel(derived.path, { taxonomy, locale });
@@ -838,7 +839,7 @@ export function deriveCommonsType(record) {
   return matched?.type ?? 'other';
 }
 
-export function commonsTypeLabel(recordOrType, locale = 'de') {
+export function commonsTypeLabel(recordOrType, locale = FALLBACK_LOCALE) {
   const type = typeof recordOrType === 'string' ? recordOrType : deriveCommonsType(recordOrType);
   const labels = normalizedLocale(locale) === 'en' ? COMMONS_TYPE_LABELS_EN : COMMONS_TYPE_LABELS;
   return labels[type] ?? labels.other;
@@ -1030,7 +1031,7 @@ const FIELD_WEIGHTS = Object.freeze({
 
 export function normalizeSearchText(value) {
   return String(value ?? '')
-    .toLocaleLowerCase()
+    .toLowerCase()
     .replace(/ß/g, 'ss')
     .normalize('NFKD')
     .replace(/\p{M}+/gu, '')
@@ -1438,11 +1439,12 @@ export function filterRecords(records, state = {}) {
   });
 }
 
-export function recordPresentationLabel(record, locale = 'de') {
+export function recordPresentationLabel(record, locale = FALLBACK_LOCALE) {
   const isGeo = publicGeographicLocations(record).length > 0;
   const isDigital = hasDigitalPresence(record);
   const pathLabel = recordDigitalPathLabel(record, { locale });
-  const digitalLabel = `Digital${pathLabel ? ` · ${pathLabel}` : ''}`;
+  const digitalPresenceLabel = localizedValue(locale, 'Digital', 'Digital');
+  const digitalLabel = `${digitalPresenceLabel}${pathLabel ? ` · ${pathLabel}` : ''}`;
 
   if (isGeo && isDigital) return `${localizedValue(locale, 'Vor Ort', 'On site')} · ${digitalLabel}`;
   if (isGeo) return localizedValue(locale, 'Vor Ort', 'On site');
@@ -2269,7 +2271,7 @@ function formattedUncertainty(meters) {
   return `${Math.round(value)} m`;
 }
 
-export function recordLocationSummaries(record, locale = 'de') {
+export function recordLocationSummaries(record, locale = FALLBACK_LOCALE) {
   const locations = Array.isArray(record?.presence?.geographic) ? record.presence.geographic : [];
   return locations.map((location) => {
     const label = location?.label ?? localizedValue(locale, 'Ort', 'Location');
@@ -2296,7 +2298,7 @@ function spatialIdentityCount(records) {
   return (Array.isArray(records) ? records : []).filter((record) => publicGeographicLocations(record).length > 0).length;
 }
 
-function focusSpatialSummary(record, locale = 'de') {
+function focusSpatialSummary(record, locale = FALLBACK_LOCALE) {
   const locations = Array.isArray(record?.presence?.geographic) ? record.presence.geographic : [];
   const publicLocations = publicGeographicLocations(record);
   const isGeo = publicLocations.length > 0;
@@ -2324,7 +2326,7 @@ export function semanticLocationLine({
   records = [],
   selectedProjectId = null,
   selectedRecord = null,
-  locale = 'de',
+  locale = FALLBACK_LOCALE,
 } = {}) {
   const selected = selectedProjectId
     ? (selectedRecord?.id === selectedProjectId

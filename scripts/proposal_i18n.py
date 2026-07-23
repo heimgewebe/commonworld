@@ -80,4 +80,4 @@ PROPOSAL_REPLACEMENTS_EN = {
 
 
 def translate_proposal(markup: str, locale: str) -> str:
-    return replace_exact(markup, PROPOSAL_REPLACEMENTS_EN) if normalize_locale(locale) == 'en' else markup
+    return replace_exact(markup, PROPOSAL_REPLACEMENTS_EN, surface='proposal page') if normalize_locale(locale) == 'en' else markup

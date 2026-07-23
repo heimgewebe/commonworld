@@ -1,4 +1,5 @@
 body.proposal-page {
+  scroll-padding-block: 1rem 7rem;
   min-height: 100vh;
   margin: 0;
   background: radial-gradient(circle at top, rgba(49, 98, 112, 0.22), transparent 42%), #071013;
@@ -9,6 +10,10 @@ body.proposal-page {
   /* We use overscroll-behavior-y: contain to prevent pull-to-refresh and scroll chaining, without altering the natural scroll model via height: 100% or inner scrollers. */
   overscroll-behavior-y: contain;
   -webkit-overflow-scrolling: touch;
+}
+
+html:has(body.proposal-page) {
+  scroll-padding-block: 1rem 7rem;
 }
 
 .proposal-page main {
@@ -54,6 +59,11 @@ body.proposal-page {
   font: inherit;
 }
 .proposal-form textarea { resize: vertical; }
+.proposal-form input,
+.proposal-form textarea,
+.proposal-form select,
+.proposal-form button,
+.proposal-page a { scroll-margin-block: 1rem; }
 .proposal-form input:focus-visible,
 .proposal-form textarea:focus-visible,
 .proposal-form select:focus-visible,
@@ -68,6 +78,20 @@ body.proposal-page {
 .proposal-grid,
 .proposal-action-row { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 0.9rem; }
 .proposal-action-row { padding-top: 0.85rem; border-top: 1px solid rgba(203, 234, 227, 0.12); }
+.proposal-form .presence-fieldset {
+  min-width: 0;
+  margin: 0;
+  padding: 0.72rem 0.82rem;
+  border: 1px solid rgba(213, 237, 232, 0.28);
+  border-radius: 0.7rem;
+  background: #0b1b1e;
+  box-shadow: none;
+  gap: 0.35rem;
+}
+.proposal-form .presence-fieldset legend { padding-inline: 0.3rem; font-size: 0.95rem; }
+.proposal-form .presence-options { display: flex; flex-wrap: wrap; gap: 0.65rem 1rem; align-items: center; }
+.proposal-form .presence-options .check-row { flex: 1 1 8rem; }
+.proposal-form .presence-help { display: block; margin-top: 0.35rem; }
 .proposal-form .check-row { grid-template-columns: 1.4rem minmax(0, 1fr); align-items: start; }
 .proposal-form .check-row input { width: 1.2rem; min-height: 1.2rem; margin-top: 0.15rem; }
 .proposal-controls { display: flex; flex-wrap: wrap; gap: 0.75rem; align-items: center; }

@@ -2,7 +2,8 @@ import json
 import unittest
 from pathlib import Path
 
-from scripts.commonworld_i18n import localize_records
+from scripts.commonworld_i18n import localize_records, replace_exact
+from scripts.render_proposal_page import render as render_proposal
 from scripts.render_public_shell import load_records, render_method, render_shell
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -48,6 +49,32 @@ class InternationalizationTests(unittest.TestCase):
         self.assertIn('href="./"', german)
         self.assertIn('Search Commons', english)
         self.assertIn('Commons suchen', german)
+
+    def test_english_static_surfaces_do_not_retain_known_german_ui_strings(self) -> None:
+        english_shell = render_shell(ROOT, "en")
+        english_proposal = render_proposal("en")
+        for marker in (
+            "Commons suchen",
+            "Filter zurücksetzen",
+            "Zur Textansicht springen",
+            "Digitale Sphäre",
+            "Meinen Standort verwenden",
+            "Commons vorschlagen",
+        ):
+            with self.subTest(surface="index", marker=marker):
+                self.assertNotIn(marker, english_shell)
+        for marker in (
+            "Ein Commons vorschlagen",
+            "Was danach passiert",
+            "Grobe Region oder Ort",
+            "Validiertes JSON herunterladen",
+        ):
+            with self.subTest(surface="proposal", marker=marker):
+                self.assertNotIn(marker, english_proposal)
+
+    def test_exact_replacement_contract_fails_closed_on_template_drift(self) -> None:
+        with self.assertRaisesRegex(ValueError, "locale replacement contract drift"):
+            replace_exact("<p>changed template</p>", {"<p>expected template</p>": "<p>translated</p>"}, surface="test")
 
     def test_method_surface_is_localized_without_scripts(self) -> None:
         english = render_method(ROOT, "en")

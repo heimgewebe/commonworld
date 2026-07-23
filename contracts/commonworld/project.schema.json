@@ -644,7 +644,16 @@
             "required": [
               "geometry",
               "uncertainty_meters_min"
-            ]
+            ],
+            "properties": {
+              "geometry": {
+                "properties": {
+                  "type": {
+                    "const": "Point"
+                  }
+                }
+              }
+            }
           }
         },
         {

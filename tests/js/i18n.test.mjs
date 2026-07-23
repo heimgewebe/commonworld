@@ -7,6 +7,7 @@ import {
   localizeCatalogRecords,
   normalizeLocale,
   taxonomyLabel,
+  themeLabel,
 } from '../../assets/commonworld-i18n.mjs';
 import { prepareIntentSearchIndex } from '../../assets/commonworld-core.mjs';
 
@@ -43,6 +44,15 @@ test('English presentation labels cover actions and digital taxonomy', () => {
   assert.equal(actionLabel('borrow', 'en'), 'Borrow');
   assert.equal(actionLabel('borrow', 'de'), 'Ausleihen');
   assert.equal(taxonomyLabel('free_software', 'Freie Software und Infrastruktur', 'en'), 'Free Software and Infrastructure');
+});
+
+test('Theme labels are localized in both public locales instead of leaking raw keys', () => {
+  assert.equal(themeLabel('open-data', 'en'), 'Open data');
+  assert.equal(themeLabel('open-data', 'de'), 'Offene Daten');
+  assert.equal(themeLabel('community-finance', 'de'), 'Gemeinschaftsfinanzierung');
+  assert.equal(themeLabel('cultural-heritage', 'en'), 'Cultural heritage');
+  assert.equal(themeLabel('research', 'de'), 'Forschung');
+  assert.equal(themeLabel('archives', 'en'), 'Archives');
 });
 
 test('English catalog search remains bilingual through canonical German aliases', () => {

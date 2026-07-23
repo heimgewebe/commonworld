@@ -102,8 +102,9 @@ def public_locations(record: dict) -> list[dict]:
     return [location for location in locations if _public_location(location)]
 
 
-def presentation_label(record: dict, locale: str = FALLBACK_LOCALE) -> str:
-    has_geo = bool(public_locations(record))
+def presentation_label(record: dict, locale: str = FALLBACK_LOCALE, public_geo_locations: list[dict] | None = None) -> str:
+    geo_locations = public_locations(record) if public_geo_locations is None else public_geo_locations
+    has_geo = bool(geo_locations)
     has_digital = record.get("presence", {}).get("digital", {}).get("available") is True
     derivation = derive_project_path(record, TAXONOMY) if has_digital else None
     if derivation:
@@ -133,11 +134,12 @@ def presentation_label(record: dict, locale: str = FALLBACK_LOCALE) -> str:
     return "Commons"
 
 
-def location_summary(record: dict, locale: str = FALLBACK_LOCALE) -> str:
+def location_summary(record: dict, locale: str = FALLBACK_LOCALE, public_geo_locations: list[dict] | None = None) -> str:
     locations = record.get("presence", {}).get("geographic", [])
     if not isinstance(locations, list) or not locations:
         return "Location-independent digital presence" if normalize_locale(locale) == "en" else "Ortsunabhängige digitale Präsenz"
-    public_count = len(public_locations(record))
+    geo_locations = public_locations(record) if public_geo_locations is None else public_geo_locations
+    public_count = len(geo_locations)
     hidden_count = sum(1 for location in locations if location.get("mode") == "hidden")
     parts = []
     if normalize_locale(locale) == "en":
@@ -186,8 +188,9 @@ def render_cards(records: list[dict], *, interactive: bool = True, locale: str =
         identifier = html.escape(record["id"], quote=True)
         title = html.escape(record["title"])
         summary = html.escape(record["summary"])
-        label = html.escape(presentation_label(record, locale))
-        place = html.escape(location_summary(record, locale))
+        geo_locations = public_locations(record)
+        label = html.escape(presentation_label(record, locale, geo_locations))
+        place = html.escape(location_summary(record, locale, geo_locations))
         notice = html.escape(activity_notice(record, locale))
         notice_html = f'            <p class="catalog-activity-notice">{notice}</p>\n' if notice else ""
         url = html.escape(homepage(record), quote=True)
@@ -307,7 +310,7 @@ def render_shell(root: Path = ROOT, locale: str = FALLBACK_LOCALE) -> str:
           <fieldset class="filter-group">
             <legend>Wo?</legend>
             <div class="filter-group-controls">
-              <fieldset class="filter-presence-group"><legend>Präsenz</legend><div class="filter-presence-options"><label><input type="checkbox" id="filter-presence-geographic" name="presence" value="geographic" data-intent-filter="presence"> Vor Ort</label><label><input type="checkbox" id="filter-presence-digital" name="presence" value="digital" data-intent-filter="presence"> Digital</label></div></fieldset>
+              <fieldset class="filter-presence-group"><legend>Präsenz</legend><div class="filter-presence-options"><label><input type="checkbox" id="filter-presence-geographic" name="presence" value="geographic" data-intent-filter="presence"> Vor Ort</label><label><input type="checkbox" id="filter-presence-digital" name="presence" value="digital" data-intent-filter="presence"> Digital</label></div><small class="filter-presence-note">Beide gewählt = nur Commons mit Vor-Ort- und digitaler Präsenz.</small></fieldset>
               <div class="spatial-destination-search">
                 <label for="spatial-destination-search">Ort oder Land suchen</label>
                 <input id="spatial-destination-search" type="search" inputmode="search" autocomplete="off" placeholder="Ort, Region oder Land" aria-controls="spatial-destination-results" aria-expanded="false" />
