@@ -1,75 +1,76 @@
 <!doctype html>
-<html lang="de">
+<html lang="en">
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="color-scheme" content="dark" />
     <meta name="referrer" content="strict-origin-when-cross-origin" />
     <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' data:; connect-src 'self'; object-src 'none'; base-uri 'self'; form-action 'none';" />
-    <meta name="description" content="Ein Commons zur redaktionellen Prüfung für Commonworld vorschlagen." />
-    <title>Commonworld — Commons vorschlagen</title>
+    <meta name="description" content="Suggest a Commons for editorial review by Commonworld." />
+    <title>Commonworld — Suggest a Commons</title>
     <link rel="icon" href="./assets/commonworld-mark.svg" type="image/svg+xml" />
     <link rel="stylesheet" href="./index.css" />
     <link rel="stylesheet" href="./assets/proposal.css" />
     <script type="module" src="./assets/commonworld-proposal.js"></script>
   </head>
   <body class="proposal-page">
-    <a class="skip-link" href="#commons-proposal-form">Zum Vorschlagsformular springen</a>
+    <a class="skip-link" href="#commons-proposal-form">Skip to suggestion form</a>
     <script id="proposal-catalog-index" type="application/json">{"titles":["Akiba Mashinani Trust","Bioleft","Brisbane Tool Library","Caño Martín Peña Community Land Trust","Community Baboon Sanctuary","Community Energy Network New Zealand","Debian","Deccan Development Society Sanghams","Edinburgh Tool Library","Ekuri Community Forest","Enspiral","FUCVAM","Freifunk","Freifunk Hamburg","Granby Four Streets Community Land Trust","Hepburn Energy","Kibera Public Space Project","Le Nid","LibreOffice","LibriVox","MASIPAG","Mastodon","MusicBrainz","NYC Mesh","Nepal Wireless Networking Project","New Mexico Acequia Association","Open Food Network Australia","Open Source Ecology","OpenMRS","OpenStreetMap","Parque de la Papa","Peer 2 Peer University (P2PU)","Prinzessinnengarten Kollektiv Berlin","Red de Guardianes de Semillas del Ecuador","Restarters","Root Access Hackerspace","Safecast","Sarantaporo.gr Community Network","Som Energia","Subak-System auf Bali","Tribunal de las Aguas de Valencia","Velondriake Locally Managed Marine Area","Wikibooks","Wikidata","Wikimedia Commons","Wikipedia","Wikiversity","Zenzeleni Community Networks","g0v","guifi.net"],"hosts":["blog.blueventures.org","cano3punto7.org","cltb.be","commons.wikimedia.org","edinburghtoollibrary.org.uk","enrd.org.np","freifunk.net","g0v.tw","hamburg.freifunk.net","joinmastodon.org","landing.guifi.net","lasacequias.org","librivox.org","masipag.org","musicbrainz.org","openfoodnetwork.org.au","openmrs.org","parquedelapapa.org","prinzessinnengarten-kollektiv.net","redsemillas.org","restarters.net","rootaccess.org","safecast.org","tribunaldelasaguas.org","whc.unesco.org","www.bioleft.org","www.brisbanetoollibrary.org","www.communityenergy.org.nz","www.ddsindia.org","www.debian.org","www.enspiral.com","www.fucvam.org.uy","www.granby4streetsclt.co.uk","www.hepburnenergy.coop","www.iccaregistry.org","www.kounkuey.org","www.libreoffice.org","www.muungano.net","www.nycmesh.net","www.opensourceecology.org","www.openstreetmap.org","www.p2pu.org","www.protectedplanet.net","www.sarantaporo.gr","www.somenergia.coop","www.wikibooks.org","www.wikidata.org","www.wikipedia.org","www.wikiversity.org","zenzeleni.net"]}</script>
     <main>
-      <p class="kicker">Commonworld-Redaktion</p>
-      <h1>Ein Commons vorschlagen</h1>
-      <p><a class="secondary-back-link" href="./">← Zurück zum Globus</a></p>
+      <p class="kicker">Commonworld editorial review</p>
+      <h1>Suggest a Commons</h1>
+      <p><a class="secondary-back-link" href="./">← Back to the globe</a></p>
+      <p class="language-switch" aria-label="Choose language"><a href="./propose.html" lang="en" aria-current="page">English</a> · <a href="./propose.de.html" lang="de">Deutsch</a></p>
       <section class="proposal-intro" aria-labelledby="proposal-process-title">
-        <h2 id="proposal-process-title">Was danach passiert</h2>
-        <p>Der Vorschlag wird <strong>nicht automatisch veröffentlicht</strong>. Commonworld prüft Identität, Quellen, Commons-Eigenschaft, Handlungswege, Ortsgenauigkeit, Datenschutz und Aktualität. Erst ein separat geprüfter Repository-Commit kann einen Katalogeintrag veröffentlichen.</p>
-        <p><strong>Öffentlichkeit:</strong> Der bevorzugte Eingang ist ein öffentliches GitHub-Issue. Trage deshalb keine E-Mail-Adresse, Telefonnummer, private Adresse, Koordinate, Wohnung, Dach-, Router- oder Haushaltsangabe ein. Dein GitHub-Konto dient als Kontaktmöglichkeit; Commonworld erhebt kein zusätzliches Kontaktfeld.</p>
-        <p>Ohne GitHub oder bei Netzfehlern kannst du eine validierte JSON-Datei lokal herunterladen. Commonworld speichert Formulareingaben nicht.</p>
+        <h2 id="proposal-process-title">What happens next</h2>
+        <p>The suggestion is <strong>not published automatically</strong>. Commonworld reviews identity, sources, Commons characteristics, ways to engage, location precision, privacy and freshness. Only a separately reviewed repository commit can publish a catalog entry.</p>
+        <p><strong>Public visibility:</strong> The preferred intake path is a public GitHub issue. Do not enter an email address, phone number, private address, coordinates, apartment, rooftop, router or household information. Your GitHub account serves as the contact path; Commonworld collects no additional contact field.</p>
+        <p>Without GitHub, or if the network fails, you can download a validated JSON file locally. Commonworld does not store form input.</p>
       </section>
 
       <form id="commons-proposal-form" class="proposal-form" novalidate>
-        <div class="honeypot" aria-hidden="true"><label>Website bestätigen <input name="website_confirm" type="text" tabindex="-1" autocomplete="off" /></label></div>
+        <div class="honeypot" aria-hidden="true"><label>Confirm website <input name="website_confirm" type="text" tabindex="-1" autocomplete="off" /></label></div>
         <fieldset>
-          <legend>Projekt</legend>
-          <label><span>Name des Commons</span><input name="name" type="text" minlength="2" maxlength="140" required autocomplete="organization" /></label>
-          <label><span>Kurze Beschreibung</span><textarea name="description" minlength="40" maxlength="800" required rows="5" aria-describedby="description-help"></textarea><small id="description-help">Beschreibe gemeinschaftliche Verwaltung, geteilte Ressource und öffentlichen Nutzen – ohne unbelegte Wirkungsaussagen.</small></label>
-          <label><span>Offizielle Website</span><input name="official_website" type="url" inputmode="url" maxlength="300" required placeholder="https://…" /></label>
+          <legend>Project</legend>
+          <label><span>Name of the Commons</span><input name="name" type="text" minlength="2" maxlength="140" required autocomplete="organization" /></label>
+          <label><span>Short description</span><textarea name="description" minlength="40" maxlength="800" required rows="5" aria-describedby="description-help"></textarea><small id="description-help">Describe community governance, the shared resource and public benefit — without unsupported impact claims.</small></label>
+          <label><span>Official website</span><input name="official_website" type="url" inputmode="url" maxlength="300" required placeholder="https://…" /></label>
           <div class="proposal-grid">
-            <label><span>Commons-Art</span><select name="commons_type" required><option value="">Bitte wählen</option><option value="knowledge">Wissen und Daten</option><option value="software">Software und Infrastruktur</option><option value="culture">Kultur und Medien</option><option value="food-seeds">Saatgut und Ernährung</option><option value="water">Wasser und Bewässerung</option><option value="energy">Energie</option><option value="housing-land">Boden und Wohnen</option><option value="health-care">Pflege und Gesundheit</option><option value="tools-repair">Werkzeuge, Reparatur und Fertigung</option><option value="community-network">Gemeinschaftsnetz</option><option value="other">Andere</option></select></label>
-            <fieldset class="presence-fieldset"><legend>Präsenz</legend><div class="presence-options"><label class="check-row"><input type="checkbox" name="presence_geographic" value="true" /><span>Vor Ort</span></label><label class="check-row"><input type="checkbox" name="presence_digital" value="true" /><span>Digital</span></label></div><small class="presence-help">Mindestens eine wählen.</small></fieldset>
+            <label><span>Commons type</span><select name="commons_type" required><option value="">Please choose</option><option value="knowledge">Knowledge and Data</option><option value="software">Software and Infrastructure</option><option value="culture">Culture and Media</option><option value="food-seeds">Seeds and Food</option><option value="water">Water and Irrigation</option><option value="energy">Energy</option><option value="housing-land">Land and Housing</option><option value="health-care">Care and Health</option><option value="tools-repair">Tools, Repair and Making</option><option value="community-network">Community Network</option><option value="other">Other</option></select></label>
+            <fieldset class="presence-fieldset"><legend>Presence</legend><div class="presence-options"><label class="check-row"><input type="checkbox" name="presence_geographic" value="true" /><span>On site</span></label><label class="check-row"><input type="checkbox" name="presence_digital" value="true" /><span>Digital</span></label></div><small class="presence-help">Choose at least one.</small></fieldset>
           </div>
-          <label id="proposal-region-field"><span>Grobe Region oder Ort <small>(nur bei „Vor Ort“)</small></span><input name="region" type="text" minlength="2" maxlength="120" placeholder="z. B. Uruguay, Taiwan oder Aotearoa Neuseeland" aria-describedby="region-help" /><small id="region-help">Nur Land, Großregion oder öffentlich unproblematische Stadt. Keine Adresse oder Koordinate. Für rein digitale Commons bleibt das Feld leer.</small></label>
-          <label class="check-row" id="proposal-sensitive-location-field"><input name="sensitive_location_risk" type="checkbox" /><span>Der Vorschlag betrifft möglicherweise private oder sensible Orte. Die Redaktion soll die Ortsangabe besonders streng prüfen.</span></label>
+          <label id="proposal-region-field"><span>Broad region or place <small>(only for “On site”)</small></span><input name="region" type="text" minlength="2" maxlength="120" placeholder="e.g. Uruguay, Taiwan or Aotearoa New Zealand" aria-describedby="region-help" /><small id="region-help">Only a country, broad region or publicly unproblematic city. No address or coordinates. Leave this field empty for digital-only Commons.</small></label>
+          <label class="check-row" id="proposal-sensitive-location-field"><input name="sensitive_location_risk" type="checkbox" /><span>The suggestion may involve private or sensitive locations. Editorial review should assess the location information especially strictly.</span></label>
         </fieldset>
 
         <fieldset>
-          <legend>Belegte Handlungswege</legend>
-          <p>Mindestens ein realer Weg, über den Menschen das Commons nutzen, kennenlernen, unterstützen oder daran mitwirken können.</p>
-          <div class="proposal-action-row"><label><span>Aktion 1</span><select name="action_type_1" required><option value="learn">Lernen</option><option value="use">Nutzen</option><option value="visit">Besuchen</option><option value="borrow">Ausleihen</option><option value="contribute">Mitmachen</option><option value="volunteer">Ehrenamt</option><option value="donate">Spenden</option><option value="contact">Kontakt</option><option value="replicate">Übertragen</option></select></label><label><span>HTTPS-Link</span><input name="action_url_1" type="url" maxlength="300" required placeholder="https://…" /></label></div>
-          <div class="proposal-action-row"><label><span>Aktion 2 (optional)</span><select name="action_type_2"><option value="">Keine</option><option value="learn">Lernen</option><option value="use">Nutzen</option><option value="visit">Besuchen</option><option value="borrow">Ausleihen</option><option value="contribute">Mitmachen</option><option value="volunteer">Ehrenamt</option><option value="donate">Spenden</option><option value="contact">Kontakt</option><option value="replicate">Übertragen</option></select></label><label><span>HTTPS-Link</span><input name="action_url_2" type="url" maxlength="300" placeholder="https://…" /></label></div>
-          <div class="proposal-action-row"><label><span>Aktion 3 (optional)</span><select name="action_type_3"><option value="">Keine</option><option value="learn">Lernen</option><option value="use">Nutzen</option><option value="visit">Besuchen</option><option value="borrow">Ausleihen</option><option value="contribute">Mitmachen</option><option value="volunteer">Ehrenamt</option><option value="donate">Spenden</option><option value="contact">Kontakt</option><option value="replicate">Übertragen</option></select></label><label><span>HTTPS-Link</span><input name="action_url_3" type="url" maxlength="300" placeholder="https://…" /></label></div>
+          <legend>Evidenced ways to engage</legend>
+          <p>At least one real path through which people can use, learn about, support or contribute to the Commons.</p>
+          <div class="proposal-action-row"><label><span>Action 1</span><select name="action_type_1" required><option value="learn">Learn</option><option value="use">Use</option><option value="visit">Visit</option><option value="borrow">Borrow</option><option value="contribute">Contribute</option><option value="volunteer">Volunteer</option><option value="donate">Donate</option><option value="contact">Contact</option><option value="replicate">Replicate</option></select></label><label><span>HTTPS link</span><input name="action_url_1" type="url" maxlength="300" required placeholder="https://…" /></label></div>
+          <div class="proposal-action-row"><label><span>Action 2 (optional)</span><select name="action_type_2"><option value="">None</option><option value="learn">Learn</option><option value="use">Use</option><option value="visit">Visit</option><option value="borrow">Borrow</option><option value="contribute">Contribute</option><option value="volunteer">Volunteer</option><option value="donate">Donate</option><option value="contact">Contact</option><option value="replicate">Replicate</option></select></label><label><span>HTTPS link</span><input name="action_url_2" type="url" maxlength="300" placeholder="https://…" /></label></div>
+          <div class="proposal-action-row"><label><span>Action 3 (optional)</span><select name="action_type_3"><option value="">None</option><option value="learn">Learn</option><option value="use">Use</option><option value="visit">Visit</option><option value="borrow">Borrow</option><option value="contribute">Contribute</option><option value="volunteer">Volunteer</option><option value="donate">Donate</option><option value="contact">Contact</option><option value="replicate">Replicate</option></select></label><label><span>HTTPS link</span><input name="action_url_3" type="url" maxlength="300" placeholder="https://…" /></label></div>
         </fieldset>
 
         <fieldset>
-          <legend>Quellen und Hinweise</legend>
-          <label><span>Primärnahe Quellen</span><textarea name="sources" required rows="4" placeholder="Eine HTTPS-Adresse pro Zeile" aria-describedby="sources-help"></textarea><small id="sources-help">Mindestens eine offizielle oder primärnahe Quelle. Höchstens fünf.</small></label>
-          <label><span>Hinweis für die Redaktion (optional)</span><textarea name="editorial_note" maxlength="500" rows="4" placeholder="Zum Beispiel: Welche Behauptung belegt welche Quelle?"></textarea></label>
+          <legend>Sources and notes</legend>
+          <label><span>Primary-near sources</span><textarea name="sources" required rows="4" placeholder="One HTTPS address per line" aria-describedby="sources-help"></textarea><small id="sources-help">At least one official or primary-near source. No more than five.</small></label>
+          <label><span>Note for editorial review (optional)</span><textarea name="editorial_note" maxlength="500" rows="4" placeholder="For example: which source supports which claim?"></textarea></label>
         </fieldset>
 
         <fieldset>
-          <legend>Einwilligung und Öffentlichkeit</legend>
-          <label class="check-row"><input name="public_issue_acknowledged" type="checkbox" required /><span>Mir ist bewusst, dass der bevorzugte GitHub-Eingang öffentlich ist.</span></label>
-          <label class="check-row"><input name="processing_agreed" type="checkbox" required /><span>Ich willige in die redaktionelle Verarbeitung der übermittelten Angaben ein.</span></label>
-          <label class="check-row"><input name="no_sensitive_data_confirmed" type="checkbox" required /><span>Ich habe keine private Adresse, Koordinate, E-Mail-Adresse, Telefonnummer oder private Netz- und Haushaltsangabe eingetragen.</span></label>
+          <legend>Consent and public visibility</legend>
+          <label class="check-row"><input name="public_issue_acknowledged" type="checkbox" required /><span>I understand that the preferred GitHub intake path is public.</span></label>
+          <label class="check-row"><input name="processing_agreed" type="checkbox" required /><span>I consent to editorial processing of the submitted information.</span></label>
+          <label class="check-row"><input name="no_sensitive_data_confirmed" type="checkbox" required /><span>I have not entered a private address, coordinates, email address, phone number, or private network or household information.</span></label>
         </fieldset>
 
         <div id="proposal-errors" class="proposal-errors" role="alert" tabindex="-1" hidden></div>
-        <div class="proposal-controls"><button class="proposal-primary" type="submit">Öffentliches GitHub-Issue vorbereiten</button><button id="proposal-download" class="quiet-button" type="button">Validiertes JSON herunterladen</button></div>
+        <div class="proposal-controls"><button class="proposal-primary" type="submit">Prepare public GitHub issue</button><button id="proposal-download" class="quiet-button" type="button">Download validated JSON</button></div>
         <p id="proposal-status" class="proposal-status" role="status" aria-live="polite"></p>
-        <div id="proposal-fallback" class="proposal-fallback" hidden><p>Der Vorschlag bleibt ein Kandidat. Er erscheint dadurch nicht im Katalog.</p><p><a id="proposal-direct-link" href="https://github.com/heimgewebe/commonworld/issues/new?template=commons-proposal.yml" rel="external noreferrer">GitHub direkt öffnen</a></p></div>
+        <div id="proposal-fallback" class="proposal-fallback" hidden><p>The suggestion remains a candidate. This does not make it appear in the catalog.</p><p><a id="proposal-direct-link" href="https://github.com/heimgewebe/commonworld/issues/new?template=commons-proposal.yml" rel="external noreferrer">Open GitHub directly</a></p></div>
       </form>
 
-      <section class="proposal-contracts" aria-labelledby="contracts-title"><h2 id="contracts-title">Maschinenlesbare Regeln</h2><ul><li><a href="./contracts/commonworld/proposal.schema.json">Vorschlagsschema</a></li><li><a href="./contracts/commonworld/editorial-review.contract.json">Redaktions- und Statusvertrag</a></li><li><a href="./contracts/commonworld/proposal-path.contract.json">Technischer Einreichungsweg</a></li><li><a href="./method.html">Methode und Datenschutz</a></li></ul></section>
+      <section class="proposal-contracts" aria-labelledby="contracts-title"><h2 id="contracts-title">Machine-readable rules</h2><ul><li><a href="./contracts/commonworld/proposal.schema.json">Suggestion schema</a></li><li><a href="./contracts/commonworld/editorial-review.contract.json">Editorial and status contract</a></li><li><a href="./contracts/commonworld/proposal-path.contract.json">Technical submission path</a></li><li><a href="./method.html">Method and privacy</a></li></ul></section>
     </main>
   </body>
 </html>

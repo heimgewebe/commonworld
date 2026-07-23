@@ -214,7 +214,7 @@ async function loadExpectedDigitalProjection() {
     identifier,
     publicMapFeatureCollection(records, new Set([identifier])).features.length,
   ]));
-  const tree = buildDigitalPresentationTree(records);
+  const tree = buildDigitalPresentationTree(records, { locale: 'en' });
   const legacyLayerIds = Object.fromEntries([
     ...new Set(records.map(deriveLayer).filter(Boolean)),
   ].map((layer) => [layer, records.filter((record) => deriveLayer(record) === layer).map(({ id }) => id)]));
@@ -235,7 +235,7 @@ async function loadExpectedDigitalProjection() {
     assert(node, `catalog projection: missing field node ${pathKey}`);
     return {
       id: field.id,
-      label: field.label,
+      label: node.label,
       path: field.path,
       pathKey,
       ids: [...node.identityIds],
@@ -530,7 +530,7 @@ async function startupAndRingOrbitScenario() {
     actionGuide: document.querySelector('.sphere-action-guide') !== null,
     actionText: document.querySelector('.sphere-action-text') !== null,
     affordanceAttribute: document.querySelector('#digital-sphere')?.hasAttribute('data-affordance-active') ?? false,
-    hintText: document.querySelector('#digital-sphere')?.textContent?.includes('DIGITALE EBENEN ÖFFNEN') ?? false,
+    hintText: ['DIGITALE EBENEN ÖFFNEN', 'OPEN DIGITAL LAYERS'].some((text) => document.querySelector('#digital-sphere')?.textContent?.includes(text)),
   }));
   assert(Object.values(removedHint).every((value) => value === false), 'outer hint: removed affordance markup is still present ' + JSON.stringify(removedHint));
 
@@ -542,7 +542,7 @@ async function startupAndRingOrbitScenario() {
       hitWidth: Number(control?.getAttribute('stroke-width')),
     };
   });
-  assert(edgeControl.ariaLabel.includes('Antippen') && edgeControl.ariaLabel.includes('Eingabetaste'), 'edge control: accessible instruction is incomplete ' + JSON.stringify(edgeControl));
+  assert(((edgeControl.ariaLabel.includes('Antippen') && edgeControl.ariaLabel.includes('Eingabetaste')) || (edgeControl.ariaLabel.includes('Tap') && edgeControl.ariaLabel.includes('Enter'))), 'edge control: accessible instruction is incomplete ' + JSON.stringify(edgeControl));
   assert(edgeControl.tabindex === '0' && edgeControl.hitWidth >= 34, 'edge control: keyboard path or hit target was lost ' + JSON.stringify(edgeControl));
 
   const rings = await run.page.evaluate(() => {
@@ -856,7 +856,7 @@ async function normalScenario() {
   const focusOnlyState = await primaryOverlayState(run.page);
   assert(focusOnlyState.focusVisible && !focusOnlyState.discoveryVisible && !focusOnlyState.settingsVisible && !focusOnlyState.focusInert && focusOnlyState.focusAriaHidden === null, 'normal: visible project focus kept suppressed accessibility state ' + JSON.stringify(focusOnlyState));
   assert((await run.page.evaluate(() => document.activeElement?.id)) === 'project-focus', 'normal: project focus did not receive focus');
-  assert(((await run.page.locator('#semantic-summary').textContent()) ?? '') === 'Digital · Ortsunabhängige digitale Präsenz', 'normal: digital-only focus lost its location-independent truth');
+  assert(((await run.page.locator('#semantic-summary').textContent()) ?? '') === 'Digital · Location-independent digital presence', 'normal: digital-only focus lost its location-independent truth');
   await run.page.locator('#filter-toggle').click();
   assert(await run.page.locator('#discovery-panel').isVisible(), 'normal: discovery did not open over a selected project');
   assert(await run.page.locator('#project-focus').isHidden(), 'normal: selected project obscured discovery results');
@@ -885,9 +885,9 @@ async function normalScenario() {
   await run.page.locator('#commons-search').fill('quantenbanane-xyz');
   await run.page.waitForTimeout(220);
   await run.page.locator('#settings-toggle').click();
-  await run.page.getByRole('radio', { name: /Globus/ }).click();
+  await run.page.getByRole('radio', { name: /Globe|Globus/ }).click();
   assert(await run.page.locator('#globe-results').getAttribute('data-empty') !== null, 'normal: globe empty state marker missing');
-  assert((await run.page.locator('#globe-results').textContent())?.includes('Keine Commons'), 'normal: globe empty-state text missing');
+  assert((await run.page.locator('#globe-results').textContent())?.includes('No Commons'), 'normal: globe empty-state text missing');
   assert(run.consoleErrors.length === 0, `normal: console errors: ${run.consoleErrors.join(' | ')}`);
   assert(run.pageErrors.length === 0, `normal: page errors: ${run.pageErrors.join(' | ')}`);
   results.push({ id: 'normal', verdict: 'PASS' });
@@ -1298,7 +1298,7 @@ async function layerJourneyScenario({ mobile = false, viewportOverride = null, t
   });
   assert(JSON.stringify(focusedLane.visibleLayers) === JSON.stringify(['open_knowledge_data']), `layer journey: identity-level focus leaves other lanes visible (${JSON.stringify(focusedLane)})`);
   assert(focusedLane.focusedPath === 'sphere/knowledge_learning_culture/open_knowledge_data', `layer journey: focused path data attribute mismatch (${JSON.stringify(focusedLane)})`);
-  assert(focusedLane.breadcrumb.at(-1)?.current === 'page' && focusedLane.breadcrumb.map(({ text }) => text).includes('Wissen, Lernen und Kultur'), `layer journey: breadcrumb did not expose parent context (${JSON.stringify(focusedLane.breadcrumb)})`);
+  assert(focusedLane.breadcrumb.at(-1)?.current === 'page' && focusedLane.breadcrumb.map(({ text }) => text).includes('Knowledge, Learning and Culture'), `layer journey: breadcrumb did not expose parent context (${JSON.stringify(focusedLane.breadcrumb)})`);
   assertSameIds(focusedLane.ids, expectedDigitalProjection.nodes['sphere/knowledge_learning_culture/open_knowledge_data'].identityIds, 'layer journey: identity-level direct Commons');
   assert(['auto', 'scroll'].includes(focusedLane.overflowX), `layer journey: focused lane lost native horizontal overflow (${JSON.stringify(focusedLane)})`);
   assert(focusedLane.touchAction.includes('pan-x'), `layer journey: focused lane lost horizontal touch panning (${JSON.stringify(focusedLane)})`);
@@ -1456,15 +1456,15 @@ async function dualPresenceAxesScenario() {
     };
   });
   assert(initial.semanticLevel === 'planet', 'dual presence: initial semantic level is not planet');
-  assert(initial.semanticText.includes('Katalogabdeckung nicht bewertet'), 'dual presence: semantic coverage boundary is missing: ' + JSON.stringify(initial));
-  assert(initial.globeResultsText.includes(`${expectedDigitalProjection.publicIdentityCount} räumlich öffentlich belegte Commons`), 'dual presence: spatial text equivalent is missing: ' + JSON.stringify(initial));
-  assert(initial.globeResultsText.includes('keine Dichteaussage'), 'dual presence: spatial text equivalent implies assessed density: ' + JSON.stringify(initial));
-  assert(initial.legendSummary === 'Kartenlegende' && initial.legendAriaHidden === null, 'dual presence: accessible map legend is missing or hidden: ' + JSON.stringify(initial));
+  assert(initial.semanticText.includes('catalog coverage not assessed'), 'dual presence: semantic coverage boundary is missing: ' + JSON.stringify(initial));
+  assert(initial.globeResultsText.includes(`${expectedDigitalProjection.publicIdentityCount} spatially evidenced public Commons`), 'dual presence: spatial text equivalent is missing: ' + JSON.stringify(initial));
+  assert(initial.globeResultsText.includes('does not indicate density'), 'dual presence: spatial text equivalent implies assessed density: ' + JSON.stringify(initial));
+  assert(initial.legendSummary === 'Map legend' && initial.legendAriaHidden === null, 'dual presence: accessible map legend is missing or hidden: ' + JSON.stringify(initial));
   assert(initial.aggregateImpressions === expectedDigitalProjection.aggregateImpressionCount, 'dual presence: aggregate impression diagnostics differ from the prepared projection: ' + JSON.stringify(initial));
   assert(initial.privacyNotices === expectedDigitalProjection.privacyNoticeCount, 'dual presence: privacy notice diagnostics differ from the prepared projection: ' + JSON.stringify(initial));
   assertSameIds(initial.geographicSemanticLevels, expectedDigitalProjection.geographicSemanticLevels, 'dual presence: geographic semantic levels');
   assert(initial.legendSwatchText.length === 11 && initial.legendSwatchText.every((value) => value === ''), 'dual presence: far-map legend swatches must not render abbreviations: ' + JSON.stringify(initial));
-  assert(initial.legendLabels.length === 11 && initial.legendLabels.some((label) => label.includes('Wissen und Daten')) && initial.legendLabels.some((label) => label.includes('Gemeinschaftsnetz')), 'dual presence: legend labels do not match the Commons type vocabulary: ' + JSON.stringify(initial));
+  assert(initial.legendLabels.length === 11 && initial.legendLabels.some((label) => label.includes('Knowledge and Data')) && initial.legendLabels.some((label) => label.includes('Community Network')), 'dual presence: legend labels do not match the Commons type vocabulary: ' + JSON.stringify(initial));
   const reviewedFeatureIds = [
     'cltb-le-nid:cltb-le-nid-entrance',
     'cltb-le-nid:cltb-le-nid-building',
@@ -1578,16 +1578,16 @@ async function dualPresenceAxesScenario() {
   assert((await run.page.locator('#focus-title').textContent()) === 'Freifunk Hamburg', 'dual presence: approximate map click selected the wrong identity');
   const updatesAfterSelection = Number(await run.page.locator('.globe-stage').getAttribute('data-public-map-updates'));
   assert(updatesAfterSelection === updatesBeforeSelection, 'dual presence: selecting a project resent unchanged GeoJSON to MapLibre');
-  assert((await run.page.locator('#focus-presence').textContent()) === 'Vor Ort · Digital · Kommunikation und Netze › Gemeinschaftsnetze', 'dual presence: dual presence presentation label mismatch');
+  assert((await run.page.locator('#focus-presence').textContent()) === 'On site · Digital · Communication and Networks › Community Networks', 'dual presence: dual presence presentation label mismatch');
   const hamburgLocations = (await run.page.locator('#focus-locations').textContent()) ?? '';
-  assert(hamburgLocations.includes('mindestens 5 km Unschärfe') && hamburgLocations.includes('Ort verborgen'), 'dual presence: approximate and hidden location truth missing');
-  assert(((await run.page.locator('#focus-relations').textContent()) ?? '').includes('Teil von Freifunk'), 'dual presence: evidenced parent relation missing');
+  assert(hamburgLocations.includes('at least 5 km uncertainty') && hamburgLocations.includes('location hidden'), 'dual presence: approximate and hidden location truth missing');
+  assert(((await run.page.locator('#focus-relations').textContent()) ?? '').includes('Part of Freifunk'), 'dual presence: evidenced parent relation missing');
   assert((await run.page.locator('.globe-stage').getAttribute('data-semantic-level')) === 'focus', 'dual presence: selected identity did not enter semantic focus');
   await run.page.locator('#commons-search').fill('Le Nid');
   await run.page.waitForFunction((count) => Number(document.querySelector('.globe-stage')?.dataset.publicMapFeatures) === count, expectedDigitalProjection.publicFeatureCountsByIdentity['cltb-le-nid']);
   assert((await run.page.locator('#focus-title').textContent()) === 'Freifunk Hamburg', 'dual presence: filtering replaced or cleared the selected identity');
   assert((await run.page.locator('.globe-stage').getAttribute('data-semantic-level')) === 'focus', 'dual presence: filtered selected identity lost semantic focus');
-  assert(((await run.page.locator('#semantic-summary').textContent()) ?? '').startsWith('Vor Ort'), 'dual presence: semantic line no longer describes the filtered selected identity');
+  assert(((await run.page.locator('#semantic-summary').textContent()) ?? '').startsWith('On site'), 'dual presence: semantic line no longer describes the filtered selected identity');
   await run.page.locator('#commons-search').fill('');
   await run.page.waitForFunction((count) => Number(document.querySelector('.globe-stage')?.dataset.publicMapFeatures) === count, expectedDigitalProjection.publicFeatureCount);
   await run.page.locator('#discovery-close').click();
@@ -1600,7 +1600,7 @@ async function dualPresenceAxesScenario() {
     expectedLevel: 'local',
   });
   assert((await run.page.locator('#focus-title').textContent()) === 'Freifunk Hamburg', 'dual presence: local uncertainty-zone click lost the dual presence identity');
-  assert(((await run.page.locator('#focus-locations').textContent()) ?? '').includes('mindestens 5 km Unschärfe'), 'dual presence: local uncertainty zone lost its minimum-radius truth');
+  assert(((await run.page.locator('#focus-locations').textContent()) ?? '').includes('at least 5 km uncertainty'), 'dual presence: local uncertainty zone lost its minimum-radius truth');
   await run.page.locator('#focus-close').click();
   assert(await run.page.evaluate(() => document.activeElement === window.__commonworldTestMap?.getCanvas()), 'dual presence: local uncertainty-zone focus did not restore map focus');
 
@@ -1611,9 +1611,9 @@ async function dualPresenceAxesScenario() {
     expectedLevel: 'local',
   });
   assert((await run.page.locator('#focus-title').textContent()) === 'Le Nid', 'dual presence: exact map click selected the wrong identity');
-  assert((await run.page.locator('#focus-presence').textContent()) === 'Vor Ort', 'dual presence: geographic presentation label mismatch');
+  assert((await run.page.locator('#focus-presence').textContent()) === 'On site', 'dual presence: geographic presentation label mismatch');
   const leNidLocations = (await run.page.locator('#focus-locations').textContent()) ?? '';
-  assert(leNidLocations.includes('exakter öffentlicher Punkt') && leNidLocations.includes('öffentliche Fläche'), 'dual presence: point and extent truth missing from focus');
+  assert(leNidLocations.includes('exact public point') && leNidLocations.includes('public area'), 'dual presence: point and extent truth missing from focus');
   const leNidCoordinates = [4.3152961, 50.8452417];
   await run.page.evaluate((target) => {
     window.__commonworldTestMap.jumpTo({ center: target, zoom: 18, bearing: 0, pitch: 0 });
@@ -1721,7 +1721,7 @@ async function intentSearchDiscoveryScenario() {
   await run.page.locator('#filter-commons-type').selectOption('community-network');
   await run.page.waitForFunction((count) => new URL(location.href).searchParams.get('commons_type') === 'community-network' && document.querySelectorAll('.discovery-result').length === count, expectedDigitalProjection.communityNetworkIds.length);
   assertSameIds(await resultIds(), expectedDigitalProjection.communityNetworkIds, 'intent filters: Commons-Art differs from deterministic catalog derivation');
-  assert((await run.page.locator('.discovery-result-meta').allTextContents()).every((text) => text.includes('Gemeinschaftsnetz')), 'intent filters: Commons-Art label missing from compact result metadata');
+  assert((await run.page.locator('.discovery-result-meta').allTextContents()).every((text) => text.includes('Community Network')), 'intent filters: Commons-Art label missing from compact result metadata');
   await run.page.locator('#filter-commons-type').selectOption('');
   await run.page.waitForFunction((count) => !new URL(location.href).searchParams.has('commons_type') && document.querySelectorAll('.discovery-result').length === count, expectedDigitalProjection.catalogEntryCount);
   await run.page.goBack({ waitUntil: 'domcontentloaded' });
@@ -1919,7 +1919,7 @@ async function spatialDiscoveryFiltersScenario() {
   assert(await run.page.locator('#discovery-panel').isVisible(), 'spatial discovery: closing Berlin autocomplete incorrectly closed discovery panel');
 
   await run.page.locator('#use-current-location').click();
-  await run.page.waitForFunction(() => document.querySelector('#geolocation-status')?.textContent.includes('Standort verwendet'));
+  await run.page.waitForFunction(() => document.querySelector('#geolocation-status')?.textContent.includes('Location used'));
   const privacyState = await run.page.evaluate(({ latitude, longitude }) => {
     const url = new URL(location.href);
     const serializedLatitude = Number(url.searchParams.get('lat'));
@@ -2375,9 +2375,9 @@ async function validEmptyDigitalPathScenario() {
 
   const parameters = new URL(run.page.url()).searchParams;
   assert(parameters.get('digital_path') === path, 'valid empty path: canonical URL discarded the taxonomy node');
-  assert((await run.page.locator('#text-layer-current').textContent()) === 'Wasser und Bewässerung · 0 Commons', 'valid empty path: current node did not expose its empty state');
+  assert((await run.page.locator('#text-layer-current').textContent()) === 'Water and Irrigation · 0 Commons', 'valid empty path: current node did not expose its empty state');
   assert((await run.page.locator('.catalog-card:not([hidden])').count()) === 0, 'valid empty path: unrelated Commons leaked into the empty node');
-  assert((await run.page.locator('#globe-results').textContent()) === 'Keine Commons entsprechen dieser Suche oder Filterauswahl.', 'valid empty path: semantic empty-state message drifted');
+  assert((await run.page.locator('#globe-results').textContent()) === 'No Commons match this search or filter selection.', 'valid empty path: semantic empty-state message drifted');
   const currentCrumb = run.page.locator(`#text-layer-breadcrumb .digital-breadcrumb-item[data-digital-path="${path}"][aria-current="page"]`);
   assert(await currentCrumb.isVisible(), 'valid empty path: current breadcrumb is not visible');
   const crumbBox = await currentCrumb.boundingBox();
@@ -2476,8 +2476,8 @@ async function syntheticCatalogueTruthScenario() {
     assert(installed.records === size && installed.treeIdentities === size, `synthetic ${size}: installation lost identities ${JSON.stringify(installed)}`);
     await run.page.waitForFunction((count) => document.querySelector('.globe-stage')?.dataset.publicMapProjectIds === String(count), size);
     const geographicSummary = (await run.page.locator('#globe-results').textContent()) ?? '';
-    assert(geographicSummary.startsWith(`${size} Commons in der aktuellen Auswahl. ${size} räumlich öffentlich belegte Commons:`), `synthetic ${size}: identity count is capped ${geographicSummary}`);
-    assert(geographicSummary.includes(`${size} Gemeinschaftsnetz`) && geographicSummary.includes('keine Dichteaussage'), `synthetic ${size}: type distribution or coverage boundary is missing ${geographicSummary}`);
+    assert(geographicSummary.startsWith(`${size} Commons in the current selection. ${size} spatially evidenced public Commons:`), `synthetic ${size}: identity count is capped ${geographicSummary}`);
+    assert(geographicSummary.includes(`${size} Community Network`) && geographicSummary.includes('does not indicate density'), `synthetic ${size}: type distribution or coverage boundary is missing ${geographicSummary}`);
 
     const sphereEdge = run.page.locator('#sphere-edge-control');
     await sphereEdge.focus();
@@ -2507,9 +2507,9 @@ async function syntheticCatalogueTruthScenario() {
 
     await run.page.locator('#filter-toggle').click();
     assert((await run.page.locator('.discovery-result').count()) === 50, `synthetic ${size}: discovery preview is not bounded at 50`);
-    assert((await run.page.locator('#discovery-count').textContent()) === `50 von ${size} Commons als Vorschau`, `synthetic ${size}: discovery total is not truthful`);
+    assert((await run.page.locator('#discovery-count').textContent()) === `50 of ${size} Commons previewed`, `synthetic ${size}: discovery total is not truthful`);
     await run.page.locator('#discovery-show-text').click();
-    await run.page.waitForFunction((count) => document.querySelector('#text-count')?.textContent?.startsWith('48 von ' + count + ' Commons angezeigt. ' + count + ' räumlich öffentlich belegte Commons:'), size);
+    await run.page.waitForFunction((count) => document.querySelector('#text-count')?.textContent?.startsWith('48 of ' + count + ' Commons shown. ' + count + ' spatially evidenced public Commons:'), size);
     assert((await run.page.locator('.catalog-card:not([hidden])').count()) === 48, `synthetic ${size}: initial text window is not bounded at 48`);
     const textMoreBox = await run.page.locator('#text-show-more').boundingBox();
     assert(textMoreBox && textMoreBox.height >= 44, `synthetic ${size}: text continuation touch target is undersized`);
@@ -2518,8 +2518,8 @@ async function syntheticCatalogueTruthScenario() {
     const textIds = await run.page.locator('.catalog-card:not([hidden])').evaluateAll((nodes) => nodes.map((node) => node.dataset.commonprojectId));
     assert(new Set(textIds).size === 96, `synthetic ${size}: continued text identities duplicate`);
     const continuedTextSummary = (await run.page.locator('#text-count').textContent()) ?? '';
-    assert(continuedTextSummary.startsWith('96 von ' + size + ' Commons angezeigt. ' + size + ' räumlich öffentlich belegte Commons:'), 'synthetic ' + size + ': text continuation count drifted ' + continuedTextSummary);
-    assert(continuedTextSummary.includes(size + ' Gemeinschaftsnetz') && continuedTextSummary.includes('keine Dichteaussage'), 'synthetic ' + size + ': text view lost map-equivalent type or coverage semantics ' + continuedTextSummary);
+    assert(continuedTextSummary.startsWith('96 of ' + size + ' Commons shown. ' + size + ' spatially evidenced public Commons:'), 'synthetic ' + size + ': text continuation count drifted ' + continuedTextSummary);
+    assert(continuedTextSummary.includes(size + ' Community Network') && continuedTextSummary.includes('does not indicate density'), 'synthetic ' + size + ': text view lost map-equivalent type or coverage semantics ' + continuedTextSummary);
     assert(run.pageErrors.length === 0, `synthetic ${size}: page errors: ${run.pageErrors.join(' | ')}`);
     await run.context.close();
   }
@@ -2722,7 +2722,7 @@ async function providerFailureScenario() {
   await run.page.waitForSelector('html.runtime-ready');
   await run.page.waitForSelector('.globe-stage[data-runtime-state="degraded"]');
   assert(await run.page.locator('#map-status').isVisible(), 'provider failure: mobile degraded status hidden');
-  assert((await run.page.locator('#map-status').textContent())?.includes('Basiskarte'), 'provider failure: degraded status unclear');
+  assert((await run.page.locator('#map-status').textContent())?.toLowerCase().includes('basemap'), 'provider failure: degraded status unclear');
 
   const topbarFit = await run.page.evaluate(() => {
     const topbar = document.querySelector('.topbar');
@@ -2761,6 +2761,27 @@ async function providerFailureScenario() {
   await run.context.close();
 }
 
+async function germanLocaleScenario() {
+  process.stdout.write(`${JSON.stringify({ state: 'RUNNING', scenario: 'locale-german' })}\n`);
+  const run = await newPage();
+  const response = await run.page.goto(`${baseUrl}/de.html`, { waitUntil: 'domcontentloaded' });
+  assert(response?.status() === 200, 'German locale: page is not served');
+  await run.page.waitForSelector('html.runtime-ready');
+  assert((await run.page.locator('html').getAttribute('lang')) === 'de', 'German locale: document language is not de');
+  assert((await run.page.locator('#commons-search').getAttribute('placeholder')) === 'Was möchtest du tun oder finden?', 'German locale: search placeholder regressed');
+  assert((await run.page.locator('#filter-commons-type option[value="knowledge"]').textContent()) === 'Wissen und Daten', 'German locale: Commons type label regressed');
+  assert(await run.page.locator('.language-switch a[href="./"][lang="en"]').count() > 0, 'German locale: English switch target is missing');
+
+  await run.page.locator('#commons-search').fill('free operating system');
+  await run.page.waitForFunction(() => document.querySelectorAll('.discovery-result').length === 1);
+  const ids = await run.page.locator('.discovery-result').evaluateAll((nodes) => nodes.map((node) => node.dataset.commonprojectId));
+  assert(JSON.stringify(ids) === JSON.stringify(['debian']), `German locale: English translation alias did not resolve Debian (${JSON.stringify(ids)})`);
+  assert(run.consoleErrors.length === 0, `German locale: console errors: ${run.consoleErrors.join(' | ')}`);
+  assert(run.pageErrors.length === 0, `German locale: page errors: ${run.pageErrors.join(' | ')}`);
+  results.push({ id: 'locale-german', verdict: 'PASS', crossLanguageSearch: true });
+  await run.context.close();
+}
+
 async function methodScenario() {
   for (const profile of [
     { id: 'desktop', mobile: false, viewportOverride: { width: 1280, height: 800 }, fontScale: null },
@@ -2778,8 +2799,8 @@ html { font-size: ${profile.fontScale}% !important; }
     }
     const response = await run.page.goto(`${baseUrl}/method.html`, { waitUntil: 'domcontentloaded' });
     assert(response?.status() === 200, `method ${profile.id}: page is not served`);
-    assert((await run.page.locator('h1').textContent()) === 'Methode, Abdeckung und Datenschutz', `method ${profile.id}: heading mismatch`);
-    assert((await run.page.locator('main').textContent())?.includes('keine vollständige Weltstatistik'), `method ${profile.id}: coverage boundary missing`);
+    assert((await run.page.locator('h1').textContent()) === 'Method, coverage and privacy', `method ${profile.id}: heading mismatch`);
+    assert((await run.page.locator('main').textContent())?.includes('not a complete global statistic'), `method ${profile.id}: coverage boundary missing`);
     const backLink = run.page.locator('.secondary-back-link');
     await backLink.waitFor({ state: 'visible' });
     const backBox = await backLink.boundingBox();
@@ -2801,6 +2822,7 @@ try {
   await reducedMotionRingScenario();
   await syntheticDigitalPerformanceScenario();
   await normalScenario();
+  await germanLocaleScenario();
   await intentSearchDiscoveryScenario();
   await spatialDiscoveryFiltersScenario();
   await androidGlobeUiScenario();

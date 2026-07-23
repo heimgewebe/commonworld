@@ -155,8 +155,8 @@ class PublicCatalogTests(unittest.TestCase):
             path = root / "index.html"
             path.write_text(
                 path.read_text(encoding="utf-8").replace(
-                    "Digital · Software, Werkzeuge und Produktion › Freie Software und Infrastruktur",
-                    "Digital · Falsches Ringbündel",
+                    "Digital · Software, Tools and Production › Free Software and Infrastructure",
+                    "Digital · Wrong ring bundle",
                     1,
                 ),
                 encoding="utf-8",
@@ -164,7 +164,7 @@ class PublicCatalogTests(unittest.TestCase):
 
             errors = validate_public_catalog(root)
 
-        self.assertTrue(any("derived German presentation label" in error for error in errors))
+        self.assertTrue(any("derived en presentation label" in error for error in errors))
 
     def test_production_delivery_boundary_cannot_regress(self) -> None:
         with tempfile.TemporaryDirectory() as tmp_dir:

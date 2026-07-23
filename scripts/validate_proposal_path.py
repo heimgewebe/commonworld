@@ -52,7 +52,7 @@ def validate_fixture(value: dict, schema: dict) -> list[str]:
 def validate(root: Path = ROOT) -> list[str]:
     errors: list[str] = []
     required = [
-        "propose.html", "assets/commonworld-proposal.js", "contracts/commonworld/proposal.schema.json",
+        "propose.html", "propose.de.html", "assets/commonworld-proposal.js", "contracts/commonworld/proposal.schema.json",
         "contracts/commonworld/editorial-review.contract.json", "contracts/commonworld/proposal-path.contract.json",
         "contracts/commonworld/catalog-diversity.contract.json", ".github/ISSUE_TEMPLATE/commons-proposal.yml",
     ]
@@ -93,9 +93,14 @@ def validate(root: Path = ROOT) -> list[str]:
             if missing: errors.append(f"diversity group {name} references missing projects: {missing}")
 
     page = (root / "propose.html").read_text(encoding="utf-8")
+    german_page = (root / "propose.de.html").read_text(encoding="utf-8")
     script = (root / "assets/commonworld-proposal.js").read_text(encoding="utf-8")
-    for marker in ("nicht automatisch veröffentlicht", "öffentliches GitHub-Issue", "keine private Adresse", "proposal-catalog-index", "proposal-download"):
+    for marker in ("not published automatically", "public GitHub issue", "private address", "proposal-catalog-index", "proposal-download"):
         if marker.casefold() not in page.casefold(): errors.append(f"proposal page missing marker: {marker}")
+    for marker in ("nicht automatisch veröffentlicht", "öffentliches GitHub-Issue", "private Adresse"):
+        if marker.casefold() not in german_page.casefold(): errors.append(f"German proposal page missing marker: {marker}")
+    if 'href="./propose.de.html"' not in page or 'href="./propose.html"' not in german_page:
+        errors.append("proposal locale switch must connect English and German surfaces")
 
     proposal_css_path = root / "assets/proposal.css"
     if not proposal_css_path.is_file():

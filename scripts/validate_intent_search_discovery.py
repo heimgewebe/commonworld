@@ -28,6 +28,19 @@ COMMONS_TYPE_LABELS = {
     "community-network": "Gemeinschaftsnetz",
     "other": "Andere",
 }
+COMMONS_TYPE_LABELS_EN = {
+    "knowledge": "Knowledge and Data",
+    "software": "Software and Infrastructure",
+    "culture": "Culture and Media",
+    "food-seeds": "Seeds and Food",
+    "water": "Water and Irrigation",
+    "energy": "Energy",
+    "housing-land": "Land and Housing",
+    "health-care": "Care and Health",
+    "tools-repair": "Tools, Repair and Making",
+    "community-network": "Community Network",
+    "other": "Other",
+}
 ACTIONS = {"visit", "use", "borrow", "learn", "contribute", "volunteer", "donate", "contact", "replicate"}
 NONCLAIMS = [
     "semantic AI or LLM search",
@@ -276,20 +289,29 @@ def validate_intent_search_discovery(root: Path = ROOT) -> list[str]:
             errors.append("T007 50,000-record inverted-index probe mismatch")
 
     shell = (root / "index.html").read_text(encoding="utf-8")
+    german_shell_path = root / "de.html"
+    german_shell = german_shell_path.read_text(encoding="utf-8") if german_shell_path.is_file() else None
     for token in (
         'id="discovery-panel"', 'id="discovery-list"', 'id="discovery-empty"',
         'class="filter-commons-type"', 'id="filter-commons-type"',
         'data-intent-filter="commons_type"', 'data-intent-filter="presence"', 'data-intent-filter="action"',
         'data-intent-filter="language"', 'data-intent-filter="access"',
         'data-intent-filter="freshness"', 'data-intent-filter="curation"',
-        '<option value="borrow">Ausleihen</option>', 'data-action-type=',
+        '<option value="borrow">Borrow</option>', 'data-action-type=',
     ):
         if token not in shell:
-            errors.append(f"T007 public shell missing token: {token}")
-    for commons_type, label in COMMONS_TYPE_LABELS.items():
+            errors.append(f"T007 English public shell missing token: {token}")
+    if german_shell is not None and '<option value="borrow">Ausleihen</option>' not in german_shell:
+        errors.append('T007 German public shell missing borrow action label')
+    for commons_type, label in COMMONS_TYPE_LABELS_EN.items():
         token = f'<option value="{commons_type}">{label}</option>'
         if shell.count(token) != 1:
-            errors.append(f"T007 public shell must emit exactly one Commons-Art option: {commons_type}")
+            errors.append(f"T007 English public shell must emit exactly one Commons type option: {commons_type}")
+    if german_shell is not None:
+        for commons_type, label in COMMONS_TYPE_LABELS.items():
+            token = f'<option value="{commons_type}">{label}</option>'
+            if german_shell.count(token) != 1:
+                errors.append(f"T007 German public shell must emit exactly one Commons-Art option: {commons_type}")
     browser = (root / "scripts/smoke_public_browser.mjs").read_text(encoding="utf-8")
     for scenario in contract.get("browser_evidence", {}).get("required_scenarios", []):
         if scenario not in browser:

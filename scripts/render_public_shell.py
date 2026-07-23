@@ -14,6 +14,10 @@ if str(ROOT) not in sys.path:
     sys.path.insert(0, str(ROOT))
 
 from scripts.digital_taxonomy import derive_project_path, load_taxonomy, path_label
+from scripts.commonworld_i18n import (
+    DEFAULT_LOCALE, FALLBACK_LOCALE, german_surface_links, inject_locale_navigation,
+    load_locale, localize_records, normalize_locale, taxonomy_label, translate_method, translate_shell,
+)
 
 ACTION_LINK_TYPES = {"visit", "use", "borrow", "learn", "contribute", "volunteer", "donate", "contact", "replicate"}
 TAXONOMY = load_taxonomy(ROOT)
@@ -98,11 +102,28 @@ def public_locations(record: dict) -> list[dict]:
     return [location for location in locations if _public_location(location)]
 
 
-def presentation_label(record: dict) -> str:
+def presentation_label(record: dict, locale: str = FALLBACK_LOCALE) -> str:
     has_geo = bool(public_locations(record))
     has_digital = record.get("presence", {}).get("digital", {}).get("available") is True
     derivation = derive_project_path(record, TAXONOMY) if has_digital else None
-    digital_label = path_label(derivation["path"], TAXONOMY) if derivation else "Digitale Commons"
+    if derivation:
+        nodes = {node["id"]: node for node in TAXONOMY.get("nodes", [])}
+        labels = [
+            taxonomy_label(node_id, nodes[node_id]["label_de"], locale, ROOT)
+            for node_id in derivation["path"]
+            if node_id in nodes and node_id != TAXONOMY.get("root_id")
+        ]
+        digital_label = " › ".join(labels)
+    else:
+        digital_label = "Digital Commons" if normalize_locale(locale) == "en" else "Digitale Commons"
+    if normalize_locale(locale) == "en":
+        if has_geo and has_digital:
+            return f"On site · Digital · {digital_label}"
+        if has_geo:
+            return "On site"
+        if has_digital:
+            return f"Digital · {digital_label}"
+        return "Commons"
     if has_geo and has_digital:
         return f"Vor Ort · Digital · {digital_label}"
     if has_geo:
@@ -112,13 +133,19 @@ def presentation_label(record: dict) -> str:
     return "Commons"
 
 
-def location_summary(record: dict) -> str:
+def location_summary(record: dict, locale: str = FALLBACK_LOCALE) -> str:
     locations = record.get("presence", {}).get("geographic", [])
     if not isinstance(locations, list) or not locations:
-        return "Ortsunabhängige digitale Präsenz"
+        return "Location-independent digital presence" if normalize_locale(locale) == "en" else "Ortsunabhängige digitale Präsenz"
     public_count = len(public_locations(record))
     hidden_count = sum(1 for location in locations if location.get("mode") == "hidden")
     parts = []
+    if normalize_locale(locale) == "en":
+        if public_count:
+            parts.append(f"{public_count} {'public location' if public_count == 1 else 'public locations'}")
+        if hidden_count:
+            parts.append(f"{hidden_count} {'hidden location' if hidden_count == 1 else 'hidden locations'}")
+        return " · ".join(parts) or "No public geometry"
     if public_count:
         parts.append(f"{public_count} {'öffentlicher Ort' if public_count == 1 else 'öffentliche Orte'}")
     if hidden_count:
@@ -126,11 +153,16 @@ def location_summary(record: dict) -> str:
     return " · ".join(parts) or "Keine öffentliche Geometrie"
 
 
-def activity_notice(record: dict) -> str:
+def activity_notice(record: dict, locale: str = FALLBACK_LOCALE) -> str:
     if record.get("activity", {}).get("status") != "unknown":
         return ""
     observed_at = record.get("activity", {}).get("observed_at", "unbekannt")
     next_review_at = record.get("curation", {}).get("next_review_at", "offen")
+    if normalize_locale(locale) == "en":
+        return (
+            "Current operating status has not been verified recently. "
+            f"Sources reviewed on {observed_at}; priority re-review {next_review_at}."
+        )
     return (
         "Aktueller Betriebszustand nicht zeitnah verifiziert. "
         f"Quellen geprüft am {observed_at}; priorisierte Nachprüfung {next_review_at}."
@@ -148,15 +180,15 @@ def load_records(root: Path = ROOT) -> list[dict]:
     return records
 
 
-def render_cards(records: list[dict], *, interactive: bool = True) -> str:
+def render_cards(records: list[dict], *, interactive: bool = True, locale: str = FALLBACK_LOCALE) -> str:
     cards: list[str] = []
     for record in records:
         identifier = html.escape(record["id"], quote=True)
         title = html.escape(record["title"])
         summary = html.escape(record["summary"])
-        label = html.escape(presentation_label(record))
-        place = html.escape(location_summary(record))
-        notice = html.escape(activity_notice(record))
+        label = html.escape(presentation_label(record, locale))
+        place = html.escape(location_summary(record, locale))
+        notice = html.escape(activity_notice(record, locale))
         notice_html = f'            <p class="catalog-activity-notice">{notice}</p>\n' if notice else ""
         url = html.escape(homepage(record), quote=True)
         action_links = "\n".join(
@@ -172,7 +204,7 @@ def render_cards(records: list[dict], *, interactive: bool = True) -> str:
             action_links += "\n"
         action = (
             f'              <button class="catalog-select" type="button" '
-            f'data-commonproject-id="{identifier}" aria-pressed="false">Öffnen</button>\n'
+            f'data-commonproject-id="{identifier}" aria-pressed="false">{"Open" if normalize_locale(locale) == "en" else "Öffnen"}</button>\n'
             if interactive
             else ""
         )
@@ -183,12 +215,21 @@ def render_cards(records: list[dict], *, interactive: bool = True) -> str:
             <p>{summary}</p>
             <p class="catalog-location">{place}</p>
 {notice_html}            <div class="catalog-actions">
-{action}{action_links}              <a href="{url}" rel="external noreferrer">Offizielle Seite <span aria-hidden="true">↗</span></a>
+{action}{action_links}              <a href="{url}" rel="external noreferrer">{"Official website" if normalize_locale(locale) == "en" else "Offizielle Seite"} <span aria-hidden="true">↗</span></a>
               <a href="./catalog/projects/{identifier}.json" type="application/json">JSON</a>
             </div>
           </article>'''
         )
     return "\n".join(cards)
+
+
+def render_locale_module(locale: str = DEFAULT_LOCALE, root: Path = ROOT) -> str:
+    payload = json.dumps(load_locale(locale, root), ensure_ascii=False, separators=(",", ":"))
+    payload = payload.replace("\u2028", "\\u2028").replace("\u2029", "\\u2029")
+    return (
+        f"// Generated from catalog/locales/{normalize_locale(locale)}.json. Do not edit.\n"
+        f"export const COMMONWORLD_{normalize_locale(locale).upper()}_LOCALE = Object.freeze({payload});\n"
+    )
 
 
 def render_bootstrap_catalog(records: list[dict]) -> str:
@@ -200,15 +241,15 @@ def render_bootstrap_catalog(records: list[dict]) -> str:
     )
 
 
-def render_shell(root: Path = ROOT) -> str:
-    records = load_records(root)
+def render_shell(root: Path = ROOT, locale: str = FALLBACK_LOCALE) -> str:
+    records = localize_records(load_records(root), locale, root)
     paths = "\n".join(
         f'              <ellipse id="sphere-path-{index}" cx="320" cy="320" rx="{rx}" ry="{ry}" transform="rotate({rotation} 320 320)" />'
         for index, (rx, ry, rotation) in enumerate(ORBIT_PROFILES, start=1)
     )
-    cards = render_cards(records)
-    noscript_cards = render_cards(records, interactive=False)
-    return f'''<!doctype html>
+    cards = render_cards(records, locale=locale)
+    noscript_cards = render_cards(records, interactive=False, locale=locale)
+    markup = f'''<!doctype html>
 <html lang="de">
   <head>
     <meta charset="utf-8" />
@@ -461,12 +502,15 @@ def render_shell(root: Path = ROOT) -> str:
   </body>
 </html>
 '''
+    markup = translate_shell(markup, locale)
+    markup = german_surface_links(markup, locale, 'index')
+    return inject_locale_navigation(markup, locale, 'index')
 
 
-def render_method(root: Path = ROOT) -> str:
+def render_method(root: Path = ROOT, locale: str = FALLBACK_LOCALE) -> str:
     manifest = json.loads((root / "catalog/catalog.json").read_text(encoding="utf-8"))
     count = manifest["entry_count"]
-    return f"""<!doctype html>
+    markup = f"""<!doctype html>
 <html lang="de">
   <head>
     <meta charset="utf-8" />
@@ -495,14 +539,20 @@ def render_method(root: Path = ROOT) -> str:
   </body>
 </html>
 """
+    markup = translate_method(markup, locale)
+    markup = german_surface_links(markup, locale, 'method')
+    return inject_locale_navigation(markup, locale, 'method')
 
 
 def main() -> int:
     records = load_records(ROOT)
     (ROOT / "assets/commonworld-bootstrap-catalog.mjs").write_text(render_bootstrap_catalog(records), encoding="utf-8")
-    (ROOT / "index.html").write_text(render_shell(ROOT), encoding="utf-8")
-    (ROOT / "method.html").write_text(render_method(ROOT), encoding="utf-8")
-    print("commonworld globe-first shell, bootstrap module and method page rendered from public contracts")
+    (ROOT / "assets/commonworld-en-locale.mjs").write_text(render_locale_module("en", ROOT), encoding="utf-8")
+    (ROOT / "index.html").write_text(render_shell(ROOT, "en"), encoding="utf-8")
+    (ROOT / "de.html").write_text(render_shell(ROOT, "de"), encoding="utf-8")
+    (ROOT / "method.html").write_text(render_method(ROOT, "en"), encoding="utf-8")
+    (ROOT / "method.de.html").write_text(render_method(ROOT, "de"), encoding="utf-8")
+    print("commonworld localized globe-first shells, bootstrap module, locale module and method pages rendered from public contracts")
     return 0
 
 

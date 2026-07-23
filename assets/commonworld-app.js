@@ -1,4 +1,5 @@
 import { BOOTSTRAP_RECORDS } from './commonworld-bootstrap-catalog.mjs';
+import { actionLabel, documentLocale, localizeCatalogRecords, text as i18nText, themeLabel } from './commonworld-i18n.mjs';
 import {
   COMMONS_TYPE_COLOR_TOKENS,
   COMMONS_TYPE_VALUES,
@@ -49,6 +50,9 @@ import {
   stateFromSearch,
   visibleDigitalNodes,
 } from './commonworld-core.mjs';
+
+const LOCALE = documentLocale();
+const t = (key, germanFallback, variables = {}) => i18nText(LOCALE, key, germanFallback, variables);
 
 const SVG_NS = 'http://www.w3.org/2000/svg';
 const LOCAL_FALLBACK_STYLE = Object.freeze({ version: 8, sources: {}, layers: [{ id: 'commonworld-fallback', type: 'background', paint: { 'background-color': '#0d2426' } }] });
@@ -167,6 +171,7 @@ const runtime = {
   catalogProjection: null,
   digitalTree: null,
   searchIndex: null,
+  searchAliasesById: new Map(),
   visibleRecordsCache: null,
   unfilteredPathRecordsCache: null,
   lastPublicMapData: null,
@@ -328,13 +333,13 @@ function setStatus(message, state = 'loading') {
 
 function refreshStatus() {
   const failures = [];
-  if (runtime.mapDegraded) failures.push('Die Basiskarte ist vorübergehend nicht erreichbar; Globuszustand und Textansicht bleiben verfügbar.');
+  if (runtime.mapDegraded) failures.push(t('map_degraded', 'Die Basiskarte ist vorübergehend nicht erreichbar; Globuszustand und Textansicht bleiben verfügbar.'));
   if (failures.length) {
     setStatus(failures.join(' '), 'degraded');
   } else if (runtime.mapReady) {
-    setStatus('Globus bereit. Ziehen zum Drehen, Pinch oder Tasten zum Zoomen.', 'ready');
+    setStatus(t('globe_ready', 'Globus bereit. Ziehen zum Drehen, Pinch oder Tasten zum Zoomen.'), 'ready');
   } else {
-    setStatus('Globus wird geladen. Die Textansicht bleibt verfügbar.', 'loading');
+    setStatus(t('globe_loading', 'Globus wird geladen. Die Textansicht bleibt verfügbar.'), 'loading');
   }
 }
 
@@ -380,14 +385,17 @@ function validateRecords(records) {
 }
 
 function bootstrapRecords() {
-  return validateRecords(BOOTSTRAP_RECORDS);
+  const canonical = validateRecords(BOOTSTRAP_RECORDS);
+  const localized = localizeCatalogRecords(canonical, LOCALE);
+  runtime.searchAliasesById = localized.searchAliasesById;
+  return localized.records;
 }
 
 function installRecords(records) {
   runtime.records = records;
   runtime.catalogProjection = prepareCatalogProjection(records);
-  runtime.digitalTree = buildDigitalPresentationTree(records);
-  runtime.searchIndex = prepareIntentSearchIndex(records);
+  runtime.digitalTree = buildDigitalPresentationTree(records, { locale: LOCALE });
+  runtime.searchIndex = prepareIntentSearchIndex(records, { searchAliasesById: runtime.searchAliasesById });
   runtime.recordsById = runtime.catalogProjection.recordsById;
   elements.stage.dataset.searchIndexedRecords = String(runtime.searchIndex.indexedRecordCount);
   elements.stage.dataset.searchIndexedTerms = String(runtime.searchIndex.indexedTermCount);
@@ -424,7 +432,7 @@ function digitalPathFiltered() {
 
 function treeForRecords(records = runtime.records) {
   if (records === runtime.records && runtime.digitalTree) return runtime.digitalTree;
-  return buildDigitalPresentationTree(records);
+  return buildDigitalPresentationTree(records, { locale: LOCALE });
 }
 
 function unfilteredPathRecords() {
@@ -507,7 +515,7 @@ function renderSphereRibbons(records = runtime.records) {
       appendRingSequence(textPath, source, { prefix: `${node.label} · ${node.identityCount}` });
     } else {
       const placeholder = createSvgElement('tspan', { class: 'sphere-ring-placeholder' });
-      placeholder.textContent = `  ${node.label} · keine sichtbaren Einträge  `;
+      placeholder.textContent = `  ${node.label} · ${t('no_visible_entries', 'keine sichtbaren Einträge')}  `;
       textPath.append(placeholder);
     }
     text.append(textPath);
@@ -529,7 +537,7 @@ function createRibbonSegment(record, copyIndex) {
   segment.className = 'digital-ribbon-item';
   segment.dataset.commonprojectId = record.id;
   segment.dataset.ribbonCopy = String(copyIndex);
-  segment.setAttribute('aria-label', `${record.title} öffnen`);
+  segment.setAttribute('aria-label', t('open_project', `${record.title} öffnen`, { title: record.title }));
   if (copyIndex > 0) segment.setAttribute('tabindex', '-1');
   const name = document.createElement('span');
   name.className = 'digital-ribbon-name';
@@ -592,7 +600,7 @@ function renderLayerDeck() {
     scroller.dataset.digitalPath = node.pathKey;
     scroller.tabIndex = 0;
     scroller.setAttribute('role', 'region');
-    scroller.setAttribute('aria-label', `${node.label} horizontal durchblättern`);
+    scroller.setAttribute('aria-label', t('horizontal_scroll', `${node.label} horizontal durchblättern`, { label: node.label }));
     const content = document.createElement('div');
     content.className = 'digital-lane-content';
     const repeats = identityLevel ? 1 : ribbonRepeatCount(records.length, 10);
@@ -606,7 +614,7 @@ function renderLayerDeck() {
       const status = document.createElement('p');
       status.className = 'identity-presentation-status';
       status.setAttribute('role', 'status');
-      status.textContent = `${shown} von ${node.identityCount} Commons angezeigt`;
+      status.textContent = t('shown_of_commons', `${shown} von ${node.identityCount} Commons angezeigt`, { shown, total: node.identityCount });
       lane.append(status);
       if (shown < node.identityCount) {
         const more = document.createElement('button');
@@ -614,8 +622,8 @@ function renderLayerDeck() {
         more.className = 'quiet-button identity-show-more';
         more.dataset.digitalPath = node.pathKey;
         const increment = Math.min(DIGITAL_IDENTITY_DOM_LIMIT, node.identityCount - shown);
-        more.textContent = `Weitere ${increment} anzeigen`;
-        more.setAttribute('aria-label', `Weitere ${increment} Commons in ${node.label} anzeigen`);
+        more.textContent = t('show_more', `Weitere ${increment} anzeigen`, { count: increment });
+        more.setAttribute('aria-label', t('show_more_in_bundle', `Weitere ${increment} Commons in ${node.label} anzeigen`, { count: increment, label: node.label }));
         more.addEventListener('click', () => {
           runtime.identityPresentationLimit += DIGITAL_IDENTITY_DOM_LIMIT;
           renderDiscoveryState();
@@ -964,7 +972,7 @@ function renderMapLegend() {
     swatch.className = 'legend-color';
     swatch.style.setProperty('--legend-color', COMMONS_TYPE_COLOR_TOKENS[type]);
     swatch.setAttribute('aria-hidden', 'true');
-    item.append(swatch, document.createTextNode(commonsTypeLabel(type)));
+    item.append(swatch, document.createTextNode(commonsTypeLabel(type, LOCALE)));
     list.append(item);
   }
 }
@@ -1112,13 +1120,14 @@ function updateSemanticLocationLine() {
     records: visibleRecords(),
     selectedProjectId: runtime.state.project,
     selectedRecord: runtime.state.project ? runtime.recordsById.get(runtime.state.project) ?? null : null,
+    locale: LOCALE,
   });
   elements.stage.dataset.semanticLevel = line.level;
-  elements.semanticLevel.textContent = line.crumbs.at(-1) ?? 'Gesamtansicht';
+  elements.semanticLevel.textContent = line.crumbs.at(-1) ?? t('overview', 'Gesamtansicht');
   elements.semanticSummary.textContent = line.level === 'focus'
     ? line.summary
-    : `${line.summary} · Katalogabdeckung nicht bewertet`;
-  elements.semanticSummary.setAttribute('aria-label', line.crumbs.join(' nach '));
+    : `${line.summary} · ${t('catalog_coverage_unassessed', 'Katalogabdeckung nicht bewertet')}`;
+  elements.semanticSummary.setAttribute('aria-label', line.crumbs.join(LOCALE === 'en' ? ' to ' : ' nach '));
 }
 
 function renderLayerButtons(container) {
@@ -1155,7 +1164,7 @@ function renderDigitalBreadcrumb(breadcrumbElement, currentElement) {
   if (currentElement) {
     currentElement.textContent = view.current
       ? `${view.current.label} · ${view.current.identityCount} Commons`
-      : 'Digitale Commons-Sphäre';
+      : t('digital_sphere', 'Digitale Commons-Sphäre');
   }
   if (breadcrumbElement) {
     breadcrumbElement.replaceChildren();
@@ -1170,7 +1179,7 @@ function renderDigitalBreadcrumb(breadcrumbElement, currentElement) {
       button.type = 'button';
       button.className = 'digital-breadcrumb-item';
       button.dataset.digitalPath = crumb.pathKey;
-      button.textContent = crumb.type === 'sphere' ? 'Sphäre' : crumb.label;
+      button.textContent = crumb.type === 'sphere' ? t('sphere', 'Sphäre') : crumb.label;
       if (index === view.breadcrumb.length - 1) button.setAttribute('aria-current', 'page');
       button.addEventListener('click', () => setDigitalPath(crumb.path));
       breadcrumbElement.append(button);
@@ -1385,7 +1394,7 @@ function closeDiscovery({ restoreFocus = false } = {}) {
 }
 
 function filterControlLabel(name, value) {
-  if (name === 'presence') return value === 'geographic' ? 'Vor Ort' : 'Digital';
+  if (name === 'presence') return value === 'geographic' ? t('presence_geographic', 'Vor Ort') : t('presence_digital', 'Digital');
   const control = elements.filterSelects.find((candidate) => candidate.dataset.intentFilter === name && candidate.type !== 'checkbox');
   const option = control ? [...control.options].find((candidate) => candidate.value === value) : null;
   return option?.textContent?.trim() || String(value);
@@ -1488,8 +1497,8 @@ function clearIntentFilters({ historyMode = 'push' } = {}) {
 }
 
 function populateCountryFilterOptions() {
-  const options = [new Option('Alle Länder', '')];
-  for (const entry of [...runtime.countryEntries.values()].sort((left, right) => left.name.localeCompare(right.name, 'de'))) {
+  const options = [new Option(t('all_countries', 'Alle Länder'), '')];
+  for (const entry of [...runtime.countryEntries.values()].sort((left, right) => left.name.localeCompare(right.name, LOCALE))) {
     options.push(new Option(entry.name, entry.id));
   }
   elements.filterCountry.replaceChildren(...options);
@@ -1503,7 +1512,7 @@ function rebuildSpatialDestinationIndex() {
       type: 'country',
       id: entry.id,
       label: entry.name,
-      contextLabel: 'Land',
+      contextLabel: t('country', 'Land'),
       searchText: normalizeSearchText(entry.name),
     }));
   }
@@ -1516,7 +1525,7 @@ function rebuildSpatialDestinationIndex() {
         type: 'place',
         id: `place:${record.id}:${location.id}`,
         label,
-        contextLabel: label === record.title ? 'Veröffentlichter Ort' : record.title,
+        contextLabel: label === record.title ? t('published_location', 'Veröffentlichter Ort') : record.title,
         searchText: normalizeSearchText(label),
         contextSearchText: normalizeSearchText(record.title),
         projectId: record.id,
@@ -1638,7 +1647,7 @@ function renderSpatialDestinationResults() {
   const matches = runtime.spatialDestinations
     .map((entry) => ({ entry, rank: spatialDestinationMatchRank(entry, query) }))
     .filter(({ rank }) => Number.isFinite(rank))
-    .sort((left, right) => left.rank - right.rank || left.entry.label.localeCompare(right.entry.label, 'de'))
+    .sort((left, right) => left.rank - right.rank || left.entry.label.localeCompare(right.entry.label, LOCALE))
     .slice(0, 8)
     .map(({ entry }) => entry);
   elements.spatialDestinationSearch.setAttribute('aria-expanded', String(matches.length > 0));
@@ -1659,8 +1668,8 @@ function renderSpatialDestinationResults() {
     const primary = document.createElement('button');
     primary.type = 'button';
     primary.className = 'quiet-button';
-    primary.textContent = 'Auf Globus zeigen';
-    primary.setAttribute('aria-label', `${entry.label} auf dem Globus zeigen`);
+    primary.textContent = t('show_on_globe', 'Auf Globus zeigen');
+    primary.setAttribute('aria-label', t('show_on_globe_aria', `${entry.label} auf dem Globus zeigen`, { label: entry.label }));
     primary.addEventListener('click', () => {
       closeSpatialDestinationResults();
       if (entry.type === 'country') navigateToCountry(entry.id);
@@ -1670,15 +1679,15 @@ function renderSpatialDestinationResults() {
     filter.type = 'button';
     filter.className = 'quiet-button';
     if (entry.type === 'country') {
-      filter.textContent = 'Commons anzeigen';
-      filter.setAttribute('aria-label', `Commons in ${entry.label} anzeigen`);
+      filter.textContent = t('show_commons', 'Commons anzeigen');
+      filter.setAttribute('aria-label', t('show_commons_in', `Commons in ${entry.label} anzeigen`, { label: entry.label }));
       filter.addEventListener('click', () => {
         closeSpatialDestinationResults();
         setCountryFilter(entry.id);
       });
     } else {
-      filter.textContent = 'In der Nähe suchen';
-      filter.setAttribute('aria-label', `Commons in der Nähe von ${entry.label} suchen`);
+      filter.textContent = t('search_nearby', 'In der Nähe suchen');
+      filter.setAttribute('aria-label', t('search_nearby_aria', `Commons in der Nähe von ${entry.label} suchen`, { label: entry.label }));
       filter.addEventListener('click', () => {
         closeSpatialDestinationResults();
         setNearbyFilter(entry.origin);
@@ -1714,10 +1723,10 @@ function navigateToPrivateLocation(origin) {
 
 function useCurrentLocation() {
   if (!navigator.geolocation) {
-    elements.geolocationStatus.textContent = 'Standortbestimmung wird von diesem Browser nicht unterstützt.';
+    elements.geolocationStatus.textContent = t('geolocation_unsupported', 'Standortbestimmung wird von diesem Browser nicht unterstützt.');
     return;
   }
-  elements.geolocationStatus.textContent = 'Standort wird bestimmt …';
+  elements.geolocationStatus.textContent = t('geolocation_loading', 'Standort wird bestimmt …');
   elements.useCurrentLocation.disabled = true;
   navigator.geolocation.getCurrentPosition((position) => {
     elements.useCurrentLocation.disabled = false;
@@ -1726,15 +1735,15 @@ function useCurrentLocation() {
     runtime.state.nearbyOrigin = Object.freeze(origin);
     runtime.state.nearbyRadiusMeters = radius;
     runtime.visibleRecordsCache = null;
-    elements.geolocationStatus.textContent = `Standort verwendet · Umkreis ${Math.round(radius / 1000)} km`;
+    elements.geolocationStatus.textContent = t('geolocation_used', `Standort verwendet · Umkreis ${Math.round(radius / 1000)} km`, { km: Math.round(radius / 1000) });
     renderDiscoveryState();
     writeHistory('push');
     navigateToPrivateLocation(origin);
   }, (error) => {
     elements.useCurrentLocation.disabled = false;
     elements.geolocationStatus.textContent = error?.code === 1
-      ? 'Standortfreigabe wurde nicht erteilt.'
-      : 'Standort konnte nicht bestimmt werden.';
+      ? t('geolocation_denied', 'Standortfreigabe wurde nicht erteilt.')
+      : t('geolocation_failed', 'Standort konnte nicht bestimmt werden.');
   }, { enableHighAccuracy: false, timeout: 10000, maximumAge: 60000 });
 }
 
@@ -1749,23 +1758,23 @@ function directActionLinks(record) {
 
 function resultLocationLabel(record) {
   const publicCount = publicGeographicLocations(record).length;
-  if (publicCount > 0) return publicCount === 1 ? '1 öffentlicher Ort' : String(publicCount) + ' öffentliche Orte';
-  return hasDigitalPresence(record) ? 'Ortsunabhängige digitale Präsenz' : 'Keine öffentliche Geometrie';
+  if (publicCount > 0) return publicCount === 1 ? t('one_public_location', '1 öffentlicher Ort') : t('public_locations', String(publicCount) + ' öffentliche Orte', { count: publicCount });
+  return hasDigitalPresence(record) ? t('location_independent_digital', 'Ortsunabhängige digitale Präsenz') : t('no_public_geometry', 'Keine öffentliche Geometrie');
 }
 
 function resultPresenceLabel(record) {
   const isGeographic = publicGeographicLocations(record).length > 0;
   const isDigital = hasDigitalPresence(record);
-  if (isGeographic && isDigital) return 'Vor Ort + digital';
-  if (isGeographic) return 'Vor Ort';
-  if (isDigital) return 'Digital';
-  return 'Präsenz nicht veröffentlicht';
+  if (isGeographic && isDigital) return t('presence_both', 'Vor Ort + digital');
+  if (isGeographic) return t('presence_geographic', 'Vor Ort');
+  if (isDigital) return t('presence_digital', 'Digital');
+  return t('presence_not_published', 'Präsenz nicht veröffentlicht');
 }
 
 function resultMetaLabel(record) {
-  const parts = [commonsTypeLabel(record), resultPresenceLabel(record)];
+  const parts = [commonsTypeLabel(record, LOCALE), resultPresenceLabel(record)];
   const publicCount = publicGeographicLocations(record).length;
-  if (publicCount > 0) parts.push(publicCount === 1 ? '1 öffentlicher Ort' : String(publicCount) + ' öffentliche Orte');
+  if (publicCount > 0) parts.push(publicCount === 1 ? t('one_public_location', '1 öffentlicher Ort') : t('public_locations', String(publicCount) + ' öffentliche Orte', { count: publicCount }));
   return parts.join(' · ');
 }
 
@@ -1778,7 +1787,7 @@ function createDiscoveryResult(record, position) {
   main.type = 'button';
   main.className = 'discovery-result-main';
   main.dataset.commonprojectId = record.id;
-  main.setAttribute('aria-label', String(position + 1) + '. ' + record.title + ' öffnen');
+  main.setAttribute('aria-label', String(position + 1) + '. ' + t('open_project', `${record.title} öffnen`, { title: record.title }));
 
   const rank = document.createElement('span');
   rank.className = 'discovery-result-rank';
@@ -1821,12 +1830,12 @@ function renderDiscoveryResults() {
   elements.discoveryList.replaceChildren(...preview.map(createDiscoveryResult));
   const total = records.length;
   elements.discoveryCount.textContent = total > preview.length
-    ? `${preview.length} von ${total} Commons als Vorschau`
+    ? t('preview_of_commons', `${preview.length} von ${total} Commons als Vorschau`, { shown: preview.length, total })
     : String(total) + ' Commons';
   elements.discoveryEmpty.hidden = total !== 0;
   elements.discoveryList.hidden = total === 0;
   elements.discoveryShowText.hidden = total <= preview.length;
-  elements.discoveryShowText.textContent = total > preview.length ? `Alle ${total} Treffer in der Textansicht anzeigen` : '';
+  elements.discoveryShowText.textContent = total > preview.length ? t('all_hits_text', `Alle ${total} Treffer in der Textansicht anzeigen`, { count: total }) : '';
 }
 
 function createRuntimeCatalogCard(record) {
@@ -1836,7 +1845,7 @@ function createRuntimeCatalogCard(record) {
   card.dataset.commonprojectId = record.id;
   const kind = document.createElement('p');
   kind.className = 'catalog-kind';
-  kind.textContent = commonsTypeLabel(record) + ' · ' + resultPresenceLabel(record);
+  kind.textContent = commonsTypeLabel(record, LOCALE) + ' · ' + resultPresenceLabel(record);
   const title = document.createElement('h2');
   title.textContent = record.title;
   const summary = document.createElement('p');
@@ -1844,7 +1853,7 @@ function createRuntimeCatalogCard(record) {
   const location = document.createElement('p');
   location.className = 'catalog-location';
   location.textContent = resultLocationLabel(record);
-  const activityNoticeText = recordActivityNotice(record);
+  const activityNoticeText = recordActivityNotice(record, LOCALE);
   const activityNotice = activityNoticeText ? document.createElement('p') : null;
   if (activityNotice) {
     activityNotice.className = 'catalog-activity-notice';
@@ -1857,7 +1866,7 @@ function createRuntimeCatalogCard(record) {
   open.type = 'button';
   open.dataset.commonprojectId = record.id;
   open.setAttribute('aria-pressed', 'false');
-  open.textContent = 'Öffnen';
+  open.textContent = t('open', 'Öffnen');
   open.addEventListener('click', () => selectProject(record.id, { trigger: open, navigateSpatial: true }));
   actions.append(open);
   for (const link of directActionLinks(record)) {
@@ -1880,7 +1889,7 @@ function createRuntimeCatalogCard(record) {
 function geographicSelectionSummary(records) {
   const geographicRecords = records.filter((record) => publicGeographicLocations(record).length > 0);
   if (geographicRecords.length === 0) {
-    return 'Keine räumlich öffentlich belegten Commons in dieser Auswahl. Katalogabdeckung nicht bewertet.';
+    return t('no_spatial_commons', 'Keine räumlich öffentlich belegten Commons in dieser Auswahl. Katalogabdeckung nicht bewertet.');
   }
   const counts = new Map(COMMONS_TYPE_VALUES.map((type) => [type, 0]));
   for (const record of geographicRecords) {
@@ -1889,9 +1898,9 @@ function geographicSelectionSummary(records) {
   }
   const distribution = COMMONS_TYPE_VALUES
     .filter((type) => (counts.get(type) ?? 0) > 0)
-    .map((type) => `${counts.get(type)} ${commonsTypeLabel(type)}`)
+    .map((type) => `${counts.get(type)} ${commonsTypeLabel(type, LOCALE)}`)
     .join(', ');
-  return `${geographicRecords.length} räumlich öffentlich belegte Commons: ${distribution}. Katalogabdeckung nicht bewertet; keine Dichteaussage. Kleine Gruppen oder kleine Filterreste ungefährer Orte werden ohne Zahl und Art zurückgehalten.`;
+  return t('spatial_summary', `${geographicRecords.length} räumlich öffentlich belegte Commons: ${distribution}. Katalogabdeckung nicht bewertet; keine Dichteaussage. Kleine Gruppen oder kleine Filterreste ungefährer Orte werden ohne Zahl und Art zurückgehalten.`, { count: geographicRecords.length, distribution });
 }
 
 function renderTextView() {
@@ -1914,15 +1923,15 @@ function renderTextView() {
   renderDigitalBreadcrumb(elements.textLayerBreadcrumb, elements.textLayerCurrent);
   const total = visible.length;
   const countText = presented.length < total
-    ? `${presented.length} von ${total} Commons angezeigt`
+    ? t('shown_of_commons', `${presented.length} von ${total} Commons angezeigt`, { shown: presented.length, total })
     : String(total) + ' Commons';
   elements.textCount.textContent = `${countText}. ${geographicSelectionSummary(visible)}`;
   elements.textEmpty.hidden = total !== 0;
   elements.textShowMore.hidden = presented.length >= total;
   if (presented.length < total) {
     const increment = Math.min(TEXT_IDENTITY_DOM_LIMIT, total - presented.length);
-    elements.textShowMore.textContent = `Weitere ${increment} Commons anzeigen`;
-    elements.textShowMore.setAttribute('aria-label', `Weitere ${increment} von insgesamt ${total} Commons anzeigen`);
+    elements.textShowMore.textContent = t('more_commons', `Weitere ${increment} Commons anzeigen`, { count: increment });
+    elements.textShowMore.setAttribute('aria-label', t('more_commons_aria', `Weitere ${increment} von insgesamt ${total} Commons anzeigen`, { count: increment, total }));
   }
 }
 
@@ -1979,25 +1988,25 @@ function updateFocusPanel() {
   if (!record) return;
   elements.focusTitle.textContent = record.title;
   elements.focusSummary.textContent = record.summary;
-  elements.focusPresence.textContent = recordPresentationLabel(record);
-  replaceList(elements.focusThemes, record.themes ?? []);
-  replaceList(elements.focusActions, record.actions ?? []);
-  replaceList(elements.focusLocations, recordLocationSummaries(record));
+  elements.focusPresence.textContent = recordPresentationLabel(record, LOCALE);
+  replaceList(elements.focusThemes, (record.themes ?? []).map((theme) => themeLabel(theme, LOCALE)));
+  replaceList(elements.focusActions, (record.actions ?? []).map((action) => actionLabel(action, LOCALE)));
+  replaceList(elements.focusLocations, recordLocationSummaries(record, LOCALE));
   const digital = record?.presence?.digital;
   elements.focusDigital.textContent = digital?.available
-    ? (digital.label ?? 'Digitale Präsenz veröffentlicht')
-    : 'Keine digitale Präsenz veröffentlicht.';
+    ? (digital.label ?? t('digital_presence_published', 'Digitale Präsenz veröffentlicht'))
+    : t('digital_presence_none', 'Keine digitale Präsenz veröffentlicht.');
   const relationLabels = (runtime.catalogProjection?.relations ?? [])
     .filter(({ source_project_id }) => source_project_id === record.id)
     .map(({ relation_type, target_title }) => relation_type === 'chapter-of'
-      ? `Teil von ${target_title}`
+      ? t('relation_chapter_of', `Teil von ${target_title}`, { title: target_title })
       : `${relation_type} · ${target_title}`);
-  replaceList(elements.focusRelations, relationLabels.length ? relationLabels : ['Keine belegte Beziehung veröffentlicht.']);
+  replaceList(elements.focusRelations, relationLabels.length ? relationLabels : [t('relation_none', 'Keine belegte Beziehung veröffentlicht.') ]);
   replaceLinks(elements.focusLinks, record.links ?? []);
   replaceLinks(elements.focusSources, record?.provenance?.sources ?? []);
   elements.focusCuration.textContent = [
-    recordActivityNotice(record),
-    `Redaktionell geprüft am ${record?.curation?.reviewed_at ?? 'unbekannt'}; nächste Prüfung ${record?.curation?.next_review_at ?? 'offen'}.`,
+    recordActivityNotice(record, LOCALE),
+    t('curation_review', `Redaktionell geprüft am ${record?.curation?.reviewed_at ?? 'unbekannt'}; nächste Prüfung ${record?.curation?.next_review_at ?? 'offen'}.`, { reviewed: record?.curation?.reviewed_at ?? t('unknown', 'unbekannt'), next: record?.curation?.next_review_at ?? t('open_date', 'offen') }),
   ].filter(Boolean).join(' ');
 }
 
@@ -2025,8 +2034,8 @@ function renderDiscoveryState() {
   const visible = visibleRecords();
   const count = visible.length;
   elements.globeResults.textContent = count === 0
-    ? 'Keine Commons entsprechen dieser Suche oder Filterauswahl.'
-    : `${count} Commons in der aktuellen Auswahl. ${geographicSelectionSummary(visible)}`;
+    ? t('no_matching_commons', 'Keine Commons entsprechen dieser Suche oder Filterauswahl.')
+    : t('current_selection', `${count} Commons in der aktuellen Auswahl. ${geographicSelectionSummary(visible)}`, { count, summary: geographicSelectionSummary(visible) });
   elements.globeResults.toggleAttribute('data-empty', count === 0);
   elements.search.value = runtime.state.query;
   elements.layerSearch.value = runtime.state.query;
@@ -2955,7 +2964,7 @@ function wireControls() {
     } else {
       runtime.state.nearbyRadiusMeters = radius;
       if (!Array.isArray(runtime.state.nearbyOrigin)) {
-        elements.geolocationStatus.textContent = 'Wähle einen veröffentlichten Ort oder verwende deinen Standort.';
+        elements.geolocationStatus.textContent = t('choose_location', 'Wähle einen veröffentlichten Ort oder verwende deinen Standort.');
       }
     }
     runtime.visibleRecordsCache = null;
@@ -3288,7 +3297,9 @@ async function boot() {
     installFocusOverlapTracking();
     if (navigator.webdriver && ['127.0.0.1', 'localhost'].includes(location.hostname)) {
       window.__commonworldInstallSyntheticRecordsForTest = (records) => {
-        installRecords(validateRecords(records));
+        const synthetic = localizeCatalogRecords(validateRecords(records), LOCALE);
+        runtime.searchAliasesById = synthetic.searchAliasesById;
+        installRecords(synthetic.records);
         runtime.state.project = null;
         runtime.state.layer = null;
         runtime.state.digitalPath = DIGITAL_ROOT_PATH;
@@ -3313,7 +3324,7 @@ async function boot() {
     // The browser therefore does not download the same 41 records a second time.
   } catch (error) {
     console.error(error);
-    setStatus('Commonworld konnte auch den buildgebundenen Katalog nicht lesen.', 'failed');
+    setStatus(t('catalog_bootstrap_failed', 'Commonworld konnte auch den buildgebundenen Katalog nicht lesen.'), 'failed');
     elements.body.dataset.presentation = 'text';
     elements.globeSurface.hidden = true;
     elements.textView.hidden = false;

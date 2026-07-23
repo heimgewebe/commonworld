@@ -1,3 +1,5 @@
+import { COMMONWORLD_EN_LOCALE } from './commonworld-en-locale.mjs';
+
 export const DEFAULT_CAMERA = Object.freeze({
   lng: 8,
   lat: 24,
@@ -26,6 +28,13 @@ export const DIGITAL_ROOT_ID = 'sphere';
 export const DIGITAL_ROOT_PATH = Object.freeze([DIGITAL_ROOT_ID]);
 const DIGITAL_UNCLASSIFIED_NODE_ID = 'unclassified_future_theme';
 const DIGITAL_ID_PATTERN = /^[a-z][a-z0-9_-]{0,95}$/;
+
+
+const normalizedLocale = (locale = 'de') => String(locale ?? 'de').toLowerCase().split('-')[0] === 'en' ? 'en' : 'de';
+const localizedValue = (locale, german, english) => normalizedLocale(locale) === 'en' ? english : german;
+const digitalNodeLabel = (node, locale = 'de') => normalizedLocale(locale) === 'en'
+  ? (COMMONWORLD_EN_LOCALE.taxonomy_labels?.[node?.id] ?? node?.label_de ?? node?.id ?? '')
+  : (node?.label_de ?? node?.id ?? '');
 
 const deepFreeze = (value) => {
   if (!value || typeof value !== 'object' || Object.isFrozen(value)) return value;
@@ -158,10 +167,11 @@ export function hasDigitalPresence(record) {
 
 export const UNKNOWN_ACTIVITY_DISCLOSURE = 'Aktueller Betriebszustand nicht zeitnah verifiziert';
 
-export function recordActivityNotice(record) {
+export function recordActivityNotice(record, locale = 'de') {
   if (record?.activity?.status !== 'unknown') return '';
-  const observedAt = record?.activity?.observed_at ?? 'unbekannt';
-  const nextReviewAt = record?.curation?.next_review_at ?? 'offen';
+  const observedAt = record?.activity?.observed_at ?? localizedValue(locale, 'unbekannt', 'unknown');
+  const nextReviewAt = record?.curation?.next_review_at ?? localizedValue(locale, 'offen', 'open');
+  if (normalizedLocale(locale) === 'en') return `Current operating status has not been verified recently. Sources reviewed on ${observedAt}; priority re-review ${nextReviewAt}.`;
   return `${UNKNOWN_ACTIVITY_DISCLOSURE}. Quellen geprüft am ${observedAt}; priorisierte Nachprüfung ${nextReviewAt}.`;
 }
 
@@ -506,10 +516,12 @@ export function digitalPresentationTreeConstructionCount() {
   return digitalTreeConstructionCount;
 }
 
-export function buildDigitalPresentationTree(records = [], { taxonomy = DIGITAL_TAXONOMY } = {}) {
+export function buildDigitalPresentationTree(records = [], { taxonomy = DIGITAL_TAXONOMY, locale = 'de' } = {}) {
   const sourceRecords = Array.isArray(records) ? records : [];
+  const localeKey = normalizedLocale(locale);
   let treesByTaxonomy = digitalTreeCache.get(sourceRecords);
-  const cached = treesByTaxonomy?.get(taxonomy);
+  let treesByLocale = treesByTaxonomy?.get(taxonomy);
+  const cached = treesByLocale?.get(localeKey);
   if (cached) return cached;
   digitalTreeConstructionCount += 1;
   const nodeMap = digitalNodeMap(taxonomy);
@@ -527,7 +539,7 @@ export function buildDigitalPresentationTree(records = [], { taxonomy = DIGITAL_
       id: node.id,
       nodeId: node.id,
       type: node.type,
-      label: node.label_de,
+      label: digitalNodeLabel(node, localeKey),
       order: node.order,
       path,
       pathKey,
@@ -583,7 +595,7 @@ export function buildDigitalPresentationTree(records = [], { taxonomy = DIGITAL_
       .filter(Boolean);
     const identityChildren = node.children
       .filter((child) => child.type === 'identity')
-      .sort((left, right) => left.label.localeCompare(right.label, 'de') || left.id.localeCompare(right.id));
+      .sort((left, right) => left.label.localeCompare(right.label, localeKey) || left.id.localeCompare(right.id));
     node.children = [...staticChildren, ...identityChildren];
   }
   const frozenNodes = new Map();
@@ -603,7 +615,11 @@ export function buildDigitalPresentationTree(records = [], { taxonomy = DIGITAL_
     treesByTaxonomy = new WeakMap();
     digitalTreeCache.set(sourceRecords, treesByTaxonomy);
   }
-  treesByTaxonomy.set(taxonomy, tree);
+  if (!treesByLocale) {
+    treesByLocale = new Map();
+    treesByTaxonomy.set(taxonomy, treesByLocale);
+  }
+  treesByLocale.set(localeKey, tree);
   return tree;
 }
 
@@ -633,20 +649,20 @@ export function visibleDigitalNodes(tree, currentPath = DIGITAL_ROOT_PATH, { inc
   });
 }
 
-export function digitalPathLabel(path, { taxonomy = DIGITAL_TAXONOMY, includeRoot = false } = {}) {
+export function digitalPathLabel(path, { taxonomy = DIGITAL_TAXONOMY, includeRoot = false, locale = 'de' } = {}) {
   const normalized = normalizeDigitalPath(path, { taxonomy });
   const nodes = digitalNodeMap(taxonomy);
   const labels = normalized.path
     .map((nodeId) => nodes.get(nodeId))
     .filter((node) => node && (includeRoot || node.id !== taxonomy.root_id))
-    .map((node) => node.label_de);
+    .map((node) => digitalNodeLabel(node, locale));
   return labels.join(' › ');
 }
 
-export function recordDigitalPathLabel(record, { taxonomy = DIGITAL_TAXONOMY } = {}) {
+export function recordDigitalPathLabel(record, { taxonomy = DIGITAL_TAXONOMY, locale = 'de' } = {}) {
   const derived = deriveDigitalProjectPath(record, { taxonomy });
   if (!derived) return '';
-  return digitalPathLabel(derived.path, { taxonomy });
+  return digitalPathLabel(derived.path, { taxonomy, locale });
 }
 
 
@@ -757,6 +773,21 @@ export const COMMONS_TYPE_LABELS = Object.freeze({
   other: 'Andere',
 });
 
+
+export const COMMONS_TYPE_LABELS_EN = Object.freeze({
+  knowledge: 'Knowledge and Data',
+  software: 'Software and Infrastructure',
+  culture: 'Culture and Media',
+  'food-seeds': 'Seeds and Food',
+  water: 'Water and Irrigation',
+  energy: 'Energy',
+  'housing-land': 'Land and Housing',
+  'health-care': 'Care and Health',
+  'tools-repair': 'Tools, Repair and Making',
+  'community-network': 'Community Network',
+  other: 'Other',
+});
+
 export const COMMONS_TYPE_COLOR_TOKENS = Object.freeze({
   knowledge: '#56B4E9',
   software: '#0072B2',
@@ -807,9 +838,10 @@ export function deriveCommonsType(record) {
   return matched?.type ?? 'other';
 }
 
-export function commonsTypeLabel(recordOrType) {
+export function commonsTypeLabel(recordOrType, locale = 'de') {
   const type = typeof recordOrType === 'string' ? recordOrType : deriveCommonsType(recordOrType);
-  return COMMONS_TYPE_LABELS[type] ?? COMMONS_TYPE_LABELS.other;
+  const labels = normalizedLocale(locale) === 'en' ? COMMONS_TYPE_LABELS_EN : COMMONS_TYPE_LABELS;
+  return labels[type] ?? labels.other;
 }
 
 
@@ -921,48 +953,48 @@ export const INTENT_SEARCH_RESULT_LIMIT = 50;
 export const INTENT_SEARCH_CACHE_LIMIT = 128;
 
 const ACTION_INTENT_TERMS = Object.freeze({
-  use: Object.freeze(['nutzen', 'verwenden', 'ausprobieren']),
-  learn: Object.freeze(['lernen', 'wissen', 'bildung', 'informieren']),
-  contribute: Object.freeze(['mitmachen', 'beitragen', 'beteiligen']),
-  volunteer: Object.freeze(['ehrenamt', 'ehrenamtlich', 'helfen']),
-  donate: Object.freeze(['spenden', 'unterstützen']),
-  visit: Object.freeze(['besuchen', 'vor ort']),
-  contact: Object.freeze(['kontakt', 'kontaktieren']),
-  replicate: Object.freeze(['nachmachen', 'übertragen', 'gründen']),
-  borrow: Object.freeze(['ausleihen', 'leihen']),
+  use: Object.freeze(['nutzen', 'verwenden', 'ausprobieren', 'use', 'using', 'try']),
+  learn: Object.freeze(['lernen', 'wissen', 'bildung', 'informieren', 'learn', 'knowledge', 'education']),
+  contribute: Object.freeze(['mitmachen', 'beitragen', 'beteiligen', 'contribute', 'participate', 'join']),
+  volunteer: Object.freeze(['ehrenamt', 'ehrenamtlich', 'helfen', 'volunteer', 'help']),
+  donate: Object.freeze(['spenden', 'unterstützen', 'donate', 'support']),
+  visit: Object.freeze(['besuchen', 'vor ort', 'visit', 'on site']),
+  contact: Object.freeze(['kontakt', 'kontaktieren', 'contact']),
+  replicate: Object.freeze(['nachmachen', 'übertragen', 'gründen', 'replicate', 'start one']),
+  borrow: Object.freeze(['ausleihen', 'leihen', 'borrow', 'lend']),
 });
 
 const THEME_INTENT_TERMS = Object.freeze({
-  knowledge: Object.freeze(['wissen']),
-  'open-data': Object.freeze(['offene daten', 'freie daten']),
-  research: Object.freeze(['forschung']),
-  documentation: Object.freeze(['dokumentation']),
-  'free-software': Object.freeze(['freie software']),
+  knowledge: Object.freeze(['wissen', 'knowledge']),
+  'open-data': Object.freeze(['offene daten', 'freie daten', 'open data']),
+  research: Object.freeze(['forschung', 'research']),
+  documentation: Object.freeze(['dokumentation', 'documentation']),
+  'free-software': Object.freeze(['freie software', 'free software']),
   'open-source': Object.freeze(['open source', 'quelloffen']),
-  infrastructure: Object.freeze(['infrastruktur']),
-  platform: Object.freeze(['plattform']),
+  infrastructure: Object.freeze(['infrastruktur', 'infrastructure']),
+  platform: Object.freeze(['plattform', 'platform']),
   'open-media': Object.freeze(['offene medien', 'freie medien']),
-  culture: Object.freeze(['kultur']),
+  culture: Object.freeze(['kultur', 'culture']),
   archives: Object.freeze(['archive', 'archiv']),
   'creative-commons': Object.freeze(['creative commons', 'freie inhalte']),
-  education: Object.freeze(['bildung']),
+  education: Object.freeze(['bildung', 'education']),
   'open-educational-resources': Object.freeze(['freie bildungsmaterialien', 'offene lernmaterialien']),
-  learning: Object.freeze(['lernen']),
-  communication: Object.freeze(['kommunikation']),
+  learning: Object.freeze(['lernen', 'learning']),
+  communication: Object.freeze(['kommunikation', 'communication']),
   'community-network': Object.freeze(['gemeinschaftsnetz', 'community netz']),
   federation: Object.freeze(['föderation', 'föderiert']),
   protocol: Object.freeze(['protokoll']),
-  housing: Object.freeze(['wohnen', 'wohnraum']),
+  housing: Object.freeze(['wohnen', 'wohnraum', 'housing']),
   'community-land': Object.freeze(['gemeinschaftsland', 'gemeinschaftlicher boden']),
   'shared-space': Object.freeze(['gemeinschaftsraum', 'gemeinsamer raum']),
-  agriculture: Object.freeze(['landwirtschaft']),
-  seeds: Object.freeze(['saatgut']),
-  food: Object.freeze(['ernährung', 'lebensmittel']),
-  water: Object.freeze(['wasser']),
-  irrigation: Object.freeze(['bewässerung']),
-  energy: Object.freeze(['energie']),
+  agriculture: Object.freeze(['landwirtschaft', 'agriculture']),
+  seeds: Object.freeze(['saatgut', 'seeds']),
+  food: Object.freeze(['ernährung', 'lebensmittel', 'food']),
+  water: Object.freeze(['wasser', 'water']),
+  irrigation: Object.freeze(['bewässerung', 'irrigation']),
+  energy: Object.freeze(['energie', 'energy']),
   'renewable-energy': Object.freeze(['erneuerbare energie']),
-  health: Object.freeze(['gesundheit']),
+  health: Object.freeze(['gesundheit', 'health']),
   'open-knowledge': Object.freeze(['offenes wissen']),
   'software-infrastructure': Object.freeze(['software infrastruktur']),
   'open-hardware': Object.freeze(['offene hardware']),
@@ -972,17 +1004,17 @@ const THEME_INTENT_TERMS = Object.freeze({
   'community-ownership': Object.freeze(['gemeinschaftseigentum']),
   cooperative: Object.freeze(['genossenschaft']),
   'civic-tech': Object.freeze(['civic tech', 'digitale selbstorganisation']),
-  network: Object.freeze(['netzwerk']),
+  network: Object.freeze(['netzwerk', 'network']),
   'rural-infrastructure': Object.freeze(['ländliche infrastruktur']),
   'digital-equity': Object.freeze(['digitaler zugang']),
   'digital-literacy': Object.freeze(['digitale bildung']),
 });
 
 const PRESENCE_INTENT_TERMS = Object.freeze({
-  digital: Object.freeze(['digital', 'online', 'ortsunabhängig']),
-  geographic: Object.freeze(['geografisch', 'vor ort', 'lokal']),
+  digital: Object.freeze(['digital', 'online', 'ortsunabhängig', 'location independent']),
+  geographic: Object.freeze(['geografisch', 'vor ort', 'lokal', 'geographic', 'on site', 'local']),
 });
-const COMBINED_PRESENCE_INTENT_TERMS = Object.freeze(['beides', 'vor ort und digital']);
+const COMBINED_PRESENCE_INTENT_TERMS = Object.freeze(['beides', 'vor ort und digital', 'both', 'on site and digital']);
 
 const FIELD_WEIGHTS = Object.freeze({
   title: 120,
@@ -998,7 +1030,7 @@ const FIELD_WEIGHTS = Object.freeze({
 
 export function normalizeSearchText(value) {
   return String(value ?? '')
-    .toLocaleLowerCase('de')
+    .toLocaleLowerCase()
     .replace(/ß/g, 'ss')
     .normalize('NFKD')
     .replace(/\p{M}+/gu, '')
@@ -1261,7 +1293,7 @@ function freezeSearchResult(result) {
   });
 }
 
-export function prepareIntentSearchIndex(records, { cacheLimit = INTENT_SEARCH_CACHE_LIMIT } = {}) {
+export function prepareIntentSearchIndex(records, { cacheLimit = INTENT_SEARCH_CACHE_LIMIT, searchAliasesById = new Map() } = {}) {
   const sourceRecords = Array.isArray(records) ? records : [];
   const recordsById = new Map(sourceRecords.map((record) => [record.id, record]));
   const postings = new Map();
@@ -1272,7 +1304,10 @@ export function prepareIntentSearchIndex(records, { cacheLimit = INTENT_SEARCH_C
 
   for (const record of sourceRecords) {
     normalizedTitles.set(record.id, normalizeSearchText(record.title));
-    for (const { field, reason, values } of recordSearchFields(record)) {
+    const alias = searchAliasesById?.get?.(record.id);
+    const searchFields = recordSearchFields(record);
+    if (alias) searchFields.push({ field: 'summary', reason: 'translation-alias', values: [alias] });
+    for (const { field, reason, values } of searchFields) {
       const weight = FIELD_WEIGHTS[field] ?? 1;
       const uniqueTokens = new Set(values.flatMap(searchTokens));
       for (const token of uniqueTokens) {
@@ -1403,14 +1438,14 @@ export function filterRecords(records, state = {}) {
   });
 }
 
-export function recordPresentationLabel(record) {
+export function recordPresentationLabel(record, locale = 'de') {
   const isGeo = publicGeographicLocations(record).length > 0;
   const isDigital = hasDigitalPresence(record);
-  const pathLabel = recordDigitalPathLabel(record);
+  const pathLabel = recordDigitalPathLabel(record, { locale });
   const digitalLabel = `Digital${pathLabel ? ` · ${pathLabel}` : ''}`;
 
-  if (isGeo && isDigital) return `Vor Ort · ${digitalLabel}`;
-  if (isGeo) return 'Vor Ort';
+  if (isGeo && isDigital) return `${localizedValue(locale, 'Vor Ort', 'On site')} · ${digitalLabel}`;
+  if (isGeo) return localizedValue(locale, 'Vor Ort', 'On site');
   if (isDigital) return digitalLabel;
   return 'Commons';
 }
@@ -2234,15 +2269,17 @@ function formattedUncertainty(meters) {
   return `${Math.round(value)} m`;
 }
 
-export function recordLocationSummaries(record) {
+export function recordLocationSummaries(record, locale = 'de') {
   const locations = Array.isArray(record?.presence?.geographic) ? record.presence.geographic : [];
   return locations.map((location) => {
-    const label = location?.label ?? 'Ort';
-    if (location?.mode === 'hidden') return `${label} · Ort verborgen`;
-    if (location?.mode === 'approximate') return `${label} · ungefähr, mindestens ${formattedUncertainty(location.uncertainty_meters_min)} Unschärfe`;
+    const label = location?.label ?? localizedValue(locale, 'Ort', 'Location');
+    if (location?.mode === 'hidden') return `${label} · ${localizedValue(locale, 'Ort verborgen', 'location hidden')}`;
+    if (location?.mode === 'approximate') return normalizedLocale(locale) === 'en'
+      ? `${label} · approximate, at least ${formattedUncertainty(location.uncertainty_meters_min)} uncertainty`
+      : `${label} · ungefähr, mindestens ${formattedUncertainty(location.uncertainty_meters_min)} Unschärfe`;
     const type = location?.geometry?.type;
-    if (type === 'Polygon' || type === 'MultiPolygon') return `${label} · öffentliche Fläche`;
-    return `${label} · exakter öffentlicher Punkt`;
+    if (type === 'Polygon' || type === 'MultiPolygon') return `${label} · ${localizedValue(locale, 'öffentliche Fläche', 'public area')}`;
+    return `${label} · ${localizedValue(locale, 'exakter öffentlicher Punkt', 'exact public point')}`;
   });
 }
 
@@ -2259,26 +2296,26 @@ function spatialIdentityCount(records) {
   return (Array.isArray(records) ? records : []).filter((record) => publicGeographicLocations(record).length > 0).length;
 }
 
-function focusSpatialSummary(record) {
+function focusSpatialSummary(record, locale = 'de') {
   const locations = Array.isArray(record?.presence?.geographic) ? record.presence.geographic : [];
   const publicLocations = publicGeographicLocations(record);
   const isGeo = publicLocations.length > 0;
   const isDigital = hasDigitalPresence(record);
-  if (isDigital && locations.length === 0) return 'Digital · Ortsunabhängige digitale Präsenz';
+  if (isDigital && locations.length === 0) return localizedValue(locale, 'Digital · Ortsunabhängige digitale Präsenz', 'Digital · Location-independent digital presence');
 
   const visible = publicLocations.length;
   const hidden = locations.filter((location) => location?.mode === 'hidden').length;
 
   let presenceLabel = 'Commons';
-  if (isGeo && isDigital) presenceLabel = 'Vor Ort · Digital';
-  else if (isGeo) presenceLabel = 'Vor Ort';
+  if (isGeo && isDigital) presenceLabel = localizedValue(locale, 'Vor Ort · Digital', 'On site · Digital');
+  else if (isGeo) presenceLabel = localizedValue(locale, 'Vor Ort', 'On site');
   else if (isDigital) presenceLabel = 'Digital';
-  else if (hidden > 0) presenceLabel = 'Verborgene Orte';
+  else if (hidden > 0) presenceLabel = localizedValue(locale, 'Verborgene Orte', 'Hidden locations');
 
-  if (visible === 0) return `${presenceLabel} · ${hidden} ${hidden === 1 ? 'verborgener Ort' : 'verborgene Orte'}`;
+  if (visible === 0) return `${presenceLabel} · ${hidden} ${hidden === 1 ? localizedValue(locale, 'verborgener Ort', 'hidden location') : localizedValue(locale, 'verborgene Orte', 'hidden locations')}`;
 
-  const publicLabel = `${visible} ${visible === 1 ? 'öffentlicher Ort' : 'öffentliche Orte'}`;
-  const hiddenLabel = `${hidden} ${hidden === 1 ? 'verborgener Ort' : 'verborgene Orte'}`;
+  const publicLabel = `${visible} ${visible === 1 ? localizedValue(locale, 'öffentlicher Ort', 'public location') : localizedValue(locale, 'öffentliche Orte', 'public locations')}`;
+  const hiddenLabel = `${hidden} ${hidden === 1 ? localizedValue(locale, 'verborgener Ort', 'hidden location') : localizedValue(locale, 'verborgene Orte', 'hidden locations')}`;
   return hidden ? `${presenceLabel} · ${publicLabel} · ${hiddenLabel}` : `${presenceLabel} · ${publicLabel}`;
 }
 
@@ -2287,6 +2324,7 @@ export function semanticLocationLine({
   records = [],
   selectedProjectId = null,
   selectedRecord = null,
+  locale = 'de',
 } = {}) {
   const selected = selectedProjectId
     ? (selectedRecord?.id === selectedProjectId
@@ -2297,16 +2335,17 @@ export function semanticLocationLine({
   if (selected) {
     return {
       level,
-      crumbs: ['Erde', 'Commons', selected.title ?? selected.id],
-      summary: focusSpatialSummary(selected),
+      crumbs: [localizedValue(locale, 'Erde', 'Earth'), 'Commons', selected.title ?? selected.id],
+      summary: focusSpatialSummary(selected, locale),
     };
   }
   const count = spatialIdentityCount(records);
-  const countLabel = `${count} räumlich belegte Commons`;
-  if (level === 'planet') return { level, crumbs: ['Erde', 'Gesamtansicht'], summary: countLabel };
-  if (level === 'macroregion') return { level, crumbs: ['Erde', 'Großregion'], summary: `${countLabel} · regionale Zusammenhänge` };
-  if (level === 'region') return { level, crumbs: ['Erde', 'Region'], summary: `${countLabel} · öffentliche Flächen und ungefähre Orte` };
-  return { level, crumbs: ['Erde', 'Lokaler Zusammenhang'], summary: `${countLabel} · öffentliche Punkte, Flächen und Beziehungen` };
+  const countLabel = normalizedLocale(locale) === 'en' ? `${count} spatially evidenced Commons` : `${count} räumlich belegte Commons`;
+  const earth = localizedValue(locale, 'Erde', 'Earth');
+  if (level === 'planet') return { level, crumbs: [earth, localizedValue(locale, 'Gesamtansicht', 'Overview')], summary: countLabel };
+  if (level === 'macroregion') return { level, crumbs: [earth, localizedValue(locale, 'Großregion', 'Macroregion')], summary: `${countLabel} · ${localizedValue(locale, 'regionale Zusammenhänge', 'regional contexts')}` };
+  if (level === 'region') return { level, crumbs: [earth, localizedValue(locale, 'Region', 'Region')], summary: `${countLabel} · ${localizedValue(locale, 'öffentliche Flächen und ungefähre Orte', 'public areas and approximate locations')}` };
+  return { level, crumbs: [earth, localizedValue(locale, 'Lokaler Zusammenhang', 'Local context')], summary: `${countLabel} · ${localizedValue(locale, 'öffentliche Punkte, Flächen und Beziehungen', 'public points, areas and relationships')}` };
 }
 
 const HORIZON_BEARINGS = Object.freeze([0, 45, 90, 135, 180, 225, 270, 315]);

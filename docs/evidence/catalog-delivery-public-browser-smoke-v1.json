@@ -47,6 +47,11 @@
       "verdict": "PASS"
     },
     {
+      "id": "locale-german",
+      "verdict": "PASS",
+      "crossLanguageSearch": true
+    },
+    {
       "id": "intent-search-discovery",
       "verdict": "PASS",
       "indexedRecords": 50,
@@ -71,7 +76,7 @@
       "filterButtonHeight": 44,
       "ringAnimationName": "none",
       "ringTransform": "none",
-      "ringTextWidth": 210.34375,
+      "ringTextWidth": 238.140625,
       "ringTextHeight": 10,
       "ringTextFontSize": 17,
       "countryRendered": 1
@@ -115,7 +120,7 @@
     {
       "id": "layer-journey-moveend-return",
       "verdict": "PASS",
-      "elapsedMs": 1531
+      "elapsedMs": 1753
     },
     {
       "id": "layer-journey-interrupted",
@@ -169,11 +174,11 @@
         "overlapArea": 0,
         "controlGap": 9.1875,
         "layerControl": {
-          "left": 455.765625,
+          "left": 465.0625,
           "top": 70.390625,
           "right": 603.8125,
           "bottom": 114.390625,
-          "width": 148.046875,
+          "width": 138.75,
           "height": 44
         },
         "zoomControl": {
@@ -213,14 +218,15 @@
   "schema_version": 1,
   "kind": "commonworld_catalog_delivery_public_browser_smoke_evidence",
   "binding": {
-    "smoke_script_sha256": "6d6c7aeb6e020a1475fdc7239ce0113553950f31fa1c1789069d5fc09eda8572",
+    "smoke_script_sha256": "920178535dad32ac8b918b72bbd4ccb9c34ae8ed82e04eacee424fa3579ea36e",
     "smoke_runner_sha256": "522b99b70b1d0064b1d0a31a3a67fdc9a2e73b7408f37d1a4bb303bc360b7556",
-    "first_party_surface_sha256": "4e0d1501944b75dc01cd11cd86d1bc81556a9d1ff27e864502be73721647f826",
+    "first_party_surface_sha256": "7c9de7042850b162829e88a69b8d3ca68b7d23167278a988f992d120939bb466",
     "scenario_ids": [
       "startup-and-ring-orbits",
       "ring-orbits-reduced-motion",
       "synthetic-digital-performance",
       "normal",
+      "locale-german",
       "intent-search-discovery",
       "spatial-discovery-filters",
       "android-globe-ui-alignment",

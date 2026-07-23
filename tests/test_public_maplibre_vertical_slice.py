@@ -20,7 +20,9 @@ class PublicMapLibreVerticalSliceTests(unittest.TestCase):
         target_root = Path(temporary_directory)
         paths = set(REQUIRED_FILES) | {
             Path("scripts/render_public_shell.py"),
+            Path("scripts/commonworld_i18n.py"),
             Path("scripts/__init__.py"),
+            Path("catalog/locales/en.json"),
         }
         manifest = json.loads((ROOT / "catalog/catalog.json").read_text(encoding="utf-8"))
         paths.update(Path("catalog") / relative for relative in manifest["project_files"])
@@ -342,7 +344,7 @@ function after() { return false; }
         with tempfile.TemporaryDirectory() as directory:
             root = self.copy_slice(directory)
             path = root / "index.html"
-            path.write_text(path.read_text(encoding="utf-8").replace("Commons direkt durchsuchen", "Andere Überschrift", 1), encoding="utf-8")
+            path.write_text(path.read_text(encoding="utf-8").replace("Browse Commons directly", "Different heading", 1), encoding="utf-8")
             errors = validate_public_maplibre_vertical_slice(root)
         self.assertTrue(any("deterministic catalog-derived shell" in error for error in errors))
 

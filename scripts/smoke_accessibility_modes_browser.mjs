@@ -325,7 +325,7 @@ async function forcedColorsProposalScenario() {
   });
   assert(errorState.role === 'alert' && errorState.focused, `proposal forced colors: validation alert did not receive semantic focus ${JSON.stringify(errorState)}`);
   assert(errorState.borderStyle !== 'none' && errorState.borderWidth >= 2, `proposal forced colors: validation alert lacks a structural boundary ${JSON.stringify(errorState)}`);
-  assert(errorState.text.includes('Bitte korrigieren'), `proposal forced colors: validation message missing ${JSON.stringify(errorState)}`);
+  assert(errorState.text.includes('Please correct'), `proposal forced colors: validation message missing ${JSON.stringify(errorState)}`);
 
   assert(run.pageErrors.length === 0, `proposal forced colors: page errors ${run.pageErrors.join(' | ')}`);
   scenarios.push({ id: 'forced-colors-proposal-keyboard', verdict: 'PASS', initialFocusables: initialCount, geographicFocusables: enabledCount });
