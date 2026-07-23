@@ -276,6 +276,7 @@ function init() {
   }
 
   geographicToggle.addEventListener("change", syncGeographicFields);
+  form.addEventListener("reset", () => window.setTimeout(syncGeographicFields, 0));
   syncGeographicFields();
 
   function validateCurrent() {

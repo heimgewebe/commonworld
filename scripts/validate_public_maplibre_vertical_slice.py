@@ -14,6 +14,7 @@ ROOT = Path(__file__).resolve().parents[1]
 if str(ROOT) not in sys.path:
     sys.path.insert(0, str(ROOT))
 
+from scripts.commonworld_geo import publicly_mappable
 from scripts.render_public_shell import render_shell
 from scripts.validate_canonical_plan import validate_browser_smoke_contract
 
@@ -328,58 +329,6 @@ def _catalog_records(root: Path, manifest: dict) -> list[dict]:
     return records
 
 
-def _valid_position(value: object) -> bool:
-    return (
-        isinstance(value, list)
-        and len(value) == 2
-        and all(isinstance(number, (int, float)) and not isinstance(number, bool) for number in value)
-        and -180 <= value[0] <= 180
-        and -90 <= value[1] <= 90
-    )
-
-
-def _valid_ring(value: object) -> bool:
-    return (
-        isinstance(value, list)
-        and len(value) >= 4
-        and all(_valid_position(position) for position in value)
-        and value[0] == value[-1]
-    )
-
-
-def _publicly_mappable(record: dict) -> bool:
-    presence = record.get("presence", {}) if isinstance(record.get("presence"), dict) else {}
-    locations = presence.get("geographic", [])
-    if not isinstance(locations, list):
-        return False
-    for location in locations:
-        if not isinstance(location, dict) or location.get("mode") == "hidden":
-            continue
-        geometry = location.get("geometry")
-        if not isinstance(geometry, dict):
-            continue
-        geometry_type = geometry.get("type")
-        coordinates = geometry.get("coordinates")
-        valid_geometry = (
-            (geometry_type == "Point" and _valid_position(coordinates))
-            or (geometry_type == "Polygon" and isinstance(coordinates, list) and bool(coordinates) and all(_valid_ring(ring) for ring in coordinates))
-            or (
-                geometry_type == "MultiPolygon"
-                and isinstance(coordinates, list)
-                and bool(coordinates)
-                and all(isinstance(polygon, list) and bool(polygon) and all(_valid_ring(ring) for ring in polygon) for polygon in coordinates)
-            )
-        )
-        if not valid_geometry:
-            continue
-        if location.get("mode") == "approximate":
-            uncertainty = location.get("uncertainty_meters_min")
-            if geometry_type != "Point" or not isinstance(uncertainty, (int, float)) or isinstance(uncertainty, bool) or uncertainty <= 0:
-                continue
-        if location.get("mode") in {"exact", "approximate"}:
-            return True
-    return False
-
 
 def validate_public_maplibre_vertical_slice(root: Path = ROOT) -> list[str]:
     errors: list[str] = []
@@ -642,7 +591,7 @@ def validate_public_maplibre_vertical_slice(root: Path = ROOT) -> list[str]:
         "cross_surface_identities": 0,
     }
     for record in records:
-        globe_eligible = _publicly_mappable(record)
+        globe_eligible = publicly_mappable(record)
         digital_eligible = record.get("presence", {}).get("digital", {}).get("available") is True
         if globe_eligible:
             projection_coverage["globe_eligible_identities"] += 1

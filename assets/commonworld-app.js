@@ -537,7 +537,7 @@ function createRibbonSegment(record, copyIndex) {
   segment.className = 'digital-ribbon-item';
   segment.dataset.commonprojectId = record.id;
   segment.dataset.ribbonCopy = String(copyIndex);
-  segment.setAttribute('aria-label', t('open_project', `${record.title} öffnen`, { title: record.title }));
+  segment.setAttribute('aria-label', t('open_project', '{title} öffnen', { title: record.title }));
   if (copyIndex > 0) segment.setAttribute('tabindex', '-1');
   const name = document.createElement('span');
   name.className = 'digital-ribbon-name';
@@ -600,7 +600,7 @@ function renderLayerDeck() {
     scroller.dataset.digitalPath = node.pathKey;
     scroller.tabIndex = 0;
     scroller.setAttribute('role', 'region');
-    scroller.setAttribute('aria-label', t('horizontal_scroll', `${node.label} horizontal durchblättern`, { label: node.label }));
+    scroller.setAttribute('aria-label', t('horizontal_scroll', '{label} horizontal durchblättern', { label: node.label }));
     const content = document.createElement('div');
     content.className = 'digital-lane-content';
     const repeats = identityLevel ? 1 : ribbonRepeatCount(records.length, 10);
@@ -614,7 +614,7 @@ function renderLayerDeck() {
       const status = document.createElement('p');
       status.className = 'identity-presentation-status';
       status.setAttribute('role', 'status');
-      status.textContent = t('shown_of_commons', `${shown} von ${node.identityCount} Commons angezeigt`, { shown, total: node.identityCount });
+      status.textContent = t('shown_of_commons', '{shown} von {total} Commons angezeigt', { shown, total: node.identityCount });
       lane.append(status);
       if (shown < node.identityCount) {
         const more = document.createElement('button');
@@ -622,8 +622,8 @@ function renderLayerDeck() {
         more.className = 'quiet-button identity-show-more';
         more.dataset.digitalPath = node.pathKey;
         const increment = Math.min(DIGITAL_IDENTITY_DOM_LIMIT, node.identityCount - shown);
-        more.textContent = t('show_more', `Weitere ${increment} anzeigen`, { count: increment });
-        more.setAttribute('aria-label', t('show_more_in_bundle', `Weitere ${increment} Commons in ${node.label} anzeigen`, { count: increment, label: node.label }));
+        more.textContent = t('show_more', 'Weitere {count} anzeigen', { count: increment });
+        more.setAttribute('aria-label', t('show_more_in_bundle', 'Weitere {count} Commons in {label} anzeigen', { count: increment, label: node.label }));
         more.addEventListener('click', () => {
           runtime.identityPresentationLimit += DIGITAL_IDENTITY_DOM_LIMIT;
           renderDiscoveryState();
@@ -1669,7 +1669,7 @@ function renderSpatialDestinationResults() {
     primary.type = 'button';
     primary.className = 'quiet-button';
     primary.textContent = t('show_on_globe', 'Auf Globus zeigen');
-    primary.setAttribute('aria-label', t('show_on_globe_aria', `${entry.label} auf dem Globus zeigen`, { label: entry.label }));
+    primary.setAttribute('aria-label', t('show_on_globe_aria', '{label} auf dem Globus zeigen', { label: entry.label }));
     primary.addEventListener('click', () => {
       closeSpatialDestinationResults();
       if (entry.type === 'country') navigateToCountry(entry.id);
@@ -1680,14 +1680,14 @@ function renderSpatialDestinationResults() {
     filter.className = 'quiet-button';
     if (entry.type === 'country') {
       filter.textContent = t('show_commons', 'Commons anzeigen');
-      filter.setAttribute('aria-label', t('show_commons_in', `Commons in ${entry.label} anzeigen`, { label: entry.label }));
+      filter.setAttribute('aria-label', t('show_commons_in', 'Commons in {label} anzeigen', { label: entry.label }));
       filter.addEventListener('click', () => {
         closeSpatialDestinationResults();
         setCountryFilter(entry.id);
       });
     } else {
       filter.textContent = t('search_nearby', 'In der Nähe suchen');
-      filter.setAttribute('aria-label', t('search_nearby_aria', `Commons in der Nähe von ${entry.label} suchen`, { label: entry.label }));
+      filter.setAttribute('aria-label', t('search_nearby_aria', 'Commons in der Nähe von {label} suchen', { label: entry.label }));
       filter.addEventListener('click', () => {
         closeSpatialDestinationResults();
         setNearbyFilter(entry.origin);
@@ -1735,7 +1735,7 @@ function useCurrentLocation() {
     runtime.state.nearbyOrigin = Object.freeze(origin);
     runtime.state.nearbyRadiusMeters = radius;
     runtime.visibleRecordsCache = null;
-    elements.geolocationStatus.textContent = t('geolocation_used', `Standort verwendet · Umkreis ${Math.round(radius / 1000)} km`, { km: Math.round(radius / 1000) });
+    elements.geolocationStatus.textContent = t('geolocation_used', 'Standort verwendet · Umkreis {km} km', { km: Math.round(radius / 1000) });
     renderDiscoveryState();
     writeHistory('push');
     navigateToPrivateLocation(origin);
@@ -1758,7 +1758,7 @@ function directActionLinks(record) {
 
 function resultLocationLabel(record) {
   const publicCount = publicGeographicLocations(record).length;
-  if (publicCount > 0) return publicCount === 1 ? t('one_public_location', '1 öffentlicher Ort') : t('public_locations', String(publicCount) + ' öffentliche Orte', { count: publicCount });
+  if (publicCount > 0) return publicCount === 1 ? t('one_public_location', '1 öffentlicher Ort') : t('public_locations', '{count} öffentliche Orte', { count: publicCount });
   return hasDigitalPresence(record) ? t('location_independent_digital', 'Ortsunabhängige digitale Präsenz') : t('no_public_geometry', 'Keine öffentliche Geometrie');
 }
 
@@ -1774,7 +1774,7 @@ function resultPresenceLabel(record) {
 function resultMetaLabel(record) {
   const parts = [commonsTypeLabel(record, LOCALE), resultPresenceLabel(record)];
   const publicCount = publicGeographicLocations(record).length;
-  if (publicCount > 0) parts.push(publicCount === 1 ? t('one_public_location', '1 öffentlicher Ort') : t('public_locations', String(publicCount) + ' öffentliche Orte', { count: publicCount }));
+  if (publicCount > 0) parts.push(publicCount === 1 ? t('one_public_location', '1 öffentlicher Ort') : t('public_locations', '{count} öffentliche Orte', { count: publicCount }));
   return parts.join(' · ');
 }
 
@@ -1787,7 +1787,7 @@ function createDiscoveryResult(record, position) {
   main.type = 'button';
   main.className = 'discovery-result-main';
   main.dataset.commonprojectId = record.id;
-  main.setAttribute('aria-label', String(position + 1) + '. ' + t('open_project', `${record.title} öffnen`, { title: record.title }));
+  main.setAttribute('aria-label', String(position + 1) + '. ' + t('open_project', '{title} öffnen', { title: record.title }));
 
   const rank = document.createElement('span');
   rank.className = 'discovery-result-rank';
@@ -1830,12 +1830,12 @@ function renderDiscoveryResults() {
   elements.discoveryList.replaceChildren(...preview.map(createDiscoveryResult));
   const total = records.length;
   elements.discoveryCount.textContent = total > preview.length
-    ? t('preview_of_commons', `${preview.length} von ${total} Commons als Vorschau`, { shown: preview.length, total })
+    ? t('preview_of_commons', '{shown} von {total} Commons als Vorschau', { shown: preview.length, total })
     : String(total) + ' Commons';
   elements.discoveryEmpty.hidden = total !== 0;
   elements.discoveryList.hidden = total === 0;
   elements.discoveryShowText.hidden = total <= preview.length;
-  elements.discoveryShowText.textContent = total > preview.length ? t('all_hits_text', `Alle ${total} Treffer in der Textansicht anzeigen`, { count: total }) : '';
+  elements.discoveryShowText.textContent = total > preview.length ? t('all_hits_text', 'Alle {count} Treffer in der Textansicht anzeigen', { count: total }) : '';
 }
 
 function createRuntimeCatalogCard(record) {
@@ -1900,7 +1900,7 @@ function geographicSelectionSummary(records) {
     .filter((type) => (counts.get(type) ?? 0) > 0)
     .map((type) => `${counts.get(type)} ${commonsTypeLabel(type, LOCALE)}`)
     .join(', ');
-  return t('spatial_summary', `${geographicRecords.length} räumlich öffentlich belegte Commons: ${distribution}. Katalogabdeckung nicht bewertet; keine Dichteaussage. Kleine Gruppen oder kleine Filterreste ungefährer Orte werden ohne Zahl und Art zurückgehalten.`, { count: geographicRecords.length, distribution });
+  return t('spatial_summary', '{count} räumlich öffentlich belegte Commons: {distribution}. Katalogabdeckung nicht bewertet; keine Dichteaussage. Kleine Gruppen oder kleine Filterreste ungefährer Orte werden ohne Zahl und Art zurückgehalten.', { count: geographicRecords.length, distribution });
 }
 
 function renderTextView() {
@@ -1923,15 +1923,15 @@ function renderTextView() {
   renderDigitalBreadcrumb(elements.textLayerBreadcrumb, elements.textLayerCurrent);
   const total = visible.length;
   const countText = presented.length < total
-    ? t('shown_of_commons', `${presented.length} von ${total} Commons angezeigt`, { shown: presented.length, total })
+    ? t('shown_of_commons', '{shown} von {total} Commons angezeigt', { shown: presented.length, total })
     : String(total) + ' Commons';
   elements.textCount.textContent = `${countText}. ${geographicSelectionSummary(visible)}`;
   elements.textEmpty.hidden = total !== 0;
   elements.textShowMore.hidden = presented.length >= total;
   if (presented.length < total) {
     const increment = Math.min(TEXT_IDENTITY_DOM_LIMIT, total - presented.length);
-    elements.textShowMore.textContent = t('more_commons', `Weitere ${increment} Commons anzeigen`, { count: increment });
-    elements.textShowMore.setAttribute('aria-label', t('more_commons_aria', `Weitere ${increment} von insgesamt ${total} Commons anzeigen`, { count: increment, total }));
+    elements.textShowMore.textContent = t('more_commons', 'Weitere {count} Commons anzeigen', { count: increment });
+    elements.textShowMore.setAttribute('aria-label', t('more_commons_aria', 'Weitere {count} von insgesamt {total} Commons anzeigen', { count: increment, total }));
   }
 }
 
@@ -1999,14 +1999,14 @@ function updateFocusPanel() {
   const relationLabels = (runtime.catalogProjection?.relations ?? [])
     .filter(({ source_project_id }) => source_project_id === record.id)
     .map(({ relation_type, target_title }) => relation_type === 'chapter-of'
-      ? t('relation_chapter_of', `Teil von ${target_title}`, { title: target_title })
+      ? t('relation_chapter_of', 'Teil von {title}', { title: target_title })
       : `${relation_type} · ${target_title}`);
   replaceList(elements.focusRelations, relationLabels.length ? relationLabels : [t('relation_none', 'Keine belegte Beziehung veröffentlicht.') ]);
   replaceLinks(elements.focusLinks, record.links ?? []);
   replaceLinks(elements.focusSources, record?.provenance?.sources ?? []);
   elements.focusCuration.textContent = [
     recordActivityNotice(record, LOCALE),
-    t('curation_review', `Redaktionell geprüft am ${record?.curation?.reviewed_at ?? 'unbekannt'}; nächste Prüfung ${record?.curation?.next_review_at ?? 'offen'}.`, { reviewed: record?.curation?.reviewed_at ?? t('unknown', 'unbekannt'), next: record?.curation?.next_review_at ?? t('open_date', 'offen') }),
+    t('curation_review', 'Redaktionell geprüft am {reviewed}; nächste Prüfung {next}.', { reviewed: record?.curation?.reviewed_at ?? t('unknown', 'unbekannt'), next: record?.curation?.next_review_at ?? t('open_date', 'offen') }),
   ].filter(Boolean).join(' ');
 }
 
@@ -2035,7 +2035,7 @@ function renderDiscoveryState() {
   const count = visible.length;
   elements.globeResults.textContent = count === 0
     ? t('no_matching_commons', 'Keine Commons entsprechen dieser Suche oder Filterauswahl.')
-    : t('current_selection', `${count} Commons in der aktuellen Auswahl. ${geographicSelectionSummary(visible)}`, { count, summary: geographicSelectionSummary(visible) });
+    : t('current_selection', '{count} Commons in der aktuellen Auswahl. {summary}', { count, summary: geographicSelectionSummary(visible) });
   elements.globeResults.toggleAttribute('data-empty', count === 0);
   elements.search.value = runtime.state.query;
   elements.layerSearch.value = runtime.state.query;

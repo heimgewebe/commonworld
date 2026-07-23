@@ -38,6 +38,23 @@ class InternationalizationTests(unittest.TestCase):
         catalog_ids = {record["id"] for record in load_records(ROOT)}
         self.assertEqual(catalog_ids, set(overlay["projects"]))
 
+
+    def test_geographic_overlay_is_bound_to_stable_location_ids(self) -> None:
+        canonical = load_records(ROOT)
+        target = next(record for record in canonical if record["id"] == "fucvam")
+        target["presence"]["geographic"] = list(reversed(target["presence"]["geographic"]))
+        localized = localize_records(canonical, "en", ROOT)
+        translated = next(record for record in localized if record["id"] == "fucvam")
+        labels = {location["id"]: location["label"] for location in translated["presence"]["geographic"]}
+        overlay = json.loads((ROOT / "catalog/locales/en.json").read_text(encoding="utf-8"))
+        self.assertEqual(labels, overlay["projects"]["fucvam"]["geographic_labels"])
+
+    def test_english_overlay_preserves_meaningful_source_labels(self) -> None:
+        canonical = load_records(ROOT)
+        localized = localize_records(canonical, "en", ROOT)
+        debian = next(record for record in localized if record["id"] == "debian")
+        self.assertTrue(debian["provenance"]["sources"][0]["label"].startswith("About Debian · "))
+
     def test_english_is_default_static_surface_and_german_remains_available(self) -> None:
         english = render_shell(ROOT, "en")
         german = render_shell(ROOT, "de")

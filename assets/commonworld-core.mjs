@@ -1089,11 +1089,19 @@ export function publicGeographicRepresentationKind(location) {
   return null;
 }
 
+// Catalog record facts are immutable for one runtime boot; cache validation by record identity.
+const publicGeographicLocationsCache = new WeakMap();
+
 export function publicGeographicLocations(record) {
+  if (!record || typeof record !== 'object') return [];
+  const cached = publicGeographicLocationsCache.get(record);
+  if (cached) return cached;
   const locations = record?.presence?.geographic;
-  return Array.isArray(locations)
+  const publicLocations = Object.freeze(Array.isArray(locations)
     ? locations.filter((location) => publicGeographicRepresentationKind(location) !== null)
-    : [];
+    : []);
+  publicGeographicLocationsCache.set(record, publicLocations);
+  return publicLocations;
 }
 
 function spatialGeometryPolygons(geometry) {

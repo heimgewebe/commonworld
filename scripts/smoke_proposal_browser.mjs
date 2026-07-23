@@ -136,6 +136,24 @@ html { font-size: ${profile.fontScale}% !important; }
 
 {
   const context = await browser.newContext({ viewport: { width: 1024, height: 768 }, reducedMotion: 'reduce' });
+  const page = await context.newPage();
+  await page.goto(`${baseUrl}/propose.html`, { waitUntil: 'networkidle' });
+  await fillValid(page, 'Reset Sync Test Commons');
+  const geographic = page.getByRole('checkbox', { name: 'On site', exact: true });
+  const region = page.locator('input[name="region"]');
+  assert(await geographic.isChecked(), 'reset-sync: geographic presence was not enabled before reset');
+  assert(!(await region.isDisabled()), 'reset-sync: region was disabled before reset');
+  await page.locator('#commons-proposal-form').evaluate((form) => form.reset());
+  await page.waitForFunction(() => document.querySelector('input[name="region"]')?.disabled === true);
+  assert(!(await geographic.isChecked()), 'reset-sync: geographic checkbox did not reset');
+  assert(await region.isDisabled(), 'reset-sync: region did not resynchronize after native form reset');
+  assert(await region.getAttribute('required') === null, 'reset-sync: region remained required after native form reset');
+  results.push('native-reset-resynchronizes-geographic-fields');
+  await context.close();
+}
+
+{
+  const context = await browser.newContext({ viewport: { width: 1024, height: 768 }, reducedMotion: 'reduce' });
   await context.addInitScript(() => { window.open = () => null; });
   const page = await context.newPage();
   await page.goto(`${baseUrl}/propose.html`, { waitUntil: 'networkidle' });
