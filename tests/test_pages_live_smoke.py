@@ -17,6 +17,7 @@ from scripts.smoke_pages_live import (
     MIN_BODY_BYTES,
     PROPOSAL_REQUIRED_TOKENS,
     REQUIRED_TOKENS,
+    ROOT,
     fetch_live_url,
     validate_catalog_fetch,
     validate_live_fetch,
@@ -200,6 +201,14 @@ class PagesLiveSmokeTests(unittest.TestCase):
         with self.assertRaisesRegex(ValueError, "retry_count must be 0 or 1"):
             fetch_live_url("https://commonworld.net/", retry_count=2)
 
+    def test_live_smoke_tokens_match_committed_default_surfaces(self) -> None:
+        index = (ROOT / "index.html").read_text(encoding="utf-8")
+        proposal = (ROOT / "propose.html").read_text(encoding="utf-8")
+        for token in REQUIRED_TOKENS:
+            self.assertIn(token, index)
+        for token in PROPOSAL_REQUIRED_TOKENS:
+            self.assertIn(token, proposal)
+
     def test_canonical_shell_passes(self) -> None:
         fetch = LiveFetch(
             requested_url="https://commonworld.net/",
@@ -223,7 +232,7 @@ class PagesLiveSmokeTests(unittest.TestCase):
         self.assertEqual([], validate_proposal_fetch(fetch))
 
     def test_public_proposal_page_missing_no_auto_publish_fails(self) -> None:
-        body = "\n".join(token for token in PROPOSAL_REQUIRED_TOKENS if token != "nicht automatisch veröffentlicht")
+        body = "\n".join(token for token in PROPOSAL_REQUIRED_TOKENS if token != "not published automatically")
         body += " " * max(0, 8_010 - len(body.encode("utf-8")))
         fetch = LiveFetch(
             requested_url="https://commonworld.net/propose.html",
@@ -232,7 +241,7 @@ class PagesLiveSmokeTests(unittest.TestCase):
             content_type="text/html; charset=utf-8",
             body=body,
         )
-        self.assertIn("live proposal page missing token: nicht automatisch veröffentlicht", validate_proposal_fetch(fetch))
+        self.assertIn("live proposal page missing token: not published automatically", validate_proposal_fetch(fetch))
 
     def test_public_catalog_passes(self) -> None:
         fetch = LiveFetch(
