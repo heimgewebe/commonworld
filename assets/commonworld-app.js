@@ -457,7 +457,7 @@ function appendRingSequence(textPath, records, { prefix = '' } = {}) {
   }
   for (const record of records) {
     const name = createSvgElement('tspan', { class: 'sphere-ring-name', 'data-commonproject-id': record.id });
-    name.textContent = `  ${record.title}  `;
+    name.textContent = `\u00A0\u00A0${record.title}`;
     textPath.append(name);
   }
 }
@@ -2988,8 +2988,8 @@ function wireControls() {
     const identifier = runtime.countryNavigationId;
     if (!identifier) return;
     hideCountryNavigationContext();
-    openDiscovery({ trigger: elements.filterToggle });
     setCountryFilter(identifier);
+    openDiscovery({ trigger: elements.filterToggle });
   });
   elements.countryNavigationClose.addEventListener('click', hideCountryNavigationContext);
   elements.discoveryClose.addEventListener('click', () => closeDiscovery({ restoreFocus: true }));

@@ -915,6 +915,7 @@ async function layerJourneyScenario({ mobile = false, viewportOverride = null, t
   const overviewRibbons = await run.page.evaluate(() => ({
     rings: document.querySelectorAll('.sphere-ring-text').length,
     names: [...document.querySelectorAll('.sphere-ring-name')].map((node) => node.textContent.trim()).filter(Boolean),
+    labels: [...document.querySelectorAll('.sphere-ring-label')].map((node) => node.textContent.trim()).filter(Boolean),
     binaryCount: document.querySelectorAll('.sphere-ring-binary').length,
   }));
   assert(overviewRibbons.rings === expectedDigitalProjection.fields.length, `layer journey: overview does not contain all text rings (${JSON.stringify(overviewRibbons)})`);
@@ -922,6 +923,9 @@ async function layerJourneyScenario({ mobile = false, viewportOverride = null, t
     ringPreviewIds.map((identifier) => expectedDigitalProjection.titleById[identifier]),
   );
   assertSameIds(overviewRibbons.names, expectedOverviewNames, 'layer journey: preview ring Commons name set');
+  const expectedOverviewLabels = expectedDigitalProjection.fields.map(({ label, count }) => `${label} · ${count}`);
+  assertSameIds(overviewRibbons.labels, expectedOverviewLabels, 'layer journey: overview ring category labels');
+  assert(overviewRibbons.labels.length === expectedDigitalProjection.fields.length, `layer journey: overview rings do not expose exactly one readable category label each (${JSON.stringify(overviewRibbons.labels)})`);
   assert(overviewRibbons.binaryCount === 0, `layer journey: decorative binary text remains in the rings (${JSON.stringify(overviewRibbons)})`);
   await waitForSphereOpacitySettled(run.page);
   const opacityBefore = Number(await run.page.locator('#digital-sphere').evaluate((node) => getComputedStyle(node).opacity));
@@ -1204,6 +1208,8 @@ async function layerJourneyScenario({ mobile = false, viewportOverride = null, t
           textOverflow: focusStyle.textOverflow,
           clientWidth: focusLabel?.clientWidth ?? 0,
           scrollWidth: focusLabel?.scrollWidth ?? 0,
+          clientHeight: focusLabel?.clientHeight ?? 0,
+          scrollHeight: focusLabel?.scrollHeight ?? 0,
         },
         primary: primary.map((item) => ({
           id: item.dataset.commonprojectId,
@@ -1233,10 +1239,11 @@ async function layerJourneyScenario({ mobile = false, viewportOverride = null, t
   assert(ribbonView.lanes.every(({ scrollWidth, clientWidth }) => scrollWidth > clientWidth + 20), `layer journey: at least one lane is not horizontally scrollable (${JSON.stringify(ribbonView.lanes)})`);
   assert(ribbonView.lanes.every(({ overflowX }) => ['auto', 'scroll'].includes(overflowX)), `layer journey: native horizontal overflow is disabled (${JSON.stringify(ribbonView.lanes)})`);
   assert(ribbonView.lanes.every(({ touchAction }) => touchAction.includes('pan-x')), `layer journey: touch panning is not explicitly horizontal (${JSON.stringify(ribbonView.lanes)})`);
-  assert(ribbonView.lanes.every(({ category }) => category.label && category.whiteSpace !== 'nowrap' && category.textOverflow !== 'ellipsis' && category.scrollWidth <= category.clientWidth + 1), `layer journey: category labels are clipped instead of fully readable (${JSON.stringify(ribbonView.lanes.map(({ layer, category }) => ({ layer, category })))})`);
+  assert(ribbonView.lanes.every(({ category }) => category.label && category.whiteSpace !== 'nowrap' && category.textOverflow !== 'ellipsis' && category.scrollWidth <= category.clientWidth + 1 && category.scrollHeight <= category.clientHeight + 1), `layer journey: category labels are clipped instead of fully readable (${JSON.stringify(ribbonView.lanes.map(({ layer, category }) => ({ layer, category })))})`);
   for (const lane of ribbonView.lanes) {
     const expectedLayer = expectedDigitalProjection.fields.find(({ id }) => id === lane.layer);
     assert(expectedLayer, `layer journey: rendered unknown lane ${lane.layer}`);
+    assert(lane.category.label === expectedLayer.label, `layer journey: category label is abbreviated or differs from the canonical label (${lane.layer}: ${JSON.stringify(lane.category.label)} vs ${JSON.stringify(expectedLayer.label)})`);
     assertSameIds(lane.primary.map(({ id }) => id), expectedLayer.previewIds, `layer journey: ${lane.layer} preview identity set`);
   }
   const primarySegments = ribbonView.lanes.flatMap(({ primary }) => primary);

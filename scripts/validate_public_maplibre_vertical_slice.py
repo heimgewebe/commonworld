@@ -992,7 +992,7 @@ def validate_public_maplibre_vertical_slice(root: Path = ROOT) -> list[str]:
     if digital_surface.get("side_view_visual") != "hierarchical_ring_bundle_lanes_after_text_sphere_flight":
         errors.append("public digital-sphere side-layer visual mismatch")
     for key, expected in {
-        "overview_ring_content": "commons_names_only",
+        "overview_ring_content": "category_label_and_identity_count_then_commons_names",
         "progressive_disclosure": "current_node_direct_children_and_parent_breadcrumb_only",
         "parent_identity_sets_equal_child_union": True,
         "primary_child_identity_sets_disjoint": True,

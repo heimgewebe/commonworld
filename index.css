@@ -1824,8 +1824,9 @@ html[data-input-modality="pointer"] :focus {
   font-weight: 720;
   line-height: 1.25;
   letter-spacing: 0.018em;
-  overflow-wrap: break-word;
+  overflow-wrap: anywhere;
   white-space: normal;
+  hyphens: auto;
 }
 
 .digital-lane-focus small {
