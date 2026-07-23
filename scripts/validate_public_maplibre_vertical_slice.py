@@ -674,9 +674,15 @@ def validate_public_maplibre_vertical_slice(root: Path = ROOT) -> list[str]:
     for identifier in identifiers:
         if identifier in app or identifier in core:
             errors.append(f"public runtime code hardcodes catalog identity instead of loading it: {identifier}")
-    for token in ("renderSphereRibbons(runtime.records);", "renderLayerDeck();", "binaryName(record.title)", "ribbonRepeatCount(records.length, 10)"):
+    for token in ("renderSphereRibbons(runtime.records);", "renderLayerDeck();", "ribbonRepeatCount(records.length, 10)"):
         if token not in app:
             errors.append(f"public runtime must use the tested text-ribbon lane architecture: {token}")
+    for token in ("binaryName(record.title)", "sphere-ring-binary", "digital-ribbon-binary"):
+        if token in app or token in css:
+            errors.append(f"public text-ribbon surfaces must not render decorative binary text: {token}")
+    for token in ("Binärcode", "Binärcodes"):
+        if token in html:
+            errors.append(f"public digital-sphere copy must not imply binary-code content: {token}")
     if re.search(r"cooperativeGestures\s*:\s*true", app):
         errors.append("public mobile globe must allow one-finger touch movement; cooperativeGestures may not be enabled")
 
@@ -986,7 +992,7 @@ def validate_public_maplibre_vertical_slice(root: Path = ROOT) -> list[str]:
     if digital_surface.get("side_view_visual") != "hierarchical_ring_bundle_lanes_after_text_sphere_flight":
         errors.append("public digital-sphere side-layer visual mismatch")
     for key, expected in {
-        "overview_ring_content": "commons_name_then_utf8_binary_name",
+        "overview_ring_content": "category_label_and_identity_count_then_commons_names",
         "progressive_disclosure": "current_node_direct_children_and_parent_breadcrumb_only",
         "parent_identity_sets_equal_child_union": True,
         "primary_child_identity_sets_disjoint": True,

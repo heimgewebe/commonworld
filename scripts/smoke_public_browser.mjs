@@ -915,14 +915,18 @@ async function layerJourneyScenario({ mobile = false, viewportOverride = null, t
   const overviewRibbons = await run.page.evaluate(() => ({
     rings: document.querySelectorAll('.sphere-ring-text').length,
     names: [...document.querySelectorAll('.sphere-ring-name')].map((node) => node.textContent.trim()).filter(Boolean),
-    binaries: [...document.querySelectorAll('.sphere-ring-binary')].map((node) => node.textContent.trim()).filter(Boolean),
+    labels: [...document.querySelectorAll('.sphere-ring-label')].map((node) => node.textContent.trim()).filter(Boolean),
+    binaryCount: document.querySelectorAll('.sphere-ring-binary').length,
   }));
   assert(overviewRibbons.rings === expectedDigitalProjection.fields.length, `layer journey: overview does not contain all text rings (${JSON.stringify(overviewRibbons)})`);
   const expectedOverviewNames = expectedDigitalProjection.fields.flatMap(({ ringPreviewIds }) =>
     ringPreviewIds.map((identifier) => expectedDigitalProjection.titleById[identifier]),
   );
   assertSameIds(overviewRibbons.names, expectedOverviewNames, 'layer journey: preview ring Commons name set');
-  assert(overviewRibbons.binaries.some((value) => /^(?:[01]{8})(?: [01]{8})*$/.test(value)), 'layer journey: real bytewise binary names are missing from the rings');
+  const expectedOverviewLabels = expectedDigitalProjection.fields.map(({ label, count }) => `${label} · ${count}`);
+  assertSameIds(overviewRibbons.labels, expectedOverviewLabels, 'layer journey: overview ring category labels');
+  assert(overviewRibbons.labels.length === expectedDigitalProjection.fields.length, `layer journey: overview rings do not expose exactly one readable category label each (${JSON.stringify(overviewRibbons.labels)})`);
+  assert(overviewRibbons.binaryCount === 0, `layer journey: decorative binary text remains in the rings (${JSON.stringify(overviewRibbons)})`);
   await waitForSphereOpacitySettled(run.page);
   const opacityBefore = Number(await run.page.locator('#digital-sphere').evaluate((node) => getComputedStyle(node).opacity));
   const ratioBefore = Number(await stage.getAttribute('data-globe-viewport-ratio'));
@@ -1188,6 +1192,8 @@ async function layerJourneyScenario({ mobile = false, viewportOverride = null, t
     const sphere = document.querySelector('#digital-sphere').getBoundingClientRect();
     const lanes = [...document.querySelectorAll('.digital-lane[data-layer-id]')].map((lane) => {
       const scroller = lane.querySelector('.digital-lane-scroll');
+      const focusLabel = lane.querySelector('.digital-lane-focus span');
+      const focusStyle = getComputedStyle(focusLabel);
       const primary = [...lane.querySelectorAll('.digital-ribbon-item[data-ribbon-copy="0"]')];
       return {
         layer: lane.dataset.layerId,
@@ -1196,10 +1202,18 @@ async function layerJourneyScenario({ mobile = false, viewportOverride = null, t
         scrollWidth: scroller.scrollWidth,
         overflowX: getComputedStyle(scroller).overflowX,
         touchAction: getComputedStyle(scroller).touchAction,
+        category: {
+          label: focusLabel?.textContent ?? '',
+          whiteSpace: focusStyle.whiteSpace,
+          textOverflow: focusStyle.textOverflow,
+          clientWidth: focusLabel?.clientWidth ?? 0,
+          scrollWidth: focusLabel?.scrollWidth ?? 0,
+          clientHeight: focusLabel?.clientHeight ?? 0,
+          scrollHeight: focusLabel?.scrollHeight ?? 0,
+        },
         primary: primary.map((item) => ({
           id: item.dataset.commonprojectId,
           name: item.querySelector('.digital-ribbon-name')?.textContent ?? '',
-          binary: item.querySelector('.digital-ribbon-binary')?.textContent ?? '',
           height: item.getBoundingClientRect().height,
           hidden: item.hidden,
         })),
@@ -1212,6 +1226,7 @@ async function layerJourneyScenario({ mobile = false, viewportOverride = null, t
       ringCount: document.querySelectorAll('.sphere-ring-text').length,
       ringNameCount: document.querySelectorAll('.sphere-ring-name').length,
       ringBinaryCount: document.querySelectorAll('.sphere-ring-binary').length,
+      ribbonBinaryCount: document.querySelectorAll('.digital-ribbon-binary').length,
       lanes,
       filterChildren: document.querySelector('#layer-buttons').childElementCount,
     };
@@ -1219,21 +1234,24 @@ async function layerJourneyScenario({ mobile = false, viewportOverride = null, t
   assert(ribbonView.sphere.width > ribbonView.viewport.width * 2, `layer journey: camera did not pass through an enlarged text sphere (${JSON.stringify(ribbonView.sphere)})`);
   assert(ribbonView.sphere.left < -ribbonView.viewport.width * 0.7, `layer journey: enlarged sphere did not move into a side approach (${JSON.stringify(ribbonView.sphere)})`);
   assert(ribbonView.sphereOpacity <= 0.1, `layer journey: enlarged sphere obscures the lane surface (${ribbonView.sphereOpacity})`);
-  assert(ribbonView.ringCount === expectedDigitalProjection.fields.length && ribbonView.ringNameCount > 0 && ribbonView.ringBinaryCount > 0, `layer journey: text-ring identity was lost during the flight (${JSON.stringify(ribbonView)})`);
+  assert(ribbonView.ringCount === expectedDigitalProjection.fields.length && ribbonView.ringNameCount > 0 && ribbonView.ringBinaryCount === 0, `layer journey: ring names were lost or decorative binary text remains (${JSON.stringify(ribbonView)})`);
   assert(ribbonView.lanes.length === expectedDigitalProjection.fields.length && ribbonView.lanes.every(({ displayed }) => displayed), `layer journey: multi-lane overview does not show all layers (${JSON.stringify(ribbonView.lanes)})`);
   assert(ribbonView.lanes.every(({ scrollWidth, clientWidth }) => scrollWidth > clientWidth + 20), `layer journey: at least one lane is not horizontally scrollable (${JSON.stringify(ribbonView.lanes)})`);
   assert(ribbonView.lanes.every(({ overflowX }) => ['auto', 'scroll'].includes(overflowX)), `layer journey: native horizontal overflow is disabled (${JSON.stringify(ribbonView.lanes)})`);
   assert(ribbonView.lanes.every(({ touchAction }) => touchAction.includes('pan-x')), `layer journey: touch panning is not explicitly horizontal (${JSON.stringify(ribbonView.lanes)})`);
+  assert(ribbonView.lanes.every(({ category }) => category.label && category.whiteSpace !== 'nowrap' && category.textOverflow !== 'ellipsis' && category.scrollWidth <= category.clientWidth + 1 && category.scrollHeight <= category.clientHeight + 1), `layer journey: category labels are clipped instead of fully readable (${JSON.stringify(ribbonView.lanes.map(({ layer, category }) => ({ layer, category })))})`);
   for (const lane of ribbonView.lanes) {
     const expectedLayer = expectedDigitalProjection.fields.find(({ id }) => id === lane.layer);
     assert(expectedLayer, `layer journey: rendered unknown lane ${lane.layer}`);
+    assert(lane.category.label === expectedLayer.label, `layer journey: category label is abbreviated or differs from the canonical label (${lane.layer}: ${JSON.stringify(lane.category.label)} vs ${JSON.stringify(expectedLayer.label)})`);
     assertSameIds(lane.primary.map(({ id }) => id), expectedLayer.previewIds, `layer journey: ${lane.layer} preview identity set`);
   }
   const primarySegments = ribbonView.lanes.flatMap(({ primary }) => primary);
   const expectedPreviewIds = expectedDigitalProjection.fields.flatMap(({ previewIds }) => previewIds);
   assert(primarySegments.length === expectedPreviewIds.length, `layer journey: primary preview identities were duplicated or lost (${primarySegments.length})`);
   assertSameIds(primarySegments.map(({ id }) => id), expectedPreviewIds, 'layer journey: primary digital preview identity set');
-  assert(primarySegments.every(({ name, binary, height }) => name && /^(?:[01]{8})(?: [01]{8})*$/.test(binary) && height >= 44), `layer journey: name/binary pairs or touch heights are invalid (${JSON.stringify(primarySegments)})`);
+  assert(primarySegments.every(({ name, height }) => name && height >= 44), `layer journey: Commons names or touch heights are invalid (${JSON.stringify(primarySegments)})`);
+  assert(ribbonView.ribbonBinaryCount === 0, `layer journey: decorative binary text remains in the digital lanes (${ribbonView.ribbonBinaryCount})`);
   assert(ribbonView.filterChildren === expectedDigitalProjection.fields.length, `layer journey: search surface does not contain all layer filters (${ribbonView.filterChildren})`);
 
   const firstScroller = run.page.locator('.digital-lane-scroll').first();
@@ -1273,6 +1291,8 @@ async function layerJourneyScenario({ mobile = false, viewportOverride = null, t
       breadcrumb: [...document.querySelectorAll('#layer-breadcrumb .digital-breadcrumb-item')].map((node) => ({ text: node.textContent.trim(), current: node.getAttribute('aria-current') })),
       clientWidth: scroller?.clientWidth ?? 0,
       scrollWidth: scroller?.scrollWidth ?? 0,
+      overflowX: scroller ? getComputedStyle(scroller).overflowX : '',
+      touchAction: scroller ? getComputedStyle(scroller).touchAction : '',
       ids: [...document.querySelectorAll('.digital-ribbon-item[data-ribbon-copy="0"]')].map((node) => node.dataset.commonprojectId),
     };
   });
@@ -1280,11 +1300,17 @@ async function layerJourneyScenario({ mobile = false, viewportOverride = null, t
   assert(focusedLane.focusedPath === 'sphere/knowledge_learning_culture/open_knowledge_data', `layer journey: focused path data attribute mismatch (${JSON.stringify(focusedLane)})`);
   assert(focusedLane.breadcrumb.at(-1)?.current === 'page' && focusedLane.breadcrumb.map(({ text }) => text).includes('Wissen, Lernen und Kultur'), `layer journey: breadcrumb did not expose parent context (${JSON.stringify(focusedLane.breadcrumb)})`);
   assertSameIds(focusedLane.ids, expectedDigitalProjection.nodes['sphere/knowledge_learning_culture/open_knowledge_data'].identityIds, 'layer journey: identity-level direct Commons');
-  assert(focusedLane.scrollWidth > focusedLane.clientWidth + 20, `layer journey: focused lane is not horizontally scrollable (${JSON.stringify(focusedLane)})`);
+  assert(['auto', 'scroll'].includes(focusedLane.overflowX), `layer journey: focused lane lost native horizontal overflow (${JSON.stringify(focusedLane)})`);
+  assert(focusedLane.touchAction.includes('pan-x'), `layer journey: focused lane lost horizontal touch panning (${JSON.stringify(focusedLane)})`);
   const focusedScroller = run.page.locator('.digital-lane[data-layer-id="open_knowledge_data"] .digital-lane-scroll');
   await focusedScroller.evaluate((node) => { node.scrollTo({ left: Math.min(node.scrollWidth - node.clientWidth, Math.max(160, node.clientWidth * 0.7)), behavior: 'instant' }); });
   await run.page.waitForTimeout(180);
-  assert((await focusedScroller.evaluate((node) => node.scrollLeft)) > 20, 'layer journey: single-lane horizontal scroll did not move');
+  const focusedScrollLeft = await focusedScroller.evaluate((node) => node.scrollLeft);
+  if (focusedLane.scrollWidth > focusedLane.clientWidth + 1) {
+    assert(focusedScrollLeft > 0, `layer journey: overflowing focused lane did not scroll (${JSON.stringify(focusedLane)})`);
+  } else {
+    assert(focusedScrollLeft === 0, `layer journey: fully fitting focused lane gained artificial overflow (${JSON.stringify(focusedLane)})`);
+  }
 
   await run.page.locator('#layer-search-toggle').click();
   assert(await run.page.locator('#layer-discovery').isVisible(), 'layer journey: search/filter magnifier did not open');
@@ -1853,6 +1879,35 @@ async function spatialDiscoveryFiltersScenario() {
   await run.page.waitForFunction((countryId) => new URL(location.href).searchParams.get('country') === countryId, firstCountry.id);
   assert((await run.page.locator('#filter-toggle-count').textContent()) === '1', 'spatial discovery: country filter count badge is wrong');
   assert(await run.page.locator('#active-filter-chips button').count() === 1, 'spatial discovery: country filter chip missing');
+  const countryFilterUiState = await run.page.evaluate(() => {
+    const panel = document.querySelector('#discovery-panel');
+    const chip = document.querySelector('#active-filter-chips .active-filter-chip');
+    const button = chip?.querySelector('button');
+    const panelStyle = panel ? getComputedStyle(panel) : null;
+    const buttonStyle = button ? getComputedStyle(button) : null;
+    const buttonRect = button?.getBoundingClientRect();
+    return {
+      panelHidden: panel?.hidden ?? null,
+      panelDisplay: panelStyle?.display ?? null,
+      panelVisibility: panelStyle?.visibility ?? null,
+      chipCount: document.querySelectorAll('#active-filter-chips .active-filter-chip').length,
+      buttonDisplay: buttonStyle?.display ?? null,
+      buttonVisibility: buttonStyle?.visibility ?? null,
+      buttonWidth: buttonRect?.width ?? 0,
+      buttonHeight: buttonRect?.height ?? 0,
+    };
+  });
+  assert(
+    countryFilterUiState.panelHidden === false
+      && countryFilterUiState.panelDisplay !== 'none'
+      && countryFilterUiState.panelVisibility !== 'hidden'
+      && countryFilterUiState.chipCount === 1
+      && countryFilterUiState.buttonDisplay !== 'none'
+      && countryFilterUiState.buttonVisibility !== 'hidden'
+      && countryFilterUiState.buttonWidth >= 43.5
+      && countryFilterUiState.buttonHeight >= 43.5,
+    `spatial discovery: country filter did not reopen with a visible removable chip (${JSON.stringify(countryFilterUiState)})`,
+  );
   await run.page.locator('#active-filter-chips button').click();
   await run.page.waitForFunction(() => !new URL(location.href).searchParams.has('country'));
 

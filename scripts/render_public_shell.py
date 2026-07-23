@@ -302,7 +302,7 @@ def render_shell(root: Path = ROOT) -> str:
         <figure class="globe-stage" aria-labelledby="globe-caption" data-runtime-state="loading" data-visual-ready="false" data-view-phase="overview" data-map-renders="0" data-overlay-renders="0">
           <div id="map" class="globe-map" role="region" aria-label="Interaktiver Commonworld-Globus"></div>
           <svg id="digital-sphere" class="digital-sphere" viewBox="0 0 640 640" role="group" aria-labelledby="sphere-title">
-            <title id="sphere-title">Digitale Commons-Sphäre aus Namen und deren Binärcode</title>
+            <title id="sphere-title">Digitale Commons-Sphäre aus Namen und Kategorien</title>
             <defs>
               <radialGradient id="sphere-center-fade">
                 <stop offset="0%" stop-color="black" />
@@ -357,7 +357,7 @@ def render_shell(root: Path = ROOT) -> str:
 
           <aside id="layer-panel" class="layer-panel" aria-labelledby="layer-title" hidden>
             <h2 id="layer-title" class="visually-hidden">Digitale Commons aus der Nähe</h2>
-            <p class="visually-hidden">Dieselben digitalen Commons erscheinen als hierarchische Ringbündel mit direktem Elternpfad, Namen und Binärcodes.</p>
+            <p class="visually-hidden">Dieselben digitalen Commons erscheinen als hierarchische Ringbündel mit direktem Elternpfad und Namen.</p>
             <div class="layer-panel-controls">
               <button id="layer-search-toggle" class="icon-button layer-search-toggle" type="button" aria-label="Commons suchen und Ringbündel filtern" aria-controls="layer-discovery" aria-expanded="false">⌕</button>
               <button id="layer-close" class="icon-button layer-close" type="button" aria-label="Zur Globusansicht zurückkehren">×</button>

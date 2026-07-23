@@ -71,7 +71,7 @@
       "filterButtonHeight": 44,
       "ringAnimationName": "none",
       "ringTransform": "none",
-      "ringTextWidth": 772.234375,
+      "ringTextWidth": 210.34375,
       "ringTextHeight": 10,
       "ringTextFontSize": 17,
       "countryRendered": 1
@@ -115,7 +115,7 @@
     {
       "id": "layer-journey-moveend-return",
       "verdict": "PASS",
-      "elapsedMs": 1558
+      "elapsedMs": 1531
     },
     {
       "id": "layer-journey-interrupted",
@@ -213,9 +213,9 @@
   "schema_version": 1,
   "kind": "commonworld_catalog_delivery_public_browser_smoke_evidence",
   "binding": {
-    "smoke_script_sha256": "597a2096c8857350796a3bb84c83c79365aaabe3d77c16de30068a3451bc84f9",
+    "smoke_script_sha256": "6d6c7aeb6e020a1475fdc7239ce0113553950f31fa1c1789069d5fc09eda8572",
     "smoke_runner_sha256": "522b99b70b1d0064b1d0a31a3a67fdc9a2e73b7408f37d1a4bb303bc360b7556",
-    "first_party_surface_sha256": "3fd8749c6e4275005d8e6d5db8c9e0edad3ed7ad06c1a97b486504e6918e7d5c",
+    "first_party_surface_sha256": "4e0d1501944b75dc01cd11cd86d1bc81556a9d1ff27e864502be73721647f826",
     "scenario_ids": [
       "startup-and-ring-orbits",
       "ring-orbits-reduced-motion",
