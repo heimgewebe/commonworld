@@ -2993,12 +2993,13 @@ function wireControls() {
     const container = elements.spatialDestinationSearch.closest('.spatial-destination-search');
     if (container && !container.contains(event.target)) closeSpatialDestinationResults();
   });
-  elements.countryFilterAction.addEventListener('click', () => {
+  elements.countryFilterAction.addEventListener('click', (event) => {
+    event.stopPropagation();
     const identifier = runtime.countryNavigationId;
     if (!identifier) return;
     hideCountryNavigationContext();
     setCountryFilter(identifier);
-    openDiscovery({ trigger: elements.filterToggle });
+    queueMicrotask(() => openDiscovery({ trigger: elements.filterToggle }));
   });
   elements.countryNavigationClose.addEventListener('click', hideCountryNavigationContext);
   elements.discoveryClose.addEventListener('click', () => closeDiscovery({ restoreFocus: true }));

@@ -26,20 +26,20 @@ RETRYABLE_HTTP_STATUSES = frozenset({429, 500, 502, 503, 504})
 CATALOG_RELATIVE_URL = "catalog/catalog.json"
 PROPOSAL_RELATIVE_URL = "propose.html"
 PROPOSAL_REQUIRED_TOKENS = (
-    "<title>Commonworld — Commons vorschlagen</title>",
+    "<title>Commonworld — Suggest a Commons</title>",
     "id=\"commons-proposal-form\"",
     "id=\"proposal-status\"",
     "id=\"proposal-download\"",
     "./assets/commonworld-proposal.js",
     "./contracts/commonworld/editorial-review.contract.json",
-    "nicht automatisch veröffentlicht",
+    "not published automatically",
 )
 _EXPECTED_CATALOG = json.loads((ROOT / CATALOG_RELATIVE_URL).read_text(encoding="utf-8"))
 EXPECTED_CATALOG_PROJECT_FILES = tuple(_EXPECTED_CATALOG["project_files"])
 EXPECTED_CATALOG_ENTRY_COUNT = int(_EXPECTED_CATALOG["entry_count"])
 
 REQUIRED_TOKENS = (
-    "<title>commonworld — Commons entdecken</title>",
+    "<title>commonworld — Discover Commons</title>",
     'class="topbar"',
     'id="commons-search"',
     'id="settings-toggle"',
@@ -487,7 +487,7 @@ def run_live_smoke(
     if parse_errors:
         raise RuntimeError("live Pages smoke failed:\n- " + "\n- ".join(parse_errors))
     return PagesLiveSmokeReceipt(
-        smoke_id="commonworld.pages-live.globe-first-and-proposal.v8",
+        smoke_id="commonworld.pages-live.globe-first-and-proposal.v9",
         requested_url=page.requested_url,
         final_url=page.final_url,
         status=page.status,
