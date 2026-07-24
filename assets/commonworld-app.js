@@ -1601,15 +1601,8 @@ function hideCountryNavigationContext() {
   elements.countryNavigationContext.hidden = true;
 }
 
-function navigateToCountry(identifier) {
-  const entry = runtime.countryEntries.get(identifier);
-  if (!entry) return false;
-  prepareGlobeForPublicNavigation();
-  showCountryNavigationContext(entry);
-  if (!runtime.mapReady) {
-    runtime.pendingCountryNavigationId = identifier;
-    return true;
-  }
+function fitMapToCountry(entry) {
+  if (!entry || !runtime.mapReady) return false;
   runtime.pendingCountryNavigationId = null;
   const bounds = geometryBounds(entry.feature.geometry);
   if (!bounds) return false;
@@ -1623,6 +1616,18 @@ function navigateToCountry(identifier) {
     essential: false,
   });
   return true;
+}
+
+function navigateToCountry(identifier) {
+  const entry = runtime.countryEntries.get(identifier);
+  if (!entry) return false;
+  prepareGlobeForPublicNavigation();
+  showCountryNavigationContext(entry);
+  if (!runtime.mapReady) {
+    runtime.pendingCountryNavigationId = identifier;
+    return true;
+  }
+  return fitMapToCountry(entry);
 }
 
 function spatialDestinationMatchRank(entry, query) {
@@ -3238,7 +3243,7 @@ function createMap() {
       elements.stage.dataset.visualReady = 'true';
     }, 1200);
     if (runtime.pendingSpatialProject) performSpatialNavigation(runtime.pendingSpatialProject);
-    if (runtime.pendingCountryNavigationId) navigateToCountry(runtime.pendingCountryNavigationId);
+    if (runtime.pendingCountryNavigationId) fitMapToCountry(runtime.countryEntries.get(runtime.pendingCountryNavigationId));
     if (runtime.pendingPrivateLocationOrigin) navigateToPrivateLocation(runtime.pendingPrivateLocationOrigin);
   });
   void verifyMapProvider();
