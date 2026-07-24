@@ -1824,9 +1824,11 @@ html[data-input-modality="pointer"] :focus {
   font-weight: 720;
   line-height: 1.25;
   letter-spacing: 0.018em;
-  overflow-wrap: anywhere;
+  overflow-wrap: normal;
   white-space: normal;
-  hyphens: auto;
+  word-break: normal;
+  hyphens: manual;
+  text-wrap: balance;
 }
 
 .digital-lane-focus small {
@@ -1853,6 +1855,19 @@ html[data-input-modality="pointer"] :focus {
   scrollbar-width: thin;
   touch-action: pan-x;
   -webkit-overflow-scrolling: touch;
+}
+
+.digital-lane-scroll[data-overflowing][data-at-start]:not([data-at-end]) {
+  -webkit-mask-image: linear-gradient(90deg, black 0, black calc(100% - 1.5rem), transparent 100%);
+  mask-image: linear-gradient(90deg, black 0, black calc(100% - 1.5rem), transparent 100%);
+}
+
+.digital-lane-scroll[data-overflowing][data-at-end]:not([data-at-start]) {
+  -webkit-mask-image: linear-gradient(90deg, transparent 0, black 1.1rem, black 100%);
+  mask-image: linear-gradient(90deg, transparent 0, black 1.1rem, black 100%);
+}
+
+.digital-lane-scroll[data-overflowing]:not([data-at-start]):not([data-at-end]) {
   -webkit-mask-image: linear-gradient(90deg, transparent 0, black 1.1rem, black calc(100% - 1.5rem), transparent 100%);
   mask-image: linear-gradient(90deg, transparent 0, black 1.1rem, black calc(100% - 1.5rem), transparent 100%);
 }
@@ -1894,6 +1909,10 @@ html:not([data-input-modality="pointer"]) .digital-lane-scroll:focus-visible {
   color: color-mix(in srgb, var(--lane-color) 42%, transparent);
   font-size: 1rem;
   transform: translateY(-0.02rem);
+}
+
+.digital-ribbon-item:last-child::after {
+  display: none;
 }
 
 .digital-ribbon-item:hover .digital-ribbon-name,
@@ -2244,7 +2263,8 @@ html:not([data-input-modality="pointer"]) .digital-ribbon-item:focus-visible {
   gap: 0.55rem;
 }
 
-.filter-commons-type {
+.filter-commons-type,
+.filter-action {
   grid-column: span 2;
 }
 
@@ -2360,6 +2380,10 @@ html:not([data-input-modality="pointer"]) .digital-ribbon-item:focus-visible {
   font-size: 0.76rem;
 }
 
+.geolocation-status:empty {
+  display: none;
+}
+
 .filter-group-controls label {
   display: grid;
   gap: 0.25rem;
@@ -2398,7 +2422,14 @@ html:not([data-input-modality="pointer"]) .digital-ribbon-item:focus-visible {
 }
 
 .filter-group-controls #use-current-location {
-  min-height: 2.75rem;
+  justify-self: start;
+  width: max-content;
+  max-width: 100%;
+  min-height: var(--minimum-touch-target, 44px);
+  padding: 0.35rem 0.75rem;
+  font-size: 0.76rem;
+  line-height: 1.2;
+  white-space: nowrap;
 }
 
 .country-navigation-context {
@@ -2639,6 +2670,7 @@ html:not([data-input-modality="pointer"]) .digital-ribbon-item:focus-visible {
   }
 
   .filter-commons-type,
+  .filter-action,
   .spatial-destination-search {
     grid-column: 1 / -1;
   }
@@ -2663,8 +2695,14 @@ html:not([data-input-modality="pointer"]) .digital-ribbon-item:focus-visible {
   }
 
   .filter-commons-type,
+  .filter-action,
   .spatial-destination-search {
     grid-column: auto;
+  }
+
+  .filter-group-controls #use-current-location {
+    justify-self: stretch;
+    width: 100%;
   }
 
   .discovery-result-actions {

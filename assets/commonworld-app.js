@@ -35,7 +35,6 @@ import {
   publicProjectNavigationTarget,
   quantizeSpherePixel,
   representativeGeometryPoint,
-  ribbonRepeatCount,
   ringOrbitDirection,
   ringOrbitDuration,
   ringOrbitStartAngle,
@@ -531,14 +530,12 @@ function selectDigitalBundle(path) {
   setDigitalPath(path);
 }
 
-function createRibbonSegment(record, copyIndex) {
+function createRibbonSegment(record) {
   const segment = document.createElement('button');
   segment.type = 'button';
   segment.className = 'digital-ribbon-item';
   segment.dataset.commonprojectId = record.id;
-  segment.dataset.ribbonCopy = String(copyIndex);
   segment.setAttribute('aria-label', t('open_project', '{title} öffnen', { title: record.title }));
-  if (copyIndex > 0) segment.setAttribute('tabindex', '-1');
   const name = document.createElement('span');
   name.className = 'digital-ribbon-name';
   name.textContent = record.title;
@@ -547,10 +544,16 @@ function createRibbonSegment(record, copyIndex) {
   return segment;
 }
 
+function syncLaneOverflow(scroller) {
+  const maximumScrollLeft = Math.max(0, scroller.scrollWidth - scroller.clientWidth);
+  const overflowing = maximumScrollLeft > 2;
+  scroller.toggleAttribute('data-overflowing', overflowing);
+  scroller.toggleAttribute('data-at-start', !overflowing || scroller.scrollLeft <= 2);
+  scroller.toggleAttribute('data-at-end', !overflowing || scroller.scrollLeft >= maximumScrollLeft - 2);
+}
+
 function updateLaneOverflow() {
-  elements.layerDeck.querySelectorAll('.digital-lane-scroll').forEach((scroller) => {
-    scroller.toggleAttribute('data-overflowing', scroller.scrollWidth > scroller.clientWidth + 2);
-  });
+  elements.layerDeck.querySelectorAll('.digital-lane-scroll').forEach(syncLaneOverflow);
 }
 
 function renderLayerDeck() {
@@ -565,7 +568,7 @@ function renderLayerDeck() {
     : null;
   for (const [index, node] of laneNodes.entries()) {
     const allRecords = visibleIdentityRecords ?? recordsForNode(node);
-    const records = identityLevel || node.type === 'identity' ? allRecords : allRecords.slice(0, 4);
+    const records = [...new Map(allRecords.map((record) => [record.id, record])).values()];
     const lane = document.createElement('section');
     lane.className = 'digital-lane';
     lane.dataset.layerId = node.id;
@@ -603,10 +606,8 @@ function renderLayerDeck() {
     scroller.setAttribute('aria-label', t('horizontal_scroll', '{label} horizontal durchblättern', { label: node.label }));
     const content = document.createElement('div');
     content.className = 'digital-lane-content';
-    const repeats = identityLevel ? 1 : ribbonRepeatCount(records.length, 10);
-    for (let copy = 0; copy < repeats; copy += 1) {
-      for (const record of records) content.append(createRibbonSegment(record, copy));
-    }
+    for (const record of records) content.append(createRibbonSegment(record));
+    scroller.addEventListener('scroll', () => syncLaneOverflow(scroller), { passive: true });
     scroller.append(content);
     lane.append(focus, scroller);
     if (identityLevel) {
@@ -1954,10 +1955,10 @@ function updateSphereResultVisibility() {
   });
   elements.layerDeck.querySelectorAll('.digital-lane[data-layer-id]').forEach((lane) => {
     const selected = focusedPath === lane.dataset.digitalPath;
-    const primaryVisible = [...lane.querySelectorAll('.digital-ribbon-item[data-ribbon-copy="0"]')].filter((segment) => !segment.hidden).length;
+    const visibleCount = [...lane.querySelectorAll('.digital-ribbon-item')].filter((segment) => !segment.hidden).length;
     lane.classList.toggle('is-focused', selected);
     lane.toggleAttribute('data-layer-hidden', false);
-    lane.toggleAttribute('data-empty', primaryVisible === 0);
+    lane.toggleAttribute('data-empty', visibleCount === 0);
     lane.querySelector('.digital-lane-focus')?.setAttribute('aria-pressed', String(selected));
   });
   window.requestAnimationFrame(updateLaneOverflow);

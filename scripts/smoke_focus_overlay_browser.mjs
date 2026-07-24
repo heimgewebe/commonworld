@@ -255,7 +255,7 @@ async function verifyLayerCreatedSphereRestoration(browser, baseUrl) {
     await page.waitForSelector('html.runtime-ready');
     await page.waitForFunction(() => document.querySelector('.globe-stage')?.dataset.viewPhase === 'layers');
     await page.waitForSelector('#layer-panel[data-visible]');
-    await page.locator('.digital-ribbon-item[data-ribbon-copy="0"]').first().click();
+    await page.locator('.digital-ribbon-item').first().click();
     await page.waitForSelector('#project-focus:not([hidden])');
     await page.waitForFunction(() => document.querySelector('#sphere-edge-control')?.dataset.focusOverlapInert === 'true');
     await page.locator('#focus-close').click();

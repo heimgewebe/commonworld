@@ -249,7 +249,7 @@ async function loadExpectedDigitalProjection() {
       path: field.path,
       pathKey,
       ids: [...node.identityIds],
-      previewIds: [...node.identityIds].slice(0, 4),
+      laneIds: [...node.identityIds],
       ringPreviewIds: [...node.identityIds].slice(0, 2),
       count: node.identityCount,
     };
@@ -585,7 +585,7 @@ async function startupAndRingOrbitScenario() {
     assert(expectedLayer, `ring orbits: rendered unknown layer ${ring.layer}`);
     assert(ring.hasGuide, `ring orbits: ${ring.layer} lost its orbit guide`);
     assert(Number.isFinite(ring.entryCount) && ring.entryCount === expectedLayer.count, `ring orbits: ${ring.layer} entry count diverges from catalog identities ${JSON.stringify({ ring, expectedLayer })}`);
-    assertSameIds(ring.ids, expectedLayer.ringPreviewIds, `ring orbits: ${ring.layer} preview identity set`);
+    assertSameIds(ring.ids, expectedLayer.ringPreviewIds, `ring orbits: ${ring.layer} lane identity set`);
     assert(new Set(ring.ids).size === ring.ids.length, `ring orbits: ${ring.layer} repeats an identity ${JSON.stringify(ring.ids)}`);
     if (ring.entryCount === 0) {
       assert(ring.placeholderCount === 1 && ring.placeholderIds === 0, `ring orbits: empty ${ring.layer} needs a non-identity placeholder ${JSON.stringify(ring)}`);
@@ -1205,7 +1205,7 @@ async function layerJourneyScenario({ mobile = false, viewportOverride = null, t
       const scroller = lane.querySelector('.digital-lane-scroll');
       const focusLabel = lane.querySelector('.digital-lane-focus span');
       const focusStyle = getComputedStyle(focusLabel);
-      const primary = [...lane.querySelectorAll('.digital-ribbon-item[data-ribbon-copy="0"]')];
+      const primary = [...lane.querySelectorAll('.digital-ribbon-item')];
       return {
         layer: lane.dataset.layerId,
         displayed: getComputedStyle(lane).display !== 'none',
@@ -1247,7 +1247,8 @@ async function layerJourneyScenario({ mobile = false, viewportOverride = null, t
   assert(ribbonView.sphereOpacity <= 0.1, `layer journey: enlarged sphere obscures the lane surface (${ribbonView.sphereOpacity})`);
   assert(ribbonView.ringCount === expectedDigitalProjection.fields.length && ribbonView.ringNameCount > 0 && ribbonView.ringBinaryCount === 0, `layer journey: ring names were lost or decorative binary text remains (${JSON.stringify(ribbonView)})`);
   assert(ribbonView.lanes.length === expectedDigitalProjection.fields.length && ribbonView.lanes.every(({ displayed }) => displayed), `layer journey: multi-lane overview does not show all layers (${JSON.stringify(ribbonView.lanes)})`);
-  assert(ribbonView.lanes.every(({ scrollWidth, clientWidth }) => scrollWidth > clientWidth + 20), `layer journey: at least one lane is not horizontally scrollable (${JSON.stringify(ribbonView.lanes)})`);
+  assert(ribbonView.lanes.every(({ scrollWidth, clientWidth }) => scrollWidth >= clientWidth), `layer journey: lane content width fell below its viewport (${JSON.stringify(ribbonView.lanes)})`);
+  assert(ribbonView.lanes.some(({ scrollWidth, clientWidth }) => scrollWidth > clientWidth + 20), `layer journey: no lane exposes meaningful horizontal overflow (${JSON.stringify(ribbonView.lanes)})`);
   assert(ribbonView.lanes.every(({ overflowX }) => ['auto', 'scroll'].includes(overflowX)), `layer journey: native horizontal overflow is disabled (${JSON.stringify(ribbonView.lanes)})`);
   assert(ribbonView.lanes.every(({ touchAction }) => touchAction.includes('pan-x')), `layer journey: touch panning is not explicitly horizontal (${JSON.stringify(ribbonView.lanes)})`);
   assert(ribbonView.lanes.every(({ category }) => category.label && category.whiteSpace !== 'nowrap' && category.textOverflow !== 'ellipsis' && category.scrollWidth <= category.clientWidth + 1 && category.scrollHeight <= category.clientHeight + 1), `layer journey: category labels are clipped instead of fully readable (${JSON.stringify(ribbonView.lanes.map(({ layer, category }) => ({ layer, category })))})`);
@@ -1255,12 +1256,12 @@ async function layerJourneyScenario({ mobile = false, viewportOverride = null, t
     const expectedLayer = expectedDigitalProjection.fields.find(({ id }) => id === lane.layer);
     assert(expectedLayer, `layer journey: rendered unknown lane ${lane.layer}`);
     assert(lane.category.label === expectedLayer.label, `layer journey: category label is abbreviated or differs from the canonical label (${lane.layer}: ${JSON.stringify(lane.category.label)} vs ${JSON.stringify(expectedLayer.label)})`);
-    assertSameIds(lane.primary.map(({ id }) => id), expectedLayer.previewIds, `layer journey: ${lane.layer} preview identity set`);
+    assertSameIds(lane.primary.map(({ id }) => id), expectedLayer.laneIds, `layer journey: ${lane.layer} lane identity set`);
   }
   const primarySegments = ribbonView.lanes.flatMap(({ primary }) => primary);
-  const expectedPreviewIds = expectedDigitalProjection.fields.flatMap(({ previewIds }) => previewIds);
-  assert(primarySegments.length === expectedPreviewIds.length, `layer journey: primary preview identities were duplicated or lost (${primarySegments.length})`);
-  assertSameIds(primarySegments.map(({ id }) => id), expectedPreviewIds, 'layer journey: primary digital preview identity set');
+  const expectedLaneIds = expectedDigitalProjection.fields.flatMap(({ laneIds }) => laneIds);
+  assert(primarySegments.length === expectedLaneIds.length, `layer journey: lane identities were duplicated or lost (${primarySegments.length})`);
+  assertSameIds(primarySegments.map(({ id }) => id), expectedLaneIds, 'layer journey: unique digital lane identity set');
   assert(primarySegments.every(({ name, height }) => name && height >= 44), `layer journey: Commons names or touch heights are invalid (${JSON.stringify(primarySegments)})`);
   assert(ribbonView.ribbonBinaryCount === 0, `layer journey: decorative binary text remains in the digital lanes (${ribbonView.ribbonBinaryCount})`);
   assert(ribbonView.filterChildren === expectedDigitalProjection.fields.length, `layer journey: search surface does not contain all layer filters (${ribbonView.filterChildren})`);
@@ -1304,7 +1305,7 @@ async function layerJourneyScenario({ mobile = false, viewportOverride = null, t
       scrollWidth: scroller?.scrollWidth ?? 0,
       overflowX: scroller ? getComputedStyle(scroller).overflowX : '',
       touchAction: scroller ? getComputedStyle(scroller).touchAction : '',
-      ids: [...document.querySelectorAll('.digital-ribbon-item[data-ribbon-copy="0"]')].map((node) => node.dataset.commonprojectId),
+      ids: [...document.querySelectorAll('.digital-ribbon-item')].map((node) => node.dataset.commonprojectId),
     };
   });
   assert(JSON.stringify(focusedLane.visibleLayers) === JSON.stringify(['open_knowledge_data']), `layer journey: identity-level focus leaves other lanes visible (${JSON.stringify(focusedLane)})`);
@@ -1317,10 +1318,10 @@ async function layerJourneyScenario({ mobile = false, viewportOverride = null, t
   await focusedScroller.evaluate((node) => { node.scrollTo({ left: Math.min(node.scrollWidth - node.clientWidth, Math.max(160, node.clientWidth * 0.7)), behavior: 'instant' }); });
   await run.page.waitForTimeout(180);
   const focusedScrollLeft = await focusedScroller.evaluate((node) => node.scrollLeft);
-  if (focusedLane.scrollWidth > focusedLane.clientWidth + 1) {
-    assert(focusedScrollLeft > 0, `layer journey: overflowing focused lane did not scroll (${JSON.stringify(focusedLane)})`);
+  if (focusedLane.scrollWidth > focusedLane.clientWidth + 2) {
+    assert(focusedScrollLeft > 2, `layer journey: overflowing focused lane did not scroll (${JSON.stringify(focusedLane)})`);
   } else {
-    assert(focusedScrollLeft === 0, `layer journey: fully fitting focused lane gained artificial overflow (${JSON.stringify(focusedLane)})`);
+    assert(focusedScrollLeft <= 2, `layer journey: fully fitting focused lane gained meaningful artificial overflow (${JSON.stringify(focusedLane)})`);
   }
 
   await run.page.locator('#layer-search-toggle').click();
@@ -1329,14 +1330,14 @@ async function layerJourneyScenario({ mobile = false, viewportOverride = null, t
   await run.page.locator('#layer-search').fill('Wikipedia');
   await run.page.waitForTimeout(220);
   assert((await run.page.locator('#commons-search').inputValue()) === 'Wikipedia', 'layer journey: lane search is not synchronized with global search');
-  const searchedVisible = await run.page.locator('.digital-ribbon-item[data-ribbon-copy="0"]:not([hidden])').count();
+  const searchedVisible = await run.page.locator('.digital-ribbon-item:not([hidden])').count();
   assert(searchedVisible === 1, `layer journey: focused search did not reduce to one visible identity (${searchedVisible})`);
   await run.page.locator('#layer-search').fill('');
   await run.page.waitForTimeout(220);
   await run.page.locator('#layer-search-toggle').click();
   assert(await run.page.locator('#layer-discovery').isHidden(), 'layer journey: search/filter panel did not close');
 
-  const directContent = run.page.locator('.digital-ribbon-item[data-ribbon-copy="0"]:not([hidden])').first();
+  const directContent = run.page.locator('.digital-ribbon-item:not([hidden])').first();
   const directTitle = (await directContent.locator('.digital-ribbon-name').textContent()) ?? '';
   const directBox = await directContent.boundingBox();
   assert(directBox && directBox.width >= 44 && directBox.height >= 44, `layer journey: Commons ribbon has an undersized touch target (${JSON.stringify(directBox)})`);
@@ -1520,7 +1521,7 @@ async function dualPresenceAxesScenario() {
   await run.page.waitForFunction(() => document.querySelector('.globe-stage')?.dataset.digitalPath === 'sphere/communication_networks');
   await run.page.locator('.digital-lane-focus[data-digital-path="sphere/communication_networks/community_networks"]').click();
   await run.page.waitForFunction(() => document.querySelector('.globe-stage')?.dataset.digitalPath === 'sphere/communication_networks/community_networks');
-  const digitalPrimaryIds = await run.page.locator('.digital-ribbon-item[data-ribbon-copy="0"]').evaluateAll((nodes) => nodes.map((node) => node.dataset.commonprojectId));
+  const digitalPrimaryIds = await run.page.locator('.digital-ribbon-item').evaluateAll((nodes) => nodes.map((node) => node.dataset.commonprojectId));
   const communityNetworkIds = expectedDigitalProjection.nodes['sphere/communication_networks/community_networks'].identityIds;
   assert(digitalPrimaryIds.length === communityNetworkIds.length, 'dual presence: digital lane identity count mismatch: ' + digitalPrimaryIds.length);
   assertSameIds(digitalPrimaryIds, communityNetworkIds, 'dual presence: community-network digital identity set');
@@ -2072,18 +2073,28 @@ async function intentSearchLayoutScenario({ viewportOverride, scenarioId }) {
     const panel = document.querySelector('#discovery-panel');
     const rect = panel.getBoundingClientRect();
     const controls = [...panel.querySelectorAll('select, .discovery-result-main')].map((node) => node.getBoundingClientRect().height);
+    const locationButton = document.querySelector('#use-current-location').getBoundingClientRect();
+    const actionSelect = document.querySelector('#filter-action').getBoundingClientRect();
+    const commonsTypeSelect = document.querySelector('#filter-commons-type').getBoundingClientRect();
+    const geolocationStatus = document.querySelector('#geolocation-status');
     return {
       panel: { left: rect.left, top: rect.top, right: rect.right, bottom: rect.bottom },
       width: innerWidth,
       height: innerHeight,
       scrollWidth: document.documentElement.scrollWidth,
       minimumControlHeight: Math.min(...controls),
+      locationButton: { width: locationButton.width, height: locationButton.height },
+      primarySelectWidths: { commonsType: commonsTypeSelect.width, action: actionSelect.width },
+      emptyGeolocationStatusDisplay: getComputedStyle(geolocationStatus).display,
     };
   });
   assert(geometry.panel.left >= -1 && geometry.panel.right <= geometry.width + 1, scenarioId + ': discovery panel overflows horizontally');
   assert(geometry.panel.top >= -1 && geometry.panel.bottom <= geometry.height + 1, scenarioId + ': discovery panel exceeds the viewport');
   assert(geometry.scrollWidth <= geometry.width + 1, scenarioId + ': document has horizontal overflow');
   assert(geometry.minimumControlHeight >= 44, scenarioId + ': a filter or result control is below the 44px touch target');
+  assert(geometry.locationButton.height >= 44 && geometry.locationButton.width < geometry.primarySelectWidths.action * 0.8, scenarioId + ': location button still dominates its filter column ' + JSON.stringify(geometry));
+  assert(Math.abs(geometry.primarySelectWidths.commonsType - geometry.primarySelectWidths.action) <= 2, scenarioId + ': primary filters no longer share a balanced row ' + JSON.stringify(geometry.primarySelectWidths));
+  assert(geometry.emptyGeolocationStatusDisplay === 'none', scenarioId + ': empty geolocation status still consumes grid space');
   const curationSelect = run.page.locator('[data-intent-filter="curation"]');
   await curationSelect.tap();
   await run.page.waitForTimeout(40);
@@ -2221,7 +2232,7 @@ async function legacyLayerAndAtomicFocusScenario() {
   await focusRun.page.goto(`${baseUrl}/?view=layers`, { waitUntil: 'domcontentloaded' });
   await focusRun.page.waitForSelector('html.runtime-ready');
   await focusRun.page.waitForSelector('.globe-stage[data-view-phase="layers"]');
-  const focusTrigger = focusRun.page.locator('.digital-ribbon-item[data-ribbon-copy="0"]').first();
+  const focusTrigger = focusRun.page.locator('.digital-ribbon-item').first();
   const focusProjectId = await focusTrigger.getAttribute('data-commonproject-id');
   assert(Boolean(focusProjectId), 'atomic focus: no rendered digital identity was available');
   const focusProjectTitle = expectedDigitalProjection.titleById[focusProjectId];
@@ -2232,7 +2243,7 @@ async function legacyLayerAndAtomicFocusScenario() {
 
   await focusRun.page.keyboard.press('Escape');
   assert(await focusRun.page.locator('#project-focus').isHidden(), 'atomic focus: Escape did not close the project overlay');
-  const keyboardFocusTrigger = focusRun.page.locator(`.digital-ribbon-item[data-commonproject-id="${focusProjectId}"][data-ribbon-copy="0"]`);
+  const keyboardFocusTrigger = focusRun.page.locator(`.digital-ribbon-item[data-commonproject-id="${focusProjectId}"]`);
   await keyboardFocusTrigger.focus();
   await focusRun.page.keyboard.press('Enter');
   assert(await focusRun.page.locator('#project-focus').isVisible(), `atomic focus: keyboard activation did not reopen ${focusProjectId}`);
@@ -2517,15 +2528,15 @@ async function syntheticCatalogueTruthScenario() {
     await network.focus();
     await run.page.keyboard.press('Enter');
     await run.page.waitForFunction(() => document.querySelector('.globe-stage')?.dataset.digitalPath === 'sphere/communication_networks/community_networks');
-    await run.page.waitForFunction(() => document.querySelectorAll('.digital-ribbon-item[data-ribbon-copy="0"]').length === 48);
-    const initialIds = await run.page.locator('.digital-ribbon-item[data-ribbon-copy="0"]').evaluateAll((nodes) => nodes.map((node) => node.dataset.commonprojectId));
+    await run.page.waitForFunction(() => document.querySelectorAll('.digital-ribbon-item').length === 48);
+    const initialIds = await run.page.locator('.digital-ribbon-item').evaluateAll((nodes) => nodes.map((node) => node.dataset.commonprojectId));
     assert(new Set(initialIds).size === 48, `synthetic ${size}: initial ring identities duplicate`);
     const ringMore = run.page.locator('.identity-show-more');
     const ringMoreBox = await ringMore.boundingBox();
     assert(ringMoreBox && ringMoreBox.height >= 44, `synthetic ${size}: ring continuation touch target is undersized`);
     await ringMore.click();
-    await run.page.waitForFunction(() => document.querySelectorAll('.digital-ribbon-item[data-ribbon-copy="0"]').length === 96);
-    const continuedIds = await run.page.locator('.digital-ribbon-item[data-ribbon-copy="0"]').evaluateAll((nodes) => nodes.map((node) => node.dataset.commonprojectId));
+    await run.page.waitForFunction(() => document.querySelectorAll('.digital-ribbon-item').length === 96);
+    const continuedIds = await run.page.locator('.digital-ribbon-item').evaluateAll((nodes) => nodes.map((node) => node.dataset.commonprojectId));
     assert(new Set(continuedIds).size === 96, `synthetic ${size}: continued ring identities duplicate`);
     assert(await run.page.locator('.identity-show-more').evaluate((node) => node === document.activeElement), `synthetic ${size}: ring continuation lost focus`);
 
