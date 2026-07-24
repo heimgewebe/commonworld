@@ -23,10 +23,12 @@ import {
   sphereOpacityForGlobeRatio,
   visibleDigitalNodes,
 } from '../assets/commonworld-core.mjs';
+import { localizeCatalogRecords } from '../assets/commonworld-i18n.mjs';
 
 const ROOT = process.cwd();
 // Allow half a CSS pixel for browser-dependent subpixel rounding of the nominal 48 px lane.
 const MIN_RENDERED_LANE_HEIGHT_PX = 47.5;
+const DISCOVERY_RESULT_PREVIEW_LIMIT = 50;
 const resultArgumentIndex = process.argv.indexOf('--result');
 const resultPath = resultArgumentIndex >= 0 ? process.argv[resultArgumentIndex + 1] : null;
 if (resultArgumentIndex >= 0 && !resultPath) throw new Error('--result requires a path');
@@ -238,7 +240,8 @@ async function loadExpectedDigitalProjection() {
     identityIds: [...node.identityIds],
     identityCount: node.identityCount,
   }]));
-  const titleById = Object.fromEntries(records.map(({ id, title }) => [id, title]));
+  const localizedRecords = localizeCatalogRecords(records, 'en').records;
+  const titleById = Object.fromEntries(localizedRecords.map(({ id, title }) => [id, title]));
   const fields = DIGITAL_RING_FIELDS.map((field) => {
     const pathKey = serializeDigitalPath(field.path);
     const node = tree.nodesByPath.get(pathKey);
@@ -279,6 +282,8 @@ async function loadExpectedDigitalProjection() {
 }
 
 const expectedDigitalProjection = await loadExpectedDigitalProjection();
+const discoveryPreviewIds = (ids) => ids.slice(0, DISCOVERY_RESULT_PREVIEW_LIMIT);
+const discoveryPreviewCount = (ids) => Math.min(ids.length, DISCOVERY_RESULT_PREVIEW_LIMIT);
 
 async function newPage({
   mobile = false,
@@ -1755,10 +1760,10 @@ async function intentSearchDiscoveryScenario() {
   const resultIds = () => run.page.locator('.discovery-result').evaluateAll((nodes) => nodes.map((node) => node.dataset.commonprojectId));
 
   await run.page.locator('#commons-search').fill('ich möchte mitmachen');
-  await run.page.waitForFunction((count) => document.querySelectorAll('.discovery-result').length === count, expectedDigitalProjection.contributionIds.length);
+  await run.page.waitForFunction((count) => document.querySelectorAll('.discovery-result').length === count, discoveryPreviewCount(expectedDigitalProjection.contributionIds));
   assert(await run.page.locator('#discovery-panel').isVisible(), 'intent search: result panel did not open');
   const contributionResultIds = await resultIds();
-  assertSameIds(contributionResultIds, expectedDigitalProjection.contributionIds, 'intent search: German contribution identities differ from claimed catalog actions');
+  assertSameIds(contributionResultIds, discoveryPreviewIds(expectedDigitalProjection.contributionIds), 'intent search: German contribution preview differs from claimed catalog actions');
   assert((await run.page.locator('#discovery-count').textContent()) === `${expectedDigitalProjection.contributionIds.length} Commons`, 'intent search: ranked count mismatch');
 
   await run.page.locator('#commons-search').focus();
@@ -1787,31 +1792,31 @@ async function intentSearchDiscoveryScenario() {
   assert(await run.page.locator('#discovery-list').isHidden(), 'intent search: empty result list remains exposed');
 
   await run.page.locator('#commons-search').fill('');
-  await run.page.waitForFunction((count) => document.querySelectorAll('.discovery-result').length === count, expectedDigitalProjection.catalogEntryCount);
+  await run.page.waitForFunction((count) => document.querySelectorAll('.discovery-result').length === count, discoveryPreviewCount(expectedDigitalProjection.catalogIds));
   await run.page.locator('#filter-commons-type').selectOption('community-network');
-  await run.page.waitForFunction((count) => new URL(location.href).searchParams.get('commons_type') === 'community-network' && document.querySelectorAll('.discovery-result').length === count, expectedDigitalProjection.communityNetworkIds.length);
-  assertSameIds(await resultIds(), expectedDigitalProjection.communityNetworkIds, 'intent filters: Commons-Art differs from deterministic catalog derivation');
+  await run.page.waitForFunction((count) => new URL(location.href).searchParams.get('commons_type') === 'community-network' && document.querySelectorAll('.discovery-result').length === count, discoveryPreviewCount(expectedDigitalProjection.communityNetworkIds));
+  assertSameIds(await resultIds(), discoveryPreviewIds(expectedDigitalProjection.communityNetworkIds), 'intent filters: Commons-Art preview differs from deterministic catalog derivation');
   assert((await run.page.locator('.discovery-result-meta').allTextContents()).every((text) => text.includes('Community Network')), 'intent filters: Commons-Art label missing from compact result metadata');
   await run.page.locator('#filter-commons-type').selectOption('');
-  await run.page.waitForFunction((count) => !new URL(location.href).searchParams.has('commons_type') && document.querySelectorAll('.discovery-result').length === count, expectedDigitalProjection.catalogEntryCount);
+  await run.page.waitForFunction((count) => !new URL(location.href).searchParams.has('commons_type') && document.querySelectorAll('.discovery-result').length === count, discoveryPreviewCount(expectedDigitalProjection.catalogIds));
   await run.page.goBack({ waitUntil: 'domcontentloaded' });
-  await run.page.waitForFunction((count) => document.querySelector('#filter-commons-type')?.value === 'community-network' && document.querySelectorAll('.discovery-result').length === count, expectedDigitalProjection.communityNetworkIds.length);
+  await run.page.waitForFunction((count) => document.querySelector('#filter-commons-type')?.value === 'community-network' && document.querySelectorAll('.discovery-result').length === count, discoveryPreviewCount(expectedDigitalProjection.communityNetworkIds));
   assertSameIds(await resultIds(), expectedDigitalProjection.communityNetworkIds, 'intent history: Back did not restore Commons-Art');
   await run.page.goForward({ waitUntil: 'domcontentloaded' });
-  await run.page.waitForFunction((count) => document.querySelector('#filter-commons-type')?.value === '' && document.querySelectorAll('.discovery-result').length === count, expectedDigitalProjection.catalogEntryCount);
+  await run.page.waitForFunction((count) => document.querySelector('#filter-commons-type')?.value === '' && document.querySelectorAll('.discovery-result').length === count, discoveryPreviewCount(expectedDigitalProjection.catalogIds));
   if (await run.page.locator('#discovery-panel').isHidden()) await run.page.locator('#filter-toggle').click();
   await run.page.locator('#discovery-panel').waitFor({ state: 'visible' });
   await run.page.waitForFunction(() => Boolean(window.__commonworldTestMap) && !window.__commonworldTestMap.isMoving());
   const filterCamera = await mapCamera();
   await run.page.locator('#filter-presence-geographic').check();
   await run.page.locator('#filter-presence-digital').check();
-  await run.page.waitForFunction((count) => document.querySelectorAll('.discovery-result').length === count, expectedDigitalProjection.selectedPresenceIds.length);
-  assert(JSON.stringify(await resultIds()) === JSON.stringify(expectedDigitalProjection.selectedPresenceIds), 'intent filters: selected presence axes differ from the catalog union');
+  await run.page.waitForFunction((count) => document.querySelectorAll('.discovery-result').length === count, discoveryPreviewCount(expectedDigitalProjection.selectedPresenceIds));
+  assert(JSON.stringify(await resultIds()) === JSON.stringify(discoveryPreviewIds(expectedDigitalProjection.selectedPresenceIds)), 'intent filters: selected presence preview differs from the catalog union');
   const params = new URL(run.page.url()).searchParams.getAll('presence');
   assert(params.length === 2 && params[0] === 'geographic' && params[1] === 'digital', 'intent filters: presence was not serialized correctly');
   await run.page.locator('#filter-action').selectOption('volunteer');
-  await run.page.waitForFunction((count) => new URL(location.href).searchParams.get('action') === 'volunteer' && document.querySelectorAll('.discovery-result').length === count, expectedDigitalProjection.selectedPresenceVolunteerIds.length);
-  assert(JSON.stringify(await resultIds()) === JSON.stringify(expectedDigitalProjection.selectedPresenceVolunteerIds), 'intent filters: combined presence-volunteer OR filter differs from selected axes and claimed catalog actions');
+  await run.page.waitForFunction((count) => new URL(location.href).searchParams.get('action') === 'volunteer' && document.querySelectorAll('.discovery-result').length === count, discoveryPreviewCount(expectedDigitalProjection.selectedPresenceVolunteerIds));
+  assert(JSON.stringify(await resultIds()) === JSON.stringify(discoveryPreviewIds(expectedDigitalProjection.selectedPresenceVolunteerIds)), 'intent filters: combined presence-volunteer preview differs from selected axes and claimed catalog actions');
   assert(sameCamera(filterCamera, await mapCamera()), 'intent filters: changing filters moved the map');
 
   const actionTypes = await run.page.locator('.discovery-result[data-commonproject-id="freifunk-hamburg"] .discovery-result-actions a').evaluateAll((links) => links.map((link) => link.dataset.actionType));
@@ -1821,13 +1826,13 @@ async function intentSearchDiscoveryScenario() {
 
   await run.page.goBack({ waitUntil: 'domcontentloaded' });
   await run.page.waitForFunction(() => document.querySelector('#filter-presence-geographic')?.checked === true && document.querySelector('#filter-presence-digital')?.checked === true && document.querySelector('#filter-action')?.value === '');
-  assert(JSON.stringify(await resultIds()) === JSON.stringify(expectedDigitalProjection.selectedPresenceIds), 'intent history: Back did not restore the previous filter context');
+  assert(JSON.stringify(await resultIds()) === JSON.stringify(discoveryPreviewIds(expectedDigitalProjection.selectedPresenceIds)), 'intent history: Back did not restore the previous filter preview');
   await run.page.goForward({ waitUntil: 'domcontentloaded' });
   await run.page.waitForFunction(() => document.querySelector('#filter-action')?.value === 'volunteer');
-  assert(JSON.stringify(await resultIds()) === JSON.stringify(expectedDigitalProjection.selectedPresenceVolunteerIds), 'intent history: Forward did not restore the combined filter context');
+  assert(JSON.stringify(await resultIds()) === JSON.stringify(discoveryPreviewIds(expectedDigitalProjection.selectedPresenceVolunteerIds)), 'intent history: Forward did not restore the combined filter preview');
 
   await run.page.locator('#filter-clear').click();
-  await run.page.waitForFunction((count) => document.querySelectorAll('.discovery-result').length === count, expectedDigitalProjection.catalogEntryCount);
+  await run.page.waitForFunction((count) => document.querySelectorAll('.discovery-result').length === count, discoveryPreviewCount(expectedDigitalProjection.catalogIds));
   assert([...new URL(run.page.url()).searchParams.keys()].every((key) => !['commons_type', 'presence', 'action', 'language', 'access', 'freshness', 'curation'].includes(key)), 'intent filters: reset left filter parameters in the URL');
 
   const digitalCamera = await mapCamera();
@@ -1867,10 +1872,10 @@ async function intentSearchDiscoveryScenario() {
   await run.page.locator('#focus-close').click();
 
   await run.page.locator('#commons-search').fill('');
-  await run.page.waitForFunction((count) => document.querySelectorAll('.discovery-result').length === count, expectedDigitalProjection.catalogEntryCount);
+  await run.page.waitForFunction((count) => document.querySelectorAll('.discovery-result').length === count, discoveryPreviewCount(expectedDigitalProjection.catalogIds));
   await run.page.locator('#filter-presence-geographic').check();
   await run.page.locator('#filter-presence-digital').check();
-  await run.page.waitForFunction((count) => document.querySelectorAll('.discovery-result').length === count, expectedDigitalProjection.selectedPresenceIds.length);
+  await run.page.waitForFunction((count) => document.querySelectorAll('.discovery-result').length === count, discoveryPreviewCount(expectedDigitalProjection.selectedPresenceIds));
   await run.page.locator('#discovery-close').click();
   await run.page.locator('#settings-toggle').click();
   await run.page.getByRole('radio', { name: /Text/ }).click();
@@ -2460,7 +2465,11 @@ async function historyFocusDiagnosticContractScenario() {
 
 async function validEmptyDigitalPathScenario() {
   process.stdout.write(`${JSON.stringify({ state: 'RUNNING', scenario: 'valid-empty-digital-path' })}\n`);
-  const path = 'sphere/provision_land_ecology/water_irrigation';
+  const emptyNode = Object.values(expectedDigitalProjection.nodes)
+    .filter((node) => node.identityCount === 0 && node.path.length >= 3)
+    .sort((left, right) => left.pathKey.localeCompare(right.pathKey))[0];
+  assert(emptyNode, 'valid empty path: taxonomy no longer exposes an empty navigable node');
+  const path = emptyNode.pathKey;
   const run = await newPage({ reducedMotion: 'reduce' });
   await run.page.goto(`${baseUrl}/?surface=text&digital_path=${path}`, { waitUntil: 'domcontentloaded' });
   await run.page.waitForSelector('html.runtime-ready');
@@ -2468,7 +2477,7 @@ async function validEmptyDigitalPathScenario() {
 
   const parameters = new URL(run.page.url()).searchParams;
   assert(parameters.get('digital_path') === path, 'valid empty path: canonical URL discarded the taxonomy node');
-  assert((await run.page.locator('#text-layer-current').textContent()) === 'Water and Irrigation · 0 Commons', 'valid empty path: current node did not expose its empty state');
+  assert((await run.page.locator('#text-layer-current').textContent()) === `${emptyNode.label} · 0 Commons`, 'valid empty path: current node did not expose its empty state');
   assert((await run.page.locator('.catalog-card:not([hidden])').count()) === 0, 'valid empty path: unrelated Commons leaked into the empty node');
   assert((await run.page.locator('#globe-results').textContent()) === 'No Commons match this search or filter selection.', 'valid empty path: semantic empty-state message drifted');
   const currentCrumb = run.page.locator(`#text-layer-breadcrumb .digital-breadcrumb-item[data-digital-path="${path}"][aria-current="page"]`);
@@ -2476,7 +2485,7 @@ async function validEmptyDigitalPathScenario() {
   const crumbBox = await currentCrumb.boundingBox();
   assert(crumbBox && crumbBox.width >= 44 && crumbBox.height >= 44, `valid empty path: breadcrumb touch target is undersized (${JSON.stringify(crumbBox)})`);
 
-  const parentPath = 'sphere/provision_land_ecology';
+  const parentPath = serializeDigitalPath(emptyNode.path.slice(0, -1));
   await run.page.locator(`#text-layer-breadcrumb .digital-breadcrumb-item[data-digital-path="${parentPath}"]`).click();
   await run.page.waitForFunction((expectedPath) => new URL(location.href).searchParams.get('digital_path') === expectedPath, parentPath);
   await run.page.goBack();

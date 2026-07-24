@@ -1,0 +1,110 @@
+{
+  "schema_version": 4,
+  "id": "namena-marine-reserve",
+  "title": "Namena Marine Reserve",
+  "summary": "Ein von den Ressourceneigentümern des Kubulau-Distrikts getragenes Meeresschutzgebiet in Fiji, dessen Regeln, Aufsicht und gemeinschaftliche Finanzierung Fischbestände und lokale Lebensgrundlagen sichern.",
+  "themes": [
+    "marine-conservation",
+    "fisheries",
+    "commons-governance",
+    "customary-governance",
+    "community-ownership",
+    "biodiversity"
+  ],
+  "actions": [
+    "learn"
+  ],
+  "presence": {
+    "geographic": [
+      {
+        "id": "namena-kubulau-area",
+        "mode": "approximate",
+        "label": "Kubulau-Distrikt und Namena-Lagune, Bua, Fiji",
+        "geometry": {
+          "type": "Point",
+          "coordinates": [
+            179.08816,
+            -16.875886
+          ]
+        },
+        "uncertainty_meters_min": 60000,
+        "privacy_note": "Der Punkt bezeichnet nur den groben öffentlich registrierten Bezug Kubulau Passage und bildet weder Schutzgebietsgrenzen noch Fischgründe oder Patrouillenwege exakt ab.",
+        "source_ids": [
+          "source-namena-wcs",
+          "source-kubulau-geonames"
+        ]
+      }
+    ],
+    "digital": {
+      "available": true,
+      "reach": "global",
+      "label": "Öffentliche WCS-Dokumentation zu Gemeinschaftsverwaltung, Schutz und Monitoring",
+      "source_ids": [
+        "source-namena-wcs"
+      ]
+    }
+  },
+  "activity": {
+    "status": "active",
+    "observed_at": "2026-07-24",
+    "source_ids": [
+      "source-namena-wcs",
+      "source-kubulau-enforcement-2025"
+    ],
+    "note": "WCS dokumentiert die fortlaufende gemeinsame Verwaltung; ein Bericht vom Dezember 2025 belegt zusätzlich aktive lokale Aufsicht und den Ausbau der gemeinschaftlichen Durchsetzung."
+  },
+  "provenance": {
+    "sources": [
+      {
+        "id": "source-namena-wcs",
+        "type": "official-source",
+        "label": "Namena Marine Reserve — WCS Fiji",
+        "url": "https://fiji.wcs.org/Initiatives/Protected-Areas/Namena-Marine-Reserve.aspx",
+        "retrieved_at": "2026-07-24",
+        "note": "Offizielle Projektquelle für Entstehung, Ressourceneigentum, Verwaltung, Finanzierung, Schutzregeln und laufendes Monitoring."
+      },
+      {
+        "id": "source-kubulau-enforcement-2025",
+        "type": "official-source",
+        "label": "Community enforcement vessel for Kubulau and Dama — WCS Fiji",
+        "url": "https://fiji.wcs.org/Blog/articleType/ArticleView/articleId/25677/WCS-Fiji-Hands-Over-New-Community-Enforcement-Vessel-to-Kubulau-and-Dama-Districts.aspx",
+        "retrieved_at": "2026-07-24",
+        "note": "Aktueller offizieller Beleg vom 3. Dezember 2025 für lokale Ressourcenausschüsse, Fischereiaufsicht und den fortgesetzten Schutz der gemeinschaftlichen Meeresgebiete."
+      },
+      {
+        "id": "source-kubulau-geonames",
+        "type": "public-registry",
+        "label": "Kubulau Passage — GeoNames",
+        "url": "https://www.geonames.org/advanced-search.html?country=FJ&featureClass=H&q=Kubulau",
+        "retrieved_at": "2026-07-24",
+        "note": "Öffentliches Georegister für einen groben regionalen Bezug im Kubulau-Gebiet; nicht als Schutzgebietsgrenze verwendet."
+      }
+    ],
+    "uncertainty_note": "Die Punktgeometrie ist nur eine grobe Orientierung im Kubulau-Gebiet. Die tatsächlichen customary fishing grounds und Schutzgebietsgrenzen werden nicht rekonstruiert."
+  },
+  "curation": {
+    "state": "listed",
+    "reviewed_by": "Commonworld editorial review",
+    "reviewed_at": "2026-07-24",
+    "next_review_at": "2026-10-24",
+    "notes": "Aufgenommen als aktuell belegtes pazifisches Meeres-Commons mit lokaler Ressourcenverwaltung und eigener Finanzierungs- und Aufsichtsstruktur."
+  },
+  "links": [
+    {
+      "type": "homepage",
+      "label": "Namena Marine Reserve — WCS Fiji",
+      "url": "https://fiji.wcs.org/Initiatives/Protected-Areas/Namena-Marine-Reserve.aspx"
+    },
+    {
+      "type": "learn",
+      "label": "Gemeinschaftliche Meeresverwaltung kennenlernen",
+      "url": "https://fiji.wcs.org/Initiatives/Protected-Areas/Namena-Marine-Reserve.aspx",
+      "source_ids": [
+        "source-namena-wcs"
+      ]
+    }
+  ],
+  "handoff": {
+    "enabled": false
+  }
+}

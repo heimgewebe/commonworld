@@ -75,11 +75,11 @@ class PublicShellTests(unittest.TestCase):
     def test_unknown_activity_notice_is_rendered_in_static_cards(self) -> None:
         records = load_records(ROOT)
         unknown_records = [record for record in records if record.get("activity", {}).get("status") == "unknown"]
-        self.assertEqual(3, len(unknown_records))
+        self.assertGreater(len(unknown_records), 0)
         self.assertTrue(all(activity_notice(record) for record in unknown_records))
         html = render_cards(records, interactive=False)
-        self.assertEqual(3, html.count('class="catalog-activity-notice"'))
-        self.assertEqual(3, html.count("Aktueller Betriebszustand nicht zeitnah verifiziert"))
+        self.assertEqual(len(unknown_records), html.count('class="catalog-activity-notice"'))
+        self.assertEqual(len(unknown_records), html.count("Aktueller Betriebszustand nicht zeitnah verifiziert"))
 
     def test_public_shell_rejects_dom_embedded_catalog(self) -> None:
         with tempfile.TemporaryDirectory() as tmp_dir:
