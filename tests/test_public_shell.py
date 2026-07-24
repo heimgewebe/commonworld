@@ -1,3 +1,4 @@
+import hashlib
 import re
 import shutil
 import tempfile
@@ -15,6 +16,17 @@ from scripts.validate_public_shell import ROOT, validate_public_shell
 
 
 class PublicShellTests(unittest.TestCase):
+    def refresh_ipad_version(self, root: Path) -> None:
+        version = hashlib.sha256((root / "assets/ipad-layout.css").read_bytes()).hexdigest()[:12]
+        path = root / "index.html"
+        html = re.sub(
+            r'\./assets/ipad-layout\.css\?v=[0-9a-f]{12}',
+            f'./assets/ipad-layout.css?v={version}',
+            path.read_text(encoding="utf-8"),
+            count=1,
+        )
+        path.write_text(html, encoding="utf-8")
+
     def copy_shell(self, tmp_dir: str) -> Path:
         root = Path(tmp_dir)
         shutil.copy2(ROOT / "index.html", root / "index.html")
@@ -87,6 +99,7 @@ class PublicShellTests(unittest.TestCase):
         html = (ROOT / "index.html").read_text(encoding="utf-8").casefold()
         self.assertIn('<script src="./assets/vendor/maplibre-gl.js" defer></script>', html)
         self.assertRegex(html, r'<script type="module" src="\./assets/commonworld-app\.js\?v=[0-9a-f]{12}"></script>')
+        self.assertRegex(html, r'<link rel="stylesheet" href="\./assets/ipad-layout\.css\?v=[0-9a-f]{12}" />')
         self.assertNotIn("unpkg.com", html)
         self.assertNotIn("cdn.jsdelivr.net", html)
         self.assertNotIn("<form", html)
@@ -137,7 +150,12 @@ class PublicShellTests(unittest.TestCase):
                 html,
                 count=1,
             )
-            html = html.replace('<link rel="stylesheet" href="./assets/ipad-layout.css" />', "<link href='./assets/ipad-layout.css' rel='stylesheet' />")
+            html = re.sub(
+                r'<link rel="stylesheet" href="(\./assets/ipad-layout\.css\?v=[0-9a-f]{12})" />',
+                r"<link href='\1' rel='stylesheet' />",
+                html,
+                count=1,
+            )
             path.write_text(html, encoding="utf-8")
             errors = validate_public_shell(root)
             self.assertEqual([], errors)
@@ -147,6 +165,7 @@ class PublicShellTests(unittest.TestCase):
             root = self.copy_shell(tmp_dir)
             path = root / "assets/ipad-layout.css"
             path.write_text(path.read_text(encoding="utf-8") + "\n\n.extra-trailing-rule { color: red; }\n", encoding="utf-8")
+            self.refresh_ipad_version(root)
             errors = validate_public_shell(root)
             self.assertEqual([], errors)
             
@@ -179,6 +198,7 @@ class PublicShellTests(unittest.TestCase):
             # An unrelated portrait media query emitted before the tablet landscape target.
             foreign = "@media (orientation: portrait) and (max-width: 30rem) {\n  .layer-discovery { top: 0; }\n}\n\n"
             path.write_text(foreign + css, encoding="utf-8")
+            self.refresh_ipad_version(root)
             errors = validate_public_shell(root)
             self.assertEqual([], errors)
 
@@ -200,6 +220,7 @@ class PublicShellTests(unittest.TestCase):
             css = path.read_text(encoding="utf-8")
             decoy = '/* pseudo braces } { should not confuse the scanner */\n.decoy-content::before { content: "} { }"; }\n\n'
             path.write_text(decoy + css, encoding="utf-8")
+            self.refresh_ipad_version(root)
             errors = validate_public_shell(root)
             self.assertEqual([], errors)
 
@@ -340,14 +361,21 @@ class PublicShellTests(unittest.TestCase):
         self.assertIn("new Map(allRecords.map((record) => [record.id, record]))", app)
         self.assertIn("for (const record of records) content.append(createRibbonSegment(record, { inlineDetails: identityLevel }));", app)
         self.assertIn("renderLayerProjectDetail(view);", app)
-        self.assertIn("!usesInlineLayerProjectDetail(record)", app)
+        self.assertIn("isIdentityLevelView(view) && recordVisibleInCurrentSelection(record)", app)
+        self.assertIn("runtime.digitalTreeCache.get(records)", app)
+        self.assertIn("reconcileProjectSelection();", app)
 
     def test_final_digital_lane_uses_inline_common_details(self) -> None:
         app = (ROOT / "assets/commonworld-app.js").read_text(encoding="utf-8")
         css = (ROOT / "index.css").read_text(encoding="utf-8")
+        html = (ROOT / "index.html").read_text(encoding="utf-8")
         self.assertIn("function renderLayerProjectDetail", app)
         self.assertIn("layer-project-detail-summary", app)
         self.assertIn("layer-project-detail-actions", app)
+        self.assertIn('id="layer-project-status"', html)
+        self.assertIn("aria-labelledby", app)
+        self.assertNotIn("elements.layerProjects.setAttribute('aria-live'", app)
+        self.assertIn("document.createElement(identityLevel ? 'header' : 'button')", app)
         self.assertIn(".globe-stage[data-focused-path] .layer-panel .layer-projects:not([hidden])", css)
         self.assertIn("--focused-lane-height", css)
         self.assertIn(".layer-project-detail", css)

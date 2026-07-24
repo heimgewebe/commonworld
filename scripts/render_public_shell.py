@@ -212,7 +212,7 @@ def render_shell(root: Path = ROOT, locale: str = FALLBACK_LOCALE) -> str:
     <link rel="alternate" type="application/schema+json" href="./contracts/commonworld/project.schema.json" title="CommonProject-Schema" />
     <link rel="stylesheet" href="./assets/vendor/maplibre-gl.css" />
     <link rel="stylesheet" href="./index.css?v={asset_version('index.css', root)}" />
-    <link rel="stylesheet" href="./assets/ipad-layout.css" />
+    <link rel="stylesheet" href="./assets/ipad-layout.css?v={asset_version('assets/ipad-layout.css', root)}" />
     <script src="./assets/vendor/maplibre-gl.js" defer></script>
     <script type="module" src="./assets/commonworld-app.js?v={asset_version('assets/commonworld-app.js', root)}"></script>
   </head>
@@ -359,6 +359,7 @@ def render_shell(root: Path = ROOT, locale: str = FALLBACK_LOCALE) -> str:
               <div id="layer-buttons" class="layer-buttons"></div>
             </div>
             <div id="layer-track-deck" class="layer-track-deck" aria-label="Hierarchische digitale Commons-Ringbündel"></div>
+            <p id="layer-project-status" class="visually-hidden" role="status" aria-live="polite" aria-atomic="true"></p>
             <div id="layer-projects" class="layer-projects" hidden></div>
           </aside>
 
@@ -424,6 +425,7 @@ def render_shell(root: Path = ROOT, locale: str = FALLBACK_LOCALE) -> str:
       <section id="project-focus" class="project-focus" tabindex="-1" aria-labelledby="focus-title" hidden>
         <div class="panel-heading"><div><p id="focus-presence" class="kicker"></p><h2 id="focus-title"></h2></div><button id="focus-close" class="icon-button" type="button" aria-label="Fokus schließen">×</button></div>
         <p id="focus-summary" class="focus-summary"></p>
+        <p id="focus-selection-status" class="focus-selection-status" role="status" hidden></p>
         <div class="focus-grid">
           <section><h3>Themen</h3><ul id="focus-themes"></ul></section>
           <section><h3>Möglichkeiten</h3><ul id="focus-actions"></ul></section>

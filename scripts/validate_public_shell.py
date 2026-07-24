@@ -52,6 +52,8 @@ REQUIRED_HTML = (
     'id="layer-panel"',
     'id="layer-breadcrumb"',
     'id="layer-current"',
+    'id="layer-project-status"',
+    'id="focus-selection-status"',
     'id="layer-stack-visual"',
     'id="text-view"',
     'id="text-layer-breadcrumb"',
@@ -244,17 +246,18 @@ def _validate_ipad_landscape_wiring(root: Path, html: str) -> list[str]:
         errors.append('public shell and index.css must preserve the Commons-Art filter layout hook')
 
     index_links = [link for link in parse_stylesheet_links(html) if link.startswith('./index.css?v=')]
-    ipad_link = './assets/ipad-layout.css'
+    ipad_version = hashlib.sha256(ipad_css_path.read_bytes()).hexdigest()[:12]
+    ipad_link = f'./assets/ipad-layout.css?v={ipad_version}'
 
     links = parse_stylesheet_links(html)
     if len(index_links) != 1 or ipad_link not in links:
-        errors.append('index.html must load versioned index.css and assets/ipad-layout.css')
+        errors.append('index.html must load content-versioned index.css and assets/ipad-layout.css')
     elif links.index(index_links[0]) >= links.index(ipad_link):
         errors.append('index.html must load assets/ipad-layout.css after index.css')
 
-    render_links = parse_stylesheet_links(render_source)
-    if ipad_link not in render_links:
-        errors.append('render_public_shell.py must emit the assets/ipad-layout.css stylesheet link')
+    render_token = "href=\"./assets/ipad-layout.css?v={asset_version('assets/ipad-layout.css', root)}\""
+    if render_token not in render_source:
+        errors.append('render_public_shell.py must emit the content-versioned assets/ipad-layout.css stylesheet link')
 
     presence = parse_presence_group(html)
     if presence.fieldset_count != 1:

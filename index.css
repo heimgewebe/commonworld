@@ -1004,6 +1004,17 @@ html[data-input-modality="pointer"] :focus {
   line-height: 1.55;
 }
 
+.focus-selection-status {
+  margin: 0 0 0.8rem;
+  padding: 0.55rem 0.7rem;
+  border: 1px solid color-mix(in srgb, var(--focus) 28%, transparent);
+  border-radius: 0.65rem;
+  background: color-mix(in srgb, var(--focus) 7%, transparent);
+  color: rgba(237, 244, 239, 0.82);
+  font-size: 0.82rem;
+  line-height: 1.45;
+}
+
 .focus-grid {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -1819,6 +1830,11 @@ html[data-input-modality="pointer"] :focus {
   cursor: pointer;
 }
 
+.digital-lane-focus.is-label {
+  cursor: default;
+  user-select: text;
+}
+
 .digital-lane-focus span {
   font-size: clamp(0.8rem, 1.05vw, 0.98rem);
   font-weight: 720;
@@ -2082,6 +2098,17 @@ html:not([data-input-modality="pointer"]) .digital-ribbon-item:focus-visible {
   text-decoration: none;
 }
 
+.layer-project-detail-actions a:hover,
+html:not([data-input-modality="pointer"]) .layer-project-detail-actions a:focus-visible {
+  border-color: color-mix(in srgb, var(--focus) 72%, transparent);
+  background: color-mix(in srgb, var(--focus) 16%, rgba(4, 15, 13, 0.78));
+}
+
+html:not([data-input-modality="pointer"]) .layer-project-detail-actions a:focus-visible {
+  outline: 2px solid var(--focus);
+  outline-offset: 0.2rem;
+}
+
 .digital-lane-content .identity-show-more {
   flex: 0 0 auto;
   min-height: 44px;
@@ -2200,6 +2227,25 @@ html:not([data-input-modality="pointer"]) .digital-ribbon-item:focus-visible {
 
   .layer-project-detail-context {
     gap: 0.55rem;
+  }
+}
+
+@media (orientation: landscape) and (max-height: 24rem) {
+  .globe-stage[data-focused-path] .layer-panel {
+    --focused-lane-top: max(4.8rem, calc(env(safe-area-inset-top) + 4.45rem));
+    --focused-lane-height: 4.25rem;
+  }
+
+  .globe-stage[data-focused-path] .layer-panel .layer-projects:not([hidden]) {
+    padding: 0.65rem 0.8rem;
+  }
+
+  .layer-project-detail {
+    gap: 0.75rem;
+  }
+
+  .layer-project-detail-title {
+    font-size: clamp(1.2rem, 4.5vw, 1.7rem);
   }
 }
 

@@ -34,6 +34,7 @@ REQUIRED_FILES = (
     Path("assets/map/openfreemap-liberty.json"),
     Path("assets/commonworld-core.mjs"),
     Path("assets/commonworld-app.js"),
+    Path("assets/ipad-layout.css"),
     Path("contracts/commonworld/digital-ring-taxonomy.contract.json"),
     Path("catalog/catalog.json"),
     Path("index.html"),

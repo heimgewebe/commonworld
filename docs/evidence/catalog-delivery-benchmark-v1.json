@@ -32,9 +32,9 @@
         "gzip_bytes": 1080
       },
       "html": {
-        "raw_bytes": 174217,
-        "gzip_bytes": 21385,
-        "start_tag_count": 1931,
+        "raw_bytes": 174450,
+        "gzip_bytes": 21450,
+        "start_tag_count": 1933,
         "catalog_card_instances": 100,
         "interactive_catalog_cards": 50,
         "noscript_catalogs": 1
@@ -270,9 +270,9 @@
         "gzip_bytes": 1080
       },
       "html": {
-        "raw_bytes": 174217,
-        "gzip_bytes": 21385,
-        "start_tag_count": 1931,
+        "raw_bytes": 174450,
+        "gzip_bytes": 21450,
+        "start_tag_count": 1933,
         "catalog_card_instances": 100,
         "interactive_catalog_cards": 50,
         "noscript_catalogs": 1
@@ -292,7 +292,7 @@
     "browser": {
       "schema_version": 1,
       "kind": "commonworld_catalog_delivery_browser_metrics",
-      "measured_at": "2026-07-24T06:04:21.523Z",
+      "measured_at": "2026-07-24T11:55:39.523Z",
       "cpu_throttle_rate": 4,
       "profiles": [
         {
@@ -302,47 +302,47 @@
             "height": 844
           },
           "cpu_throttle_rate": 4,
-          "runtime_ready_ms": 728,
-          "dom_node_count": 1913,
+          "runtime_ready_ms": 657,
+          "dom_node_count": 1915,
           "catalog_card_count": 50,
           "interactive_catalog_card_count": 50,
           "runtime_ready": true,
           "runtime_failed": false,
-          "dom_content_loaded_ms": 392.40000009536743,
-          "load_event_ms": 427.60000014305115,
+          "dom_content_loaded_ms": 395.09999990463257,
+          "load_event_ms": 427.59999990463257,
           "resource_count": 13,
-          "script_duration_ms": 815.51,
-          "task_duration_ms": 2348.7,
+          "script_duration_ms": 488.98,
+          "task_duration_ms": 934.41,
           "bootstrap_compile": {
-            "median_ms": 0.6999998092651367,
-            "p95_ms": 0.9000000953674316,
+            "median_ms": 0.40000009536743164,
+            "p95_ms": 1.0999999046325684,
             "samples_ms": [
+              0,
+              0,
               0.09999990463256836,
+              0.09999990463256836,
+              0.10000014305114746,
+              0.10000014305114746,
               0.10000014305114746,
               0.20000004768371582,
               0.20000004768371582,
-              0.20000004768371582,
-              0.20000004768371582,
+              0.39999985694885254,
               0.40000009536743164,
+              0.5,
               0.5,
               0.5999999046325684,
               0.6000001430511475,
-              0.6999998092651367,
-              0.6999998092651367,
-              0.6999998092651367,
               0.7000000476837158,
-              0.7000000476837158,
-              0.7999999523162842,
-              0.7999999523162842,
-              0.7999999523162842,
-              0.9000000953674316,
-              0.9000000953674316,
-              0.9000000953674316
+              0.8999998569488525,
+              1,
+              1,
+              1.0999999046325684,
+              2.5
             ]
           },
           "first_party_request_count": 12,
           "first_party_unique_request_count": 12,
-          "first_party_raw_bytes": 1856120,
+          "first_party_raw_bytes": 1862250,
           "first_party_requests": [
             "/",
             "/assets/commonworld-app.js",
@@ -357,7 +357,7 @@
             "/assets/vendor/maplibre-gl.js",
             "/index.css"
           ],
-          "first_party_surface_sha256": "e6175d2411b338effb3fd9e4affa31e0e873ad0f63b24c3ee1f1838678a91aa4",
+          "first_party_surface_sha256": "80b360b47ad8569cafbba0d97d76f67b1c1712cde0677f1004882898f602bf56",
           "project_json_request_count": 0,
           "project_json_unique_request_count": 0,
           "project_json_requests": []
@@ -369,47 +369,47 @@
             "height": 768
           },
           "cpu_throttle_rate": 4,
-          "runtime_ready_ms": 684,
-          "dom_node_count": 1913,
+          "runtime_ready_ms": 656,
+          "dom_node_count": 1915,
           "catalog_card_count": 50,
           "interactive_catalog_card_count": 50,
           "runtime_ready": true,
           "runtime_failed": false,
-          "dom_content_loaded_ms": 393.5,
-          "load_event_ms": 429.30000019073486,
+          "dom_content_loaded_ms": 376.7999999523163,
+          "load_event_ms": 408,
           "resource_count": 13,
-          "script_duration_ms": 586.35,
-          "task_duration_ms": 991.57,
+          "script_duration_ms": 544.03,
+          "task_duration_ms": 919.2,
           "bootstrap_compile": {
-            "median_ms": 0.6999998092651367,
-            "p95_ms": 1,
+            "median_ms": 0.5,
+            "p95_ms": 0.9000000953674316,
             "samples_ms": [
-              0,
-              0,
+              0.09999990463256836,
               0.09999990463256836,
               0.10000014305114746,
-              0.10000014305114746,
-              0.10000014305114746,
-              0.10000014305114746,
+              0.20000004768371582,
               0.20000004768371582,
               0.2999999523162842,
+              0.39999985694885254,
+              0.40000009536743164,
               0.5,
-              0.6999998092651367,
-              0.7000000476837158,
+              0.5,
+              0.5,
+              0.5,
+              0.6000001430511475,
               0.7000000476837158,
               0.7999999523162842,
-              0.8999998569488525,
-              0.8999998569488525,
+              0.7999999523162842,
+              0.7999999523162842,
               0.8999998569488525,
               0.9000000953674316,
-              1,
-              1,
-              1
+              0.9000000953674316,
+              1.0999999046325684
             ]
           },
           "first_party_request_count": 12,
           "first_party_unique_request_count": 12,
-          "first_party_raw_bytes": 1856120,
+          "first_party_raw_bytes": 1862250,
           "first_party_requests": [
             "/",
             "/assets/commonworld-app.js",
@@ -424,12 +424,53 @@
             "/assets/vendor/maplibre-gl.js",
             "/index.css"
           ],
-          "first_party_surface_sha256": "e6175d2411b338effb3fd9e4affa31e0e873ad0f63b24c3ee1f1838678a91aa4",
+          "first_party_surface_sha256": "80b360b47ad8569cafbba0d97d76f67b1c1712cde0677f1004882898f602bf56",
           "project_json_request_count": 0,
           "project_json_unique_request_count": 0,
           "project_json_requests": []
         }
       ]
+    },
+    "browser_repeatability": {
+      "run_count": 5,
+      "cpu_throttle_rate": 4,
+      "profiles": {
+        "mobile-low-power": {
+          "runtime_ready_ms": {
+            "min": 612,
+            "median": 631,
+            "max": 642
+          },
+          "script_duration_ms": {
+            "min": 454.98,
+            "median": 473.5,
+            "max": 507.31
+          },
+          "task_duration_ms": {
+            "min": 854.86,
+            "median": 870.91,
+            "max": 905.17
+          }
+        },
+        "desktop-low-power": {
+          "runtime_ready_ms": {
+            "min": 591,
+            "median": 606,
+            "max": 628
+          },
+          "script_duration_ms": {
+            "min": 483.31,
+            "median": 494.87,
+            "max": 510.47
+          },
+          "task_duration_ms": {
+            "min": 819.98,
+            "median": 848.62,
+            "max": 862.96
+          }
+        }
+      },
+      "interpretation": "Five sequential no-store measurements. Min, median and max are reported; the durable representative observation remains the canonical budget input."
     }
   },
   "delta": {
@@ -444,8 +485,8 @@
       "desktop-low-power": -39
     },
     "browser_dom_nodes_by_profile": {
-      "mobile-low-power": 226,
-      "desktop-low-power": 226
+      "mobile-low-power": 228,
+      "desktop-low-power": 228
     }
   },
   "selected_design": "build-bound-bootstrap-with-public-project-json",
@@ -499,24 +540,27 @@
         "method-mobile-text-200"
       ],
       "catalogue_network_blocked_requests": 0,
-      "durable_task_id": "258636e89de64be2a16d3c56",
-      "lifecycle_receipt_sha256": "c0237c15f16b148949fdac4eab39cb5319868439febd94c76325055d50a5001e",
-      "result_sha256": "41029c3ec3ec4e437c62a9be4fd5c1efbeb610b66f04d7f23efeb57b30e9e73b"
+      "durable_task_id": "1aa676399371",
+      "lifecycle_receipt_sha256": "69662195c8c0d118e2d5d4cb87510550b6369d1aefcd2d328c374fcfa1caca41",
+      "result_sha256": "521929a2d6b83b9726e6ba9f5403563694f9a09f304e6748af4eeb463bdc0f2c"
     },
     "proposal_browser_smoke": {
       "verdict": "PASS",
-      "durable_task_id": "162ea80c39174c408bbf10ca",
-      "lifecycle_receipt_sha256": "f9cdfb99e6d1f8110eb258cd07149bbb32fbade671f8699d8343c1a8ff37dbb3"
+      "durable_task_id": "dc851526f15c",
+      "lifecycle_receipt_sha256": "df32f769db0d762b5adfcd83e09f6ae4b4e1e598445abb35d42d63b423ee04cc",
+      "covered_by": "official_browser_runner"
     },
     "focus_overlay_browser_smoke": {
       "verdict": "PASS",
-      "durable_task_id": "4ad85284e1124f72aafde86a",
-      "lifecycle_receipt_sha256": "bb20c471d876cf65cd505d82dd8f91c1e6e48974c02d83d65baa255f4b06e8bb"
+      "durable_task_id": "dc851526f15c",
+      "lifecycle_receipt_sha256": "df32f769db0d762b5adfcd83e09f6ae4b4e1e598445abb35d42d63b423ee04cc",
+      "covered_by": "official_browser_runner"
     },
     "accessibility_modes_browser_smoke": {
       "verdict": "PASS",
-      "durable_task_id": "45588bc11e6545fc87aa4d33",
-      "lifecycle_receipt_sha256": "00e0a70f472c0f7d1f751b9a80a8d3bdb9dd18430b92d135453db3a787497f2c"
+      "durable_task_id": "dc851526f15c",
+      "lifecycle_receipt_sha256": "df32f769db0d762b5adfcd83e09f6ae4b4e1e598445abb35d42d63b423ee04cc",
+      "covered_by": "official_browser_runner"
     },
     "catalog_delivery_browser_measurement": {
       "verdict": "PASS",
@@ -525,20 +569,22 @@
         "desktop-low-power"
       ],
       "cpu_throttle_rate": 4,
-      "durable_task_id": "d323710726b64948a3cdf424",
-      "lifecycle_receipt_sha256": "bb9efd5553616d8a3e4d22bd12bca31471c1514b6588e1b2b63292589cae40ad",
-      "result_sha256": "a657349d581a15876af5698e742bfe1dca8b0c5bb667073b6a74d1b310c17043"
+      "durable_task_id": "7e767c81622a",
+      "lifecycle_receipt_sha256": "ca35e25c3f69b90ea8f0cf8ab2e311e4fda785a9670bffe36b3b70f926c6463e",
+      "result_sha256": "8a3e6ebc14f435facf3859ca161cf7559fdd0f2c689de27b9cbcf1522417e776",
+      "repeatability_run_count": 5
     },
     "official_browser_runner": {
       "verdict": "PASS",
       "covers": [
         "public-browser-smoke",
+        "catalog-delivery-evidence-validation",
         "proposal-browser-smoke",
         "focus-overlay-browser-smoke",
         "accessibility-modes-browser-smoke"
       ],
-      "durable_task_id": "326a580123c845beb2a7b001",
-      "lifecycle_receipt_sha256": "611f8c814a24c4cd4ddff719f4275540b5328560f051088e6d525d5a31129114"
+      "durable_task_id": "dc851526f15c",
+      "lifecycle_receipt_sha256": "df32f769db0d762b5adfcd83e09f6ae4b4e1e598445abb35d42d63b423ee04cc"
     }
   },
   "budget_binding": {
@@ -546,5 +592,5 @@
     "warn_bootstrap_gzip_bytes": 28672,
     "max_bootstrap_gzip_bytes": 32768
   },
-  "current_surface_note": "Rebinds delivery evidence to the compact final digital lane and its inline, responsive Common detail surface."
+  "current_surface_note": "Binds the compact final digital lane to explicit preview/selection semantics, retained-filter context, content-versioned iPad CSS, cached digital trees, short-landscape geometry and five-run performance repeatability."
 }
