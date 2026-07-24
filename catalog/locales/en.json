@@ -38,6 +38,14 @@
     "mutual_local_self_help": "Neighbourhoods and Mutual Aid"
   },
   "projects": {
+    "aflaj-irrigation-systems-oman": {
+      "title": "Aflaj Irrigation Systems of Oman",
+      "summary": "Living community-managed irrigation systems in Oman that allocate water by time shares and are sustained through shared maintenance, rules and local financing.",
+      "geographic_labels": {
+        "aflaj-oman-serial-area": "Five aflaj areas in northern Oman"
+      },
+      "digital_label": "UNESCO documentation with descriptions, maps and management information"
+    },
     "akiba-mashinani-trust": {
       "summary": "A financing instrument run by settlement communities in Kenya that supports savings groups, loans and community-organized projects for housing, sanitation and basic infrastructure.",
       "geographic_labels": {
@@ -122,6 +130,11 @@
       "geographic_labels": {},
       "digital_label": "Open documentation and collaborative network"
     },
+    "freifunk": {
+      "summary": "A non-commercial initiative for free, community-built communication networks and open digital infrastructure.",
+      "geographic_labels": {},
+      "digital_label": "Free community networks and participation information"
+    },
     "freifunk-hamburg": {
       "summary": "A local Freifunk community that operates a community-supported digital network in Hamburg and connects participation, open infrastructure and free communication.",
       "geographic_labels": {
@@ -129,11 +142,6 @@
         "freifunk-hamburg-private-routers": "Private home routers"
       },
       "digital_label": "Hamburg Freifunk community network and participation information"
-    },
-    "freifunk": {
-      "summary": "A non-commercial initiative for free, community-built communication networks and open digital infrastructure.",
-      "geographic_labels": {},
-      "digital_label": "Free community networks and participation information"
     },
     "fucvam": {
       "summary": "Uruguay's federation of mutual-aid housing cooperatives combines collective land ownership, democratic self-management and mutual aid in building and maintaining housing.",
@@ -174,6 +182,13 @@
         "kibera-public-space-network-area": "Kibera, Nairobi, Kenya"
       }
     },
+    "kobulu-community-micro-hydro": {
+      "summary": "A community-managed micro-hydropower system in Kampung Buayan, Sabah, whose local committee organizes consumption tariffs, operator pay, spare parts and future repairs.",
+      "geographic_labels": {
+        "kobulu-penampang-area": "Penampang area, Sabah, Malaysia"
+      },
+      "digital_label": "TONIBUNG project documentation on the technology and community management model"
+    },
     "libreoffice": {
       "summary": "A free and open-source office suite developed, documented and translated by an international community.",
       "geographic_labels": {},
@@ -199,6 +214,13 @@
       "summary": "An open music encyclopedia maintained by a worldwide community, with metadata collaboratively added, reviewed and made available largely under open licenses.",
       "geographic_labels": {},
       "digital_label": "Community-maintained open music metadata database"
+    },
+    "namena-marine-reserve": {
+      "summary": "A marine reserve stewarded by the customary resource owners of Kubulau District in Fiji, where community rules, enforcement and financing protect fisheries and local livelihoods.",
+      "geographic_labels": {
+        "namena-kubulau-area": "Kubulau District and Namena Lagoon, Bua, Fiji"
+      },
+      "digital_label": "WCS documentation on community governance, protection and monitoring"
     },
     "nepal-wireless-networking-project": {
       "summary": "A rural communications network in Nepal supported by local communities and E-Networking Research and Development, linking jointly maintained wireless infrastructure, education and local services.",
@@ -300,6 +322,13 @@
         "som-energia-private-sites": "Private connections and facilities not individually verified"
       },
       "digital_label": "Member portal, project information and local groups"
+    },
+    "tetepare-descendants-association": {
+      "summary": "A large landowners’ association in the Solomon Islands that collectively protects and manages Tetepare Island and its terrestrial and marine resources for future generations.",
+      "geographic_labels": {
+        "tetepare-island-area": "Tetepare Island, Western Province, Solomon Islands"
+      },
+      "digital_label": "Public organizational, conservation and visitor information from the Tetepare Descendants’ Association"
     },
     "tribunal-aguas-valencia": {
       "summary": "A water court run by irrigation communities in Valencia that hears disputes over use publicly and regularly according to established practice.",
