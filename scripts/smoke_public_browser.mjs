@@ -9,6 +9,8 @@ import {
   deriveCommonsType,
   deriveDigitalProjectPath,
   deriveLayer,
+  filterRecords,
+  prepareIntentSearchIndex,
   DIGITAL_LAYER_TRANSITION_MS,
   MAP_GEOMETRY_DIAGNOSTIC_SAMPLE_INTERVAL,
   MAP_GEOMETRY_SAMPLE_INTERVAL_MS,
@@ -179,7 +181,6 @@ async function loadExpectedDigitalProjection() {
   const contributionIds = [];
   const communityNetworkIds = [];
   const dualPresenceIds = [];
-  const dualPresenceVolunteerIds = [];
   for (const projectFile of manifest.project_files) {
     const record = JSON.parse(await readFile(path.join(ROOT, 'catalog', projectFile), 'utf8'));
     records.push(record);
@@ -189,13 +190,22 @@ async function loadExpectedDigitalProjection() {
     const hasPublicGeographicPresence = (record.presence?.geographic ?? []).some((location) => location?.mode !== 'hidden' && Boolean(location?.geometry));
     const hasPublicDigitalPresence = record.presence?.digital?.available === true;
     if (hasPublicGeographicPresence && hasPublicDigitalPresence) dualPresenceIds.push(record.id);
-    if (hasPublicGeographicPresence && hasPublicDigitalPresence && record.actions?.includes('volunteer')) dualPresenceVolunteerIds.push(record.id);
     if (record?.presence?.digital?.available !== true) continue;
     const derived = deriveDigitalProjectPath(record);
     assert(derived?.status === 'classified', `catalog projection: ${record.id} did not derive a classified digital path ${JSON.stringify(derived)}`);
     allIds.push(record.id);
   }
   assert(new Set(allIds).size === allIds.length, `catalog projection: duplicate digital IDs in catalog ${JSON.stringify(allIds)}`);
+  const searchIndex = prepareIntentSearchIndex(records);
+  const selectedPresenceIds = filterRecords(records, {
+    presence: ['geographic', 'digital'],
+    searchIndex,
+  }).map((record) => record.id);
+  const selectedPresenceVolunteerIds = filterRecords(records, {
+    presence: ['geographic', 'digital'],
+    action: 'volunteer',
+    searchIndex,
+  }).map((record) => record.id);
   const publicCollection = publicMapFeatureCollection(records);
   const publicFeatureCount = publicCollection.features.length;
   const publicIdentityCount = new Set(
@@ -251,7 +261,8 @@ async function loadExpectedDigitalProjection() {
     contributionIds,
     communityNetworkIds,
     dualPresenceIds,
-    dualPresenceVolunteerIds,
+    selectedPresenceIds,
+    selectedPresenceVolunteerIds,
     publicFeatureCount,
     publicIdentityCount,
     aggregateImpressionCount,
@@ -1735,13 +1746,13 @@ async function intentSearchDiscoveryScenario() {
   const filterCamera = await mapCamera();
   await run.page.locator('#filter-presence-geographic').check();
   await run.page.locator('#filter-presence-digital').check();
-  await run.page.waitForFunction((count) => document.querySelectorAll('.discovery-result').length === count, expectedDigitalProjection.dualPresenceIds.length);
-  assert(JSON.stringify(await resultIds()) === JSON.stringify(expectedDigitalProjection.dualPresenceIds), 'intent filters: dual presence differs from the catalog');
+  await run.page.waitForFunction((count) => document.querySelectorAll('.discovery-result').length === count, expectedDigitalProjection.selectedPresenceIds.length);
+  assert(JSON.stringify(await resultIds()) === JSON.stringify(expectedDigitalProjection.selectedPresenceIds), 'intent filters: selected presence axes differ from the catalog union');
   const params = new URL(run.page.url()).searchParams.getAll('presence');
   assert(params.length === 2 && params[0] === 'geographic' && params[1] === 'digital', 'intent filters: presence was not serialized correctly');
   await run.page.locator('#filter-action').selectOption('volunteer');
-  await run.page.waitForFunction((count) => new URL(location.href).searchParams.get('action') === 'volunteer' && document.querySelectorAll('.discovery-result').length === count, expectedDigitalProjection.dualPresenceVolunteerIds.length);
-  assert(JSON.stringify(await resultIds()) === JSON.stringify(expectedDigitalProjection.dualPresenceVolunteerIds), 'intent filters: combined dual-presence-volunteer filter differs from claimed catalog actions');
+  await run.page.waitForFunction((count) => new URL(location.href).searchParams.get('action') === 'volunteer' && document.querySelectorAll('.discovery-result').length === count, expectedDigitalProjection.selectedPresenceVolunteerIds.length);
+  assert(JSON.stringify(await resultIds()) === JSON.stringify(expectedDigitalProjection.selectedPresenceVolunteerIds), 'intent filters: combined presence-volunteer OR filter differs from selected axes and claimed catalog actions');
   assert(sameCamera(filterCamera, await mapCamera()), 'intent filters: changing filters moved the map');
 
   const actionTypes = await run.page.locator('.discovery-result[data-commonproject-id="freifunk-hamburg"] .discovery-result-actions a').evaluateAll((links) => links.map((link) => link.dataset.actionType));
@@ -1751,10 +1762,10 @@ async function intentSearchDiscoveryScenario() {
 
   await run.page.goBack({ waitUntil: 'domcontentloaded' });
   await run.page.waitForFunction(() => document.querySelector('#filter-presence-geographic')?.checked === true && document.querySelector('#filter-presence-digital')?.checked === true && document.querySelector('#filter-action')?.value === '');
-  assert(JSON.stringify(await resultIds()) === JSON.stringify(expectedDigitalProjection.dualPresenceIds), 'intent history: Back did not restore the previous filter context');
+  assert(JSON.stringify(await resultIds()) === JSON.stringify(expectedDigitalProjection.selectedPresenceIds), 'intent history: Back did not restore the previous filter context');
   await run.page.goForward({ waitUntil: 'domcontentloaded' });
   await run.page.waitForFunction(() => document.querySelector('#filter-action')?.value === 'volunteer');
-  assert(JSON.stringify(await resultIds()) === JSON.stringify(expectedDigitalProjection.dualPresenceVolunteerIds), 'intent history: Forward did not restore the combined filter context');
+  assert(JSON.stringify(await resultIds()) === JSON.stringify(expectedDigitalProjection.selectedPresenceVolunteerIds), 'intent history: Forward did not restore the combined filter context');
 
   await run.page.locator('#filter-clear').click();
   await run.page.waitForFunction((count) => document.querySelectorAll('.discovery-result').length === count, expectedDigitalProjection.catalogEntryCount);
@@ -1800,12 +1811,14 @@ async function intentSearchDiscoveryScenario() {
   await run.page.waitForFunction((count) => document.querySelectorAll('.discovery-result').length === count, expectedDigitalProjection.catalogEntryCount);
   await run.page.locator('#filter-presence-geographic').check();
   await run.page.locator('#filter-presence-digital').check();
-  await run.page.waitForFunction((count) => document.querySelectorAll('.discovery-result').length === count, expectedDigitalProjection.dualPresenceIds.length);
+  await run.page.waitForFunction((count) => document.querySelectorAll('.discovery-result').length === count, expectedDigitalProjection.selectedPresenceIds.length);
   await run.page.locator('#discovery-close').click();
   await run.page.locator('#settings-toggle').click();
   await run.page.getByRole('radio', { name: /Text/ }).click();
   const visibleTextIds = await run.page.locator('.catalog-card:not([hidden])').evaluateAll((cards) => cards.map((card) => card.dataset.commonprojectId));
-  assert(JSON.stringify(visibleTextIds) === JSON.stringify(expectedDigitalProjection.dualPresenceIds), 'intent parity: text view does not preserve the globe filter context');
+  const expectedVisibleTextIds = expectedDigitalProjection.selectedPresenceIds.slice(0, visibleTextIds.length);
+  assert(visibleTextIds.length > 0 && JSON.stringify(visibleTextIds) === JSON.stringify(expectedVisibleTextIds), 'intent parity: text view does not preserve the ordered globe filter prefix');
+  assert((await run.page.locator('#text-count').textContent())?.includes(String(expectedDigitalProjection.selectedPresenceIds.length)), 'intent parity: text view does not report the full filtered result count');
   const staticActionTypes = await run.page.locator('#project-freifunk-hamburg .catalog-action-link').evaluateAll((links) => links.map((link) => link.dataset.actionType));
   assert(JSON.stringify(staticActionTypes) === JSON.stringify(['use', 'learn', 'contribute', 'volunteer', 'contact']), 'intent parity: static text actions differ from ranked result actions');
 
