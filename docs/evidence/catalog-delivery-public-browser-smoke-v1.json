@@ -120,7 +120,7 @@
     {
       "id": "layer-journey-moveend-return",
       "verdict": "PASS",
-      "elapsedMs": 1749
+      "elapsedMs": 1640
     },
     {
       "id": "layer-journey-interrupted",
@@ -218,9 +218,9 @@
   "schema_version": 1,
   "kind": "commonworld_catalog_delivery_public_browser_smoke_evidence",
   "binding": {
-    "smoke_script_sha256": "e8677763d6c95985558f33d9afcb107bbd1c479946f6cf3b1593b768cdbecabe",
+    "smoke_script_sha256": "fa14a3d10d4a048c503682d5b4c8ae319a07d5ce9953b6123a069b037c478cd4",
     "smoke_runner_sha256": "522b99b70b1d0064b1d0a31a3a67fdc9a2e73b7408f37d1a4bb303bc360b7556",
-    "first_party_surface_sha256": "42933cb3b05297474e4f1c8ef960ad0888b8f38122908ce141e42d4ba056ec57",
+    "first_party_surface_sha256": "9bdfa6ab2b1ccc9a7438684fddf3322905092302d890168b1371c638a67d9e99",
     "scenario_ids": [
       "startup-and-ring-orbits",
       "ring-orbits-reduced-motion",

@@ -32,9 +32,9 @@
         "gzip_bytes": 1080
       },
       "html": {
-        "raw_bytes": 182644,
-        "gzip_bytes": 24645,
-        "start_tag_count": 1887,
+        "raw_bytes": 174217,
+        "gzip_bytes": 21384,
+        "start_tag_count": 1931,
         "catalog_card_instances": 100,
         "interactive_catalog_cards": 50,
         "noscript_catalogs": 1
@@ -270,8 +270,8 @@
         "gzip_bytes": 1080
       },
       "html": {
-        "raw_bytes": 174195,
-        "gzip_bytes": 21374,
+        "raw_bytes": 174217,
+        "gzip_bytes": 21384,
         "start_tag_count": 1931,
         "catalog_card_instances": 100,
         "interactive_catalog_cards": 50,
@@ -292,7 +292,7 @@
     "browser": {
       "schema_version": 1,
       "kind": "commonworld_catalog_delivery_browser_metrics",
-      "measured_at": "2026-07-24T02:36:36.984Z",
+      "measured_at": "2026-07-24T04:25:18.144Z",
       "cpu_throttle_rate": 4,
       "profiles": [
         {
@@ -302,20 +302,20 @@
             "height": 844
           },
           "cpu_throttle_rate": 4,
-          "runtime_ready_ms": 626,
-          "dom_node_count": 1959,
+          "runtime_ready_ms": 640,
+          "dom_node_count": 1913,
           "catalog_card_count": 50,
           "interactive_catalog_card_count": 50,
           "runtime_ready": true,
           "runtime_failed": false,
-          "dom_content_loaded_ms": 378.2999999523163,
-          "load_event_ms": 408,
+          "dom_content_loaded_ms": 389.59999990463257,
+          "load_event_ms": 420.5,
           "resource_count": 13,
-          "script_duration_ms": 464.78,
-          "task_duration_ms": 850.99,
+          "script_duration_ms": 473.63,
+          "task_duration_ms": 910.29,
           "bootstrap_compile": {
-            "median_ms": 0.2999999523162842,
-            "p95_ms": 0.8999998569488525,
+            "median_ms": 0.39999985694885254,
+            "p95_ms": 1.0999999046325684,
             "samples_ms": [
               0,
               0,
@@ -327,22 +327,22 @@
               0.10000014305114746,
               0.20000004768371582,
               0.2999999523162842,
-              0.2999999523162842,
+              0.39999985694885254,
+              0.39999985694885254,
+              0.5,
+              0.5,
               0.5,
               0.5999999046325684,
-              0.5999999046325684,
-              0.6000001430511475,
-              0.6999998092651367,
               0.7000000476837158,
-              0.7000000476837158,
-              0.8000001907348633,
-              0.8999998569488525,
-              0.9000000953674316
+              0.7999999523162842,
+              0.9000000953674316,
+              1.0999999046325684,
+              2.5
             ]
           },
           "first_party_request_count": 12,
           "first_party_unique_request_count": 12,
-          "first_party_raw_bytes": 1847280,
+          "first_party_raw_bytes": 1848480,
           "first_party_requests": [
             "/",
             "/assets/commonworld-app.js",
@@ -357,7 +357,7 @@
             "/assets/vendor/maplibre-gl.js",
             "/index.css"
           ],
-          "first_party_surface_sha256": "42933cb3b05297474e4f1c8ef960ad0888b8f38122908ce141e42d4ba056ec57",
+          "first_party_surface_sha256": "9bdfa6ab2b1ccc9a7438684fddf3322905092302d890168b1371c638a67d9e99",
           "project_json_request_count": 0,
           "project_json_unique_request_count": 0,
           "project_json_requests": []
@@ -369,47 +369,47 @@
             "height": 768
           },
           "cpu_throttle_rate": 4,
-          "runtime_ready_ms": 632,
-          "dom_node_count": 1959,
+          "runtime_ready_ms": 628,
+          "dom_node_count": 1913,
           "catalog_card_count": 50,
           "interactive_catalog_card_count": 50,
           "runtime_ready": true,
           "runtime_failed": false,
-          "dom_content_loaded_ms": 360.2999999523163,
-          "load_event_ms": 391,
+          "dom_content_loaded_ms": 362.30000019073486,
+          "load_event_ms": 394.40000009536743,
           "resource_count": 13,
-          "script_duration_ms": 511.62,
-          "task_duration_ms": 860.29,
+          "script_duration_ms": 506.63,
+          "task_duration_ms": 887.39,
           "bootstrap_compile": {
             "median_ms": 0.5,
-            "p95_ms": 1,
+            "p95_ms": 0.8999998569488525,
             "samples_ms": [
+              0,
               0.09999990463256836,
               0.10000014305114746,
               0.10000014305114746,
               0.10000014305114746,
-              0.10000014305114746,
               0.20000004768371582,
+              0.2999999523162842,
+              0.2999999523162842,
+              0.40000009536743164,
               0.40000009536743164,
               0.5,
-              0.5,
-              0.5,
-              0.5,
-              0.6000001430511475,
-              0.6999998092651367,
-              0.6999998092651367,
-              0.6999998092651367,
+              0.5999999046325684,
+              0.7000000476837158,
+              0.7000000476837158,
               0.7000000476837158,
               0.7999999523162842,
-              0.8000001907348633,
+              0.7999999523162842,
+              0.7999999523162842,
+              0.7999999523162842,
               0.8999998569488525,
-              1,
-              1.0999999046325684
+              0.8999998569488525
             ]
           },
           "first_party_request_count": 12,
           "first_party_unique_request_count": 12,
-          "first_party_raw_bytes": 1847280,
+          "first_party_raw_bytes": 1848480,
           "first_party_requests": [
             "/",
             "/assets/commonworld-app.js",
@@ -424,7 +424,7 @@
             "/assets/vendor/maplibre-gl.js",
             "/index.css"
           ],
-          "first_party_surface_sha256": "42933cb3b05297474e4f1c8ef960ad0888b8f38122908ce141e42d4ba056ec57",
+          "first_party_surface_sha256": "9bdfa6ab2b1ccc9a7438684fddf3322905092302d890168b1371c638a67d9e99",
           "project_json_request_count": 0,
           "project_json_unique_request_count": 0,
           "project_json_requests": []
@@ -444,8 +444,8 @@
       "desktop-low-power": -39
     },
     "browser_dom_nodes_by_profile": {
-      "mobile-low-power": 272,
-      "desktop-low-power": 272
+      "mobile-low-power": 226,
+      "desktop-low-power": 226
     }
   },
   "selected_design": "build-bound-bootstrap-with-public-project-json",

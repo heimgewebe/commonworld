@@ -333,5 +333,36 @@ class PublicShellTests(unittest.TestCase):
             self.assertIn("public reduced-motion contract must disable transitions", errors)
 
 
+    def test_digital_lanes_present_each_common_once(self) -> None:
+        app = (ROOT / "assets/commonworld-app.js").read_text(encoding="utf-8")
+        self.assertNotIn("ribbonRepeatCount", app)
+        self.assertNotIn("data-ribbon-copy", app)
+        self.assertIn("new Map(allRecords.map((record) => [record.id, record]))", app)
+        self.assertIn("for (const record of records) content.append(createRibbonSegment(record));", app)
+
+    def test_digital_lane_edges_and_labels_remain_legible(self) -> None:
+        css = (ROOT / "index.css").read_text(encoding="utf-8")
+        self.assertIn(".digital-lane-scroll[data-overflowing][data-at-start]", css)
+        self.assertIn(".digital-lane-scroll[data-overflowing][data-at-end]", css)
+        self.assertIn(".digital-ribbon-item:last-child::after", css)
+        label_block = find_css_block(css, ".digital-lane-focus span")
+        self.assertIsNotNone(label_block)
+        self.assertIn("hyphens: manual", label_block[1])
+        self.assertIn("word-break: normal", label_block[1])
+
+    def test_filter_grid_keeps_action_and_location_controls_in_rhythm(self) -> None:
+        render_source = (ROOT / "scripts/render_public_shell.py").read_text(encoding="utf-8")
+        css = (ROOT / "index.css").read_text(encoding="utf-8")
+        self.assertIn('class="filter-action"', render_source)
+        self.assertIn(".filter-commons-type,\n.filter-action {", css)
+        self.assertIn(".filter-action {\n  grid-column: span 2", css)
+        location_block = find_css_block(css, ".filter-group-controls #use-current-location")
+        self.assertIsNotNone(location_block)
+        self.assertIn("justify-self: start", location_block[1])
+        self.assertIn("width: max-content", location_block[1])
+        self.assertIn("min-height: var(--minimum-touch-target, 44px)", location_block[1])
+        self.assertIn(".geolocation-status:empty", css)
+
+
 if __name__ == "__main__":
     unittest.main()

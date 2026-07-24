@@ -623,7 +623,12 @@ def validate_public_maplibre_vertical_slice(root: Path = ROOT) -> list[str]:
     for identifier in identifiers:
         if identifier in app or identifier in core:
             errors.append(f"public runtime code hardcodes catalog identity instead of loading it: {identifier}")
-    for token in ("renderSphereRibbons(runtime.records);", "renderLayerDeck();", "ribbonRepeatCount(records.length, 10)"):
+    for token in (
+        "renderSphereRibbons(runtime.records);",
+        "renderLayerDeck();",
+        "new Map(allRecords.map((record) => [record.id, record]))",
+        "for (const record of records) content.append(createRibbonSegment(record));",
+    ):
         if token not in app:
             errors.append(f"public runtime must use the tested text-ribbon lane architecture: {token}")
     for token in ("binaryName(record.title)", "sphere-ring-binary", "digital-ribbon-binary"):
