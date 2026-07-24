@@ -88,7 +88,9 @@ test('intent filters preserve identity and treat absent language or access as un
   assert.deepEqual(index.search({ query: 'Gemeinschaftsnetz' }).map(({ id }) => id), ['freifunk-hamburg']);
   assert.deepEqual(index.search({ filters: { commons_type: 'housing-land' } }).map(({ id }) => id), ['le-nid']);
   assert.deepEqual(index.search({ filters: { commons_type: 'software' } }).map(({ id }) => id), ['debian']);
-  assert.deepEqual(index.search({ filters: { presence: ['geographic', 'digital'] } }).map(({ id }) => id), ['freifunk-hamburg']);
+  assert.deepEqual(index.search({ filters: { presence: ['geographic'] } }).map(({ id }) => id), ['freifunk-hamburg', 'le-nid']);
+  assert.deepEqual(index.search({ filters: { presence: ['digital'] } }).map(({ id }) => id), ['debian', 'freifunk-hamburg']);
+  assert.deepEqual(index.search({ filters: { presence: ['geographic', 'digital'] } }).map(({ id }) => id), ['debian', 'freifunk-hamburg', 'le-nid']);
   assert.deepEqual(index.search({ filters: { action: 'donate' } }).map(({ id }) => id), ['debian']);
   assert.deepEqual(index.search({ filters: { language: 'de' } }).map(({ id }) => id), ['freifunk-hamburg']);
   assert.deepEqual(index.search({ filters: { language: 'unknown' } }).map(({ id }) => id), ['debian', 'le-nid']);

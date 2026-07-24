@@ -97,7 +97,7 @@ console.log(JSON.stringify({
   germanContribution: ids('ich möchte mitmachen'),
   publicPlace: ids('Anderlecht'),
   hiddenPhrase: ids('private heimrouter'),
-  dualPresenceVolunteer: ids('', { presence: ['geographic', 'digital'], action: 'volunteer' }),
+  selectedPresenceVolunteer: ids('', { presence: ['geographic', 'digital'], action: 'volunteer' }),
   digitalTarget: publicProjectNavigationTarget(mapData, 'debian'),
   geographicTarget: publicProjectNavigationTarget(mapData, 'cltb-le-nid'),
   hiddenTarget: publicProjectNavigationTarget(mapData, 'freifunk-hamburg-private-routers'),
@@ -257,11 +257,13 @@ def validate_intent_search_discovery(root: Path = ROOT) -> list[str]:
             for record in records
             if "contribute" in record.get("actions", [])
         )
-        expected_dual_presence_volunteer = sorted(
+        expected_selected_presence_volunteer = sorted(
             record["id"]
             for record in records
-            if bool(record.get("presence", {}).get("geographic"))
-            and record.get("presence", {}).get("digital", {}).get("available") is True
+            if (
+                bool(record.get("presence", {}).get("geographic"))
+                or record.get("presence", {}).get("digital", {}).get("available") is True
+            )
             and "volunteer" in record.get("actions", [])
         )
         if probe.get("indexedRecords") != manifest.get("entry_count") or probe.get("indexedTerms", 0) <= 0:
@@ -272,8 +274,8 @@ def validate_intent_search_discovery(root: Path = ROOT) -> list[str]:
             errors.append("T007 public place query mismatch")
         if probe.get("hiddenPhrase") != []:
             errors.append("T007 hidden geographic values leaked into search")
-        if probe.get("dualPresenceVolunteer") != expected_dual_presence_volunteer:
-            errors.append("T007 combined dual_presence-volunteer filter does not match claimed actions")
+        if probe.get("selectedPresenceVolunteer") != expected_selected_presence_volunteer:
+            errors.append("T007 combined presence-volunteer OR filter does not match selected axes and claimed actions")
         if probe.get("digitalTarget") is not None:
             errors.append("T007 digital Commons acquired a spatial navigation target")
         if probe.get("geographicTarget", {}).get("kind") != "bounds":

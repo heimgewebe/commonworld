@@ -1263,8 +1263,13 @@ export function recordMatchesIntentFilters(record, filters = {}, today = new Dat
   } else if (filters.digitalPath && !digitalPathContainsRecord(filters.digitalPath, record)) return false;
 
   if (Array.isArray(filters.presence) && filters.presence.length > 0) {
-    if (filters.presence.includes('geographic') && publicGeographicLocations(record).length === 0) return false;
-    if (filters.presence.includes('digital') && !hasDigitalPresence(record)) return false;
+    const wantsGeographic = filters.presence.includes('geographic');
+    const wantsDigital = filters.presence.includes('digital');
+    if (wantsGeographic || wantsDigital) {
+      const matchesGeographic = wantsGeographic && publicGeographicLocations(record).length > 0;
+      const matchesDigital = wantsDigital && hasDigitalPresence(record);
+      if (!matchesGeographic && !matchesDigital) return false;
+    }
   }
 
   if (filters.commons_type && deriveCommonsType(record) !== filters.commons_type) return false;
