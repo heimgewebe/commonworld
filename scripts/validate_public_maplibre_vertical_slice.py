@@ -627,7 +627,9 @@ def validate_public_maplibre_vertical_slice(root: Path = ROOT) -> list[str]:
         "renderSphereRibbons(runtime.records);",
         "renderLayerDeck();",
         "new Map(allRecords.map((record) => [record.id, record]))",
-        "for (const record of records) content.append(createRibbonSegment(record));",
+        "for (const record of records) content.append(createRibbonSegment(record, { inlineDetails: identityLevel }));",
+        "renderLayerProjectDetail(view);",
+        "!usesInlineLayerProjectDetail(record)",
     ):
         if token not in app:
             errors.append(f"public runtime must use the tested text-ribbon lane architecture: {token}")

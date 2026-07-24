@@ -338,7 +338,19 @@ class PublicShellTests(unittest.TestCase):
         self.assertNotIn("ribbonRepeatCount", app)
         self.assertNotIn("data-ribbon-copy", app)
         self.assertIn("new Map(allRecords.map((record) => [record.id, record]))", app)
-        self.assertIn("for (const record of records) content.append(createRibbonSegment(record));", app)
+        self.assertIn("for (const record of records) content.append(createRibbonSegment(record, { inlineDetails: identityLevel }));", app)
+        self.assertIn("renderLayerProjectDetail(view);", app)
+        self.assertIn("!usesInlineLayerProjectDetail(record)", app)
+
+    def test_final_digital_lane_uses_inline_common_details(self) -> None:
+        app = (ROOT / "assets/commonworld-app.js").read_text(encoding="utf-8")
+        css = (ROOT / "index.css").read_text(encoding="utf-8")
+        self.assertIn("function renderLayerProjectDetail", app)
+        self.assertIn("layer-project-detail-summary", app)
+        self.assertIn("layer-project-detail-actions", app)
+        self.assertIn(".globe-stage[data-focused-path] .layer-panel .layer-projects:not([hidden])", css)
+        self.assertIn("--focused-lane-height", css)
+        self.assertIn(".layer-project-detail", css)
 
     def test_digital_lane_edges_and_labels_remain_legible(self) -> None:
         css = (ROOT / "index.css").read_text(encoding="utf-8")

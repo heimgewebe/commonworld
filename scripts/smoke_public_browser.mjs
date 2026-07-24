@@ -1337,17 +1337,39 @@ async function layerJourneyScenario({ mobile = false, viewportOverride = null, t
   await run.page.locator('#layer-search-toggle').click();
   assert(await run.page.locator('#layer-discovery').isHidden(), 'layer journey: search/filter panel did not close');
 
-  const directContent = run.page.locator('.digital-ribbon-item:not([hidden])').first();
+  const detailPreview = run.page.locator('#layer-projects');
+  const firstContent = run.page.locator('.digital-ribbon-item:not([hidden])').first();
+  const firstTitle = (await firstContent.locator('.digital-ribbon-name').textContent()) ?? '';
+  assert(await detailPreview.isVisible(), 'layer journey: identity level does not expose the inline Common detail area');
+  assert((await detailPreview.locator('.layer-project-detail-title').textContent()) === firstTitle, `layer journey: inline preview does not describe the first visible Common (${firstTitle})`);
+  const focusedGeometry = await run.page.evaluate(() => {
+    const lane = document.querySelector('.digital-lane.is-focused');
+    const details = document.querySelector('#layer-projects:not([hidden])');
+    const laneRect = lane?.getBoundingClientRect();
+    const detailRect = details?.getBoundingClientRect();
+    return laneRect && detailRect ? {
+      lane: { top: laneRect.top, bottom: laneRect.bottom, height: laneRect.height },
+      details: { top: detailRect.top, bottom: detailRect.bottom, height: detailRect.height },
+      viewportHeight: innerHeight,
+    } : null;
+  });
+  assert(focusedGeometry && focusedGeometry.lane.height < focusedGeometry.details.height, `layer journey: final lane still dominates the available height (${JSON.stringify(focusedGeometry)})`);
+  assert(focusedGeometry.details.top >= focusedGeometry.lane.bottom - 1, `layer journey: inline details overlap the final lane (${JSON.stringify(focusedGeometry)})`);
+  assert(focusedGeometry.details.bottom <= focusedGeometry.viewportHeight + 1, `layer journey: inline details leave the viewport (${JSON.stringify(focusedGeometry)})`);
+
+  const directContent = run.page.locator('.digital-ribbon-item:not([hidden])').nth(1);
   const directTitle = (await directContent.locator('.digital-ribbon-name').textContent()) ?? '';
   const directBox = await directContent.boundingBox();
   assert(directBox && directBox.width >= 44 && directBox.height >= 44, `layer journey: Commons ribbon has an undersized touch target (${JSON.stringify(directBox)})`);
   await directContent.click();
-  assert(await run.page.locator('#project-focus').isVisible(), 'layer journey: ribbon content did not open its Commons focus');
-  assert((await run.page.locator('#focus-title').textContent()) === directTitle, `layer journey: ribbon opened the wrong Commons identity (${directTitle})`);
+  assert(await run.page.locator('#project-focus').isHidden(), 'layer journey: ribbon selection opened the detached global focus instead of inline details');
+  assert((await detailPreview.locator('.layer-project-detail-title').textContent()) === directTitle, `layer journey: ribbon selection updated the wrong inline Common (${directTitle})`);
+  assert(await directContent.evaluate((node) => node.classList.contains('is-selected') && document.activeElement === node), 'layer journey: inline selection lost its selected or keyboard-focus state');
   await run.page.keyboard.press('Escape');
-  assert(await run.page.locator('#project-focus').isHidden(), 'layer journey: Escape did not close the topmost Commons focus');
-  assert(await run.page.locator('#layer-panel').isVisible(), 'layer journey: Escape closed the layer surface behind the visible Commons focus');
-  assert(await directContent.evaluate((node) => document.activeElement === node), 'layer journey: focus did not return to the same ribbon identity');
+  assert(await run.page.locator('#project-focus').isHidden(), 'layer journey: Escape exposed the detached global focus');
+  assert(await run.page.locator('#layer-panel').isVisible(), 'layer journey: Escape closed the layer surface while clearing the inline Common selection');
+  assert((await detailPreview.locator('.layer-project-detail-title').textContent()) === firstTitle, 'layer journey: clearing selection did not restore the default inline preview');
+  assert(await directContent.evaluate((node) => document.activeElement === node), 'layer journey: focus did not return to the selected ribbon identity');
   await run.page.keyboard.press('Escape');
   await run.page.waitForFunction(() => document.querySelector('.globe-stage')?.dataset.digitalPath === 'sphere/knowledge_learning_culture');
   assert((await stage.getAttribute('data-focused-path')) === null, 'layer journey: Escape did not leave the identity-level focus path');
