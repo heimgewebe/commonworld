@@ -1324,6 +1324,11 @@ async function layerJourneyScenario({ mobile = false, viewportOverride = null, t
     assert(focusedScrollLeft <= 2, `layer journey: fully fitting focused lane gained meaningful artificial overflow (${JSON.stringify(focusedLane)})`);
   }
 
+  const detailPreview = run.page.locator('#layer-projects');
+  const identityHeading = run.page.locator('.digital-lane.is-focused > .digital-lane-focus');
+  assert((await identityHeading.evaluate((node) => node.tagName)) === 'HEADER', 'layer journey: final lane label remains a non-functional button');
+  assert((await identityHeading.getAttribute('aria-pressed')) === null, 'layer journey: final lane heading exposes button selection semantics');
+
   await run.page.locator('#layer-search-toggle').click();
   assert(await run.page.locator('#layer-discovery').isVisible(), 'layer journey: search/filter magnifier did not open');
   assert((await run.page.locator('#layer-buttons .layer-filter').count()) === 0, 'layer journey: identity-level search panel must not expose unrelated bundle filters');
@@ -1332,22 +1337,61 @@ async function layerJourneyScenario({ mobile = false, viewportOverride = null, t
   assert((await run.page.locator('#commons-search').inputValue()) === 'Wikipedia', 'layer journey: lane search is not synchronized with global search');
   const searchedVisible = await run.page.locator('.digital-ribbon-item:not([hidden])').count();
   assert(searchedVisible === 1, `layer journey: focused search did not reduce to one visible identity (${searchedVisible})`);
+  await run.page.locator('#layer-search-toggle').click();
+  const searchedContent = run.page.locator('.digital-ribbon-item:not([hidden])').first();
+  const searchedProjectId = (await searchedContent.getAttribute('data-commonproject-id')) ?? '';
+  const searchedTitle = (await searchedContent.locator('.digital-ribbon-name').textContent()) ?? '';
+  await searchedContent.click();
+  assert(new URL(run.page.url()).searchParams.get('project') === searchedProjectId, 'layer journey: searched inline Common was not selected');
+  await run.page.locator('#layer-search-toggle').click();
+  await run.page.locator('#layer-search').fill('no-such-common-zzzz');
+  await run.page.waitForTimeout(220);
+  assert((await run.page.locator('.digital-ribbon-item:not([hidden])').count()) === 0, 'layer journey: impossible query leaves ribbon identities visible');
+  assert(await detailPreview.isHidden(), 'layer journey: empty identity result leaves stale inline details visible');
+  assert(await run.page.locator('#project-focus').isVisible(), 'layer journey: filtered selection lost its one retained focus surface');
+  assert((await run.page.locator('#focus-title').textContent()) === searchedTitle, 'layer journey: retained focus describes the wrong filtered identity');
+  assert(await run.page.locator('#focus-selection-status').isVisible(), 'layer journey: retained filtered selection is not marked outside the current selection');
+  assert(new URL(run.page.url()).searchParams.get('project') === searchedProjectId, 'layer journey: filtering cleared the selected project from public history');
+  assert((await stage.getAttribute('data-semantic-level')) === 'focus', 'layer journey: filtered selected identity lost semantic focus');
   await run.page.locator('#layer-search').fill('');
   await run.page.waitForTimeout(220);
   await run.page.locator('#layer-search-toggle').click();
   assert(await run.page.locator('#layer-discovery').isHidden(), 'layer journey: search/filter panel did not close');
 
-  const directContent = run.page.locator('.digital-ribbon-item:not([hidden])').first();
+  const selectedContent = run.page.locator(`.digital-ribbon-item[data-commonproject-id="${searchedProjectId}"]`);
+  assert(await detailPreview.isVisible(), 'layer journey: restored identity result does not expose inline Common details');
+  assert((await detailPreview.locator('.layer-project-detail-title').textContent()) === searchedTitle, `layer journey: restored inline details do not describe the retained Common (${searchedTitle})`);
+  assert((await detailPreview.getAttribute('data-detail-mode')) === 'selected', 'layer journey: restored filtered selection lost selected detail semantics');
+  assert(await selectedContent.evaluate((node) => node.classList.contains('is-selected')), 'layer journey: restored ribbon lost selected state');
+  const focusedGeometry = await run.page.evaluate(() => {
+    const lane = document.querySelector('.digital-lane.is-focused');
+    const details = document.querySelector('#layer-projects:not([hidden])');
+    const laneRect = lane?.getBoundingClientRect();
+    const detailRect = details?.getBoundingClientRect();
+    return laneRect && detailRect ? {
+      lane: { top: laneRect.top, bottom: laneRect.bottom, height: laneRect.height },
+      details: { top: detailRect.top, bottom: detailRect.bottom, height: detailRect.height },
+      viewportHeight: innerHeight,
+    } : null;
+  });
+  assert(focusedGeometry && focusedGeometry.lane.height < focusedGeometry.details.height, `layer journey: final lane still dominates the available height (${JSON.stringify(focusedGeometry)})`);
+  assert(focusedGeometry.details.top >= focusedGeometry.lane.bottom - 1, `layer journey: inline details overlap the final lane (${JSON.stringify(focusedGeometry)})`);
+  assert(focusedGeometry.details.bottom <= focusedGeometry.viewportHeight + 1, `layer journey: inline details leave the viewport (${JSON.stringify(focusedGeometry)})`);
+
+  const directContent = run.page.locator('.digital-ribbon-item:not([hidden])').nth(1);
   const directTitle = (await directContent.locator('.digital-ribbon-name').textContent()) ?? '';
   const directBox = await directContent.boundingBox();
   assert(directBox && directBox.width >= 44 && directBox.height >= 44, `layer journey: Commons ribbon has an undersized touch target (${JSON.stringify(directBox)})`);
   await directContent.click();
-  assert(await run.page.locator('#project-focus').isVisible(), 'layer journey: ribbon content did not open its Commons focus');
-  assert((await run.page.locator('#focus-title').textContent()) === directTitle, `layer journey: ribbon opened the wrong Commons identity (${directTitle})`);
+  assert(await run.page.locator('#project-focus').isHidden(), 'layer journey: ribbon selection opened the detached global focus instead of inline details');
+  assert((await detailPreview.locator('.layer-project-detail-title').textContent()) === directTitle, `layer journey: ribbon selection updated the wrong inline Common (${directTitle})`);
+  assert(await directContent.evaluate((node) => node.classList.contains('is-selected') && document.activeElement === node), 'layer journey: inline selection lost its selected or keyboard-focus state');
   await run.page.keyboard.press('Escape');
-  assert(await run.page.locator('#project-focus').isHidden(), 'layer journey: Escape did not close the topmost Commons focus');
-  assert(await run.page.locator('#layer-panel').isVisible(), 'layer journey: Escape closed the layer surface behind the visible Commons focus');
-  assert(await directContent.evaluate((node) => document.activeElement === node), 'layer journey: focus did not return to the same ribbon identity');
+  assert(await run.page.locator('#project-focus').isHidden(), 'layer journey: Escape exposed the detached global focus');
+  assert(await run.page.locator('#layer-panel').isVisible(), 'layer journey: Escape closed the layer surface while clearing the inline Common selection');
+  assert((await detailPreview.locator('.layer-project-detail-title').textContent()) === directTitle, 'layer journey: clearing selection did not preserve the focused Common as a preview');
+  assert((await detailPreview.getAttribute('data-detail-mode')) === 'preview', 'layer journey: cleared selection is not exposed as a preview state');
+  assert(await directContent.evaluate((node) => !node.classList.contains('is-selected') && node.getAttribute('aria-pressed') === 'false' && document.activeElement === node), 'layer journey: cleared inline selection kept selected semantics or lost focus');
   await run.page.keyboard.press('Escape');
   await run.page.waitForFunction(() => document.querySelector('.globe-stage')?.dataset.digitalPath === 'sphere/knowledge_learning_culture');
   assert((await stage.getAttribute('data-focused-path')) === null, 'layer journey: Escape did not leave the identity-level focus path');
@@ -1600,8 +1644,22 @@ async function dualPresenceAxesScenario() {
   assert((await run.page.locator('#focus-title').textContent()) === 'Freifunk Hamburg', 'dual presence: filtering replaced or cleared the selected identity');
   assert((await run.page.locator('.globe-stage').getAttribute('data-semantic-level')) === 'focus', 'dual presence: filtered selected identity lost semantic focus');
   assert(((await run.page.locator('#semantic-summary').textContent()) ?? '').startsWith('On site'), 'dual presence: semantic line no longer describes the filtered selected identity');
+  const retainedSelectionDebug = await run.page.evaluate(() => {
+    const status = document.querySelector('#focus-selection-status');
+    const focus = document.querySelector('#project-focus');
+    return {
+      statusHidden: status?.hidden ?? null,
+      statusText: status?.textContent ?? null,
+      focusHidden: focus?.hidden ?? null,
+      retainedAttribute: focus?.hasAttribute('data-retained-during-filtering') ?? null,
+      queryValue: document.querySelector('#commons-search')?.value ?? null,
+      url: location.href,
+    };
+  });
+  assert(!retainedSelectionDebug.statusHidden && Boolean(retainedSelectionDebug.statusText), `dual presence: retained selection context missing (${JSON.stringify(retainedSelectionDebug)})`);
   await run.page.locator('#commons-search').fill('');
   await run.page.waitForFunction((count) => Number(document.querySelector('.globe-stage')?.dataset.publicMapFeatures) === count, expectedDigitalProjection.publicFeatureCount);
+  assert(await run.page.locator('#focus-selection-status').isHidden(), 'dual presence: restored selected identity keeps an obsolete outside-selection notice');
   await run.page.locator('#discovery-close').click();
   await run.page.locator('#focus-close').click();
   assert(await run.page.evaluate(() => document.activeElement === window.__commonworldTestMap?.getCanvas()), 'dual presence: closing a map-selected focus did not restore focus to the map canvas');

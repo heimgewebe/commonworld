@@ -12,10 +12,10 @@
     <link rel="alternate" type="application/json" href="./catalog/catalog.json" title="Commonworld catalog" />
     <link rel="alternate" type="application/schema+json" href="./contracts/commonworld/project.schema.json" title="CommonProject schema" />
     <link rel="stylesheet" href="./assets/vendor/maplibre-gl.css" />
-    <link rel="stylesheet" href="./index.css?v=88b975e880fc" />
-    <link rel="stylesheet" href="./assets/ipad-layout.css" />
+    <link rel="stylesheet" href="./index.css?v=e50d2c662581" />
+    <link rel="stylesheet" href="./assets/ipad-layout.css?v=ff4e980f851f" />
     <script src="./assets/vendor/maplibre-gl.js" defer></script>
-    <script type="module" src="./assets/commonworld-app.js?v=32d955a6009c"></script>
+    <script type="module" src="./assets/commonworld-app.js?v=231307751361"></script>
   </head>
   <body data-presentation="globe">
     <a class="skip-link" href="#text-view">Skip to text view</a>
@@ -167,6 +167,7 @@
               <div id="layer-buttons" class="layer-buttons"></div>
             </div>
             <div id="layer-track-deck" class="layer-track-deck" aria-label="Hierarchical digital Commons ring bundles"></div>
+            <p id="layer-project-status" class="visually-hidden" role="status" aria-live="polite" aria-atomic="true"></p>
             <div id="layer-projects" class="layer-projects" hidden></div>
           </aside>
 
@@ -949,6 +950,7 @@
       <section id="project-focus" class="project-focus" tabindex="-1" aria-labelledby="focus-title" hidden>
         <div class="panel-heading"><div><p id="focus-presence" class="kicker"></p><h2 id="focus-title"></h2></div><button id="focus-close" class="icon-button" type="button" aria-label="Close focus">×</button></div>
         <p id="focus-summary" class="focus-summary"></p>
+        <p id="focus-selection-status" class="focus-selection-status" role="status" hidden></p>
         <div class="focus-grid">
           <section><h3>Themes</h3><ul id="focus-themes"></ul></section>
           <section><h3>Ways to engage</h3><ul id="focus-actions"></ul></section>

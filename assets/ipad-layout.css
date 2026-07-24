@@ -24,15 +24,16 @@
   }
 
   .globe-stage[data-focused-path] .layer-track-deck {
-    grid-template-rows: minmax(0, min-content);
-    align-content: center;
-    padding-block: clamp(0.6rem, 3vh, 1.6rem);
+    grid-template-rows: minmax(0, 1fr);
+    align-content: stretch;
+    padding-block: 0;
   }
 
   .globe-stage[data-focused-path] .digital-lane.is-focused {
-    align-self: center;
-    min-height: min(30vh, 15rem);
-    max-height: min(34vh, 17rem);
+    align-self: stretch;
+    min-height: 0;
+    max-height: none;
+    height: 100%;
   }
 
   .digital-lane-focus {
