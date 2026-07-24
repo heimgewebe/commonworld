@@ -1831,6 +1831,12 @@ async function intentSearchDiscoveryScenario() {
 async function spatialDiscoveryFiltersScenario() {
   const privateLocation = { latitude: 52.52, longitude: 13.405 };
   const run = await newPage({ geolocation: privateLocation, permissions: ['geolocation'], viewportOverride: { width: 1366, height: 1024 }, touch: true });
+  let releaseMapStyle;
+  const mapStyleGate = new Promise((resolve) => { releaseMapStyle = resolve; });
+  await run.context.route('**/assets/map/openfreemap-liberty.json', async (route) => {
+    await mapStyleGate;
+    await route.continue();
+  });
   await run.page.goto(baseUrl, { waitUntil: 'domcontentloaded' });
   await run.page.waitForSelector('html.runtime-ready');
   await run.page.waitForFunction(() => document.querySelector('.globe-stage')?.dataset.countryMapState === 'ready');
@@ -1921,6 +1927,11 @@ async function spatialDiscoveryFiltersScenario() {
       && countryFilterUiState.buttonHeight >= 43.5,
     `spatial discovery: country filter did not reopen with a visible removable chip (${JSON.stringify(countryFilterUiState)})`,
   );
+  releaseMapStyle();
+  await run.page.waitForFunction(() => window.__commonworldTestMap?.loaded() === true);
+  await run.page.waitForFunction(() => document.querySelector('.globe-stage')?.dataset.lastCameraCommand?.startsWith('fitBounds'));
+  assert(await run.page.locator('#discovery-panel').isVisible(), 'spatial discovery: pending country camera replay closed discovery after map load');
+  assert(await run.page.locator('#active-filter-chips button').isVisible(), 'spatial discovery: country filter chip became unreachable after pending camera replay');
   await run.page.locator('#active-filter-chips button').click();
   await run.page.waitForFunction(() => !new URL(location.href).searchParams.has('country'));
 
