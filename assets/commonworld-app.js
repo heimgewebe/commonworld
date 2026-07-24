@@ -2999,7 +2999,7 @@ function wireControls() {
     if (!identifier) return;
     hideCountryNavigationContext();
     setCountryFilter(identifier);
-    queueMicrotask(() => openDiscovery({ trigger: elements.filterToggle }));
+    openDiscovery({ trigger: elements.filterToggle });
   });
   elements.countryNavigationClose.addEventListener('click', hideCountryNavigationContext);
   elements.discoveryClose.addEventListener('click', () => closeDiscovery({ restoreFocus: true }));
