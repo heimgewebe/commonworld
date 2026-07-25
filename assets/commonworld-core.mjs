@@ -79,7 +79,7 @@ export const DIGITAL_TAXONOMY = deepFreeze({
     { id: 'water_irrigation', parent_id: 'provision_land_ecology', type: 'network', label_de: 'Wasser und Bewässerung', order: 1, themes: ['water', 'irrigation'] },
     { id: 'renewable_energy', parent_id: 'provision_land_ecology', type: 'network', label_de: 'Erneuerbare Energie', order: 2, themes: ['energy', 'renewable-energy'] },
     { id: 'health_software', parent_id: 'provision_land_ecology', type: 'interface', label_de: 'Offene Gesundheitsversorgung', order: 3, themes: ['health'] },
-    { id: 'land_ecology', parent_id: 'provision_land_ecology', type: 'network', label_de: 'Land, Stadtgrün und Ökologie', order: 4, themes: ['biodiversity', 'community-land', 'environment', 'fisheries', 'forest-conservation', 'land-commons', 'marine-conservation', 'urban-gardening'] },
+    { id: 'land_ecology', parent_id: 'provision_land_ecology', type: 'network', label_de: 'Land, Stadtgrün und Ökologie', order: 4, themes: ['biodiversity', 'climate-resilience', 'community-land', 'environment', 'fisheries', 'forest', 'forest-conservation', 'land-commons', 'marine-conservation', 'urban-gardening'] },
     { id: 'food_distribution_platforms', parent_id: 'provision_land_ecology', type: 'interface', label_de: 'Ernährungsplattformen', order: 5, themes: [] },
     { id: 'energy_cooperatives', parent_id: 'provision_land_ecology', type: 'interface', label_de: 'Energiegenossenschaften', order: 6, themes: ['energy-democracy'] },
     { id: 'watershed_food_systems', parent_id: 'provision_land_ecology', type: 'interface', label_de: 'Wasser- und Ernährungssysteme', order: 7, themes: [] },
@@ -101,6 +101,8 @@ export const DIGITAL_TAXONOMY = deepFreeze({
     { id: 'civic_tech_open_data', all_themes: ['civic-tech', 'open-data'], target_node_id: 'civic_technology', reason: 'civic technology coordinates data, code and governance' },
     { id: 'community_maintained_water', all_themes: ['water', 'community-maintenance'], target_node_id: 'water_irrigation', reason: 'water infrastructure whose upkeep is organized as a community responsibility' },
     { id: 'community_stewarded_marine_ecosystem', all_themes: ['marine-conservation', 'community-ownership', 'customary-governance'], target_node_id: 'land_ecology', reason: 'customary community ownership organizes stewardship of a marine ecosystem' },
+    { id: 'community_conservation_governance', all_themes: ['climate-resilience', 'community-land', 'commons-governance'], target_node_id: 'cooperative_governance', reason: 'community conservation resilience is organized through shared governance' },
+    { id: 'community_forest_open_data', all_themes: ['forest', 'open-data'], target_node_id: 'open_knowledge_data', reason: 'community forest knowledge is maintained as a shared public data resource' },
   ],
   tie_rules: [
     { id: 'knowledge_learning_same_field', candidate_node_ids: ['learning_education', 'open_knowledge_data'], target_node_id: 'knowledge_learning_bridge', reason: 'equal knowledge and learning themes share the knowledge field' },

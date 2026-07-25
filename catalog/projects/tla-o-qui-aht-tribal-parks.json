@@ -1,0 +1,139 @@
+{
+  "schema_version": 4,
+  "id": "tla-o-qui-aht-tribal-parks",
+  "title": "Tla-o-qui-aht Tribal Parks",
+  "summary": "Indigen verwaltete Gebiete im Clayoquot Sound, in denen die Tla-o-qui-aht First Nation traditionelle Governance, Guardian-Arbeit, ökologische Wiederherstellung und verantwortliche regionale Beteiligung verbindet.",
+  "themes": [
+    "land-commons",
+    "forest-conservation",
+    "marine-conservation",
+    "customary-governance",
+    "indigenous-knowledge",
+    "biodiversity"
+  ],
+  "actions": [
+    "learn",
+    "visit",
+    "donate"
+  ],
+  "presence": {
+    "geographic": [
+      {
+        "id": "tla-o-qui-aht-clayoquot-sound",
+        "mode": "approximate",
+        "label": "Clayoquot Sound, British Columbia, Kanada",
+        "geometry": {
+          "type": "Point",
+          "coordinates": [
+            -125.9066,
+            49.15298
+          ]
+        },
+        "uncertainty_meters_min": 40000,
+        "privacy_note": "Der Punkt bezeichnet nur den öffentlichen regionalen Bezug. Er bildet weder traditionelle Rechtsräume, Tribal-Park-Grenzen, Guardian-Routen noch kulturell sensible Orte exakt ab.",
+        "source_ids": [
+          "source-tribal-parks-official",
+          "source-tofino-geonames"
+        ]
+      }
+    ],
+    "digital": {
+      "available": true,
+      "reach": "regional",
+      "label": "Öffentliche Informationen der Tla-o-qui-aht Tribal Parks zu Governance, Guardian-Arbeit und verantwortlicher Beteiligung",
+      "source_ids": [
+        "source-tribal-parks-official",
+        "source-tribal-parks-story",
+        "source-tla-o-qui-aht-natural-resources"
+      ]
+    }
+  },
+  "activity": {
+    "status": "active",
+    "observed_at": "2026-07-25",
+    "source_ids": [
+      "source-tribal-parks-official",
+      "source-tribal-parks-story",
+      "source-tla-o-qui-aht-natural-resources"
+    ],
+    "note": "Die offiziellen Seiten dokumentieren laufende Guardian-, Restaurierungs-, Bildungs- und Partnerprogramme sowie die aktuelle institutionelle Einbindung in die Tla-o-qui-aht-Naturressourcenverwaltung."
+  },
+  "provenance": {
+    "sources": [
+      {
+        "id": "source-tribal-parks-official",
+        "type": "official-source",
+        "label": "Tla-o-qui-aht Tribal Parks — official site",
+        "url": "https://www.tribalparks.com/",
+        "retrieved_at": "2026-07-25",
+        "note": "Offizielle aktuelle Oberfläche für Identität, indigene Fürsorge, Beteiligungswege und öffentliche Wirkung."
+      },
+      {
+        "id": "source-tribal-parks-story",
+        "type": "official-source",
+        "label": "Tla-o-qui-aht Tribal Parks — Our Story",
+        "url": "https://www.tribalparks.com/our-story",
+        "retrieved_at": "2026-07-25",
+        "note": "Offizielle Beschreibung der traditionellen Governance, des seit 2008 bestehenden Guardian-Programms und seiner Aufgaben."
+      },
+      {
+        "id": "source-tla-o-qui-aht-natural-resources",
+        "type": "official-source",
+        "label": "Tla-o-qui-aht First Nation — Natural Resources",
+        "url": "https://www.tla-o-qui-aht.org/natural-resources",
+        "retrieved_at": "2026-07-25",
+        "note": "Offizielle First-Nation-Quelle zur institutionellen Verantwortung für Tribal Parks und traditionelle Gebiete."
+      },
+      {
+        "id": "source-tofino-geonames",
+        "type": "public-registry",
+        "label": "Tofino — GeoNames",
+        "url": "https://www.geonames.org/6168882/tofino.html",
+        "retrieved_at": "2026-07-25",
+        "note": "Öffentliches Georegister nur für einen groben regionalen Anker nahe Clayoquot Sound."
+      }
+    ],
+    "uncertainty_note": "Traditionelle Governance- und Territorialbezüge werden respektiert, aber nicht als vereinfachte Commonworld-Flächengeometrie reproduziert."
+  },
+  "curation": {
+    "state": "listed",
+    "reviewed_by": "Commonworld editorial review",
+    "reviewed_at": "2026-07-25",
+    "next_review_at": "2026-10-25",
+    "notes": "Aufgenommen als aktuell belegtes indigenes Land- und Meeres-Commons mit Guardian- und Wiederherstellungsarbeit."
+  },
+  "links": [
+    {
+      "type": "homepage",
+      "label": "Tla-o-qui-aht Tribal Parks",
+      "url": "https://www.tribalparks.com/"
+    },
+    {
+      "type": "visit",
+      "label": "Hinweise für einen respektvollen Besuch",
+      "url": "https://www.tribalparks.com/visit-responsibly",
+      "source_ids": [
+        "source-tribal-parks-official"
+      ]
+    },
+    {
+      "type": "learn",
+      "label": "Geschichte und Guardian-Programm",
+      "url": "https://www.tribalparks.com/our-story",
+      "source_ids": [
+        "source-tribal-parks-story"
+      ]
+    },
+    {
+      "type": "donate",
+      "label": "Tribal Parks unterstützen",
+      "url": "https://www.tribalparks.com/get-involved",
+      "source_ids": [
+        "source-tribal-parks-official"
+      ]
+    }
+  ],
+  "handoff": {
+    "enabled": false
+  }
+}

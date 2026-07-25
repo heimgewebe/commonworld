@@ -32,8 +32,10 @@
     "circular-economy",
     "citizen-science",
     "civic-tech",
+    "climate-resilience",
     "commons-governance",
     "communication",
+    "community-land",
     "community-maintenance",
     "community-network",
     "community-ownership",
@@ -53,6 +55,7 @@
     "federation",
     "fisheries",
     "food",
+    "forest",
     "forest-conservation",
     "free-software",
     "health",
@@ -332,9 +335,11 @@
       "order": 4,
       "themes": [
         "biodiversity",
+        "climate-resilience",
         "community-land",
         "environment",
         "fisheries",
+        "forest",
         "forest-conservation",
         "land-commons",
         "marine-conservation",
@@ -516,6 +521,25 @@
       ],
       "target_node_id": "land_ecology",
       "reason": "customary community ownership organizes stewardship of a marine ecosystem"
+    },
+    {
+      "id": "community_conservation_governance",
+      "all_themes": [
+        "climate-resilience",
+        "community-land",
+        "commons-governance"
+      ],
+      "target_node_id": "cooperative_governance",
+      "reason": "community conservation resilience is organized through shared governance"
+    },
+    {
+      "id": "community_forest_open_data",
+      "all_themes": [
+        "forest",
+        "open-data"
+      ],
+      "target_node_id": "open_knowledge_data",
+      "reason": "community forest knowledge is maintained as a shared public data resource"
     }
   ],
   "tie_rules": [
