@@ -49,3 +49,7 @@ Die Messung beweist die entfernten Abrufe und Bytes. Einzelne Zeitwerte hängen 
 Die frühere Entscheidung für den vollständigen Bootstrap war für 41 bis 54 Einträge gemessen richtig, ist aber keine Zielarchitektur für einen Weltkatalog. `catalog-platform-v1` führt deshalb eine parallele, generationsgebundene Lieferfläche aus Manifest, Offline-Weltindex, SHA-256-Präfix-Shards und Einzelheiten ein.
 
 Der vollständige Bootstrap bleibt nur bis zum belegten UI-Cutover aktiv. Neue Katalogeinträge dürfen die harte Bootstrap-Grenze nicht weiter verbrauchen. Vor dem Cutover müssen mindestens 10.000 und 100.000 synthetische Einträge gemessen, die benötigten Startfelder festgelegt und Katalog-, Shard- sowie Detailausfälle im Browser-Smoke geprüft sein.
+
+## Aktiver Übergangspfad
+
+Seit Catalog Platform v1 wird die neue Lieferfläche im Browser beobachtend geladen. Manifest und Aggregat sind hashgebunden; die sichtbare Anwendung bleibt bis zum vollständigen Paritätsbeleg auf dem bisherigen Bootstrap. Diese Reihenfolge verhindert, dass ein Architekturumbau Listen, Filter, Deep Links oder Projektdetails still unvollständig macht.

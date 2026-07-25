@@ -9,6 +9,7 @@ ROOT = Path(__file__).resolve().parents[1]
 CATALOG = ROOT / "catalog" / "catalog.json"
 OUT = ROOT / "catalog" / "runtime"
 SHARD_PREFIX_LENGTH = 2
+SPATIAL_CELL_DEGREES = 10
 
 
 def canonical_bytes(value: object) -> bytes:
@@ -30,6 +31,13 @@ def public_points(record: dict) -> list[dict]:
 
 def shard_key(identifier: str) -> str:
     return hashlib.sha256(identifier.encode("utf-8")).hexdigest()[:SHARD_PREFIX_LENGTH]
+
+
+def spatial_cell(coordinates: list[float]) -> str:
+    longitude, latitude = coordinates
+    x = min(35, max(0, int((longitude + 180) // SPATIAL_CELL_DEGREES)))
+    y = min(17, max(0, int((latitude + 90) // SPATIAL_CELL_DEGREES)))
+    return f"{x:02d}:{y:02d}"
 
 
 def compact_record(record: dict) -> dict:
@@ -72,11 +80,32 @@ def main() -> int:
         path = shard_dir / f"{key}.v1.json"
         path.write_bytes(payload)
         shard_entries.append({"key": key, "url": f"catalog/runtime/shards/{key}.v1.json", "sha256": sha256(payload), "bytes": len(payload), "entry_count": len(shard_records)})
+    indexes = {"themes": {}, "spatial_cells": {}, "digital": {"available": [], "unavailable": []}}
+    for record in records:
+        key = shard_key(record["id"])
+        for theme in record["themes"]:
+            indexes["themes"].setdefault(theme, set()).add(key)
+        indexes["digital"]["available" if record["presence"]["digital"] else "unavailable"].append(key)
+        for location in record["presence"]["geographic"]:
+            geometry = location.get("geometry", {})
+            if geometry.get("type") == "Point" and len(geometry.get("coordinates", [])) >= 2:
+                indexes["spatial_cells"].setdefault(spatial_cell(geometry["coordinates"]), set()).add(key)
+    aggregate = {
+        "kind": "commonworld.catalog_aggregate",
+        "version": "1.0",
+        "spatial_cell_degrees": SPATIAL_CELL_DEGREES,
+        "themes": {name: sorted(keys) for name, keys in sorted(indexes["themes"].items())},
+        "spatial_cells": {name: sorted(keys) for name, keys in sorted(indexes["spatial_cells"].items())},
+        "digital": {name: sorted(set(keys)) for name, keys in indexes["digital"].items()},
+    }
+    aggregate_bytes = canonical_bytes(aggregate)
     source_bytes = CATALOG.read_bytes()
     generation_seed = {
         "schema_version": "1.0",
         "catalog_manifest_sha256": sha256(source_bytes),
         "world_index_sha256": sha256(world_bytes),
+        "aggregate_sha256": sha256(aggregate_bytes),
+        "shards_sha256": sha256(canonical_bytes(shard_entries)),
     }
     generation = sha256(canonical_bytes(generation_seed))
     manifest = {
@@ -85,12 +114,14 @@ def main() -> int:
         "generation": generation,
         "entry_count": len(records),
         "world_index": {"url": "catalog/runtime/world.v1.json", "sha256": sha256(world_bytes), "bytes": len(world_bytes)},
+        "aggregate": {"url": "catalog/runtime/aggregate.v1.json", "sha256": sha256(aggregate_bytes), "bytes": len(aggregate_bytes)},
         "detail_url_template": "catalog/projects/{id}.json",
         "shards": {"strategy": "sha256-prefix", "prefix_length": SHARD_PREFIX_LENGTH, "entries": shard_entries},
         "source_catalog_sha256": sha256(source_bytes),
     }
     OUT.mkdir(parents=True, exist_ok=True)
     (OUT / "world.v1.json").write_bytes(world_bytes)
+    (OUT / "aggregate.v1.json").write_bytes(aggregate_bytes)
     (OUT / "manifest.v1.json").write_bytes(canonical_bytes(manifest))
     print(f"built catalog runtime generation {generation} with {len(records)} records")
     return 0

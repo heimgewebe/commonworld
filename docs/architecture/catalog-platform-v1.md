@@ -105,3 +105,15 @@ Die reproduzierbare synthetische Messung liegt in `docs/evidence/catalog-platfor
 Damit ist der vollständige 100k-Weltindex als initiale Browserlieferung verworfen. Die 256 Präfix-Shards sind als technische Grundpartition tragfähig, lösen aber allein noch keine räumliche Auswahl: Ein kleines Aggregatmanifest oder ein räumlicher PMTiles-/PostGIS-Index muss bestimmen, welche Shards beziehungsweise IDs für Viewport und Suche benötigt werden.
 
 Die Messung ist synthetisch und keine Endgeräte- oder Netzwerkmessung. Sie belegt Payload- und lokale Parsegrößen, nicht reale Interaktionslatenz auf iPad oder Mobilfunk.
+
+## Aggregatmanifest und Shadow-Laufzeit
+
+Der Compiler erzeugt nun `catalog/runtime/aggregate.v1.json`. Das Aggregat enthält ausschließlich Zuordnungen von Themen, 10-Grad-Raumzellen und digitaler Verfügbarkeit zu stabilen Shard-Schlüsseln. Es enthält keine Zusammenfassungen, Links, Quellen oder redaktionellen Notizen.
+
+Die öffentliche Anwendung lädt Manifest und Aggregat bereits nach dem kompatiblen Bootstrap im Hintergrund. Bytezahl und SHA-256 des Aggregats werden mit WebCrypto gegen das Manifest geprüft. Ein Ausfall markiert den Katalogpfad als `degraded`, verändert aber weder sichtbare Daten noch Bedienbarkeit. Damit entsteht reale Laufzeitbeobachtung vor dem eigentlichen Cutover.
+
+Die Auswahl mehrerer aktiver Dimensionen verwendet Schnittmengen: beispielsweise Thema Wasser plus Raumzelle plus digitale Verfügbarkeit. Innerhalb derselben Dimension werden Werte vereinigt. Das Aggregat liefert nur Shard-Kandidaten; die abschließende Datensatzfilterung bleibt verbindlich.
+
+### Cutover-Gate
+
+Der Bootstrap darf erst entfernt werden, wenn Feldparität, Deep-Link-Parität, definierte Lade- und Fehlerzustände für Details, Browser-Smoke und physischer Geräte-Readback belegt sind. Bis dahin bleibt die neue Plattform beobachtend und rückwärtskompatibel.

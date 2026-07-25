@@ -50,3 +50,21 @@ def test_scaling_evidence_rejects_100k_full_start_index():
     assert measurements[100_000]["world_index"]["gzip_bytes"] > 1_000_000
     assert measurements[100_000]["shards"]["gzip_max_bytes"] < 16_384
     assert evidence["decision"]["single_world_index_for_100k"] == "rejected"
+
+
+def test_aggregate_indexes_only_manifest_shards():
+    subprocess.run(["python3", "scripts/build_catalog_runtime.py"], cwd=ROOT, check=True)
+    manifest = json.loads((ROOT / "catalog/runtime/manifest.v1.json").read_text(encoding="utf-8"))
+    aggregate_path = ROOT / manifest["aggregate"]["url"]
+    payload = aggregate_path.read_bytes()
+    aggregate = json.loads(payload)
+    shard_keys = {entry["key"] for entry in manifest["shards"]["entries"]}
+    assert hashlib.sha256(payload).hexdigest() == manifest["aggregate"]["sha256"]
+    assert len(payload) == manifest["aggregate"]["bytes"]
+    assert aggregate["spatial_cell_degrees"] == 10
+    indexed = set()
+    for mapping in (aggregate["themes"], aggregate["spatial_cells"], aggregate["digital"]):
+        for keys in mapping.values():
+            indexed.update(keys)
+    assert indexed <= shard_keys
+    assert aggregate["digital"]["available"] or aggregate["digital"]["unavailable"]
