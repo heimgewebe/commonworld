@@ -374,6 +374,34 @@
         "zenzeleni-private-links": "Private household and business connections"
       },
       "digital_label": "Cooperatively operated regional internet network and public knowledge for building further community networks"
+    },
+    "ethiopia-community-seed-bank-network": {
+      "summary": "A nationwide network of community-run seed banks that connects farmer-maintained varieties, organizes exchange of experience and strengthens farmers’ authority over seed diversity.",
+      "geographic_labels": {
+        "ethiopia-national-network": "Ethiopia — nationwide network"
+      },
+      "digital_label": "Public information from Ethiopia’s Ministry of Agriculture and the FAO Plant Treaty on the community seed bank network"
+    },
+    "namibia-communal-conservancies-alliance": {
+      "summary": "A Namibian umbrella alliance of communal conservancies, community forests and other local resource groups that represents shared interests and supports community-based natural-resource governance.",
+      "geographic_labels": {
+        "namibia-alliance-national": "Namibia — nationwide alliance"
+      },
+      "digital_label": "Public NACSO information on the national alliance and Namibia’s communal conservancies"
+    },
+    "thailand-citizens-forest-database": {
+      "summary": "A collaboratively maintained digital knowledge infrastructure where communities, civil society and public institutions document Thailand’s community forests for cooperation and local management.",
+      "geographic_labels": {
+        "thailand-community-forests-national": "Thailand — nationwide community-forest network"
+      },
+      "digital_label": "Public Citizens’ Forest Database with community-maintained information on Thailand’s community forests"
+    },
+    "tla-o-qui-aht-tribal-parks": {
+      "summary": "Indigenous-governed areas in Clayoquot Sound where the Tla-o-qui-aht First Nation combines traditional governance, Guardian work, ecological restoration and responsible regional participation.",
+      "geographic_labels": {
+        "tla-o-qui-aht-clayoquot-sound": "Clayoquot Sound, British Columbia, Canada"
+      },
+      "digital_label": "Public Tla-o-qui-aht Tribal Parks information on governance, Guardian work and responsible participation"
     }
   }
 }

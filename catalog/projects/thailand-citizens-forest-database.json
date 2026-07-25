@@ -1,0 +1,128 @@
+{
+  "schema_version": 4,
+  "id": "thailand-citizens-forest-database",
+  "title": "Thailand Citizens’ Forest Database",
+  "summary": "Eine gemeinschaftlich mitgetragene digitale Wissensinfrastruktur, in der Gemeinden, Zivilgesellschaft und öffentliche Stellen Informationen zu Thailands Gemeindewäldern dokumentieren und für Zusammenarbeit und lokale Bewirtschaftung zugänglich machen.",
+  "themes": [
+    "forest",
+    "forest-conservation",
+    "open-data",
+    "knowledge",
+    "commons-governance",
+    "community-network"
+  ],
+  "actions": [
+    "learn",
+    "use"
+  ],
+  "presence": {
+    "geographic": [
+      {
+        "id": "thailand-community-forests-national",
+        "mode": "approximate",
+        "label": "Thailand – landesweites Gemeindewaldnetz",
+        "geometry": {
+          "type": "Point",
+          "coordinates": [
+            100.992541,
+            15.870032
+          ]
+        },
+        "uncertainty_meters_min": 600000,
+        "privacy_note": "Der Punkt ist nur ein grober Landesanker. Er ersetzt weder die geprüften Einträge des Fachsystems noch Grenzen einzelner Gemeindewälder.",
+        "source_ids": [
+          "source-thaicfnet-factsheet",
+          "source-thailand-geonames"
+        ]
+      }
+    ],
+    "digital": {
+      "available": true,
+      "reach": "network",
+      "label": "Öffentliche Citizens’ Forest Database mit gemeinschaftlich gepflegten Informationen zu Thailands Gemeindewäldern",
+      "source_ids": [
+        "source-thaicfnet-factsheet",
+        "source-thaicfnet-annual-report"
+      ]
+    }
+  },
+  "activity": {
+    "status": "active",
+    "observed_at": "2026-07-25",
+    "source_ids": [
+      "source-thaicfnet-factsheet",
+      "source-recoftc-thailand"
+    ],
+    "note": "RECOFTC veröffentlichte 2025 ein aktuelles Factsheet zur gemeinsam verwalteten Datenbank und führt sie weiterhin als Bestandteil der laufenden Thailand-Arbeit."
+  },
+  "provenance": {
+    "sources": [
+      {
+        "id": "source-thaicfnet-factsheet",
+        "type": "official-source",
+        "label": "RECOFTC — The citizens’ forest database of Thailand",
+        "url": "https://www.recoftc.org/th/publications/thaicfnet-factsheet",
+        "retrieved_at": "2026-07-25",
+        "note": "Aktuelles offizielles Factsheet zu gemeinsamer Entwicklung, Co-Management und Funktionen der Datenbank."
+      },
+      {
+        "id": "source-thaicfnet-annual-report",
+        "type": "official-source",
+        "label": "RECOFTC — Putting community forestry on the digital map",
+        "url": "https://www.recoftc.org/annual-report-2021-2022/data-and-forests-putting-community-forestry-digital-map-thailand",
+        "retrieved_at": "2026-07-25",
+        "note": "Offizielle Beschreibung der Beteiligung von Gemeindevertretungen und der veröffentlichten Forstinformationen."
+      },
+      {
+        "id": "source-recoftc-thailand",
+        "type": "official-source",
+        "label": "RECOFTC Thailand",
+        "url": "https://www.recoftc.org/thailand",
+        "retrieved_at": "2026-07-25",
+        "note": "Aktuelle Länderoberfläche, die die Citizens’ Forest Database weiterhin als Arbeitsbereich aufführt."
+      },
+      {
+        "id": "source-thailand-geonames",
+        "type": "public-registry",
+        "label": "Thailand — GeoNames",
+        "url": "https://www.geonames.org/1605651/thailand.html",
+        "retrieved_at": "2026-07-25",
+        "note": "Öffentliches Georegister ausschließlich für einen groben Landesanker."
+      }
+    ],
+    "uncertainty_note": "Commonworld behauptet keine Vollständigkeit oder Eigentumsgrenzen. Maßgeblich bleiben die geprüften Einträge und Regeln der Fachplattform."
+  },
+  "curation": {
+    "state": "listed",
+    "reviewed_by": "Commonworld editorial review",
+    "reviewed_at": "2026-07-25",
+    "next_review_at": "2026-10-25",
+    "notes": "Aufgenommen als gemeinschaftlich gepflegtes digitales Wissens-Commons für lokale Forst-Governance."
+  },
+  "links": [
+    {
+      "type": "homepage",
+      "label": "Factsheet zur Citizens’ Forest Database",
+      "url": "https://www.recoftc.org/th/publications/thaicfnet-factsheet"
+    },
+    {
+      "type": "use",
+      "label": "Citizens’ Forest Database öffnen",
+      "url": "https://thaicfnet.org/",
+      "source_ids": [
+        "source-thaicfnet-factsheet"
+      ]
+    },
+    {
+      "type": "learn",
+      "label": "Gemeindewälder digital sichtbar machen",
+      "url": "https://www.recoftc.org/annual-report-2021-2022/data-and-forests-putting-community-forestry-digital-map-thailand",
+      "source_ids": [
+        "source-thaicfnet-annual-report"
+      ]
+    }
+  ],
+  "handoff": {
+    "enabled": false
+  }
+}

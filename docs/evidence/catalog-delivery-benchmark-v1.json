@@ -14,41 +14,41 @@
     "static": {
       "schema_version": 1,
       "kind": "commonworld_catalog_delivery_static_metrics",
-      "entry_count": 54,
-      "identity_order_sha256": "199884abca0ca1a93d71b89b1d4b534ca6e4300a59d93cf1b1e5644357898581",
+      "entry_count": 58,
+      "identity_order_sha256": "0e2a4cc68b7c8f27e9929e17ed30e358feb707ca96a2553da2cf9175dbe3d166",
       "bootstrap": {
-        "raw_bytes": 157278,
-        "gzip_bytes": 28371,
-        "raw_bytes_per_record": 2912.56,
-        "gzip_bytes_per_record": 525.39
+        "raw_bytes": 171781,
+        "gzip_bytes": 31568,
+        "raw_bytes_per_record": 2961.74,
+        "gzip_bytes_per_record": 544.28
       },
       "canonical_projects": {
-        "file_count": 54,
-        "raw_bytes": 202615,
-        "gzip_bytes_individual_files": 68142
+        "file_count": 58,
+        "raw_bytes": 220599,
+        "gzip_bytes_individual_files": 74341
       },
       "manifest": {
-        "raw_bytes": 3381,
-        "gzip_bytes": 1142
+        "raw_bytes": 3603,
+        "gzip_bytes": 1217
       },
       "html": {
-        "raw_bytes": 184226,
-        "gzip_bytes": 22699,
-        "start_tag_count": 2027,
-        "catalog_card_instances": 108,
-        "interactive_catalog_cards": 54,
+        "raw_bytes": 195604,
+        "gzip_bytes": 24315,
+        "start_tag_count": 2131,
+        "catalog_card_instances": 116,
+        "interactive_catalog_cards": 58,
         "noscript_catalogs": 1
       },
       "runtime_verification_fetch": {
         "enabled": true,
-        "project_request_count": 54,
-        "duplicate_identity_payload_count": 54,
-        "raw_bytes": 205996,
-        "gzip_bytes": 69284
+        "project_request_count": 58,
+        "duplicate_identity_payload_count": 58,
+        "raw_bytes": 224202,
+        "gzip_bytes": 75558
       },
       "catalog_initial_delivery": {
-        "raw_bytes": 363274,
-        "gzip_bytes": 97655
+        "raw_bytes": 395983,
+        "gzip_bytes": 107126
       }
     },
     "browser": {
@@ -252,29 +252,29 @@
     "static": {
       "schema_version": 1,
       "kind": "commonworld_catalog_delivery_static_metrics",
-      "entry_count": 54,
-      "identity_order_sha256": "199884abca0ca1a93d71b89b1d4b534ca6e4300a59d93cf1b1e5644357898581",
+      "entry_count": 58,
+      "identity_order_sha256": "0e2a4cc68b7c8f27e9929e17ed30e358feb707ca96a2553da2cf9175dbe3d166",
       "bootstrap": {
-        "raw_bytes": 157278,
-        "gzip_bytes": 28371,
-        "raw_bytes_per_record": 2912.56,
-        "gzip_bytes_per_record": 525.39
+        "raw_bytes": 171781,
+        "gzip_bytes": 31568,
+        "raw_bytes_per_record": 2961.74,
+        "gzip_bytes_per_record": 544.28
       },
       "canonical_projects": {
-        "file_count": 54,
-        "raw_bytes": 202615,
-        "gzip_bytes_individual_files": 68142
+        "file_count": 58,
+        "raw_bytes": 220599,
+        "gzip_bytes_individual_files": 74341
       },
       "manifest": {
-        "raw_bytes": 3381,
-        "gzip_bytes": 1142
+        "raw_bytes": 3603,
+        "gzip_bytes": 1217
       },
       "html": {
-        "raw_bytes": 184226,
-        "gzip_bytes": 22698,
-        "start_tag_count": 2027,
-        "catalog_card_instances": 108,
-        "interactive_catalog_cards": 54,
+        "raw_bytes": 195604,
+        "gzip_bytes": 24315,
+        "start_tag_count": 2131,
+        "catalog_card_instances": 116,
+        "interactive_catalog_cards": 58,
         "noscript_catalogs": 1
       },
       "runtime_verification_fetch": {
@@ -285,14 +285,14 @@
         "gzip_bytes": 0
       },
       "catalog_initial_delivery": {
-        "raw_bytes": 157278,
-        "gzip_bytes": 28371
+        "raw_bytes": 171781,
+        "gzip_bytes": 31568
       }
     },
     "browser": {
       "schema_version": 1,
       "kind": "commonworld_catalog_delivery_browser_metrics",
-      "measured_at": "2026-07-25T11:15:55.194Z",
+      "measured_at": "2026-07-25T15:41:46.172Z",
       "cpu_throttle_rate": 4,
       "profiles": [
         {
@@ -302,47 +302,47 @@
             "height": 844
           },
           "cpu_throttle_rate": 4,
-          "runtime_ready_ms": 644,
-          "dom_node_count": 1964,
-          "catalog_card_count": 54,
-          "interactive_catalog_card_count": 54,
+          "runtime_ready_ms": 668,
+          "dom_node_count": 2029,
+          "catalog_card_count": 58,
+          "interactive_catalog_card_count": 58,
           "runtime_ready": true,
           "runtime_failed": false,
-          "dom_content_loaded_ms": 390.30000019073486,
-          "load_event_ms": 421.5,
+          "dom_content_loaded_ms": 401.60000014305115,
+          "load_event_ms": 432.60000014305115,
           "resource_count": 16,
-          "script_duration_ms": 501.46,
-          "task_duration_ms": 906.63,
+          "script_duration_ms": 484.49,
+          "task_duration_ms": 937.92,
           "bootstrap_compile": {
-            "median_ms": 0.10000014305114746,
-            "p95_ms": 1,
+            "median_ms": 0.20000004768371582,
+            "p95_ms": 0.9000000953674316,
             "samples_ms": [
               0,
               0,
               0,
               0,
-              0,
               0.09999990463256836,
               0.09999990463256836,
-              0.10000014305114746,
-              0.10000014305114746,
-              0.10000014305114746,
-              0.10000014305114746,
+              0.09999990463256836,
               0.20000004768371582,
-              0.2999999523162842,
+              0.20000004768371582,
+              0.20000004768371582,
+              0.20000004768371582,
+              0.20000004768371582,
               0.40000009536743164,
+              0.5,
+              0.7000000476837158,
               0.7000000476837158,
               0.7999999523162842,
               0.8999998569488525,
               0.8999998569488525,
-              1,
-              1,
-              1
+              0.9000000953674316,
+              3
             ]
           },
           "first_party_request_count": 15,
           "first_party_unique_request_count": 15,
-          "first_party_raw_bytes": 1907491,
+          "first_party_raw_bytes": 1962289,
           "first_party_requests": [
             "/",
             "/assets/commonworld-app.js",
@@ -360,7 +360,7 @@
             "/catalog/runtime/manifest.v1.json",
             "/index.css"
           ],
-          "first_party_surface_sha256": "7def7d22f155afc0564315fe7730b18b8e759d33f09e0ae3daa03b78fb9f6fba",
+          "first_party_surface_sha256": "67e22da133d656ca051a546af32c39636574b61838ddb675402fe16c1c298387",
           "project_json_request_count": 0,
           "project_json_unique_request_count": 0,
           "project_json_requests": []
@@ -372,47 +372,47 @@
             "height": 768
           },
           "cpu_throttle_rate": 4,
-          "runtime_ready_ms": 623,
-          "dom_node_count": 1964,
-          "catalog_card_count": 54,
-          "interactive_catalog_card_count": 54,
+          "runtime_ready_ms": 651,
+          "dom_node_count": 2029,
+          "catalog_card_count": 58,
+          "interactive_catalog_card_count": 58,
           "runtime_ready": true,
           "runtime_failed": false,
-          "dom_content_loaded_ms": 354.60000014305115,
-          "load_event_ms": 386,
+          "dom_content_loaded_ms": 368.2999999523163,
+          "load_event_ms": 399.7999999523163,
           "resource_count": 16,
-          "script_duration_ms": 509.44,
-          "task_duration_ms": 869.81,
+          "script_duration_ms": 534.82,
+          "task_duration_ms": 923.01,
           "bootstrap_compile": {
-            "median_ms": 0.5999999046325684,
-            "p95_ms": 1,
+            "median_ms": 0.7999999523162842,
+            "p95_ms": 1.1000001430511475,
             "samples_ms": [
-              0,
+              0.09999990463256836,
+              0.09999990463256836,
               0.10000014305114746,
               0.10000014305114746,
-              0.10000014305114746,
-              0.10000014305114746,
-              0.2999999523162842,
-              0.40000009536743164,
+              0.20000004768371582,
+              0.20000004768371582,
               0.5,
-              0.5999999046325684,
-              0.5999999046325684,
-              0.5999999046325684,
+              0.6999998092651367,
+              0.6999998092651367,
               0.7000000476837158,
-              0.7000000476837158,
-              0.7000000476837158,
-              0.7000000476837158,
+              0.7999999523162842,
               0.7999999523162842,
               0.7999999523162842,
               0.8999998569488525,
               0.9000000953674316,
+              0.9000000953674316,
               1,
-              1
+              1,
+              1,
+              1.1000001430511475,
+              1.2000000476837158
             ]
           },
           "first_party_request_count": 15,
           "first_party_unique_request_count": 15,
-          "first_party_raw_bytes": 1907491,
+          "first_party_raw_bytes": 1962289,
           "first_party_requests": [
             "/",
             "/assets/commonworld-app.js",
@@ -430,7 +430,7 @@
             "/catalog/runtime/manifest.v1.json",
             "/index.css"
           ],
-          "first_party_surface_sha256": "7def7d22f155afc0564315fe7730b18b8e759d33f09e0ae3daa03b78fb9f6fba",
+          "first_party_surface_sha256": "67e22da133d656ca051a546af32c39636574b61838ddb675402fe16c1c298387",
           "project_json_request_count": 0,
           "project_json_unique_request_count": 0,
           "project_json_requests": []
@@ -480,19 +480,19 @@
     }
   },
   "delta": {
-    "startup_project_json_requests": -54,
-    "duplicate_identity_payload_count": -54,
-    "catalog_initial_raw_bytes": -205996,
-    "catalog_initial_gzip_bytes": -69284,
-    "catalog_initial_raw_reduction_percent": 56.7,
-    "catalog_initial_gzip_reduction_percent": 70.9,
+    "startup_project_json_requests": -58,
+    "duplicate_identity_payload_count": -58,
+    "catalog_initial_raw_bytes": -224202,
+    "catalog_initial_gzip_bytes": -75558,
+    "catalog_initial_raw_reduction_percent": 56.6,
+    "catalog_initial_gzip_reduction_percent": 70.5,
     "first_party_request_count_by_profile": {
       "mobile-low-power": -36,
       "desktop-low-power": -36
     },
     "browser_dom_nodes_by_profile": {
-      "mobile-low-power": 277,
-      "desktop-low-power": 277
+      "mobile-low-power": 342,
+      "desktop-low-power": 342
     }
   },
   "selected_design": "build-bound-bootstrap-with-public-project-json",
@@ -592,9 +592,9 @@
     }
   },
   "budget_binding": {
-    "bootstrap_gzip_bytes": 28371,
+    "bootstrap_gzip_bytes": 31568,
     "warn_bootstrap_gzip_bytes": 28672,
     "max_bootstrap_gzip_bytes": 32768
   },
-  "current_surface_note": "Catalog Platform v1 shadow-loads a hash-bound aggregate after the compatible bootstrap; browser metrics include manifest and aggregate requests."
+  "current_surface_note": "Catalog Platform v1 shadow-loads a provenance- and hash-bound aggregate for the current 58-entry surface; browser metrics include manifest and aggregate requests."
 }

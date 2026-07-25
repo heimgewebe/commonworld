@@ -7,7 +7,7 @@
       "directGlobeProjection": true,
       "hiddenUntilCalibrated": true,
       "outerHintRemoved": true,
-      "aggregateRingIdentities": 39,
+      "aggregateRingIdentities": 43,
       "movingRingMatrix": true,
       "unchangedGeometryRepaintSkipped": true
     },
@@ -54,7 +54,7 @@
     {
       "id": "intent-search-discovery",
       "verdict": "PASS",
-      "indexedRecords": 54,
+      "indexedRecords": 58,
       "rankedGermanIntentResults": 34,
       "filters": 7,
       "digitalCoordinateFree": true,
@@ -76,7 +76,7 @@
       "filterButtonHeight": 44,
       "ringAnimationName": "none",
       "ringTransform": "none",
-      "ringTextWidth": 238.140625,
+      "ringTextWidth": 242.03125,
       "ringTextHeight": 10,
       "ringTextFontSize": 17,
       "countryRendered": 1
@@ -96,9 +96,9 @@
     {
       "id": "dual-presence-axes",
       "verdict": "PASS",
-      "publicFeatures": 104,
-      "publicIdentities": 28,
-      "digitalIdentities": 39,
+      "publicFeatures": 118,
+      "publicIdentities": 32,
+      "digitalIdentities": 43,
       "unchangedMapUpdatesSkipped": true
     },
     {
@@ -120,7 +120,7 @@
     {
       "id": "layer-journey-moveend-return",
       "verdict": "PASS",
-      "elapsedMs": 1542
+      "elapsedMs": 1482
     },
     {
       "id": "layer-journey-interrupted",
@@ -224,7 +224,7 @@
   "binding": {
     "smoke_script_sha256": "8064d0aeb795f42820406e2f457d92426c201a5c90bb8deda5611feb5bfd7180",
     "smoke_runner_sha256": "522b99b70b1d0064b1d0a31a3a67fdc9a2e73b7408f37d1a4bb303bc360b7556",
-    "first_party_surface_sha256": "7def7d22f155afc0564315fe7730b18b8e759d33f09e0ae3daa03b78fb9f6fba",
+    "first_party_surface_sha256": "67e22da133d656ca051a546af32c39636574b61838ddb675402fe16c1c298387",
     "scenario_ids": [
       "startup-and-ring-orbits",
       "ring-orbits-reduced-motion",

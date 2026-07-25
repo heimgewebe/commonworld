@@ -90,19 +90,22 @@ def main() -> int:
             geometry = location.get("geometry", {})
             if geometry.get("type") == "Point" and len(geometry.get("coordinates", [])) >= 2:
                 indexes["spatial_cells"].setdefault(spatial_cell(geometry["coordinates"]), set()).add(key)
+    source_bytes = CATALOG.read_bytes()
+    source_catalog_sha256 = sha256(source_bytes)
     aggregate = {
         "kind": "commonworld.catalog_aggregate",
         "version": "1.0",
+        "entry_count": len(records),
+        "source_catalog_sha256": source_catalog_sha256,
         "spatial_cell_degrees": SPATIAL_CELL_DEGREES,
         "themes": {name: sorted(keys) for name, keys in sorted(indexes["themes"].items())},
         "spatial_cells": {name: sorted(keys) for name, keys in sorted(indexes["spatial_cells"].items())},
         "digital": {name: sorted(set(keys)) for name, keys in indexes["digital"].items()},
     }
     aggregate_bytes = canonical_bytes(aggregate)
-    source_bytes = CATALOG.read_bytes()
     generation_seed = {
         "schema_version": "1.0",
-        "catalog_manifest_sha256": sha256(source_bytes),
+        "catalog_manifest_sha256": source_catalog_sha256,
         "world_index_sha256": sha256(world_bytes),
         "aggregate_sha256": sha256(aggregate_bytes),
         "shards_sha256": sha256(canonical_bytes(shard_entries)),
@@ -117,7 +120,7 @@ def main() -> int:
         "aggregate": {"url": "catalog/runtime/aggregate.v1.json", "sha256": sha256(aggregate_bytes), "bytes": len(aggregate_bytes)},
         "detail_url_template": "catalog/projects/{id}.json",
         "shards": {"strategy": "sha256-prefix", "prefix_length": SHARD_PREFIX_LENGTH, "entries": shard_entries},
-        "source_catalog_sha256": sha256(source_bytes),
+        "source_catalog_sha256": source_catalog_sha256,
     }
     OUT.mkdir(parents=True, exist_ok=True)
     (OUT / "world.v1.json").write_bytes(world_bytes)
