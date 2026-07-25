@@ -218,7 +218,7 @@
   "schema_version": 1,
   "kind": "commonworld_catalog_delivery_public_browser_smoke_evidence",
   "binding": {
-    "smoke_script_sha256": "d108f625ec4dea5e84833509ebbecce73880b7ea26d0172b4dc0d950ab191cdf",
+    "smoke_script_sha256": "a47c0b56cbfa6584cdc26bfd11d788a06e1d09369f367b7f97fcd238fd27b52e",
     "smoke_runner_sha256": "522b99b70b1d0064b1d0a31a3a67fdc9a2e73b7408f37d1a4bb303bc360b7556",
     "first_party_surface_sha256": "b878ddf55aa13621946d5725b1c8a20947533bec5c210d6d1102580a974a46fa",
     "scenario_ids": [
