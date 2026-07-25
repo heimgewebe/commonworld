@@ -120,7 +120,7 @@
     {
       "id": "layer-journey-moveend-return",
       "verdict": "PASS",
-      "elapsedMs": 1556
+      "elapsedMs": 1482
     },
     {
       "id": "layer-journey-interrupted",
@@ -195,7 +195,11 @@
     {
       "id": "catalogue-network-blocked",
       "verdict": "PASS",
-      "blockedCatalogRequests": 0
+      "blockedCatalogRequests": 0,
+      "observedCatalogRequests": [
+        "/catalog/runtime/aggregate.v1.json",
+        "/catalog/runtime/manifest.v1.json"
+      ]
     },
     {
       "id": "provider-failure",
@@ -218,9 +222,9 @@
   "schema_version": 1,
   "kind": "commonworld_catalog_delivery_public_browser_smoke_evidence",
   "binding": {
-    "smoke_script_sha256": "a47c0b56cbfa6584cdc26bfd11d788a06e1d09369f367b7f97fcd238fd27b52e",
+    "smoke_script_sha256": "8064d0aeb795f42820406e2f457d92426c201a5c90bb8deda5611feb5bfd7180",
     "smoke_runner_sha256": "522b99b70b1d0064b1d0a31a3a67fdc9a2e73b7408f37d1a4bb303bc360b7556",
-    "first_party_surface_sha256": "01574990049109e66fd2c8e80d4026f06e4edbcc411f2a36bd38c7d3ad57afc4",
+    "first_party_surface_sha256": "67e22da133d656ca051a546af32c39636574b61838ddb675402fe16c1c298387",
     "scenario_ids": [
       "startup-and-ring-orbits",
       "ring-orbits-reduced-motion",
@@ -252,7 +256,7 @@
       "method-mobile",
       "method-mobile-text-200"
     ],
-    "freshness_rule": "The official runner must materialize the canonical smoke plan, create a fresh temporary public result and validate exact scenario order, PASS verdicts and zero catalogue requests against this hash-bound evidence.",
+    "freshness_rule": "The official runner must materialize the canonical smoke plan, create a fresh temporary public result and validate exact scenario order, PASS verdicts, the manifest-plus-aggregate shadow requests and zero forbidden catalogue requests against this hash-bound evidence.",
     "smoke_plan_sha256": "6b8749928ead5ef81ee66883e6a2993e756ce083575c3569234bf70526448364"
   }
 }

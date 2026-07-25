@@ -122,10 +122,11 @@ EXPECTED_RESEARCH_FILES = {
     "renderer-selection-v1.md",
     "renderer-selection-v1.result.json",
 }
-EXPECTED_CONTRACT_FILES = {"catalog-delivery-budget.contract.json", "catalog-diversity.contract.json", "editorial-review.contract.json", "proposal-path.contract.json", "proposal.schema.json", "current-state.contract.json", "aggregation-zoom.contract.json", "digital-ring-taxonomy.contract.json", "digital-sphere.contract.json", "production-delivery-provider.contract.json", "project.schema.json", "public-maplibre-vertical-slice.contract.json", "presence-axes.contract.json", "intent-search-discovery.contract.json", "renderer-selection.contract.json", "visual-semantics.contract.json"}
+EXPECTED_CONTRACT_FILES = {"catalog-platform.contract.json", "catalog-delivery-budget.contract.json", "catalog-diversity.contract.json", "editorial-review.contract.json", "proposal-path.contract.json", "proposal.schema.json", "current-state.contract.json", "aggregation-zoom.contract.json", "digital-ring-taxonomy.contract.json", "digital-sphere.contract.json", "production-delivery-provider.contract.json", "project.schema.json", "public-maplibre-vertical-slice.contract.json", "presence-axes.contract.json", "intent-search-discovery.contract.json", "renderer-selection.contract.json", "visual-semantics.contract.json"}
 EXPECTED_SCRIPT_FILES = {
     "__init__.py",
     "browser_smoke_plan.py",
+    "build_catalog_runtime.py",
     "build_country_boundary_subset.mjs",
     "build_public_runtime.py",
     "catalog_delivery_compile.mjs",
@@ -135,6 +136,7 @@ EXPECTED_SCRIPT_FILES = {
     "digital_taxonomy.py",
     "measure_catalog_delivery.py",
     "measure_catalog_delivery_browser.mjs",
+    "measure_catalog_platform_scaling.py",
     "run_browser_smoke.py",
     "smoke_public_browser.mjs",
     "smoke_accessibility_modes_browser.mjs",
@@ -175,6 +177,7 @@ EXPECTED_SCRIPT_FILES = {
 EXPECTED_TEST_FILES = {
     "test_canonical_plan.py",
     "test_catalog_delivery_budget.py",
+    "test_catalog_platform.py",
     "test_proposal_path.py",
     "test_contracts.py",
     "test_current_state.py",

@@ -2791,15 +2791,26 @@ async function liveUiHardeningScenario() {
 
 async function catalogueNetworkBlockedScenario() {
   const run = await newPage();
+  const allowedCatalogRequests = new Set([
+    '/catalog/runtime/manifest.v1.json',
+    '/catalog/runtime/aggregate.v1.json',
+  ]);
+  const observedCatalogRequests = [];
   const blockedCatalogRequests = [];
   await run.page.route('**/catalog/**', (route) => {
-    blockedCatalogRequests.push(new URL(route.request().url()).pathname);
+    const pathname = new URL(route.request().url()).pathname;
+    observedCatalogRequests.push(pathname);
+    if (allowedCatalogRequests.has(pathname)) return route.continue();
+    blockedCatalogRequests.push(pathname);
     return route.abort('failed');
   });
   await run.page.goto(baseUrl, { waitUntil: 'domcontentloaded' });
   await run.page.waitForSelector('html.runtime-ready');
   await run.page.waitForSelector('.globe-stage[data-runtime-state="ready"]');
-  assert(blockedCatalogRequests.length === 0, `catalogue network blocked: build-bound runtime requested canonical catalog files: ${blockedCatalogRequests.join(' | ')}`);
+  assert(blockedCatalogRequests.length === 0, `catalogue network blocked: runtime requested forbidden catalog files: ${blockedCatalogRequests.join(' | ')}`);
+  assert(observedCatalogRequests.includes('/catalog/runtime/manifest.v1.json'), 'catalogue network blocked: runtime manifest was not observed');
+  assert(observedCatalogRequests.includes('/catalog/runtime/aggregate.v1.json'), 'catalogue network blocked: runtime aggregate was not observed');
+  assert(await run.page.locator('.globe-stage').getAttribute('data-catalog-platform') === 'ready', 'catalogue network blocked: shadow catalog platform did not become ready');
   assert(await run.page.locator('.globe-stage').getAttribute('data-catalog-delivery') === 'build-bound-bootstrap', 'catalogue network blocked: runtime delivery mode is not build-bound');
   await run.page.locator('#commons-search').fill('Debian');
   await run.page.waitForTimeout(220);
@@ -2813,7 +2824,7 @@ async function catalogueNetworkBlockedScenario() {
   assert(run.consoleErrors.length === 0, `catalogue network blocked: unexpected console errors: ${run.consoleErrors.join(' | ')}`);
   const appWarnings = run.consoleWarnings.filter((message) => message.includes('Commonworld'));
   assert(appWarnings.length === 0, `catalogue network blocked: unexpected application warnings (${appWarnings.length})`);
-  results.push({ id: 'catalogue-network-blocked', verdict: 'PASS', blockedCatalogRequests: blockedCatalogRequests.length });
+  results.push({ id: 'catalogue-network-blocked', verdict: 'PASS', blockedCatalogRequests: blockedCatalogRequests.length, observedCatalogRequests: [...new Set(observedCatalogRequests)].sort() });
   await run.context.close();
 }
 

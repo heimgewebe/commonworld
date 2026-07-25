@@ -1,4 +1,5 @@
 import { BOOTSTRAP_RECORDS } from './commonworld-bootstrap-catalog.mjs';
+import { loadCatalogAggregate } from './commonworld-catalog-runtime.mjs';
 import { actionLabel, documentLocale, localizeCatalogRecords, text as i18nText, themeLabel } from './commonworld-i18n.mjs';
 import {
   COMMONS_TYPE_COLOR_TOKENS,
@@ -3479,6 +3480,20 @@ function ensureMap() {
   if (!runtime.map) createMap();
 }
 
+async function observeCatalogPlatform() {
+  elements.stage.dataset.catalogPlatform = 'loading';
+  try {
+    const { manifest, aggregate } = await loadCatalogAggregate();
+    elements.stage.dataset.catalogPlatform = 'ready';
+    elements.stage.dataset.catalogGeneration = manifest.generation;
+    elements.stage.dataset.catalogAggregateThemes = String(Object.keys(aggregate.themes ?? {}).length);
+    elements.stage.dataset.catalogAggregateCells = String(Object.keys(aggregate.spatial_cells ?? {}).length);
+  } catch (error) {
+    elements.stage.dataset.catalogPlatform = 'degraded';
+    console.warn('Commonworld catalog aggregate unavailable; compatible bootstrap remains active', error);
+  }
+}
+
 async function boot() {
   installInputModalityTracking();
   renderMapLegend();
@@ -3514,6 +3529,7 @@ async function boot() {
       console.warn('Commonworld country composition layer unavailable', error);
     });
     document.documentElement.classList.add('runtime-ready');
+    void observeCatalogPlatform();
 
     // Build and CI compare this generated bootstrap with every canonical CommonProject.
     // The browser therefore does not download the same 41 records a second time.

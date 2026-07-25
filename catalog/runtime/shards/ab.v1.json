@@ -1,0 +1,1 @@
+{"key":"ab","kind":"commonworld.catalog_shard","records":[{"access":null,"actions":["use","learn","contribute"],"activity":"active","detail":"catalog/projects/mastodon.json","id":"mastodon","languages":[],"presence":{"digital":true,"geographic":[]},"themes":["communication","federation","protocol"],"title":"Mastodon"}],"version":"1.0"}
