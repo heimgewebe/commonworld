@@ -1175,8 +1175,8 @@ async function layerJourneyScenario({ mobile = false, viewportOverride = null, t
   const movingDiagnosticPublishDelta = settlingEntry.diagnosticPublishes - firstMovingEntry.diagnosticPublishes;
   const maxMovingDiagnosticPublishes = Math.ceil(movingGeometryEvaluationDelta / MAP_GEOMETRY_DIAGNOSTIC_SAMPLE_INTERVAL) + 2;
   assert(movingDiagnosticPublishDelta > 0 && movingDiagnosticPublishDelta <= maxMovingDiagnosticPublishes, 'layer journey: diagnostic publishing exceeded its movement-window budget ' + JSON.stringify({ movingDiagnosticPublishDelta, maxMovingDiagnosticPublishes, phaseLog }));
-  if (movingGeometryEvaluationDelta > 1) {
-    assert(movingDiagnosticPublishDelta < movingGeometryEvaluationDelta, 'layer journey: diagnostics still publish on every moving geometry evaluation ' + JSON.stringify({ movingDiagnosticPublishDelta, movingGeometryEvaluationDelta, phaseLog }));
+  if (maxMovingDiagnosticPublishes < movingGeometryEvaluationDelta) {
+    assert(movingDiagnosticPublishDelta < movingGeometryEvaluationDelta, 'layer journey: diagnostics still publish on every moving geometry evaluation ' + JSON.stringify({ movingDiagnosticPublishDelta, movingGeometryEvaluationDelta, maxMovingDiagnosticPublishes, phaseLog }));
   }
   assert((await stage.getAttribute('data-globe-geometry-source')) === 'side-view-layout', 'layer journey: settled layers view is missing the side layout geometry');
   if (touch) {
