@@ -1,0 +1,1 @@
+{"key":"40","kind":"commonworld.catalog_shard","records":[{"access":"public","actions":["use","learn","contribute"],"activity":"active","detail":"catalog/projects/musicbrainz.json","id":"musicbrainz","languages":["en"],"presence":{"digital":true,"geographic":[]},"themes":["open-data","music","knowledge","open-source","commons-governance"],"title":"MusicBrainz"}],"version":"1.0"}

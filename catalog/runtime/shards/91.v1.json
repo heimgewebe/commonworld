@@ -1,0 +1,1 @@
+{"key":"91","kind":"commonworld.catalog_shard","records":[{"access":null,"actions":["use","learn","contribute","donate"],"activity":"active","detail":"catalog/projects/openstreetmap.json","id":"openstreetmap","languages":[],"presence":{"digital":true,"geographic":[]},"themes":["open-data","infrastructure"],"title":"OpenStreetMap"}],"version":"1.0"}

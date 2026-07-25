@@ -692,6 +692,8 @@ Die digitale Sphäre ist geometrisch an MapLibre gebunden. Ihr sichtbarer Mittel
 
 Die Anwendung, die veränderbare Katalogwahrheit und die öffentliche Projektion werden getrennt. Commonworld konsumiert einen generations- und hashgebundenen statischen Weltindex sowie bedarfsgeladene Details. Weltgewebe bleibt die geplante Schreib-, Moderations- und Administrationsgrenze und soll dieselbe Projektion später aus PostgreSQL/PostGIS über Rust/Axum und eine revisionsgebundene Publisher-Pipeline erzeugen. Der Vertrag steht in `contracts/commonworld/catalog-platform.contract.json`; die technische Begründung in `docs/architecture/catalog-platform-v1.md`.
 
+Die Skalierungsprobe vom 25. Juli 2026 verwirft einen vollständigen 100.000-Einträge-Weltindex als Startpayload: 1.541.423 Byte gzip und 804,028 Millisekunden Median-Parsezeit. Eine deterministische 256-Shard-Projektion begrenzt den größten synthetischen Einzelshard auf 7.885 Byte gzip. Der kanonische Ausbaupfad lautet deshalb Aggregatmanifest, bedarfsgeladene Shards und Einzelheiten; der Vollindex bleibt Export und Prüfartefakt.
+
 ### Gemessene statische Katalogauslieferung v1
 
 Die kanonischen `CommonProject`-Dateien bleiben die einzige veränderbare Katalogwahrheit. Build und CI erzeugen daraus einen vollständigen buildgebundenen Bootstrap für Karte, Suche, Filter und Fokus sowie die statischen interaktiven und No-JavaScript-Karten. Der Browser lädt die einzelnen Projektdateien beim Start nicht nochmals zur Gleichheitsprüfung; Manifest und Projekt-JSON bleiben dennoch öffentlich und direkt adressierbar.

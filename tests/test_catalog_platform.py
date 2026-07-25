@@ -25,3 +25,28 @@ def test_runtime_projection_is_deterministic_and_compact():
             assert location["mode"] != "hidden"
             assert "geometry" in location
     assert len(world_bytes) < 1024 * manifest["entry_count"]
+
+
+def test_shards_are_complete_and_manifest_bound():
+    subprocess.run(["python3", "scripts/build_catalog_runtime.py"], cwd=ROOT, check=True)
+    manifest = json.loads((ROOT / "catalog/runtime/manifest.v1.json").read_text(encoding="utf-8"))
+    seen = []
+    for entry in manifest["shards"]["entries"]:
+        path = ROOT / entry["url"]
+        payload = path.read_bytes()
+        shard = json.loads(payload)
+        assert hashlib.sha256(payload).hexdigest() == entry["sha256"]
+        assert len(payload) == entry["bytes"]
+        assert len(shard["records"]) == entry["entry_count"]
+        assert shard["key"] == entry["key"]
+        seen.extend(record["id"] for record in shard["records"])
+    world = json.loads((ROOT / "catalog/runtime/world.v1.json").read_text(encoding="utf-8"))
+    assert sorted(seen) == sorted(record["id"] for record in world["records"])
+
+
+def test_scaling_evidence_rejects_100k_full_start_index():
+    evidence = json.loads((ROOT / "docs/evidence/catalog-platform-scaling-v1.json").read_text(encoding="utf-8"))
+    measurements = {item["entry_count"]: item for item in evidence["measurements"]}
+    assert measurements[100_000]["world_index"]["gzip_bytes"] > 1_000_000
+    assert measurements[100_000]["shards"]["gzip_max_bytes"] < 16_384
+    assert evidence["decision"]["single_world_index_for_100k"] == "rejected"

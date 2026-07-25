@@ -74,7 +74,7 @@ Wird minimale Betriebsfläche höher gewichtet, kann Commonworld lange rein stat
 ## Migrationsfolge
 
 1. Vertrag und deterministischen kompakten Weltindex einführen.
-2. Indexgröße und Browserkosten mit 10k/100k synthetischen Einträgen messen.
+2. Indexgröße und Browserkosten mit 10k/100k synthetischen Einträgen messen; Messbeleg unter `docs/evidence/catalog-platform-scaling-v1.json`.
 3. Client auf Manifest plus Weltindex umstellen; Details lazy laden.
 4. Bootstrap-Katalog entfernen und Größenbudget auf Anwendungscode beziehen.
 5. Shards und PMTiles erst nach gemessenem Bedarf aktivieren.
@@ -84,3 +84,24 @@ Wird minimale Betriebsfläche höher gewichtet, kann Commonworld lange rein stat
 ## Nicht behauptet
 
 Dieser Schnitt belegt noch keinen PostGIS-, Outbox-, Axum- oder Weltgewebe-Produktionspfad. Er schafft den kompatiblen öffentlichen Liefervertrag und einen lokalen deterministischen Snapshot-Compiler.
+
+## Umsetzungsstand der Skalierungsgrundlage
+
+Der Runtime-Compiler erzeugt neben Manifest und vollständigem Offline-Weltindex deterministische SHA-256-Präfix-Shards. Zwei Hexzeichen ergeben höchstens 256 stabile Partitionen. Ein Datensatz wechselt seinen Shard nur bei Änderung seiner ID; Inhaltsänderungen invalidieren nicht den gesamten Katalog.
+
+Der vollständige Weltindex bleibt als maschinenlesbarer Export und Prüffläche erhalten. Er ist bei großen Katalogen ausdrücklich nicht der Browser-Startpfad. Der spätere Browser lädt ein kleines Aggregatmanifest, danach nur für Viewport, Suchergebnis oder digitale Taxonomie benötigte Shards und schließlich vollständige Details.
+
+Der UI-Cutover ist fail-closed an Feldparität gebunden. Die heutige Oberfläche benötigt neben Identität und Geometrie auch Zusammenfassung, Handlungswege, Sprache, Zugang und redaktionelle Felder. Solange Lazy-Detailzustände und Deep-Link-Fehlerpfade diese Anforderungen nicht vollständig abdecken, bleibt der bestehende Bootstrap als kompatibler Übergangspfad aktiv.
+
+## Gemessene Skalierungsgrenzen vom 25. Juli 2026
+
+Die reproduzierbare synthetische Messung liegt in `docs/evidence/catalog-platform-scaling-v1.json`. Sie verwendet dieselbe kompakte Datensatzform und eine deterministische SHA-256-Präfixverteilung.
+
+| Einträge | Vollindex gzip | Median Parsezeit | größter Shard gzip | maximale Einträge je Shard |
+| ---: | ---: | ---: | ---: | ---: |
+| 10.000 | 154.620 Byte | 44,812 ms | 1.405 Byte | 59 |
+| 100.000 | 1.541.423 Byte | 804,028 ms | 7.885 Byte | 440 |
+
+Damit ist der vollständige 100k-Weltindex als initiale Browserlieferung verworfen. Die 256 Präfix-Shards sind als technische Grundpartition tragfähig, lösen aber allein noch keine räumliche Auswahl: Ein kleines Aggregatmanifest oder ein räumlicher PMTiles-/PostGIS-Index muss bestimmen, welche Shards beziehungsweise IDs für Viewport und Suche benötigt werden.
+
+Die Messung ist synthetisch und keine Endgeräte- oder Netzwerkmessung. Sie belegt Payload- und lokale Parsegrößen, nicht reale Interaktionslatenz auf iPad oder Mobilfunk.

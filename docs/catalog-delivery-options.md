@@ -43,3 +43,9 @@ Die Warnschwelle steht als `warn_bootstrap_gzip_bytes`, die harte Grenze als `ma
 ## Grenzen der Aussage
 
 Die Messung beweist die entfernten Abrufe und Bytes. Einzelne Zeitwerte hängen zusätzlich von Browser, Rechner und Scheduling ab und beweisen allein keine Beschleunigung. Die vollständigen kanonischen Projektdateien bleiben unverändert die einzige Katalogwahrheit.
+
+## Ablösungspfad ab Catalog Platform v1
+
+Die frühere Entscheidung für den vollständigen Bootstrap war für 41 bis 54 Einträge gemessen richtig, ist aber keine Zielarchitektur für einen Weltkatalog. `catalog-platform-v1` führt deshalb eine parallele, generationsgebundene Lieferfläche aus Manifest, Offline-Weltindex, SHA-256-Präfix-Shards und Einzelheiten ein.
+
+Der vollständige Bootstrap bleibt nur bis zum belegten UI-Cutover aktiv. Neue Katalogeinträge dürfen die harte Bootstrap-Grenze nicht weiter verbrauchen. Vor dem Cutover müssen mindestens 10.000 und 100.000 synthetische Einträge gemessen, die benötigten Startfelder festgelegt und Katalog-, Shard- sowie Detailausfälle im Browser-Smoke geprüft sein.

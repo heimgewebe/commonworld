@@ -6,22 +6,50 @@
     "world_index": "catalog/runtime/world.v1.json",
     "detail_url_template": "catalog/projects/{id}.json",
     "mutable_truth_in_commonworld": false,
-    "write_path": false
+    "write_path": false,
+    "shard_url_template": "catalog/runtime/shards/{sha256_prefix}.v1.json",
+    "shard_strategy": {
+      "algorithm": "sha256-prefix",
+      "prefix_length": 2
+    }
   },
   "generation": {
     "algorithm": "sha256",
-    "binds": ["schema_version", "catalog_manifest_sha256", "world_index_sha256"],
+    "binds": [
+      "schema_version",
+      "catalog_manifest_sha256",
+      "world_index_sha256"
+    ],
     "atomic_activation_required": true
   },
   "world_index_record": {
-    "required": ["id", "title", "themes", "presence", "activity", "detail"],
-    "forbidden": ["summary", "provenance", "links", "curation", "handoff"]
+    "required": [
+      "id",
+      "title",
+      "themes",
+      "actions",
+      "languages",
+      "access",
+      "presence",
+      "activity",
+      "detail"
+    ],
+    "forbidden": [
+      "summary",
+      "provenance",
+      "links",
+      "curation",
+      "handoff"
+    ]
   },
   "weltgewebe_alignment": {
     "canonical_store": "postgresql",
     "spatial_extension": "postgis_when_proven",
     "read_api": "rust_axum",
-    "projection_transport": ["immutable_static_snapshot", "read_only_api"],
+    "projection_transport": [
+      "immutable_static_snapshot",
+      "read_only_api"
+    ],
     "eventing_target": "transactional_outbox_plus_nats_jetstream",
     "map_transport": "pmtiles_when_measured"
   },

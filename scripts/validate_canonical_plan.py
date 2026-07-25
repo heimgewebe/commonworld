@@ -136,6 +136,7 @@ EXPECTED_SCRIPT_FILES = {
     "digital_taxonomy.py",
     "measure_catalog_delivery.py",
     "measure_catalog_delivery_browser.mjs",
+    "measure_catalog_platform_scaling.py",
     "run_browser_smoke.py",
     "smoke_public_browser.mjs",
     "smoke_accessibility_modes_browser.mjs",
