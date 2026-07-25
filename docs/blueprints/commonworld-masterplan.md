@@ -688,6 +688,10 @@ Die digitale Sphäre ist geometrisch an MapLibre gebunden. Ihr sichtbarer Mittel
 
 `catalog/catalog.json`, die Projektdateien unter `catalog/projects/` und `contracts/commonworld/project.schema.json` bilden die statische, ausschließlich lesende Maschinenoberfläche. Sie ist keine laufende API und besitzt keinen Schreibweg. Eine eigenständige CLI bleibt ohne belegten wiederkehrenden Anwendungsfall ausgeschlossen. Die Betriebsgrenze steht in `docs/ops/machine-readable-surface.md`.
 
+### Skalierbare Katalogplattform v1
+
+Die Anwendung, die veränderbare Katalogwahrheit und die öffentliche Projektion werden getrennt. Commonworld konsumiert einen generations- und hashgebundenen statischen Weltindex sowie bedarfsgeladene Details. Weltgewebe bleibt die geplante Schreib-, Moderations- und Administrationsgrenze und soll dieselbe Projektion später aus PostgreSQL/PostGIS über Rust/Axum und eine revisionsgebundene Publisher-Pipeline erzeugen. Der Vertrag steht in `contracts/commonworld/catalog-platform.contract.json`; die technische Begründung in `docs/architecture/catalog-platform-v1.md`.
+
 ### Gemessene statische Katalogauslieferung v1
 
 Die kanonischen `CommonProject`-Dateien bleiben die einzige veränderbare Katalogwahrheit. Build und CI erzeugen daraus einen vollständigen buildgebundenen Bootstrap für Karte, Suche, Filter und Fokus sowie die statischen interaktiven und No-JavaScript-Karten. Der Browser lädt die einzelnen Projektdateien beim Start nicht nochmals zur Gleichheitsprüfung; Manifest und Projekt-JSON bleiben dennoch öffentlich und direkt adressierbar.

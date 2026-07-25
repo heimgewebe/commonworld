@@ -1,0 +1,36 @@
+{
+  "kind": "commonworld.catalog_platform",
+  "version": "1.0",
+  "public_projection": {
+    "manifest": "catalog/runtime/manifest.v1.json",
+    "world_index": "catalog/runtime/world.v1.json",
+    "detail_url_template": "catalog/projects/{id}.json",
+    "mutable_truth_in_commonworld": false,
+    "write_path": false
+  },
+  "generation": {
+    "algorithm": "sha256",
+    "binds": ["schema_version", "catalog_manifest_sha256", "world_index_sha256"],
+    "atomic_activation_required": true
+  },
+  "world_index_record": {
+    "required": ["id", "title", "themes", "presence", "activity", "detail"],
+    "forbidden": ["summary", "provenance", "links", "curation", "handoff"]
+  },
+  "weltgewebe_alignment": {
+    "canonical_store": "postgresql",
+    "spatial_extension": "postgis_when_proven",
+    "read_api": "rust_axum",
+    "projection_transport": ["immutable_static_snapshot", "read_only_api"],
+    "eventing_target": "transactional_outbox_plus_nats_jetstream",
+    "map_transport": "pmtiles_when_measured"
+  },
+  "excluded_without_measured_need": [
+    "elasticsearch",
+    "opensearch",
+    "typesense",
+    "meilisearch",
+    "standalone_semantic_service",
+    "ann_hnsw"
+  ]
+}
