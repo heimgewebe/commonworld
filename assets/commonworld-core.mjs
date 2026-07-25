@@ -63,11 +63,11 @@ export const DIGITAL_TAXONOMY = deepFreeze({
 
     { id: 'open_knowledge_data', parent_id: 'knowledge_learning_culture', type: 'network', label_de: 'Offenes Wissen und Daten', order: 0, themes: ['knowledge', 'open-data', 'open-knowledge', 'documentation', 'research', 'citizen-science'] },
     { id: 'learning_education', parent_id: 'knowledge_learning_culture', type: 'network', label_de: 'Lernen und Bildung', order: 1, themes: ['education', 'learning', 'open-educational-resources', 'digital-literacy', 'environmental-education'] },
-    { id: 'media_culture', parent_id: 'knowledge_learning_culture', type: 'network', label_de: 'Medien, Archive und Kultur', order: 2, themes: ['open-media', 'creative-commons', 'culture', 'archives', 'music', 'public-domain'] },
+    { id: 'media_culture', parent_id: 'knowledge_learning_culture', type: 'network', label_de: 'Medien, Archive und Kultur', order: 2, themes: ['archives', 'creative-commons', 'cultural-heritage', 'culture', 'music', 'open-media', 'public-domain'] },
     { id: 'knowledge_learning_bridge', parent_id: 'knowledge_learning_culture', type: 'interface', label_de: 'Wissens- und Lernbrücke', order: 3, themes: [] },
 
     { id: 'free_software', parent_id: 'software_tools_production', type: 'network', label_de: 'Freie Software und Infrastruktur', order: 0, themes: ['free-software', 'open-source', 'software-infrastructure', 'infrastructure'] },
-    { id: 'open_hardware_production', parent_id: 'software_tools_production', type: 'network', label_de: 'Offene Hardware und Produktion', order: 1, themes: ['open-hardware', 'distributed-manufacturing'] },
+    { id: 'open_hardware_production', parent_id: 'software_tools_production', type: 'network', label_de: 'Offene Hardware und Produktion', order: 1, themes: ['appropriate-technology', 'distributed-manufacturing', 'open-hardware'] },
     { id: 'shared_platforms_tools', parent_id: 'software_tools_production', type: 'network', label_de: 'Plattformen und geteilte Werkzeuge', order: 2, themes: ['platform', 'shared-tools', 'tool-sharing', 'repair', 'circular-economy', 'skills', 'shared-space'] },
     { id: 'knowledge_software_bridge', parent_id: 'software_tools_production', type: 'interface', label_de: 'Daten- und Softwarebrücke', order: 3, themes: [] },
 
@@ -79,12 +79,12 @@ export const DIGITAL_TAXONOMY = deepFreeze({
     { id: 'water_irrigation', parent_id: 'provision_land_ecology', type: 'network', label_de: 'Wasser und Bewässerung', order: 1, themes: ['water', 'irrigation'] },
     { id: 'renewable_energy', parent_id: 'provision_land_ecology', type: 'network', label_de: 'Erneuerbare Energie', order: 2, themes: ['energy', 'renewable-energy'] },
     { id: 'health_software', parent_id: 'provision_land_ecology', type: 'interface', label_de: 'Offene Gesundheitsversorgung', order: 3, themes: ['health'] },
-    { id: 'land_ecology', parent_id: 'provision_land_ecology', type: 'network', label_de: 'Land, Stadtgrün und Ökologie', order: 4, themes: ['urban-gardening', 'biodiversity', 'community-land', 'environment'] },
+    { id: 'land_ecology', parent_id: 'provision_land_ecology', type: 'network', label_de: 'Land, Stadtgrün und Ökologie', order: 4, themes: ['biodiversity', 'community-land', 'environment', 'fisheries', 'forest-conservation', 'land-commons', 'marine-conservation', 'urban-gardening'] },
     { id: 'food_distribution_platforms', parent_id: 'provision_land_ecology', type: 'interface', label_de: 'Ernährungsplattformen', order: 5, themes: [] },
     { id: 'energy_cooperatives', parent_id: 'provision_land_ecology', type: 'interface', label_de: 'Energiegenossenschaften', order: 6, themes: ['energy-democracy'] },
     { id: 'watershed_food_systems', parent_id: 'provision_land_ecology', type: 'interface', label_de: 'Wasser- und Ernährungssysteme', order: 7, themes: [] },
 
-    { id: 'cooperative_governance', parent_id: 'cooperation_self_organization', type: 'network', label_de: 'Gemeinschaftliche Governance und Genossenschaften', order: 0, themes: ['commons-governance', 'community-ownership', 'cooperative-economy', 'cooperative', 'volunteer-community'] },
+    { id: 'cooperative_governance', parent_id: 'cooperation_self_organization', type: 'network', label_de: 'Gemeinschaftliche Governance und Genossenschaften', order: 0, themes: ['commons-governance', 'community-maintenance', 'community-ownership', 'cooperative', 'cooperative-economy', 'customary-governance', 'volunteer-community'] },
     { id: 'civic_technology', parent_id: 'cooperation_self_organization', type: 'interface', label_de: 'Civic Tech und Selbstorganisation', order: 1, themes: ['civic-tech'] },
     { id: 'mutual_local_self_help', parent_id: 'cooperation_self_organization', type: 'network', label_de: 'Nachbarschaft und gegenseitige Hilfe', order: 2, themes: ['mutual-aid', 'neighbourhood'] },
   ],
@@ -99,6 +99,8 @@ export const DIGITAL_TAXONOMY = deepFreeze({
     { id: 'open_source_hardware_production', all_themes: ['open-source', 'open-hardware', 'distributed-manufacturing'], target_node_id: 'open_hardware_production', reason: 'open source ecology combines software, hardware and distributed production' },
     { id: 'health_open_software', all_themes: ['health', 'open-source'], target_node_id: 'health_software', reason: 'health provision implemented as open software' },
     { id: 'civic_tech_open_data', all_themes: ['civic-tech', 'open-data'], target_node_id: 'civic_technology', reason: 'civic technology coordinates data, code and governance' },
+    { id: 'community_maintained_water', all_themes: ['water', 'community-maintenance'], target_node_id: 'water_irrigation', reason: 'water infrastructure whose upkeep is organized as a community responsibility' },
+    { id: 'community_stewarded_marine_ecosystem', all_themes: ['marine-conservation', 'community-ownership', 'customary-governance'], target_node_id: 'land_ecology', reason: 'customary community ownership organizes stewardship of a marine ecosystem' },
   ],
   tie_rules: [
     { id: 'knowledge_learning_same_field', candidate_node_ids: ['learning_education', 'open_knowledge_data'], target_node_id: 'knowledge_learning_bridge', reason: 'equal knowledge and learning themes share the knowledge field' },

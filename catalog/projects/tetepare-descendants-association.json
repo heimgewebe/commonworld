@@ -1,0 +1,111 @@
+{
+  "schema_version": 4,
+  "id": "tetepare-descendants-association",
+  "title": "Tetepare Descendants’ Association",
+  "summary": "Eine große Landbesitzervereinigung auf den Salomonen, die Tetepare Island und seine Land- und Meeresressourcen gemeinschaftlich schützt, verwaltet und für künftige Generationen erhält.",
+  "themes": [
+    "land-commons",
+    "forest-conservation",
+    "marine-conservation",
+    "customary-governance",
+    "community-ownership",
+    "biodiversity"
+  ],
+  "actions": [
+    "learn"
+  ],
+  "presence": {
+    "geographic": [
+      {
+        "id": "tetepare-island-area",
+        "mode": "approximate",
+        "label": "Tetepare Island, Western Province, Salomonen",
+        "geometry": {
+          "type": "Point",
+          "coordinates": [
+            157.551405,
+            -8.736192
+          ]
+        },
+        "uncertainty_meters_min": 15000,
+        "privacy_note": "Der Punkt bezeichnet nur den öffentlich registrierten Inselbezug und bildet weder Schutzgebietsgrenzen noch Rangerwege, Siedlungsbezüge oder einzelne Nutzungsflächen exakt ab.",
+        "source_ids": [
+          "source-tetepare-tda",
+          "source-tetepare-geonames"
+        ]
+      }
+    ],
+    "digital": {
+      "available": true,
+      "reach": "global",
+      "label": "Öffentliche Vereins-, Schutz- und Besuchsinformationen der Tetepare Descendants’ Association",
+      "source_ids": [
+        "source-tetepare-tda",
+        "source-tetepare-home"
+      ]
+    }
+  },
+  "activity": {
+    "status": "active",
+    "observed_at": "2026-07-24",
+    "source_ids": [
+      "source-tetepare-tda",
+      "source-tetepare-home"
+    ],
+    "note": "Die offiziellen Seiten weisen eine fortbestehende Organisation, Schutzarbeit, Ranger- und Forschungsanfragen sowie den lokal verwalteten Ökolodge-Betrieb aus."
+  },
+  "provenance": {
+    "sources": [
+      {
+        "id": "source-tetepare-tda",
+        "type": "official-source",
+        "label": "The Tetepare Descendants’ Association",
+        "url": "https://tetepare.org/the-tetepare-descendants-association/",
+        "retrieved_at": "2026-07-24",
+        "note": "Offizielle Quelle für Identität, Rechts- und Eigentumsbezug, Vereinsstruktur und gemeinschaftliches Schutz- und Verwaltungsziel."
+      },
+      {
+        "id": "source-tetepare-home",
+        "type": "official-source",
+        "label": "Tetepare — official site",
+        "url": "https://tetepare.org/",
+        "retrieved_at": "2026-07-24",
+        "note": "Aktuelle offizielle Oberfläche für Schutzarbeit, Kontakt, Forschung, Spenden und den lokal verwalteten Ökolodge-Betrieb."
+      },
+      {
+        "id": "source-tetepare-geonames",
+        "type": "public-registry",
+        "label": "Tetepare Island — GeoNames",
+        "url": "https://www.geonames.org/2102602/tetepare-island.html",
+        "retrieved_at": "2026-07-24",
+        "note": "Öffentliches Georegister für den groben Inselmittelpunkt; nicht als Schutzgebiets- oder Eigentumsgrenze verwendet."
+      }
+    ],
+    "uncertainty_note": "Die Geometrie dient nur der Orientierung. Die customary ownership, Schutzflächen und Nutzungsregeln werden nicht als genaue Flächengeometrie behauptet."
+  },
+  "curation": {
+    "state": "listed",
+    "reviewed_by": "Commonworld editorial review",
+    "reviewed_at": "2026-07-24",
+    "next_review_at": "2026-10-24",
+    "notes": "Aufgenommen als aktuell belegtes pazifisches Land- und Meeres-Commons unter gemeinschaftlicher Eigentums- und Schutzverantwortung."
+  },
+  "links": [
+    {
+      "type": "homepage",
+      "label": "Tetepare Descendants’ Association — offizielle Seite",
+      "url": "https://tetepare.org/the-tetepare-descendants-association/"
+    },
+    {
+      "type": "learn",
+      "label": "Organisation und Schutzmodell kennenlernen",
+      "url": "https://tetepare.org/the-tetepare-descendants-association/",
+      "source_ids": [
+        "source-tetepare-tda"
+      ]
+    }
+  ],
+  "handoff": {
+    "enabled": false
+  }
+}

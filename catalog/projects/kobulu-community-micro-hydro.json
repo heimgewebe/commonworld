@@ -1,0 +1,101 @@
+{
+  "schema_version": 4,
+  "id": "kobulu-community-micro-hydro",
+  "title": "Kobulu Community Micro Hydro",
+  "summary": "Ein gemeinschaftlich verwaltetes Mikrowasserkraftsystem in Kampung Buayan, Sabah, dessen lokales Komitee Verbrauchstarife, Betriebspersonal, Ersatzteile und künftige Reparaturen organisiert.",
+  "themes": [
+    "energy",
+    "renewable-energy",
+    "community-ownership",
+    "commons-governance",
+    "rural-infrastructure",
+    "appropriate-technology"
+  ],
+  "actions": [
+    "learn"
+  ],
+  "presence": {
+    "geographic": [
+      {
+        "id": "kobulu-penampang-area",
+        "mode": "approximate",
+        "label": "Raum Penampang, Sabah, Malaysia",
+        "geometry": {
+          "type": "Point",
+          "coordinates": [
+            116.25,
+            5.833333
+          ]
+        },
+        "uncertainty_meters_min": 30000,
+        "privacy_note": "Der Punkt bezeichnet nur den groben öffentlichen Verwaltungsbezug Penampang und nicht die Anlage, Leitungen, Haushalte oder private Grundstücke.",
+        "source_ids": [
+          "source-kobulu-tonibung",
+          "source-penampang-geonames"
+        ]
+      }
+    ],
+    "digital": {
+      "available": true,
+      "reach": "global",
+      "label": "Öffentliche Projektdokumentation von TONIBUNG zu Technik und gemeinschaftlicher Verwaltung",
+      "source_ids": [
+        "source-kobulu-tonibung"
+      ]
+    }
+  },
+  "activity": {
+    "status": "unknown",
+    "observed_at": "2026-07-24",
+    "source_ids": [
+      "source-kobulu-tonibung"
+    ],
+    "note": "Die offizielle Quelle belegt Fertigstellung, Nutzung und gemeinschaftliche Verwaltung im Jahr 2019, enthält aber keinen zeitnahen Nachweis des heutigen Betriebszustands."
+  },
+  "provenance": {
+    "sources": [
+      {
+        "id": "source-kobulu-tonibung",
+        "type": "official-source",
+        "label": "Micro Hydro Project KOBULU — TONIBUNG",
+        "url": "https://tonibung.org/projects",
+        "retrieved_at": "2026-07-24",
+        "note": "Offizielle Projektquelle für Ort, Leistung, Haushaltsbezug, Fertigstellung sowie das lokale Komitee, Tarifregeln, Betriebspersonal und Reparaturfinanzierung."
+      },
+      {
+        "id": "source-penampang-geonames",
+        "type": "public-registry",
+        "label": "Penampang — GeoNames",
+        "url": "https://www.geonames.org/advanced-search.html?country=MY&q=Penampang",
+        "retrieved_at": "2026-07-24",
+        "note": "Öffentliches Georegister für einen groben Verwaltungsbezug; nicht als Anlagenstandort verwendet."
+      }
+    ],
+    "uncertainty_note": "Der öffentliche Projekttext und das Georegister verwenden unterschiedliche räumliche Granularitäten. Deshalb zeigt Commonworld nur den groben Raum Penampang und keinen scheinpräzisen Anlagenpunkt."
+  },
+  "curation": {
+    "state": "listed",
+    "reviewed_by": "Commonworld editorial review",
+    "reviewed_at": "2026-07-24",
+    "next_review_at": "2026-08-24",
+    "notes": "Aktueller Betriebszustand nicht zeitnah verifiziert; priorisierte Nachprüfung bis 2026-08-24. Aufgenommen ist die belegte gemeinschaftliche Verwaltungsstruktur der Energieanlage, nicht ein zeitnah bestätigter laufender Betrieb."
+  },
+  "links": [
+    {
+      "type": "homepage",
+      "label": "Kobulu Micro Hydro — TONIBUNG",
+      "url": "https://tonibung.org/projects"
+    },
+    {
+      "type": "learn",
+      "label": "Gemeinschaftliches Betriebsmodell kennenlernen",
+      "url": "https://tonibung.org/projects",
+      "source_ids": [
+        "source-kobulu-tonibung"
+      ]
+    }
+  ],
+  "handoff": {
+    "enabled": false
+  }
+}

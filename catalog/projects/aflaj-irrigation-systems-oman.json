@@ -1,0 +1,101 @@
+{
+  "schema_version": 4,
+  "id": "aflaj-irrigation-systems-oman",
+  "title": "Aflaj-Bewässerungssysteme in Oman",
+  "summary": "Lebendige, gemeinschaftlich verwaltete Bewässerungssysteme in Oman, die Wasser nach Zeitanteilen verteilen und durch geteilte Pflege, Regeln und lokale Finanzierung erhalten werden.",
+  "themes": [
+    "water",
+    "irrigation",
+    "agriculture",
+    "commons-governance",
+    "community-maintenance",
+    "cultural-heritage"
+  ],
+  "actions": [
+    "learn"
+  ],
+  "presence": {
+    "geographic": [
+      {
+        "id": "aflaj-oman-serial-area",
+        "mode": "approximate",
+        "label": "Fünf Aflaj-Gebiete im Norden Omans",
+        "geometry": {
+          "type": "Point",
+          "coordinates": [
+            57.9167,
+            22.9567
+          ]
+        },
+        "uncertainty_meters_min": 130000,
+        "privacy_note": "Der Punkt ist ein grober, aus den fünf von UNESCO veröffentlichten Teilgebietskoordinaten abgeleiteter Mittelpunkt und bezeichnet weder Kanäle noch Grundstücke oder Wasserrechte exakt.",
+        "source_ids": [
+          "source-aflaj-unesco",
+          "source-aflaj-unesco-maps"
+        ]
+      }
+    ],
+    "digital": {
+      "available": true,
+      "reach": "global",
+      "label": "UNESCO-Dokumentation mit Beschreibung, Karten und Verwaltungsangaben",
+      "source_ids": [
+        "source-aflaj-unesco"
+      ]
+    }
+  },
+  "activity": {
+    "status": "active",
+    "observed_at": "2026-07-24",
+    "source_ids": [
+      "source-aflaj-unesco"
+    ],
+    "note": "UNESCO beschreibt die Aflaj als weiterhin funktionierende, lebendige Bewässerungslandschaften mit fortbestehender gemeinschaftlicher Wasserteilung und Pflege."
+  },
+  "provenance": {
+    "sources": [
+      {
+        "id": "source-aflaj-unesco",
+        "type": "official-source",
+        "label": "Aflaj Irrigation Systems of Oman — UNESCO World Heritage Centre",
+        "url": "https://whc.unesco.org/en/list/1207/",
+        "retrieved_at": "2026-07-24",
+        "note": "Offizielle UNESCO-Quelle für Identität, gemeinschaftliche Wasserteilung, fortbestehende Nutzung, Pflege und Verwaltung."
+      },
+      {
+        "id": "source-aflaj-unesco-maps",
+        "type": "public-registry",
+        "label": "Aflaj Irrigation Systems of Oman — geographical data",
+        "url": "https://whc.unesco.org/en/list/1207/maps/",
+        "retrieved_at": "2026-07-24",
+        "note": "UNESCO-Register mit den veröffentlichten Koordinaten der fünf Teilgebiete; daraus wurde nur ein grober Mittelpunkt abgeleitet."
+      }
+    ],
+    "uncertainty_note": "Der Datensatz bildet ein serielles, räumlich verteiltes System als groben Orientierungspunkt ab. Einzelne Kanäle, Nutzungsrechte und private Flächen werden nicht dargestellt."
+  },
+  "curation": {
+    "state": "listed",
+    "reviewed_by": "Commonworld editorial review",
+    "reviewed_at": "2026-07-24",
+    "next_review_at": "2026-10-24",
+    "notes": "Aufgenommen als fortbestehendes Wasser-Commons mit Primärquelle und als regionale Ergänzung für die Arabische Halbinsel."
+  },
+  "links": [
+    {
+      "type": "homepage",
+      "label": "Aflaj-Bewässerungssysteme — UNESCO",
+      "url": "https://whc.unesco.org/en/list/1207/"
+    },
+    {
+      "type": "learn",
+      "label": "Gemeinschaftliche Wasserteilung kennenlernen",
+      "url": "https://whc.unesco.org/en/list/1207/",
+      "source_ids": [
+        "source-aflaj-unesco"
+      ]
+    }
+  ],
+  "handoff": {
+    "enabled": false
+  }
+}

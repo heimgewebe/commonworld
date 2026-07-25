@@ -27,16 +27,21 @@
   "known_current_digital_themes": [
     "agriculture",
     "agrobiodiversity",
+    "appropriate-technology",
+    "biodiversity",
     "circular-economy",
     "citizen-science",
     "civic-tech",
     "commons-governance",
     "communication",
+    "community-maintenance",
     "community-network",
     "community-ownership",
     "cooperative",
     "cooperative-economy",
     "creative-commons",
+    "cultural-heritage",
+    "customary-governance",
     "digital-equity",
     "digital-literacy",
     "distributed-manufacturing",
@@ -46,14 +51,18 @@
     "energy-democracy",
     "environment",
     "federation",
+    "fisheries",
     "food",
+    "forest-conservation",
     "free-software",
     "health",
     "indigenous-knowledge",
     "infrastructure",
     "irrigation",
     "knowledge",
+    "land-commons",
     "learning",
+    "marine-conservation",
     "music",
     "network",
     "open-data",
@@ -169,11 +178,12 @@
       "label_de": "Medien, Archive und Kultur",
       "order": 2,
       "themes": [
-        "open-media",
-        "creative-commons",
-        "culture",
         "archives",
+        "creative-commons",
+        "cultural-heritage",
+        "culture",
         "music",
+        "open-media",
         "public-domain"
       ]
     },
@@ -205,8 +215,9 @@
       "label_de": "Offene Hardware und Produktion",
       "order": 1,
       "themes": [
-        "open-hardware",
-        "distributed-manufacturing"
+        "appropriate-technology",
+        "distributed-manufacturing",
+        "open-hardware"
       ]
     },
     {
@@ -320,10 +331,14 @@
       "label_de": "Land, Stadtgrün und Ökologie",
       "order": 4,
       "themes": [
-        "urban-gardening",
         "biodiversity",
         "community-land",
-        "environment"
+        "environment",
+        "fisheries",
+        "forest-conservation",
+        "land-commons",
+        "marine-conservation",
+        "urban-gardening"
       ]
     },
     {
@@ -360,9 +375,11 @@
       "order": 0,
       "themes": [
         "commons-governance",
+        "community-maintenance",
         "community-ownership",
-        "cooperative-economy",
         "cooperative",
+        "cooperative-economy",
+        "customary-governance",
         "volunteer-community"
       ]
     },
@@ -480,6 +497,25 @@
       ],
       "target_node_id": "civic_technology",
       "reason": "civic technology coordinates data, code and governance"
+    },
+    {
+      "id": "community_maintained_water",
+      "all_themes": [
+        "water",
+        "community-maintenance"
+      ],
+      "target_node_id": "water_irrigation",
+      "reason": "water infrastructure whose upkeep is organized as a community responsibility"
+    },
+    {
+      "id": "community_stewarded_marine_ecosystem",
+      "all_themes": [
+        "marine-conservation",
+        "community-ownership",
+        "customary-governance"
+      ],
+      "target_node_id": "land_ecology",
+      "reason": "customary community ownership organizes stewardship of a marine ecosystem"
     }
   ],
   "tie_rules": [
