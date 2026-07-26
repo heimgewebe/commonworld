@@ -2393,12 +2393,12 @@ html:not([data-input-modality="pointer"]) .project-detail-back:focus-visible {
   }
 
   .project-detail-header {
-    grid-template-columns: minmax(0, 1.35fr) minmax(12rem, 0.65fr);
-    gap: 1rem;
+    grid-template-columns: minmax(0, 1fr);
+    gap: 0.9rem;
   }
 
   .project-detail-grid {
-    grid-template-columns: repeat(4, minmax(11rem, 1fr));
+    grid-template-columns: repeat(auto-fit, minmax(min(14rem, 100%), 1fr));
   }
 
   .layer-project-detail-title {

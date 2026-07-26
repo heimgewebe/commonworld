@@ -16,8 +16,9 @@ Integrated base: `47b6e82c6e359dda1b03737ab45de0dbbca8f794`
 
 - No unresolved review threads or external review findings existed on the reviewed pull request.
 - Project and provenance links remain filtered through the existing HTTPS sanitizer before rendering.
-- Integration with the current `main` was conflict-free, but review found three real stale contracts: generated public-shell asset hashes, the vertical-slice source token for `createRibbonSegment`, and revision-bound benchmark/browser-smoke evidence.
+- Integration with the current `main` was conflict-free, but review found four real stale contracts: generated public-shell asset hashes, the vertical-slice source token for `createRibbonSegment`, and revision-bound benchmark/browser-smoke evidence.
 - The generated shell was rebuilt; the vertical-slice validator now checks the canonical project-routing path; static, throttled-browser and public-smoke evidence was regenerated and digest-bound.
+- Codex P1 for 667×375 landscape was confirmed: the fixed four-column minimum grid could be clipped. The low-height layout now adapts to one or two columns, with a browser regression proving zero horizontal overflow and reachability of the final evidence section.
 
 ## Validation
 

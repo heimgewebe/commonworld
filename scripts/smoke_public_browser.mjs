@@ -2789,6 +2789,54 @@ async function liveUiHardeningScenario() {
   assert(landscapeOverview.pageErrors.length === 0, `live UI 667x375: page errors: ${landscapeOverview.pageErrors.join(' | ')}`);
   await landscapeOverview.context.close();
 
+  const landscapeDetail = await newPage({ mobile: true, viewportOverride: { width: 667, height: 375 }, touch: true, reducedMotion: 'reduce' });
+  await landscapeDetail.page.goto(`${baseUrl}/?view=layers`, { waitUntil: 'domcontentloaded' });
+  await landscapeDetail.page.waitForSelector('html.runtime-ready');
+  await landscapeDetail.page.waitForSelector('.globe-stage[data-view-phase="layers"]');
+  const detailTrigger = landscapeDetail.page.locator('.digital-ribbon-item').first();
+  assert((await detailTrigger.count()) === 1, 'live UI 667x375 detail: no digital Commons trigger is available');
+  await detailTrigger.click();
+  await landscapeDetail.page.waitForSelector('#layer-projects:not([hidden]) .project-detail-grid');
+  const detailGeometry = await landscapeDetail.page.evaluate(() => {
+    const rect = (node) => {
+      const box = node.getBoundingClientRect();
+      return { left: box.left, top: box.top, right: box.right, bottom: box.bottom, width: box.width, height: box.height };
+    };
+    const panel = document.querySelector('#layer-projects');
+    const grid = panel.querySelector('.project-detail-grid');
+    const sections = [...grid.querySelectorAll('.project-detail-section')];
+    const gridColumns = getComputedStyle(grid).gridTemplateColumns.split(/\s+/).filter(Boolean);
+    return {
+      viewport: { width: window.innerWidth, height: window.innerHeight },
+      panel: rect(panel),
+      panelClientWidth: panel.clientWidth,
+      panelScrollWidth: panel.scrollWidth,
+      gridClientWidth: grid.clientWidth,
+      gridScrollWidth: grid.scrollWidth,
+      gridColumnCount: gridColumns.length,
+      sections: sections.map(rect),
+    };
+  });
+  assert(detailGeometry.sections.length === 4, `live UI 667x375 detail: expected four detail sections (${JSON.stringify(detailGeometry)})`);
+  assert(detailGeometry.gridColumnCount <= 2, `live UI 667x375 detail: low-height layout forced too many columns (${JSON.stringify(detailGeometry)})`);
+  assert(detailGeometry.panelScrollWidth <= detailGeometry.panelClientWidth + 1, `live UI 667x375 detail: clipped horizontal panel overflow (${JSON.stringify(detailGeometry)})`);
+  assert(detailGeometry.gridScrollWidth <= detailGeometry.gridClientWidth + 1, `live UI 667x375 detail: detail grid overflows horizontally (${JSON.stringify(detailGeometry)})`);
+  assert(detailGeometry.sections.every(({ left, right }) => left >= detailGeometry.panel.left - 0.5 && right <= detailGeometry.panel.right + 0.5), `live UI 667x375 detail: section lies outside the clipped panel (${JSON.stringify(detailGeometry)})`);
+  const lastDetailSection = landscapeDetail.page.locator('.project-detail-section').last();
+  await lastDetailSection.scrollIntoViewIfNeeded();
+  const lastSectionVisibility = await lastDetailSection.evaluate((node) => {
+    const section = node.getBoundingClientRect();
+    const panel = node.closest('#layer-projects').getBoundingClientRect();
+    return {
+      horizontallyReachable: section.left >= panel.left - 0.5 && section.right <= panel.right + 0.5,
+      verticallyReachable: section.bottom > panel.top + 0.5 && section.top < panel.bottom - 0.5,
+    };
+  });
+  assert(lastSectionVisibility.horizontallyReachable && lastSectionVisibility.verticallyReachable, `live UI 667x375 detail: final section is unreachable (${JSON.stringify(lastSectionVisibility)})`);
+  assert(landscapeDetail.consoleErrors.length === 0, `live UI 667x375 detail: console errors: ${landscapeDetail.consoleErrors.join(' | ')}`);
+  assert(landscapeDetail.pageErrors.length === 0, `live UI 667x375 detail: page errors: ${landscapeDetail.pageErrors.join(' | ')}`);
+  await landscapeDetail.context.close();
+
   const run = await newPage({ viewportOverride: { width: 844, height: 390 }, touch: true, reducedMotion: 'reduce' });
   await run.page.goto(baseUrl, { waitUntil: 'domcontentloaded' });
   await run.page.waitForSelector('html.runtime-ready');
@@ -2853,6 +2901,13 @@ async function liveUiHardeningScenario() {
       layerControl: overviewGeometry.layer,
       zoomControl: overviewGeometry.zoom,
       minimumCatalogSelectHeight,
+    },
+    landscapeDetail: {
+      viewport: detailGeometry.viewport,
+      gridColumnCount: detailGeometry.gridColumnCount,
+      panelHorizontalOverflow: Math.max(0, detailGeometry.panelScrollWidth - detailGeometry.panelClientWidth),
+      gridHorizontalOverflow: Math.max(0, detailGeometry.gridScrollWidth - detailGeometry.gridClientWidth),
+      finalSectionReachable: lastSectionVisibility.horizontallyReachable && lastSectionVisibility.verticallyReachable,
     },
   });
   await run.context.close();
