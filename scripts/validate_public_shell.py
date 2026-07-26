@@ -61,6 +61,7 @@ REQUIRED_HTML = (
     'id="catalog"',
     'id="static-catalog-fallback"',
     'data-static-catalog-fallback',
+    'id="text-skip-link" class="skip-link" href="#static-catalog-fallback"',
     'id="project-focus"',
     'href="./catalog/catalog.json"',
     'href="./contracts/commonworld/project.schema.json"',
@@ -84,6 +85,7 @@ FORBIDDEN_HTML = (
     'game feel',
     'gamification',
     '<form',
+    '<noscript',
     '/proofs/',
     '/api/',
     'unpkg.com',
@@ -152,6 +154,7 @@ def validate_public_shell(root: Path = ROOT) -> list[str]:
     german_html = german_html_path.read_text(encoding='utf-8') if german_html_path.is_file() else ''
     german_method = german_method_path.read_text(encoding='utf-8') if german_method_path.is_file() else ''
     bootstrap = bootstrap_path.read_text(encoding='utf-8')
+    app = (root / 'assets/commonworld-app.js').read_text(encoding='utf-8')
     lowered = html.casefold()
     if 'id="catalog-bootstrap"' in html:
         errors.append('public shell must not embed catalog JSON in the DOM')
@@ -164,6 +167,13 @@ def validate_public_shell(root: Path = ROOT) -> list[str]:
     css_version = hashlib.sha256(css_path.read_bytes()).hexdigest()[:12]
     if f'<script type="module" src="./assets/commonworld-app.js?v={app_version}"></script>' not in html:
         errors.append('public shell must load commonworld-app.js with its deterministic content hash')
+    for token in (
+        "document.querySelector('#text-skip-link')",
+        "textSkipLink.setAttribute('href', '#text-view')",
+        "document.querySelector('[data-static-catalog-fallback]')?.remove()",
+    ):
+        if token not in app:
+            errors.append(f'public shell runtime missing bootstrap-recovery handoff: {token}')
     expected_css_link = f'./index.css?v={css_version}'
     if expected_css_link not in parse_stylesheet_links(html):
         errors.append('public shell must load index.css with its deterministic content hash')

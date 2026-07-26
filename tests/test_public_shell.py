@@ -16,6 +16,17 @@ from scripts.validate_public_shell import ROOT, validate_public_shell
 
 
 class PublicShellTests(unittest.TestCase):
+    def refresh_app_version(self, root: Path) -> None:
+        version = hashlib.sha256((root / "assets/commonworld-app.js").read_bytes()).hexdigest()[:12]
+        path = root / "index.html"
+        html = re.sub(
+            r'\./assets/commonworld-app\.js\?v=[0-9a-f]{12}',
+            f'./assets/commonworld-app.js?v={version}',
+            path.read_text(encoding="utf-8"),
+            count=1,
+        )
+        path.write_text(html, encoding="utf-8")
+
     def refresh_ipad_version(self, root: Path) -> None:
         version = hashlib.sha256((root / "assets/ipad-layout.css").read_bytes()).hexdigest()[:12]
         path = root / "index.html"
@@ -93,6 +104,58 @@ class PublicShellTests(unittest.TestCase):
             )
             errors = validate_public_shell(root)
         self.assertIn('public shell missing required token: id="static-catalog-fallback"', errors)
+
+    def test_public_shell_rejects_fallback_inside_noscript(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp_dir:
+            root = self.copy_shell(tmp_dir)
+            path = root / "index.html"
+            path.write_text(
+                path.read_text(encoding="utf-8").replace(
+                    '<section id="static-catalog-fallback"',
+                    '<noscript><section id="static-catalog-fallback"',
+                    1,
+                ),
+                encoding="utf-8",
+            )
+            errors = validate_public_shell(root)
+        self.assertIn('public shell contains obsolete or unsafe token: <noscript', errors)
+
+    def test_public_shell_rejects_wrong_fallback_skip_target(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp_dir:
+            root = self.copy_shell(tmp_dir)
+            path = root / "index.html"
+            path.write_text(
+                path.read_text(encoding="utf-8").replace(
+                    'id="text-skip-link" class="skip-link" href="#static-catalog-fallback"',
+                    'id="text-skip-link" class="skip-link" href="#text-view"',
+                    1,
+                ),
+                encoding="utf-8",
+            )
+            errors = validate_public_shell(root)
+        self.assertIn(
+            'public shell missing required token: id="text-skip-link" class="skip-link" href="#static-catalog-fallback"',
+            errors,
+        )
+
+    def test_public_shell_rejects_missing_recovery_handoff(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp_dir:
+            root = self.copy_shell(tmp_dir)
+            app_path = root / "assets/commonworld-app.js"
+            app_path.write_text(
+                app_path.read_text(encoding="utf-8").replace(
+                    "document.querySelector('[data-static-catalog-fallback]')?.remove()",
+                    "document.querySelector('[data-static-catalog-fallback]')",
+                    1,
+                ),
+                encoding="utf-8",
+            )
+            self.refresh_app_version(root)
+            errors = validate_public_shell(root)
+        self.assertIn(
+            "public shell runtime missing bootstrap-recovery handoff: document.querySelector('[data-static-catalog-fallback]')?.remove()",
+            errors,
+        )
 
     def test_unknown_activity_notice_is_rendered_in_static_cards(self) -> None:
         records = load_records(ROOT)
