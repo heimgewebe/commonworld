@@ -88,13 +88,67 @@ jobs:
             --browser /tmp/pr143-browser.json \
             --smoke /tmp/pr143-smoke.json
       - name: Remove temporary finalizer
-        run: rm .github/workflows/pr143-finalize.yml scripts/pr143_finalize.py
-      - name: Full validation of final product tree
-        run: |
-          git diff --check
-          make validate
-          npm run smoke:browser
-          git diff --check
+        run: rm -f .github/workflows/pr143-finalize.yml scripts/pr143_finalize.py docs/evidence/pr143-finalization-receipt-v1.json
+      - name: Diff hygiene
+        run: git diff --check
+      - name: Validate proposal path
+        run: make validate-proposal-path
+      - name: Validate current state
+        run: make validate-current-state
+      - name: Validate canonical plan
+        run: make validate-canonical-plan
+      - name: Validate contracts
+        run: make validate-contracts
+      - name: Validate semantic zoom
+        run: make validate-semantic-zoom
+      - name: Validate visual semantics
+        run: make validate-visual-semantics
+      - name: Validate renderer spike
+        run: make validate-renderer-spike
+      - name: Validate MapLibre phase 2 proof
+        run: make validate-maplibre-phase2-proof
+      - name: Validate device acceptance pack
+        run: make validate-device-acceptance-pack
+      - name: Validate device acceptance rerun
+        run: make validate-device-acceptance-rerun
+      - name: Validate digital sphere
+        run: make validate-digital-sphere
+      - name: Validate digital ring taxonomy
+        run: make validate-digital-ring-taxonomy
+      - name: Validate layered digital sphere proof
+        run: make validate-layered-digital-sphere-proof
+      - name: Validate digital sphere real surface
+        run: make validate-digital-sphere-real-surface
+      - name: Validate device acceptance performance
+        run: make validate-device-acceptance-performance-v4
+      - name: Validate physical Apple acceptance
+        run: make validate-physical-device-acceptance-v4-apple
+      - name: Validate public catalog
+        run: make validate-public-catalog
+      - name: Validate public seed baseline
+        run: make validate-public-seed-baseline
+      - name: Validate presence axes
+        run: make validate-presence-axes
+      - name: Validate intent search discovery
+        run: make validate-intent-search-discovery
+      - name: Validate renderer selection
+        run: make validate-renderer-selection
+      - name: Validate public MapLibre vertical slice
+        run: make validate-public-maplibre-vertical-slice
+      - name: Validate production delivery provider
+        run: make validate-production-delivery-provider
+      - name: Validate public shell
+        run: make validate-public-shell
+      - name: Validate catalog delivery budget
+        run: make validate-catalog-delivery-budget
+      - name: JavaScript tests
+        run: make test-js
+      - name: Python tests
+        run: make test
+      - name: Browser smoke suite
+        run: npm run smoke:browser
+      - name: Final diff hygiene
+        run: git diff --check
       - name: Commit finalized PR head
         env:
           BRANCH: feat/digital-detail-unification-v1
