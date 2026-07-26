@@ -16,7 +16,9 @@ class CurrentStateTests(unittest.TestCase):
             "contracts/commonworld/public-maplibre-vertical-slice.contract.json",
             "contracts/commonworld/digital-ring-taxonomy.contract.json",
             "contracts/commonworld/production-delivery-provider.contract.json",
+            "contracts/commonworld/catalog-platform.contract.json",
             "contracts/commonworld/renderer-selection.contract.json",
+            "assets/commonworld-app.js",
             "contracts/commonworld/digital-sphere.contract.json",
             "docs/research/public-maplibre-vertical-slice-v1.result.json",
             "LICENSE",
@@ -40,7 +42,37 @@ class CurrentStateTests(unittest.TestCase):
             value["current_as_of"] = "2026-07-18"
             path.write_text(json.dumps(value), encoding="utf-8")
             errors = validate_current_state(root)
-        self.assertIn("current-state date does not cover the digital ring-bundle taxonomy truth", errors)
+        self.assertIn("current-state date does not cover the selected catalog shard shadow truth", errors)
+
+    def test_catalog_delivery_declares_selected_shard_shadow(self) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            root = self.copy_current_state(directory)
+            path = root / "contracts/commonworld/current-state.contract.json"
+            value = json.loads(path.read_text(encoding="utf-8"))
+            value["catalog_delivery"]["runtime_catalogue_parity_check"] = False
+            path.write_text(json.dumps(value), encoding="utf-8")
+            errors = validate_current_state(root)
+        self.assertIn("current catalog-delivery truth mismatch", errors)
+        self.assertIn("catalog platform and current state disagree on runtime catalogue parity", errors)
+
+    def test_catalog_delivery_rejects_platform_shadow_drift(self) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            root = self.copy_current_state(directory)
+            path = root / "contracts/commonworld/catalog-platform.contract.json"
+            value = json.loads(path.read_text(encoding="utf-8"))
+            value["browser_transition"]["shadow_runtime_observation"]["selected_identity_shard"] = False
+            path.write_text(json.dumps(value), encoding="utf-8")
+            errors = validate_current_state(root)
+        self.assertIn("catalog platform shadow-observation truth mismatch", errors)
+        self.assertIn("catalog platform and current state disagree on runtime catalogue parity", errors)
+
+    def test_catalog_delivery_rejects_runtime_implementation_drift(self) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            root = self.copy_current_state(directory)
+            path = root / "assets/commonworld-app.js"
+            path.write_text(path.read_text(encoding="utf-8").replace("function observeCatalogRecordShadow(", "function removedCatalogRecordShadow("), encoding="utf-8")
+            errors = validate_current_state(root)
+        self.assertTrue(any("observeCatalogRecordShadow" in error for error in errors))
 
     def test_dynamic_digital_count_has_precise_error_without_static_mismatch(self) -> None:
         with tempfile.TemporaryDirectory() as directory:

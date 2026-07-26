@@ -15,6 +15,8 @@ CATALOG_PATH = Path("catalog/catalog.json")
 PROVIDER_PATH = Path("contracts/commonworld/production-delivery-provider.contract.json")
 VERTICAL_SLICE_PATH = Path("contracts/commonworld/public-maplibre-vertical-slice.contract.json")
 DIGITAL_RING_PATH = Path("contracts/commonworld/digital-ring-taxonomy.contract.json")
+CATALOG_PLATFORM_PATH = Path("contracts/commonworld/catalog-platform.contract.json")
+APP_PATH = Path("assets/commonworld-app.js")
 LE_NID_PATH = Path("catalog/projects/cltb-le-nid.json")
 
 
@@ -28,7 +30,7 @@ def _sha256(path: Path) -> str:
 
 def validate_current_state(root: Path = ROOT) -> list[str]:
     errors: list[str] = []
-    for relative in (STATE_PATH, CATALOG_PATH, PROVIDER_PATH, VERTICAL_SLICE_PATH, DIGITAL_RING_PATH, LE_NID_PATH):
+    for relative in (STATE_PATH, CATALOG_PATH, PROVIDER_PATH, VERTICAL_SLICE_PATH, DIGITAL_RING_PATH, CATALOG_PLATFORM_PATH, APP_PATH, LE_NID_PATH):
         if not (root / relative).is_file():
             errors.append(f"missing current-state dependency: {relative}")
     if errors:
@@ -40,6 +42,8 @@ def validate_current_state(root: Path = ROOT) -> list[str]:
         provider = _load(root, PROVIDER_PATH)
         vertical = _load(root, VERTICAL_SLICE_PATH)
         digital_ring = _load(root, DIGITAL_RING_PATH)
+        catalog_platform = _load(root, CATALOG_PLATFORM_PATH)
+        app = (root / APP_PATH).read_text(encoding="utf-8")
         le_nid = _load(root, LE_NID_PATH)
     except (OSError, json.JSONDecodeError) as error:
         return [f"current-state dependency is invalid: {error}"]
@@ -174,6 +178,57 @@ def validate_current_state(root: Path = ROOT) -> list[str]:
     if basemap.get("service_level_agreement_claimed") is not False:
         errors.append("provider contract must not claim a basemap SLA")
 
+    catalog_delivery = state.get("catalog_delivery", {})
+    expected_catalog_delivery = {
+        "contract": "contracts/commonworld/catalog-delivery-budget.contract.json",
+        "design": "build_bound_full_bootstrap_with_public_per_project_json",
+        "canonical_records": "catalog/projects/*.json",
+        "startup_project_json_requests": 0,
+        "runtime_catalogue_parity_check": True,
+        "runtime_catalogue_parity_scope": "selected_identity_compact_shard_shadow",
+        "runtime_catalogue_visible_source": "build_bound_bootstrap",
+        "runtime_catalogue_detail_loading": False,
+        "runtime_catalogue_failure_policy": "keep_compatible_bootstrap",
+        "build_and_ci_catalogue_parity_check": True,
+        "no_javascript_projection": "generated_static_catalogue_preserved",
+        "redesign_trigger": "measured_transfer_parse_or_dom_budget_not_entry_count_alone",
+    }
+    if catalog_delivery != expected_catalog_delivery:
+        errors.append("current catalog-delivery truth mismatch")
+
+    transition = catalog_platform.get("browser_transition", {})
+    shadow = transition.get("shadow_runtime_observation", {})
+    if transition.get("current_visible_catalog") != catalog_delivery.get("runtime_catalogue_visible_source"):
+        errors.append("catalog platform and current state disagree on visible catalogue source")
+    if shadow != {
+        "aggregate_manifest": True,
+        "selected_identity_shard": True,
+        "detail_loading": False,
+    }:
+        errors.append("catalog platform shadow-observation truth mismatch")
+    if shadow.get("selected_identity_shard") is not catalog_delivery.get("runtime_catalogue_parity_check"):
+        errors.append("catalog platform and current state disagree on runtime catalogue parity")
+    if shadow.get("detail_loading") is not catalog_delivery.get("runtime_catalogue_detail_loading"):
+        errors.append("catalog platform and current state disagree on detail loading")
+    if (
+        transition.get("aggregate_failure_policy") != "keep_compatible_bootstrap_and_mark_degraded"
+        or transition.get("shard_failure_policy") != "keep_compatible_bootstrap_and_mark_selected_identity_degraded"
+        or catalog_delivery.get("runtime_catalogue_failure_policy") != "keep_compatible_bootstrap"
+    ):
+        errors.append("catalog platform and current state disagree on runtime fallback policy")
+
+    required_runtime_tokens = (
+        "loadCatalogShard",
+        "function observeCatalogRecordShadow(",
+        "function loadCatalogShardOnce(",
+        "dataset.catalogDelivery = 'build-bound-bootstrap'",
+    )
+    for token in required_runtime_tokens:
+        if token not in app:
+            errors.append(f"current runtime does not implement declared catalog shadow truth: {token}")
+    if "loadCatalogDetail" in app:
+        errors.append("current runtime implements undeclared catalog detail loading")
+
     boundary = vertical.get("decision_boundary", {})
     for key, expected in {
         "engine_selected": True,
@@ -242,8 +297,8 @@ def validate_current_state(root: Path = ROOT) -> list[str]:
         current_as_of = date.fromisoformat(str(state.get("current_as_of", "")))
     except ValueError:
         current_as_of = None
-    if current_as_of is None or current_as_of < date(2026, 7, 19):
-        errors.append("current-state date does not cover the digital ring-bundle taxonomy truth")
+    if current_as_of is None or current_as_of < date(2026, 7, 26):
+        errors.append("current-state date does not cover the selected catalog shard shadow truth")
     if not (root / "LICENSE").is_file() or not (root / "LICENSE-DATA.md").is_file():
         errors.append("declared code and data licences must exist")
 
