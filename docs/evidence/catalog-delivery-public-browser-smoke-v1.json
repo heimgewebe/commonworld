@@ -78,8 +78,8 @@
       "filterButtonHeight": 44,
       "ringAnimationName": "none",
       "ringTransform": "none",
-      "ringTextWidth": 265.578125,
-      "ringTextHeight": 9,
+      "ringTextWidth": 242.03125,
+      "ringTextHeight": 10,
       "ringTextFontSize": 17,
       "countryRendered": 1
     },
@@ -122,7 +122,7 @@
     {
       "id": "layer-journey-moveend-return",
       "verdict": "PASS",
-      "elapsedMs": 4134
+      "elapsedMs": 1788
     },
     {
       "id": "layer-journey-interrupted",
@@ -176,11 +176,11 @@
         "overlapArea": 0,
         "controlGap": 9.1875,
         "layerControl": {
-          "left": 445.765625,
+          "left": 465.0625,
           "top": 70.390625,
           "right": 603.8125,
           "bottom": 114.390625,
-          "width": 158.046875,
+          "width": 138.75,
           "height": 44
         },
         "zoomControl": {
@@ -253,9 +253,9 @@
     }
   ],
   "binding": {
-    "smoke_script_sha256": "ca72c72a8e305edbb8416a3b06be73fc7a81f3b68f5e7b8188c2e46909debe1a",
+    "smoke_script_sha256": "56c5f12699da15c06685d9aad9a69b5e47a3957e7e20bccf0ea975de645c3a29",
     "smoke_runner_sha256": "522b99b70b1d0064b1d0a31a3a67fdc9a2e73b7408f37d1a4bb303bc360b7556",
-    "first_party_surface_sha256": "4b8db6a06978280c6bbd9a7acb61f0df2cae7700a3126f1fa27387f3e66a9d15",
+    "first_party_surface_sha256": "3c403e406bad9a7349a0f96858df8e8d367d23a60fcd4290a07a84d435968683",
     "scenario_ids": [
       "startup-and-ring-orbits",
       "ring-orbits-reduced-motion",
@@ -293,8 +293,8 @@
     "smoke_plan_sha256": "6b8749928ead5ef81ee66883e6a2993e756ce083575c3569234bf70526448364"
   },
   "execution": {
-    "job_id": "github-actions-30219662465-attempt-1",
-    "finalization_receipt_sha256": "747055dd12e5616c2c2daa8708d4e64a0d1392b86f873d112ec3b5e2421c51b8",
-    "result_sha256": "f6da4c9a5cde373df4a469cb2da4519249b1b730aabcdf0d5d56785d9a725a1f"
+    "job_id": "grabowski-task-f3abfef664b7418189942b4d",
+    "finalization_receipt_sha256": "6af8d36870e9bfbdfb33b54fb6fe4f9164e83097e5f0a4f41eefdaabe67f3128",
+    "result_sha256": "24b5fdd3ac507039291187645ece3ee6edd542136348ecee9ff118397b710c78"
   }
 }

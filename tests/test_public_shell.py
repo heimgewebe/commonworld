@@ -527,7 +527,9 @@ class PublicShellTests(unittest.TestCase):
         self.assertIn("function selectDigitalProject", app)
         self.assertIn("deriveDigitalProjectPath(record)", app)
         self.assertIn("renderLayerProjectDetail(view);", app)
-        self.assertIn("isIdentityLevelView(view) && recordVisibleInCurrentSelection(record)", app)
+        self.assertIn("runtime.state.project !== record.id", app)
+        self.assertIn("recordVisibleInCurrentSelection(record)", app)
+        self.assertIn("segment.setAttribute('aria-controls', 'project-focus')", app)
         self.assertIn("runtime.digitalTreeCache.get(records)", app)
         self.assertIn("reconcileProjectSelection();", app)
 

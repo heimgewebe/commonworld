@@ -9,7 +9,7 @@
     "timing_boundary": "Timing values are representative observations, not a claimed deterministic speedup. Request, byte and DOM reductions are the primary causal evidence.",
     "baseline_static_scope": "Same-current-catalogue deterministic counterfactual: current compact generated bootstrap plus the legacy manifest and one project JSON refetch per current identity.",
     "baseline_browser_scope": "Historical 41-entry pre-optimization browser observation retained for request, DOM and timing context only; it is not a same-catalogue performance counterfactual.",
-    "browser_performance_provenance": "Controlled local Xvfb run with Chrome for Testing 149.0.7827.55, exact first-party surface SHA-256 4b8db6a06978280c6bbd9a7acb61f0df2cae7700a3126f1fa27387f3e66a9d15. The functional 31-scenario browser proof is produced separately on GitHub Actions."
+    "browser_performance_provenance": "Local isolated no-store Chromium run on the exact PR #143 working tree; fourfold CPU throttling; result bound to first-party surface SHA-256 3c403e406bad9a7349a0f96858df8e8d367d23a60fcd4290a07a84d435968683."
   },
   "baseline": {
     "static": {
@@ -273,7 +273,7 @@
       },
       "html": {
         "raw_bytes": 114732,
-        "gzip_bytes": 16354,
+        "gzip_bytes": 16355,
         "start_tag_count": 1293,
         "catalog_card_instances": 65,
         "interactive_catalog_cards": 0,
@@ -295,7 +295,7 @@
     "browser": {
       "schema_version": 1,
       "kind": "commonworld_catalog_delivery_browser_metrics",
-      "measured_at": "2026-07-26T20:31:16.238Z",
+      "measured_at": "2026-07-26T23:13:47.096Z",
       "cpu_throttle_rate": 4,
       "profiles": [
         {
@@ -305,47 +305,47 @@
             "height": 844
           },
           "cpu_throttle_rate": 4,
-          "runtime_ready_ms": 1191,
+          "runtime_ready_ms": 716,
           "dom_node_count": 1578,
           "catalog_card_count": 48,
           "interactive_catalog_card_count": 48,
           "runtime_ready": true,
           "runtime_failed": false,
-          "dom_content_loaded_ms": 796.3999999994412,
-          "load_event_ms": 842.2999999998137,
+          "dom_content_loaded_ms": 463.79999999701977,
+          "load_event_ms": 494.79999999701977,
           "resource_count": 16,
-          "script_duration_ms": 907.33,
-          "task_duration_ms": 2329.75,
+          "script_duration_ms": 506.12,
+          "task_duration_ms": 959.79,
           "bootstrap_compile": {
-            "median_ms": 0.6000000005587935,
-            "p95_ms": 1.599999999627471,
+            "median_ms": 0.29999999701976776,
+            "p95_ms": 0.7999999970197678,
             "samples_ms": [
               0,
               0,
-              0.09999999962747097,
-              0.09999999962747097,
-              0.10000000055879354,
-              0.10000000055879354,
-              0.10000000055879354,
-              0.39999999944120646,
-              0.39999999944120646,
-              0.599999999627471,
-              0.6000000005587935,
-              0.6999999992549419,
-              0.7999999998137355,
-              0.8000000007450581,
-              0.8999999994412065,
-              1,
-              1,
-              1.099999999627471,
-              1.300000000745058,
-              1.599999999627471,
-              1.8999999994412065
+              0.10000000149011612,
+              0.10000000149011612,
+              0.10000000149011612,
+              0.10000000149011612,
+              0.10000000149011612,
+              0.19999999552965164,
+              0.20000000298023224,
+              0.20000000298023224,
+              0.29999999701976776,
+              0.3999999985098839,
+              0.6000000014901161,
+              0.6000000014901161,
+              0.6000000014901161,
+              0.6000000014901161,
+              0.6999999955296516,
+              0.7000000029802322,
+              0.7999999970197678,
+              0.7999999970197678,
+              0.7999999970197678
             ]
           },
           "first_party_request_count": 15,
           "first_party_unique_request_count": 15,
-          "first_party_raw_bytes": 1844652,
+          "first_party_raw_bytes": 1844965,
           "first_party_requests": [
             "/",
             "/assets/commonworld-app.js",
@@ -363,7 +363,7 @@
             "/catalog/runtime/manifest.v1.json",
             "/index.css"
           ],
-          "first_party_surface_sha256": "4b8db6a06978280c6bbd9a7acb61f0df2cae7700a3126f1fa27387f3e66a9d15",
+          "first_party_surface_sha256": "3c403e406bad9a7349a0f96858df8e8d367d23a60fcd4290a07a84d435968683",
           "project_json_request_count": 0,
           "project_json_unique_request_count": 0,
           "project_json_requests": []
@@ -375,47 +375,47 @@
             "height": 768
           },
           "cpu_throttle_rate": 4,
-          "runtime_ready_ms": 988,
+          "runtime_ready_ms": 704,
           "dom_node_count": 1578,
           "catalog_card_count": 48,
           "interactive_catalog_card_count": 48,
           "runtime_ready": true,
           "runtime_failed": false,
-          "dom_content_loaded_ms": 625.7000000001863,
-          "load_event_ms": 670.7999999998137,
+          "dom_content_loaded_ms": 426.6000000014901,
+          "load_event_ms": 457.6000000014901,
           "resource_count": 16,
-          "script_duration_ms": 806.45,
-          "task_duration_ms": 1764.87,
+          "script_duration_ms": 528.67,
+          "task_duration_ms": 944.33,
           "bootstrap_compile": {
-            "median_ms": 0.7000000001862645,
-            "p95_ms": 1.5,
+            "median_ms": 0.20000000298023224,
+            "p95_ms": 0.8000000044703484,
             "samples_ms": [
               0,
-              0.09999999962747097,
-              0.09999999962747097,
-              0.10000000055879354,
-              0.10000000055879354,
-              0.19999999925494194,
-              0.20000000018626451,
-              0.599999999627471,
-              0.599999999627471,
-              0.6000000005587935,
-              0.7000000001862645,
-              0.7999999998137355,
-              0.8999999994412065,
-              0.8999999994412065,
-              0.900000000372529,
-              1,
-              1,
-              1.2000000001862645,
-              1.2000000001862645,
-              1.5,
-              1.5
+              0,
+              0.10000000149011612,
+              0.10000000149011612,
+              0.10000000149011612,
+              0.10000000149011612,
+              0.10000000149011612,
+              0.10000000149011612,
+              0.10000000149011612,
+              0.20000000298023224,
+              0.20000000298023224,
+              0.3999999985098839,
+              0.3999999985098839,
+              0.3999999985098839,
+              0.5,
+              0.7999999970197678,
+              0.7999999970197678,
+              0.7999999970197678,
+              0.7999999970197678,
+              0.8000000044703484,
+              0.8999999985098839
             ]
           },
           "first_party_request_count": 15,
           "first_party_unique_request_count": 15,
-          "first_party_raw_bytes": 1844652,
+          "first_party_raw_bytes": 1844965,
           "first_party_requests": [
             "/",
             "/assets/commonworld-app.js",
@@ -433,7 +433,7 @@
             "/catalog/runtime/manifest.v1.json",
             "/index.css"
           ],
-          "first_party_surface_sha256": "4b8db6a06978280c6bbd9a7acb61f0df2cae7700a3126f1fa27387f3e66a9d15",
+          "first_party_surface_sha256": "3c403e406bad9a7349a0f96858df8e8d367d23a60fcd4290a07a84d435968683",
           "project_json_request_count": 0,
           "project_json_unique_request_count": 0,
           "project_json_requests": []
@@ -553,9 +553,9 @@
         "method-mobile-text-200"
       ],
       "catalogue_network_blocked_requests": 0,
-      "job_id": "github-actions-30219662465-attempt-1",
-      "finalization_receipt_sha256": "747055dd12e5616c2c2daa8708d4e64a0d1392b86f873d112ec3b5e2421c51b8",
-      "result_sha256": "f6da4c9a5cde373df4a469cb2da4519249b1b730aabcdf0d5d56785d9a725a1f"
+      "job_id": "grabowski-task-f3abfef664b7418189942b4d",
+      "finalization_receipt_sha256": "6af8d36870e9bfbdfb33b54fb6fe4f9164e83097e5f0a4f41eefdaabe67f3128",
+      "result_sha256": "24b5fdd3ac507039291187645ece3ee6edd542136348ecee9ff118397b710c78"
     },
     "catalog_delivery_browser_measurement": {
       "verdict": "PASS",
@@ -564,9 +564,9 @@
         "desktop-low-power"
       ],
       "cpu_throttle_rate": 4,
-      "result_sha256": "8af4ccbc671abf4e0b06afe2b0df888aa09178f3e87175cd9c3d860210641d22",
-      "job_id": "github-actions-30219662465-attempt-1",
-      "finalization_receipt_sha256": "747055dd12e5616c2c2daa8708d4e64a0d1392b86f873d112ec3b5e2421c51b8"
+      "result_sha256": "d00afc3e59d37eaed63e23edd8c6f41b37f9e80fe1aabb2c97f1e0f16fad87c8",
+      "job_id": "local-readback-20260726T231347Z",
+      "finalization_receipt_sha256": "6af8d36870e9bfbdfb33b54fb6fe4f9164e83097e5f0a4f41eefdaabe67f3128"
     }
   },
   "budget_binding": {

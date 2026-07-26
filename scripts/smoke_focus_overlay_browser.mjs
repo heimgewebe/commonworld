@@ -256,13 +256,13 @@ async function verifyLayerCreatedSphereRestoration(browser, baseUrl) {
     await page.waitForFunction(() => document.querySelector('.globe-stage')?.dataset.viewPhase === 'layers');
     await page.waitForSelector('#layer-panel[data-visible]');
     await page.locator('.digital-ribbon-item').first().click();
-    await page.waitForSelector('#layer-projects:not([hidden])');
-    const inline = await page.evaluate(() => {
+    await page.waitForSelector('#project-focus:not([hidden])');
+    const shared = await page.evaluate(() => {
       const edge = document.querySelector('#sphere-edge-control');
       return {
         focusHidden: document.querySelector('#project-focus').hidden,
-        title: document.querySelector('#layer-projects .layer-project-detail-title')?.textContent ?? null,
-        detailSections: document.querySelectorAll('#layer-projects .project-detail-section').length,
+        title: document.querySelector('#focus-title')?.textContent ?? null,
+        inlineHidden: document.querySelector('#layer-projects').hidden,
         focusedPath: document.querySelector('.globe-stage')?.dataset.focusedPath ?? null,
         sphere: {
           ariaHidden: edge.getAttribute('aria-hidden'),
@@ -272,15 +272,15 @@ async function verifyLayerCreatedSphereRestoration(browser, baseUrl) {
         },
       };
     });
-    assert(inline.focusHidden, `layer-created inline detail exposed the detached focus: ${JSON.stringify(inline)}`);
-    assert(inline.detailSections === 4 && inline.focusedPath, `layer-created inline detail is incomplete: ${JSON.stringify(inline)}`);
-    assert(inline.sphere.marker === null && inline.sphere.tabindex === '-1' && inline.sphere.ariaHidden === 'true', `layer-created sphere ownership is invalid: ${JSON.stringify(inline.sphere)}`);
-    await page.locator('#layer-close').click();
-    await page.waitForFunction(() => document.querySelector('.globe-stage')?.dataset.viewPhase === 'overview');
-    await page.waitForSelector('#project-focus:not([hidden])');
-    assert((await page.locator('#focus-title').textContent()) === inline.title, 'layer-created detail handoff changed project identity');
+    assert(!shared.focusHidden && shared.inlineHidden && shared.title && shared.focusedPath, `layer-created shared focus is incomplete: ${JSON.stringify(shared)}`);
+    assert(shared.sphere.marker === 'true' && shared.sphere.tabindex === '-1' && shared.sphere.ariaHidden === 'true' && shared.sphere.pointerEvents === 'none', `layer-created shared-focus sphere ownership is invalid: ${JSON.stringify(shared.sphere)}`);
     await page.locator('#focus-close').click();
     await page.waitForFunction(() => document.querySelector('#project-focus').hidden);
+    await page.waitForSelector('#layer-projects:not([hidden])');
+    assert((await page.locator('#layer-projects .layer-project-detail-title').textContent()) === shared.title, 'layer-created shared focus did not restore the matching inline preview');
+    assert((await page.locator('#layer-projects').getAttribute('data-detail-mode')) === 'preview', 'layer-created focus close did not restore preview semantics');
+    await page.locator('#layer-close').click();
+    await page.waitForFunction(() => document.querySelector('.globe-stage')?.dataset.viewPhase === 'overview');
     await page.waitForFunction(() => document.querySelector('#sphere-edge-control')?.getAttribute('tabindex') === '0');
     const restored = await page.evaluate(() => {
       const edge = document.querySelector('#sphere-edge-control');
@@ -292,7 +292,7 @@ async function verifyLayerCreatedSphereRestoration(browser, baseUrl) {
       };
     });
     assert(restored.marker === null && restored.tabindex === '0' && restored.ariaHidden === null && restored.pointerEvents !== 'none', `layer-created sphere block was not restored: ${JSON.stringify(restored)}`);
-    return { inline, restored };
+    return { shared, restored };
   } finally {
     await context.close();
   }

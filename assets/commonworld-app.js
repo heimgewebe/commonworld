@@ -691,7 +691,7 @@ function selectDigitalProject(record, { trigger = document.activeElement } = {})
       setDigitalPath(derived.path, { historyMode: null, focusHierarchy: false });
     }
     runtime.layerPreviewProject = record.id;
-    selectProject(record.id, { trigger, focus: false });
+    selectProject(record.id, { trigger });
     return;
   }
   selectProject(record.id, { trigger });
@@ -703,7 +703,7 @@ function createRibbonSegment(record) {
   segment.className = 'digital-ribbon-item';
   segment.dataset.commonprojectId = record.id;
   segment.setAttribute('aria-label', t('show_project_details', 'Details zu {title} anzeigen', { title: record.title }));
-  segment.setAttribute('aria-controls', 'layer-projects');
+  segment.setAttribute('aria-controls', 'project-focus');
   const name = document.createElement('span');
   name.className = 'digital-ribbon-name';
   name.textContent = record.title;
@@ -732,7 +732,9 @@ function identityRecordsForView(view = visibleDigitalView(), { includeSelected =
 
 function usesInlineLayerProjectDetail(record, view = visibleDigitalView()) {
   if (!record || runtime.state.view !== 'layers') return false;
-  return isIdentityLevelView(view) && recordVisibleInCurrentSelection(record);
+  return runtime.state.project !== record.id
+    && isIdentityLevelView(view)
+    && recordVisibleInCurrentSelection(record);
 }
 
 function relationLabelsForRecord(record) {
@@ -938,13 +940,19 @@ function createLayerProjectDetail(record, { selected = false } = {}) {
 
 function renderLayerProjectDetail(view = visibleDigitalView()) {
   const records = identityRecordsForView(view);
-  const selectedRecord = records.find(({ id }) => id === runtime.state.project) ?? null;
   const previewRecord = records.find(({ id }) => id === runtime.layerPreviewProject) ?? null;
-  const record = runtime.state.project
-    ? selectedRecord
-    : (previewRecord ?? records[0] ?? null);
+  const record = runtime.state.project ? null : (previewRecord ?? records[0] ?? null);
   elements.layerProjects.replaceChildren();
   elements.layerProjects.hidden = !record;
+  if (runtime.state.project) {
+    runtime.lastLayerProjectStatus = null;
+    elements.layerProjects.removeAttribute('data-commonproject-id');
+    elements.layerProjects.removeAttribute('data-detail-mode');
+    elements.layerProjects.removeAttribute('role');
+    elements.layerProjects.removeAttribute('aria-labelledby');
+    elements.layerProjectStatus.textContent = '';
+    return;
+  }
   if (!record) {
     runtime.layerPreviewProject = null;
     runtime.lastLayerProjectStatus = null;
