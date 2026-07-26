@@ -1307,6 +1307,25 @@ async function layerJourneyScenario({ mobile = false, viewportOverride = null, t
   fieldLanes = await run.page.evaluate(() => [...document.querySelectorAll('.digital-lane[data-layer-id]')].map((lane) => lane.dataset.layerId));
   assert(JSON.stringify(fieldLanes) === JSON.stringify(['open_knowledge_data', 'learning_education', 'media_culture']), 'layer journey: Forward did not restore the field child bundles');
 
+  const parentWikipedia = run.page.locator('.digital-ribbon-item[data-commonproject-id="wikipedia"]');
+  assert(await parentWikipedia.isVisible(), 'layer journey: Wikipedia is not visible in the parent bundle lane');
+  await parentWikipedia.click();
+  await run.page.waitForFunction(() => document.querySelector('.globe-stage')?.dataset.digitalPath === 'sphere/knowledge_learning_culture/open_knowledge_data');
+  assert(await run.page.locator('#project-focus').isHidden(), 'layer journey: parent-lane selection opened the detached global focus');
+  const navigatedDetails = run.page.locator('#layer-projects:not([hidden])');
+  assert((await navigatedDetails.locator('.layer-project-detail-title').textContent()) === 'Wikipedia', 'layer journey: parent-lane selection opened the wrong inline detail');
+  assert((await navigatedDetails.locator('.project-detail-section').count()) === 4, 'layer journey: unified inline detail does not expose four information groups');
+  const detailHorizontalPolicy = await navigatedDetails.evaluate((node) => ({
+    overflowX: getComputedStyle(node).overflowX,
+    documentOverflow: document.documentElement.scrollWidth > document.documentElement.clientWidth,
+  }));
+  assert(['clip', 'hidden'].includes(detailHorizontalPolicy.overflowX) && !detailHorizontalPolicy.documentOverflow, `layer journey: unified inline detail permits horizontal user overflow (${JSON.stringify(detailHorizontalPolicy)})`);
+  assert(await navigatedDetails.locator('.project-detail-back').isVisible(), 'layer journey: unified inline detail lacks a clear return action');
+  assert(new URL(run.page.url()).searchParams.get('project') === 'wikipedia', 'layer journey: parent-lane navigation did not preserve project history');
+  await navigatedDetails.locator('.project-detail-back').click();
+  await run.page.waitForFunction(() => document.querySelector('.globe-stage')?.dataset.digitalPath === 'sphere/knowledge_learning_culture');
+  assert(new URL(run.page.url()).searchParams.get('project') === null, 'layer journey: returning from detail retained the selected project');
+
   const openKnowledgeFocus = run.page.locator('.digital-lane-focus[data-digital-path="sphere/knowledge_learning_culture/open_knowledge_data"]');
   await openKnowledgeFocus.click();
   await run.page.waitForFunction(() => document.querySelector('.globe-stage')?.dataset.digitalPath === 'sphere/knowledge_learning_culture/open_knowledge_data');
@@ -1375,7 +1394,25 @@ async function layerJourneyScenario({ mobile = false, viewportOverride = null, t
   assert(await run.page.locator('#layer-discovery').isHidden(), 'layer journey: search/filter panel did not close');
 
   const selectedContent = run.page.locator(`.digital-ribbon-item[data-commonproject-id="${searchedProjectId}"]`);
-  assert(await detailPreview.isVisible(), 'layer journey: restored identity result does not expose inline Common details');
+  const restoredDetailState = await run.page.evaluate(() => {
+    const details = document.querySelector('#layer-projects');
+    const stage = document.querySelector('.globe-stage');
+    const focus = document.querySelector('#project-focus');
+    const selected = document.querySelector('.digital-ribbon-item.is-selected');
+    return {
+      path: stage?.dataset.digitalPath ?? null,
+      focusedPath: stage?.dataset.focusedPath ?? null,
+      project: new URL(location.href).searchParams.get('project'),
+      detailsHidden: details?.hidden ?? null,
+      detailsDisplay: details ? getComputedStyle(details).display : null,
+      detailsChildren: details?.childElementCount ?? null,
+      detailsMode: details?.dataset.detailMode ?? null,
+      focusHidden: focus?.hidden ?? null,
+      visibleRibbons: document.querySelectorAll('.digital-ribbon-item:not([hidden])').length,
+      selectedProject: selected?.dataset.commonprojectId ?? null,
+    };
+  });
+  assert(await detailPreview.isVisible(), `layer journey: restored identity result does not expose inline Common details (${JSON.stringify(restoredDetailState)})`);
   assert((await detailPreview.locator('.layer-project-detail-title').textContent()) === searchedTitle, `layer journey: restored inline details do not describe the retained Common (${searchedTitle})`);
   assert((await detailPreview.getAttribute('data-detail-mode')) === 'selected', 'layer journey: restored filtered selection lost selected detail semantics');
   assert(await selectedContent.evaluate((node) => node.classList.contains('is-selected')), 'layer journey: restored ribbon lost selected state');
@@ -2312,18 +2349,34 @@ async function legacyLayerAndAtomicFocusScenario() {
   const focusProjectTitle = expectedDigitalProjection.titleById[focusProjectId];
   assert(Boolean(focusProjectTitle), `atomic focus: rendered identity ${focusProjectId} is missing from canonical projection`);
   await focusTrigger.click();
-  assert(await focusRun.page.locator('#project-focus').isVisible(), `atomic focus: ${focusProjectId} focus did not open`);
-  assert(new URL(focusRun.page.url()).searchParams.get('project') === focusProjectId, `atomic focus: ${focusProjectId} was not written to history`);
+  await focusRun.page.waitForFunction((projectId) => new URL(location.href).searchParams.get('project') === projectId, focusProjectId);
+  await focusRun.page.waitForSelector('#layer-projects:not([hidden])');
+  const selectedDigitalPath = new URL(focusRun.page.url()).searchParams.get('digital_path');
+  assert(Boolean(selectedDigitalPath), `atomic focus: ${focusProjectId} did not navigate to its concrete digital path`);
+  assert(await focusRun.page.locator('#project-focus').isHidden(), `atomic focus: ${focusProjectId} opened the detached focus`);
+  assert((await focusRun.page.locator('#layer-projects .layer-project-detail-title').textContent()) === focusProjectTitle, 'atomic focus: inline selection describes the wrong project');
+  assert((await focusRun.page.locator('#layer-projects').getAttribute('data-detail-mode')) === 'selected', 'atomic focus: inline selection lost selected semantics');
 
   await focusRun.page.keyboard.press('Escape');
-  assert(await focusRun.page.locator('#project-focus').isHidden(), 'atomic focus: Escape did not close the project overlay');
+  await focusRun.page.waitForFunction(() => new URL(location.href).searchParams.get('project') === null);
+  assert(await focusRun.page.locator('#project-focus').isHidden(), 'atomic focus: Escape exposed the detached project overlay');
+  assert(await focusRun.page.locator('#layer-projects').isVisible(), 'atomic focus: Escape removed the inline preview');
+  assert((await focusRun.page.locator('#layer-projects').getAttribute('data-detail-mode')) === 'preview', 'atomic focus: Escape did not downgrade the inline selection to a preview');
   const keyboardFocusTrigger = focusRun.page.locator(`.digital-ribbon-item[data-commonproject-id="${focusProjectId}"]`);
   await keyboardFocusTrigger.focus();
   await focusRun.page.keyboard.press('Enter');
-  assert(await focusRun.page.locator('#project-focus').isVisible(), `atomic focus: keyboard activation did not reopen ${focusProjectId}`);
+  await focusRun.page.waitForFunction((projectId) => new URL(location.href).searchParams.get('project') === projectId, focusProjectId);
+  assert(await focusRun.page.locator('#project-focus').isHidden(), `atomic focus: keyboard activation exposed the detached focus for ${focusProjectId}`);
+  assert((await focusRun.page.locator('#layer-projects').getAttribute('data-detail-mode')) === 'selected', `atomic focus: keyboard activation did not select ${focusProjectId} inline`);
 
-  // Exercise the direct state regression without pretending the covered control receives a pointer interaction.
-  await focusRun.page.locator('.digital-lane-focus[data-digital-path="sphere/communication_networks"]').evaluate((node) => node.click());
+  // Exercise the direct state regression without pretending an absent cross-field control receives a pointer interaction.
+  await focusRun.page.evaluate(() => {
+    const url = new URL(location.href);
+    url.searchParams.delete('project');
+    url.searchParams.set('digital_path', 'sphere/communication_networks');
+    history.pushState(null, '', url);
+    dispatchEvent(new PopStateEvent('popstate'));
+  });
   await waitForAtomicHierarchyFocus(focusRun.page, {
     label: 'atomic focus: direct path mutation',
     expectedPath: 'sphere/communication_networks',
@@ -2333,18 +2386,23 @@ async function legacyLayerAndAtomicFocusScenario() {
     project: new URL(location.href).searchParams.get('project'),
     path: new URL(location.href).searchParams.get('digital_path'),
     focusHidden: document.querySelector('#project-focus').hidden,
+    inlineHidden: document.querySelector('#layer-projects').hidden,
     selectedMarks: document.querySelectorAll('[data-commonproject-id].is-selected').length,
     activeHierarchy: document.activeElement?.matches('.digital-lane-scroll, .digital-breadcrumb-item') ?? false,
     activeVisible: Boolean(document.activeElement?.getClientRects().length),
   }));
   assert(cleared.project === null && cleared.path === 'sphere/communication_networks', `atomic focus: path mutation retained project state (${JSON.stringify(cleared)})`);
-  assert(cleared.focusHidden && cleared.selectedMarks === 0, `atomic focus: overlay or selection marks survived path mutation (${JSON.stringify(cleared)})`);
+  assert(cleared.focusHidden && cleared.inlineHidden && cleared.selectedMarks === 0, `atomic focus: project detail or selection marks survived path mutation (${JSON.stringify(cleared)})`);
   assert(cleared.activeHierarchy && cleared.activeVisible, `atomic focus: focus did not move to a visible hierarchy control (${JSON.stringify(cleared)})`);
 
   await focusRun.page.goBack();
-  await focusRun.page.waitForFunction((projectId) => new URL(location.href).searchParams.get('project') === projectId, focusProjectId);
-  assert(await focusRun.page.locator('#project-focus').isVisible(), `atomic focus: Back did not restore ${focusProjectId} focus`);
-  assert((await focusRun.page.locator('#focus-title').textContent()) === focusProjectTitle, 'atomic focus: Back restored the wrong project');
+  await focusRun.page.waitForFunction(({ projectId, digitalPath }) => {
+    const url = new URL(location.href);
+    return url.searchParams.get('project') === projectId && url.searchParams.get('digital_path') === digitalPath;
+  }, { projectId: focusProjectId, digitalPath: selectedDigitalPath });
+  assert(await focusRun.page.locator('#project-focus').isHidden(), `atomic focus: Back exposed the detached focus for ${focusProjectId}`);
+  assert(await focusRun.page.locator('#layer-projects').isVisible(), `atomic focus: Back did not restore ${focusProjectId} inline`);
+  assert((await focusRun.page.locator('#layer-projects .layer-project-detail-title').textContent()) === focusProjectTitle, 'atomic focus: Back restored the wrong inline project');
 
   await focusRun.page.evaluate(() => {
     const selector = '#layer-track-deck .digital-lane-focus, #layer-track-deck .digital-lane-scroll, #layer-breadcrumb .digital-breadcrumb-item';

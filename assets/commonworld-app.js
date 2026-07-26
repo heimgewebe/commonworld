@@ -12,6 +12,7 @@ import {
   commonsTypeLabel,
   deriveCommonsType,
   deriveLayer,
+  deriveDigitalProjectPath,
   digitalPathContainsRecord,
   digitalPresentationTreeConstructionCount,
   DIGITAL_LAYER_TRANSITION_MS,
@@ -683,23 +684,31 @@ function selectDigitalBundle(path) {
   setDigitalPath(path);
 }
 
-function createRibbonSegment(record, { inlineDetails = false } = {}) {
+function selectDigitalProject(record, { trigger = document.activeElement } = {}) {
+  const derived = deriveDigitalProjectPath(record);
+  if (runtime.state.view === 'layers' && derived?.path?.length) {
+    if (serializeDigitalPath(currentDigitalPath()) !== derived.pathKey) {
+      setDigitalPath(derived.path, { historyMode: null, focusHierarchy: false });
+    }
+    runtime.layerPreviewProject = record.id;
+    selectProject(record.id, { trigger, focus: false });
+    return;
+  }
+  selectProject(record.id, { trigger });
+}
+
+function createRibbonSegment(record) {
   const segment = document.createElement('button');
   segment.type = 'button';
   segment.className = 'digital-ribbon-item';
   segment.dataset.commonprojectId = record.id;
-  segment.setAttribute('aria-label', inlineDetails
-    ? t('show_project_details', 'Details zu {title} anzeigen', { title: record.title })
-    : t('open_project', '{title} öffnen', { title: record.title }));
-  if (inlineDetails) segment.setAttribute('aria-controls', 'layer-projects');
+  segment.setAttribute('aria-label', t('show_project_details', 'Details zu {title} anzeigen', { title: record.title }));
+  segment.setAttribute('aria-controls', 'layer-projects');
   const name = document.createElement('span');
   name.className = 'digital-ribbon-name';
   name.textContent = record.title;
   segment.append(name);
-  segment.addEventListener('click', () => {
-    if (inlineDetails) runtime.layerPreviewProject = record.id;
-    selectProject(record.id, { trigger: segment, focus: !inlineDetails });
-  });
+  segment.addEventListener('click', () => selectDigitalProject(record, { trigger: segment }));
   return segment;
 }
 
@@ -726,14 +735,132 @@ function usesInlineLayerProjectDetail(record, view = visibleDigitalView()) {
   return isIdentityLevelView(view) && recordVisibleInCurrentSelection(record);
 }
 
+function relationLabelsForRecord(record) {
+  return (runtime.catalogProjection?.relations ?? [])
+    .filter(({ source_project_id }) => source_project_id === record.id)
+    .map(({ relation_type, target_title }) => relation_type === 'chapter-of'
+      ? t('relation_chapter_of', 'Teil von {title}', { title: target_title })
+      : `${relation_type} · ${target_title}`);
+}
+
+function digitalPresenceText(record) {
+  const digital = record?.presence?.digital;
+  return digital?.available
+    ? (digital.label ?? t('digital_presence_published', 'Digitale Präsenz veröffentlicht'))
+    : t('digital_presence_none', 'Keine digitale Präsenz veröffentlicht.');
+}
+
+function curationTextForRecord(record) {
+  return [
+    recordActivityNotice(record, LOCALE),
+    t('curation_review', 'Redaktionell geprüft am {reviewed}; nächste Prüfung {next}.', {
+      reviewed: record?.curation?.reviewed_at ?? t('unknown', 'unbekannt'),
+      next: record?.curation?.next_review_at ?? t('open_date', 'offen'),
+    }),
+  ].filter(Boolean).join(' ');
+}
+
+function safeProjectLinks(links = []) {
+  return (Array.isArray(links) ? links : []).flatMap((link) => {
+    const url = safeExternalHttpsUrl(link?.url);
+    return url?.startsWith('https://') ? [{ ...link, url }] : [];
+  });
+}
+
+function createProjectDetailText(value, className = 'project-detail-value') {
+  const paragraph = document.createElement('p');
+  paragraph.className = className;
+  paragraph.textContent = value || t('not_published', 'Nicht veröffentlicht');
+  return paragraph;
+}
+
+function createProjectDetailList(values, className = 'project-detail-list') {
+  const list = document.createElement('ul');
+  list.className = className;
+  const entries = (Array.isArray(values) ? values : []).filter(Boolean);
+  for (const value of entries.length ? entries : [t('not_published', 'Nicht veröffentlicht')]) {
+    const item = document.createElement('li');
+    item.textContent = value;
+    if (entries.length === 0) item.className = 'is-empty';
+    list.append(item);
+  }
+  return list;
+}
+
+function createProjectDetailLinkList(links) {
+  const list = document.createElement('ul');
+  list.className = 'project-detail-links';
+  const entries = safeProjectLinks(links);
+  if (!entries.length) {
+    const item = document.createElement('li');
+    item.className = 'is-empty';
+    item.textContent = t('not_published', 'Nicht veröffentlicht');
+    list.append(item);
+    return list;
+  }
+  for (const link of entries) {
+    const item = document.createElement('li');
+    const anchor = document.createElement('a');
+    anchor.href = link.url;
+    anchor.rel = 'external noreferrer';
+    anchor.textContent = link.label || link.url;
+    item.append(anchor);
+    list.append(item);
+  }
+  return list;
+}
+
+function createProjectDetailTags(values) {
+  const list = document.createElement('ul');
+  list.className = 'project-detail-tags';
+  const entries = (Array.isArray(values) ? values : []).filter(Boolean);
+  for (const value of entries.length ? entries : [t('not_published', 'Nicht veröffentlicht')]) {
+    const item = document.createElement('li');
+    item.textContent = value;
+    if (entries.length === 0) item.className = 'is-empty';
+    list.append(item);
+  }
+  return list;
+}
+
+function createProjectDetailField(label, content) {
+  const field = document.createElement('div');
+  field.className = 'project-detail-field';
+  const heading = document.createElement('h4');
+  heading.className = 'project-detail-label';
+  heading.textContent = label;
+  field.append(heading, content);
+  return field;
+}
+
+function createProjectDetailSection(title, fields) {
+  const section = document.createElement('section');
+  section.className = 'project-detail-section';
+  const heading = document.createElement('h3');
+  heading.textContent = title;
+  section.append(heading, ...fields);
+  return section;
+}
+
+function layerProjectBackContext(record) {
+  const derived = deriveDigitalProjectPath(record);
+  if (!derived?.path || derived.path.length <= 1) return null;
+  const path = Object.freeze(derived.path.slice(0, -1));
+  const tree = runtime.digitalTree ?? treeForRecords(runtime.records);
+  const node = tree.nodesByPath.get(serializeDigitalPath(path));
+  return { path, label: node?.label ?? t('overview', 'Übersicht') };
+}
+
 function createLayerProjectDetail(record, { selected = false } = {}) {
   const article = document.createElement('article');
-  article.className = 'layer-project-detail';
+  article.className = 'layer-project-detail project-detail';
   article.dataset.commonprojectId = record.id;
   article.dataset.detailMode = selected ? 'selected' : 'preview';
 
+  const header = document.createElement('header');
+  header.className = 'project-detail-header';
   const copy = document.createElement('div');
-  copy.className = 'layer-project-detail-copy';
+  copy.className = 'layer-project-detail-copy project-detail-heading';
   const kind = document.createElement('p');
   kind.className = 'kicker';
   kind.textContent = `${commonsTypeLabel(record, LOCALE)} · ${resultPresenceLabel(record)}`;
@@ -746,38 +873,30 @@ function createLayerProjectDetail(record, { selected = false } = {}) {
   summary.textContent = record.summary;
   copy.append(kind, title, summary);
 
-  const context = document.createElement('div');
-  context.className = 'layer-project-detail-context';
-  const digital = document.createElement('p');
-  digital.className = 'layer-project-detail-digital';
-  digital.textContent = record?.presence?.digital?.label || resultLocationLabel(record);
-  context.append(digital);
-
-  const themes = (record.themes ?? []).map((theme) => themeLabel(theme, LOCALE));
-  if (themes.length) {
-    const themeList = document.createElement('div');
-    themeList.className = 'layer-project-detail-themes';
-    for (const theme of themes) {
-      const chip = document.createElement('span');
-      chip.textContent = theme;
-      themeList.append(chip);
-    }
-    context.append(themeList);
-  }
-
-  const activityNoticeText = recordActivityNotice(record, LOCALE);
-  if (activityNoticeText) {
-    const activity = document.createElement('p');
-    activity.className = 'layer-project-detail-activity';
-    activity.textContent = activityNoticeText;
-    context.append(activity);
+  const controls = document.createElement('div');
+  controls.className = 'project-detail-controls';
+  const backContext = layerProjectBackContext(record);
+  if (backContext) {
+    const back = document.createElement('button');
+    back.type = 'button';
+    back.className = 'quiet-button project-detail-back';
+    back.textContent = `← ${t('back_to_bundle', 'Zurück zu {label}', { label: backContext.label })}`;
+    back.setAttribute('aria-label', t('back_to_bundle_aria', 'Details schließen und zu {label} zurückkehren', { label: backContext.label }));
+    back.addEventListener('click', () => {
+      runtime.state.project = null;
+      runtime.layerPreviewProject = null;
+      runtime.focusReturnTarget = null;
+      void observeCatalogRecordShadow(null);
+      setDigitalPath(backContext.path);
+    });
+    controls.append(back);
   }
 
   const directLinks = directActionLinks(record);
   if (directLinks.length) {
     const actions = document.createElement('nav');
-    actions.className = 'layer-project-detail-actions';
-    actions.setAttribute('aria-label', record.title);
+    actions.className = 'layer-project-detail-actions project-detail-primary-actions';
+    actions.setAttribute('aria-label', t('direct_actions', 'Direkte Möglichkeiten'));
     for (const link of directLinks) {
       const anchor = document.createElement('a');
       anchor.href = link.url;
@@ -786,10 +905,34 @@ function createLayerProjectDetail(record, { selected = false } = {}) {
       anchor.textContent = link.label;
       actions.append(anchor);
     }
-    context.append(actions);
+    controls.append(actions);
   }
+  header.append(copy, controls);
 
-  article.append(copy, context);
+  const themes = (record.themes ?? []).map((theme) => themeLabel(theme, LOCALE));
+  const waysToEngage = (record.actions ?? []).map((action) => actionLabel(action, LOCALE));
+  const relationLabels = relationLabelsForRecord(record);
+  const grid = document.createElement('div');
+  grid.className = 'layer-project-detail-grid project-detail-grid';
+  grid.append(
+    createProjectDetailSection(t('detail_profile', 'Profil'), [
+      createProjectDetailField(t('themes', 'Themen'), createProjectDetailTags(themes)),
+      createProjectDetailField(t('ways_to_engage', 'Möglichkeiten'), createProjectDetailTags(waysToEngage)),
+    ]),
+    createProjectDetailSection(t('detail_presence', 'Präsenz'), [
+      createProjectDetailField(t('digital_presence', 'Digitale Präsenz'), createProjectDetailText(digitalPresenceText(record))),
+      createProjectDetailField(t('locations', 'Orte'), createProjectDetailList(recordLocationSummaries(record, LOCALE))),
+    ]),
+    createProjectDetailSection(t('detail_network', 'Netzwerk und Links'), [
+      createProjectDetailField(t('relationships', 'Beziehungen'), createProjectDetailList(relationLabels.length ? relationLabels : [t('relation_none', 'Keine belegte Beziehung veröffentlicht.')])),
+      createProjectDetailField(t('official_links', 'Offizielle Links'), createProjectDetailLinkList(record.links ?? [])),
+    ]),
+    createProjectDetailSection(t('detail_evidence', 'Nachweise'), [
+      createProjectDetailField(t('sources', 'Quellen'), createProjectDetailLinkList(record?.provenance?.sources ?? [])),
+      createProjectDetailField(t('curation', 'Kuration'), createProjectDetailText(curationTextForRecord(record), 'project-detail-value project-detail-curation')),
+    ]),
+  );
+  article.append(header, grid);
   return article;
 }
 
@@ -898,7 +1041,7 @@ function renderLayerDeck() {
     scroller.setAttribute('aria-label', t('horizontal_scroll', '{label} horizontal durchblättern', { label: node.label }));
     const content = document.createElement('div');
     content.className = 'digital-lane-content';
-    for (const record of records) content.append(createRibbonSegment(record, { inlineDetails: identityLevel }));
+    for (const record of records) content.append(createRibbonSegment(record));
     scroller.addEventListener('scroll', () => syncLaneOverflow(scroller), { passive: true });
     scroller.append(content);
     if (identityLevel && records.length < node.identityCount) {
@@ -2300,22 +2443,12 @@ function updateFocusPanel() {
   replaceList(elements.focusThemes, (record.themes ?? []).map((theme) => themeLabel(theme, LOCALE)));
   replaceList(elements.focusActions, (record.actions ?? []).map((action) => actionLabel(action, LOCALE)));
   replaceList(elements.focusLocations, recordLocationSummaries(record, LOCALE));
-  const digital = record?.presence?.digital;
-  elements.focusDigital.textContent = digital?.available
-    ? (digital.label ?? t('digital_presence_published', 'Digitale Präsenz veröffentlicht'))
-    : t('digital_presence_none', 'Keine digitale Präsenz veröffentlicht.');
-  const relationLabels = (runtime.catalogProjection?.relations ?? [])
-    .filter(({ source_project_id }) => source_project_id === record.id)
-    .map(({ relation_type, target_title }) => relation_type === 'chapter-of'
-      ? t('relation_chapter_of', 'Teil von {title}', { title: target_title })
-      : `${relation_type} · ${target_title}`);
+  elements.focusDigital.textContent = digitalPresenceText(record);
+  const relationLabels = relationLabelsForRecord(record);
   replaceList(elements.focusRelations, relationLabels.length ? relationLabels : [t('relation_none', 'Keine belegte Beziehung veröffentlicht.') ]);
   replaceLinks(elements.focusLinks, record.links ?? []);
   replaceLinks(elements.focusSources, record?.provenance?.sources ?? []);
-  elements.focusCuration.textContent = [
-    recordActivityNotice(record, LOCALE),
-    t('curation_review', 'Redaktionell geprüft am {reviewed}; nächste Prüfung {next}.', { reviewed: record?.curation?.reviewed_at ?? t('unknown', 'unbekannt'), next: record?.curation?.next_review_at ?? t('open_date', 'offen') }),
-  ].filter(Boolean).join(' ');
+  elements.focusCuration.textContent = curationTextForRecord(record);
 }
 
 function updateSelectionMarks() {
@@ -2581,7 +2714,7 @@ function scheduleHierarchyFocus(pathKey) {
   runtime.hierarchyFocusTimer = window.setTimeout(tryFocus, HIERARCHY_FOCUS_RETRY_DELAYS_MS[attempt]);
 }
 
-function setDigitalPath(path, { historyMode = 'push' } = {}) {
+function setDigitalPath(path, { historyMode = 'push', focusHierarchy = true } = {}) {
   const normalized = normalizeDigitalPathForApp(path);
   const closesProject = Boolean(runtime.state.project) && !projectMatchesDigitalState(runtime.state.project, {
     ...runtime.state,
@@ -2598,7 +2731,7 @@ function setDigitalPath(path, { historyMode = 'push' } = {}) {
   }
   runtime.visibleRecordsCache = null;
   renderDiscoveryState();
-  if (closesProject || runtime.state.view === 'layers' || runtime.state.surface === 'text') {
+  if (focusHierarchy && (closesProject || runtime.state.view === 'layers' || runtime.state.surface === 'text')) {
     scheduleHierarchyFocus(normalized.pathKey);
   }
   if (historyMode) writeHistory(historyMode);
