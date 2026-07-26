@@ -113,8 +113,9 @@
     "runtime_catalogue_visible_source": "compact_build_bound_bootstrap",
     "runtime_catalogue_detail_loading": false,
     "runtime_catalogue_failure_policy": "keep_compact_bootstrap",
+    "bootstrap_asset_failure_policy": "keep_generated_linear_catalogue",
     "build_and_ci_catalogue_parity_check": true,
-    "no_javascript_projection": "generated_static_catalogue_preserved",
+    "no_javascript_projection": "generated_static_catalogue_preserved_until_successful_interactive_start",
     "redesign_trigger": "measured_transfer_parse_or_dom_budget_not_entry_count_alone"
   }
 }

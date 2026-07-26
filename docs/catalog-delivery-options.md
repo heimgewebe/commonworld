@@ -6,7 +6,7 @@ Commonworld verwendet einen **kompakten buildgebundenen Bootstrap**. Die interak
 
 Ein *Bootstrap* ist der Datensatz, mit dem die Anwendung unmittelbar startet. *Buildgebunden* bedeutet: Er wird vor der Veröffentlichung deterministisch aus den kanonischen Projektdateien erzeugt und in CI auf die festgelegte Projektion geprüft.
 
-Die interaktiven Karten werden zur Laufzeit aus diesem Bootstrap erzeugt. Die vollständige statische Kartenliste in `<noscript>` bleibt genau einmal bestehen, damit der Katalog ohne JavaScript lesbar bleibt. Öffentliche Manifest-, Runtime- und Projekt-JSON-Dateien bleiben für Menschen, Prüfwerkzeuge und Suchmaschinen erreichbar.
+Die interaktiven Karten werden zur Laufzeit aus diesem Bootstrap erzeugt. Eine vollständige lineare Recovery-Liste bleibt genau einmal außerhalb der Bootstrap-Modulabhängigkeit im HTML. Sie wird erst nach erfolgreichem interaktivem Start entfernt und bleibt bei deaktiviertem JavaScript oder einem fehlenden Bootstrap-Asset lesbar. Öffentliche Manifest-, Runtime- und Projekt-JSON-Dateien bleiben für Menschen, Prüfwerkzeuge und Suchmaschinen erreichbar.
 
 ## Gemessener Anlass und Ergebnis
 
@@ -16,10 +16,10 @@ Die kompakte Projektion enthält weiterhin Titel, Zusammenfassung, Themen, Aktio
 
 Gemessener Stand vom 26. Juli 2026:
 
-- Bootstrap: 105.231 rohe Bytes, 20.179 gzip-Bytes
-- HTML: 114.635 rohe Bytes, 16.337 gzip-Bytes
-- HTML-Starttags: 1.294
-- statische Katalogkarten: 65, ausschließlich im No-JavaScript-Fallback
+- Bootstrap: 105.072 rohe Bytes, 20.132 gzip-Bytes
+- HTML: 114.718 rohe Bytes, 16.353 gzip-Bytes
+- HTML-Starttags: 1.293
+- statische Katalogkarten: 65, ausschließlich in der einmaligen linearen Recovery-Oberfläche
 - Projekt-JSON-Anfragen beim Start: 0
 - doppelte Identitätspayloads beim Start: 0
 
@@ -27,8 +27,8 @@ Gemessener Stand vom 26. Juli 2026:
 
 | Entwurf | Barrierefreiheit und No-JS | SEO | Datenschutz | Caching | Bewertung |
 |---|---|---|---|---|---|
-| Generierter vollständiger Bootstrap | Interaktive Ansicht startet sofort; `<noscript>` bleibt vollständig. | Gut. | Rein statisch. | Einfach. | Bei 65 Einträgen über dem harten Payload-Budget. |
-| **Kompakter Bootstrap** | Interaktive Felder und Quellenlinks bleiben vollständig nutzbar; `<noscript>` enthält den vollständigen Katalog. | Öffentliche Projekt-JSON und statische No-JS-Karten bleiben indexierbar. | Rein statisch, keine Telemetrie oder API. | Kleiner gemeinsamer Startcache; vollständige Einzeldateien bleiben separat cachebar. | **Gewählt.** |
+| Generierter vollständiger Bootstrap | Interaktive Ansicht startet sofort; die lineare Recovery-Liste bleibt vollständig. | Gut. | Rein statisch. | Einfach. | Bei 65 Einträgen über dem harten Payload-Budget. |
+| **Kompakter Bootstrap** | Interaktive Felder und Quellenlinks bleiben vollständig nutzbar; die bootstrap-unabhängige Recovery-Liste enthält den vollständigen Katalog. | Öffentliche Projekt-JSON und statische lineare Karten bleiben indexierbar. | Rein statisch, keine Telemetrie oder API. | Kleiner gemeinsamer Startcache; vollständige Einzeldateien bleiben separat cachebar. | **Gewählt.** |
 | HTML-Hydration | Könnte statische Karten wiederverwenden, würde das DOM zur Datenquelle machen. | Gut. | Statisch möglich. | HTML wird stärker gekoppelt. | Höhere Komplexität und zweite Wahrheitsoberfläche. |
 | Segmentiertes statisches JSON | Ein kompakter Weltindex startet Suche und Karte; Segmente liefern weitere Projektionen. | Öffentliche Detaildateien bleiben indexierbar. | Rein statisch möglich. | Gute Teilcaches. | Zusätzliche Segment- und Fehlerverträge; derzeit nur als beobachtender Catalog-Platform-Pfad genutzt. |
 | Bedarfsgeladene schreibgeschützte statische Lieferung | Kleinster Startindex, Details erst bei Auswahl. | Erfordert stabile statische Verweise. | Statisch möglich. | Gute Teilcaches. | Bleibt nächster Pfad, falls auch die kompakte Projektion die Grenze erreicht. |

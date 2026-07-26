@@ -6,6 +6,7 @@ from pathlib import Path
 
 from scripts.measure_catalog_delivery import load_bootstrap_records, measure
 from scripts.validate_catalog_delivery_budget import (
+    BOOTSTRAP_ASSET_FAILURE_SCENARIO,
     CATALOGUE_NETWORK_BLOCKED_SCENARIO,
     ROOT,
     validate,
@@ -67,7 +68,8 @@ class CatalogDeliveryBudgetTests(unittest.TestCase):
         self.assertEqual(0, metrics['runtime_verification_fetch']['project_request_count'])
         self.assertEqual(0, metrics['runtime_verification_fetch']['duplicate_identity_payload_count'])
         self.assertEqual(metrics['entry_count'], metrics['html']['catalog_card_instances'])
-        self.assertEqual(1, metrics['html']['noscript_catalogs'])
+        self.assertEqual(1, metrics['html']['static_fallback_catalogs'])
+        self.assertEqual(0, metrics['html']['noscript_elements'])
         _, bootstrap_records = load_bootstrap_records(
             ROOT / 'assets/commonworld-bootstrap-catalog.mjs'
         )
@@ -80,6 +82,11 @@ class CatalogDeliveryBudgetTests(unittest.TestCase):
             all('handoff' not in record for record in bootstrap_records),
             'compact bootstrap must omit non-interactive handoff metadata',
         )
+        relations = [relation for record in bootstrap_records for relation in record.get('relations', [])]
+        self.assertGreater(len(relations), 0)
+        self.assertTrue(all(set(relation) == {'target_id', 'type', 'evidenced'} for relation in relations))
+        self.assertTrue(all(relation['evidenced'] is True for relation in relations))
+        self.assertTrue(all('source_ids' not in relation and 'note' not in relation for relation in relations))
 
     def test_measure_rejects_stale_bootstrap_content(self) -> None:
         with tempfile.TemporaryDirectory() as tmp:
@@ -158,6 +165,22 @@ class CatalogDeliveryBudgetTests(unittest.TestCase):
         )['blockedCatalogRequests'] = 2
         errors = validate_actual_smoke(actual, expected)
         self.assertIn('fresh public browser smoke observed 2 runtime catalogue request(s)', errors)
+
+    def test_fresh_smoke_rejects_incomplete_bootstrap_failure_fallback(self) -> None:
+        expected = self.fresh_smoke()
+        actual = json.loads(json.dumps(expected))
+        scenario = next(item for item in actual['scenarios'] if item['id'] == BOOTSTRAP_ASSET_FAILURE_SCENARIO)
+        scenario['fallbackCatalogCards'] -= 1
+        errors = validate_actual_smoke(actual, expected)
+        self.assertTrue(any('bootstrap fallback catalog is incomplete' in error for error in errors))
+
+    def test_fresh_smoke_rejects_invalid_blocked_bootstrap_count(self) -> None:
+        expected = self.fresh_smoke()
+        actual = json.loads(json.dumps(expected))
+        scenario = next(item for item in actual['scenarios'] if item['id'] == BOOTSTRAP_ASSET_FAILURE_SCENARIO)
+        scenario['blockedBootstrapRequests'] = 0
+        errors = validate_actual_smoke(actual, expected)
+        self.assertIn('fresh public browser smoke expected exactly one blocked bootstrap request, got 0', errors)
 
     def test_validator_rejects_deliberate_bootstrap_budget_breach(self) -> None:
         with tempfile.TemporaryDirectory() as tmp:

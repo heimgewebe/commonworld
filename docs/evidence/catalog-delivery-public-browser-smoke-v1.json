@@ -122,7 +122,7 @@
     {
       "id": "layer-journey-moveend-return",
       "verdict": "PASS",
-      "elapsedMs": 1862
+      "elapsedMs": 1495
     },
     {
       "id": "layer-journey-interrupted",
@@ -204,6 +204,12 @@
       ]
     },
     {
+      "id": "bootstrap-asset-failure-fallback",
+      "verdict": "PASS",
+      "blockedBootstrapRequests": 1,
+      "fallbackCatalogCards": 65
+    },
+    {
       "id": "provider-failure",
       "verdict": "PASS",
       "applicationWarnings": 1
@@ -222,9 +228,9 @@
     }
   ],
   "binding": {
-    "smoke_script_sha256": "3200c9920686e22ea6c29cfefe6ca10a390a8122f5bae768fb8380bbb3a10faf",
+    "smoke_script_sha256": "7db2edabb35bfaba5a587309ea4a7d3204f7f5e979c5cbba6e4636293433f78d",
     "smoke_runner_sha256": "522b99b70b1d0064b1d0a31a3a67fdc9a2e73b7408f37d1a4bb303bc360b7556",
-    "first_party_surface_sha256": "ab6bd56b865827c29ed55f37e6bcf3d579a3b73dc9ba5be4a06fbd4575558f5e",
+    "first_party_surface_sha256": "f2a698dda9865538be6fa525f2a074a921e9d54482a6a4d2026e71985c3ad982",
     "scenario_ids": [
       "startup-and-ring-orbits",
       "ring-orbits-reduced-motion",
@@ -251,17 +257,18 @@
       "synthetic-catalogue-truth",
       "live-ui-hardening",
       "catalogue-network-blocked",
+      "bootstrap-asset-failure-fallback",
       "provider-failure",
       "method-desktop",
       "method-mobile",
       "method-mobile-text-200"
     ],
-    "freshness_rule": "The official runner must materialize the canonical smoke plan, create a fresh temporary public result and validate exact scenario order, PASS verdicts, manifest-plus-aggregate startup observation, selected-identity shard parity and zero forbidden canonical project requests against this hash-bound evidence.",
+    "freshness_rule": "The official runner must create a fresh public result and validate exact scenario order, PASS verdicts, zero forbidden canonical project requests, selected compact-shard parity, and a complete ordinary-DOM linear catalogue when the bootstrap module is unavailable.",
     "smoke_plan_sha256": "6b8749928ead5ef81ee66883e6a2993e756ce083575c3569234bf70526448364"
   },
   "execution": {
-    "job_id": "5817322c4fcb",
-    "finalization_receipt_sha256": "8c080589c95dd635bc91c157c0c4722a6b6efd60cf559cfee2ca333123e5ec50",
-    "result_sha256": "60cc53fe772b4c2d02af1707497efe2d31e90c82b0a865c9430356d3b053663f"
+    "job_id": "848b64bb7d52",
+    "finalization_receipt_sha256": "bd72f658b502cbc0a0607bad77cb1da082de9090c04e3cb4f7a0788851a7cbd8",
+    "result_sha256": "6e018a52dc14259729b41875c96483cdab2d3d143b6e8823e0126f0788225dd2"
   }
 }

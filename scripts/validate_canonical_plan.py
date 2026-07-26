@@ -43,6 +43,8 @@ REQUIRED_PLAN_TOKENS = (
     "während der kompakte Bootstrap die sichtbare Oberfläche weiter versorgt",
     "vollständige statische No-JavaScript-Liste bleibt genau einmal",
     "statische interaktive Karten werden nicht zusätzlich dupliziert",
+    "Die lineare Liste liegt außerhalb der Bootstrap-Modulabhängigkeit",
+    "bleibt sie als Recovery-Oberfläche sichtbar",
     "### Hierarchische digitale Ringbündel v1",
     "### Begrenzte Produktions- und Anbieterentscheidung v1",
     "### Commitgebundener Produktions-Readback v1",

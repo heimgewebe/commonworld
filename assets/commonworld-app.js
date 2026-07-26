@@ -3673,6 +3673,9 @@ async function boot() {
     }
     applyDeepLink(location.search, { initial: true });
     renderDiscoveryState();
+    const textSkipLink = document.querySelector('#text-skip-link');
+    if (textSkipLink) textSkipLink.setAttribute('href', '#text-view');
+    document.querySelector('[data-static-catalog-fallback]')?.remove();
     void loadCountryBoundaries().catch((error) => {
       elements.stage.dataset.countryMapState = 'failed';
       console.warn('Commonworld country composition layer unavailable', error);

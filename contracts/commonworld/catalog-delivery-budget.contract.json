@@ -14,7 +14,7 @@
   "selected_design": {
     "id": "compact-build-bound-bootstrap-with-public-project-json",
     "runtime": "The interactive shell consumes one generated compact build-bound module containing discovery, action, source-link and review-date fields. Editorial notes, source identifiers and handoff metadata remain in canonical public project JSON and are not startup payload.",
-    "no_javascript": "The generated complete noscript catalogue remains in index.html exactly once.",
+    "no_javascript": "The generated complete linear catalogue remains in index.html exactly once, outside the bootstrap module dependency, and is removed only after successful interactive startup.",
     "machine_readable": "The manifest and every complete canonical project JSON remain public and independently addressable.",
     "privacy": "No backend, account, telemetry, cookie or runtime write API is introduced."
   },

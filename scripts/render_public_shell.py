@@ -196,10 +196,10 @@ def render_shell(root: Path = ROOT, locale: str = FALLBACK_LOCALE) -> str:
         f'              <ellipse id="sphere-path-{index}" cx="320" cy="320" rx="{rx}" ry="{ry}" transform="rotate({rotation} 320 320)" />'
         for index, (rx, ry, rotation) in enumerate(ORBIT_PROFILES, start=1)
     )
-    # JavaScript creates the interactive cards from the compact bootstrap. The complete
-    # static catalogue is emitted once inside <noscript> for accessibility and no-JS use.
+    # JavaScript creates the interactive cards from the compact bootstrap. One complete
+    # static catalogue remains in ordinary DOM until a successful runtime boot removes it.
     cards = ""
-    noscript_cards = render_cards(records, interactive=False, locale=locale)
+    fallback_cards = render_cards(records, interactive=False, locale=locale)
     markup = f'''<!doctype html>
 <html lang="de">
   <head>
@@ -220,7 +220,7 @@ def render_shell(root: Path = ROOT, locale: str = FALLBACK_LOCALE) -> str:
     <script type="module" src="./assets/commonworld-app.js?v={asset_version('assets/commonworld-app.js', root)}"></script>
   </head>
   <body data-presentation="globe">
-    <a class="skip-link" href="#text-view">Zur Textansicht springen</a>
+    <a id="text-skip-link" class="skip-link" href="#static-catalog-fallback">Zur Textansicht springen</a>
     <main class="app-shell">
       <header class="topbar">
         <a class="brand" href="./" aria-label="commonworld – Globus zurücksetzen">
@@ -441,16 +441,14 @@ def render_shell(root: Path = ROOT, locale: str = FALLBACK_LOCALE) -> str:
         </div>
       </section>
 
-      <noscript>
-        <section class="noscript-catalog" aria-labelledby="noscript-title">
-          <p class="kicker">Textansicht</p>
-          <h1 id="noscript-title">Commonworld ohne JavaScript</h1>
-          <p>Der Globus benötigt JavaScript. Alle geprüften Commons und ihre Daten bleiben hier erreichbar.</p>
-          <div class="catalog-grid">
-{noscript_cards}
-          </div>
-        </section>
-      </noscript>
+      <section id="static-catalog-fallback" class="static-catalog-fallback" aria-labelledby="static-catalog-fallback-title" data-static-catalog-fallback>
+        <p class="kicker">Textansicht</p>
+        <h1 id="static-catalog-fallback-title">Statischer Commonworld-Katalog</h1>
+        <p>Der interaktive Globus ist nicht verfügbar. Alle geprüften Commons und ihre Daten bleiben hier erreichbar.</p>
+        <div class="catalog-grid">
+{fallback_cards}
+        </div>
+      </section>
     </main>
   </body>
 </html>

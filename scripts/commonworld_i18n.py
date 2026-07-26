@@ -266,8 +266,8 @@ SHELL_REPLACEMENTS_EN = {
     '<section><h3>Offizielle Links</h3>': '<section><h3>Official links</h3>',
     '<section><h3>Quellen</h3>': '<section><h3>Sources</h3>',
     '<section><h3>Kuration</h3>': '<section><h3>Curation</h3>',
-    '<h1 id="noscript-title">Commonworld ohne JavaScript</h1>': '<h1 id="noscript-title">Commonworld without JavaScript</h1>',
-    'Der Globus benötigt JavaScript. Alle geprüften Commons und ihre Daten bleiben hier erreichbar.': 'The globe requires JavaScript. All reviewed Commons and their data remain accessible here.',
+    '<h1 id="static-catalog-fallback-title">Statischer Commonworld-Katalog</h1>': '<h1 id="static-catalog-fallback-title">Static Commonworld catalog</h1>',
+    'Der interaktive Globus ist nicht verfügbar. Alle geprüften Commons und ihre Daten bleiben hier erreichbar.': 'The interactive globe is unavailable. All reviewed Commons and their data remain accessible here.',
 }
 
 METHOD_REPLACEMENTS_EN = {

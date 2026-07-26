@@ -12,13 +12,13 @@
     <link rel="alternate" type="application/json" href="./catalog/catalog.json" title="Commonworld-Katalog" />
     <link rel="alternate" type="application/schema+json" href="./contracts/commonworld/project.schema.json" title="CommonProject-Schema" />
     <link rel="stylesheet" href="./assets/vendor/maplibre-gl.css" />
-    <link rel="stylesheet" href="./index.css?v=e50d2c662581" />
+    <link rel="stylesheet" href="./index.css?v=5dc2bd48bfc1" />
     <link rel="stylesheet" href="./assets/ipad-layout.css?v=ff4e980f851f" />
     <script src="./assets/vendor/maplibre-gl.js" defer></script>
-    <script type="module" src="./assets/commonworld-app.js?v=dcd2ecd98486"></script>
+    <script type="module" src="./assets/commonworld-app.js?v=06304f41f72a"></script>
   </head>
   <body data-presentation="globe">
-    <a class="skip-link" href="#text-view">Zur Textansicht springen</a>
+    <a id="text-skip-link" class="skip-link" href="#static-catalog-fallback">Zur Textansicht springen</a>
     <main class="app-shell">
       <header class="topbar">
         <a class="brand" href="./" aria-label="commonworld – Globus zurücksetzen">
@@ -247,12 +247,11 @@
         </div>
       </section>
 
-      <noscript>
-        <section class="noscript-catalog" aria-labelledby="noscript-title">
-          <p class="kicker">Textansicht</p>
-          <h1 id="noscript-title">Commonworld ohne JavaScript</h1>
-          <p>Der Globus benötigt JavaScript. Alle geprüften Commons und ihre Daten bleiben hier erreichbar.</p>
-          <div class="catalog-grid">
+      <section id="static-catalog-fallback" class="static-catalog-fallback" aria-labelledby="static-catalog-fallback-title" data-static-catalog-fallback>
+        <p class="kicker">Textansicht</p>
+        <h1 id="static-catalog-fallback-title">Statischer Commonworld-Katalog</h1>
+        <p>Der interaktive Globus ist nicht verfügbar. Alle geprüften Commons und ihre Daten bleiben hier erreichbar.</p>
+        <div class="catalog-grid">
           <article class="catalog-card" id="project-aflaj-irrigation-systems-oman" data-commonproject-id="aflaj-irrigation-systems-oman">
             <p class="catalog-kind">Vor Ort · Digital · Versorgung, Land und Ökologie › Wasser und Bewässerung</p>
             <h2>Aflaj-Bewässerungssysteme in Oman</h2>
@@ -1099,9 +1098,8 @@
               <a href="./catalog/projects/zenzeleni-community-networks.json" type="application/json">JSON</a>
             </div>
           </article>
-          </div>
-        </section>
-      </noscript>
+        </div>
+      </section>
     </main>
   </body>
 </html>

@@ -73,6 +73,23 @@ class CanonicalPlanTests(unittest.TestCase):
             errors,
         )
 
+    def test_linear_catalog_recovery_must_be_bootstrap_independent(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp_dir:
+            root = self.copy_repository_core(tmp_dir)
+            path = root / "docs" / "blueprints" / "commonworld-masterplan.md"
+            path.write_text(
+                path.read_text(encoding="utf-8").replace(
+                    "Die lineare Liste liegt außerhalb der Bootstrap-Modulabhängigkeit",
+                    "Die lineare Liste hängt vom Bootstrap-Modul ab",
+                ),
+                encoding="utf-8",
+            )
+            errors = validate_canonical_plan(root)
+        self.assertIn(
+            "canonical globe plan missing required token: Die lineare Liste liegt außerhalb der Bootstrap-Modulabhängigkeit",
+            errors,
+        )
+
     def test_shadow_path_must_not_claim_full_bootstrap(self) -> None:
         with tempfile.TemporaryDirectory() as tmp_dir:
             root = self.copy_repository_core(tmp_dir)

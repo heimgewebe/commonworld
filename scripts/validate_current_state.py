@@ -189,8 +189,9 @@ def validate_current_state(root: Path = ROOT) -> list[str]:
         "runtime_catalogue_visible_source": "compact_build_bound_bootstrap",
         "runtime_catalogue_detail_loading": False,
         "runtime_catalogue_failure_policy": "keep_compact_bootstrap",
+        "bootstrap_asset_failure_policy": "keep_generated_linear_catalogue",
         "build_and_ci_catalogue_parity_check": True,
-        "no_javascript_projection": "generated_static_catalogue_preserved",
+        "no_javascript_projection": "generated_static_catalogue_preserved_until_successful_interactive_start",
         "redesign_trigger": "measured_transfer_parse_or_dom_budget_not_entry_count_alone",
     }
     if catalog_delivery != expected_catalog_delivery:
@@ -223,6 +224,9 @@ def validate_current_state(root: Path = ROOT) -> list[str]:
         "function observeCatalogRecordShadow(",
         "function loadCatalogShardOnce(",
         "dataset.catalogDelivery = 'build-bound-bootstrap'",
+        "document.querySelector('#text-skip-link')",
+        "textSkipLink.setAttribute('href', '#text-view')",
+        "document.querySelector('[data-static-catalog-fallback]')?.remove()",
     )
     for token in required_runtime_tokens:
         if token not in app:

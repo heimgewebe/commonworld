@@ -9,6 +9,7 @@ CURATION_BOOTSTRAP_FIELDS = ("state", "reviewed_at", "next_review_at")
 ACTIVITY_BOOTSTRAP_FIELDS = ("status", "observed_at")
 SOURCE_BOOTSTRAP_FIELDS = ("label", "url")
 LINK_BOOTSTRAP_FIELDS = ("type", "label", "url")
+RELATION_BOOTSTRAP_FIELDS = ("target_id", "type")
 
 
 def bootstrap_record(record: dict) -> dict:
@@ -45,6 +46,19 @@ def bootstrap_record(record: dict) -> dict:
         {key: link[key] for key in LINK_BOOTSTRAP_FIELDS if key in link}
         for link in projected.get("links", [])
     ]
+    if isinstance(record.get("relations"), list):
+        projected["relations"] = [
+            {
+                **{key: relation[key] for key in RELATION_BOOTSTRAP_FIELDS if key in relation},
+                "evidenced": True,
+            }
+            for relation in record["relations"]
+            if isinstance(relation, dict)
+            and relation.get("target_id")
+            and relation.get("type")
+            and isinstance(relation.get("source_ids"), list)
+            and len(relation["source_ids"]) > 0
+        ]
     if isinstance(projected.get("languages"), dict):
         projected["languages"] = {"codes": projected["languages"].get("codes", [])}
     if isinstance(projected.get("access"), dict):

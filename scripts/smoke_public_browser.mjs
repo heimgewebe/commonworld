@@ -2839,6 +2839,32 @@ async function catalogueNetworkBlockedScenario() {
   await run.context.close();
 }
 
+async function bootstrapAssetFailureFallbackScenario() {
+  const run = await newPage();
+  const manifest = JSON.parse(await readFile(path.join(ROOT, 'catalog/catalog.json'), 'utf8'));
+  let blockedBootstrapRequests = 0;
+  await run.page.route('**/assets/commonworld-bootstrap-catalog.mjs*', (route) => {
+    blockedBootstrapRequests += 1;
+    return route.abort('failed');
+  });
+  await run.page.goto(baseUrl, { waitUntil: 'domcontentloaded' });
+  await run.page.locator('#static-catalog-fallback').waitFor({ state: 'visible', timeout: 5000 });
+  const fallbackCatalogCards = await run.page.locator('#static-catalog-fallback .catalog-card').count();
+  assert(blockedBootstrapRequests === 1, `bootstrap asset failure: expected one blocked module request, found ${blockedBootstrapRequests}`);
+  assert(!(await run.page.locator('html').evaluate((node) => node.classList.contains('runtime-ready'))), 'bootstrap asset failure: runtime must not claim ready');
+  assert(await run.page.locator('#static-catalog-fallback').isVisible(), 'bootstrap asset failure: linear catalog fallback is not visible');
+  assert(fallbackCatalogCards === manifest.entry_count, `bootstrap asset failure: expected ${manifest.entry_count} fallback cards, found ${fallbackCatalogCards}`);
+  assert((await run.page.locator('#text-skip-link').getAttribute('href')) === '#static-catalog-fallback', 'bootstrap asset failure: skip link does not target the surviving catalog');
+  assert(await run.page.locator('#static-catalog-fallback .catalog-card a').first().isVisible(), 'bootstrap asset failure: fallback links are not usable');
+  results.push({
+    id: 'bootstrap-asset-failure-fallback',
+    verdict: 'PASS',
+    blockedBootstrapRequests,
+    fallbackCatalogCards,
+  });
+  await run.context.close();
+}
+
 async function providerFailureScenario() {
   const run = await newPage({ mobile: true });
   await run.page.route('https://tiles.openfreemap.org/**', (route) => route.abort('failed'));
@@ -2967,6 +2993,7 @@ try {
   await syntheticCatalogueTruthScenario();
   await liveUiHardeningScenario();
   await catalogueNetworkBlockedScenario();
+  await bootstrapAssetFailureFallbackScenario();
   await providerFailureScenario();
   await methodScenario();
 } catch (error) {

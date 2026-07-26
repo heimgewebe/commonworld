@@ -106,7 +106,8 @@ def measure(root: Path = ROOT) -> dict:
             'start_tag_count': parser.start_tags,
             'catalog_card_instances': html_raw.count(b'class="catalog-card"'),
             'interactive_catalog_cards': html_raw.count(b'class="catalog-select"'),
-            'noscript_catalogs': html_raw.count(b'class="noscript-catalog"'),
+            'static_fallback_catalogs': html_raw.count(b'class="static-catalog-fallback"'),
+            'noscript_elements': html_raw.count(b'<noscript'),
         },
         'runtime_verification_fetch': {
             'enabled': runtime_project_fetch_enabled,
