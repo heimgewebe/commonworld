@@ -54,6 +54,42 @@ class CanonicalPlanTests(unittest.TestCase):
             errors,
         )
 
+    def test_compact_catalog_delivery_architecture_is_required(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp_dir:
+            root = self.copy_repository_core(tmp_dir)
+            path = root / "docs" / "blueprints" / "commonworld-masterplan.md"
+            path.write_text(
+                path.read_text(encoding="utf-8").replace(
+                    "kompakten buildgebundenen Bootstrap",
+                    "andersartigen Startdatensatz",
+                ),
+                encoding="utf-8",
+            )
+
+            errors = validate_canonical_plan(root)
+
+        self.assertIn(
+            "canonical globe plan missing required token: kompakten buildgebundenen Bootstrap",
+            errors,
+        )
+
+    def test_obsolete_full_bootstrap_and_duplicate_cards_are_rejected(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp_dir:
+            root = self.copy_repository_core(tmp_dir)
+            path = root / "docs" / "blueprints" / "commonworld-masterplan.md"
+            path.write_text(
+                path.read_text(encoding="utf-8")
+                + "\nBuild und CI erzeugen einen vollständigen buildgebundenen Bootstrap "
+                + "sowie die statischen interaktiven und No-JavaScript-Karten.\n",
+                encoding="utf-8",
+            )
+
+            errors = validate_canonical_plan(root)
+
+        self.assertTrue(
+            any(error.startswith("canonical globe plan retains obsolete catalog delivery doctrine:") for error in errors)
+        )
+
     def test_parallel_blueprint_is_rejected(self) -> None:
         with tempfile.TemporaryDirectory() as tmp_dir:
             root = self.copy_repository_core(tmp_dir)

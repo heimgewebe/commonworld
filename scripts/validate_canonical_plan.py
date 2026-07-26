@@ -38,6 +38,9 @@ REQUIRED_PLAN_TOKENS = (
     "### Erster öffentlicher MapLibre-Vertikalschnitt v1",
     "### Globe-first Oberfläche v1",
     "### Gemessene statische Katalogauslieferung v1",
+    "kompakten buildgebundenen Bootstrap",
+    "vollständige statische No-JavaScript-Liste bleibt genau einmal",
+    "statische interaktive Karten werden nicht zusätzlich dupliziert",
     "### Hierarchische digitale Ringbündel v1",
     "### Begrenzte Produktions- und Anbieterentscheidung v1",
     "### Commitgebundener Produktions-Readback v1",
@@ -60,6 +63,12 @@ REQUIRED_PLAN_TOKENS = (
     "### Phase 6 — Weltgewebe-Übergang",
     "Der Globus liefert den Überblick. Der Zoom liefert Genauigkeit.",
 )
+
+FORBIDDEN_PLAN_TOKENS = (
+    "einen vollständigen buildgebundenen Bootstrap",
+    "die statischen interaktiven und No-JavaScript-Karten",
+)
+
 
 FORBIDDEN_ACTIVE_PATHS = (
     "proofs",
@@ -310,6 +319,10 @@ def validate_canonical_plan(root: Path = ROOT) -> list[str]:
     for token in REQUIRED_PLAN_TOKENS:
         if token not in text:
             errors.append(f"canonical globe plan missing required token: {token}")
+
+    for token in FORBIDDEN_PLAN_TOKENS:
+        if token in text:
+            errors.append(f"canonical globe plan retains obsolete catalog delivery doctrine: {token}")
 
     controlled_directories = (
         (root / "docs" / "blueprints", EXPECTED_BLUEPRINT_FILES, "blueprint"),
