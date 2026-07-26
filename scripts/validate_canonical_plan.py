@@ -39,6 +39,7 @@ REQUIRED_PLAN_TOKENS = (
     "### Globe-first Oberfläche v1",
     "### Gemessene statische Katalogauslieferung v1",
     "kompakten buildgebundenen Bootstrap",
+    "während der kompakte Bootstrap die sichtbare Oberfläche weiter versorgt",
     "vollständige statische No-JavaScript-Liste bleibt genau einmal",
     "statische interaktive Karten werden nicht zusätzlich dupliziert",
     "### Hierarchische digitale Ringbündel v1",
@@ -66,6 +67,7 @@ REQUIRED_PLAN_TOKENS = (
 
 FORBIDDEN_PLAN_TOKENS = (
     "einen vollständigen buildgebundenen Bootstrap",
+    "während der vollständige Bootstrap die sichtbare Oberfläche weiter versorgt",
     "die statischen interaktiven und No-JavaScript-Karten",
 )
 

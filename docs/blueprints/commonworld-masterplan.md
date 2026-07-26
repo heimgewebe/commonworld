@@ -694,7 +694,7 @@ Die Anwendung, die veränderbare Katalogwahrheit und die öffentliche Projektion
 
 Die Skalierungsprobe vom 25. Juli 2026 verwirft einen vollständigen 100.000-Einträge-Weltindex als Startpayload: 1.541.423 Byte gzip und 804,028 Millisekunden Median-Parsezeit. Eine deterministische 256-Shard-Projektion begrenzt den größten synthetischen Einzelshard auf 7.885 Byte gzip. Der kanonische Ausbaupfad lautet deshalb Aggregatmanifest, bedarfsgeladene Shards und Einzelheiten; der Vollindex bleibt Export und Prüfartefakt.
 
-Der erste Browseranschluss läuft als Shadow-Pfad: Manifest und Aggregat werden integritätsgeprüft geladen, während der vollständige Bootstrap die sichtbare Oberfläche weiter versorgt. Das Aggregat ordnet Themen, 10-Grad-Raumzellen und digitale Verfügbarkeit stabilen Shards zu. Sein Ausfall degradiert nur die neue Lieferachse und darf die bestehende Text-, Karten- oder Fokusansicht nicht leeren.
+Der erste Browseranschluss läuft als Shadow-Pfad: Manifest und Aggregat werden integritätsgeprüft geladen, während der kompakte Bootstrap die sichtbare Oberfläche weiter versorgt. Das Aggregat ordnet Themen, 10-Grad-Raumzellen und digitale Verfügbarkeit stabilen Shards zu. Sein Ausfall degradiert nur die neue Lieferachse und darf die bestehende Text-, Karten- oder Fokusansicht nicht leeren.
 
 ### Gemessene statische Katalogauslieferung v1
 

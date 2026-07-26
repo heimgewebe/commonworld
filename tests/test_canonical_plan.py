@@ -73,6 +73,25 @@ class CanonicalPlanTests(unittest.TestCase):
             errors,
         )
 
+    def test_shadow_path_must_not_claim_full_bootstrap(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp_dir:
+            root = self.copy_repository_core(tmp_dir)
+            path = root / "docs" / "blueprints" / "commonworld-masterplan.md"
+            path.write_text(
+                path.read_text(encoding="utf-8").replace(
+                    "während der kompakte Bootstrap die sichtbare Oberfläche weiter versorgt",
+                    "während der vollständige Bootstrap die sichtbare Oberfläche weiter versorgt",
+                ),
+                encoding="utf-8",
+            )
+
+            errors = validate_canonical_plan(root)
+
+        self.assertIn(
+            "canonical globe plan retains obsolete catalog delivery doctrine: während der vollständige Bootstrap die sichtbare Oberfläche weiter versorgt",
+            errors,
+        )
+
     def test_obsolete_full_bootstrap_and_duplicate_cards_are_rejected(self) -> None:
         with tempfile.TemporaryDirectory() as tmp_dir:
             root = self.copy_repository_core(tmp_dir)
