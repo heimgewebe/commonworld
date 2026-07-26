@@ -2,6 +2,8 @@
 
 Pull request: #143
 
+Integrated base: `47b6e82c6e359dda1b03737ab45de0dbbca8f794`
+
 ## Review scope
 
 - selection routing from every digital lane to the canonical project path
@@ -12,11 +14,22 @@ Pull request: #143
 
 ## Findings
 
-- No unresolved review threads or external review findings exist on the reviewed head.
-- The functional changes are covered by public-browser and focus-overlay smoke scenarios.
-- Project and provenance links are filtered through the existing HTTPS sanitizer before rendering.
-- The only observed CI failure is deterministic public-shell asset-hash drift; no contract or browser test executed after that build guard.
+- No unresolved review threads or external review findings existed on the reviewed pull request.
+- Project and provenance links remain filtered through the existing HTTPS sanitizer before rendering.
+- Integration with the current `main` was conflict-free, but review found three real stale contracts: generated public-shell asset hashes, the vertical-slice source token for `createRibbonSegment`, and revision-bound benchmark/browser-smoke evidence.
+- The generated shell was rebuilt; the vertical-slice validator now checks the canonical project-routing path; static, throttled-browser and public-smoke evidence was regenerated and digest-bound.
 
-## Integration requirement
+## Validation
 
-Regenerate the committed public shell after integrating the current `main`, then require the complete validation workflow to pass on the resulting exact head before merge.
+- JavaScript unit tests: 106 passed, 0 failed.
+- Python unit tests: 510 passed, 0 failed.
+- Public browser smoke: 31 scenarios passed, including desktop, mobile, iPad, keyboard/history, empty digital paths and external-link safety.
+- Proposal browser smoke: 24 scenarios passed.
+- Focus-overlay browser smoke: PASS across phone-small, phone, tablet and desktop, including inline digital detail ownership and focus restoration.
+- Accessibility browser smoke: 4 scenarios passed for forced colors and increased contrast.
+- Catalogue delivery budget: 65 records, 20,132 catalogue/bootstrap gzip bytes and 0 startup project requests.
+- Complete local validation receipt SHA-256: `842b9e589f74d9c696bbb7beebdd371e2d50d0fb7647ae1298e6e2d99f23e151`.
+
+## Merge gate
+
+Merge only when GitHub CI is green on the exact final pull-request head and the merge operation is bound to that head SHA.

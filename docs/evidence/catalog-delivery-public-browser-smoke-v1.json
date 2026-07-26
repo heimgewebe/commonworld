@@ -122,7 +122,7 @@
     {
       "id": "layer-journey-moveend-return",
       "verdict": "PASS",
-      "elapsedMs": 1451
+      "elapsedMs": 1793
     },
     {
       "id": "layer-journey-interrupted",
@@ -243,9 +243,9 @@
     }
   ],
   "binding": {
-    "smoke_script_sha256": "7a4895d57444a1855213dea419025408efebc2eb97996b0f4c4741a8290e7df3",
+    "smoke_script_sha256": "9967ff7ac030ce3b1d0587f12dc786f89d05403aaa9c3ccc84b95de1cb6e4d5f",
     "smoke_runner_sha256": "522b99b70b1d0064b1d0a31a3a67fdc9a2e73b7408f37d1a4bb303bc360b7556",
-    "first_party_surface_sha256": "f509e40fd4bec20f5e83d8a27186948b97a6b6457397c6842a5c096b2f0ca989",
+    "first_party_surface_sha256": "9aff93aad04ddd04de3b22ec70aad391b263c7499e5b8b4a739bd3405578d115",
     "scenario_ids": [
       "startup-and-ring-orbits",
       "ring-orbits-reduced-motion",
@@ -283,8 +283,8 @@
     "smoke_plan_sha256": "6b8749928ead5ef81ee66883e6a2993e756ce083575c3569234bf70526448364"
   },
   "execution": {
-    "job_id": "47f97eae8a70",
-    "finalization_receipt_sha256": "2a1f9d7657f341bc1f0de4d258867d71f2dc070594af591a19400cc7cc4bceb4",
-    "result_sha256": "39368606855301efa939f13d8699c244957145e21030f82dfe9e268e6c49eb23"
+    "job_id": "2c36093bedff",
+    "finalization_receipt_sha256": "854b510c107675322c842343840c9bf64111d6f38894a0af70a91f7adf54c525",
+    "result_sha256": "8f0b1590b90feb8c23a29ad4e2fb0cceaffa3a5eb72cfbf51cc903dafcfd1cac"
   }
 }
