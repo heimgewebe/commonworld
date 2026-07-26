@@ -1,10 +1,9 @@
 {
   "kind": "commonworld.catalog_platform",
-  "version": "1.0",
+  "version": "1.1",
   "public_projection": {
     "manifest": "catalog/runtime/manifest.v1.json",
     "world_index": "catalog/runtime/world.v1.json",
-    "detail_url_template": "catalog/projects/{id}.json",
     "mutable_truth_in_commonworld": false,
     "write_path": false,
     "shard_url_template": "catalog/runtime/shards/{sha256_prefix}.v1.json",
@@ -17,16 +16,35 @@
       "theme",
       "spatial_cell_10_degree",
       "digital_availability"
-    ]
+    ],
+    "details": {
+      "strategy": "content-addressed-shard-descriptors",
+      "descriptor_version": "1.0",
+      "url_template": "catalog/runtime/details/{sha256}.v1.json",
+      "descriptor_fields": [
+        "version",
+        "identity",
+        "generation",
+        "url",
+        "sha256",
+        "bytes"
+      ],
+      "mutable_identity_path_for_runtime_loading": false
+    }
   },
   "generation": {
     "algorithm": "sha256",
-    "binds": [
-      "schema_version",
-      "catalog_manifest_sha256",
+    "seed_binds": [
+      "source_catalog_sha256",
+      "detail_set_sha256",
+      "project_schema_version",
+      "detail_descriptor_version"
+    ],
+    "manifest_integrity_descriptors": [
       "world_index_sha256",
       "aggregate_sha256",
-      "shards_sha256"
+      "shards_sha256",
+      "detail_payload_sha256"
     ],
     "atomic_activation_required": true
   },
@@ -49,6 +67,32 @@
       "curation",
       "handoff"
     ]
+  },
+  "detail_validation_boundary": {
+    "build_and_ci": "complete_project_schema_v4_validation_and_canonical_serialization",
+    "browser": [
+      "same_origin",
+      "document_root_containment",
+      "manifest_generation",
+      "descriptor_identity",
+      "content_addressed_url",
+      "byte_length",
+      "sha256",
+      "utf8_json",
+      "schema_version_4",
+      "bounded_top_level_shape",
+      "selected_identity",
+      "compact_projection_parity"
+    ],
+    "browser_reimplements_complete_json_schema": false,
+    "visible_data_replacement": false
+  },
+  "runtime_cache": {
+    "shards_max_entries": 8,
+    "details_max_entries": 16,
+    "eviction": "least_recently_used_deterministic",
+    "failed_promises_retained": false,
+    "generation_change_clears_caches": true
   },
   "weltgewebe_alignment": {
     "canonical_store": "postgresql",
@@ -74,17 +118,44 @@
     "shadow_runtime_observation": {
       "aggregate_manifest": true,
       "selected_identity_shard": true,
-      "detail_loading": false
+      "selected_identity_detail": true
     },
+    "selection_states": [
+      "idle",
+      "loading",
+      "retrying",
+      "ready",
+      "mismatch",
+      "degraded"
+    ],
     "aggregate_failure_policy": "keep_compatible_bootstrap_and_mark_degraded",
     "shard_failure_policy": "keep_compatible_bootstrap_and_mark_selected_identity_degraded",
-    "selected_identity_parity_fields": ["id", "title", "themes", "actions", "languages", "access", "activity", "digital_presence", "public_geographic_presence"],
+    "detail_failure_policy": "keep_compatible_bootstrap_and_offer_selected_identity_retry",
+    "stale_response_policy": "selection_generation_must_match_before_state_commit",
+    "selected_identity_parity_fields": [
+      "id",
+      "title",
+      "themes",
+      "actions",
+      "languages",
+      "access",
+      "activity",
+      "digital_presence",
+      "public_geographic_presence"
+    ],
+    "selected_detail_parity": "exact_canonical_record_after_integrity_and_runtime_boundary_checks",
+    "cutover_authorized": false,
     "cutover_gate": [
-      "field_parity",
-      "deep_link_parity",
-      "detail_loading_states",
-      "browser_smoke",
-      "physical_device_readback"
+      "compact_and_detail_parity",
+      "german_english_parity",
+      "deep_link_and_history_parity",
+      "no_javascript_parity",
+      "offline_and_fault_fallback",
+      "supported_browser_matrix",
+      "four_times_cpu_budget",
+      "rollback_artifact",
+      "production_generation_readback",
+      "separate_physical_device_readback"
     ]
   }
 }

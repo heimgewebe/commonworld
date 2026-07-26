@@ -122,7 +122,7 @@
     {
       "id": "layer-journey-moveend-return",
       "verdict": "PASS",
-      "elapsedMs": 1752
+      "elapsedMs": 1532
     },
     {
       "id": "layer-journey-interrupted",
@@ -204,6 +204,16 @@
       ]
     },
     {
+      "id": "catalogue-detail-retry",
+      "verdict": "PASS",
+      "detailAttempts": 2
+    },
+    {
+      "id": "catalogue-detail-stale-response",
+      "verdict": "PASS",
+      "detailRequests": 2
+    },
+    {
       "id": "provider-failure",
       "verdict": "PASS",
       "applicationWarnings": 1
@@ -222,9 +232,9 @@
     }
   ],
   "binding": {
-    "smoke_script_sha256": "3200c9920686e22ea6c29cfefe6ca10a390a8122f5bae768fb8380bbb3a10faf",
+    "smoke_script_sha256": "86ecc70a425ca42682e846c02ff4a3a4945a799846beaf57249ed885f7560ea2",
     "smoke_runner_sha256": "522b99b70b1d0064b1d0a31a3a67fdc9a2e73b7408f37d1a4bb303bc360b7556",
-    "first_party_surface_sha256": "a05441ef09e5cacea70737d6fc272f2b56bd425ceeb50193aff2b37c896a6937",
+    "first_party_surface_sha256": "90bf319da38371db0c3f67052cfe700a581f331e6f9a31b65c68f0528df4e983",
     "scenario_ids": [
       "startup-and-ring-orbits",
       "ring-orbits-reduced-motion",
@@ -251,12 +261,14 @@
       "synthetic-catalogue-truth",
       "live-ui-hardening",
       "catalogue-network-blocked",
+      "catalogue-detail-retry",
+      "catalogue-detail-stale-response",
       "provider-failure",
       "method-desktop",
       "method-mobile",
       "method-mobile-text-200"
     ],
-    "freshness_rule": "The official runner must materialize the canonical smoke plan, create a fresh temporary public result and validate exact scenario order, PASS verdicts, manifest-plus-aggregate startup observation, selected-identity shard parity and zero forbidden canonical project requests against this hash-bound evidence.",
+    "freshness_rule": "The official runner must materialize the canonical smoke plan, create a fresh temporary public result and validate exact scenario order, PASS verdicts, manifest-plus-aggregate startup observation, selected-identity shard and content-addressed detail parity, bounded retry recovery, stale-response isolation and zero forbidden canonical project requests against this hash-bound evidence.",
     "smoke_plan_sha256": "6b8749928ead5ef81ee66883e6a2993e756ce083575c3569234bf70526448364"
   }
 }

@@ -10,6 +10,7 @@ CATALOG = ROOT / "catalog" / "catalog.json"
 OUT = ROOT / "catalog" / "runtime"
 SHARD_PREFIX_LENGTH = 2
 SPATIAL_CELL_DEGREES = 10
+DETAIL_DESCRIPTOR_VERSION = "1.0"
 
 
 def canonical_bytes(value: object) -> bytes:
@@ -40,7 +41,28 @@ def spatial_cell(coordinates: list[float]) -> str:
     return f"{x:02d}:{y:02d}"
 
 
-def compact_record(record: dict) -> dict:
+def detail_seed_entry(identifier: str, payload: bytes) -> dict:
+    digest = sha256(payload)
+    return {
+        "identity": identifier,
+        "url": f"catalog/runtime/details/{digest}.v1.json",
+        "sha256": digest,
+        "bytes": len(payload),
+    }
+
+
+def detail_descriptor(seed: dict, generation: str) -> dict:
+    return {
+        "version": DETAIL_DESCRIPTOR_VERSION,
+        "identity": seed["identity"],
+        "generation": generation,
+        "url": seed["url"],
+        "sha256": seed["sha256"],
+        "bytes": seed["bytes"],
+    }
+
+
+def compact_record(record: dict, detail: dict) -> dict:
     digital = record.get("presence", {}).get("digital", {})
     return {
         "id": record["id"],
@@ -54,17 +76,50 @@ def compact_record(record: dict) -> dict:
             "digital": bool(digital.get("available")),
         },
         "activity": record.get("activity", {}).get("status", "unknown"),
-        "detail": f"catalog/projects/{record['id']}.json",
+        "detail": detail,
     }
 
 
 def main() -> int:
     source = json.loads(CATALOG.read_text(encoding="utf-8"))
-    records = []
+    canonical_records: list[dict] = []
+    detail_payloads: dict[str, bytes] = {}
+    detail_seed_entries: list[dict] = []
     for relative in source["project_files"]:
         record = json.loads((ROOT / "catalog" / relative).read_text(encoding="utf-8"))
-        records.append(compact_record(record))
-    records.sort(key=lambda item: item["id"])
+        payload = canonical_bytes(record)
+        canonical_records.append(record)
+        detail_payloads[record["id"]] = payload
+        detail_seed_entries.append(detail_seed_entry(record["id"], payload))
+    canonical_records.sort(key=lambda item: item["id"])
+    detail_seed_entries.sort(key=lambda item: item["identity"])
+
+    source_catalog_sha256 = sha256(CATALOG.read_bytes())
+    detail_set_sha256 = sha256(canonical_bytes(detail_seed_entries))
+    generation_seed = {
+        "schema_version": "2.0",
+        "source_catalog_sha256": source_catalog_sha256,
+        "detail_set_sha256": detail_set_sha256,
+        "project_schema_version": 4,
+        "detail_descriptor_version": DETAIL_DESCRIPTOR_VERSION,
+    }
+    generation = sha256(canonical_bytes(generation_seed))
+    descriptors = {
+        seed["identity"]: detail_descriptor(seed, generation)
+        for seed in detail_seed_entries
+    }
+    records = [compact_record(record, descriptors[record["id"]]) for record in canonical_records]
+
+    details_dir = OUT / "details"
+    details_dir.mkdir(parents=True, exist_ok=True)
+    current_detail_names = {Path(descriptor["url"]).name for descriptor in descriptors.values()}
+    for stale in details_dir.glob("*.v1.json"):
+        if stale.name not in current_detail_names:
+            stale.unlink()
+    for identifier, payload in detail_payloads.items():
+        path = ROOT / descriptors[identifier]["url"]
+        path.write_bytes(payload)
+
     world = {"kind": "commonworld.world_index", "version": "1.0", "records": records}
     world_bytes = canonical_bytes(world)
     shards: dict[str, list[dict]] = {}
@@ -80,6 +135,7 @@ def main() -> int:
         path = shard_dir / f"{key}.v1.json"
         path.write_bytes(payload)
         shard_entries.append({"key": key, "url": f"catalog/runtime/shards/{key}.v1.json", "sha256": sha256(payload), "bytes": len(payload), "entry_count": len(shard_records)})
+
     indexes = {"themes": {}, "spatial_cells": {}, "digital": {"available": [], "unavailable": []}}
     for record in records:
         key = shard_key(record["id"])
@@ -90,8 +146,6 @@ def main() -> int:
             geometry = location.get("geometry", {})
             if geometry.get("type") == "Point" and len(geometry.get("coordinates", [])) >= 2:
                 indexes["spatial_cells"].setdefault(spatial_cell(geometry["coordinates"]), set()).add(key)
-    source_bytes = CATALOG.read_bytes()
-    source_catalog_sha256 = sha256(source_bytes)
     aggregate = {
         "kind": "commonworld.catalog_aggregate",
         "version": "1.0",
@@ -103,14 +157,6 @@ def main() -> int:
         "digital": {name: sorted(set(keys)) for name, keys in indexes["digital"].items()},
     }
     aggregate_bytes = canonical_bytes(aggregate)
-    generation_seed = {
-        "schema_version": "1.0",
-        "catalog_manifest_sha256": source_catalog_sha256,
-        "world_index_sha256": sha256(world_bytes),
-        "aggregate_sha256": sha256(aggregate_bytes),
-        "shards_sha256": sha256(canonical_bytes(shard_entries)),
-    }
-    generation = sha256(canonical_bytes(generation_seed))
     manifest = {
         "kind": "commonworld.catalog_runtime_manifest",
         "version": "1.0",
@@ -118,7 +164,14 @@ def main() -> int:
         "entry_count": len(records),
         "world_index": {"url": "catalog/runtime/world.v1.json", "sha256": sha256(world_bytes), "bytes": len(world_bytes)},
         "aggregate": {"url": "catalog/runtime/aggregate.v1.json", "sha256": sha256(aggregate_bytes), "bytes": len(aggregate_bytes)},
-        "detail_url_template": "catalog/projects/{id}.json",
+        "details": {
+            "strategy": "content-addressed-shard-descriptors",
+            "descriptor_version": DETAIL_DESCRIPTOR_VERSION,
+            "url_template": "catalog/runtime/details/{sha256}.v1.json",
+            "entry_count": len(records),
+            "detail_set_sha256": detail_set_sha256,
+            "project_schema_version": 4,
+        },
         "shards": {"strategy": "sha256-prefix", "prefix_length": SHARD_PREFIX_LENGTH, "entries": shard_entries},
         "source_catalog_sha256": source_catalog_sha256,
     }
@@ -126,7 +179,7 @@ def main() -> int:
     (OUT / "world.v1.json").write_bytes(world_bytes)
     (OUT / "aggregate.v1.json").write_bytes(aggregate_bytes)
     (OUT / "manifest.v1.json").write_bytes(canonical_bytes(manifest))
-    print(f"built catalog runtime generation {generation} with {len(records)} records")
+    print(f"built catalog runtime generation {generation} with {len(records)} records and {len(current_detail_names)} details")
     return 0
 
 
