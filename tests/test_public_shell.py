@@ -91,6 +91,9 @@ class PublicShellTests(unittest.TestCase):
         self.assertIn('id="text-skip-link" class="skip-link" href="#static-catalog-fallback"', html)
         fallback = html.split('id="static-catalog-fallback"', 1)[1]
         self.assertEqual(len(load_records(ROOT)), fallback.count('class="catalog-card"'))
+        self.assertIn('The complete linear catalog remains available here while the interactive view is loading or unavailable.', html)
+        self.assertIn("catalog?.querySelectorAll('.catalog-card[data-commonproject-id]')", app)
+        self.assertNotIn("document.querySelectorAll('.catalog-card[data-commonproject-id]')", app)
         self.assertIn("textSkipLink.setAttribute('href', '#text-view')", app)
         self.assertIn("document.querySelector('[data-static-catalog-fallback]')?.remove()", app)
 
@@ -135,6 +138,40 @@ class PublicShellTests(unittest.TestCase):
             errors = validate_public_shell(root)
         self.assertIn(
             'public shell missing required token: id="text-skip-link" class="skip-link" href="#static-catalog-fallback"',
+            errors,
+        )
+
+    def test_public_shell_rejects_global_catalog_card_filtering(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp_dir:
+            root = self.copy_shell(tmp_dir)
+            app_path = root / "assets/commonworld-app.js"
+            app_path.write_text(
+                app_path.read_text(encoding="utf-8").replace(
+                    "catalog?.querySelectorAll('.catalog-card[data-commonproject-id]')",
+                    "document.querySelectorAll('.catalog-card[data-commonproject-id]')",
+                    1,
+                ),
+                encoding="utf-8",
+            )
+            self.refresh_app_version(root)
+            errors = validate_public_shell(root)
+        self.assertIn('runtime catalog filtering must not mutate the bootstrap recovery surface', errors)
+
+    def test_public_shell_rejects_failure_claim_in_recovery_copy(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp_dir:
+            root = self.copy_shell(tmp_dir)
+            path = root / "index.html"
+            path.write_text(
+                path.read_text(encoding="utf-8").replace(
+                    'The complete linear catalog remains available here while the interactive view is loading or unavailable.',
+                    'The interactive globe is unavailable.',
+                    1,
+                ),
+                encoding="utf-8",
+            )
+            errors = validate_public_shell(root)
+        self.assertIn(
+            'public shell missing required token: The complete linear catalog remains available here while the interactive view is loading or unavailable.',
             errors,
         )
 

@@ -4,9 +4,9 @@
   "task_id": "COMMONWORLD-VISIONARY-COMMONS-V1",
   "base_commit": "932028d66adb1703c11e1739b59cfa84309744da",
   "measurement_method": {
-    "static": "scripts/measure_catalog_delivery.py; deterministic raw and gzip sizes, generated/canonical compact-projection parity, ordinary-DOM fallback counts, HTML tag counts and source-level startup fetch detection.",
+    "static": "scripts/measure_catalog_delivery.py; deterministic raw and gzip sizes, generated/canonical compact-projection parity, HTML tag counts and source-level startup fetch detection.",
     "browser": "scripts/measure_catalog_delivery_browser.mjs; isolated local no-store server, external requests blocked, Chromium profiles at fourfold CPU throttling.",
-    "timing_boundary": "Timing values are representative observations, not a claimed deterministic speedup. Request, byte, fallback and DOM properties are the primary causal evidence.",
+    "timing_boundary": "Timing values are representative observations, not a claimed deterministic speedup. Request, byte and DOM reductions are the primary causal evidence.",
     "baseline_static_scope": "Same-current-catalogue deterministic counterfactual: current compact generated bootstrap plus the legacy manifest and one project JSON refetch per current identity.",
     "baseline_browser_scope": "Historical 41-entry pre-optimization browser observation retained for request, DOM and timing context only; it is not a same-catalogue performance counterfactual."
   },
@@ -33,7 +33,7 @@
       },
       "html": {
         "raw_bytes": 114718,
-        "gzip_bytes": 16353,
+        "gzip_bytes": 16352,
         "start_tag_count": 1293,
         "catalog_card_instances": 65,
         "interactive_catalog_cards": 0,
@@ -272,7 +272,7 @@
       },
       "html": {
         "raw_bytes": 114718,
-        "gzip_bytes": 16353,
+        "gzip_bytes": 16352,
         "start_tag_count": 1293,
         "catalog_card_instances": 65,
         "interactive_catalog_cards": 0,
@@ -294,7 +294,7 @@
     "browser": {
       "schema_version": 1,
       "kind": "commonworld_catalog_delivery_browser_metrics",
-      "measured_at": "2026-07-26T12:49:15.144Z",
+      "measured_at": "2026-07-26T15:10:32.534Z",
       "cpu_throttle_rate": 4,
       "profiles": [
         {
@@ -304,47 +304,47 @@
             "height": 844
           },
           "cpu_throttle_rate": 4,
-          "runtime_ready_ms": 1063,
+          "runtime_ready_ms": 813,
           "dom_node_count": 1578,
           "catalog_card_count": 48,
           "interactive_catalog_card_count": 48,
           "runtime_ready": true,
           "runtime_failed": false,
-          "dom_content_loaded_ms": 648.1999999992549,
-          "load_event_ms": 684,
+          "dom_content_loaded_ms": 501.5,
+          "load_event_ms": 532.5,
           "resource_count": 16,
-          "script_duration_ms": 780.93,
-          "task_duration_ms": 1496.31,
+          "script_duration_ms": 554.48,
+          "task_duration_ms": 1100.49,
           "bootstrap_compile": {
-            "median_ms": 0.5,
-            "p95_ms": 0.8000000007450581,
+            "median_ms": 0.30000000447034836,
+            "p95_ms": 1,
             "samples_ms": [
               0,
-              0.09999999776482582,
               0.10000000149011612,
-              0.19999999925494194,
-              0.19999999925494194,
-              0.19999999925494194,
-              0.19999999925494194,
+              0.10000000149011612,
+              0.10000000149011612,
+              0.10000000149011612,
+              0.10000000149011612,
+              0.10000000149011612,
+              0.10000000149011612,
+              0.10000000149011612,
+              0.29999999701976776,
+              0.30000000447034836,
               0.3999999985098839,
-              0.3999999985098839,
-              0.4000000022351742,
-              0.5,
-              0.5,
-              0.5,
-              0.5,
-              0.5999999977648258,
               0.6000000014901161,
               0.6000000014901161,
-              0.6000000014901161,
-              0.6000000014901161,
-              0.8000000007450581,
-              3.2000000029802322
+              0.6999999955296516,
+              0.6999999955296516,
+              0.7000000029802322,
+              0.7999999970197678,
+              0.8999999985098839,
+              1,
+              2.399999998509884
             ]
           },
           "first_party_request_count": 15,
           "first_party_unique_request_count": 15,
-          "first_party_raw_bytes": 1834377,
+          "first_party_raw_bytes": 1834532,
           "first_party_requests": [
             "/",
             "/assets/commonworld-app.js",
@@ -362,7 +362,7 @@
             "/catalog/runtime/manifest.v1.json",
             "/index.css"
           ],
-          "first_party_surface_sha256": "f2a698dda9865538be6fa525f2a074a921e9d54482a6a4d2026e71985c3ad982",
+          "first_party_surface_sha256": "4c483925a0d4e419a4f5174db190c7b83df9188562a7bf75967272f38a4c3338",
           "project_json_request_count": 0,
           "project_json_unique_request_count": 0,
           "project_json_requests": []
@@ -374,47 +374,47 @@
             "height": 768
           },
           "cpu_throttle_rate": 4,
-          "runtime_ready_ms": 925,
+          "runtime_ready_ms": 728,
           "dom_node_count": 1578,
           "catalog_card_count": 48,
           "interactive_catalog_card_count": 48,
           "runtime_ready": true,
           "runtime_failed": false,
-          "dom_content_loaded_ms": 532.5,
-          "load_event_ms": 587.0999999977648,
+          "dom_content_loaded_ms": 450.70000000298023,
+          "load_event_ms": 482.20000000298023,
           "resource_count": 16,
-          "script_duration_ms": 794.78,
-          "task_duration_ms": 1550.78,
+          "script_duration_ms": 548.15,
+          "task_duration_ms": 972.13,
           "bootstrap_compile": {
-            "median_ms": 0.6000000014901161,
-            "p95_ms": 1,
+            "median_ms": 0.4000000059604645,
+            "p95_ms": 0.7999999970197678,
             "samples_ms": [
-              0,
-              0.09999999776482582,
-              0.09999999776482582,
-              0.19999999925494194,
-              0.3999999985098839,
-              0.3999999985098839,
-              0.3999999985098839,
+              0.09999999403953552,
+              0.09999999403953552,
+              0.10000000149011612,
+              0.10000000149011612,
+              0.10000000149011612,
+              0.19999999552965164,
+              0.19999999552965164,
+              0.19999999552965164,
+              0.20000000298023224,
+              0.29999999701976776,
+              0.4000000059604645,
+              0.4000000059604645,
+              0.4000000059604645,
               0.5,
               0.5,
-              0.5999999977648258,
               0.6000000014901161,
               0.6000000014901161,
-              0.6000000014901161,
-              0.6999999992549419,
               0.7000000029802322,
-              0.8000000007450581,
-              0.8999999985098839,
-              0.9000000022351742,
-              0.9000000022351742,
-              1,
-              1.1000000014901161
+              0.7999999970197678,
+              0.7999999970197678,
+              0.8000000044703484
             ]
           },
           "first_party_request_count": 15,
           "first_party_unique_request_count": 15,
-          "first_party_raw_bytes": 1834377,
+          "first_party_raw_bytes": 1834532,
           "first_party_requests": [
             "/",
             "/assets/commonworld-app.js",
@@ -432,7 +432,7 @@
             "/catalog/runtime/manifest.v1.json",
             "/index.css"
           ],
-          "first_party_surface_sha256": "f2a698dda9865538be6fa525f2a074a921e9d54482a6a4d2026e71985c3ad982",
+          "first_party_surface_sha256": "4c483925a0d4e419a4f5174db190c7b83df9188562a7bf75967272f38a4c3338",
           "project_json_request_count": 0,
           "project_json_unique_request_count": 0,
           "project_json_requests": []
@@ -445,36 +445,36 @@
       "profiles": {
         "mobile-low-power": {
           "runtime_ready_ms": {
-            "min": 1063,
-            "median": 1063,
-            "max": 1063
+            "min": 813,
+            "median": 813,
+            "max": 813
           },
           "script_duration_ms": {
-            "min": 780.93,
-            "median": 780.93,
-            "max": 780.93
+            "min": 554.48,
+            "median": 554.48,
+            "max": 554.48
           },
           "task_duration_ms": {
-            "min": 1496.31,
-            "median": 1496.31,
-            "max": 1496.31
+            "min": 1100.49,
+            "median": 1100.49,
+            "max": 1100.49
           }
         },
         "desktop-low-power": {
           "runtime_ready_ms": {
-            "min": 925,
-            "median": 925,
-            "max": 925
+            "min": 728,
+            "median": 728,
+            "max": 728
           },
           "script_duration_ms": {
-            "min": 794.78,
-            "median": 794.78,
-            "max": 794.78
+            "min": 548.15,
+            "median": 548.15,
+            "max": 548.15
           },
           "task_duration_ms": {
-            "min": 1550.78,
-            "median": 1550.78,
-            "max": 1550.78
+            "min": 972.13,
+            "median": 972.13,
+            "max": 972.13
           }
         }
       },
@@ -502,8 +502,8 @@
     "canonical CommonProject files remain complete and authoritative",
     "public manifest and per-project JSON remain addressable",
     "interactive cards are generated from the compact bootstrap",
-    "official links, source links and review dates remain available in the interactive projection",
-    "one complete generated linear catalogue remains outside the bootstrap module dependency until successful runtime startup",
+    "official links, source links, curation state and review dates remain available in the interactive projection",
+    "one complete ordinary-DOM recovery catalogue remains immutable until successful boot",
     "GitHub Pages static delivery and privacy boundary remain unchanged"
   ],
   "does_not_establish": [
@@ -517,7 +517,7 @@
   "validation": {
     "public_browser_smoke": {
       "verdict": "PASS",
-      "scenario_count": 30,
+      "scenario_count": 31,
       "scenario_ids": [
         "startup-and-ring-orbits",
         "ring-orbits-reduced-motion",
@@ -545,21 +545,16 @@
         "live-ui-hardening",
         "catalogue-network-blocked",
         "bootstrap-asset-failure-fallback",
+        "post-render-failure-preserves-fallback",
         "provider-failure",
         "method-desktop",
         "method-mobile",
         "method-mobile-text-200"
       ],
       "catalogue_network_blocked_requests": 0,
-      "bootstrap_asset_failure": {
-        "id": "bootstrap-asset-failure-fallback",
-        "verdict": "PASS",
-        "blockedBootstrapRequests": 1,
-        "fallbackCatalogCards": 65
-      },
-      "job_id": "848b64bb7d52",
-      "finalization_receipt_sha256": "bd72f658b502cbc0a0607bad77cb1da082de9090c04e3cb4f7a0788851a7cbd8",
-      "result_sha256": "6e018a52dc14259729b41875c96483cdab2d3d143b6e8823e0126f0788225dd2"
+      "job_id": "33af24b3480d",
+      "finalization_receipt_sha256": "41053dd827afa3ea13fef58d6ce69075c550f07d378ceae990e29bdb6466d892",
+      "result_sha256": "fba0979c754232079770d7b18f83a9666f1b0fca133b2cc1d214c0a092a9f13c"
     },
     "catalog_delivery_browser_measurement": {
       "verdict": "PASS",
@@ -568,7 +563,7 @@
         "desktop-low-power"
       ],
       "cpu_throttle_rate": 4,
-      "result_sha256": "5f58283233cadc47ed9e0627107fdc83f672685d10847272749423fc25d31829"
+      "result_sha256": "51b78f32d0082564cbd05d98a2138f897c5717ae29cc8d7dbfdd39f92c7cf126"
     }
   },
   "budget_binding": {
@@ -576,5 +571,5 @@
     "warn_bootstrap_gzip_bytes": 28672,
     "max_bootstrap_gzip_bytes": 32768
   },
-  "current_surface_note": "The current 65-entry surface uses a compact build-bound bootstrap, strips internal relation evidence identifiers from startup data, keeps selected compact shards as shadow parity checks, and preserves one complete linear recovery catalogue outside the bootstrap module dependency."
+  "current_surface_note": "Catalog Platform v1 observes the hash-bound aggregate for the current 65-entry surface; the visible application uses a compact build-bound bootstrap, selected compact shards remain a shadow parity check, and runtime detail loading is not enabled."
 }

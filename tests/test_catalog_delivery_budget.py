@@ -8,6 +8,7 @@ from scripts.measure_catalog_delivery import load_bootstrap_records, measure
 from scripts.validate_catalog_delivery_budget import (
     BOOTSTRAP_ASSET_FAILURE_SCENARIO,
     CATALOGUE_NETWORK_BLOCKED_SCENARIO,
+    POST_RENDER_FAILURE_SCENARIO,
     ROOT,
     validate,
     validate_actual_smoke,
@@ -181,6 +182,22 @@ class CatalogDeliveryBudgetTests(unittest.TestCase):
         scenario['blockedBootstrapRequests'] = 0
         errors = validate_actual_smoke(actual, expected)
         self.assertIn('fresh public browser smoke expected exactly one blocked bootstrap request, got 0', errors)
+
+    def test_fresh_smoke_rejects_non_neutral_bootstrap_failure_copy(self) -> None:
+        expected = self.fresh_smoke()
+        actual = json.loads(json.dumps(expected))
+        scenario = next(item for item in actual['scenarios'] if item['id'] == BOOTSTRAP_ASSET_FAILURE_SCENARIO)
+        scenario['neutralRecoveryCopy'] = False
+        errors = validate_actual_smoke(actual, expected)
+        self.assertIn('fresh public browser smoke bootstrap fallback does not prove neutral recovery copy', errors)
+
+    def test_fresh_smoke_rejects_mutated_post_render_fallback(self) -> None:
+        expected = self.fresh_smoke()
+        actual = json.loads(json.dumps(expected))
+        scenario = next(item for item in actual['scenarios'] if item['id'] == POST_RENDER_FAILURE_SCENARIO)
+        scenario['hiddenFallbackCatalogCards'] = 17
+        errors = validate_actual_smoke(actual, expected)
+        self.assertIn('fresh public browser smoke post-render failure fallback hides 17 card(s)', errors)
 
     def test_validator_rejects_deliberate_bootstrap_budget_breach(self) -> None:
         with tempfile.TemporaryDirectory() as tmp:

@@ -266,8 +266,8 @@ SHELL_REPLACEMENTS_EN = {
     '<section><h3>Offizielle Links</h3>': '<section><h3>Official links</h3>',
     '<section><h3>Quellen</h3>': '<section><h3>Sources</h3>',
     '<section><h3>Kuration</h3>': '<section><h3>Curation</h3>',
-    '<h1 id="static-catalog-fallback-title">Statischer Commonworld-Katalog</h1>': '<h1 id="static-catalog-fallback-title">Static Commonworld catalog</h1>',
-    'Der interaktive Globus ist nicht verfügbar. Alle geprüften Commons und ihre Daten bleiben hier erreichbar.': 'The interactive globe is unavailable. All reviewed Commons and their data remain accessible here.',
+    '<h1 id="static-catalog-fallback-title">Commonworld-Katalog</h1>': '<h1 id="static-catalog-fallback-title">Commonworld catalog</h1>',
+    'Der vollständige lineare Katalog bleibt hier erreichbar, während die interaktive Ansicht lädt oder nicht verfügbar ist.': 'The complete linear catalog remains available here while the interactive view is loading or unavailable.',
 }
 
 METHOD_REPLACEMENTS_EN = {

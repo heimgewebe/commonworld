@@ -2207,7 +2207,7 @@ function renderTextView() {
   for (const record of presented) {
     if (!catalog?.querySelector(`.catalog-card[data-commonproject-id="${CSS.escape(record.id)}"]`)) catalog?.append(createRuntimeCatalogCard(record));
   }
-  document.querySelectorAll('.catalog-card[data-commonproject-id]').forEach((card) => {
+  catalog?.querySelectorAll('.catalog-card[data-commonproject-id]').forEach((card) => {
     card.hidden = !visibleIds.has(card.dataset.commonprojectId);
   });
   for (const record of presented) {
@@ -3673,6 +3673,9 @@ async function boot() {
     }
     applyDeepLink(location.search, { initial: true });
     renderDiscoveryState();
+    if (navigator.webdriver && ['127.0.0.1', 'localhost'].includes(location.hostname)) {
+      window.__commonworldBeforeRecoveryRemovalForTest?.();
+    }
     const textSkipLink = document.querySelector('#text-skip-link');
     if (textSkipLink) textSkipLink.setAttribute('href', '#text-view');
     document.querySelector('[data-static-catalog-fallback]')?.remove();

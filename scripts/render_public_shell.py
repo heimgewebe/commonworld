@@ -443,8 +443,8 @@ def render_shell(root: Path = ROOT, locale: str = FALLBACK_LOCALE) -> str:
 
       <section id="static-catalog-fallback" class="static-catalog-fallback" aria-labelledby="static-catalog-fallback-title" data-static-catalog-fallback>
         <p class="kicker">Textansicht</p>
-        <h1 id="static-catalog-fallback-title">Statischer Commonworld-Katalog</h1>
-        <p>Der interaktive Globus ist nicht verfügbar. Alle geprüften Commons und ihre Daten bleiben hier erreichbar.</p>
+        <h1 id="static-catalog-fallback-title">Commonworld-Katalog</h1>
+        <p>Der vollständige lineare Katalog bleibt hier erreichbar, während die interaktive Ansicht lädt oder nicht verfügbar ist.</p>
         <div class="catalog-grid">
 {fallback_cards}
         </div>

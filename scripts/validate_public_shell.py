@@ -62,6 +62,7 @@ REQUIRED_HTML = (
     'id="static-catalog-fallback"',
     'data-static-catalog-fallback',
     'id="text-skip-link" class="skip-link" href="#static-catalog-fallback"',
+    'The complete linear catalog remains available here while the interactive view is loading or unavailable.',
     'id="project-focus"',
     'href="./catalog/catalog.json"',
     'href="./contracts/commonworld/project.schema.json"',
@@ -167,7 +168,10 @@ def validate_public_shell(root: Path = ROOT) -> list[str]:
     css_version = hashlib.sha256(css_path.read_bytes()).hexdigest()[:12]
     if f'<script type="module" src="./assets/commonworld-app.js?v={app_version}"></script>' not in html:
         errors.append('public shell must load commonworld-app.js with its deterministic content hash')
+    if "document.querySelectorAll('.catalog-card[data-commonproject-id]')" in app:
+        errors.append('runtime catalog filtering must not mutate the bootstrap recovery surface')
     for token in (
+        "catalog?.querySelectorAll('.catalog-card[data-commonproject-id]')",
         "document.querySelector('#text-skip-link')",
         "textSkipLink.setAttribute('href', '#text-view')",
         "document.querySelector('[data-static-catalog-fallback]')?.remove()",
