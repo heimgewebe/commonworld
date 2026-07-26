@@ -566,7 +566,8 @@ function loadCatalogDetailOnce(compactRecord) {
 
 function retryCatalogDetailShadow(identifier = runtime.state.project) {
   if (!identifier || identifier !== runtime.state.project || !runtime.catalogShadowEnabled) return;
-  void observeCatalogRecordShadow(identifier, { retrying: true });
+  setCatalogDetailShadowState('retrying', { identifier });
+  void observeCatalogPlatform({ retryIdentifier: identifier, forceRefresh: true });
 }
 
 async function observeCatalogRecordShadow(identifier = runtime.state.project, { retrying = false } = {}) {
@@ -3740,13 +3741,19 @@ function ensureMap() {
   if (!runtime.map) createMap();
 }
 
-async function observeCatalogPlatform() {
+async function observeCatalogPlatform({ retryIdentifier = null, forceRefresh = false } = {}) {
+  const previousGeneration = runtime.catalogPlatform?.manifest?.generation ?? null;
   runtime.catalogPlatformState = 'loading';
   elements.stage.dataset.catalogPlatform = 'loading';
+  if (forceRefresh) {
+    runtime.catalogPlatform = null;
+    runtime.catalogShardLoads.clear();
+    runtime.catalogDetailLoads.clear();
+  }
   try {
     const platform = await loadCatalogAggregate();
     const { manifest, aggregate } = platform;
-    if (runtime.catalogPlatform?.manifest?.generation !== manifest.generation) {
+    if (!forceRefresh && previousGeneration !== manifest.generation) {
       runtime.catalogShardLoads.clear();
       runtime.catalogDetailLoads.clear();
     }
@@ -3756,12 +3763,18 @@ async function observeCatalogPlatform() {
     elements.stage.dataset.catalogGeneration = manifest.generation;
     elements.stage.dataset.catalogAggregateThemes = String(Object.keys(aggregate.themes ?? {}).length);
     elements.stage.dataset.catalogAggregateCells = String(Object.keys(aggregate.spatial_cells ?? {}).length);
-    void observeCatalogRecordShadow(runtime.state.project);
+    const selectedIdentifier = retryIdentifier && runtime.state.project === retryIdentifier
+      ? retryIdentifier
+      : runtime.state.project;
+    void observeCatalogRecordShadow(selectedIdentifier, { retrying: selectedIdentifier === retryIdentifier });
   } catch (error) {
     runtime.catalogPlatform = null;
     runtime.catalogPlatformState = 'degraded';
     elements.stage.dataset.catalogPlatform = 'degraded';
-    void observeCatalogRecordShadow(runtime.state.project);
+    const selectedIdentifier = retryIdentifier && runtime.state.project === retryIdentifier
+      ? retryIdentifier
+      : runtime.state.project;
+    void observeCatalogRecordShadow(selectedIdentifier);
     console.warn('Commonworld catalog aggregate unavailable; compatible bootstrap remains active', error);
   }
 }

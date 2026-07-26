@@ -192,6 +192,7 @@ def validate_current_state(root: Path = ROOT) -> list[str]:
         "runtime_catalogue_cache_limits": {"shards": 8, "details": 16},
         "runtime_catalogue_selection_states": ["idle", "loading", "retrying", "ready", "mismatch", "degraded"],
         "runtime_catalogue_failure_policy": "keep_compatible_bootstrap",
+        "runtime_catalogue_retry_policy": "reload_platform_and_clear_shadow_caches",
         "runtime_catalogue_cutover_authorized": False,
         "build_and_ci_catalogue_parity_check": True,
         "no_javascript_projection": "generated_static_catalogue_preserved",
@@ -225,9 +226,14 @@ def validate_current_state(root: Path = ROOT) -> list[str]:
     if transition.get("cutover_authorized") is not catalog_delivery.get("runtime_catalogue_cutover_authorized"):
         errors.append("catalog platform and current state disagree on bootstrap cutover authorization")
     if (
+        runtime_cache.get("explicit_retry_refresh") != "reload_manifest_aggregate_and_clear_shard_detail_caches"
+        or catalog_delivery.get("runtime_catalogue_retry_policy") != "reload_platform_and_clear_shadow_caches"
+    ):
+        errors.append("catalog platform and current state disagree on fresh retry policy")
+    if (
         transition.get("aggregate_failure_policy") != "keep_compatible_bootstrap_and_mark_degraded"
         or transition.get("shard_failure_policy") != "keep_compatible_bootstrap_and_mark_selected_identity_degraded"
-        or transition.get("detail_failure_policy") != "keep_compatible_bootstrap_and_offer_selected_identity_retry"
+        or transition.get("detail_failure_policy") != "keep_compatible_bootstrap_and_offer_selected_identity_fresh_platform_retry"
         or catalog_delivery.get("runtime_catalogue_failure_policy") != "keep_compatible_bootstrap"
     ):
         errors.append("catalog platform and current state disagree on runtime fallback policy")
@@ -251,6 +257,7 @@ def validate_current_state(root: Path = ROOT) -> list[str]:
         "function loadCatalogShardOnce(",
         "function loadCatalogDetailOnce(",
         "function retryCatalogDetailShadow(",
+        "observeCatalogPlatform({ retryIdentifier: identifier, forceRefresh: true })",
         "dataset.catalogDelivery = 'build-bound-bootstrap'",
         "catalogDetailShadow",
     )

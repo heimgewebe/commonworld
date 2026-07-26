@@ -271,7 +271,7 @@
       },
       "html": {
         "raw_bytes": 195949,
-        "gzip_bytes": 24412,
+        "gzip_bytes": 24411,
         "start_tag_count": 2134,
         "catalog_card_instances": 116,
         "interactive_catalog_cards": 58,
@@ -292,7 +292,7 @@
     "browser": {
       "schema_version": 1,
       "kind": "commonworld_catalog_delivery_browser_metrics",
-      "measured_at": "2026-07-26T10:37:11.080Z",
+      "measured_at": "2026-07-26T11:33:19.100Z",
       "cpu_throttle_rate": 4,
       "profiles": [
         {
@@ -302,23 +302,21 @@
             "height": 844
           },
           "cpu_throttle_rate": 4,
-          "runtime_ready_ms": 694,
+          "runtime_ready_ms": 713,
           "dom_node_count": 2032,
           "catalog_card_count": 58,
           "interactive_catalog_card_count": 58,
           "runtime_ready": true,
           "runtime_failed": false,
-          "dom_content_loaded_ms": 422,
-          "load_event_ms": 455.1000000014901,
+          "dom_content_loaded_ms": 439.80000000074506,
+          "load_event_ms": 469.19999999925494,
           "resource_count": 16,
-          "script_duration_ms": 517.18,
-          "task_duration_ms": 986.65,
+          "script_duration_ms": 539.39,
+          "task_duration_ms": 1003.33,
           "bootstrap_compile": {
-            "median_ms": 0.3999999985098839,
-            "p95_ms": 0.8000000007450581,
+            "median_ms": 0.30000000074505806,
+            "p95_ms": 1.0999999977648258,
             "samples_ms": [
-              0,
-              0,
               0,
               0,
               0,
@@ -326,23 +324,25 @@
               0,
               0.09999999776482582,
               0.10000000149011612,
+              0.10000000149011612,
               0.19999999925494194,
+              0.30000000074505806,
+              0.30000000074505806,
               0.3999999985098839,
-              0.5,
+              0.5999999977648258,
               0.6000000014901161,
-              0.6000000014901161,
-              0.6000000014901161,
-              0.6999999992549419,
-              0.6999999992549419,
               0.6999999992549419,
               0.8000000007450581,
               0.8000000007450581,
+              0.8000000007450581,
+              0.8000000007450581,
+              1.0999999977648258,
               2.699999999254942
             ]
           },
           "first_party_request_count": 15,
           "first_party_unique_request_count": 15,
-          "first_party_raw_bytes": 1994919,
+          "first_party_raw_bytes": 1995605,
           "first_party_requests": [
             "/",
             "/assets/commonworld-app.js",
@@ -360,7 +360,7 @@
             "/catalog/runtime/manifest.v1.json",
             "/index.css"
           ],
-          "first_party_surface_sha256": "90bf319da38371db0c3f67052cfe700a581f331e6f9a31b65c68f0528df4e983",
+          "first_party_surface_sha256": "98dc9460984858e1e7a90048ca85c320da57946ae4de02f6bb0d44bcb0361dd1",
           "project_json_request_count": 0,
           "project_json_unique_request_count": 0,
           "project_json_requests": []
@@ -372,47 +372,47 @@
             "height": 768
           },
           "cpu_throttle_rate": 4,
-          "runtime_ready_ms": 671,
+          "runtime_ready_ms": 724,
           "dom_node_count": 2032,
           "catalog_card_count": 58,
           "interactive_catalog_card_count": 58,
           "runtime_ready": true,
           "runtime_failed": false,
-          "dom_content_loaded_ms": 390.8999999985099,
-          "load_event_ms": 422.1000000014901,
+          "dom_content_loaded_ms": 424.19999999925494,
+          "load_event_ms": 459.5,
           "resource_count": 16,
-          "script_duration_ms": 552.31,
-          "task_duration_ms": 942.59,
+          "script_duration_ms": 584.75,
+          "task_duration_ms": 1011.36,
           "bootstrap_compile": {
-            "median_ms": 0.6000000014901161,
-            "p95_ms": 1,
+            "median_ms": 0.7999999970197678,
+            "p95_ms": 1.199999999254942,
             "samples_ms": [
-              0.09999999776482582,
               0.19999999925494194,
               0.19999999925494194,
-              0.19999999925494194,
+              0.30000000074505806,
               0.3999999985098839,
               0.4000000022351742,
-              0.5,
-              0.5,
-              0.5,
               0.6000000014901161,
-              0.6000000014901161,
+              0.6999999992549419,
+              0.6999999992549419,
               0.7000000029802322,
+              0.7999999970197678,
+              0.7999999970197678,
               0.8000000007450581,
               0.8000000007450581,
               0.8999999985098839,
               0.8999999985098839,
-              0.8999999985098839,
+              0.9000000022351742,
+              0.9000000022351742,
               1,
-              1,
-              1,
-              1.1000000014901161
+              1.199999999254942,
+              1.199999999254942,
+              1.300000000745058
             ]
           },
           "first_party_request_count": 15,
           "first_party_unique_request_count": 15,
-          "first_party_raw_bytes": 1994919,
+          "first_party_raw_bytes": 1995605,
           "first_party_requests": [
             "/",
             "/assets/commonworld-app.js",
@@ -430,7 +430,7 @@
             "/catalog/runtime/manifest.v1.json",
             "/index.css"
           ],
-          "first_party_surface_sha256": "90bf319da38371db0c3f67052cfe700a581f331e6f9a31b65c68f0528df4e983",
+          "first_party_surface_sha256": "98dc9460984858e1e7a90048ca85c320da57946ae4de02f6bb0d44bcb0361dd1",
           "project_json_request_count": 0,
           "project_json_unique_request_count": 0,
           "project_json_requests": []
@@ -443,36 +443,36 @@
       "profiles": {
         "mobile-low-power": {
           "runtime_ready_ms": {
-            "min": 694,
-            "median": 694,
-            "max": 694
+            "min": 713,
+            "median": 713,
+            "max": 713
           },
           "script_duration_ms": {
-            "min": 517.18,
-            "median": 517.18,
-            "max": 517.18
+            "min": 539.39,
+            "median": 539.39,
+            "max": 539.39
           },
           "task_duration_ms": {
-            "min": 986.65,
-            "median": 986.65,
-            "max": 986.65
+            "min": 1003.33,
+            "median": 1003.33,
+            "max": 1003.33
           }
         },
         "desktop-low-power": {
           "runtime_ready_ms": {
-            "min": 671,
-            "median": 671,
-            "max": 671
+            "min": 724,
+            "median": 724,
+            "max": 724
           },
           "script_duration_ms": {
-            "min": 552.31,
-            "median": 552.31,
-            "max": 552.31
+            "min": 584.75,
+            "median": 584.75,
+            "max": 584.75
           },
           "task_duration_ms": {
-            "min": 942.59,
-            "median": 942.59,
-            "max": 942.59
+            "min": 1011.36,
+            "median": 1011.36,
+            "max": 1011.36
           }
         }
       },
@@ -514,7 +514,7 @@
   "validation": {
     "public_browser_smoke": {
       "verdict": "PASS",
-      "scenario_count": 31,
+      "scenario_count": 32,
       "scenario_ids": [
         "startup-and-ring-orbits",
         "ring-orbits-reduced-motion",
@@ -541,6 +541,7 @@
         "synthetic-catalogue-truth",
         "live-ui-hardening",
         "catalogue-network-blocked",
+        "catalogue-platform-retry",
         "catalogue-detail-retry",
         "catalogue-detail-stale-response",
         "provider-failure",
@@ -549,9 +550,11 @@
         "method-mobile-text-200"
       ],
       "catalogue_network_blocked_requests": 0,
-      "durable_task_id": "0e0bc9b20a6d4319945f04bd",
-      "lifecycle_receipt_sha256": "601ae8260cde8b5def4674179ca34698dbbd1c166ff22e74d0eefcf7bd4eb060",
-      "result_sha256": "7dbcf988b15a39be590d401fdc7677e9d642c831ad0731804c004bbf8d015951"
+      "catalogue_platform_retry_manifest_attempts": 2,
+      "catalogue_detail_retry_attempts": 2,
+      "durable_job_id": "85dd5b2571e3",
+      "finalization_receipt_sha256": "d0a943cdb76162f8e951ae7e6313023758fa108a79a8cd918978324ba0dc5f37",
+      "result_sha256": "e86a28d3d1176c2ffcac204e2535de398bc956977db6171d9dd0e207915e2e7c"
     },
     "proposal_browser_smoke": {
       "verdict": "PASS",
@@ -578,9 +581,9 @@
         "desktop-low-power"
       ],
       "cpu_throttle_rate": 4,
-      "durable_task_id": "b4761e14ceaf463d9b0bf9c8",
-      "lifecycle_receipt_sha256": "5cdbcf6603c2a092bd3138eef7bae3050e65ef4511d6fbfa8e41a779563d8155",
-      "result_sha256": "00be98bdffff86be59902830cb46078b057ef49173d935286c6ed692b98abb8d"
+      "durable_task_id": "643b6e4ecf35466d96c60704",
+      "lifecycle_receipt_sha256": "d8f723efece9938833dcab87a116abcfaa1a7178d720ad6987e74af4d902330b",
+      "result_sha256": "814b4d33c2ebac6730d6b3c478af5110dc799af7abea3a838eefcb1a8d619b79"
     },
     "official_browser_runner": {
       "verdict": "PASS",
@@ -592,6 +595,12 @@
       ],
       "durable_task_id": "fa6c4e1affbc",
       "lifecycle_receipt_sha256": "7453571544985ea9d1893002821df0d5b2cacfcb520ab0f9730e1d58a1ea2185"
+    },
+    "catalog_delivery_static_measurement": {
+      "verdict": "PASS",
+      "durable_task_id": "49b29b199efc48fdb5ce7f43",
+      "lifecycle_receipt_sha256": "2578ed0dd93f334b7237bb08f77e9a4349bfe8be1268d7e56d672bf437c00ea1",
+      "result_sha256": "fe138b3ef4e7e9fa3cb2788a59d6c588365a54fcbd10d34727644c431520f374"
     }
   },
   "budget_binding": {
@@ -599,5 +608,5 @@
     "warn_bootstrap_gzip_bytes": 28672,
     "max_bootstrap_gzip_bytes": 32768
   },
-  "current_surface_note": "Catalog Platform v1 loads manifest and aggregate at startup, then verifies one selected compact shard and one content-addressed detail artifact in shadow mode. Visible data remains the build-bound bootstrap; detail failure, retry and stale-response isolation are browser-proven, and startup performs zero canonical project JSON requests."
+  "current_surface_note": "Catalog Platform v1 loads manifest and aggregate at startup, then verifies one selected compact shard and one content-addressed detail artifact in shadow mode. Explicit retry clears both shadow caches and reloads manifest, aggregate, selected shard and selected detail. Visible data remains the build-bound bootstrap; platform failure, detail failure, retry recovery and stale-response isolation are browser-proven on the final generated shell, and startup performs zero canonical project JSON requests."
 }

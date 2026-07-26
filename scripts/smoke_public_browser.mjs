@@ -2859,6 +2859,11 @@ async function catalogueNetworkBlockedScenario() {
 async function catalogueDetailRetryScenario() {
   process.stdout.write(`${JSON.stringify({ state: 'RUNNING', scenario: 'catalogue-detail-retry' })}\n`);
   const run = await newPage();
+  const catalogRequests = [];
+  run.page.on('request', (request) => {
+    const pathname = new URL(request.url()).pathname;
+    if (pathname.startsWith('/catalog/runtime/')) catalogRequests.push(pathname);
+  });
   let detailAttempts = 0;
   await run.page.route('**/catalog/runtime/details/*.v1.json', (route) => {
     detailAttempts += 1;
@@ -2889,6 +2894,10 @@ async function catalogueDetailRetryScenario() {
       && !stage.dataset.catalogDetailRetry;
   });
   assert(detailAttempts === 2, `detail retry: expected one failed attempt and one retry, got ${detailAttempts}`);
+  for (const expectedPath of ['/catalog/runtime/manifest.v1.json', '/catalog/runtime/aggregate.v1.json', '/catalog/runtime/shards/81.v1.json']) {
+    const count = catalogRequests.filter((pathname) => pathname === expectedPath).length;
+    assert(count === 2, `detail retry: explicit retry did not refresh ${expectedPath} exactly once (${JSON.stringify(catalogRequests)})`);
+  }
   assert(await retry.isHidden(), 'detail retry: retry action remained visible after recovery');
   assert((await run.page.evaluate(() => document.activeElement?.id)) === 'project-focus', 'detail retry: successful retry left focus on a hidden control');
   assert((await run.page.locator('.globe-stage').getAttribute('data-catalog-delivery')) === 'build-bound-bootstrap', 'detail retry: retry changed the visible data source');
@@ -2900,6 +2909,52 @@ async function catalogueDetailRetryScenario() {
   assert(expectedNetworkErrors.length === 1, `detail retry: expected exactly one aborted-resource console error (${JSON.stringify(run.consoleErrors)})`);
   assert(unexpectedConsoleErrors.length === 0, `detail retry: unexpected console errors: ${unexpectedConsoleErrors.join(' | ')}`);
   results.push({ id: 'catalogue-detail-retry', verdict: 'PASS', detailAttempts });
+  await run.context.close();
+}
+
+async function cataloguePlatformRetryScenario() {
+  process.stdout.write(`${JSON.stringify({ state: 'RUNNING', scenario: 'catalogue-platform-retry' })}\n`);
+  const run = await newPage();
+  let manifestAttempts = 0;
+  await run.page.route('**/catalog/runtime/manifest.v1.json', (route) => {
+    manifestAttempts += 1;
+    if (manifestAttempts === 1) return route.abort('failed');
+    return route.continue();
+  });
+  await run.page.goto(baseUrl, { waitUntil: 'domcontentloaded' });
+  await run.page.waitForSelector('html.runtime-ready');
+  await run.page.waitForFunction(() => document.querySelector('.globe-stage')?.dataset.catalogPlatform === 'degraded');
+  await run.page.locator('#commons-search').fill('Debian');
+  await run.page.waitForTimeout(220);
+  await run.page.locator('.discovery-result-main[data-commonproject-id="debian"]').click();
+  await run.page.waitForFunction(() => {
+    const stage = document.querySelector('.globe-stage');
+    return stage?.dataset.catalogDetailShadow === 'degraded'
+      && stage.dataset.catalogDetailRetry === 'available';
+  });
+  assert((await run.page.locator('#focus-title').textContent()) === 'Debian', 'platform retry: embedded record disappeared after manifest failure');
+  const retry = run.page.locator('#focus-catalog-detail-retry');
+  assert(await retry.isVisible(), 'platform retry: retry action is not visible after manifest failure');
+  await retry.click();
+  await run.page.waitForFunction(() => {
+    const stage = document.querySelector('.globe-stage');
+    return stage?.dataset.catalogPlatform === 'ready'
+      && stage.dataset.catalogRecordShadow === 'ready'
+      && stage.dataset.catalogDetailShadow === 'ready'
+      && stage.dataset.catalogDetailShadowId === 'debian';
+  });
+  assert(manifestAttempts === 2, `platform retry: expected one failed manifest request and one fresh retry, got ${manifestAttempts}`);
+  assert(await retry.isHidden(), 'platform retry: retry action remained visible after recovery');
+  assert((await run.page.evaluate(() => document.activeElement?.id)) === 'project-focus', 'platform retry: successful retry left focus on a hidden control');
+  assert((await run.page.locator('.globe-stage').getAttribute('data-catalog-delivery')) === 'build-bound-bootstrap', 'platform retry: retry changed the visible data source');
+  const warnings = run.consoleWarnings.filter((message) => message.includes('Commonworld catalog aggregate unavailable'));
+  assert(warnings.length === 1, `platform retry: expected one bounded aggregate warning (${JSON.stringify(run.consoleWarnings)})`);
+  const expectedNetworkErrors = run.consoleErrors.filter((message) => message.includes('Failed to load resource: net::ERR_FAILED'));
+  const unexpectedConsoleErrors = run.consoleErrors.filter((message) => !message.includes('Failed to load resource: net::ERR_FAILED'));
+  assert(expectedNetworkErrors.length === 1, `platform retry: expected exactly one aborted-resource console error (${JSON.stringify(run.consoleErrors)})`);
+  assert(unexpectedConsoleErrors.length === 0, `platform retry: unexpected console errors: ${unexpectedConsoleErrors.join(' | ')}`);
+  assert(run.pageErrors.length === 0, `platform retry: page errors: ${run.pageErrors.join(' | ')}`);
+  results.push({ id: 'catalogue-platform-retry', verdict: 'PASS', manifestAttempts });
   await run.context.close();
 }
 
@@ -3077,6 +3132,7 @@ try {
   await syntheticCatalogueTruthScenario();
   await liveUiHardeningScenario();
   await catalogueNetworkBlockedScenario();
+  await cataloguePlatformRetryScenario();
   await catalogueDetailRetryScenario();
   await catalogueDetailStaleResponseScenario();
   await providerFailureScenario();

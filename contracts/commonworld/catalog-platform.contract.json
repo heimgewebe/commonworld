@@ -92,7 +92,8 @@
     "details_max_entries": 16,
     "eviction": "least_recently_used_deterministic",
     "failed_promises_retained": false,
-    "generation_change_clears_caches": true
+    "generation_change_clears_caches": true,
+    "explicit_retry_refresh": "reload_manifest_aggregate_and_clear_shard_detail_caches"
   },
   "weltgewebe_alignment": {
     "canonical_store": "postgresql",
@@ -130,7 +131,7 @@
     ],
     "aggregate_failure_policy": "keep_compatible_bootstrap_and_mark_degraded",
     "shard_failure_policy": "keep_compatible_bootstrap_and_mark_selected_identity_degraded",
-    "detail_failure_policy": "keep_compatible_bootstrap_and_offer_selected_identity_retry",
+    "detail_failure_policy": "keep_compatible_bootstrap_and_offer_selected_identity_fresh_platform_retry",
     "stale_response_policy": "selection_generation_must_match_before_state_commit",
     "selected_identity_parity_fields": [
       "id",

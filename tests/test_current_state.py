@@ -95,6 +95,17 @@ class CurrentStateTests(unittest.TestCase):
             errors = validate_current_state(root)
         self.assertIn("catalog platform and current state disagree on runtime catalogue cache limits", errors)
 
+
+    def test_catalog_delivery_rejects_retry_policy_drift(self) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            root = self.copy_current_state(directory)
+            path = root / "contracts/commonworld/catalog-platform.contract.json"
+            value = json.loads(path.read_text(encoding="utf-8"))
+            value["runtime_cache"]["explicit_retry_refresh"] = "reuse_cached_promises"
+            path.write_text(json.dumps(value), encoding="utf-8")
+            errors = validate_current_state(root)
+        self.assertIn("catalog platform and current state disagree on fresh retry policy", errors)
+
     def test_catalog_delivery_rejects_cutover_without_authority(self) -> None:
         with tempfile.TemporaryDirectory() as directory:
             root = self.copy_current_state(directory)
