@@ -869,6 +869,17 @@ async function normalScenario() {
   const debianResult = run.page.locator('.discovery-result-main[data-commonproject-id="debian"]');
   await debianResult.click();
   assert(await run.page.locator('#project-focus').isVisible(), 'normal: project focus did not open');
+  await run.page.waitForFunction(() => {
+    const stage = document.querySelector('.globe-stage');
+    return stage?.dataset.catalogRecordShadow === 'ready'
+      && stage.dataset.catalogRecordShadowId === 'debian';
+  });
+  const catalogShadow = await run.page.locator('.globe-stage').evaluate((stage) => ({
+    state: stage.dataset.catalogRecordShadow,
+    id: stage.dataset.catalogRecordShadowId,
+    shard: stage.dataset.catalogRecordShadowShard,
+  }));
+  assert(catalogShadow.state === 'ready' && catalogShadow.id === 'debian' && /^[0-9a-f]{2}$/.test(catalogShadow.shard ?? ''), `normal: selected catalog shard shadow did not reach parity (${JSON.stringify(catalogShadow)})`);
   const focusOnlyState = await primaryOverlayState(run.page);
   assert(focusOnlyState.focusVisible && !focusOnlyState.discoveryVisible && !focusOnlyState.settingsVisible && !focusOnlyState.focusInert && focusOnlyState.focusAriaHidden === null, 'normal: visible project focus kept suppressed accessibility state ' + JSON.stringify(focusOnlyState));
   assert((await run.page.evaluate(() => document.activeElement?.id)) === 'project-focus', 'normal: project focus did not receive focus');

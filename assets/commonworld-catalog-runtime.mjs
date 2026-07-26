@@ -1,6 +1,12 @@
 const MANIFEST_URL = './catalog/runtime/manifest.v1.json';
 const SHA256_PATTERN = /^[0-9a-f]{64}$/;
 const SHARD_KEY_PATTERN = /^[0-9a-f]{2}$/;
+const IDENTITY_PATTERN = /^[a-z][a-z0-9-]{2,95}$/;
+const THEME_PATTERN = /^[a-z][a-z0-9-]{1,63}$/;
+const LANGUAGE_PATTERN = /^[a-z]{2,3}(?:-[A-Z]{2})?$/;
+const ACTION_VALUES = new Set(['visit', 'use', 'borrow', 'learn', 'contribute', 'volunteer', 'donate', 'contact', 'replicate']);
+const ACCESS_VALUES = new Set(['public', 'membership', 'restricted']);
+const ACTIVITY_VALUES = new Set(['active', 'paused', 'seasonal', 'unknown', 'ended']);
 
 function assertObject(value, label) {
   if (!value || typeof value !== 'object' || Array.isArray(value)) throw new Error(`${label} is not an object`);
@@ -13,6 +19,44 @@ function assertDescriptor(value, label) {
   if (typeof descriptor.sha256 !== 'string' || !SHA256_PATTERN.test(descriptor.sha256)) throw new Error(`${label} has invalid SHA-256`);
   if (typeof descriptor.url !== 'string' || !descriptor.url) throw new Error(`${label} has invalid URL`);
   return descriptor;
+}
+
+function assertString(value, label) {
+  if (typeof value !== 'string' || !value || value.trim() !== value) throw new Error(`${label} is not a non-empty trimmed string`);
+  return value;
+}
+
+function assertBoundedString(value, label, { minLength = 1, maxLength = Infinity, pattern = null } = {}) {
+  assertString(value, label);
+  const length = [...value].length;
+  if (length < minLength || length > maxLength) throw new Error(`${label} has invalid length`);
+  if (pattern && !pattern.test(value)) throw new Error(`${label} has invalid format`);
+  return value;
+}
+
+function assertStringArray(value, label, { minItems = 0, maxItems = Infinity, pattern = null, allowed = null } = {}) {
+  if (!Array.isArray(value) || value.length < minItems || value.length > maxItems) throw new Error(`${label} has invalid item count`);
+  const seen = new Set();
+  for (const item of value) {
+    assertString(item, `${label} item`);
+    if (pattern && !pattern.test(item)) throw new Error(`${label} contains an invalid value`);
+    if (allowed && !allowed.has(item)) throw new Error(`${label} contains an unsupported value`);
+    if (seen.has(item)) throw new Error(`${label} contains a duplicate value`);
+    seen.add(item);
+  }
+  return value;
+}
+
+function assertExactKeys(value, allowedKeys, label) {
+  for (const key of Object.keys(value)) {
+    if (!allowedKeys.has(key)) throw new Error(`${label} contains an unexpected field`);
+  }
+}
+
+function deepFreeze(value) {
+  if (!value || typeof value !== 'object' || Object.isFrozen(value)) return value;
+  for (const child of Object.values(value)) deepFreeze(child);
+  return Object.freeze(value);
 }
 
 function hex(buffer) {
@@ -38,10 +82,13 @@ function validateShardIndex(index, label, knownShardKeys) {
   assertObject(index, label);
   for (const [value, keys] of Object.entries(index)) {
     if (!value || !Array.isArray(keys)) throw new Error(`${label} contains an invalid entry`);
+    const seen = new Set();
     for (const key of keys) {
       if (typeof key !== 'string' || !SHARD_KEY_PATTERN.test(key) || !knownShardKeys.has(key)) {
         throw new Error(`${label} references an unknown shard`);
       }
+      if (seen.has(key)) throw new Error(`${label} contains a duplicate shard`);
+      seen.add(key);
     }
   }
 }
@@ -55,15 +102,18 @@ function validateManifest(value) {
   const shards = assertObject(manifest.shards, 'manifest shards');
   if (shards.strategy !== 'sha256-prefix' || shards.prefix_length !== 2 || !Array.isArray(shards.entries)) throw new Error('unsupported catalog shard strategy');
   const shardKeys = new Set();
+  const shardDescriptors = new Map();
   for (const entry of shards.entries) {
     const descriptor = assertDescriptor(entry, 'manifest shard descriptor');
     if (typeof entry.key !== 'string' || !SHARD_KEY_PATTERN.test(entry.key) || shardKeys.has(entry.key)) throw new Error('invalid or duplicate catalog shard key');
     if (!Number.isSafeInteger(entry.entry_count) || entry.entry_count < 1) throw new Error('invalid catalog shard entry count');
     shardKeys.add(entry.key);
-    void descriptor;
+    shardDescriptors.set(entry.key, descriptor);
   }
+  const shardEntryCount = [...shardDescriptors.values()].reduce((sum, descriptor) => sum + descriptor.entry_count, 0);
+  if (shardEntryCount !== manifest.entry_count) throw new Error('catalog manifest shard entry count sum mismatch');
   assertDescriptor(manifest.aggregate, 'manifest aggregate descriptor');
-  return { manifest, shardKeys };
+  return { manifest, shardKeys, shardDescriptors };
 }
 
 function validateAggregate(value, manifest, shardKeys) {
@@ -76,6 +126,86 @@ function validateAggregate(value, manifest, shardKeys) {
   validateShardIndex(aggregate.spatial_cells, 'aggregate spatial cells', shardKeys);
   validateShardIndex(aggregate.digital, 'aggregate digital index', shardKeys);
   return aggregate;
+}
+
+function validatePosition(value, label) {
+  if (!Array.isArray(value) || value.length !== 2) throw new Error(`${label} is not a longitude-latitude position`);
+  const [longitude, latitude] = value;
+  if (!Number.isFinite(longitude) || longitude < -180 || longitude > 180) throw new Error(`${label} has invalid longitude`);
+  if (!Number.isFinite(latitude) || latitude < -90 || latitude > 90) throw new Error(`${label} has invalid latitude`);
+  return value;
+}
+
+function positionsEqual(left, right) {
+  return left[0] === right[0] && left[1] === right[1];
+}
+
+function validateLinearRing(value, label) {
+  if (!Array.isArray(value) || value.length < 4) throw new Error(`${label} is not a valid linear ring`);
+  value.forEach((position, index) => validatePosition(position, `${label} position ${index}`));
+  if (!positionsEqual(value[0], value.at(-1))) throw new Error(`${label} is not closed`);
+  return value;
+}
+
+function validatePolygonCoordinates(value, label) {
+  if (!Array.isArray(value) || value.length < 1) throw new Error(`${label} is not a polygon coordinate array`);
+  value.forEach((ring, index) => validateLinearRing(ring, `${label} ring ${index}`));
+  return value;
+}
+
+function validateCompactGeometry(value, label) {
+  const geometry = assertObject(value, label);
+  assertExactKeys(geometry, new Set(['type', 'coordinates']), label);
+  if (geometry.type === 'Point') validatePosition(geometry.coordinates, `${label} coordinates`);
+  else if (geometry.type === 'Polygon') validatePolygonCoordinates(geometry.coordinates, `${label} coordinates`);
+  else if (geometry.type === 'MultiPolygon') {
+    if (!Array.isArray(geometry.coordinates) || geometry.coordinates.length < 1) throw new Error(`${label} is not a multipolygon coordinate array`);
+    geometry.coordinates.forEach((polygon, index) => validatePolygonCoordinates(polygon, `${label} polygon ${index}`));
+  } else {
+    throw new Error(`${label} has unsupported geometry type`);
+  }
+  return geometry;
+}
+
+function validateCompactRecord(value, label) {
+  const record = assertObject(value, label);
+  assertExactKeys(record, new Set(['id', 'title', 'themes', 'actions', 'languages', 'access', 'presence', 'activity', 'detail']), label);
+  assertBoundedString(record.id, `${label} id`, { minLength: 3, maxLength: 96, pattern: IDENTITY_PATTERN });
+  assertBoundedString(record.title, `${label} title`, { minLength: 2, maxLength: 140 });
+  assertStringArray(record.themes, `${label} themes`, { minItems: 1, maxItems: 8, pattern: THEME_PATTERN });
+  assertStringArray(record.actions, `${label} actions`, { minItems: 1, allowed: ACTION_VALUES });
+  assertStringArray(record.languages, `${label} languages`, { pattern: LANGUAGE_PATTERN });
+  if (record.access !== null && !ACCESS_VALUES.has(record.access)) throw new Error(`${label} has invalid access type`);
+  if (!ACTIVITY_VALUES.has(record.activity)) throw new Error(`${label} has invalid activity status`);
+  if (record.detail !== `catalog/projects/${record.id}.json`) throw new Error(`${label} has an invalid detail reference`);
+  const presence = assertObject(record.presence, `${label} presence`);
+  assertExactKeys(presence, new Set(['geographic', 'digital']), `${label} presence`);
+  if (typeof presence.digital !== 'boolean') throw new Error(`${label} digital presence is not boolean`);
+  if (!Array.isArray(presence.geographic)) throw new Error(`${label} geographic presence is not an array`);
+  for (const [index, locationValue] of presence.geographic.entries()) {
+    const locationLabel = `${label} geographic presence ${index}`;
+    const location = assertObject(locationValue, locationLabel);
+    assertExactKeys(location, new Set(['mode', 'geometry']), locationLabel);
+    if (!['exact', 'approximate'].includes(location.mode)) throw new Error(`${locationLabel} has invalid mode`);
+    validateCompactGeometry(location.geometry, `${locationLabel} geometry`);
+  }
+  return record;
+}
+
+function validateCatalogShard(value, descriptor, key) {
+  const shard = assertObject(value, 'catalog shard');
+  assertExactKeys(shard, new Set(['kind', 'version', 'key', 'records']), 'catalog shard');
+  if (shard.kind !== 'commonworld.catalog_shard' || shard.version !== '1.0') throw new Error('unsupported catalog shard');
+  if (shard.key !== key) throw new Error('catalog shard key mismatch');
+  if (!Array.isArray(shard.records)) throw new Error('catalog shard records are not an array');
+  if (shard.records.length !== descriptor.entry_count) throw new Error('catalog shard entry count mismatch');
+  const ids = new Set();
+  for (const [index, recordValue] of shard.records.entries()) {
+    const record = validateCompactRecord(recordValue, `catalog shard record ${index}`);
+    if (ids.has(record.id)) throw new Error('catalog shard contains duplicate identity');
+    ids.add(record.id);
+  }
+  return shard;
 }
 
 export async function verifyCatalogPayload(bytes, descriptor, cryptoImpl = globalThis.crypto) {
@@ -99,6 +229,13 @@ async function fetchVerifiedJson(url, descriptor, { fetchImpl = globalThis.fetch
   } catch (error) {
     throw new Error(`invalid catalog JSON for ${url}`, { cause: error });
   }
+}
+
+export async function shardKeyForIdentity(identifier, cryptoImpl = globalThis.crypto) {
+  assertBoundedString(identifier, 'catalog identity', { minLength: 3, maxLength: 96, pattern: IDENTITY_PATTERN });
+  if (!cryptoImpl?.subtle) throw new Error('WebCrypto unavailable for catalog shard key');
+  const digest = await cryptoImpl.subtle.digest('SHA-256', new TextEncoder().encode(identifier));
+  return hex(digest).slice(0, 2);
 }
 
 export function spatialCellForCoordinates(longitude, latitude, cellDegrees = 10) {
@@ -134,12 +271,37 @@ export function selectAggregateShardKeys(aggregate, { themes = [], spatialCells 
 export async function loadCatalogAggregate({ manifestUrl = MANIFEST_URL, fetchImpl = globalThis.fetch, cryptoImpl = globalThis.crypto } = {}) {
   if (typeof fetchImpl !== 'function') throw new Error('Fetch unavailable for catalog manifest');
   const { documentRoot, manifestAbsolute } = documentRootFor(manifestUrl);
-  if (manifestAbsolute.origin !== documentRoot.origin) throw new Error('catalog manifest must remain same-origin');
-  const manifestResponse = await fetchImpl(manifestAbsolute.href, { headers: { Accept: 'application/json' }, cache: 'no-cache', credentials: 'same-origin' });
+  const manifestResolvedUrl = resolveCatalogUrl(manifestAbsolute.href, documentRoot, 'catalog manifest URL');
+  const manifestResponse = await fetchImpl(manifestResolvedUrl, { headers: { Accept: 'application/json' }, cache: 'no-cache', credentials: 'same-origin' });
   if (!manifestResponse.ok) throw new Error(`catalog manifest HTTP ${manifestResponse.status}`);
   const { manifest, shardKeys } = validateManifest(await manifestResponse.json());
   const aggregateDescriptor = manifest.aggregate;
   const aggregateUrl = resolveCatalogUrl(aggregateDescriptor.url, documentRoot, 'catalog aggregate URL');
   const aggregate = validateAggregate(await fetchVerifiedJson(aggregateUrl, aggregateDescriptor, { fetchImpl, cryptoImpl }), manifest, shardKeys);
-  return Object.freeze({ manifest: Object.freeze(manifest), aggregate: Object.freeze(aggregate), aggregateUrl });
+  return deepFreeze({
+    manifest,
+    aggregate,
+    aggregateUrl,
+    documentRoot: documentRoot.href,
+  });
+}
+
+export async function loadCatalogShard(platform, key, { fetchImpl = globalThis.fetch, cryptoImpl = globalThis.crypto } = {}) {
+  if (typeof key !== 'string' || !SHARD_KEY_PATTERN.test(key)) throw new Error('invalid catalog shard key');
+  const context = assertObject(platform, 'catalog platform');
+  const { shardDescriptors } = validateManifest(context.manifest);
+  const descriptor = shardDescriptors.get(key);
+  if (!descriptor) throw new Error('catalog shard is not declared by the manifest');
+  if (typeof context.documentRoot !== 'string') throw new Error('catalog platform has no document root');
+  const documentRoot = new URL(context.documentRoot);
+  const shardUrl = resolveCatalogUrl(descriptor.url, documentRoot, 'catalog shard URL');
+  const shard = validateCatalogShard(
+    await fetchVerifiedJson(shardUrl, descriptor, { fetchImpl, cryptoImpl }),
+    descriptor,
+    key,
+  );
+  for (const record of shard.records) {
+    if (await shardKeyForIdentity(record.id, cryptoImpl) !== key) throw new Error('catalog shard contains an identity for another key');
+  }
+  return deepFreeze({ key, shardUrl, records: shard.records });
 }

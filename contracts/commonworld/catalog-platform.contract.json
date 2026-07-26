@@ -71,8 +71,14 @@
   ],
   "browser_transition": {
     "current_visible_catalog": "build_bound_bootstrap",
-    "shadow_runtime_observation": true,
+    "shadow_runtime_observation": {
+      "aggregate_manifest": true,
+      "selected_identity_shard": true,
+      "detail_loading": false
+    },
     "aggregate_failure_policy": "keep_compatible_bootstrap_and_mark_degraded",
+    "shard_failure_policy": "keep_compatible_bootstrap_and_mark_selected_identity_degraded",
+    "selected_identity_parity_fields": ["id", "title", "themes", "actions", "languages", "access", "activity", "digital_presence", "public_geographic_presence"],
     "cutover_gate": [
       "field_parity",
       "deep_link_parity",

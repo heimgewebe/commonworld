@@ -1,4 +1,6 @@
 {
+  "schema_version": 1,
+  "kind": "commonworld_catalog_delivery_public_browser_smoke_evidence",
   "verdict": "PASS",
   "scenarios": [
     {
@@ -120,7 +122,7 @@
     {
       "id": "layer-journey-moveend-return",
       "verdict": "PASS",
-      "elapsedMs": 1482
+      "elapsedMs": 1752
     },
     {
       "id": "layer-journey-interrupted",
@@ -219,12 +221,10 @@
       "verdict": "PASS"
     }
   ],
-  "schema_version": 1,
-  "kind": "commonworld_catalog_delivery_public_browser_smoke_evidence",
   "binding": {
-    "smoke_script_sha256": "8064d0aeb795f42820406e2f457d92426c201a5c90bb8deda5611feb5bfd7180",
+    "smoke_script_sha256": "3200c9920686e22ea6c29cfefe6ca10a390a8122f5bae768fb8380bbb3a10faf",
     "smoke_runner_sha256": "522b99b70b1d0064b1d0a31a3a67fdc9a2e73b7408f37d1a4bb303bc360b7556",
-    "first_party_surface_sha256": "67e22da133d656ca051a546af32c39636574b61838ddb675402fe16c1c298387",
+    "first_party_surface_sha256": "a05441ef09e5cacea70737d6fc272f2b56bd425ceeb50193aff2b37c896a6937",
     "scenario_ids": [
       "startup-and-ring-orbits",
       "ring-orbits-reduced-motion",
@@ -256,7 +256,7 @@
       "method-mobile",
       "method-mobile-text-200"
     ],
-    "freshness_rule": "The official runner must materialize the canonical smoke plan, create a fresh temporary public result and validate exact scenario order, PASS verdicts, the manifest-plus-aggregate shadow requests and zero forbidden catalogue requests against this hash-bound evidence.",
+    "freshness_rule": "The official runner must materialize the canonical smoke plan, create a fresh temporary public result and validate exact scenario order, PASS verdicts, manifest-plus-aggregate startup observation, selected-identity shard parity and zero forbidden canonical project requests against this hash-bound evidence.",
     "smoke_plan_sha256": "6b8749928ead5ef81ee66883e6a2993e756ce083575c3569234bf70526448364"
   }
 }
