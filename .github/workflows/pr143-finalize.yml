@@ -35,7 +35,7 @@ jobs:
           python -m pip install -r requirements-dev.txt
       - name: Patch low-height detail layout
         run: python scripts/pr143_finalize.py patch
-      - name: Rebuild and measure exact surfaces
+      - name: Verify deterministic generated surfaces
         run: |
           npm run build
           git diff --check
@@ -43,9 +43,25 @@ jobs:
           npm run build
           git diff --binary -- de.html index.html method.de.html method.html assets/commonworld-bootstrap-catalog.mjs assets/commonworld-en-locale.mjs > /tmp/generated-after.diff
           cmp /tmp/generated-before.diff /tmp/generated-after.diff
-          python scripts/measure_catalog_delivery.py --output /tmp/pr143-static.json
-          node scripts/measure_catalog_delivery_browser.mjs --output /tmp/pr143-browser.json
-          node scripts/smoke_public_browser.mjs --result /tmp/pr143-smoke.json
+      - name: Measure static delivery
+        run: python scripts/measure_catalog_delivery.py --output /tmp/pr143-static.json
+      - name: Measure throttled browser delivery
+        run: node scripts/measure_catalog_delivery_browser.mjs --output /tmp/pr143-browser.json
+      - name: Run public browser evidence
+        run: node scripts/smoke_public_browser.mjs --result /tmp/pr143-smoke.json
+      - name: Upload finalizer diagnostics
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: pr143-finalizer-diagnostics
+          path: |
+            /tmp/pr143-static.json
+            /tmp/pr143-browser.json
+            /tmp/pr143-smoke.json
+            /tmp/generated-before.diff
+            /tmp/generated-after.diff
+          if-no-files-found: warn
+          retention-days: 1
       - name: Bind benchmark, smoke and review evidence
         run: |
           python scripts/pr143_finalize.py bind \
