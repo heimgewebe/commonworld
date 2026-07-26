@@ -152,7 +152,7 @@ def validate(root: Path = ROOT, warnings: list[str] | None = None) -> list[str]:
     static = measure(root)
     budgets = contract.get('budgets', {})
 
-    if contract.get('selected_design', {}).get('id') != 'build-bound-bootstrap-with-public-project-json':
+    if contract.get('selected_design', {}).get('id') != 'compact-build-bound-bootstrap-with-public-project-json':
         errors.append('catalogue delivery selected design is not canonical')
     if contract.get('canonical_truth', {}).get('records') != 'catalog/projects/*.json':
         errors.append('canonical CommonProject source boundary changed')
@@ -201,7 +201,7 @@ def validate(root: Path = ROOT, warnings: list[str] | None = None) -> list[str]:
         if forbidden in app:
             errors.append(f'runtime must not refetch the canonical catalogue at startup: {forbidden}')
     if "dataset.catalogDelivery = 'build-bound-bootstrap'" not in app:
-        errors.append('runtime does not declare build-bound catalogue delivery')
+        errors.append('runtime does not declare build-bound compact catalogue delivery')
 
     baseline = evidence.get('baseline', {})
     optimized = evidence.get('optimized', {})
@@ -374,8 +374,12 @@ def validate(root: Path = ROOT, warnings: list[str] | None = None) -> list[str]:
     ):
         if token not in options:
             errors.append(f'catalogue delivery option comparison missing: {token}')
-    if static['html']['noscript_catalogs'] != 1 or static['html']['catalog_card_instances'] != static['entry_count'] * 2:
-        errors.append('generated interactive and no-JavaScript catalogue projections are incomplete')
+    if (
+        static['html']['noscript_catalogs'] != 1
+        or static['html']['catalog_card_instances'] != static['entry_count']
+        or static['html']['interactive_catalog_cards'] != 0
+    ):
+        errors.append('generated no-JavaScript catalogue must be complete exactly once and interactive cards must remain runtime-created')
     return errors
 
 

@@ -4,7 +4,7 @@ import tempfile
 import unittest
 from pathlib import Path
 
-from scripts.measure_catalog_delivery import measure
+from scripts.measure_catalog_delivery import load_bootstrap_records, measure
 from scripts.validate_catalog_delivery_budget import (
     CATALOGUE_NETWORK_BLOCKED_SCENARIO,
     ROOT,
@@ -58,12 +58,7 @@ class CatalogDeliveryBudgetTests(unittest.TestCase):
     def test_current_delivery_stays_within_contract(self) -> None:
         warnings: list[str] = []
         self.assertEqual([], validate(ROOT, warnings))
-        self.assertEqual(
-            [
-                'bootstrap gzip bytes entered warning range: actual=31568, warn=28672, max=32768'
-            ],
-            warnings,
-        )
+        self.assertEqual([], warnings)
 
     def test_static_measurement_preserves_single_truth_and_no_startup_refetch(self) -> None:
         metrics = measure(ROOT)
@@ -71,8 +66,20 @@ class CatalogDeliveryBudgetTests(unittest.TestCase):
         self.assertEqual(manifest['entry_count'], metrics['entry_count'])
         self.assertEqual(0, metrics['runtime_verification_fetch']['project_request_count'])
         self.assertEqual(0, metrics['runtime_verification_fetch']['duplicate_identity_payload_count'])
-        self.assertEqual(metrics['entry_count'] * 2, metrics['html']['catalog_card_instances'])
+        self.assertEqual(metrics['entry_count'], metrics['html']['catalog_card_instances'])
         self.assertEqual(1, metrics['html']['noscript_catalogs'])
+        _, bootstrap_records = load_bootstrap_records(
+            ROOT / 'assets/commonworld-bootstrap-catalog.mjs'
+        )
+        self.assertTrue(bootstrap_records)
+        self.assertTrue(
+            all(record.get('curation', {}).get('state') for record in bootstrap_records),
+            'compact bootstrap must preserve curation.state for the public filter',
+        )
+        self.assertTrue(
+            all('handoff' not in record for record in bootstrap_records),
+            'compact bootstrap must omit non-interactive handoff metadata',
+        )
 
     def test_measure_rejects_stale_bootstrap_content(self) -> None:
         with tempfile.TemporaryDirectory() as tmp:
@@ -82,7 +89,7 @@ class CatalogDeliveryBudgetTests(unittest.TestCase):
             bootstrap_path.write_text(
                 bootstrap.replace('Commons', 'Veraltete Projektion', 1), encoding='utf-8'
             )
-            with self.assertRaisesRegex(ValueError, 'do not match canonical CommonProject content'):
+            with self.assertRaisesRegex(ValueError, 'do not match the canonical compact CommonProject projection'):
                 measure(root)
 
     def test_validator_rejects_committed_smoke_catalogue_request(self) -> None:

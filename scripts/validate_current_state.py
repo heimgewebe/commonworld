@@ -181,14 +181,14 @@ def validate_current_state(root: Path = ROOT) -> list[str]:
     catalog_delivery = state.get("catalog_delivery", {})
     expected_catalog_delivery = {
         "contract": "contracts/commonworld/catalog-delivery-budget.contract.json",
-        "design": "build_bound_full_bootstrap_with_public_per_project_json",
+        "design": "compact_build_bound_bootstrap_with_public_per_project_json",
         "canonical_records": "catalog/projects/*.json",
         "startup_project_json_requests": 0,
         "runtime_catalogue_parity_check": True,
         "runtime_catalogue_parity_scope": "selected_identity_compact_shard_shadow",
-        "runtime_catalogue_visible_source": "build_bound_bootstrap",
+        "runtime_catalogue_visible_source": "compact_build_bound_bootstrap",
         "runtime_catalogue_detail_loading": False,
-        "runtime_catalogue_failure_policy": "keep_compatible_bootstrap",
+        "runtime_catalogue_failure_policy": "keep_compact_bootstrap",
         "build_and_ci_catalogue_parity_check": True,
         "no_javascript_projection": "generated_static_catalogue_preserved",
         "redesign_trigger": "measured_transfer_parse_or_dom_budget_not_entry_count_alone",
@@ -211,9 +211,10 @@ def validate_current_state(root: Path = ROOT) -> list[str]:
     if shadow.get("detail_loading") is not catalog_delivery.get("runtime_catalogue_detail_loading"):
         errors.append("catalog platform and current state disagree on detail loading")
     if (
-        transition.get("aggregate_failure_policy") != "keep_compatible_bootstrap_and_mark_degraded"
-        or transition.get("shard_failure_policy") != "keep_compatible_bootstrap_and_mark_selected_identity_degraded"
-        or catalog_delivery.get("runtime_catalogue_failure_policy") != "keep_compatible_bootstrap"
+        transition.get("aggregate_failure_policy") != "keep_compact_bootstrap_and_mark_degraded"
+        or transition.get("shard_failure_policy") != "keep_compact_bootstrap_and_mark_selected_identity_degraded"
+        or transition.get("detail_failure_policy") != "not_enabled"
+        or catalog_delivery.get("runtime_catalogue_failure_policy") != "keep_compact_bootstrap"
     ):
         errors.append("catalog platform and current state disagree on runtime fallback policy")
 

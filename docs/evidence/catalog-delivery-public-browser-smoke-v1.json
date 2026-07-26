@@ -9,7 +9,7 @@
       "directGlobeProjection": true,
       "hiddenUntilCalibrated": true,
       "outerHintRemoved": true,
-      "aggregateRingIdentities": 43,
+      "aggregateRingIdentities": 45,
       "movingRingMatrix": true,
       "unchangedGeometryRepaintSkipped": true
     },
@@ -56,8 +56,8 @@
     {
       "id": "intent-search-discovery",
       "verdict": "PASS",
-      "indexedRecords": 58,
-      "rankedGermanIntentResults": 34,
+      "indexedRecords": 65,
+      "rankedGermanIntentResults": 36,
       "filters": 7,
       "digitalCoordinateFree": true,
       "spatialNavigation": true
@@ -98,9 +98,9 @@
     {
       "id": "dual-presence-axes",
       "verdict": "PASS",
-      "publicFeatures": 118,
-      "publicIdentities": 32,
-      "digitalIdentities": 43,
+      "publicFeatures": 120,
+      "publicIdentities": 33,
+      "digitalIdentities": 45,
       "unchangedMapUpdatesSkipped": true
     },
     {
@@ -122,7 +122,7 @@
     {
       "id": "layer-journey-moveend-return",
       "verdict": "PASS",
-      "elapsedMs": 1752
+      "elapsedMs": 1862
     },
     {
       "id": "layer-journey-interrupted",
@@ -224,7 +224,7 @@
   "binding": {
     "smoke_script_sha256": "3200c9920686e22ea6c29cfefe6ca10a390a8122f5bae768fb8380bbb3a10faf",
     "smoke_runner_sha256": "522b99b70b1d0064b1d0a31a3a67fdc9a2e73b7408f37d1a4bb303bc360b7556",
-    "first_party_surface_sha256": "a05441ef09e5cacea70737d6fc272f2b56bd425ceeb50193aff2b37c896a6937",
+    "first_party_surface_sha256": "ab6bd56b865827c29ed55f37e6bcf3d579a3b73dc9ba5be4a06fbd4575558f5e",
     "scenario_ids": [
       "startup-and-ring-orbits",
       "ring-orbits-reduced-motion",
@@ -258,5 +258,10 @@
     ],
     "freshness_rule": "The official runner must materialize the canonical smoke plan, create a fresh temporary public result and validate exact scenario order, PASS verdicts, manifest-plus-aggregate startup observation, selected-identity shard parity and zero forbidden canonical project requests against this hash-bound evidence.",
     "smoke_plan_sha256": "6b8749928ead5ef81ee66883e6a2993e756ce083575c3569234bf70526448364"
+  },
+  "execution": {
+    "job_id": "5817322c4fcb",
+    "finalization_receipt_sha256": "8c080589c95dd635bc91c157c0c4722a6b6efd60cf559cfee2ca333123e5ec50",
+    "result_sha256": "60cc53fe772b4c2d02af1707497efe2d31e90c82b0a865c9430356d3b053663f"
   }
 }

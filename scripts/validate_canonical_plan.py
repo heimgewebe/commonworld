@@ -129,6 +129,7 @@ EXPECTED_SCRIPT_FILES = {
     "build_catalog_runtime.py",
     "build_country_boundary_subset.mjs",
     "build_public_runtime.py",
+    "catalog_bootstrap.py",
     "catalog_delivery_compile.mjs",
     "check_pages_dns_target.py",
     "commonworld_geo.py",

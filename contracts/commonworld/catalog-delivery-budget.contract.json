@@ -12,10 +12,10 @@
     "rule": "Generated projections are rebuilt from canonical CommonProject files and are never edited as catalogue truth."
   },
   "selected_design": {
-    "id": "build-bound-bootstrap-with-public-project-json",
-    "runtime": "The interactive shell consumes one generated build-bound module and does not refetch canonical project files during startup.",
-    "no_javascript": "The generated noscript catalogue remains in index.html.",
-    "machine_readable": "The manifest and every canonical project JSON remain public and independently addressable.",
+    "id": "compact-build-bound-bootstrap-with-public-project-json",
+    "runtime": "The interactive shell consumes one generated compact build-bound module containing discovery, action, source-link and review-date fields. Editorial notes, source identifiers and handoff metadata remain in canonical public project JSON and are not startup payload.",
+    "no_javascript": "The generated complete noscript catalogue remains in index.html exactly once.",
+    "machine_readable": "The manifest and every complete canonical project JSON remain public and independently addressable.",
     "privacy": "No backend, account, telemetry, cookie or runtime write API is introduced."
   },
   "budgets": {

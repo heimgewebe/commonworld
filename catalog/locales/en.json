@@ -402,6 +402,52 @@
         "tla-o-qui-aht-clayoquot-sound": "Clayoquot Sound, British Columbia, Canada"
       },
       "digital_label": "Public Tla-o-qui-aht Tribal Parks information on governance, Guardian work and responsible participation"
+    },
+    "auroville": {
+      "summary": "An international township in Tamil Nadu experimenting since 1968 with communal living, ecological practice and alternative social organization; land and assets are legally held through the Auroville Foundation rather than owned individually by residents.",
+      "geographic_labels": {
+        "auroville-township-area": "Auroville near Puducherry, Tamil Nadu, India"
+      }
+    },
+    "bologna-urban-commons": {
+      "title": "Bologna Urban Commons",
+      "summary": "A citywide shared-administration infrastructure in which civic groups and the Municipality of Bologna use collaboration pacts to care for, regenerate and use material, immaterial and digital commons for activities in the general interest.",
+      "geographic_labels": {
+        "bologna-citywide-pacts": "Collaboration pacts distributed across Bologna"
+      },
+      "digital_label": "Public dataset and interactive overview of collaboration pacts for urban commons"
+    },
+    "cecosesola": {
+      "summary": "A Venezuelan network of more than 50 non-profit community organizations connecting food supply, health care, funeral services, finance and production without chains of command, through rotating tasks and consensus-oriented self-management.",
+      "geographic_labels": {
+        "cecosesola-venezuela-network": "Barquisimeto and a network across several Venezuelan states"
+      }
+    },
+    "mietshaeuser-syndikat": {
+      "summary": "A network of self-organized housing projects that uses a shared corporate structure to remove properties permanently from speculative resale and a solidarity transfer to support new community housing projects.",
+      "geographic_labels": {
+        "mietshaeuser-network": "Decentralized project network in Germany and beyond",
+        "mietshaeuser-residences": "Residential buildings and residents’ addresses"
+      }
+    },
+    "north-east-syria-autonomous-administration": {
+      "title": "Democratic Autonomous Administration of North and East Syria",
+      "summary": "A regional self-administration structure developed since 2018 that organizes local councils, communes, civil institutions and services around stated principles of participatory democracy, social justice and equality.",
+      "geographic_labels": {
+        "daanes-dynamic-region": "North and East Syria — dynamic regional area"
+      }
+    },
+    "reprap": {
+      "summary": "A global open-hardware project for freely documented 3D printers that can manufacture a significant share of their own parts and whose designs are collaboratively built, adapted and improved.",
+      "geographic_labels": {},
+      "digital_label": "Open design documentation and a community wiki for self-replicating manufacturing machines"
+    },
+    "zapatista-autonomy": {
+      "title": "Zapatista Autonomy",
+      "summary": "An autonomy structure maintained by Zapatista communities in Chiapas that since 2023 has replaced the former MAREZ and Good Government Councils with local autonomous governments, regional collectives and assembly-based coordination.",
+      "geographic_labels": {
+        "zapatista-communities-chiapas": "Zapatista communities in Chiapas, Mexico"
+      }
     }
   }
 }
