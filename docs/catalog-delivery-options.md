@@ -2,54 +2,51 @@
 
 ## Entscheidung
 
-Commonworld verwendet vorerst einen **buildgebundenen vollständigen Bootstrap**: Die interaktive Anwendung erhält genau eine generierte JavaScript-Projektion aller kanonischen `CommonProject`-Dateien. Der Browser lädt beim Start nicht zusätzlich `catalog/catalog.json` und alle einzelnen Projektdateien. Diese öffentlichen JSON-Dateien bleiben dennoch für Menschen, Prüfwerkzeuge und Suchmaschinen erreichbar.
+Commonworld verwendet einen **kompakten buildgebundenen Bootstrap**. Die interaktive Anwendung erhält beim Start alle Felder, die sie für Suche, Filter, Karte, Aktionen, Quellenlinks und Prüfdaten benötigt. Interne redaktionelle Notizen, Quellen-IDs und Handoff-Metadaten bleiben ausschließlich in den vollständigen kanonischen `CommonProject`-Dateien unter `catalog/projects/`.
 
-Ein *Bootstrap* ist der Datensatz, mit dem die Anwendung unmittelbar startet. *Buildgebunden* bedeutet: Er wird vor der Veröffentlichung aus den kanonischen Projektdateien erzeugt und in CI auf Gleichheit geprüft.
+Ein *Bootstrap* ist der Datensatz, mit dem die Anwendung unmittelbar startet. *Buildgebunden* bedeutet: Er wird vor der Veröffentlichung deterministisch aus den kanonischen Projektdateien erzeugt und in CI auf die festgelegte Projektion geprüft.
 
-Die zweite statische Kartenliste in `<noscript>` bleibt bestehen. Sie ist keine zweite veränderbare Wahrheit, sondern eine ebenfalls generierte Projektion, die ohne JavaScript lesbar ist.
+Die interaktiven Karten werden zur Laufzeit aus diesem Bootstrap erzeugt. Eine vollständige lineare Recovery-Liste bleibt genau einmal außerhalb der Bootstrap-Modulabhängigkeit im HTML. Sie wird erst nach erfolgreichem interaktivem Start entfernt und bleibt bei deaktiviertem JavaScript oder einem fehlenden Bootstrap-Asset lesbar. Öffentliche Manifest-, Runtime- und Projekt-JSON-Dateien bleiben für Menschen, Prüfwerkzeuge und Suchmaschinen erreichbar.
 
-## Gemessener Ausgangspunkt
+## Gemessener Anlass und Ergebnis
 
-Bei 41 Einträgen enthielt der Bootstrap 118.546 rohe beziehungsweise 20.526 gzip-komprimierte Bytes. Anschließend lud die Anwendung dieselben 41 Projektdateien erneut: weitere 155.840 rohe beziehungsweise 51.789 gzip-Bytes. Zwei vierfach CPU-gedrosselte Browserprofile bestätigten 41 zusätzliche Projektanfragen.
+Mit 65 Einträgen überschritt ein vollständiger Bootstrap die harte Grenze von 32 KiB gzip. Eine bloße Anhebung der Grenze wurde verworfen.
 
-Die gewählte Änderung entfernt diese 41 Abrufe und die zugehörigen JSON-Parse- und Gleichheitsvergleiche. Der initial ausgelieferte Kataloganteil sinkt komprimiert von 72.315 auf 20.526 Bytes.
+Die kompakte Projektion enthält weiterhin Titel, Zusammenfassung, Themen, Aktionen, Präsenz, Aktivitätsstatus, offizielle Links, Quellenlinks sowie Prüfdatum und nächsten Prüftermin. Entfernt werden nur nicht startrelevante Transportfelder. Gleichzeitig entfällt die zweite statische interaktive Kartenliste im HTML; die Anwendung erzeugt sie bereits aus dem Bootstrap.
 
-## Vergleich der vier statischen Entwürfe
+Gemessener Stand vom 26. Juli 2026:
 
-| Entwurf | Barrierefreiheit und No-JS | SEO | Datenschutz | Caching | Komplexität und Pages | Bewertung |
-|---|---|---|---|---|---|---|
-| Generierter vollständiger Bootstrap | Interaktive Ansicht startet sofort; separate generierte `<noscript>`-Karten bleiben vollständig lesbar. | Statische Karten und öffentliche JSON-Verweise bleiben im HTML. | Nur statische Dateien, keine Telemetrie oder API. | Ein versioniertes Modul kann als Ganzes gecacht werden. | Sehr gering; vollständig mit GitHub Pages vereinbar. | **Jetzt gewählt.** |
-| HTML-Hydration | Könnte sichtbare Karten wiederverwenden, müsste aber vollständige strukturierte Daten im DOM tragen oder HTML zur Datenquelle machen. Das erhöht Kopplung und Risiko für Fokus- und No-JS-Verhalten. | Gut, solange alle Karten statisch bleiben. | Statisch möglich. | HTML wird häufiger invalidiert; Daten und Darstellung sind eng gekoppelt. | Mittlere bis hohe Komplexität; Gefahr einer zweiten Wahrheit. | Derzeit nicht gerechtfertigt. |
-| Segmentiertes statisches JSON | Ein Grundsegment könnte Karte und Suche starten; Detailsegmente würden später geladen. No-JS braucht weiterhin HTML. | Öffentliche Detaildateien bleiben indexierbar, die interaktive Vollständigkeit wird asynchron. | Statisch und datensparsam möglich. | Gute Teilcaches. | Mittlere Komplexität: Segmentvertrag, Fehlerzustände und Deep-Links. | Nächste Option bei Überschreitung des Bootstrap-Budgets. |
-| Bedarfsgeladene schreibgeschützte statische Lieferung | Lädt Details erst bei Auswahl. Eine vollständige Suche und globale Darstellung brauchen jedoch einen kompakten Index; No-JS bleibt separat. | Erfordert sorgfältige statische Verweise. | Statisch; keine Laufzeit-API nötig. | Beste Detailcaches. | Höchste Client-Komplexität und mehr Fehlerpfade, aber weiterhin Pages-fähig. | Erst bei belegtem Bedarf. |
+- Bootstrap: 105.072 rohe Bytes, 20.132 gzip-Bytes
+- HTML: 114.732 rohe Bytes, 16.352 gzip-Bytes
+- HTML-Starttags: 1.293
+- statische Katalogkarten: 65, ausschließlich in der einmaligen linearen Recovery-Oberfläche
+- Projekt-JSON-Anfragen beim Start: 0
+- doppelte Identitätspayloads beim Start: 0
 
-## Schwellenwert statt Katalogzahl
+## Vergleich der statischen Entwürfe
 
-Ein Umbau wird nicht durch eine bestimmte Zahl von Commons ausgelöst. Entscheidend sind übertragene und verarbeitete Arbeit: Bootstrap-Größe, Doppelabrufe, DOM-Knoten sowie repräsentative Start-, Skript- und Task-Zeit unter vierfach gedrosselter CPU. Die verbindlichen Grenzwerte stehen in `contracts/commonworld/catalog-delivery-budget.contract.json`.
+| Entwurf | Barrierefreiheit und No-JS | SEO | Datenschutz | Caching | Bewertung |
+|---|---|---|---|---|---|
+| Generierter vollständiger Bootstrap | Interaktive Ansicht startet sofort; die lineare Recovery-Liste bleibt vollständig. | Gut. | Rein statisch. | Einfach. | Bei 65 Einträgen über dem harten Payload-Budget. |
+| **Kompakter Bootstrap** | Interaktive Felder und Quellenlinks bleiben vollständig nutzbar; die bootstrap-unabhängige Recovery-Liste enthält den vollständigen Katalog. | Öffentliche Projekt-JSON und statische lineare Karten bleiben indexierbar. | Rein statisch, keine Telemetrie oder API. | Kleiner gemeinsamer Startcache; vollständige Einzeldateien bleiben separat cachebar. | **Gewählt.** |
+| HTML-Hydration | Könnte statische Karten wiederverwenden, würde das DOM zur Datenquelle machen. | Gut. | Statisch möglich. | HTML wird stärker gekoppelt. | Höhere Komplexität und zweite Wahrheitsoberfläche. |
+| Segmentiertes statisches JSON | Ein kompakter Weltindex startet Suche und Karte; Segmente liefern weitere Projektionen. | Öffentliche Detaildateien bleiben indexierbar. | Rein statisch möglich. | Gute Teilcaches. | Zusätzliche Segment- und Fehlerverträge; derzeit nur als beobachtender Catalog-Platform-Pfad genutzt. |
+| Bedarfsgeladene schreibgeschützte statische Lieferung | Kleinster Startindex, Details erst bei Auswahl. | Erfordert stabile statische Verweise. | Statisch möglich. | Gute Teilcaches. | Bleibt nächster Pfad, falls auch die kompakte Projektion die Grenze erreicht. |
 
-Eine deterministische Größenüberschreitung löst sofort eine Architekturprüfung aus. Schwankende Browserzeiten müssen in zwei aufeinanderfolgenden repräsentativen Läufen überschritten werden.
+## Schwellenwerte
 
-## Next Actions: gemessene Umschaltschwellen
+Ein Umbau wird nicht durch eine feste Zahl von Commons ausgelöst. Entscheidend sind übertragene und verarbeitete Arbeit: Bootstrap-Größe, Doppelabrufe, DOM-Knoten sowie repräsentative Start-, Skript- und Task-Zeit unter vierfach gedrosselter CPU.
 
-- **Unter 28 KiB gzip:** Der vollständige buildgebundene Bootstrap bleibt der Normalfall.
-- **Ab 28 KiB gzip:** CI gibt eine Warnung aus. Sie blockiert nicht, verlangt aber eine erneute Messung der vier statischen Entwürfe.
-- **Über 32 KiB gzip:** Der deterministische Vertrag schlägt fehl; eine Veröffentlichung darf den Grenzwert nicht stillschweigend überschreiten.
-- **Bei steigender Parse-/Compile-Zeit:** Segmentiertes statisches JSON wird gegen den Voll-Bootstrap gemessen.
-- **Bei nicht startrelevanten Feldern:** Ein schlankes Startmodell wird geprüft, während vollständige öffentliche Projektdateien erhalten bleiben.
-- **Keine Katalogzahl als Auslöser:** Eine Migration erfolgt ausschließlich anhand gemessener Payload-, Request-, DOM- und Laufzeitwerte.
-
-Die Warnschwelle steht als `warn_bootstrap_gzip_bytes`, die harte Grenze als `max_bootstrap_gzip_bytes` im Contract. `new Function` bleibt für die Compile-Messung bewusst erhalten: Der Quelltext ist kontrollierter Build-Output, und die unveränderte Messmethode hält neue Werte mit T019 vergleichbar. Die Normalisierung wird separat streng getestet und verlangt exakt eine Exportzuweisung.
+- **Unter 28 KiB gzip:** Normalbetrieb.
+- **Ab 28 KiB gzip:** CI-Warnung und erneute Messung der Lieferoptionen.
+- **Über 32 KiB gzip:** deterministischer Fehler; keine stillschweigende Budgeterhöhung.
+- **Bei weiterem Wachstum:** zuerst Projektion weiter prüfen, danach bedarfsgeladene statische Details gegen den kompakten Bootstrap messen.
+- **Keine Katalogzahl als Auslöser:** Migrationen erfolgen anhand gemessener Payload-, Request-, DOM- und Laufzeitwerte.
 
 ## Grenzen der Aussage
 
-Die Messung beweist die entfernten Abrufe und Bytes. Einzelne Zeitwerte hängen zusätzlich von Browser, Rechner und Scheduling ab und beweisen allein keine Beschleunigung. Die vollständigen kanonischen Projektdateien bleiben unverändert die einzige Katalogwahrheit.
+Die Messung belegt Payload-, Request- und DOM-Eigenschaften der geprüften Oberfläche. Einzelne Zeitwerte hängen zusätzlich von Browser, Rechner und Scheduling ab und beweisen allein keine Beschleunigung. Die vollständigen kanonischen Projektdateien bleiben die einzige Katalogwahrheit; der Bootstrap ist eine deterministische, ausdrücklich unvollständige Startprojektion.
 
-## Ablösungspfad ab Catalog Platform v1
+## GitHub Pages und Catalog Platform v1
 
-Die frühere Entscheidung für den vollständigen Bootstrap war für 41 bis 54 Einträge gemessen richtig, ist aber keine Zielarchitektur für einen Weltkatalog. `catalog-platform-v1` führt deshalb eine parallele, generationsgebundene Lieferfläche aus Manifest, Offline-Weltindex, SHA-256-Präfix-Shards und Einzelheiten ein.
-
-Der vollständige Bootstrap bleibt nur bis zum belegten UI-Cutover aktiv. Neue Katalogeinträge dürfen die harte Bootstrap-Grenze nicht weiter verbrauchen. Vor dem Cutover müssen mindestens 10.000 und 100.000 synthetische Einträge gemessen, die benötigten Startfelder festgelegt und Katalog-, Shard- sowie Detailausfälle im Browser-Smoke geprüft sein.
-
-## Aktiver Übergangspfad
-
-Seit Catalog Platform v1 wird die neue Lieferfläche im Browser beobachtend geladen. Manifest und Aggregat sind hashgebunden; die sichtbare Anwendung bleibt bis zum vollständigen Paritätsbeleg auf dem bisherigen Bootstrap. Diese Reihenfolge verhindert, dass ein Architekturumbau Listen, Filter, Deep Links oder Projektdetails still unvollständig macht.
+Manifest, Offline-Weltindex, SHA-256-Präfix-Shards und Einzeldateien werden weiterhin beobachtend und hashgebunden geladen. Der sichtbare Katalog bleibt auf dem kompakten Bootstrap, solange ein bedarfsgeladener Detailpfad nicht separat mit Fehlerzuständen, Deep Links und Browserbelegen freigegeben wurde.

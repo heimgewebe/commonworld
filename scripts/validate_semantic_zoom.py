@@ -234,7 +234,7 @@ def validate_semantic_zoom(root: Path = ROOT) -> list[str]:
         "density_field": {"bucket_id", "unique_identity_count", "assessed_surface_km2", "identities_per_10000_km2", "theme_identity_counts"},
         "identity_cluster": {"cluster_id", "member_identity_ids", "unique_identity_count", "public_geometry"},
         "identity_summary": {"project_id", "title", "kind", "themes", "activity_status", "curation_state", "public_representations"},
-        "relation_summary": {"source_project_id", "target_project_id", "relation_type", "source_ids"},
+        "relation_summary": {"source_project_id", "target_project_id", "relation_type", "evidenced"},
         "focus_record": {"commonproject"},
         "digital_coverage_summary": {"coverage_state", "scope_label", "observed_at", "evidence_refs"},
         "network_summary": {"summary_id", "unique_identity_count", "evidenced_relation_count", "theme_identity_counts"},
@@ -245,6 +245,11 @@ def validate_semantic_zoom(root: Path = ROOT) -> list[str]:
         errors.append("density output shape must be restricted to assessed coverage")
     if output_shapes.get("identity_cluster", {}).get("member_key") != "CommonProject.id":
         errors.append("identity cluster members must use CommonProject.id")
+    relation_shape = output_shapes.get("relation_summary", {})
+    if relation_shape.get("evidenced_const") is not True:
+        errors.append("relation summaries must expose a constant evidenced marker")
+    if relation_shape.get("forbidden") != ["inferred_relation", "relocated_hidden_endpoint", "source_ids", "editorial_note"]:
+        errors.append("relation summaries must forbid internal source ids and editorial notes")
     if output_shapes.get("public_representation", {}).get("approximate_requires") != ["public_geometry", "uncertainty_meters_min"]:
         errors.append("approximate public representations must carry geometry and minimum uncertainty")
     if output_shapes.get("focus_record", {}).get("exactly_one_identity") is not True:

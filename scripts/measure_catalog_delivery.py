@@ -7,10 +7,15 @@ import gzip
 import hashlib
 import json
 import re
+import sys
 from html.parser import HTMLParser
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
+if str(ROOT) not in sys.path:
+    sys.path.insert(0, str(ROOT))
+
+from scripts.catalog_bootstrap import bootstrap_record
 BOOTSTRAP_PATTERN = re.compile(r"export const BOOTSTRAP_RECORDS = (\[.*\]);\s*$", re.DOTALL)
 
 
@@ -60,8 +65,8 @@ def measure(root: Path = ROOT) -> dict:
     bootstrap_ids = [record['id'] for record in bootstrap_records]
     if project_ids != bootstrap_ids:
         raise ValueError('bootstrap identities do not match canonical project order')
-    if project_records != bootstrap_records:
-        raise ValueError('bootstrap records do not match canonical CommonProject content')
+    if [bootstrap_record(record) for record in project_records] != bootstrap_records:
+        raise ValueError('bootstrap records do not match the canonical compact CommonProject projection')
 
     parser = TagCounter()
     parser.feed(html_raw.decode('utf-8'))
@@ -69,7 +74,6 @@ def measure(root: Path = ROOT) -> dict:
     runtime_project_fetch_enabled = bool(
         './catalog/catalog.json' in app_text
         or 'manifest.project_files.map' in app_text
-        or '/catalog/projects/' in app_text
     )
     fetched_project_bytes = sum(len(raw) for raw in project_raw) if runtime_project_fetch_enabled else 0
     fetched_project_gzip_bytes = sum(gzip_size(raw) for raw in project_raw) if runtime_project_fetch_enabled else 0
@@ -102,7 +106,8 @@ def measure(root: Path = ROOT) -> dict:
             'start_tag_count': parser.start_tags,
             'catalog_card_instances': html_raw.count(b'class="catalog-card"'),
             'interactive_catalog_cards': html_raw.count(b'class="catalog-select"'),
-            'noscript_catalogs': html_raw.count(b'class="noscript-catalog"'),
+            'static_fallback_catalogs': html_raw.count(b'class="static-catalog-fallback"'),
+            'noscript_elements': html_raw.count(b'<noscript'),
         },
         'runtime_verification_fetch': {
             'enabled': runtime_project_fetch_enabled,

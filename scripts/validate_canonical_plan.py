@@ -5,6 +5,7 @@ from __future__ import annotations
 
 import importlib.util
 import json
+import re
 import sys
 from pathlib import Path
 
@@ -38,6 +39,12 @@ REQUIRED_PLAN_TOKENS = (
     "### Erster öffentlicher MapLibre-Vertikalschnitt v1",
     "### Globe-first Oberfläche v1",
     "### Gemessene statische Katalogauslieferung v1",
+    "kompakten buildgebundenen Bootstrap",
+    "während der kompakte Bootstrap die sichtbare Oberfläche weiter versorgt",
+    "vollständige statische No-JavaScript-Liste bleibt genau einmal",
+    "statische interaktive Karten werden nicht zusätzlich dupliziert",
+    "Die lineare Liste liegt außerhalb der Bootstrap-Modulabhängigkeit",
+    "bleibt sie als Recovery-Oberfläche sichtbar",
     "### Hierarchische digitale Ringbündel v1",
     "### Begrenzte Produktions- und Anbieterentscheidung v1",
     "### Commitgebundener Produktions-Readback v1",
@@ -60,6 +67,15 @@ REQUIRED_PLAN_TOKENS = (
     "### Phase 6 — Weltgewebe-Übergang",
     "Der Globus liefert den Überblick. Der Zoom liefert Genauigkeit.",
 )
+
+FORBIDDEN_PLAN_TOKENS = (
+    "die statischen interaktiven und No-JavaScript-Karten",
+)
+
+FORBIDDEN_PLAN_PATTERNS = (
+    re.compile(r"\bvollständig\w*\s+(?:buildgebunden\w*\s+)?Bootstrap\b", re.IGNORECASE),
+)
+
 
 FORBIDDEN_ACTIVE_PATHS = (
     "proofs",
@@ -129,6 +145,7 @@ EXPECTED_SCRIPT_FILES = {
     "build_catalog_runtime.py",
     "build_country_boundary_subset.mjs",
     "build_public_runtime.py",
+    "catalog_bootstrap.py",
     "catalog_delivery_compile.mjs",
     "check_pages_dns_target.py",
     "commonworld_geo.py",
@@ -309,6 +326,17 @@ def validate_canonical_plan(root: Path = ROOT) -> list[str]:
     for token in REQUIRED_PLAN_TOKENS:
         if token not in text:
             errors.append(f"canonical globe plan missing required token: {token}")
+
+    for token in FORBIDDEN_PLAN_TOKENS:
+        if token in text:
+            errors.append(f"canonical globe plan retains obsolete catalog delivery doctrine: {token}")
+    for pattern in FORBIDDEN_PLAN_PATTERNS:
+        match = pattern.search(text)
+        if match:
+            errors.append(
+                "canonical globe plan retains obsolete catalog delivery doctrine: "
+                f"{match.group(0)}"
+            )
 
     controlled_directories = (
         (root / "docs" / "blueprints", EXPECTED_BLUEPRINT_FILES, "blueprint"),

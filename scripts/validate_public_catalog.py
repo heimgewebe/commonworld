@@ -393,8 +393,8 @@ def validate_public_catalog(root: Path = ROOT) -> list[str]:
         card_bodies: dict[str, list[str]] = {}
         for identifier, body in cards:
             card_bodies.setdefault(identifier, []).append(body)
-        if sorted(card_ids) != sorted(identifiers + identifiers) or any(card_ids.count(identifier) != 2 for identifier in identifiers):
-            errors.append('public shell card identities must match the public catalog once in Text and once in the no-JavaScript fallback' if locale == 'en' else 'German public shell card identities must match the public catalog once in Text and once in the no-JavaScript fallback')
+        if sorted(card_ids) != sorted(identifiers) or any(card_ids.count(identifier) != 1 for identifier in identifiers):
+            errors.append('public shell card identities must match the public catalog exactly once in the no-JavaScript fallback' if locale == 'en' else 'German public shell card identities must match the public catalog exactly once in the no-JavaScript fallback')
         if './catalog/catalog.json' not in shell:
             errors.append(f"{locale} public shell must link to the canonical public catalog manifest")
         if './contracts/commonworld/project.schema.json' not in shell:
@@ -415,7 +415,7 @@ def validate_public_catalog(root: Path = ROOT) -> list[str]:
             ]
             for value, label in expected_values:
                 if not bodies or any(value not in body for body in bodies):
-                    errors.append(f"public shell is missing {label} for {identifier} in at least one text projection" if locale == 'en' else f"German public shell is missing {label} for {identifier} in at least one text projection")
+                    errors.append(f"public shell is missing {label} for {identifier} in the no-JavaScript projection" if locale == 'en' else f"German public shell is missing {label} for {identifier} in the no-JavaScript projection")
 
     return errors
 
