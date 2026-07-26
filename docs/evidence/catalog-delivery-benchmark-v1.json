@@ -33,7 +33,7 @@
       },
       "html": {
         "raw_bytes": 114732,
-        "gzip_bytes": 16351,
+        "gzip_bytes": 16352,
         "start_tag_count": 1293,
         "catalog_card_instances": 65,
         "interactive_catalog_cards": 0,
@@ -272,7 +272,7 @@
       },
       "html": {
         "raw_bytes": 114732,
-        "gzip_bytes": 16351,
+        "gzip_bytes": 16352,
         "start_tag_count": 1293,
         "catalog_card_instances": 65,
         "interactive_catalog_cards": 0,
@@ -294,7 +294,7 @@
     "browser": {
       "schema_version": 1,
       "kind": "commonworld_catalog_delivery_browser_metrics",
-      "measured_at": "2026-07-26T15:55:05.186Z",
+      "measured_at": "2026-07-26T16:21:49.960Z",
       "cpu_throttle_rate": 4,
       "profiles": [
         {
@@ -304,47 +304,47 @@
             "height": 844
           },
           "cpu_throttle_rate": 4,
-          "runtime_ready_ms": 833,
+          "runtime_ready_ms": 1073,
           "dom_node_count": 1578,
           "catalog_card_count": 48,
           "interactive_catalog_card_count": 48,
           "runtime_ready": true,
           "runtime_failed": false,
-          "dom_content_loaded_ms": 531.2999999970198,
-          "load_event_ms": 568.7999999970198,
+          "dom_content_loaded_ms": 675.2000000029802,
+          "load_event_ms": 727.7000000029802,
           "resource_count": 16,
-          "script_duration_ms": 590.83,
-          "task_duration_ms": 1166.57,
+          "script_duration_ms": 747.59,
+          "task_duration_ms": 1462.22,
           "bootstrap_compile": {
-            "median_ms": 0.6000000014901161,
+            "median_ms": 0.4000000059604645,
             "p95_ms": 1,
             "samples_ms": [
               0,
               0,
               0,
+              0,
               0.10000000149011612,
-              0.10000000149011612,
-              0.10000000149011612,
-              0.10000000149011612,
-              0.19999999552965164,
+              0.20000000298023224,
+              0.29999999701976776,
+              0.29999999701976776,
+              0.3999999985098839,
+              0.4000000059604645,
+              0.4000000059604645,
               0.5,
               0.5,
-              0.6000000014901161,
-              0.6000000014901161,
-              0.6000000014901161,
+              0.5,
+              0.5,
               0.6999999955296516,
-              0.7000000029802322,
-              0.7000000029802322,
               0.7999999970197678,
-              0.8999999985098839,
-              0.8999999985098839,
               1,
-              2
+              1,
+              1,
+              2.399999998509884
             ]
           },
           "first_party_request_count": 15,
           "first_party_unique_request_count": 15,
-          "first_party_raw_bytes": 1835013,
+          "first_party_raw_bytes": 1835046,
           "first_party_requests": [
             "/",
             "/assets/commonworld-app.js",
@@ -362,7 +362,7 @@
             "/catalog/runtime/manifest.v1.json",
             "/index.css"
           ],
-          "first_party_surface_sha256": "9de8ac0ea2264e7a128c7429a26bbf555865c7931ba289aa1f3239e9ad621e3f",
+          "first_party_surface_sha256": "f509e40fd4bec20f5e83d8a27186948b97a6b6457397c6842a5c096b2f0ca989",
           "project_json_request_count": 0,
           "project_json_unique_request_count": 0,
           "project_json_requests": []
@@ -374,47 +374,47 @@
             "height": 768
           },
           "cpu_throttle_rate": 4,
-          "runtime_ready_ms": 800,
+          "runtime_ready_ms": 941,
           "dom_node_count": 1578,
           "catalog_card_count": 48,
           "interactive_catalog_card_count": 48,
           "runtime_ready": true,
           "runtime_failed": false,
-          "dom_content_loaded_ms": 491.29999999701977,
-          "load_event_ms": 531.5,
+          "dom_content_loaded_ms": 601.6999999955297,
+          "load_event_ms": 638.5,
           "resource_count": 16,
-          "script_duration_ms": 617.09,
-          "task_duration_ms": 1106.35,
+          "script_duration_ms": 740.05,
+          "task_duration_ms": 1423.83,
           "bootstrap_compile": {
-            "median_ms": 0.3999999985098839,
-            "p95_ms": 0.8999999985098839,
+            "median_ms": 0.6999999955296516,
+            "p95_ms": 1,
             "samples_ms": [
-              0,
-              0,
-              0.10000000149011612,
-              0.10000000149011612,
-              0.10000000149011612,
-              0.10000000149011612,
               0.10000000149011612,
               0.19999999552965164,
               0.19999999552965164,
-              0.19999999552965164,
-              0.3999999985098839,
+              0.20000000298023224,
+              0.4000000059604645,
+              0.4000000059604645,
               0.5,
-              0.5,
+              0.5999999940395355,
               0.6000000014901161,
+              0.6000000014901161,
+              0.6999999955296516,
               0.7000000029802322,
-              0.7000000029802322,
-              0.7000000029802322,
+              0.7999999970197678,
+              0.7999999970197678,
+              0.8000000044703484,
               0.8000000044703484,
               0.8999999985098839,
-              0.8999999985098839,
-              0.8999999985098839
+              0.9000000059604645,
+              1,
+              1,
+              1.1999999955296516
             ]
           },
           "first_party_request_count": 15,
           "first_party_unique_request_count": 15,
-          "first_party_raw_bytes": 1835013,
+          "first_party_raw_bytes": 1835046,
           "first_party_requests": [
             "/",
             "/assets/commonworld-app.js",
@@ -432,7 +432,7 @@
             "/catalog/runtime/manifest.v1.json",
             "/index.css"
           ],
-          "first_party_surface_sha256": "9de8ac0ea2264e7a128c7429a26bbf555865c7931ba289aa1f3239e9ad621e3f",
+          "first_party_surface_sha256": "f509e40fd4bec20f5e83d8a27186948b97a6b6457397c6842a5c096b2f0ca989",
           "project_json_request_count": 0,
           "project_json_unique_request_count": 0,
           "project_json_requests": []
@@ -445,36 +445,36 @@
       "profiles": {
         "mobile-low-power": {
           "runtime_ready_ms": {
-            "min": 833,
-            "median": 833,
-            "max": 833
+            "min": 1073,
+            "median": 1073,
+            "max": 1073
           },
           "script_duration_ms": {
-            "min": 590.83,
-            "median": 590.83,
-            "max": 590.83
+            "min": 747.59,
+            "median": 747.59,
+            "max": 747.59
           },
           "task_duration_ms": {
-            "min": 1166.57,
-            "median": 1166.57,
-            "max": 1166.57
+            "min": 1462.22,
+            "median": 1462.22,
+            "max": 1462.22
           }
         },
         "desktop-low-power": {
           "runtime_ready_ms": {
-            "min": 800,
-            "median": 800,
-            "max": 800
+            "min": 941,
+            "median": 941,
+            "max": 941
           },
           "script_duration_ms": {
-            "min": 617.09,
-            "median": 617.09,
-            "max": 617.09
+            "min": 740.05,
+            "median": 740.05,
+            "max": 740.05
           },
           "task_duration_ms": {
-            "min": 1106.35,
-            "median": 1106.35,
-            "max": 1106.35
+            "min": 1423.83,
+            "median": 1423.83,
+            "max": 1423.83
           }
         }
       },
@@ -552,9 +552,9 @@
         "method-mobile-text-200"
       ],
       "catalogue_network_blocked_requests": 0,
-      "job_id": "00ea409fa4f2",
-      "finalization_receipt_sha256": "b8049f72e541d0d156a1ee75a2474bf48691dc13b90584c6ce20a2605a6ca8cb",
-      "result_sha256": "b1778b7441786da453e09793e0e1bc5bc7196e057a880e970570a7765f67a7c4"
+      "job_id": "47f97eae8a70",
+      "finalization_receipt_sha256": "2a1f9d7657f341bc1f0de4d258867d71f2dc070594af591a19400cc7cc4bceb4",
+      "result_sha256": "39368606855301efa939f13d8699c244957145e21030f82dfe9e268e6c49eb23"
     },
     "catalog_delivery_browser_measurement": {
       "verdict": "PASS",
@@ -563,7 +563,7 @@
         "desktop-low-power"
       ],
       "cpu_throttle_rate": 4,
-      "result_sha256": "0a7e028b105dc640f718c598eb58ae2859680b6ba3bfa50c259096e12265f980"
+      "result_sha256": "b1330e9c45cf8431f5de974ea019fc8388947f510e09abfa9d0816738b530bf9"
     }
   },
   "budget_binding": {
@@ -571,5 +571,5 @@
     "warn_bootstrap_gzip_bytes": 28672,
     "max_bootstrap_gzip_bytes": 32768
   },
-  "current_surface_note": "The current 65-entry surface uses a compact build-bound bootstrap, strips internal relation evidence identifiers from startup data, and preserves one complete immutable linear recovery catalogue. Until successful startup removes it, skip activation reveals and focuses that catalogue rather than the filtered interactive text surface."
+  "current_surface_note": "The current 65-entry surface uses a compact build-bound bootstrap, strips internal relation evidence identifiers from startup data, and preserves one complete immutable linear recovery catalogue. Fragment activation reveals that catalogue through CSS :target even when the bootstrap module never evaluates; after module evaluation, the skip handler preserves the same target until successful startup removes the recovery surface."
 }

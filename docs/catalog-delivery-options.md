@@ -17,7 +17,7 @@ Die kompakte Projektion enthält weiterhin Titel, Zusammenfassung, Themen, Aktio
 Gemessener Stand vom 26. Juli 2026:
 
 - Bootstrap: 105.072 rohe Bytes, 20.132 gzip-Bytes
-- HTML: 114.732 rohe Bytes, 16.351 gzip-Bytes
+- HTML: 114.732 rohe Bytes, 16.352 gzip-Bytes
 - HTML-Starttags: 1.293
 - statische Katalogkarten: 65, ausschließlich in der einmaligen linearen Recovery-Oberfläche
 - Projekt-JSON-Anfragen beim Start: 0

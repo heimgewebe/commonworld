@@ -191,6 +191,22 @@ class CatalogDeliveryBudgetTests(unittest.TestCase):
         errors = validate_actual_smoke(actual, expected)
         self.assertIn('fresh public browser smoke bootstrap fallback does not prove neutral recovery copy', errors)
 
+    def test_fresh_smoke_rejects_missing_bootstrap_fragment_reveal(self) -> None:
+        expected = self.fresh_smoke()
+        actual = json.loads(json.dumps(expected))
+        scenario = next(item for item in actual['scenarios'] if item['id'] == BOOTSTRAP_ASSET_FAILURE_SCENARIO)
+        scenario['targetRecoveryVisible'] = False
+        errors = validate_actual_smoke(actual, expected)
+        self.assertIn('fresh public browser smoke bootstrap failure fragment does not immediately reveal the recovery catalog', errors)
+
+    def test_fresh_smoke_rejects_delayed_bootstrap_fragment_reveal(self) -> None:
+        expected = self.fresh_smoke()
+        actual = json.loads(json.dumps(expected))
+        scenario = next(item for item in actual['scenarios'] if item['id'] == BOOTSTRAP_ASSET_FAILURE_SCENARIO)
+        scenario['targetRecoveryAnimationName'] = 'static-catalog-fallback-reveal'
+        errors = validate_actual_smoke(actual, expected)
+        self.assertIn('fresh public browser smoke bootstrap failure fragment reveal still depends on delayed animation', errors)
+
     def test_fresh_smoke_rejects_mutated_post_render_fallback(self) -> None:
         expected = self.fresh_smoke()
         actual = json.loads(json.dumps(expected))

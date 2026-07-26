@@ -117,6 +117,14 @@ def validate_bootstrap_asset_failure_fallback(
         errors.append(f'{label} bootstrap fallback catalog hides {hidden} card(s)')
     if scenario.get('neutralRecoveryCopy') is not True:
         errors.append(f'{label} bootstrap fallback does not prove neutral recovery copy')
+    if scenario.get('skipLinkHref') != '#static-catalog-fallback':
+        errors.append(f'{label} bootstrap failure skip link does not target the recovery catalog')
+    if scenario.get('targetRecoveryHash') != '#static-catalog-fallback':
+        errors.append(f'{label} bootstrap failure fragment does not target the recovery catalog')
+    if scenario.get('targetRecoveryVisible') is not True:
+        errors.append(f'{label} bootstrap failure fragment does not immediately reveal the recovery catalog')
+    if scenario.get('targetRecoveryAnimationName') != 'none':
+        errors.append(f'{label} bootstrap failure fragment reveal still depends on delayed animation')
     return errors
 
 

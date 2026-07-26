@@ -116,6 +116,7 @@ REQUIRED_CSS = (
     '.settings-panel',
     '.text-view',
     '.static-catalog-fallback',
+    '.static-catalog-fallback:target,',
     '.static-catalog-fallback[data-skip-activated="true"]',
     '.project-focus',
     '.globe-results',

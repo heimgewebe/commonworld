@@ -99,7 +99,9 @@ class PublicShellTests(unittest.TestCase):
         self.assertIn("recoveryCatalog.dataset.skipActivated = 'true'", app)
         self.assertIn("recoveryCatalog.focus({ preventScroll: true })", app)
         self.assertIn("recoveryCatalog.scrollIntoView({ block: 'start' })", app)
-        self.assertIn('.static-catalog-fallback[data-skip-activated="true"]', (ROOT / 'index.css').read_text(encoding='utf-8'))
+        css = (ROOT / 'index.css').read_text(encoding='utf-8')
+        self.assertIn('.static-catalog-fallback:target,', css)
+        self.assertIn('.static-catalog-fallback[data-skip-activated="true"]', css)
         self.assertIn("textSkipLink.setAttribute('href', '#text-view')", app)
         self.assertIn("document.querySelector('[data-static-catalog-fallback]')?.remove()", app)
 
@@ -146,6 +148,21 @@ class PublicShellTests(unittest.TestCase):
             'public shell missing required token: id="text-skip-link" class="skip-link" href="#static-catalog-fallback"',
             errors,
         )
+
+    def test_public_shell_rejects_missing_fragment_recovery_reveal(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp_dir:
+            root = self.copy_shell(tmp_dir)
+            css_path = root / 'index.css'
+            css_path.write_text(
+                css_path.read_text(encoding='utf-8').replace(
+                    '.static-catalog-fallback:target,',
+                    '.static-catalog-fallback[data-missing-fragment-target],',
+                    1,
+                ),
+                encoding='utf-8',
+            )
+            errors = validate_public_shell(root)
+        self.assertIn('public shell CSS missing required token: .static-catalog-fallback:target,', errors)
 
     def test_public_shell_rejects_global_catalog_card_filtering(self) -> None:
         with tempfile.TemporaryDirectory() as tmp_dir:

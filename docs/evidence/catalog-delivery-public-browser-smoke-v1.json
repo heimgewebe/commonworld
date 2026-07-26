@@ -122,7 +122,7 @@
     {
       "id": "layer-journey-moveend-return",
       "verdict": "PASS",
-      "elapsedMs": 1719
+      "elapsedMs": 1451
     },
     {
       "id": "layer-journey-interrupted",
@@ -209,7 +209,11 @@
       "blockedBootstrapRequests": 1,
       "fallbackCatalogCards": 65,
       "hiddenFallbackCatalogCards": 0,
-      "neutralRecoveryCopy": true
+      "neutralRecoveryCopy": true,
+      "skipLinkHref": "#static-catalog-fallback",
+      "targetRecoveryHash": "#static-catalog-fallback",
+      "targetRecoveryVisible": true,
+      "targetRecoveryAnimationName": "none"
     },
     {
       "id": "post-render-failure-preserves-fallback",
@@ -239,9 +243,9 @@
     }
   ],
   "binding": {
-    "smoke_script_sha256": "16a530456029234b1dc7d5ae8410e8d09a7162c21e377ef36c5de12174bf2fd8",
+    "smoke_script_sha256": "7a4895d57444a1855213dea419025408efebc2eb97996b0f4c4741a8290e7df3",
     "smoke_runner_sha256": "522b99b70b1d0064b1d0a31a3a67fdc9a2e73b7408f37d1a4bb303bc360b7556",
-    "first_party_surface_sha256": "9de8ac0ea2264e7a128c7429a26bbf555865c7931ba289aa1f3239e9ad621e3f",
+    "first_party_surface_sha256": "f509e40fd4bec20f5e83d8a27186948b97a6b6457397c6842a5c096b2f0ca989",
     "scenario_ids": [
       "startup-and-ring-orbits",
       "ring-orbits-reduced-motion",
@@ -275,12 +279,12 @@
       "method-mobile",
       "method-mobile-text-200"
     ],
-    "freshness_rule": "The official runner must create a fresh public result and validate exact scenario order, PASS verdicts, zero forbidden canonical project requests, selected compact-shard parity, neutral recovery copy, and a complete immutable ordinary-DOM linear catalogue. When startup fails after runtime filtering, activating the skip link must reveal and focus the surviving recovery catalogue until successful startup removes it.",
+    "freshness_rule": "The official runner must create a fresh public result and validate exact scenario order, PASS verdicts, zero forbidden canonical project requests, selected compact-shard parity, neutral recovery copy, and a complete immutable ordinary-DOM linear catalogue. Bootstrap-module failure must leave fragment navigation sufficient to reveal the recovery catalogue immediately through :target without delayed animation; a later runtime failure must reveal and focus the same catalogue through the installed handler.",
     "smoke_plan_sha256": "6b8749928ead5ef81ee66883e6a2993e756ce083575c3569234bf70526448364"
   },
   "execution": {
-    "job_id": "00ea409fa4f2",
-    "finalization_receipt_sha256": "b8049f72e541d0d156a1ee75a2474bf48691dc13b90584c6ce20a2605a6ca8cb",
-    "result_sha256": "b1778b7441786da453e09793e0e1bc5bc7196e057a880e970570a7765f67a7c4"
+    "job_id": "47f97eae8a70",
+    "finalization_receipt_sha256": "2a1f9d7657f341bc1f0de4d258867d71f2dc070594af591a19400cc7cc4bceb4",
+    "result_sha256": "39368606855301efa939f13d8699c244957145e21030f82dfe9e268e6c49eb23"
   }
 }

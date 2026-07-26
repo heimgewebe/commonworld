@@ -2848,6 +2848,18 @@ async function bootstrapAssetFailureFallbackScenario() {
     return route.abort('failed');
   });
   await run.page.goto(baseUrl, { waitUntil: 'domcontentloaded' });
+  const skipLinkHref = await run.page.locator('#text-skip-link').getAttribute('href');
+  await run.page.locator('#text-skip-link').focus();
+  await run.page.keyboard.press('Enter');
+  await run.page.waitForFunction(() => location.hash === '#static-catalog-fallback');
+  const targetRecoveryState = await run.page.locator('#static-catalog-fallback').evaluate((node) => {
+    const style = getComputedStyle(node);
+    return {
+      hash: location.hash,
+      visible: style.visibility === 'visible' && style.opacity === '1' && style.pointerEvents !== 'none',
+      animationName: style.animationName,
+    };
+  });
   await run.page.locator('#static-catalog-fallback').waitFor({ state: 'visible', timeout: 5000 });
   const fallbackCatalogCards = await run.page.locator('#static-catalog-fallback .catalog-card').count();
   const hiddenFallbackCatalogCards = await run.page.locator('#static-catalog-fallback .catalog-card[hidden]').count();
@@ -2860,7 +2872,10 @@ async function bootstrapAssetFailureFallbackScenario() {
   assert(fallbackCatalogCards === manifest.entry_count, `bootstrap asset failure: expected ${manifest.entry_count} fallback cards, found ${fallbackCatalogCards}`);
   assert(hiddenFallbackCatalogCards === 0, `bootstrap asset failure: ${hiddenFallbackCatalogCards} fallback cards were hidden`);
   assert(neutralRecoveryCopy, `bootstrap asset failure: recovery copy falsely declares failure: ${recoveryCopy}`);
-  assert((await run.page.locator('#text-skip-link').getAttribute('href')) === '#static-catalog-fallback', 'bootstrap asset failure: skip link does not target the surviving catalog');
+  assert(skipLinkHref === '#static-catalog-fallback', 'bootstrap asset failure: skip link does not target the surviving catalog');
+  assert(targetRecoveryState.hash === '#static-catalog-fallback', `bootstrap asset failure: fragment target is ${targetRecoveryState.hash || 'empty'}`);
+  assert(targetRecoveryState.visible, 'bootstrap asset failure: fragment activation did not immediately reveal the recovery catalog');
+  assert(targetRecoveryState.animationName === 'none', `bootstrap asset failure: fragment reveal still depends on animation ${targetRecoveryState.animationName}`);
   assert(await run.page.locator('#static-catalog-fallback .catalog-card a').first().isVisible(), 'bootstrap asset failure: fallback links are not usable');
   results.push({
     id: 'bootstrap-asset-failure-fallback',
@@ -2869,6 +2884,10 @@ async function bootstrapAssetFailureFallbackScenario() {
     fallbackCatalogCards,
     hiddenFallbackCatalogCards,
     neutralRecoveryCopy,
+    skipLinkHref,
+    targetRecoveryHash: targetRecoveryState.hash,
+    targetRecoveryVisible: targetRecoveryState.visible,
+    targetRecoveryAnimationName: targetRecoveryState.animationName,
   });
   await run.context.close();
 }

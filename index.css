@@ -874,6 +874,7 @@ html[data-input-modality="pointer"] :focus {
   animation: static-catalog-fallback-reveal 0s linear 1s forwards;
 }
 
+.static-catalog-fallback:target,
 .static-catalog-fallback[data-skip-activated="true"] {
   opacity: 1;
   visibility: visible;
