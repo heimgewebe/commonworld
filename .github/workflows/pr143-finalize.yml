@@ -6,14 +6,14 @@ on:
       - synchronize
 
 permissions:
-  contents: write
+  contents: read
 
 concurrency:
   group: pr143-finalize
   cancel-in-progress: true
 
 jobs:
-  finalize:
+  package:
     if: github.event.pull_request.head.ref == 'feat/digital-detail-unification-v1'
     runs-on: ubuntu-latest
     steps:
@@ -21,22 +21,18 @@ jobs:
         with:
           fetch-depth: 0
           ref: feat/digital-detail-unification-v1
-      - uses: actions/setup-python@v5
-        with:
-          python-version: "3.12"
       - uses: actions/setup-node@v4
         with:
           node-version: "22"
           cache: npm
-      - name: Install dependencies
+      - name: Install exact Node and browser dependencies
         run: |
           npm ci --ignore-scripts --no-audit --no-fund
-          npx playwright install --with-deps chromium
-          python -m pip install -r requirements-dev.txt
-      - name: Patch low-height detail layout
+          npx playwright install chromium
+      - name: Patch and rebuild final product surface
         run: |
-          python scripts/pr143_finalize.py patch
-          python - <<'PY'
+          python3 scripts/pr143_finalize.py patch
+          python3 - <<'PY'
           from pathlib import Path
           path = Path('index.css')
           text = path.read_text(encoding='utf-8')
@@ -54,113 +50,19 @@ jobs:
               raise SystemExit('low-height project detail header contract not found')
           path.write_text(text, encoding='utf-8')
           PY
-      - name: Verify deterministic generated surfaces
-        run: |
           npm run build
           git diff --check
-          git diff --binary -- de.html index.html method.de.html method.html assets/commonworld-bootstrap-catalog.mjs assets/commonworld-en-locale.mjs > /tmp/generated-before.diff
-          npm run build
-          git diff --binary -- de.html index.html method.de.html method.html assets/commonworld-bootstrap-catalog.mjs assets/commonworld-en-locale.mjs > /tmp/generated-after.diff
-          cmp /tmp/generated-before.diff /tmp/generated-after.diff
-      - name: Measure static delivery
-        run: python scripts/measure_catalog_delivery.py --output /tmp/pr143-static.json
-      - name: Measure throttled browser delivery
-        run: node scripts/measure_catalog_delivery_browser.mjs --output /tmp/pr143-browser.json
-      - name: Run public browser evidence
-        run: node scripts/smoke_public_browser.mjs --result /tmp/pr143-smoke.json
-      - name: Upload finalizer diagnostics
-        if: always()
-        uses: actions/upload-artifact@v4
+      - name: Package checkout and browser runtime
+        run: |
+          tar --exclude=.git -czf /tmp/pr143-workspace.tgz .
+          tar -C "$HOME/.cache" -czf /tmp/pr143-playwright-cache.tgz ms-playwright
+          sha256sum /tmp/pr143-workspace.tgz /tmp/pr143-playwright-cache.tgz > /tmp/pr143-package.sha256
+      - uses: actions/upload-artifact@v4
         with:
-          name: pr143-finalizer-diagnostics
+          name: pr143-controlled-workspace
           path: |
-            /tmp/pr143-static.json
-            /tmp/pr143-browser.json
-            /tmp/pr143-smoke.json
-            /tmp/generated-before.diff
-            /tmp/generated-after.diff
-          if-no-files-found: warn
+            /tmp/pr143-workspace.tgz
+            /tmp/pr143-playwright-cache.tgz
+            /tmp/pr143-package.sha256
+          compression-level: 0
           retention-days: 1
-      - name: Bind benchmark, smoke and review evidence
-        run: |
-          python scripts/pr143_finalize.py bind \
-            --static /tmp/pr143-static.json \
-            --browser /tmp/pr143-browser.json \
-            --smoke /tmp/pr143-smoke.json
-      - name: Remove temporary finalizer
-        run: rm -f .github/workflows/pr143-finalize.yml scripts/pr143_finalize.py docs/evidence/pr143-finalization-receipt-v1.json
-      - name: Diff hygiene
-        run: git diff --check
-      - name: Validate proposal path
-        run: make validate-proposal-path
-      - name: Validate current state
-        run: make validate-current-state
-      - name: Validate canonical plan
-        run: make validate-canonical-plan
-      - name: Validate contracts
-        run: make validate-contracts
-      - name: Validate semantic zoom
-        run: make validate-semantic-zoom
-      - name: Validate visual semantics
-        run: make validate-visual-semantics
-      - name: Validate renderer spike
-        run: make validate-renderer-spike
-      - name: Validate MapLibre phase 2 proof
-        run: make validate-maplibre-phase2-proof
-      - name: Validate device acceptance pack
-        run: make validate-device-acceptance-pack
-      - name: Validate device acceptance rerun
-        run: make validate-device-acceptance-rerun
-      - name: Validate digital sphere
-        run: make validate-digital-sphere
-      - name: Validate digital ring taxonomy
-        run: make validate-digital-ring-taxonomy
-      - name: Validate layered digital sphere proof
-        run: make validate-layered-digital-sphere-proof
-      - name: Validate digital sphere real surface
-        run: make validate-digital-sphere-real-surface
-      - name: Validate device acceptance performance
-        run: make validate-device-acceptance-performance-v4
-      - name: Validate physical Apple acceptance
-        run: make validate-physical-device-acceptance-v4-apple
-      - name: Validate public catalog
-        run: make validate-public-catalog
-      - name: Validate public seed baseline
-        run: make validate-public-seed-baseline
-      - name: Validate presence axes
-        run: make validate-presence-axes
-      - name: Validate intent search discovery
-        run: make validate-intent-search-discovery
-      - name: Validate renderer selection
-        run: make validate-renderer-selection
-      - name: Validate public MapLibre vertical slice
-        run: make validate-public-maplibre-vertical-slice
-      - name: Validate production delivery provider
-        run: make validate-production-delivery-provider
-      - name: Validate public shell
-        run: make validate-public-shell
-      - name: Validate catalog delivery budget
-        run: make validate-catalog-delivery-budget
-      - name: JavaScript tests
-        run: make test-js
-      - name: Python tests
-        run: make test
-      - name: Browser smoke suite
-        run: npm run smoke:browser
-      - name: Final diff hygiene
-        run: git diff --check
-      - name: Commit finalized PR head
-        env:
-          BRANCH: feat/digital-detail-unification-v1
-        run: |
-          git config user.name "github-actions[bot]"
-          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add -A
-          git diff --cached --check
-          git commit -m "fix: keep low-height digital details reachable"
-          git fetch origin main
-          git diff --binary origin/main...HEAD > /tmp/pr143-final.diff
-          printf 'FINAL_HEAD=%s\n' "$(git rev-parse HEAD)"
-          printf 'FINAL_DIFF_SHA256=%s\n' "$(sha256sum /tmp/pr143-final.diff | cut -d' ' -f1)"
-          printf 'FINAL_DIFF_BYTES=%s\n' "$(wc -c < /tmp/pr143-final.diff)"
-          git push origin "HEAD:${BRANCH}"
