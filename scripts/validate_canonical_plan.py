@@ -5,6 +5,7 @@ from __future__ import annotations
 
 import importlib.util
 import json
+import re
 import sys
 from pathlib import Path
 
@@ -66,9 +67,11 @@ REQUIRED_PLAN_TOKENS = (
 )
 
 FORBIDDEN_PLAN_TOKENS = (
-    "einen vollständigen buildgebundenen Bootstrap",
-    "während der vollständige Bootstrap die sichtbare Oberfläche weiter versorgt",
     "die statischen interaktiven und No-JavaScript-Karten",
+)
+
+FORBIDDEN_PLAN_PATTERNS = (
+    re.compile(r"\bvollständig\w*\s+(?:buildgebunden\w*\s+)?Bootstrap\b", re.IGNORECASE),
 )
 
 
@@ -325,6 +328,13 @@ def validate_canonical_plan(root: Path = ROOT) -> list[str]:
     for token in FORBIDDEN_PLAN_TOKENS:
         if token in text:
             errors.append(f"canonical globe plan retains obsolete catalog delivery doctrine: {token}")
+    for pattern in FORBIDDEN_PLAN_PATTERNS:
+        match = pattern.search(text)
+        if match:
+            errors.append(
+                "canonical globe plan retains obsolete catalog delivery doctrine: "
+                f"{match.group(0)}"
+            )
 
     controlled_directories = (
         (root / "docs" / "blueprints", EXPECTED_BLUEPRINT_FILES, "blueprint"),

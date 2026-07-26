@@ -88,7 +88,7 @@ class CanonicalPlanTests(unittest.TestCase):
             errors = validate_canonical_plan(root)
 
         self.assertIn(
-            "canonical globe plan retains obsolete catalog delivery doctrine: während der vollständige Bootstrap die sichtbare Oberfläche weiter versorgt",
+            "canonical globe plan retains obsolete catalog delivery doctrine: vollständige Bootstrap",
             errors,
         )
 
