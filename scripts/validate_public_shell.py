@@ -60,6 +60,7 @@ REQUIRED_HTML = (
     'id="text-layer-current"',
     'id="catalog"',
     'id="static-catalog-fallback"',
+    'id="static-catalog-fallback" class="static-catalog-fallback" tabindex="-1"',
     'data-static-catalog-fallback',
     'id="text-skip-link" class="skip-link" href="#static-catalog-fallback"',
     'The complete linear catalog remains available here while the interactive view is loading or unavailable.',
@@ -115,6 +116,7 @@ REQUIRED_CSS = (
     '.settings-panel',
     '.text-view',
     '.static-catalog-fallback',
+    '.static-catalog-fallback[data-skip-activated="true"]',
     '.project-focus',
     '.globe-results',
     '.method-page',
@@ -173,6 +175,10 @@ def validate_public_shell(root: Path = ROOT) -> list[str]:
     for token in (
         "catalog?.querySelectorAll('.catalog-card[data-commonproject-id]')",
         "document.querySelector('#text-skip-link')",
+        "const recoveryCatalog = document.querySelector('[data-static-catalog-fallback]')",
+        "recoveryCatalog.dataset.skipActivated = 'true'",
+        "recoveryCatalog.focus({ preventScroll: true })",
+        "recoveryCatalog.scrollIntoView({ block: 'start' })",
         "textSkipLink.setAttribute('href', '#text-view')",
         "document.querySelector('[data-static-catalog-fallback]')?.remove()",
     ):

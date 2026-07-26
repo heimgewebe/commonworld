@@ -199,6 +199,22 @@ class CatalogDeliveryBudgetTests(unittest.TestCase):
         errors = validate_actual_smoke(actual, expected)
         self.assertIn('fresh public browser smoke post-render failure fallback hides 17 card(s)', errors)
 
+    def test_fresh_smoke_rejects_wrong_post_render_skip_focus(self) -> None:
+        expected = self.fresh_smoke()
+        actual = json.loads(json.dumps(expected))
+        scenario = next(item for item in actual['scenarios'] if item['id'] == POST_RENDER_FAILURE_SCENARIO)
+        scenario['skipFocusId'] = 'text-view'
+        errors = validate_actual_smoke(actual, expected)
+        self.assertIn('fresh public browser smoke post-render failure skip handler does not focus the recovery catalog', errors)
+
+    def test_fresh_smoke_rejects_missing_post_render_skip_reveal(self) -> None:
+        expected = self.fresh_smoke()
+        actual = json.loads(json.dumps(expected))
+        scenario = next(item for item in actual['scenarios'] if item['id'] == POST_RENDER_FAILURE_SCENARIO)
+        scenario['skipActivatedRecovery'] = False
+        errors = validate_actual_smoke(actual, expected)
+        self.assertIn('fresh public browser smoke post-render failure skip handler does not reveal the recovery catalog', errors)
+
     def test_validator_rejects_deliberate_bootstrap_budget_breach(self) -> None:
         with tempfile.TemporaryDirectory() as tmp:
             root = self.copy_delivery_tree(tmp)

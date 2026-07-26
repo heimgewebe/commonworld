@@ -3254,6 +3254,14 @@ function activateSphereFallbackClick(event) {
 
 function wireControls() {
   elements.skipLink.addEventListener('click', (event) => {
+    const recoveryCatalog = document.querySelector('[data-static-catalog-fallback]');
+    if (recoveryCatalog) {
+      event.preventDefault();
+      recoveryCatalog.dataset.skipActivated = 'true';
+      recoveryCatalog.focus({ preventScroll: true });
+      recoveryCatalog.scrollIntoView({ block: 'start' });
+      return;
+    }
     event.preventDefault();
     setPresentation('text');
     elements.textView.focus({ preventScroll: true });

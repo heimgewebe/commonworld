@@ -122,7 +122,7 @@
     {
       "id": "layer-journey-moveend-return",
       "verdict": "PASS",
-      "elapsedMs": 1568
+      "elapsedMs": 1719
     },
     {
       "id": "layer-journey-interrupted",
@@ -215,7 +215,10 @@
       "id": "post-render-failure-preserves-fallback",
       "verdict": "PASS",
       "fallbackCatalogCards": 65,
-      "hiddenFallbackCatalogCards": 0
+      "hiddenFallbackCatalogCards": 0,
+      "skipLinkHref": "#static-catalog-fallback",
+      "skipFocusId": "static-catalog-fallback",
+      "skipActivatedRecovery": true
     },
     {
       "id": "provider-failure",
@@ -236,9 +239,9 @@
     }
   ],
   "binding": {
-    "smoke_script_sha256": "b1e3cdacf205fa2d1b4cef416bd8841328381937caa5848c9107acc7e586d7c2",
+    "smoke_script_sha256": "16a530456029234b1dc7d5ae8410e8d09a7162c21e377ef36c5de12174bf2fd8",
     "smoke_runner_sha256": "522b99b70b1d0064b1d0a31a3a67fdc9a2e73b7408f37d1a4bb303bc360b7556",
-    "first_party_surface_sha256": "4c483925a0d4e419a4f5174db190c7b83df9188562a7bf75967272f38a4c3338",
+    "first_party_surface_sha256": "9de8ac0ea2264e7a128c7429a26bbf555865c7931ba289aa1f3239e9ad621e3f",
     "scenario_ids": [
       "startup-and-ring-orbits",
       "ring-orbits-reduced-motion",
@@ -272,12 +275,12 @@
       "method-mobile",
       "method-mobile-text-200"
     ],
-    "freshness_rule": "The official runner must materialize the canonical smoke plan, create a fresh temporary public result and validate exact scenario order, PASS verdicts, manifest-plus-aggregate startup observation, selected-identity shard parity, immutable complete recovery catalog behavior and zero forbidden canonical project requests against this hash-bound evidence.",
+    "freshness_rule": "The official runner must create a fresh public result and validate exact scenario order, PASS verdicts, zero forbidden canonical project requests, selected compact-shard parity, neutral recovery copy, and a complete immutable ordinary-DOM linear catalogue. When startup fails after runtime filtering, activating the skip link must reveal and focus the surviving recovery catalogue until successful startup removes it.",
     "smoke_plan_sha256": "6b8749928ead5ef81ee66883e6a2993e756ce083575c3569234bf70526448364"
   },
   "execution": {
-    "job_id": "33af24b3480d",
-    "finalization_receipt_sha256": "41053dd827afa3ea13fef58d6ce69075c550f07d378ceae990e29bdb6466d892",
-    "result_sha256": "fba0979c754232079770d7b18f83a9666f1b0fca133b2cc1d214c0a092a9f13c"
+    "job_id": "00ea409fa4f2",
+    "finalization_receipt_sha256": "b8049f72e541d0d156a1ee75a2474bf48691dc13b90584c6ce20a2605a6ca8cb",
+    "result_sha256": "b1778b7441786da453e09793e0e1bc5bc7196e057a880e970570a7765f67a7c4"
   }
 }

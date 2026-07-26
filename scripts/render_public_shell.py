@@ -441,7 +441,7 @@ def render_shell(root: Path = ROOT, locale: str = FALLBACK_LOCALE) -> str:
         </div>
       </section>
 
-      <section id="static-catalog-fallback" class="static-catalog-fallback" aria-labelledby="static-catalog-fallback-title" data-static-catalog-fallback>
+      <section id="static-catalog-fallback" class="static-catalog-fallback" tabindex="-1" aria-labelledby="static-catalog-fallback-title" data-static-catalog-fallback>
         <p class="kicker">Textansicht</p>
         <h1 id="static-catalog-fallback-title">Commonworld-Katalog</h1>
         <p>Der vollständige lineare Katalog bleibt hier erreichbar, während die interaktive Ansicht lädt oder nicht verfügbar ist.</p>

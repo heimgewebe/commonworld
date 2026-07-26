@@ -2886,14 +2886,25 @@ async function postRenderFailurePreservesFallbackScenario() {
   await run.page.locator('#static-catalog-fallback').waitFor({ state: 'visible', timeout: 5000 });
   const fallbackCatalogCards = await run.page.locator('#static-catalog-fallback .catalog-card').count();
   const hiddenFallbackCatalogCards = await run.page.locator('#static-catalog-fallback .catalog-card[hidden]').count();
+  const skipLinkHref = await run.page.locator('#text-skip-link').getAttribute('href');
+  await run.page.locator('#text-skip-link').focus();
+  await run.page.keyboard.press('Enter');
+  const skipFocusId = await run.page.evaluate(() => document.activeElement?.id ?? '');
+  const skipActivatedRecovery = (await run.page.locator('#static-catalog-fallback').getAttribute('data-skip-activated')) === 'true';
   assert(fallbackCatalogCards === manifest.entry_count, `post-render failure: expected ${manifest.entry_count} fallback cards, found ${fallbackCatalogCards}`);
   assert(hiddenFallbackCatalogCards === 0, `post-render failure: ${hiddenFallbackCatalogCards} fallback cards were mutated by runtime filtering`);
   assert(await run.page.locator('#static-catalog-fallback').isVisible(), 'post-render failure: complete fallback is not visible');
+  assert(skipLinkHref === '#static-catalog-fallback', `post-render failure: skip link targets ${skipLinkHref}`);
+  assert(skipFocusId === 'static-catalog-fallback', `post-render failure: skip handler focused ${skipFocusId || 'nothing'} instead of recovery catalog`);
+  assert(skipActivatedRecovery, 'post-render failure: skip handler did not reveal the recovery catalog');
   results.push({
     id: 'post-render-failure-preserves-fallback',
     verdict: 'PASS',
     fallbackCatalogCards,
     hiddenFallbackCatalogCards,
+    skipLinkHref,
+    skipFocusId,
+    skipActivatedRecovery,
   });
   await run.context.close();
 }

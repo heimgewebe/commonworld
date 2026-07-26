@@ -32,8 +32,8 @@
         "gzip_bytes": 1297
       },
       "html": {
-        "raw_bytes": 114718,
-        "gzip_bytes": 16352,
+        "raw_bytes": 114732,
+        "gzip_bytes": 16351,
         "start_tag_count": 1293,
         "catalog_card_instances": 65,
         "interactive_catalog_cards": 0,
@@ -271,8 +271,8 @@
         "gzip_bytes": 1297
       },
       "html": {
-        "raw_bytes": 114718,
-        "gzip_bytes": 16352,
+        "raw_bytes": 114732,
+        "gzip_bytes": 16351,
         "start_tag_count": 1293,
         "catalog_card_instances": 65,
         "interactive_catalog_cards": 0,
@@ -294,7 +294,7 @@
     "browser": {
       "schema_version": 1,
       "kind": "commonworld_catalog_delivery_browser_metrics",
-      "measured_at": "2026-07-26T15:10:32.534Z",
+      "measured_at": "2026-07-26T15:55:05.186Z",
       "cpu_throttle_rate": 4,
       "profiles": [
         {
@@ -304,47 +304,47 @@
             "height": 844
           },
           "cpu_throttle_rate": 4,
-          "runtime_ready_ms": 813,
+          "runtime_ready_ms": 833,
           "dom_node_count": 1578,
           "catalog_card_count": 48,
           "interactive_catalog_card_count": 48,
           "runtime_ready": true,
           "runtime_failed": false,
-          "dom_content_loaded_ms": 501.5,
-          "load_event_ms": 532.5,
+          "dom_content_loaded_ms": 531.2999999970198,
+          "load_event_ms": 568.7999999970198,
           "resource_count": 16,
-          "script_duration_ms": 554.48,
-          "task_duration_ms": 1100.49,
+          "script_duration_ms": 590.83,
+          "task_duration_ms": 1166.57,
           "bootstrap_compile": {
-            "median_ms": 0.30000000447034836,
+            "median_ms": 0.6000000014901161,
             "p95_ms": 1,
             "samples_ms": [
+              0,
+              0,
               0,
               0.10000000149011612,
               0.10000000149011612,
               0.10000000149011612,
               0.10000000149011612,
-              0.10000000149011612,
-              0.10000000149011612,
-              0.10000000149011612,
-              0.10000000149011612,
-              0.29999999701976776,
-              0.30000000447034836,
-              0.3999999985098839,
+              0.19999999552965164,
+              0.5,
+              0.5,
+              0.6000000014901161,
               0.6000000014901161,
               0.6000000014901161,
               0.6999999955296516,
-              0.6999999955296516,
+              0.7000000029802322,
               0.7000000029802322,
               0.7999999970197678,
               0.8999999985098839,
+              0.8999999985098839,
               1,
-              2.399999998509884
+              2
             ]
           },
           "first_party_request_count": 15,
           "first_party_unique_request_count": 15,
-          "first_party_raw_bytes": 1834532,
+          "first_party_raw_bytes": 1835013,
           "first_party_requests": [
             "/",
             "/assets/commonworld-app.js",
@@ -362,7 +362,7 @@
             "/catalog/runtime/manifest.v1.json",
             "/index.css"
           ],
-          "first_party_surface_sha256": "4c483925a0d4e419a4f5174db190c7b83df9188562a7bf75967272f38a4c3338",
+          "first_party_surface_sha256": "9de8ac0ea2264e7a128c7429a26bbf555865c7931ba289aa1f3239e9ad621e3f",
           "project_json_request_count": 0,
           "project_json_unique_request_count": 0,
           "project_json_requests": []
@@ -374,47 +374,47 @@
             "height": 768
           },
           "cpu_throttle_rate": 4,
-          "runtime_ready_ms": 728,
+          "runtime_ready_ms": 800,
           "dom_node_count": 1578,
           "catalog_card_count": 48,
           "interactive_catalog_card_count": 48,
           "runtime_ready": true,
           "runtime_failed": false,
-          "dom_content_loaded_ms": 450.70000000298023,
-          "load_event_ms": 482.20000000298023,
+          "dom_content_loaded_ms": 491.29999999701977,
+          "load_event_ms": 531.5,
           "resource_count": 16,
-          "script_duration_ms": 548.15,
-          "task_duration_ms": 972.13,
+          "script_duration_ms": 617.09,
+          "task_duration_ms": 1106.35,
           "bootstrap_compile": {
-            "median_ms": 0.4000000059604645,
-            "p95_ms": 0.7999999970197678,
+            "median_ms": 0.3999999985098839,
+            "p95_ms": 0.8999999985098839,
             "samples_ms": [
-              0.09999999403953552,
-              0.09999999403953552,
+              0,
+              0,
+              0.10000000149011612,
+              0.10000000149011612,
               0.10000000149011612,
               0.10000000149011612,
               0.10000000149011612,
               0.19999999552965164,
               0.19999999552965164,
               0.19999999552965164,
-              0.20000000298023224,
-              0.29999999701976776,
-              0.4000000059604645,
-              0.4000000059604645,
-              0.4000000059604645,
+              0.3999999985098839,
               0.5,
               0.5,
-              0.6000000014901161,
               0.6000000014901161,
               0.7000000029802322,
-              0.7999999970197678,
-              0.7999999970197678,
-              0.8000000044703484
+              0.7000000029802322,
+              0.7000000029802322,
+              0.8000000044703484,
+              0.8999999985098839,
+              0.8999999985098839,
+              0.8999999985098839
             ]
           },
           "first_party_request_count": 15,
           "first_party_unique_request_count": 15,
-          "first_party_raw_bytes": 1834532,
+          "first_party_raw_bytes": 1835013,
           "first_party_requests": [
             "/",
             "/assets/commonworld-app.js",
@@ -432,7 +432,7 @@
             "/catalog/runtime/manifest.v1.json",
             "/index.css"
           ],
-          "first_party_surface_sha256": "4c483925a0d4e419a4f5174db190c7b83df9188562a7bf75967272f38a4c3338",
+          "first_party_surface_sha256": "9de8ac0ea2264e7a128c7429a26bbf555865c7931ba289aa1f3239e9ad621e3f",
           "project_json_request_count": 0,
           "project_json_unique_request_count": 0,
           "project_json_requests": []
@@ -445,36 +445,36 @@
       "profiles": {
         "mobile-low-power": {
           "runtime_ready_ms": {
-            "min": 813,
-            "median": 813,
-            "max": 813
+            "min": 833,
+            "median": 833,
+            "max": 833
           },
           "script_duration_ms": {
-            "min": 554.48,
-            "median": 554.48,
-            "max": 554.48
+            "min": 590.83,
+            "median": 590.83,
+            "max": 590.83
           },
           "task_duration_ms": {
-            "min": 1100.49,
-            "median": 1100.49,
-            "max": 1100.49
+            "min": 1166.57,
+            "median": 1166.57,
+            "max": 1166.57
           }
         },
         "desktop-low-power": {
           "runtime_ready_ms": {
-            "min": 728,
-            "median": 728,
-            "max": 728
+            "min": 800,
+            "median": 800,
+            "max": 800
           },
           "script_duration_ms": {
-            "min": 548.15,
-            "median": 548.15,
-            "max": 548.15
+            "min": 617.09,
+            "median": 617.09,
+            "max": 617.09
           },
           "task_duration_ms": {
-            "min": 972.13,
-            "median": 972.13,
-            "max": 972.13
+            "min": 1106.35,
+            "median": 1106.35,
+            "max": 1106.35
           }
         }
       },
@@ -503,7 +503,7 @@
     "public manifest and per-project JSON remain addressable",
     "interactive cards are generated from the compact bootstrap",
     "official links, source links, curation state and review dates remain available in the interactive projection",
-    "one complete ordinary-DOM recovery catalogue remains immutable until successful boot",
+    "one complete ordinary-DOM recovery catalogue remains immutable and keyboard-targetable until successful boot",
     "GitHub Pages static delivery and privacy boundary remain unchanged"
   ],
   "does_not_establish": [
@@ -552,9 +552,9 @@
         "method-mobile-text-200"
       ],
       "catalogue_network_blocked_requests": 0,
-      "job_id": "33af24b3480d",
-      "finalization_receipt_sha256": "41053dd827afa3ea13fef58d6ce69075c550f07d378ceae990e29bdb6466d892",
-      "result_sha256": "fba0979c754232079770d7b18f83a9666f1b0fca133b2cc1d214c0a092a9f13c"
+      "job_id": "00ea409fa4f2",
+      "finalization_receipt_sha256": "b8049f72e541d0d156a1ee75a2474bf48691dc13b90584c6ce20a2605a6ca8cb",
+      "result_sha256": "b1778b7441786da453e09793e0e1bc5bc7196e057a880e970570a7765f67a7c4"
     },
     "catalog_delivery_browser_measurement": {
       "verdict": "PASS",
@@ -563,7 +563,7 @@
         "desktop-low-power"
       ],
       "cpu_throttle_rate": 4,
-      "result_sha256": "51b78f32d0082564cbd05d98a2138f897c5717ae29cc8d7dbfdd39f92c7cf126"
+      "result_sha256": "0a7e028b105dc640f718c598eb58ae2859680b6ba3bfa50c259096e12265f980"
     }
   },
   "budget_binding": {
@@ -571,5 +571,5 @@
     "warn_bootstrap_gzip_bytes": 28672,
     "max_bootstrap_gzip_bytes": 32768
   },
-  "current_surface_note": "Catalog Platform v1 observes the hash-bound aggregate for the current 65-entry surface; the visible application uses a compact build-bound bootstrap, selected compact shards remain a shadow parity check, and runtime detail loading is not enabled."
+  "current_surface_note": "The current 65-entry surface uses a compact build-bound bootstrap, strips internal relation evidence identifiers from startup data, and preserves one complete immutable linear recovery catalogue. Until successful startup removes it, skip activation reveals and focuses that catalogue rather than the filtered interactive text surface."
 }

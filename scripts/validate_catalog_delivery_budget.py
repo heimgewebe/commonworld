@@ -138,6 +138,12 @@ def validate_post_render_failure_fallback(
         )
     if hidden != 0:
         errors.append(f'{label} post-render failure fallback hides {hidden} card(s)')
+    if scenario.get('skipLinkHref') != '#static-catalog-fallback':
+        errors.append(f'{label} post-render failure skip link does not target the recovery catalog')
+    if scenario.get('skipFocusId') != 'static-catalog-fallback':
+        errors.append(f'{label} post-render failure skip handler does not focus the recovery catalog')
+    if scenario.get('skipActivatedRecovery') is not True:
+        errors.append(f'{label} post-render failure skip handler does not reveal the recovery catalog')
     return errors
 
 
