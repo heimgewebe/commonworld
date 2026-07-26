@@ -2839,6 +2839,95 @@ async function catalogueNetworkBlockedScenario() {
   await run.context.close();
 }
 
+async function bootstrapAssetFailureFallbackScenario() {
+  const run = await newPage();
+  const manifest = JSON.parse(await readFile(path.join(ROOT, 'catalog/catalog.json'), 'utf8'));
+  let blockedBootstrapRequests = 0;
+  await run.page.route('**/assets/commonworld-bootstrap-catalog.mjs*', (route) => {
+    blockedBootstrapRequests += 1;
+    return route.abort('failed');
+  });
+  await run.page.goto(baseUrl, { waitUntil: 'domcontentloaded' });
+  const skipLinkHref = await run.page.locator('#text-skip-link').getAttribute('href');
+  await run.page.locator('#text-skip-link').focus();
+  await run.page.keyboard.press('Enter');
+  await run.page.waitForFunction(() => location.hash === '#static-catalog-fallback');
+  const targetRecoveryState = await run.page.locator('#static-catalog-fallback').evaluate((node) => {
+    const style = getComputedStyle(node);
+    return {
+      hash: location.hash,
+      visible: style.visibility === 'visible' && style.opacity === '1' && style.pointerEvents !== 'none',
+      animationName: style.animationName,
+    };
+  });
+  await run.page.locator('#static-catalog-fallback').waitFor({ state: 'visible', timeout: 5000 });
+  const fallbackCatalogCards = await run.page.locator('#static-catalog-fallback .catalog-card').count();
+  const hiddenFallbackCatalogCards = await run.page.locator('#static-catalog-fallback .catalog-card[hidden]').count();
+  const recoveryCopy = (await run.page.locator('#static-catalog-fallback').innerText()).toLowerCase();
+  const neutralRecoveryCopy = recoveryCopy.includes('while the interactive view is loading or unavailable')
+    && !recoveryCopy.includes('interactive globe is unavailable');
+  assert(blockedBootstrapRequests === 1, `bootstrap asset failure: expected one blocked module request, found ${blockedBootstrapRequests}`);
+  assert(!(await run.page.locator('html').evaluate((node) => node.classList.contains('runtime-ready'))), 'bootstrap asset failure: runtime must not claim ready');
+  assert(await run.page.locator('#static-catalog-fallback').isVisible(), 'bootstrap asset failure: linear catalog fallback is not visible');
+  assert(fallbackCatalogCards === manifest.entry_count, `bootstrap asset failure: expected ${manifest.entry_count} fallback cards, found ${fallbackCatalogCards}`);
+  assert(hiddenFallbackCatalogCards === 0, `bootstrap asset failure: ${hiddenFallbackCatalogCards} fallback cards were hidden`);
+  assert(neutralRecoveryCopy, `bootstrap asset failure: recovery copy falsely declares failure: ${recoveryCopy}`);
+  assert(skipLinkHref === '#static-catalog-fallback', 'bootstrap asset failure: skip link does not target the surviving catalog');
+  assert(targetRecoveryState.hash === '#static-catalog-fallback', `bootstrap asset failure: fragment target is ${targetRecoveryState.hash || 'empty'}`);
+  assert(targetRecoveryState.visible, 'bootstrap asset failure: fragment activation did not immediately reveal the recovery catalog');
+  assert(targetRecoveryState.animationName === 'none', `bootstrap asset failure: fragment reveal still depends on animation ${targetRecoveryState.animationName}`);
+  assert(await run.page.locator('#static-catalog-fallback .catalog-card a').first().isVisible(), 'bootstrap asset failure: fallback links are not usable');
+  results.push({
+    id: 'bootstrap-asset-failure-fallback',
+    verdict: 'PASS',
+    blockedBootstrapRequests,
+    fallbackCatalogCards,
+    hiddenFallbackCatalogCards,
+    neutralRecoveryCopy,
+    skipLinkHref,
+    targetRecoveryHash: targetRecoveryState.hash,
+    targetRecoveryVisible: targetRecoveryState.visible,
+    targetRecoveryAnimationName: targetRecoveryState.animationName,
+  });
+  await run.context.close();
+}
+
+async function postRenderFailurePreservesFallbackScenario() {
+  const run = await newPage();
+  const manifest = JSON.parse(await readFile(path.join(ROOT, 'catalog/catalog.json'), 'utf8'));
+  await run.page.addInitScript(() => {
+    window.__commonworldBeforeRecoveryRemovalForTest = () => {
+      throw new Error('synthetic post-render startup failure');
+    };
+  });
+  await run.page.goto(`${baseUrl}/?action=learn`, { waitUntil: 'domcontentloaded' });
+  await run.page.waitForSelector('html.runtime-failed');
+  await run.page.locator('#static-catalog-fallback').waitFor({ state: 'visible', timeout: 5000 });
+  const fallbackCatalogCards = await run.page.locator('#static-catalog-fallback .catalog-card').count();
+  const hiddenFallbackCatalogCards = await run.page.locator('#static-catalog-fallback .catalog-card[hidden]').count();
+  const skipLinkHref = await run.page.locator('#text-skip-link').getAttribute('href');
+  await run.page.locator('#text-skip-link').focus();
+  await run.page.keyboard.press('Enter');
+  const skipFocusId = await run.page.evaluate(() => document.activeElement?.id ?? '');
+  const skipActivatedRecovery = (await run.page.locator('#static-catalog-fallback').getAttribute('data-skip-activated')) === 'true';
+  assert(fallbackCatalogCards === manifest.entry_count, `post-render failure: expected ${manifest.entry_count} fallback cards, found ${fallbackCatalogCards}`);
+  assert(hiddenFallbackCatalogCards === 0, `post-render failure: ${hiddenFallbackCatalogCards} fallback cards were mutated by runtime filtering`);
+  assert(await run.page.locator('#static-catalog-fallback').isVisible(), 'post-render failure: complete fallback is not visible');
+  assert(skipLinkHref === '#static-catalog-fallback', `post-render failure: skip link targets ${skipLinkHref}`);
+  assert(skipFocusId === 'static-catalog-fallback', `post-render failure: skip handler focused ${skipFocusId || 'nothing'} instead of recovery catalog`);
+  assert(skipActivatedRecovery, 'post-render failure: skip handler did not reveal the recovery catalog');
+  results.push({
+    id: 'post-render-failure-preserves-fallback',
+    verdict: 'PASS',
+    fallbackCatalogCards,
+    hiddenFallbackCatalogCards,
+    skipLinkHref,
+    skipFocusId,
+    skipActivatedRecovery,
+  });
+  await run.context.close();
+}
+
 async function providerFailureScenario() {
   const run = await newPage({ mobile: true });
   await run.page.route('https://tiles.openfreemap.org/**', (route) => route.abort('failed'));
@@ -2967,6 +3056,8 @@ try {
   await syntheticCatalogueTruthScenario();
   await liveUiHardeningScenario();
   await catalogueNetworkBlockedScenario();
+  await bootstrapAssetFailureFallbackScenario();
+  await postRenderFailurePreservesFallbackScenario();
   await providerFailureScenario();
   await methodScenario();
 } catch (error) {

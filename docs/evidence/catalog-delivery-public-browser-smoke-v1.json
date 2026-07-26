@@ -9,7 +9,7 @@
       "directGlobeProjection": true,
       "hiddenUntilCalibrated": true,
       "outerHintRemoved": true,
-      "aggregateRingIdentities": 43,
+      "aggregateRingIdentities": 45,
       "movingRingMatrix": true,
       "unchangedGeometryRepaintSkipped": true
     },
@@ -56,8 +56,8 @@
     {
       "id": "intent-search-discovery",
       "verdict": "PASS",
-      "indexedRecords": 58,
-      "rankedGermanIntentResults": 34,
+      "indexedRecords": 65,
+      "rankedGermanIntentResults": 36,
       "filters": 7,
       "digitalCoordinateFree": true,
       "spatialNavigation": true
@@ -98,9 +98,9 @@
     {
       "id": "dual-presence-axes",
       "verdict": "PASS",
-      "publicFeatures": 118,
-      "publicIdentities": 32,
-      "digitalIdentities": 43,
+      "publicFeatures": 120,
+      "publicIdentities": 33,
+      "digitalIdentities": 45,
       "unchangedMapUpdatesSkipped": true
     },
     {
@@ -122,7 +122,7 @@
     {
       "id": "layer-journey-moveend-return",
       "verdict": "PASS",
-      "elapsedMs": 1752
+      "elapsedMs": 1451
     },
     {
       "id": "layer-journey-interrupted",
@@ -204,6 +204,27 @@
       ]
     },
     {
+      "id": "bootstrap-asset-failure-fallback",
+      "verdict": "PASS",
+      "blockedBootstrapRequests": 1,
+      "fallbackCatalogCards": 65,
+      "hiddenFallbackCatalogCards": 0,
+      "neutralRecoveryCopy": true,
+      "skipLinkHref": "#static-catalog-fallback",
+      "targetRecoveryHash": "#static-catalog-fallback",
+      "targetRecoveryVisible": true,
+      "targetRecoveryAnimationName": "none"
+    },
+    {
+      "id": "post-render-failure-preserves-fallback",
+      "verdict": "PASS",
+      "fallbackCatalogCards": 65,
+      "hiddenFallbackCatalogCards": 0,
+      "skipLinkHref": "#static-catalog-fallback",
+      "skipFocusId": "static-catalog-fallback",
+      "skipActivatedRecovery": true
+    },
+    {
       "id": "provider-failure",
       "verdict": "PASS",
       "applicationWarnings": 1
@@ -222,9 +243,9 @@
     }
   ],
   "binding": {
-    "smoke_script_sha256": "3200c9920686e22ea6c29cfefe6ca10a390a8122f5bae768fb8380bbb3a10faf",
+    "smoke_script_sha256": "7a4895d57444a1855213dea419025408efebc2eb97996b0f4c4741a8290e7df3",
     "smoke_runner_sha256": "522b99b70b1d0064b1d0a31a3a67fdc9a2e73b7408f37d1a4bb303bc360b7556",
-    "first_party_surface_sha256": "a05441ef09e5cacea70737d6fc272f2b56bd425ceeb50193aff2b37c896a6937",
+    "first_party_surface_sha256": "f509e40fd4bec20f5e83d8a27186948b97a6b6457397c6842a5c096b2f0ca989",
     "scenario_ids": [
       "startup-and-ring-orbits",
       "ring-orbits-reduced-motion",
@@ -251,12 +272,19 @@
       "synthetic-catalogue-truth",
       "live-ui-hardening",
       "catalogue-network-blocked",
+      "bootstrap-asset-failure-fallback",
+      "post-render-failure-preserves-fallback",
       "provider-failure",
       "method-desktop",
       "method-mobile",
       "method-mobile-text-200"
     ],
-    "freshness_rule": "The official runner must materialize the canonical smoke plan, create a fresh temporary public result and validate exact scenario order, PASS verdicts, manifest-plus-aggregate startup observation, selected-identity shard parity and zero forbidden canonical project requests against this hash-bound evidence.",
+    "freshness_rule": "The official runner must create a fresh public result and validate exact scenario order, PASS verdicts, zero forbidden canonical project requests, selected compact-shard parity, neutral recovery copy, and a complete immutable ordinary-DOM linear catalogue. Bootstrap-module failure must leave fragment navigation sufficient to reveal the recovery catalogue immediately through :target without delayed animation; a later runtime failure must reveal and focus the same catalogue through the installed handler.",
     "smoke_plan_sha256": "6b8749928ead5ef81ee66883e6a2993e756ce083575c3569234bf70526448364"
+  },
+  "execution": {
+    "job_id": "47f97eae8a70",
+    "finalization_receipt_sha256": "2a1f9d7657f341bc1f0de4d258867d71f2dc070594af591a19400cc7cc4bceb4",
+    "result_sha256": "39368606855301efa939f13d8699c244957145e21030f82dfe9e268e6c49eb23"
   }
 }

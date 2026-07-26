@@ -518,14 +518,17 @@
         "source_project_id",
         "target_project_id",
         "relation_type",
-        "source_ids"
+        "evidenced"
       ],
       "identity_key": "CommonProject.id",
-      "source_ids_required": true,
       "forbidden": [
         "inferred_relation",
-        "relocated_hidden_endpoint"
-      ]
+        "relocated_hidden_endpoint",
+        "source_ids",
+        "editorial_note"
+      ],
+      "evidenced_const": true,
+      "evidence_boundary": "Canonical CommonProject relations require non-empty source_ids; compact and public relation summaries expose only evidenced=true, never internal source identifiers or editorial notes."
     },
     "collision_group": {
       "required": [

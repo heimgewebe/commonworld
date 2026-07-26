@@ -1,0 +1,149 @@
+{
+  "schema_version": 4,
+  "id": "auroville",
+  "title": "Auroville",
+  "summary": "Eine internationale Township in Tamil Nadu, die seit 1968 gemeinschaftliches Leben, ökologische Praxis und alternative soziale Organisation erprobt; Land und Vermögen sind rechtlich in der Auroville Foundation gebunden und nicht individuelles Eigentum der Bewohner.",
+  "themes": [
+    "community-land",
+    "shared-space",
+    "commons-governance",
+    "environment",
+    "education"
+  ],
+  "actions": [
+    "visit",
+    "learn",
+    "contact"
+  ],
+  "presence": {
+    "geographic": [
+      {
+        "id": "auroville-township-area",
+        "mode": "approximate",
+        "label": "Auroville bei Puducherry, Tamil Nadu, Indien",
+        "geometry": {
+          "type": "Point",
+          "coordinates": [
+            79.810606,
+            12.006999
+          ]
+        },
+        "uncertainty_meters_min": 5000,
+        "privacy_note": "Der Punkt bezeichnet nur den öffentlich dokumentierten Mittelpunkt des weiträumigen Township-Gebiets und weder Wohnhäuser noch Grundstücksgrenzen oder Aufenthaltsorte.",
+        "source_ids": [
+          "auroville-location"
+        ]
+      }
+    ],
+    "digital": {
+      "available": false,
+      "source_ids": [
+        "auroville-home"
+      ]
+    }
+  },
+  "activity": {
+    "status": "active",
+    "observed_at": "2026-07-26",
+    "source_ids": [
+      "auroville-home",
+      "auroville-legal"
+    ],
+    "note": "Die offiziellen Seiten beschreiben Auroville als fortbestehende Township mit mehr als 3.300 Bewohnern, laufenden Einrichtungen und einer aktiven rechtlichen Organisationsstruktur."
+  },
+  "provenance": {
+    "sources": [
+      {
+        "id": "auroville-home",
+        "type": "official-source",
+        "label": "Auroville – offizielle Seite",
+        "url": "https://auroville.org/",
+        "retrieved_at": "2026-07-26",
+        "note": "Offizielle aktuelle Oberfläche der Township mit Selbstbeschreibung, Einrichtungen sowie Besuchs- und Kontaktwegen."
+      },
+      {
+        "id": "auroville-legal",
+        "type": "official-source",
+        "label": "Auroville – Legal Structure",
+        "url": "https://auroville.org/page/legal-structure",
+        "retrieved_at": "2026-07-26",
+        "note": "Offizielle Darstellung der Auroville Foundation, ihrer Organe, Trusts und Einheiten unter dem Auroville Foundation Act von 1988."
+      },
+      {
+        "id": "auroville-location",
+        "type": "official-source",
+        "label": "Auroville – Location",
+        "url": "https://auroville.org/page/location",
+        "retrieved_at": "2026-07-26",
+        "note": "Offizielle Ortsbeschreibung und veröffentlichte Mittelpunktkoordinate des Township-Gebiets."
+      },
+      {
+        "id": "auroville-visit",
+        "type": "official-source",
+        "label": "Auroville – Visiting Auroville",
+        "url": "https://auroville.org/page/visiting-auroville",
+        "retrieved_at": "2026-07-26",
+        "note": "Offizielle Hinweise für Besuche; Auroville wird ausdrücklich als lebendes Experiment und nicht als gewöhnliches Touristenziel beschrieben."
+      }
+    ],
+    "uncertainty_note": "Die Charter formuliert Auroville als der Menschheit zugehörig; die rechtlich belastbare Eigentums- und Organisationsform ist die Auroville Foundation. Der Datensatz trennt diese Vision von der geltenden Rechtsstruktur."
+  },
+  "curation": {
+    "state": "listed",
+    "reviewed_by": "Commonworld editorial review",
+    "reviewed_at": "2026-07-26",
+    "next_review_at": "2026-09-26",
+    "notes": "Aufgenommen als langfristiges Gemeinschafts- und Landexperiment. Wegen komplexer Governance und rechtlicher Trägerschaft erfolgt eine verkürzte Nachprüfung; der Kartenpunkt ist kein Eigentums- oder Siedlungsplan."
+  },
+  "links": [
+    {
+      "type": "homepage",
+      "label": "Auroville – offizielle Seite",
+      "url": "https://auroville.org/"
+    },
+    {
+      "type": "visit",
+      "label": "Hinweise für einen Besuch lesen",
+      "url": "https://auroville.org/page/visiting-auroville",
+      "source_ids": [
+        "auroville-visit"
+      ]
+    },
+    {
+      "type": "learn",
+      "label": "Rechtliche Struktur verstehen",
+      "url": "https://auroville.org/page/legal-structure",
+      "source_ids": [
+        "auroville-legal"
+      ]
+    },
+    {
+      "type": "contact",
+      "label": "Auroville kontaktieren",
+      "url": "https://auroville.org/contact",
+      "source_ids": [
+        "auroville-home"
+      ]
+    }
+  ],
+  "handoff": {
+    "enabled": false
+  },
+  "languages": {
+    "codes": [
+      "en"
+    ],
+    "source_ids": [
+      "auroville-home"
+    ],
+    "note": "Die geprüften offiziellen Einstiegs- und Rechtsseiten sind auf Englisch verfügbar."
+  },
+  "access": {
+    "type": "membership",
+    "source_ids": [
+      "auroville-home",
+      "auroville-visit"
+    ],
+    "note": "Besuchsinformationen sind öffentlich; dauerhaftes Wohnen, Arbeiten und interne Mitwirkung folgen formalen Aufnahme- und Gemeinschaftsregeln."
+  }
+}
