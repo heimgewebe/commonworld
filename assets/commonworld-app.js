@@ -1,5 +1,5 @@
 import { BOOTSTRAP_RECORDS } from './commonworld-bootstrap-catalog.mjs';
-import { loadCatalogAggregate } from './commonworld-catalog-runtime.mjs';
+import { loadCatalogAggregate, loadCatalogShard, shardKeyForIdentity } from './commonworld-catalog-runtime.mjs';
 import { actionLabel, documentLocale, localizeCatalogRecords, text as i18nText, themeLabel } from './commonworld-i18n.mjs';
 import {
   COMMONS_TYPE_COLOR_TOKENS,
@@ -170,6 +170,13 @@ const runtime = {
   map: null,
   records: [],
   recordsById: new Map(),
+  canonicalRecordsById: new Map(),
+  catalogPlatform: null,
+  catalogPlatformState: 'idle',
+  catalogShardLoads: new Map(),
+  catalogRecordShadowGeneration: 0,
+  catalogShadowEnabled: true,
+  catalogShadowWarnings: new Set(),
   catalogProjection: null,
   digitalTree: null,
   digitalTreeCache: new WeakMap(),
@@ -392,9 +399,136 @@ function validateRecords(records) {
 
 function bootstrapRecords() {
   const canonical = validateRecords(BOOTSTRAP_RECORDS);
+  runtime.canonicalRecordsById = new Map(canonical.map((record) => [record.id, record]));
+  runtime.catalogShadowEnabled = true;
   const localized = localizeCatalogRecords(canonical, LOCALE);
   runtime.searchAliasesById = localized.searchAliasesById;
   return localized.records;
+}
+
+function sortedUniqueStrings(values) {
+  return [...new Set(Array.isArray(values) ? values : [])].sort();
+}
+
+function canonicalComparisonValue(value) {
+  if (Array.isArray(value)) return value.map(canonicalComparisonValue);
+  if (!value || typeof value !== 'object') return value;
+  return Object.fromEntries(Object.keys(value).sort().map((key) => [key, canonicalComparisonValue(value[key])]));
+}
+
+function stableComparisonJson(value) {
+  return JSON.stringify(canonicalComparisonValue(value));
+}
+
+function normalizedCompactGeographic(locations) {
+  return (Array.isArray(locations) ? locations : [])
+    .filter((location) => location?.mode !== 'hidden' && location?.geometry)
+    .map((location) => ({ mode: location.mode, geometry: location.geometry }))
+    .sort((left, right) => stableComparisonJson(left).localeCompare(stableComparisonJson(right)));
+}
+
+function compactProjectionFromCanonical(record) {
+  return {
+    id: record.id,
+    title: record.title,
+    themes: sortedUniqueStrings(record.themes),
+    actions: sortedUniqueStrings(record.actions),
+    languages: sortedUniqueStrings(record.languages?.codes),
+    access: record.access?.type ?? null,
+    presence: {
+      geographic: normalizedCompactGeographic(record.presence?.geographic),
+      digital: record.presence?.digital?.available === true,
+    },
+    activity: record.activity?.status ?? 'unknown',
+  };
+}
+
+function normalizedCompactShardRecord(record) {
+  return {
+    id: record.id,
+    title: record.title,
+    themes: sortedUniqueStrings(record.themes),
+    actions: sortedUniqueStrings(record.actions),
+    languages: sortedUniqueStrings(record.languages),
+    access: record.access ?? null,
+    presence: {
+      geographic: normalizedCompactGeographic(record.presence?.geographic),
+      digital: record.presence?.digital === true,
+    },
+    activity: record.activity ?? 'unknown',
+  };
+}
+
+function setCatalogRecordShadowState(state, { identifier = null, key = null } = {}) {
+  setDatasetIfChanged(elements.stage, 'catalogRecordShadow', state);
+  if (identifier) setDatasetIfChanged(elements.stage, 'catalogRecordShadowId', identifier);
+  else delete elements.stage.dataset.catalogRecordShadowId;
+  if (key) setDatasetIfChanged(elements.stage, 'catalogRecordShadowShard', key);
+  else delete elements.stage.dataset.catalogRecordShadowShard;
+}
+
+function warnCatalogShadowOnce(code, message, error = null) {
+  if (runtime.catalogShadowWarnings.has(code)) return;
+  runtime.catalogShadowWarnings.add(code);
+  if (error) console.warn(message, error);
+  else console.warn(message);
+}
+
+function loadCatalogShardOnce(key) {
+  const platform = runtime.catalogPlatform;
+  if (!platform) throw new Error('catalog platform is not ready');
+  const cacheKey = `${platform.manifest.generation}:${key}`;
+  const cached = runtime.catalogShardLoads.get(cacheKey);
+  if (cached) return cached;
+  const request = loadCatalogShard(platform, key).catch((error) => {
+    if (runtime.catalogShardLoads.get(cacheKey) === request) runtime.catalogShardLoads.delete(cacheKey);
+    throw error;
+  });
+  runtime.catalogShardLoads.set(cacheKey, request);
+  return request;
+}
+
+async function observeCatalogRecordShadow(identifier = runtime.state.project) {
+  const observation = ++runtime.catalogRecordShadowGeneration;
+  if (!runtime.catalogShadowEnabled || !identifier) {
+    setCatalogRecordShadowState('idle');
+    return;
+  }
+  setCatalogRecordShadowState('loading', { identifier });
+  if (runtime.catalogPlatformState === 'degraded') {
+    setCatalogRecordShadowState('degraded', { identifier });
+    return;
+  }
+  if (!runtime.catalogPlatform) return;
+  try {
+    const key = await shardKeyForIdentity(identifier);
+    if (observation !== runtime.catalogRecordShadowGeneration || runtime.state.project !== identifier) return;
+    setCatalogRecordShadowState('loading', { identifier, key });
+    const shard = await loadCatalogShardOnce(key);
+    if (observation !== runtime.catalogRecordShadowGeneration || runtime.state.project !== identifier) return;
+    const matches = shard.records.filter((record) => record.id === identifier);
+    const canonical = runtime.canonicalRecordsById.get(identifier);
+    const parity = matches.length === 1
+      && canonical
+      && stableComparisonJson(normalizedCompactShardRecord(matches[0])) === stableComparisonJson(compactProjectionFromCanonical(canonical));
+    if (parity) {
+      setCatalogRecordShadowState('ready', { identifier, key });
+      return;
+    }
+    setCatalogRecordShadowState('mismatch', { identifier, key });
+    warnCatalogShadowOnce(
+      `${runtime.catalogPlatform.manifest.generation}:${identifier}:mismatch`,
+      `Commonworld catalog shard parity mismatch for ${identifier}; compatible bootstrap remains active`,
+    );
+  } catch (error) {
+    if (observation !== runtime.catalogRecordShadowGeneration || runtime.state.project !== identifier) return;
+    setCatalogRecordShadowState('degraded', { identifier });
+    warnCatalogShadowOnce(
+      `${runtime.catalogPlatform?.manifest?.generation ?? 'unavailable'}:${identifier}:degraded`,
+      `Commonworld catalog shard unavailable for ${identifier}; compatible bootstrap remains active`,
+      error,
+    );
+  }
 }
 
 function installRecords(records) {
@@ -2309,6 +2443,7 @@ function selectProject(identifier, { historyMode = 'push', focus = true, trigger
   }
   runtime.state.project = identifier;
   renderDiscoveryState();
+  void observeCatalogRecordShadow(identifier);
   if (navigateSpatial) performSpatialNavigation(identifier);
   if (historyMode) writeHistory(historyMode);
   if (focus) elements.focus.focus({ preventScroll: true });
@@ -2338,6 +2473,7 @@ function visibleProjectTrigger(identifier) {
 function clearProject({ historyMode = 'push', restoreFocus = true } = {}) {
   const closingIdentifier = runtime.state.project;
   runtime.state.project = null;
+  void observeCatalogRecordShadow(null);
   runtime.layerPreviewProject = closingIdentifier;
   renderLayerProjectDetail();
   updateSelectionMarks();
@@ -3048,6 +3184,7 @@ function applyDeepLink(search, { initial = false } = {}) {
     showLayerState();
   }
   renderDiscoveryState();
+  void observeCatalogRecordShadow(runtime.state.project);
   if ((next.query || hasIntentFilters() || hasSpatialFilters()) && !runtime.state.project) openDiscovery({ trigger: elements.search });
   else closeDiscovery({ restoreFocus: false });
   runtime.applyingHistory = false;
@@ -3481,15 +3618,23 @@ function ensureMap() {
 }
 
 async function observeCatalogPlatform() {
+  runtime.catalogPlatformState = 'loading';
   elements.stage.dataset.catalogPlatform = 'loading';
   try {
-    const { manifest, aggregate } = await loadCatalogAggregate();
+    const platform = await loadCatalogAggregate();
+    const { manifest, aggregate } = platform;
+    runtime.catalogPlatform = platform;
+    runtime.catalogPlatformState = 'ready';
     elements.stage.dataset.catalogPlatform = 'ready';
     elements.stage.dataset.catalogGeneration = manifest.generation;
     elements.stage.dataset.catalogAggregateThemes = String(Object.keys(aggregate.themes ?? {}).length);
     elements.stage.dataset.catalogAggregateCells = String(Object.keys(aggregate.spatial_cells ?? {}).length);
+    void observeCatalogRecordShadow(runtime.state.project);
   } catch (error) {
+    runtime.catalogPlatform = null;
+    runtime.catalogPlatformState = 'degraded';
     elements.stage.dataset.catalogPlatform = 'degraded';
+    void observeCatalogRecordShadow(runtime.state.project);
     console.warn('Commonworld catalog aggregate unavailable; compatible bootstrap remains active', error);
   }
 }
@@ -3507,7 +3652,11 @@ async function boot() {
     installFocusOverlapTracking();
     if (navigator.webdriver && ['127.0.0.1', 'localhost'].includes(location.hostname)) {
       window.__commonworldInstallSyntheticRecordsForTest = (records) => {
-        const synthetic = localizeCatalogRecords(validateRecords(records), LOCALE);
+        const canonicalSynthetic = validateRecords(records);
+        runtime.catalogShadowEnabled = false;
+        runtime.canonicalRecordsById = new Map(canonicalSynthetic.map((record) => [record.id, record]));
+        void observeCatalogRecordShadow(null);
+        const synthetic = localizeCatalogRecords(canonicalSynthetic, LOCALE);
         runtime.searchAliasesById = synthetic.searchAliasesById;
         installRecords(synthetic.records);
         runtime.state.project = null;
@@ -3532,7 +3681,7 @@ async function boot() {
     void observeCatalogPlatform();
 
     // Build and CI compare this generated bootstrap with every canonical CommonProject.
-    // The browser therefore does not download the same 41 records a second time.
+    // Only a selected identity's compact shard is read in shadow mode; visible data stays bootstrap-bound.
   } catch (error) {
     console.error(error);
     setStatus(t('catalog_bootstrap_failed', 'Commonworld konnte auch den buildgebundenen Katalog nicht lesen.'), 'failed');

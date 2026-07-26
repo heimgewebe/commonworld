@@ -114,6 +114,14 @@ Die öffentliche Anwendung lädt Manifest und Aggregat bereits nach dem kompatib
 
 Die Auswahl mehrerer aktiver Dimensionen verwendet Schnittmengen: beispielsweise Thema Wasser plus Raumzelle plus digitale Verfügbarkeit. Innerhalb derselben Dimension werden Werte vereinigt. Das Aggregat liefert nur Shard-Kandidaten; die abschließende Datensatzfilterung bleibt verbindlich.
 
+## Selektionsgebundener Shard-Shadow-Pfad
+
+Bei einer konkreten Commons-Auswahl leitet der Browser den stabilen Zwei-Zeichen-Shard aus dem SHA-256 der `CommonProject.id` ab. Er lädt genau diesen im Manifest deklarierten Shard, prüft URL, Bytezahl und SHA-256 und validiert anschließend Schlüssel, Eintragszahl, Identitäten und die kompakte Datensatzform. Fehlgeschlagene Anfragen werden nicht dauerhaft gecacht und können bei einer späteren Auswahl erneut versucht werden.
+
+Die sichtbare Oberfläche bleibt weiterhin vollständig an den buildgebundenen Bootstrap gebunden. Der Shard-Pfad vergleicht nur die im kompakten Record vorhandenen Felder mit dem kanonischen Bootstrap-Datensatz und veröffentlicht einen kleinen diagnostischen Zustand am Stage-Element. Schnelle Auswahlwechsel dürfen veraltete Antworten nicht auf den aktuellen Fokus anwenden. Ein Fehler oder Mismatch leert weder Fokus, Suche, Karte noch Textansicht.
+
+Dieser Schritt belegt noch keine Lazy-Detail-Ladung, keinen Bootstrap-Cutover, keine physische Gerätefreigabe und keine Weltgewebe-Publisher-Kette. Das nächste Gate ist ein generationsgebundener Detailpfad mit definierten Lade-, Fehler- und Deep-Link-Zuständen.
+
 ### Cutover-Gate
 
 Der Bootstrap darf erst entfernt werden, wenn Feldparität, Deep-Link-Parität, definierte Lade- und Fehlerzustände für Details, Browser-Smoke und physischer Geräte-Readback belegt sind. Bis dahin bleibt die neue Plattform beobachtend und rückwärtskompatibel.
