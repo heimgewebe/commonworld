@@ -36,6 +36,8 @@ jobs:
           python -m pip install -r requirements-dev.txt
       - name: Apply exact-head review fixes
         run: |
+          python scripts/pr143_followup_bootstrap.py
+          python -m py_compile scripts/pr143_followup.py
           if [[ -f docs/evidence/pr143-followup-error.tmp.txt ]]; then
             cat docs/evidence/pr143-followup-error.tmp.txt
             exit 1
@@ -84,6 +86,7 @@ jobs:
         run: |
           rm -f .github/workflows/pr143-followup.yml
           rm -f scripts/pr143_followup.py
+          rm -f scripts/pr143_followup_bootstrap.py
           rm -f docs/evidence/pr143-followup-error.tmp.txt
       - name: Validate final product tree
         run: |
