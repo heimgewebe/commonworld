@@ -98,7 +98,7 @@
     {
       "type": "contact",
       "label": "Offizielle Kontaktoberfläche öffnen",
-      "url": "https://daanes.org/en/contact-us/",
+      "url": "https://daanes.org/en/contact/",
       "source_ids": [
         "daanes-about"
       ]
