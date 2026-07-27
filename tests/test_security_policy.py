@@ -392,7 +392,7 @@ class SecurityPolicyTests(unittest.TestCase):
             text += '\n# inert marker: - cron: "17 5 * * 1"\n'
             path.write_text(text, encoding="utf-8")
             errors = validate_security_policy(root, now=self.NOW)
-        self.assertIn("security expiry workflow must define on.schedule", errors)
+        self.assertIn("security expiry workflow must define exactly one on.schedule", errors)
 
     def test_http_error_incomplete_body_retains_response_metadata(self) -> None:
         endpoint = "https://api.github.com/repos/heimgewebe/commonworld/private-vulnerability-reporting"
@@ -412,6 +412,44 @@ class SecurityPolicyTests(unittest.TestCase):
         self.assertEqual(endpoint, fetch.final_url)
         self.assertEqual(503, fetch.status)
         self.assertIsNone(fetch.payload)
+
+
+    def test_folded_run_comment_cannot_masquerade_as_exit_one(self) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            root = self.copy_surface(directory)
+            path = root / ".github/workflows/security-policy-expiry.yml"
+            text = path.read_text(encoding="utf-8")
+            start = text.index("- name: Enforce live reporting result")
+            block = text[start:].replace("        run: exit 1", "        run: >-\n          exit\n          # comment\n          1", 1)
+            path.write_text(text[:start] + block, encoding="utf-8")
+            errors = validate_security_policy(root, now=self.NOW)
+        self.assertTrue(any("Enforce live reporting result" in error and "command mismatch" in error for error in errors))
+
+    def test_duplicate_cron_key_is_rejected(self) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            root = self.copy_surface(directory)
+            path = root / ".github/workflows/security-policy-expiry.yml"
+            text = path.read_text(encoding="utf-8").replace(
+                '    - cron: "17 5 * * 1"\n',
+                '    - cron: "17 5 * * 1"\n      cron: "0 0 * * *"\n',
+                1,
+            )
+            path.write_text(text, encoding="utf-8")
+            errors = validate_security_policy(root, now=self.NOW)
+        self.assertTrue(any("cron item must not contain duplicate" in error for error in errors))
+
+    def test_conflicting_contents_permission_is_rejected(self) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            root = self.copy_surface(directory)
+            path = root / ".github/workflows/security-policy-expiry.yml"
+            text = path.read_text(encoding="utf-8").replace(
+                "  contents: read\n",
+                "  contents: read\n  contents: write\n",
+                1,
+            )
+            path.write_text(text, encoding="utf-8")
+            errors = validate_security_policy(root, now=self.NOW)
+        self.assertIn("security expiry workflow permissions must contain exactly contents: read and no conflicting keys", errors)
 
 
 

@@ -112,14 +112,20 @@ def _yaml_scalar(value: str) -> str:
     return value
 
 
-def _collect_yaml_block(lines: list[str], start: int, parent_indent: int) -> tuple[list[str], int]:
+def _collect_yaml_block(
+    lines: list[str],
+    start: int,
+    parent_indent: int,
+    *,
+    preserve_comments: bool = False,
+) -> tuple[list[str], int]:
     collected: list[str] = []
     index = start
     while index < len(lines):
         line = lines[index]
         if line.strip() and len(line) - len(line.lstrip()) <= parent_indent:
             break
-        if line.strip() and not line.strip().startswith("#"):
+        if line.strip() and (preserve_comments or not line.strip().startswith("#")):
             collected.append(line.strip())
         index += 1
     return collected, index
@@ -184,17 +190,23 @@ def parse_workflow_step(workflow_text: str, step_name: str) -> WorkflowStep | No
                 nested_key, nested_value = nested_stripped.split(":", 1)
                 nested_value = nested_value.strip()
                 if nested_value in {"|", "|-", ">", ">-"}:
-                    lines_value, index = _collect_yaml_block(block, index + 1, nested_indent)
+                    lines_value, index = _collect_yaml_block(
+                        block, index + 1, nested_indent, preserve_comments=True
+                    )
                     rendered = "\n".join(lines_value) if nested_value.startswith("|") else " ".join(lines_value)
                     _set_unique(with_fields, nested_key, rendered, parse_errors, "with")
                 else:
-                    continuation, next_index = _collect_yaml_block(block, index + 1, nested_indent)
+                    continuation, next_index = _collect_yaml_block(
+                        block, index + 1, nested_indent, preserve_comments=True
+                    )
                     rendered = _yaml_scalar(" ".join([nested_value, *continuation]).strip())
                     _set_unique(with_fields, nested_key, rendered, parse_errors, "with")
                     index = next_index if continuation else index + 1
             continue
         if key == "run" and value in {"|", "|-", ">", ">-"}:
-            lines_value, index = _collect_yaml_block(block, index + 1, field_indent)
+            lines_value, index = _collect_yaml_block(
+                block, index + 1, field_indent, preserve_comments=True
+            )
             run_style = value
             run_text = "\n".join(lines_value) if value.startswith("|") else " ".join(lines_value)
             _set_unique(fields, key, run_text, parse_errors, "step")
@@ -272,6 +284,20 @@ def _unique_direct_child(lines: list[str], parent_index: int, key: str) -> int |
     return matches[0] if len(matches) == 1 else None
 
 
+def _direct_child_lines(lines: list[str], parent_index: int) -> list[str]:
+    parent_indent = len(lines[parent_index]) - len(lines[parent_index].lstrip())
+    child_indent = parent_indent + 2
+    children: list[str] = []
+    for index in range(parent_index + 1, len(lines)):
+        line = lines[index]
+        stripped = line.strip()
+        if stripped and len(line) - len(line.lstrip()) <= parent_indent:
+            break
+        if stripped and not stripped.startswith("#") and len(line) - len(line.lstrip()) == child_indent:
+            children.append(stripped)
+    return children
+
+
 def _validate_expiry_triggers(workflow_text: str, errors: list[str]) -> None:
     lines = workflow_text.splitlines()
     on_indices = [index for index, line in enumerate(lines) if line.strip() == "on:" and len(line) == len(line.lstrip())]
@@ -279,26 +305,40 @@ def _validate_expiry_triggers(workflow_text: str, errors: list[str]) -> None:
         errors.append("security expiry workflow must contain exactly one top-level on mapping")
         return
     on_index = on_indices[0]
-    schedule_index = _unique_direct_child(lines, on_index, "schedule:")
-    if schedule_index is None:
-        errors.append("security expiry workflow must define on.schedule")
+    on_children = _direct_child_lines(lines, on_index)
+    if on_children.count("schedule:") != 1:
+        errors.append("security expiry workflow must define exactly one on.schedule")
     else:
-        schedule_indent = len(lines[schedule_index]) - len(lines[schedule_index].lstrip())
-        cron_matches: list[int] = []
-        for index in range(schedule_index + 1, len(lines)):
-            line = lines[index]
-            stripped = line.strip()
-            if stripped and len(line) - len(line.lstrip()) <= schedule_indent:
-                break
-            if stripped == '- cron: "17 5 * * 1"' and len(line) - len(line.lstrip()) == schedule_indent + 2:
-                cron_matches.append(index)
-        if len(cron_matches) != 1:
-            errors.append('security expiry workflow on.schedule must contain exactly cron "17 5 * * 1"')
-    if _unique_direct_child(lines, on_index, "workflow_dispatch:") is None:
-        errors.append("security expiry workflow must define on.workflow_dispatch")
+        schedule_index = next(
+            index
+            for index in range(on_index + 1, len(lines))
+            if lines[index].strip() == "schedule:"
+            and len(lines[index]) - len(lines[index].lstrip()) == 2
+        )
+        schedule_children = _direct_child_lines(lines, schedule_index)
+        if schedule_children != ['- cron: "17 5 * * 1"']:
+            errors.append('security expiry workflow on.schedule must contain exactly one cron "17 5 * * 1" and no duplicate keys')
+        else:
+            schedule_indent = len(lines[schedule_index]) - len(lines[schedule_index].lstrip())
+            item_index = next(
+                index
+                for index in range(schedule_index + 1, len(lines))
+                if lines[index].strip() == '- cron: "17 5 * * 1"'
+                and len(lines[index]) - len(lines[index].lstrip()) == schedule_indent + 2
+            )
+            nested = _direct_child_lines(lines, item_index)
+            if nested:
+                errors.append("security expiry workflow cron item must not contain duplicate or additional mapping keys")
+    if on_children.count("workflow_dispatch:") != 1:
+        errors.append("security expiry workflow must define exactly one on.workflow_dispatch")
+
     permission_indices = [index for index, line in enumerate(lines) if line.strip() == "permissions:" and len(line) == len(line.lstrip())]
-    if len(permission_indices) != 1 or _unique_direct_child(lines, permission_indices[0], "contents: read") is None:
-        errors.append("security expiry workflow permissions.contents must equal read")
+    if len(permission_indices) != 1:
+        errors.append("security expiry workflow must contain exactly one top-level permissions mapping")
+    else:
+        permission_children = _direct_child_lines(lines, permission_indices[0])
+        if permission_children != ["contents: read"]:
+            errors.append("security expiry workflow permissions must contain exactly contents: read and no conflicting keys")
 
 
 def validate_security_policy(root: Path = ROOT, now: datetime | None = None) -> list[str]:
