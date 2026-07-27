@@ -257,23 +257,33 @@ async function verifyLayerCreatedSphereRestoration(browser, baseUrl) {
     await page.waitForSelector('#layer-panel[data-visible]');
     await page.locator('.digital-ribbon-item').first().click();
     await page.waitForSelector('#project-focus:not([hidden])');
-    await page.waitForFunction(() => document.querySelector('#sphere-edge-control')?.dataset.focusOverlapInert === 'true');
+    const shared = await page.evaluate(() => {
+      const edge = document.querySelector('#sphere-edge-control');
+      return {
+        focusHidden: document.querySelector('#project-focus').hidden,
+        title: document.querySelector('#focus-title')?.textContent ?? null,
+        inlineHidden: document.querySelector('#layer-projects').hidden,
+        digitalPath: document.querySelector('.globe-stage')?.dataset.digitalPath ?? null,
+        focusedPath: document.querySelector('.globe-stage')?.dataset.focusedPath ?? null,
+        urlDigitalPath: new URL(location.href).searchParams.get('digital_path'),
+        sphere: {
+          ariaHidden: edge.getAttribute('aria-hidden'),
+          marker: edge.dataset.focusOverlapInert ?? null,
+          pointerEvents: getComputedStyle(edge).pointerEvents,
+          tabindex: edge.getAttribute('tabindex'),
+        },
+      };
+    });
+    assert(!shared.focusHidden && shared.inlineHidden && shared.title, `layer-created shared focus is incomplete: ${JSON.stringify(shared)}`);
+    assert(shared.digitalPath === 'sphere' && shared.focusedPath === null && shared.urlDigitalPath === null, `layer-created shared focus abandoned the originating root lane: ${JSON.stringify(shared)}`);
+    assert(shared.sphere.marker === 'true' && shared.sphere.tabindex === '-1' && shared.sphere.ariaHidden === 'true' && shared.sphere.pointerEvents === 'none', `layer-created shared-focus sphere ownership is invalid: ${JSON.stringify(shared.sphere)}`);
     await page.locator('#focus-close').click();
     await page.waitForFunction(() => document.querySelector('#project-focus').hidden);
-    let sphere = await page.evaluate(() => {
-      const edge = document.querySelector('#sphere-edge-control');
-      return {
-        ariaHidden: edge.getAttribute('aria-hidden'),
-        marker: edge.dataset.focusOverlapInert ?? null,
-        pointerEvents: getComputedStyle(edge).pointerEvents,
-        tabindex: edge.getAttribute('tabindex'),
-      };
-    });
-    assert(sphere.marker === 'true' && sphere.tabindex === '-1' && sphere.ariaHidden === 'true' && sphere.pointerEvents === 'none', `layer-created sphere block was lost: ${JSON.stringify(sphere)}`);
+    assert(await page.locator('#layer-projects').isHidden(), 'layer-created focus close exposed a competing inline detail');
     await page.locator('#layer-close').click();
     await page.waitForFunction(() => document.querySelector('.globe-stage')?.dataset.viewPhase === 'overview');
-    await page.waitForFunction(() => document.querySelector('#sphere-edge-control')?.dataset.focusOverlapInert === undefined);
-    sphere = await page.evaluate(() => {
+    await page.waitForFunction(() => document.querySelector('#sphere-edge-control')?.getAttribute('tabindex') === '0');
+    const restored = await page.evaluate(() => {
       const edge = document.querySelector('#sphere-edge-control');
       return {
         ariaHidden: edge.getAttribute('aria-hidden'),
@@ -282,8 +292,8 @@ async function verifyLayerCreatedSphereRestoration(browser, baseUrl) {
         tabindex: edge.getAttribute('tabindex'),
       };
     });
-    assert(sphere.marker === null && sphere.tabindex === '0' && sphere.ariaHidden === null && sphere.pointerEvents !== 'none', `layer-created sphere block was not restored: ${JSON.stringify(sphere)}`);
-    return sphere;
+    assert(restored.marker === null && restored.tabindex === '0' && restored.ariaHidden === null && restored.pointerEvents !== 'none', `layer-created sphere block was not restored: ${JSON.stringify(restored)}`);
+    return { shared, restored };
   } finally {
     await context.close();
   }

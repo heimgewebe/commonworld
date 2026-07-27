@@ -789,23 +789,22 @@ function selectDigitalBundle(path) {
   setDigitalPath(path);
 }
 
-function createRibbonSegment(record, { inlineDetails = false } = {}) {
+function selectDigitalProject(record, { trigger = document.activeElement } = {}) {
+  selectProject(record.id, { trigger });
+}
+
+function createRibbonSegment(record) {
   const segment = document.createElement('button');
   segment.type = 'button';
   segment.className = 'digital-ribbon-item';
   segment.dataset.commonprojectId = record.id;
-  segment.setAttribute('aria-label', inlineDetails
-    ? t('show_project_details', 'Details zu {title} anzeigen', { title: record.title })
-    : t('open_project', '{title} öffnen', { title: record.title }));
-  if (inlineDetails) segment.setAttribute('aria-controls', 'layer-projects');
+  segment.setAttribute('aria-label', t('show_project_details', 'Details zu {title} anzeigen', { title: record.title }));
+  segment.setAttribute('aria-controls', 'project-focus');
   const name = document.createElement('span');
   name.className = 'digital-ribbon-name';
   name.textContent = record.title;
   segment.append(name);
-  segment.addEventListener('click', () => {
-    if (inlineDetails) runtime.layerPreviewProject = record.id;
-    selectProject(record.id, { trigger: segment, focus: !inlineDetails });
-  });
+  segment.addEventListener('click', () => selectDigitalProject(record, { trigger: segment }));
   return segment;
 }
 
@@ -829,126 +828,46 @@ function identityRecordsForView(view = visibleDigitalView(), { includeSelected =
 
 function usesInlineLayerProjectDetail(record, view = visibleDigitalView()) {
   if (!record || runtime.state.view !== 'layers') return false;
-  return isIdentityLevelView(view) && recordVisibleInCurrentSelection(record);
+  return runtime.state.project !== record.id
+    && isIdentityLevelView(view)
+    && recordVisibleInCurrentSelection(record);
 }
 
-function createLayerProjectDetail(record, { selected = false } = {}) {
-  const article = document.createElement('article');
-  article.className = 'layer-project-detail';
-  article.dataset.commonprojectId = record.id;
-  article.dataset.detailMode = selected ? 'selected' : 'preview';
-
-  const copy = document.createElement('div');
-  copy.className = 'layer-project-detail-copy';
-  const kind = document.createElement('p');
-  kind.className = 'kicker';
-  kind.textContent = `${commonsTypeLabel(record, LOCALE)} · ${resultPresenceLabel(record)}`;
-  const title = document.createElement('h2');
-  title.className = 'layer-project-detail-title';
-  title.id = `layer-project-title-${record.id}`;
-  title.textContent = record.title;
-  const summary = document.createElement('p');
-  summary.className = 'layer-project-detail-summary';
-  summary.textContent = record.summary;
-  copy.append(kind, title, summary);
-
-  const context = document.createElement('div');
-  context.className = 'layer-project-detail-context';
-  const digital = document.createElement('p');
-  digital.className = 'layer-project-detail-digital';
-  digital.textContent = record?.presence?.digital?.label || resultLocationLabel(record);
-  context.append(digital);
-
-  const themes = (record.themes ?? []).map((theme) => themeLabel(theme, LOCALE));
-  if (themes.length) {
-    const themeList = document.createElement('div');
-    themeList.className = 'layer-project-detail-themes';
-    for (const theme of themes) {
-      const chip = document.createElement('span');
-      chip.textContent = theme;
-      themeList.append(chip);
-    }
-    context.append(themeList);
-  }
-
-  const activityNoticeText = recordActivityNotice(record, LOCALE);
-  if (activityNoticeText) {
-    const activity = document.createElement('p');
-    activity.className = 'layer-project-detail-activity';
-    activity.textContent = activityNoticeText;
-    context.append(activity);
-  }
-
-  const integrity = document.createElement('div');
-  integrity.className = 'catalog-detail-integrity';
-  integrity.dataset.catalogDetailIntegrity = '';
-  const integrityStatus = document.createElement('p');
-  integrityStatus.dataset.catalogDetailStatus = '';
-  integrityStatus.setAttribute('role', 'status');
-  integrityStatus.setAttribute('aria-live', 'polite');
-  integrityStatus.setAttribute('aria-atomic', 'true');
-  const integrityRetry = document.createElement('button');
-  integrityRetry.type = 'button';
-  integrityRetry.className = 'quiet-button catalog-detail-retry';
-  integrityRetry.dataset.catalogDetailRetry = '';
-  integrityRetry.addEventListener('click', () => retryCatalogDetailShadow(record.id));
-  integrity.append(integrityStatus, integrityRetry);
-  context.append(integrity);
-
-  const directLinks = directActionLinks(record);
-  if (directLinks.length) {
-    const actions = document.createElement('nav');
-    actions.className = 'layer-project-detail-actions';
-    actions.setAttribute('aria-label', record.title);
-    for (const link of directLinks) {
-      const anchor = document.createElement('a');
-      anchor.href = link.url;
-      anchor.rel = 'external noreferrer';
-      anchor.dataset.actionType = link.type;
-      anchor.textContent = link.label;
-      actions.append(anchor);
-    }
-    context.append(actions);
-  }
-
-  article.append(copy, context);
-  return article;
+function relationLabelsForRecord(record) {
+  return (runtime.catalogProjection?.relations ?? [])
+    .filter(({ source_project_id }) => source_project_id === record.id)
+    .map(({ relation_type, target_title }) => relation_type === 'chapter-of'
+      ? t('relation_chapter_of', 'Teil von {title}', { title: target_title })
+      : `${relation_type} · ${target_title}`);
 }
 
-function renderLayerProjectDetail(view = visibleDigitalView()) {
-  const records = identityRecordsForView(view);
-  const selectedRecord = records.find(({ id }) => id === runtime.state.project) ?? null;
-  const previewRecord = records.find(({ id }) => id === runtime.layerPreviewProject) ?? null;
-  const record = runtime.state.project
-    ? selectedRecord
-    : (previewRecord ?? records[0] ?? null);
+function digitalPresenceText(record) {
+  const digital = record?.presence?.digital;
+  return digital?.available
+    ? (digital.label ?? t('digital_presence_published', 'Digitale Präsenz veröffentlicht'))
+    : t('digital_presence_none', 'Keine digitale Präsenz veröffentlicht.');
+}
+
+function curationTextForRecord(record) {
+  return [
+    recordActivityNotice(record, LOCALE),
+    t('curation_review', 'Redaktionell geprüft am {reviewed}; nächste Prüfung {next}.', {
+      reviewed: record?.curation?.reviewed_at ?? t('unknown', 'unbekannt'),
+      next: record?.curation?.next_review_at ?? t('open_date', 'offen'),
+    }),
+  ].filter(Boolean).join(' ');
+}
+
+function renderLayerProjectDetail() {
+  runtime.layerPreviewProject = null;
+  runtime.lastLayerProjectStatus = null;
   elements.layerProjects.replaceChildren();
-  elements.layerProjects.hidden = !record;
-  if (!record) {
-    runtime.layerPreviewProject = null;
-    runtime.lastLayerProjectStatus = null;
-    elements.layerProjects.removeAttribute('data-commonproject-id');
-    elements.layerProjects.removeAttribute('data-detail-mode');
-    elements.layerProjects.removeAttribute('role');
-    elements.layerProjects.removeAttribute('aria-labelledby');
-    elements.layerProjectStatus.textContent = '';
-    return;
-  }
-  const selected = record.id === runtime.state.project;
-  runtime.layerPreviewProject = record.id;
-  elements.layerProjects.dataset.commonprojectId = record.id;
-  elements.layerProjects.dataset.detailMode = selected ? 'selected' : 'preview';
-  elements.layerProjects.setAttribute('role', 'region');
-  elements.layerProjects.setAttribute('aria-labelledby', `layer-project-title-${record.id}`);
-  elements.layerProjects.append(createLayerProjectDetail(record, { selected }));
-  syncCatalogDetailShadowPresentation();
-  const status = selected
-    ? t('project_selected', '{title} ausgewählt', { title: record.title })
-    : t('project_preview', 'Vorschau zu {title}', { title: record.title });
-  if (runtime.lastLayerProjectStatus !== status) {
-    runtime.lastLayerProjectStatus = status;
-    elements.layerProjectStatus.textContent = status;
-  }
+  elements.layerProjects.hidden = true;
+  elements.layerProjects.removeAttribute('data-commonproject-id');
+  elements.layerProjects.removeAttribute('data-detail-mode');
+  elements.layerProjects.removeAttribute('role');
+  elements.layerProjects.removeAttribute('aria-labelledby');
+  elements.layerProjectStatus.textContent = '';
 }
 
 function syncLaneOverflow(scroller) {
@@ -1021,7 +940,7 @@ function renderLayerDeck() {
     scroller.setAttribute('aria-label', t('horizontal_scroll', '{label} horizontal durchblättern', { label: node.label }));
     const content = document.createElement('div');
     content.className = 'digital-lane-content';
-    for (const record of records) content.append(createRibbonSegment(record, { inlineDetails: identityLevel }));
+    for (const record of records) content.append(createRibbonSegment(record));
     scroller.addEventListener('scroll', () => syncLaneOverflow(scroller), { passive: true });
     scroller.append(content);
     if (identityLevel && records.length < node.identityCount) {
@@ -2423,22 +2342,12 @@ function updateFocusPanel() {
   replaceList(elements.focusThemes, (record.themes ?? []).map((theme) => themeLabel(theme, LOCALE)));
   replaceList(elements.focusActions, (record.actions ?? []).map((action) => actionLabel(action, LOCALE)));
   replaceList(elements.focusLocations, recordLocationSummaries(record, LOCALE));
-  const digital = record?.presence?.digital;
-  elements.focusDigital.textContent = digital?.available
-    ? (digital.label ?? t('digital_presence_published', 'Digitale Präsenz veröffentlicht'))
-    : t('digital_presence_none', 'Keine digitale Präsenz veröffentlicht.');
-  const relationLabels = (runtime.catalogProjection?.relations ?? [])
-    .filter(({ source_project_id }) => source_project_id === record.id)
-    .map(({ relation_type, target_title }) => relation_type === 'chapter-of'
-      ? t('relation_chapter_of', 'Teil von {title}', { title: target_title })
-      : `${relation_type} · ${target_title}`);
+  elements.focusDigital.textContent = digitalPresenceText(record);
+  const relationLabels = relationLabelsForRecord(record);
   replaceList(elements.focusRelations, relationLabels.length ? relationLabels : [t('relation_none', 'Keine belegte Beziehung veröffentlicht.') ]);
   replaceLinks(elements.focusLinks, record.links ?? []);
   replaceLinks(elements.focusSources, record?.provenance?.sources ?? []);
-  elements.focusCuration.textContent = [
-    recordActivityNotice(record, LOCALE),
-    t('curation_review', 'Redaktionell geprüft am {reviewed}; nächste Prüfung {next}.', { reviewed: record?.curation?.reviewed_at ?? t('unknown', 'unbekannt'), next: record?.curation?.next_review_at ?? t('open_date', 'offen') }),
-  ].filter(Boolean).join(' ');
+  elements.focusCuration.textContent = curationTextForRecord(record);
   syncCatalogDetailShadowPresentation();
 }
 
@@ -2562,18 +2471,12 @@ function selectProject(identifier, { historyMode = 'push', focus = true, trigger
   if (!runtime.recordsById.has(identifier)) return;
   if (trigger instanceof Element && !elements.focus.contains(trigger)) runtime.focusReturnTarget = trigger;
   if (!elements.discoveryPanel.hidden) closeDiscovery({ restoreFocus: false });
-  if (!focus && trigger instanceof Element && trigger.matches('.digital-ribbon-item')) {
-    runtime.layerPreviewProject = identifier;
-  }
   runtime.state.project = identifier;
   renderDiscoveryState();
   void observeCatalogRecordShadow(identifier);
   if (navigateSpatial) performSpatialNavigation(identifier);
   if (historyMode) writeHistory(historyMode);
   if (focus) elements.focus.focus({ preventScroll: true });
-  else if (trigger instanceof Element && trigger.matches('.digital-ribbon-item')) {
-    visibleProjectTrigger(identifier)?.focus({ preventScroll: true });
-  }
 }
 
 function isVisibleFocusTarget(target) {
@@ -2598,7 +2501,7 @@ function clearProject({ historyMode = 'push', restoreFocus = true } = {}) {
   const closingIdentifier = runtime.state.project;
   runtime.state.project = null;
   void observeCatalogRecordShadow(null);
-  runtime.layerPreviewProject = closingIdentifier;
+  runtime.layerPreviewProject = null;
   renderLayerProjectDetail();
   updateSelectionMarks();
   if (historyMode) writeHistory(historyMode);
@@ -2705,7 +2608,7 @@ function scheduleHierarchyFocus(pathKey) {
   runtime.hierarchyFocusTimer = window.setTimeout(tryFocus, HIERARCHY_FOCUS_RETRY_DELAYS_MS[attempt]);
 }
 
-function setDigitalPath(path, { historyMode = 'push' } = {}) {
+function setDigitalPath(path, { historyMode = 'push', focusHierarchy = true } = {}) {
   const normalized = normalizeDigitalPathForApp(path);
   const closesProject = Boolean(runtime.state.project) && !projectMatchesDigitalState(runtime.state.project, {
     ...runtime.state,
@@ -2722,7 +2625,7 @@ function setDigitalPath(path, { historyMode = 'push' } = {}) {
   }
   runtime.visibleRecordsCache = null;
   renderDiscoveryState();
-  if (closesProject || runtime.state.view === 'layers' || runtime.state.surface === 'text') {
+  if (focusHierarchy && (closesProject || runtime.state.view === 'layers' || runtime.state.surface === 'text')) {
     scheduleHierarchyFocus(normalized.pathKey);
   }
   if (historyMode) writeHistory(historyMode);

@@ -1,4 +1,6 @@
 {
+  "schema_version": 1,
+  "kind": "commonworld_public_browser_smoke_evidence",
   "verdict": "PASS",
   "scenarios": [
     {
@@ -120,7 +122,7 @@
     {
       "id": "layer-journey-moveend-return",
       "verdict": "PASS",
-      "elapsedMs": 2042
+      "elapsedMs": 1500
     },
     {
       "id": "layer-journey-interrupted",
@@ -190,6 +192,16 @@
           "height": 44
         },
         "minimumCatalogSelectHeight": 44
+      },
+      "landscapeDetail": {
+        "viewport": {
+          "width": 667,
+          "height": 375
+        },
+        "gridColumnCount": 1,
+        "panelHorizontalOverflow": 0,
+        "gridHorizontalOverflow": 0,
+        "finalSectionReachable": true
       }
     },
     {
@@ -256,9 +268,9 @@
     }
   ],
   "binding": {
-    "smoke_script_sha256": "68cb15afde0a62f392b7f580812f1c1ea3ee9c5de14bc196d7a19f9bd11c6191",
+    "smoke_script_sha256": "9fb4accbd8cedc0f79ba587eecab344f0135cc20ceefcf8856b38315469468f4",
     "smoke_runner_sha256": "522b99b70b1d0064b1d0a31a3a67fdc9a2e73b7408f37d1a4bb303bc360b7556",
-    "smoke_plan_sha256": "6b8749928ead5ef81ee66883e6a2993e756ce083575c3569234bf70526448364",
+    "first_party_surface_sha256": "baaaac5e62d300ae12bdd0f12e3dc59591d21d95e9176bf7be9a6e7cf51e40b6",
     "scenario_ids": [
       "startup-and-ring-orbits",
       "ring-orbits-reduced-motion",
@@ -295,6 +307,12 @@
       "method-mobile",
       "method-mobile-text-200"
     ],
-    "first_party_surface_sha256": "cce8b27986971d50a2804575ca4e47e2b84d50175c9eb6ffdda9e7d79a57db86"
+    "freshness_rule": "The committed smoke result is valid only while all bound hashes and the ordered scenario set match the current repository surface.",
+    "smoke_plan_sha256": "6b8749928ead5ef81ee66883e6a2993e756ce083575c3569234bf70526448364"
+  },
+  "execution": {
+    "job_id": "grabowski-job-7d0148eff7a8",
+    "finalization_receipt_sha256": "bc218a60908a90170acfeb56da3f2ecabfc4fa9438fa013822270c29589b2f37",
+    "result_sha256": "0b6f1f8651257c547f82a21037e0410c441618a4ee169ca1a09bf0fe86e6076b"
   }
 }
