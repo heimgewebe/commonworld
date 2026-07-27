@@ -122,7 +122,7 @@ class DigitalSphereContractTests(unittest.TestCase):
         self.assertTrue(orbit["reduced_motion_stops_orbit"])
         self.assertEqual("ringOrbitDuration", orbit["duration_function"])
         bounds = orbit["duration_bounds_seconds"]
-        self.assertEqual({"minimum": 24, "maximum": 96}, bounds)
+        self.assertEqual({"minimum": 72, "maximum": 180}, bounds)
 
     def test_validator_rejects_per_frame_javascript_orbit(self) -> None:
         errors = self.errors_after(lambda contract: contract["globe_mode"]["motion"]["ring_orbit_animation"].update({"per_frame_javascript_forbidden": False}))

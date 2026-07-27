@@ -39,6 +39,7 @@ import {
   ringOrbitDirection,
   ringOrbitDuration,
   ringOrbitStartAngle,
+  SPHERE_RING_IDENTITY_PREVIEW_LIMIT,
   safeExternalHttpsUrl,
   sampledDiagnosticPublicationDue,
   searchFromState,
@@ -47,9 +48,12 @@ import {
   sphereDetailLevel,
   sphereLayout,
   sphereOpacityForGlobeRatio,
+  sphereRingFontSize,
+  sphereRingPrimaryIndices,
+  sphereRingStrokeWidth,
   stateFromSearch,
   visibleDigitalNodes,
-} from './commonworld-core.mjs?v=e1eac1e9a382';
+} from './commonworld-core.mjs?v=b7a50dcfc9af';
 
 const LOCALE = documentLocale();
 const t = (key, germanFallback, variables = {}) => i18nText(LOCALE, key, germanFallback, variables);
@@ -728,6 +732,17 @@ function appendRingSequence(textPath, records, { prefix = '' } = {}) {
   }
 }
 
+function applySphereRingDetail(requestedDetailLevel = elements.sphere.dataset.ringDetailLevel || elements.sphere.dataset.detailLevel || 'names') {
+  const detailLevel = window.matchMedia('(max-width: 48rem)').matches && requestedDetailLevel === 'names'
+    ? 'compact'
+    : requestedDetailLevel;
+  const planes = [...elements.sphereRings.querySelectorAll('.sphere-ring-plane')];
+  const primaryIndices = new Set(sphereRingPrimaryIndices(planes.length, detailLevel));
+  planes.forEach((plane, index) => {
+    plane.dataset.emphasis = primaryIndices.has(index) ? 'primary' : 'depth';
+  });
+}
+
 function renderSphereRibbons(records = runtime.records) {
   const view = visibleDigitalView(records);
   const childBundles = view.children.filter((node) => node.type !== 'identity');
@@ -736,7 +751,7 @@ function renderSphereRibbons(records = runtime.records) {
     .slice(0, 8);
   elements.sphereRings.replaceChildren();
   visibleNodes.forEach((node, layerIndex) => {
-    const source = recordsForNode(node).slice(0, node.type === 'field' ? 2 : 3);
+    const source = recordsForNode(node).slice(0, SPHERE_RING_IDENTITY_PREVIEW_LIMIT);
     const plane = createSvgElement('g', {
       class: 'sphere-ring-plane',
       'data-node-id': node.id,
@@ -781,6 +796,7 @@ function renderSphereRibbons(records = runtime.records) {
     plane.append(text);
     elements.sphereRings.append(plane);
   });
+  applySphereRingDetail();
   runtime.overlayRenderCount += 1;
   elements.stage.dataset.overlayRenders = String(runtime.overlayRenderCount);
 }
@@ -2680,14 +2696,18 @@ function projectedGlobeGeometry(center, projectedCenter) {
   return projectedGlobeCircle({ center: projectedCenter, horizon });
 }
 
-function updateSphereVisuals({ geometry, size }) {
+function updateSphereVisuals({ geometry, size, detailLevel }) {
   const x = `${quantizeSpherePixel(geometry.x)}px`;
   const y = `${quantizeSpherePixel(geometry.y)}px`;
   const diameter = `${quantizeSpherePixel(geometry.diameter)}px`;
+  const fontSize = `${sphereRingFontSize({ diameter: geometry.diameter, detailLevel })}px`;
+  const strokeWidth = `${sphereRingStrokeWidth({ diameter: geometry.diameter })}px`;
   let visualChanged = false;
   visualChanged = setStylePropertyIfChanged(elements.stage, '--sphere-x', x) || visualChanged;
   visualChanged = setStylePropertyIfChanged(elements.stage, '--sphere-y', y) || visualChanged;
   visualChanged = setStylePropertyIfChanged(elements.stage, '--sphere-size', diameter) || visualChanged;
+  visualChanged = setStylePropertyIfChanged(elements.sphere, '--sphere-ring-font-size', fontSize) || visualChanged;
+  visualChanged = setStylePropertyIfChanged(elements.sphere, '--sphere-ring-stroke-width', strokeWidth) || visualChanged;
   runtime.sphereMetrics.globeDiameter = geometry.globeDiameter;
   visualChanged = updateSphereOpacity({ globeDiameter: geometry.globeDiameter, size }) || visualChanged;
   return visualChanged;
@@ -2735,8 +2755,13 @@ function updateSphereGeometry({ publishDiagnostics = true } = {}) {
     sideView,
   });
   const detailLevel = sphereDetailLevel({ diameter: geometry.diameter, sideView });
-  const visualChanged = updateSphereVisuals({ geometry, size });
-  if (visualChanged) runtime.sphereGeometryCommitCount += 1;
+  const ringDetailLevel = window.matchMedia('(max-width: 48rem)').matches && detailLevel === 'names' ? 'compact' : detailLevel;
+  const detailLevelChanged = setDatasetIfChanged(elements.sphere, 'detailLevel', detailLevel);
+  const ringDetailLevelChanged = setDatasetIfChanged(elements.sphere, 'ringDetailLevel', ringDetailLevel);
+  setDatasetIfChanged(elements.stage, 'sphereDetailLevel', detailLevel);
+  const visualChanged = updateSphereVisuals({ geometry, size, detailLevel });
+  if (detailLevelChanged || ringDetailLevelChanged) applySphereRingDetail(ringDetailLevel);
+  if (visualChanged || detailLevelChanged || ringDetailLevelChanged) runtime.sphereGeometryCommitCount += 1;
   if (publishDiagnostics) {
     publishSphereDiagnostics({
       projectedCenter,

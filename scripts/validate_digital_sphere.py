@@ -132,7 +132,7 @@ def validate_digital_sphere(root: Path = ROOT) -> list[str]:
             "implementation": "css_transform_keyframes_only",
             "per_frame_javascript_forbidden": True,
             "duration_function": "ringOrbitDuration",
-            "duration_bounds_seconds": {"minimum": 24, "maximum": 96},
+            "duration_bounds_seconds": {"minimum": 72, "maximum": 180},
             "duration_monotonic_in_entry_count": True,
             "deterministic_start_angles_required": True,
             "alternating_directions_allowed": True,

@@ -19,6 +19,7 @@ import {
   globeHorizonCoordinates,
   publicMapFeatureCollection,
   ringOrbitDuration,
+  SPHERE_RING_IDENTITY_PREVIEW_LIMIT,
   serializeDigitalPath,
   sphereOpacityForGlobeRatio,
   visibleDigitalNodes,
@@ -253,7 +254,7 @@ async function loadExpectedDigitalProjection() {
       pathKey,
       ids: [...node.identityIds],
       laneIds: [...node.identityIds],
-      ringPreviewIds: [...node.identityIds].slice(0, 2),
+      ringPreviewIds: [...node.identityIds].slice(0, SPHERE_RING_IDENTITY_PREVIEW_LIMIT),
       count: node.identityCount,
     };
   });
@@ -2124,11 +2125,12 @@ async function androidGlobeUiScenario() {
     const icon = button.querySelector('.filter-toggle-icon');
     const buttonRect = button.getBoundingClientRect();
     const iconRect = icon.getBoundingClientRect();
-    const ring = document.querySelector('.sphere-ring-plane');
-    const text = document.querySelector('.sphere-ring-text');
+    const ring = document.querySelector('.sphere-ring-plane[data-emphasis="primary"]');
+    const text = ring.querySelector('.sphere-ring-text');
     const textRect = text.getBoundingClientRect();
     const ringStyle = getComputedStyle(ring);
     const textStyle = getComputedStyle(text);
+    const planes = [...document.querySelectorAll('.sphere-ring-plane')];
     return {
       filterCenterDeltaX: Math.abs((buttonRect.left + buttonRect.width / 2) - (iconRect.left + iconRect.width / 2)),
       filterCenterDeltaY: Math.abs((buttonRect.top + buttonRect.height / 2) - (iconRect.top + iconRect.height / 2)),
@@ -2139,13 +2141,19 @@ async function androidGlobeUiScenario() {
       ringTextWidth: textRect.width,
       ringTextHeight: textRect.height,
       ringTextFontSize: Number.parseFloat(textStyle.fontSize),
+      primaryRingCount: planes.filter((plane) => plane.dataset.emphasis === 'primary').length,
+      depthRingCount: planes.filter((plane) => plane.dataset.emphasis === 'depth').length,
+      depthRingsStatic: planes.filter((plane) => plane.dataset.emphasis === 'depth').every((plane) => getComputedStyle(plane).animationName === 'none'),
+      viewportWidth: window.innerWidth,
+      mediaCompact: window.matchMedia('(max-width: 48rem)').matches,
     };
   });
   assert(geometry.filterCenterDeltaX <= 1 && geometry.filterCenterDeltaY <= 1, scenarioId + ': filter icon is not centered ' + JSON.stringify(geometry));
   assert(geometry.filterButtonWidth >= 44 && geometry.filterButtonHeight >= 44, scenarioId + ': filter button is below mobile touch target ' + JSON.stringify(geometry));
-  assert(geometry.ringAnimationName === 'none', scenarioId + ': mobile ring group still uses CSS orbit transform ' + JSON.stringify(geometry));
-  assert(geometry.ringTransform === 'none', scenarioId + ': mobile ring group retains a transform offset ' + JSON.stringify(geometry));
-  assert(geometry.ringTextWidth > 20 && geometry.ringTextHeight > 8 && geometry.ringTextFontSize >= 17, scenarioId + ': mobile ring text is not visibly sized ' + JSON.stringify(geometry));
+  assert(geometry.ringAnimationName === 'sphere-ring-orbit', scenarioId + ': primary mobile ring lost its slow orientation orbit ' + JSON.stringify(geometry));
+  assert(geometry.ringTransform !== 'none', scenarioId + ': primary mobile ring lost its deterministic orbital offset ' + JSON.stringify(geometry));
+  assert(geometry.primaryRingCount >= 2 && geometry.primaryRingCount <= 3 && geometry.depthRingCount > 0 && geometry.depthRingsStatic, scenarioId + ': mobile emphasis does not bound active rings ' + JSON.stringify(geometry));
+  assert(geometry.ringTextWidth > 80 && geometry.ringTextHeight >= 12.5 && geometry.ringTextFontSize >= 9.5, scenarioId + ': mobile ring text is not visibly sized ' + JSON.stringify(geometry));
 
   await run.page.evaluate(() => new Promise((resolve) => {
     const map = window.__commonworldTestMap;

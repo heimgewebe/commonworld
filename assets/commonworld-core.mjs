@@ -683,9 +683,13 @@ export function ribbonRepeatCount(recordCount, minimumSegments = 12) {
   return clamp(Math.ceil(minimum / count), 2, 6);
 }
 
-export const RING_ORBIT_MIN_DURATION_S = 24;
-export const RING_ORBIT_MAX_DURATION_S = 96;
+export const RING_ORBIT_MIN_DURATION_S = 72;
+export const RING_ORBIT_MAX_DURATION_S = 180;
+export const SPHERE_RING_IDENTITY_PREVIEW_LIMIT = 6;
 const RING_ORBIT_SATURATION_COUNT = 48;
+const SPHERE_VIEWBOX_SIZE = 640;
+const SPHERE_RING_SCREEN_FONT_TARGETS = Object.freeze({ micro: 13.5, compact: 14.5, names: 15.5, close: 16 });
+const SPHERE_RING_PRIMARY_COUNTS = Object.freeze({ micro: 2, compact: 3, names: 5, close: 2 });
 
 export function ringOrbitDuration(entryCount) {
   const count = Number.isInteger(entryCount) && entryCount > 0 ? entryCount : 1;
@@ -732,6 +736,28 @@ export function sphereDetailLevel({ diameter, sideView = false } = {}) {
   if (size < 360) return 'micro';
   if (size < 620) return 'compact';
   return 'names';
+}
+
+export function sphereRingFontSize({ diameter, detailLevel = 'names' } = {}) {
+  const sphereDiameter = Math.max(1, finite(diameter, 1));
+  const targetCssPixels = SPHERE_RING_SCREEN_FONT_TARGETS[detailLevel] ?? SPHERE_RING_SCREEN_FONT_TARGETS.names;
+  return rounded(clamp((targetCssPixels * SPHERE_VIEWBOX_SIZE) / sphereDiameter, 9.5, 26), 2);
+}
+
+export function sphereRingStrokeWidth({ diameter } = {}) {
+  const sphereDiameter = Math.max(1, finite(diameter, 1));
+  return rounded(clamp((1.65 * SPHERE_VIEWBOX_SIZE) / sphereDiameter, 1.2, 3.2), 2);
+}
+
+export function sphereRingPrimaryIndices(totalRings, detailLevel = 'names') {
+  const total = Number.isInteger(totalRings) && totalRings > 0 ? totalRings : 0;
+  if (total === 0) return Object.freeze([]);
+  const requested = SPHERE_RING_PRIMARY_COUNTS[detailLevel] ?? SPHERE_RING_PRIMARY_COUNTS.names;
+  const count = clamp(requested, 1, total);
+  if (count === total) return Object.freeze(Array.from({ length: total }, (_, index) => index));
+  if (count === 1) return Object.freeze([0]);
+  const indices = Array.from({ length: count }, (_, index) => Math.round((index * (total - 1)) / (count - 1)));
+  return Object.freeze([...new Set(indices)]);
 }
 
 

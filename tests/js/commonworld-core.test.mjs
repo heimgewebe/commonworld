@@ -56,6 +56,7 @@ import {
   ribbonRepeatCount,
   RING_ORBIT_MIN_DURATION_S,
   RING_ORBIT_MAX_DURATION_S,
+  SPHERE_RING_IDENTITY_PREVIEW_LIMIT,
   normalizeDigitalPath,
   ringOrbitDirection,
   ringOrbitDuration,
@@ -69,6 +70,9 @@ import {
   sphereDetailLevel,
   sphereLayout,
   sphereOpacityForGlobeRatio,
+  sphereRingFontSize,
+  sphereRingPrimaryIndices,
+  sphereRingStrokeWidth,
   stateFromSearch,
   validateDigitalTaxonomy,
   visibleDigitalNodes,
@@ -367,8 +371,8 @@ test('ring orbit duration is deterministic, monotonic and bounded', () => {
     assert.ok(ringOrbitDuration(count) <= ringOrbitDuration(count + 1), `monotonic at ${count}`);
   }
   assert.equal(ringOrbitDuration(1), RING_ORBIT_MIN_DURATION_S, 'one entry receives the exact minimum duration');
-  assert.equal(RING_ORBIT_MIN_DURATION_S, 24);
-  assert.equal(RING_ORBIT_MAX_DURATION_S, 96);
+  assert.equal(RING_ORBIT_MIN_DURATION_S, 72);
+  assert.equal(RING_ORBIT_MAX_DURATION_S, 180);
   assert.equal(ringOrbitDuration(10000), RING_ORBIT_MAX_DURATION_S, 'large counts saturate at the cap');
   assert.equal(ringOrbitDuration(100000), ringOrbitDuration(10000), 'cap is flat beyond saturation');
   assert.equal(ringOrbitDuration(0), ringOrbitDuration(1), 'empty rings fall back to the slowest small-ring pace');
@@ -388,6 +392,17 @@ test('orbital profiles remain distinct semantic paths rather than copied circles
   assert.equal(new Set(ORBIT_PROFILES.map(({ rotation }) => rotation)).size, ORBIT_PROFILES.length);
   assert(ORBIT_PROFILES.every(({ rx, ry }) => rx !== ry));
   assert(ORBIT_PROFILES.every(({ rx, ry }) => rx >= 274 && ry >= 262));
+});
+
+test('sphere ring typography preserves screen-space legibility and balanced emphasis', () => {
+  assert.equal(SPHERE_RING_IDENTITY_PREVIEW_LIMIT, 6);
+  assert.equal(sphereRingFontSize({ diameter: 640, detailLevel: 'names' }), 15.5);
+  assert.ok(sphereRingFontSize({ diameter: 360, detailLevel: 'compact' }) > 20);
+  assert.ok(sphereRingStrokeWidth({ diameter: 360 }) > sphereRingStrokeWidth({ diameter: 900 }));
+  assert.deepEqual(sphereRingPrimaryIndices(6, 'micro'), [0, 5]);
+  assert.deepEqual(sphereRingPrimaryIndices(6, 'compact'), [0, 3, 5]);
+  assert.deepEqual(sphereRingPrimaryIndices(6, 'names'), [0, 1, 3, 4, 5]);
+  assert.deepEqual(sphereRingPrimaryIndices(3, 'names'), [0, 1, 2]);
 });
 
 test('sphere detail levels remain stable for overview and close-up rendering', () => {
