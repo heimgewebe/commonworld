@@ -50,7 +50,7 @@ Der vollständige Weltindex bleibt Export- und Prüffläche. Er ist für große 
 
 Das Aggregat ordnet Themen, 10-Grad-Raumzellen und digitale Verfügbarkeit stabilen SHA-256-Präfix-Shards zu. Ein Shard enthält kompakte Records einschließlich Detaildescriptor, aber keine vollständigen Details.
 
-Zwei Hexzeichen ergeben höchstens 256 Partitionen. Eine Identität bleibt bei Inhaltsänderungen im selben Shard; die Generation und die Integritätshashes ändern sich trotzdem.
+Zwei Hexzeichen ergeben höchstens 256 Partitionen. Eine Identität bleibt bei Inhaltsänderungen im selben Shard; die Generation und die Integritätshashes ändern sich trotzdem. Erreicht ein generierter Shard die Warnschwelle, muss vor dem harten Maximum eine kompatible Präfixtiefen-Migration entworfen und belegt werden.
 
 ### Ebene 3: Details
 
@@ -101,20 +101,21 @@ Bei einem Detailfehler bleiben Titel, Zusammenfassung, Links, Quellen, Karte, Su
 - Bei sehr großen Geometrien: PMTiles aus PostGIS-Projektionen, nicht GeoJSON-Volltransfer.
 - ANN/HNSW, separater Suchdienst und Elasticsearch/Typesense/Meilisearch bleiben ohne belegten Engpass ausgeschlossen.
 
-Die Schwellen sind Messpunkte, keine harten Katalogzahlen.
+Die Schwellen sind Messpunkte, keine harten Katalogzahlen. Der verbindliche Vor-Cutover-Vertrag liegt in `contracts/commonworld/catalog-scale-gates.contract.json`; `scripts/validate_catalog_scale_gates.py` bindet ihn in `make validate` an Evidenz und aktuelle Produktionswahrheit.
 
-## Gemessene Skalierungsgrenzen vom 26. Juli 2026
+## Gemessene Skalierungsgrenzen vom 27. Juli 2026
 
 Die reproduzierbare synthetische Messung liegt in `docs/evidence/catalog-platform-scaling-v1.json`. Sie verwendet die aktuelle kompakte Datensatzform einschließlich generationsgebundener Detaildescriptoren und eine deterministische SHA-256-Präfixverteilung.
 
-| Einträge | Vollindex gzip | Median Parsezeit | größter Shard gzip | maximale Einträge je Shard |
-| ---: | ---: | ---: | ---: | ---: |
-| 10.000 | 624.128 Byte | 59,844 ms | 4.231 Byte | 59 |
-| 100.000 | 6.237.810 Byte | 1.003,180 ms | 28.683 Byte | 440 |
+| Einträge | Vollindex gzip | Median Parsezeit | größter Shard gzip | maximale Einträge je Shard | Shard-Gate |
+| ---: | ---: | ---: | ---: | ---: | --- |
+| 1.000 | 62.845 Byte | 4,559 ms | 1.036 Byte | 10 | PASS |
+| 10.000 | 624.128 Byte | 60,552 ms | 4.231 Byte | 59 | PASS |
+| 100.000 | 6.237.810 Byte | 792,946 ms | 28.683 Byte | 440 | WARNUNG |
 
-Der Descriptor erhöht den Weltindex gegenüber der früheren ungebundenen Detailreferenz deutlich. Genau deshalb bleibt der vollständige 100k-Weltindex als initiale Browserlieferung verworfen. Der größte bedarfsgeladene Shard bleibt unter dem festgelegten 32-KiB-gzip-Budget.
+Schon der vollständige 1.000er-Weltindex überschreitet das 32-KiB-Startbudget und bleibt deshalb bei allen gemessenen Stufen Export- und Prüffläche statt initialer Browserlieferung. Die bedarfsgeladenen Shards liegen bei 1.000 und 10.000 Einträgen deutlich unter der Warnschwelle von 28.672 Byte. Der 100.000er-Stresstest liegt mit 28.683 Byte elf Byte über dieser Warnschwelle, aber noch unter dem harten Maximum von 32.768 Byte. Er erzwingt daher keine Backend-Vorentscheidung, wohl aber einen belegten Präfixtiefen-Migrationspfad vor weiterem Wachstum.
 
-Die Messung ist synthetisch. Sie belegt Payload, lokale Parsegröße und Shardgrenze, aber keine reale Mobilfunklatenz oder physische iPad-Bedienbarkeit.
+Die Messung ist synthetisch. Sie belegt Payload, lokale Parsegröße und Shardgrenze, aber keine reale Mobilfunklatenz, produktive Such- oder Karteninteraktion oder physische iPad-Bedienbarkeit. Genau diese Lücken gehören zu `COMMONWORLD-PUBLIC-GLOBE-V1-T028`.
 
 ## Invarianten
 
@@ -127,17 +128,22 @@ Die Messung ist synthetisch. Sie belegt Payload, lokale Parsegröße und Shardgr
 7. Suche und Karte verwenden dieselbe zulässige Kandidatenmenge.
 8. Schnelle Auswahlwechsel dürfen keine ältere Antwort auf den aktuellen Fokus anwenden.
 9. Erfolgreiche Shadow-Parität autorisiert weder Bootstrap-Entfernung noch Deployment oder physischen Geräte-Cutover.
+10. Kein generierter Shard darf das harte gzip-Budget erreichen; die Warnschwelle löst vorher eine kompatible Partitionierungsentscheidung aus.
 
 ## Cutover-Gate
 
 Der Bootstrap darf erst entfernt werden, wenn alle folgenden Punkte an demselben geprüften Stand belegt sind:
 
+- realistische, schema- und projektionsvollständige 1.000er- und 10.000er-Kataloge,
 - kompakte Shardparität sowie hash-, schema- und compact-gebundene Detailparität,
+- ein sichtbarer Runtimepfad, dessen Suche, Karte und digitale Navigation nicht den vollständigen Katalog als Start- oder Speichergrundlage benötigen,
 - deutsche und englische Darstellung,
 - Deep-Link-, Vor-/Zurück- und No-JavaScript-Parität,
+- eine vollständige, aber begrenzte Recovery-Oberfläche über paginierte Indizes und kanonische Projektseiten statt vollständiger Landing-Page-Einbettung,
 - Offline-, Integritäts-, Netzwerk-, Retry- und Stale-Response-Fälle,
 - unterstützte Desktop-, Mobil- und iPad-Browserprofile,
-- 4-fache CPU-Drosselung innerhalb des Budgets,
+- 4-fache CPU-Drosselung innerhalb der Transfer-, Parse-, DOM-, Interaktions- und Speicherbudgets,
+- ein kompatibler Präfixtiefen-Migrationspfad vor Erreichen des Shardmaximums,
 - revisionsgebundenes Rollback-Artefakt,
 - Produktionsgeneration und öffentlicher Readback,
 - separat ausgewiesener physischer Gerätebeleg.
@@ -150,4 +156,4 @@ Wird minimale Betriebsfläche höher gewichtet, kann Commonworld lange beim buil
 
 ## Nicht behauptet
 
-Dieser Stand belegt noch keinen PostGIS-, Outbox-, Axum- oder Weltgewebe-Produktionspfad. Er belegt noch keine Bootstrap-Entfernung und keine physische Gerätefreigabe. Er schafft den generationsgebundenen öffentlichen Liefervertrag, einen deterministischen Snapshot-Compiler und einen fehlertoleranten ausgewählten Detail-Shadow-Pfad.
+Dieser Stand belegt noch keinen PostGIS-, Outbox-, Axum- oder Weltgewebe-Produktionspfad. Er belegt noch keine Bootstrap-Entfernung und keine physische Gerätefreigabe. Er schafft den generationsgebundenen öffentlichen Liefervertrag, einen deterministischen Snapshot-Compiler, einen fehlertoleranten ausgewählten Detail-Shadow-Pfad und ein CI-gebundenes Skalierungs-Gate für den späteren 1.000er-/10.000er-Cutover.
