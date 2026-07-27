@@ -23,6 +23,7 @@ class CatalogScaleGateValidationTests(unittest.TestCase):
             Path("contracts/commonworld/catalog-scale-gates.contract.json"),
             Path("contracts/commonworld/current-state.contract.json"),
             Path("docs/evidence/catalog-platform-scaling-v1.json"),
+            Path("scripts/measure_catalog_platform_scaling.py"),
         ):
             target = self.root / relative
             target.parent.mkdir(parents=True, exist_ok=True)
@@ -37,8 +38,20 @@ class CatalogScaleGateValidationTests(unittest.TestCase):
     def write(self, relative: str, value: dict) -> None:
         (self.root / relative).write_text(json.dumps(value, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
 
-    def test_current_scale_gate_contract_passes(self):
+    def test_current_scale_gate_contract_passes_with_fresh_recomputation(self):
         self.assertEqual(MODULE.validate_catalog_scale_gates(self.root), [])
+
+    def test_committed_measurements_cannot_be_fabricated_with_valid_gate_labels(self):
+        relative = "docs/evidence/catalog-platform-scaling-v1.json"
+        evidence = self.load(relative)
+        for measurement in evidence["measurements"]:
+            measurement["world_index"]["raw_bytes"] += 1
+            measurement["shards"]["gzip_total_bytes"] += 1
+        self.write(relative, evidence)
+        self.assertIn(
+            "catalogue scaling evidence deterministic measurement drift",
+            MODULE.validate_catalog_scale_gates(self.root),
+        )
 
     def test_cutover_cannot_be_authorized_by_synthetic_evidence(self):
         relative = "contracts/commonworld/catalog-scale-gates.contract.json"
@@ -47,7 +60,7 @@ class CatalogScaleGateValidationTests(unittest.TestCase):
         self.write(relative, contract)
         self.assertIn(
             "catalogue scale contract must not authorize cutover",
-            MODULE.validate_catalog_scale_gates(self.root),
+            MODULE.validate_catalog_scale_gates(self.root, verify_measurements=False),
         )
 
     def test_10k_cutover_tier_cannot_cross_shard_warning(self):
@@ -59,7 +72,7 @@ class CatalogScaleGateValidationTests(unittest.TestCase):
         self.write(relative, evidence)
         self.assertIn(
             "10000: cutover scale tier must remain below shard warning budget",
-            MODULE.validate_catalog_scale_gates(self.root),
+            MODULE.validate_catalog_scale_gates(self.root, verify_measurements=False),
         )
 
     def test_100k_stress_warning_cannot_be_silently_glossed_over(self):
@@ -68,7 +81,7 @@ class CatalogScaleGateValidationTests(unittest.TestCase):
         measurement = next(item for item in evidence["measurements"] if item["entry_count"] == 100_000)
         measurement["gate_evaluation"]["shard_gzip"] = "pass"
         self.write(relative, evidence)
-        errors = MODULE.validate_catalog_scale_gates(self.root)
+        errors = MODULE.validate_catalog_scale_gates(self.root, verify_measurements=False)
         self.assertIn("100000: shard gate does not match measured size", errors)
         self.assertIn("100000: stress tier must preserve the measured prefix-depth warning", errors)
 
@@ -79,7 +92,7 @@ class CatalogScaleGateValidationTests(unittest.TestCase):
         self.write(relative, contract)
         self.assertIn(
             "catalogue scale contract must remain measurement-first, not backend-first",
-            MODULE.validate_catalog_scale_gates(self.root),
+            MODULE.validate_catalog_scale_gates(self.root, verify_measurements=False),
         )
 
 
