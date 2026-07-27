@@ -23,6 +23,10 @@ class CurrentStateTests(unittest.TestCase):
             "docs/research/public-maplibre-vertical-slice-v1.result.json",
             "LICENSE",
             "LICENSE-DATA.md",
+            "SECURITY.md",
+            ".well-known/security.txt",
+            "_config.yml",
+            "scripts/verify_pages_deployment.py",
         )
         for relative in paths:
             source = ROOT / relative
@@ -42,7 +46,25 @@ class CurrentStateTests(unittest.TestCase):
             value["current_as_of"] = "2026-07-18"
             path.write_text(json.dumps(value), encoding="utf-8")
             errors = validate_current_state(root)
-        self.assertIn("current-state date does not cover the selected catalog shard shadow truth", errors)
+        self.assertIn("current-state date does not cover the security-disclosure and catalog-shard truth", errors)
+
+    def test_security_disclosure_rejects_disabled_private_reporting(self) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            root = self.copy_current_state(directory)
+            path = root / "contracts/commonworld/current-state.contract.json"
+            value = json.loads(path.read_text(encoding="utf-8"))
+            value["security_disclosure"]["private_vulnerability_reporting_enabled"] = False
+            path.write_text(json.dumps(value), encoding="utf-8")
+            errors = validate_current_state(root)
+        self.assertIn("current security-disclosure truth mismatch", errors)
+
+    def test_security_disclosure_requires_exact_production_readback(self) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            root = self.copy_current_state(directory)
+            path = root / "scripts/verify_pages_deployment.py"
+            path.write_text(path.read_text(encoding="utf-8").replace(".well-known/security.txt", "security.txt"), encoding="utf-8")
+            errors = validate_current_state(root)
+        self.assertIn("current production readback does not include security.txt", errors)
 
     def test_catalog_delivery_declares_selected_shard_shadow(self) -> None:
         with tempfile.TemporaryDirectory() as directory:

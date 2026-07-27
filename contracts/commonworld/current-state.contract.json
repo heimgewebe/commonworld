@@ -1,7 +1,7 @@
 {
   "schema_version": 2,
   "kind": "commonworld_current_public_state",
-  "current_as_of": "2026-07-26",
+  "current_as_of": "2026-07-27",
   "precedence": {
     "current_operational_truth": "this contract",
     "catalog_truth": "catalog/catalog.json and the referenced CommonProject records",
@@ -52,6 +52,17 @@
     "backend": false,
     "accounts": false,
     "write_path": false
+  },
+  "security_disclosure": {
+    "confidential_channel": "github_private_vulnerability_reporting",
+    "private_vulnerability_reporting_enabled": true,
+    "contact": "https://github.com/heimgewebe/commonworld/security/advisories/new",
+    "repository_policy": "SECURITY.md",
+    "public_discovery": ".well-known/security.txt",
+    "public_discovery_url": "https://commonworld.net/.well-known/security.txt",
+    "public_issues_confidential": false,
+    "exact_production_readback": true,
+    "host_configuration": "_config.yml includes only .well-known"
   },
   "release_gates": {
     "deterministic_build_and_tests": "pass",

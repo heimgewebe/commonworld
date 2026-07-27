@@ -105,6 +105,6 @@ The machine-readable decision and its failure/rollback boundary are in `contract
 
 ## Vulnerability disclosure surface
 
-Commonworld uses GitHub Private Vulnerability Reporting as its only confidential disclosure channel. `SECURITY.md` is the repository policy and `/.well-known/security.txt` is the RFC 9116 discovery surface. Public issues, pull requests and the Commons proposal form are not confidential reporting channels.
+Commonworld uses GitHub Private Vulnerability Reporting as its only confidential disclosure channel. The repository setting was enabled before publication on 2026-07-27. `SECURITY.md` is the repository policy and `/.well-known/security.txt` is the RFC 9116 discovery surface. Public issues, pull requests and the Commons proposal form are not confidential reporting channels.
 
 The source-branch Jekyll build includes only `.well-known`; `.nojekyll` is forbidden because it would publish a broader dotfile surface. The production readback hashes `/.well-known/security.txt` against the exact deployed commit. The expiry must remain between 30 and 366 days in the future, so stale disclosure information fails CI before deployment.

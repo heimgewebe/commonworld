@@ -18,6 +18,10 @@ DIGITAL_RING_PATH = Path("contracts/commonworld/digital-ring-taxonomy.contract.j
 CATALOG_PLATFORM_PATH = Path("contracts/commonworld/catalog-platform.contract.json")
 APP_PATH = Path("assets/commonworld-app.js")
 LE_NID_PATH = Path("catalog/projects/cltb-le-nid.json")
+SECURITY_POLICY_PATH = Path("SECURITY.md")
+SECURITY_TXT_PATH = Path(".well-known/security.txt")
+JEKYLL_CONFIG_PATH = Path("_config.yml")
+PRODUCTION_READBACK_PATH = Path("scripts/verify_pages_deployment.py")
 
 
 def _load(root: Path, relative: Path) -> dict:
@@ -30,7 +34,7 @@ def _sha256(path: Path) -> str:
 
 def validate_current_state(root: Path = ROOT) -> list[str]:
     errors: list[str] = []
-    for relative in (STATE_PATH, CATALOG_PATH, PROVIDER_PATH, VERTICAL_SLICE_PATH, DIGITAL_RING_PATH, CATALOG_PLATFORM_PATH, APP_PATH, LE_NID_PATH):
+    for relative in (STATE_PATH, CATALOG_PATH, PROVIDER_PATH, VERTICAL_SLICE_PATH, DIGITAL_RING_PATH, CATALOG_PLATFORM_PATH, APP_PATH, LE_NID_PATH, SECURITY_POLICY_PATH, SECURITY_TXT_PATH, JEKYLL_CONFIG_PATH, PRODUCTION_READBACK_PATH):
         if not (root / relative).is_file():
             errors.append(f"missing current-state dependency: {relative}")
     if errors:
@@ -45,6 +49,7 @@ def validate_current_state(root: Path = ROOT) -> list[str]:
         catalog_platform = _load(root, CATALOG_PLATFORM_PATH)
         app = (root / APP_PATH).read_text(encoding="utf-8")
         le_nid = _load(root, LE_NID_PATH)
+        production_readback = (root / PRODUCTION_READBACK_PATH).read_text(encoding="utf-8")
     except (OSError, json.JSONDecodeError) as error:
         return [f"current-state dependency is invalid: {error}"]
 
@@ -142,6 +147,25 @@ def validate_current_state(root: Path = ROOT) -> list[str]:
     }
     if production != expected_production:
         errors.append("current production truth mismatch")
+
+    security_disclosure = state.get("security_disclosure", {})
+    expected_security_disclosure = {
+        "confidential_channel": "github_private_vulnerability_reporting",
+        "private_vulnerability_reporting_enabled": True,
+        "contact": "https://github.com/heimgewebe/commonworld/security/advisories/new",
+        "repository_policy": "SECURITY.md",
+        "public_discovery": ".well-known/security.txt",
+        "public_discovery_url": "https://commonworld.net/.well-known/security.txt",
+        "public_issues_confidential": False,
+        "exact_production_readback": True,
+        "host_configuration": "_config.yml includes only .well-known",
+    }
+    if security_disclosure != expected_security_disclosure:
+        errors.append("current security-disclosure truth mismatch")
+    if '.well-known/security.txt' not in production_readback:
+        errors.append("current production readback does not include security.txt")
+    if (root / JEKYLL_CONFIG_PATH).read_text(encoding="utf-8") != "include:\n  - .well-known\n":
+        errors.append("current host configuration does not publish only .well-known")
 
     release = state.get("release_gates", {})
     expected_release = {
@@ -339,8 +363,8 @@ def validate_current_state(root: Path = ROOT) -> list[str]:
         current_as_of = date.fromisoformat(str(state.get("current_as_of", "")))
     except ValueError:
         current_as_of = None
-    if current_as_of is None or current_as_of < date(2026, 7, 26):
-        errors.append("current-state date does not cover the selected catalog shard shadow truth")
+    if current_as_of is None or current_as_of < date(2026, 7, 27):
+        errors.append("current-state date does not cover the security-disclosure and catalog-shard truth")
     if not (root / "LICENSE").is_file() or not (root / "LICENSE-DATA.md").is_file():
         errors.append("declared code and data licences must exist")
 
