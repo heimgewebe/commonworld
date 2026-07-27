@@ -1,1 +1,0 @@
-CSS still contains orphaned detail selector: .layer-panel .layer-projects
