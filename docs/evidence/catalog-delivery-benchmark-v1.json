@@ -603,5 +603,5 @@
     "warn_bootstrap_gzip_bytes": 28672,
     "max_bootstrap_gzip_bytes": 32768
   },
-  "current_surface_note": "Rebound on 2026-07-27 to the exact generated surface after correcting the stale DAANES contact link; the catalogue identity set and startup delivery design are unchanged."
+  "current_surface_note": "The 65-record surface uses a compact build-bound bootstrap and one complete immutable recovery catalogue. The unified focus panel remains the sole selected-project detail surface. Every local browser-module edge is bound to the SHA-256 prefix of the dependency bytes it loads. Manifest and aggregate load at startup; only the selected compact shard and content-addressed detail are verified in shadow mode. Hash, schema and compact-projection parity remain fail-soft; explicit retry refreshes the whole selected path; startup performs zero canonical project JSON requests. Rebound on 2026-07-27 to the exact generated surface after correcting the stale DAANES contact link; the catalogue identity set and startup delivery design are unchanged."
 }
