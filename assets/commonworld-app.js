@@ -690,7 +690,6 @@ function selectDigitalProject(record, { trigger = document.activeElement } = {})
     if (serializeDigitalPath(currentDigitalPath()) !== derived.pathKey) {
       setDigitalPath(derived.path, { historyMode: null, focusHierarchy: false });
     }
-    runtime.layerPreviewProject = record.id;
     selectProject(record.id, { trigger });
     return;
   }
@@ -762,221 +761,16 @@ function curationTextForRecord(record) {
   ].filter(Boolean).join(' ');
 }
 
-function safeProjectLinks(links = []) {
-  return (Array.isArray(links) ? links : []).flatMap((link) => {
-    const url = safeExternalHttpsUrl(link?.url);
-    return url?.startsWith('https://') ? [{ ...link, url }] : [];
-  });
-}
-
-function createProjectDetailText(value, className = 'project-detail-value') {
-  const paragraph = document.createElement('p');
-  paragraph.className = className;
-  paragraph.textContent = value || t('not_published', 'Nicht veröffentlicht');
-  return paragraph;
-}
-
-function createProjectDetailList(values, className = 'project-detail-list') {
-  const list = document.createElement('ul');
-  list.className = className;
-  const entries = (Array.isArray(values) ? values : []).filter(Boolean);
-  for (const value of entries.length ? entries : [t('not_published', 'Nicht veröffentlicht')]) {
-    const item = document.createElement('li');
-    item.textContent = value;
-    if (entries.length === 0) item.className = 'is-empty';
-    list.append(item);
-  }
-  return list;
-}
-
-function createProjectDetailLinkList(links) {
-  const list = document.createElement('ul');
-  list.className = 'project-detail-links';
-  const entries = safeProjectLinks(links);
-  if (!entries.length) {
-    const item = document.createElement('li');
-    item.className = 'is-empty';
-    item.textContent = t('not_published', 'Nicht veröffentlicht');
-    list.append(item);
-    return list;
-  }
-  for (const link of entries) {
-    const item = document.createElement('li');
-    const anchor = document.createElement('a');
-    anchor.href = link.url;
-    anchor.rel = 'external noreferrer';
-    anchor.textContent = link.label || link.url;
-    item.append(anchor);
-    list.append(item);
-  }
-  return list;
-}
-
-function createProjectDetailTags(values) {
-  const list = document.createElement('ul');
-  list.className = 'project-detail-tags';
-  const entries = (Array.isArray(values) ? values : []).filter(Boolean);
-  for (const value of entries.length ? entries : [t('not_published', 'Nicht veröffentlicht')]) {
-    const item = document.createElement('li');
-    item.textContent = value;
-    if (entries.length === 0) item.className = 'is-empty';
-    list.append(item);
-  }
-  return list;
-}
-
-function createProjectDetailField(label, content) {
-  const field = document.createElement('div');
-  field.className = 'project-detail-field';
-  const heading = document.createElement('h4');
-  heading.className = 'project-detail-label';
-  heading.textContent = label;
-  field.append(heading, content);
-  return field;
-}
-
-function createProjectDetailSection(title, fields) {
-  const section = document.createElement('section');
-  section.className = 'project-detail-section';
-  const heading = document.createElement('h3');
-  heading.textContent = title;
-  section.append(heading, ...fields);
-  return section;
-}
-
-function layerProjectBackContext(record) {
-  const derived = deriveDigitalProjectPath(record);
-  if (!derived?.path || derived.path.length <= 1) return null;
-  const path = Object.freeze(derived.path.slice(0, -1));
-  const tree = runtime.digitalTree ?? treeForRecords(runtime.records);
-  const node = tree.nodesByPath.get(serializeDigitalPath(path));
-  return { path, label: node?.label ?? t('overview', 'Übersicht') };
-}
-
-function createLayerProjectDetail(record, { selected = false } = {}) {
-  const article = document.createElement('article');
-  article.className = 'layer-project-detail project-detail';
-  article.dataset.commonprojectId = record.id;
-  article.dataset.detailMode = selected ? 'selected' : 'preview';
-
-  const header = document.createElement('header');
-  header.className = 'project-detail-header';
-  const copy = document.createElement('div');
-  copy.className = 'layer-project-detail-copy project-detail-heading';
-  const kind = document.createElement('p');
-  kind.className = 'kicker';
-  kind.textContent = `${commonsTypeLabel(record, LOCALE)} · ${resultPresenceLabel(record)}`;
-  const title = document.createElement('h2');
-  title.className = 'layer-project-detail-title';
-  title.id = `layer-project-title-${record.id}`;
-  title.textContent = record.title;
-  const summary = document.createElement('p');
-  summary.className = 'layer-project-detail-summary';
-  summary.textContent = record.summary;
-  copy.append(kind, title, summary);
-
-  const controls = document.createElement('div');
-  controls.className = 'project-detail-controls';
-  const backContext = layerProjectBackContext(record);
-  if (backContext) {
-    const back = document.createElement('button');
-    back.type = 'button';
-    back.className = 'quiet-button project-detail-back';
-    back.textContent = `← ${t('back_to_bundle', 'Zurück zu {label}', { label: backContext.label })}`;
-    back.setAttribute('aria-label', t('back_to_bundle_aria', 'Details schließen und zu {label} zurückkehren', { label: backContext.label }));
-    back.addEventListener('click', () => {
-      runtime.state.project = null;
-      runtime.layerPreviewProject = null;
-      runtime.focusReturnTarget = null;
-      void observeCatalogRecordShadow(null);
-      setDigitalPath(backContext.path);
-    });
-    controls.append(back);
-  }
-
-  const directLinks = directActionLinks(record);
-  if (directLinks.length) {
-    const actions = document.createElement('nav');
-    actions.className = 'layer-project-detail-actions project-detail-primary-actions';
-    actions.setAttribute('aria-label', t('direct_actions', 'Direkte Möglichkeiten'));
-    for (const link of directLinks) {
-      const anchor = document.createElement('a');
-      anchor.href = link.url;
-      anchor.rel = 'external noreferrer';
-      anchor.dataset.actionType = link.type;
-      anchor.textContent = link.label;
-      actions.append(anchor);
-    }
-    controls.append(actions);
-  }
-  header.append(copy, controls);
-
-  const themes = (record.themes ?? []).map((theme) => themeLabel(theme, LOCALE));
-  const waysToEngage = (record.actions ?? []).map((action) => actionLabel(action, LOCALE));
-  const relationLabels = relationLabelsForRecord(record);
-  const grid = document.createElement('div');
-  grid.className = 'layer-project-detail-grid project-detail-grid';
-  grid.append(
-    createProjectDetailSection(t('detail_profile', 'Profil'), [
-      createProjectDetailField(t('themes', 'Themen'), createProjectDetailTags(themes)),
-      createProjectDetailField(t('ways_to_engage', 'Möglichkeiten'), createProjectDetailTags(waysToEngage)),
-    ]),
-    createProjectDetailSection(t('detail_presence', 'Präsenz'), [
-      createProjectDetailField(t('digital_presence', 'Digitale Präsenz'), createProjectDetailText(digitalPresenceText(record))),
-      createProjectDetailField(t('locations', 'Orte'), createProjectDetailList(recordLocationSummaries(record, LOCALE))),
-    ]),
-    createProjectDetailSection(t('detail_network', 'Netzwerk und Links'), [
-      createProjectDetailField(t('relationships', 'Beziehungen'), createProjectDetailList(relationLabels.length ? relationLabels : [t('relation_none', 'Keine belegte Beziehung veröffentlicht.')])),
-      createProjectDetailField(t('official_links', 'Offizielle Links'), createProjectDetailLinkList(record.links ?? [])),
-    ]),
-    createProjectDetailSection(t('detail_evidence', 'Nachweise'), [
-      createProjectDetailField(t('sources', 'Quellen'), createProjectDetailLinkList(record?.provenance?.sources ?? [])),
-      createProjectDetailField(t('curation', 'Kuration'), createProjectDetailText(curationTextForRecord(record), 'project-detail-value project-detail-curation')),
-    ]),
-  );
-  article.append(header, grid);
-  return article;
-}
-
-function renderLayerProjectDetail(view = visibleDigitalView()) {
-  const records = identityRecordsForView(view);
-  const previewRecord = records.find(({ id }) => id === runtime.layerPreviewProject) ?? null;
-  const record = runtime.state.project ? null : (previewRecord ?? records[0] ?? null);
+function renderLayerProjectDetail() {
+  runtime.layerPreviewProject = null;
+  runtime.lastLayerProjectStatus = null;
   elements.layerProjects.replaceChildren();
-  elements.layerProjects.hidden = !record;
-  if (runtime.state.project) {
-    runtime.lastLayerProjectStatus = null;
-    elements.layerProjects.removeAttribute('data-commonproject-id');
-    elements.layerProjects.removeAttribute('data-detail-mode');
-    elements.layerProjects.removeAttribute('role');
-    elements.layerProjects.removeAttribute('aria-labelledby');
-    elements.layerProjectStatus.textContent = '';
-    return;
-  }
-  if (!record) {
-    runtime.layerPreviewProject = null;
-    runtime.lastLayerProjectStatus = null;
-    elements.layerProjects.removeAttribute('data-commonproject-id');
-    elements.layerProjects.removeAttribute('data-detail-mode');
-    elements.layerProjects.removeAttribute('role');
-    elements.layerProjects.removeAttribute('aria-labelledby');
-    elements.layerProjectStatus.textContent = '';
-    return;
-  }
-  const selected = record.id === runtime.state.project;
-  runtime.layerPreviewProject = record.id;
-  elements.layerProjects.dataset.commonprojectId = record.id;
-  elements.layerProjects.dataset.detailMode = selected ? 'selected' : 'preview';
-  elements.layerProjects.setAttribute('role', 'region');
-  elements.layerProjects.setAttribute('aria-labelledby', `layer-project-title-${record.id}`);
-  elements.layerProjects.append(createLayerProjectDetail(record, { selected }));
-  const status = selected
-    ? t('project_selected', '{title} ausgewählt', { title: record.title })
-    : t('project_preview', 'Vorschau zu {title}', { title: record.title });
-  if (runtime.lastLayerProjectStatus !== status) {
-    runtime.lastLayerProjectStatus = status;
-    elements.layerProjectStatus.textContent = status;
-  }
+  elements.layerProjects.hidden = true;
+  elements.layerProjects.removeAttribute('data-commonproject-id');
+  elements.layerProjects.removeAttribute('data-detail-mode');
+  elements.layerProjects.removeAttribute('role');
+  elements.layerProjects.removeAttribute('aria-labelledby');
+  elements.layerProjectStatus.textContent = '';
 }
 
 function syncLaneOverflow(scroller) {
@@ -2579,18 +2373,12 @@ function selectProject(identifier, { historyMode = 'push', focus = true, trigger
   if (!runtime.recordsById.has(identifier)) return;
   if (trigger instanceof Element && !elements.focus.contains(trigger)) runtime.focusReturnTarget = trigger;
   if (!elements.discoveryPanel.hidden) closeDiscovery({ restoreFocus: false });
-  if (!focus && trigger instanceof Element && trigger.matches('.digital-ribbon-item')) {
-    runtime.layerPreviewProject = identifier;
-  }
   runtime.state.project = identifier;
   renderDiscoveryState();
   void observeCatalogRecordShadow(identifier);
   if (navigateSpatial) performSpatialNavigation(identifier);
   if (historyMode) writeHistory(historyMode);
   if (focus) elements.focus.focus({ preventScroll: true });
-  else if (trigger instanceof Element && trigger.matches('.digital-ribbon-item')) {
-    visibleProjectTrigger(identifier)?.focus({ preventScroll: true });
-  }
 }
 
 function isVisibleFocusTarget(target) {
@@ -2615,7 +2403,7 @@ function clearProject({ historyMode = 'push', restoreFocus = true } = {}) {
   const closingIdentifier = runtime.state.project;
   runtime.state.project = null;
   void observeCatalogRecordShadow(null);
-  runtime.layerPreviewProject = closingIdentifier;
+  runtime.layerPreviewProject = null;
   renderLayerProjectDetail();
   updateSelectionMarks();
   if (historyMode) writeHistory(historyMode);

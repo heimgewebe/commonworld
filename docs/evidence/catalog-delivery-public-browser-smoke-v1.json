@@ -122,7 +122,7 @@
     {
       "id": "layer-journey-moveend-return",
       "verdict": "PASS",
-      "elapsedMs": 1788
+      "elapsedMs": 1440
     },
     {
       "id": "layer-journey-interrupted",
@@ -198,7 +198,7 @@
           "width": 667,
           "height": 375
         },
-        "gridColumnCount": 2,
+        "gridColumnCount": 1,
         "panelHorizontalOverflow": 0,
         "gridHorizontalOverflow": 0,
         "finalSectionReachable": true
@@ -253,9 +253,9 @@
     }
   ],
   "binding": {
-    "smoke_script_sha256": "56c5f12699da15c06685d9aad9a69b5e47a3957e7e20bccf0ea975de645c3a29",
+    "smoke_script_sha256": "cd2d23ab925710cf80fe28aec09f72c51ec3ea616553cfcf9690abe59dfe4785",
     "smoke_runner_sha256": "522b99b70b1d0064b1d0a31a3a67fdc9a2e73b7408f37d1a4bb303bc360b7556",
-    "first_party_surface_sha256": "3c403e406bad9a7349a0f96858df8e8d367d23a60fcd4290a07a84d435968683",
+    "first_party_surface_sha256": "b861a0ecf64677bff9c60c4170cdb77d73529226bca25372717aed6612c0ade6",
     "scenario_ids": [
       "startup-and-ring-orbits",
       "ring-orbits-reduced-motion",
@@ -293,8 +293,8 @@
     "smoke_plan_sha256": "6b8749928ead5ef81ee66883e6a2993e756ce083575c3569234bf70526448364"
   },
   "execution": {
-    "job_id": "grabowski-task-f3abfef664b7418189942b4d",
-    "finalization_receipt_sha256": "6af8d36870e9bfbdfb33b54fb6fe4f9164e83097e5f0a4f41eefdaabe67f3128",
-    "result_sha256": "24b5fdd3ac507039291187645ece3ee6edd542136348ecee9ff118397b710c78"
+    "job_id": "grabowski-task-ec4cf7e12d6a4b43b2d3628d-a1.service",
+    "finalization_receipt_sha256": "dafed7214ecfda8e072add4aae62f9b11448d3b320f267dc552bb1e193d18d7a",
+    "result_sha256": "a8fa4cfd2baad333d4c082ddfa42b4a6c90ab0ffc5b8446bea6c1c9a3b6b7bb9"
   }
 }

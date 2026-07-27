@@ -276,9 +276,7 @@ async function verifyLayerCreatedSphereRestoration(browser, baseUrl) {
     assert(shared.sphere.marker === 'true' && shared.sphere.tabindex === '-1' && shared.sphere.ariaHidden === 'true' && shared.sphere.pointerEvents === 'none', `layer-created shared-focus sphere ownership is invalid: ${JSON.stringify(shared.sphere)}`);
     await page.locator('#focus-close').click();
     await page.waitForFunction(() => document.querySelector('#project-focus').hidden);
-    await page.waitForSelector('#layer-projects:not([hidden])');
-    assert((await page.locator('#layer-projects .layer-project-detail-title').textContent()) === shared.title, 'layer-created shared focus did not restore the matching inline preview');
-    assert((await page.locator('#layer-projects').getAttribute('data-detail-mode')) === 'preview', 'layer-created focus close did not restore preview semantics');
+    assert(await page.locator('#layer-projects').isHidden(), 'layer-created focus close exposed a competing inline detail');
     await page.locator('#layer-close').click();
     await page.waitForFunction(() => document.querySelector('.globe-stage')?.dataset.viewPhase === 'overview');
     await page.waitForFunction(() => document.querySelector('#sphere-edge-control')?.getAttribute('tabindex') === '0');

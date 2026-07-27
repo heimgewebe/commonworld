@@ -1317,20 +1317,10 @@ async function layerJourneyScenario({ mobile = false, viewportOverride = null, t
   await run.page.keyboard.press('Escape');
   await run.page.waitForFunction(() => new URL(location.href).searchParams.get('project') === null);
   assert(await run.page.locator('#project-focus').isHidden(), 'layer journey: closing the shared focus did not hide it');
-  const navigatedDetails = run.page.locator('#layer-projects:not([hidden])');
-  assert((await navigatedDetails.locator('.layer-project-detail-title').textContent()) === 'Wikipedia', 'layer journey: closing the shared focus did not preserve the correct inline preview');
-  assert((await navigatedDetails.getAttribute('data-detail-mode')) === 'preview', 'layer journey: closing the shared focus did not downgrade inline detail to preview');
-  assert((await navigatedDetails.locator('.project-detail-section').count()) === 4, 'layer journey: unified inline detail does not expose four information groups');
-  const detailHorizontalPolicy = await navigatedDetails.evaluate((node) => ({
-    overflowX: getComputedStyle(node).overflowX,
-    documentOverflow: document.documentElement.scrollWidth > document.documentElement.clientWidth,
-  }));
-  assert(['clip', 'hidden'].includes(detailHorizontalPolicy.overflowX) && !detailHorizontalPolicy.documentOverflow, `layer journey: unified inline detail permits horizontal user overflow (${JSON.stringify(detailHorizontalPolicy)})`);
-  assert(await navigatedDetails.locator('.project-detail-back').isVisible(), 'layer journey: unified inline detail lacks a clear return action');
+  assert(await run.page.locator('#layer-projects').isHidden(), 'layer journey: closing shared focus exposed a competing inline detail');
   assert(new URL(run.page.url()).searchParams.get('project') === null, 'layer journey: closing shared focus retained project history');
-  await navigatedDetails.locator('.project-detail-back').click();
+  await run.page.locator('#layer-breadcrumb .digital-breadcrumb-item[data-digital-path="sphere/knowledge_learning_culture"]').click();
   await run.page.waitForFunction(() => document.querySelector('.globe-stage')?.dataset.digitalPath === 'sphere/knowledge_learning_culture');
-  assert(new URL(run.page.url()).searchParams.get('project') === null, 'layer journey: returning from detail retained the selected project');
 
   const openKnowledgeFocus = run.page.locator('.digital-lane-focus[data-digital-path="sphere/knowledge_learning_culture/open_knowledge_data"]');
   await openKnowledgeFocus.click();
@@ -1425,24 +1415,8 @@ async function layerJourneyScenario({ mobile = false, viewportOverride = null, t
   await run.page.keyboard.press('Escape');
   await run.page.waitForFunction(() => new URL(location.href).searchParams.get('project') === null);
   assert(await run.page.locator('#project-focus').isHidden(), 'layer journey: closing restored shared focus did not hide it');
-  assert(await detailPreview.isVisible(), 'layer journey: closing restored shared focus did not expose the inline preview');
-  assert((await detailPreview.locator('.layer-project-detail-title').textContent()) === searchedTitle, `layer journey: restored inline preview does not describe the retained Common (${searchedTitle})`);
-  assert((await detailPreview.getAttribute('data-detail-mode')) === 'preview', 'layer journey: restored inline detail did not use preview semantics');
+  assert(await detailPreview.isHidden(), 'layer journey: closing restored shared focus exposed a competing inline detail');
   assert(await selectedContent.evaluate((node) => !node.classList.contains('is-selected')), 'layer journey: closing restored shared focus retained selected state');
-  const focusedGeometry = await run.page.evaluate(() => {
-    const lane = document.querySelector('.digital-lane.is-focused');
-    const details = document.querySelector('#layer-projects:not([hidden])');
-    const laneRect = lane?.getBoundingClientRect();
-    const detailRect = details?.getBoundingClientRect();
-    return laneRect && detailRect ? {
-      lane: { top: laneRect.top, bottom: laneRect.bottom, height: laneRect.height },
-      details: { top: detailRect.top, bottom: detailRect.bottom, height: detailRect.height },
-      viewportHeight: innerHeight,
-    } : null;
-  });
-  assert(focusedGeometry && focusedGeometry.lane.height < focusedGeometry.details.height, `layer journey: final lane still dominates the available height (${JSON.stringify(focusedGeometry)})`);
-  assert(focusedGeometry.details.top >= focusedGeometry.lane.bottom - 1, `layer journey: inline details overlap the final lane (${JSON.stringify(focusedGeometry)})`);
-  assert(focusedGeometry.details.bottom <= focusedGeometry.viewportHeight + 1, `layer journey: inline details leave the viewport (${JSON.stringify(focusedGeometry)})`);
 
   const directContent = run.page.locator('.digital-ribbon-item:not([hidden])').nth(1);
   const directTitle = (await directContent.locator('.digital-ribbon-name').textContent()) ?? '';
@@ -1454,11 +1428,10 @@ async function layerJourneyScenario({ mobile = false, viewportOverride = null, t
   assert(await detailPreview.isHidden(), 'layer journey: ribbon selection duplicated the shared focus with inline details');
   assert(await directContent.evaluate((node) => node.classList.contains('is-selected') && document.activeElement?.id === 'project-focus'), 'layer journey: ribbon selection lost selected state or shared-focus handoff');
   await run.page.keyboard.press('Escape');
-  assert(await run.page.locator('#project-focus').isHidden(), 'layer journey: Escape exposed the detached global focus');
-  assert(await run.page.locator('#layer-panel').isVisible(), 'layer journey: Escape closed the layer surface while clearing the inline Common selection');
-  assert((await detailPreview.locator('.layer-project-detail-title').textContent()) === directTitle, 'layer journey: clearing selection did not preserve the focused Common as a preview');
-  assert((await detailPreview.getAttribute('data-detail-mode')) === 'preview', 'layer journey: cleared selection is not exposed as a preview state');
-  assert(await directContent.evaluate((node) => !node.classList.contains('is-selected') && node.getAttribute('aria-pressed') === 'false' && document.activeElement === node), 'layer journey: cleared inline selection kept selected semantics or lost focus');
+  assert(await run.page.locator('#project-focus').isHidden(), 'layer journey: Escape did not close the shared focus');
+  assert(await run.page.locator('#layer-panel').isVisible(), 'layer journey: Escape closed the layer surface while clearing the Common selection');
+  assert(await detailPreview.isHidden(), 'layer journey: clearing selection exposed a competing inline detail');
+  assert(await directContent.evaluate((node) => !node.classList.contains('is-selected') && node.getAttribute('aria-pressed') === 'false' && document.activeElement === node), 'layer journey: cleared selection kept selected semantics or lost focus');
   await run.page.keyboard.press('Escape');
   await run.page.waitForFunction(() => document.querySelector('.globe-stage')?.dataset.digitalPath === 'sphere/knowledge_learning_culture');
   assert((await stage.getAttribute('data-focused-path')) === null, 'layer journey: Escape did not leave the identity-level focus path');
@@ -2374,9 +2347,8 @@ async function legacyLayerAndAtomicFocusScenario() {
 
   await focusRun.page.keyboard.press('Escape');
   await focusRun.page.waitForFunction(() => new URL(location.href).searchParams.get('project') === null);
-  assert(await focusRun.page.locator('#project-focus').isHidden(), 'atomic focus: Escape exposed the detached project overlay');
-  assert(await focusRun.page.locator('#layer-projects').isVisible(), 'atomic focus: Escape removed the inline preview');
-  assert((await focusRun.page.locator('#layer-projects').getAttribute('data-detail-mode')) === 'preview', 'atomic focus: Escape did not downgrade the inline selection to a preview');
+  assert(await focusRun.page.locator('#project-focus').isHidden(), 'atomic focus: Escape did not close the shared focus');
+  assert(await focusRun.page.locator('#layer-projects').isHidden(), 'atomic focus: Escape exposed a competing inline detail');
   const keyboardFocusTrigger = focusRun.page.locator(`.digital-ribbon-item[data-commonproject-id="${focusProjectId}"]`);
   await keyboardFocusTrigger.focus();
   await focusRun.page.keyboard.press('Enter');
@@ -2813,17 +2785,15 @@ async function liveUiHardeningScenario() {
   const detailTrigger = landscapeDetail.page.locator('.digital-ribbon-item').first();
   assert((await detailTrigger.count()) === 1, 'live UI 667x375 detail: no digital Commons trigger is available');
   await detailTrigger.click();
-  await landscapeDetail.page.waitForSelector('#project-focus:not([hidden])');
-  await landscapeDetail.page.keyboard.press('Escape');
-  await landscapeDetail.page.waitForSelector('#layer-projects:not([hidden]) .project-detail-grid');
+  await landscapeDetail.page.waitForSelector('#project-focus:not([hidden]) .focus-grid');
   const detailGeometry = await landscapeDetail.page.evaluate(() => {
     const rect = (node) => {
       const box = node.getBoundingClientRect();
       return { left: box.left, top: box.top, right: box.right, bottom: box.bottom, width: box.width, height: box.height };
     };
-    const panel = document.querySelector('#layer-projects');
-    const grid = panel.querySelector('.project-detail-grid');
-    const sections = [...grid.querySelectorAll('.project-detail-section')];
+    const panel = document.querySelector('#project-focus');
+    const grid = panel.querySelector('.focus-grid');
+    const sections = [...grid.querySelectorAll(':scope > section')];
     const gridColumns = getComputedStyle(grid).gridTemplateColumns.split(/\s+/).filter(Boolean);
     return {
       viewport: { width: window.innerWidth, height: window.innerHeight },
@@ -2836,16 +2806,16 @@ async function liveUiHardeningScenario() {
       sections: sections.map(rect),
     };
   });
-  assert(detailGeometry.sections.length === 4, `live UI 667x375 detail: expected four detail sections (${JSON.stringify(detailGeometry)})`);
+  assert(detailGeometry.sections.length === 8, `live UI 667x375 detail: expected eight shared-focus sections (${JSON.stringify(detailGeometry)})`);
   assert(detailGeometry.gridColumnCount <= 2, `live UI 667x375 detail: low-height layout forced too many columns (${JSON.stringify(detailGeometry)})`);
   assert(detailGeometry.panelScrollWidth <= detailGeometry.panelClientWidth + 1, `live UI 667x375 detail: clipped horizontal panel overflow (${JSON.stringify(detailGeometry)})`);
   assert(detailGeometry.gridScrollWidth <= detailGeometry.gridClientWidth + 1, `live UI 667x375 detail: detail grid overflows horizontally (${JSON.stringify(detailGeometry)})`);
   assert(detailGeometry.sections.every(({ left, right }) => left >= detailGeometry.panel.left - 0.5 && right <= detailGeometry.panel.right + 0.5), `live UI 667x375 detail: section lies outside the clipped panel (${JSON.stringify(detailGeometry)})`);
-  const lastDetailSection = landscapeDetail.page.locator('.project-detail-section').last();
+  const lastDetailSection = landscapeDetail.page.locator('#project-focus .focus-grid > section').last();
   await lastDetailSection.scrollIntoViewIfNeeded();
   const lastSectionVisibility = await lastDetailSection.evaluate((node) => {
     const section = node.getBoundingClientRect();
-    const panel = node.closest('#layer-projects').getBoundingClientRect();
+    const panel = node.closest('#project-focus').getBoundingClientRect();
     return {
       horizontallyReachable: section.left >= panel.left - 0.5 && section.right <= panel.right + 0.5,
       verticallyReachable: section.bottom > panel.top + 0.5 && section.top < panel.bottom - 0.5,
