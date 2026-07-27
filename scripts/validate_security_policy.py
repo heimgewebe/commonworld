@@ -99,7 +99,10 @@ class WorkflowStep:
     raw: str
     fields: dict[str, str]
     with_fields: dict[str, str]
+    run_text: str
+    run_style: str | None
     run_argv: tuple[str, ...]
+    parse_errors: tuple[str, ...]
 
 
 def _yaml_scalar(value: str) -> str:
@@ -116,10 +119,17 @@ def _collect_yaml_block(lines: list[str], start: int, parent_indent: int) -> tup
         line = lines[index]
         if line.strip() and len(line) - len(line.lstrip()) <= parent_indent:
             break
-        if line.strip():
+        if line.strip() and not line.strip().startswith("#"):
             collected.append(line.strip())
         index += 1
     return collected, index
+
+
+def _set_unique(target: dict[str, str], key: str, value: str, errors: list[str], scope: str) -> None:
+    if key in target:
+        errors.append(f"duplicate {scope} field: {key}")
+        return
+    target[key] = value
 
 
 def parse_workflow_step(workflow_text: str, step_name: str) -> WorkflowStep | None:
@@ -139,7 +149,9 @@ def parse_workflow_step(workflow_text: str, step_name: str) -> WorkflowStep | No
     block = lines[start:end]
     fields: dict[str, str] = {"name": step_name}
     with_fields: dict[str, str] = {}
+    parse_errors: list[str] = []
     run_text = ""
+    run_style: str | None = None
     index = 1
     field_indent = step_indent + 2
     while index < len(block):
@@ -173,25 +185,39 @@ def parse_workflow_step(workflow_text: str, step_name: str) -> WorkflowStep | No
                 nested_value = nested_value.strip()
                 if nested_value in {"|", "|-", ">", ">-"}:
                     lines_value, index = _collect_yaml_block(block, index + 1, nested_indent)
-                    with_fields[nested_key] = "\n".join(lines_value)
+                    rendered = "\n".join(lines_value) if nested_value.startswith("|") else " ".join(lines_value)
+                    _set_unique(with_fields, nested_key, rendered, parse_errors, "with")
                 else:
-                    with_fields[nested_key] = _yaml_scalar(nested_value)
-                    index += 1
+                    continuation, next_index = _collect_yaml_block(block, index + 1, nested_indent)
+                    rendered = _yaml_scalar(" ".join([nested_value, *continuation]).strip())
+                    _set_unique(with_fields, nested_key, rendered, parse_errors, "with")
+                    index = next_index if continuation else index + 1
             continue
         if key == "run" and value in {"|", "|-", ">", ">-"}:
             lines_value, index = _collect_yaml_block(block, index + 1, field_indent)
-            run_text = " ".join(lines_value) if value.startswith(">") else "\n".join(lines_value)
-            fields[key] = run_text
+            run_style = value
+            run_text = "\n".join(lines_value) if value.startswith("|") else " ".join(lines_value)
+            _set_unique(fields, key, run_text, parse_errors, "step")
             continue
-        fields[key] = _yaml_scalar(value)
+        continuation, next_index = _collect_yaml_block(block, index + 1, field_indent)
+        rendered = _yaml_scalar(" ".join([value, *continuation]).strip())
+        _set_unique(fields, key, rendered, parse_errors, "step")
         if key == "run":
-            run_text = fields[key]
-        index += 1
+            run_text = rendered
+        index = next_index if continuation else index + 1
     try:
-        run_argv = tuple(shlex.split(run_text)) if run_text else ()
+        run_argv = tuple(shlex.split(run_text)) if run_text and "\n" not in run_text else ()
     except ValueError:
         run_argv = ()
-    return WorkflowStep("\n".join(block), fields, with_fields, run_argv)
+    return WorkflowStep(
+        raw="\n".join(block),
+        fields=fields,
+        with_fields=with_fields,
+        run_text=run_text,
+        run_style=run_style,
+        run_argv=run_argv,
+        parse_errors=tuple(parse_errors),
+    )
 
 
 def workflow_step(workflow_text: str, step_name: str) -> str | None:
@@ -208,22 +234,71 @@ def _require_structured_step(
     fields: dict[str, str] | None = None,
     run_argv: tuple[str, ...] | None = None,
     with_fields: dict[str, str] | None = None,
+    forbidden_fields: tuple[str, ...] = (),
 ) -> WorkflowStep | None:
     step = parse_workflow_step(workflow_text, step_name)
     if step is None:
         errors.append(f"{label} must contain exactly one step named {step_name!r}")
         return None
+    for parse_error in step.parse_errors:
+        errors.append(f"{label} step {step_name!r}: {parse_error}")
     for key, expected in (fields or {}).items():
         actual = step.fields.get(key)
         if actual != expected:
             errors.append(f"{label} step {step_name!r} field {key!r} must equal {expected!r}, got {actual!r}")
-    if run_argv is not None and step.run_argv != run_argv:
+    for key in forbidden_fields:
+        if key in step.fields:
+            errors.append(f"{label} step {step_name!r} must not define field {key!r}")
+    if run_argv is not None and (step.run_argv != run_argv or "\n" in step.run_text):
         errors.append(f"{label} step {step_name!r} command mismatch")
     for key, expected in (with_fields or {}).items():
         actual = step.with_fields.get(key)
         if actual != expected:
             errors.append(f"{label} step {step_name!r} with.{key} must equal {expected!r}, got {actual!r}")
     return step
+
+
+def _unique_direct_child(lines: list[str], parent_index: int, key: str) -> int | None:
+    parent_indent = len(lines[parent_index]) - len(lines[parent_index].lstrip())
+    child_indent = parent_indent + 2
+    matches: list[int] = []
+    for index in range(parent_index + 1, len(lines)):
+        line = lines[index]
+        stripped = line.strip()
+        if stripped and len(line) - len(line.lstrip()) <= parent_indent:
+            break
+        if stripped == key and len(line) - len(line.lstrip()) == child_indent:
+            matches.append(index)
+    return matches[0] if len(matches) == 1 else None
+
+
+def _validate_expiry_triggers(workflow_text: str, errors: list[str]) -> None:
+    lines = workflow_text.splitlines()
+    on_indices = [index for index, line in enumerate(lines) if line.strip() == "on:" and len(line) == len(line.lstrip())]
+    if len(on_indices) != 1:
+        errors.append("security expiry workflow must contain exactly one top-level on mapping")
+        return
+    on_index = on_indices[0]
+    schedule_index = _unique_direct_child(lines, on_index, "schedule:")
+    if schedule_index is None:
+        errors.append("security expiry workflow must define on.schedule")
+    else:
+        schedule_indent = len(lines[schedule_index]) - len(lines[schedule_index].lstrip())
+        cron_matches: list[int] = []
+        for index in range(schedule_index + 1, len(lines)):
+            line = lines[index]
+            stripped = line.strip()
+            if stripped and len(line) - len(line.lstrip()) <= schedule_indent:
+                break
+            if stripped == '- cron: "17 5 * * 1"' and len(line) - len(line.lstrip()) == schedule_indent + 2:
+                cron_matches.append(index)
+        if len(cron_matches) != 1:
+            errors.append('security expiry workflow on.schedule must contain exactly cron "17 5 * * 1"')
+    if _unique_direct_child(lines, on_index, "workflow_dispatch:") is None:
+        errors.append("security expiry workflow must define on.workflow_dispatch")
+    permission_indices = [index for index, line in enumerate(lines) if line.strip() == "permissions:" and len(line) == len(line.lstrip())]
+    if len(permission_indices) != 1 or _unique_direct_child(lines, permission_indices[0], "contents: read") is None:
+        errors.append("security expiry workflow permissions.contents must equal read")
 
 
 def validate_security_policy(root: Path = ROOT, now: datetime | None = None) -> list[str]:
@@ -340,6 +415,7 @@ def validate_security_policy(root: Path = ROOT, now: datetime | None = None) -> 
         "validate workflow",
         fields={"if": "always() && steps.security_setting.outcome != 'success'"},
         run_argv=("exit", "1"),
+        forbidden_fields=("continue-on-error",),
     )
 
     production_text = (root / PRODUCTION_READBACK_WORKFLOW).read_text(encoding="utf-8")
@@ -375,12 +451,11 @@ def validate_security_policy(root: Path = ROOT, now: datetime | None = None) -> 
         "production readback workflow",
         fields={"if": "always() && (steps.readback.outcome != 'success' || steps.security_setting.outcome != 'success')"},
         run_argv=("exit", "1"),
+        forbidden_fields=("continue-on-error",),
     )
 
     expiry_text = (root / SECURITY_EXPIRY_WORKFLOW).read_text(encoding="utf-8")
-    for exact_line in ('- cron: "17 5 * * 1"', "workflow_dispatch:", "contents: read"):
-        if not any(line.strip() == exact_line for line in expiry_text.splitlines()):
-            errors.append(f"security expiry workflow is incomplete: {exact_line}")
+    _validate_expiry_triggers(expiry_text, errors)
     expiry = _require_structured_step(
         expiry_text,
         "Verify private vulnerability reporting remains enabled",
@@ -413,6 +488,7 @@ def validate_security_policy(root: Path = ROOT, now: datetime | None = None) -> 
         "security expiry workflow",
         fields={"if": "always() && steps.security_setting.outcome != 'success'"},
         run_argv=("exit", "1"),
+        forbidden_fields=("continue-on-error",),
     )
     return errors
 
@@ -441,7 +517,7 @@ def github_api_get_private_reporting(repository: str, timeout_seconds: int = 20)
         try:
             raw = error.read()
             payload = json.loads(raw.decode("utf-8")) if raw else None
-        except (OSError, UnicodeDecodeError, json.JSONDecodeError):
+        except (OSError, http.client.HTTPException, UnicodeDecodeError, json.JSONDecodeError):
             payload = None
         return PrivateReportingFetch(endpoint, error.geturl() or endpoint, int(error.code), payload)
     except (

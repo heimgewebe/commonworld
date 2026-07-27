@@ -1,3 +1,4 @@
+import http.client
 import io
 import json
 import urllib.error
@@ -347,6 +348,70 @@ class SecurityPolicyTests(unittest.TestCase):
             path.write_text(text[:start] + block + text[end:], encoding="utf-8")
             errors = validate_security_policy(root, now=self.NOW)
         self.assertTrue(any("Upload scheduled security receipt" in error and "field 'if'" in error for error in errors))
+
+
+    def test_multiline_plain_condition_cannot_hide_false_suffix(self) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            root = self.copy_surface(directory)
+            path = root / ".github/workflows/security-policy-expiry.yml"
+            text = path.read_text(encoding="utf-8")
+            expected = "        if: always() && steps.security_setting.outcome != 'success'\n"
+            replacement = expected.rstrip("\n") + "\n          && false\n"
+            path.write_text(text.replace(expected, replacement, 1), encoding="utf-8")
+            errors = validate_security_policy(root, now=self.NOW)
+        self.assertTrue(any("Enforce live reporting result" in error and "field 'if'" in error for error in errors))
+
+    def test_literal_run_newlines_cannot_masquerade_as_exit_one(self) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            root = self.copy_surface(directory)
+            path = root / ".github/workflows/security-policy-expiry.yml"
+            text = path.read_text(encoding="utf-8")
+            start = text.index("- name: Enforce live reporting result")
+            block = text[start:].replace("        run: exit 1", "        run: |\n          exit\n          1", 1)
+            path.write_text(text[:start] + block, encoding="utf-8")
+            errors = validate_security_policy(root, now=self.NOW)
+        self.assertTrue(any("Enforce live reporting result" in error and "command mismatch" in error for error in errors))
+
+    def test_enforcement_step_rejects_continue_on_error(self) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            root = self.copy_surface(directory)
+            path = root / ".github/workflows/security-policy-expiry.yml"
+            text = path.read_text(encoding="utf-8")
+            marker = "      - name: Enforce live reporting result\n"
+            replacement = marker + "        continue-on-error: true\n"
+            path.write_text(text.replace(marker, replacement, 1), encoding="utf-8")
+            errors = validate_security_policy(root, now=self.NOW)
+        self.assertTrue(any("Enforce live reporting result" in error and "must not define field 'continue-on-error'" in error for error in errors))
+
+    def test_relocated_cron_text_does_not_restore_schedule(self) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            root = self.copy_surface(directory)
+            path = root / ".github/workflows/security-policy-expiry.yml"
+            text = path.read_text(encoding="utf-8")
+            text = text.replace('  schedule:\n    - cron: "17 5 * * 1"\n', "")
+            text += '\n# inert marker: - cron: "17 5 * * 1"\n'
+            path.write_text(text, encoding="utf-8")
+            errors = validate_security_policy(root, now=self.NOW)
+        self.assertIn("security expiry workflow must define on.schedule", errors)
+
+    def test_http_error_incomplete_body_retains_response_metadata(self) -> None:
+        endpoint = "https://api.github.com/repos/heimgewebe/commonworld/private-vulnerability-reporting"
+
+        class IncompleteBody:
+            def read(self, *args, **kwargs):
+                raise http.client.IncompleteRead(b"{", 10)
+
+            def close(self):
+                return None
+
+        error = urllib.error.HTTPError(endpoint, 503, "unavailable", {}, IncompleteBody())
+        from unittest.mock import patch
+        with patch("urllib.request.urlopen", side_effect=error):
+            fetch = github_api_get_private_reporting("heimgewebe/commonworld")
+        self.assertEqual(endpoint, fetch.requested_url)
+        self.assertEqual(endpoint, fetch.final_url)
+        self.assertEqual(503, fetch.status)
+        self.assertIsNone(fetch.payload)
 
 
 
