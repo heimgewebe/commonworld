@@ -1,0 +1,139 @@
+
+> commonworld-public-runtime@1.0.0 build
+> python3 scripts/build_public_runtime.py && python3 scripts/build_catalog_runtime.py && python3 scripts/render_public_shell.py && node scripts/build_country_boundary_subset.mjs && python3 scripts/render_proposal_page.py
+
+commonworld public MapLibre runtime assets built
+built catalog runtime generation e1840e3f64bed17267911f691b0deb006dfb34b4b759448bcfe58d086f6701d4 with 65 records
+commonworld localized globe-first shells, bootstrap module, locale module and method pages rendered from public contracts
+commonworld country boundary subset built: 24 countries
+commonworld localized proposal pages rendered from catalog index
+commonworld public MapLibre vertical-slice validation ok
+.F..FF.F.......F..............F.F.F....
+======================================================================
+FAIL: test_braces_inside_css_comment_and_string_are_ignored (tests.test_public_shell.PublicShellTests.test_braces_inside_css_comment_and_string_are_ignored)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/home/runner/work/commonworld/commonworld/tests/test_public_shell.py", line 389, in test_braces_inside_css_comment_and_string_are_ignored
+    self.assertEqual([], errors)
+AssertionError: Lists differ: [] != ['public shell CSS must define a forced-co[219 chars]yle']
+
+Second list contains 4 additional elements.
+First extra element 0:
+'public shell CSS must define a forced-colors: active contract'
+
+- []
++ ['public shell CSS must define a forced-colors: active contract',
++  'public reduced-motion contract must disable transitions',
++  'public shell CSS must define a prefers-contrast: more contract',
++  'index.css presence options must define a compact, touch-safe label style']
+
+======================================================================
+FAIL: test_extra_css_rule_after_ipad_media (tests.test_public_shell.PublicShellTests.test_extra_css_rule_after_ipad_media)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/home/runner/work/commonworld/commonworld/tests/test_public_shell.py", line 334, in test_extra_css_rule_after_ipad_media
+    self.assertEqual([], errors)
+AssertionError: Lists differ: [] != ['public shell CSS must define a forced-co[219 chars]yle']
+
+Second list contains 4 additional elements.
+First extra element 0:
+'public shell CSS must define a forced-colors: active contract'
+
+- []
++ ['public shell CSS must define a forced-colors: active contract',
++  'public reduced-motion contract must disable transitions',
++  'public shell CSS must define a prefers-contrast: more contract',
++  'index.css presence options must define a compact, touch-safe label style']
+
+======================================================================
+FAIL: test_filter_grid_keeps_action_and_location_controls_in_rhythm (tests.test_public_shell.PublicShellTests.test_filter_grid_keeps_action_and_location_controls_in_rhythm)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/home/runner/work/commonworld/commonworld/tests/test_public_shell.py", line 567, in test_filter_grid_keeps_action_and_location_controls_in_rhythm
+    self.assertIsNotNone(location_block)
+AssertionError: unexpectedly None
+
+======================================================================
+FAIL: test_foreign_media_query_before_target (tests.test_public_shell.PublicShellTests.test_foreign_media_query_before_target)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/home/runner/work/commonworld/commonworld/tests/test_public_shell.py", line 367, in test_foreign_media_query_before_target
+    self.assertEqual([], errors)
+AssertionError: Lists differ: [] != ['public shell CSS must define a forced-co[219 chars]yle']
+
+Second list contains 4 additional elements.
+First extra element 0:
+'public shell CSS must define a forced-colors: active contract'
+
+- []
++ ['public shell CSS must define a forced-colors: active contract',
++  'public reduced-motion contract must disable transitions',
++  'public shell CSS must define a prefers-contrast: more contract',
++  'index.css presence options must define a compact, touch-safe label style']
+
+======================================================================
+FAIL: test_presence_html_tolerates_formatting (tests.test_public_shell.PublicShellTests.test_presence_html_tolerates_formatting)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/home/runner/work/commonworld/commonworld/tests/test_public_shell.py", line 304, in test_presence_html_tolerates_formatting
+    self.assertEqual([], errors)
+AssertionError: Lists differ: [] != ['public shell CSS must define a forced-co[219 chars]yle']
+
+Second list contains 4 additional elements.
+First extra element 0:
+'public shell CSS must define a forced-colors: active contract'
+
+- []
++ ['public shell CSS must define a forced-colors: active contract',
++  'public reduced-motion contract must disable transitions',
++  'public shell CSS must define a prefers-contrast: more contract',
++  'index.css presence options must define a compact, touch-safe label style']
+
+======================================================================
+FAIL: test_public_shell_requires_increased_contrast_state_markers (tests.test_public_shell.PublicShellTests.test_public_shell_requires_increased_contrast_state_markers)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/home/runner/work/commonworld/commonworld/tests/test_public_shell.py", line 501, in test_public_shell_requires_increased_contrast_state_markers
+    self.assertIn(
+AssertionError: 'public increased-contrast contract missing token: [aria-checked="true"]' not found in ['public shell must load index.css with its deterministic content hash', 'public shell CSS must define a forced-colors: active contract', 'public reduced-motion contract must disable transitions', 'public shell CSS must define a prefers-contrast: more contract', 'index.css presence options must define a compact, touch-safe label style']
+
+======================================================================
+FAIL: test_public_shell_validates (tests.test_public_shell.PublicShellTests.test_public_shell_validates)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/home/runner/work/commonworld/commonworld/tests/test_public_shell.py", line 56, in test_public_shell_validates
+    self.assertEqual([], validate_public_shell(ROOT))
+AssertionError: Lists differ: [] != ['public shell CSS must define a forced-co[219 chars]yle']
+
+Second list contains 4 additional elements.
+First extra element 0:
+'public shell CSS must define a forced-colors: active contract'
+
+- []
++ ['public shell CSS must define a forced-colors: active contract',
++  'public reduced-motion contract must disable transitions',
++  'public shell CSS must define a prefers-contrast: more contract',
++  'index.css presence options must define a compact, touch-safe label style']
+
+======================================================================
+FAIL: test_stylesheet_links_tolerate_formatting (tests.test_public_shell.PublicShellTests.test_stylesheet_links_tolerate_formatting)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/home/runner/work/commonworld/commonworld/tests/test_public_shell.py", line 325, in test_stylesheet_links_tolerate_formatting
+    self.assertEqual([], errors)
+AssertionError: Lists differ: [] != ['public shell CSS must define a forced-co[219 chars]yle']
+
+Second list contains 4 additional elements.
+First extra element 0:
+'public shell CSS must define a forced-colors: active contract'
+
+- []
++ ['public shell CSS must define a forced-colors: active contract',
++  'public reduced-motion contract must disable transitions',
++  'public shell CSS must define a prefers-contrast: more contract',
++  'index.css presence options must define a compact, touch-safe label style']
+
+----------------------------------------------------------------------
+Ran 39 tests in 3.500s
+
+FAILED (failures=8)
