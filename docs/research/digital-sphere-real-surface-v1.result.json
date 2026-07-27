@@ -100,7 +100,7 @@
     }
   ],
   "name_presentation": {
-    "visible_name_limit_per_layer": 2,
+    "visible_name_limit_per_layer": 6,
     "orbit_label_max_chars": 18,
     "visible_by_layer": [
       {

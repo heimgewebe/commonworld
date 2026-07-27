@@ -160,7 +160,9 @@ class DigitalSphereRealSurfaceTests(unittest.TestCase):
             )
             synthetic.append(record)
         visible = visible_records_for_layer(self.records + synthetic, "knowledge_data")
-        self.assertEqual(["wikipedia-reference", "wikidata-reference"], [record["id"] for record in visible])
+        visible_ids = [record["id"] for record in visible]
+        self.assertEqual(VISIBLE_NAME_LIMIT_PER_LAYER, len(visible_ids))
+        self.assertEqual(["wikipedia-reference", "wikidata-reference"], visible_ids[:2])
 
     def test_focus_panel_is_derived_from_the_same_identity(self) -> None:
         record = next(item for item in self.records if item["id"] == FOCUS_ID)

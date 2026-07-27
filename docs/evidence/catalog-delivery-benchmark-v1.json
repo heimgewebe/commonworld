@@ -294,7 +294,7 @@
     "browser": {
       "schema_version": 1,
       "kind": "commonworld_catalog_delivery_browser_metrics",
-      "measured_at": "2026-07-27T20:13:57.239Z",
+      "measured_at": "2026-07-27T23:41:52.950Z",
       "cpu_throttle_rate": 4,
       "profiles": [
         {
@@ -304,47 +304,47 @@
             "height": 844
           },
           "cpu_throttle_rate": 4,
-          "runtime_ready_ms": 812,
+          "runtime_ready_ms": 880,
           "dom_node_count": 1598,
           "catalog_card_count": 48,
           "interactive_catalog_card_count": 48,
           "runtime_ready": true,
           "runtime_failed": false,
-          "dom_content_loaded_ms": 521.5999999940395,
-          "load_event_ms": 558.5999999940395,
+          "dom_content_loaded_ms": 577.0999999940395,
+          "load_event_ms": 618.0999999940395,
           "resource_count": 16,
-          "script_duration_ms": 544.54,
-          "task_duration_ms": 1119.92,
+          "script_duration_ms": 592.87,
+          "task_duration_ms": 1187.43,
           "bootstrap_compile": {
-            "median_ms": 0.3999999761581421,
-            "p95_ms": 0.8999999761581421,
+            "median_ms": 0.29999998211860657,
+            "p95_ms": 1.0999999940395355,
             "samples_ms": [
               0,
               0,
               0,
               0.09999999403953552,
-              0.10000002384185791,
-              0.10000002384185791,
-              0.19999998807907104,
+              0.09999999403953552,
+              0.09999999403953552,
               0.20000001788139343,
               0.20000001788139343,
-              0.30000001192092896,
-              0.3999999761581421,
+              0.29999998211860657,
+              0.29999998211860657,
+              0.29999998211860657,
+              0.4000000059604645,
               0.4000000059604645,
               0.5,
-              0.5999999940395355,
-              0.5999999940395355,
+              0.5,
               0.699999988079071,
-              0.699999988079071,
-              0.699999988079071,
-              0.800000011920929,
-              0.8999999761581421,
-              2.800000011920929
+              0.7000000178813934,
+              0.9000000059604645,
+              1,
+              1.0999999940395355,
+              2.300000011920929
             ]
           },
           "first_party_request_count": 15,
           "first_party_unique_request_count": 15,
-          "first_party_raw_bytes": 1849439,
+          "first_party_raw_bytes": 1849576,
           "first_party_requests": [
             "/",
             "/assets/commonworld-app.js",
@@ -362,7 +362,7 @@
             "/catalog/runtime/manifest.v1.json",
             "/index.css"
           ],
-          "first_party_surface_sha256": "0d33fc2ba688f863d7861e792a8fb391a54a1b9b4cc6688dcf8518601850eba2",
+          "first_party_surface_sha256": "d534404d15c88c5f235e6a3f7360b79bbc9fa880cdce1db45858f2f8f1e0dcb5",
           "project_json_request_count": 0,
           "project_json_unique_request_count": 0,
           "project_json_requests": []
@@ -374,47 +374,47 @@
             "height": 768
           },
           "cpu_throttle_rate": 4,
-          "runtime_ready_ms": 763,
+          "runtime_ready_ms": 730,
           "dom_node_count": 1598,
           "catalog_card_count": 48,
           "interactive_catalog_card_count": 48,
           "runtime_ready": true,
           "runtime_failed": false,
-          "dom_content_loaded_ms": 461.80000001192093,
-          "load_event_ms": 497.59999999403954,
+          "dom_content_loaded_ms": 444.5,
+          "load_event_ms": 478,
           "resource_count": 16,
-          "script_duration_ms": 582.24,
-          "task_duration_ms": 1041.17,
+          "script_duration_ms": 558.88,
+          "task_duration_ms": 1000.95,
           "bootstrap_compile": {
             "median_ms": 0.4000000059604645,
-            "p95_ms": 1,
+            "p95_ms": 0.7999999821186066,
             "samples_ms": [
               0,
               0.09999999403953552,
               0.09999999403953552,
               0.09999999403953552,
-              0.09999999403953552,
-              0.09999999403953552,
-              0.09999999403953552,
-              0.29999998211860657,
+              0.10000002384185791,
+              0.10000002384185791,
+              0.10000002384185791,
+              0.19999998807907104,
+              0.30000001192092896,
+              0.3999999761581421,
               0.4000000059604645,
-              0.4000000059604645,
-              0.4000000059604645,
+              0.5,
               0.5999999940395355,
               0.5999999940395355,
-              0.7000000178813934,
+              0.6000000238418579,
+              0.699999988079071,
+              0.699999988079071,
+              0.699999988079071,
               0.7000000178813934,
               0.7999999821186066,
-              0.800000011920929,
-              0.9000000059604645,
-              0.9000000059604645,
-              1,
-              1.100000023841858
+              0.800000011920929
             ]
           },
           "first_party_request_count": 15,
           "first_party_unique_request_count": 15,
-          "first_party_raw_bytes": 1849439,
+          "first_party_raw_bytes": 1849576,
           "first_party_requests": [
             "/",
             "/assets/commonworld-app.js",
@@ -432,7 +432,7 @@
             "/catalog/runtime/manifest.v1.json",
             "/index.css"
           ],
-          "first_party_surface_sha256": "0d33fc2ba688f863d7861e792a8fb391a54a1b9b4cc6688dcf8518601850eba2",
+          "first_party_surface_sha256": "d534404d15c88c5f235e6a3f7360b79bbc9fa880cdce1db45858f2f8f1e0dcb5",
           "project_json_request_count": 0,
           "project_json_unique_request_count": 0,
           "project_json_requests": []
@@ -445,36 +445,36 @@
       "profiles": {
         "mobile-low-power": {
           "runtime_ready_ms": {
-            "min": 812,
-            "median": 812,
-            "max": 812
+            "min": 880,
+            "median": 880,
+            "max": 880
           },
           "script_duration_ms": {
-            "min": 544.54,
-            "median": 544.54,
-            "max": 544.54
+            "min": 592.87,
+            "median": 592.87,
+            "max": 592.87
           },
           "task_duration_ms": {
-            "min": 1119.92,
-            "median": 1119.92,
-            "max": 1119.92
+            "min": 1187.43,
+            "median": 1187.43,
+            "max": 1187.43
           }
         },
         "desktop-low-power": {
           "runtime_ready_ms": {
-            "min": 763,
-            "median": 763,
-            "max": 763
+            "min": 730,
+            "median": 730,
+            "max": 730
           },
           "script_duration_ms": {
-            "min": 582.24,
-            "median": 582.24,
-            "max": 582.24
+            "min": 558.88,
+            "median": 558.88,
+            "max": 558.88
           },
           "task_duration_ms": {
-            "min": 1041.17,
-            "median": 1041.17,
-            "max": 1041.17
+            "min": 1000.95,
+            "median": 1000.95,
+            "max": 1000.95
           }
         }
       },
@@ -552,8 +552,8 @@
         "method-mobile",
         "method-mobile-text-200"
       ],
-      "evidence_sha256": "58a5920d4c89da2bd61db693481a493956908f301b163c624eccd95b1a2b048d",
-      "scenario_execution_note": "Fresh exact-surface public browser smoke completed all 34 scenarios successfully in durable job 2140e6d0ef40."
+      "evidence_sha256": "ead27823173b452d48c18762891b77af741fd23b1a255c80549d96947aaa7da5",
+      "scenario_execution_note": "Fresh exact-surface public browser smoke completed all 34 scenarios successfully in durable job 258be3d43fbc."
     },
     "proposal_browser_smoke": {
       "verdict": "PASS",
@@ -576,28 +576,30 @@
         "desktop-low-power"
       ],
       "cpu_throttle_rate": 4,
-      "result_sha256": "b6ff3f0466a9b2a54eb6eeba7341ec4c56ac07fb5766c69978da945c3c72ad10",
-      "durable_job_id": "153c8bcf3396",
-      "finalization_receipt_sha256": "770d8e7c85cd2fac7832880de7897827c88ad74c522f1e7c93556a33b63a3d4f"
+      "result_sha256": "254938f9a32a2ac382fec963c46748638471491a54567a69249336f898f08172",
+      "durable_job_id": "a767dad42bb4",
+      "finalization_receipt_sha256": "08da21e3d6a04ed313ad9aecd59d2ee1bbb3f0dabb974cca166e037996b0dd39"
     },
     "official_browser_runner": {
       "verdict": "PASS",
-      "command": "npm run smoke:browser",
-      "durable_job_id": "416a97c96364",
-      "finalization_receipt_sha256": "3719c96447ac1bb6d7ca0ab371438f3d24860a1bf08ccfad679e64e0db270169"
+      "command": "python3 scripts/run_browser_smoke.py",
+      "durable_job_id": "7f71a46f6411",
+      "finalization_receipt_sha256": "4929b16bb39a343a74bce6a8c61de101756529fb60346430c98140c20b44cad9"
     },
     "catalog_delivery_static_measurement": {
       "verdict": "PASS",
-      "command": "python3 scripts/measure_catalog_delivery.py --output /tmp/commonworld-digital-corona-static.json",
-      "result_sha256": "55fb93399c7d040659f1e0a0efc7c8cad66da85846264ae93804ec33d9c2c1ec"
+      "command": "python3 scripts/measure_catalog_delivery.py --output /tmp/commonworld-pr153-static-metrics.json",
+      "result_sha256": "55fb93399c7d040659f1e0a0efc7c8cad66da85846264ae93804ec33d9c2c1ec",
+      "durable_job_id": "702cb4b8c0c1",
+      "finalization_receipt_sha256": "a45a9c03160af74bec709ee9d3c8fe0bca379ec7a7c127302d7c0b50f5f5965a"
     },
     "full_validation": {
       "verdict": "PASS",
       "command": "make validate",
-      "durable_job_id": "2bb42ff5a2fc",
-      "finalization_receipt_sha256": "43ede7d10f2dc6e7e450d432b2c93e95ba6127980b3eb3ee29c625296988a2ea",
+      "durable_job_id": "f5b323fe9ff6",
+      "finalization_receipt_sha256": "5ca73741bcc772ae779572841f3d42e7b6400f3707795ee50a3962ee3d8df756",
       "javascript_tests": "110/110",
-      "python_tests": "527/527"
+      "python_tests": "543/543"
     }
   },
   "budget_binding": {
@@ -605,5 +607,5 @@
     "warn_bootstrap_gzip_bytes": 28672,
     "max_bootstrap_gzip_bytes": 32768
   },
-  "current_surface_note": "Optimized measurements and public browser smoke are bound to the adaptive typographic corona surface on feat/digital-typographic-corona-v1."
+  "current_surface_note": "Current browser and static measurements are bound to the PR #153 review-fix surface; timing remains observational while request, byte, DOM and hash boundaries are directly validated."
 }

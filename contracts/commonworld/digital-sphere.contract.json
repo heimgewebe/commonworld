@@ -201,7 +201,7 @@
       "manual_layer_override_forbidden": true
     },
     "name_presentation": {
-      "visible_name_limit_per_layer": 2,
+      "visible_name_limit_per_layer": 6,
       "orbit_label_max_chars": 18,
       "visible_orbit_labels_must_have_accessible_full_text": true,
       "side_view_uses_full_commonproject_title": true,

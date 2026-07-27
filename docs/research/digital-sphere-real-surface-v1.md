@@ -33,7 +33,7 @@ Die zwölf Referenzen belegen alle sechs Schichten. OpenStreetMap und der Meta-W
 
 ## Namen und Fokus
 
-Pro Schicht sind höchstens zwei Orbitnamen sichtbar. Die sichtbaren Orbitlabels dürfen gekürzt sein, besitzen aber eindeutigen zugänglichen Volltext. Der lange Meta-Wiki-Name bleibt als Stresstest vollständig über den zugänglichen Text und im Fokuspanel erhalten.
+Der Präsentationsvertrag erlaubt bis zu sechs Orbitnamen pro Schicht; im zwölfteiligen Referenzbeleg sind aufgrund der gleichmäßigen Belegung jeweils zwei sichtbar. Die sichtbaren Orbitlabels dürfen gekürzt sein, besitzen aber eindeutigen zugänglichen Volltext. Der lange Meta-Wiki-Name bleibt als Stresstest vollständig über den zugänglichen Text und im Fokuspanel erhalten.
 
 Seitenansicht und Fokuspanel nutzen `CommonProject.title` als Vollnamenquelle. Binärfragmente sind deterministische dekorative Zeichen aus der stabilen Identität, `aria-hidden` und kein Projektpayload, Qualitätswert oder Aktivitätssignal.
 

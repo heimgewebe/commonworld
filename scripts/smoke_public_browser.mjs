@@ -2155,6 +2155,16 @@ async function androidGlobeUiScenario() {
   assert(geometry.primaryRingCount >= 2 && geometry.primaryRingCount <= 3 && geometry.depthRingCount > 0 && geometry.depthRingsStatic, scenarioId + ': mobile emphasis does not bound active rings ' + JSON.stringify(geometry));
   assert(geometry.ringTextWidth > 80 && geometry.ringTextHeight >= 12.5 && geometry.ringTextFontSize >= 9.5, scenarioId + ': mobile ring text is not visibly sized ' + JSON.stringify(geometry));
 
+  await run.page.locator('#sphere-edge-control').focus();
+  const focusedRingMotion = await run.page.evaluate(() => ({
+    activeElement: document.activeElement?.id ?? '',
+    primaryStates: [...document.querySelectorAll('.sphere-ring-plane[data-emphasis="primary"]')]
+      .map((plane) => getComputedStyle(plane).animationPlayState),
+  }));
+  assert(focusedRingMotion.activeElement === 'sphere-edge-control', scenarioId + ': sphere edge control did not receive focus ' + JSON.stringify(focusedRingMotion));
+  assert(focusedRingMotion.primaryStates.length > 0 && focusedRingMotion.primaryStates.every((state) => state === 'paused'), scenarioId + ': primary mobile rings continue moving while the sphere control is focused ' + JSON.stringify(focusedRingMotion));
+  await run.page.evaluate(() => document.querySelector('#sphere-edge-control')?.blur());
+
   await run.page.evaluate(() => new Promise((resolve) => {
     const map = window.__commonworldTestMap;
     map.once('render', resolve);
