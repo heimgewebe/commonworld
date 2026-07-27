@@ -1,4 +1,0 @@
-  File "scripts/pr143_followup.py", line 181
-    css = css.replace(".layer-panel .layer-projects[hidden] {
-                      ^
-SyntaxError: unterminated string literal (detected at line 181)
