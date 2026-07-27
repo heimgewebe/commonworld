@@ -1,4 +1,6 @@
+import io
 import json
+import urllib.error
 import shutil
 import tempfile
 import unittest
@@ -195,7 +197,7 @@ class SecurityPolicyTests(unittest.TestCase):
             text += "\n# --verify-live-setting\n"
             path.write_text(text, encoding="utf-8")
             errors = validate_security_policy(root, now=self.NOW)
-        self.assertTrue(any("Verify private vulnerability reporting before merge" in error and "--verify-live-setting" in error for error in errors))
+        self.assertTrue(any("Verify private vulnerability reporting before merge" in error and "command mismatch" in error for error in errors))
 
     def test_production_marker_relocation_does_not_pass(self) -> None:
         with tempfile.TemporaryDirectory() as directory:
@@ -206,7 +208,7 @@ class SecurityPolicyTests(unittest.TestCase):
             text += "\n# --verify-live-setting\n"
             path.write_text(text, encoding="utf-8")
             errors = validate_security_policy(root, now=self.NOW)
-        self.assertTrue(any("Verify private vulnerability reporting setting" in error and "--verify-live-setting" in error for error in errors))
+        self.assertTrue(any("Verify private vulnerability reporting setting" in error and "command mismatch" in error for error in errors))
 
     def test_expiry_workflow_requires_schedule_and_validator(self) -> None:
         with tempfile.TemporaryDirectory() as directory:
@@ -218,7 +220,7 @@ class SecurityPolicyTests(unittest.TestCase):
             block = text[start:end].replace("python3 scripts/validate_security_policy.py", "true")
             path.write_text(text[:start] + block + text[end:], encoding="utf-8")
             errors = validate_security_policy(root, now=self.NOW)
-        self.assertTrue(any("Verify private vulnerability reporting remains enabled" in error and "python3 scripts/validate_security_policy.py" in error for error in errors))
+        self.assertTrue(any("Verify private vulnerability reporting remains enabled" in error and "command mismatch" in error for error in errors))
 
     def test_non_rfc3339_expiry_separator_fails(self) -> None:
         with tempfile.TemporaryDirectory() as directory:
@@ -259,8 +261,8 @@ class SecurityPolicyTests(unittest.TestCase):
             path = root / ".github/workflows/security-policy-expiry.yml"
             path.write_text(path.read_text(encoding="utf-8").replace("--verify-live-setting", "--offline-only").replace("steps.security_setting.outcome != 'success'", "false"), encoding="utf-8")
             errors = validate_security_policy(root, now=self.NOW)
-        self.assertTrue(any("Verify private vulnerability reporting remains enabled" in error and "--verify-live-setting" in error for error in errors))
-        self.assertTrue(any("Enforce live reporting result" in error and "steps.security_setting.outcome != 'success'" in error for error in errors))
+        self.assertTrue(any("Verify private vulnerability reporting remains enabled" in error and "command mismatch" in error for error in errors))
+        self.assertTrue(any("Enforce live reporting result" in error and "field 'if'" in error for error in errors))
 
 
     def test_workflows_keep_private_reporting_readback_tokenless(self) -> None:
@@ -306,7 +308,46 @@ class SecurityPolicyTests(unittest.TestCase):
             path = root / ".github/workflows/security-policy-expiry.yml"
             path.write_text(path.read_text(encoding="utf-8").replace("        id: security_setting\n        if: always()\n", "        id: security_setting\n"), encoding="utf-8")
             errors = validate_security_policy(root, now=self.NOW)
-        self.assertTrue(any("Verify private vulnerability reporting remains enabled" in error and "if: always()" in error for error in errors))
+        self.assertTrue(any("Verify private vulnerability reporting remains enabled" in error and "field 'if'" in error for error in errors))
+
+    def test_http_error_preserves_endpoint_and_status_metadata(self) -> None:
+        endpoint = "https://api.github.com/repos/heimgewebe/commonworld/private-vulnerability-reporting"
+        error = urllib.error.HTTPError(
+            endpoint,
+            429,
+            "rate limited",
+            {},
+            io.BytesIO(b'{"message":"rate limited"}'),
+        )
+        from unittest.mock import patch
+        with patch("urllib.request.urlopen", side_effect=error):
+            fetch = github_api_get_private_reporting("heimgewebe/commonworld")
+        self.assertEqual(endpoint, fetch.requested_url)
+        self.assertEqual(endpoint, fetch.final_url)
+        self.assertEqual(429, fetch.status)
+        receipt = verify_live_private_reporting(
+            "heimgewebe/commonworld",
+            "9" * 40,
+            api_get=lambda: fetch,
+            now=lambda: "2026-07-27T20:00:00Z",
+        )
+        self.assertEqual("fail", receipt["verdict"])
+        self.assertEqual(429, receipt["status"])
+        self.assertEqual(endpoint, receipt["requested_url"])
+        self.assertEqual(endpoint, receipt["final_url"])
+
+    def test_structural_workflow_validation_rejects_false_always_condition(self) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            root = self.copy_surface(directory)
+            path = root / ".github/workflows/security-policy-expiry.yml"
+            text = path.read_text(encoding="utf-8")
+            start = text.index("- name: Upload scheduled security receipt")
+            end = text.index("- name: Enforce live reporting result", start)
+            block = text[start:end].replace("if: always()", "if: always() && false")
+            path.write_text(text[:start] + block + text[end:], encoding="utf-8")
+            errors = validate_security_policy(root, now=self.NOW)
+        self.assertTrue(any("Upload scheduled security receipt" in error and "field 'if'" in error for error in errors))
+
 
 
 if __name__ == "__main__":

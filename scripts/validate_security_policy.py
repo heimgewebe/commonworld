@@ -7,6 +7,7 @@ import argparse
 import http.client
 import json
 import re
+import shlex
 import sys
 import urllib.error
 import urllib.request
@@ -93,37 +94,135 @@ def parse_security_txt(text: str) -> tuple[dict[str, list[str]], list[str]]:
     return dict(fields), errors
 
 
-def workflow_step(workflow_text: str, step_name: str) -> str | None:
+@dataclass(frozen=True)
+class WorkflowStep:
+    raw: str
+    fields: dict[str, str]
+    with_fields: dict[str, str]
+    run_argv: tuple[str, ...]
+
+
+def _yaml_scalar(value: str) -> str:
+    value = value.strip()
+    if len(value) >= 2 and value[0] == value[-1] and value[0] in {'"', "'"}:
+        return value[1:-1]
+    return value
+
+
+def _collect_yaml_block(lines: list[str], start: int, parent_indent: int) -> tuple[list[str], int]:
+    collected: list[str] = []
+    index = start
+    while index < len(lines):
+        line = lines[index]
+        if line.strip() and len(line) - len(line.lstrip()) <= parent_indent:
+            break
+        if line.strip():
+            collected.append(line.strip())
+        index += 1
+    return collected, index
+
+
+def parse_workflow_step(workflow_text: str, step_name: str) -> WorkflowStep | None:
     lines = workflow_text.splitlines()
     marker = f"- name: {step_name}"
     starts = [index for index, line in enumerate(lines) if line.strip() == marker]
     if len(starts) != 1:
         return None
     start = starts[0]
-    indent = len(lines[start]) - len(lines[start].lstrip())
+    step_indent = len(lines[start]) - len(lines[start].lstrip())
     end = len(lines)
     for index in range(start + 1, len(lines)):
         line = lines[index]
-        if len(line) - len(line.lstrip()) == indent and line.strip().startswith("- name:"):
+        if line.strip() and len(line) - len(line.lstrip()) == step_indent and line.strip().startswith("- "):
             end = index
             break
-    return "\n".join(lines[start:end])
+    block = lines[start:end]
+    fields: dict[str, str] = {"name": step_name}
+    with_fields: dict[str, str] = {}
+    run_text = ""
+    index = 1
+    field_indent = step_indent + 2
+    while index < len(block):
+        line = block[index]
+        indent = len(line) - len(line.lstrip())
+        stripped = line.strip()
+        if not stripped or stripped.startswith("#"):
+            index += 1
+            continue
+        if indent != field_indent or ":" not in stripped:
+            index += 1
+            continue
+        key, value = stripped.split(":", 1)
+        value = value.strip()
+        if key == "with" and value == "":
+            index += 1
+            nested_indent = field_indent + 2
+            while index < len(block):
+                nested = block[index]
+                nested_level = len(nested) - len(nested.lstrip())
+                nested_stripped = nested.strip()
+                if nested_stripped and nested_level <= field_indent:
+                    break
+                if not nested_stripped or nested_stripped.startswith("#"):
+                    index += 1
+                    continue
+                if nested_level != nested_indent or ":" not in nested_stripped:
+                    index += 1
+                    continue
+                nested_key, nested_value = nested_stripped.split(":", 1)
+                nested_value = nested_value.strip()
+                if nested_value in {"|", "|-", ">", ">-"}:
+                    lines_value, index = _collect_yaml_block(block, index + 1, nested_indent)
+                    with_fields[nested_key] = "\n".join(lines_value)
+                else:
+                    with_fields[nested_key] = _yaml_scalar(nested_value)
+                    index += 1
+            continue
+        if key == "run" and value in {"|", "|-", ">", ">-"}:
+            lines_value, index = _collect_yaml_block(block, index + 1, field_indent)
+            run_text = " ".join(lines_value) if value.startswith(">") else "\n".join(lines_value)
+            fields[key] = run_text
+            continue
+        fields[key] = _yaml_scalar(value)
+        if key == "run":
+            run_text = fields[key]
+        index += 1
+    try:
+        run_argv = tuple(shlex.split(run_text)) if run_text else ()
+    except ValueError:
+        run_argv = ()
+    return WorkflowStep("\n".join(block), fields, with_fields, run_argv)
 
 
-def _require_step(
+def workflow_step(workflow_text: str, step_name: str) -> str | None:
+    parsed = parse_workflow_step(workflow_text, step_name)
+    return None if parsed is None else parsed.raw
+
+
+def _require_structured_step(
     workflow_text: str,
     step_name: str,
-    markers: tuple[str, ...],
     errors: list[str],
     label: str,
-) -> str:
-    step = workflow_step(workflow_text, step_name)
+    *,
+    fields: dict[str, str] | None = None,
+    run_argv: tuple[str, ...] | None = None,
+    with_fields: dict[str, str] | None = None,
+) -> WorkflowStep | None:
+    step = parse_workflow_step(workflow_text, step_name)
     if step is None:
         errors.append(f"{label} must contain exactly one step named {step_name!r}")
-        return ""
-    for marker in markers:
-        if marker not in step:
-            errors.append(f"{label} step {step_name!r} is missing: {marker}")
+        return None
+    for key, expected in (fields or {}).items():
+        actual = step.fields.get(key)
+        if actual != expected:
+            errors.append(f"{label} step {step_name!r} field {key!r} must equal {expected!r}, got {actual!r}")
+    if run_argv is not None and step.run_argv != run_argv:
+        errors.append(f"{label} step {step_name!r} command mismatch")
+    for key, expected in (with_fields or {}).items():
+        actual = step.with_fields.get(key)
+        if actual != expected:
+            errors.append(f"{label} step {step_name!r} with.{key} must equal {expected!r}, got {actual!r}")
     return step
 
 
@@ -208,123 +307,112 @@ def validate_security_policy(root: Path = ROOT, now: datetime | None = None) -> 
         errors.append(".nojekyll would publish an unnecessarily broad dotfile surface")
 
     validate_text = (root / VALIDATE_WORKFLOW).read_text(encoding="utf-8")
-    premerge = _require_step(
+    premerge = _require_structured_step(
         validate_text,
         "Verify private vulnerability reporting before merge",
-        (
-            "id: security_setting",
-            "continue-on-error: true",
-            "python3 scripts/validate_security_policy.py",
-            "--verify-live-setting",
-            '--repository "${{ github.repository }}"',
-            '--expected-sha "${{ github.event.pull_request.head.sha || github.sha }}"',
-            "artifacts/commonworld-private-vulnerability-reporting-premerge.json",
-        ),
         errors,
         "validate workflow",
+        fields={"id": "security_setting", "continue-on-error": "true"},
+        run_argv=(
+            "python3", "scripts/validate_security_policy.py", "--verify-live-setting",
+            "--repository", "${{ github.repository }}", "--expected-sha",
+            "${{ github.event.pull_request.head.sha || github.sha }}", "--receipt",
+            "artifacts/commonworld-private-vulnerability-reporting-premerge.json",
+        ),
     )
-    if "GITHUB_TOKEN" in premerge or "github.token" in premerge:
+    if premerge and ("GITHUB_TOKEN" in premerge.raw or "github.token" in premerge.raw):
         errors.append("pre-merge private reporting readback must remain tokenless")
-    _require_step(
+    _require_structured_step(
         validate_text,
         "Upload pre-merge security receipt",
-        (
-            "if: always()",
-            "actions/upload-artifact@v7",
-            "artifacts/commonworld-private-vulnerability-reporting-premerge.json",
-        ),
         errors,
         "validate workflow",
+        fields={"if": "always()", "uses": "actions/upload-artifact@v7"},
+        with_fields={
+            "path": "artifacts/commonworld-private-vulnerability-reporting-premerge.json",
+            "if-no-files-found": "error", "retention-days": "30",
+        },
     )
-    _require_step(
+    _require_structured_step(
         validate_text,
         "Enforce pre-merge security readback",
-        ("if: always() && steps.security_setting.outcome != 'success'", "run: exit 1"),
         errors,
         "validate workflow",
+        fields={"if": "always() && steps.security_setting.outcome != 'success'"},
+        run_argv=("exit", "1"),
     )
 
     production_text = (root / PRODUCTION_READBACK_WORKFLOW).read_text(encoding="utf-8")
-    production = _require_step(
+    production = _require_structured_step(
         production_text,
         "Verify private vulnerability reporting setting",
-        (
-            "id: security_setting",
-            "continue-on-error: true",
-            "python3 scripts/validate_security_policy.py",
-            "--verify-live-setting",
-            '--repository "${{ github.repository }}"',
-            '--expected-sha "${{ github.sha }}"',
-            "artifacts/commonworld-private-vulnerability-reporting.json",
-        ),
         errors,
         "production readback workflow",
+        fields={"id": "security_setting", "continue-on-error": "true"},
+        run_argv=(
+            "python3", "scripts/validate_security_policy.py", "--verify-live-setting",
+            "--repository", "${{ github.repository }}", "--expected-sha", "${{ github.sha }}",
+            "--receipt", "artifacts/commonworld-private-vulnerability-reporting.json",
+        ),
     )
-    if "GITHUB_TOKEN" in production or "github.token" in production:
+    if production and ("GITHUB_TOKEN" in production.raw or "github.token" in production.raw):
         errors.append("private reporting status readback must use the public endpoint without an Actions token")
-    _require_step(
+    _require_structured_step(
         production_text,
         "Upload production readback receipts",
-        (
-            "if: always()",
-            "actions/upload-artifact@v7",
-            "artifacts/commonworld-pages-production-readback.json",
-            "artifacts/commonworld-private-vulnerability-reporting.json",
-        ),
         errors,
         "production readback workflow",
+        fields={"if": "always()", "uses": "actions/upload-artifact@v7"},
+        with_fields={
+            "path": "artifacts/commonworld-pages-production-readback.json\nartifacts/commonworld-private-vulnerability-reporting.json",
+            "if-no-files-found": "error", "retention-days": "30",
+        },
     )
-    _require_step(
+    _require_structured_step(
         production_text,
         "Enforce production readback result",
-        (
-            "steps.readback.outcome != 'success'",
-            "steps.security_setting.outcome != 'success'",
-            "run: exit 1",
-        ),
         errors,
         "production readback workflow",
+        fields={"if": "always() && (steps.readback.outcome != 'success' || steps.security_setting.outcome != 'success')"},
+        run_argv=("exit", "1"),
     )
 
     expiry_text = (root / SECURITY_EXPIRY_WORKFLOW).read_text(encoding="utf-8")
-    for marker in ('cron: "17 5 * * 1"', "workflow_dispatch:", "contents: read"):
-        if marker not in expiry_text:
-            errors.append(f"security expiry workflow is incomplete: {marker}")
-    expiry = _require_step(
+    for exact_line in ('- cron: "17 5 * * 1"', "workflow_dispatch:", "contents: read"):
+        if not any(line.strip() == exact_line for line in expiry_text.splitlines()):
+            errors.append(f"security expiry workflow is incomplete: {exact_line}")
+    expiry = _require_structured_step(
         expiry_text,
         "Verify private vulnerability reporting remains enabled",
-        (
-            "id: security_setting",
-            "if: always()",
-            "continue-on-error: true",
-            "python3 scripts/validate_security_policy.py",
-            "--verify-live-setting",
-            '--repository "${{ github.repository }}"',
-            '--expected-sha "${{ github.sha }}"',
-            "artifacts/commonworld-private-vulnerability-reporting-scheduled.json",
-        ),
         errors,
         "security expiry workflow",
+        fields={"id": "security_setting", "if": "always()", "continue-on-error": "true"},
+        run_argv=(
+            "python3", "scripts/validate_security_policy.py", "--verify-live-setting",
+            "--repository", "${{ github.repository }}", "--expected-sha", "${{ github.sha }}",
+            "--receipt", "artifacts/commonworld-private-vulnerability-reporting-scheduled.json",
+        ),
     )
-    if "GITHUB_TOKEN" in expiry or "github.token" in expiry:
+    if expiry and ("GITHUB_TOKEN" in expiry.raw or "github.token" in expiry.raw):
         errors.append("scheduled private reporting readback must use the public endpoint without an Actions token")
-    _require_step(
+    _require_structured_step(
         expiry_text,
         "Upload scheduled security receipt",
-        (
-            "if: always()",
-            "actions/upload-artifact@v7",
-            "artifacts/commonworld-private-vulnerability-reporting-scheduled.json",
-        ),
         errors,
         "security expiry workflow",
+        fields={"if": "always()", "uses": "actions/upload-artifact@v7"},
+        with_fields={
+            "path": "artifacts/commonworld-private-vulnerability-reporting-scheduled.json",
+            "if-no-files-found": "error", "retention-days": "30",
+        },
     )
-    _require_step(
+    _require_structured_step(
         expiry_text,
         "Enforce live reporting result",
-        ("if: always() && steps.security_setting.outcome != 'success'", "run: exit 1"),
         errors,
         "security expiry workflow",
+        fields={"if": "always() && steps.security_setting.outcome != 'success'"},
+        run_argv=("exit", "1"),
     )
     return errors
 
@@ -349,6 +437,13 @@ def github_api_get_private_reporting(repository: str, timeout_seconds: int = 20)
             status = int(response.status)
             final_url = response.geturl()
         payload = json.loads(raw.decode("utf-8"))
+    except urllib.error.HTTPError as error:
+        try:
+            raw = error.read()
+            payload = json.loads(raw.decode("utf-8")) if raw else None
+        except (OSError, UnicodeDecodeError, json.JSONDecodeError):
+            payload = None
+        return PrivateReportingFetch(endpoint, error.geturl() or endpoint, int(error.code), payload)
     except (
         OSError,
         ValueError,
