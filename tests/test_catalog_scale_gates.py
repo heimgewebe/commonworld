@@ -53,6 +53,16 @@ class CatalogScaleGateValidationTests(unittest.TestCase):
             MODULE.validate_catalog_scale_gates(self.root),
         )
 
+    def test_measurement_generator_path_cannot_drift(self):
+        relative = "contracts/commonworld/catalog-scale-gates.contract.json"
+        contract = self.load(relative)
+        contract["measurement"]["generator"] = "scripts/ambient_scale_measurement.py"
+        self.write(relative, contract)
+        self.assertIn(
+            "catalogue scale contract generator path mismatch",
+            MODULE.validate_catalog_scale_gates(self.root, verify_measurements=False),
+        )
+
     def test_cutover_cannot_be_authorized_by_synthetic_evidence(self):
         relative = "contracts/commonworld/catalog-scale-gates.contract.json"
         contract = self.load(relative)
