@@ -5,7 +5,7 @@ import unittest
 from datetime import datetime, timezone
 from pathlib import Path
 
-from scripts.validate_security_policy import ROOT, validate_security_policy, verify_live_private_reporting, write_json_receipt
+from scripts.validate_security_policy import ROOT, github_api_get_private_reporting, validate_security_policy, verify_live_private_reporting, write_json_receipt
 
 
 class SecurityPolicyTests(unittest.TestCase):
@@ -189,6 +189,33 @@ class SecurityPolicyTests(unittest.TestCase):
         self.assertNotIn("GITHUB_TOKEN", scheduled)
         self.assertNotIn("github.token", scheduled)
 
+
+    def test_live_private_reporting_transport_timeout_becomes_failed_receipt(self) -> None:
+        def timed_out():
+            raise RuntimeError("private vulnerability reporting readback failed: socket timeout")
+
+        receipt = verify_live_private_reporting(
+            "heimgewebe/commonworld",
+            "d" * 40,
+            api_get=timed_out,
+            now=lambda: "2026-07-27T20:00:00Z",
+        )
+        self.assertEqual("fail", receipt["verdict"])
+        self.assertIn("private vulnerability reporting readback failed: socket timeout", receipt["errors"])
+
+    def test_public_status_body_timeout_is_wrapped(self) -> None:
+        class Response:
+            def __enter__(self):
+                return self
+            def __exit__(self, *args):
+                return False
+            def read(self):
+                raise TimeoutError("socket timeout")
+
+        from unittest.mock import patch
+        with patch("urllib.request.urlopen", return_value=Response()):
+            with self.assertRaisesRegex(RuntimeError, "socket timeout"):
+                github_api_get_private_reporting("heimgewebe/commonworld")
 
 
 if __name__ == "__main__":

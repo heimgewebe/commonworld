@@ -216,7 +216,7 @@ def github_api_get_private_reporting(repository: str, timeout_seconds: int = 20)
     try:
         with urllib.request.urlopen(request, timeout=timeout_seconds) as response:
             return json.loads(response.read().decode("utf-8"))
-    except (urllib.error.URLError, UnicodeDecodeError, json.JSONDecodeError) as error:
+    except (OSError, urllib.error.URLError, UnicodeDecodeError, json.JSONDecodeError) as error:
         raise RuntimeError(f"private vulnerability reporting readback failed: {error}") from error
 
 
