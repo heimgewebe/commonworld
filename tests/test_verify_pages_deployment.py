@@ -231,6 +231,30 @@ class PagesDeploymentReadbackTests(unittest.TestCase):
         self.assertEqual("fail", result.verdict)
         self.assertIn("exact public file hash mismatch: propose.html", result.errors)
 
+    def test_exact_public_file_redirect_fails(self) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            for relative in ("index.html", "propose.html", "catalog/catalog.json", ".well-known/security.txt"):
+                target = root / relative
+                target.parent.mkdir(parents=True, exist_ok=True)
+                target.write_text("expected", encoding="utf-8")
+
+            def fetcher(url: str, **kwargs):
+                final_url = "http://commonworld.net/.well-known/security.txt" if url.endswith("/.well-known/security.txt") else url
+                return LiveFetch(url, final_url, 200, "text/plain", "expected")
+
+            result = verify_exact_public_files(
+                "https://commonworld.net/",
+                5,
+                fetcher=fetcher,
+                root=root,
+            )
+
+        self.assertEqual("fail", result.verdict)
+        self.assertIn("exact public file redirected: .well-known/security.txt", result.errors)
+        security_receipt = next(item for item in result.receipts if item.relative_url == ".well-known/security.txt")
+        self.assertFalse(security_receipt.matched)
+
     def test_live_smoke_retries_only_on_declared_schedule(self) -> None:
         clock = FakeClock()
         attempts = 0

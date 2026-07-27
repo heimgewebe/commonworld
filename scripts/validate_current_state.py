@@ -22,6 +22,7 @@ SECURITY_POLICY_PATH = Path("SECURITY.md")
 SECURITY_TXT_PATH = Path(".well-known/security.txt")
 JEKYLL_CONFIG_PATH = Path("_config.yml")
 PRODUCTION_READBACK_PATH = Path("scripts/verify_pages_deployment.py")
+PRODUCTION_READBACK_WORKFLOW_PATH = Path(".github/workflows/production-readback.yml")
 
 
 def _load(root: Path, relative: Path) -> dict:
@@ -34,7 +35,7 @@ def _sha256(path: Path) -> str:
 
 def validate_current_state(root: Path = ROOT) -> list[str]:
     errors: list[str] = []
-    for relative in (STATE_PATH, CATALOG_PATH, PROVIDER_PATH, VERTICAL_SLICE_PATH, DIGITAL_RING_PATH, CATALOG_PLATFORM_PATH, APP_PATH, LE_NID_PATH, SECURITY_POLICY_PATH, SECURITY_TXT_PATH, JEKYLL_CONFIG_PATH, PRODUCTION_READBACK_PATH):
+    for relative in (STATE_PATH, CATALOG_PATH, PROVIDER_PATH, VERTICAL_SLICE_PATH, DIGITAL_RING_PATH, CATALOG_PLATFORM_PATH, APP_PATH, LE_NID_PATH, SECURITY_POLICY_PATH, SECURITY_TXT_PATH, JEKYLL_CONFIG_PATH, PRODUCTION_READBACK_PATH, PRODUCTION_READBACK_WORKFLOW_PATH):
         if not (root / relative).is_file():
             errors.append(f"missing current-state dependency: {relative}")
     if errors:
@@ -50,6 +51,7 @@ def validate_current_state(root: Path = ROOT) -> list[str]:
         app = (root / APP_PATH).read_text(encoding="utf-8")
         le_nid = _load(root, LE_NID_PATH)
         production_readback = (root / PRODUCTION_READBACK_PATH).read_text(encoding="utf-8")
+        production_readback_workflow = (root / PRODUCTION_READBACK_WORKFLOW_PATH).read_text(encoding="utf-8")
     except (OSError, json.JSONDecodeError) as error:
         return [f"current-state dependency is invalid: {error}"]
 
@@ -159,6 +161,7 @@ def validate_current_state(root: Path = ROOT) -> list[str]:
         "public_issues_confidential": False,
         "exact_production_readback": True,
         "host_configuration": "_config.yml includes only .well-known",
+        "expiry_monitoring": "weekly_github_actions",
     }
     if security_disclosure != expected_security_disclosure:
         errors.append("current security-disclosure truth mismatch")
@@ -166,6 +169,8 @@ def validate_current_state(root: Path = ROOT) -> list[str]:
         errors.append("current production readback does not include security.txt")
     if (root / JEKYLL_CONFIG_PATH).read_text(encoding="utf-8") != "include:\n  - .well-known\n":
         errors.append("current host configuration does not publish only .well-known")
+    if "--verify-live-setting" not in production_readback_workflow or "steps.security_setting.outcome != 'success'" not in production_readback_workflow:
+        errors.append("current production readback does not enforce private vulnerability reporting")
 
     release = state.get("release_gates", {})
     expected_release = {

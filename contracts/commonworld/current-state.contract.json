@@ -62,7 +62,8 @@
     "public_discovery_url": "https://commonworld.net/.well-known/security.txt",
     "public_issues_confidential": false,
     "exact_production_readback": true,
-    "host_configuration": "_config.yml includes only .well-known"
+    "host_configuration": "_config.yml includes only .well-known",
+    "expiry_monitoring": "weekly_github_actions"
   },
   "release_gates": {
     "deterministic_build_and_tests": "pass",

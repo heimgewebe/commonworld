@@ -27,6 +27,8 @@ class CurrentStateTests(unittest.TestCase):
             ".well-known/security.txt",
             "_config.yml",
             "scripts/verify_pages_deployment.py",
+            ".github/workflows/production-readback.yml",
+            ".github/workflows/security-policy-expiry.yml",
         )
         for relative in paths:
             source = ROOT / relative
@@ -65,6 +67,15 @@ class CurrentStateTests(unittest.TestCase):
             path.write_text(path.read_text(encoding="utf-8").replace(".well-known/security.txt", "security.txt"), encoding="utf-8")
             errors = validate_current_state(root)
         self.assertIn("current production readback does not include security.txt", errors)
+
+
+    def test_security_disclosure_requires_live_setting_readback(self) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            root = self.copy_current_state(directory)
+            path = root / ".github/workflows/production-readback.yml"
+            path.write_text(path.read_text(encoding="utf-8").replace("--verify-live-setting", "--skip-live-setting"), encoding="utf-8")
+            errors = validate_current_state(root)
+        self.assertIn("current production readback does not enforce private vulnerability reporting", errors)
 
     def test_catalog_delivery_declares_selected_shard_shadow(self) -> None:
         with tempfile.TemporaryDirectory() as directory:

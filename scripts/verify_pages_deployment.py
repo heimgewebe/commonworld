@@ -302,7 +302,7 @@ def verify_exact_public_files(
             continue
         remote_sha256 = hashlib.sha256(remote_bytes).hexdigest()
         expected_sha256 = hashlib.sha256(expected_bytes).hexdigest()
-        matched = fetch.status == 200 and remote_sha256 == expected_sha256
+        matched = fetch.status == 200 and fetch.final_url == requested_url and remote_sha256 == expected_sha256
         receipts.append(
             ExactPublicFileReceipt(
                 relative_url=relative_url or "index.html",
@@ -318,6 +318,8 @@ def verify_exact_public_files(
         )
         if fetch.status != 200:
             errors.append(f"exact public file status must be 200 for {relative_url or 'index.html'}, got {fetch.status}")
+        if fetch.final_url != requested_url:
+            errors.append(f"exact public file redirected: {relative_url or 'index.html'}")
         if remote_sha256 != expected_sha256:
             errors.append(f"exact public file hash mismatch: {relative_url or 'index.html'}")
     return ExactPublicFilesResult(

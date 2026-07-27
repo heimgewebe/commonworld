@@ -229,7 +229,7 @@ EXPECTED_TEST_FILES = {
     "test_semantic_zoom.py",
     "test_visual_semantics.py",
 }
-EXPECTED_WORKFLOW_FILES = {"production-readback.yml", "validate.yml"}
+EXPECTED_WORKFLOW_FILES = {"production-readback.yml", "security-policy-expiry.yml", "validate.yml"}
 REQUIRED_CHECK_CATALOG = {
     "schema_version": 1,
     "required_checks": ["contracts"],

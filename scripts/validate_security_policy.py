@@ -4,7 +4,12 @@
 from __future__ import annotations
 
 import argparse
+import json
+import os
+import re
 import sys
+import urllib.error
+import urllib.request
 from collections import defaultdict
 from datetime import datetime, timedelta, timezone
 from pathlib import Path
@@ -14,6 +19,8 @@ ROOT = Path(__file__).resolve().parents[1]
 SECURITY_POLICY = Path("SECURITY.md")
 SECURITY_TXT = Path(".well-known/security.txt")
 JEKYLL_CONFIG = Path("_config.yml")
+PRODUCTION_READBACK_WORKFLOW = Path(".github/workflows/production-readback.yml")
+SECURITY_EXPIRY_WORKFLOW = Path(".github/workflows/security-policy-expiry.yml")
 EXPECTED_CONTACT = "https://github.com/heimgewebe/commonworld/security/advisories/new"
 EXPECTED_POLICY = "https://github.com/heimgewebe/commonworld/security/policy"
 EXPECTED_CANONICAL = "https://commonworld.net/.well-known/security.txt"
@@ -23,6 +30,7 @@ MAX_BYTES = 32 * 1024
 MAX_LINES = 1000
 MIN_REMAINING_VALIDITY = timedelta(days=30)
 MAX_REMAINING_VALIDITY = timedelta(days=366)
+RFC3339_RE = re.compile(r"^[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}(?:\.[0-9]+)?(?:Z|[+-][0-9]{2}:[0-9]{2})$")
 
 
 def utc_now() -> datetime:
@@ -64,7 +72,7 @@ def validate_security_policy(root: Path = ROOT, now: datetime | None = None) -> 
         now = now.replace(tzinfo=timezone.utc)
     now = now.astimezone(timezone.utc)
 
-    for path in (SECURITY_POLICY, SECURITY_TXT, JEKYLL_CONFIG):
+    for path in (SECURITY_POLICY, SECURITY_TXT, JEKYLL_CONFIG, PRODUCTION_READBACK_WORKFLOW, SECURITY_EXPIRY_WORKFLOW):
         if not (root / path).is_file():
             errors.append(f"missing security disclosure file: {path}")
     if errors:
@@ -104,19 +112,20 @@ def validate_security_policy(root: Path = ROOT, now: datetime | None = None) -> 
         errors.append("security.txt must contain exactly one Expires field")
     else:
         value = expires_values[0]
-        try:
-            expires = datetime.fromisoformat(value.replace("Z", "+00:00"))
-        except ValueError:
-            errors.append("security.txt Expires must be RFC 3339")
+        if not RFC3339_RE.fullmatch(value):
+            errors.append("security.txt Expires must be strict RFC 3339")
         else:
-            if expires.tzinfo is None:
-                errors.append("security.txt Expires must include a timezone")
+            try:
+                expires = datetime.fromisoformat(value.replace("Z", "+00:00"))
+            except ValueError:
+                errors.append("security.txt Expires must be a real RFC 3339 timestamp")
             else:
                 remaining = expires.astimezone(timezone.utc) - now
                 if remaining <= MIN_REMAINING_VALIDITY:
                     errors.append("security.txt Expires must remain more than 30 days in the future")
                 if remaining > MAX_REMAINING_VALIDITY:
                     errors.append("security.txt Expires must be no more than 366 days in the future")
+
 
     policy_text = (root / SECURITY_POLICY).read_text(encoding="utf-8")
     required_policy_phrases = (
@@ -137,12 +146,128 @@ def validate_security_policy(root: Path = ROOT, now: datetime | None = None) -> 
         errors.append("Jekyll configuration must expose only the reviewed .well-known directory")
     if (root / ".nojekyll").exists():
         errors.append(".nojekyll would publish an unnecessarily broad dotfile surface")
+
+    workflow_text = (root / PRODUCTION_READBACK_WORKFLOW).read_text(encoding="utf-8")
+    workflow_markers = (
+        "--verify-live-setting",
+        '--expected-sha "${{ github.sha }}"',
+        "artifacts/commonworld-private-vulnerability-reporting.json",
+        "steps.security_setting.outcome != 'success'",
+    )
+    for marker in workflow_markers:
+        if marker not in workflow_text:
+            errors.append(f"production readback does not enforce private reporting: {marker}")
+
+    expiry_workflow_text = (root / SECURITY_EXPIRY_WORKFLOW).read_text(encoding="utf-8")
+    expiry_markers = (
+        'cron: "17 5 * * 1"',
+        "workflow_dispatch:",
+        "contents: read",
+        "actions/checkout@v7",
+        "actions/setup-python@v7",
+        "python3 scripts/validate_security_policy.py",
+    )
+    for marker in expiry_markers:
+        if marker not in expiry_workflow_text:
+            errors.append(f"security expiry workflow is incomplete: {marker}")
     return errors
+
+
+def utc_timestamp() -> str:
+    return datetime.now(timezone.utc).isoformat().replace("+00:00", "Z")
+
+
+def github_api_get_private_reporting(repository: str, token: str, timeout_seconds: int = 20) -> object:
+    request = urllib.request.Request(
+        f"https://api.github.com/repos/{repository}/private-vulnerability-reporting",
+        headers={
+            "Accept": "application/vnd.github+json",
+            "Authorization": f"Bearer {token}",
+            "User-Agent": "commonworld-security-policy/1.0",
+            "X-GitHub-Api-Version": "2022-11-28",
+        },
+    )
+    try:
+        with urllib.request.urlopen(request, timeout=timeout_seconds) as response:
+            return json.loads(response.read().decode("utf-8"))
+    except (urllib.error.URLError, UnicodeDecodeError, json.JSONDecodeError) as error:
+        raise RuntimeError(f"private vulnerability reporting readback failed: {error}") from error
+
+
+def verify_live_private_reporting(
+    repository: str,
+    expected_sha: str,
+    token: str,
+    *,
+    api_get=None,
+    now=utc_timestamp,
+) -> dict[str, object]:
+    errors: list[str] = []
+    if not repository or repository.count("/") != 1:
+        errors.append("repository must be in owner/name form")
+    if len(expected_sha) != 40 or any(character not in "0123456789abcdef" for character in expected_sha.lower()):
+        errors.append("expected SHA must be a full hexadecimal commit id")
+    if not token:
+        errors.append("GitHub token is required")
+    enabled = None
+    if not errors:
+        request = api_get or (lambda: github_api_get_private_reporting(repository, token))
+        try:
+            response = request()
+        except RuntimeError as error:
+            errors.append(str(error))
+        else:
+            if not isinstance(response, dict) or not isinstance(response.get("enabled"), bool):
+                errors.append("private vulnerability reporting response must contain boolean enabled")
+            else:
+                enabled = response["enabled"]
+                if enabled is not True:
+                    errors.append("private vulnerability reporting must be enabled before publication")
+    timestamp = now()
+    return {
+        "schema_version": 1,
+        "kind": "commonworld_private_vulnerability_reporting_readback",
+        "repository": repository,
+        "expected_sha": expected_sha,
+        "endpoint": f"https://api.github.com/repos/{repository}/private-vulnerability-reporting",
+        "observed_at": timestamp,
+        "enabled": enabled,
+        "verdict": "pass" if not errors else "fail",
+        "errors": errors,
+        "does_not_establish": ["response-time SLA", "bug bounty", "payment promise", "broad legal safe harbor"],
+    }
+
+
+def write_json_receipt(path: Path, receipt: dict[str, object]) -> None:
+    path.parent.mkdir(parents=True, exist_ok=True)
+    temporary = path.with_name(path.name + ".tmp")
+    temporary.write_text(json.dumps(receipt, ensure_ascii=False, sort_keys=True, indent=2) + "\n", encoding="utf-8")
+    temporary.replace(path)
 
 
 def main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser()
-    parser.parse_args(argv)
+    parser.add_argument("--verify-live-setting", action="store_true")
+    parser.add_argument("--repository", default="")
+    parser.add_argument("--expected-sha", default="")
+    parser.add_argument("--receipt", type=Path)
+    arguments = parser.parse_args(argv)
+    if arguments.verify_live_setting:
+        if arguments.receipt is None:
+            parser.error("--receipt is required with --verify-live-setting")
+        receipt = verify_live_private_reporting(
+            arguments.repository,
+            arguments.expected_sha,
+            os.environ.get("GITHUB_TOKEN", ""),
+        )
+        write_json_receipt(arguments.receipt, receipt)
+        if receipt["verdict"] != "pass":
+            for error in receipt["errors"]:
+                print(f"ERROR: {error}", file=sys.stderr)
+            return 1
+        print("commonworld private vulnerability reporting readback ok")
+        return 0
+
     errors = validate_security_policy(ROOT)
     if errors:
         for error in errors:
