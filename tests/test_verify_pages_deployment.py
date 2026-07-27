@@ -466,8 +466,26 @@ class PagesDeploymentReadbackTests(unittest.TestCase):
         self.assertIn("timeout-minutes: 20", workflow)
         self.assertIn("continue-on-error: true", workflow)
         self.assertIn("if: always()", workflow)
-        self.assertIn("actions/upload-artifact@v4", workflow)
+        self.assertIn("actions/checkout@v6", workflow)
+        self.assertIn("actions/setup-python@v6", workflow)
+        self.assertIn("actions/upload-artifact@v6", workflow)
         self.assertIn("scripts/verify_pages_deployment.py", workflow)
+
+        validation_workflow = Path(".github/workflows/validate.yml").read_text(encoding="utf-8")
+        self.assertIn("actions/checkout@v6", validation_workflow)
+        self.assertIn("actions/setup-python@v6", validation_workflow)
+        self.assertIn("actions/setup-node@v6", validation_workflow)
+        self.assertIn('node-version: "22"', validation_workflow)
+        self.assertIn("cache: npm", validation_workflow)
+
+        combined = workflow + validation_workflow
+        for deprecated_ref in (
+            "actions/checkout@v4",
+            "actions/setup-python@v5",
+            "actions/setup-node@v4",
+            "actions/upload-artifact@v4",
+        ):
+            self.assertNotIn(deprecated_ref, combined)
 
 
 if __name__ == "__main__":
