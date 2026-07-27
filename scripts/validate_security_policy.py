@@ -30,7 +30,11 @@ MAX_BYTES = 32 * 1024
 MAX_LINES = 1000
 MIN_REMAINING_VALIDITY = timedelta(days=30)
 MAX_REMAINING_VALIDITY = timedelta(days=366)
-RFC3339_RE = re.compile(r"^[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}(?:\.[0-9]+)?(?:Z|[+-][0-9]{2}:[0-9]{2})$")
+RFC3339_DATE_TIME = re.compile(
+    r"^(?P<date>\d{4}-(?:0[1-9]|1[0-2])-(?:0[1-9]|[12]\d|3[01]))"
+    r"[Tt](?P<hour>[01]\d|2[0-3]):(?P<minute>[0-5]\d):(?P<second>[0-5]\d|60)"
+    r"(?P<fraction>\.\d+)?(?P<offset>[Zz]|[+-](?:[01]\d|2[0-3]):[0-5]\d)$"
+)
 
 
 def utc_now() -> datetime:
@@ -40,6 +44,24 @@ def utc_now() -> datetime:
 def _https_uri(value: str) -> bool:
     parsed = urlparse(value)
     return parsed.scheme == "https" and bool(parsed.netloc) and not parsed.username and not parsed.password
+
+
+def _parse_rfc3339_datetime(value: str) -> datetime:
+    match = RFC3339_DATE_TIME.fullmatch(value)
+    if match is None:
+        raise ValueError("not RFC 3339 date-time")
+    second = match.group("second")
+    offset = match.group("offset")
+    normalized_offset = "+00:00" if offset in {"Z", "z"} else offset
+    normalized_second = "59" if second == "60" else second
+    normalized = (
+        f"{match.group('date')}T{match.group('hour')}:{match.group('minute')}:{normalized_second}"
+        f"{match.group('fraction') or ''}{normalized_offset}"
+    )
+    parsed = datetime.fromisoformat(normalized)
+    if second == "60":
+        parsed += timedelta(seconds=1)
+    return parsed
 
 
 def parse_security_txt(text: str) -> tuple[dict[str, list[str]], list[str]]:
@@ -112,19 +134,16 @@ def validate_security_policy(root: Path = ROOT, now: datetime | None = None) -> 
         errors.append("security.txt must contain exactly one Expires field")
     else:
         value = expires_values[0]
-        if not RFC3339_RE.fullmatch(value):
+        try:
+            expires = _parse_rfc3339_datetime(value)
+        except ValueError:
             errors.append("security.txt Expires must be strict RFC 3339")
         else:
-            try:
-                expires = datetime.fromisoformat(value.replace("Z", "+00:00"))
-            except ValueError:
-                errors.append("security.txt Expires must be a real RFC 3339 timestamp")
-            else:
-                remaining = expires.astimezone(timezone.utc) - now
-                if remaining <= MIN_REMAINING_VALIDITY:
-                    errors.append("security.txt Expires must remain more than 30 days in the future")
-                if remaining > MAX_REMAINING_VALIDITY:
-                    errors.append("security.txt Expires must be no more than 366 days in the future")
+            remaining = expires.astimezone(timezone.utc) - now
+            if remaining <= MIN_REMAINING_VALIDITY:
+                errors.append("security.txt Expires must remain more than 30 days in the future")
+            if remaining > MAX_REMAINING_VALIDITY:
+                errors.append("security.txt Expires must be no more than 366 days in the future")
 
 
     policy_text = (root / SECURITY_POLICY).read_text(encoding="utf-8")
@@ -166,6 +185,10 @@ def validate_security_policy(root: Path = ROOT, now: datetime | None = None) -> 
         "actions/checkout@v7",
         "actions/setup-python@v7",
         "python3 scripts/validate_security_policy.py",
+        "--verify-live-setting",
+        "artifacts/commonworld-private-vulnerability-reporting-scheduled.json",
+        "actions/upload-artifact@v7",
+        "steps.security_setting.outcome != 'success'",
     )
     for marker in expiry_markers:
         if marker not in expiry_workflow_text:

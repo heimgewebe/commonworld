@@ -251,7 +251,7 @@ class PagesDeploymentReadbackTests(unittest.TestCase):
             )
 
         self.assertEqual("fail", result.verdict)
-        self.assertIn("exact public file redirected: .well-known/security.txt", result.errors)
+        self.assertIn("exact public file redirected: .well-known/security.txt: https://commonworld.net/.well-known/security.txt -> http://commonworld.net/.well-known/security.txt", result.errors)
         security_receipt = next(item for item in result.receipts if item.relative_url == ".well-known/security.txt")
         self.assertFalse(security_receipt.matched)
 

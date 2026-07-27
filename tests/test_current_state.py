@@ -77,6 +77,14 @@ class CurrentStateTests(unittest.TestCase):
             errors = validate_current_state(root)
         self.assertIn("current production readback does not enforce private vulnerability reporting", errors)
 
+    def test_security_disclosure_requires_weekly_expiry_workflow(self) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            root = self.copy_current_state(directory)
+            path = root / ".github/workflows/security-policy-expiry.yml"
+            path.write_text(path.read_text(encoding="utf-8").replace('cron: "17 5 * * 1"', 'cron: "0 0 1 1 *"'), encoding="utf-8")
+            errors = validate_current_state(root)
+        self.assertIn("current security-expiry workflow mismatch", errors)
+
     def test_catalog_delivery_declares_selected_shard_shadow(self) -> None:
         with tempfile.TemporaryDirectory() as directory:
             root = self.copy_current_state(directory)

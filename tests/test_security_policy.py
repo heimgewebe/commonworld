@@ -149,6 +149,41 @@ class SecurityPolicyTests(unittest.TestCase):
             errors = validate_security_policy(root, now=self.NOW)
         self.assertIn("security.txt Expires must be strict RFC 3339", errors)
 
+    def test_non_rfc3339_expiry_spellings_fail(self) -> None:
+        invalid_values = (
+            "2027-06-30 00:00:00Z",
+            "20270630T000000Z",
+            "2027-W26-3T00:00:00Z",
+            "2027-06-30T00:00:00+0000",
+            "2027-06-30T00:00:00+00:00:30",
+        )
+        for invalid in invalid_values:
+            with self.subTest(invalid=invalid), tempfile.TemporaryDirectory() as directory:
+                root = self.copy_surface(directory)
+                path = root / ".well-known/security.txt"
+                path.write_text(path.read_text(encoding="utf-8").replace("2027-06-30T00:00:00Z", invalid), encoding="utf-8")
+                errors = validate_security_policy(root, now=self.NOW)
+            self.assertIn("security.txt Expires must be strict RFC 3339", errors)
+
+    def test_rfc3339_fractional_offset_and_lowercase_tz_pass(self) -> None:
+        for valid in ("2027-06-30T01:30:00.250+01:30", "2027-06-30t00:00:00z"):
+            with self.subTest(valid=valid), tempfile.TemporaryDirectory() as directory:
+                root = self.copy_surface(directory)
+                path = root / ".well-known/security.txt"
+                path.write_text(path.read_text(encoding="utf-8").replace("2027-06-30T00:00:00Z", valid), encoding="utf-8")
+                errors = validate_security_policy(root, now=self.NOW)
+            self.assertEqual([], errors)
+
+    def test_expiry_workflow_requires_live_setting_and_enforcement(self) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            root = self.copy_surface(directory)
+            path = root / ".github/workflows/security-policy-expiry.yml"
+            path.write_text(path.read_text(encoding="utf-8").replace("--verify-live-setting", "--offline-only").replace("steps.security_setting.outcome != 'success'", "false"), encoding="utf-8")
+            errors = validate_security_policy(root, now=self.NOW)
+        self.assertIn("security expiry workflow is incomplete: --verify-live-setting", errors)
+        self.assertIn("security expiry workflow is incomplete: steps.security_setting.outcome != 'success'", errors)
+
+
 
 if __name__ == "__main__":
     unittest.main()

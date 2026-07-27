@@ -8,6 +8,10 @@ on:
 permissions:
   contents: read
 
+concurrency:
+  group: commonworld-security-policy-expiry
+  cancel-in-progress: false
+
 jobs:
   validate-security-policy-expiry:
     runs-on: ubuntu-latest
@@ -19,3 +23,25 @@ jobs:
           python-version: "3.12"
       - name: Validate disclosure policy and expiry
         run: python3 scripts/validate_security_policy.py
+      - name: Verify private vulnerability reporting remains enabled
+        id: security_setting
+        continue-on-error: true
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+        run: >-
+          python3 scripts/validate_security_policy.py
+          --verify-live-setting
+          --repository "${{ github.repository }}"
+          --expected-sha "${{ github.sha }}"
+          --receipt artifacts/commonworld-private-vulnerability-reporting-scheduled.json
+      - name: Upload scheduled security receipt
+        if: always()
+        uses: actions/upload-artifact@v7
+        with:
+          name: commonworld-private-vulnerability-reporting-scheduled-${{ github.sha }}
+          path: artifacts/commonworld-private-vulnerability-reporting-scheduled.json
+          if-no-files-found: error
+          retention-days: 30
+      - name: Enforce live reporting result
+        if: always() && steps.security_setting.outcome != 'success'
+        run: exit 1

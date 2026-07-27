@@ -319,7 +319,7 @@ def verify_exact_public_files(
         if fetch.status != 200:
             errors.append(f"exact public file status must be 200 for {relative_url or 'index.html'}, got {fetch.status}")
         if fetch.final_url != requested_url:
-            errors.append(f"exact public file redirected: {relative_url or 'index.html'}")
+            errors.append(f"exact public file redirected: {relative_url or 'index.html'}: {requested_url} -> {fetch.final_url}")
         if remote_sha256 != expected_sha256:
             errors.append(f"exact public file hash mismatch: {relative_url or 'index.html'}")
     return ExactPublicFilesResult(

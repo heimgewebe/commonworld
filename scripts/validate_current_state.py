@@ -23,6 +23,7 @@ SECURITY_TXT_PATH = Path(".well-known/security.txt")
 JEKYLL_CONFIG_PATH = Path("_config.yml")
 PRODUCTION_READBACK_PATH = Path("scripts/verify_pages_deployment.py")
 PRODUCTION_READBACK_WORKFLOW_PATH = Path(".github/workflows/production-readback.yml")
+SECURITY_EXPIRY_WORKFLOW_PATH = Path(".github/workflows/security-policy-expiry.yml")
 
 
 def _load(root: Path, relative: Path) -> dict:
@@ -35,7 +36,7 @@ def _sha256(path: Path) -> str:
 
 def validate_current_state(root: Path = ROOT) -> list[str]:
     errors: list[str] = []
-    for relative in (STATE_PATH, CATALOG_PATH, PROVIDER_PATH, VERTICAL_SLICE_PATH, DIGITAL_RING_PATH, CATALOG_PLATFORM_PATH, APP_PATH, LE_NID_PATH, SECURITY_POLICY_PATH, SECURITY_TXT_PATH, JEKYLL_CONFIG_PATH, PRODUCTION_READBACK_PATH, PRODUCTION_READBACK_WORKFLOW_PATH):
+    for relative in (STATE_PATH, CATALOG_PATH, PROVIDER_PATH, VERTICAL_SLICE_PATH, DIGITAL_RING_PATH, CATALOG_PLATFORM_PATH, APP_PATH, LE_NID_PATH, SECURITY_POLICY_PATH, SECURITY_TXT_PATH, JEKYLL_CONFIG_PATH, PRODUCTION_READBACK_PATH, PRODUCTION_READBACK_WORKFLOW_PATH, SECURITY_EXPIRY_WORKFLOW_PATH):
         if not (root / relative).is_file():
             errors.append(f"missing current-state dependency: {relative}")
     if errors:
@@ -52,6 +53,7 @@ def validate_current_state(root: Path = ROOT) -> list[str]:
         le_nid = _load(root, LE_NID_PATH)
         production_readback = (root / PRODUCTION_READBACK_PATH).read_text(encoding="utf-8")
         production_readback_workflow = (root / PRODUCTION_READBACK_WORKFLOW_PATH).read_text(encoding="utf-8")
+        security_expiry_workflow = (root / SECURITY_EXPIRY_WORKFLOW_PATH).read_text(encoding="utf-8")
     except (OSError, json.JSONDecodeError) as error:
         return [f"current-state dependency is invalid: {error}"]
 
@@ -171,6 +173,9 @@ def validate_current_state(root: Path = ROOT) -> list[str]:
         errors.append("current host configuration does not publish only .well-known")
     if "--verify-live-setting" not in production_readback_workflow or "steps.security_setting.outcome != 'success'" not in production_readback_workflow:
         errors.append("current production readback does not enforce private vulnerability reporting")
+    expiry_markers = ('cron: "17 5 * * 1"', "python3 scripts/validate_security_policy.py", "--verify-live-setting", "steps.security_setting.outcome != 'success'")
+    if any(marker not in security_expiry_workflow for marker in expiry_markers):
+        errors.append("current security-expiry workflow mismatch")
 
     release = state.get("release_gates", {})
     expected_release = {
