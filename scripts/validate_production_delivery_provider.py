@@ -173,7 +173,7 @@ def validate_production_delivery_provider(root: Path = ROOT) -> list[str]:
         "deployment_poll_seconds": 10,
         "live_request_timeout_seconds": 5,
         "live_retry_delays_seconds": [0, 30, 90],
-        "exact_public_files": ["index.html", "propose.html", "catalog/catalog.json"],
+        "exact_public_files": ["index.html", "propose.html", "catalog/catalog.json", ".well-known/security.txt"],
         "receipt_id": "commonworld.pages-production-readback.v1",
         "receipt_artifact_retention_days": 30,
         "automatic_rollback": False,

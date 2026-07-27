@@ -159,7 +159,8 @@
       "exact_public_files": [
         "index.html",
         "propose.html",
-        "catalog/catalog.json"
+        "catalog/catalog.json",
+        ".well-known/security.txt"
       ],
       "source_ref": "main",
       "superseded_result": "receipt_without_live_claim_and_non_failure_exit"

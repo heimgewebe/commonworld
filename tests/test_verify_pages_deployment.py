@@ -64,7 +64,7 @@ def exact_file_receipt(relative_url: str = "index.html") -> ExactPublicFileRecei
 def exact_pass(base_url: str, timeout_seconds: int) -> ExactPublicFilesResult:
     return ExactPublicFilesResult(
         verdict="pass",
-        receipts=tuple(exact_file_receipt(name) for name in ("index.html", "propose.html", "catalog/catalog.json")),
+        receipts=tuple(exact_file_receipt(name) for name in ("index.html", "propose.html", "catalog/catalog.json", ".well-known/security.txt")),
         errors=(),
     )
 
@@ -186,6 +186,7 @@ class PagesDeploymentReadbackTests(unittest.TestCase):
                 "index.html": "shell",
                 "propose.html": "proposal",
                 "catalog/catalog.json": "catalog",
+                ".well-known/security.txt": "security",
             }
             for relative, body in files.items():
                 target = root / relative
@@ -205,13 +206,13 @@ class PagesDeploymentReadbackTests(unittest.TestCase):
             )
 
         self.assertEqual("pass", result.verdict)
-        self.assertEqual(3, len(result.receipts))
+        self.assertEqual(4, len(result.receipts))
         self.assertTrue(all(receipt.matched for receipt in result.receipts))
 
     def test_exact_public_file_hash_drift_fails(self) -> None:
         with tempfile.TemporaryDirectory() as directory:
             root = Path(directory)
-            for relative in ("index.html", "propose.html", "catalog/catalog.json"):
+            for relative in ("index.html", "propose.html", "catalog/catalog.json", ".well-known/security.txt"):
                 target = root / relative
                 target.parent.mkdir(parents=True, exist_ok=True)
                 target.write_text("expected", encoding="utf-8")
@@ -310,7 +311,7 @@ class PagesDeploymentReadbackTests(unittest.TestCase):
         self.assertEqual(1, receipt.deployment_attempts)
         self.assertEqual(1, receipt.live_attempts)
         self.assertEqual("fake-live-receipt", receipt.live_receipt.smoke_id)
-        self.assertEqual(3, len(receipt.exact_public_files))
+        self.assertEqual(4, len(receipt.exact_public_files))
         self.assertTrue(all(item.matched for item in receipt.exact_public_files))
         self.assertIn("automatic rollback authorization", receipt.does_not_establish)
 

@@ -102,3 +102,9 @@ Operational limits from the official GitHub Pages contract remain visible: the p
 The basemap is a separate noncritical dependency. `tiles.openfreemap.org` is authorized only as best effort without an SLA or continuity guarantee. If it is unavailable, the complete linear catalog, project selection and focus content must remain usable and the map must report a degraded state.
 
 The machine-readable decision and its failure/rollback boundary are in `contracts/commonworld/production-delivery-provider.contract.json`. Provider migration, self-hosting, backend introduction or automatic failover require a separate reviewed task.
+
+## Vulnerability disclosure surface
+
+Commonworld uses GitHub Private Vulnerability Reporting as its only confidential disclosure channel. `SECURITY.md` is the repository policy and `/.well-known/security.txt` is the RFC 9116 discovery surface. Public issues, pull requests and the Commons proposal form are not confidential reporting channels.
+
+The source-branch Jekyll build includes only `.well-known`; `.nojekyll` is forbidden because it would publish a broader dotfile surface. The production readback hashes `/.well-known/security.txt` against the exact deployed commit. The expiry must remain between 30 and 366 days in the future, so stale disclosure information fails CI before deployment.

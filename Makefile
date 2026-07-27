@@ -1,9 +1,9 @@
-.PHONY: build validate validate-proposal-path validate-current-state browser-smoke validate-canonical-plan validate-contracts validate-semantic-zoom validate-visual-semantics validate-renderer-spike validate-maplibre-phase2-proof validate-device-acceptance-pack validate-device-acceptance-rerun validate-digital-sphere validate-digital-ring-taxonomy validate-layered-digital-sphere-proof validate-digital-sphere-real-surface validate-device-acceptance-performance-v4 validate-physical-device-acceptance-v4-apple validate-public-catalog validate-public-seed-baseline validate-presence-axes validate-intent-search-discovery validate-renderer-selection validate-public-maplibre-vertical-slice validate-production-delivery-provider validate-public-shell validate-catalog-delivery-budget validate-catalog-scale-gates test-js test smoke-pages-live check-pages-dns-target
+.PHONY: build validate validate-proposal-path validate-current-state browser-smoke validate-canonical-plan validate-contracts validate-semantic-zoom validate-visual-semantics validate-renderer-spike validate-maplibre-phase2-proof validate-device-acceptance-pack validate-device-acceptance-rerun validate-digital-sphere validate-digital-ring-taxonomy validate-layered-digital-sphere-proof validate-digital-sphere-real-surface validate-device-acceptance-performance-v4 validate-physical-device-acceptance-v4-apple validate-public-catalog validate-public-seed-baseline validate-presence-axes validate-intent-search-discovery validate-renderer-selection validate-public-maplibre-vertical-slice validate-production-delivery-provider validate-security-policy validate-public-shell validate-catalog-delivery-budget validate-catalog-scale-gates test-js test smoke-pages-live check-pages-dns-target
 
 build:
 	npm run build
 
-validate: validate-proposal-path validate-current-state validate-canonical-plan validate-contracts validate-semantic-zoom validate-visual-semantics validate-renderer-spike validate-maplibre-phase2-proof validate-device-acceptance-pack validate-device-acceptance-rerun validate-digital-sphere validate-digital-ring-taxonomy validate-layered-digital-sphere-proof validate-digital-sphere-real-surface validate-device-acceptance-performance-v4 validate-physical-device-acceptance-v4-apple validate-public-catalog validate-public-seed-baseline validate-presence-axes validate-intent-search-discovery validate-renderer-selection validate-public-maplibre-vertical-slice validate-production-delivery-provider validate-public-shell validate-catalog-delivery-budget validate-catalog-scale-gates test-js test
+validate: validate-proposal-path validate-current-state validate-canonical-plan validate-contracts validate-semantic-zoom validate-visual-semantics validate-renderer-spike validate-maplibre-phase2-proof validate-device-acceptance-pack validate-device-acceptance-rerun validate-digital-sphere validate-digital-ring-taxonomy validate-layered-digital-sphere-proof validate-digital-sphere-real-surface validate-device-acceptance-performance-v4 validate-physical-device-acceptance-v4-apple validate-public-catalog validate-public-seed-baseline validate-presence-axes validate-intent-search-discovery validate-renderer-selection validate-public-maplibre-vertical-slice validate-production-delivery-provider validate-security-policy validate-public-shell validate-catalog-delivery-budget validate-catalog-scale-gates test-js test
 
 validate-proposal-path:
 	python3 scripts/validate_proposal_path.py
@@ -74,6 +74,9 @@ validate-public-maplibre-vertical-slice:
 
 validate-production-delivery-provider:
 	python3 scripts/validate_production_delivery_provider.py
+
+validate-security-policy:
+	python3 scripts/validate_security_policy.py
 
 validate-public-shell:
 	python3 scripts/validate_public_shell.py

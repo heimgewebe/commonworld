@@ -28,7 +28,7 @@ DEFAULT_DEPLOYMENT_TIMEOUT_SECONDS = 600
 DEFAULT_DEPLOYMENT_POLL_SECONDS = 10
 DEFAULT_LIVE_TIMEOUT_SECONDS = 5
 DEFAULT_LIVE_RETRY_DELAYS_SECONDS = (0, 30, 90)
-EXACT_PUBLIC_FILES = (("", "index.html"), ("propose.html", "propose.html"), ("catalog/catalog.json", "catalog/catalog.json"))
+EXACT_PUBLIC_FILES = (("", "index.html"), ("propose.html", "propose.html"), ("catalog/catalog.json", "catalog/catalog.json"), (".well-known/security.txt", ".well-known/security.txt"))
 PENDING_DEPLOYMENT_STATES = {"waiting", "queued", "pending", "in_progress"}
 FAILED_DEPLOYMENT_STATES = {"error", "failure", "inactive"}
 
