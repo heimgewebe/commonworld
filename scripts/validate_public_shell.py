@@ -29,6 +29,13 @@ except ModuleNotFoundError as exc:  # direct script execution puts the scripts d
         parse_stylesheet_links,
     )
 
+try:
+    from scripts.render_public_shell import MODULE_IMPORT_DEPENDENCIES
+except ModuleNotFoundError as exc:
+    if exc.name not in {"scripts", "scripts.render_public_shell"}:
+        raise
+    from render_public_shell import MODULE_IMPORT_DEPENDENCIES
+
 ROOT = Path(__file__).resolve().parents[1]
 
 REQUIRED_HTML = (
@@ -59,6 +66,11 @@ REQUIRED_HTML = (
     'id="text-layer-breadcrumb"',
     'id="text-layer-current"',
     'id="catalog"',
+    'id="static-catalog-fallback"',
+    'id="static-catalog-fallback" class="static-catalog-fallback" tabindex="-1"',
+    'data-static-catalog-fallback',
+    'id="text-skip-link" class="skip-link" href="#static-catalog-fallback"',
+    'The complete linear catalog remains available here while the interactive view is loading or unavailable.',
     'id="project-focus"',
     'href="./catalog/catalog.json"',
     'href="./contracts/commonworld/project.schema.json"',
@@ -82,6 +94,7 @@ FORBIDDEN_HTML = (
     'game feel',
     'gamification',
     '<form',
+    '<noscript',
     '/proofs/',
     '/api/',
     'unpkg.com',
@@ -109,7 +122,9 @@ REQUIRED_CSS = (
     '.layer-stack-item',
     '.settings-panel',
     '.text-view',
-    '.noscript-catalog',
+    '.static-catalog-fallback',
+    '.static-catalog-fallback:target,',
+    '.static-catalog-fallback[data-skip-activated="true"]',
     '.project-focus',
     '.globe-results',
     '.method-page',
@@ -150,6 +165,7 @@ def validate_public_shell(root: Path = ROOT) -> list[str]:
     german_html = german_html_path.read_text(encoding='utf-8') if german_html_path.is_file() else ''
     german_method = german_method_path.read_text(encoding='utf-8') if german_method_path.is_file() else ''
     bootstrap = bootstrap_path.read_text(encoding='utf-8')
+    app = (root / 'assets/commonworld-app.js').read_text(encoding='utf-8')
     lowered = html.casefold()
     if 'id="catalog-bootstrap"' in html:
         errors.append('public shell must not embed catalog JSON in the DOM')
@@ -162,6 +178,35 @@ def validate_public_shell(root: Path = ROOT) -> list[str]:
     css_version = hashlib.sha256(css_path.read_bytes()).hexdigest()[:12]
     if f'<script type="module" src="./assets/commonworld-app.js?v={app_version}"></script>' not in html:
         errors.append('public shell must load commonworld-app.js with its deterministic content hash')
+    for module_path, dependencies in MODULE_IMPORT_DEPENDENCIES:
+        module_file = root / module_path
+        if not module_file.is_file():
+            errors.append(f'public shell missing local module: {module_path}')
+            continue
+        module_source = module_file.read_text(encoding='utf-8')
+        for dependency_path in dependencies:
+            dependency_file = root / dependency_path
+            if not dependency_file.is_file():
+                errors.append(f'public shell missing local module dependency: {dependency_path}')
+                continue
+            dependency_version = hashlib.sha256(dependency_file.read_bytes()).hexdigest()[:12]
+            expected_import = f"from './{dependency_file.name}?v={dependency_version}'"
+            if expected_import not in module_source:
+                errors.append(f'public shell module import is not content-bound: {module_path} -> {dependency_path}')
+    if "document.querySelectorAll('.catalog-card[data-commonproject-id]')" in app:
+        errors.append('runtime catalog filtering must not mutate the bootstrap recovery surface')
+    for token in (
+        "catalog?.querySelectorAll('.catalog-card[data-commonproject-id]')",
+        "document.querySelector('#text-skip-link')",
+        "const recoveryCatalog = document.querySelector('[data-static-catalog-fallback]')",
+        "recoveryCatalog.dataset.skipActivated = 'true'",
+        "recoveryCatalog.focus({ preventScroll: true })",
+        "recoveryCatalog.scrollIntoView({ block: 'start' })",
+        "textSkipLink.setAttribute('href', '#text-view')",
+        "document.querySelector('[data-static-catalog-fallback]')?.remove()",
+    ):
+        if token not in app:
+            errors.append(f'public shell runtime missing bootstrap-recovery handoff: {token}')
     expected_css_link = f'./index.css?v={css_version}'
     if expected_css_link not in parse_stylesheet_links(html):
         errors.append('public shell must load index.css with its deterministic content hash')

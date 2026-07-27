@@ -21,6 +21,8 @@ SMOKE_SCRIPT_PATH = ROOT / 'scripts/smoke_public_browser.mjs'
 SMOKE_RUNNER_PATH = ROOT / 'scripts/run_browser_smoke.py'
 SMOKE_PLAN_PATH = ROOT / 'scripts/browser_smoke_plan.py'
 CATALOGUE_NETWORK_BLOCKED_SCENARIO = 'catalogue-network-blocked'
+BOOTSTRAP_ASSET_FAILURE_SCENARIO = 'bootstrap-asset-failure-fallback'
+POST_RENDER_FAILURE_SCENARIO = 'post-render-failure-preserves-fallback'
 
 
 def load_json(path: Path) -> dict:
@@ -77,6 +79,82 @@ def validate_blocked_catalog_requests(scenarios: dict[str, dict], label: str) ->
     return []
 
 
+def validate_bootstrap_asset_failure_fallback(
+    scenarios: dict[str, dict],
+    label: str,
+    expected_catalog_cards: int,
+) -> list[str]:
+    scenario = scenarios.get(BOOTSTRAP_ASSET_FAILURE_SCENARIO)
+    if scenario is None:
+        return [f'{label} missing required scenario: {BOOTSTRAP_ASSET_FAILURE_SCENARIO}']
+    errors: list[str] = []
+    blocked = scenario.get('blockedBootstrapRequests')
+    if not is_nonnegative_integer(blocked):
+        errors.append(
+            f'{label} scenario {BOOTSTRAP_ASSET_FAILURE_SCENARIO} '
+            'blockedBootstrapRequests must be a nonnegative integer'
+        )
+    elif blocked != 1:
+        errors.append(f'{label} expected exactly one blocked bootstrap request, got {blocked}')
+    cards = scenario.get('fallbackCatalogCards')
+    if not is_nonnegative_integer(cards):
+        errors.append(
+            f'{label} scenario {BOOTSTRAP_ASSET_FAILURE_SCENARIO} '
+            'fallbackCatalogCards must be a nonnegative integer'
+        )
+    elif cards != expected_catalog_cards:
+        errors.append(
+            f'{label} bootstrap fallback catalog is incomplete: '
+            f'expected {expected_catalog_cards}, got {cards}'
+        )
+    hidden = scenario.get('hiddenFallbackCatalogCards')
+    if not is_nonnegative_integer(hidden):
+        errors.append(
+            f'{label} scenario {BOOTSTRAP_ASSET_FAILURE_SCENARIO} '
+            'hiddenFallbackCatalogCards must be a nonnegative integer'
+        )
+    elif hidden != 0:
+        errors.append(f'{label} bootstrap fallback catalog hides {hidden} card(s)')
+    if scenario.get('neutralRecoveryCopy') is not True:
+        errors.append(f'{label} bootstrap fallback does not prove neutral recovery copy')
+    if scenario.get('skipLinkHref') != '#static-catalog-fallback':
+        errors.append(f'{label} bootstrap failure skip link does not target the recovery catalog')
+    if scenario.get('targetRecoveryHash') != '#static-catalog-fallback':
+        errors.append(f'{label} bootstrap failure fragment does not target the recovery catalog')
+    if scenario.get('targetRecoveryVisible') is not True:
+        errors.append(f'{label} bootstrap failure fragment does not immediately reveal the recovery catalog')
+    if scenario.get('targetRecoveryAnimationName') != 'none':
+        errors.append(f'{label} bootstrap failure fragment reveal still depends on delayed animation')
+    return errors
+
+
+def validate_post_render_failure_fallback(
+    scenarios: dict[str, dict],
+    label: str,
+    expected_catalog_cards: int,
+) -> list[str]:
+    scenario = scenarios.get(POST_RENDER_FAILURE_SCENARIO)
+    if scenario is None:
+        return [f'{label} missing required scenario: {POST_RENDER_FAILURE_SCENARIO}']
+    errors: list[str] = []
+    cards = scenario.get('fallbackCatalogCards')
+    hidden = scenario.get('hiddenFallbackCatalogCards')
+    if cards != expected_catalog_cards:
+        errors.append(
+            f'{label} post-render failure fallback is incomplete: '
+            f'expected {expected_catalog_cards}, got {cards}'
+        )
+    if hidden != 0:
+        errors.append(f'{label} post-render failure fallback hides {hidden} card(s)')
+    if scenario.get('skipLinkHref') != '#static-catalog-fallback':
+        errors.append(f'{label} post-render failure skip link does not target the recovery catalog')
+    if scenario.get('skipFocusId') != 'static-catalog-fallback':
+        errors.append(f'{label} post-render failure skip handler does not focus the recovery catalog')
+    if scenario.get('skipActivatedRecovery') is not True:
+        errors.append(f'{label} post-render failure skip handler does not reveal the recovery catalog')
+    return errors
+
+
 def validate_compile_samples(profile_name: str, profile: dict) -> list[str]:
     errors: list[str] = []
     compile_metrics = profile.get('bootstrap_compile', {})
@@ -98,7 +176,7 @@ def validate_compile_samples(profile_name: str, profile: dict) -> list[str]:
 
 def validate_actual_smoke(actual: dict, expected: dict) -> list[str]:
     errors: list[str] = []
-    expected_ids, _, expected_errors = scenario_map(expected)
+    expected_ids, expected_scenarios, expected_errors = scenario_map(expected)
     actual_ids, actual_scenarios, actual_errors = scenario_map(actual)
     errors.extend(expected_errors)
     errors.extend(actual_errors)
@@ -110,6 +188,12 @@ def validate_actual_smoke(actual: dict, expected: dict) -> list[str]:
         if scenario.get('verdict') != 'PASS':
             errors.append(f'fresh public browser smoke scenario is not PASS: {identifier}')
     errors.extend(validate_blocked_catalog_requests(actual_scenarios, 'fresh public browser smoke'))
+    expected_cards = expected_scenarios.get(BOOTSTRAP_ASSET_FAILURE_SCENARIO, {}).get('fallbackCatalogCards')
+    if not is_nonnegative_integer(expected_cards):
+        errors.append('committed browser smoke has no valid bootstrap fallback catalog count')
+    else:
+        errors.extend(validate_bootstrap_asset_failure_fallback(actual_scenarios, 'fresh public browser smoke', expected_cards))
+        errors.extend(validate_post_render_failure_fallback(actual_scenarios, 'fresh public browser smoke', expected_cards))
     return errors
 
 
@@ -152,7 +236,7 @@ def validate(root: Path = ROOT, warnings: list[str] | None = None) -> list[str]:
     static = measure(root)
     budgets = contract.get('budgets', {})
 
-    if contract.get('selected_design', {}).get('id') != 'build-bound-bootstrap-with-public-project-json':
+    if contract.get('selected_design', {}).get('id') != 'compact-build-bound-bootstrap-with-public-project-json':
         errors.append('catalogue delivery selected design is not canonical')
     if contract.get('canonical_truth', {}).get('records') != 'catalog/projects/*.json':
         errors.append('canonical CommonProject source boundary changed')
@@ -201,7 +285,7 @@ def validate(root: Path = ROOT, warnings: list[str] | None = None) -> list[str]:
         if forbidden in app:
             errors.append(f'runtime must not refetch the canonical catalogue at startup: {forbidden}')
     if "dataset.catalogDelivery = 'build-bound-bootstrap'" not in app:
-        errors.append('runtime does not declare build-bound catalogue delivery')
+        errors.append('runtime does not declare build-bound compact catalogue delivery')
 
     baseline = evidence.get('baseline', {})
     optimized = evidence.get('optimized', {})
@@ -319,10 +403,12 @@ def validate(root: Path = ROOT, warnings: list[str] | None = None) -> list[str]:
     }
     if len(surface_hashes) != 1 or binding.get('first_party_surface_sha256') not in surface_hashes:
         errors.append('public browser smoke evidence is stale for the first-party surface')
-    for required_scenario in ('startup-and-ring-orbits', CATALOGUE_NETWORK_BLOCKED_SCENARIO, 'provider-failure', 'method-mobile', 'method-desktop'):
+    for required_scenario in ('startup-and-ring-orbits', CATALOGUE_NETWORK_BLOCKED_SCENARIO, BOOTSTRAP_ASSET_FAILURE_SCENARIO, POST_RENDER_FAILURE_SCENARIO, 'provider-failure', 'method-mobile', 'method-desktop'):
         if smoke_scenarios.get(required_scenario, {}).get('verdict') != 'PASS':
             errors.append(f'public browser smoke missing PASS scenario: {required_scenario}')
     errors.extend(validate_blocked_catalog_requests(smoke_scenarios, 'public browser smoke'))
+    errors.extend(validate_bootstrap_asset_failure_fallback(smoke_scenarios, 'public browser smoke', static['entry_count']))
+    errors.extend(validate_post_render_failure_fallback(smoke_scenarios, 'public browser smoke', static['entry_count']))
 
     browser = optimized.get('browser', {})
     if browser.get('cpu_throttle_rate') != 4:
@@ -374,8 +460,13 @@ def validate(root: Path = ROOT, warnings: list[str] | None = None) -> list[str]:
     ):
         if token not in options:
             errors.append(f'catalogue delivery option comparison missing: {token}')
-    if static['html']['noscript_catalogs'] != 1 or static['html']['catalog_card_instances'] != static['entry_count'] * 2:
-        errors.append('generated interactive and no-JavaScript catalogue projections are incomplete')
+    if (
+        static['html']['static_fallback_catalogs'] != 1
+        or static['html']['noscript_elements'] != 0
+        or static['html']['catalog_card_instances'] != static['entry_count']
+        or static['html']['interactive_catalog_cards'] != 0
+    ):
+        errors.append('generated static fallback catalogue must be complete exactly once in ordinary DOM, without a duplicate noscript catalogue or static interactive cards')
     return errors
 
 

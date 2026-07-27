@@ -11,7 +11,7 @@ Commonworld trennt Anwendung, Katalogwahrheit und öffentliche Projektion.
 - **Rust/Axum** liefert dieselben öffentlichen, sichtbarkeitsgeprüften Projektionen als API und Snapshot-Exporter.
 - **Immutable statische Snapshots** bleiben der primäre Commonworld-Lesepfad und können über GitHub Pages oder später ein CDN ausgeliefert werden.
 
-Der öffentliche Browser erhält nur veröffentlichte Daten. Der Übergangspfad liefert weiterhin den buildgebundenen vollständigen Bootstrap; zusätzlich lädt die Runtime ein kleines Aggregat, genau den Shard einer ausgewählten Identität und danach genau deren hashadressiertes Detail im Shadow-Modus. Der Shadow-Pfad ersetzt keine sichtbaren Daten.
+Der öffentliche Browser erhält nur veröffentlichte Daten. Der Übergangspfad liefert den kompakten buildgebundenen Bootstrap; zusätzlich lädt die Runtime ein kleines Aggregat, genau den Shard einer ausgewählten Identität und danach genau deren hashadressiertes Detail im Shadow-Modus. Der Shadow-Pfad ersetzt keine sichtbaren Daten.
 
 ## Warum diese Grundlage zum Weltgewebe passt
 
@@ -74,7 +74,7 @@ Der Browser implementiert bewusst keine zweite vollständige JSON-Schema-Engine.
 6. `schema_version: 4` und begrenzte Top-Level-Form,
 7. ausgewählte Identität,
 8. exakte Parität der kompakten Projektion,
-9. exakte Parität mit dem buildgebundenen kanonischen Datensatz im Shadow-Modus.
+9. transitive Parität zum kompakten buildgebundenen Datensatz über denselben geprüften Compact Record.
 
 Die Byte- und Hashbindung macht die vollständige CI-Schemavalidierung transportwirksam. Ein Fehler oder Mismatch ersetzt niemals den sichtbaren Bootstrap.
 
@@ -91,7 +91,7 @@ Für die ausgewählte Identität veröffentlicht die Stage getrennte Shard- und 
 
 Der Shardcache ist auf 8, der Detailcache auf 16 Einträge begrenzt. Beide verwenden deterministische LRU-Verdrängung. Fehlgeschlagene Promises werden entfernt und können erneut geladen werden. Ein Generationswechsel leert beide Caches. Ein gemeinsamer Auswahlzähler verhindert, dass verspätete Antworten eine neuere Auswahl überschreiben.
 
-Bei einem Detailfehler bleiben Titel, Zusammenfassung, Links, Quellen, Karte, Suche und Textansicht aus dem kompatiblen Bootstrap nutzbar. Eine sichtbare, lokalisierte Wiederholungsaktion verwirft beide Shadow-Caches, lädt Manifest und Aggregat frisch und verifiziert danach Shard und Detail der weiterhin ausgewählten Identität erneut. Damit kann sie sowohl einen transienten Plattformausfall als auch einen gestaffelten Snapshot-Rollout überwinden. Nach erfolgreicher Wiederholung wird der Tastaturfokus auf einen sichtbaren Kontext zurückgeführt.
+Bei einem Detailfehler bleiben Titel, Zusammenfassung, Links, Quellen, Karte, Suche und Textansicht aus dem kompakten Bootstrap nutzbar. Eine sichtbare, lokalisierte Wiederholungsaktion verwirft beide Shadow-Caches, lädt Manifest und Aggregat frisch und verifiziert danach Shard und Detail der weiterhin ausgewählten Identität erneut. Damit kann sie sowohl einen transienten Plattformausfall als auch einen gestaffelten Snapshot-Rollout überwinden. Nach erfolgreicher Wiederholung wird der Tastaturfokus auf einen sichtbaren Kontext zurückgeführt.
 
 ## Skalierungsweg
 
@@ -123,7 +123,7 @@ Die Messung ist synthetisch. Sie belegt Payload, lokale Parsegröße und Shardgr
 3. Verborgene Orte bleiben ohne rekonstruierte Geometrie.
 4. Eine Manifestgeneration bindet Quellkatalog, Detailmenge und relevante Schemaverträge.
 5. Ein Manifest verweist nur auf Artefakte, deren Hash und Größe es oder ein generationsgebundener Sharddescriptor festlegt.
-6. Ein fehlgeschlagener Shadow-Leseweg lässt den buildgebundenen vollständigen Datensatz aktiv.
+6. Ein fehlgeschlagener Shadow-Leseweg lässt den kompakten buildgebundenen Datensatz und die vollständige statische Recovery-Liste aktiv.
 7. Suche und Karte verwenden dieselbe zulässige Kandidatenmenge.
 8. Schnelle Auswahlwechsel dürfen keine ältere Antwort auf den aktuellen Fokus anwenden.
 9. Erfolgreiche Shadow-Parität autorisiert weder Bootstrap-Entfernung noch Deployment oder physischen Geräte-Cutover.
@@ -132,7 +132,7 @@ Die Messung ist synthetisch. Sie belegt Payload, lokale Parsegröße und Shardgr
 
 Der Bootstrap darf erst entfernt werden, wenn alle folgenden Punkte an demselben geprüften Stand belegt sind:
 
-- kompakte Shard- und vollständige Detailparität,
+- kompakte Shardparität sowie hash-, schema- und compact-gebundene Detailparität,
 - deutsche und englische Darstellung,
 - Deep-Link-, Vor-/Zurück- und No-JavaScript-Parität,
 - Offline-, Integritäts-, Netzwerk-, Retry- und Stale-Response-Fälle,

@@ -191,6 +191,7 @@ SHELL_REPLACEMENTS_EN = {
     '<option value="verified">Verifiziert</option>': '<option value="verified">Verified</option>',
     '<option value="featured">Hervorgehoben</option>': '<option value="featured">Featured</option>',
     '>Filter zurücksetzen</button>': '>Reset filters</button>',
+    '>Erneut prüfen</button>': '>Verify again</button>',
     '>Keine Commons entsprechen dieser Suche und Filterkombination.</p>': '>No Commons match this search and filter combination.</p>',
     'aria-label="Rangfolge der Commons-Suchergebnisse"': 'aria-label="Ranked Commons search results"',
     '>Alle Treffer in der Textansicht anzeigen</button>': '>Show all results in the text view</button>',
@@ -266,8 +267,8 @@ SHELL_REPLACEMENTS_EN = {
     '<section><h3>Offizielle Links</h3>': '<section><h3>Official links</h3>',
     '<section><h3>Quellen</h3>': '<section><h3>Sources</h3>',
     '<section><h3>Kuration</h3>': '<section><h3>Curation</h3>',
-    '<h1 id="noscript-title">Commonworld ohne JavaScript</h1>': '<h1 id="noscript-title">Commonworld without JavaScript</h1>',
-    'Der Globus benötigt JavaScript. Alle geprüften Commons und ihre Daten bleiben hier erreichbar.': 'The globe requires JavaScript. All reviewed Commons and their data remain accessible here.',
+    '<h1 id="static-catalog-fallback-title">Commonworld-Katalog</h1>': '<h1 id="static-catalog-fallback-title">Commonworld catalog</h1>',
+    'Der vollständige lineare Katalog bleibt hier erreichbar, während die interaktive Ansicht lädt oder nicht verfügbar ist.': 'The complete linear catalog remains available here while the interactive view is loading or unavailable.',
 }
 
 METHOD_REPLACEMENTS_EN = {

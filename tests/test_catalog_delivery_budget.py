@@ -4,9 +4,11 @@ import tempfile
 import unittest
 from pathlib import Path
 
-from scripts.measure_catalog_delivery import measure
+from scripts.measure_catalog_delivery import load_bootstrap_records, measure
 from scripts.validate_catalog_delivery_budget import (
+    BOOTSTRAP_ASSET_FAILURE_SCENARIO,
     CATALOGUE_NETWORK_BLOCKED_SCENARIO,
+    POST_RENDER_FAILURE_SCENARIO,
     ROOT,
     validate,
     validate_actual_smoke,
@@ -58,12 +60,7 @@ class CatalogDeliveryBudgetTests(unittest.TestCase):
     def test_current_delivery_stays_within_contract(self) -> None:
         warnings: list[str] = []
         self.assertEqual([], validate(ROOT, warnings))
-        self.assertEqual(
-            [
-                'bootstrap gzip bytes entered warning range: actual=31568, warn=28672, max=32768'
-            ],
-            warnings,
-        )
+        self.assertEqual([], warnings)
 
     def test_static_measurement_preserves_single_truth_and_no_startup_refetch(self) -> None:
         metrics = measure(ROOT)
@@ -71,8 +68,26 @@ class CatalogDeliveryBudgetTests(unittest.TestCase):
         self.assertEqual(manifest['entry_count'], metrics['entry_count'])
         self.assertEqual(0, metrics['runtime_verification_fetch']['project_request_count'])
         self.assertEqual(0, metrics['runtime_verification_fetch']['duplicate_identity_payload_count'])
-        self.assertEqual(metrics['entry_count'] * 2, metrics['html']['catalog_card_instances'])
-        self.assertEqual(1, metrics['html']['noscript_catalogs'])
+        self.assertEqual(metrics['entry_count'], metrics['html']['catalog_card_instances'])
+        self.assertEqual(1, metrics['html']['static_fallback_catalogs'])
+        self.assertEqual(0, metrics['html']['noscript_elements'])
+        _, bootstrap_records = load_bootstrap_records(
+            ROOT / 'assets/commonworld-bootstrap-catalog.mjs'
+        )
+        self.assertTrue(bootstrap_records)
+        self.assertTrue(
+            all(record.get('curation', {}).get('state') for record in bootstrap_records),
+            'compact bootstrap must preserve curation.state for the public filter',
+        )
+        self.assertTrue(
+            all('handoff' not in record for record in bootstrap_records),
+            'compact bootstrap must omit non-interactive handoff metadata',
+        )
+        relations = [relation for record in bootstrap_records for relation in record.get('relations', [])]
+        self.assertGreater(len(relations), 0)
+        self.assertTrue(all(set(relation) == {'target_id', 'type', 'evidenced'} for relation in relations))
+        self.assertTrue(all(relation['evidenced'] is True for relation in relations))
+        self.assertTrue(all('source_ids' not in relation and 'note' not in relation for relation in relations))
 
     def test_measure_rejects_stale_bootstrap_content(self) -> None:
         with tempfile.TemporaryDirectory() as tmp:
@@ -82,7 +97,7 @@ class CatalogDeliveryBudgetTests(unittest.TestCase):
             bootstrap_path.write_text(
                 bootstrap.replace('Commons', 'Veraltete Projektion', 1), encoding='utf-8'
             )
-            with self.assertRaisesRegex(ValueError, 'do not match canonical CommonProject content'):
+            with self.assertRaisesRegex(ValueError, 'do not match the canonical compact CommonProject projection'):
                 measure(root)
 
     def test_validator_rejects_committed_smoke_catalogue_request(self) -> None:
@@ -151,6 +166,70 @@ class CatalogDeliveryBudgetTests(unittest.TestCase):
         )['blockedCatalogRequests'] = 2
         errors = validate_actual_smoke(actual, expected)
         self.assertIn('fresh public browser smoke observed 2 runtime catalogue request(s)', errors)
+
+    def test_fresh_smoke_rejects_incomplete_bootstrap_failure_fallback(self) -> None:
+        expected = self.fresh_smoke()
+        actual = json.loads(json.dumps(expected))
+        scenario = next(item for item in actual['scenarios'] if item['id'] == BOOTSTRAP_ASSET_FAILURE_SCENARIO)
+        scenario['fallbackCatalogCards'] -= 1
+        errors = validate_actual_smoke(actual, expected)
+        self.assertTrue(any('bootstrap fallback catalog is incomplete' in error for error in errors))
+
+    def test_fresh_smoke_rejects_invalid_blocked_bootstrap_count(self) -> None:
+        expected = self.fresh_smoke()
+        actual = json.loads(json.dumps(expected))
+        scenario = next(item for item in actual['scenarios'] if item['id'] == BOOTSTRAP_ASSET_FAILURE_SCENARIO)
+        scenario['blockedBootstrapRequests'] = 0
+        errors = validate_actual_smoke(actual, expected)
+        self.assertIn('fresh public browser smoke expected exactly one blocked bootstrap request, got 0', errors)
+
+    def test_fresh_smoke_rejects_non_neutral_bootstrap_failure_copy(self) -> None:
+        expected = self.fresh_smoke()
+        actual = json.loads(json.dumps(expected))
+        scenario = next(item for item in actual['scenarios'] if item['id'] == BOOTSTRAP_ASSET_FAILURE_SCENARIO)
+        scenario['neutralRecoveryCopy'] = False
+        errors = validate_actual_smoke(actual, expected)
+        self.assertIn('fresh public browser smoke bootstrap fallback does not prove neutral recovery copy', errors)
+
+    def test_fresh_smoke_rejects_missing_bootstrap_fragment_reveal(self) -> None:
+        expected = self.fresh_smoke()
+        actual = json.loads(json.dumps(expected))
+        scenario = next(item for item in actual['scenarios'] if item['id'] == BOOTSTRAP_ASSET_FAILURE_SCENARIO)
+        scenario['targetRecoveryVisible'] = False
+        errors = validate_actual_smoke(actual, expected)
+        self.assertIn('fresh public browser smoke bootstrap failure fragment does not immediately reveal the recovery catalog', errors)
+
+    def test_fresh_smoke_rejects_delayed_bootstrap_fragment_reveal(self) -> None:
+        expected = self.fresh_smoke()
+        actual = json.loads(json.dumps(expected))
+        scenario = next(item for item in actual['scenarios'] if item['id'] == BOOTSTRAP_ASSET_FAILURE_SCENARIO)
+        scenario['targetRecoveryAnimationName'] = 'static-catalog-fallback-reveal'
+        errors = validate_actual_smoke(actual, expected)
+        self.assertIn('fresh public browser smoke bootstrap failure fragment reveal still depends on delayed animation', errors)
+
+    def test_fresh_smoke_rejects_mutated_post_render_fallback(self) -> None:
+        expected = self.fresh_smoke()
+        actual = json.loads(json.dumps(expected))
+        scenario = next(item for item in actual['scenarios'] if item['id'] == POST_RENDER_FAILURE_SCENARIO)
+        scenario['hiddenFallbackCatalogCards'] = 17
+        errors = validate_actual_smoke(actual, expected)
+        self.assertIn('fresh public browser smoke post-render failure fallback hides 17 card(s)', errors)
+
+    def test_fresh_smoke_rejects_wrong_post_render_skip_focus(self) -> None:
+        expected = self.fresh_smoke()
+        actual = json.loads(json.dumps(expected))
+        scenario = next(item for item in actual['scenarios'] if item['id'] == POST_RENDER_FAILURE_SCENARIO)
+        scenario['skipFocusId'] = 'text-view'
+        errors = validate_actual_smoke(actual, expected)
+        self.assertIn('fresh public browser smoke post-render failure skip handler does not focus the recovery catalog', errors)
+
+    def test_fresh_smoke_rejects_missing_post_render_skip_reveal(self) -> None:
+        expected = self.fresh_smoke()
+        actual = json.loads(json.dumps(expected))
+        scenario = next(item for item in actual['scenarios'] if item['id'] == POST_RENDER_FAILURE_SCENARIO)
+        scenario['skipActivatedRecovery'] = False
+        errors = validate_actual_smoke(actual, expected)
+        self.assertIn('fresh public browser smoke post-render failure skip handler does not reveal the recovery catalog', errors)
 
     def test_validator_rejects_deliberate_bootstrap_budget_breach(self) -> None:
         with tempfile.TemporaryDirectory() as tmp:

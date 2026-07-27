@@ -181,21 +181,22 @@ def validate_current_state(root: Path = ROOT) -> list[str]:
     catalog_delivery = state.get("catalog_delivery", {})
     expected_catalog_delivery = {
         "contract": "contracts/commonworld/catalog-delivery-budget.contract.json",
-        "design": "build_bound_full_bootstrap_with_generation_bound_selected_detail_shadow",
+        "design": "compact_build_bound_bootstrap_with_generation_bound_selected_detail_shadow",
         "canonical_records": "catalog/projects/*.json",
         "startup_project_json_requests": 0,
         "runtime_catalogue_parity_check": True,
         "runtime_catalogue_parity_scope": "selected_identity_compact_shard_and_generation_bound_detail_shadow",
-        "runtime_catalogue_visible_source": "build_bound_bootstrap",
+        "runtime_catalogue_visible_source": "compact_build_bound_bootstrap",
         "runtime_catalogue_detail_loading": True,
         "runtime_catalogue_detail_strategy": "content_addressed_shard_descriptor",
         "runtime_catalogue_cache_limits": {"shards": 8, "details": 16},
         "runtime_catalogue_selection_states": ["idle", "loading", "retrying", "ready", "mismatch", "degraded"],
-        "runtime_catalogue_failure_policy": "keep_compatible_bootstrap",
+        "runtime_catalogue_failure_policy": "keep_compact_bootstrap",
+        "bootstrap_asset_failure_policy": "keep_generated_linear_catalogue",
         "runtime_catalogue_retry_policy": "reload_platform_and_clear_shadow_caches",
         "runtime_catalogue_cutover_authorized": False,
         "build_and_ci_catalogue_parity_check": True,
-        "no_javascript_projection": "generated_static_catalogue_preserved",
+        "no_javascript_projection": "generated_static_catalogue_preserved_until_successful_interactive_start",
         "redesign_trigger": "measured_transfer_parse_or_dom_budget_not_entry_count_alone",
     }
     if catalog_delivery != expected_catalog_delivery:
@@ -231,10 +232,10 @@ def validate_current_state(root: Path = ROOT) -> list[str]:
     ):
         errors.append("catalog platform and current state disagree on fresh retry policy")
     if (
-        transition.get("aggregate_failure_policy") != "keep_compatible_bootstrap_and_mark_degraded"
-        or transition.get("shard_failure_policy") != "keep_compatible_bootstrap_and_mark_selected_identity_degraded"
-        or transition.get("detail_failure_policy") != "keep_compatible_bootstrap_and_offer_selected_identity_fresh_platform_retry"
-        or catalog_delivery.get("runtime_catalogue_failure_policy") != "keep_compatible_bootstrap"
+        transition.get("aggregate_failure_policy") != "keep_compact_bootstrap_and_mark_degraded"
+        or transition.get("shard_failure_policy") != "keep_compact_bootstrap_and_mark_selected_identity_degraded"
+        or transition.get("detail_failure_policy") != "keep_compact_bootstrap_and_offer_selected_identity_fresh_platform_retry"
+        or catalog_delivery.get("runtime_catalogue_failure_policy") != "keep_compact_bootstrap"
     ):
         errors.append("catalog platform and current state disagree on runtime fallback policy")
 
@@ -243,6 +244,8 @@ def validate_current_state(root: Path = ROOT) -> list[str]:
         errors.append("catalog platform detail strategy mismatch")
     if detail_projection.get("mutable_identity_path_for_runtime_loading") is not False:
         errors.append("catalog runtime detail path must be immutable and content-addressed")
+    if transition.get("selected_detail_parity") != "content_addressed_schema_boundary_and_compact_projection_parity":
+        errors.append("catalog platform selected-detail parity boundary mismatch")
     detail_boundary = catalog_platform.get("detail_validation_boundary", {})
     if detail_boundary.get("browser_reimplements_complete_json_schema") is not False:
         errors.append("catalog browser boundary must not claim a complete JSON Schema reimplementation")
@@ -260,6 +263,9 @@ def validate_current_state(root: Path = ROOT) -> list[str]:
         "observeCatalogPlatform({ retryIdentifier: identifier, forceRefresh: true })",
         "dataset.catalogDelivery = 'build-bound-bootstrap'",
         "catalogDetailShadow",
+        "document.querySelector('#text-skip-link')",
+        "textSkipLink.setAttribute('href', '#text-view')",
+        "document.querySelector('[data-static-catalog-fallback]')?.remove()",
     )
     for token in required_runtime_tokens:
         if token not in app:

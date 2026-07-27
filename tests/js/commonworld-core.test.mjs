@@ -1377,9 +1377,14 @@ test('only evidenced relations to known identities are projected', () => {
     target_project_id: 'freifunk',
     target_title: 'Freifunk',
     relation_type: 'chapter-of',
-    source_ids: ['api'],
-    note: 'Lokale Freifunk-Community.',
+    evidenced: true,
   }]);
+
+  const compactRecords = structuredClone(presenceAxisRecords);
+  compactRecords[2].relations = [{ type: 'chapter-of', target_id: 'freifunk', evidenced: true }];
+  assert.deepEqual(evidencedRelations(compactRecords), relations);
+  assert.equal('source_ids' in relations[0], false);
+  assert.equal('note' in relations[0], false);
 });
 
 test('semantic zoom remains presentation logic from planet to focus', () => {

@@ -2,53 +2,54 @@
   "schema_version": 1,
   "kind": "commonworld_catalog_delivery_benchmark_evidence",
   "task_id": "COMMONWORLD-PUBLIC-GLOBE-V1-T027",
-  "base_commit": "68102b0575f4101e6a4275983094d33ec78a3b20",
+  "base_commit": "47b6e82c6e359dda1b03737ab45de0dbbca8f794",
   "measurement_method": {
     "static": "scripts/measure_catalog_delivery.py; deterministic raw and gzip sizes, generated/canonical identity parity, HTML tag counts and source-level startup fetch detection.",
     "browser": "scripts/measure_catalog_delivery_browser.mjs; isolated local no-store server, external requests blocked, Chromium profiles at fourfold CPU throttling.",
     "timing_boundary": "Timing values are representative observations, not a claimed deterministic speedup. Request and byte reductions are the primary causal evidence.",
-    "baseline_static_scope": "Same-current-catalogue deterministic counterfactual: current generated bootstrap plus the legacy manifest and one project JSON refetch per current identity.",
+    "baseline_static_scope": "Same-current-catalogue deterministic counterfactual: current compact generated bootstrap plus the legacy manifest and one project JSON refetch per current identity.",
     "baseline_browser_scope": "Historical 41-entry pre-optimization browser observation retained for request and timing context only; it is not a same-catalogue performance counterfactual."
   },
   "baseline": {
     "static": {
       "schema_version": 1,
       "kind": "commonworld_catalog_delivery_static_metrics",
-      "entry_count": 58,
-      "identity_order_sha256": "0e2a4cc68b7c8f27e9929e17ed30e358feb707ca96a2553da2cf9175dbe3d166",
+      "entry_count": 65,
+      "identity_order_sha256": "a057f746c2f8ddbceecbbe92bb893970b4b3e9a66beaf99e8763169537c4f74d",
       "bootstrap": {
-        "raw_bytes": 171781,
-        "gzip_bytes": 31568,
-        "raw_bytes_per_record": 2961.74,
-        "gzip_bytes_per_record": 544.28
+        "raw_bytes": 105072,
+        "gzip_bytes": 20132,
+        "raw_bytes_per_record": 1616.49,
+        "gzip_bytes_per_record": 309.72
       },
       "canonical_projects": {
-        "file_count": 58,
-        "raw_bytes": 220599,
-        "gzip_bytes_individual_files": 74341
+        "file_count": 65,
+        "raw_bytes": 253813,
+        "gzip_bytes_individual_files": 85721
       },
       "manifest": {
-        "raw_bytes": 3603,
-        "gzip_bytes": 1217
+        "raw_bytes": 3884,
+        "gzip_bytes": 1297
       },
       "html": {
-        "raw_bytes": 195604,
-        "gzip_bytes": 24313,
-        "start_tag_count": 2131,
-        "catalog_card_instances": 116,
-        "interactive_catalog_cards": 58,
-        "noscript_catalogs": 1
+        "raw_bytes": 115075,
+        "gzip_bytes": 16415,
+        "start_tag_count": 1296,
+        "catalog_card_instances": 65,
+        "interactive_catalog_cards": 0,
+        "static_fallback_catalogs": 1,
+        "noscript_elements": 0
       },
       "runtime_verification_fetch": {
         "enabled": true,
-        "project_request_count": 58,
-        "duplicate_identity_payload_count": 58,
-        "raw_bytes": 224202,
-        "gzip_bytes": 75558
+        "project_request_count": 65,
+        "duplicate_identity_payload_count": 65,
+        "raw_bytes": 257697,
+        "gzip_bytes": 87018
       },
       "catalog_initial_delivery": {
-        "raw_bytes": 395983,
-        "gzip_bytes": 107126
+        "raw_bytes": 362769,
+        "gzip_bytes": 107150
       }
     },
     "browser": {
@@ -252,30 +253,31 @@
     "static": {
       "schema_version": 1,
       "kind": "commonworld_catalog_delivery_static_metrics",
-      "entry_count": 58,
-      "identity_order_sha256": "0e2a4cc68b7c8f27e9929e17ed30e358feb707ca96a2553da2cf9175dbe3d166",
+      "entry_count": 65,
+      "identity_order_sha256": "a057f746c2f8ddbceecbbe92bb893970b4b3e9a66beaf99e8763169537c4f74d",
       "bootstrap": {
-        "raw_bytes": 171781,
-        "gzip_bytes": 31568,
-        "raw_bytes_per_record": 2961.74,
-        "gzip_bytes_per_record": 544.28
+        "raw_bytes": 105072,
+        "gzip_bytes": 20132,
+        "raw_bytes_per_record": 1616.49,
+        "gzip_bytes_per_record": 309.72
       },
       "canonical_projects": {
-        "file_count": 58,
-        "raw_bytes": 220599,
-        "gzip_bytes_individual_files": 74341
+        "file_count": 65,
+        "raw_bytes": 253813,
+        "gzip_bytes_individual_files": 85721
       },
       "manifest": {
-        "raw_bytes": 3603,
-        "gzip_bytes": 1217
+        "raw_bytes": 3884,
+        "gzip_bytes": 1297
       },
       "html": {
-        "raw_bytes": 195949,
-        "gzip_bytes": 24411,
-        "start_tag_count": 2134,
-        "catalog_card_instances": 116,
-        "interactive_catalog_cards": 58,
-        "noscript_catalogs": 1
+        "raw_bytes": 115075,
+        "gzip_bytes": 16415,
+        "start_tag_count": 1296,
+        "catalog_card_instances": 65,
+        "interactive_catalog_cards": 0,
+        "static_fallback_catalogs": 1,
+        "noscript_elements": 0
       },
       "runtime_verification_fetch": {
         "enabled": false,
@@ -285,14 +287,14 @@
         "gzip_bytes": 0
       },
       "catalog_initial_delivery": {
-        "raw_bytes": 171781,
-        "gzip_bytes": 31568
+        "raw_bytes": 105072,
+        "gzip_bytes": 20132
       }
     },
     "browser": {
       "schema_version": 1,
       "kind": "commonworld_catalog_delivery_browser_metrics",
-      "measured_at": "2026-07-26T11:33:19.100Z",
+      "measured_at": "2026-07-26T19:41:55.597Z",
       "cpu_throttle_rate": 4,
       "profiles": [
         {
@@ -302,47 +304,47 @@
             "height": 844
           },
           "cpu_throttle_rate": 4,
-          "runtime_ready_ms": 713,
-          "dom_node_count": 2032,
-          "catalog_card_count": 58,
-          "interactive_catalog_card_count": 58,
+          "runtime_ready_ms": 737,
+          "dom_node_count": 1581,
+          "catalog_card_count": 48,
+          "interactive_catalog_card_count": 48,
           "runtime_ready": true,
           "runtime_failed": false,
-          "dom_content_loaded_ms": 439.80000000074506,
-          "load_event_ms": 469.19999999925494,
+          "dom_content_loaded_ms": 483.6000000014901,
+          "load_event_ms": 515.3999999985099,
           "resource_count": 16,
-          "script_duration_ms": 539.39,
-          "task_duration_ms": 1003.33,
+          "script_duration_ms": 481.07,
+          "task_duration_ms": 988.96,
           "bootstrap_compile": {
-            "median_ms": 0.30000000074505806,
-            "p95_ms": 1.0999999977648258,
+            "median_ms": 0.30000000447034836,
+            "p95_ms": 0.8999999985098839,
             "samples_ms": [
               0,
-              0,
-              0,
-              0,
-              0,
-              0.09999999776482582,
               0.10000000149011612,
               0.10000000149011612,
-              0.19999999925494194,
-              0.30000000074505806,
-              0.30000000074505806,
+              0.10000000149011612,
+              0.10000000149011612,
+              0.10000000149011612,
+              0.10000000149011612,
+              0.20000000298023224,
+              0.20000000298023224,
+              0.29999999701976776,
+              0.30000000447034836,
               0.3999999985098839,
-              0.5999999977648258,
-              0.6000000014901161,
-              0.6999999992549419,
-              0.8000000007450581,
-              0.8000000007450581,
-              0.8000000007450581,
-              0.8000000007450581,
-              1.0999999977648258,
-              2.699999999254942
+              0.5,
+              0.5,
+              0.5999999940395355,
+              0.6999999955296516,
+              0.7000000029802322,
+              0.7999999970197678,
+              0.8999999985098839,
+              0.8999999985098839,
+              2.6999999955296516
             ]
           },
           "first_party_request_count": 15,
           "first_party_unique_request_count": 15,
-          "first_party_raw_bytes": 1995605,
+          "first_party_raw_bytes": 1853240,
           "first_party_requests": [
             "/",
             "/assets/commonworld-app.js",
@@ -360,7 +362,7 @@
             "/catalog/runtime/manifest.v1.json",
             "/index.css"
           ],
-          "first_party_surface_sha256": "98dc9460984858e1e7a90048ca85c320da57946ae4de02f6bb0d44bcb0361dd1",
+          "first_party_surface_sha256": "cce8b27986971d50a2804575ca4e47e2b84d50175c9eb6ffdda9e7d79a57db86",
           "project_json_request_count": 0,
           "project_json_unique_request_count": 0,
           "project_json_requests": []
@@ -372,47 +374,47 @@
             "height": 768
           },
           "cpu_throttle_rate": 4,
-          "runtime_ready_ms": 724,
-          "dom_node_count": 2032,
-          "catalog_card_count": 58,
-          "interactive_catalog_card_count": 58,
+          "runtime_ready_ms": 713,
+          "dom_node_count": 1581,
+          "catalog_card_count": 48,
+          "interactive_catalog_card_count": 48,
           "runtime_ready": true,
           "runtime_failed": false,
-          "dom_content_loaded_ms": 424.19999999925494,
-          "load_event_ms": 459.5,
+          "dom_content_loaded_ms": 439.20000000298023,
+          "load_event_ms": 471.20000000298023,
           "resource_count": 16,
-          "script_duration_ms": 584.75,
-          "task_duration_ms": 1011.36,
+          "script_duration_ms": 536.3,
+          "task_duration_ms": 935.89,
           "bootstrap_compile": {
-            "median_ms": 0.7999999970197678,
-            "p95_ms": 1.199999999254942,
+            "median_ms": 0.5,
+            "p95_ms": 1.1000000014901161,
             "samples_ms": [
-              0.19999999925494194,
-              0.19999999925494194,
-              0.30000000074505806,
+              0,
+              0.09999999403953552,
+              0.10000000149011612,
+              0.10000000149011612,
+              0.10000000149011612,
+              0.20000000298023224,
+              0.20000000298023224,
               0.3999999985098839,
-              0.4000000022351742,
-              0.6000000014901161,
-              0.6999999992549419,
-              0.6999999992549419,
+              0.3999999985098839,
+              0.5,
+              0.5,
+              0.5,
+              0.5999999940395355,
+              0.6999999955296516,
+              0.7000000029802322,
               0.7000000029802322,
               0.7999999970197678,
-              0.7999999970197678,
-              0.8000000007450581,
-              0.8000000007450581,
+              0.8000000044703484,
               0.8999999985098839,
-              0.8999999985098839,
-              0.9000000022351742,
-              0.9000000022351742,
-              1,
-              1.199999999254942,
-              1.199999999254942,
-              1.300000000745058
+              1.1000000014901161,
+              1.3999999985098839
             ]
           },
           "first_party_request_count": 15,
           "first_party_unique_request_count": 15,
-          "first_party_raw_bytes": 1995605,
+          "first_party_raw_bytes": 1853240,
           "first_party_requests": [
             "/",
             "/assets/commonworld-app.js",
@@ -430,7 +432,7 @@
             "/catalog/runtime/manifest.v1.json",
             "/index.css"
           ],
-          "first_party_surface_sha256": "98dc9460984858e1e7a90048ca85c320da57946ae4de02f6bb0d44bcb0361dd1",
+          "first_party_surface_sha256": "cce8b27986971d50a2804575ca4e47e2b84d50175c9eb6ffdda9e7d79a57db86",
           "project_json_request_count": 0,
           "project_json_unique_request_count": 0,
           "project_json_requests": []
@@ -443,36 +445,36 @@
       "profiles": {
         "mobile-low-power": {
           "runtime_ready_ms": {
+            "min": 737,
+            "median": 737,
+            "max": 737
+          },
+          "script_duration_ms": {
+            "min": 481.07,
+            "median": 481.07,
+            "max": 481.07
+          },
+          "task_duration_ms": {
+            "min": 988.96,
+            "median": 988.96,
+            "max": 988.96
+          }
+        },
+        "desktop-low-power": {
+          "runtime_ready_ms": {
             "min": 713,
             "median": 713,
             "max": 713
           },
           "script_duration_ms": {
-            "min": 539.39,
-            "median": 539.39,
-            "max": 539.39
+            "min": 536.3,
+            "median": 536.3,
+            "max": 536.3
           },
           "task_duration_ms": {
-            "min": 1003.33,
-            "median": 1003.33,
-            "max": 1003.33
-          }
-        },
-        "desktop-low-power": {
-          "runtime_ready_ms": {
-            "min": 724,
-            "median": 724,
-            "max": 724
-          },
-          "script_duration_ms": {
-            "min": 584.75,
-            "median": 584.75,
-            "max": 584.75
-          },
-          "task_duration_ms": {
-            "min": 1011.36,
-            "median": 1011.36,
-            "max": 1011.36
+            "min": 935.89,
+            "median": 935.89,
+            "max": 935.89
           }
         }
       },
@@ -480,41 +482,40 @@
     }
   },
   "delta": {
-    "startup_project_json_requests": -58,
-    "duplicate_identity_payload_count": -58,
-    "catalog_initial_raw_bytes": -224202,
-    "catalog_initial_gzip_bytes": -75558,
-    "catalog_initial_raw_reduction_percent": 56.6,
-    "catalog_initial_gzip_reduction_percent": 70.5,
+    "startup_project_json_requests": -65,
+    "duplicate_identity_payload_count": -65,
+    "catalog_initial_raw_bytes": -257697,
+    "catalog_initial_gzip_bytes": -87018,
+    "catalog_initial_raw_reduction_percent": 71.0,
+    "catalog_initial_gzip_reduction_percent": 81.2,
     "first_party_request_count_by_profile": {
       "mobile-low-power": -36,
       "desktop-low-power": -36
     },
     "browser_dom_nodes_by_profile": {
-      "mobile-low-power": 345,
-      "desktop-low-power": 345
+      "mobile-low-power": -106,
+      "desktop-low-power": -106
     }
   },
-  "selected_design": "build-bound-bootstrap-with-public-project-json",
+  "selected_design": "compact-build-bound-bootstrap-with-generation-bound-selected-detail-shadow",
   "preserved": [
-    "canonical CommonProject files remain unchanged and authoritative",
-    "public manifest and per-project JSON remain addressable",
-    "generated interactive HTML cards remain available",
-    "generated no-JavaScript catalogue remains available",
+    "canonical CommonProject files remain authoritative",
+    "public manifest, runtime snapshots, compact shards and content-addressed project details remain addressable",
+    "compact interactive bootstrap retains search, filter, focus, action, source-link and evidence fields",
+    "complete static recovery catalogue remains available until successful interactive startup",
     "GitHub Pages static delivery and privacy boundary remain unchanged"
   ],
   "does_not_establish": [
     "that one timing sample proves a speedup",
-    "that duplicate generated HTML should be removed now",
+    "that the historical 41-entry browser baseline and current 65-entry browser observation isolate catalogue-growth effects",
+    "that selected shard and detail parity permits bootstrap removal or detail-path cutover",
     "that a backend is required",
-    "that the historical 41-entry browser baseline and current 58-entry browser observation isolate catalogue-growth effects",
-    "that selected shard parity permits bootstrap removal or detail-path cutover",
     "future performance after further catalogue growth"
   ],
   "validation": {
     "public_browser_smoke": {
       "verdict": "PASS",
-      "scenario_count": 32,
+      "scenario_count": 34,
       "scenario_ids": [
         "startup-and-ring-orbits",
         "ring-orbits-reduced-motion",
@@ -544,35 +545,26 @@
         "catalogue-platform-retry",
         "catalogue-detail-retry",
         "catalogue-detail-stale-response",
+        "bootstrap-asset-failure-fallback",
+        "post-render-failure-preserves-fallback",
         "provider-failure",
         "method-desktop",
         "method-mobile",
         "method-mobile-text-200"
       ],
-      "catalogue_network_blocked_requests": 0,
-      "catalogue_platform_retry_manifest_attempts": 2,
-      "catalogue_detail_retry_attempts": 2,
-      "durable_job_id": "85dd5b2571e3",
-      "finalization_receipt_sha256": "d0a943cdb76162f8e951ae7e6313023758fa108a79a8cd918978324ba0dc5f37",
-      "result_sha256": "e86a28d3d1176c2ffcac204e2535de398bc956977db6171d9dd0e207915e2e7c"
+      "evidence_sha256": "0be15588fb9eedb9c44a094f60cc0a8986b0c3d62b5469e6d88a098df8aed32c",
+      "scenario_execution_job_id": "284a25256fbb",
+      "scenario_execution_receipt_sha256": "84ebb71150dd8fd575db15af596aa8fc9046bcb496255cc61ae1630c3dc48c78",
+      "scenario_execution_note": "All browser scenarios passed; the wrapper then correctly rejected stale committed measurement evidence."
     },
     "proposal_browser_smoke": {
-      "verdict": "PASS",
-      "durable_task_id": "fa6c4e1affbc",
-      "lifecycle_receipt_sha256": "7453571544985ea9d1893002821df0d5b2cacfcb520ab0f9730e1d58a1ea2185",
-      "covered_by": "official_browser_runner"
+      "verdict": "PENDING_FINAL_RUN"
     },
     "focus_overlay_browser_smoke": {
-      "verdict": "PASS",
-      "durable_task_id": "fa6c4e1affbc",
-      "lifecycle_receipt_sha256": "7453571544985ea9d1893002821df0d5b2cacfcb520ab0f9730e1d58a1ea2185",
-      "covered_by": "official_browser_runner"
+      "verdict": "PENDING_FINAL_RUN"
     },
     "accessibility_modes_browser_smoke": {
-      "verdict": "PASS",
-      "durable_task_id": "fa6c4e1affbc",
-      "lifecycle_receipt_sha256": "7453571544985ea9d1893002821df0d5b2cacfcb520ab0f9730e1d58a1ea2185",
-      "covered_by": "official_browser_runner"
+      "verdict": "PENDING_FINAL_RUN"
     },
     "catalog_delivery_browser_measurement": {
       "verdict": "PASS",
@@ -581,32 +573,26 @@
         "desktop-low-power"
       ],
       "cpu_throttle_rate": 4,
-      "durable_task_id": "643b6e4ecf35466d96c60704",
-      "lifecycle_receipt_sha256": "d8f723efece9938833dcab87a116abcfaa1a7178d720ad6987e74af4d902330b",
-      "result_sha256": "814b4d33c2ebac6730d6b3c478af5110dc799af7abea3a838eefcb1a8d619b79"
+      "durable_job_id": "f916a0a6b973",
+      "finalization_receipt_sha256": "3e3ee64012123a1bf353514987f22ce81de433838f5a73722e5803ddb3c6a4bf",
+      "result_sha256": "d2a4096b75b95ddd6d968ce4553eec409050aba1a81d64f6bf2f0a5dd24ed5d2"
     },
     "official_browser_runner": {
-      "verdict": "PASS",
-      "covers": [
-        "public-browser-smoke",
-        "proposal-browser-smoke",
-        "focus-overlay-browser-smoke",
-        "accessibility-modes-browser-smoke"
-      ],
-      "durable_task_id": "fa6c4e1affbc",
-      "lifecycle_receipt_sha256": "7453571544985ea9d1893002821df0d5b2cacfcb520ab0f9730e1d58a1ea2185"
+      "verdict": "PENDING_FINAL_RUN"
     },
     "catalog_delivery_static_measurement": {
       "verdict": "PASS",
-      "durable_task_id": "49b29b199efc48fdb5ce7f43",
-      "lifecycle_receipt_sha256": "2578ed0dd93f334b7237bb08f77e9a4349bfe8be1268d7e56d672bf437c00ea1",
-      "result_sha256": "fe138b3ef4e7e9fa3cb2788a59d6c588365a54fcbd10d34727644c431520f374"
+      "command": "python3 scripts/measure_catalog_delivery.py --output .pr144-final-static-metrics.json",
+      "result_sha256": "c1201d9ea2214a05d915dd65eb9d413396db8f1a7b7f65f416099fc5dcdfc681"
+    },
+    "full_validation": {
+      "verdict": "PENDING_FINAL_RUN"
     }
   },
   "budget_binding": {
-    "bootstrap_gzip_bytes": 31568,
+    "bootstrap_gzip_bytes": 20132,
     "warn_bootstrap_gzip_bytes": 28672,
     "max_bootstrap_gzip_bytes": 32768
   },
-  "current_surface_note": "Catalog Platform v1 loads manifest and aggregate at startup, then verifies one selected compact shard and one content-addressed detail artifact in shadow mode. Explicit retry clears both shadow caches and reloads manifest, aggregate, selected shard and selected detail. Visible data remains the build-bound bootstrap; platform failure, detail failure, retry recovery and stale-response isolation are browser-proven on the final generated shell, and startup performs zero canonical project JSON requests."
+  "current_surface_note": "The 65-record surface uses a compact build-bound bootstrap plus an independent complete static recovery catalogue. Every local browser-module edge is bound to the SHA-256 prefix of the dependency bytes it loads. Manifest and aggregate load at startup; only the selected compact shard and content-addressed detail are verified in shadow mode. Hash, schema and compact-projection parity are browser-proven; explicit retry refreshes the whole selected path; startup performs zero canonical project JSON requests."
 }

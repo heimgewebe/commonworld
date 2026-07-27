@@ -1,6 +1,6 @@
-import { BOOTSTRAP_RECORDS } from './commonworld-bootstrap-catalog.mjs';
-import { createCatalogLoadCache, loadCatalogAggregate, loadCatalogDetail, loadCatalogShard, shardKeyForIdentity } from './commonworld-catalog-runtime.mjs';
-import { actionLabel, documentLocale, localizeCatalogRecords, text as i18nText, themeLabel } from './commonworld-i18n.mjs';
+import { BOOTSTRAP_RECORDS } from './commonworld-bootstrap-catalog.mjs?v=d7bd72164a68';
+import { createCatalogLoadCache, loadCatalogAggregate, loadCatalogDetail, loadCatalogShard, shardKeyForIdentity } from './commonworld-catalog-runtime.mjs?v=5954690ce64b';
+import { actionLabel, documentLocale, localizeCatalogRecords, text as i18nText, themeLabel } from './commonworld-i18n.mjs?v=e7db362a7f96';
 import {
   COMMONS_TYPE_COLOR_TOKENS,
   COMMONS_TYPE_VALUES,
@@ -49,7 +49,7 @@ import {
   sphereOpacityForGlobeRatio,
   stateFromSearch,
   visibleDigitalNodes,
-} from './commonworld-core.mjs';
+} from './commonworld-core.mjs?v=e1eac1e9a382';
 
 const LOCALE = documentLocale();
 const t = (key, germanFallback, variables = {}) => i18nText(LOCALE, key, germanFallback, variables);
@@ -603,7 +603,7 @@ async function observeCatalogRecordShadow(identifier = runtime.state.project, { 
       setCatalogDetailShadowState('mismatch', { identifier, key });
       warnCatalogShadowOnce(
         `${runtime.catalogPlatform.manifest.generation}:${identifier}:compact-mismatch`,
-        `Commonworld catalog shard parity mismatch for ${identifier}; compatible bootstrap remains active`,
+        `Commonworld catalog shard parity mismatch for ${identifier}; compact bootstrap remains active`,
       );
       return;
     }
@@ -614,7 +614,8 @@ async function observeCatalogRecordShadow(identifier = runtime.state.project, { 
     if (observation !== runtime.catalogRecordShadowGeneration || runtime.state.project !== identifier) return;
     const detailParity = detail.identity === identifier
       && canonical
-      && stableComparisonJson(detail.record) === stableComparisonJson(canonical);
+      && stableComparisonJson(compactProjectionFromCanonical(detail.record))
+        === stableComparisonJson(compactProjectionFromCanonical(canonical));
     if (detailParity) {
       setCatalogDetailShadowState('ready', { identifier, key, detailUrl: detail.detailUrl });
       return;
@@ -622,7 +623,7 @@ async function observeCatalogRecordShadow(identifier = runtime.state.project, { 
     setCatalogDetailShadowState('mismatch', { identifier, key, detailUrl: detail.detailUrl });
     warnCatalogShadowOnce(
       `${runtime.catalogPlatform.manifest.generation}:${identifier}:detail-mismatch`,
-      `Commonworld catalog detail parity mismatch for ${identifier}; compatible bootstrap remains active`,
+      `Commonworld catalog detail parity mismatch for ${identifier}; compact bootstrap remains active`,
     );
   } catch (error) {
     if (observation !== runtime.catalogRecordShadowGeneration || runtime.state.project !== identifier) return;
@@ -630,7 +631,7 @@ async function observeCatalogRecordShadow(identifier = runtime.state.project, { 
     setCatalogDetailShadowState('degraded', { identifier, key });
     warnCatalogShadowOnce(
       `${runtime.catalogPlatform?.manifest?.generation ?? 'unavailable'}:${identifier}:${shardReady ? 'detail' : 'shard'}-degraded`,
-      `Commonworld catalog ${shardReady ? 'detail' : 'shard'} unavailable for ${identifier}; compatible bootstrap remains active`,
+      `Commonworld catalog ${shardReady ? 'detail' : 'shard'} unavailable for ${identifier}; compact bootstrap remains active`,
       error,
     );
   }
@@ -2329,7 +2330,7 @@ function renderTextView() {
   for (const record of presented) {
     if (!catalog?.querySelector(`.catalog-card[data-commonproject-id="${CSS.escape(record.id)}"]`)) catalog?.append(createRuntimeCatalogCard(record));
   }
-  document.querySelectorAll('.catalog-card[data-commonproject-id]').forEach((card) => {
+  catalog?.querySelectorAll('.catalog-card[data-commonproject-id]').forEach((card) => {
     card.hidden = !visibleIds.has(card.dataset.commonprojectId);
   });
   for (const record of presented) {
@@ -3377,6 +3378,14 @@ function activateSphereFallbackClick(event) {
 
 function wireControls() {
   elements.skipLink.addEventListener('click', (event) => {
+    const recoveryCatalog = document.querySelector('[data-static-catalog-fallback]');
+    if (recoveryCatalog) {
+      event.preventDefault();
+      recoveryCatalog.dataset.skipActivated = 'true';
+      recoveryCatalog.focus({ preventScroll: true });
+      recoveryCatalog.scrollIntoView({ block: 'start' });
+      return;
+    }
     event.preventDefault();
     setPresentation('text');
     elements.textView.focus({ preventScroll: true });
@@ -3775,7 +3784,7 @@ async function observeCatalogPlatform({ retryIdentifier = null, forceRefresh = f
       ? retryIdentifier
       : runtime.state.project;
     void observeCatalogRecordShadow(selectedIdentifier);
-    console.warn('Commonworld catalog aggregate unavailable; compatible bootstrap remains active', error);
+    console.warn('Commonworld catalog aggregate unavailable; compact bootstrap remains active', error);
   }
 }
 
@@ -3813,6 +3822,12 @@ async function boot() {
     }
     applyDeepLink(location.search, { initial: true });
     renderDiscoveryState();
+    if (navigator.webdriver && ['127.0.0.1', 'localhost'].includes(location.hostname)) {
+      window.__commonworldBeforeRecoveryRemovalForTest?.();
+    }
+    const textSkipLink = document.querySelector('#text-skip-link');
+    if (textSkipLink) textSkipLink.setAttribute('href', '#text-view');
+    document.querySelector('[data-static-catalog-fallback]')?.remove();
     void loadCountryBoundaries().catch((error) => {
       elements.stage.dataset.countryMapState = 'failed';
       console.warn('Commonworld country composition layer unavailable', error);

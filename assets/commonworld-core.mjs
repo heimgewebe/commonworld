@@ -1,5 +1,5 @@
-import { COMMONWORLD_EN_LOCALE } from './commonworld-en-locale.mjs';
-import { FALLBACK_LOCALE, normalizeLocale } from './commonworld-i18n.mjs';
+import { COMMONWORLD_EN_LOCALE } from './commonworld-en-locale.mjs?v=797f602e0c88';
+import { FALLBACK_LOCALE, normalizeLocale } from './commonworld-i18n.mjs?v=e7db362a7f96';
 
 export const DEFAULT_CAMERA = Object.freeze({
   lng: 8,
@@ -2027,15 +2027,16 @@ function buildEvidencedRelations(records, recordsById) {
   for (const record of records) {
     for (const relation of Array.isArray(record?.relations) ? record.relations : []) {
       const target = recordsById.get(relation?.target_id);
-      if (!target || !Array.isArray(relation?.source_ids) || relation.source_ids.length === 0) continue;
+      const sourceIds = Array.isArray(relation?.source_ids) ? relation.source_ids : [];
+      const evidenced = relation?.evidenced === true || sourceIds.length > 0;
+      if (!target || !evidenced) continue;
       relations.push(Object.freeze({
         source_project_id: record.id,
         source_title: record.title ?? record.id,
         target_project_id: target.id,
         target_title: target.title ?? target.id,
         relation_type: relation.type,
-        source_ids: Object.freeze([...relation.source_ids]),
-        note: relation.note ?? '',
+        evidenced: true,
       }));
     }
   }

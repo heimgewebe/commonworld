@@ -1,6 +1,4 @@
 {
-  "schema_version": 1,
-  "kind": "commonworld_catalog_delivery_public_browser_smoke_evidence",
   "verdict": "PASS",
   "scenarios": [
     {
@@ -9,7 +7,7 @@
       "directGlobeProjection": true,
       "hiddenUntilCalibrated": true,
       "outerHintRemoved": true,
-      "aggregateRingIdentities": 43,
+      "aggregateRingIdentities": 45,
       "movingRingMatrix": true,
       "unchangedGeometryRepaintSkipped": true
     },
@@ -56,8 +54,8 @@
     {
       "id": "intent-search-discovery",
       "verdict": "PASS",
-      "indexedRecords": 58,
-      "rankedGermanIntentResults": 34,
+      "indexedRecords": 65,
+      "rankedGermanIntentResults": 36,
       "filters": 7,
       "digitalCoordinateFree": true,
       "spatialNavigation": true
@@ -98,9 +96,9 @@
     {
       "id": "dual-presence-axes",
       "verdict": "PASS",
-      "publicFeatures": 118,
-      "publicIdentities": 32,
-      "digitalIdentities": 43,
+      "publicFeatures": 120,
+      "publicIdentities": 33,
+      "digitalIdentities": 45,
       "unchangedMapUpdatesSkipped": true
     },
     {
@@ -122,7 +120,7 @@
     {
       "id": "layer-journey-moveend-return",
       "verdict": "PASS",
-      "elapsedMs": 1663
+      "elapsedMs": 2042
     },
     {
       "id": "layer-journey-interrupted",
@@ -219,6 +217,27 @@
       "detailRequests": 2
     },
     {
+      "id": "bootstrap-asset-failure-fallback",
+      "verdict": "PASS",
+      "blockedBootstrapRequests": 1,
+      "fallbackCatalogCards": 65,
+      "hiddenFallbackCatalogCards": 0,
+      "neutralRecoveryCopy": true,
+      "skipLinkHref": "#static-catalog-fallback",
+      "targetRecoveryHash": "#static-catalog-fallback",
+      "targetRecoveryVisible": true,
+      "targetRecoveryAnimationName": "none"
+    },
+    {
+      "id": "post-render-failure-preserves-fallback",
+      "verdict": "PASS",
+      "fallbackCatalogCards": 65,
+      "hiddenFallbackCatalogCards": 0,
+      "skipLinkHref": "#static-catalog-fallback",
+      "skipFocusId": "static-catalog-fallback",
+      "skipActivatedRecovery": true
+    },
+    {
       "id": "provider-failure",
       "verdict": "PASS",
       "applicationWarnings": 1
@@ -237,9 +256,9 @@
     }
   ],
   "binding": {
-    "smoke_script_sha256": "151f83d3972d0202c3cf73606e56158523c394a77f1564f0a1883b914535b683",
+    "smoke_script_sha256": "68cb15afde0a62f392b7f580812f1c1ea3ee9c5de14bc196d7a19f9bd11c6191",
     "smoke_runner_sha256": "522b99b70b1d0064b1d0a31a3a67fdc9a2e73b7408f37d1a4bb303bc360b7556",
-    "first_party_surface_sha256": "98dc9460984858e1e7a90048ca85c320da57946ae4de02f6bb0d44bcb0361dd1",
+    "smoke_plan_sha256": "6b8749928ead5ef81ee66883e6a2993e756ce083575c3569234bf70526448364",
     "scenario_ids": [
       "startup-and-ring-orbits",
       "ring-orbits-reduced-motion",
@@ -269,12 +288,13 @@
       "catalogue-platform-retry",
       "catalogue-detail-retry",
       "catalogue-detail-stale-response",
+      "bootstrap-asset-failure-fallback",
+      "post-render-failure-preserves-fallback",
       "provider-failure",
       "method-desktop",
       "method-mobile",
       "method-mobile-text-200"
     ],
-    "freshness_rule": "The official runner must materialize the canonical smoke plan, create a fresh temporary public result and validate exact scenario order, PASS verdicts, manifest-plus-aggregate startup observation, selected-identity shard and content-addressed detail parity, fresh-platform retry after manifest or detail failure, stale-response isolation and zero forbidden canonical project requests against this hash-bound evidence.",
-    "smoke_plan_sha256": "6b8749928ead5ef81ee66883e6a2993e756ce083575c3569234bf70526448364"
+    "first_party_surface_sha256": "cce8b27986971d50a2804575ca4e47e2b84d50175c9eb6ffdda9e7d79a57db86"
   }
 }

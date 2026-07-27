@@ -41,10 +41,11 @@
       "detail_descriptor_version"
     ],
     "manifest_integrity_descriptors": [
-      "world_index_sha256",
-      "aggregate_sha256",
-      "shards_sha256",
-      "detail_payload_sha256"
+      "world_index.sha256",
+      "aggregate.sha256",
+      "shards.entries[].sha256",
+      "details.detail_set_sha256",
+      "shard.records[].detail.sha256"
     ],
     "atomic_activation_required": true
   },
@@ -115,7 +116,7 @@
     "ann_hnsw"
   ],
   "browser_transition": {
-    "current_visible_catalog": "build_bound_bootstrap",
+    "current_visible_catalog": "compact_build_bound_bootstrap",
     "shadow_runtime_observation": {
       "aggregate_manifest": true,
       "selected_identity_shard": true,
@@ -129,9 +130,9 @@
       "mismatch",
       "degraded"
     ],
-    "aggregate_failure_policy": "keep_compatible_bootstrap_and_mark_degraded",
-    "shard_failure_policy": "keep_compatible_bootstrap_and_mark_selected_identity_degraded",
-    "detail_failure_policy": "keep_compatible_bootstrap_and_offer_selected_identity_fresh_platform_retry",
+    "aggregate_failure_policy": "keep_compact_bootstrap_and_mark_degraded",
+    "shard_failure_policy": "keep_compact_bootstrap_and_mark_selected_identity_degraded",
+    "detail_failure_policy": "keep_compact_bootstrap_and_offer_selected_identity_fresh_platform_retry",
     "stale_response_policy": "selection_generation_must_match_before_state_commit",
     "selected_identity_parity_fields": [
       "id",
@@ -144,7 +145,7 @@
       "digital_presence",
       "public_geographic_presence"
     ],
-    "selected_detail_parity": "exact_canonical_record_after_integrity_and_runtime_boundary_checks",
+    "selected_detail_parity": "content_addressed_schema_boundary_and_compact_projection_parity",
     "cutover_authorized": false,
     "cutover_gate": [
       "compact_and_detail_parity",

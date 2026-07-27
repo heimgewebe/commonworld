@@ -77,6 +77,16 @@ class CurrentStateTests(unittest.TestCase):
         self.assertIn("catalog platform shadow-observation truth mismatch", errors)
         self.assertIn("catalog platform and current state disagree on detail loading", errors)
 
+    def test_catalog_delivery_rejects_incompatible_detail_parity_boundary(self) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            root = self.copy_current_state(directory)
+            path = root / "contracts/commonworld/catalog-platform.contract.json"
+            value = json.loads(path.read_text(encoding="utf-8"))
+            value["browser_transition"]["selected_detail_parity"] = "unbound_detail"
+            path.write_text(json.dumps(value), encoding="utf-8")
+            errors = validate_current_state(root)
+        self.assertIn("catalog platform selected-detail parity boundary mismatch", errors)
+
     def test_catalog_delivery_rejects_runtime_implementation_drift(self) -> None:
         with tempfile.TemporaryDirectory() as directory:
             root = self.copy_current_state(directory)

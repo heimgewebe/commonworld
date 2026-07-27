@@ -1,4 +1,4 @@
-import { COMMONWORLD_EN_LOCALE } from './commonworld-en-locale.mjs';
+import { COMMONWORLD_EN_LOCALE } from './commonworld-en-locale.mjs?v=797f602e0c88';
 
 export const SUPPORTED_LOCALES = Object.freeze(['en', 'de']);
 export const DEFAULT_LOCALE = 'en';
