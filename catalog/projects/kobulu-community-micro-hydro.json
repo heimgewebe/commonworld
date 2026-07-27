@@ -45,12 +45,13 @@
     }
   },
   "activity": {
-    "status": "unknown",
-    "observed_at": "2026-07-24",
+    "status": "active",
+    "observed_at": "2026-07-27",
     "source_ids": [
-      "source-kobulu-tonibung"
+      "source-kobulu-green-empowerment-2026",
+      "source-kobulu-sabah-re2"
     ],
-    "note": "Die offizielle Quelle belegt Fertigstellung, Nutzung und gemeinschaftliche Verwaltung im Jahr 2019, enthält aber keinen zeitnahen Nachweis des heutigen Betriebszustands."
+    "note": "Zwei primärnahe Projektpartnerquellen beschreiben Buayan 2026 als weiterhin gemeinschaftlich betriebenes und gewartetes Mikrowasserkraftsystem sowie als aktiven Erprobungsort für Smart-Grid-Technik."
   },
   "provenance": {
     "sources": [
@@ -69,16 +70,32 @@
         "url": "https://www.geonames.org/advanced-search.html?country=MY&q=Penampang",
         "retrieved_at": "2026-07-24",
         "note": "Öffentliches Georegister für einen groben Verwaltungsbezug; nicht als Anlagenstandort verwendet."
+      },
+      {
+        "id": "source-kobulu-green-empowerment-2026",
+        "type": "official-source",
+        "label": "Malaysia 2026 Trip — Green Empowerment",
+        "url": "https://greenempowerment.org/malaysia2026/",
+        "retrieved_at": "2026-07-27",
+        "note": "Primärnahe Quelle des langjährigen Projektpartners: Buayan habe das Mikrowasserkraftsystem seit mehr als zehn Jahren verwaltet und gewartet und erprobe als Partner im Programm Smart Grid for Small Grids weiterhin neue Technik."
+      },
+      {
+        "id": "source-kobulu-sabah-re2",
+        "type": "official-source",
+        "label": "Sabah RE2 Roadmap — Power to the People Part 6",
+        "url": "https://www.sabahre2roadmap.org/energy-roadmap",
+        "retrieved_at": "2026-07-27",
+        "note": "Offizielle Konsortialquelle: Kampung Buayan werde seit mehr als zehn Jahren durch Mikrowasserkraft versorgt und trage das System als gemeinschaftlich verwaltetes erneuerbares Mini-Netz."
       }
     ],
-    "uncertainty_note": "Der öffentliche Projekttext und das Georegister verwenden unterschiedliche räumliche Granularitäten. Deshalb zeigt Commonworld nur den groben Raum Penampang und keinen scheinpräzisen Anlagenpunkt."
+    "uncertainty_note": "Der öffentliche Projekttext und das Georegister verwenden unterschiedliche räumliche Granularitäten. Deshalb zeigt Commonworld nur den groben Raum Penampang und keinen scheinpräzisen Anlagenpunkt. Neuere Quellen bestätigen den laufenden Betrieb, widersprechen sich aber teilweise bei Leistung und Ausbauzeitachse; diese Angaben bleiben bis zur separaten Nachprüfung unverändert."
   },
   "curation": {
     "state": "listed",
     "reviewed_by": "Commonworld editorial review",
-    "reviewed_at": "2026-07-24",
-    "next_review_at": "2026-08-24",
-    "notes": "Aktueller Betriebszustand nicht zeitnah verifiziert; priorisierte Nachprüfung bis 2026-08-24. Aufgenommen ist die belegte gemeinschaftliche Verwaltungsstruktur der Energieanlage, nicht ein zeitnah bestätigter laufender Betrieb."
+    "reviewed_at": "2026-07-27",
+    "next_review_at": "2026-08-27",
+    "notes": "Der laufende gemeinschaftliche Betrieb ist durch zwei aktuelle primärnahe Partnerquellen revalidiert. Leistung und Ausbauzeitachse bleiben wegen widersprüchlicher Angaben bis zur separaten Nachprüfung unverändert; der Kartenpunkt bezeichnet weder Anlage noch Leitungen, Haushalte oder private Grundstücke."
   },
   "links": [
     {
@@ -92,6 +109,14 @@
       "url": "https://tonibung.org/projects",
       "source_ids": [
         "source-kobulu-tonibung"
+      ]
+    },
+    {
+      "type": "source",
+      "label": "Aktuellen Betriebsnachweis bei Green Empowerment lesen",
+      "url": "https://greenempowerment.org/malaysia2026/",
+      "source_ids": [
+        "source-kobulu-green-empowerment-2026"
       ]
     }
   ],
