@@ -3,6 +3,8 @@
 
 from __future__ import annotations
 
+import copy
+import importlib.util
 import json
 import sys
 from pathlib import Path
@@ -11,6 +13,7 @@ ROOT = Path(__file__).resolve().parents[1]
 CONTRACT_PATH = ROOT / "contracts" / "commonworld" / "catalog-scale-gates.contract.json"
 EVIDENCE_PATH = ROOT / "docs" / "evidence" / "catalog-platform-scaling-v1.json"
 CURRENT_STATE_PATH = ROOT / "contracts" / "commonworld" / "current-state.contract.json"
+MEASUREMENT_GENERATOR_PATH = ROOT / "scripts" / "measure_catalog_platform_scaling.py"
 
 REQUIRED_GATES = [
     "realistic-scale-fixtures",
@@ -36,12 +39,38 @@ def expected_shard_state(size: int, warn: int, maximum: int) -> str:
     return "pass"
 
 
-def validate_catalog_scale_gates(root: Path = ROOT) -> list[str]:
+def deterministic_projection(value: dict) -> dict:
+    projected = copy.deepcopy(value)
+    measurements = projected.get("measurements", [])
+    if isinstance(measurements, list):
+        for measurement in measurements:
+            if isinstance(measurement, dict):
+                world_index = measurement.get("world_index")
+                if isinstance(world_index, dict):
+                    world_index.pop("parse_ms_median", None)
+    return projected
+
+
+def recompute_deterministic_evidence(root: Path) -> dict:
+    generator_path = root / MEASUREMENT_GENERATOR_PATH.relative_to(ROOT)
+    spec = importlib.util.spec_from_file_location("commonworld_catalog_scale_measurement", generator_path)
+    if spec is None or spec.loader is None:
+        raise RuntimeError("unable to load catalogue scale measurement generator")
+    module = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(module)
+    build_result = getattr(module, "build_result", None)
+    if not callable(build_result):
+        raise RuntimeError("catalogue scale measurement generator has no build_result")
+    return build_result(include_parse_timing=False)
+
+
+def validate_catalog_scale_gates(root: Path = ROOT, *, verify_measurements: bool = True) -> list[str]:
     errors: list[str] = []
     paths = [
         root / CONTRACT_PATH.relative_to(ROOT),
         root / EVIDENCE_PATH.relative_to(ROOT),
         root / CURRENT_STATE_PATH.relative_to(ROOT),
+        root / MEASUREMENT_GENERATOR_PATH.relative_to(ROOT),
     ]
     for path in paths:
         if not path.is_file():
@@ -72,6 +101,8 @@ def validate_catalog_scale_gates(root: Path = ROOT) -> list[str]:
         errors.append("catalogue scale tiers must remain 1k, 10k and 100k stress")
     if measurement_contract.get("synthetic_only") is not True:
         errors.append("catalogue scale contract must disclose synthetic-only evidence")
+    if measurement_contract.get("generator") != "scripts/measure_catalog_platform_scaling.py":
+        errors.append("catalogue scale contract generator path mismatch")
 
     budgets = contract.get("budgets", {})
     expected_budget_keys = {
@@ -129,6 +160,9 @@ def validate_catalog_scale_gates(root: Path = ROOT) -> list[str]:
         gates = item.get("gate_evaluation", {})
         world_gzip = world.get("gzip_bytes")
         shard_gzip = shards.get("gzip_max_bytes")
+        parse_ms = world.get("parse_ms_median")
+        if not isinstance(parse_ms, (int, float)) or parse_ms < 0:
+            errors.append(f"{count}: invalid representative parse timing")
         if not isinstance(world_gzip, int) or world_gzip <= 0:
             errors.append(f"{count}: invalid world-index gzip size")
         elif isinstance(initial_max, int):
@@ -160,6 +194,15 @@ def validate_catalog_scale_gates(root: Path = ROOT) -> list[str]:
     if decision.get("fixed_prefix_stress_state") != "warning":
         errors.append("catalogue scaling decision must expose fixed-prefix stress warning")
 
+    if verify_measurements:
+        try:
+            recomputed = recompute_deterministic_evidence(root)
+        except Exception as error:  # noqa: BLE001 - validation must report generator failures as evidence failures.
+            errors.append(f"catalogue scaling evidence could not be recomputed: {error}")
+        else:
+            if deterministic_projection(evidence) != recomputed:
+                errors.append("catalogue scaling evidence deterministic measurement drift")
+
     authorization = contract.get("current_authorization", {})
     delivery = current_state.get("catalog_delivery", {})
     if authorization.get("cutover_authorized") is not False:
@@ -189,7 +232,7 @@ def main() -> int:
         for error in errors:
             print(f"- {error}", file=sys.stderr)
         return 1
-    print("Catalogue scale gate validation passed: 1k and 10k pass, 100k fixed-prefix stress warning retained, cutover unauthorized.")
+    print("Catalogue scale gate validation passed: deterministic 1k and 10k payloads pass, 100k fixed-prefix stress warning retained, cutover unauthorized.")
     return 0
 
 
