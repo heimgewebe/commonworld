@@ -628,7 +628,8 @@ def validate_public_maplibre_vertical_slice(root: Path = ROOT) -> list[str]:
         "renderSphereRibbons(runtime.records);",
         "renderLayerDeck();",
         "new Map(allRecords.map((record) => [record.id, record]))",
-        "for (const record of records) content.append(createRibbonSegment(record, { inlineDetails: identityLevel }));",
+        "for (const record of records) content.append(createRibbonSegment(record));",
+        "function selectDigitalProject",
         "renderLayerProjectDetail(view);",
         "!usesInlineLayerProjectDetail(record)",
     ):
