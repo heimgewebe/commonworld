@@ -217,6 +217,14 @@ class SecurityPolicyTests(unittest.TestCase):
             with self.assertRaisesRegex(RuntimeError, "socket timeout"):
                 github_api_get_private_reporting("heimgewebe/commonworld")
 
+    def test_expiry_live_readback_runs_even_when_policy_validation_fails(self) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            root = self.copy_surface(directory)
+            path = root / ".github/workflows/security-policy-expiry.yml"
+            path.write_text(path.read_text(encoding="utf-8").replace("        id: security_setting\n        if: always()\n", "        id: security_setting\n"), encoding="utf-8")
+            errors = validate_security_policy(root, now=self.NOW)
+        self.assertIn("security expiry workflow is incomplete: PVR readback step must use if: always()", errors)
+
 
 if __name__ == "__main__":
     unittest.main()

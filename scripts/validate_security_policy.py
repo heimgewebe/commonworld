@@ -195,7 +195,10 @@ def validate_security_policy(root: Path = ROOT, now: datetime | None = None) -> 
     for marker in expiry_markers:
         if marker not in expiry_workflow_text:
             errors.append(f"security expiry workflow is incomplete: {marker}")
-    if "GITHUB_TOKEN" in expiry_workflow_text or "github.token" in expiry_workflow_text:
+    expiry_security_step = expiry_workflow_text.split("- name: Verify private vulnerability reporting remains enabled", 1)[-1].split("- name: Upload scheduled security receipt", 1)[0]
+    if "if: always()" not in expiry_security_step:
+        errors.append("security expiry workflow is incomplete: PVR readback step must use if: always()")
+    if "GITHUB_TOKEN" in expiry_security_step or "github.token" in expiry_security_step:
         errors.append("scheduled private reporting readback must use the public endpoint without an Actions token")
     return errors
 
