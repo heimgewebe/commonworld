@@ -36,22 +36,30 @@ patch_css = '''def patch_css() -> None:
 
 """
     css = css[:start] + mobile_focus + css[end:]
-    dead_rule = re.compile(
-        r'(?ms)^[ \\t]*(?:'
-        r'\\.layer-project-detail(?:-title|-summary)?|'
-        r'\\.project-detail-header|'
-        r'\\.project-detail-grid|'
-        r'\\.layer-panel \\.layer-projects\\[hidden\\]|'
-        r'\\.globe-stage\\[data-focused-path\\] \\.layer-panel \\.layer-projects:not\\(\\[hidden\\]\\)'
-        r')\\s*\\{[^{}]*\\}\\n?'
+    dead_markers = (
+        '.layer-project-detail',
+        '.project-detail-header',
+        '.project-detail-grid',
+        '.layer-panel .layer-projects',
     )
-    css = dead_rule.sub('', css)
-    css = css.replace(""".layer-panel .layer-projects[hidden] {
-  display: none;
-}
-
-""", '')
-    css = re.sub(r'\\n{3,}', '\\n\\n', css)
+    lines = css.splitlines(keepends=True)
+    kept = []
+    index = 0
+    while index < len(lines):
+        stripped = lines[index].strip()
+        if stripped.endswith('{') and any(marker in stripped for marker in dead_markers):
+            depth = 0
+            while index < len(lines):
+                depth += lines[index].count('{') - lines[index].count('}')
+                index += 1
+                if depth == 0:
+                    break
+            continue
+        kept.append(lines[index])
+        index += 1
+    css = ''.join(kept)
+    while chr(10) * 3 in css:
+        css = css.replace(chr(10) * 3, chr(10) * 2)
     for forbidden in ('.layer-project-detail', '.project-detail-', '.layer-panel .layer-projects'):
         if forbidden in css:
             raise SystemExit(f'CSS still contains orphaned detail selector: {forbidden}')
