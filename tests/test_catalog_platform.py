@@ -84,13 +84,46 @@ def test_shards_are_complete_manifest_bound_and_carry_current_detail_descriptors
     assert sorted(seen) == sorted(record["id"] for record in world["records"])
 
 
-def test_scaling_evidence_rejects_100k_full_start_index_and_bounds_demand_shards():
+def test_scaling_evidence_binds_1k_10k_cutover_tiers_and_100k_prefix_warning():
+    contract = json.loads((ROOT / "contracts/commonworld/catalog-scale-gates.contract.json").read_text(encoding="utf-8"))
     evidence = json.loads((ROOT / "docs/evidence/catalog-platform-scaling-v1.json").read_text(encoding="utf-8"))
     measurements = {item["entry_count"]: item for item in evidence["measurements"]}
-    assert measurements[100_000]["world_index"]["gzip_bytes"] > 1_000_000
-    assert measurements[100_000]["shards"]["gzip_max_bytes"] < 32_768
-    assert evidence["decision"]["single_world_index_for_100k"] == "rejected"
+    budgets = contract["budgets"]
+
+    assert contract["task_id"] == "COMMONWORLD-PUBLIC-GLOBE-V1-T028"
+    assert contract["measurement"]["scale_tiers"] == [1_000, 10_000]
+    assert contract["measurement"]["stress_tier"] == 100_000
+    assert set(measurements) == {1_000, 10_000, 100_000}
+    assert evidence["budgets"] == {
+        "initial_world_index_max_gzip_bytes": budgets["initial_world_index_max_gzip_bytes"],
+        "shard_warn_gzip_bytes": budgets["shard_warn_gzip_bytes"],
+        "shard_max_gzip_bytes": budgets["shard_max_gzip_bytes"],
+    }
+
+    for count in (1_000, 10_000):
+        assert measurements[count]["world_index"]["gzip_bytes"] > budgets["initial_world_index_max_gzip_bytes"]
+        assert measurements[count]["gate_evaluation"] == {
+            "world_index_initial_delivery": "rejected",
+            "shard_gzip": "pass",
+        }
+        assert measurements[count]["shards"]["gzip_max_bytes"] < budgets["shard_warn_gzip_bytes"]
+
+    stress = measurements[100_000]
+    assert stress["world_index"]["gzip_bytes"] > 1_000_000
+    assert budgets["shard_warn_gzip_bytes"] <= stress["shards"]["gzip_max_bytes"] < budgets["shard_max_gzip_bytes"]
+    assert stress["gate_evaluation"] == {
+        "world_index_initial_delivery": "rejected",
+        "shard_gzip": "warning",
+    }
+    assert evidence["decision"]["full_world_index_initial_delivery"] == "rejected_for_all_measured_tiers"
     assert evidence["decision"]["runtime_path"] == "small aggregate manifest plus demand-loaded shards and details"
+    assert evidence["decision"]["fixed_prefix_stress_state"] == "warning"
+    assert contract["current_authorization"]["cutover_authorized"] is False
+    assert contract["decision_policy"]["backend_by_default"] is False
+
+
+def test_catalog_scale_gate_validator_passes():
+    subprocess.run(["python3", "scripts/validate_catalog_scale_gates.py"], cwd=ROOT, check=True)
 
 
 def test_aggregate_indexes_only_manifest_shards():
