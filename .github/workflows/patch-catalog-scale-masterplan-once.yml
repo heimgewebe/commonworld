@@ -1,0 +1,68 @@
+name: Patch catalog scale masterplan once
+
+on:
+  push:
+    branches:
+      - feat/catalog-scale-gates-v1
+
+permissions:
+  contents: write
+
+jobs:
+  patch:
+    if: github.actor != 'github-actions[bot]'
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          ref: feat/catalog-scale-gates-v1
+          fetch-depth: 0
+      - name: Reconcile canonical scale paragraph
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+
+          path = Path('docs/blueprints/commonworld-masterplan.md')
+          workflow = Path('.github/workflows/patch-catalog-scale-masterplan-once.yml')
+          text = path.read_text(encoding='utf-8')
+          old = (
+              'Die Skalierungsprobe vom 25. Juli 2026 verwirft einen vollständigen '
+              '100.000-Einträge-Weltindex als Startpayload: 1.541.423 Byte gzip und '
+              '804,028 Millisekunden Median-Parsezeit. Eine deterministische '
+              '256-Shard-Projektion begrenzt den größten synthetischen Einzelshard '
+              'auf 7.885 Byte gzip. Der kanonische Ausbaupfad lautet deshalb '
+              'Aggregatmanifest, bedarfsgeladene Shards und Einzelheiten; der '
+              'Vollindex bleibt Export und Prüfartefakt.'
+          )
+          new = (
+              'Die revisionsgebundene Skalierungsprobe vom 27. Juli 2026 macht 1.000 '
+              'und 10.000 Einträge zu den verbindlichen synthetischen '
+              'Vor-Cutover-Stufen. Bereits der vollständige 1.000er-Weltindex '
+              'überschreitet mit 62.845 Byte gzip das 32.768-Byte-Startbudget; bei '
+              '10.000 Einträgen erreicht er 624.128 Byte gzip. Beide Vollindizes '
+              'bleiben deshalb Export- und Prüfartefakte, während die größten '
+              'bedarfsgeladenen Shards mit 1.036 beziehungsweise 4.231 Byte gzip '
+              'deutlich unter der Warnschwelle bleiben.\n\n'
+              'Der 100.000-Einträge-Stresstest erreicht 6.237.810 Byte gzip für den '
+              'Vollindex und 28.683 Byte gzip für den größten von 256 Shards. Damit '
+              'liegt er elf Byte über der Shard-Warnschwelle von 28.672 Byte, aber '
+              'noch unter dem harten Maximum von 32.768 Byte. Vor weiterem Wachstum '
+              'ist deshalb eine kompatible Präfixtiefen-Migration zu belegen; daraus '
+              'folgt weder 100.000er-Produktionsreife noch eine Backend-, PostGIS- '
+              'oder PMTiles-Pflicht ohne gemessenen statischen Engpass. Der '
+              'ausführbare Vor-Cutover-Vertrag liegt in '
+              '`contracts/commonworld/catalog-scale-gates.contract.json`.'
+          )
+          if text.count(old) != 1:
+              raise SystemExit('canonical scale paragraph did not match exactly once')
+          path.write_text(text.replace(old, new), encoding='utf-8')
+          workflow.unlink()
+          PY
+      - name: Commit canonical plan correction
+        run: |
+          git config user.name github-actions[bot]
+          git config user.email 41898282+github-actions[bot]@users.noreply.github.com
+          git add docs/blueprints/commonworld-masterplan.md .github/workflows/patch-catalog-scale-masterplan-once.yml
+          git diff --cached --check
+          git commit -m 'docs(plan): reconcile catalog scale gates'
+          git push origin HEAD:feat/catalog-scale-gates-v1
