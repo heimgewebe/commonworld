@@ -525,7 +525,8 @@ class PublicShellTests(unittest.TestCase):
         self.assertIn("new Map(allRecords.map((record) => [record.id, record]))", app)
         self.assertIn("for (const record of records) content.append(createRibbonSegment(record));", app)
         self.assertIn("function selectDigitalProject", app)
-        self.assertIn("deriveDigitalProjectPath(record)", app)
+        self.assertNotIn("deriveDigitalProjectPath(record)", app)
+        self.assertNotIn("setDigitalPath(derived.path", app)
         self.assertIn("renderLayerProjectDetail(view);", app)
         self.assertIn("selectProject(record.id, { trigger });", app)
         self.assertIn("elements.layerProjects.hidden = true", app)
@@ -535,6 +536,8 @@ class PublicShellTests(unittest.TestCase):
 
     def test_final_digital_lane_uses_only_the_shared_focus_detail(self) -> None:
         app = (ROOT / "assets/commonworld-app.js").read_text(encoding="utf-8")
+        css = (ROOT / "index.css").read_text(encoding="utf-8")
+        i18n = (ROOT / "assets/commonworld-i18n.mjs").read_text(encoding="utf-8")
         html = (ROOT / "index.html").read_text(encoding="utf-8")
         self.assertIn("function renderLayerProjectDetail", app)
         self.assertIn("runtime.layerPreviewProject = null", app)
@@ -545,6 +548,10 @@ class PublicShellTests(unittest.TestCase):
         self.assertIn('id="layer-project-status"', html)
         self.assertNotIn("previewRecord ?? records[0]", app)
         self.assertNotIn("runtime.layerPreviewProject = closingIdentifier", app)
+        self.assertNotIn(".layer-project-detail", css)
+        self.assertNotIn(".project-detail-", css)
+        self.assertNotIn("back_to_bundle", i18n)
+        self.assertNotIn("detail_profile", i18n)
         self.assertIn("document.createElement(identityLevel ? 'header' : 'button')", app)
 
     def test_digital_lane_edges_and_labels_remain_legible(self) -> None:

@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "kind": "commonworld_catalog_delivery_public_browser_smoke_evidence",
+  "kind": "commonworld_public_browser_smoke_evidence",
   "verdict": "PASS",
   "scenarios": [
     {
@@ -122,7 +122,7 @@
     {
       "id": "layer-journey-moveend-return",
       "verdict": "PASS",
-      "elapsedMs": 1440
+      "elapsedMs": 1570
     },
     {
       "id": "layer-journey-interrupted",
@@ -253,9 +253,9 @@
     }
   ],
   "binding": {
-    "smoke_script_sha256": "cd2d23ab925710cf80fe28aec09f72c51ec3ea616553cfcf9690abe59dfe4785",
+    "smoke_script_sha256": "56b06918c834cdd8ab53f5e5e5ed84f0a12d913210eac2bdcb9a60f3bae853e6",
     "smoke_runner_sha256": "522b99b70b1d0064b1d0a31a3a67fdc9a2e73b7408f37d1a4bb303bc360b7556",
-    "first_party_surface_sha256": "b861a0ecf64677bff9c60c4170cdb77d73529226bca25372717aed6612c0ade6",
+    "first_party_surface_sha256": "af9e9750f8f5915d9ffb6480ba43c04dc4b7dd35662667784ef1dbaa65059622",
     "scenario_ids": [
       "startup-and-ring-orbits",
       "ring-orbits-reduced-motion",
@@ -289,12 +289,12 @@
       "method-mobile",
       "method-mobile-text-200"
     ],
-    "freshness_rule": "The official runner must create a fresh public result and validate exact scenario order, PASS verdicts, zero forbidden canonical project requests, selected compact-shard parity, neutral recovery copy, and a complete immutable ordinary-DOM linear catalogue. Bootstrap-module failure must leave fragment navigation sufficient to reveal the recovery catalogue immediately through :target without delayed animation; a later runtime failure must reveal and focus the same catalogue through the installed handler.",
+    "freshness_rule": "The committed smoke result is valid only while all bound hashes and the ordered scenario set match the current repository surface.",
     "smoke_plan_sha256": "6b8749928ead5ef81ee66883e6a2993e756ce083575c3569234bf70526448364"
   },
   "execution": {
-    "job_id": "grabowski-task-ec4cf7e12d6a4b43b2d3628d-a1.service",
-    "finalization_receipt_sha256": "dafed7214ecfda8e072add4aae62f9b11448d3b320f267dc552bb1e193d18d7a",
-    "result_sha256": "a8fa4cfd2baad333d4c082ddfa42b4a6c90ab0ffc5b8446bea6c1c9a3b6b7bb9"
+    "job_id": "grabowski-job-12b363d42db2",
+    "finalization_receipt_sha256": "6ad2f35969943e5c718aedf2125fa3d1914b1565ad14819ced7482116e4713bc",
+    "result_sha256": "6ce88ba61fc142c70af27540c4e63f56ae13882bf17afe77ee6e6578fcab1e24"
   }
 }

@@ -1310,7 +1310,8 @@ async function layerJourneyScenario({ mobile = false, viewportOverride = null, t
   const parentWikipedia = run.page.locator('.digital-ribbon-item[data-commonproject-id="wikipedia"]');
   assert(await parentWikipedia.isVisible(), 'layer journey: Wikipedia is not visible in the parent bundle lane');
   await parentWikipedia.click();
-  await run.page.waitForFunction(() => document.querySelector('.globe-stage')?.dataset.digitalPath === 'sphere/knowledge_learning_culture/open_knowledge_data');
+  await run.page.waitForFunction(() => new URL(location.href).searchParams.get('project') === 'wikipedia');
+  assert(new URL(run.page.url()).searchParams.get('digital_path') === 'sphere/knowledge_learning_culture', 'layer journey: parent-lane selection abandoned its originating lane');
   assert(await run.page.locator('#project-focus').isVisible(), 'layer journey: parent-lane selection did not open the shared focus panel');
   assert((await run.page.locator('#focus-title').textContent()) === 'Wikipedia', 'layer journey: shared focus panel describes the wrong parent-lane project');
   assert(await run.page.locator('#layer-projects').isHidden(), 'layer journey: selected project duplicated the canonical shared focus with inline details');
@@ -1319,6 +1320,7 @@ async function layerJourneyScenario({ mobile = false, viewportOverride = null, t
   assert(await run.page.locator('#project-focus').isHidden(), 'layer journey: closing the shared focus did not hide it');
   assert(await run.page.locator('#layer-projects').isHidden(), 'layer journey: closing shared focus exposed a competing inline detail');
   assert(new URL(run.page.url()).searchParams.get('project') === null, 'layer journey: closing shared focus retained project history');
+  assert(new URL(run.page.url()).searchParams.get('digital_path') === 'sphere/knowledge_learning_culture', 'layer journey: closing shared focus did not restore the originating lane');
   await run.page.locator('#layer-breadcrumb .digital-breadcrumb-item[data-digital-path="sphere/knowledge_learning_culture"]').click();
   await run.page.waitForFunction(() => document.querySelector('.globe-stage')?.dataset.digitalPath === 'sphere/knowledge_learning_culture');
 
@@ -2335,11 +2337,14 @@ async function legacyLayerAndAtomicFocusScenario() {
   assert(Boolean(focusProjectId), 'atomic focus: no rendered digital identity was available');
   const focusProjectTitle = expectedDigitalProjection.titleById[focusProjectId];
   assert(Boolean(focusProjectTitle), `atomic focus: rendered identity ${focusProjectId} is missing from canonical projection`);
+  const originatingDigitalPath = await focusRun.page.locator('.globe-stage').getAttribute('data-digital-path');
+  assert(originatingDigitalPath === 'sphere', `atomic focus: unexpected originating lane ${originatingDigitalPath}`);
   await focusTrigger.click();
   await focusRun.page.waitForFunction((projectId) => new URL(location.href).searchParams.get('project') === projectId, focusProjectId);
   await focusRun.page.waitForSelector('#project-focus:not([hidden])');
   const selectedDigitalPath = new URL(focusRun.page.url()).searchParams.get('digital_path');
-  assert(Boolean(selectedDigitalPath), `atomic focus: ${focusProjectId} did not navigate to its concrete digital path`);
+  assert(selectedDigitalPath === null, `atomic focus: ${focusProjectId} abandoned the originating root lane (${selectedDigitalPath})`);
+  assert((await focusRun.page.locator('.globe-stage').getAttribute('data-digital-path')) === originatingDigitalPath, `atomic focus: ${focusProjectId} changed the rendered originating lane`);
   assert(await focusRun.page.locator('#project-focus').isVisible(), `atomic focus: ${focusProjectId} did not open the shared focus panel`);
   assert((await focusRun.page.locator('#focus-title').textContent()) === focusProjectTitle, 'atomic focus: shared focus describes the wrong project');
   assert((await focusRun.page.evaluate(() => document.activeElement?.id)) === 'project-focus', 'atomic focus: shared focus panel did not receive focus');
@@ -2349,6 +2354,7 @@ async function legacyLayerAndAtomicFocusScenario() {
   await focusRun.page.waitForFunction(() => new URL(location.href).searchParams.get('project') === null);
   assert(await focusRun.page.locator('#project-focus').isHidden(), 'atomic focus: Escape did not close the shared focus');
   assert(await focusRun.page.locator('#layer-projects').isHidden(), 'atomic focus: Escape exposed a competing inline detail');
+  assert(new URL(focusRun.page.url()).searchParams.get('digital_path') === null, 'atomic focus: Escape did not restore the originating root lane');
   const keyboardFocusTrigger = focusRun.page.locator(`.digital-ribbon-item[data-commonproject-id="${focusProjectId}"]`);
   await keyboardFocusTrigger.focus();
   await focusRun.page.keyboard.press('Enter');

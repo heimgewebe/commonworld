@@ -12,7 +12,6 @@ import {
   commonsTypeLabel,
   deriveCommonsType,
   deriveLayer,
-  deriveDigitalProjectPath,
   digitalPathContainsRecord,
   digitalPresentationTreeConstructionCount,
   DIGITAL_LAYER_TRANSITION_MS,
@@ -685,14 +684,6 @@ function selectDigitalBundle(path) {
 }
 
 function selectDigitalProject(record, { trigger = document.activeElement } = {}) {
-  const derived = deriveDigitalProjectPath(record);
-  if (runtime.state.view === 'layers' && derived?.path?.length) {
-    if (serializeDigitalPath(currentDigitalPath()) !== derived.pathKey) {
-      setDigitalPath(derived.path, { historyMode: null, focusHierarchy: false });
-    }
-    selectProject(record.id, { trigger });
-    return;
-  }
   selectProject(record.id, { trigger });
 }
 
