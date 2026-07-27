@@ -9,6 +9,8 @@ needle = """    app = replace_once(app, '  runtime.layerPreviewProject = null;\\
 replacement = """    app = replace_once(app, '  runtime.layerPreviewProject = null;\\n  renderLayerProjectDetail();', '  renderLayerProjectDetail();', 'remove obsolete close state')
     app = re.sub(r'^\\s*runtime\\.layerPreviewProject.*\\n', '', app, flags=re.MULTILINE)
     app = re.sub(r'^\\s*runtime\\.lastLayerProjectStatus.*\\n', '', app, flags=re.MULTILINE)
+    app = re.sub(r'usesInlineLayerProjectDetail\\([^)]*\\)', 'false', app)
+    app = re.sub(r'^\\s*reconcileProjectSelection\\(\\);\\n', '', app, flags=re.MULTILINE)
     for forbidden in ('selectDigitalProject', 'runtime.layerPreviewProject', 'runtime.lastLayerProjectStatus', 'usesInlineLayerProjectDetail', 'reconcileProjectSelection'):
 """
 if text.count(needle) != 1:
