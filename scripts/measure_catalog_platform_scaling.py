@@ -66,7 +66,7 @@ def shard_budget_state(gzip_max_bytes: int) -> str:
     return "pass"
 
 
-def measure(count: int) -> dict:
+def measure(count: int, *, include_parse_timing: bool = True) -> dict:
     records = [record(i) for i in range(count)]
     payload = canonical_bytes({"kind": "commonworld.world_index", "records": records, "version": "1.0"})
     compressed = gzip.compress(payload, compresslevel=9, mtime=0)
@@ -78,21 +78,23 @@ def measure(count: int) -> dict:
         canonical_bytes({"key": key, "kind": "commonworld.catalog_shard", "records": values, "version": "1.0"})
         for key, values in sorted(shards.items())
     ]
-    parse_samples = []
-    for _ in range(5):
-        started = time.perf_counter()
-        json.loads(payload)
-        parse_samples.append((time.perf_counter() - started) * 1000)
+    world_index = {
+        "raw_bytes": len(payload),
+        "gzip_bytes": len(compressed),
+    }
+    if include_parse_timing:
+        parse_samples = []
+        for _ in range(5):
+            started = time.perf_counter()
+            json.loads(payload)
+            parse_samples.append((time.perf_counter() - started) * 1000)
+        world_index["parse_ms_median"] = round(statistics.median(parse_samples), 3)
     gzip_sizes = [len(gzip.compress(item, compresslevel=9, mtime=0)) for item in shard_payloads]
     gzip_max_bytes = max(gzip_sizes)
-    world_index_gzip_bytes = len(compressed)
+    world_index_gzip_bytes = world_index["gzip_bytes"]
     return {
         "entry_count": count,
-        "world_index": {
-            "raw_bytes": len(payload),
-            "gzip_bytes": world_index_gzip_bytes,
-            "parse_ms_median": round(statistics.median(parse_samples), 3),
-        },
+        "world_index": world_index,
         "shards": {
             "count": len(shard_payloads),
             "gzip_total_bytes": sum(gzip_sizes),
@@ -109,16 +111,9 @@ def measure(count: int) -> dict:
     }
 
 
-def parse_args() -> argparse.Namespace:
-    parser = argparse.ArgumentParser(description="Measure deterministic Commonworld catalogue scale payloads.")
-    parser.add_argument("--output", type=Path, default=DEFAULT_OUT)
-    return parser.parse_args()
-
-
-def main() -> int:
-    args = parse_args()
-    measurements = [measure(count) for count in COUNTS]
-    result = {
+def build_result(*, include_parse_timing: bool = True) -> dict:
+    measurements = [measure(count, include_parse_timing=include_parse_timing) for count in COUNTS]
+    return {
         "kind": "commonworld.catalog_platform_scaling_evidence",
         "version": "1.1",
         "synthetic_only": True,
@@ -143,6 +138,17 @@ def main() -> int:
             ),
         },
     }
+
+
+def parse_args() -> argparse.Namespace:
+    parser = argparse.ArgumentParser(description="Measure deterministic Commonworld catalogue scale payloads.")
+    parser.add_argument("--output", type=Path, default=DEFAULT_OUT)
+    return parser.parse_args()
+
+
+def main() -> int:
+    args = parse_args()
+    result = build_result()
     args.output.parent.mkdir(parents=True, exist_ok=True)
     args.output.write_bytes(canonical_bytes(result))
     print(json.dumps(result, ensure_ascii=False, indent=2))
