@@ -145,9 +145,9 @@ def validate_catalog_scale_gates(root: Path = ROOT) -> list[str]:
                 errors.append(f"{count}: shard gate does not match measured size")
             if shard_gzip >= shard_max:
                 errors.append(f"{count}: maximum shard reaches or exceeds hard budget")
-            if count in scale_tiers and state != "pass":
+            if count in scale_tiers and gates.get("shard_gzip") != "pass":
                 errors.append(f"{count}: cutover scale tier must remain below shard warning budget")
-            if count == stress_tier and state != "warning":
+            if count == stress_tier and gates.get("shard_gzip") != "warning":
                 errors.append(f"{count}: stress tier must preserve the measured prefix-depth warning")
 
     decision = evidence.get("decision", {})
