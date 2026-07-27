@@ -101,6 +101,19 @@ class PagesLiveSmokeTests(unittest.TestCase):
             [(attempt.attempt, attempt.outcome, attempt.status, attempt.retryable) for attempt in fetch.attempts],
         )
 
+    @patch("scripts.smoke_pages_live.urllib.request.urlopen")
+    def test_fetch_preserves_exact_response_bytes(self, urlopen) -> None:
+        url = "https://commonworld.net/file.txt"
+        raw = "Grüße".encode("utf-8")
+        urlopen.return_value = FakeResponse(
+            url=url,
+            content_type="text/plain; charset=utf-8",
+            body=raw,
+        )
+        fetch = fetch_live_url(url, retry_count=0)
+        self.assertEqual(raw, fetch.raw_body)
+        self.assertEqual("Grüße", fetch.body)
+
     @patch("scripts.smoke_pages_live.time.sleep")
     @patch("scripts.smoke_pages_live.urllib.request.urlopen")
     def test_persistent_503_fails_after_exactly_one_retry(self, urlopen, sleep) -> None:

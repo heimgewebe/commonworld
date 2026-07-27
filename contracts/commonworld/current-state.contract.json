@@ -63,7 +63,8 @@
     "public_issues_confidential": false,
     "exact_production_readback": true,
     "host_configuration": "_config.yml includes only .well-known",
-    "expiry_monitoring": "weekly_github_actions"
+    "expiry_monitoring": "weekly_github_actions",
+    "premerge_live_readback": true
   },
   "release_gates": {
     "deterministic_build_and_tests": "pass",

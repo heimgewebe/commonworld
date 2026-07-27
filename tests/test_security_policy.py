@@ -5,11 +5,11 @@ import unittest
 from datetime import datetime, timezone
 from pathlib import Path
 
-from scripts.validate_security_policy import ROOT, github_api_get_private_reporting, validate_security_policy, verify_live_private_reporting, write_json_receipt
+from scripts.validate_security_policy import PrivateReportingFetch, ROOT, github_api_get_private_reporting, validate_security_policy, verify_live_private_reporting, write_json_receipt
 
 
 class SecurityPolicyTests(unittest.TestCase):
-    REQUIRED = ("SECURITY.md", ".well-known/security.txt", "_config.yml", ".github/workflows/production-readback.yml", ".github/workflows/security-policy-expiry.yml")
+    REQUIRED = ("SECURITY.md", ".well-known/security.txt", "_config.yml", ".github/workflows/validate.yml", ".github/workflows/production-readback.yml", ".github/workflows/security-policy-expiry.yml")
     NOW = datetime(2026, 7, 27, tzinfo=timezone.utc)
 
     def copy_surface(self, directory: str) -> Path:
@@ -98,7 +98,7 @@ class SecurityPolicyTests(unittest.TestCase):
         receipt = verify_live_private_reporting(
             "heimgewebe/commonworld",
             "a" * 40,
-            api_get=lambda: {"enabled": True},
+            api_get=lambda: PrivateReportingFetch("https://api.github.com/repos/heimgewebe/commonworld/private-vulnerability-reporting", "https://api.github.com/repos/heimgewebe/commonworld/private-vulnerability-reporting", 200, {"enabled": True}),
             now=lambda: "2026-07-27T20:00:00Z",
         )
         self.assertEqual("pass", receipt["verdict"])
@@ -108,7 +108,7 @@ class SecurityPolicyTests(unittest.TestCase):
         receipt = verify_live_private_reporting(
             "heimgewebe/commonworld",
             "b" * 40,
-            api_get=lambda: {"enabled": False},
+            api_get=lambda: PrivateReportingFetch("https://api.github.com/repos/heimgewebe/commonworld/private-vulnerability-reporting", "https://api.github.com/repos/heimgewebe/commonworld/private-vulnerability-reporting", 200, {"enabled": False}),
             now=lambda: "2026-07-27T20:00:00Z",
         )
         self.assertEqual("fail", receipt["verdict"])
@@ -123,19 +123,102 @@ class SecurityPolicyTests(unittest.TestCase):
         receipt = verify_live_private_reporting(
             "heimgewebe/commonworld",
             "c" * 40,
-            api_get=lambda: {"enabled": "yes"},
+            api_get=lambda: PrivateReportingFetch("https://api.github.com/repos/heimgewebe/commonworld/private-vulnerability-reporting", "https://api.github.com/repos/heimgewebe/commonworld/private-vulnerability-reporting", 200, {"enabled": "yes"}),
             now=lambda: "2026-07-27T20:00:00Z",
         )
         self.assertEqual("fail", receipt["verdict"])
         self.assertIn("private vulnerability reporting response must contain boolean enabled", receipt["errors"])
 
+    def test_private_reporting_redirect_or_status_fails(self) -> None:
+        redirected = verify_live_private_reporting(
+            "heimgewebe/commonworld",
+            "e" * 40,
+            api_get=lambda: PrivateReportingFetch("https://api.github.com/repos/heimgewebe/commonworld/private-vulnerability-reporting", "https://api.github.com/redirected", 200, {"enabled": True}),
+            now=lambda: "2026-07-27T20:00:00Z",
+        )
+        self.assertEqual("fail", redirected["verdict"])
+        self.assertIn("private vulnerability reporting endpoint redirected or mismatched", redirected["errors"])
+        wrong_status = verify_live_private_reporting(
+            "heimgewebe/commonworld",
+            "f" * 40,
+            api_get=lambda: PrivateReportingFetch("https://api.github.com/repos/heimgewebe/commonworld/private-vulnerability-reporting", "https://api.github.com/repos/heimgewebe/commonworld/private-vulnerability-reporting", 206, {"enabled": True}),
+            now=lambda: "2026-07-27T20:00:00Z",
+        )
+        self.assertIn("private vulnerability reporting status must be 200, got 206", wrong_status["errors"])
+
+    def test_malformed_repository_still_produces_failed_receipt(self) -> None:
+        receipt = verify_live_private_reporting(
+            "heimgewebe/common world",
+            "a" * 40,
+            now=lambda: "2026-07-27T20:00:00Z",
+        )
+        self.assertEqual("fail", receipt["verdict"])
+        self.assertIsNone(receipt["endpoint"])
+        with tempfile.TemporaryDirectory() as directory:
+            path = Path(directory) / "receipt.json"
+            write_json_receipt(path, receipt)
+            self.assertEqual(receipt, json.loads(path.read_text(encoding="utf-8")))
+
+    def test_security_txt_requires_exact_field_grammar_and_terminal_lf(self) -> None:
+        mutations = (
+            ("Contact: https://", "Contact:https://"),
+            ("Contact: https://", " Contact: https://"),
+        )
+        for old, new in mutations:
+            with self.subTest(new=new), tempfile.TemporaryDirectory() as directory:
+                root = self.copy_surface(directory)
+                path = root / ".well-known/security.txt"
+                path.write_text(path.read_text(encoding="utf-8").replace(old, new), encoding="utf-8")
+                errors = validate_security_policy(root, now=self.NOW)
+            self.assertTrue(any("exact 'Field: value' grammar" in error for error in errors))
+        with tempfile.TemporaryDirectory() as directory:
+            root = self.copy_surface(directory)
+            path = root / ".well-known/security.txt"
+            path.write_bytes(path.read_bytes().rstrip(b"\n"))
+            errors = validate_security_policy(root, now=self.NOW)
+        self.assertIn("security.txt must end with LF", errors)
+
+    def test_future_leap_second_is_rejected(self) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            root = self.copy_surface(directory)
+            path = root / ".well-known/security.txt"
+            path.write_text(path.read_text(encoding="utf-8").replace("2027-06-30T00:00:00Z", "2027-06-30T00:00:60Z"), encoding="utf-8")
+            errors = validate_security_policy(root, now=self.NOW)
+        self.assertIn("security.txt Expires must be strict RFC 3339", errors)
+
+    def test_premerge_workflow_requires_exact_head_live_step(self) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            root = self.copy_surface(directory)
+            path = root / ".github/workflows/validate.yml"
+            text = path.read_text(encoding="utf-8")
+            text = text.replace("--verify-live-setting\n", "--offline-only\n", 1)
+            text += "\n# --verify-live-setting\n"
+            path.write_text(text, encoding="utf-8")
+            errors = validate_security_policy(root, now=self.NOW)
+        self.assertTrue(any("Verify private vulnerability reporting before merge" in error and "--verify-live-setting" in error for error in errors))
+
+    def test_production_marker_relocation_does_not_pass(self) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            root = self.copy_surface(directory)
+            path = root / ".github/workflows/production-readback.yml"
+            text = path.read_text(encoding="utf-8")
+            text = text.replace("--verify-live-setting\n", "--offline-only\n", 1)
+            text += "\n# --verify-live-setting\n"
+            path.write_text(text, encoding="utf-8")
+            errors = validate_security_policy(root, now=self.NOW)
+        self.assertTrue(any("Verify private vulnerability reporting setting" in error and "--verify-live-setting" in error for error in errors))
+
     def test_expiry_workflow_requires_schedule_and_validator(self) -> None:
         with tempfile.TemporaryDirectory() as directory:
             root = self.copy_surface(directory)
             path = root / ".github/workflows/security-policy-expiry.yml"
-            path.write_text(path.read_text(encoding="utf-8").replace("python3 scripts/validate_security_policy.py", "true"), encoding="utf-8")
+            text = path.read_text(encoding="utf-8")
+            start = text.index("- name: Verify private vulnerability reporting remains enabled")
+            end = text.index("- name: Upload scheduled security receipt", start)
+            block = text[start:end].replace("python3 scripts/validate_security_policy.py", "true")
+            path.write_text(text[:start] + block + text[end:], encoding="utf-8")
             errors = validate_security_policy(root, now=self.NOW)
-        self.assertIn("security expiry workflow is incomplete: python3 scripts/validate_security_policy.py", errors)
+        self.assertTrue(any("Verify private vulnerability reporting remains enabled" in error and "python3 scripts/validate_security_policy.py" in error for error in errors))
 
     def test_non_rfc3339_expiry_separator_fails(self) -> None:
         with tempfile.TemporaryDirectory() as directory:
@@ -176,8 +259,8 @@ class SecurityPolicyTests(unittest.TestCase):
             path = root / ".github/workflows/security-policy-expiry.yml"
             path.write_text(path.read_text(encoding="utf-8").replace("--verify-live-setting", "--offline-only").replace("steps.security_setting.outcome != 'success'", "false"), encoding="utf-8")
             errors = validate_security_policy(root, now=self.NOW)
-        self.assertIn("security expiry workflow is incomplete: --verify-live-setting", errors)
-        self.assertIn("security expiry workflow is incomplete: steps.security_setting.outcome != 'success'", errors)
+        self.assertTrue(any("Verify private vulnerability reporting remains enabled" in error and "--verify-live-setting" in error for error in errors))
+        self.assertTrue(any("Enforce live reporting result" in error and "steps.security_setting.outcome != 'success'" in error for error in errors))
 
 
     def test_workflows_keep_private_reporting_readback_tokenless(self) -> None:
@@ -223,7 +306,7 @@ class SecurityPolicyTests(unittest.TestCase):
             path = root / ".github/workflows/security-policy-expiry.yml"
             path.write_text(path.read_text(encoding="utf-8").replace("        id: security_setting\n        if: always()\n", "        id: security_setting\n"), encoding="utf-8")
             errors = validate_security_policy(root, now=self.NOW)
-        self.assertIn("security expiry workflow is incomplete: PVR readback step must use if: always()", errors)
+        self.assertTrue(any("Verify private vulnerability reporting remains enabled" in error and "if: always()" in error for error in errors))
 
 
 if __name__ == "__main__":

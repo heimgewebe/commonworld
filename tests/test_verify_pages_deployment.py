@@ -28,6 +28,7 @@ OTHER_SHA = "b" * 40
 class FakeLiveReceipt:
     smoke_id: str = "fake-live-receipt"
     status: int = 200
+    requested_url: str = "https://commonworld.net/"
     final_url: str = "https://commonworld.net/"
 
 
@@ -53,7 +54,7 @@ def exact_file_receipt(relative_url: str = "index.html") -> ExactPublicFileRecei
         requested_url=f"https://commonworld.net/{relative_url}",
         final_url=f"https://commonworld.net/{relative_url}",
         status=200,
-        content_type="text/plain",
+        content_type="text/plain; charset=utf-8" if relative_url == ".well-known/security.txt" else "text/plain",
         body_bytes=4,
         sha256="a" * 64,
         expected_sha256="a" * 64,
@@ -196,7 +197,8 @@ class PagesDeploymentReadbackTests(unittest.TestCase):
             def fetcher(url: str, **kwargs):
                 relative = url.removeprefix("https://commonworld.net/") or "index.html"
                 body = files[relative]
-                return LiveFetch(url, url, 200, "text/plain", body)
+                content_type = "text/plain; charset=utf-8" if relative == ".well-known/security.txt" else "text/plain"
+                return LiveFetch(url, url, 200, content_type, body, body.encode("utf-8"))
 
             result = verify_exact_public_files(
                 "https://commonworld.net/",
@@ -219,7 +221,8 @@ class PagesDeploymentReadbackTests(unittest.TestCase):
 
             def fetcher(url: str, **kwargs):
                 body = "changed" if url.endswith("propose.html") else "expected"
-                return LiveFetch(url, url, 200, "text/plain", body)
+                content_type = "text/plain; charset=utf-8" if url.endswith("/.well-known/security.txt") else "text/plain"
+                return LiveFetch(url, url, 200, content_type, body, body.encode("utf-8"))
 
             result = verify_exact_public_files(
                 "https://commonworld.net/",
@@ -241,7 +244,8 @@ class PagesDeploymentReadbackTests(unittest.TestCase):
 
             def fetcher(url: str, **kwargs):
                 final_url = "http://commonworld.net/.well-known/security.txt" if url.endswith("/.well-known/security.txt") else url
-                return LiveFetch(url, final_url, 200, "text/plain", "expected")
+                content_type = "text/plain; charset=utf-8" if url.endswith("/.well-known/security.txt") else "text/plain"
+                return LiveFetch(url, final_url, 200, content_type, "expected", b"expected")
 
             result = verify_exact_public_files(
                 "https://commonworld.net/",
@@ -254,6 +258,59 @@ class PagesDeploymentReadbackTests(unittest.TestCase):
         self.assertIn("exact public file redirected: .well-known/security.txt: https://commonworld.net/.well-known/security.txt -> http://commonworld.net/.well-known/security.txt", result.errors)
         security_receipt = next(item for item in result.receipts if item.relative_url == ".well-known/security.txt")
         self.assertFalse(security_receipt.matched)
+
+    def test_security_txt_wrong_mime_fails(self) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            for relative in ("index.html", "propose.html", "catalog/catalog.json", ".well-known/security.txt"):
+                target = root / relative
+                target.parent.mkdir(parents=True, exist_ok=True)
+                target.write_bytes(b"expected")
+
+            def fetcher(url: str, **kwargs):
+                content_type = "application/octet-stream" if url.endswith("/.well-known/security.txt") else "text/plain"
+                return LiveFetch(url, url, 200, content_type, "expected", b"expected")
+
+            result = verify_exact_public_files("https://commonworld.net/", 5, fetcher=fetcher, root=root)
+        self.assertEqual("fail", result.verdict)
+        self.assertTrue(any("content-type must be text/plain; charset=utf-8" in error for error in result.errors))
+
+    def test_exact_hash_uses_received_bytes_not_decoded_text(self) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            for relative in ("index.html", "propose.html", "catalog/catalog.json", ".well-known/security.txt"):
+                target = root / relative
+                target.parent.mkdir(parents=True, exist_ok=True)
+                target.write_bytes(b"expected")
+
+            def fetcher(url: str, **kwargs):
+                content_type = "text/plain; charset=utf-8" if url.endswith("/.well-known/security.txt") else "text/plain"
+                raw = b"changed" if url.endswith("propose.html") else b"expected"
+                return LiveFetch(url, url, 200, content_type, "expected", raw)
+
+            result = verify_exact_public_files("https://commonworld.net/", 5, fetcher=fetcher, root=root)
+        self.assertIn("exact public file hash mismatch: propose.html", result.errors)
+
+    def test_canonical_root_redirect_fails_before_exact_file_check(self) -> None:
+        calls = 0
+        def exact_check(base_url: str, timeout_seconds: int):
+            nonlocal calls
+            calls += 1
+            return exact_pass(base_url, timeout_seconds)
+        result = run_live_smoke_with_retry(
+            url="https://commonworld.net/",
+            timeout_seconds=5,
+            retry_delays_seconds=(0,),
+            live_smoke=lambda url, **kwargs: FakeLiveReceipt(
+                requested_url="https://commonworld.net/",
+                final_url="https://other.example/",
+            ),
+            exact_file_check=exact_check,
+            sleeper=lambda seconds: None,
+        )
+        self.assertEqual("fail", result.verdict)
+        self.assertEqual(0, calls)
+        self.assertTrue(any("canonical Pages root redirected" in error for error in result.errors))
 
     def test_live_smoke_retries_only_on_declared_schedule(self) -> None:
         clock = FakeClock()

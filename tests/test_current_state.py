@@ -21,12 +21,14 @@ class CurrentStateTests(unittest.TestCase):
             "assets/commonworld-app.js",
             "contracts/commonworld/digital-sphere.contract.json",
             "docs/research/public-maplibre-vertical-slice-v1.result.json",
+            "docs/research/digital-sphere-v1.contract.json",
             "LICENSE",
             "LICENSE-DATA.md",
             "SECURITY.md",
             ".well-known/security.txt",
             "_config.yml",
             "scripts/verify_pages_deployment.py",
+            ".github/workflows/validate.yml",
             ".github/workflows/production-readback.yml",
             ".github/workflows/security-policy-expiry.yml",
         )
@@ -75,7 +77,7 @@ class CurrentStateTests(unittest.TestCase):
             path = root / ".github/workflows/production-readback.yml"
             path.write_text(path.read_text(encoding="utf-8").replace("--verify-live-setting", "--skip-live-setting"), encoding="utf-8")
             errors = validate_current_state(root)
-        self.assertIn("current production readback does not enforce private vulnerability reporting", errors)
+        self.assertIn("current production readback does not bind private vulnerability reporting", errors)
 
     def test_security_disclosure_requires_weekly_expiry_workflow(self) -> None:
         with tempfile.TemporaryDirectory() as directory:
@@ -83,7 +85,17 @@ class CurrentStateTests(unittest.TestCase):
             path = root / ".github/workflows/security-policy-expiry.yml"
             path.write_text(path.read_text(encoding="utf-8").replace('cron: "17 5 * * 1"', 'cron: "0 0 1 1 *"'), encoding="utf-8")
             errors = validate_current_state(root)
-        self.assertIn("current security-expiry workflow mismatch", errors)
+        self.assertTrue(any("current security-expiry workflow" in error for error in errors))
+
+    def test_security_disclosure_requires_exact_head_premerge_readback(self) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            root = self.copy_current_state(directory)
+            path = root / ".github/workflows/validate.yml"
+            text = path.read_text(encoding="utf-8").replace("--verify-live-setting", "--offline-only", 1)
+            text += "\n# --verify-live-setting\n"
+            path.write_text(text, encoding="utf-8")
+            errors = validate_current_state(root)
+        self.assertIn("current pre-merge readback does not bind live private vulnerability reporting to the exact head", errors)
 
     def test_catalog_delivery_declares_selected_shard_shadow(self) -> None:
         with tempfile.TemporaryDirectory() as directory:

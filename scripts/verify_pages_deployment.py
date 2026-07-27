@@ -20,7 +20,7 @@ from typing import Callable, Sequence
 if __package__ in {None, ""}:
     sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 
-from scripts.smoke_pages_live import PagesLiveSmokeReceipt, fetch_live_url, run_live_smoke
+from scripts.smoke_pages_live import PagesLiveSmokeReceipt, fetch_live_url, live_fetch_body_bytes, run_live_smoke
 
 API_ROOT = "https://api.github.com"
 DEFAULT_ENVIRONMENT = "github-pages"
@@ -295,14 +295,24 @@ def verify_exact_public_files(
                 insecure=False,
                 accept="*/*",
             )
-            remote_bytes = fetch.body.encode("utf-8")
+            remote_bytes = live_fetch_body_bytes(fetch)
             expected_bytes = (root / local_relative).read_bytes()
         except (OSError, RuntimeError) as error:
             errors.append(f"exact public file fetch failed for {relative_url or 'index.html'}: {error}")
             continue
         remote_sha256 = hashlib.sha256(remote_bytes).hexdigest()
         expected_sha256 = hashlib.sha256(expected_bytes).hexdigest()
-        matched = fetch.status == 200 and fetch.final_url == requested_url and remote_sha256 == expected_sha256
+        content_type_valid = True
+        if local_relative == ".well-known/security.txt":
+            media_type, *parameters = [part.strip().casefold() for part in fetch.content_type.split(";")]
+            charsets = [part.split("=", 1)[1].strip('"') for part in parameters if part.startswith("charset=")]
+            content_type_valid = media_type == "text/plain" and charsets == ["utf-8"]
+        matched = (
+            fetch.status == 200
+            and fetch.final_url == requested_url
+            and remote_sha256 == expected_sha256
+            and content_type_valid
+        )
         receipts.append(
             ExactPublicFileReceipt(
                 relative_url=relative_url or "index.html",
@@ -322,6 +332,11 @@ def verify_exact_public_files(
             errors.append(f"exact public file redirected: {relative_url or 'index.html'}: {requested_url} -> {fetch.final_url}")
         if remote_sha256 != expected_sha256:
             errors.append(f"exact public file hash mismatch: {relative_url or 'index.html'}")
+        if not content_type_valid:
+            errors.append(
+                "security.txt content-type must be text/plain; charset=utf-8, "
+                f"got {fetch.content_type!r}"
+            )
     return ExactPublicFilesResult(
         verdict="pass" if not errors and len(receipts) == len(EXACT_PUBLIC_FILES) else "fail",
         receipts=tuple(receipts),
@@ -350,7 +365,13 @@ def run_live_smoke_with_retry(
         try:
             receipt = live_smoke(url, timeout_seconds=timeout_seconds, insecure=False)
             last_receipt = receipt
-            exact_result = exact_file_check(receipt.final_url, timeout_seconds)
+            if receipt.requested_url != url or receipt.final_url != url:
+                errors.append(
+                    f"cycle {attempt}: canonical Pages root redirected: "
+                    f"{receipt.requested_url} -> {receipt.final_url}; expected {url}"
+                )
+                continue
+            exact_result = exact_file_check(url, timeout_seconds)
             last_exact_public_files = exact_result.receipts
         except (OSError, RuntimeError) as error:
             errors.append(f"cycle {attempt}: {error}")

@@ -121,7 +121,13 @@ class LiveFetch:
     status: int
     content_type: str
     body: str
+    raw_body: bytes = b""
     attempts: tuple[FetchAttemptReceipt, ...] = ()
+
+
+def live_fetch_body_bytes(fetch: LiveFetch) -> bytes:
+    """Return the exact received representation bytes when available."""
+    return fetch.raw_body if fetch.raw_body else fetch.body.encode("utf-8")
 
 
 @dataclass(frozen=True)
@@ -309,6 +315,7 @@ def fetch_live_url(
             status=status,
             content_type=content_type,
             body=body,
+            raw_body=raw,
             attempts=tuple(attempts),
         )
 
@@ -322,7 +329,7 @@ def validate_live_fetch(fetch: LiveFetch) -> list[str]:
         errors.append(f"live Pages status must be 200, got {fetch.status}")
     if "text/html" not in fetch.content_type.casefold():
         errors.append(f"live Pages content-type must include text/html, got {fetch.content_type!r}")
-    if len(fetch.body.encode("utf-8")) < MIN_BODY_BYTES:
+    if len(live_fetch_body_bytes(fetch)) < MIN_BODY_BYTES:
         errors.append(f"live Pages body too small: expected at least {MIN_BODY_BYTES} bytes")
     for token in REQUIRED_TOKENS:
         if token not in fetch.body:
@@ -339,7 +346,7 @@ def validate_proposal_fetch(fetch: LiveFetch) -> list[str]:
         errors.append(f"live proposal page status must be 200, got {fetch.status}")
     if "text/html" not in fetch.content_type.casefold():
         errors.append(f"live proposal page content-type must include text/html, got {fetch.content_type!r}")
-    if len(fetch.body.encode("utf-8")) < 8_000:
+    if len(live_fetch_body_bytes(fetch)) < 8_000:
         errors.append("live proposal page body too small")
     for token in PROPOSAL_REQUIRED_TOKENS:
         if token not in fetch.body:
@@ -405,7 +412,7 @@ def validate_runtime_asset_fetch(
     lowered_type = fetch.content_type.casefold()
     if not any(token in lowered_type for token in allowed_content_types):
         errors.append(f"live runtime asset content-type mismatch: {fetch.content_type!r}: {fetch.requested_url}")
-    raw = fetch.body.encode("utf-8")
+    raw = live_fetch_body_bytes(fetch)
     if len(raw) < minimum_bytes:
         errors.append(f"live runtime asset too small: {fetch.requested_url}")
     if hashlib.sha256(raw).hexdigest() != expected_sha256:
@@ -466,7 +473,7 @@ def run_live_smoke(
                 expected_sha256=expected_sha256,
             )
         )
-        raw = asset_fetch.body.encode("utf-8")
+        raw = live_fetch_body_bytes(asset_fetch)
         asset_receipts.append(
             RuntimeAssetReceipt(
                 relative_url=relative,
@@ -492,7 +499,7 @@ def run_live_smoke(
         final_url=page.final_url,
         status=page.status,
         content_type=page.content_type,
-        body_bytes=len(page.body.encode("utf-8")),
+        body_bytes=len(live_fetch_body_bytes(page)),
         page_attempts=page.attempts,
         required_tokens=REQUIRED_TOKENS,
         forbidden_tokens_absent=FORBIDDEN_TOKENS,
@@ -500,7 +507,7 @@ def run_live_smoke(
         proposal_final_url=proposal_fetch.final_url,
         proposal_status=proposal_fetch.status,
         proposal_content_type=proposal_fetch.content_type,
-        proposal_body_bytes=len(proposal_fetch.body.encode("utf-8")),
+        proposal_body_bytes=len(live_fetch_body_bytes(proposal_fetch)),
         proposal_attempts=proposal_fetch.attempts,
         proposal_required_tokens=PROPOSAL_REQUIRED_TOKENS,
         catalog_requested_url=catalog_fetch.requested_url,

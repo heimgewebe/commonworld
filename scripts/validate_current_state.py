@@ -9,6 +9,11 @@ from datetime import date
 import sys
 from pathlib import Path
 
+if __package__ in {None, ""}:
+    sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
+
+from scripts.validate_security_policy import workflow_step
+
 ROOT = Path(__file__).resolve().parents[1]
 STATE_PATH = Path("contracts/commonworld/current-state.contract.json")
 CATALOG_PATH = Path("catalog/catalog.json")
@@ -22,6 +27,7 @@ SECURITY_POLICY_PATH = Path("SECURITY.md")
 SECURITY_TXT_PATH = Path(".well-known/security.txt")
 JEKYLL_CONFIG_PATH = Path("_config.yml")
 PRODUCTION_READBACK_PATH = Path("scripts/verify_pages_deployment.py")
+VALIDATE_WORKFLOW_PATH = Path(".github/workflows/validate.yml")
 PRODUCTION_READBACK_WORKFLOW_PATH = Path(".github/workflows/production-readback.yml")
 SECURITY_EXPIRY_WORKFLOW_PATH = Path(".github/workflows/security-policy-expiry.yml")
 
@@ -36,7 +42,7 @@ def _sha256(path: Path) -> str:
 
 def validate_current_state(root: Path = ROOT) -> list[str]:
     errors: list[str] = []
-    for relative in (STATE_PATH, CATALOG_PATH, PROVIDER_PATH, VERTICAL_SLICE_PATH, DIGITAL_RING_PATH, CATALOG_PLATFORM_PATH, APP_PATH, LE_NID_PATH, SECURITY_POLICY_PATH, SECURITY_TXT_PATH, JEKYLL_CONFIG_PATH, PRODUCTION_READBACK_PATH, PRODUCTION_READBACK_WORKFLOW_PATH, SECURITY_EXPIRY_WORKFLOW_PATH):
+    for relative in (STATE_PATH, CATALOG_PATH, PROVIDER_PATH, VERTICAL_SLICE_PATH, DIGITAL_RING_PATH, CATALOG_PLATFORM_PATH, APP_PATH, LE_NID_PATH, SECURITY_POLICY_PATH, SECURITY_TXT_PATH, JEKYLL_CONFIG_PATH, PRODUCTION_READBACK_PATH, VALIDATE_WORKFLOW_PATH, PRODUCTION_READBACK_WORKFLOW_PATH, SECURITY_EXPIRY_WORKFLOW_PATH):
         if not (root / relative).is_file():
             errors.append(f"missing current-state dependency: {relative}")
     if errors:
@@ -52,6 +58,7 @@ def validate_current_state(root: Path = ROOT) -> list[str]:
         app = (root / APP_PATH).read_text(encoding="utf-8")
         le_nid = _load(root, LE_NID_PATH)
         production_readback = (root / PRODUCTION_READBACK_PATH).read_text(encoding="utf-8")
+        validate_workflow = (root / VALIDATE_WORKFLOW_PATH).read_text(encoding="utf-8")
         production_readback_workflow = (root / PRODUCTION_READBACK_WORKFLOW_PATH).read_text(encoding="utf-8")
         security_expiry_workflow = (root / SECURITY_EXPIRY_WORKFLOW_PATH).read_text(encoding="utf-8")
     except (OSError, json.JSONDecodeError) as error:
@@ -164,6 +171,7 @@ def validate_current_state(root: Path = ROOT) -> list[str]:
         "exact_production_readback": True,
         "host_configuration": "_config.yml includes only .well-known",
         "expiry_monitoring": "weekly_github_actions",
+        "premerge_live_readback": True,
     }
     if security_disclosure != expected_security_disclosure:
         errors.append("current security-disclosure truth mismatch")
@@ -171,11 +179,26 @@ def validate_current_state(root: Path = ROOT) -> list[str]:
         errors.append("current production readback does not include security.txt")
     if (root / JEKYLL_CONFIG_PATH).read_text(encoding="utf-8") != "include:\n  - .well-known\n":
         errors.append("current host configuration does not publish only .well-known")
-    if "--verify-live-setting" not in production_readback_workflow or "steps.security_setting.outcome != 'success'" not in production_readback_workflow:
+    premerge_step = workflow_step(validate_workflow, "Verify private vulnerability reporting before merge")
+    premerge_enforce = workflow_step(validate_workflow, "Enforce pre-merge security readback")
+    if premerge_step is None or "--verify-live-setting" not in premerge_step or "github.event.pull_request.head.sha || github.sha" not in premerge_step:
+        errors.append("current pre-merge readback does not bind live private vulnerability reporting to the exact head")
+    if premerge_enforce is None or "steps.security_setting.outcome != 'success'" not in premerge_enforce:
+        errors.append("current pre-merge readback does not enforce private vulnerability reporting")
+    production_step = workflow_step(production_readback_workflow, "Verify private vulnerability reporting setting")
+    production_enforce = workflow_step(production_readback_workflow, "Enforce production readback result")
+    if production_step is None or "--verify-live-setting" not in production_step:
+        errors.append("current production readback does not bind private vulnerability reporting")
+    if production_enforce is None or "steps.security_setting.outcome != 'success'" not in production_enforce:
         errors.append("current production readback does not enforce private vulnerability reporting")
-    expiry_markers = ('cron: "17 5 * * 1"', "python3 scripts/validate_security_policy.py", "--verify-live-setting", "steps.security_setting.outcome != 'success'")
-    if any(marker not in security_expiry_workflow for marker in expiry_markers):
-        errors.append("current security-expiry workflow mismatch")
+    if 'cron: "17 5 * * 1"' not in security_expiry_workflow:
+        errors.append("current security-expiry workflow schedule mismatch")
+    expiry_step = workflow_step(security_expiry_workflow, "Verify private vulnerability reporting remains enabled")
+    expiry_enforce = workflow_step(security_expiry_workflow, "Enforce live reporting result")
+    if expiry_step is None or "if: always()" not in expiry_step or "--verify-live-setting" not in expiry_step:
+        errors.append("current security-expiry workflow live step mismatch")
+    if expiry_enforce is None or "steps.security_setting.outcome != 'success'" not in expiry_enforce:
+        errors.append("current security-expiry workflow enforcement mismatch")
 
     release = state.get("release_gates", {})
     expected_release = {
