@@ -83,6 +83,7 @@ validate-catalog-delivery-budget: build
 
 validate-catalog-scale-gates:
 	python3 scripts/validate_catalog_scale_gates.py
+	python3 scripts/validate_catalog_scale_masterplan.py
 
 test-js:
 	npm test
