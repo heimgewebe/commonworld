@@ -556,17 +556,13 @@
       "scenario_execution_note": "Fresh exact-surface browser smoke completed all scenarios successfully. The synchronous connector returned an ambiguous 502 after the result file was written; bounded durable readback verified PASS and zero failed scenarios."
     },
     "proposal_browser_smoke": {
-      "verdict": "PASS",
-      "command": "node scripts/smoke_proposal_browser.mjs"
+      "verdict": "PENDING_FINAL_RUN"
     },
     "focus_overlay_browser_smoke": {
-      "verdict": "PASS",
-      "command": "node scripts/smoke_focus_overlay_browser.mjs"
+      "verdict": "PENDING_FINAL_RUN"
     },
     "accessibility_modes_browser_smoke": {
-      "verdict": "PASS",
-      "command": "node scripts/smoke_accessibility_modes_browser.mjs",
-      "scenario_count": 4
+      "verdict": "PENDING_FINAL_RUN"
     },
     "catalog_delivery_browser_measurement": {
       "verdict": "PASS",
@@ -591,6 +587,8 @@
     "full_validation": {
       "verdict": "PASS",
       "command": "make validate",
+      "durable_job_id": "66acaef836ca",
+      "finalization_receipt_sha256": "cc7222672500a55fa4ffe210f77761c49ef1c80d4f24eabd95e7e300bc4f7da2",
       "javascript_tests": "109/109",
       "python_tests": "517/517"
     }
