@@ -46,7 +46,11 @@ patch_css = '''def patch_css() -> None:
         r')\\s*\\{[^{}]*\\}\\n?'
     )
     css = dead_rule.sub('', css)
-    css = css.replace(".layer-panel .layer-projects[hidden] {\n  display: none;\n}\n\n", '')
+    css = css.replace(""".layer-panel .layer-projects[hidden] {
+  display: none;
+}
+
+""", '')
     css = re.sub(r'\\n{3,}', '\\n\\n', css)
     for forbidden in ('.layer-project-detail', '.project-detail-', '.layer-panel .layer-projects'):
         if forbidden in css:
