@@ -122,7 +122,7 @@
     {
       "id": "layer-journey-moveend-return",
       "verdict": "PASS",
-      "elapsedMs": 1570
+      "elapsedMs": 1500
     },
     {
       "id": "layer-journey-interrupted",
@@ -214,6 +214,21 @@
       ]
     },
     {
+      "id": "catalogue-platform-retry",
+      "verdict": "PASS",
+      "manifestAttempts": 2
+    },
+    {
+      "id": "catalogue-detail-retry",
+      "verdict": "PASS",
+      "detailAttempts": 2
+    },
+    {
+      "id": "catalogue-detail-stale-response",
+      "verdict": "PASS",
+      "detailRequests": 2
+    },
+    {
       "id": "bootstrap-asset-failure-fallback",
       "verdict": "PASS",
       "blockedBootstrapRequests": 1,
@@ -253,9 +268,9 @@
     }
   ],
   "binding": {
-    "smoke_script_sha256": "56b06918c834cdd8ab53f5e5e5ed84f0a12d913210eac2bdcb9a60f3bae853e6",
+    "smoke_script_sha256": "9fb4accbd8cedc0f79ba587eecab344f0135cc20ceefcf8856b38315469468f4",
     "smoke_runner_sha256": "522b99b70b1d0064b1d0a31a3a67fdc9a2e73b7408f37d1a4bb303bc360b7556",
-    "first_party_surface_sha256": "af9e9750f8f5915d9ffb6480ba43c04dc4b7dd35662667784ef1dbaa65059622",
+    "first_party_surface_sha256": "baaaac5e62d300ae12bdd0f12e3dc59591d21d95e9176bf7be9a6e7cf51e40b6",
     "scenario_ids": [
       "startup-and-ring-orbits",
       "ring-orbits-reduced-motion",
@@ -282,6 +297,9 @@
       "synthetic-catalogue-truth",
       "live-ui-hardening",
       "catalogue-network-blocked",
+      "catalogue-platform-retry",
+      "catalogue-detail-retry",
+      "catalogue-detail-stale-response",
       "bootstrap-asset-failure-fallback",
       "post-render-failure-preserves-fallback",
       "provider-failure",
@@ -293,8 +311,8 @@
     "smoke_plan_sha256": "6b8749928ead5ef81ee66883e6a2993e756ce083575c3569234bf70526448364"
   },
   "execution": {
-    "job_id": "grabowski-job-12b363d42db2",
-    "finalization_receipt_sha256": "6ad2f35969943e5c718aedf2125fa3d1914b1565ad14819ced7482116e4713bc",
-    "result_sha256": "6ce88ba61fc142c70af27540c4e63f56ae13882bf17afe77ee6e6578fcab1e24"
+    "job_id": "grabowski-job-7d0148eff7a8",
+    "finalization_receipt_sha256": "bc218a60908a90170acfeb56da3f2ecabfc4fa9438fa013822270c29589b2f37",
+    "result_sha256": "0b6f1f8651257c547f82a21037e0410c441618a4ee169ca1a09bf0fe86e6076b"
   }
 }

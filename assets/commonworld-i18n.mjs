@@ -1,4 +1,4 @@
-import { COMMONWORLD_EN_LOCALE } from './commonworld-en-locale.mjs';
+import { COMMONWORLD_EN_LOCALE } from './commonworld-en-locale.mjs?v=797f602e0c88';
 
 export const SUPPORTED_LOCALES = Object.freeze(['en', 'de']);
 export const DEFAULT_LOCALE = 'en';
@@ -26,6 +26,12 @@ const UI_EN = Object.freeze({
   project_preview: 'Preview of {title}',
   project_selected: '{title} selected',
   selection_retained_during_filtering: 'This selection remains open while search or filters change the rest of the view.',
+  catalog_detail_loading: 'Catalog details are being verified for this generation.',
+  catalog_detail_retrying: 'Catalog details are being verified again.',
+  catalog_detail_ready: 'Catalog details for this generation passed integrity verification.',
+  catalog_detail_mismatch: 'The verified catalog details differ from the embedded record. The embedded details remain active.',
+  catalog_detail_degraded: 'Verified catalog details are currently unavailable. The embedded details remain available.',
+  catalog_detail_retry: 'Verify again',
   horizontal_scroll: 'Scroll {label} horizontally',
   shown_of_commons: '{shown} of {total} Commons shown',
   show_more: 'Show {count} more',

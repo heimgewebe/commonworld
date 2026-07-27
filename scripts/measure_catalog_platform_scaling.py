@@ -20,11 +20,12 @@ def canonical_bytes(value: object) -> bytes:
 
 def record(index: int) -> dict:
     identifier = f"synthetic-common-{index:06d}"
+    detail_sha256 = hashlib.sha256(identifier.encode()).hexdigest()
     return {
         "access": "public",
         "actions": ["learn", "contribute"],
         "activity": "active",
-        "detail": f"catalog/projects/{identifier}.json",
+        "detail": {"version": "1.0", "identity": identifier, "generation": "b" * 64, "url": f"catalog/runtime/details/{detail_sha256}.v1.json", "sha256": detail_sha256, "bytes": 2048},
         "id": identifier,
         "languages": ["en"],
         "presence": {"digital": index % 3 == 0, "geographic": [{"geometry": {"coordinates": [((index * 37) % 360) - 180, ((index * 17) % 160) - 80], "type": "Point"}, "mode": "approximate"}]},

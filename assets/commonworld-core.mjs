@@ -1,5 +1,5 @@
-import { COMMONWORLD_EN_LOCALE } from './commonworld-en-locale.mjs';
-import { FALLBACK_LOCALE, normalizeLocale } from './commonworld-i18n.mjs';
+import { COMMONWORLD_EN_LOCALE } from './commonworld-en-locale.mjs?v=797f602e0c88';
+import { FALLBACK_LOCALE, normalizeLocale } from './commonworld-i18n.mjs?v=e7db362a7f96';
 
 export const DEFAULT_CAMERA = Object.freeze({
   lng: 8,

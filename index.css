@@ -1056,6 +1056,37 @@ html[data-input-modality="pointer"] :focus {
   line-height: 1.45;
 }
 
+.catalog-detail-integrity {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 0.55rem;
+  margin: 0 0 0.8rem;
+  padding: 0.55rem 0.7rem;
+  border: 1px solid color-mix(in srgb, var(--focus) 22%, transparent);
+  border-radius: 0.65rem;
+  background: color-mix(in srgb, var(--focus) 6%, transparent);
+  color: rgba(237, 244, 239, 0.8);
+  font-size: 0.78rem;
+  line-height: 1.45;
+}
+
+.catalog-detail-integrity[hidden] {
+  display: none;
+}
+
+.catalog-detail-integrity p {
+  flex: 1 1 14rem;
+  margin: 0;
+  padding: 0;
+}
+
+.catalog-detail-retry {
+  min-height: 2.25rem;
+  padding: 0.4rem 0.65rem;
+  white-space: nowrap;
+}
+
 .focus-grid {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));

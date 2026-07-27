@@ -7,6 +7,7 @@ const LANGUAGE_PATTERN = /^[a-z]{2,3}(?:-[A-Z]{2})?$/;
 const ACTION_VALUES = new Set(['visit', 'use', 'borrow', 'learn', 'contribute', 'volunteer', 'donate', 'contact', 'replicate']);
 const ACCESS_VALUES = new Set(['public', 'membership', 'restricted']);
 const ACTIVITY_VALUES = new Set(['active', 'paused', 'seasonal', 'unknown', 'ended']);
+const DETAIL_RECORD_KEYS = new Set(['schema_version', 'id', 'title', 'summary', 'themes', 'actions', 'presence', 'relations', 'provenance', 'curation', 'links', 'handoff', 'activity', 'languages', 'access']);
 
 function assertObject(value, label) {
   if (!value || typeof value !== 'object' || Array.isArray(value)) throw new Error(`${label} is not an object`);
@@ -93,12 +94,27 @@ function validateShardIndex(index, label, knownShardKeys) {
   }
 }
 
+function validateDetailsManifest(value, manifest) {
+  const details = assertObject(value, 'manifest details');
+  assertExactKeys(details, new Set(['strategy', 'descriptor_version', 'url_template', 'entry_count', 'detail_set_sha256', 'project_schema_version']), 'manifest details');
+  if (details.strategy !== 'content-addressed-shard-descriptors') throw new Error('unsupported catalog detail strategy');
+  if (details.descriptor_version !== '1.0') throw new Error('unsupported catalog detail descriptor');
+  if (details.url_template !== 'catalog/runtime/details/{sha256}.v1.json') throw new Error('unsupported catalog detail URL template');
+  if (!Number.isSafeInteger(details.entry_count) || details.entry_count !== manifest.entry_count) throw new Error('catalog detail entry count mismatch');
+  if (typeof details.detail_set_sha256 !== 'string' || !SHA256_PATTERN.test(details.detail_set_sha256)) throw new Error('invalid catalog detail set hash');
+  if (details.project_schema_version !== 4) throw new Error('unsupported catalog project schema');
+  return details;
+}
+
 function validateManifest(value) {
   const manifest = assertObject(value, 'manifest');
   if (manifest.kind !== 'commonworld.catalog_runtime_manifest' || manifest.version !== '1.0') throw new Error('unsupported catalog manifest');
   if (typeof manifest.generation !== 'string' || !SHA256_PATTERN.test(manifest.generation)) throw new Error('invalid catalog generation');
   if (!Number.isSafeInteger(manifest.entry_count) || manifest.entry_count < 0) throw new Error('invalid catalog entry count');
   if (typeof manifest.source_catalog_sha256 !== 'string' || !SHA256_PATTERN.test(manifest.source_catalog_sha256)) throw new Error('invalid source catalog hash');
+  assertDescriptor(manifest.world_index, 'manifest world index descriptor');
+  assertDescriptor(manifest.aggregate, 'manifest aggregate descriptor');
+  validateDetailsManifest(manifest.details, manifest);
   const shards = assertObject(manifest.shards, 'manifest shards');
   if (shards.strategy !== 'sha256-prefix' || shards.prefix_length !== 2 || !Array.isArray(shards.entries)) throw new Error('unsupported catalog shard strategy');
   const shardKeys = new Set();
@@ -112,7 +128,6 @@ function validateManifest(value) {
   }
   const shardEntryCount = [...shardDescriptors.values()].reduce((sum, descriptor) => sum + descriptor.entry_count, 0);
   if (shardEntryCount !== manifest.entry_count) throw new Error('catalog manifest shard entry count sum mismatch');
-  assertDescriptor(manifest.aggregate, 'manifest aggregate descriptor');
   return { manifest, shardKeys, shardDescriptors };
 }
 
@@ -167,7 +182,17 @@ function validateCompactGeometry(value, label) {
   return geometry;
 }
 
-function validateCompactRecord(value, label) {
+function validateDetailDescriptor(value, label, identifier, generation) {
+  const descriptor = assertDescriptor(value, label);
+  assertExactKeys(descriptor, new Set(['version', 'identity', 'generation', 'url', 'sha256', 'bytes']), label);
+  if (descriptor.version !== '1.0') throw new Error(`${label} has unsupported version`);
+  if (descriptor.identity !== identifier) throw new Error(`${label} identity mismatch`);
+  if (descriptor.generation !== generation) throw new Error(`${label} generation mismatch`);
+  if (descriptor.url !== `catalog/runtime/details/${descriptor.sha256}.v1.json`) throw new Error(`${label} has invalid content-addressed URL`);
+  return descriptor;
+}
+
+function validateCompactRecord(value, label, generation) {
   const record = assertObject(value, label);
   assertExactKeys(record, new Set(['id', 'title', 'themes', 'actions', 'languages', 'access', 'presence', 'activity', 'detail']), label);
   assertBoundedString(record.id, `${label} id`, { minLength: 3, maxLength: 96, pattern: IDENTITY_PATTERN });
@@ -177,7 +202,7 @@ function validateCompactRecord(value, label) {
   assertStringArray(record.languages, `${label} languages`, { pattern: LANGUAGE_PATTERN });
   if (record.access !== null && !ACCESS_VALUES.has(record.access)) throw new Error(`${label} has invalid access type`);
   if (!ACTIVITY_VALUES.has(record.activity)) throw new Error(`${label} has invalid activity status`);
-  if (record.detail !== `catalog/projects/${record.id}.json`) throw new Error(`${label} has an invalid detail reference`);
+  validateDetailDescriptor(record.detail, `${label} detail`, record.id, generation);
   const presence = assertObject(record.presence, `${label} presence`);
   assertExactKeys(presence, new Set(['geographic', 'digital']), `${label} presence`);
   if (typeof presence.digital !== 'boolean') throw new Error(`${label} digital presence is not boolean`);
@@ -192,7 +217,7 @@ function validateCompactRecord(value, label) {
   return record;
 }
 
-function validateCatalogShard(value, descriptor, key) {
+function validateCatalogShard(value, descriptor, key, manifest) {
   const shard = assertObject(value, 'catalog shard');
   assertExactKeys(shard, new Set(['kind', 'version', 'key', 'records']), 'catalog shard');
   if (shard.kind !== 'commonworld.catalog_shard' || shard.version !== '1.0') throw new Error('unsupported catalog shard');
@@ -201,11 +226,129 @@ function validateCatalogShard(value, descriptor, key) {
   if (shard.records.length !== descriptor.entry_count) throw new Error('catalog shard entry count mismatch');
   const ids = new Set();
   for (const [index, recordValue] of shard.records.entries()) {
-    const record = validateCompactRecord(recordValue, `catalog shard record ${index}`);
+    const record = validateCompactRecord(recordValue, `catalog shard record ${index}`, manifest.generation);
     if (ids.has(record.id)) throw new Error('catalog shard contains duplicate identity');
     ids.add(record.id);
   }
   return shard;
+}
+
+function publicGeographicProjection(value, label) {
+  if (!Array.isArray(value)) throw new Error(`${label} is not an array`);
+  const result = [];
+  for (const [index, locationValue] of value.entries()) {
+    const location = assertObject(locationValue, `${label} ${index}`);
+    if (!['exact', 'approximate', 'hidden'].includes(location.mode)) throw new Error(`${label} ${index} has invalid mode`);
+    if (location.mode === 'hidden') {
+      if ('geometry' in location) throw new Error(`${label} ${index} exposes hidden geometry`);
+      continue;
+    }
+    validateCompactGeometry(location.geometry, `${label} ${index} geometry`);
+    result.push({ mode: location.mode, geometry: location.geometry });
+  }
+  return result;
+}
+
+function detailProjection(record, label) {
+  const presence = assertObject(record.presence, `${label} presence`);
+  const digital = assertObject(presence.digital, `${label} digital presence`);
+  if (typeof digital.available !== 'boolean') throw new Error(`${label} digital availability is not boolean`);
+  const activity = assertObject(record.activity, `${label} activity`);
+  if (!ACTIVITY_VALUES.has(activity.status)) throw new Error(`${label} has invalid activity status`);
+  const languages = record.languages == null
+    ? []
+    : assertStringArray(assertObject(record.languages, `${label} languages`).codes, `${label} language codes`, { pattern: LANGUAGE_PATTERN });
+  const access = record.access == null
+    ? null
+    : assertObject(record.access, `${label} access`).type;
+  if (access !== null && !ACCESS_VALUES.has(access)) throw new Error(`${label} has invalid access type`);
+  return {
+    id: record.id,
+    title: record.title,
+    themes: record.themes,
+    actions: record.actions,
+    languages,
+    access,
+    presence: {
+      geographic: publicGeographicProjection(presence.geographic, `${label} geographic presence`),
+      digital: digital.available,
+    },
+    activity: activity.status,
+  };
+}
+
+function stableComparisonValue(value) {
+  if (Array.isArray(value)) return value.map(stableComparisonValue);
+  if (!value || typeof value !== 'object') return value;
+  return Object.fromEntries(
+    Object.keys(value).sort().map((key) => [key, stableComparisonValue(value[key])]),
+  );
+}
+
+function stableComparisonJson(value) {
+  return JSON.stringify(stableComparisonValue(value));
+}
+
+function compactProjection(record) {
+  return {
+    id: record.id,
+    title: record.title,
+    themes: record.themes,
+    actions: record.actions,
+    languages: record.languages,
+    access: record.access,
+    presence: record.presence,
+    activity: record.activity,
+  };
+}
+
+function validateCatalogDetail(value, compactRecordValue) {
+  const detail = assertObject(value, 'catalog detail');
+  assertExactKeys(detail, DETAIL_RECORD_KEYS, 'catalog detail');
+  if (detail.schema_version !== 4) throw new Error('catalog detail uses an unsupported project schema');
+  assertBoundedString(detail.id, 'catalog detail id', { minLength: 3, maxLength: 96, pattern: IDENTITY_PATTERN });
+  if (detail.id !== compactRecordValue.id) throw new Error('catalog detail identity mismatch');
+  assertBoundedString(detail.title, 'catalog detail title', { minLength: 2, maxLength: 140 });
+  assertBoundedString(detail.summary, 'catalog detail summary', { minLength: 20, maxLength: 500 });
+  assertStringArray(detail.themes, 'catalog detail themes', { minItems: 1, maxItems: 8, pattern: THEME_PATTERN });
+  assertStringArray(detail.actions, 'catalog detail actions', { minItems: 1, allowed: ACTION_VALUES });
+  assertObject(detail.provenance, 'catalog detail provenance');
+  assertObject(detail.curation, 'catalog detail curation');
+  if (!Array.isArray(detail.links) || detail.links.length < 1) throw new Error('catalog detail links are invalid');
+  if (detail.relations != null && !Array.isArray(detail.relations)) throw new Error('catalog detail relations are invalid');
+  if (detail.handoff != null) assertObject(detail.handoff, 'catalog detail handoff');
+  const projected = detailProjection(detail, 'catalog detail');
+  if (stableComparisonJson(projected) !== stableComparisonJson(compactProjection(compactRecordValue))) {
+    throw new Error('catalog detail compact parity mismatch');
+  }
+  return detail;
+}
+
+export function createCatalogLoadCache(limit) {
+  if (!Number.isSafeInteger(limit) || limit < 1) throw new TypeError('catalog cache limit must be a positive integer');
+  const entries = new Map();
+  return Object.freeze({
+    get size() { return entries.size; },
+    keys() { return [...entries.keys()]; },
+    clear() { entries.clear(); },
+    load(key, loader) {
+      assertString(key, 'catalog cache key');
+      if (typeof loader !== 'function') throw new TypeError('catalog cache loader must be a function');
+      const cached = entries.get(key);
+      if (cached) {
+        entries.delete(key);
+        entries.set(key, cached);
+        return cached;
+      }
+      const request = Promise.resolve().then(loader);
+      entries.set(key, request);
+      while (entries.size > limit) entries.delete(entries.keys().next().value);
+      void request.catch(() => {
+        if (entries.get(key) === request) entries.delete(key);
+      });
+      return request;
+    },
+  });
 }
 
 export async function verifyCatalogPayload(bytes, descriptor, cryptoImpl = globalThis.crypto) {
@@ -289,7 +432,7 @@ export async function loadCatalogAggregate({ manifestUrl = MANIFEST_URL, fetchIm
 export async function loadCatalogShard(platform, key, { fetchImpl = globalThis.fetch, cryptoImpl = globalThis.crypto } = {}) {
   if (typeof key !== 'string' || !SHARD_KEY_PATTERN.test(key)) throw new Error('invalid catalog shard key');
   const context = assertObject(platform, 'catalog platform');
-  const { shardDescriptors } = validateManifest(context.manifest);
+  const { manifest, shardDescriptors } = validateManifest(context.manifest);
   const descriptor = shardDescriptors.get(key);
   if (!descriptor) throw new Error('catalog shard is not declared by the manifest');
   if (typeof context.documentRoot !== 'string') throw new Error('catalog platform has no document root');
@@ -299,9 +442,29 @@ export async function loadCatalogShard(platform, key, { fetchImpl = globalThis.f
     await fetchVerifiedJson(shardUrl, descriptor, { fetchImpl, cryptoImpl }),
     descriptor,
     key,
+    manifest,
   );
   for (const record of shard.records) {
     if (await shardKeyForIdentity(record.id, cryptoImpl) !== key) throw new Error('catalog shard contains an identity for another key');
   }
   return deepFreeze({ key, shardUrl, records: shard.records });
+}
+
+export async function loadCatalogDetail(platform, compactRecordValue, { fetchImpl = globalThis.fetch, cryptoImpl = globalThis.crypto } = {}) {
+  const context = assertObject(platform, 'catalog platform');
+  const { manifest } = validateManifest(context.manifest);
+  const compactRecord = validateCompactRecord(compactRecordValue, 'catalog detail compact record', manifest.generation);
+  if (typeof context.documentRoot !== 'string') throw new Error('catalog platform has no document root');
+  const documentRoot = new URL(context.documentRoot);
+  const detailUrl = resolveCatalogUrl(compactRecord.detail.url, documentRoot, 'catalog detail URL');
+  const record = validateCatalogDetail(
+    await fetchVerifiedJson(detailUrl, compactRecord.detail, { fetchImpl, cryptoImpl }),
+    compactRecord,
+  );
+  return deepFreeze({
+    identity: record.id,
+    generation: manifest.generation,
+    detailUrl,
+    record,
+  });
 }

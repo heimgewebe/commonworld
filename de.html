@@ -12,10 +12,10 @@
     <link rel="alternate" type="application/json" href="./catalog/catalog.json" title="Commonworld-Katalog" />
     <link rel="alternate" type="application/schema+json" href="./contracts/commonworld/project.schema.json" title="CommonProject-Schema" />
     <link rel="stylesheet" href="./assets/vendor/maplibre-gl.css" />
-    <link rel="stylesheet" href="./index.css?v=6b2fec2d9e89" />
+    <link rel="stylesheet" href="./index.css?v=8bd80fb15da4" />
     <link rel="stylesheet" href="./assets/ipad-layout.css?v=ff4e980f851f" />
     <script src="./assets/vendor/maplibre-gl.js" defer></script>
-    <script type="module" src="./assets/commonworld-app.js?v=b38fc4e3ce75"></script>
+    <script type="module" src="./assets/commonworld-app.js?v=ecb1b2b5fb76"></script>
   </head>
   <body data-presentation="globe">
     <a id="text-skip-link" class="skip-link" href="#static-catalog-fallback">Zur Textansicht springen</a>
@@ -235,6 +235,10 @@
         <div class="panel-heading"><div><p id="focus-presence" class="kicker"></p><h2 id="focus-title"></h2></div><button id="focus-close" class="icon-button" type="button" aria-label="Fokus schließen">×</button></div>
         <p id="focus-summary" class="focus-summary"></p>
         <p id="focus-selection-status" class="focus-selection-status" role="status" hidden></p>
+        <div id="focus-catalog-detail-integrity" class="catalog-detail-integrity" hidden>
+          <p id="focus-catalog-detail-status" role="status" aria-live="polite" aria-atomic="true"></p>
+          <button id="focus-catalog-detail-retry" class="quiet-button catalog-detail-retry" type="button" hidden>Erneut prüfen</button>
+        </div>
         <div class="focus-grid">
           <section><h3>Themen</h3><ul id="focus-themes"></ul></section>
           <section><h3>Möglichkeiten</h3><ul id="focus-actions"></ul></section>

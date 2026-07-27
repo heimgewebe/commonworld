@@ -1,6 +1,6 @@
-import { BOOTSTRAP_RECORDS } from './commonworld-bootstrap-catalog.mjs';
-import { loadCatalogAggregate, loadCatalogShard, shardKeyForIdentity } from './commonworld-catalog-runtime.mjs';
-import { actionLabel, documentLocale, localizeCatalogRecords, text as i18nText, themeLabel } from './commonworld-i18n.mjs';
+import { BOOTSTRAP_RECORDS } from './commonworld-bootstrap-catalog.mjs?v=d7bd72164a68';
+import { createCatalogLoadCache, loadCatalogAggregate, loadCatalogDetail, loadCatalogShard, shardKeyForIdentity } from './commonworld-catalog-runtime.mjs?v=5954690ce64b';
+import { actionLabel, documentLocale, localizeCatalogRecords, text as i18nText, themeLabel } from './commonworld-i18n.mjs?v=e7db362a7f96';
 import {
   COMMONS_TYPE_COLOR_TOKENS,
   COMMONS_TYPE_VALUES,
@@ -49,7 +49,7 @@ import {
   sphereOpacityForGlobeRatio,
   stateFromSearch,
   visibleDigitalNodes,
-} from './commonworld-core.mjs';
+} from './commonworld-core.mjs?v=e1eac1e9a382';
 
 const LOCALE = documentLocale();
 const t = (key, germanFallback, variables = {}) => i18nText(LOCALE, key, germanFallback, variables);
@@ -80,6 +80,8 @@ const INTENT_FILTER_NAMES = Object.freeze(['commons_type', 'presence', 'action',
 const DIGITAL_IDENTITY_DOM_LIMIT = 48;
 const TEXT_IDENTITY_DOM_LIMIT = 48;
 const DISCOVERY_RESULT_PREVIEW_LIMIT = 50;
+const CATALOG_SHARD_CACHE_LIMIT = 8;
+const CATALOG_DETAIL_CACHE_LIMIT = 16;
 const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
 const elements = {
   body: document.body,
@@ -153,6 +155,9 @@ const elements = {
   focusTitle: document.querySelector('#focus-title'),
   focusSummary: document.querySelector('#focus-summary'),
   focusSelectionStatus: document.querySelector('#focus-selection-status'),
+  focusCatalogDetailIntegrity: document.querySelector('#focus-catalog-detail-integrity'),
+  focusCatalogDetailStatus: document.querySelector('#focus-catalog-detail-status'),
+  focusCatalogDetailRetry: document.querySelector('#focus-catalog-detail-retry'),
   focusPresence: document.querySelector('#focus-presence'),
   focusThemes: document.querySelector('#focus-themes'),
   focusActions: document.querySelector('#focus-actions'),
@@ -173,7 +178,8 @@ const runtime = {
   canonicalRecordsById: new Map(),
   catalogPlatform: null,
   catalogPlatformState: 'idle',
-  catalogShardLoads: new Map(),
+  catalogShardLoads: createCatalogLoadCache(CATALOG_SHARD_CACHE_LIMIT),
+  catalogDetailLoads: createCatalogLoadCache(CATALOG_DETAIL_CACHE_LIMIT),
   catalogRecordShadowGeneration: 0,
   catalogShadowEnabled: true,
   catalogShadowWarnings: new Set(),
@@ -467,6 +473,76 @@ function setCatalogRecordShadowState(state, { identifier = null, key = null } = 
   else delete elements.stage.dataset.catalogRecordShadowShard;
 }
 
+function catalogDetailStatusPresentation() {
+  const state = elements.stage.dataset.catalogDetailShadow ?? 'idle';
+  const identifier = elements.stage.dataset.catalogDetailShadowId ?? null;
+  if (!identifier || identifier !== runtime.state.project || state === 'idle') {
+    return { hidden: true, message: '', retry: false, running: false };
+  }
+  if (state === 'loading') {
+    return { hidden: false, message: t('catalog_detail_loading', 'Katalogdetails werden für diese Generation geprüft.'), retry: false, running: false };
+  }
+  if (state === 'retrying') {
+    return { hidden: false, message: t('catalog_detail_retrying', 'Katalogdetails werden erneut geprüft.'), retry: false, running: true };
+  }
+  if (state === 'ready') {
+    return { hidden: false, message: t('catalog_detail_ready', 'Katalogdetails dieser Generation sind integritätsgeprüft.'), retry: false, running: false };
+  }
+  if (state === 'mismatch') {
+    return { hidden: false, message: t('catalog_detail_mismatch', 'Die geprüften Katalogdetails weichen vom eingebetteten Datensatz ab. Die eingebetteten Details bleiben aktiv.'), retry: true, running: false };
+  }
+  return { hidden: false, message: t('catalog_detail_degraded', 'Die geprüften Katalogdetails sind derzeit nicht erreichbar. Die eingebetteten Details bleiben verfügbar.'), retry: true, running: false };
+}
+
+function applyCatalogDetailStatus(container, status, retry) {
+  if (!container || !status || !retry) return;
+  const presentation = catalogDetailStatusPresentation();
+  container.hidden = presentation.hidden;
+  const message = presentation.hidden ? '' : presentation.message;
+  if (status.textContent !== message) status.textContent = message;
+  const retryHadFocus = document.activeElement === retry;
+  retry.hidden = !presentation.retry;
+  retry.disabled = presentation.running;
+  retry.textContent = t('catalog_detail_retry', 'Erneut prüfen');
+  if (retryHadFocus && retry.hidden) {
+    const focusTarget = container.closest('#project-focus') ?? elements.layerProjects;
+    if (focusTarget === elements.layerProjects && !focusTarget.hasAttribute('tabindex')) focusTarget.tabIndex = -1;
+    queueMicrotask(() => {
+      if (focusTarget?.isConnected && !focusTarget.hidden && !focusTarget.closest('[hidden], [inert], [aria-hidden="true"]')) {
+        focusTarget.focus({ preventScroll: true });
+      }
+    });
+  }
+}
+
+function syncCatalogDetailShadowPresentation() {
+  applyCatalogDetailStatus(
+    elements.focusCatalogDetailIntegrity,
+    elements.focusCatalogDetailStatus,
+    elements.focusCatalogDetailRetry,
+  );
+  const layerIntegrity = elements.layerProjects.querySelector('[data-catalog-detail-integrity]');
+  applyCatalogDetailStatus(
+    layerIntegrity,
+    layerIntegrity?.querySelector('[data-catalog-detail-status]'),
+    layerIntegrity?.querySelector('[data-catalog-detail-retry]'),
+  );
+}
+
+function setCatalogDetailShadowState(state, { identifier = null, key = null, detailUrl = null } = {}) {
+  setDatasetIfChanged(elements.stage, 'catalogDetailShadow', state);
+  if (identifier) setDatasetIfChanged(elements.stage, 'catalogDetailShadowId', identifier);
+  else delete elements.stage.dataset.catalogDetailShadowId;
+  if (key) setDatasetIfChanged(elements.stage, 'catalogDetailShadowShard', key);
+  else delete elements.stage.dataset.catalogDetailShadowShard;
+  if (detailUrl) setDatasetIfChanged(elements.stage, 'catalogDetailShadowUrl', detailUrl);
+  else delete elements.stage.dataset.catalogDetailShadowUrl;
+  if (state === 'degraded' || state === 'mismatch') setDatasetIfChanged(elements.stage, 'catalogDetailRetry', 'available');
+  else if (state === 'retrying') setDatasetIfChanged(elements.stage, 'catalogDetailRetry', 'running');
+  else delete elements.stage.dataset.catalogDetailRetry;
+  syncCatalogDetailShadowPresentation();
+}
+
 function warnCatalogShadowOnce(code, message, error = null) {
   if (runtime.catalogShadowWarnings.has(code)) return;
   runtime.catalogShadowWarnings.add(code);
@@ -478,54 +554,84 @@ function loadCatalogShardOnce(key) {
   const platform = runtime.catalogPlatform;
   if (!platform) throw new Error('catalog platform is not ready');
   const cacheKey = `${platform.manifest.generation}:${key}`;
-  const cached = runtime.catalogShardLoads.get(cacheKey);
-  if (cached) return cached;
-  const request = loadCatalogShard(platform, key).catch((error) => {
-    if (runtime.catalogShardLoads.get(cacheKey) === request) runtime.catalogShardLoads.delete(cacheKey);
-    throw error;
-  });
-  runtime.catalogShardLoads.set(cacheKey, request);
-  return request;
+  return runtime.catalogShardLoads.load(cacheKey, () => loadCatalogShard(platform, key));
 }
 
-async function observeCatalogRecordShadow(identifier = runtime.state.project) {
+function loadCatalogDetailOnce(compactRecord) {
+  const platform = runtime.catalogPlatform;
+  if (!platform) throw new Error('catalog platform is not ready');
+  const cacheKey = `${platform.manifest.generation}:${compactRecord.id}:${compactRecord.detail.sha256}`;
+  return runtime.catalogDetailLoads.load(cacheKey, () => loadCatalogDetail(platform, compactRecord));
+}
+
+function retryCatalogDetailShadow(identifier = runtime.state.project) {
+  if (!identifier || identifier !== runtime.state.project || !runtime.catalogShadowEnabled) return;
+  setCatalogDetailShadowState('retrying', { identifier });
+  void observeCatalogPlatform({ retryIdentifier: identifier, forceRefresh: true });
+}
+
+async function observeCatalogRecordShadow(identifier = runtime.state.project, { retrying = false } = {}) {
   const observation = ++runtime.catalogRecordShadowGeneration;
   if (!runtime.catalogShadowEnabled || !identifier) {
     setCatalogRecordShadowState('idle');
+    setCatalogDetailShadowState('idle');
     return;
   }
   setCatalogRecordShadowState('loading', { identifier });
+  setCatalogDetailShadowState(retrying ? 'retrying' : 'loading', { identifier });
   if (runtime.catalogPlatformState === 'degraded') {
     setCatalogRecordShadowState('degraded', { identifier });
+    setCatalogDetailShadowState('degraded', { identifier });
     return;
   }
   if (!runtime.catalogPlatform) return;
+  let key = null;
+  let shardReady = false;
   try {
-    const key = await shardKeyForIdentity(identifier);
+    key = await shardKeyForIdentity(identifier);
     if (observation !== runtime.catalogRecordShadowGeneration || runtime.state.project !== identifier) return;
     setCatalogRecordShadowState('loading', { identifier, key });
     const shard = await loadCatalogShardOnce(key);
     if (observation !== runtime.catalogRecordShadowGeneration || runtime.state.project !== identifier) return;
     const matches = shard.records.filter((record) => record.id === identifier);
     const canonical = runtime.canonicalRecordsById.get(identifier);
-    const parity = matches.length === 1
+    const compactParity = matches.length === 1
       && canonical
       && stableComparisonJson(normalizedCompactShardRecord(matches[0])) === stableComparisonJson(compactProjectionFromCanonical(canonical));
-    if (parity) {
-      setCatalogRecordShadowState('ready', { identifier, key });
+    if (!compactParity) {
+      setCatalogRecordShadowState('mismatch', { identifier, key });
+      setCatalogDetailShadowState('mismatch', { identifier, key });
+      warnCatalogShadowOnce(
+        `${runtime.catalogPlatform.manifest.generation}:${identifier}:compact-mismatch`,
+        `Commonworld catalog shard parity mismatch for ${identifier}; compact bootstrap remains active`,
+      );
       return;
     }
-    setCatalogRecordShadowState('mismatch', { identifier, key });
+    shardReady = true;
+    setCatalogRecordShadowState('ready', { identifier, key });
+    setCatalogDetailShadowState('loading', { identifier, key });
+    const detail = await loadCatalogDetailOnce(matches[0]);
+    if (observation !== runtime.catalogRecordShadowGeneration || runtime.state.project !== identifier) return;
+    const detailParity = detail.identity === identifier
+      && canonical
+      && stableComparisonJson(compactProjectionFromCanonical(detail.record))
+        === stableComparisonJson(compactProjectionFromCanonical(canonical));
+    if (detailParity) {
+      setCatalogDetailShadowState('ready', { identifier, key, detailUrl: detail.detailUrl });
+      return;
+    }
+    setCatalogDetailShadowState('mismatch', { identifier, key, detailUrl: detail.detailUrl });
     warnCatalogShadowOnce(
-      `${runtime.catalogPlatform.manifest.generation}:${identifier}:mismatch`,
-      `Commonworld catalog shard parity mismatch for ${identifier}; compatible bootstrap remains active`,
+      `${runtime.catalogPlatform.manifest.generation}:${identifier}:detail-mismatch`,
+      `Commonworld catalog detail parity mismatch for ${identifier}; compact bootstrap remains active`,
     );
   } catch (error) {
     if (observation !== runtime.catalogRecordShadowGeneration || runtime.state.project !== identifier) return;
-    setCatalogRecordShadowState('degraded', { identifier });
+    if (!shardReady) setCatalogRecordShadowState('degraded', { identifier, key });
+    setCatalogDetailShadowState('degraded', { identifier, key });
     warnCatalogShadowOnce(
-      `${runtime.catalogPlatform?.manifest?.generation ?? 'unavailable'}:${identifier}:degraded`,
-      `Commonworld catalog shard unavailable for ${identifier}; compatible bootstrap remains active`,
+      `${runtime.catalogPlatform?.manifest?.generation ?? 'unavailable'}:${identifier}:${shardReady ? 'detail' : 'shard'}-degraded`,
+      `Commonworld catalog ${shardReady ? 'detail' : 'shard'} unavailable for ${identifier}; compact bootstrap remains active`,
       error,
     );
   }
@@ -2242,6 +2348,7 @@ function updateFocusPanel() {
   replaceLinks(elements.focusLinks, record.links ?? []);
   replaceLinks(elements.focusSources, record?.provenance?.sources ?? []);
   elements.focusCuration.textContent = curationTextForRecord(record);
+  syncCatalogDetailShadowPresentation();
 }
 
 function updateSelectionMarks() {
@@ -3205,6 +3312,7 @@ function wireControls() {
   });
   elements.globeReset.addEventListener('click', resetGlobe);
   elements.focusClose.addEventListener('click', () => clearProject());
+  elements.focusCatalogDetailRetry.addEventListener('click', () => retryCatalogDetailShadow());
   elements.filterToggle.addEventListener('click', () => {
     if (runtime.activeOverlay === 'discovery') closeDiscovery({ restoreFocus: true });
     else openDiscovery({ trigger: elements.filterToggle });
@@ -3545,25 +3653,41 @@ function ensureMap() {
   if (!runtime.map) createMap();
 }
 
-async function observeCatalogPlatform() {
+async function observeCatalogPlatform({ retryIdentifier = null, forceRefresh = false } = {}) {
+  const previousGeneration = runtime.catalogPlatform?.manifest?.generation ?? null;
   runtime.catalogPlatformState = 'loading';
   elements.stage.dataset.catalogPlatform = 'loading';
+  if (forceRefresh) {
+    runtime.catalogPlatform = null;
+    runtime.catalogShardLoads.clear();
+    runtime.catalogDetailLoads.clear();
+  }
   try {
     const platform = await loadCatalogAggregate();
     const { manifest, aggregate } = platform;
+    if (!forceRefresh && previousGeneration !== manifest.generation) {
+      runtime.catalogShardLoads.clear();
+      runtime.catalogDetailLoads.clear();
+    }
     runtime.catalogPlatform = platform;
     runtime.catalogPlatformState = 'ready';
     elements.stage.dataset.catalogPlatform = 'ready';
     elements.stage.dataset.catalogGeneration = manifest.generation;
     elements.stage.dataset.catalogAggregateThemes = String(Object.keys(aggregate.themes ?? {}).length);
     elements.stage.dataset.catalogAggregateCells = String(Object.keys(aggregate.spatial_cells ?? {}).length);
-    void observeCatalogRecordShadow(runtime.state.project);
+    const selectedIdentifier = retryIdentifier && runtime.state.project === retryIdentifier
+      ? retryIdentifier
+      : runtime.state.project;
+    void observeCatalogRecordShadow(selectedIdentifier, { retrying: selectedIdentifier === retryIdentifier });
   } catch (error) {
     runtime.catalogPlatform = null;
     runtime.catalogPlatformState = 'degraded';
     elements.stage.dataset.catalogPlatform = 'degraded';
-    void observeCatalogRecordShadow(runtime.state.project);
-    console.warn('Commonworld catalog aggregate unavailable; compatible bootstrap remains active', error);
+    const selectedIdentifier = retryIdentifier && runtime.state.project === retryIdentifier
+      ? retryIdentifier
+      : runtime.state.project;
+    void observeCatalogRecordShadow(selectedIdentifier);
+    console.warn('Commonworld catalog aggregate unavailable; compact bootstrap remains active', error);
   }
 }
 
@@ -3615,7 +3739,7 @@ async function boot() {
     void observeCatalogPlatform();
 
     // Build and CI compare this generated bootstrap with every canonical CommonProject.
-    // Only a selected identity's compact shard is read in shadow mode; visible data stays bootstrap-bound.
+    // Only a selected identity's compact shard and generation-bound detail are read in shadow mode; visible data stays bootstrap-bound.
   } catch (error) {
     console.error(error);
     setStatus(t('catalog_bootstrap_failed', 'Commonworld konnte auch den buildgebundenen Katalog nicht lesen.'), 'failed');

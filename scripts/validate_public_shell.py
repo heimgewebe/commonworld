@@ -29,6 +29,13 @@ except ModuleNotFoundError as exc:  # direct script execution puts the scripts d
         parse_stylesheet_links,
     )
 
+try:
+    from scripts.render_public_shell import MODULE_IMPORT_DEPENDENCIES
+except ModuleNotFoundError as exc:
+    if exc.name not in {"scripts", "scripts.render_public_shell"}:
+        raise
+    from render_public_shell import MODULE_IMPORT_DEPENDENCIES
+
 ROOT = Path(__file__).resolve().parents[1]
 
 REQUIRED_HTML = (
@@ -171,6 +178,21 @@ def validate_public_shell(root: Path = ROOT) -> list[str]:
     css_version = hashlib.sha256(css_path.read_bytes()).hexdigest()[:12]
     if f'<script type="module" src="./assets/commonworld-app.js?v={app_version}"></script>' not in html:
         errors.append('public shell must load commonworld-app.js with its deterministic content hash')
+    for module_path, dependencies in MODULE_IMPORT_DEPENDENCIES:
+        module_file = root / module_path
+        if not module_file.is_file():
+            errors.append(f'public shell missing local module: {module_path}')
+            continue
+        module_source = module_file.read_text(encoding='utf-8')
+        for dependency_path in dependencies:
+            dependency_file = root / dependency_path
+            if not dependency_file.is_file():
+                errors.append(f'public shell missing local module dependency: {dependency_path}')
+                continue
+            dependency_version = hashlib.sha256(dependency_file.read_bytes()).hexdigest()[:12]
+            expected_import = f"from './{dependency_file.name}?v={dependency_version}'"
+            if expected_import not in module_source:
+                errors.append(f'public shell module import is not content-bound: {module_path} -> {dependency_path}')
     if "document.querySelectorAll('.catalog-card[data-commonproject-id]')" in app:
         errors.append('runtime catalog filtering must not mutate the bootstrap recovery surface')
     for token in (

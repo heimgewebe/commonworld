@@ -6,6 +6,7 @@ from __future__ import annotations
 import hashlib
 import html
 import json
+import re
 import sys
 from pathlib import Path
 
@@ -24,6 +25,26 @@ from scripts.catalog_bootstrap import bootstrap_record
 ACTION_LINK_TYPES = {"visit", "use", "borrow", "learn", "contribute", "volunteer", "donate", "contact", "replicate"}
 TAXONOMY = load_taxonomy(ROOT)
 
+MODULE_IMPORT_DEPENDENCIES = (
+    ("assets/commonworld-i18n.mjs", ("assets/commonworld-en-locale.mjs",)),
+    (
+        "assets/commonworld-core.mjs",
+        (
+            "assets/commonworld-en-locale.mjs",
+            "assets/commonworld-i18n.mjs",
+        ),
+    ),
+    (
+        "assets/commonworld-app.js",
+        (
+            "assets/commonworld-bootstrap-catalog.mjs",
+            "assets/commonworld-catalog-runtime.mjs",
+            "assets/commonworld-i18n.mjs",
+            "assets/commonworld-core.mjs",
+        ),
+    ),
+)
+
 ORBIT_PROFILES = (
     (316, 300, -8),
     (310, 282, 20),
@@ -38,6 +59,29 @@ ORBIT_PROFILES = (
 
 def asset_version(relative_path: str, root: Path = ROOT) -> str:
     return hashlib.sha256((root / relative_path).read_bytes()).hexdigest()[:12]
+
+
+def synchronize_module_import_versions(root: Path = ROOT) -> None:
+    """Bind every local browser-module edge to the dependency bytes it loads."""
+    for module_path, dependencies in MODULE_IMPORT_DEPENDENCIES:
+        path = root / module_path
+        source = path.read_text(encoding="utf-8")
+        updated = source
+        for dependency_path in dependencies:
+            specifier = f"./{Path(dependency_path).name}"
+            versioned = f"{specifier}?v={asset_version(dependency_path, root)}"
+            pattern = re.compile(
+                rf"(?P<prefix>\bfrom\s+['\"]){re.escape(specifier)}(?:\?v=[0-9a-f]{{12}})?(?P<suffix>['\"])"
+            )
+            updated, count = pattern.subn(
+                lambda match: f"{match.group('prefix')}{versioned}{match.group('suffix')}",
+                updated,
+                count=1,
+            )
+            if count != 1:
+                raise ValueError(f"{module_path}: expected exactly one import of {specifier}")
+        if updated != source:
+            path.write_text(updated, encoding="utf-8")
 
 
 def homepage(record: dict) -> str:
@@ -429,6 +473,10 @@ def render_shell(root: Path = ROOT, locale: str = FALLBACK_LOCALE) -> str:
         <div class="panel-heading"><div><p id="focus-presence" class="kicker"></p><h2 id="focus-title"></h2></div><button id="focus-close" class="icon-button" type="button" aria-label="Fokus schließen">×</button></div>
         <p id="focus-summary" class="focus-summary"></p>
         <p id="focus-selection-status" class="focus-selection-status" role="status" hidden></p>
+        <div id="focus-catalog-detail-integrity" class="catalog-detail-integrity" hidden>
+          <p id="focus-catalog-detail-status" role="status" aria-live="polite" aria-atomic="true"></p>
+          <button id="focus-catalog-detail-retry" class="quiet-button catalog-detail-retry" type="button" hidden>Erneut prüfen</button>
+        </div>
         <div class="focus-grid">
           <section><h3>Themen</h3><ul id="focus-themes"></ul></section>
           <section><h3>Möglichkeiten</h3><ul id="focus-actions"></ul></section>
@@ -499,6 +547,7 @@ def main() -> int:
     records = load_records(ROOT)
     (ROOT / "assets/commonworld-bootstrap-catalog.mjs").write_text(render_bootstrap_catalog(records), encoding="utf-8")
     (ROOT / "assets/commonworld-en-locale.mjs").write_text(render_locale_module("en", ROOT), encoding="utf-8")
+    synchronize_module_import_versions(ROOT)
     (ROOT / "index.html").write_text(render_shell(ROOT, "en"), encoding="utf-8")
     (ROOT / "de.html").write_text(render_shell(ROOT, "de"), encoding="utf-8")
     (ROOT / "method.html").write_text(render_method(ROOT, "en"), encoding="utf-8")

@@ -2,20 +2,20 @@
 
 ## Entscheidung
 
-Commonworld trennt ab jetzt Anwendung, Katalogwahrheit und öffentliche Projektion.
+Commonworld trennt Anwendung, Katalogwahrheit und öffentliche Projektion.
 
 - **Commonworld** bleibt eine konto- und schreibfreie Entdeckungsoberfläche.
 - **Weltgewebe** ist die geplante Erfassungs-, Vorschlags-, Moderations- und Administrationsgrenze.
 - **PostgreSQL** ist perspektivisch die einzige veränderbare Katalogwahrheit.
 - **PostGIS** ergänzt räumliche Filter, Kacheln und regionale Aggregationen, sobald der Weltgewebe-Cutover belegt ist.
 - **Rust/Axum** liefert dieselben öffentlichen, sichtbarkeitsgeprüften Projektionen als API und Snapshot-Exporter.
-- **Statische, immutable Snapshots** bleiben der primäre Commonworld-Lesepfad und können über GitHub Pages oder später ein CDN ausgeliefert werden.
+- **Immutable statische Snapshots** bleiben der primäre Commonworld-Lesepfad und können über GitHub Pages oder später ein CDN ausgeliefert werden.
 
-Der Browser erhält niemals den vollständigen redaktionellen Datensatz. Er lädt eine kompakte Weltprojektion, danach räumliche oder semantische Shards und vollständige Details nur bei Auswahl.
+Der öffentliche Browser erhält nur veröffentlichte Daten. Der Übergangspfad liefert den kompakten buildgebundenen Bootstrap; zusätzlich lädt die Runtime ein kleines Aggregat, genau den Shard einer ausgewählten Identität und danach genau deren hashadressiertes Detail im Shadow-Modus. Der Shadow-Pfad ersetzt keine sichtbaren Daten.
 
 ## Warum diese Grundlage zum Weltgewebe passt
 
-Weltgewebe verwendet bereits SvelteKit 2/Svelte 5, TypeScript/Vite, Rust/Axum, PostgreSQL, MapLibre/PMTiles und plant PostGIS, Kubernetes/GitOps, NATS JetStream und eine Transactional Outbox. Commonworld übernimmt davon nur die stabilen Plattformgrenzen, nicht die gesamte Runtime.
+Weltgewebe verwendet bereits SvelteKit, TypeScript/Vite, Rust/Axum, PostgreSQL, MapLibre/PMTiles und plant PostGIS, Kubernetes/GitOps, NATS JetStream und eine Transactional Outbox. Commonworld übernimmt davon nur die stabilen Plattformgrenzen, nicht die gesamte Runtime.
 
 Die gemeinsame Linie lautet:
 
@@ -29,99 +29,125 @@ Die gemeinsame Linie lautet:
 
 ### Ebene 0: Manifest
 
-Klein, cachebar und atomar austauschbar. Enthält Generation, Schema, Anzahl, Hashes, Shardstrategie und URL-Vorlagen.
+Klein, cachebar und atomar austauschbar. Es enthält Generation, Anzahl, Aggregat- und Weltindexdescriptoren, Sharddescriptoren sowie den Vertrag für hashadressierte Details.
+
+Die Generations-ID ist SHA-256 über einen kanonischen Seed aus:
+
+- Hash des Quellkatalogs,
+- Hash der geordneten Detaildescriptor-Menge,
+- CommonProject-Schemaversion,
+- Detaildescriptor-Version.
+
+Damit ändert sich die Generation bei jeder relevanten Detail- oder Vertragsänderung, ohne einen zirkulären Hash zwischen Manifest und Shards zu erzeugen.
 
 ### Ebene 1: Weltindex
 
-Nur startrelevante Felder: Identität, Titel, Themen, Präsenzbits, grobe öffentliche Geometrie, Aktivitätsstatus und Detailreferenz. Keine Quellenlisten, langen Beschreibungen oder internen Moderationsdaten.
+Startrelevante Felder: Identität, Titel, Themen, Handlungen, Sprachen, Zugang, öffentliche Präsenz, Aktivitätsstatus und ein generationsgebundener Detaildescriptor. Keine Zusammenfassungen, Quellenlisten, Links, redaktionellen Notizen oder Handoff-Daten.
 
-### Ebene 2: Shards
+Der vollständige Weltindex bleibt Export- und Prüffläche. Er ist für große Kataloge ausdrücklich kein initialer Browserpfad.
 
-- räumlich: PMTiles oder deterministische H3-/Kachel-Shards;
-- digital: Taxonomie-/Themen-Shards;
-- Suche: lexikalische Präfix-/Sprach-Shards als Offline-Fallback;
-- Länder-/Regionenaggregate für die Totalansicht.
+### Ebene 2: Aggregat und Shards
+
+Das Aggregat ordnet Themen, 10-Grad-Raumzellen und digitale Verfügbarkeit stabilen SHA-256-Präfix-Shards zu. Ein Shard enthält kompakte Records einschließlich Detaildescriptor, aber keine vollständigen Details.
+
+Zwei Hexzeichen ergeben höchstens 256 Partitionen. Eine Identität bleibt bei Inhaltsänderungen im selben Shard; die Generation und die Integritätshashes ändern sich trotzdem.
 
 ### Ebene 3: Details
 
-Vollständige öffentliche CommonProject-Projektion, einzeln cachebar. Quellen und Provenienz bleiben hier erhalten.
+Jede vollständige öffentliche CommonProject-Projektion wird kanonisch serialisiert und unter
+
+`catalog/runtime/details/{sha256}.v1.json`
+
+abgelegt. Der Compact Record trägt `identity`, `generation`, `url`, `sha256` und `bytes`. Ein mutable Pfad wie `catalog/projects/{id}.json` ist kein Runtime-Ladepfad.
+
+## Zweischichtige Validierungsgrenze
+
+Build und CI validieren jeden kanonischen Datensatz vollständig gegen CommonProject-Schema v4 und serialisieren ihn deterministisch.
+
+Der Browser implementiert bewusst keine zweite vollständige JSON-Schema-Engine. Er prüft stattdessen:
+
+1. Same-Origin und Dokumentwurzel,
+2. aktuell akzeptierte Manifestgeneration,
+3. Descriptor-Identität und content-addressed URL,
+4. Bytezahl und SHA-256 vor dem Parsen,
+5. UTF-8 und JSON,
+6. `schema_version: 4` und begrenzte Top-Level-Form,
+7. ausgewählte Identität,
+8. exakte Parität der kompakten Projektion,
+9. transitive Parität zum kompakten buildgebundenen Datensatz über denselben geprüften Compact Record.
+
+Die Byte- und Hashbindung macht die vollständige CI-Schemavalidierung transportwirksam. Ein Fehler oder Mismatch ersetzt niemals den sichtbaren Bootstrap.
+
+## Runtime-Zustände und Cachegrenzen
+
+Für die ausgewählte Identität veröffentlicht die Stage getrennte Shard- und Detailzustände:
+
+- `idle`
+- `loading`
+- `retrying`
+- `ready`
+- `mismatch`
+- `degraded`
+
+Der Shardcache ist auf 8, der Detailcache auf 16 Einträge begrenzt. Beide verwenden deterministische LRU-Verdrängung. Fehlgeschlagene Promises werden entfernt und können erneut geladen werden. Ein Generationswechsel leert beide Caches. Ein gemeinsamer Auswahlzähler verhindert, dass verspätete Antworten eine neuere Auswahl überschreiben.
+
+Bei einem Detailfehler bleiben Titel, Zusammenfassung, Links, Quellen, Karte, Suche und Textansicht aus dem kompakten Bootstrap nutzbar. Eine sichtbare, lokalisierte Wiederholungsaktion verwirft beide Shadow-Caches, lädt Manifest und Aggregat frisch und verifiziert danach Shard und Detail der weiterhin ausgewählten Identität erneut. Damit kann sie sowohl einen transienten Plattformausfall als auch einen gestaffelten Snapshot-Rollout überwinden. Nach erfolgreicher Wiederholung wird der Tastaturfokus auf einen sichtbaren Kontext zurückgeführt.
 
 ## Skalierungsweg
 
-- Bis etwa 10.000 veröffentlichte Commons: statische Weltprojektion plus Detaildateien.
-- Ab gemessenem Payload- oder Renderengpass: räumliche und semantische Shards.
-- Bei globaler Volltextsuche: serverseitige PostgreSQL-FTS/`pg_trgm`-Suche über Axum; semantische Ergänzung nur nach Weltgewebe-Qualitätsvertrag.
+- Bis zu einem gemessenen Payload- oder Renderengpass: buildgebundener Übergang plus Shadow-Manifest, Aggregat, ausgewählter Shard und ausgewähltes Detail.
+- Nach vollständig belegtem Cutover: kleines Aggregat plus bedarfsgeladene Shards und Details.
+- Bei globaler Volltextsuche: serverseitige PostgreSQL-FTS/`pg_trgm`-Suche über Axum; semantische Ergänzung nur nach Qualitätsvertrag.
 - Bei sehr großen Geometrien: PMTiles aus PostGIS-Projektionen, nicht GeoJSON-Volltransfer.
 - ANN/HNSW, separater Suchdienst und Elasticsearch/Typesense/Meilisearch bleiben ohne belegten Engpass ausgeschlossen.
 
 Die Schwellen sind Messpunkte, keine harten Katalogzahlen.
+
+## Gemessene Skalierungsgrenzen vom 26. Juli 2026
+
+Die reproduzierbare synthetische Messung liegt in `docs/evidence/catalog-platform-scaling-v1.json`. Sie verwendet die aktuelle kompakte Datensatzform einschließlich generationsgebundener Detaildescriptoren und eine deterministische SHA-256-Präfixverteilung.
+
+| Einträge | Vollindex gzip | Median Parsezeit | größter Shard gzip | maximale Einträge je Shard |
+| ---: | ---: | ---: | ---: | ---: |
+| 10.000 | 624.128 Byte | 59,844 ms | 4.231 Byte | 59 |
+| 100.000 | 6.237.810 Byte | 1.003,180 ms | 28.683 Byte | 440 |
+
+Der Descriptor erhöht den Weltindex gegenüber der früheren ungebundenen Detailreferenz deutlich. Genau deshalb bleibt der vollständige 100k-Weltindex als initiale Browserlieferung verworfen. Der größte bedarfsgeladene Shard bleibt unter dem festgelegten 32-KiB-gzip-Budget.
+
+Die Messung ist synthetisch. Sie belegt Payload, lokale Parsegröße und Shardgrenze, aber keine reale Mobilfunklatenz oder physische iPad-Bedienbarkeit.
 
 ## Invarianten
 
 1. Keine zweite veränderbare Wahrheit in Commonworld.
 2. Nur veröffentlichte und sichtbarkeitsgeprüfte Daten gelangen in Snapshots.
 3. Verborgene Orte bleiben ohne rekonstruierte Geometrie.
-4. Jede Generation bindet Schema, Datensatzrevision, Inhalts-Hashes und Erzeugungszeit.
-5. Ein Manifest verweist ausschließlich auf Artefakte derselben Generation.
-6. Ein fehlgeschlagener Snapshotwechsel lässt die vorherige vollständige Generation aktiv.
+4. Eine Manifestgeneration bindet Quellkatalog, Detailmenge und relevante Schemaverträge.
+5. Ein Manifest verweist nur auf Artefakte, deren Hash und Größe es oder ein generationsgebundener Sharddescriptor festlegt.
+6. Ein fehlgeschlagener Shadow-Leseweg lässt den kompakten buildgebundenen Datensatz und die vollständige statische Recovery-Liste aktiv.
 7. Suche und Karte verwenden dieselbe zulässige Kandidatenmenge.
-8. Details sind bedarfsgeladen; der Bootstrap enthält keine wachsende Commons-Liste.
+8. Schnelle Auswahlwechsel dürfen keine ältere Antwort auf den aktuellen Fokus anwenden.
+9. Erfolgreiche Shadow-Parität autorisiert weder Bootstrap-Entfernung noch Deployment oder physischen Geräte-Cutover.
+
+## Cutover-Gate
+
+Der Bootstrap darf erst entfernt werden, wenn alle folgenden Punkte an demselben geprüften Stand belegt sind:
+
+- kompakte Shardparität sowie hash-, schema- und compact-gebundene Detailparität,
+- deutsche und englische Darstellung,
+- Deep-Link-, Vor-/Zurück- und No-JavaScript-Parität,
+- Offline-, Integritäts-, Netzwerk-, Retry- und Stale-Response-Fälle,
+- unterstützte Desktop-, Mobil- und iPad-Browserprofile,
+- 4-fache CPU-Drosselung innerhalb des Budgets,
+- revisionsgebundenes Rollback-Artefakt,
+- Produktionsgeneration und öffentlicher Readback,
+- separat ausgewiesener physischer Gerätebeleg.
+
+Der aktuelle Vertrag setzt `cutover_authorized: false`.
 
 ## Alternative Sinnachse
 
-Wird minimale Betriebsfläche höher gewichtet, kann Commonworld lange rein statisch bleiben. Wird maximale Aktualität höher gewichtet, kann Axum Teilabfragen direkt beantworten. Wird maximale Offlinefähigkeit höher gewichtet, werden Snapshots und Shards in IndexedDB gehalten. Der Vertrag bleibt in allen drei Fällen gleich.
-
-## Migrationsfolge
-
-1. Vertrag und deterministischen kompakten Weltindex einführen.
-2. Indexgröße und Browserkosten mit 10k/100k synthetischen Einträgen messen; Messbeleg unter `docs/evidence/catalog-platform-scaling-v1.json`.
-3. Client auf Manifest plus Weltindex umstellen; Details lazy laden.
-4. Bootstrap-Katalog entfernen und Größenbudget auf Anwendungscode beziehen.
-5. Shards und PMTiles erst nach gemessenem Bedarf aktivieren.
-6. Weltgewebe-Publisher an denselben Vertrag anbinden.
-7. Statische Repository-Katalogwahrheit nach belegtem Weltgewebe-Cutover zurückbauen.
+Wird minimale Betriebsfläche höher gewichtet, kann Commonworld lange beim buildgebundenen Bootstrap bleiben. Wird maximale Aktualität höher gewichtet, kann Axum Teilabfragen direkt beantworten. Wird maximale Offlinefähigkeit höher gewichtet, werden Snapshots und Shards in IndexedDB gehalten. Die Integritäts- und Generationsgrenze bleibt in allen drei Fällen gleich.
 
 ## Nicht behauptet
 
-Dieser Schnitt belegt noch keinen PostGIS-, Outbox-, Axum- oder Weltgewebe-Produktionspfad. Er schafft den kompatiblen öffentlichen Liefervertrag und einen lokalen deterministischen Snapshot-Compiler.
-
-## Umsetzungsstand der Skalierungsgrundlage
-
-Der Runtime-Compiler erzeugt neben Manifest und vollständigem Offline-Weltindex deterministische SHA-256-Präfix-Shards. Zwei Hexzeichen ergeben höchstens 256 stabile Partitionen. Ein Datensatz wechselt seinen Shard nur bei Änderung seiner ID; Inhaltsänderungen invalidieren nicht den gesamten Katalog.
-
-Der vollständige Weltindex bleibt als maschinenlesbarer Export und Prüffläche erhalten. Er ist bei großen Katalogen ausdrücklich nicht der Browser-Startpfad. Der spätere Browser lädt ein kleines Aggregatmanifest, danach nur für Viewport, Suchergebnis oder digitale Taxonomie benötigte Shards und schließlich vollständige Details.
-
-Der UI-Cutover ist fail-closed an Feldparität gebunden. Die heutige Oberfläche benötigt neben Identität und Geometrie auch Zusammenfassung, Handlungswege, Sprache, Zugang und redaktionelle Felder. Solange Lazy-Detailzustände und Deep-Link-Fehlerpfade diese Anforderungen nicht vollständig abdecken, bleibt der bestehende Bootstrap als kompatibler Übergangspfad aktiv.
-
-## Gemessene Skalierungsgrenzen vom 25. Juli 2026
-
-Die reproduzierbare synthetische Messung liegt in `docs/evidence/catalog-platform-scaling-v1.json`. Sie verwendet dieselbe kompakte Datensatzform und eine deterministische SHA-256-Präfixverteilung.
-
-| Einträge | Vollindex gzip | Median Parsezeit | größter Shard gzip | maximale Einträge je Shard |
-| ---: | ---: | ---: | ---: | ---: |
-| 10.000 | 154.620 Byte | 44,812 ms | 1.405 Byte | 59 |
-| 100.000 | 1.541.423 Byte | 804,028 ms | 7.885 Byte | 440 |
-
-Damit ist der vollständige 100k-Weltindex als initiale Browserlieferung verworfen. Die 256 Präfix-Shards sind als technische Grundpartition tragfähig, lösen aber allein noch keine räumliche Auswahl: Ein kleines Aggregatmanifest oder ein räumlicher PMTiles-/PostGIS-Index muss bestimmen, welche Shards beziehungsweise IDs für Viewport und Suche benötigt werden.
-
-Die Messung ist synthetisch und keine Endgeräte- oder Netzwerkmessung. Sie belegt Payload- und lokale Parsegrößen, nicht reale Interaktionslatenz auf iPad oder Mobilfunk.
-
-## Aggregatmanifest und Shadow-Laufzeit
-
-Der Compiler erzeugt nun `catalog/runtime/aggregate.v1.json`. Das Aggregat enthält ausschließlich Zuordnungen von Themen, 10-Grad-Raumzellen und digitaler Verfügbarkeit zu stabilen Shard-Schlüsseln. Es enthält keine Zusammenfassungen, Links, Quellen oder redaktionellen Notizen.
-
-Die öffentliche Anwendung lädt Manifest und Aggregat bereits nach dem kompatiblen Bootstrap im Hintergrund. Bytezahl und SHA-256 des Aggregats werden mit WebCrypto gegen das Manifest geprüft. Ein Ausfall markiert den Katalogpfad als `degraded`, verändert aber weder sichtbare Daten noch Bedienbarkeit. Damit entsteht reale Laufzeitbeobachtung vor dem eigentlichen Cutover.
-
-Die Auswahl mehrerer aktiver Dimensionen verwendet Schnittmengen: beispielsweise Thema Wasser plus Raumzelle plus digitale Verfügbarkeit. Innerhalb derselben Dimension werden Werte vereinigt. Das Aggregat liefert nur Shard-Kandidaten; die abschließende Datensatzfilterung bleibt verbindlich.
-
-## Selektionsgebundener Shard-Shadow-Pfad
-
-Bei einer konkreten Commons-Auswahl leitet der Browser den stabilen Zwei-Zeichen-Shard aus dem SHA-256 der `CommonProject.id` ab. Er lädt genau diesen im Manifest deklarierten Shard, prüft URL, Bytezahl und SHA-256 und validiert anschließend Schlüssel, Eintragszahl, Identitäten und die kompakte Datensatzform. Fehlgeschlagene Anfragen werden nicht dauerhaft gecacht und können bei einer späteren Auswahl erneut versucht werden.
-
-Die sichtbare Oberfläche bleibt weiterhin vollständig an den buildgebundenen Bootstrap gebunden. Der Shard-Pfad vergleicht nur die im kompakten Record vorhandenen Felder mit dem kanonischen Bootstrap-Datensatz und veröffentlicht einen kleinen diagnostischen Zustand am Stage-Element. Schnelle Auswahlwechsel dürfen veraltete Antworten nicht auf den aktuellen Fokus anwenden. Ein Fehler oder Mismatch leert weder Fokus, Suche, Karte noch Textansicht.
-
-Dieser Schritt belegt noch keine Lazy-Detail-Ladung, keinen Bootstrap-Cutover, keine physische Gerätefreigabe und keine Weltgewebe-Publisher-Kette. Das nächste Gate ist ein generationsgebundener Detailpfad mit definierten Lade-, Fehler- und Deep-Link-Zuständen.
-
-### Cutover-Gate
-
-Der Bootstrap darf erst entfernt werden, wenn Feldparität, Deep-Link-Parität, definierte Lade- und Fehlerzustände für Details, Browser-Smoke und physischer Geräte-Readback belegt sind. Bis dahin bleibt die neue Plattform beobachtend und rückwärtskompatibel.
+Dieser Stand belegt noch keinen PostGIS-, Outbox-, Axum- oder Weltgewebe-Produktionspfad. Er belegt noch keine Bootstrap-Entfernung und keine physische Gerätefreigabe. Er schafft den generationsgebundenen öffentlichen Liefervertrag, einen deterministischen Snapshot-Compiler und einen fehlertoleranten ausgewählten Detail-Shadow-Pfad.

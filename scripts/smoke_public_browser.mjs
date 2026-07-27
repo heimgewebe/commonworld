@@ -756,6 +756,11 @@ async function reducedMotionRingScenario() {
 
 async function normalScenario() {
   const run = await newPage();
+  const catalogRequests = [];
+  run.page.on('request', (request) => {
+    const pathname = new URL(request.url()).pathname;
+    if (pathname.startsWith('/catalog/')) catalogRequests.push(pathname);
+  });
   await run.page.goto(baseUrl, { waitUntil: 'domcontentloaded' });
   await run.page.waitForSelector('html.runtime-ready');
   assert(await run.page.locator('#globe-surface').isVisible(), 'normal: globe is not visible');
@@ -872,14 +877,26 @@ async function normalScenario() {
   await run.page.waitForFunction(() => {
     const stage = document.querySelector('.globe-stage');
     return stage?.dataset.catalogRecordShadow === 'ready'
-      && stage.dataset.catalogRecordShadowId === 'debian';
+      && stage.dataset.catalogRecordShadowId === 'debian'
+      && stage.dataset.catalogDetailShadow === 'ready'
+      && stage.dataset.catalogDetailShadowId === 'debian';
   });
   const catalogShadow = await run.page.locator('.globe-stage').evaluate((stage) => ({
-    state: stage.dataset.catalogRecordShadow,
-    id: stage.dataset.catalogRecordShadowId,
-    shard: stage.dataset.catalogRecordShadowShard,
+    recordState: stage.dataset.catalogRecordShadow,
+    detailState: stage.dataset.catalogDetailShadow,
+    id: stage.dataset.catalogDetailShadowId,
+    shard: stage.dataset.catalogDetailShadowShard,
+    detailUrl: stage.dataset.catalogDetailShadowUrl,
+    delivery: stage.dataset.catalogDelivery,
   }));
-  assert(catalogShadow.state === 'ready' && catalogShadow.id === 'debian' && /^[0-9a-f]{2}$/.test(catalogShadow.shard ?? ''), `normal: selected catalog shard shadow did not reach parity (${JSON.stringify(catalogShadow)})`);
+  assert(catalogShadow.recordState === 'ready' && catalogShadow.detailState === 'ready' && catalogShadow.id === 'debian' && /^[0-9a-f]{2}$/.test(catalogShadow.shard ?? ''), `normal: selected catalog detail shadow did not reach parity (${JSON.stringify(catalogShadow)})`);
+  assert(catalogShadow.delivery === 'build-bound-bootstrap', `normal: detail shadow replaced the visible bootstrap (${JSON.stringify(catalogShadow)})`);
+  assert(/^http:\/\/127\.0\.0\.1:\d+\/catalog\/runtime\/details\/[0-9a-f]{64}\.v1\.json$/.test(catalogShadow.detailUrl ?? ''), `normal: selected detail URL is not content-addressed (${JSON.stringify(catalogShadow)})`);
+  const detailRequestPaths = catalogRequests.filter((pathname) => /^\/catalog\/runtime\/details\/[0-9a-f]{64}\.v1\.json$/.test(pathname));
+  assert(detailRequestPaths.length === 1, `normal: selected identity did not request exactly one detail artifact (${JSON.stringify(catalogRequests)})`);
+  assert(!catalogRequests.some((pathname) => pathname.startsWith('/catalog/projects/')), `normal: runtime used mutable project JSON paths (${JSON.stringify(catalogRequests)})`);
+  assert(await run.page.locator('#focus-catalog-detail-integrity').isVisible(), 'normal: detail integrity status is not visible');
+  assert(await run.page.locator('#focus-catalog-detail-retry').isHidden(), 'normal: retry remained visible after successful detail verification');
   const focusOnlyState = await primaryOverlayState(run.page);
   assert(focusOnlyState.focusVisible && !focusOnlyState.discoveryVisible && !focusOnlyState.settingsVisible && !focusOnlyState.focusInert && focusOnlyState.focusAriaHidden === null, 'normal: visible project focus kept suppressed accessibility state ' + JSON.stringify(focusOnlyState));
   assert((await run.page.evaluate(() => document.activeElement?.id)) === 'project-focus', 'normal: project focus did not receive focus');
@@ -2947,6 +2964,154 @@ async function catalogueNetworkBlockedScenario() {
   await run.context.close();
 }
 
+async function catalogueDetailRetryScenario() {
+  process.stdout.write(`${JSON.stringify({ state: 'RUNNING', scenario: 'catalogue-detail-retry' })}\n`);
+  const run = await newPage();
+  const catalogRequests = [];
+  run.page.on('request', (request) => {
+    const pathname = new URL(request.url()).pathname;
+    if (pathname.startsWith('/catalog/runtime/')) catalogRequests.push(pathname);
+  });
+  let detailAttempts = 0;
+  await run.page.route('**/catalog/runtime/details/*.v1.json', (route) => {
+    detailAttempts += 1;
+    if (detailAttempts === 1) return route.abort('failed');
+    return route.continue();
+  });
+  await run.page.goto(baseUrl, { waitUntil: 'domcontentloaded' });
+  await run.page.waitForSelector('html.runtime-ready');
+  await run.page.waitForFunction(() => document.querySelector('.globe-stage')?.dataset.catalogPlatform === 'ready');
+  await run.page.locator('#commons-search').fill('Debian');
+  await run.page.waitForTimeout(220);
+  await run.page.locator('.discovery-result-main[data-commonproject-id="debian"]').click();
+  await run.page.waitForFunction(() => {
+    const stage = document.querySelector('.globe-stage');
+    return stage?.dataset.catalogRecordShadow === 'ready'
+      && stage.dataset.catalogDetailShadow === 'degraded'
+      && stage.dataset.catalogDetailRetry === 'available';
+  });
+  assert((await run.page.locator('#focus-title').textContent()) === 'Debian', 'detail retry: compatible embedded record disappeared after detail failure');
+  assert(((await run.page.locator('#focus-summary').textContent()) ?? '').length > 20, 'detail retry: compatible embedded summary disappeared after detail failure');
+  const retry = run.page.locator('#focus-catalog-detail-retry');
+  assert(await retry.isVisible(), 'detail retry: retry action is not visible after a detail failure');
+  await retry.click();
+  await run.page.waitForFunction(() => {
+    const stage = document.querySelector('.globe-stage');
+    return stage?.dataset.catalogDetailShadow === 'ready'
+      && stage.dataset.catalogDetailShadowId === 'debian'
+      && !stage.dataset.catalogDetailRetry;
+  });
+  assert(detailAttempts === 2, `detail retry: expected one failed attempt and one retry, got ${detailAttempts}`);
+  for (const expectedPath of ['/catalog/runtime/manifest.v1.json', '/catalog/runtime/aggregate.v1.json', '/catalog/runtime/shards/81.v1.json']) {
+    const count = catalogRequests.filter((pathname) => pathname === expectedPath).length;
+    assert(count === 2, `detail retry: explicit retry did not refresh ${expectedPath} exactly once (${JSON.stringify(catalogRequests)})`);
+  }
+  assert(await retry.isHidden(), 'detail retry: retry action remained visible after recovery');
+  assert((await run.page.evaluate(() => document.activeElement?.id)) === 'project-focus', 'detail retry: successful retry left focus on a hidden control');
+  assert((await run.page.locator('.globe-stage').getAttribute('data-catalog-delivery')) === 'build-bound-bootstrap', 'detail retry: retry changed the visible data source');
+  const warnings = run.consoleWarnings.filter((message) => message.includes('Commonworld catalog detail unavailable for debian'));
+  assert(warnings.length === 1, `detail retry: expected one bounded application warning (${JSON.stringify(run.consoleWarnings)})`);
+  assert(run.pageErrors.length === 0, `detail retry: page errors: ${run.pageErrors.join(' | ')}`);
+  const expectedNetworkErrors = run.consoleErrors.filter((message) => message.includes('Failed to load resource: net::ERR_FAILED'));
+  const unexpectedConsoleErrors = run.consoleErrors.filter((message) => !message.includes('Failed to load resource: net::ERR_FAILED'));
+  assert(expectedNetworkErrors.length === 1, `detail retry: expected exactly one aborted-resource console error (${JSON.stringify(run.consoleErrors)})`);
+  assert(unexpectedConsoleErrors.length === 0, `detail retry: unexpected console errors: ${unexpectedConsoleErrors.join(' | ')}`);
+  results.push({ id: 'catalogue-detail-retry', verdict: 'PASS', detailAttempts });
+  await run.context.close();
+}
+
+async function cataloguePlatformRetryScenario() {
+  process.stdout.write(`${JSON.stringify({ state: 'RUNNING', scenario: 'catalogue-platform-retry' })}\n`);
+  const run = await newPage();
+  let manifestAttempts = 0;
+  await run.page.route('**/catalog/runtime/manifest.v1.json', (route) => {
+    manifestAttempts += 1;
+    if (manifestAttempts === 1) return route.abort('failed');
+    return route.continue();
+  });
+  await run.page.goto(baseUrl, { waitUntil: 'domcontentloaded' });
+  await run.page.waitForSelector('html.runtime-ready');
+  await run.page.waitForFunction(() => document.querySelector('.globe-stage')?.dataset.catalogPlatform === 'degraded');
+  await run.page.locator('#commons-search').fill('Debian');
+  await run.page.waitForTimeout(220);
+  await run.page.locator('.discovery-result-main[data-commonproject-id="debian"]').click();
+  await run.page.waitForFunction(() => {
+    const stage = document.querySelector('.globe-stage');
+    return stage?.dataset.catalogDetailShadow === 'degraded'
+      && stage.dataset.catalogDetailRetry === 'available';
+  });
+  assert((await run.page.locator('#focus-title').textContent()) === 'Debian', 'platform retry: embedded record disappeared after manifest failure');
+  const retry = run.page.locator('#focus-catalog-detail-retry');
+  assert(await retry.isVisible(), 'platform retry: retry action is not visible after manifest failure');
+  await retry.click();
+  await run.page.waitForFunction(() => {
+    const stage = document.querySelector('.globe-stage');
+    return stage?.dataset.catalogPlatform === 'ready'
+      && stage.dataset.catalogRecordShadow === 'ready'
+      && stage.dataset.catalogDetailShadow === 'ready'
+      && stage.dataset.catalogDetailShadowId === 'debian';
+  });
+  assert(manifestAttempts === 2, `platform retry: expected one failed manifest request and one fresh retry, got ${manifestAttempts}`);
+  assert(await retry.isHidden(), 'platform retry: retry action remained visible after recovery');
+  assert((await run.page.evaluate(() => document.activeElement?.id)) === 'project-focus', 'platform retry: successful retry left focus on a hidden control');
+  assert((await run.page.locator('.globe-stage').getAttribute('data-catalog-delivery')) === 'build-bound-bootstrap', 'platform retry: retry changed the visible data source');
+  const warnings = run.consoleWarnings.filter((message) => message.includes('Commonworld catalog aggregate unavailable'));
+  assert(warnings.length === 1, `platform retry: expected one bounded aggregate warning (${JSON.stringify(run.consoleWarnings)})`);
+  const expectedNetworkErrors = run.consoleErrors.filter((message) => message.includes('Failed to load resource: net::ERR_FAILED'));
+  const unexpectedConsoleErrors = run.consoleErrors.filter((message) => !message.includes('Failed to load resource: net::ERR_FAILED'));
+  assert(expectedNetworkErrors.length === 1, `platform retry: expected exactly one aborted-resource console error (${JSON.stringify(run.consoleErrors)})`);
+  assert(unexpectedConsoleErrors.length === 0, `platform retry: unexpected console errors: ${unexpectedConsoleErrors.join(' | ')}`);
+  assert(run.pageErrors.length === 0, `platform retry: page errors: ${run.pageErrors.join(' | ')}`);
+  results.push({ id: 'catalogue-platform-retry', verdict: 'PASS', manifestAttempts });
+  await run.context.close();
+}
+
+async function catalogueDetailStaleResponseScenario() {
+  process.stdout.write(`${JSON.stringify({ state: 'RUNNING', scenario: 'catalogue-detail-stale-response' })}\n`);
+  const run = await newPage();
+  let detailRequests = 0;
+  await run.page.route('**/catalog/runtime/details/*.v1.json', async (route) => {
+    detailRequests += 1;
+    if (detailRequests === 1) await new Promise((resolve) => setTimeout(resolve, 650));
+    return route.continue();
+  });
+  await run.page.goto(baseUrl, { waitUntil: 'domcontentloaded' });
+  await run.page.waitForSelector('html.runtime-ready');
+  await run.page.locator('#commons-search').fill('Debian');
+  await run.page.waitForTimeout(220);
+  await run.page.locator('.discovery-result-main[data-commonproject-id="debian"]').click();
+  await run.page.waitForFunction(() => {
+    const stage = document.querySelector('.globe-stage');
+    return stage?.dataset.catalogRecordShadow === 'ready'
+      && stage.dataset.catalogDetailShadow === 'loading'
+      && stage.dataset.catalogDetailShadowId === 'debian';
+  });
+  await run.page.locator('#filter-toggle').click();
+  await run.page.locator('#discovery-panel').waitFor({ state: 'visible' });
+  await run.page.locator('#commons-search').fill('Wikipedia');
+  await run.page.waitForTimeout(220);
+  await run.page.locator('.discovery-result-main[data-commonproject-id="wikipedia"]').click({ force: true });
+  await run.page.waitForFunction(() => {
+    const stage = document.querySelector('.globe-stage');
+    return stage?.dataset.catalogDetailShadow === 'ready'
+      && stage.dataset.catalogDetailShadowId === 'wikipedia';
+  });
+  await run.page.waitForTimeout(800);
+  const finalState = await run.page.locator('.globe-stage').evaluate((stage) => ({
+    detailState: stage.dataset.catalogDetailShadow,
+    detailId: stage.dataset.catalogDetailShadowId,
+    recordId: stage.dataset.catalogRecordShadowId,
+    selectedProject: new URL(location.href).searchParams.get('project'),
+  }));
+  assert(finalState.detailState === 'ready' && finalState.detailId === 'wikipedia' && finalState.recordId === 'wikipedia' && finalState.selectedProject === 'wikipedia', `detail stale response: delayed previous response overwrote the current selection (${JSON.stringify(finalState)})`);
+  assert(detailRequests >= 2, `detail stale response: expected two selected-detail requests, got ${detailRequests}`);
+  assert((await run.page.locator('#focus-title').textContent()) === 'Wikipedia', 'detail stale response: visible record reverted to the delayed selection');
+  assert(run.pageErrors.length === 0, `detail stale response: page errors: ${run.pageErrors.join(' | ')}`);
+  assert(run.consoleErrors.length === 0, `detail stale response: console errors: ${run.consoleErrors.join(' | ')}`);
+  results.push({ id: 'catalogue-detail-stale-response', verdict: 'PASS', detailRequests });
+  await run.context.close();
+}
+
 async function bootstrapAssetFailureFallbackScenario() {
   const run = await newPage();
   const manifest = JSON.parse(await readFile(path.join(ROOT, 'catalog/catalog.json'), 'utf8'));
@@ -3164,6 +3329,9 @@ try {
   await syntheticCatalogueTruthScenario();
   await liveUiHardeningScenario();
   await catalogueNetworkBlockedScenario();
+  await cataloguePlatformRetryScenario();
+  await catalogueDetailRetryScenario();
+  await catalogueDetailStaleResponseScenario();
   await bootstrapAssetFailureFallbackScenario();
   await postRenderFailurePreservesFallbackScenario();
   await providerFailureScenario();

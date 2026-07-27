@@ -55,24 +55,76 @@ class CurrentStateTests(unittest.TestCase):
         self.assertIn("current catalog-delivery truth mismatch", errors)
         self.assertIn("catalog platform and current state disagree on runtime catalogue parity", errors)
 
+    def test_catalog_delivery_declares_generation_bound_detail_shadow(self) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            root = self.copy_current_state(directory)
+            path = root / "contracts/commonworld/current-state.contract.json"
+            value = json.loads(path.read_text(encoding="utf-8"))
+            value["catalog_delivery"]["runtime_catalogue_detail_loading"] = False
+            path.write_text(json.dumps(value), encoding="utf-8")
+            errors = validate_current_state(root)
+        self.assertIn("current catalog-delivery truth mismatch", errors)
+        self.assertIn("catalog platform and current state disagree on detail loading", errors)
+
     def test_catalog_delivery_rejects_platform_shadow_drift(self) -> None:
         with tempfile.TemporaryDirectory() as directory:
             root = self.copy_current_state(directory)
             path = root / "contracts/commonworld/catalog-platform.contract.json"
             value = json.loads(path.read_text(encoding="utf-8"))
-            value["browser_transition"]["shadow_runtime_observation"]["selected_identity_shard"] = False
+            value["browser_transition"]["shadow_runtime_observation"]["selected_identity_detail"] = False
             path.write_text(json.dumps(value), encoding="utf-8")
             errors = validate_current_state(root)
         self.assertIn("catalog platform shadow-observation truth mismatch", errors)
-        self.assertIn("catalog platform and current state disagree on runtime catalogue parity", errors)
+        self.assertIn("catalog platform and current state disagree on detail loading", errors)
+
+    def test_catalog_delivery_rejects_incompatible_detail_parity_boundary(self) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            root = self.copy_current_state(directory)
+            path = root / "contracts/commonworld/catalog-platform.contract.json"
+            value = json.loads(path.read_text(encoding="utf-8"))
+            value["browser_transition"]["selected_detail_parity"] = "unbound_detail"
+            path.write_text(json.dumps(value), encoding="utf-8")
+            errors = validate_current_state(root)
+        self.assertIn("catalog platform selected-detail parity boundary mismatch", errors)
 
     def test_catalog_delivery_rejects_runtime_implementation_drift(self) -> None:
         with tempfile.TemporaryDirectory() as directory:
             root = self.copy_current_state(directory)
             path = root / "assets/commonworld-app.js"
-            path.write_text(path.read_text(encoding="utf-8").replace("function observeCatalogRecordShadow(", "function removedCatalogRecordShadow("), encoding="utf-8")
+            path.write_text(path.read_text(encoding="utf-8").replace("function loadCatalogDetailOnce(", "function removedCatalogDetailOnce("), encoding="utf-8")
             errors = validate_current_state(root)
-        self.assertTrue(any("observeCatalogRecordShadow" in error for error in errors))
+        self.assertTrue(any("loadCatalogDetailOnce" in error for error in errors))
+
+    def test_catalog_delivery_rejects_cache_limit_drift(self) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            root = self.copy_current_state(directory)
+            path = root / "contracts/commonworld/catalog-platform.contract.json"
+            value = json.loads(path.read_text(encoding="utf-8"))
+            value["runtime_cache"]["details_max_entries"] = 128
+            path.write_text(json.dumps(value), encoding="utf-8")
+            errors = validate_current_state(root)
+        self.assertIn("catalog platform and current state disagree on runtime catalogue cache limits", errors)
+
+
+    def test_catalog_delivery_rejects_retry_policy_drift(self) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            root = self.copy_current_state(directory)
+            path = root / "contracts/commonworld/catalog-platform.contract.json"
+            value = json.loads(path.read_text(encoding="utf-8"))
+            value["runtime_cache"]["explicit_retry_refresh"] = "reuse_cached_promises"
+            path.write_text(json.dumps(value), encoding="utf-8")
+            errors = validate_current_state(root)
+        self.assertIn("catalog platform and current state disagree on fresh retry policy", errors)
+
+    def test_catalog_delivery_rejects_cutover_without_authority(self) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            root = self.copy_current_state(directory)
+            path = root / "contracts/commonworld/catalog-platform.contract.json"
+            value = json.loads(path.read_text(encoding="utf-8"))
+            value["browser_transition"]["cutover_authorized"] = True
+            path.write_text(json.dumps(value), encoding="utf-8")
+            errors = validate_current_state(root)
+        self.assertIn("catalog platform and current state disagree on bootstrap cutover authorization", errors)
 
     def test_dynamic_digital_count_has_precise_error_without_static_mismatch(self) -> None:
         with tempfile.TemporaryDirectory() as directory:

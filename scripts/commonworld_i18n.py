@@ -191,6 +191,7 @@ SHELL_REPLACEMENTS_EN = {
     '<option value="verified">Verifiziert</option>': '<option value="verified">Verified</option>',
     '<option value="featured">Hervorgehoben</option>': '<option value="featured">Featured</option>',
     '>Filter zurücksetzen</button>': '>Reset filters</button>',
+    '>Erneut prüfen</button>': '>Verify again</button>',
     '>Keine Commons entsprechen dieser Suche und Filterkombination.</p>': '>No Commons match this search and filter combination.</p>',
     'aria-label="Rangfolge der Commons-Suchergebnisse"': 'aria-label="Ranked Commons search results"',
     '>Alle Treffer in der Textansicht anzeigen</button>': '>Show all results in the text view</button>',

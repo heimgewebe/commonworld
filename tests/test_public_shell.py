@@ -5,7 +5,9 @@ import tempfile
 import unittest
 from pathlib import Path
 
-from scripts.render_public_shell import activity_notice, load_records, render_bootstrap_catalog, render_cards
+from scripts.render_public_shell import (
+    MODULE_IMPORT_DEPENDENCIES, activity_notice, load_records, render_bootstrap_catalog, render_cards,
+)
 from scripts.static_surface_parser import (
     find_css_block,
     find_media_block,
@@ -44,9 +46,16 @@ class PublicShellTests(unittest.TestCase):
         shutil.copy2(ROOT / "index.css", root / "index.css")
         shutil.copy2(ROOT / "method.html", root / "method.html")
         (root / "assets").mkdir()
-        shutil.copy2(ROOT / "assets/commonworld-bootstrap-catalog.mjs", root / "assets/commonworld-bootstrap-catalog.mjs")
-        shutil.copy2(ROOT / "assets/commonworld-app.js", root / "assets/commonworld-app.js")
-        shutil.copy2(ROOT / "assets/ipad-layout.css", root / "assets/ipad-layout.css")
+        for asset in (
+            "commonworld-bootstrap-catalog.mjs",
+            "commonworld-catalog-runtime.mjs",
+            "commonworld-i18n.mjs",
+            "commonworld-en-locale.mjs",
+            "commonworld-core.mjs",
+            "commonworld-app.js",
+            "ipad-layout.css",
+        ):
+            shutil.copy2(ROOT / "assets" / asset, root / "assets" / asset)
         (root / "scripts").mkdir()
         if (ROOT / "scripts/render_public_shell.py").exists():
             shutil.copy2(ROOT / "scripts/render_public_shell.py", root / "scripts/render_public_shell.py")
@@ -54,6 +63,44 @@ class PublicShellTests(unittest.TestCase):
 
     def test_public_shell_validates(self) -> None:
         self.assertEqual([], validate_public_shell(ROOT))
+
+    def test_local_module_graph_is_content_versioned(self) -> None:
+        for module_path, dependencies in MODULE_IMPORT_DEPENDENCIES:
+            source = (ROOT / module_path).read_text(encoding="utf-8")
+            for dependency_path in dependencies:
+                version = hashlib.sha256((ROOT / dependency_path).read_bytes()).hexdigest()[:12]
+                self.assertIn(f"from './{Path(dependency_path).name}?v={version}'", source)
+
+    def test_public_shell_rejects_stale_transitive_module_import(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp_dir:
+            root = self.copy_shell(tmp_dir)
+            core_path = root / "assets/commonworld-core.mjs"
+            locale_path = root / "assets/commonworld-en-locale.mjs"
+            expected = hashlib.sha256(locale_path.read_bytes()).hexdigest()[:12]
+            core_path.write_text(
+                core_path.read_text(encoding="utf-8").replace(
+                    f"./commonworld-en-locale.mjs?v={expected}",
+                    "./commonworld-en-locale.mjs?v=000000000000",
+                    1,
+                ),
+                encoding="utf-8",
+            )
+            core_version = hashlib.sha256(core_path.read_bytes()).hexdigest()[:12]
+            app_path = root / "assets/commonworld-app.js"
+            app_source = app_path.read_text(encoding="utf-8")
+            app_source = re.sub(
+                r"\./commonworld-core\.mjs\?v=[0-9a-f]{12}",
+                f"./commonworld-core.mjs?v={core_version}",
+                app_source,
+                count=1,
+            )
+            app_path.write_text(app_source, encoding="utf-8")
+            self.refresh_app_version(root)
+            errors = validate_public_shell(root)
+        self.assertIn(
+            "public shell module import is not content-bound: assets/commonworld-core.mjs -> assets/commonworld-en-locale.mjs",
+            errors,
+        )
 
     def test_public_shell_rejects_old_proof_language(self) -> None:
         with tempfile.TemporaryDirectory() as tmp_dir:
