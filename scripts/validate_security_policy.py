@@ -5,7 +5,6 @@ from __future__ import annotations
 
 import argparse
 import json
-import os
 import re
 import sys
 import urllib.error
@@ -176,6 +175,9 @@ def validate_security_policy(root: Path = ROOT, now: datetime | None = None) -> 
     for marker in workflow_markers:
         if marker not in workflow_text:
             errors.append(f"production readback does not enforce private reporting: {marker}")
+    security_step = workflow_text.split("- name: Verify private vulnerability reporting setting", 1)[-1].split("- name: Upload production readback receipts", 1)[0]
+    if "GITHUB_TOKEN" in security_step or "github.token" in security_step:
+        errors.append("private reporting status readback must use the public endpoint without an Actions token")
 
     expiry_workflow_text = (root / SECURITY_EXPIRY_WORKFLOW).read_text(encoding="utf-8")
     expiry_markers = (
@@ -193,6 +195,8 @@ def validate_security_policy(root: Path = ROOT, now: datetime | None = None) -> 
     for marker in expiry_markers:
         if marker not in expiry_workflow_text:
             errors.append(f"security expiry workflow is incomplete: {marker}")
+    if "GITHUB_TOKEN" in expiry_workflow_text or "github.token" in expiry_workflow_text:
+        errors.append("scheduled private reporting readback must use the public endpoint without an Actions token")
     return errors
 
 
@@ -200,12 +204,11 @@ def utc_timestamp() -> str:
     return datetime.now(timezone.utc).isoformat().replace("+00:00", "Z")
 
 
-def github_api_get_private_reporting(repository: str, token: str, timeout_seconds: int = 20) -> object:
+def github_api_get_private_reporting(repository: str, timeout_seconds: int = 20) -> object:
     request = urllib.request.Request(
         f"https://api.github.com/repos/{repository}/private-vulnerability-reporting",
         headers={
             "Accept": "application/vnd.github+json",
-            "Authorization": f"Bearer {token}",
             "User-Agent": "commonworld-security-policy/1.0",
             "X-GitHub-Api-Version": "2022-11-28",
         },
@@ -220,7 +223,6 @@ def github_api_get_private_reporting(repository: str, token: str, timeout_second
 def verify_live_private_reporting(
     repository: str,
     expected_sha: str,
-    token: str,
     *,
     api_get=None,
     now=utc_timestamp,
@@ -230,11 +232,9 @@ def verify_live_private_reporting(
         errors.append("repository must be in owner/name form")
     if len(expected_sha) != 40 or any(character not in "0123456789abcdef" for character in expected_sha.lower()):
         errors.append("expected SHA must be a full hexadecimal commit id")
-    if not token:
-        errors.append("GitHub token is required")
     enabled = None
     if not errors:
-        request = api_get or (lambda: github_api_get_private_reporting(repository, token))
+        request = api_get or (lambda: github_api_get_private_reporting(repository))
         try:
             response = request()
         except RuntimeError as error:
@@ -281,7 +281,6 @@ def main(argv: list[str] | None = None) -> int:
         receipt = verify_live_private_reporting(
             arguments.repository,
             arguments.expected_sha,
-            os.environ.get("GITHUB_TOKEN", ""),
         )
         write_json_receipt(arguments.receipt, receipt)
         if receipt["verdict"] != "pass":

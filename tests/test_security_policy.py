@@ -98,19 +98,16 @@ class SecurityPolicyTests(unittest.TestCase):
         receipt = verify_live_private_reporting(
             "heimgewebe/commonworld",
             "a" * 40,
-            "token-value",
             api_get=lambda: {"enabled": True},
             now=lambda: "2026-07-27T20:00:00Z",
         )
         self.assertEqual("pass", receipt["verdict"])
         self.assertTrue(receipt["enabled"])
-        self.assertNotIn("token-value", json.dumps(receipt))
 
     def test_live_private_reporting_disabled_fails_and_writes_receipt(self) -> None:
         receipt = verify_live_private_reporting(
             "heimgewebe/commonworld",
             "b" * 40,
-            "token-value",
             api_get=lambda: {"enabled": False},
             now=lambda: "2026-07-27T20:00:00Z",
         )
@@ -126,7 +123,6 @@ class SecurityPolicyTests(unittest.TestCase):
         receipt = verify_live_private_reporting(
             "heimgewebe/commonworld",
             "c" * 40,
-            "token-value",
             api_get=lambda: {"enabled": "yes"},
             now=lambda: "2026-07-27T20:00:00Z",
         )
@@ -182,6 +178,16 @@ class SecurityPolicyTests(unittest.TestCase):
             errors = validate_security_policy(root, now=self.NOW)
         self.assertIn("security expiry workflow is incomplete: --verify-live-setting", errors)
         self.assertIn("security expiry workflow is incomplete: steps.security_setting.outcome != 'success'", errors)
+
+
+    def test_workflows_keep_private_reporting_readback_tokenless(self) -> None:
+        production = (ROOT / ".github/workflows/production-readback.yml").read_text(encoding="utf-8")
+        security_step = production.split("- name: Verify private vulnerability reporting setting", 1)[1].split("- name: Upload production readback receipts", 1)[0]
+        scheduled = (ROOT / ".github/workflows/security-policy-expiry.yml").read_text(encoding="utf-8")
+        self.assertNotIn("GITHUB_TOKEN", security_step)
+        self.assertNotIn("github.token", security_step)
+        self.assertNotIn("GITHUB_TOKEN", scheduled)
+        self.assertNotIn("github.token", scheduled)
 
 
 

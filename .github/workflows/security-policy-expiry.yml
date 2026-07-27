@@ -26,8 +26,6 @@ jobs:
       - name: Verify private vulnerability reporting remains enabled
         id: security_setting
         continue-on-error: true
-        env:
-          GITHUB_TOKEN: ${{ github.token }}
         run: >-
           python3 scripts/validate_security_policy.py
           --verify-live-setting
