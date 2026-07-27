@@ -17,6 +17,9 @@ from datetime import datetime, timedelta, timezone
 from pathlib import Path
 from urllib.parse import urlparse
 
+import yaml
+from yaml.nodes import MappingNode, Node, ScalarNode, SequenceNode
+
 ROOT = Path(__file__).resolve().parents[1]
 SECURITY_POLICY = Path("SECURITY.md")
 SECURITY_TXT = Path(".well-known/security.txt")
@@ -105,124 +108,104 @@ class WorkflowStep:
     parse_errors: tuple[str, ...]
 
 
-def _yaml_scalar(value: str) -> str:
-    value = value.strip()
-    if len(value) >= 2 and value[0] == value[-1] and value[0] in {'"', "'"}:
-        return value[1:-1]
+def _yaml_scalar_node_value(node: Node) -> str | None:
+    if not isinstance(node, ScalarNode):
+        return None
+    value = node.value
+    if node.style in {"|", ">"}:
+        value = value.rstrip("\n")
     return value
 
 
-def _collect_yaml_block(
-    lines: list[str],
-    start: int,
-    parent_indent: int,
-    *,
-    preserve_comments: bool = False,
-) -> tuple[list[str], int]:
-    collected: list[str] = []
-    index = start
-    while index < len(lines):
-        line = lines[index]
-        if line.strip() and len(line) - len(line.lstrip()) <= parent_indent:
-            break
-        if line.strip() and (preserve_comments or not line.strip().startswith("#")):
-            collected.append(line.strip())
-        index += 1
-    return collected, index
+def _yaml_mapping_entries(node: Node, errors: list[str], scope: str) -> dict[str, Node]:
+    if not isinstance(node, MappingNode):
+        errors.append(f"{scope} must be a YAML mapping")
+        return {}
+    result: dict[str, Node] = {}
+    for key_node, value_node in node.value:
+        if not isinstance(key_node, ScalarNode):
+            errors.append(f"{scope} contains a non-scalar mapping key")
+            continue
+        key = key_node.value.strip()
+        if key in result:
+            errors.append(f"duplicate {scope} field: {key}")
+            continue
+        result[key] = value_node
+    return result
 
 
-def _set_unique(target: dict[str, str], key: str, value: str, errors: list[str], scope: str) -> None:
-    if key in target:
-        errors.append(f"duplicate {scope} field: {key}")
-        return
-    target[key] = value
+def _compose_workflow(workflow_text: str) -> Node | None:
+    try:
+        return yaml.compose(workflow_text, Loader=yaml.BaseLoader)
+    except yaml.YAMLError:
+        return None
+
+
+def _workflow_step_nodes(root: Node) -> list[MappingNode]:
+    errors: list[str] = []
+    root_entries = _yaml_mapping_entries(root, errors, "workflow")
+    jobs = root_entries.get("jobs")
+    if not isinstance(jobs, MappingNode):
+        return []
+    result: list[MappingNode] = []
+    for _, job_node in jobs.value:
+        if not isinstance(job_node, MappingNode):
+            continue
+        job_entries = _yaml_mapping_entries(job_node, [], "job")
+        steps = job_entries.get("steps")
+        if not isinstance(steps, SequenceNode):
+            continue
+        result.extend(item for item in steps.value if isinstance(item, MappingNode))
+    return result
 
 
 def parse_workflow_step(workflow_text: str, step_name: str) -> WorkflowStep | None:
-    lines = workflow_text.splitlines()
-    marker = f"- name: {step_name}"
-    starts = [index for index, line in enumerate(lines) if line.strip() == marker]
-    if len(starts) != 1:
+    root = _compose_workflow(workflow_text)
+    if root is None:
         return None
-    start = starts[0]
-    step_indent = len(lines[start]) - len(lines[start].lstrip())
-    end = len(lines)
-    for index in range(start + 1, len(lines)):
-        line = lines[index]
-        if line.strip() and len(line) - len(line.lstrip()) == step_indent and line.strip().startswith("- "):
-            end = index
-            break
-    block = lines[start:end]
-    fields: dict[str, str] = {"name": step_name}
-    with_fields: dict[str, str] = {}
+    matches: list[MappingNode] = []
+    for step_node in _workflow_step_nodes(root):
+        entries = _yaml_mapping_entries(step_node, [], "step")
+        name = _yaml_scalar_node_value(entries.get("name")) if entries.get("name") is not None else None
+        if name == step_name:
+            matches.append(step_node)
+    if len(matches) != 1:
+        return None
+
+    step_node = matches[0]
     parse_errors: list[str] = []
+    entries = _yaml_mapping_entries(step_node, parse_errors, "step")
+    fields: dict[str, str] = {}
+    with_fields: dict[str, str] = {}
     run_text = ""
     run_style: str | None = None
-    index = 1
-    field_indent = step_indent + 2
-    while index < len(block):
-        line = block[index]
-        indent = len(line) - len(line.lstrip())
-        stripped = line.strip()
-        if not stripped or stripped.startswith("#"):
-            index += 1
-            continue
-        if indent != field_indent or ":" not in stripped:
-            index += 1
-            continue
-        key, value = stripped.split(":", 1)
-        value = value.strip()
-        if key == "with" and value == "":
-            index += 1
-            nested_indent = field_indent + 2
-            while index < len(block):
-                nested = block[index]
-                nested_level = len(nested) - len(nested.lstrip())
-                nested_stripped = nested.strip()
-                if nested_stripped and nested_level <= field_indent:
-                    break
-                if not nested_stripped or nested_stripped.startswith("#"):
-                    index += 1
-                    continue
-                if nested_level != nested_indent or ":" not in nested_stripped:
-                    index += 1
-                    continue
-                nested_key, nested_value = nested_stripped.split(":", 1)
-                nested_value = nested_value.strip()
-                if nested_value in {"|", "|-", ">", ">-"}:
-                    lines_value, index = _collect_yaml_block(
-                        block, index + 1, nested_indent, preserve_comments=True
-                    )
-                    rendered = "\n".join(lines_value) if nested_value.startswith("|") else " ".join(lines_value)
-                    _set_unique(with_fields, nested_key, rendered, parse_errors, "with")
+    for key, value_node in entries.items():
+        if key == "with":
+            fields[key] = ""
+            nested = _yaml_mapping_entries(value_node, parse_errors, "with")
+            for nested_key, nested_value_node in nested.items():
+                nested_value = _yaml_scalar_node_value(nested_value_node)
+                if nested_value is None:
+                    parse_errors.append(f"with field {nested_key} must be a scalar")
                 else:
-                    continuation, next_index = _collect_yaml_block(
-                        block, index + 1, nested_indent, preserve_comments=True
-                    )
-                    rendered = _yaml_scalar(" ".join([nested_value, *continuation]).strip())
-                    _set_unique(with_fields, nested_key, rendered, parse_errors, "with")
-                    index = next_index if continuation else index + 1
+                    with_fields[nested_key] = nested_value
             continue
-        if key == "run" and value in {"|", "|-", ">", ">-"}:
-            lines_value, index = _collect_yaml_block(
-                block, index + 1, field_indent, preserve_comments=True
-            )
-            run_style = value
-            run_text = "\n".join(lines_value) if value.startswith("|") else " ".join(lines_value)
-            _set_unique(fields, key, run_text, parse_errors, "step")
+        value = _yaml_scalar_node_value(value_node)
+        if value is None:
+            parse_errors.append(f"step field {key} must be a scalar")
             continue
-        continuation, next_index = _collect_yaml_block(block, index + 1, field_indent)
-        rendered = _yaml_scalar(" ".join([value, *continuation]).strip())
-        _set_unique(fields, key, rendered, parse_errors, "step")
+        fields[key] = value
         if key == "run":
-            run_text = rendered
-        index = next_index if continuation else index + 1
+            run_text = value
+            run_style = value_node.style
+
     try:
         run_argv = tuple(shlex.split(run_text)) if run_text and "\n" not in run_text else ()
     except ValueError:
         run_argv = ()
+    raw = workflow_text[step_node.start_mark.index:step_node.end_mark.index]
     return WorkflowStep(
-        raw="\n".join(block),
+        raw=raw,
         fields=fields,
         with_fields=with_fields,
         run_text=run_text,
@@ -258,7 +241,10 @@ def _require_structured_step(
         actual = step.fields.get(key)
         if actual != expected:
             errors.append(f"{label} step {step_name!r} field {key!r} must equal {expected!r}, got {actual!r}")
-    for key in forbidden_fields:
+    effective_forbidden = set(forbidden_fields)
+    if run_argv is not None:
+        effective_forbidden.add("shell")
+    for key in sorted(effective_forbidden):
         if key in step.fields:
             errors.append(f"{label} step {step_name!r} must not define field {key!r}")
     if run_argv is not None and (step.run_argv != run_argv or "\n" in step.run_text):
@@ -270,75 +256,40 @@ def _require_structured_step(
     return step
 
 
-def _unique_direct_child(lines: list[str], parent_index: int, key: str) -> int | None:
-    parent_indent = len(lines[parent_index]) - len(lines[parent_index].lstrip())
-    child_indent = parent_indent + 2
-    matches: list[int] = []
-    for index in range(parent_index + 1, len(lines)):
-        line = lines[index]
-        stripped = line.strip()
-        if stripped and len(line) - len(line.lstrip()) <= parent_indent:
-            break
-        if stripped == key and len(line) - len(line.lstrip()) == child_indent:
-            matches.append(index)
-    return matches[0] if len(matches) == 1 else None
-
-
-def _direct_child_lines(lines: list[str], parent_index: int) -> list[str]:
-    parent_indent = len(lines[parent_index]) - len(lines[parent_index].lstrip())
-    child_indent = parent_indent + 2
-    children: list[str] = []
-    for index in range(parent_index + 1, len(lines)):
-        line = lines[index]
-        stripped = line.strip()
-        if stripped and len(line) - len(line.lstrip()) <= parent_indent:
-            break
-        if stripped and not stripped.startswith("#") and len(line) - len(line.lstrip()) == child_indent:
-            children.append(stripped)
-    return children
-
-
 def _validate_expiry_triggers(workflow_text: str, errors: list[str]) -> None:
-    lines = workflow_text.splitlines()
-    on_indices = [index for index, line in enumerate(lines) if line.strip() == "on:" and len(line) == len(line.lstrip())]
-    if len(on_indices) != 1:
-        errors.append("security expiry workflow must contain exactly one top-level on mapping")
+    root = _compose_workflow(workflow_text)
+    if root is None:
+        errors.append("security expiry workflow must be valid YAML")
         return
-    on_index = on_indices[0]
-    on_children = _direct_child_lines(lines, on_index)
-    if on_children.count("schedule:") != 1:
-        errors.append("security expiry workflow must define exactly one on.schedule")
+    structural_errors: list[str] = []
+    root_entries = _yaml_mapping_entries(root, structural_errors, "top-level")
+    on_node = root_entries.get("on")
+    on_entries = _yaml_mapping_entries(on_node, structural_errors, "on") if on_node is not None else {}
+    schedule = on_entries.get("schedule")
+    if not isinstance(schedule, SequenceNode) or len(schedule.value) != 1:
+        structural_errors.append("security expiry workflow must define exactly one on.schedule")
     else:
-        schedule_index = next(
-            index
-            for index in range(on_index + 1, len(lines))
-            if lines[index].strip() == "schedule:"
-            and len(lines[index]) - len(lines[index].lstrip()) == 2
-        )
-        schedule_children = _direct_child_lines(lines, schedule_index)
-        if schedule_children != ['- cron: "17 5 * * 1"']:
-            errors.append('security expiry workflow on.schedule must contain exactly one cron "17 5 * * 1" and no duplicate keys')
-        else:
-            schedule_indent = len(lines[schedule_index]) - len(lines[schedule_index].lstrip())
-            item_index = next(
-                index
-                for index in range(schedule_index + 1, len(lines))
-                if lines[index].strip() == '- cron: "17 5 * * 1"'
-                and len(lines[index]) - len(lines[index].lstrip()) == schedule_indent + 2
-            )
-            nested = _direct_child_lines(lines, item_index)
-            if nested:
-                errors.append("security expiry workflow cron item must not contain duplicate or additional mapping keys")
-    if on_children.count("workflow_dispatch:") != 1:
-        errors.append("security expiry workflow must define exactly one on.workflow_dispatch")
+        item_entries = _yaml_mapping_entries(schedule.value[0], structural_errors, "cron item")
+        cron = _yaml_scalar_node_value(item_entries.get("cron")) if item_entries.get("cron") is not None else None
+        duplicate_cron = any(error.startswith("duplicate cron item field: cron") for error in structural_errors)
+        if duplicate_cron:
+            structural_errors.append("security expiry workflow cron item must not contain duplicate or additional mapping keys")
+        if set(item_entries) != {"cron"} or cron != "17 5 * * 1" or duplicate_cron:
+            structural_errors.append('security expiry workflow on.schedule must contain exactly one cron "17 5 * * 1" and no duplicate keys')
+    dispatch = on_entries.get("workflow_dispatch")
+    if dispatch is None or not isinstance(dispatch, ScalarNode):
+        structural_errors.append("security expiry workflow must define exactly one on.workflow_dispatch")
 
-    permission_indices = [index for index, line in enumerate(lines) if line.strip() == "permissions:" and len(line) == len(line.lstrip())]
-    if len(permission_indices) != 1:
-        errors.append("security expiry workflow must contain exactly one top-level permissions mapping")
-    else:
-        permission_children = _direct_child_lines(lines, permission_indices[0])
-        if permission_children != ["contents: read"]:
-            errors.append("security expiry workflow permissions must contain exactly contents: read and no conflicting keys")
+    permissions = root_entries.get("permissions")
+    permission_entries = _yaml_mapping_entries(permissions, structural_errors, "permissions") if permissions is not None else {}
+    contents = _yaml_scalar_node_value(permission_entries.get("contents")) if permission_entries.get("contents") is not None else None
+    if (
+        set(permission_entries) != {"contents"}
+        or contents != "read"
+        or any(error.startswith("duplicate permissions field: contents") for error in structural_errors)
+    ):
+        structural_errors.append("security expiry workflow permissions must contain exactly contents: read and no conflicting keys")
+    errors.extend(structural_errors)
 
 
 def validate_security_policy(root: Path = ROOT, now: datetime | None = None) -> list[str]:

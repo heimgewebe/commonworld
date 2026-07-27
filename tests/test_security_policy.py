@@ -452,6 +452,73 @@ class SecurityPolicyTests(unittest.TestCase):
         self.assertIn("security expiry workflow permissions must contain exactly contents: read and no conflicting keys", errors)
 
 
+    def test_inline_duplicate_schedule_mapping_is_rejected(self) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            root = self.copy_surface(directory)
+            path = root / ".github/workflows/security-policy-expiry.yml"
+            text = path.read_text(encoding="utf-8").replace(
+                "  workflow_dispatch:\n",
+                '  workflow_dispatch:\n  schedule: [{cron: "0 0 1 1 *"}]\n',
+                1,
+            )
+            path.write_text(text, encoding="utf-8")
+            errors = validate_security_policy(root, now=self.NOW)
+        self.assertTrue(any("duplicate on field: schedule" in error for error in errors))
+
+    def test_scalar_duplicate_permissions_mapping_is_rejected(self) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            root = self.copy_surface(directory)
+            path = root / ".github/workflows/security-policy-expiry.yml"
+            text = path.read_text(encoding="utf-8").replace(
+                "  contents: read\n\n",
+                "  contents: read\npermissions: write-all\n\n",
+                1,
+            )
+            path.write_text(text, encoding="utf-8")
+            errors = validate_security_policy(root, now=self.NOW)
+        self.assertTrue(any("duplicate top-level field: permissions" in error for error in errors))
+
+    def test_second_with_mapping_with_disjoint_keys_is_rejected(self) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            root = self.copy_surface(directory)
+            path = root / ".github/workflows/security-policy-expiry.yml"
+            text = path.read_text(encoding="utf-8")
+            marker = "          retention-days: 30\n"
+            replacement = marker + "        with:\n          compression-level: 9\n"
+            self.assertEqual(1, text.count(marker))
+            path.write_text(text.replace(marker, replacement, 1), encoding="utf-8")
+            errors = validate_security_policy(root, now=self.NOW)
+        self.assertTrue(any("duplicate step field: with" in error for error in errors))
+
+    def test_folded_run_blank_line_preserves_shell_semantics(self) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            root = self.copy_surface(directory)
+            path = root / ".github/workflows/security-policy-expiry.yml"
+            text = path.read_text(encoding="utf-8")
+            text = text.replace(
+                "        run: exit 1\n",
+                "        run: >-\n          exit\n\n          1\n",
+                1,
+            )
+            path.write_text(text, encoding="utf-8")
+            errors = validate_security_policy(root, now=self.NOW)
+        self.assertTrue(any("Enforce live reporting result" in error and "command mismatch" in error for error in errors))
+
+    def test_enforcement_rejects_shell_override_and_spaced_duplicate_run(self) -> None:
+        for injected, expected in (
+            ("        shell: bash {0} || true\n", "must not define field 'shell'"),
+            ("        run : exit 0\n", "duplicate step field: run"),
+        ):
+            with self.subTest(injected=injected), tempfile.TemporaryDirectory() as directory:
+                root = self.copy_surface(directory)
+                path = root / ".github/workflows/security-policy-expiry.yml"
+                text = path.read_text(encoding="utf-8")
+                marker = "      - name: Enforce live reporting result\n"
+                path.write_text(text.replace(marker, marker + injected, 1), encoding="utf-8")
+                errors = validate_security_policy(root, now=self.NOW)
+            self.assertTrue(any(expected in error for error in errors), errors)
+
+
 
 if __name__ == "__main__":
     unittest.main()
