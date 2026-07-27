@@ -263,7 +263,9 @@ async function verifyLayerCreatedSphereRestoration(browser, baseUrl) {
         focusHidden: document.querySelector('#project-focus').hidden,
         title: document.querySelector('#focus-title')?.textContent ?? null,
         inlineHidden: document.querySelector('#layer-projects').hidden,
+        digitalPath: document.querySelector('.globe-stage')?.dataset.digitalPath ?? null,
         focusedPath: document.querySelector('.globe-stage')?.dataset.focusedPath ?? null,
+        urlDigitalPath: new URL(location.href).searchParams.get('digital_path'),
         sphere: {
           ariaHidden: edge.getAttribute('aria-hidden'),
           marker: edge.dataset.focusOverlapInert ?? null,
@@ -272,7 +274,8 @@ async function verifyLayerCreatedSphereRestoration(browser, baseUrl) {
         },
       };
     });
-    assert(!shared.focusHidden && shared.inlineHidden && shared.title && shared.focusedPath, `layer-created shared focus is incomplete: ${JSON.stringify(shared)}`);
+    assert(!shared.focusHidden && shared.inlineHidden && shared.title, `layer-created shared focus is incomplete: ${JSON.stringify(shared)}`);
+    assert(shared.digitalPath === 'sphere' && shared.focusedPath === null && shared.urlDigitalPath === null, `layer-created shared focus abandoned the originating root lane: ${JSON.stringify(shared)}`);
     assert(shared.sphere.marker === 'true' && shared.sphere.tabindex === '-1' && shared.sphere.ariaHidden === 'true' && shared.sphere.pointerEvents === 'none', `layer-created shared-focus sphere ownership is invalid: ${JSON.stringify(shared.sphere)}`);
     await page.locator('#focus-close').click();
     await page.waitForFunction(() => document.querySelector('#project-focus').hidden);
