@@ -3,6 +3,7 @@
   "kind": "commonworld_catalog_scale_gate_contract",
   "task_id": "COMMONWORLD-PUBLIC-GLOBE-V1-T028",
   "status": "pre_cutover_gate_active",
+  "canonical_plan": "docs/blueprints/commonworld-masterplan.md",
   "evidence": "docs/evidence/catalog-platform-scaling-v1.json",
   "measurement": {
     "generator": "scripts/measure_catalog_platform_scaling.py",
