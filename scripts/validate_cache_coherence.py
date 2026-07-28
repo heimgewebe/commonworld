@@ -53,7 +53,7 @@ def validate(root: Path = ROOT) -> list[str]:
         errors.append("public release identity does not match snapshot content")
 
     release_version = asset_version("assets/commonworld-release-check.js", root)
-    release_tag = f'<script type="module" src="./assets/commonworld-release-check.js?v={release_version}"></script>'
+    release_tag = f'<script type="module" src="/assets/commonworld-release-check.js?v={release_version}"></script>'
     release_checked_pages = {"index.html", "de.html", "propose.html", "propose.de.html"}
     base_safe_skip_links = {
         "index.html": 'href="/#static-catalog-fallback"',

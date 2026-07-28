@@ -105,9 +105,9 @@
       "filterButtonWidth": 44,
       "filterButtonHeight": 44,
       "ringAnimationName": "sphere-ring-orbit",
-      "ringTransform": "matrix(1, 0.000755701, -0.000755701, 1, 0, 0)",
-      "ringTextWidth": 671.1033935546875,
-      "ringTextHeight": 13.50714111328125,
+      "ringTransform": "matrix(0.999999, 0.00150941, -0.00150941, 0.999999, 0, 0)",
+      "ringTextWidth": 671.1126098632812,
+      "ringTextHeight": 14.012939453125,
       "ringTextFontSize": 22,
       "primaryRingCount": 3,
       "depthRingCount": 2,
@@ -155,7 +155,7 @@
     {
       "id": "layer-journey-moveend-return",
       "verdict": "PASS",
-      "elapsedMs": 1876
+      "elapsedMs": 2223
     },
     {
       "id": "layer-journey-interrupted",
@@ -242,8 +242,8 @@
       "verdict": "PASS",
       "blockedCatalogRequests": 0,
       "observedCatalogRequests": [
-        "/releases/7c6a3a0c0475bfc45cf3/catalog/runtime/aggregate.v1.json",
-        "/releases/7c6a3a0c0475bfc45cf3/catalog/runtime/manifest.v1.json"
+        "/releases/07faa4982e2cdda91868/catalog/runtime/aggregate.v1.json",
+        "/releases/07faa4982e2cdda91868/catalog/runtime/manifest.v1.json"
       ]
     },
     {
@@ -303,7 +303,7 @@
   "binding": {
     "smoke_script_sha256": "b06b9ba156ea5768653ab868074b88b0f191b176a008a051feba2d2aaab47876",
     "smoke_runner_sha256": "522b99b70b1d0064b1d0a31a3a67fdc9a2e73b7408f37d1a4bb303bc360b7556",
-    "first_party_surface_sha256": "2687ef09349e8757e66de3bfd2d4edf216cb4259a51bf5f2f41b63554840439e",
+    "first_party_surface_sha256": "23af2b4da7b39b13d53bc34dca401729eb44bf778aae53b3ed47bb69db3b5cfe",
     "scenario_ids": [
       "startup-and-ring-orbits",
       "synthetic-cross-ring-collision-accessibility",
@@ -345,9 +345,9 @@
     "smoke_plan_sha256": "6b8749928ead5ef81ee66883e6a2993e756ce083575c3569234bf70526448364"
   },
   "execution": {
-    "result_sha256": "507c1f4d447217d71fea85ecc19173c66b307a34abfbf1262eed797e7a63a4f5",
-    "readback_job_id": "bd4f8303017043e4b07cde70",
-    "readback_finalization_receipt_sha256": "7544a505f2b287f6ddda260e1761d0f8294a34b1192c9e34cca9b242c8b21ea3",
-    "transport_note": "Fresh 35-scenario smoke passed on sorted release 7c6a3a0c0475bfc45cf3."
+    "result_sha256": "f58ef4607477b274761feafc01d6ec639b7f6766edb3506fbe42c7cd4e3fb4ea",
+    "readback_job_id": "5d894f7dcd90",
+    "readback_finalization_receipt_sha256": "f7722224b620cec23dc325727de09b8997561b596b9b7600c0e7d0aa708f1454",
+    "transport_note": "Fresh 35-scenario smoke passed on release 07faa4982e2cdda91868; benchmark browser profiles were remeasured in the same revisions-bound evidence cycle."
   }
 }

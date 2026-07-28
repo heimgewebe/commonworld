@@ -69,6 +69,20 @@ class CacheCoherenceValidationTests(unittest.TestCase):
                 self.assertNotIn('href="#', page)
                 self.assertEqual(1, page.count(token))
 
+    def test_release_checker_survives_removal_of_the_page_snapshot(self) -> None:
+        manifest = json.loads((ROOT / "assets/commonworld-page-builds.json").read_text(encoding="utf-8"))
+        release_id = manifest["release_id"]
+        expected = '<script type="module" src="/assets/commonworld-release-check.js?v='
+        forbidden = '<script type="module" src="./assets/commonworld-release-check.js?v='
+        for relative in ("index.html", "de.html", "propose.html", "propose.de.html"):
+            with self.subTest(relative=relative):
+                canonical = (ROOT / relative).read_text(encoding="utf-8")
+                snapshot = (ROOT / "releases" / release_id / relative).read_text(encoding="utf-8")
+                self.assertIn(expected, canonical)
+                self.assertIn(expected, snapshot)
+                self.assertNotIn(forbidden, canonical)
+                self.assertNotIn(forbidden, snapshot)
+
     def test_release_identity_changes_when_public_asset_changes(self) -> None:
         current = compute_release_id(ROOT)
         with tempfile.TemporaryDirectory() as directory:

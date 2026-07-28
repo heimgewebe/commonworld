@@ -46,7 +46,7 @@ def render(locale: str = FALLBACK_LOCALE) -> str:
     <link rel="icon" href="./assets/commonworld-mark.svg?v={asset_version('assets/commonworld-mark.svg', ROOT)}" type="image/svg+xml" />
     <link rel="stylesheet" href="./index.css?v={asset_version('index.css', ROOT)}" />
     <link rel="stylesheet" href="./assets/proposal.css?v={asset_version('assets/proposal.css', ROOT)}" />
-    <script type="module" src="./assets/commonworld-release-check.js?v={asset_version('assets/commonworld-release-check.js', ROOT)}"></script>
+    <script type="module" src="/assets/commonworld-release-check.js?v={asset_version('assets/commonworld-release-check.js', ROOT)}"></script>
     <script type="module" src="./assets/commonworld-proposal.js?v={asset_version('assets/commonworld-proposal.js', ROOT)}"></script>
   </head>
   <body class="proposal-page">

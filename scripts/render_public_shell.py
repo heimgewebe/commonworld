@@ -287,7 +287,7 @@ def render_shell(root: Path = ROOT, locale: str = FALLBACK_LOCALE) -> str:
     <link rel="stylesheet" href="./assets/vendor/maplibre-gl.css?v={asset_version('assets/vendor/maplibre-gl.css', root)}" />
     <link rel="stylesheet" href="./index.css?v={asset_version('index.css', root)}" />
     <link rel="stylesheet" href="./assets/ipad-layout.css?v={asset_version('assets/ipad-layout.css', root)}" />
-    <script type="module" src="./assets/commonworld-release-check.js?v={asset_version('assets/commonworld-release-check.js', root)}"></script>
+    <script type="module" src="/assets/commonworld-release-check.js?v={asset_version('assets/commonworld-release-check.js', root)}"></script>
     <script src="./assets/vendor/maplibre-gl.js?v={asset_version('assets/vendor/maplibre-gl.js', root)}" defer></script>
     <script type="module" src="./assets/commonworld-app.js?v={asset_version('assets/commonworld-app.js', root)}"></script>
   </head>
