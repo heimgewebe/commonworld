@@ -353,6 +353,8 @@ def render_shell(root: Path = ROOT, locale: str = FALLBACK_LOCALE) -> str:
           </fieldset>
         </div>
         <div class="discovery-summary-row">
+          <label class="discovery-sort"><span>Sortieren nach</span><select id="discovery-sort" aria-describedby="discovery-sort-note"><option value="auto">Automatisch</option><option value="catalogued">Neu im Katalog</option><option value="reviewed">Zuletzt geprüft</option><option value="title">Name A–Z</option></select></label>
+          <p id="discovery-sort-note" class="discovery-sort-note">Automatisch: Suchtreffer nach Passung, mit Standort nach Nähe, sonst stabile Katalogreihenfolge.</p>
           <p id="discovery-count" class="discovery-count" role="status">{len(records)} Commons</p>
           <button id="filter-clear" class="quiet-button" type="button">Filter zurücksetzen</button>
         </div>
@@ -558,7 +560,7 @@ def render_method(root: Path = ROOT, locale: str = FALLBACK_LOCALE) -> str:
       <h1>Methode, Abdeckung und Datenschutz</h1>
       <p><a class="secondary-back-link" href="./">← Zurück zum Globus</a></p>
       <section><h2>Was Commonworld zeigt</h2><p>Commonworld veröffentlicht kuratierte Commons als eine gemeinsame Entdeckungsoberfläche. Der aktuelle Startkatalog enthält {count} Commons mit digitaler und/oder öffentlich verortbarer Präsenz. Er ist ein begrenzter redaktioneller Ausschnitt und keine vollständige Weltstatistik.</p></section>
-      <section><h2>Daten und Quellen</h2><p>Jeder Eintrag besitzt eine stabile <code>CommonProject.id</code>, Quellen, Abrufdaten, Aktivitäts- und Kurationsangaben. Die JSON-Dateien sind dieselbe Datenwahrheit wie Globus und Textansicht. Fehlende Katalogeinträge bedeuten nicht, dass in einer Region keine Commons existieren.</p></section>
+      <section><h2>Daten und Quellen</h2><p>Jeder Eintrag besitzt eine stabile <code>CommonProject.id</code>, ein unveränderliches Datum der ersten Katalogaufnahme, Quellen, Abrufdaten, Aktivitäts- und Kurationsangaben. Die JSON-Dateien sind dieselbe Datenwahrheit wie Globus und Textansicht. Fehlende Katalogeinträge bedeuten nicht, dass in einer Region keine Commons existieren.</p></section>
       <section><h2>Vorschläge und Redaktion</h2><p>Über <a href="./propose.html">Commons vorschlagen</a> können öffentliche Kandidaten vorbereitet werden. Commonworld speichert das Formular nicht. Der bevorzugte Eingang ist ein öffentliches GitHub-Issue; alternativ entsteht eine lokale JSON-Datei. Vorschläge werden nie automatisch veröffentlicht. Die Redaktion prüft Identität, primärnahe Quellen, Commons-Eigenschaft, Handlungswege, Datenschutz, Ortsgenauigkeit, Dubletten und Aktualität nach dem <a href="./contracts/commonworld/editorial-review.contract.json">Redaktionsvertrag</a>.</p></section>
       <section><h2>Orte und Privatsphäre</h2><p>Digitale Commons erhalten keine erfundenen Kartenkoordinaten. Geografische Angaben können exakt, angenähert oder verborgen sein. Verborgene Orte erhalten keine Geometrie und werden nicht aus anderen Angaben rekonstruiert.</p></section>
       <section><h2>Technischer Betrieb</h2><p>Die Seite läuft statisch über GitHub Pages. MapLibre wird lokal ausgeliefert. Die Basiskarte kommt von der öffentlichen OpenFreeMap-Instanz als nichtkritische Best-effort-Abhängigkeit ohne behauptetes SLA. Bei Kartenfehlern bleiben Katalog und Textansicht verfügbar.</p></section>

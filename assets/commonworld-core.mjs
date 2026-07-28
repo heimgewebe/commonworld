@@ -947,6 +947,8 @@ export function commonsTypeLabel(recordOrType, locale = FALLBACK_LOCALE) {
 }
 
 
+export const SORT_VALUES = Object.freeze(['auto', 'catalogued', 'reviewed', 'title']);
+
 export const INTENT_FILTER_VALUES = Object.freeze({
   commons_type: COMMONS_TYPE_VALUES,
   presence: Object.freeze(['geographic', 'digital']),
@@ -959,6 +961,11 @@ export const INTENT_FILTER_VALUES = Object.freeze({
 const filterParameter = (parameters, name) => {
   const value = parameters.get(name);
   return INTENT_FILTER_VALUES[name]?.includes(value) ? value : null;
+};
+
+const sortParameter = (parameters) => {
+  const value = parameters.get('sort');
+  return SORT_VALUES.includes(value) ? value : 'auto';
 };
 
 const languageFilterParameter = (parameters) => {
@@ -999,6 +1006,7 @@ export function stateFromSearch(search = '', knownProjectIds = []) {
     view: parameters.get('view') === 'layers' ? 'layers' : 'globe',
     surface: parameters.get('surface') === 'text' ? 'text' : 'globe',
     query: normalizeQuery(parameters.get('q')),
+    sort: sortParameter(parameters),
     commons_type: filterParameter(parameters, 'commons_type'),
     presence: Object.freeze(presence),
     action: filterParameter(parameters, 'action'),
@@ -1034,6 +1042,7 @@ export function searchFromState(state) {
   if (state?.project) parameters.set('project', state.project);
   const query = normalizeQuery(state?.query);
   if (query) parameters.set('q', query);
+  if (SORT_VALUES.includes(state?.sort) && state.sort !== 'auto') parameters.set('sort', state.sort);
   for (const name of ['commons_type', 'action', 'access', 'freshness', 'curation']) {
     const value = state?.[name];
     if (INTENT_FILTER_VALUES[name].includes(value)) parameters.set(name, value);
@@ -1523,9 +1532,61 @@ export function prepareIntentSearchIndex(records, { cacheLimit = INTENT_SEARCH_C
   });
 }
 
+function compareRecordTitles(left, right, locale = FALLBACK_LOCALE) {
+  return String(left?.title ?? '').localeCompare(String(right?.title ?? ''), normalizedLocale(locale), { sensitivity: 'base' })
+    || String(left?.id ?? '').localeCompare(String(right?.id ?? ''));
+}
+
+function descendingRecordDate(left, right, field) {
+  const leftDate = String(left?.curation?.[field] ?? '');
+  const rightDate = String(right?.curation?.[field] ?? '');
+  return rightDate.localeCompare(leftDate);
+}
+
+function nearestRecordDistance(record, origin) {
+  let nearest = Number.POSITIVE_INFINITY;
+  for (const location of publicGeographicLocations(record)) {
+    const point = representativeGeometryPoint(location.geometry);
+    if (!point) continue;
+    nearest = Math.min(nearest, geodesicDistanceMeters(origin, point));
+  }
+  return nearest;
+}
+
+export function sortRecords(records, state = {}) {
+  const source = Array.isArray(records) ? records : [];
+  const requested = SORT_VALUES.includes(state.sort) ? state.sort : 'auto';
+  const hasQuery = Boolean(normalizeSearchText(normalizeQuery(state.query)));
+  const nearbyOrigin = Array.isArray(state.nearbyOrigin) && state.nearbyOrigin.length === 2 && state.nearbyOrigin.every(Number.isFinite)
+    ? state.nearbyOrigin
+    : null;
+  const effective = requested === 'auto'
+    ? (hasQuery ? 'relevance' : (nearbyOrigin ? 'distance' : 'source'))
+    : requested;
+  if (effective === 'relevance' || effective === 'source') return source;
+  const locale = state.locale ?? FALLBACK_LOCALE;
+  return [...source].sort((left, right) => {
+    if (effective === 'distance') {
+      const leftDistance = nearestRecordDistance(left, nearbyOrigin);
+      const rightDistance = nearestRecordDistance(right, nearbyOrigin);
+      if (leftDistance < rightDistance) return -1;
+      if (leftDistance > rightDistance) return 1;
+    }
+    if (effective === 'catalogued' || effective === 'distance') {
+      const dateOrder = descendingRecordDate(left, right, 'catalogued_at');
+      if (dateOrder) return dateOrder;
+    }
+    if (effective === 'reviewed') {
+      const dateOrder = descendingRecordDate(left, right, 'reviewed_at');
+      if (dateOrder) return dateOrder;
+    }
+    return compareRecordTitles(left, right, locale);
+  });
+}
+
 export function filterRecords(records, state = {}) {
   if (state.searchIndex?.matchingRecords) {
-    return state.searchIndex.matchingRecords({
+    const matching = state.searchIndex.matchingRecords({
       query: state.query,
       filters: {
         layer: state.layer ?? null,
@@ -1544,13 +1605,15 @@ export function filterRecords(records, state = {}) {
       all: true,
       today: state.today,
     });
+    return matching;
   }
   const query = normalizeSearchText(normalizeQuery(state.query));
-  return (Array.isArray(records) ? records : []).filter((record) => {
+  const matching = (Array.isArray(records) ? records : []).filter((record) => {
     if (!recordMatchesIntentFilters(record, state, state.today)) return false;
     if (!query) return true;
     return recordSearchFields(record).some(({ values }) => normalizeSearchText(values.join(' ')).includes(query));
   });
+  return matching;
 }
 
 export function recordPresentationLabel(record, locale = FALLBACK_LOCALE) {
