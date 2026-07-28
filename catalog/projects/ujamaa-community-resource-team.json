@@ -71,6 +71,14 @@
         "url": "https://www.ujamaa-crt.or.tz/programmes.html",
         "retrieved_at": "2026-07-28",
         "note": "Offizielle Beschreibung von Landrechten, Governance, Ressourcenmanagement, Lebensgrundlagen, Empowerment und Politikarbeit."
+      },
+      {
+        "id": "ujamaa-donate",
+        "type": "official-source",
+        "label": "Ujamaa Community Resource Team – Donate",
+        "url": "https://www.ujamaa-crt.or.tz/donate.html",
+        "retrieved_at": "2026-07-28",
+        "note": "Offizieller Spendenweg mit Zweckangaben und Weiterleitung über den Dorobo Fund for Tanzania."
       }
     ]
   },
@@ -98,9 +106,9 @@
     {
       "type": "donate",
       "label": "Gemeinschaftliche Landrechtsarbeit unterstützen",
-      "url": "https://www.ujamaa-crt.or.tz/our-work.html",
+      "url": "https://www.ujamaa-crt.or.tz/donate.html",
       "source_ids": [
-        "ujamaa-work"
+        "ujamaa-donate"
       ]
     },
     {
