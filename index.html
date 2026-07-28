@@ -15,7 +15,7 @@
     <link rel="stylesheet" href="./index.css?v=f38966774158" />
     <link rel="stylesheet" href="./assets/ipad-layout.css?v=ff4e980f851f" />
     <script src="./assets/vendor/maplibre-gl.js" defer></script>
-    <script type="module" src="./assets/commonworld-app.js?v=4701e7a89079"></script>
+    <script type="module" src="./assets/commonworld-app.js?v=fdf495f6515d"></script>
   </head>
   <body data-presentation="globe">
     <a id="text-skip-link" class="skip-link" href="#static-catalog-fallback">Skip to text view</a>
@@ -91,7 +91,7 @@
       <section id="globe-surface" class="globe-surface" aria-label="Commonworld globe">
         <figure class="globe-stage" aria-labelledby="globe-caption" data-runtime-state="loading" data-visual-ready="false" data-view-phase="overview" data-map-renders="0" data-overlay-renders="0">
           <div id="map" class="globe-map" role="region" aria-label="Interactive Commonworld globe"></div>
-          <svg id="digital-sphere" class="digital-sphere" viewBox="0 0 640 640" role="group" aria-labelledby="sphere-title">
+          <svg id="digital-sphere" class="digital-sphere" viewBox="0 0 640 640" role="group" aria-labelledby="sphere-title" aria-describedby="sphere-ring-accessible-summary">
             <title id="sphere-title">Digital Commons Sphere built from names and categories</title>
             <defs>
               <radialGradient id="sphere-center-fade">
@@ -116,6 +116,7 @@
             <circle id="sphere-edge-control" class="sphere-edge-control" cx="320" cy="320" r="309" fill="none" stroke="transparent" stroke-width="44" pointer-events="stroke" role="button" tabindex="0" aria-label="Open digital ring bundles. Tap or press Enter."></circle>
             <circle class="sphere-edge-focus" cx="320" cy="320" r="309" aria-hidden="true"></circle>
           </svg>
+          <p id="sphere-ring-accessible-summary" class="visually-hidden"></p>
           <div id="layer-stack-visual" class="layer-stack-visual" aria-hidden="true"></div>
 
           <button id="layer-view-button" class="layer-view-button" type="button" aria-controls="layer-panel" aria-expanded="false">Digital Sphere</button>

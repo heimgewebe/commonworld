@@ -337,7 +337,7 @@ def render_shell(root: Path = ROOT, locale: str = FALLBACK_LOCALE) -> str:
       <section id="globe-surface" class="globe-surface" aria-label="Commonworld-Globus">
         <figure class="globe-stage" aria-labelledby="globe-caption" data-runtime-state="loading" data-visual-ready="false" data-view-phase="overview" data-map-renders="0" data-overlay-renders="0">
           <div id="map" class="globe-map" role="region" aria-label="Interaktiver Commonworld-Globus"></div>
-          <svg id="digital-sphere" class="digital-sphere" viewBox="0 0 640 640" role="group" aria-labelledby="sphere-title">
+          <svg id="digital-sphere" class="digital-sphere" viewBox="0 0 640 640" role="group" aria-labelledby="sphere-title" aria-describedby="sphere-ring-accessible-summary">
             <title id="sphere-title">Digitale Commons-Sphäre aus Namen und Kategorien</title>
             <defs>
               <radialGradient id="sphere-center-fade">
@@ -355,6 +355,7 @@ def render_shell(root: Path = ROOT, locale: str = FALLBACK_LOCALE) -> str:
             <circle id="sphere-edge-control" class="sphere-edge-control" cx="320" cy="320" r="309" fill="none" stroke="transparent" stroke-width="44" pointer-events="stroke" role="button" tabindex="0" aria-label="Digitale Ringbündel öffnen. Antippen oder Eingabetaste drücken."></circle>
             <circle class="sphere-edge-focus" cx="320" cy="320" r="309" aria-hidden="true"></circle>
           </svg>
+          <p id="sphere-ring-accessible-summary" class="visually-hidden"></p>
           <div id="layer-stack-visual" class="layer-stack-visual" aria-hidden="true"></div>
 
           <button id="layer-view-button" class="layer-view-button" type="button" aria-controls="layer-panel" aria-expanded="false">Digitale Sphäre</button>

@@ -56,6 +56,8 @@ REQUIRED_HTML = (
     'class="globe-map"',
     'class="digital-sphere"',
     'id="sphere-edge-control"',
+    'aria-describedby="sphere-ring-accessible-summary"',
+    'id="sphere-ring-accessible-summary" class="visually-hidden"',
     'id="layer-panel"',
     'id="layer-breadcrumb"',
     'id="layer-current"',

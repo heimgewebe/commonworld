@@ -90,9 +90,9 @@
       "filterButtonWidth": 44,
       "filterButtonHeight": 44,
       "ringAnimationName": "sphere-ring-orbit",
-      "ringTransform": "matrix(1, 0.000769672, -0.000769672, 1, 0, 0)",
-      "ringTextWidth": 660.6035766601562,
-      "ringTextHeight": 13.5084228515625,
+      "ringTransform": "matrix(0.999999, 0.00153967, -0.00153967, 0.999999, 0, 0)",
+      "ringTextWidth": 660.6129760742188,
+      "ringTextHeight": 14.017059326171875,
       "ringTextFontSize": 22,
       "primaryRingCount": 3,
       "depthRingCount": 2,
@@ -140,7 +140,7 @@
     {
       "id": "layer-journey-moveend-return",
       "verdict": "PASS",
-      "elapsedMs": 1867
+      "elapsedMs": 1885
     },
     {
       "id": "layer-journey-interrupted",
@@ -286,9 +286,9 @@
     }
   ],
   "binding": {
-    "smoke_script_sha256": "736b54c01638fae5d008141caf96aaecac86608e529ea41d4f6ed23d4baf4664",
+    "smoke_script_sha256": "bea02c2bc1250a3353a57be8fd563feeb6f02c14b9d6bbafb8c86f2c5b7fcf25",
     "smoke_runner_sha256": "522b99b70b1d0064b1d0a31a3a67fdc9a2e73b7408f37d1a4bb303bc360b7556",
-    "first_party_surface_sha256": "4e3c85082ba9c67dd56429c97494481afa23747a0820c4dae1dbbee422a92365",
+    "first_party_surface_sha256": "0440ff08f0243b8326f3814cc5ee7518b27dbb2b9550c96da41cfaa51870bbe5",
     "scenario_ids": [
       "startup-and-ring-orbits",
       "ring-orbits-reduced-motion",
@@ -329,9 +329,9 @@
     "smoke_plan_sha256": "6b8749928ead5ef81ee66883e6a2993e756ce083575c3569234bf70526448364"
   },
   "execution": {
-    "result_sha256": "a8cac182bb8351d46dfd2f2da3a50d5c635aa62c108ab02fc94b913d46a25ed5",
-    "readback_job_id": "81321b43fd5d",
-    "readback_finalization_receipt_sha256": "18ebb0a21baf54f3683b04f452f12ffd06566f79f1b6fd5ed2fcf90fd93830af",
-    "transport_note": "Fresh exact-surface public browser smoke completed all 34 scenarios. It proves the six-name preview limit, a maximum of 18 visible Unicode characters, accessible full-title parity, globally collision-safe short labels, and focus-triggered ring pause."
+    "result_sha256": "e627ea61b761541316345c2d0d114c501c715fbfcb29b99c9e57193764685cd7",
+    "readback_job_id": "0b8bc880eca6",
+    "readback_finalization_receipt_sha256": "451e4660b9e784c90a5d5201eb1b2e7bfe0f9d50085b836c71e9b2d3e035e2e4",
+    "transport_note": "Fresh exact-surface public browser smoke completed all 34 scenarios. Chromium accessibility-tree readback proves full visible-title parity outside aria-hidden rings; one global assignment prevents distinct-project short-label collisions across all visible rings."
   }
 }

@@ -1,5 +1,5 @@
 import { COMMONWORLD_EN_LOCALE } from './commonworld-en-locale.mjs?v=797f602e0c88';
-import { FALLBACK_LOCALE, normalizeLocale } from './commonworld-i18n.mjs?v=e7db362a7f96';
+import { FALLBACK_LOCALE, normalizeLocale } from './commonworld-i18n.mjs?v=92970b8640be';
 
 export const DEFAULT_CAMERA = Object.freeze({
   lng: 8,
@@ -707,22 +707,35 @@ export function sphereRingLabelAssignments(records, maximumCharacters = SPHERE_R
     id: String(record?.id ?? ''),
     fullText: normalizedSphereRingTitle(record),
   }));
-  const visibleByFullText = new Map();
+  const assignmentKey = ({ id, fullText }) => id || `title:${fullText}`;
+  const uniqueEntries = new Map();
+  for (const entry of entries) {
+    const key = assignmentKey(entry);
+    if (!uniqueEntries.has(key)) uniqueEntries.set(key, entry);
+  }
+  const orderedEntries = [...uniqueEntries.entries()].sort(([, left], [, right]) => {
+    if (left.fullText < right.fullText) return -1;
+    if (left.fullText > right.fullText) return 1;
+    if (left.id < right.id) return -1;
+    if (left.id > right.id) return 1;
+    return 0;
+  });
+  const visibleByKey = new Map();
   const usedVisibleTexts = new Set();
-  for (const fullText of [...new Set(entries.map((entry) => entry.fullText))].sort()) {
+  for (const [key, { fullText }] of orderedEntries) {
     let visibleText = boundedSphereRingLabel(fullText, maximumCharacters);
     let suffixIndex = 1;
     while (usedVisibleTexts.has(visibleText)) {
       visibleText = boundedSphereRingLabel(fullText, maximumCharacters, `·${suffixIndex}`);
       suffixIndex += 1;
     }
-    visibleByFullText.set(fullText, visibleText);
+    visibleByKey.set(key, visibleText);
     usedVisibleTexts.add(visibleText);
   }
-  return entries.map(({ id, fullText }) => Object.freeze({
-    id,
-    fullText,
-    visibleText: visibleByFullText.get(fullText) ?? boundedSphereRingLabel(fullText, maximumCharacters),
+  return entries.map((entry) => Object.freeze({
+    id: entry.id,
+    fullText: entry.fullText,
+    visibleText: visibleByKey.get(assignmentKey(entry)) ?? boundedSphereRingLabel(entry.fullText, maximumCharacters),
   }));
 }
 const RING_ORBIT_SATURATION_COUNT = 48;

@@ -613,6 +613,39 @@ async function startupAndRingOrbitScenario() {
     assert(Math.abs(ring.animationDurationSeconds - ring.orbitDuration) <= 0.5, `ring orbits: ${ring.layer} CSS duration diverges from its declared duration ${JSON.stringify(ring)}`);
     assert(ring.animationIterationCount === 'infinite' && ring.animationPlayState === 'running', `ring orbits: ${ring.layer} does not orbit continuously ${JSON.stringify(ring)}`);
   }
+  const globalVisibleLabelOwners = new Map();
+  const visibleTitleById = new Map();
+  for (const { names } of rings) {
+    for (const { id, visibleText } of names) {
+      const existingOwner = globalVisibleLabelOwners.get(visibleText);
+      assert(!existingOwner || existingOwner === id, `ring orbits: distinct projects collide across visible rings ${JSON.stringify({ visibleText, existingOwner, id })}`);
+      globalVisibleLabelOwners.set(visibleText, id);
+      visibleTitleById.set(id, expectedDigitalProjection.titleById[id]);
+    }
+  }
+  const accessibleRingSummary = await run.page.evaluate(() => {
+    const sphere = document.querySelector('#digital-sphere');
+    const summary = document.querySelector('#sphere-ring-accessible-summary');
+    return {
+      describedBy: sphere?.getAttribute('aria-describedby') ?? '',
+      text: summary?.textContent?.trim() ?? '',
+      hiddenByAncestor: Boolean(summary?.closest('[hidden], [aria-hidden="true"]')),
+    };
+  });
+  assert(accessibleRingSummary.describedBy.split(/\s+/u).includes('sphere-ring-accessible-summary'), `ring accessibility: sphere does not reference the full-title surface ${JSON.stringify(accessibleRingSummary)}`);
+  assert(!accessibleRingSummary.hiddenByAncestor, `ring accessibility: full-title surface is hidden ${JSON.stringify(accessibleRingSummary)}`);
+  for (const title of visibleTitleById.values()) {
+    assert(accessibleRingSummary.text.includes(title), `ring accessibility: visible full title is absent from the non-hidden summary ${JSON.stringify({ title, summary: accessibleRingSummary.text })}`);
+  }
+  const accessibilityClient = await run.page.context().newCDPSession(run.page);
+  await accessibilityClient.send('Accessibility.enable');
+  const accessibilityTree = await accessibilityClient.send('Accessibility.getFullAXTree');
+  await accessibilityClient.detach();
+  const accessibilityText = accessibilityTree.nodes.flatMap((node) => [node.name?.value, node.description?.value, node.value?.value]).filter(Boolean).join('\n');
+  for (const title of visibleTitleById.values()) {
+    assert(accessibilityText.includes(title), `ring accessibility: full title is absent from Chromium's accessibility tree (${title})`);
+  }
+
   const ringPreviewCounts = rings.map(({ ids }) => ids.length);
   const maxRingPreviewCount = Math.max(...ringPreviewCounts);
   assert(ringPreviewCounts.every((count) => count <= SPHERE_RING_IDENTITY_PREVIEW_LIMIT), `ring orbits: preview count exceeds the current six-name contract (${JSON.stringify(ringPreviewCounts)})`);

@@ -402,14 +402,22 @@ test('sphere ring labels stay bounded, accessible and collision-safe', () => {
     { id: 'two', title: 'National Communal Conservancies and Community Farming Alliance' },
     { id: 'three', title: 'Wikipedia' },
     { id: 'four', title: 'National Commun…·1' },
+    { id: 'five', title: 'National Communal Conservancies and Community Forest Alliance' },
+    { id: 'one', title: 'National Communal Conservancies and Community Forest Alliance' },
   ];
   const assignments = sphereRingLabelAssignments(records);
-  assert.equal(assignments.length, 4);
+  assert.equal(assignments.length, 6);
   assert.ok(assignments.every(({ visibleText }) => Array.from(visibleText).length <= SPHERE_RING_LABEL_MAX_CHARS));
   assert.equal(assignments[2].visibleText, 'Wikipedia');
-  assert.equal(new Set(assignments.map(({ visibleText }) => visibleText)).size, 4);
+  const firstAssignmentById = new Map();
+  for (const assignment of assignments) {
+    if (!firstAssignmentById.has(assignment.id)) firstAssignmentById.set(assignment.id, assignment);
+  }
+  assert.equal(new Set([...firstAssignmentById.values()].map(({ visibleText }) => visibleText)).size, firstAssignmentById.size);
   assert.equal(assignments[0].fullText, records[0].title);
   assert.notEqual(assignments[0].visibleText, assignments[1].visibleText);
+  assert.notEqual(assignments[0].visibleText, assignments[4].visibleText, 'distinct projects with the same title need distinct visible labels');
+  assert.equal(assignments[0].visibleText, assignments[5].visibleText, 'one project repeated across rings keeps one stable visible label');
   assert.ok(assignments.some(({ visibleText }) => /·[0-9]+$/.test(visibleText)));
 });
 

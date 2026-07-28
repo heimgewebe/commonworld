@@ -1,6 +1,6 @@
 import { BOOTSTRAP_RECORDS } from './commonworld-bootstrap-catalog.mjs?v=41ebd1e48a02';
 import { createCatalogLoadCache, loadCatalogAggregate, loadCatalogDetail, loadCatalogShard, shardKeyForIdentity } from './commonworld-catalog-runtime.mjs?v=5954690ce64b';
-import { actionLabel, documentLocale, localizeCatalogRecords, text as i18nText, themeLabel } from './commonworld-i18n.mjs?v=e7db362a7f96';
+import { actionLabel, documentLocale, localizeCatalogRecords, text as i18nText, themeLabel } from './commonworld-i18n.mjs?v=92970b8640be';
 import {
   COMMONS_TYPE_COLOR_TOKENS,
   COMMONS_TYPE_VALUES,
@@ -54,7 +54,7 @@ import {
   sphereRingStrokeWidth,
   stateFromSearch,
   visibleDigitalNodes,
-} from './commonworld-core.mjs?v=59775c4937c2';
+} from './commonworld-core.mjs?v=5845bfd27769';
 
 const LOCALE = documentLocale();
 const t = (key, germanFallback, variables = {}) => i18nText(LOCALE, key, germanFallback, variables);
@@ -108,6 +108,7 @@ const elements = {
   semanticSummary: document.querySelector('#semantic-summary'),
   sphere: document.querySelector('#digital-sphere'),
   sphereRings: document.querySelector('#sphere-rings'),
+  sphereRingAccessibleSummary: document.querySelector('#sphere-ring-accessible-summary'),
   sphereEdge: document.querySelector('#sphere-edge-control'),
   sphereFocus: document.querySelector('.sphere-edge-focus'),
   layerStack: document.querySelector('#layer-stack-visual'),
@@ -720,13 +721,13 @@ function visibleDigitalView(records = visibleRecords()) {
   return view;
 }
 
-function appendRingSequence(textPath, records, { prefix = '' } = {}) {
+function appendRingSequence(textPath, assignments, { prefix = '' } = {}) {
   if (prefix) {
     const label = createSvgElement('tspan', { class: 'sphere-ring-label' });
     label.textContent = `  ${prefix}  `;
     textPath.append(label);
   }
-  for (const assignment of sphereRingLabelAssignments(records)) {
+  for (const assignment of assignments) {
     const name = createSvgElement('tspan', {
       class: 'sphere-ring-name',
       'data-commonproject-id': assignment.id,
@@ -755,9 +756,13 @@ function renderSphereRibbons(records = runtime.records) {
   const visibleNodes = (childBundles.length ? childBundles : (view.current ? [view.current] : []))
     .filter((node) => node.type !== 'diagnostic' || node.identityCount > 0)
     .slice(0, 8);
+  const visibleRingSources = visibleNodes.map((node) => recordsForNode(node).slice(0, SPHERE_RING_IDENTITY_PREVIEW_LIMIT));
+  const globalAssignments = sphereRingLabelAssignments(visibleRingSources.flat());
+  const assignmentById = new Map(globalAssignments.map((assignment) => [assignment.id, assignment]));
   elements.sphereRings.replaceChildren();
   visibleNodes.forEach((node, layerIndex) => {
-    const source = recordsForNode(node).slice(0, SPHERE_RING_IDENTITY_PREVIEW_LIMIT);
+    const source = visibleRingSources[layerIndex];
+    const assignments = source.map((record) => assignmentById.get(String(record.id))).filter(Boolean);
     const plane = createSvgElement('g', {
       class: 'sphere-ring-plane',
       'data-node-id': node.id,
@@ -791,7 +796,7 @@ function renderSphereRibbons(records = runtime.records) {
       startOffset: `${(layerIndex * 11 + 3) % 100}%`,
     });
     if (source.length) {
-      appendRingSequence(textPath, source, { prefix: `${node.label} · ${node.identityCount}` });
+      appendRingSequence(textPath, assignments, { prefix: `${node.label} · ${node.identityCount}` });
     } else {
       const placeholder = createSvgElement('tspan', { class: 'sphere-ring-placeholder' });
       placeholder.textContent = `  ${node.label} · ${t('no_visible_entries', 'keine sichtbaren Einträge')}  `;
@@ -802,6 +807,10 @@ function renderSphereRibbons(records = runtime.records) {
     plane.append(text);
     elements.sphereRings.append(plane);
   });
+  const accessibleTitles = [...new Set(globalAssignments.map(({ fullText }) => fullText).filter(Boolean))];
+  elements.sphereRingAccessibleSummary.textContent = accessibleTitles.length
+    ? t('visible_ring_commons', 'Sichtbare Commons in den digitalen Ringen: {titles}.', { titles: accessibleTitles.join(', ') })
+    : t('visible_ring_commons_empty', 'In den digitalen Ringen sind derzeit keine Commons sichtbar.');
   applySphereRingDetail();
   runtime.overlayRenderCount += 1;
   elements.stage.dataset.overlayRenders = String(runtime.overlayRenderCount);
