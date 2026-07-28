@@ -4,6 +4,7 @@
 from __future__ import annotations
 
 import argparse
+import hashlib
 import http.client
 import json
 import re
@@ -20,11 +21,6 @@ from urllib.parse import urlparse
 import yaml
 from yaml.nodes import MappingNode, Node, ScalarNode, SequenceNode
 
-if __package__ in {None, ""}:
-    sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
-
-from scripts.verify_security_workflow_blobs import NORMALIZED_WORKFLOW_SHA256, normalized_workflow_sha256
-
 ROOT = Path(__file__).resolve().parents[1]
 SECURITY_POLICY = Path("SECURITY.md")
 SECURITY_TXT = Path(".well-known/security.txt")
@@ -32,6 +28,19 @@ JEKYLL_CONFIG = Path("_config.yml")
 VALIDATE_WORKFLOW = Path(".github/workflows/validate.yml")
 PRODUCTION_READBACK_WORKFLOW = Path(".github/workflows/production-readback.yml")
 SECURITY_EXPIRY_WORKFLOW = Path(".github/workflows/security-policy-expiry.yml")
+BOOTSTRAP_DIGEST_PATTERN = re.compile(rb"(?m)^(\s*EXPECTED_BOOTSTRAP_SHA256:\s*)[0-9a-f]{64}(\s*)$")
+NORMALIZED_WORKFLOW_SHA256 = {
+    VALIDATE_WORKFLOW: "9f638187b5b0d63fe9b7a534ebb129ba3d6324a54b479349b884b80f3e00bada",
+    PRODUCTION_READBACK_WORKFLOW: "c3045dd450c7563ecb0138880ece864e2d56528f35ffa4d0e6d5c7107473a848",
+    SECURITY_EXPIRY_WORKFLOW: "7c2d0553bc07e4ec4c8956a45df6677ffef6c64ad6d6bf0c46319adcd5990c77",
+}
+
+
+def normalized_workflow_sha256(relative: Path, content: bytes) -> tuple[str | None, str | None]:
+    normalized, count = BOOTSTRAP_DIGEST_PATTERN.subn(rb"\g<1>" + b"0" * 64 + rb"\g<2>", content)
+    if count != 2:
+        return None, f"security workflow must contain exactly two bootstrap digest fields: {relative}"
+    return hashlib.sha256(normalized).hexdigest(), None
 EXPECTED_CONTACT = "https://github.com/heimgewebe/commonworld/security/advisories/new"
 EXPECTED_POLICY = "https://github.com/heimgewebe/commonworld/security/policy"
 EXPECTED_CANONICAL = "https://commonworld.net/.well-known/security.txt"
@@ -607,6 +616,7 @@ def validate_security_policy(root: Path = ROOT, now: datetime | None = None) -> 
     _require_executable_job_for_steps(
         validate_text,
         (
+            "Re-verify trusted security bootstrap",
             "Verify private vulnerability reporting before merge",
             "Upload pre-merge security receipt",
             "Enforce pre-merge security readback",
@@ -661,6 +671,7 @@ def validate_security_policy(root: Path = ROOT, now: datetime | None = None) -> 
         (
             "Verify exact Pages deployment and public content",
             "Install security validation dependencies",
+            "Re-verify trusted security bootstrap",
             "Verify private vulnerability reporting setting",
             "Upload Pages production readback receipt",
             "Upload private reporting readback receipt",
@@ -757,6 +768,7 @@ def validate_security_policy(root: Path = ROOT, now: datetime | None = None) -> 
         expiry_text,
         (
             "Install security validation dependencies",
+            "Re-verify trusted security bootstrap",
             "Validate disclosure policy and expiry",
             "Verify private vulnerability reporting remains enabled",
             "Upload scheduled security receipt",

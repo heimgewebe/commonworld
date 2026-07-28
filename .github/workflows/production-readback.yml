@@ -30,7 +30,7 @@ jobs:
       - name: Verify trusted security bootstrap
         env:
           EXPECTED_SHA: ${{ github.sha }}
-          EXPECTED_BOOTSTRAP_SHA256: baa06f6a938ffcc2e3b95eefac0acdc3a04c29e42519df11b576ba801692b85c
+          EXPECTED_BOOTSTRAP_SHA256: bbf65a6b57153543c4fa0cd8f0b8c4fdae1be148b1e0abe608c4eaae05873d5b
         run: |
           python3 -I -S - <<'PY'
           import hashlib
@@ -96,6 +96,57 @@ jobs:
           --live-retry-delays-seconds 0,30,90
       - name: Install security validation dependencies
         run: python -m pip install -r requirements-dev.txt
+      - name: Re-verify trusted security bootstrap
+        env:
+          EXPECTED_SHA: ${{ github.sha }}
+          EXPECTED_BOOTSTRAP_SHA256: bbf65a6b57153543c4fa0cd8f0b8c4fdae1be148b1e0abe608c4eaae05873d5b
+        run: |
+          python3 -I -S - <<'PY'
+          import hashlib
+          import os
+          import pathlib
+          import stat
+          import subprocess
+          import sys
+
+          path = pathlib.Path("scripts/verify_security_workflow_blobs.py")
+          expected_sha = os.environ["EXPECTED_SHA"].lower()
+          expected_digest = os.environ["EXPECTED_BOOTSTRAP_SHA256"].lower()
+
+          def git(*arguments):
+              result = subprocess.run(
+                  ["git", *arguments],
+                  check=False,
+                  stdout=subprocess.PIPE,
+                  stderr=subprocess.PIPE,
+              )
+              if result.returncode != 0:
+                  raise SystemExit(result.stderr.decode("utf-8", errors="replace"))
+              return result.stdout
+
+          head = git("rev-parse", "HEAD").decode("ascii").strip().lower()
+          if head != expected_sha:
+              raise SystemExit(f"checkout revision mismatch: expected {expected_sha}, got {head}")
+          metadata = path.lstat()
+          if not stat.S_ISREG(metadata.st_mode):
+              raise SystemExit("security bootstrap worktree path is not a regular file")
+          entries = [entry for entry in git("ls-tree", "-z", "HEAD", "--", str(path)).split(b"\0") if entry]
+          if len(entries) != 1 or b"\t" not in entries[0]:
+              raise SystemExit("security bootstrap must resolve to one committed tree entry")
+          header, committed_path = entries[0].split(b"\t", 1)
+          mode, object_type, object_id = (part.decode("ascii") for part in header.split())
+          if committed_path.decode("utf-8") != str(path) or mode != "100755" or object_type != "blob":
+              raise SystemExit("security bootstrap committed entry mismatch")
+          blob = git("cat-file", "blob", object_id)
+          digest = hashlib.sha256(blob).hexdigest()
+          if digest != expected_digest:
+              raise SystemExit(f"security bootstrap digest mismatch: expected {expected_digest}, got {digest}")
+          if path.read_bytes() != blob:
+              raise SystemExit("security bootstrap worktree differs from committed blob")
+          PY
+          python3 -I -S scripts/verify_security_workflow_blobs.py \
+            --revision HEAD \
+            --expected-sha "$EXPECTED_SHA"
       - name: Verify private vulnerability reporting setting
         id: security_setting
         continue-on-error: true

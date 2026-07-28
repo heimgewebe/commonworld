@@ -13,12 +13,12 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
 BOOTSTRAP_DIGEST_PATTERN = re.compile(rb"(?m)^(\s*EXPECTED_BOOTSTRAP_SHA256:\s*)[0-9a-f]{64}(\s*)$")
-NORMALIZED_WORKFLOW_SHA256 = {Path(".github/workflows/validate.yml"): "dce6e52f4444b5ee16371ee0f95fa4804e334869970606ffca5ca0eb3bc0fe62", Path(".github/workflows/production-readback.yml"): "54759c601dc7e13dd7284b9a23d40577fc5ff45de71e1f9c94b93c19bcb00994", Path(".github/workflows/security-policy-expiry.yml"): "1bb0e54c7aa59b398e90aa289e2751249a6f9266298c2b4dc8e6ca37786ab268"}
+NORMALIZED_WORKFLOW_SHA256 = {Path(".github/workflows/validate.yml"): "9f638187b5b0d63fe9b7a534ebb129ba3d6324a54b479349b884b80f3e00bada", Path(".github/workflows/production-readback.yml"): "c3045dd450c7563ecb0138880ece864e2d56528f35ffa4d0e6d5c7107473a848", Path(".github/workflows/security-policy-expiry.yml"): "7c2d0553bc07e4ec4c8956a45df6677ffef6c64ad6d6bf0c46319adcd5990c77"}
 TRUSTED_BLOBS: dict[Path, tuple[str, str | None]] = {
     Path(".github/workflows/validate.yml"): ("100644", None),
     Path(".github/workflows/production-readback.yml"): ("100644", None),
     Path(".github/workflows/security-policy-expiry.yml"): ("100644", None),
-    Path("scripts/validate_security_policy.py"): ("100755", "ad951039f2dc5bca81fda6be4cd16541fc370da6e101371747618d9cf5d508d3"),
+    Path("scripts/validate_security_policy.py"): ("100755", "237315a974714dc8f06ba9ed6a858b48ec326628634833e11a615d372a5b494e"),
     Path("scripts/verify_pages_deployment.py"): ("100755", "199c5152bc7c6efe49a0d248ed256458757997d77b56f55d74e1a25ae99b560c"),
     Path("scripts/smoke_pages_live.py"): ("100755", "bf898c91f48a3165d1eeb1265d05ac9aad4e8eccbd51abd5f6618529ba2cc675"),
     Path("requirements-dev.txt"): ("100644", "2825f02444581d78ec8fae62d6c0e1ac52a01c49ba92873fe00aa3f3800dc74e"),
@@ -30,8 +30,8 @@ TRUSTED_BLOBS: dict[Path, tuple[str, str | None]] = {
 
 def normalized_workflow_sha256(relative: Path, content: bytes) -> tuple[str | None, str | None]:
     normalized, count = BOOTSTRAP_DIGEST_PATTERN.subn(rb"\g<1>" + b"0" * 64 + rb"\g<2>", content)
-    if count != 1:
-        return None, f"trusted workflow must contain exactly one bootstrap digest field: {relative}"
+    if count != 2:
+        return None, f"trusted workflow must contain exactly two bootstrap digest fields: {relative}"
     return hashlib.sha256(normalized).hexdigest(), None
 
 
