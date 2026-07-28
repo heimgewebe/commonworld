@@ -8,6 +8,7 @@ import http.client
 import json
 import re
 import sys
+import unicodedata
 import urllib.error
 import urllib.request
 from collections import defaultdict
@@ -137,6 +138,12 @@ def validate_security_policy(root: Path = ROOT, now: datetime | None = None) -> 
         security_text = security_bytes.decode("utf-8")
     except UnicodeDecodeError:
         return ["security.txt is not UTF-8"]
+    if security_text.startswith("\ufeff"):
+        errors.append("security.txt must not begin with a Unicode BOM")
+    if unicodedata.normalize("NFC", security_text) != security_text:
+        errors.append("security.txt must use Net-Unicode NFC normalization")
+    if any(unicodedata.category(character) == "Cn" for character in security_text):
+        errors.append("security.txt must not contain unassigned Unicode code points")
     if len(security_text.splitlines()) > MAX_LINES:
         errors.append("security.txt exceeds the RFC 9116 defensive line bound")
 
