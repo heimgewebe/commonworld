@@ -113,8 +113,7 @@ def main(argv: list[str] | None = None) -> int:
     args = parser.parse_args(argv)
     errors = validate_trusted_blobs(ROOT, args.revision, args.expected_sha)
     if errors:
-        for error in errors:
-            print(f"ERROR: {error}", file=sys.stderr)
+        print(f"ERROR: trusted committed blob validation failed ({len(errors)} findings)", file=sys.stderr)
         return 1
     print("commonworld trusted committed blob validation ok")
     return 0

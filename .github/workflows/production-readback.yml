@@ -30,7 +30,7 @@ jobs:
       - name: Verify trusted security bootstrap
         env:
           EXPECTED_SHA: ${{ github.sha }}
-          EXPECTED_BOOTSTRAP_SHA256: 9b1a18f3d20a59d27343a27371c469d5da259b593376f411c2bd20b3db6bc988
+          EXPECTED_BOOTSTRAP_SHA256: 157234bdedb2fd7637321b14736811f3a746c99b8d41876a72811f139657fffb
         run: |
           python3 -I -S - <<'PY'
           import hashlib
