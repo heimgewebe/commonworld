@@ -410,6 +410,14 @@ def validate_security_policy(root: Path = ROOT, now: datetime | None = None) -> 
     )
 
     production_text = (root / PRODUCTION_READBACK_WORKFLOW).read_text(encoding="utf-8")
+    _require_structured_step(
+        production_text,
+        "Install security validation dependencies",
+        errors,
+        "production readback workflow",
+        run_argv=("python", "-m", "pip", "install", "-r", "requirements-dev.txt"),
+        forbidden_fields=("continue-on-error",),
+    )
     production = _require_structured_step(
         production_text,
         "Verify private vulnerability reporting setting",
@@ -447,6 +455,14 @@ def validate_security_policy(root: Path = ROOT, now: datetime | None = None) -> 
 
     expiry_text = (root / SECURITY_EXPIRY_WORKFLOW).read_text(encoding="utf-8")
     _validate_expiry_triggers(expiry_text, errors)
+    _require_structured_step(
+        expiry_text,
+        "Install security validation dependencies",
+        errors,
+        "security expiry workflow",
+        run_argv=("python", "-m", "pip", "install", "-r", "requirements-dev.txt"),
+        forbidden_fields=("continue-on-error",),
+    )
     expiry = _require_structured_step(
         expiry_text,
         "Verify private vulnerability reporting remains enabled",
