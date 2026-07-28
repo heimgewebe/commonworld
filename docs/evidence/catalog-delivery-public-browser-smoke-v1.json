@@ -9,7 +9,7 @@
       "directGlobeProjection": true,
       "hiddenUntilCalibrated": true,
       "outerHintRemoved": true,
-      "aggregateRingIdentities": 45,
+      "aggregateRingIdentities": 50,
       "configuredRingPreviewLimit": 6,
       "ringPreviewCounts": [
         6,
@@ -84,8 +84,8 @@
     {
       "id": "intent-search-discovery",
       "verdict": "PASS",
-      "indexedRecords": 65,
-      "rankedGermanIntentResults": 36,
+      "indexedRecords": 73,
+      "rankedGermanIntentResults": 41,
       "filters": 7,
       "digitalCoordinateFree": true,
       "spatialNavigation": true
@@ -105,9 +105,9 @@
       "filterButtonWidth": 44,
       "filterButtonHeight": 44,
       "ringAnimationName": "sphere-ring-orbit",
-      "ringTransform": "matrix(0.999999, 0.00153874, -0.00153874, 0.999999, 0, 0)",
-      "ringTextWidth": 660.6129760742188,
-      "ringTextHeight": 14.0164794921875,
+      "ringTransform": "matrix(1, 0.000751811, -0.000751811, 1, 0, 0)",
+      "ringTextWidth": 671.1033935546875,
+      "ringTextHeight": 13.5045166015625,
       "ringTextFontSize": 22,
       "primaryRingCount": 3,
       "depthRingCount": 2,
@@ -133,7 +133,7 @@
       "verdict": "PASS",
       "publicFeatures": 120,
       "publicIdentities": 33,
-      "digitalIdentities": 45,
+      "digitalIdentities": 50,
       "unchangedMapUpdatesSkipped": true
     },
     {
@@ -155,7 +155,7 @@
     {
       "id": "layer-journey-moveend-return",
       "verdict": "PASS",
-      "elapsedMs": 1571
+      "elapsedMs": 1658
     },
     {
       "id": "layer-journey-interrupted",
@@ -265,7 +265,7 @@
       "id": "bootstrap-asset-failure-fallback",
       "verdict": "PASS",
       "blockedBootstrapRequests": 1,
-      "fallbackCatalogCards": 65,
+      "fallbackCatalogCards": 73,
       "hiddenFallbackCatalogCards": 0,
       "neutralRecoveryCopy": true,
       "skipLinkHref": "#static-catalog-fallback",
@@ -276,7 +276,7 @@
     {
       "id": "post-render-failure-preserves-fallback",
       "verdict": "PASS",
-      "fallbackCatalogCards": 65,
+      "fallbackCatalogCards": 73,
       "hiddenFallbackCatalogCards": 0,
       "skipLinkHref": "#static-catalog-fallback",
       "skipFocusId": "static-catalog-fallback",
@@ -303,7 +303,7 @@
   "binding": {
     "smoke_script_sha256": "9dc8ad746a180acf0a1110eabd9be9aa56d02166ac44dbddf65c247ac3ce0ac3",
     "smoke_runner_sha256": "522b99b70b1d0064b1d0a31a3a67fdc9a2e73b7408f37d1a4bb303bc360b7556",
-    "first_party_surface_sha256": "803e4adf0951ee1d7a56ca519db77ea19cab725e4b5d3e08002976dd7453b93c",
+    "first_party_surface_sha256": "84a9cdad1942c4651744378a091142f01a4d046752da17854bd09c5d53768fb2",
     "scenario_ids": [
       "startup-and-ring-orbits",
       "synthetic-cross-ring-collision-accessibility",
@@ -345,9 +345,9 @@
     "smoke_plan_sha256": "6b8749928ead5ef81ee66883e6a2993e756ce083575c3569234bf70526448364"
   },
   "execution": {
-    "result_sha256": "24a4ecf72b833f5381f587665dd8a6f7804adf7a5ffe8c4b1f09e0c0af075822",
-    "readback_job_id": "922cd44b5c614432a979bd59",
-    "readback_finalization_receipt_sha256": "7274de6f4cbc2d138f9da782eaad911ab69917cd2433bf9388633e389dd56a32",
-    "transport_note": "Fresh bounded 35-scenario smoke passed against the final cache-coherent runtime surface; the release checker and page-build manifest are part of the independently measured first-party surface binding."
+    "result_sha256": "6746449de610598faab0dc87bcf24e2191b2f0497d190a2ee834ebdd9972e56e",
+    "readback_job_id": "fecb1ed712b24ecb8938b1a1",
+    "readback_finalization_receipt_sha256": "7133beb874d28d9a2d73116bdfc5899ddcdacecfa618240f81f0cca19bbfb2d9",
+    "transport_note": "Fresh bounded 35-scenario smoke passed against the final 73-record runtime surface; all fallback catalogue paths expose all 73 identities."
   }
 }
