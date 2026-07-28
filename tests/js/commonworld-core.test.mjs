@@ -59,6 +59,7 @@ import {
   SPHERE_RING_IDENTITY_PREVIEW_LIMIT,
   SPHERE_RING_LABEL_MAX_CHARS,
   sphereRingLabelAssignments,
+  sphereRingLabelLength,
   normalizeDigitalPath,
   ringOrbitDirection,
   ringOrbitDuration,
@@ -407,7 +408,7 @@ test('sphere ring labels stay bounded, accessible and collision-safe', () => {
   ];
   const assignments = sphereRingLabelAssignments(records);
   assert.equal(assignments.length, 6);
-  assert.ok(assignments.every(({ visibleText }) => Array.from(visibleText).length <= SPHERE_RING_LABEL_MAX_CHARS));
+  assert.ok(assignments.every(({ visibleText }) => sphereRingLabelLength(visibleText) <= SPHERE_RING_LABEL_MAX_CHARS));
   assert.equal(assignments[2].visibleText, 'Wikipedia');
   const firstAssignmentById = new Map();
   for (const assignment of assignments) {
@@ -419,6 +420,21 @@ test('sphere ring labels stay bounded, accessible and collision-safe', () => {
   assert.notEqual(assignments[0].visibleText, assignments[4].visibleText, 'distinct projects with the same title need distinct visible labels');
   assert.equal(assignments[0].visibleText, assignments[5].visibleText, 'one project repeated across rings keeps one stable visible label');
   assert.ok(assignments.some(({ visibleText }) => /·[0-9]+$/.test(visibleText)));
+});
+
+test('sphere ring labels preserve combining marks and emoji grapheme clusters at the truncation boundary', () => {
+  const combiningTitle = `1234567890123456e\u0301 continuation`;
+  const emojiTitle = '1234567890123456👨‍👩‍👧‍👦 continuation';
+  const [combining, emoji] = sphereRingLabelAssignments([
+    { id: 'combining', title: combiningTitle },
+    { id: 'emoji', title: emojiTitle },
+  ]);
+  assert.equal(combining.visibleText, `1234567890123456e\u0301…`);
+  assert.equal(emoji.visibleText, '1234567890123456👨‍👩‍👧‍👦…');
+  assert.equal(sphereRingLabelLength(combining.visibleText), SPHERE_RING_LABEL_MAX_CHARS);
+  assert.equal(sphereRingLabelLength(emoji.visibleText), SPHERE_RING_LABEL_MAX_CHARS);
+  assert.equal(combining.fullText, combiningTitle);
+  assert.equal(emoji.fullText, emojiTitle);
 });
 
 test('sphere ring typography preserves screen-space legibility and balanced emphasis', () => {

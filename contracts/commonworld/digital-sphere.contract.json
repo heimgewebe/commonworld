@@ -203,6 +203,10 @@
     "name_presentation": {
       "visible_name_limit_per_layer": 6,
       "orbit_label_max_chars": 18,
+      "orbit_label_measurement": "extended_grapheme_clusters_with_code_point_fallback",
+      "platform_grapheme_segmentation_must_be_preferred": true,
+      "code_point_fallback_must_preserve_surrogate_pairs": true,
+      "hidden_svg_names_must_not_duplicate_accessible_names": true,
       "visible_orbit_labels_must_have_accessible_full_text": true,
       "side_view_uses_full_commonproject_title": true,
       "focus_panel_uses_full_commonproject_title": true,

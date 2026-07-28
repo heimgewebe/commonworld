@@ -689,11 +689,30 @@ export const SPHERE_RING_IDENTITY_PREVIEW_LIMIT = 6;
 export const SPHERE_RING_LABEL_MAX_CHARS = 18;
 
 const normalizedSphereRingTitle = (record) => String(record?.title ?? record?.id ?? '').trim().replace(/\s+/gu, ' ');
-const sphereRingCharacters = (value) => Array.from(String(value ?? ''));
+function createSphereRingGraphemeSegmenter() {
+  if (typeof Intl === 'undefined' || typeof Intl.Segmenter !== 'function') return null;
+  try {
+    return new Intl.Segmenter('und', { granularity: 'grapheme' });
+  } catch {
+    return null;
+  }
+}
+
+const sphereRingGraphemeSegmenter = createSphereRingGraphemeSegmenter();
+
+function sphereRingLabelSegments(value) {
+  const text = String(value ?? '');
+  if (!sphereRingGraphemeSegmenter) return Array.from(text);
+  return [...sphereRingGraphemeSegmenter.segment(text)].map(({ segment }) => segment);
+}
+
+export function sphereRingLabelLength(value) {
+  return sphereRingLabelSegments(value).length;
+}
 
 function boundedSphereRingLabel(value, maximumCharacters, suffix = '') {
-  const characters = sphereRingCharacters(value);
-  const suffixCharacters = sphereRingCharacters(suffix);
+  const characters = sphereRingLabelSegments(value);
+  const suffixCharacters = sphereRingLabelSegments(suffix);
   const available = maximumCharacters - suffixCharacters.length;
   if (available < 1) throw new RangeError('sphere ring label suffix exceeds the label budget');
   if (characters.length <= available) return `${characters.join('')}${suffix}`;

@@ -253,7 +253,12 @@ def validate_digital_sphere(root: Path = ROOT) -> list[str]:
         errors.append("real-surface visible name limit must be 6 per layer")
     if names.get("orbit_label_max_chars") != 18:
         errors.append("real-surface orbit label length must be bounded at 18 characters")
+    if names.get("orbit_label_measurement") != "extended_grapheme_clusters_with_code_point_fallback":
+        errors.append("real-surface orbit label measurement must use grapheme clusters with a code-point fallback")
     for invariant in (
+        "platform_grapheme_segmentation_must_be_preferred",
+        "code_point_fallback_must_preserve_surrogate_pairs",
+        "hidden_svg_names_must_not_duplicate_accessible_names",
         "visible_orbit_labels_must_have_accessible_full_text",
         "side_view_uses_full_commonproject_title",
         "focus_panel_uses_full_commonproject_title",
