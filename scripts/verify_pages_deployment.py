@@ -7,6 +7,7 @@ import argparse
 import hashlib
 import json
 import os
+import re
 import sys
 import time
 import urllib.error
@@ -28,9 +29,17 @@ DEFAULT_DEPLOYMENT_TIMEOUT_SECONDS = 600
 DEFAULT_DEPLOYMENT_POLL_SECONDS = 10
 DEFAULT_LIVE_TIMEOUT_SECONDS = 5
 DEFAULT_LIVE_RETRY_DELAYS_SECONDS = (0, 30, 90)
-EXACT_PUBLIC_FILES = (("", "index.html"), ("propose.html", "propose.html"), ("catalog/catalog.json", "catalog/catalog.json"))
+EXACT_PUBLIC_FILES = (("", "index.html"), ("propose.html", "propose.html"), ("catalog/catalog.json", "catalog/catalog.json"), (".well-known/security.txt", ".well-known/security.txt"))
 PENDING_DEPLOYMENT_STATES = {"waiting", "queued", "pending", "in_progress"}
 FAILED_DEPLOYMENT_STATES = {"error", "failure", "inactive"}
+SECURITY_TXT_CONTENT_TYPE_RE = re.compile(
+    r'^[ \t]*text/plain[ \t]*;[ \t]*charset[ \t]*=[ \t]*(?:utf-8|"utf-8")[ \t]*$',
+    re.IGNORECASE,
+)
+
+
+def valid_security_txt_content_type(value: str) -> bool:
+    return SECURITY_TXT_CONTENT_TYPE_RE.fullmatch(value) is not None
 
 
 @dataclass(frozen=True)
@@ -295,14 +304,17 @@ def verify_exact_public_files(
                 insecure=False,
                 accept="*/*",
             )
-            remote_bytes = fetch.body.encode("utf-8")
+            remote_bytes = fetch.raw_body if getattr(fetch, "raw_body", None) is not None else fetch.body.encode("utf-8")
             expected_bytes = (root / local_relative).read_bytes()
         except (OSError, RuntimeError) as error:
             errors.append(f"exact public file fetch failed for {relative_url or 'index.html'}: {error}")
             continue
         remote_sha256 = hashlib.sha256(remote_bytes).hexdigest()
         expected_sha256 = hashlib.sha256(expected_bytes).hexdigest()
-        matched = fetch.status == 200 and remote_sha256 == expected_sha256
+        content_type_valid = True
+        if local_relative == ".well-known/security.txt":
+            content_type_valid = valid_security_txt_content_type(fetch.content_type)
+        matched = fetch.status == 200 and fetch.final_url == requested_url and remote_sha256 == expected_sha256 and content_type_valid
         receipts.append(
             ExactPublicFileReceipt(
                 relative_url=relative_url or "index.html",
@@ -318,8 +330,12 @@ def verify_exact_public_files(
         )
         if fetch.status != 200:
             errors.append(f"exact public file status must be 200 for {relative_url or 'index.html'}, got {fetch.status}")
+        if fetch.final_url != requested_url:
+            errors.append(f"exact public file redirected: {relative_url or 'index.html'}: {requested_url} -> {fetch.final_url}")
         if remote_sha256 != expected_sha256:
             errors.append(f"exact public file hash mismatch: {relative_url or 'index.html'}")
+        if not content_type_valid:
+            errors.append("security.txt content-type must be text/plain; charset=utf-8")
     return ExactPublicFilesResult(
         verdict="pass" if not errors and len(receipts) == len(EXACT_PUBLIC_FILES) else "fail",
         receipts=tuple(receipts),
@@ -348,7 +364,11 @@ def run_live_smoke_with_retry(
         try:
             receipt = live_smoke(url, timeout_seconds=timeout_seconds, insecure=False)
             last_receipt = receipt
-            exact_result = exact_file_check(receipt.final_url, timeout_seconds)
+            requested_root = getattr(receipt, "requested_url", url)
+            if requested_root != url or receipt.final_url != url:
+                errors.append(f"cycle {attempt}: canonical Pages root redirected")
+                continue
+            exact_result = exact_file_check(url, timeout_seconds)
             last_exact_public_files = exact_result.receipts
         except (OSError, RuntimeError) as error:
             errors.append(f"cycle {attempt}: {error}")

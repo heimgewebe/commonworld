@@ -1,0 +1,48 @@
+name: security-policy-expiry
+
+on:
+  schedule:
+    - cron: "17 5 * * 1"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  validate-security-policy-expiry:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-python@v7
+        with:
+          python-version: "3.12"
+
+      - name: Validate disclosure policy and expiry
+        id: policy
+        continue-on-error: true
+        run: python3 scripts/validate_security_policy.py
+
+      - name: Verify private vulnerability reporting remains enabled
+        id: security_setting
+        if: always()
+        continue-on-error: true
+        run: >-
+          python3 scripts/validate_security_policy.py
+          --verify-live-setting
+          --repository "${{ github.repository }}"
+          --expected-sha "${{ github.sha }}"
+          --receipt artifacts/commonworld-private-vulnerability-reporting-scheduled.json
+
+      - name: Upload scheduled security receipt
+        if: always()
+        uses: actions/upload-artifact@v7
+        with:
+          name: commonworld-private-vulnerability-reporting-scheduled-${{ github.sha }}
+          path: artifacts/commonworld-private-vulnerability-reporting-scheduled.json
+          if-no-files-found: error
+          retention-days: 30
+
+      - name: Enforce weekly security checks
+        if: always() && (steps.policy.outcome != 'success' || steps.security_setting.outcome != 'success')
+        run: exit 1

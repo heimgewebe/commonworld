@@ -122,6 +122,7 @@ class LiveFetch:
     content_type: str
     body: str
     attempts: tuple[FetchAttemptReceipt, ...] = ()
+    raw_body: bytes | None = None
 
 
 @dataclass(frozen=True)
@@ -310,6 +311,7 @@ def fetch_live_url(
             content_type=content_type,
             body=body,
             attempts=tuple(attempts),
+            raw_body=raw,
         )
 
     raise AssertionError("bounded live fetch loop exhausted unexpectedly")

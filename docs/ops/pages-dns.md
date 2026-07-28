@@ -73,7 +73,7 @@ The delivery smoke is read-only. It verifies that the canonical Commonworld shel
 
 Every push to `main` also starts `.github/workflows/production-readback.yml`. The workflow does not treat a green Pages build as sufficient proof. It waits at most 600 seconds for a `github-pages` deployment whose SHA is the exact commit checked out by the workflow. Older successful deployments are ignored.
 
-After that exact deployment reports success, the workflow reuses `scripts/smoke_pages_live.py`. The existing smoke compares the public shell, proposal page, catalog and runtime assets with the checked-out commit. Each automated file request is bounded to five seconds. The existing smoke checks the shell, proposal page, catalog and six runtime assets; the orchestrator additionally binds `index.html`, `propose.html` and `catalog/catalog.json` byte-for-byte to the checked-out commit. CDN propagation is retried only as three complete cycles with the fixed delays `0, 30, 90` seconds. Together with the inner one-retry-per-URL limit, even twelve public files consuming their full request windows remain inside the 20-minute workflow boundary. There is no unbounded retry.
+After that exact deployment reports success, the workflow reuses `scripts/smoke_pages_live.py`. The existing smoke compares the public shell, proposal page, catalog and runtime assets with the checked-out commit. Each automated file request is bounded to five seconds. The existing smoke checks the shell, proposal page, catalog and six runtime assets; the orchestrator additionally binds `index.html`, `propose.html`, `catalog/catalog.json` and `/.well-known/security.txt` byte-for-byte to the checked-out commit. CDN propagation is retried only as three complete cycles with the fixed delays `0, 30, 90` seconds. Together with the inner one-retry-per-URL limit, even thirteen public files consuming their full request windows remain inside the 30-minute workflow boundary. There is no unbounded retry.
 
 The machine-readable artifact is retained for 30 days under the receipt id:
 
@@ -102,3 +102,12 @@ Operational limits from the official GitHub Pages contract remain visible: the p
 The basemap is a separate noncritical dependency. `tiles.openfreemap.org` is authorized only as best effort without an SLA or continuity guarantee. If it is unavailable, the complete linear catalog, project selection and focus content must remain usable and the map must report a degraded state.
 
 The machine-readable decision and its failure/rollback boundary are in `contracts/commonworld/production-delivery-provider.contract.json`. Provider migration, self-hosting, backend introduction or automatic failover require a separate reviewed task.
+
+## Vulnerability disclosure surface
+
+Commonworld uses GitHub Private Vulnerability Reporting as its only confidential disclosure channel. The repository setting was enabled before publication on 2026-07-27. `SECURITY.md` is the repository policy and `/.well-known/security.txt` is the RFC 9116 discovery surface. Public issues, pull requests and the Commons proposal form are not confidential reporting channels.
+
+The source-branch Jekyll build includes only `.well-known`; `.nojekyll` is forbidden because it would publish a broader dotfile surface. The production readback requires the exact canonical HTTPS URL without redirects and hashes `/.well-known/security.txt` against the exact deployed commit. The expiry must remain between 30 and 366 days in the future. A weekly scheduled workflow is a best-effort safety net that runs the same validator and confirms that Private Vulnerability Reporting remains enabled when the schedule is active. GitHub can automatically disable scheduled workflows in a public repository after 60 days without repository activity; an operator must then re-enable or manually dispatch the workflow. The repository therefore does not claim uninterrupted external monitoring from this schedule alone.
+
+
+These checks validate the disclosure behavior; they do not make a pull request self-trusting. Workflow trust and merge authorization remain external repository-governance concerns.
