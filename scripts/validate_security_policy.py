@@ -4,6 +4,7 @@
 from __future__ import annotations
 
 import argparse
+import hashlib
 import http.client
 import json
 import re
@@ -27,6 +28,11 @@ JEKYLL_CONFIG = Path("_config.yml")
 VALIDATE_WORKFLOW = Path(".github/workflows/validate.yml")
 PRODUCTION_READBACK_WORKFLOW = Path(".github/workflows/production-readback.yml")
 SECURITY_EXPIRY_WORKFLOW = Path(".github/workflows/security-policy-expiry.yml")
+EXPECTED_WORKFLOW_SHA256 = {
+    VALIDATE_WORKFLOW: "fe02ff290cde4bdabdfd6ef92ec4b6d94977125f8bf7980b8c3663d695ae61ed",
+    PRODUCTION_READBACK_WORKFLOW: "553c04d7eb0b814d14453e7c59093a147153a10af96e92a84e4d8be55eaed628",
+    SECURITY_EXPIRY_WORKFLOW: "1f5e132ce88792380d6eace0140ab62bb29c514d9743d6d52a1be0d965ae12cc",
+}
 EXPECTED_CONTACT = "https://github.com/heimgewebe/commonworld/security/advisories/new"
 EXPECTED_POLICY = "https://github.com/heimgewebe/commonworld/security/policy"
 EXPECTED_CANONICAL = "https://commonworld.net/.well-known/security.txt"
@@ -454,6 +460,14 @@ def validate_security_policy(root: Path = ROOT, now: datetime | None = None) -> 
             errors.append(f"missing security disclosure file: {path}")
     if errors:
         return errors
+
+    for relative, expected_sha256 in EXPECTED_WORKFLOW_SHA256.items():
+        actual_sha256 = hashlib.sha256((root / relative).read_bytes()).hexdigest()
+        if actual_sha256 != expected_sha256:
+            errors.append(
+                f"security workflow bytes changed without reviewed digest update: {relative}; "
+                f"expected {expected_sha256}, got {actual_sha256}"
+            )
 
     security_bytes = (root / SECURITY_TXT).read_bytes()
     if len(security_bytes) > MAX_BYTES:

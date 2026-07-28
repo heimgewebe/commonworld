@@ -879,6 +879,41 @@ class SecurityPolicyTests(unittest.TestCase):
                 errors,
             )
 
+    def test_security_workflow_digests_bind_triggers_and_all_predecessors(self) -> None:
+        mutations = (
+            (
+                ".github/workflows/validate.yml",
+                "  pull_request:\n",
+                "  workflow_dispatch:\n",
+            ),
+            (
+                ".github/workflows/production-readback.yml",
+                "      - main\n",
+                "      - never-run\n",
+            ),
+            (
+                ".github/workflows/security-policy-expiry.yml",
+                "    steps:\n",
+                "    steps:\n      - name: Unreviewed predecessor\n        run: echo attacker >> \"$GITHUB_PATH\"\n",
+            ),
+        )
+        for relative, old, new in mutations:
+            with self.subTest(relative=relative), tempfile.TemporaryDirectory() as directory:
+                root = self.copy_surface(directory)
+                path = root / relative
+                source = path.read_text(encoding="utf-8")
+                self.assertEqual(1, source.count(old))
+                path.write_text(source.replace(old, new, 1), encoding="utf-8")
+                errors = validate_security_policy(root, now=self.NOW)
+            self.assertTrue(
+                any(
+                    "security workflow bytes changed without reviewed digest update" in error
+                    and relative in error
+                    for error in errors
+                ),
+                errors,
+            )
+
     def test_security_workflow_and_job_field_inventories_are_exact(self) -> None:
         cases = (
             (".github/workflows/validate.yml", "  contracts:\n", "validate workflow"),
