@@ -175,6 +175,41 @@ function assertSameIds(actual, expected, label) {
   assert(JSON.stringify(actualSorted) === JSON.stringify(expectedSorted), `${label}: expected ${JSON.stringify(expectedSorted)} but found ${JSON.stringify(actualSorted)}`);
 }
 
+async function accessibilitySubtreeForSelector(page, selector) {
+  const client = await page.context().newCDPSession(page);
+  try {
+    await client.send('Accessibility.enable');
+    const documentNode = await client.send('DOM.getDocument', { depth: -1 });
+    const selected = await client.send('DOM.querySelector', { nodeId: documentNode.root.nodeId, selector });
+    assert(selected.nodeId, `accessibility selector did not resolve: ${selector}`);
+    const tree = await client.send('Accessibility.getPartialAXTree', { nodeId: selected.nodeId, fetchRelatives: true });
+    return tree.nodes.map((node) => ({
+      nodeId: node.nodeId,
+      parentId: node.parentId ?? null,
+      ignored: Boolean(node.ignored),
+      role: node.role?.value ?? '',
+      name: node.name?.value ?? '',
+      description: node.description?.value ?? '',
+    }));
+  } finally {
+    await client.detach();
+  }
+}
+
+function assertAccessibleRingSummary(nodes, titles, label) {
+  const summary = nodes[0];
+  assert(summary && !summary.ignored && summary.role === 'paragraph', `${label}: exact summary AX node is absent or ignored (${JSON.stringify(nodes)})`);
+  const exposedText = nodes
+    .filter((node) => !node.ignored && node.parentId === summary.nodeId && node.role === 'StaticText')
+    .map((node) => node.name)
+    .join(' ');
+  assert(exposedText, `${label}: exact summary AX node has no exposed StaticText child (${JSON.stringify(nodes)})`);
+  for (const title of titles) {
+    assert(exposedText.includes(title), `${label}: exact summary AX subtree is missing ${title} (${exposedText})`);
+  }
+  return exposedText;
+}
+
 async function loadExpectedDigitalProjection() {
   const manifest = JSON.parse(await readFile(path.join(ROOT, 'catalog/catalog.json'), 'utf8'));
   assert(Array.isArray(manifest.project_files), 'catalog projection: manifest project_files missing');
@@ -637,14 +672,8 @@ async function startupAndRingOrbitScenario() {
   for (const title of visibleTitleById.values()) {
     assert(accessibleRingSummary.text.includes(title), `ring accessibility: visible full title is absent from the non-hidden summary ${JSON.stringify({ title, summary: accessibleRingSummary.text })}`);
   }
-  const accessibilityClient = await run.page.context().newCDPSession(run.page);
-  await accessibilityClient.send('Accessibility.enable');
-  const accessibilityTree = await accessibilityClient.send('Accessibility.getFullAXTree');
-  await accessibilityClient.detach();
-  const accessibilityText = accessibilityTree.nodes.flatMap((node) => [node.name?.value, node.description?.value, node.value?.value]).filter(Boolean).join('\n');
-  for (const title of visibleTitleById.values()) {
-    assert(accessibilityText.includes(title), `ring accessibility: full title is absent from Chromium's accessibility tree (${title})`);
-  }
+  const summaryAccessibilityNodes = await accessibilitySubtreeForSelector(run.page, '#sphere-ring-accessible-summary');
+  assertAccessibleRingSummary(summaryAccessibilityNodes, [...visibleTitleById.values()], 'ring accessibility');
 
   const ringPreviewCounts = rings.map(({ ids }) => ids.length);
   const maxRingPreviewCount = Math.max(...ringPreviewCounts);
@@ -684,6 +713,78 @@ async function startupAndRingOrbitScenario() {
   assert(run.pageErrors.length === 0, 'startup: page errors: ' + run.pageErrors.join(' | '));
   const maximumVisibleRingLabelCharacters = Math.max(...rings.flatMap(({ names }) => names.map(({ visibleText }) => Array.from(visibleText).length)));
   results.push({ id: 'startup-and-ring-orbits', verdict: 'PASS', directGlobeProjection: true, hiddenUntilCalibrated: true, outerHintRemoved: true, aggregateRingIdentities: aggregateCount, configuredRingPreviewLimit: SPHERE_RING_IDENTITY_PREVIEW_LIMIT, ringPreviewCounts, maxRingPreviewCount, orbitLabelMaxChars: SPHERE_RING_LABEL_MAX_CHARS, maximumVisibleRingLabelCharacters, accessibleFullTitleParity: true, collisionSafeVisibleLabels: true, movingRingMatrix: movedRing, unchangedGeometryRepaintSkipped: true });
+  await run.context.close();
+}
+
+async function syntheticCrossRingCollisionAccessibilityScenario() {
+  process.stdout.write(`${JSON.stringify({ state: 'RUNNING', scenario: 'synthetic-cross-ring-collision-accessibility' })}\n`);
+  const run = await newPage({ viewportOverride: { width: 1280, height: 800 }, reducedMotion: 'reduce' });
+  await run.page.goto(baseUrl, { waitUntil: 'domcontentloaded' });
+  await run.page.waitForSelector('html.runtime-ready');
+  const records = [
+    {
+      schema_version: 4,
+      id: 'collision-communication',
+      title: 'Cross Ring Collision Alpha',
+      summary: 'Synthetic cross-ring collision probe.',
+      themes: ['communication', 'community-network'],
+      actions: ['learn'],
+      presence: { geographic: [], digital: { available: true, reach: 'global', label: 'Synthetic digital presence' } },
+      activity: { status: 'active' },
+      curation: { state: 'listed', next_review_at: '2027-01-01' },
+      links: [],
+    },
+    {
+      schema_version: 4,
+      id: 'collision-software',
+      title: 'Cross Ring Collision Beta',
+      summary: 'Synthetic cross-ring collision probe.',
+      themes: ['open-data', 'infrastructure'],
+      actions: ['learn'],
+      presence: { geographic: [], digital: { available: true, reach: 'global', label: 'Synthetic digital presence' } },
+      activity: { status: 'active' },
+      curation: { state: 'listed', next_review_at: '2027-01-01' },
+      links: [],
+    },
+  ];
+  const installed = await run.page.evaluate((syntheticRecords) => window.__commonworldInstallSyntheticRecordsForTest(syntheticRecords), records);
+  assert(installed.records === 2 && installed.treeIdentities === 2, `synthetic cross-ring collision: installation failed (${JSON.stringify(installed)})`);
+  await run.page.waitForFunction(() => document.querySelectorAll('#sphere-rings .sphere-ring-name').length === 2);
+  const rendered = await run.page.evaluate(() => [...document.querySelectorAll('#sphere-rings .sphere-ring-plane')]
+    .map((plane) => ({
+      layer: plane.dataset.layerId,
+      names: [...plane.querySelectorAll('.sphere-ring-name')].map((node) => ({
+        id: node.dataset.commonprojectId,
+        visibleText: node.dataset.visibleLabel,
+        fullText: node.getAttribute('aria-label'),
+      })),
+    }))
+    .filter(({ names }) => names.length));
+  const renderedNames = rendered.flatMap(({ layer, names }) => names.map((name) => ({ ...name, layer })));
+  assert(renderedNames.length === 2, `synthetic cross-ring collision: expected two rendered names (${JSON.stringify(rendered)})`);
+  assert(new Set(renderedNames.map(({ layer }) => layer)).size === 2, `synthetic cross-ring collision: records did not reach distinct visible rings (${JSON.stringify(renderedNames)})`);
+  assert(new Set(renderedNames.map(({ visibleText }) => visibleText)).size === 2, `synthetic cross-ring collision: global allocator exposed colliding labels (${JSON.stringify(renderedNames)})`);
+  assert(renderedNames.every(({ visibleText }) => Array.from(visibleText).length <= SPHERE_RING_LABEL_MAX_CHARS), `synthetic cross-ring collision: visible label budget drifted (${JSON.stringify(renderedNames)})`);
+  const expectedTitles = records.map(({ title }) => title);
+  const overviewNodes = await accessibilitySubtreeForSelector(run.page, '#sphere-ring-accessible-summary');
+  const overviewText = assertAccessibleRingSummary(overviewNodes, expectedTitles, 'synthetic cross-ring accessibility overview');
+  await run.page.locator('#layer-view-button').click();
+  await run.page.waitForSelector('.globe-stage[data-view-phase="layers"]');
+  assert(await run.page.locator('#digital-sphere').getAttribute('aria-hidden') === 'true', 'synthetic cross-ring accessibility: SVG sphere was not hidden in layer view');
+  const hiddenSphereNodes = await accessibilitySubtreeForSelector(run.page, '#sphere-ring-accessible-summary');
+  const hiddenSphereText = assertAccessibleRingSummary(hiddenSphereNodes, expectedTitles, 'synthetic cross-ring accessibility hidden sphere');
+  assert(hiddenSphereText === overviewText, `synthetic cross-ring accessibility: summary drifted when SVG sphere became hidden (${JSON.stringify({ overviewText, hiddenSphereText })})`);
+  assert(run.consoleErrors.length === 0, `synthetic cross-ring accessibility: console errors: ${run.consoleErrors.join(' | ')}`);
+  assert(run.pageErrors.length === 0, `synthetic cross-ring accessibility: page errors: ${run.pageErrors.join(' | ')}`);
+  results.push({
+    id: 'synthetic-cross-ring-collision-accessibility',
+    verdict: 'PASS',
+    distinctVisibleRings: 2,
+    forcedCollidingPrefixes: true,
+    globallyDistinctVisibleLabels: true,
+    exactSummaryAxNodeExposed: true,
+    summaryExposedWhileSvgSphereHidden: true,
+  });
   await run.context.close();
 }
 
@@ -3370,6 +3471,7 @@ html { font-size: ${profile.fontScale}% !important; }
 let scenarioFailure = null;
 try {
   await startupAndRingOrbitScenario();
+  await syntheticCrossRingCollisionAccessibilityScenario();
   await reducedMotionRingScenario();
   await syntheticDigitalPerformanceScenario();
   await normalScenario();

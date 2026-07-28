@@ -515,9 +515,10 @@
   "validation": {
     "public_browser_smoke": {
       "verdict": "PASS",
-      "scenario_count": 34,
+      "scenario_count": 35,
       "scenario_ids": [
         "startup-and-ring-orbits",
+        "synthetic-cross-ring-collision-accessibility",
         "ring-orbits-reduced-motion",
         "synthetic-digital-performance",
         "normal",
@@ -552,8 +553,8 @@
         "method-mobile",
         "method-mobile-text-200"
       ],
-      "evidence_sha256": "b44c4db3fc7b5dd34701df1a7f07c94d6292ee58bdc8ac7b310db85ca2631d01",
-      "scenario_execution_note": "Fresh job 0b8bc880eca6 proves the six-name limit, maximum visible label length 18, full-title parity in Chromium’s accessibility tree, and globally collision-safe visible labels."
+      "evidence_sha256": "27a0d29a6ac4866bab0958d4364d1ae3700b4ad129b9b1780eb67050512a1550",
+      "scenario_execution_note": "Fresh job c639d7b90038 proves 35 scenarios, including an exact non-ignored summary AX subtree while the SVG sphere is hidden and a forced cross-ring visible-label collision resolved only by global assignment."
     },
     "proposal_browser_smoke": {
       "verdict": "PASS",
@@ -590,8 +591,8 @@
     "official_browser_runner": {
       "verdict": "PASS",
       "command": "python3 scripts/run_browser_smoke.py",
-      "durable_job_id": "803ad386014c",
-      "finalization_receipt_sha256": "9ef3c18042495dff5391ebd0973623e71444fda0262a8fcb623734b39d890b87"
+      "durable_job_id": "b233d7cab3c7",
+      "finalization_receipt_sha256": "3ad077cd8aceab11fad59c470d40480d16cdc3637a5217a9f412eee7c254c15f"
     },
     "catalog_delivery_static_measurement": {
       "verdict": "PASS",
@@ -603,8 +604,8 @@
     "full_validation": {
       "verdict": "PASS",
       "command": "make validate",
-      "durable_job_id": "1d40db8e6b3a",
-      "finalization_receipt_sha256": "00cb6b2db839fa3ca39fe61d84b0872fd75dac294806fdf480e2616394285be6",
+      "durable_job_id": "4d47e5c78d5f",
+      "finalization_receipt_sha256": "8c680990fb02284ad751fe8c41ed7f449477f77526caeeb41d7c1fbe06f8ef0b",
       "javascript_tests": "111/111",
       "python_tests": "527/527"
     }
@@ -614,5 +615,5 @@
     "warn_bootstrap_gzip_bytes": 28672,
     "max_bootstrap_gzip_bytes": 32768
   },
-  "current_surface_note": "Current browser evidence proves bounded full-title access through Chromium’s accessibility tree and globally collision-safe typographic ring labels on the exact PR surface. Historical baseline evidence remains unchanged; timing metrics remain observational."
+  "current_surface_note": "Current browser evidence proves bounded full-title access through the exact non-ignored summary AX subtree, including layer view with the SVG sphere hidden, and forces collision-safe labels across distinct visible rings. Historical baseline evidence remains unchanged; timing metrics remain observational."
 }
