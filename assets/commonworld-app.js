@@ -54,7 +54,7 @@ import {
   sphereRingStrokeWidth,
   stateFromSearch,
   visibleDigitalNodes,
-} from './commonworld-core.mjs?v=5845bfd27769';
+} from './commonworld-core.mjs?v=9eb72428e6d1';
 
 const LOCALE = documentLocale();
 const t = (key, germanFallback, variables = {}) => i18nText(LOCALE, key, germanFallback, variables);
@@ -732,7 +732,6 @@ function appendRingSequence(textPath, assignments, { prefix = '' } = {}) {
       class: 'sphere-ring-name',
       'data-commonproject-id': assignment.id,
       'data-visible-label': assignment.visibleText,
-      'aria-label': assignment.fullText,
     });
     name.textContent = `\u00A0\u00A0${assignment.visibleText}`;
     textPath.append(name);

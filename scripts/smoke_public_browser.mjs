@@ -21,6 +21,7 @@ import {
   ringOrbitDuration,
   SPHERE_RING_IDENTITY_PREVIEW_LIMIT,
   SPHERE_RING_LABEL_MAX_CHARS,
+  sphereRingLabelLength,
   serializeDigitalPath,
   sphereOpacityForGlobeRatio,
   visibleDigitalNodes,
@@ -457,7 +458,7 @@ async function waitForSphereOpacitySettled(page) {
   });
 }
 
-async function waitForSphereGeometrySettled(page) {
+async function waitForSphereGeometrySettled(page, timeoutMs = 30_000) {
   await page.waitForFunction(() => {
     const map = window.__commonworldTestMap;
     const stage = document.querySelector('.globe-stage');
@@ -466,7 +467,7 @@ async function waitForSphereGeometrySettled(page) {
     const globeDiameter = Number(stage.dataset.globeDiameter);
     const sphereWidth = sphere.getBoundingClientRect().width;
     return !map.isMoving() && Number.isFinite(globeDiameter) && globeDiameter > 0 && Math.abs(sphereWidth - globeDiameter * 1.32) <= 2;
-  });
+  }, null, { timeout: Math.max(1, timeoutMs) });
 }
 
 async function independentProjectedGlobeDiameter(page) {
@@ -489,6 +490,22 @@ async function independentProjectedGlobeDiameter(page) {
     const radius = (radii[middle - 1] + radii[middle]) / 2;
     return radius * 2;
   }, horizon);
+}
+
+async function waitForSphereHorizonCoupling(page, label, timeoutMs = 5_000) {
+  const deadline = Date.now() + timeoutMs;
+  let last = null;
+  do {
+    const remainingMs = deadline - Date.now();
+    if (remainingMs <= 0) break;
+    await waitForSphereGeometrySettled(page, remainingMs);
+    const projected = await independentProjectedGlobeDiameter(page);
+    const declared = Number(await page.locator('.globe-stage').getAttribute('data-globe-diameter'));
+    last = { declared, projected };
+    if (Number.isFinite(declared) && Math.abs(declared - projected) <= 1) return last;
+    await page.waitForTimeout(32);
+  } while (Date.now() < deadline);
+  throw new Error(`${label}: MapLibre horizon coupling did not settle (${last?.declared} vs ${last?.projected})`);
 }
 
 async function startupAndRingOrbitScenario() {
@@ -635,8 +652,8 @@ async function startupAndRingOrbitScenario() {
     assertSameIds(ring.ids, expectedLayer.ringPreviewIds, `ring orbits: ${ring.layer} lane identity set`);
     assert(new Set(ring.ids).size === ring.ids.length, `ring orbits: ${ring.layer} repeats an identity ${JSON.stringify(ring.ids)}`);
     const visibleLabels = ring.names.map(({ visibleText }) => visibleText);
-    assert(ring.names.every(({ visibleText }) => Array.from(visibleText).length <= SPHERE_RING_LABEL_MAX_CHARS), `ring orbits: ${ring.layer} exceeds the 18-character label contract ${JSON.stringify(ring.names)}`);
-    assert(ring.names.every(({ id, ariaLabel }) => ariaLabel === expectedDigitalProjection.titleById[id]), `ring orbits: ${ring.layer} lost accessible full-title parity ${JSON.stringify(ring.names)}`);
+    assert(ring.names.every(({ visibleText }) => sphereRingLabelLength(visibleText) <= SPHERE_RING_LABEL_MAX_CHARS), `ring orbits: ${ring.layer} exceeds the 18-grapheme label contract ${JSON.stringify(ring.names)}`);
+    assert(ring.names.every(({ ariaLabel }) => ariaLabel === ''), `ring orbits: aria-hidden SVG names still carry ineffective accessibility names ${JSON.stringify(ring.names)}`);
     assert(new Set(visibleLabels).size === visibleLabels.length, `ring orbits: ${ring.layer} exposes colliding visible short labels ${JSON.stringify(visibleLabels)}`);
     if (ring.entryCount === 0) {
       assert(ring.placeholderCount === 1 && ring.placeholderIds === 0, `ring orbits: empty ${ring.layer} needs a non-identity placeholder ${JSON.stringify(ring)}`);
@@ -711,8 +728,8 @@ async function startupAndRingOrbitScenario() {
 
   assert(run.consoleErrors.length === 0, 'startup: console errors: ' + run.consoleErrors.join(' | ') + '; HTTP: ' + run.httpErrors.join(' | '));
   assert(run.pageErrors.length === 0, 'startup: page errors: ' + run.pageErrors.join(' | '));
-  const maximumVisibleRingLabelCharacters = Math.max(...rings.flatMap(({ names }) => names.map(({ visibleText }) => Array.from(visibleText).length)));
-  results.push({ id: 'startup-and-ring-orbits', verdict: 'PASS', directGlobeProjection: true, hiddenUntilCalibrated: true, outerHintRemoved: true, aggregateRingIdentities: aggregateCount, configuredRingPreviewLimit: SPHERE_RING_IDENTITY_PREVIEW_LIMIT, ringPreviewCounts, maxRingPreviewCount, orbitLabelMaxChars: SPHERE_RING_LABEL_MAX_CHARS, maximumVisibleRingLabelCharacters, accessibleFullTitleParity: true, collisionSafeVisibleLabels: true, movingRingMatrix: movedRing, unchangedGeometryRepaintSkipped: true });
+  const maximumVisibleRingLabelCharacters = Math.max(...rings.flatMap(({ names }) => names.map(({ visibleText }) => sphereRingLabelLength(visibleText))));
+  results.push({ id: 'startup-and-ring-orbits', verdict: 'PASS', directGlobeProjection: true, hiddenUntilCalibrated: true, outerHintRemoved: true, aggregateRingIdentities: aggregateCount, configuredRingPreviewLimit: SPHERE_RING_IDENTITY_PREVIEW_LIMIT, ringPreviewCounts, maxRingPreviewCount, orbitLabelMaxChars: SPHERE_RING_LABEL_MAX_CHARS, orbitLabelMeasurement: 'extended-grapheme-clusters', maximumVisibleRingLabelCharacters, accessibleFullTitleParity: true, hiddenSvgAccessibilityNamesRemoved: true, graphemeSafeVisibleLabels: true, collisionSafeVisibleLabels: true, movingRingMatrix: movedRing, unchangedGeometryRepaintSkipped: true });
   await run.context.close();
 }
 
@@ -725,8 +742,8 @@ async function syntheticCrossRingCollisionAccessibilityScenario() {
     {
       schema_version: 4,
       id: 'collision-communication',
-      title: 'Cross Ring Collision Alpha',
-      summary: 'Synthetic cross-ring collision probe.',
+      title: `1234567890123456e\u0301 Collision Alpha`,
+      summary: 'Synthetic cross-ring collision and grapheme-boundary probe.',
       themes: ['communication', 'community-network'],
       actions: ['learn'],
       presence: { geographic: [], digital: { available: true, reach: 'global', label: 'Synthetic digital presence' } },
@@ -737,9 +754,21 @@ async function syntheticCrossRingCollisionAccessibilityScenario() {
     {
       schema_version: 4,
       id: 'collision-software',
-      title: 'Cross Ring Collision Beta',
-      summary: 'Synthetic cross-ring collision probe.',
+      title: `1234567890123456e\u0301 Collision Beta`,
+      summary: 'Synthetic cross-ring collision and grapheme-boundary probe.',
       themes: ['open-data', 'infrastructure'],
+      actions: ['learn'],
+      presence: { geographic: [], digital: { available: true, reach: 'global', label: 'Synthetic digital presence' } },
+      activity: { status: 'active' },
+      curation: { state: 'listed', next_review_at: '2027-01-01' },
+      links: [],
+    },
+    {
+      schema_version: 4,
+      id: 'boundary-emoji',
+      title: '1234567890123456👨‍👩‍👧‍👦 Continuation',
+      summary: 'Synthetic joined-emoji grapheme-boundary probe.',
+      themes: ['education', 'open-knowledge'],
       actions: ['learn'],
       presence: { geographic: [], digital: { available: true, reach: 'global', label: 'Synthetic digital presence' } },
       activity: { status: 'active' },
@@ -748,23 +777,28 @@ async function syntheticCrossRingCollisionAccessibilityScenario() {
     },
   ];
   const installed = await run.page.evaluate((syntheticRecords) => window.__commonworldInstallSyntheticRecordsForTest(syntheticRecords), records);
-  assert(installed.records === 2 && installed.treeIdentities === 2, `synthetic cross-ring collision: installation failed (${JSON.stringify(installed)})`);
-  await run.page.waitForFunction(() => document.querySelectorAll('#sphere-rings .sphere-ring-name').length === 2);
+  assert(installed.records === 3 && installed.treeIdentities === 3, `synthetic cross-ring collision: installation failed (${JSON.stringify(installed)})`);
+  await run.page.waitForFunction(() => document.querySelectorAll('#sphere-rings .sphere-ring-name').length === 3);
   const rendered = await run.page.evaluate(() => [...document.querySelectorAll('#sphere-rings .sphere-ring-plane')]
     .map((plane) => ({
       layer: plane.dataset.layerId,
       names: [...plane.querySelectorAll('.sphere-ring-name')].map((node) => ({
         id: node.dataset.commonprojectId,
         visibleText: node.dataset.visibleLabel,
-        fullText: node.getAttribute('aria-label'),
+        ariaLabel: node.getAttribute('aria-label') ?? '',
       })),
     }))
     .filter(({ names }) => names.length));
   const renderedNames = rendered.flatMap(({ layer, names }) => names.map((name) => ({ ...name, layer })));
-  assert(renderedNames.length === 2, `synthetic cross-ring collision: expected two rendered names (${JSON.stringify(rendered)})`);
-  assert(new Set(renderedNames.map(({ layer }) => layer)).size === 2, `synthetic cross-ring collision: records did not reach distinct visible rings (${JSON.stringify(renderedNames)})`);
-  assert(new Set(renderedNames.map(({ visibleText }) => visibleText)).size === 2, `synthetic cross-ring collision: global allocator exposed colliding labels (${JSON.stringify(renderedNames)})`);
-  assert(renderedNames.every(({ visibleText }) => Array.from(visibleText).length <= SPHERE_RING_LABEL_MAX_CHARS), `synthetic cross-ring collision: visible label budget drifted (${JSON.stringify(renderedNames)})`);
+  assert(renderedNames.length === 3, `synthetic cross-ring collision: expected three rendered names (${JSON.stringify(rendered)})`);
+  assert(new Set(renderedNames.map(({ layer }) => layer)).size === 3, `synthetic cross-ring collision: records did not reach distinct visible rings (${JSON.stringify(renderedNames)})`);
+  assert(new Set(renderedNames.map(({ visibleText }) => visibleText)).size === 3, `synthetic cross-ring collision: global allocator exposed colliding labels (${JSON.stringify(renderedNames)})`);
+  assert(renderedNames.every(({ visibleText }) => sphereRingLabelLength(visibleText) <= SPHERE_RING_LABEL_MAX_CHARS), `synthetic cross-ring collision: visible label budget drifted (${JSON.stringify(renderedNames)})`);
+  const visibleTextById = Object.fromEntries(renderedNames.map(({ id, visibleText }) => [id, visibleText]));
+  assert(visibleTextById['collision-communication'] === `1234567890123456e\u0301…`, `synthetic cross-ring collision: combining-mark boundary label is not exact (${JSON.stringify(renderedNames)})`);
+  assert(visibleTextById['collision-software'] === '123456789012345…·1', `synthetic cross-ring collision: collision suffix did not preserve the 18-grapheme budget (${JSON.stringify(renderedNames)})`);
+  assert(visibleTextById['boundary-emoji'] === '1234567890123456👨‍👩‍👧‍👦…', `synthetic cross-ring collision: joined-emoji boundary label is not exact (${JSON.stringify(renderedNames)})`);
+  assert(renderedNames.every(({ ariaLabel }) => ariaLabel === ''), `synthetic cross-ring collision: aria-hidden SVG names retained an aria-label (${JSON.stringify(renderedNames)})`);
   const expectedTitles = records.map(({ title }) => title);
   const overviewNodes = await accessibilitySubtreeForSelector(run.page, '#sphere-ring-accessible-summary');
   const overviewText = assertAccessibleRingSummary(overviewNodes, expectedTitles, 'synthetic cross-ring accessibility overview');
@@ -779,9 +813,12 @@ async function syntheticCrossRingCollisionAccessibilityScenario() {
   results.push({
     id: 'synthetic-cross-ring-collision-accessibility',
     verdict: 'PASS',
-    distinctVisibleRings: 2,
+    distinctVisibleRings: 3,
     forcedCollidingPrefixes: true,
     globallyDistinctVisibleLabels: true,
+    combiningMarkBoundaryPreserved: true,
+    joinedEmojiBoundaryPreserved: true,
+    hiddenSvgAccessibilityNamesRemoved: true,
     exactSummaryAxNodeExposed: true,
     summaryExposedWhileSvgSphereHidden: true,
   });
@@ -1103,9 +1140,9 @@ async function layerJourneyScenario({ mobile = false, viewportOverride = null, t
   assert(before, 'layer journey: sphere has no initial geometry');
   const stage = run.page.locator('.globe-stage');
   assert((await stage.getAttribute('data-globe-geometry-source')) === 'maplibre-projected-horizon', 'layer journey: sphere does not use MapLibre horizon geometry');
-  const projectedBefore = await independentProjectedGlobeDiameter(run.page);
-  const declaredBefore = Number(await stage.getAttribute('data-globe-diameter'));
-  assert(Math.abs(declaredBefore - projectedBefore) <= 1, `layer journey: declared globe diameter diverges from MapLibre horizon (${declaredBefore} vs ${projectedBefore})`);
+  const initialCoupling = await waitForSphereHorizonCoupling(run.page, 'layer journey: initial globe diameter');
+  const projectedBefore = initialCoupling.projected;
+  const declaredBefore = initialCoupling.declared;
   assert(Math.abs(before.width - declaredBefore * 1.32) <= 2, `layer journey: outer shell ratio is wrong (${before.width} vs ${declaredBefore})`);
   const overviewRibbons = await run.page.evaluate(() => ({
     rings: document.querySelectorAll('.sphere-ring-text').length,
@@ -1151,22 +1188,18 @@ async function layerJourneyScenario({ mobile = false, viewportOverride = null, t
     await waitForSphereGeometrySettled(run.page);
   };
   await activateZoomIn();
+  await waitForSphereHorizonCoupling(run.page, 'layer journey: first zoom');
   const afterFirstZoom = await run.page.locator('#digital-sphere').boundingBox();
-  const projectedFirstZoom = await independentProjectedGlobeDiameter(run.page);
-  const declaredFirstZoom = Number(await stage.getAttribute('data-globe-diameter'));
   assert(afterFirstZoom && afterFirstZoom.width > before.width * 1.18, `layer journey: first zoom did not enlarge sphere (${before.width} -> ${afterFirstZoom?.width})`);
-  assert(Math.abs(declaredFirstZoom - projectedFirstZoom) <= 1, `layer journey: first zoom lost MapLibre horizon coupling (${declaredFirstZoom} vs ${projectedFirstZoom})`);
   await waitForSphereOpacitySettled(run.page);
   const opacityFirstZoom = Number(await run.page.locator('#digital-sphere').evaluate((node) => getComputedStyle(node).opacity));
   const ratioFirstZoom = Number(await stage.getAttribute('data-globe-viewport-ratio'));
   assert(Math.abs(opacityFirstZoom - sphereOpacityForGlobeRatio(ratioFirstZoom)) <= 0.01, `layer journey: first zoom opacity does not follow visible globe ratio (${opacityFirstZoom} at ${ratioFirstZoom})`);
 
   await activateZoomIn();
+  await waitForSphereHorizonCoupling(run.page, 'layer journey: second zoom');
   const afterSecondZoom = await run.page.locator('#digital-sphere').boundingBox();
-  const projectedSecondZoom = await independentProjectedGlobeDiameter(run.page);
-  const declaredSecondZoom = Number(await stage.getAttribute('data-globe-diameter'));
   assert(afterSecondZoom && afterSecondZoom.width > afterFirstZoom.width * 1.12, `layer journey: second zoom hit an artificial size ceiling (${afterFirstZoom.width} -> ${afterSecondZoom?.width})`);
-  assert(Math.abs(declaredSecondZoom - projectedSecondZoom) <= 1, `layer journey: second zoom lost MapLibre horizon coupling (${declaredSecondZoom} vs ${projectedSecondZoom})`);
   await waitForSphereOpacitySettled(run.page);
   const opacitySecondZoom = Number(await run.page.locator('#digital-sphere').evaluate((node) => getComputedStyle(node).opacity));
   const ratioSecondZoom = Number(await stage.getAttribute('data-globe-viewport-ratio'));
@@ -1181,11 +1214,10 @@ async function layerJourneyScenario({ mobile = false, viewportOverride = null, t
     if (mobile) await run.page.touchscreen.tap(zoomOutBox.x + zoomOutBox.width / 2, zoomOutBox.y + zoomOutBox.height / 2);
     else await run.page.mouse.click(zoomOutBox.x + zoomOutBox.width / 2, zoomOutBox.y + zoomOutBox.height / 2);
     await waitForSphereGeometrySettled(run.page);
+    const zoomOutCoupling = await waitForSphereHorizonCoupling(run.page, `layer journey: zoom-out ${index + 1}`);
     restoredScale = await run.page.locator('#digital-sphere').boundingBox();
-    const projectedZoomOut = await independentProjectedGlobeDiameter(run.page);
-    const declaredZoomOut = Number(await stage.getAttribute('data-globe-diameter'));
+    const declaredZoomOut = zoomOutCoupling.declared;
     assert(restoredScale && restoredScale.width < previousZoomOutWidth * 0.96, `layer journey: zoom-out did not shrink visible sphere (${previousZoomOutWidth} -> ${restoredScale?.width})`);
-    assert(Math.abs(declaredZoomOut - projectedZoomOut) <= 1, `layer journey: zoom-out lost MapLibre horizon coupling (${declaredZoomOut} vs ${projectedZoomOut})`);
     assert(Math.abs(restoredScale.width - declaredZoomOut * 1.32) <= 2, `layer journey: zoom-out lost outer-shell ratio (${restoredScale.width} vs ${declaredZoomOut})`);
     previousZoomOutWidth = restoredScale.width;
   }

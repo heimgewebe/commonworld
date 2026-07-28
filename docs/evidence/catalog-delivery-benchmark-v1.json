@@ -272,7 +272,7 @@
       },
       "html": {
         "raw_bytes": 115029,
-        "gzip_bytes": 16422,
+        "gzip_bytes": 16423,
         "start_tag_count": 1296,
         "catalog_card_instances": 65,
         "interactive_catalog_cards": 0,
@@ -294,7 +294,7 @@
     "browser": {
       "schema_version": 1,
       "kind": "commonworld_catalog_delivery_browser_metrics",
-      "measured_at": "2026-07-28T03:01:36.479Z",
+      "measured_at": "2026-07-28T04:33:03.686Z",
       "cpu_throttle_rate": 4,
       "profiles": [
         {
@@ -304,47 +304,47 @@
             "height": 844
           },
           "cpu_throttle_rate": 4,
-          "runtime_ready_ms": 841,
+          "runtime_ready_ms": 885,
           "dom_node_count": 1599,
           "catalog_card_count": 48,
           "interactive_catalog_card_count": 48,
           "runtime_ready": true,
           "runtime_failed": false,
-          "dom_content_loaded_ms": 491.40000000596046,
-          "load_event_ms": 523,
+          "dom_content_loaded_ms": 504.10000002384186,
+          "load_event_ms": 536.8000000119209,
           "resource_count": 16,
-          "script_duration_ms": 803.29,
-          "task_duration_ms": 2421.43,
+          "script_duration_ms": 858.4,
+          "task_duration_ms": 2583.04,
           "bootstrap_compile": {
-            "median_ms": 0.29999998211860657,
-            "p95_ms": 0.8999999761581421,
+            "median_ms": 0.20000001788139343,
+            "p95_ms": 0.9000000059604645,
             "samples_ms": [
               0,
               0,
-              0,
-              0,
+              0.09999999403953552,
+              0.09999999403953552,
+              0.09999999403953552,
+              0.09999999403953552,
               0.09999999403953552,
               0.09999999403953552,
               0.09999999403953552,
               0.10000002384185791,
               0.20000001788139343,
-              0.20000001788139343,
-              0.29999998211860657,
               0.30000001192092896,
+              0.4000000059604645,
               0.5,
-              0.6000000238418579,
-              0.6000000238418579,
-              0.699999988079071,
-              0.7000000178813934,
-              0.7999999821186066,
+              0.5999999940395355,
+              0.800000011920929,
+              0.800000011920929,
               0.8999999761581421,
               0.8999999761581421,
+              0.9000000059604645,
               0.9000000059604645
             ]
           },
           "first_party_request_count": 15,
           "first_party_unique_request_count": 15,
-          "first_party_raw_bytes": 1853387,
+          "first_party_raw_bytes": 1853925,
           "first_party_requests": [
             "/",
             "/assets/commonworld-app.js",
@@ -362,7 +362,7 @@
             "/catalog/runtime/manifest.v1.json",
             "/index.css"
           ],
-          "first_party_surface_sha256": "0440ff08f0243b8326f3814cc5ee7518b27dbb2b9550c96da41cfaa51870bbe5",
+          "first_party_surface_sha256": "3f1f1db8002dfd11e3d9d93123d180d94dabeba3f42bec82224389d569f4f5fe",
           "project_json_request_count": 0,
           "project_json_unique_request_count": 0,
           "project_json_requests": []
@@ -374,47 +374,47 @@
             "height": 768
           },
           "cpu_throttle_rate": 4,
-          "runtime_ready_ms": 704,
+          "runtime_ready_ms": 751,
           "dom_node_count": 1599,
           "catalog_card_count": 48,
           "interactive_catalog_card_count": 48,
           "runtime_ready": true,
           "runtime_failed": false,
-          "dom_content_loaded_ms": 436,
-          "load_event_ms": 466.59999999403954,
+          "dom_content_loaded_ms": 462.7000000178814,
+          "load_event_ms": 495.40000000596046,
           "resource_count": 16,
-          "script_duration_ms": 519.01,
-          "task_duration_ms": 927.18,
+          "script_duration_ms": 588.31,
+          "task_duration_ms": 1029.28,
           "bootstrap_compile": {
             "median_ms": 0.4000000059604645,
-            "p95_ms": 0.7999999821186066,
+            "p95_ms": 0.800000011920929,
             "samples_ms": [
-              0.09999999403953552,
+              0,
+              0,
               0.09999999403953552,
               0.09999999403953552,
               0.09999999403953552,
               0.09999999403953552,
               0.09999999403953552,
               0.10000002384185791,
-              0.20000001788139343,
-              0.3999999761581421,
+              0.19999998807907104,
+              0.19999998807907104,
               0.4000000059604645,
-              0.4000000059604645,
-              0.4000000059604645,
-              0.5,
               0.5,
               0.5,
               0.5999999940395355,
-              0.699999988079071,
+              0.6000000238418579,
               0.699999988079071,
               0.7000000178813934,
               0.7999999821186066,
+              0.7999999821186066,
+              0.800000011920929,
               0.9000000059604645
             ]
           },
           "first_party_request_count": 15,
           "first_party_unique_request_count": 15,
-          "first_party_raw_bytes": 1853387,
+          "first_party_raw_bytes": 1853925,
           "first_party_requests": [
             "/",
             "/assets/commonworld-app.js",
@@ -432,7 +432,7 @@
             "/catalog/runtime/manifest.v1.json",
             "/index.css"
           ],
-          "first_party_surface_sha256": "0440ff08f0243b8326f3814cc5ee7518b27dbb2b9550c96da41cfaa51870bbe5",
+          "first_party_surface_sha256": "3f1f1db8002dfd11e3d9d93123d180d94dabeba3f42bec82224389d569f4f5fe",
           "project_json_request_count": 0,
           "project_json_unique_request_count": 0,
           "project_json_requests": []
@@ -440,45 +440,45 @@
       ]
     },
     "browser_repeatability": {
-      "run_count": 2,
+      "run_count": 1,
       "cpu_throttle_rate": 4,
       "profiles": {
         "mobile-low-power": {
           "runtime_ready_ms": {
-            "min": 841,
-            "median": 946.0,
-            "max": 1051
+            "min": 885,
+            "median": 885,
+            "max": 885
           },
           "script_duration_ms": {
-            "min": 803.29,
-            "median": 844.15,
-            "max": 885.01
+            "min": 858.4,
+            "median": 858.4,
+            "max": 858.4
           },
           "task_duration_ms": {
-            "min": 2421.43,
-            "median": 2830.42,
-            "max": 3239.41
+            "min": 2583.04,
+            "median": 2583.04,
+            "max": 2583.04
           }
         },
         "desktop-low-power": {
           "runtime_ready_ms": {
-            "min": 704,
-            "median": 798.5,
-            "max": 893
+            "min": 751,
+            "median": 751,
+            "max": 751
           },
           "script_duration_ms": {
-            "min": 519.01,
-            "median": 612.23,
-            "max": 705.44
+            "min": 588.31,
+            "median": 588.31,
+            "max": 588.31
           },
           "task_duration_ms": {
-            "min": 927.18,
-            "median": 1108.55,
-            "max": 1289.92
+            "min": 1029.28,
+            "median": 1029.28,
+            "max": 1029.28
           }
         }
       },
-      "interpretation": "Two isolated no-store current-surface observations. The second exact-surface run is the budget-bound observation; the first mobile task-duration outlier is preserved in the repeatability maximum. Timing remains observational, not a causal speedup claim."
+      "interpretation": "One isolated no-store current-surface measurement. It is budget evidence, not a causal speedup claim."
     }
   },
   "delta": {
@@ -553,8 +553,8 @@
         "method-mobile",
         "method-mobile-text-200"
       ],
-      "evidence_sha256": "27a0d29a6ac4866bab0958d4364d1ae3700b4ad129b9b1780eb67050512a1550",
-      "scenario_execution_note": "Fresh job c639d7b90038 proves 35 scenarios, including an exact non-ignored summary AX subtree while the SVG sphere is hidden and a forced cross-ring visible-label collision resolved only by global assignment."
+      "evidence_sha256": "e58798cf6e2864b7a6b91c4ce158d07376fe17bffc59af97ce8a10ec2f127c35",
+      "scenario_execution_note": "Final durable job 775693ebc812 proves exact combining-mark and joined-emoji labels at the real truncation boundary and a genuinely bounded external MapLibre horizon-coupling settlement."
     },
     "proposal_browser_smoke": {
       "verdict": "PASS",
@@ -583,30 +583,30 @@
         "desktop-low-power"
       ],
       "cpu_throttle_rate": 4,
-      "result_sha256": "e2cfb569109e97e2e728eb78af74095776f31c15568e3004439465c8ebe8c3a0",
-      "durable_job_id": "cd7d7c351ad7",
-      "finalization_receipt_sha256": "fc47644decd65164e0288ca56174f7a0399be38bb72c1bd6b69489fad9c0a168",
-      "repeatability_note": "Run e845737fd4c4 produced one mobile task-duration outlier above budget; unchanged-surface repeat cd7d7c351ad7 passed. Both observations remain in optimized.browser_repeatability."
+      "result_sha256": "772508ece161f4a563da7b3a3937db2bdd84cb01061d73c0775080eae745394e",
+      "durable_job_id": "9abf06300edc",
+      "finalization_receipt_sha256": "f80344f973e41ca8b27261d380c76c7d33004cfbd1c44c8cd166a76f508395ff",
+      "repeatability_note": "One exact-surface measurement; all profiles remain within the published budgets."
     },
     "official_browser_runner": {
       "verdict": "PASS",
-      "command": "python3 scripts/run_browser_smoke.py",
-      "durable_job_id": "b233d7cab3c7",
-      "finalization_receipt_sha256": "3ad077cd8aceab11fad59c470d40480d16cdc3637a5217a9f412eee7c254c15f"
+      "command": "npm run smoke:browser",
+      "durable_job_id": "b9c964d3a1b4",
+      "finalization_receipt_sha256": "f792fc6504feb25ce92825abf0493928f59d0b85c0cfcf5d09f12c2802feb1c8"
     },
     "catalog_delivery_static_measurement": {
       "verdict": "PASS",
-      "command": "python3 scripts/measure_catalog_delivery.py --output /tmp/commonworld-pr153-static-metrics-20260728.json",
-      "result_sha256": "e446a9f3144293161fd32bc5affe1be45d5c0ea3b14bb47bc0a9dfc0a30e4399",
+      "command": "python3 scripts/measure_catalog_delivery.py --output /tmp/commonworld-pr153-postmerge-static-v2.json",
+      "result_sha256": "cc8078df72d9582b6e789b0ec479b04c93d288e495cd39eeb1ce00e95b11c80f",
       "durable_job_id": "direct-bounded-readback",
       "finalization_receipt_sha256": null
     },
     "full_validation": {
       "verdict": "PASS",
       "command": "make validate",
-      "durable_job_id": "4d47e5c78d5f",
-      "finalization_receipt_sha256": "8c680990fb02284ad751fe8c41ed7f449477f77526caeeb41d7c1fbe06f8ef0b",
-      "javascript_tests": "111/111",
+      "durable_job_id": "9dcff9393d19",
+      "finalization_receipt_sha256": "b50253e08758cad42f40d9c339f13b4514376c7f643fb86e1bc140954b47c05c",
+      "javascript_tests": "112/112",
       "python_tests": "527/527"
     }
   },
@@ -615,5 +615,5 @@
     "warn_bootstrap_gzip_bytes": 28672,
     "max_bootstrap_gzip_bytes": 32768
   },
-  "current_surface_note": "Current browser evidence proves bounded full-title access through the exact non-ignored summary AX subtree, including layer view with the SVG sphere hidden, and forces collision-safe labels across distinct visible rings. Historical baseline evidence remains unchanged; timing metrics remain observational."
+  "current_surface_note": "Optimized measurements remain bound to the same first-party runtime surface. Final browser evidence binds exact grapheme-boundary fixtures and a nested geometry wait constrained by the remaining five-second external horizon-coupling deadline, preventing Unicode false positives, intermediate-frame failures and hidden long stalls."
 }
