@@ -126,7 +126,7 @@ def _yaml_mapping_entries(node: Node, errors: list[str], scope: str) -> dict[str
         if not isinstance(key_node, ScalarNode):
             errors.append(f"{scope} contains a non-scalar mapping key")
             continue
-        key = key_node.value.strip()
+        key = key_node.value
         if key in result:
             errors.append(f"duplicate {scope} field: {key}")
             continue
@@ -256,6 +256,79 @@ def _require_structured_step(
     return step
 
 
+def _reject_inherited_shell_override(
+    entries: dict[str, Node],
+    errors: list[str],
+    scope: str,
+) -> None:
+    defaults = entries.get("defaults")
+    if defaults is None:
+        return
+    defaults_entries = _yaml_mapping_entries(defaults, errors, f"{scope} defaults")
+    run = defaults_entries.get("run")
+    if run is None:
+        return
+    run_entries = _yaml_mapping_entries(run, errors, f"{scope} defaults.run")
+    if "shell" in run_entries:
+        errors.append(f"{scope} must not define defaults.run.shell")
+
+
+def _require_executable_job_for_step(
+    workflow_text: str,
+    step_name: str,
+    errors: list[str],
+    label: str,
+) -> None:
+    root = _compose_workflow(workflow_text)
+    if root is None:
+        errors.append(f"{label} must be valid YAML")
+        return
+
+    structural_errors: list[str] = []
+    root_entries = _yaml_mapping_entries(root, structural_errors, f"{label} workflow")
+    _reject_inherited_shell_override(root_entries, structural_errors, f"{label} workflow")
+    jobs_node = root_entries.get("jobs")
+    jobs = _yaml_mapping_entries(jobs_node, structural_errors, f"{label} jobs") if jobs_node is not None else {}
+    if jobs_node is None:
+        structural_errors.append(f"{label} must define jobs")
+
+    matches: list[tuple[str, dict[str, Node]]] = []
+    for job_name, job_node in jobs.items():
+        job_entries = _yaml_mapping_entries(job_node, structural_errors, f"{label} job {job_name!r}")
+        steps = job_entries.get("steps")
+        if not isinstance(steps, SequenceNode):
+            continue
+        for index, step_node in enumerate(steps.value, start=1):
+            step_entries = _yaml_mapping_entries(
+                step_node,
+                structural_errors,
+                f"{label} job {job_name!r} step {index}",
+            )
+            name_node = step_entries.get("name")
+            name = _yaml_scalar_node_value(name_node) if name_node is not None else None
+            if name == step_name:
+                matches.append((job_name, job_entries))
+
+    if len(matches) != 1:
+        structural_errors.append(
+            f"{label} step {step_name!r} must belong to exactly one executable job"
+        )
+    else:
+        job_name, job_entries = matches[0]
+        for key in ("if", "continue-on-error"):
+            if key in job_entries:
+                structural_errors.append(
+                    f"{label} job {job_name!r} for step {step_name!r} must not define field {key!r}"
+                )
+        _reject_inherited_shell_override(
+            job_entries,
+            structural_errors,
+            f"{label} job {job_name!r}",
+        )
+
+    errors.extend(structural_errors)
+
+
 def _validate_expiry_triggers(workflow_text: str, errors: list[str]) -> None:
     root = _compose_workflow(workflow_text)
     if root is None:
@@ -373,6 +446,12 @@ def validate_security_policy(root: Path = ROOT, now: datetime | None = None) -> 
         errors.append(".nojekyll would publish an unnecessarily broad dotfile surface")
 
     validate_text = (root / VALIDATE_WORKFLOW).read_text(encoding="utf-8")
+    _require_executable_job_for_step(
+        validate_text,
+        "Verify private vulnerability reporting before merge",
+        errors,
+        "validate workflow",
+    )
     premerge = _require_structured_step(
         validate_text,
         "Verify private vulnerability reporting before merge",
@@ -410,6 +489,12 @@ def validate_security_policy(root: Path = ROOT, now: datetime | None = None) -> 
     )
 
     production_text = (root / PRODUCTION_READBACK_WORKFLOW).read_text(encoding="utf-8")
+    _require_executable_job_for_step(
+        production_text,
+        "Install security validation dependencies",
+        errors,
+        "production readback workflow",
+    )
     _require_structured_step(
         production_text,
         "Install security validation dependencies",
@@ -455,6 +540,12 @@ def validate_security_policy(root: Path = ROOT, now: datetime | None = None) -> 
 
     expiry_text = (root / SECURITY_EXPIRY_WORKFLOW).read_text(encoding="utf-8")
     _validate_expiry_triggers(expiry_text, errors)
+    _require_executable_job_for_step(
+        expiry_text,
+        "Install security validation dependencies",
+        errors,
+        "security expiry workflow",
+    )
     _require_structured_step(
         expiry_text,
         "Install security validation dependencies",

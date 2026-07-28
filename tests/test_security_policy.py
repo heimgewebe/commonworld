@@ -559,6 +559,102 @@ class SecurityPolicyTests(unittest.TestCase):
             self.assertTrue(any(expected in error for error in errors), errors)
 
 
+    def test_security_jobs_cannot_be_skipped_or_soft_failed(self) -> None:
+        cases = (
+            (".github/workflows/validate.yml", "  contracts:\n", "validate workflow"),
+            (".github/workflows/production-readback.yml", "  verify-exact-pages-deployment:\n", "production readback workflow"),
+            (".github/workflows/security-policy-expiry.yml", "  validate-security-policy-expiry:\n", "security expiry workflow"),
+        )
+        for relative, marker, label in cases:
+            for field in ("if: false", "continue-on-error: true"):
+                with self.subTest(relative=relative, field=field), tempfile.TemporaryDirectory() as directory:
+                    root = self.copy_surface(directory)
+                    path = root / relative
+                    source = path.read_text(encoding="utf-8")
+                    self.assertEqual(1, source.count(marker))
+                    path.write_text(source.replace(marker, marker + f"    {field}\n", 1), encoding="utf-8")
+                    errors = validate_security_policy(root, now=self.NOW)
+                key = field.split(":", 1)[0]
+                self.assertTrue(
+                    any(label in error and "job" in error and f"field '{key}'" in error for error in errors),
+                    errors,
+                )
+
+    def test_security_jobs_reject_inherited_shell_overrides(self) -> None:
+        cases = (
+            (".github/workflows/validate.yml", "  contracts:\n", "validate workflow"),
+            (".github/workflows/production-readback.yml", "  verify-exact-pages-deployment:\n", "production readback workflow"),
+            (".github/workflows/security-policy-expiry.yml", "  validate-security-policy-expiry:\n", "security expiry workflow"),
+        )
+        for relative, job_marker, label in cases:
+            with self.subTest(relative=relative, scope="workflow"), tempfile.TemporaryDirectory() as directory:
+                root = self.copy_surface(directory)
+                path = root / relative
+                source = path.read_text(encoding="utf-8")
+                path.write_text(
+                    source.replace(
+                        "jobs:\n",
+                        "defaults:\n  run:\n    shell: bash {0} || true\n\njobs:\n",
+                        1,
+                    ),
+                    encoding="utf-8",
+                )
+                errors = validate_security_policy(root, now=self.NOW)
+            self.assertTrue(
+                any(label in error and "workflow must not define defaults.run.shell" in error for error in errors),
+                errors,
+            )
+
+            with self.subTest(relative=relative, scope="job"), tempfile.TemporaryDirectory() as directory:
+                root = self.copy_surface(directory)
+                path = root / relative
+                source = path.read_text(encoding="utf-8")
+                self.assertEqual(1, source.count(job_marker))
+                path.write_text(
+                    source.replace(
+                        job_marker,
+                        job_marker + "    defaults:\n      run:\n        shell: bash {0} || true\n",
+                        1,
+                    ),
+                    encoding="utf-8",
+                )
+                errors = validate_security_policy(root, now=self.NOW)
+            self.assertTrue(
+                any(label in error and "job" in error and "must not define defaults.run.shell" in error for error in errors),
+                errors,
+            )
+
+    def test_quoted_mapping_key_whitespace_is_not_normalized(self) -> None:
+        mutations = (
+            (
+                ".github/workflows/security-policy-expiry.yml",
+                "        run: exit 1\n",
+                '        "run ": exit 1\n',
+                "Enforce live reporting result",
+            ),
+            (
+                ".github/workflows/security-policy-expiry.yml",
+                '    - cron: "17 5 * * 1"\n',
+                '    - "cron ": "17 5 * * 1"\n',
+                "on.schedule",
+            ),
+            (
+                ".github/workflows/security-policy-expiry.yml",
+                "  contents: read\n",
+                '  "contents ": read\n',
+                "permissions",
+            ),
+        )
+        for relative, old, new, expected in mutations:
+            with self.subTest(expected=expected), tempfile.TemporaryDirectory() as directory:
+                root = self.copy_surface(directory)
+                path = root / relative
+                source = path.read_text(encoding="utf-8")
+                self.assertEqual(1, source.count(old))
+                path.write_text(source.replace(old, new, 1), encoding="utf-8")
+                errors = validate_security_policy(root, now=self.NOW)
+            self.assertTrue(any(expected in error for error in errors), errors)
+
 
 if __name__ == "__main__":
     unittest.main()
