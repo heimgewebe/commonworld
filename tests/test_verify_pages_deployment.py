@@ -299,6 +299,40 @@ class PagesDeploymentReadbackTests(unittest.TestCase):
             mime = verify_exact_public_files("https://commonworld.net/", 5, fetcher=wrong_mime, root=root)
             self.assertIn("security.txt content-type must be text/plain; charset=utf-8", mime.errors)
 
+            malformed_values = (
+                'text/plain; charset="utf-8',
+                'text/plain; charset=utf-8"',
+                'text/plain; charset="utf-8"; boundary=extra',
+                'text/plain; charset=utf-8; charset=utf-8',
+            )
+            for content_type in malformed_values:
+                with self.subTest(content_type=content_type):
+                    def malformed(url: str, **kwargs):
+                        observed = content_type if url.endswith("security.txt") else "text/plain"
+                        return LiveFetch(url, url, 200, observed, "expected")
+                    result = verify_exact_public_files(
+                        "https://commonworld.net/", 5, fetcher=malformed, root=root
+                    )
+                    self.assertIn(
+                        "security.txt content-type must be text/plain; charset=utf-8",
+                        result.errors,
+                    )
+
+            valid_values = (
+                "text/plain; charset=utf-8",
+                'text/plain; charset="utf-8"',
+                "Text/Plain ; Charset = UTF-8",
+            )
+            for content_type in valid_values:
+                with self.subTest(content_type=content_type):
+                    def valid(url: str, **kwargs):
+                        observed = content_type if url.endswith("security.txt") else "text/plain"
+                        return LiveFetch(url, url, 200, observed, "expected")
+                    result = verify_exact_public_files(
+                        "https://commonworld.net/", 5, fetcher=valid, root=root
+                    )
+                    self.assertEqual("pass", result.verdict, result.errors)
+
     def test_live_smoke_retries_only_on_declared_schedule(self) -> None:
         clock = FakeClock()
         attempts = 0
