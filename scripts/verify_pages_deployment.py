@@ -33,7 +33,7 @@ EXACT_PUBLIC_FILES = (("", "index.html"), ("propose.html", "propose.html"), ("ca
 PENDING_DEPLOYMENT_STATES = {"waiting", "queued", "pending", "in_progress"}
 FAILED_DEPLOYMENT_STATES = {"error", "failure", "inactive"}
 SECURITY_TXT_CONTENT_TYPE_RE = re.compile(
-    r'^[ \t]*text/plain[ \t]*;[ \t]*charset[ \t]*=[ \t]*(?:utf-8|"utf-8")[ \t]*$',
+    r'^[ \t]*text/plain[ \t]*;[ \t]*charset=(?:utf-8|"utf-8")[ \t]*$',
     re.IGNORECASE,
 )
 
