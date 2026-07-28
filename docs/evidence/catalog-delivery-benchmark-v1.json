@@ -511,7 +511,7 @@
   ],
   "does_not_establish": [
     "that one timing sample proves a speedup",
-    "that the historical 41-entry browser baseline and current 65-entry browser observation isolate catalogue-growth effects",
+    "that the historical 41-entry browser baseline and current 73-entry browser observation isolate catalogue-growth effects",
     "that selected shard and detail parity permits bootstrap removal or detail-path cutover",
     "that a backend is required",
     "future performance after further catalogue growth"
@@ -574,8 +574,8 @@
     "full_validation": {
       "verdict": "PASS",
       "command": "make validate",
-      "durable_job_id": "e21a24ad9e3b",
-      "finalization_receipt_sha256": "81afd7ed1957e22a4ccbab38adeddffb3562c2d718b136ced8644638e35dcff9",
+      "durable_job_id": "1920833dab10",
+      "finalization_receipt_sha256": "4d76dca0d3c4f470ca24c93b5f7cbc059c0e3f28435b640bb8c71b37b6b25e7d",
       "javascript_tests": "117/117",
       "python_tests": "555/555"
     }
