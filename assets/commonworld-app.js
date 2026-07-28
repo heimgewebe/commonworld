@@ -1,6 +1,6 @@
-import { BOOTSTRAP_RECORDS } from './commonworld-bootstrap-catalog.mjs?v=41ebd1e48a02';
+import { BOOTSTRAP_RECORDS } from './commonworld-bootstrap-catalog.mjs?v=92d482ba20f2';
 import { createCatalogLoadCache, loadCatalogAggregate, loadCatalogDetail, loadCatalogShard, shardKeyForIdentity } from './commonworld-catalog-runtime.mjs?v=5954690ce64b';
-import { actionLabel, documentLocale, localizeCatalogRecords, text as i18nText, themeLabel } from './commonworld-i18n.mjs?v=92970b8640be';
+import { actionLabel, documentLocale, localizeCatalogRecords, text as i18nText, themeLabel } from './commonworld-i18n.mjs?v=b8ef1bc714b8';
 import {
   COMMONS_TYPE_COLOR_TOKENS,
   COMMONS_TYPE_VALUES,
@@ -54,7 +54,7 @@ import {
   sphereRingStrokeWidth,
   stateFromSearch,
   visibleDigitalNodes,
-} from './commonworld-core.mjs?v=9eb72428e6d1';
+} from './commonworld-core.mjs?v=27c6a2980a90';
 
 const LOCALE = documentLocale();
 const t = (key, germanFallback, variables = {}) => i18nText(LOCALE, key, germanFallback, variables);
@@ -66,7 +66,7 @@ const PUBLIC_MAP_SOURCE_ID = 'commonworld-public-representations';
 const COUNTRY_MAP_SOURCE_ID = 'commonworld-country-compositions';
 const COUNTRY_HIT_SOURCE_ID = 'commonworld-country-navigation';
 const COUNTRY_HIT_LAYER_ID = 'commonworld-country-navigation-hit';
-const COUNTRY_BOUNDARIES_URL = './assets/map/commonworld-country-boundaries.geojson';
+const COUNTRY_BOUNDARIES_URL = './assets/map/commonworld-country-boundaries.geojson?v=7fbd3161f6bb';
 const PUBLIC_MAP_INTERACTIVE_LAYER_IDS = Object.freeze(['commonworld-public-extents', 'commonworld-approximate-zones', 'commonworld-exact-anchor-hit-targets', 'commonworld-exact-anchors']);
 
 const COMMONS_TYPE_COLORS = [
@@ -3566,7 +3566,7 @@ function createMap() {
   setStageSizeIfChanged(initialStageBounds.width, initialStageBounds.height);
   runtime.map = new window.maplibregl.Map({
     container: elements.map,
-    style: './assets/map/openfreemap-liberty.json',
+    style: './assets/map/openfreemap-liberty.json?v=74a4e3f2eacd',
     center: [runtime.state.camera.lng, runtime.state.camera.lat],
     zoom: runtime.state.camera.zoom,
     bearing: runtime.state.camera.bearing,

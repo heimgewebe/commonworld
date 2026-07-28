@@ -7,6 +7,8 @@ import {
   containsSensitiveLocation,
   isSafeHttpsUrl,
   proposalFromFields,
+  restoreProposalReleaseDraft,
+  storeProposalReleaseDraft,
   validateProposal,
 } from "../../assets/commonworld-proposal.js";
 
@@ -104,3 +106,75 @@ test("überlange und injizierte Eingaben werden abgelehnt oder escaped", () => {
   assert.match(errors.join(" "), /höchstens 800/u);
   assert.match(errors.join(" "), /Script-Inhalt/u);
 });
+
+function proposalFormStub(source = fields) {
+  const elements = {};
+  for (const name of ["name", "description", "official_website", "commons_type", "region", "sources", "editorial_note"]) elements[name] = { value: source[name] };
+  for (const name of ["presence_geographic", "presence_digital", "sensitive_location_risk", "public_issue_acknowledged", "processing_agreed", "no_sensitive_data_confirmed"]) elements[name] = { checked: source[name] };
+  source.actions.forEach((action, offset) => {
+    const index = offset + 1;
+    elements[`action_type_${index}`] = { value: action.type };
+    elements[`action_url_${index}`] = { value: action.url };
+  });
+  return { elements };
+}
+
+function memoryStorage() {
+  const values = new Map();
+  return {
+    getItem(key) { return values.get(key) ?? null; },
+    setItem(key, value) { values.set(key, String(value)); },
+    removeItem(key) { values.delete(key); },
+  };
+}
+
+test("release reload preserves a bounded tab-local proposal draft exactly once", () => {
+  const storage = memoryStorage();
+  const source = proposalFormStub();
+  assert.equal(storeProposalReleaseDraft(source, storage, () => 1_000), true);
+  const restored = proposalFormStub({
+    ...fields,
+    name: "",
+    description: "",
+    official_website: "",
+    commons_type: "",
+    region: "",
+    sources: "",
+    editorial_note: "",
+    actions: [{ type: "", url: "" }, { type: "", url: "" }, { type: "", url: "" }],
+    presence_geographic: false,
+    presence_digital: false,
+    sensitive_location_risk: false,
+    public_issue_acknowledged: false,
+    processing_agreed: false,
+    no_sensitive_data_confirmed: false,
+  });
+  assert.equal(restoreProposalReleaseDraft(restored, storage, () => 2_000), true);
+  assert.equal(restored.elements.name.value, fields.name);
+  assert.equal(restored.elements.action_url_1.value, fields.actions[0].url);
+  assert.equal(restored.elements.presence_geographic.checked, true);
+  assert.equal(restoreProposalReleaseDraft(restored, storage, () => 2_001), false);
+});
+
+test("expired release drafts fail closed and are removed", () => {
+  const storage = memoryStorage();
+  const form = proposalFormStub();
+  assert.equal(storeProposalReleaseDraft(form, storage, () => 1_000), true);
+  assert.equal(restoreProposalReleaseDraft(form, storage, () => 302_001), false);
+  assert.equal(restoreProposalReleaseDraft(form, storage, () => 302_002), false);
+});
+
+test("malformed release drafts do not partially mutate the form", () => {
+  const storage = memoryStorage();
+  storage.setItem("commonworldProposalReleaseDraftV1", JSON.stringify({
+    schema_version: 1,
+    locale: "de",
+    saved_at: 1_000,
+    fields: { ...fields, actions: [{ type: "learn", url: "https://example.org" }] },
+  }));
+  const form = proposalFormStub({ ...fields, name: "Unchanged" });
+  assert.equal(restoreProposalReleaseDraft(form, storage, () => 2_000), false);
+  assert.equal(form.elements.name.value, "Unchanged");
+  assert.equal(restoreProposalReleaseDraft(form, storage, () => 2_001), false);
+});
+

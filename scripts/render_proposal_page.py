@@ -13,6 +13,7 @@ if str(ROOT) not in sys.path:
 
 from scripts.commonworld_i18n import FALLBACK_LOCALE, german_surface_links, inject_locale_navigation
 from scripts.proposal_i18n import translate_proposal
+from scripts.public_cache import asset_version, stamp_page_build, version_page_links
 
 
 
@@ -29,6 +30,7 @@ def catalog_index() -> dict[str, list[str]]:
 
 
 def render(locale: str = FALLBACK_LOCALE) -> str:
+    page_name = "propose.html" if locale == "en" else "propose.de.html"
     index = json.dumps(catalog_index(), ensure_ascii=False, separators=(",", ":")).replace("&", "\\u0026").replace("<", "\\u003c").replace(">", "\\u003e")
     markup = f'''<!doctype html>
 <html lang="de">
@@ -40,10 +42,11 @@ def render(locale: str = FALLBACK_LOCALE) -> str:
     <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' data:; connect-src 'self'; object-src 'none'; base-uri 'self'; form-action 'none';" />
     <meta name="description" content="Ein Commons zur redaktionellen Prüfung für Commonworld vorschlagen." />
     <title>Commonworld — Commons vorschlagen</title>
-    <link rel="icon" href="./assets/commonworld-mark.svg" type="image/svg+xml" />
-    <link rel="stylesheet" href="./index.css" />
-    <link rel="stylesheet" href="./assets/proposal.css" />
-    <script type="module" src="./assets/commonworld-proposal.js"></script>
+    <link rel="icon" href="./assets/commonworld-mark.svg?v={asset_version('assets/commonworld-mark.svg', ROOT)}" type="image/svg+xml" />
+    <link rel="stylesheet" href="./index.css?v={asset_version('index.css', ROOT)}" />
+    <link rel="stylesheet" href="./assets/proposal.css?v={asset_version('assets/proposal.css', ROOT)}" />
+    <script type="module" src="./assets/commonworld-release-check.js?v={asset_version('assets/commonworld-release-check.js', ROOT)}"></script>
+    <script type="module" src="./assets/commonworld-proposal.js?v={asset_version('assets/commonworld-proposal.js', ROOT)}"></script>
   </head>
   <body class="proposal-page">
     <a class="skip-link" href="#commons-proposal-form">Zum Vorschlagsformular springen</a>
@@ -56,7 +59,7 @@ def render(locale: str = FALLBACK_LOCALE) -> str:
         <h2 id="proposal-process-title">Was danach passiert</h2>
         <p>Der Vorschlag wird <strong>nicht automatisch veröffentlicht</strong>. Commonworld prüft Identität, Quellen, Commons-Eigenschaft, Handlungswege, Ortsgenauigkeit, Datenschutz und Aktualität. Erst ein separat geprüfter Repository-Commit kann einen Katalogeintrag veröffentlichen.</p>
         <p><strong>Öffentlichkeit:</strong> Der bevorzugte Eingang ist ein öffentliches GitHub-Issue. Trage deshalb keine E-Mail-Adresse, Telefonnummer, private Adresse, Koordinate, Wohnung, Dach-, Router- oder Haushaltsangabe ein. Dein GitHub-Konto dient als Kontaktmöglichkeit; Commonworld erhebt kein zusätzliches Kontaktfeld.</p>
-        <p>Ohne GitHub oder bei Netzfehlern kannst du eine validierte JSON-Datei lokal herunterladen. Commonworld speichert Formulareingaben nicht.</p>
+        <p>Ohne GitHub oder bei Netzfehlern kannst du eine validierte JSON-Datei lokal herunterladen. Commonworld speichert Formulareingaben nicht serverseitig. Zur unmittelbaren Wiederherstellung nach einem automatischen Versionswechsel wird ein begonnener Entwurf vorübergehend im Sitzungsspeicher dieses Tabs hinterlegt. Beim nächsten Laden wird er sofort gelöscht und nur wiederhergestellt, wenn er höchstens fünf Minuten alt ist.</p>
       </section>
 
       <form id="commons-proposal-form" class="proposal-form" novalidate>
@@ -108,7 +111,9 @@ def render(locale: str = FALLBACK_LOCALE) -> str:
 '''
     markup = translate_proposal(markup, locale)
     markup = german_surface_links(markup, locale, 'propose')
-    return inject_locale_navigation(markup, locale, 'propose')
+    markup = inject_locale_navigation(markup, locale, 'propose')
+    markup = version_page_links(markup, ('method.html', 'method.de.html'), ROOT)
+    return stamp_page_build(markup, page_name)
 
 
 def main() -> int:

@@ -76,6 +76,8 @@ html { font-size: ${profile.fontScale}% !important; }
     return { width: rect.width, height: rect.height };
   }));
   assert(contractLinkBoxes.length === 4 && contractLinkBoxes.every(({ width, height }) => width >= 44 && height >= 44), `${profile.name}: proposal contract navigation has undersized touch targets ${JSON.stringify(contractLinkBoxes)}`);
+  const methodHref = await page.locator('.proposal-contracts a').last().getAttribute('href');
+  assert(/^\.\/method\.html\?cw_release=[0-9a-f]{16}$/u.test(methodHref ?? ''), `${profile.name}: method link is not build-versioned (${methodHref})`);
   const overflow = await page.evaluate(() => document.documentElement.scrollWidth - document.documentElement.clientWidth);
   assert(overflow <= 1, `${profile.name}: horizontal overflow ${overflow}`);
   if (profile.fontScale) {
@@ -99,7 +101,77 @@ html { font-size: ${profile.fontScale}% !important; }
   assert(await page.getByRole('heading', { name: 'Ein Commons vorschlagen' }).isVisible(), 'German proposal locale: heading missing');
   assert(await page.getByRole('button', { name: 'Öffentliches GitHub-Issue vorbereiten' }).isVisible(), 'German proposal locale: submit missing');
   assert(await page.locator('.language-switch a[href="./propose.html"][lang="en"]').count() > 0, 'German proposal locale: English switch target missing');
+  const methodHref = await page.locator('.proposal-contracts a').last().getAttribute('href');
+  assert(/^\.\/method\.de\.html\?cw_release=[0-9a-f]{16}$/u.test(methodHref ?? ''), `German proposal locale: method link is not build-versioned (${methodHref})`);
   results.push('locale-german');
+  await context.close();
+}
+
+{
+  const context = await browser.newContext({ viewport: { width: 1024, height: 768 }, reducedMotion: 'reduce' });
+  const page = await context.newPage();
+  const latestBuild = 'f'.repeat(16);
+  let releaseFirstProbe = null;
+  let probeCount = 0;
+  await page.route('**/assets/commonworld-page-builds.json*', async (route) => {
+    probeCount += 1;
+    if (probeCount === 1) await new Promise((resolve) => { releaseFirstProbe = resolve; });
+    await route.fulfill({
+      status: 200,
+      contentType: 'application/json',
+      body: JSON.stringify({ kind: 'commonworld.page_build_manifest', pages: { 'propose.html': latestBuild }, schema_version: 1 }),
+    });
+  });
+  await page.goto(`${baseUrl}/propose.html`, { waitUntil: 'domcontentloaded' });
+  await page.getByRole('heading', { name: 'Suggest a Commons' }).waitFor();
+  await fillValid(page, 'Release Draft Test Commons');
+  const description = 'A community-managed resource whose started proposal must survive one automatic release-bound reload without server-side form storage.';
+  await page.getByLabel('Short description').fill(description);
+  for (let attempt = 0; !releaseFirstProbe && attempt < 100; attempt += 1) await page.waitForTimeout(10);
+  assert(typeof releaseFirstProbe === 'function', 'release-draft: initial manifest probe was not intercepted');
+  const navigated = page.waitForURL((url) => url.searchParams.get('cw_release') === latestBuild, { timeout: 5000 });
+  releaseFirstProbe();
+  await navigated;
+  await page.getByRole('heading', { name: 'Suggest a Commons' }).waitFor();
+  assert(await page.getByLabel('Name of the Commons').inputValue() === 'Release Draft Test Commons', 'release-draft: name was not restored');
+  assert(await page.getByLabel('Short description').inputValue() === description, 'release-draft: description was not restored');
+  assert((await page.locator('#proposal-status').textContent())?.includes('Draft input was restored'), 'release-draft: restoration status missing');
+  assert(await page.evaluate(() => sessionStorage.getItem('commonworldProposalReleaseDraftV1')) === null, 'release-draft: one-shot session draft was not deleted');
+  assert(probeCount >= 2, `release-draft: expected a post-navigation manifest probe, got ${probeCount}`);
+  results.push('release-reload-preserves-one-shot-draft');
+  await context.close();
+}
+
+{
+  const context = await browser.newContext({ viewport: { width: 1024, height: 768 }, reducedMotion: 'reduce' });
+  await context.addInitScript(() => {
+    const originalSetItem = Storage.prototype.setItem;
+    Storage.prototype.setItem = function setItem(key, value) {
+      if (key === 'commonworldProposalReleaseDraftV1') throw new DOMException('storage disabled', 'SecurityError');
+      return originalSetItem.call(this, key, value);
+    };
+  });
+  const page = await context.newPage();
+  const latestBuild = 'e'.repeat(16);
+  let releaseFirstProbe = null;
+  await page.route('**/assets/commonworld-page-builds.json*', async (route) => {
+    await new Promise((resolve) => { releaseFirstProbe = resolve; });
+    await route.fulfill({
+      status: 200,
+      contentType: 'application/json',
+      body: JSON.stringify({ kind: 'commonworld.page_build_manifest', pages: { 'propose.html': latestBuild }, schema_version: 1 }),
+    });
+  });
+  await page.goto(`${baseUrl}/propose.html`, { waitUntil: 'domcontentloaded' });
+  await page.getByRole('heading', { name: 'Suggest a Commons' }).waitFor();
+  await page.getByLabel('Name of the Commons').fill('Unsaved Draft Must Stay');
+  for (let attempt = 0; !releaseFirstProbe && attempt < 100; attempt += 1) await page.waitForTimeout(10);
+  assert(typeof releaseFirstProbe === 'function', 'release-veto: initial manifest probe was not intercepted');
+  releaseFirstProbe();
+  await page.getByText('The automatic release change was paused').waitFor({ timeout: 5000 });
+  assert(new URL(page.url()).searchParams.has('cw_release') === false, 'release-veto: navigation occurred despite failed draft storage');
+  assert(await page.getByLabel('Name of the Commons').inputValue() === 'Unsaved Draft Must Stay', 'release-veto: visible input changed');
+  results.push('release-reload-vetoes-when-draft-storage-fails');
   await context.close();
 }
 

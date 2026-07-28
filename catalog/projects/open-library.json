@@ -1,0 +1,136 @@
+{
+  "schema_version": 4,
+  "id": "open-library",
+  "title": "Open Library",
+  "summary": "Ein offener, gemeinschaftlich bearbeitbarer Buchkatalog und eine digitale öffentliche Bibliothek des Internet Archive, deren Software, Daten und Dokumentation offen sind und von Freiwilligen erweitert und gepflegt werden.",
+  "themes": [
+    "open-knowledge",
+    "open-data",
+    "knowledge",
+    "open-source",
+    "public-domain",
+    "volunteer-community"
+  ],
+  "actions": [
+    "use",
+    "learn",
+    "contribute"
+  ],
+  "presence": {
+    "geographic": [],
+    "digital": {
+      "available": true,
+      "reach": "global",
+      "label": "Offener Buchkatalog, digitale Bibliothek, offene Daten, Software und gemeinschaftliche Metadatenpflege",
+      "source_ids": [
+        "open-library-about",
+        "open-library-faq",
+        "open-library-volunteer"
+      ]
+    }
+  },
+  "activity": {
+    "status": "active",
+    "observed_at": "2026-07-28",
+    "source_ids": [
+      "open-library-home",
+      "open-library-about",
+      "open-library-volunteer"
+    ],
+    "note": "Die offizielle Plattform ist erreichbar, der Katalog bleibt bearbeitbar und aktuelle Freiwilligen- sowie Communitywege werden veröffentlicht."
+  },
+  "provenance": {
+    "sources": [
+      {
+        "id": "open-library-home",
+        "type": "official-source",
+        "label": "Open Library – offizielle Seite",
+        "url": "https://openlibrary.org/",
+        "retrieved_at": "2026-07-28",
+        "note": "Öffentliche Hauptoberfläche des Buchkatalogs und der digitalen Bibliothek."
+      },
+      {
+        "id": "open-library-about",
+        "type": "official-source",
+        "label": "Open Library – About Us",
+        "url": "https://openlibrary.org/about",
+        "retrieved_at": "2026-07-28",
+        "note": "Offizielle Beschreibung des offenen Projekts, der offenen Daten, Software und gemeinschaftlichen Katalogpflege."
+      },
+      {
+        "id": "open-library-faq",
+        "type": "official-source",
+        "label": "Open Library – FAQ",
+        "url": "https://openlibrary.org/about/faq",
+        "retrieved_at": "2026-07-28",
+        "note": "Offizielle Erläuterung des offenen semantischen Wikis und der Bearbeitung bibliografischer Metadaten."
+      },
+      {
+        "id": "open-library-volunteer",
+        "type": "official-source",
+        "label": "Open Library – Volunteer",
+        "url": "https://openlibrary.org/volunteer",
+        "retrieved_at": "2026-07-28",
+        "note": "Offizielle Wege für Freiwillige, an Katalog, Software und Community mitzuarbeiten."
+      }
+    ]
+  },
+  "curation": {
+    "state": "listed",
+    "reviewed_by": "Commonworld editorial review",
+    "reviewed_at": "2026-07-28",
+    "next_review_at": "2026-10-28",
+    "notes": "Aufgenommen wegen des offen bearbeitbaren Metadatenkatalogs und der offenen Projektinfrastruktur. Der Eintrag trifft keine Bewertung einzelner Ausleih- oder Rechtefragen."
+  },
+  "links": [
+    {
+      "type": "homepage",
+      "label": "Open Library – offizielle Seite",
+      "url": "https://openlibrary.org/"
+    },
+    {
+      "type": "use",
+      "label": "Offenen Buchkatalog nutzen",
+      "url": "https://openlibrary.org/search",
+      "source_ids": [
+        "open-library-home"
+      ]
+    },
+    {
+      "type": "learn",
+      "label": "Projekt, Daten und Software kennenlernen",
+      "url": "https://openlibrary.org/about",
+      "source_ids": [
+        "open-library-about"
+      ]
+    },
+    {
+      "type": "contribute",
+      "label": "Katalog und Projekt mitgestalten",
+      "url": "https://openlibrary.org/volunteer",
+      "source_ids": [
+        "open-library-volunteer"
+      ]
+    }
+  ],
+  "handoff": {
+    "enabled": false
+  },
+  "languages": {
+    "codes": [
+      "en"
+    ],
+    "source_ids": [
+      "open-library-home"
+    ],
+    "note": "Die geprüfte Haupt- und Beteiligungsoberfläche ist auf Englisch verfügbar."
+  },
+  "access": {
+    "type": "public",
+    "source_ids": [
+      "open-library-about",
+      "open-library-faq"
+    ],
+    "note": "Katalog und Metadaten sind öffentlich; bestimmte Bearbeitungs- oder Bibliotheksfunktionen können ein Konto voraussetzen."
+  }
+}

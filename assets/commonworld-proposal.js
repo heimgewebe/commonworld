@@ -3,6 +3,9 @@ const tr = (de, en) => ACTIVE_LOCALE === 'en' ? en : de;
 
 const MAX = Object.freeze({ name: 140, description: 800, region: 120, note: 500, url: 300 });
 const ISSUE_BASE = "https://github.com/heimgewebe/commonworld/issues/new";
+const RELEASE_NAVIGATION_EVENT = "commonworld:release-navigation";
+const RELEASE_DRAFT_KEY = "commonworldProposalReleaseDraftV1";
+const RELEASE_DRAFT_MAX_AGE_MS = 5 * 60_000;
 const ACTION_TYPES = new Set(["visit", "use", "borrow", "learn", "contribute", "volunteer", "donate", "contact", "replicate"]);
 const COMMONS_TYPES = new Set(["knowledge", "software", "culture", "food-seeds", "water", "energy", "housing-land", "health-care", "tools-repair", "community-network", "other"]);
 const SENSITIVE_PATTERN = /(?:\b(?:latitude|longitude|coordinates?|gps|street|straße|strasse|avenue|road|router|roof|dach|wohnung|apartment|household|haushalt)\b|[-+]?\d{1,3}\.\d{3,}\s*[,;/ ]\s*[-+]?\d{1,3}\.\d{3,})/iu;
@@ -242,6 +245,57 @@ function readFields(form) {
   };
 }
 
+function writeFields(form, fields) {
+  if (!fields || typeof fields !== "object" || Array.isArray(fields)) return false;
+  const strings = ["name", "description", "official_website", "commons_type", "region", "sources", "editorial_note"];
+  const booleans = ["presence_geographic", "presence_digital", "sensitive_location_risk", "public_issue_acknowledged", "processing_agreed", "no_sensitive_data_confirmed"];
+  if (strings.some((name) => typeof fields[name] !== "string" || !form.elements[name])) return false;
+  if (booleans.some((name) => typeof fields[name] !== "boolean" || !form.elements[name])) return false;
+  if (!Array.isArray(fields.actions) || fields.actions.length !== 3) return false;
+  if (fields.actions.some((action, offset) => !action || typeof action.type !== "string" || typeof action.url !== "string" || !form.elements[`action_type_${offset + 1}`] || !form.elements[`action_url_${offset + 1}`])) return false;
+  for (const name of strings) form.elements[name].value = fields[name];
+  for (const name of booleans) form.elements[name].checked = fields[name];
+  for (const [offset, action] of fields.actions.entries()) {
+    const index = offset + 1;
+    form.elements[`action_type_${index}`].value = action.type;
+    form.elements[`action_url_${index}`].value = action.url;
+  }
+  return true;
+}
+
+export function storeProposalReleaseDraft(form, storage = globalThis.sessionStorage, now = () => Date.now()) {
+  try {
+    storage.setItem(RELEASE_DRAFT_KEY, JSON.stringify({
+      schema_version: 1,
+      locale: ACTIVE_LOCALE,
+      saved_at: now(),
+      fields: readFields(form),
+    }));
+    return true;
+  } catch {
+    return false;
+  }
+}
+
+export function restoreProposalReleaseDraft(form, storage = globalThis.sessionStorage, now = () => Date.now()) {
+  let serialized = null;
+  try {
+    serialized = storage.getItem(RELEASE_DRAFT_KEY);
+    storage.removeItem(RELEASE_DRAFT_KEY);
+  } catch {
+    return false;
+  }
+  if (!serialized) return false;
+  try {
+    const draft = JSON.parse(serialized);
+    const age = now() - draft.saved_at;
+    if (draft.schema_version !== 1 || draft.locale !== ACTIVE_LOCALE || !Number.isFinite(age) || age < 0 || age > RELEASE_DRAFT_MAX_AGE_MS) return false;
+    return writeFields(form, draft.fields);
+  } catch {
+    return false;
+  }
+}
+
 function renderErrors(errors, node) {
   node.replaceChildren();
   if (!errors.length) return;
@@ -264,6 +318,8 @@ function init() {
   const geographicToggle = form.elements.presence_geographic;
   const region = form.elements.region;
   const sensitiveLocation = form.elements.sensitive_location_risk;
+  const restoredReleaseDraft = restoreProposalReleaseDraft(form);
+  let formDirty = restoredReleaseDraft;
 
   function syncGeographicFields() {
     const enabled = geographicToggle.checked;
@@ -276,8 +332,22 @@ function init() {
   }
 
   geographicToggle.addEventListener("change", syncGeographicFields);
-  form.addEventListener("reset", () => window.setTimeout(syncGeographicFields, 0));
+  form.addEventListener("input", () => { formDirty = true; });
+  form.addEventListener("change", () => { formDirty = true; });
+  form.addEventListener("reset", () => {
+    formDirty = false;
+    window.setTimeout(syncGeographicFields, 0);
+  });
+  document.addEventListener(RELEASE_NAVIGATION_EVENT, (event) => {
+    if (!formDirty || storeProposalReleaseDraft(form)) return;
+    event.preventDefault();
+    statusNode.textContent = tr(
+      "Der automatische Versionswechsel wurde pausiert, weil der Entwurf in diesem Tab nicht sicher zwischengespeichert werden konnte. Das Formular bleibt geöffnet.",
+      "The automatic release change was paused because the draft could not be stored safely in this tab. The form remains open.",
+    );
+  });
   syncGeographicFields();
+  if (restoredReleaseDraft) statusNode.textContent = tr("Begonnene Eingaben wurden nach dem Versionswechsel dieses Tabs wiederhergestellt.", "Draft input was restored after this tab changed release version.");
 
   function validateCurrent() {
     if (!catalog) return { proposal: null, errors: [tr("Der öffentliche Katalogindex konnte nicht sicher geladen werden. Bitte die Seite neu laden.", "The public catalog index could not be loaded safely. Please reload the page.")] };

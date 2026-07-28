@@ -2,20 +2,23 @@
 <html lang="de">
   <head>
     <meta charset="utf-8" />
+    <meta name="commonworld-page" content="de.html" />
+    <meta name="commonworld-page-build" content="419c81e82f4663ae" />
     <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
     <meta name="color-scheme" content="dark" />
     <meta name="referrer" content="strict-origin-when-cross-origin" />
     <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' data: blob: https://tiles.openfreemap.org; connect-src 'self' https://tiles.openfreemap.org; font-src 'self' data: https://tiles.openfreemap.org; worker-src 'self' blob:; child-src blob:; object-src 'none'; base-uri 'self'; form-action 'none';" />
     <meta name="description" content="Commonworld macht Commons weltweit, regional, lokal und digital auf einem gemeinsamen Globus sichtbar." />
     <title>commonworld — Commons entdecken</title>
-    <link rel="icon" href="./assets/commonworld-mark.svg" type="image/svg+xml" />
+    <link rel="icon" href="./assets/commonworld-mark.svg?v=05905a6e42f8" type="image/svg+xml" />
     <link rel="alternate" type="application/json" href="./catalog/catalog.json" title="Commonworld-Katalog" />
     <link rel="alternate" type="application/schema+json" href="./contracts/commonworld/project.schema.json" title="CommonProject-Schema" />
-    <link rel="stylesheet" href="./assets/vendor/maplibre-gl.css" />
+    <link rel="stylesheet" href="./assets/vendor/maplibre-gl.css?v=ab1e70d59ec4" />
     <link rel="stylesheet" href="./index.css?v=f38966774158" />
     <link rel="stylesheet" href="./assets/ipad-layout.css?v=ff4e980f851f" />
-    <script src="./assets/vendor/maplibre-gl.js" defer></script>
-    <script type="module" src="./assets/commonworld-app.js?v=35ca900023e1"></script>
+    <script type="module" src="./assets/commonworld-release-check.js?v=8dd4fd5abe85"></script>
+    <script src="./assets/vendor/maplibre-gl.js?v=45a9b07a9189" defer></script>
+    <script type="module" src="./assets/commonworld-app.js?v=019608c831ee"></script>
   </head>
   <body data-presentation="globe">
     <a id="text-skip-link" class="skip-link" href="#static-catalog-fallback">Zur Textansicht springen</a>
@@ -80,7 +83,7 @@
           </fieldset>
         </div>
         <div class="discovery-summary-row">
-          <p id="discovery-count" class="discovery-count" role="status">65 Commons</p>
+          <p id="discovery-count" class="discovery-count" role="status">73 Commons</p>
           <button id="filter-clear" class="quiet-button" type="button">Filter zurücksetzen</button>
         </div>
         <p id="discovery-empty" class="discovery-empty" hidden>Keine Commons entsprechen dieser Suche und Filterkombination.</p>
@@ -151,7 +154,7 @@
           </details>
 
           <p id="map-status" class="map-status" role="status">Globus wird geladen. Die Textansicht bleibt verfügbar.</p>
-          <p id="globe-results" class="globe-results" role="status">65 Commons im aktuellen Katalog.</p>
+          <p id="globe-results" class="globe-results" role="status">73 Commons im aktuellen Katalog.</p>
 
           <aside id="layer-panel" class="layer-panel" aria-labelledby="layer-title" hidden>
             <h2 id="layer-title" class="visually-hidden">Digitale Commons aus der Nähe</h2>
@@ -181,7 +184,7 @@
           <p class="kicker">Textansicht</p>
           <h1 id="text-title">Commons direkt durchsuchen</h1>
           <p>Dieselben Identitäten, Filter und Auswahlen wie im Globus – ohne räumliche Darstellung.</p>
-          <p id="text-count" class="text-count">65 Commons</p>
+          <p id="text-count" class="text-count">73 Commons</p>
         </header>
         <div class="text-layout">
           <aside class="text-filters" aria-labelledby="text-filter-title">
@@ -223,7 +226,7 @@
             <li><a href="./propose.de.html">Ein Commons vorschlagen</a></li>
             <li><a href="./catalog/catalog.json" type="application/json">Öffentliches Katalogmanifest</a></li>
             <li><a href="./contracts/commonworld/project.schema.json" type="application/schema+json">CommonProject-Schema</a></li>
-            <li><a href="./method.de.html">Methode, Abdeckung und Datenschutz</a></li>
+            <li><a href="./method.de.html?cw_release=4b8edcb2a1d7cb97">Methode, Abdeckung und Datenschutz</a></li>
             <li><a href="./contracts/commonworld/current-state.contract.json" type="application/json">Aktueller Betriebsstand</a></li>
             <li><a href="./LICENSE">Code-Lizenz</a> · <a href="./LICENSE-DATA.md">Datenlizenz</a></li>
           </ul>
@@ -404,6 +407,21 @@
               <a href="./catalog/projects/community-energy-network-new-zealand.json" type="application/json">JSON</a>
             </div>
           </article>
+          <article class="catalog-card" id="project-cooperation-jackson" data-commonproject-id="cooperation-jackson">
+            <p class="catalog-kind">Commons</p>
+            <h2>Cooperation Jackson</h2>
+            <p>Ein Solidarökonomie-Netzwerk in Jackson, Mississippi, das Arbeiterkooperativen, demokratisch selbstverwaltete Betriebe, gemeinschaftlich gebundenes Land, bezahlbares Wohnen und lokale Produktionsinfrastruktur miteinander entwickeln will.</p>
+            <p class="catalog-location">1 verborgener Ort</p>
+            <div class="catalog-actions">
+              <a class="catalog-action-link" data-action-type="visit" href="https://cooperationjackson.org/contact-us" rel="external noreferrer">Standort und aktuelle Angebote prüfen <span aria-hidden="true">↗</span></a>
+              <a class="catalog-action-link" data-action-type="learn" href="https://cooperationjackson.org/intro" rel="external noreferrer">Mission und Solidarökonomie kennenlernen <span aria-hidden="true">↗</span></a>
+              <a class="catalog-action-link" data-action-type="contribute" href="https://cooperationjackson.org/contact-us" rel="external noreferrer">Kontakt aufnehmen und mitwirken <span aria-hidden="true">↗</span></a>
+              <a class="catalog-action-link" data-action-type="donate" href="https://cooperationjackson.org/donate" rel="external noreferrer">Cooperation Jackson unterstützen <span aria-hidden="true">↗</span></a>
+              <a class="catalog-action-link" data-action-type="contact" href="https://cooperationjackson.org/contact-us" rel="external noreferrer">Cooperation Jackson kontaktieren <span aria-hidden="true">↗</span></a>
+              <a href="https://cooperationjackson.org/" rel="external noreferrer">Offizielle Seite <span aria-hidden="true">↗</span></a>
+              <a href="./catalog/projects/cooperation-jackson.json" type="application/json">JSON</a>
+            </div>
+          </article>
           <article class="catalog-card" id="project-debian" data-commonproject-id="debian">
             <p class="catalog-kind">Digital · Software, Werkzeuge und Produktion › Freie Software und Infrastruktur</p>
             <h2>Debian</h2>
@@ -481,6 +499,18 @@
               <a href="./catalog/projects/ethiopia-community-seed-bank-network.json" type="application/json">JSON</a>
             </div>
           </article>
+          <article class="catalog-card" id="project-fecofun-nepal" data-commonproject-id="fecofun-nepal">
+            <p class="catalog-kind">Commons</p>
+            <h2>Federation of Community Forestry Users Nepal</h2>
+            <p>Eine landesweite Föderation gemeinschaftlicher Waldnutzergruppen in Nepal, die lokale Nutzungsrechte, demokratische Selbstorganisation, nachhaltige Waldbewirtschaftung, Wissensaustausch und politische Mitsprache ihrer Mitglieder stärkt.</p>
+            <p class="catalog-location">1 verborgener Ort</p>
+            <div class="catalog-actions">
+              <a class="catalog-action-link" data-action-type="learn" href="https://fecofun.org.np/about/" rel="external noreferrer">Föderation und Ziele kennenlernen <span aria-hidden="true">↗</span></a>
+              <a class="catalog-action-link" data-action-type="contact" href="https://fecofun.org.np/contacts/" rel="external noreferrer">FECOFUN kontaktieren <span aria-hidden="true">↗</span></a>
+              <a href="https://fecofun.org.np/" rel="external noreferrer">Offizielle Seite <span aria-hidden="true">↗</span></a>
+              <a href="./catalog/projects/fecofun-nepal.json" type="application/json">JSON</a>
+            </div>
+          </article>
           <article class="catalog-card" id="project-freifunk-hamburg" data-commonproject-id="freifunk-hamburg">
             <p class="catalog-kind">Vor Ort · Digital · Kommunikation und Netze › Gemeinschaftsnetze</p>
             <h2>Freifunk Hamburg</h2>
@@ -546,6 +576,18 @@
               <a class="catalog-action-link" data-action-type="contact" href="https://www.granby4streetsclt.co.uk/about" rel="external noreferrer">Granby Four Streets CLT kontaktieren <span aria-hidden="true">↗</span></a>
               <a href="https://www.granby4streetsclt.co.uk/" rel="external noreferrer">Offizielle Seite <span aria-hidden="true">↗</span></a>
               <a href="./catalog/projects/granby-four-streets-clt.json" type="application/json">JSON</a>
+            </div>
+          </article>
+          <article class="catalog-card" id="project-great-lakes-commons" data-commonproject-id="great-lakes-commons">
+            <p class="catalog-kind">Digital · Versorgung, Land und Ökologie › Wasser und Bewässerung</p>
+            <h2>Great Lakes Commons</h2>
+            <p>Ein offenes bioregionales Netzwerk, das die Großen Seen als lebendiges Gemeingut begreift und gemeinschaftliche sowie indigene Governance, geteilte Verantwortung und langfristige Gewässerpflege über politische Grenzen hinweg stärken will.</p>
+            <p class="catalog-location">1 verborgener Ort</p>
+            <div class="catalog-actions">
+              <a class="catalog-action-link" data-action-type="learn" href="https://www.greatlakescommons.org/why" rel="external noreferrer">Commons-Ansatz für die Großen Seen verstehen <span aria-hidden="true">↗</span></a>
+              <a class="catalog-action-link" data-action-type="contribute" href="https://www.greatlakescommons.org/home-1" rel="external noreferrer">Beteiligungswege des Netzwerks öffnen <span aria-hidden="true">↗</span></a>
+              <a href="https://www.greatlakescommons.org/" rel="external noreferrer">Offizielle Seite <span aria-hidden="true">↗</span></a>
+              <a href="./catalog/projects/great-lakes-commons.json" type="application/json">JSON</a>
             </div>
           </article>
           <article class="catalog-card" id="project-guifi-net" data-commonproject-id="guifi-net">
@@ -766,6 +808,19 @@
               <a href="./catalog/projects/open-food-network-australia.json" type="application/json">JSON</a>
             </div>
           </article>
+          <article class="catalog-card" id="project-open-library" data-commonproject-id="open-library">
+            <p class="catalog-kind">Digital · Wissen, Lernen und Kultur › Offenes Wissen und Daten</p>
+            <h2>Open Library</h2>
+            <p>Ein offener, gemeinschaftlich bearbeitbarer Buchkatalog und eine digitale öffentliche Bibliothek des Internet Archive, deren Software, Daten und Dokumentation offen sind und von Freiwilligen erweitert und gepflegt werden.</p>
+            <p class="catalog-location">Ortsunabhängige digitale Präsenz</p>
+            <div class="catalog-actions">
+              <a class="catalog-action-link" data-action-type="use" href="https://openlibrary.org/search" rel="external noreferrer">Offenen Buchkatalog nutzen <span aria-hidden="true">↗</span></a>
+              <a class="catalog-action-link" data-action-type="learn" href="https://openlibrary.org/about" rel="external noreferrer">Projekt, Daten und Software kennenlernen <span aria-hidden="true">↗</span></a>
+              <a class="catalog-action-link" data-action-type="contribute" href="https://openlibrary.org/volunteer" rel="external noreferrer">Katalog und Projekt mitgestalten <span aria-hidden="true">↗</span></a>
+              <a href="https://openlibrary.org/" rel="external noreferrer">Offizielle Seite <span aria-hidden="true">↗</span></a>
+              <a href="./catalog/projects/open-library.json" type="application/json">JSON</a>
+            </div>
+          </article>
           <article class="catalog-card" id="project-open-source-ecology" data-commonproject-id="open-source-ecology">
             <p class="catalog-kind">Vor Ort · Digital · Software, Werkzeuge und Produktion › Offene Hardware und Produktion</p>
             <h2>Open Source Ecology</h2>
@@ -780,6 +835,20 @@
               <a class="catalog-action-link" data-action-type="replicate" href="https://wiki.opensourceecology.org/" rel="external noreferrer">Entwürfe nachbauen und weiterentwickeln <span aria-hidden="true">↗</span></a>
               <a href="https://www.opensourceecology.org/" rel="external noreferrer">Offizielle Seite <span aria-hidden="true">↗</span></a>
               <a href="./catalog/projects/open-source-ecology.json" type="application/json">JSON</a>
+            </div>
+          </article>
+          <article class="catalog-card" id="project-open-source-seed-initiative" data-commonproject-id="open-source-seed-initiative">
+            <p class="catalog-kind">Digital · Versorgung, Land und Ökologie › Saatgut, Ernährung und Landwirtschaft</p>
+            <h2>Open Source Seed Initiative</h2>
+            <p>Eine gemeinschaftlich getragene Saatgutinitiative, deren Pledge die Freiheit schützt, gekennzeichnetes Saatgut zu verwenden, zu vermehren, zu teilen, weiterzuentwickeln und unter derselben Offenheitszusage weiterzugeben.</p>
+            <p class="catalog-location">1 verborgener Ort</p>
+            <div class="catalog-actions">
+              <a class="catalog-action-link" data-action-type="use" href="https://osseeds.org/ossi-varieties/" rel="external noreferrer">OSSI-Sorten und Bezugsquellen erkunden <span aria-hidden="true">↗</span></a>
+              <a class="catalog-action-link" data-action-type="learn" href="https://osseeds.org/about/" rel="external noreferrer">OSSI-Pledge und Mission verstehen <span aria-hidden="true">↗</span></a>
+              <a class="catalog-action-link" data-action-type="contribute" href="https://osseeds.org/actions-2/" rel="external noreferrer">Sorte pledgen oder Partner werden <span aria-hidden="true">↗</span></a>
+              <a class="catalog-action-link" data-action-type="donate" href="https://osseeds.org/donate/" rel="external noreferrer">Offene Saatgutarbeit unterstützen <span aria-hidden="true">↗</span></a>
+              <a href="https://osseeds.org/" rel="external noreferrer">Offizielle Seite <span aria-hidden="true">↗</span></a>
+              <a href="./catalog/projects/open-source-seed-initiative.json" type="application/json">JSON</a>
             </div>
           </article>
           <article class="catalog-card" id="project-openmrs" data-commonproject-id="openmrs">
@@ -861,6 +930,21 @@
               <a class="catalog-action-link" data-action-type="contact" href="https://redsemillas.org/" rel="external noreferrer">Netzwerk kontaktieren <span aria-hidden="true">↗</span></a>
               <a href="https://redsemillas.org/" rel="external noreferrer">Offizielle Seite <span aria-hidden="true">↗</span></a>
               <a href="./catalog/projects/red-guardianes-semillas-ecuador.json" type="application/json">JSON</a>
+            </div>
+          </article>
+          <article class="catalog-card" id="project-repair-cafe-international" data-commonproject-id="repair-cafe-international">
+            <p class="catalog-kind">Digital · Software, Werkzeuge und Produktion › Plattformen und geteilte Werkzeuge</p>
+            <h2>Repair Café International</h2>
+            <p>Ein weltweites Netz freiwillig organisierter, nicht kommerzieller Reparaturtreffen, in denen Menschen Werkzeuge, Wissen und Zeit teilen, um Alltagsgegenstände gemeinsam zu reparieren und lokale Reparaturfähigkeiten aufzubauen.</p>
+            <p class="catalog-location">1 verborgener Ort</p>
+            <div class="catalog-actions">
+              <a class="catalog-action-link" data-action-type="visit" href="https://www.repaircafe.org/en/visit/" rel="external noreferrer">Repair Café in der Nähe suchen <span aria-hidden="true">↗</span></a>
+              <a class="catalog-action-link" data-action-type="learn" href="https://www.repaircafe.org/en/about/" rel="external noreferrer">Prinzip und Ablauf kennenlernen <span aria-hidden="true">↗</span></a>
+              <a class="catalog-action-link" data-action-type="replicate" href="https://www.repaircafe.org/en/join/start-your-own/" rel="external noreferrer">Eigenes Repair Café aufbauen <span aria-hidden="true">↗</span></a>
+              <a class="catalog-action-link" data-action-type="donate" href="https://www.repaircafe.org/en/donate/" rel="external noreferrer">Repair Café International unterstützen <span aria-hidden="true">↗</span></a>
+              <a class="catalog-action-link" data-action-type="contact" href="https://www.repaircafe.org/en/contact/" rel="external noreferrer">Repair Café International kontaktieren <span aria-hidden="true">↗</span></a>
+              <a href="https://www.repaircafe.org/en/" rel="external noreferrer">Offizielle Seite <span aria-hidden="true">↗</span></a>
+              <a href="./catalog/projects/repair-cafe-international.json" type="application/json">JSON</a>
             </div>
           </article>
           <article class="catalog-card" id="project-reprap" data-commonproject-id="reprap">
@@ -974,6 +1058,20 @@
               <a href="./catalog/projects/thailand-citizens-forest-database.json" type="application/json">JSON</a>
             </div>
           </article>
+          <article class="catalog-card" id="project-the-things-network" data-commonproject-id="the-things-network">
+            <p class="catalog-kind">Digital · Kommunikation und Netze › Gemeinschaftsnetze</p>
+            <h2>The Things Network</h2>
+            <p>Ein globales, von lokalen Communities mit aufgebautes Funknetz für das Internet der Dinge, das gemeinsam betriebene LoRaWAN-Gateways, offene Software, Lernressourcen und öffentliche Community-Infrastruktur verbindet.</p>
+            <p class="catalog-location">1 verborgener Ort</p>
+            <div class="catalog-actions">
+              <a class="catalog-action-link" data-action-type="use" href="https://www.thethingsnetwork.org/get-started" rel="external noreferrer">Öffentliches Community-Netz nutzen <span aria-hidden="true">↗</span></a>
+              <a class="catalog-action-link" data-action-type="learn" href="https://www.thethingsnetwork.org/learn" rel="external noreferrer">LoRaWAN und Netzwerkbetrieb kennenlernen <span aria-hidden="true">↗</span></a>
+              <a class="catalog-action-link" data-action-type="contribute" href="https://www.thethingsnetwork.org/community" rel="external noreferrer">Lokale Community finden und mitwirken <span aria-hidden="true">↗</span></a>
+              <a class="catalog-action-link" data-action-type="replicate" href="https://www.thethingsnetwork.org/community" rel="external noreferrer">Neue lokale Community anstoßen <span aria-hidden="true">↗</span></a>
+              <a href="https://www.thethingsnetwork.org/" rel="external noreferrer">Offizielle Seite <span aria-hidden="true">↗</span></a>
+              <a href="./catalog/projects/the-things-network.json" type="application/json">JSON</a>
+            </div>
+          </article>
           <article class="catalog-card" id="project-tla-o-qui-aht-tribal-parks" data-commonproject-id="tla-o-qui-aht-tribal-parks">
             <p class="catalog-kind">Vor Ort · Digital · Versorgung, Land und Ökologie › Land, Stadtgrün und Ökologie</p>
             <h2>Tla-o-qui-aht Tribal Parks</h2>
@@ -996,6 +1094,19 @@
               <a class="catalog-action-link" data-action-type="visit" href="https://tribunaldelasaguas.org/en/visits-to-the-tribunal/" rel="external noreferrer">Öffentliche Sitzung besuchen <span aria-hidden="true">↗</span></a>
               <a href="https://tribunaldelasaguas.org/en/" rel="external noreferrer">Offizielle Seite <span aria-hidden="true">↗</span></a>
               <a href="./catalog/projects/tribunal-aguas-valencia.json" type="application/json">JSON</a>
+            </div>
+          </article>
+          <article class="catalog-card" id="project-ujamaa-community-resource-team" data-commonproject-id="ujamaa-community-resource-team">
+            <p class="catalog-kind">Commons</p>
+            <h2>Ujamaa Community Resource Team</h2>
+            <p>Eine von Gemeinschaftsrechten ausgehende Organisation in Nordtansania, die pastoralistische, agropastoralistische und Jäger-und-Sammler-Gemeinschaften beim kollektiven Landbesitz, bei lokaler Governance und nachhaltiger Ressourcenverwaltung unterstützt.</p>
+            <p class="catalog-location">1 verborgener Ort</p>
+            <div class="catalog-actions">
+              <a class="catalog-action-link" data-action-type="learn" href="https://www.ujamaa-crt.or.tz/programmes.html" rel="external noreferrer">Programme und Arbeitsweise kennenlernen <span aria-hidden="true">↗</span></a>
+              <a class="catalog-action-link" data-action-type="donate" href="https://www.ujamaa-crt.or.tz/donate.html" rel="external noreferrer">Gemeinschaftliche Landrechtsarbeit unterstützen <span aria-hidden="true">↗</span></a>
+              <a class="catalog-action-link" data-action-type="contact" href="https://www.ujamaa-crt.or.tz/" rel="external noreferrer">Ujamaa Community Resource Team kontaktieren <span aria-hidden="true">↗</span></a>
+              <a href="https://www.ujamaa-crt.or.tz/" rel="external noreferrer">Offizielle Seite <span aria-hidden="true">↗</span></a>
+              <a href="./catalog/projects/ujamaa-community-resource-team.json" type="application/json">JSON</a>
             </div>
           </article>
           <article class="catalog-card" id="project-velondriake-lmma" data-commonproject-id="velondriake-lmma">

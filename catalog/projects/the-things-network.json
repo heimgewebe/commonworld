@@ -1,0 +1,148 @@
+{
+  "schema_version": 4,
+  "id": "the-things-network",
+  "title": "The Things Network",
+  "summary": "Ein globales, von lokalen Communities mit aufgebautes Funknetz für das Internet der Dinge, das gemeinsam betriebene LoRaWAN-Gateways, offene Software, Lernressourcen und öffentliche Community-Infrastruktur verbindet.",
+  "themes": [
+    "community-network",
+    "communication",
+    "digital-equity",
+    "network",
+    "open-source",
+    "infrastructure"
+  ],
+  "actions": [
+    "use",
+    "learn",
+    "contribute",
+    "replicate"
+  ],
+  "presence": {
+    "geographic": [
+      {
+        "id": "the-things-network-global-communities",
+        "mode": "hidden",
+        "label": "Weltweites Netz lokaler Communities und Gateways",
+        "privacy_note": "Community- und Gateway-Daten ändern sich laufend und werden auf der offiziellen Netzkarte gepflegt; Commonworld veröffentlicht daraus keine scheinbar vollständige eigene Geometrie.",
+        "source_ids": [
+          "ttn-home",
+          "ttn-community"
+        ]
+      }
+    ],
+    "digital": {
+      "available": true,
+      "reach": "global",
+      "label": "Gemeinschaftliches LoRaWAN-Netz, offene Netzwerksoftware, Forum und Lernangebote",
+      "source_ids": [
+        "ttn-home",
+        "ttn-learn",
+        "ttn-community"
+      ]
+    }
+  },
+  "activity": {
+    "status": "active",
+    "observed_at": "2026-07-28",
+    "source_ids": [
+      "ttn-home",
+      "ttn-community",
+      "ttn-get-started"
+    ],
+    "note": "Die offiziellen Seiten führen aktive lokale Communities, einen öffentlichen Einstieg in das Netz sowie laufende Lern- und Austauschangebote."
+  },
+  "provenance": {
+    "sources": [
+      {
+        "id": "ttn-home",
+        "type": "official-source",
+        "label": "The Things Network – offizielle Seite",
+        "url": "https://www.thethingsnetwork.org/",
+        "retrieved_at": "2026-07-28",
+        "note": "Offizielle Selbstbeschreibung des offenen Community-Ökosystems rund um The Things Stack und LoRaWAN."
+      },
+      {
+        "id": "ttn-community",
+        "type": "official-source",
+        "label": "The Things Network – Communities",
+        "url": "https://www.thethingsnetwork.org/community",
+        "retrieved_at": "2026-07-28",
+        "note": "Offizielle Übersicht lokaler Communities sowie Einstieg zum Gründen einer neuen Community."
+      },
+      {
+        "id": "ttn-learn",
+        "type": "official-source",
+        "label": "The Things Network – Learn",
+        "url": "https://www.thethingsnetwork.org/learn",
+        "retrieved_at": "2026-07-28",
+        "note": "Offizielle Lern-, Forum- und Community-Ressourcen."
+      },
+      {
+        "id": "ttn-get-started",
+        "type": "official-source",
+        "label": "The Things Network – Get started",
+        "url": "https://www.thethingsnetwork.org/get-started",
+        "retrieved_at": "2026-07-28",
+        "note": "Offizieller Einstieg in das öffentliche Community-Netz und in selbst betriebene LoRaWAN-Infrastruktur."
+      }
+    ]
+  },
+  "curation": {
+    "state": "listed",
+    "reviewed_by": "Commonworld editorial review",
+    "reviewed_at": "2026-07-28",
+    "next_review_at": "2026-10-28",
+    "notes": "Aufgenommen als digitale Infrastruktur-Commons. Kommerzielle Angebote von The Things Industries werden nicht mit dem Community-Netz gleichgesetzt; katalogisiert ist der offene Community-Pfad."
+  },
+  "links": [
+    {
+      "type": "homepage",
+      "label": "The Things Network – offizielle Seite",
+      "url": "https://www.thethingsnetwork.org/"
+    },
+    {
+      "type": "use",
+      "label": "Öffentliches Community-Netz nutzen",
+      "url": "https://www.thethingsnetwork.org/get-started",
+      "source_ids": [
+        "ttn-get-started"
+      ]
+    },
+    {
+      "type": "learn",
+      "label": "LoRaWAN und Netzwerkbetrieb kennenlernen",
+      "url": "https://www.thethingsnetwork.org/learn",
+      "source_ids": [
+        "ttn-learn"
+      ]
+    },
+    {
+      "type": "contribute",
+      "label": "Lokale Community finden und mitwirken",
+      "url": "https://www.thethingsnetwork.org/community",
+      "source_ids": [
+        "ttn-community"
+      ]
+    },
+    {
+      "type": "replicate",
+      "label": "Neue lokale Community anstoßen",
+      "url": "https://www.thethingsnetwork.org/community",
+      "source_ids": [
+        "ttn-community"
+      ]
+    }
+  ],
+  "handoff": {
+    "enabled": false
+  },
+  "languages": {
+    "codes": [
+      "en"
+    ],
+    "source_ids": [
+      "ttn-home"
+    ],
+    "note": "Die geprüfte globale Hauptoberfläche ist auf Englisch verfügbar."
+  }
+}

@@ -308,7 +308,7 @@ class PublicShellTests(unittest.TestCase):
 
     def test_public_shell_uses_local_scripts_and_no_form(self) -> None:
         html = (ROOT / "index.html").read_text(encoding="utf-8").casefold()
-        self.assertIn('<script src="./assets/vendor/maplibre-gl.js" defer></script>', html)
+        self.assertRegex(html, r'<script src="\./assets/vendor/maplibre-gl\.js\?v=[0-9a-f]{12}" defer></script>')
         self.assertRegex(html, r'<script type="module" src="\./assets/commonworld-app\.js\?v=[0-9a-f]{12}"></script>')
         self.assertRegex(html, r'<link rel="stylesheet" href="\./assets/ipad-layout\.css\?v=[0-9a-f]{12}" />')
         self.assertNotIn("unpkg.com", html)
