@@ -624,6 +624,81 @@ class SecurityPolicyTests(unittest.TestCase):
                 errors,
             )
 
+    def test_security_jobs_reject_skipping_needs_chains(self) -> None:
+        cases = (
+            (".github/workflows/validate.yml", "  contracts:\n", "validate workflow"),
+            (
+                ".github/workflows/production-readback.yml",
+                "  verify-exact-pages-deployment:\n",
+                "production readback workflow",
+            ),
+            (
+                ".github/workflows/security-policy-expiry.yml",
+                "  validate-security-policy-expiry:\n",
+                "security expiry workflow",
+            ),
+        )
+        for relative, marker, label in cases:
+            with self.subTest(relative=relative), tempfile.TemporaryDirectory() as directory:
+                root = self.copy_surface(directory)
+                path = root / relative
+                source = path.read_text(encoding="utf-8")
+                self.assertEqual(1, source.count(marker))
+                source = source.replace(marker, marker + "    needs: suppressed-security\n", 1)
+                source = (
+                    source.rstrip()
+                    + "\n\n  suppressed-security:\n"
+                    + "    if: false\n"
+                    + "    runs-on: ubuntu-latest\n"
+                    + "    steps:\n"
+                    + "      - run: true\n"
+                )
+                path.write_text(source, encoding="utf-8")
+                errors = validate_security_policy(root, now=self.NOW)
+            self.assertTrue(
+                any(label in error and "must not define field 'needs'" in error for error in errors),
+                errors,
+            )
+
+    def test_expiry_validation_step_is_exact_and_unconditional(self) -> None:
+        mutations = (
+            (
+                "        run: python3 scripts/validate_security_policy.py\n",
+                "        run: true\n",
+                "command mismatch",
+            ),
+            (
+                "      - name: Validate disclosure policy and expiry\n",
+                "      - name: Validate disclosure policy and expiry\n        if: false\n",
+                "must not define field 'if'",
+            ),
+            (
+                "      - name: Validate disclosure policy and expiry\n",
+                "      - name: Validate disclosure policy and expiry\n        continue-on-error: true\n",
+                "must not define field 'continue-on-error'",
+            ),
+            (
+                "      - name: Validate disclosure policy and expiry\n",
+                "      - name: Validate disclosure policy and expiry\n        shell: bash {0} || true\n",
+                "must not define field 'shell'",
+            ),
+        )
+        for old, new, expected in mutations:
+            with self.subTest(expected=expected), tempfile.TemporaryDirectory() as directory:
+                root = self.copy_surface(directory)
+                path = root / ".github/workflows/security-policy-expiry.yml"
+                source = path.read_text(encoding="utf-8")
+                self.assertEqual(1, source.count(old))
+                path.write_text(source.replace(old, new, 1), encoding="utf-8")
+                errors = validate_security_policy(root, now=self.NOW)
+            self.assertTrue(
+                any(
+                    "Validate disclosure policy and expiry" in error and expected in error
+                    for error in errors
+                ),
+                errors,
+            )
+
     def test_security_critical_steps_cannot_move_to_a_suppressed_sibling_job(self) -> None:
         cases = (
             (

@@ -334,7 +334,7 @@ def _require_executable_job_for_steps(
                 structural_errors.append(
                     f"{label} security-critical steps must belong to job {expected_job_name!r}, got {job_name!r}"
                 )
-            for key in ("if", "continue-on-error"):
+            for key in ("if", "continue-on-error", "needs"):
                 if key in job_entries:
                     structural_errors.append(
                         f"{label} job {job_name!r} for security-critical steps must not define field {key!r}"
@@ -599,6 +599,14 @@ def validate_security_policy(root: Path = ROOT, now: datetime | None = None) -> 
         errors,
         "security expiry workflow",
         run_argv=("python", "-m", "pip", "install", "-r", "requirements-dev.txt"),
+        forbidden_fields=("continue-on-error", "if"),
+    )
+    _require_structured_step(
+        expiry_text,
+        "Validate disclosure policy and expiry",
+        errors,
+        "security expiry workflow",
+        run_argv=("python3", "scripts/validate_security_policy.py"),
         forbidden_fields=("continue-on-error", "if"),
     )
     expiry = _require_structured_step(
