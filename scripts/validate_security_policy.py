@@ -78,13 +78,27 @@ def _parse_rfc3339(value: str) -> datetime:
     return datetime.fromisoformat(normalized)
 
 
+def _valid_comment_line(raw_line: str) -> bool:
+    """Return whether one RFC 9116 comment line uses only permitted characters."""
+    return raw_line.startswith("#") and all(
+        character in {"\t", " "}
+        or 0x21 <= ord(character) <= 0x7E
+        or 0x80 <= ord(character) <= 0xFFFFF
+        for character in raw_line[1:]
+    )
+
+
 def parse_security_txt(text: str) -> tuple[dict[str, list[str]], list[str]]:
     fields: dict[str, list[str]] = defaultdict(list)
     errors: list[str] = []
     if any(character in text for character in FORBIDDEN_LINE_CHARACTERS):
         errors.append("security.txt may use only LF line separators")
     for number, raw_line in enumerate(text.split("\n"), start=1):
-        if not raw_line or raw_line.startswith("#"):
+        if not raw_line or all(character in {"\t", " "} for character in raw_line):
+            continue
+        if raw_line.startswith("#"):
+            if not _valid_comment_line(raw_line):
+                errors.append(f"security.txt comment line {number} contains a forbidden character")
             continue
         match = FIELD_LINE_RE.fullmatch(raw_line)
         if match is None:
