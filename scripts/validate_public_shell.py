@@ -71,12 +71,12 @@ REQUIRED_HTML = (
     'id="static-catalog-fallback"',
     'id="static-catalog-fallback" class="static-catalog-fallback" tabindex="-1"',
     'data-static-catalog-fallback',
-    'id="text-skip-link" class="skip-link" href="#static-catalog-fallback"',
+    'id="text-skip-link" class="skip-link" href="/#static-catalog-fallback"',
     'The complete linear catalog remains available here while the interactive view is loading or unavailable.',
     'id="project-focus"',
     'href="./catalog/catalog.json"',
     'href="./contracts/commonworld/project.schema.json"',
-    'href="./method.html?cw_release=',
+    'href="./method.html',
     'href="./contracts/commonworld/current-state.contract.json"',
     'type="application/json"',
     'No API runtime, no write path and no standalone CLI.',
@@ -203,7 +203,7 @@ def validate_public_shell(root: Path = ROOT) -> list[str]:
         "recoveryCatalog.dataset.skipActivated = 'true'",
         "recoveryCatalog.focus({ preventScroll: true })",
         "recoveryCatalog.scrollIntoView({ block: 'start' })",
-        "textSkipLink.setAttribute('href', '#text-view')",
+        "target.hash = 'text-view'",
         "document.querySelector('[data-static-catalog-fallback]')?.remove()",
     ):
         if token not in app:

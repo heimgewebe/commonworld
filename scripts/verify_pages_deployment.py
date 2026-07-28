@@ -29,7 +29,36 @@ DEFAULT_DEPLOYMENT_TIMEOUT_SECONDS = 600
 DEFAULT_DEPLOYMENT_POLL_SECONDS = 10
 DEFAULT_LIVE_TIMEOUT_SECONDS = 5
 DEFAULT_LIVE_RETRY_DELAYS_SECONDS = (0, 30, 90)
-EXACT_PUBLIC_FILES = (("", "index.html"), ("propose.html", "propose.html"), ("catalog/catalog.json", "catalog/catalog.json"), (".well-known/security.txt", ".well-known/security.txt"))
+CANONICAL_EXACT_PUBLIC_FILES = (("", "index.html"), ("propose.html", "propose.html"), ("catalog/catalog.json", "catalog/catalog.json"), (".well-known/security.txt", ".well-known/security.txt"))
+RELEASE_EXACT_RELATIVES = (
+    "index.html",
+    "propose.html",
+    "method.html",
+    "assets/commonworld-release-check.js",
+    "assets/commonworld-proposal.js",
+    "catalog/catalog.json",
+)
+RELEASE_ID_PATTERN = re.compile(r"^[0-9a-f]{20}$")
+
+
+def exact_public_files(root: Path) -> tuple[tuple[str, str], ...]:
+    """Bind canonical files and the exact content-derived release snapshot."""
+    manifest_path = root / "assets/commonworld-page-builds.json"
+    try:
+        manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
+    except (OSError, json.JSONDecodeError) as error:
+        raise RuntimeError(f"cannot read public release manifest: {error}") from error
+    release_id = manifest.get("release_id")
+    if manifest.get("kind") != "commonworld.release_manifest" or manifest.get("schema_version") != 2 or not isinstance(release_id, str) or not RELEASE_ID_PATTERN.fullmatch(release_id):
+        raise RuntimeError("public release manifest identity is invalid")
+    release_files = tuple(
+        (f"releases/{release_id}/{relative}", f"releases/{release_id}/{relative}")
+        for relative in RELEASE_EXACT_RELATIVES
+    )
+    return CANONICAL_EXACT_PUBLIC_FILES + (
+        ("404.html", "404.html"),
+        ("assets/commonworld-page-builds.json", "assets/commonworld-page-builds.json"),
+    ) + release_files
 PENDING_DEPLOYMENT_STATES = {"waiting", "queued", "pending", "in_progress"}
 FAILED_DEPLOYMENT_STATES = {"error", "failure", "inactive"}
 SECURITY_TXT_CONTENT_TYPE_RE = re.compile(
@@ -327,10 +356,15 @@ def verify_exact_public_files(
     timeout_seconds: int,
     fetcher: Callable[..., object] = fetch_live_url,
     root: Path = Path(__file__).resolve().parents[1],
+    include_release_snapshot: bool = True,
 ) -> ExactPublicFilesResult:
     receipts: list[ExactPublicFileReceipt] = []
     errors: list[str] = []
-    for relative_url, local_relative in EXACT_PUBLIC_FILES:
+    try:
+        files = exact_public_files(root) if include_release_snapshot else CANONICAL_EXACT_PUBLIC_FILES
+    except RuntimeError as error:
+        return ExactPublicFilesResult(verdict="fail", receipts=(), errors=(str(error),))
+    for relative_url, local_relative in files:
         requested_url = urllib.parse.urljoin(base_url, relative_url)
         try:
             fetch = fetcher(
@@ -373,7 +407,7 @@ def verify_exact_public_files(
         if not content_type_valid:
             errors.append("security.txt content-type must be text/plain; charset=utf-8")
     return ExactPublicFilesResult(
-        verdict="pass" if not errors and len(receipts) == len(EXACT_PUBLIC_FILES) else "fail",
+        verdict="pass" if not errors and len(receipts) == len(files) else "fail",
         receipts=tuple(receipts),
         errors=tuple(errors),
     )

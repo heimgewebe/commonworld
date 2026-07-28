@@ -1,0 +1,52 @@
+{
+  "schema_version": 1,
+  "kind": "commonworld_catalog_scale_gate_contract",
+  "task_id": "COMMONWORLD-PUBLIC-GLOBE-V1-T028",
+  "status": "pre_cutover_gate_active",
+  "canonical_plan": "docs/blueprints/commonworld-masterplan.md",
+  "evidence": "docs/evidence/catalog-platform-scaling-v1.json",
+  "measurement": {
+    "generator": "scripts/measure_catalog_platform_scaling.py",
+    "synthetic_only": true,
+    "scale_tiers": [
+      1000,
+      10000
+    ],
+    "stress_tier": 100000,
+    "does_not_establish": [
+      "real mobile-network latency",
+      "physical-device usability",
+      "production catalogue cutover",
+      "100,000-entry production readiness"
+    ]
+  },
+  "budgets": {
+    "initial_world_index_max_gzip_bytes": 32768,
+    "shard_warn_gzip_bytes": 28672,
+    "shard_max_gzip_bytes": 32768,
+    "world_index_initial_delivery": "forbidden_when_over_budget",
+    "shard_prefix_migration": "required_before_generated_shard_reaches_maximum"
+  },
+  "required_gates": [
+    "realistic-scale-fixtures",
+    "measured-demand-loaded-runtime",
+    "bounded-recovery-surface",
+    "search-and-map-scale-budgets",
+    "shard-growth-policy",
+    "failure-and-device-parity",
+    "cutover-authority",
+    "editorial-boundary-preserved"
+  ],
+  "current_authorization": {
+    "visible_catalogue_source": "compact_build_bound_bootstrap",
+    "scale_native_shadow_available": true,
+    "cutover_authorized": false,
+    "reason": "The current scale evidence is synthetic and the visible runtime, search, map and recovery surfaces still depend on the complete build-bound catalogue."
+  },
+  "decision_policy": {
+    "backend_by_default": false,
+    "server_search_or_postgis_or_pmtiles": "introduce_only_after_measured_static_boundary_failure",
+    "stress_warning": "A warning at the 100,000-entry stress tier requires a compatible prefix-depth migration design but does not claim production failure at the 1,000-entry or 10,000-entry cutover tiers.",
+    "rollback": "Restore the compact build-bound bootstrap and complete generated recovery catalogue before reattempting cutover."
+  }
+}

@@ -16,13 +16,17 @@ const STABILITY_TIMEOUT_MS = 2000;
 const SCROLL_WAIT_TIMEOUT_MS = 5000;
 function assert(condition, message) { if (!condition) throw new Error(message); }
 function safePath(url) { const relative = decodeURIComponent(new URL(url, 'http://localhost').pathname).replace(/^\/+/, '') || 'propose.html'; const target = path.resolve(ROOT, relative); return target === ROOT || target.startsWith(`${ROOT}${path.sep}`) ? target : null; }
+async function respondNotFound(response) {
+  response.writeHead(404, { 'Content-Type': 'text/html; charset=utf-8', 'Cache-Control': 'no-store' });
+  response.end(await readFile(path.join(ROOT, '404.html')));
+}
 const server = createServer(async (request, response) => {
   try {
     const target = safePath(request.url ?? '/propose.html');
     if (!target || !(await stat(target)).isFile()) throw new Error('missing');
     response.writeHead(200, { 'Content-Type': MIME.get(path.extname(target)) ?? 'application/octet-stream', 'Cache-Control': 'no-store' });
     response.end(await readFile(target));
-  } catch { response.writeHead(404, { 'Content-Type': 'text/plain' }); response.end('not found'); }
+  } catch { await respondNotFound(response); }
 });
 await new Promise((resolve, reject) => { server.once('error', reject); server.listen(0, '127.0.0.1', resolve); });
 const address = server.address();
@@ -76,8 +80,6 @@ html { font-size: ${profile.fontScale}% !important; }
     return { width: rect.width, height: rect.height };
   }));
   assert(contractLinkBoxes.length === 4 && contractLinkBoxes.every(({ width, height }) => width >= 44 && height >= 44), `${profile.name}: proposal contract navigation has undersized touch targets ${JSON.stringify(contractLinkBoxes)}`);
-  const methodHref = await page.locator('.proposal-contracts a').last().getAttribute('href');
-  assert(/^\.\/method\.html\?cw_release=[0-9a-f]{16}$/u.test(methodHref ?? ''), `${profile.name}: method link is not build-versioned (${methodHref})`);
   const overflow = await page.evaluate(() => document.documentElement.scrollWidth - document.documentElement.clientWidth);
   assert(overflow <= 1, `${profile.name}: horizontal overflow ${overflow}`);
   if (profile.fontScale) {
@@ -101,8 +103,6 @@ html { font-size: ${profile.fontScale}% !important; }
   assert(await page.getByRole('heading', { name: 'Ein Commons vorschlagen' }).isVisible(), 'German proposal locale: heading missing');
   assert(await page.getByRole('button', { name: 'Öffentliches GitHub-Issue vorbereiten' }).isVisible(), 'German proposal locale: submit missing');
   assert(await page.locator('.language-switch a[href="./propose.html"][lang="en"]').count() > 0, 'German proposal locale: English switch target missing');
-  const methodHref = await page.locator('.proposal-contracts a').last().getAttribute('href');
-  assert(/^\.\/method\.de\.html\?cw_release=[0-9a-f]{16}$/u.test(methodHref ?? ''), `German proposal locale: method link is not build-versioned (${methodHref})`);
   results.push('locale-german');
   await context.close();
 }
@@ -110,26 +110,35 @@ html { font-size: ${profile.fontScale}% !important; }
 {
   const context = await browser.newContext({ viewport: { width: 1024, height: 768 }, reducedMotion: 'reduce' });
   const page = await context.newPage();
-  const latestBuild = 'f'.repeat(16);
+  const currentManifest = JSON.parse(await readFile(path.join(ROOT, 'assets/commonworld-page-builds.json'), 'utf8'));
+  const latestRelease = 'f'.repeat(20);
+  const latestManifest = { ...currentManifest, release_id: latestRelease };
   let releaseFirstProbe = null;
   let probeCount = 0;
-  await page.route('**/assets/commonworld-page-builds.json*', async (route) => {
+  await page.route('**/__cw_probe/**', async (route) => {
     probeCount += 1;
     if (probeCount === 1) await new Promise((resolve) => { releaseFirstProbe = resolve; });
     await route.fulfill({
-      status: 200,
-      contentType: 'application/json',
-      body: JSON.stringify({ kind: 'commonworld.page_build_manifest', pages: { 'propose.html': latestBuild }, schema_version: 1 }),
+      status: 404,
+      contentType: 'text/html; charset=utf-8',
+      body: `<!doctype html><!-- commonworld-release-manifest:${JSON.stringify(latestManifest)} -->`,
     });
+  });
+  await page.route(`**/releases/${latestRelease}/**`, async (route) => {
+    const requested = new URL(route.request().url());
+    const suffix = requested.pathname.slice(`/releases/${latestRelease}/`.length);
+    const translated = `${baseUrl}/releases/${currentManifest.release_id}/${suffix}${requested.search}`;
+    const response = await route.fetch({ url: translated });
+    await route.fulfill({ response });
   });
   await page.goto(`${baseUrl}/propose.html`, { waitUntil: 'domcontentloaded' });
   await page.getByRole('heading', { name: 'Suggest a Commons' }).waitFor();
   await fillValid(page, 'Release Draft Test Commons');
-  const description = 'A community-managed resource whose started proposal must survive one automatic release-bound reload without server-side form storage.';
+  const description = 'A community-managed resource whose started proposal must survive one release-bound reload without server-side form storage.';
   await page.getByLabel('Short description').fill(description);
   for (let attempt = 0; !releaseFirstProbe && attempt < 100; attempt += 1) await page.waitForTimeout(10);
-  assert(typeof releaseFirstProbe === 'function', 'release-draft: initial manifest probe was not intercepted');
-  const navigated = page.waitForURL((url) => url.searchParams.get('cw_release') === latestBuild, { timeout: 5000 });
+  assert(typeof releaseFirstProbe === 'function', 'release-draft: initial path probe was not intercepted');
+  const navigated = page.waitForURL((url) => url.pathname === `/releases/${latestRelease}/propose.html`, { timeout: 5000 });
   releaseFirstProbe();
   await navigated;
   await page.getByRole('heading', { name: 'Suggest a Commons' }).waitFor();
@@ -137,41 +146,44 @@ html { font-size: ${profile.fontScale}% !important; }
   assert(await page.getByLabel('Short description').inputValue() === description, 'release-draft: description was not restored');
   assert((await page.locator('#proposal-status').textContent())?.includes('Draft input was restored'), 'release-draft: restoration status missing');
   assert(await page.evaluate(() => sessionStorage.getItem('commonworldProposalReleaseDraftV1')) === null, 'release-draft: one-shot session draft was not deleted');
-  assert(probeCount >= 2, `release-draft: expected a post-navigation manifest probe, got ${probeCount}`);
-  results.push('release-reload-preserves-one-shot-draft');
+  assert(probeCount >= 2, `release-draft: expected a post-navigation probe, got ${probeCount}`);
+  results.push('path-release-reload-preserves-one-shot-draft');
   await context.close();
 }
 
 {
   const context = await browser.newContext({ viewport: { width: 1024, height: 768 }, reducedMotion: 'reduce' });
   await context.addInitScript(() => {
-    const originalSetItem = Storage.prototype.setItem;
+    const original = Storage.prototype.setItem;
     Storage.prototype.setItem = function setItem(key, value) {
-      if (key === 'commonworldProposalReleaseDraftV1') throw new DOMException('storage disabled', 'SecurityError');
-      return originalSetItem.call(this, key, value);
+      if (key === 'commonworldProposalReleaseDraftV1') throw new DOMException('storage blocked', 'QuotaExceededError');
+      return original.call(this, key, value);
     };
   });
   const page = await context.newPage();
-  const latestBuild = 'e'.repeat(16);
-  let releaseFirstProbe = null;
-  await page.route('**/assets/commonworld-page-builds.json*', async (route) => {
-    await new Promise((resolve) => { releaseFirstProbe = resolve; });
+  const currentManifest = JSON.parse(await readFile(path.join(ROOT, 'assets/commonworld-page-builds.json'), 'utf8'));
+  const latestRelease = 'e'.repeat(20);
+  const latestManifest = { ...currentManifest, release_id: latestRelease };
+  let releaseProbe = null;
+  await page.route('**/__cw_probe/**', async (route) => {
+    await new Promise((resolve) => { releaseProbe = resolve; });
     await route.fulfill({
-      status: 200,
-      contentType: 'application/json',
-      body: JSON.stringify({ kind: 'commonworld.page_build_manifest', pages: { 'propose.html': latestBuild }, schema_version: 1 }),
+      status: 404,
+      contentType: 'text/html; charset=utf-8',
+      body: `<!doctype html><!-- commonworld-release-manifest:${JSON.stringify(latestManifest)} -->`,
     });
   });
   await page.goto(`${baseUrl}/propose.html`, { waitUntil: 'domcontentloaded' });
   await page.getByRole('heading', { name: 'Suggest a Commons' }).waitFor();
-  await page.getByLabel('Name of the Commons').fill('Unsaved Draft Must Stay');
-  for (let attempt = 0; !releaseFirstProbe && attempt < 100; attempt += 1) await page.waitForTimeout(10);
-  assert(typeof releaseFirstProbe === 'function', 'release-veto: initial manifest probe was not intercepted');
-  releaseFirstProbe();
-  await page.getByText('The automatic release change was paused').waitFor({ timeout: 5000 });
-  assert(new URL(page.url()).searchParams.has('cw_release') === false, 'release-veto: navigation occurred despite failed draft storage');
-  assert(await page.getByLabel('Name of the Commons').inputValue() === 'Unsaved Draft Must Stay', 'release-veto: visible input changed');
-  results.push('release-reload-vetoes-when-draft-storage-fails');
+  await page.getByLabel('Name of the Commons').fill('Unsaved Protected Draft');
+  for (let attempt = 0; !releaseProbe && attempt < 100; attempt += 1) await page.waitForTimeout(10);
+  assert(typeof releaseProbe === 'function', 'release-draft-storage-failure: path probe was not intercepted');
+  releaseProbe();
+  await page.locator('#proposal-status').filter({ hasText: 'automatic release change was paused' }).waitFor({ timeout: 5000 });
+  assert(new URL(page.url()).pathname === '/propose.html', `release-draft-storage-failure: unexpected navigation ${page.url()}`);
+  assert(await page.getByLabel('Name of the Commons').inputValue() === 'Unsaved Protected Draft', 'release-draft-storage-failure: form input changed');
+  assert(await page.evaluate(() => sessionStorage.getItem('commonworldProposalReleaseDraftV1')) === null, 'release-draft-storage-failure: failed draft unexpectedly persisted');
+  results.push('release-navigation-pauses-when-draft-storage-fails');
   await context.close();
 }
 

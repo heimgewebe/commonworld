@@ -108,6 +108,33 @@ test('aggregate loader binds manifest descriptor and payload', async () => {
   assert.deepEqual(calls, ['https://commonworld.test/catalog/runtime/manifest.v1.json', 'https://commonworld.test/catalog/runtime/aggregate.v1.json']);
 });
 
+test('aggregate loader binds relative runtime URLs to the rendered release base after canonical URL cleanup', async () => {
+  const originalDocument = Object.getOwnPropertyDescriptor(globalThis, 'document');
+  const originalLocation = Object.getOwnPropertyDescriptor(globalThis, 'location');
+  const aggregate = { ...aggregateStub, digital: { available: ['01'], unavailable: [] } };
+  const manifest = manifestForShard(shardDescriptor, { aggregate });
+  manifest.aggregate = descriptor(aggregate);
+  const calls = [];
+  Object.defineProperty(globalThis, 'document', { configurable: true, value: { baseURI: 'https://commonworld.test/releases/abc123/' } });
+  Object.defineProperty(globalThis, 'location', { configurable: true, value: { href: 'https://commonworld.test/' } });
+  try {
+    const loaded = await loadCatalogAggregate({
+      fetchImpl: async (url) => { calls.push(String(url)); return calls.length === 1 ? response(manifest) : response(aggregate); },
+      cryptoImpl: webcrypto,
+    });
+    assert.equal(loaded.documentRoot, 'https://commonworld.test/releases/abc123/');
+    assert.deepEqual(calls, [
+      'https://commonworld.test/releases/abc123/catalog/runtime/manifest.v1.json',
+      'https://commonworld.test/releases/abc123/catalog/runtime/aggregate.v1.json',
+    ]);
+  } finally {
+    if (originalDocument) Object.defineProperty(globalThis, 'document', originalDocument);
+    else delete globalThis.document;
+    if (originalLocation) Object.defineProperty(globalThis, 'location', originalLocation);
+    else delete globalThis.location;
+  }
+});
+
 test('aggregate loader rejects manifest URLs that escape the browser document root before fetching', async () => {
   const originalLocation = Object.getOwnPropertyDescriptor(globalThis, 'location');
   let calls = 0;

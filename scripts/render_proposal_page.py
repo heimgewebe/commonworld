@@ -13,7 +13,7 @@ if str(ROOT) not in sys.path:
 
 from scripts.commonworld_i18n import FALLBACK_LOCALE, german_surface_links, inject_locale_navigation
 from scripts.proposal_i18n import translate_proposal
-from scripts.public_cache import asset_version, stamp_page_build, version_page_links
+from scripts.public_cache import asset_version, stamp_page_build
 
 
 
@@ -31,6 +31,7 @@ def catalog_index() -> dict[str, list[str]]:
 
 def render(locale: str = FALLBACK_LOCALE) -> str:
     page_name = "propose.html" if locale == "en" else "propose.de.html"
+    form_skip_href = f"/{page_name}#commons-proposal-form"
     index = json.dumps(catalog_index(), ensure_ascii=False, separators=(",", ":")).replace("&", "\\u0026").replace("<", "\\u003c").replace(">", "\\u003e")
     markup = f'''<!doctype html>
 <html lang="de">
@@ -49,7 +50,7 @@ def render(locale: str = FALLBACK_LOCALE) -> str:
     <script type="module" src="./assets/commonworld-proposal.js?v={asset_version('assets/commonworld-proposal.js', ROOT)}"></script>
   </head>
   <body class="proposal-page">
-    <a class="skip-link" href="#commons-proposal-form">Zum Vorschlagsformular springen</a>
+    <a class="skip-link" href="{form_skip_href}">Zum Vorschlagsformular springen</a>
     <script id="proposal-catalog-index" type="application/json">{index}</script>
     <main>
       <p class="kicker">Commonworld-Redaktion</p>
@@ -112,7 +113,6 @@ def render(locale: str = FALLBACK_LOCALE) -> str:
     markup = translate_proposal(markup, locale)
     markup = german_surface_links(markup, locale, 'propose')
     markup = inject_locale_navigation(markup, locale, 'propose')
-    markup = version_page_links(markup, ('method.html', 'method.de.html'), ROOT)
     return stamp_page_build(markup, page_name)
 
 

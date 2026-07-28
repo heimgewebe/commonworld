@@ -20,7 +20,7 @@ from scripts.commonworld_i18n import (
 )
 from scripts.commonworld_geo import public_locations
 from scripts.catalog_bootstrap import bootstrap_record
-from scripts.public_cache import asset_version, stamp_page_build, version_page_links
+from scripts.public_cache import asset_version, stamp_page_build
 
 ACTION_LINK_TYPES = {"visit", "use", "borrow", "learn", "contribute", "volunteer", "donate", "contact", "replicate"}
 TAXONOMY = load_taxonomy(ROOT)
@@ -261,6 +261,7 @@ def render_bootstrap_catalog(records: list[dict]) -> str:
 
 def render_shell(root: Path = ROOT, locale: str = FALLBACK_LOCALE) -> str:
     page_name = "index.html" if normalize_locale(locale) == "en" else "de.html"
+    static_skip_href = "/#static-catalog-fallback" if page_name == "index.html" else f"/{page_name}#static-catalog-fallback"
     records = localize_records(load_records(root), locale, root)
     paths = "\n".join(
         f'              <ellipse id="sphere-path-{index}" cx="320" cy="320" rx="{rx}" ry="{ry}" transform="rotate({rotation} 320 320)" />'
@@ -291,7 +292,7 @@ def render_shell(root: Path = ROOT, locale: str = FALLBACK_LOCALE) -> str:
     <script type="module" src="./assets/commonworld-app.js?v={asset_version('assets/commonworld-app.js', root)}"></script>
   </head>
   <body data-presentation="globe">
-    <a id="text-skip-link" class="skip-link" href="#static-catalog-fallback">Zur Textansicht springen</a>
+    <a id="text-skip-link" class="skip-link" href="{static_skip_href}">Zur Textansicht springen</a>
     <main class="app-shell">
       <header class="topbar">
         <a class="brand" href="./" aria-label="commonworld – Globus zurücksetzen">
@@ -534,7 +535,6 @@ def render_shell(root: Path = ROOT, locale: str = FALLBACK_LOCALE) -> str:
     markup = translate_shell(markup, locale)
     markup = german_surface_links(markup, locale, 'index')
     markup = inject_locale_navigation(markup, locale, 'index')
-    markup = version_page_links(markup, ('method.html', 'method.de.html'), root)
     return stamp_page_build(markup, page_name)
 
 

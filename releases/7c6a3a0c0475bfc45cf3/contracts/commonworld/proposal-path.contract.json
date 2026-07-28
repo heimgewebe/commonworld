@@ -1,0 +1,40 @@
+{
+  "schema_version": 1,
+  "kind": "commonworld_public_proposal_path_contract",
+  "current_as_of": "2026-07-16",
+  "architecture": {
+    "hosting": "github_pages_static",
+    "commonworld_backend": false,
+    "commonworld_accounts": false,
+    "commonworld_write_api": false,
+    "client_secrets": false,
+    "handoff": "public_github_issue_prefill",
+    "fallback": "validated_local_json_download",
+    "issue_template": ".github/ISSUE_TEMPLATE/commons-proposal.yml"
+  },
+  "privacy": {
+    "contact_field_collected": false,
+    "github_account_is_optional_contact_channel": true,
+    "public_issue_warning_required": true,
+    "private_addresses_coordinates_router_roofs_households_forbidden": true,
+    "coarse_region_only": true,
+    "proposal_content_stored_by_commonworld": false,
+    "local_rate_limit_stores_content": false
+  },
+  "spam_and_repetition": {
+    "github_auth_and_platform_limits": true,
+    "client_prepare_cooldown_seconds": 60,
+    "honeypot": true
+  },
+  "duplicate_check": {
+    "published_catalog_titles": true,
+    "official_website_hostname": true,
+    "server_authoritative_check_before_acceptance": true
+  },
+  "failure_modes": {
+    "offline": "offer_json_download",
+    "popup_blocked": "offer_json_download_and_direct_link",
+    "github_error": "github_retains_error_surface",
+    "no_automatic_publication": true
+  }
+}

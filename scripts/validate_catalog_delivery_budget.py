@@ -117,7 +117,7 @@ def validate_bootstrap_asset_failure_fallback(
         errors.append(f'{label} bootstrap fallback catalog hides {hidden} card(s)')
     if scenario.get('neutralRecoveryCopy') is not True:
         errors.append(f'{label} bootstrap fallback does not prove neutral recovery copy')
-    if scenario.get('skipLinkHref') != '#static-catalog-fallback':
+    if scenario.get('skipLinkHref') != '/#static-catalog-fallback':
         errors.append(f'{label} bootstrap failure skip link does not target the recovery catalog')
     if scenario.get('targetRecoveryHash') != '#static-catalog-fallback':
         errors.append(f'{label} bootstrap failure fragment does not target the recovery catalog')
@@ -146,7 +146,7 @@ def validate_post_render_failure_fallback(
         )
     if hidden != 0:
         errors.append(f'{label} post-render failure fallback hides {hidden} card(s)')
-    if scenario.get('skipLinkHref') != '#static-catalog-fallback':
+    if scenario.get('skipLinkHref') != '/#static-catalog-fallback':
         errors.append(f'{label} post-render failure skip link does not target the recovery catalog')
     if scenario.get('skipFocusId') != 'static-catalog-fallback':
         errors.append(f'{label} post-render failure skip handler does not focus the recovery catalog')
@@ -202,7 +202,10 @@ def first_party_surface_sha256(root: Path, requests: list[str]) -> str:
     for request_path in sorted(requests):
         if not isinstance(request_path, str) or not request_path.startswith('/'):
             raise ValueError(f'invalid first-party request path: {request_path!r}')
-        relative = 'index.html' if request_path == '/' else request_path.lstrip('/')
+        if request_path == '/__cw_probe/<nonce>/manifest':
+            relative = '404.html'
+        else:
+            relative = 'index.html' if request_path == '/' else request_path.lstrip('/')
         target = (root / relative).resolve()
         if target != root.resolve() and root.resolve() not in target.parents:
             raise ValueError(f'first-party request escapes repository root: {request_path}')

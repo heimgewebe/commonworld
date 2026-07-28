@@ -114,6 +114,24 @@ def validate_production_delivery_provider(root: Path = ROOT) -> list[str]:
     for key, expected in expected_delivery.items():
         if delivery.get(key) != expected:
             errors.append(f"production delivery boundary mismatch: {key}")
+    cache_coherence = delivery.get("html_cache_coherence", {})
+    expected_cache_coherence = {
+        "observed_canonical_cache_control": "max-age=600",
+        "query_strings_observed_as_distinct_shared_cache_keys": False,
+        "query_parameter_cache_busting_claimed": False,
+        "release_delivery": "path_keyed_public_snapshot",
+        "snapshot_path_pattern": "/releases/<release_id>/",
+        "release_identity": "sha256_public_snapshot_first_20_hex",
+        "freshness_probe": "unique_unknown_path_served_by_current_custom_404_manifest",
+        "freshness_probe_path_pattern": "/__cw_probe/<nonce>/manifest",
+        "freshness_probe_timeout_ms": 3000,
+        "canonical_root_role": "entry_surface_and_path_release_bootstrap",
+        "direct_script_free_method_url_boundary": "provider_cache_ttl",
+        "initial_checker_rollout_boundary": "preexisting_html_without_the_path_probe_checker_requires_one_manual_reload_or_provider_ttl_expiry",
+    }
+    for key, expected in expected_cache_coherence.items():
+        if cache_coherence.get(key) != expected:
+            errors.append(f"production HTML cache-coherence boundary mismatch: {key}")
 
     basemap = contract.get("basemap", {})
     expected_basemap = {
@@ -156,12 +174,14 @@ def validate_production_delivery_provider(root: Path = ROOT) -> list[str]:
                 errors.append(f"provider option {entry.get('id')} missing axis: {axis}")
 
     failure = contract.get("failure_contract", {})
-    for key in ("provider_outage", "rate_limiting", "stale_tiles", "pages_failure", "dns_failure", "rollback", "backend_failover"):
+    for key in ("provider_outage", "rate_limiting", "stale_tiles", "stale_canonical_html", "pages_failure", "dns_failure", "rollback", "backend_failover"):
         if not failure.get(key):
             errors.append(f"production failure contract missing: {key}")
     if "keep_linear_catalog" not in failure.get("provider_outage", ""):
         errors.append("provider outage must preserve the linear catalog")
     monitoring = contract.get("monitoring", {})
+    if monitoring.get("cache_coherence_check") != "make validate-cache-coherence":
+        errors.append("production monitoring must include the path-keyed cache-coherence check")
     readback = monitoring.get("pages_production_readback", {})
     expected_readback = {
         "workflow": PRODUCTION_READBACK_WORKFLOW.as_posix(),
@@ -174,6 +194,17 @@ def validate_production_delivery_provider(root: Path = ROOT) -> list[str]:
         "live_request_timeout_seconds": 5,
         "live_retry_delays_seconds": [0, 30, 90],
         "exact_public_files": ["index.html", "propose.html", "catalog/catalog.json"],
+        "exact_release_id_source": "assets/commonworld-page-builds.json:release_id",
+        "exact_release_files": [
+            "404.html",
+            "assets/commonworld-page-builds.json",
+            "releases/<release_id>/index.html",
+            "releases/<release_id>/propose.html",
+            "releases/<release_id>/method.html",
+            "releases/<release_id>/assets/commonworld-release-check.js",
+            "releases/<release_id>/assets/commonworld-proposal.js",
+            "releases/<release_id>/catalog/catalog.json",
+        ],
         "receipt_id": "commonworld.pages-production-readback.v1",
         "receipt_artifact_retention_days": 30,
         "automatic_rollback": False,
