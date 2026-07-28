@@ -879,6 +879,111 @@ class SecurityPolicyTests(unittest.TestCase):
                 errors,
             )
 
+    def test_security_workflow_and_job_field_inventories_are_exact(self) -> None:
+        cases = (
+            (".github/workflows/validate.yml", "  contracts:\n", "validate workflow"),
+            (
+                ".github/workflows/production-readback.yml",
+                "  verify-exact-pages-deployment:\n",
+                "production readback workflow",
+            ),
+            (
+                ".github/workflows/security-policy-expiry.yml",
+                "  validate-security-policy-expiry:\n",
+                "security expiry workflow",
+            ),
+        )
+        for relative, job_marker, label in cases:
+            with self.subTest(relative=relative, scope="workflow"), tempfile.TemporaryDirectory() as directory:
+                root = self.copy_surface(directory)
+                path = root / relative
+                source = path.read_text(encoding="utf-8")
+                path.write_text(
+                    source.replace("jobs:\n", "env:\n  PYTHONPATH: attacker\n\njobs:\n", 1),
+                    encoding="utf-8",
+                )
+                errors = validate_security_policy(root, now=self.NOW)
+            self.assertTrue(any(label in error and "workflow fields must equal" in error for error in errors), errors)
+
+            with self.subTest(relative=relative, scope="job"), tempfile.TemporaryDirectory() as directory:
+                root = self.copy_surface(directory)
+                path = root / relative
+                source = path.read_text(encoding="utf-8")
+                self.assertEqual(1, source.count(job_marker))
+                path.write_text(
+                    source.replace(job_marker, job_marker + "    env:\n      PYTHONPATH: attacker\n", 1),
+                    encoding="utf-8",
+                )
+                errors = validate_security_policy(root, now=self.NOW)
+            self.assertTrue(any(label in error and "job" in error and "fields must equal" in error for error in errors), errors)
+
+    def test_security_steps_reject_unreviewed_fields(self) -> None:
+        cases = (
+            (
+                ".github/workflows/validate.yml",
+                "Verify private vulnerability reporting before merge",
+                "validate workflow",
+            ),
+            (
+                ".github/workflows/production-readback.yml",
+                "Verify exact Pages deployment and public content",
+                "production readback workflow",
+            ),
+            (
+                ".github/workflows/security-policy-expiry.yml",
+                "Validate disclosure policy and expiry",
+                "security expiry workflow",
+            ),
+        )
+        for relative, step_name, label in cases:
+            marker = f"      - name: {step_name}\n"
+            with self.subTest(relative=relative), tempfile.TemporaryDirectory() as directory:
+                root = self.copy_surface(directory)
+                path = root / relative
+                source = path.read_text(encoding="utf-8")
+                self.assertEqual(1, source.count(marker))
+                path.write_text(
+                    source.replace(marker, marker + "        working-directory: attacker\n", 1),
+                    encoding="utf-8",
+                )
+                errors = validate_security_policy(root, now=self.NOW)
+            self.assertTrue(
+                any(label in error and step_name in error and "unreviewed field 'working-directory'" in error for error in errors),
+                errors,
+            )
+
+    def test_security_critical_steps_are_consecutive_and_ordered(self) -> None:
+        cases = (
+            (
+                ".github/workflows/validate.yml",
+                "      - name: Upload pre-merge security receipt\n",
+                "validate workflow",
+            ),
+            (
+                ".github/workflows/production-readback.yml",
+                "      - name: Verify private vulnerability reporting setting\n",
+                "production readback workflow",
+            ),
+            (
+                ".github/workflows/security-policy-expiry.yml",
+                "      - name: Verify private vulnerability reporting remains enabled\n",
+                "security expiry workflow",
+            ),
+        )
+        injected = "      - name: Interposed unreviewed step\n        run: true\n\n"
+        for relative, marker, label in cases:
+            with self.subTest(relative=relative), tempfile.TemporaryDirectory() as directory:
+                root = self.copy_surface(directory)
+                path = root / relative
+                source = path.read_text(encoding="utf-8")
+                self.assertEqual(1, source.count(marker))
+                path.write_text(source.replace(marker, injected + marker, 1), encoding="utf-8")
+                errors = validate_security_policy(root, now=self.NOW)
+            self.assertTrue(
+                any(label in error and "must be consecutive and in reviewed order" in error for error in errors),
+                errors,
+            )
+
     def test_quoted_mapping_key_whitespace_is_not_normalized(self) -> None:
         mutations = (
             (

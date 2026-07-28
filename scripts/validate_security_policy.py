@@ -235,6 +235,7 @@ def _require_structured_step(
     with_fields: dict[str, str] | None = None,
     env_fields: dict[str, str] | None = None,
     forbidden_fields: tuple[str, ...] = (),
+    exact_fields: bool = True,
 ) -> WorkflowStep | None:
     step = parse_workflow_step(workflow_text, step_name)
     if step is None:
@@ -246,6 +247,17 @@ def _require_structured_step(
         actual = step.fields.get(key)
         if actual != expected:
             errors.append(f"{label} step {step_name!r} field {key!r} must equal {expected!r}, got {actual!r}")
+    if exact_fields:
+        allowed_fields = {"name"}
+        allowed_fields.update((fields or {}).keys())
+        if run_argv is not None:
+            allowed_fields.add("run")
+        if with_fields is not None:
+            allowed_fields.add("with")
+        if env_fields is not None:
+            allowed_fields.add("env")
+        for key in sorted(set(step.fields) - allowed_fields):
+            errors.append(f"{label} step {step_name!r} contains unreviewed field {key!r}")
     effective_forbidden = set(forbidden_fields)
     if run_argv is not None:
         effective_forbidden.add("shell")
@@ -289,6 +301,8 @@ def _require_executable_job_for_steps(
     label: str,
     *,
     expected_job_name: str | None = None,
+    expected_job_fields: dict[str, str] | None = None,
+    expected_workflow_fields: set[str] | None = None,
 ) -> None:
     root = _compose_workflow(workflow_text)
     if root is None:
@@ -297,13 +311,17 @@ def _require_executable_job_for_steps(
 
     structural_errors: list[str] = []
     root_entries = _yaml_mapping_entries(root, structural_errors, f"{label} workflow")
+    if expected_workflow_fields is not None and set(root_entries) != expected_workflow_fields:
+        structural_errors.append(
+            f"{label} workflow fields must equal {sorted(expected_workflow_fields)!r}, got {sorted(root_entries)!r}"
+        )
     _reject_inherited_shell_override(root_entries, structural_errors, f"{label} workflow")
     jobs_node = root_entries.get("jobs")
     jobs = _yaml_mapping_entries(jobs_node, structural_errors, f"{label} jobs") if jobs_node is not None else {}
     if jobs_node is None:
         structural_errors.append(f"{label} must define jobs")
 
-    matches: dict[str, list[tuple[str, dict[str, Node]]]] = {name: [] for name in step_names}
+    matches: dict[str, list[tuple[str, dict[str, Node], int]]] = {name: [] for name in step_names}
     for job_name, job_node in jobs.items():
         job_entries = _yaml_mapping_entries(job_node, structural_errors, f"{label} job {job_name!r}")
         steps = job_entries.get("steps")
@@ -318,9 +336,9 @@ def _require_executable_job_for_steps(
             name_node = step_entries.get("name")
             name = _yaml_scalar_node_value(name_node) if name_node is not None else None
             if name in matches:
-                matches[name].append((job_name, job_entries))
+                matches[name].append((job_name, job_entries, index))
 
-    resolved: list[tuple[str, dict[str, Node]]] = []
+    resolved: list[tuple[str, dict[str, Node], int]] = []
     for step_name in step_names:
         locations = matches[step_name]
         if len(locations) != 1:
@@ -331,7 +349,7 @@ def _require_executable_job_for_steps(
             resolved.append(locations[0])
 
     if len(resolved) == len(step_names):
-        job_names = {job_name for job_name, _ in resolved}
+        job_names = {job_name for job_name, _, _ in resolved}
         if len(job_names) != 1:
             structural_errors.append(
                 f"{label} security-critical steps must belong to the same executable job"
@@ -339,10 +357,28 @@ def _require_executable_job_for_steps(
         else:
             job_name = next(iter(job_names))
             job_entries = resolved[0][1]
+            indices = [index for _, _, index in resolved]
+            if indices != list(range(indices[0], indices[0] + len(indices))):
+                structural_errors.append(
+                    f"{label} security-critical steps must be consecutive and in reviewed order"
+                )
             if expected_job_name is not None and job_name != expected_job_name:
                 structural_errors.append(
                     f"{label} security-critical steps must belong to job {expected_job_name!r}, got {job_name!r}"
                 )
+            if expected_job_fields is not None:
+                allowed_job_fields = {"steps", *expected_job_fields.keys()}
+                if set(job_entries) != allowed_job_fields:
+                    structural_errors.append(
+                        f"{label} job {job_name!r} fields must equal {sorted(allowed_job_fields)!r}, got {sorted(job_entries)!r}"
+                    )
+                for key, expected in expected_job_fields.items():
+                    value_node = job_entries.get(key)
+                    actual = _yaml_scalar_node_value(value_node) if value_node is not None else None
+                    if actual != expected:
+                        structural_errors.append(
+                            f"{label} job {job_name!r} field {key!r} must equal {expected!r}, got {actual!r}"
+                        )
             for key in ("if", "continue-on-error", "needs"):
                 if key in job_entries:
                     structural_errors.append(
@@ -493,6 +529,8 @@ def validate_security_policy(root: Path = ROOT, now: datetime | None = None) -> 
         errors,
         "validate workflow",
         expected_job_name="contracts",
+        expected_job_fields={"runs-on": "ubuntu-latest"},
+        expected_workflow_fields={"name", "on", "permissions", "jobs"},
     )
     premerge = _require_structured_step(
         validate_text,
@@ -544,6 +582,8 @@ def validate_security_policy(root: Path = ROOT, now: datetime | None = None) -> 
         errors,
         "production readback workflow",
         expected_job_name="verify-exact-pages-deployment",
+        expected_job_fields={"runs-on": "ubuntu-latest", "timeout-minutes": "20"},
+        expected_workflow_fields={"name", "on", "permissions", "concurrency", "jobs"},
     )
     _require_structured_step(
         production_text,
@@ -626,6 +666,8 @@ def validate_security_policy(root: Path = ROOT, now: datetime | None = None) -> 
         errors,
         "security expiry workflow",
         expected_job_name="validate-security-policy-expiry",
+        expected_job_fields={"runs-on": "ubuntu-latest", "timeout-minutes": "5"},
+        expected_workflow_fields={"name", "on", "permissions", "concurrency", "jobs"},
     )
     _require_structured_step(
         expiry_text,
