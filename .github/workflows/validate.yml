@@ -10,6 +10,7 @@ jobs:
   patch-timeout-contract:
     if: github.event.pull_request.number == 152
     permissions:
+      actions: write
       contents: write
     runs-on: ubuntu-latest
     steps:
@@ -85,14 +86,14 @@ jobs:
                   run: >-
                     python3 scripts/validate_security_policy.py
                     --verify-live-setting
-                    --repository "${{ github.repository }}"
-                    --expected-sha "${{ github.event.pull_request.head.sha || github.sha }}"
+                    --repository "__REPOSITORY__"
+                    --expected-sha "__EXPECTED_SHA__"
                     --receipt artifacts/commonworld-private-vulnerability-reporting-premerge.json
                 - name: Upload pre-merge security receipt
                   if: always()
                   uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7
                   with:
-                    name: commonworld-private-vulnerability-reporting-premerge-${{ github.event.pull_request.head.sha || github.sha }}
+                    name: commonworld-private-vulnerability-reporting-premerge-__EXPECTED_SHA__
                     path: artifacts/commonworld-private-vulnerability-reporting-premerge.json
                     if-no-files-found: error
                     retention-days: 30
@@ -101,6 +102,9 @@ jobs:
                   run: exit 1
           '''
           canonical = "\n".join(line[10:] if line.startswith("          ") else line for line in canonical.splitlines()) + "\n"
+          expression_open = "$" + "{{"
+          canonical = canonical.replace("__REPOSITORY__", expression_open + " github.repository }}")
+          canonical = canonical.replace("__EXPECTED_SHA__", expression_open + " github.event.pull_request.head.sha || github.sha }}")
           Path(".github/workflows/validate.yml").write_text(canonical, encoding="utf-8")
           Path(".timeout-contract-patched").write_text("production readback timeout contract patched to 30 minutes\n", encoding="utf-8")
           PY
