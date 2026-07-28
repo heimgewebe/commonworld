@@ -552,8 +552,8 @@
         "method-mobile",
         "method-mobile-text-200"
       ],
-      "evidence_sha256": "ead27823173b452d48c18762891b77af741fd23b1a255c80549d96947aaa7da5",
-      "scenario_execution_note": "Fresh exact-surface public browser smoke completed all 34 scenarios successfully in durable job 258be3d43fbc."
+      "evidence_sha256": "af2cce815779678903a8b72f64e3dddd37893a23754dd37d2466ec3c98c67fc2",
+      "scenario_execution_note": "Fresh current-surface smoke job d35b6a1f50d7 proves configuredRingPreviewLimit=6, maxRingPreviewCount=6 and ringPreviewCounts=[6,6,6,6,4] without rewriting the historical v6 real-surface result."
     },
     "proposal_browser_smoke": {
       "verdict": "PASS",
@@ -583,8 +583,8 @@
     "official_browser_runner": {
       "verdict": "PASS",
       "command": "python3 scripts/run_browser_smoke.py",
-      "durable_job_id": "7f71a46f6411",
-      "finalization_receipt_sha256": "4929b16bb39a343a74bce6a8c61de101756529fb60346430c98140c20b44cad9"
+      "durable_job_id": "d2f0be1b0c3b",
+      "finalization_receipt_sha256": "8442dede99f9c323627a86593d20986eeb6f02a9f7427aa9cb142faa63015cd5"
     },
     "catalog_delivery_static_measurement": {
       "verdict": "PASS",
@@ -596,8 +596,8 @@
     "full_validation": {
       "verdict": "PASS",
       "command": "make validate",
-      "durable_job_id": "f5b323fe9ff6",
-      "finalization_receipt_sha256": "5ca73741bcc772ae779572841f3d42e7b6400f3707795ee50a3962ee3d8df756",
+      "durable_job_id": "f42cdcc7ccc3",
+      "finalization_receipt_sha256": "9cf0840e9ebd1a846b8ede72783d104fd76c940a43fa3af341c543f902d0846f",
       "javascript_tests": "110/110",
       "python_tests": "543/543"
     }
@@ -607,5 +607,5 @@
     "warn_bootstrap_gzip_bytes": 28672,
     "max_bootstrap_gzip_bytes": 32768
   },
-  "current_surface_note": "Current browser and static measurements are bound to the PR #153 review-fix surface; timing remains observational while request, byte, DOM and hash boundaries are directly validated."
+  "current_surface_note": "Current browser evidence proves the six-name public runtime contract on the exact PR surface. The dated v6 real-surface research result remains historical two-name evidence; timing metrics remain observational."
 }

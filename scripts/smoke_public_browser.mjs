@@ -603,6 +603,11 @@ async function startupAndRingOrbitScenario() {
     assert(Math.abs(ring.animationDurationSeconds - ring.orbitDuration) <= 0.5, `ring orbits: ${ring.layer} CSS duration diverges from its declared duration ${JSON.stringify(ring)}`);
     assert(ring.animationIterationCount === 'infinite' && ring.animationPlayState === 'running', `ring orbits: ${ring.layer} does not orbit continuously ${JSON.stringify(ring)}`);
   }
+  const ringPreviewCounts = rings.map(({ ids }) => ids.length);
+  const maxRingPreviewCount = Math.max(...ringPreviewCounts);
+  assert(ringPreviewCounts.every((count) => count <= SPHERE_RING_IDENTITY_PREVIEW_LIMIT), `ring orbits: preview count exceeds the current six-name contract (${JSON.stringify(ringPreviewCounts)})`);
+  assert(maxRingPreviewCount === SPHERE_RING_IDENTITY_PREVIEW_LIMIT, `ring orbits: current public catalog does not exercise the six-name preview limit (${JSON.stringify(ringPreviewCounts)})`);
+
   const directions = rings.map(({ directionVariable }) => directionVariable);
   assert(directions.every((value) => value === '1' || value === '-1'), `ring orbits: directions must be deterministic units (${JSON.stringify(directions)})`);
   assert(new Set(directions).size === 2, `ring orbits: directions must alternate (${JSON.stringify(directions)})`);
@@ -634,7 +639,7 @@ async function startupAndRingOrbitScenario() {
 
   assert(run.consoleErrors.length === 0, 'startup: console errors: ' + run.consoleErrors.join(' | ') + '; HTTP: ' + run.httpErrors.join(' | '));
   assert(run.pageErrors.length === 0, 'startup: page errors: ' + run.pageErrors.join(' | '));
-  results.push({ id: 'startup-and-ring-orbits', verdict: 'PASS', directGlobeProjection: true, hiddenUntilCalibrated: true, outerHintRemoved: true, aggregateRingIdentities: aggregateCount, movingRingMatrix: movedRing, unchangedGeometryRepaintSkipped: true });
+  results.push({ id: 'startup-and-ring-orbits', verdict: 'PASS', directGlobeProjection: true, hiddenUntilCalibrated: true, outerHintRemoved: true, aggregateRingIdentities: aggregateCount, configuredRingPreviewLimit: SPHERE_RING_IDENTITY_PREVIEW_LIMIT, ringPreviewCounts, maxRingPreviewCount, movingRingMatrix: movedRing, unchangedGeometryRepaintSkipped: true });
   await run.context.close();
 }
 

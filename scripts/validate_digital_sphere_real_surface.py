@@ -36,7 +36,7 @@ LAYER_TOPICS: OrderedDict[str, tuple[str, ...]] = OrderedDict(
     )
 )
 LAYER_ORDER = tuple(LAYER_TOPICS) + ("mixed_other",)
-VISIBLE_NAME_LIMIT_PER_LAYER = 6
+VISIBLE_NAME_LIMIT_PER_LAYER = 2
 ORBIT_LABEL_MAX_CHARS = 18
 REFERENCE_COUNT = 12
 FOCUS_ID = "meta-wiki-reference"
