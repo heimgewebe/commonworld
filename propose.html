@@ -3,7 +3,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="commonworld-page" content="propose.html" />
-    <meta name="commonworld-page-build" content="17d4229d8c606068" />
+    <meta name="commonworld-page-build" content="1cb04d7de5868825" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="color-scheme" content="dark" />
     <meta name="referrer" content="strict-origin-when-cross-origin" />
@@ -13,8 +13,8 @@
     <link rel="icon" href="./assets/commonworld-mark.svg?v=05905a6e42f8" type="image/svg+xml" />
     <link rel="stylesheet" href="./index.css?v=f38966774158" />
     <link rel="stylesheet" href="./assets/proposal.css?v=0823cd3bbbbd" />
-    <script type="module" src="./assets/commonworld-release-check.js?v=bee3ae4f1e8b"></script>
-    <script type="module" src="./assets/commonworld-proposal.js?v=e5ae0d076071"></script>
+    <script type="module" src="./assets/commonworld-release-check.js?v=8dd4fd5abe85"></script>
+    <script type="module" src="./assets/commonworld-proposal.js?v=82ebe90e26b4"></script>
   </head>
   <body class="proposal-page">
     <a class="skip-link" href="#commons-proposal-form">Skip to suggestion form</a>
@@ -28,7 +28,7 @@
         <h2 id="proposal-process-title">What happens next</h2>
         <p>The suggestion is <strong>not published automatically</strong>. Commonworld reviews identity, sources, Commons characteristics, ways to engage, location precision, privacy and freshness. Only a separately reviewed repository commit can publish a catalog entry.</p>
         <p><strong>Public visibility:</strong> The preferred intake path is a public GitHub issue. Do not enter an email address, phone number, private address, coordinates, apartment, rooftop, router or household information. Your GitHub account serves as the contact path; Commonworld collects no additional contact field.</p>
-        <p>Without GitHub, or if the network fails, you can download a validated JSON file locally. Commonworld does not store form input.</p>
+        <p>Without GitHub, or if the network fails, you can download a validated JSON file locally. Commonworld does not store form input on a server. To restore a started draft immediately after an automatic release change, it is placed temporarily in this tab’s session storage. On the next load it is deleted immediately and restored only when it is no more than five minutes old.</p>
       </section>
 
       <form id="commons-proposal-form" class="proposal-form" novalidate>
@@ -73,7 +73,7 @@
         <div id="proposal-fallback" class="proposal-fallback" hidden><p>The suggestion remains a candidate. This does not make it appear in the catalog.</p><p><a id="proposal-direct-link" href="https://github.com/heimgewebe/commonworld/issues/new?template=commons-proposal.yml" rel="external noreferrer">Open GitHub directly</a></p></div>
       </form>
 
-      <section class="proposal-contracts" aria-labelledby="contracts-title"><h2 id="contracts-title">Machine-readable rules</h2><ul><li><a href="./contracts/commonworld/proposal.schema.json">Suggestion schema</a></li><li><a href="./contracts/commonworld/editorial-review.contract.json">Editorial and status contract</a></li><li><a href="./contracts/commonworld/proposal-path.contract.json">Technical submission path</a></li><li><a href="./method.html">Method and privacy</a></li></ul></section>
+      <section class="proposal-contracts" aria-labelledby="contracts-title"><h2 id="contracts-title">Machine-readable rules</h2><ul><li><a href="./contracts/commonworld/proposal.schema.json">Suggestion schema</a></li><li><a href="./contracts/commonworld/editorial-review.contract.json">Editorial and status contract</a></li><li><a href="./contracts/commonworld/proposal-path.contract.json">Technical submission path</a></li><li><a href="./method.html?cw_release=32a908a1332b11dc">Method and privacy</a></li></ul></section>
     </main>
   </body>
 </html>

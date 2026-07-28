@@ -720,7 +720,7 @@ def validate_public_maplibre_vertical_slice(root: Path = ROOT) -> list[str]:
         'data-presentation-choice="text"',
         'href="./catalog/catalog.json"',
         'href="./contracts/commonworld/project.schema.json"',
-        'href="./method.html"',
+        'href="./method.html?cw_release=',
         'href="./contracts/commonworld/current-state.contract.json"',
     )
     for token in required_html:

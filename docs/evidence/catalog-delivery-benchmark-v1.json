@@ -2,7 +2,7 @@
   "schema_version": 1,
   "kind": "commonworld_catalog_delivery_benchmark_evidence",
   "task_id": "COMMONWORLD-PUBLIC-GLOBE-V1-T027",
-  "base_commit": "4dfdb4dcd3d4cd674a4a70ede4770c8845736ac9",
+  "base_commit": "8138c7d5f512bbd88645a48a0bf1735919e3b342",
   "measurement_method": {
     "static": "scripts/measure_catalog_delivery.py; deterministic raw and gzip sizes, generated/canonical identity parity, HTML tag counts and source-level startup fetch detection.",
     "browser": "scripts/measure_catalog_delivery_browser.mjs; isolated local no-store server, external requests blocked, Chromium profiles at fourfold CPU throttling.",
@@ -271,8 +271,8 @@
         "gzip_bytes": 1379
       },
       "html": {
-        "raw_bytes": 127437,
-        "gzip_bytes": 17764,
+        "raw_bytes": 127465,
+        "gzip_bytes": 17789,
         "start_tag_count": 1427,
         "catalog_card_instances": 73,
         "interactive_catalog_cards": 0,
@@ -294,7 +294,7 @@
     "browser": {
       "schema_version": 1,
       "kind": "commonworld_catalog_delivery_browser_metrics",
-      "measured_at": "2026-07-28T12:21:49.416Z",
+      "measured_at": "2026-07-28T14:00:18.255Z",
       "cpu_throttle_rate": 4,
       "profiles": [
         {
@@ -304,47 +304,47 @@
             "height": 844
           },
           "cpu_throttle_rate": 4,
-          "runtime_ready_ms": 796,
+          "runtime_ready_ms": 1121,
           "dom_node_count": 1600,
           "catalog_card_count": 48,
           "interactive_catalog_card_count": 48,
           "runtime_ready": true,
           "runtime_failed": false,
-          "dom_content_loaded_ms": 530.6000000014901,
-          "load_event_ms": 561.5,
+          "dom_content_loaded_ms": 716.2999999970198,
+          "load_event_ms": 779.3999999985099,
           "resource_count": 18,
-          "script_duration_ms": 558.75,
-          "task_duration_ms": 1056.03,
+          "script_duration_ms": 874.2,
+          "task_duration_ms": 1905.7,
           "bootstrap_compile": {
-            "median_ms": 0.3999999985098839,
-            "p95_ms": 1,
+            "median_ms": 0.6999999992549419,
+            "p95_ms": 1.699999999254942,
             "samples_ms": [
               0,
               0,
-              0,
-              0,
-              0.09999999776482582,
               0.09999999776482582,
               0.10000000149011612,
               0.10000000149011612,
               0.19999999925494194,
               0.19999999925494194,
-              0.3999999985098839,
+              0.4000000022351742,
               0.5,
               0.5,
-              0.5999999977648258,
-              0.6000000014901161,
-              0.7000000029802322,
+              0.6999999992549419,
+              0.6999999992549419,
+              0.6999999992549419,
               0.8000000007450581,
-              0.8999999985098839,
+              0.8000000007450581,
               0.9000000022351742,
               1,
-              1.5
+              1,
+              1,
+              1.699999999254942,
+              3.199999999254942
             ]
           },
           "first_party_request_count": 17,
           "first_party_unique_request_count": 17,
-          "first_party_raw_bytes": 1890021,
+          "first_party_raw_bytes": 1890843,
           "first_party_requests": [
             "/",
             "/assets/commonworld-app.js",
@@ -364,7 +364,7 @@
             "/catalog/runtime/manifest.v1.json",
             "/index.css"
           ],
-          "first_party_surface_sha256": "e6587942f34560428c23d62e1e8e10229e799853f6cd923dead5434c8c2f06ad",
+          "first_party_surface_sha256": "47e4047e33e39c315f0346ec81e53256a75ba713de0ff7e0ec9bf29bf19d681a",
           "project_json_request_count": 0,
           "project_json_unique_request_count": 0,
           "project_json_requests": []
@@ -376,47 +376,47 @@
             "height": 768
           },
           "cpu_throttle_rate": 4,
-          "runtime_ready_ms": 821,
+          "runtime_ready_ms": 1511,
           "dom_node_count": 1600,
           "catalog_card_count": 48,
           "interactive_catalog_card_count": 48,
           "runtime_ready": true,
           "runtime_failed": false,
-          "dom_content_loaded_ms": 505.4000000022352,
-          "load_event_ms": 543.5,
+          "dom_content_loaded_ms": 938,
+          "load_event_ms": 1005,
           "resource_count": 18,
-          "script_duration_ms": 649.57,
-          "task_duration_ms": 1115.92,
+          "script_duration_ms": 1156.06,
+          "task_duration_ms": 2095.36,
           "bootstrap_compile": {
-            "median_ms": 0.6000000014901161,
-            "p95_ms": 0.8000000007450581,
+            "median_ms": 0.7999999970197678,
+            "p95_ms": 1.0999999977648258,
             "samples_ms": [
               0.09999999776482582,
               0.09999999776482582,
-              0.09999999776482582,
-              0.10000000149011612,
-              0.10000000149011612,
               0.19999999925494194,
               0.19999999925494194,
-              0.3999999985098839,
+              0.30000000074505806,
+              0.5,
+              0.5,
               0.5,
               0.6000000014901161,
-              0.6000000014901161,
-              0.6000000014901161,
               0.6999999992549419,
-              0.6999999992549419,
-              0.6999999992549419,
-              0.6999999992549419,
-              0.7000000029802322,
-              0.7000000029802322,
               0.7999999970197678,
               0.8000000007450581,
-              0.9000000022351742
+              0.8000000007450581,
+              0.8000000007450581,
+              0.8999999985098839,
+              0.9000000022351742,
+              0.9000000022351742,
+              0.9000000022351742,
+              1,
+              1.0999999977648258,
+              1.1000000014901161
             ]
           },
           "first_party_request_count": 17,
           "first_party_unique_request_count": 17,
-          "first_party_raw_bytes": 1890021,
+          "first_party_raw_bytes": 1890843,
           "first_party_requests": [
             "/",
             "/assets/commonworld-app.js",
@@ -436,7 +436,7 @@
             "/catalog/runtime/manifest.v1.json",
             "/index.css"
           ],
-          "first_party_surface_sha256": "e6587942f34560428c23d62e1e8e10229e799853f6cd923dead5434c8c2f06ad",
+          "first_party_surface_sha256": "47e4047e33e39c315f0346ec81e53256a75ba713de0ff7e0ec9bf29bf19d681a",
           "project_json_request_count": 0,
           "project_json_unique_request_count": 0,
           "project_json_requests": []
@@ -520,31 +520,70 @@
     "public_browser_smoke": {
       "verdict": "PASS",
       "scenario_count": 35,
-      "evidence_sha256": "15da3b5ef4bc5ec8eb3a4544f66cbb5575135a0e6d543925d024376c90d46b6a",
-      "command": "node scripts/smoke_public_browser.mjs --result /tmp/commonworld-pr159-smoke.json",
-      "durable_job_id": "5e03ae29dd37",
-      "finalization_receipt_sha256": "874824d6b1f4376576539bf2153399849026e3834869f45327846e947c7cbcec",
-      "scenario_execution_note": "Fresh 35-scenario smoke on the corrected 73-record runtime surface."
+      "scenario_ids": [
+        "startup-and-ring-orbits",
+        "synthetic-cross-ring-collision-accessibility",
+        "ring-orbits-reduced-motion",
+        "synthetic-digital-performance",
+        "normal",
+        "locale-german",
+        "intent-search-discovery",
+        "spatial-discovery-filters",
+        "android-globe-ui-alignment",
+        "intent-search-ipad-portrait",
+        "intent-search-ipad-landscape",
+        "dual-presence-axes",
+        "layer-journey-desktop",
+        "layer-journey-mobile",
+        "layer-journey-ipad-portrait",
+        "layer-journey-ipad-landscape",
+        "layer-journey-moveend-return",
+        "layer-journey-interrupted",
+        "layer-journey-reduced-motion",
+        "legacy-layer-and-atomic-focus",
+        "history-focus-diagnostic-contract",
+        "valid-empty-digital-path",
+        "external-link-safety",
+        "synthetic-catalogue-truth",
+        "live-ui-hardening",
+        "catalogue-network-blocked",
+        "catalogue-platform-retry",
+        "catalogue-detail-retry",
+        "catalogue-detail-stale-response",
+        "bootstrap-asset-failure-fallback",
+        "post-render-failure-preserves-fallback",
+        "provider-failure",
+        "method-desktop",
+        "method-mobile",
+        "method-mobile-text-200"
+      ],
+      "evidence_sha256": "b79d85352fda2a38ea6ce008789bf8cddc5167bb805949323bcd1c7df3475296",
+      "command": "node scripts/smoke_public_browser.mjs --result /tmp/commonworld-pr158-final2-smoke.json",
+      "durable_job_id": "08151ac3930e4562b8539b4a",
+      "finalization_receipt_sha256": "447be7c6d85cfed4027cb27d4e5d5427f50dd12d4e9d956be528344a02b53853",
+      "scenario_execution_note": "Fresh 35-scenario smoke on the final combined 73-record surface."
     },
     "proposal_browser_smoke": {
       "verdict": "PASS",
-      "scenario_count": 24,
+      "scenario_count": 26,
       "command": "node scripts/smoke_proposal_browser.mjs",
-      "durable_job_id": "bcb9de99f660",
-      "finalization_receipt_sha256": "f9e2cec41c3cd2f90342e236a1b8d9b669b52fb3ce04caed5c8069b4f570727c"
+      "script_sha256": "fe4456b0817275fd6706b62cb06817398477aa4ca1a8d09c034676ad87f35dc7",
+      "durable_job_id": "aa4e94aae1494bd08d78289d",
+      "finalization_receipt_sha256": "d4d6fecb5b9acfff2324a5416c49b30f8e00182eb97afc4501cff7368f45b2a1",
+      "scenario_execution_note": "Includes successful one-shot draft restoration and fail-closed navigation when tab storage is unavailable."
     },
     "focus_overlay_browser_smoke": {
       "verdict": "PASS",
       "command": "node scripts/smoke_focus_overlay_browser.mjs",
-      "durable_job_id": "bcb9de99f660",
-      "finalization_receipt_sha256": "f9e2cec41c3cd2f90342e236a1b8d9b669b52fb3ce04caed5c8069b4f570727c"
+      "durable_job_id": "aa4e94aae1494bd08d78289d",
+      "finalization_receipt_sha256": "d4d6fecb5b9acfff2324a5416c49b30f8e00182eb97afc4501cff7368f45b2a1"
     },
     "accessibility_modes_browser_smoke": {
       "verdict": "PASS",
       "scenario_count": 4,
       "command": "node scripts/smoke_accessibility_modes_browser.mjs",
-      "durable_job_id": "bcb9de99f660",
-      "finalization_receipt_sha256": "f9e2cec41c3cd2f90342e236a1b8d9b669b52fb3ce04caed5c8069b4f570727c"
+      "durable_job_id": "aa4e94aae1494bd08d78289d",
+      "finalization_receipt_sha256": "d4d6fecb5b9acfff2324a5416c49b30f8e00182eb97afc4501cff7368f45b2a1"
     },
     "catalog_delivery_browser_measurement": {
       "verdict": "PASS",
@@ -553,31 +592,31 @@
         "desktop-low-power"
       ],
       "cpu_throttle_rate": 4,
-      "result_sha256": "c3b3ef7600fa3e2feaea02358b8b66fddfa1538cc1b36bccf7f45f09c4ef4fb2",
-      "durable_job_id": "92a04f9ec763",
-      "finalization_receipt_sha256": "941a5ad46782fa382c5c3ccec1ef65e1ceb6947208df9df088e8e4429f3b2d9b",
+      "result_sha256": "ebdaff03e6e81513593594dc4bf19691026fbdb9125988f07de5e32d30104b97",
+      "durable_job_id": "5e2ef72cce024d1caa8a2dc0",
+      "finalization_receipt_sha256": "8ade0621785a17bcba6a7702ccf8ceef0182de427eb87050d5f3dd87db0d7cf4",
       "repeatability_note": "One exact-surface measurement; both profiles remain within the published budgets."
     },
     "official_browser_runner": {
       "verdict": "PASS",
       "command": "npm run smoke:browser",
-      "durable_job_id": "870cb28906f84fd5b9fa71ad",
-      "finalization_receipt_sha256": "1ce1d0819d18418afa0137b7fd0961c8ecac24c0937c00a2efa7dc42d81a9370"
+      "durable_job_id": "aa4e94aae1494bd08d78289d",
+      "finalization_receipt_sha256": "d4d6fecb5b9acfff2324a5416c49b30f8e00182eb97afc4501cff7368f45b2a1"
     },
     "catalog_delivery_static_measurement": {
       "verdict": "PASS",
-      "command": "python3 scripts/measure_catalog_delivery.py --output /tmp/commonworld-pr159-static.json",
-      "result_sha256": "0f42982a74e41b5aab7484dc23b12f2fa20796c20f3c701e0d9e1aa922a0f590",
+      "command": "python3 scripts/measure_catalog_delivery.py --output /tmp/commonworld-pr158-final2-static.json",
+      "result_sha256": "9c543a6224a6188d7c6ed14b0c4648ec89e962076dc50588e20a642fc848b0d1",
       "durable_job_id": "direct-bounded-readback",
       "finalization_receipt_sha256": null
     },
     "full_validation": {
       "verdict": "PASS",
       "command": "make validate",
-      "durable_job_id": "1920833dab10",
-      "finalization_receipt_sha256": "4d76dca0d3c4f470ca24c93b5f7cbc059c0e3f28435b640bb8c71b37b6b25e7d",
-      "javascript_tests": "117/117",
-      "python_tests": "555/555"
+      "durable_job_id": "8ddfc37d0e20478a8dccc775",
+      "finalization_receipt_sha256": "933a7cff77a46bc7562782a3a900e265e01f70e7e8ad11263aec1484f70f5f9d",
+      "javascript_tests": "121/121",
+      "python_tests": "556/556"
     }
   },
   "budget_binding": {
@@ -585,5 +624,5 @@
     "warn_bootstrap_gzip_bytes": 28672,
     "max_bootstrap_gzip_bytes": 32768
   },
-  "current_surface_note": "Optimized measurements are bound to the corrected 73-record first-party runtime surface. Canonical project JSON startup requests remain zero; the complete no-JavaScript and recovery catalogue exposes all 73 identities exactly once."
+  "current_surface_note": "Optimized measurements are bound to the final combined 73-record cache-coherent runtime surface. Script-free method links carry the rendered method-page build. Started proposal drafts survive one automatic release navigation through bounded, one-shot tab session storage; if that storage is unavailable, navigation fails closed and leaves the form open. Canonical project JSON startup requests remain zero."
 }

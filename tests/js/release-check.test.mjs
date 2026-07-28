@@ -57,16 +57,38 @@ test('release navigation preserves product state and replaces only cache paramet
 
 test('stale page performs one release-bound replacement', async () => {
   let replaced = '';
+  let announced = null;
   const result = await checkForCurrentPage({
     documentImpl: documentStub(),
     locationImpl: { href: 'https://commonworld.net/?project=debian', replace(value) { replaced = value; } },
     historyImpl: {},
     fetchImpl: fetchStub(),
     now: () => 123,
+    beforeNavigate(value) { announced = value; },
   });
   assert.equal(result.state, 'reloading');
   assert.equal(new URL(replaced).searchParams.get('project'), 'debian');
   assert.equal(new URL(replaced).searchParams.get('cw_release'), latestBuild);
+  assert.equal(announced.target, replaced);
+  assert.equal(announced.page, 'index.html');
+});
+
+test('release navigation stays on the current page when draft preservation vetoes it', async () => {
+  let replaced = false;
+  const result = await checkForCurrentPage({
+    documentImpl: documentStub('propose.html'),
+    locationImpl: { href: 'https://commonworld.net/propose.html', replace() { replaced = true; } },
+    historyImpl: {},
+    fetchImpl: async () => ({
+      ok: true,
+      status: 200,
+      async json() { return { kind: 'commonworld.page_build_manifest', pages: { 'propose.html': latestBuild }, schema_version: 1 }; },
+    }),
+    now: () => 123,
+    beforeNavigate() { return false; },
+  });
+  assert.equal(result.state, 'navigation-blocked');
+  assert.equal(replaced, false);
 });
 
 test('matching release target stops a propagation reload loop', async () => {

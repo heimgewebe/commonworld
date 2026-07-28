@@ -13,7 +13,7 @@ if str(ROOT) not in sys.path:
 
 from scripts.commonworld_i18n import FALLBACK_LOCALE, german_surface_links, inject_locale_navigation
 from scripts.proposal_i18n import translate_proposal
-from scripts.public_cache import asset_version, stamp_page_build
+from scripts.public_cache import asset_version, stamp_page_build, version_page_links
 
 
 
@@ -59,7 +59,7 @@ def render(locale: str = FALLBACK_LOCALE) -> str:
         <h2 id="proposal-process-title">Was danach passiert</h2>
         <p>Der Vorschlag wird <strong>nicht automatisch veröffentlicht</strong>. Commonworld prüft Identität, Quellen, Commons-Eigenschaft, Handlungswege, Ortsgenauigkeit, Datenschutz und Aktualität. Erst ein separat geprüfter Repository-Commit kann einen Katalogeintrag veröffentlichen.</p>
         <p><strong>Öffentlichkeit:</strong> Der bevorzugte Eingang ist ein öffentliches GitHub-Issue. Trage deshalb keine E-Mail-Adresse, Telefonnummer, private Adresse, Koordinate, Wohnung, Dach-, Router- oder Haushaltsangabe ein. Dein GitHub-Konto dient als Kontaktmöglichkeit; Commonworld erhebt kein zusätzliches Kontaktfeld.</p>
-        <p>Ohne GitHub oder bei Netzfehlern kannst du eine validierte JSON-Datei lokal herunterladen. Commonworld speichert Formulareingaben nicht.</p>
+        <p>Ohne GitHub oder bei Netzfehlern kannst du eine validierte JSON-Datei lokal herunterladen. Commonworld speichert Formulareingaben nicht serverseitig. Zur unmittelbaren Wiederherstellung nach einem automatischen Versionswechsel wird ein begonnener Entwurf vorübergehend im Sitzungsspeicher dieses Tabs hinterlegt. Beim nächsten Laden wird er sofort gelöscht und nur wiederhergestellt, wenn er höchstens fünf Minuten alt ist.</p>
       </section>
 
       <form id="commons-proposal-form" class="proposal-form" novalidate>
@@ -112,6 +112,7 @@ def render(locale: str = FALLBACK_LOCALE) -> str:
     markup = translate_proposal(markup, locale)
     markup = german_surface_links(markup, locale, 'propose')
     markup = inject_locale_navigation(markup, locale, 'propose')
+    markup = version_page_links(markup, ('method.html', 'method.de.html'), ROOT)
     return stamp_page_build(markup, page_name)
 
 

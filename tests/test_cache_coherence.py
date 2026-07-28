@@ -4,7 +4,7 @@ import tempfile
 import unittest
 from pathlib import Path
 
-from scripts.public_cache import page_build_metadata, stamp_page_build
+from scripts.public_cache import page_build_metadata, stamp_page_build, version_page_links, versioned_page_href
 from scripts.validate_cache_coherence import ROOT, validate
 
 
@@ -22,6 +22,19 @@ class PublicCacheMetadataTests(unittest.TestCase):
         source = '<!doctype html>\n<html><head>\n    <meta charset="utf-8" />\n<meta name="commonworld-page" content="index.html" /></head></html>'
         with self.assertRaises(ValueError):
             stamp_page_build(source, "index.html")
+
+    def test_versioned_page_links_bind_rendered_target_build(self) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            method = stamp_page_build(
+                '<!doctype html>\n<html><head>\n    <meta charset="utf-8" />\n</head><body>method</body></html>\n',
+                "method.html",
+            )
+            (root / "method.html").write_text(method, encoding="utf-8")
+            build = page_build_metadata(method)[1]
+            self.assertEqual(f"./method.html?cw_release={build}", versioned_page_href("method.html", root))
+            rendered = version_page_links('<a href="./method.html">Method</a>', ("method.html",), root)
+            self.assertEqual(f'<a href="./method.html?cw_release={build}">Method</a>', rendered)
 
 
 class CacheCoherenceValidationTests(unittest.TestCase):

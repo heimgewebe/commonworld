@@ -54,6 +54,26 @@ def validate(root: Path = ROOT) -> list[str]:
                 f"public page release-check count mismatch: {relative} expected {expected_release_count}"
             )
 
+    for relative, method_page in (
+        ("index.html", "method.html"),
+        ("de.html", "method.de.html"),
+        ("propose.html", "method.html"),
+        ("propose.de.html", "method.de.html"),
+    ):
+        try:
+            declared_method, method_build = page_build_metadata(
+                (root / method_page).read_text(encoding="utf-8")
+            )
+            page = (root / relative).read_text(encoding="utf-8")
+        except (OSError, ValueError) as error:
+            errors.append(f"invalid versioned method link for {relative}: {error}")
+            continue
+        expected_href = f'href="./{method_page}?cw_release={method_build}"'
+        if declared_method != method_page or page.count(expected_href) != 1:
+            errors.append(f"public page method link is not build-versioned: {relative}")
+        if f'href="./{method_page}"' in page:
+            errors.append(f"public page retains an unversioned method link: {relative}")
+
     index = (root / "index.html").read_text(encoding="utf-8")
     for relative, token in (
         ("assets/commonworld-mark.svg", "./assets/commonworld-mark.svg"),

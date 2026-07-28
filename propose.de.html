@@ -3,7 +3,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="commonworld-page" content="propose.de.html" />
-    <meta name="commonworld-page-build" content="9a06254870eda037" />
+    <meta name="commonworld-page-build" content="5fed293dd6398819" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="color-scheme" content="dark" />
     <meta name="referrer" content="strict-origin-when-cross-origin" />
@@ -13,8 +13,8 @@
     <link rel="icon" href="./assets/commonworld-mark.svg?v=05905a6e42f8" type="image/svg+xml" />
     <link rel="stylesheet" href="./index.css?v=f38966774158" />
     <link rel="stylesheet" href="./assets/proposal.css?v=0823cd3bbbbd" />
-    <script type="module" src="./assets/commonworld-release-check.js?v=bee3ae4f1e8b"></script>
-    <script type="module" src="./assets/commonworld-proposal.js?v=e5ae0d076071"></script>
+    <script type="module" src="./assets/commonworld-release-check.js?v=8dd4fd5abe85"></script>
+    <script type="module" src="./assets/commonworld-proposal.js?v=82ebe90e26b4"></script>
   </head>
   <body class="proposal-page">
     <a class="skip-link" href="#commons-proposal-form">Zum Vorschlagsformular springen</a>
@@ -28,7 +28,7 @@
         <h2 id="proposal-process-title">Was danach passiert</h2>
         <p>Der Vorschlag wird <strong>nicht automatisch veröffentlicht</strong>. Commonworld prüft Identität, Quellen, Commons-Eigenschaft, Handlungswege, Ortsgenauigkeit, Datenschutz und Aktualität. Erst ein separat geprüfter Repository-Commit kann einen Katalogeintrag veröffentlichen.</p>
         <p><strong>Öffentlichkeit:</strong> Der bevorzugte Eingang ist ein öffentliches GitHub-Issue. Trage deshalb keine E-Mail-Adresse, Telefonnummer, private Adresse, Koordinate, Wohnung, Dach-, Router- oder Haushaltsangabe ein. Dein GitHub-Konto dient als Kontaktmöglichkeit; Commonworld erhebt kein zusätzliches Kontaktfeld.</p>
-        <p>Ohne GitHub oder bei Netzfehlern kannst du eine validierte JSON-Datei lokal herunterladen. Commonworld speichert Formulareingaben nicht.</p>
+        <p>Ohne GitHub oder bei Netzfehlern kannst du eine validierte JSON-Datei lokal herunterladen. Commonworld speichert Formulareingaben nicht serverseitig. Zur unmittelbaren Wiederherstellung nach einem automatischen Versionswechsel wird ein begonnener Entwurf vorübergehend im Sitzungsspeicher dieses Tabs hinterlegt. Beim nächsten Laden wird er sofort gelöscht und nur wiederhergestellt, wenn er höchstens fünf Minuten alt ist.</p>
       </section>
 
       <form id="commons-proposal-form" class="proposal-form" novalidate>
@@ -73,7 +73,7 @@
         <div id="proposal-fallback" class="proposal-fallback" hidden><p>Der Vorschlag bleibt ein Kandidat. Er erscheint dadurch nicht im Katalog.</p><p><a id="proposal-direct-link" href="https://github.com/heimgewebe/commonworld/issues/new?template=commons-proposal.yml" rel="external noreferrer">GitHub direkt öffnen</a></p></div>
       </form>
 
-      <section class="proposal-contracts" aria-labelledby="contracts-title"><h2 id="contracts-title">Maschinenlesbare Regeln</h2><ul><li><a href="./contracts/commonworld/proposal.schema.json">Vorschlagsschema</a></li><li><a href="./contracts/commonworld/editorial-review.contract.json">Redaktions- und Statusvertrag</a></li><li><a href="./contracts/commonworld/proposal-path.contract.json">Technischer Einreichungsweg</a></li><li><a href="./method.de.html">Methode und Datenschutz</a></li></ul></section>
+      <section class="proposal-contracts" aria-labelledby="contracts-title"><h2 id="contracts-title">Maschinenlesbare Regeln</h2><ul><li><a href="./contracts/commonworld/proposal.schema.json">Vorschlagsschema</a></li><li><a href="./contracts/commonworld/editorial-review.contract.json">Redaktions- und Statusvertrag</a></li><li><a href="./contracts/commonworld/proposal-path.contract.json">Technischer Einreichungsweg</a></li><li><a href="./method.de.html?cw_release=4b8edcb2a1d7cb97">Methode und Datenschutz</a></li></ul></section>
     </main>
   </body>
 </html>

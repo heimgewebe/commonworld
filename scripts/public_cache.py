@@ -10,6 +10,7 @@ from pathlib import Path
 PAGE_BUILD_PLACEHOLDER = "0" * 16
 PAGE_NAME_PATTERN = re.compile(r"^[a-z0-9][a-z0-9.-]{0,79}$")
 PAGE_BUILD_PATTERN = re.compile(r"^[0-9a-f]{16}$")
+RELEASE_PARAMETER = "cw_release"
 _PAGE_META_PATTERN = re.compile(r'<meta name="commonworld-page" content="([^"]+)" />')
 _BUILD_META_PATTERN = re.compile(r'<meta name="commonworld-page-build" content="([0-9a-f]{16})" />')
 
@@ -36,6 +37,25 @@ def stamp_page_build(markup: str, page_name: str) -> str:
     stamped = markup.replace(charset, metadata, 1)
     build = hashlib.sha256(stamped.encode("utf-8")).hexdigest()[:16]
     return stamped.replace(PAGE_BUILD_PLACEHOLDER, build, 1)
+
+
+def versioned_page_href(page_name: str, root: Path) -> str:
+    """Return one browser-cache-busting href bound to a rendered public page."""
+    page_path = root / page_name
+    declared_page, build = page_build_metadata(page_path.read_text(encoding="utf-8"))
+    if declared_page != page_name:
+        raise ValueError(f"public page identity mismatch: {page_name!r}")
+    return f"./{page_name}?{RELEASE_PARAMETER}={build}"
+
+
+def version_page_links(markup: str, page_names: tuple[str, ...], root: Path) -> str:
+    """Version exact internal links without changing unrelated query or hash state."""
+    rendered = markup
+    for page_name in page_names:
+        plain = f'href="./{page_name}"'
+        if plain in rendered:
+            rendered = rendered.replace(plain, f'href="{versioned_page_href(page_name, root)}"')
+    return rendered
 
 
 def page_build_metadata(markup: str) -> tuple[str, str]:

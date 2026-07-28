@@ -20,7 +20,7 @@ from scripts.commonworld_i18n import (
 )
 from scripts.commonworld_geo import public_locations
 from scripts.catalog_bootstrap import bootstrap_record
-from scripts.public_cache import asset_version, stamp_page_build
+from scripts.public_cache import asset_version, stamp_page_build, version_page_links
 
 ACTION_LINK_TYPES = {"visit", "use", "borrow", "learn", "contribute", "volunteer", "donate", "contact", "replicate"}
 TAXONOMY = load_taxonomy(ROOT)
@@ -532,6 +532,7 @@ def render_shell(root: Path = ROOT, locale: str = FALLBACK_LOCALE) -> str:
     markup = translate_shell(markup, locale)
     markup = german_surface_links(markup, locale, 'index')
     markup = inject_locale_navigation(markup, locale, 'index')
+    markup = version_page_links(markup, ('method.html', 'method.de.html'), root)
     return stamp_page_build(markup, page_name)
 
 
@@ -580,10 +581,10 @@ def main() -> int:
     (ROOT / "assets/commonworld-en-locale.mjs").write_text(render_locale_module("en", ROOT), encoding="utf-8")
     synchronize_module_import_versions(ROOT)
     synchronize_runtime_url_versions(ROOT)
-    (ROOT / "index.html").write_text(render_shell(ROOT, "en"), encoding="utf-8")
-    (ROOT / "de.html").write_text(render_shell(ROOT, "de"), encoding="utf-8")
     (ROOT / "method.html").write_text(render_method(ROOT, "en"), encoding="utf-8")
     (ROOT / "method.de.html").write_text(render_method(ROOT, "de"), encoding="utf-8")
+    (ROOT / "index.html").write_text(render_shell(ROOT, "en"), encoding="utf-8")
+    (ROOT / "de.html").write_text(render_shell(ROOT, "de"), encoding="utf-8")
     print("commonworld localized globe-first shells, bootstrap module, locale module and method pages rendered from public contracts")
     return 0
 

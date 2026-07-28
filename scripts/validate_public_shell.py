@@ -76,7 +76,7 @@ REQUIRED_HTML = (
     'id="project-focus"',
     'href="./catalog/catalog.json"',
     'href="./contracts/commonworld/project.schema.json"',
-    'href="./method.html"',
+    'href="./method.html?cw_release=',
     'href="./contracts/commonworld/current-state.contract.json"',
     'type="application/json"',
     'No API runtime, no write path and no standalone CLI.',

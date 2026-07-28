@@ -4,10 +4,18 @@ const MANIFEST_KIND = 'commonworld.page_build_manifest';
 const MANIFEST_URL = './assets/commonworld-page-builds.json';
 const RELEASE_PARAMETER = 'cw_release';
 const PROBE_PARAMETER = 'cw_probe';
+export const RELEASE_NAVIGATION_EVENT = 'commonworld:release-navigation';
 
 function metaContent(documentImpl, name) {
   const value = documentImpl?.querySelector?.(`meta[name="${name}"]`)?.content;
   return typeof value === 'string' ? value : '';
+}
+
+function announceReleaseNavigation(documentImpl, detail) {
+  if (typeof documentImpl?.dispatchEvent !== 'function') return true;
+  const EventImpl = documentImpl.defaultView?.CustomEvent ?? globalThis.CustomEvent;
+  if (typeof EventImpl !== 'function') return true;
+  return documentImpl.dispatchEvent(new EventImpl(RELEASE_NAVIGATION_EVENT, { detail, cancelable: true }));
 }
 
 export function validatePageBuildManifest(value) {
@@ -46,6 +54,7 @@ export async function checkForCurrentPage({
   historyImpl = globalThis.history,
   fetchImpl = globalThis.fetch,
   now = () => Date.now(),
+  beforeNavigate = null,
 } = {}) {
   if (!documentImpl || !locationImpl || typeof fetchImpl !== 'function') return Object.freeze({ state: 'unsupported' });
   const page = metaContent(documentImpl, 'commonworld-page');
@@ -76,8 +85,13 @@ export async function checkForCurrentPage({
   }
 
   const target = releaseNavigationUrl(currentUrl.href, latestBuild);
+  const navigation = Object.freeze({ page, currentBuild, latestBuild, target });
+  const navigationAllowed = typeof beforeNavigate === 'function'
+    ? beforeNavigate(navigation) !== false
+    : announceReleaseNavigation(documentImpl, navigation);
+  if (!navigationAllowed) return Object.freeze({ state: 'navigation-blocked', ...navigation });
   locationImpl.replace(target);
-  return Object.freeze({ state: 'reloading', page, currentBuild, latestBuild, target });
+  return Object.freeze({ state: 'reloading', ...navigation });
 }
 
 if (typeof document !== 'undefined' && typeof location !== 'undefined' && /^https?:$/u.test(location.protocol)) {
