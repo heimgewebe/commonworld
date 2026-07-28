@@ -304,6 +304,10 @@ class PagesDeploymentReadbackTests(unittest.TestCase):
                 'text/plain; charset=utf-8"',
                 'text/plain; charset="utf-8"; boundary=extra',
                 'text/plain; charset=utf-8; charset=utf-8',
+                'text/plain;\r\n charset=utf-8',
+                'text/plain;\vcharset=utf-8',
+                'text/plain;\fcharset=utf-8',
+                'text/plain;\u00a0charset=utf-8',
             )
             for content_type in malformed_values:
                 with self.subTest(content_type=content_type):
