@@ -66,6 +66,8 @@ import {
   ringOrbitStartAngle,
   safeExternalHttpsUrl,
   sampledDiagnosticPublicationDue,
+  SORT_VALUES,
+  sortRecords,
   searchFromState,
   serializeDigitalPath,
   semanticLocationLine,
@@ -458,11 +460,12 @@ test('sphere detail levels remain stable for overview and close-up rendering', (
 });
 
 test('deep-link state accepts surface, search, identity, filters and clamped camera', () => {
-  const state = stateFromSearch('?surface=text&q=open%20data&project=debian&view=layers&layer=software_infrastructure&commons_type=software&presence=digital&action=contribute&language=de&access=public&freshness=current&curation=listed&lng=999&lat=-999&z=99&p=99', ['debian']);
+  const state = stateFromSearch('?surface=text&q=open%20data&sort=catalogued&project=debian&view=layers&layer=software_infrastructure&commons_type=software&presence=digital&action=contribute&language=de&access=public&freshness=current&curation=listed&lng=999&lat=-999&z=99&p=99', ['debian']);
   assert.equal(state.project, 'debian');
   assert.equal(state.view, 'layers');
   assert.equal(state.surface, 'text');
   assert.equal(state.query, 'open data');
+  assert.equal(state.sort, 'catalogued');
   assert.equal(state.layer, 'software_infrastructure');
   assert.deepEqual(state.digitalPath, ['sphere', 'software_tools_production', 'free_software']);
   assert.deepEqual(
@@ -504,11 +507,12 @@ test('legacy layer links preserve their exact six-layer filter and URL until exp
 });
 
 test('unknown identities, filters and malformed numbers fail closed', () => {
-  const state = stateFromSearch('?project=unknown&layer=unknown&commons_type=imaginary&presence=space&action=hack&language=../../private&access=secret&freshness=future&curation=hidden&lng=nope', ['debian']);
+  const state = stateFromSearch('?project=unknown&layer=unknown&sort=opaque&commons_type=imaginary&presence=space&action=hack&language=../../private&access=secret&freshness=future&curation=hidden&lng=nope', ['debian']);
   assert.equal(state.project, null);
   assert.equal(state.layer, null);
   assert.deepEqual(state.digitalPath, DIGITAL_ROOT_PATH);
   assert.equal(state.surface, 'globe');
+  assert.equal(state.sort, 'auto');
   assert.deepEqual(
     { commons_type: state.commons_type, presence: state.presence, action: state.action, language: state.language, access: state.access, freshness: state.freshness, curation: state.curation },
     { commons_type: null, presence: [], action: null, language: null, access: null, freshness: null, curation: null },
@@ -537,6 +541,7 @@ test('serialized state roundtrips selection, view, surface, query and filters', 
     view: 'layers',
     surface: 'text',
     query: 'freie Software',
+    sort: 'reviewed',
     commons_type: 'software',
     presence: ['digital'],
     action: 'learn',
@@ -555,11 +560,38 @@ test('serialized state roundtrips selection, view, surface, query and filters', 
   assert.equal(state.view, 'layers');
   assert.equal(state.surface, 'text');
   assert.equal(state.query, 'freie Software');
+  assert.equal(state.sort, 'reviewed');
+  assert.equal(parameters.get('sort'), 'reviewed');
   assert.deepEqual(
     { commons_type: state.commons_type, presence: state.presence, action: state.action, language: state.language, access: state.access, freshness: state.freshness, curation: state.curation },
     { commons_type: 'software', presence: ['digital'], action: 'learn', language: 'unknown', access: 'unknown', freshness: 'stale', curation: 'verified' },
   );
   assert.equal(state.camera.zoom, 3.46);
+});
+
+test('record sorting is stable, transparent and separate from filtering', () => {
+  const records = [
+    { id: 'zulu', title: 'Zulu', curation: { catalogued_at: '2026-07-10', reviewed_at: '2026-07-27' }, presence: { geographic: [{ id: 'z', mode: 'exact', geometry: { type: 'Point', coordinates: [10, 0] } }], digital: { available: false } } },
+    { id: 'alpha', title: 'Alpha', curation: { catalogued_at: '2026-07-20', reviewed_at: '2026-07-21' }, presence: { geographic: [{ id: 'a', mode: 'exact', geometry: { type: 'Point', coordinates: [1, 0] } }], digital: { available: false } } },
+    { id: 'beta', title: 'Beta', curation: { catalogued_at: '2026-07-20', reviewed_at: '2026-07-26' }, presence: { geographic: [{ id: 'b', mode: 'exact', geometry: { type: 'Point', coordinates: [2, 0] } }], digital: { available: false } } },
+    { id: 'digital', title: 'Digital', curation: { catalogued_at: '2026-07-30', reviewed_at: '2026-07-30' }, presence: { geographic: [], digital: { available: true } } },
+  ];
+  assert.deepEqual(SORT_VALUES, ['auto', 'catalogued', 'reviewed', 'title']);
+  assert.deepEqual(sortRecords(records, { sort: 'catalogued' }).map(({ id }) => id), ['digital', 'alpha', 'beta', 'zulu']);
+  assert.deepEqual(sortRecords(records, { sort: 'reviewed' }).map(({ id }) => id), ['digital', 'zulu', 'beta', 'alpha']);
+  assert.deepEqual(sortRecords(records, { sort: 'title', locale: 'de' }).map(({ id }) => id), ['alpha', 'beta', 'digital', 'zulu']);
+  assert.equal(sortRecords(records, { sort: 'auto' }), records);
+  assert.deepEqual(sortRecords(records, { sort: 'auto', nearbyOrigin: [0, 0] }).map(({ id }) => id), ['alpha', 'beta', 'zulu', 'digital']);
+  assert.equal(sortRecords(records, { sort: 'auto', query: 'open' }), records);
+  assert.deepEqual(records.map(({ id }) => id), ['zulu', 'alpha', 'beta', 'digital']);
+});
+
+test('public catalogue entries expose a stable catalogue date no later than publication', () => {
+  const manifest = JSON.parse(readFileSync(new URL('../../catalog/catalog.json', import.meta.url), 'utf8'));
+  for (const record of loadPublicCatalogRecords()) {
+    assert.match(record.curation.catalogued_at, /^\d{4}-\d{2}-\d{2}$/);
+    assert(record.curation.catalogued_at <= manifest.published_at, record.id);
+  }
 });
 
 test('record filtering keeps one shared search and layer truth', () => {

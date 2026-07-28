@@ -388,6 +388,11 @@
             "archived"
           ]
         },
+        "catalogued_at": {
+          "type": "string",
+          "format": "date",
+          "description": "Stable date on which the record first entered the public Commonworld catalogue. Later reviews must not change it."
+        },
         "reviewed_by": {
           "type": "string",
           "minLength": 2,

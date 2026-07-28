@@ -1,4 +1,4 @@
-import { BOOTSTRAP_RECORDS } from './commonworld-bootstrap-catalog.mjs?v=92d482ba20f2';
+import { BOOTSTRAP_RECORDS } from './commonworld-bootstrap-catalog.mjs?v=849588aaddcf';
 import { createCatalogLoadCache, loadCatalogAggregate, loadCatalogDetail, loadCatalogShard, shardKeyForIdentity } from './commonworld-catalog-runtime.mjs?v=5954690ce64b';
 import { actionLabel, documentLocale, localizeCatalogRecords, text as i18nText, themeLabel } from './commonworld-i18n.mjs?v=b8ef1bc714b8';
 import {
@@ -52,9 +52,11 @@ import {
   sphereRingFontSize,
   sphereRingPrimaryIndices,
   sphereRingStrokeWidth,
+  SORT_VALUES,
+  sortRecords,
   stateFromSearch,
   visibleDigitalNodes,
-} from './commonworld-core.mjs?v=27c6a2980a90';
+} from './commonworld-core.mjs?v=69fec441fd3f';
 
 const LOCALE = documentLocale();
 const t = (key, germanFallback, variables = {}) => i18nText(LOCALE, key, germanFallback, variables);
@@ -130,6 +132,7 @@ const elements = {
   searchClear: document.querySelector('#search-clear'),
   filterToggle: document.querySelector('#filter-toggle'),
   filterToggleCount: document.querySelector('#filter-toggle-count'),
+  discoverySort: document.querySelector('#discovery-sort'),
   filterSectionsToggle: document.querySelector('#filter-sections-toggle'),
   filterSections: document.querySelector('#filter-sections'),
   activeFilterChips: document.querySelector('#active-filter-chips'),
@@ -210,6 +213,7 @@ const runtime = {
     view: 'globe',
     surface: 'globe',
     query: '',
+    sort: 'auto',
     commons_type: null,
     presence: null,
     action: null,
@@ -1046,6 +1050,7 @@ function filterStateForRecords(overrides = {}) {
     nearbyOrigin: nearbyActive ? runtime.state.nearbyOrigin : null,
     nearbyRadiusMeters: nearbyActive ? runtime.state.nearbyRadiusMeters : null,
     searchIndex: runtime.searchIndex,
+    locale: LOCALE,
   };
 }
 
@@ -1072,6 +1077,10 @@ function visibleRecords() {
   runtime.visibleRecordsCache = { key, records, ids: new Set(records.map(({ id }) => id)) };
   runtime.visibleDigitalViewCache = null;
   return records;
+}
+
+function orderedVisibleRecords() {
+  return sortRecords(visibleRecords(), filterStateForRecords());
 }
 
 function visibleRecordIds() {
@@ -1828,6 +1837,7 @@ function syncIntentFilterControls() {
   }
   elements.filterCountry.value = runtime.countryEntries.has(runtime.state.country) ? runtime.state.country : '';
   elements.filterNearbyRadius.value = Number.isFinite(runtime.state.nearbyRadiusMeters) ? String(runtime.state.nearbyRadiusMeters) : '';
+  elements.discoverySort.value = runtime.state.sort ?? 'auto';
   elements.filterClear.disabled = !(hasIntentFilters() || hasSpatialFilters());
   renderActiveFilterChips();
 }
@@ -1843,6 +1853,12 @@ function setIntentFilter(name, value, { historyMode = 'push' } = {}) {
     const allowed = [...select.options].some((option) => option.value === value);
     runtime.state[name] = allowed && value ? value : null;
   }
+  renderDiscoveryState();
+  if (historyMode) writeHistory(historyMode);
+}
+
+function setDiscoverySort(value, { historyMode = 'push' } = {}) {
+  runtime.state.sort = SORT_VALUES.includes(value) ? value : 'auto';
   renderDiscoveryState();
   if (historyMode) writeHistory(historyMode);
 }
@@ -2192,7 +2208,7 @@ function createDiscoveryResult(record, position) {
 }
 
 function renderDiscoveryResults() {
-  const records = visibleRecords();
+  const records = orderedVisibleRecords();
   const preview = records.slice(0, DISCOVERY_RESULT_PREVIEW_LIMIT);
   elements.discoveryList.replaceChildren(...preview.map(createDiscoveryResult));
   const total = records.length;
@@ -2271,7 +2287,7 @@ function geographicSelectionSummary(records) {
 }
 
 function renderTextView() {
-  const visible = visibleRecords();
+  const visible = orderedVisibleRecords();
   syncPresentationBudgets();
   const presented = visible.slice(0, runtime.textPresentationLimit);
   const visibleIds = new Set(presented.map(({ id }) => id));
@@ -3362,6 +3378,7 @@ function wireControls() {
     elements.filterSectionsToggle.setAttribute('aria-expanded', String(opening));
   });
   elements.filterCountry.addEventListener('change', () => setCountryFilter(elements.filterCountry.value));
+  elements.discoverySort.addEventListener('change', () => setDiscoverySort(elements.discoverySort.value));
   elements.filterNearbyRadius.addEventListener('change', () => {
     const radius = Number(elements.filterNearbyRadius.value);
     if (!elements.filterNearbyRadius.value || !Number.isFinite(radius)) {

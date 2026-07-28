@@ -2028,6 +2028,20 @@ async function intentSearchDiscoveryScenario() {
 
   await run.page.locator('#commons-search').fill('');
   await run.page.waitForFunction((count) => document.querySelectorAll('.discovery-result').length === count, discoveryPreviewCount(expectedDigitalProjection.catalogIds));
+  const firstResultId = () => run.page.locator('.discovery-result').first().getAttribute('data-commonproject-id');
+  assert((await firstResultId()) === expectedDigitalProjection.catalogIds[0], 'result sorting: automatic source order changed without query or location');
+  await run.page.locator('#discovery-sort').selectOption('catalogued');
+  await run.page.waitForFunction(() => new URL(location.href).searchParams.get('sort') === 'catalogued' && document.querySelector('.discovery-result')?.dataset.commonprojectId === 'cooperation-jackson');
+  assert((await firstResultId()) === 'cooperation-jackson', 'result sorting: new-to-catalogue did not place the newest alphabetical tie-break first');
+  await run.page.locator('#discovery-sort').selectOption('reviewed');
+  await run.page.waitForFunction(() => new URL(location.href).searchParams.get('sort') === 'reviewed' && document.querySelector('.discovery-result')?.dataset.commonprojectId === 'cooperation-jackson');
+  assert((await firstResultId()) === 'cooperation-jackson', 'result sorting: recently reviewed did not use editorial review date');
+  await run.page.locator('#discovery-sort').selectOption('title');
+  await run.page.waitForFunction(() => new URL(location.href).searchParams.get('sort') === 'title' && document.querySelector('.discovery-result')?.dataset.commonprojectId === 'aflaj-irrigation-systems-oman');
+  assert((await firstResultId()) === 'aflaj-irrigation-systems-oman', 'result sorting: title order is not locale-aware A-Z');
+  await run.page.locator('#discovery-sort').selectOption('auto');
+  await run.page.waitForFunction((firstId) => !new URL(location.href).searchParams.has('sort') && document.querySelector('.discovery-result')?.dataset.commonprojectId === firstId, expectedDigitalProjection.catalogIds[0]);
+  assert((await firstResultId()) === expectedDigitalProjection.catalogIds[0], 'result sorting: automatic mode did not restore stable source order');
   await run.page.locator('#filter-commons-type').selectOption('community-network');
   await run.page.waitForFunction((count) => new URL(location.href).searchParams.get('commons_type') === 'community-network' && document.querySelectorAll('.discovery-result').length === count, discoveryPreviewCount(expectedDigitalProjection.communityNetworkIds));
   assertSameIds(await resultIds(), discoveryPreviewIds(expectedDigitalProjection.communityNetworkIds), 'intent filters: Commons-Art preview differs from deterministic catalog derivation');

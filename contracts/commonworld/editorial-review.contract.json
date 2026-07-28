@@ -1,7 +1,7 @@
 {
   "schema_version": 1,
   "kind": "commonworld_editorial_review_contract",
-  "current_as_of": "2026-07-16",
+  "current_as_of": "2026-07-28",
   "statuses": [
     "submitted",
     "needs_information",
@@ -72,7 +72,9 @@
     "proposal_is_not_catalog_record": true,
     "automatic_publication": false,
     "catalog_change_requires_reviewed_repository_commit": true,
-    "published_record_must_validate_against": "contracts/commonworld/project.schema.json"
+    "published_record_must_validate_against": "contracts/commonworld/project.schema.json",
+    "catalogued_at_set_on_first_publication": true,
+    "catalogued_at_immutable_after_publication": true
   },
   "freshness": {
     "next_review_at_required_for_acceptance": true,

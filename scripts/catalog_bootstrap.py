@@ -5,7 +5,7 @@ from __future__ import annotations
 import copy
 
 BOOTSTRAP_OMITTED_FIELDS = frozenset({"handoff"})
-CURATION_BOOTSTRAP_FIELDS = ("state", "reviewed_at", "next_review_at")
+CURATION_BOOTSTRAP_FIELDS = ("state", "catalogued_at", "reviewed_at", "next_review_at")
 ACTIVITY_BOOTSTRAP_FIELDS = ("status", "observed_at")
 SOURCE_BOOTSTRAP_FIELDS = ("label", "url")
 LINK_BOOTSTRAP_FIELDS = ("type", "label", "url")

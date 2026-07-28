@@ -247,13 +247,16 @@ def validate_public_catalog(root: Path = ROOT) -> list[str]:
             errors.append(f"public catalog project {relative.name} must be in a public curation state")
         if curation.get("reviewed_by") != "Commonworld editorial review":
             errors.append(f"public catalog project {relative.name} must name the editorial reviewer")
+        catalogued_at = _parse_date(curation.get("catalogued_at"))
         reviewed_at = _parse_date(curation.get("reviewed_at"))
         next_review_at = _parse_date(curation.get("next_review_at"))
-        if reviewed_at is None or next_review_at is None:
+        if catalogued_at is None or reviewed_at is None or next_review_at is None:
             errors.append(f"public catalog project {relative.name} has invalid curation dates")
         else:
             if next_review_at <= reviewed_at:
                 errors.append(f"public catalog project {relative.name} next review must follow editorial review")
+            if published_at and catalogued_at > published_at:
+                errors.append(f"public catalog project {relative.name} catalogue date must not be after catalog publication")
             if published_at and reviewed_at > published_at:
                 errors.append(f"public catalog project {relative.name} review date must not be after catalog publication")
 

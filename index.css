@@ -2628,9 +2628,37 @@ html:not([data-input-modality="pointer"]) .digital-ribbon-item:focus-visible {
 }
 
 .discovery-summary-row {
+  display: grid;
+  grid-template-columns: minmax(12rem, auto) minmax(14rem, 1fr) auto auto;
+  align-items: end;
   margin-top: 0.65rem;
   padding-top: 0.65rem;
   border-top: 1px solid var(--line);
+}
+
+.discovery-sort {
+  display: grid;
+  gap: 0.25rem;
+  color: var(--muted);
+  font-size: 0.72rem;
+  font-weight: 700;
+}
+
+.discovery-sort select {
+  min-height: 2.75rem;
+  padding: 0.45rem 2.1rem 0.45rem 0.7rem;
+  border: 1px solid var(--line-strong);
+  border-radius: 0.75rem;
+  background: #0b201b;
+  color: #edf4ef;
+  font: inherit;
+}
+
+.discovery-sort-note {
+  max-width: 32rem;
+  color: var(--muted);
+  font-size: 0.72rem;
+  line-height: 1.35;
 }
 
 .discovery-count {
@@ -2781,6 +2809,16 @@ html:not([data-input-modality="pointer"]) .digital-ribbon-item:focus-visible {
 }
 
 @media (max-width: 48rem) {
+  .discovery-summary-row {
+    grid-template-columns: 1fr auto;
+    align-items: end;
+  }
+
+  .discovery-sort,
+  .discovery-sort-note {
+    grid-column: 1 / -1;
+  }
+
   .topbar {
     grid-template-columns: auto minmax(0, 1fr) auto auto;
     gap: 0.5rem;
