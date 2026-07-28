@@ -33,6 +33,7 @@ MIN_REMAINING_VALIDITY = timedelta(days=30)
 MAX_REMAINING_VALIDITY = timedelta(days=366)
 REPOSITORY_RE = re.compile(r"^[A-Za-z0-9_.-]+/[A-Za-z0-9_.-]+$")
 FIELD_LINE_RE = re.compile(r"^(?P<name>[A-Za-z][A-Za-z0-9-]*): (?P<value>\S(?:.*\S)?)$")
+FORBIDDEN_LINE_CHARACTERS = {"\x0b", "\x0c", "\x85", "\u2028", "\u2029"}
 RFC3339_RE = re.compile(
     r"^(?P<date>\d{4}-(?:0[1-9]|1[0-2])-(?:0[1-9]|[12]\d|3[01]))"
     r"T(?P<hour>[01]\d|2[0-3]):(?P<minute>[0-5]\d):(?P<second>[0-5]\d)"
@@ -80,7 +81,9 @@ def _parse_rfc3339(value: str) -> datetime:
 def parse_security_txt(text: str) -> tuple[dict[str, list[str]], list[str]]:
     fields: dict[str, list[str]] = defaultdict(list)
     errors: list[str] = []
-    for number, raw_line in enumerate(text.splitlines(), start=1):
+    if any(character in text for character in FORBIDDEN_LINE_CHARACTERS):
+        errors.append("security.txt may use only LF line separators")
+    for number, raw_line in enumerate(text.split("\n"), start=1):
         if not raw_line or raw_line.startswith("#"):
             continue
         match = FIELD_LINE_RE.fullmatch(raw_line)

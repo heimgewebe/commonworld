@@ -53,6 +53,17 @@ class SecurityPolicyTests(unittest.TestCase):
                 errors = validate_security_policy(root, now=self.NOW)
             self.assertTrue(any(expected in error for error in errors), errors)
 
+    def test_only_lf_is_accepted_as_line_separator(self) -> None:
+        separators = ("\x0b", "\x0c", "\x85", "\u2028", "\u2029")
+        for separator in separators:
+            with self.subTest(separator=ascii(separator)), tempfile.TemporaryDirectory() as directory:
+                root = self.copy_surface(directory)
+                path = root / ".well-known/security.txt"
+                text = path.read_text(encoding="utf-8").replace("\nExpires:", separator + "Expires:", 1)
+                path.write_text(text, encoding="utf-8")
+                errors = validate_security_policy(root, now=self.NOW)
+            self.assertIn("security.txt may use only LF line separators", errors)
+
     def test_exact_field_grammar_and_terminal_lf_are_required(self) -> None:
         with tempfile.TemporaryDirectory() as directory:
             root = self.copy_surface(directory)
