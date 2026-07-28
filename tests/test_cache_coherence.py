@@ -1,75 +1,158 @@
 from __future__ import annotations
 
+import json
+import shutil
 import tempfile
 import unittest
 from pathlib import Path
 
-from scripts.public_cache import page_build_metadata, stamp_page_build, version_page_links, versioned_page_href
+from scripts.build_page_release_manifest import compute_release_id, snapshot_files
+from scripts.public_cache import (
+    RELEASE_ID_PLACEHOLDER,
+    finalize_page_release,
+    page_build_metadata,
+    page_release_id,
+    stamp_page_build,
+)
 from scripts.validate_cache_coherence import ROOT, validate
+
+
+SOURCE = '<!doctype html>\n<html><head>\n    <meta charset="utf-8" />\n</head><body>one</body></html>\n'
 
 
 class PublicCacheMetadataTests(unittest.TestCase):
     def test_page_build_is_deterministic_and_content_bound(self) -> None:
-        source = '<!doctype html>\n<html><head>\n    <meta charset="utf-8" />\n</head><body>one</body></html>\n'
-        first = stamp_page_build(source, "index.html")
-        second = stamp_page_build(source, "index.html")
-        changed = stamp_page_build(source.replace("one", "two"), "index.html")
+        first = stamp_page_build(SOURCE, "index.html")
+        second = stamp_page_build(SOURCE, "index.html")
+        changed = stamp_page_build(SOURCE.replace("one", "two"), "index.html")
         self.assertEqual(first, second)
         self.assertNotEqual(page_build_metadata(first)[1], page_build_metadata(changed)[1])
-        self.assertEqual(("index.html", page_build_metadata(first)[1]), page_build_metadata(first))
+        self.assertEqual(RELEASE_ID_PLACEHOLDER, page_release_id(first))
 
-    def test_page_build_rejects_duplicate_metadata(self) -> None:
-        source = '<!doctype html>\n<html><head>\n    <meta charset="utf-8" />\n<meta name="commonworld-page" content="index.html" /></head></html>'
+    def test_release_self_reference_does_not_change_page_build(self) -> None:
+        stamped = stamp_page_build(SOURCE, "index.html")
+        before = page_build_metadata(stamped)[1]
+        finalized = finalize_page_release(stamped, "a" * 20)
+        self.assertEqual(before, page_build_metadata(finalized)[1])
+        self.assertEqual("a" * 20, page_release_id(finalized))
+        self.assertIn('<base href="/releases/aaaaaaaaaaaaaaaaaaaa/" />', finalized)
+
+    def test_final_html_drift_is_rejected_even_when_metadata_is_unchanged(self) -> None:
+        finalized = finalize_page_release(stamp_page_build(SOURCE, "method.html"), "b" * 20)
+        drifted = finalized.replace("one", "changed after stamping", 1)
+        with self.assertRaisesRegex(ValueError, "does not match final HTML bytes"):
+            page_build_metadata(drifted)
+
+    def test_page_build_rejects_duplicate_cache_metadata(self) -> None:
+        source = SOURCE.replace(
+            '<meta charset="utf-8" />',
+            '<meta charset="utf-8" />\n<meta name="commonworld-page" content="index.html" />',
+        )
         with self.assertRaises(ValueError):
             stamp_page_build(source, "index.html")
-
-    def test_versioned_page_links_bind_rendered_target_build(self) -> None:
-        with tempfile.TemporaryDirectory() as directory:
-            root = Path(directory)
-            method = stamp_page_build(
-                '<!doctype html>\n<html><head>\n    <meta charset="utf-8" />\n</head><body>method</body></html>\n',
-                "method.html",
-            )
-            (root / "method.html").write_text(method, encoding="utf-8")
-            build = page_build_metadata(method)[1]
-            self.assertEqual(f"./method.html?cw_release={build}", versioned_page_href("method.html", root))
-            rendered = version_page_links('<a href="./method.html">Method</a>', ("method.html",), root)
-            self.assertEqual(f'<a href="./method.html?cw_release={build}">Method</a>', rendered)
 
 
 class CacheCoherenceValidationTests(unittest.TestCase):
     def test_repository_cache_coherence_validates(self) -> None:
         self.assertEqual([], validate(ROOT))
 
-    def test_validator_rejects_stale_page_manifest(self) -> None:
+    def test_release_bound_pages_use_base_safe_fragment_links(self) -> None:
+        expected = {
+            "index.html": 'href="/#static-catalog-fallback"',
+            "de.html": 'href="/de.html#static-catalog-fallback"',
+            "propose.html": 'href="/propose.html#commons-proposal-form"',
+            "propose.de.html": 'href="/propose.de.html#commons-proposal-form"',
+        }
+        for relative, token in expected.items():
+            with self.subTest(relative=relative):
+                page = (ROOT / relative).read_text(encoding="utf-8")
+                self.assertNotIn('href="#', page)
+                self.assertEqual(1, page.count(token))
+
+    def test_release_checker_survives_removal_of_the_page_snapshot(self) -> None:
+        manifest = json.loads((ROOT / "assets/commonworld-page-builds.json").read_text(encoding="utf-8"))
+        release_id = manifest["release_id"]
+        expected = '<script type="module" src="/assets/commonworld-release-check.js?v='
+        forbidden = '<script type="module" src="./assets/commonworld-release-check.js?v='
+        for relative in ("index.html", "de.html", "propose.html", "propose.de.html"):
+            with self.subTest(relative=relative):
+                canonical = (ROOT / relative).read_text(encoding="utf-8")
+                snapshot = (ROOT / "releases" / release_id / relative).read_text(encoding="utf-8")
+                self.assertIn(expected, canonical)
+                self.assertIn(expected, snapshot)
+                self.assertNotIn(forbidden, canonical)
+                self.assertNotIn(forbidden, snapshot)
+
+    def test_release_identity_changes_when_public_asset_changes(self) -> None:
+        current = compute_release_id(ROOT)
         with tempfile.TemporaryDirectory() as directory:
             root = Path(directory)
-            for relative in (
-                "assets/commonworld-page-builds.json",
-                "assets/commonworld-release-check.js",
-                "assets/commonworld-mark.svg",
-                "assets/vendor/maplibre-gl.css",
-                "assets/vendor/maplibre-gl.js",
-                "assets/ipad-layout.css",
-                "assets/commonworld-app.js",
-                "assets/commonworld-proposal.js",
-                "assets/proposal.css",
-                "assets/map/commonworld-country-boundaries.geojson",
-                "assets/map/openfreemap-liberty.json",
-                "index.css",
-                "package.json",
-            ):
-                source = ROOT / relative
+            for source in snapshot_files(ROOT, include_manifest=False):
+                relative = source.relative_to(ROOT)
                 target = root / relative
                 target.parent.mkdir(parents=True, exist_ok=True)
-                target.write_bytes(source.read_bytes())
-            for relative in ("index.html", "de.html", "method.html", "method.de.html", "propose.html", "propose.de.html"):
-                source = ROOT / relative
+                shutil.copy2(source, target)
+            asset = root / "assets/commonworld-mark.svg"
+            asset.write_text(f"{asset.read_text(encoding='utf-8')}\n", encoding="utf-8")
+            self.assertNotEqual(current, compute_release_id(root))
+
+    def test_validator_rejects_stale_final_page_bytes_and_snapshot(self) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            manifest = json.loads((ROOT / "assets/commonworld-page-builds.json").read_text(encoding="utf-8"))
+            release_id = manifest["release_id"]
+            for source in snapshot_files(ROOT, include_manifest=True):
+                relative = source.relative_to(ROOT)
                 target = root / relative
-                target.write_bytes(source.read_bytes())
-            manifest = root / "assets/commonworld-page-builds.json"
-            manifest.write_text('{"kind":"commonworld.page_build_manifest","pages":{},"schema_version":1}\n', encoding="utf-8")
-            self.assertIn("public page-build manifest does not match rendered pages", validate(root))
+                target.parent.mkdir(parents=True, exist_ok=True)
+                shutil.copy2(source, target)
+                snapshot_target = root / "releases" / release_id / relative
+                snapshot_target.parent.mkdir(parents=True, exist_ok=True)
+                shutil.copy2(source, snapshot_target)
+            for relative in ("404.html", "package.json"):
+                shutil.copy2(ROOT / relative, root / relative)
+            method = root / "method.html"
+            method.write_text(method.read_text(encoding="utf-8").replace("Method, coverage and privacy", "Undeclared drift", 1), encoding="utf-8")
+            errors = validate(root)
+            self.assertTrue(any("final HTML bytes" in error for error in errors), errors)
+
+    def test_validator_rejects_snapshot_drift(self) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            manifest = json.loads((ROOT / "assets/commonworld-page-builds.json").read_text(encoding="utf-8"))
+            release_id = manifest["release_id"]
+            for source in snapshot_files(ROOT, include_manifest=True):
+                relative = source.relative_to(ROOT)
+                target = root / relative
+                target.parent.mkdir(parents=True, exist_ok=True)
+                shutil.copy2(source, target)
+                snapshot_target = root / "releases" / release_id / relative
+                snapshot_target.parent.mkdir(parents=True, exist_ok=True)
+                shutil.copy2(source, snapshot_target)
+            for relative in ("404.html", "package.json"):
+                shutil.copy2(ROOT / relative, root / relative)
+            snapshot_method = root / "releases" / release_id / "method.html"
+            snapshot_method.write_text(snapshot_method.read_text(encoding="utf-8").replace("Method, coverage and privacy", "Snapshot drift", 1), encoding="utf-8")
+            errors = validate(root)
+            self.assertTrue(any("snapshot file differs" in error for error in errors), errors)
+
+    def test_validator_rejects_noncanonical_404_manifest(self) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            manifest = json.loads((ROOT / "assets/commonworld-page-builds.json").read_text(encoding="utf-8"))
+            release_id = manifest["release_id"]
+            for source in snapshot_files(ROOT, include_manifest=True):
+                relative = source.relative_to(ROOT)
+                target = root / relative
+                target.parent.mkdir(parents=True, exist_ok=True)
+                shutil.copy2(source, target)
+                snapshot_target = root / "releases" / release_id / relative
+                snapshot_target.parent.mkdir(parents=True, exist_ok=True)
+                shutil.copy2(source, snapshot_target)
+            shutil.copy2(ROOT / "package.json", root / "package.json")
+            not_found = (ROOT / "404.html").read_text(encoding="utf-8").replace('"schema_version":2', '"schema_version":1', 1)
+            (root / "404.html").write_text(not_found, encoding="utf-8")
+            self.assertIn("custom 404 release marker does not exactly match canonical manifest", validate(root))
 
 
 if __name__ == "__main__":

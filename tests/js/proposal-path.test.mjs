@@ -107,6 +107,7 @@ test("überlange und injizierte Eingaben werden abgelehnt oder escaped", () => {
   assert.match(errors.join(" "), /Script-Inhalt/u);
 });
 
+
 function proposalFormStub(source = fields) {
   const elements = {};
   for (const name of ["name", "description", "official_website", "commons_type", "region", "sources", "editorial_note"]) elements[name] = { value: source[name] };
@@ -130,8 +131,7 @@ function memoryStorage() {
 
 test("release reload preserves a bounded tab-local proposal draft exactly once", () => {
   const storage = memoryStorage();
-  const source = proposalFormStub();
-  assert.equal(storeProposalReleaseDraft(source, storage, () => 1_000), true);
+  assert.equal(storeProposalReleaseDraft(proposalFormStub(), storage, () => 1_000), true);
   const restored = proposalFormStub({
     ...fields,
     name: "",
@@ -170,7 +170,7 @@ test("malformed release drafts do not partially mutate the form", () => {
     schema_version: 1,
     locale: "de",
     saved_at: 1_000,
-    fields: { ...fields, actions: [{ type: "learn", url: "https://example.org" }] },
+    fields: { ...fields, name: "Must not leak", actions: [{ type: "learn", url: "https://example.org" }] },
   }));
   const form = proposalFormStub({ ...fields, name: "Unchanged" });
   assert.equal(restoreProposalReleaseDraft(form, storage, () => 2_000), false);
@@ -178,3 +178,14 @@ test("malformed release drafts do not partially mutate the form", () => {
   assert.equal(restoreProposalReleaseDraft(form, storage, () => 2_001), false);
 });
 
+
+test("release draft storage failure is explicit and non-mutating", () => {
+  const form = proposalFormStub({ ...fields, name: "Keep visible" });
+  const storage = {
+    getItem() { return null; },
+    removeItem() {},
+    setItem() { throw new Error("storage unavailable"); },
+  };
+  assert.equal(storeProposalReleaseDraft(form, storage, () => 1_000), false);
+  assert.equal(form.elements.name.value, "Keep visible");
+});

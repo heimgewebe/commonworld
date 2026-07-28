@@ -10,6 +10,8 @@ import { normalizeBootstrapForCompile } from './catalog_delivery_compile.mjs';
 
 const ROOT = process.cwd();
 const CPU_THROTTLE_RATE = 4;
+const RELEASE_PROBE_PATH_PATTERN = /^\/__cw_probe\/[A-Za-z0-9_-]{3,160}\/manifest$/u;
+const RELEASE_PROBE_METRIC_PATH = '/__cw_probe/<nonce>/manifest';
 const MIME = new Map([
   ['.html', 'text/html; charset=utf-8'],
   ['.css', 'text/css; charset=utf-8'],
@@ -20,6 +22,18 @@ const MIME = new Map([
   ['.png', 'image/png'],
   ['.pbf', 'application/x-protobuf'],
 ]);
+
+function normalizeFirstPartyPath(pathname) {
+  return RELEASE_PROBE_PATH_PATTERN.test(pathname) ? RELEASE_PROBE_METRIC_PATH : pathname;
+}
+
+async function respondNotFound(response) {
+  response.writeHead(404, {
+    'Content-Type': 'text/html; charset=utf-8',
+    'Cache-Control': 'no-store',
+  });
+  response.end(await readFile(path.join(ROOT, '404.html')));
+}
 
 function safePath(url) {
   const pathname = decodeURIComponent(new URL(url, 'http://localhost').pathname);
@@ -33,8 +47,7 @@ const server = createServer(async (request, response) => {
   try {
     const resolved = safePath(request.url ?? '/');
     if (!resolved || !(await stat(resolved.target)).isFile()) {
-      response.writeHead(404, { 'Content-Type': 'text/plain; charset=utf-8' });
-      response.end('not found');
+      await respondNotFound(response);
       return;
     }
     response.writeHead(200, {
@@ -43,8 +56,7 @@ const server = createServer(async (request, response) => {
     });
     response.end(await readFile(resolved.target));
   } catch {
-    response.writeHead(404, { 'Content-Type': 'text/plain; charset=utf-8' });
-    response.end('not found');
+    await respondNotFound(response);
   }
 });
 
@@ -86,7 +98,7 @@ async function measureProfile(profile) {
   });
   page.on('requestfinished', (request) => {
     const url = new URL(request.url());
-    if (url.origin === baseUrl) firstPartyRequests.push(url.pathname);
+    if (url.origin === baseUrl) firstPartyRequests.push(normalizeFirstPartyPath(url.pathname));
   });
 
   const startedAt = Date.now();
@@ -134,9 +146,9 @@ async function measureProfile(profile) {
   const requestSizes = {};
   const firstPartySurfaceHash = createHash('sha256');
   for (const pathname of uniqueRequests) {
-    const resolved = safePath(pathname);
-    if (!resolved) continue;
-    const bytes = await readFile(resolved.target);
+    const bytes = pathname === RELEASE_PROBE_METRIC_PATH
+      ? await readFile(path.join(ROOT, '404.html'))
+      : await readFile(safePath(pathname).target);
     requestSizes[pathname] = bytes.length;
     firstPartySurfaceHash.update(pathname, 'utf8');
     firstPartySurfaceHash.update('\0', 'utf8');

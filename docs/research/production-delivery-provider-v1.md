@@ -28,6 +28,21 @@ This decision does not treat free service as guaranteed service. It makes the la
 - CSP permits the basemap origin only for the required map resources;
 - no Commonworld telemetry, proxy, backend, account or API key is used.
 
+## HTML cache coherence boundary
+
+The live GitHub Pages delivery was re-read on 2026-07-28. Canonical HTML and catalog responses exposed `Cache-Control: max-age=600`. Different query strings reused the same shared Varnish cache entry: they returned the same ETag with increasing `Age` and changed from `MISS` to `HIT`. Commonworld therefore does not claim that `?v=`, `cw_probe` or `cw_release` values bypass the provider cache. Query tags remain only content diagnostics inside one immutable release path.
+
+Every public build now creates exactly one content-derived snapshot under `/releases/<release-id>/`. The rendered pages contain a release-bound `<base>` element, so relative scripts, styles, catalog files, contracts and navigation remain inside that coherent snapshot. Interactive entry pages check freshness through a unique unknown path under `/__cw_probe/<nonce>/manifest`. A first request to each distinct path was observed as a separate CDN `MISS`; GitHub Pages serves the current custom `404.html`, which contains the strict release manifest. A stale interactive page replaces itself with the matching release-snapshot path and then presents the canonical URL through `history.replaceState`.
+
+The probe is limited to three seconds. A late response cannot trigger navigation. Before a necessary proposal-page navigation, a dirty form is stored once in that tab's `sessionStorage`; the next page load deletes the draft immediately and restores it only when schema, locale and the five-minute age bound match. No server receives the draft.
+
+Two limits remain explicit:
+
+- HTML cached before the first deployment of this path-probe checker cannot execute code it does not yet contain; one manual reload or expiry of the observed provider TTL is required once.
+- `method.html` and `method.de.html` remain script-free. Navigation from an interactive current release resolves to the release-bound method copy, but a direct canonical method URL can remain stale for the provider TTL.
+
+True zero-staleness for every direct URL would require delivery where Commonworld controls HTML response headers, for example `no-cache, must-revalidate` for documents and immutable caching for content-addressed release assets. That migration is not authorized by this record.
+
 ## Compared options
 
 | Option | SLA | Privacy/control | Cost | Operations | Decision |

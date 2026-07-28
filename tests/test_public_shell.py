@@ -135,7 +135,7 @@ class PublicShellTests(unittest.TestCase):
         app = (ROOT / "assets/commonworld-app.js").read_text(encoding="utf-8")
         self.assertEqual(1, html.count('id="static-catalog-fallback"'))
         self.assertNotIn("<noscript", html.casefold())
-        self.assertIn('id="text-skip-link" class="skip-link" href="#static-catalog-fallback"', html)
+        self.assertIn('id="text-skip-link" class="skip-link" href="/#static-catalog-fallback"', html)
         self.assertIn('id="static-catalog-fallback" class="static-catalog-fallback" tabindex="-1"', html)
         fallback = html.split('id="static-catalog-fallback"', 1)[1]
         self.assertEqual(len(load_records(ROOT)), fallback.count('class="catalog-card"'))
@@ -149,7 +149,7 @@ class PublicShellTests(unittest.TestCase):
         css = (ROOT / 'index.css').read_text(encoding='utf-8')
         self.assertIn('.static-catalog-fallback:target,', css)
         self.assertIn('.static-catalog-fallback[data-skip-activated="true"]', css)
-        self.assertIn("textSkipLink.setAttribute('href', '#text-view')", app)
+        self.assertIn("target.hash = 'text-view'", app)
         self.assertIn("document.querySelector('[data-static-catalog-fallback]')?.remove()", app)
 
     def test_public_shell_rejects_missing_linear_catalog_fallback(self) -> None:
@@ -184,15 +184,15 @@ class PublicShellTests(unittest.TestCase):
             path = root / "index.html"
             path.write_text(
                 path.read_text(encoding="utf-8").replace(
-                    'id="text-skip-link" class="skip-link" href="#static-catalog-fallback"',
-                    'id="text-skip-link" class="skip-link" href="#text-view"',
+                    'id="text-skip-link" class="skip-link" href="/#static-catalog-fallback"',
+                    'id="text-skip-link" class="skip-link" href="/#text-view"',
                     1,
                 ),
                 encoding="utf-8",
             )
             errors = validate_public_shell(root)
         self.assertIn(
-            'public shell missing required token: id="text-skip-link" class="skip-link" href="#static-catalog-fallback"',
+            'public shell missing required token: id="text-skip-link" class="skip-link" href="/#static-catalog-fallback"',
             errors,
         )
 

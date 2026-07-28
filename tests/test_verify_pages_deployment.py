@@ -12,6 +12,7 @@ from scripts.verify_pages_deployment import (
     DEFAULT_ENVIRONMENT,
     ExactPublicFileReceipt,
     ExactPublicFilesResult,
+    exact_public_files,
     run_live_smoke_with_retry,
     run_production_readback,
     select_exact_deployment,
@@ -205,11 +206,28 @@ class PagesDeploymentReadbackTests(unittest.TestCase):
                 5,
                 fetcher=fetcher,
                 root=root,
+                include_release_snapshot=False,
             )
 
         self.assertEqual("pass", result.verdict)
         self.assertEqual(4, len(result.receipts))
         self.assertTrue(all(receipt.matched for receipt in result.receipts))
+
+    def test_exact_public_files_include_current_release_snapshot(self) -> None:
+        root = Path(__file__).resolve().parents[1]
+        expected = exact_public_files(root)
+
+        def fetcher(url: str, **kwargs):
+            relative = url.removeprefix("https://commonworld.net/") or "index.html"
+            raw = (root / relative).read_bytes()
+            content_type = "text/plain; charset=utf-8" if relative == ".well-known/security.txt" else "application/octet-stream"
+            return LiveFetch(url, url, 200, content_type, raw.decode("utf-8"), raw_body=raw)
+
+        result = verify_exact_public_files("https://commonworld.net/", 5, fetcher=fetcher, root=root)
+        self.assertEqual("pass", result.verdict)
+        self.assertEqual(len(expected), len(result.receipts))
+        self.assertTrue(any(item.relative_url.startswith("releases/") for item in result.receipts))
+        self.assertTrue(any(item.relative_url == "404.html" for item in result.receipts))
 
     def test_exact_public_files_hash_received_bytes(self) -> None:
         with tempfile.TemporaryDirectory() as directory:
@@ -230,7 +248,7 @@ class PagesDeploymentReadbackTests(unittest.TestCase):
                 content_type = "text/plain; charset=utf-8" if relative == ".well-known/security.txt" else "text/plain"
                 return LiveFetch(url, url, 200, content_type, "decoded-drift", raw_body=files[relative])
 
-            result = verify_exact_public_files("https://commonworld.net/", 5, fetcher=fetcher, root=root)
+            result = verify_exact_public_files("https://commonworld.net/", 5, fetcher=fetcher, root=root, include_release_snapshot=False)
         self.assertEqual("pass", result.verdict)
 
     def test_exact_public_file_hash_drift_fails(self) -> None:
@@ -250,6 +268,7 @@ class PagesDeploymentReadbackTests(unittest.TestCase):
                 5,
                 fetcher=fetcher,
                 root=root,
+                include_release_snapshot=False,
             )
 
         self.assertEqual("fail", result.verdict)
@@ -272,6 +291,7 @@ class PagesDeploymentReadbackTests(unittest.TestCase):
                 5,
                 fetcher=fetcher,
                 root=root,
+                include_release_snapshot=False,
             )
 
         self.assertEqual("fail", result.verdict)
@@ -291,12 +311,12 @@ class PagesDeploymentReadbackTests(unittest.TestCase):
                 final = url + "/redirect" if url.endswith("security.txt") else url
                 content_type = "text/plain; charset=utf-8" if url.endswith("security.txt") else "text/plain"
                 return LiveFetch(url, final, 200, content_type, "expected")
-            redirected = verify_exact_public_files("https://commonworld.net/", 5, fetcher=redirecting, root=root)
+            redirected = verify_exact_public_files("https://commonworld.net/", 5, fetcher=redirecting, root=root, include_release_snapshot=False)
             self.assertTrue(any(error.startswith("exact public file redirected: .well-known/security.txt") for error in redirected.errors))
 
             def wrong_mime(url: str, **kwargs):
                 return LiveFetch(url, url, 200, "text/html", "expected")
-            mime = verify_exact_public_files("https://commonworld.net/", 5, fetcher=wrong_mime, root=root)
+            mime = verify_exact_public_files("https://commonworld.net/", 5, fetcher=wrong_mime, root=root, include_release_snapshot=False)
             self.assertIn("security.txt content-type must be text/plain; charset=utf-8", mime.errors)
 
             def duplicate_mime(url: str, **kwargs):
@@ -307,7 +327,7 @@ class PagesDeploymentReadbackTests(unittest.TestCase):
                     )
                 return LiveFetch(url, url, 200, "text/plain", "expected")
             duplicate = verify_exact_public_files(
-                "https://commonworld.net/", 5, fetcher=duplicate_mime, root=root
+                "https://commonworld.net/", 5, fetcher=duplicate_mime, root=root, include_release_snapshot=False
             )
             self.assertIn("security.txt content-type must be text/plain; charset=utf-8", duplicate.errors)
 
@@ -334,7 +354,7 @@ class PagesDeploymentReadbackTests(unittest.TestCase):
                         observed = content_type if url.endswith("security.txt") else "text/plain"
                         return LiveFetch(url, url, 200, observed, "expected")
                     result = verify_exact_public_files(
-                        "https://commonworld.net/", 5, fetcher=malformed, root=root
+                        "https://commonworld.net/", 5, fetcher=malformed, root=root, include_release_snapshot=False
                     )
                     self.assertIn(
                         "security.txt content-type must be text/plain; charset=utf-8",
@@ -353,7 +373,7 @@ class PagesDeploymentReadbackTests(unittest.TestCase):
                         observed = content_type if url.endswith("security.txt") else "text/plain"
                         return LiveFetch(url, url, 200, observed, "expected")
                     result = verify_exact_public_files(
-                        "https://commonworld.net/", 5, fetcher=valid, root=root
+                        "https://commonworld.net/", 5, fetcher=valid, root=root, include_release_snapshot=False
                     )
                     self.assertEqual("pass", result.verdict, result.errors)
 

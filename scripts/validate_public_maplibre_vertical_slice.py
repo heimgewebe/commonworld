@@ -15,6 +15,7 @@ if str(ROOT) not in sys.path:
     sys.path.insert(0, str(ROOT))
 
 from scripts.commonworld_geo import publicly_mappable
+from scripts.public_cache import canonicalize_page_release
 from scripts.render_public_shell import render_shell
 from scripts.validate_canonical_plan import validate_browser_smoke_contract
 
@@ -720,7 +721,7 @@ def validate_public_maplibre_vertical_slice(root: Path = ROOT) -> list[str]:
         'data-presentation-choice="text"',
         'href="./catalog/catalog.json"',
         'href="./contracts/commonworld/project.schema.json"',
-        'href="./method.html?cw_release=',
+        'href="./method.html',
         'href="./contracts/commonworld/current-state.contract.json"',
     )
     for token in required_html:
@@ -860,7 +861,7 @@ def validate_public_maplibre_vertical_slice(root: Path = ROOT) -> list[str]:
     except Exception as error:  # fail closed for malformed catalog inputs
         errors.append(f"deterministic public shell render failed: {error}")
     else:
-        if rendered != html:
+        if canonicalize_page_release(rendered) != canonicalize_page_release(html):
             errors.append("index.html does not match the deterministic catalog-derived shell render")
 
     surface = contract.get("surface", {}) if isinstance(contract.get("surface"), dict) else {}

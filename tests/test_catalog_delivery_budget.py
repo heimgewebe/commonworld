@@ -40,7 +40,10 @@ class CatalogDeliveryBudgetTests(unittest.TestCase):
         )
         for profile in benchmark['optimized']['browser']['profiles']:
             for request_path in profile['first_party_requests']:
-                relative = 'index.html' if request_path == '/' else request_path.lstrip('/')
+                if request_path == '/__cw_probe/<nonce>/manifest':
+                    relative = '404.html'
+                else:
+                    relative = 'index.html' if request_path == '/' else request_path.lstrip('/')
                 source = ROOT / relative
                 target = root / relative
                 if source.is_file() and not target.exists():

@@ -135,12 +135,19 @@ function safePath(url) {
   return target;
 }
 
+async function respondNotFound(response) {
+  response.writeHead(404, {
+    'Content-Type': 'text/html; charset=utf-8',
+    'Cache-Control': 'no-store',
+  });
+  response.end(await readFile(path.join(ROOT, '404.html')));
+}
+
 const server = createServer(async (request, response) => {
   try {
     const target = safePath(request.url ?? '/');
     if (!target || !(await stat(target)).isFile()) {
-      response.writeHead(404, { 'Content-Type': 'text/plain; charset=utf-8' });
-      response.end('not found');
+      await respondNotFound(response);
       return;
     }
     response.writeHead(200, {
@@ -149,8 +156,7 @@ const server = createServer(async (request, response) => {
     });
     response.end(await readFile(target));
   } catch {
-    response.writeHead(404, { 'Content-Type': 'text/plain; charset=utf-8' });
-    response.end('not found');
+    await respondNotFound(response);
   }
 });
 
@@ -320,8 +326,22 @@ async function loadExpectedDigitalProjection() {
 }
 
 const expectedDigitalProjection = await loadExpectedDigitalProjection();
+const publicReleaseManifest = JSON.parse(await readFile(path.join(ROOT, 'assets/commonworld-page-builds.json'), 'utf8'));
+const releaseCatalogRuntimePath = `/releases/${publicReleaseManifest.release_id}/catalog/runtime`;
 const discoveryPreviewIds = (ids) => ids.slice(0, DISCOVERY_RESULT_PREVIEW_LIMIT);
 const discoveryPreviewCount = (ids) => Math.min(ids.length, DISCOVERY_RESULT_PREVIEW_LIMIT);
+
+const RELEASE_PROBE_PATH_PATTERN = /^\/__cw_probe\/[A-Za-z0-9_-]{3,160}\/manifest$/u;
+
+function isExpectedReleaseProbeUrl(value) {
+  if (typeof value !== 'string' || value.length === 0) return false;
+  try {
+    const parsed = new URL(value, baseUrl);
+    return parsed.origin === new URL(baseUrl).origin && RELEASE_PROBE_PATH_PATTERN.test(parsed.pathname);
+  } catch {
+    return false;
+  }
+}
 
 async function newPage({
   mobile = false,
@@ -415,12 +435,15 @@ async function newPage({
   const pageErrors = [];
   const httpErrors = [];
   page.on('console', (message) => {
-    if (message.type() === 'error') consoleErrors.push(message.text());
+    const locationUrl = message.location()?.url ?? '';
+    if (message.type() === 'error' && !isExpectedReleaseProbeUrl(locationUrl)) consoleErrors.push(message.text());
     if (message.type() === 'warning') consoleWarnings.push(message.text());
   });
   page.on('pageerror', (error) => pageErrors.push(error.message));
   page.on('response', (response) => {
-    if (response.status() >= 400) httpErrors.push(response.status() + ' ' + response.url());
+    if (response.status() >= 400 && !(response.status() === 404 && isExpectedReleaseProbeUrl(response.url()))) {
+      httpErrors.push(response.status() + ' ' + response.url());
+    }
   });
   return { context, page, consoleErrors, consoleWarnings, pageErrors, httpErrors };
 }
@@ -947,7 +970,7 @@ async function normalScenario() {
   const catalogRequests = [];
   run.page.on('request', (request) => {
     const pathname = new URL(request.url()).pathname;
-    if (pathname.startsWith('/catalog/')) catalogRequests.push(pathname);
+    if (pathname.startsWith(`${releaseCatalogRuntimePath}/`)) catalogRequests.push(pathname);
   });
   await run.page.goto(baseUrl, { waitUntil: 'domcontentloaded' });
   await run.page.waitForSelector('html.runtime-ready');
@@ -1079,10 +1102,12 @@ async function normalScenario() {
   }));
   assert(catalogShadow.recordState === 'ready' && catalogShadow.detailState === 'ready' && catalogShadow.id === 'debian' && /^[0-9a-f]{2}$/.test(catalogShadow.shard ?? ''), `normal: selected catalog detail shadow did not reach parity (${JSON.stringify(catalogShadow)})`);
   assert(catalogShadow.delivery === 'build-bound-bootstrap', `normal: detail shadow replaced the visible bootstrap (${JSON.stringify(catalogShadow)})`);
-  assert(/^http:\/\/127\.0\.0\.1:\d+\/catalog\/runtime\/details\/[0-9a-f]{64}\.v1\.json$/.test(catalogShadow.detailUrl ?? ''), `normal: selected detail URL is not content-addressed (${JSON.stringify(catalogShadow)})`);
-  const detailRequestPaths = catalogRequests.filter((pathname) => /^\/catalog\/runtime\/details\/[0-9a-f]{64}\.v1\.json$/.test(pathname));
+  const expectedDetailUrlPattern = new RegExp(`^http://127\\.0\\.0\\.1:\\d+${releaseCatalogRuntimePath.replaceAll('/', '\\/')}/details/[0-9a-f]{64}\\.v1\\.json$`);
+  assert(expectedDetailUrlPattern.test(catalogShadow.detailUrl ?? ''), `normal: selected detail URL is not content-addressed inside the current release (${JSON.stringify(catalogShadow)})`);
+  const detailRequestPattern = new RegExp(`^${releaseCatalogRuntimePath.replaceAll('/', '\\/')}/details/[0-9a-f]{64}\\.v1\\.json$`);
+  const detailRequestPaths = catalogRequests.filter((pathname) => detailRequestPattern.test(pathname));
   assert(detailRequestPaths.length === 1, `normal: selected identity did not request exactly one detail artifact (${JSON.stringify(catalogRequests)})`);
-  assert(!catalogRequests.some((pathname) => pathname.startsWith('/catalog/projects/')), `normal: runtime used mutable project JSON paths (${JSON.stringify(catalogRequests)})`);
+  assert(!catalogRequests.some((pathname) => pathname.includes('/catalog/projects/')), `normal: runtime used mutable project JSON paths (${JSON.stringify(catalogRequests)})`);
   assert(await run.page.locator('#focus-catalog-detail-integrity').isVisible(), 'normal: detail integrity status is not visible');
   assert(await run.page.locator('#focus-catalog-detail-retry').isHidden(), 'normal: retry remained visible after successful detail verification');
   const focusOnlyState = await primaryOverlayState(run.page);
@@ -3140,8 +3165,8 @@ async function liveUiHardeningScenario() {
 async function catalogueNetworkBlockedScenario() {
   const run = await newPage();
   const allowedCatalogRequests = new Set([
-    '/catalog/runtime/manifest.v1.json',
-    '/catalog/runtime/aggregate.v1.json',
+    `${releaseCatalogRuntimePath}/manifest.v1.json`,
+    `${releaseCatalogRuntimePath}/aggregate.v1.json`,
   ]);
   const observedCatalogRequests = [];
   const blockedCatalogRequests = [];
@@ -3156,8 +3181,8 @@ async function catalogueNetworkBlockedScenario() {
   await run.page.waitForSelector('html.runtime-ready');
   await run.page.waitForSelector('.globe-stage[data-runtime-state="ready"]');
   assert(blockedCatalogRequests.length === 0, `catalogue network blocked: runtime requested forbidden catalog files: ${blockedCatalogRequests.join(' | ')}`);
-  assert(observedCatalogRequests.includes('/catalog/runtime/manifest.v1.json'), 'catalogue network blocked: runtime manifest was not observed');
-  assert(observedCatalogRequests.includes('/catalog/runtime/aggregate.v1.json'), 'catalogue network blocked: runtime aggregate was not observed');
+  assert(observedCatalogRequests.includes(`${releaseCatalogRuntimePath}/manifest.v1.json`), 'catalogue network blocked: runtime manifest was not observed');
+  assert(observedCatalogRequests.includes(`${releaseCatalogRuntimePath}/aggregate.v1.json`), 'catalogue network blocked: runtime aggregate was not observed');
   assert(await run.page.locator('.globe-stage').getAttribute('data-catalog-platform') === 'ready', 'catalogue network blocked: shadow catalog platform did not become ready');
   assert(await run.page.locator('.globe-stage').getAttribute('data-catalog-delivery') === 'build-bound-bootstrap', 'catalogue network blocked: runtime delivery mode is not build-bound');
   await run.page.locator('#commons-search').fill('Debian');
@@ -3182,7 +3207,7 @@ async function catalogueDetailRetryScenario() {
   const catalogRequests = [];
   run.page.on('request', (request) => {
     const pathname = new URL(request.url()).pathname;
-    if (pathname.startsWith('/catalog/runtime/')) catalogRequests.push(pathname);
+    if (pathname.startsWith(`${releaseCatalogRuntimePath}/`)) catalogRequests.push(pathname);
   });
   let detailAttempts = 0;
   await run.page.route('**/catalog/runtime/details/*.v1.json', (route) => {
@@ -3214,7 +3239,7 @@ async function catalogueDetailRetryScenario() {
       && !stage.dataset.catalogDetailRetry;
   });
   assert(detailAttempts === 2, `detail retry: expected one failed attempt and one retry, got ${detailAttempts}`);
-  for (const expectedPath of ['/catalog/runtime/manifest.v1.json', '/catalog/runtime/aggregate.v1.json', '/catalog/runtime/shards/81.v1.json']) {
+  for (const expectedPath of [`${releaseCatalogRuntimePath}/manifest.v1.json`, `${releaseCatalogRuntimePath}/aggregate.v1.json`, `${releaseCatalogRuntimePath}/shards/81.v1.json`]) {
     const count = catalogRequests.filter((pathname) => pathname === expectedPath).length;
     assert(count === 2, `detail retry: explicit retry did not refresh ${expectedPath} exactly once (${JSON.stringify(catalogRequests)})`);
   }
@@ -3357,7 +3382,7 @@ async function bootstrapAssetFailureFallbackScenario() {
   assert(fallbackCatalogCards === manifest.entry_count, `bootstrap asset failure: expected ${manifest.entry_count} fallback cards, found ${fallbackCatalogCards}`);
   assert(hiddenFallbackCatalogCards === 0, `bootstrap asset failure: ${hiddenFallbackCatalogCards} fallback cards were hidden`);
   assert(neutralRecoveryCopy, `bootstrap asset failure: recovery copy falsely declares failure: ${recoveryCopy}`);
-  assert(skipLinkHref === '#static-catalog-fallback', 'bootstrap asset failure: skip link does not target the surviving catalog');
+  assert(skipLinkHref === '/#static-catalog-fallback', 'bootstrap asset failure: skip link does not target the surviving catalog');
   assert(targetRecoveryState.hash === '#static-catalog-fallback', `bootstrap asset failure: fragment target is ${targetRecoveryState.hash || 'empty'}`);
   assert(targetRecoveryState.visible, 'bootstrap asset failure: fragment activation did not immediately reveal the recovery catalog');
   assert(targetRecoveryState.animationName === 'none', `bootstrap asset failure: fragment reveal still depends on animation ${targetRecoveryState.animationName}`);
@@ -3398,7 +3423,7 @@ async function postRenderFailurePreservesFallbackScenario() {
   assert(fallbackCatalogCards === manifest.entry_count, `post-render failure: expected ${manifest.entry_count} fallback cards, found ${fallbackCatalogCards}`);
   assert(hiddenFallbackCatalogCards === 0, `post-render failure: ${hiddenFallbackCatalogCards} fallback cards were mutated by runtime filtering`);
   assert(await run.page.locator('#static-catalog-fallback').isVisible(), 'post-render failure: complete fallback is not visible');
-  assert(skipLinkHref === '#static-catalog-fallback', `post-render failure: skip link targets ${skipLinkHref}`);
+  assert(skipLinkHref === '/#static-catalog-fallback', `post-render failure: skip link targets ${skipLinkHref}`);
   assert(skipFocusId === 'static-catalog-fallback', `post-render failure: skip handler focused ${skipFocusId || 'nothing'} instead of recovery catalog`);
   assert(skipActivatedRecovery, 'post-render failure: skip handler did not reveal the recovery catalog');
   results.push({

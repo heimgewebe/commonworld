@@ -51,8 +51,8 @@ function createServer() {
       });
       response.end(body);
     } catch {
-      response.writeHead(404, { 'content-type': 'text/plain; charset=utf-8' });
-      response.end('not found');
+      response.writeHead(404, { 'cache-control': 'no-store', 'content-type': 'text/html; charset=utf-8' });
+      response.end(await readFile(path.join(ROOT, '404.html')));
     }
   });
 }

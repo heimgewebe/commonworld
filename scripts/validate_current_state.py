@@ -301,7 +301,7 @@ def validate_current_state(root: Path = ROOT) -> list[str]:
         "dataset.catalogDelivery = 'build-bound-bootstrap'",
         "catalogDetailShadow",
         "document.querySelector('#text-skip-link')",
-        "textSkipLink.setAttribute('href', '#text-view')",
+        "target.hash = 'text-view'",
         "document.querySelector('[data-static-catalog-fallback]')?.remove()",
     )
     for token in required_runtime_tokens:
