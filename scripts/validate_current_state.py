@@ -163,7 +163,9 @@ def validate_current_state(root: Path = ROOT) -> list[str]:
         "public_issues_confidential": False,
         "exact_production_readback": True,
         "host_configuration": "_config.yml includes only .well-known",
-        "expiry_monitoring": "weekly_github_actions",
+        "expiry_monitoring": "github_actions_weekly_best_effort",
+        "scheduled_workflow_inactivity_boundary_days": 60,
+        "manual_reenable_required_after_automatic_disablement": True,
         "trust_boundary": "repository_review_and_github_settings_not_self_attested",
     }
     if security_disclosure != expected_security_disclosure:

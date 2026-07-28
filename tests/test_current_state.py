@@ -60,6 +60,18 @@ class CurrentStateTests(unittest.TestCase):
             errors = validate_current_state(root)
         self.assertIn("current security-disclosure truth mismatch", errors)
 
+    def test_security_disclosure_rejects_unconditional_weekly_monitoring_claim(self) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            root = self.copy_current_state(directory)
+            path = root / "contracts/commonworld/current-state.contract.json"
+            value = json.loads(path.read_text(encoding="utf-8"))
+            value["security_disclosure"]["expiry_monitoring"] = "weekly_github_actions"
+            value["security_disclosure"].pop("scheduled_workflow_inactivity_boundary_days", None)
+            value["security_disclosure"].pop("manual_reenable_required_after_automatic_disablement", None)
+            path.write_text(json.dumps(value), encoding="utf-8")
+            errors = validate_current_state(root)
+        self.assertIn("current security-disclosure truth mismatch", errors)
+
     def test_security_disclosure_requires_exact_production_readback(self) -> None:
         with tempfile.TemporaryDirectory() as directory:
             root = self.copy_current_state(directory)

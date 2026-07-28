@@ -63,8 +63,10 @@
     "public_issues_confidential": false,
     "exact_production_readback": true,
     "host_configuration": "_config.yml includes only .well-known",
-    "expiry_monitoring": "weekly_github_actions",
-    "trust_boundary": "repository_review_and_github_settings_not_self_attested"
+    "expiry_monitoring": "github_actions_weekly_best_effort",
+    "trust_boundary": "repository_review_and_github_settings_not_self_attested",
+    "scheduled_workflow_inactivity_boundary_days": 60,
+    "manual_reenable_required_after_automatic_disablement": true
   },
   "release_gates": {
     "deterministic_build_and_tests": "pass",
