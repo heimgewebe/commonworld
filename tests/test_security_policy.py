@@ -624,6 +624,94 @@ class SecurityPolicyTests(unittest.TestCase):
                 errors,
             )
 
+    def test_exact_pages_readback_step_is_structurally_bound(self) -> None:
+        mutations = (
+            (
+                "        shell: bash {0} || true\n",
+                "must not define field 'shell'",
+            ),
+            (
+                "        if: false\n",
+                "must not define field 'if'",
+            ),
+        )
+        marker = "      - name: Verify exact Pages deployment and public content\n"
+        for injected, expected in mutations:
+            with self.subTest(expected=expected), tempfile.TemporaryDirectory() as directory:
+                root = self.copy_surface(directory)
+                path = root / ".github/workflows/production-readback.yml"
+                source = path.read_text(encoding="utf-8")
+                self.assertEqual(1, source.count(marker))
+                path.write_text(source.replace(marker, marker + injected, 1), encoding="utf-8")
+                errors = validate_security_policy(root, now=self.NOW)
+            self.assertTrue(
+                any(
+                    "Verify exact Pages deployment and public content" in error and expected in error
+                    for error in errors
+                ),
+                errors,
+            )
+
+        with tempfile.TemporaryDirectory() as directory:
+            root = self.copy_surface(directory)
+            path = root / ".github/workflows/production-readback.yml"
+            source = path.read_text(encoding="utf-8")
+            path.write_text(
+                source.replace(
+                    "          --deployment-timeout-seconds 600\n",
+                    "          --deployment-timeout-seconds 0\n",
+                    1,
+                ),
+                encoding="utf-8",
+            )
+            errors = validate_security_policy(root, now=self.NOW)
+        self.assertTrue(
+            any(
+                "Verify exact Pages deployment and public content" in error
+                and "command mismatch" in error
+                for error in errors
+            ),
+            errors,
+        )
+
+    def test_security_receipt_uploads_cannot_soft_fail(self) -> None:
+        cases = (
+            (".github/workflows/validate.yml", "Upload pre-merge security receipt", "validate workflow"),
+            (
+                ".github/workflows/production-readback.yml",
+                "Upload production readback receipts",
+                "production readback workflow",
+            ),
+            (
+                ".github/workflows/security-policy-expiry.yml",
+                "Upload scheduled security receipt",
+                "security expiry workflow",
+            ),
+        )
+        for relative, step_name, label in cases:
+            marker = f"      - name: {step_name}\n"
+            for field in ("continue-on-error: true", "shell: bash {0} || true"):
+                with self.subTest(relative=relative, field=field), tempfile.TemporaryDirectory() as directory:
+                    root = self.copy_surface(directory)
+                    path = root / relative
+                    source = path.read_text(encoding="utf-8")
+                    self.assertEqual(1, source.count(marker))
+                    path.write_text(
+                        source.replace(marker, marker + f"        {field}\n", 1),
+                        encoding="utf-8",
+                    )
+                    errors = validate_security_policy(root, now=self.NOW)
+                key = field.split(":", 1)[0]
+                self.assertTrue(
+                    any(
+                        label in error
+                        and step_name in error
+                        and f"must not define field '{key}'" in error
+                        for error in errors
+                    ),
+                    errors,
+                )
+
     def test_security_jobs_reject_skipping_needs_chains(self) -> None:
         cases = (
             (".github/workflows/validate.yml", "  contracts:\n", "validate workflow"),

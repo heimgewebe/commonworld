@@ -102,6 +102,7 @@ class WorkflowStep:
     raw: str
     fields: dict[str, str]
     with_fields: dict[str, str]
+    env_fields: dict[str, str]
     run_text: str
     run_style: str | None
     run_argv: tuple[str, ...]
@@ -177,18 +178,20 @@ def parse_workflow_step(workflow_text: str, step_name: str) -> WorkflowStep | No
     entries = _yaml_mapping_entries(step_node, parse_errors, "step")
     fields: dict[str, str] = {}
     with_fields: dict[str, str] = {}
+    env_fields: dict[str, str] = {}
     run_text = ""
     run_style: str | None = None
     for key, value_node in entries.items():
-        if key == "with":
+        if key in {"with", "env"}:
             fields[key] = ""
-            nested = _yaml_mapping_entries(value_node, parse_errors, "with")
+            nested = _yaml_mapping_entries(value_node, parse_errors, key)
+            target = with_fields if key == "with" else env_fields
             for nested_key, nested_value_node in nested.items():
                 nested_value = _yaml_scalar_node_value(nested_value_node)
                 if nested_value is None:
-                    parse_errors.append(f"with field {nested_key} must be a scalar")
+                    parse_errors.append(f"{key} field {nested_key} must be a scalar")
                 else:
-                    with_fields[nested_key] = nested_value
+                    target[nested_key] = nested_value
             continue
         value = _yaml_scalar_node_value(value_node)
         if value is None:
@@ -208,6 +211,7 @@ def parse_workflow_step(workflow_text: str, step_name: str) -> WorkflowStep | No
         raw=raw,
         fields=fields,
         with_fields=with_fields,
+        env_fields=env_fields,
         run_text=run_text,
         run_style=run_style,
         run_argv=run_argv,
@@ -229,6 +233,7 @@ def _require_structured_step(
     fields: dict[str, str] | None = None,
     run_argv: tuple[str, ...] | None = None,
     with_fields: dict[str, str] | None = None,
+    env_fields: dict[str, str] | None = None,
     forbidden_fields: tuple[str, ...] = (),
 ) -> WorkflowStep | None:
     step = parse_workflow_step(workflow_text, step_name)
@@ -253,6 +258,10 @@ def _require_structured_step(
         actual = step.with_fields.get(key)
         if actual != expected:
             errors.append(f"{label} step {step_name!r} with.{key} must equal {expected!r}, got {actual!r}")
+    if env_fields is not None and step.env_fields != env_fields:
+        errors.append(
+            f"{label} step {step_name!r} env must equal {env_fields!r}, got {step.env_fields!r}"
+        )
     return step
 
 
@@ -510,6 +519,7 @@ def validate_security_policy(root: Path = ROOT, now: datetime | None = None) -> 
             "path": "artifacts/commonworld-private-vulnerability-reporting-premerge.json",
             "if-no-files-found": "error", "retention-days": "30",
         },
+        forbidden_fields=("continue-on-error", "shell"),
     )
     _require_structured_step(
         validate_text,
@@ -543,6 +553,29 @@ def validate_security_policy(root: Path = ROOT, now: datetime | None = None) -> 
         run_argv=("python", "-m", "pip", "install", "-r", "requirements-dev.txt"),
         forbidden_fields=("continue-on-error", "if"),
     )
+    _require_structured_step(
+        production_text,
+        "Verify exact Pages deployment and public content",
+        errors,
+        "production readback workflow",
+        fields={"id": "readback", "continue-on-error": "true"},
+        run_argv=(
+            "python3", "scripts/verify_pages_deployment.py",
+            "--repository", "${{ github.repository }}",
+            "--sha", "${{ github.sha }}",
+            "--source-ref", "main",
+            "--receipt", "artifacts/commonworld-pages-production-readback.json",
+            "--deployment-timeout-seconds", "600",
+            "--deployment-poll-seconds", "10",
+            "--live-timeout-seconds", "5",
+            "--live-retry-delays-seconds", "0,30,90",
+        ),
+        env_fields={
+            "GITHUB_TOKEN": "${{ github.token }}",
+            "COMMONWORLD_PAGES_URL": "https://commonworld.net/",
+        },
+        forbidden_fields=("if",),
+    )
     production = _require_structured_step(
         production_text,
         "Verify private vulnerability reporting setting",
@@ -567,6 +600,7 @@ def validate_security_policy(root: Path = ROOT, now: datetime | None = None) -> 
             "path": "artifacts/commonworld-pages-production-readback.json\nartifacts/commonworld-private-vulnerability-reporting.json",
             "if-no-files-found": "error", "retention-days": "30",
         },
+        forbidden_fields=("continue-on-error", "shell"),
     )
     _require_structured_step(
         production_text,
@@ -633,6 +667,7 @@ def validate_security_policy(root: Path = ROOT, now: datetime | None = None) -> 
             "path": "artifacts/commonworld-private-vulnerability-reporting-scheduled.json",
             "if-no-files-found": "error", "retention-days": "30",
         },
+        forbidden_fields=("continue-on-error", "shell"),
     )
     _require_structured_step(
         expiry_text,
