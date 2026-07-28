@@ -174,6 +174,7 @@ EXPECTED_SCRIPT_FILES = {
     "validate_production_delivery_provider.py",
     "validate_security_policy.py",
     "verify_pages_deployment.py",
+    "verify_security_workflow_blobs.py",
     "validate_public_catalog.py",
     "validate_public_maplibre_vertical_slice.py",
     "validate_public_seed_baseline.py",

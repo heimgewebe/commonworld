@@ -1,6 +1,8 @@
 import http.client
 import io
 import json
+import os
+import subprocess
 import urllib.error
 import shutil
 import tempfile
@@ -9,6 +11,7 @@ from datetime import datetime, timezone
 from pathlib import Path
 
 from scripts.validate_security_policy import PrivateReportingFetch, ROOT, github_api_get_private_reporting, validate_security_policy, verify_live_private_reporting, write_json_receipt
+from scripts.verify_security_workflow_blobs import EXPECTED_WORKFLOW_SHA256, validate_security_workflow_blobs
 
 
 class SecurityPolicyTests(unittest.TestCase):
@@ -268,7 +271,7 @@ class SecurityPolicyTests(unittest.TestCase):
 
     def test_workflows_keep_private_reporting_readback_tokenless(self) -> None:
         production = (ROOT / ".github/workflows/production-readback.yml").read_text(encoding="utf-8")
-        security_step = production.split("- name: Verify private vulnerability reporting setting", 1)[1].split("- name: Upload production readback receipts", 1)[0]
+        security_step = production.split("- name: Verify private vulnerability reporting setting", 1)[1].split("- name: Upload Pages production readback receipt", 1)[0]
         scheduled = (ROOT / ".github/workflows/security-policy-expiry.yml").read_text(encoding="utf-8")
         self.assertNotIn("GITHUB_TOKEN", security_step)
         self.assertNotIn("github.token", security_step)
@@ -679,7 +682,12 @@ class SecurityPolicyTests(unittest.TestCase):
             (".github/workflows/validate.yml", "Upload pre-merge security receipt", "validate workflow"),
             (
                 ".github/workflows/production-readback.yml",
-                "Upload production readback receipts",
+                "Upload Pages production readback receipt",
+                "production readback workflow",
+            ),
+            (
+                ".github/workflows/production-readback.yml",
+                "Upload private reporting readback receipt",
                 "production readback workflow",
             ),
             (
@@ -1049,6 +1057,64 @@ class SecurityPolicyTests(unittest.TestCase):
                 path.write_text(source.replace(old, new, 1), encoding="utf-8")
                 errors = validate_security_policy(root, now=self.NOW)
             self.assertTrue(any(expected in error for error in errors), errors)
+
+    def make_security_workflow_git_repo(self, directory: str) -> Path:
+        root = Path(directory)
+        for relative in EXPECTED_WORKFLOW_SHA256:
+            source = ROOT / relative
+            target = root / relative
+            target.parent.mkdir(parents=True, exist_ok=True)
+            shutil.copy2(source, target)
+        subprocess.run(["git", "init", "-q", str(root)], check=True)
+        subprocess.run(["git", "-C", str(root), "config", "user.name", "Commonworld Tests"], check=True)
+        subprocess.run(["git", "-C", str(root), "config", "user.email", "tests@example.invalid"], check=True)
+        subprocess.run(["git", "-C", str(root), "add", ".github/workflows"], check=True)
+        subprocess.run(["git", "-C", str(root), "commit", "-q", "-m", "workflow fixtures"], check=True)
+        return root
+
+    def test_committed_security_workflow_blobs_validate(self) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            root = self.make_security_workflow_git_repo(directory)
+            errors = validate_security_workflow_blobs(root, "HEAD")
+        self.assertEqual([], errors)
+
+    def test_security_workflow_blob_check_rejects_worktree_drift(self) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            root = self.make_security_workflow_git_repo(directory)
+            relative = Path(".github/workflows/validate.yml")
+            path = root / relative
+            path.write_text(path.read_text(encoding="utf-8") + "# drift\n", encoding="utf-8")
+            errors = validate_security_workflow_blobs(root, "HEAD")
+        self.assertIn(f"security workflow worktree bytes differ from committed blob: {relative}", errors)
+
+    def test_security_workflow_blob_check_rejects_committed_symlink(self) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            root = self.make_security_workflow_git_repo(directory)
+            relative = Path(".github/workflows/security-policy-expiry.yml")
+            path = root / relative
+            path.unlink()
+            path.symlink_to("validate.yml")
+            subprocess.run(["git", "-C", str(root), "add", relative.as_posix()], check=True)
+            subprocess.run(["git", "-C", str(root), "commit", "-q", "-m", "symlink workflow"], check=True)
+            errors = validate_security_workflow_blobs(root, "HEAD")
+        self.assertIn(f"security workflow worktree path must be a regular file: {relative}", errors)
+
+    def test_security_workflow_blob_check_rejects_committed_digest_drift(self) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            root = self.make_security_workflow_git_repo(directory)
+            relative = Path(".github/workflows/production-readback.yml")
+            path = root / relative
+            path.write_text(path.read_text(encoding="utf-8") + "# committed drift\n", encoding="utf-8")
+            subprocess.run(["git", "-C", str(root), "add", relative.as_posix()], check=True)
+            subprocess.run(["git", "-C", str(root), "commit", "-q", "-m", "drift workflow"], check=True)
+            errors = validate_security_workflow_blobs(root, "HEAD")
+        self.assertTrue(
+            any(
+                error.startswith(f"security workflow committed blob digest mismatch: {relative};")
+                for error in errors
+            ),
+            errors,
+        )
 
 
 if __name__ == "__main__":

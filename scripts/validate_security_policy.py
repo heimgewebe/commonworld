@@ -21,6 +21,11 @@ from urllib.parse import urlparse
 import yaml
 from yaml.nodes import MappingNode, Node, ScalarNode, SequenceNode
 
+if __package__ in {None, ""}:
+    sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
+
+from scripts.verify_security_workflow_blobs import EXPECTED_WORKFLOW_SHA256
+
 ROOT = Path(__file__).resolve().parents[1]
 SECURITY_POLICY = Path("SECURITY.md")
 SECURITY_TXT = Path(".well-known/security.txt")
@@ -28,11 +33,6 @@ JEKYLL_CONFIG = Path("_config.yml")
 VALIDATE_WORKFLOW = Path(".github/workflows/validate.yml")
 PRODUCTION_READBACK_WORKFLOW = Path(".github/workflows/production-readback.yml")
 SECURITY_EXPIRY_WORKFLOW = Path(".github/workflows/security-policy-expiry.yml")
-EXPECTED_WORKFLOW_SHA256 = {
-    VALIDATE_WORKFLOW: "fe02ff290cde4bdabdfd6ef92ec4b6d94977125f8bf7980b8c3663d695ae61ed",
-    PRODUCTION_READBACK_WORKFLOW: "553c04d7eb0b814d14453e7c59093a147153a10af96e92a84e4d8be55eaed628",
-    SECURITY_EXPIRY_WORKFLOW: "1f5e132ce88792380d6eace0140ab62bb29c514d9743d6d52a1be0d965ae12cc",
-}
 EXPECTED_CONTACT = "https://github.com/heimgewebe/commonworld/security/advisories/new"
 EXPECTED_POLICY = "https://github.com/heimgewebe/commonworld/security/policy"
 EXPECTED_CANONICAL = "https://commonworld.net/.well-known/security.txt"
@@ -566,7 +566,7 @@ def validate_security_policy(root: Path = ROOT, now: datetime | None = None) -> 
         "Upload pre-merge security receipt",
         errors,
         "validate workflow",
-        fields={"if": "always()", "uses": "actions/upload-artifact@v7"},
+        fields={"if": "always()", "uses": "actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a"},
         with_fields={
             "path": "artifacts/commonworld-private-vulnerability-reporting-premerge.json",
             "if-no-files-found": "error", "retention-days": "30",
@@ -587,10 +587,11 @@ def validate_security_policy(root: Path = ROOT, now: datetime | None = None) -> 
     _require_executable_job_for_steps(
         production_text,
         (
-            "Install security validation dependencies",
             "Verify exact Pages deployment and public content",
+            "Install security validation dependencies",
             "Verify private vulnerability reporting setting",
-            "Upload production readback receipts",
+            "Upload Pages production readback receipt",
+            "Upload private reporting readback receipt",
             "Enforce production readback result",
         ),
         errors,
@@ -646,12 +647,24 @@ def validate_security_policy(root: Path = ROOT, now: datetime | None = None) -> 
         errors.append("private reporting status readback must use the public endpoint without an Actions token")
     _require_structured_step(
         production_text,
-        "Upload production readback receipts",
+        "Upload Pages production readback receipt",
         errors,
         "production readback workflow",
-        fields={"if": "always()", "uses": "actions/upload-artifact@v7"},
+        fields={"if": "always()", "uses": "actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a"},
         with_fields={
-            "path": "artifacts/commonworld-pages-production-readback.json\nartifacts/commonworld-private-vulnerability-reporting.json",
+            "path": "artifacts/commonworld-pages-production-readback.json",
+            "if-no-files-found": "error", "retention-days": "30",
+        },
+        forbidden_fields=("continue-on-error", "shell"),
+    )
+    _require_structured_step(
+        production_text,
+        "Upload private reporting readback receipt",
+        errors,
+        "production readback workflow",
+        fields={"if": "always()", "uses": "actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a"},
+        with_fields={
+            "path": "artifacts/commonworld-private-vulnerability-reporting.json",
             "if-no-files-found": "error", "retention-days": "30",
         },
         forbidden_fields=("continue-on-error", "shell"),
@@ -718,7 +731,7 @@ def validate_security_policy(root: Path = ROOT, now: datetime | None = None) -> 
         "Upload scheduled security receipt",
         errors,
         "security expiry workflow",
-        fields={"if": "always()", "uses": "actions/upload-artifact@v7"},
+        fields={"if": "always()", "uses": "actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a"},
         with_fields={
             "path": "artifacts/commonworld-private-vulnerability-reporting-scheduled.json",
             "if-no-files-found": "error", "retention-days": "30",
