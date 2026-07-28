@@ -416,7 +416,7 @@ def validate_security_policy(root: Path = ROOT, now: datetime | None = None) -> 
         errors,
         "production readback workflow",
         run_argv=("python", "-m", "pip", "install", "-r", "requirements-dev.txt"),
-        forbidden_fields=("continue-on-error",),
+        forbidden_fields=("continue-on-error", "if"),
     )
     production = _require_structured_step(
         production_text,
@@ -461,7 +461,7 @@ def validate_security_policy(root: Path = ROOT, now: datetime | None = None) -> 
         errors,
         "security expiry workflow",
         run_argv=("python", "-m", "pip", "install", "-r", "requirements-dev.txt"),
-        forbidden_fields=("continue-on-error",),
+        forbidden_fields=("continue-on-error", "if"),
     )
     expiry = _require_structured_step(
         expiry_text,

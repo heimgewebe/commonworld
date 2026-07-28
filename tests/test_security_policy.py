@@ -474,6 +474,24 @@ class SecurityPolicyTests(unittest.TestCase):
                 errors,
             )
 
+    def test_runtime_dependency_install_cannot_be_conditional(self) -> None:
+        for relative, label in (
+            (".github/workflows/production-readback.yml", "production readback workflow"),
+            (".github/workflows/security-policy-expiry.yml", "security expiry workflow"),
+        ):
+            with self.subTest(relative=relative), tempfile.TemporaryDirectory() as directory:
+                root = self.copy_surface(directory)
+                path = root / relative
+                text = path.read_text(encoding="utf-8")
+                marker = "      - name: Install security validation dependencies\n"
+                self.assertEqual(1, text.count(marker))
+                path.write_text(text.replace(marker, marker + "        if: false\n", 1), encoding="utf-8")
+                errors = validate_security_policy(root, now=self.NOW)
+            self.assertTrue(
+                any(label in error and "Install security validation dependencies" in error and "must not define field 'if'" in error for error in errors),
+                errors,
+            )
+
     def test_inline_duplicate_schedule_mapping_is_rejected(self) -> None:
         with tempfile.TemporaryDirectory() as directory:
             root = self.copy_surface(directory)
