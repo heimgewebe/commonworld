@@ -545,7 +545,7 @@ class PagesDeploymentReadbackTests(unittest.TestCase):
         self.assertIn("--source-ref main", workflow)
         self.assertIn("--live-timeout-seconds 5", workflow)
         self.assertIn("--live-retry-delays-seconds 0,30,90", workflow)
-        self.assertIn("timeout-minutes: 20", workflow)
+        self.assertIn("timeout-minutes: 30", workflow)
         self.assertIn("continue-on-error: true", workflow)
         self.assertIn("if: always()", workflow)
         self.assertIn("actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1", workflow)

@@ -597,7 +597,7 @@ def validate_security_policy(root: Path = ROOT, now: datetime | None = None) -> 
         errors,
         "production readback workflow",
         expected_job_name="verify-exact-pages-deployment",
-        expected_job_fields={"runs-on": "ubuntu-latest", "timeout-minutes": "20"},
+        expected_job_fields={"runs-on": "ubuntu-latest", "timeout-minutes": "30"},
         expected_workflow_fields={"name", "on", "permissions", "concurrency", "jobs"},
     )
     _require_structured_step(
