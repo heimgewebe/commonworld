@@ -8,6 +8,7 @@ import http.client
 import json
 import re
 import sys
+import unicodedata
 import urllib.error
 import urllib.request
 from collections import defaultdict
@@ -78,13 +79,27 @@ def _parse_rfc3339(value: str) -> datetime:
     return datetime.fromisoformat(normalized)
 
 
+def _valid_comment_line(raw_line: str) -> bool:
+    """Return whether one RFC 9116 comment line uses only permitted characters."""
+    return raw_line.startswith("#") and all(
+        character in {"\t", " "}
+        or 0x21 <= ord(character) <= 0x7E
+        or 0xA0 <= ord(character) <= 0xFFFFF
+        for character in raw_line[1:]
+    )
+
+
 def parse_security_txt(text: str) -> tuple[dict[str, list[str]], list[str]]:
     fields: dict[str, list[str]] = defaultdict(list)
     errors: list[str] = []
     if any(character in text for character in FORBIDDEN_LINE_CHARACTERS):
         errors.append("security.txt may use only LF line separators")
     for number, raw_line in enumerate(text.split("\n"), start=1):
-        if not raw_line or raw_line.startswith("#"):
+        if not raw_line or all(character in {"\t", " "} for character in raw_line):
+            continue
+        if raw_line.startswith("#"):
+            if not _valid_comment_line(raw_line):
+                errors.append(f"security.txt comment line {number} contains a forbidden character")
             continue
         match = FIELD_LINE_RE.fullmatch(raw_line)
         if match is None:
@@ -123,6 +138,12 @@ def validate_security_policy(root: Path = ROOT, now: datetime | None = None) -> 
         security_text = security_bytes.decode("utf-8")
     except UnicodeDecodeError:
         return ["security.txt is not UTF-8"]
+    if security_text.startswith("\ufeff"):
+        errors.append("security.txt must not begin with a Unicode BOM")
+    if unicodedata.normalize("NFC", security_text) != security_text:
+        errors.append("security.txt must use Net-Unicode NFC normalization")
+    if any(unicodedata.category(character) == "Cn" for character in security_text):
+        errors.append("security.txt must not contain unassigned Unicode code points")
     if len(security_text.splitlines()) > MAX_LINES:
         errors.append("security.txt exceeds the RFC 9116 defensive line bound")
 

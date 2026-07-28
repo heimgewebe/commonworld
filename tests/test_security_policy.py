@@ -64,6 +64,46 @@ class SecurityPolicyTests(unittest.TestCase):
                 errors = validate_security_policy(root, now=self.NOW)
             self.assertIn("security.txt may use only LF line separators", errors)
 
+    def test_comment_grammar_rejects_controls_and_out_of_range_unicode(self) -> None:
+        invalid_comments = (
+            "#\x00bad",
+            "#\x1fbad",
+            "#\x7fbad",
+            "#\x80bad",
+            "#\x9fbad",
+            "#\U00100000bad",
+        )
+        for comment in invalid_comments:
+            with self.subTest(comment=ascii(comment)), tempfile.TemporaryDirectory() as directory:
+                root = self.copy_surface(directory)
+                path = root / ".well-known/security.txt"
+                path.write_text(comment + "\n" + path.read_text(encoding="utf-8"), encoding="utf-8")
+                errors = validate_security_policy(root, now=self.NOW)
+            self.assertTrue(any("comment line 1 contains a forbidden character" in error for error in errors), errors)
+
+    def test_net_unicode_rejects_non_nfc_unassigned_and_bom(self) -> None:
+        cases = (
+            ("# a\u0308\n", "security.txt must use Net-Unicode NFC normalization"),
+            ("# unassigned: \u0378\n", "security.txt must not contain unassigned Unicode code points"),
+            ("\ufeff", "security.txt must not begin with a Unicode BOM"),
+        )
+        for prefix, expected in cases:
+            with self.subTest(expected=expected), tempfile.TemporaryDirectory() as directory:
+                root = self.copy_surface(directory)
+                path = root / ".well-known/security.txt"
+                path.write_text(prefix + path.read_text(encoding="utf-8"), encoding="utf-8")
+                errors = validate_security_policy(root, now=self.NOW)
+            self.assertIn(expected, errors)
+
+    def test_comment_grammar_accepts_reviewed_visible_unicode_and_blank_wsp(self) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            root = self.copy_surface(directory)
+            path = root / ".well-known/security.txt"
+            prefix = "# Reviewed ASCII, tab\tand Unicode: ä and NBSP:\u00a0\n \t \n"
+            path.write_text(prefix + path.read_text(encoding="utf-8"), encoding="utf-8")
+            errors = validate_security_policy(root, now=self.NOW)
+        self.assertEqual([], errors)
+
     def test_exact_field_grammar_and_terminal_lf_are_required(self) -> None:
         with tempfile.TemporaryDirectory() as directory:
             root = self.copy_surface(directory)
