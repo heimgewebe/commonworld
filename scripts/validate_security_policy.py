@@ -624,7 +624,7 @@ def validate_security_policy(root: Path = ROOT, now: datetime | None = None) -> 
         "validate workflow",
         fields={"id": "security_setting", "continue-on-error": "true"},
         run_argv=(
-            "python3", "scripts/validate_security_policy.py", "--verify-live-setting",
+            "python3", "-I", "scripts/validate_security_policy.py", "--verify-live-setting",
             "--repository", "${{ github.repository }}", "--expected-sha",
             "${{ github.event.pull_request.head.sha || github.sha }}", "--receipt",
             "artifacts/commonworld-private-vulnerability-reporting-premerge.json",
@@ -710,7 +710,7 @@ def validate_security_policy(root: Path = ROOT, now: datetime | None = None) -> 
         "production readback workflow",
         fields={"id": "security_setting", "continue-on-error": "true"},
         run_argv=(
-            "python3", "scripts/validate_security_policy.py", "--verify-live-setting",
+            "python3", "-I", "scripts/validate_security_policy.py", "--verify-live-setting",
             "--repository", "${{ github.repository }}", "--expected-sha", "${{ github.sha }}",
             "--receipt", "artifacts/commonworld-private-vulnerability-reporting.json",
         ),
@@ -781,7 +781,7 @@ def validate_security_policy(root: Path = ROOT, now: datetime | None = None) -> 
         "Validate disclosure policy and expiry",
         errors,
         "security expiry workflow",
-        run_argv=("python3", "scripts/validate_security_policy.py"),
+        run_argv=("python3", "-I", "scripts/validate_security_policy.py"),
         forbidden_fields=("continue-on-error", "if"),
     )
     expiry = _require_structured_step(
@@ -791,7 +791,7 @@ def validate_security_policy(root: Path = ROOT, now: datetime | None = None) -> 
         "security expiry workflow",
         fields={"id": "security_setting", "if": "always()", "continue-on-error": "true"},
         run_argv=(
-            "python3", "scripts/validate_security_policy.py", "--verify-live-setting",
+            "python3", "-I", "scripts/validate_security_policy.py", "--verify-live-setting",
             "--repository", "${{ github.repository }}", "--expected-sha", "${{ github.sha }}",
             "--receipt", "artifacts/commonworld-private-vulnerability-reporting-scheduled.json",
         ),

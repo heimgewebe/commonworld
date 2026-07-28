@@ -13,17 +13,18 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
 BOOTSTRAP_DIGEST_PATTERN = re.compile(rb"(?m)^(\s*EXPECTED_BOOTSTRAP_SHA256:\s*)[0-9a-f]{64}(\s*)$")
-NORMALIZED_WORKFLOW_SHA256 = {Path(".github/workflows/validate.yml"): "565eb102dcffceaef7230e08ed6d7295a4584f113a4344444551bee4587181e0", Path(".github/workflows/production-readback.yml"): "ae883ba43d2c2ba58c2ac68179c6c48bbb4bca5e87b4cf4289b7da56328b2fec", Path(".github/workflows/security-policy-expiry.yml"): "d0985736e48eeb997c21252bc9fa1c9af351892fd1b493e69b08eebf8c810075"}
+NORMALIZED_WORKFLOW_SHA256 = {Path(".github/workflows/validate.yml"): "dce6e52f4444b5ee16371ee0f95fa4804e334869970606ffca5ca0eb3bc0fe62", Path(".github/workflows/production-readback.yml"): "54759c601dc7e13dd7284b9a23d40577fc5ff45de71e1f9c94b93c19bcb00994", Path(".github/workflows/security-policy-expiry.yml"): "1bb0e54c7aa59b398e90aa289e2751249a6f9266298c2b4dc8e6ca37786ab268"}
 TRUSTED_BLOBS: dict[Path, tuple[str, str | None]] = {
     Path(".github/workflows/validate.yml"): ("100644", None),
     Path(".github/workflows/production-readback.yml"): ("100644", None),
     Path(".github/workflows/security-policy-expiry.yml"): ("100644", None),
-    Path("scripts/validate_security_policy.py"): ("100755", "c2729ae7d502d6f1fc67b74b83a41cdd858e57b5e015d4a52137de6d70ce2012"),
+    Path("scripts/validate_security_policy.py"): ("100755", "ad951039f2dc5bca81fda6be4cd16541fc370da6e101371747618d9cf5d508d3"),
     Path("scripts/verify_pages_deployment.py"): ("100755", "199c5152bc7c6efe49a0d248ed256458757997d77b56f55d74e1a25ae99b560c"),
     Path("scripts/smoke_pages_live.py"): ("100755", "bf898c91f48a3165d1eeb1265d05ac9aad4e8eccbd51abd5f6618529ba2cc675"),
     Path("requirements-dev.txt"): ("100644", "2825f02444581d78ec8fae62d6c0e1ac52a01c49ba92873fe00aa3f3800dc74e"),
     Path("package.json"): ("100644", "ab1ad07609bab8a68df56f256219c0d1422a40c1e01ef1c3164f55ba7ff2d7cb"),
     Path("package-lock.json"): ("100644", "2477b7328337e250d3cbb490b4f86fc4a23a66e4455c66f668deffe31d52261b"),
+    Path("Makefile"): ("100644", "582ffac39bfb052135704cdae265a60aa201e9a210924be6b85749f54ed2a8c2"),
 }
 
 

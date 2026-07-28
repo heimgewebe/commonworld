@@ -76,7 +76,7 @@ validate-production-delivery-provider:
 	python3 scripts/validate_production_delivery_provider.py
 
 validate-security-policy:
-	python3 scripts/validate_security_policy.py
+	python3 -I scripts/validate_security_policy.py
 
 validate-public-shell:
 	python3 scripts/validate_public_shell.py

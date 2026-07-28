@@ -3,6 +3,7 @@ import io
 import json
 import os
 import subprocess
+import sys
 import urllib.error
 import shutil
 import tempfile
@@ -221,7 +222,7 @@ class SecurityPolicyTests(unittest.TestCase):
             text = path.read_text(encoding="utf-8")
             start = text.index("- name: Verify private vulnerability reporting remains enabled")
             end = text.index("- name: Upload scheduled security receipt", start)
-            block = text[start:end].replace("python3 scripts/validate_security_policy.py", "true")
+            block = text[start:end].replace("python3 -I scripts/validate_security_policy.py", "true")
             path.write_text(text[:start] + block + text[end:], encoding="utf-8")
             errors = validate_security_policy(root, now=self.NOW)
         self.assertTrue(any("Verify private vulnerability reporting remains enabled" in error and "command mismatch" in error for error in errors))
@@ -759,7 +760,7 @@ class SecurityPolicyTests(unittest.TestCase):
     def test_expiry_validation_step_is_exact_and_unconditional(self) -> None:
         mutations = (
             (
-                "        run: python3 scripts/validate_security_policy.py\n",
+                "        run: python3 -I scripts/validate_security_policy.py\n",
                 "        run: true\n",
                 "command mismatch",
             ),
@@ -1116,6 +1117,34 @@ class SecurityPolicyTests(unittest.TestCase):
             any(error == f"trusted committed blob digest mismatch: {relative}" for error in errors),
             errors,
         )
+
+    def test_security_policy_invocations_use_isolated_python(self) -> None:
+        surfaces = (ROOT / "Makefile", ROOT / ".github/workflows/validate.yml", ROOT / ".github/workflows/production-readback.yml", ROOT / ".github/workflows/security-policy-expiry.yml")
+        for path in surfaces:
+            text = path.read_text(encoding="utf-8")
+            with self.subTest(path=str(path)):
+                self.assertNotIn("python3 scripts/validate_security_policy.py", text)
+                self.assertIn("python3 -I scripts/validate_security_policy.py", text)
+
+    def test_isolated_security_policy_cli_ignores_scripts_yaml_shadow(self) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            scripts = root / "scripts"
+            scripts.mkdir(parents=True)
+            shutil.copy2(ROOT / "scripts/validate_security_policy.py", scripts / "validate_security_policy.py")
+            shutil.copy2(ROOT / "scripts/verify_security_workflow_blobs.py", scripts / "verify_security_workflow_blobs.py")
+            (scripts / "yaml.py").write_text('raise SystemExit("SHADOW MODULE EXECUTED")\n', encoding="utf-8")
+            result = subprocess.run(
+                [sys.executable, "-I", str(scripts / "validate_security_policy.py")],
+                cwd=root,
+                stdout=subprocess.PIPE,
+                stderr=subprocess.PIPE,
+                text=True,
+                check=False,
+            )
+        self.assertNotEqual(0, result.returncode)
+        self.assertNotIn("SHADOW MODULE EXECUTED", result.stdout + result.stderr)
+        self.assertNotIn("Traceback", result.stderr)
 
 
 if __name__ == "__main__":
