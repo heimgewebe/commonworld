@@ -624,6 +624,98 @@ class SecurityPolicyTests(unittest.TestCase):
                 errors,
             )
 
+    def test_security_critical_steps_cannot_move_to_a_suppressed_sibling_job(self) -> None:
+        cases = (
+            (
+                ".github/workflows/validate.yml",
+                "Upload pre-merge security receipt",
+                "validate workflow",
+            ),
+            (
+                ".github/workflows/production-readback.yml",
+                "Verify private vulnerability reporting setting",
+                "production readback workflow",
+            ),
+            (
+                ".github/workflows/security-policy-expiry.yml",
+                "Verify private vulnerability reporting remains enabled",
+                "security expiry workflow",
+            ),
+        )
+
+        def relocate_step(source: str, step_name: str) -> str:
+            marker = f"      - name: {step_name}\n"
+            self.assertEqual(1, source.count(marker))
+            start = source.index(marker)
+            end = source.find("      - name: ", start + len(marker))
+            if end == -1:
+                end = len(source)
+            block = source[start:end]
+            without = source[:start] + source[end:]
+            return (
+                without.rstrip()
+                + "\n\n  suppressed-security:\n"
+                + "    if: false\n"
+                + "    runs-on: ubuntu-latest\n"
+                + "    steps:\n"
+                + block.rstrip()
+                + "\n"
+            )
+
+        for relative, step_name, label in cases:
+            with self.subTest(relative=relative), tempfile.TemporaryDirectory() as directory:
+                root = self.copy_surface(directory)
+                path = root / relative
+                path.write_text(
+                    relocate_step(path.read_text(encoding="utf-8"), step_name),
+                    encoding="utf-8",
+                )
+                errors = validate_security_policy(root, now=self.NOW)
+            self.assertTrue(
+                any(
+                    label in error
+                    and "security-critical steps must belong to the same executable job" in error
+                    for error in errors
+                ),
+                errors,
+            )
+
+    def test_security_critical_steps_require_the_reviewed_job_name(self) -> None:
+        cases = (
+            (".github/workflows/validate.yml", "  contracts:\n", "validate workflow", "contracts"),
+            (
+                ".github/workflows/production-readback.yml",
+                "  verify-exact-pages-deployment:\n",
+                "production readback workflow",
+                "verify-exact-pages-deployment",
+            ),
+            (
+                ".github/workflows/security-policy-expiry.yml",
+                "  validate-security-policy-expiry:\n",
+                "security expiry workflow",
+                "validate-security-policy-expiry",
+            ),
+        )
+        for relative, marker, label, expected_job in cases:
+            with self.subTest(relative=relative), tempfile.TemporaryDirectory() as directory:
+                root = self.copy_surface(directory)
+                path = root / relative
+                source = path.read_text(encoding="utf-8")
+                self.assertEqual(1, source.count(marker))
+                path.write_text(
+                    source.replace(marker, "  renamed-security-job:\n", 1),
+                    encoding="utf-8",
+                )
+                errors = validate_security_policy(root, now=self.NOW)
+            self.assertTrue(
+                any(
+                    label in error
+                    and f"must belong to job '{expected_job}'" in error
+                    for error in errors
+                ),
+                errors,
+            )
+
     def test_quoted_mapping_key_whitespace_is_not_normalized(self) -> None:
         mutations = (
             (

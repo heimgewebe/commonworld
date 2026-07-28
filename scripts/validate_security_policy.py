@@ -273,11 +273,13 @@ def _reject_inherited_shell_override(
         errors.append(f"{scope} must not define defaults.run.shell")
 
 
-def _require_executable_job_for_step(
+def _require_executable_job_for_steps(
     workflow_text: str,
-    step_name: str,
+    step_names: tuple[str, ...],
     errors: list[str],
     label: str,
+    *,
+    expected_job_name: str | None = None,
 ) -> None:
     root = _compose_workflow(workflow_text)
     if root is None:
@@ -292,7 +294,7 @@ def _require_executable_job_for_step(
     if jobs_node is None:
         structural_errors.append(f"{label} must define jobs")
 
-    matches: list[tuple[str, dict[str, Node]]] = []
+    matches: dict[str, list[tuple[str, dict[str, Node]]]] = {name: [] for name in step_names}
     for job_name, job_node in jobs.items():
         job_entries = _yaml_mapping_entries(job_node, structural_errors, f"{label} job {job_name!r}")
         steps = job_entries.get("steps")
@@ -306,27 +308,53 @@ def _require_executable_job_for_step(
             )
             name_node = step_entries.get("name")
             name = _yaml_scalar_node_value(name_node) if name_node is not None else None
-            if name == step_name:
-                matches.append((job_name, job_entries))
+            if name in matches:
+                matches[name].append((job_name, job_entries))
 
-    if len(matches) != 1:
-        structural_errors.append(
-            f"{label} step {step_name!r} must belong to exactly one executable job"
-        )
-    else:
-        job_name, job_entries = matches[0]
-        for key in ("if", "continue-on-error"):
-            if key in job_entries:
+    resolved: list[tuple[str, dict[str, Node]]] = []
+    for step_name in step_names:
+        locations = matches[step_name]
+        if len(locations) != 1:
+            structural_errors.append(
+                f"{label} step {step_name!r} must belong to exactly one executable job"
+            )
+        else:
+            resolved.append(locations[0])
+
+    if len(resolved) == len(step_names):
+        job_names = {job_name for job_name, _ in resolved}
+        if len(job_names) != 1:
+            structural_errors.append(
+                f"{label} security-critical steps must belong to the same executable job"
+            )
+        else:
+            job_name = next(iter(job_names))
+            job_entries = resolved[0][1]
+            if expected_job_name is not None and job_name != expected_job_name:
                 structural_errors.append(
-                    f"{label} job {job_name!r} for step {step_name!r} must not define field {key!r}"
+                    f"{label} security-critical steps must belong to job {expected_job_name!r}, got {job_name!r}"
                 )
-        _reject_inherited_shell_override(
-            job_entries,
-            structural_errors,
-            f"{label} job {job_name!r}",
-        )
+            for key in ("if", "continue-on-error"):
+                if key in job_entries:
+                    structural_errors.append(
+                        f"{label} job {job_name!r} for security-critical steps must not define field {key!r}"
+                    )
+            _reject_inherited_shell_override(
+                job_entries,
+                structural_errors,
+                f"{label} job {job_name!r}",
+            )
 
     errors.extend(structural_errors)
+
+
+def _require_executable_job_for_step(
+    workflow_text: str,
+    step_name: str,
+    errors: list[str],
+    label: str,
+) -> None:
+    _require_executable_job_for_steps(workflow_text, (step_name,), errors, label)
 
 
 def _validate_expiry_triggers(workflow_text: str, errors: list[str]) -> None:
@@ -446,11 +474,16 @@ def validate_security_policy(root: Path = ROOT, now: datetime | None = None) -> 
         errors.append(".nojekyll would publish an unnecessarily broad dotfile surface")
 
     validate_text = (root / VALIDATE_WORKFLOW).read_text(encoding="utf-8")
-    _require_executable_job_for_step(
+    _require_executable_job_for_steps(
         validate_text,
-        "Verify private vulnerability reporting before merge",
+        (
+            "Verify private vulnerability reporting before merge",
+            "Upload pre-merge security receipt",
+            "Enforce pre-merge security readback",
+        ),
         errors,
         "validate workflow",
+        expected_job_name="contracts",
     )
     premerge = _require_structured_step(
         validate_text,
@@ -489,11 +522,18 @@ def validate_security_policy(root: Path = ROOT, now: datetime | None = None) -> 
     )
 
     production_text = (root / PRODUCTION_READBACK_WORKFLOW).read_text(encoding="utf-8")
-    _require_executable_job_for_step(
+    _require_executable_job_for_steps(
         production_text,
-        "Install security validation dependencies",
+        (
+            "Install security validation dependencies",
+            "Verify exact Pages deployment and public content",
+            "Verify private vulnerability reporting setting",
+            "Upload production readback receipts",
+            "Enforce production readback result",
+        ),
         errors,
         "production readback workflow",
+        expected_job_name="verify-exact-pages-deployment",
     )
     _require_structured_step(
         production_text,
@@ -540,11 +580,18 @@ def validate_security_policy(root: Path = ROOT, now: datetime | None = None) -> 
 
     expiry_text = (root / SECURITY_EXPIRY_WORKFLOW).read_text(encoding="utf-8")
     _validate_expiry_triggers(expiry_text, errors)
-    _require_executable_job_for_step(
+    _require_executable_job_for_steps(
         expiry_text,
-        "Install security validation dependencies",
+        (
+            "Install security validation dependencies",
+            "Validate disclosure policy and expiry",
+            "Verify private vulnerability reporting remains enabled",
+            "Upload scheduled security receipt",
+            "Enforce live reporting result",
+        ),
         errors,
         "security expiry workflow",
+        expected_job_name="validate-security-policy-expiry",
     )
     _require_structured_step(
         expiry_text,
