@@ -123,6 +123,7 @@ class LiveFetch:
     body: str
     attempts: tuple[FetchAttemptReceipt, ...] = ()
     raw_body: bytes | None = None
+    content_type_values: tuple[str, ...] = ()
 
 
 @dataclass(frozen=True)
@@ -214,7 +215,8 @@ def fetch_live_url(
                 raw = response.read()
                 status = int(response.status)
                 final_url = response.geturl()
-                content_type = response.headers.get("content-type", "")
+                content_type_values = tuple(response.headers.get_all("content-type") or ())
+                content_type = content_type_values[0] if content_type_values else ""
                 charset = response.headers.get_content_charset() or "utf-8"
         except urllib.error.HTTPError as error:
             status = int(error.code)
@@ -312,6 +314,7 @@ def fetch_live_url(
             body=body,
             attempts=tuple(attempts),
             raw_body=raw,
+            content_type_values=content_type_values,
         )
 
     raise AssertionError("bounded live fetch loop exhausted unexpectedly")

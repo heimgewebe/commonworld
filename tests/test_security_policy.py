@@ -99,7 +99,7 @@ class SecurityPolicyTests(unittest.TestCase):
         with tempfile.TemporaryDirectory() as directory:
             root = self.copy_surface(directory)
             path = root / ".well-known/security.txt"
-            prefix = "# Reviewed ASCII, tab\tand Unicode: ä and NBSP:\u00a0\n \t \n"
+            prefix = "# Reviewed ASCII, tab\tand Unicode: ä, NBSP:\u00a0 and noncharacter:\U000FFFFF\n \t \n"
             path.write_text(prefix + path.read_text(encoding="utf-8"), encoding="utf-8")
             errors = validate_security_policy(root, now=self.NOW)
         self.assertEqual([], errors)

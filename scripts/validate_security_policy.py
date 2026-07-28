@@ -79,6 +79,10 @@ def _parse_rfc3339(value: str) -> datetime:
     return datetime.fromisoformat(normalized)
 
 
+def _is_unicode_noncharacter(codepoint: int) -> bool:
+    return 0xFDD0 <= codepoint <= 0xFDEF or (codepoint <= 0x10FFFF and codepoint & 0xFFFF in {0xFFFE, 0xFFFF})
+
+
 def _valid_comment_line(raw_line: str) -> bool:
     """Return whether one RFC 9116 comment line uses only permitted characters."""
     return raw_line.startswith("#") and all(
@@ -142,7 +146,10 @@ def validate_security_policy(root: Path = ROOT, now: datetime | None = None) -> 
         errors.append("security.txt must not begin with a Unicode BOM")
     if unicodedata.normalize("NFC", security_text) != security_text:
         errors.append("security.txt must use Net-Unicode NFC normalization")
-    if any(unicodedata.category(character) == "Cn" for character in security_text):
+    if any(
+        unicodedata.category(character) == "Cn" and not _is_unicode_noncharacter(ord(character))
+        for character in security_text
+    ):
         errors.append("security.txt must not contain unassigned Unicode code points")
     if len(security_text.splitlines()) > MAX_LINES:
         errors.append("security.txt exceeds the RFC 9116 defensive line bound")

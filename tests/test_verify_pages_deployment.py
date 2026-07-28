@@ -299,11 +299,24 @@ class PagesDeploymentReadbackTests(unittest.TestCase):
             mime = verify_exact_public_files("https://commonworld.net/", 5, fetcher=wrong_mime, root=root)
             self.assertIn("security.txt content-type must be text/plain; charset=utf-8", mime.errors)
 
+            def duplicate_mime(url: str, **kwargs):
+                if url.endswith("security.txt"):
+                    return LiveFetch(
+                        url, url, 200, "text/plain; charset=utf-8", "expected",
+                        content_type_values=("text/plain; charset=utf-8", "text/html; charset=utf-8"),
+                    )
+                return LiveFetch(url, url, 200, "text/plain", "expected")
+            duplicate = verify_exact_public_files(
+                "https://commonworld.net/", 5, fetcher=duplicate_mime, root=root
+            )
+            self.assertIn("security.txt content-type must be text/plain; charset=utf-8", duplicate.errors)
+
             malformed_values = (
                 'text/plain; charset="utf-8',
                 'text/plain; charset=utf-8"',
                 'text/plain; charset="utf-8"; boundary=extra',
                 'text/plain; charset=utf-8; charset=utf-8',
+                'text/plain; charset="utf-8\\"',
                 'text/plain; charset =utf-8',
                 'text/plain; charset= utf-8',
                 'text/plain; charset = utf-8',
@@ -331,6 +344,7 @@ class PagesDeploymentReadbackTests(unittest.TestCase):
             valid_values = (
                 "text/plain; charset=utf-8",
                 'text/plain; charset="utf-8"',
+                'text/plain; charset="utf\\-8"',
                 "Text/Plain ; Charset=UTF-8",
             )
             for content_type in valid_values:

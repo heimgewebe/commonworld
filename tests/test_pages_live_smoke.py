@@ -101,6 +101,21 @@ class PagesLiveSmokeTests(unittest.TestCase):
             [(attempt.attempt, attempt.outcome, attempt.status, attempt.retryable) for attempt in fetch.attempts],
         )
 
+    @patch("scripts.smoke_pages_live.urllib.request.urlopen")
+    def test_fetch_preserves_duplicate_content_type_fields(self, urlopen) -> None:
+        url = "https://commonworld.net/.well-known/security.txt"
+        response = FakeResponse(url=url, content_type="text/plain; charset=utf-8", body=b"security")
+        response.headers["Content-Type"] = "text/html; charset=utf-8"
+        urlopen.return_value = response
+
+        fetch = fetch_live_url(url, retry_count=0)
+
+        self.assertEqual(
+            ("text/plain; charset=utf-8", "text/html; charset=utf-8"),
+            fetch.content_type_values,
+        )
+        self.assertEqual("text/plain; charset=utf-8", fetch.content_type)
+
     @patch("scripts.smoke_pages_live.time.sleep")
     @patch("scripts.smoke_pages_live.urllib.request.urlopen")
     def test_persistent_503_fails_after_exactly_one_retry(self, urlopen, sleep) -> None:

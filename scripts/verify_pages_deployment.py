@@ -33,13 +33,48 @@ EXACT_PUBLIC_FILES = (("", "index.html"), ("propose.html", "propose.html"), ("ca
 PENDING_DEPLOYMENT_STATES = {"waiting", "queued", "pending", "in_progress"}
 FAILED_DEPLOYMENT_STATES = {"error", "failure", "inactive"}
 SECURITY_TXT_CONTENT_TYPE_RE = re.compile(
-    r'^[ \t]*text/plain[ \t]*;[ \t]*charset=(?:utf-8|"utf-8")[ \t]*$',
+    r'^[ \t]*text/plain[ \t]*;[ \t]*charset=(?P<value>.*?)[ \t]*$',
     re.IGNORECASE | re.ASCII,
 )
 
 
+def _decode_http_quoted_string(value: str) -> str | None:
+    if len(value) < 2 or value[0] != '"' or value[-1] != '"':
+        return None
+    decoded: list[str] = []
+    index = 1
+    while index < len(value) - 1:
+        character = value[index]
+        if character == "\\":
+            index += 1
+            if index >= len(value) - 1:
+                return None
+            character = value[index]
+            codepoint = ord(character)
+            if character not in {"\t", " "} and not (0x21 <= codepoint <= 0x7E or 0x80 <= codepoint <= 0xFF):
+                return None
+            decoded.append(character)
+        else:
+            codepoint = ord(character)
+            if character in {'"', "\\"}:
+                return None
+            if character not in {"\t", " "} and not (codepoint == 0x21 or 0x23 <= codepoint <= 0x5B or 0x5D <= codepoint <= 0x7E or 0x80 <= codepoint <= 0xFF):
+                return None
+            decoded.append(character)
+        index += 1
+    return "".join(decoded)
+
+
 def valid_security_txt_content_type(value: str) -> bool:
-    return SECURITY_TXT_CONTENT_TYPE_RE.fullmatch(value) is not None
+    match = SECURITY_TXT_CONTENT_TYPE_RE.fullmatch(value)
+    if match is None:
+        return False
+    parameter_value = match.group("value")
+    if parameter_value.startswith('"'):
+        decoded = _decode_http_quoted_string(parameter_value)
+        return decoded is not None and decoded.isascii() and decoded.lower() == "utf-8"
+    return parameter_value.isascii() and parameter_value.lower() == "utf-8"
+
 
 
 @dataclass(frozen=True)
@@ -313,7 +348,8 @@ def verify_exact_public_files(
         expected_sha256 = hashlib.sha256(expected_bytes).hexdigest()
         content_type_valid = True
         if local_relative == ".well-known/security.txt":
-            content_type_valid = valid_security_txt_content_type(fetch.content_type)
+            content_type_values = fetch.content_type_values or ((fetch.content_type,) if fetch.content_type else ())
+            content_type_valid = len(content_type_values) == 1 and valid_security_txt_content_type(content_type_values[0])
         matched = fetch.status == 200 and fetch.final_url == requested_url and remote_sha256 == expected_sha256 and content_type_valid
         receipts.append(
             ExactPublicFileReceipt(
