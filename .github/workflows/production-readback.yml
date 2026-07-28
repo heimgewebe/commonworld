@@ -17,7 +17,7 @@ concurrency:
 jobs:
   verify-exact-pages-deployment:
     runs-on: ubuntu-latest
-    timeout-minutes: 20
+    timeout-minutes: 30
     steps:
       - name: Check out exact commit
         uses: actions/checkout@v7
@@ -46,7 +46,17 @@ jobs:
           --live-timeout-seconds 5
           --live-retry-delays-seconds 0,30,90
 
-      - name: Upload production readback receipt
+      - name: Verify private vulnerability reporting setting
+        id: security_setting
+        continue-on-error: true
+        run: >-
+          python3 scripts/validate_security_policy.py
+          --verify-live-setting
+          --repository "${{ github.repository }}"
+          --expected-sha "${{ github.sha }}"
+          --receipt artifacts/commonworld-private-vulnerability-reporting.json
+
+      - name: Upload Pages production readback receipt
         if: always()
         uses: actions/upload-artifact@v7
         with:
@@ -55,6 +65,15 @@ jobs:
           if-no-files-found: error
           retention-days: 30
 
+      - name: Upload private reporting readback receipt
+        if: always()
+        uses: actions/upload-artifact@v7
+        with:
+          name: commonworld-private-vulnerability-reporting-${{ github.sha }}
+          path: artifacts/commonworld-private-vulnerability-reporting.json
+          if-no-files-found: error
+          retention-days: 30
+
       - name: Enforce production readback result
-        if: always() && steps.readback.outcome != 'success'
+        if: always() && (steps.readback.outcome != 'success' || steps.security_setting.outcome != 'success')
         run: exit 1
