@@ -1113,7 +1113,7 @@ class SecurityPolicyTests(unittest.TestCase):
             subprocess.run(["git", "-C", str(root), "commit", "-q", "-m", "drift trusted blob"], check=True)
             errors = validate_trusted_blobs(root, "HEAD")
         self.assertTrue(
-            any(error.startswith(f"trusted committed blob digest mismatch: {relative};") for error in errors),
+            any(error == f"trusted committed blob digest mismatch: {relative}" for error in errors),
             errors,
         )
 

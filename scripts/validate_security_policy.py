@@ -23,6 +23,8 @@ from yaml.nodes import MappingNode, Node, ScalarNode, SequenceNode
 if __package__ in {None, ""}:
     sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 
+from scripts.verify_security_workflow_blobs import NORMALIZED_WORKFLOW_SHA256, normalized_workflow_sha256
+
 ROOT = Path(__file__).resolve().parents[1]
 SECURITY_POLICY = Path("SECURITY.md")
 SECURITY_TXT = Path(".well-known/security.txt")
@@ -530,6 +532,12 @@ def validate_security_policy(root: Path = ROOT, now: datetime | None = None) -> 
     if errors:
         return errors
 
+    for relative, expected_digest in NORMALIZED_WORKFLOW_SHA256.items():
+        digest, normalization_error = normalized_workflow_sha256(relative, (root / relative).read_bytes())
+        if normalization_error is not None:
+            errors.append(normalization_error)
+        elif digest != expected_digest:
+            errors.append(f"security workflow normalized digest mismatch: {relative}")
 
     security_bytes = (root / SECURITY_TXT).read_bytes()
     if len(security_bytes) > MAX_BYTES:
