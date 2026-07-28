@@ -686,6 +686,45 @@ export function ribbonRepeatCount(recordCount, minimumSegments = 12) {
 export const RING_ORBIT_MIN_DURATION_S = 72;
 export const RING_ORBIT_MAX_DURATION_S = 180;
 export const SPHERE_RING_IDENTITY_PREVIEW_LIMIT = 6;
+export const SPHERE_RING_LABEL_MAX_CHARS = 18;
+
+const normalizedSphereRingTitle = (record) => String(record?.title ?? record?.id ?? '').trim().replace(/\s+/gu, ' ');
+const sphereRingCharacters = (value) => Array.from(String(value ?? ''));
+
+function boundedSphereRingLabel(value, maximumCharacters, suffix = '') {
+  const characters = sphereRingCharacters(value);
+  const suffixCharacters = sphereRingCharacters(suffix);
+  const available = maximumCharacters - suffixCharacters.length;
+  if (available < 1) throw new RangeError('sphere ring label suffix exceeds the label budget');
+  if (characters.length <= available) return `${characters.join('')}${suffix}`;
+  const visibleCharacters = Math.max(1, available - 1);
+  return `${characters.slice(0, visibleCharacters).join('')}…${suffix}`;
+}
+
+export function sphereRingLabelAssignments(records, maximumCharacters = SPHERE_RING_LABEL_MAX_CHARS) {
+  if (!Number.isInteger(maximumCharacters) || maximumCharacters < 4) throw new RangeError('sphere ring label budget must be an integer of at least four characters');
+  const entries = (Array.isArray(records) ? records : []).map((record) => ({
+    id: String(record?.id ?? ''),
+    fullText: normalizedSphereRingTitle(record),
+  }));
+  const visibleByFullText = new Map();
+  const usedVisibleTexts = new Set();
+  for (const fullText of [...new Set(entries.map((entry) => entry.fullText))].sort()) {
+    let visibleText = boundedSphereRingLabel(fullText, maximumCharacters);
+    let suffixIndex = 1;
+    while (usedVisibleTexts.has(visibleText)) {
+      visibleText = boundedSphereRingLabel(fullText, maximumCharacters, `·${suffixIndex}`);
+      suffixIndex += 1;
+    }
+    visibleByFullText.set(fullText, visibleText);
+    usedVisibleTexts.add(visibleText);
+  }
+  return entries.map(({ id, fullText }) => Object.freeze({
+    id,
+    fullText,
+    visibleText: visibleByFullText.get(fullText) ?? boundedSphereRingLabel(fullText, maximumCharacters),
+  }));
+}
 const RING_ORBIT_SATURATION_COUNT = 48;
 const SPHERE_VIEWBOX_SIZE = 640;
 const SPHERE_RING_SCREEN_FONT_TARGETS = Object.freeze({ micro: 13.5, compact: 14.5, names: 15.5, close: 16 });

@@ -19,6 +19,10 @@
         4
       ],
       "maxRingPreviewCount": 6,
+      "orbitLabelMaxChars": 18,
+      "maximumVisibleRingLabelCharacters": 18,
+      "accessibleFullTitleParity": true,
+      "collisionSafeVisibleLabels": true,
       "movingRingMatrix": true,
       "unchangedGeometryRepaintSkipped": true
     },
@@ -86,9 +90,9 @@
       "filterButtonWidth": 44,
       "filterButtonHeight": 44,
       "ringAnimationName": "sphere-ring-orbit",
-      "ringTransform": "matrix(1, 0.000765244, -0.000765244, 1, 0, 0)",
-      "ringTextWidth": 799.025390625,
-      "ringTextHeight": 13.611419677734375,
+      "ringTransform": "matrix(1, 0.000769672, -0.000769672, 1, 0, 0)",
+      "ringTextWidth": 660.6035766601562,
+      "ringTextHeight": 13.5084228515625,
       "ringTextFontSize": 22,
       "primaryRingCount": 3,
       "depthRingCount": 2,
@@ -136,7 +140,7 @@
     {
       "id": "layer-journey-moveend-return",
       "verdict": "PASS",
-      "elapsedMs": 1919
+      "elapsedMs": 1867
     },
     {
       "id": "layer-journey-interrupted",
@@ -282,9 +286,9 @@
     }
   ],
   "binding": {
-    "smoke_script_sha256": "d6c44f146f36dc7cc103c4dbde00487629fbe31c9aff4ab34b2daa9ef89da234",
+    "smoke_script_sha256": "736b54c01638fae5d008141caf96aaecac86608e529ea41d4f6ed23d4baf4664",
     "smoke_runner_sha256": "522b99b70b1d0064b1d0a31a3a67fdc9a2e73b7408f37d1a4bb303bc360b7556",
-    "first_party_surface_sha256": "d534404d15c88c5f235e6a3f7360b79bbc9fa880cdce1db45858f2f8f1e0dcb5",
+    "first_party_surface_sha256": "4e3c85082ba9c67dd56429c97494481afa23747a0820c4dae1dbbee422a92365",
     "scenario_ids": [
       "startup-and-ring-orbits",
       "ring-orbits-reduced-motion",
@@ -325,9 +329,9 @@
     "smoke_plan_sha256": "6b8749928ead5ef81ee66883e6a2993e756ce083575c3569234bf70526448364"
   },
   "execution": {
-    "result_sha256": "95f53f9b8939b1ef643a08cf3f5fdb58465f5b8d37b29e7a47cd1f7f142aeac5",
-    "readback_job_id": "d35b6a1f50d7",
-    "readback_finalization_receipt_sha256": "44fb336e7f27fe5ef1fb4025cfb59fcf7fe948cb06ba9cdaedd05c3f3dfd3bdd",
-    "transport_note": "Fresh current-surface public browser smoke completed all 34 scenarios successfully. The startup scenario proves the configured six-name limit against public ring counts [6, 6, 6, 6, 4]; historical v6 research evidence remains unchanged."
+    "result_sha256": "a8cac182bb8351d46dfd2f2da3a50d5c635aa62c108ab02fc94b913d46a25ed5",
+    "readback_job_id": "81321b43fd5d",
+    "readback_finalization_receipt_sha256": "18ebb0a21baf54f3683b04f452f12ffd06566f79f1b6fd5ed2fcf90fd93830af",
+    "transport_note": "Fresh exact-surface public browser smoke completed all 34 scenarios. It proves the six-name preview limit, a maximum of 18 visible Unicode characters, accessible full-title parity, globally collision-safe short labels, and focus-triggered ring pause."
   }
 }

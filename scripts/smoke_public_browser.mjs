@@ -20,6 +20,7 @@ import {
   publicMapFeatureCollection,
   ringOrbitDuration,
   SPHERE_RING_IDENTITY_PREVIEW_LIMIT,
+  SPHERE_RING_LABEL_MAX_CHARS,
   serializeDigitalPath,
   sphereOpacityForGlobeRatio,
   visibleDigitalNodes,
@@ -565,7 +566,11 @@ async function startupAndRingOrbitScenario() {
   const rings = await run.page.evaluate(() => {
     return [...document.querySelectorAll('#sphere-rings .sphere-ring-plane')].map((plane) => {
       const style = getComputedStyle(plane);
-      const names = [...plane.querySelectorAll('.sphere-ring-name[data-commonproject-id]')].map((node) => node.dataset.commonprojectId);
+      const names = [...plane.querySelectorAll('.sphere-ring-name[data-commonproject-id]')].map((node) => ({
+        id: node.dataset.commonprojectId,
+        visibleText: node.dataset.visibleLabel ?? node.textContent.trim(),
+        ariaLabel: node.getAttribute('aria-label') ?? '',
+      }));
       return {
         layer: plane.dataset.layerId,
         entryCount: Number(plane.dataset.entryCount),
@@ -579,7 +584,8 @@ async function startupAndRingOrbitScenario() {
         hasGuide: plane.querySelector('use.sphere-layer-guide') !== null,
         placeholderCount: plane.querySelectorAll('.sphere-ring-placeholder').length,
         placeholderIds: [...plane.querySelectorAll('.sphere-ring-placeholder')].filter((node) => node.dataset.commonprojectId).length,
-        ids: names,
+        ids: names.map(({ id }) => id),
+        names,
       };
     });
   });
@@ -593,6 +599,10 @@ async function startupAndRingOrbitScenario() {
     assert(Number.isFinite(ring.entryCount) && ring.entryCount === expectedLayer.count, `ring orbits: ${ring.layer} entry count diverges from catalog identities ${JSON.stringify({ ring, expectedLayer })}`);
     assertSameIds(ring.ids, expectedLayer.ringPreviewIds, `ring orbits: ${ring.layer} lane identity set`);
     assert(new Set(ring.ids).size === ring.ids.length, `ring orbits: ${ring.layer} repeats an identity ${JSON.stringify(ring.ids)}`);
+    const visibleLabels = ring.names.map(({ visibleText }) => visibleText);
+    assert(ring.names.every(({ visibleText }) => Array.from(visibleText).length <= SPHERE_RING_LABEL_MAX_CHARS), `ring orbits: ${ring.layer} exceeds the 18-character label contract ${JSON.stringify(ring.names)}`);
+    assert(ring.names.every(({ id, ariaLabel }) => ariaLabel === expectedDigitalProjection.titleById[id]), `ring orbits: ${ring.layer} lost accessible full-title parity ${JSON.stringify(ring.names)}`);
+    assert(new Set(visibleLabels).size === visibleLabels.length, `ring orbits: ${ring.layer} exposes colliding visible short labels ${JSON.stringify(visibleLabels)}`);
     if (ring.entryCount === 0) {
       assert(ring.placeholderCount === 1 && ring.placeholderIds === 0, `ring orbits: empty ${ring.layer} needs a non-identity placeholder ${JSON.stringify(ring)}`);
     } else {
@@ -639,7 +649,8 @@ async function startupAndRingOrbitScenario() {
 
   assert(run.consoleErrors.length === 0, 'startup: console errors: ' + run.consoleErrors.join(' | ') + '; HTTP: ' + run.httpErrors.join(' | '));
   assert(run.pageErrors.length === 0, 'startup: page errors: ' + run.pageErrors.join(' | '));
-  results.push({ id: 'startup-and-ring-orbits', verdict: 'PASS', directGlobeProjection: true, hiddenUntilCalibrated: true, outerHintRemoved: true, aggregateRingIdentities: aggregateCount, configuredRingPreviewLimit: SPHERE_RING_IDENTITY_PREVIEW_LIMIT, ringPreviewCounts, maxRingPreviewCount, movingRingMatrix: movedRing, unchangedGeometryRepaintSkipped: true });
+  const maximumVisibleRingLabelCharacters = Math.max(...rings.flatMap(({ names }) => names.map(({ visibleText }) => Array.from(visibleText).length)));
+  results.push({ id: 'startup-and-ring-orbits', verdict: 'PASS', directGlobeProjection: true, hiddenUntilCalibrated: true, outerHintRemoved: true, aggregateRingIdentities: aggregateCount, configuredRingPreviewLimit: SPHERE_RING_IDENTITY_PREVIEW_LIMIT, ringPreviewCounts, maxRingPreviewCount, orbitLabelMaxChars: SPHERE_RING_LABEL_MAX_CHARS, maximumVisibleRingLabelCharacters, accessibleFullTitleParity: true, collisionSafeVisibleLabels: true, movingRingMatrix: movedRing, unchangedGeometryRepaintSkipped: true });
   await run.context.close();
 }
 
@@ -964,15 +975,13 @@ async function layerJourneyScenario({ mobile = false, viewportOverride = null, t
   assert(Math.abs(before.width - declaredBefore * 1.32) <= 2, `layer journey: outer shell ratio is wrong (${before.width} vs ${declaredBefore})`);
   const overviewRibbons = await run.page.evaluate(() => ({
     rings: document.querySelectorAll('.sphere-ring-text').length,
-    names: [...document.querySelectorAll('.sphere-ring-name')].map((node) => node.textContent.trim()).filter(Boolean),
+    ids: [...document.querySelectorAll('.sphere-ring-name[data-commonproject-id]')].map((node) => node.dataset.commonprojectId).filter(Boolean),
     labels: [...document.querySelectorAll('.sphere-ring-label')].map((node) => node.textContent.trim()).filter(Boolean),
     binaryCount: document.querySelectorAll('.sphere-ring-binary').length,
   }));
   assert(overviewRibbons.rings === expectedDigitalProjection.fields.length, `layer journey: overview does not contain all text rings (${JSON.stringify(overviewRibbons)})`);
-  const expectedOverviewNames = expectedDigitalProjection.fields.flatMap(({ ringPreviewIds }) =>
-    ringPreviewIds.map((identifier) => expectedDigitalProjection.titleById[identifier]),
-  );
-  assertSameIds(overviewRibbons.names, expectedOverviewNames, 'layer journey: preview ring Commons name set');
+  const expectedOverviewIds = expectedDigitalProjection.fields.flatMap(({ ringPreviewIds }) => ringPreviewIds);
+  assertSameIds(overviewRibbons.ids, expectedOverviewIds, 'layer journey: preview ring Commons identity set');
   const expectedOverviewLabels = expectedDigitalProjection.fields.map(({ label, count }) => `${label} · ${count}`);
   assertSameIds(overviewRibbons.labels, expectedOverviewLabels, 'layer journey: overview ring category labels');
   assert(overviewRibbons.labels.length === expectedDigitalProjection.fields.length, `layer journey: overview rings do not expose exactly one readable category label each (${JSON.stringify(overviewRibbons.labels)})`);

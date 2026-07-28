@@ -57,6 +57,8 @@ import {
   RING_ORBIT_MIN_DURATION_S,
   RING_ORBIT_MAX_DURATION_S,
   SPHERE_RING_IDENTITY_PREVIEW_LIMIT,
+  SPHERE_RING_LABEL_MAX_CHARS,
+  sphereRingLabelAssignments,
   normalizeDigitalPath,
   ringOrbitDirection,
   ringOrbitDuration,
@@ -392,6 +394,23 @@ test('orbital profiles remain distinct semantic paths rather than copied circles
   assert.equal(new Set(ORBIT_PROFILES.map(({ rotation }) => rotation)).size, ORBIT_PROFILES.length);
   assert(ORBIT_PROFILES.every(({ rx, ry }) => rx !== ry));
   assert(ORBIT_PROFILES.every(({ rx, ry }) => rx >= 274 && ry >= 262));
+});
+
+test('sphere ring labels stay bounded, accessible and collision-safe', () => {
+  const records = [
+    { id: 'one', title: 'National Communal Conservancies and Community Forest Alliance' },
+    { id: 'two', title: 'National Communal Conservancies and Community Farming Alliance' },
+    { id: 'three', title: 'Wikipedia' },
+    { id: 'four', title: 'National Commun…·1' },
+  ];
+  const assignments = sphereRingLabelAssignments(records);
+  assert.equal(assignments.length, 4);
+  assert.ok(assignments.every(({ visibleText }) => Array.from(visibleText).length <= SPHERE_RING_LABEL_MAX_CHARS));
+  assert.equal(assignments[2].visibleText, 'Wikipedia');
+  assert.equal(new Set(assignments.map(({ visibleText }) => visibleText)).size, 4);
+  assert.equal(assignments[0].fullText, records[0].title);
+  assert.notEqual(assignments[0].visibleText, assignments[1].visibleText);
+  assert.ok(assignments.some(({ visibleText }) => /·[0-9]+$/.test(visibleText)));
 });
 
 test('sphere ring typography preserves screen-space legibility and balanced emphasis', () => {

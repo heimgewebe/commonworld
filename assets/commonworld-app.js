@@ -40,6 +40,7 @@ import {
   ringOrbitDuration,
   ringOrbitStartAngle,
   SPHERE_RING_IDENTITY_PREVIEW_LIMIT,
+  sphereRingLabelAssignments,
   safeExternalHttpsUrl,
   sampledDiagnosticPublicationDue,
   searchFromState,
@@ -53,7 +54,7 @@ import {
   sphereRingStrokeWidth,
   stateFromSearch,
   visibleDigitalNodes,
-} from './commonworld-core.mjs?v=b7a50dcfc9af';
+} from './commonworld-core.mjs?v=59775c4937c2';
 
 const LOCALE = documentLocale();
 const t = (key, germanFallback, variables = {}) => i18nText(LOCALE, key, germanFallback, variables);
@@ -725,9 +726,14 @@ function appendRingSequence(textPath, records, { prefix = '' } = {}) {
     label.textContent = `  ${prefix}  `;
     textPath.append(label);
   }
-  for (const record of records) {
-    const name = createSvgElement('tspan', { class: 'sphere-ring-name', 'data-commonproject-id': record.id });
-    name.textContent = `\u00A0\u00A0${record.title}`;
+  for (const assignment of sphereRingLabelAssignments(records)) {
+    const name = createSvgElement('tspan', {
+      class: 'sphere-ring-name',
+      'data-commonproject-id': assignment.id,
+      'data-visible-label': assignment.visibleText,
+      'aria-label': assignment.fullText,
+    });
+    name.textContent = `\u00A0\u00A0${assignment.visibleText}`;
     textPath.append(name);
   }
 }
