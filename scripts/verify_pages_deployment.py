@@ -34,7 +34,7 @@ PENDING_DEPLOYMENT_STATES = {"waiting", "queued", "pending", "in_progress"}
 FAILED_DEPLOYMENT_STATES = {"error", "failure", "inactive"}
 SECURITY_TXT_CONTENT_TYPE_RE = re.compile(
     r'^[ \t]*text/plain[ \t]*;[ \t]*charset=(?:utf-8|"utf-8")[ \t]*$',
-    re.IGNORECASE,
+    re.IGNORECASE | re.ASCII,
 )
 
 

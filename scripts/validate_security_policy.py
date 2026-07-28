@@ -83,7 +83,7 @@ def _valid_comment_line(raw_line: str) -> bool:
     return raw_line.startswith("#") and all(
         character in {"\t", " "}
         or 0x21 <= ord(character) <= 0x7E
-        or 0x80 <= ord(character) <= 0xFFFFF
+        or 0xA0 <= ord(character) <= 0xFFFFF
         for character in raw_line[1:]
     )
 

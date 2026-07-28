@@ -69,6 +69,8 @@ class SecurityPolicyTests(unittest.TestCase):
             "#\x00bad",
             "#\x1fbad",
             "#\x7fbad",
+            "#\x80bad",
+            "#\x9fbad",
             "#\U00100000bad",
         )
         for comment in invalid_comments:
@@ -83,7 +85,7 @@ class SecurityPolicyTests(unittest.TestCase):
         with tempfile.TemporaryDirectory() as directory:
             root = self.copy_surface(directory)
             path = root / ".well-known/security.txt"
-            prefix = "# Reviewed ASCII, tab\tand Unicode: ä\n \t \n"
+            prefix = "# Reviewed ASCII, tab\tand Unicode: ä and NBSP:\u00a0\n \t \n"
             path.write_text(prefix + path.read_text(encoding="utf-8"), encoding="utf-8")
             errors = validate_security_policy(root, now=self.NOW)
         self.assertEqual([], errors)
