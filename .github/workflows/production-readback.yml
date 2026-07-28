@@ -23,15 +23,61 @@ jobs:
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
         with:
           ref: ${{ github.sha }}
-
       - name: Set up Python
         uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97 # v7
         with:
           python-version: "3.12"
+      - name: Verify trusted security bootstrap
+        env:
+          EXPECTED_SHA: ${{ github.sha }}
+          EXPECTED_BOOTSTRAP_SHA256: e7b33c3cdef303505b6789ea07696b3f7eeec6a9f770dc74ab3da459026aea66
+        run: |
+          python3 -I -S - <<'PY'
+          import hashlib
+          import os
+          import pathlib
+          import stat
+          import subprocess
+          import sys
 
-      - name: Verify committed security workflow blobs
-        run: python3 scripts/verify_security_workflow_blobs.py --revision HEAD
+          path = pathlib.Path("scripts/verify_security_workflow_blobs.py")
+          expected_sha = os.environ["EXPECTED_SHA"].lower()
+          expected_digest = os.environ["EXPECTED_BOOTSTRAP_SHA256"].lower()
 
+          def git(*arguments):
+              result = subprocess.run(
+                  ["git", *arguments],
+                  check=False,
+                  stdout=subprocess.PIPE,
+                  stderr=subprocess.PIPE,
+              )
+              if result.returncode != 0:
+                  raise SystemExit(result.stderr.decode("utf-8", errors="replace"))
+              return result.stdout
+
+          head = git("rev-parse", "HEAD").decode("ascii").strip().lower()
+          if head != expected_sha:
+              raise SystemExit(f"checkout revision mismatch: expected {expected_sha}, got {head}")
+          metadata = path.lstat()
+          if not stat.S_ISREG(metadata.st_mode):
+              raise SystemExit("security bootstrap worktree path is not a regular file")
+          entries = [entry for entry in git("ls-tree", "-z", "HEAD", "--", str(path)).split(b"\0") if entry]
+          if len(entries) != 1 or b"\t" not in entries[0]:
+              raise SystemExit("security bootstrap must resolve to one committed tree entry")
+          header, committed_path = entries[0].split(b"\t", 1)
+          mode, object_type, object_id = (part.decode("ascii") for part in header.split())
+          if committed_path.decode("utf-8") != str(path) or mode != "100755" or object_type != "blob":
+              raise SystemExit("security bootstrap committed entry mismatch")
+          blob = git("cat-file", "blob", object_id)
+          digest = hashlib.sha256(blob).hexdigest()
+          if digest != expected_digest:
+              raise SystemExit(f"security bootstrap digest mismatch: expected {expected_digest}, got {digest}")
+          if path.read_bytes() != blob:
+              raise SystemExit("security bootstrap worktree differs from committed blob")
+          PY
+          python3 -I -S scripts/verify_security_workflow_blobs.py \
+            --revision HEAD \
+            --expected-sha "$EXPECTED_SHA"
       - name: Verify exact Pages deployment and public content
         id: readback
         continue-on-error: true
@@ -48,10 +94,8 @@ jobs:
           --deployment-poll-seconds 10
           --live-timeout-seconds 5
           --live-retry-delays-seconds 0,30,90
-
       - name: Install security validation dependencies
         run: python -m pip install -r requirements-dev.txt
-
       - name: Verify private vulnerability reporting setting
         id: security_setting
         continue-on-error: true
@@ -61,7 +105,6 @@ jobs:
           --repository "${{ github.repository }}"
           --expected-sha "${{ github.sha }}"
           --receipt artifacts/commonworld-private-vulnerability-reporting.json
-
       - name: Upload Pages production readback receipt
         if: always()
         uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7
@@ -70,7 +113,6 @@ jobs:
           path: artifacts/commonworld-pages-production-readback.json
           if-no-files-found: error
           retention-days: 30
-
       - name: Upload private reporting readback receipt
         if: always()
         uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7
@@ -79,7 +121,6 @@ jobs:
           path: artifacts/commonworld-private-vulnerability-reporting.json
           if-no-files-found: error
           retention-days: 30
-
       - name: Enforce production readback result
         if: always() && (steps.readback.outcome != 'success' || steps.security_setting.outcome != 'success')
         run: exit 1

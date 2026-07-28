@@ -4,7 +4,6 @@
 from __future__ import annotations
 
 import argparse
-import hashlib
 import http.client
 import json
 import re
@@ -23,8 +22,6 @@ from yaml.nodes import MappingNode, Node, ScalarNode, SequenceNode
 
 if __package__ in {None, ""}:
     sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
-
-from scripts.verify_security_workflow_blobs import EXPECTED_WORKFLOW_SHA256
 
 ROOT = Path(__file__).resolve().parents[1]
 SECURITY_POLICY = Path("SECURITY.md")
@@ -408,6 +405,78 @@ def _require_executable_job_for_step(
     _require_executable_job_for_steps(workflow_text, (step_name,), errors, label)
 
 
+def _mapping_scalar(entries: dict[str, Node], key: str) -> str | None:
+    node = entries.get(key)
+    return _yaml_scalar_node_value(node) if node is not None else None
+
+
+def _single_branch_trigger(
+    on_entries: dict[str, Node],
+    event: str,
+    structural_errors: list[str],
+    label: str,
+) -> None:
+    event_node = on_entries.get(event)
+    event_entries = _yaml_mapping_entries(event_node, structural_errors, event) if event_node is not None else {}
+    branches = event_entries.get("branches")
+    values = []
+    if isinstance(branches, SequenceNode):
+        for item in branches.value:
+            value = _yaml_scalar_node_value(item)
+            if value is not None:
+                values.append(value)
+    if set(event_entries) != {"branches"} or values != ["main"]:
+        structural_errors.append(f"{label} on.{event} must contain exactly branches: [main]")
+
+
+def _validate_validate_triggers(workflow_text: str, errors: list[str]) -> None:
+    root = _compose_workflow(workflow_text)
+    if root is None:
+        errors.append("validate workflow must be valid YAML")
+        return
+    structural_errors: list[str] = []
+    root_entries = _yaml_mapping_entries(root, structural_errors, "validate top-level")
+    on_node = root_entries.get("on")
+    on_entries = _yaml_mapping_entries(on_node, structural_errors, "validate on") if on_node is not None else {}
+    if set(on_entries) != {"pull_request", "push"}:
+        structural_errors.append("validate workflow triggers must equal pull_request and push")
+    pull_request = on_entries.get("pull_request")
+    if pull_request is None or not isinstance(pull_request, ScalarNode):
+        structural_errors.append("validate workflow must define an unconfigured pull_request trigger")
+    _single_branch_trigger(on_entries, "push", structural_errors, "validate workflow")
+    permissions = root_entries.get("permissions")
+    permission_entries = _yaml_mapping_entries(permissions, structural_errors, "validate permissions") if permissions is not None else {}
+    if set(permission_entries) != {"contents"} or _mapping_scalar(permission_entries, "contents") != "read":
+        structural_errors.append("validate workflow permissions must equal contents: read")
+    errors.extend(structural_errors)
+
+
+def _validate_production_triggers(workflow_text: str, errors: list[str]) -> None:
+    root = _compose_workflow(workflow_text)
+    if root is None:
+        errors.append("production readback workflow must be valid YAML")
+        return
+    structural_errors: list[str] = []
+    root_entries = _yaml_mapping_entries(root, structural_errors, "production top-level")
+    on_node = root_entries.get("on")
+    on_entries = _yaml_mapping_entries(on_node, structural_errors, "production on") if on_node is not None else {}
+    if set(on_entries) != {"push", "workflow_dispatch"}:
+        structural_errors.append("production readback triggers must equal push and workflow_dispatch")
+    _single_branch_trigger(on_entries, "push", structural_errors, "production readback workflow")
+    dispatch = on_entries.get("workflow_dispatch")
+    if dispatch is None or not isinstance(dispatch, ScalarNode):
+        structural_errors.append("production readback must define an unconfigured workflow_dispatch trigger")
+    permissions = root_entries.get("permissions")
+    permission_entries = _yaml_mapping_entries(permissions, structural_errors, "production permissions") if permissions is not None else {}
+    if set(permission_entries) != {"contents", "deployments"} or _mapping_scalar(permission_entries, "contents") != "read" or _mapping_scalar(permission_entries, "deployments") != "read":
+        structural_errors.append("production readback permissions must equal contents: read and deployments: read")
+    concurrency = root_entries.get("concurrency")
+    concurrency_entries = _yaml_mapping_entries(concurrency, structural_errors, "production concurrency") if concurrency is not None else {}
+    if set(concurrency_entries) != {"group", "cancel-in-progress"} or _mapping_scalar(concurrency_entries, "group") != "commonworld-production-readback-${{ github.sha }}" or _mapping_scalar(concurrency_entries, "cancel-in-progress") != "false":
+        structural_errors.append("production readback concurrency contract mismatch")
+    errors.extend(structural_errors)
+
+
 def _validate_expiry_triggers(workflow_text: str, errors: list[str]) -> None:
     root = _compose_workflow(workflow_text)
     if root is None:
@@ -461,13 +530,6 @@ def validate_security_policy(root: Path = ROOT, now: datetime | None = None) -> 
     if errors:
         return errors
 
-    for relative, expected_sha256 in EXPECTED_WORKFLOW_SHA256.items():
-        actual_sha256 = hashlib.sha256((root / relative).read_bytes()).hexdigest()
-        if actual_sha256 != expected_sha256:
-            errors.append(
-                f"security workflow bytes changed without reviewed digest update: {relative}; "
-                f"expected {expected_sha256}, got {actual_sha256}"
-            )
 
     security_bytes = (root / SECURITY_TXT).read_bytes()
     if len(security_bytes) > MAX_BYTES:
@@ -533,6 +595,7 @@ def validate_security_policy(root: Path = ROOT, now: datetime | None = None) -> 
         errors.append(".nojekyll would publish an unnecessarily broad dotfile surface")
 
     validate_text = (root / VALIDATE_WORKFLOW).read_text(encoding="utf-8")
+    _validate_validate_triggers(validate_text, errors)
     _require_executable_job_for_steps(
         validate_text,
         (
@@ -584,6 +647,7 @@ def validate_security_policy(root: Path = ROOT, now: datetime | None = None) -> 
     )
 
     production_text = (root / PRODUCTION_READBACK_WORKFLOW).read_text(encoding="utf-8")
+    _validate_production_triggers(production_text, errors)
     _require_executable_job_for_steps(
         production_text,
         (

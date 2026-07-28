@@ -13,12 +13,65 @@ jobs:
   contracts:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
-      - uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97 # v7
+      - name: Check out exact commit
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+        with:
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+      - name: Set up Python
+        uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97 # v7
         with:
           python-version: "3.12"
-      - name: Verify committed security workflow blobs
-        run: python3 scripts/verify_security_workflow_blobs.py --revision HEAD
+      - name: Verify trusted security bootstrap
+        env:
+          EXPECTED_SHA: ${{ github.event.pull_request.head.sha || github.sha }}
+          EXPECTED_BOOTSTRAP_SHA256: e7b33c3cdef303505b6789ea07696b3f7eeec6a9f770dc74ab3da459026aea66
+        run: |
+          python3 -I -S - <<'PY'
+          import hashlib
+          import os
+          import pathlib
+          import stat
+          import subprocess
+          import sys
+
+          path = pathlib.Path("scripts/verify_security_workflow_blobs.py")
+          expected_sha = os.environ["EXPECTED_SHA"].lower()
+          expected_digest = os.environ["EXPECTED_BOOTSTRAP_SHA256"].lower()
+
+          def git(*arguments):
+              result = subprocess.run(
+                  ["git", *arguments],
+                  check=False,
+                  stdout=subprocess.PIPE,
+                  stderr=subprocess.PIPE,
+              )
+              if result.returncode != 0:
+                  raise SystemExit(result.stderr.decode("utf-8", errors="replace"))
+              return result.stdout
+
+          head = git("rev-parse", "HEAD").decode("ascii").strip().lower()
+          if head != expected_sha:
+              raise SystemExit(f"checkout revision mismatch: expected {expected_sha}, got {head}")
+          metadata = path.lstat()
+          if not stat.S_ISREG(metadata.st_mode):
+              raise SystemExit("security bootstrap worktree path is not a regular file")
+          entries = [entry for entry in git("ls-tree", "-z", "HEAD", "--", str(path)).split(b"\0") if entry]
+          if len(entries) != 1 or b"\t" not in entries[0]:
+              raise SystemExit("security bootstrap must resolve to one committed tree entry")
+          header, committed_path = entries[0].split(b"\t", 1)
+          mode, object_type, object_id = (part.decode("ascii") for part in header.split())
+          if committed_path.decode("utf-8") != str(path) or mode != "100755" or object_type != "blob":
+              raise SystemExit("security bootstrap committed entry mismatch")
+          blob = git("cat-file", "blob", object_id)
+          digest = hashlib.sha256(blob).hexdigest()
+          if digest != expected_digest:
+              raise SystemExit(f"security bootstrap digest mismatch: expected {expected_digest}, got {digest}")
+          if path.read_bytes() != blob:
+              raise SystemExit("security bootstrap worktree differs from committed blob")
+          PY
+          python3 -I -S scripts/verify_security_workflow_blobs.py \
+            --revision HEAD \
+            --expected-sha "$EXPECTED_SHA"
       - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7
         with:
           node-version: "22"

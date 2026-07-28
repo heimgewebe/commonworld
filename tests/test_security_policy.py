@@ -11,7 +11,7 @@ from datetime import datetime, timezone
 from pathlib import Path
 
 from scripts.validate_security_policy import PrivateReportingFetch, ROOT, github_api_get_private_reporting, validate_security_policy, verify_live_private_reporting, write_json_receipt
-from scripts.verify_security_workflow_blobs import EXPECTED_WORKFLOW_SHA256, validate_security_workflow_blobs
+from scripts.verify_security_workflow_blobs import TRUSTED_BLOBS, validate_trusted_blobs
 
 
 class SecurityPolicyTests(unittest.TestCase):
@@ -887,40 +887,37 @@ class SecurityPolicyTests(unittest.TestCase):
                 errors,
             )
 
-    def test_security_workflow_digests_bind_triggers_and_all_predecessors(self) -> None:
+    def test_security_workflow_triggers_fail_closed(self) -> None:
         mutations = (
             (
                 ".github/workflows/validate.yml",
                 "  pull_request:\n",
                 "  workflow_dispatch:\n",
+                "validate workflow",
             ),
             (
                 ".github/workflows/production-readback.yml",
                 "      - main\n",
                 "      - never-run\n",
+                "production readback",
             ),
             (
                 ".github/workflows/security-policy-expiry.yml",
-                "    steps:\n",
-                "    steps:\n      - name: Unreviewed predecessor\n        run: echo attacker >> \"$GITHUB_PATH\"\n",
+                '    - cron: "17 5 * * 1"\n',
+                '    - cron: "0 0 1 1 *"\n',
+                "security expiry workflow",
             ),
         )
-        for relative, old, new in mutations:
+        for relative, old, new_value, expected in mutations:
             with self.subTest(relative=relative), tempfile.TemporaryDirectory() as directory:
                 root = self.copy_surface(directory)
                 path = root / relative
                 source = path.read_text(encoding="utf-8")
                 self.assertEqual(1, source.count(old))
-                path.write_text(source.replace(old, new, 1), encoding="utf-8")
+                path.write_text(source.replace(old, new_value, 1), encoding="utf-8")
                 errors = validate_security_policy(root, now=self.NOW)
-            self.assertTrue(
-                any(
-                    "security workflow bytes changed without reviewed digest update" in error
-                    and relative in error
-                    for error in errors
-                ),
-                errors,
-            )
+            self.assertTrue(any(expected in error for error in errors), errors)
+
 
     def test_security_workflow_and_job_field_inventories_are_exact(self) -> None:
         cases = (
@@ -1060,7 +1057,7 @@ class SecurityPolicyTests(unittest.TestCase):
 
     def make_security_workflow_git_repo(self, directory: str) -> Path:
         root = Path(directory)
-        for relative in EXPECTED_WORKFLOW_SHA256:
+        for relative in TRUSTED_BLOBS:
             source = ROOT / relative
             target = root / relative
             target.parent.mkdir(parents=True, exist_ok=True)
@@ -1068,15 +1065,22 @@ class SecurityPolicyTests(unittest.TestCase):
         subprocess.run(["git", "init", "-q", str(root)], check=True)
         subprocess.run(["git", "-C", str(root), "config", "user.name", "Commonworld Tests"], check=True)
         subprocess.run(["git", "-C", str(root), "config", "user.email", "tests@example.invalid"], check=True)
-        subprocess.run(["git", "-C", str(root), "add", ".github/workflows"], check=True)
-        subprocess.run(["git", "-C", str(root), "commit", "-q", "-m", "workflow fixtures"], check=True)
+        subprocess.run(["git", "-C", str(root), "add", "."], check=True)
+        subprocess.run(["git", "-C", str(root), "commit", "-q", "-m", "trusted fixtures"], check=True)
         return root
 
     def test_committed_security_workflow_blobs_validate(self) -> None:
         with tempfile.TemporaryDirectory() as directory:
             root = self.make_security_workflow_git_repo(directory)
-            errors = validate_security_workflow_blobs(root, "HEAD")
+            head = subprocess.check_output(["git", "-C", str(root), "rev-parse", "HEAD"], text=True).strip()
+            errors = validate_trusted_blobs(root, "HEAD", head)
         self.assertEqual([], errors)
+
+    def test_security_workflow_blob_check_rejects_revision_mismatch(self) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            root = self.make_security_workflow_git_repo(directory)
+            errors = validate_trusted_blobs(root, "HEAD", "a" * 40)
+        self.assertTrue(any("trusted-blob revision mismatch" in error for error in errors), errors)
 
     def test_security_workflow_blob_check_rejects_worktree_drift(self) -> None:
         with tempfile.TemporaryDirectory() as directory:
@@ -1084,8 +1088,8 @@ class SecurityPolicyTests(unittest.TestCase):
             relative = Path(".github/workflows/validate.yml")
             path = root / relative
             path.write_text(path.read_text(encoding="utf-8") + "# drift\n", encoding="utf-8")
-            errors = validate_security_workflow_blobs(root, "HEAD")
-        self.assertIn(f"security workflow worktree bytes differ from committed blob: {relative}", errors)
+            errors = validate_trusted_blobs(root, "HEAD")
+        self.assertIn(f"trusted worktree bytes differ from committed blob: {relative}", errors)
 
     def test_security_workflow_blob_check_rejects_committed_symlink(self) -> None:
         with tempfile.TemporaryDirectory() as directory:
@@ -1096,23 +1100,20 @@ class SecurityPolicyTests(unittest.TestCase):
             path.symlink_to("validate.yml")
             subprocess.run(["git", "-C", str(root), "add", relative.as_posix()], check=True)
             subprocess.run(["git", "-C", str(root), "commit", "-q", "-m", "symlink workflow"], check=True)
-            errors = validate_security_workflow_blobs(root, "HEAD")
-        self.assertIn(f"security workflow worktree path must be a regular file: {relative}", errors)
+            errors = validate_trusted_blobs(root, "HEAD")
+        self.assertIn(f"trusted worktree path must be a regular file: {relative}", errors)
 
     def test_security_workflow_blob_check_rejects_committed_digest_drift(self) -> None:
         with tempfile.TemporaryDirectory() as directory:
             root = self.make_security_workflow_git_repo(directory)
-            relative = Path(".github/workflows/production-readback.yml")
+            relative = Path("requirements-dev.txt")
             path = root / relative
             path.write_text(path.read_text(encoding="utf-8") + "# committed drift\n", encoding="utf-8")
             subprocess.run(["git", "-C", str(root), "add", relative.as_posix()], check=True)
-            subprocess.run(["git", "-C", str(root), "commit", "-q", "-m", "drift workflow"], check=True)
-            errors = validate_security_workflow_blobs(root, "HEAD")
+            subprocess.run(["git", "-C", str(root), "commit", "-q", "-m", "drift trusted blob"], check=True)
+            errors = validate_trusted_blobs(root, "HEAD")
         self.assertTrue(
-            any(
-                error.startswith(f"security workflow committed blob digest mismatch: {relative};")
-                for error in errors
-            ),
+            any(error.startswith(f"trusted committed blob digest mismatch: {relative};") for error in errors),
             errors,
         )
 
