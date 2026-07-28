@@ -80,7 +80,6 @@ REQUIRED_HTML = (
     'href="./contracts/commonworld/current-state.contract.json"',
     'type="application/json"',
     'No API runtime, no write path and no standalone CLI.',
-    '<script src="./assets/vendor/maplibre-gl.js" defer></script>',
     '<meta http-equiv="Content-Security-Policy"',
 )
 
@@ -242,8 +241,8 @@ def validate_public_shell(root: Path = ROOT) -> list[str]:
                 errors.append(f'German alternative surfaces missing required token: {token}')
         if 'href="./de.html"' not in html or 'href="./"' not in german_html:
             errors.append('public locale switch must connect English and German index surfaces')
-    if "<script" in method.casefold():
-        errors.append('public method surface must remain script-free')
+    if "<script" in method.casefold() or "<script" in german_method.casefold():
+        errors.append('public method surfaces must remain script-free')
 
     errors.extend(_validate_accessibility_modes(css))
     errors.extend(_validate_ipad_landscape_wiring(root, html))

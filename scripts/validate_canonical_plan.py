@@ -144,6 +144,7 @@ EXPECTED_SCRIPT_FILES = {
     "browser_smoke_plan.py",
     "build_catalog_runtime.py",
     "build_country_boundary_subset.mjs",
+    "build_page_release_manifest.py",
     "build_public_runtime.py",
     "catalog_bootstrap.py",
     "catalog_delivery_compile.mjs",
@@ -160,10 +161,12 @@ EXPECTED_SCRIPT_FILES = {
     "smoke_focus_overlay_browser.mjs",
     "render_public_shell.py",
     "proposal_i18n.py",
+    "public_cache.py",
     "render_proposal_page.py",
     "smoke_proposal_browser.mjs",
     "smoke_pages_live.py",
     "static_surface_parser.py",
+    "validate_cache_coherence.py",
     "validate_canonical_plan.py",
     "validate_catalog_delivery_budget.py",
     "validate_catalog_scale_gates.py",
@@ -195,6 +198,7 @@ EXPECTED_SCRIPT_FILES = {
     "validate_visual_semantics.py",
 }
 EXPECTED_TEST_FILES = {
+    "test_cache_coherence.py",
     "test_canonical_plan.py",
     "test_catalog_delivery_budget.py",
     "test_catalog_platform.py",

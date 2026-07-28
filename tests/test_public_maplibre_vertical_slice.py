@@ -6,6 +6,7 @@ import tempfile
 import unittest
 from pathlib import Path
 
+from scripts.render_public_shell import render_shell
 from scripts.validate_public_maplibre_vertical_slice import (
     CONTRACT_PATH,
     REQUIRED_FILES,
@@ -22,7 +23,13 @@ class PublicMapLibreVerticalSliceTests(unittest.TestCase):
             Path("scripts/render_public_shell.py"),
             Path("scripts/commonworld_i18n.py"),
             Path("scripts/__init__.py"),
+            Path("scripts/public_cache.py"),
             Path("catalog/locales/en.json"),
+            Path("assets/commonworld-mark.svg"),
+            Path("assets/commonworld-release-check.js"),
+            Path("assets/ipad-layout.css"),
+            Path("assets/vendor/maplibre-gl.css"),
+            Path("assets/vendor/maplibre-gl.js"),
         }
         manifest = json.loads((ROOT / "catalog/catalog.json").read_text(encoding="utf-8"))
         paths.update(Path("catalog") / relative for relative in manifest["project_files"])
@@ -300,16 +307,8 @@ function after() { return false; }
                 1,
             )
             path.write_text(source, encoding="utf-8")
-            app_hash = hashlib.sha256(path.read_bytes()).hexdigest()[:12]
             index_path = root / "index.html"
-            index_html = index_path.read_text(encoding="utf-8")
-            index_html = re.sub(
-                r'(commonworld-app\.js\?v=)[0-9a-f]{12}',
-                rf'\g<1>{app_hash}',
-                index_html,
-                count=1,
-            )
-            index_path.write_text(index_html, encoding="utf-8")
+            index_path.write_text(render_shell(root, "en"), encoding="utf-8")
             errors = validate_public_maplibre_vertical_slice(root)
         self.assertEqual(errors, baseline_errors)
 

@@ -3,7 +3,6 @@
 
 from __future__ import annotations
 
-import hashlib
 import html
 import json
 import re
@@ -21,6 +20,7 @@ from scripts.commonworld_i18n import (
 )
 from scripts.commonworld_geo import public_locations
 from scripts.catalog_bootstrap import bootstrap_record
+from scripts.public_cache import asset_version, stamp_page_build
 
 ACTION_LINK_TYPES = {"visit", "use", "borrow", "learn", "contribute", "volunteer", "donate", "contact", "replicate"}
 TAXONOMY = load_taxonomy(ROOT)
@@ -45,6 +45,16 @@ MODULE_IMPORT_DEPENDENCIES = (
     ),
 )
 
+RUNTIME_URL_DEPENDENCIES = (
+    (
+        "assets/commonworld-app.js",
+        (
+            ("./assets/map/commonworld-country-boundaries.geojson", "assets/map/commonworld-country-boundaries.geojson"),
+            ("./assets/map/openfreemap-liberty.json", "assets/map/openfreemap-liberty.json"),
+        ),
+    ),
+)
+
 ORBIT_PROFILES = (
     (316, 300, -8),
     (310, 282, 20),
@@ -55,11 +65,6 @@ ORBIT_PROFILES = (
     (280, 262, 78),
     (274, 284, -77),
 )
-
-
-def asset_version(relative_path: str, root: Path = ROOT) -> str:
-    return hashlib.sha256((root / relative_path).read_bytes()).hexdigest()[:12]
-
 
 def synchronize_module_import_versions(root: Path = ROOT) -> None:
     """Bind every local browser-module edge to the dependency bytes it loads."""
@@ -80,6 +85,26 @@ def synchronize_module_import_versions(root: Path = ROOT) -> None:
             )
             if count != 1:
                 raise ValueError(f"{module_path}: expected exactly one import of {specifier}")
+        if updated != source:
+            path.write_text(updated, encoding="utf-8")
+
+
+def synchronize_runtime_url_versions(root: Path = ROOT) -> None:
+    """Bind browser-fetched static runtime URLs to the exact bytes they load."""
+    for source_path, dependencies in RUNTIME_URL_DEPENDENCIES:
+        path = root / source_path
+        source = path.read_text(encoding="utf-8")
+        updated = source
+        for specifier, dependency_path in dependencies:
+            versioned = f"{specifier}?v={asset_version(dependency_path, root)}"
+            pattern = re.compile(rf"(?P<prefix>['\"]){re.escape(specifier)}(?:\?v=[0-9a-f]{{12}})?(?P<suffix>['\"])")
+            updated, count = pattern.subn(
+                lambda match: f"{match.group('prefix')}{versioned}{match.group('suffix')}",
+                updated,
+                count=1,
+            )
+            if count != 1:
+                raise ValueError(f"{source_path}: expected exactly one runtime URL for {specifier}")
         if updated != source:
             path.write_text(updated, encoding="utf-8")
 
@@ -235,6 +260,7 @@ def render_bootstrap_catalog(records: list[dict]) -> str:
 
 
 def render_shell(root: Path = ROOT, locale: str = FALLBACK_LOCALE) -> str:
+    page_name = "index.html" if normalize_locale(locale) == "en" else "de.html"
     records = localize_records(load_records(root), locale, root)
     paths = "\n".join(
         f'              <ellipse id="sphere-path-{index}" cx="320" cy="320" rx="{rx}" ry="{ry}" transform="rotate({rotation} 320 320)" />'
@@ -254,13 +280,14 @@ def render_shell(root: Path = ROOT, locale: str = FALLBACK_LOCALE) -> str:
     <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' data: blob: https://tiles.openfreemap.org; connect-src 'self' https://tiles.openfreemap.org; font-src 'self' data: https://tiles.openfreemap.org; worker-src 'self' blob:; child-src blob:; object-src 'none'; base-uri 'self'; form-action 'none';" />
     <meta name="description" content="Commonworld macht Commons weltweit, regional, lokal und digital auf einem gemeinsamen Globus sichtbar." />
     <title>commonworld — Commons entdecken</title>
-    <link rel="icon" href="./assets/commonworld-mark.svg" type="image/svg+xml" />
+    <link rel="icon" href="./assets/commonworld-mark.svg?v={asset_version('assets/commonworld-mark.svg', root)}" type="image/svg+xml" />
     <link rel="alternate" type="application/json" href="./catalog/catalog.json" title="Commonworld-Katalog" />
     <link rel="alternate" type="application/schema+json" href="./contracts/commonworld/project.schema.json" title="CommonProject-Schema" />
-    <link rel="stylesheet" href="./assets/vendor/maplibre-gl.css" />
+    <link rel="stylesheet" href="./assets/vendor/maplibre-gl.css?v={asset_version('assets/vendor/maplibre-gl.css', root)}" />
     <link rel="stylesheet" href="./index.css?v={asset_version('index.css', root)}" />
     <link rel="stylesheet" href="./assets/ipad-layout.css?v={asset_version('assets/ipad-layout.css', root)}" />
-    <script src="./assets/vendor/maplibre-gl.js" defer></script>
+    <script type="module" src="./assets/commonworld-release-check.js?v={asset_version('assets/commonworld-release-check.js', root)}"></script>
+    <script src="./assets/vendor/maplibre-gl.js?v={asset_version('assets/vendor/maplibre-gl.js', root)}" defer></script>
     <script type="module" src="./assets/commonworld-app.js?v={asset_version('assets/commonworld-app.js', root)}"></script>
   </head>
   <body data-presentation="globe">
@@ -504,10 +531,12 @@ def render_shell(root: Path = ROOT, locale: str = FALLBACK_LOCALE) -> str:
 '''
     markup = translate_shell(markup, locale)
     markup = german_surface_links(markup, locale, 'index')
-    return inject_locale_navigation(markup, locale, 'index')
+    markup = inject_locale_navigation(markup, locale, 'index')
+    return stamp_page_build(markup, page_name)
 
 
 def render_method(root: Path = ROOT, locale: str = FALLBACK_LOCALE) -> str:
+    page_name = "method.html" if normalize_locale(locale) == "en" else "method.de.html"
     manifest = json.loads((root / "catalog/catalog.json").read_text(encoding="utf-8"))
     count = manifest["entry_count"]
     markup = f"""<!doctype html>
@@ -519,7 +548,7 @@ def render_method(root: Path = ROOT, locale: str = FALLBACK_LOCALE) -> str:
     <meta http-equiv="Content-Security-Policy" content="default-src 'self'; style-src 'self'; img-src 'self' data:; object-src 'none'; base-uri 'self'; form-action 'none';" />
     <meta name="description" content="Methode, Abdeckung, Datenschutz und Betriebsgrenzen von Commonworld." />
     <title>Commonworld — Methode und Grenzen</title>
-    <link rel="icon" href="./assets/commonworld-mark.svg" type="image/svg+xml" />
+    <link rel="icon" href="./assets/commonworld-mark.svg?v={asset_version('assets/commonworld-mark.svg', root)}" type="image/svg+xml" />
     <link rel="stylesheet" href="./index.css?v={asset_version('index.css', root)}" />
   </head>
   <body class="method-page">
@@ -541,7 +570,8 @@ def render_method(root: Path = ROOT, locale: str = FALLBACK_LOCALE) -> str:
 """
     markup = translate_method(markup, locale)
     markup = german_surface_links(markup, locale, 'method')
-    return inject_locale_navigation(markup, locale, 'method')
+    markup = inject_locale_navigation(markup, locale, 'method')
+    return stamp_page_build(markup, page_name)
 
 
 def main() -> int:
@@ -549,6 +579,7 @@ def main() -> int:
     (ROOT / "assets/commonworld-bootstrap-catalog.mjs").write_text(render_bootstrap_catalog(records), encoding="utf-8")
     (ROOT / "assets/commonworld-en-locale.mjs").write_text(render_locale_module("en", ROOT), encoding="utf-8")
     synchronize_module_import_versions(ROOT)
+    synchronize_runtime_url_versions(ROOT)
     (ROOT / "index.html").write_text(render_shell(ROOT, "en"), encoding="utf-8")
     (ROOT / "de.html").write_text(render_shell(ROOT, "de"), encoding="utf-8")
     (ROOT / "method.html").write_text(render_method(ROOT, "en"), encoding="utf-8")

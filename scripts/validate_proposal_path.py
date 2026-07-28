@@ -109,8 +109,7 @@ def validate(root: Path = ROOT) -> list[str]:
         proposal_css = proposal_css_path.read_text(encoding="utf-8")
         index_link = "./index.css"
         proposal_link = "./assets/proposal.css"
-
-        links = parse_stylesheet_links(page)
+        links = [link.split("?", 1)[0] for link in parse_stylesheet_links(page)]
         if index_link not in links or proposal_link not in links:
             errors.append("propose.html must load index.css and assets/proposal.css")
         elif links.index(index_link) >= links.index(proposal_link):

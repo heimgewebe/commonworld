@@ -693,8 +693,6 @@ def validate_public_maplibre_vertical_slice(root: Path = ROOT) -> list[str]:
         errors.append("sphere diagnostic cadence must use the tested admitted-sample helper")
 
     required_html = (
-        '<script src="./assets/vendor/maplibre-gl.js" defer></script>',
-        'href="./assets/vendor/maplibre-gl.css"',
         'id="map"',
         'id="semantic-level"',
         'id="semantic-summary"',
@@ -730,12 +728,18 @@ def validate_public_maplibre_vertical_slice(root: Path = ROOT) -> list[str]:
             errors.append(f"public runtime shell missing token: {token}")
     expected_app_version = _sha256(root / "assets/commonworld-app.js")[:12]
     expected_css_version = _sha256(root / "index.css")[:12]
+    expected_vendor_js_version = _sha256(root / "assets/vendor/maplibre-gl.js")[:12]
+    expected_vendor_css_version = _sha256(root / "assets/vendor/maplibre-gl.css")[:12]
     expected_app_tag = f'<script type="module" src="./assets/commonworld-app.js?v={expected_app_version}"></script>'
     expected_css_tag = f'href="./index.css?v={expected_css_version}"'
+    expected_vendor_js_tag = f'<script src="./assets/vendor/maplibre-gl.js?v={expected_vendor_js_version}" defer></script>'
+    expected_vendor_css_tag = f'href="./assets/vendor/maplibre-gl.css?v={expected_vendor_css_version}"'
     if expected_app_tag not in html:
         errors.append("public runtime shell must bind commonworld-app.js to its deterministic content hash")
     if expected_css_tag not in html:
         errors.append("public runtime shell must bind index.css to its deterministic content hash")
+    if expected_vendor_js_tag not in html or expected_vendor_css_tag not in html:
+        errors.append("public runtime shell must bind MapLibre assets to deterministic content hashes")
     if 'id="catalog-bootstrap"' in html:
         errors.append("public runtime shell must not expose catalog JSON as DOM text")
     if re.search(r"<script(?![^>]+src=)[^>]*>", html, re.IGNORECASE):
