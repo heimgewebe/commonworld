@@ -132,7 +132,7 @@ def validate_digital_sphere(root: Path = ROOT) -> list[str]:
             "implementation": "css_transform_keyframes_only",
             "per_frame_javascript_forbidden": True,
             "duration_function": "ringOrbitDuration",
-            "duration_bounds_seconds": {"minimum": 24, "maximum": 96},
+            "duration_bounds_seconds": {"minimum": 72, "maximum": 180},
             "duration_monotonic_in_entry_count": True,
             "deterministic_start_angles_required": True,
             "alternating_directions_allowed": True,
@@ -249,8 +249,8 @@ def validate_digital_sphere(root: Path = ROOT) -> list[str]:
     }:
         errors.append("real-surface layer derivation contract mismatch")
     names = real_surface.get("name_presentation", {})
-    if names.get("visible_name_limit_per_layer") != 2:
-        errors.append("real-surface visible name limit must be 2 per layer")
+    if names.get("visible_name_limit_per_layer") != 6:
+        errors.append("real-surface visible name limit must be 6 per layer")
     if names.get("orbit_label_max_chars") != 18:
         errors.append("real-surface orbit label length must be bounded at 18 characters")
     for invariant in (

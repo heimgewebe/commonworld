@@ -77,6 +77,7 @@ class DigitalSphereContractTests(unittest.TestCase):
         self.assertFalse(real_surface["reference_projects_are_public_catalog"])
         self.assertEqual("no_digital_layer", real_surface["layer_derivation"]["missing_digital_presence_result"])
         self.assertEqual("mixed_other", real_surface["layer_derivation"]["tie_or_unmapped_result"])
+        self.assertEqual(6, real_surface["name_presentation"]["visible_name_limit_per_layer"])
 
     def test_real_surface_focus_and_camera_are_source_derived(self) -> None:
         real_surface = self.contract["real_surface_v1"]
@@ -122,7 +123,7 @@ class DigitalSphereContractTests(unittest.TestCase):
         self.assertTrue(orbit["reduced_motion_stops_orbit"])
         self.assertEqual("ringOrbitDuration", orbit["duration_function"])
         bounds = orbit["duration_bounds_seconds"]
-        self.assertEqual({"minimum": 24, "maximum": 96}, bounds)
+        self.assertEqual({"minimum": 72, "maximum": 180}, bounds)
 
     def test_validator_rejects_per_frame_javascript_orbit(self) -> None:
         errors = self.errors_after(lambda contract: contract["globe_mode"]["motion"]["ring_orbit_animation"].update({"per_frame_javascript_forbidden": False}))

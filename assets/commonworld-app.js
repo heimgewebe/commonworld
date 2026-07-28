@@ -1,6 +1,6 @@
 import { BOOTSTRAP_RECORDS } from './commonworld-bootstrap-catalog.mjs?v=41ebd1e48a02';
 import { createCatalogLoadCache, loadCatalogAggregate, loadCatalogDetail, loadCatalogShard, shardKeyForIdentity } from './commonworld-catalog-runtime.mjs?v=5954690ce64b';
-import { actionLabel, documentLocale, localizeCatalogRecords, text as i18nText, themeLabel } from './commonworld-i18n.mjs?v=e7db362a7f96';
+import { actionLabel, documentLocale, localizeCatalogRecords, text as i18nText, themeLabel } from './commonworld-i18n.mjs?v=92970b8640be';
 import {
   COMMONS_TYPE_COLOR_TOKENS,
   COMMONS_TYPE_VALUES,
@@ -39,6 +39,8 @@ import {
   ringOrbitDirection,
   ringOrbitDuration,
   ringOrbitStartAngle,
+  SPHERE_RING_IDENTITY_PREVIEW_LIMIT,
+  sphereRingLabelAssignments,
   safeExternalHttpsUrl,
   sampledDiagnosticPublicationDue,
   searchFromState,
@@ -47,9 +49,12 @@ import {
   sphereDetailLevel,
   sphereLayout,
   sphereOpacityForGlobeRatio,
+  sphereRingFontSize,
+  sphereRingPrimaryIndices,
+  sphereRingStrokeWidth,
   stateFromSearch,
   visibleDigitalNodes,
-} from './commonworld-core.mjs?v=e1eac1e9a382';
+} from './commonworld-core.mjs?v=5845bfd27769';
 
 const LOCALE = documentLocale();
 const t = (key, germanFallback, variables = {}) => i18nText(LOCALE, key, germanFallback, variables);
@@ -103,6 +108,7 @@ const elements = {
   semanticSummary: document.querySelector('#semantic-summary'),
   sphere: document.querySelector('#digital-sphere'),
   sphereRings: document.querySelector('#sphere-rings'),
+  sphereRingAccessibleSummary: document.querySelector('#sphere-ring-accessible-summary'),
   sphereEdge: document.querySelector('#sphere-edge-control'),
   sphereFocus: document.querySelector('.sphere-edge-focus'),
   layerStack: document.querySelector('#layer-stack-visual'),
@@ -715,17 +721,33 @@ function visibleDigitalView(records = visibleRecords()) {
   return view;
 }
 
-function appendRingSequence(textPath, records, { prefix = '' } = {}) {
+function appendRingSequence(textPath, assignments, { prefix = '' } = {}) {
   if (prefix) {
     const label = createSvgElement('tspan', { class: 'sphere-ring-label' });
     label.textContent = `  ${prefix}  `;
     textPath.append(label);
   }
-  for (const record of records) {
-    const name = createSvgElement('tspan', { class: 'sphere-ring-name', 'data-commonproject-id': record.id });
-    name.textContent = `\u00A0\u00A0${record.title}`;
+  for (const assignment of assignments) {
+    const name = createSvgElement('tspan', {
+      class: 'sphere-ring-name',
+      'data-commonproject-id': assignment.id,
+      'data-visible-label': assignment.visibleText,
+      'aria-label': assignment.fullText,
+    });
+    name.textContent = `\u00A0\u00A0${assignment.visibleText}`;
     textPath.append(name);
   }
+}
+
+function applySphereRingDetail(requestedDetailLevel = elements.sphere.dataset.ringDetailLevel || elements.sphere.dataset.detailLevel || 'names') {
+  const detailLevel = window.matchMedia('(max-width: 48rem)').matches && requestedDetailLevel === 'names'
+    ? 'compact'
+    : requestedDetailLevel;
+  const planes = [...elements.sphereRings.querySelectorAll('.sphere-ring-plane')];
+  const primaryIndices = new Set(sphereRingPrimaryIndices(planes.length, detailLevel));
+  planes.forEach((plane, index) => {
+    plane.dataset.emphasis = primaryIndices.has(index) ? 'primary' : 'depth';
+  });
 }
 
 function renderSphereRibbons(records = runtime.records) {
@@ -734,9 +756,13 @@ function renderSphereRibbons(records = runtime.records) {
   const visibleNodes = (childBundles.length ? childBundles : (view.current ? [view.current] : []))
     .filter((node) => node.type !== 'diagnostic' || node.identityCount > 0)
     .slice(0, 8);
+  const visibleRingSources = visibleNodes.map((node) => recordsForNode(node).slice(0, SPHERE_RING_IDENTITY_PREVIEW_LIMIT));
+  const globalAssignments = sphereRingLabelAssignments(visibleRingSources.flat());
+  const assignmentById = new Map(globalAssignments.map((assignment) => [assignment.id, assignment]));
   elements.sphereRings.replaceChildren();
   visibleNodes.forEach((node, layerIndex) => {
-    const source = recordsForNode(node).slice(0, node.type === 'field' ? 2 : 3);
+    const source = visibleRingSources[layerIndex];
+    const assignments = source.map((record) => assignmentById.get(String(record.id))).filter(Boolean);
     const plane = createSvgElement('g', {
       class: 'sphere-ring-plane',
       'data-node-id': node.id,
@@ -770,7 +796,7 @@ function renderSphereRibbons(records = runtime.records) {
       startOffset: `${(layerIndex * 11 + 3) % 100}%`,
     });
     if (source.length) {
-      appendRingSequence(textPath, source, { prefix: `${node.label} · ${node.identityCount}` });
+      appendRingSequence(textPath, assignments, { prefix: `${node.label} · ${node.identityCount}` });
     } else {
       const placeholder = createSvgElement('tspan', { class: 'sphere-ring-placeholder' });
       placeholder.textContent = `  ${node.label} · ${t('no_visible_entries', 'keine sichtbaren Einträge')}  `;
@@ -781,6 +807,11 @@ function renderSphereRibbons(records = runtime.records) {
     plane.append(text);
     elements.sphereRings.append(plane);
   });
+  const accessibleTitles = [...new Set(globalAssignments.map(({ fullText }) => fullText).filter(Boolean))];
+  elements.sphereRingAccessibleSummary.textContent = accessibleTitles.length
+    ? t('visible_ring_commons', 'Sichtbare Commons in den digitalen Ringen: {titles}.', { titles: accessibleTitles.join(', ') })
+    : t('visible_ring_commons_empty', 'In den digitalen Ringen sind derzeit keine Commons sichtbar.');
+  applySphereRingDetail();
   runtime.overlayRenderCount += 1;
   elements.stage.dataset.overlayRenders = String(runtime.overlayRenderCount);
 }
@@ -2680,14 +2711,18 @@ function projectedGlobeGeometry(center, projectedCenter) {
   return projectedGlobeCircle({ center: projectedCenter, horizon });
 }
 
-function updateSphereVisuals({ geometry, size }) {
+function updateSphereVisuals({ geometry, size, detailLevel }) {
   const x = `${quantizeSpherePixel(geometry.x)}px`;
   const y = `${quantizeSpherePixel(geometry.y)}px`;
   const diameter = `${quantizeSpherePixel(geometry.diameter)}px`;
+  const fontSize = `${sphereRingFontSize({ diameter: geometry.diameter, detailLevel })}px`;
+  const strokeWidth = `${sphereRingStrokeWidth({ diameter: geometry.diameter })}px`;
   let visualChanged = false;
   visualChanged = setStylePropertyIfChanged(elements.stage, '--sphere-x', x) || visualChanged;
   visualChanged = setStylePropertyIfChanged(elements.stage, '--sphere-y', y) || visualChanged;
   visualChanged = setStylePropertyIfChanged(elements.stage, '--sphere-size', diameter) || visualChanged;
+  visualChanged = setStylePropertyIfChanged(elements.sphere, '--sphere-ring-font-size', fontSize) || visualChanged;
+  visualChanged = setStylePropertyIfChanged(elements.sphere, '--sphere-ring-stroke-width', strokeWidth) || visualChanged;
   runtime.sphereMetrics.globeDiameter = geometry.globeDiameter;
   visualChanged = updateSphereOpacity({ globeDiameter: geometry.globeDiameter, size }) || visualChanged;
   return visualChanged;
@@ -2735,8 +2770,13 @@ function updateSphereGeometry({ publishDiagnostics = true } = {}) {
     sideView,
   });
   const detailLevel = sphereDetailLevel({ diameter: geometry.diameter, sideView });
-  const visualChanged = updateSphereVisuals({ geometry, size });
-  if (visualChanged) runtime.sphereGeometryCommitCount += 1;
+  const ringDetailLevel = window.matchMedia('(max-width: 48rem)').matches && detailLevel === 'names' ? 'compact' : detailLevel;
+  const detailLevelChanged = setDatasetIfChanged(elements.sphere, 'detailLevel', detailLevel);
+  const ringDetailLevelChanged = setDatasetIfChanged(elements.sphere, 'ringDetailLevel', ringDetailLevel);
+  setDatasetIfChanged(elements.stage, 'sphereDetailLevel', detailLevel);
+  const visualChanged = updateSphereVisuals({ geometry, size, detailLevel });
+  if (detailLevelChanged || ringDetailLevelChanged) applySphereRingDetail(ringDetailLevel);
+  if (visualChanged || detailLevelChanged || ringDetailLevelChanged) runtime.sphereGeometryCommitCount += 1;
   if (publishDiagnostics) {
     publishSphereDiagnostics({
       projectedCenter,

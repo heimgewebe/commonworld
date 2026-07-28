@@ -1,5 +1,5 @@
 import { COMMONWORLD_EN_LOCALE } from './commonworld-en-locale.mjs?v=797f602e0c88';
-import { FALLBACK_LOCALE, normalizeLocale } from './commonworld-i18n.mjs?v=e7db362a7f96';
+import { FALLBACK_LOCALE, normalizeLocale } from './commonworld-i18n.mjs?v=92970b8640be';
 
 export const DEFAULT_CAMERA = Object.freeze({
   lng: 8,
@@ -683,9 +683,65 @@ export function ribbonRepeatCount(recordCount, minimumSegments = 12) {
   return clamp(Math.ceil(minimum / count), 2, 6);
 }
 
-export const RING_ORBIT_MIN_DURATION_S = 24;
-export const RING_ORBIT_MAX_DURATION_S = 96;
+export const RING_ORBIT_MIN_DURATION_S = 72;
+export const RING_ORBIT_MAX_DURATION_S = 180;
+export const SPHERE_RING_IDENTITY_PREVIEW_LIMIT = 6;
+export const SPHERE_RING_LABEL_MAX_CHARS = 18;
+
+const normalizedSphereRingTitle = (record) => String(record?.title ?? record?.id ?? '').trim().replace(/\s+/gu, ' ');
+const sphereRingCharacters = (value) => Array.from(String(value ?? ''));
+
+function boundedSphereRingLabel(value, maximumCharacters, suffix = '') {
+  const characters = sphereRingCharacters(value);
+  const suffixCharacters = sphereRingCharacters(suffix);
+  const available = maximumCharacters - suffixCharacters.length;
+  if (available < 1) throw new RangeError('sphere ring label suffix exceeds the label budget');
+  if (characters.length <= available) return `${characters.join('')}${suffix}`;
+  const visibleCharacters = Math.max(1, available - 1);
+  return `${characters.slice(0, visibleCharacters).join('')}…${suffix}`;
+}
+
+export function sphereRingLabelAssignments(records, maximumCharacters = SPHERE_RING_LABEL_MAX_CHARS) {
+  if (!Number.isInteger(maximumCharacters) || maximumCharacters < 4) throw new RangeError('sphere ring label budget must be an integer of at least four characters');
+  const entries = (Array.isArray(records) ? records : []).map((record) => ({
+    id: String(record?.id ?? ''),
+    fullText: normalizedSphereRingTitle(record),
+  }));
+  const assignmentKey = ({ id, fullText }) => id || `title:${fullText}`;
+  const uniqueEntries = new Map();
+  for (const entry of entries) {
+    const key = assignmentKey(entry);
+    if (!uniqueEntries.has(key)) uniqueEntries.set(key, entry);
+  }
+  const orderedEntries = [...uniqueEntries.entries()].sort(([, left], [, right]) => {
+    if (left.fullText < right.fullText) return -1;
+    if (left.fullText > right.fullText) return 1;
+    if (left.id < right.id) return -1;
+    if (left.id > right.id) return 1;
+    return 0;
+  });
+  const visibleByKey = new Map();
+  const usedVisibleTexts = new Set();
+  for (const [key, { fullText }] of orderedEntries) {
+    let visibleText = boundedSphereRingLabel(fullText, maximumCharacters);
+    let suffixIndex = 1;
+    while (usedVisibleTexts.has(visibleText)) {
+      visibleText = boundedSphereRingLabel(fullText, maximumCharacters, `·${suffixIndex}`);
+      suffixIndex += 1;
+    }
+    visibleByKey.set(key, visibleText);
+    usedVisibleTexts.add(visibleText);
+  }
+  return entries.map((entry) => Object.freeze({
+    id: entry.id,
+    fullText: entry.fullText,
+    visibleText: visibleByKey.get(assignmentKey(entry)) ?? boundedSphereRingLabel(entry.fullText, maximumCharacters),
+  }));
+}
 const RING_ORBIT_SATURATION_COUNT = 48;
+const SPHERE_VIEWBOX_SIZE = 640;
+const SPHERE_RING_SCREEN_FONT_TARGETS = Object.freeze({ micro: 13.5, compact: 14.5, names: 15.5, close: 16 });
+const SPHERE_RING_PRIMARY_COUNTS = Object.freeze({ micro: 2, compact: 3, names: 5, close: 2 });
 
 export function ringOrbitDuration(entryCount) {
   const count = Number.isInteger(entryCount) && entryCount > 0 ? entryCount : 1;
@@ -732,6 +788,28 @@ export function sphereDetailLevel({ diameter, sideView = false } = {}) {
   if (size < 360) return 'micro';
   if (size < 620) return 'compact';
   return 'names';
+}
+
+export function sphereRingFontSize({ diameter, detailLevel = 'names' } = {}) {
+  const sphereDiameter = Math.max(1, finite(diameter, 1));
+  const targetCssPixels = SPHERE_RING_SCREEN_FONT_TARGETS[detailLevel] ?? SPHERE_RING_SCREEN_FONT_TARGETS.names;
+  return rounded(clamp((targetCssPixels * SPHERE_VIEWBOX_SIZE) / sphereDiameter, 9.5, 26), 2);
+}
+
+export function sphereRingStrokeWidth({ diameter } = {}) {
+  const sphereDiameter = Math.max(1, finite(diameter, 1));
+  return rounded(clamp((1.65 * SPHERE_VIEWBOX_SIZE) / sphereDiameter, 1.2, 3.2), 2);
+}
+
+export function sphereRingPrimaryIndices(totalRings, detailLevel = 'names') {
+  const total = Number.isInteger(totalRings) && totalRings > 0 ? totalRings : 0;
+  if (total === 0) return Object.freeze([]);
+  const requested = SPHERE_RING_PRIMARY_COUNTS[detailLevel] ?? SPHERE_RING_PRIMARY_COUNTS.names;
+  const count = clamp(requested, 1, total);
+  if (count === total) return Object.freeze(Array.from({ length: total }, (_, index) => index));
+  if (count === 1) return Object.freeze([0]);
+  const indices = Array.from({ length: count }, (_, index) => Math.round((index * (total - 1)) / (count - 1)));
+  return Object.freeze([...new Set(indices)]);
 }
 
 
