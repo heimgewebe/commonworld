@@ -13,7 +13,7 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[1]
 EXPECTED_WORKFLOW_SHA256 = {
     Path(".github/workflows/validate.yml"): "5303fd29f96a8f3bf6cd1afa0c9e3c823da840d766b4490d564fed29de30172e",
-    Path(".github/workflows/production-readback.yml"): "c7bccab63a77e812a9df3b48232a99cf8b6b972fa6c671d6aac77332fb343417",
+    Path(".github/workflows/production-readback.yml"): "33e4c010bac1e80711903fd2a514ac85c43c4773f339f14d7c8b0eac54f0be91",
     Path(".github/workflows/security-policy-expiry.yml"): "7ed4582754086d0ffb871ac9503e3b5ab8980ff8a6cd8d7b321260abe8a90a05",
 }
 
@@ -48,10 +48,10 @@ def validate_security_workflow_blobs(root: Path = ROOT, revision: str = "HEAD") 
             )
             continue
         entries = [entry for entry in listing.stdout.split(b"\0") if entry]
-        if len(entries) != 1 or b"	" not in entries[0]:
+        if len(entries) != 1 or b"\t" not in entries[0]:
             errors.append(f"security workflow must resolve to exactly one committed tree entry: {relative}")
             continue
-        header, committed_path = entries[0].split(b"	", 1)
+        header, committed_path = entries[0].split(b"\t", 1)
         parts = header.split()
         if len(parts) != 3:
             errors.append(f"security workflow tree entry is malformed: {relative}")
