@@ -651,8 +651,47 @@ html[data-input-modality="pointer"] :focus {
 .settings-section a {
   display: inline-flex;
   align-items: center;
+  justify-content: center;
   min-block-size: var(--minimum-touch-target);
   padding-block: 0.22rem;
+}
+
+.language-switch {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin-top: 0.7rem;
+}
+
+.language-switch a {
+  min-inline-size: var(--minimum-touch-target);
+  padding: 0.45rem 0.72rem;
+  border: 1px solid var(--line-strong);
+  border-radius: 999px;
+  background: rgba(7, 22, 18, 0.72);
+  color: #c2ecd4;
+  line-height: 1.2;
+  text-align: center;
+  text-decoration: none;
+}
+
+.language-switch a:hover {
+  border-color: var(--green);
+  background: #102c25;
+  color: #edf4ef;
+}
+
+.language-switch a[aria-current="page"] {
+  border-color: var(--green);
+  background: rgba(79, 255, 178, 0.14);
+  color: #edf4ef;
+}
+
+.language-effective {
+  margin: 0.55rem 0 0;
+  color: var(--muted);
+  font-size: 0.88rem;
+  line-height: 1.45;
 }
 
 .method-page code {

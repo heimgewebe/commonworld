@@ -460,7 +460,7 @@ test('sphere detail levels remain stable for overview and close-up rendering', (
 });
 
 test('deep-link state accepts surface, search, identity, filters and clamped camera', () => {
-  const state = stateFromSearch('?surface=text&q=open%20data&sort=catalogued&project=debian&view=layers&layer=software_infrastructure&commons_type=software&presence=digital&action=contribute&language=de&access=public&freshness=current&curation=listed&lng=999&lat=-999&z=99&p=99', ['debian']);
+  const state = stateFromSearch('?surface=text&q=open%20data&sort=catalogued&project=debian&view=layers&layer=software_infrastructure&commons_type=software&presence=digital&action=contribute&language=de&ui_lang=de&access=public&freshness=current&curation=listed&lng=999&lat=-999&z=99&p=99', ['debian']);
   assert.equal(state.project, 'debian');
   assert.equal(state.view, 'layers');
   assert.equal(state.surface, 'text');
@@ -473,6 +473,9 @@ test('deep-link state accepts surface, search, identity, filters and clamped cam
     { commons_type: 'software', presence: ['digital'], action: 'contribute', language: 'de', access: 'public', freshness: 'current', curation: 'listed' },
   );
   assert.equal(MAX_MAP_ZOOM, 18);
+  assert.equal(state.uiLocaleChoice, 'de');
+  const serialized = new URLSearchParams(searchFromState(state).slice(1));
+  assert.equal(serialized.get('ui_lang'), 'de');
   assert.deepEqual(state.camera, { lng: 180, lat: -85, zoom: MAX_MAP_ZOOM, bearing: 0, pitch: 70 });
 });
 

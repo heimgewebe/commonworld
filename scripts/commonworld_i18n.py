@@ -315,39 +315,49 @@ def translate_method(markup: str, locale: str) -> str:
     return replace_exact(markup, METHOD_REPLACEMENTS_EN, surface="method page") if normalize_locale(locale) == "en" else markup
 
 
+def _locale_choice_href(surface: str, choice: str) -> str:
+    hrefs = {
+        "index": {"auto": "./?ui_lang=auto", "en": "./?ui_lang=en", "de": "./de.html?ui_lang=de"},
+        "method": {"auto": "./method.html?ui_lang=auto", "en": "./method.html?ui_lang=en", "de": "./method.de.html?ui_lang=de"},
+        "propose": {"auto": "./propose.html?ui_lang=auto", "en": "./propose.html?ui_lang=en", "de": "./propose.de.html?ui_lang=de"},
+    }
+    return hrefs.get(surface, hrefs["index"])[choice]
+
+
 def inject_locale_navigation(markup: str, locale: str, surface: str = "index") -> str:
     normalized = normalize_locale(locale)
-    hrefs = {
-        "index": ("./", "./de.html"),
-        "method": ("./method.html", "./method.de.html"),
-        "propose": ("./propose.html", "./propose.de.html"),
-    }
-    en_href, de_href = hrefs.get(surface, hrefs["index"])
+    heading = "Interface language" if normalized == "en" else "Oberflächensprache"
+    label = "Choose interface language" if normalized == "en" else "Oberflächensprache wählen"
+    automatic = "Automatic – device language" if normalized == "en" else "Automatisch – Gerätesprache"
+    effective = "Effective language: English" if normalized == "en" else "Aktive Sprache: Deutsch"
+    auto_href = _locale_choice_href(surface, "auto")
+    en_href = _locale_choice_href(surface, "en")
+    de_href = _locale_choice_href(surface, "de")
+    control = (
+        '<div class="language-switch" role="group" aria-label="' + label + '" data-locale-surface="' + surface + '">'
+        + '<a href="' + auto_href + '" data-locale-choice="auto" data-locale-surface="' + surface + '">' + automatic + '</a>'
+        + '<a href="' + en_href + '" lang="en" data-locale-choice="en" data-locale-surface="' + surface + '"'
+        + (' aria-current="page"' if normalized == "en" else '') + '>English</a>'
+        + '<a href="' + de_href + '" lang="de" data-locale-choice="de" data-locale-surface="' + surface + '"'
+        + (' aria-current="page"' if normalized == "de" else '') + '>Deutsch</a></div>'
+        + '<p class="language-effective" data-locale-effective aria-live="polite">' + effective + '</p>'
+    )
     if surface == "index":
         section = (
             '<section class="settings-section language-settings"><h3>'
-            + ("Language" if normalized == "en" else "Sprache")
-            + '</h3><p class="language-switch" aria-label="'
-            + ("Choose language" if normalized == "en" else "Sprache wählen")
-            + '"><a href="' + en_href + '" lang="en"' + (' aria-current="page"' if normalized == "en" else '') + '>English</a> · '
-            + '<a href="' + de_href + '" lang="de"' + (' aria-current="page"' if normalized == "de" else '') + '>Deutsch</a></p></section>\n        '
+            + heading
+            + '</h3>' + control + '</section>\n        '
         )
         marker = '<section class="settings-section">\n          <h3>' + ("Interaction" if normalized == "en" else "Bedienung") + '</h3>'
         markup = markup.replace(marker, section + marker, 1)
     else:
-        switch = (
-            '<p class="language-switch" aria-label="'
-            + ("Choose language" if normalized == "en" else "Sprache wählen")
-            + '"><a href="' + en_href + '" lang="en"' + (' aria-current="page"' if normalized == "en" else '') + '>English</a> · '
-            + '<a href="' + de_href + '" lang="de"' + (' aria-current="page"' if normalized == "de" else '') + '>Deutsch</a></p>'
-        )
         marker = '<p><a class="secondary-back-link"'
         position = markup.find(marker)
         if position >= 0:
             end = markup.find('</p>', position)
             if end >= 0:
                 end += 4
-                markup = markup[:end] + '\n      ' + switch + markup[end:]
+                markup = markup[:end] + '\n      ' + control + markup[end:]
     return markup
 
 

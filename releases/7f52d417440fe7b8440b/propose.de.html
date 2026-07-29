@@ -3,9 +3,9 @@
   <head>
     <meta charset="utf-8" />
     <meta name="commonworld-page" content="propose.de.html" />
-    <meta name="commonworld-page-build" content="8c3991ce94607088" />
-    <meta name="commonworld-release" content="2e492b2a2d030a7ea12e" />
-    <base href="/releases/2e492b2a2d030a7ea12e/" />
+    <meta name="commonworld-page-build" content="d185990dd84306b8" />
+    <meta name="commonworld-release" content="7f52d417440fe7b8440b" />
+    <base href="/releases/7f52d417440fe7b8440b/" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="color-scheme" content="dark" />
     <meta name="referrer" content="strict-origin-when-cross-origin" />
@@ -13,9 +13,10 @@
     <meta name="description" content="Ein Commons zur redaktionellen Prüfung für Commonworld vorschlagen." />
     <title>Commonworld — Commons vorschlagen</title>
     <link rel="icon" href="./assets/commonworld-mark.svg?v=05905a6e42f8" type="image/svg+xml" />
-    <link rel="stylesheet" href="./index.css?v=08b3c84958b8" />
+    <link rel="stylesheet" href="./index.css?v=50661fc1ca34" />
     <link rel="stylesheet" href="./assets/proposal.css?v=0823cd3bbbbd" />
     <script type="module" src="/assets/commonworld-release-check.js?v=9dddad3cab3d"></script>
+    <script type="module" src="./assets/commonworld-locale.mjs?v=b82d6a2e0479"></script>
     <script type="module" src="./assets/commonworld-proposal.js?v=a25f2b53dbb1"></script>
   </head>
   <body class="proposal-page">
@@ -25,7 +26,7 @@
       <p class="kicker">Commonworld-Redaktion</p>
       <h1>Ein Commons vorschlagen</h1>
       <p><a class="secondary-back-link" href="./de.html">← Zurück zum Globus</a></p>
-      <p class="language-switch" aria-label="Sprache wählen"><a href="./propose.html" lang="en">English</a> · <a href="./propose.de.html" lang="de" aria-current="page">Deutsch</a></p>
+      <div class="language-switch" role="group" aria-label="Oberflächensprache wählen" data-locale-surface="propose"><a href="./propose.html?ui_lang=auto" data-locale-choice="auto" data-locale-surface="propose">Automatisch – Gerätesprache</a><a href="./propose.html?ui_lang=en" lang="en" data-locale-choice="en" data-locale-surface="propose">English</a><a href="./propose.de.html?ui_lang=de" lang="de" data-locale-choice="de" data-locale-surface="propose" aria-current="page">Deutsch</a></div><p class="language-effective" data-locale-effective aria-live="polite">Aktive Sprache: Deutsch</p>
       <section class="proposal-intro" aria-labelledby="proposal-process-title">
         <h2 id="proposal-process-title">Was danach passiert</h2>
         <p>Der Vorschlag wird <strong>nicht automatisch veröffentlicht</strong>. Commonworld prüft Identität, Quellen, Commons-Eigenschaft, Handlungswege, Ortsgenauigkeit, Datenschutz und Aktualität. Erst ein separat geprüfter Repository-Commit kann einen Katalogeintrag veröffentlichen.</p>

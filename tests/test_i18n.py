@@ -38,7 +38,6 @@ class InternationalizationTests(unittest.TestCase):
         catalog_ids = {record["id"] for record in load_records(ROOT)}
         self.assertEqual(catalog_ids, set(overlay["projects"]))
 
-
     def test_geographic_overlay_is_bound_to_stable_location_ids(self) -> None:
         canonical = load_records(ROOT)
         target = next(record for record in canonical if record["id"] == "fucvam")
@@ -60,10 +59,15 @@ class InternationalizationTests(unittest.TestCase):
         german = render_shell(ROOT, "de")
         self.assertIn('<html lang="en">', english)
         self.assertIn('<title>commonworld — Discover Commons</title>', english)
-        self.assertIn('href="./de.html"', english)
+        self.assertIn('href="./de.html?ui_lang=de"', english)
         self.assertIn('<html lang="de">', german)
         self.assertIn('<title>commonworld — Commons entdecken</title>', german)
-        self.assertIn('href="./"', german)
+        self.assertIn('href="./?ui_lang=en"', german)
+        for markup in (english, german):
+            self.assertIn('data-locale-choice="auto"', markup)
+            self.assertIn('data-locale-choice="en"', markup)
+            self.assertIn('data-locale-choice="de"', markup)
+            self.assertIn('data-locale-effective', markup)
         self.assertIn('Search Commons', english)
         self.assertIn('Commons suchen', german)
 
@@ -93,13 +97,15 @@ class InternationalizationTests(unittest.TestCase):
         with self.assertRaisesRegex(ValueError, "locale replacement contract drift"):
             replace_exact("<p>changed template</p>", {"<p>expected template</p>": "<p>translated</p>"}, surface="test")
 
-    def test_method_surface_is_localized_without_scripts(self) -> None:
+    def test_method_surface_is_localized_with_only_locale_runtime(self) -> None:
         english = render_method(ROOT, "en")
         german = render_method(ROOT, "de")
         self.assertIn('Method, coverage and privacy', english)
         self.assertIn('Methode, Abdeckung und Datenschutz', german)
-        self.assertNotIn('<script', english.casefold())
-        self.assertNotIn('<script', german.casefold())
+        for markup in (english, german):
+            self.assertEqual(1, markup.casefold().count('<script'))
+            self.assertIn('commonworld-locale.mjs?v=', markup)
+            self.assertIn('data-locale-choice="auto"', markup)
 
 
 if __name__ == "__main__":

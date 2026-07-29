@@ -350,6 +350,7 @@ async function newPage({
   reducedMotion = 'reduce',
   geolocation = null,
   permissions = [],
+  languages = ['en'],
 } = {}) {
   const context = await browser.newContext({
     viewport: viewportOverride ?? (mobile ? { width: 390, height: 844 } : { width: 1280, height: 800 }),
@@ -360,6 +361,11 @@ async function newPage({
     ...(geolocation ? { geolocation } : {}),
   });
   if (permissions.length) await context.grantPermissions(permissions, { origin: baseUrl });
+  if (Array.isArray(languages)) {
+    await context.addInitScript((values) => {
+      Object.defineProperty(navigator, 'languages', { configurable: true, get: () => [...values] });
+    }, languages);
+  }
   await context.route('https://tiles.openfreemap.org/fonts/**', (route) => route.fulfill({
     status: 200,
     contentType: 'application/x-protobuf',
@@ -3523,7 +3529,7 @@ async function germanLocaleScenario() {
   assert((await run.page.locator('html').getAttribute('lang')) === 'de', 'German locale: document language is not de');
   assert((await run.page.locator('#commons-search').getAttribute('placeholder')) === 'Was möchtest du tun oder finden?', 'German locale: search placeholder regressed');
   assert((await run.page.locator('#filter-commons-type option[value="knowledge"]').textContent()) === 'Wissen und Daten', 'German locale: Commons type label regressed');
-  assert(await run.page.locator('.language-switch a[href="./"][lang="en"]').count() > 0, 'German locale: English switch target is missing');
+  assert(await run.page.locator('.language-switch a[data-locale-choice="en"][lang="en"]').count() > 0, 'German locale: English switch target is missing');
 
   await run.page.locator('#commons-search').fill('free operating system');
   await run.page.waitForFunction(() => document.querySelectorAll('.discovery-result').length === 1);
@@ -3533,6 +3539,44 @@ async function germanLocaleScenario() {
   assert(run.pageErrors.length === 0, `German locale: page errors: ${run.pageErrors.join(' | ')}`);
   results.push({ id: 'locale-german', verdict: 'PASS', crossLanguageSearch: true });
   await run.context.close();
+}
+
+async function localePreferenceScenario() {
+  process.stdout.write(`${JSON.stringify({ state: 'RUNNING', scenario: 'locale-preference' })}\n`);
+  const automatic = await newPage({ languages: ['fr-FR', 'de-DE', 'en-GB'] });
+  await automatic.page.goto(`${baseUrl}/?project=debian#text-view`, { waitUntil: 'domcontentloaded' });
+  await automatic.page.waitForURL((url) => url.pathname.endsWith('/de.html') && url.searchParams.get('ui_lang') === 'auto');
+  await automatic.page.waitForSelector('html.runtime-ready');
+  const automaticUrl = new URL(automatic.page.url());
+  assert(automaticUrl.searchParams.get('project') === 'debian', 'locale preference: automatic redirect lost project state');
+  assert(automaticUrl.hash === '#text-view', 'locale preference: automatic redirect lost fragment state');
+  assert((await automatic.page.locator('html').getAttribute('lang')) === 'de', 'locale preference: ordered browser languages did not choose German');
+  assert(await automatic.page.locator('[data-locale-choice="auto"][aria-current="page"]').count() === 1, 'locale preference: automatic control is not current');
+  assert(await automatic.page.evaluate(() => localStorage.getItem('commonworld.ui-locale')) === 'auto', 'locale preference: automatic choice was not persisted');
+  assert(automatic.consoleErrors.length === 0, `locale preference automatic: console errors: ${automatic.consoleErrors.join(' | ')}`);
+  assert(automatic.pageErrors.length === 0, `locale preference automatic: page errors: ${automatic.pageErrors.join(' | ')}`);
+  await automatic.context.close();
+
+  const explicit = await newPage({ languages: ['de-DE'] });
+  await explicit.context.addInitScript(() => localStorage.setItem('commonworld.ui-locale', 'de'));
+  await explicit.page.goto(`${baseUrl}/?ui_lang=en&language=de#text-view`, { waitUntil: 'domcontentloaded' });
+  await explicit.page.waitForSelector('html.runtime-ready');
+  assert((await explicit.page.locator('html').getAttribute('lang')) === 'en', 'locale preference: explicit English URL was overwritten by stored German');
+  assert(await explicit.page.locator('#filter-language').inputValue() === 'de', 'locale preference: content-language filter did not initialize independently');
+  await explicit.page.locator('#settings-toggle').click();
+  await explicit.page.locator('#settings-panel:not([hidden])').waitFor();
+  await explicit.page.locator('#settings-panel [data-locale-choice="de"]').click();
+  await explicit.page.waitForURL((url) => url.pathname.endsWith('/de.html') && url.searchParams.get('ui_lang') === 'de');
+  await explicit.page.waitForSelector('html.runtime-ready');
+  const manualUrl = new URL(explicit.page.url());
+  assert(manualUrl.searchParams.get('language') === 'de', 'locale preference: UI switch overwrote content-language filter');
+  assert(manualUrl.hash === '#text-view', 'locale preference: manual switch lost fragment state');
+  assert(await explicit.page.locator('#filter-language').inputValue() === 'de', 'locale preference: content-language filter changed after UI switch');
+  assert(await explicit.page.evaluate(() => localStorage.getItem('commonworld.ui-locale')) === 'de', 'locale preference: manual choice was not persisted');
+  assert(explicit.consoleErrors.length === 0, `locale preference manual: console errors: ${explicit.consoleErrors.join(' | ')}`);
+  assert(explicit.pageErrors.length === 0, `locale preference manual: page errors: ${explicit.pageErrors.join(' | ')}`);
+  results.push({ id: 'locale-preference', verdict: 'PASS', browserOrder: true, explicitUrl: true, statePreserved: true });
+  await explicit.context.close();
 }
 
 async function methodScenario() {
@@ -3577,6 +3621,7 @@ try {
   await syntheticDigitalPerformanceScenario();
   await normalScenario();
   await germanLocaleScenario();
+  await localePreferenceScenario();
   await intentSearchDiscoveryScenario();
   await spatialDiscoveryFiltersScenario();
   await androidGlobeUiScenario();

@@ -3,9 +3,9 @@
   <head>
     <meta charset="utf-8" />
     <meta name="commonworld-page" content="de.html" />
-    <meta name="commonworld-page-build" content="1c8cf6fa1ddf25c4" />
-    <meta name="commonworld-release" content="2e492b2a2d030a7ea12e" />
-    <base href="/releases/2e492b2a2d030a7ea12e/" />
+    <meta name="commonworld-page-build" content="11354fd30acf5043" />
+    <meta name="commonworld-release" content="7f52d417440fe7b8440b" />
+    <base href="/releases/7f52d417440fe7b8440b/" />
     <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
     <meta name="color-scheme" content="dark" />
     <meta name="referrer" content="strict-origin-when-cross-origin" />
@@ -16,11 +16,12 @@
     <link rel="alternate" type="application/json" href="./catalog/catalog.json" title="Commonworld-Katalog" />
     <link rel="alternate" type="application/schema+json" href="./contracts/commonworld/project.schema.json" title="CommonProject-Schema" />
     <link rel="stylesheet" href="./assets/vendor/maplibre-gl.css?v=ab1e70d59ec4" />
-    <link rel="stylesheet" href="./index.css?v=08b3c84958b8" />
+    <link rel="stylesheet" href="./index.css?v=50661fc1ca34" />
     <link rel="stylesheet" href="./assets/ipad-layout.css?v=739d6b8460d4" />
     <script type="module" src="/assets/commonworld-release-check.js?v=9dddad3cab3d"></script>
     <script src="./assets/vendor/maplibre-gl.js?v=45a9b07a9189" defer></script>
-    <script type="module" src="./assets/commonworld-app.js?v=0cbbf6ae09af"></script>
+    <script type="module" src="./assets/commonworld-locale.mjs?v=b82d6a2e0479"></script>
+    <script type="module" src="./assets/commonworld-app.js?v=4cb075c40101"></script>
   </head>
   <body data-presentation="globe">
     <a id="text-skip-link" class="skip-link" href="/de.html#static-catalog-fallback">Zur Textansicht springen</a>
@@ -224,7 +225,7 @@
           <button type="button" role="radio" aria-checked="true" data-presentation-choice="globe"><strong>Globus</strong><span>Räumlich entdecken und zoomen</span></button>
           <button type="button" role="radio" aria-checked="false" data-presentation-choice="text"><strong>Text</strong><span>Dieselben Commons als Liste</span></button>
         </div>
-        <section class="settings-section language-settings"><h3>Sprache</h3><p class="language-switch" aria-label="Sprache wählen"><a href="./" lang="en">English</a> · <a href="./de.html" lang="de" aria-current="page">Deutsch</a></p></section>
+        <section class="settings-section language-settings"><h3>Oberflächensprache</h3><div class="language-switch" role="group" aria-label="Oberflächensprache wählen" data-locale-surface="index"><a href="./?ui_lang=auto" data-locale-choice="auto" data-locale-surface="index">Automatisch – Gerätesprache</a><a href="./?ui_lang=en" lang="en" data-locale-choice="en" data-locale-surface="index">English</a><a href="./de.html?ui_lang=de" lang="de" data-locale-choice="de" data-locale-surface="index" aria-current="page">Deutsch</a></div><p class="language-effective" data-locale-effective aria-live="polite">Aktive Sprache: Deutsch</p></section>
         <section class="settings-section">
           <h3>Bedienung</h3>
           <p>Die Systemeinstellung für reduzierte Bewegung wird automatisch respektiert.</p>
