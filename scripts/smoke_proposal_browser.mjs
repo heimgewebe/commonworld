@@ -283,7 +283,7 @@ html { font-size: ${profile.fontScale}% !important; }
   await page.getByLabel('Broad region or place').fill('52.5200, 13.4050');
   await page.getByRole('button', { name: 'Prepare public GitHub issue' }).click();
   assert(await page.getByRole('alert').isVisible(), 'privacy-invalid: error surface missing');
-  assert((await page.getByRole('alert').textContent()).includes('no address or coordinates'), 'privacy-invalid: fail-closed reason missing');
+  assert((await page.getByRole('alert').textContent()).includes('no private address or coordinates'), 'privacy-invalid: fail-closed reason missing');
   results.push('privacy-fail-closed');
   await context.close();
 }
