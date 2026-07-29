@@ -651,7 +651,6 @@ html[data-input-modality="pointer"] :focus {
 .settings-section a {
   display: inline-flex;
   align-items: center;
-  justify-content: center;
   min-block-size: var(--minimum-touch-target);
   padding-block: 0.22rem;
 }
@@ -664,6 +663,7 @@ html[data-input-modality="pointer"] :focus {
 }
 
 .language-switch a {
+  justify-content: center;
   min-inline-size: var(--minimum-touch-target);
   padding: 0.45rem 0.72rem;
   border: 1px solid var(--line-strong);
