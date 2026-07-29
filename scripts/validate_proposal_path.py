@@ -26,15 +26,15 @@ REJECTION_CODES = {
     "commercial_listing_only", "project_inactive", "action_claim_unverified", "out_of_scope",
 }
 EXPECTED_STATUSES = {"submitted", "needs_information", "under_review", "accepted", "rejected", "withdrawn", "published", "superseded"}
-SENSITIVE_CONTEXT_PATTERN = re.compile(r"\b(?:latitude|longitude|coordinates?|gps|router|roof|dach|wohnung|apartment|household|haushalt)\b", re.I)
+SENSITIVE_CONTEXT_PATTERN = re.compile(r"\b(?:latitude|longitude|coordinates?|gps)\b", re.I)
 DECIMAL_POINT_COORDINATE_PATTERN = re.compile(r"(?:^|[^\d])[-+]?\d{1,3}\.\d{3,}\s*[,;/ ]\s*[-+]?\d{1,3}\.\d{3,}(?:[^\d]|$)")
 DECIMAL_COMMA_COORDINATE_PATTERN = re.compile(r"(?:^|[^\d])[-+]?\d{1,3},\d{3,}\s*[;/]\s*[-+]?\d{1,3},\d{3,}(?:[^\d]|$)")
-DMS_COORDINATE_PATTERN = re.compile(r"\d{1,3}\s*°\s*\d{1,2}\s*[′']\s*\d{1,2}(?:[.,]\d+)?\s*(?:[″\"]|[′']{2})\s*[NS]\s+\d{1,3}\s*°\s*\d{1,2}\s*[′']\s*\d{1,2}(?:[.,]\d+)?\s*(?:[″\"]|[′']{2})\s*[EW]", re.I)
+DMS_COORDINATE_PATTERN = re.compile(r"\d{1,3}\s*°\s*\d{1,2}\s*[′']\s*\d{1,2}(?:[.,]\d+)?\s*(?:[″\"]|[′']{2})\s*[NS](?:\s*[,;]\s*|\s+)\d{1,3}\s*°\s*\d{1,2}\s*[′']\s*\d{1,2}(?:[.,]\d+)?\s*(?:[″\"]|[′']{2})\s*[EW]", re.I)
 LETTER_OR_MARK = r"(?:[^\W\d_]|[\u0300-\u036f\u1ab0-\u1aff\u1dc0-\u1dff\u20d0-\u20ff\ufe20-\ufe2f])"
 WORD = rf"{LETTER_OR_MARK}(?:{LETTER_OR_MARK}|['’.-])*"
 HOUSE_NUMBER = r"\d{1,5}[a-z]?(?:[-/]\d{1,5}[a-z]?)?"
 ATTACHED_STREET_SUFFIX = r"(?:straße|strasse|weg|gasse|allee|platz)"
-STREET_WORD = r"(?:street|road|avenue|boulevard|lane|drive|way|rue|calle|via|viale|corso|ulica|prospekt|st\.?|rd\.?|ave\.?|blvd\.?|ln\.?|dr\.?)"
+STREET_WORD = r"(?:street|road|avenue|boulevard|lane|drive|way|straße|strasse|rue|calle|via|viale|corso|ulica|prospekt|st\.?|rd\.?|ave\.?|blvd\.?|ln\.?|dr\.?)"
 ADDRESS_PATTERNS = (
     re.compile(rf"(?:^|[^\w])(?:{WORD}\s+){{0,5}}{WORD}{ATTACHED_STREET_SUFFIX}\s+{HOUSE_NUMBER}(?=$|[^\w])", re.I),
     re.compile(rf"(?:^|[^\w])(?:{WORD}\s+){{1,5}}{STREET_WORD}\s+{HOUSE_NUMBER}(?=$|[^\w])", re.I),

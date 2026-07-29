@@ -41,6 +41,14 @@
     {
       "id": "explicit-coordinate-label",
       "value": "GPS coordinates available on request"
+    },
+    {
+      "id": "dms-comma-separated",
+      "value": "52°31′12″N, 13°24′36″E"
+    },
+    {
+      "id": "dms-semicolon-separated",
+      "value": "52°31′12″N; 13°24′36″E"
     }
   ],
   "allowed": [
@@ -75,6 +83,22 @@
     {
       "id": "street-word-only",
       "value": "Street art and public-space culture in Berlin"
+    },
+    {
+      "id": "household-domain-term",
+      "value": "This housing commons supports household energy and shared local infrastructure."
+    },
+    {
+      "id": "apartment-domain-term",
+      "value": "An apartment cooperative shares repair tools and knowledge."
+    },
+    {
+      "id": "router-domain-term",
+      "value": "Community members maintain router software and open network documentation."
+    },
+    {
+      "id": "roof-domain-term",
+      "value": "The cooperative installs solar panels on shared roof areas."
     }
   ]
 }
