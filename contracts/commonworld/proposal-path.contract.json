@@ -1,7 +1,7 @@
 {
   "schema_version": 1,
   "kind": "commonworld_public_proposal_path_contract",
-  "current_as_of": "2026-07-16",
+  "current_as_of": "2026-07-29",
   "architecture": {
     "hosting": "github_pages_static",
     "commonworld_backend": false,
@@ -16,10 +16,30 @@
     "contact_field_collected": false,
     "github_account_is_optional_contact_channel": true,
     "public_issue_warning_required": true,
-    "private_addresses_coordinates_router_roofs_households_forbidden": true,
     "coarse_region_only": true,
     "proposal_content_stored_by_commonworld": false,
-    "local_rate_limit_stores_content": false
+    "local_rate_limit_stores_content": false,
+    "sensitive_location_validation": {
+      "public_text_fields": [
+        "name",
+        "description",
+        "region",
+        "editorial_note"
+      ],
+      "blocked_families": [
+        "compound_street_address",
+        "decimal_point_coordinate_pair",
+        "decimal_comma_coordinate_pair",
+        "degrees_minutes_seconds_coordinate_pair",
+        "explicit_coordinate_context"
+      ],
+      "broad_country_city_region_names_preserved": true,
+      "single_street_keyword_is_not_sufficient": true,
+      "shared_parity_fixture": "tests/fixtures/proposals/sensitive-location-cases.json",
+      "public_issue_handoff_fails_closed_after_validation_error": true,
+      "standalone_domain_terms_are_not_sufficient": true
+    },
+    "private_addresses_and_coordinates_forbidden": true
   },
   "spam_and_repetition": {
     "github_auth_and_platform_limits": true,

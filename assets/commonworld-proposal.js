@@ -8,7 +8,20 @@ const RELEASE_DRAFT_KEY = "commonworldProposalReleaseDraftV1";
 const RELEASE_DRAFT_MAX_AGE_MS = 5 * 60_000;
 const ACTION_TYPES = new Set(["visit", "use", "borrow", "learn", "contribute", "volunteer", "donate", "contact", "replicate"]);
 const COMMONS_TYPES = new Set(["knowledge", "software", "culture", "food-seeds", "water", "energy", "housing-land", "health-care", "tools-repair", "community-network", "other"]);
-const SENSITIVE_PATTERN = /(?:\b(?:latitude|longitude|coordinates?|gps|street|straße|strasse|avenue|road|router|roof|dach|wohnung|apartment|household|haushalt)\b|[-+]?\d{1,3}\.\d{3,}\s*[,;/ ]\s*[-+]?\d{1,3}\.\d{3,})/iu;
+const SENSITIVE_CONTEXT_PATTERN = /\b(?:latitude|longitude|coordinates?|gps)\b/iu;
+const DECIMAL_POINT_COORDINATE_PATTERN = /(?:^|[^\d])[-+]?\d{1,3}\.\d{3,}\s*[,;/ ]\s*[-+]?\d{1,3}\.\d{3,}(?:[^\d]|$)/u;
+const DECIMAL_COMMA_COORDINATE_PATTERN = /(?:^|[^\d])[-+]?\d{1,3},\d{3,}\s*[;/]\s*[-+]?\d{1,3},\d{3,}(?:[^\d]|$)/u;
+const DMS_COORDINATE_PATTERN = /\d{1,3}\s*°\s*\d{1,2}\s*[′']\s*\d{1,2}(?:[.,]\d+)?\s*(?:[″"]|[′']{2})\s*[NS](?:\s*[,;]\s*|\s+)\d{1,3}\s*°\s*\d{1,2}\s*[′']\s*\d{1,2}(?:[.,]\d+)?\s*(?:[″"]|[′']{2})\s*[EW]/iu;
+const WORD = String.raw`[\p{L}\p{M}][\p{L}\p{M}'’.-]*`;
+const HOUSE_NUMBER = String.raw`\d{1,5}[a-z]?(?:[-/]\d{1,5}[a-z]?)?`;
+const ATTACHED_STREET_SUFFIX = String.raw`(?:straße|strasse|weg|gasse|allee|platz)`;
+const STREET_WORD = String.raw`(?:street|road|avenue|boulevard|lane|drive|way|straße|strasse|rue|calle|via|viale|corso|ulica|prospekt|st\.?|rd\.?|ave\.?|blvd\.?|ln\.?|dr\.?)`;
+const ADDRESS_PATTERNS = Object.freeze([
+  new RegExp(String.raw`(?:^|[^\p{L}\p{N}])(?:${WORD}\s+){0,5}${WORD}${ATTACHED_STREET_SUFFIX}\s+${HOUSE_NUMBER}(?=$|[^\p{L}\p{N}])`, 'iu'),
+  new RegExp(String.raw`(?:^|[^\p{L}\p{N}])(?:${WORD}\s+){1,5}${STREET_WORD}\s+${HOUSE_NUMBER}(?=$|[^\p{L}\p{N}])`, 'iu'),
+  new RegExp(String.raw`(?:^|[^\p{L}\p{N}])(?:rue|calle|via|viale|corso|avenue|boulevard)\s+(?:${WORD}\s+){0,4}${WORD}\s+${HOUSE_NUMBER}(?=$|[^\p{L}\p{N}])`, 'iu'),
+  new RegExp(String.raw`(?:^|[^\p{L}\p{N}])${HOUSE_NUMBER}\s+(?:${WORD}\s+){0,5}${STREET_WORD}(?=$|[^\p{L}\p{N}])`, 'iu'),
+]);
 const CONTACT_PATTERN = /(?:\b[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}\b|(?:\+?\d[\d\s()/.-]{7,}\d))/iu;
 const ACTIVE_CONTENT_PATTERN = /(?:<\s*script\b|javascript\s*:|data\s*:\s*text\/html|on(?:error|load|click)\s*=)/iu;
 
@@ -27,7 +40,12 @@ export function isSafeHttpsUrl(value) {
 }
 
 export function containsSensitiveLocation(value) {
-  return SENSITIVE_PATTERN.test(String(value || ""));
+  const normalized = String(value || "").normalize("NFKC");
+  return SENSITIVE_CONTEXT_PATTERN.test(normalized)
+    || DECIMAL_POINT_COORDINATE_PATTERN.test(normalized)
+    || DECIMAL_COMMA_COORDINATE_PATTERN.test(normalized)
+    || DMS_COORDINATE_PATTERN.test(normalized)
+    || ADDRESS_PATTERNS.some((pattern) => pattern.test(normalized));
 }
 
 export function containsContactData(value) {
@@ -39,6 +57,7 @@ function validateText(errors, field, value, min, max) {
   if (typeof value === "string" && value.length > max) errors.push(`${field}: ${tr(`höchstens ${max} Zeichen.`, `at most ${max} characters.`)}`);
   if (typeof value === "string" && ACTIVE_CONTENT_PATTERN.test(value)) errors.push(`${field}: ${tr("aktiver HTML- oder Script-Inhalt ist nicht erlaubt.", "active HTML or script content is not allowed.")}`);
   if (typeof value === "string" && containsContactData(value)) errors.push(`${field}: ${tr("keine E-Mail-Adresse oder Telefonnummer in öffentlichen Vorschlägen.", "no email address or phone number in public suggestions.")}`);
+  if (typeof value === "string" && containsSensitiveLocation(value)) errors.push(`${field}: ${tr("keine private Adresse oder Koordinate in öffentlichen Vorschlägen.", "no private address or coordinates in public suggestions.")}`);
 }
 
 export function validateProposal(proposal, knownTitles = [], knownHosts = []) {
@@ -58,7 +77,6 @@ export function validateProposal(proposal, knownTitles = [], knownHosts = []) {
   validateText(errors, tr("Beschreibung", "Description"), project.description, 40, MAX.description);
   if (project.presence_geographic === true) {
     validateText(errors, "Region", project.region, 2, MAX.region);
-    if (containsSensitiveLocation(project.region)) errors.push(tr("Region: nur Land, Großregion oder Stadt nennen; keine Adresse oder Koordinate.", "Region: provide only a country, broad region or city; no address or coordinates."));
     if (project.location_precision !== "country_or_region_only") errors.push(tr("Ortsgenauigkeit: nur Land oder grobe Region ist zulässig.", "Location precision: only a country or broad region is allowed."));
   } else {
     if (Object.prototype.hasOwnProperty.call(project, "region")) errors.push(tr("Region: bei rein digitaler Präsenz nicht angeben.", "Region: do not provide one for digital-only presence."));
@@ -146,7 +164,13 @@ function markdown(value) {
   return String(value).replace(/[\\`*_{}\[\]()#+\-.!|>]/gu, "\\$&").replace(/[<>]/gu, "");
 }
 
+function assertPublicHandoffSafe(proposal) {
+  const errors = validateProposal(proposal);
+  if (errors.length) throw new TypeError(`public issue handoff rejected: ${errors.join(" | ")}`);
+}
+
 export function buildIssueBody(proposal) {
+  assertPublicHandoffSafe(proposal);
   const project = proposal.project;
   const actionLines = project.actions.map((entry) => `- ${markdown(entry.type)}: ${entry.url}`).join("\n");
   const sourceLines = project.sources.map((url) => `- ${url}`).join("\n");
