@@ -479,6 +479,15 @@ test('deep-link state accepts surface, search, identity, filters and clamped cam
   assert.deepEqual(state.camera, { lng: 180, lat: -85, zoom: MAX_MAP_ZOOM, bearing: 0, pitch: 70 });
 });
 
+test('UI locale choice is normalized consistently across parsing and serialization', () => {
+  const parsed = stateFromSearch('?ui_lang=%20DE%20');
+  assert.equal(parsed.uiLocaleChoice, 'de');
+
+  const serialized = new URLSearchParams(searchFromState({ camera: DEFAULT_CAMERA, uiLocaleChoice: ' EN ' }).slice(1));
+  assert.equal(serialized.get('ui_lang'), 'en');
+  assert.equal(searchFromState({ camera: DEFAULT_CAMERA, uiLocaleChoice: 'fr' }).includes('ui_lang='), false);
+});
+
 test('legacy layer links preserve their exact six-layer filter and URL until explicit path selection', () => {
   const records = loadPublicCatalogRecords();
   for (const { id: layer } of LAYERS) {

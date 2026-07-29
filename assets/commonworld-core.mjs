@@ -973,10 +973,12 @@ const languageFilterParameter = (parameters) => {
   return value === 'unknown' || /^[a-z]{2,3}(?:-[A-Z]{2})?$/.test(value ?? '') ? value : null;
 };
 
-const uiLocaleChoiceParameter = (parameters) => {
-  const value = parameters.get('ui_lang');
-  return ['auto', 'en', 'de'].includes(value) ? value : null;
+const normalizeUiLocaleChoice = (value) => {
+  const normalized = typeof value === 'string' ? value.trim().toLowerCase() : '';
+  return ['auto', 'en', 'de'].includes(normalized) ? normalized : null;
 };
+
+const uiLocaleChoiceParameter = (parameters) => normalizeUiLocaleChoice(parameters.get('ui_lang'));
 
 const COUNTRY_CODE_PATTERN = /^[A-Za-z0-9_-]{1,16}$/;
 
@@ -1063,8 +1065,8 @@ export function searchFromState(state) {
   if (language === 'unknown' || /^[a-z]{2,3}(?:-[A-Z]{2})?$/.test(language ?? '')) {
     parameters.set('language', language);
   }
-  const uiLocaleChoice = state?.uiLocaleChoice;
-  if (['auto', 'en', 'de'].includes(uiLocaleChoice)) {
+  const uiLocaleChoice = normalizeUiLocaleChoice(state?.uiLocaleChoice);
+  if (uiLocaleChoice) {
     parameters.set('ui_lang', uiLocaleChoice);
   }
   return '?' + parameters.toString();
