@@ -2550,7 +2550,8 @@ html:not([data-input-modality="pointer"]) .digital-ribbon-item:focus-visible {
   display: none;
 }
 
-.filter-group-controls label {
+.filter-group-controls label,
+.location-filter-block--destination label {
   display: grid;
   gap: 0.25rem;
   min-width: 0;
@@ -2559,7 +2560,8 @@ html:not([data-input-modality="pointer"]) .digital-ribbon-item:focus-visible {
   font-weight: 700;
 }
 
-.filter-group-controls select {
+.filter-group-controls select,
+.location-filter-block--destination select {
   width: 100%;
   min-height: 2.75rem;
   padding: 0.5rem 2rem 0.5rem 0.72rem;
@@ -2918,6 +2920,275 @@ html:not([data-input-modality="pointer"]) .digital-ribbon-item:focus-visible {
     right: max(0.6rem, env(safe-area-inset-right));
     bottom: max(0.9rem, env(safe-area-inset-bottom));
     width: min(16rem, calc(100% - 1.2rem));
+  }
+}
+
+
+/* Filter layout semantics v1 */
+.discovery-panel {
+  width: min(56rem, calc(100% - 2rem));
+  padding: 0;
+}
+
+.discovery-heading {
+  position: sticky;
+  z-index: 24;
+  top: 0;
+  min-height: 3.65rem;
+  padding: 0.72rem 0.85rem;
+  border-bottom: 1px solid var(--line);
+  background: rgba(7, 20, 17, 0.98);
+  backdrop-filter: blur(1rem);
+}
+
+.discovery-heading .kicker {
+  font-size: 0.68rem;
+  letter-spacing: 0.08em;
+}
+
+.discovery-heading h2 {
+  font-size: clamp(1.12rem, 2.4vw, 1.42rem);
+  line-height: 1.15;
+}
+
+.active-filter-chips {
+  padding: 0 0.85rem;
+}
+
+.filter-sections {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.7rem;
+  margin-top: 0;
+  padding: 0.75rem 0.85rem;
+}
+
+.filter-group {
+  min-width: 0;
+  padding: 0.72rem;
+  border: 1px solid var(--line);
+  border-radius: 0.9rem;
+  background: rgba(11, 32, 27, 0.62);
+}
+
+.filter-group--location,
+.advanced-filters {
+  grid-column: 1 / -1;
+}
+
+.filter-group > legend {
+  padding: 0 0.35rem;
+  font-size: 0.8rem;
+  letter-spacing: 0.02em;
+}
+
+.filter-group-controls {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.55rem;
+}
+
+.filter-commons-type,
+.filter-action,
+.spatial-destination-search {
+  grid-column: auto;
+}
+
+.location-filter-layout {
+  display: grid;
+  grid-template-columns: minmax(12rem, 0.8fr) minmax(0, 1.2fr);
+  gap: 0.65rem;
+}
+
+.location-filter-block {
+  display: grid;
+  align-content: start;
+  gap: 0.5rem;
+  min-width: 0;
+  padding: 0.6rem;
+  border: 1px solid var(--line);
+  border-radius: 0.78rem;
+  background: rgba(5, 18, 14, 0.38);
+}
+
+.location-filter-block > h3 {
+  margin: 0;
+  color: #edf4ef;
+  font-size: 0.78rem;
+  line-height: 1.2;
+}
+
+.location-filter-block.filter-presence-group {
+  align-self: start;
+  min-width: 0;
+  margin: 0;
+}
+
+.location-filter-block.filter-presence-group > legend {
+  padding: 0 0.25rem;
+  color: #edf4ef;
+  font-size: 0.78rem;
+  font-weight: 740;
+}
+
+.location-filter-block--destination {
+  grid-template-columns: minmax(0, 1fr) minmax(9rem, 0.55fr);
+  align-items: end;
+}
+
+.location-filter-block--destination > h3,
+.location-filter-block--destination > .spatial-search-note,
+.location-filter-block--destination > .geolocation-status,
+.location-filter-block--destination > .location-proximity-controls {
+  grid-column: 1 / -1;
+}
+
+.location-proximity-controls {
+  display: grid;
+  grid-template-columns: minmax(8rem, 0.7fr) auto;
+  align-items: end;
+  gap: 0.5rem;
+}
+
+.location-proximity-controls > label {
+  min-width: 0;
+}
+
+.location-proximity-controls #use-current-location {
+  width: max-content;
+  max-width: 100%;
+  padding: 0.35rem 0.75rem;
+  font-size: 0.76rem;
+  line-height: 1.2;
+  white-space: nowrap;
+}
+
+.advanced-filters {
+  margin: 0;
+  border: 1px solid var(--line);
+  border-radius: 0.9rem;
+  background: rgba(11, 32, 27, 0.46);
+}
+
+.advanced-filters > summary {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  min-height: var(--minimum-touch-target, 44px);
+  padding: 0.65rem 0.75rem;
+  color: #edf4ef;
+  font-size: 0.8rem;
+  font-weight: 760;
+  cursor: pointer;
+  list-style: none;
+}
+
+.advanced-filters > summary::-webkit-details-marker {
+  display: none;
+}
+
+.advanced-filters > summary::after {
+  content: '+';
+  display: inline-grid;
+  place-items: center;
+  width: 1.5rem;
+  height: 1.5rem;
+  border: 1px solid var(--line-strong);
+  border-radius: 50%;
+  font-size: 1rem;
+  line-height: 1;
+}
+
+.advanced-filters[open] > summary::after {
+  content: '−';
+}
+
+.advanced-filters > .filter-group-controls {
+  padding: 0 0.75rem 0.75rem;
+}
+
+.discovery-summary-row {
+  grid-template-columns: minmax(10.5rem, 0.8fr) minmax(12rem, 1.35fr) auto;
+  gap: 0.55rem 0.7rem;
+  margin-top: 0;
+  padding: 0.72rem 0.85rem;
+  border-top: 1px solid var(--line);
+  border-bottom: 1px solid var(--line);
+  background: rgba(5, 18, 14, 0.42);
+}
+
+.discovery-summary-row #filter-clear {
+  grid-column: 3;
+  grid-row: 1 / span 2;
+  align-self: center;
+}
+
+.discovery-count {
+  grid-column: 1;
+  font-weight: 700;
+}
+
+.discovery-sort-note {
+  max-width: none;
+}
+
+.discovery-list,
+.discovery-empty,
+.result-continuation {
+  margin-right: 0.85rem;
+  margin-left: 0.85rem;
+}
+
+.filter-group-controls select,
+.location-filter-block--destination select,
+.spatial-destination-search input,
+.discovery-sort select,
+.location-filter-block .quiet-button,
+.advanced-filters > summary {
+  min-height: var(--minimum-touch-target, 44px);
+}
+
+@media (max-width: 48rem) {
+  .discovery-panel {
+    width: min(42rem, calc(100% - 1rem));
+  }
+
+  .filter-sections,
+  .location-filter-layout,
+  .location-filter-block--destination,
+  .discovery-summary-row {
+    grid-template-columns: 1fr;
+  }
+
+  .filter-group--location,
+  .advanced-filters,
+  .location-filter-block--destination > h3,
+  .location-filter-block--destination > .spatial-search-note,
+  .location-filter-block--destination > .geolocation-status,
+  .location-filter-block--destination > .location-proximity-controls,
+  .discovery-summary-row #filter-clear,
+  .discovery-count {
+    grid-column: 1;
+  }
+
+  .discovery-summary-row #filter-clear {
+    grid-row: auto;
+    justify-self: stretch;
+  }
+}
+
+@media (max-width: 34rem) {
+  .discovery-panel {
+    top: calc(var(--topbar-height) + env(safe-area-inset-top));
+    width: 100%;
+    max-height: calc(100dvh - var(--topbar-height) - env(safe-area-inset-top));
+    border-right: 0;
+    border-left: 0;
+    border-radius: 0 0 1rem 1rem;
+  }
+
+  .filter-group-controls,
+  .location-proximity-controls,
+  .advanced-filters > .filter-group-controls {
+    grid-template-columns: 1fr;
   }
 }
 

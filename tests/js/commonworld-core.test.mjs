@@ -802,6 +802,17 @@ test('ephemeral nearby origin and radius are never serialized and default to nul
   assert.equal(search.includes('5000'), false);
 });
 
+test('selected presence types compose with strict AND semantics', () => {
+  const records = [
+    { id: 'geographic', presence: { geographic: [{ id: 'g', mode: 'exact', geometry: { type: 'Point', coordinates: [1, 1] } }], digital: { available: false } } },
+    { id: 'digital', presence: { geographic: [], digital: { available: true } } },
+    { id: 'dual', presence: { geographic: [{ id: 'd', mode: 'approximate', geometry: { type: 'Point', coordinates: [2, 2] }, uncertainty_meters_min: 1000 }], digital: { available: true } } },
+  ];
+  assert.deepEqual(filterRecords(records, { presence: ['geographic'] }).map(({ id }) => id), ['geographic', 'dual']);
+  assert.deepEqual(filterRecords(records, { presence: ['digital'] }).map(({ id }) => id), ['digital', 'dual']);
+  assert.deepEqual(filterRecords(records, { presence: ['geographic', 'digital'] }).map(({ id }) => id), ['dual']);
+});
+
 test('country and nearby spatial helpers only consult public geographic locations', () => {
   const westland = { type: 'Polygon', coordinates: [[[0, 0], [10, 0], [10, 10], [0, 10], [0, 0]]] };
   const exactPoint = { id: 'a', title: 'Exact point', presence: { geographic: [{ id: 'loc', mode: 'exact', geometry: { type: 'Point', coordinates: [5, 5] } }] } };

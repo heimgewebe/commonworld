@@ -260,10 +260,8 @@ def validate_intent_search_discovery(root: Path = ROOT) -> list[str]:
         expected_selected_presence_volunteer = sorted(
             record["id"]
             for record in records
-            if (
-                bool(record.get("presence", {}).get("geographic"))
-                or record.get("presence", {}).get("digital", {}).get("available") is True
-            )
+            if bool(record.get("presence", {}).get("geographic"))
+            and record.get("presence", {}).get("digital", {}).get("available") is True
             and "volunteer" in record.get("actions", [])
         )
         if probe.get("indexedRecords") != manifest.get("entry_count") or probe.get("indexedTerms", 0) <= 0:
@@ -275,7 +273,7 @@ def validate_intent_search_discovery(root: Path = ROOT) -> list[str]:
         if probe.get("hiddenPhrase") != []:
             errors.append("T007 hidden geographic values leaked into search")
         if probe.get("selectedPresenceVolunteer") != expected_selected_presence_volunteer:
-            errors.append("T007 combined presence-volunteer OR filter does not match selected axes and claimed actions")
+            errors.append("T007 combined presence-volunteer AND filter does not match selected axes and claimed actions")
         if probe.get("digitalTarget") is not None:
             errors.append("T007 digital Commons acquired a spatial navigation target")
         if probe.get("geographicTarget", {}).get("kind") != "bounds":

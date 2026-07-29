@@ -2085,7 +2085,7 @@ async function intentSearchDiscoveryScenario() {
   await run.page.locator('#filter-presence-geographic').check();
   await run.page.locator('#filter-presence-digital').check();
   await run.page.waitForFunction((count) => document.querySelectorAll('.discovery-result').length === count, discoveryPreviewCount(expectedDigitalProjection.selectedPresenceIds));
-  assert(JSON.stringify(await resultIds()) === JSON.stringify(discoveryPreviewIds(expectedDigitalProjection.selectedPresenceIds)), 'intent filters: selected presence preview differs from the catalog union');
+  assert(JSON.stringify(await resultIds()) === JSON.stringify(discoveryPreviewIds(expectedDigitalProjection.selectedPresenceIds)), 'intent filters: selected presence preview differs from the catalog intersection');
   const params = new URL(run.page.url()).searchParams.getAll('presence');
   assert(params.length === 2 && params[0] === 'geographic' && params[1] === 'digital', 'intent filters: presence was not serialized correctly');
   await run.page.locator('#filter-action').selectOption('volunteer');
@@ -2181,12 +2181,11 @@ async function spatialDiscoveryFiltersScenario() {
 
   await run.page.locator('#filter-toggle').click();
   assert(await run.page.locator('#discovery-panel').isVisible(), 'spatial discovery: discovery panel did not open');
-  assert(await run.page.locator('#filter-sections').isVisible(), 'spatial discovery: filter sections were not initially visible');
-  await run.page.locator('#filter-sections-toggle').click();
-  assert(await run.page.locator('#filter-sections').isHidden(), 'spatial discovery: filter sections did not collapse');
-  assert(await run.page.locator('#filter-sections-toggle').getAttribute('aria-expanded') === 'false', 'spatial discovery: collapsed filter aria state is wrong');
-  assert(await run.page.locator('#active-filter-chips').evaluate((element) => !element.hidden && !element.closest('#filter-sections')), 'spatial discovery: active filter chip region moved into or disappeared with collapsed controls');
-  await run.page.locator('#filter-sections-toggle').click();
+  assert(await run.page.locator('#filter-sections').isVisible(), 'spatial discovery: primary filter sections were not initially visible');
+  assert(await run.page.locator('#filter-sections-toggle').isHidden(), 'spatial discovery: obsolete all-filter toggle became visible');
+  assert(!(await run.page.locator('#advanced-filters').evaluate((element) => element.open)), 'spatial discovery: advanced filters were not collapsed by default');
+  assert(await run.page.locator('#active-filter-chips').evaluate((element) => !element.hidden && !element.closest('#advanced-filters')), 'spatial discovery: active filter chip region moved into collapsed advanced controls');
+  assert(await run.page.locator('#filter-nearby-radius').isDisabled(), 'spatial discovery: radius was enabled without a proximity origin');
 
   const nearbyControlTopBeforeAutocomplete = await run.page.locator('#filter-nearby-radius').evaluate((element) => element.getBoundingClientRect().top);
   await run.page.locator('#spatial-destination-search').fill('ham');
@@ -2236,6 +2235,8 @@ async function spatialDiscoveryFiltersScenario() {
   await run.page.waitForFunction((countryId) => new URL(location.href).searchParams.get('country') === countryId, firstCountry.id);
   assert((await run.page.locator('#filter-toggle-count').textContent()) === '1', 'spatial discovery: country filter count badge is wrong');
   assert(await run.page.locator('#active-filter-chips button').count() === 1, 'spatial discovery: country filter chip missing');
+  assert(await run.page.locator('#filter-nearby-radius').isDisabled(), 'spatial discovery: country filtering left radius enabled without an origin');
+  assert(/(?:Land|Country):/.test((await run.page.locator('#active-filter-chips').textContent()) ?? ''), 'spatial discovery: country chip does not identify its localized spatial mode');
   const countryFilterUiState = await run.page.evaluate(() => {
     const panel = document.querySelector('#discovery-panel');
     const chip = document.querySelector('#active-filter-chips .active-filter-chip');
@@ -2294,12 +2295,17 @@ async function spatialDiscoveryFiltersScenario() {
       historyNearbyRadiusMeters: state.nearbyRadiusMeters ?? null,
       chipCount: document.querySelectorAll('#active-filter-chips .active-filter-chip').length,
       badge: document.querySelector('#filter-toggle-count')?.textContent,
+      country: document.querySelector('#filter-country')?.value ?? null,
+      radiusDisabled: document.querySelector('#filter-nearby-radius')?.disabled ?? null,
+      sortNote: document.querySelector('#discovery-sort-note')?.textContent ?? '',
     };
   }, privateLocation);
   assert(!privacyState.hasNearbyUrlState, `spatial discovery: private nearby state leaked into URL (${JSON.stringify(privacyState)})`);
   assert(!privacyState.cameraContainsPrivateLocation, `spatial discovery: private geolocation leaked through camera URL (${JSON.stringify(privacyState)})`);
   assert(privacyState.historyNearbyOrigin === null && privacyState.historyNearbyRadiusMeters === null, `spatial discovery: private geolocation leaked into history state (${JSON.stringify(privacyState)})`);
   assert(privacyState.chipCount === 1 && privacyState.badge === '1', `spatial discovery: nearby filter chip/badge missing (${JSON.stringify(privacyState)})`);
+  assert(privacyState.country === '' && privacyState.radiusDisabled === false, `spatial discovery: proximity did not exclude country and enable radius (${JSON.stringify(privacyState)})`);
+  assert(/(?:Nahe|Nearby) Commons/.test(privacyState.sortNote), `spatial discovery: recommended sort hint does not describe active proximity (${JSON.stringify(privacyState)})`);
 
   const mapCanvas = run.page.locator('.maplibregl-canvas');
   const mapCanvasBox = await mapCanvas.boundingBox();
@@ -2319,6 +2325,20 @@ async function spatialDiscoveryFiltersScenario() {
   }, privateLocation);
   assert(!postInteractionPrivacyState.cameraContainsPrivateLocation, `spatial discovery: manual map interaction leaked private geolocation through camera URL (${JSON.stringify(postInteractionPrivacyState)})`);
   assert(postInteractionPrivacyState.historyNearbyOrigin === null && postInteractionPrivacyState.historyNearbyRadiusMeters === null, `spatial discovery: manual map interaction leaked private nearby state into history (${JSON.stringify(postInteractionPrivacyState)})`);
+
+  if (await run.page.locator('#discovery-panel').isHidden()) await run.page.locator('#filter-toggle').click();
+  await run.page.locator('#discovery-panel').waitFor({ state: 'visible' });
+  await run.page.locator('#filter-country').selectOption(firstCountry.id);
+  await run.page.waitForFunction((countryId) => new URL(location.href).searchParams.get('country') === countryId, firstCountry.id);
+  const exclusiveSpatialState = await run.page.evaluate(() => ({
+    country: document.querySelector('#filter-country')?.value ?? null,
+    radiusDisabled: document.querySelector('#filter-nearby-radius')?.disabled ?? null,
+    radiusValue: document.querySelector('#filter-nearby-radius')?.value ?? null,
+    status: document.querySelector('#geolocation-status')?.textContent ?? '',
+    chips: [...document.querySelectorAll('#active-filter-chips .active-filter-chip span')].map((node) => node.textContent),
+  }));
+  assert(exclusiveSpatialState.country === firstCountry.id && exclusiveSpatialState.radiusDisabled && exclusiveSpatialState.radiusValue === '', `spatial discovery: country did not clear and disable proximity (${JSON.stringify(exclusiveSpatialState)})`);
+  assert(exclusiveSpatialState.status === '' && exclusiveSpatialState.chips.length === 1 && /^(?:Land|Country):/.test(exclusiveSpatialState.chips[0]), `spatial discovery: exclusive country state retained proximity residue (${JSON.stringify(exclusiveSpatialState)})`);
   assert(run.pageErrors.length === 0, `spatial discovery: page errors: ${run.pageErrors.join(' | ')}`);
   assert(run.consoleErrors.length === 0, `spatial discovery: console errors: ${run.consoleErrors.join(' | ')}`);
   results.push({
@@ -2426,29 +2446,36 @@ async function intentSearchLayoutScenario({ viewportOverride, scenarioId }) {
   const geometry = await run.page.evaluate(() => {
     const panel = document.querySelector('#discovery-panel');
     const rect = panel.getBoundingClientRect();
-    const controls = [...panel.querySelectorAll('select, .discovery-result-main')].map((node) => node.getBoundingClientRect().height);
+    const controls = [...panel.querySelectorAll('select, .discovery-result-main')]
+      .filter((node) => node.getClientRects().length > 0)
+      .map((node) => ({ identifier: node.id || node.className, height: node.getBoundingClientRect().height }));
     const locationButton = document.querySelector('#use-current-location').getBoundingClientRect();
     const actionSelect = document.querySelector('#filter-action').getBoundingClientRect();
     const commonsTypeSelect = document.querySelector('#filter-commons-type').getBoundingClientRect();
     const geolocationStatus = document.querySelector('#geolocation-status');
     return {
-      panel: { left: rect.left, top: rect.top, right: rect.right, bottom: rect.bottom },
+      panel: { left: rect.left, top: rect.top, right: rect.right, bottom: rect.bottom, width: rect.width },
       width: innerWidth,
       height: innerHeight,
       scrollWidth: document.documentElement.scrollWidth,
-      minimumControlHeight: Math.min(...controls),
+      minimumControlHeight: Math.min(...controls.map(({ height }) => height)),
+      controlHeights: controls,
       locationButton: { width: locationButton.width, height: locationButton.height },
       primarySelectWidths: { commonsType: commonsTypeSelect.width, action: actionSelect.width },
       emptyGeolocationStatusDisplay: getComputedStyle(geolocationStatus).display,
     };
   });
   assert(geometry.panel.left >= -1 && geometry.panel.right <= geometry.width + 1, scenarioId + ': discovery panel overflows horizontally');
+  assert(geometry.panel.width <= 896.5, scenarioId + ': discovery panel exceeds the 56rem contract ' + JSON.stringify(geometry.panel));
   assert(geometry.panel.top >= -1 && geometry.panel.bottom <= geometry.height + 1, scenarioId + ': discovery panel exceeds the viewport');
   assert(geometry.scrollWidth <= geometry.width + 1, scenarioId + ': document has horizontal overflow');
-  assert(geometry.minimumControlHeight >= 44, scenarioId + ': a filter or result control is below the 44px touch target');
+  assert(geometry.minimumControlHeight >= 44, scenarioId + ': a visible filter or result control is below the 44px touch target ' + JSON.stringify(geometry.controlHeights));
   assert(geometry.locationButton.height >= 44 && geometry.locationButton.width < geometry.primarySelectWidths.action * 0.8, scenarioId + ': location button still dominates its filter column ' + JSON.stringify(geometry));
   assert(Math.abs(geometry.primarySelectWidths.commonsType - geometry.primarySelectWidths.action) <= 2, scenarioId + ': primary filters no longer share a balanced row ' + JSON.stringify(geometry.primarySelectWidths));
   assert(geometry.emptyGeolocationStatusDisplay === 'none', scenarioId + ': empty geolocation status still consumes grid space');
+  assert(!(await run.page.locator('#advanced-filters').evaluate((element) => element.open)), scenarioId + ': advanced filters are expanded by default');
+  await run.page.locator('#advanced-filters summary').tap();
+  assert(await run.page.locator('#advanced-filters').evaluate((element) => element.open), scenarioId + ': advanced filters did not open on demand');
   const curationSelect = run.page.locator('[data-intent-filter="curation"]');
   await curationSelect.tap();
   await run.page.waitForTimeout(40);

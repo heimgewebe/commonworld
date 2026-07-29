@@ -1,6 +1,6 @@
 import { BOOTSTRAP_RECORDS } from './commonworld-bootstrap-catalog.mjs?v=849588aaddcf';
 import { createCatalogLoadCache, loadCatalogAggregate, loadCatalogDetail, loadCatalogShard, shardKeyForIdentity } from './commonworld-catalog-runtime.mjs?v=836cd2a8f3f9';
-import { actionLabel, documentLocale, localizeCatalogRecords, text as i18nText, themeLabel } from './commonworld-i18n.mjs?v=b8ef1bc714b8';
+import { actionLabel, documentLocale, localizeCatalogRecords, text as i18nText, themeLabel } from './commonworld-i18n.mjs?v=7ad5eb18f9d4';
 import {
   COMMONS_TYPE_COLOR_TOKENS,
   COMMONS_TYPE_VALUES,
@@ -56,7 +56,7 @@ import {
   sortRecords,
   stateFromSearch,
   visibleDigitalNodes,
-} from './commonworld-core.mjs?v=69fec441fd3f';
+} from './commonworld-core.mjs?v=8bc42a1f2d59';
 
 const LOCALE = documentLocale();
 const t = (key, germanFallback, variables = {}) => i18nText(LOCALE, key, germanFallback, variables);
@@ -133,6 +133,7 @@ const elements = {
   filterToggle: document.querySelector('#filter-toggle'),
   filterToggleCount: document.querySelector('#filter-toggle-count'),
   discoverySort: document.querySelector('#discovery-sort'),
+  discoverySortNote: document.querySelector('#discovery-sort-note'),
   filterSectionsToggle: document.querySelector('#filter-sections-toggle'),
   filterSections: document.querySelector('#filter-sections'),
   activeFilterChips: document.querySelector('#active-filter-chips'),
@@ -1026,10 +1027,16 @@ function countryFeatureName(feature, identifier = '') {
   return String(properties.NAME_EN ?? properties.NAME_LONG ?? properties.NAME ?? identifier);
 }
 
-function activeNearbyFilter() {
+function nearbyOriginForState() {
   return Array.isArray(runtime.state.nearbyOrigin)
     && runtime.state.nearbyOrigin.length === 2
     && runtime.state.nearbyOrigin.every(Number.isFinite)
+    ? runtime.state.nearbyOrigin
+    : null;
+}
+
+function activeNearbyFilter() {
+  return Boolean(nearbyOriginForState())
     && Number.isFinite(runtime.state.nearbyRadiusMeters)
     && runtime.state.nearbyRadiusMeters >= 0;
 }
@@ -1781,10 +1788,11 @@ function activeFilterDescriptors() {
   }
   if (runtime.state.country) {
     const entry = runtime.countryEntries.get(runtime.state.country);
-    descriptors.push({ key: 'country', label: entry?.name ?? runtime.state.country, name: 'country', value: runtime.state.country });
+    const countryLabel = entry?.name ?? runtime.state.country;
+    descriptors.push({ key: 'country', label: t('country_filter', 'Land: {label}', { label: countryLabel }), name: 'country', value: runtime.state.country });
   }
   if (activeNearbyFilter()) {
-    descriptors.push({ key: 'nearby', label: `Umkreis ${Math.round(runtime.state.nearbyRadiusMeters / 1000)} km`, name: 'nearby', value: runtime.state.nearbyRadiusMeters });
+    descriptors.push({ key: 'nearby', label: t('nearby_radius', 'Umkreis: {km} km', { km: Math.round(runtime.state.nearbyRadiusMeters / 1000) }), name: 'nearby', value: runtime.state.nearbyRadiusMeters });
   }
   return descriptors;
 }
@@ -1817,13 +1825,39 @@ function renderActiveFilterChips() {
     const remove = document.createElement('button');
     remove.type = 'button';
     remove.textContent = '×';
-    remove.setAttribute('aria-label', `${descriptor.label} entfernen`);
+    remove.setAttribute('aria-label', t('remove_filter', '{label} entfernen', { label: descriptor.label }));
     remove.addEventListener('click', () => removeActiveFilter(descriptor));
     chip.append(label, remove);
     return chip;
   }));
   elements.filterToggleCount.textContent = String(descriptors.length);
   elements.filterToggleCount.hidden = descriptors.length === 0;
+}
+
+function updateDiscoverySortNote() {
+  const selected = runtime.state.sort ?? 'auto';
+  let key = 'sort_hint_default';
+  let fallback = 'Empfohlen: Die gefilterte Ergebnisreihenfolge bleibt erhalten.';
+  if (selected === 'catalogued') {
+    key = 'sort_hint_catalogued';
+    fallback = 'Neu im Katalog: Das jüngste Katalogdatum steht zuerst.';
+  } else if (selected === 'reviewed') {
+    key = 'sort_hint_reviewed';
+    fallback = 'Zuletzt geprüft: Das jüngste Prüfdatum steht zuerst.';
+  } else if (selected === 'title') {
+    key = 'sort_hint_title';
+    fallback = 'Name A–Z: alphabetisch nach Titel.';
+  } else if (normalizeQuery(runtime.state.query)) {
+    key = 'sort_hint_relevance';
+    fallback = 'Empfohlen: Suchtreffer werden nach Passung sortiert.';
+  } else if (activeNearbyFilter()) {
+    key = 'sort_hint_distance';
+    fallback = 'Empfohlen: Nahe Commons stehen zuerst; danach folgt das jüngste Katalogdatum.';
+  } else if (runtime.state.country) {
+    key = 'sort_hint_country';
+    fallback = 'Empfohlen: Die Treffer im gewählten Land behalten die gefilterte Ergebnisreihenfolge.';
+  }
+  elements.discoverySortNote.textContent = t(key, fallback);
 }
 
 function syncIntentFilterControls() {
@@ -1835,9 +1869,14 @@ function syncIntentFilterControls() {
       control.value = value ?? '';
     }
   }
+  const nearbyOrigin = nearbyOriginForState();
   elements.filterCountry.value = runtime.countryEntries.has(runtime.state.country) ? runtime.state.country : '';
-  elements.filterNearbyRadius.value = Number.isFinite(runtime.state.nearbyRadiusMeters) ? String(runtime.state.nearbyRadiusMeters) : '';
+  elements.filterNearbyRadius.disabled = !nearbyOrigin;
+  elements.filterNearbyRadius.value = nearbyOrigin && Number.isFinite(runtime.state.nearbyRadiusMeters)
+    ? String(runtime.state.nearbyRadiusMeters)
+    : '';
   elements.discoverySort.value = runtime.state.sort ?? 'auto';
+  updateDiscoverySortNote();
   elements.filterClear.disabled = !(hasIntentFilters() || hasSpatialFilters());
   renderActiveFilterChips();
 }
@@ -1915,7 +1954,13 @@ function rebuildSpatialDestinationIndex() {
 }
 
 function setCountryFilter(identifier, { historyMode = 'push' } = {}) {
-  runtime.state.country = identifier && runtime.countryEntries.has(identifier) ? identifier : null;
+  const nextCountry = identifier && runtime.countryEntries.has(identifier) ? identifier : null;
+  runtime.state.country = nextCountry;
+  if (nextCountry) {
+    runtime.state.nearbyOrigin = null;
+    runtime.state.nearbyRadiusMeters = null;
+    elements.geolocationStatus.textContent = '';
+  }
   runtime.visibleRecordsCache = null;
   renderDiscoveryState();
   if (historyMode) writeHistory(historyMode);
@@ -1928,6 +1973,7 @@ function setNearbyFilter(origin, radiusMeters = null, { historyMode = 'push' } =
     : (Number.isFinite(runtime.state.nearbyRadiusMeters) ? runtime.state.nearbyRadiusMeters : 25000);
   runtime.state.nearbyOrigin = validOrigin ? Object.freeze([...origin]) : null;
   runtime.state.nearbyRadiusMeters = validOrigin ? resolvedRadius : null;
+  if (validOrigin) runtime.state.country = null;
   runtime.visibleRecordsCache = null;
   renderDiscoveryState();
   if (historyMode) writeHistory(historyMode);
@@ -3380,16 +3426,19 @@ function wireControls() {
   elements.filterCountry.addEventListener('change', () => setCountryFilter(elements.filterCountry.value));
   elements.discoverySort.addEventListener('change', () => setDiscoverySort(elements.discoverySort.value));
   elements.filterNearbyRadius.addEventListener('change', () => {
+    const origin = nearbyOriginForState();
+    if (!origin) {
+      syncIntentFilterControls();
+      return;
+    }
     const radius = Number(elements.filterNearbyRadius.value);
-    if (!elements.filterNearbyRadius.value || !Number.isFinite(radius)) {
+    if (!elements.filterNearbyRadius.value || !Number.isFinite(radius) || radius < 0) {
       runtime.state.nearbyOrigin = null;
       runtime.state.nearbyRadiusMeters = null;
       elements.geolocationStatus.textContent = '';
     } else {
+      runtime.state.country = null;
       runtime.state.nearbyRadiusMeters = radius;
-      if (!Array.isArray(runtime.state.nearbyOrigin)) {
-        elements.geolocationStatus.textContent = t('choose_location', 'Wähle einen veröffentlichten Ort oder verwende deinen Standort.');
-      }
     }
     runtime.visibleRecordsCache = null;
     renderDiscoveryState();

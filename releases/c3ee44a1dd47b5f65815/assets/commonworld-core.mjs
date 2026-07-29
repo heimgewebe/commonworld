@@ -1,5 +1,5 @@
 import { COMMONWORLD_EN_LOCALE } from './commonworld-en-locale.mjs?v=f6360a52dd30';
-import { FALLBACK_LOCALE, normalizeLocale } from './commonworld-i18n.mjs?v=b8ef1bc714b8';
+import { FALLBACK_LOCALE, normalizeLocale } from './commonworld-i18n.mjs?v=7ad5eb18f9d4';
 
 export const DEFAULT_CAMERA = Object.freeze({
   lng: 8,
@@ -1375,11 +1375,8 @@ export function recordMatchesIntentFilters(record, filters = {}, today = new Dat
   if (Array.isArray(filters.presence) && filters.presence.length > 0) {
     const wantsGeographic = filters.presence.includes('geographic');
     const wantsDigital = filters.presence.includes('digital');
-    if (wantsGeographic || wantsDigital) {
-      const matchesGeographic = wantsGeographic && publicGeographicLocations(record).length > 0;
-      const matchesDigital = wantsDigital && hasDigitalPresence(record);
-      if (!matchesGeographic && !matchesDigital) return false;
-    }
+    if (wantsGeographic && publicGeographicLocations(record).length === 0) return false;
+    if (wantsDigital && !hasDigitalPresence(record)) return false;
   }
 
   if (filters.commons_type && deriveCommonsType(record) !== filters.commons_type) return false;
