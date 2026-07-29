@@ -2161,11 +2161,8 @@ function useCurrentLocation() {
     elements.useCurrentLocation.disabled = false;
     const origin = [position.coords.longitude, position.coords.latitude];
     const radius = Number.isFinite(runtime.state.nearbyRadiusMeters) ? runtime.state.nearbyRadiusMeters : 25000;
-    runtime.state.nearbyOrigin = Object.freeze(origin);
-    runtime.state.nearbyRadiusMeters = radius;
-    runtime.visibleRecordsCache = null;
     elements.geolocationStatus.textContent = t('geolocation_used', 'Standort verwendet · Umkreis {km} km', { km: Math.round(radius / 1000) });
-    renderDiscoveryState();
+    setNearbyFilter(origin, radius, { historyMode: null });
     writeHistory('push');
     navigateToPrivateLocation(origin);
   }, (error) => {

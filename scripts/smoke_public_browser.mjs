@@ -2280,6 +2280,9 @@ async function spatialDiscoveryFiltersScenario() {
   await run.page.locator('#spatial-destination-search').press('Escape');
   assert(await run.page.locator('#spatial-destination-search').getAttribute('aria-expanded') === 'false', 'spatial discovery: Berlin autocomplete did not close before continuing to geolocation');
   assert(await run.page.locator('#discovery-panel').isVisible(), 'spatial discovery: closing Berlin autocomplete incorrectly closed discovery panel');
+  await run.page.locator('#filter-country').selectOption(firstCountry.id);
+  await run.page.waitForFunction((countryId) => new URL(location.href).searchParams.get('country') === countryId, firstCountry.id);
+  assert(await run.page.locator('#active-filter-chips button').count() === 1, 'spatial discovery: country precondition for geolocation exclusivity is missing');
 
   await run.page.locator('#use-current-location').click();
   await run.page.waitForFunction(() => document.querySelector('#geolocation-status')?.textContent.includes('Location used'));

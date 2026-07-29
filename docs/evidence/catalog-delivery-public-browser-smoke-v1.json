@@ -105,9 +105,9 @@
       "filterButtonWidth": 44,
       "filterButtonHeight": 44,
       "ringAnimationName": "sphere-ring-orbit",
-      "ringTransform": "matrix(0.999999, 0.00150959, -0.00150959, 0.999999, 0, 0)",
-      "ringTextWidth": 671.1126098632812,
-      "ringTextHeight": 14.013092041015625,
+      "ringTransform": "matrix(0.999999, 0.00150525, -0.00150525, 0.999999, 0, 0)",
+      "ringTextWidth": 671.112548828125,
+      "ringTextHeight": 14.010162353515625,
       "ringTextFontSize": 22,
       "primaryRingCount": 3,
       "depthRingCount": 2,
@@ -155,7 +155,7 @@
     {
       "id": "layer-journey-moveend-return",
       "verdict": "PASS",
-      "elapsedMs": 1763
+      "elapsedMs": 1577
     },
     {
       "id": "layer-journey-interrupted",
@@ -242,8 +242,8 @@
       "verdict": "PASS",
       "blockedCatalogRequests": 0,
       "observedCatalogRequests": [
-        "/releases/c3ee44a1dd47b5f65815/catalog/runtime/aggregate.v1.json",
-        "/releases/c3ee44a1dd47b5f65815/catalog/runtime/manifest.v1.json"
+        "/releases/2e492b2a2d030a7ea12e/catalog/runtime/aggregate.v1.json",
+        "/releases/2e492b2a2d030a7ea12e/catalog/runtime/manifest.v1.json"
       ]
     },
     {
@@ -301,9 +301,9 @@
     }
   ],
   "binding": {
-    "smoke_script_sha256": "b11df251cf9ab493f8f06ac81964aca3ff81314fec6806523f71ceb43a0fc3cf",
+    "smoke_script_sha256": "7e14408cb7428100cfe209c6ec011bd21323507de4b6f6804fd46b52d2748886",
     "smoke_runner_sha256": "522b99b70b1d0064b1d0a31a3a67fdc9a2e73b7408f37d1a4bb303bc360b7556",
-    "first_party_surface_sha256": "1d8ce369da91c2b8991a46594172d6daec872d96ffa13fb425f62b69662e0d02",
+    "first_party_surface_sha256": "37668d38c2a5173b7ad6aafa56b1b5236f5a285f0f702200bcb9c6e07e897e32",
     "scenario_ids": [
       "startup-and-ring-orbits",
       "synthetic-cross-ring-collision-accessibility",
@@ -341,11 +341,12 @@
       "method-mobile",
       "method-mobile-text-200"
     ],
+    "freshness_rule": "The committed smoke result is valid only while all bound hashes and the ordered scenario set match the current repository surface.",
     "smoke_plan_sha256": "6b8749928ead5ef81ee66883e6a2993e756ce083575c3569234bf70526448364"
   },
   "execution": {
-    "result_sha256": "bdae108b5cadb349da47c8f70590e51bb4539c64b81b2771dc9aecf76553f24f",
-    "observed_at": "2026-07-29T14:54:26Z",
-    "transport_note": "Fresh public browser smoke passed on release c3ee44a1dd47b5f65815; benchmark browser profiles were remeasured in the same exact isolated T032 worktree after deterministic release regeneration."
+    "result_sha256": "41be53694c592e6b1bd8274b77300639e2e86bfbc2c314e08083c6b839e7589d",
+    "observed_at": "2026-07-29T15:10:56Z",
+    "transport_note": "Fresh public browser smoke passed on release 2e492b2a2d030a7ea12e; evidence is bound to the exact current scripts, ordered scenarios and complete first-party surface."
   }
 }
