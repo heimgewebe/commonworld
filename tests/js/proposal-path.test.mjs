@@ -1,5 +1,6 @@
 import test from "node:test";
 import assert from "node:assert/strict";
+import { readFileSync } from "node:fs";
 import {
   buildIssueBody,
   buildIssueUrl,
@@ -72,6 +73,25 @@ test("präzise private Orte und Kontaktdaten werden fail-closed blockiert", () =
   assert.equal(containsContactData("alex@example.org"), true);
   const proposal = validProposal(); proposal.project.region = "52.5200, 13.4050";
   assert.match(validateProposal(proposal).join(" "), /Adresse oder Koordinate/u);
+});
+
+test("gemeinsame sensible Ortsfälle bleiben zwischen Laufzeit und Offline-Prüfung eindeutig", () => {
+  const cases = JSON.parse(readFileSync(new URL("../fixtures/proposals/sensitive-location-cases.json", import.meta.url), "utf8"));
+  for (const entry of cases.blocked) assert.equal(containsSensitiveLocation(entry.value), true, entry.id);
+  for (const entry of cases.allowed) assert.equal(containsSensitiveLocation(entry.value), false, entry.id);
+});
+
+test("alle öffentlichen Freitextfelder blockieren Adressen und Koordinaten fail-closed", () => {
+  for (const field of ["name", "description", "region", "editorial_note"]) {
+    const proposal = validProposal();
+    proposal.project[field] = field === "description"
+      ? "Gemeinschaftliche Verwaltung mit öffentlichen Regeln an Musterstraße 12 in Berlin."
+      : "Musterstraße 12, Berlin";
+    const errors = validateProposal(proposal);
+    assert(errors.some((error) => error.startsWith(`${field === "description" ? "Beschreibung" : field === "editorial_note" ? "Redaktioneller Hinweis" : field[0].toUpperCase() + field.slice(1)}:`)), field);
+    assert.throws(() => buildIssueBody(proposal), /public issue handoff rejected/u, field);
+    assert.throws(() => buildIssueUrl(proposal), /public issue handoff rejected/u, field);
+  }
 });
 
 test("Dubletten werden über Titel und offizielle Domain erkannt", () => {

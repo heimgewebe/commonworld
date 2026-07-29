@@ -5,6 +5,7 @@ from __future__ import annotations
 import json
 import re
 import sys
+import unicodedata
 from pathlib import Path
 from urllib.parse import urlparse
 
@@ -25,7 +26,33 @@ REJECTION_CODES = {
     "commercial_listing_only", "project_inactive", "action_claim_unverified", "out_of_scope",
 }
 EXPECTED_STATUSES = {"submitted", "needs_information", "under_review", "accepted", "rejected", "withdrawn", "published", "superseded"}
-PRIVATE_PATTERN = re.compile(r"(?:\b(?:latitude|longitude|coordinates?|gps|street|straße|strasse|router|roof|dach|wohnung|apartment|household|haushalt)\b|[-+]?\d{1,3}\.\d{3,}\s*[,;/ ]\s*[-+]?\d{1,3}\.\d{3,})", re.I)
+SENSITIVE_CONTEXT_PATTERN = re.compile(r"\b(?:latitude|longitude|coordinates?|gps|router|roof|dach|wohnung|apartment|household|haushalt)\b", re.I)
+DECIMAL_POINT_COORDINATE_PATTERN = re.compile(r"(?:^|[^\d])[-+]?\d{1,3}\.\d{3,}\s*[,;/ ]\s*[-+]?\d{1,3}\.\d{3,}(?:[^\d]|$)")
+DECIMAL_COMMA_COORDINATE_PATTERN = re.compile(r"(?:^|[^\d])[-+]?\d{1,3},\d{3,}\s*[;/]\s*[-+]?\d{1,3},\d{3,}(?:[^\d]|$)")
+DMS_COORDINATE_PATTERN = re.compile(r"\d{1,3}\s*°\s*\d{1,2}\s*[′']\s*\d{1,2}(?:[.,]\d+)?\s*(?:[″\"]|[′']{2})\s*[NS]\s+\d{1,3}\s*°\s*\d{1,2}\s*[′']\s*\d{1,2}(?:[.,]\d+)?\s*(?:[″\"]|[′']{2})\s*[EW]", re.I)
+LETTER_OR_MARK = r"(?:[^\W\d_]|[\u0300-\u036f\u1ab0-\u1aff\u1dc0-\u1dff\u20d0-\u20ff\ufe20-\ufe2f])"
+WORD = rf"{LETTER_OR_MARK}(?:{LETTER_OR_MARK}|['’.-])*"
+HOUSE_NUMBER = r"\d{1,5}[a-z]?(?:[-/]\d{1,5}[a-z]?)?"
+ATTACHED_STREET_SUFFIX = r"(?:straße|strasse|weg|gasse|allee|platz)"
+STREET_WORD = r"(?:street|road|avenue|boulevard|lane|drive|way|rue|calle|via|viale|corso|ulica|prospekt|st\.?|rd\.?|ave\.?|blvd\.?|ln\.?|dr\.?)"
+ADDRESS_PATTERNS = (
+    re.compile(rf"(?:^|[^\w])(?:{WORD}\s+){{0,5}}{WORD}{ATTACHED_STREET_SUFFIX}\s+{HOUSE_NUMBER}(?=$|[^\w])", re.I),
+    re.compile(rf"(?:^|[^\w])(?:{WORD}\s+){{1,5}}{STREET_WORD}\s+{HOUSE_NUMBER}(?=$|[^\w])", re.I),
+    re.compile(rf"(?:^|[^\w])(?:rue|calle|via|viale|corso|avenue|boulevard)\s+(?:{WORD}\s+){{0,4}}{WORD}\s+{HOUSE_NUMBER}(?=$|[^\w])", re.I),
+    re.compile(rf"(?:^|[^\w]){HOUSE_NUMBER}\s+(?:{WORD}\s+){{0,5}}{STREET_WORD}(?=$|[^\w])", re.I),
+)
+PUBLIC_TEXT_FIELDS = ("name", "description", "region", "editorial_note")
+
+
+def contains_sensitive_location(value: object) -> bool:
+    normalized = unicodedata.normalize("NFKC", str(value or ""))
+    return bool(
+        SENSITIVE_CONTEXT_PATTERN.search(normalized)
+        or DECIMAL_POINT_COORDINATE_PATTERN.search(normalized)
+        or DECIMAL_COMMA_COORDINATE_PATTERN.search(normalized)
+        or DMS_COORDINATE_PATTERN.search(normalized)
+        or any(pattern.search(normalized) for pattern in ADDRESS_PATTERNS)
+    )
 
 
 def load(path: str) -> dict:
@@ -44,8 +71,10 @@ def validate_fixture(value: dict, schema: dict) -> list[str]:
         parsed = urlparse(raw) if isinstance(raw, str) else None
         if not parsed or parsed.scheme != "https" or not parsed.netloc:
             errors.append("source must be safe HTTPS")
-    if PRIVATE_PATTERN.search(str(project.get("region", ""))):
-        errors.append("region contains precise or private location material")
+    for key in PUBLIC_TEXT_FIELDS:
+        raw = project.get(key)
+        if isinstance(raw, str) and contains_sensitive_location(raw):
+            errors.append(f"{key} contains precise or private location material")
     return errors
 
 
@@ -160,6 +189,11 @@ def validate(root: Path = ROOT) -> list[str]:
     if "sessionStorage" not in script or "60_000" not in script: errors.append("proposal client lacks bounded repeated-preparation control")
     if "window.open" not in script or "downloadJson" not in script: errors.append("proposal client lacks GitHub handoff or JSON fallback")
 
+    sensitive_cases = load("tests/fixtures/proposals/sensitive-location-cases.json")
+    for case in sensitive_cases.get("blocked", []):
+        if not contains_sensitive_location(case.get("value", "")): errors.append(f"sensitive-location blocked fixture accepted: {case.get('id')}")
+    for case in sensitive_cases.get("allowed", []):
+        if contains_sensitive_location(case.get("value", "")): errors.append(f"sensitive-location allowed fixture rejected: {case.get('id')}")
     for fixture in ("valid.json", "digital-only-valid.json"):
         if validate_fixture(load(f"tests/fixtures/proposals/{fixture}"), schema): errors.append(f"valid proposal fixture is rejected: {fixture}")
     for fixture in ("missing-source.json", "javascript-url.json", "private-coordinates.json", "geographic-missing-region.json"):

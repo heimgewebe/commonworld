@@ -50,6 +50,20 @@ class ProposalPathTests(unittest.TestCase):
         candidate["project"]["region"] = "52.5200, 13.4050"
         self.assertTrue(MODULE.validate_fixture(candidate, self.schema))
 
+    def test_sensitive_location_shared_cases_match_offline_validator(self) -> None:
+        cases = json.loads((ROOT / "tests/fixtures/proposals/sensitive-location-cases.json").read_text(encoding="utf-8"))
+        for case in cases["blocked"]:
+            self.assertTrue(MODULE.contains_sensitive_location(case["value"]), case["id"])
+        for case in cases["allowed"]:
+            self.assertFalse(MODULE.contains_sensitive_location(case["value"]), case["id"])
+
+    def test_every_public_text_field_rejects_sensitive_location_material(self) -> None:
+        for field in MODULE.PUBLIC_TEXT_FIELDS:
+            candidate = copy.deepcopy(self.valid)
+            candidate["project"][field] = "Musterstraße 12, Berlin"
+            errors = MODULE.validate_fixture(candidate, self.schema)
+            self.assertTrue(any(error.startswith(field) for error in errors), (field, errors))
+
     def test_proposal_never_mutates_catalog_inventory(self) -> None:
         manifest = json.loads((ROOT / "catalog/catalog.json").read_text(encoding="utf-8"))
         proposal_ids = {path.stem for path in (ROOT / "tests/fixtures/proposals").glob("*.json")}

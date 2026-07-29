@@ -1,0 +1,80 @@
+{
+  "schema_version": 1,
+  "kind": "commonworld_sensitive_location_cases",
+  "blocked": [
+    {
+      "id": "de-musterstrasse",
+      "value": "Musterstraße 12, Berlin"
+    },
+    {
+      "id": "de-feldweg",
+      "value": "Am Feldweg 7 in Hamburg"
+    },
+    {
+      "id": "en-number-leading",
+      "value": "10 Downing Street, London"
+    },
+    {
+      "id": "en-number-trailing",
+      "value": "Baker Street 221B, London"
+    },
+    {
+      "id": "fr-prefix",
+      "value": "Rue de Rivoli 12, Paris"
+    },
+    {
+      "id": "es-prefix",
+      "value": "Calle de Alcalá 45, Madrid"
+    },
+    {
+      "id": "decimal-point",
+      "value": "52.5200, 13.4050"
+    },
+    {
+      "id": "decimal-comma",
+      "value": "52,5200; 13,4050"
+    },
+    {
+      "id": "dms",
+      "value": "52°31′12″N 13°24′36″E"
+    },
+    {
+      "id": "explicit-coordinate-label",
+      "value": "GPS coordinates available on request"
+    }
+  ],
+  "allowed": [
+    {
+      "id": "country-de",
+      "value": "Deutschland"
+    },
+    {
+      "id": "city-de",
+      "value": "Hamburg"
+    },
+    {
+      "id": "broad-region-de",
+      "value": "Norddeutschland und die Metropolregion Hamburg"
+    },
+    {
+      "id": "country-en",
+      "value": "United Kingdom"
+    },
+    {
+      "id": "city-en",
+      "value": "London"
+    },
+    {
+      "id": "broad-region-en",
+      "value": "Northern Europe and the Baltic region"
+    },
+    {
+      "id": "unrelated-numbers",
+      "value": "Seit 2012 arbeiten 35 Gruppen in drei Regionen zusammen."
+    },
+    {
+      "id": "street-word-only",
+      "value": "Street art and public-space culture in Berlin"
+    }
+  ]
+}
