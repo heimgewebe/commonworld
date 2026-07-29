@@ -137,6 +137,7 @@ def validate(root: Path = ROOT) -> list[str]:
         ("assets/vendor/maplibre-gl.js", "./assets/vendor/maplibre-gl.js"),
         ("index.css", "./index.css"),
         ("assets/ipad-layout.css", "./assets/ipad-layout.css"),
+        ("assets/commonworld-locale.mjs", "./assets/commonworld-locale.mjs"),
         ("assets/commonworld-app.js", "./assets/commonworld-app.js"),
     ):
         versioned = f'{token}?v={asset_version(relative, root)}'
@@ -148,6 +149,7 @@ def validate(root: Path = ROOT) -> list[str]:
         ("assets/commonworld-mark.svg", "./assets/commonworld-mark.svg"),
         ("index.css", "./index.css"),
         ("assets/proposal.css", "./assets/proposal.css"),
+        ("assets/commonworld-locale.mjs", "./assets/commonworld-locale.mjs"),
         ("assets/commonworld-proposal.js", "./assets/commonworld-proposal.js"),
     ):
         versioned = f'{token}?v={asset_version(relative, root)}'

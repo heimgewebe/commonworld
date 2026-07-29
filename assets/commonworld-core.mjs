@@ -973,6 +973,11 @@ const languageFilterParameter = (parameters) => {
   return value === 'unknown' || /^[a-z]{2,3}(?:-[A-Z]{2})?$/.test(value ?? '') ? value : null;
 };
 
+const uiLocaleChoiceParameter = (parameters) => {
+  const value = parameters.get('ui_lang');
+  return ['auto', 'en', 'de'].includes(value) ? value : null;
+};
+
 const COUNTRY_CODE_PATTERN = /^[A-Za-z0-9_-]{1,16}$/;
 
 const countryFilterParameter = (parameters) => {
@@ -1011,6 +1016,7 @@ export function stateFromSearch(search = '', knownProjectIds = []) {
     presence: Object.freeze(presence),
     action: filterParameter(parameters, 'action'),
     language: languageFilterParameter(parameters),
+    uiLocaleChoice: uiLocaleChoiceParameter(parameters),
     access: filterParameter(parameters, 'access'),
     freshness: filterParameter(parameters, 'freshness'),
     curation: filterParameter(parameters, 'curation'),
@@ -1056,6 +1062,10 @@ export function searchFromState(state) {
   const language = state?.language;
   if (language === 'unknown' || /^[a-z]{2,3}(?:-[A-Z]{2})?$/.test(language ?? '')) {
     parameters.set('language', language);
+  }
+  const uiLocaleChoice = state?.uiLocaleChoice;
+  if (['auto', 'en', 'de'].includes(uiLocaleChoice)) {
+    parameters.set('ui_lang', uiLocaleChoice);
   }
   return '?' + parameters.toString();
 }

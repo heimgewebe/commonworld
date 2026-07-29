@@ -84,6 +84,7 @@ async function measureProfile(profile) {
     isMobile: profile.isMobile ?? false,
     hasTouch: profile.hasTouch ?? false,
     reducedMotion: 'reduce',
+    locale: 'en',
   });
   const page = await context.newPage();
   const cdp = await context.newCDPSession(page);

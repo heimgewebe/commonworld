@@ -176,9 +176,13 @@ def validate_public_shell(root: Path = ROOT) -> list[str]:
         if token not in html:
             errors.append(f'public shell missing required token: {token}')
     app_version = hashlib.sha256((root / 'assets/commonworld-app.js').read_bytes()).hexdigest()[:12]
+    locale_runtime_path = root / 'assets/commonworld-locale.mjs'
+    locale_version = hashlib.sha256(locale_runtime_path.read_bytes()).hexdigest()[:12] if locale_runtime_path.is_file() else ''
     css_version = hashlib.sha256(css_path.read_bytes()).hexdigest()[:12]
     if f'<script type="module" src="./assets/commonworld-app.js?v={app_version}"></script>' not in html:
         errors.append('public shell must load commonworld-app.js with its deterministic content hash')
+    if f'<script type="module" src="./assets/commonworld-locale.mjs?v={locale_version}"></script>' not in html:
+        errors.append('public shell must load the locale preference runtime with its deterministic content hash')
     for module_path, dependencies in MODULE_IMPORT_DEPENDENCIES:
         module_file = root / module_path
         if not module_file.is_file():
@@ -239,10 +243,20 @@ def validate_public_shell(root: Path = ROOT) -> list[str]:
         for token in ('<html lang="de">', 'Commons entdecken', 'Methode, Abdeckung und Datenschutz'):
             if token not in german_html and token not in german_method:
                 errors.append(f'German alternative surfaces missing required token: {token}')
-        if 'href="./de.html"' not in html or 'href="./"' not in german_html:
+        if 'href="./de.html?ui_lang=de"' not in html or 'href="./?ui_lang=en"' not in german_html:
             errors.append('public locale switch must connect English and German index surfaces')
-    if "<script" in method.casefold() or "<script" in german_method.casefold():
-        errors.append('public method surfaces must remain script-free')
+        for surface, name in ((html, 'index.html'), (german_html, 'de.html'), (method, 'method.html'), (german_method, 'method.de.html')):
+            for token in ('data-locale-choice="auto"', 'data-locale-choice="en"', 'data-locale-choice="de"', 'data-locale-effective'):
+                if token not in surface:
+                    errors.append(f'{name} locale control missing token: {token}')
+    locale_script = f'<script type="module" src="./assets/commonworld-locale.mjs?v={locale_version}"></script>'
+    for surface, name in ((method, 'method.html'), (german_method, 'method.de.html')):
+        if not surface:
+            continue
+        if locale_script not in surface:
+            errors.append(f'{name} must load the locale preference runtime')
+        if surface.casefold().count('<script') != 1:
+            errors.append(f'{name} may load only the locale preference runtime')
 
     errors.extend(_validate_accessibility_modes(css))
     errors.extend(_validate_ipad_landscape_wiring(root, html))

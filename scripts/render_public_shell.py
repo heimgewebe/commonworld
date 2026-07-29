@@ -27,6 +27,7 @@ TAXONOMY = load_taxonomy(ROOT)
 
 MODULE_IMPORT_DEPENDENCIES = (
     ("assets/commonworld-i18n.mjs", ("assets/commonworld-en-locale.mjs",)),
+    ("assets/commonworld-locale.mjs", ("assets/commonworld-i18n.mjs",)),
     (
         "assets/commonworld-core.mjs",
         (
@@ -289,6 +290,7 @@ def render_shell(root: Path = ROOT, locale: str = FALLBACK_LOCALE) -> str:
     <link rel="stylesheet" href="./assets/ipad-layout.css?v={asset_version('assets/ipad-layout.css', root)}" />
     <script type="module" src="/assets/commonworld-release-check.js?v={asset_version('assets/commonworld-release-check.js', root)}"></script>
     <script src="./assets/vendor/maplibre-gl.js?v={asset_version('assets/vendor/maplibre-gl.js', root)}" defer></script>
+    <script type="module" src="./assets/commonworld-locale.mjs?v={asset_version('assets/commonworld-locale.mjs', root)}"></script>
     <script type="module" src="./assets/commonworld-app.js?v={asset_version('assets/commonworld-app.js', root)}"></script>
   </head>
   <body data-presentation="globe">
@@ -553,11 +555,12 @@ def render_method(root: Path = ROOT, locale: str = FALLBACK_LOCALE) -> str:
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="color-scheme" content="dark" />
-    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; style-src 'self'; img-src 'self' data:; object-src 'none'; base-uri 'self'; form-action 'none';" />
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' data:; object-src 'none'; base-uri 'self'; form-action 'none';" />
     <meta name="description" content="Methode, Abdeckung, Datenschutz und Betriebsgrenzen von Commonworld." />
     <title>Commonworld — Methode und Grenzen</title>
     <link rel="icon" href="./assets/commonworld-mark.svg?v={asset_version('assets/commonworld-mark.svg', root)}" type="image/svg+xml" />
     <link rel="stylesheet" href="./index.css?v={asset_version('index.css', root)}" />
+    <script type="module" src="./assets/commonworld-locale.mjs?v={asset_version('assets/commonworld-locale.mjs', root)}"></script>
   </head>
   <body class="method-page">
     <main>

@@ -26,6 +26,7 @@ class PublicMapLibreVerticalSliceTests(unittest.TestCase):
             Path("scripts/public_cache.py"),
             Path("catalog/locales/en.json"),
             Path("assets/commonworld-mark.svg"),
+            Path("assets/commonworld-locale.mjs"),
             Path("assets/commonworld-release-check.js"),
             Path("assets/ipad-layout.css"),
             Path("assets/vendor/maplibre-gl.css"),
