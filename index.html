@@ -3,9 +3,9 @@
   <head>
     <meta charset="utf-8" />
     <meta name="commonworld-page" content="index.html" />
-    <meta name="commonworld-page-build" content="bb216e3b7e563e24" />
-    <meta name="commonworld-release" content="308a7c23e5665c43726b" />
-    <base href="/releases/308a7c23e5665c43726b/" />
+    <meta name="commonworld-page-build" content="c8d2c61e507f405d" />
+    <meta name="commonworld-release" content="2e492b2a2d030a7ea12e" />
+    <base href="/releases/2e492b2a2d030a7ea12e/" />
     <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
     <meta name="color-scheme" content="dark" />
     <meta name="referrer" content="strict-origin-when-cross-origin" />
@@ -16,11 +16,11 @@
     <link rel="alternate" type="application/json" href="./catalog/catalog.json" title="Commonworld catalog" />
     <link rel="alternate" type="application/schema+json" href="./contracts/commonworld/project.schema.json" title="CommonProject schema" />
     <link rel="stylesheet" href="./assets/vendor/maplibre-gl.css?v=ab1e70d59ec4" />
-    <link rel="stylesheet" href="./index.css?v=25df28b4d9fb" />
-    <link rel="stylesheet" href="./assets/ipad-layout.css?v=ff4e980f851f" />
+    <link rel="stylesheet" href="./index.css?v=08b3c84958b8" />
+    <link rel="stylesheet" href="./assets/ipad-layout.css?v=739d6b8460d4" />
     <script type="module" src="/assets/commonworld-release-check.js?v=9dddad3cab3d"></script>
     <script src="./assets/vendor/maplibre-gl.js?v=45a9b07a9189" defer></script>
-    <script type="module" src="./assets/commonworld-app.js?v=e8dcb252c989"></script>
+    <script type="module" src="./assets/commonworld-app.js?v=0cbbf6ae09af"></script>
   </head>
   <body data-presentation="globe">
     <a id="text-skip-link" class="skip-link" href="/#static-catalog-fallback">Skip to text view</a>
@@ -49,44 +49,49 @@
           <button id="discovery-close" class="icon-button" type="button" aria-label="Close search results">×</button>
         </div>
         <div id="active-filter-chips" class="active-filter-chips" aria-label="Active filters"></div>
-        <button id="filter-sections-toggle" class="quiet-button filter-sections-toggle" type="button" aria-controls="filter-sections" aria-expanded="true"><span class="filter-toggle-icon" aria-hidden="true"></span><span>Filters</span></button>
+        <button id="filter-sections-toggle" type="button" aria-controls="filter-sections" aria-expanded="true" aria-hidden="true" tabindex="-1" hidden><span>Filters</span></button>
         <div id="filter-sections" class="filter-sections">
-          <fieldset class="filter-group">
+          <fieldset class="filter-group filter-group--purpose">
             <legend>What?</legend>
             <div class="filter-group-controls">
               <label class="filter-commons-type"><span>Commons type</span><select id="filter-commons-type" data-intent-filter="commons_type"><option value="">All types</option><option value="knowledge">Knowledge and Data</option><option value="software">Software and Infrastructure</option><option value="culture">Culture and Media</option><option value="food-seeds">Seeds and Food</option><option value="water">Water and Irrigation</option><option value="energy">Energy</option><option value="housing-land">Land and Housing</option><option value="health-care">Care and Health</option><option value="tools-repair">Tools, Repair and Making</option><option value="community-network">Community Network</option><option value="other">Other</option></select></label>
               <label class="filter-action"><span>Action</span><select id="filter-action" data-intent-filter="action"><option value="">All actions</option><option value="use">Use</option><option value="borrow">Borrow</option><option value="learn">Learn</option><option value="contribute">Contribute</option><option value="volunteer">Volunteer</option><option value="donate">Donate</option><option value="visit">Visit</option><option value="contact">Contact</option><option value="replicate">Replicate</option></select></label>
             </div>
           </fieldset>
-          <fieldset class="filter-group">
+          <fieldset class="filter-group filter-group--location">
             <legend>Where?</legend>
-            <div class="filter-group-controls">
-              <fieldset class="filter-presence-group"><legend>Presence</legend><div class="filter-presence-options"><label><input type="checkbox" id="filter-presence-geographic" name="presence" value="geographic" data-intent-filter="presence"> On site</label><label><input type="checkbox" id="filter-presence-digital" name="presence" value="digital" data-intent-filter="presence"> Digital</label></div><small class="filter-presence-note">Both selected = only Commons with both on-site and digital presence.</small></fieldset>
-              <div class="spatial-destination-search">
-                <label for="spatial-destination-search">Search place or country</label>
-                <input id="spatial-destination-search" type="search" inputmode="search" autocomplete="off" placeholder="Place, region or country" aria-controls="spatial-destination-results" aria-expanded="false" />
-                <ul id="spatial-destination-results" class="spatial-destination-results" aria-label="Place suggestions"></ul>
+            <div class="location-filter-layout">
+              <fieldset class="filter-presence-group location-filter-block location-filter-block--presence"><legend>Required presence</legend><div class="filter-presence-options"><label><input type="checkbox" id="filter-presence-geographic" name="presence" value="geographic" data-intent-filter="presence"> On site</label><label><input type="checkbox" id="filter-presence-digital" name="presence" value="digital" data-intent-filter="presence"> Digital</label></div><small class="filter-presence-note">Multiple selected characteristics must all be present (AND).</small></fieldset>
+              <div class="location-filter-block location-filter-block--destination">
+                <h3>Location scope</h3>
+                <div class="spatial-destination-search">
+                  <label for="spatial-destination-search">Search place or country</label>
+                  <input id="spatial-destination-search" type="search" inputmode="search" autocomplete="off" placeholder="Place, region or country" aria-controls="spatial-destination-results" aria-expanded="false" />
+                  <ul id="spatial-destination-results" class="spatial-destination-results" aria-label="Place suggestions"></ul>
+                </div>
+                <label class="location-country-filter"><span>Country</span><select id="filter-country"><option value="">All countries</option></select></label>
+                <div class="location-proximity-controls">
+                  <label><span>Radius</span><select id="filter-nearby-radius" disabled><option value="">No radius</option><option value="5000">5 km</option><option value="25000">25 km</option><option value="100000">100 km</option><option value="500000">500 km</option></select></label>
+                  <button id="use-current-location" class="quiet-button" type="button">Use my location</button>
+                </div>
+                <p id="geolocation-status" class="geolocation-status" role="status"></p>
+                <p class="spatial-search-note">Country and radius are mutually exclusive. A radius becomes active only after choosing a place or location. Search covers published Commonworld places and countries.</p>
               </div>
-              <label><span>Country</span><select id="filter-country"><option value="">All countries</option></select></label>
-              <label><span>Radius</span><select id="filter-nearby-radius"><option value="">No radius</option><option value="5000">5 km</option><option value="25000">25 km</option><option value="100000">100 km</option><option value="500000">500 km</option></select></label>
-              <button id="use-current-location" class="quiet-button" type="button">Use my location</button>
-              <p id="geolocation-status" class="geolocation-status" role="status"></p>
-              <p class="spatial-search-note">Place search covers countries and published Commonworld locations, not a complete worldwide address search.</p>
             </div>
           </fieldset>
-          <fieldset class="filter-group">
-            <legend>More filters</legend>
+          <details id="advanced-filters" class="advanced-filters">
+            <summary>More filters</summary>
             <div class="filter-group-controls">
               <label><span>Access</span><select id="filter-access" data-intent-filter="access"><option value="">All access types</option><option value="public">Public</option><option value="membership">Membership</option><option value="restricted">Restricted</option><option value="unknown">Not specified</option></select></label>
               <label><span>Language</span><select id="filter-language" data-intent-filter="language"><option value="">All entries</option><option value="de">German</option><option value="unknown">Not specified</option></select></label>
               <label><span>Freshness</span><select id="filter-freshness" data-intent-filter="freshness"><option value="">Any freshness</option><option value="current">Currently reviewed</option><option value="stale">Review due</option><option value="unknown">Not specified</option></select></label>
               <label><span>Curation</span><select id="filter-curation" data-intent-filter="curation"><option value="">Any status</option><option value="listed">Listed</option><option value="verified">Verified</option><option value="featured">Featured</option><option value="unknown">Not specified</option></select></label>
             </div>
-          </fieldset>
+          </details>
         </div>
         <div class="discovery-summary-row">
-          <label class="discovery-sort"><span>Sort by</span><select id="discovery-sort" aria-describedby="discovery-sort-note"><option value="auto">Automatic</option><option value="catalogued">New to the catalogue</option><option value="reviewed">Recently reviewed</option><option value="title">Name A–Z</option></select></label>
-          <p id="discovery-sort-note" class="discovery-sort-note">Automatic: search results by relevance, with a location by proximity, otherwise the stable catalogue order.</p>
+          <label class="discovery-sort"><span>Sort by</span><select id="discovery-sort" aria-describedby="discovery-sort-note"><option value="auto">Recommended</option><option value="catalogued">New to the catalogue</option><option value="reviewed">Recently reviewed</option><option value="title">Name A–Z</option></select></label>
+          <p id="discovery-sort-note" class="discovery-sort-note">Recommended adapts to context: search by relevance, radius by proximity, otherwise the filtered order is retained.</p>
           <p id="discovery-count" class="discovery-count" role="status">73 Commons</p>
           <button id="filter-clear" class="quiet-button" type="button">Reset filters</button>
         </div>

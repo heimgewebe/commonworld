@@ -318,44 +318,49 @@ def render_shell(root: Path = ROOT, locale: str = FALLBACK_LOCALE) -> str:
           <button id="discovery-close" class="icon-button" type="button" aria-label="Suchergebnisse schließen">×</button>
         </div>
         <div id="active-filter-chips" class="active-filter-chips" aria-label="Aktive Filter"></div>
-        <button id="filter-sections-toggle" class="quiet-button filter-sections-toggle" type="button" aria-controls="filter-sections" aria-expanded="true"><span class="filter-toggle-icon" aria-hidden="true"></span><span>Filter</span></button>
+        <button id="filter-sections-toggle" type="button" aria-controls="filter-sections" aria-expanded="true" aria-hidden="true" tabindex="-1" hidden><span>Filter</span></button>
         <div id="filter-sections" class="filter-sections">
-          <fieldset class="filter-group">
+          <fieldset class="filter-group filter-group--purpose">
             <legend>Was?</legend>
             <div class="filter-group-controls">
               <label class="filter-commons-type"><span>Commons-Art</span><select id="filter-commons-type" data-intent-filter="commons_type"><option value="">Alle Arten</option><option value="knowledge">Wissen und Daten</option><option value="software">Software und Infrastruktur</option><option value="culture">Kultur und Medien</option><option value="food-seeds">Saatgut und Ernährung</option><option value="water">Wasser und Bewässerung</option><option value="energy">Energie</option><option value="housing-land">Boden und Wohnen</option><option value="health-care">Pflege und Gesundheit</option><option value="tools-repair">Werkzeuge, Reparatur und Fertigung</option><option value="community-network">Gemeinschaftsnetz</option><option value="other">Andere</option></select></label>
               <label class="filter-action"><span>Aktion</span><select id="filter-action" data-intent-filter="action"><option value="">Alle Aktionen</option><option value="use">Nutzen</option><option value="borrow">Ausleihen</option><option value="learn">Lernen</option><option value="contribute">Mitmachen</option><option value="volunteer">Ehrenamtlich helfen</option><option value="donate">Spenden</option><option value="visit">Besuchen</option><option value="contact">Kontaktieren</option><option value="replicate">Übertragen</option></select></label>
             </div>
           </fieldset>
-          <fieldset class="filter-group">
+          <fieldset class="filter-group filter-group--location">
             <legend>Wo?</legend>
-            <div class="filter-group-controls">
-              <fieldset class="filter-presence-group"><legend>Präsenz</legend><div class="filter-presence-options"><label><input type="checkbox" id="filter-presence-geographic" name="presence" value="geographic" data-intent-filter="presence"> Vor Ort</label><label><input type="checkbox" id="filter-presence-digital" name="presence" value="digital" data-intent-filter="presence"> Digital</label></div><small class="filter-presence-note">Beide gewählt = nur Commons mit Vor-Ort- und digitaler Präsenz.</small></fieldset>
-              <div class="spatial-destination-search">
-                <label for="spatial-destination-search">Ort oder Land suchen</label>
-                <input id="spatial-destination-search" type="search" inputmode="search" autocomplete="off" placeholder="Ort, Region oder Land" aria-controls="spatial-destination-results" aria-expanded="false" />
-                <ul id="spatial-destination-results" class="spatial-destination-results" aria-label="Ortsvorschläge"></ul>
+            <div class="location-filter-layout">
+              <fieldset class="filter-presence-group location-filter-block location-filter-block--presence"><legend>Erforderliche Präsenz</legend><div class="filter-presence-options"><label><input type="checkbox" id="filter-presence-geographic" name="presence" value="geographic" data-intent-filter="presence"> Vor Ort</label><label><input type="checkbox" id="filter-presence-digital" name="presence" value="digital" data-intent-filter="presence"> Digital</label></div><small class="filter-presence-note">Mehrere ausgewählte Merkmale müssen gemeinsam erfüllt sein (UND).</small></fieldset>
+              <div class="location-filter-block location-filter-block--destination">
+                <h3>Ortsbezug</h3>
+                <div class="spatial-destination-search">
+                  <label for="spatial-destination-search">Ort oder Land suchen</label>
+                  <input id="spatial-destination-search" type="search" inputmode="search" autocomplete="off" placeholder="Ort, Region oder Land" aria-controls="spatial-destination-results" aria-expanded="false" />
+                  <ul id="spatial-destination-results" class="spatial-destination-results" aria-label="Ortsvorschläge"></ul>
+                </div>
+                <label class="location-country-filter"><span>Land</span><select id="filter-country"><option value="">Alle Länder</option></select></label>
+                <div class="location-proximity-controls">
+                  <label><span>Umkreis</span><select id="filter-nearby-radius" disabled><option value="">Kein Umkreis</option><option value="5000">5 km</option><option value="25000">25 km</option><option value="100000">100 km</option><option value="500000">500 km</option></select></label>
+                  <button id="use-current-location" class="quiet-button" type="button">Meinen Standort verwenden</button>
+                </div>
+                <p id="geolocation-status" class="geolocation-status" role="status"></p>
+                <p class="spatial-search-note">Land und Umkreis schließen sich aus. Ein Umkreis wird erst nach Auswahl eines Orts oder Standorts aktiv. Die Ortssuche umfasst veröffentlichte Commonworld-Orte und Länder.</p>
               </div>
-              <label><span>Land</span><select id="filter-country"><option value="">Alle Länder</option></select></label>
-              <label><span>Umkreis</span><select id="filter-nearby-radius"><option value="">Kein Umkreis</option><option value="5000">5 km</option><option value="25000">25 km</option><option value="100000">100 km</option><option value="500000">500 km</option></select></label>
-              <button id="use-current-location" class="quiet-button" type="button">Meinen Standort verwenden</button>
-              <p id="geolocation-status" class="geolocation-status" role="status"></p>
-              <p class="spatial-search-note">Die Ortssuche deckt Länder und veröffentlichte Commonworld-Orte ab, nicht eine vollständige Weltadresssuche.</p>
             </div>
           </fieldset>
-          <fieldset class="filter-group">
-            <legend>Weitere Filter</legend>
+          <details id="advanced-filters" class="advanced-filters">
+            <summary>Weitere Filter</summary>
             <div class="filter-group-controls">
               <label><span>Zugang</span><select id="filter-access" data-intent-filter="access"><option value="">Alle Zugänge</option><option value="public">Öffentlich</option><option value="membership">Mitgliedschaft</option><option value="restricted">Beschränkt</option><option value="unknown">Nicht angegeben</option></select></label>
               <label><span>Sprache</span><select id="filter-language" data-intent-filter="language"><option value="">Alle Angaben</option><option value="de">Deutsch</option><option value="unknown">Nicht angegeben</option></select></label>
               <label><span>Aktualität</span><select id="filter-freshness" data-intent-filter="freshness"><option value="">Jede Aktualität</option><option value="current">Aktuell geprüft</option><option value="stale">Prüfung fällig</option><option value="unknown">Nicht angegeben</option></select></label>
               <label><span>Kuration</span><select id="filter-curation" data-intent-filter="curation"><option value="">Jeder Status</option><option value="listed">Gelistet</option><option value="verified">Verifiziert</option><option value="featured">Hervorgehoben</option><option value="unknown">Nicht angegeben</option></select></label>
             </div>
-          </fieldset>
+          </details>
         </div>
         <div class="discovery-summary-row">
-          <label class="discovery-sort"><span>Sortieren nach</span><select id="discovery-sort" aria-describedby="discovery-sort-note"><option value="auto">Automatisch</option><option value="catalogued">Neu im Katalog</option><option value="reviewed">Zuletzt geprüft</option><option value="title">Name A–Z</option></select></label>
-          <p id="discovery-sort-note" class="discovery-sort-note">Automatisch: Suchtreffer nach Passung, mit Standort nach Nähe, sonst stabile Katalogreihenfolge.</p>
+          <label class="discovery-sort"><span>Sortieren nach</span><select id="discovery-sort" aria-describedby="discovery-sort-note"><option value="auto">Empfohlen</option><option value="catalogued">Neu im Katalog</option><option value="reviewed">Zuletzt geprüft</option><option value="title">Name A–Z</option></select></label>
+          <p id="discovery-sort-note" class="discovery-sort-note">Empfohlen passt sich dem Kontext an: Suche nach Passung, Umkreis nach Nähe, sonst bleibt die gefilterte Reihenfolge erhalten.</p>
           <p id="discovery-count" class="discovery-count" role="status">{len(records)} Commons</p>
           <button id="filter-clear" class="quiet-button" type="button">Filter zurücksetzen</button>
         </div>

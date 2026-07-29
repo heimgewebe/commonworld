@@ -6,7 +6,7 @@ import unittest
 from pathlib import Path
 
 from scripts.render_public_shell import (
-    MODULE_IMPORT_DEPENDENCIES, activity_notice, load_records, render_bootstrap_catalog, render_cards,
+    MODULE_IMPORT_DEPENDENCIES, activity_notice, load_records, render_bootstrap_catalog, render_cards, render_shell,
 )
 from scripts.static_surface_parser import (
     find_css_block,
@@ -63,6 +63,42 @@ class PublicShellTests(unittest.TestCase):
 
     def test_public_shell_validates(self) -> None:
         self.assertEqual([], validate_public_shell(ROOT))
+
+    def test_filter_layout_renderer_uses_compact_semantic_structure(self) -> None:
+        german = render_shell(locale="de")
+        english = render_shell(locale="en")
+
+        for markup in (german, english):
+            self.assertIn('class="filter-group filter-group--purpose"', markup)
+            self.assertIn('class="filter-group filter-group--location"', markup)
+            self.assertIn('class="location-filter-layout"', markup)
+            self.assertIn('id="advanced-filters" class="advanced-filters"', markup)
+            self.assertNotIn('id="advanced-filters" class="advanced-filters" open', markup)
+            self.assertRegex(
+                markup,
+                r'<button id="filter-sections-toggle"[^>]*aria-hidden="true"[^>]*hidden>',
+            )
+
+        self.assertIn('<legend>Erforderliche Präsenz</legend>', german)
+        self.assertIn('gemeinsam erfüllt sein (UND)', german)
+        self.assertIn('<option value="auto">Empfohlen</option>', german)
+        self.assertIn('id="filter-nearby-radius" disabled', german)
+        self.assertIn('Land und Umkreis schließen sich aus', german)
+        self.assertIn('<legend>Required presence</legend>', english)
+        self.assertIn('all be present (AND)', english)
+        self.assertIn('<option value="auto">Recommended</option>', english)
+        self.assertIn('Country and radius are mutually exclusive', english)
+
+    def test_filter_layout_css_contract_is_bounded_and_responsive(self) -> None:
+        stylesheet = (ROOT / "index.css").read_text(encoding="utf-8")
+        self.assertIn("/* Filter layout semantics v1 */", stylesheet)
+        self.assertIn("width: min(56rem, calc(100% - 2rem));", stylesheet)
+        self.assertIn(".filter-group--location,\n.advanced-filters", stylesheet)
+        self.assertIn("@media (max-width: 48rem)", stylesheet)
+        self.assertIn("@media (max-width: 34rem)", stylesheet)
+        ipad_stylesheet = (ROOT / "assets/ipad-layout.css").read_text(encoding="utf-8")
+        self.assertIn("width: min(56rem, calc(100% - 1.5rem));", ipad_stylesheet)
+        self.assertNotIn("width: min(64rem, calc(100% - 1.5rem));", ipad_stylesheet)
 
     def test_local_module_graph_is_content_versioned(self) -> None:
         for module_path, dependencies in MODULE_IMPORT_DEPENDENCIES:
@@ -462,7 +498,9 @@ class PublicShellTests(unittest.TestCase):
             root = self.copy_shell(tmp_dir)
             path = root / "index.html"
             html = path.read_text(encoding="utf-8")
-            html = html.replace("<legend>Presence</legend>", "")
+            original = html
+            html = html.replace("<legend>Required presence</legend>", "", 1)
+            self.assertNotEqual(original, html)
             path.write_text(html, encoding="utf-8")
             errors = validate_public_shell(root)
             self.assertIn("presence fieldset must expose a legend", errors)
