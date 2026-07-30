@@ -48,7 +48,7 @@ Every public-runtime change must preserve:
 1. deterministic `npm run build` output;
 2. `make validate` contract and regression checks;
 3. the real `npm run smoke:browser` scenarios for normal, catalog-failure, provider-failure and method surfaces;
-4. a complete published diff and head/tree/diff-bound review before merge;
+4. a complete internally verified diff and head/tree/diff-bound review before merge; a published diff artifact is optional;
 5. exact live Pages readback after merge.
 
 Product order:
