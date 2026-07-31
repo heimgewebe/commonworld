@@ -11,7 +11,9 @@ from copy import deepcopy
 from datetime import datetime, timezone
 from pathlib import Path
 
-ROOT = Path(__file__).resolve().parents[1]
+ROOT = Path(
+    os.environ.get("COMMONWORLD_ROOT", Path(__file__).resolve().parents[1])
+).resolve()
 BENCHMARK_PATH = ROOT / "docs/evidence/catalog-delivery-benchmark-v1.json"
 SMOKE_EVIDENCE_PATH = ROOT / "docs/evidence/catalog-delivery-public-browser-smoke-v1.json"
 BUDGET_PATH = ROOT / "contracts/commonworld/catalog-delivery-budget.contract.json"
