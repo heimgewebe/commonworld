@@ -1,11 +1,17 @@
 from __future__ import annotations
 
+import tempfile
 import unittest
 from copy import deepcopy
+from pathlib import Path
 
 from scripts.evaluate_catalog_browser_measurements import (
     build_decision_evidence,
     validate_decision_evidence,
+)
+from scripts.validate_catalog_browser_measurement_decision import (
+    first_party_surface_sha256,
+    validate_attempt_surfaces,
 )
 
 
@@ -159,6 +165,32 @@ class CatalogBrowserMeasurementDecisionTests(unittest.TestCase):
                 for error in self.validate(manipulated_decision)
             )
         )
+
+    def test_every_attempt_is_bound_to_the_current_file_surface(self) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            (root / "assets").mkdir()
+            (root / "index.html").write_text("<main>Commonworld</main>", encoding="utf-8")
+            app_path = root / "assets/commonworld-app.js"
+            app_path.write_text("export const version = 1;", encoding="utf-8")
+            requests = ["/", "/assets/commonworld-app.js"]
+            surface_hash = first_party_surface_sha256(root, requests)
+            evidence = self.build(
+                self.measurement(
+                    surface_hash=surface_hash,
+                    task_duration_ms=3500.0,
+                ),
+                self.measurement(
+                    surface_hash=surface_hash,
+                    task_duration_ms=1700.0,
+                ),
+            )
+            self.assertEqual(validate_attempt_surfaces(evidence, root), [])
+
+            app_path.write_text("export const version = 2;", encoding="utf-8")
+            errors = validate_attempt_surfaces(evidence, root)
+            self.assertEqual(len(errors), 4)
+            self.assertTrue(all("stale for the current" in error for error in errors))
 
 
 if __name__ == "__main__":
