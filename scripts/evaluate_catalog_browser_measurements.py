@@ -16,6 +16,8 @@ DEFAULT_BUDGET_PATH = ROOT / "contracts/commonworld/catalog-delivery-budget.cont
 EXPECTED_PROFILES = ("mobile-low-power", "desktop-low-power")
 EXIT_CONFIRMATION_REQUIRED = 2
 EXIT_CONSECUTIVE_BREACH = 3
+STARTUP_DURATION_SCOPE = "navigation-start-to-runtime-ready"
+POST_READY_SCOPE = "runtime-ready-through-networkidle-or-10s-timeout-plus-750ms"
 
 METRIC_BUDGETS = (
     ("project_json_request_count", "max_startup_project_json_requests"),
@@ -53,6 +55,51 @@ def canonical_sha256(payload: object) -> str:
 
 def is_number(value: object) -> bool:
     return isinstance(value, (int, float)) and not isinstance(value, bool)
+
+
+def _validate_post_ready_diagnostics(name: str, profile: dict[str, Any]) -> list[str]:
+    errors: list[str] = []
+    if profile.get("duration_scope") != STARTUP_DURATION_SCOPE:
+        errors.append(f"{name}: startup duration scope is not {STARTUP_DURATION_SCOPE}")
+    if profile.get("post_ready_scope") != POST_READY_SCOPE:
+        errors.append(f"{name}: post-ready scope is not {POST_READY_SCOPE}")
+
+    numeric_fields = (
+        "script_duration_ms",
+        "task_duration_ms",
+        "post_ready_observation_ms",
+        "observed_script_duration_ms",
+        "observed_task_duration_ms",
+        "post_ready_script_delta_ms",
+        "post_ready_task_delta_ms",
+    )
+    for field in numeric_fields:
+        value = profile.get(field)
+        if not is_number(value):
+            errors.append(f"{name}: missing numeric {field}")
+        elif value < 0:
+            errors.append(f"{name}: {field} must be nonnegative")
+    if errors:
+        return errors
+
+    if profile["post_ready_observation_ms"] < 700:
+        errors.append(f"{name}: post-ready observation is shorter than the required stabilization window")
+    if profile["observed_script_duration_ms"] < profile["script_duration_ms"]:
+        errors.append(f"{name}: observed script duration predates startup duration")
+    if profile["observed_task_duration_ms"] < profile["task_duration_ms"]:
+        errors.append(f"{name}: observed task duration predates startup duration")
+
+    expected_script_delta = round(
+        (profile["observed_script_duration_ms"] - profile["script_duration_ms"]) * 100
+    ) / 100
+    expected_task_delta = round(
+        (profile["observed_task_duration_ms"] - profile["task_duration_ms"]) * 100
+    ) / 100
+    if abs(profile["post_ready_script_delta_ms"] - expected_script_delta) > 0.01:
+        errors.append(f"{name}: post-ready script delta does not match the preserved observations")
+    if abs(profile["post_ready_task_delta_ms"] - expected_task_delta) > 0.01:
+        errors.append(f"{name}: post-ready task delta does not match the preserved observations")
+    return errors
 
 
 def assess_measurement(
@@ -98,6 +145,7 @@ def assess_measurement(
             errors.append(f"{name}: runtime_ready must be true")
         if profile.get("runtime_failed") is not False:
             errors.append(f"{name}: runtime_failed must be false")
+        errors.extend(_validate_post_ready_diagnostics(name, profile))
 
         requests = profile.get("first_party_requests")
         if not isinstance(requests, list) or not requests:
@@ -112,7 +160,8 @@ def assess_measurement(
             actual = profile.get(metric)
             maximum = budgets.get(budget_name)
             if not is_number(actual):
-                errors.append(f"{name}: missing numeric {metric}")
+                if not any(error == f"{name}: missing numeric {metric}" for error in errors):
+                    errors.append(f"{name}: missing numeric {metric}")
                 continue
             if not is_number(maximum):
                 errors.append(f"missing numeric budget {budget_name}")
@@ -189,12 +238,12 @@ def build_decision_evidence(
             decision = "confirmation-required"
             gate_verdict = "pending"
             selected_attempt = None
-            reason = "The first representative attempt breached a budget and requires exactly one confirmation run."
+            reason = "The first representative attempt breached a startup budget and requires exactly one confirmation run."
         else:
             decision = "pass"
             gate_verdict = "pass"
             selected_attempt = 1
-            reason = "The first representative attempt passed every bound browser budget."
+            reason = "The first representative attempt passed every bound startup budget; post-ready CPU remains preserved as diagnostic evidence."
     else:
         if not first_breached:
             return None, ["a second attempt is only permitted after a first-attempt breach"]
@@ -203,12 +252,12 @@ def build_decision_evidence(
             decision = "consecutive-breach"
             gate_verdict = "block"
             selected_attempt = None
-            reason = "Two consecutive representative attempts breached a browser budget; architecture review is required."
+            reason = "Two consecutive representative attempts breached a startup budget; architecture review is required."
         else:
             decision = "variance-observed"
             gate_verdict = "pass"
             selected_attempt = 2
-            reason = "The first attempt breached and the required second attempt passed; both observations remain authoritative evidence of variance."
+            reason = "The first attempt breached and the required second attempt passed; both startup and post-ready observations remain authoritative evidence of variance."
 
     projection: list[dict[str, Any]] = []
     if selected_attempt is not None:
@@ -229,10 +278,10 @@ def build_decision_evidence(
         "selected_attempt": selected_attempt,
         "profiles": projection,
         "projection_note": (
-            "Top-level profiles reproduce the accepted gate attempt for legacy consumers; "
-            "the complete attempts array is the authoritative evidence."
+            "Top-level profiles reproduce the accepted startup gate attempt for legacy consumers; "
+            "the complete attempts array, including post-ready diagnostics, is authoritative."
             if selected_attempt is not None
-            else "No passing attempt exists, so no top-level budget projection is published."
+            else "No passing startup attempt exists, so no top-level budget projection is published."
         ),
     }
     return evidence, []
