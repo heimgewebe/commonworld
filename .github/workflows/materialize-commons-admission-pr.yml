@@ -1,0 +1,131 @@
+name: materialize-commons-admission-pr
+
+on:
+  pull_request:
+    branches:
+      - main
+
+permissions:
+  contents: write
+
+concurrency:
+  group: commons-admission-materialization-${{ github.event.pull_request.number }}
+  cancel-in-progress: true
+
+jobs:
+  materialize:
+    if: github.head_ref == 'feat/commons-admission-meshtastic-v1'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          ref: feat/commons-admission-meshtastic-v1
+          fetch-depth: 0
+      - uses: actions/setup-python@v7
+        with:
+          python-version: "3.12"
+      - uses: actions/setup-node@v7
+        with:
+          node-version: "22"
+          cache: npm
+      - name: Patch canonical source surfaces and permanent inventory
+        run: |
+          python3 scripts/materialize_commons_admission.py
+          python3 scripts/patch_commons_canonical_inventory.py
+      - name: Remove first-stage one-shot machinery
+        run: |
+          rm .github/workflows/materialize-commons-admission.yml
+          rm .github/workflows/materialize-commons-admission-pr.yml
+          rm scripts/materialize_commons_admission.py
+          rm scripts/patch_commons_canonical_inventory.py
+          rm scripts/select_commons_browser_measurement.py
+          rm catalog/commons-bases/materialize.request.json
+      - name: Install public runtime dependencies
+        run: npm ci --ignore-scripts --no-audit --no-fund
+      - name: Install bounded browser runtime
+        run: npx playwright install --with-deps chromium
+      - name: Build deterministic public runtime from final state
+        run: npm run build
+      - name: Measure exact 78-record public surface
+        run: |
+          set -o pipefail
+          node scripts/smoke_public_browser.mjs \
+            --result /tmp/commonworld-commons-smoke.json
+          node scripts/measure_catalog_delivery_browser.mjs \
+            --output /tmp/commonworld-commons-browser-attempt-1.json \
+            | tee /tmp/commonworld-commons-browser-attempt-1.log
+
+          set +e
+          python3 scripts/evaluate_catalog_browser_measurements.py \
+            --attempt /tmp/commonworld-commons-browser-attempt-1.json \
+            --output /tmp/commonworld-commons-browser.json
+          decision_status=$?
+          set -e
+
+          if [ "$decision_status" -eq 2 ]; then
+            echo "First attempt breached; running the single contractually required confirmation attempt"
+            node scripts/measure_catalog_delivery_browser.mjs \
+              --output /tmp/commonworld-commons-browser-attempt-2.json \
+              | tee /tmp/commonworld-commons-browser-attempt-2.log
+            set +e
+            python3 scripts/evaluate_catalog_browser_measurements.py \
+              --attempt /tmp/commonworld-commons-browser-attempt-1.json \
+              --attempt /tmp/commonworld-commons-browser-attempt-2.json \
+              --output /tmp/commonworld-commons-browser.json
+            decision_status=$?
+            set -e
+          fi
+
+          if [ "$decision_status" -eq 3 ]; then
+            echo "Two consecutive representative attempts breached; architecture review evidence is preserved"
+            exit 3
+          fi
+          if [ "$decision_status" -ne 0 ]; then
+            echo "Browser measurement evidence is invalid or incomplete"
+            exit "$decision_status"
+          fi
+
+          python3 scripts/measure_catalog_delivery.py \
+            --output /tmp/commonworld-commons-static.json
+      - name: Preserve blocked browser decision evidence
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: commonworld-browser-measurement-decision-${{ github.sha }}
+          path: |
+            /tmp/commonworld-commons-browser.json
+            /tmp/commonworld-commons-browser-attempt-1.json
+            /tmp/commonworld-commons-browser-attempt-2.json
+          if-no-files-found: ignore
+          retention-days: 30
+      - name: Refresh source-bound benchmark evidence
+        run: |
+          cp scripts/refresh_commons_catalog_evidence.py /tmp/refresh_commons_catalog_evidence.py
+          python3 scripts/refresh_commons_catalog_evidence.py \
+            --static /tmp/commonworld-commons-static.json \
+            --browser /tmp/commonworld-commons-browser.json \
+            --smoke /tmp/commonworld-commons-smoke.json
+          rm scripts/refresh_commons_catalog_evidence.py
+      - name: Install validation dependencies
+        run: python -m pip install -r requirements-dev.txt
+      - name: Validate complete repository state
+        run: |
+          set -o pipefail
+          make validate | tee /tmp/commonworld-make-validate.log
+          npm run smoke:browser | tee /tmp/commonworld-browser-smoke.log
+          COMMONWORLD_ROOT="$GITHUB_WORKSPACE" \
+            python3 /tmp/refresh_commons_catalog_evidence.py --mark-validation-pass
+          python3 scripts/validate_catalog_delivery_budget.py \
+            --smoke-result /tmp/commonworld-commons-smoke.json
+          python3 scripts/validate_catalog_browser_measurement_decision.py
+      - name: Commit materialized runtime
+        run: |
+          git config user.name "commonworld-materializer[bot]"
+          git config user.email "commonworld-materializer[bot]@users.noreply.github.com"
+          git add -A
+          if git diff --cached --quiet; then
+            echo "No materialized changes"
+            exit 0
+          fi
+          git commit -m "chore: materialize Commons admission policy"
+          git push origin HEAD:feat/commons-admission-meshtastic-v1

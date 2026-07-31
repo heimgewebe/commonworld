@@ -1,0 +1,6 @@
+{
+  "schema_version": 1,
+  "kind": "commonworld_commons_admission_materialization_request",
+  "requested_at": "2026-07-31",
+  "base_commit": "f319d078087d1dffd1e0e08198802f1edd897d72"
+}

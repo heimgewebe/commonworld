@@ -1,0 +1,134 @@
+name: materialize-commons-admission
+
+on:
+  push:
+    branches:
+      - feat/commons-admission-meshtastic-v1
+
+permissions:
+  contents: write
+
+jobs:
+  materialize:
+    if: github.event.head_commit.message == 'chore: request commons materialization'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          ref: feat/commons-admission-meshtastic-v1
+          fetch-depth: 0
+      - uses: actions/setup-python@v7
+        with:
+          python-version: "3.12"
+      - uses: actions/setup-node@v7
+        with:
+          node-version: "22"
+          cache: npm
+      - name: Patch canonical source surfaces
+        run: |
+          python3 - <<'PY'
+          import json
+          from pathlib import Path
+
+          root = Path('.')
+
+          manifest_path = root / 'catalog/catalog.json'
+          manifest = json.loads(manifest_path.read_text(encoding='utf-8'))
+          meshtastic_path = 'projects/meshtastic.json'
+          files = sorted(set(manifest['project_files']) | {meshtastic_path})
+          manifest['project_files'] = files
+          manifest['entry_count'] = len(files)
+          manifest['published_at'] = '2026-07-31'
+          manifest_path.write_text(json.dumps(manifest, ensure_ascii=False, indent=2) + '\n', encoding='utf-8')
+
+          locale_path = root / 'catalog/locales/en.json'
+          locale = json.loads(locale_path.read_text(encoding='utf-8'))
+          locale['projects']['meshtastic'] = {
+              'summary': 'A community-driven open-source ecosystem for decentralized off-grid communication over affordable low-power LoRa devices, with shared firmware, protocols, documentation and contribution paths.',
+              'geographic_labels': {},
+              'digital_label': 'Open-source off-grid mesh software, protocols, documentation and community collaboration',
+          }
+          locale['projects'] = dict(sorted(locale['projects'].items()))
+          locale_path.write_text(json.dumps(locale, ensure_ascii=False, indent=2) + '\n', encoding='utf-8')
+
+          ttn_path = root / 'catalog/projects/the-things-network.json'
+          ttn = json.loads(ttn_path.read_text(encoding='utf-8'))
+          ttn['curation']['reviewed_at'] = '2026-07-31'
+          ttn['curation']['next_review_at'] = '2026-10-31'
+          ttn['curation']['notes'] = (
+              'Aufgenommen als digitale Commons-Infrastruktur. Kommerzielle Angebote von The Things Industries '
+              'werden nicht mit dem Community-Netz gleichgesetzt; katalogisiert ist der offene Community-Pfad. '
+              'Der strukturierte Commons-Basisnachweis wurde am 31. Juli 2026 rückwirkend ergänzt.'
+          )
+          ttn_path.write_text(json.dumps(ttn, ensure_ascii=False, indent=2) + '\n', encoding='utf-8')
+
+          readme_path = root / 'README.md'
+          readme = readme_path.read_text(encoding='utf-8')
+          marker = '## Internationalisierung\n'
+          section = '''## Commons-Begriff und Aufnahme
+
+Commonworld bleibt offen für physische, digitale, lokale und globale Formen von Commons, verlangt aber eine überprüfbare Begründung. Ein Common ist eine benennbare Ressource, Infrastruktur, Praxis oder Wissensbasis, die von mehreren Menschen gemeinsam genutzt, erhalten oder weiterentwickelt wird und deren Umgang durch gemeinschaftliche Regeln, Rechte oder belastbare Verantwortungspraktiken geprägt ist.
+
+Open Source, Kostenfreiheit, Gemeinnützigkeit, Dezentralität, eine öffentliche API, viele Nutzer oder das Wort „Community“ genügen für sich allein nicht. Maßgeblich sind fünf quellengebundene Dimensionen: gemeinsame Ressource, Gemeinschaft, Commoning-Praxis, Regeln und Verantwortung sowie gemeinsamer Nutzen.
+
+Maschinenlesbare Grundlage:
+
+- [`contracts/commonworld/commons-definition.contract.json`](contracts/commonworld/commons-definition.contract.json)
+- [`contracts/commonworld/commons-basis.schema.json`](contracts/commonworld/commons-basis.schema.json)
+- [`catalog/commons-bases/index.json`](catalog/commons-bases/index.json)
+- [`catalog/commons-bases/retroreview-policy.json`](catalog/commons-bases/retroreview-policy.json)
+
+Seit dem 31. Juli 2026 benötigen neue oder wesentlich neu geprüfte Einträge einen strukturierten Commons-Basisnachweis. Ältere Einträge werden dynamisch bis zu ihrer bestehenden Wiedervorlage rückgeprüft; bereits fällige Altbestände erhalten einmalig eine Migrationsfrist bis zum 31. August 2026. Das Prinzip lautet: offen in den Formen, streng bei der Begründung.
+
+'''
+          if section not in readme:
+              if marker not in readme:
+                  raise SystemExit('README insertion marker missing')
+              readme = readme.replace(marker, section + marker, 1)
+              readme_path.write_text(readme, encoding='utf-8')
+
+          render_path = root / 'scripts/render_public_shell.py'
+          render = render_path.read_text(encoding='utf-8')
+          old_section = '''      <section><h2>Vorschläge und Redaktion</h2><p>Über <a href="./propose.html">Commons vorschlagen</a> können öffentliche Kandidaten vorbereitet werden. Commonworld speichert das Formular nicht. Der bevorzugte Eingang ist ein öffentliches GitHub-Issue; alternativ entsteht eine lokale JSON-Datei. Vorschläge werden nie automatisch veröffentlicht. Die Redaktion prüft Identität, primärnahe Quellen, Commons-Eigenschaft, Handlungswege, Datenschutz, Ortsgenauigkeit, Dubletten und Aktualität nach dem <a href="./contracts/commonworld/editorial-review.contract.json">Redaktionsvertrag</a>.</p></section>'''
+          new_section = '''      <section><h2>Was als Common gilt</h2><p>Commonworld versteht ein Common als eine benennbare Ressource, Infrastruktur, Praxis oder Wissensbasis, die von mehreren Menschen gemeinsam genutzt, erhalten oder weiterentwickelt wird. Für die Aufnahme müssen gemeinsame Ressource, Gemeinschaft, Commoning-Praxis, Regeln und Verantwortung sowie gemeinsamer Nutzen durch primärnahe Quellen belegt sein. Open Source, Kostenfreiheit, Gemeinnützigkeit, Dezentralität oder viele Nutzer reichen für sich allein nicht aus. Die Formen bleiben offen; die Begründung ist verbindlich und im <a href="./contracts/commonworld/commons-definition.contract.json">Commons-Definitionsvertrag</a> maschinenlesbar.</p></section>
+      <section><h2>Vorschläge und Redaktion</h2><p>Über <a href="./propose.html">Commons vorschlagen</a> können öffentliche Kandidaten vorbereitet werden. Commonworld speichert das Formular nicht. Der bevorzugte Eingang ist ein öffentliches GitHub-Issue; alternativ entsteht eine lokale JSON-Datei. Vorschläge werden nie automatisch veröffentlicht. Die Redaktion prüft Identität, primärnahe Quellen, Commons-Eigenschaft, Handlungswege, Datenschutz, Ortsgenauigkeit, Dubletten und Aktualität nach dem <a href="./contracts/commonworld/editorial-review.contract.json">Redaktionsvertrag</a> und dokumentiert die Aufnahme im <a href="./contracts/commonworld/commons-basis.schema.json">Commons-Basisnachweis</a>. Seit dem 31. Juli 2026 benötigen neue oder wesentlich neu geprüfte Einträge diesen Nachweis; ältere Einträge werden spätestens zu ihrer bestehenden Wiedervorlage rückwirkend geprüft. Bereits fällige Altbestände erhalten einmalig bis zum 31. August 2026 Zeit.</p></section>'''
+          if old_section not in render:
+              raise SystemExit('method source marker missing')
+          render_path.write_text(render.replace(old_section, new_section, 1), encoding='utf-8')
+
+          i18n_path = root / 'scripts/commonworld_i18n.py'
+          i18n = i18n_path.read_text(encoding='utf-8')
+          old_entries = '''    '<h2>Vorschläge und Redaktion</h2>': '<h2>Suggestions and editorial review</h2>',
+    'Über <a href="./propose.html">Commons vorschlagen</a> können öffentliche Kandidaten vorbereitet werden. Commonworld speichert das Formular nicht. Der bevorzugte Eingang ist ein öffentliches GitHub-Issue; alternativ entsteht eine lokale JSON-Datei. Vorschläge werden nie automatisch veröffentlicht. Die Redaktion prüft Identität, primärnahe Quellen, Commons-Eigenschaft, Handlungswege, Datenschutz, Ortsgenauigkeit, Dubletten und Aktualität nach dem': 'Public candidates can be prepared through <a href="./propose.html">Suggest a Commons</a>. Commonworld does not store the form. The preferred intake path is a public GitHub issue; alternatively, a local JSON file is produced. Suggestions are never published automatically. Editorial review checks identity, primary-near sources, Commons characteristics, ways to engage, privacy, location precision, duplicates and freshness under the',
+    '>Redaktionsvertrag</a>.': '>editorial review contract</a>.','''
+          new_entries = '''    '<h2>Was als Common gilt</h2>': '<h2>What counts as a Common</h2>',
+    'Commonworld versteht ein Common als eine benennbare Ressource, Infrastruktur, Praxis oder Wissensbasis, die von mehreren Menschen gemeinsam genutzt, erhalten oder weiterentwickelt wird. Für die Aufnahme müssen gemeinsame Ressource, Gemeinschaft, Commoning-Praxis, Regeln und Verantwortung sowie gemeinsamer Nutzen durch primärnahe Quellen belegt sein. Open Source, Kostenfreiheit, Gemeinnützigkeit, Dezentralität oder viele Nutzer reichen für sich allein nicht aus. Die Formen bleiben offen; die Begründung ist verbindlich und im <a href="./contracts/commonworld/commons-definition.contract.json">Commons-Definitionsvertrag</a> maschinenlesbar.': 'Commonworld understands a Common as an identifiable resource, infrastructure, practice or body of knowledge that multiple people use, maintain or develop together. Admission requires primary-near evidence for a shared resource, community, commoning practice, rules and responsibility, and common benefit. Open source, free access, nonprofit status, decentralization or many users are not sufficient on their own. Forms remain open; justification is binding and machine-readable in the <a href="./contracts/commonworld/commons-definition.contract.json">Commons definition contract</a>.',
+    '<h2>Vorschläge und Redaktion</h2>': '<h2>Suggestions and editorial review</h2>',
+    'Über <a href="./propose.html">Commons vorschlagen</a> können öffentliche Kandidaten vorbereitet werden. Commonworld speichert das Formular nicht. Der bevorzugte Eingang ist ein öffentliches GitHub-Issue; alternativ entsteht eine lokale JSON-Datei. Vorschläge werden nie automatisch veröffentlicht. Die Redaktion prüft Identität, primärnahe Quellen, Commons-Eigenschaft, Handlungswege, Datenschutz, Ortsgenauigkeit, Dubletten und Aktualität nach dem <a href="./contracts/commonworld/editorial-review.contract.json">Redaktionsvertrag</a> und dokumentiert die Aufnahme im <a href="./contracts/commonworld/commons-basis.schema.json">Commons-Basisnachweis</a>. Seit dem 31. Juli 2026 benötigen neue oder wesentlich neu geprüfte Einträge diesen Nachweis; ältere Einträge werden spätestens zu ihrer bestehenden Wiedervorlage rückwirkend geprüft. Bereits fällige Altbestände erhalten einmalig bis zum 31. August 2026 Zeit.': 'Public candidates can be prepared through <a href="./propose.html">Suggest a Commons</a>. Commonworld does not store the form. The preferred intake path is a public GitHub issue; alternatively, a local JSON file is produced. Suggestions are never published automatically. Editorial review checks identity, primary-near sources, Commons characteristics, ways to engage, privacy, location precision, duplicates and freshness under the <a href="./contracts/commonworld/editorial-review.contract.json">editorial review contract</a> and documents admission in a <a href="./contracts/commonworld/commons-basis.schema.json">Commons basis record</a>. Since 31 July 2026, new or materially re-reviewed entries require this record; older entries are reviewed retroactively no later than their existing review date. Legacy entries already due receive a one-time grace period until 31 August 2026.','''
+          if old_entries not in i18n:
+              raise SystemExit('method translation marker missing')
+          i18n_path.write_text(i18n.replace(old_entries, new_entries, 1), encoding='utf-8')
+          PY
+      - name: Install public runtime dependencies
+        run: npm ci --ignore-scripts --no-audit --no-fund
+      - name: Install bounded browser runtime
+        run: npx playwright install --with-deps chromium
+      - name: Build deterministic public runtime
+        run: npm run build
+      - name: Install validation dependencies
+        run: python -m pip install -r requirements-dev.txt
+      - name: Validate complete repository state
+        run: |
+          make validate
+          npm run smoke:browser
+      - name: Commit materialized runtime
+        run: |
+          git config user.name "commonworld-materializer[bot]"
+          git config user.email "commonworld-materializer[bot]@users.noreply.github.com"
+          git add -A
+          if git diff --cached --quiet; then
+            echo "No materialized changes"
+            exit 0
+          fi
+          git commit -m "chore: materialize Commons admission policy"
+          git push origin HEAD:feat/commons-admission-meshtastic-v1

@@ -1,4 +1,4 @@
-.PHONY: build validate validate-cache-coherence validate-security-policy validate-proposal-path validate-current-state browser-smoke validate-canonical-plan validate-contracts validate-semantic-zoom validate-visual-semantics validate-renderer-spike validate-maplibre-phase2-proof validate-device-acceptance-pack validate-device-acceptance-rerun validate-digital-sphere validate-digital-ring-taxonomy validate-layered-digital-sphere-proof validate-digital-sphere-real-surface validate-device-acceptance-performance-v4 validate-physical-device-acceptance-v4-apple validate-public-catalog validate-public-seed-baseline validate-presence-axes validate-intent-search-discovery validate-renderer-selection validate-public-maplibre-vertical-slice validate-production-delivery-provider validate-public-shell validate-catalog-delivery-budget validate-catalog-scale-gates test-js test smoke-pages-live check-pages-dns-target
+.PHONY: build validate validate-cache-coherence validate-security-policy validate-proposal-path validate-current-state browser-smoke validate-canonical-plan validate-contracts validate-commons-admission validate-semantic-zoom validate-visual-semantics validate-renderer-spike validate-maplibre-phase2-proof validate-device-acceptance-pack validate-device-acceptance-rerun validate-digital-sphere validate-digital-ring-taxonomy validate-layered-digital-sphere-proof validate-digital-sphere-real-surface validate-device-acceptance-performance-v4 validate-physical-device-acceptance-v4-apple validate-public-catalog validate-public-seed-baseline validate-presence-axes validate-intent-search-discovery validate-renderer-selection validate-public-maplibre-vertical-slice validate-production-delivery-provider validate-public-shell validate-catalog-delivery-budget validate-catalog-browser-measurement-decision validate-catalog-scale-gates test-js test smoke-pages-live check-pages-dns-target
 
 build:
 	npm run build
@@ -6,7 +6,7 @@ build:
 validate-cache-coherence:
 	python3 scripts/validate_cache_coherence.py
 
-validate: validate-cache-coherence validate-security-policy validate-proposal-path validate-current-state validate-canonical-plan validate-contracts validate-semantic-zoom validate-visual-semantics validate-renderer-spike validate-maplibre-phase2-proof validate-device-acceptance-pack validate-device-acceptance-rerun validate-digital-sphere validate-digital-ring-taxonomy validate-layered-digital-sphere-proof validate-digital-sphere-real-surface validate-device-acceptance-performance-v4 validate-physical-device-acceptance-v4-apple validate-public-catalog validate-public-seed-baseline validate-presence-axes validate-intent-search-discovery validate-renderer-selection validate-public-maplibre-vertical-slice validate-production-delivery-provider validate-public-shell validate-catalog-delivery-budget validate-catalog-scale-gates test-js test
+validate: validate-cache-coherence validate-security-policy validate-proposal-path validate-current-state validate-canonical-plan validate-contracts validate-commons-admission validate-semantic-zoom validate-visual-semantics validate-renderer-spike validate-maplibre-phase2-proof validate-device-acceptance-pack validate-device-acceptance-rerun validate-digital-sphere validate-digital-ring-taxonomy validate-layered-digital-sphere-proof validate-digital-sphere-real-surface validate-device-acceptance-performance-v4 validate-physical-device-acceptance-v4-apple validate-public-catalog validate-public-seed-baseline validate-presence-axes validate-intent-search-discovery validate-renderer-selection validate-public-maplibre-vertical-slice validate-production-delivery-provider validate-public-shell validate-catalog-delivery-budget validate-catalog-browser-measurement-decision validate-catalog-scale-gates test-js test
 
 validate-proposal-path:
 	python3 scripts/validate_proposal_path.py
@@ -19,6 +19,9 @@ validate-canonical-plan:
 
 validate-contracts:
 	python3 scripts/validate_contracts.py
+
+validate-commons-admission:
+	python3 scripts/validate_commons_admission.py
 
 validate-semantic-zoom:
 	python3 scripts/validate_semantic_zoom.py
@@ -86,6 +89,9 @@ validate-public-shell:
 
 validate-catalog-delivery-budget: build
 	python3 scripts/validate_catalog_delivery_budget.py
+
+validate-catalog-browser-measurement-decision:
+	python3 scripts/validate_catalog_browser_measurement_decision.py
 
 validate-catalog-scale-gates:
 	python3 scripts/validate_catalog_scale_gates.py
