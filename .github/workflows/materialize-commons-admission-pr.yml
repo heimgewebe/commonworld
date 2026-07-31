@@ -8,6 +8,10 @@ on:
 permissions:
   contents: write
 
+concurrency:
+  group: commons-admission-materialization-${{ github.event.pull_request.number }}
+  cancel-in-progress: true
+
 jobs:
   materialize:
     if: github.head_ref == 'feat/commons-admission-meshtastic-v1'
@@ -34,6 +38,7 @@ jobs:
           rm .github/workflows/materialize-commons-admission-pr.yml
           rm scripts/materialize_commons_admission.py
           rm scripts/patch_commons_canonical_inventory.py
+          rm scripts/select_commons_browser_measurement.py
           rm catalog/commons-bases/materialize.request.json
       - name: Install public runtime dependencies
         run: npm ci --ignore-scripts --no-audit --no-fund
@@ -49,23 +54,50 @@ jobs:
           node scripts/measure_catalog_delivery_browser.mjs \
             --output /tmp/commonworld-commons-browser-attempt-1.json \
             | tee /tmp/commonworld-commons-browser-attempt-1.log
-          if python3 scripts/select_commons_browser_measurement.py \
-            --candidate /tmp/commonworld-commons-browser-attempt-1.json \
-            --output /tmp/commonworld-commons-browser.json \
-            --attempt 1; then
-            echo "First representative browser measurement passed all budgets"
-          else
-            echo "First representative measurement breached a browser budget; checking the contractually required consecutive run"
+
+          set +e
+          python3 scripts/evaluate_catalog_browser_measurements.py \
+            --attempt /tmp/commonworld-commons-browser-attempt-1.json \
+            --output /tmp/commonworld-commons-browser.json
+          decision_status=$?
+          set -e
+
+          if [ "$decision_status" -eq 2 ]; then
+            echo "First attempt breached; running the single contractually required confirmation attempt"
             node scripts/measure_catalog_delivery_browser.mjs \
               --output /tmp/commonworld-commons-browser-attempt-2.json \
               | tee /tmp/commonworld-commons-browser-attempt-2.log
-            python3 scripts/select_commons_browser_measurement.py \
-              --candidate /tmp/commonworld-commons-browser-attempt-2.json \
-              --output /tmp/commonworld-commons-browser.json \
-              --attempt 2
+            set +e
+            python3 scripts/evaluate_catalog_browser_measurements.py \
+              --attempt /tmp/commonworld-commons-browser-attempt-1.json \
+              --attempt /tmp/commonworld-commons-browser-attempt-2.json \
+              --output /tmp/commonworld-commons-browser.json
+            decision_status=$?
+            set -e
           fi
+
+          if [ "$decision_status" -eq 3 ]; then
+            echo "Two consecutive representative attempts breached; architecture review evidence is preserved"
+            exit 3
+          fi
+          if [ "$decision_status" -ne 0 ]; then
+            echo "Browser measurement evidence is invalid or incomplete"
+            exit "$decision_status"
+          fi
+
           python3 scripts/measure_catalog_delivery.py \
             --output /tmp/commonworld-commons-static.json
+      - name: Preserve blocked browser decision evidence
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: commonworld-browser-measurement-decision-${{ github.sha }}
+          path: |
+            /tmp/commonworld-commons-browser.json
+            /tmp/commonworld-commons-browser-attempt-1.json
+            /tmp/commonworld-commons-browser-attempt-2.json
+          if-no-files-found: ignore
+          retention-days: 30
       - name: Refresh source-bound benchmark evidence
         run: |
           cp scripts/refresh_commons_catalog_evidence.py /tmp/refresh_commons_catalog_evidence.py
@@ -74,7 +106,6 @@ jobs:
             --browser /tmp/commonworld-commons-browser.json \
             --smoke /tmp/commonworld-commons-smoke.json
           rm scripts/refresh_commons_catalog_evidence.py
-          rm scripts/select_commons_browser_measurement.py
       - name: Install validation dependencies
         run: python -m pip install -r requirements-dev.txt
       - name: Validate complete repository state
@@ -86,6 +117,7 @@ jobs:
             python3 /tmp/refresh_commons_catalog_evidence.py --mark-validation-pass
           python3 scripts/validate_catalog_delivery_budget.py \
             --smoke-result /tmp/commonworld-commons-smoke.json
+          python3 scripts/validate_catalog_browser_measurement_decision.py
       - name: Commit materialized runtime
         run: |
           git config user.name "commonworld-materializer[bot]"
