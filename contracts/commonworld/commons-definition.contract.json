@@ -1,0 +1,90 @@
+{
+  "schema_version": 1,
+  "kind": "commonworld_commons_definition_contract",
+  "current_as_of": "2026-07-31",
+  "definition": {
+    "de": "Ein Common ist eine benennbare Ressource, Infrastruktur, Praxis oder Wissensbasis, die von mehreren Menschen gemeinsam genutzt, erhalten oder weiterentwickelt wird und deren Umgang durch gemeinschaftliche Regeln, Rechte oder belastbare Praktiken der Verantwortung geprägt ist.",
+    "en": "A Common is an identifiable resource, infrastructure, practice or body of knowledge that multiple people use, maintain or develop together and whose use is shaped by shared rules, rights or established practices of responsibility."
+  },
+  "editorial_principle": {
+    "id": "open_in_forms_strict_in_reasoning",
+    "de": "Offen in den Formen, streng bei der Begründung.",
+    "en": "Open in form, strict in justification."
+  },
+  "required_dimensions": [
+    {
+      "id": "shared_resource",
+      "de": "Eine konkrete gemeinsame Ressource, Infrastruktur, Praxis oder Wissensbasis ist benennbar.",
+      "en": "A concrete shared resource, infrastructure, practice or body of knowledge can be identified."
+    },
+    {
+      "id": "community",
+      "de": "Eine Mehrzahl von Beteiligten ist als Gemeinschaft, Trägerschaft oder Beitragendenkreis erkennbar.",
+      "en": "A plurality of participants is identifiable as a community, stewarding body or contributor group."
+    },
+    {
+      "id": "commoning_practice",
+      "de": "Beteiligte können real beitragen, mitverantworten, erhalten, weiterentwickeln oder gemeinsame Nutzung organisieren; bloßer Konsum genügt nicht.",
+      "en": "Participants can genuinely contribute, share responsibility, maintain, develop or organize shared use; consumption alone is insufficient."
+    },
+    {
+      "id": "rules_and_responsibility",
+      "de": "Regeln, Rechte, Lizenzen, Entscheidungsverfahren oder belastbare Praktiken ordnen Zugang, Beiträge, Pflege oder Konflikte.",
+      "en": "Rules, rights, licenses, decision procedures or established practices govern access, contributions, maintenance or conflict."
+    },
+    {
+      "id": "common_benefit",
+      "de": "Der gemeinsame Nutzen besteht eigenständig und ist nicht nur ein Vertriebsweg zugunsten eines externen Eigentümers.",
+      "en": "The shared benefit exists in its own right and is not merely a sales channel for an external owner."
+    }
+  ],
+  "classifications": [
+    {
+      "id": "common",
+      "de": "Die gemeinsam getragene Ressource oder Praxis selbst.",
+      "en": "The collectively sustained resource or practice itself."
+    },
+    {
+      "id": "commons-infrastructure",
+      "de": "Eine gemeinschaftlich getragene Infrastruktur, die Commons ermöglicht oder mehrere Commons verbindet und selbst die Mindestkriterien erfüllt.",
+      "en": "Collectively sustained infrastructure that enables or connects Commons and itself satisfies the minimum criteria."
+    }
+  ],
+  "non_sufficient_indicators": [
+    "open_source",
+    "free_of_charge",
+    "nonprofit_status",
+    "decentralized_architecture",
+    "public_api",
+    "many_users",
+    "community_label",
+    "cooperative_legal_form"
+  ],
+  "exclusion_signals": [
+    "commercial_listing_only",
+    "provider_customer_relationship_only",
+    "no_identifiable_shared_resource",
+    "no_real_contribution_or_stewardship_path",
+    "community_claim_without_evidence"
+  ],
+  "decision_rules": {
+    "include_requires_all_dimensions_supported": true,
+    "partial_or_unknown_dimension_requires_needs_information_or_rejection": true,
+    "centralized_elements_must_be_disclosed_but_are_not_automatic_exclusion": true,
+    "candidate_is_review_status_not_classification": true,
+    "local_instance_is_separate_common_only_when_separately_supported": true
+  },
+  "evidence_policy": {
+    "primary_near_sources_preferred": true,
+    "each_dimension_requires_source_ids": true,
+    "limitations_required_when_material_control_or_commercial_tension_exists": true,
+    "basis_schema": "contracts/commonworld/commons-basis.schema.json",
+    "basis_index": "catalog/commons-bases/index.json"
+  },
+  "transition": {
+    "effective_from": "2026-07-31",
+    "new_or_materially_rereviewed_records_require_basis": true,
+    "legacy_records_without_basis_follow": "catalog/commons-bases/retroreview-policy.json",
+    "legacy_listing_is_not_retroactive_certification": true
+  }
+}
