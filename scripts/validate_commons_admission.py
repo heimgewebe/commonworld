@@ -131,23 +131,57 @@ def validate(root: Path = ROOT, *, today: date | None = None) -> list[str]:
             for source in project.get("provenance", {}).get("sources", [])
             if isinstance(source, dict) and isinstance(source.get("id"), str)
         }
+        statuses: dict[str, object] = {}
         for dimension in DIMENSIONS:
             criterion = basis.get("criteria", {}).get(dimension, {})
+            statuses[dimension] = criterion.get("status")
             unknown = sorted(set(criterion.get("source_ids", [])) - known_sources)
             if unknown:
                 errors.append(
                     f"{filename}:{dimension} references unknown project sources: {unknown}"
                 )
-        if basis.get("decision") == "include":
-            unsupported = [
+
+        decision = basis.get("decision")
+        if decision == "include":
+            not_supported = [
                 dimension
-                for dimension in DIMENSIONS
-                if basis.get("criteria", {}).get(dimension, {}).get("status") != "supported"
+                for dimension, status in statuses.items()
+                if status != "supported"
             ]
-            if unsupported:
+            if not_supported:
                 errors.append(
-                    f"{filename}: include decision requires supported dimensions: {unsupported}"
+                    f"{filename}: include decision requires supported dimensions: {not_supported}"
                 )
+        elif decision == "needs_information":
+            unresolved = [
+                dimension
+                for dimension, status in statuses.items()
+                if status in {"partial", "unknown"}
+            ]
+            contradicted = [
+                dimension
+                for dimension, status in statuses.items()
+                if status == "unsupported"
+            ]
+            if not unresolved:
+                errors.append(
+                    f"{filename}: needs_information requires at least one partial or unknown dimension"
+                )
+            if contradicted:
+                errors.append(
+                    f"{filename}: unsupported dimensions require reject, not needs_information: {contradicted}"
+                )
+        elif decision == "reject":
+            contradicted = [
+                dimension
+                for dimension, status in statuses.items()
+                if status == "unsupported"
+            ]
+            if not contradicted:
+                errors.append(
+                    f"{filename}: reject requires at least one unsupported dimension"
+                )
+
         try:
             basis_reviewed_at = date.fromisoformat(basis["reviewed_at"])
             project_reviewed_at = date.fromisoformat(project["curation"]["reviewed_at"])
