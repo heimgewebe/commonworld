@@ -56,9 +56,16 @@ def refresh(static_path: Path, browser_path: Path, smoke_path: Path) -> None:
     if any(not isinstance(item, str) for item in scenario_ids):
         raise ValueError("fresh public browser smoke has an invalid scenario id")
 
+    browser_decision = browser.get("decision")
+    if browser_decision not in {"pass", "variance-observed"}:
+        raise ValueError(f"browser measurement decision is not a terminal pass: {browser_decision}")
+    attempt_count = browser.get("attempt_count")
+    if attempt_count not in {1, 2}:
+        raise ValueError("browser measurement decision has an invalid attempt count")
+
     profiles = browser.get("profiles")
     if not isinstance(profiles, list) or len(profiles) != 2:
-        raise ValueError("browser measurement must contain two profiles")
+        raise ValueError("browser measurement decision must project two accepted profiles")
     surface_hashes = {
         item.get("first_party_surface_sha256")
         for item in profiles
@@ -67,6 +74,8 @@ def refresh(static_path: Path, browser_path: Path, smoke_path: Path) -> None:
     if len(surface_hashes) != 1 or None in surface_hashes:
         raise ValueError("browser profiles do not share one first-party surface hash")
     first_party_surface_sha256 = surface_hashes.pop()
+    if browser.get("first_party_surface_sha256") != first_party_surface_sha256:
+        raise ValueError("browser decision surface hash differs from its profile projection")
 
     smoke_evidence = {
         "schema_version": fresh_smoke.get("schema_version", 1),
@@ -190,17 +199,31 @@ def refresh(static_path: Path, browser_path: Path, smoke_path: Path) -> None:
             "mobile/tablet layouts and all established scenarios."
         ),
     }
+    measurement_hashes = [
+        item.get("measurement_sha256")
+        for item in browser.get("attempts", [])
+        if isinstance(item, dict)
+    ]
+    repeatability_note = (
+        "One isolated fourfold-CPU no-store attempt passed every budget."
+        if browser_decision == "pass"
+        else (
+            "The first isolated fourfold-CPU attempt breached and the required second attempt "
+            "passed; both source-identical observations remain embedded and the decision is "
+            "recorded as variance-observed."
+        )
+    )
     validation["catalog_delivery_browser_measurement"] = {
         "verdict": "PASS",
+        "decision": browser_decision,
+        "attempt_count": attempt_count,
+        "attempt_measurement_sha256s": measurement_hashes,
         "profiles": [item["profile"] for item in profiles],
         "cpu_throttle_rate": browser["cpu_throttle_rate"],
         "result_sha256": sha256(browser_path),
         "durable_job_id": os.environ.get("GITHUB_RUN_ID", "direct-bounded-readback"),
         "finalization_receipt_sha256": None,
-        "repeatability_note": (
-            "One isolated fourfold-CPU no-store run; both profiles share the same complete "
-            "release-bound first-party surface hash."
-        ),
+        "repeatability_note": repeatability_note,
     }
     validation["catalog_delivery_static_measurement"] = {
         "verdict": "PASS",
@@ -222,8 +245,9 @@ def refresh(static_path: Path, browser_path: Path, smoke_path: Path) -> None:
     }
     benchmark["current_surface_note"] = (
         f"Commons admission migration regenerated release {release_id} for {entry_count} records "
-        "and refreshed deterministic static, fourfold-CPU browser and public-smoke evidence from "
-        "the same isolated GitHub Actions checkout."
+        f"and refreshed deterministic static, browser decision {browser_decision} from "
+        f"{attempt_count} source-identical fourfold-CPU attempt(s), and public-smoke evidence "
+        "from the same isolated GitHub Actions checkout."
     )
     write(BENCHMARK_PATH, benchmark)
 
