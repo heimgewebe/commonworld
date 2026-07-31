@@ -1,0 +1,161 @@
+{
+  "schema_version": 1,
+  "kind": "commonworld.ui_locale_release_contract",
+  "title": "Commonworld staged interface-language release contract",
+  "decision": {
+    "released_locales": [
+      "en",
+      "de"
+    ],
+    "default_locale": "en",
+    "fallback_locale": "de",
+    "automatic_selection": {
+      "precedence": [
+        "explicit_url",
+        "stored_preference",
+        "browser_language_order",
+        "default_locale"
+      ],
+      "geolocation_must_not_influence_locale": true,
+      "explicit_surface_must_resist_stored_override": true,
+      "preserve_query_and_fragment": true
+    }
+  },
+  "tag_policy": {
+    "standard": "BCP 47",
+    "canonical_ui_tag_pattern": "^[a-z]{2,3}(?:-[A-Z][a-z]{3})?(?:-(?:[A-Z]{2}|[0-9]{3}))?$",
+    "matching_order": [
+      "exact",
+      "language_script",
+      "primary_language",
+      "default_locale"
+    ],
+    "case_insensitive_input": true,
+    "canonical_output_required": true,
+    "script_and_region_must_be_preserved": true
+  },
+  "content_language_policy": {
+    "independent_from_interface_locales": true,
+    "valid_bcp47_tags_allowed": true,
+    "must_not_be_rewritten_to_interface_locale": true,
+    "unknown_language_must_remain_explicit": true
+  },
+  "locale_registry": {
+    "en": {
+      "status": "released",
+      "direction": "ltr",
+      "surface_files": {
+        "index": "index.html",
+        "method": "method.html",
+        "proposal": "propose.html"
+      },
+      "native_name": "English",
+      "english_name": "English"
+    },
+    "de": {
+      "status": "released",
+      "direction": "ltr",
+      "surface_files": {
+        "index": "de.html",
+        "method": "method.de.html",
+        "proposal": "propose.de.html"
+      },
+      "native_name": "Deutsch",
+      "english_name": "German"
+    },
+    "es": {
+      "status": "planned",
+      "direction": "ltr",
+      "native_name": "Español",
+      "english_name": "Spanish"
+    },
+    "fr": {
+      "status": "planned",
+      "direction": "ltr",
+      "native_name": "Français",
+      "english_name": "French"
+    },
+    "pt-BR": {
+      "status": "planned",
+      "direction": "ltr",
+      "native_name": "Português (Brasil)",
+      "english_name": "Brazilian Portuguese"
+    },
+    "ar": {
+      "status": "planned",
+      "direction": "rtl",
+      "native_name": "العربية",
+      "english_name": "Arabic"
+    },
+    "zh-Hans": {
+      "status": "planned",
+      "direction": "ltr",
+      "native_name": "简体中文",
+      "english_name": "Simplified Chinese"
+    },
+    "hi": {
+      "status": "planned",
+      "direction": "ltr",
+      "native_name": "हिन्दी",
+      "english_name": "Hindi"
+    },
+    "id": {
+      "status": "planned",
+      "direction": "ltr",
+      "native_name": "Bahasa Indonesia",
+      "english_name": "Indonesian"
+    },
+    "ja": {
+      "status": "planned",
+      "direction": "ltr",
+      "native_name": "日本語",
+      "english_name": "Japanese"
+    }
+  },
+  "rollout": {
+    "wave_1": [
+      "es",
+      "fr",
+      "pt-BR",
+      "ar"
+    ],
+    "wave_2": [
+      "zh-Hans",
+      "hi",
+      "id",
+      "ja"
+    ],
+    "promotion_is_evidence_bound": true,
+    "wave_order_may_follow_observed_demand": true,
+    "planned_locales_must_not_be_selectable": true
+  },
+  "release_gate": {
+    "required_surfaces": [
+      "globe",
+      "text",
+      "method",
+      "proposal",
+      "runtime_labels",
+      "catalog_localization",
+      "metadata_and_navigation"
+    ],
+    "translation_coverage_ratio": 1.0,
+    "untranslated_ui_markers_max": 0,
+    "missing_runtime_keys_max": 0,
+    "machine_translation_only_forbidden": true,
+    "independent_language_review_required": true,
+    "keyboard_and_screen_reader_review_required": true,
+    "browser_smoke_required": true,
+    "state_preservation_smoke_required": true,
+    "directional_layout_review_for": [
+      "rtl"
+    ],
+    "production_activation_requires_all_checks": true
+  },
+  "non_goals": [
+    "Inferring language from IP address or physical location",
+    "Publishing partially translated interface locales",
+    "Restricting catalog content languages to released interface locales",
+    "Treating machine translation as final editorial review"
+  ]
+}
