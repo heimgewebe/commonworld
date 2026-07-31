@@ -286,6 +286,25 @@ async function loadExpectedDigitalProjection() {
   }]));
   const localizedRecords = localizeCatalogRecords(records, 'en').records;
   const titleById = Object.fromEntries(localizedRecords.map(({ id, title }) => [id, title]));
+  const compareExpectedTitles = (left, right) => String(left?.title ?? '').localeCompare(String(right?.title ?? ''), 'en', { sensitivity: 'base' })
+    || String(left?.id ?? '').localeCompare(String(right?.id ?? ''));
+  const firstExpectedId = (dateField = null) => {
+    const latest = dateField
+      ? localizedRecords.reduce((current, record) => {
+        const value = String(record?.curation?.[dateField] ?? '');
+        return value > current ? value : current;
+      }, '')
+      : null;
+    const candidates = dateField
+      ? localizedRecords.filter((record) => String(record?.curation?.[dateField] ?? '') === latest)
+      : localizedRecords;
+    return [...candidates].sort(compareExpectedTitles)[0]?.id ?? null;
+  };
+  const firstIdsBySort = Object.freeze({
+    catalogued: firstExpectedId('catalogued_at'),
+    reviewed: firstExpectedId('reviewed_at'),
+    title: firstExpectedId(),
+  });
   const fields = DIGITAL_RING_FIELDS.map((field) => {
     const pathKey = serializeDigitalPath(field.path);
     const node = tree.nodesByPath.get(pathKey);
@@ -304,6 +323,7 @@ async function loadExpectedDigitalProjection() {
   return {
     allIds,
     titleById,
+    firstIdsBySort,
     catalogIds,
     contributionIds,
     communityNetworkIds,
@@ -2062,14 +2082,14 @@ async function intentSearchDiscoveryScenario() {
   const firstResultId = () => run.page.locator('.discovery-result').first().getAttribute('data-commonproject-id');
   assert((await firstResultId()) === expectedDigitalProjection.catalogIds[0], 'result sorting: automatic source order changed without query or location');
   await run.page.locator('#discovery-sort').selectOption('catalogued');
-  await run.page.waitForFunction(() => new URL(location.href).searchParams.get('sort') === 'catalogued' && document.querySelector('.discovery-result')?.dataset.commonprojectId === 'cooperation-jackson');
-  assert((await firstResultId()) === 'cooperation-jackson', 'result sorting: new-to-catalogue did not place the newest alphabetical tie-break first');
+  await run.page.waitForFunction((firstId) => new URL(location.href).searchParams.get('sort') === 'catalogued' && document.querySelector('.discovery-result')?.dataset.commonprojectId === firstId, expectedDigitalProjection.firstIdsBySort.catalogued);
+  assert((await firstResultId()) === expectedDigitalProjection.firstIdsBySort.catalogued, 'result sorting: new-to-catalogue differs from the canonical date and locale-aware title order');
   await run.page.locator('#discovery-sort').selectOption('reviewed');
-  await run.page.waitForFunction(() => new URL(location.href).searchParams.get('sort') === 'reviewed' && document.querySelector('.discovery-result')?.dataset.commonprojectId === 'cooperation-jackson');
-  assert((await firstResultId()) === 'cooperation-jackson', 'result sorting: recently reviewed did not use editorial review date');
+  await run.page.waitForFunction((firstId) => new URL(location.href).searchParams.get('sort') === 'reviewed' && document.querySelector('.discovery-result')?.dataset.commonprojectId === firstId, expectedDigitalProjection.firstIdsBySort.reviewed);
+  assert((await firstResultId()) === expectedDigitalProjection.firstIdsBySort.reviewed, 'result sorting: recently reviewed differs from the canonical review-date order');
   await run.page.locator('#discovery-sort').selectOption('title');
-  await run.page.waitForFunction(() => new URL(location.href).searchParams.get('sort') === 'title' && document.querySelector('.discovery-result')?.dataset.commonprojectId === 'aflaj-irrigation-systems-oman');
-  assert((await firstResultId()) === 'aflaj-irrigation-systems-oman', 'result sorting: title order is not locale-aware A-Z');
+  await run.page.waitForFunction((firstId) => new URL(location.href).searchParams.get('sort') === 'title' && document.querySelector('.discovery-result')?.dataset.commonprojectId === firstId, expectedDigitalProjection.firstIdsBySort.title);
+  assert((await firstResultId()) === expectedDigitalProjection.firstIdsBySort.title, 'result sorting: title order differs from the canonical locale-aware A-Z order');
   await run.page.locator('#discovery-sort').selectOption('auto');
   await run.page.waitForFunction((firstId) => !new URL(location.href).searchParams.has('sort') && document.querySelector('.discovery-result')?.dataset.commonprojectId === firstId, expectedDigitalProjection.catalogIds[0]);
   assert((await firstResultId()) === expectedDigitalProjection.catalogIds[0], 'result sorting: automatic mode did not restore stable source order');
