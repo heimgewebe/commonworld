@@ -158,6 +158,34 @@ class CommonsAdmissionValidationTests(unittest.TestCase):
             )
         )
 
+    def test_needs_information_requires_an_unresolved_dimension(self) -> None:
+        project = self.project("unclear-common", state="candidate")
+        basis = self.basis("unclear-common")
+        basis["classification"] = "undetermined"
+        basis["decision"] = "needs_information"
+        self.write_case([project], [basis])
+        errors = validate(self.root, today=date(2026, 7, 31))
+        self.assertTrue(
+            any(
+                "needs_information requires at least one partial or unknown dimension" in error
+                for error in errors
+            )
+        )
+
+    def test_reject_requires_an_unsupported_dimension(self) -> None:
+        project = self.project("rejected-common", state="archived")
+        basis = self.basis("rejected-common")
+        basis["classification"] = "undetermined"
+        basis["decision"] = "reject"
+        self.write_case([project], [basis])
+        errors = validate(self.root, today=date(2026, 7, 31))
+        self.assertTrue(
+            any(
+                "reject requires at least one unsupported dimension" in error
+                for error in errors
+            )
+        )
+
     def test_supported_dimension_requires_at_least_one_source(self) -> None:
         project = self.project("new-common")
         basis = self.basis("new-common")
