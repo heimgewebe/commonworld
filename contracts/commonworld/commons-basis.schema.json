@@ -34,7 +34,8 @@
       "type": "string",
       "enum": [
         "common",
-        "commons-infrastructure"
+        "commons-infrastructure",
+        "undetermined"
       ]
     },
     "decision": {
@@ -101,6 +102,30 @@
       "maxLength": 1000
     }
   },
+  "allOf": [
+    {
+      "if": {
+        "properties": {
+          "decision": {
+            "const": "include"
+          }
+        },
+        "required": [
+          "decision"
+        ]
+      },
+      "then": {
+        "properties": {
+          "classification": {
+            "enum": [
+              "common",
+              "commons-infrastructure"
+            ]
+          }
+        }
+      }
+    }
+  ],
   "$defs": {
     "criterion": {
       "type": "object",
