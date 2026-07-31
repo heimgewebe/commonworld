@@ -69,7 +69,9 @@
   ],
   "decision_rules": {
     "include_requires_all_dimensions_supported": true,
+    "include_requires_common_or_commons_infrastructure_classification": true,
     "partial_or_unknown_dimension_requires_needs_information_or_rejection": true,
+    "non_include_may_use_undetermined_classification": true,
     "centralized_elements_must_be_disclosed_but_are_not_automatic_exclusion": true,
     "candidate_is_review_status_not_classification": true,
     "local_instance_is_separate_common_only_when_separately_supported": true
