@@ -82,7 +82,8 @@ jobs:
           set -o pipefail
           make validate | tee /tmp/commonworld-make-validate.log
           npm run smoke:browser | tee /tmp/commonworld-browser-smoke.log
-          python3 /tmp/refresh_commons_catalog_evidence.py --mark-validation-pass
+          COMMONWORLD_ROOT="$GITHUB_WORKSPACE" \
+            python3 /tmp/refresh_commons_catalog_evidence.py --mark-validation-pass
           python3 scripts/validate_catalog_delivery_budget.py \
             --smoke-result /tmp/commonworld-commons-smoke.json
       - name: Commit materialized runtime
