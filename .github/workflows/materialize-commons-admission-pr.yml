@@ -46,11 +46,9 @@ jobs:
         run: npx playwright install --with-deps chromium
       - name: Build deterministic public runtime from final state
         run: npm run build
-      - name: Measure exact 78-record public surface
+      - name: Measure isolated public surface
         run: |
           set -o pipefail
-          node scripts/smoke_public_browser.mjs \
-            --result /tmp/commonworld-commons-smoke.json
           node scripts/measure_catalog_delivery_browser.mjs \
             --output /tmp/commonworld-commons-browser-attempt-1.json \
             | tee /tmp/commonworld-commons-browser-attempt-1.log
@@ -98,6 +96,10 @@ jobs:
             /tmp/commonworld-commons-browser-attempt-2.json
           if-no-files-found: ignore
           retention-days: 30
+      - name: Run complete public browser smoke
+        run: |
+          node scripts/smoke_public_browser.mjs \
+            --result /tmp/commonworld-commons-smoke.json
       - name: Refresh source-bound benchmark evidence
         run: |
           cp scripts/refresh_commons_catalog_evidence.py /tmp/refresh_commons_catalog_evidence.py
