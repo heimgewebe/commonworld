@@ -76,6 +76,10 @@ function metricMap(metrics) {
   return Object.fromEntries(metrics.metrics.map(({ name, value }) => [name, value]));
 }
 
+function roundedMilliseconds(metrics, field) {
+  return Math.round((metrics[field] ?? 0) * 1000 * 100) / 100;
+}
+
 async function measureProfile(profile) {
   // Each profile gets a fresh browser process. A shared process leaked renderer,
   // cache and garbage-collection state across otherwise independent profiles and
@@ -110,14 +114,27 @@ async function measureProfile(profile) {
     await page.goto(baseUrl, { waitUntil: 'load', timeout: 30_000 });
     await page.waitForFunction(() => document.documentElement.classList.contains('runtime-ready'), null, { timeout: 30_000 });
     const runtimeReadyMs = Date.now() - startedAt;
+
+    // The release gate is explicitly a startup gate. Capture cumulative CPU work
+    // at runtime-ready before provider fallback observation and request inventory
+    // stabilization can add unrelated steady-state or degraded-provider work.
+    const startupPerformanceMetrics = metricMap(await cdp.send('Performance.getMetrics'));
+    const postReadyStartedAt = Date.now();
     try {
       await page.waitForLoadState('networkidle', { timeout: 10_000 });
     } catch {
-      // The provider fallback may keep browser-level work alive; local requests are still recorded.
+      // Provider fallback may keep browser work alive. Preserve this work below as
+      // a separate post-ready diagnostic instead of misreporting it as startup CPU.
     }
     await page.waitForTimeout(750);
+    const postReadyObservationMs = Date.now() - postReadyStartedAt;
+    const observedPerformanceMetrics = metricMap(await cdp.send('Performance.getMetrics'));
 
-    const performanceMetrics = metricMap(await cdp.send('Performance.getMetrics'));
+    const startupScriptDurationMs = roundedMilliseconds(startupPerformanceMetrics, 'ScriptDuration');
+    const startupTaskDurationMs = roundedMilliseconds(startupPerformanceMetrics, 'TaskDuration');
+    const observedScriptDurationMs = roundedMilliseconds(observedPerformanceMetrics, 'ScriptDuration');
+    const observedTaskDurationMs = roundedMilliseconds(observedPerformanceMetrics, 'TaskDuration');
+
     const pageMetrics = await page.evaluate(() => {
       const navigation = performance.getEntriesByType('navigation')[0];
       return {
@@ -167,8 +184,15 @@ async function measureProfile(profile) {
       cpu_throttle_rate: CPU_THROTTLE_RATE,
       runtime_ready_ms: runtimeReadyMs,
       ...pageMetrics,
-      script_duration_ms: Math.round((performanceMetrics.ScriptDuration ?? 0) * 1000 * 100) / 100,
-      task_duration_ms: Math.round((performanceMetrics.TaskDuration ?? 0) * 1000 * 100) / 100,
+      script_duration_ms: startupScriptDurationMs,
+      task_duration_ms: startupTaskDurationMs,
+      duration_scope: 'navigation-start-to-runtime-ready',
+      post_ready_observation_ms: postReadyObservationMs,
+      observed_script_duration_ms: observedScriptDurationMs,
+      observed_task_duration_ms: observedTaskDurationMs,
+      post_ready_script_delta_ms: Math.round((observedScriptDurationMs - startupScriptDurationMs) * 100) / 100,
+      post_ready_task_delta_ms: Math.round((observedTaskDurationMs - startupTaskDurationMs) * 100) / 100,
+      post_ready_scope: 'runtime-ready-through-networkidle-or-10s-timeout-plus-750ms',
       bootstrap_compile: compileSamples,
       first_party_request_count: firstPartyRequests.length,
       first_party_unique_request_count: uniqueRequests.length,
