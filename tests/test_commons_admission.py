@@ -134,6 +134,7 @@ class CommonsAdmissionValidationTests(unittest.TestCase):
     def test_unknown_dimension_may_record_an_honest_empty_source_gap(self) -> None:
         project = self.project("unclear-common", state="candidate")
         basis = self.basis("unclear-common")
+        basis["classification"] = "undetermined"
         basis["decision"] = "needs_information"
         basis["criteria"]["community"] = {
             "status": "unknown",
@@ -142,6 +143,20 @@ class CommonsAdmissionValidationTests(unittest.TestCase):
         }
         self.write_case([project], [basis])
         self.assertEqual(validate(self.root, today=date(2026, 7, 31)), [])
+
+    def test_include_cannot_use_undetermined_classification(self) -> None:
+        project = self.project("new-common")
+        basis = self.basis("new-common")
+        basis["classification"] = "undetermined"
+        self.write_case([project], [basis])
+        errors = validate(self.root, today=date(2026, 7, 31))
+        self.assertTrue(
+            any(
+                "classification" in error
+                and "commons-infrastructure" in error
+                for error in errors
+            )
+        )
 
     def test_supported_dimension_requires_at_least_one_source(self) -> None:
         project = self.project("new-common")
