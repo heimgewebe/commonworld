@@ -131,6 +131,32 @@ class CommonsAdmissionValidationTests(unittest.TestCase):
         errors = validate(self.root, today=date(2026, 7, 31))
         self.assertTrue(any("lacks Commons basis" in error for error in errors))
 
+    def test_unknown_dimension_may_record_an_honest_empty_source_gap(self) -> None:
+        project = self.project("unclear-common", state="candidate")
+        basis = self.basis("unclear-common")
+        basis["decision"] = "needs_information"
+        basis["criteria"]["community"] = {
+            "status": "unknown",
+            "statement": "No primary-near source currently establishes a participating community.",
+            "source_ids": [],
+        }
+        self.write_case([project], [basis])
+        self.assertEqual(validate(self.root, today=date(2026, 7, 31)), [])
+
+    def test_supported_dimension_requires_at_least_one_source(self) -> None:
+        project = self.project("new-common")
+        basis = self.basis("new-common")
+        basis["criteria"]["community"]["source_ids"] = []
+        self.write_case([project], [basis])
+        errors = validate(self.root, today=date(2026, 7, 31))
+        self.assertTrue(
+            any(
+                "criteria.community.source_ids" in error
+                and "non-empty" in error
+                for error in errors
+            )
+        )
+
     def test_legacy_record_is_queued_until_effective_deadline(self) -> None:
         legacy = self.project(
             "legacy-common",
