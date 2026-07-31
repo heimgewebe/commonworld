@@ -76,7 +76,8 @@
   },
   "evidence_policy": {
     "primary_near_sources_preferred": true,
-    "each_dimension_requires_source_ids": true,
+    "supported_or_partial_dimension_requires_source_ids": true,
+    "unknown_dimension_may_record_an_empty_source_list": true,
     "limitations_required_when_material_control_or_commercial_tension_exists": true,
     "basis_schema": "contracts/commonworld/commons-basis.schema.json",
     "basis_index": "catalog/commons-bases/index.json"
