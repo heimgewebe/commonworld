@@ -34,6 +34,9 @@ class CatalogBrowserMeasurementDecisionTests(unittest.TestCase):
         task_duration_ms: float = 1200.0,
     ) -> dict:
         profiles = []
+        script_duration_ms = 500.0
+        observed_script_duration_ms = 800.0
+        observed_task_duration_ms = task_duration_ms + 5000.0
         for name in ("mobile-low-power", "desktop-low-power"):
             profiles.append(
                 {
@@ -44,8 +47,17 @@ class CatalogBrowserMeasurementDecisionTests(unittest.TestCase):
                     "dom_node_count": 1200,
                     "runtime_ready": True,
                     "runtime_failed": False,
-                    "script_duration_ms": 500.0,
+                    "script_duration_ms": script_duration_ms,
                     "task_duration_ms": task_duration_ms,
+                    "duration_scope": "navigation-start-to-runtime-ready",
+                    "post_ready_observation_ms": 10750,
+                    "observed_script_duration_ms": observed_script_duration_ms,
+                    "observed_task_duration_ms": observed_task_duration_ms,
+                    "post_ready_script_delta_ms": 300.0,
+                    "post_ready_task_delta_ms": 5000.0,
+                    "post_ready_scope": (
+                        "runtime-ready-through-networkidle-or-10s-timeout-plus-750ms"
+                    ),
                     "bootstrap_compile": {"p95_ms": 5.0},
                     "first_party_requests": ["/", "/assets/commonworld-app.js"],
                     "first_party_surface_sha256": surface_hash,
@@ -141,6 +153,31 @@ class CatalogBrowserMeasurementDecisionTests(unittest.TestCase):
         self.assertIsNone(evidence)
         self.assertTrue(any("only permitted" in error for error in errors))
 
+    def test_missing_or_manipulated_post_ready_diagnostics_are_rejected(self) -> None:
+        missing = self.measurement()
+        missing["profiles"][0].pop("post_ready_task_delta_ms")
+        evidence, errors = build_decision_evidence(
+            [missing],
+            self.budgets,
+            budget_contract_sha256=self.budget_hash,
+        )
+        self.assertIsNone(evidence)
+        self.assertTrue(
+            any("missing numeric post_ready_task_delta_ms" in error for error in errors)
+        )
+
+        manipulated = self.measurement()
+        manipulated["profiles"][0]["post_ready_task_delta_ms"] = 1.0
+        evidence, errors = build_decision_evidence(
+            [manipulated],
+            self.budgets,
+            budget_contract_sha256=self.budget_hash,
+        )
+        self.assertIsNone(evidence)
+        self.assertTrue(
+            any("post-ready task delta does not match" in error for error in errors)
+        )
+
     def test_manipulated_attempt_or_decision_is_detected(self) -> None:
         evidence = self.build(
             self.measurement(task_duration_ms=3500.0),
@@ -153,6 +190,7 @@ class CatalogBrowserMeasurementDecisionTests(unittest.TestCase):
         self.assertTrue(
             any(
                 "does not match its embedded attempts" in error
+                or "post-ready task delta does not match" in error
                 for error in self.validate(manipulated_attempt)
             )
         )
