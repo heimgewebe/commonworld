@@ -1,0 +1,51 @@
+name: materialize-commons-admission-pr
+
+on:
+  pull_request:
+    branches:
+      - main
+
+permissions:
+  contents: write
+
+jobs:
+  materialize:
+    if: github.head_ref == 'feat/commons-admission-meshtastic-v1'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          ref: feat/commons-admission-meshtastic-v1
+          fetch-depth: 0
+      - uses: actions/setup-python@v7
+        with:
+          python-version: "3.12"
+      - uses: actions/setup-node@v7
+        with:
+          node-version: "22"
+          cache: npm
+      - name: Patch canonical source surfaces
+        run: python3 scripts/materialize_commons_admission.py
+      - name: Install public runtime dependencies
+        run: npm ci --ignore-scripts --no-audit --no-fund
+      - name: Install bounded browser runtime
+        run: npx playwright install --with-deps chromium
+      - name: Build deterministic public runtime
+        run: npm run build
+      - name: Install validation dependencies
+        run: python -m pip install -r requirements-dev.txt
+      - name: Validate complete repository state
+        run: |
+          make validate
+          npm run smoke:browser
+      - name: Commit materialized runtime
+        run: |
+          git config user.name "commonworld-materializer[bot]"
+          git config user.email "commonworld-materializer[bot]@users.noreply.github.com"
+          git add -A
+          if git diff --cached --quiet; then
+            echo "No materialized changes"
+            exit 0
+          fi
+          git commit -m "chore: materialize Commons admission policy"
+          git push origin HEAD:feat/commons-admission-meshtastic-v1
