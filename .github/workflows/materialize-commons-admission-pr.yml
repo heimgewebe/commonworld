@@ -24,14 +24,23 @@ jobs:
         with:
           node-version: "22"
           cache: npm
-      - name: Patch canonical source surfaces
-        run: python3 scripts/materialize_commons_admission.py
+      - name: Patch canonical source surfaces and permanent inventory
+        run: |
+          python3 scripts/materialize_commons_admission.py
+          python3 scripts/patch_commons_canonical_inventory.py
       - name: Install public runtime dependencies
         run: npm ci --ignore-scripts --no-audit --no-fund
       - name: Install bounded browser runtime
         run: npx playwright install --with-deps chromium
       - name: Build deterministic public runtime
         run: npm run build
+      - name: Remove one-shot materialization machinery
+        run: |
+          rm .github/workflows/materialize-commons-admission.yml
+          rm .github/workflows/materialize-commons-admission-pr.yml
+          rm scripts/materialize_commons_admission.py
+          rm scripts/patch_commons_canonical_inventory.py
+          rm catalog/commons-bases/materialize.request.json
       - name: Install validation dependencies
         run: python -m pip install -r requirements-dev.txt
       - name: Validate complete repository state
