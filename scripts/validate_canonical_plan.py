@@ -194,6 +194,7 @@ EXPECTED_SCRIPT_FILES = {
     "validate_digital_sphere.py",
     "validate_digital_sphere_real_surface.py",
     "validate_layered_digital_sphere_proof.py",
+    "validate_locale_release.py",
     "validate_semantic_zoom.py",
     "validate_visual_semantics.py",
 }
@@ -219,6 +220,7 @@ EXPECTED_TEST_FILES = {
     "test_presence_axes.py",
     "test_intent_search_discovery.py",
     "test_i18n.py",
+    "test_locale_release_contract.py",
     "test_public_shell.py",
     "test_renderer_spike.py",
     "test_renderer_selection.py",
