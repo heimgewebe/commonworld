@@ -22,8 +22,23 @@ def main() -> int:
     source = replace_once(source, old_contracts, new_contracts)
     source = replace_once(
         source,
+        '    "measure_catalog_delivery.py",\n',
+        '    "evaluate_catalog_browser_measurements.py",\n    "measure_catalog_delivery.py",\n',
+    )
+    source = replace_once(
+        source,
         '    "validate_contracts.py",\n',
         '    "validate_commons_admission.py",\n    "validate_contracts.py",\n',
+    )
+    source = replace_once(
+        source,
+        '    "validate_catalog_delivery_budget.py",\n',
+        '    "validate_catalog_browser_measurement_decision.py",\n    "validate_catalog_delivery_budget.py",\n',
+    )
+    source = replace_once(
+        source,
+        '    "test_catalog_delivery_budget.py",\n',
+        '    "test_catalog_browser_measurement_decision.py",\n    "test_catalog_delivery_budget.py",\n',
     )
     source = replace_once(
         source,
