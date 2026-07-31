@@ -33,6 +33,21 @@ Die Produktionsarchitektur und der Kartenanbieter sind für diesen begrenzten, k
 
 Die menschlich lesbare Methode, Abdeckungs- und Datenschutzgrenze wird als `method.html` veröffentlicht.
 
+## Commons-Begriff und Aufnahme
+
+Commonworld bleibt offen für physische, digitale, lokale und globale Formen von Commons, verlangt aber eine überprüfbare Begründung. Ein Common ist eine benennbare Ressource, Infrastruktur, Praxis oder Wissensbasis, die von mehreren Menschen gemeinsam genutzt, erhalten oder weiterentwickelt wird und deren Umgang durch gemeinschaftliche Regeln, Rechte oder belastbare Verantwortungspraktiken geprägt ist.
+
+Open Source, Kostenfreiheit, Gemeinnützigkeit, Dezentralität, eine öffentliche API, viele Nutzer oder das Wort „Community“ genügen für sich allein nicht. Maßgeblich sind fünf quellengebundene Dimensionen: gemeinsame Ressource, Gemeinschaft, Commoning-Praxis, Regeln und Verantwortung sowie gemeinsamer Nutzen.
+
+Maschinenlesbare Grundlage:
+
+- [`contracts/commonworld/commons-definition.contract.json`](contracts/commonworld/commons-definition.contract.json)
+- [`contracts/commonworld/commons-basis.schema.json`](contracts/commonworld/commons-basis.schema.json)
+- [`catalog/commons-bases/index.json`](catalog/commons-bases/index.json)
+- [`catalog/commons-bases/retroreview-policy.json`](catalog/commons-bases/retroreview-policy.json)
+
+Seit dem 31. Juli 2026 benötigen neue oder wesentlich neu geprüfte Einträge einen strukturierten Commons-Basisnachweis. Ältere Einträge werden dynamisch bis zu ihrer bestehenden Wiedervorlage rückgeprüft; bereits fällige Altbestände erhalten einmalig eine Migrationsfrist bis zum 31. August 2026. Das Prinzip lautet: offen in den Formen, streng bei der Begründung.
+
 ## Internationalisierung
 
 Englisch ist die öffentliche Standardsprache (`index.html`, `method.html`, `propose.html`). Deutsch bleibt als vollständig statische Alternative über `de.html`, `method.de.html` und `propose.de.html` erreichbar. Der Sprachwechsel funktioniert daher auch ohne JavaScript.

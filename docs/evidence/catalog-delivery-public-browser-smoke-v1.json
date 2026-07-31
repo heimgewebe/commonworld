@@ -9,7 +9,7 @@
       "directGlobeProjection": true,
       "hiddenUntilCalibrated": true,
       "outerHintRemoved": true,
-      "aggregateRingIdentities": 51,
+      "aggregateRingIdentities": 52,
       "configuredRingPreviewLimit": 6,
       "ringPreviewCounts": [
         6,
@@ -91,8 +91,8 @@
     {
       "id": "intent-search-discovery",
       "verdict": "PASS",
-      "indexedRecords": 77,
-      "rankedGermanIntentResults": 42,
+      "indexedRecords": 78,
+      "rankedGermanIntentResults": 43,
       "filters": 7,
       "digitalCoordinateFree": true,
       "spatialNavigation": true
@@ -112,9 +112,9 @@
       "filterButtonWidth": 44,
       "filterButtonHeight": 44,
       "ringAnimationName": "sphere-ring-orbit",
-      "ringTransform": "matrix(0.999999, 0.00150525, -0.00150525, 0.999999, 0, 0)",
-      "ringTextWidth": 671.112548828125,
-      "ringTextHeight": 14.010162353515625,
+      "ringTransform": "matrix(0.999993, 0.00377022, -0.00377022, 0.999993, 0, 0)",
+      "ringTextWidth": 781.6959228515625,
+      "ringTextHeight": 14.946929931640625,
       "ringTextFontSize": 22,
       "primaryRingCount": 3,
       "depthRingCount": 2,
@@ -140,7 +140,7 @@
       "verdict": "PASS",
       "publicFeatures": 130,
       "publicIdentities": 37,
-      "digitalIdentities": 51,
+      "digitalIdentities": 52,
       "unchangedMapUpdatesSkipped": true
     },
     {
@@ -162,7 +162,7 @@
     {
       "id": "layer-journey-moveend-return",
       "verdict": "PASS",
-      "elapsedMs": 1600
+      "elapsedMs": 2590
     },
     {
       "id": "layer-journey-interrupted",
@@ -216,11 +216,11 @@
         "overlapArea": 0,
         "controlGap": 9.1875,
         "layerControl": {
-          "left": 465.0625,
+          "left": 445.765625,
           "top": 70.390625,
           "right": 603.8125,
           "bottom": 114.390625,
-          "width": 138.75,
+          "width": 158.046875,
           "height": 44
         },
         "zoomControl": {
@@ -249,8 +249,8 @@
       "verdict": "PASS",
       "blockedCatalogRequests": 0,
       "observedCatalogRequests": [
-        "/releases/e8f1f7987bf7fd5d8430/catalog/runtime/aggregate.v1.json",
-        "/releases/e8f1f7987bf7fd5d8430/catalog/runtime/manifest.v1.json"
+        "/releases/78c4942a09f2b51e01bc/catalog/runtime/aggregate.v1.json",
+        "/releases/78c4942a09f2b51e01bc/catalog/runtime/manifest.v1.json"
       ]
     },
     {
@@ -272,7 +272,7 @@
       "id": "bootstrap-asset-failure-fallback",
       "verdict": "PASS",
       "blockedBootstrapRequests": 1,
-      "fallbackCatalogCards": 77,
+      "fallbackCatalogCards": 78,
       "hiddenFallbackCatalogCards": 0,
       "neutralRecoveryCopy": true,
       "skipLinkHref": "/#static-catalog-fallback",
@@ -283,7 +283,7 @@
     {
       "id": "post-render-failure-preserves-fallback",
       "verdict": "PASS",
-      "fallbackCatalogCards": 77,
+      "fallbackCatalogCards": 78,
       "hiddenFallbackCatalogCards": 0,
       "skipLinkHref": "/#static-catalog-fallback",
       "skipFocusId": "static-catalog-fallback",
@@ -310,7 +310,7 @@
   "binding": {
     "smoke_script_sha256": "f3b576f51120be32fa0a612fc4d17129d7ffc18fd39a46f4bcc89d38ab1ac4b1",
     "smoke_runner_sha256": "522b99b70b1d0064b1d0a31a3a67fdc9a2e73b7408f37d1a4bb303bc360b7556",
-    "first_party_surface_sha256": "9c65ca10adc0ae8852b6539277f9b935d2e5597d6347f4d99a16826df4ca9ed7",
+    "first_party_surface_sha256": "bedda46030ad568b393bbf088cdf9b42934247477a266e560c77986c905674f0",
     "scenario_ids": [
       "startup-and-ring-orbits",
       "synthetic-cross-ring-collision-accessibility",
@@ -353,8 +353,8 @@
     "smoke_plan_sha256": "6b8749928ead5ef81ee66883e6a2993e756ce083575c3569234bf70526448364"
   },
   "execution": {
-    "result_sha256": "2c9b3b0d7a8647e2c0298f6579218497914ba7ea67a9cddf5843b6006ecb4358",
-    "observed_at": "2026-07-30T19:23:51Z",
-    "transport_note": "Fresh public browser smoke passed all 36 scenarios on release e8f1f7987bf7fd5d8430; evidence is bound to the exact current scripts, ordered scenarios and complete first-party surface."
+    "result_sha256": "e12f0700c692cdb92cc03a1a17a3df6749e75b136cfa327ffa5ee68ac98500bb",
+    "observed_at": "2026-07-31T12:49:05Z",
+    "transport_note": "Fresh public browser smoke passed all 36 scenarios on release 78c4942a09f2b51e01bc; evidence is bound to the exact current scripts, ordered scenarios and complete first-party surface."
   }
 }
