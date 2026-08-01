@@ -89,6 +89,18 @@
     {
       "id": "ar-coordinate-label",
       "value": "الإحداثيات متاحة عند الطلب"
+    },
+    {
+      "id": "pt-br-r-abbreviation",
+      "value": "R. das Flores, 123, Recife"
+    },
+    {
+      "id": "pt-br-av-abbreviation",
+      "value": "Av. Paulista, 45, São Paulo"
+    },
+    {
+      "id": "pt-br-trav-abbreviation",
+      "value": "Trav. da Paz, 7, Salvador"
     }
   ],
   "allowed": [
@@ -155,6 +167,14 @@
     {
       "id": "ar-street-word-without-number",
       "value": "فن الشارع والثقافة العامة في القاهرة"
+    },
+    {
+      "id": "pt-r-abbreviation-without-number",
+      "value": "A rede usa a classificação R. em sua documentação pública."
+    },
+    {
+      "id": "pt-av-abbreviation-without-number",
+      "value": "O projeto atua na Av. cultural da cidade sem publicar endereços."
     }
   ]
 }

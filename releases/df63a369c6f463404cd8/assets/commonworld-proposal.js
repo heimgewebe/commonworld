@@ -6,7 +6,7 @@ const ACTIVE_LOCALE = normalizeKnownLocale(
 );
 let candidateRuntimeMessages = null;
 if (CANDIDATE_LOCALES.includes(ACTIVE_LOCALE)) {
-  const { WAVE1_LOCALE_PACKS } = await import('./commonworld-wave1-locales.mjs?v=fe82403325eb');
+  const { WAVE1_LOCALE_PACKS } = await import('./commonworld-wave1-locales.mjs?v=aa83c07b2f35');
   candidateRuntimeMessages = WAVE1_LOCALE_PACKS[ACTIVE_LOCALE]?.proposal_runtime ?? null;
   if (!candidateRuntimeMessages) throw new Error(`missing proposal runtime locale pack: ${ACTIVE_LOCALE}`);
 }
@@ -45,11 +45,11 @@ const DMS_COORDINATE_PATTERN = /\d{1,3}\s*°\s*\d{1,2}\s*[′']\s*\d{1,2}(?:[.,]
 const WORD = String.raw`[\p{L}\p{M}][\p{L}\p{M}'’.-]*`;
 const HOUSE_NUMBER = String.raw`\p{N}{1,5}[A-Za-z]?(?:[-/]\p{N}{1,5}[A-Za-z]?)?`;
 const ATTACHED_STREET_SUFFIX = String.raw`(?:straße|strasse|weg|gasse|allee|platz)`;
-const STREET_WORD = String.raw`(?:street|road|avenue|boulevard|lane|drive|way|straße|strasse|rue|chemin|place|calle|avenida|plaza|paseo|carretera|camino|via|viale|corso|rua|travessa|praça|praca|estrada|alameda|rodovia|ulica|prospekt|شارع|طريق|جادة|زقاق|ميدان|st\.?|rd\.?|ave\.?|blvd\.?|ln\.?|dr\.?)`;
+const STREET_WORD = String.raw`(?:street|road|avenue|boulevard|lane|drive|way|straße|strasse|rue|chemin|place|calle|avenida|plaza|paseo|carretera|camino|via|viale|corso|rua|r\.|avenida|av\.|avda\.|travessa|trav\.|praça|praca|pça\.|estrada|estr\.|alameda|rodovia|ulica|prospekt|شارع|طريق|جادة|زقاق|ميدان|st\.?|rd\.?|ave\.?|blvd\.?|ln\.?|dr\.?)`;
 const ADDRESS_PATTERNS = Object.freeze([
   new RegExp(String.raw`(?:^|[^\p{L}\p{N}])(?:${WORD}\s+){0,5}${WORD}${ATTACHED_STREET_SUFFIX}\s+${HOUSE_NUMBER}(?=$|[^\p{L}\p{N}])`, 'iu'),
   new RegExp(String.raw`(?:^|[^\p{L}\p{N}])(?:${WORD}\s+){1,5}${STREET_WORD}\s+${HOUSE_NUMBER}(?=$|[^\p{L}\p{N}])`, 'iu'),
-  new RegExp(String.raw`(?:^|[^\p{L}\p{N}])${STREET_WORD}\s+(?:${WORD}\s+){0,4}${WORD}\s+${HOUSE_NUMBER}(?=$|[^\p{L}\p{N}])`, 'iu'),
+  new RegExp(String.raw`(?:^|[^\p{L}\p{N}])${STREET_WORD}\s+(?:${WORD}\s+){0,4}${WORD}(?:\s+|\s*,\s*)${HOUSE_NUMBER}(?=$|[^\p{L}\p{N}])`, 'iu'),
   new RegExp(String.raw`(?:^|[^\p{L}\p{N}])${HOUSE_NUMBER}\s+(?:${WORD}\s+){0,5}${STREET_WORD}(?=$|[^\p{L}\p{N}])`, 'iu'),
   new RegExp(String.raw`(?:^|[^\p{L}\p{N}])${HOUSE_NUMBER}\s+${STREET_WORD}\s+(?:${WORD}\s+){0,4}${WORD}(?=$|[^\p{L}\p{N}])`, 'iu'),
 ]);

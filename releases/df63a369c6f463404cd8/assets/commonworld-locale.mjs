@@ -1,4 +1,5 @@
 import {
+  CANDIDATE_LOCALES,
   DEFAULT_LOCALE,
   LOCALE_REGISTRY,
   RELEASED_LOCALES,
@@ -6,7 +7,7 @@ import {
   documentLocale,
   localeSwitchHref,
   normalizeLocale,
-} from './commonworld-i18n.mjs?v=ff9f3b1c3a1d';
+} from './commonworld-i18n.mjs?v=ad571d099ca0';
 
 export const UI_LOCALE_STORAGE_KEY = 'commonworld.ui-locale';
 export const UI_LOCALE_QUERY_PARAMETER = 'ui_lang';
@@ -175,6 +176,7 @@ function effectiveLanguageLabel(locale, interfaceLocale) {
 
 function reflectLocaleControl(documentRef, choice, locale) {
   const normalizedChoice = normalizeLocalePreference(choice);
+  const interfaceLocale = documentLocale(documentRef);
   for (const link of documentRef.querySelectorAll('[data-locale-choice]')) {
     if (normalizedChoice && link.dataset.localeChoice === normalizedChoice) link.setAttribute('aria-current', 'page');
     else link.removeAttribute('aria-current');
@@ -183,7 +185,9 @@ function reflectLocaleControl(documentRef, choice, locale) {
     control.dataset.effectiveLocale = locale;
   }
   for (const status of documentRef.querySelectorAll('[data-locale-effective]')) {
-    status.textContent = effectiveLanguageLabel(locale, documentLocale(documentRef));
+    if (!CANDIDATE_LOCALES.includes(interfaceLocale)) {
+      status.textContent = effectiveLanguageLabel(locale, interfaceLocale);
+    }
   }
 }
 

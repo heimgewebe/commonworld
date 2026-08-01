@@ -12,7 +12,8 @@ PACK_PATH = ROOT / "assets/locales/wave1-candidates.json"
 CANDIDATES = ("es", "fr", "pt-BR", "ar")
 BIDI_CONTROL_RE = re.compile(r"[\u202a-\u202e\u2066-\u2069]")
 PLACEHOLDER_RE = re.compile(r"\{[^{}]+\}")
-TAG_RE = re.compile(r"</?([A-Za-z][A-Za-z0-9-]*)\b")
+TAG_SEGMENT_RE = re.compile(r"<[^>]*>")
+TAG_NAME_RE = re.compile(r"<\s*(/?)\s*([A-Za-z][A-Za-z0-9-]*)\b")
 CRITICAL_ATTRIBUTES = (
     "href",
     "rel",
@@ -142,6 +143,15 @@ def attribute_values(markup: str, name: str) -> list[str]:
     return re.findall(rf'\b{re.escape(name)}="([^"]*)"', markup)
 
 
+def tag_tokens(markup: str) -> list[tuple[str, str]]:
+    tokens: list[tuple[str, str]] = []
+    for segment in TAG_SEGMENT_RE.findall(markup):
+        match = TAG_NAME_RE.match(segment)
+        if match:
+            tokens.append((match.group(1), match.group(2).lower()))
+    return tokens
+
+
 class LocaleCandidatePackTests(unittest.TestCase):
     def test_js_property_parser_rejects_adversarial_backslash_input(self) -> None:
         self.assertIsNone(parse_js_string_property("0:" + r"\&" * 100_000))
@@ -176,7 +186,7 @@ class LocaleCandidatePackTests(unittest.TestCase):
                     target = pack[section][key]
                     with self.subTest(locale=locale, section=section, key=key):
                         self.assertEqual(PLACEHOLDER_RE.findall(target), PLACEHOLDER_RE.findall(source))
-                        self.assertEqual(TAG_RE.findall(target), TAG_RE.findall(source))
+                        self.assertEqual(tag_tokens(target), tag_tokens(source))
                         for attribute in CRITICAL_ATTRIBUTES:
                             self.assertEqual(
                                 attribute_values(target, attribute),

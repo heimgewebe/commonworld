@@ -200,6 +200,7 @@ try {
         documentWidth: document.documentElement.scrollWidth,
         viewportWidth: document.documentElement.clientWidth,
         englishContentBlocks: document.querySelectorAll('[lang="en"]').length,
+        effectiveLanguage: document.querySelector('[data-locale-effective]')?.textContent?.trim() ?? '',
       }));
       assert(state.lang === candidate.locale, `${pageName}: lang drifted to ${state.lang}`);
       assert(state.dir === candidate.direction, `${pageName}: dir drifted to ${state.dir}`);
@@ -208,6 +209,7 @@ try {
       assert(state.titleCount === 1 && state.documentTitle.trim().length > 0, `${pageName}: candidate title metadata is malformed`);
       assert(state.iconHref.includes('commonworld-mark.svg'), `${pageName}: candidate head swallowed the icon link`);
       assert(state.bannerVisible, `${pageName}: candidate banner is not visible`);
+      assert(state.effectiveLanguage === CANDIDATE_SOURCE.locales[candidate.locale].static.effective_language, `${pageName}: effective-language status drifted: ${state.effectiveLanguage}`);
       const missingMarkers = state.bodyText.match(/\[missing:[^\]]+\]/gu) ?? [];
       assert(missingMarkers.length === 0, `${pageName}: missing translation marker rendered: ${missingMarkers.slice(0, 8).join(' | ')}`);
       assert(state.candidateChoices.length === 0, `${pageName}: candidate locale became selectable`);

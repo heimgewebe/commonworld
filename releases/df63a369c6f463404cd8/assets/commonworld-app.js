@@ -1,6 +1,6 @@
 import { BOOTSTRAP_RECORDS } from './commonworld-bootstrap-catalog.mjs?v=6b2e3dc6ea44';
 import { createCatalogLoadCache, loadCatalogAggregate, loadCatalogDetail, loadCatalogShard, shardKeyForIdentity } from './commonworld-catalog-runtime.mjs?v=836cd2a8f3f9';
-import { actionLabel, documentLocale, localizeCatalogRecords, text as i18nText, themeLabel } from './commonworld-i18n.mjs?v=ff9f3b1c3a1d';
+import { actionLabel, documentLocale, localizeCatalogRecords, text as i18nText, themeLabel } from './commonworld-i18n.mjs?v=ad571d099ca0';
 import {
   COMMONS_TYPE_COLOR_TOKENS,
   COMMONS_TYPE_VALUES,
@@ -56,7 +56,7 @@ import {
   sortRecords,
   stateFromSearch,
   visibleDigitalNodes,
-} from './commonworld-core.mjs?v=5be9e46b3c16';
+} from './commonworld-core.mjs?v=74f9408fb884';
 
 const LOCALE = documentLocale();
 const t = (key, germanFallback, variables = {}) => i18nText(LOCALE, key, germanFallback, variables);

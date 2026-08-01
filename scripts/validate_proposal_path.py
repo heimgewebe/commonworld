@@ -34,11 +34,11 @@ LETTER_OR_MARK = r"(?:[^\W\d_]|[\u0300-\u036f\u1ab0-\u1aff\u1dc0-\u1dff\u20d0-\u
 WORD = rf"{LETTER_OR_MARK}(?:{LETTER_OR_MARK}|['’.-])*"
 HOUSE_NUMBER = r"\d{1,5}[a-z]?(?:[-/]\d{1,5}[a-z]?)?"
 ATTACHED_STREET_SUFFIX = r"(?:straße|strasse|weg|gasse|allee|platz)"
-STREET_WORD = r"(?:street|road|avenue|boulevard|lane|drive|way|straße|strasse|rue|chemin|place|calle|avenida|plaza|paseo|carretera|camino|via|viale|corso|rua|travessa|praça|praca|estrada|alameda|rodovia|ulica|prospekt|شارع|طريق|جادة|زقاق|ميدان|st\.?|rd\.?|ave\.?|blvd\.?|ln\.?|dr\.?)"
+STREET_WORD = r"(?:street|road|avenue|boulevard|lane|drive|way|straße|strasse|rue|chemin|place|calle|avenida|plaza|paseo|carretera|camino|via|viale|corso|rua|r\.|avenida|av\.|avda\.|travessa|trav\.|praça|praca|pça\.|estrada|estr\.|alameda|rodovia|ulica|prospekt|شارع|طريق|جادة|زقاق|ميدان|st\.?|rd\.?|ave\.?|blvd\.?|ln\.?|dr\.?)"
 ADDRESS_PATTERNS = (
     re.compile(rf"(?:^|[^\w])(?:{WORD}\s+){{0,5}}{WORD}{ATTACHED_STREET_SUFFIX}\s+{HOUSE_NUMBER}(?=$|[^\w])", re.I),
     re.compile(rf"(?:^|[^\w])(?:{WORD}\s+){{1,5}}{STREET_WORD}\s+{HOUSE_NUMBER}(?=$|[^\w])", re.I),
-    re.compile(rf"(?:^|[^\w]){STREET_WORD}\s+(?:{WORD}\s+){{0,4}}{WORD}\s+{HOUSE_NUMBER}(?=$|[^\w])", re.I),
+    re.compile(rf"(?:^|[^\w]){STREET_WORD}\s+(?:{WORD}\s+){{0,4}}{WORD}(?:\s+|\s*,\s*){HOUSE_NUMBER}(?=$|[^\w])", re.I),
     re.compile(rf"(?:^|[^\w]){HOUSE_NUMBER}\s+(?:{WORD}\s+){{0,5}}{STREET_WORD}(?=$|[^\w])", re.I),
     re.compile(rf"(?:^|[^\w]){HOUSE_NUMBER}\s+{STREET_WORD}\s+(?:{WORD}\s+){{0,4}}{WORD}(?=$|[^\w])", re.I),
 )

@@ -3,9 +3,9 @@
   <head>
     <meta charset="utf-8" />
     <meta name="commonworld-page" content="es.html" />
-    <meta name="commonworld-page-build" content="87e3dbd999d020e7" />
-    <meta name="commonworld-release" content="435d52b88f06b877bf11" />
-    <base href="/releases/435d52b88f06b877bf11/" />
+    <meta name="commonworld-page-build" content="992cc7beacd973f2" />
+    <meta name="commonworld-release" content="df63a369c6f463404cd8" />
+    <base href="/releases/df63a369c6f463404cd8/" />
     <meta name="robots" content="noindex,nofollow">
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
     <meta name="color-scheme" content="dark" />
@@ -21,8 +21,8 @@
     <link rel="stylesheet" href="./assets/ipad-layout.css?v=739d6b8460d4" />
     <script type="module" src="/assets/commonworld-release-check.js?v=a274ceda64b7"></script>
     <script src="./assets/vendor/maplibre-gl.js?v=45a9b07a9189" defer></script>
-    <script type="module" src="./assets/commonworld-locale.mjs?v=eb4c4e37802b"></script>
-    <script type="module" src="./assets/commonworld-app.js?v=825b2a6844fa"></script>
+    <script type="module" src="./assets/commonworld-locale.mjs?v=a4c197739e47"></script>
+    <script type="module" src="./assets/commonworld-app.js?v=64e21d9011b3"></script>
   </head>
   <body data-presentation="globe">
   <aside class="locale-candidate-banner" role="status" lang="es">Vista previa de traducción. Esta lengua aún no está activada; falta una revisión lingüística independiente.</aside>
@@ -65,18 +65,18 @@
           <fieldset class="filter-group filter-group--location">
             <legend>¿Dónde?</legend>
             <div class="location-filter-layout">
-              <fieldset class="filter-presence-group location-filter-block location-filter-block--presence"><legend>Presencia requerida</legend><div class="filter-presence-options"><label><input type="checkbox" id="filter-presence-geographic" name="presence" value="geographic" data-intent-filter="presence"> En el sitio<label><label><input type="checkbox" id="filter-presence-digital" name="presence" value="digital" data-intent-filter="presence"> Digital<label></div><small class="filter-presence-note">Múltiples características seleccionadas deben estar presentes (AND).</small></fieldset>
+              <fieldset class="filter-presence-group location-filter-block location-filter-block--presence"><legend>Presencia requerida</legend><div class="filter-presence-options"><label><input type="checkbox" id="filter-presence-geographic" name="presence" value="geographic" data-intent-filter="presence"> En el sitio</label><label><input type="checkbox" id="filter-presence-digital" name="presence" value="digital" data-intent-filter="presence"> Digital</label></div><small class="filter-presence-note">Múltiples características seleccionadas deben estar presentes (AND).</small></fieldset>
               <div class="location-filter-block location-filter-block--destination">
                 <h3>Ámbito de ubicación</h3>
                 <div class="spatial-destination-search">
-                  <label for="spatial-destination-search">Buscar lugar o país<label>
+                  <label for="spatial-destination-search">Buscar lugar o país</label>
                   <input id="spatial-destination-search" type="search" inputmode="search" autocomplete="off" placeholder="Lugar, región o país" aria-controls="spatial-destination-results" aria-expanded="false" />
                   <ul id="spatial-destination-results" class="spatial-destination-results" aria-label="Sugerencias de lugares"></ul>
                 </div>
                 <label class="location-country-filter"><span>País</span><select id="filter-country"><option value="">Todos los países</option></select></label>
                 <div class="location-proximity-controls">
                   <label><span>Radio</span><select id="filter-nearby-radius" disabled><option value="">Sin radio</option><option value="5000">5 km</option><option value="25000">25 km</option><option value="100000">100 km</option><option value="500000">500 km</option></select></label>
-                  <button id="use-current-location" class="quiet-button" type="button">Usar mi ubicación<button>
+                  <button id="use-current-location" class="quiet-button" type="button">Usar mi ubicación</button>
                 </div>
                 <p id="geolocation-status" class="geolocation-status" role="status"></p>
                 <p class="spatial-search-note">El país y el radio son excluyentes. El radio se activa solo después de elegir un lugar o ubicación. La búsqueda cubre los lugares y países publicados en Commonworld.</p>
@@ -97,11 +97,11 @@
           <label class="discovery-sort"><span>Ordenar por</span><select id="discovery-sort" aria-describedby="discovery-sort-note"><option value="auto">Recomendado</option><option value="catalogued">Nuevos en el catálogo</option><option value="reviewed">Recientemente revisados</option><option value="title">Nombre A–Z</option></select></label>
           <p id="discovery-sort-note" class="discovery-sort-note">La recomendación se adapta al contexto: búsqueda por relevancia, radio por proximidad, de lo contrario el orden filtrado se retiene.</p>
           <p id="discovery-count" class="discovery-count" role="status">78 Commons</p>
-          <button id="filter-clear" class="quiet-button" type="button">Reiniciar filtros<button>
+          <button id="filter-clear" class="quiet-button" type="button">Reiniciar filtros</button>
         </div>
         <p id="discovery-empty" class="discovery-empty" hidden>No hay Comunes que coincidan con esta búsqueda y combinación de filtros.</p>
         <ol id="discovery-list" class="discovery-list" aria-label="Resultados de búsqueda de Comunes clasificados"></ol>
-        <button id="discovery-show-text" class="quiet-button result-continuation" type="button" hidden>Mostrar todos los resultados en el modo de texto<button>
+        <button id="discovery-show-text" class="quiet-button result-continuation" type="button" hidden>Mostrar todos los resultados en el modo de texto</button>
       </section>
 
       <section id="globe-surface" class="globe-surface" aria-label="Globo digital de Commonworld">
@@ -135,18 +135,18 @@
           <p id="sphere-ring-accessible-summary" class="visually-hidden"></p>
           <div id="layer-stack-visual" class="layer-stack-visual" aria-hidden="true"></div>
 
-          <button id="layer-view-button" class="layer-view-button" type="button" aria-controls="layer-panel" aria-expanded="false">Esfera Digital<button>
+          <button id="layer-view-button" class="layer-view-button" type="button" aria-controls="layer-panel" aria-expanded="false">Esfera Digital</button>
 
           <div id="country-navigation-context" class="country-navigation-context" role="region" aria-label="Contexto de país" hidden>
             <p id="country-navigation-name" class="country-navigation-name"></p>
             <div class="country-navigation-actions">
-              <button id="country-filter-action" class="quiet-button" type="button">Mostrar Comunes en este país<button>
+              <button id="country-filter-action" class="quiet-button" type="button">Mostrar Comunes en este país</button>
               <button id="country-navigation-close" class="icon-button" type="button" aria-label="Cerrar contexto de país">×</button>
             </div>
           </div>
 
           <div class="orientation-bar" aria-label="Orientación del globo">
-            <button id="globe-reset" type="button">Tierra<button>
+            <button id="globe-reset" type="button">Tierra</button>
             <span aria-hidden="true">›</span>
             <span id="semantic-level">Resumen</span>
             <span id="semantic-summary" class="semantic-summary">Muestra de catálogo · cobertura no evaluada</span>
@@ -179,7 +179,7 @@
             <nav id="layer-breadcrumb" class="digital-breadcrumb" aria-label="Ruta digital"></nav>
             <p id="layer-current" class="digital-current" role="status">Esfera Digital de Comunes</p>
             <div id="layer-discovery" class="layer-discovery" hidden>
-              <label for="layer-search">Buscar Comunes en los anillos empaquetados digitales<label>
+              <label for="layer-search">Buscar Comunes en los anillos empaquetados digitales</label>
               <div class="layer-search-field"><span aria-hidden="true">⌕</span><input id="layer-search" type="search" inputmode="search" autocomplete="off" placeholder="Buscar Comunes" /></div>
               <div id="layer-buttons" class="layer-buttons"></div>
             </div>
@@ -202,7 +202,7 @@
         <div class="text-layout">
           <aside class="text-filters" aria-labelledby="text-filter-title">
             <h2 id="text-filter-title">Filtros y anillos empaquetados digitales</h2>
-            <button class="quiet-button text-discovery-open" type="button" data-open-discovery>Abrir filtros de búsqueda<button>
+            <button class="quiet-button text-discovery-open" type="button" data-open-discovery>Abrir filtros de búsqueda</button>
             <nav id="text-layer-breadcrumb" class="digital-breadcrumb" aria-label="Ruta digital en la vista de texto"></nav>
             <p id="text-layer-current" class="digital-current" role="status">Esfera Digital de Comunes</p>
             <div id="text-layer-buttons" class="layer-buttons"></div>
@@ -213,7 +213,7 @@
             <div id="catalog" class="catalog-grid" aria-live="polite">
 
             </div>
-            <button id="text-show-more" class="quiet-button result-continuation" type="button" hidden>Mostrar más Comunes<button>
+            <button id="text-show-more" class="quiet-button result-continuation" type="button" hidden>Mostrar más Comunes</button>
           </div>
         </div>
       </section>
@@ -236,7 +236,7 @@
         <section class="settings-section">
           <h3>Datos y método</h3>
           <ul>
-            <li><a href="./propose.es.html">Proponer un común<a></li>
+            <li><a href="./propose.es.html">Proponer un común</a></li>
             <li><a href="./catalog/catalog.json" type="application/json">Manifiesto del catálogo público</a></li>
             <li><a href="./contracts/commonworld/project.schema.json" type="application/schema+json">Esquema de CommonProject</a></li>
             <li><a href="./method.es.html">Método, cobertura y privacidad</a></li>
@@ -254,7 +254,7 @@
         <p id="focus-selection-status" class="focus-selection-status" role="status" hidden></p>
         <div id="focus-catalog-detail-integrity" class="catalog-detail-integrity" hidden>
           <p id="focus-catalog-detail-status" role="status" aria-live="polite" aria-atomic="true"></p>
-          <button id="focus-catalog-detail-retry" class="quiet-button catalog-detail-retry" type="button" hidden>Verificar nuevamente<button>
+          <button id="focus-catalog-detail-retry" class="quiet-button catalog-detail-retry" type="button" hidden>Verificar nuevamente</button>
         </div>
         <div class="focus-grid">
           <section><h3>Temas</h3><ul id="focus-themes"></ul></section>
