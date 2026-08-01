@@ -6,6 +6,7 @@ from __future__ import annotations
 import argparse
 import concurrent.futures
 import hashlib
+import http.client
 import json
 import os
 import re
@@ -146,7 +147,11 @@ def load_snapshot_inventory(root: Path = ROOT) -> tuple[str, tuple[SnapshotFile,
     return release_id, tuple(inventory)
 
 
-def fetch_bytes(url: str, timeout_seconds: int) -> RawFetch:
+def fetch_bytes(
+    url: str,
+    timeout_seconds: int,
+    opener: Callable[..., object] = urllib.request.urlopen,
+) -> RawFetch:
     request = urllib.request.Request(
         url,
         headers={
@@ -157,7 +162,7 @@ def fetch_bytes(url: str, timeout_seconds: int) -> RawFetch:
         },
     )
     try:
-        with urllib.request.urlopen(
+        with opener(
             request,
             timeout=timeout_seconds,
             context=ssl.create_default_context(),
@@ -172,6 +177,8 @@ def fetch_bytes(url: str, timeout_seconds: int) -> RawFetch:
     except urllib.error.HTTPError as error:
         try:
             body = error.read()
+        except http.client.HTTPException:
+            body = b""
         finally:
             error.close()
         return RawFetch(
@@ -181,7 +188,7 @@ def fetch_bytes(url: str, timeout_seconds: int) -> RawFetch:
             content_type=error.headers.get("content-type", "") if error.headers else "",
             body=body,
         )
-    except (urllib.error.URLError, OSError) as error:
+    except (urllib.error.URLError, http.client.HTTPException, OSError) as error:
         raise RuntimeError(
             f"snapshot fetch failed for {url}: {type(error).__name__}: {error}"
         ) from error
@@ -482,6 +489,36 @@ def run_self_test() -> None:
         )
         assert redirected.verdict == "fail"
         assert any(error.startswith("index.html: redirect=") for error in redirected.errors)
+
+        class TruncatedResponse:
+            status = 200
+            headers = {"content-type": "application/octet-stream"}
+
+            def __enter__(self):
+                return self
+
+            def __exit__(self, exc_type, exc_value, traceback):
+                return False
+
+            def geturl(self) -> str:
+                return "https://commonworld.net/truncated"
+
+            def read(self) -> bytes:
+                raise http.client.IncompleteRead(b"partial", 12)
+
+        def truncated_opener(*args, **kwargs):
+            return TruncatedResponse()
+
+        try:
+            fetch_bytes(
+                "https://commonworld.net/truncated",
+                5,
+                opener=truncated_opener,
+            )
+        except RuntimeError as error:
+            assert "IncompleteRead" in str(error)
+        else:
+            raise AssertionError("truncated HTTP responses must fail through RuntimeError")
 
         snapshot_manifest = snapshot_root / MANIFEST_RELATIVE
         snapshot_manifest.write_text("{}\n", encoding="utf-8")
