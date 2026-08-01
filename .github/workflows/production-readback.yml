@@ -17,8 +17,8 @@ concurrency:
 jobs:
   verify-exact-pages-deployment:
     runs-on: ubuntu-latest
-    # 10 min deployment wait + <=20 min exhaustive retry scan + receipts/security.
-    timeout-minutes: 45
+    # 10 min deployment wait + bounded live checks stay within this contract.
+    timeout-minutes: 30
     steps:
       - name: Check out exact commit
         uses: actions/checkout@v7
@@ -67,8 +67,8 @@ jobs:
         run: >-
           python3 .github/production-readback/verify_release_snapshot_live.py
           --url https://commonworld.net/
-          --timeout-seconds 10
-          --retry-delays-seconds 0,30,90
+          --timeout-seconds 5
+          --retry-delays-seconds 0,30,60
           --workers 8
           --receipt artifacts/commonworld-release-snapshot-readback.json
 
