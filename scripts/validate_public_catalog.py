@@ -30,6 +30,10 @@ UNKNOWN_ACTIVITY_DISCLOSURE = "Aktueller Betriebszustand nicht zeitnah verifizie
 PUBLIC_SOURCE_TYPES = {"official-source", "public-registry"}
 ACTION_LINK_TYPES = {"visit", "use", "borrow", "learn", "contribute", "volunteer", "donate", "contact", "replicate"}
 FORBIDDEN_PUBLIC_TEXT = ("reference-only", "test-only", "synthetic", "acceptance-only")
+GENERIC_COMMONS_SUMMARY_PHRASES = {
+    "de": ("gemeinschaftlich entwickelt", "gemeinsam gepflegt"),
+    "en": ("community-driven",),
+}
 CARD_PATTERN = re.compile(
     r'<article class="catalog-card"[^>]*data-commonproject-id="([a-z][a-z0-9-]{2,95})"[^>]*>(.*?)</article>',
     re.DOTALL,
@@ -108,6 +112,19 @@ def _parse_date(value: object) -> date | None:
         return date.fromisoformat(value)
     except ValueError:
         return None
+
+
+def _summary_specificity_errors(record: dict, locale: str) -> list[str]:
+    identifier = record.get("id", "unknown")
+    summary = record.get("summary")
+    if not isinstance(summary, str):
+        return []
+    folded_summary = summary.casefold()
+    return [
+        f"public catalog project {identifier} {locale} summary repeats generic Commons framing: {phrase}"
+        for phrase in GENERIC_COMMONS_SUMMARY_PHRASES.get(locale, ())
+        if phrase in folded_summary
+    ]
 
 
 def validate_public_catalog(root: Path = ROOT) -> list[str]:
@@ -356,6 +373,8 @@ def validate_public_catalog(root: Path = ROOT) -> list[str]:
         if homepage is None or not _is_https_url(homepage):
             errors.append(f"public catalog project {relative.name} must have exactly one HTTPS homepage")
 
+        errors.extend(_summary_specificity_errors(record, "de"))
+
         searchable_text = json.dumps(record, ensure_ascii=False).casefold()
         for forbidden in FORBIDDEN_PUBLIC_TEXT:
             if forbidden in searchable_text:
@@ -386,6 +405,9 @@ def validate_public_catalog(root: Path = ROOT) -> list[str]:
         english_records = localize_records(records, "en", root)
     except ValueError:
         english_records = records
+
+    for record in english_records:
+        errors.extend(_summary_specificity_errors(record, "en"))
 
     projections = [("en", english_shell, english_records)]
     if german_shell is not None:
