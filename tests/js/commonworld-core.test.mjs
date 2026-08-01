@@ -1557,6 +1557,19 @@ test('semantic zoom remains presentation logic from planet to focus', () => {
     crumbs: ['Erde', 'Commons', 'Freifunk Hamburg'],
     summary: 'Vor Ort · Digital · 1 öffentlicher Ort · 1 verborgener Ort',
   });
+  const candidateRecord = { ...presenceAxisRecords[2], title: 'Freifunk Hamburg', _content_locale: 'en' };
+  assert.deepEqual(semanticLocationLine({
+    zoom: 1.15,
+    records: [candidateRecord],
+    selectedProjectId: 'freifunk-hamburg',
+    locale: 'ar',
+  }), {
+    level: 'focus',
+    crumbs: ['الأرض', 'Commons', 'Freifunk Hamburg'],
+    contentCrumbIndex: 2,
+    contentLocale: 'en',
+    summary: 'في الموقع + رقمي · موقع عام واحد · موقع مخفي واحد',
+  });
 });
 
 test('candidate runtime labels use candidate UI vocabulary over English catalog content', () => {

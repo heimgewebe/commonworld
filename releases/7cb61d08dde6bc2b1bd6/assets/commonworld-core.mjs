@@ -2572,9 +2572,13 @@ export function semanticLocationLine({
     : null;
   const level = semanticZoomLevel(zoom, selected?.id ?? null);
   if (selected) {
+    const contentLocale = typeof selected._content_locale === 'string' && selected._content_locale.trim()
+      ? selected._content_locale
+      : null;
     return {
       level,
       crumbs: [localizedValue(locale, 'earth', 'Erde'), 'Commons', selected.title ?? selected.id],
+      ...(contentLocale ? { contentCrumbIndex: 2, contentLocale } : {}),
       summary: focusSpatialSummary(selected, locale),
     };
   }

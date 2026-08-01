@@ -27,14 +27,14 @@ REJECTION_CODES = {
 }
 EXPECTED_STATUSES = {"submitted", "needs_information", "under_review", "accepted", "rejected", "withdrawn", "published", "superseded"}
 SENSITIVE_CONTEXT_PATTERN = re.compile(r"(?:^|[^\w])(?:latitude|longitude|coordinates?|coordonnées?|coordenadas?|gps|الإحداثيات|احداثيات|خط\s+العرض|خط\s+الطول)(?=$|[^\w])", re.I)
-DECIMAL_POINT_COORDINATE_PATTERN = re.compile(r"(?:^|[^\d])[-+]?\d{1,3}\.\d{3,}\s*[,;/ ]\s*[-+]?\d{1,3}\.\d{3,}(?:[^\d]|$)")
-DECIMAL_COMMA_COORDINATE_PATTERN = re.compile(r"(?:^|[^\d])[-+]?\d{1,3},\d{3,}\s*[;/]\s*[-+]?\d{1,3},\d{3,}(?:[^\d]|$)")
-DMS_COORDINATE_PATTERN = re.compile(r"\d{1,3}\s*°\s*\d{1,2}\s*[′']\s*\d{1,2}(?:[.,]\d+)?\s*(?:[″\"]|[′']{2})\s*[NS](?:\s*[,;]\s*|\s+)\d{1,3}\s*°\s*\d{1,2}\s*[′']\s*\d{1,2}(?:[.,]\d+)?\s*(?:[″\"]|[′']{2})\s*[EW]", re.I)
+# Python's Unicode regex mode makes \d cover every Unicode decimal digit.
+# Keep the reusable atom explicit so coordinate and address checks remain in parity with JS \p{Nd}.
+UNICODE_DECIMAL_DIGIT = r"(?u:\d)"
+DECIMAL_POINT_COORDINATE_PATTERN = re.compile(rf"(?:^|[^\d])[-+]?{UNICODE_DECIMAL_DIGIT}{{1,3}}[.\u066B]{UNICODE_DECIMAL_DIGIT}{{3,}}\s*[,،;/ ]\s*[-+]?{UNICODE_DECIMAL_DIGIT}{{1,3}}[.\u066B]{UNICODE_DECIMAL_DIGIT}{{3,}}(?:[^\d]|$)")
+DECIMAL_COMMA_COORDINATE_PATTERN = re.compile(rf"(?:^|[^\d])[-+]?{UNICODE_DECIMAL_DIGIT}{{1,3}},{UNICODE_DECIMAL_DIGIT}{{3,}}\s*[;/،]\s*[-+]?{UNICODE_DECIMAL_DIGIT}{{1,3}},{UNICODE_DECIMAL_DIGIT}{{3,}}(?:[^\d]|$)")
+DMS_COORDINATE_PATTERN = re.compile(rf"{UNICODE_DECIMAL_DIGIT}{{1,3}}\s*°\s*{UNICODE_DECIMAL_DIGIT}{{1,2}}\s*[′']\s*{UNICODE_DECIMAL_DIGIT}{{1,2}}(?:[.,\u066B]{UNICODE_DECIMAL_DIGIT}+)?\s*(?:[″\"]|[′']{{2}})\s*[NS](?:\s*[,،;]\s*|\s+){UNICODE_DECIMAL_DIGIT}{{1,3}}\s*°\s*{UNICODE_DECIMAL_DIGIT}{{1,2}}\s*[′']\s*{UNICODE_DECIMAL_DIGIT}{{1,2}}(?:[.,\u066B]{UNICODE_DECIMAL_DIGIT}+)?\s*(?:[″\"]|[′']{{2}})\s*[EW]", re.I)
 LETTER_OR_MARK = r"(?:[^\W\d_]|[\u0300-\u036f\u1ab0-\u1aff\u1dc0-\u1dff\u20d0-\u20ff\ufe20-\ufe2f])"
 WORD = rf"{LETTER_OR_MARK}(?:{LETTER_OR_MARK}|['’.-])*"
-# Python's Unicode regex mode makes \d cover every Unicode decimal digit.
-# Keep that mode explicit so future flags cannot silently narrow parity with JS \p{Nd}.
-UNICODE_DECIMAL_DIGIT = r"(?u:\d)"
 HOUSE_NUMBER = rf"{UNICODE_DECIMAL_DIGIT}{{1,5}}[a-z]?(?:[-/]{UNICODE_DECIMAL_DIGIT}{{1,5}}[a-z]?)?"
 ATTACHED_STREET_SUFFIX = r"(?:straße|strasse|weg|gasse|allee|platz)"
 STREET_WORD = r"(?:street|road|avenue|boulevard|lane|drive|way|straße|strasse|rue|chemin|place|bd\.?|calle|c/|c\.|avenida|plaza|paseo|carretera|camino|via|viale|corso|rua|r\.|avenida|av\.|avda\.|travessa|trav\.|praça|praca|pça\.|estrada|estr\.|alameda|rodovia|ulica|prospekt|شارع|طريق|جادة|زقاق|ميدان|st\.?|rd\.?|ave\.?|blvd\.?|ln\.?|dr\.?)"

@@ -70,6 +70,21 @@ class PublicShellTests(unittest.TestCase):
     def test_public_shell_validates(self) -> None:
         self.assertEqual([], validate_public_shell(ROOT))
 
+    def test_locale_index_brand_resets_within_the_current_surface(self) -> None:
+        expected = {
+            "en": "./",
+            "de": "./de.html",
+            "es": "./es.html",
+            "fr": "./fr.html",
+            "pt-BR": "./pt-BR.html",
+            "ar": "./ar.html",
+        }
+        for locale, href in expected.items():
+            with self.subTest(locale=locale):
+                markup = render_shell(locale=locale)
+                self.assertIn(f'<a class="brand" href="{href}"', markup)
+                self.assertIn('id="semantic-breadcrumb-accessible" class="visually-hidden"', markup)
+
     def test_catalog_counts_use_build_count_and_locale_noun(self) -> None:
         count = len(load_records(ROOT))
         arabic = render_shell(locale="ar")

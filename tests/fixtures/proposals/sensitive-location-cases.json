@@ -113,6 +113,18 @@
     {
       "id": "es-c-dot-abbreviation",
       "value": "C. Mayor, 12, Madrid"
+    },
+    {
+      "id": "ar-decimal-coordinates-ascii-punctuation",
+      "value": "٢٥.٢٠٤٨, ٥٥.٢٧٠٨"
+    },
+    {
+      "id": "ar-decimal-coordinates-native-punctuation",
+      "value": "٢٥٫٢٠٤٨، ٥٥٫٢٧٠٨"
+    },
+    {
+      "id": "fa-decimal-coordinates-native-punctuation",
+      "value": "۲۵٫۲۰۴۸، ۵۵٫۲۷۰۸"
     }
   ],
   "allowed": [
@@ -199,6 +211,10 @@
     {
       "id": "es-c-dot-without-house-number",
       "value": "La guía usa C. como abreviatura editorial, sin dirección privada."
+    },
+    {
+      "id": "ar-unrelated-numbers",
+      "value": "منذ ٢٠١٢ تعمل ٣٥ مجموعة في ثلاث مناطق."
     }
   ]
 }

@@ -181,6 +181,20 @@ try {
           const focusDigitalText = focusDigital?.textContent ?? '';
           const focusDigitalLang = focusDigital?.getAttribute('lang') ?? '';
           const focusDigitalDir = focusDigital?.getAttribute('dir') ?? '';
+          const semanticLevelNode = document.querySelector('#semantic-level');
+          const semanticBreadcrumbContentNode = document.querySelector('#semantic-breadcrumb-accessible [data-content-language]');
+          const semanticSummaryNode = document.querySelector('#semantic-summary');
+          const semanticBreadcrumbLabelledBy = (semanticSummaryNode?.getAttribute('aria-labelledby') ?? '')
+            .split(/\s+/u)
+            .filter(Boolean);
+          const semanticBreadcrumbLabelsResolve = semanticBreadcrumbLabelledBy.length > 0
+            && semanticBreadcrumbLabelledBy.every((id) => Boolean(document.getElementById(id)));
+          const semanticLevelText = semanticLevelNode?.textContent ?? '';
+          const semanticLevelLang = semanticLevelNode?.getAttribute('lang') ?? '';
+          const semanticLevelDir = semanticLevelNode?.getAttribute('dir') ?? '';
+          const semanticBreadcrumbContentText = semanticBreadcrumbContentNode?.textContent ?? '';
+          const semanticBreadcrumbContentLang = semanticBreadcrumbContentNode?.getAttribute('lang') ?? '';
+          const semanticBreadcrumbContentDir = semanticBreadcrumbContentNode?.getAttribute('dir') ?? '';
           document.querySelector('#focus-close')?.click();
           document.querySelector('#layer-view-button')?.click();
           const layerDeadline = performance.now() + 15_000;
@@ -209,6 +223,13 @@ try {
             focusDigitalText,
             focusDigitalLang,
             focusDigitalDir,
+            semanticLevelText,
+            semanticLevelLang,
+            semanticLevelDir,
+            semanticBreadcrumbContentText,
+            semanticBreadcrumbContentLang,
+            semanticBreadcrumbContentDir,
+            semanticBreadcrumbLabelsResolve,
             sphereNameLangs,
             sphereNameDirs,
             sphereSummaryTitleLangs,
@@ -245,7 +266,8 @@ try {
         viewportWidth: document.documentElement.clientWidth,
         englishContentBlocks: document.querySelectorAll('[lang="en"]').length,
         effectiveLanguage: document.querySelector('[data-locale-effective]')?.textContent?.trim() ?? '',
-        semanticBreadcrumb: document.querySelector('#semantic-summary')?.getAttribute('aria-label') ?? '',
+        semanticBreadcrumb: document.querySelector('#semantic-breadcrumb-accessible')?.textContent ?? '',
+        brandHref: document.querySelector('.brand')?.getAttribute('href') ?? '',
         languageOptions: [...document.querySelectorAll('#filter-language option[value]:not([value=""])')].map((node) => ({
           value: node.value,
           lang: node.getAttribute('lang') ?? '',
@@ -292,6 +314,7 @@ try {
       }
       if (pageName === `${candidate.locale}.html`) {
         const connector = CANDIDATE_SOURCE.locales[candidate.locale].ui.semantic_breadcrumb_connector;
+        assert(state.brandHref === `./${candidate.locale}.html`, `${pageName}: brand reset leaves the candidate surface: ${state.brandHref}`);
         assert(state.semanticBreadcrumb.includes(` ${connector} `), `${pageName}: semantic breadcrumb connector drifted: ${state.semanticBreadcrumb}`);
         assert(!state.semanticBreadcrumb.includes(' nach '), `${pageName}: German semantic breadcrumb connector leaked: ${state.semanticBreadcrumb}`);
       }
@@ -307,6 +330,11 @@ try {
         assert(runtimeCatalogBoundary?.staticTitleDir === 'ltr' && runtimeCatalogBoundary?.staticSummaryDir === 'ltr', `${pageName}: static English content lacks dir=ltr boundaries`);
         assert(runtimeCatalogBoundary?.focusTitleLang === 'en' && runtimeCatalogBoundary?.focusSummaryLang === 'en', `${pageName}: runtime English content lacks lang=en boundaries`);
         assert(runtimeCatalogBoundary?.focusTitleDir === 'ltr' && runtimeCatalogBoundary?.focusSummaryDir === 'ltr', `${pageName}: runtime English content lacks dir=ltr boundaries`);
+        assert(runtimeCatalogBoundary?.semanticLevelText === runtimeCatalogBoundary?.staticTitle, `${pageName}: visible semantic focus crumb lost the selected title`);
+        assert(runtimeCatalogBoundary?.semanticLevelLang === 'en' && runtimeCatalogBoundary?.semanticLevelDir === 'ltr', `${pageName}: visible semantic focus crumb lacks lang=en dir=ltr`);
+        assert(runtimeCatalogBoundary?.semanticBreadcrumbContentText === runtimeCatalogBoundary?.staticTitle, `${pageName}: accessible semantic breadcrumb lost the selected title`);
+        assert(runtimeCatalogBoundary?.semanticBreadcrumbContentLang === 'en' && runtimeCatalogBoundary?.semanticBreadcrumbContentDir === 'ltr', `${pageName}: accessible semantic title crumb lacks lang=en dir=ltr`);
+        assert(runtimeCatalogBoundary?.semanticBreadcrumbLabelsResolve, `${pageName}: semantic breadcrumb aria-labelledby references are incomplete`);
         assert((runtimeCatalogBoundary?.focusLocationItemCount ?? 0) > 0, `${pageName}: expected dual-presence focus fixture has no locations`);
         assert(runtimeCatalogBoundary.focusLocationContentLangs.length === runtimeCatalogBoundary.focusLocationItemCount && runtimeCatalogBoundary.focusLocationContentLangs.every((lang) => lang === 'en'), `${pageName}: focus location content labels lack lang=en boundaries`);
         assert(runtimeCatalogBoundary.focusLocationContentDirs.every((direction) => direction === 'ltr'), `${pageName}: focus location content labels lack dir=ltr boundaries`);

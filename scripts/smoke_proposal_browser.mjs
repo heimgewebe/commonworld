@@ -295,6 +295,31 @@ html { font-size: ${profile.fontScale}% !important; }
 {
   const context = await browser.newContext({ viewport: { width: 1280, height: 900 } });
   const page = await context.newPage();
+  await page.goto(`${baseUrl}/propose.ar.html`, { waitUntil: 'networkidle' });
+  await page.locator('#commons-proposal-form [name="name"]').fill('مشاع اختبار الإحداثيات');
+  await page.locator('#commons-proposal-form [name="description"]').fill('مورد مشترك تديره جماعة محلية وفق قواعد مفتوحة ومصادر رسمية ومسار مشاركة عام موثّق.');
+  await page.locator('#commons-proposal-form [name="official_website"]').fill('https://example.net/commons');
+  await page.locator('#commons-proposal-form [name="commons_type"]').selectOption('other');
+  await page.locator('#commons-proposal-form [name="presence_geographic"]').check();
+  await page.locator('#commons-proposal-form [name="presence_digital"]').check();
+  await page.locator('#commons-proposal-form [name="region"]').fill('٢٥٫٢٠٤٨، ٥٥٫٢٧٠٨');
+  await page.locator('#commons-proposal-form [name="action_url_1"]').fill('https://example.net/commons/about');
+  await page.locator('#commons-proposal-form [name="sources"]').fill('https://example.net/commons/governance');
+  await page.locator('#commons-proposal-form [name="public_issue_acknowledged"]').check();
+  await page.locator('#commons-proposal-form [name="processing_agreed"]').check();
+  await page.locator('#commons-proposal-form [name="no_sensitive_data_confirmed"]').check();
+  await page.locator('#commons-proposal-form').evaluate((form) => form.requestSubmit());
+  const alert = page.getByRole('alert');
+  await alert.waitFor();
+  const nativeCoordinateError = (await alert.textContent()) ?? '';
+  assert(nativeCoordinateError.includes('إحداثيات'), `privacy-native-arabic: native coordinates were not blocked: ${nativeCoordinateError}`);
+  results.push('privacy-native-arabic-coordinates-fail-closed');
+  await context.close();
+}
+
+{
+  const context = await browser.newContext({ viewport: { width: 1280, height: 900 } });
+  const page = await context.newPage();
   await page.goto(`${baseUrl}/propose.html`, { waitUntil: 'networkidle' });
   await fillValid(page, 'No Presence Test');
   await page.getByRole('checkbox', { name: 'On site', exact: true }).uncheck();

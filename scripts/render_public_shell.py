@@ -343,6 +343,7 @@ def render_bootstrap_catalog(records: list[dict]) -> str:
 def render_shell(root: Path = ROOT, locale: str = FALLBACK_LOCALE) -> str:
     normalized = normalize_locale(locale)
     page_name = surface_file(normalized, "index", root)
+    brand_href = "./" if page_name == "index.html" else f"./{page_name}"
     static_skip_href = "/#static-catalog-fallback" if page_name == "index.html" else f"/{page_name}#static-catalog-fallback"
     records = localize_records(load_records(root), locale, root)
     paths = "\n".join(
@@ -378,7 +379,7 @@ def render_shell(root: Path = ROOT, locale: str = FALLBACK_LOCALE) -> str:
     <a id="text-skip-link" class="skip-link" href="{static_skip_href}">Zur Textansicht springen</a>
     <main class="app-shell">
       <header class="topbar">
-        <a class="brand" href="./" aria-label="commonworld – Globus zurücksetzen">
+        <a class="brand" href="{brand_href}" aria-label="commonworld – Globus zurücksetzen">
           <span class="brand-mark" aria-hidden="true"></span>
           <span>commonworld</span>
         </a>
@@ -491,6 +492,7 @@ def render_shell(root: Path = ROOT, locale: str = FALLBACK_LOCALE) -> str:
             <span aria-hidden="true">›</span>
             <span id="semantic-level">Gesamtansicht</span>
             <span id="semantic-summary" class="semantic-summary">Katalogauszug · Abdeckung nicht bewertet</span>
+            <span id="semantic-breadcrumb-accessible" class="visually-hidden"></span>
           </div>
 
           <details class="map-legend">

@@ -58,7 +58,7 @@ import {
   sortRecords,
   stateFromSearch,
   visibleDigitalNodes,
-} from './commonworld-core.mjs?v=01c9ebca65b5';
+} from './commonworld-core.mjs?v=410bcdd670f1';
 
 const LOCALE = documentLocale();
 const DOCUMENT_DIRECTION = documentDirection(LOCALE);
@@ -125,6 +125,7 @@ const elements = {
   globeResults: document.querySelector('#globe-results'),
   semanticLevel: document.querySelector('#semantic-level'),
   semanticSummary: document.querySelector('#semantic-summary'),
+  semanticBreadcrumbAccessible: document.querySelector('#semantic-breadcrumb-accessible'),
   sphere: document.querySelector('#digital-sphere'),
   sphereRings: document.querySelector('#sphere-rings'),
   sphereRingAccessibleSummary: document.querySelector('#sphere-ring-accessible-summary'),
@@ -1537,6 +1538,33 @@ function ensurePublicMapLayers() {
   elements.stage.dataset.publicMapInteractiveLayers = runtime.publicMapInteractiveLayerIds.join(',');
 }
 
+function renderSemanticBreadcrumb(line) {
+  const connector = t('semantic_breadcrumb_connector', 'nach');
+  const nodes = [];
+  const labelledBy = [];
+  line.crumbs.forEach((crumb, index) => {
+    const crumbNode = document.createElement('span');
+    crumbNode.id = `semantic-breadcrumb-crumb-${index}`;
+    crumbNode.textContent = crumb;
+    if (index === line.contentCrumbIndex) {
+      applyContentLanguage(crumbNode, line.contentLocale);
+      crumbNode.dataset.contentLanguage = 'true';
+    }
+    nodes.push(crumbNode);
+    labelledBy.push(crumbNode.id);
+    if (index + 1 < line.crumbs.length) {
+      const connectorNode = document.createElement('span');
+      connectorNode.id = `semantic-breadcrumb-connector-${index}`;
+      connectorNode.textContent = connector;
+      nodes.push(document.createTextNode(' '), connectorNode, document.createTextNode(' '));
+      labelledBy.push(connectorNode.id);
+    }
+  });
+  elements.semanticBreadcrumbAccessible.replaceChildren(...nodes);
+  elements.semanticSummary.removeAttribute('aria-label');
+  elements.semanticSummary.setAttribute('aria-labelledby', labelledBy.join(' '));
+}
+
 function updateSemanticLocationLine() {
   const zoom = runtime.mapReady ? runtime.map.getZoom() : runtime.state.camera.zoom;
   const line = semanticLocationLine({
@@ -1547,11 +1575,16 @@ function updateSemanticLocationLine() {
     locale: LOCALE,
   });
   elements.stage.dataset.semanticLevel = line.level;
+  const finalCrumbIndex = line.crumbs.length - 1;
   elements.semanticLevel.textContent = line.crumbs.at(-1) ?? t('overview', 'Gesamtansicht');
+  applyContentLanguage(
+    elements.semanticLevel,
+    finalCrumbIndex === line.contentCrumbIndex ? line.contentLocale : null,
+  );
   elements.semanticSummary.textContent = line.level === 'focus'
     ? line.summary
     : `${line.summary} · ${t('catalog_coverage_unassessed', 'Katalogabdeckung nicht bewertet')}`;
-  elements.semanticSummary.setAttribute('aria-label', line.crumbs.join(` ${t('semantic_breadcrumb_connector', 'nach')} `));
+  renderSemanticBreadcrumb(line);
 }
 
 function renderLayerButtons(container) {
