@@ -100,15 +100,14 @@ def specificity_errors(
     policies = contract.get("locale_policies")
     policy = policies.get(locale) if isinstance(policies, dict) else None
     if not isinstance(policy, dict):
-        return [
-            f"public catalog project {identifier} locale={locale} lacks a summary specificity policy"
-        ]
+        # Contract validation reports this once at locale level. Avoid one
+        # redundant error per catalogue record.
+        return []
     errors: list[str] = []
     rules = policy.get("rules")
     if not isinstance(rules, list):
-        return [
-            f"public catalog project {identifier} locale={locale} has an invalid summary specificity policy"
-        ]
+        # The structural contract error is authoritative and already exact.
+        return []
     for rule in rules:
         if not isinstance(rule, dict):
             continue

@@ -422,8 +422,10 @@ def validate_public_catalog(root: Path = ROOT) -> list[str]:
                 specificity_errors(record, locale, summary_specificity_contract)
             )
 
-    english_records = localized_records_by_locale.get("en", [])
-    projections = [("en", english_shell, english_records)]
+    projections = []
+    english_records = localized_records_by_locale.get("en")
+    if english_records is not None:
+        projections.append(("en", english_shell, english_records))
     if german_shell is not None:
         projections.append(("de", german_shell, records))
     for locale, shell, projected_records in projections:
