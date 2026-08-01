@@ -9,6 +9,7 @@ on:
 permissions:
   contents: read
   deployments: read
+  statuses: write
 
 concurrency:
   group: commonworld-production-readback-${{ github.sha }}
@@ -17,6 +18,7 @@ concurrency:
 jobs:
   verify-exact-pages-deployment:
     runs-on: ubuntu-latest
+    # 10 min deployment wait + bounded live checks stay within this contract.
     timeout-minutes: 30
     steps:
       - name: Check out exact commit
@@ -35,16 +37,56 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ github.token }}
           COMMONWORLD_PAGES_URL: https://commonworld.net/
+        run: |
+          python3 scripts/verify_pages_deployment.py \
+            --repository "${{ github.repository }}" \
+            --sha "${{ github.sha }}" \
+            --source-ref main \
+            --receipt artifacts/commonworld-pages-production-readback.json \
+            --deployment-timeout-seconds 600 \
+            --deployment-poll-seconds 10 \
+            --live-timeout-seconds 5 \
+            --live-retry-delays-seconds 0,30,90
+          python3 - <<'PY' >> "$GITHUB_OUTPUT"
+          import json
+          from pathlib import Path
+
+          receipt = json.loads(
+              Path("artifacts/commonworld-pages-production-readback.json").read_text(
+                  encoding="utf-8"
+              )
+          )
+          print(f"verdict={receipt['verdict']}")
+          PY
+
+      - name: Verify complete path-keyed release snapshot
+        id: release_snapshot
+        if: steps.readback.outcome == 'success' && steps.readback.outputs.verdict == 'pass'
+        continue-on-error: true
+        env:
+          COMMONWORLD_EXPECTED_SHA: ${{ github.sha }}
         run: >-
-          python3 scripts/verify_pages_deployment.py
-          --repository "${{ github.repository }}"
-          --sha "${{ github.sha }}"
-          --source-ref main
-          --receipt artifacts/commonworld-pages-production-readback.json
-          --deployment-timeout-seconds 600
-          --deployment-poll-seconds 10
-          --live-timeout-seconds 5
-          --live-retry-delays-seconds 0,30,90
+          python3 .github/production-readback/verify_release_snapshot_live.py
+          --url https://commonworld.net/
+          --timeout-seconds 5
+          --retry-delays-seconds 0,30,60
+          --workers 8
+          --receipt artifacts/commonworld-release-snapshot-readback.json
+
+      - name: Recheck main after snapshot mismatch
+        id: snapshot_supersession
+        if: >-
+          always() &&
+          steps.readback.outputs.verdict == 'pass' &&
+          steps.release_snapshot.outcome != 'success'
+        run: |
+          current_sha="$(git ls-remote --exit-code origin refs/heads/main | awk 'NR == 1 { print $1 }')"
+          test -n "$current_sha"
+          if test "$current_sha" != "$GITHUB_SHA"; then
+            echo "superseded=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "superseded=false" >> "$GITHUB_OUTPUT"
+          fi
 
       - name: Verify private vulnerability reporting setting
         id: security_setting
@@ -57,6 +99,7 @@ jobs:
           --receipt artifacts/commonworld-private-vulnerability-reporting.json
 
       - name: Upload Pages production readback receipt
+        id: pages_artifact
         if: always()
         uses: actions/upload-artifact@v7
         with:
@@ -65,7 +108,18 @@ jobs:
           if-no-files-found: error
           retention-days: 30
 
+      - name: Upload complete release snapshot receipt
+        id: snapshot_artifact
+        if: always() && steps.release_snapshot.outcome != 'skipped'
+        uses: actions/upload-artifact@v7
+        with:
+          name: commonworld-release-snapshot-readback-${{ github.sha }}
+          path: artifacts/commonworld-release-snapshot-readback.json
+          if-no-files-found: error
+          retention-days: 30
+
       - name: Upload private reporting readback receipt
+        id: security_artifact
         if: always()
         uses: actions/upload-artifact@v7
         with:
@@ -74,6 +128,56 @@ jobs:
           if-no-files-found: error
           retention-days: 30
 
+      - name: Publish terminal production readback commit status
+        id: commit_status
+        if: always()
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+        run: |
+          python3 .github/production-readback/publish_commit_status.py \
+            --mode final \
+            --repository "${{ github.repository }}" \
+            --sha "${{ github.sha }}" \
+            --run-url "${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}" \
+            --snapshot-receipt artifacts/commonworld-release-snapshot-readback.json \
+            --pages-outcome "${{ steps.readback.outcome }}" \
+            --pages-verdict "${{ steps.readback.outputs.verdict }}" \
+            --snapshot-outcome "${{ steps.release_snapshot.outcome }}" \
+            --snapshot-superseded "${{ steps.snapshot_supersession.outputs.superseded }}" \
+            --security-outcome "${{ steps.security_setting.outcome }}" \
+            --pages-artifact-outcome "${{ steps.pages_artifact.outcome }}" \
+            --snapshot-artifact-outcome "${{ steps.snapshot_artifact.outcome }}" \
+            --security-artifact-outcome "${{ steps.security_artifact.outcome }}" \
+            > "$RUNNER_TEMP/commonworld-production-readback-status.json"
+          cat "$RUNNER_TEMP/commonworld-production-readback-status.json"
+          python3 - <<'PY' >> "$GITHUB_OUTPUT"
+          import json
+          import os
+          from pathlib import Path
+
+          payload = json.loads(
+              (Path(os.environ["RUNNER_TEMP"]) / "commonworld-production-readback-status.json").read_text(
+                  encoding="utf-8"
+              )
+          )
+          state = payload.get("state")
+          if state not in {"success", "failure"}:
+              raise SystemExit(f"unexpected published commit status state: {state!r}")
+          print(f"state={state}")
+          PY
+
       - name: Enforce production readback result
-        if: always() && (steps.readback.outcome != 'success' || steps.security_setting.outcome != 'success')
+        if: >-
+          always() &&
+          (steps.readback.outcome != 'success' ||
+           (steps.readback.outputs.verdict == 'pass' &&
+            steps.release_snapshot.outcome != 'success' &&
+            steps.snapshot_supersession.outputs.superseded != 'true') ||
+           steps.security_setting.outcome != 'success' ||
+           steps.pages_artifact.outcome != 'success' ||
+           (steps.release_snapshot.outcome != 'skipped' &&
+            steps.snapshot_artifact.outcome != 'success') ||
+           steps.security_artifact.outcome != 'success' ||
+           steps.commit_status.outcome != 'success' ||
+           steps.commit_status.outputs.state != 'success')
         run: exit 1
