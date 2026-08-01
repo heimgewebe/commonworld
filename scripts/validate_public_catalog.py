@@ -16,7 +16,13 @@ if str(ROOT) not in sys.path:
     sys.path.insert(0, str(ROOT))
 
 from scripts.render_public_shell import presentation_label, public_locations
-from scripts.commonworld_i18n import localize_records
+from scripts.catalog_summary_specificity import (
+    SummarySpecificityContractError,
+    load_contract as load_summary_specificity_contract,
+    specificity_errors,
+    validate_contract as validate_summary_specificity_contract,
+)
+from scripts.commonworld_i18n import FALLBACK_LOCALE, SUPPORTED_LOCALES, localize_records
 from scripts.digital_taxonomy import derive_project_path, load_taxonomy, path_label
 from scripts.validate_contracts import validation_errors
 
@@ -30,10 +36,6 @@ UNKNOWN_ACTIVITY_DISCLOSURE = "Aktueller Betriebszustand nicht zeitnah verifizie
 PUBLIC_SOURCE_TYPES = {"official-source", "public-registry"}
 ACTION_LINK_TYPES = {"visit", "use", "borrow", "learn", "contribute", "volunteer", "donate", "contact", "replicate"}
 FORBIDDEN_PUBLIC_TEXT = ("reference-only", "test-only", "synthetic", "acceptance-only")
-GENERIC_COMMONS_SUMMARY_PHRASES = {
-    "de": ("gemeinschaftlich entwickelt", "gemeinsam gepflegt"),
-    "en": ("community-driven",),
-}
 CARD_PATTERN = re.compile(
     r'<article class="catalog-card"[^>]*data-commonproject-id="([a-z][a-z0-9-]{2,95})"[^>]*>(.*?)</article>',
     re.DOTALL,
@@ -114,19 +116,6 @@ def _parse_date(value: object) -> date | None:
         return None
 
 
-def _summary_specificity_errors(record: dict, locale: str) -> list[str]:
-    identifier = record.get("id", "unknown")
-    summary = record.get("summary")
-    if not isinstance(summary, str):
-        return []
-    folded_summary = summary.casefold()
-    return [
-        f"public catalog project {identifier} {locale} summary repeats generic Commons framing: {phrase}"
-        for phrase in GENERIC_COMMONS_SUMMARY_PHRASES.get(locale, ())
-        if phrase in folded_summary
-    ]
-
-
 def validate_public_catalog(root: Path = ROOT) -> list[str]:
     errors: list[str] = []
     manifest_path = root / CATALOG_PATH
@@ -148,8 +137,25 @@ def validate_public_catalog(root: Path = ROOT) -> list[str]:
     try:
         manifest = _load_json(manifest_path)
         contract = load_taxonomy(root)
-    except (json.JSONDecodeError, OSError) as error:
+        summary_specificity_contract = load_summary_specificity_contract(root)
+    except (json.JSONDecodeError, OSError, SummarySpecificityContractError) as error:
         return [f"public catalog control file is invalid: {error}"]
+
+    errors.extend(
+        validate_summary_specificity_contract(
+            summary_specificity_contract, SUPPORTED_LOCALES
+        )
+    )
+    canonical_summary_locale = summary_specificity_contract.get("canonical_locale")
+    if canonical_summary_locale != FALLBACK_LOCALE:
+        errors.append(
+            "catalogue summary specificity canonical_locale must match the canonical catalog locale"
+        )
+    summary_locale = (
+        canonical_summary_locale
+        if isinstance(canonical_summary_locale, str) and canonical_summary_locale
+        else FALLBACK_LOCALE
+    )
 
     expected_publication = {
         "public": True,
@@ -373,8 +379,6 @@ def validate_public_catalog(root: Path = ROOT) -> list[str]:
         if homepage is None or not _is_https_url(homepage):
             errors.append(f"public catalog project {relative.name} must have exactly one HTTPS homepage")
 
-        errors.extend(_summary_specificity_errors(record, "de"))
-
         searchable_text = json.dumps(record, ensure_ascii=False).casefold()
         for forbidden in FORBIDDEN_PUBLIC_TEXT:
             if forbidden in searchable_text:
@@ -401,15 +405,27 @@ def validate_public_catalog(root: Path = ROOT) -> list[str]:
 
     english_shell = shell_path.read_text(encoding="utf-8")
     german_shell = german_shell_path.read_text(encoding="utf-8") if german_shell_path.is_file() else None
-    try:
-        english_records = localize_records(records, "en", root)
-    except ValueError:
-        english_records = records
+    localized_records_by_locale = {summary_locale: records}
+    for locale in SUPPORTED_LOCALES:
+        if locale == summary_locale:
+            continue
+        try:
+            localized = localize_records(records, locale, root)
+        except ValueError as error:
+            errors.append(f"locale {locale} catalog projection invalid: {error}")
+            continue
+        localized_records_by_locale[locale] = localized
 
-    for record in english_records:
-        errors.extend(_summary_specificity_errors(record, "en"))
+    for locale, localized_records in localized_records_by_locale.items():
+        for record in localized_records:
+            errors.extend(
+                specificity_errors(record, locale, summary_specificity_contract)
+            )
 
-    projections = [("en", english_shell, english_records)]
+    projections = []
+    english_records = localized_records_by_locale.get("en")
+    if english_records is not None:
+        projections.append(("en", english_shell, english_records))
     if german_shell is not None:
         projections.append(("de", german_shell, records))
     for locale, shell, projected_records in projections:

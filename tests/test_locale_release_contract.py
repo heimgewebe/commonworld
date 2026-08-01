@@ -20,6 +20,21 @@ class LocaleReleaseContractTests(unittest.TestCase):
         errors = validate_contract(contract, ROOT)
         self.assertTrue(any("planned locale es" in error for error in errors))
         self.assertTrue(any("SUPPORTED_LOCALES" in error for error in errors))
+        self.assertIn(
+            "summary specificity policy missing for released locale es",
+            errors,
+        )
+
+    def test_release_gate_requires_locale_specific_summary_policy(self) -> None:
+        contract = copy.deepcopy(self.contract)
+        contract["release_gate"][
+            "catalog_summary_specificity_policy_required"
+        ] = False
+        errors = validate_contract(contract, ROOT)
+        self.assertIn(
+            "release gate must require a locale-aware catalog summary specificity policy",
+            errors,
+        )
 
     def test_location_based_language_inference_is_rejected(self) -> None:
         contract = copy.deepcopy(self.contract)
