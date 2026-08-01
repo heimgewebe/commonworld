@@ -63,14 +63,20 @@ def _rule_matches(
 ) -> list[str]:
     if rule.get("match") != "casefolded_literal":
         return []
-    if (
-        rule.get("allow_when_actor_and_mechanism_are_named") is True
-        and _specific_context_named(summary, policy)
-    ):
-        return []
-    folded = _normalized(summary)
     phrases = rule.get("phrases")
     if not isinstance(phrases, list):
+        return []
+    folded = _normalized(summary)
+    independent_context = folded
+    for phrase in phrases:
+        if isinstance(phrase, str):
+            independent_context = independent_context.replace(
+                _normalized(phrase), " "
+            )
+    if (
+        rule.get("allow_when_actor_and_mechanism_are_named") is True
+        and _specific_context_named(independent_context, policy)
+    ):
         return []
     matched = [
         phrase
@@ -122,7 +128,7 @@ def specificity_errors(
 
 
 def _string_list(value: Any) -> list[str] | None:
-    if not isinstance(value, list) or not all(
+    if not isinstance(value, list) or not value or not all(
         isinstance(item, str) and bool(item.strip()) for item in value
     ):
         return None

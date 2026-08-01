@@ -47,6 +47,55 @@ class CatalogSummarySpecificityTests(unittest.TestCase):
                         [],
                     )
 
+    def test_forbidden_phrase_cannot_supply_its_own_mechanism(self) -> None:
+        cases = (
+            (
+                "en",
+                "A community-maintained knowledge base for communities.",
+                "en-generic-community-maintained",
+            ),
+            (
+                "de",
+                "Eine gemeinschaftlich gepflegte Wissenssammlung für Gemeinschaften.",
+                "de-generic-community-maintained",
+            ),
+        )
+        for locale, summary, rule_id in cases:
+            with self.subTest(locale=locale):
+                errors = specificity_errors(
+                    {"id": "self-exemption-fixture", "summary": summary},
+                    locale,
+                    self.contract,
+                )
+                self.assertEqual(len(errors), 1)
+                self.assertIn(f"rule={rule_id}", errors[0])
+
+    def test_independent_actor_and_mechanism_can_justify_similar_wording(self) -> None:
+        summary = (
+            "A community-maintained package archive whose volunteers publish "
+            "signed security updates through a documented process."
+        )
+        self.assertEqual(
+            specificity_errors(
+                {"id": "independent-context-fixture", "summary": summary},
+                "en",
+                self.contract,
+            ),
+            [],
+        )
+
+    def test_specificity_marker_lists_must_not_be_empty(self) -> None:
+        for marker_kind in ("actor_patterns", "mechanism_patterns"):
+            contract = copy.deepcopy(self.contract)
+            contract["locale_policies"]["en"]["specificity_markers"][
+                marker_kind
+            ] = []
+            with self.subTest(marker_kind=marker_kind):
+                self.assertIn(
+                    f"summary specificity locale en {marker_kind} must be a non-empty string list",
+                    validate_contract(contract, SUPPORTED_LOCALES),
+                )
+
     def test_released_locale_without_policy_fails_closed(self) -> None:
         contract = copy.deepcopy(self.contract)
         del contract["locale_policies"]["en"]
