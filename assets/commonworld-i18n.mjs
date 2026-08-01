@@ -32,7 +32,7 @@ const runtimeDocumentLocale = canonicalLocaleTag(globalThis.document?.documentEl
 const nodeRuntime = typeof process !== 'undefined' && Boolean(process?.versions?.node);
 let WAVE1_LOCALE_PACKS = Object.freeze({});
 if (nodeRuntime || (runtimeDocumentLocale && CANDIDATE_LOCALES.includes(runtimeDocumentLocale))) {
-  ({ WAVE1_LOCALE_PACKS } = await import('./commonworld-wave1-locales.mjs?v=2d4fc19f3f23'));
+  ({ WAVE1_LOCALE_PACKS } = await import('./commonworld-wave1-locales.mjs?v=0fa3212a7d24'));
 }
 
 export function normalizeLocale(value, fallback = DEFAULT_LOCALE) {

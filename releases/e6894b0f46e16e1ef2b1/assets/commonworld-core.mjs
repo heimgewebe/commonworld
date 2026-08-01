@@ -1,4 +1,4 @@
-import { FALLBACK_LOCALE, normalizeLocale, taxonomyLabel, text as i18nText } from './commonworld-i18n.mjs?v=12932532815f';
+import { FALLBACK_LOCALE, normalizeLocale, taxonomyLabel, text as i18nText } from './commonworld-i18n.mjs?v=2bcfb13ba17c';
 
 export const DEFAULT_CAMERA = Object.freeze({
   lng: 8,
@@ -978,6 +978,11 @@ export const INTENT_FILTER_VALUES = Object.freeze({
   freshness: Object.freeze(['current', 'stale', 'unknown']),
   curation: Object.freeze(['listed', 'verified', 'featured', 'unknown']),
 });
+
+export function normalizePresenceFilterValues(value) {
+  const values = Array.isArray(value) ? value : (value ? [value] : []);
+  return [...new Set(values.filter((entry) => INTENT_FILTER_VALUES.presence.includes(entry)))];
+}
 
 const filterParameter = (parameters, name) => {
   const value = parameters.get(name);

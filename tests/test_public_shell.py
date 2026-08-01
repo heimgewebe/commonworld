@@ -6,7 +6,7 @@ import unittest
 from pathlib import Path
 
 from scripts.render_public_shell import (
-    MODULE_IMPORT_DEPENDENCIES, activity_notice, load_records, render_bootstrap_catalog, render_cards, render_shell,
+    LANGUAGE_NATIVE_NAMES, MODULE_IMPORT_DEPENDENCIES, activity_notice, catalog_language_codes, load_records, render_bootstrap_catalog, render_cards, render_shell,
 )
 from scripts.static_surface_parser import (
     find_css_block,
@@ -66,6 +66,26 @@ class PublicShellTests(unittest.TestCase):
 
     def test_public_shell_validates(self) -> None:
         self.assertEqual([], validate_public_shell(ROOT))
+
+    def test_catalog_counts_use_build_count_and_locale_noun(self) -> None:
+        count = len(load_records(ROOT))
+        arabic = render_shell(locale="ar")
+        self.assertIn(f'id="discovery-count" class="discovery-count" role="status">{count} المشاعات</p>', arabic)
+        self.assertIn(f'id="text-count" class="text-count">{count} المشاعات</p>', arabic)
+        self.assertNotIn(f'{count} Commons', arabic)
+
+    def test_language_filter_is_derived_from_catalog_content_languages(self) -> None:
+        codes = catalog_language_codes(load_records(ROOT))
+        self.assertGreater(len(codes), 2)
+        for locale in ("de", "en", "es", "fr", "pt-BR", "ar"):
+            markup = render_shell(locale=locale)
+            match = re.search(r'<select id="filter-language"[^>]*>(.*?)</select>', markup, re.S)
+            self.assertIsNotNone(match, locale)
+            options = re.findall(r'<option value="([^"]*)">(.*?)</option>', match.group(1), re.S)
+            self.assertEqual([value for value, _ in options], ["", *codes, "unknown"], locale)
+            labels = dict(options)
+            for code in codes:
+                self.assertEqual(labels[code], LANGUAGE_NATIVE_NAMES.get(code, code), (locale, code))
 
     def test_filter_layout_renderer_uses_compact_semantic_structure(self) -> None:
         german = render_shell(locale="de")

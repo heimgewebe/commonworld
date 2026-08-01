@@ -110,9 +110,9 @@
       "filterButtonWidth": 44,
       "filterButtonHeight": 44,
       "ringAnimationName": "sphere-ring-orbit",
-      "ringTransform": "matrix(0.999997, 0.00226262, -0.00226262, 0.999997, 0, 0)",
-      "ringTextWidth": 671.1214599609375,
-      "ringTextHeight": 14.518402099609375,
+      "ringTransform": "matrix(1, 0.000750273, -0.000750273, 1, 0, 0)",
+      "ringTextWidth": 671.1033935546875,
+      "ringTextHeight": 13.503509521484375,
       "ringTextFontSize": 22,
       "primaryRingCount": 3,
       "depthRingCount": 2,
@@ -160,7 +160,7 @@
     {
       "id": "layer-journey-moveend-return",
       "verdict": "PASS",
-      "elapsedMs": 1605
+      "elapsedMs": 1689
     },
     {
       "id": "layer-journey-interrupted",
@@ -247,8 +247,8 @@
       "verdict": "PASS",
       "blockedCatalogRequests": 0,
       "observedCatalogRequests": [
-        "/releases/c422a39fa56ce7abe18f/catalog/runtime/aggregate.v1.json",
-        "/releases/c422a39fa56ce7abe18f/catalog/runtime/manifest.v1.json"
+        "/releases/e6894b0f46e16e1ef2b1/catalog/runtime/aggregate.v1.json",
+        "/releases/e6894b0f46e16e1ef2b1/catalog/runtime/manifest.v1.json"
       ]
     },
     {
@@ -308,7 +308,7 @@
   "binding": {
     "smoke_script_sha256": "9671d24e7ab2e235f3e58d77f10fb43c099c6342daefe88b6a36b9287dbe3834",
     "smoke_runner_sha256": "522b99b70b1d0064b1d0a31a3a67fdc9a2e73b7408f37d1a4bb303bc360b7556",
-    "first_party_surface_sha256": "3d79ea9efe8eac4d85b65da199aff59fefcb6c1937486692966cd83c65099d3a",
+    "first_party_surface_sha256": "e911978b503ec121d8bcc8e002c931748f056698b8f9bbfbf997bc8f76368e4d",
     "scenario_ids": [
       "startup-and-ring-orbits",
       "synthetic-cross-ring-collision-accessibility",
@@ -351,8 +351,8 @@
     "smoke_plan_sha256": "11e90aa53237fa2c78518c9f472d3dde41e53e2c2381a7969e96da3546641847"
   },
   "execution": {
-    "result_sha256": "70975e91ee966a92b4e28c8e9410dff3e7d34dbfa6a6e33fc2a65585fa540325",
-    "observed_at": "2026-08-01T15:08:49.101632Z",
-    "transport_note": "Fresh public browser smoke passed all 36 scenarios on release c422a39fa56ce7abe18f; evidence is bound to the exact scripts, ordered scenarios and complete first-party surface."
+    "result_sha256": "3e7bc4bf24dfeee158afc33c3dfb5e1f5a9c235d97be5e5195bd348b5e5fc86f",
+    "observed_at": "2026-08-01T16:20:21.529579Z",
+    "transport_note": "Fresh public browser smoke passed all 36 scenarios on release e6894b0f46e16e1ef2b1; evidence is bound to the exact scripts, ordered scenarios and complete first-party surface."
   }
 }

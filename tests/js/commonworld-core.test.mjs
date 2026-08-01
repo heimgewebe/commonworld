@@ -61,6 +61,7 @@ import {
   sphereRingLabelAssignments,
   sphereRingLabelLength,
   normalizeDigitalPath,
+  normalizePresenceFilterValues,
   ringOrbitDirection,
   ringOrbitDuration,
   ringOrbitStartAngle,
@@ -814,6 +815,12 @@ test('ephemeral nearby origin and radius are never serialized and default to nul
   assert.equal(search.includes('5000'), false);
 });
 
+test('presence filter normalization honors explicit programmatic values', () => {
+  assert.deepEqual(normalizePresenceFilterValues('geographic'), ['geographic']);
+  assert.deepEqual(normalizePresenceFilterValues(['digital', 'geographic', 'digital', 'hybrid']), ['digital', 'geographic']);
+  assert.deepEqual(normalizePresenceFilterValues(null), []);
+});
+
 test('selected presence types compose with strict AND semantics', () => {
   const records = [
     { id: 'geographic', presence: { geographic: [{ id: 'g', mode: 'exact', geometry: { type: 'Point', coordinates: [1, 1] } }], digital: { available: false } } },
@@ -1551,8 +1558,8 @@ test('candidate runtime labels use candidate UI vocabulary over English catalog 
     'Community Hamburg · aproximada, con al menos 5 km de incertidumbre',
     'Private Heimrouter · ubicación oculta',
   ]);
-  assert.equal(commonsTypeLabel('community-network', 'ar'), 'شبكة المجتمع');
-  assert.equal(recordPresentationLabel(presenceAxisRecords[0], 'ar'), 'على الموقع');
+  assert.equal(commonsTypeLabel('community-network', 'ar'), 'شبكة مجتمعية');
+  assert.equal(recordPresentationLabel(presenceAxisRecords[0], 'ar'), 'في الموقع');
 });
 
 test('presentation and location labels explain geographic, digital and dual presence truth', () => {

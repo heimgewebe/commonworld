@@ -1,6 +1,6 @@
 import { BOOTSTRAP_RECORDS } from './commonworld-bootstrap-catalog.mjs?v=cc49548bc45c';
 import { createCatalogLoadCache, loadCatalogAggregate, loadCatalogDetail, loadCatalogShard, shardKeyForIdentity } from './commonworld-catalog-runtime.mjs?v=836cd2a8f3f9';
-import { actionLabel, documentLocale, localizeCatalogRecords, text as i18nText, themeLabel } from './commonworld-i18n.mjs?v=12932532815f';
+import { actionLabel, documentLocale, localizeCatalogRecords, text as i18nText, themeLabel } from './commonworld-i18n.mjs?v=2bcfb13ba17c';
 import {
   COMMONS_TYPE_COLOR_TOKENS,
   COMMONS_TYPE_VALUES,
@@ -23,6 +23,7 @@ import {
   mapCamera,
   mapFailurePolicy,
   normalizeDigitalPath,
+  normalizePresenceFilterValues,
   normalizeQuery,
   normalizeSearchText,
   prepareCatalogProjection,
@@ -56,7 +57,7 @@ import {
   sortRecords,
   stateFromSearch,
   visibleDigitalNodes,
-} from './commonworld-core.mjs?v=35c01fb3a624';
+} from './commonworld-core.mjs?v=f6e0d2ea1d5e';
 
 const LOCALE = documentLocale();
 const t = (key, germanFallback, variables = {}) => i18nText(LOCALE, key, germanFallback, variables);
@@ -1887,6 +1888,12 @@ function updateDiscoverySortNote() {
   elements.discoverySortNote.textContent = t(key, fallback);
 }
 
+function selectedPresenceFilterValues() {
+  return elements.filterSelects
+    .filter((control) => control.dataset.intentFilter === 'presence' && control.type === 'checkbox' && control.checked)
+    .map((control) => control.value);
+}
+
 function syncIntentFilterControls() {
   for (const control of elements.filterSelects) {
     const value = runtime.state[control.dataset.intentFilter];
@@ -1910,9 +1917,8 @@ function syncIntentFilterControls() {
 
 function setIntentFilter(name, value, { historyMode = 'push' } = {}) {
   if (name === 'presence') {
-    const checkboxes = elements.filterSelects.filter(c => c.dataset.intentFilter === name);
-    const checkedValues = checkboxes.filter(c => c.checked).map(c => c.value);
-    runtime.state[name] = checkedValues.length > 0 ? Object.freeze(checkedValues) : null;
+    const selectedValues = normalizePresenceFilterValues(value);
+    runtime.state[name] = selectedValues.length > 0 ? Object.freeze(selectedValues) : null;
   } else {
     const select = elements.filterSelects.find((candidate) => candidate.dataset.intentFilter === name);
     if (!select) return;
@@ -3557,8 +3563,13 @@ function wireControls() {
   for (const button of elements.discoveryOpenButtons) {
     button.addEventListener('click', () => openDiscovery({ trigger: button }));
   }
-  for (const select of elements.filterSelects) {
-    select.addEventListener('change', () => setIntentFilter(select.dataset.intentFilter, select.value));
+  for (const control of elements.filterSelects) {
+    control.addEventListener('change', () => {
+      const value = control.dataset.intentFilter === 'presence' && control.type === 'checkbox'
+        ? selectedPresenceFilterValues()
+        : control.value;
+      setIntentFilter(control.dataset.intentFilter, value);
+    });
   }
   elements.filterClear.addEventListener('click', () => clearIntentFilters());
   elements.search.addEventListener('input', () => {

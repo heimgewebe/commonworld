@@ -231,6 +231,14 @@ class LocaleCandidatePackTests(unittest.TestCase):
             for value in values.values()
         )
         self.assertRegex(arabic_text, r"[\u0600-\u06ff]")
+        self.assertNotRegex(
+            arabic_text,
+            r"[\u0621-\u063A\u0641-\u064A][A-Za-z]|[A-Za-z][\u0621-\u063A\u0641-\u064A]",
+            "Arabic candidate contains a glued Arabic/Latin machine-translation fragment",
+        )
+        self.assertNotRegex(arabic_text, r"\bCommons\b", "Arabic candidate contains raw English Commons terminology")
+        for legacy_term in ("الكامونز", "الكومنز", "الكامنز", "القirculars"):
+            self.assertNotIn(legacy_term, arabic_text)
 
     def test_candidate_packs_reject_unexpected_script_contamination(self) -> None:
         forbidden_for_latin = (

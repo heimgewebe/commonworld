@@ -27,6 +27,53 @@ from scripts.public_cache import asset_version, stamp_page_build
 ACTION_LINK_TYPES = {"visit", "use", "borrow", "learn", "contribute", "volunteer", "donate", "contact", "replicate"}
 TAXONOMY = load_taxonomy(ROOT)
 
+LANGUAGE_NATIVE_NAMES = {
+    "ar": "العربية",
+    "ca": "Català",
+    "de": "Deutsch",
+    "el": "Ελληνικά",
+    "en": "English",
+    "es": "Español",
+    "it": "Italiano",
+    "ku": "Kurdî",
+    "ne": "नेपाली",
+    "pt-BR": "Português (Brasil)",
+    "syr": "ܣܘܪܝܝܐ",
+    "zh": "中文",
+}
+LANGUAGE_SELECT_RE = re.compile(r'(<select id="filter-language"[^>]*>)(.*?)(</select>)', re.S)
+LANGUAGE_ALL_OPTION_RE = re.compile(r'<option value="">.*?</option>', re.S)
+LANGUAGE_UNKNOWN_OPTION_RE = re.compile(r'<option value="unknown">.*?</option>', re.S)
+
+
+def catalog_language_codes(records: list[dict]) -> list[str]:
+    codes: set[str] = set()
+    for record in records:
+        languages = record.get("languages")
+        if not isinstance(languages, dict) or not isinstance(languages.get("codes"), list):
+            continue
+        for code in languages["codes"]:
+            if isinstance(code, str) and re.fullmatch(r"[a-z]{2,3}(?:-[A-Z]{2})?", code):
+                codes.add(code)
+    return sorted(codes, key=lambda code: (LANGUAGE_NATIVE_NAMES.get(code, code).casefold(), code))
+
+
+def expand_language_filter_options(markup: str, records: list[dict]) -> str:
+    match = LANGUAGE_SELECT_RE.search(markup)
+    if not match:
+        raise ValueError("rendered shell lacks the language filter select")
+    body = match.group(2)
+    all_option = LANGUAGE_ALL_OPTION_RE.search(body)
+    unknown_option = LANGUAGE_UNKNOWN_OPTION_RE.search(body)
+    if not all_option or not unknown_option:
+        raise ValueError("rendered language filter lacks all/unknown boundary options")
+    language_options = "".join(
+        f'<option value="{html.escape(code, quote=True)}">{html.escape(LANGUAGE_NATIVE_NAMES.get(code, code))}</option>'
+        for code in catalog_language_codes(records)
+    )
+    replacement = f"{match.group(1)}{all_option.group(0)}{language_options}{unknown_option.group(0)}{match.group(3)}"
+    return markup[:match.start()] + replacement + markup[match.end():]
+
 MODULE_IMPORT_DEPENDENCIES = (
     (
         "assets/commonworld-i18n.mjs",
@@ -555,6 +602,9 @@ def render_shell(root: Path = ROOT, locale: str = FALLBACK_LOCALE) -> str:
 </html>
 '''
     markup = translate_shell(markup, locale)
+    commons_noun = interface_static(normalized, "commons", de="Commons", en="Commons", root=root)
+    markup = markup.replace(f'>{len(records)} Commons</p>', f'>{len(records)} {html.escape(commons_noun)}</p>')
+    markup = expand_language_filter_options(markup, records)
     markup = german_surface_links(markup, locale, 'index')
     markup = inject_locale_navigation(markup, locale, 'index')
     return stamp_page_build(markup, page_name)
