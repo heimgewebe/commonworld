@@ -26,6 +26,8 @@ jobs:
         run: |
           npm run build
           git diff --exit-code
+      - name: Self-test complete release snapshot readback
+        run: python3 .github/production-readback/verify_release_snapshot_live.py --self-test
       - name: Install validation dependencies
         run: python -m pip install -r requirements-dev.txt
       - name: Validate canonical globe core
