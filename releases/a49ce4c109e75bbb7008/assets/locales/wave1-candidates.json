@@ -129,7 +129,8 @@
         "public_points_areas_relationships": "puntos públicos, áreas y relaciones",
         "visible_ring_commons_intro": "Commons visibles en los anillos digitales:",
         "show_project_details_short": "Mostrar detalles del proyecto",
-        "open_project_short": "Abrir proyecto"
+        "open_project_short": "Abrir proyecto",
+        "semantic_breadcrumb_connector": "a"
       },
       "themes": {
         "agriculture": "Agricultura",
@@ -737,7 +738,8 @@
         "public_points_areas_relationships": "points publics, zones et relations",
         "visible_ring_commons_intro": "Communs visibles dans les anneaux numériques :",
         "show_project_details_short": "Afficher les détails du projet",
-        "open_project_short": "Ouvrir le projet"
+        "open_project_short": "Ouvrir le projet",
+        "semantic_breadcrumb_connector": "vers"
       },
       "themes": {
         "agriculture": "Agriculture",
@@ -1345,7 +1347,8 @@
         "public_points_areas_relationships": "pontos públicos, áreas e relações",
         "visible_ring_commons_intro": "Comuns visíveis nos anéis digitais:",
         "show_project_details_short": "Mostrar detalhes do projeto",
-        "open_project_short": "Abrir projeto"
+        "open_project_short": "Abrir projeto",
+        "semantic_breadcrumb_connector": "para"
       },
       "themes": {
         "agriculture": "Agricultura",
@@ -1953,7 +1956,8 @@
         "public_points_areas_relationships": "نقاط ومناطق وعلاقات عامة",
         "visible_ring_commons_intro": "المشاعات الظاهرة في الحلقات الرقمية:",
         "show_project_details_short": "عرض تفاصيل المشروع",
-        "open_project_short": "فتح المشروع"
+        "open_project_short": "فتح المشروع",
+        "semantic_breadcrumb_connector": "إلى"
       },
       "themes": {
         "agriculture": "الزراعة",

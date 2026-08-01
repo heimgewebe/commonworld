@@ -32,7 +32,7 @@ const runtimeDocumentLocale = canonicalLocaleTag(globalThis.document?.documentEl
 const nodeRuntime = typeof process !== 'undefined' && Boolean(process?.versions?.node);
 let WAVE1_LOCALE_PACKS = Object.freeze({});
 if (nodeRuntime || (runtimeDocumentLocale && CANDIDATE_LOCALES.includes(runtimeDocumentLocale))) {
-  ({ WAVE1_LOCALE_PACKS } = await import('./commonworld-wave1-locales.mjs?v=aa83c07b2f35'));
+  ({ WAVE1_LOCALE_PACKS } = await import('./commonworld-wave1-locales.mjs?v=2d4fc19f3f23'));
 }
 
 export function normalizeLocale(value, fallback = DEFAULT_LOCALE) {
@@ -80,6 +80,7 @@ const UI_EN = Object.freeze({
   show_more_in_bundle: 'Show {count} more Commons in {label}',
   overview: 'Overview',
   catalog_coverage_unassessed: 'catalog coverage not assessed',
+  semantic_breadcrumb_connector: 'to',
   digital_sphere: 'Digital Commons Sphere',
   sphere: 'Sphere',
   presence_geographic: 'On site',

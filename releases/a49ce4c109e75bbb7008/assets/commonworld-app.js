@@ -1,6 +1,6 @@
 import { BOOTSTRAP_RECORDS } from './commonworld-bootstrap-catalog.mjs?v=6b2e3dc6ea44';
 import { createCatalogLoadCache, loadCatalogAggregate, loadCatalogDetail, loadCatalogShard, shardKeyForIdentity } from './commonworld-catalog-runtime.mjs?v=836cd2a8f3f9';
-import { actionLabel, documentLocale, localizeCatalogRecords, text as i18nText, themeLabel } from './commonworld-i18n.mjs?v=ad571d099ca0';
+import { actionLabel, documentLocale, localizeCatalogRecords, text as i18nText, themeLabel } from './commonworld-i18n.mjs?v=2b96161638ed';
 import {
   COMMONS_TYPE_COLOR_TOKENS,
   COMMONS_TYPE_VALUES,
@@ -56,7 +56,7 @@ import {
   sortRecords,
   stateFromSearch,
   visibleDigitalNodes,
-} from './commonworld-core.mjs?v=74f9408fb884';
+} from './commonworld-core.mjs?v=f8629874a734';
 
 const LOCALE = documentLocale();
 const t = (key, germanFallback, variables = {}) => i18nText(LOCALE, key, germanFallback, variables);
@@ -1533,7 +1533,7 @@ function updateSemanticLocationLine() {
   elements.semanticSummary.textContent = line.level === 'focus'
     ? line.summary
     : `${line.summary} · ${t('catalog_coverage_unassessed', 'Katalogabdeckung nicht bewertet')}`;
-  elements.semanticSummary.setAttribute('aria-label', line.crumbs.join(LOCALE === 'en' ? ' to ' : ' nach '));
+  elements.semanticSummary.setAttribute('aria-label', line.crumbs.join(` ${t('semantic_breadcrumb_connector', 'nach')} `));
 }
 
 function renderLayerButtons(container) {
