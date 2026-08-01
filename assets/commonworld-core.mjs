@@ -707,6 +707,29 @@ export function sphereRingBundleVisibleChildCount(totalChildren, detailLevel = '
   return clamp(requested, 0, count);
 }
 
+export function sphereRingBundleProjection(view, { nodeLimit = 8, childLimit = SPHERE_RING_BUNDLE_CHILD_LIMIT } = {}) {
+  const current = view?.current ?? null;
+  if (!current) return Object.freeze([]);
+  const directBundles = [...(view?.children ?? [])]
+    .filter((child) => child?.type !== 'identity' && child?.identityCount > 0)
+    .sort((left, right) => left.order - right.order || left.id.localeCompare(right.id));
+  const visibleNodeLimit = Number.isInteger(nodeLimit) && nodeLimit > 0 ? nodeLimit : 8;
+  const visibleChildLimit = clamp(
+    Number.isInteger(childLimit) ? childLimit : SPHERE_RING_BUNDLE_CHILD_LIMIT,
+    0,
+    SPHERE_RING_BUNDLE_CHILD_LIMIT,
+  );
+  const rootOverview = current.id === DIGITAL_ROOT_ID && current.path?.length === DIGITAL_ROOT_PATH.length;
+  const visibleNodes = rootOverview ? directBundles.slice(0, visibleNodeLimit) : [current];
+  const subordinateBundles = Object.freeze(rootOverview ? [] : directBundles);
+  return Object.freeze(visibleNodes.map((node) => Object.freeze({
+    node,
+    children: Object.freeze(subordinateBundles.slice(0, visibleChildLimit)),
+    allChildren: subordinateBundles,
+    totalChildCount: subordinateBundles.length,
+  })));
+}
+
 const normalizedSphereRingTitle = (record) => String(record?.title ?? record?.id ?? '').trim().replace(/\s+/gu, ' ');
 function createSphereRingGraphemeSegmenter() {
   if (typeof Intl === 'undefined' || typeof Intl.Segmenter !== 'function') return null;

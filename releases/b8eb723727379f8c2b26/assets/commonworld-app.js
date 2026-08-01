@@ -41,6 +41,7 @@ import {
   ringOrbitStartAngle,
   SPHERE_RING_BUNDLE_CHILD_LIMIT,
   SPHERE_RING_IDENTITY_PREVIEW_LIMIT,
+  sphereRingBundleProjection,
   sphereRingBundleScaleOffsets,
   sphereRingBundleVisibleChildCount,
   sphereRingLabelAssignments,
@@ -59,7 +60,7 @@ import {
   sortRecords,
   stateFromSearch,
   visibleDigitalNodes,
-} from './commonworld-core.mjs?v=d317e342ad90';
+} from './commonworld-core.mjs?v=6f9a2aadb749';
 
 const LOCALE = documentLocale();
 const t = (key, germanFallback, variables = {}) => i18nText(LOCALE, key, germanFallback, variables);
@@ -746,12 +747,6 @@ function appendRingSequence(textPath, assignments, { prefix = '' } = {}) {
   }
 }
 
-function sphereRingBundleChildren(node) {
-  return (node?.children ?? [])
-    .filter((child) => child.type !== 'identity' && child.identityCount > 0)
-    .sort((left, right) => left.order - right.order || left.id.localeCompare(right.id));
-}
-
 function appendSphereRingBundleLabels(textPath, children, childAssignmentById, totalChildCount) {
   children.forEach((child, index) => {
     const assignment = childAssignmentById.get(`node:${child.id}`);
@@ -799,21 +794,16 @@ function applySphereRingDetail(requestedDetailLevel = elements.sphere.dataset.ri
 
 function renderSphereRibbons(records = runtime.records) {
   const view = visibleDigitalView(records);
-  const childBundles = view.children.filter((node) => node.type !== 'identity');
-  const visibleNodes = (childBundles.length ? childBundles : (view.current ? [view.current] : []))
-    .filter((node) => node.type !== 'diagnostic' || node.identityCount > 0)
-    .slice(0, 8);
+  const visibleBundles = sphereRingBundleProjection(view, { nodeLimit: 8 })
+    .filter(({ node }) => node.type !== 'diagnostic' || node.identityCount > 0);
+  const visibleNodes = visibleBundles.map(({ node }) => node);
   const visibleRingSources = visibleNodes.map((node) => recordsForNode(node).slice(0, SPHERE_RING_IDENTITY_PREVIEW_LIMIT));
-  const bundleDescriptors = visibleNodes.map((node) => {
-    const allChildren = sphereRingBundleChildren(node);
-    const children = allChildren.slice(0, SPHERE_RING_BUNDLE_CHILD_LIMIT);
-    return Object.freeze({
-      children,
-      accessibleChildLabels: Object.freeze(allChildren.map((child) => child.label)),
-      totalChildCount: allChildren.length,
-      initialOverflowCount: Math.max(0, allChildren.length - children.length),
-    });
-  });
+  const bundleDescriptors = visibleBundles.map(({ children, allChildren, totalChildCount }) => Object.freeze({
+    children,
+    accessibleChildLabels: Object.freeze(allChildren.map((child) => child.label)),
+    totalChildCount,
+    initialOverflowCount: Math.max(0, totalChildCount - children.length),
+  }));
   const globalAssignments = sphereRingLabelAssignments(visibleRingSources.flat());
   const assignmentById = new Map(globalAssignments.map((assignment) => [assignment.id, assignment]));
   const childAssignments = sphereRingLabelAssignments(bundleDescriptors.flatMap(({ children }) => children.map((child) => ({
