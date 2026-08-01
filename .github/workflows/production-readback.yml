@@ -31,16 +31,6 @@ jobs:
         with:
           python-version: "3.12"
 
-      - name: Mark production readback pending
-        env:
-          GITHUB_TOKEN: ${{ github.token }}
-        run: >-
-          python3 .github/production-readback/publish_commit_status.py
-          --mode pending
-          --repository "${{ github.repository }}"
-          --sha "${{ github.sha }}"
-          --run-url "${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}"
-
       - name: Verify exact Pages deployment and public content
         id: readback
         continue-on-error: true
@@ -138,7 +128,7 @@ jobs:
           if-no-files-found: error
           retention-days: 30
 
-      - name: Publish production readback commit status
+      - name: Publish terminal production readback commit status
         id: commit_status
         if: always()
         env:
