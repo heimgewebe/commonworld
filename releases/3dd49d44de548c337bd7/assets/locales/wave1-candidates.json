@@ -131,7 +131,8 @@
         "visible_ring_commons_intro": "Commons visibles en los anillos digitales:",
         "show_project_details_short": "Mostrar detalles del proyecto",
         "open_project_short": "Abrir proyecto",
-        "semantic_breadcrumb_connector": "a"
+        "semantic_breadcrumb_connector": "a",
+        "visible_ring_bundles": "Grupos de anillos digitales: {bundles}."
       },
       "themes": {
         "agriculture": "Agricultura",
@@ -741,7 +742,8 @@
         "visible_ring_commons_intro": "Communs visibles dans les anneaux numériques :",
         "show_project_details_short": "Afficher les détails du projet",
         "open_project_short": "Ouvrir le projet",
-        "semantic_breadcrumb_connector": "vers"
+        "semantic_breadcrumb_connector": "vers",
+        "visible_ring_bundles": "Faisceaux d’anneaux numériques : {bundles}."
       },
       "themes": {
         "agriculture": "Agriculture",
@@ -1351,7 +1353,8 @@
         "visible_ring_commons_intro": "Comuns visíveis nos anéis digitais:",
         "show_project_details_short": "Mostrar detalhes do projeto",
         "open_project_short": "Abrir projeto",
-        "semantic_breadcrumb_connector": "para"
+        "semantic_breadcrumb_connector": "para",
+        "visible_ring_bundles": "Feixes de anéis digitais: {bundles}."
       },
       "themes": {
         "agriculture": "Agricultura",
@@ -1961,7 +1964,8 @@
         "visible_ring_commons_intro": "المشاعات الظاهرة في الحلقات الرقمية:",
         "show_project_details_short": "عرض تفاصيل المشروع",
         "open_project_short": "فتح المشروع",
-        "semantic_breadcrumb_connector": "إلى"
+        "semantic_breadcrumb_connector": "إلى",
+        "visible_ring_bundles": "حزم الحلقات الرقمية: {bundles}."
       },
       "themes": {
         "agriculture": "الزراعة",

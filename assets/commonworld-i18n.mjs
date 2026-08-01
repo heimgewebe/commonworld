@@ -32,7 +32,7 @@ const runtimeDocumentLocale = canonicalLocaleTag(globalThis.document?.documentEl
 const nodeRuntime = typeof process !== 'undefined' && Boolean(process?.versions?.node);
 let WAVE1_LOCALE_PACKS = Object.freeze({});
 if (nodeRuntime || (runtimeDocumentLocale && CANDIDATE_LOCALES.includes(runtimeDocumentLocale))) {
-  ({ WAVE1_LOCALE_PACKS } = await import('./commonworld-wave1-locales.mjs?v=7315976125e3'));
+  ({ WAVE1_LOCALE_PACKS } = await import('./commonworld-wave1-locales.mjs?v=ad8723ab3fae'));
 }
 
 export function normalizeLocale(value, fallback = DEFAULT_LOCALE) {
@@ -58,6 +58,7 @@ const UI_EN = Object.freeze({
   catalog_empty: 'The catalog contains no entries.',
   invalid_or_duplicate_id: 'Invalid or duplicate CommonProject ID.',
   no_visible_entries: 'no visible entries',
+  visible_ring_bundles: 'Digital ring bundles: {bundles}.',
   visible_ring_commons: 'Visible Commons in the digital rings: {titles}.',
   visible_ring_commons_intro: 'Visible Commons in the digital rings:',
   visible_ring_commons_empty: 'No Commons are currently visible in the digital rings.',

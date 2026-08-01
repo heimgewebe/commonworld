@@ -1,4 +1,4 @@
-import { FALLBACK_LOCALE, documentDirection, normalizeLocale, taxonomyLabel, text as i18nText } from './commonworld-i18n.mjs?v=4831bdce339a';
+import { FALLBACK_LOCALE, documentDirection, normalizeLocale, taxonomyLabel, text as i18nText } from './commonworld-i18n.mjs?v=1073aba98696';
 
 export const DEFAULT_CAMERA = Object.freeze({
   lng: 8,
@@ -705,6 +705,48 @@ export const RING_ORBIT_MIN_DURATION_S = 72;
 export const RING_ORBIT_MAX_DURATION_S = 180;
 export const SPHERE_RING_IDENTITY_PREVIEW_LIMIT = 6;
 export const SPHERE_RING_LABEL_MAX_CHARS = 18;
+export const SPHERE_RING_BUNDLE_CHILD_LIMIT = 4;
+const SPHERE_RING_BUNDLE_SCALE_STEP = 0.018;
+const SPHERE_RING_BUNDLE_VISIBLE_CHILD_COUNTS = Object.freeze({ micro: 1, compact: 2, names: 4, close: 2 });
+
+function normalizedSphereRingBundleChildCount(totalChildren) {
+  const count = Number.isInteger(totalChildren) && totalChildren > 0 ? totalChildren : 0;
+  return clamp(count, 0, SPHERE_RING_BUNDLE_CHILD_LIMIT);
+}
+
+export function sphereRingBundleScaleOffsets(totalChildren) {
+  const count = normalizedSphereRingBundleChildCount(totalChildren);
+  return Object.freeze(Array.from({ length: count }, (_, index) => rounded(-(index + 1) * SPHERE_RING_BUNDLE_SCALE_STEP, 3)));
+}
+
+export function sphereRingBundleVisibleChildCount(totalChildren, detailLevel = 'names') {
+  const count = normalizedSphereRingBundleChildCount(totalChildren);
+  const requested = SPHERE_RING_BUNDLE_VISIBLE_CHILD_COUNTS[detailLevel] ?? SPHERE_RING_BUNDLE_VISIBLE_CHILD_COUNTS.names;
+  return clamp(requested, 0, count);
+}
+
+export function sphereRingBundleProjection(view, { nodeLimit = 8, childLimit = SPHERE_RING_BUNDLE_CHILD_LIMIT } = {}) {
+  const current = view?.current ?? null;
+  if (!current) return Object.freeze([]);
+  const directBundles = [...(view?.children ?? [])]
+    .filter((child) => child?.type !== 'identity' && child?.identityCount > 0)
+    .sort((left, right) => left.order - right.order || left.id.localeCompare(right.id));
+  const visibleNodeLimit = Number.isInteger(nodeLimit) && nodeLimit > 0 ? nodeLimit : 8;
+  const visibleChildLimit = clamp(
+    Number.isInteger(childLimit) ? childLimit : SPHERE_RING_BUNDLE_CHILD_LIMIT,
+    0,
+    SPHERE_RING_BUNDLE_CHILD_LIMIT,
+  );
+  const rootOverview = current.id === DIGITAL_ROOT_ID && current.path?.length === DIGITAL_ROOT_PATH.length;
+  const visibleNodes = rootOverview ? directBundles.slice(0, visibleNodeLimit) : [current];
+  const subordinateBundles = Object.freeze(rootOverview ? [] : directBundles);
+  return Object.freeze(visibleNodes.map((node) => Object.freeze({
+    node,
+    children: Object.freeze(subordinateBundles.slice(0, visibleChildLimit)),
+    allChildren: subordinateBundles,
+    totalChildCount: subordinateBundles.length,
+  })));
+}
 
 const normalizedSphereRingTitle = (record) => String(record?.title ?? record?.id ?? '').trim().replace(/\s+/gu, ' ');
 function createSphereRingGraphemeSegmenter() {
