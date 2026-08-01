@@ -22,6 +22,13 @@
       "orbitLabelMaxChars": 18,
       "orbitLabelMeasurement": "extended-grapheme-clusters",
       "maximumVisibleRingLabelCharacters": 18,
+      "adaptiveRingBundles": true,
+      "rootProgressiveDisclosure": true,
+      "renderedBundleLineCount": 5,
+      "renderedChildRingCount": 0,
+      "oneTextPathPerBundle": true,
+      "subordinateLinesIndependentlyStatic": true,
+      "accessibleBundleHierarchy": true,
       "accessibleFullTitleParity": true,
       "hiddenSvgAccessibilityNamesRemoved": true,
       "graphemeSafeVisibleLabels": true,
@@ -112,13 +119,41 @@
       "filterButtonWidth": 44,
       "filterButtonHeight": 44,
       "ringAnimationName": "sphere-ring-orbit",
-      "ringTransform": "matrix(0.999999, 0.001509, -0.001509, 0.999999, 0, 0)",
-      "ringTextWidth": 671.1126708984375,
-      "ringTextHeight": 14.0126953125,
+      "ringTransform": "matrix(0.999999, 0.00150674, -0.00150674, 0.999999, 0, 0)",
+      "ringTextWidth": 671.1126098632812,
+      "ringTextHeight": 14.011138916015625,
       "ringTextFontSize": 22,
       "primaryRingCount": 3,
       "depthRingCount": 2,
       "depthRingsStatic": true,
+      "ringDetailLevel": "compact",
+      "bundleVisibleChildCounts": [
+        {
+          "layer": "knowledge_learning_culture",
+          "declared": 0,
+          "rendered": 0
+        },
+        {
+          "layer": "software_tools_production",
+          "declared": 0,
+          "rendered": 0
+        },
+        {
+          "layer": "communication_networks",
+          "declared": 0,
+          "rendered": 0
+        },
+        {
+          "layer": "provision_land_ecology",
+          "declared": 0,
+          "rendered": 0
+        },
+        {
+          "layer": "cooperation_self_organization",
+          "declared": 0,
+          "rendered": 0
+        }
+      ],
       "viewportWidth": 390,
       "mediaCompact": true,
       "countryRendered": 1
@@ -162,7 +197,7 @@
     {
       "id": "layer-journey-moveend-return",
       "verdict": "PASS",
-      "elapsedMs": 2319
+      "elapsedMs": 1517
     },
     {
       "id": "layer-journey-interrupted",
@@ -249,8 +284,8 @@
       "verdict": "PASS",
       "blockedCatalogRequests": 0,
       "observedCatalogRequests": [
-        "/releases/c2635b8bdfe7a82a41d4/catalog/runtime/aggregate.v1.json",
-        "/releases/c2635b8bdfe7a82a41d4/catalog/runtime/manifest.v1.json"
+        "/releases/b8eb723727379f8c2b26/catalog/runtime/aggregate.v1.json",
+        "/releases/b8eb723727379f8c2b26/catalog/runtime/manifest.v1.json"
       ]
     },
     {
@@ -308,9 +343,9 @@
     }
   ],
   "binding": {
-    "smoke_script_sha256": "f3b576f51120be32fa0a612fc4d17129d7ffc18fd39a46f4bcc89d38ab1ac4b1",
+    "smoke_script_sha256": "eb29099941d804186daf195899fcee7c1ba3c0fecf96187076412fb4a4ad055a",
     "smoke_runner_sha256": "522b99b70b1d0064b1d0a31a3a67fdc9a2e73b7408f37d1a4bb303bc360b7556",
-    "first_party_surface_sha256": "adf84ef5a18c274a9545ba6125db95fb2ff067c3fae82d528a5a9b3cfe848715",
+    "first_party_surface_sha256": "b7b0ae54731537684d680ad3cb674483361a21633e4c510710737828efa04fa0",
     "scenario_ids": [
       "startup-and-ring-orbits",
       "synthetic-cross-ring-collision-accessibility",
@@ -353,8 +388,8 @@
     "smoke_plan_sha256": "6b8749928ead5ef81ee66883e6a2993e756ce083575c3569234bf70526448364"
   },
   "execution": {
-    "result_sha256": "2cbc9b19acbdef98845d0fbd60048e9ed1f98d241b1ae92fccebc3c46122f08c",
-    "observed_at": "2026-08-01T12:36:54Z",
-    "transport_note": "Fresh public browser smoke passed all 36 scenarios on release c2635b8bdfe7a82a41d4; evidence is bound to the exact current scripts, ordered scenarios and complete first-party surface."
+    "result_sha256": "10d0518c3cd3848f61535c6d4889f4b8423c14992b21c5f93fa618597857e592",
+    "observed_at": "2026-08-01T19:22:49Z",
+    "transport_note": "Fresh public browser smoke passed all 36 scenarios on release b8eb723727379f8c2b26; root progressive disclosure, direct-child field bundles and leaf isolation are bound to the current scripts and first-party surface."
   }
 }

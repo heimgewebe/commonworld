@@ -1,6 +1,6 @@
 import { BOOTSTRAP_RECORDS } from './commonworld-bootstrap-catalog.mjs?v=cc49548bc45c';
 import { createCatalogLoadCache, loadCatalogAggregate, loadCatalogDetail, loadCatalogShard, shardKeyForIdentity } from './commonworld-catalog-runtime.mjs?v=836cd2a8f3f9';
-import { actionLabel, documentLocale, localizeCatalogRecords, text as i18nText, themeLabel } from './commonworld-i18n.mjs?v=34f9c64a75f1';
+import { actionLabel, documentLocale, localizeCatalogRecords, text as i18nText, themeLabel } from './commonworld-i18n.mjs?v=b8662dad78e9';
 import {
   COMMONS_TYPE_COLOR_TOKENS,
   COMMONS_TYPE_VALUES,
@@ -39,7 +39,11 @@ import {
   ringOrbitDirection,
   ringOrbitDuration,
   ringOrbitStartAngle,
+  SPHERE_RING_BUNDLE_CHILD_LIMIT,
   SPHERE_RING_IDENTITY_PREVIEW_LIMIT,
+  sphereRingBundleProjection,
+  sphereRingBundleScaleOffsets,
+  sphereRingBundleVisibleChildCount,
   sphereRingLabelAssignments,
   safeExternalHttpsUrl,
   sampledDiagnosticPublicationDue,
@@ -56,7 +60,7 @@ import {
   sortRecords,
   stateFromSearch,
   visibleDigitalNodes,
-} from './commonworld-core.mjs?v=c50e7734628c';
+} from './commonworld-core.mjs?v=6f9a2aadb749';
 
 const LOCALE = documentLocale();
 const t = (key, germanFallback, variables = {}) => i18nText(LOCALE, key, germanFallback, variables);
@@ -743,29 +747,74 @@ function appendRingSequence(textPath, assignments, { prefix = '' } = {}) {
   }
 }
 
+function appendSphereRingBundleLabels(textPath, children, childAssignmentById, totalChildCount) {
+  children.forEach((child, index) => {
+    const assignment = childAssignmentById.get(`node:${child.id}`);
+    if (!assignment) return;
+    const label = createSvgElement('tspan', {
+      class: 'sphere-ring-sublabel',
+      'data-node-id': child.id,
+      'data-bundle-index': String(index),
+      'data-visible-label': assignment.visibleText,
+    });
+    label.textContent = ` · ${assignment.visibleText}`;
+    textPath.append(label);
+  });
+  if (totalChildCount > 0) {
+    const overflow = createSvgElement('tspan', {
+      class: 'sphere-ring-overflow',
+      'data-total-child-count': String(totalChildCount),
+      'data-hidden': '',
+    });
+    textPath.append(overflow);
+  }
+}
+
 function applySphereRingDetail(requestedDetailLevel = elements.sphere.dataset.ringDetailLevel || elements.sphere.dataset.detailLevel || 'names') {
   const detailLevel = window.matchMedia('(max-width: 48rem)').matches && requestedDetailLevel === 'names'
     ? 'compact'
     : requestedDetailLevel;
+  elements.sphere.dataset.ringDetailLevel = detailLevel;
   const planes = [...elements.sphereRings.querySelectorAll('.sphere-ring-plane')];
   const primaryIndices = new Set(sphereRingPrimaryIndices(planes.length, detailLevel));
   planes.forEach((plane, index) => {
     plane.dataset.emphasis = primaryIndices.has(index) ? 'primary' : 'depth';
+    const totalChildCount = Number.parseInt(plane.dataset.bundleTotalChildCount ?? '0', 10);
+    const visibleChildCount = sphereRingBundleVisibleChildCount(totalChildCount, detailLevel);
+    const overflowCount = Math.max(0, totalChildCount - visibleChildCount);
+    plane.dataset.bundleVisibleChildCount = String(visibleChildCount);
+    plane.dataset.bundleOverflowCount = String(overflowCount);
+    const overflow = plane.querySelector('.sphere-ring-overflow');
+    if (overflow) {
+      overflow.textContent = overflowCount > 0 ? ` · +${overflowCount}` : '';
+      overflow.toggleAttribute('data-hidden', overflowCount === 0);
+    }
   });
 }
 
 function renderSphereRibbons(records = runtime.records) {
   const view = visibleDigitalView(records);
-  const childBundles = view.children.filter((node) => node.type !== 'identity');
-  const visibleNodes = (childBundles.length ? childBundles : (view.current ? [view.current] : []))
-    .filter((node) => node.type !== 'diagnostic' || node.identityCount > 0)
-    .slice(0, 8);
+  const visibleBundles = sphereRingBundleProjection(view, { nodeLimit: 8 })
+    .filter(({ node }) => node.type !== 'diagnostic' || node.identityCount > 0);
+  const visibleNodes = visibleBundles.map(({ node }) => node);
   const visibleRingSources = visibleNodes.map((node) => recordsForNode(node).slice(0, SPHERE_RING_IDENTITY_PREVIEW_LIMIT));
+  const bundleDescriptors = visibleBundles.map(({ children, allChildren, totalChildCount }) => Object.freeze({
+    children,
+    accessibleChildLabels: Object.freeze(allChildren.map((child) => child.label)),
+    totalChildCount,
+    initialOverflowCount: Math.max(0, totalChildCount - children.length),
+  }));
   const globalAssignments = sphereRingLabelAssignments(visibleRingSources.flat());
   const assignmentById = new Map(globalAssignments.map((assignment) => [assignment.id, assignment]));
+  const childAssignments = sphereRingLabelAssignments(bundleDescriptors.flatMap(({ children }) => children.map((child) => ({
+    id: `node:${child.id}`,
+    title: child.label,
+  }))));
+  const childAssignmentById = new Map(childAssignments.map((assignment) => [assignment.id, assignment]));
   elements.sphereRings.replaceChildren();
   visibleNodes.forEach((node, layerIndex) => {
     const source = visibleRingSources[layerIndex];
+    const bundle = bundleDescriptors[layerIndex];
     const assignments = source.map((record) => assignmentById.get(String(record.id))).filter(Boolean);
     const plane = createSvgElement('g', {
       class: 'sphere-ring-plane',
@@ -773,14 +822,33 @@ function renderSphereRibbons(records = runtime.records) {
       'data-layer-id': node.id,
       'data-digital-path': node.pathKey,
       'data-ring-index': String(layerIndex),
+      'data-bundle-child-count': String(bundle.children.length),
+      'data-bundle-total-child-count': String(bundle.totalChildCount),
+      'data-bundle-overflow-count': String(bundle.initialOverflowCount),
+      'data-bundle-line-count': String(bundle.children.length + 1),
+      'data-bundle-text-path-count': '1',
     });
     const guide = createSvgElement('use', {
       href: `#sphere-path-${layerIndex + 1}`,
-      class: 'sphere-layer-guide',
+      class: 'sphere-layer-guide sphere-bundle-main-ring',
       'data-node-id': node.id,
       'data-layer-id': node.id,
     });
     plane.append(guide);
+    const bundleOffsets = sphereRingBundleScaleOffsets(bundle.children.length);
+    bundle.children.forEach((child, childIndex) => {
+      const scale = 1 + bundleOffsets[childIndex];
+      const childGuide = createSvgElement('use', {
+        href: `#sphere-path-${layerIndex + 1}`,
+        class: 'sphere-layer-guide sphere-bundle-child-ring',
+        'data-node-id': child.id,
+        'data-parent-node-id': node.id,
+        'data-layer-id': child.id,
+        'data-bundle-index': String(childIndex),
+        transform: `translate(320 320) scale(${scale.toFixed(4)}) translate(-320 -320)`,
+      });
+      plane.append(childGuide);
+    });
     const orbitDuration = ringOrbitDuration(node.identityCount);
     plane.dataset.entryCount = String(node.identityCount);
     plane.dataset.identityCount = String(node.identityCount);
@@ -799,11 +867,13 @@ function renderSphereRibbons(records = runtime.records) {
       href: `#sphere-path-${layerIndex + 1}`,
       startOffset: `${(layerIndex * 11 + 3) % 100}%`,
     });
+    appendRingSequence(textPath, [], { prefix: `${node.label} · ${node.identityCount}` });
+    appendSphereRingBundleLabels(textPath, bundle.children, childAssignmentById, bundle.totalChildCount);
     if (source.length) {
-      appendRingSequence(textPath, assignments, { prefix: `${node.label} · ${node.identityCount}` });
+      appendRingSequence(textPath, assignments);
     } else {
       const placeholder = createSvgElement('tspan', { class: 'sphere-ring-placeholder' });
-      placeholder.textContent = `  ${node.label} · ${t('no_visible_entries', 'keine sichtbaren Einträge')}  `;
+      placeholder.textContent = `  ${t('no_visible_entries', 'keine sichtbaren Einträge')}  `;
       textPath.append(placeholder);
     }
     text.append(textPath);
@@ -811,10 +881,16 @@ function renderSphereRibbons(records = runtime.records) {
     plane.append(text);
     elements.sphereRings.append(plane);
   });
+  const accessibleBundles = visibleNodes.map((node, index) => {
+    const childLabels = bundleDescriptors[index].accessibleChildLabels;
+    return childLabels.length ? `${node.label}: ${childLabels.join(', ')}` : node.label;
+  });
   const accessibleTitles = [...new Set(globalAssignments.map(({ fullText }) => fullText).filter(Boolean))];
-  elements.sphereRingAccessibleSummary.textContent = accessibleTitles.length
+  const bundleSummary = t('visible_ring_bundles', 'Digitale Ringbündel: {bundles}.', { bundles: accessibleBundles.join('; ') });
+  const commonsSummary = accessibleTitles.length
     ? t('visible_ring_commons', 'Sichtbare Commons in den digitalen Ringen: {titles}.', { titles: accessibleTitles.join(', ') })
     : t('visible_ring_commons_empty', 'In den digitalen Ringen sind derzeit keine Commons sichtbar.');
+  elements.sphereRingAccessibleSummary.textContent = `${bundleSummary} ${commonsSummary}`;
   applySphereRingDetail();
   runtime.overlayRenderCount += 1;
   elements.stage.dataset.overlayRenders = String(runtime.overlayRenderCount);

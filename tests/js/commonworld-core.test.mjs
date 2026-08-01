@@ -56,8 +56,12 @@ import {
   ribbonRepeatCount,
   RING_ORBIT_MIN_DURATION_S,
   RING_ORBIT_MAX_DURATION_S,
+  SPHERE_RING_BUNDLE_CHILD_LIMIT,
   SPHERE_RING_IDENTITY_PREVIEW_LIMIT,
   SPHERE_RING_LABEL_MAX_CHARS,
+  sphereRingBundleProjection,
+  sphereRingBundleScaleOffsets,
+  sphereRingBundleVisibleChildCount,
   sphereRingLabelAssignments,
   sphereRingLabelLength,
   normalizeDigitalPath,
@@ -437,6 +441,47 @@ test('sphere ring labels preserve combining marks and emoji grapheme clusters at
   assert.equal(sphereRingLabelLength(emoji.visibleText), SPHERE_RING_LABEL_MAX_CHARS);
   assert.equal(combining.fullText, combiningTitle);
   assert.equal(emoji.fullText, emojiTitle);
+});
+
+test('sphere ring bundle projection exposes only the current level and its direct children', () => {
+  const tree = buildDigitalPresentationTree(loadPublicCatalogRecords());
+  const rootView = visibleDigitalNodes(tree, DIGITAL_ROOT_PATH);
+  const rootProjection = sphereRingBundleProjection(rootView);
+  assert.deepEqual(rootProjection.map(({ node }) => node.id), DIGITAL_RING_FIELDS.map(({ id }) => id));
+  assert(rootProjection.every(({ children, allChildren, totalChildCount }) => children.length === 0 && allChildren.length === 0 && totalChildCount === 0));
+
+  const provisionPath = ['sphere', 'provision_land_ecology'];
+  const provisionView = visibleDigitalNodes(tree, provisionPath);
+  const provisionProjection = sphereRingBundleProjection(provisionView);
+  assert.equal(provisionProjection.length, 1);
+  assert.equal(provisionProjection[0].node.pathKey, serializeDigitalPath(provisionPath));
+  const directProvisionChildren = provisionView.children.filter(({ type, identityCount }) => type !== 'identity' && identityCount > 0);
+  assert.equal(provisionProjection[0].totalChildCount, directProvisionChildren.length);
+  assert.deepEqual(provisionProjection[0].allChildren.map(({ id }) => id), directProvisionChildren.map(({ id }) => id));
+  assert.deepEqual(
+    provisionProjection[0].children.map(({ id }) => id),
+    directProvisionChildren.slice(0, SPHERE_RING_BUNDLE_CHILD_LIMIT).map(({ id }) => id),
+  );
+  assert(provisionProjection[0].children.every(({ parentPathKey }) => parentPathKey === serializeDigitalPath(provisionPath)));
+
+  const leafPath = ['sphere', 'communication_networks', 'community_networks'];
+  const leafProjection = sphereRingBundleProjection(visibleDigitalNodes(tree, leafPath));
+  assert.equal(leafProjection.length, 1);
+  assert.equal(leafProjection[0].node.pathKey, serializeDigitalPath(leafPath));
+  assert.deepEqual(leafProjection[0].children, []);
+  assert.deepEqual(leafProjection[0].allChildren, []);
+  assert.equal(leafProjection[0].totalChildCount, 0);
+});
+
+test('sphere ring bundles bound static child geometry and responsive detail', () => {
+  assert.equal(SPHERE_RING_BUNDLE_CHILD_LIMIT, 4);
+  assert.deepEqual(sphereRingBundleScaleOffsets(0), []);
+  assert.deepEqual(sphereRingBundleScaleOffsets(8), [-0.018, -0.036, -0.054, -0.072]);
+  assert.equal(sphereRingBundleVisibleChildCount(8, 'names'), 4);
+  assert.equal(sphereRingBundleVisibleChildCount(8, 'compact'), 2);
+  assert.equal(sphereRingBundleVisibleChildCount(8, 'micro'), 1);
+  assert.equal(sphereRingBundleVisibleChildCount(1, 'compact'), 1);
+  assert.equal(sphereRingBundleVisibleChildCount(0, 'names'), 0);
 });
 
 test('sphere ring typography preserves screen-space legibility and balanced emphasis', () => {
