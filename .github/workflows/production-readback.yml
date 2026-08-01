@@ -71,6 +71,21 @@ jobs:
           --workers 8
           --receipt artifacts/commonworld-release-snapshot-readback.json
 
+      - name: Recheck main after snapshot mismatch
+        id: snapshot_supersession
+        if: >-
+          always() &&
+          steps.readback.outputs.verdict == 'pass' &&
+          steps.release_snapshot.outcome != 'success'
+        run: |
+          current_sha="$(git ls-remote --exit-code origin refs/heads/main | awk 'NR == 1 { print $1 }')"
+          test -n "$current_sha"
+          if test "$current_sha" != "$GITHUB_SHA"; then
+            echo "superseded=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "superseded=false" >> "$GITHUB_OUTPUT"
+          fi
+
       - name: Verify private vulnerability reporting setting
         id: security_setting
         continue-on-error: true
@@ -113,6 +128,7 @@ jobs:
           always() &&
           (steps.readback.outcome != 'success' ||
            (steps.readback.outputs.verdict == 'pass' &&
-            steps.release_snapshot.outcome != 'success') ||
+            steps.release_snapshot.outcome != 'success' &&
+            steps.snapshot_supersession.outputs.superseded != 'true') ||
            steps.security_setting.outcome != 'success')
         run: exit 1
