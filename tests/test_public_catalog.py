@@ -226,6 +226,59 @@ class PublicCatalogTests(unittest.TestCase):
 
         self.assertTrue(any("must not store presentation or zoom assignments" in error for error in errors))
 
+    def test_summary_rejects_generic_commons_framing(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp_dir:
+            root = self.copy_public_catalog(tmp_dir)
+            self.mutate_project(
+                root,
+                "debian",
+                lambda record: record.update(
+                    {
+                        "summary": (
+                            "Ein gemeinschaftlich entwickeltes Betriebssystem "
+                            "mit gemeinsam gepflegter Dokumentation."
+                        )
+                    }
+                ),
+            )
+
+            errors = validate_public_catalog(root)
+
+        self.assertTrue(
+            any(
+                "summary repeats generic Commons framing: gemeinschaftlich entwickelt" in error
+                for error in errors
+            )
+        )
+        self.assertTrue(
+            any(
+                "summary repeats generic Commons framing: gemeinsam gepflegt" in error
+                for error in errors
+            )
+        )
+
+    def test_english_summary_rejects_generic_commons_framing(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp_dir:
+            root = self.copy_public_catalog(tmp_dir)
+            path = root / "catalog" / "locales" / "en.json"
+            overlay = json.loads(path.read_text(encoding="utf-8"))
+            overlay["projects"]["debian"]["summary"] = (
+                "A community-driven operating system with an open package archive."
+            )
+            path.write_text(
+                json.dumps(overlay, ensure_ascii=False, indent=2) + "\n",
+                encoding="utf-8",
+            )
+
+            errors = validate_public_catalog(root)
+
+        self.assertTrue(
+            any(
+                "en summary repeats generic Commons framing: community-driven" in error
+                for error in errors
+            )
+        )
+
     def test_growth_catalog_preserves_real_world_balance(self) -> None:
         manifest = json.loads((ROOT / "catalog" / "catalog.json").read_text(encoding="utf-8"))
         records = [
