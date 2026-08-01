@@ -70,6 +70,147 @@ class CatalogSummarySpecificityTests(unittest.TestCase):
                 self.assertEqual(len(errors), 1)
                 self.assertIn(f"rule={rule_id}", errors[0])
 
+    def test_generic_beneficiary_and_support_do_not_unlock_exemption(self) -> None:
+        cases = (
+            (
+                "en",
+                "A community-maintained knowledge base with support for communities.",
+                "en-generic-community-maintained",
+            ),
+            (
+                "de",
+                "Eine gemeinschaftlich gepflegte Wissenssammlung mit Unterstützung für Gemeinschaften.",
+                "de-generic-community-maintained",
+            ),
+        )
+        for locale, summary, rule_id in cases:
+            with self.subTest(locale=locale):
+                errors = specificity_errors(
+                    {"id": "generic-relation-fixture", "summary": summary},
+                    locale,
+                    self.contract,
+                )
+                self.assertEqual(len(errors), 1)
+                self.assertIn(f"rule={rule_id}", errors[0])
+
+    def test_passive_specific_relation_preserves_catalog_entry(self) -> None:
+        summary = (
+            "A rural communications network in Nepal supported by local communities "
+            "and E-Networking Research and Development, linking jointly maintained "
+            "wireless infrastructure, education and local services."
+        )
+        self.assertEqual(
+            specificity_errors(
+                {"id": "nepal-wireless-networking-project", "summary": summary},
+                "en",
+                self.contract,
+            ),
+            [],
+        )
+
+    def test_actor_and_mechanism_must_form_one_bounded_statement(self) -> None:
+        cases = (
+            "A community-maintained archive. Volunteers publish signed updates.",
+            "A community-maintained archive whose volunteers " + "care " * 90 + "publish updates.",
+        )
+        for summary in cases:
+            with self.subTest(summary=summary[:60]):
+                errors = specificity_errors(
+                    {"id": "relation-boundary-fixture", "summary": summary},
+                    "en",
+                    self.contract,
+                )
+                self.assertEqual(len(errors), 1)
+                self.assertIn("rule=en-generic-community-maintained", errors[0])
+
+    def test_actor_and_mechanism_must_share_a_direct_clause(self) -> None:
+        cases = (
+            (
+                "en",
+                "A community-maintained archive where volunteers socialize while the platform operates automatically.",
+                "en-generic-community-maintained",
+            ),
+            (
+                "de",
+                "Eine gemeinschaftlich gepflegte Sammlung in der Freiwillige plaudern während das System verwaltet wird.",
+                "de-generic-community-maintained",
+            ),
+            (
+                "de",
+                "Eine gemeinschaftlich gepflegte Sammlung deren Freiwillige plaudern und die Software Daten verwaltet.",
+                "de-generic-community-maintained",
+            ),
+        )
+        for locale, summary, rule_id in cases:
+            with self.subTest(locale=locale, summary=summary):
+                errors = specificity_errors(
+                    {"id": "direct-clause-fixture", "summary": summary},
+                    locale,
+                    self.contract,
+                )
+                self.assertEqual(len(errors), 1)
+                self.assertIn(f"rule={rule_id}", errors[0])
+
+    def test_allowed_adverb_preserves_a_direct_relation(self) -> None:
+        summary = (
+            "A community-maintained package archive whose volunteers collectively "
+            "publish signed security updates."
+        )
+        self.assertEqual(
+            specificity_errors(
+                {"id": "direct-adverb-fixture", "summary": summary},
+                "en",
+                self.contract,
+            ),
+            [],
+        )
+
+    def test_concrete_sentence_cannot_exempt_a_separate_generic_sentence(self) -> None:
+        cases = (
+            (
+                "en",
+                "A community-maintained package archive whose volunteers publish signed updates. A second archive is collaboratively maintained.",
+                "matched='collaboratively maintained'",
+            ),
+            (
+                "de",
+                "Eine gemeinschaftlich gepflegte Paketsammlung, deren Freiwillige Sicherheitsaktualisierungen veröffentlichen. Eine zweite Wissenssammlung wird gemeinsam gepflegt.",
+                "matched='gemeinsam gepflegt'",
+            ),
+        )
+        for locale, summary, expected_match in cases:
+            with self.subTest(locale=locale):
+                errors = specificity_errors(
+                    {"id": "sentence-isolation-fixture", "summary": summary},
+                    locale,
+                    self.contract,
+                )
+                self.assertEqual(len(errors), 1)
+                self.assertIn(expected_match, errors[0])
+
+    def test_specificity_relation_contract_fails_closed(self) -> None:
+        mutations = (
+            ("relation", None),
+            ("max_distance_chars", 0),
+            ("actor_must_precede_mechanism", False),
+            ("same_sentence", False),
+            ("allowed_intervening_pattern", "("),
+        )
+        for field, value in mutations:
+            contract = copy.deepcopy(self.contract)
+            markers = contract["locale_policies"]["en"]["specificity_markers"]
+            if field == "relation":
+                markers[field] = value
+            else:
+                markers["relation"][field] = value
+            with self.subTest(field=field):
+                self.assertTrue(
+                    any(
+                        "summary specificity locale en relation" in error
+                        for error in validate_contract(contract, SUPPORTED_LOCALES)
+                    )
+                )
+
     def test_independent_actor_and_mechanism_can_justify_similar_wording(self) -> None:
         summary = (
             "A community-maintained package archive whose volunteers publish "
@@ -85,7 +226,11 @@ class CatalogSummarySpecificityTests(unittest.TestCase):
         )
 
     def test_specificity_marker_lists_must_not_be_empty(self) -> None:
-        for marker_kind in ("actor_patterns", "mechanism_patterns"):
+        for marker_kind in (
+            "actor_patterns",
+            "mechanism_patterns",
+            "passive_mechanism_patterns",
+        ):
             contract = copy.deepcopy(self.contract)
             contract["locale_policies"]["en"]["specificity_markers"][
                 marker_kind

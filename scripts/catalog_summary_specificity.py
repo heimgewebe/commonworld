@@ -40,22 +40,76 @@ def _specific_context_named(summary: str, policy: dict[str, Any]) -> bool:
         return False
     actors = markers.get("actor_patterns")
     mechanisms = markers.get("mechanism_patterns")
-    if not isinstance(actors, list) or not isinstance(mechanisms, list):
+    passive_mechanisms = markers.get("passive_mechanism_patterns")
+    relation = markers.get("relation")
+    if (
+        not isinstance(actors, list)
+        or not isinstance(mechanisms, list)
+        or not isinstance(passive_mechanisms, list)
+        or not isinstance(relation, dict)
+    ):
+        return False
+    max_distance = relation.get("max_distance_chars")
+    allowed_intervening_pattern = relation.get("allowed_intervening_pattern")
+    if (
+        not isinstance(max_distance, int)
+        or isinstance(max_distance, bool)
+        or max_distance < 1
+        or not isinstance(allowed_intervening_pattern, str)
+        or not allowed_intervening_pattern
+        or relation.get("actor_must_precede_mechanism") is not True
+        or relation.get("same_sentence") is not True
+    ):
         return False
     try:
-        actor_named = any(
-            isinstance(pattern, str)
-            and re.search(pattern, summary, re.IGNORECASE) is not None
+        allowed_intervening = re.compile(
+            allowed_intervening_pattern, re.IGNORECASE
+        )
+        actor_matches = [
+            match
             for pattern in actors
-        )
-        mechanism_named = any(
-            isinstance(pattern, str)
-            and re.search(pattern, summary, re.IGNORECASE) is not None
+            if isinstance(pattern, str)
+            for match in re.finditer(pattern, summary, re.IGNORECASE)
+        ]
+        mechanism_matches = [
+            match
             for pattern in mechanisms
-        )
+            if isinstance(pattern, str)
+            for match in re.finditer(pattern, summary, re.IGNORECASE)
+        ]
+        passive_mechanism_matches = [
+            match
+            for pattern in passive_mechanisms
+            if isinstance(pattern, str)
+            for match in re.finditer(pattern, summary, re.IGNORECASE)
+        ]
     except re.error:
         return False
-    return actor_named and mechanism_named
+    for actor in actor_matches:
+        for mechanism in mechanism_matches:
+            if actor.end() > mechanism.start():
+                continue
+            between = summary[actor.end() : mechanism.start()]
+            if (
+                len(between) > max_distance
+                or re.search(r"[.!?]", between)
+                or allowed_intervening.fullmatch(between) is None
+            ):
+                continue
+            return True
+    for mechanism in passive_mechanism_matches:
+        for actor in actor_matches:
+            if mechanism.end() > actor.start():
+                continue
+            between = summary[mechanism.end() : actor.start()]
+            if (
+                len(between) > max_distance
+                or re.search(r"[.!?]", between)
+                or allowed_intervening.fullmatch(between) is None
+            ):
+                continue
+            return True
+    return False
 
 
 def _rule_matches(
@@ -67,23 +121,12 @@ def _rule_matches(
     if not isinstance(phrases, list):
         return []
     folded = _normalized(summary)
-    independent_context = folded
-    for phrase in phrases:
-        if isinstance(phrase, str):
-            independent_context = independent_context.replace(
-                _normalized(phrase), " "
-            )
-    if (
-        rule.get("allow_when_actor_and_mechanism_are_named") is True
-        and _specific_context_named(independent_context, policy)
-    ):
-        return []
     matched = [
         phrase
         for phrase in phrases
         if isinstance(phrase, str) and _normalized(phrase) in folded
     ]
-    return [
+    matched = [
         phrase
         for phrase in matched
         if not any(
@@ -92,6 +135,31 @@ def _rule_matches(
             for other in matched
         )
     ]
+    if not matched:
+        return []
+    if rule.get("allow_when_actor_and_mechanism_are_named") is True:
+        sentences = re.split(r"(?<=[.!?])\s+", folded)
+        remaining: list[str] = []
+        for matched_phrase in matched:
+            needle = _normalized(matched_phrase)
+            matching_sentences = [
+                sentence for sentence in sentences if needle in sentence
+            ]
+            exempt = bool(matching_sentences)
+            for sentence in matching_sentences:
+                independent_context = sentence
+                for phrase in phrases:
+                    if isinstance(phrase, str):
+                        independent_context = independent_context.replace(
+                            _normalized(phrase), " "
+                        )
+                if not _specific_context_named(independent_context, policy):
+                    exempt = False
+                    break
+            if not exempt:
+                remaining.append(matched_phrase)
+        return remaining
+    return matched
 
 
 def specificity_errors(
@@ -218,7 +286,11 @@ def validate_contract(
                 f"summary specificity locale {locale} specificity_markers must be an object"
             )
             markers = {}
-        for marker_kind in ("actor_patterns", "mechanism_patterns"):
+        for marker_kind in (
+            "actor_patterns",
+            "mechanism_patterns",
+            "passive_mechanism_patterns",
+        ):
             patterns = _string_list(markers.get(marker_kind))
             if patterns is None:
                 errors.append(
@@ -231,6 +303,47 @@ def validate_contract(
                 except re.error as exc:
                     errors.append(
                         f"summary specificity locale {locale} {marker_kind} contains invalid regex {pattern!r}: {exc}"
+                    )
+
+        relation = markers.get("relation")
+        if not isinstance(relation, dict):
+            errors.append(
+                f"summary specificity locale {locale} relation must be an object"
+            )
+        else:
+            max_distance = relation.get("max_distance_chars")
+            if (
+                not isinstance(max_distance, int)
+                or isinstance(max_distance, bool)
+                or not 1 <= max_distance <= 500
+            ):
+                errors.append(
+                    f"summary specificity locale {locale} relation max_distance_chars must be an integer from 1 to 500"
+                )
+            if relation.get("actor_must_precede_mechanism") is not True:
+                errors.append(
+                    f"summary specificity locale {locale} relation must require actor before mechanism"
+                )
+            if relation.get("same_sentence") is not True:
+                errors.append(
+                    f"summary specificity locale {locale} relation must require one sentence"
+                )
+            allowed_intervening_pattern = relation.get(
+                "allowed_intervening_pattern"
+            )
+            if (
+                not isinstance(allowed_intervening_pattern, str)
+                or not allowed_intervening_pattern
+            ):
+                errors.append(
+                    f"summary specificity locale {locale} relation allowed_intervening_pattern must be a non-empty regex"
+                )
+            else:
+                try:
+                    re.compile(allowed_intervening_pattern)
+                except re.error as exc:
+                    errors.append(
+                        f"summary specificity locale {locale} relation allowed_intervening_pattern is invalid: {exc}"
                     )
 
         rules = policy.get("rules")
