@@ -125,12 +125,12 @@ class PublicShellTests(unittest.TestCase):
         with tempfile.TemporaryDirectory() as tmp_dir:
             root = self.copy_shell(tmp_dir)
             core_path = root / "assets/commonworld-core.mjs"
-            locale_path = root / "assets/commonworld-en-locale.mjs"
-            expected = hashlib.sha256(locale_path.read_bytes()).hexdigest()[:12]
+            i18n_path = root / "assets/commonworld-i18n.mjs"
+            expected = hashlib.sha256(i18n_path.read_bytes()).hexdigest()[:12]
             core_path.write_text(
                 core_path.read_text(encoding="utf-8").replace(
-                    f"./commonworld-en-locale.mjs?v={expected}",
-                    "./commonworld-en-locale.mjs?v=000000000000",
+                    f"./commonworld-i18n.mjs?v={expected}",
+                    "./commonworld-i18n.mjs?v=000000000000",
                     1,
                 ),
                 encoding="utf-8",
@@ -148,7 +148,7 @@ class PublicShellTests(unittest.TestCase):
             self.refresh_app_version(root)
             errors = validate_public_shell(root)
         self.assertIn(
-            "public shell module import is not content-bound: assets/commonworld-core.mjs -> assets/commonworld-en-locale.mjs",
+            "public shell module import is not content-bound: assets/commonworld-core.mjs -> assets/commonworld-i18n.mjs",
             errors,
         )
 

@@ -1,6 +1,6 @@
 import { BOOTSTRAP_RECORDS } from './commonworld-bootstrap-catalog.mjs?v=6b2e3dc6ea44';
 import { createCatalogLoadCache, loadCatalogAggregate, loadCatalogDetail, loadCatalogShard, shardKeyForIdentity } from './commonworld-catalog-runtime.mjs?v=836cd2a8f3f9';
-import { actionLabel, documentLocale, localizeCatalogRecords, text as i18nText, themeLabel } from './commonworld-i18n.mjs?v=86bc9c84a74d';
+import { actionLabel, documentLocale, localizeCatalogRecords, text as i18nText, themeLabel } from './commonworld-i18n.mjs?v=179acb1373e6';
 import {
   COMMONS_TYPE_COLOR_TOKENS,
   COMMONS_TYPE_VALUES,
@@ -56,7 +56,7 @@ import {
   sortRecords,
   stateFromSearch,
   visibleDigitalNodes,
-} from './commonworld-core.mjs?v=5c24e753c51a';
+} from './commonworld-core.mjs?v=a40753070c5b';
 
 const LOCALE = documentLocale();
 const t = (key, germanFallback, variables = {}) => i18nText(LOCALE, key, germanFallback, variables);
@@ -2222,12 +2222,14 @@ function createDiscoveryResult(record, position) {
   copy.className = 'discovery-result-copy';
   const title = document.createElement('strong');
   title.textContent = record.title;
+  if (record._content_locale) title.lang = record._content_locale;
   const meta = document.createElement('span');
   meta.className = 'discovery-result-meta';
   meta.textContent = resultMetaLabel(record);
   const summary = document.createElement('span');
   summary.className = 'discovery-result-summary';
   summary.textContent = record.summary;
+  if (record._content_locale) summary.lang = record._content_locale;
   copy.append(title, meta, summary);
   main.append(rank, copy);
   main.addEventListener('click', () => selectProject(record.id, { trigger: main, navigateSpatial: true }));
@@ -2276,6 +2278,10 @@ function createRuntimeCatalogCard(record) {
   title.textContent = record.title;
   const summary = document.createElement('p');
   summary.textContent = record.summary;
+  if (record._content_locale) {
+    title.lang = record._content_locale;
+    summary.lang = record._content_locale;
+  }
   const location = document.createElement('p');
   location.className = 'catalog-location';
   location.textContent = resultLocationLabel(record);
@@ -2415,6 +2421,10 @@ function updateFocusPanel() {
   if (!record) return;
   elements.focusTitle.textContent = record.title;
   elements.focusSummary.textContent = record.summary;
+  for (const node of [elements.focusTitle, elements.focusSummary]) {
+    if (record._content_locale) node.lang = record._content_locale;
+    else node.removeAttribute('lang');
+  }
   const filteringActive = Boolean(
     digitalPathFiltered()
     || normalizeQuery(runtime.state.query)

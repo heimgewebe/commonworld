@@ -1540,6 +1540,21 @@ test('semantic zoom remains presentation logic from planet to focus', () => {
   });
 });
 
+test('candidate runtime labels use candidate UI vocabulary over English catalog content', () => {
+  assert.equal(commonsTypeLabel('community-network', 'es'), 'Red Comunitaria');
+  assert.equal(recordPresentationLabel(presenceAxisRecords[0], 'es'), 'En el sitio');
+  assert.equal(
+    recordPresentationLabel(presenceAxisRecords[1], 'es'),
+    'Digital · Comunicación y Redes › Redes Comunitarias',
+  );
+  assert.deepEqual(recordLocationSummaries(presenceAxisRecords[2], 'es'), [
+    'Community Hamburg · aproximada, con al menos 5 km de incertidumbre',
+    'Private Heimrouter · ubicación oculta',
+  ]);
+  assert.equal(commonsTypeLabel('community-network', 'ar'), 'شبكة المجتمع');
+  assert.equal(recordPresentationLabel(presenceAxisRecords[0], 'ar'), 'على الموقع');
+});
+
 test('presentation and location labels explain geographic, digital and dual presence truth', () => {
   assert.equal(recordPresentationLabel(presenceAxisRecords[0]), 'Vor Ort');
   assert.equal(recordPresentationLabel(presenceAxisRecords[1]), 'Digital · Kommunikation und Netze › Gemeinschaftsnetze');

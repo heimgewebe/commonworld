@@ -5,6 +5,8 @@ import { readFileSync } from 'node:fs';
 import { BOOTSTRAP_RECORDS } from '../../assets/commonworld-bootstrap-catalog.mjs';
 import {
   actionLabel,
+  catalogContentLocale,
+  hasThemeLabel,
   localizeCatalogRecords,
   normalizeLocale,
   taxonomyLabel,
@@ -34,6 +36,31 @@ test('English locale overlay preserves canonical identity and factual fields', (
   }
 });
 
+test('candidate locales keep English catalog content with localized interface labels', () => {
+  const english = localizeCatalogRecords(BOOTSTRAP_RECORDS, 'en').records;
+  for (const locale of ['es', 'fr', 'pt-BR', 'ar']) {
+    assert.equal(catalogContentLocale(locale), 'en');
+    const candidate = localizeCatalogRecords(BOOTSTRAP_RECORDS, locale).records;
+    assert.equal(candidate.length, english.length);
+    for (let index = 0; index < candidate.length; index += 1) {
+      assert.equal(candidate[index]._content_locale, 'en', `${locale}:${candidate[index].id}`);
+      assert.equal(candidate[index].title, english[index].title, `${locale}:${candidate[index].id}:title`);
+      assert.equal(candidate[index].summary, english[index].summary, `${locale}:${candidate[index].id}:summary`);
+      assert.deepEqual(
+        candidate[index].presence.geographic.map(({ id, label }) => ({ id, label })),
+        english[index].presence.geographic.map(({ id, label }) => ({ id, label })),
+        `${locale}:${candidate[index].id}:locations`,
+      );
+      assert.equal(candidate[index].presence.digital?.label, english[index].presence.digital?.label, `${locale}:${candidate[index].id}:digital`);
+      for (const link of candidate[index].links ?? []) {
+        if (['homepage', 'visit', 'use', 'borrow', 'learn', 'contribute', 'volunteer', 'donate', 'contact', 'replicate'].includes(link.type)) {
+          assert.equal(link.label, actionLabel(link.type, locale), `${locale}:${candidate[index].id}:${link.type}`);
+        }
+      }
+    }
+  }
+});
+
 test('registry normalizes released and candidate locales', () => {
   assert.equal(normalizeLocale('de-DE'), 'de');
   assert.equal(normalizeLocale('fr'), 'fr');
@@ -46,6 +73,16 @@ test('English presentation labels cover actions and digital taxonomy', () => {
   assert.equal(actionLabel('borrow', 'en'), 'Borrow');
   assert.equal(actionLabel('borrow', 'de'), 'Ausleihen');
   assert.equal(taxonomyLabel('free_software', 'Freie Software und Infrastruktur', 'en'), 'Free Software and Infrastructure');
+});
+
+test('every catalog theme has an explicit label in every rendered UI locale', () => {
+  const catalogThemes = new Set(BOOTSTRAP_RECORDS.flatMap((record) => record.themes ?? []));
+  for (const locale of ['en', 'de', 'es', 'fr', 'pt-BR', 'ar']) {
+    for (const theme of catalogThemes) {
+      assert.equal(hasThemeLabel(theme, locale), true, `${locale}:${theme}`);
+      assert.ok(!themeLabel(theme, locale).startsWith('[missing:'), `${locale}:${theme}`);
+    }
+  }
 });
 
 test('Theme labels are localized in both public locales instead of leaking raw keys', () => {

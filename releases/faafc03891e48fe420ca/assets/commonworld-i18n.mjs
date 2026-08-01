@@ -32,11 +32,15 @@ const runtimeDocumentLocale = canonicalLocaleTag(globalThis.document?.documentEl
 const nodeRuntime = typeof process !== 'undefined' && Boolean(process?.versions?.node);
 let WAVE1_LOCALE_PACKS = Object.freeze({});
 if (nodeRuntime || (runtimeDocumentLocale && CANDIDATE_LOCALES.includes(runtimeDocumentLocale))) {
-  ({ WAVE1_LOCALE_PACKS } = await import('./commonworld-wave1-locales.mjs?v=a661f17a9b92'));
+  ({ WAVE1_LOCALE_PACKS } = await import('./commonworld-wave1-locales.mjs?v=00ad225e0849'));
 }
 
 export function normalizeLocale(value, fallback = DEFAULT_LOCALE) {
   return normalizeKnownLocale(value, fallback);
+}
+
+export function catalogContentLocale(value = DEFAULT_LOCALE) {
+  return normalizeLocale(value) === 'de' ? 'de' : 'en';
 }
 
 export function documentLocale(documentRef = globalThis.document) {
@@ -147,7 +151,23 @@ const UI_EN = Object.freeze({
   type_health_care: 'Care and Health',
   type_tools_repair: 'Tools, Repair and Making',
   type_community_network: 'Community Network',
-  type_other: 'Other'
+  type_other: 'Other',
+  activity_unknown_runtime: 'Current operating status has not been verified recently. Sources reviewed on {observed}; priority re-review {next}.',
+  location: 'Location',
+  location_hidden: 'location hidden',
+  location_approximate: 'approximate, at least {uncertainty} uncertainty',
+  public_area: 'public area',
+  exact_public_point: 'exact public point',
+  hidden_location_one: '1 hidden location',
+  hidden_locations: '{count} hidden locations',
+  earth: 'Earth',
+  macroregion: 'Macroregion',
+  region: 'Region',
+  local_context: 'Local context',
+  spatial_evidenced_commons: '{count} spatially evidenced Commons',
+  regional_contexts: 'regional contexts',
+  public_areas_approximate_locations: 'public areas and approximate locations',
+  public_points_areas_relationships: 'public points, areas and relationships'
 });
 
 function format(template, variables = {}) {
@@ -281,6 +301,14 @@ const THEME_LABELS_DE = Object.freeze({
   'tool-sharing': 'Werkzeugteilen',
   'urban-gardening': 'Urbanes Gärtnern',
   'volunteer-community': 'Ehrenamtliche Gemeinschaft',
+  'appropriate-technology': 'Angepasste Technologie',
+  'care-work': 'Sorgearbeit',
+  'community-maintenance': 'Gemeinschaftliche Instandhaltung',
+  'customary-governance': 'Traditionelle Selbstverwaltung',
+  'forest-conservation': 'Waldschutz',
+  'land-commons': 'Land-Commons',
+  'local-currency': 'Lokalwährung',
+  watershed: 'Wassereinzugsgebiet',
   water: 'Wasser'
 });
 
@@ -357,8 +385,27 @@ const THEME_LABELS_EN = Object.freeze({
   'tool-sharing': 'Tool sharing',
   'urban-gardening': 'Urban gardening',
   'volunteer-community': 'Volunteer community',
+  'appropriate-technology': 'Appropriate technology',
+  'care-work': 'Care work',
+  'community-maintenance': 'Community maintenance',
+  'customary-governance': 'Customary governance',
+  'forest-conservation': 'Forest conservation',
+  'land-commons': 'Land commons',
+  'local-currency': 'Local currency',
+  watershed: 'Watershed',
   water: 'Water'
 });
+
+export function hasThemeLabel(theme, locale = DEFAULT_LOCALE) {
+  const value = String(theme ?? '');
+  const normalized = normalizeLocale(locale);
+  const labels = normalized === 'en'
+    ? THEME_LABELS_EN
+    : normalized === 'de'
+      ? THEME_LABELS_DE
+      : WAVE1_LOCALE_PACKS[normalized]?.themes;
+  return Boolean(labels && typeof labels[value] === 'string');
+}
 
 export function themeLabel(theme, locale = DEFAULT_LOCALE) {
   const value = String(theme ?? '');
@@ -412,13 +459,14 @@ function englishTranslationSearchAlias(record, translation = {}) {
 }
 
 function localizeLink(link, locale) {
-  if (normalizeLocale(locale) !== 'en') return link;
+  const normalized = normalizeLocale(locale);
+  if (normalized === 'de') return link;
   const type = String(link?.type ?? '');
-  return ACTION_LABEL_KEYS[type] ? { ...link, label: actionLabel(type, 'en') } : link;
+  return ACTION_LABEL_KEYS[type] ? { ...link, label: actionLabel(type, normalized) } : link;
 }
 
-function localizeSource(source, locale, index) {
-  if (normalizeLocale(locale) !== 'en') return source;
+function localizeSource(source, contentLocale, index) {
+  if (contentLocale !== 'en') return source;
   const host = hostLabel(source?.url ?? '');
   const canonicalLabel = String(source?.label ?? '').trim();
   return { ...source, label: canonicalLabel ? `${canonicalLabel} · ${host}` : `${text('en', 'source', 'Quelle')} ${index + 1} · ${host}` };
@@ -426,9 +474,10 @@ function localizeSource(source, locale, index) {
 
 export function localizeCatalogRecords(records, locale = DEFAULT_LOCALE) {
   const normalized = normalizeLocale(locale);
+  const contentLocale = catalogContentLocale(normalized);
   const sourceRecords = Array.isArray(records) ? records : [];
   const translations = COMMONWORLD_EN_LOCALE.projects ?? {};
-  if (normalized !== 'en') {
+  if (contentLocale !== 'en') {
     const searchAliasesById = new Map(sourceRecords.map((record) => [
       record.id,
       englishTranslationSearchAlias(record, translations[record?.id] ?? {}),
@@ -453,6 +502,7 @@ export function localizeCatalogRecords(records, locale = DEFAULT_LOCALE) {
       : record?.presence?.digital;
     return {
       ...record,
+      _content_locale: 'en',
       title: translation.title ?? record.title,
       summary: translation.summary ?? record.summary,
       presence: {
@@ -464,7 +514,7 @@ export function localizeCatalogRecords(records, locale = DEFAULT_LOCALE) {
       provenance: record.provenance ? {
         ...record.provenance,
         sources: Array.isArray(record.provenance.sources)
-          ? record.provenance.sources.map((source, index) => localizeSource(source, normalized, index))
+          ? record.provenance.sources.map((source, index) => localizeSource(source, contentLocale, index))
           : record.provenance.sources
       } : record.provenance
     };

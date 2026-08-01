@@ -129,10 +129,41 @@ try {
         assert(proposalRuntimeError.includes(expectedRuntimeError), `${pageName}: candidate proposal runtime message drifted: ${proposalRuntimeError}`);
         assert(!proposalRuntimeError.includes('[missing:proposal_runtime:'), `${pageName}: proposal runtime fallback marker rendered`);
       }
+      let runtimeCatalogBoundary = null;
+      if (pageName === `${candidate.locale}.html`) {
+        runtimeCatalogBoundary = await page.evaluate(async () => {
+          const card = document.querySelector('.catalog-card[data-commonproject-id]');
+          const button = card?.querySelector('.catalog-select');
+          const staticTitle = card?.querySelector('h2')?.textContent ?? '';
+          const staticSummary = card?.querySelector('h2 + p')?.textContent ?? '';
+          const staticKind = card?.querySelector('.catalog-kind')?.textContent ?? '';
+          const expectedPresence = staticKind.split(' · ').slice(1).join(' · ');
+          button?.click();
+          const deadline = performance.now() + 10_000;
+          while ((document.querySelector('#focus-title')?.textContent ?? '') !== staticTitle) {
+            if (performance.now() > deadline) throw new Error('candidate runtime focus did not open');
+            await new Promise((resolve) => requestAnimationFrame(resolve));
+          }
+          return {
+            staticTitle,
+            staticSummary,
+            expectedPresence,
+            focusTitle: document.querySelector('#focus-title')?.textContent ?? '',
+            focusSummary: document.querySelector('#focus-summary')?.textContent ?? '',
+            focusTitleLang: document.querySelector('#focus-title')?.lang ?? '',
+            focusSummaryLang: document.querySelector('#focus-summary')?.lang ?? '',
+            focusPresence: document.querySelector('#focus-presence')?.textContent ?? '',
+          };
+        });
+      }
       const state = await page.evaluate(() => ({
         lang: document.documentElement.lang,
         dir: document.documentElement.dir,
         robots: document.querySelector('meta[name="robots"]')?.content ?? '',
+        description: document.querySelector('meta[name="description"]')?.content ?? '',
+        titleCount: document.querySelectorAll('head > title').length,
+        documentTitle: document.title,
+        iconHref: document.querySelector('link[rel~="icon"]')?.getAttribute('href') ?? '',
         bannerVisible: Boolean(document.querySelector('.locale-candidate-banner')?.getClientRects().length),
         bodyText: document.body.textContent ?? '',
         candidateChoices: [...document.querySelectorAll('[data-locale-choice]')]
@@ -148,13 +179,34 @@ try {
       assert(state.lang === candidate.locale, `${pageName}: lang drifted to ${state.lang}`);
       assert(state.dir === candidate.direction, `${pageName}: dir drifted to ${state.dir}`);
       assert(state.robots === 'noindex,nofollow', `${pageName}: candidate robots contract missing`);
+      assert(state.description.trim().length > 0, `${pageName}: candidate description metadata is malformed`);
+      assert(state.titleCount === 1 && state.documentTitle.trim().length > 0, `${pageName}: candidate title metadata is malformed`);
+      assert(state.iconHref.includes('commonworld-mark.svg'), `${pageName}: candidate head swallowed the icon link`);
       assert(state.bannerVisible, `${pageName}: candidate banner is not visible`);
-      assert(!state.bodyText.includes('[missing:'), `${pageName}: missing translation marker rendered`);
+      const missingMarkers = state.bodyText.match(/\[missing:[^\]]+\]/gu) ?? [];
+      assert(missingMarkers.length === 0, `${pageName}: missing translation marker rendered: ${missingMarkers.slice(0, 8).join(' | ')}`);
       assert(state.candidateChoices.length === 0, `${pageName}: candidate locale became selectable`);
       assert(JSON.stringify([...new Set(state.releasedChoices)].sort()) === JSON.stringify(['de', 'en']), `${pageName}: released locale choices drifted`);
       assert(state.documentWidth <= state.viewportWidth + 1, `${pageName}: horizontal overflow ${state.documentWidth}/${state.viewportWidth}`);
       if (pageName === `${candidate.locale}.html`) {
         assert(state.englishContentBlocks > 0, `${pageName}: canonical English catalog content lacks lang=en boundaries`);
+        assert(runtimeCatalogBoundary?.focusTitle === runtimeCatalogBoundary?.staticTitle, `${pageName}: runtime title fell off the English content overlay`);
+        assert(runtimeCatalogBoundary?.focusSummary === runtimeCatalogBoundary?.staticSummary, `${pageName}: runtime summary fell off the English content overlay`);
+        assert(runtimeCatalogBoundary?.focusTitleLang === 'en' && runtimeCatalogBoundary?.focusSummaryLang === 'en', `${pageName}: runtime English content lacks lang=en boundaries`);
+        const candidatePack = CANDIDATE_SOURCE.locales[candidate.locale];
+        const focusPresence = runtimeCatalogBoundary?.focusPresence ?? '';
+        const staticPresence = runtimeCatalogBoundary?.expectedPresence ?? '';
+        const expectsGeographic = staticPresence.includes(candidatePack.ui.presence_geographic)
+          || staticPresence.includes(candidatePack.ui.presence_both);
+        const expectsDigital = staticPresence.includes(candidatePack.ui.presence_digital)
+          || staticPresence.includes(candidatePack.ui.presence_both);
+        if (expectsGeographic) assert(focusPresence.includes(candidatePack.ui.presence_geographic), `${pageName}: runtime geographic presence is not candidate-localized: ${focusPresence}`);
+        if (expectsDigital) assert(focusPresence.includes(candidatePack.ui.presence_digital), `${pageName}: runtime digital presence is not candidate-localized: ${focusPresence}`);
+        const taxonomyLabels = new Set(Object.values(candidatePack.taxonomy));
+        const taxonomyPath = focusPresence.split(' · ').slice((expectsGeographic ? 1 : 0) + (expectsDigital ? 1 : 0)).join(' · ');
+        for (const label of taxonomyPath.split(' › ').filter(Boolean)) {
+          assert(taxonomyLabels.has(label), `${pageName}: runtime taxonomy label is not candidate-localized: ${label} / ${focusPresence}`);
+        }
       }
       assert(pageErrors.length === 0, `${pageName}: page errors: ${pageErrors.join(' | ')}`);
       assert(failedResponses.length === 0, `${pageName}: failed resources: ${failedResponses.join(' | ')}`);

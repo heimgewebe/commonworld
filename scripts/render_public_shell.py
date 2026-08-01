@@ -39,10 +39,7 @@ MODULE_IMPORT_DEPENDENCIES = (
     ("assets/commonworld-locale.mjs", ("assets/commonworld-i18n.mjs",)),
     (
         "assets/commonworld-core.mjs",
-        (
-            "assets/commonworld-en-locale.mjs",
-            "assets/commonworld-i18n.mjs",
-        ),
+        ("assets/commonworld-i18n.mjs",),
     ),
     (
         "assets/commonworld-app.js",

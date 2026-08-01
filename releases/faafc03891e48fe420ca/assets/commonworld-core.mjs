@@ -1,5 +1,4 @@
-import { COMMONWORLD_EN_LOCALE } from './commonworld-en-locale.mjs?v=5326744e6ec9';
-import { FALLBACK_LOCALE, normalizeLocale } from './commonworld-i18n.mjs?v=86bc9c84a74d';
+import { FALLBACK_LOCALE, normalizeLocale, taxonomyLabel, text as i18nText } from './commonworld-i18n.mjs?v=179acb1373e6';
 
 export const DEFAULT_CAMERA = Object.freeze({
   lng: 8,
@@ -32,10 +31,10 @@ const DIGITAL_ID_PATTERN = /^[a-z][a-z0-9_-]{0,95}$/;
 
 
 const normalizedLocale = (locale = FALLBACK_LOCALE) => normalizeLocale(locale, FALLBACK_LOCALE);
-const localizedValue = (locale, german, english) => normalizedLocale(locale) === 'en' ? english : german;
-const digitalNodeLabel = (node, locale = FALLBACK_LOCALE) => normalizedLocale(locale) === 'en'
-  ? (COMMONWORLD_EN_LOCALE.taxonomy_labels?.[node?.id] ?? node?.label_de ?? node?.id ?? '')
-  : (node?.label_de ?? node?.id ?? '');
+const localizedValue = (locale, key, german, variables = {}) =>
+  i18nText(normalizedLocale(locale), key, german, variables);
+const digitalNodeLabel = (node, locale = FALLBACK_LOCALE) =>
+  taxonomyLabel(node?.id ?? '', normalizedLocale(locale), node?.label_de ?? node?.id ?? '');
 
 const deepFreeze = (value) => {
   if (!value || typeof value !== 'object' || Object.isFrozen(value)) return value;
@@ -174,10 +173,14 @@ export const UNKNOWN_ACTIVITY_DISCLOSURE = 'Aktueller Betriebszustand nicht zeit
 
 export function recordActivityNotice(record, locale = FALLBACK_LOCALE) {
   if (record?.activity?.status !== 'unknown') return '';
-  const observedAt = record?.activity?.observed_at ?? localizedValue(locale, 'unbekannt', 'unknown');
-  const nextReviewAt = record?.curation?.next_review_at ?? localizedValue(locale, 'offen', 'open');
-  if (normalizedLocale(locale) === 'en') return `Current operating status has not been verified recently. Sources reviewed on ${observedAt}; priority re-review ${nextReviewAt}.`;
-  return `${UNKNOWN_ACTIVITY_DISCLOSURE}. Quellen geprüft am ${observedAt}; priorisierte Nachprüfung ${nextReviewAt}.`;
+  const observedAt = record?.activity?.observed_at ?? localizedValue(locale, 'unknown', 'unbekannt');
+  const nextReviewAt = record?.curation?.next_review_at ?? localizedValue(locale, 'open_date', 'offen');
+  return localizedValue(
+    locale,
+    'activity_unknown_runtime',
+    `${UNKNOWN_ACTIVITY_DISCLOSURE}. Quellen geprüft am {observed}; priorisierte Nachprüfung {next}.`,
+    { observed: observedAt, next: nextReviewAt },
+  );
 }
 
 export function deriveLayer(record) {
@@ -940,10 +943,28 @@ export function deriveCommonsType(record) {
   return matched?.type ?? 'other';
 }
 
+const COMMONS_TYPE_LABEL_KEYS = Object.freeze({
+  knowledge: 'type_knowledge',
+  software: 'type_software',
+  culture: 'type_culture',
+  'food-seeds': 'type_food_seeds',
+  water: 'type_water',
+  energy: 'type_energy',
+  'housing-land': 'type_housing_land',
+  'health-care': 'type_health_care',
+  'tools-repair': 'type_tools_repair',
+  'community-network': 'type_community_network',
+  other: 'type_other',
+});
+
 export function commonsTypeLabel(recordOrType, locale = FALLBACK_LOCALE) {
   const type = typeof recordOrType === 'string' ? recordOrType : deriveCommonsType(recordOrType);
-  const labels = normalizedLocale(locale) === 'en' ? COMMONS_TYPE_LABELS_EN : COMMONS_TYPE_LABELS;
-  return labels[type] ?? labels.other;
+  const normalizedType = COMMONS_TYPE_VALUES.includes(type) ? type : 'other';
+  return localizedValue(
+    locale,
+    COMMONS_TYPE_LABEL_KEYS[normalizedType],
+    COMMONS_TYPE_LABELS[normalizedType] ?? COMMONS_TYPE_LABELS.other,
+  );
 }
 
 
@@ -1629,11 +1650,11 @@ export function recordPresentationLabel(record, locale = FALLBACK_LOCALE) {
   const isGeo = publicGeographicLocations(record).length > 0;
   const isDigital = hasDigitalPresence(record);
   const pathLabel = recordDigitalPathLabel(record, { locale });
-  const digitalPresenceLabel = localizedValue(locale, 'Digital', 'Digital');
+  const digitalPresenceLabel = localizedValue(locale, 'presence_digital', 'Digital');
   const digitalLabel = `${digitalPresenceLabel}${pathLabel ? ` · ${pathLabel}` : ''}`;
 
-  if (isGeo && isDigital) return `${localizedValue(locale, 'Vor Ort', 'On site')} · ${digitalLabel}`;
-  if (isGeo) return localizedValue(locale, 'Vor Ort', 'On site');
+  if (isGeo && isDigital) return `${localizedValue(locale, 'presence_geographic', 'Vor Ort')} · ${digitalLabel}`;
+  if (isGeo) return localizedValue(locale, 'presence_geographic', 'Vor Ort');
   if (isDigital) return digitalLabel;
   return 'Commons';
 }
@@ -2461,14 +2482,17 @@ function formattedUncertainty(meters) {
 export function recordLocationSummaries(record, locale = FALLBACK_LOCALE) {
   const locations = Array.isArray(record?.presence?.geographic) ? record.presence.geographic : [];
   return locations.map((location) => {
-    const label = location?.label ?? localizedValue(locale, 'Ort', 'Location');
-    if (location?.mode === 'hidden') return `${label} · ${localizedValue(locale, 'Ort verborgen', 'location hidden')}`;
-    if (location?.mode === 'approximate') return normalizedLocale(locale) === 'en'
-      ? `${label} · approximate, at least ${formattedUncertainty(location.uncertainty_meters_min)} uncertainty`
-      : `${label} · ungefähr, mindestens ${formattedUncertainty(location.uncertainty_meters_min)} Unschärfe`;
+    const label = location?.label ?? localizedValue(locale, 'location', 'Ort');
+    if (location?.mode === 'hidden') return `${label} · ${localizedValue(locale, 'location_hidden', 'Ort verborgen')}`;
+    if (location?.mode === 'approximate') return `${label} · ${localizedValue(
+      locale,
+      'location_approximate',
+      'ungefähr, mindestens {uncertainty} Unschärfe',
+      { uncertainty: formattedUncertainty(location.uncertainty_meters_min) },
+    )}`;
     const type = location?.geometry?.type;
-    if (type === 'Polygon' || type === 'MultiPolygon') return `${label} · ${localizedValue(locale, 'öffentliche Fläche', 'public area')}`;
-    return `${label} · ${localizedValue(locale, 'exakter öffentlicher Punkt', 'exact public point')}`;
+    if (type === 'Polygon' || type === 'MultiPolygon') return `${label} · ${localizedValue(locale, 'public_area', 'öffentliche Fläche')}`;
+    return `${label} · ${localizedValue(locale, 'exact_public_point', 'exakter öffentlicher Punkt')}`;
   });
 }
 
@@ -2490,21 +2514,27 @@ function focusSpatialSummary(record, locale = FALLBACK_LOCALE) {
   const publicLocations = publicGeographicLocations(record);
   const isGeo = publicLocations.length > 0;
   const isDigital = hasDigitalPresence(record);
-  if (isDigital && locations.length === 0) return localizedValue(locale, 'Digital · Ortsunabhängige digitale Präsenz', 'Digital · Location-independent digital presence');
+  if (isDigital && locations.length === 0) return `${localizedValue(locale, 'presence_digital', 'Digital')} · ${localizedValue(locale, 'location_independent_digital', 'Ortsunabhängige digitale Präsenz')}`;
 
   const visible = publicLocations.length;
   const hidden = locations.filter((location) => location?.mode === 'hidden').length;
 
   let presenceLabel = 'Commons';
-  if (isGeo && isDigital) presenceLabel = localizedValue(locale, 'Vor Ort · Digital', 'On site · Digital');
-  else if (isGeo) presenceLabel = localizedValue(locale, 'Vor Ort', 'On site');
+  if (isGeo && isDigital) presenceLabel = localizedValue(locale, 'presence_both', 'Vor Ort · Digital');
+  else if (isGeo) presenceLabel = localizedValue(locale, 'presence_geographic', 'Vor Ort');
   else if (isDigital) presenceLabel = 'Digital';
-  else if (hidden > 0) presenceLabel = localizedValue(locale, 'Verborgene Orte', 'Hidden locations');
+  else if (hidden > 0) presenceLabel = localizedValue(locale, 'hidden_locations', '{count} verborgene Orte', { count: hidden });
 
-  if (visible === 0) return `${presenceLabel} · ${hidden} ${hidden === 1 ? localizedValue(locale, 'verborgener Ort', 'hidden location') : localizedValue(locale, 'verborgene Orte', 'hidden locations')}`;
+  if (visible === 0) return `${presenceLabel} · ${hidden === 1
+    ? localizedValue(locale, 'hidden_location_one', '1 verborgener Ort')
+    : localizedValue(locale, 'hidden_locations', '{count} verborgene Orte', { count: hidden })}`;
 
-  const publicLabel = `${visible} ${visible === 1 ? localizedValue(locale, 'öffentlicher Ort', 'public location') : localizedValue(locale, 'öffentliche Orte', 'public locations')}`;
-  const hiddenLabel = `${hidden} ${hidden === 1 ? localizedValue(locale, 'verborgener Ort', 'hidden location') : localizedValue(locale, 'verborgene Orte', 'hidden locations')}`;
+  const publicLabel = visible === 1
+    ? localizedValue(locale, 'one_public_location', '1 öffentlicher Ort')
+    : localizedValue(locale, 'public_locations', '{count} öffentliche Orte', { count: visible });
+  const hiddenLabel = hidden === 1
+    ? localizedValue(locale, 'hidden_location_one', '1 verborgener Ort')
+    : localizedValue(locale, 'hidden_locations', '{count} verborgene Orte', { count: hidden });
   return hidden ? `${presenceLabel} · ${publicLabel} · ${hiddenLabel}` : `${presenceLabel} · ${publicLabel}`;
 }
 
@@ -2524,17 +2554,17 @@ export function semanticLocationLine({
   if (selected) {
     return {
       level,
-      crumbs: [localizedValue(locale, 'Erde', 'Earth'), 'Commons', selected.title ?? selected.id],
+      crumbs: [localizedValue(locale, 'earth', 'Erde'), 'Commons', selected.title ?? selected.id],
       summary: focusSpatialSummary(selected, locale),
     };
   }
   const count = spatialIdentityCount(records);
-  const countLabel = normalizedLocale(locale) === 'en' ? `${count} spatially evidenced Commons` : `${count} räumlich belegte Commons`;
-  const earth = localizedValue(locale, 'Erde', 'Earth');
-  if (level === 'planet') return { level, crumbs: [earth, localizedValue(locale, 'Gesamtansicht', 'Overview')], summary: countLabel };
-  if (level === 'macroregion') return { level, crumbs: [earth, localizedValue(locale, 'Großregion', 'Macroregion')], summary: `${countLabel} · ${localizedValue(locale, 'regionale Zusammenhänge', 'regional contexts')}` };
-  if (level === 'region') return { level, crumbs: [earth, localizedValue(locale, 'Region', 'Region')], summary: `${countLabel} · ${localizedValue(locale, 'öffentliche Flächen und ungefähre Orte', 'public areas and approximate locations')}` };
-  return { level, crumbs: [earth, localizedValue(locale, 'Lokaler Zusammenhang', 'Local context')], summary: `${countLabel} · ${localizedValue(locale, 'öffentliche Punkte, Flächen und Beziehungen', 'public points, areas and relationships')}` };
+  const countLabel = localizedValue(locale, 'spatial_evidenced_commons', '{count} räumlich belegte Commons', { count });
+  const earth = localizedValue(locale, 'earth', 'Erde');
+  if (level === 'planet') return { level, crumbs: [earth, localizedValue(locale, 'overview', 'Gesamtansicht')], summary: countLabel };
+  if (level === 'macroregion') return { level, crumbs: [earth, localizedValue(locale, 'macroregion', 'Großregion')], summary: `${countLabel} · ${localizedValue(locale, 'regional_contexts', 'regionale Zusammenhänge')}` };
+  if (level === 'region') return { level, crumbs: [earth, localizedValue(locale, 'region', 'Region')], summary: `${countLabel} · ${localizedValue(locale, 'public_areas_approximate_locations', 'öffentliche Flächen und ungefähre Orte')}` };
+  return { level, crumbs: [earth, localizedValue(locale, 'local_context', 'Lokaler Zusammenhang')], summary: `${countLabel} · ${localizedValue(locale, 'public_points_areas_relationships', 'öffentliche Punkte, Flächen und Beziehungen')}` };
 }
 
 const HORIZON_BEARINGS = Object.freeze([0, 45, 90, 135, 180, 225, 270, 315]);
