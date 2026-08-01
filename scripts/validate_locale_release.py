@@ -6,10 +6,20 @@ from __future__ import annotations
 import hashlib
 import json
 import re
+import sys
 from pathlib import Path
 from typing import Any
 
 ROOT = Path(__file__).resolve().parents[1]
+if str(ROOT) not in sys.path:
+    sys.path.insert(0, str(ROOT))
+
+from scripts.catalog_summary_specificity import (
+    SummarySpecificityContractError,
+    load_contract as load_summary_specificity_contract,
+    validate_contract as validate_summary_specificity_contract,
+)
+
 CONTRACT_PATH = ROOT / "docs/architecture/locale-release.contract.json"
 REGISTRY_MODULE_PATH = ROOT / "assets/commonworld-locale-registry.mjs"
 PACK_PATH = ROOT / "assets/locales/wave1-candidates.json"
@@ -687,6 +697,11 @@ def validate_contract(contract: dict[str, Any], root: Path = ROOT) -> list[str]:
     _require(errors, gate.get("translation_coverage_ratio") == 1.0, "translation coverage must be 100%")
     _require(errors, gate.get("untranslated_ui_markers_max") == 0, "untranslated UI markers must be zero")
     _require(errors, gate.get("missing_runtime_keys_max") == 0, "missing runtime keys must be zero")
+    _require(
+        errors,
+        gate.get("catalog_summary_specificity_policy_required") is True,
+        "release gate must require a locale-aware catalog summary specificity policy",
+    )
     for field in (
         "machine_translation_only_forbidden",
         "independent_language_review_required",
@@ -718,7 +733,29 @@ def validate_contract(contract: dict[str, Any], root: Path = ROOT) -> list[str]:
         "candidate_evidence_path_template": "docs/evidence/locale-candidates/{locale}.json",
         "candidate_evidence_is_not_release_evidence": True,
     }
-    _require(errors, evidence_contract == expected_evidence, "release_evidence contract does not match the fail-closed digest-bound schema")
+    _require(
+        errors,
+        evidence_contract == expected_evidence,
+        "release_evidence contract does not match the fail-closed digest-bound schema",
+    )
+
+    try:
+        summary_specificity_contract = load_summary_specificity_contract(root)
+    except SummarySpecificityContractError as exc:
+        errors.append(str(exc))
+    else:
+        errors.extend(
+            validate_summary_specificity_contract(
+                summary_specificity_contract, released_tags
+            )
+        )
+        _require(
+            errors,
+            summary_specificity_contract.get("canonical_locale")
+            == decision.get("fallback_locale"),
+            "summary specificity canonical_locale must match fallback_locale",
+        )
+
     return errors
 
 

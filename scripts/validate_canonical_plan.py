@@ -138,7 +138,7 @@ EXPECTED_RESEARCH_FILES = {
     "renderer-selection-v1.md",
     "renderer-selection-v1.result.json",
 }
-EXPECTED_CONTRACT_FILES = {"catalog-platform.contract.json", "catalog-delivery-budget.contract.json", "catalog-scale-gates.contract.json", "catalog-diversity.contract.json", "commons-basis.schema.json", "commons-definition.contract.json", "editorial-review.contract.json", "proposal-path.contract.json", "proposal.schema.json", "current-state.contract.json", "aggregation-zoom.contract.json", "digital-ring-taxonomy.contract.json", "digital-sphere.contract.json", "production-delivery-provider.contract.json", "project.schema.json", "public-maplibre-vertical-slice.contract.json", "presence-axes.contract.json", "intent-search-discovery.contract.json", "renderer-selection.contract.json", "visual-semantics.contract.json"}
+EXPECTED_CONTRACT_FILES = {"catalog-platform.contract.json", "catalog-delivery-budget.contract.json", "catalog-scale-gates.contract.json", "catalog-diversity.contract.json", "catalog-summary-specificity.contract.json", "commons-basis.schema.json", "commons-definition.contract.json", "editorial-review.contract.json", "proposal-path.contract.json", "proposal.schema.json", "current-state.contract.json", "aggregation-zoom.contract.json", "digital-ring-taxonomy.contract.json", "digital-sphere.contract.json", "production-delivery-provider.contract.json", "project.schema.json", "public-maplibre-vertical-slice.contract.json", "presence-axes.contract.json", "intent-search-discovery.contract.json", "renderer-selection.contract.json", "visual-semantics.contract.json"}
 EXPECTED_SCRIPT_FILES = {
     "__init__.py",
     "browser_smoke_plan.py",
@@ -149,6 +149,7 @@ EXPECTED_SCRIPT_FILES = {
     "build_public_runtime.py",
     "catalog_bootstrap.py",
     "catalog_delivery_compile.mjs",
+    "catalog_summary_specificity.py",
     "check_pages_dns_target.py",
     "commonworld_geo.py",
     "commonworld_i18n.py",
@@ -213,6 +214,7 @@ EXPECTED_TEST_FILES = {
     "test_catalog_platform.py",
     "test_catalog_scale_gates.py",
     "test_catalog_scale_masterplan.py",
+    "test_catalog_summary_specificity.py",
     "test_proposal_path.py",
     "test_commons_admission.py",
     "test_contracts.py",

@@ -246,13 +246,17 @@ class PublicCatalogTests(unittest.TestCase):
 
         self.assertTrue(
             any(
-                "summary repeats generic Commons framing: gemeinschaftlich entwickelt" in error
+                "project debian locale=de summary repeats generic Commons framing "
+                "rule=de-generic-community-developed matched='gemeinschaftlich entwickeltes'"
+                in error
                 for error in errors
             )
         )
         self.assertTrue(
             any(
-                "summary repeats generic Commons framing: gemeinsam gepflegt" in error
+                "project debian locale=de summary repeats generic Commons framing "
+                "rule=de-generic-community-maintained matched='gemeinsam gepflegt'"
+                in error
                 for error in errors
             )
         )
@@ -263,7 +267,7 @@ class PublicCatalogTests(unittest.TestCase):
             path = root / "catalog" / "locales" / "en.json"
             overlay = json.loads(path.read_text(encoding="utf-8"))
             overlay["projects"]["debian"]["summary"] = (
-                "A community-driven operating system with an open package archive."
+                "A community-developed operating system with an open package archive."
             )
             path.write_text(
                 json.dumps(overlay, ensure_ascii=False, indent=2) + "\n",
@@ -274,7 +278,53 @@ class PublicCatalogTests(unittest.TestCase):
 
         self.assertTrue(
             any(
-                "en summary repeats generic Commons framing: community-driven" in error
+                "project debian locale=en summary repeats generic Commons framing "
+                "rule=en-generic-community-developed matched='community-developed'"
+                in error
+                for error in errors
+            )
+        )
+
+    def test_released_locale_without_specificity_policy_is_rejected(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp_dir:
+            root = self.copy_public_catalog(tmp_dir)
+            path = (
+                root
+                / "contracts"
+                / "commonworld"
+                / "catalog-summary-specificity.contract.json"
+            )
+            contract = json.loads(path.read_text(encoding="utf-8"))
+            del contract["locale_policies"]["en"]
+            path.write_text(
+                json.dumps(contract, ensure_ascii=False, indent=2) + "\n",
+                encoding="utf-8",
+            )
+
+            errors = validate_public_catalog(root)
+
+        self.assertIn(
+            "summary specificity policy missing for released locale en",
+            errors,
+        )
+
+    def test_broken_locale_overlay_fails_instead_of_falling_back_to_german(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp_dir:
+            root = self.copy_public_catalog(tmp_dir)
+            path = root / "catalog" / "locales" / "en.json"
+            overlay = json.loads(path.read_text(encoding="utf-8"))
+            del overlay["projects"]["debian"]
+            path.write_text(
+                json.dumps(overlay, ensure_ascii=False, indent=2) + "\n",
+                encoding="utf-8",
+            )
+
+            errors = validate_public_catalog(root)
+
+        self.assertTrue(
+            any(
+                error.startswith("locale en catalog projection invalid:")
+                and "missing=['debian']" in error
                 for error in errors
             )
         )
