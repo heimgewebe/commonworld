@@ -44,7 +44,9 @@ jobs:
           assert "--mode final" in readback
           assert "--mode pending" not in readback
           assert "Mark production readback pending" not in readback
+          assert 'print(f"state={state}")' in readback
           assert "steps.commit_status.outcome != 'success'" in readback
+          assert "steps.commit_status.outputs.state != 'success'" in readback
           assert "contents: write" not in readback
           print("commonworld terminal production readback status workflow contract ok")
           PY
