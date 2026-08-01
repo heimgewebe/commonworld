@@ -42,6 +42,7 @@ PROPOSAL_REPLACEMENTS_EN = {
     '<option value="other">Andere</option>': '<option value="other">Other</option>',
     '<legend>Präsenz</legend>': '<legend>Presence</legend>',
     '<span>Vor Ort</span>': '<span>On site</span>',
+    '<span>Digital</span>': '<span>Digital</span>',
     'Mindestens eine wählen.': 'Choose at least one.',
     '<span>Grobe Region oder Ort <small>(nur bei „Vor Ort“)</small></span>': '<span>Broad region or place <small>(only for “On site”)</small></span>',
     'placeholder="z. B. Uruguay, Taiwan oder Aotearoa Neuseeland"': 'placeholder="e.g. Uruguay, Taiwan or Aotearoa New Zealand"',

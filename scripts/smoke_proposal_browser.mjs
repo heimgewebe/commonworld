@@ -54,6 +54,22 @@ async function fillValid(page, name = 'Browser Test Commons') {
   await page.getByLabel('I have not entered a private address, coordinates, email address, phone number, or private network or household information.').check();
 }
 
+async function fillCandidateValid(page, { name, description, region }) {
+  const form = page.locator('#commons-proposal-form');
+  await form.locator('[name="name"]').fill(name);
+  await form.locator('[name="description"]').fill(description);
+  await form.locator('[name="official_website"]').fill('https://example.net/commons');
+  await form.locator('[name="commons_type"]').selectOption('other');
+  await form.locator('[name="presence_geographic"]').check();
+  await form.locator('[name="presence_digital"]').check();
+  await form.locator('[name="region"]').fill(region);
+  await form.locator('[name="action_url_1"]').fill('https://example.net/commons/about');
+  await form.locator('[name="sources"]').fill('https://example.net/commons/governance');
+  await form.locator('[name="public_issue_acknowledged"]').check();
+  await form.locator('[name="processing_agreed"]').check();
+  await form.locator('[name="no_sensitive_data_confirmed"]').check();
+}
+
 for (const profile of [
   { name: 'desktop', viewport: { width: 1280, height: 900 }, mobile: false },
   { name: 'mobile', viewport: { width: 390, height: 844 }, mobile: true },
@@ -314,6 +330,62 @@ html { font-size: ${profile.fontScale}% !important; }
   const nativeCoordinateError = (await alert.textContent()) ?? '';
   assert(nativeCoordinateError.includes('إحداثيات'), `privacy-native-arabic: native coordinates were not blocked: ${nativeCoordinateError}`);
   results.push('privacy-native-arabic-coordinates-fail-closed');
+  await context.close();
+}
+
+{
+  const context = await browser.newContext({ viewport: { width: 1280, height: 900 } });
+  const page = await context.newPage();
+  await page.goto(`${baseUrl}/propose.ar.html`, { waitUntil: 'networkidle' });
+  await fillCandidateValid(page, {
+    name: 'مشاع اختبار الهاتف',
+    description: 'مورد مشترك تديره جماعة محلية وفق قواعد مفتوحة. رقم التواصل الخاص هو +٩٧١ ٥٠ ١٢٣ ٤٥٦٧ ويجب حجبه.',
+    region: 'دبي',
+  });
+  await page.locator('#commons-proposal-form').evaluate((form) => form.requestSubmit());
+  const alert = page.getByRole('alert');
+  await alert.waitFor();
+  const error = (await alert.textContent()) ?? '';
+  assert(error.includes('هاتف'), `privacy-native-arabic-phone: native-digit phone number was not blocked: ${error}`);
+  results.push('privacy-native-arabic-phone-fail-closed');
+  await context.close();
+}
+
+{
+  const context = await browser.newContext({ viewport: { width: 1280, height: 900 } });
+  const page = await context.newPage();
+  await page.goto(`${baseUrl}/propose.es.html`, { waitUntil: 'networkidle' });
+  await fillCandidateValid(page, {
+    name: 'Común de prueba de dirección',
+    description: 'Recurso compartido administrado por una comunidad con reglas abiertas, fuentes oficiales y participación pública comprobable.',
+    region: 'Calle Mayor, nº 12, Madrid',
+  });
+  await page.locator('#commons-proposal-form').evaluate((form) => form.requestSubmit());
+  const alert = page.getByRole('alert');
+  await alert.waitFor();
+  const error = (await alert.textContent()) ?? '';
+  assert(/direcci|coordenad/iu.test(error), `privacy-spanish-number-marker: localized address marker was not blocked: ${error}`);
+  results.push('privacy-spanish-number-marker-fail-closed');
+  await context.close();
+}
+
+{
+  const context = await browser.newContext({ viewport: { width: 1280, height: 900 } });
+  const page = await context.newPage();
+  await page.goto(`${baseUrl}/propose.ar.html`, { waitUntil: 'networkidle' });
+  await fillCandidateValid(page, {
+    name: 'ا',
+    description: 'مورد مشترك تديره جماعة محلية وفق قواعد مفتوحة ومصادر رسمية ومسار مشاركة عام موثّق.',
+    region: 'د',
+  });
+  await page.locator('#commons-proposal-form').evaluate((form) => form.requestSubmit());
+  const alert = page.getByRole('alert');
+  await alert.waitFor();
+  const error = (await alert.textContent()) ?? '';
+  assert(error.includes('الاسم:'), `candidate-field-labels: Arabic Name prefix missing: ${error}`);
+  assert(error.includes('المنطقة:'), `candidate-field-labels: Arabic Region prefix missing: ${error}`);
+  assert(!error.includes('Name:') && !error.includes('Region:'), `candidate-field-labels: English field prefix leaked: ${error}`);
+  results.push('candidate-field-labels-localized');
   await context.close();
 }
 

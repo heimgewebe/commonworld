@@ -1,6 +1,6 @@
 import { BOOTSTRAP_RECORDS } from './commonworld-bootstrap-catalog.mjs?v=cc49548bc45c';
 import { createCatalogLoadCache, loadCatalogAggregate, loadCatalogDetail, loadCatalogShard, shardKeyForIdentity } from './commonworld-catalog-runtime.mjs?v=836cd2a8f3f9';
-import { actionLabel, documentDirection, documentLocale, localizeCatalogRecords, text as i18nText, themeLabel } from './commonworld-i18n.mjs?v=1073aba98696';
+import { actionLabel, documentDirection, documentLocale, localizeCatalogRecords, text as i18nText, themeLabel } from './commonworld-i18n.mjs?v=700272231d7a';
 import {
   COMMONS_TYPE_COLOR_TOKENS,
   COMMONS_TYPE_VALUES,
@@ -62,7 +62,7 @@ import {
   sortRecords,
   stateFromSearch,
   visibleDigitalNodes,
-} from './commonworld-core.mjs?v=beb3c853ce34';
+} from './commonworld-core.mjs?v=f8cafa5b9042';
 
 const LOCALE = documentLocale();
 const DOCUMENT_DIRECTION = documentDirection(LOCALE);

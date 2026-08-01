@@ -125,6 +125,30 @@
     {
       "id": "fa-decimal-coordinates-native-punctuation",
       "value": "۲۵٫۲۰۴۸، ۵۵٫۲۷۰۸"
+    },
+    {
+      "id": "es-number-marker-n-ordinal",
+      "value": "Calle Mayor, nº 12, Madrid"
+    },
+    {
+      "id": "pt-number-marker-n-ordinal",
+      "value": "Rua das Flores, nº 123, Recife"
+    },
+    {
+      "id": "es-number-marker-degree",
+      "value": "Calle Mayor, n° 12, Madrid"
+    },
+    {
+      "id": "pt-number-marker-num",
+      "value": "Rua das Flores, núm. 123, Recife"
+    },
+    {
+      "id": "es-number-marker-dot-ordinal",
+      "value": "Calle Mayor, n.º 12, Madrid"
+    },
+    {
+      "id": "pt-number-marker-dot-ordinal-compact",
+      "value": "Rua das Flores, n.º123, Recife"
     }
   ],
   "allowed": [
@@ -215,6 +239,14 @@
     {
       "id": "ar-unrelated-numbers",
       "value": "منذ ٢٠١٢ تعمل ٣٥ مجموعة في ثلاث مناطق."
+    },
+    {
+      "id": "es-number-marker-without-house-number",
+      "value": "La guía usa la abreviatura nº para identificar entradas."
+    },
+    {
+      "id": "pt-number-marker-without-street",
+      "value": "O registro nº 123 descreve uma rede comunitária."
     }
   ]
 }

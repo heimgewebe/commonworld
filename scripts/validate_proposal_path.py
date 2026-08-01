@@ -36,14 +36,20 @@ DMS_COORDINATE_PATTERN = re.compile(rf"{UNICODE_DECIMAL_DIGIT}{{1,3}}\s*°\s*{UN
 LETTER_OR_MARK = r"(?:[^\W\d_]|[\u0300-\u036f\u1ab0-\u1aff\u1dc0-\u1dff\u20d0-\u20ff\ufe20-\ufe2f])"
 WORD = rf"{LETTER_OR_MARK}(?:{LETTER_OR_MARK}|['’.-])*"
 HOUSE_NUMBER = rf"{UNICODE_DECIMAL_DIGIT}{{1,5}}[a-z]?(?:[-/]{UNICODE_DECIMAL_DIGIT}{{1,5}}[a-z]?)?"
+HOUSE_NUMBER_MARKER = r"(?:n(?:[º°o]\.?|\.[º°o])|núm\.?|num\.?|número|numero)"
+HOUSE_NUMBER_JOIN = rf"(?:\s+(?:{HOUSE_NUMBER_MARKER}\s*)?|\s*,\s*(?:{HOUSE_NUMBER_MARKER}\s*)?)"
 ATTACHED_STREET_SUFFIX = r"(?:straße|strasse|weg|gasse|allee|platz)"
 STREET_WORD = r"(?:street|road|avenue|boulevard|lane|drive|way|straße|strasse|rue|chemin|place|bd\.?|calle|c/|c\.|avenida|plaza|paseo|carretera|camino|via|viale|corso|rua|r\.|avenida|av\.|avda\.|travessa|trav\.|praça|praca|pça\.|estrada|estr\.|alameda|rodovia|ulica|prospekt|شارع|طريق|جادة|زقاق|ميدان|st\.?|rd\.?|ave\.?|blvd\.?|ln\.?|dr\.?)"
 ADDRESS_PATTERNS = (
     re.compile(rf"(?:^|[^\w])(?:{WORD}\s+){{0,5}}{WORD}{ATTACHED_STREET_SUFFIX}\s+{HOUSE_NUMBER}(?=$|[^\w])", re.I),
     re.compile(rf"(?:^|[^\w])(?:{WORD}\s+){{1,5}}{STREET_WORD}\s+{HOUSE_NUMBER}(?=$|[^\w])", re.I),
-    re.compile(rf"(?:^|[^\w]){STREET_WORD}\s+(?:{WORD}\s+){{0,4}}{WORD}(?:\s+|\s*,\s*){HOUSE_NUMBER}(?=$|[^\w])", re.I),
+    re.compile(rf"(?:^|[^\w]){STREET_WORD}\s+(?:{WORD}\s+){{0,4}}{WORD}{HOUSE_NUMBER_JOIN}{HOUSE_NUMBER}(?=$|[^\w])", re.I),
     re.compile(rf"(?:^|[^\w]){HOUSE_NUMBER}\s+(?:{WORD}\s+){{0,5}}{STREET_WORD}(?=$|[^\w])", re.I),
     re.compile(rf"(?:^|[^\w]){HOUSE_NUMBER}\s+{STREET_WORD}\s+(?:{WORD}\s+){{0,4}}{WORD}(?=$|[^\w])", re.I),
+)
+CONTACT_PATTERN = re.compile(
+    rf"(?:\b[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{{2,}}\b|(?:\+?{UNICODE_DECIMAL_DIGIT}(?:{UNICODE_DECIMAL_DIGIT}|[\s()/.\-]){{7,}}{UNICODE_DECIMAL_DIGIT}))",
+    re.I,
 )
 PUBLIC_TEXT_FIELDS = ("name", "description", "region", "editorial_note")
 
@@ -57,6 +63,11 @@ def contains_sensitive_location(value: object) -> bool:
         or DMS_COORDINATE_PATTERN.search(normalized)
         or any(pattern.search(normalized) for pattern in ADDRESS_PATTERNS)
     )
+
+
+def contains_contact_data(value: object) -> bool:
+    normalized = unicodedata.normalize("NFKC", str(value or ""))
+    return bool(CONTACT_PATTERN.search(normalized))
 
 
 def load(path: str) -> dict:
@@ -77,6 +88,8 @@ def validate_fixture(value: dict, schema: dict) -> list[str]:
             errors.append("source must be safe HTTPS")
     for key in PUBLIC_TEXT_FIELDS:
         raw = project.get(key)
+        if isinstance(raw, str) and contains_contact_data(raw):
+            errors.append(f"{key} contains direct contact data")
         if isinstance(raw, str) and contains_sensitive_location(raw):
             errors.append(f"{key} contains precise or private location material")
     return errors
@@ -217,6 +230,11 @@ def validate(root: Path = ROOT) -> list[str]:
         if not contains_sensitive_location(case.get("value", "")): errors.append(f"sensitive-location blocked fixture accepted: {case.get('id')}")
     for case in sensitive_cases.get("allowed", []):
         if contains_sensitive_location(case.get("value", "")): errors.append(f"sensitive-location allowed fixture rejected: {case.get('id')}")
+    contact_cases = load("tests/fixtures/proposals/contact-data-cases.json")
+    for case in contact_cases.get("blocked", []):
+        if not contains_contact_data(case.get("value", "")): errors.append(f"contact-data blocked fixture accepted: {case.get('id')}")
+    for case in contact_cases.get("allowed", []):
+        if contains_contact_data(case.get("value", "")): errors.append(f"contact-data allowed fixture rejected: {case.get('id')}")
     for fixture in ("valid.json", "digital-only-valid.json"):
         if validate_fixture(load(f"tests/fixtures/proposals/{fixture}"), schema): errors.append(f"valid proposal fixture is rejected: {fixture}")
     for fixture in ("missing-source.json", "javascript-url.json", "private-coordinates.json", "geographic-missing-region.json"):

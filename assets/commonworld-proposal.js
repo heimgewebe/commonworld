@@ -6,7 +6,7 @@ const ACTIVE_LOCALE = normalizeKnownLocale(
 );
 let candidateRuntimeMessages = null;
 if (CANDIDATE_LOCALES.includes(ACTIVE_LOCALE)) {
-  const { WAVE1_LOCALE_PACKS } = await import('./commonworld-wave1-locales.mjs?v=ad8723ab3fae');
+  const { WAVE1_LOCALE_PACKS } = await import('./commonworld-wave1-locales.mjs?v=690bf50164c5');
   candidateRuntimeMessages = WAVE1_LOCALE_PACKS[ACTIVE_LOCALE]?.proposal_runtime ?? null;
   if (!candidateRuntimeMessages) throw new Error(`missing proposal runtime locale pack: ${ACTIVE_LOCALE}`);
 }
@@ -44,16 +44,18 @@ const DECIMAL_COMMA_COORDINATE_PATTERN = /(?:^|[^\p{Nd}])[-+]?\p{Nd}{1,3},\p{Nd}
 const DMS_COORDINATE_PATTERN = /\p{Nd}{1,3}\s*°\s*\p{Nd}{1,2}\s*[′']\s*\p{Nd}{1,2}(?:[.,\u066B]\p{Nd}+)?\s*(?:[″"]|[′']{2})\s*[NS](?:\s*[,،;]\s*|\s+)\p{Nd}{1,3}\s*°\s*\p{Nd}{1,2}\s*[′']\s*\p{Nd}{1,2}(?:[.,\u066B]\p{Nd}+)?\s*(?:[″"]|[′']{2})\s*[EW]/iu;
 const WORD = String.raw`[\p{L}\p{M}][\p{L}\p{M}'’.-]*`;
 const HOUSE_NUMBER = String.raw`\p{Nd}{1,5}[A-Za-z]?(?:[-/]\p{Nd}{1,5}[A-Za-z]?)?`;
+const HOUSE_NUMBER_MARKER = String.raw`(?:n(?:[º°o]\.?|\.[º°o])|núm\.?|num\.?|número|numero)`;
+const HOUSE_NUMBER_JOIN = String.raw`(?:\s+(?:${HOUSE_NUMBER_MARKER}\s*)?|\s*,\s*(?:${HOUSE_NUMBER_MARKER}\s*)?)`;
 const ATTACHED_STREET_SUFFIX = String.raw`(?:straße|strasse|weg|gasse|allee|platz)`;
 const STREET_WORD = String.raw`(?:street|road|avenue|boulevard|lane|drive|way|straße|strasse|rue|chemin|place|bd\.?|calle|c/|c\.|avenida|plaza|paseo|carretera|camino|via|viale|corso|rua|r\.|avenida|av\.|avda\.|travessa|trav\.|praça|praca|pça\.|estrada|estr\.|alameda|rodovia|ulica|prospekt|شارع|طريق|جادة|زقاق|ميدان|st\.?|rd\.?|ave\.?|blvd\.?|ln\.?|dr\.?)`;
 const ADDRESS_PATTERNS = Object.freeze([
   new RegExp(String.raw`(?:^|[^\p{L}\p{N}])(?:${WORD}\s+){0,5}${WORD}${ATTACHED_STREET_SUFFIX}\s+${HOUSE_NUMBER}(?=$|[^\p{L}\p{N}])`, 'iu'),
   new RegExp(String.raw`(?:^|[^\p{L}\p{N}])(?:${WORD}\s+){1,5}${STREET_WORD}\s+${HOUSE_NUMBER}(?=$|[^\p{L}\p{N}])`, 'iu'),
-  new RegExp(String.raw`(?:^|[^\p{L}\p{N}])${STREET_WORD}\s+(?:${WORD}\s+){0,4}${WORD}(?:\s+|\s*,\s*)${HOUSE_NUMBER}(?=$|[^\p{L}\p{N}])`, 'iu'),
+  new RegExp(String.raw`(?:^|[^\p{L}\p{N}])${STREET_WORD}\s+(?:${WORD}\s+){0,4}${WORD}${HOUSE_NUMBER_JOIN}${HOUSE_NUMBER}(?=$|[^\p{L}\p{N}])`, 'iu'),
   new RegExp(String.raw`(?:^|[^\p{L}\p{N}])${HOUSE_NUMBER}\s+(?:${WORD}\s+){0,5}${STREET_WORD}(?=$|[^\p{L}\p{N}])`, 'iu'),
   new RegExp(String.raw`(?:^|[^\p{L}\p{N}])${HOUSE_NUMBER}\s+${STREET_WORD}\s+(?:${WORD}\s+){0,4}${WORD}(?=$|[^\p{L}\p{N}])`, 'iu'),
 ]);
-const CONTACT_PATTERN = /(?:\b[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}\b|(?:\+?\d[\d\s()/.-]{7,}\d))/iu;
+const CONTACT_PATTERN = /(?:\b[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}\b|(?:\+?\p{Nd}[\p{Nd}\s()/.\-]{7,}\p{Nd}))/iu;
 const ACTIVE_CONTENT_PATTERN = /(?:<\s*script\b|javascript\s*:|data\s*:\s*text\/html|on(?:error|load|click)\s*=)/iu;
 
 export function normalizeTitle(value) {
@@ -80,7 +82,7 @@ export function containsSensitiveLocation(value) {
 }
 
 export function containsContactData(value) {
-  return CONTACT_PATTERN.test(String(value || ""));
+  return CONTACT_PATTERN.test(String(value || "").normalize("NFKC"));
 }
 
 function validateText(errors, field, value, min, max) {
@@ -104,10 +106,10 @@ export function validateProposal(proposal, knownTitles = [], knownHosts = []) {
   if (!project || typeof project !== "object" || Array.isArray(project)) return [...errors, tr("Projekt: Angaben fehlen.", "Project: information is missing.")];
   const allowedProject = new Set(["name", "description", "official_website", "commons_type", "presence_geographic", "presence_digital", "region", "actions", "sources", "sensitive_location_risk", "location_precision", "editorial_note"]);
   for (const key of Object.keys(project)) if (!allowedProject.has(key)) errors.push(tr(`Projekt: unbekanntes Feld ${key}.`, `Project: unknown field ${key}.`));
-  validateText(errors, "Name", project.name, 2, MAX.name);
+  validateText(errors, tr("Name", "Name"), project.name, 2, MAX.name);
   validateText(errors, tr("Beschreibung", "Description"), project.description, 40, MAX.description);
   if (project.presence_geographic === true) {
-    validateText(errors, "Region", project.region, 2, MAX.region);
+    validateText(errors, tr("Region", "Region"), project.region, 2, MAX.region);
     if (project.location_precision !== "country_or_region_only") errors.push(tr("Ortsgenauigkeit: nur Land oder grobe Region ist zulässig.", "Location precision: only a country or broad region is allowed."));
   } else {
     if (Object.prototype.hasOwnProperty.call(project, "region")) errors.push(tr("Region: bei rein digitaler Präsenz nicht angeben.", "Region: do not provide one for digital-only presence."));

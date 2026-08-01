@@ -130,7 +130,10 @@ try {
         }
       }
       let proposalRuntimeError = '';
+      let proposalDigitalLabel = '';
       if (pageName.startsWith('propose.')) {
+        proposalDigitalLabel = ((await page.locator('#commons-proposal-form [name="presence_digital"]').locator('xpath=ancestor::label[1]//span').textContent()) ?? '').trim();
+        assert(proposalDigitalLabel === CANDIDATE_SOURCE.locales[candidate.locale].static.digital, `${pageName}: candidate Digital option is not localized: ${proposalDigitalLabel}`);
         const expectedRuntimeError = CANDIDATE_SOURCE.locales[candidate.locale].proposal_runtime['Automated submission blocked.'];
         await page.locator('input[name=website_confirm]').fill('bot');
         await page.locator('#commons-proposal-form').evaluate((form) => form.requestSubmit());
@@ -461,7 +464,7 @@ try {
       assert(pageErrors.length === 0, `${pageName}: page errors: ${pageErrors.join(' | ')}`);
       assert(failedResponses.length === 0, `${pageName}: failed resources: ${failedResponses.join(' | ')}`);
       assert(consoleErrors.length === 0, `${pageName}: console errors: ${consoleErrors.join(' | ')}`);
-      results.push({ page: pageName, locale: candidate.locale, direction: candidate.direction, proposalRuntimeLocalized: pageName.startsWith('propose.'), verdict: 'PASS' });
+      results.push({ page: pageName, locale: candidate.locale, direction: candidate.direction, proposalRuntimeLocalized: pageName.startsWith('propose.'), proposalDigitalLabel, verdict: 'PASS' });
       await context.close();
     }
   }
