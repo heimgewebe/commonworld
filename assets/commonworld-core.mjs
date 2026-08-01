@@ -1,4 +1,4 @@
-import { FALLBACK_LOCALE, normalizeLocale, taxonomyLabel, text as i18nText } from './commonworld-i18n.mjs?v=179acb1373e6';
+import { FALLBACK_LOCALE, normalizeLocale, taxonomyLabel, text as i18nText } from './commonworld-i18n.mjs?v=ff9f3b1c3a1d';
 
 export const DEFAULT_CAMERA = Object.freeze({
   lng: 8,

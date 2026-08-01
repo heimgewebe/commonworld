@@ -126,7 +126,10 @@
         "spatial_evidenced_commons": "{count} Commons con evidencia espacial",
         "regional_contexts": "contextos regionales",
         "public_areas_approximate_locations": "áreas públicas y ubicaciones aproximadas",
-        "public_points_areas_relationships": "puntos públicos, áreas y relaciones"
+        "public_points_areas_relationships": "puntos públicos, áreas y relaciones",
+        "visible_ring_commons_intro": "Commons visibles en los anillos digitales:",
+        "show_project_details_short": "Mostrar detalles del proyecto",
+        "open_project_short": "Abrir proyecto"
       },
       "themes": {
         "agriculture": "Agricultura",
@@ -731,7 +734,10 @@
         "spatial_evidenced_commons": "{count} Communs étayés par des données spatiales",
         "regional_contexts": "contextes régionaux",
         "public_areas_approximate_locations": "zones publiques et emplacements approximatifs",
-        "public_points_areas_relationships": "points publics, zones et relations"
+        "public_points_areas_relationships": "points publics, zones et relations",
+        "visible_ring_commons_intro": "Communs visibles dans les anneaux numériques :",
+        "show_project_details_short": "Afficher les détails du projet",
+        "open_project_short": "Ouvrir le projet"
       },
       "themes": {
         "agriculture": "Agriculture",
@@ -1336,7 +1342,10 @@
         "spatial_evidenced_commons": "{count} Comuns com evidência espacial",
         "regional_contexts": "contextos regionais",
         "public_areas_approximate_locations": "áreas públicas e localizações aproximadas",
-        "public_points_areas_relationships": "pontos públicos, áreas e relações"
+        "public_points_areas_relationships": "pontos públicos, áreas e relações",
+        "visible_ring_commons_intro": "Comuns visíveis nos anéis digitais:",
+        "show_project_details_short": "Mostrar detalhes do projeto",
+        "open_project_short": "Abrir projeto"
       },
       "themes": {
         "agriculture": "Agricultura",
@@ -1941,7 +1950,10 @@
         "spatial_evidenced_commons": "{count} مشاعات موثقة مكانيًا",
         "regional_contexts": "سياقات إقليمية",
         "public_areas_approximate_locations": "مناطق عامة ومواقع تقريبية",
-        "public_points_areas_relationships": "نقاط ومناطق وعلاقات عامة"
+        "public_points_areas_relationships": "نقاط ومناطق وعلاقات عامة",
+        "visible_ring_commons_intro": "المشاعات الظاهرة في الحلقات الرقمية:",
+        "show_project_details_short": "عرض تفاصيل المشروع",
+        "open_project_short": "فتح المشروع"
       },
       "themes": {
         "agriculture": "الزراعة",

@@ -209,8 +209,19 @@ async function accessibilitySubtreeForSelector(page, selector) {
 function assertAccessibleRingSummary(nodes, titles, label) {
   const summary = nodes[0];
   assert(summary && !summary.ignored && summary.role === 'paragraph', `${label}: exact summary AX node is absent or ignored (${JSON.stringify(nodes)})`);
+  const descendants = new Set([summary.nodeId]);
+  let changed = true;
+  while (changed) {
+    changed = false;
+    for (const node of nodes) {
+      if (node.parentId && descendants.has(node.parentId) && !descendants.has(node.nodeId)) {
+        descendants.add(node.nodeId);
+        changed = true;
+      }
+    }
+  }
   const exposedText = nodes
-    .filter((node) => !node.ignored && node.parentId === summary.nodeId && node.role === 'StaticText')
+    .filter((node) => !node.ignored && descendants.has(node.parentId) && node.role === 'StaticText')
     .map((node) => node.name)
     .join(' ');
   assert(exposedText, `${label}: exact summary AX node has no exposed StaticText child (${JSON.stringify(nodes)})`);

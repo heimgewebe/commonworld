@@ -1,6 +1,6 @@
 import { BOOTSTRAP_RECORDS } from './commonworld-bootstrap-catalog.mjs?v=6b2e3dc6ea44';
 import { createCatalogLoadCache, loadCatalogAggregate, loadCatalogDetail, loadCatalogShard, shardKeyForIdentity } from './commonworld-catalog-runtime.mjs?v=836cd2a8f3f9';
-import { actionLabel, documentLocale, localizeCatalogRecords, text as i18nText, themeLabel } from './commonworld-i18n.mjs?v=179acb1373e6';
+import { actionLabel, documentLocale, localizeCatalogRecords, text as i18nText, themeLabel } from './commonworld-i18n.mjs?v=ff9f3b1c3a1d';
 import {
   COMMONS_TYPE_COLOR_TOKENS,
   COMMONS_TYPE_VALUES,
@@ -56,7 +56,7 @@ import {
   sortRecords,
   stateFromSearch,
   visibleDigitalNodes,
-} from './commonworld-core.mjs?v=a40753070c5b';
+} from './commonworld-core.mjs?v=5be9e46b3c16';
 
 const LOCALE = documentLocale();
 const t = (key, germanFallback, variables = {}) => i18nText(LOCALE, key, germanFallback, variables);
@@ -739,9 +739,11 @@ function appendRingSequence(textPath, assignments, { prefix = '' } = {}) {
       'data-visible-label': assignment.visibleText,
     });
     name.textContent = `\u00A0\u00A0${assignment.visibleText}`;
+    if (assignment.contentLocale) name.setAttribute('lang', assignment.contentLocale);
     textPath.append(name);
   }
 }
+
 
 function applySphereRingDetail(requestedDetailLevel = elements.sphere.dataset.ringDetailLevel || elements.sphere.dataset.detailLevel || 'names') {
   const detailLevel = window.matchMedia('(max-width: 48rem)').matches && requestedDetailLevel === 'names'
@@ -761,7 +763,12 @@ function renderSphereRibbons(records = runtime.records) {
     .filter((node) => node.type !== 'diagnostic' || node.identityCount > 0)
     .slice(0, 8);
   const visibleRingSources = visibleNodes.map((node) => recordsForNode(node).slice(0, SPHERE_RING_IDENTITY_PREVIEW_LIMIT));
-  const globalAssignments = sphereRingLabelAssignments(visibleRingSources.flat());
+  const ringRecords = visibleRingSources.flat();
+  const contentLocaleById = new Map(ringRecords.map((record) => [String(record.id), record._content_locale ?? null]));
+  const globalAssignments = sphereRingLabelAssignments(ringRecords).map((assignment) => ({
+    ...assignment,
+    contentLocale: contentLocaleById.get(String(assignment.id)) ?? null,
+  }));
   const assignmentById = new Map(globalAssignments.map((assignment) => [assignment.id, assignment]));
   elements.sphereRings.replaceChildren();
   visibleNodes.forEach((node, layerIndex) => {
@@ -811,10 +818,23 @@ function renderSphereRibbons(records = runtime.records) {
     plane.append(text);
     elements.sphereRings.append(plane);
   });
-  const accessibleTitles = [...new Set(globalAssignments.map(({ fullText }) => fullText).filter(Boolean))];
-  elements.sphereRingAccessibleSummary.textContent = accessibleTitles.length
-    ? t('visible_ring_commons', 'Sichtbare Commons in den digitalen Ringen: {titles}.', { titles: accessibleTitles.join(', ') })
-    : t('visible_ring_commons_empty', 'In den digitalen Ringen sind derzeit keine Commons sichtbar.');
+  const accessibleAssignments = [...new Map(
+    globalAssignments.filter(({ fullText }) => Boolean(fullText)).map((assignment) => [assignment.fullText, assignment]),
+  ).values()];
+  if (accessibleAssignments.length) {
+    const intro = document.createElement('span');
+    intro.textContent = t('visible_ring_commons_intro', 'Sichtbare Commons in den digitalen Ringen:');
+    const nodes = [intro, document.createTextNode(' ')];
+    accessibleAssignments.forEach((assignment, index) => {
+      const title = document.createElement('span');
+      title.textContent = assignment.fullText;
+      if (assignment.contentLocale) title.lang = assignment.contentLocale;
+      nodes.push(title, document.createTextNode(index + 1 < accessibleAssignments.length ? ', ' : '.'));
+    });
+    elements.sphereRingAccessibleSummary.replaceChildren(...nodes);
+  } else {
+    elements.sphereRingAccessibleSummary.textContent = t('visible_ring_commons_empty', 'In den digitalen Ringen sind derzeit keine Commons sichtbar.');
+  }
   applySphereRingDetail();
   runtime.overlayRenderCount += 1;
   elements.stage.dataset.overlayRenders = String(runtime.overlayRenderCount);
@@ -833,15 +853,22 @@ function createRibbonSegment(record) {
   segment.type = 'button';
   segment.className = 'digital-ribbon-item';
   segment.dataset.commonprojectId = record.id;
-  segment.setAttribute('aria-label', t('show_project_details', 'Details zu {title} anzeigen', { title: record.title }));
   segment.setAttribute('aria-controls', 'project-focus');
+  const action = document.createElement('span');
+  action.className = 'visually-hidden';
+  action.id = `digital-ribbon-action-${record.id}`;
+  action.textContent = t('show_project_details_short', 'Projektdetails anzeigen');
   const name = document.createElement('span');
   name.className = 'digital-ribbon-name';
+  name.id = `digital-ribbon-name-${record.id}`;
   name.textContent = record.title;
-  segment.append(name);
+  if (record._content_locale) name.lang = record._content_locale;
+  segment.setAttribute('aria-labelledby', `${action.id} ${name.id}`);
+  segment.append(action, name);
   segment.addEventListener('click', () => selectDigitalProject(record, { trigger: segment }));
   return segment;
 }
+
 
 function isIdentityLevelView(view) {
   return Boolean(view?.current) && view.children.length > 0 && view.children.every((node) => node.type === 'identity');
@@ -2213,14 +2240,18 @@ function createDiscoveryResult(record, position) {
   main.type = 'button';
   main.className = 'discovery-result-main';
   main.dataset.commonprojectId = record.id;
-  main.setAttribute('aria-label', String(position + 1) + '. ' + t('open_project', '{title} öffnen', { title: record.title }));
-
+  const action = document.createElement('span');
+  action.className = 'visually-hidden';
+  action.id = `discovery-result-action-${record.id}`;
+  action.textContent = t('open_project_short', 'Projekt öffnen');
   const rank = document.createElement('span');
   rank.className = 'discovery-result-rank';
+  rank.id = `discovery-result-rank-${record.id}`;
   rank.textContent = String(position + 1);
   const copy = document.createElement('span');
   copy.className = 'discovery-result-copy';
   const title = document.createElement('strong');
+  title.id = `discovery-result-title-${record.id}`;
   title.textContent = record.title;
   if (record._content_locale) title.lang = record._content_locale;
   const meta = document.createElement('span');
@@ -2231,7 +2262,8 @@ function createDiscoveryResult(record, position) {
   summary.textContent = record.summary;
   if (record._content_locale) summary.lang = record._content_locale;
   copy.append(title, meta, summary);
-  main.append(rank, copy);
+  main.setAttribute('aria-labelledby', `${rank.id} ${action.id} ${title.id}`);
+  main.append(action, rank, copy);
   main.addEventListener('click', () => selectProject(record.id, { trigger: main, navigateSpatial: true }));
   item.append(main);
 

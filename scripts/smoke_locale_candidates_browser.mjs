@@ -138,21 +138,46 @@ try {
           const staticSummary = card?.querySelector('h2 + p')?.textContent ?? '';
           const staticKind = card?.querySelector('.catalog-kind')?.textContent ?? '';
           const expectedPresence = staticKind.split(' · ').slice(1).join(' · ');
+          const sphereNameLangs = [...document.querySelectorAll('.sphere-ring-name')].map((node) => node.getAttribute('lang') ?? '');
+          const sphereSummaryTitleLangs = [...document.querySelectorAll('#sphere-ring-accessible-summary span[lang]')].map((node) => node.getAttribute('lang') ?? '');
           button?.click();
           const deadline = performance.now() + 10_000;
           while ((document.querySelector('#focus-title')?.textContent ?? '') !== staticTitle) {
             if (performance.now() > deadline) throw new Error('candidate runtime focus did not open');
             await new Promise((resolve) => requestAnimationFrame(resolve));
           }
+          const focusTitle = document.querySelector('#focus-title')?.textContent ?? '';
+          const focusSummary = document.querySelector('#focus-summary')?.textContent ?? '';
+          const focusTitleLang = document.querySelector('#focus-title')?.lang ?? '';
+          const focusSummaryLang = document.querySelector('#focus-summary')?.lang ?? '';
+          const focusPresence = document.querySelector('#focus-presence')?.textContent ?? '';
+          document.querySelector('#focus-close')?.click();
+          document.querySelector('#layer-view-button')?.click();
+          const layerDeadline = performance.now() + 15_000;
+          while (!document.querySelector('.digital-ribbon-name')) {
+            if (performance.now() > layerDeadline) throw new Error('candidate digital ribbon did not render');
+            await new Promise((resolve) => requestAnimationFrame(resolve));
+          }
+          const ribbonNames = [...document.querySelectorAll('.digital-ribbon-name')];
+          const ribbonControls = [...document.querySelectorAll('.digital-ribbon-item')];
           return {
             staticTitle,
             staticSummary,
             expectedPresence,
-            focusTitle: document.querySelector('#focus-title')?.textContent ?? '',
-            focusSummary: document.querySelector('#focus-summary')?.textContent ?? '',
-            focusTitleLang: document.querySelector('#focus-title')?.lang ?? '',
-            focusSummaryLang: document.querySelector('#focus-summary')?.lang ?? '',
-            focusPresence: document.querySelector('#focus-presence')?.textContent ?? '',
+            focusTitle,
+            focusSummary,
+            focusTitleLang,
+            focusSummaryLang,
+            focusPresence,
+            sphereNameLangs,
+            sphereSummaryTitleLangs,
+            ribbonNameLangs: ribbonNames.map((node) => node.getAttribute('lang') ?? ''),
+            ribbonLabelsBound: ribbonControls.every((node) => !node.hasAttribute('aria-label') && Boolean(node.getAttribute('aria-labelledby'))),
+            ribbonTitleLabelsEnglish: ribbonControls.every((node) => {
+              const ids = (node.getAttribute('aria-labelledby') ?? '').split(/\s+/u).filter(Boolean);
+              const title = ids.map((id) => document.getElementById(id)).find((label) => label?.classList.contains('digital-ribbon-name'));
+              return title?.getAttribute('lang') === 'en';
+            }),
           };
         });
       }
@@ -193,6 +218,10 @@ try {
         assert(runtimeCatalogBoundary?.focusTitle === runtimeCatalogBoundary?.staticTitle, `${pageName}: runtime title fell off the English content overlay`);
         assert(runtimeCatalogBoundary?.focusSummary === runtimeCatalogBoundary?.staticSummary, `${pageName}: runtime summary fell off the English content overlay`);
         assert(runtimeCatalogBoundary?.focusTitleLang === 'en' && runtimeCatalogBoundary?.focusSummaryLang === 'en', `${pageName}: runtime English content lacks lang=en boundaries`);
+        assert((runtimeCatalogBoundary?.sphereNameLangs?.length ?? 0) > 0 && runtimeCatalogBoundary.sphereNameLangs.every((lang) => lang === 'en'), `${pageName}: sphere ring titles lack lang=en boundaries`);
+        assert((runtimeCatalogBoundary?.sphereSummaryTitleLangs?.length ?? 0) > 0 && runtimeCatalogBoundary.sphereSummaryTitleLangs.every((lang) => lang === 'en'), `${pageName}: sphere accessible summary titles lack lang=en boundaries`);
+        assert((runtimeCatalogBoundary?.ribbonNameLangs?.length ?? 0) > 0 && runtimeCatalogBoundary.ribbonNameLangs.every((lang) => lang === 'en'), `${pageName}: digital ribbon titles lack lang=en boundaries`);
+        assert(runtimeCatalogBoundary?.ribbonLabelsBound && runtimeCatalogBoundary?.ribbonTitleLabelsEnglish, `${pageName}: digital ribbon accessible labels do not preserve mixed-language boundaries`);
         const candidatePack = CANDIDATE_SOURCE.locales[candidate.locale];
         const focusPresence = runtimeCatalogBoundary?.focusPresence ?? '';
         const staticPresence = runtimeCatalogBoundary?.expectedPresence ?? '';

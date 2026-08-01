@@ -6,7 +6,7 @@ const ACTIVE_LOCALE = normalizeKnownLocale(
 );
 let candidateRuntimeMessages = null;
 if (CANDIDATE_LOCALES.includes(ACTIVE_LOCALE)) {
-  const { WAVE1_LOCALE_PACKS } = await import('./commonworld-wave1-locales.mjs?v=00ad225e0849');
+  const { WAVE1_LOCALE_PACKS } = await import('./commonworld-wave1-locales.mjs?v=fe82403325eb');
   candidateRuntimeMessages = WAVE1_LOCALE_PACKS[ACTIVE_LOCALE]?.proposal_runtime ?? null;
   if (!candidateRuntimeMessages) throw new Error(`missing proposal runtime locale pack: ${ACTIVE_LOCALE}`);
 }
@@ -38,19 +38,20 @@ const RELEASE_DRAFT_KEY = "commonworldProposalReleaseDraftV1";
 const RELEASE_DRAFT_MAX_AGE_MS = 5 * 60_000;
 const ACTION_TYPES = new Set(["visit", "use", "borrow", "learn", "contribute", "volunteer", "donate", "contact", "replicate"]);
 const COMMONS_TYPES = new Set(["knowledge", "software", "culture", "food-seeds", "water", "energy", "housing-land", "health-care", "tools-repair", "community-network", "other"]);
-const SENSITIVE_CONTEXT_PATTERN = /\b(?:latitude|longitude|coordinates?|gps)\b/iu;
+const SENSITIVE_CONTEXT_PATTERN = /(?:^|[^\p{L}\p{N}])(?:latitude|longitude|coordinates?|coordonnées?|coordenadas?|gps|الإحداثيات|احداثيات|خط\s+العرض|خط\s+الطول)(?=$|[^\p{L}\p{N}])/iu;
 const DECIMAL_POINT_COORDINATE_PATTERN = /(?:^|[^\d])[-+]?\d{1,3}\.\d{3,}\s*[,;/ ]\s*[-+]?\d{1,3}\.\d{3,}(?:[^\d]|$)/u;
 const DECIMAL_COMMA_COORDINATE_PATTERN = /(?:^|[^\d])[-+]?\d{1,3},\d{3,}\s*[;/]\s*[-+]?\d{1,3},\d{3,}(?:[^\d]|$)/u;
 const DMS_COORDINATE_PATTERN = /\d{1,3}\s*°\s*\d{1,2}\s*[′']\s*\d{1,2}(?:[.,]\d+)?\s*(?:[″"]|[′']{2})\s*[NS](?:\s*[,;]\s*|\s+)\d{1,3}\s*°\s*\d{1,2}\s*[′']\s*\d{1,2}(?:[.,]\d+)?\s*(?:[″"]|[′']{2})\s*[EW]/iu;
 const WORD = String.raw`[\p{L}\p{M}][\p{L}\p{M}'’.-]*`;
-const HOUSE_NUMBER = String.raw`\d{1,5}[a-z]?(?:[-/]\d{1,5}[a-z]?)?`;
+const HOUSE_NUMBER = String.raw`\p{N}{1,5}[A-Za-z]?(?:[-/]\p{N}{1,5}[A-Za-z]?)?`;
 const ATTACHED_STREET_SUFFIX = String.raw`(?:straße|strasse|weg|gasse|allee|platz)`;
-const STREET_WORD = String.raw`(?:street|road|avenue|boulevard|lane|drive|way|straße|strasse|rue|calle|via|viale|corso|ulica|prospekt|st\.?|rd\.?|ave\.?|blvd\.?|ln\.?|dr\.?)`;
+const STREET_WORD = String.raw`(?:street|road|avenue|boulevard|lane|drive|way|straße|strasse|rue|chemin|place|calle|avenida|plaza|paseo|carretera|camino|via|viale|corso|rua|travessa|praça|praca|estrada|alameda|rodovia|ulica|prospekt|شارع|طريق|جادة|زقاق|ميدان|st\.?|rd\.?|ave\.?|blvd\.?|ln\.?|dr\.?)`;
 const ADDRESS_PATTERNS = Object.freeze([
   new RegExp(String.raw`(?:^|[^\p{L}\p{N}])(?:${WORD}\s+){0,5}${WORD}${ATTACHED_STREET_SUFFIX}\s+${HOUSE_NUMBER}(?=$|[^\p{L}\p{N}])`, 'iu'),
   new RegExp(String.raw`(?:^|[^\p{L}\p{N}])(?:${WORD}\s+){1,5}${STREET_WORD}\s+${HOUSE_NUMBER}(?=$|[^\p{L}\p{N}])`, 'iu'),
-  new RegExp(String.raw`(?:^|[^\p{L}\p{N}])(?:rue|calle|via|viale|corso|avenue|boulevard)\s+(?:${WORD}\s+){0,4}${WORD}\s+${HOUSE_NUMBER}(?=$|[^\p{L}\p{N}])`, 'iu'),
+  new RegExp(String.raw`(?:^|[^\p{L}\p{N}])${STREET_WORD}\s+(?:${WORD}\s+){0,4}${WORD}\s+${HOUSE_NUMBER}(?=$|[^\p{L}\p{N}])`, 'iu'),
   new RegExp(String.raw`(?:^|[^\p{L}\p{N}])${HOUSE_NUMBER}\s+(?:${WORD}\s+){0,5}${STREET_WORD}(?=$|[^\p{L}\p{N}])`, 'iu'),
+  new RegExp(String.raw`(?:^|[^\p{L}\p{N}])${HOUSE_NUMBER}\s+${STREET_WORD}\s+(?:${WORD}\s+){0,4}${WORD}(?=$|[^\p{L}\p{N}])`, 'iu'),
 ]);
 const CONTACT_PATTERN = /(?:\b[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}\b|(?:\+?\d[\d\s()/.-]{7,}\d))/iu;
 const ACTIVE_CONTENT_PATTERN = /(?:<\s*script\b|javascript\s*:|data\s*:\s*text\/html|on(?:error|load|click)\s*=)/iu;

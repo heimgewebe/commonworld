@@ -49,6 +49,46 @@
     {
       "id": "dms-semicolon-separated",
       "value": "52°31′12″N; 13°24′36″E"
+    },
+    {
+      "id": "fr-chemin",
+      "value": "Chemin des Lilas 8, Lyon"
+    },
+    {
+      "id": "es-avenida",
+      "value": "Avenida de la Constitución 15, Sevilla"
+    },
+    {
+      "id": "pt-br-rua",
+      "value": "Rua das Flores 123, Recife"
+    },
+    {
+      "id": "pt-br-number-leading",
+      "value": "45 Avenida Paulista, São Paulo"
+    },
+    {
+      "id": "ar-street-ascii-digits",
+      "value": "شارع النيل 12، القاهرة"
+    },
+    {
+      "id": "ar-street-arabic-digits",
+      "value": "شارع التحرير ١٢، القاهرة"
+    },
+    {
+      "id": "ar-number-leading",
+      "value": "١٢ شارع النيل، القاهرة"
+    },
+    {
+      "id": "pt-coordinate-label",
+      "value": "Coordenadas disponíveis mediante solicitação"
+    },
+    {
+      "id": "fr-coordinate-label",
+      "value": "Coordonnées disponibles sur demande"
+    },
+    {
+      "id": "ar-coordinate-label",
+      "value": "الإحداثيات متاحة عند الطلب"
     }
   ],
   "allowed": [
@@ -99,6 +139,22 @@
     {
       "id": "roof-domain-term",
       "value": "The cooperative installs solar panels on shared roof areas."
+    },
+    {
+      "id": "pt-broad-region",
+      "value": "Nordeste do Brasil e região metropolitana do Recife"
+    },
+    {
+      "id": "ar-broad-region",
+      "value": "شمال مصر ومنطقة القاهرة الكبرى"
+    },
+    {
+      "id": "pt-street-word-without-number",
+      "value": "Arte de rua e cultura do espaço público em Recife"
+    },
+    {
+      "id": "ar-street-word-without-number",
+      "value": "فن الشارع والثقافة العامة في القاهرة"
     }
   ]
 }
