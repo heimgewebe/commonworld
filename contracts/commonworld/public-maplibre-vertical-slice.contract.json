@@ -17,6 +17,10 @@
       {
         "path": "assets/vendor/maplibre-gl.css",
         "sha256": "ab1e70d59ec40465bae7e7030da2f3ccf28133fd502e62bd598eefbadfd7a732"
+      },
+      {
+        "path": "assets/vendor/mapbox-gl-rtl-text.js",
+        "sha256": "d1c69035295613baaf83fe23fd9266b0eaed7e5e472e9632b0b5438afc3f589e"
       }
     ],
     "floating_cdn_forbidden": true,
@@ -27,6 +31,28 @@
       "path": "assets/vendor/MAPLIBRE-LICENSE.txt",
       "sha256": "ee5fc05a0677eaf69601d2c7db0d9ecd6cc27c3abc1d0733bc9ed34707cf8ef2",
       "copied_verbatim_from": "node_modules/maplibre-gl/LICENSE.txt"
+    },
+    "rtl_text_plugin": {
+      "package": "@mapbox/mapbox-gl-rtl-text",
+      "version": "0.3.0",
+      "exact_dependency_required": true,
+      "local_only": true,
+      "rtl_locale_activation": [
+        "ar"
+      ],
+      "browser_asset": {
+        "path": "assets/vendor/mapbox-gl-rtl-text.js",
+        "sha256": "d1c69035295613baaf83fe23fd9266b0eaed7e5e472e9632b0b5438afc3f589e"
+      },
+      "notice_file": {
+        "path": "assets/vendor/MAPBOX-RTL-TEXT-NOTICE.txt",
+        "sha256": "2699e6cd1359b8c6228576cde6411b4b90df37c0e03ea63663e7806798695fb0"
+      },
+      "license_file": {
+        "path": "assets/vendor/MAPBOX-RTL-TEXT-LICENSE.md",
+        "sha256": "7dca3646879aae2fa04f9d77f98ddeeabe4898be6a592a59985c112fd817300b",
+        "copied_verbatim_from": "node_modules/@mapbox/mapbox-gl-rtl-text/LICENSE.md"
+      }
     }
   },
   "basemap": {

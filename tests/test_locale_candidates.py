@@ -289,12 +289,12 @@ class LocaleCandidatePackTests(unittest.TestCase):
                     for candidate in CANDIDATES:
                         self.assertNotIn(f'data-locale-choice="{candidate}"', markup)
             index_markup = (ROOT / entry["surface_files"]["index"]).read_text(encoding="utf-8")
-            self.assertRegex(index_markup, r'<h2 lang="en">')
+            self.assertRegex(index_markup, r'<h2 lang="en" dir="ltr">')
 
     def test_arabic_surface_keeps_mixed_script_fragments_explicit(self) -> None:
         markup = (ROOT / "ar.html").read_text(encoding="utf-8")
         self.assertIn('<html lang="ar" dir="rtl">', markup)
-        self.assertIn('lang="en"', markup)
+        self.assertIn('lang="en" dir="ltr"', markup)
         self.assertIn('dir="ltr"', (ROOT / "index.css").read_text(encoding="utf-8"))
 
 

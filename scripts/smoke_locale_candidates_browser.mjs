@@ -100,7 +100,11 @@ try {
       const pageErrors = [];
       const consoleErrors = [];
       const failedResponses = [];
+      const rtlPluginRequests = [];
       page.on('pageerror', (error) => pageErrors.push(error.message));
+      page.on('request', (request) => {
+        if (request.url().includes('/assets/vendor/mapbox-gl-rtl-text.js')) rtlPluginRequests.push(request.url());
+      });
       page.on('response', (networkResponse) => {
         if (networkResponse.status() < 400) return;
         const failedUrl = networkResponse.url();
@@ -118,6 +122,12 @@ try {
       assert(response?.status() === 200, `${pageName}: HTTP ${response?.status()}`);
       if (!pageName.startsWith('method.') && !pageName.startsWith('propose.')) {
         await page.waitForSelector('html.runtime-ready', { timeout: 30_000 });
+        if (pageName === 'ar.html') {
+          await page.waitForFunction(
+            () => window.maplibregl?.getRTLTextPluginStatus?.() === 'loaded',
+            { timeout: 30_000 },
+          );
+        }
       }
       let proposalRuntimeError = '';
       if (pageName.startsWith('propose.')) {
@@ -134,12 +144,21 @@ try {
         runtimeCatalogBoundary = await page.evaluate(async () => {
           const card = document.querySelector('.catalog-card[data-commonproject-id]');
           const button = card?.querySelector('.catalog-select');
-          const staticTitle = card?.querySelector('h2')?.textContent ?? '';
-          const staticSummary = card?.querySelector('h2 + p')?.textContent ?? '';
+          const staticTitleNode = card?.querySelector('h2');
+          const staticSummaryNode = card?.querySelector('h2 + p');
+          const staticTitle = staticTitleNode?.textContent ?? '';
+          const staticSummary = staticSummaryNode?.textContent ?? '';
+          const staticTitleDir = staticTitleNode?.getAttribute('dir') ?? '';
+          const staticSummaryDir = staticSummaryNode?.getAttribute('dir') ?? '';
           const staticKind = card?.querySelector('.catalog-kind')?.textContent ?? '';
           const expectedPresence = staticKind.split(' · ').slice(1).join(' · ');
-          const sphereNameLangs = [...document.querySelectorAll('.sphere-ring-name')].map((node) => node.getAttribute('lang') ?? '');
-          const sphereSummaryTitleLangs = [...document.querySelectorAll('#sphere-ring-accessible-summary span[lang]')].map((node) => node.getAttribute('lang') ?? '');
+          const sphereNameNodes = [...document.querySelectorAll('.sphere-ring-name')];
+          const sphereSummaryTitleNodes = [...document.querySelectorAll('#sphere-ring-accessible-summary span[lang]')];
+          const sphereNameLangs = sphereNameNodes.map((node) => node.getAttribute('lang') ?? '');
+          const sphereNameDirs = sphereNameNodes.map((node) => node.getAttribute('dir') ?? '');
+          const sphereSummaryTitleLangs = sphereSummaryTitleNodes.map((node) => node.getAttribute('lang') ?? '');
+          const sphereSummaryTitleDirs = sphereSummaryTitleNodes.map((node) => node.getAttribute('dir') ?? '');
+          const sphereAccessibleText = document.querySelector('#sphere-ring-accessible-summary')?.textContent ?? '';
           button?.click();
           const deadline = performance.now() + 10_000;
           while ((document.querySelector('#focus-title')?.textContent ?? '') !== staticTitle) {
@@ -148,14 +167,20 @@ try {
           }
           const focusTitle = document.querySelector('#focus-title')?.textContent ?? '';
           const focusSummary = document.querySelector('#focus-summary')?.textContent ?? '';
-          const focusTitleLang = document.querySelector('#focus-title')?.lang ?? '';
-          const focusSummaryLang = document.querySelector('#focus-summary')?.lang ?? '';
+          const focusTitleNode = document.querySelector('#focus-title');
+          const focusSummaryNode = document.querySelector('#focus-summary');
+          const focusTitleLang = focusTitleNode?.lang ?? '';
+          const focusSummaryLang = focusSummaryNode?.lang ?? '';
+          const focusTitleDir = focusTitleNode?.getAttribute('dir') ?? '';
+          const focusSummaryDir = focusSummaryNode?.getAttribute('dir') ?? '';
           const focusPresence = document.querySelector('#focus-presence')?.textContent ?? '';
           const focusLocationItems = [...document.querySelectorAll('#focus-locations > li')];
           const focusLocationContentLangs = focusLocationItems.map((item) => item.querySelector('[data-content-language]')?.getAttribute('lang') ?? '');
+          const focusLocationContentDirs = focusLocationItems.map((item) => item.querySelector('[data-content-language]')?.getAttribute('dir') ?? '');
           const focusDigital = document.querySelector('#focus-digital');
           const focusDigitalText = focusDigital?.textContent ?? '';
           const focusDigitalLang = focusDigital?.getAttribute('lang') ?? '';
+          const focusDigitalDir = focusDigital?.getAttribute('dir') ?? '';
           document.querySelector('#focus-close')?.click();
           document.querySelector('#layer-view-button')?.click();
           const layerDeadline = performance.now() + 15_000;
@@ -168,19 +193,29 @@ try {
           return {
             staticTitle,
             staticSummary,
+            staticTitleDir,
+            staticSummaryDir,
             expectedPresence,
             focusTitle,
             focusSummary,
             focusTitleLang,
             focusSummaryLang,
+            focusTitleDir,
+            focusSummaryDir,
             focusPresence,
             focusLocationItemCount: focusLocationItems.length,
             focusLocationContentLangs,
+            focusLocationContentDirs,
             focusDigitalText,
             focusDigitalLang,
+            focusDigitalDir,
             sphereNameLangs,
+            sphereNameDirs,
             sphereSummaryTitleLangs,
+            sphereSummaryTitleDirs,
+            sphereAccessibleText,
             ribbonNameLangs: ribbonNames.map((node) => node.getAttribute('lang') ?? ''),
+            ribbonNameDirs: ribbonNames.map((node) => node.getAttribute('dir') ?? ''),
             ribbonLabelsBound: ribbonControls.every((node) => !node.hasAttribute('aria-label') && Boolean(node.getAttribute('aria-labelledby'))),
             ribbonTitleLabelsEnglish: ribbonControls.every((node) => {
               const ids = (node.getAttribute('aria-labelledby') ?? '').split(/\s+/u).filter(Boolean);
@@ -211,8 +246,14 @@ try {
         englishContentBlocks: document.querySelectorAll('[lang="en"]').length,
         effectiveLanguage: document.querySelector('[data-locale-effective]')?.textContent?.trim() ?? '',
         semanticBreadcrumb: document.querySelector('#semantic-summary')?.getAttribute('aria-label') ?? '',
+        languageOptions: [...document.querySelectorAll('#filter-language option[value]:not([value=""])')].map((node) => ({
+          value: node.value,
+          lang: node.getAttribute('lang') ?? '',
+          dir: node.getAttribute('dir') ?? '',
+        })),
         naturalTextDirections: [...document.querySelectorAll('input[type="text"], input[type="search"], textarea')].map((node) => getComputedStyle(node).direction),
         structuredInputDirections: [...document.querySelectorAll('input[type="url"], input[type="email"], input[type="tel"], input[type="number"]')].map((node) => getComputedStyle(node).direction),
+        rtlTextPluginStatus: document.querySelector('.globe-stage')?.dataset.rtlTextPlugin ?? '',
       }));
       assert(state.lang === candidate.locale, `${pageName}: lang drifted to ${state.lang}`);
       assert(state.dir === candidate.direction, `${pageName}: dir drifted to ${state.dir}`);
@@ -222,6 +263,27 @@ try {
       assert(state.iconHref.includes('commonworld-mark.svg'), `${pageName}: candidate head swallowed the icon link`);
       assert(state.bannerVisible, `${pageName}: candidate banner is not visible`);
       assert(state.effectiveLanguage === CANDIDATE_SOURCE.locales[candidate.locale].static.effective_language, `${pageName}: effective-language status drifted: ${state.effectiveLanguage}`);
+      if (pageName === `${candidate.locale}.html`) {
+        const catalogLanguageOptions = state.languageOptions.filter(({ value }) => value !== 'unknown');
+        assert(catalogLanguageOptions.length > 0, `${pageName}: generated catalog language options are missing`);
+        for (const option of catalogLanguageOptions) {
+          const expectedDirection = ['ar', 'syr'].includes(option.value.split('-')[0]) ? 'rtl' : 'ltr';
+          assert(option.lang === option.value, `${pageName}: language option ${option.value} has lang=${option.lang}`);
+          assert(option.dir === expectedDirection, `${pageName}: language option ${option.value} has dir=${option.dir}`);
+        }
+      }
+      if (pageName === 'ar.html') {
+        assert(state.rtlTextPluginStatus === 'loaded', `${pageName}: local RTL text plugin status is ${state.rtlTextPluginStatus}`);
+        const rtlPluginUrl = rtlPluginRequests.length === 1 ? new URL(rtlPluginRequests[0]) : null;
+        assert(
+          rtlPluginUrl
+            && /\/releases\/[0-9a-f]{20}\/assets\/vendor\/mapbox-gl-rtl-text\.js$/u.test(rtlPluginUrl.pathname)
+            && rtlPluginUrl.searchParams.get('v') === 'd1c690352956',
+          `${pageName}: RTL plugin was not loaded exactly once from the local versioned asset: ${rtlPluginRequests.join(' | ')}`,
+        );
+      } else {
+        assert(rtlPluginRequests.length === 0, `${pageName}: unexpected RTL plugin request: ${rtlPluginRequests.join(' | ')}`);
+      }
       if (candidate.locale === 'ar' && pageName !== 'method.ar.html') {
         assert(state.naturalTextDirections.length > 0 && state.naturalTextDirections.every((direction) => direction === 'rtl'), `${pageName}: Arabic natural-language controls are not RTL: ${state.naturalTextDirections.join(', ')}`);
         if (pageName === 'propose.ar.html') {
@@ -242,13 +304,21 @@ try {
         assert(state.englishContentBlocks > 0, `${pageName}: canonical English catalog content lacks lang=en boundaries`);
         assert(runtimeCatalogBoundary?.focusTitle === runtimeCatalogBoundary?.staticTitle, `${pageName}: runtime title fell off the English content overlay`);
         assert(runtimeCatalogBoundary?.focusSummary === runtimeCatalogBoundary?.staticSummary, `${pageName}: runtime summary fell off the English content overlay`);
+        assert(runtimeCatalogBoundary?.staticTitleDir === 'ltr' && runtimeCatalogBoundary?.staticSummaryDir === 'ltr', `${pageName}: static English content lacks dir=ltr boundaries`);
         assert(runtimeCatalogBoundary?.focusTitleLang === 'en' && runtimeCatalogBoundary?.focusSummaryLang === 'en', `${pageName}: runtime English content lacks lang=en boundaries`);
+        assert(runtimeCatalogBoundary?.focusTitleDir === 'ltr' && runtimeCatalogBoundary?.focusSummaryDir === 'ltr', `${pageName}: runtime English content lacks dir=ltr boundaries`);
         assert((runtimeCatalogBoundary?.focusLocationItemCount ?? 0) > 0, `${pageName}: expected dual-presence focus fixture has no locations`);
         assert(runtimeCatalogBoundary.focusLocationContentLangs.length === runtimeCatalogBoundary.focusLocationItemCount && runtimeCatalogBoundary.focusLocationContentLangs.every((lang) => lang === 'en'), `${pageName}: focus location content labels lack lang=en boundaries`);
+        assert(runtimeCatalogBoundary.focusLocationContentDirs.every((direction) => direction === 'ltr'), `${pageName}: focus location content labels lack dir=ltr boundaries`);
         assert((runtimeCatalogBoundary?.focusDigitalText ?? '').trim().length > 0 && runtimeCatalogBoundary?.focusDigitalLang === 'en', `${pageName}: focus digital content label lacks lang=en boundary`);
+        assert(runtimeCatalogBoundary?.focusDigitalDir === 'ltr', `${pageName}: focus digital content label lacks dir=ltr boundary`);
         assert((runtimeCatalogBoundary?.sphereNameLangs?.length ?? 0) > 0 && runtimeCatalogBoundary.sphereNameLangs.every((lang) => lang === 'en'), `${pageName}: sphere ring titles lack lang=en boundaries`);
+        assert(runtimeCatalogBoundary.sphereNameDirs.every((direction) => direction === 'ltr'), `${pageName}: sphere ring titles lack dir=ltr boundaries`);
         assert((runtimeCatalogBoundary?.sphereSummaryTitleLangs?.length ?? 0) > 0 && runtimeCatalogBoundary.sphereSummaryTitleLangs.every((lang) => lang === 'en'), `${pageName}: sphere accessible summary titles lack lang=en boundaries`);
+        assert(runtimeCatalogBoundary.sphereSummaryTitleDirs.every((direction) => direction === 'ltr'), `${pageName}: sphere accessible summary titles lack dir=ltr boundaries`);
         assert((runtimeCatalogBoundary?.ribbonNameLangs?.length ?? 0) > 0 && runtimeCatalogBoundary.ribbonNameLangs.every((lang) => lang === 'en'), `${pageName}: digital ribbon titles lack lang=en boundaries`);
+        assert(runtimeCatalogBoundary.ribbonNameDirs.every((direction) => direction === 'ltr'), `${pageName}: digital ribbon titles lack dir=ltr boundaries`);
+        if (candidate.direction === 'rtl') assert(runtimeCatalogBoundary.sphereAccessibleText.includes('، '), `${pageName}: accessible ring list lacks Arabic separator`);
         assert(runtimeCatalogBoundary?.ribbonLabelsBound && runtimeCatalogBoundary?.ribbonTitleLabelsEnglish, `${pageName}: digital ribbon accessible labels do not preserve mixed-language boundaries`);
         const candidatePack = CANDIDATE_SOURCE.locales[candidate.locale];
         const focusPresence = runtimeCatalogBoundary?.focusPresence ?? '';

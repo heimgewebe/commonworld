@@ -3,13 +3,13 @@
   <head>
     <meta charset="utf-8" />
     <meta name="commonworld-page" content="index.html" />
-    <meta name="commonworld-page-build" content="ebd14362240a8d86" />
-    <meta name="commonworld-release" content="e6894b0f46e16e1ef2b1" />
-    <base href="/releases/e6894b0f46e16e1ef2b1/" />
+    <meta name="commonworld-page-build" content="52743e0ecbb1593f" />
+    <meta name="commonworld-release" content="87454318973d5e7c8d07" />
+    <base href="/releases/87454318973d5e7c8d07/" />
     <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
     <meta name="color-scheme" content="dark" />
     <meta name="referrer" content="strict-origin-when-cross-origin" />
-    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' data: blob: https://tiles.openfreemap.org; connect-src 'self' https://tiles.openfreemap.org; font-src 'self' data: https://tiles.openfreemap.org; worker-src 'self' blob:; child-src blob:; object-src 'none'; base-uri 'self'; form-action 'none';" />
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'wasm-unsafe-eval'; style-src 'self'; img-src 'self' data: blob: https://tiles.openfreemap.org; connect-src 'self' https://tiles.openfreemap.org; font-src 'self' data: https://tiles.openfreemap.org; worker-src 'self' blob:; child-src blob:; object-src 'none'; base-uri 'self'; form-action 'none';" />
     <meta name="description" content="Commonworld makes Commons discoverable worldwide, regionally, locally and digitally on one shared globe." />
     <title>commonworld — Discover Commons</title>
     <link rel="icon" href="./assets/commonworld-mark.svg?v=05905a6e42f8" type="image/svg+xml" />
@@ -21,7 +21,7 @@
     <script type="module" src="/assets/commonworld-release-check.js?v=a274ceda64b7"></script>
     <script src="./assets/vendor/maplibre-gl.js?v=45a9b07a9189" defer></script>
     <script type="module" src="./assets/commonworld-locale.mjs?v=187aee463fae"></script>
-    <script type="module" src="./assets/commonworld-app.js?v=3b9ac1c968f7"></script>
+    <script type="module" src="./assets/commonworld-app.js?v=bd48f95f2091"></script>
   </head>
   <body data-presentation="globe">
     <a id="text-skip-link" class="skip-link" href="/#static-catalog-fallback">Skip to text view</a>
@@ -84,7 +84,7 @@
             <summary>More filters</summary>
             <div class="filter-group-controls">
               <label><span>Access</span><select id="filter-access" data-intent-filter="access"><option value="">All access types</option><option value="public">Public</option><option value="membership">Membership</option><option value="restricted">Restricted</option><option value="unknown">Not specified</option></select></label>
-              <label><span>Language</span><select id="filter-language" data-intent-filter="language"><option value="">All entries</option><option value="ca">Català</option><option value="de">Deutsch</option><option value="en">English</option><option value="es">Español</option><option value="it">Italiano</option><option value="ku">Kurdî</option><option value="pt-BR">Português (Brasil)</option><option value="el">Ελληνικά</option><option value="ar">العربية</option><option value="syr">ܣܘܪܝܝܐ</option><option value="ne">नेपाली</option><option value="zh">中文</option><option value="unknown">Not specified</option></select></label>
+              <label><span>Language</span><select id="filter-language" data-intent-filter="language"><option value="">All entries</option><option value="ca" lang="ca" dir="ltr">Català</option><option value="de" lang="de" dir="ltr">Deutsch</option><option value="en" lang="en" dir="ltr">English</option><option value="es" lang="es" dir="ltr">Español</option><option value="it" lang="it" dir="ltr">Italiano</option><option value="ku" lang="ku" dir="ltr">Kurdî</option><option value="pt-BR" lang="pt-BR" dir="ltr">Português (Brasil)</option><option value="el" lang="el" dir="ltr">Ελληνικά</option><option value="ar" lang="ar" dir="rtl">العربية</option><option value="syr" lang="syr" dir="rtl">ܣܘܪܝܝܐ</option><option value="ne" lang="ne" dir="ltr">नेपाली</option><option value="zh" lang="zh" dir="ltr">中文</option><option value="unknown">Not specified</option></select></label>
               <label><span>Freshness</span><select id="filter-freshness" data-intent-filter="freshness"><option value="">Any freshness</option><option value="current">Currently reviewed</option><option value="stale">Review due</option><option value="unknown">Not specified</option></select></label>
               <label><span>Curation</span><select id="filter-curation" data-intent-filter="curation"><option value="">Any status</option><option value="listed">Listed</option><option value="verified">Verified</option><option value="featured">Featured</option><option value="unknown">Not specified</option></select></label>
             </div>

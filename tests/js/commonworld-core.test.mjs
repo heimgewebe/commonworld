@@ -18,6 +18,7 @@ import {
   DIGITAL_TAXONOMY,
   LAYERS,
   ORBIT_PROFILES,
+  bidiIsolateForLocale,
   binaryFragment,
   binaryName,
   buildDigitalPresentationTree,
@@ -217,6 +218,17 @@ test('digital ring path derivation is deterministic and handles ambiguity explic
   assert.deepEqual(unknown?.unknownThemes, ['future-theme']);
   assert.equal(deriveDigitalProjectPath(digital(['education'], false)), null);
   assert.equal(deriveDigitalProjectPath(digital(['open-source', 'open-data']))?.pathKey, deriveDigitalProjectPath(digital(['open-data', 'open-source']))?.pathKey);
+});
+
+test('RTL locale placeholders isolate embedded LTR date tokens', () => {
+  assert.equal(bidiIsolateForLocale('2026-07-19', 'en'), '2026-07-19');
+  assert.equal(bidiIsolateForLocale('2026-07-19', 'ar'), '⁨2026-07-19⁩');
+  const notice = recordActivityNotice({
+    activity: { status: 'unknown', observed_at: '2026-07-19' },
+    curation: { next_review_at: '2026-08-19' },
+  }, 'ar');
+  assert.ok(notice.includes('⁨2026-07-19⁩'));
+  assert.ok(notice.includes('⁨2026-08-19⁩'));
 });
 
 test('unknown activity produces an explicit public notice and active records do not', () => {

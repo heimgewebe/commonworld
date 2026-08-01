@@ -1,4 +1,4 @@
-import { FALLBACK_LOCALE, normalizeLocale, taxonomyLabel, text as i18nText } from './commonworld-i18n.mjs?v=2bcfb13ba17c';
+import { FALLBACK_LOCALE, documentDirection, normalizeLocale, taxonomyLabel, text as i18nText } from './commonworld-i18n.mjs?v=2bcfb13ba17c';
 
 export const DEFAULT_CAMERA = Object.freeze({
   lng: 8,
@@ -170,11 +170,26 @@ export function hasDigitalPresence(record) {
 }
 
 export const UNKNOWN_ACTIVITY_DISCLOSURE = 'Aktueller Betriebszustand nicht zeitnah verifiziert';
+const FIRST_STRONG_ISOLATE = '⁨';
+const POP_DIRECTIONAL_ISOLATE = '⁩';
+
+export function bidiIsolateForLocale(value, locale = FALLBACK_LOCALE) {
+  const text = String(value ?? '');
+  return documentDirection(locale) === 'rtl'
+    ? `${FIRST_STRONG_ISOLATE}${text}${POP_DIRECTIONAL_ISOLATE}`
+    : text;
+}
 
 export function recordActivityNotice(record, locale = FALLBACK_LOCALE) {
   if (record?.activity?.status !== 'unknown') return '';
-  const observedAt = record?.activity?.observed_at ?? localizedValue(locale, 'unknown', 'unbekannt');
-  const nextReviewAt = record?.curation?.next_review_at ?? localizedValue(locale, 'open_date', 'offen');
+  const observedAt = bidiIsolateForLocale(
+    record?.activity?.observed_at ?? localizedValue(locale, 'unknown', 'unbekannt'),
+    locale,
+  );
+  const nextReviewAt = bidiIsolateForLocale(
+    record?.curation?.next_review_at ?? localizedValue(locale, 'open_date', 'offen'),
+    locale,
+  );
   return localizedValue(
     locale,
     'activity_unknown_runtime',

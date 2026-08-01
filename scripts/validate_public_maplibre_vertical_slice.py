@@ -32,6 +32,9 @@ REQUIRED_FILES = (
     Path("assets/vendor/maplibre-gl.css"),
     Path("assets/vendor/MAPLIBRE-NOTICE.txt"),
     Path("assets/vendor/MAPLIBRE-LICENSE.txt"),
+    Path("assets/vendor/mapbox-gl-rtl-text.js"),
+    Path("assets/vendor/MAPBOX-RTL-TEXT-NOTICE.txt"),
+    Path("assets/vendor/MAPBOX-RTL-TEXT-LICENSE.md"),
     Path("assets/map/openfreemap-liberty.json"),
     Path("assets/commonworld-core.mjs"),
     Path("assets/commonworld-app.js"),
@@ -71,7 +74,14 @@ EXPECTED_IDS = [
 EXPECTED_VENDOR_HASHES = {
     "assets/vendor/maplibre-gl.js": "45a9b07a9189ce56054c620a947ccf41e291e58c95e9b61533b740aaa65ee5cb",
     "assets/vendor/maplibre-gl.css": "ab1e70d59ec40465bae7e7030da2f3ccf28133fd502e62bd598eefbadfd7a732",
+    "assets/vendor/mapbox-gl-rtl-text.js": "d1c69035295613baaf83fe23fd9266b0eaed7e5e472e9632b0b5438afc3f589e",
 }
+EXPECTED_RUNTIME_DEPENDENCIES = {
+    "@mapbox/mapbox-gl-rtl-text": "0.3.0",
+    "maplibre-gl": "5.24.0",
+}
+EXPECTED_RTL_NOTICE_SHA256 = "2699e6cd1359b8c6228576cde6411b4b90df37c0e03ea63663e7806798695fb0"
+EXPECTED_RTL_LICENSE_SHA256 = "7dca3646879aae2fa04f9d77f98ddeeabe4898be6a592a59985c112fd817300b"
 EXPECTED_STYLE_HASH = "74a4e3f2eacd4242dd2235b50ab6e14d0285e5e3bde07de2753949ec7f776a18"
 ALLOWED_MAP_ORIGIN = "https://tiles.openfreemap.org"
 FORBIDDEN_RUNTIME_TOKENS = (
@@ -481,18 +491,23 @@ def validate_public_maplibre_vertical_slice(root: Path = ROOT) -> list[str]:
             errors.append(f"public renderer contract must retain false: {flag}")
 
     dependencies = package.get("dependencies")
-    if dependencies != {"maplibre-gl": "5.24.0"}:
-        errors.append("package.json must contain only the exactly pinned maplibre-gl 5.24.0 runtime dependency")
+    if dependencies != EXPECTED_RUNTIME_DEPENDENCIES:
+        errors.append("package.json must contain only the exactly pinned MapLibre and RTL-text runtime dependencies")
     if package.get("devDependencies") != {"playwright": "1.61.1"}:
         errors.append("package.json must pin the browser-gate Playwright dependency exactly")
     errors.extend(validate_browser_smoke_contract(root, package))
     packages = lock.get("packages", {}) if isinstance(lock.get("packages"), dict) else {}
     root_lock = packages.get("", {}) if isinstance(packages.get(""), dict) else {}
     maplibre_lock = packages.get("node_modules/maplibre-gl", {}) if isinstance(packages.get("node_modules/maplibre-gl"), dict) else {}
+    rtl_lock = packages.get("node_modules/@mapbox/mapbox-gl-rtl-text", {}) if isinstance(packages.get("node_modules/@mapbox/mapbox-gl-rtl-text"), dict) else {}
     if lock.get("lockfileVersion") != 3:
         errors.append("package-lock.json must use lockfileVersion 3")
-    if root_lock.get("dependencies") != {"maplibre-gl": "5.24.0"} or maplibre_lock.get("version") != "5.24.0":
-        errors.append("package-lock.json must resolve maplibre-gl exactly to 5.24.0")
+    if (
+        root_lock.get("dependencies") != EXPECTED_RUNTIME_DEPENDENCIES
+        or maplibre_lock.get("version") != "5.24.0"
+        or rtl_lock.get("version") != "0.3.0"
+    ):
+        errors.append("package-lock.json must resolve MapLibre and RTL-text dependencies exactly")
     playwright_lock = packages.get("node_modules/playwright", {}) if isinstance(packages.get("node_modules/playwright"), dict) else {}
     if root_lock.get("devDependencies") != {"playwright": "1.61.1"} or playwright_lock.get("version") != "1.61.1":
         errors.append("package-lock.json must resolve Playwright exactly to 1.61.1")
@@ -521,6 +536,39 @@ def validate_public_maplibre_vertical_slice(root: Path = ROOT) -> list[str]:
         "copied_verbatim_from": "node_modules/maplibre-gl/LICENSE.txt",
     }:
         errors.append("MapLibre license-file contract mismatch")
+
+    rtl_plugin = renderer.get("rtl_text_plugin", {}) if isinstance(renderer.get("rtl_text_plugin"), dict) else {}
+    expected_rtl_plugin = {
+        "package": "@mapbox/mapbox-gl-rtl-text",
+        "version": "0.3.0",
+        "exact_dependency_required": True,
+        "local_only": True,
+        "rtl_locale_activation": ["ar"],
+        "browser_asset": {
+            "path": "assets/vendor/mapbox-gl-rtl-text.js",
+            "sha256": EXPECTED_VENDOR_HASHES["assets/vendor/mapbox-gl-rtl-text.js"],
+        },
+        "notice_file": {
+            "path": "assets/vendor/MAPBOX-RTL-TEXT-NOTICE.txt",
+            "sha256": EXPECTED_RTL_NOTICE_SHA256,
+        },
+        "license_file": {
+            "path": "assets/vendor/MAPBOX-RTL-TEXT-LICENSE.md",
+            "sha256": EXPECTED_RTL_LICENSE_SHA256,
+            "copied_verbatim_from": "node_modules/@mapbox/mapbox-gl-rtl-text/LICENSE.md",
+        },
+    }
+    if rtl_plugin != expected_rtl_plugin:
+        errors.append("RTL text plugin contract mismatch")
+    rtl_notice_path = root / "assets/vendor/MAPBOX-RTL-TEXT-NOTICE.txt"
+    if _sha256(rtl_notice_path) != EXPECTED_RTL_NOTICE_SHA256:
+        errors.append("RTL text plugin notice hash mismatch")
+    rtl_notice = rtl_notice_path.read_text(encoding="utf-8")
+    for token in ("Mapbox GL RTL Text 0.3.0", "BSD-2-Clause", "@mapbox/mapbox-gl-rtl-text@0.3.0"):
+        if token not in rtl_notice:
+            errors.append(f"RTL text plugin notice missing token: {token}")
+    if _sha256(root / "assets/vendor/MAPBOX-RTL-TEXT-LICENSE.md") != EXPECTED_RTL_LICENSE_SHA256:
+        errors.append("RTL text plugin verbatim license hash mismatch")
 
     basemap = contract.get("basemap", {}) if isinstance(contract.get("basemap"), dict) else {}
     if basemap.get("style_snapshot_sha256") != EXPECTED_STYLE_HASH or _sha256(root / "assets/map/openfreemap-liberty.json") != EXPECTED_STYLE_HASH:
@@ -618,6 +666,14 @@ def validate_public_maplibre_vertical_slice(root: Path = ROOT) -> list[str]:
     css = (root / "index.css").read_text(encoding="utf-8")
     app = (root / "assets/commonworld-app.js").read_text(encoding="utf-8")
     core = (root / "assets/commonworld-core.mjs").read_text(encoding="utf-8")
+    expected_rtl_plugin_url = (
+        "./assets/vendor/mapbox-gl-rtl-text.js?v="
+        + _sha256(root / "assets/vendor/mapbox-gl-rtl-text.js")[:12]
+    )
+    if expected_rtl_plugin_url not in app:
+        errors.append("public runtime must bind the local RTL text plugin to its deterministic content hash")
+    if "setRTLTextPlugin" not in app or "getRTLTextPluginStatus" not in app or "DOCUMENT_DIRECTION !== 'rtl'" not in app:
+        errors.append("public runtime must activate the local RTL text plugin only for RTL interface locales")
     combined = "\n".join((html, css, app, core)).casefold()
     for token in FORBIDDEN_RUNTIME_TOKENS:
         if token.casefold() in combined:
@@ -757,7 +813,7 @@ def validate_public_maplibre_vertical_slice(root: Path = ROOT) -> list[str]:
         csp = csp_match.group(1)
         for token in (
             "default-src 'self'",
-            "script-src 'self'",
+            "script-src 'self' 'wasm-unsafe-eval'",
             "style-src 'self'",
             "connect-src 'self' https://tiles.openfreemap.org",
             "worker-src 'self' blob:",
@@ -767,10 +823,14 @@ def validate_public_maplibre_vertical_slice(root: Path = ROOT) -> list[str]:
             if token not in csp:
                 errors.append(f"public runtime CSP missing token: {token}")
         if "'unsafe-inline'" in csp or "'unsafe-eval'" in csp:
-            errors.append("public runtime CSP must not authorize unsafe inline code or eval")
+            errors.append("public runtime CSP must not authorize unsafe inline code or general JavaScript eval")
+        if csp.count("'wasm-unsafe-eval'") != 1:
+            errors.append("public runtime CSP must authorize WebAssembly exactly once for the local RTL text plugin")
 
     required_app = (
         "new window.maplibregl.Map",
+        "configureRtlMapTextPlugin()",
+        "setRTLTextPlugin",
         "setProjection({ type: 'globe' })",
         "runtime.map.easeTo",
         "runtime.map.jumpTo",

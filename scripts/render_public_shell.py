@@ -41,6 +41,13 @@ LANGUAGE_NATIVE_NAMES = {
     "syr": "ܣܘܪܝܝܐ",
     "zh": "中文",
 }
+RTL_LANGUAGE_CODES = frozenset({"ar", "syr"})
+
+
+def language_option_direction(code: str) -> str:
+    return "rtl" if code.split("-", 1)[0] in RTL_LANGUAGE_CODES else "ltr"
+
+
 LANGUAGE_SELECT_RE = re.compile(r'(<select id="filter-language"[^>]*>)(.*?)(</select>)', re.S)
 LANGUAGE_ALL_OPTION_RE = re.compile(r'<option value="">.*?</option>', re.S)
 LANGUAGE_UNKNOWN_OPTION_RE = re.compile(r'<option value="unknown">.*?</option>', re.S)
@@ -68,7 +75,8 @@ def expand_language_filter_options(markup: str, records: list[dict]) -> str:
     if not all_option or not unknown_option:
         raise ValueError("rendered language filter lacks all/unknown boundary options")
     language_options = "".join(
-        f'<option value="{html.escape(code, quote=True)}">{html.escape(LANGUAGE_NATIVE_NAMES.get(code, code))}</option>'
+        f'<option value="{html.escape(code, quote=True)}" lang="{html.escape(code, quote=True)}" dir="{language_option_direction(code)}">'
+        f'{html.escape(LANGUAGE_NATIVE_NAMES.get(code, code))}</option>'
         for code in catalog_language_codes(records)
     )
     replacement = f"{match.group(1)}{all_option.group(0)}{language_options}{unknown_option.group(0)}{match.group(3)}"
@@ -105,6 +113,7 @@ RUNTIME_URL_DEPENDENCIES = (
         (
             ("./assets/map/commonworld-country-boundaries.geojson", "assets/map/commonworld-country-boundaries.geojson"),
             ("./assets/map/openfreemap-liberty.json", "assets/map/openfreemap-liberty.json"),
+            ("./assets/vendor/mapbox-gl-rtl-text.js", "assets/vendor/mapbox-gl-rtl-text.js"),
         ),
     ),
 )
@@ -237,6 +246,9 @@ def activity_notice(record: dict, locale: str = FALLBACK_LOCALE) -> str:
         return ""
     observed_at = record.get("activity", {}).get("observed_at", "unknown")
     next_review_at = record.get("curation", {}).get("next_review_at", "open")
+    if locale_entry(normalize_locale(locale))["direction"] == "rtl":
+        observed_at = f"⁨{observed_at}⁩"
+        next_review_at = f"⁨{next_review_at}⁩"
     return interface_static(
         locale,
         "activity_unknown",
@@ -264,7 +276,14 @@ def render_cards(records: list[dict], *, interactive: bool = True, locale: str =
         title = html.escape(record["title"])
         summary = html.escape(record["summary"])
         content_locale = record.get("_content_locale")
-        content_lang = f' lang="{html.escape(content_locale, quote=True)}"' if isinstance(content_locale, str) and content_locale else ""
+        if isinstance(content_locale, str) and content_locale:
+            content_direction = "ltr" if content_locale.lower() == "en" else "auto"
+            content_boundary = (
+                f' lang="{html.escape(content_locale, quote=True)}"'
+                f' dir="{content_direction}"'
+            )
+        else:
+            content_boundary = ""
         geo_locations = public_locations(record)
         label = html.escape(presentation_label(record, locale, geo_locations))
         place = html.escape(location_summary(record, locale, geo_locations))
@@ -291,8 +310,8 @@ def render_cards(records: list[dict], *, interactive: bool = True, locale: str =
         cards.append(
             f'''          <article class="catalog-card" id="project-{identifier}" data-commonproject-id="{identifier}">
             <p class="catalog-kind">{label}</p>
-            <h2{content_lang}>{title}</h2>
-            <p{content_lang}>{summary}</p>
+            <h2{content_boundary}>{title}</h2>
+            <p{content_boundary}>{summary}</p>
             <p class="catalog-location">{place}</p>
 {notice_html}            <div class="catalog-actions">
 {action}{action_links}              <a href="{url}" rel="external noreferrer">{html.escape(interface_static(locale, "official_website", de="Offizielle Seite", en="Official website"))} <span aria-hidden="true">↗</span></a>
@@ -341,7 +360,7 @@ def render_shell(root: Path = ROOT, locale: str = FALLBACK_LOCALE) -> str:
     <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
     <meta name="color-scheme" content="dark" />
     <meta name="referrer" content="strict-origin-when-cross-origin" />
-    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' data: blob: https://tiles.openfreemap.org; connect-src 'self' https://tiles.openfreemap.org; font-src 'self' data: https://tiles.openfreemap.org; worker-src 'self' blob:; child-src blob:; object-src 'none'; base-uri 'self'; form-action 'none';" />
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'wasm-unsafe-eval'; style-src 'self'; img-src 'self' data: blob: https://tiles.openfreemap.org; connect-src 'self' https://tiles.openfreemap.org; font-src 'self' data: https://tiles.openfreemap.org; worker-src 'self' blob:; child-src blob:; object-src 'none'; base-uri 'self'; form-action 'none';" />
     <meta name="description" content="Commonworld macht Commons weltweit, regional, lokal und digital auf einem gemeinsamen Globus sichtbar." />
     <title>commonworld — Commons entdecken</title>
     <link rel="icon" href="./assets/commonworld-mark.svg?v={asset_version('assets/commonworld-mark.svg', root)}" type="image/svg+xml" />

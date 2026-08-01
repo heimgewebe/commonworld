@@ -1,6 +1,6 @@
 import { BOOTSTRAP_RECORDS } from './commonworld-bootstrap-catalog.mjs?v=cc49548bc45c';
 import { createCatalogLoadCache, loadCatalogAggregate, loadCatalogDetail, loadCatalogShard, shardKeyForIdentity } from './commonworld-catalog-runtime.mjs?v=836cd2a8f3f9';
-import { actionLabel, documentLocale, localizeCatalogRecords, text as i18nText, themeLabel } from './commonworld-i18n.mjs?v=2bcfb13ba17c';
+import { actionLabel, documentDirection, documentLocale, localizeCatalogRecords, text as i18nText, themeLabel } from './commonworld-i18n.mjs?v=2bcfb13ba17c';
 import {
   COMMONS_TYPE_COLOR_TOKENS,
   COMMONS_TYPE_VALUES,
@@ -8,6 +8,7 @@ import {
   MAX_MAP_ZOOM,
   MAP_GEOMETRY_DIAGNOSTIC_SAMPLE_INTERVAL,
   MAP_GEOMETRY_SAMPLE_INTERVAL_MS,
+  bidiIsolateForLocale,
   buildDigitalPresentationTree,
   commonsTypeLabel,
   deriveCommonsType,
@@ -57,10 +58,25 @@ import {
   sortRecords,
   stateFromSearch,
   visibleDigitalNodes,
-} from './commonworld-core.mjs?v=f6e0d2ea1d5e';
+} from './commonworld-core.mjs?v=01c9ebca65b5';
 
 const LOCALE = documentLocale();
+const DOCUMENT_DIRECTION = documentDirection(LOCALE);
 const t = (key, germanFallback, variables = {}) => i18nText(LOCALE, key, germanFallback, variables);
+
+function contentDirection(locale) {
+  return String(locale ?? '').toLowerCase() === 'en' ? 'ltr' : 'auto';
+}
+
+function applyContentLanguage(element, locale) {
+  if (typeof locale === 'string' && locale.trim()) {
+    element.setAttribute('lang', locale);
+    element.setAttribute('dir', contentDirection(locale));
+  } else {
+    element.removeAttribute('lang');
+    element.removeAttribute('dir');
+  }
+}
 
 const SVG_NS = 'http://www.w3.org/2000/svg';
 const LOCAL_FALLBACK_STYLE = Object.freeze({ version: 8, sources: {}, layers: [{ id: 'commonworld-fallback', type: 'background', paint: { 'background-color': '#0d2426' } }] });
@@ -740,7 +756,7 @@ function appendRingSequence(textPath, assignments, { prefix = '' } = {}) {
       'data-visible-label': assignment.visibleText,
     });
     name.textContent = `\u00A0\u00A0${assignment.visibleText}`;
-    if (assignment.contentLocale) name.setAttribute('lang', assignment.contentLocale);
+    applyContentLanguage(name, assignment.contentLocale);
     textPath.append(name);
   }
 }
@@ -826,11 +842,12 @@ function renderSphereRibbons(records = runtime.records) {
     const intro = document.createElement('span');
     intro.textContent = t('visible_ring_commons_intro', 'Sichtbare Commons in den digitalen Ringen:');
     const nodes = [intro, document.createTextNode(' ')];
+    const separator = DOCUMENT_DIRECTION === 'rtl' ? '، ' : ', ';
     accessibleAssignments.forEach((assignment, index) => {
       const title = document.createElement('span');
       title.textContent = assignment.fullText;
-      if (assignment.contentLocale) title.lang = assignment.contentLocale;
-      nodes.push(title, document.createTextNode(index + 1 < accessibleAssignments.length ? ', ' : '.'));
+      applyContentLanguage(title, assignment.contentLocale);
+      nodes.push(title, document.createTextNode(index + 1 < accessibleAssignments.length ? separator : '.'));
     });
     elements.sphereRingAccessibleSummary.replaceChildren(...nodes);
   } else {
@@ -863,7 +880,7 @@ function createRibbonSegment(record) {
   name.className = 'digital-ribbon-name';
   name.id = `digital-ribbon-name-${record.id}`;
   name.textContent = record.title;
-  if (record._content_locale) name.lang = record._content_locale;
+  applyContentLanguage(name, record._content_locale);
   segment.setAttribute('aria-labelledby', `${action.id} ${name.id}`);
   segment.append(action, name);
   segment.addEventListener('click', () => selectDigitalProject(record, { trigger: segment }));
@@ -915,8 +932,8 @@ function curationTextForRecord(record) {
   return [
     recordActivityNotice(record, LOCALE),
     t('curation_review', 'Redaktionell geprüft am {reviewed}; nächste Prüfung {next}.', {
-      reviewed: record?.curation?.reviewed_at ?? t('unknown', 'unbekannt'),
-      next: record?.curation?.next_review_at ?? t('open_date', 'offen'),
+      reviewed: bidiIsolateForLocale(record?.curation?.reviewed_at ?? t('unknown', 'unbekannt'), LOCALE),
+      next: bidiIsolateForLocale(record?.curation?.next_review_at ?? t('open_date', 'offen'), LOCALE),
     }),
   ].filter(Boolean).join(' ');
 }
@@ -2259,14 +2276,14 @@ function createDiscoveryResult(record, position) {
   const title = document.createElement('strong');
   title.id = `discovery-result-title-${record.id}`;
   title.textContent = record.title;
-  if (record._content_locale) title.lang = record._content_locale;
+  applyContentLanguage(title, record._content_locale);
   const meta = document.createElement('span');
   meta.className = 'discovery-result-meta';
   meta.textContent = resultMetaLabel(record);
   const summary = document.createElement('span');
   summary.className = 'discovery-result-summary';
   summary.textContent = record.summary;
-  if (record._content_locale) summary.lang = record._content_locale;
+  applyContentLanguage(summary, record._content_locale);
   copy.append(title, meta, summary);
   main.setAttribute('aria-labelledby', `${rank.id} ${action.id} ${title.id}`);
   main.append(action, rank, copy);
@@ -2316,10 +2333,8 @@ function createRuntimeCatalogCard(record) {
   title.textContent = record.title;
   const summary = document.createElement('p');
   summary.textContent = record.summary;
-  if (record._content_locale) {
-    title.lang = record._content_locale;
-    summary.lang = record._content_locale;
-  }
+  applyContentLanguage(title, record._content_locale);
+  applyContentLanguage(summary, record._content_locale);
   const location = document.createElement('p');
   location.className = 'catalog-location';
   location.textContent = resultLocationLabel(record);
@@ -2448,7 +2463,7 @@ function replaceLocationList(container, record) {
     if (record?._content_locale && contentLabel && value.startsWith(contentLabel)) {
       const label = document.createElement('span');
       label.dataset.contentLanguage = record._content_locale;
-      label.lang = record._content_locale;
+      applyContentLanguage(label, record._content_locale);
       label.textContent = contentLabel;
       item.append(label, document.createTextNode(value.slice(contentLabel.length)));
     } else {
@@ -2480,8 +2495,7 @@ function updateFocusPanel() {
   elements.focusTitle.textContent = record.title;
   elements.focusSummary.textContent = record.summary;
   for (const node of [elements.focusTitle, elements.focusSummary]) {
-    if (record._content_locale) node.lang = record._content_locale;
-    else node.removeAttribute('lang');
+    applyContentLanguage(node, record._content_locale);
   }
   const filteringActive = Boolean(
     digitalPathFiltered()
@@ -2503,8 +2517,7 @@ function updateFocusPanel() {
   const digitalContentLanguage = record?._content_locale && record?.presence?.digital?.available && record?.presence?.digital?.label
     ? record._content_locale
     : null;
-  if (digitalContentLanguage) elements.focusDigital.lang = digitalContentLanguage;
-  else elements.focusDigital.removeAttribute('lang');
+  applyContentLanguage(elements.focusDigital, digitalContentLanguage);
   const relationLabels = relationLabelsForRecord(record);
   replaceList(elements.focusRelations, relationLabels.length ? relationLabels : [t('relation_none', 'Keine belegte Beziehung veröffentlicht.') ]);
   replaceLinks(elements.focusLinks, record.links ?? []);
@@ -3695,6 +3708,26 @@ function bindPublicMapInteractions() {
   });
 }
 
+function configureRtlMapTextPlugin() {
+  if (DOCUMENT_DIRECTION !== 'rtl') return;
+  const getStatus = window.maplibregl?.getRTLTextPluginStatus;
+  const setPlugin = window.maplibregl?.setRTLTextPlugin;
+  if (typeof getStatus !== 'function' || typeof setPlugin !== 'function') {
+    elements.stage.dataset.rtlTextPlugin = 'unsupported';
+    return;
+  }
+  const status = getStatus();
+  elements.stage.dataset.rtlTextPlugin = status;
+  if (status !== 'unavailable') return;
+  elements.stage.dataset.rtlTextPlugin = 'loading';
+  Promise.resolve(setPlugin('./assets/vendor/mapbox-gl-rtl-text.js?v=d1c690352956', false))
+    .then(() => { elements.stage.dataset.rtlTextPlugin = getStatus(); })
+    .catch((error) => {
+      elements.stage.dataset.rtlTextPlugin = 'error';
+      degradeMap(error, { replaceStyle: false });
+    });
+}
+
 function createMap() {
   if (runtime.map) return;
   if (!window.maplibregl?.Map) {
@@ -3703,6 +3736,7 @@ function createMap() {
     setPresentation('text', { historyMode: 'replace', persist: false });
     return;
   }
+  configureRtlMapTextPlugin();
   const initialStageBounds = elements.stage.getBoundingClientRect();
   setStageSizeIfChanged(initialStageBounds.width, initialStageBounds.height);
   runtime.map = new window.maplibregl.Map({

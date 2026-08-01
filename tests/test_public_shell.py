@@ -6,7 +6,7 @@ import unittest
 from pathlib import Path
 
 from scripts.render_public_shell import (
-    LANGUAGE_NATIVE_NAMES, MODULE_IMPORT_DEPENDENCIES, activity_notice, catalog_language_codes, load_records, render_bootstrap_catalog, render_cards, render_shell,
+    LANGUAGE_NATIVE_NAMES, MODULE_IMPORT_DEPENDENCIES, activity_notice, catalog_language_codes, language_option_direction, load_records, render_bootstrap_catalog, render_cards, render_shell,
 )
 from scripts.static_surface_parser import (
     find_css_block,
@@ -57,8 +57,11 @@ class PublicShellTests(unittest.TestCase):
             "commonworld-core.mjs",
             "commonworld-app.js",
             "ipad-layout.css",
+            "vendor/mapbox-gl-rtl-text.js",
         ):
-            shutil.copy2(ROOT / "assets" / asset, root / "assets" / asset)
+            target = root / "assets" / asset
+            target.parent.mkdir(parents=True, exist_ok=True)
+            shutil.copy2(ROOT / "assets" / asset, target)
         (root / "scripts").mkdir()
         if (ROOT / "scripts/render_public_shell.py").exists():
             shutil.copy2(ROOT / "scripts/render_public_shell.py", root / "scripts/render_public_shell.py")
@@ -81,11 +84,15 @@ class PublicShellTests(unittest.TestCase):
             markup = render_shell(locale=locale)
             match = re.search(r'<select id="filter-language"[^>]*>(.*?)</select>', markup, re.S)
             self.assertIsNotNone(match, locale)
-            options = re.findall(r'<option value="([^"]*)">(.*?)</option>', match.group(1), re.S)
-            self.assertEqual([value for value, _ in options], ["", *codes, "unknown"], locale)
-            labels = dict(options)
+            option_markup = re.findall(r'<option ([^>]*)>(.*?)</option>', match.group(1), re.S)
+            values = [re.search(r'value="([^"]*)"', attrs).group(1) for attrs, _ in option_markup]
+            self.assertEqual(values, ["", *codes, "unknown"], locale)
+            labels = {value: label for value, (_, label) in zip(values, option_markup)}
             for code in codes:
                 self.assertEqual(labels[code], LANGUAGE_NATIVE_NAMES.get(code, code), (locale, code))
+                attrs = next(attrs for attrs, _ in option_markup if f'value="{code}"' in attrs)
+                self.assertIn(f'lang="{code}"', attrs, (locale, code))
+                self.assertIn(f'dir="{language_option_direction(code)}"', attrs, (locale, code))
 
     def test_filter_layout_renderer_uses_compact_semantic_structure(self) -> None:
         german = render_shell(locale="de")
@@ -352,6 +359,15 @@ class PublicShellTests(unittest.TestCase):
             "public shell runtime missing bootstrap-recovery handoff: document.querySelector('[data-static-catalog-fallback]')?.remove()",
             errors,
         )
+
+    def test_candidate_static_content_and_dates_keep_explicit_bidi_boundaries(self) -> None:
+        arabic = render_shell(locale="ar")
+        self.assertIn('<h2 lang="en" dir="ltr">', arabic)
+        self.assertIn('<p lang="en" dir="ltr">', arabic)
+        unknown = next(record for record in load_records(ROOT) if record.get("activity", {}).get("status") == "unknown")
+        notice = activity_notice(unknown, "ar")
+        self.assertIn("\u2068", notice)
+        self.assertIn("\u2069", notice)
 
     def test_unknown_activity_notice_is_rendered_in_static_cards(self) -> None:
         records = load_records(ROOT)

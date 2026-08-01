@@ -3,6 +3,7 @@ from __future__ import annotations
 import copy
 import importlib.util
 import json
+import re
 import shutil
 import tempfile
 import unittest
@@ -52,6 +53,11 @@ class ProposalPathTests(unittest.TestCase):
         candidate = copy.deepcopy(self.valid)
         candidate["project"]["region"] = "52.5200, 13.4050"
         self.assertTrue(MODULE.validate_fixture(candidate, self.schema))
+
+    def test_house_number_pattern_explicitly_accepts_unicode_decimal_digits(self) -> None:
+        for value in ("12", "١٢", "۱۲", "१२", "１２"):  # ASCII, Arabic-Indic, Eastern Arabic, Devanagari, fullwidth
+            self.assertIsNotNone(re.fullmatch(MODULE.HOUSE_NUMBER, value), value)
+        self.assertIsNone(re.fullmatch(MODULE.HOUSE_NUMBER, "Ⅻ"))
 
     def test_sensitive_location_shared_cases_match_offline_validator(self) -> None:
         cases = json.loads((ROOT / "tests/fixtures/proposals/sensitive-location-cases.json").read_text(encoding="utf-8"))
