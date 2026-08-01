@@ -28,6 +28,28 @@ jobs:
           git diff --exit-code
       - name: Self-test complete release snapshot readback
         run: python3 .github/production-readback/verify_release_snapshot_live.py --self-test
+      - name: Self-test production readback commit status
+        run: python3 .github/production-readback/publish_commit_status.py --self-test
+      - name: Validate production readback status workflow contract
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+
+          readback = Path(".github/workflows/production-readback.yml").read_text(
+              encoding="utf-8"
+          )
+
+          assert "statuses: write" in readback
+          assert "Publish terminal production readback commit status" in readback
+          assert "--mode final" in readback
+          assert "--mode pending" not in readback
+          assert "Mark production readback pending" not in readback
+          assert 'print(f"state={state}")' in readback
+          assert "steps.commit_status.outcome != 'success'" in readback
+          assert "steps.commit_status.outputs.state != 'success'" in readback
+          assert "contents: write" not in readback
+          print("commonworld terminal production readback status workflow contract ok")
+          PY
       - name: Install validation dependencies
         run: python -m pip install -r requirements-dev.txt
       - name: Validate canonical globe core
