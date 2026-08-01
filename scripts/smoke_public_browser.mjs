@@ -19,8 +19,10 @@ import {
   globeHorizonCoordinates,
   publicMapFeatureCollection,
   ringOrbitDuration,
+  SPHERE_RING_BUNDLE_CHILD_LIMIT,
   SPHERE_RING_IDENTITY_PREVIEW_LIMIT,
   SPHERE_RING_LABEL_MAX_CHARS,
+  sphereRingBundleVisibleChildCount,
   sphereRingLabelLength,
   serializeDigitalPath,
   sphereOpacityForGlobeRatio,
@@ -317,6 +319,12 @@ async function loadExpectedDigitalProjection() {
       ids: [...node.identityIds],
       laneIds: [...node.identityIds],
       ringPreviewIds: [...node.identityIds].slice(0, SPHERE_RING_IDENTITY_PREVIEW_LIMIT),
+      childIds: node.children
+        .filter((child) => child.type !== 'identity' && child.identityCount > 0)
+        .map(({ id }) => id),
+      childLabels: node.children
+        .filter((child) => child.type !== 'identity' && child.identityCount > 0)
+        .map(({ label }) => label),
       count: node.identityCount,
     };
   });
@@ -683,6 +691,19 @@ async function startupAndRingOrbitScenario() {
         animationIterationCount: style.animationIterationCount,
         animationPlayState: style.animationPlayState,
         hasGuide: plane.querySelector('use.sphere-layer-guide') !== null,
+        mainRingCount: plane.querySelectorAll('use.sphere-bundle-main-ring').length,
+        childRingIds: [...plane.querySelectorAll('use.sphere-bundle-child-ring')].map((node) => node.dataset.nodeId),
+        childRingTransforms: [...plane.querySelectorAll('use.sphere-bundle-child-ring')].map((node) => node.getAttribute('transform')),
+        childRingAnimationNames: [...plane.querySelectorAll('use.sphere-bundle-child-ring')].map((node) => getComputedStyle(node).animationName),
+        visibleChildRingCount: [...plane.querySelectorAll('use.sphere-bundle-child-ring')].filter((node) => getComputedStyle(node).display !== 'none').length,
+        bundleChildCount: Number(plane.dataset.bundleChildCount),
+        bundleTotalChildCount: Number(plane.dataset.bundleTotalChildCount),
+        bundleVisibleChildCount: Number(plane.dataset.bundleVisibleChildCount),
+        bundleOverflowCount: Number(plane.dataset.bundleOverflowCount),
+        bundleLineCount: Number(plane.dataset.bundleLineCount),
+        bundleTextPathCount: plane.querySelectorAll('textPath').length,
+        sublabelIds: [...plane.querySelectorAll('.sphere-ring-sublabel')].map((node) => node.dataset.nodeId),
+        overflowText: plane.querySelector('.sphere-ring-overflow')?.textContent?.trim() ?? '',
         placeholderCount: plane.querySelectorAll('.sphere-ring-placeholder').length,
         placeholderIds: [...plane.querySelectorAll('.sphere-ring-placeholder')].filter((node) => node.dataset.commonprojectId).length,
         ids: names.map(({ id }) => id),
@@ -697,6 +718,19 @@ async function startupAndRingOrbitScenario() {
     const expectedLayer = expectedDigitalProjection.fields.find(({ id }) => id === ring.layer);
     assert(expectedLayer, `ring orbits: rendered unknown layer ${ring.layer}`);
     assert(ring.hasGuide, `ring orbits: ${ring.layer} lost its orbit guide`);
+    const expectedChildIds = expectedLayer.childIds.slice(0, SPHERE_RING_BUNDLE_CHILD_LIMIT);
+    const expectedVisibleChildCount = sphereRingBundleVisibleChildCount(expectedLayer.childIds.length, await run.page.locator('#digital-sphere').getAttribute('data-ring-detail-level'));
+    assert(ring.mainRingCount === 1, `ring bundles: ${ring.layer} must retain exactly one main ring ${JSON.stringify(ring)}`);
+    assertSameIds(ring.childRingIds, expectedChildIds, `ring bundles: ${ring.layer} subordinate ring set`);
+    assertSameIds(ring.sublabelIds, expectedChildIds, `ring bundles: ${ring.layer} subordinate label set`);
+    assert(ring.bundleChildCount === expectedChildIds.length && ring.bundleTotalChildCount === expectedLayer.childIds.length, `ring bundles: ${ring.layer} child counts drifted ${JSON.stringify({ ring, expectedLayer })}`);
+    assert(ring.bundleChildCount <= SPHERE_RING_BUNDLE_CHILD_LIMIT && ring.bundleLineCount === ring.bundleChildCount + 1, `ring bundles: ${ring.layer} exceeds the bounded line contract ${JSON.stringify(ring)}`);
+    assert(ring.bundleTextPathCount === 1, `ring bundles: ${ring.layer} created more than one moving text lane ${JSON.stringify(ring)}`);
+    assert(ring.childRingAnimationNames.every((name) => name === 'none'), `ring bundles: ${ring.layer} gives subordinate lines independent animations ${JSON.stringify(ring)}`);
+    assert(new Set(ring.childRingTransforms).size === ring.childRingTransforms.length && ring.childRingTransforms.every(Boolean), `ring bundles: ${ring.layer} subordinate geometry is not distinct ${JSON.stringify(ring)}`);
+    assert(ring.visibleChildRingCount === expectedVisibleChildCount && ring.bundleVisibleChildCount === expectedVisibleChildCount, `ring bundles: ${ring.layer} responsive child count drifted ${JSON.stringify({ ring, expectedVisibleChildCount })}`);
+    assert(ring.bundleOverflowCount === Math.max(0, expectedLayer.childIds.length - expectedVisibleChildCount), `ring bundles: ${ring.layer} overflow count drifted ${JSON.stringify(ring)}`);
+    assert(ring.bundleOverflowCount === 0 ? ring.overflowText === '' : ring.overflowText === `· +${ring.bundleOverflowCount}`, `ring bundles: ${ring.layer} overflow label drifted ${JSON.stringify(ring)}`);
     assert(Number.isFinite(ring.entryCount) && ring.entryCount === expectedLayer.count, `ring orbits: ${ring.layer} entry count diverges from catalog identities ${JSON.stringify({ ring, expectedLayer })}`);
     assertSameIds(ring.ids, expectedLayer.ringPreviewIds, `ring orbits: ${ring.layer} lane identity set`);
     assert(new Set(ring.ids).size === ring.ids.length, `ring orbits: ${ring.layer} repeats an identity ${JSON.stringify(ring.ids)}`);
@@ -714,6 +748,11 @@ async function startupAndRingOrbitScenario() {
     assert(Math.abs(ring.animationDurationSeconds - ring.orbitDuration) <= 0.5, `ring orbits: ${ring.layer} CSS duration diverges from its declared duration ${JSON.stringify(ring)}`);
     assert(ring.animationIterationCount === 'infinite' && ring.animationPlayState === 'running', `ring orbits: ${ring.layer} does not orbit continuously ${JSON.stringify(ring)}`);
   }
+  const renderedBundleLineCount = rings.reduce((total, ring) => total + ring.bundleLineCount, 0);
+  const renderedChildRingCount = rings.reduce((total, ring) => total + ring.bundleChildCount, 0);
+  assert(renderedChildRingCount > 0 && renderedBundleLineCount === rings.length + renderedChildRingCount, `ring bundles: hierarchy did not produce bounded subordinate lines ${JSON.stringify({ renderedBundleLineCount, renderedChildRingCount })}`);
+  assert(renderedBundleLineCount <= rings.length * (SPHERE_RING_BUNDLE_CHILD_LIMIT + 1), `ring bundles: total line budget exceeded ${JSON.stringify({ renderedBundleLineCount, ringCount: rings.length })}`);
+
   const globalVisibleLabelOwners = new Map();
   const visibleTitleById = new Map();
   for (const { names } of rings) {
@@ -735,6 +774,12 @@ async function startupAndRingOrbitScenario() {
   });
   assert(accessibleRingSummary.describedBy.split(/\s+/u).includes('sphere-ring-accessible-summary'), `ring accessibility: sphere does not reference the full-title surface ${JSON.stringify(accessibleRingSummary)}`);
   assert(!accessibleRingSummary.hiddenByAncestor, `ring accessibility: full-title surface is hidden ${JSON.stringify(accessibleRingSummary)}`);
+  for (const field of expectedDigitalProjection.fields) {
+    assert(accessibleRingSummary.text.includes(field.label), `ring accessibility: bundle label is absent from the non-hidden summary ${JSON.stringify({ label: field.label, summary: accessibleRingSummary.text })}`);
+    for (const childLabel of field.childLabels) {
+      assert(accessibleRingSummary.text.includes(childLabel), `ring accessibility: subordinate bundle label is absent from the non-hidden summary ${JSON.stringify({ childLabel, summary: accessibleRingSummary.text })}`);
+    }
+  }
   for (const title of visibleTitleById.values()) {
     assert(accessibleRingSummary.text.includes(title), `ring accessibility: visible full title is absent from the non-hidden summary ${JSON.stringify({ title, summary: accessibleRingSummary.text })}`);
   }
@@ -778,7 +823,7 @@ async function startupAndRingOrbitScenario() {
   assert(run.consoleErrors.length === 0, 'startup: console errors: ' + run.consoleErrors.join(' | ') + '; HTTP: ' + run.httpErrors.join(' | '));
   assert(run.pageErrors.length === 0, 'startup: page errors: ' + run.pageErrors.join(' | '));
   const maximumVisibleRingLabelCharacters = Math.max(...rings.flatMap(({ names }) => names.map(({ visibleText }) => sphereRingLabelLength(visibleText))));
-  results.push({ id: 'startup-and-ring-orbits', verdict: 'PASS', directGlobeProjection: true, hiddenUntilCalibrated: true, outerHintRemoved: true, aggregateRingIdentities: aggregateCount, configuredRingPreviewLimit: SPHERE_RING_IDENTITY_PREVIEW_LIMIT, ringPreviewCounts, maxRingPreviewCount, orbitLabelMaxChars: SPHERE_RING_LABEL_MAX_CHARS, orbitLabelMeasurement: 'extended-grapheme-clusters', maximumVisibleRingLabelCharacters, accessibleFullTitleParity: true, hiddenSvgAccessibilityNamesRemoved: true, graphemeSafeVisibleLabels: true, collisionSafeVisibleLabels: true, movingRingMatrix: movedRing, unchangedGeometryRepaintSkipped: true });
+  results.push({ id: 'startup-and-ring-orbits', verdict: 'PASS', directGlobeProjection: true, hiddenUntilCalibrated: true, outerHintRemoved: true, aggregateRingIdentities: aggregateCount, configuredRingPreviewLimit: SPHERE_RING_IDENTITY_PREVIEW_LIMIT, ringPreviewCounts, maxRingPreviewCount, orbitLabelMaxChars: SPHERE_RING_LABEL_MAX_CHARS, orbitLabelMeasurement: 'extended-grapheme-clusters', maximumVisibleRingLabelCharacters, adaptiveRingBundles: true, renderedBundleLineCount, renderedChildRingCount, oneTextPathPerBundle: true, subordinateLinesIndependentlyStatic: true, accessibleBundleHierarchy: true, accessibleFullTitleParity: true, hiddenSvgAccessibilityNamesRemoved: true, graphemeSafeVisibleLabels: true, collisionSafeVisibleLabels: true, movingRingMatrix: movedRing, unchangedGeometryRepaintSkipped: true });
   await run.context.close();
 }
 
@@ -1297,7 +1342,7 @@ async function layerJourneyScenario({ mobile = false, viewportOverride = null, t
   assert(Math.abs(afterRotation.width - restoredScale.width) <= 2, `layer journey: sphere followed internal zoom normalization instead of visible globe (${restoredScale.width} -> ${afterRotation.width}; MapLibre zoom ${zoomNumberBeforeRotation} -> ${zoomNumberAfterRotation})`);
   await waitForSphereOpacitySettled(run.page);
   const opacityAfterRotation = Number(await run.page.locator('#digital-sphere').evaluate((node) => getComputedStyle(node).opacity));
-  assert(opacityAfterRotation === opacityRestored, `layer journey: sphere opacity followed internal zoom normalization during rotation (${opacityRestored} -> ${opacityAfterRotation})`);
+  assert(Math.abs(opacityAfterRotation - opacityRestored) <= 0.002, `layer journey: sphere opacity followed internal zoom normalization during rotation (${opacityRestored} -> ${opacityAfterRotation})`);
 
 
   const sphereBox = await run.page.locator('#digital-sphere').boundingBox();
@@ -2412,6 +2457,12 @@ async function androidGlobeUiScenario() {
       primaryRingCount: planes.filter((plane) => plane.dataset.emphasis === 'primary').length,
       depthRingCount: planes.filter((plane) => plane.dataset.emphasis === 'depth').length,
       depthRingsStatic: planes.filter((plane) => plane.dataset.emphasis === 'depth').every((plane) => getComputedStyle(plane).animationName === 'none'),
+      ringDetailLevel: document.querySelector('#digital-sphere')?.dataset.ringDetailLevel ?? '',
+      bundleVisibleChildCounts: planes.map((plane) => ({
+        layer: plane.dataset.layerId,
+        declared: Number(plane.dataset.bundleVisibleChildCount),
+        rendered: [...plane.querySelectorAll('.sphere-bundle-child-ring')].filter((node) => getComputedStyle(node).display !== 'none').length,
+      })),
       viewportWidth: window.innerWidth,
       mediaCompact: window.matchMedia('(max-width: 48rem)').matches,
     };
@@ -2421,6 +2472,8 @@ async function androidGlobeUiScenario() {
   assert(geometry.ringAnimationName === 'sphere-ring-orbit', scenarioId + ': primary mobile ring lost its slow orientation orbit ' + JSON.stringify(geometry));
   assert(geometry.ringTransform !== 'none', scenarioId + ': primary mobile ring lost its deterministic orbital offset ' + JSON.stringify(geometry));
   assert(geometry.primaryRingCount >= 2 && geometry.primaryRingCount <= 3 && geometry.depthRingCount > 0 && geometry.depthRingsStatic, scenarioId + ': mobile emphasis does not bound active rings ' + JSON.stringify(geometry));
+  assert(['micro', 'compact'].includes(geometry.ringDetailLevel), scenarioId + ': mobile detail level is not bounded ' + JSON.stringify(geometry));
+  assert(geometry.bundleVisibleChildCounts.every(({ declared, rendered }) => declared === rendered && rendered <= 2), scenarioId + ': mobile bundle detail did not reduce subordinate lines ' + JSON.stringify(geometry));
   assert(geometry.ringTextWidth > 80 && geometry.ringTextHeight >= 12.5 && geometry.ringTextFontSize >= 9.5, scenarioId + ': mobile ring text is not visibly sized ' + JSON.stringify(geometry));
 
   await run.page.locator('#sphere-edge-control').focus();

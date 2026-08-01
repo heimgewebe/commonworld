@@ -56,8 +56,11 @@ import {
   ribbonRepeatCount,
   RING_ORBIT_MIN_DURATION_S,
   RING_ORBIT_MAX_DURATION_S,
+  SPHERE_RING_BUNDLE_CHILD_LIMIT,
   SPHERE_RING_IDENTITY_PREVIEW_LIMIT,
   SPHERE_RING_LABEL_MAX_CHARS,
+  sphereRingBundleScaleOffsets,
+  sphereRingBundleVisibleChildCount,
   sphereRingLabelAssignments,
   sphereRingLabelLength,
   normalizeDigitalPath,
@@ -437,6 +440,17 @@ test('sphere ring labels preserve combining marks and emoji grapheme clusters at
   assert.equal(sphereRingLabelLength(emoji.visibleText), SPHERE_RING_LABEL_MAX_CHARS);
   assert.equal(combining.fullText, combiningTitle);
   assert.equal(emoji.fullText, emojiTitle);
+});
+
+test('sphere ring bundles bound static child geometry and responsive detail', () => {
+  assert.equal(SPHERE_RING_BUNDLE_CHILD_LIMIT, 4);
+  assert.deepEqual(sphereRingBundleScaleOffsets(0), []);
+  assert.deepEqual(sphereRingBundleScaleOffsets(8), [-0.018, -0.036, -0.054, -0.072]);
+  assert.equal(sphereRingBundleVisibleChildCount(8, 'names'), 4);
+  assert.equal(sphereRingBundleVisibleChildCount(8, 'compact'), 2);
+  assert.equal(sphereRingBundleVisibleChildCount(8, 'micro'), 1);
+  assert.equal(sphereRingBundleVisibleChildCount(1, 'compact'), 1);
+  assert.equal(sphereRingBundleVisibleChildCount(0, 'names'), 0);
 });
 
 test('sphere ring typography preserves screen-space legibility and balanced emphasis', () => {

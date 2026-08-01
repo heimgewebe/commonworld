@@ -1691,7 +1691,31 @@ html[data-input-modality="pointer"] :focus {
 }
 
 .sphere-ring-plane[data-emphasis="depth"] .sphere-ring-text {
-  opacity: 0.22;
+  opacity: 0.34;
+}
+
+.sphere-ring-plane[data-emphasis="depth"] .sphere-ring-name {
+  display: none;
+}
+
+.sphere-bundle-child-ring {
+  --bundle-ring-opacity: 0.58;
+  animation: none;
+  pointer-events: none;
+}
+
+.sphere-bundle-child-ring[data-bundle-index="1"] { --bundle-ring-opacity: 0.5; }
+.sphere-bundle-child-ring[data-bundle-index="2"] { --bundle-ring-opacity: 0.42; }
+.sphere-bundle-child-ring[data-bundle-index="3"] { --bundle-ring-opacity: 0.34; }
+
+.sphere-ring-plane[data-emphasis="primary"] .sphere-bundle-child-ring {
+  opacity: var(--bundle-ring-opacity);
+  stroke-width: 0.9;
+}
+
+.sphere-ring-plane[data-emphasis="depth"] .sphere-bundle-child-ring {
+  opacity: calc(var(--bundle-ring-opacity) * 0.42);
+  stroke-width: 0.55;
 }
 
 .sphere-ring-label {
@@ -1701,6 +1725,41 @@ html[data-input-modality="pointer"] :focus {
 
 .sphere-ring-name {
   font-weight: 720;
+}
+
+.sphere-ring-sublabel {
+  font-size: 0.84em;
+  font-weight: 650;
+  letter-spacing: 0.035em;
+  opacity: 0.82;
+}
+
+.sphere-ring-overflow {
+  font-size: 0.82em;
+  font-weight: 820;
+  letter-spacing: 0.045em;
+  opacity: 0.74;
+}
+
+.sphere-ring-overflow[data-hidden] {
+  display: none;
+}
+
+.digital-sphere[data-ring-detail-level="compact"] .sphere-bundle-child-ring[data-bundle-index="2"],
+.digital-sphere[data-ring-detail-level="compact"] .sphere-bundle-child-ring[data-bundle-index="3"],
+.digital-sphere[data-ring-detail-level="compact"] .sphere-ring-sublabel[data-bundle-index="2"],
+.digital-sphere[data-ring-detail-level="compact"] .sphere-ring-sublabel[data-bundle-index="3"],
+.digital-sphere[data-ring-detail-level="close"] .sphere-bundle-child-ring[data-bundle-index="2"],
+.digital-sphere[data-ring-detail-level="close"] .sphere-bundle-child-ring[data-bundle-index="3"],
+.digital-sphere[data-ring-detail-level="close"] .sphere-ring-sublabel[data-bundle-index="2"],
+.digital-sphere[data-ring-detail-level="close"] .sphere-ring-sublabel[data-bundle-index="3"],
+.digital-sphere[data-ring-detail-level="micro"] .sphere-bundle-child-ring[data-bundle-index="1"],
+.digital-sphere[data-ring-detail-level="micro"] .sphere-bundle-child-ring[data-bundle-index="2"],
+.digital-sphere[data-ring-detail-level="micro"] .sphere-bundle-child-ring[data-bundle-index="3"],
+.digital-sphere[data-ring-detail-level="micro"] .sphere-ring-sublabel[data-bundle-index="1"],
+.digital-sphere[data-ring-detail-level="micro"] .sphere-ring-sublabel[data-bundle-index="2"],
+.digital-sphere[data-ring-detail-level="micro"] .sphere-ring-sublabel[data-bundle-index="3"] {
+  display: none;
 }
 
 

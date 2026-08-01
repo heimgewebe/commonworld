@@ -22,6 +22,12 @@
       "orbitLabelMaxChars": 18,
       "orbitLabelMeasurement": "extended-grapheme-clusters",
       "maximumVisibleRingLabelCharacters": 18,
+      "adaptiveRingBundles": true,
+      "renderedBundleLineCount": 20,
+      "renderedChildRingCount": 15,
+      "oneTextPathPerBundle": true,
+      "subordinateLinesIndependentlyStatic": true,
+      "accessibleBundleHierarchy": true,
       "accessibleFullTitleParity": true,
       "hiddenSvgAccessibilityNamesRemoved": true,
       "graphemeSafeVisibleLabels": true,
@@ -112,13 +118,41 @@
       "filterButtonWidth": 44,
       "filterButtonHeight": 44,
       "ringAnimationName": "sphere-ring-orbit",
-      "ringTransform": "matrix(0.999999, 0.001509, -0.001509, 0.999999, 0, 0)",
-      "ringTextWidth": 671.1126708984375,
-      "ringTextHeight": 14.0126953125,
+      "ringTransform": "matrix(0.999997, 0.00226199, -0.00226199, 0.999997, 0, 0)",
+      "ringTextWidth": 893.027099609375,
+      "ringTextHeight": 15.019927978515625,
       "ringTextFontSize": 22,
       "primaryRingCount": 3,
       "depthRingCount": 2,
       "depthRingsStatic": true,
+      "ringDetailLevel": "compact",
+      "bundleVisibleChildCounts": [
+        {
+          "layer": "knowledge_learning_culture",
+          "declared": 2,
+          "rendered": 2
+        },
+        {
+          "layer": "software_tools_production",
+          "declared": 2,
+          "rendered": 2
+        },
+        {
+          "layer": "communication_networks",
+          "declared": 2,
+          "rendered": 2
+        },
+        {
+          "layer": "provision_land_ecology",
+          "declared": 2,
+          "rendered": 2
+        },
+        {
+          "layer": "cooperation_self_organization",
+          "declared": 2,
+          "rendered": 2
+        }
+      ],
       "viewportWidth": 390,
       "mediaCompact": true,
       "countryRendered": 1
@@ -162,7 +196,7 @@
     {
       "id": "layer-journey-moveend-return",
       "verdict": "PASS",
-      "elapsedMs": 2319
+      "elapsedMs": 1685
     },
     {
       "id": "layer-journey-interrupted",
@@ -249,8 +283,8 @@
       "verdict": "PASS",
       "blockedCatalogRequests": 0,
       "observedCatalogRequests": [
-        "/releases/c2635b8bdfe7a82a41d4/catalog/runtime/aggregate.v1.json",
-        "/releases/c2635b8bdfe7a82a41d4/catalog/runtime/manifest.v1.json"
+        "/releases/8ee25073650920a2ebcb/catalog/runtime/aggregate.v1.json",
+        "/releases/8ee25073650920a2ebcb/catalog/runtime/manifest.v1.json"
       ]
     },
     {
@@ -308,9 +342,9 @@
     }
   ],
   "binding": {
-    "smoke_script_sha256": "f3b576f51120be32fa0a612fc4d17129d7ffc18fd39a46f4bcc89d38ab1ac4b1",
+    "smoke_script_sha256": "edb2355eedf922404f648341575af3f6e1ca831cf9de4af5d5e6e2eb65e1eecf",
     "smoke_runner_sha256": "522b99b70b1d0064b1d0a31a3a67fdc9a2e73b7408f37d1a4bb303bc360b7556",
-    "first_party_surface_sha256": "adf84ef5a18c274a9545ba6125db95fb2ff067c3fae82d528a5a9b3cfe848715",
+    "first_party_surface_sha256": "66be2d42aad0f2cd9a993ac83f7510beccf4364e205426c4a4ec185dd75cc1c2",
     "scenario_ids": [
       "startup-and-ring-orbits",
       "synthetic-cross-ring-collision-accessibility",
@@ -353,8 +387,8 @@
     "smoke_plan_sha256": "6b8749928ead5ef81ee66883e6a2993e756ce083575c3569234bf70526448364"
   },
   "execution": {
-    "result_sha256": "2cbc9b19acbdef98845d0fbd60048e9ed1f98d241b1ae92fccebc3c46122f08c",
-    "observed_at": "2026-08-01T12:36:54Z",
-    "transport_note": "Fresh public browser smoke passed all 36 scenarios on release c2635b8bdfe7a82a41d4; evidence is bound to the exact current scripts, ordered scenarios and complete first-party surface."
+    "result_sha256": "d950d2ebb04f232960806ed93650d01c4bfa605aa4c41e88560a007e537305f1",
+    "observed_at": "2026-08-01T17:38:00Z",
+    "transport_note": "Fresh public browser smoke passed all 36 scenarios on release 8ee25073650920a2ebcb; evidence is bound to the exact current scripts, ordered scenarios and complete first-party surface."
   }
 }

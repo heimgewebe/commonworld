@@ -1,5 +1,5 @@
 import { COMMONWORLD_EN_LOCALE } from './commonworld-en-locale.mjs?v=951a6a8cc25f';
-import { FALLBACK_LOCALE, normalizeLocale } from './commonworld-i18n.mjs?v=34f9c64a75f1';
+import { FALLBACK_LOCALE, normalizeLocale } from './commonworld-i18n.mjs?v=b8662dad78e9';
 
 export const DEFAULT_CAMERA = Object.freeze({
   lng: 8,
@@ -687,6 +687,25 @@ export const RING_ORBIT_MIN_DURATION_S = 72;
 export const RING_ORBIT_MAX_DURATION_S = 180;
 export const SPHERE_RING_IDENTITY_PREVIEW_LIMIT = 6;
 export const SPHERE_RING_LABEL_MAX_CHARS = 18;
+export const SPHERE_RING_BUNDLE_CHILD_LIMIT = 4;
+const SPHERE_RING_BUNDLE_SCALE_STEP = 0.018;
+const SPHERE_RING_BUNDLE_VISIBLE_CHILD_COUNTS = Object.freeze({ micro: 1, compact: 2, names: 4, close: 2 });
+
+function normalizedSphereRingBundleChildCount(totalChildren) {
+  const count = Number.isInteger(totalChildren) && totalChildren > 0 ? totalChildren : 0;
+  return clamp(count, 0, SPHERE_RING_BUNDLE_CHILD_LIMIT);
+}
+
+export function sphereRingBundleScaleOffsets(totalChildren) {
+  const count = normalizedSphereRingBundleChildCount(totalChildren);
+  return Object.freeze(Array.from({ length: count }, (_, index) => rounded(-(index + 1) * SPHERE_RING_BUNDLE_SCALE_STEP, 3)));
+}
+
+export function sphereRingBundleVisibleChildCount(totalChildren, detailLevel = 'names') {
+  const count = normalizedSphereRingBundleChildCount(totalChildren);
+  const requested = SPHERE_RING_BUNDLE_VISIBLE_CHILD_COUNTS[detailLevel] ?? SPHERE_RING_BUNDLE_VISIBLE_CHILD_COUNTS.names;
+  return clamp(requested, 0, count);
+}
 
 const normalizedSphereRingTitle = (record) => String(record?.title ?? record?.id ?? '').trim().replace(/\s+/gu, ' ');
 function createSphereRingGraphemeSegmenter() {

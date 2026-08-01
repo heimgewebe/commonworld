@@ -21,6 +21,7 @@ const UI_EN = Object.freeze({
   catalog_empty: 'The catalog contains no entries.',
   invalid_or_duplicate_id: 'Invalid or duplicate CommonProject ID.',
   no_visible_entries: 'no visible entries',
+  visible_ring_bundles: 'Digital ring bundles: {bundles}.',
   visible_ring_commons: 'Visible Commons in the digital rings: {titles}.',
   visible_ring_commons_empty: 'No Commons are currently visible in the digital rings.',
   open_project: 'Open {title}',
