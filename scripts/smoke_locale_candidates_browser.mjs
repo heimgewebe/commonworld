@@ -151,6 +151,11 @@ try {
           const focusTitleLang = document.querySelector('#focus-title')?.lang ?? '';
           const focusSummaryLang = document.querySelector('#focus-summary')?.lang ?? '';
           const focusPresence = document.querySelector('#focus-presence')?.textContent ?? '';
+          const focusLocationItems = [...document.querySelectorAll('#focus-locations > li')];
+          const focusLocationContentLangs = focusLocationItems.map((item) => item.querySelector('[data-content-language]')?.getAttribute('lang') ?? '');
+          const focusDigital = document.querySelector('#focus-digital');
+          const focusDigitalText = focusDigital?.textContent ?? '';
+          const focusDigitalLang = focusDigital?.getAttribute('lang') ?? '';
           document.querySelector('#focus-close')?.click();
           document.querySelector('#layer-view-button')?.click();
           const layerDeadline = performance.now() + 15_000;
@@ -169,6 +174,10 @@ try {
             focusTitleLang,
             focusSummaryLang,
             focusPresence,
+            focusLocationItemCount: focusLocationItems.length,
+            focusLocationContentLangs,
+            focusDigitalText,
+            focusDigitalLang,
             sphereNameLangs,
             sphereSummaryTitleLangs,
             ribbonNameLangs: ribbonNames.map((node) => node.getAttribute('lang') ?? ''),
@@ -226,6 +235,9 @@ try {
         assert(runtimeCatalogBoundary?.focusTitle === runtimeCatalogBoundary?.staticTitle, `${pageName}: runtime title fell off the English content overlay`);
         assert(runtimeCatalogBoundary?.focusSummary === runtimeCatalogBoundary?.staticSummary, `${pageName}: runtime summary fell off the English content overlay`);
         assert(runtimeCatalogBoundary?.focusTitleLang === 'en' && runtimeCatalogBoundary?.focusSummaryLang === 'en', `${pageName}: runtime English content lacks lang=en boundaries`);
+        assert((runtimeCatalogBoundary?.focusLocationItemCount ?? 0) > 0, `${pageName}: expected dual-presence focus fixture has no locations`);
+        assert(runtimeCatalogBoundary.focusLocationContentLangs.length === runtimeCatalogBoundary.focusLocationItemCount && runtimeCatalogBoundary.focusLocationContentLangs.every((lang) => lang === 'en'), `${pageName}: focus location content labels lack lang=en boundaries`);
+        assert((runtimeCatalogBoundary?.focusDigitalText ?? '').trim().length > 0 && runtimeCatalogBoundary?.focusDigitalLang === 'en', `${pageName}: focus digital content label lacks lang=en boundary`);
         assert((runtimeCatalogBoundary?.sphereNameLangs?.length ?? 0) > 0 && runtimeCatalogBoundary.sphereNameLangs.every((lang) => lang === 'en'), `${pageName}: sphere ring titles lack lang=en boundaries`);
         assert((runtimeCatalogBoundary?.sphereSummaryTitleLangs?.length ?? 0) > 0 && runtimeCatalogBoundary.sphereSummaryTitleLangs.every((lang) => lang === 'en'), `${pageName}: sphere accessible summary titles lack lang=en boundaries`);
         assert((runtimeCatalogBoundary?.ribbonNameLangs?.length ?? 0) > 0 && runtimeCatalogBoundary.ribbonNameLangs.every((lang) => lang === 'en'), `${pageName}: digital ribbon titles lack lang=en boundaries`);

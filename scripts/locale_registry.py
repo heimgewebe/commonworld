@@ -73,7 +73,7 @@ def match_registry_locale(values: Iterable[str], *, statuses: Iterable[str] = ("
             if matched:
                 return matched
         primary = parts[0]
-        matched = next((tag for tag in candidates if tag.casefold() == primary.casefold()), None)
+        matched = next((tag for tag in candidates if tag.split("-", 1)[0].casefold() == primary.casefold()), None)
         if matched:
             return matched
     default = fallback or load_locale_contract(root / "docs/architecture/locale-release.contract.json")["decision"]["default_locale"]

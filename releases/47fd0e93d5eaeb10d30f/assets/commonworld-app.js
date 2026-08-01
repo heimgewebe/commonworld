@@ -1,6 +1,6 @@
 import { BOOTSTRAP_RECORDS } from './commonworld-bootstrap-catalog.mjs?v=cc49548bc45c';
 import { createCatalogLoadCache, loadCatalogAggregate, loadCatalogDetail, loadCatalogShard, shardKeyForIdentity } from './commonworld-catalog-runtime.mjs?v=836cd2a8f3f9';
-import { actionLabel, documentLocale, localizeCatalogRecords, text as i18nText, themeLabel } from './commonworld-i18n.mjs?v=8f980501175b';
+import { actionLabel, documentLocale, localizeCatalogRecords, text as i18nText, themeLabel } from './commonworld-i18n.mjs?v=12932532815f';
 import {
   COMMONS_TYPE_COLOR_TOKENS,
   COMMONS_TYPE_VALUES,
@@ -56,7 +56,7 @@ import {
   sortRecords,
   stateFromSearch,
   visibleDigitalNodes,
-} from './commonworld-core.mjs?v=54af67802a5e';
+} from './commonworld-core.mjs?v=35c01fb3a624';
 
 const LOCALE = documentLocale();
 const t = (key, germanFallback, variables = {}) => i18nText(LOCALE, key, germanFallback, variables);
@@ -2432,6 +2432,26 @@ function replaceList(container, values) {
   }
 }
 
+function replaceLocationList(container, record) {
+  const values = recordLocationSummaries(record, LOCALE);
+  const locations = Array.isArray(record?.presence?.geographic) ? record.presence.geographic : [];
+  container.replaceChildren();
+  values.forEach((value, index) => {
+    const item = document.createElement('li');
+    const contentLabel = locations[index]?.label;
+    if (record?._content_locale && contentLabel && value.startsWith(contentLabel)) {
+      const label = document.createElement('span');
+      label.dataset.contentLanguage = record._content_locale;
+      label.lang = record._content_locale;
+      label.textContent = contentLabel;
+      item.append(label, document.createTextNode(value.slice(contentLabel.length)));
+    } else {
+      item.textContent = value;
+    }
+    container.append(item);
+  });
+}
+
 function replaceLinks(container, links) {
   container.replaceChildren();
   for (const link of links) {
@@ -2472,8 +2492,13 @@ function updateFocusPanel() {
   elements.focusPresence.textContent = recordPresentationLabel(record, LOCALE);
   replaceList(elements.focusThemes, (record.themes ?? []).map((theme) => themeLabel(theme, LOCALE)));
   replaceList(elements.focusActions, (record.actions ?? []).map((action) => actionLabel(action, LOCALE)));
-  replaceList(elements.focusLocations, recordLocationSummaries(record, LOCALE));
+  replaceLocationList(elements.focusLocations, record);
   elements.focusDigital.textContent = digitalPresenceText(record);
+  const digitalContentLanguage = record?._content_locale && record?.presence?.digital?.available && record?.presence?.digital?.label
+    ? record._content_locale
+    : null;
+  if (digitalContentLanguage) elements.focusDigital.lang = digitalContentLanguage;
+  else elements.focusDigital.removeAttribute('lang');
   const relationLabels = relationLabelsForRecord(record);
   replaceList(elements.focusRelations, relationLabels.length ? relationLabels : [t('relation_none', 'Keine belegte Beziehung veröffentlicht.') ]);
   replaceLinks(elements.focusLinks, record.links ?? []);

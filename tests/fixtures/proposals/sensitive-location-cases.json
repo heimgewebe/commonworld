@@ -101,6 +101,14 @@
     {
       "id": "pt-br-trav-abbreviation",
       "value": "Trav. da Paz, 7, Salvador"
+    },
+    {
+      "id": "fr-bd-abbreviation",
+      "value": "12 bd Saint-Michel, Paris"
+    },
+    {
+      "id": "es-c-slash-abbreviation",
+      "value": "C/ Mayor, 12, Madrid"
     }
   ],
   "allowed": [
@@ -175,6 +183,14 @@
     {
       "id": "pt-av-abbreviation-without-number",
       "value": "O projeto atua na Av. cultural da cidade sem publicar endereços."
+    },
+    {
+      "id": "fr-bd-without-house-number",
+      "value": "Le projet documente le bd culturel sans publier une adresse."
+    },
+    {
+      "id": "es-c-slash-without-house-number",
+      "value": "La guía usa C/ como abreviatura editorial, sin dirección privada."
     }
   ]
 }

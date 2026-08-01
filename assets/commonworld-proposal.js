@@ -1,4 +1,4 @@
-import { CANDIDATE_LOCALES, normalizeKnownLocale } from './commonworld-locale-registry.mjs?v=322c888feae3';
+import { CANDIDATE_LOCALES, normalizeKnownLocale } from './commonworld-locale-registry.mjs?v=54777bc92af7';
 
 const ACTIVE_LOCALE = normalizeKnownLocale(
   typeof document !== 'undefined' ? document.documentElement?.lang : 'de',
@@ -45,7 +45,7 @@ const DMS_COORDINATE_PATTERN = /\d{1,3}\s*°\s*\d{1,2}\s*[′']\s*\d{1,2}(?:[.,]
 const WORD = String.raw`[\p{L}\p{M}][\p{L}\p{M}'’.-]*`;
 const HOUSE_NUMBER = String.raw`\p{N}{1,5}[A-Za-z]?(?:[-/]\p{N}{1,5}[A-Za-z]?)?`;
 const ATTACHED_STREET_SUFFIX = String.raw`(?:straße|strasse|weg|gasse|allee|platz)`;
-const STREET_WORD = String.raw`(?:street|road|avenue|boulevard|lane|drive|way|straße|strasse|rue|chemin|place|calle|avenida|plaza|paseo|carretera|camino|via|viale|corso|rua|r\.|avenida|av\.|avda\.|travessa|trav\.|praça|praca|pça\.|estrada|estr\.|alameda|rodovia|ulica|prospekt|شارع|طريق|جادة|زقاق|ميدان|st\.?|rd\.?|ave\.?|blvd\.?|ln\.?|dr\.?)`;
+const STREET_WORD = String.raw`(?:street|road|avenue|boulevard|lane|drive|way|straße|strasse|rue|chemin|place|bd\.?|calle|c/|avenida|plaza|paseo|carretera|camino|via|viale|corso|rua|r\.|avenida|av\.|avda\.|travessa|trav\.|praça|praca|pça\.|estrada|estr\.|alameda|rodovia|ulica|prospekt|شارع|طريق|جادة|زقاق|ميدان|st\.?|rd\.?|ave\.?|blvd\.?|ln\.?|dr\.?)`;
 const ADDRESS_PATTERNS = Object.freeze([
   new RegExp(String.raw`(?:^|[^\p{L}\p{N}])(?:${WORD}\s+){0,5}${WORD}${ATTACHED_STREET_SUFFIX}\s+${HOUSE_NUMBER}(?=$|[^\p{L}\p{N}])`, 'iu'),
   new RegExp(String.raw`(?:^|[^\p{L}\p{N}])(?:${WORD}\s+){1,5}${STREET_WORD}\s+${HOUSE_NUMBER}(?=$|[^\p{L}\p{N}])`, 'iu'),

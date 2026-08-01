@@ -12,7 +12,7 @@ import {
   matchRegistryLocale,
   normalizeKnownLocale,
   normalizeReleasedLocale,
-} from './commonworld-locale-registry.mjs?v=322c888feae3';
+} from './commonworld-locale-registry.mjs?v=54777bc92af7';
 
 export {
   CANDIDATE_LOCALES,

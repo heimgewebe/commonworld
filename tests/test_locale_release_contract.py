@@ -2,6 +2,7 @@ import copy
 import unittest
 from pathlib import Path
 
+from scripts.locale_registry import match_registry_locale
 from scripts.validate_locale_release import load_contract, validate_contract
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -36,6 +37,16 @@ class LocaleReleaseContractTests(unittest.TestCase):
         self.assertIn(
             "release gate must require a locale-aware catalog summary specificity policy",
             errors,
+        )
+
+    def test_primary_subtag_matches_region_specific_candidate(self) -> None:
+        self.assertEqual(
+            match_registry_locale(["pt-PT"], statuses=("candidate",), root=ROOT),
+            "pt-BR",
+        )
+        self.assertEqual(
+            match_registry_locale(["pt"], statuses=("candidate",), root=ROOT),
+            "pt-BR",
         )
 
     def test_location_based_language_inference_is_rejected(self) -> None:

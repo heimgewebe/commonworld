@@ -24,6 +24,8 @@ test('registry preserves canonical BCP 47 casing and release states', () => {
 test('candidate matching is script-aware but cannot activate a candidate as released', () => {
   assert.equal(matchRegistryLocale(['AR-arab-EG'], { statuses: ['candidate'] }), 'ar');
   assert.equal(matchRegistryLocale(['PT-br'], { statuses: ['candidate'] }), 'pt-BR');
+  assert.equal(matchRegistryLocale(['pt-PT'], { statuses: ['candidate'] }), 'pt-BR');
+  assert.equal(matchRegistryLocale(['pt'], { statuses: ['candidate'] }), 'pt-BR');
   assert.equal(matchRegistryLocale(['fr-CA'], { statuses: ['candidate'] }), 'fr');
   assert.equal(normalizeReleasedLocale('es'), 'en');
 });

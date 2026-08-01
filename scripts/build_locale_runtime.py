@@ -99,7 +99,7 @@ export function matchRegistryLocale(values, {{ statuses = ['released'], fallback
       if (scriptMatch) return scriptMatch;
     }}
     const primary = parts[0].toLowerCase();
-    const primaryMatch = allowed.find((tag) => tag.toLowerCase() === primary);
+    const primaryMatch = allowed.find((tag) => tag.split('-')[0].toLowerCase() === primary);
     if (primaryMatch) return primaryMatch;
   }}
   const normalizedFallback = canonicalLocaleTag(fallback);
