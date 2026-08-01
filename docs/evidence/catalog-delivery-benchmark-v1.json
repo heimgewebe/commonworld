@@ -792,14 +792,14 @@
       "verdict": "PASS",
       "command": "make validate && npm run smoke:browser",
       "durable_job_ids": [
-        "f602e74724c5",
+        "fb31a03e6b9b",
         "807ef5557b1c"
       ],
       "finalization_receipt_sha256s": [
-        "f5a681ded544c961b4d805869f608abb0b8ff3983e27f18cc716b96f2bd7ca73",
+        "73f0cf5c22781b5fe7b67ed2493b770acc87722e1befbd72d9c62343beda26d4",
         "cc8594c84c8fb087c33e4d0abbbd134d684cc55892d613dcf4bcc3e1f7db3025"
       ],
-      "note": "The complete repository validation passed 142 JavaScript and 607 Python tests; the canonical browser plan then passed public delivery, 12 candidate pages, proposal flows, focus overlays and accessibility modes on release b465b5a3f53140b8ae81."
+      "note": "The complete repository validation passed 142 JavaScript and 608 Python tests after replacing the CodeQL-flagged test regex with a linear parser; the canonical browser plan passed public delivery, 12 candidate pages, proposal flows, focus overlays and accessibility modes on release b465b5a3f53140b8ae81."
     }
   },
   "budget_binding": {

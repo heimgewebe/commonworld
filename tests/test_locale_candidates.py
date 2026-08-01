@@ -36,21 +36,64 @@ def assignment(path: Path, name: str):
     raise AssertionError(f"missing assignment {name} in {path}")
 
 
+def parse_js_string_property(line: str) -> tuple[str, str] | None:
+    candidate = line.strip()
+    if not candidate or candidate.startswith("//"):
+        return None
+    if candidate.endswith(","):
+        candidate = candidate[:-1].rstrip()
+
+    quote: str | None = None
+    escaped = False
+    separator = -1
+    for index, character in enumerate(candidate):
+        if escaped:
+            escaped = False
+            continue
+        if character == "\\":
+            escaped = True
+            continue
+        if quote is not None:
+            if character == quote:
+                quote = None
+            continue
+        if character in {"'", '"'}:
+            quote = character
+            continue
+        if character == ":":
+            separator = index
+            break
+    if separator < 1:
+        return None
+
+    raw_key = candidate[:separator].strip()
+    raw_value = candidate[separator + 1 :].strip()
+    if len(raw_value) < 2 or raw_value[0] != "'" or raw_value[-1] != "'":
+        return None
+
+    if raw_key[0:1] in {"'", '"'}:
+        key = ast.literal_eval(raw_key)
+    elif re.fullmatch(r"[A-Za-z0-9_]+", raw_key):
+        key = raw_key
+    else:
+        return None
+    value = ast.literal_eval(raw_value)
+    if not isinstance(key, str) or not isinstance(value, str):
+        return None
+    return key, value
+
+
 def js_object(name: str) -> dict[str, str]:
     source = (ROOT / "assets/commonworld-i18n.mjs").read_text(encoding="utf-8")
     start = source.index(f"const {name} = Object.freeze({{")
     end = source.index("\n});", start)
     block = source[start:end]
     result: dict[str, str] = {}
-    pattern = re.compile(
-        r"^\s*(?:(['\"])(.*?)\1|([A-Za-z0-9_]+)):\s*'((?:\\.|[^'])*)',?\s*$"
-    )
     for line in block.splitlines()[1:]:
-        match = pattern.match(line)
-        if not match:
-            continue
-        key = match.group(2) or match.group(3)
-        result[key] = ast.literal_eval("'" + match.group(4) + "'")
+        parsed = parse_js_string_property(line)
+        if parsed is not None:
+            key, value = parsed
+            result[key] = value
     return result
 
 
@@ -100,6 +143,9 @@ def attribute_values(markup: str, name: str) -> list[str]:
 
 
 class LocaleCandidatePackTests(unittest.TestCase):
+    def test_js_property_parser_rejects_adversarial_backslash_input(self) -> None:
+        self.assertIsNone(parse_js_string_property("0:" + r"\&" * 100_000))
+
     @classmethod
     def setUpClass(cls) -> None:
         cls.payload = json.loads(PACK_PATH.read_text(encoding="utf-8"))
