@@ -133,21 +133,38 @@ jobs:
         if: always()
         env:
           GITHUB_TOKEN: ${{ github.token }}
-        run: >-
-          python3 .github/production-readback/publish_commit_status.py
-          --mode final
-          --repository "${{ github.repository }}"
-          --sha "${{ github.sha }}"
-          --run-url "${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}"
-          --snapshot-receipt artifacts/commonworld-release-snapshot-readback.json
-          --pages-outcome "${{ steps.readback.outcome }}"
-          --pages-verdict "${{ steps.readback.outputs.verdict }}"
-          --snapshot-outcome "${{ steps.release_snapshot.outcome }}"
-          --snapshot-superseded "${{ steps.snapshot_supersession.outputs.superseded }}"
-          --security-outcome "${{ steps.security_setting.outcome }}"
-          --pages-artifact-outcome "${{ steps.pages_artifact.outcome }}"
-          --snapshot-artifact-outcome "${{ steps.snapshot_artifact.outcome }}"
-          --security-artifact-outcome "${{ steps.security_artifact.outcome }}"
+        run: |
+          python3 .github/production-readback/publish_commit_status.py \
+            --mode final \
+            --repository "${{ github.repository }}" \
+            --sha "${{ github.sha }}" \
+            --run-url "${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}" \
+            --snapshot-receipt artifacts/commonworld-release-snapshot-readback.json \
+            --pages-outcome "${{ steps.readback.outcome }}" \
+            --pages-verdict "${{ steps.readback.outputs.verdict }}" \
+            --snapshot-outcome "${{ steps.release_snapshot.outcome }}" \
+            --snapshot-superseded "${{ steps.snapshot_supersession.outputs.superseded }}" \
+            --security-outcome "${{ steps.security_setting.outcome }}" \
+            --pages-artifact-outcome "${{ steps.pages_artifact.outcome }}" \
+            --snapshot-artifact-outcome "${{ steps.snapshot_artifact.outcome }}" \
+            --security-artifact-outcome "${{ steps.security_artifact.outcome }}" \
+            > "$RUNNER_TEMP/commonworld-production-readback-status.json"
+          cat "$RUNNER_TEMP/commonworld-production-readback-status.json"
+          python3 - <<'PY' >> "$GITHUB_OUTPUT"
+          import json
+          import os
+          from pathlib import Path
+
+          payload = json.loads(
+              (Path(os.environ["RUNNER_TEMP"]) / "commonworld-production-readback-status.json").read_text(
+                  encoding="utf-8"
+              )
+          )
+          state = payload.get("state")
+          if state not in {"success", "failure"}:
+              raise SystemExit(f"unexpected published commit status state: {state!r}")
+          print(f"state={state}")
+          PY
 
       - name: Enforce production readback result
         if: >-
@@ -161,5 +178,6 @@ jobs:
            (steps.release_snapshot.outcome != 'skipped' &&
             steps.snapshot_artifact.outcome != 'success') ||
            steps.security_artifact.outcome != 'success' ||
-           steps.commit_status.outcome != 'success')
+           steps.commit_status.outcome != 'success' ||
+           steps.commit_status.outputs.state != 'success')
         run: exit 1
