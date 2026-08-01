@@ -5,10 +5,20 @@ from __future__ import annotations
 
 import json
 import re
+import sys
 from pathlib import Path
 from typing import Any
 
 ROOT = Path(__file__).resolve().parents[1]
+if str(ROOT) not in sys.path:
+    sys.path.insert(0, str(ROOT))
+
+from scripts.catalog_summary_specificity import (
+    SummarySpecificityContractError,
+    load_contract as load_summary_specificity_contract,
+    validate_contract as validate_summary_specificity_contract,
+)
+
 CONTRACT_PATH = ROOT / "docs/architecture/locale-release.contract.json"
 I18N_MODULE_PATH = ROOT / "assets/commonworld-i18n.mjs"
 
@@ -234,6 +244,11 @@ def validate_contract(contract: dict[str, Any], root: Path = ROOT) -> list[str]:
     _require(errors, gate.get("translation_coverage_ratio") == 1.0, "translation coverage must be 100%")
     _require(errors, gate.get("untranslated_ui_markers_max") == 0, "untranslated UI markers must be zero")
     _require(errors, gate.get("missing_runtime_keys_max") == 0, "missing runtime keys must be zero")
+    _require(
+        errors,
+        gate.get("catalog_summary_specificity_policy_required") is True,
+        "release gate must require a locale-aware catalog summary specificity policy",
+    )
     for field in (
         "machine_translation_only_forbidden",
         "independent_language_review_required",
@@ -246,6 +261,23 @@ def validate_contract(contract: dict[str, Any], root: Path = ROOT) -> list[str]:
     _require(errors, gate.get("directional_layout_review_for") == ["rtl"], "RTL locales must require directional layout review")
     ar_entry = registry.get("ar")
     _require(errors, isinstance(ar_entry, dict) and ar_entry.get("direction") == "rtl", "Arabic must exercise the RTL contract")
+
+    try:
+        summary_specificity_contract = load_summary_specificity_contract(root)
+    except SummarySpecificityContractError as exc:
+        errors.append(str(exc))
+    else:
+        errors.extend(
+            validate_summary_specificity_contract(
+                summary_specificity_contract, released_tags
+            )
+        )
+        _require(
+            errors,
+            summary_specificity_contract.get("canonical_locale")
+            == decision.get("fallback_locale"),
+            "summary specificity canonical_locale must match fallback_locale",
+        )
 
     return errors
 

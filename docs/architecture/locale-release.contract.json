@@ -150,7 +150,8 @@
     "directional_layout_review_for": [
       "rtl"
     ],
-    "production_activation_requires_all_checks": true
+    "production_activation_requires_all_checks": true,
+    "catalog_summary_specificity_policy_required": true
   },
   "non_goals": [
     "Inferring language from IP address or physical location",
