@@ -46,6 +46,19 @@ jobs:
           --live-timeout-seconds 5
           --live-retry-delays-seconds 0,30,90
 
+      - name: Verify complete path-keyed release snapshot
+        id: release_snapshot
+        continue-on-error: true
+        env:
+          COMMONWORLD_EXPECTED_SHA: ${{ github.sha }}
+        run: >-
+          python3 scripts/verify_release_snapshot_live.py
+          --url https://commonworld.net/
+          --timeout-seconds 10
+          --retry-delays-seconds 0,30,90
+          --workers 8
+          --receipt artifacts/commonworld-release-snapshot-readback.json
+
       - name: Verify private vulnerability reporting setting
         id: security_setting
         continue-on-error: true
@@ -65,6 +78,15 @@ jobs:
           if-no-files-found: error
           retention-days: 30
 
+      - name: Upload complete release snapshot receipt
+        if: always()
+        uses: actions/upload-artifact@v7
+        with:
+          name: commonworld-release-snapshot-readback-${{ github.sha }}
+          path: artifacts/commonworld-release-snapshot-readback.json
+          if-no-files-found: error
+          retention-days: 30
+
       - name: Upload private reporting readback receipt
         if: always()
         uses: actions/upload-artifact@v7
@@ -75,5 +97,9 @@ jobs:
           retention-days: 30
 
       - name: Enforce production readback result
-        if: always() && (steps.readback.outcome != 'success' || steps.security_setting.outcome != 'success')
+        if: >-
+          always() &&
+          (steps.readback.outcome != 'success' ||
+           steps.release_snapshot.outcome != 'success' ||
+           steps.security_setting.outcome != 'success')
         run: exit 1
