@@ -211,6 +211,8 @@ try {
         englishContentBlocks: document.querySelectorAll('[lang="en"]').length,
         effectiveLanguage: document.querySelector('[data-locale-effective]')?.textContent?.trim() ?? '',
         semanticBreadcrumb: document.querySelector('#semantic-summary')?.getAttribute('aria-label') ?? '',
+        naturalTextDirections: [...document.querySelectorAll('input[type="text"], input[type="search"], textarea')].map((node) => getComputedStyle(node).direction),
+        structuredInputDirections: [...document.querySelectorAll('input[type="url"], input[type="email"], input[type="tel"], input[type="number"]')].map((node) => getComputedStyle(node).direction),
       }));
       assert(state.lang === candidate.locale, `${pageName}: lang drifted to ${state.lang}`);
       assert(state.dir === candidate.direction, `${pageName}: dir drifted to ${state.dir}`);
@@ -220,6 +222,12 @@ try {
       assert(state.iconHref.includes('commonworld-mark.svg'), `${pageName}: candidate head swallowed the icon link`);
       assert(state.bannerVisible, `${pageName}: candidate banner is not visible`);
       assert(state.effectiveLanguage === CANDIDATE_SOURCE.locales[candidate.locale].static.effective_language, `${pageName}: effective-language status drifted: ${state.effectiveLanguage}`);
+      if (candidate.locale === 'ar' && pageName !== 'method.ar.html') {
+        assert(state.naturalTextDirections.length > 0 && state.naturalTextDirections.every((direction) => direction === 'rtl'), `${pageName}: Arabic natural-language controls are not RTL: ${state.naturalTextDirections.join(', ')}`);
+        if (pageName === 'propose.ar.html') {
+          assert(state.structuredInputDirections.length > 0 && state.structuredInputDirections.every((direction) => direction === 'ltr'), `${pageName}: structured URL/contact controls are not LTR: ${state.structuredInputDirections.join(', ')}`);
+        }
+      }
       if (pageName === `${candidate.locale}.html`) {
         const connector = CANDIDATE_SOURCE.locales[candidate.locale].ui.semantic_breadcrumb_connector;
         assert(state.semanticBreadcrumb.includes(` ${connector} `), `${pageName}: semantic breadcrumb connector drifted: ${state.semanticBreadcrumb}`);

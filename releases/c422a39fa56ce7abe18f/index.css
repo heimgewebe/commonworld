@@ -3428,13 +3428,23 @@ html[dir="rtl"] body {
   text-align: start;
 }
 
-html[dir="rtl"] input,
-html[dir="rtl"] textarea,
+html[dir="rtl"] input[type="url"],
+html[dir="rtl"] input[type="email"],
+html[dir="rtl"] input[type="tel"],
+html[dir="rtl"] input[type="number"],
 html[dir="rtl"] [dir="ltr"],
 html[dir="rtl"] code,
 html[dir="rtl"] .catalog-action-link,
 html[dir="rtl"] .catalog-actions a {
   direction: ltr;
+  unicode-bidi: plaintext;
+  text-align: start;
+}
+
+html[dir="rtl"] input[type="text"],
+html[dir="rtl"] input[type="search"],
+html[dir="rtl"] textarea {
+  direction: rtl;
   unicode-bidi: plaintext;
   text-align: start;
 }

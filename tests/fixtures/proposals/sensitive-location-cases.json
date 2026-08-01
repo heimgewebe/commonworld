@@ -109,6 +109,10 @@
     {
       "id": "es-c-slash-abbreviation",
       "value": "C/ Mayor, 12, Madrid"
+    },
+    {
+      "id": "es-c-dot-abbreviation",
+      "value": "C. Mayor, 12, Madrid"
     }
   ],
   "allowed": [
@@ -191,6 +195,10 @@
     {
       "id": "es-c-slash-without-house-number",
       "value": "La guía usa C/ como abreviatura editorial, sin dirección privada."
+    },
+    {
+      "id": "es-c-dot-without-house-number",
+      "value": "La guía usa C. como abreviatura editorial, sin dirección privada."
     }
   ]
 }

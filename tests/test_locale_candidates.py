@@ -194,6 +194,17 @@ class LocaleCandidatePackTests(unittest.TestCase):
                                 f"translated contract attribute {attribute}",
                             )
 
+    def test_rtl_natural_language_controls_are_not_forced_ltr(self) -> None:
+        css = (ROOT / "index.css").read_text(encoding="utf-8")
+        self.assertNotIn(
+            'html[dir="rtl"] input,\nhtml[dir="rtl"] textarea,',
+            css,
+        )
+        self.assertIn('html[dir="rtl"] input[type="url"]', css)
+        self.assertIn('html[dir="rtl"] input[type="text"]', css)
+        self.assertIn('html[dir="rtl"] input[type="search"]', css)
+        self.assertIn('html[dir="rtl"] textarea', css)
+
     def test_candidates_have_no_directional_control_characters_or_empty_values(self) -> None:
         for locale, pack in self.packs.items():
             for section, values in pack.items():
