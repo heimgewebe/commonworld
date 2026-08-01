@@ -9,6 +9,7 @@ on:
 permissions:
   contents: read
   deployments: read
+  statuses: write
 
 concurrency:
   group: commonworld-production-readback-${{ github.sha }}
@@ -29,6 +30,16 @@ jobs:
         uses: actions/setup-python@v7
         with:
           python-version: "3.12"
+
+      - name: Mark production readback pending
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+        run: >-
+          python3 .github/production-readback/publish_commit_status.py
+          --mode pending
+          --repository "${{ github.repository }}"
+          --sha "${{ github.sha }}"
+          --run-url "${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}"
 
       - name: Verify exact Pages deployment and public content
         id: readback
@@ -98,6 +109,7 @@ jobs:
           --receipt artifacts/commonworld-private-vulnerability-reporting.json
 
       - name: Upload Pages production readback receipt
+        id: pages_artifact
         if: always()
         uses: actions/upload-artifact@v7
         with:
@@ -107,6 +119,7 @@ jobs:
           retention-days: 30
 
       - name: Upload complete release snapshot receipt
+        id: snapshot_artifact
         if: always() && steps.release_snapshot.outcome != 'skipped'
         uses: actions/upload-artifact@v7
         with:
@@ -116,6 +129,7 @@ jobs:
           retention-days: 30
 
       - name: Upload private reporting readback receipt
+        id: security_artifact
         if: always()
         uses: actions/upload-artifact@v7
         with:
@@ -124,6 +138,27 @@ jobs:
           if-no-files-found: error
           retention-days: 30
 
+      - name: Publish production readback commit status
+        id: commit_status
+        if: always()
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+        run: >-
+          python3 .github/production-readback/publish_commit_status.py
+          --mode final
+          --repository "${{ github.repository }}"
+          --sha "${{ github.sha }}"
+          --run-url "${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}"
+          --snapshot-receipt artifacts/commonworld-release-snapshot-readback.json
+          --pages-outcome "${{ steps.readback.outcome }}"
+          --pages-verdict "${{ steps.readback.outputs.verdict }}"
+          --snapshot-outcome "${{ steps.release_snapshot.outcome }}"
+          --snapshot-superseded "${{ steps.snapshot_supersession.outputs.superseded }}"
+          --security-outcome "${{ steps.security_setting.outcome }}"
+          --pages-artifact-outcome "${{ steps.pages_artifact.outcome }}"
+          --snapshot-artifact-outcome "${{ steps.snapshot_artifact.outcome }}"
+          --security-artifact-outcome "${{ steps.security_artifact.outcome }}"
+
       - name: Enforce production readback result
         if: >-
           always() &&
@@ -131,5 +166,10 @@ jobs:
            (steps.readback.outputs.verdict == 'pass' &&
             steps.release_snapshot.outcome != 'success' &&
             steps.snapshot_supersession.outputs.superseded != 'true') ||
-           steps.security_setting.outcome != 'success')
+           steps.security_setting.outcome != 'success' ||
+           steps.pages_artifact.outcome != 'success' ||
+           (steps.release_snapshot.outcome != 'skipped' &&
+            steps.snapshot_artifact.outcome != 'success') ||
+           steps.security_artifact.outcome != 'success' ||
+           steps.commit_status.outcome != 'success')
         run: exit 1
