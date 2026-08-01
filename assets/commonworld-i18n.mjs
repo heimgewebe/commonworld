@@ -32,7 +32,7 @@ const runtimeDocumentLocale = canonicalLocaleTag(globalThis.document?.documentEl
 const nodeRuntime = typeof process !== 'undefined' && Boolean(process?.versions?.node);
 let WAVE1_LOCALE_PACKS = Object.freeze({});
 if (nodeRuntime || (runtimeDocumentLocale && CANDIDATE_LOCALES.includes(runtimeDocumentLocale))) {
-  ({ WAVE1_LOCALE_PACKS } = await import('./commonworld-wave1-locales.mjs?v=0fa3212a7d24'));
+  ({ WAVE1_LOCALE_PACKS } = await import('./commonworld-wave1-locales.mjs?v=7315976125e3'));
 }
 
 export function normalizeLocale(value, fallback = DEFAULT_LOCALE) {
@@ -75,6 +75,7 @@ const UI_EN = Object.freeze({
   catalog_detail_degraded: 'Verified catalog details are currently unavailable. The embedded details remain available.',
   catalog_detail_retry: 'Verify again',
   horizontal_scroll: 'Scroll {label} horizontally',
+  commons_count: '{count} Commons',
   shown_of_commons: '{shown} of {total} Commons shown',
   show_more: 'Show {count} more',
   show_more_in_bundle: 'Show {count} more Commons in {label}',

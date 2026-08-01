@@ -175,8 +175,10 @@ try {
           const focusSummaryDir = focusSummaryNode?.getAttribute('dir') ?? '';
           const focusPresence = document.querySelector('#focus-presence')?.textContent ?? '';
           const focusLocationItems = [...document.querySelectorAll('#focus-locations > li')];
-          const focusLocationContentLangs = focusLocationItems.map((item) => item.querySelector('[data-content-language]')?.getAttribute('lang') ?? '');
-          const focusLocationContentDirs = focusLocationItems.map((item) => item.querySelector('[data-content-language]')?.getAttribute('dir') ?? '');
+          const focusLocationContentNodes = focusLocationItems.map((item) => item.querySelector('[data-content-language]'));
+          const focusLocationContentLabels = focusLocationContentNodes.map((node) => node?.textContent ?? '');
+          const focusLocationContentLangs = focusLocationContentNodes.map((node) => node?.getAttribute('lang') ?? '');
+          const focusLocationContentDirs = focusLocationContentNodes.map((node) => node?.getAttribute('dir') ?? '');
           const focusDigital = document.querySelector('#focus-digital');
           const focusDigitalText = focusDigital?.textContent ?? '';
           const focusDigitalLang = focusDigital?.getAttribute('lang') ?? '';
@@ -195,7 +197,66 @@ try {
           const semanticBreadcrumbContentText = semanticBreadcrumbContentNode?.textContent ?? '';
           const semanticBreadcrumbContentLang = semanticBreadcrumbContentNode?.getAttribute('lang') ?? '';
           const semanticBreadcrumbContentDir = semanticBreadcrumbContentNode?.getAttribute('dir') ?? '';
+          const placeSearchLabel = focusLocationContentLabels.find((label) => label.trim()) ?? '';
           document.querySelector('#focus-close')?.click();
+
+          const spatialSearch = document.querySelector('#spatial-destination-search');
+          spatialSearch.value = placeSearchLabel;
+          spatialSearch.dispatchEvent(new Event('input', { bubbles: true }));
+          const placeDeadline = performance.now() + 10_000;
+          while (!document.querySelector('[data-destination-type="place"]')) {
+            if (performance.now() > placeDeadline) throw new Error('candidate place search did not render');
+            await new Promise((resolve) => requestAnimationFrame(resolve));
+          }
+          const placeResult = document.querySelector('[data-destination-type="place"]');
+          const placeTitle = placeResult?.querySelector('.spatial-destination-result-copy > strong');
+          const placeContext = placeResult?.querySelector('.spatial-destination-result-copy > span');
+          const placeButtons = [...(placeResult?.querySelectorAll('button') ?? [])];
+          const placeTitleId = placeTitle?.id ?? '';
+          const placeButtonsBound = placeButtons.length === 2 && placeButtons.every((control) => {
+            const ids = (control.getAttribute('aria-labelledby') ?? '').split(/\s+/u).filter(Boolean);
+            return !control.hasAttribute('aria-label')
+              && ids.includes(placeTitleId)
+              && ids.length === 2
+              && ids.every((id) => Boolean(document.getElementById(id)));
+          });
+          const placeResultBoundary = {
+            searchLabel: placeSearchLabel,
+            title: placeTitle?.textContent ?? '',
+            titleLang: placeTitle?.getAttribute('lang') ?? '',
+            titleDir: placeTitle?.getAttribute('dir') ?? '',
+            context: placeContext?.textContent ?? '',
+            contextLang: placeContext?.getAttribute('lang') ?? '',
+            contextDir: placeContext?.getAttribute('dir') ?? '',
+            buttonsBound: placeButtonsBound,
+          };
+          spatialSearch.value = '';
+          spatialSearch.dispatchEvent(new Event('input', { bubbles: true }));
+
+          const search = document.querySelector('#commons-search');
+          search.value = staticTitle;
+          search.dispatchEvent(new Event('input', { bubbles: true }));
+          const countDeadline = performance.now() + 10_000;
+          while (document.querySelectorAll('#discovery-list > li').length !== 1) {
+            if (performance.now() > countDeadline) throw new Error('candidate exact discovery count did not settle');
+            await new Promise((resolve) => requestAnimationFrame(resolve));
+          }
+          const exactDiscoveryCount = document.querySelector('#discovery-count')?.textContent?.trim() ?? '';
+          document.querySelector('[data-presentation-choice="text"]')?.click();
+          while (document.body.dataset.presentation !== 'text') {
+            if (performance.now() > countDeadline) throw new Error('candidate text presentation did not open');
+            await new Promise((resolve) => requestAnimationFrame(resolve));
+          }
+          const exactTextCount = document.querySelector('#text-count')?.textContent?.trim() ?? '';
+          document.querySelector('[data-presentation-choice="globe"]')?.click();
+          while (document.body.dataset.presentation !== 'globe') {
+            if (performance.now() > countDeadline) throw new Error('candidate globe presentation did not restore');
+            await new Promise((resolve) => requestAnimationFrame(resolve));
+          }
+          search.value = '';
+          search.dispatchEvent(new Event('input', { bubbles: true }));
+          await new Promise((resolve) => requestAnimationFrame(resolve));
+
           document.querySelector('#layer-view-button')?.click();
           const layerDeadline = performance.now() + 15_000;
           while (!document.querySelector('.digital-ribbon-name')) {
@@ -204,6 +265,12 @@ try {
           }
           const ribbonNames = [...document.querySelectorAll('.digital-ribbon-name')];
           const ribbonControls = [...document.querySelectorAll('.digital-ribbon-item')];
+          const digitalLaneCounts = [...document.querySelectorAll('.digital-lane-focus > small')]
+            .map((node) => node.textContent?.trim() ?? '')
+            .filter(Boolean);
+          const digitalLaneLabels = [...document.querySelectorAll('.digital-lane')]
+            .map((node) => node.getAttribute('aria-label') ?? '')
+            .filter(Boolean);
           return {
             staticTitle,
             staticSummary,
@@ -218,6 +285,7 @@ try {
             focusSummaryDir,
             focusPresence,
             focusLocationItemCount: focusLocationItems.length,
+            focusLocationContentLabels,
             focusLocationContentLangs,
             focusLocationContentDirs,
             focusDigitalText,
@@ -230,6 +298,11 @@ try {
             semanticBreadcrumbContentLang,
             semanticBreadcrumbContentDir,
             semanticBreadcrumbLabelsResolve,
+            placeResultBoundary,
+            exactDiscoveryCount,
+            exactTextCount,
+            digitalLaneCounts,
+            digitalLaneLabels,
             sphereNameLangs,
             sphereNameDirs,
             sphereSummaryTitleLangs,
@@ -349,6 +422,28 @@ try {
         if (candidate.direction === 'rtl') assert(runtimeCatalogBoundary.sphereAccessibleText.includes('، '), `${pageName}: accessible ring list lacks Arabic separator`);
         assert(runtimeCatalogBoundary?.ribbonLabelsBound && runtimeCatalogBoundary?.ribbonTitleLabelsEnglish, `${pageName}: digital ribbon accessible labels do not preserve mixed-language boundaries`);
         const candidatePack = CANDIDATE_SOURCE.locales[candidate.locale];
+        const localizedExactCount = (count) => candidatePack.ui.commons_count.replace('{count}', String(count));
+        const expectedExactCount = localizedExactCount(1);
+        assert(runtimeCatalogBoundary?.exactDiscoveryCount === expectedExactCount, `${pageName}: exact discovery count is not localized: ${runtimeCatalogBoundary?.exactDiscoveryCount}`);
+        assert((runtimeCatalogBoundary?.exactTextCount ?? '').startsWith(`${expectedExactCount}.`), `${pageName}: exact text count is not localized: ${runtimeCatalogBoundary?.exactTextCount}`);
+        assert((runtimeCatalogBoundary?.digitalLaneCounts?.length ?? 0) > 0 && runtimeCatalogBoundary.digitalLaneCounts.every((value) => {
+          const count = value.match(/\d+/u)?.[0];
+          return count && value === localizedExactCount(count);
+        }), `${pageName}: exact digital lane counts are not localized: ${runtimeCatalogBoundary?.digitalLaneCounts?.join(' | ')}`);
+        assert((runtimeCatalogBoundary?.digitalLaneLabels?.length ?? 0) > 0 && runtimeCatalogBoundary.digitalLaneLabels.every((value) => {
+          const count = value.match(/\d+/u)?.[0];
+          return count && value.endsWith(localizedExactCount(count));
+        }), `${pageName}: digital lane accessible counts are not localized: ${runtimeCatalogBoundary?.digitalLaneLabels?.join(' | ')}`);
+        const placeBoundary = runtimeCatalogBoundary?.placeResultBoundary;
+        assert(placeBoundary?.searchLabel && placeBoundary.title === placeBoundary.searchLabel, `${pageName}: place-search title drifted from the English location label`);
+        assert(placeBoundary?.titleLang === 'en' && placeBoundary?.titleDir === 'ltr', `${pageName}: place-search title lacks lang=en dir=ltr`);
+        if (placeBoundary?.context === runtimeCatalogBoundary?.staticTitle) {
+          assert(placeBoundary.contextLang === 'en' && placeBoundary.contextDir === 'ltr', `${pageName}: place-search project context lacks lang=en dir=ltr`);
+        } else {
+          assert(placeBoundary?.context === candidatePack.ui.published_location, `${pageName}: place-search interface context drifted: ${placeBoundary?.context}`);
+          assert(placeBoundary?.contextLang === '' && placeBoundary?.contextDir === '', `${pageName}: localized place-search context was mislabeled as catalog content`);
+        }
+        assert(placeBoundary?.buttonsBound, `${pageName}: place-search accessible labels do not separate interface action and English title`);
         const focusPresence = runtimeCatalogBoundary?.focusPresence ?? '';
         const staticPresence = runtimeCatalogBoundary?.expectedPresence ?? '';
         const expectsGeographic = staticPresence.includes(candidatePack.ui.presence_geographic)

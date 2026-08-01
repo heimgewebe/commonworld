@@ -1,6 +1,6 @@
 import { BOOTSTRAP_RECORDS } from './commonworld-bootstrap-catalog.mjs?v=cc49548bc45c';
 import { createCatalogLoadCache, loadCatalogAggregate, loadCatalogDetail, loadCatalogShard, shardKeyForIdentity } from './commonworld-catalog-runtime.mjs?v=836cd2a8f3f9';
-import { actionLabel, documentDirection, documentLocale, localizeCatalogRecords, text as i18nText, themeLabel } from './commonworld-i18n.mjs?v=2bcfb13ba17c';
+import { actionLabel, documentDirection, documentLocale, localizeCatalogRecords, text as i18nText, themeLabel } from './commonworld-i18n.mjs?v=4831bdce339a';
 import {
   COMMONS_TYPE_COLOR_TOKENS,
   COMMONS_TYPE_VALUES,
@@ -58,11 +58,12 @@ import {
   sortRecords,
   stateFromSearch,
   visibleDigitalNodes,
-} from './commonworld-core.mjs?v=410bcdd670f1';
+} from './commonworld-core.mjs?v=b6a74412aeda';
 
 const LOCALE = documentLocale();
 const DOCUMENT_DIRECTION = documentDirection(LOCALE);
 const t = (key, germanFallback, variables = {}) => i18nText(LOCALE, key, germanFallback, variables);
+const commonsCount = (count) => t('commons_count', '{count} Commons', { count });
 
 function contentDirection(locale) {
   return String(locale ?? '').toLowerCase() === 'en' ? 'ltr' : 'auto';
@@ -987,7 +988,7 @@ function renderLayerDeck() {
     lane.dataset.nodeId = node.id;
     lane.dataset.digitalPath = node.pathKey;
     lane.style.setProperty('--lane-index', String(index));
-    lane.setAttribute('aria-label', `${node.label}, ${node.identityCount} Commons`);
+    lane.setAttribute('aria-label', `${node.label}, ${commonsCount(node.identityCount)}`);
 
     const focus = document.createElement(identityLevel ? 'header' : 'button');
     focus.className = 'digital-lane-focus';
@@ -1008,7 +1009,7 @@ function renderLayerDeck() {
     const count = document.createElement('small');
     count.textContent = identityLevel && records.length < node.identityCount
       ? t('shown_of_commons', '{shown} von {total} Commons angezeigt', { shown: records.length, total: node.identityCount })
-      : `${node.identityCount} Commons`;
+      : commonsCount(node.identityCount);
     focus.append(focusLabel, count);
 
     const scroller = document.createElement('div');
@@ -1619,7 +1620,7 @@ function renderDigitalBreadcrumb(breadcrumbElement, currentElement) {
   const view = visibleDigitalNodes(tree, currentDigitalPath());
   if (currentElement) {
     currentElement.textContent = view.current
-      ? `${view.current.label} · ${view.current.identityCount} Commons`
+      ? `${view.current.label} · ${commonsCount(view.current.identityCount)}`
       : t('digital_sphere', 'Digitale Commons-Sphäre');
   }
   if (breadcrumbElement) {
@@ -2012,7 +2013,9 @@ function rebuildSpatialDestinationIndex() {
       type: 'country',
       id: entry.id,
       label: entry.name,
+      labelLocale: 'en',
       contextLabel: t('country', 'Land'),
+      contextLocale: null,
       searchText: normalizeSearchText(entry.name),
     }));
   }
@@ -2021,11 +2024,17 @@ function rebuildSpatialDestinationIndex() {
       const origin = representativeGeometryPoint(location.geometry);
       const label = location.label?.trim();
       if (!origin || !label) continue;
+      const contentLocale = typeof record._content_locale === 'string' && record._content_locale.trim()
+        ? record._content_locale
+        : null;
+      const contextIsInterfaceText = label === record.title;
       destinations.push(Object.freeze({
         type: 'place',
         id: `place:${record.id}:${location.id}`,
         label,
-        contextLabel: label === record.title ? t('published_location', 'Veröffentlichter Ort') : record.title,
+        labelLocale: contentLocale,
+        contextLabel: contextIsInterfaceText ? t('published_location', 'Veröffentlichter Ort') : record.title,
+        contextLocale: contextIsInterfaceText ? null : contentLocale,
         searchText: normalizeSearchText(label),
         contextSearchText: normalizeSearchText(record.title),
         projectId: record.id,
@@ -2163,16 +2172,22 @@ function renderSpatialDestinationResults() {
     .slice(0, 8)
     .map(({ entry }) => entry);
   elements.spatialDestinationSearch.setAttribute('aria-expanded', String(matches.length > 0));
-  elements.spatialDestinationResults.replaceChildren(...matches.map((entry) => {
+  elements.spatialDestinationResults.replaceChildren(...matches.map((entry, index) => {
     const item = document.createElement('li');
     item.className = 'spatial-destination-result';
+    item.dataset.destinationType = entry.type;
 
     const copy = document.createElement('div');
     copy.className = 'spatial-destination-result-copy';
     const title = document.createElement('strong');
+    title.id = `spatial-destination-${index}-title`;
     title.textContent = entry.label;
+    applyContentLanguage(title, entry.labelLocale);
+    if (entry.labelLocale) title.dataset.contentLanguage = entry.labelLocale;
     const context = document.createElement('span');
     context.textContent = entry.contextLabel;
+    applyContentLanguage(context, entry.contextLocale);
+    if (entry.contextLocale) context.dataset.contentLanguage = entry.contextLocale;
     copy.append(title, context);
 
     const actions = document.createElement('div');
@@ -2180,8 +2195,11 @@ function renderSpatialDestinationResults() {
     const primary = document.createElement('button');
     primary.type = 'button';
     primary.className = 'quiet-button';
-    primary.textContent = t('show_on_globe', 'Auf Globus zeigen');
-    primary.setAttribute('aria-label', t('show_on_globe_aria', '{label} auf dem Globus zeigen', { label: entry.label }));
+    const primaryLabel = document.createElement('span');
+    primaryLabel.id = `spatial-destination-${index}-primary-action`;
+    primaryLabel.textContent = t('show_on_globe', 'Auf Globus zeigen');
+    primary.append(primaryLabel);
+    primary.setAttribute('aria-labelledby', `${primaryLabel.id} ${title.id}`);
     primary.addEventListener('click', () => {
       closeSpatialDestinationResults();
       if (entry.type === 'country') navigateToCountry(entry.id);
@@ -2190,16 +2208,18 @@ function renderSpatialDestinationResults() {
     const filter = document.createElement('button');
     filter.type = 'button';
     filter.className = 'quiet-button';
+    const filterLabel = document.createElement('span');
+    filterLabel.id = `spatial-destination-${index}-filter-action`;
+    filter.append(filterLabel);
+    filter.setAttribute('aria-labelledby', `${filterLabel.id} ${title.id}`);
     if (entry.type === 'country') {
-      filter.textContent = t('show_commons', 'Commons anzeigen');
-      filter.setAttribute('aria-label', t('show_commons_in', 'Commons in {label} anzeigen', { label: entry.label }));
+      filterLabel.textContent = t('show_commons', 'Commons anzeigen');
       filter.addEventListener('click', () => {
         closeSpatialDestinationResults();
         setCountryFilter(entry.id);
       });
     } else {
-      filter.textContent = t('search_nearby', 'In der Nähe suchen');
-      filter.setAttribute('aria-label', t('search_nearby_aria', 'Commons in der Nähe von {label} suchen', { label: entry.label }));
+      filterLabel.textContent = t('search_nearby', 'In der Nähe suchen');
       filter.addEventListener('click', () => {
         closeSpatialDestinationResults();
         setNearbyFilter(entry.origin);
@@ -2347,7 +2367,7 @@ function renderDiscoveryResults() {
   const total = records.length;
   elements.discoveryCount.textContent = total > preview.length
     ? t('preview_of_commons', '{shown} von {total} Commons als Vorschau', { shown: preview.length, total })
-    : String(total) + ' Commons';
+    : commonsCount(total);
   elements.discoveryEmpty.hidden = total !== 0;
   elements.discoveryList.hidden = total === 0;
   elements.discoveryShowText.hidden = total <= preview.length;
@@ -2442,7 +2462,7 @@ function renderTextView() {
   const total = visible.length;
   const countText = presented.length < total
     ? t('shown_of_commons', '{shown} von {total} Commons angezeigt', { shown: presented.length, total })
-    : String(total) + ' Commons';
+    : commonsCount(total);
   elements.textCount.textContent = `${countText}. ${geographicSelectionSummary(visible)}`;
   elements.textEmpty.hidden = total !== 0;
   elements.textShowMore.hidden = presented.length >= total;

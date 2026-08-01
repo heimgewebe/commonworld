@@ -61,6 +61,13 @@ test('candidate locales keep English catalog content with localized interface la
   }
 });
 
+test('exact Commons counts stay localized on every candidate surface', () => {
+  assert.equal(text('es', 'commons_count', '{count} Commons', { count: 4 }), '4 Commons');
+  assert.equal(text('fr', 'commons_count', '{count} Commons', { count: 4 }), '4 Communs');
+  assert.equal(text('pt-BR', 'commons_count', '{count} Commons', { count: 4 }), '4 Comuns');
+  assert.equal(text('ar', 'commons_count', '{count} Commons', { count: 4 }), '4 من المشاعات');
+});
+
 test('registry normalizes released and candidate locales', () => {
   assert.equal(normalizeLocale('de-DE'), 'de');
   assert.equal(normalizeLocale('fr'), 'fr');
