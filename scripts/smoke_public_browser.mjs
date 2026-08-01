@@ -1,5 +1,4 @@
 import { createServer } from 'node:http';
-import { existsSync } from 'node:fs';
 import { readFile, rename, stat, writeFile } from 'node:fs/promises';
 import path from 'node:path';
 import process from 'node:process';
@@ -168,8 +167,12 @@ const address = server.address();
 if (!address || typeof address === 'string') throw new Error('browser smoke server has no TCP address');
 const baseUrl = `http://127.0.0.1:${address.port}`;
 
-const executablePath = process.env.PLAYWRIGHT_CHROMIUM_EXECUTABLE_PATH || (existsSync('/usr/bin/google-chrome') ? '/usr/bin/google-chrome' : undefined);
-const browser = await chromium.launch({ headless: true, executablePath });
+const executablePath = process.env.PLAYWRIGHT_CHROMIUM_EXECUTABLE_PATH || undefined;
+const browser = await chromium.launch({
+  headless: true,
+  executablePath: executablePath,
+  args: ['--enable-unsafe-swiftshader'],
+});
 const results = [];
 
 function sortedIds(values) {

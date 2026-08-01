@@ -7,14 +7,27 @@ from __future__ import annotations
 
 import copy
 import json
+import re
+from functools import lru_cache
+from html import escape
 from pathlib import Path
 from typing import Any
 from urllib.parse import urlparse
 
-ROOT = Path(__file__).resolve().parents[1]
-SUPPORTED_LOCALES = ("en", "de")
+from scripts.locale_registry import (
+    ROOT,
+    canonical_registry_tag,
+    locale_entry,
+    locales_with_status,
+    surface_file,
+)
+
+SUPPORTED_LOCALES = locales_with_status("released")
+CANDIDATE_LOCALES = locales_with_status("candidate")
+KNOWN_UI_LOCALES = locales_with_status("released", "candidate", "planned")
 DEFAULT_LOCALE = "en"
 FALLBACK_LOCALE = "de"
+CANDIDATE_PACK_PATH = ROOT / "assets/locales/wave1-candidates.json"
 
 ACTION_LABELS_EN = {
     "homepage": "Official website",
@@ -30,19 +43,74 @@ ACTION_LABELS_EN = {
 }
 
 
+def interface_static(locale: str, key: str, *, de: str, en: str, variables: dict[str, Any] | None = None, root: Path = ROOT) -> str:
+    normalized = normalize_locale(locale)
+    if normalized == "de":
+        template = de
+    elif normalized == "en":
+        template = en
+    else:
+        template = candidate_pack(normalized, root).get("static", {}).get(key)
+        if not isinstance(template, str) or not template.strip():
+            raise ValueError(f"candidate locale {normalized} lacks static key {key}")
+    for name, value in (variables or {}).items():
+        template = template.replace("{" + name + "}", str(value))
+    return template
+
+
+def action_label(action: str, locale: str, german_fallback: str = "", root: Path = ROOT) -> str:
+    normalized = normalize_locale(locale)
+    if normalized == "de":
+        return german_fallback or action
+    if normalized == "en":
+        return ACTION_LABELS_EN.get(action, german_fallback or action)
+    value = candidate_pack(normalized, root).get("actions", {}).get(action)
+    if not isinstance(value, str) or not value.strip():
+        raise ValueError(f"candidate locale {normalized} lacks action label {action}")
+    return value
+
+
 def normalize_locale(value: str | None) -> str:
-    primary = str(value or "").strip().lower().split("-", 1)[0]
-    return primary if primary in SUPPORTED_LOCALES else DEFAULT_LOCALE
+    return canonical_registry_tag(value, statuses=("released", "candidate")) or DEFAULT_LOCALE
+
+
+@lru_cache(maxsize=4)
+def load_candidate_packs(path: Path = CANDIDATE_PACK_PATH) -> dict[str, Any]:
+    payload = json.loads(path.read_text(encoding="utf-8"))
+    if payload.get("schema_version") != 1 or payload.get("source_locale") != "en":
+        raise ValueError(f"invalid locale candidate pack: {path}")
+    locales = payload.get("locales")
+    if not isinstance(locales, dict):
+        raise ValueError(f"locale candidate pack lacks locales: {path}")
+    return locales
+
+
+def candidate_pack(locale: str, root: Path = ROOT) -> dict[str, Any]:
+    normalized = normalize_locale(locale)
+    if normalized not in CANDIDATE_LOCALES:
+        raise ValueError(f"locale is not a candidate: {locale!r}")
+    path = root / CANDIDATE_PACK_PATH.relative_to(ROOT)
+    packs = load_candidate_packs(path)
+    pack = packs.get(normalized)
+    if not isinstance(pack, dict):
+        raise ValueError(f"candidate locale pack missing: {normalized}")
+    return pack
 
 
 def load_locale(locale: str = DEFAULT_LOCALE, root: Path = ROOT) -> dict[str, Any]:
     normalized = normalize_locale(locale)
     if normalized == FALLBACK_LOCALE:
         return {"schema_version": 1, "locale": "de", "fallback_locale": "de", "projects": {}, "taxonomy_labels": {}}
-    path = root / "catalog" / "locales" / f"{normalized}.json"
+    overlay_locale = "en" if normalized in CANDIDATE_LOCALES else normalized
+    path = root / "catalog" / "locales" / f"{overlay_locale}.json"
     payload = json.loads(path.read_text(encoding="utf-8"))
-    if payload.get("schema_version") != 1 or payload.get("locale") != normalized:
+    if payload.get("schema_version") != 1 or payload.get("locale") != overlay_locale:
         raise ValueError(f"invalid locale overlay contract: {path}")
+    if normalized in CANDIDATE_LOCALES:
+        payload = copy.deepcopy(payload)
+        payload["locale"] = normalized
+        payload["source_content_locale"] = overlay_locale
+        payload["taxonomy_labels"] = candidate_pack(normalized, root).get("taxonomy", {})
     return payload
 
 
@@ -86,11 +154,15 @@ def localize_records(records: list[dict[str, Any]], locale: str = DEFAULT_LOCALE
         for link in record.get("links", []):
             link_type = link.get("type")
             if link_type in ACTION_LABELS_EN:
-                link["label"] = ACTION_LABELS_EN[link_type]
+                link["label"] = action_label(link_type, normalized, str(link.get("label") or ""), root)
+        source_prefix = interface_static(normalized, "source_number", de="Quelle {index}", en="Source {index}", variables={"index": "{index}"}, root=root)
         for index, source in enumerate(record.get("provenance", {}).get("sources", []), start=1):
             hostname = urlparse(source.get("url", "")).hostname or source.get("url", "")
             canonical_label = str(source.get("label") or "").strip()
-            source["label"] = f"{canonical_label} · {hostname.removeprefix('www.')}" if canonical_label else f"Source {index} · {hostname.removeprefix('www.')}"
+            fallback_label = source_prefix.replace("{index}", str(index))
+            source["label"] = f"{canonical_label} · {hostname.removeprefix('www.')}" if canonical_label else f"{fallback_label} · {hostname.removeprefix('www.')}"
+        if normalized in CANDIDATE_LOCALES:
+            record["_content_locale"] = overlay.get("source_content_locale", "en")
         localized.append(record)
     return localized
 
@@ -308,67 +380,171 @@ METHOD_REPLACEMENTS_EN = {
 }
 
 
+def _candidate_replacements(locale: str, section: str, english_replacements: dict[str, str], root: Path = ROOT) -> dict[str, str]:
+    normalized = normalize_locale(locale)
+    pack = candidate_pack(normalized, root).get(section)
+    if not isinstance(pack, dict):
+        raise ValueError(f"candidate locale {normalized} lacks {section} translations")
+    english_values = list(dict.fromkeys(english_replacements.values()))
+    expected_keys = [f"{section}_{index:03d}" for index in range(1, len(english_values) + 1)]
+    if list(pack) != expected_keys:
+        raise ValueError(f"candidate locale {normalized} {section} keys drift from the English inventory")
+    return {source: pack[key] for source, key in zip(english_values, expected_keys, strict=True)}
+
+
+def _decorate_candidate_surface(markup: str, locale: str, root: Path = ROOT) -> str:
+    normalized = normalize_locale(locale)
+    if normalized not in CANDIDATE_LOCALES:
+        return markup
+    entry = locale_entry(normalized, root)
+    direction = entry.get("direction", "ltr")
+    markup, count = re.subn(r'<html\b[^>]*>', f'<html lang="{normalized}" dir="{direction}">', markup, count=1)
+    if count != 1:
+        raise ValueError(f"candidate locale {normalized} surface lacks one html element")
+    if 'name="robots"' not in markup:
+        marker = '<meta name="viewport"'
+        position = markup.find(marker)
+        if position < 0:
+            raise ValueError(f"candidate locale {normalized} surface lacks viewport metadata")
+        markup = markup[:position] + '<meta name="robots" content="noindex,nofollow">\n  ' + markup[position:]
+    notice = candidate_pack(normalized, root).get("static", {}).get("candidate_notice")
+    if not isinstance(notice, str) or not notice.strip():
+        raise ValueError(f"candidate locale {normalized} lacks candidate_notice")
+    banner = (
+        f'<aside class="locale-candidate-banner" role="status" lang="{normalized}">'
+        f'{escape(notice)}</aside>\n'
+    )
+    markup = markup.replace('<body>', '<body>\n  ' + banner, 1) if '<body>' in markup else re.sub(
+        r'<body([^>]*)>', lambda match: match.group(0) + '\n  ' + banner, markup, count=1
+    )
+    return markup
+
+
 def translate_shell(markup: str, locale: str) -> str:
-    return replace_exact(markup, SHELL_REPLACEMENTS_EN, surface="public shell") if normalize_locale(locale) == "en" else markup
+    normalized = normalize_locale(locale)
+    if normalized == "de":
+        return markup
+    translated = replace_exact(markup, SHELL_REPLACEMENTS_EN, surface="public shell")
+    if normalized in CANDIDATE_LOCALES:
+        translated = replace_exact(
+            translated,
+            _candidate_replacements(normalized, "shell", SHELL_REPLACEMENTS_EN),
+            surface=f"public shell {normalized}",
+        )
+    return _decorate_candidate_surface(translated, normalized)
 
 
 def translate_method(markup: str, locale: str) -> str:
-    return replace_exact(markup, METHOD_REPLACEMENTS_EN, surface="method page") if normalize_locale(locale) == "en" else markup
+    normalized = normalize_locale(locale)
+    if normalized == "de":
+        return markup
+    translated = replace_exact(markup, METHOD_REPLACEMENTS_EN, surface="method page")
+    if normalized in CANDIDATE_LOCALES:
+        translated = replace_exact(
+            translated,
+            _candidate_replacements(normalized, "method", METHOD_REPLACEMENTS_EN),
+            surface=f"method page {normalized}",
+        )
+    return _decorate_candidate_surface(translated, normalized)
 
 
 def _locale_choice_href(surface: str, choice: str) -> str:
-    hrefs = {
-        "index": {"auto": "./?ui_lang=auto", "en": "./?ui_lang=en", "de": "./de.html?ui_lang=de"},
-        "method": {"auto": "./method.html?ui_lang=auto", "en": "./method.html?ui_lang=en", "de": "./method.de.html?ui_lang=de"},
-        "propose": {"auto": "./propose.html?ui_lang=auto", "en": "./propose.html?ui_lang=en", "de": "./propose.de.html?ui_lang=de"},
+    registry_surface = "proposal" if surface == "propose" else surface
+    target_locale = DEFAULT_LOCALE if choice == "auto" else choice
+    file_name = surface_file(target_locale, registry_surface)
+    href = "./" if file_name == "index.html" else f"./{file_name}"
+    return f"{href}?ui_lang={choice}"
+
+
+def _locale_navigation_copy(locale: str, root: Path = ROOT) -> dict[str, str]:
+    normalized = normalize_locale(locale)
+    if normalized == "en":
+        return {
+            "heading": "Interface language",
+            "label": "Choose interface language",
+            "automatic": "Automatic – device language",
+            "effective": "Effective language: English",
+        }
+    if normalized == "de":
+        return {
+            "heading": "Oberflächensprache",
+            "label": "Oberflächensprache wählen",
+            "automatic": "Automatisch – Gerätesprache",
+            "effective": "Aktive Sprache: Deutsch",
+        }
+    static = candidate_pack(normalized, root).get("static", {})
+    keys = {
+        "heading": "interface_language",
+        "label": "choose_interface_language",
+        "automatic": "automatic_device_language",
+        "effective": "effective_language",
     }
-    return hrefs.get(surface, hrefs["index"])[choice]
+    copy = {name: static.get(key) for name, key in keys.items()}
+    if any(not isinstance(value, str) or not value.strip() for value in copy.values()):
+        raise ValueError(f"candidate locale {normalized} lacks locale-navigation copy")
+    return copy  # type: ignore[return-value]
 
 
 def inject_locale_navigation(markup: str, locale: str, surface: str = "index") -> str:
     normalized = normalize_locale(locale)
-    heading = "Interface language" if normalized == "en" else "Oberflächensprache"
-    label = "Choose interface language" if normalized == "en" else "Oberflächensprache wählen"
-    automatic = "Automatic – device language" if normalized == "en" else "Automatisch – Gerätesprache"
-    effective = "Effective language: English" if normalized == "en" else "Aktive Sprache: Deutsch"
-    auto_href = _locale_choice_href(surface, "auto")
-    en_href = _locale_choice_href(surface, "en")
-    de_href = _locale_choice_href(surface, "de")
+    copy = _locale_navigation_copy(normalized)
+    links: list[str] = []
+    links.append(
+        f'<a href="{_locale_choice_href(surface, "auto")}" data-locale-choice="auto" '
+        f'data-locale-surface="{surface}">{escape(copy["automatic"])}</a>'
+    )
+    for tag in SUPPORTED_LOCALES:
+        entry = locale_entry(tag)
+        current = ' aria-current="page"' if normalized == tag else ""
+        links.append(
+            f'<a href="{_locale_choice_href(surface, tag)}" lang="{tag}" '
+            f'data-locale-choice="{tag}" data-locale-surface="{surface}"{current}>'
+            f'{escape(entry["native_name"])}</a>'
+        )
     control = (
-        '<div class="language-switch" role="group" aria-label="' + label + '" data-locale-surface="' + surface + '">'
-        + '<a href="' + auto_href + '" data-locale-choice="auto" data-locale-surface="' + surface + '">' + automatic + '</a>'
-        + '<a href="' + en_href + '" lang="en" data-locale-choice="en" data-locale-surface="' + surface + '"'
-        + (' aria-current="page"' if normalized == "en" else '') + '>English</a>'
-        + '<a href="' + de_href + '" lang="de" data-locale-choice="de" data-locale-surface="' + surface + '"'
-        + (' aria-current="page"' if normalized == "de" else '') + '>Deutsch</a></div>'
-        + '<p class="language-effective" data-locale-effective aria-live="polite">' + effective + '</p>'
+        f'<div class="language-switch" role="group" aria-label="{escape(copy["label"])}" '
+        f'data-locale-surface="{surface}">'
+        + "".join(links)
+        + '</div>'
+        + f'<p class="language-effective" data-locale-effective aria-live="polite">{escape(copy["effective"])}</p>'
     )
     if surface == "index":
         section = (
             '<section class="settings-section language-settings"><h3>'
-            + heading
+            + escape(copy["heading"])
             + '</h3>' + control + '</section>\n        '
         )
-        marker = '<section class="settings-section">\n          <h3>' + ("Interaction" if normalized == "en" else "Bedienung") + '</h3>'
+        interaction = "Interaction" if normalized == "en" else "Bedienung"
+        if normalized in CANDIDATE_LOCALES:
+            interaction = candidate_pack(normalized).get("static", {}).get("interaction", interaction)
+        marker = '<section class="settings-section">\n          <h3>' + interaction + '</h3>'
+        if marker not in markup:
+            raise ValueError(f"locale navigation insertion marker missing for {normalized}/{surface}")
         markup = markup.replace(marker, section + marker, 1)
     else:
         marker = '<p><a class="secondary-back-link"'
         position = markup.find(marker)
-        if position >= 0:
-            end = markup.find('</p>', position)
-            if end >= 0:
-                end += 4
-                markup = markup[:end] + '\n      ' + control + markup[end:]
+        if position < 0:
+            raise ValueError(f"locale navigation insertion marker missing for {normalized}/{surface}")
+        end = markup.find('</p>', position)
+        if end < 0:
+            raise ValueError(f"locale navigation paragraph is malformed for {normalized}/{surface}")
+        end += 4
+        markup = markup[:end] + '\n      ' + control + markup[end:]
     return markup
 
 
 def german_surface_links(markup: str, locale: str, surface: str = "index") -> str:
-    if normalize_locale(locale) != "de":
+    normalized = normalize_locale(locale)
+    if normalized == "en":
         return markup
+    index_href = "./" if surface_file(normalized, "index") == "index.html" else f'./{surface_file(normalized, "index")}'
+    method_href = f'./{surface_file(normalized, "method")}'
+    proposal_href = f'./{surface_file(normalized, "proposal")}'
     if surface == "index":
-        return markup.replace('href="./propose.html"', 'href="./propose.de.html"').replace('href="./method.html"', 'href="./method.de.html"')
+        return markup.replace('href="./propose.html"', f'href="{proposal_href}"').replace('href="./method.html"', f'href="{method_href}"')
     if surface == "method":
-        return markup.replace('href="./">', 'href="./de.html">').replace('href="./propose.html"', 'href="./propose.de.html"')
+        return markup.replace('href="./">', f'href="{index_href}">').replace('href="./propose.html"', f'href="{proposal_href}"')
     if surface == "propose":
-        return markup.replace('href="./">', 'href="./de.html">').replace('href="./method.html"', 'href="./method.de.html"')
+        return markup.replace('href="./">', f'href="{index_href}">').replace('href="./method.html"', f'href="{method_href}"')
     return markup

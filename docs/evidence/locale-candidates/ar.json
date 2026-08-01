@@ -1,0 +1,31 @@
+{
+  "schema_version": 1,
+  "kind": "commonworld.ui_locale_candidate_evidence",
+  "locale": "ar",
+  "status": "candidate",
+  "release_ready": false,
+  "source_pack_sha256": "d9995b3237bf42f1274bc8258be5b1a511e45fe364e39d3734931ac3304c8ae5",
+  "source_revision": "35b6b19529891d33f0b0db3f864256f7069bbba4",
+  "independent_language_review": {
+    "status": "pending",
+    "reviewer": null
+  },
+  "technical_gates": {
+    "translation_structure": "passed",
+    "runtime_key_coverage": "passed",
+    "surface_generation": "passed",
+    "noindex_enforcement": "passed",
+    "bcp47_matching": "passed",
+    "state_preservation": "passed",
+    "rtl_structure": "passed",
+    "mixed_script_structure": "passed"
+  },
+  "activation_blockers": [
+    "independent_language_review",
+    "keyboard_and_screen_reader_review",
+    "browser_visual_review",
+    "directional_layout_review",
+    "mixed_script_review"
+  ],
+  "scope_note": "Technical candidate only. This artifact is not release evidence and does not activate the locale."
+}

@@ -9,7 +9,7 @@ from pathlib import Path
 
 PAGE_BUILD_PLACEHOLDER = "0" * 16
 RELEASE_ID_PLACEHOLDER = "0" * 20
-PAGE_NAME_PATTERN = re.compile(r"^[a-z0-9][a-z0-9.-]{0,79}$")
+PAGE_NAME_PATTERN = re.compile(r"^[A-Za-z0-9][A-Za-z0-9.-]{0,79}$")
 PAGE_BUILD_PATTERN = re.compile(r"^[0-9a-f]{16}$")
 RELEASE_ID_PATTERN = re.compile(r"^[0-9a-f]{20}$")
 _PAGE_META_PATTERN = re.compile(r'<meta name="commonworld-page" content="([^"]+)" />')

@@ -51,6 +51,8 @@ class PublicShellTests(unittest.TestCase):
             "commonworld-catalog-runtime.mjs",
             "commonworld-i18n.mjs",
             "commonworld-en-locale.mjs",
+            "commonworld-locale-registry.mjs",
+            "commonworld-wave1-locales.mjs",
             "commonworld-locale.mjs",
             "commonworld-core.mjs",
             "commonworld-app.js",
@@ -106,7 +108,18 @@ class PublicShellTests(unittest.TestCase):
             source = (ROOT / module_path).read_text(encoding="utf-8")
             for dependency_path in dependencies:
                 version = hashlib.sha256((ROOT / dependency_path).read_bytes()).hexdigest()[:12]
-                self.assertIn(f"from './{Path(dependency_path).name}?v={version}'", source)
+                versioned_specifier = f"./{Path(dependency_path).name}?v={version}"
+                self.assertTrue(
+                    f"from '{versioned_specifier}'" in source
+                    or f"import('{versioned_specifier}')" in source
+                )
+
+    def test_wave1_candidate_pack_is_loaded_dynamically(self) -> None:
+        source = (ROOT / "assets/commonworld-i18n.mjs").read_text(encoding="utf-8")
+        version = hashlib.sha256((ROOT / "assets/commonworld-wave1-locales.mjs").read_bytes()).hexdigest()[:12]
+        specifier = f"./commonworld-wave1-locales.mjs?v={version}"
+        self.assertIn(f"import('{specifier}')", source)
+        self.assertNotIn(f"from '{specifier}'", source)
 
     def test_public_shell_rejects_stale_transitive_module_import(self) -> None:
         with tempfile.TemporaryDirectory() as tmp_dir:

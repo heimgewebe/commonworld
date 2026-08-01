@@ -195,8 +195,12 @@ def validate_public_shell(root: Path = ROOT) -> list[str]:
                 errors.append(f'public shell missing local module dependency: {dependency_path}')
                 continue
             dependency_version = hashlib.sha256(dependency_file.read_bytes()).hexdigest()[:12]
-            expected_import = f"from './{dependency_file.name}?v={dependency_version}'"
-            if expected_import not in module_source:
+            versioned_specifier = f"./{dependency_file.name}?v={dependency_version}"
+            expected_imports = (
+                f"from '{versioned_specifier}'",
+                f"import('{versioned_specifier}')",
+            )
+            if not any(expected_import in module_source for expected_import in expected_imports):
                 errors.append(f'public shell module import is not content-bound: {module_path} -> {dependency_path}')
     if "document.querySelectorAll('.catalog-card[data-commonproject-id]')" in app:
         errors.append('runtime catalog filtering must not mutate the bootstrap recovery surface')

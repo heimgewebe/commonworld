@@ -34,9 +34,9 @@ test('English locale overlay preserves canonical identity and factual fields', (
   }
 });
 
-test('German remains the explicit fallback locale', () => {
+test('registry normalizes released and candidate locales', () => {
   assert.equal(normalizeLocale('de-DE'), 'de');
-  assert.equal(normalizeLocale('fr'), 'en');
+  assert.equal(normalizeLocale('fr'), 'fr');
   const localized = localizeCatalogRecords(BOOTSTRAP_RECORDS, 'de');
   assert.equal(localized.records, BOOTSTRAP_RECORDS);
   assert.equal(localized.searchAliasesById.size, BOOTSTRAP_RECORDS.length);

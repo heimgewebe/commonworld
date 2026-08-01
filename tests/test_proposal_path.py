@@ -8,6 +8,9 @@ import tempfile
 import unittest
 from pathlib import Path
 
+from scripts.public_cache import asset_version
+from scripts.render_proposal_page import synchronize_proposal_module_import_versions
+
 ROOT = Path(__file__).resolve().parents[1]
 SPEC = importlib.util.spec_from_file_location("validate_proposal_path", ROOT / "scripts/validate_proposal_path.py")
 MODULE = importlib.util.module_from_spec(SPEC)
@@ -87,6 +90,28 @@ class ProposalPathTests(unittest.TestCase):
             path.write_text(html, encoding="utf-8")
             self.assertEqual([], MODULE.validate(root))
 
+    def test_proposal_module_imports_are_content_versioned_independently(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp_dir:
+            root = self.copy_repo(tmp_dir)
+            registry = root / "assets/commonworld-locale-registry.mjs"
+            registry.write_text(registry.read_text(encoding="utf-8") + "\n// fixture change\n", encoding="utf-8")
+            synchronize_proposal_module_import_versions(root)
+            source = (root / "assets/commonworld-proposal.js").read_text(encoding="utf-8")
+            self.assertIn(
+                f"./commonworld-locale-registry.mjs?v={asset_version('assets/commonworld-locale-registry.mjs', root)}",
+                source,
+            )
+            self.assertIn(
+                f"./commonworld-wave1-locales.mjs?v={asset_version('assets/commonworld-wave1-locales.mjs', root)}",
+                source,
+            )
+            before = source
+            synchronize_proposal_module_import_versions(root)
+            self.assertEqual(
+                before,
+                (root / "assets/commonworld-proposal.js").read_text(encoding="utf-8"),
+            )
+
     def test_validator_reports_missing_body_proposal_page_block(self) -> None:
         with tempfile.TemporaryDirectory() as tmp_dir:
             root = self.copy_repo(tmp_dir)
@@ -107,6 +132,19 @@ class ProposalPathTests(unittest.TestCase):
             path.write_text(decoy + css, encoding="utf-8")
             self.assertEqual([], MODULE.validate(root))
 
+
+    def test_validator_rejects_direction_sensitive_honeypot_positioning(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp_dir:
+            root = self.copy_repo(tmp_dir)
+            path = root / "assets/proposal.css"
+            css = path.read_text(encoding="utf-8").replace(
+                "clip-path: inset(50%) !important;",
+                "clip-path: inset(50%) !important; left: -10000px !important;",
+                1,
+            )
+            path.write_text(css, encoding="utf-8")
+            errors = MODULE.validate(root)
+            self.assertIn("proposal honeypot must not use direction-sensitive offscreen positioning", errors)
 
     def test_validator_requires_proposal_forced_colors_contract(self) -> None:
         with tempfile.TemporaryDirectory() as tmp_dir:

@@ -22,9 +22,11 @@ class PublicMapLibreVerticalSliceTests(unittest.TestCase):
         paths = set(REQUIRED_FILES) | {
             Path("scripts/render_public_shell.py"),
             Path("scripts/commonworld_i18n.py"),
+            Path("scripts/locale_registry.py"),
             Path("scripts/__init__.py"),
             Path("scripts/public_cache.py"),
             Path("catalog/locales/en.json"),
+            Path("docs/architecture/locale-release.contract.json"),
             Path("assets/commonworld-mark.svg"),
             Path("assets/commonworld-locale.mjs"),
             Path("assets/commonworld-release-check.js"),

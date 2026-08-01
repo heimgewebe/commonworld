@@ -302,7 +302,11 @@ async function verifyLayerCreatedSphereRestoration(browser, baseUrl) {
 const server = createServer();
 await new Promise((resolve) => server.listen(0, '127.0.0.1', resolve));
 const baseUrl = `http://127.0.0.1:${server.address().port}`;
-const browser = await chromium.launch({ headless: true, executablePath: '/usr/bin/google-chrome' });
+const browser = await chromium.launch({
+  headless: true,
+  executablePath: process.env.PLAYWRIGHT_CHROMIUM_EXECUTABLE_PATH || undefined,
+  args: ['--enable-unsafe-swiftshader'],
+});
 const results = [];
 try {
   for (const viewport of VIEWPORTS) {

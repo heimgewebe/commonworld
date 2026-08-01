@@ -99,6 +99,10 @@ class CacheCoherenceValidationTests(unittest.TestCase):
     def test_validator_rejects_stale_final_page_bytes_and_snapshot(self) -> None:
         with tempfile.TemporaryDirectory() as directory:
             root = Path(directory)
+            contract_source = ROOT / "docs/architecture/locale-release.contract.json"
+            contract_target = root / "docs/architecture/locale-release.contract.json"
+            contract_target.parent.mkdir(parents=True, exist_ok=True)
+            shutil.copy2(contract_source, contract_target)
             manifest = json.loads((ROOT / "assets/commonworld-page-builds.json").read_text(encoding="utf-8"))
             release_id = manifest["release_id"]
             for source in snapshot_files(ROOT, include_manifest=True):
@@ -119,6 +123,10 @@ class CacheCoherenceValidationTests(unittest.TestCase):
     def test_validator_rejects_snapshot_drift(self) -> None:
         with tempfile.TemporaryDirectory() as directory:
             root = Path(directory)
+            contract_source = ROOT / "docs/architecture/locale-release.contract.json"
+            contract_target = root / "docs/architecture/locale-release.contract.json"
+            contract_target.parent.mkdir(parents=True, exist_ok=True)
+            shutil.copy2(contract_source, contract_target)
             manifest = json.loads((ROOT / "assets/commonworld-page-builds.json").read_text(encoding="utf-8"))
             release_id = manifest["release_id"]
             for source in snapshot_files(ROOT, include_manifest=True):
@@ -139,6 +147,10 @@ class CacheCoherenceValidationTests(unittest.TestCase):
     def test_validator_rejects_noncanonical_404_manifest(self) -> None:
         with tempfile.TemporaryDirectory() as directory:
             root = Path(directory)
+            contract_source = ROOT / "docs/architecture/locale-release.contract.json"
+            contract_target = root / "docs/architecture/locale-release.contract.json"
+            contract_target.parent.mkdir(parents=True, exist_ok=True)
+            shutil.copy2(contract_source, contract_target)
             manifest = json.loads((ROOT / "assets/commonworld-page-builds.json").read_text(encoding="utf-8"))
             release_id = manifest["release_id"]
             for source in snapshot_files(ROOT, include_manifest=True):

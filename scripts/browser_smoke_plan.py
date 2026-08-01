@@ -31,6 +31,10 @@ CANONICAL_BROWSER_SMOKE_PLAN = (
         ),
         True,
     ),
+    BrowserSmokeStep(
+        "locale-candidate-browser-smoke",
+        ("node", "scripts/smoke_locale_candidates_browser.mjs"),
+    ),
     BrowserSmokeStep("proposal-browser-smoke", ("node", "scripts/smoke_proposal_browser.mjs")),
     BrowserSmokeStep("focus-overlay-browser-smoke", ("node", "scripts/smoke_focus_overlay_browser.mjs")),
     BrowserSmokeStep(

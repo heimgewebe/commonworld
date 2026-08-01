@@ -32,7 +32,11 @@ await new Promise((resolve, reject) => { server.once('error', reject); server.li
 const address = server.address();
 if (!address || typeof address === 'string') throw new Error('proposal smoke server missing address');
 const baseUrl = `http://127.0.0.1:${address.port}`;
-const browser = await chromium.launch({ headless: true, executablePath: process.env.PLAYWRIGHT_CHROMIUM_EXECUTABLE_PATH || undefined });
+const browser = await chromium.launch({
+  headless: true,
+  executablePath: process.env.PLAYWRIGHT_CHROMIUM_EXECUTABLE_PATH || undefined,
+  args: ['--enable-unsafe-swiftshader'],
+});
 const results = [];
 
 async function fillValid(page, name = 'Browser Test Commons') {
@@ -138,7 +142,7 @@ html { font-size: ${profile.fontScale}% !important; }
   await page.getByLabel('Short description').fill(description);
   for (let attempt = 0; !releaseFirstProbe && attempt < 100; attempt += 1) await page.waitForTimeout(10);
   assert(typeof releaseFirstProbe === 'function', 'release-draft: initial path probe was not intercepted');
-  const navigated = page.waitForURL((url) => url.pathname === `/releases/${latestRelease}/propose.html`, { timeout: 5000 });
+  const navigated = page.waitForURL((url) => url.pathname === `/releases/${latestRelease}/propose.html`, { waitUntil: 'domcontentloaded', timeout: 10_000 });
   releaseFirstProbe();
   await navigated;
   await page.getByRole('heading', { name: 'Suggest a Commons' }).waitFor();

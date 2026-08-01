@@ -168,6 +168,17 @@ def validate(root: Path = ROOT) -> list[str]:
             if "overflow: hidden" in block or "overflow-y: hidden" in block:
                 errors.append("assets/proposal.css body.proposal-page must not reintroduce overflow-y: hidden")
 
+        honeypot_match = find_css_block(proposal_css, ".honeypot")
+        if honeypot_match is None:
+            errors.append("assets/proposal.css must visually hide the proposal honeypot")
+        else:
+            block = honeypot_match[1]
+            for token in ("position: absolute", "width: 1px", "height: 1px", "overflow: hidden", "clip-path: inset(50%)"):
+                if token not in block:
+                    errors.append(f"proposal honeypot hiding contract missing token: {token}")
+            if re.search(r"(?:^|[;{])\s*(?:left|right|inset-inline-(?:start|end))\s*:", block):
+                errors.append("proposal honeypot must not use direction-sensitive offscreen positioning")
+
         forced = find_media_block(proposal_css, ("forced-colors: active",))
         if forced is None:
             errors.append("assets/proposal.css must define a forced-colors: active contract")

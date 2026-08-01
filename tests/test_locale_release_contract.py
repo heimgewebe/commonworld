@@ -14,12 +14,12 @@ class LocaleReleaseContractTests(unittest.TestCase):
     def test_current_runtime_and_released_surfaces_match_contract(self) -> None:
         self.assertEqual(validate_contract(self.contract, ROOT), [])
 
-    def test_planned_locale_cannot_be_published_without_runtime_and_surface_evidence(self) -> None:
+    def test_candidate_locale_cannot_be_published_without_release_evidence(self) -> None:
         contract = copy.deepcopy(self.contract)
         contract["decision"]["released_locales"].append("es")
         errors = validate_contract(contract, ROOT)
-        self.assertTrue(any("planned locale es" in error for error in errors))
-        self.assertTrue(any("SUPPORTED_LOCALES" in error for error in errors))
+        self.assertTrue(any("candidate locale es must not be released" == error for error in errors))
+        self.assertTrue(any("runtime released locales" in error for error in errors))
 
     def test_location_based_language_inference_is_rejected(self) -> None:
         contract = copy.deepcopy(self.contract)
@@ -47,7 +47,7 @@ class LocaleReleaseContractTests(unittest.TestCase):
     def test_content_languages_remain_independent_from_interface_languages(self) -> None:
         contract = copy.deepcopy(self.contract)
         contract["content_language_policy"]["independent_from_interface_locales"] = False
-        self.assertTrue(any("content languages" in error for error in validate_contract(contract, ROOT)))
+        self.assertTrue(any("independent_from_interface_locales" in error for error in validate_contract(contract, ROOT)))
 
     def test_malformed_locale_lists_fail_closed_without_exception(self) -> None:
         contract = copy.deepcopy(self.contract)
@@ -55,7 +55,7 @@ class LocaleReleaseContractTests(unittest.TestCase):
         contract["rollout"]["wave_1"] = ["es", {}]
         errors = validate_contract(contract, ROOT)
         self.assertTrue(any("released_locales" in error for error in errors))
-        self.assertTrue(any("wave_1" in error for error in errors))
+        self.assertTrue(any("Wave 1" in error or "rollout waves" in error for error in errors))
 
     def test_registry_requires_stable_native_and_english_names(self) -> None:
         contract = copy.deepcopy(self.contract)

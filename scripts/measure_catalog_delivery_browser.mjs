@@ -1,6 +1,5 @@
 import { createHash } from 'node:crypto';
 import { createServer } from 'node:http';
-import { existsSync } from 'node:fs';
 import { readFile, stat } from 'node:fs/promises';
 import path from 'node:path';
 import process from 'node:process';
@@ -67,8 +66,7 @@ await new Promise((resolve, reject) => {
 const address = server.address();
 if (!address || typeof address === 'string') throw new Error('benchmark server has no TCP address');
 const baseUrl = `http://127.0.0.1:${address.port}`;
-const executablePath = process.env.PLAYWRIGHT_CHROMIUM_EXECUTABLE_PATH
-  || (existsSync('/usr/bin/google-chrome') ? '/usr/bin/google-chrome' : undefined);
+const executablePath = process.env.PLAYWRIGHT_CHROMIUM_EXECUTABLE_PATH || undefined;
 const bootstrapSource = await readFile(path.join(ROOT, 'assets/commonworld-bootstrap-catalog.mjs'), 'utf8');
 const normalizedBootstrapSource = normalizeBootstrapForCompile(bootstrapSource);
 
@@ -84,7 +82,11 @@ async function measureProfile(profile) {
   // Each profile gets a fresh browser process. A shared process leaked renderer,
   // cache and garbage-collection state across otherwise independent profiles and
   // produced alternating TaskDuration breaches on an identical first-party tree.
-  const browser = await chromium.launch({ headless: true, executablePath });
+  const browser = await chromium.launch({
+    headless: true,
+    executablePath: executablePath,
+    args: ['--enable-unsafe-swiftshader'],
+  });
   const context = await browser.newContext({
     viewport: profile.viewport,
     deviceScaleFactor: profile.deviceScaleFactor ?? 1,

@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import json
+import re
 import sys
 from pathlib import Path
 from urllib.parse import urlparse
@@ -11,10 +12,36 @@ ROOT = Path(__file__).resolve().parents[1]
 if str(ROOT) not in sys.path:
     sys.path.insert(0, str(ROOT))
 
-from scripts.commonworld_i18n import FALLBACK_LOCALE, german_surface_links, inject_locale_navigation
+from scripts.commonworld_i18n import FALLBACK_LOCALE, german_surface_links, inject_locale_navigation, normalize_locale
+from scripts.locale_registry import locales_with_status, surface_file
 from scripts.proposal_i18n import translate_proposal
 from scripts.public_cache import asset_version, stamp_page_build
 
+PROPOSAL_MODULE_DEPENDENCIES = (
+    "assets/commonworld-locale-registry.mjs",
+    "assets/commonworld-wave1-locales.mjs",
+)
+
+
+def synchronize_proposal_module_import_versions(root: Path = ROOT) -> None:
+    path = root / "assets/commonworld-proposal.js"
+    source = path.read_text(encoding="utf-8")
+    updated = source
+    for dependency_path in PROPOSAL_MODULE_DEPENDENCIES:
+        specifier = f"./{Path(dependency_path).name}"
+        versioned = f"{specifier}?v={asset_version(dependency_path, root)}"
+        pattern = re.compile(
+            rf"(?P<prefix>(?:\bfrom\s+|\bimport\(\s*)['\"]){re.escape(specifier)}(?:\?v=[0-9a-f]{{12}})?(?P<suffix>['\"])"
+        )
+        updated, count = pattern.subn(
+            lambda match: f"{match.group('prefix')}{versioned}{match.group('suffix')}",
+            updated,
+            count=1,
+        )
+        if count != 1:
+            raise ValueError(f"assets/commonworld-proposal.js: expected exactly one import of {specifier}")
+    if updated != source:
+        path.write_text(updated, encoding="utf-8")
 
 
 def catalog_index() -> dict[str, list[str]]:
@@ -30,7 +57,8 @@ def catalog_index() -> dict[str, list[str]]:
 
 
 def render(locale: str = FALLBACK_LOCALE) -> str:
-    page_name = "propose.html" if locale == "en" else "propose.de.html"
+    normalized = normalize_locale(locale)
+    page_name = surface_file(normalized, "proposal", ROOT)
     form_skip_href = f"/{page_name}#commons-proposal-form"
     index = json.dumps(catalog_index(), ensure_ascii=False, separators=(",", ":")).replace("&", "\\u0026").replace("<", "\\u003c").replace(">", "\\u003e")
     markup = f'''<!doctype html>
@@ -118,9 +146,11 @@ def render(locale: str = FALLBACK_LOCALE) -> str:
 
 
 def main() -> int:
-    (ROOT / "propose.html").write_text(render("en"), encoding="utf-8")
-    (ROOT / "propose.de.html").write_text(render("de"), encoding="utf-8")
-    print("commonworld localized proposal pages rendered from catalog index")
+    synchronize_proposal_module_import_versions(ROOT)
+    render_locales = locales_with_status("released", "candidate", root=ROOT)
+    for locale in render_locales:
+        (ROOT / surface_file(locale, "proposal", ROOT)).write_text(render(locale), encoding="utf-8")
+    print(f"commonworld localized proposal pages rendered for {', '.join(render_locales)}")
     return 0
 
 
