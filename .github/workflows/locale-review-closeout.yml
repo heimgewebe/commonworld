@@ -10,7 +10,7 @@ permissions:
 
 concurrency:
   group: locale-review-closeout-v1
-  cancel-in-progress: false
+  cancel-in-progress: true
 
 jobs:
   implement-and-verify:
@@ -29,6 +29,11 @@ jobs:
           cache: npm
       - name: Apply review closeout
         run: python3 scripts/apply_locale_review_closeout.py
+      - name: Remove one-shot execution surface
+        run: |
+          rm -f scripts/apply_locale_review_closeout.py
+          rm -f .github/workflows/locale-review-closeout.yml
+          rm -f docs/evidence/locale-candidates/.gitkeep-closeout*
       - name: Install public runtime dependencies
         run: npm ci --ignore-scripts --no-audit --no-fund
       - name: Install bounded browser runtime
@@ -45,10 +50,9 @@ jobs:
         env:
           BRANCH: fix/locale-review-closeout-v1
         run: |
-          rm -f scripts/apply_locale_review_closeout.py .github/workflows/locale-review-closeout.yml
           git config user.name "commonworld-review-closeout[bot]"
           git config user.email "commonworld-review-closeout[bot]@users.noreply.github.com"
           git add -A
           git diff --cached --check
           git commit -m "fix(i18n): close Wave-1 locale review findings"
-          git push origin "HEAD:${BRANCH}"
+          git push --force-with-lease origin "HEAD:${BRANCH}"
