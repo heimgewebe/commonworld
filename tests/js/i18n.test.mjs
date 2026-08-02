@@ -72,8 +72,13 @@ test('registry normalizes released and candidate locales', () => {
   assert.equal(normalizeLocale('de-DE'), 'de');
   assert.equal(normalizeLocale('fr'), 'fr');
   const localized = localizeCatalogRecords(BOOTSTRAP_RECORDS, 'de');
-  assert.equal(localized.records, BOOTSTRAP_RECORDS);
+  assert.notEqual(localized.records, BOOTSTRAP_RECORDS);
   assert.equal(localized.searchAliasesById.size, BOOTSTRAP_RECORDS.length);
+  for (const record of localized.records) {
+    assert.equal(record._content_locale, 'de');
+    for (const link of record.links ?? []) assert.equal(link._label_locale, 'de');
+    for (const source of record.provenance?.sources ?? []) assert.equal(source._label_locale, 'de');
+  }
 });
 
 test('English presentation labels cover actions and digital taxonomy', () => {
