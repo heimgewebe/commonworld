@@ -161,6 +161,46 @@ export async function checkForCurrentPage({
   return Object.freeze({ state: 'reloading', ...navigation });
 }
 
+export function startCurrentPageChecks({
+  checkImpl = checkForCurrentPage,
+  documentImpl = globalThis.document,
+  windowImpl = globalThis.window,
+  setIntervalImpl = globalThis.setInterval,
+  clearIntervalImpl = globalThis.clearInterval,
+  intervalMs = 5 * 60 * 1_000,
+} = {}) {
+  if (!documentImpl || !windowImpl || typeof checkImpl !== 'function') return () => {};
+
+  let inFlight = false;
+  const run = () => {
+    if (inFlight) return;
+    inFlight = true;
+    void Promise.resolve()
+      .then(() => checkImpl())
+      .catch(() => {})
+      .finally(() => { inFlight = false; });
+  };
+  const runWhenVisible = () => {
+    if (documentImpl.visibilityState && documentImpl.visibilityState !== 'visible') return;
+    run();
+  };
+
+  documentImpl.addEventListener?.('visibilitychange', runWhenVisible);
+  windowImpl.addEventListener?.('pageshow', runWhenVisible);
+  windowImpl.addEventListener?.('focus', runWhenVisible);
+  const intervalId = typeof setIntervalImpl === 'function' && Number.isFinite(intervalMs) && intervalMs >= 30_000
+    ? setIntervalImpl(runWhenVisible, intervalMs)
+    : null;
+  runWhenVisible();
+
+  return () => {
+    documentImpl.removeEventListener?.('visibilitychange', runWhenVisible);
+    windowImpl.removeEventListener?.('pageshow', runWhenVisible);
+    windowImpl.removeEventListener?.('focus', runWhenVisible);
+    if (intervalId !== null && typeof clearIntervalImpl === 'function') clearIntervalImpl(intervalId);
+  };
+}
+
 if (typeof document !== 'undefined' && typeof location !== 'undefined' && /^https?:$/u.test(location.protocol)) {
-  void checkForCurrentPage().catch(() => {});
+  startCurrentPageChecks();
 }
