@@ -343,7 +343,7 @@
   "binding": {
     "smoke_script_sha256": "4e9c95911010b71eccf79a292f6ea20ee4793c96c70be686ce21fe04a2dfe59a",
     "smoke_runner_sha256": "522b99b70b1d0064b1d0a31a3a67fdc9a2e73b7408f37d1a4bb303bc360b7556",
-    "first_party_surface_sha256": "8bb56eb38455fd74b9938a3aec03979fa3ef09093cf1fb3e9099e31da060ca8c",
+    "first_party_surface_sha256": "488698d5ebc4d0936727b069dda3e5fd2a899d8122b25a3e35caedc50093eb42",
     "scenario_ids": [
       "startup-and-ring-orbits",
       "synthetic-cross-ring-collision-accessibility",
