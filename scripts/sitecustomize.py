@@ -1,12 +1,11 @@
-"""One-shot closeout hook removed by its first interpreter process."""
+"""Apply the generated browser-smoke closeout patch exactly once."""
 from __future__ import annotations
 
-import atexit
 from pathlib import Path
 
 
-def _patch_generated_smoke() -> None:
-    target = Path(__file__).with_name("smoke_proposal_browser.mjs")
+def _patch_generated_smoke(script_path: Path) -> None:
+    target = script_path.with_name("smoke_proposal_browser.mjs")
     text = target.read_text(encoding="utf-8")
     old = "  assert(await page.locator('#proposal-download').isHidden(), 'privacy-native-arabic-dms: JSON download became available');\n"
     new = """  assert(await page.locator('#proposal-download').isVisible(), 'privacy-native-arabic-dms: validated download control is unavailable');
@@ -20,7 +19,8 @@ def _patch_generated_smoke() -> None:
     if text.count(old) != 1:
         raise RuntimeError("localized DMS download assertion was not generated exactly once")
     target.write_text(text.replace(old, new, 1), encoding="utf-8")
-    Path(__file__).unlink()
+    script_path.unlink()
 
 
-atexit.register(_patch_generated_smoke)
+if __name__ == "__main__":
+    _patch_generated_smoke(Path(__file__).resolve())
