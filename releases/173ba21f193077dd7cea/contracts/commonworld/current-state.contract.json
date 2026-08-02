@@ -19,7 +19,8 @@
       "active",
       "paused",
       "seasonal",
-      "unknown"
+      "unknown",
+      "ended"
     ],
     "unknown_semantics": "documented_practice_current_operation_not_timely_verified",
     "unknown_review_max_days": 45,
