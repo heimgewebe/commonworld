@@ -3,6 +3,7 @@ import assert from 'node:assert/strict';
 
 import {
   checkForCurrentPage,
+  startCurrentPageChecks,
   cleanReleaseNavigationUrl,
   parseReleaseManifestDocument,
   releaseNavigationUrl,
@@ -168,4 +169,111 @@ test('bounded probe timeout cannot navigate after a delayed response', async () 
   });
   assert.equal(result.state, 'probe-timeout');
   assert.equal(replaced, false);
+});
+
+
+async function settleReleaseChecks() {
+  await new Promise((resolve) => setImmediate(resolve));
+}
+
+test('runtime watcher rechecks after foregrounding, pageshow, focus and the bounded interval', async () => {
+  const documentListeners = new Map();
+  const windowListeners = new Map();
+  const documentImpl = {
+    visibilityState: 'visible',
+    addEventListener(name, listener) { documentListeners.set(name, listener); },
+    removeEventListener(name, listener) {
+      if (documentListeners.get(name) === listener) documentListeners.delete(name);
+    },
+  };
+  const windowImpl = {
+    addEventListener(name, listener) { windowListeners.set(name, listener); },
+    removeEventListener(name, listener) {
+      if (windowListeners.get(name) === listener) windowListeners.delete(name);
+    },
+  };
+  let intervalCallback = null;
+  let clearedInterval = null;
+  let checks = 0;
+  const stop = startCurrentPageChecks({
+    checkImpl: async () => { checks += 1; return { state: 'current' }; },
+    documentImpl,
+    windowImpl,
+    intervalMs: 120_000,
+    setIntervalImpl(callback, intervalMs) {
+      assert.equal(intervalMs, 120_000);
+      intervalCallback = callback;
+      return 17;
+    },
+    clearIntervalImpl(intervalId) { clearedInterval = intervalId; },
+  });
+
+  await settleReleaseChecks();
+  assert.equal(checks, 1);
+  windowListeners.get('focus')();
+  await settleReleaseChecks();
+  assert.equal(checks, 2);
+
+  documentImpl.visibilityState = 'hidden';
+  documentListeners.get('visibilitychange')();
+  intervalCallback();
+  await settleReleaseChecks();
+  assert.equal(checks, 2);
+
+  documentImpl.visibilityState = 'visible';
+  documentListeners.get('visibilitychange')();
+  await settleReleaseChecks();
+  assert.equal(checks, 3);
+  windowListeners.get('pageshow')();
+  await settleReleaseChecks();
+  assert.equal(checks, 4);
+  intervalCallback();
+  await settleReleaseChecks();
+  assert.equal(checks, 5);
+
+  stop();
+  assert.equal(clearedInterval, 17);
+  assert.equal(documentListeners.size, 0);
+  assert.equal(windowListeners.size, 0);
+});
+
+test('runtime watcher serializes probes so repeated lifecycle signals cannot overlap', async () => {
+  const windowListeners = new Map();
+  let intervalCallback = null;
+  let releaseFirstProbe = null;
+  let checks = 0;
+  const firstProbe = new Promise((resolve) => { releaseFirstProbe = resolve; });
+  const stop = startCurrentPageChecks({
+    checkImpl: () => {
+      checks += 1;
+      return checks === 1 ? firstProbe : Promise.resolve({ state: 'current' });
+    },
+    documentImpl: {
+      visibilityState: 'visible',
+      addEventListener() {},
+      removeEventListener() {},
+    },
+    windowImpl: {
+      addEventListener(name, listener) { windowListeners.set(name, listener); },
+      removeEventListener() {},
+    },
+    intervalMs: 60_000,
+    setIntervalImpl(callback) { intervalCallback = callback; return 1; },
+    clearIntervalImpl() {},
+  });
+
+  await Promise.resolve();
+  assert.equal(checks, 1);
+  windowListeners.get('focus')();
+  windowListeners.get('pageshow')();
+  intervalCallback();
+  await settleReleaseChecks();
+  assert.equal(checks, 1);
+
+  releaseFirstProbe({ state: 'current' });
+  await settleReleaseChecks();
+  windowListeners.get('focus')();
+  await settleReleaseChecks();
+  assert.equal(checks, 2);
+  stop();
 });
