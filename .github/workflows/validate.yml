@@ -26,6 +26,24 @@ jobs:
           cache: npm
       - name: Apply review closeout
         run: python3 scripts/apply_locale_review_closeout.py
+      - name: Complete issue-body runtime translations
+        run: |
+          python3 - <<'PY'
+          import json
+          from pathlib import Path
+
+          path = Path("assets/locales/wave1-candidates.json")
+          payload = json.loads(path.read_text(encoding="utf-8"))
+          translations = {
+              "es": "Digital",
+              "fr": "Numérique",
+              "pt-BR": "Digital",
+              "ar": "رقمي",
+          }
+          for locale, translation in translations.items():
+              payload["locales"][locale]["proposal_runtime"]["Digital"] = translation
+          path.write_text(json.dumps(payload, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
+          PY
       - name: Restore canonical execution surface
         run: |
           git fetch origin main --depth=1
