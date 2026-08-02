@@ -76,7 +76,7 @@ def validate_current_state(root: Path = ROOT) -> list[str]:
         errors.append("current public-surface truth mismatch")
 
     if state.get("activity_status_policy") != {
-        "public_states": ["active", "paused", "seasonal", "unknown"],
+        "public_states": ["active", "paused", "seasonal", "unknown", "ended"],
         "unknown_semantics": "documented_practice_current_operation_not_timely_verified",
         "unknown_review_max_days": 45,
         "unknown_public_notice_required": True,

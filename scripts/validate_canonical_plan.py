@@ -138,7 +138,7 @@ EXPECTED_RESEARCH_FILES = {
     "renderer-selection-v1.md",
     "renderer-selection-v1.result.json",
 }
-EXPECTED_CONTRACT_FILES = {"catalog-platform.contract.json", "catalog-delivery-budget.contract.json", "catalog-scale-gates.contract.json", "catalog-diversity.contract.json", "catalog-summary-specificity.contract.json", "commons-basis.schema.json", "commons-definition.contract.json", "editorial-review.contract.json", "proposal-path.contract.json", "proposal.schema.json", "current-state.contract.json", "aggregation-zoom.contract.json", "digital-ring-taxonomy.contract.json", "digital-sphere.contract.json", "production-delivery-provider.contract.json", "project.schema.json", "public-maplibre-vertical-slice.contract.json", "presence-axes.contract.json", "intent-search-discovery.contract.json", "renderer-selection.contract.json", "visual-semantics.contract.json"}
+EXPECTED_CONTRACT_FILES = {"catalog-platform.contract.json", "catalog-delivery-budget.contract.json", "catalog-scale-gates.contract.json", "catalog-diversity.contract.json", "catalog-summary-specificity.contract.json", "commons-basis.schema.json", "commons-definition.contract.json", "editorial-review.contract.json", "proposal-path.contract.json", "proposal.schema.json", "current-state.contract.json", "aggregation-zoom.contract.json", "digital-ring-taxonomy.contract.json", "digital-sphere.contract.json", "production-delivery-provider.contract.json", "project.schema.json", "public-maplibre-vertical-slice.contract.json", "presence-axes.contract.json", "intent-search-discovery.contract.json", "platform-foundation-gate.contract.json", "renderer-selection.contract.json", "visual-semantics.contract.json"}
 EXPECTED_SCRIPT_FILES = {
     "__init__.py",
     "browser_smoke_plan.py",
@@ -199,6 +199,7 @@ EXPECTED_SCRIPT_FILES = {
     "validate_digital_ring_taxonomy.py",
     "validate_device_acceptance_performance_v4.py",
     "validate_physical_device_acceptance_v4_apple.py",
+    "validate_platform_foundation.py",
     "validate_digital_sphere.py",
     "validate_digital_sphere_real_surface.py",
     "validate_layered_digital_sphere_proof.py",
@@ -241,6 +242,7 @@ EXPECTED_TEST_FILES = {
     "test_device_acceptance_rerun.py",
     "test_device_acceptance_performance_v4.py",
     "test_physical_device_acceptance_v4_apple.py",
+    "test_platform_foundation.py",
     "test_digital_sphere.py",
     "test_digital_sphere_real_surface.py",
     "test_layered_digital_sphere_proof.py",
