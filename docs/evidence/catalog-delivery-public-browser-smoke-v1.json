@@ -1,6 +1,4 @@
 {
-  "schema_version": 1,
-  "kind": "commonworld_catalog_delivery_public_browser_smoke",
   "verdict": "PASS",
   "scenarios": [
     {
@@ -119,9 +117,9 @@
       "filterButtonWidth": 44,
       "filterButtonHeight": 44,
       "ringAnimationName": "sphere-ring-orbit",
-      "ringTransform": "matrix(0.999999, 0.00150674, -0.00150674, 0.999999, 0, 0)",
-      "ringTextWidth": 671.1126098632812,
-      "ringTextHeight": 14.011138916015625,
+      "ringTransform": "matrix(0.999999, 0.00151154, -0.00151154, 0.999999, 0, 0)",
+      "ringTextWidth": 671.1126708984375,
+      "ringTextHeight": 14.014373779296875,
       "ringTextFontSize": 22,
       "primaryRingCount": 3,
       "depthRingCount": 2,
@@ -197,7 +195,7 @@
     {
       "id": "layer-journey-moveend-return",
       "verdict": "PASS",
-      "elapsedMs": 1517
+      "elapsedMs": 1770
     },
     {
       "id": "layer-journey-interrupted",
@@ -284,8 +282,8 @@
       "verdict": "PASS",
       "blockedCatalogRequests": 0,
       "observedCatalogRequests": [
-        "/releases/b8eb723727379f8c2b26/catalog/runtime/aggregate.v1.json",
-        "/releases/b8eb723727379f8c2b26/catalog/runtime/manifest.v1.json"
+        "/releases/32d975a988d4cc3a067f/catalog/runtime/aggregate.v1.json",
+        "/releases/32d975a988d4cc3a067f/catalog/runtime/manifest.v1.json"
       ]
     },
     {
@@ -343,9 +341,9 @@
     }
   ],
   "binding": {
-    "smoke_script_sha256": "eb29099941d804186daf195899fcee7c1ba3c0fecf96187076412fb4a4ad055a",
+    "smoke_script_sha256": "4e9c95911010b71eccf79a292f6ea20ee4793c96c70be686ce21fe04a2dfe59a",
     "smoke_runner_sha256": "522b99b70b1d0064b1d0a31a3a67fdc9a2e73b7408f37d1a4bb303bc360b7556",
-    "first_party_surface_sha256": "b7b0ae54731537684d680ad3cb674483361a21633e4c510710737828efa04fa0",
+    "first_party_surface_sha256": "68ae3847b94e8e9480e893680ba9e10e9a917ef86c46fcd4ed4a79976e2a2042",
     "scenario_ids": [
       "startup-and-ring-orbits",
       "synthetic-cross-ring-collision-accessibility",
@@ -385,11 +383,6 @@
       "method-mobile-text-200"
     ],
     "freshness_rule": "The committed smoke result is valid only while all bound hashes and the ordered scenario set match the current repository surface.",
-    "smoke_plan_sha256": "6b8749928ead5ef81ee66883e6a2993e756ce083575c3569234bf70526448364"
-  },
-  "execution": {
-    "result_sha256": "10d0518c3cd3848f61535c6d4889f4b8423c14992b21c5f93fa618597857e592",
-    "observed_at": "2026-08-01T19:22:49Z",
-    "transport_note": "Fresh public browser smoke passed all 36 scenarios on release b8eb723727379f8c2b26; root progressive disclosure, direct-child field bundles and leaf isolation are bound to the current scripts and first-party surface."
+    "smoke_plan_sha256": "11e90aa53237fa2c78518c9f472d3dde41e53e2c2381a7969e96da3546641847"
   }
 }

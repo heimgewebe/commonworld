@@ -1,5 +1,4 @@
 import { createServer } from 'node:http';
-import { existsSync } from 'node:fs';
 import { readFile, stat } from 'node:fs/promises';
 import path from 'node:path';
 import process from 'node:process';
@@ -70,8 +69,12 @@ await new Promise((resolve, reject) => {
 const address = server.address();
 if (!address || typeof address === 'string') throw new Error('accessibility smoke server has no TCP address');
 const baseUrl = `http://127.0.0.1:${address.port}`;
-const executablePath = process.env.PLAYWRIGHT_CHROMIUM_EXECUTABLE_PATH || (existsSync('/usr/bin/google-chrome') ? '/usr/bin/google-chrome' : undefined);
-const browser = await chromium.launch({ headless: true, executablePath });
+const executablePath = process.env.PLAYWRIGHT_CHROMIUM_EXECUTABLE_PATH || undefined;
+const browser = await chromium.launch({
+  headless: true,
+  executablePath: executablePath,
+  args: ['--enable-unsafe-swiftshader'],
+});
 const scenarios = [];
 const lateFocusSettlements = [];
 const FOCUS_SETTLE_TIMEOUT_MS = 3000;

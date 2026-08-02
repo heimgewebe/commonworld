@@ -1,0 +1,40 @@
+{
+  "schema_version": 1,
+  "kind": "commonworld_contact_data_cases",
+  "blocked": [
+    {
+      "id": "email-ascii",
+      "value": "alex@example.org"
+    },
+    {
+      "id": "phone-ascii",
+      "value": "+49 40 12345678"
+    },
+    {
+      "id": "phone-arabic-indic",
+      "value": "+٩٧١ ٥٠ ١٢٣ ٤٥٦٧"
+    },
+    {
+      "id": "phone-eastern-arabic",
+      "value": "+۹۸ ۹۱۲ ۱۲۳ ۴۵۶۷"
+    },
+    {
+      "id": "phone-fullwidth",
+      "value": "＋８１ ９０ １２３４ ５６７８"
+    }
+  ],
+  "allowed": [
+    {
+      "id": "year-and-groups-arabic",
+      "value": "منذ ٢٠١٢ تعمل ٣٥ مجموعة في ثلاث مناطق."
+    },
+    {
+      "id": "short-reference-number",
+      "value": "Projektphase ٢٠٢٦-٢"
+    },
+    {
+      "id": "ordinary-counts",
+      "value": "12 Gruppen arbeiten in 4 Regionen."
+    }
+  ]
+}

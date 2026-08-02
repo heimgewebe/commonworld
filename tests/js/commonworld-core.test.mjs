@@ -18,6 +18,7 @@ import {
   DIGITAL_TAXONOMY,
   LAYERS,
   ORBIT_PROFILES,
+  bidiIsolateForLocale,
   binaryFragment,
   binaryName,
   buildDigitalPresentationTree,
@@ -65,6 +66,7 @@ import {
   sphereRingLabelAssignments,
   sphereRingLabelLength,
   normalizeDigitalPath,
+  normalizePresenceFilterValues,
   ringOrbitDirection,
   ringOrbitDuration,
   ringOrbitStartAngle,
@@ -220,6 +222,17 @@ test('digital ring path derivation is deterministic and handles ambiguity explic
   assert.deepEqual(unknown?.unknownThemes, ['future-theme']);
   assert.equal(deriveDigitalProjectPath(digital(['education'], false)), null);
   assert.equal(deriveDigitalProjectPath(digital(['open-source', 'open-data']))?.pathKey, deriveDigitalProjectPath(digital(['open-data', 'open-source']))?.pathKey);
+});
+
+test('RTL locale placeholders isolate embedded LTR date tokens', () => {
+  assert.equal(bidiIsolateForLocale('2026-07-19', 'en'), '2026-07-19');
+  assert.equal(bidiIsolateForLocale('2026-07-19', 'ar'), '⁨2026-07-19⁩');
+  const notice = recordActivityNotice({
+    activity: { status: 'unknown', observed_at: '2026-07-19' },
+    curation: { next_review_at: '2026-08-19' },
+  }, 'ar');
+  assert.ok(notice.includes('⁨2026-07-19⁩'));
+  assert.ok(notice.includes('⁨2026-08-19⁩'));
 });
 
 test('unknown activity produces an explicit public notice and active records do not', () => {
@@ -857,6 +870,12 @@ test('ephemeral nearby origin and radius are never serialized and default to nul
   assert.equal(search.includes('nearby'), false);
   assert.equal(search.includes('8.5'), false);
   assert.equal(search.includes('5000'), false);
+});
+
+test('presence filter normalization honors explicit programmatic values', () => {
+  assert.deepEqual(normalizePresenceFilterValues('geographic'), ['geographic']);
+  assert.deepEqual(normalizePresenceFilterValues(['digital', 'geographic', 'digital', 'hybrid']), ['digital', 'geographic']);
+  assert.deepEqual(normalizePresenceFilterValues(null), []);
 });
 
 test('selected presence types compose with strict AND semantics', () => {
@@ -1583,6 +1602,34 @@ test('semantic zoom remains presentation logic from planet to focus', () => {
     crumbs: ['Erde', 'Commons', 'Freifunk Hamburg'],
     summary: 'Vor Ort · Digital · 1 öffentlicher Ort · 1 verborgener Ort',
   });
+  const candidateRecord = { ...presenceAxisRecords[2], title: 'Freifunk Hamburg', _content_locale: 'en' };
+  assert.deepEqual(semanticLocationLine({
+    zoom: 1.15,
+    records: [candidateRecord],
+    selectedProjectId: 'freifunk-hamburg',
+    locale: 'ar',
+  }), {
+    level: 'focus',
+    crumbs: ['الأرض', 'Commons', 'Freifunk Hamburg'],
+    contentCrumbIndex: 2,
+    contentLocale: 'en',
+    summary: 'في الموقع + رقمي · موقع عام واحد · موقع مخفي واحد',
+  });
+});
+
+test('candidate runtime labels use candidate UI vocabulary over English catalog content', () => {
+  assert.equal(commonsTypeLabel('community-network', 'es'), 'Red Comunitaria');
+  assert.equal(recordPresentationLabel(presenceAxisRecords[0], 'es'), 'En el sitio');
+  assert.equal(
+    recordPresentationLabel(presenceAxisRecords[1], 'es'),
+    'Digital · Comunicación y Redes › Redes Comunitarias',
+  );
+  assert.deepEqual(recordLocationSummaries(presenceAxisRecords[2], 'es'), [
+    'Community Hamburg · aproximada, con al menos 5 km de incertidumbre',
+    'Private Heimrouter · ubicación oculta',
+  ]);
+  assert.equal(commonsTypeLabel('community-network', 'ar'), 'شبكة مجتمعية');
+  assert.equal(recordPresentationLabel(presenceAxisRecords[0], 'ar'), 'في الموقع');
 });
 
 test('presentation and location labels explain geographic, digital and dual presence truth', () => {

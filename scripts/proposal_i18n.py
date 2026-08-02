@@ -1,7 +1,13 @@
 """English presentation overlay for the static Commons proposal form."""
 from __future__ import annotations
 
-from scripts.commonworld_i18n import normalize_locale, replace_exact
+from scripts.commonworld_i18n import (
+    CANDIDATE_LOCALES,
+    _candidate_replacements,
+    _decorate_candidate_surface,
+    normalize_locale,
+    replace_exact,
+)
 
 PROPOSAL_REPLACEMENTS_EN = {
     '<html lang="de">': '<html lang="en">',
@@ -36,6 +42,7 @@ PROPOSAL_REPLACEMENTS_EN = {
     '<option value="other">Andere</option>': '<option value="other">Other</option>',
     '<legend>Präsenz</legend>': '<legend>Presence</legend>',
     '<span>Vor Ort</span>': '<span>On site</span>',
+    '<span>Digital</span>': '<span>Digital</span>',
     'Mindestens eine wählen.': 'Choose at least one.',
     '<span>Grobe Region oder Ort <small>(nur bei „Vor Ort“)</small></span>': '<span>Broad region or place <small>(only for “On site”)</small></span>',
     'placeholder="z. B. Uruguay, Taiwan oder Aotearoa Neuseeland"': 'placeholder="e.g. Uruguay, Taiwan or Aotearoa New Zealand"',
@@ -80,4 +87,14 @@ PROPOSAL_REPLACEMENTS_EN = {
 
 
 def translate_proposal(markup: str, locale: str) -> str:
-    return replace_exact(markup, PROPOSAL_REPLACEMENTS_EN, surface='proposal page') if normalize_locale(locale) == 'en' else markup
+    normalized = normalize_locale(locale)
+    if normalized == 'de':
+        return markup
+    translated = replace_exact(markup, PROPOSAL_REPLACEMENTS_EN, surface='proposal page')
+    if normalized in CANDIDATE_LOCALES:
+        translated = replace_exact(
+            translated,
+            _candidate_replacements(normalized, 'proposal', PROPOSAL_REPLACEMENTS_EN),
+            surface=f'proposal page {normalized}',
+        )
+    return _decorate_candidate_surface(translated, normalized)

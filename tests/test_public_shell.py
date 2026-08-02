@@ -6,7 +6,7 @@ import unittest
 from pathlib import Path
 
 from scripts.render_public_shell import (
-    MODULE_IMPORT_DEPENDENCIES, activity_notice, load_records, render_bootstrap_catalog, render_cards, render_shell,
+    LANGUAGE_NATIVE_NAMES, MODULE_IMPORT_DEPENDENCIES, activity_notice, catalog_language_codes, language_option_direction, load_records, render_bootstrap_catalog, render_cards, render_shell,
 )
 from scripts.static_surface_parser import (
     find_css_block,
@@ -51,12 +51,17 @@ class PublicShellTests(unittest.TestCase):
             "commonworld-catalog-runtime.mjs",
             "commonworld-i18n.mjs",
             "commonworld-en-locale.mjs",
+            "commonworld-locale-registry.mjs",
+            "commonworld-wave1-locales.mjs",
             "commonworld-locale.mjs",
             "commonworld-core.mjs",
             "commonworld-app.js",
             "ipad-layout.css",
+            "vendor/mapbox-gl-rtl-text.js",
         ):
-            shutil.copy2(ROOT / "assets" / asset, root / "assets" / asset)
+            target = root / "assets" / asset
+            target.parent.mkdir(parents=True, exist_ok=True)
+            shutil.copy2(ROOT / "assets" / asset, target)
         (root / "scripts").mkdir()
         if (ROOT / "scripts/render_public_shell.py").exists():
             shutil.copy2(ROOT / "scripts/render_public_shell.py", root / "scripts/render_public_shell.py")
@@ -64,6 +69,45 @@ class PublicShellTests(unittest.TestCase):
 
     def test_public_shell_validates(self) -> None:
         self.assertEqual([], validate_public_shell(ROOT))
+
+    def test_locale_index_brand_resets_within_the_current_surface(self) -> None:
+        expected = {
+            "en": "./",
+            "de": "./de.html",
+            "es": "./es.html",
+            "fr": "./fr.html",
+            "pt-BR": "./pt-BR.html",
+            "ar": "./ar.html",
+        }
+        for locale, href in expected.items():
+            with self.subTest(locale=locale):
+                markup = render_shell(locale=locale)
+                self.assertIn(f'<a class="brand" href="{href}"', markup)
+                self.assertIn('id="semantic-breadcrumb-accessible" class="visually-hidden"', markup)
+
+    def test_catalog_counts_use_build_count_and_locale_noun(self) -> None:
+        count = len(load_records(ROOT))
+        arabic = render_shell(locale="ar")
+        self.assertIn(f'id="discovery-count" class="discovery-count" role="status">{count} المشاعات</p>', arabic)
+        self.assertIn(f'id="text-count" class="text-count">{count} المشاعات</p>', arabic)
+        self.assertNotIn(f'{count} Commons', arabic)
+
+    def test_language_filter_is_derived_from_catalog_content_languages(self) -> None:
+        codes = catalog_language_codes(load_records(ROOT))
+        self.assertGreater(len(codes), 2)
+        for locale in ("de", "en", "es", "fr", "pt-BR", "ar"):
+            markup = render_shell(locale=locale)
+            match = re.search(r'<select id="filter-language"[^>]*>(.*?)</select>', markup, re.S)
+            self.assertIsNotNone(match, locale)
+            option_markup = re.findall(r'<option ([^>]*)>(.*?)</option>', match.group(1), re.S)
+            values = [re.search(r'value="([^"]*)"', attrs).group(1) for attrs, _ in option_markup]
+            self.assertEqual(values, ["", *codes, "unknown"], locale)
+            labels = {value: label for value, (_, label) in zip(values, option_markup)}
+            for code in codes:
+                self.assertEqual(labels[code], LANGUAGE_NATIVE_NAMES.get(code, code), (locale, code))
+                attrs = next(attrs for attrs, _ in option_markup if f'value="{code}"' in attrs)
+                self.assertIn(f'lang="{code}"', attrs, (locale, code))
+                self.assertIn(f'dir="{language_option_direction(code)}"', attrs, (locale, code))
 
     def test_filter_layout_renderer_uses_compact_semantic_structure(self) -> None:
         german = render_shell(locale="de")
@@ -106,18 +150,29 @@ class PublicShellTests(unittest.TestCase):
             source = (ROOT / module_path).read_text(encoding="utf-8")
             for dependency_path in dependencies:
                 version = hashlib.sha256((ROOT / dependency_path).read_bytes()).hexdigest()[:12]
-                self.assertIn(f"from './{Path(dependency_path).name}?v={version}'", source)
+                versioned_specifier = f"./{Path(dependency_path).name}?v={version}"
+                self.assertTrue(
+                    f"from '{versioned_specifier}'" in source
+                    or f"import('{versioned_specifier}')" in source
+                )
+
+    def test_wave1_candidate_pack_is_loaded_dynamically(self) -> None:
+        source = (ROOT / "assets/commonworld-i18n.mjs").read_text(encoding="utf-8")
+        version = hashlib.sha256((ROOT / "assets/commonworld-wave1-locales.mjs").read_bytes()).hexdigest()[:12]
+        specifier = f"./commonworld-wave1-locales.mjs?v={version}"
+        self.assertIn(f"import('{specifier}')", source)
+        self.assertNotIn(f"from '{specifier}'", source)
 
     def test_public_shell_rejects_stale_transitive_module_import(self) -> None:
         with tempfile.TemporaryDirectory() as tmp_dir:
             root = self.copy_shell(tmp_dir)
             core_path = root / "assets/commonworld-core.mjs"
-            locale_path = root / "assets/commonworld-en-locale.mjs"
-            expected = hashlib.sha256(locale_path.read_bytes()).hexdigest()[:12]
+            i18n_path = root / "assets/commonworld-i18n.mjs"
+            expected = hashlib.sha256(i18n_path.read_bytes()).hexdigest()[:12]
             core_path.write_text(
                 core_path.read_text(encoding="utf-8").replace(
-                    f"./commonworld-en-locale.mjs?v={expected}",
-                    "./commonworld-en-locale.mjs?v=000000000000",
+                    f"./commonworld-i18n.mjs?v={expected}",
+                    "./commonworld-i18n.mjs?v=000000000000",
                     1,
                 ),
                 encoding="utf-8",
@@ -135,7 +190,7 @@ class PublicShellTests(unittest.TestCase):
             self.refresh_app_version(root)
             errors = validate_public_shell(root)
         self.assertIn(
-            "public shell module import is not content-bound: assets/commonworld-core.mjs -> assets/commonworld-en-locale.mjs",
+            "public shell module import is not content-bound: assets/commonworld-core.mjs -> assets/commonworld-i18n.mjs",
             errors,
         )
 
@@ -319,6 +374,15 @@ class PublicShellTests(unittest.TestCase):
             "public shell runtime missing bootstrap-recovery handoff: document.querySelector('[data-static-catalog-fallback]')?.remove()",
             errors,
         )
+
+    def test_candidate_static_content_and_dates_keep_explicit_bidi_boundaries(self) -> None:
+        arabic = render_shell(locale="ar")
+        self.assertIn('<h2 lang="en" dir="ltr">', arabic)
+        self.assertIn('<p lang="en" dir="ltr">', arabic)
+        unknown = next(record for record in load_records(ROOT) if record.get("activity", {}).get("status") == "unknown")
+        notice = activity_notice(unknown, "ar")
+        self.assertIn("\u2068", notice)
+        self.assertIn("\u2069", notice)
 
     def test_unknown_activity_notice_is_rendered_in_static_cards(self) -> None:
         records = load_records(ROOT)

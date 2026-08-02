@@ -22,9 +22,11 @@ class PublicMapLibreVerticalSliceTests(unittest.TestCase):
         paths = set(REQUIRED_FILES) | {
             Path("scripts/render_public_shell.py"),
             Path("scripts/commonworld_i18n.py"),
+            Path("scripts/locale_registry.py"),
             Path("scripts/__init__.py"),
             Path("scripts/public_cache.py"),
             Path("catalog/locales/en.json"),
+            Path("docs/architecture/locale-release.contract.json"),
             Path("assets/commonworld-mark.svg"),
             Path("assets/commonworld-locale.mjs"),
             Path("assets/commonworld-release-check.js"),
@@ -107,7 +109,7 @@ function after() { return false; }
                 lambda value: value["packages"]["node_modules/maplibre-gl"].update({"version": "5.25.0"}),
             )
             errors = validate_public_maplibre_vertical_slice(root)
-        self.assertTrue(any("resolve maplibre-gl exactly" in error for error in errors))
+        self.assertTrue(any("resolve MapLibre and RTL-text dependencies exactly" in error for error in errors))
 
     def test_rejects_changed_vendored_runtime(self) -> None:
         with tempfile.TemporaryDirectory() as directory:
@@ -117,6 +119,44 @@ function after() { return false; }
             errors = validate_public_maplibre_vertical_slice(root)
         self.assertTrue(any("vendored MapLibre asset hash mismatch" in error for error in errors))
 
+
+    def test_rejects_floating_rtl_text_plugin_version(self) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            root = self.copy_slice(directory)
+            self.mutate_json(
+                root,
+                "package.json",
+                lambda value: value["dependencies"].update({"@mapbox/mapbox-gl-rtl-text": "^0.3.0"}),
+            )
+            errors = validate_public_maplibre_vertical_slice(root)
+        self.assertTrue(any("exactly pinned" in error for error in errors))
+
+    def test_rejects_rtl_text_plugin_lockfile_drift(self) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            root = self.copy_slice(directory)
+            self.mutate_json(
+                root,
+                "package-lock.json",
+                lambda value: value["packages"]["node_modules/@mapbox/mapbox-gl-rtl-text"].update({"version": "0.3.1"}),
+            )
+            errors = validate_public_maplibre_vertical_slice(root)
+        self.assertTrue(any("resolve MapLibre and RTL-text dependencies exactly" in error for error in errors))
+
+    def test_rejects_changed_rtl_text_plugin_runtime(self) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            root = self.copy_slice(directory)
+            path = root / "assets/vendor/mapbox-gl-rtl-text.js"
+            path.write_bytes(path.read_bytes() + b"\n// changed\n")
+            errors = validate_public_maplibre_vertical_slice(root)
+        self.assertTrue(any("vendored MapLibre asset hash mismatch" in error for error in errors))
+
+    def test_rejects_changed_rtl_text_plugin_license(self) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            root = self.copy_slice(directory)
+            path = root / "assets/vendor/MAPBOX-RTL-TEXT-LICENSE.md"
+            path.write_text(path.read_text(encoding="utf-8") + "\nchanged\n", encoding="utf-8")
+            errors = validate_public_maplibre_vertical_slice(root)
+        self.assertTrue(any("RTL text plugin verbatim license hash mismatch" in error for error in errors))
 
     def test_rejects_changed_maplibre_license(self) -> None:
         with tempfile.TemporaryDirectory() as directory:

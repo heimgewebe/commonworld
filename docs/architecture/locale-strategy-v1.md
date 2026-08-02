@@ -6,7 +6,7 @@ Commonworld exposes only interface languages whose complete public surface is tr
 
 This is deliberately different from publishing a long language menu immediately. A selectable but incomplete language creates false inclusion: navigation may be translated while filters, runtime messages, project details, method text or proposal safeguards silently fall back to another language.
 
-The machine-readable authority is `docs/architecture/locale-release.contract.json`. `scripts/validate_locale_release.py` binds that policy to the actual runtime declarations and released HTML surfaces. The test suite fails when runtime and contract drift apart or when a planned language is promoted without the required evidence.
+The machine-readable authority is `docs/architecture/locale-release.contract.json`. `scripts/validate_locale_release.py` binds that policy to the generated runtime registry, released surfaces, hidden candidate surfaces and digest-bound evidence. The test suite fails when runtime and contract drift apart, when a candidate becomes selectable, or when a non-baseline language is promoted without complete independent evidence.
 
 ## For non-specialists
 
@@ -39,7 +39,7 @@ Interface and content languages use BCP 47 tags. The architecture must preserve 
 
 Matching proceeds from the most specific usable tag to broader fallbacks: exact tag, language plus script, primary language, then the default language. Input matching is case-insensitive, but stored and emitted tags are canonical.
 
-The current runtime still supports only `en` and `de`. Generalizing runtime matching and surface generation is the next integration step after the active catalog-generation work has terminated, because both operations modify the same release-bound files.
+The runtime now derives known, released and candidate interface locales, canonical matching, page paths and document direction from one registry. Only `en` and `de` are released and selectable. Candidate pages are generated for technical review, carry `noindex,nofollow`, identify themselves as previews and cannot be selected by the public locale control.
 
 ## Release waves
 
@@ -48,12 +48,14 @@ The current runtime still supports only `en` and `de`. Generalizing runtime matc
 - `en` — English, neutral default
 - `de` — German, maintained fallback for canonical German source material
 
-### Wave 1
+### Wave 1 — hidden candidates
 
 - `es` — Spanish
 - `fr` — French
 - `pt-BR` — Brazilian Portuguese
 - `ar` — Arabic
+
+All three public surfaces and the runtime vocabulary are generated for these locales as technical candidates. They are not released, are not selectable and still require independent language, accessibility and browser review. Candidate evidence records technical results and blockers but is deliberately not release evidence.
 
 Arabic is intentionally early. It forces the system to prove bidirectional layout, focus order, icon direction, punctuation and mixed-script behavior before the localization architecture becomes entrenched around left-to-right assumptions.
 
@@ -68,7 +70,7 @@ The order inside a wave may change when real visitor, search and contribution-la
 
 ## Promotion gate
 
-A planned locale becomes selectable only when all of the following are true:
+A candidate locale becomes released and selectable only when all of the following are true:
 
 - the globe, text view, method page and proposal page are complete;
 - all runtime labels and error states are translated;
@@ -81,7 +83,7 @@ A planned locale becomes selectable only when all of the following are true:
 - right-to-left locales additionally pass directional layout and mixed-script review;
 - machine translation, when used as a draft, has received human editorial review.
 
-A language is therefore either released or planned. There is no publicly selectable “mostly translated” state.
+A language is therefore either released, a hidden technical candidate, or planned. There is no publicly selectable “mostly translated” state. Promotion of every non-baseline locale requires a revision- and SHA-256-bound release-evidence artifact with independent receipts; candidate evidence alone can never satisfy that gate.
 
 ## Alternative path
 
@@ -95,15 +97,17 @@ A growth-first strategy would expose machine-translated languages quickly and co
 - script, region and right-to-left requirements are considered before expansion;
 - incomplete translations cannot be activated accidentally;
 - content languages remain globally open even while the interface rollout is staged;
-- the contract gives CI a stable boundary between “planned” and “released”.
+- the contract gives CI a stable boundary between planned, hidden candidate and released locales;
+- generated candidate previews make technical integration testable without implying public language support.
 
 ### Costs and risks
 
 - visible language growth is slower;
 - each language needs review and browser evidence, not only translated strings;
-- English/German source asymmetry remains until catalog localization is generalized;
-- a runtime registry and generated surface convention still need implementation after the current catalog release operation.
+- English/German source asymmetry remains: Wave 1 currently presents canonical English catalog content with an explicit `lang="en"` boundary;
+- candidate previews add generated files and release-snapshot weight before they create public reach;
+- independent language, keyboard, screen-reader and browser reviews remain real activation work.
 
 ## Next implementation boundary
 
-After the active catalog-growth operation is terminal, the runtime should derive locale choices, canonical matching, page paths, display names and document direction from one registry rather than hard-coded English/German branches. That change must preserve the already merged precedence contract: explicit URL, stored preference, browser languages, English default.
+Wave 1 is technically integrated but intentionally inactive. The next boundary is independent review of the exact candidate-pack digest and generated surfaces, followed by accessibility and browser receipts. Only then may a locale registry entry move from `candidate` to `released` and appear in automatic or manual selection. Wave 2 remains planned and should reuse this same evidence path rather than introduce another localization mechanism.

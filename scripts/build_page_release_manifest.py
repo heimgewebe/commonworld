@@ -13,6 +13,7 @@ ROOT = Path(__file__).resolve().parents[1]
 if str(ROOT) not in sys.path:
     sys.path.insert(0, str(ROOT))
 
+from scripts.locale_registry import locales_with_status, surface_file
 from scripts.public_cache import (
     RELEASE_ID_PLACEHOLDER,
     canonicalize_page_release,
@@ -21,13 +22,10 @@ from scripts.public_cache import (
     page_release_id,
 )
 
-PUBLIC_PAGES = (
-    "index.html",
-    "de.html",
-    "method.html",
-    "method.de.html",
-    "propose.html",
-    "propose.de.html",
+PUBLIC_PAGES = tuple(
+    surface_file(locale, surface, ROOT)
+    for locale in locales_with_status("released", "candidate", root=ROOT)
+    for surface in ("index", "method", "proposal")
 )
 SNAPSHOT_ROOT_FILES = PUBLIC_PAGES + ("index.css", "LICENSE", "LICENSE-DATA.md")
 SNAPSHOT_TREES = ("assets", "catalog", "contracts/commonworld", ".well-known")

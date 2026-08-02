@@ -1,5 +1,4 @@
 import { createServer } from 'node:http';
-import { existsSync } from 'node:fs';
 import { readFile, rename, stat, writeFile } from 'node:fs/promises';
 import path from 'node:path';
 import process from 'node:process';
@@ -170,8 +169,12 @@ const address = server.address();
 if (!address || typeof address === 'string') throw new Error('browser smoke server has no TCP address');
 const baseUrl = `http://127.0.0.1:${address.port}`;
 
-const executablePath = process.env.PLAYWRIGHT_CHROMIUM_EXECUTABLE_PATH || (existsSync('/usr/bin/google-chrome') ? '/usr/bin/google-chrome' : undefined);
-const browser = await chromium.launch({ headless: true, executablePath });
+const executablePath = process.env.PLAYWRIGHT_CHROMIUM_EXECUTABLE_PATH || undefined;
+const browser = await chromium.launch({
+  headless: true,
+  executablePath: executablePath,
+  args: ['--enable-unsafe-swiftshader'],
+});
 const results = [];
 
 function sortedIds(values) {
@@ -208,8 +211,19 @@ async function accessibilitySubtreeForSelector(page, selector) {
 function assertAccessibleRingSummary(nodes, titles, label) {
   const summary = nodes[0];
   assert(summary && !summary.ignored && summary.role === 'paragraph', `${label}: exact summary AX node is absent or ignored (${JSON.stringify(nodes)})`);
+  const descendants = new Set([summary.nodeId]);
+  let changed = true;
+  while (changed) {
+    changed = false;
+    for (const node of nodes) {
+      if (node.parentId && descendants.has(node.parentId) && !descendants.has(node.nodeId)) {
+        descendants.add(node.nodeId);
+        changed = true;
+      }
+    }
+  }
   const exposedText = nodes
-    .filter((node) => !node.ignored && node.parentId === summary.nodeId && node.role === 'StaticText')
+    .filter((node) => !node.ignored && descendants.has(node.parentId) && node.role === 'StaticText')
     .map((node) => node.name)
     .join(' ');
   assert(exposedText, `${label}: exact summary AX node has no exposed StaticText child (${JSON.stringify(nodes)})`);

@@ -19,6 +19,7 @@ from scripts.build_page_release_manifest import (
     compute_release_id,
     snapshot_files,
 )
+from scripts.locale_registry import locales_with_status, surface_file
 from scripts.public_cache import asset_version, page_build_metadata, page_release_id
 
 _MARKER_PATTERN = re.compile(r"<!-- commonworld-release-manifest:(\{[^\n]+\}) -->")
@@ -54,13 +55,19 @@ def validate(root: Path = ROOT) -> list[str]:
 
     release_version = asset_version("assets/commonworld-release-check.js", root)
     release_tag = f'<script type="module" src="/assets/commonworld-release-check.js?v={release_version}"></script>'
-    release_checked_pages = {"index.html", "de.html", "propose.html", "propose.de.html"}
-    base_safe_skip_links = {
-        "index.html": 'href="/#static-catalog-fallback"',
-        "de.html": 'href="/de.html#static-catalog-fallback"',
-        "propose.html": 'href="/propose.html#commons-proposal-form"',
-        "propose.de.html": 'href="/propose.de.html#commons-proposal-form"',
+    rendered_locales = locales_with_status("released", "candidate", root=root)
+    release_checked_pages = {
+        surface_file(locale, surface, root)
+        for locale in rendered_locales
+        for surface in ("index", "proposal")
     }
+    base_safe_skip_links = {}
+    for locale in rendered_locales:
+        index_page = surface_file(locale, "index", root)
+        proposal_page = surface_file(locale, "proposal", root)
+        index_href = "/" if index_page == "index.html" else f"/{index_page}"
+        base_safe_skip_links[index_page] = f'href="{index_href}#static-catalog-fallback"'
+        base_safe_skip_links[proposal_page] = f'href="/{proposal_page}#commons-proposal-form"'
     for relative in PUBLIC_PAGES:
         page_path = root / relative
         try:

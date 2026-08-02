@@ -71,6 +71,7 @@ test("präzise private Orte und Kontaktdaten werden fail-closed blockiert", () =
   assert.equal(containsSensitiveLocation("52.5200, 13.4050"), true);
   assert.equal(containsSensitiveLocation("Router auf Dach Straße 12"), true);
   assert.equal(containsContactData("alex@example.org"), true);
+  assert.equal(containsContactData("+٩٧١ ٥٠ ١٢٣ ٤٥٦٧"), true);
   const proposal = validProposal(); proposal.project.region = "52.5200, 13.4050";
   assert.match(validateProposal(proposal).join(" "), /Adresse oder Koordinate/u);
 });
@@ -79,6 +80,12 @@ test("gemeinsame sensible Ortsfälle bleiben zwischen Laufzeit und Offline-Prüf
   const cases = JSON.parse(readFileSync(new URL("../fixtures/proposals/sensitive-location-cases.json", import.meta.url), "utf8"));
   for (const entry of cases.blocked) assert.equal(containsSensitiveLocation(entry.value), true, entry.id);
   for (const entry of cases.allowed) assert.equal(containsSensitiveLocation(entry.value), false, entry.id);
+});
+
+test("gemeinsame Kontaktdatenfälle erkennen Unicode-Ziffern ohne gewöhnliche Zahlen zu blockieren", () => {
+  const cases = JSON.parse(readFileSync(new URL("../fixtures/proposals/contact-data-cases.json", import.meta.url), "utf8"));
+  for (const entry of cases.blocked) assert.equal(containsContactData(entry.value), true, entry.id);
+  for (const entry of cases.allowed) assert.equal(containsContactData(entry.value), false, entry.id);
 });
 
 test("alle öffentlichen Freitextfelder blockieren Adressen und Koordinaten fail-closed", () => {

@@ -61,6 +61,9 @@ test('release manifest validation and 404 marker parsing reject loose input', ()
   assert.throws(() => validatePageBuildManifest({ ...manifest(), pages: {} }), /must not be empty/u);
   assert.throws(() => parseReleaseManifestDocument('no marker'), /marker/u);
   assert.throws(() => parseReleaseManifestDocument(`${probeDocument()}${probeDocument()}`), /marker/u);
+  assert.deepEqual(validatePageBuildManifest(manifest(latestBuild, latestRelease, 'method.pt-BR.html')).pages, { 'method.pt-BR.html': latestBuild });
+  assert.throws(() => validatePageBuildManifest(manifest(latestBuild, latestRelease, '../propose.html')), /invalid release manifest page/u);
+  assert.throws(() => validatePageBuildManifest(manifest(latestBuild, latestRelease, 'method.pt_BR.html')), /invalid release manifest page/u);
 });
 
 test('path-keyed release navigation preserves product query and fragment', () => {
@@ -72,6 +75,7 @@ test('path-keyed release navigation preserves product query and fragment', () =>
   assert.equal(target.hash, '#focus');
   assert.equal(cleanReleaseNavigationUrl(target.href, 'index.html'), 'https://commonworld.net/?project=debian#focus');
   assert.equal(cleanReleaseNavigationUrl(`https://commonworld.net/releases/${latestRelease}/method.de.html?x=1`, 'method.de.html'), 'https://commonworld.net/method.de.html?x=1');
+  assert.equal(cleanReleaseNavigationUrl(`https://commonworld.net/releases/${latestRelease}/method.pt-BR.html?x=1`, 'method.pt-BR.html'), 'https://commonworld.net/method.pt-BR.html?x=1');
 });
 
 test('stale page performs one path-bound replacement after announcing navigation', async () => {

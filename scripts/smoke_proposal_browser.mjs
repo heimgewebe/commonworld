@@ -32,7 +32,11 @@ await new Promise((resolve, reject) => { server.once('error', reject); server.li
 const address = server.address();
 if (!address || typeof address === 'string') throw new Error('proposal smoke server missing address');
 const baseUrl = `http://127.0.0.1:${address.port}`;
-const browser = await chromium.launch({ headless: true, executablePath: process.env.PLAYWRIGHT_CHROMIUM_EXECUTABLE_PATH || undefined });
+const browser = await chromium.launch({
+  headless: true,
+  executablePath: process.env.PLAYWRIGHT_CHROMIUM_EXECUTABLE_PATH || undefined,
+  args: ['--enable-unsafe-swiftshader'],
+});
 const results = [];
 
 async function fillValid(page, name = 'Browser Test Commons') {
@@ -48,6 +52,22 @@ async function fillValid(page, name = 'Browser Test Commons') {
   await page.getByLabel('I understand that the preferred GitHub intake path is public.').check();
   await page.getByLabel('I consent to editorial processing of the submitted information.').check();
   await page.getByLabel('I have not entered a private address, coordinates, email address, phone number, or private network or household information.').check();
+}
+
+async function fillCandidateValid(page, { name, description, region }) {
+  const form = page.locator('#commons-proposal-form');
+  await form.locator('[name="name"]').fill(name);
+  await form.locator('[name="description"]').fill(description);
+  await form.locator('[name="official_website"]').fill('https://example.net/commons');
+  await form.locator('[name="commons_type"]').selectOption('other');
+  await form.locator('[name="presence_geographic"]').check();
+  await form.locator('[name="presence_digital"]').check();
+  await form.locator('[name="region"]').fill(region);
+  await form.locator('[name="action_url_1"]').fill('https://example.net/commons/about');
+  await form.locator('[name="sources"]').fill('https://example.net/commons/governance');
+  await form.locator('[name="public_issue_acknowledged"]').check();
+  await form.locator('[name="processing_agreed"]').check();
+  await form.locator('[name="no_sensitive_data_confirmed"]').check();
 }
 
 for (const profile of [
@@ -138,7 +158,7 @@ html { font-size: ${profile.fontScale}% !important; }
   await page.getByLabel('Short description').fill(description);
   for (let attempt = 0; !releaseFirstProbe && attempt < 100; attempt += 1) await page.waitForTimeout(10);
   assert(typeof releaseFirstProbe === 'function', 'release-draft: initial path probe was not intercepted');
-  const navigated = page.waitForURL((url) => url.pathname === `/releases/${latestRelease}/propose.html`, { timeout: 5000 });
+  const navigated = page.waitForURL((url) => url.pathname === `/releases/${latestRelease}/propose.html`, { waitUntil: 'domcontentloaded', timeout: 10_000 });
   releaseFirstProbe();
   await navigated;
   await page.getByRole('heading', { name: 'Suggest a Commons' }).waitFor();
@@ -285,6 +305,87 @@ html { font-size: ${profile.fontScale}% !important; }
   assert(await page.getByRole('alert').isVisible(), 'privacy-invalid: error surface missing');
   assert((await page.getByRole('alert').textContent()).includes('no private address or coordinates'), 'privacy-invalid: fail-closed reason missing');
   results.push('privacy-fail-closed');
+  await context.close();
+}
+
+{
+  const context = await browser.newContext({ viewport: { width: 1280, height: 900 } });
+  const page = await context.newPage();
+  await page.goto(`${baseUrl}/propose.ar.html`, { waitUntil: 'networkidle' });
+  await page.locator('#commons-proposal-form [name="name"]').fill('مشاع اختبار الإحداثيات');
+  await page.locator('#commons-proposal-form [name="description"]').fill('مورد مشترك تديره جماعة محلية وفق قواعد مفتوحة ومصادر رسمية ومسار مشاركة عام موثّق.');
+  await page.locator('#commons-proposal-form [name="official_website"]').fill('https://example.net/commons');
+  await page.locator('#commons-proposal-form [name="commons_type"]').selectOption('other');
+  await page.locator('#commons-proposal-form [name="presence_geographic"]').check();
+  await page.locator('#commons-proposal-form [name="presence_digital"]').check();
+  await page.locator('#commons-proposal-form [name="region"]').fill('٢٥٫٢٠٤٨، ٥٥٫٢٧٠٨');
+  await page.locator('#commons-proposal-form [name="action_url_1"]').fill('https://example.net/commons/about');
+  await page.locator('#commons-proposal-form [name="sources"]').fill('https://example.net/commons/governance');
+  await page.locator('#commons-proposal-form [name="public_issue_acknowledged"]').check();
+  await page.locator('#commons-proposal-form [name="processing_agreed"]').check();
+  await page.locator('#commons-proposal-form [name="no_sensitive_data_confirmed"]').check();
+  await page.locator('#commons-proposal-form').evaluate((form) => form.requestSubmit());
+  const alert = page.getByRole('alert');
+  await alert.waitFor();
+  const nativeCoordinateError = (await alert.textContent()) ?? '';
+  assert(nativeCoordinateError.includes('إحداثيات'), `privacy-native-arabic: native coordinates were not blocked: ${nativeCoordinateError}`);
+  results.push('privacy-native-arabic-coordinates-fail-closed');
+  await context.close();
+}
+
+{
+  const context = await browser.newContext({ viewport: { width: 1280, height: 900 } });
+  const page = await context.newPage();
+  await page.goto(`${baseUrl}/propose.ar.html`, { waitUntil: 'networkidle' });
+  await fillCandidateValid(page, {
+    name: 'مشاع اختبار الهاتف',
+    description: 'مورد مشترك تديره جماعة محلية وفق قواعد مفتوحة. رقم التواصل الخاص هو +٩٧١ ٥٠ ١٢٣ ٤٥٦٧ ويجب حجبه.',
+    region: 'دبي',
+  });
+  await page.locator('#commons-proposal-form').evaluate((form) => form.requestSubmit());
+  const alert = page.getByRole('alert');
+  await alert.waitFor();
+  const error = (await alert.textContent()) ?? '';
+  assert(error.includes('هاتف'), `privacy-native-arabic-phone: native-digit phone number was not blocked: ${error}`);
+  results.push('privacy-native-arabic-phone-fail-closed');
+  await context.close();
+}
+
+{
+  const context = await browser.newContext({ viewport: { width: 1280, height: 900 } });
+  const page = await context.newPage();
+  await page.goto(`${baseUrl}/propose.es.html`, { waitUntil: 'networkidle' });
+  await fillCandidateValid(page, {
+    name: 'Común de prueba de dirección',
+    description: 'Recurso compartido administrado por una comunidad con reglas abiertas, fuentes oficiales y participación pública comprobable.',
+    region: 'Calle Mayor, nº 12, Madrid',
+  });
+  await page.locator('#commons-proposal-form').evaluate((form) => form.requestSubmit());
+  const alert = page.getByRole('alert');
+  await alert.waitFor();
+  const error = (await alert.textContent()) ?? '';
+  assert(/direcci|coordenad/iu.test(error), `privacy-spanish-number-marker: localized address marker was not blocked: ${error}`);
+  results.push('privacy-spanish-number-marker-fail-closed');
+  await context.close();
+}
+
+{
+  const context = await browser.newContext({ viewport: { width: 1280, height: 900 } });
+  const page = await context.newPage();
+  await page.goto(`${baseUrl}/propose.ar.html`, { waitUntil: 'networkidle' });
+  await fillCandidateValid(page, {
+    name: 'ا',
+    description: 'مورد مشترك تديره جماعة محلية وفق قواعد مفتوحة ومصادر رسمية ومسار مشاركة عام موثّق.',
+    region: 'د',
+  });
+  await page.locator('#commons-proposal-form').evaluate((form) => form.requestSubmit());
+  const alert = page.getByRole('alert');
+  await alert.waitFor();
+  const error = (await alert.textContent()) ?? '';
+  assert(error.includes('الاسم:'), `candidate-field-labels: Arabic Name prefix missing: ${error}`);
+  assert(error.includes('المنطقة:'), `candidate-field-labels: Arabic Region prefix missing: ${error}`);
+  assert(!error.includes('Name:') && !error.includes('Region:'), `candidate-field-labels: English field prefix leaked: ${error}`);
+  results.push('candidate-field-labels-localized');
   await context.close();
 }
 

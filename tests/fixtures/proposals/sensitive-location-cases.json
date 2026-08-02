@@ -49,6 +49,106 @@
     {
       "id": "dms-semicolon-separated",
       "value": "52°31′12″N; 13°24′36″E"
+    },
+    {
+      "id": "fr-chemin",
+      "value": "Chemin des Lilas 8, Lyon"
+    },
+    {
+      "id": "es-avenida",
+      "value": "Avenida de la Constitución 15, Sevilla"
+    },
+    {
+      "id": "pt-br-rua",
+      "value": "Rua das Flores 123, Recife"
+    },
+    {
+      "id": "pt-br-number-leading",
+      "value": "45 Avenida Paulista, São Paulo"
+    },
+    {
+      "id": "ar-street-ascii-digits",
+      "value": "شارع النيل 12، القاهرة"
+    },
+    {
+      "id": "ar-street-arabic-digits",
+      "value": "شارع التحرير ١٢، القاهرة"
+    },
+    {
+      "id": "ar-number-leading",
+      "value": "١٢ شارع النيل، القاهرة"
+    },
+    {
+      "id": "pt-coordinate-label",
+      "value": "Coordenadas disponíveis mediante solicitação"
+    },
+    {
+      "id": "fr-coordinate-label",
+      "value": "Coordonnées disponibles sur demande"
+    },
+    {
+      "id": "ar-coordinate-label",
+      "value": "الإحداثيات متاحة عند الطلب"
+    },
+    {
+      "id": "pt-br-r-abbreviation",
+      "value": "R. das Flores, 123, Recife"
+    },
+    {
+      "id": "pt-br-av-abbreviation",
+      "value": "Av. Paulista, 45, São Paulo"
+    },
+    {
+      "id": "pt-br-trav-abbreviation",
+      "value": "Trav. da Paz, 7, Salvador"
+    },
+    {
+      "id": "fr-bd-abbreviation",
+      "value": "12 bd Saint-Michel, Paris"
+    },
+    {
+      "id": "es-c-slash-abbreviation",
+      "value": "C/ Mayor, 12, Madrid"
+    },
+    {
+      "id": "es-c-dot-abbreviation",
+      "value": "C. Mayor, 12, Madrid"
+    },
+    {
+      "id": "ar-decimal-coordinates-ascii-punctuation",
+      "value": "٢٥.٢٠٤٨, ٥٥.٢٧٠٨"
+    },
+    {
+      "id": "ar-decimal-coordinates-native-punctuation",
+      "value": "٢٥٫٢٠٤٨، ٥٥٫٢٧٠٨"
+    },
+    {
+      "id": "fa-decimal-coordinates-native-punctuation",
+      "value": "۲۵٫۲۰۴۸، ۵۵٫۲۷۰۸"
+    },
+    {
+      "id": "es-number-marker-n-ordinal",
+      "value": "Calle Mayor, nº 12, Madrid"
+    },
+    {
+      "id": "pt-number-marker-n-ordinal",
+      "value": "Rua das Flores, nº 123, Recife"
+    },
+    {
+      "id": "es-number-marker-degree",
+      "value": "Calle Mayor, n° 12, Madrid"
+    },
+    {
+      "id": "pt-number-marker-num",
+      "value": "Rua das Flores, núm. 123, Recife"
+    },
+    {
+      "id": "es-number-marker-dot-ordinal",
+      "value": "Calle Mayor, n.º 12, Madrid"
+    },
+    {
+      "id": "pt-number-marker-dot-ordinal-compact",
+      "value": "Rua das Flores, n.º123, Recife"
     }
   ],
   "allowed": [
@@ -99,6 +199,54 @@
     {
       "id": "roof-domain-term",
       "value": "The cooperative installs solar panels on shared roof areas."
+    },
+    {
+      "id": "pt-broad-region",
+      "value": "Nordeste do Brasil e região metropolitana do Recife"
+    },
+    {
+      "id": "ar-broad-region",
+      "value": "شمال مصر ومنطقة القاهرة الكبرى"
+    },
+    {
+      "id": "pt-street-word-without-number",
+      "value": "Arte de rua e cultura do espaço público em Recife"
+    },
+    {
+      "id": "ar-street-word-without-number",
+      "value": "فن الشارع والثقافة العامة في القاهرة"
+    },
+    {
+      "id": "pt-r-abbreviation-without-number",
+      "value": "A rede usa a classificação R. em sua documentação pública."
+    },
+    {
+      "id": "pt-av-abbreviation-without-number",
+      "value": "O projeto atua na Av. cultural da cidade sem publicar endereços."
+    },
+    {
+      "id": "fr-bd-without-house-number",
+      "value": "Le projet documente le bd culturel sans publier une adresse."
+    },
+    {
+      "id": "es-c-slash-without-house-number",
+      "value": "La guía usa C/ como abreviatura editorial, sin dirección privada."
+    },
+    {
+      "id": "es-c-dot-without-house-number",
+      "value": "La guía usa C. como abreviatura editorial, sin dirección privada."
+    },
+    {
+      "id": "ar-unrelated-numbers",
+      "value": "منذ ٢٠١٢ تعمل ٣٥ مجموعة في ثلاث مناطق."
+    },
+    {
+      "id": "es-number-marker-without-house-number",
+      "value": "La guía usa la abreviatura nº para identificar entradas."
+    },
+    {
+      "id": "pt-number-marker-without-street",
+      "value": "O registro nº 123 descreve uma rede comunitária."
     }
   ]
 }

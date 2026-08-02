@@ -19,7 +19,11 @@
       "geolocation_must_not_influence_locale": true,
       "explicit_surface_must_resist_stored_override": true,
       "preserve_query_and_fragment": true
-    }
+    },
+    "baseline_locales": [
+      "en",
+      "de"
+    ]
   },
   "tag_policy": {
     "standard": "BCP 47",
@@ -64,28 +68,52 @@
       "english_name": "German"
     },
     "es": {
-      "status": "planned",
+      "status": "candidate",
       "direction": "ltr",
       "native_name": "Español",
-      "english_name": "Spanish"
+      "english_name": "Spanish",
+      "surface_files": {
+        "index": "es.html",
+        "method": "method.es.html",
+        "proposal": "propose.es.html"
+      },
+      "candidate_evidence_path": "docs/evidence/locale-candidates/es.json"
     },
     "fr": {
-      "status": "planned",
+      "status": "candidate",
       "direction": "ltr",
       "native_name": "Français",
-      "english_name": "French"
+      "english_name": "French",
+      "surface_files": {
+        "index": "fr.html",
+        "method": "method.fr.html",
+        "proposal": "propose.fr.html"
+      },
+      "candidate_evidence_path": "docs/evidence/locale-candidates/fr.json"
     },
     "pt-BR": {
-      "status": "planned",
+      "status": "candidate",
       "direction": "ltr",
       "native_name": "Português (Brasil)",
-      "english_name": "Brazilian Portuguese"
+      "english_name": "Brazilian Portuguese",
+      "surface_files": {
+        "index": "pt-BR.html",
+        "method": "method.pt-BR.html",
+        "proposal": "propose.pt-BR.html"
+      },
+      "candidate_evidence_path": "docs/evidence/locale-candidates/pt-BR.json"
     },
     "ar": {
-      "status": "planned",
+      "status": "candidate",
       "direction": "rtl",
       "native_name": "العربية",
-      "english_name": "Arabic"
+      "english_name": "Arabic",
+      "surface_files": {
+        "index": "ar.html",
+        "method": "method.ar.html",
+        "proposal": "propose.ar.html"
+      },
+      "candidate_evidence_path": "docs/evidence/locale-candidates/ar.json"
     },
     "zh-Hans": {
       "status": "planned",
@@ -127,7 +155,9 @@
     ],
     "promotion_is_evidence_bound": true,
     "wave_order_may_follow_observed_demand": true,
-    "planned_locales_must_not_be_selectable": true
+    "planned_locales_must_not_be_selectable": true,
+    "candidate_locales_must_not_be_selectable": true,
+    "candidate_surfaces_must_be_noindex": true
   },
   "release_gate": {
     "required_surfaces": [
@@ -158,5 +188,24 @@
     "Publishing partially translated interface locales",
     "Restricting catalog content languages to released interface locales",
     "Treating machine translation as final editorial review"
-  ]
+  ],
+  "release_evidence": {
+    "baseline_locales_may_precede_digest_receipts": true,
+    "required_for_non_baseline_release": true,
+    "path_template": "docs/evidence/locale-releases/{locale}.json",
+    "digest_algorithm": "sha256",
+    "required_receipts": [
+      "independent_language_review",
+      "keyboard_and_screen_reader_review",
+      "browser_smoke",
+      "state_preservation_smoke"
+    ],
+    "rtl_additional_receipts": [
+      "directional_layout_review",
+      "mixed_script_review"
+    ],
+    "candidate_evidence_path_template": "docs/evidence/locale-candidates/{locale}.json",
+    "candidate_evidence_is_not_release_evidence": true,
+    "registry_pointer_field": "release_evidence"
+  }
 }
