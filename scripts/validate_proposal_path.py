@@ -26,13 +26,20 @@ REJECTION_CODES = {
     "commercial_listing_only", "project_inactive", "action_claim_unverified", "out_of_scope",
 }
 EXPECTED_STATUSES = {"submitted", "needs_information", "under_review", "accepted", "rejected", "withdrawn", "published", "superseded"}
-SENSITIVE_CONTEXT_PATTERN = re.compile(r"(?:^|[^\w])(?:latitude|longitude|coordinates?|coordonnées?|coordenadas?|gps|الإحداثيات|احداثيات|خط\s+العرض|خط\s+الطول)(?=$|[^\w])", re.I)
+SENSITIVE_CONTEXT_PATTERN = re.compile(r"(?:^|[^\w])(?:latitude|longitude|gps(?:\s+coordinates?)?|coordonnées?|coordenadas?|الإحداثيات|احداثيات|خط\s+العرض|خط\s+الطول)(?=$|[^\w])", re.I)
 # Python's Unicode regex mode makes \d cover every Unicode decimal digit.
 # Keep the reusable atom explicit so coordinate and address checks remain in parity with JS \p{Nd}.
 UNICODE_DECIMAL_DIGIT = r"(?u:\d)"
 DECIMAL_POINT_COORDINATE_PATTERN = re.compile(rf"(?:^|[^\d])[-+]?{UNICODE_DECIMAL_DIGIT}{{1,3}}[.\u066B]{UNICODE_DECIMAL_DIGIT}{{3,}}\s*[,،;/ ]\s*[-+]?{UNICODE_DECIMAL_DIGIT}{{1,3}}[.\u066B]{UNICODE_DECIMAL_DIGIT}{{3,}}(?:[^\d]|$)")
 DECIMAL_COMMA_COORDINATE_PATTERN = re.compile(rf"(?:^|[^\d])[-+]?{UNICODE_DECIMAL_DIGIT}{{1,3}},{UNICODE_DECIMAL_DIGIT}{{3,}}\s*[;/،]\s*[-+]?{UNICODE_DECIMAL_DIGIT}{{1,3}},{UNICODE_DECIMAL_DIGIT}{{3,}}(?:[^\d]|$)")
-DMS_COORDINATE_PATTERN = re.compile(rf"{UNICODE_DECIMAL_DIGIT}{{1,3}}\s*°\s*{UNICODE_DECIMAL_DIGIT}{{1,2}}\s*[′']\s*{UNICODE_DECIMAL_DIGIT}{{1,2}}(?:[.,\u066B]{UNICODE_DECIMAL_DIGIT}+)?\s*(?:[″\"]|[′']{{2}})\s*[NS](?:\s*[,،;]\s*|\s+){UNICODE_DECIMAL_DIGIT}{{1,3}}\s*°\s*{UNICODE_DECIMAL_DIGIT}{{1,2}}\s*[′']\s*{UNICODE_DECIMAL_DIGIT}{{1,2}}(?:[.,\u066B]{UNICODE_DECIMAL_DIGIT}+)?\s*(?:[″\"]|[′']{{2}})\s*[EW]", re.I)
+DMS_COMPONENT = rf"{UNICODE_DECIMAL_DIGIT}{{1,3}}\s*°\s*{UNICODE_DECIMAL_DIGIT}{{1,2}}\s*[′'’]\s*{UNICODE_DECIMAL_DIGIT}{{1,2}}(?:[.,\u066B]{UNICODE_DECIMAL_DIGIT}+)?\s*(?:[″\"“”]|[′'’]{{2}})"
+DMS_LATITUDE_DIRECTION = r"(?:N|S|north|south|nord|sud|norte|sur|sul|شمال|جنوب)"
+DMS_LONGITUDE_DIRECTION = r"(?:E|W|O|east|west|est|ouest|este|oeste|leste|شرق|غرب)"
+DMS_PAIR_SEPARATOR = r"(?:\s*[,،;]\s*|\s+)"
+DMS_COORDINATE_PATTERN = re.compile(
+    rf"{DMS_COMPONENT}(?:\s*{DMS_LATITUDE_DIRECTION})?{DMS_PAIR_SEPARATOR}{DMS_COMPONENT}(?:\s*{DMS_LONGITUDE_DIRECTION})?",
+    re.I,
+)
 LETTER_OR_MARK = r"(?:[^\W\d_]|[\u0300-\u036f\u1ab0-\u1aff\u1dc0-\u1dff\u20d0-\u20ff\ufe20-\ufe2f])"
 WORD = rf"{LETTER_OR_MARK}(?:{LETTER_OR_MARK}|['’.-])*"
 HOUSE_NUMBER = rf"{UNICODE_DECIMAL_DIGIT}{{1,5}}[a-z]?(?:[-/]{UNICODE_DECIMAL_DIGIT}{{1,5}}[a-z]?)?"

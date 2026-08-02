@@ -149,6 +149,30 @@
     {
       "id": "pt-number-marker-dot-ordinal-compact",
       "value": "Rua das Flores, n.º123, Recife"
+    },
+    {
+      "id": "ar-dms-native-directions",
+      "value": "٤٨° ٨′ ٠″ شمال، ١١° ٣٤′ ٠″ شرق"
+    },
+    {
+      "id": "fa-dms-native-digits",
+      "value": "۴۸° ۸′ ۰″ شمال، ۱۱° ۳۴′ ۰″ شرق"
+    },
+    {
+      "id": "fr-dms-words",
+      "value": "48° 8′ 0″ Nord, 11° 34′ 0″ Est"
+    },
+    {
+      "id": "es-dms-west-o",
+      "value": "48° 8′ 0″ N, 11° 34′ 0″ O"
+    },
+    {
+      "id": "pt-dms-words",
+      "value": "48° 8′ 0″ Norte, 11° 34′ 0″ Leste"
+    },
+    {
+      "id": "directionless-dms",
+      "value": "48° 8′ 0″, 11° 34′ 0″"
     }
   ],
   "allowed": [
@@ -247,6 +271,10 @@
     {
       "id": "pt-number-marker-without-street",
       "value": "O registro nº 123 descreve uma rede comunitária."
+    },
+    {
+      "id": "coordinate-verb",
+      "value": "The network coordinates community repair groups across three regions."
     }
   ]
 }
