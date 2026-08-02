@@ -76,6 +76,7 @@ jobs:
           import json
           from pathlib import Path
 
+          from scripts.evaluate_catalog_browser_measurements import build_decision_evidence
           from scripts.measure_catalog_delivery import measure
 
           root = Path('.').resolve()
@@ -88,62 +89,27 @@ jobs:
           measurement = json.loads(measurement_path.read_text(encoding='utf-8'))
           budget_contract = json.loads(budget_path.read_text(encoding='utf-8'))
           budgets = budget_contract['budgets']
-          profiles = measurement['profiles']
+          decision, decision_errors = build_decision_evidence(
+              [measurement],
+              budgets,
+              budget_contract_sha256=hashlib.sha256(budget_path.read_bytes()).hexdigest(),
+          )
+          if decision_errors or decision is None:
+              raise SystemExit('browser decision generation failed: ' + ' | '.join(decision_errors))
+          if decision['decision'] != 'pass':
+              raise SystemExit(f"browser decision is not a terminal pass: {decision['decision']}")
 
-          breaches = []
-          checks = {
-              'project_json_request_count': 'max_startup_project_json_requests',
-              'dom_node_count': 'max_browser_dom_nodes',
-              'runtime_ready_ms': 'max_runtime_ready_ms_at_4x_cpu',
-              'script_duration_ms': 'max_script_duration_ms_at_4x_cpu',
-              'task_duration_ms': 'max_task_duration_ms_at_4x_cpu',
-          }
-          for profile in profiles:
-              name = profile['profile']
-              for metric, budget_key in checks.items():
-                  if profile[metric] > budgets[budget_key]:
-                      breaches.append(f'{name}:{metric}={profile[metric]}>{budgets[budget_key]}')
-              p95 = profile['bootstrap_compile']['p95_ms']
-              if p95 > budgets['max_bootstrap_compile_p95_ms_at_4x_cpu']:
-                  breaches.append(f'{name}:bootstrap_compile_p95_ms={p95}>{budgets["max_bootstrap_compile_p95_ms_at_4x_cpu"]}')
-              if profile.get('runtime_ready') is not True or profile.get('runtime_failed') is not False:
-                  breaches.append(f'{name}:runtime-not-healthy')
-          surface_hashes = {profile['first_party_surface_sha256'] for profile in profiles}
-          if len(surface_hashes) != 1:
-              breaches.append(f'profile-surface-hash-mismatch:{sorted(surface_hashes)}')
-          if breaches:
-              raise SystemExit('catalogue delivery measurement breached gates: ' + ' | '.join(breaches))
-          surface_hash = next(iter(surface_hashes))
-
+          profiles = decision['profiles']
+          surface_hash = decision['first_party_surface_sha256']
           static = measure(root)
-          optimized = benchmark['optimized']
-          optimized['static'] = static
-          browser = optimized['browser']
-          browser.update({
-              'decision': 'pass',
-              'gate_verdict': 'pass',
-              'decision_reason': 'Fresh post-fix representative measurement passed every bound startup budget; post-ready CPU remains diagnostic evidence.',
-              'architecture_review_required': False,
-              'cpu_throttle_rate': measurement['cpu_throttle_rate'],
-              'budget_contract_sha256': hashlib.sha256(budget_path.read_bytes()).hexdigest(),
-              'first_party_surface_sha256': surface_hash,
-              'attempt_count': 1,
-              'attempts': [{
-                  'attempt': 1,
-                  'verdict': 'pass',
-                  'measurement_sha256': hashlib.sha256(measurement_path.read_bytes()).hexdigest(),
-                  'breaches': [],
-                  'measurement': measurement,
-              }],
-              'selected_attempt': 1,
-              'profiles': profiles,
-          })
-
+          benchmark['optimized']['static'] = static
+          benchmark['optimized']['browser'] = decision
           benchmark['budget_binding'] = {
               'bootstrap_gzip_bytes': static['bootstrap']['gzip_bytes'],
               'warn_bootstrap_gzip_bytes': budgets['warn_bootstrap_gzip_bytes'],
               'max_bootstrap_gzip_bytes': budgets['max_bootstrap_gzip_bytes'],
           }
+
           baseline_static = benchmark['baseline']['static']
           baseline_browser_profiles = {
               profile['profile']: profile
