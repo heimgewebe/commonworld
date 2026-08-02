@@ -67,6 +67,118 @@ jobs:
         run: npx playwright install --with-deps chromium
       - name: Rebuild deterministic public runtime
         run: npm run build
+      - name: Measure release-bound catalogue delivery
+        run: npm run measure:catalog-browser -- --output /tmp/catalog-browser.json
+      - name: Refresh catalogue delivery evidence
+        run: |
+          python3 - <<'PY'
+          import hashlib
+          import json
+          from pathlib import Path
+
+          from scripts.measure_catalog_delivery import measure
+
+          root = Path('.').resolve()
+          benchmark_path = Path('docs/evidence/catalog-delivery-benchmark-v1.json')
+          smoke_path = Path('docs/evidence/catalog-delivery-public-browser-smoke-v1.json')
+          budget_path = Path('contracts/commonworld/catalog-delivery-budget.contract.json')
+          measurement_path = Path('/tmp/catalog-browser.json')
+
+          benchmark = json.loads(benchmark_path.read_text(encoding='utf-8'))
+          measurement = json.loads(measurement_path.read_text(encoding='utf-8'))
+          budget_contract = json.loads(budget_path.read_text(encoding='utf-8'))
+          budgets = budget_contract['budgets']
+          profiles = measurement['profiles']
+
+          breaches = []
+          checks = {
+              'project_json_request_count': 'max_startup_project_json_requests',
+              'dom_node_count': 'max_browser_dom_nodes',
+              'runtime_ready_ms': 'max_runtime_ready_ms_at_4x_cpu',
+              'script_duration_ms': 'max_script_duration_ms_at_4x_cpu',
+              'task_duration_ms': 'max_task_duration_ms_at_4x_cpu',
+          }
+          for profile in profiles:
+              name = profile['profile']
+              for metric, budget_key in checks.items():
+                  if profile[metric] > budgets[budget_key]:
+                      breaches.append(f'{name}:{metric}={profile[metric]}>{budgets[budget_key]}')
+              p95 = profile['bootstrap_compile']['p95_ms']
+              if p95 > budgets['max_bootstrap_compile_p95_ms_at_4x_cpu']:
+                  breaches.append(f'{name}:bootstrap_compile_p95_ms={p95}>{budgets["max_bootstrap_compile_p95_ms_at_4x_cpu"]}')
+              if profile.get('runtime_ready') is not True or profile.get('runtime_failed') is not False:
+                  breaches.append(f'{name}:runtime-not-healthy')
+          surface_hashes = {profile['first_party_surface_sha256'] for profile in profiles}
+          if len(surface_hashes) != 1:
+              breaches.append(f'profile-surface-hash-mismatch:{sorted(surface_hashes)}')
+          if breaches:
+              raise SystemExit('catalogue delivery measurement breached gates: ' + ' | '.join(breaches))
+          surface_hash = next(iter(surface_hashes))
+
+          static = measure(root)
+          optimized = benchmark['optimized']
+          optimized['static'] = static
+          browser = optimized['browser']
+          browser.update({
+              'decision': 'pass',
+              'gate_verdict': 'pass',
+              'decision_reason': 'Fresh post-fix representative measurement passed every bound startup budget; post-ready CPU remains diagnostic evidence.',
+              'architecture_review_required': False,
+              'cpu_throttle_rate': measurement['cpu_throttle_rate'],
+              'budget_contract_sha256': hashlib.sha256(budget_path.read_bytes()).hexdigest(),
+              'first_party_surface_sha256': surface_hash,
+              'attempt_count': 1,
+              'attempts': [{
+                  'attempt': 1,
+                  'verdict': 'pass',
+                  'measurement_sha256': hashlib.sha256(measurement_path.read_bytes()).hexdigest(),
+                  'breaches': [],
+                  'measurement': measurement,
+              }],
+              'selected_attempt': 1,
+              'profiles': profiles,
+          })
+
+          benchmark['budget_binding'] = {
+              'bootstrap_gzip_bytes': static['bootstrap']['gzip_bytes'],
+              'warn_bootstrap_gzip_bytes': budgets['warn_bootstrap_gzip_bytes'],
+              'max_bootstrap_gzip_bytes': budgets['max_bootstrap_gzip_bytes'],
+          }
+          baseline_static = benchmark['baseline']['static']
+          baseline_browser_profiles = {
+              profile['profile']: profile
+              for profile in benchmark['baseline']['browser']['profiles']
+          }
+          optimized_browser_profiles = {profile['profile']: profile for profile in profiles}
+          delta = benchmark['delta']
+          delta.update({
+              'startup_project_json_requests': static['runtime_verification_fetch']['project_request_count'] - baseline_static['runtime_verification_fetch']['project_request_count'],
+              'duplicate_identity_payload_count': static['runtime_verification_fetch']['duplicate_identity_payload_count'] - baseline_static['runtime_verification_fetch']['duplicate_identity_payload_count'],
+              'catalog_initial_raw_bytes': static['catalog_initial_delivery']['raw_bytes'] - baseline_static['catalog_initial_delivery']['raw_bytes'],
+              'catalog_initial_gzip_bytes': static['catalog_initial_delivery']['gzip_bytes'] - baseline_static['catalog_initial_delivery']['gzip_bytes'],
+              'first_party_request_count_by_profile': {
+                  name: optimized_browser_profiles[name]['first_party_request_count'] - profile['first_party_request_count']
+                  for name, profile in baseline_browser_profiles.items()
+              },
+              'browser_dom_nodes_by_profile': {
+                  name: optimized_browser_profiles[name]['dom_node_count'] - profile['dom_node_count']
+                  for name, profile in baseline_browser_profiles.items()
+              },
+          })
+          delta['catalog_initial_raw_reduction_percent'] = round(
+              (-delta['catalog_initial_raw_bytes'] / baseline_static['catalog_initial_delivery']['raw_bytes']) * 100,
+              1,
+          )
+          delta['catalog_initial_gzip_reduction_percent'] = round(
+              (-delta['catalog_initial_gzip_bytes'] / baseline_static['catalog_initial_delivery']['gzip_bytes']) * 100,
+              1,
+          )
+          benchmark_path.write_text(json.dumps(benchmark, ensure_ascii=False, indent=2) + '\n', encoding='utf-8')
+
+          smoke = json.loads(smoke_path.read_text(encoding='utf-8'))
+          smoke['binding']['first_party_surface_sha256'] = surface_hash
+          smoke_path.write_text(json.dumps(smoke, ensure_ascii=False, indent=2) + '\n', encoding='utf-8')
+          PY
       - name: Install validation dependencies
         run: python -m pip install -r requirements-dev.txt
       - name: Validate canonical contracts and tests
