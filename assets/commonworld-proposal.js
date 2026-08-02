@@ -6,7 +6,7 @@ const ACTIVE_LOCALE = normalizeKnownLocale(
 );
 let candidateRuntimeMessages = null;
 if (CANDIDATE_LOCALES.includes(ACTIVE_LOCALE)) {
-  const { WAVE1_LOCALE_PACKS } = await import('./commonworld-wave1-locales.mjs?v=690bf50164c5');
+  const { WAVE1_LOCALE_PACKS } = await import('./commonworld-wave1-locales.mjs?v=8fdd68f1e579');
   candidateRuntimeMessages = WAVE1_LOCALE_PACKS[ACTIVE_LOCALE]?.proposal_runtime ?? null;
   if (!candidateRuntimeMessages) throw new Error(`missing proposal runtime locale pack: ${ACTIVE_LOCALE}`);
 }
@@ -38,10 +38,17 @@ const RELEASE_DRAFT_KEY = "commonworldProposalReleaseDraftV1";
 const RELEASE_DRAFT_MAX_AGE_MS = 5 * 60_000;
 const ACTION_TYPES = new Set(["visit", "use", "borrow", "learn", "contribute", "volunteer", "donate", "contact", "replicate"]);
 const COMMONS_TYPES = new Set(["knowledge", "software", "culture", "food-seeds", "water", "energy", "housing-land", "health-care", "tools-repair", "community-network", "other"]);
-const SENSITIVE_CONTEXT_PATTERN = /(?:^|[^\p{L}\p{N}])(?:latitude|longitude|coordinates?|coordonnées?|coordenadas?|gps|الإحداثيات|احداثيات|خط\s+العرض|خط\s+الطول)(?=$|[^\p{L}\p{N}])/iu;
+const SENSITIVE_CONTEXT_PATTERN = /(?:^|[^\p{L}\p{N}])(?:latitude|longitude|gps(?:\s+coordinates?)?|coordonnées?|coordenadas?|الإحداثيات|احداثيات|خط\s+العرض|خط\s+الطول)(?=$|[^\p{L}\p{N}])/iu;
 const DECIMAL_POINT_COORDINATE_PATTERN = /(?:^|[^\p{Nd}])[-+]?\p{Nd}{1,3}[.\u066B]\p{Nd}{3,}\s*[,،;/ ]\s*[-+]?\p{Nd}{1,3}[.\u066B]\p{Nd}{3,}(?:[^\p{Nd}]|$)/u;
 const DECIMAL_COMMA_COORDINATE_PATTERN = /(?:^|[^\p{Nd}])[-+]?\p{Nd}{1,3},\p{Nd}{3,}\s*[;/،]\s*[-+]?\p{Nd}{1,3},\p{Nd}{3,}(?:[^\p{Nd}]|$)/u;
-const DMS_COORDINATE_PATTERN = /\p{Nd}{1,3}\s*°\s*\p{Nd}{1,2}\s*[′']\s*\p{Nd}{1,2}(?:[.,\u066B]\p{Nd}+)?\s*(?:[″"]|[′']{2})\s*[NS](?:\s*[,،;]\s*|\s+)\p{Nd}{1,3}\s*°\s*\p{Nd}{1,2}\s*[′']\s*\p{Nd}{1,2}(?:[.,\u066B]\p{Nd}+)?\s*(?:[″"]|[′']{2})\s*[EW]/iu;
+const DMS_COMPONENT = String.raw`\p{Nd}{1,3}\s*°\s*\p{Nd}{1,2}\s*[′'’]\s*\p{Nd}{1,2}(?:[.,\u066B]\p{Nd}+)?\s*(?:[″"“”]|[′'’]{2})`;
+const DMS_LATITUDE_DIRECTION = String.raw`(?:N|S|north|south|nord|sud|norte|sur|sul|شمال|جنوب)`;
+const DMS_LONGITUDE_DIRECTION = String.raw`(?:E|W|O|east|west|est|ouest|este|oeste|leste|شرق|غرب)`;
+const DMS_PAIR_SEPARATOR = String.raw`(?:\s*[,،;]\s*|\s+)`;
+const DMS_COORDINATE_PATTERN = new RegExp(
+  String.raw`${DMS_COMPONENT}(?:\s*${DMS_LATITUDE_DIRECTION})?${DMS_PAIR_SEPARATOR}${DMS_COMPONENT}(?:\s*${DMS_LONGITUDE_DIRECTION})?`,
+  'iu',
+);
 const WORD = String.raw`[\p{L}\p{M}][\p{L}\p{M}'’.-]*`;
 const HOUSE_NUMBER = String.raw`\p{Nd}{1,5}[A-Za-z]?(?:[-/]\p{Nd}{1,5}[A-Za-z]?)?`;
 const HOUSE_NUMBER_MARKER = String.raw`(?:n(?:[º°o]\.?|\.[º°o])|núm\.?|num\.?|número|numero)`;
@@ -213,9 +220,9 @@ export function buildIssueBody(proposal) {
     tr("> Dieser Vorschlag ist ein redaktioneller Kandidat. Er wird nicht automatisch veröffentlicht.", "> This suggestion is an editorial candidate. It is not published automatically."),
     "",
     `**${tr("Vorschlags-ID", "Suggestion ID")}:** \`${proposal.proposal_id}\``,
-    `**Name:** ${markdown(project.name)}`,
+    `**${tr("Name", "Name")}:** ${markdown(project.name)}`,
     `**${tr("Commons-Art", "Commons type")}:** ${markdown(project.commons_type)}`,
-    `**${tr("Präsenz", "Presence")}:** ${project.presence_geographic && project.presence_digital ? tr('Vor Ort und Digital', 'On site and Digital') : (project.presence_geographic ? tr('Geografisch (Vor Ort)', 'Geographic (On site)') : 'Digital')}`,
+    `**${tr("Präsenz", "Presence")}:** ${project.presence_geographic && project.presence_digital ? tr('Vor Ort und Digital', 'On site and Digital') : (project.presence_geographic ? tr('Geografisch (Vor Ort)', 'Geographic (On site)') : tr('Digital', 'Digital'))}`,
     `**${tr("Grobe Region", "Broad region")}:** ${project.presence_geographic ? markdown(project.region) : tr("nicht zutreffend (nur digital)", "not applicable (digital only)")}`,
     `**${tr("Offizielle Website", "Official website")}:** ${project.official_website}`,
     `**${tr("Möglicherweise sensible Orte", "Potentially sensitive locations")}:** ${project.sensitive_location_risk ? tr("ja – redaktionell besonders prüfen", "yes — apply especially strict editorial review") : tr("nein angegeben", "none indicated")}`,

@@ -32,7 +32,7 @@ const runtimeDocumentLocale = canonicalLocaleTag(globalThis.document?.documentEl
 const nodeRuntime = typeof process !== 'undefined' && Boolean(process?.versions?.node);
 let WAVE1_LOCALE_PACKS = Object.freeze({});
 if (nodeRuntime || (runtimeDocumentLocale && CANDIDATE_LOCALES.includes(runtimeDocumentLocale))) {
-  ({ WAVE1_LOCALE_PACKS } = await import('./commonworld-wave1-locales.mjs?v=690bf50164c5'));
+  ({ WAVE1_LOCALE_PACKS } = await import('./commonworld-wave1-locales.mjs?v=8fdd68f1e579'));
 }
 
 export function normalizeLocale(value, fallback = DEFAULT_LOCALE) {
@@ -464,18 +464,24 @@ function englishTranslationSearchAlias(record, translation = {}) {
   ].filter(Boolean).join(' ');
 }
 
-function localizeLink(link, locale) {
+function localizeLink(link, locale, contentLocale) {
   const normalized = normalizeLocale(locale);
-  if (normalized === 'de') return link;
   const type = String(link?.type ?? '');
-  return ACTION_LABEL_KEYS[type] ? { ...link, label: actionLabel(type, normalized) } : link;
+  if (ACTION_LABEL_KEYS[type]) {
+    return { ...link, label: actionLabel(type, normalized), _label_locale: normalized };
+  }
+  return contentLocale ? { ...link, _label_locale: contentLocale } : link;
 }
 
 function localizeSource(source, contentLocale, index) {
   if (contentLocale !== 'en') return source;
   const host = hostLabel(source?.url ?? '');
   const canonicalLabel = String(source?.label ?? '').trim();
-  return { ...source, label: canonicalLabel ? `${canonicalLabel} · ${host}` : `${text('en', 'source', 'Quelle')} ${index + 1} · ${host}` };
+  return {
+    ...source,
+    label: canonicalLabel ? `${canonicalLabel} · ${host}` : `${text('en', 'source', 'Quelle')} ${index + 1} · ${host}`,
+    _label_locale: 'en',
+  };
 }
 
 export function localizeCatalogRecords(records, locale = DEFAULT_LOCALE) {
@@ -488,7 +494,20 @@ export function localizeCatalogRecords(records, locale = DEFAULT_LOCALE) {
       record.id,
       englishTranslationSearchAlias(record, translations[record?.id] ?? {}),
     ]));
-    return Object.freeze({ records: sourceRecords, searchAliasesById });
+    const localized = sourceRecords.map((record) => ({
+      ...record,
+      _content_locale: contentLocale,
+      links: Array.isArray(record.links)
+        ? record.links.map((link) => localizeLink(link, normalized, contentLocale))
+        : record.links,
+      provenance: record.provenance ? {
+        ...record.provenance,
+        sources: Array.isArray(record.provenance.sources)
+          ? record.provenance.sources.map((source) => ({ ...source, _label_locale: contentLocale }))
+          : record.provenance.sources,
+      } : record.provenance,
+    }));
+    return Object.freeze({ records: localized, searchAliasesById });
   }
   const searchAliasesById = new Map();
   const localized = sourceRecords.map((record) => {
@@ -516,7 +535,7 @@ export function localizeCatalogRecords(records, locale = DEFAULT_LOCALE) {
         geographic,
         digital
       },
-      links: Array.isArray(record.links) ? record.links.map((link) => localizeLink(link, normalized)) : record.links,
+      links: Array.isArray(record.links) ? record.links.map((link) => localizeLink(link, normalized, contentLocale)) : record.links,
       provenance: record.provenance ? {
         ...record.provenance,
         sources: Array.isArray(record.provenance.sources)

@@ -338,6 +338,32 @@ html { font-size: ${profile.fontScale}% !important; }
   const page = await context.newPage();
   await page.goto(`${baseUrl}/propose.ar.html`, { waitUntil: 'networkidle' });
   await fillCandidateValid(page, {
+    name: 'مشاع اختبار درجات الموقع',
+    description: 'مورد مشترك تديره جماعة محلية وفق قواعد مفتوحة ومصادر رسمية ومسار مشاركة عام موثّق.',
+    region: '٤٨° ٨′ ٠″ شمال، ١١° ٣٤′ ٠″ شرق',
+  });
+  await page.locator('#commons-proposal-form').evaluate((form) => form.requestSubmit());
+  const alert = page.getByRole('alert');
+  await alert.waitFor();
+  const error = (await alert.textContent()) ?? '';
+  assert(error.includes('إحداثيات'), `privacy-native-arabic-dms: localized DMS coordinates were not blocked: ${error}`);
+  assert(await page.locator('#proposal-direct-link').isHidden(), 'privacy-native-arabic-dms: public issue URL became available');
+  assert(await page.locator('#proposal-download').isVisible(), 'privacy-native-arabic-dms: validated download control is unavailable');
+  let invalidDownloadStarted = false;
+  page.once('download', () => { invalidDownloadStarted = true; });
+  await page.locator('#proposal-download').click();
+  await page.waitForTimeout(100);
+  assert(!invalidDownloadStarted, 'privacy-native-arabic-dms: invalid JSON download started');
+  assert(((await alert.textContent()) ?? '').includes('إحداثيات'), 'privacy-native-arabic-dms: download validation lost the coordinate error');
+  results.push('privacy-native-arabic-dms-fail-closed');
+  await context.close();
+}
+
+{
+  const context = await browser.newContext({ viewport: { width: 1280, height: 900 } });
+  const page = await context.newPage();
+  await page.goto(`${baseUrl}/propose.ar.html`, { waitUntil: 'networkidle' });
+  await fillCandidateValid(page, {
     name: 'مشاع اختبار الهاتف',
     description: 'مورد مشترك تديره جماعة محلية وفق قواعد مفتوحة. رقم التواصل الخاص هو +٩٧١ ٥٠ ١٢٣ ٤٥٦٧ ويجب حجبه.',
     region: 'دبي',

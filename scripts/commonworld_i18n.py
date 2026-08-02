@@ -414,9 +414,13 @@ def _decorate_candidate_surface(markup: str, locale: str, root: Path = ROOT) -> 
         f'<aside class="locale-candidate-banner" role="status" lang="{normalized}">'
         f'{escape(notice)}</aside>\n'
     )
-    markup = markup.replace('<body>', '<body>\n  ' + banner, 1) if '<body>' in markup else re.sub(
-        r'<body([^>]*)>', lambda match: match.group(0) + '\n  ' + banner, markup, count=1
-    )
+    def decorate_body(match: re.Match[str]) -> str:
+        attributes = match.group(1)
+        return f'<body{attributes} data-locale-candidate="{normalized}">\n  {banner}'
+
+    markup, body_count = re.subn(r'<body([^>]*)>', decorate_body, markup, count=1)
+    if body_count != 1:
+        raise ValueError(f"candidate locale {normalized} surface lacks one body element")
     return markup
 
 

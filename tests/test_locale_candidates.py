@@ -298,5 +298,28 @@ class LocaleCandidatePackTests(unittest.TestCase):
         self.assertIn('dir="ltr"', (ROOT / "index.css").read_text(encoding="utf-8"))
 
 
+    def test_reviewed_wave1_terms_and_whitespace_regressions(self):
+        locales = json.loads(PACK_PATH.read_text(encoding="utf-8"))["locales"]
+        expected = {
+            ("fr", "energy-democracy"): "Démocratie de l'énergie",
+            ("fr", "savings-groups"): "Groupes d'épargne",
+            ("pt-BR", "fisheries"): "Pesca",
+            ("pt-BR", "mangroves"): "Manguezais",
+            ("pt-BR", "open-media"): "Mídia aberta",
+            ("ar", "creative-commons"): "المشاع الإبداعي",
+            ("ar", "rural-infrastructure"): "البنية التحتية الريفية",
+            ("ar", "free-software"): "برمجيات حرة",
+        }
+        for (locale, key), value in expected.items():
+            self.assertEqual(locales[locale]["themes"][key], value)
+        self.assertEqual(
+            locales["pt-BR"]["proposal_runtime"]["no private address or coordinates in public suggestions."],
+            "nenhum endereço privado ou coordenadas em sugestões públicas.",
+        )
+        for locale in locales.values():
+            for section_name in ("themes", "proposal_runtime"):
+                for value in locale[section_name].values():
+                    self.assertEqual(value, value.strip())
+
 if __name__ == "__main__":
     unittest.main()

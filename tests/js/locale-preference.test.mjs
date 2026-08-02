@@ -8,6 +8,7 @@ import {
   localeNavigationUrl,
   localeSurfaceFromPathname,
   matchSupportedLocale,
+  matchSupportedLocaleTag,
   normalizeLocalePreference,
   readStoredLocalePreference,
   resolveLocalePreference,
@@ -23,6 +24,13 @@ test('ordered browser preferences match supported BCP 47 primary subtags', () =>
   assert.equal(matchSupportedLocale(['zh-Hant', 'fr-FR']), 'en');
 });
 
+test('future region-tag release accepts primary and sibling-region preferences', () => {
+  const futureReleased = ['en', 'de', 'pt-BR'];
+  assert.equal(matchSupportedLocaleTag('PT-br', futureReleased), 'pt-BR');
+  assert.equal(matchSupportedLocaleTag('pt', futureReleased), 'pt-BR');
+  assert.equal(matchSupportedLocaleTag('pt-PT', futureReleased), 'pt-BR');
+});
+
 test('locale preference accepts only automatic and supported manual choices', () => {
   assert.equal(normalizeLocalePreference('AUTO'), 'auto');
   assert.equal(normalizeLocalePreference('de'), 'de');
@@ -31,60 +39,27 @@ test('locale preference accepts only automatic and supported manual choices', ()
 
 test('storage failures and corrupt values fail safely', () => {
   const values = new Map();
-  const storage = {
-    getItem(key) { return values.get(key) ?? null; },
-    setItem(key, value) { values.set(key, value); },
-  };
+  const storage = { getItem(key) { return values.get(key) ?? null; }, setItem(key, value) { values.set(key, value); } };
   assert.equal(readStoredLocalePreference(storage), null);
   assert.equal(writeStoredLocalePreference('de', storage), true);
   assert.equal(values.get(UI_LOCALE_STORAGE_KEY), 'de');
   assert.equal(readStoredLocalePreference(storage), 'de');
   values.set(UI_LOCALE_STORAGE_KEY, 'corrupt');
   assert.equal(readStoredLocalePreference(storage), null);
-
-  const blocked = {
-    getItem() { throw new Error('blocked'); },
-    setItem() { throw new Error('blocked'); },
-  };
+  const blocked = { getItem() { throw new Error('blocked'); }, setItem() { throw new Error('blocked'); } };
   assert.equal(readStoredLocalePreference(blocked), null);
   assert.equal(writeStoredLocalePreference('en', blocked), false);
 });
 
 test('explicit locale query wins while explicit surface resists stored override', () => {
-  assert.deepEqual(
-    resolveLocalePreference({
-      pathname: '/releases/abc/de.html',
-      currentLocale: 'de',
-      queryChoice: 'en',
-      storedChoice: 'de',
-      languages: ['de-DE'],
-    }),
-    { choice: 'en', locale: 'en', source: 'query', shouldRedirect: true },
-  );
-  assert.deepEqual(
-    resolveLocalePreference({
-      pathname: '/method.html',
-      currentLocale: 'en',
-      storedChoice: 'de',
-      languages: ['de-DE'],
-    }),
-    { choice: 'en', locale: 'en', source: 'explicit-surface', shouldRedirect: false },
-  );
+  assert.deepEqual(resolveLocalePreference({ pathname:'/releases/abc/de.html', currentLocale:'de', queryChoice:'en', storedChoice:'de', languages:['de-DE'] }), { choice:'en', locale:'en', source:'query', shouldRedirect:true });
+  assert.deepEqual(resolveLocalePreference({ pathname:'/method.html', currentLocale:'en', storedChoice:'de', languages:['de-DE'] }), { choice:'en', locale:'en', source:'explicit-surface', shouldRedirect:false });
 });
 
-test('neutral entry uses stored choice, then browser preference, then English', () => {
-  assert.deepEqual(
-    resolveLocalePreference({ pathname: '/', currentLocale: 'en', storedChoice: 'de', languages: ['en-GB'] }),
-    { choice: 'de', locale: 'de', source: 'storage', shouldRedirect: true },
-  );
-  assert.deepEqual(
-    resolveLocalePreference({ pathname: '/index.html', currentLocale: 'en', languages: ['fr-FR', 'de-DE'] }),
-    { choice: 'auto', locale: 'de', source: 'browser', shouldRedirect: true },
-  );
-  assert.deepEqual(
-    resolveLocalePreference({ pathname: '/', currentLocale: 'en', languages: ['fr-FR'] }),
-    { choice: 'auto', locale: 'en', source: 'browser', shouldRedirect: false },
-  );
+test('neutral entry uses stored choice, browser preference, then English', () => {
+  assert.deepEqual(resolveLocalePreference({ pathname:'/', currentLocale:'en', storedChoice:'de', languages:['en-GB'] }), { choice:'de', locale:'de', source:'storage', shouldRedirect:true });
+  assert.deepEqual(resolveLocalePreference({ pathname:'/index.html', currentLocale:'en', languages:['fr-FR','de-DE'] }), { choice:'auto', locale:'de', source:'browser', shouldRedirect:true });
+  assert.deepEqual(resolveLocalePreference({ pathname:'/', currentLocale:'en', languages:['fr-FR'] }), { choice:'auto', locale:'en', source:'browser', shouldRedirect:false });
 });
 
 test('surface detection covers canonical and immutable release paths', () => {
@@ -97,13 +72,7 @@ test('surface detection covers canonical and immutable release paths', () => {
 });
 
 test('locale navigation preserves discovery query and fragment state', () => {
-  const target = new URL(localeNavigationUrl({
-    currentHref: 'https://example.test/?project=debian&language=de#text-view',
-    documentBase: 'https://example.test/releases/release-1/',
-    surface: 'index',
-    targetLocale: 'de',
-    choice: 'de',
-  }));
+  const target = new URL(localeNavigationUrl({ currentHref:'https://example.test/?project=debian&language=de#text-view', documentBase:'https://example.test/releases/release-1/', surface:'index', targetLocale:'de', choice:'de' }));
   assert.equal(target.pathname, '/releases/release-1/de.html');
   assert.equal(target.searchParams.get('project'), 'debian');
   assert.equal(target.searchParams.get('language'), 'de');

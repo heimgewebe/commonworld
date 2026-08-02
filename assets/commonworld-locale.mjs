@@ -7,7 +7,7 @@ import {
   documentLocale,
   localeSwitchHref,
   normalizeLocale,
-} from './commonworld-i18n.mjs?v=700272231d7a';
+} from './commonworld-i18n.mjs?v=b36f6e0b18b8';
 
 export const UI_LOCALE_STORAGE_KEY = 'commonworld.ui-locale';
 export const UI_LOCALE_QUERY_PARAMETER = 'ui_lang';
@@ -53,19 +53,24 @@ export function normalizeLocalePreference(value) {
   return canonical && RELEASED_LOCALES.includes(canonical) ? canonical : null;
 }
 
-export function supportedLocale(value) {
+export function matchSupportedLocaleTag(value, supportedLocales = RELEASED_LOCALES) {
   const canonical = canonicalLocaleTag(value);
   if (!canonical) return null;
-  const exact = RELEASED_LOCALES.find((tag) => tag.toLowerCase() === canonical.toLowerCase());
+  const allowed = Array.isArray(supportedLocales) ? supportedLocales : RELEASED_LOCALES;
+  const exact = allowed.find((tag) => tag.toLowerCase() === canonical.toLowerCase());
   if (exact) return exact;
   const parts = canonical.split('-');
   if (parts.length >= 2 && parts[1].length === 4) {
     const languageScript = parts.slice(0, 2).join('-').toLowerCase();
-    const scriptMatch = RELEASED_LOCALES.find((tag) => tag.toLowerCase() === languageScript);
+    const scriptMatch = allowed.find((tag) => tag.toLowerCase() === languageScript);
     if (scriptMatch) return scriptMatch;
   }
   const primary = parts[0].toLowerCase();
-  return RELEASED_LOCALES.find((tag) => tag.toLowerCase() === primary) ?? null;
+  return allowed.find((tag) => tag.split('-')[0].toLowerCase() === primary) ?? null;
+}
+
+export function supportedLocale(value) {
+  return matchSupportedLocaleTag(value);
 }
 
 export function matchSupportedLocale(values, fallback = DEFAULT_LOCALE) {

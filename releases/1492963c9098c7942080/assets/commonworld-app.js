@@ -1,6 +1,6 @@
 import { BOOTSTRAP_RECORDS } from './commonworld-bootstrap-catalog.mjs?v=cc49548bc45c';
 import { createCatalogLoadCache, loadCatalogAggregate, loadCatalogDetail, loadCatalogShard, shardKeyForIdentity } from './commonworld-catalog-runtime.mjs?v=836cd2a8f3f9';
-import { actionLabel, documentDirection, documentLocale, localizeCatalogRecords, text as i18nText, themeLabel } from './commonworld-i18n.mjs?v=700272231d7a';
+import { actionLabel, documentDirection, documentLocale, localizeCatalogRecords, text as i18nText, themeLabel } from './commonworld-i18n.mjs?v=b36f6e0b18b8';
 import {
   COMMONS_TYPE_COLOR_TOKENS,
   COMMONS_TYPE_VALUES,
@@ -62,7 +62,7 @@ import {
   sortRecords,
   stateFromSearch,
   visibleDigitalNodes,
-} from './commonworld-core.mjs?v=f8cafa5b9042';
+} from './commonworld-core.mjs?v=1db7ded69c88';
 
 const LOCALE = documentLocale();
 const DOCUMENT_DIRECTION = documentDirection(LOCALE);
@@ -2616,6 +2616,11 @@ function replaceLinks(container, links) {
     anchor.href = url;
     anchor.rel = 'external noreferrer';
     anchor.textContent = link.label || url;
+    const labelLocale = typeof link?._label_locale === 'string' && link._label_locale.trim()
+      ? link._label_locale
+      : null;
+    applyContentLanguage(anchor, labelLocale);
+    if (labelLocale) anchor.dataset.contentLanguage = labelLocale;
     item.append(anchor);
     container.append(item);
   }

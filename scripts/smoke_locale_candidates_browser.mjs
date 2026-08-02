@@ -131,6 +131,7 @@ try {
       }
       let proposalRuntimeError = '';
       let proposalDigitalLabel = '';
+      let proposalIssueBody = '';
       if (pageName.startsWith('propose.')) {
         proposalDigitalLabel = ((await page.locator('#commons-proposal-form [name="presence_digital"]').locator('xpath=ancestor::label[1]//span').textContent()) ?? '').trim();
         assert(proposalDigitalLabel === CANDIDATE_SOURCE.locales[candidate.locale].static.digital, `${pageName}: candidate Digital option is not localized: ${proposalDigitalLabel}`);
@@ -141,6 +142,32 @@ try {
         proposalRuntimeError = (await page.locator('#proposal-errors').textContent()) ?? '';
         assert(proposalRuntimeError.includes(expectedRuntimeError), `${pageName}: candidate proposal runtime message drifted: ${proposalRuntimeError}`);
         assert(!proposalRuntimeError.includes('[missing:proposal_runtime:'), `${pageName}: proposal runtime fallback marker rendered`);
+        proposalIssueBody = await page.evaluate(async () => {
+          const moduleScript = [...document.scripts].find((script) => script.src.includes('/assets/commonworld-proposal.js'));
+          if (!moduleScript?.src) throw new Error('candidate proposal module script is missing');
+          const proposalModule = await import(moduleScript.src);
+          const proposal = proposalModule.proposalFromFields({
+            name: 'Candidate Issue Body Commons',
+            description: 'A community-managed resource with open rules, primary-near sources and a real public participation path.',
+            official_website: 'https://example.net/commons',
+            commons_type: 'other',
+            presence_geographic: false,
+            presence_digital: true,
+            region: '',
+            actions: [{ type: 'learn', url: 'https://example.net/commons/about' }, { type: '', url: '' }, { type: '', url: '' }],
+            sources: 'https://example.net/commons/governance',
+            sensitive_location_risk: false,
+            editorial_note: '',
+            public_issue_acknowledged: true,
+            processing_agreed: true,
+            no_sensitive_data_confirmed: true,
+          }, new Date('2026-08-02T00:00:00Z'));
+          return proposalModule.buildIssueBody(proposal);
+        });
+        const expectedName = CANDIDATE_SOURCE.locales[candidate.locale].proposal_runtime.Name;
+        assert(proposalIssueBody.includes(`**${expectedName}:**`), `${pageName}: localized Name label missing from issue body: ${proposalIssueBody}`);
+        assert(proposalIssueBody.includes(proposalDigitalLabel), `${pageName}: localized Digital value missing from issue body: ${proposalIssueBody}`);
+        assert(!proposalIssueBody.includes('**Name:**'), `${pageName}: hardcoded English Name leaked into issue body`);
       }
       let runtimeCatalogBoundary = null;
       if (pageName === `${candidate.locale}.html`) {
@@ -186,6 +213,14 @@ try {
           const focusDigitalText = focusDigital?.textContent ?? '';
           const focusDigitalLang = focusDigital?.getAttribute('lang') ?? '';
           const focusDigitalDir = focusDigital?.getAttribute('dir') ?? '';
+          const focusLinkNodes = [...document.querySelectorAll('#focus-links a')];
+          const focusSourceNodes = [...document.querySelectorAll('#focus-sources a')];
+          const focusLinkLangs = focusLinkNodes.map((node) => node.getAttribute('lang') ?? '');
+          const focusLinkDirs = focusLinkNodes.map((node) => node.getAttribute('dir') ?? '');
+          const focusLinkBidi = focusLinkNodes.map((node) => getComputedStyle(node).unicodeBidi);
+          const focusSourceLangs = focusSourceNodes.map((node) => node.getAttribute('lang') ?? '');
+          const focusSourceDirs = focusSourceNodes.map((node) => node.getAttribute('dir') ?? '');
+          const focusSourceBidi = focusSourceNodes.map((node) => getComputedStyle(node).unicodeBidi);
           const semanticLevelNode = document.querySelector('#semantic-level');
           const semanticBreadcrumbContentNode = document.querySelector('#semantic-breadcrumb-accessible [data-content-language]');
           const semanticSummaryNode = document.querySelector('#semantic-summary');
@@ -294,6 +329,12 @@ try {
             focusDigitalText,
             focusDigitalLang,
             focusDigitalDir,
+            focusLinkLangs,
+            focusLinkDirs,
+            focusLinkBidi,
+            focusSourceLangs,
+            focusSourceDirs,
+            focusSourceBidi,
             semanticLevelText,
             semanticLevelLang,
             semanticLevelDir,
@@ -322,6 +363,41 @@ try {
           };
         });
       }
+      const shellLayouts = [];
+      if (pageName === `${candidate.locale}.html`) {
+        for (const viewport of [{ width: 1024, height: 768 }, { width: 390, height: 844 }]) {
+          await page.setViewportSize(viewport);
+          await page.evaluate(() => new Promise((resolve) => requestAnimationFrame(() => requestAnimationFrame(resolve))));
+          shellLayouts.push(await page.evaluate(() => {
+            const banner = document.querySelector('.locale-candidate-banner');
+            const topbar = document.querySelector('.topbar');
+            const stage = document.querySelector('.globe-stage');
+            const bannerRect = banner?.getBoundingClientRect();
+            const topbarRect = topbar?.getBoundingClientRect();
+            const stageRect = stage?.getBoundingClientRect();
+            const visibleBottomControls = [...document.querySelectorAll('.orientation-bar, .maplibregl-ctrl-bottom-left, .maplibregl-ctrl-bottom-right')]
+              .filter((node) => node.getClientRects().length > 0 && getComputedStyle(node).visibility !== 'hidden');
+            const bottomControlBottom = visibleBottomControls.reduce(
+              (maximum, node) => Math.max(maximum, node.getBoundingClientRect().bottom),
+              0,
+            );
+            const hit = bannerRect
+              ? document.elementFromPoint((bannerRect.left + bannerRect.right) / 2, (bannerRect.top + bannerRect.bottom) / 2)
+              : null;
+            return {
+              viewportWidth: window.innerWidth,
+              viewportHeight: window.innerHeight,
+              candidateMarker: document.body.dataset.localeCandidate ?? '',
+              bannerHit: Boolean(banner && hit && banner.contains(hit)),
+              bannerBottom: bannerRect?.bottom ?? -1,
+              topbarTop: topbarRect?.top ?? -1,
+              stageBottom: stageRect?.bottom ?? -1,
+              bottomControlBottom,
+              documentHeight: document.documentElement.scrollHeight,
+            };
+          }));
+        }
+      }
       const state = await page.evaluate(() => ({
         lang: document.documentElement.lang,
         dir: document.documentElement.dir,
@@ -331,6 +407,7 @@ try {
         documentTitle: document.title,
         iconHref: document.querySelector('link[rel~="icon"]')?.getAttribute('href') ?? '',
         bannerVisible: Boolean(document.querySelector('.locale-candidate-banner')?.getClientRects().length),
+        candidateMarker: document.body.dataset.localeCandidate ?? '',
         bodyText: document.body.textContent ?? '',
         candidateChoices: [...document.querySelectorAll('[data-locale-choice]')]
           .map((node) => node.getAttribute('data-locale-choice'))
@@ -360,6 +437,15 @@ try {
       assert(state.titleCount === 1 && state.documentTitle.trim().length > 0, `${pageName}: candidate title metadata is malformed`);
       assert(state.iconHref.includes('commonworld-mark.svg'), `${pageName}: candidate head swallowed the icon link`);
       assert(state.bannerVisible, `${pageName}: candidate banner is not visible`);
+      assert(state.candidateMarker === candidate.locale, `${pageName}: candidate body marker drifted: ${state.candidateMarker}`);
+      for (const layout of shellLayouts) {
+        assert(layout.candidateMarker === candidate.locale, `${pageName}: shell candidate marker drifted at ${layout.viewportWidth}x${layout.viewportHeight}`);
+        assert(layout.bannerHit, `${pageName}: candidate banner is occluded at ${layout.viewportWidth}x${layout.viewportHeight}`);
+        assert(layout.topbarTop + 1 >= layout.bannerBottom, `${pageName}: topbar overlaps candidate banner at ${layout.viewportWidth}x${layout.viewportHeight}: ${JSON.stringify(layout)}`);
+        assert(layout.stageBottom <= layout.viewportHeight + 1 && layout.stageBottom >= layout.viewportHeight - 1, `${pageName}: stage is clipped or undersized at ${layout.viewportWidth}x${layout.viewportHeight}: ${JSON.stringify(layout)}`);
+        assert(layout.bottomControlBottom <= layout.viewportHeight + 1, `${pageName}: bottom controls leave the viewport at ${layout.viewportWidth}x${layout.viewportHeight}: ${JSON.stringify(layout)}`);
+        assert(layout.documentHeight <= layout.viewportHeight + 1, `${pageName}: candidate shell exceeds the viewport at ${layout.viewportWidth}x${layout.viewportHeight}: ${JSON.stringify(layout)}`);
+      }
       assert(state.effectiveLanguage === CANDIDATE_SOURCE.locales[candidate.locale].static.effective_language, `${pageName}: effective-language status drifted: ${state.effectiveLanguage}`);
       if (pageName === `${candidate.locale}.html`) {
         const catalogLanguageOptions = state.languageOptions.filter(({ value }) => value !== 'unknown');
@@ -416,6 +502,12 @@ try {
         assert(runtimeCatalogBoundary.focusLocationContentDirs.every((direction) => direction === 'ltr'), `${pageName}: focus location content labels lack dir=ltr boundaries`);
         assert((runtimeCatalogBoundary?.focusDigitalText ?? '').trim().length > 0 && runtimeCatalogBoundary?.focusDigitalLang === 'en', `${pageName}: focus digital content label lacks lang=en boundary`);
         assert(runtimeCatalogBoundary?.focusDigitalDir === 'ltr', `${pageName}: focus digital content label lacks dir=ltr boundary`);
+        assert((runtimeCatalogBoundary?.focusLinkLangs?.length ?? 0) > 0 && runtimeCatalogBoundary.focusLinkLangs.every((lang) => [candidate.locale, 'en'].includes(lang)), `${pageName}: focus link labels lack explicit language boundaries: ${runtimeCatalogBoundary?.focusLinkLangs?.join(' | ')}`);
+        assert(runtimeCatalogBoundary.focusLinkDirs.every((direction, index) => direction === (runtimeCatalogBoundary.focusLinkLangs[index] === 'en' ? 'ltr' : 'auto')), `${pageName}: focus link directions drifted: ${runtimeCatalogBoundary?.focusLinkDirs?.join(' | ')}`);
+        assert(runtimeCatalogBoundary.focusLinkBidi.every((value) => value === 'isolate'), `${pageName}: focus link bidi isolation is missing: ${runtimeCatalogBoundary?.focusLinkBidi?.join(' | ')}`);
+        assert((runtimeCatalogBoundary?.focusSourceLangs?.length ?? 0) > 0 && runtimeCatalogBoundary.focusSourceLangs.every((lang) => lang === 'en'), `${pageName}: focus source labels lack lang=en boundaries`);
+        assert(runtimeCatalogBoundary.focusSourceDirs.every((direction) => direction === 'ltr'), `${pageName}: focus source labels lack dir=ltr boundaries`);
+        assert(runtimeCatalogBoundary.focusSourceBidi.every((value) => value === 'isolate'), `${pageName}: focus source bidi isolation is missing`);
         assert((runtimeCatalogBoundary?.sphereNameLangs?.length ?? 0) > 0 && runtimeCatalogBoundary.sphereNameLangs.every((lang) => lang === 'en'), `${pageName}: sphere ring titles lack lang=en boundaries`);
         assert(runtimeCatalogBoundary.sphereNameDirs.every((direction) => direction === 'ltr'), `${pageName}: sphere ring titles lack dir=ltr boundaries`);
         assert((runtimeCatalogBoundary?.sphereSummaryTitleLangs?.length ?? 0) > 0 && runtimeCatalogBoundary.sphereSummaryTitleLangs.every((lang) => lang === 'en'), `${pageName}: sphere accessible summary titles lack lang=en boundaries`);
@@ -464,7 +556,7 @@ try {
       assert(pageErrors.length === 0, `${pageName}: page errors: ${pageErrors.join(' | ')}`);
       assert(failedResponses.length === 0, `${pageName}: failed resources: ${failedResponses.join(' | ')}`);
       assert(consoleErrors.length === 0, `${pageName}: console errors: ${consoleErrors.join(' | ')}`);
-      results.push({ page: pageName, locale: candidate.locale, direction: candidate.direction, proposalRuntimeLocalized: pageName.startsWith('propose.'), proposalDigitalLabel, verdict: 'PASS' });
+      results.push({ page: pageName, locale: candidate.locale, direction: candidate.direction, proposalRuntimeLocalized: pageName.startsWith('propose.'), proposalDigitalLabel, proposalIssueBodyLocalized: Boolean(proposalIssueBody), verdict: 'PASS' });
       await context.close();
     }
   }
