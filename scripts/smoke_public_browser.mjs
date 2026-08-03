@@ -756,6 +756,11 @@ async function reducedMotionRingScenario() {
 
 async function normalScenario() {
   const run = await newPage();
+  const catalogRequests = [];
+  run.page.on('request', (request) => {
+    const pathname = new URL(request.url()).pathname;
+    if (pathname.startsWith('/catalog/')) catalogRequests.push(pathname);
+  });
   await run.page.goto(baseUrl, { waitUntil: 'domcontentloaded' });
   await run.page.waitForSelector('html.runtime-ready');
   assert(await run.page.locator('#globe-surface').isVisible(), 'normal: globe is not visible');
@@ -872,15 +877,26 @@ async function normalScenario() {
   await run.page.waitForFunction(() => {
     const stage = document.querySelector('.globe-stage');
     return stage?.dataset.catalogRecordShadow === 'ready'
-      && stage.dataset.catalogRecordShadowId === 'debian';
+      && stage.dataset.catalogRecordShadowId === 'debian'
+      && stage.dataset.catalogDetailShadow === 'ready'
+      && stage.dataset.catalogDetailShadowId === 'debian';
   });
   const catalogShadow = await run.page.locator('.globe-stage').evaluate((stage) => ({
-    state: stage.dataset.catalogRecordShadow,
-    id: stage.dataset.catalogRecordShadowId,
-    shard: stage.dataset.catalogRecordShadowShard,
+    recordState: stage.dataset.catalogRecordShadow,
+    detailState: stage.dataset.catalogDetailShadow,
+    id: stage.dataset.catalogDetailShadowId,
+    shard: stage.dataset.catalogDetailShadowShard,
+    detailUrl: stage.dataset.catalogDetailShadowUrl,
+    delivery: stage.dataset.catalogDelivery,
   }));
-  assert(catalogShadow.state === 'ready' && catalogShadow.id === 'debian' && /^[0-9a-f]{2}$/.test(catalogShadow.shard ?? ''), `normal: selected catalog shard shadow did not reach parity (${JSON.stringify(catalogShadow)})`);
-  const focusOnlyState = await primaryOverlayState(run.page);
+  assert(catalogShadow.recordState === 'ready' && catalogShadow.detailState === 'ready' && catalogShadow.id === 'debian' && /^[0-9a-f]{2}$/.test(catalogShadow.shard ?? ''), `normal: selected catalog detail shadow did not reach parity (${JSON.stringify(catalogShadow)})`);
+  assert(catalogShadow.delivery === 'build-bound-bootstrap', `normal: detail shadow replaced the visible bootstrap (${JSON.stringify(catalogShadow)})`);
+  assert(/^http:\/\/127\.0\.0\.1:\d+\/catalog\/runtime\/details\/[0-9a-f]{64}\.v1\.json$/.test(catalogShadow.detailUrl ?? ''), `normal: selected detail URL is not content-addressed (${JSON.stringify(catalogShadow)})`);
+  const detailRequestPaths = catalogRequests.filter((pathname) => /^\/catalog\/runtime\/details\/[0-9a-f]{64}\.v1\.json$/.test(pathname));
+  assert(detailRequestPaths.length === 1, `normal: selected identity did not request exactly one detail artifact (${JSON.stringify(catalogRequests)})`);
+  assert(!catalogRequests.some((pathname) => pathname.startsWith('/catalog/projects/')), `normal: runtime used mutable project JSON paths (${JSON.stringify(catalogRequests)})`);
+  assert(await run.page.locator('#focus-catalog-detail-integrity').isVisible(), 'normal: detail integrity status is not visible');
+  assert(await run.page.locator('#focus-catalog-detail-retry').isHidden(), 'normal: retry remained visible after successful detail verification');  const focusOnlyState = await primaryOverlayState(run.page);
   assert(focusOnlyState.focusVisible && !focusOnlyState.discoveryVisible && !focusOnlyState.settingsVisible && !focusOnlyState.focusInert && focusOnlyState.focusAriaHidden === null, 'normal: visible project focus kept suppressed accessibility state ' + JSON.stringify(focusOnlyState));
   assert((await run.page.evaluate(() => document.activeElement?.id)) === 'project-focus', 'normal: project focus did not receive focus');
   assert(((await run.page.locator('#semantic-summary').textContent()) ?? '') === 'Digital · Location-independent digital presence', 'normal: digital-only focus lost its location-independent truth');
@@ -2789,6 +2805,72 @@ async function liveUiHardeningScenario() {
   assert(landscapeOverview.pageErrors.length === 0, `live UI 667x375: page errors: ${landscapeOverview.pageErrors.join(' | ')}`);
   await landscapeOverview.context.close();
 
+  const landscapeDetail = await newPage({ mobile: true, viewportOverride: { width: 667, height: 375 }, touch: true, reducedMotion: 'reduce' });
+  await landscapeDetail.page.goto(`${baseUrl}/?view=layers`, { waitUntil: 'domcontentloaded' });
+  await landscapeDetail.page.waitForSelector('html.runtime-ready');
+  await landscapeDetail.page.waitForSelector('.globe-stage[data-view-phase="layers"]');
+  const detailTrigger = landscapeDetail.page.locator('.digital-ribbon-item').first();
+  assert((await detailTrigger.count()) === 1, 'live UI 667x375 detail: no digital Commons trigger is available');
+  await detailTrigger.click();
+  await landscapeDetail.page.waitForSelector('#layer-projects:not([hidden]) .project-detail-grid');
+  const detailGeometry = await landscapeDetail.page.evaluate(() => {
+    const rect = (node) => {
+      const box = node.getBoundingClientRect();
+      return { left: box.left, top: box.top, right: box.right, bottom: box.bottom, width: box.width, height: box.height };
+    };
+    const panel = document.querySelector('#layer-projects');
+    const panelBox = panel.getBoundingClientRect();
+    const grid = panel.querySelector('.project-detail-grid');
+    const sections = [...grid.querySelectorAll('.project-detail-section')];
+    const gridColumns = getComputedStyle(grid).gridTemplateColumns.split(/\s+/).filter(Boolean);
+    return {
+      viewport: { width: window.innerWidth, height: window.innerHeight },
+      panel: rect(panel),
+      panelClientWidth: panel.clientWidth,
+      panelScrollWidth: panel.scrollWidth,
+      panelOverflowX: getComputedStyle(panel).overflowX,
+      grid: rect(grid),
+      gridClientWidth: grid.clientWidth,
+      gridScrollWidth: grid.scrollWidth,
+      gridColumnCount: gridColumns.length,
+      sections: sections.map(rect),
+      overflowingDescendants: [...panel.querySelectorAll('*')]
+        .map((node) => ({
+          tag: node.tagName,
+          className: typeof node.className === 'string' ? node.className : '',
+          text: (node.textContent ?? '').trim().replace(/\s+/g, ' ').slice(0, 100),
+          box: rect(node),
+          clientWidth: node.clientWidth,
+          scrollWidth: node.scrollWidth,
+          position: getComputedStyle(node).position,
+        }))
+        .filter(({ box, clientWidth, scrollWidth }) => box.left < panelBox.left - 0.5
+          || box.right > panelBox.right + 0.5
+          || scrollWidth > clientWidth + 1)
+        .sort((left, right) => (right.scrollWidth - right.clientWidth) - (left.scrollWidth - left.clientWidth))
+        .slice(0, 20),
+    };
+  });
+  assert(detailGeometry.sections.length === 4, `live UI 667x375 detail: expected four detail sections (${JSON.stringify(detailGeometry)})`);
+  assert(detailGeometry.gridColumnCount <= 2, `live UI 667x375 detail: low-height layout forced too many columns (${JSON.stringify(detailGeometry)})`);
+  assert(detailGeometry.panelScrollWidth <= detailGeometry.panelClientWidth + 1, `live UI 667x375 detail: clipped horizontal panel overflow (${JSON.stringify(detailGeometry)})`);
+  assert(detailGeometry.gridScrollWidth <= detailGeometry.gridClientWidth + 1, `live UI 667x375 detail: detail grid overflows horizontally (${JSON.stringify(detailGeometry)})`);
+  assert(detailGeometry.sections.every(({ left, right }) => left >= detailGeometry.panel.left - 0.5 && right <= detailGeometry.panel.right + 0.5), `live UI 667x375 detail: section lies outside the clipped panel (${JSON.stringify(detailGeometry)})`);
+  const lastDetailSection = landscapeDetail.page.locator('.project-detail-section').last();
+  await lastDetailSection.scrollIntoViewIfNeeded();
+  const lastSectionVisibility = await lastDetailSection.evaluate((node) => {
+    const section = node.getBoundingClientRect();
+    const panel = node.closest('#layer-projects').getBoundingClientRect();
+    return {
+      horizontallyReachable: section.left >= panel.left - 0.5 && section.right <= panel.right + 0.5,
+      verticallyReachable: section.bottom > panel.top + 0.5 && section.top < panel.bottom - 0.5,
+    };
+  });
+  assert(lastSectionVisibility.horizontallyReachable && lastSectionVisibility.verticallyReachable, `live UI 667x375 detail: final section is unreachable (${JSON.stringify(lastSectionVisibility)})`);
+  assert(landscapeDetail.consoleErrors.length === 0, `live UI 667x375 detail: console errors: ${landscapeDetail.consoleErrors.join(' | ')}`);
+  assert(landscapeDetail.pageErrors.length === 0, `live UI 667x375 detail: page errors: ${landscapeDetail.pageErrors.join(' | ')}`);
+  await landscapeDetail.context.close();
+
   const run = await newPage({ viewportOverride: { width: 844, height: 390 }, touch: true, reducedMotion: 'reduce' });
   await run.page.goto(baseUrl, { waitUntil: 'domcontentloaded' });
   await run.page.waitForSelector('html.runtime-ready');
@@ -2854,6 +2936,13 @@ async function liveUiHardeningScenario() {
       zoomControl: overviewGeometry.zoom,
       minimumCatalogSelectHeight,
     },
+    landscapeDetail: {
+      viewport: detailGeometry.viewport,
+      gridColumnCount: detailGeometry.gridColumnCount,
+      panelHorizontalOverflow: Math.max(0, detailGeometry.panelScrollWidth - detailGeometry.panelClientWidth),
+      gridHorizontalOverflow: Math.max(0, detailGeometry.gridScrollWidth - detailGeometry.gridClientWidth),
+      finalSectionReachable: lastSectionVisibility.horizontallyReachable && lastSectionVisibility.verticallyReachable,
+    },
   });
   await run.context.close();
 }
@@ -2894,6 +2983,136 @@ async function catalogueNetworkBlockedScenario() {
   const appWarnings = run.consoleWarnings.filter((message) => message.includes('Commonworld'));
   assert(appWarnings.length === 0, `catalogue network blocked: unexpected application warnings (${appWarnings.length})`);
   results.push({ id: 'catalogue-network-blocked', verdict: 'PASS', blockedCatalogRequests: blockedCatalogRequests.length, observedCatalogRequests: [...new Set(observedCatalogRequests)].sort() });
+  await run.context.close();
+}
+
+async function catalogueDetailRetryScenario() {
+  process.stdout.write(`${JSON.stringify({ state: 'RUNNING', scenario: 'catalogue-detail-retry' })}\n`);
+  const run = await newPage();
+  const catalogRequests = [];
+  run.page.on('request', (request) => {
+    const pathname = new URL(request.url()).pathname;
+    if (pathname.startsWith('/catalog/runtime/')) catalogRequests.push(pathname);
+  });
+  let detailAttempts = 0;
+  await run.page.route('**/catalog/runtime/details/*.v1.json', (route) => {
+    detailAttempts += 1;
+    if (detailAttempts === 1) return route.abort('failed');
+    return route.continue();
+  });
+  await run.page.goto(baseUrl, { waitUntil: 'domcontentloaded' });
+  await run.page.waitForSelector('html.runtime-ready');
+  await run.page.waitForFunction(() => document.querySelector('.globe-stage')?.dataset.catalogPlatform === 'ready');
+  await run.page.locator('#commons-search').fill('Debian');
+  await run.page.waitForTimeout(220);
+  await run.page.locator('.discovery-result-main[data-commonproject-id="debian"]').click();
+  await run.page.waitForFunction(() => {
+    const stage = document.querySelector('.globe-stage');
+    return stage?.dataset.catalogRecordShadow === 'ready'
+      && stage.dataset.catalogDetailShadow === 'degraded'
+      && stage.dataset.catalogDetailRetry === 'available';
+  });
+  assert((await run.page.locator('#focus-title').textContent()) === 'Debian', 'detail retry: compatible embedded record disappeared after detail failure');
+  assert(((await run.page.locator('#focus-summary').textContent()) ?? '').length > 20, 'detail retry: compatible embedded summary disappeared after detail failure');
+  const retry = run.page.locator('#focus-catalog-detail-retry');
+  assert(await retry.isVisible(), 'detail retry: retry action is not visible after a detail failure');
+  await retry.click();
+  await run.page.waitForFunction(() => {
+    const stage = document.querySelector('.globe-stage');
+    return stage?.dataset.catalogDetailShadow === 'ready'
+      && stage.dataset.catalogDetailShadowId === 'debian'
+      && !stage.dataset.catalogDetailRetry;
+  });
+  assert(detailAttempts === 2, `detail retry: expected one failed attempt and one retry, got ${detailAttempts}`);
+  for (const expectedPath of ['/catalog/runtime/manifest.v1.json', '/catalog/runtime/aggregate.v1.json', '/catalog/runtime/shards/81.v1.json']) {
+    const count = catalogRequests.filter((pathname) => pathname === expectedPath).length;
+    assert(count === 2, `detail retry: explicit retry did not refresh ${expectedPath} exactly once (${JSON.stringify(catalogRequests)})`);
+  }
+  assert(await retry.isHidden(), 'detail retry: retry action remained visible after recovery');
+  assert((await run.page.evaluate(() => document.activeElement?.id)) === 'project-focus', 'detail retry: successful retry left focus on a hidden control');
+  assert((await run.page.locator('.globe-stage').getAttribute('data-catalog-delivery')) === 'build-bound-bootstrap', 'detail retry: retry changed the visible data source');
+  const warnings = run.consoleWarnings.filter((message) => message.includes('Commonworld catalog detail unavailable for debian'));
+  assert(warnings.length === 1, `detail retry: expected one bounded application warning (${JSON.stringify(run.consoleWarnings)})`);
+  assert(run.pageErrors.length === 0, `detail retry: page errors: ${run.pageErrors.join(' | ')}`);
+  const expectedNetworkErrors = run.consoleErrors.filter((message) => message.includes('Failed to load resource: net::ERR_FAILED'));
+  const unexpectedConsoleErrors = run.consoleErrors.filter((message) => !message.includes('Failed to load resource: net::ERR_FAILED'));
+  assert(expectedNetworkErrors.length === 1, `detail retry: expected exactly one aborted-resource console error (${JSON.stringify(run.consoleErrors)})`);
+  assert(unexpectedConsoleErrors.length === 0, `detail retry: unexpected console errors: ${unexpectedConsoleErrors.join(' | ')}`);
+  results.push({ id: 'catalogue-detail-retry', verdict: 'PASS', detailAttempts });
+  await run.context.close();
+}
+
+async function cataloguePlatformRetryScenario() {
+  process.stdout.write(`${JSON.stringify({ state: 'RUNNING', scenario: 'catalogue-platform-retry' })}\n`);
+  const run = await newPage();
+  let manifestAttempts = 0;
+  await run.page.route('**/catalog/runtime/manifest.v1.json', (route) => {
+    manifestAttempts += 1;
+    if (manifestAttempts === 1) return route.abort('failed');
+    return route.continue();
+  });
+  await run.page.goto(baseUrl, { waitUntil: 'domcontentloaded' });
+  await run.page.waitForSelector('html.runtime-ready');
+  await run.page.waitForFunction(() => document.querySelector('.globe-stage')?.dataset.catalogPlatform === 'degraded');
+  await run.page.locator('#commons-search').fill('Debian');
+  await run.page.waitForTimeout(220);
+  await run.page.locator('.discovery-result-main[data-commonproject-id="debian"]').click();
+  await run.page.waitForFunction(() => {
+    const stage = document.querySelector('.globe-stage');
+    return stage?.dataset.catalogDetailShadow === 'degraded'
+      && stage.dataset.catalogDetailRetry === 'available';
+  });
+  assert((await run.page.locator('#focus-title').textContent()) === 'Debian', 'platform retry: embedded record disappeared after manifest failure');
+  const retry = run.page.locator('#focus-catalog-detail-retry');
+  assert(await retry.isVisible(), 'platform retry: retry action is not visible after manifest failure');
+  await retry.click();
+  await run.page.waitForFunction(() => {
+    const stage = document.querySelector('.globe-stage');
+    return stage?.dataset.catalogPlatform === 'ready'
+      && stage.dataset.catalogRecordShadow === 'ready'
+      && stage.dataset.catalogDetailShadow === 'ready'
+      && stage.dataset.catalogDetailShadowId === 'debian';
+  });
+  assert(manifestAttempts === 2, `platform retry: expected one failed manifest request and one fresh retry, got ${manifestAttempts}`);
+  assert(await retry.isHidden(), 'platform retry: retry action remained visible after recovery');
+  assert((await run.page.evaluate(() => document.activeElement?.id)) === 'project-focus', 'platform retry: successful retry left focus on a hidden control');
+  assert((await run.page.locator('.globe-stage').getAttribute('data-catalog-delivery')) === 'build-bound-bootstrap', 'platform retry: retry changed the visible data source');
+  const warnings = run.consoleWarnings.filter((message) => message.includes('Commonworld catalog aggregate unavailable'));
+  assert(warnings.length === 1, `platform retry: expected one bounded aggregate warning (${JSON.stringify(run.consoleWarnings)})`);
+  const expectedNetworkErrors = run.consoleErrors.filter((message) => message.includes('Failed to load resource: net::ERR_FAILED'));
+  const unexpectedConsoleErrors = run.consoleErrors.filter((message) => !message.includes('Failed to load resource: net::ERR_FAILED'));
+  assert(expectedNetworkErrors.length === 1, `platform retry: expected exactly one aborted-resource console error (${JSON.stringify(run.consoleErrors)})`);
+  assert(unexpectedConsoleErrors.length === 0, `platform retry: unexpected console errors: ${unexpectedConsoleErrors.join(' | ')}`);
+  assert(run.pageErrors.length === 0, `platform retry: page errors: ${run.pageErrors.join(' | ')}`);
+  results.push({ id: 'catalogue-platform-retry', verdict: 'PASS', manifestAttempts });
+  await run.context.close();
+}
+
+async function catalogueDetailStaleResponseScenario() {
+  process.stdout.write(`${JSON.stringify({ state: 'RUNNING', scenario: 'catalogue-detail-stale-response' })}\n`);
+  const run = await newPage();
+  await run.page.goto(baseUrl, { waitUntil: 'domcontentloaded' });
+  await run.page.waitForSelector('html.runtime-ready');
+  await run.page.waitForFunction(() => document.querySelector('.globe-stage')?.dataset.catalogPlatform === 'ready');
+  await run.page.locator('#commons-search').fill('Debian');
+  await run.page.waitForTimeout(220);
+  await run.page.locator('.discovery-result-main[data-commonproject-id="debian"]').click();
+  await run.page.waitForFunction(() => {
+    const stage = document.querySelector('.globe-stage');
+    return stage?.dataset.catalogRecordShadow === 'ready'
+      && stage.dataset.catalogDetailShadow === 'ready'
+      && stage.dataset.catalogDetailShadowId === 'debian';
+  });
+  await run.page.locator('#commons-search').fill('Bauhaus');
+  await run.page.waitForTimeout(220);
+  await run.page.locator('.discovery-result-main[data-commonproject-id="das-bauhaus"]').click();
+  await run.page.waitForFunction(() => {
+    const stage = document.querySelector('.globe-stage');
+    return stage?.dataset.catalogDetailShadowId === 'das-bauhaus'
+      && stage.dataset.catalogDetailShadow === 'ready';
+  });
+  assert((await run.page.locator('#focus-title').textContent()) === 'Das Bauhaus', 'stale response: late Debian response overwrote Bauhaus selection');
+  results.push({ id: 'catalogue-detail-stale-response', verdict: 'PASS' });
   await run.context.close();
 }
 
@@ -3114,6 +3333,9 @@ try {
   await syntheticCatalogueTruthScenario();
   await liveUiHardeningScenario();
   await catalogueNetworkBlockedScenario();
+  await cataloguePlatformRetryScenario();
+  await catalogueDetailRetryScenario();
+  await catalogueDetailStaleResponseScenario();
   await bootstrapAssetFailureFallbackScenario();
   await postRenderFailurePreservesFallbackScenario();
   await providerFailureScenario();

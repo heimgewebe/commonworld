@@ -20,7 +20,10 @@ def test_runtime_projection_is_deterministic_and_compact():
     forbidden = {"summary", "provenance", "links", "curation", "handoff"}
     for record in world["records"]:
         assert forbidden.isdisjoint(record)
-        assert record["detail"] == f"catalog/projects/{record['id']}.json"
+        assert isinstance(record["detail"], dict)
+        assert record["detail"]["identity"] == record["id"]
+        assert record["detail"]["version"] == "1.0"
+        assert record["detail"]["generation"] == manifest["generation"]
         for location in record["presence"]["geographic"]:
             assert location["mode"] != "hidden"
             assert "geometry" in location
@@ -68,3 +71,33 @@ def test_aggregate_indexes_only_manifest_shards():
             indexed.update(keys)
     assert indexed <= shard_keys
     assert aggregate["digital"]["available"] or aggregate["digital"]["unavailable"]
+
+
+def test_details_are_content_addressed_and_generation_bound():
+    subprocess.run(["python3", "scripts/build_catalog_runtime.py"], cwd=ROOT, check=True)
+    manifest = json.loads((ROOT / "catalog/runtime/manifest.v1.json").read_text(encoding="utf-8"))
+    details = manifest["details"]
+    assert details["strategy"] == "content-addressed-shard-descriptors"
+    assert details["descriptor_version"] == "1.0"
+    assert details["url_template"] == "catalog/runtime/details/{sha256}.v1.json"
+    assert details["project_schema_version"] == 4
+    assert details["entry_count"] == manifest["entry_count"]
+    world = json.loads((ROOT / "catalog/runtime/world.v1.json").read_text(encoding="utf-8"))
+    detail_urls = {record["detail"]["url"] for record in world["records"]}
+    detail_sha256s = {record["detail"]["sha256"] for record in world["records"]}
+    detail_dir = ROOT / "catalog/runtime/details"
+    detail_files = {f.name for f in detail_dir.glob("*.v1.json")}
+    for url in detail_urls:
+        filename = url.split("/")[-1]
+        assert filename in detail_files, f"declared detail file missing: {filename}"
+    for filename in detail_files:
+        path = detail_dir / filename
+        payload = path.read_bytes()
+        computed = hashlib.sha256(payload).hexdigest()
+        assert computed in detail_sha256s, f"orphaned detail file: {filename}"
+    for record in world["records"]:
+        descriptor = record["detail"]
+        assert descriptor["url"] == f"catalog/runtime/details/{descriptor['sha256']}.v1.json"
+        detail_path = ROOT / descriptor["url"]
+        assert detail_path.read_bytes()[:1] == b"{"  # canonical JSON
+        assert descriptor["bytes"] == len(detail_path.read_bytes())

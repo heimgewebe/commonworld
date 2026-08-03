@@ -2,7 +2,9 @@ import assert from 'node:assert/strict';
 import { createHash, webcrypto } from 'node:crypto';
 import test from 'node:test';
 import {
+  createCatalogLoadCache,
   loadCatalogAggregate,
+  loadCatalogDetail,
   loadCatalogShard,
   selectAggregateShardKeys,
   shardKeyForIdentity,
@@ -15,6 +17,12 @@ const descriptor = (value, url = 'catalog/runtime/aggregate.v1.json') => ({ byte
 const sourceHash = 'a'.repeat(64);
 const aggregateStub = { kind: 'commonworld.catalog_aggregate', version: '1.0', entry_count: 1, source_catalog_sha256: sourceHash, spatial_cell_degrees: 10, themes: {}, spatial_cells: {}, digital: { available: [], unavailable: [] } };
 const shardDescriptor = { key: '01', entry_count: 1, ...descriptor({ records: [] }, 'catalog/runtime/shards/01.v1.json') };
+const generation = 'b'.repeat(64);
+
+function detailDescriptor(identifier = 'debian') {
+  const compact = compactRecord(identifier);
+  return { version: '1.0', identity: identifier, generation, url: compact.detail.url, sha256: compact.detail.sha256, bytes: compact.detail.bytes };
+}
 
 function response(value) {
   const payload = bytes(value);
@@ -22,6 +30,25 @@ function response(value) {
 }
 
 function compactRecord(identifier = 'debian') {
+  const fullRecord = {
+    schema_version: 4,
+    id: identifier,
+    title: identifier === 'debian' ? 'Debian' : `Project ${identifier}`,
+    summary: 'A free operating system that is committed to stability and freedom.',
+    themes: ['software'],
+    actions: ['use'],
+    presence: { geographic: [], digital: { available: true }, relations: [] },
+    activity: { status: 'active' },
+    languages: { codes: ['en'] },
+    access: null,
+    provenance: { sources: [] },
+    curation: { reviewed_at: '2026-01-01', next_review_at: '2026-07-01' },
+    links: [{ url: 'https://debian.org', label: 'Debian' }],
+    relations: [],
+  };
+  const payload = bytes(fullRecord);
+  const digest = createHash('sha256').update(payload).digest('hex');
+  const detailUrl = `catalog/runtime/details/${digest}.v1.json`;
   return {
     id: identifier,
     title: identifier === 'debian' ? 'Debian' : `Project ${identifier}`,
@@ -31,7 +58,33 @@ function compactRecord(identifier = 'debian') {
     access: null,
     presence: { geographic: [], digital: true },
     activity: 'active',
-    detail: `catalog/projects/${identifier}.json`,
+    detail: {
+      version: '1.0',
+      identity: identifier,
+      generation,
+      url: detailUrl,
+      sha256: digest,
+      bytes: payload.byteLength,
+    },
+  };
+}
+
+function fullProjectRecord(identifier = 'debian') {
+  return {
+    schema_version: 4,
+    id: identifier,
+    title: identifier === 'debian' ? 'Debian' : `Project ${identifier}`,
+    summary: 'A free operating system that is committed to stability and freedom.',
+    themes: ['software'],
+    actions: ['use'],
+    presence: { geographic: [], digital: { available: true }, relations: [] },
+    activity: { status: 'active' },
+    languages: { codes: ['en'] },
+    access: null,
+    provenance: { sources: [] },
+    curation: { reviewed_at: '2026-01-01', next_review_at: '2026-07-01' },
+    links: [{ url: 'https://debian.org', label: 'Debian' }],
+    relations: [],
   };
 }
 
@@ -41,10 +94,19 @@ function platformForShard(shard, { entryCount = shard.records.length, descriptor
     manifest: {
       kind: 'commonworld.catalog_runtime_manifest',
       version: '1.0',
-      generation: 'b'.repeat(64),
+      generation,
       entry_count: entryCount,
       source_catalog_sha256: sourceHash,
+      world_index: descriptor({ kind: 'commonworld.world_index', version: '1.0', records: [] }),
       aggregate: descriptor(aggregateStub),
+      details: {
+        strategy: 'content-addressed-shard-descriptors',
+        descriptor_version: '1.0',
+        url_template: 'catalog/runtime/details/{sha256}.v1.json',
+        entry_count: entryCount,
+        detail_set_sha256: 'c'.repeat(64),
+        project_schema_version: 4,
+      },
       shards: { strategy: 'sha256-prefix', prefix_length: 2, entries: [shardEntry] },
     },
     documentRoot,
@@ -59,7 +121,13 @@ test('integrity verification rejects changed catalog bytes', async () => {
 
 test('aggregate loader binds manifest descriptor and payload', async () => {
   const aggregate = { ...aggregateStub, digital: { available: ['01'], unavailable: [] } };
-  const manifest = { kind: 'commonworld.catalog_runtime_manifest', version: '1.0', generation: 'b'.repeat(64), entry_count: 1, source_catalog_sha256: sourceHash, aggregate: descriptor(aggregate), shards: { strategy: 'sha256-prefix', prefix_length: 2, entries: [shardDescriptor] } };
+  const manifest = {
+    kind: 'commonworld.catalog_runtime_manifest', version: '1.0', generation, entry_count: 1,
+    source_catalog_sha256: sourceHash, world_index: descriptor({}),
+    aggregate: descriptor(aggregate),
+    details: { strategy: 'content-addressed-shard-descriptors', descriptor_version: '1.0', url_template: 'catalog/runtime/details/{sha256}.v1.json', entry_count: 1, detail_set_sha256: 'c'.repeat(64), project_schema_version: 4 },
+    shards: { strategy: 'sha256-prefix', prefix_length: 2, entries: [shardDescriptor] },
+  };
   const calls = [];
   const fetchImpl = async (url) => { calls.push(String(url)); return calls.length === 1 ? response(manifest) : response(aggregate); };
   const loaded = await loadCatalogAggregate({ manifestUrl: 'https://commonworld.test/catalog/runtime/manifest.v1.json', fetchImpl, cryptoImpl: webcrypto });
@@ -142,10 +210,10 @@ test('catalog shard loading validates payload key, entry count, duplicate IDs an
     [{ kind: 'commonworld.catalog_shard', version: '1.0', key: 'ff', records: [record] }, { descriptorKey: key }, /key mismatch/],
     [{ kind: 'commonworld.catalog_shard', version: '1.0', key, records: [record] }, { entryCount: 2 }, /entry count mismatch/],
     [{ kind: 'commonworld.catalog_shard', version: '1.0', key, records: [record, record] }, {}, /duplicate identity/],
-    [{ kind: 'commonworld.catalog_shard', version: '1.0', key, records: [{ ...record, detail: '../escape.json' }] }, {}, /detail reference/],
+    [{ kind: 'commonworld.catalog_shard', version: '1.0', key, records: [{ ...record, detail: { ...record.detail, identity: 'wrong' } }] }, {}, /identity mismatch/],
     [{ kind: 'commonworld.catalog_shard', version: '1.0', key, records: [{ ...record, languages: ['en', 'en'] }] }, {}, /duplicate value/],
     [{ kind: 'commonworld.catalog_shard', version: '1.0', key, records: [{ ...record, presence: { geographic: [{ mode: 'exact', geometry: { type: 'Point', coordinates: [null, 10] } }], digital: false } }] }, {}, /longitude/],
-    [{ kind: 'commonworld.catalog_shard', version: '1.0', key, records: [{ ...record, id: 'Bad-ID', detail: 'catalog/projects/Bad-ID.json' }] }, {}, /invalid format/],
+    [{ kind: 'commonworld.catalog_shard', version: '1.0', key, records: [{ ...record, id: 'Bad-ID', detail: { ...record.detail, identity: 'Bad-ID', url: record.detail.url } }] }, {}, /invalid format/],
     [{ kind: 'commonworld.catalog_shard', version: '1.0', key, records: [{ ...record, themes: [] }] }, {}, /invalid item count/],
     [{ kind: 'commonworld.catalog_shard', version: '1.0', key, records: [{ ...record, themes: ['one', 'two', 'three', 'four', 'five', 'six', 'seven', 'eight', 'nine'] }] }, {}, /invalid item count/],
     [{ kind: 'commonworld.catalog_shard', version: '1.0', key, records: [{ ...record, themes: ['Bad Theme'] }] }, {}, /invalid value/],
@@ -189,12 +257,10 @@ test('spatial cell calculation is bounded at world edges', () => {
 test('aggregate loader rejects inconsistent shard sums and duplicate aggregate shard references', async () => {
   const aggregate = { ...aggregateStub, themes: { software: ['01', '01'] } };
   const sumMismatchManifest = {
-    kind: 'commonworld.catalog_runtime_manifest',
-    version: '1.0',
-    generation: 'b'.repeat(64),
-    entry_count: 2,
-    source_catalog_sha256: sourceHash,
+    kind: 'commonworld.catalog_runtime_manifest', version: '1.0', generation, entry_count: 2,
+    source_catalog_sha256: sourceHash, world_index: descriptor({}),
     aggregate: descriptor({ ...aggregate, entry_count: 2 }),
+    details: { strategy: 'content-addressed-shard-descriptors', descriptor_version: '1.0', url_template: 'catalog/runtime/details/{sha256}.v1.json', entry_count: 2, detail_set_sha256: 'c'.repeat(64), project_schema_version: 4 },
     shards: { strategy: 'sha256-prefix', prefix_length: 2, entries: [shardDescriptor] },
   };
   let calls = 0;
@@ -208,6 +274,7 @@ test('aggregate loader rejects inconsistent shard sums and duplicate aggregate s
     ...sumMismatchManifest,
     entry_count: 1,
     aggregate: descriptor(aggregate),
+    details: { ...sumMismatchManifest.details, entry_count: 1 },
   };
   const fetchImpl = async (url) => String(url).includes('manifest') ? response(duplicateManifest) : response(aggregate);
   await assert.rejects(
@@ -218,7 +285,13 @@ test('aggregate loader rejects inconsistent shard sums and duplicate aggregate s
 
 test('aggregate loader rejects cross-origin descriptors and unknown shards', async () => {
   const aggregate = { ...aggregateStub, themes: { water: ['ff'] } };
-  const manifest = { kind: 'commonworld.catalog_runtime_manifest', version: '1.0', generation: 'b'.repeat(64), entry_count: 1, source_catalog_sha256: sourceHash, aggregate: descriptor(aggregate), shards: { strategy: 'sha256-prefix', prefix_length: 2, entries: [shardDescriptor] } };
+  const manifest = {
+    kind: 'commonworld.catalog_runtime_manifest', version: '1.0', generation, entry_count: 1,
+    source_catalog_sha256: sourceHash, world_index: descriptor({}),
+    aggregate: descriptor(aggregate),
+    details: { strategy: 'content-addressed-shard-descriptors', descriptor_version: '1.0', url_template: 'catalog/runtime/details/{sha256}.v1.json', entry_count: 1, detail_set_sha256: 'c'.repeat(64), project_schema_version: 4 },
+    shards: { strategy: 'sha256-prefix', prefix_length: 2, entries: [shardDescriptor] },
+  };
   const fetchImpl = async (_url) => _url.toString().includes('manifest') ? response(manifest) : response(aggregate);
   await assert.rejects(() => loadCatalogAggregate({ manifestUrl: 'https://commonworld.test/catalog/runtime/manifest.v1.json', fetchImpl, cryptoImpl: webcrypto }), /unknown shard/);
   manifest.aggregate = descriptor(aggregate, 'https://evil.test/aggregate.json');
@@ -228,4 +301,77 @@ test('aggregate loader rejects cross-origin descriptors and unknown shards', asy
 test('spatial cell calculation rejects out-of-world coordinates and uneven grids', () => {
   assert.throws(() => spatialCellForCoordinates(181, 0), /invalid spatial cell/);
   assert.throws(() => spatialCellForCoordinates(0, 0, 7), /invalid spatial cell/);
+});
+
+test('createCatalogLoadCache provides bounded LRU caching with deterministic eviction', async () => {
+  const cache = createCatalogLoadCache(3);
+  let counter = 0;
+  const result1 = await cache.load('a', () => ++counter);
+  const result2 = await cache.load('b', () => ++counter);
+  const result3 = await cache.load('c', () => ++counter);
+  assert.equal(cache.size, 3);
+  assert.equal(result1, 1);
+  const result1Again = await cache.load('a', () => ++counter);
+  assert.equal(result1Again, 1);
+  assert.equal(cache.size, 3);
+  const result4 = await cache.load('d', () => ++counter);
+  assert.equal(cache.size, 3);
+  assert.equal(result4, 4);
+  const result2Again = await cache.load('b', () => ++counter);
+  assert.equal(result2Again, 2);
+  cache.clear();
+  assert.equal(cache.size, 0);
+});
+
+test('createCatalogLoadCache removes failed promises', async () => {
+  const cache = createCatalogLoadCache(2);
+  await assert.rejects(() => cache.load('fail', () => Promise.reject(new Error('test'))));
+  assert.equal(cache.size, 0);
+  const result = await cache.load('fail', () => 'recovered');
+  assert.equal(result, 'recovered');
+});
+
+test('loadCatalogDetail validates content-addressed detail against compact record', async () => {
+  const fullRecord = fullProjectRecord();
+  const key = await shardKeyForIdentity('debian', webcrypto);
+  const compact = compactRecord();
+  const shard = { kind: 'commonworld.catalog_shard', version: '1.0', key, records: [compact] };
+  const platform = platformForShard(shard);
+  const detailUrl = `https://commonworld.test/${compact.detail.url}`;
+  const calls = [];
+  const fetchImpl = async (url) => {
+    calls.push(String(url));
+    if (String(url).includes('manifest') || String(url).includes('aggregate') || String(url).includes('shards')) return response(shard);
+    return response(fullRecord);
+  };
+  const loaded = await loadCatalogDetail(platform, compact, { fetchImpl, cryptoImpl: webcrypto });
+  assert.equal(loaded.identity, 'debian');
+  assert.equal(loaded.generation, generation);
+  assert(loaded.detailUrl.includes('/catalog/runtime/details/'));
+  assert.equal(loaded.record.id, 'debian');
+  assert(Object.isFrozen(loaded));
+});
+
+test('loadCatalogDetail rejects compact record with wrong generation', async () => {
+  const key = await shardKeyForIdentity('debian', webcrypto);
+  const compact = compactRecord();
+  const shard = { kind: 'commonworld.catalog_shard', version: '1.0', key, records: [compact] };
+  const platform = platformForShard(shard);
+  const wrongCompact = { ...compact, detail: { ...compact.detail, generation: 'f'.repeat(64) } };
+  await assert.rejects(
+    () => loadCatalogDetail(platform, wrongCompact, { fetchImpl: async () => response(fullProjectRecord()), cryptoImpl: webcrypto }),
+    /generation mismatch/,
+  );
+});
+
+test('loadCatalogDetail rejects detail with compact parity mismatch', async () => {
+  const key = await shardKeyForIdentity('debian', webcrypto);
+  const compact = compactRecord();
+  const shard = { kind: 'commonworld.catalog_shard', version: '1.0', key, records: [compact] };
+  const platform = platformForShard(shard);
+  const mismatchedRecord = { ...fullProjectRecord(), title: 'Different Title' };
+  await assert.rejects(
+    () => loadCatalogDetail(platform, compact, { fetchImpl: async () => response(mismatchedRecord), cryptoImpl: webcrypto }),
+    /compact parity mismatch/,
+  );
 });

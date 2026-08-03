@@ -122,7 +122,7 @@
     {
       "id": "layer-journey-moveend-return",
       "verdict": "PASS",
-      "elapsedMs": 1793
+      "elapsedMs": 1853
     },
     {
       "id": "layer-journey-interrupted",
@@ -192,6 +192,16 @@
           "height": 44
         },
         "minimumCatalogSelectHeight": 44
+      },
+      "landscapeDetail": {
+        "viewport": {
+          "width": 667,
+          "height": 375
+        },
+        "gridColumnCount": 2,
+        "panelHorizontalOverflow": 0,
+        "gridHorizontalOverflow": 0,
+        "finalSectionReachable": true
       }
     },
     {
@@ -243,9 +253,9 @@
     }
   ],
   "binding": {
-    "smoke_script_sha256": "9967ff7ac030ce3b1d0587f12dc786f89d05403aaa9c3ccc84b95de1cb6e4d5f",
+    "smoke_script_sha256": "b0d379681c8f5c0f0efa68d31b243401c166b4bd6b01d84e539610e5881f5859",
     "smoke_runner_sha256": "522b99b70b1d0064b1d0a31a3a67fdc9a2e73b7408f37d1a4bb303bc360b7556",
-    "first_party_surface_sha256": "9aff93aad04ddd04de3b22ec70aad391b263c7499e5b8b4a739bd3405578d115",
+    "first_party_surface_sha256": "b0b338ef10a48c7d7557b642002c3a9823c2eb8cba78fe88fbbfb00af06486ba",
     "scenario_ids": [
       "startup-and-ring-orbits",
       "ring-orbits-reduced-motion",
@@ -283,8 +293,9 @@
     "smoke_plan_sha256": "6b8749928ead5ef81ee66883e6a2993e756ce083575c3569234bf70526448364"
   },
   "execution": {
-    "job_id": "2c36093bedff",
-    "finalization_receipt_sha256": "854b510c107675322c842343840c9bf64111d6f38894a0af70a91f7adf54c525",
-    "result_sha256": "8f0b1590b90feb8c23a29ad4e2fb0cceaffa3a5eb72cfbf51cc903dafcfd1cac"
+    "job_id": "a6f3d8662109",
+    "finalization_receipt_sha256": "f5b7b1bc2802ed9ddec6781cf649f059bcab17d2784f9d066908b0c9d9d6d26c",
+    "job_finalization_receipt_sha256": "e20acd3b304e1b67a4e101313e35d026d4e219ad152cda3d023d9ec97f35ab99",
+    "result_sha256": "a250187031fa75a87758b660574d6a8c6e4cb420684b5f11cac78c1ec7cf3729"
   }
 }

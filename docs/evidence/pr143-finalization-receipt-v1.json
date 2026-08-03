@@ -1,0 +1,49 @@
+{
+  "schema_version": 1,
+  "kind": "commonworld_pr143_finalization_receipt",
+  "source_commit": "02d5d4fb231ee4bdaac88a0fd17702019dcf1fa9",
+  "branch": "feat/digital-detail-unification-v1",
+  "base_commit": "47b6e82c6e359dda1b03737ab45de0dbbca8f794",
+  "result_sha256": {
+    "static": "6f5e91131aa4ce75b199cbf43d1207c4468397260eb7cbdaf08edb6d35f04874",
+    "browser": "291cfe163bfcbefc68b9096d3dccc78feabeaf272f987128136004f3583ec2c7",
+    "smoke": "a250187031fa75a87758b660574d6a8c6e4cb420684b5f11cac78c1ec7cf3729"
+  },
+  "job_id": {
+    "static": "9361a13873c2",
+    "browser": "b500eaca7a7f",
+    "smoke": "a6f3d8662109"
+  },
+  "job_finalization_receipt_sha256": {
+    "static": "03ed2ef954e9cab2ff5d64d324852ddd26bd738f246becde13460c32259d552e",
+    "browser": "98c28b96dcb591b50f67a0bbab79546ca493e419a3245eae1e5e6cb8974eb70a",
+    "smoke": "e20acd3b304e1b67a4e101313e35d026d4e219ad152cda3d023d9ec97f35ab99"
+  },
+  "validation": {
+    "public_browser_scenarios": 31,
+    "low_height_detail": {
+      "viewport": {
+        "width": 667,
+        "height": 375
+      },
+      "gridColumnCount": 2,
+      "panelHorizontalOverflow": 0,
+      "gridHorizontalOverflow": 0,
+      "finalSectionReachable": true
+    },
+    "browser_profiles": [
+      "mobile-low-power",
+      "desktop-low-power"
+    ],
+    "cpu_throttle_rate": 4,
+    "catalog_records": 65,
+    "catalog_bootstrap_gzip_bytes": 20132,
+    "startup_project_requests": 0
+  },
+  "does_not_establish": [
+    "final_commit_sha",
+    "github_ci_on_final_head",
+    "merge_completion",
+    "post_merge_pages_readback"
+  ]
+}

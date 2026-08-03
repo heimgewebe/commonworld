@@ -46,6 +46,8 @@ Nur startrelevante Felder: Identität, Titel, Themen, Präsenzbits, grobe öffen
 
 Vollständige öffentliche CommonProject-Projektion, einzeln cachebar. Quellen und Provenienz bleiben hier erhalten.
 
+Details werden als inhaltsadressierte Deskriptoren ausgeliefert: `catalog/runtime/details/{sha256}.v1.json`. Jeder Detail-Deskriptor ist an eine Bindeseite gebunden, die `source_catalog_sha256`, `detail_set_sha256`, `project_schema_version` und `detail_descriptor_version` (aktuell `1.0`) enthält. Der Browser prüft diese Bindung und vergleicht die geladene URL mit der im Manifest deklarierten inhaltsadressierten URL. Eine inhaltliche Abweichung oder eine nicht passende Generierung wird als `mismatch` markiert und nicht über den Bootstrap angezeigt.
+
 ## Skalierungsweg
 
 - Bis etwa 10.000 veröffentlichte Commons: statische Weltprojektion plus Detaildateien.
@@ -66,6 +68,7 @@ Die Schwellen sind Messpunkte, keine harten Katalogzahlen.
 6. Ein fehlgeschlagener Snapshotwechsel lässt die vorherige vollständige Generation aktiv.
 7. Suche und Karte verwenden dieselbe zulässige Kandidatenmenge.
 8. Details sind bedarfsgeladen; der Bootstrap enthält keine wachsende Commons-Liste.
+9. Detail-Deskriptoren sind inhaltsadressiert und an den Generierungsseed gebunden; eine Abweichung wird nicht als Wahrheit angezeigt.
 
 ## Alternative Sinnachse
 
@@ -122,6 +125,42 @@ Die sichtbare Oberfläche bleibt weiterhin vollständig an den buildgebundenen B
 
 Dieser Schritt belegt noch keine Lazy-Detail-Ladung, keinen Bootstrap-Cutover, keine physische Gerätefreigabe und keine Weltgewebe-Publisher-Kette. Das nächste Gate ist ein generationsgebundener Detailpfad mit definierten Lade-, Fehler- und Deep-Link-Zuständen.
 
+## Generationsgebundener Detail-Shadow-Pfad
+
+Bei einer konkreten Auswahl lädt der Browser den inhaltsadressierten Detail-Deskriptor aus dem Manifest. Der Deskriptor enthält Bindeseite (Generierungsseed), URL, Byteanzahl und SHA-256. Der Browser validiert:
+
+1. **Same-Origin**: Detail-URL liegt auf derselben Origin wie die Anwendung.
+2. **Document-Root-Containment**: Die URL verlässt nicht das Anwendungsverzeichnis.
+3. **Generierungsbindung**: `source_catalog_sha256`, `detail_set_sha256`, `project_schema_version` und `detail_descriptor_version` stimmen mit dem aktuellen Katalog überein.
+4. **Identitätsbindung**: Die `CommonProject.id` im Detail-Deskriptor entspricht der erwarteten Identität.
+5. **Inhaltsadressierte URL**: Die geladene Detail-URL entspricht exakt der im Manifest deklarierten inhaltsadressierten URL.
+6. **Byte-Anzahl und SHA-256**: Die heruntergeladene Datei entspricht den deklarierten Metriken.
+7. **UTF-8 JSON**: Die Datei ist valides, UTF-8-kodiertes JSON.
+8. **Schema-Version 4**: Das `schema_version`-Feld entspricht der erwarteten Version.
+9. **Begrenzte Form**: Die Detailstruktur überschreitet die definierten Grenzen (`max_top_level_keys`, `max_string_length`, `max_array_length`).
+10. **Kompakte Parität**: Die im kompakten Record vorhandenen Felder stimmen mit dem Detail überein.
+
+Fehlgeschlagene Detailanfragen werden nicht dauerhaft gecacht und können bei einer späteren Auswahl erneut versucht werden. Der Browser verwendet einen begrenzten LRU-Cache (`CATALOG_DETAIL_CACHE_LIMIT = 16` für Details, `CATALOG_SHARD_CACHE_LIMIT = 8` für Shards) zur Vermeidung wiederholter identischer Anfragen.
+
+### Shadow-Status
+
+Der Detail-Shadow-Zustand wird am `data-catalog-detail-shadow`-Attribut des Stage-Elements veröffentlicht:
+
+- `ready`: Detail-Parität erreicht.
+- `mismatch`: Detail-Inhalt weicht vom Bootstrap ab (z. B. Generation, Identität oder Parität).
+- `degraded`: Detail-Anfrage fehlgeschlagen; der Bootstrap bleibt aktiv.
+- `retrying`: Der Benutzer hat einen expliziten Retry ausgelöst.
+
+Ein `mismatch` oder `degraded` leert weder Fokus, Suche, Karte noch Textansicht. Der sichtbare Inhalt bleibt vollständig am buildgebundenen Bootstrap. Retry-Aktionen sind nur sichtbar, wenn der Zustand `retrying` nicht bereits aktiv ist, um parallele Anfragen zu verhindern.
+
 ### Cutover-Gate
 
-Der Bootstrap darf erst entfernt werden, wenn Feldparität, Deep-Link-Parität, definierte Lade- und Fehlerzustände für Details, Browser-Smoke und physischer Geräte-Readback belegt sind. Bis dahin bleibt die neue Plattform beobachtend und rückwärtskompatibel.
+Der Bootstrap darf erst entfernt werden, wenn:
+
+1. Feldparität zwischen Bootstrap und Detail-Shadow belegt ist.
+2. Deep-Link-Parität in allen Selektionszuständen (`initial`, `selected`, `compatible_selected`) erreicht ist.
+3. Definierte Lade-, Retry- und Fehlerzustände (`loading`, `ready`, `retrying`, `degraded`, `mismatch`) vollständig abgedeckt sind.
+4. Der Cutover nur durch den `cutover_authority`-Eintrag im Vertrag freigegeben wird.
+5. Browser-Smoke und physischer Geräte-Readback belegt sind.
+
+Bis dahin bleibt die neue Plattform beobachtend und rückwärtskompatibel.
