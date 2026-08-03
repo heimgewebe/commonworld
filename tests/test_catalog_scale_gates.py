@@ -22,12 +22,19 @@ class CatalogScaleGateValidationTests(unittest.TestCase):
         for relative in (
             Path("contracts/commonworld/catalog-scale-gates.contract.json"),
             Path("contracts/commonworld/current-state.contract.json"),
+            Path("contracts/commonworld/project.schema.json"),
             Path("docs/evidence/catalog-platform-scaling-v1.json"),
+            Path("scripts/__init__.py"),
             Path("scripts/measure_catalog_platform_scaling.py"),
+            Path("scripts/catalog_scale_fixtures.py"),
+            Path("scripts/validate_contracts.py"),
+            Path("catalog/catalog.json"),
+            Path("catalog/locales/en.json"),
         ):
             target = self.root / relative
             target.parent.mkdir(parents=True, exist_ok=True)
             shutil.copy2(ROOT / relative, target)
+        shutil.copytree(ROOT / "catalog" / "projects", self.root / "catalog" / "projects")
 
     def tearDown(self):
         self.temp_directory.cleanup()
@@ -63,13 +70,85 @@ class CatalogScaleGateValidationTests(unittest.TestCase):
             MODULE.validate_catalog_scale_gates(self.root, verify_measurements=False),
         )
 
-    def test_cutover_cannot_be_authorized_by_synthetic_evidence(self):
+    def test_obsolete_synthetic_marker_cannot_replace_representative_fixture_disclosure(self):
+        relative = "contracts/commonworld/catalog-scale-gates.contract.json"
+        contract = self.load(relative)
+        contract["measurement"].pop("representative_fixture_only")
+        contract["measurement"]["synthetic_only"] = True
+        self.write(relative, contract)
+        errors = MODULE.validate_catalog_scale_gates(self.root, verify_measurements=False)
+        self.assertIn("catalogue scale contract must disclose representative-fixture-only evidence", errors)
+        self.assertIn("catalogue scale contract must not retain the obsolete synthetic-only model", errors)
+
+    def test_cutover_cannot_be_authorized_by_representative_fixture_evidence(self):
         relative = "contracts/commonworld/catalog-scale-gates.contract.json"
         contract = self.load(relative)
         contract["current_authorization"]["cutover_authorized"] = True
         self.write(relative, contract)
         self.assertIn(
             "catalogue scale contract must not authorize cutover",
+            MODULE.validate_catalog_scale_gates(self.root, verify_measurements=False),
+        )
+
+    def test_fixture_source_digest_is_bound_to_the_exact_catalogue(self):
+        relative = "docs/evidence/catalog-platform-scaling-v1.json"
+        evidence = self.load(relative)
+        evidence["fixture_model"]["source_catalog_sha256"] = "0" * 64
+        self.write(relative, evidence)
+        self.assertIn(
+            "catalogue scaling fixture source digest drift",
+            MODULE.validate_catalog_scale_gates(self.root, verify_measurements=False),
+        )
+
+    def test_fixture_project_set_digest_is_bound_to_project_contents(self):
+        relative = "docs/evidence/catalog-platform-scaling-v1.json"
+        evidence = self.load(relative)
+        evidence["fixture_model"]["source_project_set_sha256"] = "0" * 64
+        self.write(relative, evidence)
+        self.assertIn(
+            "catalogue scaling fixture project-set digest drift",
+            MODULE.validate_catalog_scale_gates(self.root, verify_measurements=False),
+        )
+
+    def test_fixture_english_overlay_digest_is_bound_to_overlay_contents(self):
+        relative = "docs/evidence/catalog-platform-scaling-v1.json"
+        evidence = self.load(relative)
+        evidence["fixture_model"]["source_english_overlay_sha256"] = "0" * 64
+        self.write(relative, evidence)
+        self.assertIn(
+            "catalogue scaling fixture English overlay digest drift",
+            MODULE.validate_catalog_scale_gates(self.root, verify_measurements=False),
+        )
+
+    def test_malformed_source_project_inventory_fails_closed_without_exception(self):
+        relative = "catalog/catalog.json"
+        catalog = self.load(relative)
+        catalog["project_files"] = "not-a-list"
+        self.write(relative, catalog)
+        self.assertIn(
+            "catalogue scaling source project inventory must be a list",
+            MODULE.validate_catalog_scale_gates(self.root, verify_measurements=False),
+        )
+
+    def test_source_project_path_escape_fails_closed(self):
+        relative = "catalog/catalog.json"
+        catalog = self.load(relative)
+        catalog["project_files"][0] = "../catalog.json"
+        self.write(relative, catalog)
+        errors = MODULE.validate_catalog_scale_gates(self.root, verify_measurements=False)
+        self.assertTrue(
+            any(error.startswith("catalogue scaling source project set is invalid:") for error in errors),
+            errors,
+        )
+
+    def test_full_schema_tier_must_cover_every_released_english_identity(self):
+        relative = "docs/evidence/catalog-platform-scaling-v1.json"
+        evidence = self.load(relative)
+        measurement = next(item for item in evidence["measurements"] if item["entry_count"] == 1_000)
+        measurement["coverage"]["english_overlay_project_count"] -= 1
+        self.write(relative, evidence)
+        self.assertIn(
+            "1000: fixture English overlay coverage incomplete",
             MODULE.validate_catalog_scale_gates(self.root, verify_measurements=False),
         )
 
@@ -85,7 +164,7 @@ class CatalogScaleGateValidationTests(unittest.TestCase):
             MODULE.validate_catalog_scale_gates(self.root, verify_measurements=False),
         )
 
-    def test_100k_stress_warning_cannot_be_silently_glossed_over(self):
+    def test_100k_hard_failure_cannot_be_silently_glossed_over(self):
         relative = "docs/evidence/catalog-platform-scaling-v1.json"
         evidence = self.load(relative)
         measurement = next(item for item in evidence["measurements"] if item["entry_count"] == 100_000)
@@ -93,7 +172,49 @@ class CatalogScaleGateValidationTests(unittest.TestCase):
         self.write(relative, evidence)
         errors = MODULE.validate_catalog_scale_gates(self.root, verify_measurements=False)
         self.assertIn("100000: shard gate does not match measured size", errors)
-        self.assertIn("100000: stress tier must preserve the measured prefix-depth warning", errors)
+        self.assertIn("100000: fixed two-hex stress tier must preserve the measured hard-budget failure", errors)
+
+    def test_100k_stress_projection_cannot_claim_materialized_locales(self):
+        relative = "docs/evidence/catalog-platform-scaling-v1.json"
+        evidence = self.load(relative)
+        measurement = next(item for item in evidence["measurements"] if item["entry_count"] == 100_000)
+        measurement["coverage"]["stress_projection"]["locale_overlays_materialized"] = True
+        measurement["coverage"]["english_overlay_project_count"] = 100_000
+        self.write(relative, evidence)
+        errors = MODULE.validate_catalog_scale_gates(self.root, verify_measurements=False)
+        self.assertIn("100000: stress projection must disclose unmaterialized locale overlays", errors)
+        self.assertIn("100000: compact stress projection must not claim generated English overlays", errors)
+
+    def test_100k_stress_projection_metadata_must_be_an_object(self):
+        relative = "docs/evidence/catalog-platform-scaling-v1.json"
+        evidence = self.load(relative)
+        measurement = next(item for item in evidence["measurements"] if item["entry_count"] == 100_000)
+        measurement["coverage"]["stress_projection"] = "not-an-object"
+        self.write(relative, evidence)
+        self.assertIn(
+            "100000: stress projection metadata must be an object",
+            MODULE.validate_catalog_scale_gates(self.root, verify_measurements=False),
+        )
+
+    def test_100k_prefix_migration_candidate_must_restore_headroom(self):
+        relative = "docs/evidence/catalog-platform-scaling-v1.json"
+        evidence = self.load(relative)
+        measurement = next(item for item in evidence["measurements"] if item["entry_count"] == 100_000)
+        measurement["prefix_migration_candidate"]["gate_evaluation"]["shard_gzip"] = "fail"
+        self.write(relative, evidence)
+        errors = MODULE.validate_catalog_scale_gates(self.root, verify_measurements=False)
+        self.assertIn("100000: prefix migration shard gate does not match measured size", errors)
+        self.assertIn("100000: three-hex prefix migration candidate must restore shard headroom", errors)
+
+    def test_unpublished_fixture_task_cannot_be_asserted_as_registry_truth(self):
+        relative = "docs/evidence/catalog-platform-scaling-v1.json"
+        evidence = self.load(relative)
+        evidence["decision"]["fixture_task"] = "COMMONWORLD-PUBLIC-GLOBE-V1-T039"
+        self.write(relative, evidence)
+        self.assertIn(
+            "catalogue scaling evidence must not assert an unpublished fixture task",
+            MODULE.validate_catalog_scale_gates(self.root, verify_measurements=False),
+        )
 
     def test_backend_escalation_cannot_become_default(self):
         relative = "contracts/commonworld/catalog-scale-gates.contract.json"

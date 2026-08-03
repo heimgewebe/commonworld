@@ -37,7 +37,7 @@ class CatalogScaleMasterplanValidationTests(unittest.TestCase):
     def test_stale_100k_baseline_is_rejected(self):
         path = self.root / "docs/blueprints/commonworld-masterplan.md"
         text = path.read_text(encoding="utf-8")
-        text = text.replace("6.237.810 Byte gzip", "1.541.423 Byte gzip", 1)
+        text = text.replace("9.844.462 Byte gzip", "1.541.423 Byte gzip", 1)
         path.write_text(text, encoding="utf-8")
         errors = MODULE.validate_catalog_scale_masterplan(self.root)
         self.assertIn(
@@ -45,7 +45,7 @@ class CatalogScaleMasterplanValidationTests(unittest.TestCase):
             errors,
         )
         self.assertIn(
-            "canonical catalogue scale plan misses current fragment: 6.237.810 Byte gzip",
+            "canonical catalogue scale plan misses current fragment: 9.844.462 Byte gzip",
             errors,
         )
 
