@@ -7,17 +7,25 @@
   "evidence": "docs/evidence/catalog-platform-scaling-v1.json",
   "measurement": {
     "generator": "scripts/measure_catalog_platform_scaling.py",
-    "synthetic_only": true,
+    "fixture_generator": "scripts/catalog_scale_fixtures.py",
+    "representative_fixture_only": true,
+    "fixture_kind": "schema-realistic-derived-fixtures",
+    "source_catalog": "catalog/catalog.json",
+    "released_locale_overlays": [
+      "de",
+      "en"
+    ],
     "scale_tiers": [
       1000,
       10000
     ],
     "stress_tier": 100000,
     "does_not_establish": [
+      "that generated fixture projects are editorially publishable",
       "real mobile-network latency",
       "physical-device usability",
       "production catalogue cutover",
-      "100,000-entry production readiness"
+      "100,000-entry detail-delivery readiness"
     ]
   },
   "budgets": {
@@ -41,12 +49,13 @@
     "visible_catalogue_source": "compact_build_bound_bootstrap",
     "scale_native_shadow_available": true,
     "cutover_authorized": false,
-    "reason": "The current scale evidence is synthetic and the visible runtime, search, map and recovery surfaces still depend on the complete build-bound catalogue."
+    "reason": "Schema-realistic 1k and 10k fixtures pass the current two-hex shard budgets. At 100,000 compact records the fixed two-hex strategy exceeds the hard shard maximum; a three-hex partition candidate restores shard headroom but is not compatible with the current flat manifest and aggregate contract. Visible runtime, global search, map, digital navigation, bounded recovery and physical-device surfaces remain unproven."
   },
   "decision_policy": {
     "backend_by_default": false,
     "server_search_or_postgis_or_pmtiles": "introduce_only_after_measured_static_boundary_failure",
-    "stress_warning": "A warning at the 100,000-entry stress tier requires a compatible prefix-depth migration design but does not claim production failure at the 1,000-entry or 10,000-entry cutover tiers.",
-    "rollback": "Restore the compact build-bound bootstrap and complete generated recovery catalogue before reattempting cutover."
+    "rollback": "Restore the previous fixture generator and evidence while retaining the compact build-bound bootstrap and complete generated recovery catalogue before reattempting cutover.",
+    "stress_boundary": "The representative 100,000-entry compact stress tier is a measured hard failure for fixed two-hex shards, not a production-ready scale claim.",
+    "prefix_migration_candidate": "Three-hex SHA-256 partitions may be implemented only together with a versioned hierarchical manifest and aggregate contract, compatibility tests, bounded recovery and exact-head browser evidence."
   }
 }

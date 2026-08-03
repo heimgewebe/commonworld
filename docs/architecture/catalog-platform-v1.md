@@ -103,19 +103,21 @@ Bei einem Detailfehler bleiben Titel, Zusammenfassung, Links, Quellen, Karte, Su
 
 Die Schwellen sind Messpunkte, keine harten Katalogzahlen. Der verbindliche Vor-Cutover-Vertrag liegt in `contracts/commonworld/catalog-scale-gates.contract.json`; `scripts/validate_catalog_scale_gates.py` bindet ihn in `make validate` an Evidenz und aktuelle Produktionswahrheit.
 
-## Gemessene Skalierungsgrenzen vom 27. Juli 2026
+## Gemessene Skalierungsgrenzen vom 2. August 2026
 
-Die reproduzierbare synthetische Messung liegt in `docs/evidence/catalog-platform-scaling-v1.json`. Sie verwendet die aktuelle kompakte Datensatzform einschließlich generationsgebundener Detaildescriptoren und eine deterministische SHA-256-Präfixverteilung.
+Die reproduzierbare Messung liegt in `docs/evidence/catalog-platform-scaling-v1.json`. Die Stufen 1.000 und 10.000 werden deterministisch aus dem aktuellen öffentlichen Katalog abgeleitet, erneut gegen CommonProject-Schema v4 geprüft und mit exakten, ungefähren und verborgenen Ortsmodi, digitalen und geografischen Präsenzformen, Relationen, Provenienz, deutschen Kanontexten, englischem Übersetzungs-Overlay sowie inhaltsadressierten Detaildateien aufgebaut. Die 100.000er-Stufe bleibt bewusst ein kompakter Shard-Stresstest ohne materialisierte Detailmenge.
 
-| Einträge | Vollindex gzip | Median Parsezeit | größter Shard gzip | maximale Einträge je Shard | Shard-Gate |
-| ---: | ---: | ---: | ---: | ---: | --- |
-| 1.000 | 62.845 Byte | 4,559 ms | 1.036 Byte | 10 | PASS |
-| 10.000 | 624.128 Byte | 60,552 ms | 4.231 Byte | 59 | PASS |
-| 100.000 | 6.237.810 Byte | 792,946 ms | 28.683 Byte | 440 | WARNUNG |
+| Einträge | Prüfumfang | Vollindex gzip | größter 2-Hex-Shard gzip | maximale Einträge je Shard | Shard-Gate |
+| ---: | --- | ---: | ---: | ---: | --- |
+| 1.000 | vollständiges Schema | 100.733 Byte | 1.723 Byte | 11 | PASS |
+| 10.000 | vollständiges Schema | 999.100 Byte | 6.237 Byte | 60 | PASS |
+| 100.000 | kompakter Stresstest | 9.844.462 Byte | 39.243 Byte | 440 | FAIL |
 
-Schon der vollständige 1.000er-Weltindex überschreitet das 32-KiB-Startbudget und bleibt deshalb bei allen gemessenen Stufen Export- und Prüffläche statt initialer Browserlieferung. Die bedarfsgeladenen Shards liegen bei 1.000 und 10.000 Einträgen deutlich unter der Warnschwelle von 28.672 Byte. Der 100.000er-Stresstest liegt mit 28.683 Byte elf Byte über dieser Warnschwelle, aber noch unter dem harten Maximum von 32.768 Byte. Er erzwingt daher keine Backend-Vorentscheidung, wohl aber einen belegten Präfixtiefen-Migrationspfad vor weiterem Wachstum.
+Schon der vollständige 1.000er-Weltindex überschreitet das 32-KiB-Startbudget und bleibt deshalb bei allen gemessenen Stufen Export- und Prüffläche statt initialer Browserlieferung. Die bedarfsgeladenen 2-Hex-Shards liegen bei 1.000 und 10.000 Einträgen deutlich unter der Warnschwelle von 28.672 Byte. Bei 100.000 Einträgen überschreitet der größte Shard mit 39.243 Byte das harte Maximum von 32.768 Byte; die aktuelle Partitionierung ist dort fail-closed nicht zulässig.
 
-Die Messung ist synthetisch. Sie belegt Payload, lokale Parsegröße und Shardgrenze, aber keine reale Mobilfunklatenz, produktive Such- oder Karteninteraktion oder physische iPad-Bedienbarkeit. Genau diese Lücken gehören zu `COMMONWORLD-PUBLIC-GLOBE-V1-T028`.
+Eine vermessene 3-Hex-Neupartitionierung senkt den größten Shard auf 4.982 Byte und höchstens 42 Einträge. Sie ist dennoch kein fertiger Runtimepfad: Ein flaches Manifest würde 212.373 Byte gzip und das Aggregat 285.832 Byte gzip erreichen. Vor einer solchen Migration braucht Commonworld daher einen versionierten hierarchischen Manifest- und Aggregatvertrag, Kompatibilitäts- und Recoverytests sowie Browserbelege auf demselben Head. Daraus folgt weder 100.000er-Produktionsreife noch eine automatische Backend-, PostGIS- oder PMTiles-Pflicht.
+
+Die Messung belegt deterministische Rekonstruktion, Schema- und Integritätsgrenzen, lokale Payloadgrößen und hostgebundene Parsebeobachtungen sowie den konkreten Shardwachstumspunkt. Parsezeiten stehen nur in der Evidenz und sind keine deterministische Vertragsidentität. Sie belegt keine reale Mobilfunklatenz, vollständige bedarfsgeladene Suche/Karte/Digitalnavigation oder physische iPad-Bedienbarkeit. Genau diese Lücken bleiben bei `COMMONWORLD-PUBLIC-GLOBE-V1-T028`.
 
 ## Invarianten
 

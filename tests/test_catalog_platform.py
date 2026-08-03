@@ -84,15 +84,19 @@ def test_shards_are_complete_manifest_bound_and_carry_current_detail_descriptors
     assert sorted(seen) == sorted(record["id"] for record in world["records"])
 
 
-def test_scaling_evidence_binds_1k_10k_cutover_tiers_and_100k_prefix_warning():
+def test_scaling_evidence_binds_schema_realistic_tiers_and_fail_closed_100k_boundary():
     contract = json.loads((ROOT / "contracts/commonworld/catalog-scale-gates.contract.json").read_text(encoding="utf-8"))
     evidence = json.loads((ROOT / "docs/evidence/catalog-platform-scaling-v1.json").read_text(encoding="utf-8"))
     measurements = {item["entry_count"]: item for item in evidence["measurements"]}
     budgets = contract["budgets"]
 
     assert contract["task_id"] == "COMMONWORLD-PUBLIC-GLOBE-V1-T028"
+    assert contract["measurement"]["representative_fixture_only"] is True
+    assert contract["measurement"]["fixture_generator"] == "scripts/catalog_scale_fixtures.py"
     assert contract["measurement"]["scale_tiers"] == [1_000, 10_000]
     assert contract["measurement"]["stress_tier"] == 100_000
+    assert evidence["version"] == "2.0"
+    assert evidence["fixture_model"]["kind"] == "schema-realistic-derived-fixtures"
     assert set(measurements) == {1_000, 10_000, 100_000}
     assert evidence["budgets"] == {
         "initial_world_index_max_gzip_bytes": budgets["initial_world_index_max_gzip_bytes"],
@@ -101,23 +105,42 @@ def test_scaling_evidence_binds_1k_10k_cutover_tiers_and_100k_prefix_warning():
     }
 
     for count in (1_000, 10_000):
-        assert measurements[count]["world_index"]["gzip_bytes"] > budgets["initial_world_index_max_gzip_bytes"]
-        assert measurements[count]["gate_evaluation"] == {
+        measurement = measurements[count]
+        assert measurement["fixture_scope"] == "full-schema-realistic"
+        assert measurement["coverage"]["location_modes"] == ["approximate", "exact", "hidden"]
+        assert measurement["coverage"]["english_overlay_project_count"] == count
+        assert measurement["details"]["count"] == count
+        assert set(measurement["locale_payloads"]) == {"de", "en"}
+        assert measurement["world_index"]["gzip_bytes"] > budgets["initial_world_index_max_gzip_bytes"]
+        assert measurement["gate_evaluation"] == {
             "world_index_initial_delivery": "rejected",
             "shard_gzip": "pass",
         }
-        assert measurements[count]["shards"]["gzip_max_bytes"] < budgets["shard_warn_gzip_bytes"]
+        assert measurement["shards"]["gzip_max_bytes"] < budgets["shard_warn_gzip_bytes"]
 
     stress = measurements[100_000]
+    assert stress["fixture_scope"] == "compact-shard-stress"
+    assert stress["details"] == {"count": 100_000, "materialized": False}
     assert stress["world_index"]["gzip_bytes"] > 1_000_000
-    assert budgets["shard_warn_gzip_bytes"] <= stress["shards"]["gzip_max_bytes"] < budgets["shard_max_gzip_bytes"]
+    assert stress["shards"]["gzip_max_bytes"] >= budgets["shard_max_gzip_bytes"]
     assert stress["gate_evaluation"] == {
         "world_index_initial_delivery": "rejected",
-        "shard_gzip": "warning",
+        "shard_gzip": "fail",
     }
+    migration = stress["prefix_migration_candidate"]
+    assert migration["prefix_length"] == 3
+    assert migration["runtime_compatible_with_current_manifest"] is False
+    assert migration["shards"]["gzip_max_bytes"] < budgets["shard_warn_gzip_bytes"]
+    assert migration["gate_evaluation"] == {"shard_gzip": "pass"}
+    assert migration["manifest"]["gzip_bytes"] > budgets["initial_world_index_max_gzip_bytes"]
+    assert migration["aggregate"]["gzip_bytes"] > budgets["initial_world_index_max_gzip_bytes"]
+    assert evidence["decision"]["fixture_milestone"] == "schema-realistic-scale-fixtures-v1"
+    assert "fixture_task" not in evidence["decision"]
     assert evidence["decision"]["full_world_index_initial_delivery"] == "rejected_for_all_measured_tiers"
     assert evidence["decision"]["runtime_path"] == "small aggregate manifest plus demand-loaded shards and details"
-    assert evidence["decision"]["fixed_prefix_stress_state"] == "warning"
+    assert evidence["decision"]["fixed_prefix_stress_state"] == "fail"
+    assert evidence["decision"]["prefix_migration_candidate_state"] == "pass"
+    assert evidence["decision"]["runtime_catalogue_cutover_authorized"] is False
     assert contract["current_authorization"]["cutover_authorized"] is False
     assert contract["decision_policy"]["backend_by_default"] is False
 
