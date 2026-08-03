@@ -1,6 +1,9 @@
 import copy
 import gzip
+import subprocess
+import sys
 import tempfile
+import textwrap
 import unittest
 from pathlib import Path
 
@@ -22,6 +25,41 @@ class CatalogHierarchyV2Tests(unittest.TestCase):
         cls.records = representative_records(240, ROOT)
         cls.v1 = build_runtime_fixture(cls.records, ROOT)
         cls.v2 = build_hierarchical_runtime_fixture(cls.v1)
+
+    def test_direct_build_import_does_not_require_jsonschema(self):
+        probe = textwrap.dedent(
+            """
+            import builtins
+            import runpy
+            import sys
+
+            original_import = builtins.__import__
+
+            def block_jsonschema(name, globals=None, locals=None, fromlist=(), level=0):
+                if name == "jsonschema" or name.startswith("jsonschema."):
+                    raise ModuleNotFoundError("jsonschema intentionally unavailable")
+                return original_import(name, globals, locals, fromlist, level)
+
+            builtins.__import__ = block_jsonschema
+            sys.path.insert(0, "scripts")
+            runpy.run_path(
+                "scripts/build_catalog_runtime.py",
+                run_name="commonworld_build_import_probe",
+            )
+            """
+        )
+        result = subprocess.run(
+            [sys.executable, "-I", "-c", probe],
+            cwd=ROOT,
+            text=True,
+            capture_output=True,
+            check=False,
+        )
+        self.assertEqual(
+            result.returncode,
+            0,
+            msg=f"stdout={result.stdout}\nstderr={result.stderr}",
+        )
 
     def test_hierarchy_is_deterministic_and_preserves_v1_source(self):
         second = build_hierarchical_runtime_fixture(self.v1)

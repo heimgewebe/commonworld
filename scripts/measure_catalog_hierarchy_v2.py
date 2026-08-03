@@ -79,6 +79,7 @@ def implementation_digests() -> dict[str, str]:
         "contracts/commonworld/catalog-hierarchy-v2.contract.json",
         "scripts/build_catalog_runtime.py",
         "scripts/catalog_hierarchy_v2.py",
+        "scripts/catalog_scale_fixtures.py",
         "scripts/smoke_catalog_hierarchy_v2_browser.mjs",
         "scripts/validate_catalog_hierarchy_browser_v2.py",
         "scripts/measure_catalog_hierarchy_v2.py",
