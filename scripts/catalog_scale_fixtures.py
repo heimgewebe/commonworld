@@ -20,8 +20,6 @@ ROOT = Path(__file__).resolve().parents[1]
 if str(ROOT) not in sys.path:
     sys.path.insert(0, str(ROOT))
 
-from scripts.validate_contracts import validation_errors
-
 CATALOG_PATH = Path("catalog/catalog.json")
 ENGLISH_OVERLAY_PATH = Path("catalog/locales/en.json")
 CURRENT_SHARD_PREFIX_LENGTH = 2
@@ -174,6 +172,14 @@ def representative_english_overlay(records: list[dict], root: Path = ROOT) -> di
 
 
 def validate_fixture_records(records: list[dict], root: Path = ROOT) -> None:
+    # Schema validation is a development-only fixture concern. Keep the pure
+    # runtime projection helpers importable by the public build without making
+    # jsonschema a production-build dependency.
+    try:
+        from scripts.validate_contracts import validation_errors
+    except ModuleNotFoundError:  # Direct script execution adds scripts/ to sys.path.
+        from validate_contracts import validation_errors
+
     if not isinstance(records, list) or not records:
         raise ValueError("fixture records must be a non-empty list")
     identifiers = [record.get("id") for record in records if isinstance(record, dict)]

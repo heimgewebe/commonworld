@@ -4,9 +4,11 @@ import test from 'node:test';
 import {
   createCatalogLoadCache,
   loadCatalogAggregate,
+  loadCatalogAggregateSegment,
   loadCatalogDetail,
   loadCatalogShard,
   selectAggregateShardKeys,
+  selectCatalogShardKeys,
   shardKeyForIdentity,
   spatialCellForCoordinates,
   verifyCatalogPayload,
@@ -344,4 +346,194 @@ test('aggregate loader rejects cross-origin descriptors and unknown shards', asy
 test('spatial cell calculation rejects out-of-world coordinates and uneven grids', () => {
   assert.throws(() => spatialCellForCoordinates(181, 0), /invalid spatial cell/);
   assert.throws(() => spatialCellForCoordinates(0, 0, 7), /invalid spatial cell/);
+});
+
+
+async function hierarchyFixture(identifier = 'debian') {
+  const record = compactRecord(identifier);
+  const key = await shardKeyForIdentity(identifier, webcrypto, 3);
+  const indexKey = key.slice(0, 1);
+  const shard = { kind: 'commonworld.catalog_shard', version: '1.0', key, records: [record] };
+  const leafDescriptor = { key, entry_count: 1, ...descriptor(shard, `catalog/runtime/shards/${key}.v1.json`) };
+  const shardIndex = {
+    kind: 'commonworld.catalog_shard_index',
+    version: '2.0',
+    generation,
+    source_catalog_sha256: sourceHash,
+    index_key: indexKey,
+    index_prefix_length: 1,
+    leaf_prefix_length: 3,
+    entry_count: 1,
+    shard_count: 1,
+    entries: [leafDescriptor],
+  };
+  const shardIndexDescriptor = { key: indexKey, entry_count: 1, shard_count: 1, ...descriptor(shardIndex, `catalog/runtime/shard-indexes/${indexKey}.v2.json`) };
+  const themeSegment = {
+    kind: 'commonworld.catalog_aggregate_segment',
+    version: '2.0',
+    generation,
+    source_catalog_sha256: sourceHash,
+    dimension: 'themes',
+    key: 'so',
+    entry_count: 1,
+    value_count: 1,
+    shard_reference_count: 1,
+    index: { software: [key] },
+  };
+  const themeDescriptor = { dimension: 'themes', key: 'so', value_count: 1, shard_reference_count: 1, ...descriptor(themeSegment, 'catalog/runtime/aggregate-segments/themes/so.v2.json') };
+  const digitalSegment = {
+    kind: 'commonworld.catalog_aggregate_segment',
+    version: '2.0',
+    generation,
+    source_catalog_sha256: sourceHash,
+    dimension: 'digital',
+    key: 'all',
+    entry_count: 1,
+    value_count: 2,
+    shard_reference_count: 1,
+    index: { available: [key], unavailable: [] },
+  };
+  const digitalDescriptor = { dimension: 'digital', key: 'all', value_count: 2, shard_reference_count: 1, ...descriptor(digitalSegment, 'catalog/runtime/aggregate-segments/digital/all.v2.json') };
+  const aggregate = {
+    kind: 'commonworld.catalog_aggregate',
+    version: '2.0',
+    generation,
+    entry_count: 1,
+    source_catalog_sha256: sourceHash,
+    spatial_cell_degrees: 10,
+    segments: { themes: [themeDescriptor], spatial_cells: [], digital: [digitalDescriptor] },
+  };
+  const manifest = {
+    kind: 'commonworld.catalog_runtime_manifest',
+    version: '2.0',
+    generation,
+    entry_count: 1,
+    source_catalog_sha256: sourceHash,
+    world_index: worldDescriptor,
+    aggregate: descriptor(aggregate, 'catalog/runtime/aggregate.v2.json'),
+    details: detailsManifest,
+    shards: { strategy: 'sha256-prefix-hierarchy', index_prefix_length: 1, leaf_prefix_length: 3, indexes: [shardIndexDescriptor] },
+    migration_guard: {
+      default_manifest_version: '1.0',
+      default_shard_prefix_length: 2,
+      candidate_manifest_version: '2.0',
+      cutover_authorized: false,
+      rollback_manifest_url: 'catalog/runtime/manifest.v1.json',
+      required_gates: ['deterministic-fixtures', 'browser-transfer-budget', 'physical-device'],
+    },
+  };
+  return { manifest, aggregate, themeSegment, digitalSegment, shardIndex, shard, key, indexKey };
+}
+
+test('manifest v2 aggregate root loads without eagerly fetching segments', async () => {
+  const fixture = await hierarchyFixture();
+  const calls = [];
+  const fetchImpl = async (url) => {
+    calls.push(String(url));
+    return calls.length === 1 ? response(fixture.manifest) : response(fixture.aggregate);
+  };
+  const platform = await loadCatalogAggregate({ manifestUrl: 'https://commonworld.test/catalog/runtime/manifest.v2.json', fetchImpl, cryptoImpl: webcrypto });
+  assert.equal(platform.manifest.version, '2.0');
+  assert.deepEqual(calls, [
+    'https://commonworld.test/catalog/runtime/manifest.v2.json',
+    'https://commonworld.test/catalog/runtime/aggregate.v2.json',
+  ]);
+});
+
+test('manifest v2 selection fetches only the required aggregate segment', async () => {
+  const fixture = await hierarchyFixture();
+  const platform = { manifest: fixture.manifest, aggregate: fixture.aggregate, documentRoot: 'https://commonworld.test/' };
+  const calls = [];
+  const selected = await selectCatalogShardKeys(platform, { themes: ['software'] }, {
+    cryptoImpl: webcrypto,
+    fetchImpl: async (url) => { calls.push(String(url)); return response(fixture.themeSegment); },
+  });
+  assert.deepEqual(selected, [fixture.key]);
+  assert.deepEqual(calls, ['https://commonworld.test/catalog/runtime/aggregate-segments/themes/so.v2.json']);
+});
+
+test('manifest v2 segment loader rejects undeclared buckets before fetching', async () => {
+  const fixture = await hierarchyFixture();
+  const platform = { manifest: fixture.manifest, aggregate: fixture.aggregate, documentRoot: 'https://commonworld.test/' };
+  let calls = 0;
+  await assert.rejects(
+    () => loadCatalogAggregateSegment(platform, { dimension: 'themes', key: 'x' }, { fetchImpl: async () => { calls += 1; return response({}); }, cryptoImpl: webcrypto }),
+    /not declared/,
+  );
+  assert.equal(calls, 0);
+});
+
+test('manifest v2 shard load fetches one bounded directory and one leaf shard', async () => {
+  const fixture = await hierarchyFixture();
+  const platform = { manifest: fixture.manifest, aggregate: fixture.aggregate, documentRoot: 'https://commonworld.test/' };
+  const calls = [];
+  const loaded = await loadCatalogShard(platform, fixture.key, {
+    cryptoImpl: webcrypto,
+    fetchImpl: async (url) => {
+      calls.push(String(url));
+      return calls.length === 1 ? response(fixture.shardIndex) : response(fixture.shard);
+    },
+  });
+  assert.equal(loaded.records[0].id, 'debian');
+  assert.deepEqual(calls, [
+    `https://commonworld.test/catalog/runtime/shard-indexes/${fixture.indexKey}.v2.json`,
+    `https://commonworld.test/catalog/runtime/shards/${fixture.key}.v1.json`,
+  ]);
+});
+
+test('manifest v2 shard load fails closed on corrupt directory bytes', async () => {
+  const fixture = await hierarchyFixture();
+  const platform = { manifest: fixture.manifest, aggregate: fixture.aggregate, documentRoot: 'https://commonworld.test/' };
+  const corrupted = { ...fixture.shardIndex, entry_count: 2 };
+  await assert.rejects(
+    () => loadCatalogShard(platform, fixture.key, { fetchImpl: async () => response(corrupted), cryptoImpl: webcrypto }),
+    /byte length mismatch|SHA-256 mismatch/,
+  );
+});
+
+test('manifest v2 cutover guard and unknown versions fail closed', async () => {
+  const fixture = await hierarchyFixture();
+  const enabled = structuredClone(fixture.manifest);
+  enabled.migration_guard.cutover_authorized = true;
+  await assert.rejects(
+    () => loadCatalogAggregate({ manifestUrl: 'https://commonworld.test/catalog/runtime/manifest.v2.json', fetchImpl: async () => response(enabled), cryptoImpl: webcrypto }),
+    /cutover must remain unauthorized/,
+  );
+  const unknown = { ...fixture.manifest, version: '3.0' };
+  await assert.rejects(
+    () => loadCatalogAggregate({ manifestUrl: 'https://commonworld.test/catalog/runtime/manifest.v3.json', fetchImpl: async () => response(unknown), cryptoImpl: webcrypto }),
+    /unsupported catalog manifest/,
+  );
+});
+
+test('identity shard key supports explicit v2 leaf prefix without changing v1 default', async () => {
+  const v1 = await shardKeyForIdentity('debian', webcrypto);
+  const v2 = await shardKeyForIdentity('debian', webcrypto, 3);
+  assert.equal(v1.length, 2);
+  assert.equal(v2.length, 3);
+  assert.equal(v2.slice(0, 2), v1);
+  await assert.rejects(() => shardKeyForIdentity('debian', webcrypto, 9), /prefix length/);
+});
+
+
+test('manifest v2 rejects unbounded roots, prefix drift and unexpected schema fields', async () => {
+  const fixture = await hierarchyFixture();
+  const unbounded = structuredClone(fixture.manifest);
+  unbounded.shards.indexes = Array.from({ length: 17 }, () => structuredClone(unbounded.shards.indexes[0]));
+  await assert.rejects(
+    () => loadCatalogAggregate({ manifestUrl: 'https://commonworld.test/catalog/runtime/manifest.v2.json', fetchImpl: async () => response(unbounded), cryptoImpl: webcrypto }),
+    /bounded shard indexes/,
+  );
+  const prefixDrift = structuredClone(fixture.manifest);
+  prefixDrift.shards.leaf_prefix_length = 4;
+  await assert.rejects(
+    () => loadCatalogAggregate({ manifestUrl: 'https://commonworld.test/catalog/runtime/manifest.v2.json', fetchImpl: async () => response(prefixDrift), cryptoImpl: webcrypto }),
+    /prefix contract mismatch/,
+  );
+  const unexpected = structuredClone(fixture.manifest);
+  unexpected.unexpected = true;
+  await assert.rejects(
+    () => loadCatalogAggregate({ manifestUrl: 'https://commonworld.test/catalog/runtime/manifest.v2.json', fetchImpl: async () => response(unexpected), cryptoImpl: webcrypto }),
+    /unexpected field/,
+  );
 });
