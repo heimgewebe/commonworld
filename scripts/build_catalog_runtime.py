@@ -5,6 +5,11 @@ import hashlib
 import json
 from pathlib import Path
 
+try:
+    from scripts.catalog_hierarchy_v2 import build_hierarchical_runtime_fixture
+except ModuleNotFoundError:  # Direct script execution adds scripts/ to sys.path.
+    from catalog_hierarchy_v2 import build_hierarchical_runtime_fixture
+
 ROOT = Path(__file__).resolve().parents[1]
 CATALOG = ROOT / "catalog" / "catalog.json"
 OUT = ROOT / "catalog" / "runtime"
@@ -60,6 +65,16 @@ def detail_descriptor(seed: dict, generation: str) -> dict:
         "sha256": seed["sha256"],
         "bytes": seed["bytes"],
     }
+
+
+def clear_generated_catalog_files(shard_dir: Path, index_dir: Path, segment_root: Path) -> None:
+    for directory in (shard_dir, index_dir, segment_root): directory.mkdir(parents=True, exist_ok=True)
+    for stale in shard_dir.glob("*.v1.json"): stale.unlink()
+    for stale in index_dir.glob("*.v2.json"): stale.unlink()
+    for stale in segment_root.rglob("*.v2.json"): stale.unlink()
+    for directory in sorted((item for item in segment_root.rglob("*") if item.is_dir()), reverse=True):
+        try: directory.rmdir()
+        except OSError: pass
 
 
 def compact_record(record: dict, detail: dict) -> dict:
@@ -126,9 +141,9 @@ def main() -> int:
     for record in records:
         shards.setdefault(shard_key(record["id"]), []).append(record)
     shard_dir = OUT / "shards"
-    shard_dir.mkdir(parents=True, exist_ok=True)
-    for stale in shard_dir.glob("*.v1.json"):
-        stale.unlink()
+    index_dir = OUT / "shard-indexes"
+    segment_root = OUT / "aggregate-segments"
+    clear_generated_catalog_files(shard_dir, index_dir, segment_root)
     shard_entries = []
     for key, shard_records in sorted(shards.items()):
         payload = canonical_bytes({"kind": "commonworld.catalog_shard", "version": "1.0", "key": key, "records": shard_records})
@@ -175,11 +190,30 @@ def main() -> int:
         "shards": {"strategy": "sha256-prefix", "prefix_length": SHARD_PREFIX_LENGTH, "entries": shard_entries},
         "source_catalog_sha256": source_catalog_sha256,
     }
+    source_runtime = {"manifest": manifest, "compact_records": records}
+    hierarchy = build_hierarchical_runtime_fixture(source_runtime)
+
+    for dimension in ("themes", "spatial_cells", "digital"):
+        (segment_root / dimension).mkdir(parents=True, exist_ok=True)
+
+    for key, payload in hierarchy["shard_payloads"].items():
+        (shard_dir / f"{key}.v1.json").write_bytes(payload)
+    for key, payload in hierarchy["shard_index_payloads"].items():
+        (index_dir / f"{key}.v2.json").write_bytes(payload)
+    for segment_id, payload in hierarchy["aggregate_segment_payloads"].items():
+        dimension, key = segment_id.split(":", 1)
+        (segment_root / dimension / f"{key}.v2.json").write_bytes(payload)
+
     OUT.mkdir(parents=True, exist_ok=True)
     (OUT / "world.v1.json").write_bytes(world_bytes)
     (OUT / "aggregate.v1.json").write_bytes(aggregate_bytes)
     (OUT / "manifest.v1.json").write_bytes(canonical_bytes(manifest))
-    print(f"built catalog runtime generation {generation} with {len(records)} records and {len(current_detail_names)} details")
+    (OUT / "aggregate.v2.json").write_bytes(hierarchy["aggregate_bytes"])
+    (OUT / "manifest.v2.json").write_bytes(hierarchy["manifest_bytes"])
+    print(
+        f"built catalog runtime generation {generation} with {len(records)} records, "
+        f"{len(current_detail_names)} details, and a guarded v2 hierarchy"
+    )
     return 0
 
 

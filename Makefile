@@ -1,4 +1,4 @@
-.PHONY: build validate validate-cache-coherence validate-security-policy validate-proposal-path validate-current-state validate-platform-foundation validate-locale-release browser-smoke validate-canonical-plan validate-contracts validate-commons-admission validate-semantic-zoom validate-visual-semantics validate-renderer-spike validate-maplibre-phase2-proof validate-device-acceptance-pack validate-device-acceptance-rerun validate-digital-sphere validate-digital-ring-taxonomy validate-layered-digital-sphere-proof validate-digital-sphere-real-surface validate-device-acceptance-performance-v4 validate-physical-device-acceptance-v4-apple validate-public-catalog validate-public-seed-baseline validate-presence-axes validate-intent-search-discovery validate-renderer-selection validate-public-maplibre-vertical-slice validate-production-delivery-provider validate-public-shell validate-catalog-delivery-budget validate-catalog-browser-measurement-decision validate-catalog-scale-gates test-js test smoke-pages-live check-pages-dns-target
+.PHONY: validate-catalog-hierarchy-v2 browser-smoke-catalog-hierarchy-v2 build validate validate-cache-coherence validate-security-policy validate-proposal-path validate-current-state validate-platform-foundation validate-locale-release browser-smoke validate-canonical-plan validate-contracts validate-commons-admission validate-semantic-zoom validate-visual-semantics validate-renderer-spike validate-maplibre-phase2-proof validate-device-acceptance-pack validate-device-acceptance-rerun validate-digital-sphere validate-digital-ring-taxonomy validate-layered-digital-sphere-proof validate-digital-sphere-real-surface validate-device-acceptance-performance-v4 validate-physical-device-acceptance-v4-apple validate-public-catalog validate-public-seed-baseline validate-presence-axes validate-intent-search-discovery validate-renderer-selection validate-public-maplibre-vertical-slice validate-production-delivery-provider validate-public-shell validate-catalog-delivery-budget validate-catalog-browser-measurement-decision validate-catalog-scale-gates validate-catalog-hierarchy-v2 test-js test smoke-pages-live check-pages-dns-target
 
 build:
 	npm run build
@@ -6,7 +6,7 @@ build:
 validate-cache-coherence:
 	python3 scripts/validate_cache_coherence.py
 
-validate: validate-cache-coherence validate-security-policy validate-proposal-path validate-current-state validate-platform-foundation validate-canonical-plan validate-contracts validate-locale-release validate-commons-admission validate-semantic-zoom validate-visual-semantics validate-renderer-spike validate-maplibre-phase2-proof validate-device-acceptance-pack validate-device-acceptance-rerun validate-digital-sphere validate-digital-ring-taxonomy validate-layered-digital-sphere-proof validate-digital-sphere-real-surface validate-device-acceptance-performance-v4 validate-physical-device-acceptance-v4-apple validate-public-catalog validate-public-seed-baseline validate-presence-axes validate-intent-search-discovery validate-renderer-selection validate-public-maplibre-vertical-slice validate-production-delivery-provider validate-public-shell validate-catalog-delivery-budget validate-catalog-browser-measurement-decision validate-catalog-scale-gates test-js test
+validate: validate-cache-coherence validate-security-policy validate-proposal-path validate-current-state validate-platform-foundation validate-canonical-plan validate-contracts validate-locale-release validate-commons-admission validate-semantic-zoom validate-visual-semantics validate-renderer-spike validate-maplibre-phase2-proof validate-device-acceptance-pack validate-device-acceptance-rerun validate-digital-sphere validate-digital-ring-taxonomy validate-layered-digital-sphere-proof validate-digital-sphere-real-surface validate-device-acceptance-performance-v4 validate-physical-device-acceptance-v4-apple validate-public-catalog validate-public-seed-baseline validate-presence-axes validate-intent-search-discovery validate-renderer-selection validate-public-maplibre-vertical-slice validate-production-delivery-provider validate-public-shell validate-catalog-delivery-budget validate-catalog-browser-measurement-decision validate-catalog-scale-gates validate-catalog-hierarchy-v2 test-js test
 
 validate-proposal-path:
 	python3 scripts/validate_proposal_path.py
@@ -102,6 +102,14 @@ validate-catalog-browser-measurement-decision:
 validate-catalog-scale-gates:
 	python3 scripts/validate_catalog_scale_gates.py
 	python3 scripts/validate_catalog_scale_masterplan.py
+
+validate-catalog-hierarchy-v2:
+	python3 scripts/validate_catalog_hierarchy_browser_v2.py
+	python3 scripts/validate_catalog_hierarchy_v2.py
+	python3 -m unittest tests.test_catalog_hierarchy_v2 tests.test_catalog_hierarchy_v2_evidence tests.test_catalog_hierarchy_browser_v2_evidence
+
+browser-smoke-catalog-hierarchy-v2: build
+	npm run smoke:catalog-hierarchy
 
 test-js:
 	npm test
