@@ -446,7 +446,12 @@ try {
         assert(layout.bottomControlBottom <= layout.viewportHeight + 1, `${pageName}: bottom controls leave the viewport at ${layout.viewportWidth}x${layout.viewportHeight}: ${JSON.stringify(layout)}`);
         assert(layout.documentHeight <= layout.viewportHeight + 1, `${pageName}: candidate shell exceeds the viewport at ${layout.viewportWidth}x${layout.viewportHeight}: ${JSON.stringify(layout)}`);
       }
-      assert(state.effectiveLanguage === CANDIDATE_SOURCE.locales[candidate.locale].static.effective_language, `${pageName}: effective-language status drifted: ${state.effectiveLanguage}`);
+      const proposalSurface = pageName === `propose.${candidate.locale}.html`;
+      if (proposalSurface) {
+        assert(state.effectiveLanguage === '', `${pageName}: redundant effective-language status is still present: ${state.effectiveLanguage}`);
+      } else {
+        assert(state.effectiveLanguage === CANDIDATE_SOURCE.locales[candidate.locale].static.effective_language, `${pageName}: effective-language status drifted: ${state.effectiveLanguage}`);
+      }
       if (pageName === `${candidate.locale}.html`) {
         const catalogLanguageOptions = state.languageOptions.filter(({ value }) => value !== 'unknown');
         assert(catalogLanguageOptions.length > 0, `${pageName}: generated catalog language options are missing`);
@@ -482,8 +487,13 @@ try {
       }
       const missingMarkers = state.bodyText.match(/\[missing:[^\]]+\]/gu) ?? [];
       assert(missingMarkers.length === 0, `${pageName}: missing translation marker rendered: ${missingMarkers.slice(0, 8).join(' | ')}`);
-      assert(state.candidateChoices.length === 0, `${pageName}: candidate locale became selectable`);
-      assert(JSON.stringify([...new Set(state.releasedChoices)].sort()) === JSON.stringify(['de', 'en']), `${pageName}: released locale choices drifted`);
+      if (proposalSurface) {
+        assert(state.candidateChoices.length === 0, `${pageName}: redundant candidate locale choices are still present`);
+        assert(state.releasedChoices.length === 0, `${pageName}: redundant released locale choices are still present`);
+      } else {
+        assert(JSON.stringify([...new Set(state.candidateChoices)].sort()) === JSON.stringify(['ar', 'es', 'fr', 'pt-BR']), `${pageName}: candidate locale choices drifted`);
+        assert(JSON.stringify([...new Set(state.releasedChoices)].sort()) === JSON.stringify(['de', 'en']), `${pageName}: released locale choices drifted`);
+      }
       assert(state.documentWidth <= state.viewportWidth + 1, `${pageName}: horizontal overflow ${state.documentWidth}/${state.viewportWidth}`);
       if (pageName === `${candidate.locale}.html`) {
         assert(state.englishContentBlocks > 0, `${pageName}: canonical English catalog content lacks lang=en boundaries`);

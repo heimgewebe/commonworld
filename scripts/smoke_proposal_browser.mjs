@@ -122,7 +122,8 @@ html { font-size: ${profile.fontScale}% !important; }
   await page.goto(`${baseUrl}/propose.de.html`, { waitUntil: 'networkidle' });
   assert(await page.getByRole('heading', { name: 'Ein Commons vorschlagen' }).isVisible(), 'German proposal locale: heading missing');
   assert(await page.getByRole('button', { name: 'Öffentliches GitHub-Issue vorbereiten' }).isVisible(), 'German proposal locale: submit missing');
-  assert(await page.locator('.language-switch a[data-locale-choice="en"][lang="en"]').count() > 0, 'German proposal locale: English switch target missing');
+  assert(await page.locator('.language-switch').count() === 0, 'German proposal locale: redundant locale control is still present');
+  assert(await page.locator('[data-locale-choice]').count() === 0, 'German proposal locale: locale choice links are still present');
   results.push('locale-german');
   await context.close();
 }

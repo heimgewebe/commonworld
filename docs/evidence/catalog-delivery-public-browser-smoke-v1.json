@@ -91,7 +91,8 @@
       "verdict": "PASS",
       "browserOrder": true,
       "explicitUrl": true,
-      "statePreserved": true
+      "statePreserved": true,
+      "previewChoice": true
     },
     {
       "id": "intent-search-discovery",
@@ -117,9 +118,9 @@
       "filterButtonWidth": 44,
       "filterButtonHeight": 44,
       "ringAnimationName": "sphere-ring-orbit",
-      "ringTransform": "matrix(1, 0.000752444, -0.000752444, 1, 0, 0)",
+      "ringTransform": "matrix(1, 0.000755656, -0.000755656, 1, 0, 0)",
       "ringTextWidth": 671.1033935546875,
-      "ringTextHeight": 13.504974365234375,
+      "ringTextHeight": 13.50714111328125,
       "ringTextFontSize": 22,
       "primaryRingCount": 3,
       "depthRingCount": 2,
@@ -195,7 +196,7 @@
     {
       "id": "layer-journey-moveend-return",
       "verdict": "PASS",
-      "elapsedMs": 1882
+      "elapsedMs": 1881
     },
     {
       "id": "layer-journey-interrupted",
@@ -282,8 +283,8 @@
       "verdict": "PASS",
       "blockedCatalogRequests": 0,
       "observedCatalogRequests": [
-        "/releases/384ace6f1988653d753a/catalog/runtime/aggregate.v1.json",
-        "/releases/384ace6f1988653d753a/catalog/runtime/manifest.v1.json"
+        "/releases/532a8c448c8fb0795578/catalog/runtime/aggregate.v1.json",
+        "/releases/532a8c448c8fb0795578/catalog/runtime/manifest.v1.json"
       ]
     },
     {
@@ -341,9 +342,9 @@
     }
   ],
   "binding": {
-    "smoke_script_sha256": "4e9c95911010b71eccf79a292f6ea20ee4793c96c70be686ce21fe04a2dfe59a",
+    "smoke_script_sha256": "589078eb9291124c796f71c7b648d961be145a8c740eb03565867f9b6af5a07f",
     "smoke_runner_sha256": "522b99b70b1d0064b1d0a31a3a67fdc9a2e73b7408f37d1a4bb303bc360b7556",
-    "first_party_surface_sha256": "de66c4a7a83ae11c6d29674c31cd472d581208f586e00d2a7920db086b38931f",
+    "first_party_surface_sha256": "e87a41a7ca9d941bba8b6ec4d397f64378fdfad5ef4aa2b5602ccc66b4bfb791",
     "scenario_ids": [
       "startup-and-ring-orbits",
       "synthetic-cross-ring-collision-accessibility",

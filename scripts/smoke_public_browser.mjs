@@ -3658,6 +3658,15 @@ async function germanLocaleScenario() {
   assert((await run.page.locator('#commons-search').getAttribute('placeholder')) === 'Was möchtest du tun oder finden?', 'German locale: search placeholder regressed');
   assert((await run.page.locator('#filter-commons-type option[value="knowledge"]').textContent()) === 'Wissen und Daten', 'German locale: Commons type label regressed');
   assert(await run.page.locator('.language-switch a[data-locale-choice="en"][lang="en"]').count() > 0, 'German locale: English switch target is missing');
+  await run.page.locator('#settings-toggle').click();
+  await run.page.locator('#settings-panel:not([hidden])').waitFor();
+  const localeChoices = await run.page.locator('#settings-panel [data-locale-choice]').evaluateAll((nodes) => nodes.map((node) => node.dataset.localeChoice));
+  assert(JSON.stringify(localeChoices) === JSON.stringify(['auto', 'en', 'de', 'es', 'fr', 'pt-BR', 'ar']), `German locale: settings do not expose all interface languages (${JSON.stringify(localeChoices)})`);
+  const previewLabels = await run.page.locator('#settings-panel [data-locale-status="candidate"] .language-choice-status').allTextContents();
+  assert(JSON.stringify(previewLabels) === JSON.stringify(['Vorschau', 'Vorschau', 'Vorschau', 'Vorschau']), `German locale: preview languages are not labelled consistently (${JSON.stringify(previewLabels)})`);
+  const languageGridOverflow = await run.page.locator('#settings-panel .language-choice-grid').evaluate((node) => node.scrollWidth - node.clientWidth);
+  assert(languageGridOverflow <= 1, `German locale: language grid overflows by ${languageGridOverflow}px`);
+  await run.page.locator('#settings-close').click();
 
   await run.page.locator('#commons-search').fill('free operating system');
   await run.page.waitForFunction(() => document.querySelectorAll('.discovery-result').length === 1);
@@ -3703,8 +3712,25 @@ async function localePreferenceScenario() {
   assert(await explicit.page.evaluate(() => localStorage.getItem('commonworld.ui-locale')) === 'de', 'locale preference: manual choice was not persisted');
   assert(explicit.consoleErrors.length === 0, `locale preference manual: console errors: ${explicit.consoleErrors.join(' | ')}`);
   assert(explicit.pageErrors.length === 0, `locale preference manual: page errors: ${explicit.pageErrors.join(' | ')}`);
-  results.push({ id: 'locale-preference', verdict: 'PASS', browserOrder: true, explicitUrl: true, statePreserved: true });
   await explicit.context.close();
+
+  const preview = await newPage({ languages: ['de-DE'] });
+  await preview.page.goto(`${baseUrl}/de.html`, { waitUntil: 'domcontentloaded' });
+  await preview.page.waitForSelector('html.runtime-ready');
+  await preview.page.locator('#settings-toggle').click();
+  await preview.page.locator('#settings-panel:not([hidden])').waitFor();
+  await preview.page.locator('#settings-panel [data-locale-choice="fr"]').click();
+  await preview.page.waitForURL((url) => url.pathname.endsWith('/fr.html') && url.searchParams.get('ui_lang') === 'fr');
+  await preview.page.waitForSelector('html.runtime-ready');
+  assert((await preview.page.locator('html').getAttribute('lang')) === 'fr', 'locale preference preview: French preview surface was not selected');
+  assert(await preview.page.locator('.locale-candidate-banner[lang="fr"]').count() === 1, 'locale preference preview: candidate notice is missing');
+  assert(await preview.page.locator('[data-locale-choice="fr"][aria-current="page"]').count() === 1, 'locale preference preview: French choice is not current');
+  assert(await preview.page.evaluate(() => localStorage.getItem('commonworld.ui-locale')) === 'fr', 'locale preference preview: manual preview choice was not persisted');
+  assert(preview.consoleErrors.length === 0, `locale preference preview: console errors: ${preview.consoleErrors.join(' | ')}`);
+  assert(preview.pageErrors.length === 0, `locale preference preview: page errors: ${preview.pageErrors.join(' | ')}`);
+  await preview.context.close();
+
+  results.push({ id: 'locale-preference', verdict: 'PASS', browserOrder: true, explicitUrl: true, statePreserved: true, previewChoice: true });
 }
 
 async function methodScenario() {
