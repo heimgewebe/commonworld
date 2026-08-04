@@ -60,6 +60,11 @@ jobs:
             --browser-measurement /tmp/catalog-browser.json \
             --smoke-result /tmp/public-smoke.json
 
+      - name: Remove temporary closeout machinery
+        run: |
+          rm scripts/refresh_catalog_delivery_evidence.py
+          rm .github/workflows/catalog-evidence-one-shot.yml
+
       - name: Validate complete repository
         run: make validate
 
@@ -70,8 +75,6 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          rm scripts/refresh_catalog_delivery_evidence.py
-          rm .github/workflows/catalog-evidence-one-shot.yml
           git diff --check
           git config user.name 'commonworld-evidence-refresh[bot]'
           git config user.email 'commonworld-evidence-refresh[bot]@users.noreply.github.com'
