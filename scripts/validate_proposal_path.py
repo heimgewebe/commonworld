@@ -152,16 +152,14 @@ def validate(root: Path = ROOT) -> list[str]:
         if marker.casefold() not in page.casefold(): errors.append(f"proposal page missing marker: {marker}")
     for marker in ("nicht automatisch veröffentlicht", "öffentliches GitHub-Issue", "private Adresse"):
         if marker.casefold() not in german_page.casefold(): errors.append(f"German proposal page missing marker: {marker}")
-    if 'href="./propose.de.html?ui_lang=de"' not in page or 'href="./propose.html?ui_lang=en"' not in german_page:
-        errors.append("proposal locale switch must connect English and German surfaces")
     for surface, name in ((page, "propose.html"), (german_page, "propose.de.html")):
         for marker in (
-            'data-locale-choice="auto"',
-            'data-locale-choice="en"',
-            'data-locale-choice="de"',
+            'data-locale-choice=',
             'data-locale-effective',
+            'language-switch',
         ):
-            if marker not in surface: errors.append(f"{name} locale control missing marker: {marker}")
+            if marker in surface:
+                errors.append(f"{name} must not duplicate the global locale control: {marker}")
 
     proposal_css_path = root / "assets/proposal.css"
     if not proposal_css_path.is_file():

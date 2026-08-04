@@ -12,7 +12,7 @@ ROOT = Path(__file__).resolve().parents[1]
 if str(ROOT) not in sys.path:
     sys.path.insert(0, str(ROOT))
 
-from scripts.commonworld_i18n import FALLBACK_LOCALE, german_surface_links, inject_locale_navigation, normalize_locale
+from scripts.commonworld_i18n import FALLBACK_LOCALE, german_surface_links, normalize_locale
 from scripts.locale_registry import locales_with_status, surface_file
 from scripts.proposal_i18n import translate_proposal
 from scripts.public_cache import asset_version, stamp_page_build
@@ -141,7 +141,6 @@ def render(locale: str = FALLBACK_LOCALE) -> str:
 '''
     markup = translate_proposal(markup, locale)
     markup = german_surface_links(markup, locale, 'propose')
-    markup = inject_locale_navigation(markup, locale, 'propose')
     return stamp_page_build(markup, page_name)
 
 

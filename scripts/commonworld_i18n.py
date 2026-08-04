@@ -24,10 +24,20 @@ from scripts.locale_registry import (
 
 SUPPORTED_LOCALES = locales_with_status("released")
 CANDIDATE_LOCALES = locales_with_status("candidate")
+SELECTABLE_UI_LOCALES = (*SUPPORTED_LOCALES, *CANDIDATE_LOCALES)
 KNOWN_UI_LOCALES = locales_with_status("released", "candidate", "planned")
 DEFAULT_LOCALE = "en"
 FALLBACK_LOCALE = "de"
 CANDIDATE_PACK_PATH = ROOT / "assets/locales/wave1-candidates.json"
+
+PREVIEW_LABELS = {
+    "en": "Preview",
+    "de": "Vorschau",
+    "es": "Vista previa",
+    "fr": "Aperçu",
+    "pt-BR": "Prévia",
+    "ar": "معاينة",
+}
 
 ACTION_LABELS_EN = {
     "homepage": "Official website",
@@ -489,30 +499,51 @@ def _locale_navigation_copy(locale: str, root: Path = ROOT) -> dict[str, str]:
     return copy  # type: ignore[return-value]
 
 
+def _locale_preview_label(locale: str) -> str:
+    normalized = normalize_locale(locale)
+    return PREVIEW_LABELS.get(normalized, PREVIEW_LABELS[DEFAULT_LOCALE])
+
+
+def _locale_choice_link(surface: str, tag: str, current_locale: str) -> str:
+    entry = locale_entry(tag)
+    current = ' aria-current="page"' if current_locale == tag else ""
+    status = "candidate" if tag in CANDIDATE_LOCALES else "released"
+    status_markup = ""
+    if status == "candidate":
+        status_markup = (
+            f'<span class="language-choice-status">{escape(_locale_preview_label(current_locale))}</span>'
+        )
+    return (
+        f'<a class="language-choice" href="{_locale_choice_href(surface, tag)}" '
+        f'lang="{tag}" dir="{entry.get("direction", "ltr")}" '
+        f'data-locale-choice="{tag}" data-locale-surface="{surface}" '
+        f'data-locale-status="{status}"{current}>'
+        f'<span class="language-choice-name">{escape(entry["native_name"])}</span>'
+        f'{status_markup}</a>'
+    )
+
+
 def inject_locale_navigation(markup: str, locale: str, surface: str = "index") -> str:
     normalized = normalize_locale(locale)
     copy = _locale_navigation_copy(normalized)
-    links: list[str] = []
-    links.append(
-        f'<a href="{_locale_choice_href(surface, "auto")}" data-locale-choice="auto" '
-        f'data-locale-surface="{surface}">{escape(copy["automatic"])}</a>'
-    )
-    for tag in SUPPORTED_LOCALES:
-        entry = locale_entry(tag)
-        current = ' aria-current="page"' if normalized == tag else ""
-        links.append(
-            f'<a href="{_locale_choice_href(surface, tag)}" lang="{tag}" '
-            f'data-locale-choice="{tag}" data-locale-surface="{surface}"{current}>'
-            f'{escape(entry["native_name"])}</a>'
-        )
-    control = (
-        f'<div class="language-switch" role="group" aria-label="{escape(copy["label"])}" '
+    automatic = (
+        f'<a class="language-choice language-choice--auto" '
+        f'href="{_locale_choice_href(surface, "auto")}" data-locale-choice="auto" '
         f'data-locale-surface="{surface}">'
-        + "".join(links)
-        + '</div>'
-        + f'<p class="language-effective" data-locale-effective aria-live="polite">{escape(copy["effective"])}</p>'
+        f'<span class="language-choice-name">{escape(copy["automatic"])}</span></a>'
+    )
+    links = "".join(
+        _locale_choice_link(surface, tag, normalized)
+        for tag in SELECTABLE_UI_LOCALES
     )
     if surface == "index":
+        control = (
+            f'<nav class="language-switch language-switch--settings" '
+            f'aria-label="{escape(copy["label"])}" data-locale-surface="{surface}">'
+            f'{automatic}<div class="language-choice-grid">{links}</div></nav>'
+            f'<p class="language-effective visually-hidden" data-locale-effective '
+            f'aria-live="polite">{escape(copy["effective"])}</p>'
+        )
         section = (
             '<section class="settings-section language-settings"><h3>'
             + escape(copy["heading"])
@@ -524,18 +555,24 @@ def inject_locale_navigation(markup: str, locale: str, surface: str = "index") -
         marker = '<section class="settings-section">\n          <h3>' + interaction + '</h3>'
         if marker not in markup:
             raise ValueError(f"locale navigation insertion marker missing for {normalized}/{surface}")
-        markup = markup.replace(marker, section + marker, 1)
-    else:
-        marker = '<p><a class="secondary-back-link"'
-        position = markup.find(marker)
-        if position < 0:
-            raise ValueError(f"locale navigation insertion marker missing for {normalized}/{surface}")
-        end = markup.find('</p>', position)
-        if end < 0:
-            raise ValueError(f"locale navigation paragraph is malformed for {normalized}/{surface}")
-        end += 4
-        markup = markup[:end] + '\n      ' + control + markup[end:]
-    return markup
+        return markup.replace(marker, section + marker, 1)
+
+    control = (
+        f'<div class="language-switch language-switch--compact" role="group" '
+        f'aria-label="{escape(copy["label"])}" data-locale-surface="{surface}">'
+        f'{automatic}{links}</div>'
+        f'<p class="language-effective" data-locale-effective '
+        f'aria-live="polite">{escape(copy["effective"])}</p>'
+    )
+    marker = '<p><a class="secondary-back-link"'
+    position = markup.find(marker)
+    if position < 0:
+        raise ValueError(f"locale navigation insertion marker missing for {normalized}/{surface}")
+    end = markup.find('</p>', position)
+    if end < 0:
+        raise ValueError(f"locale navigation paragraph is malformed for {normalized}/{surface}")
+    end += 4
+    return markup[:end] + '\n      ' + control + markup[end:]
 
 
 def german_surface_links(markup: str, locale: str, surface: str = "index") -> str:

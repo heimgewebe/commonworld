@@ -286,8 +286,13 @@ class LocaleCandidatePackTests(unittest.TestCase):
                     self.assertIn('name="robots" content="noindex,nofollow"', markup)
                     self.assertIn('class="locale-candidate-banner"', markup)
                     self.assertNotIn("[missing:", markup)
-                    for candidate in CANDIDATES:
-                        self.assertNotIn(f'data-locale-choice="{candidate}"', markup)
+                    if surface == "proposal":
+                        self.assertNotIn("data-locale-choice=", markup)
+                        self.assertNotIn('class="language-switch"', markup)
+                    else:
+                        for candidate in CANDIDATES:
+                            self.assertIn(f'data-locale-choice="{candidate}"', markup)
+                        self.assertEqual(markup.count('data-locale-status="candidate"'), len(CANDIDATES))
             index_markup = (ROOT / entry["surface_files"]["index"]).read_text(encoding="utf-8")
             self.assertRegex(index_markup, r'<h2 lang="en" dir="ltr">')
 
