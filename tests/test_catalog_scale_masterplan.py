@@ -36,8 +36,17 @@ class CatalogScaleMasterplanValidationTests(unittest.TestCase):
 
     def test_stale_100k_baseline_is_rejected(self):
         path = self.root / "docs/blueprints/commonworld-masterplan.md"
+        evidence = json.loads(
+            (self.root / "docs/evidence/catalog-platform-scaling-v1.json").read_text(
+                encoding="utf-8"
+            )
+        )
+        stress = next(
+            item for item in evidence["measurements"] if item["entry_count"] == 100_000
+        )
+        current = MODULE.format_de(stress["world_index"]["gzip_bytes"])
         text = path.read_text(encoding="utf-8")
-        text = text.replace("9.844.462 Byte gzip", "1.541.423 Byte gzip", 1)
+        text = text.replace(f"{current} Byte gzip", "1.541.423 Byte gzip", 1)
         path.write_text(text, encoding="utf-8")
         errors = MODULE.validate_catalog_scale_masterplan(self.root)
         self.assertIn(
@@ -45,7 +54,7 @@ class CatalogScaleMasterplanValidationTests(unittest.TestCase):
             errors,
         )
         self.assertIn(
-            "canonical catalogue scale plan misses current fragment: 9.844.462 Byte gzip",
+            f"canonical catalogue scale plan misses current fragment: {current} Byte gzip",
             errors,
         )
 
