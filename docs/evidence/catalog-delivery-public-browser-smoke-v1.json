@@ -118,9 +118,9 @@
       "filterButtonWidth": 44,
       "filterButtonHeight": 44,
       "ringAnimationName": "sphere-ring-orbit",
-      "ringTransform": "matrix(1, 0.000755656, -0.000755656, 1, 0, 0)",
-      "ringTextWidth": 671.1033935546875,
-      "ringTextHeight": 13.50714111328125,
+      "ringTransform": "matrix(0.999993, 0.00376692, -0.00376692, 0.999993, 0, 0)",
+      "ringTextWidth": 781.6959228515625,
+      "ringTextHeight": 14.9443359375,
       "ringTextFontSize": 22,
       "primaryRingCount": 3,
       "depthRingCount": 2,
@@ -196,7 +196,7 @@
     {
       "id": "layer-journey-moveend-return",
       "verdict": "PASS",
-      "elapsedMs": 1881
+      "elapsedMs": 2590
     },
     {
       "id": "layer-journey-interrupted",
@@ -250,11 +250,11 @@
         "overlapArea": 0,
         "controlGap": 9.1875,
         "layerControl": {
-          "left": 465.0625,
+          "left": 445.765625,
           "top": 70.390625,
           "right": 603.8125,
           "bottom": 114.390625,
-          "width": 138.75,
+          "width": 158.046875,
           "height": 44
         },
         "zoomControl": {
