@@ -272,6 +272,20 @@
       },
       "digital_label": "Member portal for membership and cooperative shares"
     },
+    "isle-of-eigg-heritage-trust": {
+      "title": "Isle of Eigg Heritage Trust",
+      "summary": "The Isle of Eigg Heritage Trust owns and manages the island for its residents; four directors elected by the Residents’ Association shape decisions on land, housing, infrastructure, natural heritage and the local electricity grid.",
+      "geographic_labels": {
+        "isle-of-eigg-island": "Isle of Eigg, Scotland — broad island anchor"
+      }
+    },
+    "kawawana": {
+      "title": "Kawawana",
+      "summary": "APCRM and residents from eight villages in central Casamance protect local fish stocks through colour-coded use zones, fishing restrictions, monitoring and patrols under coastal management rights devolved in 2010.",
+      "geographic_labels": {
+        "kawawana-central-casamance": "Central Casamance, Senegal — broad regional anchor"
+      }
+    },
     "kibera-public-space-project": {
       "summary": "A growing network of public spaces co-designed and operated with resident groups in Kibera, linking flood resilience, basic services, gathering places and local economic use.",
       "geographic_labels": {
@@ -420,6 +434,13 @@
       "summary": "A non-profit, community-supported learning network that connects free learning circles and open learning resources with libraries, facilitators and local communities worldwide.",
       "geographic_labels": {},
       "digital_label": "Open infrastructure and community for peer learning circles"
+    },
+    "pachgaon-community-forest": {
+      "title": "Pachgaon Community Forest",
+      "summary": "The Pachgaon Gram Sabha manages 1,006 hectares of forest through recognised Community Forest Resource rights, combining democratic decisions with forest protection and bamboo harvesting and sales for local livelihoods.",
+      "geographic_labels": {
+        "pachgaon-chandrapur-district": "Chandrapur district, Maharashtra, India — broad district anchor"
+      }
     },
     "park-slope-food-coop": {
       "title": "Park Slope Food Coop",

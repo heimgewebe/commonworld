@@ -2,14 +2,17 @@
   "schema_version": 1,
   "kind": "commonworld_commons_basis_index",
   "current_as_of": "2026-08-04",
-  "entry_count": 8,
+  "entry_count": 11,
   "basis_files": [
     "acofop-peten-community-forests.json",
     "common-voice.json",
     "fordhall-organic-farm.json",
+    "isle-of-eigg-heritage-trust.json",
+    "kawawana.json",
     "meshtastic.json",
     "mikoko-pamoja.json",
     "open-food-facts.json",
+    "pachgaon-community-forest.json",
     "park-slope-food-coop.json",
     "the-things-network.json"
   ],
