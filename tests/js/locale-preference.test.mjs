@@ -31,10 +31,12 @@ test('future region-tag release accepts primary and sibling-region preferences',
   assert.equal(matchSupportedLocaleTag('pt-PT', futureReleased), 'pt-BR');
 });
 
-test('locale preference accepts only automatic and supported manual choices', () => {
+test('locale preference accepts automatic, released and preview manual choices', () => {
   assert.equal(normalizeLocalePreference('AUTO'), 'auto');
   assert.equal(normalizeLocalePreference('de'), 'de');
-  assert.equal(normalizeLocalePreference('fr'), null);
+  assert.equal(normalizeLocalePreference('fr'), 'fr');
+  assert.equal(normalizeLocalePreference('pt-PT'), 'pt-BR');
+  assert.equal(normalizeLocalePreference('zh-Hans'), null);
 });
 
 test('storage failures and corrupt values fail safely', () => {

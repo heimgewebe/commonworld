@@ -11,7 +11,11 @@ import {
 
 export const UI_LOCALE_STORAGE_KEY = 'commonworld.ui-locale';
 export const UI_LOCALE_QUERY_PARAMETER = 'ui_lang';
-export const UI_LOCALE_CHOICES = Object.freeze(['auto', ...RELEASED_LOCALES]);
+export const SELECTABLE_UI_LOCALES = Object.freeze([
+  ...RELEASED_LOCALES,
+  ...CANDIDATE_LOCALES,
+]);
+export const UI_LOCALE_CHOICES = Object.freeze(['auto', ...SELECTABLE_UI_LOCALES]);
 
 const SURFACE_FILES = Object.freeze((() => {
   const values = {
@@ -49,8 +53,7 @@ function safeStorage(storage) {
 export function normalizeLocalePreference(value) {
   const raw = String(value ?? '').trim();
   if (raw.toLowerCase() === 'auto') return 'auto';
-  const canonical = canonicalLocaleTag(raw);
-  return canonical && RELEASED_LOCALES.includes(canonical) ? canonical : null;
+  return matchSupportedLocaleTag(raw, SELECTABLE_UI_LOCALES);
 }
 
 export function matchSupportedLocaleTag(value, supportedLocales = RELEASED_LOCALES) {
@@ -71,6 +74,10 @@ export function matchSupportedLocaleTag(value, supportedLocales = RELEASED_LOCAL
 
 export function supportedLocale(value) {
   return matchSupportedLocaleTag(value);
+}
+
+export function selectableLocale(value) {
+  return matchSupportedLocaleTag(value, SELECTABLE_UI_LOCALES);
 }
 
 export function matchSupportedLocale(values, fallback = DEFAULT_LOCALE) {
@@ -138,7 +145,7 @@ export function resolveLocalePreference({
     locale = choice === 'auto' ? matchSupportedLocale(languages) : choice;
     source = stored ? 'storage' : 'browser';
   } else {
-    choice = RELEASED_LOCALES.includes(current) ? current : null;
+    choice = SELECTABLE_UI_LOCALES.includes(current) ? current : null;
     locale = current;
     source = 'explicit-surface';
   }
@@ -160,7 +167,7 @@ export function localeNavigationUrl({
   choice,
 }) {
   const current = new URL(currentHref);
-  const normalizedTarget = supportedLocale(targetLocale) ?? DEFAULT_LOCALE;
+  const normalizedTarget = selectableLocale(targetLocale) ?? DEFAULT_LOCALE;
   const target = new URL(localeSwitchHref(normalizedTarget, surface), documentBase ?? currentHref);
   target.search = current.search;
   target.searchParams.set(
