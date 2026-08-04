@@ -10,8 +10,10 @@ import os
 from pathlib import Path
 
 try:
+    from scripts.evaluate_catalog_browser_measurements import build_decision_evidence
     from scripts.measure_catalog_delivery import measure
 except ModuleNotFoundError:
+    from evaluate_catalog_browser_measurements import build_decision_evidence
     from measure_catalog_delivery import measure
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -33,11 +35,6 @@ def write_json(path: Path, value: dict) -> None:
 
 def file_sha256(path: Path) -> str:
     return hashlib.sha256(path.read_bytes()).hexdigest()
-
-
-def payload_sha256(value: dict) -> str:
-    encoded = json.dumps(value, ensure_ascii=False, sort_keys=True, separators=(",", ":")).encode("utf-8")
-    return hashlib.sha256(encoded).hexdigest()
 
 
 def baseline_static_from(static: dict) -> dict:
@@ -64,35 +61,6 @@ def baseline_static_from(static: dict) -> dict:
     return baseline
 
 
-def browser_breaches(measurement: dict, budgets: dict) -> list[str]:
-    checks = {
-        "project_json_request_count": "max_startup_project_json_requests",
-        "dom_node_count": "max_browser_dom_nodes",
-        "runtime_ready_ms": "max_runtime_ready_ms_at_4x_cpu",
-        "script_duration_ms": "max_script_duration_ms_at_4x_cpu",
-        "task_duration_ms": "max_task_duration_ms_at_4x_cpu",
-    }
-    breaches: list[str] = []
-    for profile in measurement.get("profiles", []):
-        name = profile.get("profile", "unknown")
-        for metric, budget_key in checks.items():
-            actual = profile.get(metric)
-            maximum = budgets.get(budget_key)
-            if not isinstance(actual, (int, float)) or not isinstance(maximum, (int, float)):
-                breaches.append(f"{name}:{metric}:missing")
-            elif actual > maximum:
-                breaches.append(f"{name}:{metric}:{actual}>{maximum}")
-        p95 = profile.get("bootstrap_compile", {}).get("p95_ms")
-        p95_max = budgets.get("max_bootstrap_compile_p95_ms_at_4x_cpu")
-        if not isinstance(p95, (int, float)) or not isinstance(p95_max, (int, float)):
-            breaches.append(f"{name}:bootstrap_compile_p95_ms:missing")
-        elif p95 > p95_max:
-            breaches.append(f"{name}:bootstrap_compile_p95_ms:{p95}>{p95_max}")
-        if profile.get("runtime_ready") is not True or profile.get("runtime_failed") is not False:
-            breaches.append(f"{name}:runtime-health")
-    return breaches
-
-
 def profile_map(value: dict) -> dict[str, dict]:
     return {
         profile["profile"]: profile
@@ -110,55 +78,28 @@ def refresh(browser_measurement_path: Path, smoke_result_path: Path) -> None:
     static = measure(ROOT)
     budgets = contract.get("budgets", {})
 
-    breaches = browser_breaches(browser_measurement, budgets)
-    if breaches:
-        raise RuntimeError("fresh browser measurement breaches delivery budgets: " + ", ".join(breaches))
-    if browser_measurement.get("cpu_throttle_rate") != 4:
-        raise RuntimeError("fresh browser measurement did not use fourfold CPU throttling")
+    browser_decision, decision_errors = build_decision_evidence(
+        [browser_measurement],
+        budgets,
+        budget_contract_sha256=file_sha256(CONTRACT_PATH),
+    )
+    if decision_errors or browser_decision is None:
+        raise RuntimeError(
+            "fresh browser measurement cannot form canonical decision evidence: "
+            + "; ".join(decision_errors)
+        )
+    if browser_decision.get("decision") != "pass":
+        raise RuntimeError(
+            "fresh browser measurement is not a terminal pass: "
+            + str(browser_decision.get("decision"))
+        )
 
-    profiles = browser_measurement.get("profiles", [])
-    surface_hashes = {
-        profile.get("first_party_surface_sha256")
-        for profile in profiles
-        if isinstance(profile, dict)
-    }
-    if len(surface_hashes) != 1 or None in surface_hashes:
-        raise RuntimeError(f"fresh browser profiles disagree on first-party surface: {surface_hashes}")
-    surface_hash = next(iter(surface_hashes))
-
+    surface_hash = browser_decision["first_party_surface_sha256"]
     evidence["base_commit"] = os.environ.get("GITHUB_SHA", evidence.get("base_commit"))
     evidence["optimized"]["static"] = static
     evidence["baseline"]["static"] = baseline_static_from(static)
-
-    optimized_browser = evidence["optimized"].setdefault("browser", {})
-    optimized_browser.update(
-        {
-            "schema_version": 1,
-            "kind": "commonworld_catalog_delivery_browser_measurement_decision",
-            "decision": "pass",
-            "gate_verdict": "pass",
-            "decision_reason": (
-                "Fresh fourfold-CPU mobile and desktop measurements passed every bound startup budget. "
-                "Post-ready work remains diagnostic and is not folded into the startup gate."
-            ),
-            "architecture_review_required": False,
-            "cpu_throttle_rate": browser_measurement["cpu_throttle_rate"],
-            "budget_contract_sha256": file_sha256(CONTRACT_PATH),
-            "first_party_surface_sha256": surface_hash,
-            "measured_at": browser_measurement.get("measured_at"),
-            "profiles": profiles,
-            "attempt_count": 1,
-            "attempts": [
-                {
-                    "attempt": 1,
-                    "verdict": "pass",
-                    "measurement_sha256": payload_sha256(browser_measurement),
-                    "breaches": [],
-                    "measurement": browser_measurement,
-                }
-            ],
-        }
-    )
+    evidence["optimized"]["browser"] = browser_decision
+    optimized_browser = browser_decision
 
     baseline_static = evidence["baseline"]["static"]
     optimized_static = evidence["optimized"]["static"]
