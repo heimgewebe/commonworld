@@ -97,8 +97,8 @@
     {
       "id": "intent-search-discovery",
       "verdict": "PASS",
-      "indexedRecords": 81,
-      "rankedGermanIntentResults": 46,
+      "indexedRecords": 84,
+      "rankedGermanIntentResults": 47,
       "filters": 7,
       "digitalCoordinateFree": true,
       "spatialNavigation": true
@@ -118,9 +118,9 @@
       "filterButtonWidth": 44,
       "filterButtonHeight": 44,
       "ringAnimationName": "sphere-ring-orbit",
-      "ringTransform": "matrix(0.999993, 0.00376692, -0.00376692, 0.999993, 0, 0)",
-      "ringTextWidth": 781.6959228515625,
-      "ringTextHeight": 14.9443359375,
+      "ringTransform": "matrix(1, 0.000750544, -0.000750544, 1, 0, 0)",
+      "ringTextWidth": 671.1033325195312,
+      "ringTextHeight": 13.503692626953125,
       "ringTextFontSize": 22,
       "primaryRingCount": 3,
       "depthRingCount": 2,
@@ -172,8 +172,8 @@
     {
       "id": "dual-presence-axes",
       "verdict": "PASS",
-      "publicFeatures": 131,
-      "publicIdentities": 38,
+      "publicFeatures": 135,
+      "publicIdentities": 41,
       "digitalIdentities": 55,
       "unchangedMapUpdatesSkipped": true
     },
@@ -196,7 +196,7 @@
     {
       "id": "layer-journey-moveend-return",
       "verdict": "PASS",
-      "elapsedMs": 2590
+      "elapsedMs": 2348
     },
     {
       "id": "layer-journey-interrupted",
@@ -250,11 +250,11 @@
         "overlapArea": 0,
         "controlGap": 9.1875,
         "layerControl": {
-          "left": 445.765625,
+          "left": 465.0625,
           "top": 70.390625,
           "right": 603.8125,
           "bottom": 114.390625,
-          "width": 158.046875,
+          "width": 138.75,
           "height": 44
         },
         "zoomControl": {
@@ -283,8 +283,8 @@
       "verdict": "PASS",
       "blockedCatalogRequests": 0,
       "observedCatalogRequests": [
-        "/releases/532a8c448c8fb0795578/catalog/runtime/aggregate.v1.json",
-        "/releases/532a8c448c8fb0795578/catalog/runtime/manifest.v1.json"
+        "/releases/b6c3d810dba38df0f534/catalog/runtime/aggregate.v1.json",
+        "/releases/b6c3d810dba38df0f534/catalog/runtime/manifest.v1.json"
       ]
     },
     {
@@ -306,7 +306,7 @@
       "id": "bootstrap-asset-failure-fallback",
       "verdict": "PASS",
       "blockedBootstrapRequests": 1,
-      "fallbackCatalogCards": 81,
+      "fallbackCatalogCards": 84,
       "hiddenFallbackCatalogCards": 0,
       "neutralRecoveryCopy": true,
       "skipLinkHref": "/#static-catalog-fallback",
@@ -317,7 +317,7 @@
     {
       "id": "post-render-failure-preserves-fallback",
       "verdict": "PASS",
-      "fallbackCatalogCards": 81,
+      "fallbackCatalogCards": 84,
       "hiddenFallbackCatalogCards": 0,
       "skipLinkHref": "/#static-catalog-fallback",
       "skipFocusId": "static-catalog-fallback",
@@ -344,7 +344,7 @@
   "binding": {
     "smoke_script_sha256": "589078eb9291124c796f71c7b648d961be145a8c740eb03565867f9b6af5a07f",
     "smoke_runner_sha256": "522b99b70b1d0064b1d0a31a3a67fdc9a2e73b7408f37d1a4bb303bc360b7556",
-    "first_party_surface_sha256": "e87a41a7ca9d941bba8b6ec4d397f64378fdfad5ef4aa2b5602ccc66b4bfb791",
+    "first_party_surface_sha256": "72dbe1dbc7b7e7b56c32f7b2c5e30245d89bc3765c4a60e30e93a7e7804654aa",
     "scenario_ids": [
       "startup-and-ring-orbits",
       "synthetic-cross-ring-collision-accessibility",

@@ -172,8 +172,10 @@ try {
       let runtimeCatalogBoundary = null;
       if (pageName === `${candidate.locale}.html`) {
         runtimeCatalogBoundary = await page.evaluate(async () => {
-          const card = document.querySelector('.catalog-card[data-commonproject-id]');
-          const button = card?.querySelector('.catalog-select');
+          const card = document.querySelector('#catalog .catalog-card[data-commonproject-id="aflaj-irrigation-systems-oman"]');
+          if (!card) throw new Error('candidate dual-presence fixture card is missing');
+          const button = card.querySelector('.catalog-select');
+          if (!button) throw new Error('candidate dual-presence fixture select control is missing');
           const staticTitleNode = card?.querySelector('h2');
           const staticSummaryNode = card?.querySelector('h2 + p');
           const staticTitle = staticTitleNode?.textContent ?? '';

@@ -11,6 +11,7 @@ from scripts.build_catalog_runtime import clear_generated_catalog_files
 from scripts.catalog_hierarchy_v2 import (
     INDEX_PREFIX_LENGTH,
     LEAF_PREFIX_LENGTH,
+    aggregate_bucket,
     build_hierarchical_runtime_fixture,
     validate_hierarchical_runtime_fixture,
 )
@@ -60,6 +61,13 @@ class CatalogHierarchyV2Tests(unittest.TestCase):
             0,
             msg=f"stdout={result.stdout}\nstderr={result.stderr}",
         )
+
+    def test_dimension_specific_aggregate_buckets_split_dense_theme_prefixes(self):
+        self.assertEqual(aggregate_bucket("themes", "community-ownership"), "com")
+        self.assertEqual(aggregate_bucket("themes", "conservation"), "con")
+        self.assertEqual(aggregate_bucket("themes", "cooperative"), "coo")
+        self.assertEqual(aggregate_bucket("spatial_cells", "10:17"), "10")
+        self.assertEqual(aggregate_bucket("digital", "available"), "all")
 
     def test_hierarchy_is_deterministic_and_preserves_v1_source(self):
         second = build_hierarchical_runtime_fixture(self.v1)
