@@ -57,7 +57,7 @@ def aggregate_bucket(dimension: str, value: str) -> str:
     if not isinstance(value, str) or not value:
         raise ValueError("aggregate index value must be a non-empty string")
     if dimension == "themes":
-        return value[:2]
+        return value[:3]
     if dimension == "spatial_cells":
         x, separator, _y = value.partition(":")
         if separator != ":" or len(x) != 2 or not x.isdigit():

@@ -374,13 +374,13 @@ async function hierarchyFixture(identifier = 'debian') {
     generation,
     source_catalog_sha256: sourceHash,
     dimension: 'themes',
-    key: 'so',
+    key: 'sof',
     entry_count: 1,
     value_count: 1,
     shard_reference_count: 1,
     index: { software: [key] },
   };
-  const themeDescriptor = { dimension: 'themes', key: 'so', value_count: 1, shard_reference_count: 1, ...descriptor(themeSegment, 'catalog/runtime/aggregate-segments/themes/so.v2.json') };
+  const themeDescriptor = { dimension: 'themes', key: 'sof', value_count: 1, shard_reference_count: 1, ...descriptor(themeSegment, 'catalog/runtime/aggregate-segments/themes/sof.v2.json') };
   const digitalSegment = {
     kind: 'commonworld.catalog_aggregate_segment',
     version: '2.0',
@@ -449,7 +449,7 @@ test('manifest v2 selection fetches only the required aggregate segment', async 
     fetchImpl: async (url) => { calls.push(String(url)); return response(fixture.themeSegment); },
   });
   assert.deepEqual(selected, [fixture.key]);
-  assert.deepEqual(calls, ['https://commonworld.test/catalog/runtime/aggregate-segments/themes/so.v2.json']);
+  assert.deepEqual(calls, ['https://commonworld.test/catalog/runtime/aggregate-segments/themes/sof.v2.json']);
 });
 
 test('manifest v2 segment loader rejects undeclared buckets before fetching', async () => {
