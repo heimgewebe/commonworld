@@ -41,8 +41,9 @@ jobs:
 
       - name: Apply source patch
         run: |
-          python3 -m py_compile scripts/apply_locale_settings_patch.py
+          python3 -m py_compile scripts/apply_locale_settings_patch.py scripts/apply_locale_settings_test_patch.py
           python3 scripts/apply_locale_settings_patch.py
+          python3 scripts/apply_locale_settings_test_patch.py
 
       - name: Build deterministic public surfaces
         run: npm run build
@@ -79,7 +80,7 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          rm scripts/apply_locale_settings_patch.py
+          rm scripts/apply_locale_settings_patch.py scripts/apply_locale_settings_test_patch.py
           rm .github/workflows/locale-settings-one-shot.yml
           git diff --check
           git config user.name 'commonworld-locale-settings[bot]'
