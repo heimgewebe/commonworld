@@ -97,7 +97,7 @@
     {
       "id": "intent-search-discovery",
       "verdict": "PASS",
-      "indexedRecords": 84,
+      "indexedRecords": 87,
       "rankedGermanIntentResults": 47,
       "filters": 7,
       "digitalCoordinateFree": true,
@@ -118,9 +118,9 @@
       "filterButtonWidth": 44,
       "filterButtonHeight": 44,
       "ringAnimationName": "sphere-ring-orbit",
-      "ringTransform": "matrix(1, 0.000750544, -0.000750544, 1, 0, 0)",
-      "ringTextWidth": 671.1033325195312,
-      "ringTextHeight": 13.503692626953125,
+      "ringTransform": "matrix(1, 0.000756742, -0.000756742, 1, 0, 0)",
+      "ringTextWidth": 671.1034545898438,
+      "ringTextHeight": 13.507843017578125,
       "ringTextFontSize": 22,
       "primaryRingCount": 3,
       "depthRingCount": 2,
@@ -172,8 +172,8 @@
     {
       "id": "dual-presence-axes",
       "verdict": "PASS",
-      "publicFeatures": 135,
-      "publicIdentities": 41,
+      "publicFeatures": 143,
+      "publicIdentities": 44,
       "digitalIdentities": 55,
       "unchangedMapUpdatesSkipped": true
     },
@@ -196,7 +196,7 @@
     {
       "id": "layer-journey-moveend-return",
       "verdict": "PASS",
-      "elapsedMs": 2348
+      "elapsedMs": 2455
     },
     {
       "id": "layer-journey-interrupted",
@@ -283,8 +283,8 @@
       "verdict": "PASS",
       "blockedCatalogRequests": 0,
       "observedCatalogRequests": [
-        "/releases/b6c3d810dba38df0f534/catalog/runtime/aggregate.v1.json",
-        "/releases/b6c3d810dba38df0f534/catalog/runtime/manifest.v1.json"
+        "/releases/f2d63d83a6b351d51be5/catalog/runtime/aggregate.v1.json",
+        "/releases/f2d63d83a6b351d51be5/catalog/runtime/manifest.v1.json"
       ]
     },
     {
@@ -306,7 +306,7 @@
       "id": "bootstrap-asset-failure-fallback",
       "verdict": "PASS",
       "blockedBootstrapRequests": 1,
-      "fallbackCatalogCards": 84,
+      "fallbackCatalogCards": 87,
       "hiddenFallbackCatalogCards": 0,
       "neutralRecoveryCopy": true,
       "skipLinkHref": "/#static-catalog-fallback",
@@ -317,7 +317,7 @@
     {
       "id": "post-render-failure-preserves-fallback",
       "verdict": "PASS",
-      "fallbackCatalogCards": 84,
+      "fallbackCatalogCards": 87,
       "hiddenFallbackCatalogCards": 0,
       "skipLinkHref": "/#static-catalog-fallback",
       "skipFocusId": "static-catalog-fallback",
@@ -344,7 +344,7 @@
   "binding": {
     "smoke_script_sha256": "589078eb9291124c796f71c7b648d961be145a8c740eb03565867f9b6af5a07f",
     "smoke_runner_sha256": "522b99b70b1d0064b1d0a31a3a67fdc9a2e73b7408f37d1a4bb303bc360b7556",
-    "first_party_surface_sha256": "72dbe1dbc7b7e7b56c32f7b2c5e30245d89bc3765c4a60e30e93a7e7804654aa",
+    "smoke_plan_sha256": "11e90aa53237fa2c78518c9f472d3dde41e53e2c2381a7969e96da3546641847",
     "scenario_ids": [
       "startup-and-ring-orbits",
       "synthetic-cross-ring-collision-accessibility",
@@ -383,7 +383,6 @@
       "method-mobile",
       "method-mobile-text-200"
     ],
-    "freshness_rule": "The committed smoke result is valid only while all bound hashes and the ordered scenario set match the current repository surface.",
-    "smoke_plan_sha256": "11e90aa53237fa2c78518c9f472d3dde41e53e2c2381a7969e96da3546641847"
+    "first_party_surface_sha256": "e79c7e8f663d3bb8b591e558797a998c48e991495518e2402f4fe57b4950b5c8"
   }
 }
