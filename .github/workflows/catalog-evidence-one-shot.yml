@@ -4,17 +4,23 @@ on:
   push:
     branches:
       - fix/locale-settings-menu
+  pull_request:
+    branches:
+      - main
+    types:
+      - opened
+      - synchronize
 
 permissions:
   contents: write
 
 concurrency:
   group: catalog-evidence-one-shot
-  cancel-in-progress: false
+  cancel-in-progress: true
 
 jobs:
   refresh-validate-and-clean:
-    if: github.ref_name == 'fix/locale-settings-menu'
+    if: github.head_ref == 'fix/locale-settings-menu' || github.ref_name == 'fix/locale-settings-menu'
     runs-on: ubuntu-latest
     timeout-minutes: 45
     steps:
