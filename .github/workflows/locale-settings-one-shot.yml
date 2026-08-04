@@ -1,0 +1,78 @@
+name: Locale settings one-shot
+
+on:
+  push:
+    branches:
+      - fix/locale-settings-menu
+
+permissions:
+  contents: write
+
+concurrency:
+  group: locale-settings-one-shot
+  cancel-in-progress: false
+
+jobs:
+  apply-build-test-and-clean:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - name: Check out exact branch
+        uses: actions/checkout@v4
+        with:
+          ref: fix/locale-settings-menu
+          fetch-depth: 0
+
+      - name: Set up Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Apply source patch
+        run: |
+          python3 -m py_compile scripts/apply_locale_settings_patch.py
+          python3 scripts/apply_locale_settings_patch.py
+
+      - name: Build deterministic public surfaces
+        run: npm run build
+
+      - name: Run JavaScript tests
+        run: npm test
+
+      - name: Run focused validators
+        shell: bash
+        run: |
+          set -euo pipefail
+          for target in validate-locale-release validate-proposal-path validate-public-shell; do
+            if grep -q "^${target}:" Makefile; then
+              make "$target"
+            fi
+          done
+
+      - name: Verify generated language surfaces
+        shell: bash
+        run: |
+          set -euo pipefail
+          if grep -n 'data-locale-choice' propose*.html; then
+            echo 'Proposal pages still expose duplicate locale controls.' >&2
+            exit 1
+          fi
+          for page in index.html de.html es.html fr.html pt-BR.html ar.html; do
+            for choice in auto en de es fr pt-BR ar; do
+              grep -q "data-locale-choice=\"${choice}\"" "$page"
+            done
+          done
+          git diff --check
+
+      - name: Commit source, generated output and self-cleanup
+        shell: bash
+        run: |
+          set -euo pipefail
+          rm scripts/apply_locale_settings_patch.py
+          rm .github/workflows/locale-settings-one-shot.yml
+          git diff --check
+          git config user.name 'commonworld-locale-settings[bot]'
+          git config user.email 'commonworld-locale-settings[bot]@users.noreply.github.com'
+          git add --all
+          git commit -m 'fix(i18n): centralize and expand language settings'
+          git push origin HEAD:fix/locale-settings-menu
