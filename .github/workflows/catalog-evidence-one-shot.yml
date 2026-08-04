@@ -1,0 +1,74 @@
+name: Catalog evidence one-shot
+
+on:
+  push:
+    branches:
+      - fix/locale-settings-menu
+
+permissions:
+  contents: write
+
+concurrency:
+  group: catalog-evidence-one-shot
+  cancel-in-progress: false
+
+jobs:
+  refresh-validate-and-clean:
+    if: github.ref_name == 'fix/locale-settings-menu'
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    steps:
+      - name: Check out exact branch
+        uses: actions/checkout@v4
+        with:
+          ref: fix/locale-settings-menu
+          fetch-depth: 0
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Set up Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: Install deterministic dependencies
+        run: |
+          npm ci --ignore-scripts --no-audit --no-fund
+          python -m pip install -r requirements-dev.txt
+          npx playwright install --with-deps chromium
+
+      - name: Rebuild current public surfaces
+        run: |
+          npm run build
+          git diff --exit-code
+
+      - name: Capture fresh browser and smoke evidence
+        run: |
+          node scripts/measure_catalog_delivery_browser.mjs --output /tmp/catalog-browser.json
+          node scripts/smoke_public_browser.mjs --result /tmp/public-smoke.json
+          python3 scripts/refresh_catalog_delivery_evidence.py \
+            --browser-measurement /tmp/catalog-browser.json \
+            --smoke-result /tmp/public-smoke.json
+
+      - name: Validate complete repository
+        run: make validate
+
+      - name: Run complete browser smoke plan
+        run: python3 scripts/run_browser_smoke.py
+
+      - name: Commit evidence and self-cleanup
+        shell: bash
+        run: |
+          set -euo pipefail
+          rm scripts/refresh_catalog_delivery_evidence.py
+          rm .github/workflows/catalog-evidence-one-shot.yml
+          git diff --check
+          git config user.name 'commonworld-evidence-refresh[bot]'
+          git config user.email 'commonworld-evidence-refresh[bot]@users.noreply.github.com'
+          git add --all
+          git commit -m 'test(delivery): refresh locale-bound browser evidence'
+          git push origin HEAD:fix/locale-settings-menu
