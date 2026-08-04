@@ -6,7 +6,9 @@ import {
   UI_LOCALE_CHOICES,
   matchSupportedLocale,
   normalizeLocalePreference,
+  readStoredLocalePreference,
   resolveLocalePreference,
+  writeStoredLocalePreference,
 } from '../../assets/commonworld-locale.mjs';
 
 test('manual language choices include reviewed and preview locales', () => {
@@ -26,6 +28,18 @@ test('manual language choices include reviewed and preview locales', () => {
 test('automatic language matching remains limited to released locales', () => {
   assert.equal(matchSupportedLocale(['fr-FR', 'de-DE']), 'de');
   assert.equal(matchSupportedLocale(['ar', 'en-GB']), 'en');
+});
+
+test('preview locale choices survive the same bounded storage path as released choices', () => {
+  const values = new Map();
+  const storage = {
+    getItem(key) { return values.get(key) ?? null; },
+    setItem(key, value) { values.set(key, value); },
+  };
+  assert.equal(writeStoredLocalePreference('fr', storage), true);
+  assert.equal(readStoredLocalePreference(storage), 'fr');
+  assert.equal(writeStoredLocalePreference('zh-Hans', storage), false);
+  assert.equal(readStoredLocalePreference(storage), 'fr');
 });
 
 test('manual and direct preview locale navigation keeps the preview choice', () => {
