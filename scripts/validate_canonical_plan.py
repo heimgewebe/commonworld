@@ -242,7 +242,7 @@ EXPECTED_TEST_FILES = {
     "test_presence_axes.py",
     "test_intent_search_discovery.py",
     "test_i18n.py",
-    "test_locale_candidates.py",
+    "test_locale_wave1.py",
     "test_locale_release_contract.py",
     "test_public_shell.py",
     "test_renderer_spike.py",
