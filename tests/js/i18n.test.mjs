@@ -9,6 +9,7 @@ import {
   hasThemeLabel,
   localizeCatalogRecords,
   normalizeLocale,
+  shouldLoadWave1LocalePack,
   taxonomyLabel,
   text,
   themeLabel,
@@ -34,6 +35,15 @@ test('English locale overlay preserves canonical identity and factual fields', (
     assert.deepEqual(localized.provenance.sources.map(({ url }) => ({ url })), canonical.provenance.sources.map(({ url }) => ({ url })));
     assert.notEqual(localized.summary.trim(), '');
   }
+});
+
+test('Wave-1 translation packages remain loadable after candidate promotion', () => {
+  assert.equal(shouldLoadWave1LocalePack('es', false), true);
+  assert.equal(shouldLoadWave1LocalePack('fr', false), true);
+  assert.equal(shouldLoadWave1LocalePack('pt-BR', false), true);
+  assert.equal(shouldLoadWave1LocalePack('ar', false), true);
+  assert.equal(shouldLoadWave1LocalePack('de', false), false);
+  assert.equal(shouldLoadWave1LocalePack('de', true), true);
 });
 
 test('candidate locales keep English catalog content with localized interface labels', () => {

@@ -1,0 +1,1271 @@
+{
+  "schema_version": 1,
+  "kind": "commonworld.locale_language_advisory_audit",
+  "date": "2026-08-05",
+  "source_pack": "assets/locales/wave1-locales.json",
+  "reviewers": [
+    {
+      "task_id": "1b4a98d13ffc4397aad928aa",
+      "scope": [
+        "es",
+        "fr"
+      ],
+      "role": "advisory-language-audit",
+      "native_human_review": false
+    },
+    {
+      "task_id": "769195654f604b979fe44c80",
+      "scope": [
+        "pt-BR",
+        "ar"
+      ],
+      "role": "advisory-language-audit",
+      "native_human_review": false
+    }
+  ],
+  "applied_exact": {
+    "es": {
+      "count": 55,
+      "keys": [
+        {
+          "section": "ui",
+          "key": "map_degraded"
+        },
+        {
+          "section": "ui",
+          "key": "globe_ready"
+        },
+        {
+          "section": "ui",
+          "key": "preview_of_commons"
+        },
+        {
+          "section": "ui",
+          "key": "all_hits_text"
+        },
+        {
+          "section": "ui",
+          "key": "no_spatial_commons"
+        },
+        {
+          "section": "ui",
+          "key": "more_commons"
+        },
+        {
+          "section": "ui",
+          "key": "show_more_in_bundle"
+        },
+        {
+          "section": "ui",
+          "key": "more_commons_aria"
+        },
+        {
+          "section": "ui",
+          "key": "curation_review"
+        },
+        {
+          "section": "ui",
+          "key": "search_nearby_aria"
+        },
+        {
+          "section": "ui",
+          "key": "catalog_bootstrap_failed"
+        },
+        {
+          "section": "ui",
+          "key": "action_borrow"
+        },
+        {
+          "section": "ui",
+          "key": "action_replicate"
+        },
+        {
+          "section": "ui",
+          "key": "action_contact"
+        },
+        {
+          "section": "ui",
+          "key": "action_volunteer"
+        },
+        {
+          "section": "themes",
+          "key": "mangroves"
+        },
+        {
+          "section": "themes",
+          "key": "customary-law"
+        },
+        {
+          "section": "themes",
+          "key": "environment"
+        },
+        {
+          "section": "themes",
+          "key": "digital-literacy"
+        },
+        {
+          "section": "static",
+          "key": "activity_unknown"
+        },
+        {
+          "section": "shell",
+          "key": "shell_036"
+        },
+        {
+          "section": "shell",
+          "key": "shell_043"
+        },
+        {
+          "section": "shell",
+          "key": "shell_063"
+        },
+        {
+          "section": "shell",
+          "key": "shell_092"
+        },
+        {
+          "section": "shell",
+          "key": "shell_108"
+        },
+        {
+          "section": "shell",
+          "key": "shell_088"
+        },
+        {
+          "section": "shell",
+          "key": "shell_006"
+        },
+        {
+          "section": "shell",
+          "key": "shell_127"
+        },
+        {
+          "section": "shell",
+          "key": "shell_137"
+        },
+        {
+          "section": "shell",
+          "key": "shell_139"
+        },
+        {
+          "section": "shell",
+          "key": "shell_089"
+        },
+        {
+          "section": "method",
+          "key": "method_011"
+        },
+        {
+          "section": "method",
+          "key": "method_025"
+        },
+        {
+          "section": "method",
+          "key": "method_005"
+        },
+        {
+          "section": "proposal",
+          "key": "proposal_007"
+        },
+        {
+          "section": "proposal",
+          "key": "proposal_026"
+        },
+        {
+          "section": "proposal",
+          "key": "proposal_028"
+        },
+        {
+          "section": "proposal",
+          "key": "proposal_030"
+        },
+        {
+          "section": "proposal",
+          "key": "proposal_045"
+        },
+        {
+          "section": "proposal",
+          "key": "proposal_050"
+        },
+        {
+          "section": "proposal",
+          "key": "proposal_060"
+        },
+        {
+          "section": "taxonomy",
+          "key": "provision_land_ecology"
+        },
+        {
+          "section": "taxonomy",
+          "key": "land_ecology"
+        },
+        {
+          "section": "taxonomy",
+          "key": "unclassified_future_theme"
+        },
+        {
+          "section": "taxonomy",
+          "key": "network_coordination"
+        },
+        {
+          "section": "taxonomy",
+          "key": "sphere"
+        },
+        {
+          "section": "proposal_runtime",
+          "key": "Ways to engage: one to three evidenced paths are required."
+        },
+        {
+          "section": "proposal_runtime",
+          "key": "Sources: provide at least one and at most five primary-near HTTPS sources."
+        },
+        {
+          "section": "proposal_runtime",
+          "key": "active HTML or script content is not allowed."
+        },
+        {
+          "section": "proposal_runtime",
+          "key": "## Public Commons suggestion"
+        },
+        {
+          "section": "proposal_runtime",
+          "key": "Commons type"
+        },
+        {
+          "section": "proposal_runtime",
+          "key": "Commons suggestion"
+        },
+        {
+          "section": "proposal_runtime",
+          "key": "Presence: choose at least one option (On site or Digital)."
+        },
+        {
+          "section": "proposal_runtime",
+          "key": "- [x] I understand that this issue is public."
+        },
+        {
+          "section": "proposal_runtime",
+          "key": "Please correct:"
+        }
+      ]
+    },
+    "fr": {
+      "count": 72,
+      "keys": [
+        {
+          "section": "ui",
+          "key": "map_degraded"
+        },
+        {
+          "section": "ui",
+          "key": "no_visible_entries"
+        },
+        {
+          "section": "ui",
+          "key": "all_countries"
+        },
+        {
+          "section": "ui",
+          "key": "show_more"
+        },
+        {
+          "section": "ui",
+          "key": "show_more_in_bundle"
+        },
+        {
+          "section": "ui",
+          "key": "horizontal_scroll"
+        },
+        {
+          "section": "ui",
+          "key": "geolocation_failed"
+        },
+        {
+          "section": "ui",
+          "key": "visible_ring_commons"
+        },
+        {
+          "section": "ui",
+          "key": "visible_ring_commons_empty"
+        },
+        {
+          "section": "ui",
+          "key": "show_commons"
+        },
+        {
+          "section": "ui",
+          "key": "show_commons_in"
+        },
+        {
+          "section": "ui",
+          "key": "shown_of_commons"
+        },
+        {
+          "section": "ui",
+          "key": "digital_sphere"
+        },
+        {
+          "section": "ui",
+          "key": "catalog_bootstrap_failed"
+        },
+        {
+          "section": "ui",
+          "key": "more_commons_aria"
+        },
+        {
+          "section": "ui",
+          "key": "overview"
+        },
+        {
+          "section": "themes",
+          "key": "restoration"
+        },
+        {
+          "section": "themes",
+          "key": "open-source"
+        },
+        {
+          "section": "themes",
+          "key": "seeds"
+        },
+        {
+          "section": "themes",
+          "key": "knowledge"
+        },
+        {
+          "section": "shell",
+          "key": "shell_020"
+        },
+        {
+          "section": "shell",
+          "key": "shell_025"
+        },
+        {
+          "section": "shell",
+          "key": "shell_063"
+        },
+        {
+          "section": "shell",
+          "key": "shell_068"
+        },
+        {
+          "section": "shell",
+          "key": "shell_086"
+        },
+        {
+          "section": "shell",
+          "key": "shell_087"
+        },
+        {
+          "section": "shell",
+          "key": "shell_092"
+        },
+        {
+          "section": "shell",
+          "key": "shell_113"
+        },
+        {
+          "section": "shell",
+          "key": "shell_122"
+        },
+        {
+          "section": "shell",
+          "key": "shell_123"
+        },
+        {
+          "section": "shell",
+          "key": "shell_127"
+        },
+        {
+          "section": "shell",
+          "key": "shell_128"
+        },
+        {
+          "section": "shell",
+          "key": "shell_142"
+        },
+        {
+          "section": "shell",
+          "key": "shell_130"
+        },
+        {
+          "section": "shell",
+          "key": "shell_136"
+        },
+        {
+          "section": "shell",
+          "key": "shell_143"
+        },
+        {
+          "section": "shell",
+          "key": "shell_044"
+        },
+        {
+          "section": "shell",
+          "key": "shell_131"
+        },
+        {
+          "section": "method",
+          "key": "method_005"
+        },
+        {
+          "section": "method",
+          "key": "method_007"
+        },
+        {
+          "section": "method",
+          "key": "method_019"
+        },
+        {
+          "section": "proposal",
+          "key": "proposal_004"
+        },
+        {
+          "section": "proposal",
+          "key": "proposal_021"
+        },
+        {
+          "section": "proposal",
+          "key": "proposal_023"
+        },
+        {
+          "section": "proposal",
+          "key": "proposal_026"
+        },
+        {
+          "section": "proposal",
+          "key": "proposal_035"
+        },
+        {
+          "section": "proposal",
+          "key": "proposal_045"
+        },
+        {
+          "section": "proposal",
+          "key": "proposal_050"
+        },
+        {
+          "section": "proposal",
+          "key": "proposal_060"
+        },
+        {
+          "section": "proposal",
+          "key": "proposal_063"
+        },
+        {
+          "section": "taxonomy",
+          "key": "knowledge_learning_bridge"
+        },
+        {
+          "section": "taxonomy",
+          "key": "knowledge_software_bridge"
+        },
+        {
+          "section": "taxonomy",
+          "key": "network_coordination"
+        },
+        {
+          "section": "taxonomy",
+          "key": "cooperation_self_organization"
+        },
+        {
+          "section": "taxonomy",
+          "key": "provision_land_ecology"
+        },
+        {
+          "section": "taxonomy",
+          "key": "sphere"
+        },
+        {
+          "section": "proposal_runtime",
+          "key": "Ways to engage: check the type and HTTPS address."
+        },
+        {
+          "section": "proposal_runtime",
+          "key": "Ways to engage: remove the duplicate."
+        },
+        {
+          "section": "proposal_runtime",
+          "key": "Sources: only valid HTTPS addresses are allowed."
+        },
+        {
+          "section": "proposal_runtime",
+          "key": "Official website: only a valid HTTPS address is allowed."
+        },
+        {
+          "section": "proposal_runtime",
+          "key": "Region: do not provide one for digital-only presence."
+        },
+        {
+          "section": "proposal_runtime",
+          "key": "## Public Commons suggestion"
+        },
+        {
+          "section": "proposal_runtime",
+          "key": "- [x] I consent to editorial processing of this information."
+        },
+        {
+          "section": "proposal_runtime",
+          "key": "Draft input was restored after this tab changed release version."
+        },
+        {
+          "section": "proposal_runtime",
+          "key": "No network connection detected. Download the validated JSON suggestion and submit it through GitHub later."
+        },
+        {
+          "section": "proposal_runtime",
+          "key": "The public catalog index could not be loaded safely. Please reload the page."
+        },
+        {
+          "section": "proposal_runtime",
+          "key": "Sources: provide at least one and at most five primary-near HTTPS sources."
+        },
+        {
+          "section": "proposal_runtime",
+          "key": "Suggestion: timestamp is invalid."
+        },
+        {
+          "section": "proposal_runtime",
+          "key": "### Suggested ways to engage"
+        },
+        {
+          "section": "actions",
+          "key": "homepage"
+        },
+        {
+          "section": "actions",
+          "key": "donate"
+        },
+        {
+          "section": "actions",
+          "key": "volunteer"
+        }
+      ]
+    },
+    "pt-BR": {
+      "count": 77,
+      "keys": [
+        {
+          "section": "shell",
+          "key": "shell_001"
+        },
+        {
+          "section": "shell",
+          "key": "shell_002"
+        },
+        {
+          "section": "shell",
+          "key": "shell_005"
+        },
+        {
+          "section": "shell",
+          "key": "shell_007"
+        },
+        {
+          "section": "shell",
+          "key": "shell_013"
+        },
+        {
+          "section": "shell",
+          "key": "shell_036"
+        },
+        {
+          "section": "shell",
+          "key": "shell_039"
+        },
+        {
+          "section": "shell",
+          "key": "shell_042"
+        },
+        {
+          "section": "shell",
+          "key": "shell_043"
+        },
+        {
+          "section": "shell",
+          "key": "shell_063"
+        },
+        {
+          "section": "shell",
+          "key": "shell_089"
+        },
+        {
+          "section": "shell",
+          "key": "shell_102"
+        },
+        {
+          "section": "shell",
+          "key": "shell_110"
+        },
+        {
+          "section": "shell",
+          "key": "shell_121"
+        },
+        {
+          "section": "shell",
+          "key": "shell_141"
+        },
+        {
+          "section": "shell",
+          "key": "shell_148"
+        },
+        {
+          "section": "shell",
+          "key": "shell_160"
+        },
+        {
+          "section": "ui",
+          "key": "map_degraded"
+        },
+        {
+          "section": "ui",
+          "key": "globe_ready"
+        },
+        {
+          "section": "ui",
+          "key": "globe_loading"
+        },
+        {
+          "section": "ui",
+          "key": "invalid_or_duplicate_id"
+        },
+        {
+          "section": "ui",
+          "key": "visible_ring_commons"
+        },
+        {
+          "section": "ui",
+          "key": "visible_ring_commons_empty"
+        },
+        {
+          "section": "ui",
+          "key": "show_on_globe"
+        },
+        {
+          "section": "ui",
+          "key": "show_on_globe_aria"
+        },
+        {
+          "section": "ui",
+          "key": "public_locations"
+        },
+        {
+          "section": "ui",
+          "key": "preview_of_commons"
+        },
+        {
+          "section": "ui",
+          "key": "spatial_summary"
+        },
+        {
+          "section": "ui",
+          "key": "action_use"
+        },
+        {
+          "section": "ui",
+          "key": "action_visit"
+        },
+        {
+          "section": "ui",
+          "key": "action_borrow"
+        },
+        {
+          "section": "ui",
+          "key": "action_learn"
+        },
+        {
+          "section": "ui",
+          "key": "action_contribute"
+        },
+        {
+          "section": "ui",
+          "key": "action_volunteer"
+        },
+        {
+          "section": "ui",
+          "key": "action_donate"
+        },
+        {
+          "section": "ui",
+          "key": "action_contact"
+        },
+        {
+          "section": "ui",
+          "key": "action_replicate"
+        },
+        {
+          "section": "static",
+          "key": "digital_commons"
+        },
+        {
+          "section": "static",
+          "key": "commons"
+        },
+        {
+          "section": "static",
+          "key": "public_location_many"
+        },
+        {
+          "section": "static",
+          "key": "hidden_location_many"
+        },
+        {
+          "section": "method",
+          "key": "method_001"
+        },
+        {
+          "section": "method",
+          "key": "method_005"
+        },
+        {
+          "section": "method",
+          "key": "method_009"
+        },
+        {
+          "section": "method",
+          "key": "method_014"
+        },
+        {
+          "section": "method",
+          "key": "method_016"
+        },
+        {
+          "section": "method",
+          "key": "method_018"
+        },
+        {
+          "section": "proposal",
+          "key": "proposal_001"
+        },
+        {
+          "section": "proposal",
+          "key": "proposal_002"
+        },
+        {
+          "section": "proposal",
+          "key": "proposal_007"
+        },
+        {
+          "section": "proposal",
+          "key": "proposal_010"
+        },
+        {
+          "section": "proposal",
+          "key": "proposal_011"
+        },
+        {
+          "section": "proposal",
+          "key": "proposal_017"
+        },
+        {
+          "section": "proposal",
+          "key": "proposal_037"
+        },
+        {
+          "section": "proposal",
+          "key": "proposal_038"
+        },
+        {
+          "section": "proposal",
+          "key": "proposal_050"
+        },
+        {
+          "section": "proposal",
+          "key": "proposal_051"
+        },
+        {
+          "section": "proposal",
+          "key": "proposal_056"
+        },
+        {
+          "section": "proposal",
+          "key": "proposal_057"
+        },
+        {
+          "section": "proposal",
+          "key": "proposal_064"
+        },
+        {
+          "section": "proposal",
+          "key": "proposal_067"
+        },
+        {
+          "section": "taxonomy",
+          "key": "unclassified_future_theme"
+        },
+        {
+          "section": "taxonomy",
+          "key": "network_coordination"
+        },
+        {
+          "section": "taxonomy",
+          "key": "community_networks"
+        },
+        {
+          "section": "taxonomy",
+          "key": "land_ecology"
+        },
+        {
+          "section": "taxonomy",
+          "key": "mutual_local_self_help"
+        },
+        {
+          "section": "themes",
+          "key": "open-source"
+        },
+        {
+          "section": "themes",
+          "key": "customary-law"
+        },
+        {
+          "section": "themes",
+          "key": "digital-literacy"
+        },
+        {
+          "section": "themes",
+          "key": "marine-conservation"
+        },
+        {
+          "section": "proposal_runtime",
+          "key": "Commons type: unknown value."
+        },
+        {
+          "section": "proposal_runtime",
+          "key": "Ways to engage: check the type and HTTPS address."
+        },
+        {
+          "section": "proposal_runtime",
+          "key": "## Public Commons suggestion"
+        },
+        {
+          "section": "proposal_runtime",
+          "key": "- [x] I understand that this issue is public."
+        },
+        {
+          "section": "proposal_runtime",
+          "key": "- [x] I consent to editorial processing of this information."
+        },
+        {
+          "section": "proposal_runtime",
+          "key": "GitHub was opened. The suggestion is transferred only when you submit the public issue; this does not publish it in the catalog."
+        },
+        {
+          "section": "actions",
+          "key": "replicate"
+        }
+      ]
+    },
+    "ar": {
+      "count": 16,
+      "keys": [
+        {
+          "section": "shell",
+          "key": "shell_089"
+        },
+        {
+          "section": "shell",
+          "key": "shell_090"
+        },
+        {
+          "section": "shell",
+          "key": "shell_043"
+        },
+        {
+          "section": "shell",
+          "key": "shell_148"
+        },
+        {
+          "section": "actions",
+          "key": "replicate"
+        },
+        {
+          "section": "ui",
+          "key": "action_replicate"
+        },
+        {
+          "section": "themes",
+          "key": "open-hardware"
+        },
+        {
+          "section": "proposal_runtime",
+          "key": "Duplicate: this name is already present in the public catalog."
+        },
+        {
+          "section": "proposal_runtime",
+          "key": "Duplicate: this official domain is already present in the catalog."
+        },
+        {
+          "section": "proposal_runtime",
+          "key": "The public catalog index could not be loaded safely. Please reload the page."
+        },
+        {
+          "section": "ui",
+          "key": "presence_not_published"
+        },
+        {
+          "section": "proposal_runtime",
+          "key": "Presence: Boolean values are required."
+        },
+        {
+          "section": "proposal_runtime",
+          "key": "Presence: choose at least one option (On site or Digital)."
+        },
+        {
+          "section": "proposal_runtime",
+          "key": "Presence"
+        },
+        {
+          "section": "shell",
+          "key": "shell_092"
+        },
+        {
+          "section": "static",
+          "key": "candidate_notice"
+        }
+      ]
+    }
+  },
+  "deferred": [],
+  "whole_string_review_required": [],
+  "release_decision": "blocked",
+  "release_blockers": [
+    "independent_native_language_review",
+    "keyboard_and_screen_reader_review",
+    "browser_visual_smoke",
+    "state_preservation_smoke",
+    "arabic_directional_layout_review",
+    "arabic_mixed_script_review"
+  ],
+  "does_not_establish": [
+    "native_language_approval",
+    "release_readiness",
+    "production_activation"
+  ],
+  "applied_whole_string": {
+    "es": {
+      "count": 13,
+      "keys": [
+        {
+          "section": "ui",
+          "key": "spatial_summary"
+        },
+        {
+          "section": "shell",
+          "key": "shell_002"
+        },
+        {
+          "section": "shell",
+          "key": "shell_102"
+        },
+        {
+          "section": "method",
+          "key": "method_014"
+        },
+        {
+          "section": "method",
+          "key": "method_016"
+        },
+        {
+          "section": "method",
+          "key": "method_020"
+        },
+        {
+          "section": "method",
+          "key": "method_022"
+        },
+        {
+          "section": "method",
+          "key": "method_024"
+        },
+        {
+          "section": "method",
+          "key": "method_026"
+        },
+        {
+          "section": "proposal",
+          "key": "proposal_010"
+        },
+        {
+          "section": "proposal",
+          "key": "proposal_011"
+        },
+        {
+          "section": "proposal",
+          "key": "proposal_016"
+        },
+        {
+          "section": "proposal",
+          "key": "proposal_037"
+        }
+      ]
+    },
+    "fr": {
+      "count": 20,
+      "keys": [
+        {
+          "section": "ui",
+          "key": "globe_ready"
+        },
+        {
+          "section": "ui",
+          "key": "spatial_summary"
+        },
+        {
+          "section": "ui",
+          "key": "invalid_or_duplicate_id"
+        },
+        {
+          "section": "shell",
+          "key": "shell_002"
+        },
+        {
+          "section": "shell",
+          "key": "shell_102"
+        },
+        {
+          "section": "shell",
+          "key": "shell_104"
+        },
+        {
+          "section": "shell",
+          "key": "shell_107"
+        },
+        {
+          "section": "method",
+          "key": "method_012"
+        },
+        {
+          "section": "method",
+          "key": "method_014"
+        },
+        {
+          "section": "method",
+          "key": "method_016"
+        },
+        {
+          "section": "method",
+          "key": "method_022"
+        },
+        {
+          "section": "method",
+          "key": "method_024"
+        },
+        {
+          "section": "method",
+          "key": "method_026"
+        },
+        {
+          "section": "proposal",
+          "key": "proposal_009"
+        },
+        {
+          "section": "proposal",
+          "key": "proposal_010"
+        },
+        {
+          "section": "proposal",
+          "key": "proposal_011"
+        },
+        {
+          "section": "proposal",
+          "key": "proposal_040"
+        },
+        {
+          "section": "proposal",
+          "key": "proposal_064"
+        },
+        {
+          "section": "proposal",
+          "key": "proposal_067"
+        },
+        {
+          "section": "proposal",
+          "key": "proposal_037"
+        }
+      ]
+    }
+  },
+  "applied_structural_arabic": [
+    {
+      "section": "method",
+      "key": "method_005"
+    },
+    {
+      "section": "proposal",
+      "key": "proposal_007"
+    },
+    {
+      "section": "shell",
+      "key": "shell_119"
+    },
+    {
+      "section": "shell",
+      "key": "shell_007"
+    },
+    {
+      "section": "method",
+      "key": "method_016"
+    },
+    {
+      "section": "proposal_runtime",
+      "key": "GitHub was opened. The suggestion is transferred only when you submit the public issue; this does not publish it in the catalog."
+    },
+    {
+      "section": "proposal_runtime",
+      "key": "- [x] I understand that this issue is public."
+    }
+  ],
+  "source_pack_sha256": "b06200a47e1ca2cdb58ebb5539a35524432e708795ee85c6aa2462e7704b6672",
+  "applied_cross_surface_action_parity": [
+    {
+      "locale": "es",
+      "section": "shell",
+      "key": "shell_039"
+    },
+    {
+      "locale": "es",
+      "section": "shell",
+      "key": "shell_042"
+    },
+    {
+      "locale": "es",
+      "section": "proposal",
+      "key": "proposal_047"
+    },
+    {
+      "locale": "es",
+      "section": "proposal",
+      "key": "proposal_049"
+    },
+    {
+      "locale": "fr",
+      "section": "ui",
+      "key": "action_volunteer"
+    },
+    {
+      "locale": "fr",
+      "section": "ui",
+      "key": "action_donate"
+    },
+    {
+      "locale": "fr",
+      "section": "shell",
+      "key": "shell_039"
+    },
+    {
+      "locale": "fr",
+      "section": "shell",
+      "key": "shell_040"
+    },
+    {
+      "locale": "fr",
+      "section": "proposal",
+      "key": "proposal_047"
+    },
+    {
+      "locale": "fr",
+      "section": "proposal",
+      "key": "proposal_048"
+    },
+    {
+      "locale": "pt-BR",
+      "section": "proposal",
+      "key": "proposal_045"
+    },
+    {
+      "locale": "pt-BR",
+      "section": "proposal",
+      "key": "proposal_047"
+    },
+    {
+      "locale": "pt-BR",
+      "section": "proposal",
+      "key": "proposal_049"
+    },
+    {
+      "locale": "ar",
+      "section": "shell",
+      "key": "shell_037"
+    },
+    {
+      "locale": "ar",
+      "section": "shell",
+      "key": "shell_039"
+    },
+    {
+      "locale": "ar",
+      "section": "shell",
+      "key": "shell_040"
+    },
+    {
+      "locale": "ar",
+      "section": "shell",
+      "key": "shell_042"
+    },
+    {
+      "locale": "ar",
+      "section": "proposal",
+      "key": "proposal_050"
+    }
+  ],
+  "applied_sentence_boundary_fixes": [
+    {
+      "locale": "es",
+      "section": "method",
+      "key": "method_011"
+    },
+    {
+      "locale": "fr",
+      "section": "method",
+      "key": "method_011"
+    },
+    {
+      "locale": "pt-BR",
+      "section": "method",
+      "key": "method_011"
+    }
+  ],
+  "applied_quality_gate_followups": [
+    {
+      "locale": "pt-BR",
+      "section": "method",
+      "key": "method_020"
+    },
+    {
+      "locale": "pt-BR",
+      "section": "ui",
+      "key": "action_homepage"
+    },
+    {
+      "locale": "ar",
+      "section": "proposal",
+      "key": "proposal_010"
+    },
+    {
+      "locale": "ar",
+      "section": "proposal",
+      "key": "proposal_065"
+    }
+  ],
+  "contrast_review_attempts": [
+    {
+      "task_id": "522b99eea30a406194a12d33",
+      "scope": [
+        "es",
+        "fr"
+      ],
+      "outcome": "cancelled_before_review",
+      "evidence_value": "none"
+    },
+    {
+      "task_id": "73cede817bbd4408b8bf3377",
+      "scope": [
+        "pt-BR",
+        "ar"
+      ],
+      "outcome": "provider_session_limit",
+      "evidence_value": "none"
+    }
+  ],
+  "contrast_review_conclusion": "No second-pass linguistic verdict was produced; neither attempt changes release status or establishes quality."
+}

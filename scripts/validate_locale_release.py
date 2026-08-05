@@ -22,7 +22,7 @@ from scripts.catalog_summary_specificity import (
 
 CONTRACT_PATH = ROOT / "docs/architecture/locale-release.contract.json"
 REGISTRY_MODULE_PATH = ROOT / "assets/commonworld-locale-registry.mjs"
-PACK_PATH = ROOT / "assets/locales/wave1-candidates.json"
+PACK_PATH = ROOT / "assets/locales/wave1-locales.json"
 
 ARRAY_EXPORT_RE = re.compile(
     r"export const (?P<name>[A-Z_]+) = Object\.freeze\((?P<value>\[[^\n]*\])\);"
@@ -435,23 +435,24 @@ def _pack_errors(
     try:
         payload = json.loads(path.read_text(encoding="utf-8"))
     except json.JSONDecodeError as exc:
-        return [f"Wave-1 candidate locale pack is invalid JSON: {exc}"], digest
-    _require(errors, payload.get("schema_version") == 1, "candidate pack schema_version must be 1")
-    _require(errors, payload.get("source_locale") == "en", "candidate pack source_locale must be en")
-    _require(errors, payload.get("candidate_only") is True, "candidate pack must be candidate_only")
+        return [f"Wave-1 locale pack is invalid JSON: {exc}"], digest
+    _require(errors, payload.get("schema_version") == 2, "Wave-1 pack schema_version must be 2")
+    _require(errors, payload.get("source_locale") == "en", "Wave-1 pack source_locale must be en")
+    _require(errors, payload.get("wave") == "wave_1", "Wave-1 pack must declare wave_1")
     locales = payload.get("locales")
     if not isinstance(locales, dict):
-        return errors + ["candidate pack locales must be an object"], digest
+        return errors + ["Wave-1 pack locales must be an object"], digest
     registry = contract.get("locale_registry", {})
-    expected = {
-        tag
-        for tag, entry in registry.items()
-        if isinstance(entry, dict) and entry.get("status") == "candidate"
-    }
+    raw_expected = contract.get("rollout", {}).get("wave_1", [])
+    if isinstance(raw_expected, list) and all(isinstance(tag, str) for tag in raw_expected):
+        expected = set(raw_expected)
+    else:
+        errors.append("rollout.wave_1 must be a list of locale tags")
+        expected = set()
     _require(
         errors,
         set(locales) == expected,
-        "candidate pack locales must exactly match candidate registry entries",
+        "Wave-1 pack locales must exactly match rollout.wave_1",
     )
     required_sections = {
         "meta",
@@ -474,12 +475,14 @@ def _pack_errors(
         if not isinstance(pack, dict):
             continue
         meta = pack.get("meta")
+        registry_entry = registry.get(tag, {}) if isinstance(registry, dict) else {}
+        expected_review = "passed" if registry_entry.get("status") == "released" else "pending"
         _require(
             errors,
             isinstance(meta, dict)
             and meta.get("draft_origin") == "machine_translation_assisted"
-            and meta.get("independent_language_review") == "pending",
-            f"candidate pack provenance is invalid for {tag}",
+            and meta.get("independent_language_review") == expected_review,
+            f"Wave-1 pack provenance is invalid for {tag}",
         )
         for section in required_sections - {"meta"}:
             values = pack.get(section)
@@ -664,8 +667,9 @@ def validate_contract(contract: dict[str, Any], root: Path = ROOT) -> list[str]:
     wave_2_tags = list(wave_2) if isinstance(wave_2, list) and all(isinstance(tag, str) for tag in wave_2) else []
     rollout_tags = wave_1_tags + wave_2_tags
     _require(errors, len(rollout_tags) == len(set(rollout_tags)), "rollout waves must not contain duplicates")
-    _require(errors, set(rollout_tags) == set(candidate_tags + planned_tags), "rollout waves must cover every non-released locale exactly once")
-    _require(errors, set(wave_1_tags) == set(candidate_tags), "Wave 1 must exactly contain current candidate locales")
+    wave_1_registry_tags = {tag for tag, entry in registry.items() if isinstance(entry, dict) and entry.get("translation_pack") == "wave_1"}
+    _require(errors, set(rollout_tags) == set(wave_1_registry_tags | set(planned_tags)), "rollout waves must cover Wave-1 package locales and planned locales exactly once")
+    _require(errors, set(wave_1_tags) == wave_1_registry_tags, "Wave 1 must exactly contain registry entries bound to the Wave-1 translation pack")
     _require(errors, set(wave_2_tags) == set(planned_tags), "Wave 2 must exactly contain current planned locales")
     for field in (
         "promotion_is_evidence_bound",

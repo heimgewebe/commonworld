@@ -24,11 +24,12 @@ from scripts.locale_registry import (
 
 SUPPORTED_LOCALES = locales_with_status("released")
 CANDIDATE_LOCALES = locales_with_status("candidate")
+WAVE1_LOCALES = tuple(json.loads((ROOT / "docs/architecture/locale-release.contract.json").read_text(encoding="utf-8"))["rollout"]["wave_1"])
 SELECTABLE_UI_LOCALES = (*SUPPORTED_LOCALES, *CANDIDATE_LOCALES)
 KNOWN_UI_LOCALES = locales_with_status("released", "candidate", "planned")
 DEFAULT_LOCALE = "en"
 FALLBACK_LOCALE = "de"
-CANDIDATE_PACK_PATH = ROOT / "assets/locales/wave1-candidates.json"
+LOCALE_PACK_PATH = ROOT / "assets/locales/wave1-locales.json"
 
 PREVIEW_LABELS = {
     "en": "Preview",
@@ -60,9 +61,9 @@ def interface_static(locale: str, key: str, *, de: str, en: str, variables: dict
     elif normalized == "en":
         template = en
     else:
-        template = candidate_pack(normalized, root).get("static", {}).get(key)
+        template = locale_pack(normalized, root).get("static", {}).get(key)
         if not isinstance(template, str) or not template.strip():
-            raise ValueError(f"candidate locale {normalized} lacks static key {key}")
+            raise ValueError(f"locale {normalized} lacks static key {key}")
     for name, value in (variables or {}).items():
         template = template.replace("{" + name + "}", str(value))
     return template
@@ -74,9 +75,9 @@ def action_label(action: str, locale: str, german_fallback: str = "", root: Path
         return german_fallback or action
     if normalized == "en":
         return ACTION_LABELS_EN.get(action, german_fallback or action)
-    value = candidate_pack(normalized, root).get("actions", {}).get(action)
+    value = locale_pack(normalized, root).get("actions", {}).get(action)
     if not isinstance(value, str) or not value.strip():
-        raise ValueError(f"candidate locale {normalized} lacks action label {action}")
+        raise ValueError(f"locale {normalized} lacks action label {action}")
     return value
 
 
@@ -85,25 +86,29 @@ def normalize_locale(value: str | None) -> str:
 
 
 @lru_cache(maxsize=4)
-def load_candidate_packs(path: Path = CANDIDATE_PACK_PATH) -> dict[str, Any]:
+def load_locale_packs(path: Path = LOCALE_PACK_PATH) -> dict[str, Any]:
     payload = json.loads(path.read_text(encoding="utf-8"))
-    if payload.get("schema_version") != 1 or payload.get("source_locale") != "en":
-        raise ValueError(f"invalid locale candidate pack: {path}")
+    if (
+        payload.get("schema_version") != 2
+        or payload.get("source_locale") != "en"
+        or payload.get("wave") != "wave_1"
+    ):
+        raise ValueError(f"invalid Wave-1 locale pack: {path}")
     locales = payload.get("locales")
     if not isinstance(locales, dict):
-        raise ValueError(f"locale candidate pack lacks locales: {path}")
+        raise ValueError(f"Wave-1 locale pack lacks locales: {path}")
     return locales
 
 
-def candidate_pack(locale: str, root: Path = ROOT) -> dict[str, Any]:
+def locale_pack(locale: str, root: Path = ROOT) -> dict[str, Any]:
     normalized = normalize_locale(locale)
-    if normalized not in CANDIDATE_LOCALES:
-        raise ValueError(f"locale is not a candidate: {locale!r}")
-    path = root / CANDIDATE_PACK_PATH.relative_to(ROOT)
-    packs = load_candidate_packs(path)
+    if normalized not in WAVE1_LOCALES:
+        raise ValueError(f"locale has no Wave-1 translation pack: {locale!r}")
+    path = root / LOCALE_PACK_PATH.relative_to(ROOT)
+    packs = load_locale_packs(path)
     pack = packs.get(normalized)
     if not isinstance(pack, dict):
-        raise ValueError(f"candidate locale pack missing: {normalized}")
+        raise ValueError(f"Wave-1 locale pack missing: {normalized}")
     return pack
 
 
@@ -111,16 +116,16 @@ def load_locale(locale: str = DEFAULT_LOCALE, root: Path = ROOT) -> dict[str, An
     normalized = normalize_locale(locale)
     if normalized == FALLBACK_LOCALE:
         return {"schema_version": 1, "locale": "de", "fallback_locale": "de", "projects": {}, "taxonomy_labels": {}}
-    overlay_locale = "en" if normalized in CANDIDATE_LOCALES else normalized
+    overlay_locale = "en" if normalized in WAVE1_LOCALES else normalized
     path = root / "catalog" / "locales" / f"{overlay_locale}.json"
     payload = json.loads(path.read_text(encoding="utf-8"))
     if payload.get("schema_version") != 1 or payload.get("locale") != overlay_locale:
         raise ValueError(f"invalid locale overlay contract: {path}")
-    if normalized in CANDIDATE_LOCALES:
+    if normalized in WAVE1_LOCALES:
         payload = copy.deepcopy(payload)
         payload["locale"] = normalized
         payload["source_content_locale"] = overlay_locale
-        payload["taxonomy_labels"] = candidate_pack(normalized, root).get("taxonomy", {})
+        payload["taxonomy_labels"] = locale_pack(normalized, root).get("taxonomy", {})
     return payload
 
 
@@ -171,7 +176,7 @@ def localize_records(records: list[dict[str, Any]], locale: str = DEFAULT_LOCALE
             canonical_label = str(source.get("label") or "").strip()
             fallback_label = source_prefix.replace("{index}", str(index))
             source["label"] = f"{canonical_label} · {hostname.removeprefix('www.')}" if canonical_label else f"{fallback_label} · {hostname.removeprefix('www.')}"
-        if normalized in CANDIDATE_LOCALES:
+        if normalized in WAVE1_LOCALES:
             record["_content_locale"] = overlay.get("source_content_locale", "en")
         localized.append(record)
     return localized
@@ -390,9 +395,9 @@ METHOD_REPLACEMENTS_EN = {
 }
 
 
-def _candidate_replacements(locale: str, section: str, english_replacements: dict[str, str], root: Path = ROOT) -> dict[str, str]:
+def _wave1_replacements(locale: str, section: str, english_replacements: dict[str, str], root: Path = ROOT) -> dict[str, str]:
     normalized = normalize_locale(locale)
-    pack = candidate_pack(normalized, root).get(section)
+    pack = locale_pack(normalized, root).get(section)
     if not isinstance(pack, dict):
         raise ValueError(f"candidate locale {normalized} lacks {section} translations")
     english_values = list(dict.fromkeys(english_replacements.values()))
@@ -417,7 +422,7 @@ def _decorate_candidate_surface(markup: str, locale: str, root: Path = ROOT) -> 
         if position < 0:
             raise ValueError(f"candidate locale {normalized} surface lacks viewport metadata")
         markup = markup[:position] + '<meta name="robots" content="noindex,nofollow">\n  ' + markup[position:]
-    notice = candidate_pack(normalized, root).get("static", {}).get("candidate_notice")
+    notice = locale_pack(normalized, root).get("static", {}).get("candidate_notice")
     if not isinstance(notice, str) or not notice.strip():
         raise ValueError(f"candidate locale {normalized} lacks candidate_notice")
     banner = (
@@ -439,10 +444,10 @@ def translate_shell(markup: str, locale: str) -> str:
     if normalized == "de":
         return markup
     translated = replace_exact(markup, SHELL_REPLACEMENTS_EN, surface="public shell")
-    if normalized in CANDIDATE_LOCALES:
+    if normalized in WAVE1_LOCALES:
         translated = replace_exact(
             translated,
-            _candidate_replacements(normalized, "shell", SHELL_REPLACEMENTS_EN),
+            _wave1_replacements(normalized, "shell", SHELL_REPLACEMENTS_EN),
             surface=f"public shell {normalized}",
         )
     return _decorate_candidate_surface(translated, normalized)
@@ -453,10 +458,10 @@ def translate_method(markup: str, locale: str) -> str:
     if normalized == "de":
         return markup
     translated = replace_exact(markup, METHOD_REPLACEMENTS_EN, surface="method page")
-    if normalized in CANDIDATE_LOCALES:
+    if normalized in WAVE1_LOCALES:
         translated = replace_exact(
             translated,
-            _candidate_replacements(normalized, "method", METHOD_REPLACEMENTS_EN),
+            _wave1_replacements(normalized, "method", METHOD_REPLACEMENTS_EN),
             surface=f"method page {normalized}",
         )
     return _decorate_candidate_surface(translated, normalized)
@@ -486,7 +491,7 @@ def _locale_navigation_copy(locale: str, root: Path = ROOT) -> dict[str, str]:
             "automatic": "Automatisch – Gerätesprache",
             "effective": "Aktive Sprache: Deutsch",
         }
-    static = candidate_pack(normalized, root).get("static", {})
+    static = locale_pack(normalized, root).get("static", {})
     keys = {
         "heading": "interface_language",
         "label": "choose_interface_language",
@@ -550,8 +555,8 @@ def inject_locale_navigation(markup: str, locale: str, surface: str = "index") -
             + '</h3>' + control + '</section>\n        '
         )
         interaction = "Interaction" if normalized == "en" else "Bedienung"
-        if normalized in CANDIDATE_LOCALES:
-            interaction = candidate_pack(normalized).get("static", {}).get("interaction", interaction)
+        if normalized in WAVE1_LOCALES:
+            interaction = locale_pack(normalized).get("static", {}).get("interaction", interaction)
         marker = '<section class="settings-section">\n          <h3>' + interaction + '</h3>'
         if marker not in markup:
             raise ValueError(f"locale navigation insertion marker missing for {normalized}/{surface}")
