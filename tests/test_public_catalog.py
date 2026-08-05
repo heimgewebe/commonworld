@@ -21,6 +21,51 @@ class PublicCatalogTests(unittest.TestCase):
         mutation(record)
         path.write_text(json.dumps(record, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
 
+    def test_mundraub_listed_as_commons_infrastructure_without_open_claims(self) -> None:
+        """mundraub.org is catalogued as operator-led commons infrastructure, not open data/software commons."""
+        project_path = ROOT / "catalog" / "projects" / "mundraub.json"
+        basis_path = ROOT / "catalog" / "commons-bases" / "mundraub.json"
+        self.assertTrue(project_path.is_file(), "mundraub project record missing")
+        self.assertTrue(basis_path.is_file(), "mundraub commons basis missing")
+
+        project = json.loads(project_path.read_text(encoding="utf-8"))
+        basis = json.loads(basis_path.read_text(encoding="utf-8"))
+
+        self.assertEqual("mundraub", project["id"])
+        self.assertEqual("mundraub.org", project["title"])
+        self.assertIn("https://mundraub.org/map", {link["url"] for link in project["links"]})
+        self.assertEqual("regional", project["presence"]["digital"]["reach"])
+        self.assertEqual([], project["presence"]["geographic"])
+        self.assertNotIn("open-data", project["themes"])
+        self.assertNotIn("open-source", project["themes"])
+        self.assertIn("food", project["themes"])
+        self.assertEqual("public", project["access"]["type"])
+        self.assertIn("Konto", project["access"]["note"])
+        self.assertIn("Eigentum", project["provenance"]["uncertainty_note"])
+
+        self.assertEqual("mundraub", basis["project_id"])
+        self.assertEqual("commons-infrastructure", basis["classification"])
+        self.assertEqual("include", basis["decision"])
+        self.assertTrue(any("Terra Concordia" in item for item in basis["limitations"]))
+        self.assertTrue(any("Open-Data" in item or "Open-Source" in item for item in basis["limitations"]))
+        self.assertEqual(
+            {dimension: criterion["status"] for dimension, criterion in basis["criteria"].items()},
+            {
+                "shared_resource": "supported",
+                "community": "supported",
+                "commoning_practice": "supported",
+                "rules_and_responsibility": "supported",
+                "common_benefit": "supported",
+            },
+        )
+
+        manifest = json.loads((ROOT / "catalog" / "catalog.json").read_text(encoding="utf-8"))
+        self.assertIn("projects/mundraub.json", manifest["project_files"])
+
+        en = json.loads((ROOT / "catalog" / "locales" / "en.json").read_text(encoding="utf-8"))
+        self.assertIn("mundraub", en["projects"])
+        self.assertEqual("mundraub.org", en["projects"]["mundraub"]["title"])
+
     def test_public_catalog_validates(self) -> None:
         self.assertEqual([], validate_public_catalog(ROOT))
 

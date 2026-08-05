@@ -7,7 +7,7 @@
       "directGlobeProjection": true,
       "hiddenUntilCalibrated": true,
       "outerHintRemoved": true,
-      "aggregateRingIdentities": 55,
+      "aggregateRingIdentities": 56,
       "configuredRingPreviewLimit": 6,
       "ringPreviewCounts": [
         6,
@@ -97,8 +97,8 @@
     {
       "id": "intent-search-discovery",
       "verdict": "PASS",
-      "indexedRecords": 87,
-      "rankedGermanIntentResults": 47,
+      "indexedRecords": 88,
+      "rankedGermanIntentResults": 48,
       "filters": 7,
       "digitalCoordinateFree": true,
       "spatialNavigation": true
@@ -118,9 +118,9 @@
       "filterButtonWidth": 44,
       "filterButtonHeight": 44,
       "ringAnimationName": "sphere-ring-orbit",
-      "ringTransform": "matrix(1, 0.000754977, -0.000754977, 1, 0, 0)",
-      "ringTextWidth": 671.1033935546875,
-      "ringTextHeight": 13.50665283203125,
+      "ringTransform": "matrix(0.999999, 0.00150719, -0.00150719, 0.999999, 0, 0)",
+      "ringTextWidth": 671.1126098632812,
+      "ringTextHeight": 14.011474609375,
       "ringTextFontSize": 22,
       "primaryRingCount": 3,
       "depthRingCount": 2,
@@ -174,7 +174,7 @@
       "verdict": "PASS",
       "publicFeatures": 143,
       "publicIdentities": 44,
-      "digitalIdentities": 55,
+      "digitalIdentities": 56,
       "unchangedMapUpdatesSkipped": true
     },
     {
@@ -196,7 +196,7 @@
     {
       "id": "layer-journey-moveend-return",
       "verdict": "PASS",
-      "elapsedMs": 1780
+      "elapsedMs": 2017
     },
     {
       "id": "layer-journey-interrupted",
@@ -283,8 +283,8 @@
       "verdict": "PASS",
       "blockedCatalogRequests": 0,
       "observedCatalogRequests": [
-        "/releases/20bd3ac144ecadcf4769/catalog/runtime/aggregate.v1.json",
-        "/releases/20bd3ac144ecadcf4769/catalog/runtime/manifest.v1.json"
+        "/releases/9c36891d46ae498c1d79/catalog/runtime/aggregate.v1.json",
+        "/releases/9c36891d46ae498c1d79/catalog/runtime/manifest.v1.json"
       ]
     },
     {
@@ -306,7 +306,7 @@
       "id": "bootstrap-asset-failure-fallback",
       "verdict": "PASS",
       "blockedBootstrapRequests": 1,
-      "fallbackCatalogCards": 87,
+      "fallbackCatalogCards": 88,
       "hiddenFallbackCatalogCards": 0,
       "neutralRecoveryCopy": true,
       "skipLinkHref": "/#static-catalog-fallback",
@@ -317,7 +317,7 @@
     {
       "id": "post-render-failure-preserves-fallback",
       "verdict": "PASS",
-      "fallbackCatalogCards": 87,
+      "fallbackCatalogCards": 88,
       "hiddenFallbackCatalogCards": 0,
       "skipLinkHref": "/#static-catalog-fallback",
       "skipFocusId": "static-catalog-fallback",
@@ -383,6 +383,6 @@
       "method-mobile",
       "method-mobile-text-200"
     ],
-    "first_party_surface_sha256": "b4309e4970ee11f889691d74f3fa35a89d6c5c50f5bdf65750b52f43ce979170"
+    "first_party_surface_sha256": "0df5ecadd404c3fe55d349e57ffaad27dcdce45eefb87f508479b011bb9ce3a8"
   }
 }
