@@ -2,8 +2,8 @@
 from __future__ import annotations
 
 from scripts.commonworld_i18n import (
-    CANDIDATE_LOCALES,
-    _candidate_replacements,
+    WAVE1_LOCALES,
+    _wave1_replacements,
     _decorate_candidate_surface,
     normalize_locale,
     replace_exact,
@@ -91,10 +91,10 @@ def translate_proposal(markup: str, locale: str) -> str:
     if normalized == 'de':
         return markup
     translated = replace_exact(markup, PROPOSAL_REPLACEMENTS_EN, surface='proposal page')
-    if normalized in CANDIDATE_LOCALES:
+    if normalized in WAVE1_LOCALES:
         translated = replace_exact(
             translated,
-            _candidate_replacements(normalized, 'proposal', PROPOSAL_REPLACEMENTS_EN),
+            _wave1_replacements(normalized, 'proposal', PROPOSAL_REPLACEMENTS_EN),
             surface=f'proposal page {normalized}',
         )
     return _decorate_candidate_surface(translated, normalized)

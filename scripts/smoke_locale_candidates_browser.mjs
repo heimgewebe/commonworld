@@ -22,7 +22,7 @@ const CANDIDATES = Object.freeze([
   { locale: 'ar', direction: 'rtl', pages: ['ar.html', 'method.ar.html', 'propose.ar.html'] },
 ]);
 const CANDIDATE_SOURCE = JSON.parse(
-  await readFile(path.join(ROOT, 'assets/locales/wave1-candidates.json'), 'utf8'),
+  await readFile(path.join(ROOT, 'assets/locales/wave1-locales.json'), 'utf8'),
 );
 
 function assert(condition, message) {

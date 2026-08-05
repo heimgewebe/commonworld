@@ -5,6 +5,7 @@ import {
   CANDIDATE_LOCALES,
   KNOWN_UI_LOCALES,
   RELEASED_LOCALES,
+  WAVE1_LOCALES,
   canonicalLocaleTag,
   localeFromSurfaceFile,
   localeSurfaceHref,
@@ -18,6 +19,7 @@ test('registry preserves canonical BCP 47 casing and release states', () => {
   assert.equal(canonicalLocaleTag('AR-arab-eg'), 'ar-Arab-EG');
   assert.deepEqual(RELEASED_LOCALES, ['en', 'de']);
   assert.deepEqual(CANDIDATE_LOCALES, ['es', 'fr', 'pt-BR', 'ar']);
+  assert.deepEqual(WAVE1_LOCALES, ['es', 'fr', 'pt-BR', 'ar']);
   assert.deepEqual(KNOWN_UI_LOCALES.slice(0, 6), ['en', 'de', 'es', 'fr', 'pt-BR', 'ar']);
 });
 

@@ -77,7 +77,8 @@
         "method": "method.es.html",
         "proposal": "propose.es.html"
       },
-      "candidate_evidence_path": "docs/evidence/locale-candidates/es.json"
+      "candidate_evidence_path": "docs/evidence/locale-candidates/es.json",
+      "translation_pack": "wave_1"
     },
     "fr": {
       "status": "candidate",
@@ -89,7 +90,8 @@
         "method": "method.fr.html",
         "proposal": "propose.fr.html"
       },
-      "candidate_evidence_path": "docs/evidence/locale-candidates/fr.json"
+      "candidate_evidence_path": "docs/evidence/locale-candidates/fr.json",
+      "translation_pack": "wave_1"
     },
     "pt-BR": {
       "status": "candidate",
@@ -101,7 +103,8 @@
         "method": "method.pt-BR.html",
         "proposal": "propose.pt-BR.html"
       },
-      "candidate_evidence_path": "docs/evidence/locale-candidates/pt-BR.json"
+      "candidate_evidence_path": "docs/evidence/locale-candidates/pt-BR.json",
+      "translation_pack": "wave_1"
     },
     "ar": {
       "status": "candidate",
@@ -113,7 +116,8 @@
         "method": "method.ar.html",
         "proposal": "propose.ar.html"
       },
-      "candidate_evidence_path": "docs/evidence/locale-candidates/ar.json"
+      "candidate_evidence_path": "docs/evidence/locale-candidates/ar.json",
+      "translation_pack": "wave_1"
     },
     "zh-Hans": {
       "status": "planned",
