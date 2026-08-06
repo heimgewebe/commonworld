@@ -234,6 +234,57 @@ class PagesLiveSmokeTests(unittest.TestCase):
         )
         self.assertEqual([], validate_live_fetch(fetch))
 
+    def test_committed_shell_allows_external_catalog_login_target(self) -> None:
+        body = (ROOT / "index.html").read_text(encoding="utf-8")
+        fetch = LiveFetch(
+            requested_url="https://commonworld.net/",
+            final_url="https://commonworld.net/",
+            status=200,
+            content_type="text/html; charset=utf-8",
+            body=body,
+        )
+        self.assertEqual([], validate_live_fetch(fetch))
+
+    def test_external_login_path_is_not_a_local_auth_surface(self) -> None:
+        fetch = LiveFetch(
+            requested_url="https://commonworld.net/",
+            final_url="https://commonworld.net/",
+            status=200,
+            content_type="text/html; charset=utf-8",
+            body=self.valid_body() + '<a href="https://example.org/user/login">Contribute</a>',
+        )
+        self.assertEqual([], validate_live_fetch(fetch))
+
+    def test_same_origin_login_path_still_fails(self) -> None:
+        fetch = LiveFetch(
+            requested_url="https://commonworld.net/",
+            final_url="https://commonworld.net/",
+            status=200,
+            content_type="text/html; charset=utf-8",
+            body=self.valid_body() + '<a href="/user/login">Continue</a>',
+        )
+        self.assertIn("live Pages contains forbidden delivery token: login", validate_live_fetch(fetch))
+
+    def test_malformed_external_login_url_fails_closed(self) -> None:
+        fetch = LiveFetch(
+            requested_url="https://commonworld.net/",
+            final_url="https://commonworld.net/",
+            status=200,
+            content_type="text/html; charset=utf-8",
+            body=self.valid_body() + '<a href="https://[invalid]/login">Continue</a>',
+        )
+        self.assertIn("live Pages contains forbidden delivery token: login", validate_live_fetch(fetch))
+
+    def test_visible_login_text_still_fails(self) -> None:
+        fetch = LiveFetch(
+            requested_url="https://commonworld.net/",
+            final_url="https://commonworld.net/",
+            status=200,
+            content_type="text/html; charset=utf-8",
+            body=self.valid_body() + " Login required ",
+        )
+        self.assertIn("live Pages contains forbidden delivery token: login", validate_live_fetch(fetch))
+
     def test_public_proposal_page_passes(self) -> None:
         body = "\n".join(PROPOSAL_REQUIRED_TOKENS)
         body += " " * max(0, 8_010 - len(body.encode("utf-8")))
