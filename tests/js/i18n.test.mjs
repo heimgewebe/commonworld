@@ -7,6 +7,7 @@ import {
   actionLabel,
   catalogContentLocale,
   hasThemeLabel,
+  loadWave1LocalePacks,
   localizeCatalogRecords,
   normalizeLocale,
   shouldLoadWave1LocalePack,
@@ -44,6 +45,15 @@ test('Wave-1 translation packages remain loadable after candidate promotion', ()
   assert.equal(shouldLoadWave1LocalePack('ar', false), true);
   assert.equal(shouldLoadWave1LocalePack('de', false), false);
   assert.equal(shouldLoadWave1LocalePack('de', true), true);
+});
+
+test('Wave-1 locale pack loading has a bounded timeout', async () => {
+  const startedAt = performance.now();
+  await assert.rejects(
+    loadWave1LocalePacks({ importer: () => new Promise(() => {}), timeoutMs: 20 }),
+    /load timed out/u,
+  );
+  assert.ok(performance.now() - startedAt < 1_000);
 });
 
 test('candidate locales keep English catalog content with localized interface labels', () => {
@@ -94,7 +104,7 @@ test('registry normalizes released and candidate locales', () => {
 test('English presentation labels cover actions and digital taxonomy', () => {
   assert.equal(actionLabel('borrow', 'en'), 'Borrow');
   assert.equal(actionLabel('borrow', 'de'), 'Ausleihen');
-  assert.equal(taxonomyLabel('free_software', 'Freie Software und Infrastruktur', 'en'), 'Free Software and Infrastructure');
+  assert.equal(taxonomyLabel('free_software', 'en', 'Freie Software und Infrastruktur'), 'Free Software and Infrastructure');
 });
 
 test('every catalog theme has an explicit label in every rendered UI locale', () => {

@@ -37,9 +37,42 @@ export function shouldLoadWave1LocalePack(locale, isNodeRuntime = nodeRuntime) {
   return Boolean(isNodeRuntime || (locale && WAVE1_LOCALES.includes(locale)));
 }
 
+export const WAVE1_LOCALE_PACK_TIMEOUT_MS = 2_500;
+
+export async function loadWave1LocalePacks({
+  importer = () => import('./commonworld-wave1-locales.mjs?v=9adcf2fbae66'),
+  timeoutMs = nodeRuntime ? 0 : WAVE1_LOCALE_PACK_TIMEOUT_MS,
+} = {}) {
+  const importPromise = Promise.resolve().then(importer);
+  let timeoutId = null;
+  try {
+    const module = timeoutMs > 0
+      ? await Promise.race([
+          importPromise,
+          new Promise((_, reject) => {
+            timeoutId = globalThis.setTimeout(
+              () => reject(new Error('Wave-1 locale pack load timed out')),
+              timeoutMs,
+            );
+          }),
+        ])
+      : await importPromise;
+    const packs = module?.WAVE1_LOCALE_PACKS;
+    if (!packs || typeof packs !== 'object') throw new Error('Wave-1 locale pack export is missing');
+    return packs;
+  } finally {
+    if (timeoutId !== null) globalThis.clearTimeout(timeoutId);
+  }
+}
+
 let WAVE1_LOCALE_PACKS = Object.freeze({});
 if (shouldLoadWave1LocalePack(runtimeDocumentLocale)) {
-  ({ WAVE1_LOCALE_PACKS } = await import('./commonworld-wave1-locales.mjs?v=9adcf2fbae66'));
+  try {
+    WAVE1_LOCALE_PACKS = await loadWave1LocalePacks();
+  } catch (error) {
+    const detail = error instanceof Error ? error.message : String(error);
+    console.warn(`[i18n] Wave-1 locale pack unavailable; continuing with English interface fallbacks. ${detail}`);
+  }
 }
 
 export function normalizeLocale(value, fallback = DEFAULT_LOCALE) {
@@ -203,7 +236,7 @@ export function text(locale, key, germanFallback, variables = {}) {
   let template;
   if (normalized === 'de') template = germanFallback;
   else if (normalized === 'en') template = UI_EN[key];
-  else template = WAVE1_LOCALE_PACKS[normalized]?.ui?.[key];
+  else template = WAVE1_LOCALE_PACKS[normalized]?.ui?.[key] ?? UI_EN[key];
   if (typeof template !== 'string' || !template.trim()) return missingUi(normalized, key);
   return format(template, variables);
 }
@@ -416,7 +449,7 @@ export function hasThemeLabel(theme, locale = DEFAULT_LOCALE) {
     ? THEME_LABELS_EN
     : normalized === 'de'
       ? THEME_LABELS_DE
-      : WAVE1_LOCALE_PACKS[normalized]?.themes;
+      : WAVE1_LOCALE_PACKS[normalized]?.themes ?? THEME_LABELS_EN;
   return Boolean(labels && typeof labels[value] === 'string');
 }
 
@@ -427,9 +460,9 @@ export function themeLabel(theme, locale = DEFAULT_LOCALE) {
     ? THEME_LABELS_EN
     : normalized === 'de'
       ? THEME_LABELS_DE
-      : WAVE1_LOCALE_PACKS[normalized]?.themes;
+      : WAVE1_LOCALE_PACKS[normalized]?.themes ?? THEME_LABELS_EN;
   if (labels && typeof labels[value] === 'string') return labels[value];
-  return normalized === 'en' || normalized === 'de' ? value.replaceAll('-', ' ') : `[missing:${normalized}:theme:${value}]`;
+  return value.replaceAll('-', ' ');
 }
 
 function hostLabel(url) {
@@ -556,9 +589,11 @@ export function localizeCatalogRecords(records, locale = DEFAULT_LOCALE) {
 
 export function taxonomyLabel(nodeId, locale = DEFAULT_LOCALE, germanFallback = '') {
   const normalized = normalizeLocale(locale);
-  if (normalized === 'en') return COMMONWORLD_EN_LOCALE.taxonomy_labels?.[nodeId] ?? germanFallback;
+  const englishFallback = COMMONWORLD_EN_LOCALE.taxonomy_labels?.[nodeId]
+    ?? String(nodeId ?? '').replaceAll('_', ' ');
+  if (normalized === 'en') return englishFallback;
   if (normalized === 'de') return germanFallback;
-  return WAVE1_LOCALE_PACKS[normalized]?.taxonomy?.[nodeId] ?? `[missing:${normalized}:taxonomy:${nodeId}]`;
+  return WAVE1_LOCALE_PACKS[normalized]?.taxonomy?.[nodeId] ?? englishFallback;
 }
 
 export function localeSwitchHref(locale, surface = 'index') {
