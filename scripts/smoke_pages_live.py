@@ -8,6 +8,7 @@ import hashlib
 import http.client
 import json
 import os
+import re
 import ssl
 import sys
 import time
@@ -15,7 +16,7 @@ import urllib.error
 import urllib.request
 from dataclasses import asdict, dataclass
 from pathlib import Path
-from urllib.parse import urljoin
+from urllib.parse import urljoin, urlsplit
 
 ROOT = Path(__file__).resolve().parents[1]
 URL_ENV = "COMMONWORLD_PAGES_URL"
@@ -82,6 +83,11 @@ FORBIDDEN_TOKENS = (
     "three.js",
     "'unsafe-inline'",
     "'unsafe-eval'",
+)
+EXTERNAL_URL_EXEMPT_FORBIDDEN_TOKENS = frozenset({"login", "signup"})
+HTML_URL_ATTRIBUTE_RE = re.compile(
+    r"""\b(?:href|src|action|formaction)\s*=\s*(?P<quote>["'])(?P<url>.*?)(?P=quote)""",
+    re.IGNORECASE | re.DOTALL,
 )
 
 EXPECTED_PUBLICATION = dict(_EXPECTED_CATALOG["publication"])
@@ -320,9 +326,36 @@ def fetch_live_url(
     raise AssertionError("bounded live fetch loop exhausted unexpectedly")
 
 
+def _external_url_attribute_spans(body: str, base_url: str) -> tuple[tuple[int, int], ...]:
+    base_host = (urlsplit(base_url).hostname or "").casefold()
+    spans: list[tuple[int, int]] = []
+    for match in HTML_URL_ATTRIBUTE_RE.finditer(body):
+        candidate = match.group("url").strip()
+        try:
+            parsed = urlsplit(urljoin(base_url, candidate))
+            candidate_host = (parsed.hostname or "").casefold()
+        except ValueError:
+            continue
+        if parsed.scheme in {"http", "https"} and candidate_host and candidate_host != base_host:
+            spans.append(match.span("url"))
+    return tuple(spans)
+
+
+def _token_occurs_outside_spans(
+    body: str,
+    token: str,
+    exempt_spans: tuple[tuple[int, int], ...],
+) -> bool:
+    for match in re.finditer(re.escape(token), body, re.IGNORECASE | re.ASCII):
+        if not any(match.start() >= start and match.end() <= end for start, end in exempt_spans):
+            return True
+    return False
+
+
 def validate_live_fetch(fetch: LiveFetch) -> list[str]:
     errors: list[str] = []
     body_lower = fetch.body.casefold()
+    external_url_spans = _external_url_attribute_spans(fetch.body, fetch.final_url)
     if fetch.status != 200:
         errors.append(f"live Pages status must be 200, got {fetch.status}")
     if "text/html" not in fetch.content_type.casefold():
@@ -333,7 +366,11 @@ def validate_live_fetch(fetch: LiveFetch) -> list[str]:
         if token not in fetch.body:
             errors.append(f"live Pages missing canonical-shell token: {token}")
     for token in FORBIDDEN_TOKENS:
-        if token.casefold() in body_lower:
+        if token in EXTERNAL_URL_EXEMPT_FORBIDDEN_TOKENS:
+            forbidden = _token_occurs_outside_spans(fetch.body, token, external_url_spans)
+        else:
+            forbidden = token.casefold() in body_lower
+        if forbidden:
             errors.append(f"live Pages contains forbidden delivery token: {token}")
     return errors
 
