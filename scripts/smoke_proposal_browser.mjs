@@ -245,9 +245,22 @@ html { font-size: ${profile.fontScale}% !important; }
   await page.getByText('GitHub was opened.').waitFor();
   const issueUrl = new URL(await page.getByRole('link', { name: 'Open GitHub directly' }).getAttribute('href'));
   const issueBody = issueUrl.searchParams.get('body');
-  const match = issueBody.match(/### Optional Commons basis draft\n>[^\n]+\n((?:    .*\n?)+?)\n### Confirmations/u);
-  assert(match, `basis-draft: structured issue block missing ${issueBody}`);
-  const issueDraft = JSON.parse(match[1].split('\n').map((line) => line.slice(4)).join('\n'));
+  const sectionStart = issueBody.indexOf('### Optional Commons basis draft\n');
+  const sectionEnd = issueBody.indexOf('\n### Confirmations', sectionStart);
+  assert(
+    sectionStart >= 0 && sectionEnd > sectionStart,
+    `basis-draft: structured issue block missing ${issueBody}`,
+  );
+  const sectionLines = issueBody.slice(sectionStart, sectionEnd).trimEnd().split('\n');
+  const issueDraft = JSON.parse(
+    sectionLines
+      .slice(2)
+      .map((line) => {
+        assert(line.startsWith('    '), `basis-draft: invalid indented JSON line ${line}`);
+        return line.slice(4);
+      })
+      .join('\n'),
+  );
   assert(issueDraft.dimensions.shared_good.classification === 'confirmed', 'basis-draft: confirmed dimension lost');
   assert(issueDraft.dimensions.community.classification === 'open', 'basis-draft: explicit unknown lost');
   assert(JSON.stringify(issueDraft.dimensions.shared_good.refs) === JSON.stringify(['source-1']), 'basis-draft: source reference lost');

@@ -55,9 +55,19 @@ test("optional dimensions serialize with explicit unknown and source references"
 test("GitHub issue contains the identical structured draft object", () => {
   const value = proposal();
   const body = buildIssueBody(value);
-  const match = body.match(/### Optionaler Commons-Basisentwurf\n>[^\n]+\n((?:    .*\n?)+?)\n### Bestätigungen/u);
-  assert.ok(match, body);
-  const embedded = JSON.parse(match[1].split("\n").map((line) => line.slice(4)).join("\n"));
+  const sectionStart = body.indexOf("### Optionaler Commons-Basisentwurf\n");
+  const sectionEnd = body.indexOf("\n### Bestätigungen", sectionStart);
+  assert.ok(sectionStart >= 0 && sectionEnd > sectionStart, body);
+  const sectionLines = body.slice(sectionStart, sectionEnd).trimEnd().split("\n");
+  const embedded = JSON.parse(
+    sectionLines
+      .slice(2)
+      .map((line) => {
+        assert.ok(line.startsWith("    "), body);
+        return line.slice(4);
+      })
+      .join("\n"),
+  );
   assert.deepEqual(embedded, value.commons_basis_draft);
   assert.match(body, /source-1: https:\/\/example\.org\/basis-commons\/governance/u);
   assert.doesNotMatch(body, /Punktzahl:\s*\d/iu);
