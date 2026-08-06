@@ -99,7 +99,7 @@ html { font-size: ${profile.fontScale}% !important; }
     const rect = node.getBoundingClientRect();
     return { width: rect.width, height: rect.height };
   }));
-  assert(contractLinkBoxes.length === 4 && contractLinkBoxes.every(({ width, height }) => width >= 44 && height >= 44), `${profile.name}: proposal contract navigation has undersized touch targets ${JSON.stringify(contractLinkBoxes)}`);
+  assert(contractLinkBoxes.length === 5 && contractLinkBoxes.every(({ width, height }) => width >= 44 && height >= 44), `${profile.name}: proposal contract navigation has undersized touch targets ${JSON.stringify(contractLinkBoxes)}`);
   const overflow = await page.evaluate(() => document.documentElement.scrollWidth - document.documentElement.clientWidth);
   assert(overflow <= 1, `${profile.name}: horizontal overflow ${overflow}`);
   if (profile.fontScale) {
@@ -108,8 +108,10 @@ html { font-size: ${profile.fontScale}% !important; }
     const skipBox = await skipLink.boundingBox();
     assert(skipBox && skipBox.x >= 0 && skipBox.x + skipBox.width <= profile.viewport.width + 1, `${profile.name}: focused skip link overflows the viewport ${JSON.stringify(skipBox)}`);
   }
-  const fieldsetLegends = await page.locator('form fieldset > legend').allTextContents();
-  assert(JSON.stringify(fieldsetLegends) === JSON.stringify(['Project', 'Presence', 'Evidenced ways to engage', 'Sources and notes', 'Consent and public visibility']), `${profile.name}: semantic fieldsets differ ${JSON.stringify(fieldsetLegends)}`);
+  const topLevelLegends = await page.locator('form > fieldset > legend').allTextContents();
+  assert(JSON.stringify(topLevelLegends) === JSON.stringify(['Project', 'Evidenced ways to engage', 'Sources and notes', 'Consent and public visibility']), `${profile.name}: top-level semantic fieldsets differ ${JSON.stringify(topLevelLegends)}`);
+  assert(await page.locator('#proposal-criteria > summary').getByText('Add Commons basis information').isVisible(), `${profile.name}: optional Commons basis disclosure missing`);
+  assert(await page.locator('.proposal-dimension > legend').count() === 5, `${profile.name}: Commons basis dimensions are incomplete`);
   assert(await page.locator('input[name="region"]').isDisabled(), `${profile.name}: geographic region is active without Vor Ort`);
   assert(pageErrors.length === 0, `${profile.name}: page errors ${pageErrors.join('; ')}`);
   results.push(profile.name);
@@ -218,6 +220,60 @@ html { font-size: ${profile.fontScale}% !important; }
   await page.getByText('GitHub was opened.').waitFor();
   assert((await page.getByRole('link', { name: 'Open GitHub directly' }).getAttribute('href')).includes('body='), 'success: structured issue body missing');
   results.push('success-message');
+  await context.close();
+}
+
+
+{
+  const context = await browser.newContext({ viewport: { width: 1024, height: 900 }, reducedMotion: 'reduce' });
+  await context.addInitScript(() => { window.open = () => ({ opener: window }); });
+  const page = await context.newPage();
+  await page.goto(`${baseUrl}/propose.html`, { waitUntil: 'networkidle' });
+  await fillValid(page, 'Structured Basis Browser Commons');
+  const criteria = page.locator('#proposal-criteria');
+  const summary = criteria.locator('summary');
+  await summary.focus();
+  await summary.press('Enter');
+  assert(await criteria.getAttribute('open') !== null, 'basis-draft: keyboard did not open progressive disclosure');
+  const sharedGood = criteria.locator('[data-basis-dimension="shared_good"]');
+  await sharedGood.locator('[name="basis_shared_good_classification"]').selectOption('confirmed');
+  await sharedGood.locator('[name="basis_shared_good_text"]').fill('A jointly maintained knowledge resource with documented community use and stewardship.');
+  await sharedGood.locator('[name="basis_shared_good_ref_1"]').check();
+  const community = criteria.locator('[data-basis-dimension="community"]');
+  await community.locator('[name="basis_community_classification"]').selectOption('open');
+  await page.getByRole('button', { name: 'Prepare public GitHub issue' }).click();
+  await page.getByText('GitHub was opened.').waitFor();
+  const issueUrl = new URL(await page.getByRole('link', { name: 'Open GitHub directly' }).getAttribute('href'));
+  const issueBody = issueUrl.searchParams.get('body');
+  const sectionStart = issueBody.indexOf('### Optional Commons basis draft\n');
+  const sectionEnd = issueBody.indexOf('\n### Confirmations', sectionStart);
+  assert(
+    sectionStart >= 0 && sectionEnd > sectionStart,
+    `basis-draft: structured issue block missing ${issueBody}`,
+  );
+  const sectionLines = issueBody.slice(sectionStart, sectionEnd).trimEnd().split('\n');
+  const issueDraft = JSON.parse(
+    sectionLines
+      .slice(2)
+      .map((line) => {
+        assert(line.startsWith('    '), `basis-draft: invalid indented JSON line ${line}`);
+        return line.slice(4);
+      })
+      .join('\n'),
+  );
+  assert(issueDraft.dimensions.shared_good.classification === 'confirmed', 'basis-draft: confirmed dimension lost');
+  assert(issueDraft.dimensions.community.classification === 'open', 'basis-draft: explicit unknown lost');
+  assert(JSON.stringify(issueDraft.dimensions.shared_good.refs) === JSON.stringify(['source-1']), 'basis-draft: source reference lost');
+  const downloadPromise = page.waitForEvent('download');
+  await page.getByRole('button', { name: 'Download validated JSON' }).click();
+  const download = await downloadPromise;
+  const stream = await download.createReadStream();
+  assert(stream, 'basis-draft: JSON download stream unavailable');
+  const chunks = [];
+  for await (const chunk of stream) chunks.push(chunk);
+  const downloaded = JSON.parse(Buffer.concat(chunks).toString('utf8'));
+  assert(JSON.stringify(downloaded.commons_basis_draft) === JSON.stringify(issueDraft), 'basis-draft: JSON and issue objects differ');
+  results.push('commons-basis-keyboard-unknown-output-parity');
   await context.close();
 }
 

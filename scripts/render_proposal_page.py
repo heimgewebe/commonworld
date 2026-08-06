@@ -121,6 +121,79 @@ def render(locale: str = FALLBACK_LOCALE) -> str:
           <label><span>Hinweis für die Redaktion (optional)</span><textarea name="editorial_note" maxlength="500" rows="4" placeholder="Zum Beispiel: Welche Behauptung belegt welche Quelle?"></textarea></label>
         </fieldset>
 
+
+        <details class="proposal-criteria" id="proposal-criteria">
+          <summary>Commons-Begründung ergänzen (optional)</summary>
+          <p id="proposal-criteria-help">Diese fünf Angaben helfen der Redaktion, den Vorschlag direkt als Commons-Basisentwurf weiterzuverwenden. Du kannst einzelne Punkte auslassen oder ausdrücklich „Unklar / weiß ich nicht“ wählen. Es gibt keine Punktzahl und keine automatische Aufnahmeentscheidung.</p>
+          <div class="proposal-dimensions" aria-describedby="proposal-criteria-help">
+          <fieldset class="proposal-dimension" data-basis-dimension="shared_good">
+            <legend>Gemeinsames Gut</legend>
+            <p>Welche benennbare Ressource, Infrastruktur, Praxis oder Wissensbasis wird gemeinsam genutzt oder erhalten?</p>
+            <div class="proposal-dimension-grid">
+              <label><span>Einschätzung</span><select name="basis_shared_good_classification"><option value="">Nicht ergänzt</option><option value="confirmed">Belegt</option><option value="open">Unklar / weiß ich nicht</option><option value="not_applicable">Nicht zutreffend</option></select></label>
+              <label><span>Begründung oder offene Frage</span><textarea name="basis_shared_good_text" maxlength="800" rows="3" placeholder="Kurze, prüfbare Aussage – ohne private Angaben"></textarea></label>
+            </div>
+            <div class="proposal-source-refs" role="group" aria-labelledby="basis-shared_good-sources-label">
+              <span id="basis-shared_good-sources-label" class="proposal-source-refs-label">Quellenbezug</span>
+              <div class="proposal-source-ref-options"><label class="check-row"><input name="basis_shared_good_ref_1" type="checkbox" /><span>Quelle 1</span></label><label class="check-row"><input name="basis_shared_good_ref_2" type="checkbox" /><span>Quelle 2</span></label><label class="check-row"><input name="basis_shared_good_ref_3" type="checkbox" /><span>Quelle 3</span></label><label class="check-row"><input name="basis_shared_good_ref_4" type="checkbox" /><span>Quelle 4</span></label><label class="check-row"><input name="basis_shared_good_ref_5" type="checkbox" /><span>Quelle 5</span></label></div>
+              <small>Ordne die oben nummerierten Quellen zu. Für „Belegt“ ist mindestens eine Quelle erforderlich.</small>
+            </div>
+          </fieldset>
+          <fieldset class="proposal-dimension" data-basis-dimension="community">
+            <legend>Gemeinschaft</legend>
+            <p>Wer nutzt, pflegt oder entwickelt das Gemeinsame zusammen – und woran ist diese Gemeinschaft erkennbar?</p>
+            <div class="proposal-dimension-grid">
+              <label><span>Einschätzung</span><select name="basis_community_classification"><option value="">Nicht ergänzt</option><option value="confirmed">Belegt</option><option value="open">Unklar / weiß ich nicht</option><option value="not_applicable">Nicht zutreffend</option></select></label>
+              <label><span>Begründung oder offene Frage</span><textarea name="basis_community_text" maxlength="800" rows="3" placeholder="Kurze, prüfbare Aussage – ohne private Angaben"></textarea></label>
+            </div>
+            <div class="proposal-source-refs" role="group" aria-labelledby="basis-community-sources-label">
+              <span id="basis-community-sources-label" class="proposal-source-refs-label">Quellenbezug</span>
+              <div class="proposal-source-ref-options"><label class="check-row"><input name="basis_community_ref_1" type="checkbox" /><span>Quelle 1</span></label><label class="check-row"><input name="basis_community_ref_2" type="checkbox" /><span>Quelle 2</span></label><label class="check-row"><input name="basis_community_ref_3" type="checkbox" /><span>Quelle 3</span></label><label class="check-row"><input name="basis_community_ref_4" type="checkbox" /><span>Quelle 4</span></label><label class="check-row"><input name="basis_community_ref_5" type="checkbox" /><span>Quelle 5</span></label></div>
+              <small>Ordne die oben nummerierten Quellen zu. Für „Belegt“ ist mindestens eine Quelle erforderlich.</small>
+            </div>
+          </fieldset>
+          <fieldset class="proposal-dimension" data-basis-dimension="rules_and_governance">
+            <legend>Regeln und Governance</legend>
+            <p>Welche Regeln, Entscheidungswege, Zugangsbedingungen oder Konfliktverfahren sind belegt?</p>
+            <div class="proposal-dimension-grid">
+              <label><span>Einschätzung</span><select name="basis_rules_and_governance_classification"><option value="">Nicht ergänzt</option><option value="confirmed">Belegt</option><option value="open">Unklar / weiß ich nicht</option><option value="not_applicable">Nicht zutreffend</option></select></label>
+              <label><span>Begründung oder offene Frage</span><textarea name="basis_rules_and_governance_text" maxlength="800" rows="3" placeholder="Kurze, prüfbare Aussage – ohne private Angaben"></textarea></label>
+            </div>
+            <div class="proposal-source-refs" role="group" aria-labelledby="basis-rules_and_governance-sources-label">
+              <span id="basis-rules_and_governance-sources-label" class="proposal-source-refs-label">Quellenbezug</span>
+              <div class="proposal-source-ref-options"><label class="check-row"><input name="basis_rules_and_governance_ref_1" type="checkbox" /><span>Quelle 1</span></label><label class="check-row"><input name="basis_rules_and_governance_ref_2" type="checkbox" /><span>Quelle 2</span></label><label class="check-row"><input name="basis_rules_and_governance_ref_3" type="checkbox" /><span>Quelle 3</span></label><label class="check-row"><input name="basis_rules_and_governance_ref_4" type="checkbox" /><span>Quelle 4</span></label><label class="check-row"><input name="basis_rules_and_governance_ref_5" type="checkbox" /><span>Quelle 5</span></label></div>
+              <small>Ordne die oben nummerierten Quellen zu. Für „Belegt“ ist mindestens eine Quelle erforderlich.</small>
+            </div>
+          </fieldset>
+          <fieldset class="proposal-dimension" data-basis-dimension="stewardship">
+            <legend>Fürsorge und Verantwortung</legend>
+            <p>Wer übernimmt Pflege, Wartung, Schutz oder langfristige Verantwortung für das Gemeinsame?</p>
+            <div class="proposal-dimension-grid">
+              <label><span>Einschätzung</span><select name="basis_stewardship_classification"><option value="">Nicht ergänzt</option><option value="confirmed">Belegt</option><option value="open">Unklar / weiß ich nicht</option><option value="not_applicable">Nicht zutreffend</option></select></label>
+              <label><span>Begründung oder offene Frage</span><textarea name="basis_stewardship_text" maxlength="800" rows="3" placeholder="Kurze, prüfbare Aussage – ohne private Angaben"></textarea></label>
+            </div>
+            <div class="proposal-source-refs" role="group" aria-labelledby="basis-stewardship-sources-label">
+              <span id="basis-stewardship-sources-label" class="proposal-source-refs-label">Quellenbezug</span>
+              <div class="proposal-source-ref-options"><label class="check-row"><input name="basis_stewardship_ref_1" type="checkbox" /><span>Quelle 1</span></label><label class="check-row"><input name="basis_stewardship_ref_2" type="checkbox" /><span>Quelle 2</span></label><label class="check-row"><input name="basis_stewardship_ref_3" type="checkbox" /><span>Quelle 3</span></label><label class="check-row"><input name="basis_stewardship_ref_4" type="checkbox" /><span>Quelle 4</span></label><label class="check-row"><input name="basis_stewardship_ref_5" type="checkbox" /><span>Quelle 5</span></label></div>
+              <small>Ordne die oben nummerierten Quellen zu. Für „Belegt“ ist mindestens eine Quelle erforderlich.</small>
+            </div>
+          </fieldset>
+          <fieldset class="proposal-dimension" data-basis-dimension="legitimacy">
+            <legend>Kontextuelle Legitimität</legend>
+            <p>Warum ist die gemeinschaftliche Nutzung im jeweiligen sozialen, kulturellen, rechtlichen oder ökologischen Kontext legitim?</p>
+            <div class="proposal-dimension-grid">
+              <label><span>Einschätzung</span><select name="basis_legitimacy_classification"><option value="">Nicht ergänzt</option><option value="confirmed">Belegt</option><option value="open">Unklar / weiß ich nicht</option><option value="not_applicable">Nicht zutreffend</option></select></label>
+              <label><span>Begründung oder offene Frage</span><textarea name="basis_legitimacy_text" maxlength="800" rows="3" placeholder="Kurze, prüfbare Aussage – ohne private Angaben"></textarea></label>
+            </div>
+            <div class="proposal-source-refs" role="group" aria-labelledby="basis-legitimacy-sources-label">
+              <span id="basis-legitimacy-sources-label" class="proposal-source-refs-label">Quellenbezug</span>
+              <div class="proposal-source-ref-options"><label class="check-row"><input name="basis_legitimacy_ref_1" type="checkbox" /><span>Quelle 1</span></label><label class="check-row"><input name="basis_legitimacy_ref_2" type="checkbox" /><span>Quelle 2</span></label><label class="check-row"><input name="basis_legitimacy_ref_3" type="checkbox" /><span>Quelle 3</span></label><label class="check-row"><input name="basis_legitimacy_ref_4" type="checkbox" /><span>Quelle 4</span></label><label class="check-row"><input name="basis_legitimacy_ref_5" type="checkbox" /><span>Quelle 5</span></label></div>
+              <small>Ordne die oben nummerierten Quellen zu. Für „Belegt“ ist mindestens eine Quelle erforderlich.</small>
+            </div>
+          </fieldset>
+          </div>
+        </details>
+
         <fieldset>
           <legend>Einwilligung und Öffentlichkeit</legend>
           <label class="check-row"><input name="public_issue_acknowledged" type="checkbox" required /><span>Mir ist bewusst, dass der bevorzugte GitHub-Eingang öffentlich ist.</span></label>
@@ -134,7 +207,7 @@ def render(locale: str = FALLBACK_LOCALE) -> str:
         <div id="proposal-fallback" class="proposal-fallback" hidden><p>Der Vorschlag bleibt ein Kandidat. Er erscheint dadurch nicht im Katalog.</p><p><a id="proposal-direct-link" href="https://github.com/heimgewebe/commonworld/issues/new?template=commons-proposal.yml" rel="external noreferrer">GitHub direkt öffnen</a></p></div>
       </form>
 
-      <section class="proposal-contracts" aria-labelledby="contracts-title"><h2 id="contracts-title">Maschinenlesbare Regeln</h2><ul><li><a href="./contracts/commonworld/proposal.schema.json">Vorschlagsschema</a></li><li><a href="./contracts/commonworld/editorial-review.contract.json">Redaktions- und Statusvertrag</a></li><li><a href="./contracts/commonworld/proposal-path.contract.json">Technischer Einreichungsweg</a></li><li><a href="./method.html">Methode und Datenschutz</a></li></ul></section>
+      <section class="proposal-contracts" aria-labelledby="contracts-title"><h2 id="contracts-title">Maschinenlesbare Regeln</h2><ul><li><a href="./contracts/commonworld/proposal.schema.json">Vorschlagsschema</a></li><li><a href="./contracts/commonworld/commons-basis.schema.json">Commons-Basisschema</a></li><li><a href="./contracts/commonworld/editorial-review.contract.json">Redaktions- und Statusvertrag</a></li><li><a href="./contracts/commonworld/proposal-path.contract.json">Technischer Einreichungsweg</a></li><li><a href="./method.html">Methode und Datenschutz</a></li></ul></section>
     </main>
   </body>
 </html>

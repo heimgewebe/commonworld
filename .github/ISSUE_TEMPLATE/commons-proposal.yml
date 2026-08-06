@@ -88,6 +88,16 @@ body:
         - Ja – besonders streng prüfen
     validations:
       required: true
+  - type: textarea
+    id: commons_basis_draft
+    attributes:
+      label: Optionaler Commons-Basisentwurf
+      description: Optional. Nutze die fünf Schlüssel shared_good, community, rules_and_governance, stewardship und legitimacy. classification ist confirmed, open oder not_applicable; refs verweist auf source-1 bis source-5 entsprechend der Quellenreihenfolge. Keine Punktzahl und keine automatische Aufnahmeentscheidung.
+      placeholder: |
+        shared_good:
+          classification: open
+          text: ""
+          refs: []
   - type: checkboxes
     id: consent
     attributes:

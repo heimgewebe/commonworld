@@ -59,6 +59,7 @@ CONTACT_PATTERN = re.compile(
     re.I,
 )
 PUBLIC_TEXT_FIELDS = ("name", "description", "region", "editorial_note")
+COMMONS_DIMENSIONS = ("shared_good", "community", "rules_and_governance", "stewardship", "legitimacy")
 
 
 def contains_sensitive_location(value: object) -> bool:
@@ -99,6 +100,15 @@ def validate_fixture(value: dict, schema: dict) -> list[str]:
             errors.append(f"{key} contains direct contact data")
         if isinstance(raw, str) and contains_sensitive_location(raw):
             errors.append(f"{key} contains precise or private location material")
+    draft = value.get("commons_basis_draft", {}) if isinstance(value, dict) else {}
+    dimensions = draft.get("dimensions", {}) if isinstance(draft, dict) else {}
+    if isinstance(dimensions, dict):
+        for key, dimension in dimensions.items():
+            raw = dimension.get("text") if isinstance(dimension, dict) else None
+            if isinstance(raw, str) and contains_contact_data(raw):
+                errors.append(f"commons_basis_draft.{key}.text contains direct contact data")
+            if isinstance(raw, str) and contains_sensitive_location(raw):
+                errors.append(f"commons_basis_draft.{key}.text contains precise or private location material")
     return errors
 
 
@@ -124,6 +134,13 @@ def validate(root: Path = ROOT) -> list[str]:
     project_schema = schema.get("properties", {}).get("project", {})
     if project_schema.get("additionalProperties") is not False: errors.append("proposal project schema must reject unknown fields")
     if "contact" in project_schema.get("properties", {}): errors.append("public proposal schema must not collect direct contact data")
+    basis_schema = schema.get("properties", {}).get("commons_basis_draft", {})
+    if "commons_basis_draft" in schema.get("required", []): errors.append("Commons basis draft must remain optional")
+    dimension_properties = basis_schema.get("properties", {}).get("dimensions", {}).get("properties", {})
+    if set(dimension_properties) != set(COMMONS_DIMENSIONS): errors.append("Commons basis draft dimensions mismatch")
+    dimension_definition = schema.get("$defs", {}).get("proposal_commons_dimension", {})
+    classifications = dimension_definition.get("properties", {}).get("classification", {}).get("enum", [])
+    if set(classifications) != {"confirmed", "open", "not_applicable"}: errors.append("Commons basis draft classifications mismatch")
 
     statuses = set(editorial.get("statuses", []))
     if statuses != EXPECTED_STATUSES: errors.append("editorial statuses mismatch")
@@ -134,6 +151,10 @@ def validate(root: Path = ROOT) -> list[str]:
 
     architecture = path.get("architecture", {})
     if architecture.get("hosting") != "github_pages_static" or architecture.get("commonworld_backend") is not False or architecture.get("commonworld_write_api") is not False: errors.append("proposal architecture crossed the static read-only boundary")
+    basis_contract = architecture.get("structured_commons_basis_draft", {})
+    if basis_contract.get("optional") is not True or basis_contract.get("unknown_ui_maps_to") != "open": errors.append("proposal path does not preserve optional explicit-unknown Commons basis input")
+    if basis_contract.get("automatic_scoring") is not False or basis_contract.get("automatic_admission_decision") is not False: errors.append("proposal path introduced automated Commons scoring or admission")
+    if basis_contract.get("github_issue_and_json_share_identical_object") is not True: errors.append("proposal outputs do not promise structured Commons basis parity")
     privacy = path.get("privacy", {})
     if privacy.get("contact_field_collected") is not False or privacy.get("proposal_content_stored_by_commonworld") is not False: errors.append("proposal path collects or stores unnecessary personal data")
 
@@ -240,9 +261,9 @@ def validate(root: Path = ROOT) -> list[str]:
         if not contains_contact_data(case.get("value", "")): errors.append(f"contact-data blocked fixture accepted: {case.get('id')}")
     for case in contact_cases.get("allowed", []):
         if contains_contact_data(case.get("value", "")): errors.append(f"contact-data allowed fixture rejected: {case.get('id')}")
-    for fixture in ("valid.json", "digital-only-valid.json"):
+    for fixture in ("valid.json", "digital-only-valid.json", "commons-basis-valid.json"):
         if validate_fixture(load(f"tests/fixtures/proposals/{fixture}"), schema): errors.append(f"valid proposal fixture is rejected: {fixture}")
-    for fixture in ("missing-source.json", "javascript-url.json", "private-coordinates.json", "geographic-missing-region.json"):
+    for fixture in ("missing-source.json", "javascript-url.json", "private-coordinates.json", "geographic-missing-region.json", "commons-basis-confirmed-missing-ref.json"):
         if not validate_fixture(load(f"tests/fixtures/proposals/{fixture}"), schema): errors.append(f"invalid proposal fixture accepted: {fixture}")
     return errors
 
