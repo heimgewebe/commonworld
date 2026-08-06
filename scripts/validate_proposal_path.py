@@ -155,6 +155,15 @@ def validate(root: Path = ROOT) -> list[str]:
     if basis_contract.get("optional") is not True or basis_contract.get("unknown_ui_maps_to") != "open": errors.append("proposal path does not preserve optional explicit-unknown Commons basis input")
     if basis_contract.get("automatic_scoring") is not False or basis_contract.get("automatic_admission_decision") is not False: errors.append("proposal path introduced automated Commons scoring or admission")
     if basis_contract.get("github_issue_and_json_share_identical_object") is not True: errors.append("proposal outputs do not promise structured Commons basis parity")
+    if basis_contract.get("partial_input_without_classification") != "reject_with_explicit_error_without_discarding_input": errors.append("proposal path does not preserve partial Commons basis input behind an explicit classification error")
+    expected_markers = {"start": "<!-- commonworld-commons-basis-draft:start -->", "end": "<!-- commonworld-commons-basis-draft:end -->"}
+    if basis_contract.get("issue_body_markers") != expected_markers: errors.append("proposal path does not expose stable Commons basis issue markers")
+    expected_source_mapping = {
+        "format": "source-{one_based_index}",
+        "order": "project.sources",
+        "issue_body_marker": "<!-- commonworld-source-reference-map:v1; source-N=project.sources[N-1] -->",
+    }
+    if basis_contract.get("source_reference_mapping") != expected_source_mapping: errors.append("proposal path source-reference mapping is not stable")
     privacy = path.get("privacy", {})
     if privacy.get("contact_field_collected") is not False or privacy.get("proposal_content_stored_by_commonworld") is not False: errors.append("proposal path collects or stores unnecessary personal data")
 
@@ -169,6 +178,13 @@ def validate(root: Path = ROOT) -> list[str]:
     page = (root / "propose.html").read_text(encoding="utf-8")
     german_page = (root / "propose.de.html").read_text(encoding="utf-8")
     script = (root / "assets/commonworld-proposal.js").read_text(encoding="utf-8")
+    for marker in (
+        "<!-- commonworld-commons-basis-draft:start -->",
+        "<!-- commonworld-commons-basis-draft:end -->",
+        "<!-- commonworld-source-reference-map:v1; source-N=project.sources[N-1] -->",
+        "because text or source references were entered",
+    ):
+        if marker not in script: errors.append(f"proposal client missing stable review-hardening marker: {marker}")
     for marker in ("not published automatically", "public GitHub issue", "private address", "proposal-catalog-index", "proposal-download"):
         if marker.casefold() not in page.casefold(): errors.append(f"proposal page missing marker: {marker}")
     for marker in ("nicht automatisch veröffentlicht", "öffentliches GitHub-Issue", "private Adresse"):

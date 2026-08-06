@@ -29,7 +29,17 @@
       "confirmed_requires_source_reference": true,
       "github_issue_and_json_share_identical_object": true,
       "automatic_scoring": false,
-      "automatic_admission_decision": false
+      "automatic_admission_decision": false,
+      "partial_input_without_classification": "reject_with_explicit_error_without_discarding_input",
+      "issue_body_markers": {
+        "start": "<!-- commonworld-commons-basis-draft:start -->",
+        "end": "<!-- commonworld-commons-basis-draft:end -->"
+      },
+      "source_reference_mapping": {
+        "format": "source-{one_based_index}",
+        "order": "project.sources",
+        "issue_body_marker": "<!-- commonworld-source-reference-map:v1; source-N=project.sources[N-1] -->"
+      }
     }
   },
   "privacy": {

@@ -40,6 +40,9 @@ const ISSUE_BASE = "https://github.com/heimgewebe/commonworld/issues/new";
 const RELEASE_NAVIGATION_EVENT = "commonworld:release-navigation";
 const RELEASE_DRAFT_KEY = "commonworldProposalReleaseDraftV1";
 const RELEASE_DRAFT_MAX_AGE_MS = 5 * 60_000;
+const BASIS_DRAFT_SECTION_START = "<!-- commonworld-commons-basis-draft:start -->";
+const BASIS_DRAFT_SECTION_END = "<!-- commonworld-commons-basis-draft:end -->";
+const SOURCE_REFERENCE_MAP_MARKER = "<!-- commonworld-source-reference-map:v1; source-N=project.sources[N-1] -->";
 const ACTION_TYPES = new Set(["visit", "use", "borrow", "learn", "contribute", "volunteer", "donate", "contact", "replicate"]);
 const COMMONS_TYPES = new Set(["knowledge", "software", "culture", "food-seeds", "water", "energy", "housing-land", "health-care", "tools-repair", "community-network", "other"]);
 const SENSITIVE_CONTEXT_PATTERN = /(?:^|[^\p{L}\p{N}])(?:latitude|longitude|gps(?:\s+coordinates?)?|coordonnées?|coordenadas?|الإحداثيات|احداثيات|خط\s+العرض|خط\s+الطول)(?=$|[^\p{L}\p{N}])/iu;
@@ -143,7 +146,17 @@ function validateCommonsBasisDraft(errors, draft, sources) {
     }
     const allowedDimension = new Set(["classification", "text", "refs"]);
     if (Object.keys(dimension).some((name) => !allowedDimension.has(name))) errors.push(`${label}: ${tr("Dimensionsangaben ungültig.", "dimension data is invalid.")}`);
-    if (!BASIS_CLASSIFICATIONS.has(dimension.classification)) errors.push(`${label}: ${tr("Belegt, Unklar oder Nicht zutreffend wählen.", "choose Confirmed, Unknown, or Not applicable.")}`);
+    const classificationIsValid = BASIS_CLASSIFICATIONS.has(dimension.classification);
+    if (!classificationIsValid) {
+      const hasPartialInput = (typeof dimension.text === "string" && dimension.text.trim().length > 0)
+        || (Array.isArray(dimension.refs) && dimension.refs.length > 0);
+      const classificationMessage = hasPartialInput && ACTIVE_LOCALE === 'de'
+        ? "Belegt, Unklar oder Nicht zutreffend wählen, weil Text oder Quellenverweise eingetragen wurden."
+        : (hasPartialInput && ACTIVE_LOCALE === 'en'
+          ? "choose Confirmed, Unknown, or Not applicable because text or source references were entered."
+          : tr("Belegt, Unklar oder Nicht zutreffend wählen.", "choose Confirmed, Unknown, or Not applicable."));
+      errors.push(`${label}: ${classificationMessage}`);
+    }
     validateText(errors, label, dimension.text, 0, MAX.basis);
     if (dimension.classification === "confirmed" && (typeof dimension.text !== "string" || dimension.text.trim().length < 20)) errors.push(`${label}: ${tr("belegte Dimensionen benötigen mindestens 20 Zeichen.", "confirmed dimensions need at least 20 characters.")}`);
     if (!Array.isArray(dimension.refs) || dimension.refs.length > 5 || dimension.refs.some((ref) => typeof ref !== "string" || !sourceIds.has(ref))) errors.push(`${label}: ${tr("Quellenverweise müssen zu den aufgeführten Quellen passen.", "source references must match the listed sources.")}`);
@@ -287,9 +300,11 @@ export function buildIssueBody(proposal) {
   const sourceLines = project.sources.map((url, index) => `- source-${index + 1}: ${url}`).join("\n");
   const basisLines = proposal.commons_basis_draft ? [
     "",
+    BASIS_DRAFT_SECTION_START,
     tr("### Optionaler Commons-Basisentwurf", "### Optional Commons basis draft"),
     tr("> Nur redaktionelles Arbeitsmaterial. Keine Punktzahl und keine automatische Aufnahmeentscheidung.", "> Editorial working material only. No score and no automatic admission decision."),
     ...JSON.stringify(proposal.commons_basis_draft, null, 2).split("\n").map((line) => `    ${line}`),
+    BASIS_DRAFT_SECTION_END,
   ] : [];
   return [
     tr("## Öffentlicher Commons-Vorschlag", "## Public Commons suggestion"),
@@ -311,6 +326,7 @@ export function buildIssueBody(proposal) {
     actionLines,
     "",
     tr("### Primärnahe Quellen", "### Primary-near sources"),
+    SOURCE_REFERENCE_MAP_MARKER,
     sourceLines,
     ...(project.editorial_note ? ["", tr("### Redaktioneller Hinweis", "### Editorial note"), markdown(project.editorial_note)] : []),
     ...basisLines,
