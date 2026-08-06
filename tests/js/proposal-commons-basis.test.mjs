@@ -2,6 +2,28 @@ import test from "node:test";
 import assert from "node:assert/strict";
 import { buildIssueBody, proposalFromFields, validateProposal } from "../../assets/commonworld-proposal.js";
 
+const BASIS_MARKER_START = "<!-- commonworld-commons-basis-draft:start -->";
+const BASIS_MARKER_END = "<!-- commonworld-commons-basis-draft:end -->";
+const SOURCE_MAP_MARKER = "<!-- commonworld-source-reference-map:v1; source-N=project.sources[N-1] -->";
+
+function embeddedBasisDraft(body) {
+  const sectionStart = body.indexOf(BASIS_MARKER_START);
+  const sectionEnd = body.indexOf(BASIS_MARKER_END, sectionStart + BASIS_MARKER_START.length);
+  assert.ok(sectionStart >= 0 && sectionEnd > sectionStart, body);
+  const sectionLines = body.slice(sectionStart + BASIS_MARKER_START.length, sectionEnd).trim().split("\n");
+  const jsonStart = sectionLines.findIndex((line) => line.startsWith("    {"));
+  assert.ok(jsonStart >= 0, body);
+  return JSON.parse(
+    sectionLines
+      .slice(jsonStart)
+      .map((line) => {
+        assert.ok(line.startsWith("    "), body);
+        return line.slice(4);
+      })
+      .join("\n"),
+  );
+}
+
 const baseFields = {
   name: "Basis Example Commons",
   description: "Eine gemeinschaftlich verwaltete Ressource mit offenen Regeln, primärnahen Quellen und einem realen öffentlichen Beteiligungsweg.",
@@ -55,20 +77,9 @@ test("optional dimensions serialize with explicit unknown and source references"
 test("GitHub issue contains the identical structured draft object", () => {
   const value = proposal();
   const body = buildIssueBody(value);
-  const sectionStart = body.indexOf("### Optionaler Commons-Basisentwurf\n");
-  const sectionEnd = body.indexOf("\n### Bestätigungen", sectionStart);
-  assert.ok(sectionStart >= 0 && sectionEnd > sectionStart, body);
-  const sectionLines = body.slice(sectionStart, sectionEnd).trimEnd().split("\n");
-  const embedded = JSON.parse(
-    sectionLines
-      .slice(2)
-      .map((line) => {
-        assert.ok(line.startsWith("    "), body);
-        return line.slice(4);
-      })
-      .join("\n"),
-  );
+  const embedded = embeddedBasisDraft(body);
   assert.deepEqual(embedded, value.commons_basis_draft);
+  assert.ok(body.includes(SOURCE_MAP_MARKER));
   assert.match(body, /source-1: https:\/\/example\.org\/basis-commons\/governance/u);
   assert.doesNotMatch(body, /Punktzahl:\s*\d/iu);
 });
@@ -83,6 +94,54 @@ test("confirmed dimensions require evidence text and a listed source", () => {
   const shortText = proposal();
   shortText.commons_basis_draft.dimensions.shared_good.text = "zu kurz";
   assert.match(validateProposal(shortText).join(" "), /20 Zeichen/u);
+});
+
+test("partial dimension input is preserved and requests an explicit classification", () => {
+  const commonsBasis = basisFields();
+  commonsBasis.stewardship = {
+    classification: "",
+    text: "A stewardship note that must not be silently discarded when classification is missing.",
+    refs: ["source-1"],
+  };
+  const value = proposalFromFields(
+    { ...baseFields, commons_basis: commonsBasis },
+    new Date("2026-08-06T03:30:00Z"),
+  );
+  assert.equal(value.commons_basis_draft.dimensions.stewardship.text, commonsBasis.stewardship.text);
+  assert.deepEqual(value.commons_basis_draft.dimensions.stewardship.refs, ["source-1"]);
+  assert.match(
+    validateProposal(value).join(" "),
+    /weil Text oder Quellenverweise eingetragen wurden/u,
+  );
+});
+
+test("basis draft rejects status drift, unknown dimensions, duplicate refs and oversized ref lists", () => {
+  const statusDrift = proposal();
+  statusDrift.commons_basis_draft.status = "accepted";
+  assert.match(validateProposal(statusDrift).join(" "), /needs_review/u);
+
+  const unknownDimension = proposal();
+  unknownDimension.commons_basis_draft.dimensions.future_axis = {
+    classification: "open",
+    text: "",
+    refs: [],
+  };
+  assert.match(validateProposal(unknownDimension).join(" "), /unbekannte Dimension/u);
+
+  const duplicateRefs = proposal();
+  duplicateRefs.commons_basis_draft.dimensions.shared_good.refs = ["source-1", "source-1"];
+  assert.match(validateProposal(duplicateRefs).join(" "), /doppelte Quellenverweise/u);
+
+  const oversizedRefs = proposal();
+  oversizedRefs.commons_basis_draft.dimensions.shared_good.refs = [
+    "source-1",
+    "source-2",
+    "source-1",
+    "source-2",
+    "source-1",
+    "source-2",
+  ];
+  assert.match(validateProposal(oversizedRefs).join(" "), /Quellenverweise müssen/u);
 });
 
 test("new basis text uses the same privacy boundary as every public field", () => {

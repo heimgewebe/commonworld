@@ -245,16 +245,20 @@ html { font-size: ${profile.fontScale}% !important; }
   await page.getByText('GitHub was opened.').waitFor();
   const issueUrl = new URL(await page.getByRole('link', { name: 'Open GitHub directly' }).getAttribute('href'));
   const issueBody = issueUrl.searchParams.get('body');
-  const sectionStart = issueBody.indexOf('### Optional Commons basis draft\n');
-  const sectionEnd = issueBody.indexOf('\n### Confirmations', sectionStart);
+  const markerStart = '<!-- commonworld-commons-basis-draft:start -->';
+  const markerEnd = '<!-- commonworld-commons-basis-draft:end -->';
+  const sectionStart = issueBody.indexOf(markerStart);
+  const sectionEnd = issueBody.indexOf(markerEnd, sectionStart + markerStart.length);
   assert(
     sectionStart >= 0 && sectionEnd > sectionStart,
     `basis-draft: structured issue block missing ${issueBody}`,
   );
-  const sectionLines = issueBody.slice(sectionStart, sectionEnd).trimEnd().split('\n');
+  const sectionLines = issueBody.slice(sectionStart + markerStart.length, sectionEnd).trim().split('\n');
+  const jsonStart = sectionLines.findIndex((line) => line.startsWith('    {'));
+  assert(jsonStart >= 0, `basis-draft: indented JSON missing ${issueBody}`);
   const issueDraft = JSON.parse(
     sectionLines
-      .slice(2)
+      .slice(jsonStart)
       .map((line) => {
         assert(line.startsWith('    '), `basis-draft: invalid indented JSON line ${line}`);
         return line.slice(4);
@@ -274,6 +278,32 @@ html { font-size: ${profile.fontScale}% !important; }
   const downloaded = JSON.parse(Buffer.concat(chunks).toString('utf8'));
   assert(JSON.stringify(downloaded.commons_basis_draft) === JSON.stringify(issueDraft), 'basis-draft: JSON and issue objects differ');
   results.push('commons-basis-keyboard-unknown-output-parity');
+  await context.close();
+}
+
+
+{
+  const context = await browser.newContext({ viewport: { width: 1024, height: 820 }, reducedMotion: 'reduce' });
+  await context.addInitScript(() => { window.open = () => ({ opener: window }); });
+  const page = await context.newPage();
+  await page.goto(`${baseUrl}/propose.html`, { waitUntil: 'networkidle' });
+  await fillValid(page, 'Partial Basis Browser Commons');
+  const criteria = page.locator('#proposal-criteria');
+  await criteria.locator('summary').click();
+  const stewardship = criteria.locator('[data-basis-dimension="stewardship"]');
+  const partialText = 'A stewardship note stays in the form until an explicit classification is selected.';
+  await stewardship.locator('[name="basis_stewardship_text"]').fill(partialText);
+  await stewardship.locator('[name="basis_stewardship_ref_1"]').check();
+  await page.getByRole('button', { name: 'Prepare public GitHub issue' }).click();
+  const errors = page.locator('#proposal-errors');
+  await errors.waitFor({ state: 'visible' });
+  assert(
+    (await errors.textContent()).includes('because text or source references were entered'),
+    `basis-partial: explicit classification error missing ${(await errors.textContent())}`,
+  );
+  assert(await stewardship.locator('[name="basis_stewardship_text"]').inputValue() === partialText, 'basis-partial: text was discarded');
+  assert(await page.locator('#proposal-direct-link').isHidden(), 'basis-partial: invalid public issue URL became available');
+  results.push('commons-basis-partial-classification-error');
   await context.close();
 }
 

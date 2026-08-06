@@ -118,9 +118,9 @@
       "filterButtonWidth": 44,
       "filterButtonHeight": 44,
       "ringAnimationName": "sphere-ring-orbit",
-      "ringTransform": "matrix(1, 0.000755837, -0.000755837, 1, 0, 0)",
-      "ringTextWidth": 671.1033935546875,
-      "ringTextHeight": 13.507232666015625,
+      "ringTransform": "matrix(0.999999, 0.00150896, -0.00150896, 0.999999, 0, 0)",
+      "ringTextWidth": 671.1126708984375,
+      "ringTextHeight": 14.01263427734375,
       "ringTextFontSize": 22,
       "primaryRingCount": 3,
       "depthRingCount": 2,
@@ -196,7 +196,7 @@
     {
       "id": "layer-journey-moveend-return",
       "verdict": "PASS",
-      "elapsedMs": 2204
+      "elapsedMs": 1767
     },
     {
       "id": "layer-journey-interrupted",
@@ -283,8 +283,8 @@
       "verdict": "PASS",
       "blockedCatalogRequests": 0,
       "observedCatalogRequests": [
-        "/releases/594432d01f5a8c4e5d97/catalog/runtime/aggregate.v1.json",
-        "/releases/594432d01f5a8c4e5d97/catalog/runtime/manifest.v1.json"
+        "/releases/df42f88ce9a4261f7a97/catalog/runtime/aggregate.v1.json",
+        "/releases/df42f88ce9a4261f7a97/catalog/runtime/manifest.v1.json"
       ]
     },
     {
@@ -383,6 +383,6 @@
       "method-mobile",
       "method-mobile-text-200"
     ],
-    "first_party_surface_sha256": "b11d4473b10a1a66a2ad809a7154a3c65f28c55b9411f34f017ddb9b022ec6e9"
+    "first_party_surface_sha256": "901733187414b42977b780c64a7b333a67123b245f449dda2aaa8fd9ebbfbcea"
   }
 }
