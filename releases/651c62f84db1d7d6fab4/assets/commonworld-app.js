@@ -1328,6 +1328,12 @@ function updateCountryMapData() {
   publishCountryMapDiagnostics(data);
 }
 
+function countryMapLayersMissing() {
+  if (!runtime.countryBoundaries) return false;
+  return !runtime.map?.getSource(COUNTRY_MAP_SOURCE_ID)
+    || !runtime.map.getLayer('commonworld-country-compositions-base');
+}
+
 function firstSymbolLayerId() {
   return runtime.map?.getStyle()?.layers?.find(({ type }) => type === 'symbol')?.id;
 }
@@ -3935,7 +3941,10 @@ function createMap() {
     if (runtime.mapReady) ensurePublicMapLayers();
   });
   runtime.map.on('idle', () => {
-    if (runtime.mapReady && !runtime.map.getSource(PUBLIC_MAP_SOURCE_ID)) ensurePublicMapLayers();
+    if (runtime.mapReady && (
+      !runtime.map.getSource(PUBLIC_MAP_SOURCE_ID)
+      || countryMapLayersMissing()
+    )) ensurePublicMapLayers();
     scheduleFocusOverlapInteractivity();
     if (runtime.mapReady && elements.stage.dataset.visualReady !== 'true') {
       flushSphereGeometry();

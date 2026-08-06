@@ -261,6 +261,24 @@ function after() { return false; }
             errors = validate_public_maplibre_vertical_slice(root)
         self.assertTrue(any("one-finger touch movement" in error for error in errors))
 
+    def test_rejects_missing_country_layer_idle_retry(self) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            root = self.copy_slice(directory)
+            path = root / "assets/commonworld-app.js"
+            path.write_text(
+                path.read_text(encoding="utf-8").replace(
+                    "      || countryMapLayersMissing()\n",
+                    "",
+                    1,
+                ),
+                encoding="utf-8",
+            )
+            errors = validate_public_maplibre_vertical_slice(root)
+        self.assertIn(
+            "map idle recovery must retry missing country layers after boundaries arrive",
+            errors,
+        )
+
     def test_rejects_raw_subpixel_sphere_visuals(self) -> None:
         with tempfile.TemporaryDirectory() as directory:
             root = self.copy_slice(directory)
