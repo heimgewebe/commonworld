@@ -2,7 +2,7 @@
   "schema_version": 1,
   "kind": "commonworld.ui_locale_independent_review_input",
   "locale": "pt-BR",
-  "source_revision": "pending-product-commit",
+  "source_revision": "23e7d39204dd9a2373ac2ecba6396461c9b1ab13",
   "source_pack": "assets/locales/wave1-locales.json",
   "source_pack_sha256": "c37e13d79f7234b8a1d4d74a69353eed1ebf3455f4a954db291c60a0af9aea57",
   "payload": {
