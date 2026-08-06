@@ -273,29 +273,62 @@ class LocaleWave1PackTests(unittest.TestCase):
                                     f"unexpected script in {locale} candidate: {unicode_name}",
                                 )
 
-    def test_generated_candidate_surfaces_are_preview_only(self) -> None:
+    def test_generated_wave1_surfaces_have_lifecycle_correct_decoration(self) -> None:
         contract = json.loads(
             (ROOT / "docs/architecture/locale-release.contract.json").read_text(encoding="utf-8")
         )
         for locale in WAVE1_LOCALES:
             entry = contract["locale_registry"][locale]
+            status = entry["status"]
             for surface, relative in entry["surface_files"].items():
                 markup = (ROOT / relative).read_text(encoding="utf-8")
-                with self.subTest(locale=locale, surface=surface):
+                with self.subTest(locale=locale, surface=surface, status=status):
                     self.assertRegex(markup, rf'<html\b[^>]*\blang="{re.escape(locale)}"')
                     self.assertRegex(markup, rf'<html\b[^>]*\bdir="{entry["direction"]}"')
-                    self.assertIn('name="robots" content="noindex,nofollow"', markup)
-                    self.assertIn('class="locale-candidate-banner"', markup)
                     self.assertNotIn("[missing:", markup)
+                    if status == "candidate":
+                        self.assertIn('name="robots" content="noindex,nofollow"', markup)
+                        self.assertIn('class="locale-candidate-banner"', markup)
+                        self.assertIn(f'data-locale-candidate="{locale}"', markup)
+                    else:
+                        self.assertNotIn('name="robots" content="noindex,nofollow"', markup)
+                        self.assertNotIn('class="locale-candidate-banner"', markup)
+                        self.assertNotIn("data-locale-candidate=", markup)
                     if surface == "proposal":
                         self.assertNotIn("data-locale-choice=", markup)
                         self.assertNotIn('class="language-switch"', markup)
                     else:
-                        for candidate in WAVE1_LOCALES:
-                            self.assertIn(f'data-locale-choice="{candidate}"', markup)
-                        self.assertEqual(markup.count('data-locale-status="candidate"'), len(WAVE1_LOCALES))
+                        for wave_locale in WAVE1_LOCALES:
+                            self.assertIn(f'data-locale-choice="{wave_locale}"', markup)
+                        if status == "candidate":
+                            self.assertEqual(
+                                markup.count('data-locale-status="candidate"'),
+                                len(WAVE1_LOCALES),
+                            )
             index_markup = (ROOT / entry["surface_files"]["index"]).read_text(encoding="utf-8")
             self.assertRegex(index_markup, r'<h2 lang="en" dir="ltr">')
+
+    def test_surface_decoration_keeps_rtl_after_hypothetical_promotion(self) -> None:
+        from scripts import commonworld_i18n as i18n
+
+        markup = (
+            '<!doctype html>\n<html lang="de">\n'
+            '<head><meta name="viewport" content="width=device-width"></head>\n'
+            "<body>\n</body>\n</html>\n"
+        )
+        candidate = i18n._decorate_surface(markup, "ar")
+        self.assertIn('<html lang="ar" dir="rtl">', candidate)
+        self.assertIn('data-locale-candidate="ar"', candidate)
+        original_candidates = i18n.CANDIDATE_LOCALES
+        try:
+            i18n.CANDIDATE_LOCALES = ()
+            released = i18n._decorate_surface(candidate, "ar")
+        finally:
+            i18n.CANDIDATE_LOCALES = original_candidates
+        self.assertIn('<html lang="ar" dir="rtl">', released)
+        self.assertNotIn("data-locale-candidate=", released)
+        self.assertNotIn('name="robots" content="noindex,nofollow"', released)
+        self.assertNotIn("locale-candidate-banner", released)
 
     def test_arabic_surface_keeps_mixed_script_fragments_explicit(self) -> None:
         markup = (ROOT / "ar.html").read_text(encoding="utf-8")
@@ -315,7 +348,18 @@ class LocaleWave1PackTests(unittest.TestCase):
             ("ar", "creative-commons"): "المشاع الإبداعي",
             ("ar", "rural-infrastructure"): "البنية التحتية الريفية",
             ("ar", "free-software"): "برمجيات حرة",
+            ("ar", "irrigation"): "الري",
+            ("ar", "public-domain"): "الملك العام",
+            ("ar", "mangroves"): "أشجار القرم",
         }
+        self.assertEqual(locales["pt-BR"]["shell"]["shell_101"], "<summary>Legenda do mapa</summary>")
+        self.assertEqual(locales["pt-BR"]["ui"]["type_housing_land"], "Terra e Moradia")
+        self.assertEqual(locales["pt-BR"]["ui"]["type_health_care"], "Cuidado e Saúde")
+        self.assertEqual(locales["ar"]["ui"]["action_contribute"], "ساهم")
+        self.assertNotIn("الفلاتر", "\n".join(locales["ar"]["shell"].values()))
+        self.assertNotIn("principal-proxima", locales["pt-BR"]["proposal"]["proposal_058"])
+        self.assertNotIn("commoning", locales["pt-BR"]["method"]["method_014"])
+        self.assertNotIn("session storage", locales["pt-BR"]["proposal"]["proposal_011"])
         for (locale, key), value in expected.items():
             self.assertEqual(locales[locale]["themes"][key], value)
         self.assertEqual(

@@ -6,19 +6,29 @@ from scripts.catalog_summary_specificity import (
     specificity_errors,
     validate_contract,
 )
-from scripts.commonworld_i18n import SUPPORTED_LOCALES
+from scripts.catalog_summary_specificity import published_content_languages
 
 
 class CatalogSummarySpecificityTests(unittest.TestCase):
     def setUp(self) -> None:
         self.contract = load_contract()
+        self.content_languages = published_content_languages(self.contract)
 
-    def test_current_contract_covers_every_released_locale(self) -> None:
-        self.assertEqual(validate_contract(self.contract, SUPPORTED_LOCALES), [])
+    def test_current_contract_covers_every_published_content_language(self) -> None:
+        self.assertEqual(self.content_languages, ["de", "en"])
+        self.assertEqual(validate_contract(self.contract, self.content_languages), [])
+
+    def test_ui_locales_do_not_require_content_policy_copies(self) -> None:
+        # Releasing a Wave-1 UI locale must not invent es/fr/pt-BR/ar summary policies.
+        self.assertEqual(validate_contract(self.contract, ["de", "en"]), [])
+        self.assertNotIn("es", self.contract["locale_policies"])
+        self.assertNotIn("fr", self.contract["locale_policies"])
+        self.assertNotIn("pt-BR", self.contract["locale_policies"])
+        self.assertNotIn("ar", self.contract["locale_policies"])
 
     def test_every_declared_phrase_reports_project_locale_rule_and_match(self) -> None:
         policies = self.contract["locale_policies"]
-        for locale in SUPPORTED_LOCALES:
+        for locale in self.content_languages:
             for rule in policies[locale]["rules"]:
                 for phrase in rule["phrases"]:
                     with self.subTest(locale=locale, rule=rule["id"], phrase=phrase):
@@ -35,7 +45,7 @@ class CatalogSummarySpecificityTests(unittest.TestCase):
 
     def test_concrete_collective_governance_examples_remain_allowed(self) -> None:
         policies = self.contract["locale_policies"]
-        for locale in SUPPORTED_LOCALES:
+        for locale in self.content_languages:
             for index, summary in enumerate(policies[locale]["allowed_examples"]):
                 with self.subTest(locale=locale, example=index):
                     self.assertEqual(
@@ -207,7 +217,7 @@ class CatalogSummarySpecificityTests(unittest.TestCase):
                 self.assertTrue(
                     any(
                         "summary specificity locale en relation" in error
-                        for error in validate_contract(contract, SUPPORTED_LOCALES)
+                        for error in validate_contract(contract, self.content_languages)
                     )
                 )
 
@@ -238,15 +248,15 @@ class CatalogSummarySpecificityTests(unittest.TestCase):
             with self.subTest(marker_kind=marker_kind):
                 self.assertIn(
                     f"summary specificity locale en {marker_kind} must be a non-empty string list",
-                    validate_contract(contract, SUPPORTED_LOCALES),
+                    validate_contract(contract, self.content_languages),
                 )
 
-    def test_released_locale_without_policy_fails_closed(self) -> None:
+    def test_published_content_language_without_policy_fails_closed(self) -> None:
         contract = copy.deepcopy(self.contract)
         del contract["locale_policies"]["en"]
-        errors = validate_contract(contract, SUPPORTED_LOCALES)
+        errors = validate_contract(contract, self.content_languages)
         self.assertIn(
-            "summary specificity policy missing for released locale en",
+            "summary specificity policy missing for published content language en",
             errors,
         )
 
@@ -254,7 +264,7 @@ class CatalogSummarySpecificityTests(unittest.TestCase):
         contract = copy.deepcopy(self.contract)
         phrases = contract["locale_policies"]["en"]["rules"][0]["phrases"]
         phrases.append("  COMMUNITY-DRIVEN  ")
-        errors = validate_contract(contract, SUPPORTED_LOCALES)
+        errors = validate_contract(contract, self.content_languages)
         self.assertTrue(
             any(
                 "en-generic-community-developed phrases must be unique after normalization"
@@ -266,7 +276,7 @@ class CatalogSummarySpecificityTests(unittest.TestCase):
     def test_every_rule_requires_a_bound_rejected_example(self) -> None:
         contract = copy.deepcopy(self.contract)
         contract["locale_policies"]["de"]["rejected_examples"] = []
-        errors = validate_contract(contract, SUPPORTED_LOCALES)
+        errors = validate_contract(contract, self.content_languages)
         self.assertTrue(
             any(
                 "locale de rule de-generic-community-developed needs at least 1 rejected examples"
@@ -282,11 +292,12 @@ class CatalogSummarySpecificityTests(unittest.TestCase):
             )
         )
 
-    def test_planned_locale_policy_is_not_required_before_promotion(self) -> None:
+    def test_content_language_without_policy_fails_but_ui_only_locale_does_not(self) -> None:
         self.assertEqual(validate_contract(self.contract, ("en", "de")), [])
+        # If a catalogue content language is published without a policy, fail closed.
         errors = validate_contract(self.contract, ("en", "de", "es"))
         self.assertIn(
-            "summary specificity policy missing for released locale es",
+            "summary specificity policy missing for published content language es",
             errors,
         )
 

@@ -407,15 +407,49 @@ def _wave1_replacements(locale: str, section: str, english_replacements: dict[st
     return {source: pack[key] for source, key in zip(english_values, expected_keys, strict=True)}
 
 
-def _decorate_candidate_surface(markup: str, locale: str, root: Path = ROOT) -> str:
+def _decorate_surface(markup: str, locale: str, root: Path = ROOT) -> str:
+    """Apply document language/direction and candidate-only preview markers.
+
+    Non-baseline Wave-1 surfaces always receive correct ``html lang`` and ``dir``,
+    including after later promotion to released. Preview markers (noindex, banner,
+    ``data-locale-candidate``) remain candidate-only so released Arabic keeps RTL
+    without staying a technical preview.
+    """
     normalized = normalize_locale(locale)
-    if normalized not in CANDIDATE_LOCALES:
+    if normalized not in WAVE1_LOCALES:
         return markup
     entry = locale_entry(normalized, root)
     direction = entry.get("direction", "ltr")
-    markup, count = re.subn(r'<html\b[^>]*>', f'<html lang="{normalized}" dir="{direction}">', markup, count=1)
+    markup, count = re.subn(
+        r"<html\b[^>]*>",
+        f'<html lang="{normalized}" dir="{direction}">',
+        markup,
+        count=1,
+    )
     if count != 1:
-        raise ValueError(f"candidate locale {normalized} surface lacks one html element")
+        raise ValueError(f"locale {normalized} surface lacks one html element")
+    if normalized not in CANDIDATE_LOCALES:
+        # Released Wave-1 surfaces must not retain candidate-only markers.
+        markup = re.sub(
+            r'\s*<meta name="robots" content="noindex,nofollow">\s*',
+            "\n  ",
+            markup,
+            count=1,
+        )
+        markup = re.sub(
+            r'\s*<aside class="locale-candidate-banner"[^>]*>.*?</aside>\s*',
+            "\n  ",
+            markup,
+            count=1,
+            flags=re.DOTALL,
+        )
+        markup = re.sub(
+            r'\s*data-locale-candidate="[^"]*"',
+            "",
+            markup,
+            count=1,
+        )
+        return markup
     if 'name="robots"' not in markup:
         marker = '<meta name="viewport"'
         position = markup.find(marker)
@@ -427,16 +461,21 @@ def _decorate_candidate_surface(markup: str, locale: str, root: Path = ROOT) -> 
         raise ValueError(f"candidate locale {normalized} lacks candidate_notice")
     banner = (
         f'<aside class="locale-candidate-banner" role="status" lang="{normalized}">'
-        f'{escape(notice)}</aside>\n'
+        f"{escape(notice)}</aside>\n"
     )
+
     def decorate_body(match: re.Match[str]) -> str:
         attributes = match.group(1)
         return f'<body{attributes} data-locale-candidate="{normalized}">\n  {banner}'
 
-    markup, body_count = re.subn(r'<body([^>]*)>', decorate_body, markup, count=1)
+    markup, body_count = re.subn(r"<body([^>]*)>", decorate_body, markup, count=1)
     if body_count != 1:
         raise ValueError(f"candidate locale {normalized} surface lacks one body element")
     return markup
+
+
+# Backward-compatible alias used by older call sites and tests.
+_decorate_candidate_surface = _decorate_surface
 
 
 def translate_shell(markup: str, locale: str) -> str:
@@ -450,7 +489,7 @@ def translate_shell(markup: str, locale: str) -> str:
             _wave1_replacements(normalized, "shell", SHELL_REPLACEMENTS_EN),
             surface=f"public shell {normalized}",
         )
-    return _decorate_candidate_surface(translated, normalized)
+    return _decorate_surface(translated, normalized)
 
 
 def translate_method(markup: str, locale: str) -> str:
@@ -464,7 +503,7 @@ def translate_method(markup: str, locale: str) -> str:
             _wave1_replacements(normalized, "method", METHOD_REPLACEMENTS_EN),
             surface=f"method page {normalized}",
         )
-    return _decorate_candidate_surface(translated, normalized)
+    return _decorate_surface(translated, normalized)
 
 
 def _locale_choice_href(surface: str, choice: str) -> str:

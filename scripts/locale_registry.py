@@ -77,7 +77,14 @@ def match_registry_locale(values: Iterable[str], *, statuses: Iterable[str] = ("
         if matched:
             return matched
     default = fallback or load_locale_contract(root / "docs/architecture/locale-release.contract.json")["decision"]["default_locale"]
-    return canonical_registry_tag(default, statuses=allowed, root=root) or candidates[0]
+    matched_default = canonical_registry_tag(default, statuses=allowed, root=root)
+    if matched_default:
+        return matched_default
+    if candidates:
+        return candidates[0]
+    # Keep parity with the browser runtime: an empty status class falls back to
+    # the configured default instead of crashing.
+    return canonical_registry_tag(default, root=root) or canonicalize_tag(default) or "en"
 
 
 def locale_entry(locale: str, root: Path = ROOT) -> dict:

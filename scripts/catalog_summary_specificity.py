@@ -203,16 +203,31 @@ def _string_list(value: Any) -> list[str] | None:
     return list(value)
 
 
+def published_content_languages(contract: dict[str, Any]) -> list[str]:
+    """Return catalogue content languages that require specificity policies."""
+    declared = contract.get("published_content_languages")
+    if isinstance(declared, list) and all(isinstance(item, str) and item for item in declared):
+        return list(declared)
+    return []
+
+
 def validate_contract(
     contract: dict[str, Any],
-    released_locales: Iterable[str],
+    content_languages: Iterable[str] | None = None,
 ) -> list[str]:
+    """Validate policies for published catalogue content languages.
+
+    Interface UI locales must not force policy copies. Pass the catalogue content
+    languages (today predominantly ``de``/``en``), not every released UI locale.
+    """
     errors: list[str] = []
-    released = list(released_locales)
-    if not released or not all(isinstance(locale, str) and locale for locale in released):
-        return ["summary specificity released_locales must be a non-empty string list"]
-    if len(released) != len(set(released)):
-        errors.append("summary specificity released_locales must not contain duplicates")
+    if content_languages is None:
+        content_languages = published_content_languages(contract)
+    required = list(content_languages)
+    if not required or not all(isinstance(locale, str) and locale for locale in required):
+        return ["summary specificity content_languages must be a non-empty string list"]
+    if len(required) != len(set(required)):
+        errors.append("summary specificity content_languages must not contain duplicates")
 
     if contract.get("schema_version") != 1:
         errors.append("summary specificity schema_version must be 1")
@@ -221,12 +236,23 @@ def validate_contract(
             "summary specificity kind must be commonworld.catalog_summary_specificity_contract"
         )
 
+    declared = contract.get("published_content_languages")
+    if not isinstance(declared, list) or not declared or not all(
+        isinstance(item, str) and item for item in declared
+    ):
+        errors.append(
+            "summary specificity published_content_languages must be a non-empty string list"
+        )
+    elif list(declared) != required and set(declared) != set(required):
+        # Callers may pass an explicit subset for tests; live validation uses the contract list.
+        pass
+
     canonical_locale = contract.get("canonical_locale")
     if not isinstance(canonical_locale, str) or not canonical_locale:
         errors.append("summary specificity canonical_locale must be a non-empty string")
-    elif canonical_locale not in released:
+    elif canonical_locale not in required:
         errors.append(
-            "summary specificity canonical_locale must be a released interface locale"
+            "summary specificity canonical_locale must be a published content language"
         )
 
     interpretation = contract.get("interpretation")
@@ -244,21 +270,25 @@ def validate_contract(
     if not isinstance(gate, dict):
         errors.append("summary specificity release_gate must be an object")
         gate = {}
-    if gate.get("every_released_locale_requires_policy") is not True:
+    if gate.get("every_published_content_language_requires_policy") is not True:
         errors.append(
-            "summary specificity release gate must require a policy for every released locale"
+            "summary specificity release gate must require a policy for every published content language"
         )
-    if gate.get("planned_locales_may_omit_policy") is not True:
+    if gate.get("planned_content_languages_may_omit_policy") is not True:
         errors.append(
-            "summary specificity release gate must allow planned locales to remain unpublished"
+            "summary specificity release gate must allow planned content languages to remain unpublished"
+        )
+    if gate.get("ui_locales_do_not_require_content_policy_copies") is not True:
+        errors.append(
+            "summary specificity release gate must keep content policies independent from UI locales"
         )
 
-    minimum_rules = gate.get("minimum_rules_per_released_locale")
-    minimum_allowed = gate.get("minimum_allowed_examples_per_released_locale")
+    minimum_rules = gate.get("minimum_rules_per_published_content_language")
+    minimum_allowed = gate.get("minimum_allowed_examples_per_published_content_language")
     minimum_rejected = gate.get("minimum_rejected_examples_per_rule")
     for field, value in (
-        ("minimum_rules_per_released_locale", minimum_rules),
-        ("minimum_allowed_examples_per_released_locale", minimum_allowed),
+        ("minimum_rules_per_published_content_language", minimum_rules),
+        ("minimum_allowed_examples_per_published_content_language", minimum_allowed),
         ("minimum_rejected_examples_per_rule", minimum_rejected),
     ):
         if not isinstance(value, int) or isinstance(value, bool) or value < 1:
@@ -272,11 +302,11 @@ def validate_contract(
         errors.append("summary specificity locale_policies must be an object")
         return errors
 
-    for locale in released:
+    for locale in required:
         policy = policies.get(locale)
         if not isinstance(policy, dict):
             errors.append(
-                f"summary specificity policy missing for released locale {locale}"
+                f"summary specificity policy missing for published content language {locale}"
             )
             continue
 

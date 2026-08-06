@@ -77,8 +77,8 @@
         "method": "method.es.html",
         "proposal": "propose.es.html"
       },
-      "candidate_evidence_path": "docs/evidence/locale-candidates/es.json",
-      "translation_pack": "wave_1"
+      "translation_pack": "wave_1",
+      "candidate_evidence_path": "docs/evidence/locale-candidates/es.json"
     },
     "fr": {
       "status": "candidate",
@@ -90,8 +90,8 @@
         "method": "method.fr.html",
         "proposal": "propose.fr.html"
       },
-      "candidate_evidence_path": "docs/evidence/locale-candidates/fr.json",
-      "translation_pack": "wave_1"
+      "translation_pack": "wave_1",
+      "candidate_evidence_path": "docs/evidence/locale-candidates/fr.json"
     },
     "pt-BR": {
       "status": "candidate",
@@ -103,8 +103,8 @@
         "method": "method.pt-BR.html",
         "proposal": "propose.pt-BR.html"
       },
-      "candidate_evidence_path": "docs/evidence/locale-candidates/pt-BR.json",
-      "translation_pack": "wave_1"
+      "translation_pack": "wave_1",
+      "candidate_evidence_path": "docs/evidence/locale-candidates/pt-BR.json"
     },
     "ar": {
       "status": "candidate",
@@ -116,8 +116,8 @@
         "method": "method.ar.html",
         "proposal": "propose.ar.html"
       },
-      "candidate_evidence_path": "docs/evidence/locale-candidates/ar.json",
-      "translation_pack": "wave_1"
+      "translation_pack": "wave_1",
+      "candidate_evidence_path": "docs/evidence/locale-candidates/ar.json"
     },
     "zh-Hans": {
       "status": "planned",
@@ -185,13 +185,20 @@
       "rtl"
     ],
     "production_activation_requires_all_checks": true,
-    "catalog_summary_specificity_policy_required": true
+    "catalog_summary_specificity_policy_required": true,
+    "independent_language_review_may_be_model_assisted": true,
+    "model_assisted_review_must_be_labeled_as_such": true,
+    "model_assisted_review_must_be_digest_bound_and_findings_based": true,
+    "post_fix_review_required_after_model_assisted_findings": true,
+    "native_human_polish_may_remain_follow_up": true
   },
   "non_goals": [
     "Inferring language from IP address or physical location",
     "Publishing partially translated interface locales",
     "Restricting catalog content languages to released interface locales",
-    "Treating machine translation as final editorial review"
+    "Treating machine translation as final editorial review",
+    "Treating machine-assisted raw translation as finished language review",
+    "Claiming native or human language approval from model-assisted editorial review alone"
   ],
   "release_evidence": {
     "baseline_locales_may_precede_digest_receipts": true,
@@ -210,6 +217,9 @@
     ],
     "candidate_evidence_path_template": "docs/evidence/locale-candidates/{locale}.json",
     "candidate_evidence_is_not_release_evidence": true,
-    "registry_pointer_field": "release_evidence"
+    "registry_pointer_field": "release_evidence",
+    "schema_path": "docs/architecture/locale-release-evidence.schema.json",
+    "receipt_sources_must_exist_and_match_sha256": true,
+    "generator": "scripts/generate_locale_release_evidence.py"
   }
 }

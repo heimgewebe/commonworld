@@ -22,8 +22,32 @@ def compact(value: object) -> str:
     return json.dumps(value, ensure_ascii=False, separators=(",", ":"))
 
 
+RUNTIME_LOCALE_FIELDS = (
+    "status",
+    "direction",
+    "surface_files",
+    "native_name",
+    "english_name",
+    "translation_pack",
+)
+
+
+def runtime_locale_registry(contract: dict) -> dict[str, dict]:
+    """Project governance-rich locale entries onto browser-required fields only.
+
+    Release-evidence digests and candidate-evidence paths stay in the canonical
+    contract. Embedding them in a public release asset would make the evidence
+    digest affect the release id, which in turn changes the surface digests the
+    evidence is meant to bind.
+    """
+    return {
+        tag: {field: entry[field] for field in RUNTIME_LOCALE_FIELDS if field in entry}
+        for tag, entry in contract["locale_registry"].items()
+    }
+
+
 def render_registry_module(contract: dict) -> str:
-    registry = contract["locale_registry"]
+    registry = runtime_locale_registry(contract)
     decision = contract["decision"]
     released = decision["released_locales"]
     candidates = [tag for tag, entry in registry.items() if entry.get("status") == "candidate"]

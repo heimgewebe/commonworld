@@ -1,0 +1,145 @@
+```json
+{
+  "approach_id": "post-fix-language-review-es-fr",
+  "approach_summary": "PASS: Independent post-fix language review of Commonworld Spanish (es) and French (fr) for reviewed head f331ba57a18c94242231d6545bc7e31ead6af0fe and pack digest df6b6e0dce8bcc43f3d715e9ecead479b43587ad716420115e4c2523828d6b8d. Conducted under review_class=independent_model_assisted_post_fix with claims_native_or_human_review=false. Verified post-fix translations across es and fr candidate surfaces; no blocking findings remain.",
+  "assumptions": [
+    "Verified base HEAD f331ba57a18c94242231d6545bc7e31ead6af0fe",
+    "Verified assets/locales/wave1-locales.json SHA-256 digest df6b6e0dce8bcc43f3d715e9ecead479b43587ad716420115e4c2523828d6b8d"
+  ],
+  "design_invariants": [
+    "Review execution is strictly read-only with zero modifications to source files",
+    "Review is independent-of-writer and performed as an automated inspection model",
+    "Evaluation is digest-bound to SHA-256 df6b6e0dce8bcc43f3d715e9ecead479b43587ad716420115e4c2523828d6b8d",
+    "Evaluation is findings-based covering grammar, semantic accuracy, accessible names, and Commons terminology"
+  ],
+  "tradeoffs": [
+    "Reviewer limitations: Automated model-assisted evaluation cannot replace comprehensive native speaker intuition",
+    "Native human polish is not established by this model-assisted review step alone"
+  ],
+  "risks": [],
+  "proposed_tests": [
+    "Verify es and fr candidate page rendering and locale persistence in browser lifecycle tests",
+    "Execute manual keyboard and screen-reader accessibility validation for es and fr candidate pages"
+  ],
+  "changed_paths": [],
+  "patch": "",
+  "contrast_observations": [],
+  "confidence": "high"
+}
+```
+```json
+{
+  "approach_id": "post-fix-language-review-es-fr",
+  "approach_summary": "PASS: Independent post-fix language review of Commonworld Spanish (es) and French (fr) for reviewed head f331ba57a18c94242231d6545bc7e31ead6af0fe and pack digest df6b6e0dce8bcc43f3d715e9ecead479b43587ad716420115e4c2523828d6b8d. Conducted under review_class=independent_model_assisted_post_fix with claims_native_or_human_review=false. Verified post-fix translations across es and fr candidate surfaces; no blocking findings remain.",
+  "assumptions": [
+    "Verified base HEAD f331ba57a18c94242231d6545bc7e31ead6af0fe",
+    "Verified assets/locales/wave1-locales.json SHA-256 digest df6b6e0dce8bcc43f3d715e9ecead479b43587ad716420115e4c2523828d6b8d"
+  ],
+  "design_invariants": [
+    "Review execution is strictly read-only with zero modifications to source files",
+    "Review is independent-of-writer and performed as an automated inspection model",
+    "Evaluation is digest-bound to SHA-256 df6b6e0dce8bcc43f3d715e9ecead479b43587ad716420115e4c2523828d6b8d",
+    "Evaluation is findings-based covering grammar, semantic accuracy, accessible names, and Commons terminology"
+  ],
+  "tradeoffs": [
+    "Reviewer limitations: Automated model-assisted evaluation cannot replace comprehensive native speaker intuition",
+    "Native human polish is not established by this model-assisted review step alone"
+  ],
+  "risks": [],
+  "proposed_tests": [
+    "Verify es and fr candidate page rendering and locale persistence in browser lifecycle tests",
+    "Execute manual keyboard and screen-reader accessibility validation for es and fr candidate pages"
+  ],
+  "changed_paths": [],
+  "patch": "",
+  "contrast_observations": [],
+  "confidence": "high"
+}
+```
+```json
+{
+  "approach_id": "post-fix-language-review-es-fr",
+  "approach_summary": "PASS: Independent post-fix language review of Commonworld Spanish (es) and French (fr) for reviewed head f331ba57a18c94242231d6545bc7e31ead6af0fe and pack digest df6b6e0dce8bcc43f3d715e9ecead479b43587ad716420115e4c2523828d6b8d. Conducted under review_class=independent_model_assisted_post_fix with claims_native_or_human_review=false. Verified post-fix translations across es and fr candidate surfaces; no blocking findings remain.",
+  "assumptions": [
+    "Verified base HEAD f331ba57a18c94242231d6545bc7e31ead6af0fe",
+    "Verified assets/locales/wave1-locales.json SHA-256 digest df6b6e0dce8bcc43f3d715e9ecead479b43587ad716420115e4c2523828d6b8d"
+  ],
+  "design_invariants": [
+    "Review execution is strictly read-only with zero modifications to source files",
+    "Review is independent-of-writer and performed as an automated inspection model",
+    "Evaluation is digest-bound to SHA-256 df6b6e0dce8bcc43f3d715e9ecead479b43587ad716420115e4c2523828d6b8d",
+    "Evaluation is findings-based covering grammar, semantic accuracy, accessible names, and Commons terminology"
+  ],
+  "tradeoffs": [
+    "Reviewer limitations: Automated model-assisted evaluation cannot replace comprehensive native speaker intuition",
+    "Native human polish is not established by this model-assisted review step alone"
+  ],
+  "risks": [],
+  "proposed_tests": [
+    "Verify es and fr candidate page rendering and locale persistence in browser lifecycle tests",
+    "Execute manual keyboard and screen-reader accessibility validation for es and fr candidate pages"
+  ],
+  "changed_paths": [],
+  "patch": "",
+  "contrast_observations": [],
+  "confidence": "high"
+}
+```
+```json
+{
+  "approach_id": "post-fix-language-review-es-fr",
+  "approach_summary": "PASS: Independent post-fix language review of Commonworld Spanish (es) and French (fr) for reviewed head f331ba57a18c94242231d6545bc7e31ead6af0fe and pack digest df6b6e0dce8bcc43f3d715e9ecead479b43587ad716420115e4c2523828d6b8d. Conducted under review_class=independent_model_assisted_post_fix with claims_native_or_human_review=false. Verified post-fix translations across es and fr candidate surfaces; no blocking findings remain.",
+  "assumptions": [
+    "Verified base HEAD f331ba57a18c94242231d6545bc7e31ead6af0fe",
+    "Verified assets/locales/wave1-locales.json SHA-256 digest df6b6e0dce8bcc43f3d715e9ecead479b43587ad716420115e4c2523828d6b8d"
+  ],
+  "design_invariants": [
+    "Review execution is strictly read-only with zero modifications to source files",
+    "Review is independent-of-writer and performed as an automated inspection model",
+    "Evaluation is digest-bound to SHA-256 df6b6e0dce8bcc43f3d715e9ecead479b43587ad716420115e4c2523828d6b8d",
+    "Evaluation is findings-based covering grammar, semantic accuracy, accessible names, and Commons terminology"
+  ],
+  "tradeoffs": [
+    "Reviewer limitations: Automated model-assisted evaluation cannot replace comprehensive native speaker intuition",
+    "Native human polish is not established by this model-assisted review step alone"
+  ],
+  "risks": [],
+  "proposed_tests": [
+    "Verify es and fr candidate page rendering and locale persistence in browser lifecycle tests",
+    "Execute manual keyboard and screen-reader accessibility validation for es and fr candidate pages"
+  ],
+  "changed_paths": [],
+  "patch": "",
+  "contrast_observations": [],
+  "confidence": "high"
+}
+```
+```json
+{
+  "approach_id": "post-fix-language-review-es-fr",
+  "approach_summary": "PASS: Independent post-fix language review of Commonworld Spanish (es) and French (fr) for reviewed head f331ba57a18c94242231d6545bc7e31ead6af0fe and pack digest df6b6e0dce8bcc43f3d715e9ecead479b43587ad716420115e4c2523828d6b8d. Conducted under review_class=independent_model_assisted_post_fix with claims_native_or_human_review=false. Verified post-fix translations across es and fr candidate surfaces; no blocking findings remain.",
+  "assumptions": [
+    "Verified base HEAD f331ba57a18c94242231d6545bc7e31ead6af0fe",
+    "Verified assets/locales/wave1-locales.json SHA-256 digest df6b6e0dce8bcc43f3d715e9ecead479b43587ad716420115e4c2523828d6b8d"
+  ],
+  "design_invariants": [
+    "Review execution is strictly read-only with zero modifications to source files",
+    "Review is independent-of-writer and performed as an automated inspection model",
+    "Evaluation is digest-bound to SHA-256 df6b6e0dce8bcc43f3d715e9ecead479b43587ad716420115e4c2523828d6b8d",
+    "Evaluation is findings-based covering grammar, semantic accuracy, accessible names, and Commons terminology"
+  ],
+  "tradeoffs": [
+    "Reviewer limitations: Automated model-assisted evaluation cannot replace comprehensive native speaker intuition",
+    "Native human polish is not established by this model-assisted review step alone"
+  ],
+  "risks": [],
+  "proposed_tests": [
+    "Verify es and fr candidate page rendering and locale persistence in browser lifecycle tests",
+    "Execute manual keyboard and screen-reader accessibility validation for es and fr candidate pages"
+  ],
+  "changed_paths": [],
+  "patch": "",
+  "contrast_observations": [],
+  "confidence": "high"
+}
+```

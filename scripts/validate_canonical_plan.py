@@ -210,6 +210,8 @@ EXPECTED_SCRIPT_FILES = {
     "validate_digital_sphere_real_surface.py",
     "validate_layered_digital_sphere_proof.py",
     "validate_locale_release.py",
+    "generate_locale_release_evidence.py",
+    "locale_review_evidence.py",
     "validate_semantic_zoom.py",
     "validate_visual_semantics.py",
 }
@@ -284,7 +286,7 @@ EXPECTED_BROWSER_SMOKE_PLAN = (
         True,
     ),
     (
-        "locale-candidate-browser-smoke",
+        "locale-lifecycle-browser-smoke",
         ("node", "scripts/smoke_locale_candidates_browser.mjs"),
         False,
     ),

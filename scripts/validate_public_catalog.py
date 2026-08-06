@@ -141,9 +141,12 @@ def validate_public_catalog(root: Path = ROOT) -> list[str]:
     except (json.JSONDecodeError, OSError, SummarySpecificityContractError) as error:
         return [f"public catalog control file is invalid: {error}"]
 
+    from scripts.catalog_summary_specificity import published_content_languages
+
+    content_languages = published_content_languages(summary_specificity_contract)
     errors.extend(
         validate_summary_specificity_contract(
-            summary_specificity_contract, SUPPORTED_LOCALES
+            summary_specificity_contract, content_languages
         )
     )
     canonical_summary_locale = summary_specificity_contract.get("canonical_locale")
@@ -416,10 +419,25 @@ def validate_public_catalog(root: Path = ROOT) -> list[str]:
             continue
         localized_records_by_locale[locale] = localized
 
-    for locale, localized_records in localized_records_by_locale.items():
+    # Specificity binds catalogue content languages, not every UI surface language.
+    # Wave-1 UI locales keep English content overlays and must not invent parallel
+    # summary policies for es/fr/pt-BR/ar.
+    content_checked: set[str] = set()
+    for ui_locale, localized_records in localized_records_by_locale.items():
         for record in localized_records:
+            content_locale = record.get("_content_locale")
+            if not isinstance(content_locale, str) or not content_locale:
+                content_locale = ui_locale if ui_locale in content_languages else (
+                    "en" if ui_locale != summary_locale else summary_locale
+                )
+            if content_locale not in content_languages:
+                continue
+            check_key = f"{content_locale}:{record.get('id')}"
+            if check_key in content_checked:
+                continue
+            content_checked.add(check_key)
             errors.extend(
-                specificity_errors(record, locale, summary_specificity_contract)
+                specificity_errors(record, content_locale, summary_specificity_contract)
             )
 
     projections = []

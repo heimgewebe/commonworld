@@ -81,13 +81,25 @@ A candidate locale becomes released and selectable only when all of the followin
 - keyboard and screen-reader paths have been checked;
 - browser smoke tests prove language choice, persistence and query/fragment preservation;
 - right-to-left locales additionally pass directional layout and mixed-script review;
-- machine translation, when used as a draft, has received human editorial review.
+- machine-only raw translation remains forbidden;
+- independent language review has passed; this review may be model-assisted only when it is labeled as such, kept independent of the writer, digest-bound, findings-based and followed by a fail-closed post-fix review;
+- native or human polish may remain an explicit follow-up and must not be claimed by model-assisted review alone.
 
 A language is therefore either released, a hidden technical candidate, or planned. There is no publicly selectable “mostly translated” state. Promotion of every non-baseline locale requires a revision- and SHA-256-bound release-evidence artifact with independent receipts; candidate evidence alone can never satisfy that gate.
 
 ## Alternative path
 
 A growth-first strategy would expose machine-translated languages quickly and correct them later. That may increase nominal reach, but it shifts errors into safety-relevant proposal guidance, accessibility labels and Commons descriptions. Commonworld instead optimizes for trustworthy inclusion: fewer released languages initially, an open BCP 47 content model, and evidence-bound promotion.
+
+## Catalogue content languages
+
+Catalogue summaries keep their own content language. Interface locales do not invent parallel summary-specificity policies. Today published catalogue content languages are predominantly German and English. Wave-1 UI surfaces therefore present English catalogue content with explicit `lang` boundaries rather than rewritten local catalogue prose.
+
+## Review classes
+
+- Machine-generated raw translation is never a release gate pass.
+- Independent model-assisted editorial review is allowed only when explicitly labeled, separated from the writer, bound to the pack digest, findings-based, and closed by a post-fix review that can still fail.
+- This process never claims native or human approval by itself.
 
 ## Consequences
 
