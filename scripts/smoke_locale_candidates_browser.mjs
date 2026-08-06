@@ -15,15 +15,27 @@ const MIME = new Map([
   ['.png', 'image/png'],
   ['.pbf', 'application/x-protobuf'],
 ]);
-const CANDIDATES = Object.freeze([
-  { locale: 'es', direction: 'ltr', pages: ['es.html', 'method.es.html', 'propose.es.html'] },
-  { locale: 'fr', direction: 'ltr', pages: ['fr.html', 'method.fr.html', 'propose.fr.html'] },
-  { locale: 'pt-BR', direction: 'ltr', pages: ['pt-BR.html', 'method.pt-BR.html', 'propose.pt-BR.html'] },
-  { locale: 'ar', direction: 'rtl', pages: ['ar.html', 'method.ar.html', 'propose.ar.html'] },
-]);
-const CANDIDATE_SOURCE = JSON.parse(
+const LOCALE_RELEASE_CONTRACT = JSON.parse(
+  await readFile(path.join(ROOT, 'docs/architecture/locale-release.contract.json'), 'utf8'),
+);
+const WAVE1_SOURCE = JSON.parse(
   await readFile(path.join(ROOT, 'assets/locales/wave1-locales.json'), 'utf8'),
 );
+const WAVE1_LOCALES = Object.freeze(
+  (LOCALE_RELEASE_CONTRACT.rollout?.wave_1 ?? []).map((locale) => {
+    const entry = LOCALE_RELEASE_CONTRACT.locale_registry?.[locale] ?? {};
+    const surfaces = entry.surface_files ?? {};
+    return {
+      locale,
+      status: entry.status ?? 'candidate',
+      direction: entry.direction ?? 'ltr',
+      pages: [surfaces.index, surfaces.method, surfaces.proposal].filter(Boolean),
+    };
+  }),
+);
+// Backward-compatible alias while callers migrate from candidate-only naming.
+const CANDIDATES = WAVE1_LOCALES;
+const CANDIDATE_SOURCE = WAVE1_SOURCE;
 
 function assert(condition, message) {
   if (!condition) throw new Error(message);
@@ -61,7 +73,7 @@ await new Promise((resolve, reject) => {
   server.listen(0, '127.0.0.1', resolve);
 });
 const address = server.address();
-if (!address || typeof address === 'string') throw new Error('locale candidate smoke server has no TCP address');
+if (!address || typeof address === 'string') throw new Error('locale lifecycle smoke server has no TCP address');
 const baseUrl = `http://127.0.0.1:${address.port}`;
 const executablePath = process.env.PLAYWRIGHT_CHROMIUM_EXECUTABLE_PATH || undefined;
 const browser = await chromium.launch({
@@ -71,6 +83,12 @@ const browser = await chromium.launch({
 });
 const results = [];
 const releasedIsolation = [];
+const claims = Object.freeze({
+  full_wcag_conformance: false,
+  manual_screen_reader_acceptance: false,
+  native_language_approval: false,
+  scope: 'automated lifecycle smoke for Wave-1 locales: state preservation, keyboard focus paths, accessible names, RTL overflow/direction, mixed-script boundaries',
+});
 
 try {
   for (const pageName of ['index.html', 'de.html']) {
@@ -88,12 +106,12 @@ try {
     assert(response?.status() === 200, `${pageName}: HTTP ${response?.status()}`);
     await page.waitForSelector('html.runtime-ready', { timeout: 30_000 });
     assert(pageErrors.length === 0, `${pageName}: page errors: ${pageErrors.join(' | ')}`);
-    assert(candidatePackRequests.length === 0, `${pageName}: loaded hidden Wave-1 candidate pack: ${candidatePackRequests.join(' | ')}`);
-    releasedIsolation.push({ page: pageName, candidatePackRequests: 0, verdict: 'PASS' });
+    assert(candidatePackRequests.length === 0, `${pageName}: loaded Wave-1 pack on baseline released surface: ${candidatePackRequests.join(' | ')}`);
+    releasedIsolation.push({ page: pageName, wave1PackRequests: 0, verdict: 'PASS' });
     await context.close();
   }
 
-  for (const candidate of CANDIDATES) {
+  for (const candidate of WAVE1_LOCALES) {
     for (const pageName of candidate.pages) {
       const context = await browser.newContext({ viewport: { width: 1024, height: 768 }, reducedMotion: 'reduce' });
       const page = await context.newPage();
@@ -134,8 +152,8 @@ try {
       let proposalIssueBody = '';
       if (pageName.startsWith('propose.')) {
         proposalDigitalLabel = ((await page.locator('#commons-proposal-form [name="presence_digital"]').locator('xpath=ancestor::label[1]//span').textContent()) ?? '').trim();
-        assert(proposalDigitalLabel === CANDIDATE_SOURCE.locales[candidate.locale].static.digital, `${pageName}: candidate Digital option is not localized: ${proposalDigitalLabel}`);
-        const expectedRuntimeError = CANDIDATE_SOURCE.locales[candidate.locale].proposal_runtime['Automated submission blocked.'];
+        assert(proposalDigitalLabel === WAVE1_SOURCE.locales[candidate.locale].static.digital, `${pageName}: candidate Digital option is not localized: ${proposalDigitalLabel}`);
+        const expectedRuntimeError = WAVE1_SOURCE.locales[candidate.locale].proposal_runtime['Automated submission blocked.'];
         await page.locator('input[name=website_confirm]').fill('bot');
         await page.locator('#commons-proposal-form').evaluate((form) => form.requestSubmit());
         await page.waitForSelector('#proposal-errors:not([hidden])');
@@ -164,7 +182,7 @@ try {
           }, new Date('2026-08-02T00:00:00Z'));
           return proposalModule.buildIssueBody(proposal);
         });
-        const expectedName = CANDIDATE_SOURCE.locales[candidate.locale].proposal_runtime.Name;
+        const expectedName = WAVE1_SOURCE.locales[candidate.locale].proposal_runtime.Name;
         assert(proposalIssueBody.includes(`**${expectedName}:**`), `${pageName}: localized Name label missing from issue body: ${proposalIssueBody}`);
         assert(proposalIssueBody.includes(proposalDigitalLabel), `${pageName}: localized Digital value missing from issue body: ${proposalIssueBody}`);
         assert(!proposalIssueBody.includes('**Name:**'), `${pageName}: hardcoded English Name leaked into issue body`);
@@ -411,6 +429,12 @@ try {
         bannerVisible: Boolean(document.querySelector('.locale-candidate-banner')?.getClientRects().length),
         candidateMarker: document.body.dataset.localeCandidate ?? '',
         bodyText: document.body.textContent ?? '',
+        allChoices: [...document.querySelectorAll('[data-locale-choice]')]
+          .map((node) => node.getAttribute('data-locale-choice'))
+          .filter(Boolean),
+        candidateStatusChoices: [...document.querySelectorAll('[data-locale-status="candidate"][data-locale-choice]')]
+          .map((node) => node.getAttribute('data-locale-choice'))
+          .filter(Boolean),
         candidateChoices: [...document.querySelectorAll('[data-locale-choice]')]
           .map((node) => node.getAttribute('data-locale-choice'))
           .filter((value) => ['es', 'fr', 'pt-BR', 'ar'].includes(value)),
@@ -434,25 +458,35 @@ try {
       }));
       assert(state.lang === candidate.locale, `${pageName}: lang drifted to ${state.lang}`);
       assert(state.dir === candidate.direction, `${pageName}: dir drifted to ${state.dir}`);
-      assert(state.robots === 'noindex,nofollow', `${pageName}: candidate robots contract missing`);
-      assert(state.description.trim().length > 0, `${pageName}: candidate description metadata is malformed`);
-      assert(state.titleCount === 1 && state.documentTitle.trim().length > 0, `${pageName}: candidate title metadata is malformed`);
-      assert(state.iconHref.includes('commonworld-mark.svg'), `${pageName}: candidate head swallowed the icon link`);
-      assert(state.bannerVisible, `${pageName}: candidate banner is not visible`);
-      assert(state.candidateMarker === candidate.locale, `${pageName}: candidate body marker drifted: ${state.candidateMarker}`);
+      const isCandidate = candidate.status === 'candidate';
+      if (isCandidate) {
+        assert(state.robots === 'noindex,nofollow', `${pageName}: candidate robots contract missing`);
+        assert(state.bannerVisible, `${pageName}: candidate banner is not visible`);
+        assert(state.candidateMarker === candidate.locale, `${pageName}: candidate body marker drifted: ${state.candidateMarker}`);
+      } else {
+        // Released lifecycle: no preview markers; language and direction remain authoritative.
+        assert(state.robots !== 'noindex,nofollow', `${pageName}: released surface must not keep candidate noindex`);
+        assert(!state.bannerVisible, `${pageName}: released surface must not show candidate banner`);
+        assert(state.candidateMarker === '', `${pageName}: released surface must not keep data-locale-candidate`);
+      }
+      assert(state.description.trim().length > 0, `${pageName}: description metadata is malformed`);
+      assert(state.titleCount === 1 && state.documentTitle.trim().length > 0, `${pageName}: title metadata is malformed`);
+      assert(state.iconHref.includes('commonworld-mark.svg'), `${pageName}: head swallowed the icon link`);
       for (const layout of shellLayouts) {
-        assert(layout.candidateMarker === candidate.locale, `${pageName}: shell candidate marker drifted at ${layout.viewportWidth}x${layout.viewportHeight}`);
-        assert(layout.bannerHit, `${pageName}: candidate banner is occluded at ${layout.viewportWidth}x${layout.viewportHeight}`);
-        assert(layout.topbarTop + 1 >= layout.bannerBottom, `${pageName}: topbar overlaps candidate banner at ${layout.viewportWidth}x${layout.viewportHeight}: ${JSON.stringify(layout)}`);
+        if (isCandidate) {
+          assert(layout.candidateMarker === candidate.locale, `${pageName}: shell candidate marker drifted at ${layout.viewportWidth}x${layout.viewportHeight}`);
+          assert(layout.bannerHit, `${pageName}: candidate banner is occluded at ${layout.viewportWidth}x${layout.viewportHeight}`);
+          assert(layout.topbarTop + 1 >= layout.bannerBottom, `${pageName}: topbar overlaps candidate banner at ${layout.viewportWidth}x${layout.viewportHeight}: ${JSON.stringify(layout)}`);
+        }
         assert(layout.stageBottom <= layout.viewportHeight + 1 && layout.stageBottom >= layout.viewportHeight - 1, `${pageName}: stage is clipped or undersized at ${layout.viewportWidth}x${layout.viewportHeight}: ${JSON.stringify(layout)}`);
         assert(layout.bottomControlBottom <= layout.viewportHeight + 1, `${pageName}: bottom controls leave the viewport at ${layout.viewportWidth}x${layout.viewportHeight}: ${JSON.stringify(layout)}`);
-        assert(layout.documentHeight <= layout.viewportHeight + 1, `${pageName}: candidate shell exceeds the viewport at ${layout.viewportWidth}x${layout.viewportHeight}: ${JSON.stringify(layout)}`);
+        assert(layout.documentHeight <= layout.viewportHeight + 1, `${pageName}: shell exceeds the viewport at ${layout.viewportWidth}x${layout.viewportHeight}: ${JSON.stringify(layout)}`);
       }
       const proposalSurface = pageName === `propose.${candidate.locale}.html`;
       if (proposalSurface) {
         assert(state.effectiveLanguage === '', `${pageName}: redundant effective-language status is still present: ${state.effectiveLanguage}`);
       } else {
-        assert(state.effectiveLanguage === CANDIDATE_SOURCE.locales[candidate.locale].static.effective_language, `${pageName}: effective-language status drifted: ${state.effectiveLanguage}`);
+        assert(state.effectiveLanguage === WAVE1_SOURCE.locales[candidate.locale].static.effective_language, `${pageName}: effective-language status drifted: ${state.effectiveLanguage}`);
       }
       if (pageName === `${candidate.locale}.html`) {
         const catalogLanguageOptions = state.languageOptions.filter(({ value }) => value !== 'unknown');
@@ -482,7 +516,7 @@ try {
         }
       }
       if (pageName === `${candidate.locale}.html`) {
-        const connector = CANDIDATE_SOURCE.locales[candidate.locale].ui.semantic_breadcrumb_connector;
+        const connector = WAVE1_SOURCE.locales[candidate.locale].ui.semantic_breadcrumb_connector;
         assert(state.brandHref === `./${candidate.locale}.html`, `${pageName}: brand reset leaves the candidate surface: ${state.brandHref}`);
         assert(state.semanticBreadcrumb.includes(` ${connector} `), `${pageName}: semantic breadcrumb connector drifted: ${state.semanticBreadcrumb}`);
         assert(!state.semanticBreadcrumb.includes(' nach '), `${pageName}: German semantic breadcrumb connector leaked: ${state.semanticBreadcrumb}`);
@@ -490,11 +524,23 @@ try {
       const missingMarkers = state.bodyText.match(/\[missing:[^\]]+\]/gu) ?? [];
       assert(missingMarkers.length === 0, `${pageName}: missing translation marker rendered: ${missingMarkers.slice(0, 8).join(' | ')}`);
       if (proposalSurface) {
-        assert(state.candidateChoices.length === 0, `${pageName}: redundant candidate locale choices are still present`);
-        assert(state.releasedChoices.length === 0, `${pageName}: redundant released locale choices are still present`);
+        assert(state.candidateChoices.length === 0, `${pageName}: redundant Wave-1 locale choices are still present on proposal`);
+        assert(state.releasedChoices.length === 0, `${pageName}: redundant released locale choices are still present on proposal`);
       } else {
-        assert(JSON.stringify([...new Set(state.candidateChoices)].sort()) === JSON.stringify(['ar', 'es', 'fr', 'pt-BR']), `${pageName}: candidate locale choices drifted`);
-        assert(JSON.stringify([...new Set(state.releasedChoices)].sort()) === JSON.stringify(['de', 'en']), `${pageName}: released locale choices drifted`);
+        const wave1Choices = [...new Set(state.candidateChoices)].sort();
+        const releasedChoices = [...new Set(state.releasedChoices)].sort();
+        if (isCandidate) {
+          // Candidate previews expose Wave-1 links as technical previews, not public selection.
+          assert(JSON.stringify(wave1Choices) === JSON.stringify(['ar', 'es', 'fr', 'pt-BR']), `${pageName}: Wave-1 locale choices drifted`);
+          assert(JSON.stringify(releasedChoices) === JSON.stringify(['de', 'en']), `${pageName}: released locale choices drifted`);
+        } else {
+          // After promotion, Wave-1 languages join released selection without preview status.
+          const allChoices = [...new Set(state.allChoices)].sort();
+          assert(allChoices.includes(candidate.locale), `${pageName}: released surface lacks self language link`);
+          assert(allChoices.includes('en') && allChoices.includes('de'), `${pageName}: released baseline language links missing`);
+          assert(state.candidateStatusChoices.length === 0, `${pageName}: released language choices still carry candidate status`);
+          assert(!state.bannerVisible && state.candidateMarker === '', `${pageName}: released surface still looks like a candidate preview`);
+        }
       }
       assert(state.documentWidth <= state.viewportWidth + 1, `${pageName}: horizontal overflow ${state.documentWidth}/${state.viewportWidth}`);
       if (pageName === `${candidate.locale}.html`) {
@@ -528,7 +574,7 @@ try {
         assert(runtimeCatalogBoundary.ribbonNameDirs.every((direction) => direction === 'ltr'), `${pageName}: digital ribbon titles lack dir=ltr boundaries`);
         if (candidate.direction === 'rtl') assert(runtimeCatalogBoundary.sphereAccessibleText.includes('، '), `${pageName}: accessible ring list lacks Arabic separator`);
         assert(runtimeCatalogBoundary?.ribbonLabelsBound && runtimeCatalogBoundary?.ribbonTitleLabelsEnglish, `${pageName}: digital ribbon accessible labels do not preserve mixed-language boundaries`);
-        const candidatePack = CANDIDATE_SOURCE.locales[candidate.locale];
+        const candidatePack = WAVE1_SOURCE.locales[candidate.locale];
         const localizedExactCount = (count) => candidatePack.ui.commons_count.replace('{count}', String(count));
         const expectedExactCount = localizedExactCount(1);
         assert(runtimeCatalogBoundary?.exactDiscoveryCount === expectedExactCount, `${pageName}: exact discovery count is not localized: ${runtimeCatalogBoundary?.exactDiscoveryCount}`);
@@ -568,11 +614,27 @@ try {
       assert(pageErrors.length === 0, `${pageName}: page errors: ${pageErrors.join(' | ')}`);
       assert(failedResponses.length === 0, `${pageName}: failed resources: ${failedResponses.join(' | ')}`);
       assert(consoleErrors.length === 0, `${pageName}: console errors: ${consoleErrors.join(' | ')}`);
-      results.push({ page: pageName, locale: candidate.locale, direction: candidate.direction, proposalRuntimeLocalized: pageName.startsWith('propose.'), proposalDigitalLabel, proposalIssueBodyLocalized: Boolean(proposalIssueBody), verdict: 'PASS' });
+      results.push({
+        page: pageName,
+        locale: candidate.locale,
+        status: candidate.status,
+        direction: candidate.direction,
+        proposalRuntimeLocalized: pageName.startsWith('propose.'),
+        proposalDigitalLabel,
+        proposalIssueBodyLocalized: Boolean(proposalIssueBody),
+        verdict: 'PASS',
+      });
       await context.close();
     }
   }
-  console.log(JSON.stringify({ verdict: 'PASS', pages: results.length, releasedIsolation, results }, null, 2));
+  console.log(JSON.stringify({
+    kind: 'commonworld.locale_lifecycle_browser_smoke',
+    verdict: 'PASS',
+    pages: results.length,
+    claims,
+    releasedIsolation,
+    results,
+  }, null, 2));
 } finally {
   await browser.close();
   await new Promise((resolve) => server.close(resolve));

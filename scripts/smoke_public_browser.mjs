@@ -3663,7 +3663,7 @@ async function germanLocaleScenario() {
   const localeChoices = await run.page.locator('#settings-panel [data-locale-choice]').evaluateAll((nodes) => nodes.map((node) => node.dataset.localeChoice));
   assert(JSON.stringify(localeChoices) === JSON.stringify(['auto', 'en', 'de', 'es', 'fr', 'pt-BR', 'ar']), `German locale: settings do not expose all interface languages (${JSON.stringify(localeChoices)})`);
   const previewLabels = await run.page.locator('#settings-panel [data-locale-status="candidate"] .language-choice-status').allTextContents();
-  assert(JSON.stringify(previewLabels) === JSON.stringify(['Vorschau', 'Vorschau', 'Vorschau', 'Vorschau']), `German locale: preview languages are not labelled consistently (${JSON.stringify(previewLabels)})`);
+  assert(previewLabels.length === 0, `German locale: released languages still carry preview labels (${JSON.stringify(previewLabels)})`);
   const languageGridOverflow = await run.page.locator('#settings-panel .language-choice-grid').evaluate((node) => node.scrollWidth - node.clientWidth);
   assert(languageGridOverflow <= 1, `German locale: language grid overflows by ${languageGridOverflow}px`);
   await run.page.locator('#settings-close').click();
@@ -3682,12 +3682,12 @@ async function localePreferenceScenario() {
   process.stdout.write(`${JSON.stringify({ state: 'RUNNING', scenario: 'locale-preference' })}\n`);
   const automatic = await newPage({ languages: ['fr-FR', 'de-DE', 'en-GB'] });
   await automatic.page.goto(`${baseUrl}/?project=debian#text-view`, { waitUntil: 'domcontentloaded' });
-  await automatic.page.waitForURL((url) => url.pathname.endsWith('/de.html') && url.searchParams.get('ui_lang') === 'auto');
+  await automatic.page.waitForURL((url) => url.pathname.endsWith('/fr.html') && url.searchParams.get('ui_lang') === 'auto');
   await automatic.page.waitForSelector('html.runtime-ready');
   const automaticUrl = new URL(automatic.page.url());
   assert(automaticUrl.searchParams.get('project') === 'debian', 'locale preference: automatic redirect lost project state');
   assert(automaticUrl.hash === '#text-view', 'locale preference: automatic redirect lost fragment state');
-  assert((await automatic.page.locator('html').getAttribute('lang')) === 'de', 'locale preference: ordered browser languages did not choose German');
+  assert((await automatic.page.locator('html').getAttribute('lang')) === 'fr', 'locale preference: ordered browser languages did not choose released French');
   assert(await automatic.page.locator('[data-locale-choice="auto"][aria-current="page"]').count() === 1, 'locale preference: automatic control is not current');
   assert(await automatic.page.evaluate(() => localStorage.getItem('commonworld.ui-locale')) === 'auto', 'locale preference: automatic choice was not persisted');
   assert(automatic.consoleErrors.length === 0, `locale preference automatic: console errors: ${automatic.consoleErrors.join(' | ')}`);
@@ -3714,23 +3714,23 @@ async function localePreferenceScenario() {
   assert(explicit.pageErrors.length === 0, `locale preference manual: page errors: ${explicit.pageErrors.join(' | ')}`);
   await explicit.context.close();
 
-  const preview = await newPage({ languages: ['de-DE'] });
-  await preview.page.goto(`${baseUrl}/de.html`, { waitUntil: 'domcontentloaded' });
-  await preview.page.waitForSelector('html.runtime-ready');
-  await preview.page.locator('#settings-toggle').click();
-  await preview.page.locator('#settings-panel:not([hidden])').waitFor();
-  await preview.page.locator('#settings-panel [data-locale-choice="fr"]').click();
-  await preview.page.waitForURL((url) => url.pathname.endsWith('/fr.html') && url.searchParams.get('ui_lang') === 'fr');
-  await preview.page.waitForSelector('html.runtime-ready');
-  assert((await preview.page.locator('html').getAttribute('lang')) === 'fr', 'locale preference preview: French preview surface was not selected');
-  assert(await preview.page.locator('.locale-candidate-banner[lang="fr"]').count() === 1, 'locale preference preview: candidate notice is missing');
-  assert(await preview.page.locator('[data-locale-choice="fr"][aria-current="page"]').count() === 1, 'locale preference preview: French choice is not current');
-  assert(await preview.page.evaluate(() => localStorage.getItem('commonworld.ui-locale')) === 'fr', 'locale preference preview: manual preview choice was not persisted');
-  assert(preview.consoleErrors.length === 0, `locale preference preview: console errors: ${preview.consoleErrors.join(' | ')}`);
-  assert(preview.pageErrors.length === 0, `locale preference preview: page errors: ${preview.pageErrors.join(' | ')}`);
-  await preview.context.close();
+  const wave1 = await newPage({ languages: ['de-DE'] });
+  await wave1.page.goto(`${baseUrl}/de.html`, { waitUntil: 'domcontentloaded' });
+  await wave1.page.waitForSelector('html.runtime-ready');
+  await wave1.page.locator('#settings-toggle').click();
+  await wave1.page.locator('#settings-panel:not([hidden])').waitFor();
+  await wave1.page.locator('#settings-panel [data-locale-choice="fr"]').click();
+  await wave1.page.waitForURL((url) => url.pathname.endsWith('/fr.html') && url.searchParams.get('ui_lang') === 'fr');
+  await wave1.page.waitForSelector('html.runtime-ready');
+  assert((await wave1.page.locator('html').getAttribute('lang')) === 'fr', 'locale preference Wave-1: French released surface was not selected');
+  assert(await wave1.page.locator('.locale-candidate-banner').count() === 0, 'locale preference Wave-1: released French still shows a candidate notice');
+  assert(await wave1.page.locator('[data-locale-choice="fr"][aria-current="page"]').count() === 1, 'locale preference Wave-1: French choice is not current');
+  assert(await wave1.page.evaluate(() => localStorage.getItem('commonworld.ui-locale')) === 'fr', 'locale preference Wave-1: manual preview choice was not persisted');
+  assert(wave1.consoleErrors.length === 0, `locale preference Wave-1: console errors: ${wave1.consoleErrors.join(' | ')}`);
+  assert(wave1.pageErrors.length === 0, `locale preference Wave-1: page errors: ${wave1.pageErrors.join(' | ')}`);
+  await wave1.context.close();
 
-  results.push({ id: 'locale-preference', verdict: 'PASS', browserOrder: true, explicitUrl: true, statePreserved: true, previewChoice: true });
+  results.push({ id: 'locale-preference', verdict: 'PASS', browserOrder: true, explicitUrl: true, statePreserved: true, releasedWave1Choice: true });
 }
 
 async function methodScenario() {

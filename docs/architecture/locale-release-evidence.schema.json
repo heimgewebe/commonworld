@@ -1,0 +1,188 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "commonworld.ui_locale_release_evidence.schema.json",
+  "title": "Commonworld UI locale release evidence",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "kind",
+    "locale",
+    "status",
+    "source_revision",
+    "source_pack_sha256",
+    "reviewed_source_pack_sha256",
+    "surface_sha256",
+    "gate_results",
+    "evidence_receipts",
+    "review_class"
+  ],
+  "properties": {
+    "schema_version": {
+      "const": 1
+    },
+    "kind": {
+      "const": "commonworld.ui_locale_release_evidence"
+    },
+    "locale": {
+      "type": "string",
+      "minLength": 2
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "pending",
+        "candidate",
+        "ready",
+        "released"
+      ]
+    },
+    "source_revision": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{40,64}$"
+    },
+    "source_pack_sha256": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{64}$"
+    },
+    "surface_sha256": {
+      "type": "object",
+      "minProperties": 1,
+      "additionalProperties": {
+        "type": "string",
+        "pattern": "^[0-9a-f]{64}$"
+      }
+    },
+    "gate_results": {
+      "type": "object",
+      "required": [
+        "required_surfaces_passed",
+        "translation_coverage_ratio",
+        "untranslated_ui_markers",
+        "missing_runtime_keys",
+        "machine_translation_only",
+        "independent_language_review_passed",
+        "keyboard_and_screen_reader_review_passed",
+        "browser_smoke_passed",
+        "state_preservation_smoke_passed",
+        "directional_layout_review",
+        "mixed_script_review"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "required_surfaces_passed": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "translation_coverage_ratio": {
+          "type": "number"
+        },
+        "untranslated_ui_markers": {
+          "type": "integer"
+        },
+        "missing_runtime_keys": {
+          "type": "integer"
+        },
+        "machine_translation_only": {
+          "type": "boolean"
+        },
+        "independent_language_review_passed": {
+          "type": "boolean"
+        },
+        "keyboard_and_screen_reader_review_passed": {
+          "type": "boolean"
+        },
+        "browser_smoke_passed": {
+          "type": "boolean"
+        },
+        "state_preservation_smoke_passed": {
+          "type": "boolean"
+        },
+        "directional_layout_review": {
+          "type": "string",
+          "enum": [
+            "passed",
+            "pending",
+            "not_required",
+            "failed"
+          ]
+        },
+        "mixed_script_review": {
+          "type": "string",
+          "enum": [
+            "passed",
+            "pending",
+            "not_required",
+            "failed"
+          ]
+        }
+      }
+    },
+    "evidence_receipts": {
+      "type": "object",
+      "additionalProperties": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "source",
+          "sha256"
+        ],
+        "properties": {
+          "source": {
+            "type": "string",
+            "minLength": 1
+          },
+          "sha256": {
+            "type": "string",
+            "pattern": "^[0-9a-f]{64}$"
+          }
+        }
+      }
+    },
+    "review_class": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "machine_translation_only",
+        "independent_of_writer",
+        "model_assisted_editorial_review",
+        "claims_native_or_human_review",
+        "digest_bound",
+        "findings_based",
+        "post_fix_review_required"
+      ],
+      "properties": {
+        "machine_translation_only": {
+          "const": false
+        },
+        "independent_of_writer": {
+          "type": "boolean"
+        },
+        "model_assisted_editorial_review": {
+          "type": "boolean"
+        },
+        "claims_native_or_human_review": {
+          "const": false
+        },
+        "digest_bound": {
+          "type": "boolean"
+        },
+        "findings_based": {
+          "type": "boolean"
+        },
+        "post_fix_review_required": {
+          "type": "boolean"
+        }
+      }
+    },
+    "notes": {
+      "type": "string"
+    },
+    "reviewed_source_pack_sha256": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{64}$"
+    }
+  }
+}

@@ -1,0 +1,63 @@
+{
+  "schema_version": 1,
+  "kind": "commonworld.ui_locale_release_evidence",
+  "locale": "fr",
+  "status": "released",
+  "source_revision": "36583887e893bb1dea9b7242c6a4737c161ffd3a",
+  "source_pack_sha256": "b65c7108bb7c2debf77dcb18ed1f70cd53da1478743e2bba7f4b11e761cc9be4",
+  "reviewed_source_pack_sha256": "316da43be8603cf0400dfa886bf244f953cd0dcb702c150f87e652fc260e9819",
+  "surface_sha256": {
+    "index": "04d55a28e26bd07396976203341f00238a9a902467d25a7ce309ba120826d97f",
+    "method": "f297aece1fcafb8b1e937cb9f632514a78b5042a31832ea107f2e9d086b4aead",
+    "proposal": "7ba8f4f677ce4afe89c5c573bc2fe2365f7e285d60a7ed788378431bc70645a2"
+  },
+  "gate_results": {
+    "required_surfaces_passed": [
+      "catalog_localization",
+      "globe",
+      "metadata_and_navigation",
+      "method",
+      "proposal",
+      "runtime_labels",
+      "text"
+    ],
+    "translation_coverage_ratio": 1.0,
+    "untranslated_ui_markers": 0,
+    "missing_runtime_keys": 0,
+    "machine_translation_only": false,
+    "independent_language_review_passed": true,
+    "keyboard_and_screen_reader_review_passed": true,
+    "browser_smoke_passed": true,
+    "state_preservation_smoke_passed": true,
+    "directional_layout_review": "not_required",
+    "mixed_script_review": "not_required"
+  },
+  "evidence_receipts": {
+    "independent_language_review": {
+      "source": "docs/evidence/locale-releases/receipts/shared/independent-language-review.json",
+      "sha256": "b9f2cbd9816adfba9a6b013da990fad782440663c1354e758588817aeecfcd4c"
+    },
+    "keyboard_and_screen_reader_review": {
+      "source": "docs/evidence/locale-releases/receipts/shared/keyboard-and-screen-reader-review.json",
+      "sha256": "3840e7bbede9bb833a4baebc314793966e6924531b58e505f13b08a961ab0f42"
+    },
+    "browser_smoke": {
+      "source": "docs/evidence/locale-releases/receipts/shared/browser-smoke.json",
+      "sha256": "c2d926de594a1f78090ef753dc36c14050e1cbdb2c3ab1178d8919753ec18679"
+    },
+    "state_preservation_smoke": {
+      "source": "docs/evidence/locale-releases/receipts/shared/state-preservation-smoke.json",
+      "sha256": "705e466554ccab30b228f07e3224131ca2af2b13efa9c5725fb897146281f68a"
+    }
+  },
+  "review_class": {
+    "machine_translation_only": false,
+    "independent_of_writer": true,
+    "model_assisted_editorial_review": true,
+    "claims_native_or_human_review": false,
+    "digest_bound": true,
+    "findings_based": true,
+    "post_fix_review_required": true
+  },
+  "notes": "Model-assisted release review; native/human approval and full WCAG conformance are not claimed."
+}

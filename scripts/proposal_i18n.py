@@ -4,7 +4,7 @@ from __future__ import annotations
 from scripts.commonworld_i18n import (
     WAVE1_LOCALES,
     _wave1_replacements,
-    _decorate_candidate_surface,
+    _decorate_surface,
     normalize_locale,
     replace_exact,
 )
@@ -124,4 +124,4 @@ def translate_proposal(markup: str, locale: str) -> str:
             _wave1_replacements(normalized, 'proposal', PROPOSAL_REPLACEMENTS_EN),
             surface=f'proposal page {normalized}',
         )
-    return _decorate_candidate_surface(translated, normalized)
+    return _decorate_surface(translated, normalized)

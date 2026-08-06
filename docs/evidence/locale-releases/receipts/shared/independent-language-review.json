@@ -1,0 +1,133 @@
+{
+  "schema_version": 2,
+  "kind": "commonworld.ui_locale_independent_language_review_receipt",
+  "status": "passed",
+  "reviewed_revision": "36583887e893bb1dea9b7242c6a4737c161ffd3a",
+  "reviewed_source_pack_sha256": "316da43be8603cf0400dfa886bf244f953cd0dcb702c150f87e652fc260e9819",
+  "locale_verdicts": {
+    "es": {
+      "status": "passed",
+      "blocking_findings": []
+    },
+    "fr": {
+      "status": "passed",
+      "blocking_findings": []
+    },
+    "pt-BR": {
+      "status": "passed",
+      "blocking_findings": []
+    },
+    "ar": {
+      "status": "passed",
+      "blocking_findings": []
+    }
+  },
+  "finding_history": {
+    "resolved": [
+      {
+        "locale": "es",
+        "severity": "major",
+        "section_key": "shell.shell_003",
+        "problem": "Inconsistent terminology: mixes 'Commons' and 'Comunes' throughout the interface. Here, 'Comunes' is used while other keys (like ui.commons_count) use 'Commons'.",
+        "exact_replacement": "<title>commonworld — Descubre Commons</title>"
+      },
+      {
+        "locale": "es",
+        "severity": "major",
+        "section_key": "shell.shell_008",
+        "problem": "Inconsistent terminology: uses 'Comunes'.",
+        "exact_replacement": ">Buscar Commons<"
+      },
+      {
+        "locale": "fr",
+        "severity": "major",
+        "section_key": "shell.shell_003",
+        "problem": "Inconsistent terminology: mixes 'Commons' and 'communs' throughout the interface. Here, 'Commons' is used while other keys (like ui.commons_count) use 'Communs'.",
+        "exact_replacement": "<title>commonworld — Découvrez les communs</title>"
+      },
+      {
+        "locale": "fr",
+        "severity": "major",
+        "section_key": "shell.shell_008",
+        "problem": "Inconsistent terminology: uses 'Commons'.",
+        "exact_replacement": ">Rechercher les communs<"
+      },
+      {
+        "locale": "fr",
+        "severity": "major",
+        "section_key": "method.method_014",
+        "problem": "Mixed terminology in a single paragraph (uses 'commun', 'Common', and 'communs').",
+        "exact_replacement": "Commonworld définit un commun comme une ressource, une infrastructure, une pratique ou un corpus de connaissances identifiable que plusieurs personnes utilisent, entretiennent ou développent ensemble. L'admission exige des preuves primaires ou proches de la source concernant une ressource partagée, une communauté, une pratique de mise en commun, des règles et des responsabilités ainsi qu'un bénéfice commun. L'open source, l'accès gratuit, le statut sans but lucratif, la décentralisation ou un grand nombre d'utilisateurs ne suffisent pas à eux seuls. Les formes restent ouvertes ; la justification est contraignante et lisible par machine dans le <a href=\"./contracts/commonworld/commons-definition.contract.json\">contrat de définition des communs</a>."
+      },
+      {
+        "locale": "ar",
+        "severity": "blocker",
+        "section_key": "static.candidate_notice",
+        "problem": "The Arabic translation contains an extraneous translator's note about needing RTL and mixed-script review ('وإلى مراجعة اتجاه RTL والنصوص المختلطة.') which was added to the public-facing string. This must be removed.",
+        "exact_replacement": "معاينة ترجمة. لم تُفعَّل هذه اللغة بعد؛ وما تزال تحتاج إلى مراجعة لغوية مستقلة."
+      }
+    ],
+    "final_findings": []
+  },
+  "final_reviews": {
+    "es-fr": {
+      "review_class": "independent_language_review",
+      "reviewed_revision": "36583887e893bb1dea9b7242c6a4737c161ffd3a",
+      "source_pack_sha256": "316da43be8603cf0400dfa886bf244f953cd0dcb702c150f87e652fc260e9819",
+      "locale_verdicts": {
+        "es": "PASS",
+        "fr": "PASS"
+      },
+      "findings": [],
+      "limitations": "Model-assisted review; does not constitute native or human approval.",
+      "confidence": "high"
+    },
+    "pt-ar": {
+      "review_class": "model_assisted_independent_language_review",
+      "reviewed_revision": "36583887e893bb1dea9b7242c6a4737c161ffd3a",
+      "source_pack_sha256": "316da43be8603cf0400dfa886bf244f953cd0dcb702c150f87e652fc260e9819",
+      "locale_verdicts": {
+        "pt-BR": "PASS",
+        "ar": "PASS"
+      },
+      "findings": [],
+      "limitations": "This is a model-assisted review. It does not constitute native or human language approval.",
+      "confidence": "high"
+    }
+  },
+  "raw_sources": [
+    {
+      "label": "initial-es-fr-findings",
+      "path": "docs/evidence/locale-reviews/raw/initial-es-fr-findings.txt",
+      "sha256": "b4959506759d0249b00f8a7c27ecf63e88f21c12debffd8c537222e0e64eda1a"
+    },
+    {
+      "label": "initial-pt-ar-findings",
+      "path": "docs/evidence/locale-reviews/raw/initial-pt-ar-findings.txt",
+      "sha256": "3bf95cd9afa9981ca354455b62f0c3a1922fd871a9f6c03ea48380d3a8469dfa"
+    },
+    {
+      "label": "final-es-fr-pass",
+      "path": "docs/evidence/locale-reviews/raw/final-es-fr-pass.txt",
+      "sha256": "9fc5115f4071d2a015cd75ffe4f8676664a71973579ab020fcc423ca83bdd7df"
+    },
+    {
+      "label": "final-pt-ar-pass",
+      "path": "docs/evidence/locale-reviews/raw/final-pt-ar-pass.txt",
+      "sha256": "caa7abec3cbd1930cb6791957fbb3885449cd57efbbc03485d6a163ee116756b"
+    }
+  ],
+  "review_class": {
+    "machine_translation_only": false,
+    "independent_of_writer": true,
+    "model_assisted_editorial_review": true,
+    "claims_native_or_human_review": false,
+    "digest_bound": true,
+    "findings_based": true,
+    "post_fix_review_required": true
+  },
+  "limitations": [
+    "No native-speaker or human approval.",
+    "No full WCAG or manual assistive-technology acceptance."
+  ]
+}

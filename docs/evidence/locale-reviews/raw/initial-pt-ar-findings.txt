@@ -1,0 +1,23 @@
+```json
+{
+  "review_class": "model_assisted_independent_language_review",
+  "reviewed_revision": "23e7d39204dd9a2373ac2ecba6396461c9b1ab13",
+  "source_pack_sha256": "c37e13d79f7234b8a1d4d74a69353eed1ebf3455f4a954db291c60a0af9aea57",
+  "locale_verdicts": {
+    "pt-BR": "PASS",
+    "ar": "FAIL"
+  },
+  "findings": [
+    {
+      "locale": "ar",
+      "severity": "blocker",
+      "section_key": "static.candidate_notice",
+      "problem": "The Arabic translation contains an extraneous translator's note about needing RTL and mixed-script review ('وإلى مراجعة اتجاه RTL والنصوص المختلطة.') which was added to the public-facing string. This must be removed.",
+      "exact_replacement": "معاينة ترجمة. لم تُفعَّل هذه اللغة بعد؛ وما تزال تحتاج إلى مراجعة لغوية مستقلة."
+    }
+  ],
+  "limitations": "This is a model-assisted review and does not constitute a native or human approval. The assessment evaluates semantic accuracy, structural integrity, and basic idiomatic correctness, but subtle cultural nuances or complex bidirectional layout edge cases in rendering may require native human validation.",
+  "confidence": "high"
+}
+```
+{"created": false, "finalization": {"created": true, "receipt": {"argv_sha256": "f7f7a43e4b5209885317589eab6e338ee5e7b8382743b32f462c184a3d3180c6", "completion_status": "complete", "contract_sha256": "1ca5fd2b0d934b6097ef1899fe333278837cdc4a138040477c7d16d721a9674c", "failure_type": null, "final_status": "succeeded", "job_id": "d72293871819", "kind": "grabowski_job_finalization", "payload_sha256": "24535f60d90ca96fa9a565ae4b2ee20f33edab6b928249be6e4950e9d2c074db", "receipt_paths": {"finalization": "/home/alex/.local/state/grabowski/jobs/grabowski-job-d72293871819/finalization.json", "metadata": "/home/alex/.local/state/grabowski/jobs/grabowski-job-d72293871819/metadata.json", "stderr": "/home/alex/.local/state/grabowski/jobs/grabowski-job-d72293871819/stderr.log", "stdout": "/home/alex/.local/state/grabowski/jobs/grabowski-job-d72293871819/stdout.log"}, "schema_version": 1, "timestamp_unix": 1785997975, "unit": "grabowski-job-d72293871819"}}, "reason": "notification_not_requested"}

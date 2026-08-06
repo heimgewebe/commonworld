@@ -1,0 +1,883 @@
+{
+  "schema_version": 1,
+  "kind": "commonworld.locale_wave1_pre_release_preparation_report",
+  "date": "2026-08-05",
+  "branch": "feat/release-wave1-locales-v2",
+  "source_pack": "assets/locales/wave1-locales.json",
+  "source_pack_sha256": "df6b6e0dce8bcc43f3d715e9ecead479b43587ad716420115e4c2523828d6b8d",
+  "independent_grok_review_task_id": "9767cb7a44094dde81004f1c",
+  "independent_grok_review_verdict": {
+    "pt-BR": "pass_with_fixes",
+    "ar": "pass_with_fixes"
+  },
+  "claims": {
+    "native_or_human_review": false,
+    "release_ready": false,
+    "released_status_changed": false,
+    "model_assisted_editorial_preparation": true,
+    "post_fix_review_still_required": true
+  },
+  "status": {
+    "es": "candidate",
+    "fr": "candidate",
+    "pt-BR": "candidate",
+    "ar": "candidate"
+  },
+  "change_count": 103,
+  "changes_by_locale": {
+    "pt-BR": 62,
+    "ar": 32,
+    "es": 6,
+    "fr": 3
+  },
+  "applied_findings": [
+    {
+      "locale": "pt-BR",
+      "section": "shell",
+      "key": "shell_101",
+      "reason": "Lenda→Legenda",
+      "before": "<summary>Lenda do mapa</summary>",
+      "after": "<summary>Legenda do mapa</summary>"
+    },
+    {
+      "locale": "pt-BR",
+      "section": "shell",
+      "key": "shell_136",
+      "reason": "zoom/imperative",
+      "before": "<strong>Globo</strong><span>Explore espacialmente e zoom</span>",
+      "after": "<strong>Globo</strong><span>Explore o espaço e amplie</span>"
+    },
+    {
+      "locale": "pt-BR",
+      "section": "shell",
+      "key": "shell_111",
+      "reason": "parent-calque + ring + Comuns",
+      "before": "Os mesmos Commons digitais aparecem como pacotes de anéis hierárquicos com seu caminho e nomes de pai direto.",
+      "after": "Os mesmos Comuns digitais aparecem como pacotes de anéis hierárquicos com o caminho hierárquico e os nomes imediatos."
+    },
+    {
+      "locale": "pt-BR",
+      "section": "proposal",
+      "key": "proposal_058",
+      "reason": "principal-proxima",
+      "before": "Pelo menos uma fonte oficial ou principal-proxima. Não mais do que cinco.",
+      "after": "Pelo menos uma fonte oficial ou primária próxima. Não mais do que cinco."
+    },
+    {
+      "locale": "pt-BR",
+      "section": "ui",
+      "key": "catalog_bootstrap_failed",
+      "reason": "bootstrap semantics",
+      "before": "O Commonworld não conseguiu ler o catálogo vinculado à construção também.",
+      "after": "O Commonworld também não conseguiu ler o catálogo vinculado a esta versão."
+    },
+    {
+      "locale": "pt-BR",
+      "section": "method",
+      "key": "method_014",
+      "reason": "commoning + Comum",
+      "before": "O Commonworld entende um Commons como um recurso, infraestrutura, prática ou corpo de conhecimento identificável que várias pessoas usam, mantêm ou desenvolvem em conjunto. A admis",
+      "after": "O Commonworld entende um Comum como um recurso, infraestrutura, prática ou corpo de conhecimento identificável que várias pessoas usam, mantêm ou desenvolvem em conjunto. A admissã"
+    },
+    {
+      "locale": "pt-BR",
+      "section": "ui",
+      "key": "type_housing_land",
+      "reason": "type unify",
+      "before": "Solo e Habitação",
+      "after": "Terra e Moradia"
+    },
+    {
+      "locale": "pt-BR",
+      "section": "shell",
+      "key": "shell_028",
+      "reason": "type unify",
+      "before": "<option value=\"housing-land\">Terreno e Habitação</option>",
+      "after": "<option value=\"housing-land\">Terra e Moradia</option>"
+    },
+    {
+      "locale": "pt-BR",
+      "section": "shell",
+      "key": "shell_029",
+      "reason": "type unify",
+      "before": "<option value=\"health-care\">Cuidados e Saúde</option>",
+      "after": "<option value=\"health-care\">Cuidado e Saúde</option>"
+    },
+    {
+      "locale": "pt-BR",
+      "section": "proposal",
+      "key": "proposal_026",
+      "reason": "type unify",
+      "before": "<option value=\"housing-land\">Terreno e Habitação</option>",
+      "after": "<option value=\"housing-land\">Terra e Moradia</option>"
+    },
+    {
+      "locale": "pt-BR",
+      "section": "proposal",
+      "key": "proposal_027",
+      "reason": "type unify",
+      "before": "<option value=\"health-care\">Saúde e Cuidado</option>",
+      "after": "<option value=\"health-care\">Cuidado e Saúde</option>"
+    },
+    {
+      "locale": "pt-BR",
+      "section": "ui",
+      "key": "visible_ring_bundles",
+      "reason": "ring term",
+      "before": "Feixes de anéis digitais: {bundles}.",
+      "after": "Pacotes de anéis digitais: {bundles}."
+    },
+    {
+      "locale": "pt-BR",
+      "section": "ui",
+      "key": "visible_ring_commons",
+      "reason": "Comuns + ring",
+      "before": "Commons visíveis nos anéis digitais: {titles}.",
+      "after": "Comuns visíveis nos anéis digitais: {titles}."
+    },
+    {
+      "locale": "pt-BR",
+      "section": "ui",
+      "key": "visible_ring_commons_empty",
+      "reason": "Comum",
+      "before": "Nenhum Commons está visível no momento nos anéis digitais.",
+      "after": "Nenhum Comum está visível no momento nos anéis digitais."
+    },
+    {
+      "locale": "pt-BR",
+      "section": "ui",
+      "key": "preview_of_commons",
+      "reason": "Comuns",
+      "before": "{shown} de {total} Commons em pré-visualização",
+      "after": "{shown} de {total} Comuns em pré-visualização"
+    },
+    {
+      "locale": "pt-BR",
+      "section": "ui",
+      "key": "spatial_summary",
+      "reason": "spatial_summary idiomatic + Comuns",
+      "before": "{count} Commons públicos com evidência espacial: {distribution}. A cobertura do catálogo não é avaliada; isso não indica densidade. Pequenos grupos ou pequenos restos filtrados de ",
+      "after": "{count} Comuns públicos com evidência espacial: {distribution}. A cobertura do catálogo não é avaliada; isso não indica densidade. Pequenos grupos ou pequenos restos filtrados de l"
+    },
+    {
+      "locale": "pt-BR",
+      "section": "ui",
+      "key": "action_volunteer",
+      "reason": "volunteer label",
+      "before": "Voluntariar-se",
+      "after": "Ser voluntário"
+    },
+    {
+      "locale": "pt-BR",
+      "section": "actions",
+      "key": "volunteer",
+      "reason": "action parity",
+      "before": "Voluntariar-se",
+      "after": "Ser voluntário"
+    },
+    {
+      "locale": "pt-BR",
+      "section": "shell",
+      "key": "shell_039",
+      "reason": "action parity shell",
+      "before": "<option value=\"volunteer\">Voluntariar-se</option>",
+      "after": "<option value=\"volunteer\">Ser voluntário</option>"
+    },
+    {
+      "locale": "pt-BR",
+      "section": "proposal",
+      "key": "proposal_047",
+      "reason": "action parity proposal",
+      "before": "<option value=\"volunteer\">Voluntariar-se</option>",
+      "after": "<option value=\"volunteer\">Ser voluntário</option>"
+    },
+    {
+      "locale": "pt-BR",
+      "section": "static",
+      "key": "digital_commons",
+      "reason": "Comuns",
+      "before": "Commons digitais",
+      "after": "Comuns digitais"
+    },
+    {
+      "locale": "pt-BR",
+      "section": "static",
+      "key": "commons",
+      "reason": "Comuns",
+      "before": "Commons",
+      "after": "Comuns"
+    },
+    {
+      "locale": "pt-BR",
+      "section": "static",
+      "key": "official_website",
+      "reason": "Site oficial casing",
+      "before": "Site Oficial",
+      "after": "Site oficial"
+    },
+    {
+      "locale": "pt-BR",
+      "section": "shell",
+      "key": "shell_002",
+      "reason": "Comuns",
+      "before": "content=\"O Commonworld torna Commons descobráveis em todo o mundo, regionalmente, localmente e digitalmente em um único globo compartilhado.\"",
+      "after": "content=\"O Commonworld torna Comuns descobráveis em todo o mundo, regionalmente, localmente e digitalmente em um único globo compartilhado.\""
+    },
+    {
+      "locale": "pt-BR",
+      "section": "shell",
+      "key": "shell_013",
+      "reason": "Comum",
+      "before": "<span class=\"proposal-label\">Sugerir um Commons</span>",
+      "after": "<span class=\"proposal-label\">Sugerir um Comum</span>"
+    },
+    {
+      "locale": "pt-BR",
+      "section": "shell",
+      "key": "shell_084",
+      "reason": "reset filters",
+      "before": ">Reiniciar filtros</button>",
+      "after": ">Redefinir filtros</button>"
+    },
+    {
+      "locale": "pt-BR",
+      "section": "shell",
+      "key": "shell_086",
+      "reason": "Comum",
+      "before": ">Nenhuma correspondência de Comuns para esta combinação de busca e filtro.</p>",
+      "after": ">Nenhum Comum corresponde a esta combinação de pesquisa e filtros.</p>"
+    },
+    {
+      "locale": "pt-BR",
+      "section": "shell",
+      "key": "shell_092",
+      "reason": "ring term",
+      "before": "aria-label=\"Abrir anéis digitais em agrupamento. Toque ou pressione Enter.\"",
+      "after": "aria-label=\"Abrir pacotes de anéis digitais. Toque ou pressione Enter.\""
+    },
+    {
+      "locale": "pt-BR",
+      "section": "shell",
+      "key": "shell_102",
+      "reason": "Comum/Comuns + zoom",
+      "before": "As cores mostram o tipo de Commons. Na visão mundial, os países são listrados proporcionalmente com as cores dos tipos de Commons ali evidenciados por referências de localização pu",
+      "after": "As cores mostram o tipo de Comum. Na visão mundial, os países são listrados proporcionalmente com as cores dos tipos de Comuns ali evidenciados por referências de localização publi"
+    },
+    {
+      "locale": "pt-BR",
+      "section": "shell",
+      "key": "shell_103",
+      "reason": "Comuns",
+      "before": "aria-label=\"Tipos de Commons e símbolos do mapa\"",
+      "after": "aria-label=\"Tipos de Comuns e símbolos do mapa\""
+    },
+    {
+      "locale": "pt-BR",
+      "section": "shell",
+      "key": "shell_104",
+      "reason": "Comuns",
+      "before": "Listras dos países: distribuição relativa de tipos de Commons documentados em cada país",
+      "after": "Listras dos países: distribuição relativa de tipos de Comuns documentados em cada país"
+    },
+    {
+      "locale": "pt-BR",
+      "section": "shell",
+      "key": "shell_109",
+      "reason": "Comuns",
+      "before": "Commons no catálogo atual.",
+      "after": "Comuns no catálogo atual."
+    },
+    {
+      "locale": "pt-BR",
+      "section": "shell",
+      "key": "shell_110",
+      "reason": "Comuns",
+      "before": "Commons digitais de perto",
+      "after": "Comuns digitais de perto"
+    },
+    {
+      "locale": "pt-BR",
+      "section": "shell",
+      "key": "shell_112",
+      "reason": "Comuns + ring",
+      "before": "aria-label=\"Pesquisar Commons e filtrar pacotes de anéis hierárquicos\"",
+      "after": "aria-label=\"Pesquisar Comuns e filtrar pacotes de anéis hierárquicos\""
+    },
+    {
+      "locale": "pt-BR",
+      "section": "shell",
+      "key": "shell_115",
+      "reason": "Comuns",
+      "before": "<p id=\"layer-current\" class=\"digital-current\" role=\"status\">Esfera dos Commons Digitais</p>",
+      "after": "<p id=\"layer-current\" class=\"digital-current\" role=\"status\">Esfera dos Comuns Digitais</p>"
+    },
+    {
+      "locale": "pt-BR",
+      "section": "shell",
+      "key": "shell_116",
+      "reason": "Comuns + ring",
+      "before": ">Pesquisar Commons nos pacotes de anéis hierárquicos</label>",
+      "after": ">Pesquisar Comuns nos pacotes de anéis hierárquicos</label>"
+    },
+    {
+      "locale": "pt-BR",
+      "section": "shell",
+      "key": "shell_117",
+      "reason": "Comuns",
+      "before": "placeholder=\"Pesquisar Commons\"",
+      "after": "placeholder=\"Pesquisar Comuns\""
+    },
+    {
+      "locale": "pt-BR",
+      "section": "shell",
+      "key": "shell_118",
+      "reason": "ring + Comuns",
+      "before": "aria-label=\"Pacotes de anéis hierárquicos digitais\"",
+      "after": "aria-label=\"Pacotes de anéis hierárquicos de Comuns digitais\""
+    },
+    {
+      "locale": "pt-BR",
+      "section": "shell",
+      "key": "shell_119",
+      "reason": "Comum",
+      "before": "Terra → macroregião → região → contexto local → Commons",
+      "after": "Terra → macroregião → região → contexto local → Comum"
+    },
+    {
+      "locale": "pt-BR",
+      "section": "shell",
+      "key": "shell_121",
+      "reason": "Comuns",
+      "before": "<h1 id=\"text-title\">Explorar Commons diretamente</h1>",
+      "after": "<h1 id=\"text-title\">Explorar Comuns diretamente</h1>"
+    },
+    {
+      "locale": "pt-BR",
+      "section": "shell",
+      "key": "shell_141",
+      "reason": "Comum",
+      "before": ">Sugerir um Commons</a>",
+      "after": ">Sugerir um Comum</a>"
+    },
+    {
+      "locale": "pt-BR",
+      "section": "method",
+      "key": "method_009",
+      "reason": "Comuns",
+      "before": "Commons com presença digital e/ou publicamente mapeável. É uma seleção editorial limitada, não uma estatística global completa.",
+      "after": "Comuns com presença digital e/ou publicamente mapeável. É uma seleção editorial limitada, não uma estatística global completa."
+    },
+    {
+      "locale": "pt-BR",
+      "section": "method",
+      "key": "method_016",
+      "reason": "Comum in method_016",
+      "before": "Candidatos públicos podem ser preparados em <a href=\"./propose.html\">Sugerir um Commons</a>. O Commonworld não armazena o formulário. O caminho preferencial de entrada é uma issue ",
+      "after": "Candidatos públicos podem ser preparados em <a href=\"./propose.html\">Sugerir um Comum</a>. O Commonworld não armazena o formulário. O caminho preferencial de entrada é uma issue pú"
+    },
+    {
+      "locale": "pt-BR",
+      "section": "method",
+      "key": "method_018",
+      "reason": "Comuns",
+      "before": "Commons digitais não recebem coordenadas de mapa inventadas. Informações geográficas podem ser exatas, aproximadas ou ocultas. Locais ocultos não têm geometria e não são reconstruí",
+      "after": "Comuns digitais não recebem coordenadas de mapa inventadas. Informações geográficas podem ser exatas, aproximadas ou ocultas. Locais ocultos não têm geometria e não são reconstruíd"
+    },
+    {
+      "locale": "pt-BR",
+      "section": "proposal",
+      "key": "proposal_002",
+      "reason": "Comum",
+      "before": "content=\"Sugerir um Commons para revisão editorial do Commonworld.\"",
+      "after": "content=\"Sugerir um Comum para revisão editorial do Commonworld.\""
+    },
+    {
+      "locale": "pt-BR",
+      "section": "proposal",
+      "key": "proposal_009",
+      "reason": "frescor→atualidade",
+      "before": "A sugestão <strong>não é publicada automaticamente</strong>. O Commonworld revisa identidade, fontes, características do Comum, formas de engajamento, precisão geográfica, privacid",
+      "after": "A sugestão <strong>não é publicada automaticamente</strong>. O Commonworld revisa identidade, fontes, características do Comum, formas de engajamento, precisão geográfica, privacid"
+    },
+    {
+      "locale": "pt-BR",
+      "section": "proposal",
+      "key": "proposal_011",
+      "reason": "release + session storage",
+      "before": "Sem GitHub, ou se a rede falhar, você pode baixar localmente um arquivo JSON validado. O Commonworld não armazena entradas do formulário em servidor. Para restaurar um rascunho ini",
+      "after": "Sem GitHub, ou se a rede falhar, você pode baixar localmente um arquivo JSON validado. O Commonworld não armazena as entradas do formulário em um servidor. Para restaurar um rascun"
+    },
+    {
+      "locale": "pt-BR",
+      "section": "proposal",
+      "key": "proposal_012",
+      "reason": "website",
+      "before": "Confirmar website",
+      "after": "Confirmar site"
+    },
+    {
+      "locale": "pt-BR",
+      "section": "proposal",
+      "key": "proposal_037",
+      "reason": "Comuns",
+      "before": "Apenas um país, região ampla ou cidade publicamente não problemática. Sem endereço nem coordenadas. Deixe este campo vazio para Commons somente digitais.",
+      "after": "Apenas um país, região ampla ou cidade publicamente não problemática. Sem endereço nem coordenadas. Deixe este campo vazio para Comuns somente digitais."
+    },
+    {
+      "locale": "pt-BR",
+      "section": "proposal_runtime",
+      "key": "Suggestion: timestamp is invalid.",
+      "reason": "timestamp calque",
+      "before": "Sugestão: timestamp é inválido.",
+      "after": "Sugestão: o carimbo de data e hora é inválido."
+    },
+    {
+      "locale": "pt-BR",
+      "section": "proposal_runtime",
+      "key": "Commons type: unknown value.",
+      "reason": "Comum",
+      "before": "Tipo de Commons: valor desconhecido.",
+      "after": "Tipo de Comum: valor desconhecido."
+    },
+    {
+      "locale": "pt-BR",
+      "section": "proposal_runtime",
+      "key": "## Public Commons suggestion",
+      "reason": "Comum",
+      "before": "## Sugestão pública de Commons",
+      "after": "## Sugestão pública de Comum"
+    },
+    {
+      "locale": "pt-BR",
+      "section": "proposal_runtime",
+      "key": "> This suggestion is an editorial candidate. It is not published automatically.",
+      "reason": "editorial candidate",
+      "before": "> Esta sugestão é um candidato a edição. Ela não é publicada automaticamente.",
+      "after": "> Esta sugestão é um candidato editorial. Ela não é publicada automaticamente."
+    },
+    {
+      "locale": "pt-BR",
+      "section": "proposal_runtime",
+      "key": "Commons type",
+      "reason": "Comum",
+      "before": "Tipo de Commons",
+      "after": "Tipo de Comum"
+    },
+    {
+      "locale": "pt-BR",
+      "section": "proposal_runtime",
+      "key": "The automatic release change was paused because the draft could not be stored safely in this tab. The form remains open.",
+      "reason": "release calque",
+      "before": "A mudança de versão automática foi pausada porque o rascunho não pode ser armazenado com segurança nesta aba. O formulário permanece aberto.",
+      "after": "A troca automática de versão foi pausada porque o rascunho não pôde ser armazenado com segurança nesta aba. O formulário permanece aberto."
+    },
+    {
+      "locale": "pt-BR",
+      "section": "proposal_runtime",
+      "key": "Draft input was restored after this tab changed release version.",
+      "reason": "input/release calque",
+      "before": "O input do rascunho foi restaurado após esta aba alterar a versão de liberação.",
+      "after": "As entradas do rascunho foram restauradas após esta aba mudar a versão."
+    },
+    {
+      "locale": "pt-BR",
+      "section": "proposal_runtime",
+      "key": "Repeated preparation is rate-limited: wait one minute or use the existing GitHub tab.",
+      "reason": "rate-limit",
+      "before": "Preparação repetida é limitada por taxa: aguarde um minuto ou use a aba existente GitHub.",
+      "after": "A preparação repetida está limitada por frequência: aguarde um minuto ou use a aba GitHub existente."
+    },
+    {
+      "locale": "pt-BR",
+      "section": "proposal_runtime",
+      "key": "No network connection detected. Download the validated JSON suggestion and submit it through GitHub later.",
+      "reason": "download phrasing",
+      "before": "Nenhuma conexão de rede detectada. Baixe a sugestão validada JSON e envie-a mais tarde através de GitHub.",
+      "after": "Nenhuma conexão de rede detectada. Baixe a sugestão JSON validada e envie-a mais tarde pelo GitHub."
+    },
+    {
+      "locale": "pt-BR",
+      "section": "proposal_runtime",
+      "key": "The GitHub tab was blocked. Use the direct link or the JSON download.",
+      "reason": "download phrasing",
+      "before": "A aba GitHub foi bloqueada. Use o link direto ou o download JSON.",
+      "after": "A aba do GitHub foi bloqueada. Use o link direto ou o download do JSON."
+    },
+    {
+      "locale": "pt-BR",
+      "section": "taxonomy",
+      "key": "health_software",
+      "reason": "health_software",
+      "before": "Saúde Pública Aberta",
+      "after": "Saúde aberta"
+    },
+    {
+      "locale": "pt-BR",
+      "section": "taxonomy",
+      "key": "provision_land_ecology",
+      "reason": "provision_land_ecology casing",
+      "before": "Provisão, Terra e Ecologia",
+      "after": "Provisão, terra e ecologia"
+    },
+    {
+      "locale": "ar",
+      "section": "themes",
+      "key": "irrigation",
+      "reason": "irrigation",
+      "before": "التغذية المائية",
+      "after": "الري"
+    },
+    {
+      "locale": "ar",
+      "section": "themes",
+      "key": "public-domain",
+      "reason": "public-domain",
+      "before": "حقوق النشر العامة",
+      "after": "الملك العام"
+    },
+    {
+      "locale": "ar",
+      "section": "themes",
+      "key": "mangroves",
+      "reason": "mangroves",
+      "before": "الشجر النباتية البحرية",
+      "after": "أشجار القرم"
+    },
+    {
+      "locale": "ar",
+      "section": "themes",
+      "key": "indigenous-knowledge",
+      "reason": "indigenous-knowledge",
+      "before": "العلم الثقافي الأصلي",
+      "after": "المعرفة الأصلية"
+    },
+    {
+      "locale": "ar",
+      "section": "themes",
+      "key": "knowledge",
+      "reason": "knowledge",
+      "before": "العلم",
+      "after": "المعرفة"
+    },
+    {
+      "locale": "ar",
+      "section": "themes",
+      "key": "open-knowledge",
+      "reason": "open-knowledge",
+      "before": "العلم المفتوح",
+      "after": "المعرفة المفتوحة"
+    },
+    {
+      "locale": "ar",
+      "section": "themes",
+      "key": "urban-gardening",
+      "reason": "urban-gardening",
+      "before": "زراعة الحديقة المدنية",
+      "after": "البستنة الحضرية"
+    },
+    {
+      "locale": "ar",
+      "section": "themes",
+      "key": "research",
+      "reason": "research",
+      "before": "بحث وتطوير",
+      "after": "البحث"
+    },
+    {
+      "locale": "ar",
+      "section": "method",
+      "key": "method_009",
+      "reason": "method_009 congruence",
+      "before": "مشاعًا ذات حضور رقمي و/أو قابل للتمثيل على خريطة عامة. وهذه عينة تحريرية محدودة وليست إحصاءً عالميًا شاملًا.",
+      "after": "مشاعًا ذا حضور رقمي و/أو قابلًا للتمثيل على خريطة عامة. وهذه عينة تحريرية محدودة وليست إحصاءً عالميًا شاملًا."
+    },
+    {
+      "locale": "ar",
+      "section": "ui",
+      "key": "action_contribute",
+      "reason": "contribute imperative",
+      "before": "مساهمة",
+      "after": "ساهم"
+    },
+    {
+      "locale": "ar",
+      "section": "actions",
+      "key": "contribute",
+      "reason": "contribute parity",
+      "before": "مساهمة",
+      "after": "ساهم"
+    },
+    {
+      "locale": "ar",
+      "section": "shell",
+      "key": "shell_038",
+      "reason": "contribute shell",
+      "before": "<option value=\"contribute\">مساهمة</option>",
+      "after": "<option value=\"contribute\">ساهم</option>"
+    },
+    {
+      "locale": "ar",
+      "section": "proposal",
+      "key": "proposal_046",
+      "reason": "contribute proposal",
+      "before": "<option value=\"contribute\">مساهمة</option>",
+      "after": "<option value=\"contribute\">ساهم</option>"
+    },
+    {
+      "locale": "ar",
+      "section": "shell",
+      "key": "shell_023",
+      "reason": "type unify",
+      "before": "<option value=\"software\">البرمجيات والمعلوماتية</option>",
+      "after": "<option value=\"software\">البرمجيات والبنية التحتية</option>"
+    },
+    {
+      "locale": "ar",
+      "section": "shell",
+      "key": "shell_027",
+      "reason": "type unify",
+      "before": "<option value=\"energy\">طاقة</option>",
+      "after": "<option value=\"energy\">الطاقة</option>"
+    },
+    {
+      "locale": "ar",
+      "section": "shell",
+      "key": "shell_032",
+      "reason": "type unify",
+      "before": "<option value=\"other\">آخر</option>",
+      "after": "<option value=\"other\">أخرى</option>"
+    },
+    {
+      "locale": "ar",
+      "section": "shell",
+      "key": "shell_048",
+      "reason": "AND→و",
+      "before": "يجب أن تتوافر جميع الخصائص المحددة معًا (AND).",
+      "after": "يجب أن تتوافر جميع الخصائص المحددة معًا (و)."
+    },
+    {
+      "locale": "ar",
+      "section": "shell",
+      "key": "shell_092",
+      "reason": "Enter→مفتاح الإدخال",
+      "before": "aria-label=\"فتح حزم الحلقات الرقمية. انقر أو اضغط Enter.\"",
+      "after": "aria-label=\"فتح حزم الحلقات الرقمية. انقر أو اضغط مفتاح الإدخال.\""
+    },
+    {
+      "locale": "ar",
+      "section": "ui",
+      "key": "selection_retained_during_filtering",
+      "reason": "filters term",
+      "before": "يظل هذا التحديد مفتوحًا أثناء تغيير البحث أو الفلاتر لبقية العرض.",
+      "after": "يظل هذا التحديد مفتوحًا أثناء تغيير البحث أو عوامل التصفية لبقية العرض."
+    },
+    {
+      "locale": "ar",
+      "section": "ui",
+      "key": "no_matching_commons",
+      "reason": "filters term",
+      "before": "لا توجد مشاعات تطابق البحث أو الفلاتر المحددة.",
+      "after": "لا توجد مشاعات تطابق البحث أو عوامل التصفية المحددة."
+    },
+    {
+      "locale": "ar",
+      "section": "shell",
+      "key": "shell_011",
+      "reason": "filters term",
+      "before": "aria-label=\"فتح نتائج البحث والفلاتر\"",
+      "after": "aria-label=\"فتح نتائج البحث وعوامل التصفية\""
+    },
+    {
+      "locale": "ar",
+      "section": "shell",
+      "key": "shell_012",
+      "reason": "filters term",
+      "before": "<span class=\"filter-toggle-label\">الفلاتر</span>",
+      "after": "<span class=\"filter-toggle-label\">عوامل التصفية</span>"
+    },
+    {
+      "locale": "ar",
+      "section": "shell",
+      "key": "shell_017",
+      "reason": "filters term",
+      "before": "aria-label=\"الفلاتر النشطة\"",
+      "after": "aria-label=\"عوامل التصفية النشطة\""
+    },
+    {
+      "locale": "ar",
+      "section": "shell",
+      "key": "shell_018",
+      "reason": "filters term",
+      "before": "<span>الفلاتر</span></button>",
+      "after": "<span>عوامل التصفية</span></button>"
+    },
+    {
+      "locale": "ar",
+      "section": "shell",
+      "key": "shell_084",
+      "reason": "filters term",
+      "before": ">إعادة تعيين الفلاتر</button>",
+      "after": ">إعادة تعيين عوامل التصفية</button>"
+    },
+    {
+      "locale": "ar",
+      "section": "shell",
+      "key": "shell_086",
+      "reason": "filters term",
+      "before": ">لا توجد مشاعات تطابق هذا البحث ومجموعة الفلاتر.</p>",
+      "after": ">لا توجد مشاعات تطابق هذا البحث ومجموعة عوامل التصفية.</p>"
+    },
+    {
+      "locale": "ar",
+      "section": "shell",
+      "key": "shell_122",
+      "reason": "filters term",
+      "before": "الهويات والفلاتر والتحديدات نفسها الموجودة على الكرة الأرضية — من دون العرض المكاني.",
+      "after": "الهويات وعوامل التصفية والتحديدات نفسها الموجودة على الكرة الأرضية — من دون العرض المكاني."
+    },
+    {
+      "locale": "ar",
+      "section": "shell",
+      "key": "shell_123",
+      "reason": "filters term",
+      "before": "<h2 id=\"text-filter-title\">الفلاتر وحزم الحلقات الرقمية</h2>",
+      "after": "<h2 id=\"text-filter-title\">عوامل التصفية وحزم الحلقات الرقمية</h2>"
+    },
+    {
+      "locale": "ar",
+      "section": "shell",
+      "key": "shell_009",
+      "reason": "find not know",
+      "before": "placeholder=\"ماذا تريد أن تفعل أو تعرفه؟\"",
+      "after": "placeholder=\"ماذا تريد أن تفعل أو تجد؟\""
+    },
+    {
+      "locale": "ar",
+      "section": "ui",
+      "key": "spatial_summary",
+      "reason": "spatial_summary idiomatic",
+      "before": "{count} من المشاعات العامة الموثقة مكانيًا: {distribution}. لم تُقيَّم تغطية الفهرس؛ ولا يدل ذلك على الكثافة. تُحجب المجموعات الصغيرة أو البقايا الصغيرة المفلترة من المواقع التقريب",
+      "after": "{count} من المشاعات العامة ذات الأدلة المكانية: {distribution}. لم تُقيَّم تغطية الفهرس؛ ولا يدل ذلك على الكثافة. تُحجب المجموعات الصغيرة أو البقايا الصغيرة بعد التصفية من المواقع "
+    },
+    {
+      "locale": "ar",
+      "section": "proposal_runtime",
+      "key": "Repeated preparation is rate-limited: wait one minute or use the existing GitHub tab.",
+      "reason": "rate-limit calque",
+      "before": "تكرار التجهيز محدود المعدل: انتظر دقيقة واحدة أو استخدم علامة تبويب GitHub الموجودة.",
+      "after": "يتقيّد تكرار التجهيز بحد زمني: انتظر دقيقة واحدة أو استخدم علامة تبويب GitHub الموجودة."
+    },
+    {
+      "locale": "ar",
+      "section": "proposal",
+      "key": "proposal_036",
+      "reason": "country naming",
+      "before": "placeholder=\"مثل أوروغواي أو تايوان أو أوتياروا نيوزيلندا\"",
+      "after": "placeholder=\"مثل أوروغواي أو تايوان أو أوتياروا/نيوزيلندا\""
+    },
+    {
+      "locale": "es",
+      "section": "ui",
+      "key": "catalog_bootstrap_failed",
+      "reason": "build→compilación",
+      "before": "Commonworld tampoco pudo leer el catálogo vinculado al build.",
+      "after": "Commonworld tampoco pudo leer el catálogo vinculado a esta compilación."
+    },
+    {
+      "locale": "es",
+      "section": "ui",
+      "key": "globe_ready",
+      "reason": "zoom→acercar",
+      "before": "Globo listo. Arrastra para rotar; pellizca o usa las teclas para hacer zoom.",
+      "after": "Globo listo. Arrastra para rotar; pellizca o usa las teclas para acercar."
+    },
+    {
+      "locale": "es",
+      "section": "shell",
+      "key": "shell_102",
+      "reason": "zoom term",
+      "before": "Los colores muestran el tipo de Commons. En la vista mundial, los países se rayan proporcionalmente con los colores de los tipos de Commons documentados allí mediante referencias d",
+      "after": "Los colores muestran el tipo de Commons. En la vista mundial, los países se rayan proporcionalmente con los colores de los tipos de Commons documentados allí mediante referencias d"
+    },
+    {
+      "locale": "es",
+      "section": "shell",
+      "key": "shell_111",
+      "reason": "parent calque",
+      "before": "Los mismos Comunes digitales aparecen como anillos empaquetados jerárquicos con su ruta directa y nombres del padre.",
+      "after": "Los mismos Comunes digitales aparecen como paquetes de anillos jerárquicos con su ruta directa y los nombres inmediatos."
+    },
+    {
+      "locale": "fr",
+      "section": "ui",
+      "key": "catalog_bootstrap_failed",
+      "reason": "build→compilation",
+      "before": "Commonworld n'a pas pu lire non plus le catalogue lié au build.",
+      "after": "Commonworld n'a pas pu lire non plus le catalogue lié à cette compilation."
+    },
+    {
+      "locale": "fr",
+      "section": "shell",
+      "key": "shell_111",
+      "reason": "parent calque",
+      "before": "Les mêmes Commons numériques apparaissent comme des groupes de boucles hiérarchiques avec leur chemin parent direct et leurs noms.",
+      "after": "Les mêmes communs numériques apparaissent comme des faisceaux d’anneaux hiérarchiques avec leur chemin direct et leurs noms immédiats."
+    },
+    {
+      "locale": "fr",
+      "section": "proposal_runtime",
+      "key": "> This suggestion is an editorial candidate. It is not published automatically.",
+      "reason": "double space",
+      "before": ">  Cette suggestion est un candidat éditorial. Elle n'est pas publiée automatiquement.",
+      "after": "> Cette suggestion est un candidat éditorial. Elle n'est pas publiée automatiquement."
+    },
+    {
+      "locale": "es",
+      "section": "method",
+      "key": "method_014",
+      "reason": "Commons grammar",
+      "before": "Commonworld entiende un Commons como un recurso, una infraestructura, una práctica o un cuerpo de conocimiento identificable que varias personas usan, mantienen o desarrollan junta",
+      "after": "Commonworld entiende un común como un recurso, una infraestructura, una práctica o un cuerpo de conocimiento identificable que varias personas usan, mantienen o desarrollan juntas."
+    },
+    {
+      "locale": "es",
+      "section": "shell",
+      "key": "shell_102",
+      "reason": "remove duplicated acercamiento calque",
+      "before": "Al acercar el acercamiento, la visualización pasa a ser regional y finalmente específica de una ubicación.",
+      "after": "Al ampliar la vista, la visualización pasa a ser regional y finalmente específica de una ubicación."
+    },
+    {
+      "locale": "pt-BR",
+      "section": "shell",
+      "key": "shell_092",
+      "reason": "explicit keyboard-key wording",
+      "before": "aria-label=\"Abrir pacotes de anéis digitais. Toque ou pressione Enter.\"",
+      "after": "aria-label=\"Abrir pacotes de anéis digitais. Toque ou pressione a tecla Enter.\""
+    }
+  ],
+  "technical_work": [
+    "Surface decoration: lang/dir for all Wave-1 surfaces; candidate-only noindex/banner/data-locale-candidate",
+    "Catalog summary specificity bound to published content languages de/en, not UI locales",
+    "Browser smoke generalized to locale lifecycle with honest non-WCAG claims",
+    "Release-evidence schema, generator and receipt source SHA-256 validation prepared; scaffolds remain pending",
+    "Governance: machine-only translation forbidden; model-assisted editorial review labeled; post-fix required"
+  ],
+  "open_blockers": [
+    "independent post-fix language review (fail-closed) after this preparation",
+    "keyboard_and_screen_reader_review receipts",
+    "browser_visual_review / lifecycle smoke evidence bound as release receipts",
+    "state_preservation_smoke release receipt",
+    "arabic directional_layout_review and mixed_script_review release receipts",
+    "no promotion to released in this wave"
+  ],
+  "does_not_establish": [
+    "native language approval",
+    "production activation",
+    "release readiness",
+    "WCAG conformance",
+    "manual screen-reader product acceptance"
+  ],
+  "base_revision": "80fae8c40587fc033b94302396d2b81b6b7b3a39",
+  "recovered_from_quarantined_worktree": "feat/release-wave1-locales-v1"
+}

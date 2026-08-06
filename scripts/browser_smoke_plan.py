@@ -32,7 +32,7 @@ CANONICAL_BROWSER_SMOKE_PLAN = (
         True,
     ),
     BrowserSmokeStep(
-        "locale-candidate-browser-smoke",
+        "locale-lifecycle-browser-smoke",
         ("node", "scripts/smoke_locale_candidates_browser.mjs"),
     ),
     BrowserSmokeStep("proposal-browser-smoke", ("node", "scripts/smoke_proposal_browser.mjs")),

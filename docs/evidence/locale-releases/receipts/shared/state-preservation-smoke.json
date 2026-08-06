@@ -1,0 +1,25 @@
+{
+  "schema_version": 1,
+  "source_revision": "36583887e893bb1dea9b7242c6a4737c161ffd3a",
+  "source_pack_sha256": "b65c7108bb7c2debf77dcb18ed1f70cd53da1478743e2bba7f4b11e761cc9be4",
+  "reviewed_source_pack_sha256": "316da43be8603cf0400dfa886bf244f953cd0dcb702c150f87e652fc260e9819",
+  "release_id": "594432d01f5a8c4e5d97",
+  "raw_source": {
+    "path": "docs/evidence/locale-reviews/raw/released-browser-lifecycle-smoke.json",
+    "sha256": "9b1a6290cc8a1bba845c8e3f700fde326e7988cebbbe2fab0eb091c3d39ac69e"
+  },
+  "locales": [
+    "es",
+    "fr",
+    "pt-BR",
+    "ar"
+  ],
+  "kind": "commonworld.ui_locale_state_preservation_receipt",
+  "status": "passed",
+  "automated_checks": [
+    "locale persistence",
+    "query and fragment preservation",
+    "proposal draft lifecycle",
+    "released navigation"
+  ]
+}

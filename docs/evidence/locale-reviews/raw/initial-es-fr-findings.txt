@@ -1,0 +1,51 @@
+```json
+{
+  "review_class": "model_assisted_post_fix_review",
+  "reviewed_revision": "d96a8211035483328db26216da7ff2839bcdc6b2",
+  "source_pack_sha256": "e1093ff8231246307cbd96ad5f4382c46cbc1d36619d6b964dcd6790233e0351",
+  "locale_verdicts": {
+    "es": "FAIL",
+    "fr": "FAIL"
+  },
+  "findings": [
+    {
+      "locale": "es",
+      "severity": "major",
+      "section_key": "shell.shell_003",
+      "problem": "Inconsistent terminology: mixes 'Commons' and 'Comunes' throughout the interface. Here, 'Comunes' is used while other keys (like ui.commons_count) use 'Commons'.",
+      "exact_replacement": "<title>commonworld — Descubre Commons</title>"
+    },
+    {
+      "locale": "es",
+      "severity": "major",
+      "section_key": "shell.shell_008",
+      "problem": "Inconsistent terminology: uses 'Comunes'.",
+      "exact_replacement": ">Buscar Commons<"
+    },
+    {
+      "locale": "fr",
+      "severity": "major",
+      "section_key": "shell.shell_003",
+      "problem": "Inconsistent terminology: mixes 'Commons' and 'communs' throughout the interface. Here, 'Commons' is used while other keys (like ui.commons_count) use 'Communs'.",
+      "exact_replacement": "<title>commonworld — Découvrez les communs</title>"
+    },
+    {
+      "locale": "fr",
+      "severity": "major",
+      "section_key": "shell.shell_008",
+      "problem": "Inconsistent terminology: uses 'Commons'.",
+      "exact_replacement": ">Rechercher les communs<"
+    },
+    {
+      "locale": "fr",
+      "severity": "major",
+      "section_key": "method.method_014",
+      "problem": "Mixed terminology in a single paragraph (uses 'commun', 'Common', and 'communs').",
+      "exact_replacement": "Commonworld définit un commun comme une ressource, une infrastructure, une pratique ou un corpus de connaissances identifiable que plusieurs personnes utilisent, entretiennent ou développent ensemble. L'admission exige des preuves primaires ou proches de la source concernant une ressource partagée, une communauté, une pratique de mise en commun, des règles et des responsabilités ainsi qu'un bénéfice commun. L'open source, l'accès gratuit, le statut sans but lucratif, la décentralisation ou un grand nombre d'utilisateurs ne suffisent pas à eux seuls. Les formes restent ouvertes ; la justification est contraignante et lisible par machine dans le <a href=\"./contracts/commonworld/commons-definition.contract.json\">contrat de définition des communs</a>."
+    }
+  ],
+  "limitations": "This is a model-assisted review, which does not constitute or replace native or human language approval.",
+  "confidence": "high"
+}
+```
+{"created": false, "finalization": {"created": true, "receipt": {"argv_sha256": "6fe8430942acb7a5fab04ea2f9becb0a02dd6ffa139aebfe852f09a6a75f653b", "completion_status": "complete", "contract_sha256": "d30ecfefe3c9bc4bfb281b5398e726284226e5c75f537ca9ade9e0526759f9f2", "failure_type": null, "final_status": "succeeded", "job_id": "6e0f4bb4a3f3", "kind": "grabowski_job_finalization", "payload_sha256": "3dd5a92da5b48daf144f88d834f002cfa053205c6b8fb51e9774b42422c03472", "receipt_paths": {"finalization": "/home/alex/.local/state/grabowski/jobs/grabowski-job-6e0f4bb4a3f3/finalization.json", "metadata": "/home/alex/.local/state/grabowski/jobs/grabowski-job-6e0f4bb4a3f3/metadata.json", "stderr": "/home/alex/.local/state/grabowski/jobs/grabowski-job-6e0f4bb4a3f3/stderr.log", "stdout": "/home/alex/.local/state/grabowski/jobs/grabowski-job-6e0f4bb4a3f3/stdout.log"}, "schema_version": 1, "timestamp_unix": 1785998616, "unit": "grabowski-job-6e0f4bb4a3f3"}}, "reason": "notification_not_requested"}

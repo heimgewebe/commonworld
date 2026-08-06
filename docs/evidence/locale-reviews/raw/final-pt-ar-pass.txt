@@ -1,0 +1,15 @@
+```json
+{
+  "review_class": "model_assisted_independent_language_review",
+  "reviewed_revision": "36583887e893bb1dea9b7242c6a4737c161ffd3a",
+  "source_pack_sha256": "316da43be8603cf0400dfa886bf244f953cd0dcb702c150f87e652fc260e9819",
+  "locale_verdicts": {
+    "pt-BR": "PASS",
+    "ar": "PASS"
+  },
+  "findings": [],
+  "limitations": "This is a model-assisted review. It does not constitute native or human language approval.",
+  "confidence": "high"
+}
+```
+{"created": false, "finalization": {"created": true, "receipt": {"argv_sha256": "289319669fd47ce22ecd555ec177008dc6c5e7c1bb55dd3bb89b573d0999f1e0", "completion_status": "complete", "contract_sha256": "c2d1fd621f814f168006eccf288e64d4a41e07bad41a3b104035f28534732ad5", "failure_type": null, "final_status": "succeeded", "job_id": "e4cf4125a08c", "kind": "grabowski_job_finalization", "payload_sha256": "e328799064b25c5aad409bff393d9536591e3f072cd9f52812141f9469beb202", "receipt_paths": {"finalization": "/home/alex/.local/state/grabowski/jobs/grabowski-job-e4cf4125a08c/finalization.json", "metadata": "/home/alex/.local/state/grabowski/jobs/grabowski-job-e4cf4125a08c/metadata.json", "stderr": "/home/alex/.local/state/grabowski/jobs/grabowski-job-e4cf4125a08c/stderr.log", "stdout": "/home/alex/.local/state/grabowski/jobs/grabowski-job-e4cf4125a08c/stdout.log"}, "schema_version": 1, "timestamp_unix": 1785999268, "unit": "grabowski-job-e4cf4125a08c"}}, "reason": "notification_not_requested"}

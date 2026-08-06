@@ -5,7 +5,11 @@
   "decision": {
     "released_locales": [
       "en",
-      "de"
+      "de",
+      "es",
+      "fr",
+      "pt-BR",
+      "ar"
     ],
     "default_locale": "en",
     "fallback_locale": "de",
@@ -68,7 +72,7 @@
       "english_name": "German"
     },
     "es": {
-      "status": "candidate",
+      "status": "released",
       "direction": "ltr",
       "native_name": "Español",
       "english_name": "Spanish",
@@ -77,11 +81,14 @@
         "method": "method.es.html",
         "proposal": "propose.es.html"
       },
-      "candidate_evidence_path": "docs/evidence/locale-candidates/es.json",
-      "translation_pack": "wave_1"
+      "translation_pack": "wave_1",
+      "release_evidence": {
+        "path": "docs/evidence/locale-releases/es.json",
+        "sha256": "bc3210438aeb5f896c20ef4f868f8a29be2de218e32d3236bc978fc1179556e3"
+      }
     },
     "fr": {
-      "status": "candidate",
+      "status": "released",
       "direction": "ltr",
       "native_name": "Français",
       "english_name": "French",
@@ -90,11 +97,14 @@
         "method": "method.fr.html",
         "proposal": "propose.fr.html"
       },
-      "candidate_evidence_path": "docs/evidence/locale-candidates/fr.json",
-      "translation_pack": "wave_1"
+      "translation_pack": "wave_1",
+      "release_evidence": {
+        "path": "docs/evidence/locale-releases/fr.json",
+        "sha256": "67e1c91f33bd959397f73214954b2a58e9add46793d3f7bd808cff13c484fe6c"
+      }
     },
     "pt-BR": {
-      "status": "candidate",
+      "status": "released",
       "direction": "ltr",
       "native_name": "Português (Brasil)",
       "english_name": "Brazilian Portuguese",
@@ -103,11 +113,14 @@
         "method": "method.pt-BR.html",
         "proposal": "propose.pt-BR.html"
       },
-      "candidate_evidence_path": "docs/evidence/locale-candidates/pt-BR.json",
-      "translation_pack": "wave_1"
+      "translation_pack": "wave_1",
+      "release_evidence": {
+        "path": "docs/evidence/locale-releases/pt-BR.json",
+        "sha256": "c32ec8cf36008af20816b9fedfe8ec7fc476dec6243742a2cb2155c47efc9628"
+      }
     },
     "ar": {
-      "status": "candidate",
+      "status": "released",
       "direction": "rtl",
       "native_name": "العربية",
       "english_name": "Arabic",
@@ -116,8 +129,11 @@
         "method": "method.ar.html",
         "proposal": "propose.ar.html"
       },
-      "candidate_evidence_path": "docs/evidence/locale-candidates/ar.json",
-      "translation_pack": "wave_1"
+      "translation_pack": "wave_1",
+      "release_evidence": {
+        "path": "docs/evidence/locale-releases/ar.json",
+        "sha256": "598c0abedc64137419dceb8b8f7e089c7384320bc9da6daa15106e6dbc29ae4c"
+      }
     },
     "zh-Hans": {
       "status": "planned",
@@ -185,13 +201,20 @@
       "rtl"
     ],
     "production_activation_requires_all_checks": true,
-    "catalog_summary_specificity_policy_required": true
+    "catalog_summary_specificity_policy_required": true,
+    "independent_language_review_may_be_model_assisted": true,
+    "model_assisted_review_must_be_labeled_as_such": true,
+    "model_assisted_review_must_be_digest_bound_and_findings_based": true,
+    "post_fix_review_required_after_model_assisted_findings": true,
+    "native_human_polish_may_remain_follow_up": true
   },
   "non_goals": [
     "Inferring language from IP address or physical location",
     "Publishing partially translated interface locales",
     "Restricting catalog content languages to released interface locales",
-    "Treating machine translation as final editorial review"
+    "Treating machine translation as final editorial review",
+    "Treating machine-assisted raw translation as finished language review",
+    "Claiming native or human language approval from model-assisted editorial review alone"
   ],
   "release_evidence": {
     "baseline_locales_may_precede_digest_receipts": true,
@@ -210,6 +233,9 @@
     ],
     "candidate_evidence_path_template": "docs/evidence/locale-candidates/{locale}.json",
     "candidate_evidence_is_not_release_evidence": true,
-    "registry_pointer_field": "release_evidence"
+    "registry_pointer_field": "release_evidence",
+    "schema_path": "docs/architecture/locale-release-evidence.schema.json",
+    "receipt_sources_must_exist_and_match_sha256": true,
+    "generator": "scripts/generate_locale_release_evidence.py"
   }
 }

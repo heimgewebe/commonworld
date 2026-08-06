@@ -19,6 +19,7 @@ from scripts.catalog_summary_specificity import (
     load_contract as load_summary_specificity_contract,
     validate_contract as validate_summary_specificity_contract,
 )
+from scripts.locale_review_evidence import reviewed_source_pack_sha256
 
 CONTRACT_PATH = ROOT / "docs/architecture/locale-release.contract.json"
 REGISTRY_MODULE_PATH = ROOT / "assets/commonworld-locale-registry.mjs"
@@ -115,6 +116,7 @@ def _surface_errors(
     root: Path,
     *,
     candidate: bool,
+    require_direction: bool = False,
 ) -> list[str]:
     errors: list[str] = []
     surfaces = entry.get("surface_files")
@@ -152,7 +154,9 @@ def _surface_errors(
             ),
             f"surface {relative} does not declare lang={tag}",
         )
-        if candidate:
+        if require_direction:
+            # Non-baseline Wave-1 surfaces always keep document direction, including
+            # after promotion (Arabic must remain rtl without candidate markers).
             _require(
                 errors,
                 bool(
@@ -162,8 +166,14 @@ def _surface_errors(
                         re.IGNORECASE,
                     )
                 ),
-                f"candidate surface {relative} does not declare dir={direction}",
+                f"surface {relative} does not declare dir={direction}",
             )
+        _require(
+            errors,
+            "[missing:" not in markup,
+            f"surface {relative} contains missing-translation markers",
+        )
+        if candidate:
             _require(
                 errors,
                 'meta name="robots" content="noindex,nofollow"' in markup,
@@ -176,8 +186,24 @@ def _surface_errors(
             )
             _require(
                 errors,
-                "[missing:" not in markup,
-                f"candidate surface {relative} contains missing-translation markers",
+                f'data-locale-candidate="{tag}"' in markup,
+                f"candidate surface {relative} lacks data-locale-candidate",
+            )
+        elif require_direction:
+            _require(
+                errors,
+                'meta name="robots" content="noindex,nofollow"' not in markup,
+                f"released surface {relative} must not keep candidate noindex",
+            )
+            _require(
+                errors,
+                'class="locale-candidate-banner"' not in markup,
+                f"released surface {relative} must not keep the candidate notice",
+            )
+            _require(
+                errors,
+                "data-locale-candidate=" not in markup,
+                f"released surface {relative} must not keep data-locale-candidate",
             )
     return errors
 
@@ -188,6 +214,8 @@ def _release_evidence_errors(
     contract: dict[str, Any],
     root: Path,
     required_surfaces: set[str],
+    pack_digest: str | None,
+    reviewed_pack_digest: str | None,
 ) -> list[str]:
     errors: list[str] = []
     pointer = entry.get("release_evidence")
@@ -232,6 +260,71 @@ def _release_evidence_errors(
         evidence.get("locale") == tag,
         f"release evidence locale mismatch for {tag}",
     )
+    _require(
+        errors,
+        evidence.get("status") == "released",
+        f"release evidence status must be released for {tag}",
+    )
+    _require(
+        errors,
+        pack_digest is not None
+        and evidence.get("source_pack_sha256") == pack_digest,
+        f"release evidence pack digest is stale for {tag}",
+    )
+    _require(
+        errors,
+        reviewed_pack_digest is not None
+        and evidence.get("reviewed_source_pack_sha256") == reviewed_pack_digest,
+        f"release evidence reviewed source pack digest is stale for {tag}",
+    )
+    review_class = evidence.get("review_class")
+    expected_review_fields = {
+        "machine_translation_only",
+        "independent_of_writer",
+        "model_assisted_editorial_review",
+        "claims_native_or_human_review",
+        "digest_bound",
+        "findings_based",
+        "post_fix_review_required",
+    }
+    valid_review_shape = (
+        isinstance(review_class, dict)
+        and set(review_class) == expected_review_fields
+    )
+    _require(
+        errors,
+        valid_review_shape,
+        f"release evidence review_class is invalid for {tag}",
+    )
+    if valid_review_shape:
+        assert isinstance(review_class, dict)
+        _require(
+            errors,
+            review_class.get("machine_translation_only") is False,
+            f"release evidence review must not be machine-translation-only for {tag}",
+        )
+        _require(
+            errors,
+            review_class.get("independent_of_writer") is True,
+            f"release evidence review must be independent of the writer for {tag}",
+        )
+        _require(
+            errors,
+            review_class.get("claims_native_or_human_review") is False,
+            f"release evidence must not overclaim native or human review for {tag}",
+        )
+        _require(
+            errors,
+            review_class.get("digest_bound") is True
+            and review_class.get("findings_based") is True,
+            f"release evidence review must be digest-bound and findings-based for {tag}",
+        )
+        if review_class.get("model_assisted_editorial_review") is True:
+            _require(
+                errors,
+                review_class.get("post_fix_review_required") is True,
+                f"model-assisted release evidence must require post-fix review for {tag}",
+            )
     revision = evidence.get("source_revision")
     _require(
         errors,
@@ -324,6 +417,25 @@ def _release_evidence_errors(
                 valid_receipt,
                 f"release evidence receipt is invalid for {tag}/{gate_name}",
             )
+            if not valid_receipt:
+                continue
+            assert isinstance(receipt, dict)
+            source_path, source_error = _safe_path(
+                root, receipt["source"], f"release evidence receipt {tag}/{gate_name}"
+            )
+            if source_error:
+                errors.append(source_error)
+                continue
+            assert source_path is not None
+            if not source_path.is_file():
+                errors.append(
+                    f"release evidence receipt source is missing for {tag}/{gate_name}"
+                )
+                continue
+            if _sha256(source_path) != receipt["sha256"]:
+                errors.append(
+                    f"release evidence receipt source is stale for {tag}/{gate_name}: sha256 mismatch"
+                )
     return errors
 
 
@@ -585,6 +697,12 @@ def validate_contract(contract: dict[str, Any], root: Path = ROOT) -> list[str]:
 
     pack_errors, pack_digest = _pack_errors(contract, root)
     errors.extend(pack_errors)
+    try:
+        reviewed_pack_digest = reviewed_source_pack_sha256(
+            root / PACK_PATH.relative_to(ROOT)
+        )
+    except (OSError, ValueError, json.JSONDecodeError):
+        reviewed_pack_digest = None
     candidate_tags: list[str] = []
     planned_tags: list[str] = []
     for tag, entry in registry.items():
@@ -611,20 +729,42 @@ def validate_contract(contract: dict[str, Any], root: Path = ROOT) -> list[str]:
             )
         if status == "released":
             _require(errors, tag in released_tags, f"released registry locale {tag} is absent from released_locales")
-            errors.extend(_surface_errors(tag, entry, root, candidate=False))
+            errors.extend(
+                _surface_errors(
+                    tag,
+                    entry,
+                    root,
+                    candidate=False,
+                    require_direction=tag not in baseline_tags,
+                )
+            )
             if tag in baseline_tags:
                 _require(errors, "release_evidence" not in entry, f"baseline locale {tag} must not claim post-baseline release evidence")
             else:
                 errors.extend(
                     _release_evidence_errors(
-                        tag, entry, contract, root, set(gate.get("required_surfaces", []))
+                        tag,
+                        entry,
+                        contract,
+                        root,
+                        set(gate.get("required_surfaces", [])),
+                        pack_digest,
+                        reviewed_pack_digest,
                     )
                 )
         elif status == "candidate":
             candidate_tags.append(tag)
             _require(errors, tag not in released_tags, f"candidate locale {tag} must not be released")
             _require(errors, "release_evidence" not in entry, f"candidate locale {tag} must not claim release evidence")
-            errors.extend(_surface_errors(tag, entry, root, candidate=True))
+            errors.extend(
+                _surface_errors(
+                    tag,
+                    entry,
+                    root,
+                    candidate=True,
+                    require_direction=True,
+                )
+            )
             errors.extend(_candidate_evidence_errors(tag, entry, root, pack_digest))
         else:
             planned_tags.append(tag)
@@ -736,21 +876,37 @@ def validate_contract(contract: dict[str, Any], root: Path = ROOT) -> list[str]:
         ],
         "candidate_evidence_path_template": "docs/evidence/locale-candidates/{locale}.json",
         "candidate_evidence_is_not_release_evidence": True,
+        "schema_path": "docs/architecture/locale-release-evidence.schema.json",
+        "receipt_sources_must_exist_and_match_sha256": True,
+        "generator": "scripts/generate_locale_release_evidence.py",
     }
     _require(
         errors,
         evidence_contract == expected_evidence,
         "release_evidence contract does not match the fail-closed digest-bound schema",
     )
+    for field in (
+        "machine_translation_only_forbidden",
+        "independent_language_review_required",
+        "independent_language_review_may_be_model_assisted",
+        "model_assisted_review_must_be_labeled_as_such",
+        "model_assisted_review_must_be_digest_bound_and_findings_based",
+        "post_fix_review_required_after_model_assisted_findings",
+        "native_human_polish_may_remain_follow_up",
+    ):
+        _require(errors, gate.get(field) is True, f"release gate must require {field}")
 
     try:
         summary_specificity_contract = load_summary_specificity_contract(root)
     except SummarySpecificityContractError as exc:
         errors.append(str(exc))
     else:
+        from scripts.catalog_summary_specificity import published_content_languages
+
+        content_languages = published_content_languages(summary_specificity_contract)
         errors.extend(
             validate_summary_specificity_contract(
-                summary_specificity_contract, released_tags
+                summary_specificity_contract, content_languages
             )
         )
         _require(

@@ -1,0 +1,70 @@
+```json
+{
+  "approach_id": "post-fix-language-review-pt-ar",
+  "approach_summary": "PASS: Independent post-fix language review of Commonworld Wave 1 locales pt-BR and ar at HEAD f331ba57a18c94242231d6545bc7e31ead6af0fe with assets/locales/wave1-locales.json SHA-256 digest df6b6e0dce8bcc43f3d715e9ecead479b43587ad716420115e4c2523828d6b8d. Verified 1.0 translation coverage across meta, ui, themes, static, shell, method, proposal, taxonomy, actions, and proposal_runtime sections. Confirmed terminology consistency (Comum/Comuns in pt-BR, مشاع/مشاعات and عوامل التصفية in ar), placeholder matching, safety guidance preservation, accessible name clarity, and zero English/German leakage. Classified review_class=independent_model_assisted_post_fix with claims_native_or_human_review=false. No blocking findings remain.",
+  "assumptions": [
+    "Verified HEAD commit matches exact bound base revision f331ba57a18c94242231d6545bc7e31ead6af0fe.",
+    "Verified assets/locales/wave1-locales.json SHA-256 digest matches exact expected value df6b6e0dce8bcc43f3d715e9ecead479b43587ad716420115e4c2523828d6b8d.",
+    "Wave 1 candidate status remains candidate without promotion to released status in this review step."
+  ],
+  "design_invariants": [
+    "Review execution is strictly read-only with changed_paths [] and patch empty string.",
+    "Review process is independent-of-writer, analyzing pre-release fixes and candidate surfaces objectively.",
+    "Verification is digest-bound to SHA-256 df6b6e0dce8bcc43f3d715e9ecead479b43587ad716420115e4c2523828d6b8d and HEAD f331ba57a18c94242231d6545bc7e31ead6af0fe.",
+    "Validation is findings-based, failing closed if any blocking linguistic, technical, or safety-critical defect is found."
+  ],
+  "tradeoffs": [
+    "Automated model-assisted review verifies structural, semantic, and grammatical correctness but does not establish native human speaker polish or cultural nuance.",
+    "Read-only post-fix verification relies on static pack analysis and contract test suites, leaving browser visual layout and screen reader receipts to separate validation gates."
+  ],
+  "risks": [],
+  "proposed_tests": [
+    "NONBLOCKING|locale=ar|test=directional_layout_review|Execute browser visual smoke testing for RTL alignment and mixed-script inline formatting of HTTPS URLs and GitHub tags.",
+    "NONBLOCKING|locale=pt-BR|test=keyboard_and_screen_reader_review|Perform accessibility audit for screen reader announcements of aria-label keyboard shortcuts.",
+    "NONBLOCKING|locale=ar,pt-BR|test=native_speaker_acceptance|Schedule optional native speaker review prior to future Wave 1 candidate status promotion to released."
+  ],
+  "changed_paths": [],
+  "patch": "",
+  "contrast_observations": [
+    "NONBLOCKING|locale=pt-BR|section=shell|key=shell_092|severity=info|source=Open digital ring bundles. Tap or press Enter.|current=aria-label=\"Abrir pacotes de anéis digitais. Toque ou pressione a tecla Enter.\"|problem=Pre-release fix replaced enter-calque with explicit keyboard key wording.|replacement=aria-label=\"Abrir pacotes de anéis digitais. Toque ou pressione a tecla Enter.\"",
+    "NONBLOCKING|locale=ar|section=shell|key=shell_092|severity=info|source=Open digital ring bundles. Tap or press Enter.|current=aria-label=\"فتح حزم الحلقات الرقمية. انقر أو اضغط مفتاح الإدخال.\"|problem=Pre-release fix replaced Enter calque with explicit Arabic key term.|replacement=aria-label=\"فتح حزم الحلقات الرقمية. انقر أو اضغط مفتاح الإدخال.\"",
+    "NONBLOCKING|locale=ar|section=ui|key=selection_retained_during_filtering|severity=info|source=This selection remains open while search or filters change the rest of the view.|current=يظل هذا التحديد مفتوحًا أثناء تغيير البحث أو عوامل التصفية لبقية العرض.|problem=Pre-release fix unified filters terminology to عوامل التصفية.|replacement=يظل هذا التحديد مفتوحًا أثناء تغيير البحث أو عوامل التصفية لبقية العرض."
+  ],
+  "confidence": "high"
+}
+```
+```json
+{
+  "approach_id": "post-fix-language-review-pt-ar",
+  "approach_summary": "PASS: Independent post-fix language review of Commonworld Wave 1 locales pt-BR and ar at HEAD f331ba57a18c94242231d6545bc7e31ead6af0fe with assets/locales/wave1-locales.json SHA-256 digest df6b6e0dce8bcc43f3d715e9ecead479b43587ad716420115e4c2523828d6b8d. Verified 1.0 translation coverage across meta, ui, themes, static, shell, method, proposal, taxonomy, actions, and proposal_runtime sections. Confirmed terminology consistency (Comum/Comuns in pt-BR, مشاع/مشاعات and عوامل التصفية in ar), placeholder matching, safety guidance preservation, accessible name clarity, and zero English/German leakage. Classified review_class=independent_model_assisted_post_fix with claims_native_or_human_review=false. No blocking findings remain.",
+  "assumptions": [
+    "Verified HEAD commit matches exact bound base revision f331ba57a18c94242231d6545bc7e31ead6af0fe.",
+    "Verified assets/locales/wave1-locales.json SHA-256 digest matches exact expected value df6b6e0dce8bcc43f3d715e9ecead479b43587ad716420115e4c2523828d6b8d.",
+    "Wave 1 candidate status remains candidate without promotion to released status in this review step."
+  ],
+  "design_invariants": [
+    "Review execution is strictly read-only with changed_paths [] and patch empty string.",
+    "Review process is independent-of-writer, analyzing pre-release fixes and candidate surfaces objectively.",
+    "Verification is digest-bound to SHA-256 df6b6e0dce8bcc43f3d715e9ecead479b43587ad716420115e4c2523828d6b8d and HEAD f331ba57a18c94242231d6545bc7e31ead6af0fe.",
+    "Validation is findings-based, failing closed if any blocking linguistic, technical, or safety-critical defect is found."
+  ],
+  "tradeoffs": [
+    "Automated model-assisted review verifies structural, semantic, and grammatical correctness but does not establish native human speaker polish or cultural nuance.",
+    "Read-only post-fix verification relies on static pack analysis and contract test suites, leaving browser visual layout and screen reader receipts to separate validation gates."
+  ],
+  "risks": [],
+  "proposed_tests": [
+    "NONBLOCKING|locale=ar|test=directional_layout_review|Execute browser visual smoke testing for RTL alignment and mixed-script inline formatting of HTTPS URLs and GitHub tags.",
+    "NONBLOCKING|locale=pt-BR|test=keyboard_and_screen_reader_review|Perform accessibility audit for screen reader announcements of aria-label keyboard shortcuts.",
+    "NONBLOCKING|locale=ar,pt-BR|test=native_speaker_acceptance|Schedule optional native speaker review prior to future Wave 1 candidate status promotion to released."
+  ],
+  "changed_paths": [],
+  "patch": "",
+  "contrast_observations": [
+    "NONBLOCKING|locale=pt-BR|section=shell|key=shell_092|severity=info|source=Open digital ring bundles. Tap or press Enter.|current=aria-label=\"Abrir pacotes de anéis digitais. Toque ou pressione a tecla Enter.\"|problem=Pre-release fix replaced enter-calque with explicit keyboard key wording.|replacement=aria-label=\"Abrir pacotes de anéis digitais. Toque ou pressione a tecla Enter.\"",
+    "NONBLOCKING|locale=ar|section=shell|key=shell_092|severity=info|source=Open digital ring bundles. Tap or press Enter.|current=aria-label=\"فتح حزم الحلقات الرقمية. انقر أو اضغط مفتاح الإدخال.\"|problem=Pre-release fix replaced Enter calque with explicit Arabic key term.|replacement=aria-label=\"فتح حزم الحلقات الرقمية. انقر أو اضغط مفتاح الإدخال.\"",
+    "NONBLOCKING|locale=ar|section=ui|key=selection_retained_during_filtering|severity=info|source=This selection remains open while search or filters change the rest of the view.|current=يظل هذا التحديد مفتوحًا أثناء تغيير البحث أو عوامل التصفية لبقية العرض.|problem=Pre-release fix unified filters terminology to عوامل التصفية.|replacement=يظل هذا التحديد مفتوحًا أثناء تغيير البحث أو عوامل التصفية لبقية العرض."
+  ],
+  "confidence": "high"
+}
+```
