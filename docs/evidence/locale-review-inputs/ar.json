@@ -2,9 +2,9 @@
   "schema_version": 1,
   "kind": "commonworld.ui_locale_independent_review_input",
   "locale": "ar",
-  "source_revision": "23e7d39204dd9a2373ac2ecba6396461c9b1ab13",
+  "source_revision": "pending-post-fix-commit",
   "source_pack": "assets/locales/wave1-locales.json",
-  "source_pack_sha256": "c37e13d79f7234b8a1d4d74a69353eed1ebf3455f4a954db291c60a0af9aea57",
+  "source_pack_sha256": "e1093ff8231246307cbd96ad5f4382c46cbc1d36619d6b964dcd6790233e0351",
   "payload": {
     "meta": {
       "draft_origin": "machine_translation_assisted",
@@ -234,7 +234,7 @@
       "open": "فتح",
       "official_website": "الموقع الرسمي",
       "source_number": "المصدر {index}",
-      "candidate_notice": "معاينة ترجمة. لم تُفعَّل هذه اللغة بعد؛ وما تزال تحتاج إلى مراجعة لغوية مستقلة وإلى مراجعة اتجاه RTL والنصوص المختلطة.",
+      "candidate_notice": "معاينة ترجمة. لم تُفعَّل هذه اللغة بعد؛ وما تزال تحتاج إلى مراجعة لغوية مستقلة.",
       "interface_language": "لغة الواجهة",
       "choose_interface_language": "اختيار لغة الواجهة",
       "automatic_device_language": "تلقائي – لغة الجهاز",
@@ -671,5 +671,5 @@
     "release_evidence": false,
     "native_or_human_review": false
   },
-  "reviewed_source_pack_sha256": "c37e13d79f7234b8a1d4d74a69353eed1ebf3455f4a954db291c60a0af9aea57"
+  "reviewed_source_pack_sha256": "e1093ff8231246307cbd96ad5f4382c46cbc1d36619d6b964dcd6790233e0351"
 }

@@ -39,7 +39,7 @@ export function shouldLoadWave1LocalePack(locale, isNodeRuntime = nodeRuntime) {
 
 let WAVE1_LOCALE_PACKS = Object.freeze({});
 if (shouldLoadWave1LocalePack(runtimeDocumentLocale)) {
-  ({ WAVE1_LOCALE_PACKS } = await import('./commonworld-wave1-locales.mjs?v=07b564ee54b4'));
+  ({ WAVE1_LOCALE_PACKS } = await import('./commonworld-wave1-locales.mjs?v=782d8ef51e9f'));
 }
 
 export function normalizeLocale(value, fallback = DEFAULT_LOCALE) {

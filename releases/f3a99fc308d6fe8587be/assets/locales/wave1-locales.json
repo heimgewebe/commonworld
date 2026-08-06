@@ -2215,7 +2215,7 @@
         "open": "فتح",
         "official_website": "الموقع الرسمي",
         "source_number": "المصدر {index}",
-        "candidate_notice": "معاينة ترجمة. لم تُفعَّل هذه اللغة بعد؛ وما تزال تحتاج إلى مراجعة لغوية مستقلة وإلى مراجعة اتجاه RTL والنصوص المختلطة.",
+        "candidate_notice": "معاينة ترجمة. لم تُفعَّل هذه اللغة بعد؛ وما تزال تحتاج إلى مراجعة لغوية مستقلة.",
         "interface_language": "لغة الواجهة",
         "choose_interface_language": "اختيار لغة الواجهة",
         "automatic_device_language": "تلقائي – لغة الجهاز",

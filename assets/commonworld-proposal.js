@@ -6,7 +6,7 @@ const ACTIVE_LOCALE = normalizeKnownLocale(
 );
 let wave1RuntimeMessages = null;
 if (WAVE1_LOCALES.includes(ACTIVE_LOCALE)) {
-  const { WAVE1_LOCALE_PACKS } = await import('./commonworld-wave1-locales.mjs?v=07b564ee54b4');
+  const { WAVE1_LOCALE_PACKS } = await import('./commonworld-wave1-locales.mjs?v=782d8ef51e9f');
   wave1RuntimeMessages = WAVE1_LOCALE_PACKS[ACTIVE_LOCALE]?.proposal_runtime ?? null;
   if (!wave1RuntimeMessages) throw new Error(`missing proposal runtime locale pack: ${ACTIVE_LOCALE}`);
 }
