@@ -1,121 +1,120 @@
 {
-  "schema_version": 1,
+  "schema_version": 2,
   "kind": "commonworld.ui_locale_independent_language_review_receipt",
   "status": "passed",
-  "reviewed_revision": "f331ba57a18c94242231d6545bc7e31ead6af0fe",
-  "review_input_revision": "f6ceeadce8a9ae3f3331f0c0993798245507e380",
-  "reviewed_source_pack_sha256": "df6b6e0dce8bcc43f3d715e9ecead479b43587ad716420115e4c2523828d6b8d",
-  "reviewer": {
-    "provider_surface": "Google Antigravity",
-    "model_family": "Gemini Pro",
-    "review_mode": "independent_model_assisted_post_fix",
-    "independent_of_writer": true,
-    "automatic_apply": false,
-    "competition_ids": [
-      "gac-antigravity-competitor-bd0f8dc55a-72a21fb767",
-      "gac-antigravity-competitor-04a828a213-f752e2837a"
-    ]
-  },
+  "reviewed_revision": "36583887e893bb1dea9b7242c6a4737c161ffd3a",
+  "reviewed_source_pack_sha256": "316da43be8603cf0400dfa886bf244f953cd0dcb702c150f87e652fc260e9819",
   "locale_verdicts": {
     "es": {
       "status": "passed",
-      "blocking_findings": [],
-      "basis": "Gemini es/fr post-fix review reported PASS with no blocking findings."
+      "blocking_findings": []
     },
     "fr": {
       "status": "passed",
-      "blocking_findings": [],
-      "basis": "Gemini es/fr post-fix review reported PASS with no blocking findings."
+      "blocking_findings": []
     },
     "pt-BR": {
       "status": "passed",
-      "blocking_findings": [],
-      "basis": "Gemini pt-BR/ar post-fix review reported PASS with terminology, placeholder, safety, and leakage checks."
+      "blocking_findings": []
     },
     "ar": {
       "status": "passed",
-      "blocking_findings": [],
-      "basis": "Gemini pt-BR/ar post-fix review reported PASS with Arabic terminology, placeholder, safety, and leakage checks."
+      "blocking_findings": []
     }
   },
-  "canonical_reviews": {
+  "finding_history": {
+    "resolved": [
+      {
+        "locale": "es",
+        "severity": "major",
+        "section_key": "shell.shell_003",
+        "problem": "Inconsistent terminology: mixes 'Commons' and 'Comunes' throughout the interface. Here, 'Comunes' is used while other keys (like ui.commons_count) use 'Commons'.",
+        "exact_replacement": "<title>commonworld — Descubre Commons</title>"
+      },
+      {
+        "locale": "es",
+        "severity": "major",
+        "section_key": "shell.shell_008",
+        "problem": "Inconsistent terminology: uses 'Comunes'.",
+        "exact_replacement": ">Buscar Commons<"
+      },
+      {
+        "locale": "fr",
+        "severity": "major",
+        "section_key": "shell.shell_003",
+        "problem": "Inconsistent terminology: mixes 'Commons' and 'communs' throughout the interface. Here, 'Commons' is used while other keys (like ui.commons_count) use 'Communs'.",
+        "exact_replacement": "<title>commonworld — Découvrez les communs</title>"
+      },
+      {
+        "locale": "fr",
+        "severity": "major",
+        "section_key": "shell.shell_008",
+        "problem": "Inconsistent terminology: uses 'Commons'.",
+        "exact_replacement": ">Rechercher les communs<"
+      },
+      {
+        "locale": "fr",
+        "severity": "major",
+        "section_key": "method.method_014",
+        "problem": "Mixed terminology in a single paragraph (uses 'commun', 'Common', and 'communs').",
+        "exact_replacement": "Commonworld définit un commun comme une ressource, une infrastructure, une pratique ou un corpus de connaissances identifiable que plusieurs personnes utilisent, entretiennent ou développent ensemble. L'admission exige des preuves primaires ou proches de la source concernant une ressource partagée, une communauté, une pratique de mise en commun, des règles et des responsabilités ainsi qu'un bénéfice commun. L'open source, l'accès gratuit, le statut sans but lucratif, la décentralisation ou un grand nombre d'utilisateurs ne suffisent pas à eux seuls. Les formes restent ouvertes ; la justification est contraignante et lisible par machine dans le <a href=\"./contracts/commonworld/commons-definition.contract.json\">contrat de définition des communs</a>."
+      },
+      {
+        "locale": "ar",
+        "severity": "blocker",
+        "section_key": "static.candidate_notice",
+        "problem": "The Arabic translation contains an extraneous translator's note about needing RTL and mixed-script review ('وإلى مراجعة اتجاه RTL والنصوص المختلطة.') which was added to the public-facing string. This must be removed.",
+        "exact_replacement": "معاينة ترجمة. لم تُفعَّل هذه اللغة بعد؛ وما تزال تحتاج إلى مراجعة لغوية مستقلة."
+      }
+    ],
+    "final_findings": []
+  },
+  "final_reviews": {
     "es-fr": {
-      "approach_id": "post-fix-language-review-es-fr",
-      "approach_summary": "PASS: Independent post-fix language review of Commonworld Spanish (es) and French (fr) for reviewed head f331ba57a18c94242231d6545bc7e31ead6af0fe and pack digest df6b6e0dce8bcc43f3d715e9ecead479b43587ad716420115e4c2523828d6b8d. Conducted under review_class=independent_model_assisted_post_fix with claims_native_or_human_review=false. Verified post-fix translations across es and fr candidate surfaces; no blocking findings remain.",
-      "assumptions": [
-        "Verified base HEAD f331ba57a18c94242231d6545bc7e31ead6af0fe",
-        "Verified assets/locales/wave1-locales.json SHA-256 digest df6b6e0dce8bcc43f3d715e9ecead479b43587ad716420115e4c2523828d6b8d"
-      ],
-      "design_invariants": [
-        "Review execution is strictly read-only with zero modifications to source files",
-        "Review is independent-of-writer and performed as an automated inspection model",
-        "Evaluation is digest-bound to SHA-256 df6b6e0dce8bcc43f3d715e9ecead479b43587ad716420115e4c2523828d6b8d",
-        "Evaluation is findings-based covering grammar, semantic accuracy, accessible names, and Commons terminology"
-      ],
-      "tradeoffs": [
-        "Reviewer limitations: Automated model-assisted evaluation cannot replace comprehensive native speaker intuition",
-        "Native human polish is not established by this model-assisted review step alone"
-      ],
-      "risks": [],
-      "proposed_tests": [
-        "Verify es and fr candidate page rendering and locale persistence in browser lifecycle tests",
-        "Execute manual keyboard and screen-reader accessibility validation for es and fr candidate pages"
-      ],
-      "changed_paths": [],
-      "patch": "",
-      "contrast_observations": [],
+      "review_class": "independent_language_review",
+      "reviewed_revision": "36583887e893bb1dea9b7242c6a4737c161ffd3a",
+      "source_pack_sha256": "316da43be8603cf0400dfa886bf244f953cd0dcb702c150f87e652fc260e9819",
+      "locale_verdicts": {
+        "es": "PASS",
+        "fr": "PASS"
+      },
+      "findings": [],
+      "limitations": "Model-assisted review; does not constitute native or human approval.",
       "confidence": "high"
     },
     "pt-ar": {
-      "approach_id": "post-fix-language-review-pt-ar",
-      "approach_summary": "PASS: Independent post-fix language review of Commonworld Wave 1 locales pt-BR and ar at HEAD f331ba57a18c94242231d6545bc7e31ead6af0fe with assets/locales/wave1-locales.json SHA-256 digest df6b6e0dce8bcc43f3d715e9ecead479b43587ad716420115e4c2523828d6b8d. Verified 1.0 translation coverage across meta, ui, themes, static, shell, method, proposal, taxonomy, actions, and proposal_runtime sections. Confirmed terminology consistency (Comum/Comuns in pt-BR, مشاع/مشاعات and عوامل التصفية in ar), placeholder matching, safety guidance preservation, accessible name clarity, and zero English/German leakage. Classified review_class=independent_model_assisted_post_fix with claims_native_or_human_review=false. No blocking findings remain.",
-      "assumptions": [
-        "Verified HEAD commit matches exact bound base revision f331ba57a18c94242231d6545bc7e31ead6af0fe.",
-        "Verified assets/locales/wave1-locales.json SHA-256 digest matches exact expected value df6b6e0dce8bcc43f3d715e9ecead479b43587ad716420115e4c2523828d6b8d.",
-        "Wave 1 candidate status remains candidate without promotion to released status in this review step."
-      ],
-      "design_invariants": [
-        "Review execution is strictly read-only with changed_paths [] and patch empty string.",
-        "Review process is independent-of-writer, analyzing pre-release fixes and candidate surfaces objectively.",
-        "Verification is digest-bound to SHA-256 df6b6e0dce8bcc43f3d715e9ecead479b43587ad716420115e4c2523828d6b8d and HEAD f331ba57a18c94242231d6545bc7e31ead6af0fe.",
-        "Validation is findings-based, failing closed if any blocking linguistic, technical, or safety-critical defect is found."
-      ],
-      "tradeoffs": [
-        "Automated model-assisted review verifies structural, semantic, and grammatical correctness but does not establish native human speaker polish or cultural nuance.",
-        "Read-only post-fix verification relies on static pack analysis and contract test suites, leaving browser visual layout and screen reader receipts to separate validation gates."
-      ],
-      "risks": [],
-      "proposed_tests": [
-        "NONBLOCKING|locale=ar|test=directional_layout_review|Execute browser visual smoke testing for RTL alignment and mixed-script inline formatting of HTTPS URLs and GitHub tags.",
-        "NONBLOCKING|locale=pt-BR|test=keyboard_and_screen_reader_review|Perform accessibility audit for screen reader announcements of aria-label keyboard shortcuts.",
-        "NONBLOCKING|locale=ar,pt-BR|test=native_speaker_acceptance|Schedule optional native speaker review prior to future Wave 1 candidate status promotion to released."
-      ],
-      "changed_paths": [],
-      "patch": "",
-      "contrast_observations": [
-        "NONBLOCKING|locale=pt-BR|section=shell|key=shell_092|severity=info|source=Open digital ring bundles. Tap or press Enter.|current=aria-label=\"Abrir pacotes de anéis digitais. Toque ou pressione a tecla Enter.\"|problem=Pre-release fix replaced enter-calque with explicit keyboard key wording.|replacement=aria-label=\"Abrir pacotes de anéis digitais. Toque ou pressione a tecla Enter.\"",
-        "NONBLOCKING|locale=ar|section=shell|key=shell_092|severity=info|source=Open digital ring bundles. Tap or press Enter.|current=aria-label=\"فتح حزم الحلقات الرقمية. انقر أو اضغط مفتاح الإدخال.\"|problem=Pre-release fix replaced Enter calque with explicit Arabic key term.|replacement=aria-label=\"فتح حزم الحلقات الرقمية. انقر أو اضغط مفتاح الإدخال.\"",
-        "NONBLOCKING|locale=ar|section=ui|key=selection_retained_during_filtering|severity=info|source=This selection remains open while search or filters change the rest of the view.|current=يظل هذا التحديد مفتوحًا أثناء تغيير البحث أو عوامل التصفية لبقية العرض.|problem=Pre-release fix unified filters terminology to عوامل التصفية.|replacement=يظل هذا التحديد مفتوحًا أثناء تغيير البحث أو عوامل التصفية لبقية العرض."
-      ],
+      "review_class": "model_assisted_independent_language_review",
+      "reviewed_revision": "36583887e893bb1dea9b7242c6a4737c161ffd3a",
+      "source_pack_sha256": "316da43be8603cf0400dfa886bf244f953cd0dcb702c150f87e652fc260e9819",
+      "locale_verdicts": {
+        "pt-BR": "PASS",
+        "ar": "PASS"
+      },
+      "findings": [],
+      "limitations": "This is a model-assisted review. It does not constitute native or human language approval.",
       "confidence": "high"
     }
   },
   "raw_sources": [
     {
-      "scope": "es-fr",
-      "path": "docs/evidence/locale-reviews/raw/gemini-es-fr-f331ba5.txt",
-      "sha256": "db469ee26dfd63d348f939d03d91c0e3410529bf366fe2b08a93aa57ea2f0bf7",
-      "duplicate_json_fence_count": 5,
-      "duplicates_semantically_identical": true,
-      "wrapper_status": "rejected_duplicate_json_fences"
+      "label": "initial-es-fr-findings",
+      "path": "docs/evidence/locale-reviews/raw/initial-es-fr-findings.txt",
+      "sha256": "b4959506759d0249b00f8a7c27ecf63e88f21c12debffd8c537222e0e64eda1a"
     },
     {
-      "scope": "pt-ar",
-      "path": "docs/evidence/locale-reviews/raw/gemini-pt-ar-f331ba5.txt",
-      "sha256": "a47e9395057cc64e8f7201f79f7a296ff69bbab028f513224ce27e30e6e42ce5",
-      "duplicate_json_fence_count": 2,
-      "duplicates_semantically_identical": true,
-      "wrapper_status": "rejected_duplicate_json_fences"
+      "label": "initial-pt-ar-findings",
+      "path": "docs/evidence/locale-reviews/raw/initial-pt-ar-findings.txt",
+      "sha256": "3bf95cd9afa9981ca354455b62f0c3a1922fd871a9f6c03ea48380d3a8469dfa"
+    },
+    {
+      "label": "final-es-fr-pass",
+      "path": "docs/evidence/locale-reviews/raw/final-es-fr-pass.txt",
+      "sha256": "9fc5115f4071d2a015cd75ffe4f8676664a71973579ab020fcc423ca83bdd7df"
+    },
+    {
+      "label": "final-pt-ar-pass",
+      "path": "docs/evidence/locale-reviews/raw/final-pt-ar-pass.txt",
+      "sha256": "caa7abec3cbd1930cb6791957fbb3885449cd57efbbc03485d6a163ee116756b"
     }
   ],
   "review_class": {
@@ -128,8 +127,7 @@
     "post_fix_review_required": true
   },
   "limitations": [
-    "Does not establish native-speaker or human approval.",
-    "Does not establish browser visual, keyboard, screen-reader, RTL layout, or production acceptance; those are separate gates.",
-    "The Grabowski wrapper rejected repeated identical JSON fences, so canonicalization was accepted only after proving every repeated object semantically identical."
+    "No native-speaker or human approval.",
+    "No full WCAG or manual assistive-technology acceptance."
   ]
 }

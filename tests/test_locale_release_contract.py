@@ -22,16 +22,21 @@ class LocaleReleaseContractTests(unittest.TestCase):
 
         pack_path = ROOT / "assets/locales/wave1-locales.json"
         pack = json.loads(pack_path.read_text(encoding="utf-8"))
-        pack_digest = hashlib.sha256(pack_path.read_bytes()).hexdigest()
+        from scripts.locale_review_evidence import reviewed_source_pack_sha256
+
+        reviewed_digest = reviewed_source_pack_sha256(pack_path)
         for locale, payload in pack["locales"].items():
             review_input = json.loads(
                 (ROOT / f"docs/evidence/locale-review-inputs/{locale}.json").read_text(
                     encoding="utf-8"
                 )
             )
+            reviewed_payload = copy.deepcopy(payload)
+            reviewed_payload["meta"]["independent_language_review"] = "pending"
             self.assertEqual(review_input["locale"], locale)
-            self.assertEqual(review_input["source_pack_sha256"], pack_digest)
-            self.assertEqual(review_input["payload"], payload)
+            self.assertEqual(review_input["source_pack_sha256"], reviewed_digest)
+            self.assertEqual(review_input["reviewed_source_pack_sha256"], reviewed_digest)
+            self.assertEqual(review_input["payload"], reviewed_payload)
             self.assertTrue(review_input["claims"]["derived_without_translation_changes"])
             self.assertFalse(review_input["claims"]["release_evidence"])
             self.assertFalse(review_input["claims"]["native_or_human_review"])
@@ -51,8 +56,8 @@ class LocaleReleaseContractTests(unittest.TestCase):
         for source in receipt["raw_sources"]:
             path = ROOT / source["path"]
             self.assertEqual(hashlib.sha256(path.read_bytes()).hexdigest(), source["sha256"])
-            self.assertTrue(source["duplicates_semantically_identical"])
-            self.assertGreaterEqual(source["duplicate_json_fence_count"], 2)
+            self.assertRegex(source["label"], r"^(?:initial|final)-(?:es-fr|pt-ar)-(?:findings|pass)$")
+        self.assertEqual(receipt["finding_history"]["final_findings"], [])
         self.assertFalse(receipt["review_class"]["claims_native_or_human_review"])
 
     def test_browser_registry_excludes_governance_evidence_pointers(self) -> None:
@@ -64,19 +69,19 @@ class LocaleReleaseContractTests(unittest.TestCase):
             "sha256": "a" * 64,
         }
         projected = runtime_locale_registry(contract)
-        self.assertEqual(projected["es"]["status"], "candidate")
+        self.assertEqual(projected["es"]["status"], "released")
         self.assertNotIn("candidate_evidence_path", projected["es"])
         self.assertNotIn("release_evidence", projected["es"])
         self.assertIn("surface_files", projected["es"])
 
     def test_candidate_locale_cannot_be_published_without_release_evidence(self) -> None:
         contract = copy.deepcopy(self.contract)
-        contract["decision"]["released_locales"].append("es")
+        contract["locale_registry"]["es"]["status"] = "candidate"
+        contract["locale_registry"]["es"].pop("release_evidence")
         errors = validate_contract(contract, ROOT)
         self.assertTrue(
             any("candidate locale es must not be released" == error for error in errors)
         )
-        self.assertTrue(any("runtime released locales" in error for error in errors))
         # UI release of es must not require a Spanish catalogue-content policy copy.
         self.assertNotIn(
             "summary specificity policy missing for released locale es",
@@ -98,13 +103,13 @@ class LocaleReleaseContractTests(unittest.TestCase):
             errors,
         )
 
-    def test_primary_subtag_matches_region_specific_candidate(self) -> None:
+    def test_primary_subtag_matches_region_specific_released_locale(self) -> None:
         self.assertEqual(
-            match_registry_locale(["pt-PT"], statuses=("candidate",), root=ROOT),
+            match_registry_locale(["pt-PT"], statuses=("released",), root=ROOT),
             "pt-BR",
         )
         self.assertEqual(
-            match_registry_locale(["pt"], statuses=("candidate",), root=ROOT),
+            match_registry_locale(["pt"], statuses=("released",), root=ROOT),
             "pt-BR",
         )
 
@@ -154,8 +159,8 @@ class LocaleReleaseContractTests(unittest.TestCase):
 
     def test_default_and_fallback_locales_must_be_released(self) -> None:
         contract = copy.deepcopy(self.contract)
-        contract["decision"]["default_locale"] = "es"
-        contract["decision"]["fallback_locale"] = "fr"
+        contract["decision"]["default_locale"] = "zh-Hans"
+        contract["decision"]["fallback_locale"] = "hi"
         errors = validate_contract(contract, ROOT)
         self.assertTrue(any("default_locale must be released" == error for error in errors))
         self.assertTrue(any("fallback_locale must be released" == error for error in errors))
@@ -167,7 +172,8 @@ class LocaleReleaseContractTests(unittest.TestCase):
         scaffold = build_scaffold("es")
         self.assertEqual(scaffold["status"], "pending")
         self.assertFalse(scaffold["gate_results"]["independent_language_review_passed"])
-        self.assertEqual(scaffold["source_pack_sha256"], scaffold["reviewed_source_pack_sha256"])
+        self.assertNotEqual(scaffold["source_pack_sha256"], scaffold["reviewed_source_pack_sha256"])
+        self.assertRegex(scaffold["reviewed_source_pack_sha256"], r"^[0-9a-f]{64}$")
         self.assertFalse(scaffold["review_class"]["claims_native_or_human_review"])
         self.assertTrue(scaffold["review_class"]["model_assisted_editorial_review"])
         self.assertTrue(scaffold["review_class"]["post_fix_review_required"])

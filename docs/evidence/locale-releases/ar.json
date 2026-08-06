@@ -1,0 +1,71 @@
+{
+  "schema_version": 1,
+  "kind": "commonworld.ui_locale_release_evidence",
+  "locale": "ar",
+  "status": "released",
+  "source_revision": "36583887e893bb1dea9b7242c6a4737c161ffd3a",
+  "source_pack_sha256": "b65c7108bb7c2debf77dcb18ed1f70cd53da1478743e2bba7f4b11e761cc9be4",
+  "reviewed_source_pack_sha256": "316da43be8603cf0400dfa886bf244f953cd0dcb702c150f87e652fc260e9819",
+  "surface_sha256": {
+    "index": "3b8b8fb9f54d38db736121bb4ca4687108040847bea9402c2c817b16bf7489a3",
+    "method": "41114a720b2192c42209ec449f1376c2ab77418a7620960a63bdec954fcfcd31",
+    "proposal": "c9ad609aa396c1cfd9867762894bbd1e9c2c3490b86fa34008101b1b36b8f780"
+  },
+  "gate_results": {
+    "required_surfaces_passed": [
+      "catalog_localization",
+      "globe",
+      "metadata_and_navigation",
+      "method",
+      "proposal",
+      "runtime_labels",
+      "text"
+    ],
+    "translation_coverage_ratio": 1.0,
+    "untranslated_ui_markers": 0,
+    "missing_runtime_keys": 0,
+    "machine_translation_only": false,
+    "independent_language_review_passed": true,
+    "keyboard_and_screen_reader_review_passed": true,
+    "browser_smoke_passed": true,
+    "state_preservation_smoke_passed": true,
+    "directional_layout_review": "passed",
+    "mixed_script_review": "passed"
+  },
+  "evidence_receipts": {
+    "independent_language_review": {
+      "source": "docs/evidence/locale-releases/receipts/shared/independent-language-review.json",
+      "sha256": "b9f2cbd9816adfba9a6b013da990fad782440663c1354e758588817aeecfcd4c"
+    },
+    "keyboard_and_screen_reader_review": {
+      "source": "docs/evidence/locale-releases/receipts/shared/keyboard-and-screen-reader-review.json",
+      "sha256": "3840e7bbede9bb833a4baebc314793966e6924531b58e505f13b08a961ab0f42"
+    },
+    "browser_smoke": {
+      "source": "docs/evidence/locale-releases/receipts/shared/browser-smoke.json",
+      "sha256": "c2d926de594a1f78090ef753dc36c14050e1cbdb2c3ab1178d8919753ec18679"
+    },
+    "state_preservation_smoke": {
+      "source": "docs/evidence/locale-releases/receipts/shared/state-preservation-smoke.json",
+      "sha256": "705e466554ccab30b228f07e3224131ca2af2b13efa9c5725fb897146281f68a"
+    },
+    "directional_layout_review": {
+      "source": "docs/evidence/locale-releases/receipts/shared/directional-layout-review.json",
+      "sha256": "7a6b0c1ef68701bb0a50cfa1d005ec2ab1d4053b05e92f2961ed9f0d64cb6f56"
+    },
+    "mixed_script_review": {
+      "source": "docs/evidence/locale-releases/receipts/shared/mixed-script-review.json",
+      "sha256": "0d61563d69e3575bae9450ce06a1eb2c47658417dcb92a692c0fb3c4ad615237"
+    }
+  },
+  "review_class": {
+    "machine_translation_only": false,
+    "independent_of_writer": true,
+    "model_assisted_editorial_review": true,
+    "claims_native_or_human_review": false,
+    "digest_bound": true,
+    "findings_based": true,
+    "post_fix_review_required": true
+  },
+  "notes": "Model-assisted release review; native/human approval and full WCAG conformance are not claimed."
+}

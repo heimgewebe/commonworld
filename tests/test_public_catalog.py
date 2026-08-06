@@ -12,6 +12,7 @@ class PublicCatalogTests(unittest.TestCase):
         root = Path(tmp_dir)
         shutil.copytree(ROOT / "catalog", root / "catalog")
         shutil.copytree(ROOT / "contracts", root / "contracts")
+        shutil.copytree(ROOT / "assets" / "locales", root / "assets" / "locales")
         shutil.copy2(ROOT / "index.html", root / "index.html")
         return root
 
@@ -349,7 +350,7 @@ class PublicCatalogTests(unittest.TestCase):
             errors = validate_public_catalog(root)
 
         self.assertIn(
-            "summary specificity policy missing for released locale en",
+            "summary specificity policy missing for published content language en",
             errors,
         )
 

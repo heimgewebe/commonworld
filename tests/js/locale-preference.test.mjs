@@ -20,8 +20,8 @@ test('ordered browser preferences match supported BCP 47 primary subtags', () =>
   assert.equal(supportedLocale('DE-de'), 'de');
   assert.equal(supportedLocale('en-Latn-GB'), 'en');
   assert.equal(supportedLocale('zh-Hant'), null);
-  assert.equal(matchSupportedLocale(['fr-FR', 'de-DE', 'en-GB']), 'de');
-  assert.equal(matchSupportedLocale(['zh-Hant', 'fr-FR']), 'en');
+  assert.equal(matchSupportedLocale(['fr-FR', 'de-DE', 'en-GB']), 'fr');
+  assert.equal(matchSupportedLocale(['zh-Hant', 'fr-FR']), 'fr');
 });
 
 test('future region-tag release accepts primary and sibling-region preferences', () => {
@@ -31,7 +31,7 @@ test('future region-tag release accepts primary and sibling-region preferences',
   assert.equal(matchSupportedLocaleTag('pt-PT', futureReleased), 'pt-BR');
 });
 
-test('locale preference accepts automatic, released and preview manual choices', () => {
+test('locale preference accepts automatic and all released manual choices', () => {
   assert.equal(normalizeLocalePreference('AUTO'), 'auto');
   assert.equal(normalizeLocalePreference('de'), 'de');
   assert.equal(normalizeLocalePreference('fr'), 'fr');
@@ -60,8 +60,8 @@ test('explicit locale query wins while explicit surface resists stored override'
 
 test('neutral entry uses stored choice, browser preference, then English', () => {
   assert.deepEqual(resolveLocalePreference({ pathname:'/', currentLocale:'en', storedChoice:'de', languages:['en-GB'] }), { choice:'de', locale:'de', source:'storage', shouldRedirect:true });
-  assert.deepEqual(resolveLocalePreference({ pathname:'/index.html', currentLocale:'en', languages:['fr-FR','de-DE'] }), { choice:'auto', locale:'de', source:'browser', shouldRedirect:true });
-  assert.deepEqual(resolveLocalePreference({ pathname:'/', currentLocale:'en', languages:['fr-FR'] }), { choice:'auto', locale:'en', source:'browser', shouldRedirect:false });
+  assert.deepEqual(resolveLocalePreference({ pathname:'/index.html', currentLocale:'en', languages:['fr-FR','de-DE'] }), { choice:'auto', locale:'fr', source:'browser', shouldRedirect:true });
+  assert.deepEqual(resolveLocalePreference({ pathname:'/', currentLocale:'en', languages:['fr-FR'] }), { choice:'auto', locale:'fr', source:'browser', shouldRedirect:true });
 });
 
 test('surface detection covers canonical and immutable release paths', () => {

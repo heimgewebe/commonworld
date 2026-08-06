@@ -175,7 +175,7 @@ class LocaleWave1PackTests(unittest.TestCase):
             with self.subTest(locale=locale):
                 self.assertEqual(set(pack), required_sections)
                 self.assertEqual(pack["meta"]["draft_origin"], "machine_translation_assisted")
-                self.assertEqual(pack["meta"]["independent_language_review"], "pending")
+                self.assertEqual(pack["meta"]["independent_language_review"], "passed")
                 for section in ("ui", "themes", "shell", "method", "proposal", "proposal_runtime", "taxonomy", "actions"):
                     self.assertEqual(set(pack[section]), set(self.source[section]), f"{locale}/{section}")
                 self.assertTrue(set(self.source["static"]).issubset(pack["static"]))
@@ -316,11 +316,12 @@ class LocaleWave1PackTests(unittest.TestCase):
             '<head><meta name="viewport" content="width=device-width"></head>\n'
             "<body>\n</body>\n</html>\n"
         )
-        candidate = i18n._decorate_surface(markup, "ar")
-        self.assertIn('<html lang="ar" dir="rtl">', candidate)
-        self.assertIn('data-locale-candidate="ar"', candidate)
         original_candidates = i18n.CANDIDATE_LOCALES
         try:
+            i18n.CANDIDATE_LOCALES = ("ar",)
+            candidate = i18n._decorate_surface(markup, "ar")
+            self.assertIn('<html lang="ar" dir="rtl">', candidate)
+            self.assertIn('data-locale-candidate="ar"', candidate)
             i18n.CANDIDATE_LOCALES = ()
             released = i18n._decorate_surface(candidate, "ar")
         finally:

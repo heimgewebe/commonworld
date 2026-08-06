@@ -5,7 +5,11 @@
   "decision": {
     "released_locales": [
       "en",
-      "de"
+      "de",
+      "es",
+      "fr",
+      "pt-BR",
+      "ar"
     ],
     "default_locale": "en",
     "fallback_locale": "de",
@@ -68,7 +72,7 @@
       "english_name": "German"
     },
     "es": {
-      "status": "candidate",
+      "status": "released",
       "direction": "ltr",
       "native_name": "Español",
       "english_name": "Spanish",
@@ -78,10 +82,13 @@
         "proposal": "propose.es.html"
       },
       "translation_pack": "wave_1",
-      "candidate_evidence_path": "docs/evidence/locale-candidates/es.json"
+      "release_evidence": {
+        "path": "docs/evidence/locale-releases/es.json",
+        "sha256": "bc3210438aeb5f896c20ef4f868f8a29be2de218e32d3236bc978fc1179556e3"
+      }
     },
     "fr": {
-      "status": "candidate",
+      "status": "released",
       "direction": "ltr",
       "native_name": "Français",
       "english_name": "French",
@@ -91,10 +98,13 @@
         "proposal": "propose.fr.html"
       },
       "translation_pack": "wave_1",
-      "candidate_evidence_path": "docs/evidence/locale-candidates/fr.json"
+      "release_evidence": {
+        "path": "docs/evidence/locale-releases/fr.json",
+        "sha256": "67e1c91f33bd959397f73214954b2a58e9add46793d3f7bd808cff13c484fe6c"
+      }
     },
     "pt-BR": {
-      "status": "candidate",
+      "status": "released",
       "direction": "ltr",
       "native_name": "Português (Brasil)",
       "english_name": "Brazilian Portuguese",
@@ -104,10 +114,13 @@
         "proposal": "propose.pt-BR.html"
       },
       "translation_pack": "wave_1",
-      "candidate_evidence_path": "docs/evidence/locale-candidates/pt-BR.json"
+      "release_evidence": {
+        "path": "docs/evidence/locale-releases/pt-BR.json",
+        "sha256": "c32ec8cf36008af20816b9fedfe8ec7fc476dec6243742a2cb2155c47efc9628"
+      }
     },
     "ar": {
-      "status": "candidate",
+      "status": "released",
       "direction": "rtl",
       "native_name": "العربية",
       "english_name": "Arabic",
@@ -117,7 +130,10 @@
         "proposal": "propose.ar.html"
       },
       "translation_pack": "wave_1",
-      "candidate_evidence_path": "docs/evidence/locale-candidates/ar.json"
+      "release_evidence": {
+        "path": "docs/evidence/locale-releases/ar.json",
+        "sha256": "598c0abedc64137419dceb8b8f7e089c7384320bc9da6daa15106e6dbc29ae4c"
+      }
     },
     "zh-Hans": {
       "status": "planned",

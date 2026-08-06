@@ -25,12 +25,12 @@ test('manual language choices include reviewed and preview locales', () => {
   assert.equal(normalizeLocalePreference('zh-Hans'), null);
 });
 
-test('automatic language matching remains limited to released locales', () => {
-  assert.equal(matchSupportedLocale(['fr-FR', 'de-DE']), 'de');
-  assert.equal(matchSupportedLocale(['ar', 'en-GB']), 'en');
+test('automatic language matching includes every released Wave-1 locale', () => {
+  assert.equal(matchSupportedLocale(['fr-FR', 'de-DE']), 'fr');
+  assert.equal(matchSupportedLocale(['ar', 'en-GB']), 'ar');
 });
 
-test('preview locale choices survive the same bounded storage path as released choices', () => {
+test('Wave-1 locale choices survive the same bounded storage path as baseline choices', () => {
   const values = new Map();
   const storage = {
     getItem(key) { return values.get(key) ?? null; },
@@ -42,7 +42,7 @@ test('preview locale choices survive the same bounded storage path as released c
   assert.equal(readStoredLocalePreference(storage), 'fr');
 });
 
-test('manual and direct preview locale navigation keeps the preview choice', () => {
+test('manual and direct Wave-1 locale navigation keeps the released choice', () => {
   const manual = resolveLocalePreference({
     pathname: '/index.html',
     currentLocale: 'en',
