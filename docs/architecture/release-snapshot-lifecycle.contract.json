@@ -1,0 +1,93 @@
+{
+  "schema_version": 1,
+  "kind": "commonworld.release_snapshot_lifecycle",
+  "task_id": "COMMONWORLD-PUBLIC-GLOBE-V1-T040",
+  "current_release": {
+    "manifest": "assets/commonworld-page-builds.json",
+    "selector": "release_id",
+    "snapshot_path": "releases/<release_id>/",
+    "selection_policy": "manifest-selected-current-release"
+  },
+  "history": {
+    "mode": "append-only-content-addressed",
+    "automatic_pruning": false,
+    "existing_release_policy": "verify-byte-identical-or-fail",
+    "publication": "stage-then-rename"
+  },
+  "generated_paths": {
+    "immutable_release_snapshots": {
+      "pattern": "releases/<release_id>/**",
+      "class": "regenerable-immutable-output",
+      "legacy_transition": "delete-common-ancestor-and-add-new-hash-tree",
+      "replacement_transition": "retain-common-ancestor-and-add-new-hash-tree"
+    },
+    "current_release_selector": {
+      "path": "assets/commonworld-page-builds.json",
+      "class": "regenerable-current-selector",
+      "resolution": "regenerate-from-verified-source-and-build-inputs"
+    },
+    "provider_probe": {
+      "path": "404.html",
+      "class": "regenerable-current-release-probe"
+    },
+    "rendered_public_pages": {
+      "source": "scripts.locale_registry.PUBLIC_PAGES",
+      "class": "regenerable-release-bound-pages"
+    },
+    "delivery_evidence": {
+      "paths": [
+        "docs/evidence/catalog-delivery-benchmark-v1.json",
+        "docs/evidence/catalog-delivery-public-browser-smoke-v1.json"
+      ],
+      "class": "measured-evidence",
+      "resolution": "remeasure-or-rebind-only-after-digest-validation"
+    }
+  },
+  "semantic_source_conflicts": {
+    "automatic_resolution": false,
+    "policy": "normal-git-conflict-fail-closed",
+    "custom_merge_driver": false,
+    "scope": "catalog, contracts, runtime source, templates and other human-authored inputs",
+    "does_not_establish": "conflict freedom for semantic source edits"
+  },
+  "conflict_model": {
+    "legacy_transition": "delete-common-ancestor-release-and-add-new-hash-release",
+    "legacy_git_effect": "competing-rename-delete-conflicts",
+    "replacement_transition": "retain-common-ancestor-release-and-add-new-hash-release",
+    "replacement_git_effect": "disjoint-additions",
+    "observed_pull_request": 186,
+    "observed_diff_class": "more-than-300-files"
+  },
+  "evidence_freshness": {
+    "binding": "docs/evidence/release-snapshot-lifecycle-v1.json",
+    "generator": "python3 scripts/measure_release_snapshot_lifecycle.py",
+    "model": "digest-defined-proposed-head-scope",
+    "current_release_required": true,
+    "proposed_head_inputs": [
+      "Makefile",
+      "docs/architecture/release-snapshot-lifecycle.contract.json",
+      "package.json",
+      "assets/commonworld-release-check.js",
+      "scripts/build_page_release_manifest.py",
+      "scripts/measure_release_snapshot_lifecycle.py",
+      "scripts/public_cache.py",
+      "scripts/render_public_shell.py",
+      "scripts/validate_cache_coherence.py",
+      "scripts/validate_canonical_plan.py",
+      "scripts/validate_catalog_delivery_budget.py",
+      "scripts/validate_release_snapshot_lifecycle.py",
+      "tests/test_release_snapshot_lifecycle.py"
+    ],
+    "delivery_evidence": [
+      "docs/evidence/catalog-delivery-benchmark-v1.json",
+      "docs/evidence/catalog-delivery-public-browser-smoke-v1.json"
+    ],
+    "stale_or_invalidated_must_fail": true
+  },
+  "rollback": {
+    "historical_snapshot_retained": true,
+    "current_selection_remains_manifest_bound": true,
+    "source_release_metadata_and_retained_artifacts_revert_together": true,
+    "shared_history_rewrite_forbidden": true
+  }
+}

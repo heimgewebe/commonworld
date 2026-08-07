@@ -13,6 +13,7 @@ if str(ROOT) not in sys.path:
     sys.path.insert(0, str(ROOT))
 
 from scripts.build_page_release_manifest import (
+    MANIFEST_RELATIVE,
     PUBLIC_PAGES,
     build_manifest,
     canonical_json,
@@ -23,6 +24,7 @@ from scripts.locale_registry import locales_with_status, surface_file
 from scripts.public_cache import asset_version, page_build_metadata, page_release_id
 
 _MARKER_PATTERN = re.compile(r"<!-- commonworld-release-manifest:(\{[^\n]+\}) -->")
+_RELEASE_ID_PATTERN = re.compile(r"^[0-9a-f]{20}$")
 
 
 def validate(root: Path = ROOT) -> list[str]:
@@ -112,13 +114,32 @@ def validate(root: Path = ROOT) -> list[str]:
 
     releases_root = root / "releases"
     release_directories = sorted(path for path in releases_root.iterdir() if path.is_dir()) if releases_root.is_dir() else []
-    if [path.name for path in release_directories] != [release_id]:
-        errors.append("public build must retain exactly the current path-keyed release snapshot")
+    if not release_directories:
+        errors.append("public build must retain at least the current path-keyed release snapshot")
+    invalid_release_names = [path.name for path in release_directories if not _RELEASE_ID_PATTERN.fullmatch(path.name)]
+    if invalid_release_names:
+        errors.append(f"public release history contains invalid snapshot identities: {invalid_release_names[:5]}")
+    for snapshot_root in release_directories:
+        historical_manifest_path = snapshot_root / MANIFEST_RELATIVE
+        try:
+            historical_manifest = json.loads(historical_manifest_path.read_text(encoding="utf-8"))
+        except (OSError, json.JSONDecodeError) as error:
+            errors.append(f"historical release manifest is unreadable: {snapshot_root.name}: {error}")
+            continue
+        if (
+            historical_manifest.get("kind") != "commonworld.release_manifest"
+            or historical_manifest.get("schema_version") != 2
+            or historical_manifest.get("release_id") != snapshot_root.name
+        ):
+            errors.append(f"historical release manifest identity mismatch: {snapshot_root.name}")
+
+    current_snapshot_root = releases_root / str(release_id)
+    if not current_snapshot_root.is_dir():
+        errors.append("public release history does not contain the current snapshot")
     else:
-        snapshot_root = release_directories[0]
         for source in snapshot_files(root, include_manifest=True):
             relative = source.relative_to(root)
-            target = snapshot_root / relative
+            target = current_snapshot_root / relative
             if not target.is_file():
                 errors.append(f"release snapshot is missing public file: {relative.as_posix()}")
             elif target.read_bytes() != source.read_bytes():

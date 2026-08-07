@@ -7,6 +7,7 @@ import hashlib
 import json
 import shutil
 import sys
+import tempfile
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -131,16 +132,65 @@ def finalize_pages(root: Path, release_id: str) -> None:
         path.write_text(finalize_page_release(markup, release_id), encoding="utf-8")
 
 
-def build_snapshot(root: Path, release_id: str) -> Path:
-    releases_root = root / "releases"
-    if releases_root.is_dir():
-        shutil.rmtree(releases_root)
-    target_root = releases_root / release_id
-    for source in snapshot_files(root, include_manifest=True):
-        relative = source.relative_to(root)
+def _snapshot_sources(root: Path) -> dict[Path, Path]:
+    return {
+        source.relative_to(root): source
+        for source in snapshot_files(root, include_manifest=True)
+    }
+
+
+def assert_current_snapshot_immutable(root: Path, target_root: Path) -> None:
+    """Fail closed if a content-addressed release path already contains different bytes."""
+    expected = _snapshot_sources(root)
+    actual = {
+        path.relative_to(target_root)
+        for path in target_root.rglob("*")
+        if path.is_file()
+    }
+    expected_paths = set(expected)
+    if actual != expected_paths:
+        missing = sorted(path.as_posix() for path in expected_paths - actual)
+        extra = sorted(path.as_posix() for path in actual - expected_paths)
+        raise ValueError(
+            "immutable release snapshot file set drift: "
+            f"missing={missing[:5]} extra={extra[:5]}"
+        )
+    for relative, source in expected.items():
         target = target_root / relative
-        target.parent.mkdir(parents=True, exist_ok=True)
-        shutil.copy2(source, target)
+        if target.read_bytes() != source.read_bytes():
+            raise ValueError(
+                f"immutable release snapshot content drift: {relative.as_posix()}"
+            )
+
+
+def build_snapshot(root: Path, release_id: str) -> Path:
+    """Materialize one immutable snapshot without deleting historical releases.
+
+    Hash-named releases are append-only Git artifacts. Keeping the common ancestor
+    snapshot prevents independent branches from turning every release file into a
+    competing rename/delete pair when they are later combined.
+    """
+    releases_root = root / "releases"
+    releases_root.mkdir(parents=True, exist_ok=True)
+    target_root = releases_root / release_id
+    if target_root.exists():
+        if not target_root.is_dir():
+            raise ValueError(f"release snapshot path is not a directory: {release_id}")
+        assert_current_snapshot_immutable(root, target_root)
+        return target_root
+
+    staging_root = Path(
+        tempfile.mkdtemp(prefix=f".{release_id}.staging-", dir=releases_root)
+    )
+    try:
+        for relative, source in _snapshot_sources(root).items():
+            target = staging_root / relative
+            target.parent.mkdir(parents=True, exist_ok=True)
+            shutil.copy2(source, target)
+        staging_root.rename(target_root)
+    except BaseException:
+        shutil.rmtree(staging_root, ignore_errors=True)
+        raise
     return target_root
 
 
