@@ -141,6 +141,12 @@ try {
       assert(response?.status() === 200, `${pageName}: HTTP ${response?.status()}`);
       if (!pageName.startsWith('method.') && !pageName.startsWith('propose.')) {
         await page.waitForSelector('html.runtime-ready', { timeout: 30_000 });
+        if (pageName === `${candidate.locale}.html`) {
+          await page.waitForFunction(
+            () => document.querySelector('.globe-stage')?.dataset.localePack === 'ready',
+            { timeout: 30_000 },
+          );
+        }
         if (pageName === 'ar.html') {
           await page.waitForFunction(
             () => window.maplibregl?.getRTLTextPluginStatus?.() === 'loaded',
@@ -628,6 +634,52 @@ try {
       await context.close();
     }
   }
+  {
+    const candidate = WAVE1_LOCALES.find(({ locale }) => locale === 'fr');
+    assert(candidate, 'Wave-1 non-blocking smoke requires the released French locale');
+    const pageName = `${candidate.locale}.html`;
+    const context = await browser.newContext({ viewport: { width: 1024, height: 768 }, reducedMotion: 'reduce' });
+    await context.addInitScript(() => {
+      const nativeSetTimeout = globalThis.setTimeout.bind(globalThis);
+      globalThis.setTimeout = (callback, delay, ...args) => nativeSetTimeout(
+        callback,
+        delay === 2_500 ? 60_000 : delay,
+        ...args,
+      );
+    });
+    const page = await context.newPage();
+    const pageErrors = [];
+    const warnings = [];
+    let heldLocalePackRoute = null;
+    page.on('pageerror', (error) => pageErrors.push(error.message));
+    page.on('console', (message) => {
+      if (message.type() === 'warning') warnings.push(message.text());
+    });
+    await page.route('**/assets/commonworld-wave1-locales.mjs*', (route) => {
+      heldLocalePackRoute = route;
+    });
+    const navigation = page.goto(`${baseUrl}/${pageName}`, { waitUntil: 'domcontentloaded' });
+    await page.waitForSelector('html.runtime-ready', { timeout: 5_000 });
+    const response = await navigation;
+    assert(response?.status() === 200, `${pageName}: pending-pack HTTP ${response?.status()}`);
+    assert(heldLocalePackRoute, `${pageName}: locale pack request was not held`);
+    const pendingState = await page.evaluate(() => ({
+      presentation: document.body.dataset.presentation ?? '',
+      fallbackPresent: Boolean(document.querySelector('[data-static-catalog-fallback]')),
+      runtimeReady: document.documentElement.classList.contains('runtime-ready'),
+    }));
+    assert(pendingState.runtimeReady, `${pageName}: pending locale pack blocked runtime-ready`);
+    assert(pendingState.presentation === 'globe', `${pageName}: pending locale pack changed presentation to ${pendingState.presentation}`);
+    assert(!pendingState.fallbackPresent, `${pageName}: pending locale pack left the static catalogue over the globe`);
+    await heldLocalePackRoute.abort('failed');
+    await page.waitForTimeout(50);
+    assert(pageErrors.length === 0, `${pageName}: pending-pack page errors: ${pageErrors.join(' | ')}`);
+    const fallbackWarnings = warnings.filter((message) => message.includes('Wave-1 locale pack unavailable'));
+    assert(fallbackWarnings.length === 1, `${pageName}: expected one pending-pack fallback warning, got ${fallbackWarnings.length}: ${warnings.join(' | ')}`);
+    localePackResilience.push({ page: pageName, locale: candidate.locale, surface: 'globe', pendingPackNonBlocking: true, verdict: 'PASS' });
+    await context.close();
+  }
+
   for (const candidate of WAVE1_LOCALES) {
     const pageName = `${candidate.locale}.html`;
     const context = await browser.newContext({ viewport: { width: 1024, height: 768 }, reducedMotion: 'reduce' });

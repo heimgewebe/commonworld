@@ -1,6 +1,6 @@
 import { BOOTSTRAP_RECORDS } from './commonworld-bootstrap-catalog.mjs?v=82a9928802d2';
 import { createCatalogLoadCache, loadCatalogAggregate, loadCatalogDetail, loadCatalogShard, shardKeyForIdentity } from './commonworld-catalog-runtime.mjs?v=25d37dcafe15';
-import { actionLabel, documentDirection, documentLocale, localizeCatalogRecords, text as i18nText, themeLabel } from './commonworld-i18n.mjs?v=adb1f6df0737';
+import { actionLabel, documentDirection, documentLocale, localizeCatalogRecords, text as i18nText, themeLabel, wave1LocalePackReady } from './commonworld-i18n.mjs?v=e23e271a569d';
 import {
   COMMONS_TYPE_COLOR_TOKENS,
   COMMONS_TYPE_VALUES,
@@ -62,7 +62,7 @@ import {
   sortRecords,
   stateFromSearch,
   visibleDigitalNodes,
-} from './commonworld-core.mjs?v=4abe593714f8';
+} from './commonworld-core.mjs?v=1a3707d50636';
 
 const LOCALE = documentLocale();
 const DOCUMENT_DIRECTION = documentDirection(LOCALE);
@@ -688,6 +688,20 @@ function installRecords(records) {
   runtime.publicMapUpdateCount = 0;
   runtime.presentationKey = null;
   if (runtime.countryEntries.size) rebuildSpatialDestinationIndex();
+}
+
+function refreshRuntimeLocalization() {
+  const canonical = [...runtime.canonicalRecordsById.values()];
+  if (canonical.length === 0) return;
+  const localized = localizeCatalogRecords(canonical, LOCALE);
+  runtime.searchAliasesById = localized.searchAliasesById;
+  installRecords(localized.records);
+  document.querySelector('#catalog')?.replaceChildren();
+  renderMapLegend();
+  renderSphere();
+  renderLayerStack();
+  renderDiscoveryState();
+  refreshStatus();
 }
 
 function createSvgElement(name, attributes = {}) {
@@ -4101,6 +4115,15 @@ async function boot() {
       console.warn('Commonworld country composition layer unavailable', error);
     });
     document.documentElement.classList.add('runtime-ready');
+    void wave1LocalePackReady.then((loaded) => {
+      if (!loaded) return;
+      try {
+        refreshRuntimeLocalization();
+        elements.stage.dataset.localePack = 'ready';
+      } catch (error) {
+        console.warn('Commonworld locale pack loaded after boot but runtime relocalization failed; current fallbacks remain active', error);
+      }
+    });
     void observeCatalogPlatform();
 
     // Build and CI compare this generated bootstrap with every canonical CommonProject.

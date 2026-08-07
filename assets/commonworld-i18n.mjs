@@ -66,14 +66,22 @@ export async function loadWave1LocalePacks({
 }
 
 let WAVE1_LOCALE_PACKS = Object.freeze({});
+export let wave1LocalePackReady = Promise.resolve(false);
 if (shouldLoadWave1LocalePack(runtimeDocumentLocale)) {
-  try {
-    WAVE1_LOCALE_PACKS = await loadWave1LocalePacks();
-  } catch (error) {
-    const detail = error instanceof Error ? error.message : String(error);
-    console.warn(`[i18n] Wave-1 locale pack unavailable; continuing with English interface fallbacks. ${detail}`);
-  }
+  wave1LocalePackReady = loadWave1LocalePacks()
+    .then((packs) => {
+      WAVE1_LOCALE_PACKS = packs;
+      return true;
+    })
+    .catch((error) => {
+      const detail = error instanceof Error ? error.message : String(error);
+      console.warn(`[i18n] Wave-1 locale pack unavailable; continuing with English interface fallbacks. ${detail}`);
+      return false;
+    });
 }
+
+// Consumers that require the complete Wave-1 vocabulary can await this promise explicitly.
+// The module itself stays synchronous so an optional translation download can never gate the globe.
 
 export function normalizeLocale(value, fallback = DEFAULT_LOCALE) {
   return normalizeKnownLocale(value, fallback);

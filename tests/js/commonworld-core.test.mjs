@@ -88,6 +88,9 @@ import {
   validateDigitalTaxonomy,
   visibleDigitalNodes,
 } from '../../assets/commonworld-core.mjs';
+import { wave1LocalePackReady } from '../../assets/commonworld-i18n.mjs';
+
+await wave1LocalePackReady;
 
 function loadPublicCatalogRecords() {
   const manifest = JSON.parse(readFileSync(new URL('../../catalog/catalog.json', import.meta.url), 'utf8'));

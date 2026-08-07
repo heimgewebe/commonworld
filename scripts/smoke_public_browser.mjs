@@ -27,7 +27,9 @@ import {
   sphereOpacityForGlobeRatio,
   visibleDigitalNodes,
 } from '../assets/commonworld-core.mjs';
-import { localizeCatalogRecords } from '../assets/commonworld-i18n.mjs';
+import { localizeCatalogRecords, wave1LocalePackReady } from '../assets/commonworld-i18n.mjs';
+
+await wave1LocalePackReady;
 
 const ROOT = process.cwd();
 // Allow half a CSS pixel for browser-dependent subpixel rounding of the nominal 48 px lane.
