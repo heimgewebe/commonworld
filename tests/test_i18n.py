@@ -1,8 +1,10 @@
+import copy
 import json
+import re
 import unittest
 from pathlib import Path
 
-from scripts.commonworld_i18n import localize_records, replace_exact
+from scripts.commonworld_i18n import SUPPORTED_LOCALES, load_locale, localize_records, replace_exact, validate_catalog_overlay
 from scripts.render_proposal_page import render as render_proposal
 from scripts.render_public_shell import load_records, render_method, render_shell
 
@@ -33,10 +35,49 @@ class InternationalizationTests(unittest.TestCase):
             )
             self.assertTrue(translated["summary"].strip())
 
-    def test_locale_overlay_matches_catalog_ids_exactly(self) -> None:
-        overlay = json.loads((ROOT / "catalog/locales/en.json").read_text(encoding="utf-8"))
+    def test_released_locale_overlays_match_catalog_ids_exactly(self) -> None:
         catalog_ids = {record["id"] for record in load_records(ROOT)}
-        self.assertEqual(catalog_ids, set(overlay["projects"]))
+        for locale in SUPPORTED_LOCALES:
+            if locale == "de":
+                continue
+            overlay = json.loads((ROOT / f"catalog/locales/{locale}.json").read_text(encoding="utf-8"))
+            with self.subTest(locale=locale):
+                self.assertEqual(catalog_ids, set(overlay["projects"]))
+
+    def test_wave1_catalog_content_is_localized_and_content_locale_is_exact(self) -> None:
+        canonical = load_records(ROOT)
+        english = {record["id"]: record for record in localize_records(canonical, "en", ROOT)}
+        for locale in ("es", "fr", "pt-BR", "ar"):
+            localized = {record["id"]: record for record in localize_records(canonical, locale, ROOT)}
+            for project_id in ("mundraub", "common-voice"):
+                with self.subTest(locale=locale, project=project_id):
+                    self.assertEqual(locale, localized[project_id]["_content_locale"] )
+                    self.assertEqual(english[project_id]["title"], localized[project_id]["title"] )
+                    self.assertNotEqual(english[project_id]["summary"], localized[project_id]["summary"] )
+                    self.assertNotEqual(english[project_id]["presence"]["digital"]["label"], localized[project_id]["presence"]["digital"]["label"] )
+            if locale == "ar":
+                self.assertRegex(localized["mundraub"]["summary"], r"[\u0600-\u06ff]")
+
+    def test_catalog_overlay_validation_rejects_extra_fields_and_wrong_digital_shape(self) -> None:
+        canonical = load_records(ROOT)
+        overlay = load_locale("es", ROOT)
+        broken = copy.deepcopy(overlay)
+        broken["projects"]["mundraub"]["canonical_url"] = "https://example.invalid/"
+        with self.assertRaisesRegex(ValueError, "unexpected project fields"):
+            validate_catalog_overlay(broken, canonical, "es")
+        broken = copy.deepcopy(overlay)
+        unavailable = next(record for record in canonical if record["presence"]["digital"]["available"] is not True)
+        broken["projects"][unavailable["id"]]["digital_label"] = "must not exist"
+        with self.assertRaisesRegex(ValueError, "must not contain digital label"):
+            validate_catalog_overlay(broken, canonical, "es")
+
+    def test_arabic_catalog_prose_has_arabic_without_glued_mixed_script(self) -> None:
+        overlay = json.loads((ROOT / "catalog/locales/ar.json").read_text(encoding="utf-8"))
+        for project_id, translation in overlay["projects"].items():
+            text = " ".join([translation["summary"], *translation["geographic_labels"].values(), translation.get("digital_label", "")])
+            with self.subTest(project=project_id):
+                self.assertRegex(text, r"[\u0600-\u06ff]")
+                self.assertNotRegex(text, r"[\u0621-\u063A\u0641-\u064A][A-Za-z]|[A-Za-z][\u0621-\u063A\u0641-\u064A]")
 
     def test_geographic_overlay_is_bound_to_stable_location_ids(self) -> None:
         canonical = load_records(ROOT)

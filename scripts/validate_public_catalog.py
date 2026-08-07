@@ -420,7 +420,7 @@ def validate_public_catalog(root: Path = ROOT) -> list[str]:
         localized_records_by_locale[locale] = localized
 
     # Specificity binds catalogue content languages, not every UI surface language.
-    # Wave-1 UI locales keep English content overlays and must not invent parallel
+    # Released Wave-1 UI locales use complete locale-specific presentation overlays and must not invent parallel
     # summary policies for es/fr/pt-BR/ar.
     content_checked: set[str] = set()
     for ui_locale, localized_records in localized_records_by_locale.items():

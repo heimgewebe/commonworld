@@ -306,7 +306,7 @@ class LocaleWave1PackTests(unittest.TestCase):
                                 len(WAVE1_LOCALES),
                             )
             index_markup = (ROOT / entry["surface_files"]["index"]).read_text(encoding="utf-8")
-            self.assertRegex(index_markup, r'<h2 lang="en" dir="ltr">')
+            self.assertRegex(index_markup, rf'<h2 lang="{re.escape(locale)}" dir="auto">')
 
     def test_surface_decoration_keeps_rtl_after_hypothetical_promotion(self) -> None:
         from scripts import commonworld_i18n as i18n

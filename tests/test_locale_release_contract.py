@@ -170,7 +170,9 @@ class LocaleReleaseContractTests(unittest.TestCase):
         from scripts.generate_locale_release_evidence import build_scaffold
 
         scaffold = build_scaffold("es")
+        self.assertEqual(scaffold["schema_version"], 2)
         self.assertEqual(scaffold["status"], "pending")
+        self.assertRegex(scaffold["catalog_overlay_sha256"], r"^[0-9a-f]{64}$")
         self.assertFalse(scaffold["gate_results"]["independent_language_review_passed"])
         self.assertNotEqual(scaffold["source_pack_sha256"], scaffold["reviewed_source_pack_sha256"])
         self.assertRegex(scaffold["reviewed_source_pack_sha256"], r"^[0-9a-f]{64}$")
@@ -190,13 +192,14 @@ class LocaleReleaseContractTests(unittest.TestCase):
             for relative in surfaces.values():
                 (root / relative).write_text('<html lang="es" dir="ltr"></html>\n', encoding="utf-8")
             evidence = {
-                "schema_version": 1,
+                "schema_version": 2,
                 "kind": "commonworld.ui_locale_release_evidence",
                 "locale": "es",
                 "status": "released",
                 "source_revision": "a" * 40,
                 "source_pack_sha256": "b" * 64,
                 "reviewed_source_pack_sha256": "d" * 64,
+                "catalog_overlay_sha256": "f" * 64,
                 "surface_sha256": {name: hashlib.sha256((root / relative).read_bytes()).hexdigest() for name, relative in surfaces.items()},
                 "gate_results": {
                     "required_surfaces_passed": sorted(contract["release_gate"]["required_surfaces"]),
@@ -239,6 +242,7 @@ class LocaleReleaseContractTests(unittest.TestCase):
                 set(contract["release_gate"]["required_surfaces"]),
                 "c" * 64,
                 "e" * 64,
+                "f" * 64,
             )
             self.assertIn("release evidence pack digest is stale for es", errors)
             self.assertIn("release evidence reviewed source pack digest is stale for es", errors)
@@ -267,13 +271,14 @@ class LocaleReleaseContractTests(unittest.TestCase):
                 target = root / relative
                 target.write_text(f"<html lang=\"es\" dir=\"ltr\"><body>{relative}</body></html>\n", encoding="utf-8")
             evidence = {
-                "schema_version": 1,
+                "schema_version": 2,
                 "kind": "commonworld.ui_locale_release_evidence",
                 "locale": "es",
                 "status": "released",
                 "source_revision": "a" * 40,
                 "source_pack_sha256": "c" * 64,
                 "reviewed_source_pack_sha256": "d" * 64,
+                "catalog_overlay_sha256": "e" * 64,
                 "surface_sha256": {
                     name: hashlib.sha256((root / relative).read_bytes()).hexdigest()
                     for name, relative in surfaces.items()
@@ -328,6 +333,7 @@ class LocaleReleaseContractTests(unittest.TestCase):
                 set(contract["release_gate"]["required_surfaces"]),
                 "c" * 64,
                 "d" * 64,
+                "e" * 64,
             )
             self.assertTrue(any("receipt source is missing" in error or "stale" in error for error in errors))
 

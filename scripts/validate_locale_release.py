@@ -216,6 +216,7 @@ def _release_evidence_errors(
     required_surfaces: set[str],
     pack_digest: str | None,
     reviewed_pack_digest: str | None,
+    catalog_overlay_digest: str | None,
 ) -> list[str]:
     errors: list[str] = []
     pointer = entry.get("release_evidence")
@@ -247,8 +248,8 @@ def _release_evidence_errors(
         return [f"release evidence artifact root must be an object for {tag}"]
     _require(
         errors,
-        evidence.get("schema_version") == 1,
-        f"release evidence schema_version must be 1 for {tag}",
+        evidence.get("schema_version") == 2,
+        f"release evidence schema_version must be 2 for {tag}",
     )
     _require(
         errors,
@@ -276,6 +277,12 @@ def _release_evidence_errors(
         reviewed_pack_digest is not None
         and evidence.get("reviewed_source_pack_sha256") == reviewed_pack_digest,
         f"release evidence reviewed source pack digest is stale for {tag}",
+    )
+    _require(
+        errors,
+        catalog_overlay_digest is not None
+        and evidence.get("catalog_overlay_sha256") == catalog_overlay_digest,
+        f"release evidence catalog overlay digest is stale for {tag}",
     )
     review_class = evidence.get("review_class")
     expected_review_fields = {
@@ -435,6 +442,49 @@ def _release_evidence_errors(
             if _sha256(source_path) != receipt["sha256"]:
                 errors.append(
                     f"release evidence receipt source is stale for {tag}/{gate_name}: sha256 mismatch"
+                )
+                continue
+            if gate_name == "independent_language_review":
+                try:
+                    review_receipt = json.loads(source_path.read_text(encoding="utf-8"))
+                except json.JSONDecodeError as exc:
+                    errors.append(
+                        f"independent language review receipt is invalid JSON for {tag}: {exc}"
+                    )
+                    continue
+                catalog_review = review_receipt.get("catalog_review") if isinstance(review_receipt, dict) else None
+                input_digests = catalog_review.get("input_digests") if isinstance(catalog_review, dict) else None
+                coverage = catalog_review.get("coverage") if isinstance(catalog_review, dict) else None
+                counts = catalog_review.get("counts") if isinstance(catalog_review, dict) else None
+                _require(
+                    errors,
+                    isinstance(catalog_review, dict)
+                    and catalog_review.get("review_kind") == "model_assisted_independent_language_review"
+                    and catalog_review.get("writer_independence") == "independent_from_grok_4_5_writer"
+                    and catalog_review.get("verdict") == "pass",
+                    f"independent language review receipt lacks a passing catalog review for {tag}",
+                )
+                _require(
+                    errors,
+                    isinstance(input_digests, dict)
+                    and catalog_overlay_digest is not None
+                    and input_digests.get(tag) == catalog_overlay_digest,
+                    f"independent language review catalog digest is stale for {tag}",
+                )
+                _require(
+                    errors,
+                    isinstance(coverage, dict)
+                    and coverage.get("all_entries_reviewed") is True
+                    and tag in coverage.get("locales", []),
+                    f"independent language review catalog coverage is incomplete for {tag}",
+                )
+                _require(
+                    errors,
+                    isinstance(counts, dict)
+                    and counts.get("blocker") == 0
+                    and counts.get("major") == 0
+                    and counts.get("minor") == 0,
+                    f"independent language review still has blocking catalog findings for {tag}",
                 )
     return errors
 
@@ -750,6 +800,9 @@ def validate_contract(contract: dict[str, Any], root: Path = ROOT) -> list[str]:
                         set(gate.get("required_surfaces", [])),
                         pack_digest,
                         reviewed_pack_digest,
+                        _sha256(root / "catalog" / "locales" / f"{tag}.json")
+                        if (root / "catalog" / "locales" / f"{tag}.json").is_file()
+                        else None,
                     )
                 )
         elif status == "candidate":

@@ -59,25 +59,30 @@ test('Wave-1 locale pack loading has a bounded timeout', async () => {
   assert.ok(performance.now() - startedAt < 1_000);
 });
 
-test('candidate locales keep English catalog content with localized interface labels', () => {
+test('released Wave-1 locales use their complete catalog presentation packs', () => {
   const english = localizeCatalogRecords(BOOTSTRAP_RECORDS, 'en').records;
+  const englishById = new Map(english.map((record) => [record.id, record]));
   for (const locale of ['es', 'fr', 'pt-BR', 'ar']) {
-    assert.equal(catalogContentLocale(locale), 'en');
-    const candidate = localizeCatalogRecords(BOOTSTRAP_RECORDS, locale).records;
-    assert.equal(candidate.length, english.length);
-    for (let index = 0; index < candidate.length; index += 1) {
-      assert.equal(candidate[index]._content_locale, 'en', `${locale}:${candidate[index].id}`);
-      assert.equal(candidate[index].title, english[index].title, `${locale}:${candidate[index].id}:title`);
-      assert.equal(candidate[index].summary, english[index].summary, `${locale}:${candidate[index].id}:summary`);
-      assert.deepEqual(
-        candidate[index].presence.geographic.map(({ id, label }) => ({ id, label })),
-        english[index].presence.geographic.map(({ id, label }) => ({ id, label })),
-        `${locale}:${candidate[index].id}:locations`,
-      );
-      assert.equal(candidate[index].presence.digital?.label, english[index].presence.digital?.label, `${locale}:${candidate[index].id}:digital`);
-      for (const link of candidate[index].links ?? []) {
+    assert.equal(catalogContentLocale(locale), locale);
+    const localized = localizeCatalogRecords(BOOTSTRAP_RECORDS, locale).records;
+    assert.equal(localized.length, english.length);
+    for (const projectId of ['mundraub', 'common-voice']) {
+      const record = localized.find((entry) => entry.id === projectId);
+      const englishRecord = englishById.get(projectId);
+      assert.ok(record && englishRecord);
+      assert.equal(record._content_locale, locale, `${locale}:${projectId}:content-locale`);
+      assert.equal(record.title, englishRecord.title, `${locale}:${projectId}:proper-name`);
+      assert.notEqual(record.summary, englishRecord.summary, `${locale}:${projectId}:summary`);
+      if (record.presence.digital?.available === true) {
+        assert.notEqual(record.presence.digital.label, englishRecord.presence.digital.label, `${locale}:${projectId}:digital`);
+      }
+      if (locale === 'ar') assert.match(record.summary, /[\u0600-\u06ff]/u);
+    }
+    for (const record of localized) {
+      assert.equal(record._content_locale, locale, `${locale}:${record.id}`);
+      for (const link of record.links ?? []) {
         if (['homepage', 'visit', 'use', 'borrow', 'learn', 'contribute', 'volunteer', 'donate', 'contact', 'replicate'].includes(link.type)) {
-          assert.equal(link.label, actionLabel(link.type, locale), `${locale}:${candidate[index].id}:${link.type}`);
+          assert.equal(link.label, actionLabel(link.type, locale), `${locale}:${record.id}:${link.type}`);
         }
       }
     }
@@ -169,6 +174,17 @@ test('English catalog search remains bilingual through canonical German aliases'
   assert.equal(index.search({ query: 'freies betriebssystem', all: true })[0]?.id, 'debian');
   assert.ok(index.search({ query: 'borrow', all: true }).some(({ id }) => id === 'brisbane-tool-library' || id === 'edinburgh-tool-library'));
   assert.equal(index.search({ query: 'private heimrouter', all: true }).length, 0);
+});
+
+
+
+test('Wave-1 localized search retains English and canonical German discovery aliases', () => {
+  for (const locale of ['es', 'fr', 'pt-BR', 'ar']) {
+    const localized = localizeCatalogRecords(BOOTSTRAP_RECORDS, locale);
+    const index = prepareIntentSearchIndex(localized.records, { searchAliasesById: localized.searchAliasesById });
+    assert.equal(index.search({ query: 'free operating system', all: true })[0]?.id, 'debian', `${locale}:english`);
+    assert.equal(index.search({ query: 'freies betriebssystem', all: true })[0]?.id, 'debian', `${locale}:german`);
+  }
 });
 
 test('German catalog search also accepts English translation aliases without hidden-location leakage', () => {
