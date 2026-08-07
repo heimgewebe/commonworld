@@ -639,14 +639,6 @@ try {
     assert(candidate, 'Wave-1 non-blocking smoke requires the released French locale');
     const pageName = `${candidate.locale}.html`;
     const context = await browser.newContext({ viewport: { width: 1024, height: 768 }, reducedMotion: 'reduce' });
-    await context.addInitScript(() => {
-      const nativeSetTimeout = globalThis.setTimeout.bind(globalThis);
-      globalThis.setTimeout = (callback, delay, ...args) => nativeSetTimeout(
-        callback,
-        delay === 2_500 ? 60_000 : delay,
-        ...args,
-      );
-    });
     const page = await context.newPage();
     const pageErrors = [];
     const warnings = [];
@@ -671,12 +663,31 @@ try {
     assert(pendingState.runtimeReady, `${pageName}: pending locale pack blocked runtime-ready`);
     assert(pendingState.presentation === 'globe', `${pageName}: pending locale pack changed presentation to ${pendingState.presentation}`);
     assert(!pendingState.fallbackPresent, `${pageName}: pending locale pack left the static catalogue over the globe`);
-    await heldLocalePackRoute.abort('failed');
-    await page.waitForTimeout(50);
-    assert(pageErrors.length === 0, `${pageName}: pending-pack page errors: ${pageErrors.join(' | ')}`);
+    const pendingCount = (await page.locator('#text-count').textContent()) ?? '';
+    assert(pendingCount.includes('Commons'), `${pageName}: pending locale pack did not use the English runtime fallback: ${pendingCount}`);
+    await page.waitForTimeout(2_800);
+    await heldLocalePackRoute.continue();
+    await page.waitForFunction(
+      () => document.querySelector('.globe-stage')?.dataset.localePack === 'ready',
+      null,
+      { timeout: 5_000 },
+    );
+    await page.waitForFunction(
+      () => document.querySelector('#text-count')?.textContent?.includes('Communs'),
+      null,
+      { timeout: 5_000 },
+    );
+    assert(pageErrors.length === 0, `${pageName}: late-pack page errors: ${pageErrors.join(' | ')}`);
     const fallbackWarnings = warnings.filter((message) => message.includes('Wave-1 locale pack unavailable'));
-    assert(fallbackWarnings.length === 1, `${pageName}: expected one pending-pack fallback warning, got ${fallbackWarnings.length}: ${warnings.join(' | ')}`);
-    localePackResilience.push({ page: pageName, locale: candidate.locale, surface: 'globe', pendingPackNonBlocking: true, verdict: 'PASS' });
+    assert(fallbackWarnings.length === 0, `${pageName}: late successful locale pack was treated as failed: ${warnings.join(' | ')}`);
+    localePackResilience.push({
+      page: pageName,
+      locale: candidate.locale,
+      surface: 'globe',
+      pendingPackNonBlocking: true,
+      latePackRelocalized: true,
+      verdict: 'PASS',
+    });
     await context.close();
   }
 

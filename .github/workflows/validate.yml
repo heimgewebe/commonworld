@@ -1,22 +1,16 @@
-name: repair-pr-198
+name: validate
 
 on:
   pull_request:
   push:
     branches:
-      - fix/wave1-nonblocking-globe-v1
-
-permissions:
-  contents: write
+      - main
 
 jobs:
-  repair:
+  contracts:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v7
-        with:
-          ref: fix/wave1-nonblocking-globe-v1
-          fetch-depth: 20
       - uses: actions/setup-python@v7
         with:
           python-version: "3.12"
@@ -24,97 +18,41 @@ jobs:
         with:
           node-version: "22"
           cache: npm
-      - name: Apply late Wave-1 completion fix
+      - name: Install public runtime dependencies
+        run: npm ci --ignore-scripts --no-audit --no-fund
+      - name: Install bounded browser runtime
+        run: npx playwright install --with-deps chromium
+      - name: Rebuild committed public runtime
+        run: |
+          npm run build
+          git diff --exit-code
+      - name: Self-test complete release snapshot readback
+        run: python3 .github/production-readback/verify_release_snapshot_live.py --self-test
+      - name: Self-test production readback commit status
+        run: python3 .github/production-readback/publish_commit_status.py --self-test
+      - name: Validate production readback status workflow contract
         run: |
           python3 - <<'PY'
           from pathlib import Path
 
-          i18n = Path('assets/commonworld-i18n.mjs')
-          source = i18n.read_text(encoding='utf-8')
-          old = 'wave1LocalePackReady = loadWave1LocalePacks()\n'
-          new = 'wave1LocalePackReady = loadWave1LocalePacks({ timeoutMs: 0 })\n'
-          if source.count(old) != 1:
-              raise SystemExit(f'expected one runtime Wave-1 load site, found {source.count(old)}')
-          source = source.replace(old, new)
-          old_comment = "\n".join([
-              '// Consumers that require the complete Wave-1 vocabulary can await this promise explicitly.',
-              '// The module itself stays synchronous so an optional translation download can never gate the globe.',
-          ]) + "\n"
-          new_comment = "\n".join([
-              '// Runtime startup never times out the eventual Wave-1 import: the globe can render immediately,',
-              '// while a slow but successful pack still relocalizes the live UI when it finally arrives.',
-              '// Explicit callers of loadWave1LocalePacks can still request a bounded timeout.',
-          ]) + "\n"
-          if source.count(old_comment) != 1:
-              raise SystemExit(f'expected one Wave-1 runtime comment, found {source.count(old_comment)}')
-          i18n.write_text(source.replace(old_comment, new_comment), encoding='utf-8')
+          readback = Path(".github/workflows/production-readback.yml").read_text(
+              encoding="utf-8"
+          )
 
-          smoke = Path('scripts/smoke_locale_candidates_browser.mjs')
-          source = smoke.read_text(encoding='utf-8')
-          timer_patch = "\n".join([
-              '    await context.addInitScript(() => {',
-              '      const nativeSetTimeout = globalThis.setTimeout.bind(globalThis);',
-              '      globalThis.setTimeout = (callback, delay, ...args) => nativeSetTimeout(',
-              '        callback,',
-              '        delay === 2_500 ? 60_000 : delay,',
-              '        ...args,',
-              '      );',
-              '    });',
-          ]) + "\n"
-          if source.count(timer_patch) != 1:
-              raise SystemExit(f'expected one timer monkeypatch, found {source.count(timer_patch)}')
-          source = source.replace(timer_patch, '')
-
-          old_tail = "\n".join([
-              "    await heldLocalePackRoute.abort('failed');",
-              '    await page.waitForTimeout(50);',
-              "    assert(pageErrors.length === 0, `${pageName}: pending-pack page errors: ${pageErrors.join(' | ')}`);",
-              "    const fallbackWarnings = warnings.filter((message) => message.includes('Wave-1 locale pack unavailable'));",
-              "    assert(fallbackWarnings.length === 1, `${pageName}: expected one pending-pack fallback warning, got ${fallbackWarnings.length}: ${warnings.join(' | ')}`);",
-              "    localePackResilience.push({ page: pageName, locale: candidate.locale, surface: 'globe', pendingPackNonBlocking: true, verdict: 'PASS' });",
-          ]) + "\n"
-          new_tail = "\n".join([
-              "    const pendingCount = (await page.locator('#text-count').textContent()) ?? '';",
-              "    assert(pendingCount.includes('Commons'), `${pageName}: pending locale pack did not use the English runtime fallback: ${pendingCount}`);",
-              '    await page.waitForTimeout(2_800);',
-              '    await heldLocalePackRoute.continue();',
-              '    await page.waitForFunction(',
-              "      () => document.querySelector('.globe-stage')?.dataset.localePack === 'ready',",
-              '      null,',
-              '      { timeout: 5_000 },',
-              '    );',
-              '    await page.waitForFunction(',
-              "      () => document.querySelector('#text-count')?.textContent?.includes('Communs'),",
-              '      null,',
-              '      { timeout: 5_000 },',
-              '    );',
-              "    assert(pageErrors.length === 0, `${pageName}: late-pack page errors: ${pageErrors.join(' | ')}`);",
-              "    const fallbackWarnings = warnings.filter((message) => message.includes('Wave-1 locale pack unavailable'));",
-              "    assert(fallbackWarnings.length === 0, `${pageName}: late successful locale pack was treated as failed: ${warnings.join(' | ')}`);",
-              '    localePackResilience.push({',
-              '      page: pageName,',
-              '      locale: candidate.locale,',
-              "      surface: 'globe',",
-              '      pendingPackNonBlocking: true,',
-              '      latePackRelocalized: true,',
-              "      verdict: 'PASS',",
-              '    });',
-          ]) + "\n"
-          if source.count(old_tail) != 1:
-              raise SystemExit(f'expected one pending-pack tail, found {source.count(old_tail)}')
-          smoke.write_text(source.replace(old_tail, new_tail), encoding='utf-8')
+          assert "statuses: write" in readback
+          assert "Publish terminal production readback commit status" in readback
+          assert "--mode final" in readback
+          assert "--mode pending" not in readback
+          assert "Mark production readback pending" not in readback
+          assert 'print(f"state={state}")' in readback
+          assert "steps.commit_status.outcome != 'success'" in readback
+          assert "steps.commit_status.outputs.state != 'success'" in readback
+          assert "contents: write" not in readback
+          print("commonworld terminal production readback status workflow contract ok")
           PY
-      - name: Rebuild content-addressed public release
-        run: |
-          npm ci --ignore-scripts --no-audit --no-fund
-          npm run build
-          node --test tests/js/*.test.mjs
-      - name: Commit repaired PR head
-        run: |
-          git show 6d75eb997b178f0df9bc28171dbbeb91ff2e9241:.github/workflows/validate.yml > .github/workflows/validate.yml
-          git config user.name "grabowski-operator"
-          git config user.email "grabowski-operator@users.noreply.github.com"
-          git add -A
-          git diff --cached --check
-          git commit -m "fix(i18n): preserve late Wave-1 locale completion"
-          git push origin HEAD:fix/wave1-nonblocking-globe-v1
+      - name: Install validation dependencies
+        run: python -m pip install -r requirements-dev.txt
+      - name: Validate canonical globe core
+        run: make validate
+      - name: Run failure-safe browser smoke
+        run: npm run smoke:browser
