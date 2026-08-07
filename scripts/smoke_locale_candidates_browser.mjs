@@ -673,7 +673,7 @@ try {
       { timeout: 5_000 },
     );
     await page.waitForFunction(
-      () => document.querySelector('#text-count')?.textContent?.includes('Communs'),
+      () => document.querySelector('#text-count')?.textContent?.includes('communs'),
       null,
       { timeout: 5_000 },
     );
