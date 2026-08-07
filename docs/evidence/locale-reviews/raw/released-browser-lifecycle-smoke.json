@@ -20,6 +20,60 @@
       "verdict": "PASS"
     }
   ],
+  "localePackResilience": [
+    {
+      "page": "es.html",
+      "locale": "es",
+      "surface": "globe",
+      "mapRenders": 27,
+      "verdict": "PASS"
+    },
+    {
+      "page": "propose.es.html",
+      "locale": "es",
+      "surface": "proposal",
+      "verdict": "PASS"
+    },
+    {
+      "page": "fr.html",
+      "locale": "fr",
+      "surface": "globe",
+      "mapRenders": 28,
+      "verdict": "PASS"
+    },
+    {
+      "page": "propose.fr.html",
+      "locale": "fr",
+      "surface": "proposal",
+      "verdict": "PASS"
+    },
+    {
+      "page": "pt-BR.html",
+      "locale": "pt-BR",
+      "surface": "globe",
+      "mapRenders": 27,
+      "verdict": "PASS"
+    },
+    {
+      "page": "propose.pt-BR.html",
+      "locale": "pt-BR",
+      "surface": "proposal",
+      "verdict": "PASS"
+    },
+    {
+      "page": "ar.html",
+      "locale": "ar",
+      "surface": "globe",
+      "mapRenders": 28,
+      "verdict": "PASS"
+    },
+    {
+      "page": "propose.ar.html",
+      "locale": "ar",
+      "surface": "proposal",
+      "verdict": "PASS"
+    }
+  ],
   "results": [
     {
       "page": "es.html",

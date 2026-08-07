@@ -83,6 +83,7 @@ const browser = await chromium.launch({
 });
 const results = [];
 const releasedIsolation = [];
+const localePackResilience = [];
 const claims = Object.freeze({
   full_wcag_conformance: false,
   manual_screen_reader_acceptance: false,
@@ -627,12 +628,87 @@ try {
       await context.close();
     }
   }
+  for (const candidate of WAVE1_LOCALES) {
+    const pageName = `${candidate.locale}.html`;
+    const context = await browser.newContext({ viewport: { width: 1024, height: 768 }, reducedMotion: 'reduce' });
+    const page = await context.newPage();
+    const pageErrors = [];
+    const warnings = [];
+    page.on('pageerror', (error) => pageErrors.push(error.message));
+    page.on('console', (message) => {
+      if (message.type() === 'warning') warnings.push(message.text());
+    });
+    await page.route('**/assets/commonworld-wave1-locales.mjs*', (route) => route.abort('failed'));
+    const response = await page.goto(`${baseUrl}/${pageName}`, { waitUntil: 'domcontentloaded' });
+    assert(response?.status() === 200, `${pageName}: fallback HTTP ${response?.status()}`);
+    await page.waitForSelector('html.runtime-ready', { timeout: 30_000 });
+    await page.waitForFunction(() => {
+      const stage = document.querySelector('.globe-stage');
+      const canvas = document.querySelector('.maplibregl-canvas');
+      return document.body.dataset.presentation === 'globe'
+        && Number(stage?.dataset.mapRenders ?? 0) > 0
+        && Boolean(canvas && canvas.width > 0 && canvas.height > 0);
+    }, { timeout: 30_000 });
+    const state = await page.evaluate(() => {
+      const stage = document.querySelector('.globe-stage');
+      const canvas = document.querySelector('.maplibregl-canvas');
+      return {
+        lang: document.documentElement.lang,
+        runtimeReady: document.documentElement.classList.contains('runtime-ready'),
+        presentation: document.body.dataset.presentation ?? '',
+        mapRenders: Number(stage?.dataset.mapRenders ?? 0),
+        mapCanvasReady: Boolean(canvas && canvas.width > 0 && canvas.height > 0),
+        bodyText: document.body.textContent ?? '',
+      };
+    });
+    assert(state.lang === candidate.locale, `${pageName}: fallback lang drifted to ${state.lang}`);
+    assert(state.runtimeReady, `${pageName}: fallback runtime did not become ready`);
+    assert(state.presentation === 'globe', `${pageName}: fallback presentation is ${state.presentation}`);
+    assert(state.mapRenders > 0 && state.mapCanvasReady, `${pageName}: fallback globe did not render`);
+    assert(!/\[missing:[^\]]+\]/u.test(state.bodyText), `${pageName}: fallback rendered a missing marker`);
+    assert(pageErrors.length === 0, `${pageName}: fallback page errors: ${pageErrors.join(' | ')}`);
+    const fallbackWarnings = warnings.filter((message) => message.includes('Wave-1 locale pack unavailable'));
+    assert(fallbackWarnings.length === 1, `${pageName}: expected one fallback warning, got ${fallbackWarnings.length}: ${warnings.join(' | ')}`);
+    localePackResilience.push({ page: pageName, locale: candidate.locale, surface: 'globe', mapRenders: state.mapRenders, verdict: 'PASS' });
+    await context.close();
+
+    const proposalName = `propose.${candidate.locale}.html`;
+    const proposalContext = await browser.newContext({ viewport: { width: 1024, height: 768 }, reducedMotion: 'reduce' });
+    const proposalPage = await proposalContext.newPage();
+    const proposalErrors = [];
+    const proposalWarnings = [];
+    proposalPage.on('pageerror', (error) => proposalErrors.push(error.message));
+    proposalPage.on('console', (message) => {
+      if (message.type() === 'warning') proposalWarnings.push(message.text());
+    });
+    await proposalPage.route('**/assets/commonworld-wave1-locales.mjs*', (route) => route.abort('failed'));
+    const proposalResponse = await proposalPage.goto(`${baseUrl}/${proposalName}`, { waitUntil: 'domcontentloaded' });
+    assert(proposalResponse?.status() === 200, `${proposalName}: fallback HTTP ${proposalResponse?.status()}`);
+    await proposalPage.locator('input[name=website_confirm]').fill('bot');
+    await proposalPage.locator('#commons-proposal-form').evaluate((form) => form.requestSubmit());
+    await proposalPage.waitForSelector('#proposal-errors:not([hidden])');
+    const proposalState = await proposalPage.evaluate(() => ({
+      lang: document.documentElement.lang,
+      errors: document.querySelector('#proposal-errors')?.textContent ?? '',
+      bodyText: document.body.textContent ?? '',
+    }));
+    assert(proposalState.lang === candidate.locale, `${proposalName}: fallback lang drifted to ${proposalState.lang}`);
+    assert(proposalState.errors.includes('Automated submission blocked.'), `${proposalName}: English runtime fallback missing: ${proposalState.errors}`);
+    assert(!/\[missing:[^\]]+\]/u.test(proposalState.bodyText), `${proposalName}: fallback rendered a missing marker`);
+    assert(proposalErrors.length === 0, `${proposalName}: fallback page errors: ${proposalErrors.join(' | ')}`);
+    const proposalFallbackWarnings = proposalWarnings.filter((message) => message.includes('Proposal locale pack unavailable'));
+    assert(proposalFallbackWarnings.length === 1, `${proposalName}: expected one fallback warning, got ${proposalFallbackWarnings.length}: ${proposalWarnings.join(' | ')}`);
+    localePackResilience.push({ page: proposalName, locale: candidate.locale, surface: 'proposal', verdict: 'PASS' });
+    await proposalContext.close();
+  }
+
   console.log(JSON.stringify({
     kind: 'commonworld.locale_lifecycle_browser_smoke',
     verdict: 'PASS',
     pages: results.length,
     claims,
     releasedIsolation,
+    localePackResilience,
     results,
   }, null, 2));
 } finally {

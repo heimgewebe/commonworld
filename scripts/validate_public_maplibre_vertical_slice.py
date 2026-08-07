@@ -701,6 +701,21 @@ def validate_public_maplibre_vertical_slice(root: Path = ROOT) -> list[str]:
     if re.search(r"cooperativeGestures\s*:\s*true", app):
         errors.append("public mobile globe must allow one-finger touch movement; cooperativeGestures may not be enabled")
 
+    country_layer_retry = _javascript_function_source(app, "countryMapLayersMissing")
+    if (
+        "runtime.countryBoundaries" not in country_layer_retry
+        or "getSource(COUNTRY_MAP_SOURCE_ID)" not in country_layer_retry
+        or "getLayer('commonworld-country-compositions-base')" not in country_layer_retry
+    ):
+        errors.append("country layers must expose a bounded completeness check after boundary loading")
+    if not re.search(
+        r"runtime\.map\.on\(\s*['\"]idle['\"]\s*,[\s\S]*?"
+        r"!runtime\.map\.getSource\(PUBLIC_MAP_SOURCE_ID\)[\s\S]*?"
+        r"countryMapLayersMissing\(\)[\s\S]*?ensurePublicMapLayers\(\)",
+        app,
+    ):
+        errors.append("map idle recovery must retry missing country layers after boundaries arrive")
+
     sphere_opacity = _javascript_function_source(app, "updateSphereOpacity")
     sphere_visuals = _javascript_function_source(app, "updateSphereVisuals")
     sphere_diagnostics = _javascript_function_source(app, "publishSphereDiagnostics")

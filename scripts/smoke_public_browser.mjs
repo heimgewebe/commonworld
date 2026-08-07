@@ -173,7 +173,14 @@ const executablePath = process.env.PLAYWRIGHT_CHROMIUM_EXECUTABLE_PATH || undefi
 const browser = await chromium.launch({
   headless: true,
   executablePath: executablePath,
-  args: ['--enable-unsafe-swiftshader'],
+  args: [
+    '--enable-unsafe-swiftshader',
+    '--use-gl=angle',
+    '--use-angle=swiftshader',
+    '--disable-background-timer-throttling',
+    '--disable-backgrounding-occluded-windows',
+    '--disable-renderer-backgrounding',
+  ],
 });
 const results = [];
 

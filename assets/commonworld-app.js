@@ -1,6 +1,6 @@
 import { BOOTSTRAP_RECORDS } from './commonworld-bootstrap-catalog.mjs?v=82a9928802d2';
 import { createCatalogLoadCache, loadCatalogAggregate, loadCatalogDetail, loadCatalogShard, shardKeyForIdentity } from './commonworld-catalog-runtime.mjs?v=25d37dcafe15';
-import { actionLabel, documentDirection, documentLocale, localizeCatalogRecords, text as i18nText, themeLabel } from './commonworld-i18n.mjs?v=b35170336aad';
+import { actionLabel, documentDirection, documentLocale, localizeCatalogRecords, text as i18nText, themeLabel } from './commonworld-i18n.mjs?v=adb1f6df0737';
 import {
   COMMONS_TYPE_COLOR_TOKENS,
   COMMONS_TYPE_VALUES,
@@ -62,7 +62,7 @@ import {
   sortRecords,
   stateFromSearch,
   visibleDigitalNodes,
-} from './commonworld-core.mjs?v=580f4d95bcd7';
+} from './commonworld-core.mjs?v=4abe593714f8';
 
 const LOCALE = documentLocale();
 const DOCUMENT_DIRECTION = documentDirection(LOCALE);
@@ -1326,6 +1326,12 @@ function updateCountryMapData() {
     runtime.countryMapUpdateCount += 1;
   }
   publishCountryMapDiagnostics(data);
+}
+
+function countryMapLayersMissing() {
+  if (!runtime.countryBoundaries) return false;
+  return !runtime.map?.getSource(COUNTRY_MAP_SOURCE_ID)
+    || !runtime.map.getLayer('commonworld-country-compositions-base');
 }
 
 function firstSymbolLayerId() {
@@ -3935,7 +3941,10 @@ function createMap() {
     if (runtime.mapReady) ensurePublicMapLayers();
   });
   runtime.map.on('idle', () => {
-    if (runtime.mapReady && !runtime.map.getSource(PUBLIC_MAP_SOURCE_ID)) ensurePublicMapLayers();
+    if (runtime.mapReady && (
+      !runtime.map.getSource(PUBLIC_MAP_SOURCE_ID)
+      || countryMapLayersMissing()
+    )) ensurePublicMapLayers();
     scheduleFocusOverlapInteractivity();
     if (runtime.mapReady && elements.stage.dataset.visualReady !== 'true') {
       flushSphereGeometry();

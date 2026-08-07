@@ -65,6 +65,15 @@ class CatalogDeliveryBudgetTests(unittest.TestCase):
         self.assertEqual([], validate(ROOT, warnings))
         self.assertEqual([], warnings)
 
+    def test_public_browser_smoke_pins_angle_swiftshader_backend(self) -> None:
+        smoke = (ROOT / 'scripts/smoke_public_browser.mjs').read_text(encoding='utf-8')
+        self.assertIn("'--enable-unsafe-swiftshader'", smoke)
+        self.assertIn("'--use-gl=angle'", smoke)
+        self.assertIn("'--use-angle=swiftshader'", smoke)
+        self.assertIn("'--disable-background-timer-throttling'", smoke)
+        self.assertIn("'--disable-backgrounding-occluded-windows'", smoke)
+        self.assertIn("'--disable-renderer-backgrounding'", smoke)
+
     def test_static_measurement_preserves_single_truth_and_no_startup_refetch(self) -> None:
         metrics = measure(ROOT)
         manifest = json.loads((ROOT / 'catalog/catalog.json').read_text(encoding='utf-8'))

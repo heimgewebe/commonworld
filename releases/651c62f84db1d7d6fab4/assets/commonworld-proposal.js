@@ -4,11 +4,31 @@ const ACTIVE_LOCALE = normalizeKnownLocale(
   typeof document !== 'undefined' ? document.documentElement?.lang : 'de',
   'de',
 );
+const WAVE1_LOCALE_PACK_TIMEOUT_MS = 2_500;
 let wave1RuntimeMessages = null;
+let wave1RuntimeFallbackToEnglish = false;
 if (WAVE1_LOCALES.includes(ACTIVE_LOCALE)) {
-  const { WAVE1_LOCALE_PACKS } = await import('./commonworld-wave1-locales.mjs?v=9adcf2fbae66');
-  wave1RuntimeMessages = WAVE1_LOCALE_PACKS[ACTIVE_LOCALE]?.proposal_runtime ?? null;
-  if (!wave1RuntimeMessages) throw new Error(`missing proposal runtime locale pack: ${ACTIVE_LOCALE}`);
+  let timeoutId = null;
+  try {
+    const importPromise = import('./commonworld-wave1-locales.mjs?v=9adcf2fbae66');
+    const { WAVE1_LOCALE_PACKS } = await Promise.race([
+      importPromise,
+      new Promise((_, reject) => {
+        timeoutId = globalThis.setTimeout(
+          () => reject(new Error('proposal locale pack load timed out')),
+          WAVE1_LOCALE_PACK_TIMEOUT_MS,
+        );
+      }),
+    ]);
+    wave1RuntimeMessages = WAVE1_LOCALE_PACKS?.[ACTIVE_LOCALE]?.proposal_runtime ?? null;
+    if (!wave1RuntimeMessages) throw new Error(`missing proposal runtime locale pack: ${ACTIVE_LOCALE}`);
+  } catch (error) {
+    wave1RuntimeFallbackToEnglish = true;
+    const detail = error instanceof Error ? error.message : String(error);
+    console.warn(`[i18n] Proposal locale pack unavailable; continuing with English runtime messages. ${detail}`);
+  } finally {
+    if (timeoutId !== null) globalThis.clearTimeout(timeoutId);
+  }
 }
 
 const WAVE1_TEMPLATE_MESSAGES = Object.freeze([
@@ -20,6 +40,7 @@ const WAVE1_TEMPLATE_MESSAGES = Object.freeze([
 ]);
 
 function wave1Message(source) {
+  if (wave1RuntimeFallbackToEnglish) return source;
   const direct = wave1RuntimeMessages?.[source];
   if (typeof direct === 'string') return direct;
   for (const [pattern, templateKey] of WAVE1_TEMPLATE_MESSAGES) {
