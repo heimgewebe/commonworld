@@ -758,11 +758,11 @@
         "method-mobile",
         "method-mobile-text-200"
       ],
-      "evidence_sha256": "a001fe1b78096220790ad9ab2043d9db643686a0b1c3194e2cb695b093789d6a",
-      "command": "node scripts/smoke_public_browser.mjs --result /tmp/commonworld-pr198-public-smoke-stable.json",
-      "durable_job_id": "3d7917f63157",
-      "finalization_receipt_sha256": "42f263a010c12cb437b247d5880fcb10c5659f6ef8139efbf04af3909923e621",
-      "scenario_execution_note": "Fresh public smoke passed all 36 canonical scenarios on release 613a1efe6e58fa885734; the established ring-motion proof remains scheduler-stable, locale-navigation diagnostics stay fail-closed through HTTP response tracking, and overview return is ordered after a captured MapLibre moveend."
+      "evidence_sha256": "c109dc853a782dcdf17cc7a841c49d64db858716da097656a789a8e773765618",
+      "command": "node scripts/smoke_public_browser.mjs --result /tmp/commonworld-pr198-ci4-public-smoke.json",
+      "durable_job_id": "cc3abd51b601",
+      "finalization_receipt_sha256": "86d133af6ee71ac6b9725ff910c5ad6e19a002121cbab8b995ed5685a5f27bf6",
+      "scenario_execution_note": "Fresh public smoke passed all 36 canonical scenarios on release 613a1efe6e58fa885734; CSS ring motion is verified by deterministic Web Animations API timeline sampling, while the layer return proves bounded UI completion plus prompt MapLibre camera settlement without scheduler-sensitive event timestamp ordering."
     },
     "catalog_delivery_browser_measurement": {
       "verdict": "PASS",
@@ -795,18 +795,18 @@
         "make validate",
         "npm run smoke:browser"
       ],
-      "durable_job_id": "3d10b98082ed",
+      "durable_job_id": "bb71e590e7d7",
       "durable_task_id": null,
-      "finalization_receipt_sha256": "efa7db56ed1042299d6573dd1f7aa4c892eead3ffadcdac1807479d9889681a5",
-      "make_validate_job_id": "f930768619dd",
-      "make_validate_receipt_sha256": "a723f70b14a4ca6bc8a2eb89756de9e6e978e1992fc56a99f3e967018569a2a3",
+      "finalization_receipt_sha256": "3867b40ee13cccc2f22bc74ced6b01d1b3b9e5fe653a27a16c12454d5b0a5e7a",
+      "make_validate_job_id": "32ae1eec831d",
+      "make_validate_receipt_sha256": "780b0068e6c502a2aefb21bd6d56ecf07adc7158ea5c946584b81f451f707e79",
       "result_summary": {
         "python_tests": 712,
         "javascript_tests": 175,
         "browser_smoke": "PASS",
         "forced_colors_and_contrast": "PASS"
       },
-      "note": "Exact-tree validation passed after minimizing the CI smoke hardening: make validate succeeded, then the complete canonical browser-smoke plan succeeded including all 36 public scenarios, Wave-1 lifecycle checks, proposal flows and forced-colors/increased-contrast checks."
+      "note": "Exact-tree validation passed after the scheduler-independent public-smoke hardening: make validate succeeded, then the complete canonical browser-smoke plan succeeded including all 36 public scenarios, the held Wave-1 locale-pack non-blocking regression, proposal flows and forced-colors/increased-contrast checks."
     },
     "locale_candidate_browser_smoke": {
       "verdict": "PASS",

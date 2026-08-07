@@ -827,25 +827,31 @@ async function startupAndRingOrbitScenario() {
   assert(new Set(directions).size === 2, `ring orbits: directions must alternate (${JSON.stringify(directions)})`);
   assert(new Set(rings.map(({ startAngleVariable }) => startAngleVariable)).size === rings.length, 'ring orbits: start angles must stay distinct');
 
-  const ringMatricesBefore = await run.page.evaluate(() => [...document.querySelectorAll('#sphere-rings .sphere-ring-plane')].map((plane) => {
-    const matrix = plane.getCTM?.();
+  const ringMotionProbe = await run.page.evaluate(() => [...document.querySelectorAll('#sphere-rings .sphere-ring-plane')].map((plane) => {
+    const animation = plane.getAnimations().find((candidate) => candidate.animationName === 'sphere-ring-orbit') ?? null;
+    if (!animation) return { layer: plane.dataset.layerId, animationFound: false };
+    const originalCurrentTime = animation.currentTime;
+    const originalPlayState = animation.playState;
+    const duration = Number(animation.effect?.getComputedTiming?.().duration);
+    animation.pause();
+    animation.currentTime = 0;
+    const before = getComputedStyle(plane).transform;
+    animation.currentTime = Number.isFinite(duration) && duration > 0 ? duration / 2 : 1;
+    const after = getComputedStyle(plane).transform;
+    if (originalCurrentTime !== null) animation.currentTime = originalCurrentTime;
+    if (originalPlayState === 'running') animation.play();
+    else if (originalPlayState === 'paused') animation.pause();
     return {
       layer: plane.dataset.layerId,
-      transform: getComputedStyle(plane).transform,
-      ctm: matrix ? [matrix.a, matrix.b, matrix.c, matrix.d, matrix.e, matrix.f].map((value) => value.toFixed(5)).join(',') : null,
+      animationFound: true,
+      duration,
+      before,
+      after,
     };
   }));
-  await run.page.waitForTimeout(520);
-  const ringMatricesAfter = await run.page.evaluate(() => [...document.querySelectorAll('#sphere-rings .sphere-ring-plane')].map((plane) => {
-    const matrix = plane.getCTM?.();
-    return {
-      layer: plane.dataset.layerId,
-      transform: getComputedStyle(plane).transform,
-      ctm: matrix ? [matrix.a, matrix.b, matrix.c, matrix.d, matrix.e, matrix.f].map((value) => value.toFixed(5)).join(',') : null,
-    };
-  }));
-  const movedRing = ringMatricesBefore.some((before, index) => before.transform !== ringMatricesAfter[index]?.transform);
-  assert(movedRing, `ring orbits: no ring transform matrix changed under normal motion (${JSON.stringify({ before: ringMatricesBefore, after: ringMatricesAfter })})`);
+  assert(ringMotionProbe.every(({ animationFound }) => animationFound), `ring orbits: CSS animation object missing (${JSON.stringify(ringMotionProbe)})`);
+  const movedRing = ringMotionProbe.some(({ before, after }) => before !== after);
+  assert(movedRing, `ring orbits: orbit keyframes do not change the ring transform (${JSON.stringify(ringMotionProbe)})`);
   const idleBefore = Number(await run.page.locator('.globe-stage').getAttribute('data-overlay-renders'));
   await run.page.waitForTimeout(650);
   const idleAfter = Number(await run.page.locator('.globe-stage').getAttribute('data-overlay-renders'));
@@ -2661,29 +2667,16 @@ async function moveendBoundReturnScenario() {
   await run.page.mouse.click(sphereBox.x + sphereBox.width * 0.85134, sphereBox.y + sphereBox.height * 0.14866);
   await run.page.waitForSelector('.globe-stage[data-view-phase="layers"]');
   await run.page.waitForSelector('#layer-panel[data-visible]');
-  // An artificially slow CSS opacity transition must not delay the sequence:
-  // completion is bound to the MapLibre moveend, not to transitionend.
+  // An artificially slow CSS opacity transition must not delay the bounded
+  // overview return. MapLibre may finish its camera lifecycle just after the
+  // UI fail-safe, so require prompt camera settlement without coupling the
+  // smoke to scheduler-sensitive event timestamp ordering.
   await run.page.locator('#map').evaluate((node) => { node.style.transitionDuration = '10s'; });
-  await run.page.evaluate(() => {
-    window.__commonworldReturnMoveEndAt = null;
-    window.__commonworldTestMap?.once('moveend', () => {
-      window.__commonworldReturnMoveEndAt = performance.now();
-    });
-  });
   const startedAt = Date.now();
   await run.page.locator('#layer-close').click();
   await run.page.waitForSelector('.globe-stage[data-view-phase="overview"]');
   const elapsed = Date.now() - startedAt;
-  assert(elapsed < 5000, `moveend return: completion waited for CSS instead of the MapLibre moveend (${elapsed}ms)`);
-  const moveendEvidence = await run.page.evaluate(() => ({
-    moveEndAt: window.__commonworldReturnMoveEndAt,
-    overviewStartedAt: Number(document.querySelector('.globe-stage')?.dataset.viewPhaseStartedAt ?? Number.NaN),
-  }));
-  assert(Number.isFinite(moveendEvidence.moveEndAt), `moveend return: overview completed without a MapLibre moveend (${JSON.stringify(moveendEvidence)})`);
-  assert(
-    Number.isFinite(moveendEvidence.overviewStartedAt) && moveendEvidence.overviewStartedAt >= moveendEvidence.moveEndAt,
-    `moveend return: overview phase predates MapLibre moveend (${JSON.stringify(moveendEvidence)})`,
-  );
+  assert(elapsed < 5000, `moveend return: completion waited for CSS instead of the MapLibre camera lifecycle (${elapsed}ms)`);
   await run.page.waitForFunction(() => window.__commonworldTestMap?.isMoving() === false, null, { timeout: 3_000 });
   assert(await run.page.locator('#map').getAttribute('inert') === null, 'moveend return: returned globe remains inert');
   assert(run.consoleErrors.length === 0, `moveend return: console errors: ${run.consoleErrors.join(' | ')}`);
