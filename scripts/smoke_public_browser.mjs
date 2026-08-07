@@ -2324,6 +2324,14 @@ async function spatialDiscoveryFiltersScenario() {
     await mapStyleGate;
     await route.continue();
   });
+  // Keep the provider health probe successful while the style is intentionally
+  // held. Otherwise a slow/offline CI network can trigger the provider fallback,
+  // make the map ready early, and invalidate this pending-navigation scenario.
+  await run.context.route('https://tiles.openfreemap.org/planet', (route) => route.fulfill({
+    status: 200,
+    contentType: 'application/json',
+    body: '{}',
+  }));
   await run.page.goto(baseUrl, { waitUntil: 'domcontentloaded' });
   await run.page.waitForSelector('html.runtime-ready');
   await run.page.waitForFunction(() => document.querySelector('.globe-stage')?.dataset.countryMapState === 'ready');
