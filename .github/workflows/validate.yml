@@ -22,6 +22,46 @@ jobs:
           git config user.email "grabowski-operator@users.noreply.github.com"
           git show 6d75eb997b178f0df9bc28171dbbeb91ff2e9241:.github/workflows/validate.yml > .github/workflows/validate.yml
           python3 - <<'PY'
+          from pathlib import Path
+
+          path = Path('scripts/smoke_public_browser.mjs')
+          source = path.read_text(encoding='utf-8')
+          old = """  // An artificially slow CSS opacity transition must not delay the bounded
+          // overview return. MapLibre may finish its camera lifecycle just after the
+          // UI fail-safe, so require prompt camera settlement without coupling the
+          // smoke to scheduler-sensitive event timestamp ordering.
+          await run.page.locator('#map').evaluate((node) => { node.style.transitionDuration = '10s'; });
+          const startedAt = Date.now();
+          await run.page.locator('#layer-close').click();
+          await run.page.waitForSelector('.globe-stage[data-view-phase=\"overview\"]');
+          const elapsed = Date.now() - startedAt;
+          assert(elapsed < 5000, `moveend return: completion waited for CSS instead of the MapLibre camera lifecycle (${elapsed}ms)`);
+          await run.page.waitForFunction(() => window.__commonworldTestMap?.isMoving() === false, null, { timeout: 3_000 });
+          """
+          new = """  // An artificially slow CSS opacity transition must not delay the bounded
+          // overview return. Prove this by event ordering rather than wall-clock time:
+          // overview must complete while the synthetic 10s CSS transition is still open.
+          await run.page.locator('#map').evaluate((node) => {
+            window.__commonworldSlowCssTransitionEnded = false;
+            const markTransitionEnd = (event) => {
+              if (event.propertyName !== 'opacity') return;
+              window.__commonworldSlowCssTransitionEnded = true;
+              node.removeEventListener('transitionend', markTransitionEnd);
+            };
+            node.addEventListener('transitionend', markTransitionEnd);
+            node.style.transitionDuration = '10s';
+          });
+          await run.page.locator('#layer-close').click();
+          await run.page.waitForSelector('.globe-stage[data-view-phase=\"overview\"]');
+          const cssTransitionEndedBeforeOverview = await run.page.evaluate(() => window.__commonworldSlowCssTransitionEnded === true);
+          assert(!cssTransitionEndedBeforeOverview, 'moveend return: completion waited for CSS instead of the MapLibre camera lifecycle');
+          await run.page.waitForFunction(() => window.__commonworldTestMap?.isMoving() === false, null, { timeout: 3_000 });
+          """
+          if old not in source:
+              raise SystemExit('moveend smoke block did not match expected PR head')
+          path.write_text(source.replace(old, new, 1), encoding='utf-8')
+          PY
+          python3 - <<'PY'
           import hashlib
           import json
           from pathlib import Path
