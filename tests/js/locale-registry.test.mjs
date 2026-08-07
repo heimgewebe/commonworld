@@ -12,7 +12,9 @@ import {
   matchRegistryLocale,
   normalizeReleasedLocale,
 } from '../../assets/commonworld-locale-registry.mjs';
-import { documentDirection, text } from '../../assets/commonworld-i18n.mjs';
+import { documentDirection, text, wave1LocalePackReady } from '../../assets/commonworld-i18n.mjs';
+
+await wave1LocalePackReady;
 
 test('registry preserves canonical BCP 47 casing and release states', () => {
   assert.equal(canonicalLocaleTag('PT-br'), 'pt-BR');

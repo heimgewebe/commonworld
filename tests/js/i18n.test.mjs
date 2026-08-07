@@ -14,8 +14,11 @@ import {
   taxonomyLabel,
   text,
   themeLabel,
+  wave1LocalePackReady,
 } from '../../assets/commonworld-i18n.mjs';
 import { prepareIntentSearchIndex } from '../../assets/commonworld-core.mjs';
+
+await wave1LocalePackReady;
 
 test('English locale overlay preserves canonical identity and factual fields', () => {
   const { records, searchAliasesById } = localizeCatalogRecords(BOOTSTRAP_RECORDS, 'en');

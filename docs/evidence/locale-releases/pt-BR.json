@@ -3,13 +3,13 @@
   "kind": "commonworld.ui_locale_release_evidence",
   "locale": "pt-BR",
   "status": "released",
-  "source_revision": "791f791434b0ba7cbe20ab5f514ad57d9997eecb",
+  "source_revision": "ea0aa4f41d08a6f8ef8f419990cfb5b745fe9eee",
   "source_pack_sha256": "b65c7108bb7c2debf77dcb18ed1f70cd53da1478743e2bba7f4b11e761cc9be4",
   "reviewed_source_pack_sha256": "316da43be8603cf0400dfa886bf244f953cd0dcb702c150f87e652fc260e9819",
   "surface_sha256": {
-    "index": "082519698b6baee0dd14208d2f3946cba68b9f5befd45d95e6a70cc0349e8e6e",
-    "method": "4d7fb4dbfe329badcc3e58841e23e81f8dc0035a68eb5001b3cd5f971b55d462",
-    "proposal": "26f71f793360ee96c0918fad238083421b3daeb76afe743d5a02b1cd46c46fbe"
+    "index": "fd4703587f5854d9d08356e72d8131d93da4f2ee6a135ac7d6e030f2af90a3e8",
+    "method": "a3437966789a13cdffbb3061c4c00479439b7bb3ae3743113a608373adb0a7fc",
+    "proposal": "e99bbad16f8c240f8f0d9e7de8cc20f4113668b63602e9c996247cbb99c95ef5"
   },
   "gate_results": {
     "required_surfaces_passed": [
@@ -43,7 +43,7 @@
     },
     "browser_smoke": {
       "source": "docs/evidence/locale-releases/receipts/shared/browser-smoke.json",
-      "sha256": "375f89e67d41d9841ff1a1bda9ec968c214783e1b7a34fe20b046966d72ef0df"
+      "sha256": "7c5109e1f441b62aaee7febbe7778277576635087c6af8c39e984cf567409911"
     },
     "state_preservation_smoke": {
       "source": "docs/evidence/locale-releases/receipts/shared/state-preservation-smoke.json",

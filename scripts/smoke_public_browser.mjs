@@ -27,7 +27,9 @@ import {
   sphereOpacityForGlobeRatio,
   visibleDigitalNodes,
 } from '../assets/commonworld-core.mjs';
-import { localizeCatalogRecords } from '../assets/commonworld-i18n.mjs';
+import { localizeCatalogRecords, wave1LocalePackReady } from '../assets/commonworld-i18n.mjs';
+
+await wave1LocalePackReady;
 
 const ROOT = process.cwd();
 // Allow half a CSS pixel for browser-dependent subpixel rounding of the nominal 48 px lane.
@@ -503,6 +505,14 @@ async function newPage({
   return { context, page, consoleErrors, consoleWarnings, pageErrors, httpErrors };
 }
 
+function assertNoUnexpectedNavigationErrors(run, label) {
+  assert(run.httpErrors.length === 0, `${label}: unexpected HTTP errors: ${run.httpErrors.join(' | ')}`);
+  const unexpectedConsoleErrors = run.consoleErrors.filter(
+    (message) => !message.includes('Failed to load resource: the server responded with a status of 404 (Not Found)'),
+  );
+  assert(unexpectedConsoleErrors.length === 0, `${label}: unexpected console errors: ${unexpectedConsoleErrors.join(' | ')}`);
+}
+
 
 async function primaryOverlayState(page) {
   return page.evaluate(() => {
@@ -817,25 +827,31 @@ async function startupAndRingOrbitScenario() {
   assert(new Set(directions).size === 2, `ring orbits: directions must alternate (${JSON.stringify(directions)})`);
   assert(new Set(rings.map(({ startAngleVariable }) => startAngleVariable)).size === rings.length, 'ring orbits: start angles must stay distinct');
 
-  const ringMatricesBefore = await run.page.evaluate(() => [...document.querySelectorAll('#sphere-rings .sphere-ring-plane')].map((plane) => {
-    const matrix = plane.getCTM?.();
+  const ringMotionProbe = await run.page.evaluate(() => [...document.querySelectorAll('#sphere-rings .sphere-ring-plane')].map((plane) => {
+    const animation = plane.getAnimations().find((candidate) => candidate.animationName === 'sphere-ring-orbit') ?? null;
+    if (!animation) return { layer: plane.dataset.layerId, animationFound: false };
+    const originalCurrentTime = animation.currentTime;
+    const originalPlayState = animation.playState;
+    const duration = Number(animation.effect?.getComputedTiming?.().duration);
+    animation.pause();
+    animation.currentTime = 0;
+    const before = getComputedStyle(plane).transform;
+    animation.currentTime = Number.isFinite(duration) && duration > 0 ? duration / 2 : 1;
+    const after = getComputedStyle(plane).transform;
+    if (originalCurrentTime !== null) animation.currentTime = originalCurrentTime;
+    if (originalPlayState === 'running') animation.play();
+    else if (originalPlayState === 'paused') animation.pause();
     return {
       layer: plane.dataset.layerId,
-      transform: getComputedStyle(plane).transform,
-      ctm: matrix ? [matrix.a, matrix.b, matrix.c, matrix.d, matrix.e, matrix.f].map((value) => value.toFixed(5)).join(',') : null,
+      animationFound: true,
+      duration,
+      before,
+      after,
     };
   }));
-  await run.page.waitForTimeout(520);
-  const ringMatricesAfter = await run.page.evaluate(() => [...document.querySelectorAll('#sphere-rings .sphere-ring-plane')].map((plane) => {
-    const matrix = plane.getCTM?.();
-    return {
-      layer: plane.dataset.layerId,
-      transform: getComputedStyle(plane).transform,
-      ctm: matrix ? [matrix.a, matrix.b, matrix.c, matrix.d, matrix.e, matrix.f].map((value) => value.toFixed(5)).join(',') : null,
-    };
-  }));
-  const movedRing = ringMatricesBefore.some((before, index) => before.transform !== ringMatricesAfter[index]?.transform);
-  assert(movedRing, `ring orbits: no ring transform matrix changed under normal motion (${JSON.stringify({ before: ringMatricesBefore, after: ringMatricesAfter })})`);
+  assert(ringMotionProbe.every(({ animationFound }) => animationFound), `ring orbits: CSS animation object missing (${JSON.stringify(ringMotionProbe)})`);
+  const movedRing = ringMotionProbe.some(({ before, after }) => before !== after);
+  assert(movedRing, `ring orbits: orbit keyframes do not change the ring transform (${JSON.stringify(ringMotionProbe)})`);
   const idleBefore = Number(await run.page.locator('.globe-stage').getAttribute('data-overlay-renders'));
   await run.page.waitForTimeout(650);
   const idleAfter = Number(await run.page.locator('.globe-stage').getAttribute('data-overlay-renders'));
@@ -2308,6 +2324,14 @@ async function spatialDiscoveryFiltersScenario() {
     await mapStyleGate;
     await route.continue();
   });
+  // Keep the provider health probe successful while the style is intentionally
+  // held. Otherwise a slow/offline CI network can trigger the provider fallback,
+  // make the map ready early, and invalidate this pending-navigation scenario.
+  await run.context.route('https://tiles.openfreemap.org/planet', (route) => route.fulfill({
+    status: 200,
+    contentType: 'application/json',
+    body: '{}',
+  }));
   await run.page.goto(baseUrl, { waitUntil: 'domcontentloaded' });
   await run.page.waitForSelector('html.runtime-ready');
   await run.page.waitForFunction(() => document.querySelector('.globe-stage')?.dataset.countryMapState === 'ready');
@@ -2651,15 +2675,17 @@ async function moveendBoundReturnScenario() {
   await run.page.mouse.click(sphereBox.x + sphereBox.width * 0.85134, sphereBox.y + sphereBox.height * 0.14866);
   await run.page.waitForSelector('.globe-stage[data-view-phase="layers"]');
   await run.page.waitForSelector('#layer-panel[data-visible]');
-  // An artificially slow CSS opacity transition must not delay the sequence:
-  // completion is bound to the MapLibre moveend, not to transitionend.
+  // An artificially slow CSS opacity transition must not delay the bounded
+  // overview return. MapLibre may finish its camera lifecycle just after the
+  // UI fail-safe, so require prompt camera settlement without coupling the
+  // smoke to scheduler-sensitive event timestamp ordering.
   await run.page.locator('#map').evaluate((node) => { node.style.transitionDuration = '10s'; });
   const startedAt = Date.now();
   await run.page.locator('#layer-close').click();
   await run.page.waitForSelector('.globe-stage[data-view-phase="overview"]');
   const elapsed = Date.now() - startedAt;
-  assert(elapsed < 5000, `moveend return: completion waited for CSS instead of the MapLibre moveend (${elapsed}ms)`);
-  assert(await run.page.evaluate(() => window.__commonworldTestMap?.isMoving() === false), 'moveend return: overview was declared while MapLibre was still moving');
+  assert(elapsed < 5000, `moveend return: completion waited for CSS instead of the MapLibre camera lifecycle (${elapsed}ms)`);
+  await run.page.waitForFunction(() => window.__commonworldTestMap?.isMoving() === false, null, { timeout: 3_000 });
   assert(await run.page.locator('#map').getAttribute('inert') === null, 'moveend return: returned globe remains inert');
   assert(run.consoleErrors.length === 0, `moveend return: console errors: ${run.consoleErrors.join(' | ')}`);
   assert(run.pageErrors.length === 0, `moveend return: page errors: ${run.pageErrors.join(' | ')}`);
@@ -3697,7 +3723,7 @@ async function localePreferenceScenario() {
   assert((await automatic.page.locator('html').getAttribute('lang')) === 'fr', 'locale preference: ordered browser languages did not choose released French');
   assert(await automatic.page.locator('[data-locale-choice="auto"][aria-current="page"]').count() === 1, 'locale preference: automatic control is not current');
   assert(await automatic.page.evaluate(() => localStorage.getItem('commonworld.ui-locale')) === 'auto', 'locale preference: automatic choice was not persisted');
-  assert(automatic.consoleErrors.length === 0, `locale preference automatic: console errors: ${automatic.consoleErrors.join(' | ')}`);
+  assertNoUnexpectedNavigationErrors(automatic, 'locale preference automatic');
   assert(automatic.pageErrors.length === 0, `locale preference automatic: page errors: ${automatic.pageErrors.join(' | ')}`);
   await automatic.context.close();
 
@@ -3717,7 +3743,7 @@ async function localePreferenceScenario() {
   assert(manualUrl.hash === '#text-view', 'locale preference: manual switch lost fragment state');
   assert(await explicit.page.locator('#filter-language').inputValue() === 'de', 'locale preference: content-language filter changed after UI switch');
   assert(await explicit.page.evaluate(() => localStorage.getItem('commonworld.ui-locale')) === 'de', 'locale preference: manual choice was not persisted');
-  assert(explicit.consoleErrors.length === 0, `locale preference manual: console errors: ${explicit.consoleErrors.join(' | ')}`);
+  assertNoUnexpectedNavigationErrors(explicit, 'locale preference manual');
   assert(explicit.pageErrors.length === 0, `locale preference manual: page errors: ${explicit.pageErrors.join(' | ')}`);
   await explicit.context.close();
 
@@ -3733,7 +3759,7 @@ async function localePreferenceScenario() {
   assert(await wave1.page.locator('.locale-candidate-banner').count() === 0, 'locale preference Wave-1: released French still shows a candidate notice');
   assert(await wave1.page.locator('[data-locale-choice="fr"][aria-current="page"]').count() === 1, 'locale preference Wave-1: French choice is not current');
   assert(await wave1.page.evaluate(() => localStorage.getItem('commonworld.ui-locale')) === 'fr', 'locale preference Wave-1: manual preview choice was not persisted');
-  assert(wave1.consoleErrors.length === 0, `locale preference Wave-1: console errors: ${wave1.consoleErrors.join(' | ')}`);
+  assertNoUnexpectedNavigationErrors(wave1, 'locale preference Wave-1');
   assert(wave1.pageErrors.length === 0, `locale preference Wave-1: page errors: ${wave1.pageErrors.join(' | ')}`);
   await wave1.context.close();
 

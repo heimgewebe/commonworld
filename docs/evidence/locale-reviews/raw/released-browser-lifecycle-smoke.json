@@ -22,10 +22,17 @@
   ],
   "localePackResilience": [
     {
+      "page": "fr.html",
+      "locale": "fr",
+      "surface": "globe",
+      "pendingPackNonBlocking": true,
+      "verdict": "PASS"
+    },
+    {
       "page": "es.html",
       "locale": "es",
       "surface": "globe",
-      "mapRenders": 27,
+      "mapRenders": 24,
       "verdict": "PASS"
     },
     {
@@ -38,7 +45,7 @@
       "page": "fr.html",
       "locale": "fr",
       "surface": "globe",
-      "mapRenders": 28,
+      "mapRenders": 24,
       "verdict": "PASS"
     },
     {
@@ -51,7 +58,7 @@
       "page": "pt-BR.html",
       "locale": "pt-BR",
       "surface": "globe",
-      "mapRenders": 27,
+      "mapRenders": 24,
       "verdict": "PASS"
     },
     {
@@ -64,7 +71,7 @@
       "page": "ar.html",
       "locale": "ar",
       "surface": "globe",
-      "mapRenders": 28,
+      "mapRenders": 25,
       "verdict": "PASS"
     },
     {
