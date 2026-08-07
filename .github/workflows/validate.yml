@@ -21,8 +21,34 @@ jobs:
           git config user.name "grabowski-operator"
           git config user.email "grabowski-operator@users.noreply.github.com"
           git show 6d75eb997b178f0df9bc28171dbbeb91ff2e9241:.github/workflows/validate.yml > .github/workflows/validate.yml
+          python3 - <<'PY'
+          import hashlib
+          import json
+          from pathlib import Path
+
+          root = Path('.')
+          contract_path = root / 'docs/architecture/locale-release.contract.json'
+          contract = json.loads(contract_path.read_text(encoding='utf-8'))
+          for locale in ('es', 'fr', 'pt-BR', 'ar'):
+              entry = contract['locale_registry'][locale]
+              evidence_path = root / entry['release_evidence']['path']
+              evidence = json.loads(evidence_path.read_text(encoding='utf-8'))
+              evidence['surface_sha256'] = {
+                  surface: hashlib.sha256((root / relative).read_bytes()).hexdigest()
+                  for surface, relative in entry['surface_files'].items()
+              }
+              evidence_path.write_text(
+                  json.dumps(evidence, ensure_ascii=False, indent=2) + '\n',
+                  encoding='utf-8',
+              )
+              entry['release_evidence']['sha256'] = hashlib.sha256(evidence_path.read_bytes()).hexdigest()
+          contract_path.write_text(
+              json.dumps(contract, ensure_ascii=False, indent=2) + '\n',
+              encoding='utf-8',
+          )
+          PY
           python3 scripts/measure_release_snapshot_lifecycle.py
-          git add .github/workflows/validate.yml docs/evidence/release-snapshot-lifecycle-v1.json
+          git add .github/workflows/validate.yml docs/architecture/locale-release.contract.json docs/evidence/release-snapshot-lifecycle-v1.json docs/evidence/locale-releases/es.json docs/evidence/locale-releases/fr.json docs/evidence/locale-releases/pt-BR.json docs/evidence/locale-releases/ar.json
           git diff --cached --check
           git commit -m "fix(i18n): bind late locale recovery evidence"
           echo "FINAL_HEAD=$(git rev-parse HEAD)" >> "$GITHUB_ENV"
