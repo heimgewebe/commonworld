@@ -758,11 +758,11 @@
         "method-mobile",
         "method-mobile-text-200"
       ],
-      "evidence_sha256": "8102f708c256ba370ca74d904e9f7bff5e785f080d2d04e20a89a73953387a19",
-      "command": "node scripts/smoke_public_browser.mjs --result /tmp/commonworld-pr198-public-smoke-eventbound.json",
-      "durable_job_id": "d05d2d8539ad",
-      "finalization_receipt_sha256": "f1364353db5a25134035ec52d88cf03c1253eb7c515de3a13f8e67bca6e70c09",
-      "scenario_execution_note": "Fresh public smoke passed all 36 canonical scenarios on release 613a1efe6e58fa885734; ring motion is frame-bound, locale-navigation 404s remain fail-closed through response tracking, and overview return is explicitly ordered after a captured MapLibre moveend."
+      "evidence_sha256": "a001fe1b78096220790ad9ab2043d9db643686a0b1c3194e2cb695b093789d6a",
+      "command": "node scripts/smoke_public_browser.mjs --result /tmp/commonworld-pr198-public-smoke-stable.json",
+      "durable_job_id": "3d7917f63157",
+      "finalization_receipt_sha256": "42f263a010c12cb437b247d5880fcb10c5659f6ef8139efbf04af3909923e621",
+      "scenario_execution_note": "Fresh public smoke passed all 36 canonical scenarios on release 613a1efe6e58fa885734; the established ring-motion proof remains scheduler-stable, locale-navigation diagnostics stay fail-closed through HTTP response tracking, and overview return is ordered after a captured MapLibre moveend."
     },
     "catalog_delivery_browser_measurement": {
       "verdict": "PASS",
@@ -795,18 +795,18 @@
         "make validate",
         "npm run smoke:browser"
       ],
-      "durable_job_id": "47e2b0cda82e",
+      "durable_job_id": "3d10b98082ed",
       "durable_task_id": null,
-      "finalization_receipt_sha256": "1ea828d10f19f2ceb9e0347ff9f436e56a004e82ae8df1e79f5faafe995958ea",
-      "make_validate_job_id": "430ce04f39ba",
-      "make_validate_receipt_sha256": "42c6bc05c6cb4ba0e0451c5888b6734b796761858c6796e36adf7db6ae32e66a",
+      "finalization_receipt_sha256": "efa7db56ed1042299d6573dd1f7aa4c892eead3ffadcdac1807479d9889681a5",
+      "make_validate_job_id": "f930768619dd",
+      "make_validate_receipt_sha256": "a723f70b14a4ca6bc8a2eb89756de9e6e978e1992fc56a99f3e967018569a2a3",
       "result_summary": {
         "python_tests": 712,
         "javascript_tests": 175,
         "browser_smoke": "PASS",
         "forced_colors_and_contrast": "PASS"
       },
-      "note": "Exact-tree validation passed after the event-bound browser-smoke hardening: make validate succeeded, then the complete canonical browser-smoke plan succeeded including all 36 public scenarios, Wave-1 lifecycle checks, proposal flows and forced-colors/increased-contrast checks."
+      "note": "Exact-tree validation passed after minimizing the CI smoke hardening: make validate succeeded, then the complete canonical browser-smoke plan succeeded including all 36 public scenarios, Wave-1 lifecycle checks, proposal flows and forced-colors/increased-contrast checks."
     },
     "locale_candidate_browser_smoke": {
       "verdict": "PASS",

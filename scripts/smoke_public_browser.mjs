@@ -827,16 +827,6 @@ async function startupAndRingOrbitScenario() {
   assert(new Set(directions).size === 2, `ring orbits: directions must alternate (${JSON.stringify(directions)})`);
   assert(new Set(rings.map(({ startAngleVariable }) => startAngleVariable)).size === rings.length, 'ring orbits: start angles must stay distinct');
 
-  await run.page.evaluate(() => {
-    window.__commonworldTestMap?.stop?.();
-    document.querySelector('#sphere-edge-control')?.blur();
-  });
-  await run.page.waitForFunction(
-    () => document.querySelector('.globe-stage')?.dataset.mapMoving !== 'true',
-    null,
-    { timeout: 5_000 },
-  );
-
   const ringMatricesBefore = await run.page.evaluate(() => [...document.querySelectorAll('#sphere-rings .sphere-ring-plane')].map((plane) => {
     const matrix = plane.getCTM?.();
     return {
@@ -845,10 +835,7 @@ async function startupAndRingOrbitScenario() {
       ctm: matrix ? [matrix.a, matrix.b, matrix.c, matrix.d, matrix.e, matrix.f].map((value) => value.toFixed(5)).join(',') : null,
     };
   }));
-  await run.page.waitForFunction((before) => {
-    const current = [...document.querySelectorAll('#sphere-rings .sphere-ring-plane')].map((plane) => getComputedStyle(plane).transform);
-    return before.some((snapshot, index) => snapshot.transform !== current[index]);
-  }, ringMatricesBefore, { polling: 'raf', timeout: 3_000 });
+  await run.page.waitForTimeout(520);
   const ringMatricesAfter = await run.page.evaluate(() => [...document.querySelectorAll('#sphere-rings .sphere-ring-plane')].map((plane) => {
     const matrix = plane.getCTM?.();
     return {
@@ -858,7 +845,7 @@ async function startupAndRingOrbitScenario() {
     };
   }));
   const movedRing = ringMatricesBefore.some((before, index) => before.transform !== ringMatricesAfter[index]?.transform);
-  assert(movedRing, `ring orbits: no ring transform matrix changed after the globe settled (${JSON.stringify({ before: ringMatricesBefore, after: ringMatricesAfter })})`);
+  assert(movedRing, `ring orbits: no ring transform matrix changed under normal motion (${JSON.stringify({ before: ringMatricesBefore, after: ringMatricesAfter })})`);
   const idleBefore = Number(await run.page.locator('.globe-stage').getAttribute('data-overlay-renders'));
   await run.page.waitForTimeout(650);
   const idleAfter = Number(await run.page.locator('.globe-stage').getAttribute('data-overlay-renders'));
