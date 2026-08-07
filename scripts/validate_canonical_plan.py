@@ -162,6 +162,7 @@ EXPECTED_SCRIPT_FILES = {
     "measure_catalog_delivery_browser.mjs",
     "measure_catalog_hierarchy_v2.py",
     "measure_catalog_platform_scaling.py",
+    "measure_release_snapshot_lifecycle.py",
     "run_browser_smoke.py",
     "smoke_public_browser.mjs",
     "smoke_accessibility_modes_browser.mjs",
@@ -177,6 +178,7 @@ EXPECTED_SCRIPT_FILES = {
     "smoke_pages_live.py",
     "static_surface_parser.py",
     "validate_cache_coherence.py",
+    "validate_release_snapshot_lifecycle.py",
     "validate_canonical_plan.py",
     "validate_catalog_browser_measurement_decision.py",
     "validate_catalog_hierarchy_browser_v2.py",
@@ -217,6 +219,7 @@ EXPECTED_SCRIPT_FILES = {
 }
 EXPECTED_TEST_FILES = {
     "test_cache_coherence.py",
+    "test_release_snapshot_lifecycle.py",
     "test_canonical_plan.py",
     "test_catalog_browser_measurement_decision.py",
     "test_catalog_hierarchy_browser_v2_evidence.py",

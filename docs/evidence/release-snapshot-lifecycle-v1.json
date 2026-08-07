@@ -1,0 +1,38 @@
+{
+  "conflict_reproduction": {
+    "append_only": {
+      "clean_merge": true,
+      "unmerged_path_count": 0
+    },
+    "legacy": {
+      "conflict": true,
+      "unmerged_path_count": 36
+    }
+  },
+  "current_release_id": "651c62f84db1d7d6fab4",
+  "delivery_evidence": {
+    "docs/evidence/catalog-delivery-benchmark-v1.json": "e6095928f743090afa95ad15e82ef5e22650266eb900989d62bed78d122f65cc",
+    "docs/evidence/catalog-delivery-public-browser-smoke-v1.json": "10ef4d5b88720955b6fc79aee1ab461408ea0f4bf68cfc41b3dc0edf84090034"
+  },
+  "freshness_model": "digest-defined-proposed-head-scope",
+  "kind": "commonworld.release_snapshot_lifecycle_evidence",
+  "proposed_head_inputs": {
+    "Makefile": "7b5199665a4e1c5ad0de75fea444da2ed9a946a8140b801a64a4ad9bac46f4c6",
+    "assets/commonworld-release-check.js": "b1b62be4dc1e2910cc0b1c878bded86d49140b1d67c9256c6f762c60e0675f26",
+    "docs/architecture/release-snapshot-lifecycle.contract.json": "6fda74667864e8ca13ab8519b151e95e3d886428dca83b2f342b5f96b45b3e7b",
+    "package.json": "2cf87cdcfd58a1a75bd4af004eda9f37e583174637e8dbb730ae9d976a558085",
+    "scripts/build_page_release_manifest.py": "173848a0794cafae03dd58c6d26f2b632f97ff7c76fa514b5d2e7d226d4e98ee",
+    "scripts/measure_release_snapshot_lifecycle.py": "e57826aa7fe7c0999c15608d8a316d1c030f343b81ec646819728dbb0cba5277",
+    "scripts/public_cache.py": "4da2bd6dd8267e644506ac7284090755e33ad3415c46b9c7caa1d0750e6f0cd7",
+    "scripts/render_public_shell.py": "5518ffa5deb8ab9039602f6ca3a5b1aebf4d1afd8b38a749fb4ebcbada37647d",
+    "scripts/validate_cache_coherence.py": "50b924851facfad392b04e09cd8714cb9cba3d8c7855632cd01d45a0739d0fa6",
+    "scripts/validate_canonical_plan.py": "158f690c907d386d263e7c908f8b5ee74609675d783a588e5196a43734f0d807",
+    "scripts/validate_catalog_delivery_budget.py": "5ab956e1b60db5f4728ab1da2071f763dcf5776eb728afe000339f3efe2284f4",
+    "scripts/validate_release_snapshot_lifecycle.py": "13b2fb3f01192fd6057d295684406556dd3ba4b0e578de5504ad39130fd3869c",
+    "tests/test_release_snapshot_lifecycle.py": "6cd44edbe32e10d17485b168ce547f0789a641a5ffdf1e47889bf6782b464f92"
+  },
+  "proposed_head_scope_sha256": "58d28ddb813899ab06c7e49b3a2978e546fc04d08762b56e9e7af1282ff4143d",
+  "schema_version": 1,
+  "status": "fresh",
+  "task_id": "COMMONWORLD-PUBLIC-GLOBE-V1-T040"
+}
