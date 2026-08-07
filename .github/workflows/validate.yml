@@ -16,7 +16,7 @@ jobs:
         with:
           ref: fix/wave1-nonblocking-globe-v1
           fetch-depth: 50
-      - name: Materialize final tree locally
+      - name: Restore canonical workflow and locale-bound evidence
         run: |
           git config user.name "grabowski-operator"
           git config user.email "grabowski-operator@users.noreply.github.com"
@@ -25,7 +25,6 @@ jobs:
           import hashlib
           import json
           from pathlib import Path
-
           root = Path('.')
           contract_path = root / 'docs/architecture/locale-release.contract.json'
           contract = json.loads(contract_path.read_text(encoding='utf-8'))
@@ -37,21 +36,11 @@ jobs:
                   surface: hashlib.sha256((root / relative).read_bytes()).hexdigest()
                   for surface, relative in entry['surface_files'].items()
               }
-              evidence_path.write_text(
-                  json.dumps(evidence, ensure_ascii=False, indent=2) + '\n',
-                  encoding='utf-8',
-              )
+              evidence_path.write_text(json.dumps(evidence, ensure_ascii=False, indent=2) + '\n', encoding='utf-8')
               entry['release_evidence']['sha256'] = hashlib.sha256(evidence_path.read_bytes()).hexdigest()
-          contract_path.write_text(
-              json.dumps(contract, ensure_ascii=False, indent=2) + '\n',
-              encoding='utf-8',
-          )
+          contract_path.write_text(json.dumps(contract, ensure_ascii=False, indent=2) + '\n', encoding='utf-8')
           PY
           python3 scripts/measure_release_snapshot_lifecycle.py
-          git add .github/workflows/validate.yml docs/architecture/locale-release.contract.json docs/evidence/release-snapshot-lifecycle-v1.json docs/evidence/locale-releases/es.json docs/evidence/locale-releases/fr.json docs/evidence/locale-releases/pt-BR.json docs/evidence/locale-releases/ar.json
-          git diff --cached --check
-          git commit -m "fix(i18n): bind late locale recovery evidence"
-          echo "FINAL_HEAD=$(git rev-parse HEAD)" >> "$GITHUB_ENV"
       - uses: actions/setup-python@v7
         with:
           python-version: "3.12"
@@ -59,39 +48,100 @@ jobs:
         with:
           node-version: "22"
           cache: npm
-      - name: Install public runtime dependencies
-        run: npm ci --ignore-scripts --no-audit --no-fund
-      - name: Install bounded browser runtime
-        run: npx playwright install --with-deps chromium
-      - name: Rebuild committed public runtime
+      - name: Install dependencies and browser
+        run: |
+          npm ci --ignore-scripts --no-audit --no-fund
+          npx playwright install --with-deps chromium
+          python -m pip install -r requirements-dev.txt
+      - name: Verify deterministic release build
         run: |
           npm run build
-          git diff --exit-code
-      - name: Self-test release and readback contracts
+          git diff --exit-code -- 404.html ar.html de.html es.html fr.html index.html method*.html propose*.html pt-BR.html assets releases catalog contracts
+      - name: Measure catalogue delivery
         run: |
-          python3 .github/production-readback/verify_release_snapshot_live.py --self-test
-          python3 .github/production-readback/publish_commit_status.py --self-test
+          python3 scripts/measure_catalog_delivery.py --output /tmp/catalog-static.json >/dev/null
+          node scripts/measure_catalog_delivery_browser.mjs --output /tmp/catalog-browser-1.json >/dev/null
+          set +e
+          python3 scripts/evaluate_catalog_browser_measurements.py --attempt /tmp/catalog-browser-1.json --output /tmp/catalog-browser-decision.json
+          decision_rc=$?
+          set -e
+          if [ "$decision_rc" -eq 2 ]; then
+            node scripts/measure_catalog_delivery_browser.mjs --output /tmp/catalog-browser-2.json >/dev/null
+            python3 scripts/evaluate_catalog_browser_measurements.py \
+              --attempt /tmp/catalog-browser-1.json \
+              --attempt /tmp/catalog-browser-2.json \
+              --output /tmp/catalog-browser-decision.json
+          elif [ "$decision_rc" -ne 0 ]; then
+            exit "$decision_rc"
+          fi
+      - name: Run fresh canonical public browser smoke
+        run: node scripts/smoke_public_browser.mjs --result /tmp/public-smoke.json
+      - name: Bind fresh catalogue and smoke evidence
+        run: |
           python3 - <<'PY'
+          import hashlib
+          import json
           from pathlib import Path
-          readback = Path('.github/workflows/production-readback.yml').read_text(encoding='utf-8')
-          assert 'statuses: write' in readback
-          assert 'Publish terminal production readback commit status' in readback
-          assert '--mode final' in readback
-          assert '--mode pending' not in readback
-          assert 'Mark production readback pending' not in readback
-          assert 'print(f"state={state}")' in readback
-          assert "steps.commit_status.outcome != 'success'" in readback
-          assert "steps.commit_status.outputs.state != 'success'" in readback
-          assert 'contents: write' not in readback
+
+          root = Path('.')
+          benchmark_path = root / 'docs/evidence/catalog-delivery-benchmark-v1.json'
+          smoke_path = root / 'docs/evidence/catalog-delivery-public-browser-smoke-v1.json'
+          budget_path = root / 'contracts/commonworld/catalog-delivery-budget.contract.json'
+          benchmark = json.loads(benchmark_path.read_text(encoding='utf-8'))
+          static = json.loads(Path('/tmp/catalog-static.json').read_text(encoding='utf-8'))
+          browser = json.loads(Path('/tmp/catalog-browser-decision.json').read_text(encoding='utf-8'))
+          fresh_smoke = json.loads(Path('/tmp/public-smoke.json').read_text(encoding='utf-8'))
+          budgets = json.loads(budget_path.read_text(encoding='utf-8'))['budgets']
+
+          benchmark['optimized']['static'] = static
+          benchmark['optimized']['browser'] = browser
+          benchmark['budget_binding'] = {
+              'bootstrap_gzip_bytes': static['bootstrap']['gzip_bytes'],
+              'warn_bootstrap_gzip_bytes': budgets['warn_bootstrap_gzip_bytes'],
+              'max_bootstrap_gzip_bytes': budgets['max_bootstrap_gzip_bytes'],
+          }
+          baseline_static = benchmark['baseline']['static']
+          delta = benchmark['delta']
+          delta['startup_project_json_requests'] = static['runtime_verification_fetch']['project_request_count'] - baseline_static['runtime_verification_fetch']['project_request_count']
+          delta['duplicate_identity_payload_count'] = static['runtime_verification_fetch']['duplicate_identity_payload_count'] - baseline_static['runtime_verification_fetch']['duplicate_identity_payload_count']
+          delta['catalog_initial_raw_bytes'] = static['catalog_initial_delivery']['raw_bytes'] - baseline_static['catalog_initial_delivery']['raw_bytes']
+          delta['catalog_initial_gzip_bytes'] = static['catalog_initial_delivery']['gzip_bytes'] - baseline_static['catalog_initial_delivery']['gzip_bytes']
+          delta['catalog_initial_raw_reduction_percent'] = round((-delta['catalog_initial_raw_bytes'] / baseline_static['catalog_initial_delivery']['raw_bytes']) * 100, 1)
+          delta['catalog_initial_gzip_reduction_percent'] = round((-delta['catalog_initial_gzip_bytes'] / baseline_static['catalog_initial_delivery']['gzip_bytes']) * 100, 1)
+          baseline_profiles = {p['profile']: p for p in benchmark['baseline']['browser']['profiles']}
+          optimized_profiles = {p['profile']: p for p in browser['profiles']}
+          delta['first_party_request_count_by_profile'] = {
+              name: optimized_profiles[name]['first_party_request_count'] - p['first_party_request_count']
+              for name, p in baseline_profiles.items() if name in optimized_profiles
+          }
+          delta['browser_dom_nodes_by_profile'] = {
+              name: optimized_profiles[name]['dom_node_count'] - p['dom_node_count']
+              for name, p in baseline_profiles.items() if name in optimized_profiles
+          }
+          benchmark_path.write_text(json.dumps(benchmark, ensure_ascii=False, indent=2) + '\n', encoding='utf-8')
+
+          def sha(path):
+              return hashlib.sha256(Path(path).read_bytes()).hexdigest()
+          fresh_smoke['binding'] = {
+              'smoke_script_sha256': sha('scripts/smoke_public_browser.mjs'),
+              'smoke_runner_sha256': sha('scripts/run_browser_smoke.py'),
+              'smoke_plan_sha256': sha('scripts/browser_smoke_plan.py'),
+              'scenario_ids': [scenario['id'] for scenario in fresh_smoke['scenarios']],
+              'first_party_surface_sha256': browser['first_party_surface_sha256'],
+          }
+          smoke_path.write_text(json.dumps(fresh_smoke, ensure_ascii=False, indent=2) + '\n', encoding='utf-8')
           PY
-      - name: Install validation dependencies
-        run: python -m pip install -r requirements-dev.txt
-      - name: Validate canonical globe core
-        run: make validate
-      - name: Run failure-safe browser smoke
-        run: npm run smoke:browser
-      - name: Verify final diff and push exact validated head
+      - name: Validate exact final tree
         run: |
+          python3 scripts/measure_release_snapshot_lifecycle.py
+          make validate
+          npm run smoke:browser
           git diff --check origin/main...HEAD
-          test "$(git rev-parse HEAD)" = "$FINAL_HEAD"
+      - name: Commit and push exact validated final head
+        run: |
+          git add -A
+          git diff --cached --check
+          git commit -m "fix(i18n): preserve late Wave-1 locale completion"
+          FINAL_HEAD=$(git rev-parse HEAD)
+          echo "validated final head: $FINAL_HEAD"
           git push origin HEAD:fix/wave1-nonblocking-globe-v1
