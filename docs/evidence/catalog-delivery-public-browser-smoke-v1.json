@@ -118,9 +118,9 @@
       "filterButtonWidth": 44,
       "filterButtonHeight": 44,
       "ringAnimationName": "sphere-ring-orbit",
-      "ringTransform": "matrix(0.999999, 0.00150679, -0.00150679, 0.999999, 0, 0)",
-      "ringTextWidth": 671.1126098632812,
-      "ringTextHeight": 14.011199951171875,
+      "ringTransform": "matrix(1, 0.000756334, -0.000756334, 1, 0, 0)",
+      "ringTextWidth": 671.1033935546875,
+      "ringTextHeight": 13.507568359375,
       "ringTextFontSize": 22,
       "primaryRingCount": 3,
       "depthRingCount": 2,
@@ -196,7 +196,7 @@
     {
       "id": "layer-journey-moveend-return",
       "verdict": "PASS",
-      "elapsedMs": 1445
+      "elapsedMs": 2851
     },
     {
       "id": "layer-journey-interrupted",
@@ -342,7 +342,7 @@
     }
   ],
   "binding": {
-    "smoke_script_sha256": "22b790972636f81e78da48d45e4b47e174bb2cef8382d26576332dbe38c07d07",
+    "smoke_script_sha256": "345294c8a527332d55fccdcf61e33aefd25c510641b35bce77b04bb25961adab",
     "smoke_runner_sha256": "522b99b70b1d0064b1d0a31a3a67fdc9a2e73b7408f37d1a4bb303bc360b7556",
     "smoke_plan_sha256": "8a068c3b573eb2ab95ed7c3f8477f607cba6de9353ab5250ba9abc09345b23a7",
     "scenario_ids": [

@@ -758,11 +758,11 @@
         "method-mobile",
         "method-mobile-text-200"
       ],
-      "evidence_sha256": "11f11e7c58aef993da6518f3adae7b4929622ad2bfecfac3dde781eb398119ff",
-      "command": "node scripts/smoke_public_browser.mjs --result docs/evidence/catalog-delivery-public-browser-smoke-v1.json",
-      "durable_job_id": "0e1a2c6ad7aa",
-      "finalization_receipt_sha256": "1283ce3c86c67681cadb287438ba517fe808e123d35db05f25ec025570003bd7",
-      "scenario_execution_note": "Fresh public smoke passed all canonical scenarios on release 613a1efe6e58fa885734 after the non-blocking Wave-1 locale bootstrap."
+      "evidence_sha256": "8102f708c256ba370ca74d904e9f7bff5e785f080d2d04e20a89a73953387a19",
+      "command": "node scripts/smoke_public_browser.mjs --result /tmp/commonworld-pr198-public-smoke-eventbound.json",
+      "durable_job_id": "d05d2d8539ad",
+      "finalization_receipt_sha256": "f1364353db5a25134035ec52d88cf03c1253eb7c515de3a13f8e67bca6e70c09",
+      "scenario_execution_note": "Fresh public smoke passed all 36 canonical scenarios on release 613a1efe6e58fa885734; ring motion is frame-bound, locale-navigation 404s remain fail-closed through response tracking, and overview return is explicitly ordered after a captured MapLibre moveend."
     },
     "catalog_delivery_browser_measurement": {
       "verdict": "PASS",
@@ -795,18 +795,18 @@
         "make validate",
         "npm run smoke:browser"
       ],
-      "durable_job_id": "49d139b8c7bf",
+      "durable_job_id": "47e2b0cda82e",
       "durable_task_id": null,
-      "finalization_receipt_sha256": "96382403e24ab8cfe1c035535af68ba19819f0ea1d5cd75521e0b8d3d4946f44",
-      "make_validate_job_id": "eb602b29c0b6",
-      "make_validate_receipt_sha256": "517cb41ea0e9202051c0afbf789d578f22ce1c87c139a745b086ed084feadd5b",
+      "finalization_receipt_sha256": "1ea828d10f19f2ceb9e0347ff9f436e56a004e82ae8df1e79f5faafe995958ea",
+      "make_validate_job_id": "430ce04f39ba",
+      "make_validate_receipt_sha256": "42c6bc05c6cb4ba0e0451c5888b6734b796761858c6796e36adf7db6ae32e66a",
       "result_summary": {
         "python_tests": 712,
         "javascript_tests": 175,
         "browser_smoke": "PASS",
         "forced_colors_and_contrast": "PASS"
       },
-      "note": "Exact-tree validation passed after the non-blocking Wave-1 locale bootstrap: make validate succeeded, then the complete canonical browser-smoke plan succeeded."
+      "note": "Exact-tree validation passed after the event-bound browser-smoke hardening: make validate succeeded, then the complete canonical browser-smoke plan succeeded including all 36 public scenarios, Wave-1 lifecycle checks, proposal flows and forced-colors/increased-contrast checks."
     },
     "locale_candidate_browser_smoke": {
       "verdict": "PASS",
