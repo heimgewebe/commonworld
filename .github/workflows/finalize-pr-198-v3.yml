@@ -20,7 +20,6 @@ jobs:
         run: |
           git config user.name "grabowski-operator"
           git config user.email "grabowski-operator@users.noreply.github.com"
-          git show 6d75eb997b178f0df9bc28171dbbeb91ff2e9241:.github/workflows/validate.yml > .github/workflows/validate.yml
           python3 - <<'PY'
           from pathlib import Path
 
@@ -49,31 +48,22 @@ jobs:
 
           smoke = Path('scripts/smoke_public_browser.mjs')
           source = smoke.read_text(encoding='utf-8')
-          old = """  // An artificially slow CSS opacity transition must not delay the bounded
-          // overview return. MapLibre may finish its camera lifecycle just after the
-          // UI fail-safe, so require prompt camera settlement without coupling the
-          // smoke to scheduler-sensitive event timestamp ordering.
-          await run.page.locator('#map').evaluate((node) => { node.style.transitionDuration = '10s'; });
-          const startedAt = Date.now();
-          await run.page.locator('#layer-close').click();
-          await run.page.waitForSelector('.globe-stage[data-view-phase=\"overview\"]');
-          const elapsed = Date.now() - startedAt;
-          assert(elapsed < 5000, `moveend return: completion waited for CSS instead of the MapLibre camera lifecycle (${elapsed}ms)`);
-          await run.page.waitForFunction(() => window.__commonworldTestMap?.isMoving() === false, null, { timeout: 3_000 });
-          """
-          new = """  // Make CSS effectively non-terminal for this scenario and prove the return
-          // directly against MapLibre's lifecycle. A CSS-bound implementation would never
-          // reach overview within the normal smoke timeout.
-          await run.page.evaluate(() => {
+          replacements = [
+              (
+                  "  await run.page.locator('#map').evaluate((node) => { node.style.transitionDuration = '10s'; });\n",
+                  """  await run.page.evaluate(() => {
             const map = window.__commonworldTestMap;
             window.__commonworldReturnMoveendObserved = false;
             window.__commonworldCameraCommands = [];
             map.once('moveend', () => { window.__commonworldReturnMoveendObserved = true; });
             document.querySelector('#map').style.transitionDuration = '3600s';
           });
-          await run.page.locator('#layer-close').click();
-          await run.page.waitForSelector('.globe-stage[data-view-phase=\"overview\"]');
-          const returnLifecycle = await run.page.evaluate(() => ({
+          """,
+              ),
+              ("  const startedAt = Date.now();\n", ""),
+              (
+                  "  const elapsed = Date.now() - startedAt;\n  assert(elapsed < 5000, `moveend return: completion waited for CSS instead of the MapLibre camera lifecycle (${elapsed}ms)`);\n  await run.page.waitForFunction(() => window.__commonworldTestMap?.isMoving() === false, null, { timeout: 3_000 });\n",
+                  """  const returnLifecycle = await run.page.evaluate(() => ({
             moveendObserved: window.__commonworldReturnMoveendObserved === true,
             moving: window.__commonworldTestMap?.isMoving?.() ?? null,
             commands: window.__commonworldCameraCommands ?? [],
@@ -83,14 +73,21 @@ jobs:
           assert(returnLifecycle.moving === false, `moveend return: overview completed while MapLibre was still moving (${JSON.stringify(returnLifecycle)})`);
           assert(returnLifecycle.commands.length === 1 && returnLifecycle.commands[0].command === 'easeTo', `moveend return: return was not one MapLibre camera command (${JSON.stringify(returnLifecycle)})`);
           assert(returnLifecycle.cssTransitionDuration.includes('3600s'), `moveend return: synthetic CSS guard was not active (${JSON.stringify(returnLifecycle)})`);
-          """
-          count = source.count(old)
-          if count != 1:
-              raise SystemExit(f'expected exactly one moveend smoke block, found {count}')
-          source = source.replace(old, new, 1)
+          """,
+              ),
+              (
+                  "  results.push({ id: 'layer-journey-moveend-return', verdict: 'PASS', elapsedMs: elapsed });\n",
+                  "  results.push({ id: 'layer-journey-moveend-return', verdict: 'PASS', moveendObserved: true, cssTransitionDuration: '3600s' });\n",
+              ),
+          ]
+          for old, new in replacements:
+              count = source.count(old)
+              if count != 1:
+                  raise SystemExit(f'expected exactly one smoke match, found {count}: {old!r}')
+              source = source.replace(old, new, 1)
           source = source.replace(
-              "  results.push({ id: 'layer-journey-moveend-return', verdict: 'PASS', elapsedMs: elapsed });\n",
-              "  results.push({ id: 'layer-journey-moveend-return', verdict: 'PASS', moveendObserved: true, cssTransitionDuration: '3600s' });\n",
+              "  // An artificially slow CSS opacity transition must not delay the bounded\n  // overview return. MapLibre may finish its camera lifecycle just after the\n  // UI fail-safe, so require prompt camera settlement without coupling the\n  // smoke to scheduler-sensitive event timestamp ordering.\n",
+              "  // Make CSS effectively non-terminal and prove return through MapLibre moveend.\n",
               1,
           )
           smoke.write_text(source, encoding='utf-8')
@@ -210,7 +207,7 @@ jobs:
           git diff --check origin/main...HEAD
       - name: Commit and push exact validated final head
         run: |
-          rm -f .github/workflows/finalize-pr-198.yml .github/workflows/finalize-pr-198-v2.yml .github/workflows/finalize-pr-198-v3.yml
+          rm -f .github/workflows/finalize-pr-198-v3.yml
           git add -A
           git diff --cached --check
           git commit -m "fix(i18n): preserve late Wave-1 locale completion"
