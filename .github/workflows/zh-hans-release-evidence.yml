@@ -59,41 +59,7 @@ jobs:
           python -m unittest tests.test_i18n -v
           npm test
       - name: Harden late-pack resilience timing without weakening the assertion
-        run: |
-          python - <<'PY'
-          from pathlib import Path
-          path = Path('scripts/smoke_locale_candidates_browser.mjs')
-          text = path.read_text(encoding='utf-8')
-          old = """    await page.waitForTimeout(2_800);
-    await heldLocalePackRoute.continue();
-    await page.waitForFunction(
-      () => document.querySelector('.globe-stage')?.dataset.localePack === 'ready',
-      null,
-      { timeout: 5_000 },
-    );
-    await page.waitForFunction(
-      () => document.querySelector('#text-count')?.textContent?.includes('communs'),
-      null,
-      { timeout: 5_000 },
-    );
-"""
-          new = """    await page.waitForTimeout(800);
-    await heldLocalePackRoute.continue();
-    await page.waitForFunction(
-      () => document.querySelector('.globe-stage')?.dataset.localePack === 'ready',
-      null,
-      { timeout: 15_000 },
-    );
-    await page.waitForFunction(
-      () => document.querySelector('#text-count')?.textContent?.includes('communs'),
-      null,
-      { timeout: 15_000 },
-    );
-"""
-          if old not in text:
-              raise SystemExit('late-pack resilience block not found exactly')
-          path.write_text(text.replace(old, new, 1), encoding='utf-8')
-          PY
+        run: python scripts/_tmp_harden_locale_smoke.py
       - name: Run released locale lifecycle smoke
         run: |
           mkdir -p docs/evidence/locale-reviews/raw
@@ -143,7 +109,7 @@ jobs:
           npm run smoke:browser
       - name: Remove one-shot release machinery
         run: |
-          rm scripts/_tmp_smoke_zh_hans_search.mjs scripts/_tmp_finalize_zh_hans_evidence.py .github/workflows/zh-hans-release-evidence.yml
+          rm scripts/_tmp_harden_locale_smoke.py scripts/_tmp_smoke_zh_hans_search.mjs scripts/_tmp_finalize_zh_hans_evidence.py .github/workflows/zh-hans-release-evidence.yml
       - name: Commit verified zh-Hans release evidence
         run: |
           git config user.name 'grabowski-operator'
