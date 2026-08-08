@@ -29,7 +29,7 @@ jobs:
         run: |
           npm ci --ignore-scripts --no-audit --no-fund
           npx playwright install --with-deps chromium
-      - name: Promote only the reviewed provenance bit
+      - name: Promote reviewed provenance and patch review-contract semantics
         run: |
           python - <<'PY'
           import json
@@ -52,6 +52,7 @@ jobs:
               raise SystemExit('expected release-evidence schema patch anchor missing')
           path.write_text(text.replace(old, new, 1), encoding='utf-8')
           PY
+          PYTHONPATH=. python scripts/_tmp_fix_bundle_review_contract.py
       - name: Build final reviewed surfaces
         run: npm run build
       - name: Run unit regressions before receipts
@@ -112,7 +113,7 @@ jobs:
           npm run smoke:browser
       - name: Remove one-shot release machinery
         run: |
-          rm scripts/_tmp_harden_locale_smoke.py scripts/_tmp_smoke_zh_hans_search.mjs scripts/_tmp_finalize_zh_hans_evidence.py scripts/_tmp_refresh_wave1_bundle_evidence.py .github/workflows/zh-hans-release-evidence.yml
+          rm scripts/_tmp_harden_locale_smoke.py scripts/_tmp_smoke_zh_hans_search.mjs scripts/_tmp_finalize_zh_hans_evidence.py scripts/_tmp_refresh_wave1_bundle_evidence.py scripts/_tmp_fix_bundle_review_contract.py .github/workflows/zh-hans-release-evidence.yml
       - name: Commit verified zh-Hans release evidence
         run: |
           git config user.name 'grabowski-operator'
