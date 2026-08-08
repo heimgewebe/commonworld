@@ -71,6 +71,7 @@ test('released Wave-1 locales use their complete catalog presentation packs', ()
       const englishRecord = englishById.get(projectId);
       assert.ok(record && englishRecord);
       assert.equal(record._content_locale, locale, `${locale}:${projectId}:content-locale`);
+      assert.equal(record._title_locale, englishRecord._title_locale, `${locale}:${projectId}:title-locale`);
       assert.equal(record.title, englishRecord.title, `${locale}:${projectId}:proper-name`);
       assert.notEqual(record.summary, englishRecord.summary, `${locale}:${projectId}:summary`);
       if (record.presence.digital?.available === true) {
@@ -89,6 +90,14 @@ test('released Wave-1 locales use their complete catalog presentation packs', ()
   }
 });
 
+test('canonical identity titles without an explicit English overlay remain language-unknown', () => {
+  for (const locale of ['en', 'es', 'fr', 'pt-BR', 'ar']) {
+    const record = localizeCatalogRecords(BOOTSTRAP_RECORDS, locale).records.find((entry) => entry.id === 'akiba-mashinani-trust');
+    assert.ok(record);
+    assert.equal(record._title_locale, null, locale);
+  }
+});
+
 test('exact Commons counts stay localized on every candidate surface', () => {
   assert.equal(text('es', 'commons_count', '{count} Commons', { count: 4 }), '4 Commons');
   assert.equal(text('fr', 'commons_count', '{count} Commons', { count: 4 }), '4 Communs');
@@ -104,8 +113,12 @@ test('registry normalizes released and candidate locales', () => {
   assert.equal(localized.searchAliasesById.size, BOOTSTRAP_RECORDS.length);
   for (const record of localized.records) {
     assert.equal(record._content_locale, 'de');
-    for (const link of record.links ?? []) assert.equal(link._label_locale, 'de');
-    for (const source of record.provenance?.sources ?? []) assert.equal(source._label_locale, 'de');
+    assert.equal(record._title_locale, null);
+    for (const link of record.links ?? []) {
+      const expected = ['homepage', 'visit', 'use', 'borrow', 'learn', 'contribute', 'volunteer', 'donate', 'contact', 'replicate'].includes(link.type) ? 'de' : null;
+      assert.equal(link._label_locale, expected, `${record.id}:${link.type}`);
+    }
+    for (const source of record.provenance?.sources ?? []) assert.equal(source._label_locale, null);
   }
 });
 

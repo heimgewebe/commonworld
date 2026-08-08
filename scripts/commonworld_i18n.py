@@ -191,8 +191,14 @@ def localize_records(records: list[dict[str, Any]], locale: str = DEFAULT_LOCALE
         english_title = english_translation.get("title")
         if isinstance(translated_title, str) and translated_title.strip():
             record["title"] = translated_title
+            title_locale = normalized
         elif isinstance(english_title, str) and english_title.strip():
             record["title"] = english_title
+            title_locale = "en"
+        else:
+            # Canonical identity names are source/original text, not implicitly English.
+            # Keep the language unknown and let direction resolve from the text itself.
+            title_locale = None
         geographic = record.get("presence", {}).get("geographic", [])
         labels = translation["geographic_labels"]
         for location in geographic:
@@ -211,6 +217,7 @@ def localize_records(records: list[dict[str, Any]], locale: str = DEFAULT_LOCALE
             fallback_label = source_prefix.replace("{index}", str(index))
             source["label"] = f"{canonical_label} · {hostname.removeprefix('www.')}" if canonical_label else f"{fallback_label} · {hostname.removeprefix('www.')}"
         record["_content_locale"] = normalized
+        record["_title_locale"] = title_locale
         localized.append(record)
     return localized
 

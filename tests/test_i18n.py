@@ -52,11 +52,19 @@ class InternationalizationTests(unittest.TestCase):
             for project_id in ("mundraub", "common-voice"):
                 with self.subTest(locale=locale, project=project_id):
                     self.assertEqual(locale, localized[project_id]["_content_locale"] )
+                    self.assertEqual(english[project_id].get("_title_locale"), localized[project_id]["_title_locale"] )
                     self.assertEqual(english[project_id]["title"], localized[project_id]["title"] )
                     self.assertNotEqual(english[project_id]["summary"], localized[project_id]["summary"] )
                     self.assertNotEqual(english[project_id]["presence"]["digital"]["label"], localized[project_id]["presence"]["digital"]["label"] )
             if locale == "ar":
                 self.assertRegex(localized["mundraub"]["summary"], r"[\u0600-\u06ff]")
+
+    def test_canonical_title_without_explicit_english_overlay_has_no_false_language(self) -> None:
+        canonical = load_records(ROOT)
+        for locale in ("en", "es", "fr", "pt-BR", "ar"):
+            localized = {record["id"]: record for record in localize_records(canonical, locale, ROOT)}
+            with self.subTest(locale=locale):
+                self.assertIsNone(localized["akiba-mashinani-trust"]["_title_locale"])
 
     def test_catalog_overlay_validation_rejects_extra_fields_and_wrong_digital_shape(self) -> None:
         canonical = load_records(ROOT)
