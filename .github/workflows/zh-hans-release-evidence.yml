@@ -102,6 +102,8 @@ jobs:
                   assert f'/releases/{release_id}/' in markup
           print(f'final evidence stable for all Wave-1 locales on release {release_id}')
           PY
+      - name: Refresh release-snapshot lifecycle evidence for the new deterministic release
+        run: python scripts/measure_release_snapshot_lifecycle.py
       - name: Run full release validators
         run: |
           python -m unittest tests.test_i18n tests.test_locale_wave1 tests.test_locale_release_contract -v
