@@ -124,3 +124,5 @@ jobs:
           git diff --cached --stat
           git commit -m 'feat(i18n): release complete zh-Hans locale'
           git push origin HEAD:feat/zh-hans-complete-v1
+
+# execution trigger: lifecycle evidence refresh
