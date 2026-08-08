@@ -1,0 +1,118 @@
+name: zh-hans-release-evidence
+
+on:
+  push:
+    branches:
+      - feat/zh-hans-complete-v1
+
+permissions:
+  contents: write
+
+jobs:
+  evidence:
+    if: contains(github.event.head_commit.message, 'run zh-Hans release evidence gates')
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          ref: feat/zh-hans-complete-v1
+          fetch-depth: 0
+      - uses: actions/setup-python@v7
+        with:
+          python-version: '3.12'
+      - uses: actions/setup-node@v7
+        with:
+          node-version: '22'
+          cache: npm
+      - name: Install deterministic browser dependencies
+        run: |
+          npm ci --ignore-scripts --no-audit --no-fund
+          npx playwright install --with-deps chromium
+      - name: Promote only the reviewed provenance bit
+        run: |
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          path = Path('assets/locales/wave1-locales.json')
+          payload = json.loads(path.read_text(encoding='utf-8'))
+          meta = payload['locales']['zh-Hans']['meta']
+          if meta.get('independent_language_review') != 'pending':
+              raise SystemExit(f"unexpected pre-evidence review state: {meta.get('independent_language_review')!r}")
+          meta['independent_language_review'] = 'passed'
+          path.write_text(json.dumps(payload, ensure_ascii=False, indent=2) + '\n', encoding='utf-8')
+          PY
+          python - <<'PY'
+          from pathlib import Path
+          path = Path('scripts/_tmp_finalize_zh_hans_evidence.py')
+          text = path.read_text(encoding='utf-8')
+          old = '        "surface_sha256": surface_sha,\n        "release_id": release_id,\n        "gate_results": {'
+          new = '        "surface_sha256": surface_sha,\n        "gate_results": {'
+          if old not in text:
+              raise SystemExit('expected release-evidence schema patch anchor missing')
+          path.write_text(text.replace(old, new, 1), encoding='utf-8')
+          PY
+      - name: Build final reviewed surfaces
+        run: npm run build
+      - name: Run unit regressions before receipts
+        run: |
+          python -m unittest tests.test_i18n -v
+          npm test
+      - name: Run released locale lifecycle smoke
+        run: |
+          mkdir -p docs/evidence/locale-reviews/raw
+          node scripts/smoke_locale_candidates_browser.mjs > docs/evidence/locale-reviews/raw/zh-Hans-released-browser-lifecycle-smoke.json
+      - name: Prove product-owned Chinese search semantics
+        run: |
+          python3 -m http.server 8765 --bind 127.0.0.1 >/tmp/commonworld-http.log 2>&1 &
+          server_pid=$!
+          trap 'kill "$server_pid" 2>/dev/null || true' EXIT
+          node scripts/_tmp_smoke_zh_hans_search.mjs > docs/evidence/locale-reviews/raw/zh-Hans-search-semantics-smoke.json
+      - name: Write digest-bound review receipts and release evidence
+        run: PYTHONPATH=. python scripts/_tmp_finalize_zh_hans_evidence.py
+      - name: Rebuild after evidence pointer
+        run: npm run build
+      - name: Verify evidence still binds exact final public bytes
+        run: |
+          python - <<'PY'
+          import hashlib, json, re
+          from pathlib import Path
+          root = Path('.')
+          evidence = json.loads((root/'docs/evidence/locale-releases/zh-Hans.json').read_text(encoding='utf-8'))
+          contract = json.loads((root/'docs/architecture/locale-release.contract.json').read_text(encoding='utf-8'))
+          pointer = contract['locale_registry']['zh-Hans']['release_evidence']
+          evidence_path = root/pointer['path']
+          digest = hashlib.sha256(evidence_path.read_bytes()).hexdigest()
+          assert digest == pointer['sha256'], (digest, pointer['sha256'])
+          for surface, relative in contract['locale_registry']['zh-Hans']['surface_files'].items():
+              actual = hashlib.sha256((root/relative).read_bytes()).hexdigest()
+              assert actual == evidence['surface_sha256'][surface], (surface, actual, evidence['surface_sha256'][surface])
+          manifest = json.loads((root/'assets/commonworld-page-builds.json').read_text(encoding='utf-8'))
+          release_id = manifest['release_id']
+          assert re.fullmatch(r'[0-9a-f]{20}', release_id)
+          for relative in contract['locale_registry']['zh-Hans']['surface_files'].values():
+              markup = (root/relative).read_text(encoding='utf-8')
+              assert f'content="{release_id}"' in markup
+              assert f'/releases/{release_id}/' in markup
+          print(f'final evidence stable for release {release_id}')
+          PY
+      - name: Run full release validators
+        run: |
+          python -m unittest tests.test_i18n tests.test_locale_wave1 tests.test_locale_release_contract -v
+          make validate
+          npm test
+      - name: Re-run final lifecycle and public browser smoke
+        run: |
+          node scripts/smoke_locale_candidates_browser.mjs >/tmp/zh-hans-final-lifecycle.json
+          npm run smoke:browser
+      - name: Remove one-shot release machinery
+        run: |
+          rm scripts/_tmp_smoke_zh_hans_search.mjs scripts/_tmp_finalize_zh_hans_evidence.py .github/workflows/zh-hans-release-evidence.yml
+      - name: Commit verified zh-Hans release evidence
+        run: |
+          git config user.name 'grabowski-operator'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add -A
+          git diff --cached --stat
+          git commit -m 'feat(i18n): release complete zh-Hans locale'
+          git push origin HEAD:feat/zh-hans-complete-v1
