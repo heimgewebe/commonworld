@@ -26,17 +26,19 @@ jobs:
           node-version: '22'
           cache: npm
       - name: Apply reviewed Simplified Chinese corrections
-        run: PYTHONPATH=. python scripts/_tmp_finalize_zh_hans.py
+        run: |
+          PYTHONPATH=. python scripts/_tmp_finalize_zh_hans.py
+          PYTHONPATH=. python scripts/_tmp_fix_zh_hans_locale_contracts.py
       - name: Rebuild deterministic runtime
         run: |
           npm ci --ignore-scripts --no-audit --no-fund
           npm run build
       - name: Run pre-evidence regressions
         run: |
-          python -m unittest tests.test_i18n -v
+          python -m unittest tests.test_i18n tests.test_locale_wave1 tests.test_locale_release_contract -v
           npm test
       - name: Remove one-shot machinery
-        run: rm scripts/_tmp_finalize_zh_hans.py .github/workflows/zh-hans-finalize.yml
+        run: rm scripts/_tmp_finalize_zh_hans.py scripts/_tmp_fix_zh_hans_locale_contracts.py .github/workflows/zh-hans-finalize.yml
       - name: Commit corrected review source
         run: |
           git config user.name 'grabowski-operator'
