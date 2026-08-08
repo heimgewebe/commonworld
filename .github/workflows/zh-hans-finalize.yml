@@ -28,6 +28,16 @@ jobs:
       - name: Apply reviewed Simplified Chinese corrections
         run: |
           PYTHONPATH=. python scripts/_tmp_finalize_zh_hans.py
+          python - <<'PY'
+          from pathlib import Path
+          path = Path('scripts/_tmp_fix_zh_hans_locale_contracts.py')
+          text = path.read_text(encoding='utf-8')
+          old = "marker = '    def test_runtime_registry_tracks_contract_lifecycle(self) -> None:\\n'"
+          new = "marker = '    def test_primary_subtag_matches_region_specific_released_locale(self) -> None:\\n'"
+          if old not in text:
+              raise SystemExit('expected temporary test anchor missing')
+          path.write_text(text.replace(old, new, 1), encoding='utf-8')
+          PY
           PYTHONPATH=. python scripts/_tmp_fix_zh_hans_locale_contracts.py
       - name: Rebuild deterministic runtime
         run: |
