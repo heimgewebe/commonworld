@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 from __future__ import annotations
 
+import json
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -28,7 +29,7 @@ def patch_runtime_matcher() -> None:
     new = '''    const parts = canonical.split('-');
     const primary = parts[0].toLowerCase();
     const explicitScript = parts.length >= 2 && parts[1].length === 4 ? parts[1] : null;
-    const region = parts.find((part, index) => index > 0 && (part.length === 2 || /^\\d{{3}}$/.test(part))) ?? null;
+    const region = parts.find((part, index) => index > 0 && (part.length === 2 || /^[0-9]{{3}}$/.test(part))) ?? null;
     const inferredChineseScript = primary === 'zh' && region
       ? (['TW', 'HK', 'MO'].includes(region.toUpperCase()) ? 'Hant' : ['CN', 'SG'].includes(region.toUpperCase()) ? 'Hans' : null)
       : null;
@@ -92,6 +93,55 @@ def patch_runtime_matcher() -> None:
     replace_once(path, old, new)
 
 
+def patch_surface_matcher() -> None:
+    path = ROOT / "assets/commonworld-locale.mjs"
+    old = '''export function matchSupportedLocaleTag(value, supportedLocales = RELEASED_LOCALES) {
+  const canonical = canonicalLocaleTag(value);
+  if (!canonical) return null;
+  const allowed = Array.isArray(supportedLocales) ? supportedLocales : RELEASED_LOCALES;
+  const exact = allowed.find((tag) => tag.toLowerCase() === canonical.toLowerCase());
+  if (exact) return exact;
+  const parts = canonical.split('-');
+  if (parts.length >= 2 && parts[1].length === 4) {
+    const languageScript = parts.slice(0, 2).join('-').toLowerCase();
+    const scriptMatch = allowed.find((tag) => tag.toLowerCase() === languageScript);
+    if (scriptMatch) return scriptMatch;
+  }
+  const primary = parts[0].toLowerCase();
+  return allowed.find((tag) => tag.split('-')[0].toLowerCase() === primary) ?? null;
+}
+'''
+    new = '''export function matchSupportedLocaleTag(value, supportedLocales = RELEASED_LOCALES) {
+  const canonical = canonicalLocaleTag(value);
+  if (!canonical) return null;
+  const allowed = Array.isArray(supportedLocales) ? supportedLocales : RELEASED_LOCALES;
+  const exact = allowed.find((tag) => tag.toLowerCase() === canonical.toLowerCase());
+  if (exact) return exact;
+  const parts = canonical.split('-');
+  const primary = parts[0].toLowerCase();
+  const explicitScript = parts.length >= 2 && parts[1].length === 4 ? parts[1] : null;
+  const region = parts.find((part, index) => index > 0 && (part.length === 2 || /^[0-9]{3}$/.test(part))) ?? null;
+  const inferredChineseScript = primary === 'zh' && region
+    ? (['TW', 'HK', 'MO'].includes(region.toUpperCase()) ? 'Hant' : ['CN', 'SG'].includes(region.toUpperCase()) ? 'Hans' : null)
+    : null;
+  const requestedScript = explicitScript ?? inferredChineseScript;
+  if (requestedScript) {
+    const languageScript = `${primary}-${requestedScript}`.toLowerCase();
+    const scriptMatch = allowed.find((tag) => tag.toLowerCase() === languageScript);
+    if (scriptMatch) return scriptMatch;
+    const scriptlessPrimary = allowed.find((tag) => {
+      const candidateParts = tag.split('-');
+      return candidateParts[0].toLowerCase() === primary
+        && !(candidateParts.length >= 2 && candidateParts[1].length === 4);
+    });
+    return scriptlessPrimary ?? null;
+  }
+  return allowed.find((tag) => tag.split('-')[0].toLowerCase() === primary) ?? null;
+}
+'''
+    replace_once(path, old, new)
+
+
 def patch_js_tests() -> None:
     path = ROOT / "tests/js/i18n.test.mjs"
     old = '''  actionLabel,
@@ -145,15 +195,29 @@ def patch_js_tests() -> None:
 
 def patch_python_tests() -> None:
     path = ROOT / "tests/test_locale_release_contract.py"
-    marker = '    def test_runtime_registry_tracks_contract_lifecycle(self) -> None:\n'
+    marker = '    def test_primary_subtag_matches_region_specific_released_locale(self) -> None:\n'
     test = '''    def test_simplified_chinese_does_not_claim_traditional_script_or_regions(self) -> None:\n        from scripts.locale_registry import match_registry_locale\n\n        self.assertEqual(match_registry_locale(["zh-CN"], root=ROOT), "zh-Hans")\n        self.assertEqual(match_registry_locale(["zh-SG"], root=ROOT), "zh-Hans")\n        self.assertEqual(match_registry_locale(["zh-Hant", "fr-FR"], root=ROOT), "fr")\n        self.assertEqual(match_registry_locale(["zh-TW", "fr-FR"], root=ROOT), "fr")\n        self.assertEqual(match_registry_locale(["zh-HK", "fr-FR"], root=ROOT), "fr")\n\n'''
     replace_once(path, marker, test + marker)
+    text = path.read_text(encoding="utf-8")
+    old = 'contract["decision"]["default_locale"] = "zh-Hans"\n        contract["decision"]["fallback_locale"] = "hi"'
+    new = 'contract["decision"]["default_locale"] = "hi"\n        contract["decision"]["fallback_locale"] = "ja"'
+    if old in text:
+        path.write_text(text.replace(old, new, 1), encoding="utf-8")
+
+
+def patch_pack_placeholder_order() -> None:
+    path = ROOT / "assets/locales/wave1-locales.json"
+    payload = json.loads(path.read_text(encoding="utf-8"))
+    payload["locales"]["zh-Hans"]["ui"]["show_more_in_bundle"] = "再显示 {count} 个 Commons（{label}）"
+    path.write_text(json.dumps(payload, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
 
 
 def main() -> int:
     patch_runtime_matcher()
+    patch_surface_matcher()
     patch_js_tests()
     patch_python_tests()
+    patch_pack_placeholder_order()
     print("zh-Hans script-aware locale matching and stale test contracts fixed")
     return 0
 
