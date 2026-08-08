@@ -1,0 +1,34 @@
+{
+  "review_kind": "model_assisted_independent_language_review",
+  "reviewer": "GPT-5.6 Sol independent post-fix release review via Codex",
+  "writer_independence": "independent_from_grok_4_5_writer",
+  "input_digests": {
+    "es": "de1638df4c7f4b71aaab644c28e7739a699f3d914f49cfa09b205885a5f1ec36",
+    "fr": "c58061ed7f34dce421898b2894026aeafec56c41c32cb488a2ceb6cbf9a0875b",
+    "pt-BR": "d016bbf890ad12d59ab9004c2b47e88595d76c9d426dfceec07a1e50f5042ddc",
+    "ar": "ee4d37a7f75174099408a5191863440a9c8bd40475a1f05e59537c25c44ccaf2"
+  },
+  "coverage": {
+    "locales": [
+      "es",
+      "fr",
+      "pt-BR",
+      "ar"
+    ],
+    "project_count_per_locale": 88,
+    "all_entries_reviewed": true
+  },
+  "verdict": "pass",
+  "counts": {
+    "blocker": 0,
+    "major": 0,
+    "minor": 0,
+    "note": 0
+  },
+  "findings": [],
+  "review_notes": [
+    "All five JSON files were read completely and all summaries, geographic-label values, and digital labels were independently compared with en.json.",
+    "All four target files match the required SHA-256 digests and contain the same 88 project IDs, 56 digital labels, and 78 geographic-label values.",
+    "The corrected pt-BR geographic label uses “Porto Rico”. No material semantic, linguistic, geographic, numerical, untranslated-prose, or Arabic mixed-script/direction defects were found."
+  ]
+}

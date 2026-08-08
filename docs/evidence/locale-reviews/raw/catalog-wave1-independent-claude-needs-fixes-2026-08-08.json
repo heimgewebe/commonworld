@@ -1,0 +1,551 @@
+{
+  "review_kind": "model_assisted_independent_language_review",
+  "reviewer": "Claude Opus 5 independent post-fix review via Claude Pro",
+  "writer_independence": "independent_from_grok_4_5_writer",
+  "input_digests": {
+    "es": "0bd41982a4d50bad5d0e63cd77d58dd0ad6383d71da0d9ead88fc5f7c04c8b04",
+    "fr": "e711f653756fa5f3b7a296bd049aa8704bb45e1bbf36c3e1d8e90bef5b815f7a",
+    "pt-BR": "11f084c1e7583504b9008483e59edc76fed44c5fe535f28cd419ccf1331c529b",
+    "ar": "3e2925a47e29fa4b3fcb9151f371375b9c925af95eee840a5b1b2fd5277696c4"
+  },
+  "coverage": {
+    "locales": [
+      "es",
+      "fr",
+      "pt-BR",
+      "ar"
+    ],
+    "project_count_per_locale": 88,
+    "all_entries_reviewed": true
+  },
+  "verdict": "needs_fixes",
+  "counts": {
+    "blocker": 0,
+    "major": 1,
+    "minor": 47,
+    "note": 15
+  },
+  "findings": [
+    {
+      "locale": "es",
+      "project_id": "zapatista-autonomy",
+      "field": "summary",
+      "severity": "major",
+      "issue": "The Zapatista bodies dissolved in 2023 are named 'Juntas de Buen Gobierno' (JBG) in Spanish. 'Consejos de Buen Gobierno' is a back-translation of the English gloss 'Good Government Councils' and produces an institution name Spanish-language readers will not recognise; the same entry correctly keeps 'MAREZ'.",
+      "recommended_text": "Una estructura de autonomía mantenida por las comunidades zapatistas en Chiapas que desde 2023 ha sustituido a los antiguos MAREZ y Juntas de Buen Gobierno por gobiernos autónomos locales, colectivos regionales y coordinación asamblearia."
+    },
+    {
+      "locale": "es",
+      "project_id": "great-lakes-commons",
+      "field": "summary",
+      "severity": "minor",
+      "issue": "'bioregional' is misspelled. In Spanish orthography a prefix ending in a vowel before word-initial r doubles the r: 'biorregional' (cf. 'birregional', 'contrarreforma').",
+      "recommended_text": "Una red biorregional abierta que trata los Grandes Lagos como un bien común vivo y busca reforzar la gobernanza comunitaria e indígena, la responsabilidad compartida y la custodia a largo plazo del agua más allá de las fronteras políticas."
+    },
+    {
+      "locale": "es",
+      "project_id": "great-lakes-commons",
+      "field": "geographic_labels.great-lakes-bioregion",
+      "severity": "minor",
+      "issue": "'Bioregión' is misspelled; correct Spanish is 'Biorregión'.",
+      "recommended_text": "Biorregión de los Grandes Lagos en Canadá y Estados Unidos"
+    },
+    {
+      "locale": "es",
+      "project_id": "great-lakes-commons",
+      "field": "digital_label",
+      "severity": "minor",
+      "issue": "'bioregional' is misspelled; correct Spanish is 'biorregional'.",
+      "recommended_text": "Aprendizaje biorregional, creación de redes y participación para la gobernanza comunitaria del agua"
+    },
+    {
+      "locale": "es",
+      "project_id": "mikoko-pamoja",
+      "field": "geographic_labels.mikoko-pamoja-gazi-bay",
+      "severity": "minor",
+      "issue": "Untranslated English administrative and country names in an otherwise Spanish label: 'Kwale County, Kenya'. The same file uses 'Kenia' in akiba-mashinani-trust and kibera-public-space-project, so this is also an internal inconsistency.",
+      "recommended_text": "Bahía de Gazi, condado de Kwale, Kenia — ancla costera amplia"
+    },
+    {
+      "locale": "es",
+      "project_id": "tetepare-descendants-association",
+      "field": "geographic_labels.tetepare-island-area",
+      "severity": "minor",
+      "issue": "'Western Province' is left in English; it is an administrative division name, not an organisation name, and has a standard Spanish form.",
+      "recommended_text": "Isla de Tetepare, Provincia Occidental, Islas Salomón"
+    },
+    {
+      "locale": "es",
+      "project_id": "prinzessinnengarten-kollektiv",
+      "field": "geographic_labels.prinzessinnengarten-neukoelln",
+      "severity": "minor",
+      "issue": "'Neuer St. Jacobi Cemetery' carries the English common noun 'Cemetery' into Spanish prose; the site is the German 'Neuer St. Jacobi Friedhof'. fr and pt-BR both translate the generic ('cimetière', 'cemitério').",
+      "recommended_text": "Huerto comunitario en el cementerio Neuer St. Jacobi"
+    },
+    {
+      "locale": "es",
+      "project_id": "wikidata",
+      "field": "summary",
+      "severity": "minor",
+      "issue": "'Una base de conocimiento libre de enunciados estructurados' parses naturally as 'a knowledge base free OF structured statements', i.e. the opposite of the source. The purpose relation ('for statements') is lost.",
+      "recommended_text": "Una base de datos de conocimiento libre para enunciados estructurados y legibles por máquina, utilizados y enlazados en los proyectos Wikimedia y en otras aplicaciones."
+    },
+    {
+      "locale": "es",
+      "project_id": "open-library",
+      "field": "summary",
+      "severity": "minor",
+      "issue": "'se amplían y mantienen con voluntarios' uses the wrong preposition for an agent; the source is 'expanded and maintained BY volunteers' ('por voluntarios').",
+      "recommended_text": "Un catálogo de libros abierto y editable de forma colaborativa y una biblioteca pública digital del Internet Archive cuyo software, datos y documentación son abiertos y son ampliados y mantenidos por voluntarios."
+    },
+    {
+      "locale": "es",
+      "project_id": "openstreetmap",
+      "field": "summary",
+      "severity": "minor",
+      "issue": "'relevados' for 'surveyed' is a River Plate regionalism; in most of the Spanish-speaking world 'relevar' means 'to relieve/replace', which is misleading in a neutral-Spanish overlay.",
+      "recommended_text": "Una base de datos cartográfica abierta mundial cuyas carreteras, caminos y otros datos geográficos son cartografiados, corregidos y reutilizables libremente por los colaboradores."
+    },
+    {
+      "locale": "es",
+      "project_id": "auroville",
+      "field": "summary",
+      "severity": "minor",
+      "issue": "'Una comunidad internacional' drops the source's 'township' (a planned town) and collides with the fixed Spanish collocation 'la comunidad internacional' (= the international community). fr renders it correctly as 'cité internationale'.",
+      "recommended_text": "Una ciudad internacional en Tamil Nadu que desde 1968 experimenta con vida comunal, práctica ecológica y organización social alternativa; la tierra y los activos se mantienen legalmente a través de la Auroville Foundation en lugar de ser propiedad individual de los residentes."
+    },
+    {
+      "locale": "es",
+      "project_id": "potato-park-peru",
+      "field": "geographic_labels.potato-park-pisac-region",
+      "severity": "minor",
+      "issue": "The English 'Potato Park' is kept in the Spanish overlay although the initiative's own name in its own language is 'Parque de la Papa'; this is untranslated English rather than a canonical name for this locale.",
+      "recommended_text": "Comunidades del Parque de la Papa cerca de Písac, Cusco, Perú"
+    },
+    {
+      "locale": "es",
+      "project_id": "deccan-development-society",
+      "field": "digital_label",
+      "severity": "minor",
+      "issue": "'video' is written without the accent here while wikimedia-commons in the same file uses 'vídeo'; the overlay is internally inconsistent in its neutral-Spanish spelling choice.",
+      "recommended_text": "Medios comunitarios y el archivo público de vídeo de las Sanghams"
+    },
+    {
+      "locale": "es",
+      "project_id": "meshtastic",
+      "field": "digital_label",
+      "severity": "minor",
+      "issue": "'Software de red mallada de código abierto sin infraestructura convencional' misplaces the off-grid modifier so it reads as 'open source without conventional infrastructure' rather than as a property of the network's operation.",
+      "recommended_text": "Software de red mallada de código abierto para funcionar fuera de las infraestructuras convencionales, protocolos, documentación y colaboración comunitaria"
+    },
+    {
+      "locale": "es",
+      "project_id": "cano-martin-pena-clt",
+      "field": "summary",
+      "severity": "note",
+      "issue": "'las residentes son dueñas' uses a feminine generic for a mixed group, while the rest of the file uses masculine generics ('los residentes', 'vecinos', 'voluntarios'). Style choice is defensible but inconsistent within the overlay.",
+      "recommended_text": "Un fideicomiso comunitario de tierras gestionado por ocho comunidades en San Juan que mantiene colectivamente tierras públicas mientras los residentes son dueños de sus viviendas y reciben protección a largo plazo frente al desplazamiento."
+    },
+    {
+      "locale": "es",
+      "project_id": "pachgaon-community-forest",
+      "field": "summary",
+      "severity": "note",
+      "issue": "'1,006 hectáreas' uses the English thousands comma. It is read as a decimal separator in Spain and in RAE-recommended usage; pt-BR and fr both localised the grouping ('1.006', '1 006').",
+      "recommended_text": "La Pachgaon Gram Sabha gestiona 1006 hectáreas de bosque mediante derechos reconocidos de Community Forest Resource, combinando decisiones democráticas con la protección forestal y la cosecha y venta de bambú para medios de vida locales."
+    },
+    {
+      "locale": "es",
+      "project_id": "thailand-citizens-forest-database",
+      "field": "digital_label",
+      "severity": "note",
+      "issue": "'Base de datos pública Citizens’ Forest Database' repeats 'database' in both languages; fr avoids the redundancy by dropping the English generic.",
+      "recommended_text": "Base de datos pública Citizens’ Forest con información mantenida por las comunidades sobre los bosques comunitarios de Tailandia"
+    },
+    {
+      "locale": "fr",
+      "project_id": "namibia-communal-conservancies-alliance",
+      "field": "summary",
+      "severity": "minor",
+      "issue": "'conservancies communales' leaves the English common noun untranslated inside French prose; es and pt-BR both render it ('áreas de conservación comunales', 'áreas de conservação comunais').",
+      "recommended_text": "Une alliance-cadre namibienne d’aires de conservation communales (conservancies), de forêts communautaires et d’autres groupes locaux de ressources, qui représente des intérêts partagés et soutient la gouvernance communautaire des ressources naturelles."
+    },
+    {
+      "locale": "fr",
+      "project_id": "namibia-communal-conservancies-alliance",
+      "field": "digital_label",
+      "severity": "minor",
+      "issue": "Same untranslated English common noun 'conservancies' in the digital label.",
+      "recommended_text": "Informations publiques NACSO sur l’alliance nationale et les aires de conservation communales de Namibie"
+    },
+    {
+      "locale": "fr",
+      "project_id": "bosco-uganda",
+      "field": "geographic_labels.bosco-gulu-network-anchor",
+      "severity": "minor",
+      "issue": "'Gulu City' and 'West Nile' are left in English in a French label; both are ordinary place designations with established French forms, and es localises them ('Ciudad de Gulu', 'Nilo Occidental').",
+      "recommended_text": "La ville de Gulu comme ancrage large d’un réseau couvrant l’Acholi, le Lango et le Nil occidental"
+    },
+    {
+      "locale": "fr",
+      "project_id": "mikoko-pamoja",
+      "field": "summary",
+      "severity": "minor",
+      "issue": "'Une initiative mangroves en propriété communautaire' is an ungrammatical noun juxtaposition; French requires a preposition or an adjectival form.",
+      "recommended_text": "Une initiative communautaire de mangrove à Gazi Bay, qui combine conservation, restauration et suivi local avec des revenus issus de crédits carbone pour des projets d’intérêt communautaire choisis collectivement."
+    },
+    {
+      "locale": "fr",
+      "project_id": "mikoko-pamoja",
+      "field": "geographic_labels.mikoko-pamoja-gazi-bay",
+      "severity": "minor",
+      "issue": "'vaste repère côtier' departs from the 'ancrage …' term used for every other anchor label in the file (regional, urban, district, island, local), breaking terminology consistency for a repeated UI string.",
+      "recommended_text": "Gazi Bay, comté de Kwale, Kenya — ancrage côtier large"
+    },
+    {
+      "locale": "fr",
+      "project_id": "park-slope-food-coop",
+      "field": "summary",
+      "severity": "minor",
+      "issue": "'tours de travail' is not the idiomatic French for member work shifts; 'créneaux de travail' (or 'tours de service') is standard. The same wording recurs in this entry's digital_label.",
+      "recommended_text": "Une épicerie coopérative détenue par ses membres à Brooklyn, dont quelque 17 000 membres assurent les achats, le fonctionnement et les règles par des créneaux de travail, des parts de capital et des procédures démocratiques."
+    },
+    {
+      "locale": "fr",
+      "project_id": "park-slope-food-coop",
+      "field": "digital_label",
+      "severity": "minor",
+      "issue": "Same unidiomatic rendering of 'work shifts' as 'tours de travail'.",
+      "recommended_text": "Informations d’adhésion, règles et coordination numérique des créneaux de travail pour le fonctionnement de la coopérative locale"
+    },
+    {
+      "locale": "fr",
+      "project_id": "wikipedia",
+      "field": "summary",
+      "severity": "note",
+      "issue": "Apostrophe typography is mixed across the fr overlay: roughly a quarter of the entries use the straight ASCII apostrophe (this entry has none, but cano-martin-pena-clt, cecosesola, cooperation-jackson, open-library, openstreetmap, wikidata, zapatista-autonomy and about eighteen others do) while the majority use the typographic ’. Anchored here as a file-level observation.",
+      "recommended_text": "Normalise every apostrophe in catalog/locales/fr.json to the typographic ’ used by the majority of entries."
+    },
+    {
+      "locale": "fr",
+      "project_id": "akiba-mashinani-trust",
+      "field": "summary",
+      "severity": "note",
+      "issue": "'communautés d’habitat informel' adds 'informel', which is not in the source ('settlement communities'). The gloss is factually apt for this trust but is an addition relative to the reference text and to the other three locales.",
+      "recommended_text": "Un instrument de financement conduit par des communautés d’habitat au Kenya qui soutient les groupes d’épargne, les prêts et des projets organisés par la communauté pour le logement, l’assainissement et les infrastructures de base."
+    },
+    {
+      "locale": "fr",
+      "project_id": "tribunal-aguas-valencia",
+      "field": "summary",
+      "severity": "note",
+      "issue": "'communautés d’irrigation' is a calque; the established French term for these bodies is 'communautés d’irrigants' (or 'd’arrosants'), matching the Spanish 'comunidades de regantes' used in the es overlay.",
+      "recommended_text": "Un tribunal de l’eau géré par des communautés d’irrigants à Valence qui tranche publiquement et régulièrement les litiges d’usage selon une pratique établie."
+    },
+    {
+      "locale": "fr",
+      "project_id": "ekuri-community-forest",
+      "field": "summary",
+      "severity": "note",
+      "issue": "'Forêt collectivement possédée' is clumsy; 'détenue' is the normal verb for collective ownership of land in French and is already used elsewhere in the file (auroville, fordhall-organic-farm).",
+      "recommended_text": "Forêt détenue et gérée collectivement par les communautés Old et New Ekuri dans l’État de Cross River, au Nigeria, dont les règles lient conservation, usage durable et infrastructures locales."
+    },
+    {
+      "locale": "pt-BR",
+      "project_id": "great-lakes-commons",
+      "field": "summary",
+      "severity": "minor",
+      "issue": "'bioregional' is misspelled. Portuguese doubles the r after a vowel-final prefix: 'biorregional' (cf. 'microrregião', 'autorregulação').",
+      "recommended_text": "Uma rede biorregional aberta que trata os Grandes Lagos como um bem comum vivo e busca fortalecer a governança comunitária e indígena, a responsabilidade compartilhada e a gestão de longo prazo da água além das fronteiras políticas."
+    },
+    {
+      "locale": "pt-BR",
+      "project_id": "great-lakes-commons",
+      "field": "geographic_labels.great-lakes-bioregion",
+      "severity": "minor",
+      "issue": "'Bioregião' is misspelled; correct Brazilian Portuguese is 'Biorregião'.",
+      "recommended_text": "Biorregião dos Grandes Lagos no Canadá e nos Estados Unidos"
+    },
+    {
+      "locale": "pt-BR",
+      "project_id": "great-lakes-commons",
+      "field": "digital_label",
+      "severity": "minor",
+      "issue": "'bioregional' is misspelled; correct Brazilian Portuguese is 'biorregional'.",
+      "recommended_text": "Aprendizado biorregional, articulação em rede e participação para a governança comunitária da água"
+    },
+    {
+      "locale": "pt-BR",
+      "project_id": "ujamaa-community-resource-team",
+      "field": "summary",
+      "severity": "minor",
+      "issue": "'comunidades pastoras, agro-pastoras' uses the noun 'pastora' (shepherdess) where Portuguese requires the adjective 'pastoril/pastoris' (or 'pastoralistas'); 'agro-pastoras' is likewise malformed and the hyphen is dropped in current orthography.",
+      "recommended_text": "Uma organização de direitos comunitários no norte da Tanzânia que apoia comunidades pastoris, agropastoris e de caçadores-coletores com posse coletiva da terra, governança local e gestão sustentável de recursos."
+    },
+    {
+      "locale": "pt-BR",
+      "project_id": "mikoko-pamoja",
+      "field": "geographic_labels.mikoko-pamoja-gazi-bay",
+      "severity": "minor",
+      "issue": "'Kwale County' is left in English inside an otherwise Portuguese label whose country name is localised ('Quênia').",
+      "recommended_text": "Gazi Bay, Condado de Kwale, Quênia — âncora costeira ampla"
+    },
+    {
+      "locale": "pt-BR",
+      "project_id": "bosco-uganda",
+      "field": "geographic_labels.bosco-gulu-network-anchor",
+      "severity": "minor",
+      "issue": "'Gulu City' and 'West Nile' are untranslated English designations; the rest of the label is Portuguese.",
+      "recommended_text": "Cidade de Gulu como âncora ampla de uma rede que cobre Acholi, Lango e o Nilo Ocidental"
+    },
+    {
+      "locale": "pt-BR",
+      "project_id": "tla-o-qui-aht-tribal-parks",
+      "field": "summary",
+      "severity": "minor",
+      "issue": "'a Tla-o-qui-aht First Nation' leaves the English institutional generic 'First Nation' untranslated in running Portuguese prose; es and fr both localise it ('Primera Nación', 'Première Nation').",
+      "recommended_text": "Áreas sob governança indígena em Clayoquot Sound onde a Primeira Nação Tla-o-qui-aht combina governança tradicional, trabalho de Guardiões, restauração ecológica e participação regional responsável."
+    },
+    {
+      "locale": "pt-BR",
+      "project_id": "fordhall-organic-farm",
+      "field": "geographic_labels.fordhall-market-drayton",
+      "severity": "minor",
+      "issue": "'âncora da localidade ampla' attaches 'ampla' to 'localidade', so it reads 'anchor of the broad locality' instead of 'broad locality anchor'; every other anchor label in the file puts the qualifier on the anchor.",
+      "recommended_text": "Market Drayton, Shropshire — âncora ampla de localidade"
+    },
+    {
+      "locale": "pt-BR",
+      "project_id": "g0v",
+      "field": "digital_label",
+      "severity": "minor",
+      "issue": "'Projetos de tecnologia cívica aberta' attaches 'aberta' to 'tecnologia cívica'; the source qualifies the projects as open ('Open civic-tech projects'), as es and fr both render.",
+      "recommended_text": "Projetos abertos de tecnologia cívica, dados e espaços de trabalho colaborativos"
+    },
+    {
+      "locale": "pt-BR",
+      "project_id": "openstreetmap",
+      "field": "summary",
+      "severity": "minor",
+      "issue": "'base de dados' is the European-Portuguese form; this overlay otherwise uses the Brazilian 'banco de dados' (musicbrainz, open-food-facts, wikidata, thailand-citizens-forest-database).",
+      "recommended_text": "Um banco de dados cartográfico aberto mundial cujas estradas, caminhos e outros geodados são levantados, corrigidos e livremente reutilizáveis por colaboradores."
+    },
+    {
+      "locale": "pt-BR",
+      "project_id": "auroville",
+      "field": "summary",
+      "severity": "minor",
+      "issue": "'Uma comunidade internacional' drops the source's 'township' (a planned town) and collides with the fixed collocation 'a comunidade internacional'.",
+      "recommended_text": "Uma cidade internacional em Tamil Nadu que desde 1968 experimenta a vida comunitária, práticas ecológicas e organização social alternativa; a terra e os bens são legalmente detidos pela Auroville Foundation, e não de propriedade individual dos residentes."
+    },
+    {
+      "locale": "pt-BR",
+      "project_id": "zapatista-autonomy",
+      "field": "summary",
+      "severity": "note",
+      "issue": "'as antigas MAREZ' treats the acronym as feminine, but MAREZ expands to 'Municípios Autônomos Rebeldes Zapatistas' (masculine); Portuguese usage normally follows the head noun of the expansion.",
+      "recommended_text": "Uma estrutura de autonomia mantida por comunidades zapatistas em Chiapas que, desde 2023, substituiu os antigos MAREZ e os Conselhos de Bom Governo por governos autônomos locais, coletivos regionais e coordenação baseada em assembleias."
+    },
+    {
+      "locale": "pt-BR",
+      "project_id": "reprap",
+      "field": "digital_label",
+      "severity": "note",
+      "issue": "'um wiki comunitário' is masculine here while root-access-hackerspace in the same file uses 'Wiki comunitária'; the overlay should settle on one gender for the loanword.",
+      "recommended_text": "Documentação de design aberto e uma wiki comunitária para máquinas de fabricação auto-replicantes"
+    },
+    {
+      "locale": "pt-BR",
+      "project_id": "sarantaporo-community-network",
+      "field": "summary",
+      "severity": "note",
+      "issue": "'conectando conectividade aberta' repeats the same root twice in three words, which reads as an artefact of literal translation.",
+      "recommended_text": "Uma rede sem fio construída e operada pela comunidade em vilarejos rurais da região de Elassona, articulando conectividade aberta, educação digital e auto-organização local."
+    },
+    {
+      "locale": "pt-BR",
+      "project_id": "new-mexico-acequia-association",
+      "field": "digital_label",
+      "severity": "note",
+      "issue": "'Educação pública, informações organizacionais e de participação' re-parses the source so that 'public education' becomes a separate offering; es and fr both keep 'public' as a qualifier of the information ('Información pública educativa…', 'Informations publiques d’éducation…').",
+      "recommended_text": "Informações públicas educacionais, organizacionais e de participação"
+    },
+    {
+      "locale": "pt-BR",
+      "project_id": "arvari-river-parliament",
+      "field": "geographic_labels.arvari-water-infrastructure",
+      "severity": "note",
+      "issue": "'locais de uso na bacia' drops 'local' from 'local use sites'; es, fr and ar all keep it.",
+      "recommended_text": "Aldeias, estruturas hídricas e locais de uso local na bacia"
+    },
+    {
+      "locale": "ar",
+      "project_id": "bosco-uganda",
+      "field": "summary",
+      "severity": "minor",
+      "issue": "The Latin-script acronym 'ICT' is embedded in RTL Arabic prose. It is not an acronym Arabic readers use unexpanded (unlike API or FAO), and the bidirectional switch is avoidable; MSA uses تكنولوجيا المعلومات والاتصالات.",
+      "recommended_text": "شبكة مجتمعية غير ربحية في شمال أوغندا تربط الوصول الريفي إلى الإنترنت ومراكز تكنولوجيا المعلومات والاتصالات المجتمعية والتعليم الرقمي والبنية التحتية التي تعمل بالطاقة الشمسية."
+    },
+    {
+      "locale": "ar",
+      "project_id": "bosco-uganda",
+      "field": "geographic_labels.bosco-network-sites",
+      "severity": "minor",
+      "issue": "Same untranslated Latin-script 'ICT' inside an Arabic geographic label.",
+      "recommended_text": "مراكز تكنولوجيا المعلومات والاتصالات وروابط راديو ومواقع اتصال محلية"
+    },
+    {
+      "locale": "ar",
+      "project_id": "bosco-uganda",
+      "field": "digital_label",
+      "severity": "minor",
+      "issue": "Same untranslated Latin-script 'ICT' inside the Arabic digital label.",
+      "recommended_text": "شبكة مجتمعية ومراكز تكنولوجيا المعلومات والاتصالات وتعليم رقمي في شمال أوغندا"
+    },
+    {
+      "locale": "ar",
+      "project_id": "cano-martin-pena-clt",
+      "field": "summary",
+      "severity": "minor",
+      "issue": "Number–noun gender polarity error: مجتمع is masculine in the singular, so the numeral must take the feminine form ثمانية. The file applies the rule correctly elsewhere (ثماني قرى, خمس مناطق, سبعة منازل), so this is an isolated slip.",
+      "recommended_text": "صندوق أراضٍ مجتمعي تديره ثمانية مجتمعات في سان خوان، يحتفظ بالأراضي العامة جماعيًا بينما يملك السكان منازلهم ويحظون بحماية طويلة الأمد من التهجير."
+    },
+    {
+      "locale": "ar",
+      "project_id": "cano-martin-pena-clt",
+      "field": "geographic_labels.cano-martin-pena-san-juan",
+      "severity": "minor",
+      "issue": "Same number–noun polarity error (ثماني مجتمعات) in the geographic label.",
+      "recommended_text": "ثمانية مجتمعات على امتداد كاينو مارتين بينيا، سان خوان، بورتوريكو"
+    },
+    {
+      "locale": "ar",
+      "project_id": "potato-park-peru",
+      "field": "summary",
+      "severity": "minor",
+      "issue": "Same number–noun polarity error: خمس مجتمعات should be خمسة مجتمعات because the singular مجتمع is masculine.",
+      "recommended_text": "منطقة قرب بيساك ترعاها خمسة مجتمعات من الكيتشوا، حيث تُحفظ أصناف البطاطا الأصلية والمعرفة الزراعية والنظم البيئية والممارسات الثقافية بصورة جماعية."
+    },
+    {
+      "locale": "ar",
+      "project_id": "fordhall-organic-farm",
+      "field": "summary",
+      "severity": "minor",
+      "issue": "'تُحتفظ أراضيها' is ungrammatical: احتفظ is used with the preposition بـ, so the passive must be يُحتفظ بأراضيها. As written the verb also lacks a valid subject.",
+      "recommended_text": "مزرعة عضوية مملوكة للمجتمع في شروبشاير يُحتفظ بأراضيها عبر جمعية خيرية للمنفعة المجتمعية تضم آلاف المساهمين، وهي مؤمّنة للزراعة البيئية والتعليم والوصول العام إلى الطبيعة والبرامج الاجتماعية."
+    },
+    {
+      "locale": "ar",
+      "project_id": "deccan-development-society",
+      "field": "digital_label",
+      "severity": "minor",
+      "issue": "Latin-script 'Sanghams' appears mid-Arabic although the same entry's geographic label already transliterates the term (مجالس سانغهام); the overlay contradicts itself and forces an avoidable script switch.",
+      "recommended_text": "إعلام مجتمعي والأرشيف المرئي العام لمجالس سانغهام"
+    },
+    {
+      "locale": "ar",
+      "project_id": "namena-marine-reserve",
+      "field": "geographic_labels.namena-kubulau-area",
+      "severity": "minor",
+      "issue": "'بحيرة نامينا' means 'Lake Namena'; Namena Lagoon is a marine coral lagoon, not a lake. fr and pt-BR use 'lagon'/'Lagoa'.",
+      "recommended_text": "منطقة كوبولاو وبحيرة نامينا الشاطئية، بوا، فيجي"
+    },
+    {
+      "locale": "ar",
+      "project_id": "pachgaon-community-forest",
+      "field": "summary",
+      "severity": "minor",
+      "issue": "'وحصاد الخيزران وبيعه سبلًا لكسب العيش محليًا' is syntactically unmotivated: the accusative سبلًا has no governing verb or valid tamyīz/ḥāl reading, leaving the purpose relation unexpressed.",
+      "recommended_text": "تدير Pachgaon Gram Sabha مساحة 1,006 هكتار من الغابات من خلال حقوق موارد الغابات المجتمعية المعترف بها، جامعةً بين القرارات الديمقراطية وحماية الغابة وحصاد الخيزران وبيعه دعمًا لسبل العيش المحلية."
+    },
+    {
+      "locale": "ar",
+      "project_id": "great-lakes-commons",
+      "field": "summary",
+      "severity": "minor",
+      "issue": "'شبكة إقليمية حيوية مفتوحة' reads most naturally as 'an open, vibrant regional network'; the source term is 'bioregional', for which the entry's own geographic label already uses الإقليم الحيوي.",
+      "recommended_text": "شبكة مفتوحة على مستوى الإقليم الحيوي تعامل البحيرات العظمى كمشاع حيّ وتسعى إلى تعزيز الحوكمة المجتمعية وحوكمة السكان الأصليين والمسؤولية المشتركة والإشراف طويل الأمد على المياه عبر الحدود السياسية."
+    },
+    {
+      "locale": "ar",
+      "project_id": "great-lakes-commons",
+      "field": "digital_label",
+      "severity": "minor",
+      "issue": "'تعلّم إقليمي حيوي' has the same defect: it reads as 'lively regional learning' rather than 'bioregional learning'.",
+      "recommended_text": "تعلّم على مستوى الإقليم الحيوي وتواصل ومشاركة لحوكمة المياه المجتمعية"
+    },
+    {
+      "locale": "ar",
+      "project_id": "acofop-peten-community-forests",
+      "field": "summary",
+      "severity": "minor",
+      "issue": "'منظمات فلاحية وسكان أصليين' coordinates an adjective with a noun, so it reads 'peasant organisations and Indigenous inhabitants' rather than the source's 'peasant and Indigenous organisations'.",
+      "recommended_text": "شبكة تديرها منظمات الفلاحين والسكان الأصليين في بيتين، وتربط امتيازات الغابات المجتمعية في محمية المايا للمحيط الحيوي عبر التمثيل الديمقراطي وحماية الإقليم ومكافحة الحرائق والترميم والاستخدام المستدام للغابات."
+    },
+    {
+      "locale": "ar",
+      "project_id": "meshtastic",
+      "field": "digital_label",
+      "severity": "minor",
+      "issue": "'برمجيات شبكة متداخلة مفتوحة المصدر خارج الشبكة' places 'خارج الشبكة' after 'مفتوحة المصدر', producing 'open source outside the network'; the off-grid property belongs to the network's operation.",
+      "recommended_text": "برمجيات شبكة متداخلة مفتوحة المصدر تعمل خارج البنية التحتية التقليدية، وبروتوكولات وتوثيق وتعاون مجتمعي"
+    },
+    {
+      "locale": "ar",
+      "project_id": "wikidata",
+      "field": "summary",
+      "severity": "minor",
+      "issue": "'البيانات المنظمة' renders 'statements' as 'data', losing the Wikidata-specific unit that es, fr and pt-BR all preserve ('enunciados', 'énoncés', 'declarações'). 'Wikimedia' is also left in Latin script where the standard Arabic form ويكيميديا exists.",
+      "recommended_text": "قاعدة معرفة حرة للعبارات المنظمة القابلة للقراءة آلياً، تُستخدم وتُربط عبر مشاريع ويكيميديا والتطبيقات الأخرى."
+    },
+    {
+      "locale": "ar",
+      "project_id": "ujamaa-community-resource-team",
+      "field": "summary",
+      "severity": "minor",
+      "issue": "'الصيادين الجامعين' is an opaque calque of 'hunter-gatherers'; Arabic requires a coordinated construction such as مجتمعات الصيد وجمع الثمار.",
+      "recommended_text": "منظمة لحقوق المجتمعات في شمال تنزانيا تدعم مجتمعات الرعاة والرعاة الزراعيين ومجتمعات الصيد وجمع الثمار في حيازة الأراضي الجماعية والحوكمة المحلية والإدارة المستدامة للموارد."
+    },
+    {
+      "locale": "ar",
+      "project_id": "librivox",
+      "field": "summary",
+      "severity": "note",
+      "issue": "'الملك العام' for 'public domain' is attested but unvocalised it is ambiguous with 'the public king'; الملكية العامة is the clearer standard rendering. The same wording recurs in safecast's summary.",
+      "recommended_text": "مجتمع تطوعي عالمي يسجّل نصوصًا في الملكية العامة ككتب صوتية متاحة بحرية، وينشر التسجيلات دون حواجز وصول تجارية."
+    },
+    {
+      "locale": "ar",
+      "project_id": "velondriake-lmma",
+      "field": "summary",
+      "severity": "note",
+      "issue": "'المنغروف' here versus 'مانغروف' in mikoko-pamoja: the overlay transliterates the same term two ways.",
+      "recommended_text": "منطقة بحرية تُدار بالاشتراك من قبل المجتمعات الساحلية حول أندافادواكا، وتربط الصيد المستدام والرصد والمناطق المحمية والشعاب المرجانية وأشجار المانغروف."
+    },
+    {
+      "locale": "ar",
+      "project_id": "park-slope-food-coop",
+      "field": "digital_label",
+      "severity": "note",
+      "issue": "'التنسيق الرقمي لنوبات العمل لعملية التعاونية المحلية' chains two لـ phrases and uses عملية (process/surgery) for the co-op's 'operation'; عمل or نشاط reads better.",
+      "recommended_text": "معلومات العضوية والقواعد والتنسيق الرقمي لنوبات العمل في نشاط التعاونية المحلية"
+    }
+  ],
+  "review_notes": [
+    "SHA-256 of all four target overlays was recomputed locally before review and matched the required digests exactly; en.json (reference) hashed to 97d084727349070505fc19a3fb2463c1aa3241f227821270e7e60a2a6c32bb97.",
+    "Structural check: each of es, fr, pt-BR, ar contains exactly 88 project entries with the same project ids as en.json, the same presence/absence of summary and digital_label, and identical geographic_labels key sets; no extra or missing keys were found.",
+    "Titles are absent from all four target overlays as expected; title omission was not treated as a defect.",
+    "All 88 summaries, all geographic_labels values and all digital_labels present in each locale were read in full and compared field by field against en.json.",
+    "No blocker-level defects were found: no entry is in the wrong language, and no summary was found to be materially wrong about what the project is, where it is, or who runs it.",
+    "The single major finding is es/zapatista-autonomy, where the Spanish-language institution 'Juntas de Buen Gobierno' is rendered as 'Consejos de Buen Gobierno', a back-translation from the English gloss. fr, pt-BR and ar are unaffected because 'Conseils/Conselhos/مجالس' are correct translations rather than the entity's own name.",
+    "Recurring cross-locale pattern: the 'bioregional' family is misspelled without the doubled r in both es (bioregional/Bioregión) and pt-BR (bioregional/Bioregião); fr uses 'biorégional' correctly.",
+    "Recurring cross-locale pattern: the geographic labels for mikoko-pamoja and bosco-uganda retain untranslated English administrative terms ('Kwale County', 'Gulu City', 'West Nile') in es, pt-BR and, for bosco, fr, while the surrounding text is localised.",
+    "Numeric formatting: fr ('1 006', '17 000') and pt-BR ('1.006', '17.000') localise digit grouping; es keeps the English comma ('1,006', '17,000'), which is ambiguous in neutral Spanish; ar keeps the comma, which is acceptable.",
+    "Arabic mixed-script check: most Latin-script insertions are genuine organisation or product names (Community Land Trust Brussels, Terra Concordia gGmbH, TONIBUNG, NACSO, WCS, LoRaWAN, ODbL, API, Discord, Internet Archive, Factor e Farm) and were not flagged; only 'ICT' (a translatable common-noun acronym) and 'Sanghams' (already transliterated elsewhere in the same entry) were flagged.",
+    "Arabic numeral polarity was checked across all counted expressions; the rule is applied correctly for قرى, مناطق and منازل and is violated only for مجتمعات in cano-martin-pena-clt and potato-park-peru.",
+    "The fr overlay mixes straight ASCII apostrophes and typographic ’ across roughly a quarter of its entries; this is a file-level typography inconsistency rather than a per-entry linguistic defect and is recorded as a single note.",
+    "Terminology consistency was checked per locale for recurring UI strings (the '— broad … anchor' suffixes, 'community network', 'commons', 'open source'); the only outlier serious enough to report is fr/mikoko-pamoja's 'vaste repère côtier' against the uniform 'ancrage …' pattern.",
+    "No fabricated facts, invented figures, or dropped clauses were found in any locale beyond the small additions and omissions recorded as findings (fr/akiba 'informel'; pt-BR/arvari dropped 'local').",
+    "No web sources were consulted; the review is based solely on the five files in catalog/locales/ and on internal linguistic knowledge. No file in the repository was modified."
+  ]
+}

@@ -2,7 +2,7 @@
   "schema_version": 2,
   "kind": "commonworld.ui_locale_independent_language_review_receipt",
   "status": "passed",
-  "reviewed_revision": "36583887e893bb1dea9b7242c6a4737c161ffd3a",
+  "reviewed_revision": "9a25778823f8fdbe8f1337252c991701f7df1f95",
   "reviewed_source_pack_sha256": "316da43be8603cf0400dfa886bf244f953cd0dcb702c150f87e652fc260e9819",
   "locale_verdicts": {
     "es": {
@@ -129,5 +129,48 @@
   "limitations": [
     "No native-speaker or human approval.",
     "No full WCAG or manual assistive-technology acceptance."
-  ]
+  ],
+  "catalog_review": {
+    "review_kind": "model_assisted_independent_language_review",
+    "reviewer": "GPT-5.6 Sol independent post-fix release review via Codex",
+    "writer_independence": "independent_from_grok_4_5_writer",
+    "input_digests": {
+      "es": "de1638df4c7f4b71aaab644c28e7739a699f3d914f49cfa09b205885a5f1ec36",
+      "fr": "c58061ed7f34dce421898b2894026aeafec56c41c32cb488a2ceb6cbf9a0875b",
+      "pt-BR": "d016bbf890ad12d59ab9004c2b47e88595d76c9d426dfceec07a1e50f5042ddc",
+      "ar": "ee4d37a7f75174099408a5191863440a9c8bd40475a1f05e59537c25c44ccaf2"
+    },
+    "coverage": {
+      "locales": [
+        "es",
+        "fr",
+        "pt-BR",
+        "ar"
+      ],
+      "project_count_per_locale": 88,
+      "all_entries_reviewed": true,
+      "basis": "full_digest_bound_independent_post_fix_review",
+      "full_review_source": "docs/evidence/locale-reviews/raw/catalog-wave1-independent-codex-final-pass-2026-08-08.json"
+    },
+    "verdict": "pass",
+    "counts": {
+      "blocker": 0,
+      "major": 0,
+      "minor": 0,
+      "note": 0
+    },
+    "findings": [],
+    "review_notes": [
+      "All five JSON files were read completely and all summaries, geographic-label values, and digital labels were independently compared with en.json.",
+      "All four target files match the required SHA-256 digests and contain the same 88 project IDs, 56 digital labels, and 78 geographic-label values.",
+      "The corrected pt-BR geographic label uses “Porto Rico”. No material semantic, linguistic, geographic, numerical, untranslated-prose, or Arabic mixed-script/direction defects were found."
+    ],
+    "source_receipts": [
+      {
+        "path": "docs/evidence/locale-reviews/raw/catalog-wave1-independent-codex-final-pass-2026-08-08.json",
+        "sha256": "6756a78ad888e4c484fa89befb05113c62fe5044c3a8803cdfb7cbd83d5b3bd8",
+        "role": "full_corpus_final_release_review"
+      }
+    ]
+  }
 }

@@ -1,0 +1,316 @@
+{
+  "review_kind": "model_assisted_independent_language_review",
+  "reviewer": "Claude Opus 5 independent final post-fix review via Claude Pro",
+  "writer_independence": "independent_from_grok_4_5_writer",
+  "input_digests": {
+    "es": "2cb9029389c4c8c9b16cbd3fed2381f5ba8a7ff3b12fad7a5a2bf127f50848c8",
+    "fr": "97ffb691edfc7748a8e40ac5428b20f88ae795f6b4a866e231d9bbfa08ee2b7c",
+    "pt-BR": "da453816b03f9d9fad499cc6b5c48d0a98d2fedf0c4e268bb1e7462dde0c66cb",
+    "ar": "bc5c07c1655627952603704a46b4b296d4b4dc56053cf1c76ecdecac906d9acc"
+  },
+  "coverage": {
+    "locales": [
+      "es",
+      "fr",
+      "pt-BR",
+      "ar"
+    ],
+    "project_count_per_locale": 88,
+    "all_entries_reviewed": true
+  },
+  "verdict": "needs_fixes",
+  "counts": {
+    "blocker": 0,
+    "major": 0,
+    "minor": 30,
+    "note": 4
+  },
+  "findings": [
+    {
+      "locale": "es",
+      "project_id": "auroville",
+      "field": "summary",
+      "severity": "minor",
+      "issue": "\"se mantienen legalmente a través de la Auroville Foundation\" is a calque of English \"held through\"; Spanish \"mantener\" does not carry the sense of holding legal title, so the ownership statement reads as \"are kept via\" rather than \"are legally held by\".",
+      "recommended_text": "Una ciudad internacional en Tamil Nadu que desde 1968 experimenta con vida comunal, práctica ecológica y organización social alternativa; la tierra y los activos están legalmente en manos de la Auroville Foundation en lugar de ser propiedad individual de los residentes."
+    },
+    {
+      "locale": "es",
+      "project_id": "cano-martin-pena-clt",
+      "field": "summary",
+      "severity": "minor",
+      "issue": "\"las residentes son dueñas\" introduces a feminine-only reference that is absent from the gender-neutral English \"residents own their homes\" and is inconsistent with the generic masculine used throughout the rest of the Spanish overlay.",
+      "recommended_text": "Un fideicomiso comunitario de tierras gestionado por ocho comunidades en San Juan que mantiene colectivamente tierras públicas mientras los residentes son dueños de sus viviendas y reciben protección a largo plazo frente al desplazamiento."
+    },
+    {
+      "locale": "es",
+      "project_id": "cltb-le-nid",
+      "field": "summary",
+      "severity": "minor",
+      "issue": "\"siete hogares\" renders \"seven homes\" as households rather than dwelling units; in a housing-project description the correct term is \"viviendas\".",
+      "recommended_text": "Un proyecto habitacional de Community Land Trust Brussels con siete viviendas, una sala compartida y un jardín semipúblico en Anderlecht."
+    },
+    {
+      "locale": "es",
+      "project_id": "granby-four-streets-clt",
+      "field": "summary",
+      "severity": "minor",
+      "issue": "\"ecologización\" denotes making policy or practice more ecological, not the physical greening of a neighbourhood that the English \"greening\" means alongside housing and community spaces.",
+      "recommended_text": "Un fideicomiso de tierras comunitarias liderado por residentes en Liverpool que asegura vivienda permanentemente asequible, espacios comunitarios, creación de zonas verdes y actividad económica local en el barrio."
+    },
+    {
+      "locale": "es",
+      "project_id": "kobulu-community-micro-hydro",
+      "field": "summary",
+      "severity": "minor",
+      "issue": "\"minihidráulica\" designates mini-hydro (roughly 1–10 MW), a different scale class from the source's \"micro-hydropower\"; French and Portuguese correctly use micro-scale terms.",
+      "recommended_text": "Un sistema microhidroeléctrico gestionado por la comunidad en Kampung Buayan, Sabah, cuyo comité local organiza las tarifas de consumo, la remuneración de operadores, las piezas de repuesto y las reparaciones futuras."
+    },
+    {
+      "locale": "es",
+      "project_id": "pachgaon-community-forest",
+      "field": "summary",
+      "severity": "minor",
+      "issue": "\"1,006 hectáreas\" uses the comma as a thousands separator; in Spain and most of South America the comma is the decimal mark, so the figure can be read as 1.006 hectares. RAE writes four-digit numbers without a separator.",
+      "recommended_text": "La Pachgaon Gram Sabha gestiona 1006 hectáreas de bosque mediante derechos reconocidos de Community Forest Resource, combinando decisiones democráticas con la protección forestal y la cosecha y venta de bambú para medios de vida locales."
+    },
+    {
+      "locale": "es",
+      "project_id": "park-slope-food-coop",
+      "field": "summary",
+      "severity": "minor",
+      "issue": "\"17,000 socios\" uses comma digit grouping, which conflicts with the decimal comma used across most of the Spanish-speaking world; RAE recommends a space for grouping in neutral Spanish.",
+      "recommended_text": "Una tienda de comestibles de propiedad de sus socios en Brooklyn cuyos aproximadamente 17 000 socios sostienen las compras, las operaciones y las normas mediante turnos de trabajo, participaciones de capital y procedimientos democráticos."
+    },
+    {
+      "locale": "es",
+      "project_id": "repair-cafe-international",
+      "field": "summary",
+      "severity": "minor",
+      "issue": "Gender agreement error: the implicit subject of \"reparar\" is \"las personas\" (feminine), so the predicative adjective must be \"juntas\", not \"juntos\".",
+      "recommended_text": "Una red mundial de encuentros de reparación voluntarios y no comerciales donde las personas comparten herramientas, conocimientos y tiempo para reparar juntas objetos cotidianos y desarrollar habilidades locales de reparación."
+    },
+    {
+      "locale": "es",
+      "project_id": "restarters",
+      "field": "digital_label",
+      "severity": "minor",
+      "issue": "Singular \"global\" after two coordinated nouns attaches only to \"plataforma\", losing the source's scope in which \"Global\" qualifies both network and platform; the French and Arabic overlays render the scope correctly.",
+      "recommended_text": "Red y plataforma globales para la reparación comunitaria"
+    },
+    {
+      "locale": "fr",
+      "project_id": "cano-martin-pena-clt",
+      "field": "summary",
+      "severity": "minor",
+      "issue": "\"protection à long terme contre les expulsions\" narrows the source's \"protection from displacement\" to eviction specifically, dropping the broader displacement/gentrification sense that the CLT model addresses.",
+      "recommended_text": "Une fiducie foncière communautaire gérée par huit communautés à San Juan qui détient collectivement des terrains publics, tandis que les habitants sont propriétaires de leurs logements et bénéficient d’une protection à long terme contre le déplacement."
+    },
+    {
+      "locale": "fr",
+      "project_id": "nyc-mesh",
+      "field": "geographic_labels.nycmesh-city-area",
+      "severity": "minor",
+      "issue": "\"New York City\" is untranslated English in a French geographic label; standard French usage is \"New York\" (or \"ville de New York\"). The Spanish, Portuguese and Arabic overlays all localise this toponym.",
+      "recommended_text": "New York"
+    },
+    {
+      "locale": "fr",
+      "project_id": "thailand-citizens-forest-database",
+      "field": "digital_label",
+      "severity": "minor",
+      "issue": "\"des informations tenues par les communautés\" reads as information held by the communities rather than maintained/kept up to date by them; the Spanish and Portuguese overlays use \"mantenida/mantidas\".",
+      "recommended_text": "Base de données publique Citizens’ Forest contenant des informations maintenues par les communautés sur les forêts communautaires de Thaïlande"
+    },
+    {
+      "locale": "pt-BR",
+      "project_id": "arvari-river-parliament",
+      "field": "geographic_labels.arvari-water-infrastructure",
+      "severity": "minor",
+      "issue": "The qualifier \"local\" from the English \"local use sites\" is dropped; the Spanish, French and Arabic overlays all retain it.",
+      "recommended_text": "Aldeias, estruturas hídricas e pontos de uso local na bacia"
+    },
+    {
+      "locale": "pt-BR",
+      "project_id": "community-baboon-sanctuary",
+      "field": "summary",
+      "severity": "minor",
+      "issue": "\"cuja governança consta como das comunidades locais\" is a syntactically strained rendering of \"whose governance is recorded as local communities\"; the elliptical \"consta como das\" is hard to parse.",
+      "recommended_text": "Uma área protegida publicamente registrada em Belize, cuja governança está registrada como sendo das comunidades locais e cuja responsabilidade de gestão é exercida por comitês locais."
+    },
+    {
+      "locale": "pt-BR",
+      "project_id": "granby-four-streets-clt",
+      "field": "summary",
+      "severity": "minor",
+      "issue": "\"fideicomisso fundiário comunitário\" imports a Spanish-flavoured calque; in Brazilian Portuguese \"fideicomisso\" is a distinct inheritance-law institute, and the established term for a community land trust is \"termo territorial coletivo\".",
+      "recommended_text": "Um termo territorial coletivo (community land trust) liderado por moradores em Liverpool que assegura moradia permanentemente acessível, espaços comunitários, áreas verdes e atividade econômica local no bairro."
+    },
+    {
+      "locale": "pt-BR",
+      "project_id": "kibera-public-space-project",
+      "field": "summary",
+      "severity": "minor",
+      "issue": "Orthography: under the Acordo Ortográfico the prefix \"co-\" is written solid before a consonant, so \"co-desenhados\" should be \"codesenhados\".",
+      "recommended_text": "Uma rede crescente de espaços públicos codesenhados e operados com grupos de moradores em Kibera, articulando resiliência a inundações, serviços básicos, locais de encontro e uso econômico local."
+    },
+    {
+      "locale": "pt-BR",
+      "project_id": "namena-marine-reserve",
+      "field": "summary",
+      "severity": "minor",
+      "issue": "\"proprietários costumeiros\" means habitual/usual owners; the legal term for \"customary owners\" in Portuguese is \"consuetudinários\", as used correctly in the Spanish overlay.",
+      "recommended_text": "Uma reserva marinha administrada pelos proprietários consuetudinários de recursos do Distrito de Kubulau, em Fiji, onde regras comunitárias, fiscalização e financiamento protegem a pesca e os meios de vida locais."
+    },
+    {
+      "locale": "pt-BR",
+      "project_id": "new-mexico-acequia-association",
+      "field": "digital_label",
+      "severity": "minor",
+      "issue": "Mis-parse of the English \"Public education, organizational and participation information\": \"Educação pública\" is read as a separate item instead of \"public\" qualifying all three kinds of information. Spanish, French and Arabic parse it correctly.",
+      "recommended_text": "Informações públicas educacionais, organizacionais e de participação"
+    },
+    {
+      "locale": "pt-BR",
+      "project_id": "nyc-mesh",
+      "field": "summary",
+      "severity": "minor",
+      "issue": "\"acesso à internet acessível\" both echoes \"acesso\" and is ambiguous, since \"acessível\" reads first as \"accessible\" rather than the intended \"affordable\".",
+      "recommended_text": "Uma rede comunitária administrada por voluntários na cidade de Nova York que conecta acesso à internet a preço acessível, autodeterminação digital e infraestrutura local construída em conjunto."
+    },
+    {
+      "locale": "pt-BR",
+      "project_id": "repair-cafe-international",
+      "field": "summary",
+      "severity": "minor",
+      "issue": "Gender agreement error: the implicit subject of \"consertar\" is \"as pessoas\" (feminine), so the predicative must be \"juntas\"; the placement after the object also obscures the reference.",
+      "recommended_text": "Uma rede mundial de encontros de reparo voluntários e não comerciais, onde as pessoas compartilham ferramentas, conhecimento e tempo para consertar juntas objetos do dia a dia e desenvolver habilidades locais de reparo."
+    },
+    {
+      "locale": "pt-BR",
+      "project_id": "reprap",
+      "field": "digital_label",
+      "severity": "minor",
+      "issue": "Orthography: \"auto-\" before a consonant-initial element is written solid with r-doubling, so \"auto-replicantes\" should be \"autorreplicantes\".",
+      "recommended_text": "Documentação de design aberto e um wiki comunitário para máquinas de fabricação autorreplicantes"
+    },
+    {
+      "locale": "pt-BR",
+      "project_id": "restarters",
+      "field": "digital_label",
+      "severity": "minor",
+      "issue": "Singular \"global\" after two coordinated nouns attaches only to \"plataforma\", so \"Global network\" loses its qualifier; the French and Arabic overlays render the scope correctly.",
+      "recommended_text": "Rede e plataforma globais para reparo comunitário"
+    },
+    {
+      "locale": "ar",
+      "project_id": "cano-martin-pena-clt",
+      "field": "geographic_labels.cano-martin-pena-san-juan",
+      "severity": "minor",
+      "issue": "Transliteration error: \"Caño\" is rendered \"كاينو\" (kaynu) instead of \"كانيو\"; the same overlay transliterates \"Peña\" correctly as \"بينيا\", so the ñ handling is internally inconsistent.",
+      "recommended_text": "ثمانية مجتمعات على امتداد كانيو مارتين بينيا، سان خوان، بورتوريكو"
+    },
+    {
+      "locale": "ar",
+      "project_id": "cooperation-jackson",
+      "field": "summary",
+      "severity": "minor",
+      "issue": "Grammar: \"أراضيًا\" is incorrect. أراضٍ is a منقوص diptote (ممنوع من الصرف), whose indefinite accusative is أراضِيَ without tanwin.",
+      "recommended_text": "شبكة لاقتصاد التضامن في جاكسون بولاية مسيسيبي تطوّر معًا تعاونيات عمالية ومؤسسات ذات إدارة ذاتية ديمقراطية وأراضيَ تحتفظ بها المجتمعات وإسكانًا ميسور التكلفة وبنية تحتية للإنتاج المحلي."
+    },
+    {
+      "locale": "ar",
+      "project_id": "granby-four-streets-clt",
+      "field": "summary",
+      "severity": "minor",
+      "issue": "Tanwin-alif orthography is inconsistent inside a single string: \"تخضيرًا\" uses the ـًا form while \"إسكاناً\", \"نشاطاً\", \"اقتصادياً\" and \"محلياً\" use ـاً in the same coordinated list.",
+      "recommended_text": "صندوق أراضٍ مجتمعي يقوده السكان في ليفربول يؤمّن إسكانًا ميسور التكلفة بشكل دائم ومساحات مجتمعية وتخضيرًا ونشاطًا اقتصاديًا محليًا في الحي."
+    },
+    {
+      "locale": "ar",
+      "project_id": "isle-of-eigg-heritage-trust",
+      "field": "summary",
+      "severity": "minor",
+      "issue": "\"منتخبين من جمعية السكان\" reads as \"elected from (among) the Residents’ Association\" rather than the source's \"elected by the Residents’ Association\"; the agentive requires من قِبَل.",
+      "recommended_text": "تملك Isle of Eigg Heritage Trust الجزيرة وتديرها لصالح سكانها؛ ويشكّل أربعة مديرين منتخبين من قِبَل جمعية السكان قرارات تتعلق بالأرض والإسكان والبنية التحتية والتراث الطبيعي وشبكة الكهرباء المحلية."
+    },
+    {
+      "locale": "ar",
+      "project_id": "kawawana",
+      "field": "summary",
+      "severity": "minor",
+      "issue": "\"تحمي APCRM والسكان من ثماني قرى ... المخزون السمكي\" invites the wrong reading \"protects the residents from eight villages\", because تحمي … من is the standard protect-from frame; the intended sense is \"residents of eight villages\".",
+      "recommended_text": "تحمي APCRM وسكان ثماني قرى في وسط كازامانس المخزونَ السمكي المحلي عبر مناطق استخدام مرمّزة بالألوان، وقيود على الصيد، والمراقبة والدوريات، ضمن حقوق الإدارة الساحلية المفوّضة في عام 2010."
+    },
+    {
+      "locale": "ar",
+      "project_id": "park-slope-food-coop",
+      "field": "summary",
+      "severity": "minor",
+      "issue": "Word order: \"يدعم نحو 17,000 عضو فيها المشتريات\" strands فيها between subject and object; the adverbial should follow the verb for a well-formed MSA relative clause.",
+      "recommended_text": "منشأة بقالة مملوكة للأعضاء في بروكلين يدعم فيها نحو 17,000 عضو المشترياتِ والعملياتِ والقواعدَ من خلال نوبات العمل وحصص رأس المال والإجراءات الديمقراطية."
+    },
+    {
+      "locale": "ar",
+      "project_id": "velondriake-lmma",
+      "field": "summary",
+      "severity": "minor",
+      "issue": "Terminology inconsistency: mangrove is transliterated \"المنغروف\" here but \"مانغروف\" in mikoko-pamoja within the same overlay.",
+      "recommended_text": "منطقة بحرية تُدار بالاشتراك من قبل المجتمعات الساحلية حول أندافادواكا، وتربط الصيد المستدام والرصد والمناطق المحمية والشعاب المرجانية وأشجار المانغروف."
+    },
+    {
+      "locale": "ar",
+      "project_id": "zapatista-autonomy",
+      "field": "summary",
+      "severity": "minor",
+      "issue": "\"حكومات محلية مستقلة\" says \"independent local governments\", shifting the source's \"local autonomous governments\"; Arabic marks autonomy with ذاتي, and the overlay itself uses إدارة ذاتية for the comparable North and East Syria entry.",
+      "recommended_text": "هيكل حكم ذاتي تحافظ عليه مجتمعات زاباتيستا في تشياباس، وقد حل منذ عام 2023 محل MAREZ ومجالس الحكم الرشيد السابقة بحكومات محلية ذاتية الحكم وجماعات إقليمية وتنسيق قائم على الجمعيات."
+    },
+    {
+      "locale": "fr",
+      "project_id": "open-food-network-australia",
+      "field": "summary",
+      "severity": "note",
+      "issue": "Apostrophe typography is mixed across the French overlay: most entries use the typographic apostrophe (U+2019) while roughly thirty, including this one, use the straight ASCII apostrophe (U+0027). Style only; no meaning affected.",
+      "recommended_text": "Une plateforme communautaire et open source australienne à but non lucratif qui permet aux producteurs et aux initiatives alimentaires d’organiser des circuits d’approvisionnement courts, transparents et contrôlés par la communauté."
+    },
+    {
+      "locale": "fr",
+      "project_id": "enspiral",
+      "field": "summary",
+      "severity": "note",
+      "issue": "About ten French summaries open telegraphically without a determiner (enspiral, ethiopia-community-seed-bank-network, fecofun-nepal, fordhall-organic-farm, freifunk, freifunk-hamburg, g0v, great-lakes-commons, ekuri-community-forest, tla-o-qui-aht-tribal-parks) while the remaining entries open with \"Un/Une\". Register inconsistency only.",
+      "recommended_text": "Un réseau collaboratif né en Aotearoa Nouvelle-Zélande qui développe des formes d’entreprise orientées vers la communauté, des ressources partagées et des outils documentés en libre accès pour la collaboration décentralisée."
+    },
+    {
+      "locale": "pt-BR",
+      "project_id": "open-food-network-australia",
+      "field": "summary",
+      "severity": "note",
+      "issue": "Four stacked modifiers leave \"australiana\" stranded after \"sem fins lucrativos\", making the opening noun phrase hard to parse. Grammatical; readability only.",
+      "recommended_text": "Uma plataforma australiana comunitária, sem fins lucrativos e de código aberto que permite a produtores e iniciativas alimentares organizar cadeias de abastecimento curtas, transparentes e controladas pela comunidade."
+    },
+    {
+      "locale": "ar",
+      "project_id": "nepal-wireless-networking-project",
+      "field": "summary",
+      "severity": "note",
+      "issue": "The proclitic conjunction و is written detached with a space before the Latin-script run (\"و E-Networking\"); the same pattern occurs in open-food-facts (\"و API\") and root-access-hackerspace (\"و Discord\"). Mixed-script typography only; rendering and direction are correct.",
+      "recommended_text": "تدير المجتمعات المحلية وE-Networking Research and Development شبكة اتصالات ريفية في نيبال، تربط البنية التحتية اللاسلكية والتعليم والخدمات المحلية."
+    }
+  ],
+  "review_notes": [
+    "All four target overlays matched the required SHA-256 digests byte for byte; en.json digest is 97d084727349070505fc19a3fb2463c1aa3241f227821270e7e60a2a6c32bb97.",
+    "Each target locale contains exactly the same 88 project ids as en.json, with identical geographic_label id sets and identical digital_label presence per project; no titles appear in any target overlay, as expected.",
+    "Every summary, every geographic_labels value and every digital_label in all four locales was read and compared against en.json.",
+    "All quantities, dates and named entities were cross-checked (more than 50 organizations, 17,000 members, 1,006 hectares, eight communities, five aflaj areas, four directors, seven homes, 1968, 2010, 2018, 2023); no factual omission, invention or numeric drift was found in any locale.",
+    "No blocker- or major-severity defect survived verification; the previously reported major and the 47 minors show no re-occurrence in the current files.",
+    "Untranslated English is confined to organization and project names (Community Land Trust Brussels, Isle of Eigg Heritage Trust, Auroville Foundation, Terra Concordia gGmbH, E-Networking Research and Development, Tetepare Descendants’ Association, Factor e Farm, Meadowbank/Portobello Tool Library, Granby Four Streets, Repair Café, Citizens’ Forest Database, Pachgaon Gram Sabha, Internet Archive) and accepted acronyms (ODbL, API, NACSO, WCS, FAO, LoRa/LoRaWAN, TONIBUNG, MAREZ, ICT/TIC, Discord).",
+    "Arabic numeral-noun gender polarity was checked for every counted noun (ثمانية مجتمعات, ثماني قرى, سبعة منازل, خمسة مجتمعات, خمس مناطق, أربعة مديرين) and is correct throughout.",
+    "Arabic mixed-script runs render correctly for direction; embedded Latin organization names, the Anderlecht street address and the Le Nid building label carry no bidi hazards beyond the detached-و typography noted above.",
+    "Arabic tanwin-alif spelling alternates between the ـًا and ـاً forms across the file; both are accepted, and only the case where both appear inside one string is reported as a finding.",
+    "Spanish digit grouping with commas (1,006 and 17,000) is reported because the comma is the decimal mark in Spain and most of South America, which conflicts with the neutral-Spanish target; French (1 006 / 17 000), Portuguese (1.006 / 17.000) and Arabic conventions are correct.",
+    "Terminology is otherwise consistent within each locale, including the recurring anchor vocabulary (ancla/ancrage/âncora/مرجع) and the commons vocabulary (bienes comunes/communs/bens comuns/المشاعات).",
+    "No web sources were consulted; the review is a closed comparison of the five files at the stated digests."
+  ]
+}

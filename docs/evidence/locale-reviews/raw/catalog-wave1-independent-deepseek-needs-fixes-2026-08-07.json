@@ -1,0 +1,63 @@
+{
+  "review_kind": "model_assisted_independent_language_review",
+  "reviewer": "DeepSeek V4 Flash via OpenCode free",
+  "writer_independence": "independent_from_grok_4_5_writer",
+  "input_digests": {
+    "es": "0bd41982a4d50bad5d0e63cd77d58dd0ad6383d71da0d9ead88fc5f7c04c8b04",
+    "fr": "e711f653756fa5f3b7a296bd049aa8704bb45e1bbf36c3e1d8e90bef5b815f7a",
+    "pt-BR": "11f084c1e7583504b9008483e59edc76fed44c5fe535f28cd419ccf1331c529b",
+    "ar": "ae5c0302049e5468deca814470c5ab7fe0f573c01df6ed00fc2e5d56ce0ba8b5"
+  },
+  "coverage": {
+    "locales": [
+      "es",
+      "fr",
+      "pt-BR",
+      "ar"
+    ],
+    "project_count_per_locale": 88,
+    "all_entries_reviewed": true
+  },
+  "verdict": "needs_fixes",
+  "counts": {
+    "blocker": 0,
+    "major": 0,
+    "minor": 1,
+    "notes": 3
+  },
+  "findings": [
+    {
+      "locale": "ar",
+      "project_id": "new-mexico-acequia-association",
+      "field": "geographic_labels.nmaa-acequias",
+      "severity": "minor",
+      "issue": "Common noun 'acequia' is kept in Latin script inside an otherwise Arabic sentence; it is not a genuine proper name or acronym and is inconsistent with the Arabic transliteration الأسيكيا used for the same term in this project's summary. Breaks Arabic mixed-script consistency.",
+      "recommended_text": "قنوات الأسيكيا الفردية وقطع أراضٍ وبنية تحتية مائية خاصة"
+    },
+    {
+      "locale": "pt-BR",
+      "project_id": "auroville",
+      "field": "summary",
+      "severity": "note",
+      "issue": "'township' translated as 'comunidade' narrows the meaning; Auroville is an international township (settlement), not merely a community. Rest of sentence accurate.",
+      "recommended_text": "Uma township internacional em Tamil Nadu que desde 1968 experimenta a vida comunitária, práticas ecológicas e organização social alternativa; a terra e os bens são legalmente detidos pela Auroville Foundation e não pertencem individualmente aos residentes."
+    },
+    {
+      "locale": "pt-BR",
+      "project_id": "mietshaeuser-syndikat",
+      "field": "summary",
+      "severity": "note",
+      "issue": "'e uma transferência solidária' can be misread as a parallel object of 'retirar'; mirrors the English source's ambiguity, a clearer connector would improve readability.",
+      "recommended_text": "Uma rede de projetos habitacionais auto-organizados que usa uma estrutura societária compartilhada para retirar imóveis permanentemente da revenda especulativa, além de uma transferência solidária para apoiar novos projetos habitacionais comunitários."
+    },
+    {
+      "locale": "pt-BR",
+      "project_id": "arvari-river-parliament",
+      "field": "summary",
+      "severity": "note",
+      "issue": "'instituição hídrica' is a literal rendering of 'water institution' and is unidiomatic in Brazilian Portuguese; 'instituição de gestão da água' reads more naturally.",
+      "recommended_text": "Uma instituição de gestão da água formada por comunidades de aldeias na bacia do rio Arvari para organizar regras compartilhadas, responsabilidade e resolução de conflitos para a restauração e o uso do rio."
+    }
+  ],
+  "review_notes": "es: all 88 projects verified semantically, numerically (17,000 / 1,006 / 2018 / 2010 / 2023 / 'más de 50'), terminologically and grammatically faithful; no untranslated prose beyond proper names; pass. fr: all 88 projects verified faithful with consistent terminology and correct numbers; pass. pt-BR: all 88 projects faithful and idiomatic with correct pt-BR number formats; three non-blocking fluency/style observations recorded as notes, no severity defects; pass. ar: 88 projects faithful, numbers intact, correct MSA, Arabic mixed-script quality good except one Latin-script common noun ('acequia') inconsistent with its transliteration in the same project; one minor defect -> needs_fixes. Aggregate verdict driven by the ar minor finding."
+}
