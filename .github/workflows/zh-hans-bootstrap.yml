@@ -28,7 +28,7 @@ jobs:
       - name: Install one-shot draft writer
         run: python -m pip install --disable-pip-version-check 'deep-translator==1.11.4'
       - name: Generate Simplified Chinese review draft
-        run: python scripts/_tmp_generate_zh_hans.py
+        run: PYTHONPATH=. python scripts/_tmp_generate_zh_hans.py
       - name: Rebuild deterministic public runtime
         run: |
           npm ci --ignore-scripts --no-audit --no-fund
