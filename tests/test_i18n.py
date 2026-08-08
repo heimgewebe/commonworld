@@ -61,6 +61,9 @@ class InternationalizationTests(unittest.TestCase):
                 self.assertRegex(localized["mundraub"]["summary"], r"[\u0600-\u06ff]")
             if locale == "zh-Hans":
                 self.assertRegex(localized["mundraub"]["summary"], r"[\u4e00-\u9fff]")
+                zh_overlay = json.loads((ROOT / "catalog/locales/zh-Hans.json").read_text(encoding="utf-8"))
+                self.assertEqual(zh_overlay["projects"]["libreoffice"]["digital_label"], "自由办公套件和开放的参与路径")
+                self.assertEqual(localized["reprap"]["summary"], "一个围绕自由记录、可制造自身大部分零件的 3D 打印机展开的全球开放硬件项目；其设计可由社区协作构建、调整和改进。")
 
     def test_canonical_title_without_explicit_english_overlay_has_no_false_language(self) -> None:
         canonical = load_records(ROOT)
