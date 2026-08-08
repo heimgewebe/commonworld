@@ -202,6 +202,78 @@ class PublicShellTests(unittest.TestCase):
                 )
                 self.assertNotIn(tmp_dir, "\n".join(errors))
 
+    def test_public_shell_accepts_supported_double_quoted_module_import_forms(self) -> None:
+        cases = (
+            (
+                "static",
+                "assets/commonworld-core.mjs",
+                "assets/commonworld-i18n.mjs",
+                "from './commonworld-i18n.mjs?v={token}'",
+                'from "./commonworld-i18n.mjs?v={token}"',
+            ),
+            (
+                "dynamic-with-whitespace",
+                "assets/commonworld-i18n.mjs",
+                "assets/commonworld-wave1-locales.mjs",
+                "import('./commonworld-wave1-locales.mjs?v={token}')",
+                'import(   "./commonworld-wave1-locales.mjs?v={token}")',
+            ),
+        )
+        for name, module_path, dependency_path, before_template, after_template in cases:
+            with self.subTest(name=name), tempfile.TemporaryDirectory() as tmp_dir:
+                root = self.copy_shell(tmp_dir)
+                dependency = root / dependency_path
+                expected = hashlib.sha256(dependency.read_bytes()).hexdigest()[:12]
+                module = root / module_path
+                source = module.read_text(encoding="utf-8")
+                before = before_template.format(token=expected)
+                after = after_template.format(token=expected)
+                self.assertIn(before, source)
+                module.write_text(source.replace(before, after, 1), encoding="utf-8")
+
+                errors = validate_public_shell(root)
+                prefix = f"public shell module import is not content-bound: {module_path} -> {dependency_path};"
+                self.assertFalse(any(error.startswith(prefix) for error in errors), errors)
+
+    def test_public_shell_reports_stale_tokens_for_supported_double_quoted_import_forms(self) -> None:
+        cases = (
+            (
+                "static",
+                "assets/commonworld-core.mjs",
+                "assets/commonworld-i18n.mjs",
+                "from './commonworld-i18n.mjs?v={token}'",
+                'from "./commonworld-i18n.mjs?v={token}"',
+                "111111111111",
+            ),
+            (
+                "dynamic-with-whitespace",
+                "assets/commonworld-i18n.mjs",
+                "assets/commonworld-wave1-locales.mjs",
+                "import('./commonworld-wave1-locales.mjs?v={token}')",
+                'import(   "./commonworld-wave1-locales.mjs?v={token}")',
+                "222222222222",
+            ),
+        )
+        for name, module_path, dependency_path, before_template, after_template, observed in cases:
+            with self.subTest(name=name), tempfile.TemporaryDirectory() as tmp_dir:
+                root = self.copy_shell(tmp_dir)
+                dependency = root / dependency_path
+                expected = hashlib.sha256(dependency.read_bytes()).hexdigest()[:12]
+                module = root / module_path
+                source = module.read_text(encoding="utf-8")
+                before = before_template.format(token=expected)
+                after = after_template.format(token=observed)
+                self.assertIn(before, source)
+                module.write_text(source.replace(before, after, 1), encoding="utf-8")
+
+                errors = validate_public_shell(root)
+                self.assertIn(
+                    f"public shell module import is not content-bound: {module_path} -> {dependency_path}; "
+                    f"observed token: {observed}; expected token: {expected}",
+                    errors,
+                )
+                self.assertNotIn(tmp_dir, "\n".join(errors))
+
     def test_public_shell_rejects_old_proof_language(self) -> None:
         with tempfile.TemporaryDirectory() as tmp_dir:
             root = self.copy_shell(tmp_dir)
