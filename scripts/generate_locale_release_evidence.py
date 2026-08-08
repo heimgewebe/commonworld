@@ -24,6 +24,7 @@ from scripts.locale_review_evidence import reviewed_source_pack_sha256
 from scripts.validate_locale_release import load_contract
 
 PACK_PATH = ROOT / "assets/locales/wave1-locales.json"
+CATALOG_LOCALE_DIR = ROOT / "catalog/locales"
 OUT_DIR = ROOT / "docs/evidence/locale-releases"
 
 
@@ -61,6 +62,7 @@ def build_scaffold(locale: str, *, root: Path = ROOT) -> dict[str, Any]:
     pack_path = root / PACK_PATH.relative_to(ROOT)
     pack_digest = sha256_file(pack_path)
     reviewed_pack_digest = reviewed_source_pack_sha256(pack_path)
+    catalog_overlay_digest = sha256_file(root / CATALOG_LOCALE_DIR.relative_to(ROOT) / f"{locale}.json")
     surface_sha = {
         surface: sha256_file(root / relative)
         for surface, relative in surfaces.items()
@@ -69,13 +71,14 @@ def build_scaffold(locale: str, *, root: Path = ROOT) -> dict[str, Any]:
     required_surfaces = set(contract.get("release_gate", {}).get("required_surfaces", []))
     rtl = entry.get("direction") == "rtl"
     return {
-        "schema_version": 1,
+        "schema_version": 2,
         "kind": "commonworld.ui_locale_release_evidence",
         "locale": locale,
         "status": "pending",
         "source_revision": git_head(root),
         "source_pack_sha256": pack_digest,
         "reviewed_source_pack_sha256": reviewed_pack_digest,
+        "catalog_overlay_sha256": catalog_overlay_digest,
         "surface_sha256": surface_sha,
         "gate_results": {
             "required_surfaces_passed": sorted(required_surfaces),

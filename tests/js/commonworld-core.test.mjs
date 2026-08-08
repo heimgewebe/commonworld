@@ -1588,11 +1588,13 @@ test('semantic zoom remains presentation logic from planet to focus', () => {
   assert.deepEqual(semanticLocationLine({ zoom: 1.15, records: presenceAxisRecords, selectedProjectId: 'freifunk' }), {
     level: 'focus',
     crumbs: ['Erde', 'Commons', 'Freifunk'],
+    contentCrumbIndex: 2,
     summary: 'Digital · Ortsunabhängige digitale Präsenz',
   });
   assert.deepEqual(semanticLocationLine({ zoom: 1.15, records: presenceAxisRecords, selectedProjectId: 'freifunk-hamburg' }), {
     level: 'focus',
     crumbs: ['Erde', 'Commons', 'Freifunk Hamburg'],
+    contentCrumbIndex: 2,
     summary: 'Vor Ort · Digital · 1 öffentlicher Ort · 1 verborgener Ort',
   });
   assert.deepEqual(semanticLocationLine({
@@ -1603,9 +1605,10 @@ test('semantic zoom remains presentation logic from planet to focus', () => {
   }), {
     level: 'focus',
     crumbs: ['Erde', 'Commons', 'Freifunk Hamburg'],
+    contentCrumbIndex: 2,
     summary: 'Vor Ort · Digital · 1 öffentlicher Ort · 1 verborgener Ort',
   });
-  const candidateRecord = { ...presenceAxisRecords[2], title: 'Freifunk Hamburg', _content_locale: 'en' };
+  const candidateRecord = { ...presenceAxisRecords[2], title: 'Freifunk Hamburg', _content_locale: 'en', _title_locale: 'en' };
   assert.deepEqual(semanticLocationLine({
     zoom: 1.15,
     records: [candidateRecord],

@@ -1,0 +1,125 @@
+{
+  "review_kind": "model_assisted_independent_language_review",
+  "reviewer": "Claude Opus 5 independent final release review via Claude Pro",
+  "writer_independence": "independent_from_grok_4_5_writer",
+  "input_digests": {
+    "en": "97d084727349070505fc19a3fb2463c1aa3241f227821270e7e60a2a6c32bb97",
+    "es": "de1638df4c7f4b71aaab644c28e7739a699f3d914f49cfa09b205885a5f1ec36",
+    "fr": "c58061ed7f34dce421898b2894026aeafec56c41c32cb488a2ceb6cbf9a0875b",
+    "pt-BR": "dadcbea241f2f4117c64b2c4c8a1852d6480d31fec15864d6af5e133272917dc",
+    "ar": "ee4d37a7f75174099408a5191863440a9c8bd40475a1f05e59537c25c44ccaf2",
+    "digest_match": "all four required target digests verified byte-exact before review"
+  },
+  "coverage": {
+    "locales": [
+      "es",
+      "fr",
+      "pt-BR",
+      "ar"
+    ],
+    "project_count_per_locale": 88,
+    "all_entries_reviewed": true
+  },
+  "verdict": "needs_fixes",
+  "counts": {
+    "blocker": 0,
+    "major": 0,
+    "minor": 1,
+    "note": 9
+  },
+  "findings": [
+    {
+      "locale": "pt-BR",
+      "project_id": "cano-martin-pena-clt",
+      "field": "geographic_labels.cano-martin-pena-san-juan",
+      "severity": "minor",
+      "issue": "The country name is left in its Spanish form 'Puerto Rico'. Every other country name in the pt-BR overlay is localized (Quênia, Nigéria, Etiópia, Namíbia, Malásia, Escócia, Tailândia, Ilhas Salomão, Colúmbia Britânica, Nova Zelândia), and the established Brazilian Portuguese exonym is 'Porto Rico' (fr correctly uses 'Porto Rico', ar 'بورتوريكو'). The city name 'San Juan' is correctly left unchanged.",
+      "recommended_text": "Oito comunidades ao longo do Caño Martín Peña, San Juan, Porto Rico"
+    },
+    {
+      "locale": "fr",
+      "project_id": "cecosesola",
+      "field": "summary",
+      "severity": "note",
+      "issue": "Apostrophe typography is inconsistent across the French overlay: 24 of the 73 translated strings use the straight ASCII apostrophe U+0027 (cecosesola, community-energy-network-new-zealand, cooperation-jackson, debian, deccan-development-society, edinburgh-tool-library, open-library, open-source-ecology, open-source-seed-initiative, openmrs, openstreetmap, p2pu, prinzessinnengarten-kollektiv, tribunal-aguas-valencia, velondriake-lmma, wikibooks, wikidata, wikimedia-commons, wikiversity, zapatista-autonomy, zenzeleni-community-networks) while the remaining strings use the typographic apostrophe U+2019. No string mixes both internally, so meaning and grammar are unaffected; this is a presentation-consistency issue only. This entry is cited as representative.",
+      "recommended_text": "Un réseau vénézuélien de plus de 50 organisations communautaires à but non lucratif qui relie l’approvisionnement alimentaire, les soins de santé, les services funéraires, la finance et la production sans chaînes de commandement, par la rotation des tâches et une autogestion orientée vers le consensus."
+    },
+    {
+      "locale": "fr",
+      "project_id": "akiba-mashinani-trust",
+      "field": "summary",
+      "severity": "note",
+      "issue": "'settlement communities' is rendered as 'communautés d’habitat informel', which adds the qualifier 'informel' that is not present in the source. The addition is factually defensible for this organisation and does not distort the entry, but es/pt-BR/ar all stay neutral ('comunidades de asentamientos', 'comunidades de assentamentos', 'مجتمعات المستوطنات'). A neutral French rendering keeps the overlay aligned with the source.",
+      "recommended_text": "Un instrument de financement conduit par des communautés d’établissements humains au Kenya qui soutient les groupes d’épargne, les prêts et des projets organisés par la communauté pour le logement, l’assainissement et les infrastructures de base."
+    },
+    {
+      "locale": "fr",
+      "project_id": "nyc-mesh",
+      "field": "summary",
+      "severity": "note",
+      "issue": "The summary and digital_label use the anglicism 'New York City' while the geographic label in the same entry uses the idiomatic French 'New York'. Idiomatic French names the city 'New York' (the state being 'l’État de New York'), so the label is the better form and the two prose fields are the outliers. Meaning is unaffected; this is intra-entry consistency only.",
+      "recommended_text": "Un réseau communautaire géré par des bénévoles à New York, qui relie accès Internet abordable, autodétermination numérique et infrastructures locales construites collectivement."
+    },
+    {
+      "locale": "ar",
+      "project_id": "ekuri-community-forest",
+      "field": "summary",
+      "severity": "note",
+      "issue": "'the Old and New Ekuri communities' is rendered as 'مجتمعات إيكوري القديمة والجديدة', which reads as 'the old and new Ekuri communities' (an age contrast) rather than as the two settlement names Old Ekuri and New Ekuri. es/fr/pt-BR keep the names intact ('comunidades Old y New Ekuri', 'les communautés Old et New Ekuri'). The referent is still recoverable, so this is a naming-precision observation. A dual form makes the two named settlements explicit while staying fully Arabic-script.",
+      "recommended_text": "غابة تملكها وتديرها جماعيًا مجتمعا إيكوري القديمة وإيكوري الجديدة في ولاية كروس ريفر بنيجيريا، بقواعد تربط بين الحفظ والاستخدام المستدام والبنية التحتية المحلية."
+    },
+    {
+      "locale": "pt-BR",
+      "project_id": "cano-martin-pena-clt",
+      "field": "summary",
+      "severity": "note",
+      "issue": "The pt-BR overlay renders 'community land trust' two different ways: 'fideicomisso fundiário comunitário' here and 'termo territorial coletivo (community land trust)' in granby-four-streets-clt. Both are intelligible, but 'termo territorial coletivo' is the established Brazilian term and the glossed form used in the sibling entry; harmonising on it removes the inconsistency.",
+      "recommended_text": "Um termo territorial coletivo (community land trust) administrado por oito comunidades em San Juan que detém a terra pública de forma coletiva, enquanto os moradores são donos de suas casas e recebem proteção de longo prazo contra o deslocamento."
+    },
+    {
+      "locale": "pt-BR",
+      "project_id": "mikoko-pamoja",
+      "field": "summary",
+      "severity": "note",
+      "issue": "'Gazi Bay' is kept in English but takes the Portuguese feminine article ('na Gazi Bay'), which presupposes the unstated noun 'baía'. es and ar localize the toponym ('Bahía de Gazi', 'خليج غازي'), and the rest of the pt-BR file localizes generic geographic heads ('Vale do Rio Belize', 'Lagoa Namena', 'Ilha Tetepare'). The same applies to the entry's geographic label 'Gazi Bay, Condado de Kwale, Quênia — âncora costeira ampla'.",
+      "recommended_text": "Uma iniciativa comunitária de manguezais na Baía de Gazi que combina conservação, restauração e monitoramento local com receita de créditos de carbono para projetos de benefício comunitário escolhidos em conjunto."
+    },
+    {
+      "locale": "pt-BR",
+      "project_id": "arvari-river-parliament",
+      "field": "geographic_labels.arvari-alwar-district-anchor",
+      "severity": "note",
+      "issue": "'Rajasthan' keeps the international romanization where Brazilian Portuguese has the established exonym 'Rajastão' (es correctly uses 'Rajastán'). 'Rajasthan' is common in Brazilian usage, so this is a localization-depth observation rather than an error, but it is the only Indian state name in the file with an available Portuguese exonym left untranslated.",
+      "recommended_text": "Bacia do Arvari no distrito de Alwar, Rajastão — âncora distrital ampla"
+    },
+    {
+      "locale": "es",
+      "project_id": "cano-martin-pena-clt",
+      "field": "summary",
+      "severity": "note",
+      "issue": "'holds public land collectively' is rendered as 'mantiene colectivamente tierras públicas'. 'Mantener' reads as 'maintains/keeps' rather than 'holds title to', which is the legal sense that distinguishes the trust's land from the residents' individually owned homes in the same sentence. 'Posee' (or 'es titular de') carries the tenure meaning; fr and pt-BR use 'détient' / 'detém'.",
+      "recommended_text": "Un fideicomiso comunitario de tierras gestionado por ocho comunidades en San Juan que posee colectivamente tierras públicas mientras los residentes son dueños de sus viviendas y reciben protección a largo plazo frente al desplazamiento."
+    },
+    {
+      "locale": "ar",
+      "project_id": "kobulu-community-micro-hydro",
+      "field": "summary",
+      "severity": "note",
+      "issue": "The transliteration of 'Kampung Buayan' as 'كامبونغ بويان' drops the medial /a/ and reads back as 'Buyan'. 'بوايان' reproduces the Malay pronunciation. Everything else in the entry, including 'بينامبانغ' for Penampang and 'صباح' for Sabah, is transliterated accurately.",
+      "recommended_text": "نظام طاقة كهرومائية صغرى يُدار مجتمعيًا في كامبونغ بوايان بولاية صباح، حيث تنظّم اللجنة المحلية تعريفات الاستهلاك وأجور المشغّلين وقطع الغيار والإصلاحات المستقبلية."
+    }
+  ],
+  "review_notes": [
+    "Digests verified before reading: es/fr/pt-BR/ar all match the required SHA-256 values byte-exact; en.json (reference) is 97d084727349070505fc19a3fb2463c1aa3241f227821270e7e60a2a6c32bb97. No files were modified during this review.",
+    "Structural parity confirmed programmatically and by full read: each target locale contains exactly 88 project entries, the same project ids as en.json with no additions or omissions, identical geographic_labels key sets per project, and digital_label present in exactly the same 44 entries as en. No empty or whitespace-only values. Titles are absent from all four target locales, consistent with the stated intent that titles remain canonical proper names.",
+    "Numeric fidelity verified across all 88 entries in all four locales: 1968, 50, 2010, 2018, 2023, 1,006 hectares and ~17,000 members are preserved everywhere, with correct locale-specific grouping (es '1006' / '17 000'; fr '1 006' / '17 000'; pt-BR '1.006' / '17.000'; ar '1,006' / '17,000'). The only numeral-token difference is ar reprap, where '3D' is correctly expressed lexically as 'طابعات ثلاثية الأبعاد'.",
+    "es: all 88 summaries, 44 digital_labels and 58 geographic labels read in full. Neutral Spanish throughout; no regionalisms that would jar in either Spain or Latin America; terminology consistent (bienes comunes, gobernanza, autogestión, monitoreo, sin fines de lucro); country and region exonyms correct (Kenia, Belice, Fiyi, Etiopía, Nuevo México, Islas Salomón, Cabo Oriental, Rajastán, Tesalia). One non-blocking nuance recorded (cano-martin-pena-clt).",
+    "fr: all 88 entries read in full. Grammar, agreement and register are sound; exonyms correct (Ouganda, Éthiopie, Nouveau-Mexique, Colombie-Britannique, Îles Salomon, Cap-Oriental, Porto Rico, Fidji, Thessalie). Three non-blocking observations recorded (apostrophe typography, akiba 'informel', nyc-mesh 'New York City'). 'en Oman' (aflaj) is attested alongside the more common 'à Oman' and was not treated as a defect.",
+    "pt-BR: all 88 entries read in full. Idiomatic Brazilian Portuguese (Prefeitura, mercearia, geridas, acessível, monitoramento); one genuine minor localization defect found ('Puerto Rico'), plus three non-blocking observations. 'Projetos' in open-source-ecology is the correct engineering sense of 'designs' but sits next to 'projeto global' in the same sentence; it is intelligible and was not raised as a separate finding.",
+    "ar: all 88 entries read in full. Modern Standard Arabic throughout, with correct number–noun polarity (ثمانية مجتمعات، خمسة مجتمعات، ثماني قرى، سبعة منازل، خمس مناطق، أربعة مديرين), correct case marking where vowelled (وأراضيَ، المخزونَ السمكي، المشترياتِ والعملياتِ والقواعدَ), correct dual agreement (شبكة ومنصة عالميتان), and no direction or bidi hazards: Latin runs (Freifunk, Discord, LoRaWAN, ODbL, API, NACSO, WCS, TONIBUNG, Internet Archive, Citizens’ Forest, Tla-o-qui-aht Tribal Parks, Isle of Eigg Heritage Trust, Community Land Trust Brussels, E-Networking Research and Development, Terra Concordia gGmbH, Mundräuber, Pachgaon Gram Sabha, Factor e Farm, Repair Café, Granby Four Streets, Meadowbank/Portobello Tool Library, 121 Rue Verheyden) are all separated from Arabic script by explicit boundaries and read correctly in RTL context.",
+    "As instructed, the deliberate visible boundary between Arabic proclitics and Latin organization names (e.g. 'تدير المجتمعات المحلية و E-Networking Research and Development' in nepal-wireless-networking-project, 'ويكي مجتمعي و Discord' in root-access-hackerspace, 'مشروع سكني تابع لـ Community Land Trust Brussels' in cltb-le-nid, 'قاعدة بيانات مفتوحة للمنتجات و API' in open-food-facts) was not flagged. It is consistently applied and does not harm meaning or grammar in any of these entries.",
+    "Cross-locale choices reviewed and accepted rather than filed as findings: the Ugandan sub-region 'West Nile' is translated consistently as 'Nilo Occidental' / 'le Nil occidental' / 'Nilo Ocidental' / 'غرب النيل' in bosco-uganda; 'Potato Park' is kept in fr/pt-BR, localized in es ('Parque de la Papa') and ar ('حديقة البطاطا'); the informal 'FAO Plant Treaty' is rendered informally in es/pt-BR/ar and expanded to the official name in fr; 'Community Forest Resource rights' is kept in Latin script in es/fr/pt-BR and translated in ar; the official German compound 'Berlin-Neukölln' is kept unlocalized in es/fr/pt-BR. Each is defensible and internally consistent within its locale.",
+    "taxonomy_labels exists only in en.json among the files under review; the sphere/theme labels for es, fr, pt-BR and ar are supplied by assets/commonworld-wave1-locales.mjs, so their absence from the four catalog overlays is by design and outside the scope of the 88 project entries reviewed here.",
+    "Verdict rationale: no blockers and no majors. One real minor localization defect (pt-BR 'Puerto Rico' → 'Porto Rico') keeps the aggregate verdict at needs_fixes; it was not downgraded to a note in order to reach a pass. The remaining nine items are non-blocking notes covering typography, terminology consistency, naming precision and transliteration depth, and none of them affects semantic fidelity, grammar or numbers."
+  ]
+}

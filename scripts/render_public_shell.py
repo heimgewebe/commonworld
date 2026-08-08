@@ -275,15 +275,18 @@ def render_cards(records: list[dict], *, interactive: bool = True, locale: str =
         identifier = html.escape(record["id"], quote=True)
         title = html.escape(record["title"])
         summary = html.escape(record["summary"])
-        content_locale = record.get("_content_locale")
-        if isinstance(content_locale, str) and content_locale:
-            content_direction = "ltr" if content_locale.lower() == "en" else "auto"
-            content_boundary = (
-                f' lang="{html.escape(content_locale, quote=True)}"'
-                f' dir="{content_direction}"'
+        title_locale = record.get("_title_locale")
+        summary_locale = record.get("_content_locale")
+        def content_boundary_for(field_locale: object) -> str:
+            if not isinstance(field_locale, str) or not field_locale:
+                return ' dir="auto"'
+            field_direction = "ltr" if field_locale.lower() == "en" else "auto"
+            return (
+                f' lang="{html.escape(field_locale, quote=True)}"'
+                f' dir="{field_direction}"'
             )
-        else:
-            content_boundary = ""
+        title_boundary = content_boundary_for(title_locale)
+        summary_boundary = content_boundary_for(summary_locale)
         geo_locations = public_locations(record)
         label = html.escape(presentation_label(record, locale, geo_locations))
         place = html.escape(location_summary(record, locale, geo_locations))
@@ -310,8 +313,8 @@ def render_cards(records: list[dict], *, interactive: bool = True, locale: str =
         cards.append(
             f'''          <article class="catalog-card" id="project-{identifier}" data-commonproject-id="{identifier}">
             <p class="catalog-kind">{label}</p>
-            <h2{content_boundary}>{title}</h2>
-            <p{content_boundary}>{summary}</p>
+            <h2{title_boundary}>{title}</h2>
+            <p{summary_boundary}>{summary}</p>
             <p class="catalog-location">{place}</p>
 {notice_html}            <div class="catalog-actions">
 {action}{action_links}              <a href="{url}" rel="external noreferrer">{html.escape(interface_static(locale, "official_website", de="Offizielle Seite", en="Official website"))} <span aria-hidden="true">↗</span></a>

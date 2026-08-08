@@ -1,0 +1,117 @@
+{
+  "review_kind": "model_assisted_independent_language_closure_review",
+  "reviewer": "Claude Opus 5 independent closure review via Claude Pro",
+  "writer_independence": "independent_from_grok_4_5_writer",
+  "input_digests": {
+    "en": "97d084727349070505fc19a3fb2463c1aa3241f227821270e7e60a2a6c32bb97",
+    "es": "de1638df4c7f4b71aaab644c28e7739a699f3d914f49cfa09b205885a5f1ec36",
+    "fr": "c58061ed7f34dce421898b2894026aeafec56c41c32cb488a2ceb6cbf9a0875b",
+    "pt-BR": "d016bbf890ad12d59ab9004c2b47e88595d76c9d426dfceec07a1e50f5042ddc",
+    "ar": "ee4d37a7f75174099408a5191863440a9c8bd40475a1f05e59537c25c44ccaf2",
+    "digest_match": "all four required target digests recomputed and verified byte-exact before review; es, fr and ar are unchanged from the prior full independent review, pt-BR advanced from dadcbea241f2f4117c64b2c4c8a1852d6480d31fec15864d6af5e133272917dc to d016bbf890ad12d59ab9004c2b47e88595d76c9d426dfceec07a1e50f5042ddc"
+  },
+  "coverage": {
+    "basis": "prior_full_review_plus_exact_fix_closure",
+    "prior_review_path": "docs/evidence/locale-reviews/raw/catalog-wave1-independent-claude-release-needs-fixes-2026-08-08.json",
+    "locales": [
+      "es",
+      "fr",
+      "pt-BR",
+      "ar"
+    ],
+    "project_count_per_locale": 88,
+    "prior_all_entries_reviewed": true,
+    "closure_changed_fields_reviewed": true
+  },
+  "verdict": "pass",
+  "counts": {
+    "blocker": 0,
+    "major": 0,
+    "minor": 0,
+    "note": 9
+  },
+  "findings": [
+    {
+      "locale": "fr",
+      "project_id": "cecosesola",
+      "field": "summary",
+      "severity": "note",
+      "issue": "Apostrophe typography is inconsistent across the French overlay: 24 of the 73 translated strings use the straight ASCII apostrophe U+0027 (cecosesola, community-energy-network-new-zealand, cooperation-jackson, debian, deccan-development-society, edinburgh-tool-library, open-library, open-source-ecology, open-source-seed-initiative, openmrs, openstreetmap, p2pu, prinzessinnengarten-kollektiv, tribunal-aguas-valencia, velondriake-lmma, wikibooks, wikidata, wikimedia-commons, wikiversity, zapatista-autonomy, zenzeleni-community-networks) while the remaining strings use the typographic apostrophe U+2019. No string mixes both internally, so meaning and grammar are unaffected; this is a presentation-consistency issue only. This entry is cited as representative.",
+      "recommended_text": "Un réseau vénézuélien de plus de 50 organisations communautaires à but non lucratif qui relie l’approvisionnement alimentaire, les soins de santé, les services funéraires, la finance et la production sans chaînes de commandement, par la rotation des tâches et une autogestion orientée vers le consensus."
+    },
+    {
+      "locale": "fr",
+      "project_id": "akiba-mashinani-trust",
+      "field": "summary",
+      "severity": "note",
+      "issue": "'settlement communities' is rendered as 'communautés d’habitat informel', which adds the qualifier 'informel' that is not present in the source. The addition is factually defensible for this organisation and does not distort the entry, but es/pt-BR/ar all stay neutral ('comunidades de asentamientos', 'comunidades de assentamentos', 'مجتمعات المستوطنات'). A neutral French rendering keeps the overlay aligned with the source.",
+      "recommended_text": "Un instrument de financement conduit par des communautés d’établissements humains au Kenya qui soutient les groupes d’épargne, les prêts et des projets organisés par la communauté pour le logement, l’assainissement et les infrastructures de base."
+    },
+    {
+      "locale": "fr",
+      "project_id": "nyc-mesh",
+      "field": "summary",
+      "severity": "note",
+      "issue": "The summary and digital_label use the anglicism 'New York City' while the geographic label in the same entry uses the idiomatic French 'New York'. Idiomatic French names the city 'New York' (the state being 'l’État de New York'), so the label is the better form and the two prose fields are the outliers. Meaning is unaffected; this is intra-entry consistency only.",
+      "recommended_text": "Un réseau communautaire géré par des bénévoles à New York, qui relie accès Internet abordable, autodétermination numérique et infrastructures locales construites collectivement."
+    },
+    {
+      "locale": "ar",
+      "project_id": "ekuri-community-forest",
+      "field": "summary",
+      "severity": "note",
+      "issue": "'the Old and New Ekuri communities' is rendered as 'مجتمعات إيكوري القديمة والجديدة', which reads as 'the old and new Ekuri communities' (an age contrast) rather than as the two settlement names Old Ekuri and New Ekuri. es/fr/pt-BR keep the names intact ('comunidades Old y New Ekuri', 'les communautés Old et New Ekuri'). The referent is still recoverable, so this is a naming-precision observation. A dual form makes the two named settlements explicit while staying fully Arabic-script.",
+      "recommended_text": "غابة تملكها وتديرها جماعيًا مجتمعا إيكوري القديمة وإيكوري الجديدة في ولاية كروس ريفر بنيجيريا، بقواعد تربط بين الحفظ والاستخدام المستدام والبنية التحتية المحلية."
+    },
+    {
+      "locale": "pt-BR",
+      "project_id": "cano-martin-pena-clt",
+      "field": "summary",
+      "severity": "note",
+      "issue": "The pt-BR overlay renders 'community land trust' two different ways: 'fideicomisso fundiário comunitário' here and 'termo territorial coletivo (community land trust)' in granby-four-streets-clt. Both are intelligible, but 'termo territorial coletivo' is the established Brazilian term and the glossed form used in the sibling entry; harmonising on it removes the inconsistency.",
+      "recommended_text": "Um termo territorial coletivo (community land trust) administrado por oito comunidades em San Juan que detém a terra pública de forma coletiva, enquanto os moradores são donos de suas casas e recebem proteção de longo prazo contra o deslocamento."
+    },
+    {
+      "locale": "pt-BR",
+      "project_id": "mikoko-pamoja",
+      "field": "summary",
+      "severity": "note",
+      "issue": "'Gazi Bay' is kept in English but takes the Portuguese feminine article ('na Gazi Bay'), which presupposes the unstated noun 'baía'. es and ar localize the toponym ('Bahía de Gazi', 'خليج غازي'), and the rest of the pt-BR file localizes generic geographic heads ('Vale do Rio Belize', 'Lagoa Namena', 'Ilha Tetepare'). The same applies to the entry's geographic label 'Gazi Bay, Condado de Kwale, Quênia — âncora costeira ampla'.",
+      "recommended_text": "Uma iniciativa comunitária de manguezais na Baía de Gazi que combina conservação, restauração e monitoramento local com receita de créditos de carbono para projetos de benefício comunitário escolhidos em conjunto."
+    },
+    {
+      "locale": "pt-BR",
+      "project_id": "arvari-river-parliament",
+      "field": "geographic_labels.arvari-alwar-district-anchor",
+      "severity": "note",
+      "issue": "'Rajasthan' keeps the international romanization where Brazilian Portuguese has the established exonym 'Rajastão' (es correctly uses 'Rajastán'). 'Rajasthan' is common in Brazilian usage, so this is a localization-depth observation rather than an error, but it is the only Indian state name in the file with an available Portuguese exonym left untranslated.",
+      "recommended_text": "Bacia do Arvari no distrito de Alwar, Rajastão — âncora distrital ampla"
+    },
+    {
+      "locale": "es",
+      "project_id": "cano-martin-pena-clt",
+      "field": "summary",
+      "severity": "note",
+      "issue": "'holds public land collectively' is rendered as 'mantiene colectivamente tierras públicas'. 'Mantener' reads as 'maintains/keeps' rather than 'holds title to', which is the legal sense that distinguishes the trust's land from the residents' individually owned homes in the same sentence. 'Posee' (or 'es titular de') carries the tenure meaning; fr and pt-BR use 'détient' / 'detém'.",
+      "recommended_text": "Un fideicomiso comunitario de tierras gestionado por ocho comunidades en San Juan que posee colectivamente tierras públicas mientras los residentes son dueños de sus viviendas y reciben protección a largo plazo frente al desplazamiento."
+    },
+    {
+      "locale": "ar",
+      "project_id": "kobulu-community-micro-hydro",
+      "field": "summary",
+      "severity": "note",
+      "issue": "The transliteration of 'Kampung Buayan' as 'كامبونغ بويان' drops the medial /a/ and reads back as 'Buyan'. 'بوايان' reproduces the Malay pronunciation. Everything else in the entry, including 'بينامبانغ' for Penampang and 'صباح' for Sabah, is transliterated accurately.",
+      "recommended_text": "نظام طاقة كهرومائية صغرى يُدار مجتمعيًا في كامبونغ بوايان بولاية صباح، حيث تنظّم اللجنة المحلية تعريفات الاستهلاك وأجور المشغّلين وقطع الغيار والإصلاحات المستقبلية."
+    }
+  ],
+  "review_notes": [
+    "Closure scope: this is not a second full corpus review. The coverage basis is the prior full independent review at docs/evidence/locale-reviews/raw/catalog-wave1-independent-claude-release-needs-fixes-2026-08-08.json, which read all 88 entries in each of es, fr, pt-BR and ar; this pass verifies only the digests, the exact fix, and the entries carrying prior findings.",
+    "Digest verification: es, fr and ar recompute byte-exact to the required target digests and are bit-identical to the files covered by the prior full review, so that review's coverage carries forward unchanged. pt-BR recomputes to the required d016bbf890ad12d59ab9004c2b47e88595d76c9d426dfceec07a1e50f5042ddc; en.json (reference) is 97d084727349070505fc19a3fb2463c1aa3241f227821270e7e60a2a6c32bb97. No files were modified during this review.",
+    "The prior minor is fixed. pt-BR cano-martin-pena-clt geographic_labels.cano-martin-pena-san-juan now reads 'Oito comunidades ao longo do Caño Martín Peña, San Juan, Porto Rico', character-for-character identical to the prior review's recommended_text. The Spanish exonym 'Puerto Rico' is gone; the city name 'San Juan' and the proper name 'Caño Martín Peña' with its tilde and acute accents are preserved.",
+    "Fix isolation verified mechanically: diffing the current pt-BR.json against the exact prior-review artefact (releases/451cd1bc8d424868c475/catalog/locales/pt-BR.json, digest dadcbea241f2f4117c64b2c4c8a1852d6480d31fec15864d6af5e133272917dc) yields exactly one changed line and exactly one changed leaf value — the field above. Leaf count is 227 before and after, project ids, geographic_labels key sets and digital_label presence are untouched, the file parses as valid JSON, and no whitespace, encoding or ordering side effects were introduced. The final fix therefore introduced no new defect.",
+    "Focused sanity read of the changed entry: pt-BR cano-martin-pena-clt reads consistently end to end. The summary ('Um fideicomisso fundiário comunitário administrado por oito comunidades em San Juan que detém a terra pública de forma coletiva...') and the corrected label agree on referent, numerals ('oito' matching en 'eight') and register; 'Porto Rico' is the established Brazilian Portuguese exonym and now matches fr 'Porto Rico' and ar 'بورتوريكو', while es correctly retains the Spanish 'Puerto Rico'.",
+    "All nine prior note locations re-read in their current state and confirmed unchanged and free of new defects: fr cecosesola summary (straight U+0027 apostrophe still present, representative of the file-wide typography split), fr akiba-mashinani-trust summary ('communautés d’habitat informel'), fr nyc-mesh summary and digital_label ('New York City' vs the label's 'New York'), ar ekuri-community-forest summary ('مجتمعات إيكوري القديمة والجديدة'), pt-BR cano-martin-pena-clt summary ('fideicomisso fundiário comunitário' vs granby-four-streets-clt 'termo territorial coletivo (community land trust)'), pt-BR mikoko-pamoja summary and label ('na Gazi Bay' / 'Gazi Bay, Condado de Kwale, Quênia'), pt-BR arvari-river-parliament geographic_labels.arvari-alwar-district-anchor ('Rajasthan'), es cano-martin-pena-clt summary ('mantiene colectivamente tierras públicas'), and ar kobulu-community-micro-hydro summary ('كامبونغ بويان').",
+    "The nine retained items are non-blocking notes covering apostrophe typography, terminology and intra-entry consistency, naming precision and transliteration depth. None affects semantic fidelity, grammar, numbers or bidi safety, and none blocks release. They are carried forward verbatim from the prior review as optional polish for a future pass.",
+    "Verdict rationale: blocker 0, major 0, minor 0. The single release-blocking minor identified by the prior full review is resolved exactly as recommended and in isolation, so the aggregate verdict moves from needs_fixes to pass."
+  ]
+}

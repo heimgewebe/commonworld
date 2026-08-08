@@ -30,6 +30,7 @@ KNOWN_UI_LOCALES = locales_with_status("released", "candidate", "planned")
 DEFAULT_LOCALE = "en"
 FALLBACK_LOCALE = "de"
 LOCALE_PACK_PATH = ROOT / "assets/locales/wave1-locales.json"
+CATALOG_OVERLAY_PROJECT_FIELDS = frozenset({"title", "summary", "geographic_labels", "digital_label"})
 
 PREVIEW_LABELS = {
     "en": "Preview",
@@ -116,17 +117,61 @@ def load_locale(locale: str = DEFAULT_LOCALE, root: Path = ROOT) -> dict[str, An
     normalized = normalize_locale(locale)
     if normalized == FALLBACK_LOCALE:
         return {"schema_version": 1, "locale": "de", "fallback_locale": "de", "projects": {}, "taxonomy_labels": {}}
-    overlay_locale = "en" if normalized in WAVE1_LOCALES else normalized
-    path = root / "catalog" / "locales" / f"{overlay_locale}.json"
+    path = root / "catalog" / "locales" / f"{normalized}.json"
     payload = json.loads(path.read_text(encoding="utf-8"))
-    if payload.get("schema_version") != 1 or payload.get("locale") != overlay_locale:
+    if payload.get("schema_version") != 1 or payload.get("locale") != normalized:
         raise ValueError(f"invalid locale overlay contract: {path}")
     if normalized in WAVE1_LOCALES:
         payload = copy.deepcopy(payload)
-        payload["locale"] = normalized
-        payload["source_content_locale"] = overlay_locale
         payload["taxonomy_labels"] = locale_pack(normalized, root).get("taxonomy", {})
     return payload
+
+
+def validate_catalog_overlay(
+    payload: dict[str, Any],
+    records: list[dict[str, Any]],
+    locale: str,
+) -> dict[str, dict[str, Any]]:
+    normalized = normalize_locale(locale)
+    translations = payload.get("projects")
+    if not isinstance(translations, dict):
+        raise ValueError(f"locale {normalized} lacks project translations")
+    canonical_ids = {record.get("id") for record in records}
+    if set(translations) != canonical_ids:
+        missing = sorted(canonical_ids - set(translations))
+        extra = sorted(set(translations) - canonical_ids)
+        raise ValueError(f"locale {normalized} project coverage mismatch: missing={missing}, extra={extra}")
+    for canonical in records:
+        project_id = canonical["id"]
+        translation = translations[project_id]
+        if not isinstance(translation, dict):
+            raise ValueError(f"locale {normalized} has invalid project overlay for {project_id}")
+        unexpected = sorted(set(translation) - CATALOG_OVERLAY_PROJECT_FIELDS)
+        if unexpected:
+            raise ValueError(f"locale {normalized} has unexpected project fields for {project_id}: {unexpected}")
+        summary = translation.get("summary")
+        if not isinstance(summary, str) or not summary.strip():
+            raise ValueError(f"locale {normalized} lacks summary for {project_id}")
+        if "title" in translation and (not isinstance(translation["title"], str) or not translation["title"].strip()):
+            raise ValueError(f"locale {normalized} has invalid title for {project_id}")
+        geographic = canonical.get("presence", {}).get("geographic", [])
+        location_ids = {location.get("id") for location in geographic}
+        labels = translation.get("geographic_labels")
+        if not isinstance(labels, dict) or set(labels) != location_ids:
+            raise ValueError(f"locale {normalized} geographic label coverage mismatch for {project_id}")
+        for location_id, label in labels.items():
+            if not isinstance(label, str) or not label.strip():
+                raise ValueError(f"locale {normalized} has invalid geographic label for {project_id}:{location_id}")
+        digital_available = canonical.get("presence", {}).get("digital", {}).get("available") is True
+        has_digital_label = "digital_label" in translation
+        if digital_available != has_digital_label:
+            expectation = "requires" if digital_available else "must not contain"
+            raise ValueError(f"locale {normalized} {expectation} digital label for {project_id}")
+        if has_digital_label:
+            label = translation.get("digital_label")
+            if not isinstance(label, str) or not label.strip():
+                raise ValueError(f"locale {normalized} has invalid digital label for {project_id}")
+    return translations
 
 
 def localize_records(records: list[dict[str, Any]], locale: str = DEFAULT_LOCALE, root: Path = ROOT) -> list[dict[str, Any]]:
@@ -134,38 +179,33 @@ def localize_records(records: list[dict[str, Any]], locale: str = DEFAULT_LOCALE
     if normalized == FALLBACK_LOCALE:
         return records
     overlay = load_locale(normalized, root)
-    translations = overlay.get("projects", {})
-    canonical_ids = {record.get("id") for record in records}
-    if set(translations) != canonical_ids:
-        missing = sorted(canonical_ids - set(translations))
-        extra = sorted(set(translations) - canonical_ids)
-        raise ValueError(f"locale {normalized} project coverage mismatch: missing={missing}, extra={extra}")
+    translations = validate_catalog_overlay(overlay, records, normalized)
+    english_translations = translations if normalized == "en" else load_locale("en", root).get("projects", {})
     localized: list[dict[str, Any]] = []
     for canonical in records:
         record = copy.deepcopy(canonical)
         translation = translations[record["id"]]
-        summary = translation.get("summary")
-        if not isinstance(summary, str) or not summary.strip():
-            raise ValueError(f"locale {normalized} lacks summary for {record['id']}")
-        record["summary"] = summary
-        if isinstance(translation.get("title"), str) and translation["title"].strip():
-            record["title"] = translation["title"]
+        english_translation = english_translations.get(record["id"], {})
+        record["summary"] = translation["summary"]
+        translated_title = translation.get("title")
+        english_title = english_translation.get("title")
+        if isinstance(translated_title, str) and translated_title.strip():
+            record["title"] = translated_title
+            title_locale = normalized
+        elif isinstance(english_title, str) and english_title.strip():
+            record["title"] = english_title
+            title_locale = "en"
+        else:
+            # Canonical identity names are source/original text, not implicitly English.
+            # Keep the language unknown and let direction resolve from the text itself.
+            title_locale = None
         geographic = record.get("presence", {}).get("geographic", [])
-        labels = translation.get("geographic_labels")
-        location_ids = {location.get("id") for location in geographic}
-        if not isinstance(labels, dict) or set(labels) != location_ids:
-            raise ValueError(f"locale {normalized} geographic label coverage mismatch for {record['id']}")
+        labels = translation["geographic_labels"]
         for location in geographic:
-            label = labels.get(location.get("id"))
-            if not isinstance(label, str) or not label.strip():
-                raise ValueError(f"locale {normalized} has invalid geographic label for {record['id']}:{location.get('id')}")
-            location["label"] = label
+            location["label"] = labels[location["id"]]
         digital = record.get("presence", {}).get("digital", {})
         if digital.get("available") is True:
-            label = translation.get("digital_label")
-            if not isinstance(label, str) or not label.strip():
-                raise ValueError(f"locale {normalized} lacks digital label for {record['id']}")
-            digital["label"] = label
+            digital["label"] = translation["digital_label"]
         for link in record.get("links", []):
             link_type = link.get("type")
             if link_type in ACTION_LABELS_EN:
@@ -176,8 +216,8 @@ def localize_records(records: list[dict[str, Any]], locale: str = DEFAULT_LOCALE
             canonical_label = str(source.get("label") or "").strip()
             fallback_label = source_prefix.replace("{index}", str(index))
             source["label"] = f"{canonical_label} · {hostname.removeprefix('www.')}" if canonical_label else f"{fallback_label} · {hostname.removeprefix('www.')}"
-        if normalized in WAVE1_LOCALES:
-            record["_content_locale"] = overlay.get("source_content_locale", "en")
+        record["_content_locale"] = normalized
+        record["_title_locale"] = title_locale
         localized.append(record)
     return localized
 

@@ -378,7 +378,8 @@ class PublicShellTests(unittest.TestCase):
     def test_candidate_static_content_and_dates_keep_explicit_bidi_boundaries(self) -> None:
         arabic = render_shell(locale="ar")
         self.assertIn('<h2 lang="en" dir="ltr">', arabic)
-        self.assertIn('<p lang="en" dir="ltr">', arabic)
+        self.assertIn('<h2 dir="auto">', arabic)
+        self.assertIn('<p lang="ar" dir="auto">', arabic)
         unknown = next(record for record in load_records(ROOT) if record.get("activity", {}).get("status") == "unknown")
         notice = activity_notice(unknown, "ar")
         self.assertIn("\u2068", notice)

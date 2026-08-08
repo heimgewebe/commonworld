@@ -205,12 +205,14 @@ try {
           const staticSummaryNode = card?.querySelector('h2 + p');
           const staticTitle = staticTitleNode?.textContent ?? '';
           const staticSummary = staticSummaryNode?.textContent ?? '';
+          const staticTitleLang = staticTitleNode?.getAttribute('lang') ?? '';
+          const staticSummaryLang = staticSummaryNode?.getAttribute('lang') ?? '';
           const staticTitleDir = staticTitleNode?.getAttribute('dir') ?? '';
           const staticSummaryDir = staticSummaryNode?.getAttribute('dir') ?? '';
           const staticKind = card?.querySelector('.catalog-kind')?.textContent ?? '';
           const expectedPresence = staticKind.split(' · ').slice(1).join(' · ');
           const sphereNameNodes = [...document.querySelectorAll('.sphere-ring-name')];
-          const sphereSummaryTitleNodes = [...document.querySelectorAll('#sphere-ring-accessible-summary span[lang]')];
+          const sphereSummaryTitleNodes = [...document.querySelectorAll('#sphere-ring-accessible-summary .sphere-ring-accessible-title')];
           const sphereNameLangs = sphereNameNodes.map((node) => node.getAttribute('lang') ?? '');
           const sphereNameDirs = sphereNameNodes.map((node) => node.getAttribute('dir') ?? '');
           const sphereSummaryTitleLangs = sphereSummaryTitleNodes.map((node) => node.getAttribute('lang') ?? '');
@@ -339,6 +341,8 @@ try {
           return {
             staticTitle,
             staticSummary,
+            staticTitleLang,
+            staticSummaryLang,
             staticTitleDir,
             staticSummaryDir,
             expectedPresence,
@@ -382,10 +386,12 @@ try {
             ribbonNameLangs: ribbonNames.map((node) => node.getAttribute('lang') ?? ''),
             ribbonNameDirs: ribbonNames.map((node) => node.getAttribute('dir') ?? ''),
             ribbonLabelsBound: ribbonControls.every((node) => !node.hasAttribute('aria-label') && Boolean(node.getAttribute('aria-labelledby'))),
-            ribbonTitleLabelsEnglish: ribbonControls.every((node) => {
+            ribbonTitleLabelsLanguageSafe: ribbonControls.every((node) => {
               const ids = (node.getAttribute('aria-labelledby') ?? '').split(/\s+/u).filter(Boolean);
               const title = ids.map((id) => document.getElementById(id)).find((label) => label?.classList.contains('digital-ribbon-name'));
-              return title?.getAttribute('lang') === 'en';
+              const lang = title?.getAttribute('lang') ?? '';
+              const direction = title?.getAttribute('dir') ?? '';
+              return (lang === 'en' && direction === 'ltr') || (lang === '' && direction === 'auto');
             }),
           };
         });
@@ -554,33 +560,34 @@ try {
         assert(state.englishContentBlocks > 0, `${pageName}: canonical English catalog content lacks lang=en boundaries`);
         assert(runtimeCatalogBoundary?.focusTitle === runtimeCatalogBoundary?.staticTitle, `${pageName}: runtime title fell off the English content overlay`);
         assert(runtimeCatalogBoundary?.focusSummary === runtimeCatalogBoundary?.staticSummary, `${pageName}: runtime summary fell off the English content overlay`);
-        assert(runtimeCatalogBoundary?.staticTitleDir === 'ltr' && runtimeCatalogBoundary?.staticSummaryDir === 'ltr', `${pageName}: static English content lacks dir=ltr boundaries`);
-        assert(runtimeCatalogBoundary?.focusTitleLang === 'en' && runtimeCatalogBoundary?.focusSummaryLang === 'en', `${pageName}: runtime English content lacks lang=en boundaries`);
-        assert(runtimeCatalogBoundary?.focusTitleDir === 'ltr' && runtimeCatalogBoundary?.focusSummaryDir === 'ltr', `${pageName}: runtime English content lacks dir=ltr boundaries`);
+        assert(runtimeCatalogBoundary?.staticTitleLang === 'en' && runtimeCatalogBoundary?.staticTitleDir === 'ltr', `${pageName}: static canonical title lacks lang=en dir=ltr`);
+        assert(runtimeCatalogBoundary?.staticSummaryLang === candidate.locale && runtimeCatalogBoundary?.staticSummaryDir === 'auto', `${pageName}: static localized summary lacks candidate language boundary`);
+        assert(runtimeCatalogBoundary?.focusTitleLang === 'en' && runtimeCatalogBoundary?.focusSummaryLang === candidate.locale, `${pageName}: runtime title/summary language boundaries drifted`);
+        assert(runtimeCatalogBoundary?.focusTitleDir === 'ltr' && runtimeCatalogBoundary?.focusSummaryDir === 'auto', `${pageName}: runtime title/summary direction boundaries drifted`);
         assert(runtimeCatalogBoundary?.semanticLevelText === runtimeCatalogBoundary?.staticTitle, `${pageName}: visible semantic focus crumb lost the selected title`);
         assert(runtimeCatalogBoundary?.semanticLevelLang === 'en' && runtimeCatalogBoundary?.semanticLevelDir === 'ltr', `${pageName}: visible semantic focus crumb lacks lang=en dir=ltr`);
         assert(runtimeCatalogBoundary?.semanticBreadcrumbContentText === runtimeCatalogBoundary?.staticTitle, `${pageName}: accessible semantic breadcrumb lost the selected title`);
         assert(runtimeCatalogBoundary?.semanticBreadcrumbContentLang === 'en' && runtimeCatalogBoundary?.semanticBreadcrumbContentDir === 'ltr', `${pageName}: accessible semantic title crumb lacks lang=en dir=ltr`);
         assert(runtimeCatalogBoundary?.semanticBreadcrumbLabelsResolve, `${pageName}: semantic breadcrumb aria-labelledby references are incomplete`);
         assert((runtimeCatalogBoundary?.focusLocationItemCount ?? 0) > 0, `${pageName}: expected dual-presence focus fixture has no locations`);
-        assert(runtimeCatalogBoundary.focusLocationContentLangs.length === runtimeCatalogBoundary.focusLocationItemCount && runtimeCatalogBoundary.focusLocationContentLangs.every((lang) => lang === 'en'), `${pageName}: focus location content labels lack lang=en boundaries`);
-        assert(runtimeCatalogBoundary.focusLocationContentDirs.every((direction) => direction === 'ltr'), `${pageName}: focus location content labels lack dir=ltr boundaries`);
-        assert((runtimeCatalogBoundary?.focusDigitalText ?? '').trim().length > 0 && runtimeCatalogBoundary?.focusDigitalLang === 'en', `${pageName}: focus digital content label lacks lang=en boundary`);
-        assert(runtimeCatalogBoundary?.focusDigitalDir === 'ltr', `${pageName}: focus digital content label lacks dir=ltr boundary`);
-        assert((runtimeCatalogBoundary?.focusLinkLangs?.length ?? 0) > 0 && runtimeCatalogBoundary.focusLinkLangs.every((lang) => [candidate.locale, 'en'].includes(lang)), `${pageName}: focus link labels lack explicit language boundaries: ${runtimeCatalogBoundary?.focusLinkLangs?.join(' | ')}`);
+        assert(runtimeCatalogBoundary.focusLocationContentLangs.length === runtimeCatalogBoundary.focusLocationItemCount && runtimeCatalogBoundary.focusLocationContentLangs.every((lang) => lang === candidate.locale), `${pageName}: focus location content labels lack candidate language boundaries`);
+        assert(runtimeCatalogBoundary.focusLocationContentDirs.every((direction) => direction === 'auto'), `${pageName}: focus location content labels lack dir=auto boundaries`);
+        assert((runtimeCatalogBoundary?.focusDigitalText ?? '').trim().length > 0 && runtimeCatalogBoundary?.focusDigitalLang === candidate.locale, `${pageName}: focus digital content label lacks candidate language boundary`);
+        assert(runtimeCatalogBoundary?.focusDigitalDir === 'auto', `${pageName}: focus digital content label lacks dir=auto boundary`);
+        assert((runtimeCatalogBoundary?.focusLinkLangs?.length ?? 0) > 0 && runtimeCatalogBoundary.focusLinkLangs.every((lang) => [candidate.locale, ''].includes(lang)), `${pageName}: focus link labels carry an unexpected language boundary: ${runtimeCatalogBoundary?.focusLinkLangs?.join(' | ')}`);
         assert(runtimeCatalogBoundary.focusLinkDirs.every((direction, index) => direction === (runtimeCatalogBoundary.focusLinkLangs[index] === 'en' ? 'ltr' : 'auto')), `${pageName}: focus link directions drifted: ${runtimeCatalogBoundary?.focusLinkDirs?.join(' | ')}`);
         assert(runtimeCatalogBoundary.focusLinkBidi.every((value) => value === 'isolate'), `${pageName}: focus link bidi isolation is missing: ${runtimeCatalogBoundary?.focusLinkBidi?.join(' | ')}`);
-        assert((runtimeCatalogBoundary?.focusSourceLangs?.length ?? 0) > 0 && runtimeCatalogBoundary.focusSourceLangs.every((lang) => lang === 'en'), `${pageName}: focus source labels lack lang=en boundaries`);
-        assert(runtimeCatalogBoundary.focusSourceDirs.every((direction) => direction === 'ltr'), `${pageName}: focus source labels lack dir=ltr boundaries`);
+        assert((runtimeCatalogBoundary?.focusSourceLangs?.length ?? 0) > 0 && runtimeCatalogBoundary.focusSourceLangs.every((lang) => lang === ''), `${pageName}: canonical source labels were falsely assigned a content language`);
+        assert(runtimeCatalogBoundary.focusSourceDirs.every((direction) => direction === 'auto'), `${pageName}: canonical source labels lack dir=auto boundaries`);
         assert(runtimeCatalogBoundary.focusSourceBidi.every((value) => value === 'isolate'), `${pageName}: focus source bidi isolation is missing`);
-        assert((runtimeCatalogBoundary?.sphereNameLangs?.length ?? 0) > 0 && runtimeCatalogBoundary.sphereNameLangs.every((lang) => lang === 'en'), `${pageName}: sphere ring titles lack lang=en boundaries`);
-        assert(runtimeCatalogBoundary.sphereNameDirs.every((direction) => direction === 'ltr'), `${pageName}: sphere ring titles lack dir=ltr boundaries`);
-        assert((runtimeCatalogBoundary?.sphereSummaryTitleLangs?.length ?? 0) > 0 && runtimeCatalogBoundary.sphereSummaryTitleLangs.every((lang) => lang === 'en'), `${pageName}: sphere accessible summary titles lack lang=en boundaries`);
-        assert(runtimeCatalogBoundary.sphereSummaryTitleDirs.every((direction) => direction === 'ltr'), `${pageName}: sphere accessible summary titles lack dir=ltr boundaries`);
-        assert((runtimeCatalogBoundary?.ribbonNameLangs?.length ?? 0) > 0 && runtimeCatalogBoundary.ribbonNameLangs.every((lang) => lang === 'en'), `${pageName}: digital ribbon titles lack lang=en boundaries`);
-        assert(runtimeCatalogBoundary.ribbonNameDirs.every((direction) => direction === 'ltr'), `${pageName}: digital ribbon titles lack dir=ltr boundaries`);
+        assert((runtimeCatalogBoundary?.sphereNameLangs?.length ?? 0) > 0 && runtimeCatalogBoundary.sphereNameLangs.every((lang) => ['en', ''].includes(lang)), `${pageName}: sphere ring titles carry an unexpected language boundary`);
+        assert(runtimeCatalogBoundary.sphereNameDirs.every((direction, index) => direction === (runtimeCatalogBoundary.sphereNameLangs[index] === 'en' ? 'ltr' : 'auto')), `${pageName}: sphere ring title directions drifted`);
+        assert((runtimeCatalogBoundary?.sphereSummaryTitleLangs?.length ?? 0) > 0 && runtimeCatalogBoundary.sphereSummaryTitleLangs.every((lang) => ['en', ''].includes(lang)), `${pageName}: sphere accessible summary titles carry an unexpected language boundary`);
+        assert(runtimeCatalogBoundary.sphereSummaryTitleDirs.every((direction, index) => direction === (runtimeCatalogBoundary.sphereSummaryTitleLangs[index] === 'en' ? 'ltr' : 'auto')), `${pageName}: sphere accessible summary title directions drifted`);
+        assert((runtimeCatalogBoundary?.ribbonNameLangs?.length ?? 0) > 0 && runtimeCatalogBoundary.ribbonNameLangs.every((lang) => ['en', ''].includes(lang)), `${pageName}: digital ribbon titles carry an unexpected language boundary`);
+        assert(runtimeCatalogBoundary.ribbonNameDirs.every((direction, index) => direction === (runtimeCatalogBoundary.ribbonNameLangs[index] === 'en' ? 'ltr' : 'auto')), `${pageName}: digital ribbon title directions drifted`);
         if (candidate.direction === 'rtl') assert(runtimeCatalogBoundary.sphereAccessibleText.includes('، '), `${pageName}: accessible ring list lacks Arabic separator`);
-        assert(runtimeCatalogBoundary?.ribbonLabelsBound && runtimeCatalogBoundary?.ribbonTitleLabelsEnglish, `${pageName}: digital ribbon accessible labels do not preserve mixed-language boundaries`);
+        assert(runtimeCatalogBoundary?.ribbonLabelsBound && runtimeCatalogBoundary?.ribbonTitleLabelsLanguageSafe, `${pageName}: digital ribbon accessible labels do not preserve source-language-safe boundaries`);
         const candidatePack = WAVE1_SOURCE.locales[candidate.locale];
         const localizedExactCount = (count) => candidatePack.ui.commons_count.replace('{count}', String(count));
         const expectedExactCount = localizedExactCount(1);
@@ -595,15 +602,15 @@ try {
           return count && value.endsWith(localizedExactCount(count));
         }), `${pageName}: digital lane accessible counts are not localized: ${runtimeCatalogBoundary?.digitalLaneLabels?.join(' | ')}`);
         const placeBoundary = runtimeCatalogBoundary?.placeResultBoundary;
-        assert(placeBoundary?.searchLabel && placeBoundary.title === placeBoundary.searchLabel, `${pageName}: place-search title drifted from the English location label`);
-        assert(placeBoundary?.titleLang === 'en' && placeBoundary?.titleDir === 'ltr', `${pageName}: place-search title lacks lang=en dir=ltr`);
+        assert(placeBoundary?.searchLabel && placeBoundary.title === placeBoundary.searchLabel, `${pageName}: place-search title drifted from the localized location label`);
+        assert(placeBoundary?.titleLang === candidate.locale && placeBoundary?.titleDir === 'auto', `${pageName}: place-search title lacks localized language boundary`);
         if (placeBoundary?.context === runtimeCatalogBoundary?.staticTitle) {
           assert(placeBoundary.contextLang === 'en' && placeBoundary.contextDir === 'ltr', `${pageName}: place-search project context lacks lang=en dir=ltr`);
         } else {
           assert(placeBoundary?.context === candidatePack.ui.published_location, `${pageName}: place-search interface context drifted: ${placeBoundary?.context}`);
           assert(placeBoundary?.contextLang === '' && placeBoundary?.contextDir === '', `${pageName}: localized place-search context was mislabeled as catalog content`);
         }
-        assert(placeBoundary?.buttonsBound, `${pageName}: place-search accessible labels do not separate interface action and English title`);
+        assert(placeBoundary?.buttonsBound, `${pageName}: place-search accessible labels do not separate interface action and localized place title`);
         const focusPresence = runtimeCatalogBoundary?.focusPresence ?? '';
         const staticPresence = runtimeCatalogBoundary?.expectedPresence ?? '';
         const expectsGeographic = staticPresence.includes(candidatePack.ui.presence_geographic)

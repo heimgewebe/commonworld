@@ -1836,12 +1836,14 @@ async function layerJourneyScenario({ mobile = false, viewportOverride = null, t
     observer.observe(stage, { attributes: true, attributeFilter: ['data-view-phase'] });
   }, touch);
   await run.page.locator('#layer-close').click();
-  await run.page.waitForSelector('.globe-stage[data-view-phase="preparing-overview"]');
+  await run.page.waitForFunction(() => window.__commonworldPhaseLog?.some((entry) => entry.phase === 'preparing-overview'), null, { timeout: 2000 });
   const preparingOverviewUrlCamera = Object.fromEntries(
     ['lng', 'lat', 'z', 'b', 'p'].map((key) => [key, new URL(run.page.url()).searchParams.get(key)]),
   );
   assert(JSON.stringify(preparingOverviewUrlCamera) === JSON.stringify(overviewUrlCamera), 'layer journey: return preparation serialized the side camera instead of preserving the overview camera ' + JSON.stringify({ overviewUrlCamera, preparingOverviewUrlCamera }));
-  assert((await stage.getAttribute('data-globe-geometry-source')) === 'side-view-layout', 'layer journey: return preparation left side layout too early');
+  const preparingReturnState = await run.page.evaluate(() => window.__commonworldPhaseLog.find((entry) => entry.phase === 'preparing-overview'));
+  assert(preparingReturnState?.source === 'side-view-layout', `layer journey: return preparation left side layout too early (${JSON.stringify(preparingReturnState)})`);
+  assert(preparingReturnState.panelHidden === true && preparingReturnState.panelVisible === false, `layer journey: description panel was visible during return preparation (${JSON.stringify(preparingReturnState)})`);
   assert(await run.page.locator('#layer-panel').isHidden(), 'layer journey: description panel did not close before return preparation');
   await run.page.waitForFunction(() => ['leaving-layers', 'overview'].includes(document.querySelector('.globe-stage')?.dataset.viewPhase));
   // The transient phase can complete before Playwright observes it; the phase log below remains the strict proof.
@@ -1851,6 +1853,8 @@ async function layerJourneyScenario({ mobile = false, viewportOverride = null, t
   const returnCommands = await run.page.evaluate(() => window.__commonworldCameraCommands ?? []);
   assert(returnCommands.length === 1 && returnCommands[0].command === 'easeTo', `layer journey: closing issued multiple camera commands (${JSON.stringify(returnCommands)})`);
   const returnPhaseLog = await run.page.evaluate(() => window.__commonworldPhaseLog);
+  const preparingReturnEntries = returnPhaseLog.filter((entry) => entry.phase === 'preparing-overview');
+  assert(preparingReturnEntries.length > 0 && preparingReturnEntries.every((entry) => entry.source === 'side-view-layout'), `layer journey: return preparation geometry drifted before leaving-layers (${JSON.stringify(preparingReturnEntries)})`);
   const firstReturnOverviewGeometry = returnPhaseLog.find((entry) => entry.source === 'maplibre-projected-horizon');
   assert(firstReturnOverviewGeometry && firstReturnOverviewGeometry.phase === 'leaving-layers' && firstReturnOverviewGeometry.sphereOpacity <= 0.1, `layer journey: return geometry changed while the sphere was visible (${JSON.stringify({ firstReturnOverviewGeometry, returnPhaseLog })})`);
   await run.page.waitForSelector('.globe-stage[data-view-phase="overview"]');
