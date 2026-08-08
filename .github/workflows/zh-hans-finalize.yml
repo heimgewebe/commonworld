@@ -1,0 +1,47 @@
+name: zh-hans-editorial-finalize
+
+on:
+  push:
+    branches:
+      - feat/zh-hans-complete-v1
+
+permissions:
+  contents: write
+
+jobs:
+  finalize:
+    if: contains(github.event.head_commit.message, 'run zh-Hans editorial finalize')
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          ref: feat/zh-hans-complete-v1
+          fetch-depth: 0
+      - uses: actions/setup-python@v7
+        with:
+          python-version: '3.12'
+      - uses: actions/setup-node@v7
+        with:
+          node-version: '22'
+          cache: npm
+      - name: Apply reviewed Simplified Chinese corrections
+        run: PYTHONPATH=. python scripts/_tmp_finalize_zh_hans.py
+      - name: Rebuild deterministic runtime
+        run: |
+          npm ci --ignore-scripts --no-audit --no-fund
+          npm run build
+      - name: Run pre-evidence regressions
+        run: |
+          python -m unittest tests.test_i18n -v
+          npm test
+      - name: Remove one-shot machinery
+        run: rm scripts/_tmp_finalize_zh_hans.py .github/workflows/zh-hans-finalize.yml
+      - name: Commit corrected review source
+        run: |
+          git config user.name 'grabowski-operator'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add -A
+          git diff --cached --stat
+          git commit -m 'fix(i18n): editorially correct zh-Hans and demand-gate future locales'
+          git push origin HEAD:feat/zh-hans-complete-v1
