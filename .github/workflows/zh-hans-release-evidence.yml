@@ -70,9 +70,11 @@ jobs:
           server_pid=$!
           trap 'kill "$server_pid" 2>/dev/null || true' EXIT
           node scripts/_tmp_smoke_zh_hans_search.mjs > docs/evidence/locale-reviews/raw/zh-Hans-search-semantics-smoke.json
-      - name: Write digest-bound review receipts and release evidence
+      - name: Write digest-bound zh-Hans review receipts and release evidence
         run: PYTHONPATH=. python scripts/_tmp_finalize_zh_hans_evidence.py
-      - name: Rebuild after evidence pointer
+      - name: Refresh existing Wave-1 evidence through exact continuity proof
+        run: PYTHONPATH=. python scripts/_tmp_refresh_wave1_bundle_evidence.py
+      - name: Rebuild after evidence pointers
         run: npm run build
       - name: Verify evidence still binds exact final public bytes
         run: |
@@ -80,23 +82,24 @@ jobs:
           import hashlib, json, re
           from pathlib import Path
           root = Path('.')
-          evidence = json.loads((root/'docs/evidence/locale-releases/zh-Hans.json').read_text(encoding='utf-8'))
           contract = json.loads((root/'docs/architecture/locale-release.contract.json').read_text(encoding='utf-8'))
-          pointer = contract['locale_registry']['zh-Hans']['release_evidence']
-          evidence_path = root/pointer['path']
-          digest = hashlib.sha256(evidence_path.read_bytes()).hexdigest()
-          assert digest == pointer['sha256'], (digest, pointer['sha256'])
-          for surface, relative in contract['locale_registry']['zh-Hans']['surface_files'].items():
-              actual = hashlib.sha256((root/relative).read_bytes()).hexdigest()
-              assert actual == evidence['surface_sha256'][surface], (surface, actual, evidence['surface_sha256'][surface])
           manifest = json.loads((root/'assets/commonworld-page-builds.json').read_text(encoding='utf-8'))
           release_id = manifest['release_id']
           assert re.fullmatch(r'[0-9a-f]{20}', release_id)
-          for relative in contract['locale_registry']['zh-Hans']['surface_files'].values():
-              markup = (root/relative).read_text(encoding='utf-8')
-              assert f'content="{release_id}"' in markup
-              assert f'/releases/{release_id}/' in markup
-          print(f'final evidence stable for release {release_id}')
+          for locale in contract['rollout']['wave_1']:
+              entry = contract['locale_registry'][locale]
+              pointer = entry['release_evidence']
+              evidence_path = root/pointer['path']
+              evidence = json.loads(evidence_path.read_text(encoding='utf-8'))
+              digest = hashlib.sha256(evidence_path.read_bytes()).hexdigest()
+              assert digest == pointer['sha256'], (locale, digest, pointer['sha256'])
+              for surface, relative in entry['surface_files'].items():
+                  actual = hashlib.sha256((root/relative).read_bytes()).hexdigest()
+                  assert actual == evidence['surface_sha256'][surface], (locale, surface, actual, evidence['surface_sha256'][surface])
+                  markup = (root/relative).read_text(encoding='utf-8')
+                  assert f'content="{release_id}"' in markup
+                  assert f'/releases/{release_id}/' in markup
+          print(f'final evidence stable for all Wave-1 locales on release {release_id}')
           PY
       - name: Run full release validators
         run: |
@@ -109,7 +112,7 @@ jobs:
           npm run smoke:browser
       - name: Remove one-shot release machinery
         run: |
-          rm scripts/_tmp_harden_locale_smoke.py scripts/_tmp_smoke_zh_hans_search.mjs scripts/_tmp_finalize_zh_hans_evidence.py .github/workflows/zh-hans-release-evidence.yml
+          rm scripts/_tmp_harden_locale_smoke.py scripts/_tmp_smoke_zh_hans_search.mjs scripts/_tmp_finalize_zh_hans_evidence.py scripts/_tmp_refresh_wave1_bundle_evidence.py .github/workflows/zh-hans-release-evidence.yml
       - name: Commit verified zh-Hans release evidence
         run: |
           git config user.name 'grabowski-operator'
