@@ -117,14 +117,35 @@
       "filterCenterDeltaY": 0,
       "filterButtonWidth": 44,
       "filterButtonHeight": 44,
-      "ringAnimationName": "sphere-ring-orbit",
-      "ringTransform": "matrix(0.999999, 0.0015048, -0.0015048, 0.999999, 0, 0)",
-      "ringTextWidth": 671.112548828125,
-      "ringTextHeight": 14.009857177734375,
+      "ringAnimationName": "none",
+      "ringTransform": "none",
+      "ringTextWidth": 671.09375,
+      "ringTextHeight": 13,
       "ringTextFontSize": 22,
       "primaryRingCount": 3,
       "depthRingCount": 2,
+      "primaryRingsStatic": true,
       "depthRingsStatic": true,
+      "representativePrimaryLabels": [
+        {
+          "text": "Knowledge, Learning and Culture · 11    LibriVox  MusicBrainz  Open Library  Peer 2 Peer Unive…  Safecast  Thailand Citizens…",
+          "width": 671.09375,
+          "height": 13,
+          "visible": true
+        },
+        {
+          "text": "Communication and Networks · 11    BOSCO Uganda  Freifunk  Freifunk Hamburg  guifi.net  Mastodon  Meshtastic",
+          "width": 603.78125,
+          "height": 13,
+          "visible": true
+        },
+        {
+          "text": "Cooperation and Self-Organization · 5    Bologna Urban Com…  Enspiral  g0v  National Communal…  Park Slope Food C…",
+          "width": 637.578125,
+          "height": 13,
+          "visible": true
+        }
+      ],
       "ringDetailLevel": "compact",
       "bundleVisibleChildCounts": [
         {
@@ -155,6 +176,36 @@
       ],
       "viewportWidth": 390,
       "mediaCompact": true,
+      "wideTouch": {
+        "viewportWidth": 844,
+        "mediaCompact": false,
+        "mediaCoarseTouch": true,
+        "primaryRingsStatic": true,
+        "depthRingsStatic": true,
+        "representativePrimaryLabels": [
+          {
+            "text": "Knowledge, Learning and Culture · 11    LibriVox  MusicBrainz  Open Library  Peer 2 Peer Unive…  Safecast  Thailand Citizens…",
+            "width": 671.09375,
+            "height": 13,
+            "fontSize": 22,
+            "visible": true
+          },
+          {
+            "text": "Communication and Networks · 11    BOSCO Uganda  Freifunk  Freifunk Hamburg  guifi.net  Mastodon  Meshtastic",
+            "width": 603.78125,
+            "height": 13,
+            "fontSize": 22,
+            "visible": true
+          },
+          {
+            "text": "Cooperation and Self-Organization · 5    Bologna Urban Com…  Enspiral  g0v  National Communal…  Park Slope Food C…",
+            "width": 637.578125,
+            "height": 13,
+            "fontSize": 22,
+            "visible": true
+          }
+        ]
+      },
       "countryRendered": 1
     },
     {
@@ -196,7 +247,7 @@
     {
       "id": "layer-journey-moveend-return",
       "verdict": "PASS",
-      "elapsedMs": 1361
+      "elapsedMs": 1966
     },
     {
       "id": "layer-journey-interrupted",
@@ -283,8 +334,8 @@
       "verdict": "PASS",
       "blockedCatalogRequests": 0,
       "observedCatalogRequests": [
-        "/releases/241d9693be45a6a83a52/catalog/runtime/aggregate.v1.json",
-        "/releases/241d9693be45a6a83a52/catalog/runtime/manifest.v1.json"
+        "/releases/3d5771ff57c4ba321a20/catalog/runtime/aggregate.v1.json",
+        "/releases/3d5771ff57c4ba321a20/catalog/runtime/manifest.v1.json"
       ]
     },
     {
@@ -342,7 +393,7 @@
     }
   ],
   "binding": {
-    "smoke_script_sha256": "9ae9c2331a1c5d2cc912a200c2e857926c785f776539d2796c53a00154f188dc",
+    "smoke_script_sha256": "03f6bb8502fbc05b9475fbb56a42eb4743fd2857c2d6581a79eeae08667d156d",
     "smoke_runner_sha256": "522b99b70b1d0064b1d0a31a3a67fdc9a2e73b7408f37d1a4bb303bc360b7556",
     "smoke_plan_sha256": "8a068c3b573eb2ab95ed7c3f8477f607cba6de9353ab5250ba9abc09345b23a7",
     "scenario_ids": [
@@ -383,6 +434,6 @@
       "method-mobile",
       "method-mobile-text-200"
     ],
-    "first_party_surface_sha256": "bfc3ec65aac475d2a05e222d17bb06f9caf8db920d85da358f7c252af32c0a0e"
+    "first_party_surface_sha256": "d9b74b88ce0f36202b955b66544b77d5eb9a4b67e1a3695cceb21c1d5c86f8cc"
   }
 }
