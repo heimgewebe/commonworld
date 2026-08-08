@@ -25,10 +25,11 @@ jobs:
         with:
           node-version: '22'
           cache: npm
-      - name: Install deterministic browser dependencies
+      - name: Install deterministic browser and validation dependencies
         run: |
           npm ci --ignore-scripts --no-audit --no-fund
           npx playwright install --with-deps chromium
+          python -m pip install -r requirements-dev.txt
       - name: Promote reviewed provenance and patch review-contract semantics
         run: |
           python - <<'PY'
@@ -125,4 +126,4 @@ jobs:
           git commit -m 'feat(i18n): release complete zh-Hans locale'
           git push origin HEAD:feat/zh-hans-complete-v1
 
-# execution trigger: lifecycle evidence refresh
+# execution trigger: validation dependencies aligned with canonical CI
