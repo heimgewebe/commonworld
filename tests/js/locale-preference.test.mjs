@@ -20,6 +20,8 @@ test('ordered browser preferences match supported BCP 47 primary subtags', () =>
   assert.equal(supportedLocale('DE-de'), 'de');
   assert.equal(supportedLocale('en-Latn-GB'), 'en');
   assert.equal(supportedLocale('zh-Hant'), null);
+  assert.equal(supportedLocale('zh-CN'), 'zh-Hans');
+  assert.equal(supportedLocale('zh-TW'), null);
   assert.equal(matchSupportedLocale(['fr-FR', 'de-DE', 'en-GB']), 'fr');
   assert.equal(matchSupportedLocale(['zh-Hant', 'fr-FR']), 'fr');
 });
@@ -36,7 +38,9 @@ test('locale preference accepts automatic and all released manual choices', () =
   assert.equal(normalizeLocalePreference('de'), 'de');
   assert.equal(normalizeLocalePreference('fr'), 'fr');
   assert.equal(normalizeLocalePreference('pt-PT'), 'pt-BR');
-  assert.equal(normalizeLocalePreference('zh-Hans'), null);
+  assert.equal(normalizeLocalePreference('zh-Hans'), 'zh-Hans');
+  assert.equal(normalizeLocalePreference('zh-Hant'), null);
+  assert.equal(normalizeLocalePreference('zh-TW'), null);
 });
 
 test('storage failures and corrupt values fail safely', () => {

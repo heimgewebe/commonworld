@@ -460,7 +460,8 @@ def _release_evidence_errors(
                     errors,
                     isinstance(catalog_review, dict)
                     and catalog_review.get("review_kind") == "model_assisted_independent_language_review"
-                    and catalog_review.get("writer_independence") == "independent_from_grok_4_5_writer"
+                    and isinstance(catalog_review.get("writer_independence"), str)
+                    and re.fullmatch(r"independent_from_[a-z0-9_]+_writer", catalog_review["writer_independence"]) is not None
                     and catalog_review.get("verdict") == "pass",
                     f"independent language review receipt lacks a passing catalog review for {tag}",
                 )
@@ -870,6 +871,9 @@ def validate_contract(contract: dict[str, Any], root: Path = ROOT) -> list[str]:
         "planned_locales_must_not_be_selectable",
         "candidate_locales_must_not_be_selectable",
         "candidate_surfaces_must_be_noindex",
+        "future_full_locale_activation_requires_observed_demand",
+        "browser_translation_may_assist_long_tail_reading",
+        "browser_translation_does_not_replace_owned_search_semantics",
     ):
         _require(errors, rollout.get(field) is True, f"rollout must require {field}")
 

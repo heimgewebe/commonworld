@@ -6,6 +6,8 @@ import { BOOTSTRAP_RECORDS } from '../../assets/commonworld-bootstrap-catalog.mj
 import {
   actionLabel,
   catalogContentLocale,
+  RELEASED_LOCALES,
+  WAVE1_LOCALES,
   hasThemeLabel,
   loadWave1LocalePacks,
   localizeCatalogRecords,
@@ -46,6 +48,7 @@ test('Wave-1 translation packages remain loadable after candidate promotion', ()
   assert.equal(shouldLoadWave1LocalePack('fr', false), true);
   assert.equal(shouldLoadWave1LocalePack('pt-BR', false), true);
   assert.equal(shouldLoadWave1LocalePack('ar', false), true);
+  assert.equal(shouldLoadWave1LocalePack('zh-Hans', false), true);
   assert.equal(shouldLoadWave1LocalePack('de', false), false);
   assert.equal(shouldLoadWave1LocalePack('de', true), true);
 });
@@ -62,7 +65,7 @@ test('Wave-1 locale pack loading has a bounded timeout', async () => {
 test('released Wave-1 locales use their complete catalog presentation packs', () => {
   const english = localizeCatalogRecords(BOOTSTRAP_RECORDS, 'en').records;
   const englishById = new Map(english.map((record) => [record.id, record]));
-  for (const locale of ['es', 'fr', 'pt-BR', 'ar']) {
+  for (const locale of WAVE1_LOCALES) {
     assert.equal(catalogContentLocale(locale), locale);
     const localized = localizeCatalogRecords(BOOTSTRAP_RECORDS, locale).records;
     assert.equal(localized.length, english.length);
@@ -91,7 +94,7 @@ test('released Wave-1 locales use their complete catalog presentation packs', ()
 });
 
 test('canonical identity titles without an explicit English overlay remain language-unknown', () => {
-  for (const locale of ['en', 'es', 'fr', 'pt-BR', 'ar']) {
+  for (const locale of ['en', ...WAVE1_LOCALES]) {
     const record = localizeCatalogRecords(BOOTSTRAP_RECORDS, locale).records.find((entry) => entry.id === 'akiba-mashinani-trust');
     assert.ok(record);
     assert.equal(record._title_locale, null, locale);
@@ -108,6 +111,7 @@ test('exact Commons counts stay localized on every candidate surface', () => {
 test('registry normalizes released and candidate locales', () => {
   assert.equal(normalizeLocale('de-DE'), 'de');
   assert.equal(normalizeLocale('fr'), 'fr');
+  assert.equal(normalizeLocale('zh-CN'), 'zh-Hans');
   const localized = localizeCatalogRecords(BOOTSTRAP_RECORDS, 'de');
   assert.notEqual(localized.records, BOOTSTRAP_RECORDS);
   assert.equal(localized.searchAliasesById.size, BOOTSTRAP_RECORDS.length);
@@ -130,7 +134,7 @@ test('English presentation labels cover actions and digital taxonomy', () => {
 
 test('every catalog theme has an explicit label in every rendered UI locale', () => {
   const catalogThemes = new Set(BOOTSTRAP_RECORDS.flatMap((record) => record.themes ?? []));
-  for (const locale of ['en', 'de', 'es', 'fr', 'pt-BR', 'ar']) {
+  for (const locale of RELEASED_LOCALES) {
     for (const theme of catalogThemes) {
       assert.equal(hasThemeLabel(theme, locale), true, `${locale}:${theme}`);
       assert.ok(!themeLabel(theme, locale).startsWith('[missing:'), `${locale}:${theme}`);
@@ -192,7 +196,7 @@ test('English catalog search remains bilingual through canonical German aliases'
 
 
 test('Wave-1 localized search retains English and canonical German discovery aliases', () => {
-  for (const locale of ['es', 'fr', 'pt-BR', 'ar']) {
+  for (const locale of WAVE1_LOCALES) {
     const localized = localizeCatalogRecords(BOOTSTRAP_RECORDS, locale);
     const index = prepareIntentSearchIndex(localized.records, { searchAliasesById: localized.searchAliasesById });
     assert.equal(index.search({ query: 'free operating system', all: true })[0]?.id, 'debian', `${locale}:english`);

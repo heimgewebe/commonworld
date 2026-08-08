@@ -103,6 +103,15 @@ class LocaleReleaseContractTests(unittest.TestCase):
             errors,
         )
 
+    def test_simplified_chinese_does_not_claim_traditional_script_or_regions(self) -> None:
+        from scripts.locale_registry import match_registry_locale
+
+        self.assertEqual(match_registry_locale(["zh-CN"], root=ROOT), "zh-Hans")
+        self.assertEqual(match_registry_locale(["zh-SG"], root=ROOT), "zh-Hans")
+        self.assertEqual(match_registry_locale(["zh-Hant", "fr-FR"], root=ROOT), "fr")
+        self.assertEqual(match_registry_locale(["zh-TW", "fr-FR"], root=ROOT), "fr")
+        self.assertEqual(match_registry_locale(["zh-HK", "fr-FR"], root=ROOT), "fr")
+
     def test_primary_subtag_matches_region_specific_released_locale(self) -> None:
         self.assertEqual(
             match_registry_locale(["pt-PT"], statuses=("released",), root=ROOT),
@@ -125,6 +134,17 @@ class LocaleReleaseContractTests(unittest.TestCase):
         errors = validate_contract(contract, ROOT)
         self.assertTrue(any("100%" in error for error in errors))
         self.assertTrue(any("markers" in error for error in errors))
+
+    def test_future_full_locales_are_demand_gated_but_browser_translation_is_only_an_assist(self) -> None:
+        contract = copy.deepcopy(self.contract)
+        for field in (
+            "future_full_locale_activation_requires_observed_demand",
+            "browser_translation_may_assist_long_tail_reading",
+            "browser_translation_does_not_replace_owned_search_semantics",
+        ):
+            contract["rollout"][field] = False
+            self.assertTrue(any(field in error for error in validate_contract(contract, ROOT)), field)
+            contract["rollout"][field] = True
 
     def test_rollout_waves_are_disjoint_and_not_yet_selectable(self) -> None:
         contract = copy.deepcopy(self.contract)
@@ -159,8 +179,8 @@ class LocaleReleaseContractTests(unittest.TestCase):
 
     def test_default_and_fallback_locales_must_be_released(self) -> None:
         contract = copy.deepcopy(self.contract)
-        contract["decision"]["default_locale"] = "zh-Hans"
-        contract["decision"]["fallback_locale"] = "hi"
+        contract["decision"]["default_locale"] = "hi"
+        contract["decision"]["fallback_locale"] = "ja"
         errors = validate_contract(contract, ROOT)
         self.assertTrue(any("default_locale must be released" == error for error in errors))
         self.assertTrue(any("fallback_locale must be released" == error for error in errors))

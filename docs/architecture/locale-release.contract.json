@@ -184,7 +184,10 @@
     "wave_order_may_follow_observed_demand": true,
     "planned_locales_must_not_be_selectable": true,
     "candidate_locales_must_not_be_selectable": true,
-    "candidate_surfaces_must_be_noindex": true
+    "candidate_surfaces_must_be_noindex": true,
+    "future_full_locale_activation_requires_observed_demand": true,
+    "browser_translation_may_assist_long_tail_reading": true,
+    "browser_translation_does_not_replace_owned_search_semantics": true
   },
   "release_gate": {
     "required_surfaces": [

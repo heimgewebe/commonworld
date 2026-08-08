@@ -9,6 +9,7 @@ from scripts.render_proposal_page import render as render_proposal
 from scripts.render_public_shell import load_records, render_method, render_shell
 
 ROOT = Path(__file__).resolve().parents[1]
+WAVE1_LOCALES = tuple(json.loads((ROOT / "docs/architecture/locale-release.contract.json").read_text(encoding="utf-8"))["rollout"]["wave_1"])
 
 
 class InternationalizationTests(unittest.TestCase):
@@ -47,7 +48,7 @@ class InternationalizationTests(unittest.TestCase):
     def test_wave1_catalog_content_is_localized_and_content_locale_is_exact(self) -> None:
         canonical = load_records(ROOT)
         english = {record["id"]: record for record in localize_records(canonical, "en", ROOT)}
-        for locale in ("es", "fr", "pt-BR", "ar"):
+        for locale in WAVE1_LOCALES:
             localized = {record["id"]: record for record in localize_records(canonical, locale, ROOT)}
             for project_id in ("mundraub", "common-voice"):
                 with self.subTest(locale=locale, project=project_id):
@@ -58,10 +59,12 @@ class InternationalizationTests(unittest.TestCase):
                     self.assertNotEqual(english[project_id]["presence"]["digital"]["label"], localized[project_id]["presence"]["digital"]["label"] )
             if locale == "ar":
                 self.assertRegex(localized["mundraub"]["summary"], r"[\u0600-\u06ff]")
+            if locale == "zh-Hans":
+                self.assertRegex(localized["mundraub"]["summary"], r"[\u4e00-\u9fff]")
 
     def test_canonical_title_without_explicit_english_overlay_has_no_false_language(self) -> None:
         canonical = load_records(ROOT)
-        for locale in ("en", "es", "fr", "pt-BR", "ar"):
+        for locale in ("en", *WAVE1_LOCALES):
             localized = {record["id"]: record for record in localize_records(canonical, locale, ROOT)}
             with self.subTest(locale=locale):
                 self.assertIsNone(localized["akiba-mashinani-trust"]["_title_locale"])
