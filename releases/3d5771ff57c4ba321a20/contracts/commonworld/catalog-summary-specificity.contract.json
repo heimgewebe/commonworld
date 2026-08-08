@@ -1,0 +1,192 @@
+{
+  "schema_version": 1,
+  "kind": "commonworld.catalog_summary_specificity_contract",
+  "title": "Content-language catalogue summary specificity contract",
+  "canonical_locale": "de",
+  "interpretation": {
+    "goal": "Kurzbeschreibungen beginnen mit dem unterscheidenden Gegenstand, Zweck oder Governance-Mechanismus statt die Commons-Zugehörigkeit erneut zu behaupten.",
+    "reject_when": "Eine Kurzbeschreibung verwendet eine der je Sprache gebundenen Leerformeln, ohne dadurch einen projektspezifischen Gegenstand, Akteur, Entscheidungsweg oder eine konkrete Verantwortung zu benennen.",
+    "allow_when": "Kollektives Handeln bleibt ausdrücklich zulässig, wenn Akteure, Verfahren, Verantwortlichkeiten, Eigentumsformen oder der konkret erhaltene Gegenstand benannt werden.",
+    "non_goal": "Die Regeln versuchen weder alle denkbaren Leerformeln vollständig zu erkennen noch konkrete Aussagen über gemeinschaftliche Governance zu unterdrücken. Policies binden Katalog-Inhaltssprachen, nicht jede UI-Oberflächensprache."
+  },
+  "release_gate": {
+    "every_published_content_language_requires_policy": true,
+    "planned_content_languages_may_omit_policy": true,
+    "ui_locales_do_not_require_content_policy_copies": true,
+    "minimum_rules_per_published_content_language": 2,
+    "minimum_allowed_examples_per_published_content_language": 3,
+    "minimum_rejected_examples_per_rule": 1
+  },
+  "locale_policies": {
+    "de": {
+      "rules": [
+        {
+          "id": "de-generic-community-developed",
+          "match": "casefolded_literal",
+          "phrases": [
+            "gemeinschaftlich entwickelt",
+            "gemeinschaftlich entwickelte",
+            "gemeinschaftlich entwickeltes",
+            "gemeinschaftlich entwickelten",
+            "gemeinsam entwickelt",
+            "gemeinsam entwickelte",
+            "gemeinsam entwickeltes",
+            "gemeinsam entwickelten"
+          ],
+          "rationale": "Die Formulierung sagt ohne benannten Gegenstand, Akteur oder Entwicklungsmechanismus nur erneut, dass das Projekt gemeinschaftlich ist.",
+          "allow_when_actor_and_mechanism_are_named": true
+        },
+        {
+          "id": "de-generic-community-maintained",
+          "match": "casefolded_literal",
+          "phrases": [
+            "gemeinsam gepflegt",
+            "gemeinschaftlich gepflegt",
+            "gemeinschaftlich gepflegte",
+            "gemeinsam gewartet",
+            "gemeinschaftlich gewartet"
+          ],
+          "rationale": "Pflege oder Wartung ist nur unterscheidend, wenn Verantwortliche, Verfahren oder der konkret erhaltene Gegenstand genannt werden.",
+          "allow_when_actor_and_mechanism_are_named": true
+        }
+      ],
+      "allowed_examples": [
+        "Die Mitglieder wählen einen siebenköpfigen Rat, der Budgets und Nutzungsregeln beschließt.",
+        "Freiwillige pflegen das Debian-Paketarchiv und veröffentlichen Sicherheitsaktualisierungen nach einem dokumentierten Verfahren.",
+        "Eine Genossenschaft hält das Grundstück gemeinschaftlich und vergibt Wohnungen nach veröffentlichten Regeln."
+      ],
+      "rejected_examples": [
+        {
+          "summary": "Ein gemeinschaftlich entwickeltes Betriebssystem für alle.",
+          "expected_rule_id": "de-generic-community-developed"
+        },
+        {
+          "summary": "Eine offene Wissenssammlung, die gemeinsam gepflegt wird.",
+          "expected_rule_id": "de-generic-community-maintained"
+        }
+      ],
+      "specificity_markers": {
+        "actor_patterns": [
+          "\\bmitglieder\\b",
+          "\\bfreiwillige\\b",
+          "\\bgemeinden\\b",
+          "\\bzivilgesellschaft\\b",
+          "\\böffentliche stellen\\b",
+          "\\bgenossenschaft\\b",
+          "\\blokale\\w* gemeinschaften\\b",
+          "\\brat\\b",
+          "\\bgremium\\b"
+        ],
+        "mechanism_patterns": [
+          "\\bwähl\\w*\\b",
+          "\\bbeschließ\\w*\\b",
+          "\\bpfleg\\w*\\b",
+          "\\bwart\\w*\\b",
+          "\\btrag\\w*\\b",
+          "\\bgetrag\\w*\\b",
+          "\\bdokumentier\\w*\\b",
+          "\\bvergib\\w*\\b",
+          "\\bverwalt\\w*\\b",
+          "\\bveröffentlich\\w*\\b",
+          "\\b(?:hält|halten)\\b"
+        ],
+        "relation": {
+          "actor_must_precede_mechanism": true,
+          "same_sentence": true,
+          "max_distance_chars": 160,
+          "allowed_intervening_pattern": "(?:\\s*(?:(?!(?:und|oder|aber|während|wohingegen|obwohl|weil|bevor|nachdem|wenn|falls|sobald|als|dann)\\b)[\\w-]+\\s+){0,6})"
+        },
+        "passive_mechanism_patterns": [
+          "\\bgetragen von\\b",
+          "\\bbetrieben von\\b",
+          "\\bverwaltet von\\b",
+          "\\bgepflegt von\\b"
+        ]
+      }
+    },
+    "en": {
+      "rules": [
+        {
+          "id": "en-generic-community-developed",
+          "match": "casefolded_literal",
+          "phrases": [
+            "community-developed",
+            "community developed",
+            "community-driven",
+            "community driven",
+            "collaboratively developed"
+          ],
+          "rationale": "The wording merely restates collective origin unless it names a specific object, actor or decision mechanism.",
+          "allow_when_actor_and_mechanism_are_named": true
+        },
+        {
+          "id": "en-generic-community-maintained",
+          "match": "casefolded_literal",
+          "phrases": [
+            "community-maintained",
+            "community maintained",
+            "collaboratively maintained",
+            "jointly maintained"
+          ],
+          "rationale": "Maintenance is distinguishing only when the responsible actors, process or maintained object is stated.",
+          "allow_when_actor_and_mechanism_are_named": true
+        }
+      ],
+      "allowed_examples": [
+        "Members elect a seven-person council that approves budgets and access rules.",
+        "Volunteers maintain Debian's package archive and publish security updates through a documented process.",
+        "A member-owned cooperative holds the land and allocates homes under published rules."
+      ],
+      "rejected_examples": [
+        {
+          "summary": "A community-driven operating system for everyone.",
+          "expected_rule_id": "en-generic-community-developed"
+        },
+        {
+          "summary": "An open knowledge base that is collaboratively maintained.",
+          "expected_rule_id": "en-generic-community-maintained"
+        }
+      ],
+      "specificity_markers": {
+        "actor_patterns": [
+          "\\bmembers?\\b",
+          "\\bvolunteers?\\b",
+          "\\bcivil society\\b",
+          "\\bpublic institutions?\\b",
+          "\\bcooperatives?\\b",
+          "\\bcouncils?\\b",
+          "\\bstewards?\\b",
+          "\\blocal communities\\b"
+        ],
+        "mechanism_patterns": [
+          "\\belect\\w*\\b",
+          "\\bapprov\\w*\\b",
+          "\\bmaintain\\w*\\b",
+          "\\bdocument\\w*\\b",
+          "\\bpublish\\w*\\b",
+          "\\bgovern\\w*\\b",
+          "\\boperat\\w*\\b",
+          "\\ballocat\\w*\\b",
+          "\\bsteward\\w*\\b",
+          "\\bhold\\w*\\b"
+        ],
+        "relation": {
+          "actor_must_precede_mechanism": true,
+          "same_sentence": true,
+          "max_distance_chars": 160,
+          "allowed_intervening_pattern": "(?:\\s*(?:(?:collectively|jointly|democratically|directly|regularly|actively|publicly|locally|cooperatively|also|themselves)\\s+){0,3})"
+        },
+        "passive_mechanism_patterns": [
+          "\\bsupported by\\b",
+          "\\boperated by\\b",
+          "\\bgoverned by\\b",
+          "\\bmaintained by\\b"
+        ]
+      }
+    }
+  },
+  "published_content_languages": [
+    "de",
+    "en"
+  ]
+}

@@ -2546,7 +2546,27 @@ async function androidGlobeUiScenario() {
       ringTextFontSize: Number.parseFloat(textStyle.fontSize),
       primaryRingCount: planes.filter((plane) => plane.dataset.emphasis === 'primary').length,
       depthRingCount: planes.filter((plane) => plane.dataset.emphasis === 'depth').length,
-      depthRingsStatic: planes.filter((plane) => plane.dataset.emphasis === 'depth').every((plane) => getComputedStyle(plane).animationName === 'none'),
+      primaryRingsStatic: planes.filter((plane) => plane.dataset.emphasis === 'primary').every((plane) => {
+        const style = getComputedStyle(plane);
+        return style.animationName === 'none' && style.transform === 'none';
+      }),
+      depthRingsStatic: planes.filter((plane) => plane.dataset.emphasis === 'depth').every((plane) => {
+        const style = getComputedStyle(plane);
+        return style.animationName === 'none' && style.transform === 'none';
+      }),
+      representativePrimaryLabels: planes
+        .filter((plane) => plane.dataset.emphasis === 'primary')
+        .map((plane) => {
+          const label = plane.querySelector('.sphere-ring-text');
+          const rect = label?.getBoundingClientRect();
+          const style = label ? getComputedStyle(label) : null;
+          return {
+            text: label?.textContent?.trim() ?? '',
+            width: rect?.width ?? 0,
+            height: rect?.height ?? 0,
+            visible: Boolean(label && style.display !== 'none' && style.visibility !== 'hidden' && Number(style.opacity) > 0 && rect.width > 0 && rect.height > 0),
+          };
+        }),
       ringDetailLevel: document.querySelector('#digital-sphere')?.dataset.ringDetailLevel ?? '',
       bundleVisibleChildCounts: planes.map((plane) => ({
         layer: plane.dataset.layerId,
@@ -2559,22 +2579,61 @@ async function androidGlobeUiScenario() {
   });
   assert(geometry.filterCenterDeltaX <= 1 && geometry.filterCenterDeltaY <= 1, scenarioId + ': filter icon is not centered ' + JSON.stringify(geometry));
   assert(geometry.filterButtonWidth >= 44 && geometry.filterButtonHeight >= 44, scenarioId + ': filter button is below mobile touch target ' + JSON.stringify(geometry));
-  assert(geometry.ringAnimationName === 'sphere-ring-orbit', scenarioId + ': primary mobile ring lost its slow orientation orbit ' + JSON.stringify(geometry));
-  assert(geometry.ringTransform !== 'none', scenarioId + ': primary mobile ring lost its deterministic orbital offset ' + JSON.stringify(geometry));
-  assert(geometry.primaryRingCount >= 2 && geometry.primaryRingCount <= 3 && geometry.depthRingCount > 0 && geometry.depthRingsStatic, scenarioId + ': mobile emphasis does not bound active rings ' + JSON.stringify(geometry));
+  assert(geometry.ringAnimationName === 'none' && geometry.ringTransform === 'none' && geometry.primaryRingsStatic, scenarioId + ': primary mobile ring retains CSS animation or transform that can hide Android textPath labels ' + JSON.stringify(geometry));
+  assert(geometry.primaryRingCount >= 2 && geometry.primaryRingCount <= 3 && geometry.depthRingCount > 0 && geometry.depthRingsStatic, scenarioId + ': mobile emphasis does not bound or fully freeze ring groups ' + JSON.stringify(geometry));
   assert(['micro', 'compact'].includes(geometry.ringDetailLevel), scenarioId + ': mobile detail level is not bounded ' + JSON.stringify(geometry));
   assert(geometry.bundleVisibleChildCounts.every(({ declared, rendered }) => declared === rendered && rendered <= 2), scenarioId + ': mobile bundle detail did not reduce subordinate lines ' + JSON.stringify(geometry));
-  assert(geometry.ringTextWidth > 80 && geometry.ringTextHeight >= 12.5 && geometry.ringTextFontSize >= 9.5, scenarioId + ': mobile ring text is not visibly sized ' + JSON.stringify(geometry));
+  assert(geometry.ringTextWidth > 80 && geometry.ringTextHeight > 0 && geometry.ringTextFontSize >= 20, scenarioId + ': mobile ring text is not visibly sized ' + JSON.stringify(geometry));
+  assert(geometry.representativePrimaryLabels.length >= 2 && geometry.representativePrimaryLabels.every(({ text, visible, width, height }) => text.length > 0 && visible && width > 80 && height > 0), scenarioId + ': representative primary mobile ring labels are absent or not visibly laid out ' + JSON.stringify(geometry));
 
   await run.page.locator('#sphere-edge-control').focus();
   const focusedRingMotion = await run.page.evaluate(() => ({
     activeElement: document.activeElement?.id ?? '',
     primaryStates: [...document.querySelectorAll('.sphere-ring-plane[data-emphasis="primary"]')]
-      .map((plane) => getComputedStyle(plane).animationPlayState),
+      .map((plane) => {
+        const style = getComputedStyle(plane);
+        return { animationName: style.animationName, transform: style.transform };
+      }),
   }));
   assert(focusedRingMotion.activeElement === 'sphere-edge-control', scenarioId + ': sphere edge control did not receive focus ' + JSON.stringify(focusedRingMotion));
-  assert(focusedRingMotion.primaryStates.length > 0 && focusedRingMotion.primaryStates.every((state) => state === 'paused'), scenarioId + ': primary mobile rings continue moving while the sphere control is focused ' + JSON.stringify(focusedRingMotion));
+  assert(focusedRingMotion.primaryStates.length > 0 && focusedRingMotion.primaryStates.every(({ animationName, transform }) => animationName === 'none' && transform === 'none'), scenarioId + ': focused primary mobile rings retain CSS animation or transform ' + JSON.stringify(focusedRingMotion));
   await run.page.evaluate(() => document.querySelector('#sphere-edge-control')?.blur());
+
+  await run.page.setViewportSize({ width: 844, height: 390 });
+  await run.page.waitForTimeout(100);
+  const wideTouchGeometry = await run.page.evaluate(() => {
+    const planes = [...document.querySelectorAll('.sphere-ring-plane')];
+    const primaryPlanes = planes.filter((plane) => plane.dataset.emphasis === 'primary');
+    const depthPlanes = planes.filter((plane) => plane.dataset.emphasis === 'depth');
+    const groupsAreStatic = (items) => items.every((plane) => {
+      const style = getComputedStyle(plane);
+      return style.animationName === 'none' && style.transform === 'none';
+    });
+    return {
+      viewportWidth: window.innerWidth,
+      mediaCompact: window.matchMedia('(max-width: 48rem)').matches,
+      mediaCoarseTouch: window.matchMedia('(hover: none) and (pointer: coarse)').matches,
+      primaryRingsStatic: groupsAreStatic(primaryPlanes),
+      depthRingsStatic: groupsAreStatic(depthPlanes),
+      representativePrimaryLabels: primaryPlanes.map((plane) => {
+        const label = plane.querySelector('.sphere-ring-text');
+        const rect = label?.getBoundingClientRect();
+        const style = label ? getComputedStyle(label) : null;
+        return {
+          text: label?.textContent?.trim() ?? '',
+          width: rect?.width ?? 0,
+          height: rect?.height ?? 0,
+          fontSize: style ? Number.parseFloat(style.fontSize) : 0,
+          visible: Boolean(label && style.display !== 'none' && style.visibility !== 'hidden' && Number(style.opacity) > 0 && rect.width > 0 && rect.height > 0),
+        };
+      }),
+    };
+  });
+  assert(wideTouchGeometry.viewportWidth > 768 && !wideTouchGeometry.mediaCompact && wideTouchGeometry.mediaCoarseTouch, scenarioId + ': wide touch viewport did not exercise the non-compact coarse-pointer path ' + JSON.stringify(wideTouchGeometry));
+  assert(wideTouchGeometry.primaryRingsStatic && wideTouchGeometry.depthRingsStatic, scenarioId + ': wide touch ring group retained CSS animation or transform ' + JSON.stringify(wideTouchGeometry));
+  assert(wideTouchGeometry.representativePrimaryLabels.length >= 2 && wideTouchGeometry.representativePrimaryLabels.every(({ text, visible, width, height, fontSize }) => text.length > 0 && visible && width > 80 && height > 0 && fontSize >= 20), scenarioId + ': wide touch primary ring labels are absent or not visibly laid out ' + JSON.stringify(wideTouchGeometry));
+  await run.page.setViewportSize({ width: 390, height: 844 });
+  await run.page.waitForTimeout(100);
 
   await run.page.evaluate(() => new Promise((resolve) => {
     const map = window.__commonworldTestMap;
@@ -2604,7 +2663,7 @@ async function androidGlobeUiScenario() {
   assert(JSON.stringify(country.opacity).includes('0.78'), scenarioId + ': overview country tint is not strong enough ' + JSON.stringify(country));
   assert(country.diagnosticsFeatures > 0 && country.rendered > 0, scenarioId + ': country composition is not rendered at mobile globe overview ' + JSON.stringify(country));
   assert(run.pageErrors.length === 0, scenarioId + ': page errors: ' + run.pageErrors.join(' | '));
-  results.push({ id: scenarioId, verdict: 'PASS', ...geometry, countryRendered: country.rendered });
+  results.push({ id: scenarioId, verdict: 'PASS', ...geometry, wideTouch: wideTouchGeometry, countryRendered: country.rendered });
   await run.context.close();
 }
 
