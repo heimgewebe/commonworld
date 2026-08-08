@@ -1,0 +1,35 @@
+<!doctype html>
+<html lang="zh-Hans" dir="ltr">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="commonworld-page" content="method.zh-Hans.html" />
+    <meta name="commonworld-page-build" content="7282491dfc36b6b5" />
+    <meta name="commonworld-release" content="77886a3823f7fa605a9b" />
+    <base href="/releases/77886a3823f7fa605a9b/" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="color-scheme" content="dark" />
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' data:; object-src 'none'; base-uri 'self'; form-action 'none';" />
+    <meta name="description" content="Commonworld 的方法、覆盖范围、隐私和操作边界。" />
+    <title>Commonworld — 方法和边界</title>
+    <link rel="icon" href="./assets/commonworld-mark.svg?v=05905a6e42f8" type="image/svg+xml" />
+    <link rel="stylesheet" href="./index.css?v=f3052b7e2188" />
+    <script type="module" src="./assets/commonworld-locale.mjs?v=d8abdc89cc84"></script>
+  </head>
+  <body class="method-page">
+    <main>
+      <p class="kicker">Commonworld</p>
+      <h1>方法、覆盖范围和隐私</h1>
+      <p><a class="secondary-back-link" href="./zh-Hans.html">← 返回地球</a></p>
+      <div class="language-switch language-switch--compact" role="group" aria-label="选择界面语言" data-locale-surface="method"><a class="language-choice language-choice--auto" href="./method.html?ui_lang=auto" data-locale-choice="auto" data-locale-surface="method"><span class="language-choice-name">自动 - 设备语言</span></a><a class="language-choice" href="./method.html?ui_lang=en" lang="en" dir="ltr" data-locale-choice="en" data-locale-surface="method" data-locale-status="released"><span class="language-choice-name">English</span></a><a class="language-choice" href="./method.de.html?ui_lang=de" lang="de" dir="ltr" data-locale-choice="de" data-locale-surface="method" data-locale-status="released"><span class="language-choice-name">Deutsch</span></a><a class="language-choice" href="./method.es.html?ui_lang=es" lang="es" dir="ltr" data-locale-choice="es" data-locale-surface="method" data-locale-status="released"><span class="language-choice-name">Español</span></a><a class="language-choice" href="./method.fr.html?ui_lang=fr" lang="fr" dir="ltr" data-locale-choice="fr" data-locale-surface="method" data-locale-status="released"><span class="language-choice-name">Français</span></a><a class="language-choice" href="./method.pt-BR.html?ui_lang=pt-BR" lang="pt-BR" dir="ltr" data-locale-choice="pt-BR" data-locale-surface="method" data-locale-status="released"><span class="language-choice-name">Português (Brasil)</span></a><a class="language-choice" href="./method.ar.html?ui_lang=ar" lang="ar" dir="rtl" data-locale-choice="ar" data-locale-surface="method" data-locale-status="released"><span class="language-choice-name">العربية</span></a><a class="language-choice" href="./method.zh-Hans.html?ui_lang=zh-Hans" lang="zh-Hans" dir="ltr" data-locale-choice="zh-Hans" data-locale-surface="method" data-locale-status="released" aria-current="page"><span class="language-choice-name">简体中文</span></a></div><p class="language-effective" data-locale-effective aria-live="polite">活跃语言： 西班牙语</p>
+      <section><h2>Commonworld 显示什么</h2><p>Commonworld 通过一个共享发现界面发布精选的 Commons。 当前的初始目录包含 88 Commons 具有数字和/或公开可映射的存在。这是有限的编辑选择，而不是完整的全球统计数据。</p></section>
+      <section><h2>数据和来源</h2><p>每个条目都有一个稳定的 <code>CommonProject.id</code>，首次目录收录的不可变日期、来源、检索日期、活动信息和策展信息。 JSON 文件与地球视图和文本视图使用的数据事实相同。缺少目录条目并不意味着某个区域中不存在 Commons。</p></section>
+      <section><h2>什么算作共同点</h2><p>Commonworld 将公共资源理解为多人共同使用、维护或开发的可识别资源、基础设施、实践或知识体系。录取需要共享资源、社区、共同实践、规则和责任以及共同利益的主要证据。开源、免费访问、非营利地位、权力下放或许多用户本身是不够的。表格保持开放状态；理由具有约束力且机器可读<a href="./contracts/commonworld/commons-definition.contract.json">Commons定义合约</a>.</p></section>
+      <section><h2>建议和编辑审查</h2><p>公共候选人可以通过以下方式准备<a href="./propose.zh-Hans.html">建议 Commons</a>。 Commonworld 不存储表格。首选的引入路径是公开的 GitHub 问题；或者，生成本地 JSON 文件。建议永远不会自动发布。编辑审查检查身份、主要邻近来源、Commons 特征、参与方式、隐私、位置精度、重复项和新鲜度<a href="./contracts/commonworld/editorial-review.contract.json">编辑审查合同</a>和文件入场<a href="./contracts/commonworld/commons-basis.schema.json">Commons 基础记录</a>。自 2026 年 7 月 31 日起，新的或经过实质性重新审查的条目需要此记录；较早的条目将在其现有审核日期之前进行追溯审核。已到期的旧条目将获得一次性宽限期，直至 2026 年 8 月 31 日。</p></section>
+      <section><h2>地点和隐私</h2><p>数字 Commons 未分配发明的地图坐标。地理信息可以是精确的、近似的或隐藏的。隐藏位置没有几何形状，也不会根据其他信息重建。</p></section>
+      <section><h2>技术操作</h2><p>该网站在 GitHub 页面上静态运行。 MapLibre 在本地提供服务。底图来自公共 OpenFreeMap 实例，作为非关键尽力而为依赖项，没有声明 SLA。如果地图失败，目录和文本视图仍然可用。</p></section>
+      <section><h2>隐私</h2><p>Commonworld 没有帐户、第一方遥测、cookie 或写入 API。地图请求直接发送至 OpenFreeMap；从技术上讲，IP 地址可能会在那里进行处理并出于安全原因临时记录。</p></section>
+      <section><h2>无障碍</h2><p>提供文本视图、键盘路径、简化运动处理和 no-JavaScript 目录。尚未声明全屏阅读器产品适用性或 WCAG 一致性。</p></section>
+      <section><h2>许可证和机器可读边界</h2><p>© 2026 Commonworld contributors. 这<a href="https://github.com/heimgewebe/commonworld" rel="external noreferrer">Commonworld源代码</a>仅在 AGPL-3.0 下不提供保修；这<a href="./LICENSE">完整的许可文本</a>是公开的。 Commonworld 创建的目录数据在 CC0-1.0 下发布。第三方商标、地图数据和源数据保留自己的权利。这<a href="./contracts/commonworld/current-state.contract.json">当前运行状态</a>, <a href="./catalog/catalog.json">目录清单</a>和<a href="./contracts/commonworld/project.schema.json">数据模式</a>是公开可读的。</p></section>
+    </main>
+  </body>
+</html>
