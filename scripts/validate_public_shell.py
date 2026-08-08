@@ -201,7 +201,19 @@ def validate_public_shell(root: Path = ROOT) -> list[str]:
                 f"import('{versioned_specifier}')",
             )
             if not any(expected_import in module_source for expected_import in expected_imports):
-                errors.append(f'public shell module import is not content-bound: {module_path} -> {dependency_path}')
+                observed_import = re.search(
+                    rf"(?:from\s+|import\()'\./{re.escape(dependency_file.name)}(?:\?([^']*))?'",
+                    module_source,
+                )
+                observed_version = None
+                if observed_import:
+                    version_match = re.search(r'(?:^|&)v=([^&]+)', observed_import.group(1) or '')
+                    observed_version = version_match.group(1) if version_match else None
+                observed_token = observed_version or '<missing>'
+                errors.append(
+                    f'public shell module import is not content-bound: {module_path} -> {dependency_path}; '
+                    f'observed token: {observed_token}; expected token: {dependency_version}'
+                )
     if "document.querySelectorAll('.catalog-card[data-commonproject-id]')" in app:
         errors.append('runtime catalog filtering must not mutate the bootstrap recovery surface')
     for token in (

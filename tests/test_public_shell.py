@@ -164,35 +164,43 @@ class PublicShellTests(unittest.TestCase):
         self.assertNotIn(f"from '{specifier}'", source)
 
     def test_public_shell_rejects_stale_transitive_module_import(self) -> None:
-        with tempfile.TemporaryDirectory() as tmp_dir:
-            root = self.copy_shell(tmp_dir)
-            core_path = root / "assets/commonworld-core.mjs"
-            i18n_path = root / "assets/commonworld-i18n.mjs"
-            expected = hashlib.sha256(i18n_path.read_bytes()).hexdigest()[:12]
-            core_path.write_text(
-                core_path.read_text(encoding="utf-8").replace(
-                    f"./commonworld-i18n.mjs?v={expected}",
-                    "./commonworld-i18n.mjs?v=000000000000",
-                    1,
-                ),
-                encoding="utf-8",
-            )
-            core_version = hashlib.sha256(core_path.read_bytes()).hexdigest()[:12]
-            app_path = root / "assets/commonworld-app.js"
-            app_source = app_path.read_text(encoding="utf-8")
-            app_source = re.sub(
-                r"\./commonworld-core\.mjs\?v=[0-9a-f]{12}",
-                f"./commonworld-core.mjs?v={core_version}",
-                app_source,
-                count=1,
-            )
-            app_path.write_text(app_source, encoding="utf-8")
-            self.refresh_app_version(root)
-            errors = validate_public_shell(root)
-        self.assertIn(
-            "public shell module import is not content-bound: assets/commonworld-core.mjs -> assets/commonworld-i18n.mjs",
-            errors,
-        )
+        for replacement, observed in (
+            ("./commonworld-i18n.mjs?v=000000000000", "000000000000"),
+            ("./commonworld-i18n.mjs", "<missing>"),
+        ):
+            with self.subTest(observed=observed), tempfile.TemporaryDirectory() as tmp_dir:
+                root = self.copy_shell(tmp_dir)
+                core_path = root / "assets/commonworld-core.mjs"
+                i18n_path = root / "assets/commonworld-i18n.mjs"
+                expected = hashlib.sha256(i18n_path.read_bytes()).hexdigest()[:12]
+                core_path.write_text(
+                    core_path.read_text(encoding="utf-8").replace(
+                        f"./commonworld-i18n.mjs?v={expected}",
+                        replacement,
+                        1,
+                    ),
+                    encoding="utf-8",
+                )
+                core_version = hashlib.sha256(core_path.read_bytes()).hexdigest()[:12]
+                app_path = root / "assets/commonworld-app.js"
+                app_source = app_path.read_text(encoding="utf-8")
+                app_source = re.sub(
+                    r"\./commonworld-core\.mjs\?v=[0-9a-f]{12}",
+                    f"./commonworld-core.mjs?v={core_version}",
+                    app_source,
+                    count=1,
+                )
+                app_path.write_text(app_source, encoding="utf-8")
+                self.refresh_app_version(root)
+                errors = validate_public_shell(root)
+
+                self.assertIn(
+                    "public shell module import is not content-bound: "
+                    "assets/commonworld-core.mjs -> assets/commonworld-i18n.mjs; "
+                    f"observed token: {observed}; expected token: {expected}",
+                    errors,
+                )
+                self.assertNotIn(tmp_dir, "\n".join(errors))
 
     def test_public_shell_rejects_old_proof_language(self) -> None:
         with tempfile.TemporaryDirectory() as tmp_dir:
