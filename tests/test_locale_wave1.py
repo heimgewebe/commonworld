@@ -306,7 +306,16 @@ class LocaleWave1PackTests(unittest.TestCase):
                                 len(WAVE1_LOCALES),
                             )
             index_markup = (ROOT / entry["surface_files"]["index"]).read_text(encoding="utf-8")
-            self.assertRegex(index_markup, rf'<h2 lang="{re.escape(locale)}" dir="auto">')
+            from scripts.commonworld_i18n import localize_records
+            from scripts.render_public_shell import load_records
+
+            localized_records = localize_records(load_records(ROOT), locale, ROOT)
+            expected_english_titles = sum(record.get("_title_locale") == "en" for record in localized_records)
+            expected_unknown_titles = sum(record.get("_title_locale") is None for record in localized_records)
+            self.assertEqual(index_markup.count('<h2 lang="en" dir="ltr">'), expected_english_titles)
+            self.assertEqual(index_markup.count('<h2 dir="auto">'), expected_unknown_titles)
+            self.assertGreater(expected_english_titles, 0)
+            self.assertGreater(expected_unknown_titles, 0)
 
     def test_surface_decoration_keeps_rtl_after_hypothetical_promotion(self) -> None:
         from scripts import commonworld_i18n as i18n
