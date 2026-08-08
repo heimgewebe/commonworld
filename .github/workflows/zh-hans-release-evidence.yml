@@ -103,6 +103,9 @@ jobs:
                   assert f'/releases/{release_id}/' in markup
           print(f'final evidence stable for all Wave-1 locales on release {release_id}')
           PY
+      - name: Remove one-shot release machinery before canonical validation
+        run: |
+          rm scripts/_tmp_harden_locale_smoke.py scripts/_tmp_smoke_zh_hans_search.mjs scripts/_tmp_finalize_zh_hans_evidence.py scripts/_tmp_refresh_wave1_bundle_evidence.py scripts/_tmp_fix_bundle_review_contract.py .github/workflows/zh-hans-release-evidence.yml
       - name: Refresh release-snapshot lifecycle evidence for the new deterministic release
         run: python scripts/measure_release_snapshot_lifecycle.py
       - name: Run full release validators
@@ -114,9 +117,6 @@ jobs:
         run: |
           node scripts/smoke_locale_candidates_browser.mjs >/tmp/zh-hans-final-lifecycle.json
           npm run smoke:browser
-      - name: Remove one-shot release machinery
-        run: |
-          rm scripts/_tmp_harden_locale_smoke.py scripts/_tmp_smoke_zh_hans_search.mjs scripts/_tmp_finalize_zh_hans_evidence.py scripts/_tmp_refresh_wave1_bundle_evidence.py scripts/_tmp_fix_bundle_review_contract.py .github/workflows/zh-hans-release-evidence.yml
       - name: Commit verified zh-Hans release evidence
         run: |
           git config user.name 'grabowski-operator'
@@ -126,4 +126,4 @@ jobs:
           git commit -m 'feat(i18n): release complete zh-Hans locale'
           git push origin HEAD:feat/zh-hans-complete-v1
 
-# execution trigger: validation dependencies aligned with canonical CI
+# execution trigger: canonical validation runs only after one-shot cleanup
