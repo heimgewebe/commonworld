@@ -27,7 +27,13 @@ replacement = '''    css.write_text(s.replace(old, new, 1), encoding="utf-8")
   const restartCoarseTouchRings = (event) => {
     if (event.matches) return;
     if (!window.matchMedia('(hover: none) and (pointer: coarse)').matches) return;
-    renderSphereRibbons(runtime.records);
+    window.requestAnimationFrame(() => {
+      window.requestAnimationFrame(() => {
+        if (reducedMotion.matches) return;
+        if (!window.matchMedia('(hover: none) and (pointer: coarse)').matches) return;
+        renderSphereRibbons(runtime.records);
+      });
+    });
   };
   if (typeof reducedMotion.addEventListener === 'function') {
     reducedMotion.addEventListener('change', restartCoarseTouchRings);
