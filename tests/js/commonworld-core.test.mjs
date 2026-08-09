@@ -1317,6 +1317,40 @@ test('explicit wrapped bbox focuses an intentional short antimeridian crossing',
   });
 });
 
+test('multiple explicit wrapped bboxes combine without expanding to near-global focus', () => {
+  const collection = publicMapFeatureCollection([{
+    id: 'multi-antimeridian-extent',
+    title: 'Multi antimeridian extent',
+    presence: {
+      geographic: [
+        {
+          id: 'western-crossing-area',
+          mode: 'exact',
+          geometry: {
+            type: 'Polygon',
+            coordinates: [[[170, -10], [-175, -10], [-175, 0], [170, 0], [170, -10]]],
+            bbox: [170, -10, -175, 0],
+          },
+        },
+        {
+          id: 'eastern-crossing-area',
+          mode: 'exact',
+          geometry: {
+            type: 'Polygon',
+            coordinates: [[[175, 0], [-170, 0], [-170, 10], [175, 10], [175, 0]]],
+            bbox: [175, 0, -170, 10],
+          },
+        },
+      ],
+      digital: { available: false },
+    },
+  }]);
+  assert.deepEqual(publicProjectNavigationTarget(collection, 'multi-antimeridian-extent'), {
+    kind: 'bounds',
+    bounds: [[170, -10], [-170, 10]],
+  });
+});
+
 test('explicit unwrapped bbox preserves an intentional extent wider than 180 degrees', () => {
   const collection = publicMapFeatureCollection([{
     id: 'explicit-wide-extent',
@@ -1337,6 +1371,40 @@ test('explicit unwrapped bbox preserves an intentional extent wider than 180 deg
   assert.deepEqual(publicProjectNavigationTarget(collection, 'explicit-wide-extent'), {
     kind: 'bounds',
     bounds: [[-170, -10], [170, 10]],
+  });
+});
+
+test('multiple explicit bounds cannot shrink an intentionally wide declared extent', () => {
+  const collection = publicMapFeatureCollection([{
+    id: 'multi-wide-extent',
+    title: 'Multi wide extent',
+    presence: {
+      geographic: [
+        {
+          id: 'wide-area',
+          mode: 'exact',
+          geometry: {
+            type: 'Polygon',
+            coordinates: [[[-170, -10], [170, -10], [170, 0], [-170, 0], [-170, -10]]],
+            bbox: [-170, -10, 170, 0],
+          },
+        },
+        {
+          id: 'companion-area',
+          mode: 'exact',
+          geometry: {
+            type: 'Polygon',
+            coordinates: [[[160, 0], [175, 0], [175, 10], [160, 10], [160, 0]]],
+            bbox: [160, 0, 175, 10],
+          },
+        },
+      ],
+      digital: { available: false },
+    },
+  }]);
+  assert.deepEqual(publicProjectNavigationTarget(collection, 'multi-wide-extent'), {
+    kind: 'bounds',
+    bounds: [[-170, -10], [175, 10]],
   });
 });
 
