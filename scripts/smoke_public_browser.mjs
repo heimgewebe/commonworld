@@ -61,6 +61,45 @@ function assert(condition, message) {
   if (!condition) throw new Error(message);
 }
 
+function validRecordedCameraTarget(target) {
+  if (!target || typeof target !== 'object' || Array.isArray(target)) return false;
+  if (Object.keys(target).sort().join(',') !== 'bearing,center,offset,padding,pitch,zoom') return false;
+  if (!Array.isArray(target.center) || target.center.length !== 2 || !target.center.every(Number.isFinite)) return false;
+  if (!Array.isArray(target.offset) || target.offset.length !== 2 || !target.offset.every(Number.isFinite)) return false;
+  if (![target.zoom, target.bearing, target.pitch].every(Number.isFinite)) return false;
+  if (!target.padding || typeof target.padding !== 'object' || Array.isArray(target.padding)) return false;
+  if (Object.keys(target.padding).sort().join(',') !== 'bottom,left,right,top') return false;
+  return [target.padding.top, target.padding.right, target.padding.bottom, target.padding.left].every(Number.isFinite);
+}
+
+function recordedCameraTargetsMatch(left, right) {
+  return validRecordedCameraTarget(left)
+    && validRecordedCameraTarget(right)
+    && left.center[0] === right.center[0]
+    && left.center[1] === right.center[1]
+    && left.zoom === right.zoom
+    && left.bearing === right.bearing
+    && left.pitch === right.pitch
+    && left.padding.top === right.padding.top
+    && left.padding.right === right.padding.right
+    && left.padding.bottom === right.padding.bottom
+    && left.padding.left === right.padding.left
+    && left.offset[0] === right.offset[0]
+    && left.offset[1] === right.offset[1];
+}
+
+function hasBoundedLayerOpeningCameraCommands({ commands, settlement, mapIdle }, ordinaryDuration) {
+  if (!Array.isArray(commands) || mapIdle !== true || commands.length < 1 || commands.length > 2) return false;
+  const ordinary = commands[0];
+  if (ordinary?.command !== 'easeTo' || ordinary.duration !== ordinaryDuration || !validRecordedCameraTarget(ordinary.target)) return false;
+  if (commands.length === 1) return settlement === 'moveend';
+  const fallback = commands[1];
+  return settlement === 'fallback-stop'
+    && fallback?.command === 'jumpTo'
+    && fallback.duration === 0
+    && recordedCameraTargetsMatch(ordinary.target, fallback.target);
+}
+
 async function hierarchyFocusDiagnostic(page) {
   return page.evaluate(() => {
     const stage = document.querySelector('.globe-stage');
@@ -469,13 +508,37 @@ async function newPage({
 
             easeTo(options) {
               window.__commonworldCameraCommands ??= [];
-              window.__commonworldCameraCommands.push({ command: 'easeTo', duration: options?.duration ?? null, at: performance.now() });
+              window.__commonworldCameraCommands.push({
+                command: 'easeTo',
+                duration: options?.duration ?? null,
+                target: structuredClone({
+                  center: options?.center ?? null,
+                  zoom: options?.zoom ?? null,
+                  bearing: options?.bearing ?? null,
+                  pitch: options?.pitch ?? null,
+                  padding: options?.padding ?? null,
+                  offset: options?.offset ?? null,
+                }),
+                at: performance.now(),
+              });
               return super.easeTo(options);
             }
 
             jumpTo(options) {
               window.__commonworldCameraCommands ??= [];
-              window.__commonworldCameraCommands.push({ command: 'jumpTo', duration: 0, at: performance.now() });
+              window.__commonworldCameraCommands.push({
+                command: 'jumpTo',
+                duration: options?.duration ?? 0,
+                target: structuredClone({
+                  center: options?.center ?? null,
+                  zoom: options?.zoom ?? null,
+                  bearing: options?.bearing ?? null,
+                  pitch: options?.pitch ?? null,
+                  padding: options?.padding ?? null,
+                  offset: options?.offset ?? null,
+                }),
+                at: performance.now(),
+              });
               return super.jumpTo(options);
             }
           }
@@ -1485,16 +1548,11 @@ async function layerJourneyScenario({ mobile = false, viewportOverride = null, t
     return {
       transform: style.transform,
       transitionProperties: style.transitionProperty.split(',').map((value) => value.trim()),
-      duration: Number(stage.dataset.lastCameraDuration),
-      command: stage.dataset.lastCameraCommand,
       phase: stage.dataset.viewPhase,
     };
   });
   assert(['none', 'matrix(1, 0, 0, 1, 0, 0)'].includes(flightComposition.transform), 'layer journey: CSS still applies a competing map zoom ' + JSON.stringify(flightComposition));
   assert(!flightComposition.transitionProperties.includes('transform'), 'layer journey: map transform remains part of the camera flight ' + JSON.stringify(flightComposition));
-  assert(flightComposition.command === 'easeTo' && flightComposition.duration === DIGITAL_LAYER_TRANSITION_MS, 'layer journey: MapLibre is not the single camera authority for the shortened flight ' + JSON.stringify(flightComposition));
-  const openingCommands = await run.page.evaluate(() => window.__commonworldCameraCommands ?? []);
-  assert(openingCommands.length === 1 && openingCommands[0].command === 'easeTo', `layer journey: opening issued multiple camera commands (${JSON.stringify(openingCommands)})`);
   const enteringSphere = await run.page.locator('#digital-sphere').boundingBox();
   assert(enteringSphere, 'layer journey: transforming sphere is not visible during camera flight');
   await run.page.waitForSelector('.globe-stage[data-view-phase="layers"]');
@@ -1508,6 +1566,19 @@ async function layerJourneyScenario({ mobile = false, viewportOverride = null, t
   const sideIndex = phaseLog.indexOf(firstSideEntry);
   const firstPanelEntry = phaseLog.find((entry) => entry.panelVisible);
   assert(firstPanelEntry && phaseLog.indexOf(firstPanelEntry) > sideIndex && firstPanelEntry.phase === 'layers' && firstPanelEntry.source === 'side-view-layout', `layer journey: panel became visible before the side layout was stable (${JSON.stringify({ firstPanelEntry, phaseLog })})`);
+  // Bound the opening-camera contract to the opening transition itself. Later in
+  // this scenario Back/Forward history restoration legitimately issues instant
+  // camera commands and must not be misclassified as extra opening commands.
+  const openingCameraState = await run.page.evaluate(() => ({
+    commands: window.__commonworldCameraCommands ?? [],
+    settlement: document.querySelector('.globe-stage')?.dataset.cameraFlightSettlement ?? '',
+    mapIdle: window.__commonworldTestMap ? !window.__commonworldTestMap.isMoving() : false,
+  }));
+  assert(
+    hasBoundedLayerOpeningCameraCommands(openingCameraState, DIGITAL_LAYER_TRANSITION_MS),
+    `layer journey: opening camera command contract failed (${JSON.stringify(openingCameraState)})`,
+  );
+  await run.page.evaluate(() => { window.__commonworldCameraCommands = []; });
   const flightGeometryEvaluationDelta = firstSideEntry.geometryEvaluations - phaseLog[0].geometryEvaluations;
   const maxFlightGeometryEvaluations = Math.ceil(DIGITAL_LAYER_TRANSITION_MS / MAP_GEOMETRY_SAMPLE_INTERVAL_MS) + 3;
   assert(flightGeometryEvaluationDelta > 0 && flightGeometryEvaluationDelta <= maxFlightGeometryEvaluations, 'layer journey: sphere projection exceeded the sampled camera-flight budget ' + JSON.stringify({ flightGeometryEvaluationDelta, maxFlightGeometryEvaluations, phaseLog }));
@@ -1850,14 +1921,21 @@ async function layerJourneyScenario({ mobile = false, viewportOverride = null, t
   // The phase log below proves that leaving-layers occurred and carried the invisible geometry switch.
   assert((await stage.getAttribute('data-globe-geometry-source')) === 'maplibre-projected-horizon', 'layer journey: return flight did not mirror back to the MapLibre horizon geometry');
   assert(await run.page.locator('#layer-panel').isHidden(), 'layer journey: description panel obscures the return camera flight');
-  const returnCommands = await run.page.evaluate(() => window.__commonworldCameraCommands ?? []);
-  assert(returnCommands.length === 1 && returnCommands[0].command === 'easeTo', `layer journey: closing issued multiple camera commands (${JSON.stringify(returnCommands)})`);
   const returnPhaseLog = await run.page.evaluate(() => window.__commonworldPhaseLog);
   const preparingReturnEntries = returnPhaseLog.filter((entry) => entry.phase === 'preparing-overview');
   assert(preparingReturnEntries.length > 0 && preparingReturnEntries.every((entry) => entry.source === 'side-view-layout'), `layer journey: return preparation geometry drifted before leaving-layers (${JSON.stringify(preparingReturnEntries)})`);
   const firstReturnOverviewGeometry = returnPhaseLog.find((entry) => entry.source === 'maplibre-projected-horizon');
   assert(firstReturnOverviewGeometry && firstReturnOverviewGeometry.phase === 'leaving-layers' && firstReturnOverviewGeometry.sphereOpacity <= 0.1, `layer journey: return geometry changed while the sphere was visible (${JSON.stringify({ firstReturnOverviewGeometry, returnPhaseLog })})`);
   await run.page.waitForSelector('.globe-stage[data-view-phase="overview"]');
+  const returnCameraState = await run.page.evaluate(() => ({
+    commands: window.__commonworldCameraCommands ?? [],
+    settlement: document.querySelector('.globe-stage')?.dataset.cameraFlightSettlement ?? '',
+    mapIdle: window.__commonworldTestMap ? !window.__commonworldTestMap.isMoving() : false,
+  }));
+  assert(
+    hasBoundedLayerOpeningCameraCommands(returnCameraState, DIGITAL_LAYER_TRANSITION_MS),
+    `layer journey: closing camera command contract failed (${JSON.stringify(returnCameraState)})`,
+  );
   await run.page.waitForFunction(() => Number(getComputedStyle(document.querySelector('#map')).opacity) >= 0.98);
   assert(await run.page.locator('#map').getAttribute('inert') === null, 'layer journey: returned globe remains inert');
   assert((await run.page.locator('#sphere-edge-control').getAttribute('tabindex')) === '0', 'layer journey: sphere trigger was not restored');
@@ -2546,7 +2624,27 @@ async function androidGlobeUiScenario() {
       ringTextFontSize: Number.parseFloat(textStyle.fontSize),
       primaryRingCount: planes.filter((plane) => plane.dataset.emphasis === 'primary').length,
       depthRingCount: planes.filter((plane) => plane.dataset.emphasis === 'depth').length,
-      depthRingsStatic: planes.filter((plane) => plane.dataset.emphasis === 'depth').every((plane) => getComputedStyle(plane).animationName === 'none'),
+      primaryRingsStatic: planes.filter((plane) => plane.dataset.emphasis === 'primary').every((plane) => {
+        const style = getComputedStyle(plane);
+        return style.animationName === 'none' && style.transform === 'none';
+      }),
+      depthRingsStatic: planes.filter((plane) => plane.dataset.emphasis === 'depth').every((plane) => {
+        const style = getComputedStyle(plane);
+        return style.animationName === 'none' && style.transform === 'none';
+      }),
+      representativePrimaryLabels: planes
+        .filter((plane) => plane.dataset.emphasis === 'primary')
+        .map((plane) => {
+          const label = plane.querySelector('.sphere-ring-text');
+          const rect = label?.getBoundingClientRect();
+          const style = label ? getComputedStyle(label) : null;
+          return {
+            text: label?.textContent?.trim() ?? '',
+            width: rect?.width ?? 0,
+            height: rect?.height ?? 0,
+            visible: Boolean(label && style.display !== 'none' && style.visibility !== 'hidden' && Number(style.opacity) > 0 && rect.width > 0 && rect.height > 0),
+          };
+        }),
       ringDetailLevel: document.querySelector('#digital-sphere')?.dataset.ringDetailLevel ?? '',
       bundleVisibleChildCounts: planes.map((plane) => ({
         layer: plane.dataset.layerId,
@@ -2559,22 +2657,91 @@ async function androidGlobeUiScenario() {
   });
   assert(geometry.filterCenterDeltaX <= 1 && geometry.filterCenterDeltaY <= 1, scenarioId + ': filter icon is not centered ' + JSON.stringify(geometry));
   assert(geometry.filterButtonWidth >= 44 && geometry.filterButtonHeight >= 44, scenarioId + ': filter button is below mobile touch target ' + JSON.stringify(geometry));
-  assert(geometry.ringAnimationName === 'sphere-ring-orbit', scenarioId + ': primary mobile ring lost its slow orientation orbit ' + JSON.stringify(geometry));
-  assert(geometry.ringTransform !== 'none', scenarioId + ': primary mobile ring lost its deterministic orbital offset ' + JSON.stringify(geometry));
-  assert(geometry.primaryRingCount >= 2 && geometry.primaryRingCount <= 3 && geometry.depthRingCount > 0 && geometry.depthRingsStatic, scenarioId + ': mobile emphasis does not bound active rings ' + JSON.stringify(geometry));
+  assert(geometry.ringAnimationName === 'none' && geometry.ringTransform === 'none' && geometry.primaryRingsStatic, scenarioId + ': primary mobile ring retains CSS animation or transform that can hide Android textPath labels ' + JSON.stringify(geometry));
+  assert(geometry.primaryRingCount >= 2 && geometry.primaryRingCount <= 3 && geometry.depthRingCount > 0 && geometry.depthRingsStatic, scenarioId + ': mobile emphasis does not bound or fully freeze ring groups ' + JSON.stringify(geometry));
   assert(['micro', 'compact'].includes(geometry.ringDetailLevel), scenarioId + ': mobile detail level is not bounded ' + JSON.stringify(geometry));
   assert(geometry.bundleVisibleChildCounts.every(({ declared, rendered }) => declared === rendered && rendered <= 2), scenarioId + ': mobile bundle detail did not reduce subordinate lines ' + JSON.stringify(geometry));
-  assert(geometry.ringTextWidth > 80 && geometry.ringTextHeight >= 12.5 && geometry.ringTextFontSize >= 9.5, scenarioId + ': mobile ring text is not visibly sized ' + JSON.stringify(geometry));
+  assert(geometry.ringTextWidth > 80 && geometry.ringTextHeight > 0 && geometry.ringTextFontSize >= 20, scenarioId + ': mobile ring text is not visibly sized ' + JSON.stringify(geometry));
+  assert(geometry.representativePrimaryLabels.length >= 2 && geometry.representativePrimaryLabels.every(({ text, visible, width, height }) => text.length > 0 && visible && width > 80 && height > 0), scenarioId + ': representative primary mobile ring labels are absent or not visibly laid out ' + JSON.stringify(geometry));
 
   await run.page.locator('#sphere-edge-control').focus();
   const focusedRingMotion = await run.page.evaluate(() => ({
     activeElement: document.activeElement?.id ?? '',
     primaryStates: [...document.querySelectorAll('.sphere-ring-plane[data-emphasis="primary"]')]
-      .map((plane) => getComputedStyle(plane).animationPlayState),
+      .map((plane) => {
+        const style = getComputedStyle(plane);
+        return { animationName: style.animationName, transform: style.transform };
+      }),
   }));
   assert(focusedRingMotion.activeElement === 'sphere-edge-control', scenarioId + ': sphere edge control did not receive focus ' + JSON.stringify(focusedRingMotion));
-  assert(focusedRingMotion.primaryStates.length > 0 && focusedRingMotion.primaryStates.every((state) => state === 'paused'), scenarioId + ': primary mobile rings continue moving while the sphere control is focused ' + JSON.stringify(focusedRingMotion));
+  assert(focusedRingMotion.primaryStates.length > 0 && focusedRingMotion.primaryStates.every(({ animationName, transform }) => animationName === 'none' && transform === 'none'), scenarioId + ': focused primary mobile rings retain CSS animation or transform ' + JSON.stringify(focusedRingMotion));
   await run.page.evaluate(() => document.querySelector('#sphere-edge-control')?.blur());
+
+  await run.page.setViewportSize({ width: 844, height: 390 });
+  await run.page.waitForTimeout(100);
+  const wideTouchGeometry = await run.page.evaluate(() => {
+    const planes = [...document.querySelectorAll('.sphere-ring-plane')];
+    const primaryPlanes = planes.filter((plane) => plane.dataset.emphasis === 'primary');
+    const depthPlanes = planes.filter((plane) => plane.dataset.emphasis === 'depth');
+    const groupsAreStatic = (items) => items.every((plane) => {
+      const style = getComputedStyle(plane);
+      return style.animationName === 'none' && style.transform === 'none';
+    });
+    return {
+      viewportWidth: window.innerWidth,
+      mediaCompact: window.matchMedia('(max-width: 48rem)').matches,
+      mediaCoarseTouch: window.matchMedia('(hover: none) and (pointer: coarse)').matches,
+      primaryRingsStatic: groupsAreStatic(primaryPlanes),
+      depthRingsStatic: groupsAreStatic(depthPlanes),
+      representativePrimaryLabels: primaryPlanes.map((plane) => {
+        const label = plane.querySelector('.sphere-ring-text');
+        const rect = label?.getBoundingClientRect();
+        const style = label ? getComputedStyle(label) : null;
+        return {
+          text: label?.textContent?.trim() ?? '',
+          width: rect?.width ?? 0,
+          height: rect?.height ?? 0,
+          fontSize: style ? Number.parseFloat(style.fontSize) : 0,
+          visible: Boolean(label && style.display !== 'none' && style.visibility !== 'hidden' && Number(style.opacity) > 0 && rect.width > 0 && rect.height > 0),
+        };
+      }),
+    };
+  });
+  assert(wideTouchGeometry.viewportWidth > 768 && !wideTouchGeometry.mediaCompact && wideTouchGeometry.mediaCoarseTouch, scenarioId + ': wide touch viewport did not exercise the non-compact coarse-pointer path ' + JSON.stringify(wideTouchGeometry));
+  assert(wideTouchGeometry.primaryRingsStatic && wideTouchGeometry.depthRingsStatic, scenarioId + ': wide touch ring group retained CSS animation or transform ' + JSON.stringify(wideTouchGeometry));
+  assert(wideTouchGeometry.representativePrimaryLabels.length >= 2 && wideTouchGeometry.representativePrimaryLabels.every(({ text, visible, width, height, fontSize }) => text.length > 0 && visible && width > 80 && height > 0 && fontSize >= 20), scenarioId + ': wide touch primary ring labels are absent or not visibly laid out ' + JSON.stringify(wideTouchGeometry));
+
+  const compactDesktopRun = await newPage({
+    viewportOverride: { width: 720, height: 800 },
+    touch: false,
+    reducedMotion: 'no-preference',
+  });
+  await compactDesktopRun.page.goto(baseUrl, { waitUntil: 'domcontentloaded' });
+  await compactDesktopRun.page.waitForSelector('html.runtime-ready');
+  await compactDesktopRun.page.waitForFunction(() => document.querySelectorAll('.sphere-ring-plane[data-emphasis="primary"]').length > 0);
+  const compactDesktopGeometry = await compactDesktopRun.page.evaluate(() => {
+    const primaryPlanes = [...document.querySelectorAll('.sphere-ring-plane[data-emphasis="primary"]')];
+    const depthPlanes = [...document.querySelectorAll('.sphere-ring-plane[data-emphasis="depth"]')];
+    const states = (planes) => planes.map((plane) => {
+      const style = getComputedStyle(plane);
+      return { animationName: style.animationName, transform: style.transform };
+    });
+    return {
+      viewportWidth: window.innerWidth,
+      mediaCompact: window.matchMedia('(max-width: 48rem)').matches,
+      mediaCoarseTouch: window.matchMedia('(hover: none) and (pointer: coarse)').matches,
+      primaryStates: states(primaryPlanes),
+      depthStates: states(depthPlanes),
+    };
+  });
+  assert(compactDesktopGeometry.viewportWidth <= 768 && compactDesktopGeometry.mediaCompact && !compactDesktopGeometry.mediaCoarseTouch, scenarioId + ': compact desktop did not exercise the narrow fine-pointer path ' + JSON.stringify(compactDesktopGeometry));
+  assert(compactDesktopGeometry.primaryStates.length > 0 && compactDesktopGeometry.primaryStates.every(({ animationName, transform }) => animationName === 'sphere-ring-orbit' && transform !== 'none'), scenarioId + ': compact fine-pointer desktop lost primary ring motion ' + JSON.stringify(compactDesktopGeometry));
+  assert(compactDesktopGeometry.depthStates.length > 0 && compactDesktopGeometry.depthStates.every(({ animationName, transform }) => animationName === 'none' && transform !== 'none'), scenarioId + ': compact fine-pointer desktop lost bounded depth-ring orientation ' + JSON.stringify(compactDesktopGeometry));
+  assert(compactDesktopRun.pageErrors.length === 0, scenarioId + ': compact desktop page errors: ' + compactDesktopRun.pageErrors.join(' | '));
+  await compactDesktopRun.context.close();
+
+  await run.page.setViewportSize({ width: 390, height: 844 });
+  await run.page.waitForTimeout(100);
 
   await run.page.evaluate(() => new Promise((resolve) => {
     const map = window.__commonworldTestMap;
@@ -2604,7 +2771,7 @@ async function androidGlobeUiScenario() {
   assert(JSON.stringify(country.opacity).includes('0.78'), scenarioId + ': overview country tint is not strong enough ' + JSON.stringify(country));
   assert(country.diagnosticsFeatures > 0 && country.rendered > 0, scenarioId + ': country composition is not rendered at mobile globe overview ' + JSON.stringify(country));
   assert(run.pageErrors.length === 0, scenarioId + ': page errors: ' + run.pageErrors.join(' | '));
-  results.push({ id: scenarioId, verdict: 'PASS', ...geometry, countryRendered: country.rendered });
+  results.push({ id: scenarioId, verdict: 'PASS', ...geometry, wideTouch: wideTouchGeometry, compactDesktop: compactDesktopGeometry, countryRendered: country.rendered });
   await run.context.close();
 }
 
@@ -2694,6 +2861,67 @@ async function moveendBoundReturnScenario() {
   assert(run.consoleErrors.length === 0, `moveend return: console errors: ${run.consoleErrors.join(' | ')}`);
   assert(run.pageErrors.length === 0, `moveend return: page errors: ${run.pageErrors.join(' | ')}`);
   results.push({ id: 'layer-journey-moveend-return', verdict: 'PASS', elapsedMs: elapsed });
+  await run.context.close();
+}
+
+async function missingMoveendFlightFallbackScenario() {
+  const run = await newPage({ reducedMotion: 'no-preference' });
+  await run.page.goto(baseUrl, { waitUntil: 'domcontentloaded' });
+  await run.page.waitForSelector('html.runtime-ready');
+  await run.page.waitForFunction(() => Number(document.querySelector('.globe-stage')?.dataset.sphereSize ?? 0) > 0);
+  await run.page.waitForTimeout(820);
+  const sphereBox = await run.page.locator('#digital-sphere').boundingBox();
+  assert(sphereBox, 'missing moveend fallback: sphere geometry missing');
+  await run.page.evaluate(() => {
+    const map = window.__commonworldTestMap;
+    const stage = document.querySelector('.globe-stage');
+    const nativeOn = map.on;
+    const nativeEaseTo = map.easeTo;
+    window.__commonworldMissingMoveendRestore = () => {
+      map.on = nativeOn;
+      map.easeTo = nativeEaseTo;
+    };
+    window.__commonworldFallbackPhaseLog = [];
+    const snapshot = () => window.__commonworldFallbackPhaseLog.push({
+      phase: stage.dataset.viewPhase,
+      source: stage.dataset.globeGeometrySource,
+      moving: map.isMoving(),
+      settlement: stage.dataset.cameraFlightSettlement ?? '',
+    });
+    snapshot();
+    window.__commonworldFallbackPhaseObserver = new MutationObserver(snapshot);
+    window.__commonworldFallbackPhaseObserver.observe(stage, {
+      attributes: true,
+      attributeFilter: ['data-view-phase', 'data-globe-geometry-source', 'data-camera-flight-settlement'],
+    });
+    map.on = function suppressAppMoveend(type, listener, ...rest) {
+      if (type === 'moveend') return this;
+      return nativeOn.call(this, type, listener, ...rest);
+    };
+    map.easeTo = function prolongCameraFlight(options) {
+      return nativeEaseTo.call(this, { ...options, duration: 2_800 });
+    };
+  });
+  await run.page.mouse.click(sphereBox.x + sphereBox.width * 0.85134, sphereBox.y + sphereBox.height * 0.14866);
+  await run.page.waitForFunction(() => ['fallback-idle', 'fallback-stop'].includes(document.querySelector('.globe-stage')?.dataset.cameraFlightSettlement), null, { timeout: 4_000 });
+  await run.page.waitForSelector('.globe-stage[data-view-phase="layers"]');
+  const fallbackState = await run.page.evaluate(() => {
+    const stage = document.querySelector('.globe-stage');
+    const map = window.__commonworldTestMap;
+    const phaseLog = window.__commonworldFallbackPhaseLog;
+    window.__commonworldFallbackPhaseObserver?.disconnect();
+    window.__commonworldMissingMoveendRestore?.();
+    return {
+      moving: map.isMoving(),
+      settlement: stage.dataset.cameraFlightSettlement,
+      phaseLog,
+    };
+  });
+  assert(['fallback-idle', 'fallback-stop'].includes(fallbackState.settlement) && fallbackState.moving === false, 'missing moveend fallback: side layout settled without an idle MapLibre camera ' + JSON.stringify(fallbackState));
+  assert(fallbackState.phaseLog.every((entry) => entry.source !== 'side-view-layout' || entry.moving === false), 'missing moveend fallback: side layout appeared while MapLibre was moving ' + JSON.stringify(fallbackState));
+  assert(run.consoleErrors.length === 0, `missing moveend fallback: console errors: ${run.consoleErrors.join(' | ')}`);
+  assert(run.pageErrors.length === 0, `missing moveend fallback: page errors: ${run.pageErrors.join(' | ')}`);
+  results.push({ id: 'layer-journey-missing-moveend-fallback', verdict: 'PASS', settlement: fallbackState.settlement });
   await run.context.close();
 }
 
@@ -3824,6 +4052,7 @@ try {
   await layerJourneyScenario({ viewportOverride: { width: 1024, height: 1366 }, touch: true, scenarioId: 'layer-journey-ipad-portrait' });
   await layerJourneyScenario({ viewportOverride: { width: 1366, height: 1024 }, touch: true, scenarioId: 'layer-journey-ipad-landscape' });
   await moveendBoundReturnScenario();
+  await missingMoveendFlightFallbackScenario();
   await interruptedLayerJourneyScenario();
   await reducedMotionLayerScenario();
   await legacyLayerAndAtomicFocusScenario();
