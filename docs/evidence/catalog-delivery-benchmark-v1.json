@@ -748,8 +748,13 @@
       "note": "Fresh deterministic static measurement for the combined antimeridian review fix."
     },
     "full_validation": {
-      "verdict": "PENDING",
-      "note": "Current-tree full validation will be recorded only after make validate completes on the refreshed combined-antimeridian evidence."
+      "verdict": "PASS",
+      "validated_head": "2cb19e161cba36b574c5397592c32e0839d1ec20",
+      "durable_task_id": "9a5bb8267d054888aa598979",
+      "release_id": "30d0cd0c076f0b7ce43c",
+      "js_tests": "183/183",
+      "python_tests": "721/721",
+      "note": "Full repository make validate plus the fresh smoke-bound catalog delivery validator passed on this exact product-and-evidence tree. The following metadata/lifecycle-only closeout commit is revalidated separately without changing the first-party runtime surface."
     },
     "locale_candidate_browser_smoke": {
       "verdict": "PASS",
