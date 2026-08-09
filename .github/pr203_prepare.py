@@ -4,98 +4,81 @@ from pathlib import Path
 path = Path('.github/pr203_repair.py')
 source = path.read_text(encoding='utf-8')
 
-# Let Commonworld's existing global reduced-motion rule collapse the CSS orbit to one
-# effectively instantaneous iteration. Do not mutate the keyframe effect or custom
-# direction while reduced motion is active.
+# The existing global reduced-motion policy already collapses all animations to one
+# effectively instantaneous iteration. Do not add a competing coarse-touch animation
+# mechanism; verify Reduced Motion on a fresh context instead of mutating it live.
 old_reduced = "    --ring-orbit-direction: 0;\n"
 if old_reduced not in source:
     raise SystemExit('reduced-motion orbit insertion point missing')
-source = source.replace(old_reduced, "    /* global reduced-motion reset makes the orbit static */\n", 1)
+source = source.replace(old_reduced, "    /* reduced motion is governed by the global animation reset */\n", 1)
 
-state_anchor = """      labelAnimationName: labelStyle?.animationName ?? 'none',
-      labelAnimationPlayState: labelStyle?.animationPlayState ?? 'running',
-      labelOrbitDirection: labelStyle?.getPropertyValue('--ring-orbit-direction').trim() ?? '',
-      ringAnimationName: ringStyle?.animationName ?? 'none',
-      ringAnimationPlayState: ringStyle?.animationPlayState ?? 'running',
-      ringOrbitDirection: ringStyle?.getPropertyValue('--ring-orbit-direction').trim() ?? '',
-"""
-state_replacement = """      labelAnimationName: labelStyle?.animationName ?? 'none',
-      labelAnimationPlayState: labelStyle?.animationPlayState ?? 'running',
+live_start = "  await run.page.emulateMedia({ reducedMotion: 'reduce' });\n"
+compact_start = "  const compactDesktopRun = await newPage({\n"
+start = source.index(live_start)
+end = source.index(compact_start, start)
+fresh_reduced = '''  const reducedTouchRun = await newPage({
+    mobile: true,
+    touch: true,
+    viewportOverride: { width: 844, height: 390 },
+    reducedMotion: 'reduce',
+  });
+  await reducedTouchRun.page.goto(baseUrl, { waitUntil: 'domcontentloaded' });
+  await reducedTouchRun.page.waitForSelector('html.runtime-ready');
+  await reducedTouchRun.page.waitForFunction(() => document.querySelectorAll('.sphere-ring-plane .sphere-ring-text').length > 0);
+  const reducedTouchState = () => reducedTouchRun.page.evaluate(() => [...document.querySelectorAll('.sphere-ring-plane')].map((plane) => {
+    const label = plane.querySelector('.sphere-ring-text');
+    const ring = plane.querySelector('use');
+    const labelStyle = label ? getComputedStyle(label) : null;
+    const ringStyle = ring ? getComputedStyle(ring) : null;
+    const labelRect = label?.getBoundingClientRect();
+    const ringRect = ring?.getBoundingClientRect();
+    return {
+      coarse: window.matchMedia('(hover: none) and (pointer: coarse)').matches,
+      reduced: window.matchMedia('(prefers-reduced-motion: reduce)').matches,
+      labelAnimationName: labelStyle?.animationName ?? 'none',
       labelAnimationDuration: labelStyle?.animationDuration ?? '',
       labelAnimationIterations: labelStyle?.animationIterationCount ?? '',
-      labelOrbitDirection: labelStyle?.getPropertyValue('--ring-orbit-direction').trim() ?? '',
-      labelAnimations: label ? label.getAnimations().map((animation) => ({ name: animation.animationName ?? animation.constructor.name, currentTime: animation.currentTime, playState: animation.playState, pending: animation.pending, playbackRate: animation.playbackRate })) : [],
       ringAnimationName: ringStyle?.animationName ?? 'none',
-      ringAnimationPlayState: ringStyle?.animationPlayState ?? 'running',
       ringAnimationDuration: ringStyle?.animationDuration ?? '',
       ringAnimationIterations: ringStyle?.animationIterationCount ?? '',
-      ringOrbitDirection: ringStyle?.getPropertyValue('--ring-orbit-direction').trim() ?? '',
-      ringAnimations: ring ? ring.getAnimations().map((animation) => ({ name: animation.animationName ?? animation.constructor.name, currentTime: animation.currentTime, playState: animation.playState, pending: animation.pending, playbackRate: animation.playbackRate })) : [],
-      recoveryEvent: document.querySelector('.globe-stage')?.dataset.touchOrbitRecoveryEvent ?? '',
-      recoveryRestarted: document.querySelector('.globe-stage')?.dataset.touchOrbitRecoveryRestarted ?? '',
-"""
-if state_anchor not in source:
-    raise SystemExit('touch ring state instrumentation point missing')
-source = source.replace(state_anchor, state_replacement, 1)
+      labelBox: labelRect ? [labelRect.x, labelRect.y, labelRect.width, labelRect.height] : null,
+      ringBox: ringRect ? [ringRect.x, ringRect.y, ringRect.width, ringRect.height] : null,
+    };
+  }));
+  const reducedTouchBefore = await reducedTouchState();
+  await reducedTouchRun.page.waitForTimeout(350);
+  const reducedTouchAfter = await reducedTouchState();
+  const visibleBoxesMoved = (before, after, key, threshold = 1e-3) => after.filter((entry, index) => {
+    const previous = before[index];
+    if (!entry[key] || !previous?.[key]) return false;
+    return entry[key].some((value, boxIndex) => Math.abs(value - previous[key][boxIndex]) > threshold);
+  });
+  assert(reducedTouchAfter.length >= 2 && reducedTouchAfter.every(({ coarse, reduced }) => coarse && reduced), scenarioId + ': reduced-motion touch context did not exercise the intended media path ' + JSON.stringify(reducedTouchAfter));
+  assert(reducedTouchAfter.filter(({ labelAnimationDuration, labelAnimationIterations, ringAnimationDuration, ringAnimationIterations }) => Number.parseFloat(labelAnimationDuration) <= 0.001 && labelAnimationIterations === '1' && Number.parseFloat(ringAnimationDuration) <= 0.001 && ringAnimationIterations === '1').length >= 2, scenarioId + ': reduced-motion touch context did not inherit the global static animation policy ' + JSON.stringify(reducedTouchAfter));
+  assert(visibleBoxesMoved(reducedTouchBefore, reducedTouchAfter, 'labelBox').length === 0, scenarioId + ': reduced-motion touch labels moved ' + JSON.stringify({ before: reducedTouchBefore, after: reducedTouchAfter }));
+  assert(visibleBoxesMoved(reducedTouchBefore, reducedTouchAfter, 'ringBox').length === 0, scenarioId + ': reduced-motion touch ring strokes moved ' + JSON.stringify({ before: reducedTouchBefore, after: reducedTouchAfter }));
+  await reducedTouchRun.context.close();
 
-old_assert = """  assert(reducedTouchAfter.filter(({ labelAnimationName, labelOrbitDirection, ringAnimationName, ringOrbitDirection }) => labelAnimationName === 'sphere-ring-orbit' && labelOrbitDirection === '0' && ringAnimationName === 'sphere-ring-orbit' && ringOrbitDirection === '0').length >= 2, scenarioId + ': live reduced-motion change did not zero wide touch ring motion ' + JSON.stringify(reducedTouchAfter));"""
-new_assert = """  assert(reducedTouchAfter.filter(({ labelAnimationName, labelAnimationDuration, labelAnimationIterations, ringAnimationName, ringAnimationDuration, ringAnimationIterations }) => labelAnimationName === 'sphere-ring-orbit' && Number.parseFloat(labelAnimationDuration) <= 0.001 && labelAnimationIterations === '1' && ringAnimationName === 'sphere-ring-orbit' && Number.parseFloat(ringAnimationDuration) <= 0.001 && ringAnimationIterations === '1').length >= 2, scenarioId + ': live reduced-motion change did not apply the global static orbit policy ' + JSON.stringify(reducedTouchAfter));"""
-if old_assert not in source:
-    raise SystemExit('reduced-motion smoke assertion missing')
-source = source.replace(old_assert, new_assert, 1)
-
-anchor = '''    css.write_text(s.replace(old, new, 1), encoding="utf-8")
-
-    smoke = ROOT / "scripts/smoke_public_browser.mjs"
 '''
-replacement = '''    css.write_text(s.replace(old, new, 1), encoding="utf-8")
+source = source[:start] + fresh_reduced + source[end:]
 
-    app = ROOT / "assets/commonworld-app.js"
-    app_source = app.read_text(encoding="utf-8")
-    boot_marker = "async function boot() {\\n"
-    recovery = """function installReducedMotionRingRecovery() {
-  const restartCoarseTouchOrbits = (event) => {
-    elements.stage.dataset.touchOrbitRecoveryEvent = event.matches ? 'reduce' : 'resume';
-    if (event.matches) return;
-    if (!window.matchMedia('(hover: none) and (pointer: coarse)').matches) return;
-    window.requestAnimationFrame(() => {
-      window.requestAnimationFrame(() => {
-        if (reducedMotion.matches) return;
-        const orbitNodes = [...elements.sphereRings.querySelectorAll('.sphere-ring-plane > use, .sphere-ring-plane > .sphere-ring-text')];
-        let restarted = 0;
-        orbitNodes.forEach((node) => {
-          node.getAnimations().forEach((animation) => {
-            if (animation.animationName !== 'sphere-ring-orbit') return;
-            animation.cancel();
-            animation.play();
-            restarted += 1;
-          });
-        });
-        elements.stage.dataset.touchOrbitRecoveryRestarted = String(restarted);
-      });
-    });
-  };
-  if (typeof reducedMotion.addEventListener === 'function') {
-    reducedMotion.addEventListener('change', restartCoarseTouchOrbits);
-  } else {
-    reducedMotion.addListener?.(restartCoarseTouchOrbits);
-  }
-}
-
-"""
-    if boot_marker not in app_source:
-        raise RuntimeError("boot marker for reduced-motion ring recovery not found")
-    app_source = app_source.replace(boot_marker, recovery + boot_marker, 1)
-    wire_marker = "    wireControls();\\n"
-    if wire_marker not in app_source:
-        raise RuntimeError("wireControls marker for reduced-motion ring recovery not found")
-    app_source = app_source.replace(wire_marker, wire_marker + "    installReducedMotionRingRecovery();\\n", 1)
-    app.write_text(app_source, encoding="utf-8")
-
-    smoke = ROOT / "scripts/smoke_public_browser.mjs"
+cleanup_anchor = '''    shutil.rmtree(TMP, ignore_errors=True)
+    run("git", "config", "user.name", "Commonworld Repair Bot")
 '''
-if anchor not in source:
-    raise SystemExit('app recovery insertion point missing')
-source = source.replace(anchor, replacement, 1)
+cleanup_replacement = '''    shutil.rmtree(TMP, ignore_errors=True)
+    for helper in (
+        ROOT / ".github/pr203_prepare.py",
+        ROOT / ".github/pr203_repair.py",
+        ROOT / ".github/pr203_media_probe.mjs",
+        ROOT / ".github/workflows/pr203-repair.yml",
+        ROOT / ".github/workflows/pr203-media-probe.yml",
+        ROOT / "pr203-repair.log",
+    ):
+        helper.unlink(missing_ok=True)
+    run("git", "config", "user.name", "Commonworld Repair Bot")
+'''
+if cleanup_anchor not in source:
+    raise SystemExit('final cleanup insertion point missing')
+source = source.replace(cleanup_anchor, cleanup_replacement, 1)
 
 path.write_text(source, encoding='utf-8')
