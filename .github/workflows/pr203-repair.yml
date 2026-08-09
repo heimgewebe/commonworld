@@ -1,0 +1,83 @@
+name: PR203 bounded repair
+
+on:
+  push:
+    branches:
+      - fix/touch-ring-orbit-v1
+
+permissions:
+  contents: write
+
+jobs:
+  repair:
+    if: github.actor != 'github-actions[bot]'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          ref: fix/touch-ring-orbit-v1
+          fetch-depth: 0
+      - uses: actions/setup-python@v7
+        with:
+          python-version: "3.12"
+      - uses: actions/setup-node@v7
+        with:
+          node-version: "22"
+          cache: npm
+      - name: Install runtime and validation dependencies
+        run: |
+          npm ci --ignore-scripts --no-audit --no-fund
+          npx playwright install --with-deps chromium
+          python -m pip install -r requirements-dev.txt
+      - name: Prepare final product tree and validation driver
+        run: |
+          python3 .github/pr203_finalize.py
+          rm .github/pr203_finalize.py
+          git show 14b2310e286222207447167649121673f2aaff1f:.github/pr203_repair.py > .github/pr203_repair.py
+          python3 - <<'PY'
+          from pathlib import Path
+
+          path = Path('.github/pr203_repair.py')
+          source = path.read_text(encoding='utf-8')
+          source = source.replace('    patch_sources()\n', '', 1)
+          validate_anchor = '''    refresh_evidence()
+    run("git", "diff", "--check")
+    run("make", "validate")
+'''
+          validate_replacement = '''    refresh_evidence()
+    for helper in (
+        ROOT / ".github/pr203_repair.py",
+        ROOT / ".github/pr203_prepare_final.py",
+        ROOT / ".github/workflows/pr203-repair.yml",
+    ):
+        helper.unlink(missing_ok=True)
+    run("git", "diff", "--check")
+    run("make", "validate")
+'''
+          if validate_anchor not in source:
+              raise SystemExit('validation cleanup insertion point missing')
+          source = source.replace(validate_anchor, validate_replacement, 1)
+          cleanup_anchor = '''    shutil.rmtree(TMP, ignore_errors=True)
+    run("git", "config", "user.name", "Commonworld Repair Bot")
+'''
+          cleanup_replacement = '''    shutil.rmtree(TMP, ignore_errors=True)
+    (ROOT / "pr203-repair.log").unlink(missing_ok=True)
+    run("git", "config", "user.name", "Commonworld Repair Bot")
+'''
+          if cleanup_anchor not in source:
+              raise SystemExit('final cleanup insertion point missing')
+          source = source.replace(cleanup_anchor, cleanup_replacement, 1)
+          source = source.replace('run("git", "commit", "-m", "fix: restore coarse-touch ring motion safely")', 'run("git", "commit", "-m", "fix: harden touch ring browser contract")', 1)
+          path.write_text(source, encoding='utf-8')
+          PY
+      - name: Regenerate, validate and push final PR head
+        run: |
+          set -o pipefail
+          python3 .github/pr203_repair.py 2>&1 | tee pr203-repair.log
+      - name: Preserve repair log
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: pr203-repair-log
+          path: pr203-repair.log
+          if-no-files-found: warn
