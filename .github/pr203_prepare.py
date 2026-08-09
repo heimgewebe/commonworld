@@ -13,9 +13,9 @@ if old_reduced not in source:
 source = source.replace(old_reduced, "    /* reduced motion is governed by the global animation reset */\n", 1)
 
 live_start = "  await run.page.emulateMedia({ reducedMotion: 'reduce' });\n"
-compact_start = "  const compactDesktopRun = await newPage({\n"
+block_end = "\n\n'''\n    smoke.write_text"
 start = source.index(live_start)
-end = source.index(compact_start, start)
+end = source.index(block_end, start)
 fresh_reduced = '''  const reducedTouchRun = await newPage({
     mobile: true,
     touch: true,
@@ -58,7 +58,6 @@ fresh_reduced = '''  const reducedTouchRun = await newPage({
   assert(visibleBoxesMoved(reducedTouchBefore, reducedTouchAfter, 'labelBox').length === 0, scenarioId + ': reduced-motion touch labels moved ' + JSON.stringify({ before: reducedTouchBefore, after: reducedTouchAfter }));
   assert(visibleBoxesMoved(reducedTouchBefore, reducedTouchAfter, 'ringBox').length === 0, scenarioId + ': reduced-motion touch ring strokes moved ' + JSON.stringify({ before: reducedTouchBefore, after: reducedTouchAfter }));
   await reducedTouchRun.context.close();
-
 '''
 source = source[:start] + fresh_reduced + source[end:]
 
