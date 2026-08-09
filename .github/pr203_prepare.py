@@ -90,6 +90,26 @@ if smoke_write_anchor not in source:
     raise SystemExit('smoke hardening insertion point missing')
 source = source.replace(smoke_write_anchor, smoke_hardening, 1)
 
+# Canonical-plan validation intentionally rejects extra active workflows. Remove the
+# two task-local workflow files from the runner checkout before make validate; the
+# already-running workflow keeps executing from GitHub's immutable run definition.
+validate_anchor = '''    refresh_evidence()
+    run("git", "diff", "--check")
+    run("make", "validate")
+'''
+validate_replacement = '''    refresh_evidence()
+    run("git", "diff", "--check")
+    for workflow_helper in (
+        ROOT / ".github/workflows/pr203-repair.yml",
+        ROOT / ".github/workflows/pr203-media-probe.yml",
+    ):
+        workflow_helper.unlink(missing_ok=True)
+    run("make", "validate")
+'''
+if validate_anchor not in source:
+    raise SystemExit('pre-validation workflow cleanup insertion point missing')
+source = source.replace(validate_anchor, validate_replacement, 1)
+
 cleanup_anchor = '''    shutil.rmtree(TMP, ignore_errors=True)
     run("git", "config", "user.name", "Commonworld Repair Bot")
 '''
