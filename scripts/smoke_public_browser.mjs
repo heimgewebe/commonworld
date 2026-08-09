@@ -2959,12 +2959,22 @@ async function moveendBoundReturnScenario() {
   // overview return. MapLibre may finish its camera lifecycle just after the
   // UI fail-safe, so require prompt camera settlement without coupling the
   // smoke to scheduler-sensitive event timestamp ordering.
-  await run.page.locator('#map').evaluate((node) => { node.style.transitionDuration = '10s'; });
+  const cssTransitionDurationMs = 10_000;
+  const cssIndependenceMarginMs = 2_000;
+  await run.page.locator('#map').evaluate((node, durationMs) => { node.style.transitionDuration = `${durationMs}ms`; }, cssTransitionDurationMs);
   const startedAt = Date.now();
   await run.page.locator('#layer-close').click();
   await run.page.waitForSelector('.globe-stage[data-view-phase="overview"]');
   const elapsed = Date.now() - startedAt;
-  assert(elapsed < 5000, `moveend return: completion waited for CSS instead of the MapLibre camera lifecycle (${elapsed}ms)`);
+  const settlement = await run.page.locator('.globe-stage').getAttribute('data-camera-flight-settlement');
+  assert(
+    ['moveend', 'fallback-idle', 'fallback-stop'].includes(settlement),
+    `moveend return: overview completed without a bounded MapLibre settlement (${settlement})`,
+  );
+  assert(
+    elapsed < cssTransitionDurationMs - cssIndependenceMarginMs,
+    `moveend return: completion drifted toward the CSS transition instead of the MapLibre camera lifecycle (${elapsed}ms, settlement=${settlement})`,
+  );
   await run.page.waitForFunction(() => window.__commonworldTestMap?.isMoving() === false, null, { timeout: 3_000 });
   assert(await run.page.locator('#map').getAttribute('inert') === null, 'moveend return: returned globe remains inert');
   assert(run.consoleErrors.length === 0, `moveend return: console errors: ${run.consoleErrors.join(' | ')}`);

@@ -3116,7 +3116,9 @@ function sampleSphereGeometry(timestamp = performance.now()) {
 
 function flushSphereGeometry() {
   runtime.mapGeometryLastAt = performance.now();
-  updateSphereGeometry();
+  // Forced layout flushes keep geometry visually current during a camera flight,
+  // while the render sampler remains the sole owner of movement diagnostics.
+  updateSphereGeometry({ publishDiagnostics: !runtime.mapMoving });
 }
 
 function layerCamera(camera = null) {
