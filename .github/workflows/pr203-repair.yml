@@ -29,60 +29,15 @@ jobs:
           npm ci --ignore-scripts --no-audit --no-fund
           npx playwright install --with-deps chromium
           python -m pip install -r requirements-dev.txt
-      - name: Restore bounded repair helpers
+      - name: Restore and prepare bounded repair
         run: |
           git show 14b2310e286222207447167649121673f2aaff1f:.github/pr203_repair.py > .github/pr203_repair.py
           git show 14b2310e286222207447167649121673f2aaff1f:.github/pr203_prepare.py > .github/pr203_prepare.py
-          python3 - <<'PY'
-          from pathlib import Path
-
-          path = Path('.github/pr203_prepare.py')
-          source = path.read_text(encoding='utf-8')
-          anchor = '''    hardened_smoke = hardened_smoke.replace(fallback_wait, fallback_wait_hardened, 1)
-              smoke.write_text(hardened_smoke, encoding="utf-8")
-          '''.replace('              smoke.write_text', '    smoke.write_text')
-          replacement = '''    hardened_smoke = hardened_smoke.replace(fallback_wait, fallback_wait_hardened, 1)
-              moveend_bound = "  assert(elapsed < 5000, `moveend return:"
-              moveend_bound_hardened = "  assert(elapsed < 6500, `moveend return:"
-              if moveend_bound not in hardened_smoke:
-                  raise RuntimeError("moveend return timing bound marker not found")
-              hardened_smoke = hardened_smoke.replace(moveend_bound, moveend_bound_hardened, 1)
-
-              phase_observer = "      attributeFilter: ['data-view-phase', 'data-globe-geometry-source', 'data-layer-panel-visible-at', 'data-last-camera-command', 'data-last-camera-duration', 'data-map-moving'],"
-              phase_observer_hardened = "      attributeFilter: ['data-view-phase', 'data-globe-geometry-source', 'data-layer-panel-visible-at', 'data-last-camera-command', 'data-last-camera-duration', 'data-map-moving', 'data-sphere-geometry-diagnostic-publishes'],"
-              if phase_observer not in hardened_smoke:
-                  raise RuntimeError("layer journey diagnostic observer marker not found")
-              hardened_smoke = hardened_smoke.replace(phase_observer, phase_observer_hardened, 1)
-
-              diagnostic_start = "  const firstMovingEntry = phaseLog.find((entry) => entry.mapMovingAttribute);"
-              diagnostic_end = "  assert((await stage.getAttribute('data-globe-geometry-source')) === 'side-view-layout'"
-              diagnostic_start_index = hardened_smoke.find(diagnostic_start)
-              diagnostic_end_index = hardened_smoke.find(diagnostic_end, diagnostic_start_index)
-              if diagnostic_start_index < 0 or diagnostic_end_index < 0:
-                  raise RuntimeError("layer journey diagnostic budget boundaries not found")
-              diagnostic_block_hardened = """  const movingDiagnosticEntries = phaseLog
-                .filter((entry) => entry.mapMovingAttribute && entry.reason.includes('data-sphere-geometry-diagnostic-publishes'))
-                .filter((entry, index, entries) => index === 0 || entry.diagnosticPublishes !== entries[index - 1].diagnosticPublishes);
-              const movingDiagnosticSpacings = movingDiagnosticEntries.slice(1).map((entry, index) => ({
-                evaluations: entry.geometryEvaluations - movingDiagnosticEntries[index].geometryEvaluations,
-                publishes: entry.diagnosticPublishes - movingDiagnosticEntries[index].diagnosticPublishes,
-              }));
-              const maxMovingDiagnosticEntries = Math.ceil(flightGeometryEvaluationDelta / MAP_GEOMETRY_DIAGNOSTIC_SAMPLE_INTERVAL) + 1;
-              assert(movingDiagnosticEntries.length <= maxMovingDiagnosticEntries, 'layer journey: moving diagnostic publication count exceeded the sampled budget ' + JSON.stringify({ movingDiagnosticEntries, maxMovingDiagnosticEntries, phaseLog }));
-              assert(movingDiagnosticSpacings.every(({ evaluations, publishes }) => publishes > 0 && evaluations >= MAP_GEOMETRY_DIAGNOSTIC_SAMPLE_INTERVAL * publishes), 'layer journey: consecutive moving diagnostics were not sample-spaced ' + JSON.stringify({ movingDiagnosticEntries, movingDiagnosticSpacings, phaseLog }));
-
-          """
-              hardened_smoke = hardened_smoke[:diagnostic_start_index] + diagnostic_block_hardened + hardened_smoke[diagnostic_end_index:]
-              smoke.write_text(hardened_smoke, encoding="utf-8")
-          '''
-          replacement = replacement.replace('              moveend_bound', '    moveend_bound').replace('              moveend_bound_hardened', '    moveend_bound_hardened').replace('              if moveend_bound', '    if moveend_bound').replace('              phase_observer', '    phase_observer').replace('              phase_observer_hardened', '    phase_observer_hardened').replace('              if phase_observer', '    if phase_observer').replace('              diagnostic_start', '    diagnostic_start').replace('              diagnostic_end', '    diagnostic_end').replace('              diagnostic_start_index', '    diagnostic_start_index').replace('              diagnostic_end_index', '    diagnostic_end_index').replace('              if diagnostic_start_index', '    if diagnostic_start_index').replace('              diagnostic_block_hardened', '    diagnostic_block_hardened').replace('              hardened_smoke', '    hardened_smoke').replace('                  raise RuntimeError', '        raise RuntimeError').replace('              smoke.write_text', '    smoke.write_text')
-          if anchor not in source:
-              raise SystemExit('final smoke hardening insertion point missing')
-          path.write_text(source.replace(anchor, replacement, 1), encoding='utf-8')
-          PY
+          python3 .github/pr203_prepare_final.py
+          python3 .github/pr203_prepare.py
+          rm .github/pr203_prepare_final.py
       - name: Repair, regenerate, validate and push PR head
         run: |
-          python3 .github/pr203_prepare.py
           set -o pipefail
           python3 .github/pr203_repair.py 2>&1 | tee pr203-repair.log
       - name: Preserve repair log
