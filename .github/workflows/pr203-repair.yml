@@ -48,8 +48,8 @@ jobs:
                   raise RuntimeError("moveend return timing bound marker not found")
               hardened_smoke = hardened_smoke.replace(moveend_bound, moveend_bound_hardened, 1)
 
-              phase_observer = "      attributeFilter: ['data-view-phase', 'data-globe-geometry-source', 'data-layer-panel-visible-at', 'data-last-camera-command', 'data-last-camera-duration', 'data-map-moving'],\\n"
-              phase_observer_hardened = "      attributeFilter: ['data-view-phase', 'data-globe-geometry-source', 'data-layer-panel-visible-at', 'data-last-camera-command', 'data-last-camera-duration', 'data-map-moving', 'data-sphere-geometry-diagnostic-publishes'],\\n"
+              phase_observer = "      attributeFilter: ['data-view-phase', 'data-globe-geometry-source', 'data-layer-panel-visible-at', 'data-last-camera-command', 'data-last-camera-duration', 'data-map-moving'],"
+              phase_observer_hardened = "      attributeFilter: ['data-view-phase', 'data-globe-geometry-source', 'data-layer-panel-visible-at', 'data-last-camera-command', 'data-last-camera-duration', 'data-map-moving', 'data-sphere-geometry-diagnostic-publishes'],"
               if phase_observer not in hardened_smoke:
                   raise RuntimeError("layer journey diagnostic observer marker not found")
               hardened_smoke = hardened_smoke.replace(phase_observer, phase_observer_hardened, 1)
