@@ -259,6 +259,23 @@ def _rings(geometry: dict) -> Iterable[list[list[float]]]:
             yield from polygon
 
 
+def _valid_bbox_number(value: object) -> bool:
+    return isinstance(value, (int, float)) and not isinstance(value, bool)
+
+
+def _bbox_contains_position(bbox: list[float], position: object) -> bool:
+    if (
+        not isinstance(position, list)
+        or len(position) != 2
+        or not all(_valid_bbox_number(value) for value in position)
+    ):
+        return False
+    west, south, east, north = bbox
+    longitude, latitude = position
+    longitude_inside = west <= longitude <= east if west <= east else longitude >= west or longitude <= east
+    return longitude_inside and south <= latitude <= north
+
+
 def semantic_errors(record: dict) -> list[str]:
     errors: list[str] = []
     provenance = record.get("provenance", {})
@@ -295,6 +312,22 @@ def semantic_errors(record: dict) -> list[str]:
         for ring in _rings(geometry):
             if isinstance(ring, list) and ring and ring[0] != ring[-1]:
                 errors.append(f"geographic location {location.get('id')} has an unclosed polygon ring")
+        bbox = geometry.get("bbox")
+        if (
+            not isinstance(bbox, list)
+            or len(bbox) != 4
+            or not all(_valid_bbox_number(value) for value in bbox)
+        ):
+            continue
+        west, south, east, north = bbox
+        if west == east:
+            errors.append(f"geographic location {location.get('id')} bbox must have distinct west and east")
+        if south > north:
+            errors.append(f"geographic location {location.get('id')} bbox south must not exceed north")
+        if west != east and south <= north:
+            positions = [position for ring in _rings(geometry) if isinstance(ring, list) for position in ring]
+            if positions and not all(_bbox_contains_position(bbox, position) for position in positions):
+                errors.append(f"geographic location {location.get('id')} bbox must contain every geometry vertex")
 
     curation = record.get("curation", {})
     try:
