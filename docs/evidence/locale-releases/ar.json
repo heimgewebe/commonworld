@@ -3,13 +3,13 @@
   "kind": "commonworld.ui_locale_release_evidence",
   "locale": "ar",
   "status": "released",
-  "source_revision": "9cd3811bd70241e8d4e2e393bd3f4ccad82fe6da",
+  "source_revision": "972c286313a313abc8368f5b1fd5aaf291ab0824",
   "source_pack_sha256": "b65c7108bb7c2debf77dcb18ed1f70cd53da1478743e2bba7f4b11e761cc9be4",
   "reviewed_source_pack_sha256": "316da43be8603cf0400dfa886bf244f953cd0dcb702c150f87e652fc260e9819",
   "surface_sha256": {
-    "index": "eacb53d0e2f338d779437fab0b7d8d463fec3792799377e9aaab3aeb23d859dd",
-    "method": "61d24e66b053043e17378b1afab3d0c0d41ef94fecba34855d8494c85c29e364",
-    "proposal": "7ed135193184488d47759d94db947e8d6173c26710c288fdc6351b12428f5e65"
+    "index": "4c93a4eb102295afb6c5701f65cb09bac6a264e99ce6a14480fa2cba74dd1f8e",
+    "method": "d5653398d9bf3a761de9c16e61b0e409a348ff9e7ace403866838c1baa573610",
+    "proposal": "afb97b0c8d29a93c4203d06d4028478fa618d9ad3f14611c2587a301982cadd6"
   },
   "gate_results": {
     "required_surfaces_passed": [
@@ -39,23 +39,23 @@
     },
     "keyboard_and_screen_reader_review": {
       "source": "docs/evidence/locale-releases/receipts/shared/keyboard-and-screen-reader-review.json",
-      "sha256": "0b19200b1cf4f07d70eb7b0211d9dd4c4f0be816e41225cd57acf24372d9bde5"
+      "sha256": "08005f99f54cd96ab9f427707b66db50030bfb48e0f75f850ef588e821d71af9"
     },
     "browser_smoke": {
       "source": "docs/evidence/locale-releases/receipts/shared/browser-smoke.json",
-      "sha256": "dc0a58fa00120db24b947c5e9f4f6191b5a59f8ca45376ea9952edf1d771e2ed"
+      "sha256": "ded097edf3f91c9a82d263fec54a63f1fa36ec3cfd1d424d55788c85b20661d5"
     },
     "state_preservation_smoke": {
       "source": "docs/evidence/locale-releases/receipts/shared/state-preservation-smoke.json",
-      "sha256": "dd3b93c974123960d66d70b21137e6913201af5351aba467e91b4e25ed500f43"
+      "sha256": "525f1b5137babbedb32b748a10a4773a809fb65b51f4e256b5679fe704e85518"
     },
     "directional_layout_review": {
       "source": "docs/evidence/locale-releases/receipts/shared/directional-layout-review.json",
-      "sha256": "24bb68068c9e1ffd9a4d249aa5386ab098b2b0edc37ac9defafe9f0a308e71d2"
+      "sha256": "60840a0cc6be3282aaced8be16c5103114dd703771b554a8c7e197bc2009d9e3"
     },
     "mixed_script_review": {
       "source": "docs/evidence/locale-releases/receipts/shared/mixed-script-review.json",
-      "sha256": "835bde7d8550bf57bd2f568d1123c33214097ac7b1a6e3d81b425eb7173cd48d"
+      "sha256": "9607ae5755aef7c335150a2269237310c0897285d40281f1ac34bae02b503828"
     }
   },
   "review_class": {

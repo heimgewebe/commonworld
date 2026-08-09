@@ -3,13 +3,13 @@
   "kind": "commonworld.ui_locale_release_evidence",
   "locale": "pt-BR",
   "status": "released",
-  "source_revision": "9cd3811bd70241e8d4e2e393bd3f4ccad82fe6da",
+  "source_revision": "972c286313a313abc8368f5b1fd5aaf291ab0824",
   "source_pack_sha256": "b65c7108bb7c2debf77dcb18ed1f70cd53da1478743e2bba7f4b11e761cc9be4",
   "reviewed_source_pack_sha256": "316da43be8603cf0400dfa886bf244f953cd0dcb702c150f87e652fc260e9819",
   "surface_sha256": {
-    "index": "eccbd0a40c467904dcead2eec6d0f004c50d5793a87d0ddae006dac54afe979b",
-    "method": "a646dd5827134b086b40e80c5396a73bcc89d8a8966a1ce0cecd4ecbeee33e50",
-    "proposal": "a8e2aa152901451bfdb0dce10017c7ff44d7881173eefd5058129d41d8eab0d7"
+    "index": "c284e9c03b36b241ecf30c476e136bdc588c9ff649973525727fd0c3e51e1cf2",
+    "method": "571f15032d6ac5bff4de342dd1b7a5d428af9b54bb852669182fc91f6fe420ae",
+    "proposal": "ea734d180f8edd795f018eaaae25561fc9ed16975a7733d4262404b17f40ee51"
   },
   "gate_results": {
     "required_surfaces_passed": [
@@ -39,15 +39,15 @@
     },
     "keyboard_and_screen_reader_review": {
       "source": "docs/evidence/locale-releases/receipts/shared/keyboard-and-screen-reader-review.json",
-      "sha256": "0b19200b1cf4f07d70eb7b0211d9dd4c4f0be816e41225cd57acf24372d9bde5"
+      "sha256": "08005f99f54cd96ab9f427707b66db50030bfb48e0f75f850ef588e821d71af9"
     },
     "browser_smoke": {
       "source": "docs/evidence/locale-releases/receipts/shared/browser-smoke.json",
-      "sha256": "dc0a58fa00120db24b947c5e9f4f6191b5a59f8ca45376ea9952edf1d771e2ed"
+      "sha256": "ded097edf3f91c9a82d263fec54a63f1fa36ec3cfd1d424d55788c85b20661d5"
     },
     "state_preservation_smoke": {
       "source": "docs/evidence/locale-releases/receipts/shared/state-preservation-smoke.json",
-      "sha256": "dd3b93c974123960d66d70b21137e6913201af5351aba467e91b4e25ed500f43"
+      "sha256": "525f1b5137babbedb32b748a10a4773a809fb65b51f4e256b5679fe704e85518"
     }
   },
   "review_class": {
