@@ -195,13 +195,27 @@ def validate_public_shell(root: Path = ROOT) -> list[str]:
                 errors.append(f'public shell missing local module dependency: {dependency_path}')
                 continue
             dependency_version = hashlib.sha256(dependency_file.read_bytes()).hexdigest()[:12]
-            versioned_specifier = f"./{dependency_file.name}?v={dependency_version}"
-            expected_imports = (
-                f"from '{versioned_specifier}'",
-                f"import('{versioned_specifier}')",
+            specifier = f"./{dependency_file.name}"
+            import_pattern = re.compile(
+                rf"(?:(?:\bfrom\s+)|(?:\bimport\(\s*))"
+                rf"(?P<quote>['\"])"
+                rf"{re.escape(specifier)}"
+                rf"(?:\?(?P<query>[^'\"]*))?"
+                rf"(?P=quote)"
             )
-            if not any(expected_import in module_source for expected_import in expected_imports):
-                errors.append(f'public shell module import is not content-bound: {module_path} -> {dependency_path}')
+            observed_imports = list(import_pattern.finditer(module_source))
+            expected_query = f"v={dependency_version}"
+            if any(match.group('query') == expected_query for match in observed_imports):
+                continue
+            observed_version = None
+            if observed_imports:
+                version_match = re.search(r'(?:^|&)v=([^&]+)', observed_imports[0].group('query') or '')
+                observed_version = version_match.group(1) if version_match else None
+            observed_token = observed_version or '<missing>'
+            errors.append(
+                f'public shell module import is not content-bound: {module_path} -> {dependency_path}; '
+                f'observed token: {observed_token}; expected token: {dependency_version}'
+            )
     if "document.querySelectorAll('.catalog-card[data-commonproject-id]')" in app:
         errors.append('runtime catalog filtering must not mutate the bootstrap recovery surface')
     for token in (
