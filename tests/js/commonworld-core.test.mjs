@@ -1273,6 +1273,163 @@ test('public project navigation targets use only published geometry and keep dig
   assert(Object.isFrozen(leNid.bounds));
 });
 
+test('ordinary polygon navigation retains non-crossing numeric bounds', () => {
+  const collection = publicMapFeatureCollection([{
+    id: 'ordinary-extent',
+    title: 'Ordinary extent',
+    presence: {
+      geographic: [{
+        id: 'ordinary-area',
+        mode: 'exact',
+        geometry: { type: 'Polygon', coordinates: [[[10, -5], [20, -5], [20, 5], [10, 5], [10, -5]]] },
+      }],
+      digital: { available: false },
+    },
+  }]);
+  assert.deepEqual(publicProjectNavigationTarget(collection, 'ordinary-extent'), {
+    kind: 'bounds',
+    bounds: [[10, -5], [20, 5]],
+  });
+});
+
+test('explicit wrapped bbox focuses an intentional short antimeridian crossing', () => {
+  const collection = publicMapFeatureCollection([{
+    id: 'short-antimeridian-extent',
+    title: 'Short antimeridian extent',
+    presence: {
+      geographic: [{
+        id: 'crossing-area',
+        mode: 'exact',
+        geometry: {
+          type: 'Polygon',
+          coordinates: [[[170, -10], [-170, -10], [-170, 10], [170, 10], [170, -10]]],
+          bbox: [170, -10, -170, 10],
+        },
+      }],
+      digital: { available: false },
+    },
+  }]);
+  const feature = collection.features.find(({ properties }) => properties.project_id === 'short-antimeridian-extent');
+  assert.deepEqual(feature.geometry.bbox, [170, -10, -170, 10]);
+  assert.deepEqual(publicProjectNavigationTarget(collection, 'short-antimeridian-extent'), {
+    kind: 'bounds',
+    bounds: [[170, -10], [-170, 10]],
+  });
+});
+
+test('multiple explicit wrapped bboxes combine without expanding to near-global focus', () => {
+  const collection = publicMapFeatureCollection([{
+    id: 'multi-antimeridian-extent',
+    title: 'Multi antimeridian extent',
+    presence: {
+      geographic: [
+        {
+          id: 'western-crossing-area',
+          mode: 'exact',
+          geometry: {
+            type: 'Polygon',
+            coordinates: [[[170, -10], [-175, -10], [-175, 0], [170, 0], [170, -10]]],
+            bbox: [170, -10, -175, 0],
+          },
+        },
+        {
+          id: 'eastern-crossing-area',
+          mode: 'exact',
+          geometry: {
+            type: 'Polygon',
+            coordinates: [[[175, 0], [-170, 0], [-170, 10], [175, 10], [175, 0]]],
+            bbox: [175, 0, -170, 10],
+          },
+        },
+      ],
+      digital: { available: false },
+    },
+  }]);
+  assert.deepEqual(publicProjectNavigationTarget(collection, 'multi-antimeridian-extent'), {
+    kind: 'bounds',
+    bounds: [[170, -10], [-170, 10]],
+  });
+});
+
+test('explicit unwrapped bbox preserves an intentional extent wider than 180 degrees', () => {
+  const collection = publicMapFeatureCollection([{
+    id: 'explicit-wide-extent',
+    title: 'Explicit wide extent',
+    presence: {
+      geographic: [{
+        id: 'wide-area',
+        mode: 'exact',
+        geometry: {
+          type: 'Polygon',
+          coordinates: [[[170, -10], [-170, -10], [-170, 10], [170, 10], [170, -10]]],
+          bbox: [-170, -10, 170, 10],
+        },
+      }],
+      digital: { available: false },
+    },
+  }]);
+  assert.deepEqual(publicProjectNavigationTarget(collection, 'explicit-wide-extent'), {
+    kind: 'bounds',
+    bounds: [[-170, -10], [170, 10]],
+  });
+});
+
+test('multiple explicit bounds cannot shrink an intentionally wide declared extent', () => {
+  const collection = publicMapFeatureCollection([{
+    id: 'multi-wide-extent',
+    title: 'Multi wide extent',
+    presence: {
+      geographic: [
+        {
+          id: 'wide-area',
+          mode: 'exact',
+          geometry: {
+            type: 'Polygon',
+            coordinates: [[[-170, -10], [170, -10], [170, 0], [-170, 0], [-170, -10]]],
+            bbox: [-170, -10, 170, 0],
+          },
+        },
+        {
+          id: 'companion-area',
+          mode: 'exact',
+          geometry: {
+            type: 'Polygon',
+            coordinates: [[[160, 0], [175, 0], [175, 10], [160, 10], [160, 0]]],
+            bbox: [160, 0, 175, 10],
+          },
+        },
+      ],
+      digital: { available: false },
+    },
+  }]);
+  assert.deepEqual(publicProjectNavigationTarget(collection, 'multi-wide-extent'), {
+    kind: 'bounds',
+    bounds: [[-170, -10], [175, 10]],
+  });
+});
+
+test('ambiguous legacy geometry wider than 180 degrees retains its unwrapped interpretation', () => {
+  const collection = publicMapFeatureCollection([{
+    id: 'legacy-wide-extent',
+    title: 'Legacy wide extent',
+    presence: {
+      geographic: [{
+        id: 'wide-area',
+        mode: 'exact',
+        geometry: {
+          type: 'Polygon',
+          coordinates: [[[170, -10], [-170, -10], [-170, 10], [170, 10], [170, -10]]],
+        },
+      }],
+      digital: { available: false },
+    },
+  }]);
+  assert.deepEqual(publicProjectNavigationTarget(collection, 'legacy-wide-extent'), {
+    kind: 'bounds',
+    bounds: [[-170, -10], [170, 10]],
+  });
+});
+
 test('map filtering uses the same visible identity set without multiplying dual presence identities', () => {
   const visible = new Set(['freifunk-hamburg']);
   const collection = publicMapFeatureCollection(presenceAxisRecords, visible);

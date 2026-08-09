@@ -1,0 +1,1423 @@
+<!doctype html>
+<html lang="es" dir="ltr">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="commonworld-page" content="es.html" />
+    <meta name="commonworld-page-build" content="ac3b750de6c4b3b7" />
+    <meta name="commonworld-release" content="c579fdf5a931eb6a0c4d" />
+    <base href="/releases/c579fdf5a931eb6a0c4d/" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <meta name="color-scheme" content="dark" />
+    <meta name="referrer" content="strict-origin-when-cross-origin" />
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'wasm-unsafe-eval'; style-src 'self'; img-src 'self' data: blob: https://tiles.openfreemap.org; connect-src 'self' https://tiles.openfreemap.org; font-src 'self' data: https://tiles.openfreemap.org; worker-src 'self' blob:; child-src blob:; object-src 'none'; base-uri 'self'; form-action 'none';" />
+    <meta name="description" content="Commonworld hace que los Commons sean descubribles en todo el mundo —a escala regional, local y digital— en un único globo compartido." />
+    <title>commonworld — Descubre Commons</title>
+    <link rel="icon" href="./assets/commonworld-mark.svg?v=05905a6e42f8" type="image/svg+xml" />
+    <link rel="alternate" type="application/json" href="./catalog/catalog.json" title="Catálogo de Commonworld" />
+    <link rel="alternate" type="application/schema+json" href="./contracts/commonworld/project.schema.json" title="Esquema de CommonProject" />
+    <link rel="stylesheet" href="./assets/vendor/maplibre-gl.css?v=ab1e70d59ec4" />
+    <link rel="stylesheet" href="./index.css?v=f3052b7e2188" />
+    <link rel="stylesheet" href="./assets/ipad-layout.css?v=739d6b8460d4" />
+    <script type="module" src="/assets/commonworld-release-check.js?v=b1b62be4dc1e"></script>
+    <script src="./assets/vendor/maplibre-gl.js?v=45a9b07a9189" defer></script>
+    <script type="module" src="./assets/commonworld-locale.mjs?v=fd8db4a3359a"></script>
+    <script type="module" src="./assets/commonworld-app.js?v=a1a8e0df4f64"></script>
+  </head>
+  <body data-presentation="globe">
+    <a id="text-skip-link" class="skip-link" href="/es.html#static-catalog-fallback">Ir a la vista de texto</a>
+    <main class="app-shell">
+      <header class="topbar">
+        <a class="brand" href="./es.html" aria-label="commonworld – restablecer el globo">
+          <span class="brand-mark" aria-hidden="true"></span>
+          <span>commonworld</span>
+        </a>
+        <div class="discovery-control">
+          <div class="search-control" role="search">
+            <label class="visually-hidden" for="commons-search">Buscar Commons</label>
+            <span class="search-symbol" aria-hidden="true">⌕</span>
+            <input id="commons-search" type="search" inputmode="search" autocomplete="off" placeholder="¿Qué te gustaría hacer o encontrar?" aria-controls="discovery-list" aria-expanded="false" />
+            <button id="search-clear" class="search-clear" type="button" aria-label="Limpiar búsqueda" hidden>×</button>
+          </div>
+          <button id="filter-toggle" class="icon-button filter-toggle" type="button" aria-label="Abrir resultados de búsqueda y filtros" aria-controls="discovery-panel" aria-expanded="false"><span class="filter-toggle-icon" aria-hidden="true"></span><span class="filter-toggle-label">Filtros</span><span id="filter-toggle-count" class="filter-toggle-count" hidden>0</span></button>
+        </div>
+        <a class="proposal-link" href="./propose.es.html"><span class="proposal-symbol" aria-hidden="true">+</span><span class="proposal-label">Proponer un común</span></a>
+        <button id="settings-toggle" class="icon-button settings-toggle" type="button" aria-label="Abrir configuración" aria-controls="settings-panel" aria-expanded="false"><span aria-hidden="true">⚙</span></button>
+      </header>
+
+      <section id="discovery-panel" class="discovery-panel" aria-labelledby="discovery-title" hidden>
+        <div class="discovery-heading">
+          <div><p class="kicker">Descubre</p><h2 id="discovery-title">Comunes coincidentes</h2></div>
+          <button id="discovery-close" class="icon-button" type="button" aria-label="Cerrar resultados de búsqueda">×</button>
+        </div>
+        <div id="active-filter-chips" class="active-filter-chips" aria-label="Filtros activos"></div>
+        <button id="filter-sections-toggle" type="button" aria-controls="filter-sections" aria-expanded="true" aria-hidden="true" tabindex="-1" hidden><span>Filtros</span></button>
+        <div id="filter-sections" class="filter-sections">
+          <fieldset class="filter-group filter-group--purpose">
+            <legend>¿Qué?</legend>
+            <div class="filter-group-controls">
+              <label class="filter-commons-type"><span>Tipo de Común</span><select id="filter-commons-type" data-intent-filter="commons_type"><option value="">Todos los tipos</option><option value="knowledge">Conocimiento y Datos</option><option value="software">Software e Infraestructura</option><option value="culture">Cultura y Medios</option><option value="food-seeds">Semillas y Alimentos</option><option value="water">Agua e Irrigación</option><option value="energy">Energía</option><option value="housing-land">Tierra y Vivienda</option><option value="health-care">Cuidado y Salud</option><option value="tools-repair">Herramientas, Reparación y Fabricación</option><option value="community-network">Red Comunitaria</option><option value="other">Otros</option></select></label>
+              <label class="filter-action"><span>Acción</span><select id="filter-action" data-intent-filter="action"><option value="">Todas las acciones</option><option value="use">Usar</option><option value="borrow">Pedir prestado</option><option value="learn">Aprender</option><option value="contribute">Contribuir</option><option value="volunteer">Colaborar como voluntario</option><option value="donate">Donar</option><option value="visit">Visitar</option><option value="contact">Contactar</option><option value="replicate">Replicar</option></select></label>
+            </div>
+          </fieldset>
+          <fieldset class="filter-group filter-group--location">
+            <legend>¿Dónde?</legend>
+            <div class="location-filter-layout">
+              <fieldset class="filter-presence-group location-filter-block location-filter-block--presence"><legend>Presencia requerida</legend><div class="filter-presence-options"><label><input type="checkbox" id="filter-presence-geographic" name="presence" value="geographic" data-intent-filter="presence"> En el sitio</label><label><input type="checkbox" id="filter-presence-digital" name="presence" value="digital" data-intent-filter="presence"> Digital</label></div><small class="filter-presence-note">Múltiples características seleccionadas deben estar presentes (AND).</small></fieldset>
+              <div class="location-filter-block location-filter-block--destination">
+                <h3>Ámbito de ubicación</h3>
+                <div class="spatial-destination-search">
+                  <label for="spatial-destination-search">Buscar lugar o país</label>
+                  <input id="spatial-destination-search" type="search" inputmode="search" autocomplete="off" placeholder="Lugar, región o país" aria-controls="spatial-destination-results" aria-expanded="false" />
+                  <ul id="spatial-destination-results" class="spatial-destination-results" aria-label="Sugerencias de lugares"></ul>
+                </div>
+                <label class="location-country-filter"><span>País</span><select id="filter-country"><option value="">Todos los países</option></select></label>
+                <div class="location-proximity-controls">
+                  <label><span>Radio</span><select id="filter-nearby-radius" disabled><option value="">Sin radio</option><option value="5000">5 km</option><option value="25000">25 km</option><option value="100000">100 km</option><option value="500000">500 km</option></select></label>
+                  <button id="use-current-location" class="quiet-button" type="button">Usar mi ubicación</button>
+                </div>
+                <p id="geolocation-status" class="geolocation-status" role="status"></p>
+                <p class="spatial-search-note">El país y el radio son excluyentes. El radio se activa solo después de elegir un lugar o ubicación. La búsqueda cubre los lugares y países publicados en Commonworld.</p>
+              </div>
+            </div>
+          </fieldset>
+          <details id="advanced-filters" class="advanced-filters">
+            <summary>Más filtros</summary>
+            <div class="filter-group-controls">
+              <label><span>Acceso</span><select id="filter-access" data-intent-filter="access"><option value="">Todos los tipos de acceso</option><option value="public">Público</option><option value="membership">Membresía</option><option value="restricted">Restringido</option><option value="unknown">No especificado</option></select></label>
+              <label><span>Idioma</span><select id="filter-language" data-intent-filter="language"><option value="">Todas las entradas</option><option value="ca" lang="ca" dir="ltr">Català</option><option value="de" lang="de" dir="ltr">Deutsch</option><option value="en" lang="en" dir="ltr">English</option><option value="es" lang="es" dir="ltr">Español</option><option value="it" lang="it" dir="ltr">Italiano</option><option value="ku" lang="ku" dir="ltr">Kurdî</option><option value="pt-BR" lang="pt-BR" dir="ltr">Português (Brasil)</option><option value="el" lang="el" dir="ltr">Ελληνικά</option><option value="ar" lang="ar" dir="rtl">العربية</option><option value="syr" lang="syr" dir="rtl">ܣܘܪܝܝܐ</option><option value="ne" lang="ne" dir="ltr">नेपाली</option><option value="zh" lang="zh" dir="ltr">中文</option><option value="unknown">No especificado</option></select></label>
+              <label><span>Frescura</span><select id="filter-freshness" data-intent-filter="freshness"><option value="">Cualquier frescura</option><option value="current">Actualmente revisado</option><option value="stale">Revisión pendiente</option><option value="unknown">No especificado</option></select></label>
+              <label><span>Curación</span><select id="filter-curation" data-intent-filter="curation"><option value="">Cualquier estado</option><option value="listed">Listado</option><option value="verified">Verificado</option><option value="featured">Destacado</option><option value="unknown">No especificado</option></select></label>
+            </div>
+          </details>
+        </div>
+        <div class="discovery-summary-row">
+          <label class="discovery-sort"><span>Ordenar por</span><select id="discovery-sort" aria-describedby="discovery-sort-note"><option value="auto">Recomendado</option><option value="catalogued">Nuevos en el catálogo</option><option value="reviewed">Recientemente revisados</option><option value="title">Nombre A–Z</option></select></label>
+          <p id="discovery-sort-note" class="discovery-sort-note">La recomendación se adapta al contexto: búsqueda por relevancia, radio por proximidad, de lo contrario el orden filtrado se retiene.</p>
+          <p id="discovery-count" class="discovery-count" role="status">88 Commons</p>
+          <button id="filter-clear" class="quiet-button" type="button">Reiniciar filtros</button>
+        </div>
+        <p id="discovery-empty" class="discovery-empty" hidden>No hay Comunes que coincidan con esta búsqueda y combinación de filtros.</p>
+        <ol id="discovery-list" class="discovery-list" aria-label="Resultados de búsqueda de Comunes clasificados"></ol>
+        <button id="discovery-show-text" class="quiet-button result-continuation" type="button" hidden>Mostrar todos los resultados en la vista de texto</button>
+      </section>
+
+      <section id="globe-surface" class="globe-surface" aria-label="Globo de Commonworld">
+        <figure class="globe-stage" aria-labelledby="globe-caption" data-runtime-state="loading" data-visual-ready="false" data-view-phase="overview" data-map-renders="0" data-overlay-renders="0">
+          <div id="map" class="globe-map" role="region" aria-label="Globo interactivo de Commonworld"></div>
+          <svg id="digital-sphere" class="digital-sphere" viewBox="0 0 640 640" role="group" aria-labelledby="sphere-title" aria-describedby="sphere-ring-accessible-summary">
+            <title id="sphere-title">Esfera Digital de Comunes construida a partir de nombres y categorías</title>
+            <defs>
+              <radialGradient id="sphere-center-fade">
+                <stop offset="0%" stop-color="black" />
+                <stop offset="58%" stop-color="black" />
+                <stop offset="78%" stop-color="white" />
+                <stop offset="100%" stop-color="white" />
+              </radialGradient>
+              <mask id="sphere-mask"><rect width="640" height="640" fill="url(#sphere-center-fade)" /></mask>
+              <g id="sphere-paths" fill="none">
+              <ellipse id="sphere-path-1" cx="320" cy="320" rx="316" ry="300" transform="rotate(-8 320 320)" />
+              <ellipse id="sphere-path-2" cx="320" cy="320" rx="310" ry="282" transform="rotate(20 320 320)" />
+              <ellipse id="sphere-path-3" cx="320" cy="320" rx="304" ry="268" transform="rotate(43 320 320)" />
+              <ellipse id="sphere-path-4" cx="320" cy="320" rx="298" ry="288" transform="rotate(-31 320 320)" />
+              <ellipse id="sphere-path-5" cx="320" cy="320" rx="292" ry="274" transform="rotate(63 320 320)" />
+              <ellipse id="sphere-path-6" cx="320" cy="320" rx="286" ry="294" transform="rotate(-62 320 320)" />
+              <ellipse id="sphere-path-7" cx="320" cy="320" rx="280" ry="262" transform="rotate(78 320 320)" />
+              <ellipse id="sphere-path-8" cx="320" cy="320" rx="274" ry="284" transform="rotate(-77 320 320)" />
+              </g>
+            </defs>
+            <g id="sphere-rings" mask="url(#sphere-mask)" aria-hidden="true"></g>
+            <circle id="sphere-edge-control" class="sphere-edge-control" cx="320" cy="320" r="309" fill="none" stroke="transparent" stroke-width="44" pointer-events="stroke" role="button" tabindex="0" aria-label="Abrir los grupos de anillos digitales. Toque o pulse Intro."></circle>
+            <circle class="sphere-edge-focus" cx="320" cy="320" r="309" aria-hidden="true"></circle>
+          </svg>
+          <p id="sphere-ring-accessible-summary" class="visually-hidden"></p>
+          <div id="layer-stack-visual" class="layer-stack-visual" aria-hidden="true"></div>
+
+          <button id="layer-view-button" class="layer-view-button" type="button" aria-controls="layer-panel" aria-expanded="false">Esfera Digital</button>
+
+          <div id="country-navigation-context" class="country-navigation-context" role="region" aria-label="Contexto de país" hidden>
+            <p id="country-navigation-name" class="country-navigation-name"></p>
+            <div class="country-navigation-actions">
+              <button id="country-filter-action" class="quiet-button" type="button">Mostrar Comunes en este país</button>
+              <button id="country-navigation-close" class="icon-button" type="button" aria-label="Cerrar contexto de país">×</button>
+            </div>
+          </div>
+
+          <div class="orientation-bar" aria-label="Orientación del globo">
+            <button id="globe-reset" type="button">Tierra</button>
+            <span aria-hidden="true">›</span>
+            <span id="semantic-level">Resumen</span>
+            <span id="semantic-summary" class="semantic-summary">Muestra de catálogo · cobertura no evaluada</span>
+            <span id="semantic-breadcrumb-accessible" class="visually-hidden"></span>
+          </div>
+
+          <details class="map-legend">
+            <summary>Leyenda del mapa</summary>
+            <div class="legend-body">
+              <p class="legend-note">Los colores muestran el tipo de Commons. En la vista mundial, los países se rayan proporcionalmente con los colores de los tipos de Commons documentados allí mediante referencias de ubicación publicadas. Al ampliar la vista, la visualización pasa a ser regional y finalmente específica de una ubicación. La cobertura del catálogo no se evalúa; el mapa no muestra ni densidad ni ausencia documentada.</p>
+              <ul id="commons-type-legend" class="legend-list" aria-label="Tipos de Comunes y símbolos del mapa"></ul>
+              <ul class="legend-semantics">
+                <li><span class="legend-semantic-mark legend-semantic-mark--coverage" aria-hidden="true"></span>Las franjas de países: distribución relativa de los tipos de Comunes documentados en cada país</li>
+                <li><span class="legend-semantic-mark legend-semantic-mark--count" aria-hidden="true"></span>Círculos coloreados: agrupación regional más amplia mientras se acerca</li>
+                <li><span class="legend-semantic-mark legend-semantic-mark--withheld" aria-hidden="true"></span>Las referencias a ubicaciones ocultas no se incluyen en la visualización espacial</li>
+              </ul>
+              <p class="legend-precision"><strong>Precisión de la ubicación:</strong> punto = exacto, área discontinua = aproximado, área sólida = extensión publicada.</p>
+            </div>
+          </details>
+
+          <p id="map-status" class="map-status" role="status">Cargando globo. La vista de texto permanece disponible.</p>
+          <p id="globe-results" class="globe-results" role="status">88 Comunes en el catálogo actual.</p>
+
+          <aside id="layer-panel" class="layer-panel" aria-labelledby="layer-title" hidden>
+            <h2 id="layer-title" class="visually-hidden">Comunes digitales de cerca</h2>
+            <p class="visually-hidden">Los mismos Comunes digitales aparecen como paquetes de anillos jerárquicos con su ruta directa y los nombres inmediatos.</p>
+            <div class="layer-panel-controls">
+              <button id="layer-search-toggle" class="icon-button layer-search-toggle" type="button" aria-label="Buscar Comunes y filtrar anillos empaquetados" aria-controls="layer-discovery" aria-expanded="false">⌕</button>
+              <button id="layer-close" class="icon-button layer-close" type="button" aria-label="Volver a la vista del globo">×</button>
+            </div>
+            <nav id="layer-breadcrumb" class="digital-breadcrumb" aria-label="Ruta digital"></nav>
+            <p id="layer-current" class="digital-current" role="status">Esfera Digital de Comunes</p>
+            <div id="layer-discovery" class="layer-discovery" hidden>
+              <label for="layer-search">Buscar Comunes en los anillos empaquetados digitales</label>
+              <div class="layer-search-field"><span aria-hidden="true">⌕</span><input id="layer-search" type="search" inputmode="search" autocomplete="off" placeholder="Buscar Comunes" /></div>
+              <div id="layer-buttons" class="layer-buttons"></div>
+            </div>
+            <div id="layer-track-deck" class="layer-track-deck" aria-label="Anillos empaquetados jerárquicos digitales"></div>
+            <p id="layer-project-status" class="visually-hidden" role="status" aria-live="polite" aria-atomic="true"></p>
+            <div id="layer-projects" class="layer-projects" hidden></div>
+          </aside>
+
+          <figcaption id="globe-caption" class="visually-hidden">Tierra → macroregión → región → contexto local → Común</figcaption>
+        </figure>
+      </section>
+
+      <section id="text-view" class="text-view" tabindex="-1" aria-labelledby="text-title" hidden>
+        <header class="text-header">
+          <p class="kicker">Vista de texto</p>
+          <h1 id="text-title">Explorar los comunes directamente</h1>
+          <p>Las mismas identidades, filtros y selecciones que en el globo — sin la visualización espacial.</p>
+          <p id="text-count" class="text-count">88 Commons</p>
+        </header>
+        <div class="text-layout">
+          <aside class="text-filters" aria-labelledby="text-filter-title">
+            <h2 id="text-filter-title">Filtros y anillos empaquetados digitales</h2>
+            <button class="quiet-button text-discovery-open" type="button" data-open-discovery>Abrir filtros de búsqueda</button>
+            <nav id="text-layer-breadcrumb" class="digital-breadcrumb" aria-label="Ruta digital en la vista de texto"></nav>
+            <p id="text-layer-current" class="digital-current" role="status">Esfera Digital de Comunes</p>
+            <div id="text-layer-buttons" class="layer-buttons"></div>
+            <p class="machine-note">Legible por máquina: <a href="./catalog/catalog.json" type="application/json">Manifiesto del catálogo</a> · <a href="./contracts/commonworld/project.schema.json" type="application/schema+json">Esquema de datos</a></p>
+          </aside>
+          <div>
+            <p id="text-empty" class="text-empty" hidden>No hay Comunes que coincidan con esta selección.</p>
+            <div id="catalog" class="catalog-grid" aria-live="polite">
+
+            </div>
+            <button id="text-show-more" class="quiet-button result-continuation" type="button" hidden>Mostrar más Comunes</button>
+          </div>
+        </div>
+      </section>
+
+      <aside id="settings-panel" class="settings-panel" role="dialog" aria-modal="true" aria-labelledby="settings-title" aria-describedby="settings-description" hidden>
+        <p id="settings-description" class="visually-hidden">Elige una presentación y abre información sobre los datos, el método y las licencias.</p>
+        <div class="panel-heading">
+          <div><p class="kicker">Configuración</p><h2 id="settings-title">Presentación</h2></div>
+          <button id="settings-close" class="icon-button" type="button" aria-label="Cerrar configuración">×</button>
+        </div>
+        <div class="presentation-choices" role="radiogroup" aria-label="Elegir presentación">
+          <button type="button" role="radio" aria-checked="true" data-presentation-choice="globe"><strong>Globo</strong><span>Explora espacialmente y acerca</span></button>
+          <button type="button" role="radio" aria-checked="false" data-presentation-choice="text"><strong>Texto</strong><span>Los mismos Commons en forma de lista</span></button>
+        </div>
+        <section class="settings-section language-settings"><h3>Idioma de la interfaz</h3><nav class="language-switch language-switch--settings" aria-label="Elegir idioma de la interfaz" data-locale-surface="index"><a class="language-choice language-choice--auto" href="./?ui_lang=auto" data-locale-choice="auto" data-locale-surface="index"><span class="language-choice-name">Automático – idioma del dispositivo</span></a><div class="language-choice-grid"><a class="language-choice" href="./?ui_lang=en" lang="en" dir="ltr" data-locale-choice="en" data-locale-surface="index" data-locale-status="released"><span class="language-choice-name">English</span></a><a class="language-choice" href="./de.html?ui_lang=de" lang="de" dir="ltr" data-locale-choice="de" data-locale-surface="index" data-locale-status="released"><span class="language-choice-name">Deutsch</span></a><a class="language-choice" href="./es.html?ui_lang=es" lang="es" dir="ltr" data-locale-choice="es" data-locale-surface="index" data-locale-status="released" aria-current="page"><span class="language-choice-name">Español</span></a><a class="language-choice" href="./fr.html?ui_lang=fr" lang="fr" dir="ltr" data-locale-choice="fr" data-locale-surface="index" data-locale-status="released"><span class="language-choice-name">Français</span></a><a class="language-choice" href="./pt-BR.html?ui_lang=pt-BR" lang="pt-BR" dir="ltr" data-locale-choice="pt-BR" data-locale-surface="index" data-locale-status="released"><span class="language-choice-name">Português (Brasil)</span></a><a class="language-choice" href="./ar.html?ui_lang=ar" lang="ar" dir="rtl" data-locale-choice="ar" data-locale-surface="index" data-locale-status="released"><span class="language-choice-name">العربية</span></a></div></nav><p class="language-effective visually-hidden" data-locale-effective aria-live="polite">Idioma activo: español</p></section>
+        <section class="settings-section">
+          <h3>Interacción</h3>
+          <p>La configuración del sistema para movimiento reducido se respeta automáticamente.</p>
+        </section>
+        <section class="settings-section">
+          <h3>Datos y método</h3>
+          <ul>
+            <li><a href="./propose.es.html">Proponer un común</a></li>
+            <li><a href="./catalog/catalog.json" type="application/json">Manifiesto del catálogo público</a></li>
+            <li><a href="./contracts/commonworld/project.schema.json" type="application/schema+json">Esquema de CommonProject</a></li>
+            <li><a href="./method.es.html">Método, cobertura y privacidad</a></li>
+            <li><a href="./contracts/commonworld/current-state.contract.json" type="application/json">Estado operativo actual</a></li>
+            <li><a href="./LICENSE">Licencia del código</a> · <a href="./LICENSE-DATA.md">Licencia de datos</a></li>
+          </ul>
+          <p>Superficie JSON estática, solo lectura. El formulario de sugerencia no almacena nada en Commonworld y solo prepara un candidato público de GitHub o una descarga local de JSON. No hay ejecución de API, ruta de escritura ni CLI independiente.</p>
+          <p class="legal-note">© 2026 Commonworld contributors. El código se proporciona sin garantía bajo la licencia AGPL-3.0-only. <a href="https://github.com/heimgewebe/commonworld" rel="external noreferrer">Código fuente</a> · <a href="./LICENSE">Texto de la licencia</a></p>
+        </section>
+      </aside>
+
+      <section id="project-focus" class="project-focus" tabindex="-1" aria-labelledby="focus-title" hidden>
+        <div class="panel-heading"><div><p id="focus-presence" class="kicker"></p><h2 id="focus-title"></h2></div><button id="focus-close" class="icon-button" type="button" aria-label="Cerrar enfoque">×</button></div>
+        <p id="focus-summary" class="focus-summary"></p>
+        <p id="focus-selection-status" class="focus-selection-status" role="status" hidden></p>
+        <div id="focus-catalog-detail-integrity" class="catalog-detail-integrity" hidden>
+          <p id="focus-catalog-detail-status" role="status" aria-live="polite" aria-atomic="true"></p>
+          <button id="focus-catalog-detail-retry" class="quiet-button catalog-detail-retry" type="button" hidden>Verificar nuevamente</button>
+        </div>
+        <div class="focus-grid">
+          <section><h3>Temas</h3><ul id="focus-themes"></ul></section>
+          <section><h3>Maneras de participar</h3><ul id="focus-actions"></ul></section>
+          <section><h3>Lugares</h3><ul id="focus-locations"></ul></section>
+          <section><h3>Presencia digital</h3><p id="focus-digital"></p></section>
+          <section><h3>Relaciones</h3><ul id="focus-relations"></ul></section>
+          <section><h3>Vínculos oficiales</h3><ul id="focus-links"></ul></section>
+          <section><h3>Fuentes</h3><ul id="focus-sources"></ul></section>
+          <section><h3>Curación</h3><p id="focus-curation"></p></section>
+        </div>
+      </section>
+
+      <section id="static-catalog-fallback" class="static-catalog-fallback" tabindex="-1" aria-labelledby="static-catalog-fallback-title" data-static-catalog-fallback>
+        <p class="kicker">Vista de texto</p>
+        <h1 id="static-catalog-fallback-title">Catálogo de Commonworld</h1>
+        <p>El catálogo completo lineal permanece disponible aquí mientras se carga o no está disponible la vista interactiva.</p>
+        <div class="catalog-grid">
+          <article class="catalog-card" id="project-acofop-peten-community-forests" data-commonproject-id="acofop-peten-community-forests">
+            <p class="catalog-kind">En el sitio</p>
+            <h2 lang="en" dir="ltr">ACOFOP – Community Forests of Petén</h2>
+            <p lang="es" dir="auto">Una red gestionada por organizaciones campesinas e indígenas en Petén que conecta concesiones forestales comunitarias en la Reserva de la Biosfera Maya mediante representación democrática, protección territorial, control de incendios, restauración y uso forestal sostenible.</p>
+            <p class="catalog-location">1 ubicación pública</p>
+            <div class="catalog-actions">
+              <a class="catalog-action-link" data-action-type="learn" href="https://acofop.org/quienes-somos/" rel="external noreferrer">Aprender <span aria-hidden="true">↗</span></a>
+              <a href="https://acofop.org/" rel="external noreferrer">Sitio web oficial <span aria-hidden="true">↗</span></a>
+              <a href="./catalog/projects/acofop-peten-community-forests.json" type="application/json">JSON</a>
+            </div>
+          </article>
+          <article class="catalog-card" id="project-aflaj-irrigation-systems-oman" data-commonproject-id="aflaj-irrigation-systems-oman">
+            <p class="catalog-kind">En el sitio · Digital · Suministro, Tierra y Ecología › Agua e Irrigación</p>
+            <h2 lang="en" dir="ltr">Aflaj Irrigation Systems of Oman</h2>
+            <p lang="es" dir="auto">Sistemas de riego vivos gestionados por comunidades en Omán que asignan el agua por turnos de tiempo y se sostienen mediante mantenimiento compartido, normas y financiación local.</p>
+            <p class="catalog-location">1 ubicación pública</p>
+            <div class="catalog-actions">
+              <a class="catalog-action-link" data-action-type="learn" href="https://whc.unesco.org/en/list/1207/" rel="external noreferrer">Aprender <span aria-hidden="true">↗</span></a>
+              <a href="https://whc.unesco.org/en/list/1207/" rel="external noreferrer">Sitio web oficial <span aria-hidden="true">↗</span></a>
+              <a href="./catalog/projects/aflaj-irrigation-systems-oman.json" type="application/json">JSON</a>
+            </div>
+          </article>
+          <article class="catalog-card" id="project-akiba-mashinani-trust" data-commonproject-id="akiba-mashinani-trust">
+            <p class="catalog-kind">En el sitio</p>
+            <h2 dir="auto">Akiba Mashinani Trust</h2>
+            <p lang="es" dir="auto">Un instrumento de financiación gestionado por comunidades de asentamientos en Kenia que apoya grupos de ahorro, préstamos y proyectos organizados por la comunidad para vivienda, saneamiento e infraestructura básica.</p>
+            <p class="catalog-location">1 ubicación pública</p>
+            <div class="catalog-actions">
+              <a class="catalog-action-link" data-action-type="learn" href="https://www.muungano.net/akibamashinanitrust" rel="external noreferrer">Aprender <span aria-hidden="true">↗</span></a>
+              <a href="https://www.muungano.net/akibamashinanitrust" rel="external noreferrer">Sitio web oficial <span aria-hidden="true">↗</span></a>
+              <a href="./catalog/projects/akiba-mashinani-trust.json" type="application/json">JSON</a>
+            </div>
+          </article>
+          <article class="catalog-card" id="project-arvari-river-parliament" data-commonproject-id="arvari-river-parliament">
+            <p class="catalog-kind">En el sitio</p>
+            <h2 dir="auto">Arvari River Parliament</h2>
+            <p lang="es" dir="auto">Una institución hídrica formada por comunidades aldeanas en la cuenca del río Arvari para organizar normas compartidas, responsabilidad y resolución de conflictos en la restauración y el uso del río.</p>
+            <p class="catalog-location">1 ubicación pública · 1 ubicación oculta</p>
+            <p class="catalog-activity-notice">El estado operativo actual no se ha verificado recientemente. Fuentes revisadas el 2026-07-30; revisión prioritaria 2026-08-30.</p>
+            <div class="catalog-actions">
+              <a class="catalog-action-link" data-action-type="learn" href="https://tarunbharatsangh.in/rivers-rejuvenated/" rel="external noreferrer">Aprender <span aria-hidden="true">↗</span></a>
+              <a class="catalog-action-link" data-action-type="contact" href="https://tarunbharatsangh.in/contact/" rel="external noreferrer">Contactar <span aria-hidden="true">↗</span></a>
+              <a href="https://tarunbharatsangh.in/rivers-rejuvenated/" rel="external noreferrer">Sitio web oficial <span aria-hidden="true">↗</span></a>
+              <a href="./catalog/projects/arvari-river-parliament.json" type="application/json">JSON</a>
+            </div>
+          </article>
+          <article class="catalog-card" id="project-auroville" data-commonproject-id="auroville">
+            <p class="catalog-kind">En el sitio</p>
+            <h2 dir="auto">Auroville</h2>
+            <p lang="es" dir="auto">Una ciudad internacional en Tamil Nadu que desde 1968 experimenta con vida comunal, práctica ecológica y organización social alternativa; la tierra y los activos están legalmente en manos de la Auroville Foundation en lugar de ser propiedad individual de los residentes.</p>
+            <p class="catalog-location">1 ubicación pública</p>
+            <div class="catalog-actions">
+              <a class="catalog-action-link" data-action-type="visit" href="https://auroville.org/page/visiting-auroville" rel="external noreferrer">Visitar <span aria-hidden="true">↗</span></a>
+              <a class="catalog-action-link" data-action-type="learn" href="https://auroville.org/page/legal-structure" rel="external noreferrer">Aprender <span aria-hidden="true">↗</span></a>
+              <a class="catalog-action-link" data-action-type="contact" href="https://auroville.org/contact" rel="external noreferrer">Contactar <span aria-hidden="true">↗</span></a>
+              <a href="https://auroville.org/" rel="external noreferrer">Sitio web oficial <span aria-hidden="true">↗</span></a>
+              <a href="./catalog/projects/auroville.json" type="application/json">JSON</a>
+            </div>
+          </article>
+          <article class="catalog-card" id="project-bali-subak-system" data-commonproject-id="bali-subak-system">
+            <p class="catalog-kind">En el sitio</p>
+            <h2 lang="en" dir="ltr">Subak System in Bali</h2>
+            <p lang="es" dir="auto">Un sistema gestionado por comunidades locales de riego que distribuye el agua a través de templos, canales y arrozales y mantiene colectivamente los paisajes agrícolas de Bali.</p>
+            <p class="catalog-location">1 ubicación pública</p>
+            <div class="catalog-actions">
+              <a class="catalog-action-link" data-action-type="learn" href="https://whc.unesco.org/en/list/1194" rel="external noreferrer">Aprender <span aria-hidden="true">↗</span></a>
+              <a href="https://whc.unesco.org/en/list/1194" rel="external noreferrer">Sitio web oficial <span aria-hidden="true">↗</span></a>
+              <a href="./catalog/projects/bali-subak-system.json" type="application/json">JSON</a>
+            </div>
+          </article>
+          <article class="catalog-card" id="project-banco-palmas" data-commonproject-id="banco-palmas">
+            <p class="catalog-kind">En el sitio</p>
+            <h2 dir="auto">Banco Palmas</h2>
+            <p lang="es" dir="auto">Un banco de desarrollo de propiedad comunitaria en Conjunto Palmeiras, Fortaleza, que conecta finanzas solidarias, producción y consumo locales y una moneda social gestionada por la comunidad.</p>
+            <p class="catalog-location">1 ubicación pública</p>
+            <div class="catalog-actions">
+              <a class="catalog-action-link" data-action-type="learn" href="https://bancopalmas.com/o-que-e/" rel="external noreferrer">Aprender <span aria-hidden="true">↗</span></a>
+              <a href="https://bancopalmas.com/" rel="external noreferrer">Sitio web oficial <span aria-hidden="true">↗</span></a>
+              <a href="./catalog/projects/banco-palmas.json" type="application/json">JSON</a>
+            </div>
+          </article>
+          <article class="catalog-card" id="project-bioleft" data-commonproject-id="bioleft">
+            <p class="catalog-kind">Digital · Suministro, Tierra y Ecología › Semillas, Alimentos y Agricultura</p>
+            <h2 dir="auto">Bioleft</h2>
+            <p lang="es" dir="auto">Una iniciativa comunitaria en Argentina que comparte semillas, conocimiento agronómico y mejora participativa de plantas mediante acuerdos abiertos entre productores, investigadores y otros participantes.</p>
+            <p class="catalog-location">1 ubicación oculta</p>
+            <div class="catalog-actions">
+              <a class="catalog-action-link" data-action-type="learn" href="https://www.bioleft.org/es/acerca-de-bioleft/" rel="external noreferrer">Aprender <span aria-hidden="true">↗</span></a>
+              <a class="catalog-action-link" data-action-type="contribute" href="https://www.bioleft.org/es/plataforma/" rel="external noreferrer">Contribuir <span aria-hidden="true">↗</span></a>
+              <a href="https://www.bioleft.org/es/" rel="external noreferrer">Sitio web oficial <span aria-hidden="true">↗</span></a>
+              <a href="./catalog/projects/bioleft.json" type="application/json">JSON</a>
+            </div>
+          </article>
+          <article class="catalog-card" id="project-bologna-urban-commons" data-commonproject-id="bologna-urban-commons">
+            <p class="catalog-kind">Digital · Cooperación y Autoorganización › Gobernanza Comunitaria y Cooperativas</p>
+            <h2 lang="en" dir="ltr">Bologna Urban Commons</h2>
+            <p lang="es" dir="auto">Una infraestructura de administración compartida a escala de ciudad en la que grupos cívicos y el Ayuntamiento de Bolonia usan pactos de colaboración para cuidar, regenerar y usar bienes comunes materiales, inmateriales y digitales en actividades de interés general.</p>
+            <p class="catalog-location">1 ubicación oculta</p>
+            <div class="catalog-actions">
+              <a class="catalog-action-link" data-action-type="use" href="https://opendata.comune.bologna.it/explore/dataset/patti-di-collaborazione/" rel="external noreferrer">Usar <span aria-hidden="true">↗</span></a>
+              <a class="catalog-action-link" data-action-type="learn" href="https://www.comune.bologna.it/novita/comunicati-stampa/consiglio-comunale-approvate-modifiche-allo-statuto-e-il-nuovo-regolamento-sulle-forme-di" rel="external noreferrer">Aprender <span aria-hidden="true">↗</span></a>
+              <a href="https://opendata.comune.bologna.it/explore/dataset/patti-di-collaborazione/" rel="external noreferrer">Sitio web oficial <span aria-hidden="true">↗</span></a>
+              <a href="./catalog/projects/bologna-urban-commons.json" type="application/json">JSON</a>
+            </div>
+          </article>
+          <article class="catalog-card" id="project-bosco-uganda" data-commonproject-id="bosco-uganda">
+            <p class="catalog-kind">En el sitio · Digital · Comunicación y Redes › Redes Comunitarias</p>
+            <h2 dir="auto">BOSCO Uganda</h2>
+            <p lang="es" dir="auto">Una red comunitaria sin fines de lucro en el norte de Uganda que conecta acceso a internet rural, centros comunitarios de TIC, educación digital e infraestructura alimentada por energía solar.</p>
+            <p class="catalog-location">1 ubicación pública · 1 ubicación oculta</p>
+            <div class="catalog-actions">
+              <a class="catalog-action-link" data-action-type="use" href="https://www.boscouganda.com/connectivity/" rel="external noreferrer">Usar <span aria-hidden="true">↗</span></a>
+              <a class="catalog-action-link" data-action-type="learn" href="https://www.boscouganda.com/about-us-2/" rel="external noreferrer">Aprender <span aria-hidden="true">↗</span></a>
+              <a class="catalog-action-link" data-action-type="donate" href="https://secure.givelively.org/donate/bosco-inc/uganda-2025-operating-campaign" rel="external noreferrer">Donar <span aria-hidden="true">↗</span></a>
+              <a class="catalog-action-link" data-action-type="contact" href="https://www.boscouganda.com/contact/" rel="external noreferrer">Contactar <span aria-hidden="true">↗</span></a>
+              <a href="https://www.boscouganda.com/" rel="external noreferrer">Sitio web oficial <span aria-hidden="true">↗</span></a>
+              <a href="./catalog/projects/bosco-uganda.json" type="application/json">JSON</a>
+            </div>
+          </article>
+          <article class="catalog-card" id="project-brisbane-tool-library" data-commonproject-id="brisbane-tool-library">
+            <p class="catalog-kind">En el sitio · Digital · Software, Herramientas y Producción › Plataformas y Herramientas Compartidas</p>
+            <h2 dir="auto">Brisbane Tool Library</h2>
+            <p lang="es" dir="auto">Una biblioteca de cosas gestionada íntegramente por voluntarios en Brisbane que presta herramientas y equipos de uso cotidiano y promueve la reparación, la reutilización y las habilidades prácticas.</p>
+            <p class="catalog-location">1 ubicación pública</p>
+            <div class="catalog-actions">
+              <a class="catalog-action-link" data-action-type="visit" href="https://www.brisbanetoollibrary.org/find-us/location-and-contact" rel="external noreferrer">Visitar <span aria-hidden="true">↗</span></a>
+              <a class="catalog-action-link" data-action-type="borrow" href="https://www.brisbanetoollibrary.org/memberships" rel="external noreferrer">Pedir prestado <span aria-hidden="true">↗</span></a>
+              <a class="catalog-action-link" data-action-type="learn" href="https://www.brisbanetoollibrary.org/about-us/who-we-are" rel="external noreferrer">Aprender <span aria-hidden="true">↗</span></a>
+              <a class="catalog-action-link" data-action-type="volunteer" href="https://www.brisbanetoollibrary.org/get-involved/volunteering" rel="external noreferrer">Colaborar como voluntario <span aria-hidden="true">↗</span></a>
+              <a class="catalog-action-link" data-action-type="donate" href="https://www.brisbanetoollibrary.org/get-involved/donate" rel="external noreferrer">Donar <span aria-hidden="true">↗</span></a>
+              <a class="catalog-action-link" data-action-type="contact" href="https://www.brisbanetoollibrary.org/find-us/location-and-contact" rel="external noreferrer">Contactar <span aria-hidden="true">↗</span></a>
+              <a href="https://www.brisbanetoollibrary.org/" rel="external noreferrer">Sitio web oficial <span aria-hidden="true">↗</span></a>
+              <a href="./catalog/projects/brisbane-tool-library.json" type="application/json">JSON</a>
+            </div>
+          </article>
+          <article class="catalog-card" id="project-cano-martin-pena-clt" data-commonproject-id="cano-martin-pena-clt">
+            <p class="catalog-kind">En el sitio</p>
+            <h2 dir="auto">Caño Martín Peña Community Land Trust</h2>
+            <p lang="es" dir="auto">Un fideicomiso comunitario de tierras gestionado por ocho comunidades en San Juan que mantiene colectivamente tierras públicas mientras los residentes son dueños de sus viviendas y reciben protección a largo plazo frente al desplazamiento.</p>
+            <p class="catalog-location">1 ubicación pública</p>
+            <p class="catalog-activity-notice">El estado operativo actual no se ha verificado recientemente. Fuentes revisadas el 2026-07-19; revisión prioritaria 2026-08-19.</p>
+            <div class="catalog-actions">
+              <a class="catalog-action-link" data-action-type="learn" href="https://cano3punto7.org/index-english.html" rel="external noreferrer">Aprender <span aria-hidden="true">↗</span></a>
+              <a href="https://cano3punto7.org/index-english.html" rel="external noreferrer">Sitio web oficial <span aria-hidden="true">↗</span></a>
+              <a href="./catalog/projects/cano-martin-pena-clt.json" type="application/json">JSON</a>
+            </div>
+          </article>
+          <article class="catalog-card" id="project-cecosesola" data-commonproject-id="cecosesola">
+            <p class="catalog-kind">Commons</p>
+            <h2 dir="auto">Cecosesola</h2>
+            <p lang="es" dir="auto">Una red venezolana de más de 50 organizaciones comunitarias sin fines de lucro que conecta el abastecimiento de alimentos, la atención de salud, los servicios funerarios, las finanzas y la producción sin cadenas de mando, mediante tareas rotativas y una autogestión orientada al consenso.</p>
+            <p class="catalog-location">1 ubicación oculta</p>
+            <div class="catalog-actions">
+              <a class="catalog-action-link" data-action-type="learn" href="https://cecosesola.org/organizandonos-sin-lineas-de-mando/" rel="external noreferrer">Aprender <span aria-hidden="true">↗</span></a>
+              <a class="catalog-action-link" data-action-type="contact" href="https://cecosesola.org/" rel="external noreferrer">Contactar <span aria-hidden="true">↗</span></a>
+              <a href="https://cecosesola.org/" rel="external noreferrer">Sitio web oficial <span aria-hidden="true">↗</span></a>
+              <a href="./catalog/projects/cecosesola.json" type="application/json">JSON</a>
+            </div>
+          </article>
+          <article class="catalog-card" id="project-cltb-le-nid" data-commonproject-id="cltb-le-nid">
+            <p class="catalog-kind">En el sitio</p>
+            <h2 dir="auto">Le Nid</h2>
+            <p lang="es" dir="auto">Un proyecto habitacional de Community Land Trust Brussels con siete viviendas, una sala compartida y un jardín semipúblico en Anderlecht.</p>
+            <p class="catalog-location">2 ubicaciones públicas</p>
+            <div class="catalog-actions">
+              <a class="catalog-action-link" data-action-type="visit" href="https://www.openstreetmap.org/node/13966522352" rel="external noreferrer">Visitar <span aria-hidden="true">↗</span></a>
+              <a class="catalog-action-link" data-action-type="learn" href="https://cltb.be/en/projet/verheyden-le-nid-2/" rel="external noreferrer">Aprender <span aria-hidden="true">↗</span></a>
+              <a class="catalog-action-link" data-action-type="contact" href="https://cltb.be/contact/" rel="external noreferrer">Contactar <span aria-hidden="true">↗</span></a>
+              <a href="https://cltb.be/en/projet/verheyden-le-nid-2/" rel="external noreferrer">Sitio web oficial <span aria-hidden="true">↗</span></a>
+              <a href="./catalog/projects/cltb-le-nid.json" type="application/json">JSON</a>
+            </div>
+          </article>
+          <article class="catalog-card" id="project-common-voice" data-commonproject-id="common-voice">
+            <p class="catalog-kind">Digital · Software, Herramientas y Producción › Puente de Datos y Software</p>
+            <h2 lang="en" dir="ltr">Common Voice</h2>
+            <p lang="es" dir="auto">Un conjunto de datos de voz multilingüe y abierto en el que las comunidades lingüísticas aportan grabaciones, oraciones y validaciones para construir datos de libre acceso para la tecnología del habla.</p>
+            <p class="catalog-location">Presencia digital independiente de la ubicación</p>
+            <div class="catalog-actions">
+              <a class="catalog-action-link" data-action-type="use" href="https://commonvoice.mozilla.org/en/datasets" rel="external noreferrer">Usar <span aria-hidden="true">↗</span></a>
+              <a class="catalog-action-link" data-action-type="learn" href="https://github.com/common-voice/community-playbook" rel="external noreferrer">Aprender <span aria-hidden="true">↗</span></a>
+              <a class="catalog-action-link" data-action-type="contribute" href="https://commonvoice.mozilla.org/" rel="external noreferrer">Contribuir <span aria-hidden="true">↗</span></a>
+              <a class="catalog-action-link" data-action-type="replicate" href="https://github.com/common-voice/common-voice" rel="external noreferrer">Replicar <span aria-hidden="true">↗</span></a>
+              <a href="https://commonvoice.mozilla.org/" rel="external noreferrer">Sitio web oficial <span aria-hidden="true">↗</span></a>
+              <a href="./catalog/projects/common-voice.json" type="application/json">JSON</a>
+            </div>
+          </article>
+          <article class="catalog-card" id="project-community-baboon-sanctuary" data-commonproject-id="community-baboon-sanctuary">
+            <p class="catalog-kind">En el sitio</p>
+            <h2 dir="auto">Community Baboon Sanctuary</h2>
+            <p lang="es" dir="auto">Un área protegida de registro público en Belice cuya gobernanza figura a cargo de las comunidades locales y cuya responsabilidad de gestión recae en comités locales.</p>
+            <p class="catalog-location">1 ubicación pública</p>
+            <div class="catalog-actions">
+              <a class="catalog-action-link" data-action-type="learn" href="https://www.protectedplanet.net/19553" rel="external noreferrer">Aprender <span aria-hidden="true">↗</span></a>
+              <a href="https://www.protectedplanet.net/19553" rel="external noreferrer">Sitio web oficial <span aria-hidden="true">↗</span></a>
+              <a href="./catalog/projects/community-baboon-sanctuary.json" type="application/json">JSON</a>
+            </div>
+          </article>
+          <article class="catalog-card" id="project-community-energy-network-new-zealand" data-commonproject-id="community-energy-network-new-zealand">
+            <p class="catalog-kind">Digital · Suministro, Tierra y Ecología › Cooperativas de Energía</p>
+            <h2 dir="auto">Community Energy Network New Zealand</h2>
+            <p lang="es" dir="auto">Una red de Nueva Zelanda de iniciativas energéticas locales impulsadas por la ciudadanía que conecta conocimiento, colaboración y control comunitario de proyectos de energías renovables y eficiencia.</p>
+            <p class="catalog-location">2 ubicaciones ocultas</p>
+            <div class="catalog-actions">
+              <a class="catalog-action-link" data-action-type="learn" href="https://www.communityenergy.org.nz/about-us/" rel="external noreferrer">Aprender <span aria-hidden="true">↗</span></a>
+              <a class="catalog-action-link" data-action-type="contribute" href="https://www.communityenergy.org.nz/about-us/join-us/" rel="external noreferrer">Contribuir <span aria-hidden="true">↗</span></a>
+              <a class="catalog-action-link" data-action-type="contact" href="https://www.communityenergy.org.nz/" rel="external noreferrer">Contactar <span aria-hidden="true">↗</span></a>
+              <a href="https://www.communityenergy.org.nz/" rel="external noreferrer">Sitio web oficial <span aria-hidden="true">↗</span></a>
+              <a href="./catalog/projects/community-energy-network-new-zealand.json" type="application/json">JSON</a>
+            </div>
+          </article>
+          <article class="catalog-card" id="project-cooperation-jackson" data-commonproject-id="cooperation-jackson">
+            <p class="catalog-kind">Commons</p>
+            <h2 lang="en" dir="ltr">Cooperation Jackson</h2>
+            <p lang="es" dir="auto">Una red de economía solidaria en Jackson, Mississippi, que desarrolla de forma conjunta cooperativas de trabajadores, empresas democráticamente autogestionadas, tierras de tenencia comunitaria, vivienda asequible e infraestructura de producción local.</p>
+            <p class="catalog-location">1 ubicación oculta</p>
+            <div class="catalog-actions">
+              <a class="catalog-action-link" data-action-type="visit" href="https://cooperationjackson.org/contact-us" rel="external noreferrer">Visitar <span aria-hidden="true">↗</span></a>
+              <a class="catalog-action-link" data-action-type="learn" href="https://cooperationjackson.org/intro" rel="external noreferrer">Aprender <span aria-hidden="true">↗</span></a>
+              <a class="catalog-action-link" data-action-type="contribute" href="https://cooperationjackson.org/contact-us" rel="external noreferrer">Contribuir <span aria-hidden="true">↗</span></a>
+              <a class="catalog-action-link" data-action-type="donate" href="https://cooperationjackson.org/donate" rel="external noreferrer">Donar <span aria-hidden="true">↗</span></a>
+              <a class="catalog-action-link" data-action-type="contact" href="https://cooperationjackson.org/contact-us" rel="external noreferrer">Contactar <span aria-hidden="true">↗</span></a>
+              <a href="https://cooperationjackson.org/" rel="external noreferrer">Sitio web oficial <span aria-hidden="true">↗</span></a>
+              <a href="./catalog/projects/cooperation-jackson.json" type="application/json">JSON</a>
+            </div>
+          </article>
+          <article class="catalog-card" id="project-cooperative-home-care-associates" data-commonproject-id="cooperative-home-care-associates">
+            <p class="catalog-kind">En el sitio</p>
+            <h2 dir="auto">Cooperative Home Care Associates</h2>
+            <p lang="es" dir="auto">Una cooperativa de cuidados propiedad de sus trabajadores en Nueva York que combina la atención domiciliaria con formación gratuita, voz de los trabajadores y una participación económica para el personal cuidador.</p>
+            <p class="catalog-location">1 ubicación pública · 1 ubicación oculta</p>
+            <div class="catalog-actions">
+              <a class="catalog-action-link" data-action-type="use" href="https://chcany.org/how-to-access-care/" rel="external noreferrer">Usar <span aria-hidden="true">↗</span></a>
+              <a class="catalog-action-link" data-action-type="learn" href="https://chcany.org/about/" rel="external noreferrer">Aprender <span aria-hidden="true">↗</span></a>
+              <a class="catalog-action-link" data-action-type="contribute" href="https://chcany.org/careers/" rel="external noreferrer">Contribuir <span aria-hidden="true">↗</span></a>
+              <a class="catalog-action-link" data-action-type="contact" href="https://chcany.org/contact-us" rel="external noreferrer">Contactar <span aria-hidden="true">↗</span></a>
+              <a href="https://chcany.org/" rel="external noreferrer">Sitio web oficial <span aria-hidden="true">↗</span></a>
+              <a href="./catalog/projects/cooperative-home-care-associates.json" type="application/json">JSON</a>
+            </div>
+          </article>
+          <article class="catalog-card" id="project-debian" data-commonproject-id="debian">
+            <p class="catalog-kind">Digital · Software, Herramientas y Producción › Software Libre e Infraestructura</p>
+            <h2 dir="auto">Debian</h2>
+            <p lang="es" dir="auto">Un sistema operativo libre con un archivo abierto de paquetes, documentación pública y participación a escala mundial.</p>
+            <p class="catalog-location">Presencia digital independiente de la ubicación</p>
+            <div class="catalog-actions">
+              <a class="catalog-action-link" data-action-type="use" href="https://www.debian.org/distrib/" rel="external noreferrer">Usar <span aria-hidden="true">↗</span></a>
+              <a class="catalog-action-link" data-action-type="learn" href="https://www.debian.org/doc/" rel="external noreferrer">Aprender <span aria-hidden="true">↗</span></a>
+              <a class="catalog-action-link" data-action-type="contribute" href="https://www.debian.org/intro/help" rel="external noreferrer">Contribuir <span aria-hidden="true">↗</span></a>
+              <a class="catalog-action-link" data-action-type="donate" href="https://www.debian.org/donations" rel="external noreferrer">Donar <span aria-hidden="true">↗</span></a>
+              <a href="https://www.debian.org/" rel="external noreferrer">Sitio web oficial <span aria-hidden="true">↗</span></a>
+              <a href="./catalog/projects/debian.json" type="application/json">JSON</a>
+            </div>
+          </article>
+          <article class="catalog-card" id="project-deccan-development-society" data-commonproject-id="deccan-development-society">
+            <p class="catalog-kind">En el sitio · Digital · Suministro, Tierra y Ecología › Semillas, Alimentos y Agricultura</p>
+            <h2 dir="auto">Deccan Development Society Sanghams</h2>
+            <p lang="es" dir="auto">Una federación de asociaciones de aldea de mujeres campesinas dalit e indígenas en Telangana que organizan colectivamente semillas, agricultura de secano, alimentos, mercados, medios y saberes tradicionales.</p>
+            <p class="catalog-location">1 ubicación pública</p>
+            <div class="catalog-actions">
+              <a class="catalog-action-link" data-action-type="learn" href="https://www.ddsindia.org/" rel="external noreferrer">Aprender <span aria-hidden="true">↗</span></a>
+              <a class="catalog-action-link" data-action-type="use" href="https://www.ddsindia.org/video-channel/" rel="external noreferrer">Usar <span aria-hidden="true">↗</span></a>
+              <a href="https://www.ddsindia.org/" rel="external noreferrer">Sitio web oficial <span aria-hidden="true">↗</span></a>
+              <a href="./catalog/projects/deccan-development-society.json" type="application/json">JSON</a>
+            </div>
+          </article>
+          <article class="catalog-card" id="project-edinburgh-tool-library" data-commonproject-id="edinburgh-tool-library">
+            <p class="catalog-kind">En el sitio</p>
+            <h2 dir="auto">Edinburgh Tool Library</h2>
+            <p lang="es" dir="auto">Una biblioteca de herramientas de gestión comunitaria y en gran medida voluntaria que presta herramientas, enseña reparación y habilidades prácticas, y apoya proyectos comunitarios locales.</p>
+            <p class="catalog-location">2 ubicaciones públicas</p>
+            <div class="catalog-actions">
+              <a class="catalog-action-link" data-action-type="visit" href="https://edinburghtoollibrary.org.uk/about/find-us/" rel="external noreferrer">Visitar <span aria-hidden="true">↗</span></a>
+              <a class="catalog-action-link" data-action-type="borrow" href="https://edinburghtoollibrary.org.uk/join/" rel="external noreferrer">Pedir prestado <span aria-hidden="true">↗</span></a>
+              <a class="catalog-action-link" data-action-type="learn" href="https://edinburghtoollibrary.org.uk/about/" rel="external noreferrer">Aprender <span aria-hidden="true">↗</span></a>
+              <a class="catalog-action-link" data-action-type="volunteer" href="https://edinburghtoollibrary.org.uk/volunteer/" rel="external noreferrer">Colaborar como voluntario <span aria-hidden="true">↗</span></a>
+              <a class="catalog-action-link" data-action-type="donate" href="https://edinburghtoollibrary.org.uk/" rel="external noreferrer">Donar <span aria-hidden="true">↗</span></a>
+              <a class="catalog-action-link" data-action-type="contact" href="https://edinburghtoollibrary.org.uk/about/find-us/" rel="external noreferrer">Contactar <span aria-hidden="true">↗</span></a>
+              <a href="https://edinburghtoollibrary.org.uk/" rel="external noreferrer">Sitio web oficial <span aria-hidden="true">↗</span></a>
+              <a href="./catalog/projects/edinburgh-tool-library.json" type="application/json">JSON</a>
+            </div>
+          </article>
+          <article class="catalog-card" id="project-ekuri-community-forest" data-commonproject-id="ekuri-community-forest">
+            <p class="catalog-kind">En el sitio</p>
+            <h2 dir="auto">Ekuri Community Forest</h2>
+            <p lang="es" dir="auto">Un bosque de propiedad y gestión colectiva de las comunidades Old y New Ekuri en el estado de Cross River de Nigeria, con normas que vinculan la conservación, el uso sostenible y la infraestructura local.</p>
+            <p class="catalog-location">1 ubicación pública</p>
+            <p class="catalog-activity-notice">El estado operativo actual no se ha verificado recientemente. Fuentes revisadas el 2026-07-19; revisión prioritaria 2026-08-19.</p>
+            <div class="catalog-actions">
+              <a class="catalog-action-link" data-action-type="learn" href="https://www.iccaregistry.org/en/explore/nigeria/ekuri-icca" rel="external noreferrer">Aprender <span aria-hidden="true">↗</span></a>
+              <a href="https://www.iccaregistry.org/en/explore/nigeria/ekuri-icca" rel="external noreferrer">Sitio web oficial <span aria-hidden="true">↗</span></a>
+              <a href="./catalog/projects/ekuri-community-forest.json" type="application/json">JSON</a>
+            </div>
+          </article>
+          <article class="catalog-card" id="project-enspiral" data-commonproject-id="enspiral">
+            <p class="catalog-kind">Digital · Cooperación y Autoorganización › Gobernanza Comunitaria y Cooperativas</p>
+            <h2 dir="auto">Enspiral</h2>
+            <p lang="es" dir="auto">Una red colaborativa originaria de Aotearoa Nueva Zelanda que desarrolla formas de empresa orientadas a la comunidad, recursos compartidos y herramientas documentadas abiertamente para la colaboración descentralizada.</p>
+            <p class="catalog-location">Presencia digital independiente de la ubicación</p>
+            <div class="catalog-actions">
+              <a class="catalog-action-link" data-action-type="learn" href="https://www.enspiral.com/" rel="external noreferrer">Aprender <span aria-hidden="true">↗</span></a>
+              <a class="catalog-action-link" data-action-type="contribute" href="https://www.enspiral.com/" rel="external noreferrer">Contribuir <span aria-hidden="true">↗</span></a>
+              <a href="https://www.enspiral.com/" rel="external noreferrer">Sitio web oficial <span aria-hidden="true">↗</span></a>
+              <a href="./catalog/projects/enspiral.json" type="application/json">JSON</a>
+            </div>
+          </article>
+          <article class="catalog-card" id="project-ethiopia-community-seed-bank-network" data-commonproject-id="ethiopia-community-seed-bank-network">
+            <p class="catalog-kind">En el sitio · Digital · Suministro, Tierra y Ecología › Semillas, Alimentos y Agricultura</p>
+            <h2 dir="auto">Ethiopian Community Seed Bank Network</h2>
+            <p lang="es" dir="auto">Una red nacional de bancos de semillas gestionados por la comunidad que conecta variedades mantenidas por agricultores, organiza el intercambio de experiencias y refuerza la autoridad de los agricultores sobre la diversidad de semillas.</p>
+            <p class="catalog-location">1 ubicación pública</p>
+            <div class="catalog-actions">
+              <a class="catalog-action-link" data-action-type="learn" href="https://www.fao.org/plant-treaty/areas-of-work/benefit-sharing-fund/projects/projects-detail/National-Community-Seed-Bank-Platform-for-Strengthening-Informal-Seed-System-in-Ethiopia/en" rel="external noreferrer">Aprender <span aria-hidden="true">↗</span></a>
+              <a href="https://www.moa.gov.et/ethiopias-community-seed-bank-networkempowering-seed-authority/" rel="external noreferrer">Sitio web oficial <span aria-hidden="true">↗</span></a>
+              <a href="./catalog/projects/ethiopia-community-seed-bank-network.json" type="application/json">JSON</a>
+            </div>
+          </article>
+          <article class="catalog-card" id="project-fecofun-nepal" data-commonproject-id="fecofun-nepal">
+            <p class="catalog-kind">Commons</p>
+            <h2 lang="en" dir="ltr">Federation of Community Forestry Users Nepal</h2>
+            <p lang="es" dir="auto">Una federación nacional de grupos de usuarios de bosques comunitarios en Nepal que refuerza los derechos de uso local, la autoorganización democrática, la gestión forestal sostenible, el intercambio de conocimientos y la participación de los miembros en las políticas.</p>
+            <p class="catalog-location">1 ubicación oculta</p>
+            <div class="catalog-actions">
+              <a class="catalog-action-link" data-action-type="learn" href="https://fecofun.org.np/about/" rel="external noreferrer">Aprender <span aria-hidden="true">↗</span></a>
+              <a class="catalog-action-link" data-action-type="contact" href="https://fecofun.org.np/contacts/" rel="external noreferrer">Contactar <span aria-hidden="true">↗</span></a>
+              <a href="https://fecofun.org.np/" rel="external noreferrer">Sitio web oficial <span aria-hidden="true">↗</span></a>
+              <a href="./catalog/projects/fecofun-nepal.json" type="application/json">JSON</a>
+            </div>
+          </article>
+          <article class="catalog-card" id="project-fordhall-organic-farm" data-commonproject-id="fordhall-organic-farm">
+            <p class="catalog-kind">En el sitio</p>
+            <h2 dir="auto">Fordhall Organic Farm</h2>
+            <p lang="es" dir="auto">Una granja orgánica de propiedad comunitaria en Shropshire cuya tierra está en manos de una sociedad benéfica de beneficio comunitario con miles de accionistas y asegurada para la agricultura ecológica, la educación, el acceso público a la naturaleza y programas sociales.</p>
+            <p class="catalog-location">1 ubicación pública</p>
+            <div class="catalog-actions">
+              <a class="catalog-action-link" data-action-type="visit" href="https://www.fordhallfarm.com/" rel="external noreferrer">Visitar <span aria-hidden="true">↗</span></a>
+              <a class="catalog-action-link" data-action-type="use" href="https://www.fordhallfarm.com/our-impact" rel="external noreferrer">Usar <span aria-hidden="true">↗</span></a>
+              <a class="catalog-action-link" data-action-type="learn" href="https://www.fordhallfarm.com/fcli-story" rel="external noreferrer">Aprender <span aria-hidden="true">↗</span></a>
+              <a class="catalog-action-link" data-action-type="contribute" href="https://www.fordhallfarm.com/buy-a-share" rel="external noreferrer">Contribuir <span aria-hidden="true">↗</span></a>
+              <a href="https://www.fordhallfarm.com/" rel="external noreferrer">Sitio web oficial <span aria-hidden="true">↗</span></a>
+              <a href="./catalog/projects/fordhall-organic-farm.json" type="application/json">JSON</a>
+            </div>
+          </article>
+          <article class="catalog-card" id="project-freifunk-hamburg" data-commonproject-id="freifunk-hamburg">
+            <p class="catalog-kind">En el sitio · Digital · Comunicación y Redes › Redes Comunitarias</p>
+            <h2 dir="auto">Freifunk Hamburg</h2>
+            <p lang="es" dir="auto">Una comunidad local Freifunk que opera una red digital respaldada por la comunidad en Hamburgo y conecta participación, infraestructura abierta y comunicación libre.</p>
+            <p class="catalog-location">1 ubicación pública · 1 ubicación oculta</p>
+            <div class="catalog-actions">
+              <a class="catalog-action-link" data-action-type="use" href="https://map.hamburg.freifunk.net/" rel="external noreferrer">Usar <span aria-hidden="true">↗</span></a>
+              <a class="catalog-action-link" data-action-type="learn" href="https://hamburg.freifunk.net/" rel="external noreferrer">Aprender <span aria-hidden="true">↗</span></a>
+              <a class="catalog-action-link" data-action-type="contribute" href="https://hamburg.freifunk.net/mitmachen" rel="external noreferrer">Contribuir <span aria-hidden="true">↗</span></a>
+              <a class="catalog-action-link" data-action-type="volunteer" href="https://hamburg.freifunk.net/mitmachen" rel="external noreferrer">Colaborar como voluntario <span aria-hidden="true">↗</span></a>
+              <a class="catalog-action-link" data-action-type="contact" href="https://hamburg.freifunk.net/kontakt" rel="external noreferrer">Contactar <span aria-hidden="true">↗</span></a>
+              <a href="https://hamburg.freifunk.net/" rel="external noreferrer">Sitio web oficial <span aria-hidden="true">↗</span></a>
+              <a href="./catalog/projects/freifunk-hamburg.json" type="application/json">JSON</a>
+            </div>
+          </article>
+          <article class="catalog-card" id="project-freifunk" data-commonproject-id="freifunk">
+            <p class="catalog-kind">Digital · Comunicación y Redes › Redes Comunitarias</p>
+            <h2 dir="auto">Freifunk</h2>
+            <p lang="es" dir="auto">Una iniciativa no comercial de redes de comunicación libres y construidas por la comunidad e infraestructura digital abierta.</p>
+            <p class="catalog-location">Presencia digital independiente de la ubicación</p>
+            <div class="catalog-actions">
+              <a class="catalog-action-link" data-action-type="use" href="https://freifunk.net/wie-mache-ich-mit/" rel="external noreferrer">Usar <span aria-hidden="true">↗</span></a>
+              <a class="catalog-action-link" data-action-type="learn" href="https://freifunk.net/worum-geht-es/" rel="external noreferrer">Aprender <span aria-hidden="true">↗</span></a>
+              <a class="catalog-action-link" data-action-type="contribute" href="https://freifunk.net/wie-mache-ich-mit/" rel="external noreferrer">Contribuir <span aria-hidden="true">↗</span></a>
+              <a class="catalog-action-link" data-action-type="volunteer" href="https://freifunk.net/wie-mache-ich-mit/" rel="external noreferrer">Colaborar como voluntario <span aria-hidden="true">↗</span></a>
+              <a href="https://freifunk.net/" rel="external noreferrer">Sitio web oficial <span aria-hidden="true">↗</span></a>
+              <a href="./catalog/projects/freifunk.json" type="application/json">JSON</a>
+            </div>
+          </article>
+          <article class="catalog-card" id="project-fucvam" data-commonproject-id="fucvam">
+            <p class="catalog-kind">Commons</p>
+            <h2 dir="auto">FUCVAM</h2>
+            <p lang="es" dir="auto">La federación uruguaya de cooperativas de vivienda de ayuda mutua combina la propiedad colectiva de la tierra, la autogestión democrática y la ayuda mutua en la construcción y el mantenimiento de viviendas.</p>
+            <p class="catalog-location">2 ubicaciones ocultas</p>
+            <div class="catalog-actions">
+              <a class="catalog-action-link" data-action-type="learn" href="https://www.fucvam.org.uy/" rel="external noreferrer">Aprender <span aria-hidden="true">↗</span></a>
+              <a class="catalog-action-link" data-action-type="contribute" href="https://www.fucvam.org.uy/afiliacion-de-nuevas-cooperativas/" rel="external noreferrer">Contribuir <span aria-hidden="true">↗</span></a>
+              <a href="https://www.fucvam.org.uy/" rel="external noreferrer">Sitio web oficial <span aria-hidden="true">↗</span></a>
+              <a href="./catalog/projects/fucvam.json" type="application/json">JSON</a>
+            </div>
+          </article>
+          <article class="catalog-card" id="project-g0v" data-commonproject-id="g0v">
+            <p class="catalog-kind">Digital · Cooperación y Autoorganización › Tecnología Ciudadana y Autoorganización</p>
+            <h2 dir="auto">g0v</h2>
+            <p lang="es" dir="auto">Una comunidad abierta de tecnología cívica de Taiwán que trabaja de forma colaborativa en problemas públicos y publica resultados, código fuente y documentación como bienes comunes digitales de libre acceso.</p>
+            <p class="catalog-location">Presencia digital independiente de la ubicación</p>
+            <div class="catalog-actions">
+              <a class="catalog-action-link" data-action-type="learn" href="https://g0v.tw/intl/en/manifesto/" rel="external noreferrer">Aprender <span aria-hidden="true">↗</span></a>
+              <a class="catalog-action-link" data-action-type="contribute" href="https://g0v.tw/intl/en/" rel="external noreferrer">Contribuir <span aria-hidden="true">↗</span></a>
+              <a href="https://g0v.tw/intl/en/" rel="external noreferrer">Sitio web oficial <span aria-hidden="true">↗</span></a>
+              <a href="./catalog/projects/g0v.json" type="application/json">JSON</a>
+            </div>
+          </article>
+          <article class="catalog-card" id="project-granby-four-streets-clt" data-commonproject-id="granby-four-streets-clt">
+            <p class="catalog-kind">En el sitio</p>
+            <h2 dir="auto">Granby Four Streets Community Land Trust</h2>
+            <p lang="es" dir="auto">Un fideicomiso de tierras comunitarias liderado por residentes en Liverpool que asegura vivienda permanentemente asequible, espacios comunitarios, creación de zonas verdes y actividad económica local en el barrio.</p>
+            <p class="catalog-location">1 ubicación pública</p>
+            <div class="catalog-actions">
+              <a class="catalog-action-link" data-action-type="visit" href="https://www.granby4streetsclt.co.uk/about" rel="external noreferrer">Visitar <span aria-hidden="true">↗</span></a>
+              <a class="catalog-action-link" data-action-type="learn" href="https://www.granby4streetsclt.co.uk/whats-a-clt" rel="external noreferrer">Aprender <span aria-hidden="true">↗</span></a>
+              <a class="catalog-action-link" data-action-type="contribute" href="https://www.granby4streetsclt.co.uk/about" rel="external noreferrer">Contribuir <span aria-hidden="true">↗</span></a>
+              <a class="catalog-action-link" data-action-type="contact" href="https://www.granby4streetsclt.co.uk/about" rel="external noreferrer">Contactar <span aria-hidden="true">↗</span></a>
+              <a href="https://www.granby4streetsclt.co.uk/" rel="external noreferrer">Sitio web oficial <span aria-hidden="true">↗</span></a>
+              <a href="./catalog/projects/granby-four-streets-clt.json" type="application/json">JSON</a>
+            </div>
+          </article>
+          <article class="catalog-card" id="project-great-lakes-commons" data-commonproject-id="great-lakes-commons">
+            <p class="catalog-kind">Digital · Suministro, Tierra y Ecología › Agua e Irrigación</p>
+            <h2 lang="en" dir="ltr">Great Lakes Commons</h2>
+            <p lang="es" dir="auto">Una red biorregional abierta que trata los Grandes Lagos como un bien común vivo y busca reforzar la gobernanza comunitaria e indígena, la responsabilidad compartida y la custodia a largo plazo del agua más allá de las fronteras políticas.</p>
+            <p class="catalog-location">1 ubicación oculta</p>
+            <div class="catalog-actions">
+              <a class="catalog-action-link" data-action-type="learn" href="https://www.greatlakescommons.org/why" rel="external noreferrer">Aprender <span aria-hidden="true">↗</span></a>
+              <a class="catalog-action-link" data-action-type="contribute" href="https://www.greatlakescommons.org/home-1" rel="external noreferrer">Contribuir <span aria-hidden="true">↗</span></a>
+              <a href="https://www.greatlakescommons.org/" rel="external noreferrer">Sitio web oficial <span aria-hidden="true">↗</span></a>
+              <a href="./catalog/projects/great-lakes-commons.json" type="application/json">JSON</a>
+            </div>
+          </article>
+          <article class="catalog-card" id="project-guifi-net" data-commonproject-id="guifi-net">
+            <p class="catalog-kind">En el sitio · Digital · Comunicación y Redes › Redes Comunitarias</p>
+            <h2 dir="auto">guifi.net</h2>
+            <p lang="es" dir="auto">Una red de telecomunicaciones abierta, libre y neutral cuya infraestructura se construye y se usa de forma colectiva como bien común y puede seguir desarrollándose por distintos participantes en igualdad de condiciones.</p>
+            <p class="catalog-location">1 ubicación pública · 1 ubicación oculta</p>
+            <div class="catalog-actions">
+              <a class="catalog-action-link" data-action-type="use" href="https://network.guifi.net/en" rel="external noreferrer">Usar <span aria-hidden="true">↗</span></a>
+              <a class="catalog-action-link" data-action-type="learn" href="https://fundacio.guifi.net/page/red" rel="external noreferrer">Aprender <span aria-hidden="true">↗</span></a>
+              <a class="catalog-action-link" data-action-type="contribute" href="https://network.guifi.net/en" rel="external noreferrer">Contribuir <span aria-hidden="true">↗</span></a>
+              <a class="catalog-action-link" data-action-type="replicate" href="https://network.guifi.net/en/node/70380" rel="external noreferrer">Replicar <span aria-hidden="true">↗</span></a>
+              <a class="catalog-action-link" data-action-type="contact" href="https://landing.guifi.net/en/" rel="external noreferrer">Contactar <span aria-hidden="true">↗</span></a>
+              <a href="https://landing.guifi.net/en/" rel="external noreferrer">Sitio web oficial <span aria-hidden="true">↗</span></a>
+              <a href="./catalog/projects/guifi-net.json" type="application/json">JSON</a>
+            </div>
+          </article>
+          <article class="catalog-card" id="project-hepburn-energy" data-commonproject-id="hepburn-energy">
+            <p class="catalog-kind">En el sitio · Digital · Suministro, Tierra y Ecología › Cooperativas de Energía</p>
+            <h2 dir="auto">Hepburn Energy</h2>
+            <p lang="es" dir="auto">Una cooperativa energética de propiedad de sus miembros en el Hepburn Shire de Australia que opera energía eólica comunitaria y sigue desarrollando su capacidad de generación local.</p>
+            <p class="catalog-location">1 ubicación pública</p>
+            <div class="catalog-actions">
+              <a class="catalog-action-link" data-action-type="learn" href="https://www.hepburnenergy.coop/about/" rel="external noreferrer">Aprender <span aria-hidden="true">↗</span></a>
+              <a class="catalog-action-link" data-action-type="use" href="https://www.hepburnenergy.coop/membership/" rel="external noreferrer">Usar <span aria-hidden="true">↗</span></a>
+              <a href="https://www.hepburnenergy.coop/about/" rel="external noreferrer">Sitio web oficial <span aria-hidden="true">↗</span></a>
+              <a href="./catalog/projects/hepburn-energy.json" type="application/json">JSON</a>
+            </div>
+          </article>
+          <article class="catalog-card" id="project-isle-of-eigg-heritage-trust" data-commonproject-id="isle-of-eigg-heritage-trust">
+            <p class="catalog-kind">En el sitio</p>
+            <h2 lang="en" dir="ltr">Isle of Eigg Heritage Trust</h2>
+            <p lang="es" dir="auto">Isle of Eigg Heritage Trust es propietario y gestiona la isla en beneficio de sus residentes; cuatro directores elegidos por la Residents’ Association orientan las decisiones sobre tierra, vivienda, infraestructura, patrimonio natural y la red eléctrica local.</p>
+            <p class="catalog-location">1 ubicación pública</p>
+            <div class="catalog-actions">
+              <a class="catalog-action-link" data-action-type="learn" href="https://isleofeigg.org/ieht/community-buyout/" rel="external noreferrer">Aprender <span aria-hidden="true">↗</span></a>
+              <a href="https://isleofeigg.org/ieht/" rel="external noreferrer">Sitio web oficial <span aria-hidden="true">↗</span></a>
+              <a href="./catalog/projects/isle-of-eigg-heritage-trust.json" type="application/json">JSON</a>
+            </div>
+          </article>
+          <article class="catalog-card" id="project-kawawana" data-commonproject-id="kawawana">
+            <p class="catalog-kind">En el sitio</p>
+            <h2 lang="en" dir="ltr">Kawawana</h2>
+            <p lang="es" dir="auto">APCRM y residentes de ocho aldeas en el centro de Casamance protegen las poblaciones locales de peces mediante zonas de uso codificadas por colores, restricciones de pesca, monitoreo y patrullas bajo derechos de gestión costera transferidos en 2010.</p>
+            <p class="catalog-location">1 ubicación pública</p>
+            <p class="catalog-activity-notice">El estado operativo actual no se ha verificado recientemente. Fuentes revisadas el 2026-08-04; revisión prioritaria 2026-09-04.</p>
+            <div class="catalog-actions">
+              <a class="catalog-action-link" data-action-type="learn" href="https://www.iccaregistry.org/en/explore/Senegal/kawawana" rel="external noreferrer">Aprender <span aria-hidden="true">↗</span></a>
+              <a href="https://www.iccaregistry.org/en/explore/Senegal/kawawana" rel="external noreferrer">Sitio web oficial <span aria-hidden="true">↗</span></a>
+              <a href="./catalog/projects/kawawana.json" type="application/json">JSON</a>
+            </div>
+          </article>
+          <article class="catalog-card" id="project-kibera-public-space-project" data-commonproject-id="kibera-public-space-project">
+            <p class="catalog-kind">En el sitio</p>
+            <h2 dir="auto">Kibera Public Space Project</h2>
+            <p lang="es" dir="auto">Una red creciente de espacios públicos codiseñados y gestionados con grupos de residentes en Kibera, que vincula la resiliencia ante inundaciones, los servicios básicos, los lugares de encuentro y el uso económico local.</p>
+            <p class="catalog-location">1 ubicación pública</p>
+            <div class="catalog-actions">
+              <a class="catalog-action-link" data-action-type="learn" href="https://www.kounkuey.org/projects/kibera_public_space_project_network" rel="external noreferrer">Aprender <span aria-hidden="true">↗</span></a>
+              <a href="https://www.kounkuey.org/projects/kibera_public_space_project_network" rel="external noreferrer">Sitio web oficial <span aria-hidden="true">↗</span></a>
+              <a href="./catalog/projects/kibera-public-space-project.json" type="application/json">JSON</a>
+            </div>
+          </article>
+          <article class="catalog-card" id="project-kobulu-community-micro-hydro" data-commonproject-id="kobulu-community-micro-hydro">
+            <p class="catalog-kind">En el sitio · Digital · Suministro, Tierra y Ecología › Cooperativas de Energía</p>
+            <h2 dir="auto">Kobulu Community Micro Hydro</h2>
+            <p lang="es" dir="auto">Un sistema microhidroeléctrico gestionado por la comunidad en Kampung Buayan, Sabah, cuyo comité local organiza las tarifas de consumo, la remuneración de operadores, las piezas de repuesto y las reparaciones futuras.</p>
+            <p class="catalog-location">1 ubicación pública</p>
+            <div class="catalog-actions">
+              <a class="catalog-action-link" data-action-type="learn" href="https://tonibung.org/projects" rel="external noreferrer">Aprender <span aria-hidden="true">↗</span></a>
+              <a href="https://tonibung.org/projects" rel="external noreferrer">Sitio web oficial <span aria-hidden="true">↗</span></a>
+              <a href="./catalog/projects/kobulu-community-micro-hydro.json" type="application/json">JSON</a>
+            </div>
+          </article>
+          <article class="catalog-card" id="project-libreoffice" data-commonproject-id="libreoffice">
+            <p class="catalog-kind">Digital · Software, Herramientas y Producción › Software Libre e Infraestructura</p>
+            <h2 dir="auto">LibreOffice</h2>
+            <p lang="es" dir="auto">Una suite ofimática libre y de código abierto desarrollada, documentada y traducida por una comunidad internacional.</p>
+            <p class="catalog-location">Presencia digital independiente de la ubicación</p>
+            <div class="catalog-actions">
+              <a class="catalog-action-link" data-action-type="use" href="https://www.libreoffice.org/download/" rel="external noreferrer">Usar <span aria-hidden="true">↗</span></a>
+              <a class="catalog-action-link" data-action-type="learn" href="https://documentation.libreoffice.org/en/english-documentation/" rel="external noreferrer">Aprender <span aria-hidden="true">↗</span></a>
+              <a class="catalog-action-link" data-action-type="contribute" href="https://www.libreoffice.org/improve-it/" rel="external noreferrer">Contribuir <span aria-hidden="true">↗</span></a>
+              <a class="catalog-action-link" data-action-type="donate" href="https://www.libreoffice.org/donate/" rel="external noreferrer">Donar <span aria-hidden="true">↗</span></a>
+              <a href="https://www.libreoffice.org/" rel="external noreferrer">Sitio web oficial <span aria-hidden="true">↗</span></a>
+              <a href="./catalog/projects/libreoffice.json" type="application/json">JSON</a>
+            </div>
+          </article>
+          <article class="catalog-card" id="project-librivox" data-commonproject-id="librivox">
+            <p class="catalog-kind">Digital · Conocimiento, Aprendizaje y Cultura › Medios, Archivos y Cultura</p>
+            <h2 dir="auto">LibriVox</h2>
+            <p lang="es" dir="auto">Una comunidad mundial de voluntarios que graba textos de dominio público como audiolibros de libre acceso y publica las grabaciones sin barreras comerciales de acceso.</p>
+            <p class="catalog-location">Presencia digital independiente de la ubicación</p>
+            <div class="catalog-actions">
+              <a class="catalog-action-link" data-action-type="use" href="https://librivox.org/" rel="external noreferrer">Usar <span aria-hidden="true">↗</span></a>
+              <a class="catalog-action-link" data-action-type="learn" href="https://librivox.org/pages/about-librivox/" rel="external noreferrer">Aprender <span aria-hidden="true">↗</span></a>
+              <a class="catalog-action-link" data-action-type="contribute" href="https://librivox.org/pages/volunteer-for-librivox/" rel="external noreferrer">Contribuir <span aria-hidden="true">↗</span></a>
+              <a class="catalog-action-link" data-action-type="volunteer" href="https://librivox.org/pages/volunteer-for-librivox/" rel="external noreferrer">Colaborar como voluntario <span aria-hidden="true">↗</span></a>
+              <a href="https://librivox.org/" rel="external noreferrer">Sitio web oficial <span aria-hidden="true">↗</span></a>
+              <a href="./catalog/projects/librivox.json" type="application/json">JSON</a>
+            </div>
+          </article>
+          <article class="catalog-card" id="project-masipag" data-commonproject-id="masipag">
+            <p class="catalog-kind">En el sitio</p>
+            <h2 dir="auto">MASIPAG</h2>
+            <p lang="es" dir="auto">Una red filipina liderada por agricultores que conecta semillas conservadas por agricultores, prácticas agroecológicas, soberanía alimentaria y desarrollo comunitario del conocimiento.</p>
+            <p class="catalog-location">1 ubicación pública</p>
+            <div class="catalog-actions">
+              <a class="catalog-action-link" data-action-type="learn" href="https://masipag.org/about-masipag/" rel="external noreferrer">Aprender <span aria-hidden="true">↗</span></a>
+              <a class="catalog-action-link" data-action-type="contact" href="https://masipag.org/" rel="external noreferrer">Contactar <span aria-hidden="true">↗</span></a>
+              <a class="catalog-action-link" data-action-type="contribute" href="https://masipag.org/" rel="external noreferrer">Contribuir <span aria-hidden="true">↗</span></a>
+              <a href="https://masipag.org/" rel="external noreferrer">Sitio web oficial <span aria-hidden="true">↗</span></a>
+              <a href="./catalog/projects/masipag.json" type="application/json">JSON</a>
+            </div>
+          </article>
+          <article class="catalog-card" id="project-mastodon" data-commonproject-id="mastodon">
+            <p class="catalog-kind">Digital · Comunicación y Redes › Federación y Protocolos</p>
+            <h2 dir="auto">Mastodon</h2>
+            <p lang="es" dir="auto">Software de redes sociales libre, de código abierto y federado cuyos servidores independientes pueden comunicarse entre sí.</p>
+            <p class="catalog-location">Presencia digital independiente de la ubicación</p>
+            <div class="catalog-actions">
+              <a class="catalog-action-link" data-action-type="use" href="https://joinmastodon.org/servers" rel="external noreferrer">Usar <span aria-hidden="true">↗</span></a>
+              <a class="catalog-action-link" data-action-type="learn" href="https://docs.joinmastodon.org/" rel="external noreferrer">Aprender <span aria-hidden="true">↗</span></a>
+              <a class="catalog-action-link" data-action-type="contribute" href="https://github.com/mastodon/mastodon" rel="external noreferrer">Contribuir <span aria-hidden="true">↗</span></a>
+              <a href="https://joinmastodon.org/" rel="external noreferrer">Sitio web oficial <span aria-hidden="true">↗</span></a>
+              <a href="./catalog/projects/mastodon.json" type="application/json">JSON</a>
+            </div>
+          </article>
+          <article class="catalog-card" id="project-meshtastic" data-commonproject-id="meshtastic">
+            <p class="catalog-kind">Digital · Comunicación y Redes › Redes Comunitarias</p>
+            <h2 dir="auto">Meshtastic</h2>
+            <p lang="es" dir="auto">Un ecosistema de código abierto para la comunicación descentralizada sin servicio celular ni conexión a internet, que utiliza dispositivos LoRa asequibles de bajo consumo y proporciona firmware, protocolos y documentación.</p>
+            <p class="catalog-location">Presencia digital independiente de la ubicación</p>
+            <div class="catalog-actions">
+              <a class="catalog-action-link" data-action-type="use" href="https://meshtastic.org/docs/getting-started/" rel="external noreferrer">Usar <span aria-hidden="true">↗</span></a>
+              <a class="catalog-action-link" data-action-type="learn" href="https://meshtastic.org/docs/introduction/" rel="external noreferrer">Aprender <span aria-hidden="true">↗</span></a>
+              <a class="catalog-action-link" data-action-type="contribute" href="https://github.com/meshtastic/firmware" rel="external noreferrer">Contribuir <span aria-hidden="true">↗</span></a>
+              <a class="catalog-action-link" data-action-type="replicate" href="https://meshtastic.org/docs/getting-started/" rel="external noreferrer">Replicar <span aria-hidden="true">↗</span></a>
+              <a href="https://meshtastic.org/" rel="external noreferrer">Sitio web oficial <span aria-hidden="true">↗</span></a>
+              <a href="./catalog/projects/meshtastic.json" type="application/json">JSON</a>
+            </div>
+          </article>
+          <article class="catalog-card" id="project-mietshaeuser-syndikat" data-commonproject-id="mietshaeuser-syndikat">
+            <p class="catalog-kind">Commons</p>
+            <h2 dir="auto">Mietshäuser Syndikat</h2>
+            <p lang="es" dir="auto">Una red de proyectos de vivienda autoorganizados que utiliza una estructura societaria compartida para sacar permanentemente las propiedades de la reventa especulativa y una transferencia solidaria para apoyar nuevos proyectos de vivienda comunitaria.</p>
+            <p class="catalog-location">2 ubicaciones ocultas</p>
+            <div class="catalog-actions">
+              <a class="catalog-action-link" data-action-type="learn" href="https://www.syndikat.org/en/the-syndikat-in-operation/" rel="external noreferrer">Aprender <span aria-hidden="true">↗</span></a>
+              <a class="catalog-action-link" data-action-type="contribute" href="https://www.syndikat.org/solidartransfer/" rel="external noreferrer">Contribuir <span aria-hidden="true">↗</span></a>
+              <a class="catalog-action-link" data-action-type="contact" href="https://www.syndikat.org/der-projektverbund/" rel="external noreferrer">Contactar <span aria-hidden="true">↗</span></a>
+              <a href="https://www.syndikat.org/der-projektverbund/" rel="external noreferrer">Sitio web oficial <span aria-hidden="true">↗</span></a>
+              <a href="./catalog/projects/mietshaeuser-syndikat.json" type="application/json">JSON</a>
+            </div>
+          </article>
+          <article class="catalog-card" id="project-mikoko-pamoja" data-commonproject-id="mikoko-pamoja">
+            <p class="catalog-kind">En el sitio</p>
+            <h2 dir="auto">Mikoko Pamoja</h2>
+            <p lang="es" dir="auto">Una iniciativa de manglares de propiedad comunitaria en Gazi Bay que combina conservación, restauración y monitoreo local con ingresos por créditos de carbono para proyectos de beneficio comunitario elegidos en conjunto.</p>
+            <p class="catalog-location">1 ubicación pública</p>
+            <div class="catalog-actions">
+              <a class="catalog-action-link" data-action-type="learn" href="https://www.planvivo.org/projects/mikoko-pamoja-kenya" rel="external noreferrer">Aprender <span aria-hidden="true">↗</span></a>
+              <a href="https://mikokopamoja.org/" rel="external noreferrer">Sitio web oficial <span aria-hidden="true">↗</span></a>
+              <a href="./catalog/projects/mikoko-pamoja.json" type="application/json">JSON</a>
+            </div>
+          </article>
+          <article class="catalog-card" id="project-mundraub" data-commonproject-id="mundraub">
+            <p class="catalog-kind">Digital · Suministro, Tierra y Ecología › Sistemas de Agua y Alimentos</p>
+            <h2 lang="en" dir="ltr">mundraub.org</h2>
+            <p lang="es" dir="auto">Una plataforma operada por Terra Concordia gGmbH con un mapa de lectura pública donde las personas colaboradoras registran, comparten, usan y cuidan ubicaciones de plantas comestibles de acceso público bajo las reglas publicadas de Mundräuber.</p>
+            <p class="catalog-location">Presencia digital independiente de la ubicación</p>
+            <div class="catalog-actions">
+              <a class="catalog-action-link" data-action-type="use" href="https://mundraub.org/map" rel="external noreferrer">Usar <span aria-hidden="true">↗</span></a>
+              <a class="catalog-action-link" data-action-type="learn" href="https://mundraub.org/mundraeuber-regeln" rel="external noreferrer">Aprender <span aria-hidden="true">↗</span></a>
+              <a class="catalog-action-link" data-action-type="contribute" href="https://mundraub.org/user/login" rel="external noreferrer">Contribuir <span aria-hidden="true">↗</span></a>
+              <a class="catalog-action-link" data-action-type="donate" href="https://mundraub.org/spenden" rel="external noreferrer">Donar <span aria-hidden="true">↗</span></a>
+              <a href="https://mundraub.org/" rel="external noreferrer">Sitio web oficial <span aria-hidden="true">↗</span></a>
+              <a href="./catalog/projects/mundraub.json" type="application/json">JSON</a>
+            </div>
+          </article>
+          <article class="catalog-card" id="project-musicbrainz" data-commonproject-id="musicbrainz">
+            <p class="catalog-kind">Digital · Conocimiento, Aprendizaje y Cultura › Conocimiento y Datos Abiertos</p>
+            <h2 dir="auto">MusicBrainz</h2>
+            <p lang="es" dir="auto">Una enciclopedia musical abierta mantenida por una comunidad mundial, con metadatos añadidos, revisados y puestos a disposición de forma colaborativa, en gran medida bajo licencias abiertas.</p>
+            <p class="catalog-location">Presencia digital independiente de la ubicación</p>
+            <div class="catalog-actions">
+              <a class="catalog-action-link" data-action-type="use" href="https://musicbrainz.org/" rel="external noreferrer">Usar <span aria-hidden="true">↗</span></a>
+              <a class="catalog-action-link" data-action-type="learn" href="https://musicbrainz.org/doc/About" rel="external noreferrer">Aprender <span aria-hidden="true">↗</span></a>
+              <a class="catalog-action-link" data-action-type="contribute" href="https://musicbrainz.org/doc/How_to_Contribute" rel="external noreferrer">Contribuir <span aria-hidden="true">↗</span></a>
+              <a href="https://musicbrainz.org/" rel="external noreferrer">Sitio web oficial <span aria-hidden="true">↗</span></a>
+              <a href="./catalog/projects/musicbrainz.json" type="application/json">JSON</a>
+            </div>
+          </article>
+          <article class="catalog-card" id="project-namena-marine-reserve" data-commonproject-id="namena-marine-reserve">
+            <p class="catalog-kind">En el sitio · Digital · Suministro, Tierra y Ecología › Tierra, Verde Urbano y Ecología</p>
+            <h2 dir="auto">Namena Marine Reserve</h2>
+            <p lang="es" dir="auto">Una reserva marina administrada por los propietarios consuetudinarios de recursos del distrito de Kubulau en Fiyi, donde las normas comunitarias, su aplicación y la financiación protegen las pesquerías y los medios de vida locales.</p>
+            <p class="catalog-location">1 ubicación pública</p>
+            <div class="catalog-actions">
+              <a class="catalog-action-link" data-action-type="learn" href="https://fiji.wcs.org/Initiatives/Protected-Areas/Namena-Marine-Reserve.aspx" rel="external noreferrer">Aprender <span aria-hidden="true">↗</span></a>
+              <a href="https://fiji.wcs.org/Initiatives/Protected-Areas/Namena-Marine-Reserve.aspx" rel="external noreferrer">Sitio web oficial <span aria-hidden="true">↗</span></a>
+              <a href="./catalog/projects/namena-marine-reserve.json" type="application/json">JSON</a>
+            </div>
+          </article>
+          <article class="catalog-card" id="project-namibia-communal-conservancies-alliance" data-commonproject-id="namibia-communal-conservancies-alliance">
+            <p class="catalog-kind">En el sitio · Digital · Cooperación y Autoorganización › Gobernanza Comunitaria y Cooperativas</p>
+            <h2 dir="auto">National Communal Conservancies and Community Forest Alliance</h2>
+            <p lang="es" dir="auto">Una alianza paraguas namibiana de áreas de conservación comunales, bosques comunitarios y otros grupos locales de recursos que representa intereses compartidos y apoya la gobernanza comunitaria de los recursos naturales.</p>
+            <p class="catalog-location">1 ubicación pública</p>
+            <div class="catalog-actions">
+              <a class="catalog-action-link" data-action-type="learn" href="https://nacso.org.na/communal-conservancies/" rel="external noreferrer">Aprender <span aria-hidden="true">↗</span></a>
+              <a href="https://nacso.org.na/" rel="external noreferrer">Sitio web oficial <span aria-hidden="true">↗</span></a>
+              <a href="./catalog/projects/namibia-communal-conservancies-alliance.json" type="application/json">JSON</a>
+            </div>
+          </article>
+          <article class="catalog-card" id="project-nepal-wireless-networking-project" data-commonproject-id="nepal-wireless-networking-project">
+            <p class="catalog-kind">Digital · Comunicación y Redes › Redes Comunitarias</p>
+            <h2 dir="auto">Nepal Wireless Networking Project</h2>
+            <p lang="es" dir="auto">Comunidades locales y E-Networking Research and Development operan una red de comunicaciones rurales en Nepal, que vincula infraestructura inalámbrica, educación y servicios locales.</p>
+            <p class="catalog-location">2 ubicaciones ocultas</p>
+            <div class="catalog-actions">
+              <a class="catalog-action-link" data-action-type="learn" href="https://enrd.org.np/projects-2/project-3/" rel="external noreferrer">Aprender <span aria-hidden="true">↗</span></a>
+              <a class="catalog-action-link" data-action-type="contribute" href="https://enrd.org.np/projects-2/empowering-mountain-community-to-maintain-and-build-wireless-network/" rel="external noreferrer">Contribuir <span aria-hidden="true">↗</span></a>
+              <a class="catalog-action-link" data-action-type="contact" href="https://enrd.org.np/" rel="external noreferrer">Contactar <span aria-hidden="true">↗</span></a>
+              <a href="https://enrd.org.np/" rel="external noreferrer">Sitio web oficial <span aria-hidden="true">↗</span></a>
+              <a href="./catalog/projects/nepal-wireless-networking-project.json" type="application/json">JSON</a>
+            </div>
+          </article>
+          <article class="catalog-card" id="project-new-mexico-acequia-association" data-commonproject-id="new-mexico-acequia-association">
+            <p class="catalog-kind">Digital · Suministro, Tierra y Ecología › Sistemas de Agua y Alimentos</p>
+            <h2 dir="auto">New Mexico Acequia Association</h2>
+            <p lang="es" dir="auto">Una asociación en Nuevo México que apoya los canales de riego gestionados colectivamente, la gobernanza democrática del agua, la agricultura tradicional y la capacidad de actuación de las comunidades locales de acequia.</p>
+            <p class="catalog-location">2 ubicaciones ocultas</p>
+            <div class="catalog-actions">
+              <a class="catalog-action-link" data-action-type="learn" href="https://lasacequias.org/about-us/" rel="external noreferrer">Aprender <span aria-hidden="true">↗</span></a>
+              <a class="catalog-action-link" data-action-type="contribute" href="https://lasacequias.org/become-a-member/" rel="external noreferrer">Contribuir <span aria-hidden="true">↗</span></a>
+              <a class="catalog-action-link" data-action-type="contact" href="https://lasacequias.org/" rel="external noreferrer">Contactar <span aria-hidden="true">↗</span></a>
+              <a href="https://lasacequias.org/" rel="external noreferrer">Sitio web oficial <span aria-hidden="true">↗</span></a>
+              <a href="./catalog/projects/new-mexico-acequia-association.json" type="application/json">JSON</a>
+            </div>
+          </article>
+          <article class="catalog-card" id="project-north-east-syria-autonomous-administration" data-commonproject-id="north-east-syria-autonomous-administration">
+            <p class="catalog-kind">Commons</p>
+            <h2 lang="en" dir="ltr">Democratic Autonomous Administration of North and East Syria</h2>
+            <p lang="es" dir="auto">Una estructura de autoadministración regional desarrollada desde 2018 que organiza consejos locales, comunas, instituciones civiles y servicios en torno a principios declarados de democracia participativa, justicia social e igualdad.</p>
+            <p class="catalog-location">1 ubicación oculta</p>
+            <div class="catalog-actions">
+              <a class="catalog-action-link" data-action-type="learn" href="https://daanes.org/en/about/" rel="external noreferrer">Aprender <span aria-hidden="true">↗</span></a>
+              <a class="catalog-action-link" data-action-type="contact" href="https://daanes.org/en/contact/" rel="external noreferrer">Contactar <span aria-hidden="true">↗</span></a>
+              <a href="https://daanes.org/en/" rel="external noreferrer">Sitio web oficial <span aria-hidden="true">↗</span></a>
+              <a href="./catalog/projects/north-east-syria-autonomous-administration.json" type="application/json">JSON</a>
+            </div>
+          </article>
+          <article class="catalog-card" id="project-nyc-mesh" data-commonproject-id="nyc-mesh">
+            <p class="catalog-kind">En el sitio · Digital · Comunicación y Redes › Redes Comunitarias</p>
+            <h2 dir="auto">NYC Mesh</h2>
+            <p lang="es" dir="auto">Una red comunitaria gestionada por voluntarios en la ciudad de Nueva York que conecta el acceso asequible a internet, la autodeterminación digital y la infraestructura local construida en conjunto.</p>
+            <p class="catalog-location">1 ubicación pública · 1 ubicación oculta</p>
+            <div class="catalog-actions">
+              <a class="catalog-action-link" data-action-type="use" href="https://www.nycmesh.net/join" rel="external noreferrer">Usar <span aria-hidden="true">↗</span></a>
+              <a class="catalog-action-link" data-action-type="learn" href="https://wiki.nycmesh.net/books/1-introduction/page/nyc-mesh-overview" rel="external noreferrer">Aprender <span aria-hidden="true">↗</span></a>
+              <a class="catalog-action-link" data-action-type="contribute" href="https://www.nycmesh.net/volunteer" rel="external noreferrer">Contribuir <span aria-hidden="true">↗</span></a>
+              <a class="catalog-action-link" data-action-type="volunteer" href="https://www.nycmesh.net/volunteer" rel="external noreferrer">Colaborar como voluntario <span aria-hidden="true">↗</span></a>
+              <a class="catalog-action-link" data-action-type="donate" href="https://www.nycmesh.net/donate" rel="external noreferrer">Donar <span aria-hidden="true">↗</span></a>
+              <a class="catalog-action-link" data-action-type="contact" href="https://www.nycmesh.net/support" rel="external noreferrer">Contactar <span aria-hidden="true">↗</span></a>
+              <a href="https://www.nycmesh.net/" rel="external noreferrer">Sitio web oficial <span aria-hidden="true">↗</span></a>
+              <a href="./catalog/projects/nyc-mesh.json" type="application/json">JSON</a>
+            </div>
+          </article>
+          <article class="catalog-card" id="project-open-food-facts" data-commonproject-id="open-food-facts">
+            <p class="catalog-kind">Digital · Suministro, Tierra y Ecología › Plataformas de Alimentos</p>
+            <h2 lang="en" dir="ltr">Open Food Facts</h2>
+            <p lang="es" dir="auto">Una base de datos abierta de alimentos cuyos voluntarios recopilan y revisan datos e imágenes de productos y los publican bajo la ODbL para reutilización libre.</p>
+            <p class="catalog-location">Presencia digital independiente de la ubicación</p>
+            <div class="catalog-actions">
+              <a class="catalog-action-link" data-action-type="use" href="https://world.openfoodfacts.org/" rel="external noreferrer">Usar <span aria-hidden="true">↗</span></a>
+              <a class="catalog-action-link" data-action-type="learn" href="https://openfoodfacts.github.io/documentation/docs/" rel="external noreferrer">Aprender <span aria-hidden="true">↗</span></a>
+              <a class="catalog-action-link" data-action-type="contribute" href="https://openfoodfacts.github.io/documentation/docs/" rel="external noreferrer">Contribuir <span aria-hidden="true">↗</span></a>
+              <a href="https://world.openfoodfacts.org/" rel="external noreferrer">Sitio web oficial <span aria-hidden="true">↗</span></a>
+              <a href="./catalog/projects/open-food-facts.json" type="application/json">JSON</a>
+            </div>
+          </article>
+          <article class="catalog-card" id="project-open-food-network-australia" data-commonproject-id="open-food-network-australia">
+            <p class="catalog-kind">Digital · Suministro, Tierra y Ecología › Plataformas de Alimentos</p>
+            <h2 dir="auto">Open Food Network Australia</h2>
+            <p lang="es" dir="auto">Una plataforma comunitaria australiana sin fines de lucro y de código abierto que permite a productores e iniciativas alimentarias organizar cadenas de suministro cortas, transparentes y controladas por la comunidad.</p>
+            <p class="catalog-location">Presencia digital independiente de la ubicación</p>
+            <div class="catalog-actions">
+              <a class="catalog-action-link" data-action-type="use" href="https://openfoodnetwork.org.au/" rel="external noreferrer">Usar <span aria-hidden="true">↗</span></a>
+              <a class="catalog-action-link" data-action-type="learn" href="https://about.openfoodnetwork.org.au/about-us/" rel="external noreferrer">Aprender <span aria-hidden="true">↗</span></a>
+              <a class="catalog-action-link" data-action-type="contribute" href="https://about.openfoodnetwork.org.au/join-us/" rel="external noreferrer">Contribuir <span aria-hidden="true">↗</span></a>
+              <a href="https://openfoodnetwork.org.au/" rel="external noreferrer">Sitio web oficial <span aria-hidden="true">↗</span></a>
+              <a href="./catalog/projects/open-food-network-australia.json" type="application/json">JSON</a>
+            </div>
+          </article>
+          <article class="catalog-card" id="project-open-library" data-commonproject-id="open-library">
+            <p class="catalog-kind">Digital · Conocimiento, Aprendizaje y Cultura › Conocimiento y Datos Abiertos</p>
+            <h2 lang="en" dir="ltr">Open Library</h2>
+            <p lang="es" dir="auto">Un catálogo de libros abierto y editable de forma colaborativa y una biblioteca pública digital del Internet Archive cuyo software, datos y documentación son abiertos y son ampliados y mantenidos por voluntarios.</p>
+            <p class="catalog-location">Presencia digital independiente de la ubicación</p>
+            <div class="catalog-actions">
+              <a class="catalog-action-link" data-action-type="use" href="https://openlibrary.org/search" rel="external noreferrer">Usar <span aria-hidden="true">↗</span></a>
+              <a class="catalog-action-link" data-action-type="learn" href="https://openlibrary.org/about" rel="external noreferrer">Aprender <span aria-hidden="true">↗</span></a>
+              <a class="catalog-action-link" data-action-type="contribute" href="https://openlibrary.org/volunteer" rel="external noreferrer">Contribuir <span aria-hidden="true">↗</span></a>
+              <a href="https://openlibrary.org/" rel="external noreferrer">Sitio web oficial <span aria-hidden="true">↗</span></a>
+              <a href="./catalog/projects/open-library.json" type="application/json">JSON</a>
+            </div>
+          </article>
+          <article class="catalog-card" id="project-open-source-ecology" data-commonproject-id="open-source-ecology">
+            <p class="catalog-kind">En el sitio · Digital · Software, Herramientas y Producción › Hardware Abierto y Producción</p>
+            <h2 dir="auto">Open Source Ecology</h2>
+            <p lang="es" dir="auto">Un proyecto global de hardware abierto que desarrolla diseños de uso libre para herramientas industriales y los prueba, documenta y enseña en la práctica en Factor e Farm en Missouri.</p>
+            <p class="catalog-location">1 ubicación pública</p>
+            <div class="catalog-actions">
+              <a class="catalog-action-link" data-action-type="use" href="https://wiki.opensourceecology.org/" rel="external noreferrer">Usar <span aria-hidden="true">↗</span></a>
+              <a class="catalog-action-link" data-action-type="learn" href="https://www.opensourceecology.org/" rel="external noreferrer">Aprender <span aria-hidden="true">↗</span></a>
+              <a class="catalog-action-link" data-action-type="contribute" href="https://www.opensourceecology.org/community/" rel="external noreferrer">Contribuir <span aria-hidden="true">↗</span></a>
+              <a class="catalog-action-link" data-action-type="donate" href="https://wiki.opensourceecology.org/wiki/Support_OSE" rel="external noreferrer">Donar <span aria-hidden="true">↗</span></a>
+              <a class="catalog-action-link" data-action-type="contact" href="https://www.opensourceecology.org/contact/" rel="external noreferrer">Contactar <span aria-hidden="true">↗</span></a>
+              <a class="catalog-action-link" data-action-type="replicate" href="https://wiki.opensourceecology.org/" rel="external noreferrer">Replicar <span aria-hidden="true">↗</span></a>
+              <a href="https://www.opensourceecology.org/" rel="external noreferrer">Sitio web oficial <span aria-hidden="true">↗</span></a>
+              <a href="./catalog/projects/open-source-ecology.json" type="application/json">JSON</a>
+            </div>
+          </article>
+          <article class="catalog-card" id="project-open-source-seed-initiative" data-commonproject-id="open-source-seed-initiative">
+            <p class="catalog-kind">Digital · Suministro, Tierra y Ecología › Semillas, Alimentos y Agricultura</p>
+            <h2 lang="en" dir="ltr">Open Source Seed Initiative</h2>
+            <p lang="es" dir="auto">Una iniciativa de semillas respaldada por la comunidad cuyo compromiso protege la libertad de usar, cultivar, compartir, mejorar y transmitir semillas designadas bajo el mismo compromiso de apertura.</p>
+            <p class="catalog-location">1 ubicación oculta</p>
+            <div class="catalog-actions">
+              <a class="catalog-action-link" data-action-type="use" href="https://osseeds.org/ossi-varieties/" rel="external noreferrer">Usar <span aria-hidden="true">↗</span></a>
+              <a class="catalog-action-link" data-action-type="learn" href="https://osseeds.org/about/" rel="external noreferrer">Aprender <span aria-hidden="true">↗</span></a>
+              <a class="catalog-action-link" data-action-type="contribute" href="https://osseeds.org/actions-2/" rel="external noreferrer">Contribuir <span aria-hidden="true">↗</span></a>
+              <a class="catalog-action-link" data-action-type="donate" href="https://osseeds.org/donate/" rel="external noreferrer">Donar <span aria-hidden="true">↗</span></a>
+              <a href="https://osseeds.org/" rel="external noreferrer">Sitio web oficial <span aria-hidden="true">↗</span></a>
+              <a href="./catalog/projects/open-source-seed-initiative.json" type="application/json">JSON</a>
+            </div>
+          </article>
+          <article class="catalog-card" id="project-openmrs" data-commonproject-id="openmrs">
+            <p class="catalog-kind">Digital · Suministro, Tierra y Ecología › Salud Abierta</p>
+            <h2 dir="auto">OpenMRS</h2>
+            <p lang="es" dir="auto">Un sistema de información médica de código abierto adaptable para la atención sanitaria local, con documentación pública y vías de contribución en todo el mundo.</p>
+            <p class="catalog-location">Presencia digital independiente de la ubicación</p>
+            <div class="catalog-actions">
+              <a class="catalog-action-link" data-action-type="use" href="https://openmrs.org/download/" rel="external noreferrer">Usar <span aria-hidden="true">↗</span></a>
+              <a class="catalog-action-link" data-action-type="learn" href="https://openmrs.org/about/" rel="external noreferrer">Aprender <span aria-hidden="true">↗</span></a>
+              <a class="catalog-action-link" data-action-type="contribute" href="https://openmrs.org/get-involved/" rel="external noreferrer">Contribuir <span aria-hidden="true">↗</span></a>
+              <a href="https://openmrs.org/" rel="external noreferrer">Sitio web oficial <span aria-hidden="true">↗</span></a>
+              <a href="./catalog/projects/openmrs.json" type="application/json">JSON</a>
+            </div>
+          </article>
+          <article class="catalog-card" id="project-openstreetmap" data-commonproject-id="openstreetmap">
+            <p class="catalog-kind">Digital · Software, Herramientas y Producción › Puente de Datos y Software</p>
+            <h2 dir="auto">OpenStreetMap</h2>
+            <p lang="es" dir="auto">Una base de datos cartográfica abierta mundial cuyas carreteras, caminos y otros datos geográficos son cartografiados, corregidos y reutilizables libremente por los colaboradores.</p>
+            <p class="catalog-location">Presencia digital independiente de la ubicación</p>
+            <div class="catalog-actions">
+              <a class="catalog-action-link" data-action-type="use" href="https://www.openstreetmap.org/" rel="external noreferrer">Usar <span aria-hidden="true">↗</span></a>
+              <a class="catalog-action-link" data-action-type="learn" href="https://learnosm.org/en/" rel="external noreferrer">Aprender <span aria-hidden="true">↗</span></a>
+              <a class="catalog-action-link" data-action-type="contribute" href="https://www.openstreetmap.org/fixthemap" rel="external noreferrer">Contribuir <span aria-hidden="true">↗</span></a>
+              <a class="catalog-action-link" data-action-type="donate" href="https://supporting.openstreetmap.org/" rel="external noreferrer">Donar <span aria-hidden="true">↗</span></a>
+              <a href="https://www.openstreetmap.org/" rel="external noreferrer">Sitio web oficial <span aria-hidden="true">↗</span></a>
+              <a href="./catalog/projects/openstreetmap.json" type="application/json">JSON</a>
+            </div>
+          </article>
+          <article class="catalog-card" id="project-p2pu" data-commonproject-id="p2pu">
+            <p class="catalog-kind">Digital · Conocimiento, Aprendizaje y Cultura › Aprendizaje y Educación</p>
+            <h2 dir="auto">Peer 2 Peer University (P2PU)</h2>
+            <p lang="es" dir="auto">Una red de aprendizaje sin fines de lucro y respaldada por la comunidad que conecta círculos de aprendizaje gratuitos y recursos de aprendizaje abiertos con bibliotecas, facilitadores y comunidades locales en todo el mundo.</p>
+            <p class="catalog-location">Presencia digital independiente de la ubicación</p>
+            <div class="catalog-actions">
+              <a class="catalog-action-link" data-action-type="use" href="https://www.p2pu.org/" rel="external noreferrer">Usar <span aria-hidden="true">↗</span></a>
+              <a class="catalog-action-link" data-action-type="learn" href="https://www.p2pu.org/en/about/" rel="external noreferrer">Aprender <span aria-hidden="true">↗</span></a>
+              <a class="catalog-action-link" data-action-type="contribute" href="https://community.p2pu.org/" rel="external noreferrer">Contribuir <span aria-hidden="true">↗</span></a>
+              <a class="catalog-action-link" data-action-type="volunteer" href="https://www.p2pu.org/" rel="external noreferrer">Colaborar como voluntario <span aria-hidden="true">↗</span></a>
+              <a href="https://www.p2pu.org/" rel="external noreferrer">Sitio web oficial <span aria-hidden="true">↗</span></a>
+              <a href="./catalog/projects/p2pu.json" type="application/json">JSON</a>
+            </div>
+          </article>
+          <article class="catalog-card" id="project-pachgaon-community-forest" data-commonproject-id="pachgaon-community-forest">
+            <p class="catalog-kind">En el sitio</p>
+            <h2 lang="en" dir="ltr">Pachgaon Community Forest</h2>
+            <p lang="es" dir="auto">La Pachgaon Gram Sabha gestiona 1006 hectáreas de bosque mediante derechos reconocidos de Community Forest Resource, combinando decisiones democráticas con la protección forestal y la cosecha y venta de bambú para medios de vida locales.</p>
+            <p class="catalog-location">1 ubicación pública</p>
+            <p class="catalog-activity-notice">El estado operativo actual no se ha verificado recientemente. Fuentes revisadas el 2026-08-04; revisión prioritaria 2026-09-04.</p>
+            <div class="catalog-actions">
+              <a class="catalog-action-link" data-action-type="learn" href="https://cfr.atree.org/portfolio/learning-from-and-carrying-forward-cfr-management-planning-in-central-india-2/" rel="external noreferrer">Aprender <span aria-hidden="true">↗</span></a>
+              <a href="https://cfr.atree.org/portfolio/learning-from-and-carrying-forward-cfr-management-planning-in-central-india-2/" rel="external noreferrer">Sitio web oficial <span aria-hidden="true">↗</span></a>
+              <a href="./catalog/projects/pachgaon-community-forest.json" type="application/json">JSON</a>
+            </div>
+          </article>
+          <article class="catalog-card" id="project-park-slope-food-coop" data-commonproject-id="park-slope-food-coop">
+            <p class="catalog-kind">En el sitio · Digital · Cooperación y Autoorganización › Gobernanza Comunitaria y Cooperativas</p>
+            <h2 lang="en" dir="ltr">Park Slope Food Coop</h2>
+            <p lang="es" dir="auto">Una tienda de comestibles de propiedad de sus socios en Brooklyn cuyos aproximadamente 17 000 socios sostienen las compras, las operaciones y las normas mediante turnos de trabajo, participaciones de capital y procedimientos democráticos.</p>
+            <p class="catalog-location">1 ubicación pública</p>
+            <div class="catalog-actions">
+              <a class="catalog-action-link" data-action-type="visit" href="https://www.foodcoop.com/ort-agreements/" rel="external noreferrer">Visitar <span aria-hidden="true">↗</span></a>
+              <a class="catalog-action-link" data-action-type="use" href="https://www.foodcoop.com/ort-about/" rel="external noreferrer">Usar <span aria-hidden="true">↗</span></a>
+              <a class="catalog-action-link" data-action-type="learn" href="https://www.foodcoop.com/manual/" rel="external noreferrer">Aprender <span aria-hidden="true">↗</span></a>
+              <a class="catalog-action-link" data-action-type="contribute" href="https://www.foodcoop.com/ort-about/" rel="external noreferrer">Contribuir <span aria-hidden="true">↗</span></a>
+              <a href="https://www.foodcoop.com/" rel="external noreferrer">Sitio web oficial <span aria-hidden="true">↗</span></a>
+              <a href="./catalog/projects/park-slope-food-coop.json" type="application/json">JSON</a>
+            </div>
+          </article>
+          <article class="catalog-card" id="project-potato-park-peru" data-commonproject-id="potato-park-peru">
+            <p class="catalog-kind">En el sitio</p>
+            <h2 dir="auto">Parque de la Papa</h2>
+            <p lang="es" dir="auto">Un área cerca de Písac administrada por cinco comunidades quechuas donde se conservan de forma colectiva variedades nativas de papa, conocimientos agrícolas, ecosistemas y prácticas culturales.</p>
+            <p class="catalog-location">1 ubicación pública</p>
+            <div class="catalog-actions">
+              <a class="catalog-action-link" data-action-type="visit" href="https://parquedelapapa.org/" rel="external noreferrer">Visitar <span aria-hidden="true">↗</span></a>
+              <a href="https://parquedelapapa.org/" rel="external noreferrer">Sitio web oficial <span aria-hidden="true">↗</span></a>
+              <a href="./catalog/projects/potato-park-peru.json" type="application/json">JSON</a>
+            </div>
+          </article>
+          <article class="catalog-card" id="project-prinzessinnengarten-kollektiv" data-commonproject-id="prinzessinnengarten-kollektiv">
+            <p class="catalog-kind">En el sitio</p>
+            <h2 dir="auto">Prinzessinnengarten Kollektiv Berlin</h2>
+            <p lang="es" dir="auto">Un huerto comunitario de acceso público en Berlin-Neukölln donde vecinos cultivan juntos, comparten conocimientos y apoyan la biodiversidad urbana y la educación ecológica.</p>
+            <p class="catalog-location">1 ubicación pública</p>
+            <div class="catalog-actions">
+              <a class="catalog-action-link" data-action-type="visit" href="https://prinzessinnengarten-kollektiv.net/ueber-uns/" rel="external noreferrer">Visitar <span aria-hidden="true">↗</span></a>
+              <a class="catalog-action-link" data-action-type="learn" href="https://prinzessinnengarten-kollektiv.net/ueber-uns/" rel="external noreferrer">Aprender <span aria-hidden="true">↗</span></a>
+              <a class="catalog-action-link" data-action-type="contribute" href="https://prinzessinnengarten-kollektiv.net/ueber-uns/" rel="external noreferrer">Contribuir <span aria-hidden="true">↗</span></a>
+              <a class="catalog-action-link" data-action-type="volunteer" href="https://prinzessinnengarten-kollektiv.net/ueber-uns/" rel="external noreferrer">Colaborar como voluntario <span aria-hidden="true">↗</span></a>
+              <a class="catalog-action-link" data-action-type="contact" href="https://prinzessinnengarten-kollektiv.net/kontakt/" rel="external noreferrer">Contactar <span aria-hidden="true">↗</span></a>
+              <a href="https://prinzessinnengarten-kollektiv.net/" rel="external noreferrer">Sitio web oficial <span aria-hidden="true">↗</span></a>
+              <a href="./catalog/projects/prinzessinnengarten-kollektiv.json" type="application/json">JSON</a>
+            </div>
+          </article>
+          <article class="catalog-card" id="project-red-guardianes-semillas-ecuador" data-commonproject-id="red-guardianes-semillas-ecuador">
+            <p class="catalog-kind">Digital · Suministro, Tierra y Ecología › Semillas, Alimentos y Agricultura</p>
+            <h2 dir="auto">Red de Guardianes de Semillas del Ecuador</h2>
+            <p lang="es" dir="auto">Una red ecuatoriana de familias y guardianes de semillas que conecta la agrobiodiversidad, la gestión regenerativa de la tierra, el conocimiento sobre semillas y el aprendizaje comunitario.</p>
+            <p class="catalog-location">Presencia digital independiente de la ubicación</p>
+            <div class="catalog-actions">
+              <a class="catalog-action-link" data-action-type="learn" href="https://redsemillas.org/" rel="external noreferrer">Aprender <span aria-hidden="true">↗</span></a>
+              <a class="catalog-action-link" data-action-type="contribute" href="https://redsemillas.org/" rel="external noreferrer">Contribuir <span aria-hidden="true">↗</span></a>
+              <a class="catalog-action-link" data-action-type="volunteer" href="https://redsemillas.org/" rel="external noreferrer">Colaborar como voluntario <span aria-hidden="true">↗</span></a>
+              <a class="catalog-action-link" data-action-type="contact" href="https://redsemillas.org/" rel="external noreferrer">Contactar <span aria-hidden="true">↗</span></a>
+              <a href="https://redsemillas.org/" rel="external noreferrer">Sitio web oficial <span aria-hidden="true">↗</span></a>
+              <a href="./catalog/projects/red-guardianes-semillas-ecuador.json" type="application/json">JSON</a>
+            </div>
+          </article>
+          <article class="catalog-card" id="project-repair-cafe-international" data-commonproject-id="repair-cafe-international">
+            <p class="catalog-kind">Digital · Software, Herramientas y Producción › Plataformas y Herramientas Compartidas</p>
+            <h2 lang="en" dir="ltr">Repair Café International</h2>
+            <p lang="es" dir="auto">Una red mundial de encuentros de reparación voluntarios y no comerciales donde las personas comparten herramientas, conocimientos y tiempo para reparar juntas objetos cotidianos y desarrollar habilidades locales de reparación.</p>
+            <p class="catalog-location">1 ubicación oculta</p>
+            <div class="catalog-actions">
+              <a class="catalog-action-link" data-action-type="visit" href="https://www.repaircafe.org/en/visit/" rel="external noreferrer">Visitar <span aria-hidden="true">↗</span></a>
+              <a class="catalog-action-link" data-action-type="learn" href="https://www.repaircafe.org/en/about/" rel="external noreferrer">Aprender <span aria-hidden="true">↗</span></a>
+              <a class="catalog-action-link" data-action-type="replicate" href="https://www.repaircafe.org/en/join/start-your-own/" rel="external noreferrer">Replicar <span aria-hidden="true">↗</span></a>
+              <a class="catalog-action-link" data-action-type="donate" href="https://www.repaircafe.org/en/donate/" rel="external noreferrer">Donar <span aria-hidden="true">↗</span></a>
+              <a class="catalog-action-link" data-action-type="contact" href="https://www.repaircafe.org/en/contact/" rel="external noreferrer">Contactar <span aria-hidden="true">↗</span></a>
+              <a href="https://www.repaircafe.org/en/" rel="external noreferrer">Sitio web oficial <span aria-hidden="true">↗</span></a>
+              <a href="./catalog/projects/repair-cafe-international.json" type="application/json">JSON</a>
+            </div>
+          </article>
+          <article class="catalog-card" id="project-reprap" data-commonproject-id="reprap">
+            <p class="catalog-kind">Digital · Software, Herramientas y Producción › Hardware Abierto y Producción</p>
+            <h2 dir="auto">RepRap</h2>
+            <p lang="es" dir="auto">Un proyecto global de hardware abierto de impresoras 3D libremente documentadas que pueden fabricar una parte importante de sus propias piezas y cuyos diseños se construyen, adaptan y mejoran de forma colaborativa.</p>
+            <p class="catalog-location">Presencia digital independiente de la ubicación</p>
+            <div class="catalog-actions">
+              <a class="catalog-action-link" data-action-type="use" href="https://reprap.org/wiki/RepRap_Machines" rel="external noreferrer">Usar <span aria-hidden="true">↗</span></a>
+              <a class="catalog-action-link" data-action-type="learn" href="https://reprap.org/wiki/About" rel="external noreferrer">Aprender <span aria-hidden="true">↗</span></a>
+              <a class="catalog-action-link" data-action-type="contribute" href="https://reprap.org/" rel="external noreferrer">Contribuir <span aria-hidden="true">↗</span></a>
+              <a class="catalog-action-link" data-action-type="replicate" href="https://reprap.org/wiki/RepRap_Machines" rel="external noreferrer">Replicar <span aria-hidden="true">↗</span></a>
+              <a href="https://reprap.org/" rel="external noreferrer">Sitio web oficial <span aria-hidden="true">↗</span></a>
+              <a href="./catalog/projects/reprap.json" type="application/json">JSON</a>
+            </div>
+          </article>
+          <article class="catalog-card" id="project-restarters" data-commonproject-id="restarters">
+            <p class="catalog-kind">Digital · Software, Herramientas y Producción › Plataformas y Herramientas Compartidas</p>
+            <h2 dir="auto">Restarters</h2>
+            <p lang="es" dir="auto">Una red global de reparación comunitaria que conecta grupos locales de reparación, eventos, conocimientos y datos abiertos de impacto a través de una infraestructura digital compartida.</p>
+            <p class="catalog-location">Presencia digital independiente de la ubicación</p>
+            <div class="catalog-actions">
+              <a class="catalog-action-link" data-action-type="use" href="https://restarters.net/" rel="external noreferrer">Usar <span aria-hidden="true">↗</span></a>
+              <a class="catalog-action-link" data-action-type="learn" href="https://restarters.net/about" rel="external noreferrer">Aprender <span aria-hidden="true">↗</span></a>
+              <a class="catalog-action-link" data-action-type="contribute" href="https://talk.restarters.net/" rel="external noreferrer">Contribuir <span aria-hidden="true">↗</span></a>
+              <a class="catalog-action-link" data-action-type="volunteer" href="https://restarters.net/" rel="external noreferrer">Colaborar como voluntario <span aria-hidden="true">↗</span></a>
+              <a href="https://restarters.net/" rel="external noreferrer">Sitio web oficial <span aria-hidden="true">↗</span></a>
+              <a href="./catalog/projects/restarters.json" type="application/json">JSON</a>
+            </div>
+          </article>
+          <article class="catalog-card" id="project-root-access-hackerspace" data-commonproject-id="root-access-hackerspace">
+            <p class="catalog-kind">En el sitio · Digital · Software, Herramientas y Producción › Plataformas y Herramientas Compartidas</p>
+            <h2 dir="auto">Root Access Hackerspace</h2>
+            <p lang="es" dir="auto">Un hackerspace y makerspace sin fines de lucro, operado íntegramente por voluntarios en Fresno, donde los miembros comparten herramientas e infraestructura y organizan clases públicas y eventos comunitarios.</p>
+            <p class="catalog-location">1 ubicación pública</p>
+            <div class="catalog-actions">
+              <a class="catalog-action-link" data-action-type="visit" href="https://rootaccess.org/" rel="external noreferrer">Visitar <span aria-hidden="true">↗</span></a>
+              <a class="catalog-action-link" data-action-type="learn" href="https://rootaccess.org/classes" rel="external noreferrer">Aprender <span aria-hidden="true">↗</span></a>
+              <a class="catalog-action-link" data-action-type="contribute" href="https://rootaccess.org/wiki/Main_Page/" rel="external noreferrer">Contribuir <span aria-hidden="true">↗</span></a>
+              <a class="catalog-action-link" data-action-type="volunteer" href="https://rootaccess.org/" rel="external noreferrer">Colaborar como voluntario <span aria-hidden="true">↗</span></a>
+              <a class="catalog-action-link" data-action-type="donate" href="https://rootaccess.org/" rel="external noreferrer">Donar <span aria-hidden="true">↗</span></a>
+              <a class="catalog-action-link" data-action-type="contact" href="https://rootaccess.org/" rel="external noreferrer">Contactar <span aria-hidden="true">↗</span></a>
+              <a href="https://rootaccess.org/" rel="external noreferrer">Sitio web oficial <span aria-hidden="true">↗</span></a>
+              <a href="./catalog/projects/root-access-hackerspace.json" type="application/json">JSON</a>
+            </div>
+          </article>
+          <article class="catalog-card" id="project-safecast" data-commonproject-id="safecast">
+            <p class="catalog-kind">Digital · Conocimiento, Aprendizaje y Cultura › Conocimiento y Datos Abiertos</p>
+            <h2 dir="auto">Safecast</h2>
+            <p lang="es" dir="auto">Una comunidad internacional de ciencia ciudadana liderada por voluntarios que recoge mediciones ambientales abiertas, desarrolla herramientas para que las personas midan de forma independiente y publica sus datos en el dominio público.</p>
+            <p class="catalog-location">Presencia digital independiente de la ubicación</p>
+            <div class="catalog-actions">
+              <a class="catalog-action-link" data-action-type="use" href="https://safecast.org/data/" rel="external noreferrer">Usar <span aria-hidden="true">↗</span></a>
+              <a class="catalog-action-link" data-action-type="learn" href="https://safecast.org/about/" rel="external noreferrer">Aprender <span aria-hidden="true">↗</span></a>
+              <a class="catalog-action-link" data-action-type="contribute" href="https://api.safecast.org/" rel="external noreferrer">Contribuir <span aria-hidden="true">↗</span></a>
+              <a class="catalog-action-link" data-action-type="volunteer" href="https://safecast.org/join-us/" rel="external noreferrer">Colaborar como voluntario <span aria-hidden="true">↗</span></a>
+              <a class="catalog-action-link" data-action-type="donate" href="https://safecast.org/donate/" rel="external noreferrer">Donar <span aria-hidden="true">↗</span></a>
+              <a href="https://safecast.org/" rel="external noreferrer">Sitio web oficial <span aria-hidden="true">↗</span></a>
+              <a href="./catalog/projects/safecast.json" type="application/json">JSON</a>
+            </div>
+          </article>
+          <article class="catalog-card" id="project-sarantaporo-community-network" data-commonproject-id="sarantaporo-community-network">
+            <p class="catalog-kind">En el sitio · Digital · Comunicación y Redes › Redes Comunitarias</p>
+            <h2 dir="auto">Sarantaporo.gr Community Network</h2>
+            <p lang="es" dir="auto">Una red inalámbrica construida y operada por la comunidad en aldeas rurales de la región de Elassona, que conecta conectividad abierta, educación digital y autoorganización local.</p>
+            <p class="catalog-location">1 ubicación pública · 1 ubicación oculta</p>
+            <div class="catalog-actions">
+              <a class="catalog-action-link" data-action-type="use" href="https://www.sarantaporo.gr/en/community-network" rel="external noreferrer">Usar <span aria-hidden="true">↗</span></a>
+              <a class="catalog-action-link" data-action-type="learn" href="https://www.sarantaporo.gr/en/community-network" rel="external noreferrer">Aprender <span aria-hidden="true">↗</span></a>
+              <a class="catalog-action-link" data-action-type="contribute" href="https://www.sarantaporo.gr/en/about-us" rel="external noreferrer">Contribuir <span aria-hidden="true">↗</span></a>
+              <a class="catalog-action-link" data-action-type="volunteer" href="https://www.sarantaporo.gr/en/about-us" rel="external noreferrer">Colaborar como voluntario <span aria-hidden="true">↗</span></a>
+              <a class="catalog-action-link" data-action-type="donate" href="https://www.sarantaporo.gr/en/about-us" rel="external noreferrer">Donar <span aria-hidden="true">↗</span></a>
+              <a class="catalog-action-link" data-action-type="contact" href="https://www.sarantaporo.gr/en/contact-us" rel="external noreferrer">Contactar <span aria-hidden="true">↗</span></a>
+              <a href="https://www.sarantaporo.gr/en/" rel="external noreferrer">Sitio web oficial <span aria-hidden="true">↗</span></a>
+              <a href="./catalog/projects/sarantaporo-community-network.json" type="application/json">JSON</a>
+            </div>
+          </article>
+          <article class="catalog-card" id="project-som-energia" data-commonproject-id="som-energia">
+            <p class="catalog-kind">Digital · Suministro, Tierra y Ecología › Cooperativas de Energía</p>
+            <h2 dir="auto">Som Energia</h2>
+            <p lang="es" dir="auto">Una cooperativa energética sin fines de lucro en España cuyos miembros apoyan y desarrollan de forma democrática el suministro de energía renovable, proyectos de generación comunitaria y grupos locales.</p>
+            <p class="catalog-location">2 ubicaciones ocultas</p>
+            <div class="catalog-actions">
+              <a class="catalog-action-link" data-action-type="use" href="https://www.somenergia.coop/es/cooperativa/asociarse" rel="external noreferrer">Usar <span aria-hidden="true">↗</span></a>
+              <a class="catalog-action-link" data-action-type="learn" href="https://www.somenergia.coop/es/cooperativa/sobre-nosotros" rel="external noreferrer">Aprender <span aria-hidden="true">↗</span></a>
+              <a class="catalog-action-link" data-action-type="contribute" href="https://www.somenergia.coop/es/cooperativa/grupos-locales/" rel="external noreferrer">Contribuir <span aria-hidden="true">↗</span></a>
+              <a href="https://www.somenergia.coop/es" rel="external noreferrer">Sitio web oficial <span aria-hidden="true">↗</span></a>
+              <a href="./catalog/projects/som-energia.json" type="application/json">JSON</a>
+            </div>
+          </article>
+          <article class="catalog-card" id="project-tetepare-descendants-association" data-commonproject-id="tetepare-descendants-association">
+            <p class="catalog-kind">En el sitio · Digital · Suministro, Tierra y Ecología › Tierra, Verde Urbano y Ecología</p>
+            <h2 dir="auto">Tetepare Descendants’ Association</h2>
+            <p lang="es" dir="auto">Una gran asociación de propietarios de tierras en las Islas Salomón que protege y gestiona de forma colectiva la isla de Tetepare y sus recursos terrestres y marinos para las generaciones futuras.</p>
+            <p class="catalog-location">1 ubicación pública</p>
+            <div class="catalog-actions">
+              <a class="catalog-action-link" data-action-type="learn" href="https://tetepare.org/the-tetepare-descendants-association/" rel="external noreferrer">Aprender <span aria-hidden="true">↗</span></a>
+              <a href="https://tetepare.org/the-tetepare-descendants-association/" rel="external noreferrer">Sitio web oficial <span aria-hidden="true">↗</span></a>
+              <a href="./catalog/projects/tetepare-descendants-association.json" type="application/json">JSON</a>
+            </div>
+          </article>
+          <article class="catalog-card" id="project-thailand-citizens-forest-database" data-commonproject-id="thailand-citizens-forest-database">
+            <p class="catalog-kind">En el sitio · Digital · Conocimiento, Aprendizaje y Cultura › Conocimiento y Datos Abiertos</p>
+            <h2 dir="auto">Thailand Citizens’ Forest Database</h2>
+            <p lang="es" dir="auto">Una infraestructura digital de conocimiento mantenida de forma colaborativa donde comunidades, sociedad civil e instituciones públicas documentan los bosques comunitarios de Tailandia para la cooperación y la gestión local.</p>
+            <p class="catalog-location">1 ubicación pública</p>
+            <div class="catalog-actions">
+              <a class="catalog-action-link" data-action-type="use" href="https://thaicfnet.org/" rel="external noreferrer">Usar <span aria-hidden="true">↗</span></a>
+              <a class="catalog-action-link" data-action-type="learn" href="https://www.recoftc.org/annual-report-2021-2022/data-and-forests-putting-community-forestry-digital-map-thailand" rel="external noreferrer">Aprender <span aria-hidden="true">↗</span></a>
+              <a href="https://www.recoftc.org/th/publications/thaicfnet-factsheet" rel="external noreferrer">Sitio web oficial <span aria-hidden="true">↗</span></a>
+              <a href="./catalog/projects/thailand-citizens-forest-database.json" type="application/json">JSON</a>
+            </div>
+          </article>
+          <article class="catalog-card" id="project-the-things-network" data-commonproject-id="the-things-network">
+            <p class="catalog-kind">Digital · Comunicación y Redes › Redes Comunitarias</p>
+            <h2 lang="en" dir="ltr">The Things Network</h2>
+            <p lang="es" dir="auto">Una red global de radio del Internet de las cosas construida con comunidades locales, que combina pasarelas LoRaWAN operadas por la comunidad, software abierto, recursos de aprendizaje e infraestructura comunitaria pública.</p>
+            <p class="catalog-location">1 ubicación oculta</p>
+            <div class="catalog-actions">
+              <a class="catalog-action-link" data-action-type="use" href="https://www.thethingsnetwork.org/get-started" rel="external noreferrer">Usar <span aria-hidden="true">↗</span></a>
+              <a class="catalog-action-link" data-action-type="learn" href="https://www.thethingsnetwork.org/learn" rel="external noreferrer">Aprender <span aria-hidden="true">↗</span></a>
+              <a class="catalog-action-link" data-action-type="contribute" href="https://www.thethingsnetwork.org/community" rel="external noreferrer">Contribuir <span aria-hidden="true">↗</span></a>
+              <a class="catalog-action-link" data-action-type="replicate" href="https://www.thethingsnetwork.org/community" rel="external noreferrer">Replicar <span aria-hidden="true">↗</span></a>
+              <a href="https://www.thethingsnetwork.org/" rel="external noreferrer">Sitio web oficial <span aria-hidden="true">↗</span></a>
+              <a href="./catalog/projects/the-things-network.json" type="application/json">JSON</a>
+            </div>
+          </article>
+          <article class="catalog-card" id="project-tla-o-qui-aht-tribal-parks" data-commonproject-id="tla-o-qui-aht-tribal-parks">
+            <p class="catalog-kind">En el sitio · Digital · Suministro, Tierra y Ecología › Tierra, Verde Urbano y Ecología</p>
+            <h2 dir="auto">Tla-o-qui-aht Tribal Parks</h2>
+            <p lang="es" dir="auto">Áreas de gobernanza indígena en Clayoquot Sound donde la Primera Nación Tla-o-qui-aht combina la gobernanza tradicional, el trabajo de los Guardianes, la restauración ecológica y una participación regional responsable.</p>
+            <p class="catalog-location">1 ubicación pública</p>
+            <div class="catalog-actions">
+              <a class="catalog-action-link" data-action-type="visit" href="https://www.tribalparks.com/visit-responsibly" rel="external noreferrer">Visitar <span aria-hidden="true">↗</span></a>
+              <a class="catalog-action-link" data-action-type="learn" href="https://www.tribalparks.com/our-story" rel="external noreferrer">Aprender <span aria-hidden="true">↗</span></a>
+              <a class="catalog-action-link" data-action-type="donate" href="https://www.tribalparks.com/get-involved" rel="external noreferrer">Donar <span aria-hidden="true">↗</span></a>
+              <a href="https://www.tribalparks.com/" rel="external noreferrer">Sitio web oficial <span aria-hidden="true">↗</span></a>
+              <a href="./catalog/projects/tla-o-qui-aht-tribal-parks.json" type="application/json">JSON</a>
+            </div>
+          </article>
+          <article class="catalog-card" id="project-tribunal-aguas-valencia" data-commonproject-id="tribunal-aguas-valencia">
+            <p class="catalog-kind">En el sitio</p>
+            <h2 dir="auto">Tribunal de las Aguas de Valencia</h2>
+            <p lang="es" dir="auto">Un tribunal de aguas gestionado por las comunidades de regantes de Valencia que resuelve en público y con regularidad los conflictos sobre el uso del agua conforme a la práctica establecida.</p>
+            <p class="catalog-location">1 ubicación pública</p>
+            <div class="catalog-actions">
+              <a class="catalog-action-link" data-action-type="visit" href="https://tribunaldelasaguas.org/en/visits-to-the-tribunal/" rel="external noreferrer">Visitar <span aria-hidden="true">↗</span></a>
+              <a href="https://tribunaldelasaguas.org/en/" rel="external noreferrer">Sitio web oficial <span aria-hidden="true">↗</span></a>
+              <a href="./catalog/projects/tribunal-aguas-valencia.json" type="application/json">JSON</a>
+            </div>
+          </article>
+          <article class="catalog-card" id="project-ujamaa-community-resource-team" data-commonproject-id="ujamaa-community-resource-team">
+            <p class="catalog-kind">Commons</p>
+            <h2 lang="en" dir="ltr">Ujamaa Community Resource Team</h2>
+            <p lang="es" dir="auto">Una organización de derechos comunitarios del norte de Tanzania que apoya a comunidades pastoralistas, agro-pastoralistas y de cazadores-recolectores en la tenencia colectiva de la tierra, la gobernanza local y la gestión sostenible de los recursos.</p>
+            <p class="catalog-location">1 ubicación oculta</p>
+            <div class="catalog-actions">
+              <a class="catalog-action-link" data-action-type="learn" href="https://www.ujamaa-crt.or.tz/programmes.html" rel="external noreferrer">Aprender <span aria-hidden="true">↗</span></a>
+              <a class="catalog-action-link" data-action-type="donate" href="https://www.ujamaa-crt.or.tz/donate.html" rel="external noreferrer">Donar <span aria-hidden="true">↗</span></a>
+              <a class="catalog-action-link" data-action-type="contact" href="https://www.ujamaa-crt.or.tz/" rel="external noreferrer">Contactar <span aria-hidden="true">↗</span></a>
+              <a href="https://www.ujamaa-crt.or.tz/" rel="external noreferrer">Sitio web oficial <span aria-hidden="true">↗</span></a>
+              <a href="./catalog/projects/ujamaa-community-resource-team.json" type="application/json">JSON</a>
+            </div>
+          </article>
+          <article class="catalog-card" id="project-velondriake-lmma" data-commonproject-id="velondriake-lmma">
+            <p class="catalog-kind">En el sitio</p>
+            <h2 dir="auto">Velondriake Locally Managed Marine Area</h2>
+            <p lang="es" dir="auto">Un área marina gestionada de forma conjunta por comunidades costeras en torno a Andavadoaka, que articula la pesca sostenible, el monitoreo, zonas protegidas, arrecifes y manglares.</p>
+            <p class="catalog-location">1 ubicación pública</p>
+            <p class="catalog-activity-notice">El estado operativo actual no se ha verificado recientemente. Fuentes revisadas el 2026-07-19; revisión prioritaria 2026-08-19.</p>
+            <div class="catalog-actions">
+              <a class="catalog-action-link" data-action-type="learn" href="https://blog.blueventures.org/en/locations/madagascar/velondriake-madagascar/" rel="external noreferrer">Aprender <span aria-hidden="true">↗</span></a>
+              <a href="https://blog.blueventures.org/en/locations/madagascar/velondriake-madagascar/" rel="external noreferrer">Sitio web oficial <span aria-hidden="true">↗</span></a>
+              <a href="./catalog/projects/velondriake-lmma.json" type="application/json">JSON</a>
+            </div>
+          </article>
+          <article class="catalog-card" id="project-wikibooks" data-commonproject-id="wikibooks">
+            <p class="catalog-kind">Digital · Conocimiento, Aprendizaje y Cultura › Aprendizaje y Educación</p>
+            <h2 dir="auto">Wikibooks</h2>
+            <p lang="es" dir="auto">Una colección abierta de libros de texto, manuales y obras de no ficción de uso libre, escritos y mejorados de forma colaborativa.</p>
+            <p class="catalog-location">Presencia digital independiente de la ubicación</p>
+            <div class="catalog-actions">
+              <a class="catalog-action-link" data-action-type="use" href="https://www.wikibooks.org/" rel="external noreferrer">Usar <span aria-hidden="true">↗</span></a>
+              <a class="catalog-action-link" data-action-type="learn" href="https://www.wikibooks.org/" rel="external noreferrer">Aprender <span aria-hidden="true">↗</span></a>
+              <a href="https://www.wikibooks.org/" rel="external noreferrer">Sitio web oficial <span aria-hidden="true">↗</span></a>
+              <a href="./catalog/projects/wikibooks.json" type="application/json">JSON</a>
+            </div>
+          </article>
+          <article class="catalog-card" id="project-wikidata" data-commonproject-id="wikidata">
+            <p class="catalog-kind">Digital · Conocimiento, Aprendizaje y Cultura › Conocimiento y Datos Abiertos</p>
+            <h2 dir="auto">Wikidata</h2>
+            <p lang="es" dir="auto">Una base de datos de conocimiento libre para enunciados estructurados y legibles por máquina, utilizados y enlazados en los proyectos Wikimedia y en otras aplicaciones.</p>
+            <p class="catalog-location">Presencia digital independiente de la ubicación</p>
+            <div class="catalog-actions">
+              <a class="catalog-action-link" data-action-type="use" href="https://www.wikidata.org/" rel="external noreferrer">Usar <span aria-hidden="true">↗</span></a>
+              <a class="catalog-action-link" data-action-type="learn" href="https://www.wikidata.org/wiki/Wikidata:Introduction" rel="external noreferrer">Aprender <span aria-hidden="true">↗</span></a>
+              <a class="catalog-action-link" data-action-type="contribute" href="https://www.wikidata.org/wiki/Wikidata:Contribute" rel="external noreferrer">Contribuir <span aria-hidden="true">↗</span></a>
+              <a class="catalog-action-link" data-action-type="donate" href="https://donate.wikimedia.org/" rel="external noreferrer">Donar <span aria-hidden="true">↗</span></a>
+              <a href="https://www.wikidata.org/" rel="external noreferrer">Sitio web oficial <span aria-hidden="true">↗</span></a>
+              <a href="./catalog/projects/wikidata.json" type="application/json">JSON</a>
+            </div>
+          </article>
+          <article class="catalog-card" id="project-wikimedia-commons" data-commonproject-id="wikimedia-commons">
+            <p class="catalog-kind">Digital · Conocimiento, Aprendizaje y Cultura › Medios, Archivos y Cultura</p>
+            <h2 dir="auto">Wikimedia Commons</h2>
+            <p lang="es" dir="auto">Una colección libre y colaborativa de imágenes, audio, vídeo y otros archivos multimedia para su reutilización.</p>
+            <p class="catalog-location">Presencia digital independiente de la ubicación</p>
+            <div class="catalog-actions">
+              <a class="catalog-action-link" data-action-type="use" href="https://commons.wikimedia.org/" rel="external noreferrer">Usar <span aria-hidden="true">↗</span></a>
+              <a class="catalog-action-link" data-action-type="learn" href="https://commons.wikimedia.org/wiki/Commons:Welcome" rel="external noreferrer">Aprender <span aria-hidden="true">↗</span></a>
+              <a class="catalog-action-link" data-action-type="contribute" href="https://commons.wikimedia.org/wiki/Commons:First_steps" rel="external noreferrer">Contribuir <span aria-hidden="true">↗</span></a>
+              <a class="catalog-action-link" data-action-type="donate" href="https://donate.wikimedia.org/" rel="external noreferrer">Donar <span aria-hidden="true">↗</span></a>
+              <a href="https://commons.wikimedia.org/" rel="external noreferrer">Sitio web oficial <span aria-hidden="true">↗</span></a>
+              <a href="./catalog/projects/wikimedia-commons.json" type="application/json">JSON</a>
+            </div>
+          </article>
+          <article class="catalog-card" id="project-wikipedia" data-commonproject-id="wikipedia">
+            <p class="catalog-kind">Digital · Conocimiento, Aprendizaje y Cultura › Conocimiento y Datos Abiertos</p>
+            <h2 dir="auto">Wikipedia</h2>
+            <p lang="es" dir="auto">Una enciclopedia de acceso libre creada de forma colaborativa en muchos idiomas, cuyo contenido es escrito y mantenido por voluntarios.</p>
+            <p class="catalog-location">Presencia digital independiente de la ubicación</p>
+            <div class="catalog-actions">
+              <a class="catalog-action-link" data-action-type="use" href="https://www.wikipedia.org/" rel="external noreferrer">Usar <span aria-hidden="true">↗</span></a>
+              <a class="catalog-action-link" data-action-type="learn" href="https://de.wikipedia.org/wiki/Wikipedia" rel="external noreferrer">Aprender <span aria-hidden="true">↗</span></a>
+              <a class="catalog-action-link" data-action-type="contribute" href="https://de.wikipedia.org/wiki/Wikipedia:Starthilfe" rel="external noreferrer">Contribuir <span aria-hidden="true">↗</span></a>
+              <a class="catalog-action-link" data-action-type="donate" href="https://donate.wikimedia.org/" rel="external noreferrer">Donar <span aria-hidden="true">↗</span></a>
+              <a href="https://www.wikipedia.org/" rel="external noreferrer">Sitio web oficial <span aria-hidden="true">↗</span></a>
+              <a href="./catalog/projects/wikipedia.json" type="application/json">JSON</a>
+            </div>
+          </article>
+          <article class="catalog-card" id="project-wikiversity" data-commonproject-id="wikiversity">
+            <p class="catalog-kind">Digital · Conocimiento, Aprendizaje y Cultura › Aprendizaje y Educación</p>
+            <h2 dir="auto">Wikiversity</h2>
+            <p lang="es" dir="auto">Una plataforma abierta de recursos de aprendizaje gratuitos, cursos y proyectos educativos colaborativos en muchos idiomas.</p>
+            <p class="catalog-location">Presencia digital independiente de la ubicación</p>
+            <div class="catalog-actions">
+              <a class="catalog-action-link" data-action-type="use" href="https://www.wikiversity.org/" rel="external noreferrer">Usar <span aria-hidden="true">↗</span></a>
+              <a class="catalog-action-link" data-action-type="learn" href="https://www.wikiversity.org/" rel="external noreferrer">Aprender <span aria-hidden="true">↗</span></a>
+              <a href="https://www.wikiversity.org/" rel="external noreferrer">Sitio web oficial <span aria-hidden="true">↗</span></a>
+              <a href="./catalog/projects/wikiversity.json" type="application/json">JSON</a>
+            </div>
+          </article>
+          <article class="catalog-card" id="project-zapatista-autonomy" data-commonproject-id="zapatista-autonomy">
+            <p class="catalog-kind">Commons</p>
+            <h2 lang="en" dir="ltr">Zapatista Autonomy</h2>
+            <p lang="es" dir="auto">Una estructura de autonomía mantenida por las comunidades zapatistas en Chiapas que desde 2023 ha sustituido a los antiguos MAREZ y Juntas de Buen Gobierno por gobiernos autónomos locales, colectivos regionales y coordinación asamblearia.</p>
+            <p class="catalog-location">1 ubicación oculta</p>
+            <div class="catalog-actions">
+              <a class="catalog-action-link" data-action-type="learn" href="https://enlacezapatista.ezln.org.mx/2023/11/13/neunter-teil-die-neue-struktur-der-zapatistischen-autonomie/" rel="external noreferrer">Aprender <span aria-hidden="true">↗</span></a>
+              <a href="https://enlacezapatista.ezln.org.mx/" rel="external noreferrer">Sitio web oficial <span aria-hidden="true">↗</span></a>
+              <a href="./catalog/projects/zapatista-autonomy.json" type="application/json">JSON</a>
+            </div>
+          </article>
+          <article class="catalog-card" id="project-zenzeleni-community-networks" data-commonproject-id="zenzeleni-community-networks">
+            <p class="catalog-kind">En el sitio · Digital · Comunicación y Redes › Redes Comunitarias</p>
+            <h2 dir="auto">Zenzeleni Community Networks</h2>
+            <p lang="es" dir="auto">Una red comunitaria gestionada por cooperativas locales en la zona rural del Cabo Oriental que ofrece conectividad asequible y mantiene los ingresos y la responsabilidad dentro de las comunidades.</p>
+            <p class="catalog-location">1 ubicación pública · 1 ubicación oculta</p>
+            <div class="catalog-actions">
+              <a class="catalog-action-link" data-action-type="use" href="https://zenzeleni.net/get-connected/" rel="external noreferrer">Usar <span aria-hidden="true">↗</span></a>
+              <a class="catalog-action-link" data-action-type="learn" href="https://zenzeleni.net/our-model/" rel="external noreferrer">Aprender <span aria-hidden="true">↗</span></a>
+              <a class="catalog-action-link" data-action-type="contribute" href="https://zenzeleni.net/get-connected/" rel="external noreferrer">Contribuir <span aria-hidden="true">↗</span></a>
+              <a class="catalog-action-link" data-action-type="replicate" href="https://zenzeleni.net/get-connected/" rel="external noreferrer">Replicar <span aria-hidden="true">↗</span></a>
+              <a class="catalog-action-link" data-action-type="contact" href="https://zenzeleni.net/get-connected/" rel="external noreferrer">Contactar <span aria-hidden="true">↗</span></a>
+              <a href="https://zenzeleni.net/" rel="external noreferrer">Sitio web oficial <span aria-hidden="true">↗</span></a>
+              <a href="./catalog/projects/zenzeleni-community-networks.json" type="application/json">JSON</a>
+            </div>
+          </article>
+        </div>
+      </section>
+    </main>
+  </body>
+</html>

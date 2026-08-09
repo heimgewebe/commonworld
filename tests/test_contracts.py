@@ -133,6 +133,36 @@ class ContractTests(unittest.TestCase):
         }
         self.assertTrue(any("unclosed polygon ring" in error for error in validation_errors(record)))
 
+    def test_wrapped_polygon_bbox_explicitly_validates_antimeridian_focus(self) -> None:
+        record = copy.deepcopy(base_record())
+        record["presence"]["geographic"][0]["geometry"] = {
+            "type": "Polygon",
+            "coordinates": [[[170, -10], [-170, -10], [-170, 10], [170, 10], [170, -10]]],
+            "bbox": [170, -10, -170, 10],
+        }
+        self.assertEqual([], validation_errors(record))
+
+    def test_unwrapped_polygon_bbox_explicitly_allows_extent_wider_than_180_degrees(self) -> None:
+        record = copy.deepcopy(base_record())
+        record["presence"]["geographic"][0]["geometry"] = {
+            "type": "Polygon",
+            "coordinates": [[[170, -10], [-170, -10], [-170, 10], [170, 10], [170, -10]]],
+            "bbox": [-170, -10, 170, 10],
+        }
+        self.assertEqual([], validation_errors(record))
+
+    def test_polygon_bbox_must_be_ordered_and_contain_every_vertex(self) -> None:
+        record = copy.deepcopy(base_record())
+        geometry = {
+            "type": "Polygon",
+            "coordinates": [[[170, -10], [-170, -10], [-170, 10], [170, 10], [170, -10]]],
+            "bbox": [175, -10, -175, 10],
+        }
+        record["presence"]["geographic"][0]["geometry"] = geometry
+        self.assertTrue(any("contain every geometry vertex" in error for error in validation_errors(record)))
+        geometry["bbox"] = [170, 10, -170, -10]
+        self.assertTrue(any("south must not exceed north" in error for error in validation_errors(record)))
+
     def test_exact_location_rejects_uncertainty_radius(self) -> None:
         record = copy.deepcopy(base_record())
         record["presence"]["geographic"][0]["uncertainty_meters_min"] = 100
