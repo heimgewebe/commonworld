@@ -11,8 +11,14 @@ insertion = r'''    moveend_bound = "  assert(elapsed < 5000, `moveend return:"
         raise RuntimeError("moveend return timing bound marker not found")
     hardened_smoke = hardened_smoke.replace(moveend_bound, moveend_bound_hardened, 1)
 
-    phase_log_marker = "    window.__commonworldPhaseLog = [];\n    window.__commonworldPhaseObserver?.disconnect?.();\n"
-    phase_log_hardened = "    window.__commonworldPhaseLog = [];\n    window.__commonworldMovingDiagnosticLog = [];\n    let observedMapMoving = stageNode.dataset.mapMoving === 'true';\n    window.__commonworldPhaseObserver?.disconnect?.();\n"
+    phase_log_marker = """    window.__commonworldPhaseLog = [];
+    window.__commonworldPhaseObserver?.disconnect?.();
+"""
+    phase_log_hardened = """    window.__commonworldPhaseLog = [];
+    window.__commonworldMovingDiagnosticLog = [];
+    let observedMapMoving = stageNode.dataset.mapMoving === 'true';
+    window.__commonworldPhaseObserver?.disconnect?.();
+"""
     if phase_log_marker not in hardened_smoke:
         raise RuntimeError("layer journey phase-log marker not found")
     hardened_smoke = hardened_smoke.replace(phase_log_marker, phase_log_hardened, 1)
