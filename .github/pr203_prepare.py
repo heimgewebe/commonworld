@@ -12,8 +12,6 @@ if old_reduced not in source:
     raise SystemExit('reduced-motion orbit insertion point missing')
 source = source.replace(old_reduced, "    /* global reduced-motion reset makes the orbit static */\n", 1)
 
-# Expose enough native CSSAnimation state in failures to distinguish compositor
-# staleness from a finished/idle timeline.
 state_anchor = """      labelAnimationName: labelStyle?.animationName ?? 'none',
       labelAnimationPlayState: labelStyle?.animationPlayState ?? 'running',
       labelOrbitDirection: labelStyle?.getPropertyValue('--ring-orbit-direction').trim() ?? '',
@@ -33,6 +31,8 @@ state_replacement = """      labelAnimationName: labelStyle?.animationName ?? 'n
       ringAnimationIterations: ringStyle?.animationIterationCount ?? '',
       ringOrbitDirection: ringStyle?.getPropertyValue('--ring-orbit-direction').trim() ?? '',
       ringAnimations: ring ? ring.getAnimations().map((animation) => ({ name: animation.animationName ?? animation.constructor.name, currentTime: animation.currentTime, playState: animation.playState, pending: animation.pending, playbackRate: animation.playbackRate })) : [],
+      recoveryEvent: document.querySelector('.globe-stage')?.dataset.touchOrbitRecoveryEvent ?? '',
+      recoveryRestarted: document.querySelector('.globe-stage')?.dataset.touchOrbitRecoveryRestarted ?? '',
 """
 if state_anchor not in source:
     raise SystemExit('touch ring state instrumentation point missing')
@@ -55,19 +55,23 @@ replacement = '''    css.write_text(s.replace(old, new, 1), encoding="utf-8")
     boot_marker = "async function boot() {\\n"
     recovery = """function installReducedMotionRingRecovery() {
   const restartCoarseTouchOrbits = (event) => {
+    elements.stage.dataset.touchOrbitRecoveryEvent = event.matches ? 'reduce' : 'resume';
     if (event.matches) return;
     if (!window.matchMedia('(hover: none) and (pointer: coarse)').matches) return;
     window.requestAnimationFrame(() => {
       window.requestAnimationFrame(() => {
         if (reducedMotion.matches) return;
         const orbitNodes = [...elements.sphereRings.querySelectorAll('.sphere-ring-plane > use, .sphere-ring-plane > .sphere-ring-text')];
+        let restarted = 0;
         orbitNodes.forEach((node) => {
           node.getAnimations().forEach((animation) => {
             if (animation.animationName !== 'sphere-ring-orbit') return;
             animation.cancel();
             animation.play();
+            restarted += 1;
           });
         });
+        elements.stage.dataset.touchOrbitRecoveryRestarted = String(restarted);
       });
     });
   };
