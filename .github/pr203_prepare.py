@@ -4,57 +4,31 @@ from pathlib import Path
 path = Path('.github/pr203_repair.py')
 source = path.read_text(encoding='utf-8')
 
-old = "    --ring-orbit-direction: 0;\n"
-new = (
-    "    animation-duration: var(--ring-orbit-duration, 240s) !important;\n"
-    "    animation-iteration-count: infinite !important;\n"
-    "    --ring-orbit-direction: 0;\n"
-)
-if old not in source:
-    raise SystemExit('reduced-motion orbit insertion point missing')
-source = source.replace(old, new, 1)
-
-anchor = '''    css.write_text(s.replace(old, new, 1), encoding="utf-8")
-
-    smoke = ROOT / "scripts/smoke_public_browser.mjs"
-'''
-replacement = '''    css.write_text(s.replace(old, new, 1), encoding="utf-8")
-
-    app = ROOT / "assets/commonworld-app.js"
-    app_source = app.read_text(encoding="utf-8")
-    boot_marker = "async function boot() {\\n"
-    recovery = """function installReducedMotionRingRecovery() {
-  const restartCoarseTouchRings = (event) => {
-    if (event.matches) return;
-    if (!window.matchMedia('(hover: none) and (pointer: coarse)').matches) return;
-    window.requestAnimationFrame(() => {
-      window.requestAnimationFrame(() => {
-        if (reducedMotion.matches) return;
-        if (!window.matchMedia('(hover: none) and (pointer: coarse)').matches) return;
-        renderSphereRibbons(runtime.records);
-      });
-    });
-  };
-  if (typeof reducedMotion.addEventListener === 'function') {
-    reducedMotion.addEventListener('change', restartCoarseTouchRings);
-  } else {
-    reducedMotion.addListener?.(restartCoarseTouchRings);
-  }
+header = "    new = '''@media (hover: none) and (pointer: coarse) {\n"
+header_replacement = """    new = '''@keyframes sphere-ring-orbit-reduced {
+  from, to { transform: rotate(var(--ring-orbit-start-angle, 0deg)); }
 }
 
+@media (hover: none) and (pointer: coarse) {
 """
-    if boot_marker not in app_source:
-        raise RuntimeError("boot marker for reduced-motion ring recovery not found")
-    app_source = app_source.replace(boot_marker, recovery + boot_marker, 1)
-    wire_marker = "    wireControls();\\n"
-    if wire_marker not in app_source:
-        raise RuntimeError("wireControls marker for reduced-motion ring recovery not found")
-    app_source = app_source.replace(wire_marker, wire_marker + "    installReducedMotionRingRecovery();\\n", 1)
-    app.write_text(app_source, encoding="utf-8")
+if header not in source:
+    raise SystemExit('coarse touch CSS replacement header missing')
+source = source.replace(header, header_replacement, 1)
 
-    smoke = ROOT / "scripts/smoke_public_browser.mjs"
-'''
-if anchor not in source:
-    raise SystemExit('app recovery insertion point missing')
-source = source.replace(anchor, replacement, 1)
+old_reduced = "    --ring-orbit-direction: 0;\n"
+new_reduced = (
+    "    animation-name: sphere-ring-orbit-reduced !important;\n"
+    "    animation-duration: var(--ring-orbit-duration, 240s) !important;\n"
+    "    animation-iteration-count: infinite !important;\n"
+)
+if old_reduced not in source:
+    raise SystemExit('reduced-motion orbit insertion point missing')
+source = source.replace(old_reduced, new_reduced, 1)
+
+old_assert = """  assert(reducedTouchAfter.filter(({ labelAnimationName, labelOrbitDirection, ringAnimationName, ringOrbitDirection }) => labelAnimationName === 'sphere-ring-orbit' && labelOrbitDirection === '0' && ringAnimationName === 'sphere-ring-orbit' && ringOrbitDirection === '0').length >= 2, scenarioId + ': live reduced-motion change did not zero wide touch ring motion ' + JSON.stringify(reducedTouchAfter));"""
+new_assert = """  assert(reducedTouchAfter.filter(({ labelAnimationName, ringAnimationName }) => labelAnimationName === 'sphere-ring-orbit-reduced' && ringAnimationName === 'sphere-ring-orbit-reduced').length >= 2, scenarioId + ': live reduced-motion change did not switch wide touch rings to the static CSS orbit ' + JSON.stringify(reducedTouchAfter));"""
+if old_assert not in source:
+    raise SystemExit('reduced-motion smoke assertion missing')
+source = source.replace(old_assert, new_assert, 1)
+
 path.write_text(source, encoding='utf-8')
