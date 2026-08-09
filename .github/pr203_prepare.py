@@ -61,6 +61,35 @@ fresh_reduced = '''  const reducedTouchRun = await newPage({
 '''
 source = source[:start] + fresh_reduced + source[end:]
 
+# The existing camera replay smoke has two deliberately tight timing windows. Hosted
+# runners have now hit both without any product failure. Preserve the same state
+# assertions but allow enough time for the deliberately 2.8s camera flight and map
+# style replay to settle under CI load.
+smoke_write_anchor = '    smoke.write_text(s[:start] + block + s[end:], encoding="utf-8")\n'
+smoke_hardening = '''    smoke.write_text(s[:start] + block + s[end:], encoding="utf-8")
+    hardened_smoke = smoke.read_text(encoding="utf-8")
+    spatial_wait = """  releaseMapStyle();
+  await run.page.waitForFunction(() => window.__commonworldTestMap?.loaded() === true);
+"""
+    spatial_wait_hardened = """  releaseMapStyle();
+  await run.page.waitForFunction(() => window.__commonworldTestMap?.loaded() === true, null, { timeout: 60_000 });
+"""
+    if spatial_wait not in hardened_smoke:
+        raise RuntimeError("spatial map replay wait marker not found")
+    hardened_smoke = hardened_smoke.replace(spatial_wait, spatial_wait_hardened, 1)
+    fallback_wait = """  await run.page.waitForFunction(() => ['fallback-idle', 'fallback-stop'].includes(document.querySelector('.globe-stage')?.dataset.cameraFlightSettlement), null, { timeout: 4_000 });
+"""
+    fallback_wait_hardened = """  await run.page.waitForFunction(() => ['fallback-idle', 'fallback-stop'].includes(document.querySelector('.globe-stage')?.dataset.cameraFlightSettlement), null, { timeout: 8_000 });
+"""
+    if fallback_wait not in hardened_smoke:
+        raise RuntimeError("missing-moveend fallback wait marker not found")
+    hardened_smoke = hardened_smoke.replace(fallback_wait, fallback_wait_hardened, 1)
+    smoke.write_text(hardened_smoke, encoding="utf-8")
+'''
+if smoke_write_anchor not in source:
+    raise SystemExit('smoke hardening insertion point missing')
+source = source.replace(smoke_write_anchor, smoke_hardening, 1)
+
 cleanup_anchor = '''    shutil.rmtree(TMP, ignore_errors=True)
     run("git", "config", "user.name", "Commonworld Repair Bot")
 '''
