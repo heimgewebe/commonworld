@@ -30,4 +30,13 @@ jobs:
           npx playwright install --with-deps chromium
           python -m pip install -r requirements-dev.txt
       - name: Repair, regenerate, validate and push PR head
-        run: python3 .github/pr203_repair.py
+        run: |
+          set -o pipefail
+          python3 .github/pr203_repair.py 2>&1 | tee pr203-repair.log
+      - name: Preserve repair log
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: pr203-repair-log
+          path: pr203-repair.log
+          if-no-files-found: error
