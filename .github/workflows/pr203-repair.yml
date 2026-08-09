@@ -31,6 +31,16 @@ jobs:
           python -m pip install -r requirements-dev.txt
       - name: Repair, regenerate, validate and push PR head
         run: |
+          python3 - <<'PY'
+          from pathlib import Path
+          path = Path('.github/pr203_repair.py')
+          source = path.read_text()
+          old = "    --ring-orbit-direction: 0;\n"
+          new = "    animation-duration: var(--ring-orbit-duration, 240s) !important;\n    animation-iteration-count: infinite !important;\n    --ring-orbit-direction: 0;\n"
+          if old not in source:
+              raise SystemExit('reduced-motion orbit insertion point missing')
+          path.write_text(source.replace(old, new, 1))
+          PY
           set -o pipefail
           python3 .github/pr203_repair.py 2>&1 | tee pr203-repair.log
       - name: Preserve repair log
