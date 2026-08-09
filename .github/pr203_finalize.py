@@ -4,12 +4,6 @@ from pathlib import Path
 smoke = Path('scripts/smoke_public_browser.mjs')
 source = smoke.read_text(encoding='utf-8')
 
-moveend_bound = "  assert(elapsed < 5000, `moveend return:"
-moveend_bound_hardened = "  assert(elapsed < 6500, `moveend return:"
-if moveend_bound not in source:
-    raise SystemExit('moveend return timing bound marker not found')
-source = source.replace(moveend_bound, moveend_bound_hardened, 1)
-
 probe_marker = """    window.__commonworldCameraCommands = [];
     window.__commonworldPhaseLog = [];
     window.__commonworldPhaseObserver?.disconnect?.();
