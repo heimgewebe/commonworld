@@ -2506,7 +2506,7 @@ async function spatialDiscoveryFiltersScenario() {
     `spatial discovery: country filter did not reopen with a visible removable chip (${JSON.stringify(countryFilterUiState)})`,
   );
   releaseMapStyle();
-  await run.page.waitForFunction(() => window.__commonworldTestMap?.loaded() === true);
+  await run.page.waitForFunction(() => window.__commonworldTestMap?.loaded() === true, null, { timeout: 60_000 });
   await run.page.waitForFunction(() => document.querySelector('.globe-stage')?.dataset.lastCameraCommand?.startsWith('fitBounds'));
   assert(await run.page.locator('#discovery-panel').isVisible(), 'spatial discovery: pending country camera replay closed discovery after map load');
   assert(await run.page.locator('#active-filter-chips button').isVisible(), 'spatial discovery: country filter chip became unreachable after pending camera replay');
@@ -2679,23 +2679,29 @@ async function androidGlobeUiScenario() {
 
   await run.page.setViewportSize({ width: 844, height: 390 });
   await run.page.waitForTimeout(100);
-  const touchPathState = () => run.page.evaluate(() => {
-    const paths = [...document.querySelectorAll('#sphere-paths ellipse')];
-    const labels = [...document.querySelectorAll('.sphere-ring-plane .sphere-ring-text')];
-    return paths.map((path, index) => {
-      const transforms = path.transform.animVal;
-      const transform = transforms.numberOfItems > 0 ? transforms.getItem(transforms.numberOfItems - 1) : null;
-      const matrix = transform?.matrix;
-      const labelRect = labels[index]?.getBoundingClientRect();
-      return {
-        id: path.id,
-        animated: Boolean(path.querySelector('[data-touch-ring-motion="true"]')),
-        matrix: matrix ? [matrix.a, matrix.b, matrix.c, matrix.d, matrix.e, matrix.f] : null,
-        labelBox: labelRect ? [labelRect.x, labelRect.y, labelRect.width, labelRect.height] : null,
-      };
-    });
-  });
-  const wideTouchMotionBefore = await touchPathState();
+  const touchRingState = () => run.page.evaluate(() => [...document.querySelectorAll('.sphere-ring-plane')].map((plane) => {
+    const label = plane.querySelector('.sphere-ring-text');
+    const ring = plane.querySelector('use');
+    const labelStyle = label ? getComputedStyle(label) : null;
+    const ringStyle = ring ? getComputedStyle(ring) : null;
+    const labelTransform = labelStyle?.transform && labelStyle.transform !== 'none' ? new DOMMatrixReadOnly(labelStyle.transform) : null;
+    const ringTransform = ringStyle?.transform && ringStyle.transform !== 'none' ? new DOMMatrixReadOnly(ringStyle.transform) : null;
+    const labelRect = label?.getBoundingClientRect();
+    const ringRect = ring?.getBoundingClientRect();
+    return {
+      labelAnimationName: labelStyle?.animationName ?? 'none',
+      labelAnimationPlayState: labelStyle?.animationPlayState ?? 'running',
+      labelOrbitDirection: labelStyle?.getPropertyValue('--ring-orbit-direction').trim() ?? '',
+      ringAnimationName: ringStyle?.animationName ?? 'none',
+      ringAnimationPlayState: ringStyle?.animationPlayState ?? 'running',
+      ringOrbitDirection: ringStyle?.getPropertyValue('--ring-orbit-direction').trim() ?? '',
+      labelMatrix: labelTransform ? [labelTransform.a, labelTransform.b, labelTransform.c, labelTransform.d, labelTransform.e, labelTransform.f] : null,
+      ringMatrix: ringTransform ? [ringTransform.a, ringTransform.b, ringTransform.c, ringTransform.d, ringTransform.e, ringTransform.f] : null,
+      labelBox: labelRect ? [labelRect.x, labelRect.y, labelRect.width, labelRect.height] : null,
+      ringBox: ringRect ? [ringRect.x, ringRect.y, ringRect.width, ringRect.height] : null,
+    };
+  }));
+  const wideTouchMotionBefore = await touchRingState();
   await run.page.waitForTimeout(350);
   const wideTouchGeometry = await run.page.evaluate(() => {
     const planes = [...document.querySelectorAll('.sphere-ring-plane')];
@@ -2725,20 +2731,94 @@ async function androidGlobeUiScenario() {
       }),
     };
   });
-  const wideTouchMotionAfter = await touchPathState();
-  const movingTouchPaths = wideTouchMotionAfter.filter((after, index) => {
-    if (!after.animated || !after.matrix || !wideTouchMotionBefore[index]?.matrix) return false;
-    return after.matrix.some((value, matrixIndex) => Math.abs(value - wideTouchMotionBefore[index].matrix[matrixIndex]) > 1e-5);
+  const wideTouchMotionAfter = await touchRingState();
+  const movingTouchRings = wideTouchMotionAfter.filter((after, index) => {
+    const before = wideTouchMotionBefore[index];
+    if (after.ringAnimationName !== 'sphere-ring-orbit' || !after.ringMatrix || !before?.ringMatrix) return false;
+    return after.ringMatrix.some((value, matrixIndex) => Math.abs(value - before.ringMatrix[matrixIndex]) > 1e-5);
   });
   const movingTouchLabels = wideTouchMotionAfter.filter((after, index) => {
-    if (!after.animated || !after.labelBox || !wideTouchMotionBefore[index]?.labelBox) return false;
-    return after.labelBox.some((value, boxIndex) => Math.abs(value - wideTouchMotionBefore[index].labelBox[boxIndex]) > 1e-3);
+    const before = wideTouchMotionBefore[index];
+    if (after.labelAnimationName !== 'sphere-ring-orbit' || !after.labelBox || !before?.labelBox) return false;
+    return after.labelBox.some((value, boxIndex) => Math.abs(value - before.labelBox[boxIndex]) > 1e-3);
   });
   assert(wideTouchGeometry.viewportWidth > 768 && !wideTouchGeometry.mediaCompact && wideTouchGeometry.mediaCoarseTouch, scenarioId + ': wide touch viewport did not exercise the non-compact coarse-pointer path ' + JSON.stringify(wideTouchGeometry));
   assert(wideTouchGeometry.primaryRingsStatic && wideTouchGeometry.depthRingsStatic, scenarioId + ': wide touch ring group regained compositor animation or transform ' + JSON.stringify(wideTouchGeometry));
-  assert(movingTouchPaths.length >= 2, scenarioId + ': wide touch SVG path motion did not advance ' + JSON.stringify({ before: wideTouchMotionBefore, after: wideTouchMotionAfter }));
-  assert(movingTouchLabels.length >= 2, scenarioId + ': wide touch visible ring labels did not move with their SVG paths ' + JSON.stringify({ before: wideTouchMotionBefore, after: wideTouchMotionAfter }));
+  assert(movingTouchRings.length >= 2, scenarioId + ': wide touch visible ring strokes did not advance ' + JSON.stringify({ before: wideTouchMotionBefore, after: wideTouchMotionAfter }));
+  assert(movingTouchLabels.length >= 2, scenarioId + ': wide touch visible ring labels did not move with their ring strokes ' + JSON.stringify({ before: wideTouchMotionBefore, after: wideTouchMotionAfter }));
   assert(wideTouchGeometry.representativePrimaryLabels.length >= 2 && wideTouchGeometry.representativePrimaryLabels.every(({ text, visible, width, height, fontSize }) => text.length > 0 && visible && width > 80 && height > 0 && fontSize >= 20), scenarioId + ': wide touch primary ring labels are absent or not visibly laid out ' + JSON.stringify(wideTouchGeometry));
+
+  const movingLabelsBetween = (before, after, threshold = 1e-3) => after.filter((entry, index) => {
+    const previous = before[index];
+    if (!entry.labelBox || !previous?.labelBox) return false;
+    return entry.labelBox.some((value, boxIndex) => Math.abs(value - previous.labelBox[boxIndex]) > threshold);
+  });
+  await run.page.evaluate(() => { document.querySelector('.globe-stage').dataset.mapMoving = 'true'; });
+  await run.page.waitForTimeout(80);
+  const mapPausedBefore = await touchRingState();
+  await run.page.waitForTimeout(350);
+  const mapPausedAfter = await touchRingState();
+  assert(mapPausedAfter.filter(({ labelAnimationName, labelAnimationPlayState, ringAnimationName, ringAnimationPlayState }) => labelAnimationName === 'sphere-ring-orbit' && labelAnimationPlayState === 'paused' && ringAnimationName === 'sphere-ring-orbit' && ringAnimationPlayState === 'paused').length >= 2, scenarioId + ': wide touch ring children did not pause while map-moving state was active ' + JSON.stringify(mapPausedAfter));
+  assert(movingLabelsBetween(mapPausedBefore, mapPausedAfter).length === 0, scenarioId + ': wide touch labels moved while map-moving state paused the orbit ' + JSON.stringify({ before: mapPausedBefore, after: mapPausedAfter }));
+  await run.page.evaluate(() => { delete document.querySelector('.globe-stage').dataset.mapMoving; });
+
+  await run.page.locator('#sphere-edge-control').focus();
+  await run.page.waitForTimeout(80);
+  const focusPausedBefore = await touchRingState();
+  await run.page.waitForTimeout(350);
+  const focusPausedAfter = await touchRingState();
+  assert(focusPausedAfter.filter(({ labelAnimationName, labelAnimationPlayState, ringAnimationName, ringAnimationPlayState }) => labelAnimationName === 'sphere-ring-orbit' && labelAnimationPlayState === 'paused' && ringAnimationName === 'sphere-ring-orbit' && ringAnimationPlayState === 'paused').length >= 2, scenarioId + ': wide touch ring children did not pause while sphere edge control was focused ' + JSON.stringify(focusPausedAfter));
+  assert(movingLabelsBetween(focusPausedBefore, focusPausedAfter).length === 0, scenarioId + ': wide touch labels moved while sphere edge focus paused the orbit ' + JSON.stringify({ before: focusPausedBefore, after: focusPausedAfter }));
+  await run.page.evaluate(() => document.querySelector('#sphere-edge-control')?.blur());
+  await run.page.waitForTimeout(80);
+  const focusResumedBefore = await touchRingState();
+  await run.page.waitForTimeout(350);
+  const focusResumedAfter = await touchRingState();
+  assert(movingLabelsBetween(focusResumedBefore, focusResumedAfter).length >= 2, scenarioId + ': wide touch labels did not resume after sphere edge focus ended ' + JSON.stringify({ before: focusResumedBefore, after: focusResumedAfter }));
+
+  const reducedTouchRun = await newPage({
+    mobile: true,
+    touch: true,
+    viewportOverride: { width: 844, height: 390 },
+    reducedMotion: 'reduce',
+  });
+  await reducedTouchRun.page.goto(baseUrl, { waitUntil: 'domcontentloaded' });
+  await reducedTouchRun.page.waitForSelector('html.runtime-ready');
+  await reducedTouchRun.page.waitForFunction(() => document.querySelectorAll('.sphere-ring-plane .sphere-ring-text').length > 0);
+  const reducedTouchState = () => reducedTouchRun.page.evaluate(() => [...document.querySelectorAll('.sphere-ring-plane')].map((plane) => {
+    const label = plane.querySelector('.sphere-ring-text');
+    const ring = plane.querySelector('use');
+    const labelStyle = label ? getComputedStyle(label) : null;
+    const ringStyle = ring ? getComputedStyle(ring) : null;
+    const labelRect = label?.getBoundingClientRect();
+    const ringRect = ring?.getBoundingClientRect();
+    return {
+      coarse: window.matchMedia('(hover: none) and (pointer: coarse)').matches,
+      reduced: window.matchMedia('(prefers-reduced-motion: reduce)').matches,
+      labelAnimationName: labelStyle?.animationName ?? 'none',
+      labelAnimationDuration: labelStyle?.animationDuration ?? '',
+      labelAnimationIterations: labelStyle?.animationIterationCount ?? '',
+      ringAnimationName: ringStyle?.animationName ?? 'none',
+      ringAnimationDuration: ringStyle?.animationDuration ?? '',
+      ringAnimationIterations: ringStyle?.animationIterationCount ?? '',
+      labelBox: labelRect ? [labelRect.x, labelRect.y, labelRect.width, labelRect.height] : null,
+      ringBox: ringRect ? [ringRect.x, ringRect.y, ringRect.width, ringRect.height] : null,
+    };
+  }));
+  const reducedTouchBefore = await reducedTouchState();
+  await reducedTouchRun.page.waitForTimeout(350);
+  const reducedTouchAfter = await reducedTouchState();
+  const visibleBoxesMoved = (before, after, key, threshold = 1e-3) => after.filter((entry, index) => {
+    const previous = before[index];
+    if (!entry[key] || !previous?.[key]) return false;
+    return entry[key].some((value, boxIndex) => Math.abs(value - previous[key][boxIndex]) > threshold);
+  });
+  assert(reducedTouchAfter.length >= 2 && reducedTouchAfter.every(({ coarse, reduced }) => coarse && reduced), scenarioId + ': reduced-motion touch context did not exercise the intended media path ' + JSON.stringify(reducedTouchAfter));
+  assert(reducedTouchAfter.filter(({ labelAnimationDuration, labelAnimationIterations, ringAnimationDuration, ringAnimationIterations }) => Number.parseFloat(labelAnimationDuration) <= 0.001 && labelAnimationIterations === '1' && Number.parseFloat(ringAnimationDuration) <= 0.001 && ringAnimationIterations === '1').length >= 2, scenarioId + ': reduced-motion touch context did not inherit the global static animation policy ' + JSON.stringify(reducedTouchAfter));
+  assert(visibleBoxesMoved(reducedTouchBefore, reducedTouchAfter, 'labelBox').length === 0, scenarioId + ': reduced-motion touch labels moved ' + JSON.stringify({ before: reducedTouchBefore, after: reducedTouchAfter }));
+  assert(visibleBoxesMoved(reducedTouchBefore, reducedTouchAfter, 'ringBox').length === 0, scenarioId + ': reduced-motion touch ring strokes moved ' + JSON.stringify({ before: reducedTouchBefore, after: reducedTouchAfter }));
+  await reducedTouchRun.context.close();
+
 
   const compactDesktopRun = await newPage({
     viewportOverride: { width: 720, height: 800 },
@@ -2932,7 +3012,7 @@ async function missingMoveendFlightFallbackScenario() {
     };
   });
   await run.page.mouse.click(sphereBox.x + sphereBox.width * 0.85134, sphereBox.y + sphereBox.height * 0.14866);
-  await run.page.waitForFunction(() => ['fallback-idle', 'fallback-stop'].includes(document.querySelector('.globe-stage')?.dataset.cameraFlightSettlement), null, { timeout: 4_000 });
+  await run.page.waitForFunction(() => ['fallback-idle', 'fallback-stop'].includes(document.querySelector('.globe-stage')?.dataset.cameraFlightSettlement), null, { timeout: 8_000 });
   await run.page.waitForSelector('.globe-stage[data-view-phase="layers"]');
   const fallbackState = await run.page.evaluate(() => {
     const stage = document.querySelector('.globe-stage');

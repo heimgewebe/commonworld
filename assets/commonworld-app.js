@@ -857,9 +857,6 @@ function renderSphereRibbons(records = runtime.records) {
   }))));
   const childAssignmentById = new Map(childAssignments.map((assignment) => [assignment.id, assignment]));
   elements.sphereRings.replaceChildren();
-  document.querySelectorAll('#sphere-paths [data-touch-ring-motion="true"]').forEach((animation) => animation.remove());
-  const touchRingPathMotion = window.matchMedia('(hover: none) and (pointer: coarse)').matches
-    && !window.matchMedia('(prefers-reduced-motion: reduce)').matches;
   visibleNodes.forEach((node, layerIndex) => {
     const source = visibleRingSources[layerIndex];
     const bundle = bundleDescriptors[layerIndex];
@@ -898,29 +895,12 @@ function renderSphereRibbons(records = runtime.records) {
       plane.append(childGuide);
     });
     const orbitDuration = ringOrbitDuration(node.identityCount);
-    const orbitDirection = ringOrbitDirection(layerIndex);
-    const orbitStartAngle = ringOrbitStartAngle(layerIndex);
     plane.dataset.entryCount = String(node.identityCount);
     plane.dataset.identityCount = String(node.identityCount);
     plane.dataset.orbitDuration = String(orbitDuration);
     plane.style.setProperty('--ring-orbit-duration', `${orbitDuration}s`);
-    plane.style.setProperty('--ring-orbit-direction', String(orbitDirection));
-    plane.style.setProperty('--ring-orbit-start-angle', `${orbitStartAngle}deg`);
-    if (touchRingPathMotion) {
-      const path = document.querySelector(`#sphere-path-${layerIndex + 1}`);
-      const baseRotation = path?.getAttribute('transform')?.match(/rotate\(([-\d.]+)\s+320\s+320\)/);
-      const baseAngle = Number(baseRotation?.[1] ?? 0);
-      const fromAngle = baseAngle + orbitStartAngle;
-      path?.append(createSvgElement('animateTransform', {
-        attributeName: 'transform',
-        type: 'rotate',
-        from: `${fromAngle} 320 320`,
-        to: `${fromAngle + (orbitDirection * 360)} 320 320`,
-        dur: `${orbitDuration}s`,
-        repeatCount: 'indefinite',
-        'data-touch-ring-motion': 'true',
-      }));
-    }
+    plane.style.setProperty('--ring-orbit-direction', String(ringOrbitDirection(layerIndex)));
+    plane.style.setProperty('--ring-orbit-start-angle', `${ringOrbitStartAngle(layerIndex)}deg`);
     const text = createSvgElement('text', {
       class: 'sphere-ring-text',
       'data-layer-id': node.id,

@@ -3065,10 +3065,34 @@ html:not([data-input-modality="pointer"]) .digital-ribbon-item:focus-visible {
     transform: none;
   }
 
+  .sphere-ring-plane > use,
+  .sphere-ring-plane > .sphere-ring-text {
+    transform-box: view-box;
+    transform-origin: 320px 320px;
+    transform: rotate(var(--ring-orbit-start-angle, 0deg));
+    animation: sphere-ring-orbit var(--ring-orbit-duration, 240s) linear infinite;
+  }
+
+  .globe-stage[data-map-moving="true"] .sphere-ring-plane > use,
+  .globe-stage[data-map-moving="true"] .sphere-ring-plane > .sphere-ring-text,
+  .digital-sphere:has(.sphere-edge-control:focus) .sphere-ring-plane > use,
+  .digital-sphere:has(.sphere-edge-control:focus) .sphere-ring-plane > .sphere-ring-text,
+  .digital-sphere:has(.sphere-edge-control:active) .sphere-ring-plane > use,
+  .digital-sphere:has(.sphere-edge-control:active) .sphere-ring-plane > .sphere-ring-text {
+    animation-play-state: paused;
+  }
+
   .sphere-ring-text {
     font-size: var(--sphere-ring-font-size, 22px);
     stroke-width: var(--sphere-ring-stroke-width, 2.4px);
     letter-spacing: 0.018em;
+  }
+}
+
+@media (hover: none) and (pointer: coarse) and (prefers-reduced-motion: reduce) {
+  .sphere-ring-plane > use,
+  .sphere-ring-plane > .sphere-ring-text {
+    /* reduced motion is governed by the global animation reset */
   }
 }
 

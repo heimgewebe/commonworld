@@ -7,9 +7,9 @@
   "source_pack_sha256": "b65c7108bb7c2debf77dcb18ed1f70cd53da1478743e2bba7f4b11e761cc9be4",
   "reviewed_source_pack_sha256": "316da43be8603cf0400dfa886bf244f953cd0dcb702c150f87e652fc260e9819",
   "surface_sha256": {
-    "index": "4f6f8b96b36b2e1eaad9efaa1643f4e7f6980430193b1d6b90bba7e3ad16750a",
-    "method": "313b0b50c41ab4a3368af4ae56a9e0ef440a05595cb02cf6be15c4be8c5367c5",
-    "proposal": "b508eccbe4f6d44f1c5f8ea2757a7e22ebe5e9cf8691782591a1ab046e03b592"
+    "index": "488a055b141f05ba34c178f696af3eab97505470a94a5f7e110d23916b8a3157",
+    "method": "3073c7a4191dbb14767f896692796f76ef17e061493fc22686533a1240770f3c",
+    "proposal": "2f9dc2c18d4c0347784acf905ee6eeacfa7a51bc2c34ae7688b169fac73fe3db"
   },
   "gate_results": {
     "required_surfaces_passed": [

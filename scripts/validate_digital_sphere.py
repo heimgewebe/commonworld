@@ -140,6 +140,12 @@ def validate_digital_sphere(root: Path = ROOT) -> list[str]:
         },
     }:
         errors.append("digital sphere motion boundary mismatch")
+    app_source = (ROOT / "assets" / "commonworld-app.js").read_text(encoding="utf-8")
+    css_source = (ROOT / "index.css").read_text(encoding="utf-8")
+    if "animateTransform" in app_source or "<animateTransform" in app_source:
+        errors.append("digital sphere orbit runtime must not use SVG SMIL animateTransform")
+    if "@keyframes sphere-ring-orbit" not in css_source or "animation: sphere-ring-orbit" not in css_source:
+        errors.append("digital sphere orbit runtime must use CSS transform keyframes")
 
     interaction = contract.get("interaction", {})
     hit = interaction.get("sphere_edge_hit_target", {})
