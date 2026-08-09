@@ -11,7 +11,7 @@
   },
   "current_release_id": "c579fdf5a931eb6a0c4d",
   "delivery_evidence": {
-    "docs/evidence/catalog-delivery-benchmark-v1.json": "57faba7fa7d86f78cafece7a3a6e5e9e0226d3b9ada8f556e148acfb1be0945b",
+    "docs/evidence/catalog-delivery-benchmark-v1.json": "2d89b17aed8b85e965c1db7bb0c6f4654ca92e7686c73a758fe6668c60a31d31",
     "docs/evidence/catalog-delivery-public-browser-smoke-v1.json": "1c7c02827cd9baa7861d77d45edec4e6831b175f1e0a6c44e24de65acb5b4c17"
   },
   "freshness_model": "digest-defined-proposed-head-scope",

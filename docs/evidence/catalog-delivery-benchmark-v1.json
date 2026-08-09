@@ -748,8 +748,13 @@
       "note": "Fresh deterministic static measurement for the final T045 product surface."
     },
     "full_validation": {
-      "verdict": "PENDING",
-      "note": "Current-tree full validation will be recorded only after make validate completes on the refreshed benchmark evidence."
+      "verdict": "PASS",
+      "validated_head": "384fef8516e1505a45656cc4013d0af24075a1dc",
+      "durable_task_id": "fd127d682b8b4e3abce1ca99",
+      "release_id": "c579fdf5a931eb6a0c4d",
+      "js_tests": "181/181",
+      "python_tests": "721/721",
+      "note": "Full repository make validate plus the fresh smoke-bound catalog delivery validator passed on this exact product-and-evidence tree. The following metadata/lifecycle-only closeout commit is revalidated separately without changing the first-party runtime surface."
     },
     "locale_candidate_browser_smoke": {
       "verdict": "PASS",
