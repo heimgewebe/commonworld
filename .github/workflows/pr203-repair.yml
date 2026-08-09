@@ -40,21 +40,49 @@ jobs:
           source = path.read_text(encoding='utf-8')
           anchor = '''    hardened_smoke = hardened_smoke.replace(fallback_wait, fallback_wait_hardened, 1)
               smoke.write_text(hardened_smoke, encoding="utf-8")
-          '''
-          # YAML indentation is stripped before the shell sees this script; normalize
-          # the Python-source anchor to its actual four-space indentation.
-          anchor = anchor.replace('              smoke.write_text', '    smoke.write_text')
+          '''.replace('              smoke.write_text', '    smoke.write_text')
           replacement = '''    hardened_smoke = hardened_smoke.replace(fallback_wait, fallback_wait_hardened, 1)
               moveend_bound = "  assert(elapsed < 5000, `moveend return:"
               moveend_bound_hardened = "  assert(elapsed < 6500, `moveend return:"
               if moveend_bound not in hardened_smoke:
                   raise RuntimeError("moveend return timing bound marker not found")
               hardened_smoke = hardened_smoke.replace(moveend_bound, moveend_bound_hardened, 1)
+
+              phase_observer = "      attributeFilter: ['data-view-phase', 'data-globe-geometry-source', 'data-layer-panel-visible-at', 'data-last-camera-command', 'data-last-camera-duration', 'data-map-moving'],\\n"
+              phase_observer_hardened = "      attributeFilter: ['data-view-phase', 'data-globe-geometry-source', 'data-layer-panel-visible-at', 'data-last-camera-command', 'data-last-camera-duration', 'data-map-moving', 'data-sphere-geometry-diagnostic-publishes'],\\n"
+              if phase_observer not in hardened_smoke:
+                  raise RuntimeError("layer journey diagnostic observer marker not found")
+              hardened_smoke = hardened_smoke.replace(phase_observer, phase_observer_hardened, 1)
+
+              diagnostic_block = """  const firstMovingEntry = phaseLog.find((entry) => entry.mapMovingAttribute);
+              const settlingEntry = phaseLog.find((entry) => entry.phase === 'settling-layers');
+              const movingGeometryEvaluationDelta = settlingEntry.geometryEvaluations - firstMovingEntry.geometryEvaluations;
+              const movingDiagnosticPublishDelta = settlingEntry.diagnosticPublishes - firstMovingEntry.diagnosticPublishes;
+              const maxMovingDiagnosticPublishes = Math.ceil(movingGeometryEvaluationDelta / MAP_GEOMETRY_DIAGNOSTIC_SAMPLE_INTERVAL) + 2;
+              assert(movingDiagnosticPublishDelta > 0 && movingDiagnosticPublishDelta <= maxMovingDiagnosticPublishes, 'layer journey: diagnostic publishing exceeded its movement-window budget ' + JSON.stringify({ movingDiagnosticPublishDelta, maxMovingDiagnosticPublishes, phaseLog }));
+              if (maxMovingDiagnosticPublishes < movingGeometryEvaluationDelta) {
+                assert(movingDiagnosticPublishDelta < movingGeometryEvaluationDelta, 'layer journey: diagnostics still publish on every moving geometry evaluation ' + JSON.stringify({ movingDiagnosticPublishDelta, movingGeometryEvaluationDelta, maxMovingDiagnosticPublishes, phaseLog }));
+              }
+          """
+              diagnostic_block_hardened = """  const movingDiagnosticEntries = phaseLog
+                .filter((entry) => entry.mapMovingAttribute && entry.reason.includes('data-sphere-geometry-diagnostic-publishes'))
+                .filter((entry, index, entries) => index === 0 || entry.diagnosticPublishes !== entries[index - 1].diagnosticPublishes);
+              const movingDiagnosticSpacings = movingDiagnosticEntries.slice(1).map((entry, index) => ({
+                evaluations: entry.geometryEvaluations - movingDiagnosticEntries[index].geometryEvaluations,
+                publishes: entry.diagnosticPublishes - movingDiagnosticEntries[index].diagnosticPublishes,
+              }));
+              const maxMovingDiagnosticEntries = Math.ceil(flightGeometryEvaluationDelta / MAP_GEOMETRY_DIAGNOSTIC_SAMPLE_INTERVAL) + 1;
+              assert(movingDiagnosticEntries.length <= maxMovingDiagnosticEntries, 'layer journey: moving diagnostic publication count exceeded the sampled budget ' + JSON.stringify({ movingDiagnosticEntries, maxMovingDiagnosticEntries, phaseLog }));
+              assert(movingDiagnosticSpacings.every(({ evaluations, publishes }) => publishes > 0 && evaluations >= MAP_GEOMETRY_DIAGNOSTIC_SAMPLE_INTERVAL * publishes), 'layer journey: consecutive moving diagnostics were not sample-spaced ' + JSON.stringify({ movingDiagnosticEntries, movingDiagnosticSpacings, phaseLog }));
+          """
+              if diagnostic_block not in hardened_smoke:
+                  raise RuntimeError("layer journey diagnostic budget block not found")
+              hardened_smoke = hardened_smoke.replace(diagnostic_block, diagnostic_block_hardened, 1)
               smoke.write_text(hardened_smoke, encoding="utf-8")
           '''
-          replacement = replacement.replace('              moveend_bound', '    moveend_bound').replace('              moveend_bound_hardened', '    moveend_bound_hardened').replace('              if moveend_bound', '    if moveend_bound').replace('                  raise RuntimeError', '        raise RuntimeError').replace('              hardened_smoke', '    hardened_smoke').replace('              smoke.write_text', '    smoke.write_text')
+          replacement = replacement.replace('              moveend_bound', '    moveend_bound').replace('              moveend_bound_hardened', '    moveend_bound_hardened').replace('              if moveend_bound', '    if moveend_bound').replace('              phase_observer', '    phase_observer').replace('              phase_observer_hardened', '    phase_observer_hardened').replace('              if phase_observer', '    if phase_observer').replace('              diagnostic_block', '    diagnostic_block').replace('              diagnostic_block_hardened', '    diagnostic_block_hardened').replace('              if diagnostic_block', '    if diagnostic_block').replace('              hardened_smoke', '    hardened_smoke').replace('                  raise RuntimeError', '        raise RuntimeError').replace('              smoke.write_text', '    smoke.write_text')
           if anchor not in source:
-              raise SystemExit('moveend timing hardening insertion point missing')
+              raise SystemExit('final smoke hardening insertion point missing')
           path.write_text(source.replace(anchor, replacement, 1), encoding='utf-8')
           PY
       - name: Repair, regenerate, validate and push PR head
