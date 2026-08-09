@@ -2679,6 +2679,24 @@ async function androidGlobeUiScenario() {
 
   await run.page.setViewportSize({ width: 844, height: 390 });
   await run.page.waitForTimeout(100);
+  const touchPathState = () => run.page.evaluate(() => {
+    const paths = [...document.querySelectorAll('#sphere-paths ellipse')];
+    const labels = [...document.querySelectorAll('.sphere-ring-plane .sphere-ring-text')];
+    return paths.map((path, index) => {
+      const transforms = path.transform.animVal;
+      const transform = transforms.numberOfItems > 0 ? transforms.getItem(transforms.numberOfItems - 1) : null;
+      const matrix = transform?.matrix;
+      const labelRect = labels[index]?.getBoundingClientRect();
+      return {
+        id: path.id,
+        animated: Boolean(path.querySelector('[data-touch-ring-motion="true"]')),
+        matrix: matrix ? [matrix.a, matrix.b, matrix.c, matrix.d, matrix.e, matrix.f] : null,
+        labelBox: labelRect ? [labelRect.x, labelRect.y, labelRect.width, labelRect.height] : null,
+      };
+    });
+  });
+  const wideTouchMotionBefore = await touchPathState();
+  await run.page.waitForTimeout(350);
   const wideTouchGeometry = await run.page.evaluate(() => {
     const planes = [...document.querySelectorAll('.sphere-ring-plane')];
     const primaryPlanes = planes.filter((plane) => plane.dataset.emphasis === 'primary');
@@ -2707,8 +2725,19 @@ async function androidGlobeUiScenario() {
       }),
     };
   });
+  const wideTouchMotionAfter = await touchPathState();
+  const movingTouchPaths = wideTouchMotionAfter.filter((after, index) => {
+    if (!after.animated || !after.matrix || !wideTouchMotionBefore[index]?.matrix) return false;
+    return after.matrix.some((value, matrixIndex) => Math.abs(value - wideTouchMotionBefore[index].matrix[matrixIndex]) > 1e-5);
+  });
+  const movingTouchLabels = wideTouchMotionAfter.filter((after, index) => {
+    if (!after.animated || !after.labelBox || !wideTouchMotionBefore[index]?.labelBox) return false;
+    return after.labelBox.some((value, boxIndex) => Math.abs(value - wideTouchMotionBefore[index].labelBox[boxIndex]) > 1e-3);
+  });
   assert(wideTouchGeometry.viewportWidth > 768 && !wideTouchGeometry.mediaCompact && wideTouchGeometry.mediaCoarseTouch, scenarioId + ': wide touch viewport did not exercise the non-compact coarse-pointer path ' + JSON.stringify(wideTouchGeometry));
-  assert(wideTouchGeometry.primaryRingsStatic && wideTouchGeometry.depthRingsStatic, scenarioId + ': wide touch ring group retained CSS animation or transform ' + JSON.stringify(wideTouchGeometry));
+  assert(wideTouchGeometry.primaryRingsStatic && wideTouchGeometry.depthRingsStatic, scenarioId + ': wide touch ring group regained compositor animation or transform ' + JSON.stringify(wideTouchGeometry));
+  assert(movingTouchPaths.length >= 2, scenarioId + ': wide touch SVG path motion did not advance ' + JSON.stringify({ before: wideTouchMotionBefore, after: wideTouchMotionAfter }));
+  assert(movingTouchLabels.length >= 2, scenarioId + ': wide touch visible ring labels did not move with their SVG paths ' + JSON.stringify({ before: wideTouchMotionBefore, after: wideTouchMotionAfter }));
   assert(wideTouchGeometry.representativePrimaryLabels.length >= 2 && wideTouchGeometry.representativePrimaryLabels.every(({ text, visible, width, height, fontSize }) => text.length > 0 && visible && width > 80 && height > 0 && fontSize >= 20), scenarioId + ': wide touch primary ring labels are absent or not visibly laid out ' + JSON.stringify(wideTouchGeometry));
 
   const compactDesktopRun = await newPage({

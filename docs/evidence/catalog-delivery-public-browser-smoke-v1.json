@@ -185,23 +185,23 @@
         "representativePrimaryLabels": [
           {
             "text": "Knowledge, Learning and Culture · 11    LibriVox  MusicBrainz  Open Library  Peer 2 Peer Unive…  Safecast  Thailand Citizens…",
-            "width": 671.09375,
-            "height": 13,
-            "fontSize": 22,
+            "width": 931.9375,
+            "height": 18,
+            "fontSize": 23.77,
             "visible": true
           },
           {
             "text": "Communication and Networks · 11    BOSCO Uganda  Freifunk  Freifunk Hamburg  guifi.net  Mastodon  Meshtastic",
-            "width": 603.78125,
-            "height": 13,
-            "fontSize": 22,
+            "width": 838.546875,
+            "height": 18,
+            "fontSize": 23.77,
             "visible": true
           },
           {
             "text": "Cooperation and Self-Organization · 5    Bologna Urban Com…  Enspiral  g0v  National Communal…  Park Slope Food C…",
-            "width": 637.578125,
-            "height": 13,
-            "fontSize": 22,
+            "width": 885.578125,
+            "height": 18,
+            "fontSize": 23.77,
             "visible": true
           }
         ]
@@ -213,15 +213,15 @@
         "primaryStates": [
           {
             "animationName": "sphere-ring-orbit",
-            "transform": "matrix(0.999999, 0.00150584, -0.00150584, 0.999999, 0, 0)"
+            "transform": "matrix(1, 0.000756968, -0.000756968, 1, 0, 0)"
           },
           {
             "animationName": "sphere-ring-orbit",
-            "transform": "matrix(-0.531196, 0.847249, -0.847249, -0.531196, 0, 0)"
+            "transform": "matrix(-0.530561, 0.847647, -0.847647, -0.530561, 0, 0)"
           },
           {
             "animationName": "sphere-ring-orbit",
-            "transform": "matrix(-0.436762, -0.899577, 0.899577, -0.436762, 0, 0)"
+            "transform": "matrix(-0.437563, -0.899188, 0.899188, -0.437563, 0, 0)"
           }
         ],
         "depthStates": [
@@ -276,7 +276,7 @@
     {
       "id": "layer-journey-moveend-return",
       "verdict": "PASS",
-      "elapsedMs": 2383
+      "elapsedMs": 2697
     },
     {
       "id": "layer-journey-missing-moveend-fallback",
@@ -368,8 +368,8 @@
       "verdict": "PASS",
       "blockedCatalogRequests": 0,
       "observedCatalogRequests": [
-        "/releases/08cc9b89ef85fbf529e7/catalog/runtime/aggregate.v1.json",
-        "/releases/08cc9b89ef85fbf529e7/catalog/runtime/manifest.v1.json"
+        "/releases/45a5d32988afca9cc668/catalog/runtime/aggregate.v1.json",
+        "/releases/45a5d32988afca9cc668/catalog/runtime/manifest.v1.json"
       ]
     },
     {
@@ -427,7 +427,7 @@
     }
   ],
   "binding": {
-    "smoke_script_sha256": "e2f3c0178c5c96035126efb64f63da700a72c05eefc7286ec70dd6468a8747d5",
+    "smoke_script_sha256": "f3230a9faf5db87107c5f21e29a22ab0dde9c1ffafeb044d0ca3e97192cad5e8",
     "smoke_runner_sha256": "522b99b70b1d0064b1d0a31a3a67fdc9a2e73b7408f37d1a4bb303bc360b7556",
     "smoke_plan_sha256": "8a068c3b573eb2ab95ed7c3f8477f607cba6de9353ab5250ba9abc09345b23a7",
     "scenario_ids": [
@@ -469,6 +469,6 @@
       "method-mobile",
       "method-mobile-text-200"
     ],
-    "first_party_surface_sha256": "68a57834e9b772509e117a1af590be28a4e1f61c7bcf885e476a60ca36897eff"
+    "first_party_surface_sha256": "a81872cc8568a5cc5edacfecce5a8089b4d1b2480f2af7c47e3e275f7f50371e"
   }
 }
