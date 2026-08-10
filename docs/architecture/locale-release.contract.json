@@ -9,7 +9,8 @@
       "es",
       "fr",
       "pt-BR",
-      "ar"
+      "ar",
+      "zh-Hans"
     ],
     "default_locale": "en",
     "fallback_locale": "de",
@@ -35,12 +36,29 @@
     "matching_order": [
       "exact",
       "language_script",
-      "primary_language",
+      "scriptless_primary",
+      "next_preference_on_script_mismatch",
+      "primary_language_without_script",
       "default_locale"
     ],
     "case_insensitive_input": true,
     "canonical_output_required": true,
-    "script_and_region_must_be_preserved": true
+    "script_and_region_must_be_preserved": true,
+    "requested_script_mismatch_must_not_cross_scripts": true,
+    "region_inferred_script_counts_as_script_for_matching": true,
+    "region_script_inference": {
+      "zh": {
+        "Hans": [
+          "CN",
+          "SG"
+        ],
+        "Hant": [
+          "TW",
+          "HK",
+          "MO"
+        ]
+      }
+    }
   },
   "content_language_policy": {
     "independent_from_interface_locales": true,
@@ -84,7 +102,7 @@
       "translation_pack": "wave_1",
       "release_evidence": {
         "path": "docs/evidence/locale-releases/es.json",
-        "sha256": "ee22c245fde5147731e011e4901b65867557e60018d947092c660f15a38b11b0"
+        "sha256": "7ab3672ae7957b00c4c845cb5ccd02877d1f1199e0a95bff394db1b694d865ec"
       }
     },
     "fr": {
@@ -100,7 +118,7 @@
       "translation_pack": "wave_1",
       "release_evidence": {
         "path": "docs/evidence/locale-releases/fr.json",
-        "sha256": "31e3943422b2318fe0ea933944f52fe7facc1e8ddaf37d900db388c1338a4061"
+        "sha256": "ff3bbd886e638abd2ebf83140f31f284bdfbd4ad5e56e26fa54cba79ade284f1"
       }
     },
     "pt-BR": {
@@ -116,7 +134,7 @@
       "translation_pack": "wave_1",
       "release_evidence": {
         "path": "docs/evidence/locale-releases/pt-BR.json",
-        "sha256": "dfe2f61b66470cd7fc8cb55e19fbadc2df6e9d212032874120eb986db9faf634"
+        "sha256": "123d2251b41cfc6fd87f6e4fb362bc28083394299194cd4089aa8c2b38351110"
       }
     },
     "ar": {
@@ -132,14 +150,24 @@
       "translation_pack": "wave_1",
       "release_evidence": {
         "path": "docs/evidence/locale-releases/ar.json",
-        "sha256": "701fd6c481a0387ad4332d09c5cd9bb0f520e13925c348c8f79cc37d200e579d"
+        "sha256": "a0e84c8ba1d249631044d94110ab9c2dff1a0fb1ee398b487d85894e4d89bdc7"
       }
     },
     "zh-Hans": {
-      "status": "planned",
+      "status": "released",
       "direction": "ltr",
       "native_name": "简体中文",
-      "english_name": "Simplified Chinese"
+      "english_name": "Simplified Chinese",
+      "surface_files": {
+        "index": "zh-Hans.html",
+        "method": "method.zh-Hans.html",
+        "proposal": "propose.zh-Hans.html"
+      },
+      "translation_pack": "wave_1",
+      "release_evidence": {
+        "path": "docs/evidence/locale-releases/zh-Hans.json",
+        "sha256": "fb79dc241e39d97059b2ed3dcacfee2bbaf757b1c608c8ac5d34c9d55e628a1f"
+      }
     },
     "hi": {
       "status": "planned",
@@ -165,10 +193,10 @@
       "es",
       "fr",
       "pt-BR",
-      "ar"
+      "ar",
+      "zh-Hans"
     ],
     "wave_2": [
-      "zh-Hans",
       "hi",
       "id",
       "ja"

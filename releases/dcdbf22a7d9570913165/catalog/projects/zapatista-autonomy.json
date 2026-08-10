@@ -1,0 +1,120 @@
+{
+  "schema_version": 4,
+  "id": "zapatista-autonomy",
+  "title": "Zapatistische Autonomie",
+  "summary": "Eine von zapatistischen Gemeinden in Chiapas getragene Autonomiestruktur, die seit 2023 lokale autonome Regierungen, regionale Kollektive und versammlungsgebundene Koordination an die Stelle der früheren MAREZ und Juntas de Buen Gobierno setzt.",
+  "themes": [
+    "community-land",
+    "commons-governance",
+    "customary-governance",
+    "mutual-aid",
+    "education",
+    "health"
+  ],
+  "actions": [
+    "learn"
+  ],
+  "presence": {
+    "geographic": [
+      {
+        "id": "zapatista-communities-chiapas",
+        "mode": "hidden",
+        "label": "Zapatistische Gemeinden in Chiapas, Mexiko",
+        "privacy_note": "Autonome Territorien, Gemeinden, Versammlungsorte, Versorgungsstrukturen und Sicherheitsbezüge werden weder kartiert noch aus offiziellen Mitteilungen rekonstruiert.",
+        "source_ids": [
+          "zapatista-reorganisation-2023",
+          "zapatista-structure-2026"
+        ]
+      }
+    ],
+    "digital": {
+      "available": false,
+      "source_ids": [
+        "zapatista-reorganisation-2023"
+      ]
+    }
+  },
+  "activity": {
+    "status": "active",
+    "observed_at": "2026-07-26",
+    "source_ids": [
+      "zapatista-structure-2026",
+      "zapatista-acgaz-2025"
+    ],
+    "note": "Offizielle Mitteilungen aus 2025 und 2026 belegen fortbestehende lokale und regionale autonome Koordination; zugleich wird die neue Struktur als noch im Aufbau und begrifflich veränderlich beschrieben."
+  },
+  "provenance": {
+    "sources": [
+      {
+        "id": "zapatista-reorganisation-2023",
+        "type": "official-source",
+        "label": "EZLN – Die neue Struktur der zapatistischen Autonomie",
+        "url": "https://enlacezapatista.ezln.org.mx/2023/11/13/neunter-teil-die-neue-struktur-der-zapatistischen-autonomie/",
+        "retrieved_at": "2026-07-26",
+        "note": "Offizielle Erklärung zur Ablösung der MAREZ und Juntas de Buen Gobierno durch lokale autonome Regierungen, Kollektive und Versammlungen."
+      },
+      {
+        "id": "zapatista-acgaz-2025",
+        "type": "official-source",
+        "label": "EZLN – Mitteilung der ACGAZ, Oktober 2025",
+        "url": "https://enlacezapatista.ezln.org.mx/2025/10/05/denunciation-of-the-assembly-of-collectives-of-zapatista-autonomous-governments-a-c-g-a-z/",
+        "retrieved_at": "2026-07-26",
+        "note": "Offizielle aktuelle Mitteilung einer Versammlung regionaler Kollektive autonomer zapatistischer Regierungen."
+      },
+      {
+        "id": "zapatista-structure-2026",
+        "type": "official-source",
+        "label": "EZLN – Erläuterung der neuen lokalen und regionalen Struktur, 2026",
+        "url": "https://enlacezapatista.ezln.org.mx/2026/03/22/der-verdammte-und-die-ameisen-liebe-und-lieblosigkeit-aus-sicht-eines-zapatistischen-kindes/",
+        "retrieved_at": "2026-07-26",
+        "note": "Offizielle deutschsprachige Erläuterung von GAL, regionalen Kollektiven und Versammlungen sowie des noch entstehenden Gemeinsamen."
+      }
+    ],
+    "uncertainty_note": "Die Struktur wird von ihren Trägern selbst als im Umbau beschrieben. Der Datensatz verwendet deshalb keine statische Caracol-, MAREZ- oder JBG-Karte und behauptet keine unveränderte Organisationsform seit 1994."
+  },
+  "curation": {
+    "state": "listed",
+    "catalogued_at": "2026-07-26",
+    "reviewed_by": "Commonworld editorial review",
+    "reviewed_at": "2026-07-26",
+    "next_review_at": "2026-08-26",
+    "notes": "Aufgenommen als indigene Autonomie- und Gemeinschaffensstruktur. Die veraltete Gleichsetzung mit MAREZ, Juntas und unveränderten Caracoles wurde korrigiert; wegen Sicherheits- und Strukturwandel monatlich prüfen."
+  },
+  "links": [
+    {
+      "type": "homepage",
+      "label": "Enlace Zapatista – offizielle Mitteilungen",
+      "url": "https://enlacezapatista.ezln.org.mx/"
+    },
+    {
+      "type": "learn",
+      "label": "Neue Autonomiestruktur kennenlernen",
+      "url": "https://enlacezapatista.ezln.org.mx/2023/11/13/neunter-teil-die-neue-struktur-der-zapatistischen-autonomie/",
+      "source_ids": [
+        "zapatista-reorganisation-2023"
+      ]
+    }
+  ],
+  "handoff": {
+    "enabled": false
+  },
+  "languages": {
+    "codes": [
+      "es",
+      "de",
+      "en"
+    ],
+    "source_ids": [
+      "zapatista-reorganisation-2023",
+      "zapatista-acgaz-2025"
+    ],
+    "note": "Offizielle Mitteilungen werden auf Spanisch und teilweise in deutscher und englischer Übersetzung veröffentlicht."
+  },
+  "access": {
+    "type": "restricted",
+    "source_ids": [
+      "zapatista-reorganisation-2023"
+    ],
+    "note": "Öffentliche Mitteilungen sind lesbar; autonome Gebiete, Dienste und politische Mitwirkung sind keine allgemein offene Besuchs- oder Mitgliedschaftsoberfläche."
+  }
+}

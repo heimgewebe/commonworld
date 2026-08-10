@@ -28,6 +28,7 @@ import {
   visibleDigitalNodes,
 } from '../assets/commonworld-core.mjs';
 import { localizeCatalogRecords, wave1LocalePackReady } from '../assets/commonworld-i18n.mjs';
+import { RELEASED_LOCALES } from '../assets/commonworld-locale-registry.mjs';
 
 await wave1LocalePackReady;
 
@@ -2813,6 +2814,15 @@ async function androidGlobeUiScenario() {
     if (!entry.labelBox || !previous?.labelBox) return false;
     return entry.labelBox.some((value, boxIndex) => Math.abs(value - previous.labelBox[boxIndex]) > threshold);
   });
+  const waitForMovingTouchLabels = async (before, minimum = 2, timeoutMs = 1500) => {
+    const deadline = Date.now() + timeoutMs;
+    let after = await touchRingState();
+    while (movingLabelsBetween(before, after).length < minimum && Date.now() < deadline) {
+      await run.page.waitForTimeout(50);
+      after = await touchRingState();
+    }
+    return after;
+  };
   await run.page.evaluate(() => { document.querySelector('.globe-stage').dataset.mapMoving = 'true'; });
   await run.page.waitForTimeout(80);
   const mapPausedBefore = await touchRingState();
@@ -2821,6 +2831,10 @@ async function androidGlobeUiScenario() {
   assert(mapPausedAfter.filter(({ labelAnimationName, labelAnimationPlayState, ringAnimationName, ringAnimationPlayState }) => labelAnimationName === 'sphere-ring-orbit' && labelAnimationPlayState === 'paused' && ringAnimationName === 'sphere-ring-orbit' && ringAnimationPlayState === 'paused').length >= 2, scenarioId + ': wide touch ring children did not pause while map-moving state was active ' + JSON.stringify(mapPausedAfter));
   assert(movingLabelsBetween(mapPausedBefore, mapPausedAfter).length === 0, scenarioId + ': wide touch labels moved while map-moving state paused the orbit ' + JSON.stringify({ before: mapPausedBefore, after: mapPausedAfter }));
   await run.page.evaluate(() => { delete document.querySelector('.globe-stage').dataset.mapMoving; });
+  const mapResumedBefore = await touchRingState();
+  const mapResumedAfter = await waitForMovingTouchLabels(mapResumedBefore);
+  assert(mapResumedAfter.filter(({ labelAnimationName, labelAnimationPlayState, ringAnimationName, ringAnimationPlayState }) => labelAnimationName === 'sphere-ring-orbit' && labelAnimationPlayState === 'running' && ringAnimationName === 'sphere-ring-orbit' && ringAnimationPlayState === 'running').length >= 2, scenarioId + ': wide touch ring children did not return to running state after map-moving ended ' + JSON.stringify(mapResumedAfter));
+  assert(movingLabelsBetween(mapResumedBefore, mapResumedAfter).length >= 2, scenarioId + ': wide touch labels did not resume after map-moving ended ' + JSON.stringify({ before: mapResumedBefore, after: mapResumedAfter }));
 
   await run.page.locator('#sphere-edge-control').focus();
   await run.page.waitForTimeout(80);
@@ -2832,8 +2846,8 @@ async function androidGlobeUiScenario() {
   await run.page.evaluate(() => document.querySelector('#sphere-edge-control')?.blur());
   await run.page.waitForTimeout(80);
   const focusResumedBefore = await touchRingState();
-  await run.page.waitForTimeout(350);
-  const focusResumedAfter = await touchRingState();
+  const focusResumedAfter = await waitForMovingTouchLabels(focusResumedBefore);
+  assert(focusResumedAfter.filter(({ labelAnimationName, labelAnimationPlayState, ringAnimationName, ringAnimationPlayState }) => labelAnimationName === 'sphere-ring-orbit' && labelAnimationPlayState === 'running' && ringAnimationName === 'sphere-ring-orbit' && ringAnimationPlayState === 'running').length >= 2, scenarioId + ': wide touch ring children did not return to running state after sphere edge focus ended ' + JSON.stringify(focusResumedAfter));
   assert(movingLabelsBetween(focusResumedBefore, focusResumedAfter).length >= 2, scenarioId + ': wide touch labels did not resume after sphere edge focus ended ' + JSON.stringify({ before: focusResumedBefore, after: focusResumedAfter }));
 
   const reducedTouchRun = await newPage({
@@ -2874,7 +2888,7 @@ async function androidGlobeUiScenario() {
     return entry[key].some((value, boxIndex) => Math.abs(value - previous[key][boxIndex]) > threshold);
   });
   assert(reducedTouchAfter.length >= 2 && reducedTouchAfter.every(({ coarse, reduced }) => coarse && reduced), scenarioId + ': reduced-motion touch context did not exercise the intended media path ' + JSON.stringify(reducedTouchAfter));
-  assert(reducedTouchAfter.filter(({ labelAnimationDuration, labelAnimationIterations, ringAnimationDuration, ringAnimationIterations }) => Number.parseFloat(labelAnimationDuration) <= 0.001 && labelAnimationIterations === '1' && Number.parseFloat(ringAnimationDuration) <= 0.001 && ringAnimationIterations === '1').length >= 2, scenarioId + ': reduced-motion touch context did not inherit the global static animation policy ' + JSON.stringify(reducedTouchAfter));
+  assert(reducedTouchAfter.filter(({ labelAnimationName, ringAnimationName }) => labelAnimationName === 'none' && ringAnimationName === 'none').length >= 2, scenarioId + ': reduced-motion touch ring children were not fully static ' + JSON.stringify(reducedTouchAfter));
   assert(visibleBoxesMoved(reducedTouchBefore, reducedTouchAfter, 'labelBox').length === 0, scenarioId + ': reduced-motion touch labels moved ' + JSON.stringify({ before: reducedTouchBefore, after: reducedTouchAfter }));
   assert(visibleBoxesMoved(reducedTouchBefore, reducedTouchAfter, 'ringBox').length === 0, scenarioId + ': reduced-motion touch ring strokes moved ' + JSON.stringify({ before: reducedTouchBefore, after: reducedTouchAfter }));
   await reducedTouchRun.context.close();
@@ -4113,7 +4127,7 @@ async function germanLocaleScenario() {
   await run.page.locator('#settings-toggle').click();
   await run.page.locator('#settings-panel:not([hidden])').waitFor();
   const localeChoices = await run.page.locator('#settings-panel [data-locale-choice]').evaluateAll((nodes) => nodes.map((node) => node.dataset.localeChoice));
-  assert(JSON.stringify(localeChoices) === JSON.stringify(['auto', 'en', 'de', 'es', 'fr', 'pt-BR', 'ar']), `German locale: settings do not expose all interface languages (${JSON.stringify(localeChoices)})`);
+  assert(JSON.stringify(localeChoices) === JSON.stringify(['auto', ...RELEASED_LOCALES]), `German locale: settings do not expose all interface languages (${JSON.stringify(localeChoices)})`);
   const previewLabels = await run.page.locator('#settings-panel [data-locale-status="candidate"] .language-choice-status').allTextContents();
   assert(previewLabels.length === 0, `German locale: released languages still carry preview labels (${JSON.stringify(previewLabels)})`);
   const languageGridOverflow = await run.page.locator('#settings-panel .language-choice-grid').evaluate((node) => node.scrollWidth - node.clientWidth);

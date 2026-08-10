@@ -1,0 +1,80 @@
+{
+  "schema_version": 1,
+  "kind": "commonworld.catalog_locale_independent_review",
+  "status": "passed",
+  "review_kind": "model_assisted_independent_language_review",
+  "reviewer": "GPT-5.6 Sol independent post-fix review via ChatGPT",
+  "writer_independence": "independent_from_grok_4_5_writer",
+  "reviewed_revision": "1e7e9be4ca01d30a96f2516a36278e3dcd2c8a92",
+  "reviewed_source_pack_sha256": "c2bc4c17138b29e9d45a4a8a082a95aaa59c7e925b17b4020ac74c3690f29274",
+  "input_digests": {
+    "en": "97d084727349070505fc19a3fb2463c1aa3241f227821270e7e60a2a6c32bb97",
+    "es": "de1638df4c7f4b71aaab644c28e7739a699f3d914f49cfa09b205885a5f1ec36",
+    "fr": "c58061ed7f34dce421898b2894026aeafec56c41c32cb488a2ceb6cbf9a0875b",
+    "pt-BR": "d016bbf890ad12d59ab9004c2b47e88595d76c9d426dfceec07a1e50f5042ddc",
+    "ar": "ee4d37a7f75174099408a5191863440a9c8bd40475a1f05e59537c25c44ccaf2",
+    "zh-Hans": "a9d7af6799f51c36c83dda3799ddf58fddd67af73da542b9d87e2aa8541638db"
+  },
+  "coverage": {
+    "locales": [
+      "es",
+      "fr",
+      "pt-BR",
+      "ar",
+      "zh-Hans"
+    ],
+    "project_count_per_locale": 88,
+    "all_entries_reviewed": true,
+    "basis": "prior_digest_bound_review_for_es_fr_pt_ar_plus_full_current_zh_hans_review"
+  },
+  "method": [
+    "Verified es, fr, pt-BR, and ar catalog overlay digests are byte-identical to the already passed independent Wave-1 review inputs.",
+    "Read the complete current en.json and zh-Hans.json catalog overlays and compared all 88 project IDs and their localized summaries, geographic labels, digital labels, numbers, institutions, roles, and place references.",
+    "Read the complete zh-Hans UI/runtime translation pack and checked for untranslated prose, mixed-script defects, missing runtime coverage, and misleading terminology.",
+    "Rechecked the complete Simplified Chinese overlay after the two PR #204 terminology fixes and regenerated release surfaces."
+  ],
+  "verdict": "pass",
+  "counts": {
+    "blocker": 0,
+    "major": 0,
+    "minor": 0,
+    "note": 1
+  },
+  "findings": [],
+  "notes": [
+    "PR #204 automated review found two terminology defects; both were corrected before this post-fix PASS.",
+    "The retained term “Commons” in some Chinese strings is treated as a product/domain term rather than automatically narrowed to 公地. Native-speaker stylistic polish remains useful but is not claimed here."
+  ],
+  "prior_review_source": {
+    "path": "docs/evidence/locale-reviews/raw/catalog-wave1-independent-codex-final-pass-2026-08-08.json",
+    "sha256": "6756a78ad888e4c484fa89befb05113c62fe5044c3a8803cdfb7cbd83d5b3bd8",
+    "scope": [
+      "es",
+      "fr",
+      "pt-BR",
+      "ar"
+    ]
+  },
+  "limitations": [
+    "Model-assisted independent review; no native-speaker or human approval is claimed.",
+    "No full WCAG or manual assistive-technology acceptance is claimed."
+  ],
+  "resolved_findings": [
+    {
+      "severity": "P2",
+      "project": "open-food-network-australia",
+      "field": "summary",
+      "before": "简短…供应链",
+      "after": "一个澳大利亚非营利社区和开源平台，使生产者和食品倡议能够组织短供应链，并确保供应链透明且由社区控制。",
+      "resolution": "corrected short/local supply-chain terminology; post-fix review passed"
+    },
+    {
+      "severity": "P2",
+      "project": "the-things-network",
+      "field": "geographic_labels.the-things-network-global-communities",
+      "before": "门户",
+      "after": "当地社区和网关的全球网络",
+      "resolution": "corrected LoRaWAN gateway terminology; post-fix review passed"
+    }
+  ]
+}

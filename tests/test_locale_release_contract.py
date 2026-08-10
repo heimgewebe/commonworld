@@ -51,13 +51,18 @@ class LocaleReleaseContractTests(unittest.TestCase):
         )
         self.assertEqual(receipt["status"], "passed")
         self.assertRegex(receipt["reviewed_source_pack_sha256"], r"^[0-9a-f]{64}$")
-        self.assertEqual(set(receipt["locale_verdicts"]), {"es", "fr", "pt-BR", "ar"})
+        self.assertEqual(set(receipt["locale_verdicts"]), set(self.contract["rollout"]["wave_1"]))
         self.assertTrue(all(item["status"] == "passed" for item in receipt["locale_verdicts"].values()))
         for source in receipt["raw_sources"]:
             path = ROOT / source["path"]
             self.assertEqual(hashlib.sha256(path.read_bytes()).hexdigest(), source["sha256"])
             self.assertRegex(source["label"], r"^(?:initial|final)-(?:es-fr|pt-ar)-(?:findings|pass)$")
         self.assertEqual(receipt["finding_history"]["final_findings"], [])
+        for source in receipt["catalog_review"]["source_receipts"]:
+            path = ROOT / source["path"]
+            self.assertEqual(hashlib.sha256(path.read_bytes()).hexdigest(), source["sha256"])
+        self.assertEqual(set(receipt["catalog_review"]["coverage"]["locales"]), set(self.contract["rollout"]["wave_1"]))
+        self.assertTrue(receipt["catalog_review"]["coverage"]["all_entries_reviewed"])
         self.assertFalse(receipt["review_class"]["claims_native_or_human_review"])
 
     def test_browser_registry_excludes_governance_evidence_pointers(self) -> None:
@@ -113,6 +118,79 @@ class LocaleReleaseContractTests(unittest.TestCase):
             "pt-BR",
         )
 
+    def test_requested_chinese_script_mismatch_advances_to_next_preference(self) -> None:
+        self.assertEqual(
+            match_registry_locale(["zh-Hant", "fr-CA"], statuses=("released",), root=ROOT),
+            "fr",
+        )
+        self.assertEqual(
+            match_registry_locale(["zh-TW", "fr-CA"], statuses=("released",), root=ROOT),
+            "fr",
+        )
+        self.assertEqual(
+            match_registry_locale(["zh-CN", "fr-CA"], statuses=("released",), root=ROOT),
+            "zh-Hans",
+        )
+        self.assertEqual(
+            match_registry_locale(["zh-SG", "fr-CA"], statuses=("released",), root=ROOT),
+            "zh-Hans",
+        )
+        for preference in ("zh-HK", "zh-MO"):
+            self.assertEqual(
+                match_registry_locale([preference, "fr-CA"], statuses=("released",), root=ROOT),
+                "fr",
+            )
+
+    def test_script_mismatch_policy_is_contractually_fail_closed(self) -> None:
+        contract = copy.deepcopy(self.contract)
+        contract["tag_policy"]["matching_order"] = [
+            "exact",
+            "language_script",
+            "primary_language",
+            "default_locale",
+        ]
+        contract["tag_policy"]["requested_script_mismatch_must_not_cross_scripts"] = False
+        contract["tag_policy"]["region_inferred_script_counts_as_script_for_matching"] = False
+        contract["tag_policy"]["region_script_inference"]["zh"]["Hant"] = ["TW"]
+        errors = validate_contract(contract, ROOT)
+        self.assertTrue(any("script mismatch" in error for error in errors))
+        self.assertTrue(any("region-inferred scripts" in error for error in errors))
+        self.assertTrue(any("matching order" in error for error in errors))
+        self.assertTrue(any("region script inference" in error for error in errors))
+
+    def test_region_specific_candidates_respect_inferred_chinese_scripts(self) -> None:
+        import tempfile
+
+        contract = {
+            "decision": {"default_locale": "en"},
+            "locale_registry": {
+                "en": {"status": "released"},
+                "zh-CN": {"status": "released"},
+                "zh-TW": {"status": "candidate"},
+            },
+        }
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            contract_path = root / "docs/architecture/locale-release.contract.json"
+            contract_path.parent.mkdir(parents=True)
+            contract_path.write_text(json.dumps(contract), encoding="utf-8")
+            self.assertEqual(
+                match_registry_locale(["zh-Hans"], statuses=("released",), root=root),
+                "zh-CN",
+            )
+            self.assertEqual(
+                match_registry_locale(["zh-Hant"], statuses=("candidate",), root=root),
+                "zh-TW",
+            )
+            self.assertEqual(
+                match_registry_locale(["zh-HK"], statuses=("candidate",), root=root),
+                "zh-TW",
+            )
+            self.assertEqual(
+                match_registry_locale(["zh-Hant", "en"], statuses=("released",), root=root),
+                "en",
+            )
+
     def test_location_based_language_inference_is_rejected(self) -> None:
         contract = copy.deepcopy(self.contract)
         contract["decision"]["automatic_selection"]["geolocation_must_not_influence_locale"] = False
@@ -159,8 +237,8 @@ class LocaleReleaseContractTests(unittest.TestCase):
 
     def test_default_and_fallback_locales_must_be_released(self) -> None:
         contract = copy.deepcopy(self.contract)
-        contract["decision"]["default_locale"] = "zh-Hans"
-        contract["decision"]["fallback_locale"] = "hi"
+        contract["decision"]["default_locale"] = "hi"
+        contract["decision"]["fallback_locale"] = "ja"
         errors = validate_contract(contract, ROOT)
         self.assertTrue(any("default_locale must be released" == error for error in errors))
         self.assertTrue(any("fallback_locale must be released" == error for error in errors))
