@@ -121,12 +121,25 @@ export function matchRegistryLocale(values, {{ statuses = ['released'], fallback
     const exact = allowed.find((tag) => tag.toLowerCase() === canonical.toLowerCase());
     if (exact) return exact;
     const parts = canonical.split('-');
-    if (parts.length >= 2 && parts[1].length === 4) {{
-      const languageScript = parts.slice(0, 2).join('-').toLowerCase();
+    const primary = parts[0].toLowerCase();
+    const explicitScript = parts.length >= 2 && parts[1].length === 4 ? parts[1] : null;
+    const region = parts.find((part, index) => index > 0 && (part.length === 2 || /^[0-9]{{3}}$/.test(part))) ?? null;
+    const inferredChineseScript = primary === 'zh' && region
+      ? (['TW', 'HK', 'MO'].includes(region.toUpperCase()) ? 'Hant' : ['CN', 'SG'].includes(region.toUpperCase()) ? 'Hans' : null)
+      : null;
+    const requestedScript = explicitScript ?? inferredChineseScript;
+    if (requestedScript) {{
+      const languageScript = `${{primary}}-${{requestedScript}}`.toLowerCase();
       const scriptMatch = allowed.find((tag) => tag.toLowerCase() === languageScript);
       if (scriptMatch) return scriptMatch;
+      const scriptlessPrimary = allowed.find((tag) => {{
+        const candidateParts = tag.split('-');
+        return candidateParts[0].toLowerCase() === primary
+          && !(candidateParts.length >= 2 && candidateParts[1].length === 4);
+      }});
+      if (scriptlessPrimary) return scriptlessPrimary;
+      continue;
     }}
-    const primary = parts[0].toLowerCase();
     const primaryMatch = allowed.find((tag) => tag.split('-')[0].toLowerCase() === primary);
     if (primaryMatch) return primaryMatch;
   }}

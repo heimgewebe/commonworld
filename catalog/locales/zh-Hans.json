@@ -1,0 +1,590 @@
+{
+  "schema_version": 1,
+  "locale": "zh-Hans",
+  "fallback_locale": "en",
+  "contract": {
+    "kind": "presentation_translation_overlay",
+    "rule": "Translations may replace presentation text only. Canonical ids, URLs, geometry, provenance, activity, curation and publication state remain authoritative in catalog/projects/*.json."
+  },
+  "taxonomy_labels": {
+    "sphere": "数字 Commons 球体",
+    "knowledge_learning_culture": "知识、学习和文化",
+    "software_tools_production": "软件、工具和生产",
+    "communication_networks": "通信与网络",
+    "provision_land_ecology": "供给、土地和生态",
+    "cooperation_self_organization": "合作与自组织",
+    "unclassified_future_theme": "未分类的新主题",
+    "open_knowledge_data": "开放知识和数据",
+    "learning_education": "学习与教育",
+    "media_culture": "媒体、档案和文化",
+    "knowledge_learning_bridge": "知识与学习桥梁",
+    "free_software": "自由软件和基础设施",
+    "open_hardware_production": "开放硬件和生产",
+    "shared_platforms_tools": "平台和共享工具",
+    "knowledge_software_bridge": "数据和软件桥梁",
+    "community_networks": "社区网络",
+    "federated_protocols": "联邦式网络与协议",
+    "network_coordination": "网络化协调",
+    "food_seed_agriculture": "种子、食品和农业",
+    "water_irrigation": "水和灌溉",
+    "renewable_energy": "可再生能源",
+    "health_software": "开放医疗",
+    "land_ecology": "土地、城市绿化与生态",
+    "food_distribution_platforms": "食品平台",
+    "energy_cooperatives": "能源合作社",
+    "watershed_food_systems": "水和食品系统",
+    "cooperative_governance": "社区治理与合作社",
+    "civic_technology": "公民技术和自组织",
+    "mutual_local_self_help": "邻里和互助"
+  },
+  "projects": {
+    "acofop-peten-community-forests": {
+      "summary": "由佩滕农民和土著组织运营的网络，通过民主代表、领土保护、消防、恢复和可持续森林利用将玛雅生物圈保护区的社区森林特许权连接起来。",
+      "geographic_labels": {
+        "acofop-peten-region": "危地马拉佩滕 — 广泛的区域锚"
+      }
+    },
+    "aflaj-irrigation-systems-oman": {
+      "summary": "阿曼的社区管理灌溉系统按时间份额分配水，并通过共享维护、规则和当地融资来维持。",
+      "geographic_labels": {
+        "aflaj-oman-serial-area": "阿曼北部的五个阿弗拉吉地区"
+      },
+      "digital_label": "联合国教科文组织文档，包含说明、地图和管理信息"
+    },
+    "akiba-mashinani-trust": {
+      "summary": "由肯尼亚定居社区运营的融资工具，支持储蓄团体、贷款和社区组织的住房、卫生和基础设施项目。",
+      "geographic_labels": {
+        "akiba-mashinani-trust-approximate-area": "肯尼亚"
+      }
+    },
+    "arvari-river-parliament": {
+      "summary": "由阿尔瓦里河流域的村庄社区组建的供水机构，旨在组织共同规则、责任和冲突解决方案，以恢复和使用河流。",
+      "geographic_labels": {
+        "arvari-alwar-district-anchor": "拉贾斯坦邦阿尔瓦区的阿尔瓦里集水区 — 广阔的地区锚",
+        "arvari-water-infrastructure": "流域内的村庄、水利设施和当地使用场所"
+      }
+    },
+    "auroville": {
+      "summary": "泰米尔纳德邦的一个国际小镇自 1968 年以来一直在尝试公共生活、生态实践和替代性社会组织；土地和资产通过黎明之城基金会合法持有，而不是由居民个人拥有。",
+      "geographic_labels": {
+        "auroville-township-area": "印度泰米尔纳德邦本地治里附近的黎明之村"
+      }
+    },
+    "bali-subak-system": {
+      "summary": "由当地灌溉社区运营的系统，通过寺庙、运河和稻田供水，并共同维护巴厘岛的农业景观。",
+      "geographic_labels": {
+        "bali-subak-landscapes": "印度尼西亚巴厘岛的苏巴克风景"
+      }
+    },
+    "banco-palmas": {
+      "summary": "位于福塔莱萨 Conjunto Palmeiras 的一家社区所有的开发银行，将团结金融、当地生产和消费以及社区管理的社会货币联系起来。",
+      "geographic_labels": {
+        "banco-palmas-fortaleza": "巴西塞阿拉州福塔雷萨的 Conjunto Palmeiras — 近似城市锚点"
+      }
+    },
+    "bioleft": {
+      "summary": "阿根廷的一项社区倡议，通过生产者、研究人员和其他参与者之间的公开协议分享种子、农艺知识和参与式植物育种。",
+      "geographic_labels": {
+        "bioleft-argentina": "阿根廷——全国范围"
+      },
+      "digital_label": "开放种子协议、知识和网络通信"
+    },
+    "bologna-urban-commons": {
+      "summary": "全市范围内的共享管理基础设施，公民团体和博洛尼亚市政府通过合作协议来维护、再生和使用物质、非物质和数字公共资源，以开展符合普遍利益的活动。",
+      "geographic_labels": {
+        "bologna-citywide-pacts": "合作协议分布在博洛尼亚各地"
+      },
+      "digital_label": "城市公共空间合作协议的公共数据集和交互式概述"
+    },
+    "bosco-uganda": {
+      "summary": "乌干达北部的一个非营利社区网络，连接农村互联网接入、社区信息通信技术中心、数字教育和太阳能基础设施。",
+      "geographic_labels": {
+        "bosco-gulu-network-anchor": "古卢市作为横跨阿乔利、兰戈和西尼罗河网络的广泛锚点",
+        "bosco-network-sites": "ICT 中心、无线电链路和本地连接站点"
+      },
+      "digital_label": "乌干达北部的社区网络、信息通信技术中心和数字教育"
+    },
+    "brisbane-tool-library": {
+      "summary": "位于布里斯班的一个完全由志愿者运营的图书馆，提供工具和日常设备，并促进维修、再利用和实用技能。",
+      "geographic_labels": {
+        "brisbane-tool-library-brisbane": "昆士兰州布里斯班 — 近似城市锚"
+      },
+      "digital_label": "在线库存和预订作为本地借贷服务的一部分"
+    },
+    "cano-martin-pena-clt": {
+      "summary": "由圣胡安八个社区运营的社区土地信托基金集体持有公共土地，而居民则拥有自己的房屋并获得长期保护，免遭流离失所。",
+      "geographic_labels": {
+        "cano-martin-pena-san-juan": "波多黎各圣胡安卡诺马丁佩纳沿岸的八个社区"
+      }
+    },
+    "cecosesola": {
+      "summary": "委内瑞拉由 50 多个非营利社区组织组成的网络，通过轮流任务和以共识为导向的自我管理，在没有指挥链的情况下将食品供应、医疗保健、殡葬服务、金融和生产连接起来。",
+      "geographic_labels": {
+        "cecosesola-venezuela-network": "巴基西梅托和横跨委内瑞拉几个州的网络"
+      }
+    },
+    "cltb-le-nid": {
+      "summary": "布鲁塞尔社区土地信托基金的一个住房项目，位于安德莱赫特，拥有七套住宅、一间共用房间和一个半公共花园。",
+      "geographic_labels": {
+        "cltb-le-nid-entrance": "121 Rue Verheyden, 安德莱赫特",
+        "cltb-le-nid-building": "勒尼德大厦"
+      }
+    },
+    "common-voice": {
+      "summary": "一个开放的多语言语音数据集，语言社区在其中贡献录音、句子和验证，为语音技术构建可自由使用的数据。",
+      "geographic_labels": {},
+      "digital_label": "开放语音、文本和验证数据以及用于自组织语言社区的工具"
+    },
+    "community-baboon-sanctuary": {
+      "summary": "伯利兹的一个公开注册的保护区，其治理记录为当地社区，其管理责任由当地委员会承担。",
+      "geographic_labels": {
+        "community-baboon-sanctuary-belize-area": "伯利兹伯利兹河谷"
+      }
+    },
+    "community-energy-network-new-zealand": {
+      "summary": "新西兰当地公民主导的能源倡议网络，将可再生能源和效率项目的知识、协作和社区控制联系起来。",
+      "geographic_labels": {
+        "cen-new-zealand": "新西兰 — 全国网络",
+        "cen-member-sites": "当地设施和会员地点"
+      },
+      "digital_label": "网络、知识交流和参与信息"
+    },
+    "cooperation-jackson": {
+      "summary": "密西西比州杰克逊市的团结经济网络，共同发展工人合作社、民主自治企业、社区拥有的土地、经济适用房和当地生产基础设施。",
+      "geographic_labels": {
+        "cooperation-jackson-west-jackson": "西杰克逊, 密西西比州, 美国"
+      }
+    },
+    "cooperative-home-care-associates": {
+      "summary": "纽约的一家工人拥有的护理合作社将家庭护理与免费培训、工人的声音和护理人员的经济利益结合起来。",
+      "geographic_labels": {
+        "chca-bronx-metro-anchor": "布朗克斯和纽约大都会区——广泛的服务区域锚点",
+        "chca-private-care-sites": "私人住宅和护理任务"
+      }
+    },
+    "debian": {
+      "summary": "一个自由操作系统，具有开放的软件包档案、公共文档和全球参与。",
+      "geographic_labels": {},
+      "digital_label": "自由操作系统和全球项目基础设施"
+    },
+    "deccan-development-society": {
+      "summary": "泰兰加纳达利特和土著小农妇女村庄协会联合会，共同组织种子、旱地农业、食品、市场、媒体和传统知识。",
+      "geographic_labels": {
+        "dds-telangana-region": "印度特伦甘纳邦的桑加姆"
+      },
+      "digital_label": "社区媒体和 Sanghams 的公共视频档案"
+    },
+    "edinburgh-tool-library": {
+      "summary": "一个由社区运营且主要由志愿者运营的工具库，提供工具借用、教授维修和实用技能并支持当地社区项目。",
+      "geographic_labels": {
+        "etl-meadowbank": "Meadowbank 工具图书馆中心，爱丁堡",
+        "etl-portobello": "波托贝洛工具图书馆，爱丁堡"
+      }
+    },
+    "ekuri-community-forest": {
+      "summary": "由尼日利亚克罗斯河州的新老埃库里社区集体拥有和管理的森林，其规则将保护、可持续利用和当地基础设施联系起来。",
+      "geographic_labels": {
+        "ekuri-cross-river-region": "尼日利亚克罗斯河州埃库里社区"
+      }
+    },
+    "enspiral": {
+      "summary": "起源于新西兰的协作网络，通过面向社区的企业形式、共享资源和公开记录的工具支持去中心化协作。",
+      "geographic_labels": {},
+      "digital_label": "开放文档和协作网络"
+    },
+    "ethiopia-community-seed-bank-network": {
+      "summary": "社区运营的全国种子库网络，连接农民维护的品种，组织经验交流并加强农民对种子多样性的权威。",
+      "geographic_labels": {
+        "ethiopia-national-network": "埃塞俄比亚 — 全国网络"
+      },
+      "digital_label": "埃塞俄比亚农业部和粮农组织植物条约关于社区种子库网络的公共信息"
+    },
+    "fecofun-nepal": {
+      "summary": "尼泊尔全国社区森林用户团体联合会，旨在加强当地使用权、民主自我组织、可持续森林管理、知识交流和成员对政策的参与。",
+      "geographic_labels": {
+        "fecofun-nepal-network": "尼泊尔全国社区森林用户团体网络"
+      }
+    },
+    "fordhall-organic-farm": {
+      "summary": "什罗普郡的一个社区拥有的有机农场，其土地由一个拥有数千名股东的慈善社区福利社会持有，并用于生态农业、教育、公共自然获取和社会项目。",
+      "geographic_labels": {
+        "fordhall-market-drayton": "什罗普郡马基特德雷顿 — 广泛的地方锚点"
+      }
+    },
+    "freifunk": {
+      "summary": "一项致力于自由、由社区建设的通信网络和开放数字基础设施的非商业倡议。",
+      "geographic_labels": {},
+      "digital_label": "自由社区网络和参与信息"
+    },
+    "freifunk-hamburg": {
+      "summary": "Freifunk 是当地的一个社区，在汉堡运营一个社区支持的数字网络，连接参与、开放基础设施和自由通信。",
+      "geographic_labels": {
+        "freifunk-hamburg-community-area": "汉堡社区",
+        "freifunk-hamburg-private-routers": "私人家庭路由器"
+      },
+      "digital_label": "汉堡 Freifunk 社区网络和参与信息"
+    },
+    "fucvam": {
+      "summary": "乌拉圭互助住房合作社联合会将集体土地所有权、民主自我管理以及住房建设和维护互助结合起来。",
+      "geographic_labels": {
+        "fucvam-uruguay": "乌拉圭 — 全国联合会",
+        "fucvam-homes": "个人住宅和居民地址"
+      }
+    },
+    "g0v": {
+      "summary": "来自台湾的开放公民技术社区，致力于解决公共问题，并将结果、源代码和文档作为可免费访问的数字共享资源发布。",
+      "geographic_labels": {},
+      "digital_label": "开放的公民技术项目、数据和协作工作空间"
+    },
+    "granby-four-streets-clt": {
+      "summary": "利物浦的一个居民主导的社区土地信托基金，确保该社区永久提供经济适用房、社区空间、绿化和当地经济活动。",
+      "geographic_labels": {
+        "granby-four-streets-area": "格兰比四街, 利物浦"
+      }
+    },
+    "great-lakes-commons": {
+      "summary": "一个开放的生物区域网络，将五大湖视为一个共同的生存空间，并寻求加强社区和原住民治理、分担责任和跨政治边界的长期水资源管理。",
+      "geographic_labels": {
+        "great-lakes-bioregion": "加拿大和美国的五大湖生物区"
+      },
+      "digital_label": "社区水治理的生物区域学习、网络和参与"
+    },
+    "guifi-net": {
+      "summary": "一个开放、自由和中立的电信网络，其基础设施作为公共资源共同建设和使用，并且可以由不同参与者在平等条件下进一步发展。",
+      "geographic_labels": {
+        "guifi-catalonia-region": "加泰罗尼亚的历史焦点",
+        "guifi-private-nodes": "私有且未公开验证的网络节点"
+      },
+      "digital_label": "数字网络治理、文档和社区电信基础设施"
+    },
+    "hepburn-energy": {
+      "summary": "澳大利亚赫本郡的一家会员制能源合作社，运营社区风力发电并继续发展当地发电能力。",
+      "geographic_labels": {
+        "hepburn-energy-approximate-area": "澳大利亚维多利亚赫本郡"
+      },
+      "digital_label": "会员和合作股份的会员门户"
+    },
+    "isle-of-eigg-heritage-trust": {
+      "summary": "艾格岛遗产信托基金 (Isle of Eigg Heritage Trust) 为其居民拥有并管理该岛；居民协会选出的四名董事负责制定有关土地、住房、基础设施、自然遗产和当地电网的决策。",
+      "geographic_labels": {
+        "isle-of-eigg-island": "苏格兰艾格岛 — 宽阔的岛屿锚"
+      }
+    },
+    "kawawana": {
+      "summary": "APCRM 和卡萨芒斯中部 8 个村庄的居民根据 2010 年下放的沿海管理权，通过颜色编码的使用区、捕捞限制、监测和巡逻来保护当地鱼类资源。",
+      "geographic_labels": {
+        "kawawana-central-casamance": "塞内加尔卡萨芒斯中部 — 广泛的区域锚点"
+      }
+    },
+    "kibera-public-space-project": {
+      "summary": "与基贝拉居民团体共同设计和运营的不断增长的公共空间网络，将防洪能力、基本服务、聚集场所和当地经济利用联系起来。",
+      "geographic_labels": {
+        "kibera-public-space-network-area": "基贝拉, 内罗毕, 肯尼亚"
+      }
+    },
+    "kobulu-community-micro-hydro": {
+      "summary": "沙巴 Kampung Buayan 的一个社区管理的微型水力发电系统，其地方委员会负责组织消费电价、运营商工资、备件和未来维修。",
+      "geographic_labels": {
+        "kobulu-penampang-area": "马来西亚, 沙巴州, 兵南邦地区"
+      },
+      "digital_label": "TONIBUNG 关于技术和社区管理模型的项目文档"
+    },
+    "libreoffice": {
+      "summary": "由国际社区开发、记录和翻译的自由开源办公套件。",
+      "geographic_labels": {},
+      "digital_label": "自由办公套件和开放的参与路径"
+    },
+    "librivox": {
+      "summary": "一个全球志愿者社区，将公共领域文本录制为可自由访问的有声读物，并在没有商业访问障碍的情况下发布录音。",
+      "geographic_labels": {},
+      "digital_label": "由志愿者制作的开放有声读物集合"
+    },
+    "masipag": {
+      "summary": "一个由农民主导的菲律宾网络，将农民保存的种子、农业生态实践、粮食主权和社区知识发展联系起来。",
+      "geographic_labels": {
+        "masipag-los-banos": "洛斯巴尼奥斯，拉古纳 — 公共组织参考"
+      }
+    },
+    "mastodon": {
+      "summary": "免费、开源、联合的社交网络软件，其独立服务器可以相互通信。",
+      "geographic_labels": {},
+      "digital_label": "跨独立服务器运行的联邦式社交通信"
+    },
+    "meshtastic": {
+      "summary": "一个开源生态系统，无需蜂窝服务或互联网连接即可实现去中心化通信，使用经济实惠的低功耗 LoRa 设备并提供固件、协议和文档。",
+      "geographic_labels": {},
+      "digital_label": "开源离网网格软件、协议、文档和社区协作"
+    },
+    "mietshaeuser-syndikat": {
+      "summary": "一个自我组织的住房项目网络，使用共享的公司结构永久消除房产的投机性转售和团结转让，以支持新的社区住房项目。",
+      "geographic_labels": {
+        "mietshaeuser-network": "德国及其他地区的去中心化项目网络",
+        "mietshaeuser-residences": "住宅楼及居民地址"
+      }
+    },
+    "mikoko-pamoja": {
+      "summary": "加齐湾社区所有的红树林倡议将保护、恢复和当地监测与碳信用收入结合起来，用于共同选择的社区效益项目。",
+      "geographic_labels": {
+        "mikoko-pamoja-gazi-bay": "肯尼亚夸勒县加齐湾 — 广阔的海岸锚"
+      }
+    },
+    "mundraub": {
+      "summary": "由 Terra Concordia gGmbH 运营的平台，具有可公开阅读的地图，贡献者可以根据已发布的 Mundräuber 规则记录、共享、使用和维护可公开访问的食用植物的位置。",
+      "geographic_labels": {},
+      "digital_label": "德语区可食用景观地点的公开可读地图和贡献路径"
+    },
+    "musicbrainz": {
+      "summary": "由全球社区维护的开放音乐百科全书，元数据主要在开放许可下协作添加、审查和提供。",
+      "geographic_labels": {},
+      "digital_label": "社区维护的开放音乐元数据数据库"
+    },
+    "namena-marine-reserve": {
+      "summary": "由斐济库布劳区传统资源所有者管理的海洋保护区，社区规则、执法和融资保护渔业和当地生计。",
+      "geographic_labels": {
+        "namena-kubulau-area": "斐济布阿库布劳区和纳美纳泻湖"
+      },
+      "digital_label": "WCS 关于社区治理、保护和监控的文档"
+    },
+    "namibia-communal-conservancies-alliance": {
+      "summary": "纳米比亚的一个由公共保护区、社区森林和其他当地资源团体组成的伞式联盟，代表共同利益并支持基于社区的自然资源治理。",
+      "geographic_labels": {
+        "namibia-alliance-national": "纳米比亚 — 全国联盟"
+      },
+      "digital_label": "NACSO 关于国家联盟和纳米比亚公共保护区的公共信息"
+    },
+    "nepal-wireless-networking-project": {
+      "summary": "当地社区和电子网络研究与开发公司在尼泊尔运营着一个农村通信网络，将无线基础设施、教育和当地服务连接起来。",
+      "geographic_labels": {
+        "nepal-wireless-country": "尼泊尔——全国范围",
+        "nepal-wireless-nodes": "无线节点、屋顶和家庭连接"
+      },
+      "digital_label": "社区网络、项目信息和数字服务"
+    },
+    "new-mexico-acequia-association": {
+      "summary": "新墨西哥州的一个协会，支持集体管理的灌溉渠、民主水治理、传统农业和当地 acequia 社区机构。",
+      "geographic_labels": {
+        "nmaa-new-mexico": "新墨西哥州——全州协会背景",
+        "nmaa-acequias": "个人水源、地块和私人水利基础设施"
+      },
+      "digital_label": "公共教育、组织和参与信息"
+    },
+    "north-east-syria-autonomous-administration": {
+      "summary": "自 2018 年以来建立的区域自治结构，围绕参与性民主、社会正义和平等的既定原则组织地方议会、公社、民间机构和服务。",
+      "geographic_labels": {
+        "daanes-dynamic-region": "叙利亚北部和东部——边界动态变化的区域"
+      }
+    },
+    "nyc-mesh": {
+      "summary": "纽约市的一个志愿者运营的社区网络，连接负担得起的互联网接入、数字自决和共同建设的当地基础设施。",
+      "geographic_labels": {
+        "nycmesh-city-area": "纽约市",
+        "nycmesh-member-sites": "私人会员和屋顶地点"
+      },
+      "digital_label": "纽约市的社区网络、开放文档和数字协作"
+    },
+    "open-food-facts": {
+      "summary": "一个开放的食品数据库，志愿者收集和审查产品数据和图像，并在 ODbL 下发布，供自由再利用。",
+      "geographic_labels": {},
+      "digital_label": "开放产品数据库、API、食品信息数据导出和开源工具"
+    },
+    "open-food-network-australia": {
+      "summary": "一个澳大利亚非营利社区和开源平台，使生产者和食品倡议能够组织简短、透明和社区控制的供应链。",
+      "geographic_labels": {},
+      "digital_label": "社区食品网络的开源平台"
+    },
+    "open-library": {
+      "summary": "互联网档案馆的开放式、可协作编辑的图书目录和数字公共图书馆，其软件、数据和文档由志愿者开放、扩展和维护。",
+      "geographic_labels": {},
+      "digital_label": "开放图书目录、数字图书馆、开放数据和软件以及协作元数据管理"
+    },
+    "open-source-ecology": {
+      "summary": "这是一个全球开放硬件项目，为工业工具开发可自由使用的设计并进行测试、记录并在密苏里州的 Factor e Farm 进行实践教学。",
+      "geographic_labels": {
+        "ose-factor-e-farm-region": "密苏里州梅斯维尔附近的 Factor e 农场"
+      },
+      "digital_label": "自由获取机器设计、文档并参与全球协作开发"
+    },
+    "open-source-seed-initiative": {
+      "summary": "一项由社区支持的种子倡议，其承诺在相同的开放承诺下保护使用、种植、分享、改进和传递指定种子的自由。",
+      "geographic_labels": {
+        "ossi-distributed-community": "育种者、种子公司、园丁和农民的分布式网络"
+      },
+      "digital_label": "为育种者和种子公司开放种子承诺、品种目录和参与途径"
+    },
+    "openmrs": {
+      "summary": "适用于当地医疗保健的适应性强的开源医疗信息系统，具有公共文档和全球贡献路径。",
+      "geographic_labels": {},
+      "digital_label": "自由医疗软件、文档和全球协作"
+    },
+    "openstreetmap": {
+      "summary": "一个全球开放的地图数据库，其中的道路、路径和其他地理数据由贡献者进行勘测、修正和免费重复使用。",
+      "geographic_labels": {},
+      "digital_label": "全球开放地图数据和协作编辑"
+    },
+    "p2pu": {
+      "summary": "一个非盈利、社区支持的学习网络，将免费学习圈和开放学习资源与世界各地的图书馆、辅导员和当地社区连接起来。",
+      "geographic_labels": {},
+      "digital_label": "面向同行学习圈的开放基础设施和社区"
+    },
+    "pachgaon-community-forest": {
+      "summary": "Pachgaon Gram Sabha 通过公认的社区森林资源权管理着 1,006 公顷的森林，将民主决策与森林保护以及竹子采伐和销售相结合以维持当地生计。",
+      "geographic_labels": {
+        "pachgaon-chandrapur-district": "印度马哈拉施特拉邦钱德拉普尔县 — 广泛的地区锚"
+      }
+    },
+    "park-slope-food-coop": {
+      "summary": "布鲁克林的一家会员制杂货店，约有 17,000 名会员通过轮班、资本份额和民主程序维持采购、运营和规则。",
+      "geographic_labels": {
+        "park-slope-food-coop-brooklyn": "布鲁克林公园坡 — 广阔的社区锚点"
+      },
+      "digital_label": "本地合作运营的会员信息、规则和数字化班次协调"
+    },
+    "potato-park-peru": {
+      "summary": "皮萨克附近的一个地区，由五个盖丘亚族社区管理，当地的马铃薯品种、农业知识、生态系统和文化习俗得到了共同保护。",
+      "geographic_labels": {
+        "potato-park-pisac-region": "秘鲁库斯科皮萨克附近的马铃薯公园社区"
+      }
+    },
+    "prinzessinnengarten-kollektiv": {
+      "summary": "柏林-新克尔恩的一个公共社区花园，邻居们一起园艺、分享知识并支持城市生物多样性和生态教育。",
+      "geographic_labels": {
+        "prinzessinnengarten-neukoelln": "Neuer St. Jacobi 公墓的社区花园"
+      }
+    },
+    "red-guardianes-semillas-ecuador": {
+      "summary": "厄瓜多尔家庭和种子监护人网络将农业生物多样性、再生土地管理、种子知识和社区学习联系起来。",
+      "geographic_labels": {},
+      "digital_label": "全国种子网络的数字化学习、出版和参与平台"
+    },
+    "repair-cafe-international": {
+      "summary": "一个由志愿者运营的非商业性维修会议的全球网络，人们在这里分享工具、知识和时间，共同修复日常物品并培养本地维修技能。",
+      "geographic_labels": {
+        "repair-cafe-worldwide-network": "当地组织的维修咖啡馆的全球网络"
+      },
+      "digital_label": "当地维修咖啡馆的位置搜索、维修知识和入门材料"
+    },
+    "reprap": {
+      "summary": "一个围绕自由记录、可制造自身大部分零件的 3D 打印机展开的全球开放硬件项目；其设计可由社区协作构建、调整和改进。",
+      "geographic_labels": {},
+      "digital_label": "用于自我复制制造机器的开放设计文档和社区维基"
+    },
+    "restarters": {
+      "summary": "全球社区修复网络，通过共享数字基础设施连接本地修复小组、活动、知识和开放影响数据。",
+      "geographic_labels": {},
+      "digital_label": "全球社区维修网络和平台"
+    },
+    "root-access-hackerspace": {
+      "summary": "位于弗雷斯诺的一个非营利性、完全由志愿者运营的黑客空间和创客空间，成员在这里共享工具和基础设施，并组织公共课程和社区活动。",
+      "geographic_labels": {
+        "root-access-fresno": "加利福尼亚州弗雷斯诺 — 近似城市锚"
+      },
+      "digital_label": "社区 wiki 和 Discord 作为实体创客空间的持续补充"
+    },
+    "safecast": {
+      "summary": "一个由志愿者领导的国际公民科学社区，收集开放的环境测量结果，开发供人们独立测量的工具，并将其数据发布到公共领域。",
+      "geographic_labels": {},
+      "digital_label": "开放环境测量数据、地图、上传和 API 访问"
+    },
+    "sarantaporo-community-network": {
+      "summary": "埃拉索纳地区乡村社区建设和运营的无线网络，连接开放连接、数字教育和当地自组织。",
+      "geographic_labels": {
+        "sarantaporo-elassona-region": "色萨利埃拉索纳地区的村庄",
+        "sarantaporo-household-nodes": "私人家庭节点"
+      },
+      "digital_label": "区域社区网络、开放项目信息和数字教育"
+    },
+    "som-energia": {
+      "summary": "西班牙的一个非营利性能源合作社，其成员以民主方式支持和发展可再生能源供应、社区发电项目和当地团体。",
+      "geographic_labels": {
+        "som-energia-spain": "西班牙——全国合作环境",
+        "som-energia-private-sites": "私人连接和设施未单独验证"
+      },
+      "digital_label": "会员门户、项目信息和本地团体"
+    },
+    "tetepare-descendants-association": {
+      "summary": "所罗门群岛的一个大型土地所有者协会，为子孙后代共同保护和管理特特帕雷岛及其陆地和海洋资源。",
+      "geographic_labels": {
+        "tetepare-island-area": "特特帕雷岛, 西部省, 所罗门群岛"
+      },
+      "digital_label": "来自泰特帕雷后裔协会的公共组织、保护和游客信息"
+    },
+    "thailand-citizens-forest-database": {
+      "summary": "协作维护的数字知识基础设施，社区、民间社会和公共机构记录泰国的社区森林，以进行合作和当地管理。",
+      "geographic_labels": {
+        "thailand-community-forests-national": "泰国 — 全国社区森林网络"
+      },
+      "digital_label": "公共公民森林数据库，包含社区维护的泰国社区森林信息"
+    },
+    "the-things-network": {
+      "summary": "与当地社区共同构建的全球物联网无线电网络，结合了社区运营的 LoRaWAN 网关、开放软件、学习资源和公共社区基础设施。",
+      "geographic_labels": {
+        "the-things-network-global-communities": "当地社区和门户的全球网络"
+      },
+      "digital_label": "社区 LoRaWAN 网络、开放网络软件、论坛和学习资源"
+    },
+    "tla-o-qui-aht-tribal-parks": {
+      "summary": "克拉阔特湾 (Clayoquot Sound) 的原住民治理地区，Tla-o-qui-aht 原住民将传统治理、守护者工作、生态恢复和负责任的区域参与结合在一起。",
+      "geographic_labels": {
+        "tla-o-qui-aht-clayoquot-sound": "加拿大不列颠哥伦比亚省 Clayoquot Sound"
+      },
+      "digital_label": "Tla-o-qui-aht 部落公园有关治理、监护人工作和负责任参与的公共信息"
+    },
+    "tribunal-aguas-valencia": {
+      "summary": "由巴伦西亚灌溉社区管理的水法庭，根据惯例定期公开审理有关使用的纠纷。",
+      "geographic_labels": {
+        "tribunal-aguas-valencia-approximate-area": "西班牙巴伦西亚"
+      }
+    },
+    "ujamaa-community-resource-team": {
+      "summary": "坦桑尼亚北部的一个社区权利组织，通过集体土地保有权、地方治理和可持续资源管理来支持牧民、农牧民和狩猎采集社区。",
+      "geographic_labels": {
+        "ujamaa-northern-tanzania-communities": "坦桑尼亚北部多个地区的合作伙伴社区"
+      }
+    },
+    "velondriake-lmma": {
+      "summary": "由安达瓦多卡周围沿海社区共同管理的海洋区域，连接可持续渔业、监测、保护区、珊瑚礁和红树林。",
+      "geographic_labels": {
+        "velondriake-andavadoaka-region": "马达加斯加西南部安达瓦多卡周边沿海地区"
+      }
+    },
+    "wikibooks": {
+      "summary": "合作编写和改进的开放教科书、手册和非小说类书籍集合，可自由使用。",
+      "geographic_labels": {},
+      "digital_label": "开放教科书和开放学习材料"
+    },
+    "wikidata": {
+      "summary": "一个开放的知识数据库，提供可在维基媒体项目和其他应用中使用和链接的结构化、机器可读语句。",
+      "geographic_labels": {},
+      "digital_label": "开放的结构化知识数据库"
+    },
+    "wikimedia-commons": {
+      "summary": "一个协作构建的开放图像、音频、视频和其他媒体文件集合，可自由再利用。",
+      "geographic_labels": {},
+      "digital_label": "开放媒体集合，可供全球自由再利用"
+    },
+    "wikipedia": {
+      "summary": "一个协作创建、可自由访问的多语言百科全书，其内容由志愿者编写和维护。",
+      "geographic_labels": {},
+      "digital_label": "多语言开放百科全书"
+    },
+    "wikiversity": {
+      "summary": "一个提供多语言开放学习资源、课程和协作教育项目的平台。",
+      "geographic_labels": {},
+      "digital_label": "开放学习资源和协作教育项目"
+    },
+    "zapatista-autonomy": {
+      "summary": "恰帕斯州萨帕塔社区维持的自治结构自 2023 年起以地方自治政府、区域集体和议会协调取代了以前的马雷兹委员会和好政府委员会。",
+      "geographic_labels": {
+        "zapatista-communities-chiapas": "墨西哥恰帕斯州的萨帕塔社区"
+      }
+    },
+    "zenzeleni-community-networks": {
+      "summary": "由东开普省农村当地合作社运营的社区网络，提供负担得起的连接，并将收入和责任保留在社区内。",
+      "geographic_labels": {
+        "zenzeleni-mankosi-zithulele": "东开普省曼科西和齐图勒勒",
+        "zenzeleni-private-links": "私人家庭和商业联系"
+      },
+      "digital_label": "合作运营区域互联网网络和公共知识，以建立进一步的社区网络"
+    }
+  }
+}

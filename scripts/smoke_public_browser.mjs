@@ -28,6 +28,7 @@ import {
   visibleDigitalNodes,
 } from '../assets/commonworld-core.mjs';
 import { localizeCatalogRecords, wave1LocalePackReady } from '../assets/commonworld-i18n.mjs';
+import { RELEASED_LOCALES } from '../assets/commonworld-locale-registry.mjs';
 
 await wave1LocalePackReady;
 
@@ -3926,7 +3927,7 @@ async function germanLocaleScenario() {
   await run.page.locator('#settings-toggle').click();
   await run.page.locator('#settings-panel:not([hidden])').waitFor();
   const localeChoices = await run.page.locator('#settings-panel [data-locale-choice]').evaluateAll((nodes) => nodes.map((node) => node.dataset.localeChoice));
-  assert(JSON.stringify(localeChoices) === JSON.stringify(['auto', 'en', 'de', 'es', 'fr', 'pt-BR', 'ar']), `German locale: settings do not expose all interface languages (${JSON.stringify(localeChoices)})`);
+  assert(JSON.stringify(localeChoices) === JSON.stringify(['auto', ...RELEASED_LOCALES]), `German locale: settings do not expose all interface languages (${JSON.stringify(localeChoices)})`);
   const previewLabels = await run.page.locator('#settings-panel [data-locale-status="candidate"] .language-choice-status').allTextContents();
   assert(previewLabels.length === 0, `German locale: released languages still carry preview labels (${JSON.stringify(previewLabels)})`);
   const languageGridOverflow = await run.page.locator('#settings-panel .language-choice-grid').evaluate((node) => node.scrollWidth - node.clientWidth);

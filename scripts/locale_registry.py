@@ -10,6 +10,24 @@ from typing import Iterable
 ROOT = Path(__file__).resolve().parents[1]
 CONTRACT_PATH = ROOT / "docs/architecture/locale-release.contract.json"
 TAG_RE = re.compile(r"^[A-Za-z]{2,3}(?:-[A-Za-z]{4})?(?:-(?:[A-Za-z]{2}|[0-9]{3}))?$")
+ZH_REGION_SCRIPT = {
+    "CN": "Hans",
+    "SG": "Hans",
+    "TW": "Hant",
+    "HK": "Hant",
+    "MO": "Hant",
+}
+
+
+def requested_script(tag: str) -> str | None:
+    parts = tag.split("-")
+    if len(parts) >= 2 and len(parts[1]) == 4 and parts[1].isalpha():
+        return parts[1].title()
+    primary = parts[0].lower()
+    region = next((part for part in parts[1:] if (len(part) == 2 and part.isalpha()) or (len(part) == 3 and part.isdigit())), None)
+    if primary == "zh" and region:
+        return ZH_REGION_SCRIPT.get(region.upper())
+    return None
 
 
 @lru_cache(maxsize=4)
@@ -67,12 +85,25 @@ def match_registry_locale(values: Iterable[str], *, statuses: Iterable[str] = ("
         if exact:
             return exact
         parts = canonical.split("-")
-        if len(parts) >= 2 and len(parts[1]) == 4:
-            language_script = "-".join(parts[:2])
+        primary = parts[0]
+        script = requested_script(canonical)
+        if script:
+            language_script = f"{primary}-{script}"
             matched = next((tag for tag in candidates if tag.casefold() == language_script.casefold()), None)
             if matched:
                 return matched
-        primary = parts[0]
+            scriptless = next(
+                (
+                    tag
+                    for tag in candidates
+                    if tag.split("-", 1)[0].casefold() == primary.casefold()
+                    and not (len(tag.split("-")) >= 2 and len(tag.split("-")[1]) == 4)
+                ),
+                None,
+            )
+            if scriptless:
+                return scriptless
+            continue
         matched = next((tag for tag in candidates if tag.split("-", 1)[0].casefold() == primary.casefold()), None)
         if matched:
             return matched

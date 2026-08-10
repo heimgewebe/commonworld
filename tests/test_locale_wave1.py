@@ -9,7 +9,7 @@ from scripts.proposal_runtime_i18n import proposal_runtime_inventory
 
 ROOT = Path(__file__).resolve().parents[1]
 PACK_PATH = ROOT / "assets/locales/wave1-locales.json"
-WAVE1_LOCALES = ("es", "fr", "pt-BR", "ar")
+WAVE1_LOCALES = tuple(json.loads((ROOT / "docs/architecture/locale-release.contract.json").read_text(encoding="utf-8"))["rollout"]["wave_1"])
 BIDI_CONTROL_RE = re.compile(r"[\u202a-\u202e\u2066-\u2069]")
 PLACEHOLDER_RE = re.compile(r"\{[^{}]+\}")
 TAG_SEGMENT_RE = re.compile(r"<[^>]*>")
@@ -216,7 +216,7 @@ class LocaleWave1PackTests(unittest.TestCase):
                         self.assertIsInstance(value, str)
                         self.assertTrue(value.strip())
                         self.assertIsNone(BIDI_CONTROL_RE.search(value))
-        for locale in ("es", "fr", "pt-BR"):
+        for locale in (tag for tag in WAVE1_LOCALES if tag not in {"ar", "zh-Hans"}):
             text = " ".join(
                 value
                 for section, values in self.packs[locale].items()
@@ -266,6 +266,11 @@ class LocaleWave1PackTests(unittest.TestCase):
                                 self.assertTrue(
                                     "ARABIC" in unicode_name or "LATIN" in unicode_name,
                                     f"unexpected script in Arabic candidate: {unicode_name}",
+                                )
+                            elif locale == "zh-Hans":
+                                self.assertTrue(
+                                    "CJK UNIFIED IDEOGRAPH" in unicode_name or "LATIN" in unicode_name,
+                                    f"unexpected script in Simplified Chinese locale: {unicode_name}",
                                 )
                             else:
                                 self.assertFalse(
@@ -366,6 +371,16 @@ class LocaleWave1PackTests(unittest.TestCase):
         self.assertEqual(locales["pt-BR"]["ui"]["type_housing_land"], "Terra e Moradia")
         self.assertEqual(locales["pt-BR"]["ui"]["type_health_care"], "Cuidado e Saúde")
         self.assertEqual(locales["ar"]["ui"]["action_contribute"], "ساهم")
+        self.assertEqual(locales["zh-Hans"]["themes"]["energy"], "能源")
+        self.assertEqual(locales["zh-Hans"]["themes"]["free-software"], "自由软件")
+        self.assertEqual(locales["zh-Hans"]["static"]["source_number"], "来源 {index}")
+        self.assertEqual(locales["zh-Hans"]["static"]["effective_language"], "当前语言：简体中文")
+        self.assertEqual(locales["zh-Hans"]["static"]["public_location_many"], "{count} 个公开位置")
+        self.assertNotIn("世界观", locales["zh-Hans"]["shell"]["shell_102"])
+        self.assertNotIn("公开问题", locales["zh-Hans"]["proposal_runtime"]["GitHub was opened. The suggestion is transferred only when you submit the public issue; this does not publish it in the catalog."])
+        self.assertEqual(locales["zh-Hans"]["shell"]["shell_001"], '<html lang="zh-Hans">')
+        self.assertEqual(locales["zh-Hans"]["method"]["method_001"], '<html lang="zh-Hans">')
+        self.assertEqual(locales["zh-Hans"]["proposal"]["proposal_001"], '<html lang="zh-Hans">')
         self.assertNotIn("الفلاتر", "\n".join(locales["ar"]["shell"].values()))
         self.assertNotIn("principal-proxima", locales["pt-BR"]["proposal"]["proposal_058"])
         self.assertNotIn("commoning", locales["pt-BR"]["method"]["method_014"])
@@ -432,7 +447,7 @@ class LocaleWave1PackTests(unittest.TestCase):
                 if section != "meta"
                 for value in values.values()
             )
-            for fragment in forbidden[locale]:
+            for fragment in forbidden.get(locale, ()):
                 with self.subTest(locale=locale, fragment=fragment):
                     self.assertNotIn(fragment, localized_text)
 
