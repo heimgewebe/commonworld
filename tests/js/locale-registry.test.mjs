@@ -33,8 +33,11 @@ test('released Wave-1 matching is script-aware and an empty candidate class fail
   assert.equal(matchRegistryLocale(['pt'], { statuses: ['released'] }), 'pt-BR');
   assert.equal(matchRegistryLocale(['fr-CA'], { statuses: ['released'] }), 'fr');
   assert.equal(matchRegistryLocale(['zh-CN'], { statuses: ['released'] }), 'zh-Hans');
+  assert.equal(matchRegistryLocale(['zh-SG'], { statuses: ['released'] }), 'zh-Hans');
   assert.equal(matchRegistryLocale(['zh-Hant', 'fr-CA'], { statuses: ['released'] }), 'fr');
   assert.equal(matchRegistryLocale(['zh-TW', 'fr-CA'], { statuses: ['released'] }), 'fr');
+  assert.equal(matchRegistryLocale(['zh-HK', 'fr-CA'], { statuses: ['released'] }), 'fr');
+  assert.equal(matchRegistryLocale(['zh-MO', 'fr-CA'], { statuses: ['released'] }), 'fr');
   assert.equal(matchRegistryLocale(['fr-CA'], { statuses: ['candidate'] }), 'en');
   assert.equal(normalizeReleasedLocale('es'), 'es');
 });

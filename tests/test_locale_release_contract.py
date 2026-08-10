@@ -118,6 +118,44 @@ class LocaleReleaseContractTests(unittest.TestCase):
             "pt-BR",
         )
 
+    def test_requested_chinese_script_mismatch_advances_to_next_preference(self) -> None:
+        self.assertEqual(
+            match_registry_locale(["zh-Hant", "fr-CA"], statuses=("released",), root=ROOT),
+            "fr",
+        )
+        self.assertEqual(
+            match_registry_locale(["zh-TW", "fr-CA"], statuses=("released",), root=ROOT),
+            "fr",
+        )
+        self.assertEqual(
+            match_registry_locale(["zh-CN", "fr-CA"], statuses=("released",), root=ROOT),
+            "zh-Hans",
+        )
+        self.assertEqual(
+            match_registry_locale(["zh-SG", "fr-CA"], statuses=("released",), root=ROOT),
+            "zh-Hans",
+        )
+        for preference in ("zh-HK", "zh-MO"):
+            self.assertEqual(
+                match_registry_locale([preference, "fr-CA"], statuses=("released",), root=ROOT),
+                "fr",
+            )
+
+    def test_script_mismatch_policy_is_contractually_fail_closed(self) -> None:
+        contract = copy.deepcopy(self.contract)
+        contract["tag_policy"]["matching_order"] = [
+            "exact",
+            "language_script",
+            "primary_language",
+            "default_locale",
+        ]
+        contract["tag_policy"]["requested_script_mismatch_must_not_cross_scripts"] = False
+        contract["tag_policy"]["region_script_inference"]["zh"]["Hant"] = ["TW"]
+        errors = validate_contract(contract, ROOT)
+        self.assertTrue(any("script mismatch" in error for error in errors))
+        self.assertTrue(any("matching order" in error for error in errors))
+        self.assertTrue(any("region script inference" in error for error in errors))
+
     def test_location_based_language_inference_is_rejected(self) -> None:
         contract = copy.deepcopy(self.contract)
         contract["decision"]["automatic_selection"]["geolocation_must_not_influence_locale"] = False

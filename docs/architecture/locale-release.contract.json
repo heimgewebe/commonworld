@@ -36,12 +36,28 @@
     "matching_order": [
       "exact",
       "language_script",
-      "primary_language",
+      "scriptless_primary",
+      "next_preference_on_script_mismatch",
+      "primary_language_without_script",
       "default_locale"
     ],
     "case_insensitive_input": true,
     "canonical_output_required": true,
-    "script_and_region_must_be_preserved": true
+    "script_and_region_must_be_preserved": true,
+    "requested_script_mismatch_must_not_cross_scripts": true,
+    "region_script_inference": {
+      "zh": {
+        "Hans": [
+          "CN",
+          "SG"
+        ],
+        "Hant": [
+          "TW",
+          "HK",
+          "MO"
+        ]
+      }
+    }
   },
   "content_language_policy": {
     "independent_from_interface_locales": true,

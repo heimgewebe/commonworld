@@ -740,9 +740,27 @@ def validate_contract(contract: dict[str, Any], root: Path = ROOT) -> list[str]:
     _require(errors, tag_policy.get("script_and_region_must_be_preserved") is True, "script and region subtags must be preserved")
     _require(
         errors,
+        tag_policy.get("requested_script_mismatch_must_not_cross_scripts") is True,
+        "requested script mismatch must not fall back across scripts",
+    )
+    _require(
+        errors,
+        tag_policy.get("region_script_inference")
+        == {"zh": {"Hans": ["CN", "SG"], "Hant": ["TW", "HK", "MO"]}},
+        "region script inference must preserve the declared Chinese Hans/Hant mapping",
+    )
+    _require(
+        errors,
         tag_policy.get("matching_order")
-        == ["exact", "language_script", "primary_language", "default_locale"],
-        "matching order must prefer exact and script-aware matches before primary-language fallback",
+        == [
+            "exact",
+            "language_script",
+            "scriptless_primary",
+            "next_preference_on_script_mismatch",
+            "primary_language_without_script",
+            "default_locale",
+        ],
+        "matching order must preserve script-safe fallback and browser preference order",
     )
 
     pack_errors, pack_digest = _pack_errors(contract, root)
