@@ -9,10 +9,10 @@
       "unmerged_path_count": 36
     }
   },
-  "current_release_id": "c49c91be692aad05c8b6",
+  "current_release_id": "21b56aa17c1b60146e72",
   "delivery_evidence": {
-    "docs/evidence/catalog-delivery-benchmark-v1.json": "cdb8ed00933c1bb21cf3fde1399c8a9335eaa9f7cd7f70f7ffc213bdbf62a5b7",
-    "docs/evidence/catalog-delivery-public-browser-smoke-v1.json": "e357aa7d7a08605494fce17c9a04aba111f7e7516a8c668a13273dd39a2812a4"
+    "docs/evidence/catalog-delivery-benchmark-v1.json": "91b03b3afeb200f0f71eb7d04771660f2f98fa78cc00f690f4b74268e75c985f",
+    "docs/evidence/catalog-delivery-public-browser-smoke-v1.json": "eeb97e02e9c9f149e3e1868dcfd28d9f4616072d460401a0d489cd15417e5a98"
   },
   "freshness_model": "digest-defined-proposed-head-scope",
   "kind": "commonworld.release_snapshot_lifecycle_evidence",
