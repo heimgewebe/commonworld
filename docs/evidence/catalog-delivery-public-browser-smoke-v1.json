@@ -119,8 +119,8 @@
       "filterButtonHeight": 44,
       "ringAnimationName": "none",
       "ringTransform": "none",
-      "ringTextWidth": 671.1033935546875,
-      "ringTextHeight": 13.506683349609375,
+      "ringTextWidth": 671.1126098632812,
+      "ringTextHeight": 14.0120849609375,
       "ringTextFontSize": 22,
       "primaryRingCount": 3,
       "depthRingCount": 2,
@@ -129,20 +129,20 @@
       "representativePrimaryLabels": [
         {
           "text": "Knowledge, Learning and Culture · 11    LibriVox  MusicBrainz  Open Library  Peer 2 Peer Unive…  Safecast  Thailand Citizens…",
-          "width": 671.1033935546875,
-          "height": 13.506683349609375,
+          "width": 671.1126098632812,
+          "height": 14.0120849609375,
           "visible": true
         },
         {
           "text": "Communication and Networks · 11    BOSCO Uganda  Freifunk  Freifunk Hamburg  guifi.net  Mastodon  Meshtastic",
-          "width": 331.36126708984375,
-          "height": 518.6911010742188,
+          "width": 331.7414245605469,
+          "height": 518.4580078125,
           "visible": true
         },
         {
           "text": "Cooperation and Self-Organization · 5    Bologna Urban Com…  Enspiral  g0v  National Communal…  Park Slope Food C…",
-          "width": 290.67108154296875,
-          "height": 578.9903564453125,
+          "width": 290.16302490234375,
+          "height": 579.229248046875,
           "visible": true
         }
       ],
@@ -185,22 +185,22 @@
         "representativePrimaryLabels": [
           {
             "text": "Knowledge, Learning and Culture · 11    LibriVox  MusicBrainz  Open Library  Peer 2 Peer Unive…  Safecast  Thailand Citizens…",
-            "width": 932.1082763671875,
-            "height": 38.36792755126953,
+            "width": 932.1004638671875,
+            "height": 40.476318359375,
             "fontSize": 23.77,
             "visible": true
           },
           {
             "text": "Communication and Networks · 11    BOSCO Uganda  Freifunk  Freifunk Hamburg  guifi.net  Mastodon  Meshtastic",
-            "width": 474.85400390625,
-            "height": 711.1143188476562,
+            "width": 476.41796875,
+            "height": 710.1055908203125,
             "fontSize": 23.77,
             "visible": true
           },
           {
             "text": "Cooperation and Self-Organization · 5    Bologna Urban Com…  Enspiral  g0v  National Communal…  Park Slope Food C…",
-            "width": 383.7852783203125,
-            "height": 813.2347412109375,
+            "width": 381.6364440917969,
+            "height": 814.1760864257812,
             "fontSize": 23.77,
             "visible": true
           }
@@ -213,15 +213,15 @@
         "primaryStates": [
           {
             "animationName": "sphere-ring-orbit",
-            "transform": "matrix(0.999997, 0.00226176, -0.00226176, 0.999997, 0, 0)"
+            "transform": "matrix(0.999999, 0.00150421, -0.00150421, 0.999999, 0, 0)"
           },
           {
             "animationName": "sphere-ring-orbit",
-            "transform": "matrix(-0.531836, 0.846847, -0.846847, -0.531836, 0, 0)"
+            "transform": "matrix(-0.531194, 0.84725, -0.84725, -0.531194, 0, 0)"
           },
           {
             "animationName": "sphere-ring-orbit",
-            "transform": "matrix(-0.435954, -0.899969, 0.899969, -0.435954, 0, 0)"
+            "transform": "matrix(-0.436764, -0.899576, 0.899576, -0.436764, 0, 0)"
           }
         ],
         "depthStates": [
@@ -276,7 +276,7 @@
     {
       "id": "layer-journey-moveend-return",
       "verdict": "PASS",
-      "elapsedMs": 899
+      "elapsedMs": 1371
     },
     {
       "id": "layer-journey-missing-moveend-fallback",
@@ -384,8 +384,8 @@
       "verdict": "PASS",
       "blockedCatalogRequests": 0,
       "observedCatalogRequests": [
-        "/releases/86df5a8cf9cadc1f5236/catalog/runtime/aggregate.v1.json",
-        "/releases/86df5a8cf9cadc1f5236/catalog/runtime/manifest.v1.json"
+        "/releases/dcdbf22a7d9570913165/catalog/runtime/aggregate.v1.json",
+        "/releases/dcdbf22a7d9570913165/catalog/runtime/manifest.v1.json"
       ]
     },
     {
@@ -446,7 +446,7 @@
     "smoke_script_sha256": "6491d3183111ba32f378056622c554d75ca603fdd34ace00206f956c584cafc3",
     "smoke_runner_sha256": "522b99b70b1d0064b1d0a31a3a67fdc9a2e73b7408f37d1a4bb303bc360b7556",
     "smoke_plan_sha256": "8a068c3b573eb2ab95ed7c3f8477f607cba6de9353ab5250ba9abc09345b23a7",
-    "first_party_surface_sha256": "8ee0be6a2a292c2105608b62a728fe728602a4c973b1b8c412dbf01062e20f27",
+    "first_party_surface_sha256": "3c36d2c52fa330106c5c2b94c4a423cab603588b98ec1f33fd6dfa32d7a1c2bd",
     "scenario_ids": [
       "startup-and-ring-orbits",
       "synthetic-cross-ring-collision-accessibility",

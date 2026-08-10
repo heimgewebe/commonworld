@@ -150,11 +150,46 @@ class LocaleReleaseContractTests(unittest.TestCase):
             "default_locale",
         ]
         contract["tag_policy"]["requested_script_mismatch_must_not_cross_scripts"] = False
+        contract["tag_policy"]["region_inferred_script_counts_as_script_for_matching"] = False
         contract["tag_policy"]["region_script_inference"]["zh"]["Hant"] = ["TW"]
         errors = validate_contract(contract, ROOT)
         self.assertTrue(any("script mismatch" in error for error in errors))
+        self.assertTrue(any("region-inferred scripts" in error for error in errors))
         self.assertTrue(any("matching order" in error for error in errors))
         self.assertTrue(any("region script inference" in error for error in errors))
+
+    def test_region_specific_candidates_respect_inferred_chinese_scripts(self) -> None:
+        import tempfile
+
+        contract = {
+            "decision": {"default_locale": "en"},
+            "locale_registry": {
+                "en": {"status": "released"},
+                "zh-CN": {"status": "released"},
+                "zh-TW": {"status": "candidate"},
+            },
+        }
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            contract_path = root / "docs/architecture/locale-release.contract.json"
+            contract_path.parent.mkdir(parents=True)
+            contract_path.write_text(json.dumps(contract), encoding="utf-8")
+            self.assertEqual(
+                match_registry_locale(["zh-Hans"], statuses=("released",), root=root),
+                "zh-CN",
+            )
+            self.assertEqual(
+                match_registry_locale(["zh-Hant"], statuses=("candidate",), root=root),
+                "zh-TW",
+            )
+            self.assertEqual(
+                match_registry_locale(["zh-HK"], statuses=("candidate",), root=root),
+                "zh-TW",
+            )
+            self.assertEqual(
+                match_registry_locale(["zh-Hant", "en"], statuses=("released",), root=root),
+                "en",
+            )
 
     def test_location_based_language_inference_is_rejected(self) -> None:
         contract = copy.deepcopy(self.contract)

@@ -745,6 +745,11 @@ def validate_contract(contract: dict[str, Any], root: Path = ROOT) -> list[str]:
     )
     _require(
         errors,
+        tag_policy.get("region_inferred_script_counts_as_script_for_matching") is True,
+        "region-inferred scripts must count as scripts during locale matching",
+    )
+    _require(
+        errors,
         tag_policy.get("region_script_inference")
         == {"zh": {"Hans": ["CN", "SG"], "Hant": ["TW", "HK", "MO"]}},
         "region script inference must preserve the declared Chinese Hans/Hant mapping",

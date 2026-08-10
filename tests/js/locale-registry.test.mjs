@@ -8,6 +8,7 @@ import {
   WAVE1_LOCALES,
   canonicalLocaleTag,
   localeFromSurfaceFile,
+  localeScriptForMatching,
   localeSurfaceHref,
   matchRegistryLocale,
   normalizeReleasedLocale,
@@ -24,6 +25,14 @@ test('registry preserves canonical BCP 47 casing and release states', () => {
   assert.deepEqual(CANDIDATE_LOCALES, []);
   assert.deepEqual(WAVE1_LOCALES, ['es', 'fr', 'pt-BR', 'ar', 'zh-Hans']);
   assert.deepEqual(KNOWN_UI_LOCALES.slice(0, 7), ['en', 'de', 'es', 'fr', 'pt-BR', 'ar', 'zh-Hans']);
+  assert.equal(localeScriptForMatching('zh-Hans'), 'Hans');
+  assert.equal(localeScriptForMatching('zh-CN'), 'Hans');
+  assert.equal(localeScriptForMatching('zh-SG'), 'Hans');
+  assert.equal(localeScriptForMatching('zh-Hant'), 'Hant');
+  assert.equal(localeScriptForMatching('zh-TW'), 'Hant');
+  assert.equal(localeScriptForMatching('zh-HK'), 'Hant');
+  assert.equal(localeScriptForMatching('zh-MO'), 'Hant');
+  assert.equal(localeScriptForMatching('pt-BR'), null);
 });
 
 test('released Wave-1 matching is script-aware and an empty candidate class fails safely', () => {

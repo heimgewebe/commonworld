@@ -88,8 +88,15 @@ def match_registry_locale(values: Iterable[str], *, statuses: Iterable[str] = ("
         primary = parts[0]
         script = requested_script(canonical)
         if script:
-            language_script = f"{primary}-{script}"
-            matched = next((tag for tag in candidates if tag.casefold() == language_script.casefold()), None)
+            matched = next(
+                (
+                    tag
+                    for tag in candidates
+                    if tag.split("-", 1)[0].casefold() == primary.casefold()
+                    and requested_script(tag) == script
+                ),
+                None,
+            )
             if matched:
                 return matched
             scriptless = next(
@@ -97,7 +104,7 @@ def match_registry_locale(values: Iterable[str], *, statuses: Iterable[str] = ("
                     tag
                     for tag in candidates
                     if tag.split("-", 1)[0].casefold() == primary.casefold()
-                    and not (len(tag.split("-")) >= 2 and len(tag.split("-")[1]) == 4)
+                    and requested_script(tag) is None
                 ),
                 None,
             )

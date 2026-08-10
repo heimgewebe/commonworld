@@ -92,6 +92,19 @@ export function canonicalLocaleTag(value) {{
   return KNOWN_UI_LOCALES.find((tag) => tag.toLowerCase() === canonical.toLowerCase()) ?? canonical;
 }}
 
+export function localeScriptForMatching(value) {{
+  const canonical = canonicalizeTag(value);
+  if (!canonical) return null;
+  const parts = canonical.split('-');
+  const primary = parts[0].toLowerCase();
+  const explicitScript = parts.length >= 2 && parts[1].length === 4 ? parts[1] : null;
+  const region = parts.find((part, index) => index > 0 && (part.length === 2 || /^[0-9]{{3}}$/.test(part))) ?? null;
+  const inferredChineseScript = primary === 'zh' && region
+    ? (['TW', 'HK', 'MO'].includes(region.toUpperCase()) ? 'Hant' : ['CN', 'SG'].includes(region.toUpperCase()) ? 'Hans' : null)
+    : null;
+  return explicitScript ?? inferredChineseScript;
+}}
+
 export function localeEntry(value) {{
   const canonical = canonicalLocaleTag(value);
   return canonical && Object.prototype.hasOwnProperty.call(LOCALE_REGISTRY, canonical)
@@ -122,20 +135,20 @@ export function matchRegistryLocale(values, {{ statuses = ['released'], fallback
     if (exact) return exact;
     const parts = canonical.split('-');
     const primary = parts[0].toLowerCase();
-    const explicitScript = parts.length >= 2 && parts[1].length === 4 ? parts[1] : null;
-    const region = parts.find((part, index) => index > 0 && (part.length === 2 || /^[0-9]{{3}}$/.test(part))) ?? null;
-    const inferredChineseScript = primary === 'zh' && region
-      ? (['TW', 'HK', 'MO'].includes(region.toUpperCase()) ? 'Hant' : ['CN', 'SG'].includes(region.toUpperCase()) ? 'Hans' : null)
-      : null;
-    const requestedScript = explicitScript ?? inferredChineseScript;
+    const requestedScript = localeScriptForMatching(canonical);
     if (requestedScript) {{
-      const languageScript = `${{primary}}-${{requestedScript}}`.toLowerCase();
-      const scriptMatch = allowed.find((tag) => tag.toLowerCase() === languageScript);
+      const scriptMatch = allowed.find((tag) => {{
+        const candidate = canonicalizeTag(tag);
+        return candidate
+          && candidate.split('-')[0].toLowerCase() === primary
+          && localeScriptForMatching(candidate) === requestedScript;
+      }});
       if (scriptMatch) return scriptMatch;
       const scriptlessPrimary = allowed.find((tag) => {{
-        const candidateParts = tag.split('-');
-        return candidateParts[0].toLowerCase() === primary
-          && !(candidateParts.length >= 2 && candidateParts[1].length === 4);
+        const candidate = canonicalizeTag(tag);
+        return candidate
+          && candidate.split('-')[0].toLowerCase() === primary
+          && localeScriptForMatching(candidate) === null;
       }});
       if (scriptlessPrimary) return scriptlessPrimary;
       continue;

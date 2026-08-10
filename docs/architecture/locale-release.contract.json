@@ -45,6 +45,7 @@
     "canonical_output_required": true,
     "script_and_region_must_be_preserved": true,
     "requested_script_mismatch_must_not_cross_scripts": true,
+    "region_inferred_script_counts_as_script_for_matching": true,
     "region_script_inference": {
       "zh": {
         "Hans": [
@@ -101,7 +102,7 @@
       "translation_pack": "wave_1",
       "release_evidence": {
         "path": "docs/evidence/locale-releases/es.json",
-        "sha256": "a1ba9cf49b209e93bfa4d34b016cadbc8fb0482c8034ea1d4fd789e83e07d19d"
+        "sha256": "b4952e96e6330f05685b300098a2fb6d418535cd3edf83d31f91957f2106a4ba"
       }
     },
     "fr": {
@@ -117,7 +118,7 @@
       "translation_pack": "wave_1",
       "release_evidence": {
         "path": "docs/evidence/locale-releases/fr.json",
-        "sha256": "1a532380ede3be61131be8519b95eda811ef03565a4f07ee8fbaf0f96696debd"
+        "sha256": "da753dc410271719172f3f35b53354377b715836c6c1a0f0f7a8a143046ce9b0"
       }
     },
     "pt-BR": {
@@ -133,7 +134,7 @@
       "translation_pack": "wave_1",
       "release_evidence": {
         "path": "docs/evidence/locale-releases/pt-BR.json",
-        "sha256": "93eac3000cc1a402cfb8e1c1bcb23ed23ddbc965cb2b7753716a43b096dd6752"
+        "sha256": "c4969025038349a861935fd1292f4a4b4f2f52beb9389836de374db56cc676cf"
       }
     },
     "ar": {
@@ -149,7 +150,7 @@
       "translation_pack": "wave_1",
       "release_evidence": {
         "path": "docs/evidence/locale-releases/ar.json",
-        "sha256": "8c4d2c89a4d312f717fd3bbfdf19e38986de21f23730e69799c98d000c6e4916"
+        "sha256": "f4b67644fecbd9af4756a266d9d6cc6422c689d3eaf1ec9f88f7961957f0d411"
       }
     },
     "zh-Hans": {
@@ -165,7 +166,7 @@
       "translation_pack": "wave_1",
       "release_evidence": {
         "path": "docs/evidence/locale-releases/zh-Hans.json",
-        "sha256": "975bcb208c0be1a2a94f05c323c580956820b5f7a53682c70202be2b0b4fb311"
+        "sha256": "b34842e83356d393b889f0528c8db2be34d02567c69803b9e0e054776851e1da"
       }
     },
     "hi": {

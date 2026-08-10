@@ -33,6 +33,14 @@ test('future region-tag release accepts primary and sibling-region preferences',
   assert.equal(matchSupportedLocaleTag('pt-PT', futureReleased), 'pt-BR');
 });
 
+test('future Chinese region locales participate in script-safe matching', () => {
+  assert.equal(matchSupportedLocaleTag('zh-Hant', ['en', 'zh-CN']), null);
+  assert.equal(matchSupportedLocaleTag('zh-Hant', ['en', 'zh-TW']), 'zh-TW');
+  assert.equal(matchSupportedLocaleTag('zh-HK', ['en', 'zh-TW']), 'zh-TW');
+  assert.equal(matchSupportedLocaleTag('zh-CN', ['en', 'zh-TW']), null);
+  assert.equal(matchSupportedLocaleTag('zh-SG', ['en', 'zh-Hans']), 'zh-Hans');
+});
+
 test('locale preference accepts automatic and all released manual choices', () => {
   assert.equal(normalizeLocalePreference('AUTO'), 'auto');
   assert.equal(normalizeLocalePreference('de'), 'de');
