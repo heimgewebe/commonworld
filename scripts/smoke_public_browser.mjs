@@ -2888,7 +2888,7 @@ async function androidGlobeUiScenario() {
     return entry[key].some((value, boxIndex) => Math.abs(value - previous[key][boxIndex]) > threshold);
   });
   assert(reducedTouchAfter.length >= 2 && reducedTouchAfter.every(({ coarse, reduced }) => coarse && reduced), scenarioId + ': reduced-motion touch context did not exercise the intended media path ' + JSON.stringify(reducedTouchAfter));
-  assert(reducedTouchAfter.filter(({ labelAnimationDuration, labelAnimationIterations, ringAnimationDuration, ringAnimationIterations }) => Number.parseFloat(labelAnimationDuration) <= 0.001 && labelAnimationIterations === '1' && Number.parseFloat(ringAnimationDuration) <= 0.001 && ringAnimationIterations === '1').length >= 2, scenarioId + ': reduced-motion touch context did not inherit the global static animation policy ' + JSON.stringify(reducedTouchAfter));
+  assert(reducedTouchAfter.filter(({ labelAnimationName, ringAnimationName }) => labelAnimationName === 'none' && ringAnimationName === 'none').length >= 2, scenarioId + ': reduced-motion touch ring children were not fully static ' + JSON.stringify(reducedTouchAfter));
   assert(visibleBoxesMoved(reducedTouchBefore, reducedTouchAfter, 'labelBox').length === 0, scenarioId + ': reduced-motion touch labels moved ' + JSON.stringify({ before: reducedTouchBefore, after: reducedTouchAfter }));
   assert(visibleBoxesMoved(reducedTouchBefore, reducedTouchAfter, 'ringBox').length === 0, scenarioId + ': reduced-motion touch ring strokes moved ' + JSON.stringify({ before: reducedTouchBefore, after: reducedTouchAfter }));
   await reducedTouchRun.context.close();
