@@ -2814,6 +2814,15 @@ async function androidGlobeUiScenario() {
     if (!entry.labelBox || !previous?.labelBox) return false;
     return entry.labelBox.some((value, boxIndex) => Math.abs(value - previous.labelBox[boxIndex]) > threshold);
   });
+  const waitForMovingTouchLabels = async (before, minimum = 2, timeoutMs = 1500) => {
+    const deadline = Date.now() + timeoutMs;
+    let after = await touchRingState();
+    while (movingLabelsBetween(before, after).length < minimum && Date.now() < deadline) {
+      await run.page.waitForTimeout(50);
+      after = await touchRingState();
+    }
+    return after;
+  };
   await run.page.evaluate(() => { document.querySelector('.globe-stage').dataset.mapMoving = 'true'; });
   await run.page.waitForTimeout(80);
   const mapPausedBefore = await touchRingState();
@@ -2822,6 +2831,10 @@ async function androidGlobeUiScenario() {
   assert(mapPausedAfter.filter(({ labelAnimationName, labelAnimationPlayState, ringAnimationName, ringAnimationPlayState }) => labelAnimationName === 'sphere-ring-orbit' && labelAnimationPlayState === 'paused' && ringAnimationName === 'sphere-ring-orbit' && ringAnimationPlayState === 'paused').length >= 2, scenarioId + ': wide touch ring children did not pause while map-moving state was active ' + JSON.stringify(mapPausedAfter));
   assert(movingLabelsBetween(mapPausedBefore, mapPausedAfter).length === 0, scenarioId + ': wide touch labels moved while map-moving state paused the orbit ' + JSON.stringify({ before: mapPausedBefore, after: mapPausedAfter }));
   await run.page.evaluate(() => { delete document.querySelector('.globe-stage').dataset.mapMoving; });
+  const mapResumedBefore = await touchRingState();
+  const mapResumedAfter = await waitForMovingTouchLabels(mapResumedBefore);
+  assert(mapResumedAfter.filter(({ labelAnimationName, labelAnimationPlayState, ringAnimationName, ringAnimationPlayState }) => labelAnimationName === 'sphere-ring-orbit' && labelAnimationPlayState === 'running' && ringAnimationName === 'sphere-ring-orbit' && ringAnimationPlayState === 'running').length >= 2, scenarioId + ': wide touch ring children did not return to running state after map-moving ended ' + JSON.stringify(mapResumedAfter));
+  assert(movingLabelsBetween(mapResumedBefore, mapResumedAfter).length >= 2, scenarioId + ': wide touch labels did not resume after map-moving ended ' + JSON.stringify({ before: mapResumedBefore, after: mapResumedAfter }));
 
   await run.page.locator('#sphere-edge-control').focus();
   await run.page.waitForTimeout(80);
@@ -2833,8 +2846,8 @@ async function androidGlobeUiScenario() {
   await run.page.evaluate(() => document.querySelector('#sphere-edge-control')?.blur());
   await run.page.waitForTimeout(80);
   const focusResumedBefore = await touchRingState();
-  await run.page.waitForTimeout(350);
-  const focusResumedAfter = await touchRingState();
+  const focusResumedAfter = await waitForMovingTouchLabels(focusResumedBefore);
+  assert(focusResumedAfter.filter(({ labelAnimationName, labelAnimationPlayState, ringAnimationName, ringAnimationPlayState }) => labelAnimationName === 'sphere-ring-orbit' && labelAnimationPlayState === 'running' && ringAnimationName === 'sphere-ring-orbit' && ringAnimationPlayState === 'running').length >= 2, scenarioId + ': wide touch ring children did not return to running state after sphere edge focus ended ' + JSON.stringify(focusResumedAfter));
   assert(movingLabelsBetween(focusResumedBefore, focusResumedAfter).length >= 2, scenarioId + ': wide touch labels did not resume after sphere edge focus ended ' + JSON.stringify({ before: focusResumedBefore, after: focusResumedAfter }));
 
   const reducedTouchRun = await newPage({
