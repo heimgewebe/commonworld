@@ -51,13 +51,18 @@ class LocaleReleaseContractTests(unittest.TestCase):
         )
         self.assertEqual(receipt["status"], "passed")
         self.assertRegex(receipt["reviewed_source_pack_sha256"], r"^[0-9a-f]{64}$")
-        self.assertEqual(set(receipt["locale_verdicts"]), {"es", "fr", "pt-BR", "ar"})
+        self.assertEqual(set(receipt["locale_verdicts"]), set(self.contract["rollout"]["wave_1"]))
         self.assertTrue(all(item["status"] == "passed" for item in receipt["locale_verdicts"].values()))
         for source in receipt["raw_sources"]:
             path = ROOT / source["path"]
             self.assertEqual(hashlib.sha256(path.read_bytes()).hexdigest(), source["sha256"])
             self.assertRegex(source["label"], r"^(?:initial|final)-(?:es-fr|pt-ar)-(?:findings|pass)$")
         self.assertEqual(receipt["finding_history"]["final_findings"], [])
+        for source in receipt["catalog_review"]["source_receipts"]:
+            path = ROOT / source["path"]
+            self.assertEqual(hashlib.sha256(path.read_bytes()).hexdigest(), source["sha256"])
+        self.assertEqual(set(receipt["catalog_review"]["coverage"]["locales"]), set(self.contract["rollout"]["wave_1"]))
+        self.assertTrue(receipt["catalog_review"]["coverage"]["all_entries_reviewed"])
         self.assertFalse(receipt["review_class"]["claims_native_or_human_review"])
 
     def test_browser_registry_excludes_governance_evidence_pointers(self) -> None:
@@ -159,8 +164,8 @@ class LocaleReleaseContractTests(unittest.TestCase):
 
     def test_default_and_fallback_locales_must_be_released(self) -> None:
         contract = copy.deepcopy(self.contract)
-        contract["decision"]["default_locale"] = "zh-Hans"
-        contract["decision"]["fallback_locale"] = "hi"
+        contract["decision"]["default_locale"] = "hi"
+        contract["decision"]["fallback_locale"] = "ja"
         errors = validate_contract(contract, ROOT)
         self.assertTrue(any("default_locale must be released" == error for error in errors))
         self.assertTrue(any("fallback_locale must be released" == error for error in errors))

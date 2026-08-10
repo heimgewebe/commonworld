@@ -2,8 +2,8 @@
   "schema_version": 2,
   "kind": "commonworld.ui_locale_independent_language_review_receipt",
   "status": "passed",
-  "reviewed_revision": "9a25778823f8fdbe8f1337252c991701f7df1f95",
-  "reviewed_source_pack_sha256": "316da43be8603cf0400dfa886bf244f953cd0dcb702c150f87e652fc260e9819",
+  "reviewed_revision": "88564d33db66842c313e0cff9d7eec82600a4db5",
+  "reviewed_source_pack_sha256": "c2bc4c17138b29e9d45a4a8a082a95aaa59c7e925b17b4020ac74c3690f29274",
   "locale_verdicts": {
     "es": {
       "status": "passed",
@@ -18,6 +18,10 @@
       "blocking_findings": []
     },
     "ar": {
+      "status": "passed",
+      "blocking_findings": []
+    },
+    "zh-Hans": {
       "status": "passed",
       "blocking_findings": []
     }
@@ -93,6 +97,17 @@
       "findings": [],
       "limitations": "This is a model-assisted review. It does not constitute native or human language approval.",
       "confidence": "high"
+    },
+    "zh-Hans": {
+      "review_class": "model_assisted_independent_language_review",
+      "reviewed_revision": "88564d33db66842c313e0cff9d7eec82600a4db5",
+      "source_pack_sha256": "c2bc4c17138b29e9d45a4a8a082a95aaa59c7e925b17b4020ac74c3690f29274",
+      "locale_verdicts": {
+        "zh-Hans": "PASS"
+      },
+      "findings": [],
+      "limitations": "Model-assisted review; does not constitute native or human language approval.",
+      "confidence": "high"
     }
   },
   "raw_sources": [
@@ -132,44 +147,51 @@
   ],
   "catalog_review": {
     "review_kind": "model_assisted_independent_language_review",
-    "reviewer": "GPT-5.6 Sol independent post-fix release review via Codex",
+    "reviewer": "GPT-5.6 Sol independent post-fix release review via ChatGPT",
     "writer_independence": "independent_from_grok_4_5_writer",
     "input_digests": {
       "es": "de1638df4c7f4b71aaab644c28e7739a699f3d914f49cfa09b205885a5f1ec36",
       "fr": "c58061ed7f34dce421898b2894026aeafec56c41c32cb488a2ceb6cbf9a0875b",
       "pt-BR": "d016bbf890ad12d59ab9004c2b47e88595d76c9d426dfceec07a1e50f5042ddc",
-      "ar": "ee4d37a7f75174099408a5191863440a9c8bd40475a1f05e59537c25c44ccaf2"
+      "ar": "ee4d37a7f75174099408a5191863440a9c8bd40475a1f05e59537c25c44ccaf2",
+      "zh-Hans": "e7c95086be3da6035ab4ea127e70e22bcf0062a86c75eea9f9347a70ff1d7779"
     },
     "coverage": {
       "locales": [
         "es",
         "fr",
         "pt-BR",
-        "ar"
+        "ar",
+        "zh-Hans"
       ],
       "project_count_per_locale": 88,
       "all_entries_reviewed": true,
-      "basis": "full_digest_bound_independent_post_fix_review",
-      "full_review_source": "docs/evidence/locale-reviews/raw/catalog-wave1-independent-codex-final-pass-2026-08-08.json"
+      "basis": "prior_digest_bound_review_plus_full_zh_hans_post_fix_review",
+      "full_review_source": "docs/evidence/locale-reviews/raw/catalog-wave1-zh-hans-independent-final-pass-2026-08-10.json"
     },
     "verdict": "pass",
     "counts": {
       "blocker": 0,
       "major": 0,
       "minor": 0,
-      "note": 0
+      "note": 1
     },
     "findings": [],
     "review_notes": [
-      "All five JSON files were read completely and all summaries, geographic-label values, and digital labels were independently compared with en.json.",
-      "All four target files match the required SHA-256 digests and contain the same 88 project IDs, 56 digital labels, and 78 geographic-label values.",
-      "The corrected pt-BR geographic label uses “Porto Rico”. No material semantic, linguistic, geographic, numerical, untranslated-prose, or Arabic mixed-script/direction defects were found."
+      "The prior es/fr/pt-BR/ar review remains valid because all four catalog overlay digests are unchanged.",
+      "The current zh-Hans overlay and the English reference were read completely; all 88 project IDs and localized semantic fields were compared.",
+      "No material semantic, numerical, geographic, untranslated-prose, or script-direction defects were found. Native Chinese stylistic polish is not claimed."
     ],
     "source_receipts": [
       {
         "path": "docs/evidence/locale-reviews/raw/catalog-wave1-independent-codex-final-pass-2026-08-08.json",
         "sha256": "6756a78ad888e4c484fa89befb05113c62fe5044c3a8803cdfb7cbd83d5b3bd8",
-        "role": "full_corpus_final_release_review"
+        "role": "prior_wave1_full_corpus_release_review"
+      },
+      {
+        "path": "docs/evidence/locale-reviews/raw/catalog-wave1-zh-hans-independent-final-pass-2026-08-10.json",
+        "sha256": "6c3aa2359e8dddf07bb548db37fea3274893ca90863b1aca54aeafe70195005f",
+        "role": "zh_hans_full_corpus_final_release_review_and_aggregate"
       }
     ]
   }

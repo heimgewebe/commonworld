@@ -2,9 +2,9 @@
   "schema_version": 1,
   "kind": "commonworld.ui_locale_independent_review_input",
   "locale": "pt-BR",
-  "source_revision": "36583887e893bb1dea9b7242c6a4737c161ffd3a",
+  "source_revision": "88564d33db66842c313e0cff9d7eec82600a4db5",
   "source_pack": "assets/locales/wave1-locales.json",
-  "source_pack_sha256": "316da43be8603cf0400dfa886bf244f953cd0dcb702c150f87e652fc260e9819",
+  "source_pack_sha256": "c2bc4c17138b29e9d45a4a8a082a95aaa59c7e925b17b4020ac74c3690f29274",
   "payload": {
     "meta": {
       "draft_origin": "machine_translation_assisted",
@@ -671,5 +671,5 @@
     "release_evidence": false,
     "native_or_human_review": false
   },
-  "reviewed_source_pack_sha256": "316da43be8603cf0400dfa886bf244f953cd0dcb702c150f87e652fc260e9819"
+  "reviewed_source_pack_sha256": "c2bc4c17138b29e9d45a4a8a082a95aaa59c7e925b17b4020ac74c3690f29274"
 }
