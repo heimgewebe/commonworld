@@ -2,7 +2,7 @@
   "schema_version": 2,
   "kind": "commonworld.ui_locale_independent_language_review_receipt",
   "status": "passed",
-  "reviewed_revision": "88564d33db66842c313e0cff9d7eec82600a4db5",
+  "reviewed_revision": "1e7e9be4ca01d30a96f2516a36278e3dcd2c8a92",
   "reviewed_source_pack_sha256": "c2bc4c17138b29e9d45a4a8a082a95aaa59c7e925b17b4020ac74c3690f29274",
   "locale_verdicts": {
     "es": {
@@ -100,12 +100,30 @@
     },
     "zh-Hans": {
       "review_class": "model_assisted_independent_language_review",
-      "reviewed_revision": "88564d33db66842c313e0cff9d7eec82600a4db5",
+      "reviewed_revision": "1e7e9be4ca01d30a96f2516a36278e3dcd2c8a92",
       "source_pack_sha256": "c2bc4c17138b29e9d45a4a8a082a95aaa59c7e925b17b4020ac74c3690f29274",
       "locale_verdicts": {
         "zh-Hans": "PASS"
       },
       "findings": [],
+      "resolved_findings": [
+        {
+          "severity": "P2",
+          "project": "open-food-network-australia",
+          "field": "summary",
+          "before": "简短…供应链",
+          "after": "一个澳大利亚非营利社区和开源平台，使生产者和食品倡议能够组织短供应链，并确保供应链透明且由社区控制。",
+          "resolution": "corrected short/local supply-chain terminology; post-fix review passed"
+        },
+        {
+          "severity": "P2",
+          "project": "the-things-network",
+          "field": "geographic_labels.the-things-network-global-communities",
+          "before": "门户",
+          "after": "当地社区和网关的全球网络",
+          "resolution": "corrected LoRaWAN gateway terminology; post-fix review passed"
+        }
+      ],
       "limitations": "Model-assisted review; does not constitute native or human language approval.",
       "confidence": "high"
     }
@@ -154,7 +172,7 @@
       "fr": "c58061ed7f34dce421898b2894026aeafec56c41c32cb488a2ceb6cbf9a0875b",
       "pt-BR": "d016bbf890ad12d59ab9004c2b47e88595d76c9d426dfceec07a1e50f5042ddc",
       "ar": "ee4d37a7f75174099408a5191863440a9c8bd40475a1f05e59537c25c44ccaf2",
-      "zh-Hans": "e7c95086be3da6035ab4ea127e70e22bcf0062a86c75eea9f9347a70ff1d7779"
+      "zh-Hans": "a9d7af6799f51c36c83dda3799ddf58fddd67af73da542b9d87e2aa8541638db"
     },
     "coverage": {
       "locales": [
@@ -166,7 +184,7 @@
       ],
       "project_count_per_locale": 88,
       "all_entries_reviewed": true,
-      "basis": "prior_digest_bound_review_plus_full_zh_hans_post_fix_review",
+      "basis": "prior_digest_bound_review_plus_zh_hans_pr204_post_fix_review",
       "full_review_source": "docs/evidence/locale-reviews/raw/catalog-wave1-zh-hans-independent-final-pass-2026-08-10.json"
     },
     "verdict": "pass",
@@ -179,8 +197,8 @@
     "findings": [],
     "review_notes": [
       "The prior es/fr/pt-BR/ar review remains valid because all four catalog overlay digests are unchanged.",
-      "The current zh-Hans overlay and the English reference were read completely; all 88 project IDs and localized semantic fields were compared.",
-      "No material semantic, numerical, geographic, untranslated-prose, or script-direction defects were found. Native Chinese stylistic polish is not claimed."
+      "PR #204 found two Simplified Chinese terminology defects; both are fixed and regression-tested.",
+      "The full zh-Hans corpus received a post-fix review; no blocker, major, or minor findings remain. Native-speaker approval is not claimed."
     ],
     "source_receipts": [
       {
@@ -190,8 +208,26 @@
       },
       {
         "path": "docs/evidence/locale-reviews/raw/catalog-wave1-zh-hans-independent-final-pass-2026-08-10.json",
-        "sha256": "6c3aa2359e8dddf07bb548db37fea3274893ca90863b1aca54aeafe70195005f",
-        "role": "zh_hans_full_corpus_final_release_review_and_aggregate"
+        "sha256": "04a4fca1a3796de7cfb5dd2a68bb1d962070e1c3799fa0f4ffe0e133afb52f62",
+        "role": "zh_hans_pr204_post_fix_full_corpus_review"
+      }
+    ],
+    "resolved_findings": [
+      {
+        "severity": "P2",
+        "project": "open-food-network-australia",
+        "field": "summary",
+        "before": "简短…供应链",
+        "after": "一个澳大利亚非营利社区和开源平台，使生产者和食品倡议能够组织短供应链，并确保供应链透明且由社区控制。",
+        "resolution": "corrected short/local supply-chain terminology; post-fix review passed"
+      },
+      {
+        "severity": "P2",
+        "project": "the-things-network",
+        "field": "geographic_labels.the-things-network-global-communities",
+        "before": "门户",
+        "after": "当地社区和网关的全球网络",
+        "resolution": "corrected LoRaWAN gateway terminology; post-fix review passed"
       }
     ]
   }

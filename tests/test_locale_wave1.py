@@ -396,6 +396,15 @@ class LocaleWave1PackTests(unittest.TestCase):
                 for value in locale[section_name].values():
                     self.assertEqual(value, value.strip())
 
+    def test_simplified_chinese_catalog_terminology_regressions(self) -> None:
+        projects = json.loads((ROOT / "catalog/locales/zh-Hans.json").read_text(encoding="utf-8"))["projects"]
+        food_network = projects["open-food-network-australia"]["summary"]
+        self.assertIn("短供应链", food_network)
+        self.assertNotIn("简短", food_network)
+        gateway_label = projects["the-things-network"]["geographic_labels"]["the-things-network-global-communities"]
+        self.assertIn("网关", gateway_label)
+        self.assertNotIn("门户", gateway_label)
+
     def test_language_quality_regressions_and_action_parity(self) -> None:
         forbidden = {
             "es": (

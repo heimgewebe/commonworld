@@ -213,15 +213,15 @@
         "primaryStates": [
           {
             "animationName": "sphere-ring-orbit",
-            "transform": "matrix(0.999999, 0.00150783, -0.00150783, 0.999999, 0, 0)"
+            "transform": "matrix(1, 0.000751178, -0.000751178, 1, 0, 0)"
           },
           {
             "animationName": "sphere-ring-orbit",
-            "transform": "matrix(-0.531197, 0.847248, -0.847248, -0.531197, 0, 0)"
+            "transform": "matrix(-0.530556, 0.84765, -0.84765, -0.530556, 0, 0)"
           },
           {
             "animationName": "sphere-ring-orbit",
-            "transform": "matrix(-0.43676, -0.899578, 0.899578, -0.43676, 0, 0)"
+            "transform": "matrix(-0.437569, -0.899185, 0.899185, -0.437569, 0, 0)"
           }
         ],
         "depthStates": [
@@ -276,7 +276,7 @@
     {
       "id": "layer-journey-moveend-return",
       "verdict": "PASS",
-      "elapsedMs": 1400
+      "elapsedMs": 3015
     },
     {
       "id": "layer-journey-missing-moveend-fallback",
@@ -368,8 +368,8 @@
       "verdict": "PASS",
       "blockedCatalogRequests": 0,
       "observedCatalogRequests": [
-        "/releases/eb30ff714951301f41f3/catalog/runtime/aggregate.v1.json",
-        "/releases/eb30ff714951301f41f3/catalog/runtime/manifest.v1.json"
+        "/releases/c49c91be692aad05c8b6/catalog/runtime/aggregate.v1.json",
+        "/releases/c49c91be692aad05c8b6/catalog/runtime/manifest.v1.json"
       ]
     },
     {
@@ -469,6 +469,6 @@
       "method-mobile",
       "method-mobile-text-200"
     ],
-    "first_party_surface_sha256": "2dd6d4e386700acb7043bcd3b82b6ec39806127b7d051e139ac8b78c0726c585"
+    "first_party_surface_sha256": "85d1c7483a790c0d1c7e441990ac1a75ff983760399e613092d009f67d36021c"
   }
 }
