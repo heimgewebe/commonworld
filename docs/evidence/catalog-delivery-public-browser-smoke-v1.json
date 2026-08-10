@@ -119,8 +119,8 @@
       "filterButtonHeight": 44,
       "ringAnimationName": "none",
       "ringTransform": "none",
-      "ringTextWidth": 671.1033935546875,
-      "ringTextHeight": 13.506195068359375,
+      "ringTextWidth": 671.1126098632812,
+      "ringTextHeight": 14.01177978515625,
       "ringTextFontSize": 22,
       "primaryRingCount": 3,
       "depthRingCount": 2,
@@ -129,20 +129,20 @@
       "representativePrimaryLabels": [
         {
           "text": "Knowledge, Learning and Culture · 11    LibriVox  MusicBrainz  Open Library  Peer 2 Peer Unive…  Safecast  Thailand Citizens…",
-          "width": 671.1033935546875,
-          "height": 13.506195068359375,
+          "width": 671.1126098632812,
+          "height": 14.01177978515625,
           "visible": true
         },
         {
           "text": "Communication and Networks · 11    BOSCO Uganda  Freifunk  Freifunk Hamburg  guifi.net  Mastodon  Meshtastic",
-          "width": 331.36090087890625,
-          "height": 518.6912841796875,
+          "width": 331.7412109375,
+          "height": 518.4581298828125,
           "visible": true
         },
         {
           "text": "Cooperation and Self-Organization · 5    Bologna Urban Com…  Enspiral  g0v  National Communal…  Park Slope Food C…",
-          "width": 290.67156982421875,
-          "height": 578.9900512695312,
+          "width": 290.163330078125,
+          "height": 579.2291259765625,
           "visible": true
         }
       ],
@@ -185,22 +185,22 @@
         "representativePrimaryLabels": [
           {
             "text": "Knowledge, Learning and Culture · 11    LibriVox  MusicBrainz  Open Library  Peer 2 Peer Unive…  Safecast  Thailand Citizens…",
-            "width": 932.0968017578125,
-            "height": 41.17705154418945,
+            "width": 932.1062622070312,
+            "height": 39.06889343261719,
             "fontSize": 23.77,
             "visible": true
           },
           {
             "text": "Communication and Networks · 11    BOSCO Uganda  Freifunk  Freifunk Hamburg  guifi.net  Mastodon  Meshtastic",
-            "width": 476.9373474121094,
-            "height": 709.7694702148438,
+            "width": 475.37420654296875,
+            "height": 710.7794189453125,
             "fontSize": 23.77,
             "visible": true
           },
           {
             "text": "Cooperation and Self-Organization · 5    Bologna Urban Com…  Enspiral  g0v  National Communal…  Park Slope Food C…",
-            "width": 380.921630859375,
-            "height": 814.4876708984375,
+            "width": 383.07122802734375,
+            "height": 813.54833984375,
             "fontSize": 23.77,
             "visible": true
           }
@@ -213,11 +213,11 @@
         "primaryStates": [
           {
             "animationName": "sphere-ring-orbit",
-            "transform": "matrix(0.999997, 0.00226027, -0.00226027, 0.999997, 0, 0)"
+            "transform": "matrix(0.999997, 0.00225995, -0.00225995, 0.999997, 0, 0)"
           },
           {
             "animationName": "sphere-ring-orbit",
-            "transform": "matrix(-0.531835, 0.846848, -0.846848, -0.531835, 0, 0)"
+            "transform": "matrix(-0.531834, 0.846848, -0.846848, -0.531834, 0, 0)"
           },
           {
             "animationName": "sphere-ring-orbit",
@@ -276,12 +276,28 @@
     {
       "id": "layer-journey-moveend-return",
       "verdict": "PASS",
-      "elapsedMs": 1375
+      "elapsedMs": 1515
     },
     {
       "id": "layer-journey-missing-moveend-fallback",
       "verdict": "PASS",
-      "settlement": "fallback-stop"
+      "settlement": "fallback-stop",
+      "movementDiagnostics": [
+        {
+          "index": 0,
+          "geometryEvaluationDelta": 19,
+          "diagnosticPublishDelta": 6,
+          "sampledEvaluationCount": 18,
+          "maxDiagnosticPublishes": 6
+        },
+        {
+          "index": 1,
+          "geometryEvaluationDelta": 1,
+          "diagnosticPublishDelta": 1,
+          "sampledEvaluationCount": 0,
+          "maxDiagnosticPublishes": 1
+        }
+      ]
     },
     {
       "id": "layer-journey-interrupted",
@@ -427,7 +443,7 @@
     }
   ],
   "binding": {
-    "smoke_script_sha256": "1f3e41d7264169ca64cca3984bf17099467dd853c07e0d988f0a2d39103f061f",
+    "smoke_script_sha256": "ad4d486f7871db09e15310a6431d9cfc2d4fe44cfe6006e97215ddc5bf281624",
     "smoke_runner_sha256": "522b99b70b1d0064b1d0a31a3a67fdc9a2e73b7408f37d1a4bb303bc360b7556",
     "smoke_plan_sha256": "8a068c3b573eb2ab95ed7c3f8477f607cba6de9353ab5250ba9abc09345b23a7",
     "scenario_ids": [

@@ -100,6 +100,72 @@ function hasBoundedLayerOpeningCameraCommands({ commands, settlement, mapIdle },
     && recordedCameraTargetsMatch(ordinary.target, fallback.target);
 }
 
+async function beginMovementDiagnosticTracking(page) {
+  await page.evaluate(() => {
+    const map = window.__commonworldTestMap;
+    const stage = document.querySelector('.globe-stage');
+    if (!map || !stage) throw new Error('movement diagnostic tracker requires the live map and globe stage');
+    window.__commonworldMovementDiagnosticTracker?.stop?.();
+    const readCounters = () => ({
+      geometryEvaluations: Number(stage.dataset.sphereGeometryEvaluations ?? 0),
+      diagnosticPublishes: Number(stage.dataset.sphereGeometryDiagnosticPublishes ?? 0),
+    });
+    const tracker = { current: null, windows: [] };
+    const onMoveStart = () => {
+      tracker.current = { start: readCounters() };
+    };
+    const onMoveEnd = () => {
+      if (!tracker.current) return;
+      tracker.windows.push({ ...tracker.current, end: readCounters() });
+      tracker.current = null;
+    };
+    tracker.stop = () => {
+      map.off('movestart', onMoveStart);
+      map.off('moveend', onMoveEnd);
+    };
+    map.on('movestart', onMoveStart);
+    map.on('moveend', onMoveEnd);
+    window.__commonworldMovementDiagnosticTracker = tracker;
+  });
+}
+
+async function finishMovementDiagnosticTracking(page) {
+  return page.evaluate(() => {
+    const tracker = window.__commonworldMovementDiagnosticTracker;
+    tracker?.stop?.();
+    return tracker?.windows ?? [];
+  });
+}
+
+function assertSampledMovementDiagnostics(windows, label) {
+  assert(Array.isArray(windows) && windows.length > 0, `${label}: no MapLibre movement window was recorded`);
+  return windows.map(({ start, end }, index) => {
+    const geometryEvaluationDelta = end.geometryEvaluations - start.geometryEvaluations;
+    const diagnosticPublishDelta = end.diagnosticPublishes - start.diagnosticPublishes;
+    // Each window ends with one forced non-moving geometry publication. All
+    // preceding evaluations are moving render samples whose counter restarts at
+    // movestart and publishes only for sample 1 and each admitted interval.
+    const sampledEvaluationCount = geometryEvaluationDelta - 1;
+    const maxSampledPublishes = sampledEvaluationCount > 0
+      ? 1 + Math.floor(sampledEvaluationCount / MAP_GEOMETRY_DIAGNOSTIC_SAMPLE_INTERVAL)
+      : 0;
+    const maxDiagnosticPublishes = maxSampledPublishes + 1;
+    const diagnostic = {
+      index,
+      geometryEvaluationDelta,
+      diagnosticPublishDelta,
+      sampledEvaluationCount,
+      maxDiagnosticPublishes,
+    };
+    assert(geometryEvaluationDelta >= 1, `${label}: movement window has no moveend geometry flush (${JSON.stringify(diagnostic)})`);
+    assert(diagnosticPublishDelta > 0 && diagnosticPublishDelta <= maxDiagnosticPublishes, `${label}: diagnostic publishing exceeded the sampled movement-window budget (${JSON.stringify(diagnostic)})`);
+    if (maxDiagnosticPublishes < geometryEvaluationDelta) {
+      assert(diagnosticPublishDelta < geometryEvaluationDelta, `${label}: diagnostics still publish on every moving geometry evaluation (${JSON.stringify(diagnostic)})`);
+    }
+    return diagnostic;
+  });
+}
+
 async function hierarchyFocusDiagnostic(page) {
   return page.evaluate(() => {
     const stage = document.querySelector('.globe-stage');
@@ -1510,6 +1576,7 @@ async function layerJourneyScenario({ mobile = false, viewportOverride = null, t
       attributeFilter: ['data-visible', 'hidden', 'data-closing', 'inert'],
     });
   });
+  await beginMovementDiagnosticTracking(run.page);
   if (touch) await run.page.touchscreen.tap(edgeX, edgeY);
   else await run.page.mouse.click(edgeX, edgeY);
   if (touch) {
@@ -1557,6 +1624,8 @@ async function layerJourneyScenario({ mobile = false, viewportOverride = null, t
   assert(enteringSphere, 'layer journey: transforming sphere is not visible during camera flight');
   await run.page.waitForSelector('.globe-stage[data-view-phase="layers"]');
   await run.page.waitForSelector('#layer-panel[data-visible]');
+  const movementDiagnosticWindows = await finishMovementDiagnosticTracking(run.page);
+  assertSampledMovementDiagnostics(movementDiagnosticWindows, 'layer journey');
   await run.page.evaluate(() => new Promise((resolve) => queueMicrotask(resolve)));
   const phaseLog = await run.page.evaluate(() => window.__commonworldPhaseLog);
   assert(phaseLog.every((entry) => entry.phase !== 'entering-layers' || entry.source === 'maplibre-projected-horizon'), `layer journey: side layout appeared while the camera was still flying (${JSON.stringify(phaseLog)})`);
@@ -1582,15 +1651,6 @@ async function layerJourneyScenario({ mobile = false, viewportOverride = null, t
   const flightGeometryEvaluationDelta = firstSideEntry.geometryEvaluations - phaseLog[0].geometryEvaluations;
   const maxFlightGeometryEvaluations = Math.ceil(DIGITAL_LAYER_TRANSITION_MS / MAP_GEOMETRY_SAMPLE_INTERVAL_MS) + 3;
   assert(flightGeometryEvaluationDelta > 0 && flightGeometryEvaluationDelta <= maxFlightGeometryEvaluations, 'layer journey: sphere projection exceeded the sampled camera-flight budget ' + JSON.stringify({ flightGeometryEvaluationDelta, maxFlightGeometryEvaluations, phaseLog }));
-  const firstMovingEntry = phaseLog.find((entry) => entry.mapMovingAttribute);
-  const settlingEntry = phaseLog.find((entry) => entry.phase === 'settling-layers');
-  const movingGeometryEvaluationDelta = settlingEntry.geometryEvaluations - firstMovingEntry.geometryEvaluations;
-  const movingDiagnosticPublishDelta = settlingEntry.diagnosticPublishes - firstMovingEntry.diagnosticPublishes;
-  const maxMovingDiagnosticPublishes = Math.ceil(movingGeometryEvaluationDelta / MAP_GEOMETRY_DIAGNOSTIC_SAMPLE_INTERVAL) + 2;
-  assert(movingDiagnosticPublishDelta > 0 && movingDiagnosticPublishDelta <= maxMovingDiagnosticPublishes, 'layer journey: diagnostic publishing exceeded its movement-window budget ' + JSON.stringify({ movingDiagnosticPublishDelta, maxMovingDiagnosticPublishes, phaseLog }));
-  if (maxMovingDiagnosticPublishes < movingGeometryEvaluationDelta) {
-    assert(movingDiagnosticPublishDelta < movingGeometryEvaluationDelta, 'layer journey: diagnostics still publish on every moving geometry evaluation ' + JSON.stringify({ movingDiagnosticPublishDelta, movingGeometryEvaluationDelta, maxMovingDiagnosticPublishes, phaseLog }));
-  }
   assert((await stage.getAttribute('data-globe-geometry-source')) === 'side-view-layout', 'layer journey: settled layers view is missing the side layout geometry');
   if (touch) {
     const closeFocusAppearance = await run.page.locator('#layer-close').evaluate((node) => {
@@ -2991,6 +3051,7 @@ async function missingMoveendFlightFallbackScenario() {
   await run.page.waitForTimeout(820);
   const sphereBox = await run.page.locator('#digital-sphere').boundingBox();
   assert(sphereBox, 'missing moveend fallback: sphere geometry missing');
+  await beginMovementDiagnosticTracking(run.page);
   await run.page.evaluate(() => {
     const map = window.__commonworldTestMap;
     const stage = document.querySelector('.globe-stage');
@@ -3024,6 +3085,8 @@ async function missingMoveendFlightFallbackScenario() {
   await run.page.mouse.click(sphereBox.x + sphereBox.width * 0.85134, sphereBox.y + sphereBox.height * 0.14866);
   await run.page.waitForFunction(() => ['fallback-idle', 'fallback-stop'].includes(document.querySelector('.globe-stage')?.dataset.cameraFlightSettlement), null, { timeout: 8_000 });
   await run.page.waitForSelector('.globe-stage[data-view-phase="layers"]');
+  const movementDiagnosticWindows = await finishMovementDiagnosticTracking(run.page);
+  const movementDiagnostics = assertSampledMovementDiagnostics(movementDiagnosticWindows, 'missing moveend fallback');
   const fallbackState = await run.page.evaluate(() => {
     const stage = document.querySelector('.globe-stage');
     const map = window.__commonworldTestMap;
@@ -3040,7 +3103,12 @@ async function missingMoveendFlightFallbackScenario() {
   assert(fallbackState.phaseLog.every((entry) => entry.source !== 'side-view-layout' || entry.moving === false), 'missing moveend fallback: side layout appeared while MapLibre was moving ' + JSON.stringify(fallbackState));
   assert(run.consoleErrors.length === 0, `missing moveend fallback: console errors: ${run.consoleErrors.join(' | ')}`);
   assert(run.pageErrors.length === 0, `missing moveend fallback: page errors: ${run.pageErrors.join(' | ')}`);
-  results.push({ id: 'layer-journey-missing-moveend-fallback', verdict: 'PASS', settlement: fallbackState.settlement });
+  results.push({
+    id: 'layer-journey-missing-moveend-fallback',
+    verdict: 'PASS',
+    settlement: fallbackState.settlement,
+    movementDiagnostics,
+  });
   await run.context.close();
 }
 
