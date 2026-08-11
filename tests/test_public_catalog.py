@@ -164,10 +164,10 @@ class PublicCatalogTests(unittest.TestCase):
 
         self.assertTrue(any("unknown provenance sources" in error for error in errors))
 
-    def test_public_shell_identity_drift_is_rejected(self) -> None:
+    def test_catalog_recovery_identity_drift_is_rejected(self) -> None:
         with tempfile.TemporaryDirectory() as tmp_dir:
             root = self.copy_public_catalog(tmp_dir)
-            path = root / "index.html"
+            path = root / "catalog" / "index.html"
             path.write_text(
                 path.read_text(encoding="utf-8").replace('data-commonproject-id="debian"', 'data-commonproject-id="debian-missing"'),
                 encoding="utf-8",
@@ -175,7 +175,7 @@ class PublicCatalogTests(unittest.TestCase):
 
             errors = validate_public_catalog(root)
 
-        self.assertIn("public shell card identities must match the public catalog exactly once in the no-JavaScript fallback", errors)
+        self.assertIn("en catalog recovery index identities must match the public catalog exactly once", errors)
 
     def test_manual_presentation_layer_is_rejected(self) -> None:
         with tempfile.TemporaryDirectory() as tmp_dir:
@@ -195,10 +195,10 @@ class PublicCatalogTests(unittest.TestCase):
 
         self.assertTrue(any("must not store presentation or zoom assignments" in error for error in errors))
 
-    def test_public_shell_wrong_digital_path_label_is_rejected(self) -> None:
+    def test_catalog_recovery_wrong_digital_path_label_is_rejected(self) -> None:
         with tempfile.TemporaryDirectory() as tmp_dir:
             root = self.copy_public_catalog(tmp_dir)
-            path = root / "index.html"
+            path = root / "catalog" / "index.html"
             path.write_text(
                 path.read_text(encoding="utf-8").replace(
                     "Digital · Software, Tools and Production › Free Software and Infrastructure",

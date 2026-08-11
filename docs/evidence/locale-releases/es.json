@@ -8,9 +8,9 @@
   "reviewed_source_pack_sha256": "c2bc4c17138b29e9d45a4a8a082a95aaa59c7e925b17b4020ac74c3690f29274",
   "catalog_overlay_sha256": "de1638df4c7f4b71aaab644c28e7739a699f3d914f49cfa09b205885a5f1ec36",
   "surface_sha256": {
-    "index": "994fdf176336f4f3d8021868272b276ce63e6e76f4902b83991572999dac0222",
-    "method": "38e40a874264a3fd1f34bd0ec100cf877625c3f503732bab7fa5f46341b00064",
-    "proposal": "2e4cf5ba297a21327919fa4a2b0d007b864030ea617a92a6f7e1d002d1ef2ad4"
+    "index": "81cfb50b62a719c9eb74ccec25d2ce0f7bd8725a60bf6e89c02dba4d37fd163e",
+    "method": "f876fb6d99a9b8d6f40cc980a0169a18a6d2ac25deb84fc1a276ba1925ef57a5",
+    "proposal": "97d1dc38053fa6ec7ec5f6e96600e830826de87876ac79a73a1fb30a7a54441e"
   },
   "gate_results": {
     "required_surfaces_passed": [
@@ -22,7 +22,7 @@
       "runtime_labels",
       "text"
     ],
-    "translation_coverage_ratio": 1.0,
+    "translation_coverage_ratio": 1,
     "untranslated_ui_markers": 0,
     "missing_runtime_keys": 0,
     "machine_translation_only": false,
@@ -60,5 +60,5 @@
     "findings_based": true,
     "post_fix_review_required": true
   },
-  "notes": "Digest-bound release evidence after PR #204 post-fix review. Model-assisted independent review; native/human language approval and full WCAG conformance are not claimed."
+  "notes": "Digest-bound PR #204 post-fix language review retained; surface digests rebound after the T028 recovery-only build. Reviewed translations, source pack and receipt claims are unchanged. Model-assisted independent review; native/human language approval and full WCAG conformance are not claimed."
 }

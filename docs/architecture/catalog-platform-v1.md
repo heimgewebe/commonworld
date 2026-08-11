@@ -126,7 +126,7 @@ Die Messung belegt deterministische Rekonstruktion, Schema- und Integritätsgren
 3. Verborgene Orte bleiben ohne rekonstruierte Geometrie.
 4. Eine Manifestgeneration bindet Quellkatalog, Detailmenge und relevante Schemaverträge.
 5. Ein Manifest verweist nur auf Artefakte, deren Hash und Größe es oder ein generationsgebundener Sharddescriptor festlegt.
-6. Ein fehlgeschlagener Shadow-Leseweg lässt den kompakten buildgebundenen Datensatz und die vollständige statische Recovery-Liste aktiv.
+6. Ein fehlgeschlagener Shadow-Leseweg lässt den kompakten buildgebundenen Datensatz und den begrenzten DE/EN-Recovery-Einstieg mit paginierten Indizes und kanonischen Projektseiten aktiv.
 7. Suche und Karte verwenden dieselbe zulässige Kandidatenmenge.
 8. Schnelle Auswahlwechsel dürfen keine ältere Antwort auf den aktuellen Fokus anwenden.
 9. Erfolgreiche Shadow-Parität autorisiert weder Bootstrap-Entfernung noch Deployment oder physischen Geräte-Cutover.

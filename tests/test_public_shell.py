@@ -6,7 +6,7 @@ import unittest
 from pathlib import Path
 
 from scripts.render_public_shell import (
-    LANGUAGE_NATIVE_NAMES, MODULE_IMPORT_DEPENDENCIES, activity_notice, catalog_language_codes, language_option_direction, load_records, render_bootstrap_catalog, render_cards, render_shell,
+    LANGUAGE_NATIVE_NAMES, MODULE_IMPORT_DEPENDENCIES, RECOVERY_PAGE_SIZE, activity_notice, catalog_language_codes, language_option_direction, load_records, render_bootstrap_catalog, render_cards, render_shell,
 )
 from scripts.static_surface_parser import (
     find_css_block,
@@ -310,8 +310,11 @@ class PublicShellTests(unittest.TestCase):
         self.assertIn('id="text-skip-link" class="skip-link" href="/#static-catalog-fallback"', html)
         self.assertIn('id="static-catalog-fallback" class="static-catalog-fallback" tabindex="-1"', html)
         fallback = html.split('id="static-catalog-fallback"', 1)[1]
-        self.assertEqual(len(load_records(ROOT)), fallback.count('class="catalog-card"'))
-        self.assertIn('The complete linear catalog remains available here while the interactive view is loading or unavailable.', html)
+        self.assertEqual(min(RECOVERY_PAGE_SIZE, len(load_records(ROOT))), fallback.count('class="catalog-card"'))
+        self.assertIn(f'data-recovery-page-size="{RECOVERY_PAGE_SIZE}"', html)
+        self.assertIn('entries remain available here while the interactive view is loading or unavailable.', html)
+        self.assertIn('href="catalog/"', fallback)
+        self.assertNotIn('href="/catalog/', fallback)
         self.assertIn("catalog?.querySelectorAll('.catalog-card[data-commonproject-id]')", app)
         self.assertNotIn("document.querySelectorAll('.catalog-card[data-commonproject-id]')", app)
         self.assertIn("const recoveryCatalog = document.querySelector('[data-static-catalog-fallback]')", app)
@@ -424,7 +427,7 @@ class PublicShellTests(unittest.TestCase):
             path = root / "index.html"
             path.write_text(
                 path.read_text(encoding="utf-8").replace(
-                    'The complete linear catalog remains available here while the interactive view is loading or unavailable.',
+                    'entries remain available here while the interactive view is loading or unavailable.',
                     'The interactive globe is unavailable.',
                     1,
                 ),
@@ -432,7 +435,7 @@ class PublicShellTests(unittest.TestCase):
             )
             errors = validate_public_shell(root)
         self.assertIn(
-            'public shell missing required token: The complete linear catalog remains available here while the interactive view is loading or unavailable.',
+            'public shell missing required token: entries remain available here while the interactive view is loading or unavailable.',
             errors,
         )
 

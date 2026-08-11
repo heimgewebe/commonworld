@@ -229,11 +229,11 @@ def validate_current_state(root: Path = ROOT) -> list[str]:
         "runtime_catalogue_cache_limits": {"shards": 8, "details": 16},
         "runtime_catalogue_selection_states": ["idle", "loading", "retrying", "ready", "mismatch", "degraded"],
         "runtime_catalogue_failure_policy": "keep_compact_bootstrap",
-        "bootstrap_asset_failure_policy": "keep_generated_linear_catalogue",
+        "bootstrap_asset_failure_policy": "keep_bounded_de_en_recovery_and_paginated_catalogue",
         "runtime_catalogue_retry_policy": "reload_platform_and_clear_shadow_caches",
         "runtime_catalogue_cutover_authorized": False,
         "build_and_ci_catalogue_parity_check": True,
-        "no_javascript_projection": "generated_static_catalogue_preserved_until_successful_interactive_start",
+        "no_javascript_projection": "generated_bounded_de_en_landing_with_paginated_indexes_and_project_pages_preserved_until_successful_interactive_start",
         "redesign_trigger": "measured_transfer_parse_or_dom_budget_not_entry_count_alone",
     }
     if catalog_delivery != expected_catalog_delivery:

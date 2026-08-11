@@ -102,7 +102,7 @@
       "translation_pack": "wave_1",
       "release_evidence": {
         "path": "docs/evidence/locale-releases/es.json",
-        "sha256": "7ab3672ae7957b00c4c845cb5ccd02877d1f1199e0a95bff394db1b694d865ec"
+        "sha256": "da4d3ccb4baf47a962450ad7b0acdf60a38b9819958a9c9c52b18ab6aaf7b911"
       }
     },
     "fr": {
@@ -118,7 +118,7 @@
       "translation_pack": "wave_1",
       "release_evidence": {
         "path": "docs/evidence/locale-releases/fr.json",
-        "sha256": "ff3bbd886e638abd2ebf83140f31f284bdfbd4ad5e56e26fa54cba79ade284f1"
+        "sha256": "e639742ca1d261b8b83607b88683227ca81175a3fea0bc1dd099ad4386dbff60"
       }
     },
     "pt-BR": {
@@ -134,7 +134,7 @@
       "translation_pack": "wave_1",
       "release_evidence": {
         "path": "docs/evidence/locale-releases/pt-BR.json",
-        "sha256": "123d2251b41cfc6fd87f6e4fb362bc28083394299194cd4089aa8c2b38351110"
+        "sha256": "37bd0fd1400a05b568d0eb3b4fa964a79f2a6bb793743f31728c9fc4ffdbd7d1"
       }
     },
     "ar": {
@@ -150,7 +150,7 @@
       "translation_pack": "wave_1",
       "release_evidence": {
         "path": "docs/evidence/locale-releases/ar.json",
-        "sha256": "a0e84c8ba1d249631044d94110ab9c2dff1a0fb1ee398b487d85894e4d89bdc7"
+        "sha256": "ca91a29db8f9862cde86bfdaf51588bd2424a7c281d1cbcd82fa512e61084d80"
       }
     },
     "zh-Hans": {
@@ -166,7 +166,7 @@
       "translation_pack": "wave_1",
       "release_evidence": {
         "path": "docs/evidence/locale-releases/zh-Hans.json",
-        "sha256": "fb79dc241e39d97059b2ed3dcacfee2bbaf757b1c608c8ac5d34c9d55e628a1f"
+        "sha256": "857b774b11505504958117d19777e3fb4315c6086326af49081f4d09f0008aa5"
       }
     },
     "hi": {
@@ -217,7 +217,7 @@
       "catalog_localization",
       "metadata_and_navigation"
     ],
-    "translation_coverage_ratio": 1.0,
+    "translation_coverage_ratio": 1,
     "untranslated_ui_markers_max": 0,
     "missing_runtime_keys_max": 0,
     "machine_translation_only_forbidden": true,

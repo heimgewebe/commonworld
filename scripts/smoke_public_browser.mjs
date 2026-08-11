@@ -3982,6 +3982,7 @@ async function catalogueDetailStaleResponseScenario() {
 async function bootstrapAssetFailureFallbackScenario() {
   const run = await newPage();
   const manifest = JSON.parse(await readFile(path.join(ROOT, 'catalog/catalog.json'), 'utf8'));
+  const expectedRecoveryCards = Math.min(24, manifest.entry_count);
   let blockedBootstrapRequests = 0;
   await run.page.route('**/assets/commonworld-bootstrap-catalog.mjs*', (route) => {
     blockedBootstrapRequests += 1;
@@ -4009,7 +4010,7 @@ async function bootstrapAssetFailureFallbackScenario() {
   assert(blockedBootstrapRequests === 1, `bootstrap asset failure: expected one blocked module request, found ${blockedBootstrapRequests}`);
   assert(!(await run.page.locator('html').evaluate((node) => node.classList.contains('runtime-ready'))), 'bootstrap asset failure: runtime must not claim ready');
   assert(await run.page.locator('#static-catalog-fallback').isVisible(), 'bootstrap asset failure: linear catalog fallback is not visible');
-  assert(fallbackCatalogCards === manifest.entry_count, `bootstrap asset failure: expected ${manifest.entry_count} fallback cards, found ${fallbackCatalogCards}`);
+  assert(fallbackCatalogCards === expectedRecoveryCards, `bootstrap asset failure: expected ${expectedRecoveryCards} bounded fallback cards, found ${fallbackCatalogCards}`);
   assert(hiddenFallbackCatalogCards === 0, `bootstrap asset failure: ${hiddenFallbackCatalogCards} fallback cards were hidden`);
   assert(neutralRecoveryCopy, `bootstrap asset failure: recovery copy falsely declares failure: ${recoveryCopy}`);
   assert(skipLinkHref === '/#static-catalog-fallback', 'bootstrap asset failure: skip link does not target the surviving catalog');
@@ -4035,6 +4036,7 @@ async function bootstrapAssetFailureFallbackScenario() {
 async function postRenderFailurePreservesFallbackScenario() {
   const run = await newPage();
   const manifest = JSON.parse(await readFile(path.join(ROOT, 'catalog/catalog.json'), 'utf8'));
+  const expectedRecoveryCards = Math.min(24, manifest.entry_count);
   await run.page.addInitScript(() => {
     window.__commonworldBeforeRecoveryRemovalForTest = () => {
       throw new Error('synthetic post-render startup failure');
@@ -4050,9 +4052,9 @@ async function postRenderFailurePreservesFallbackScenario() {
   await run.page.keyboard.press('Enter');
   const skipFocusId = await run.page.evaluate(() => document.activeElement?.id ?? '');
   const skipActivatedRecovery = (await run.page.locator('#static-catalog-fallback').getAttribute('data-skip-activated')) === 'true';
-  assert(fallbackCatalogCards === manifest.entry_count, `post-render failure: expected ${manifest.entry_count} fallback cards, found ${fallbackCatalogCards}`);
+  assert(fallbackCatalogCards === expectedRecoveryCards, `post-render failure: expected ${expectedRecoveryCards} bounded fallback cards, found ${fallbackCatalogCards}`);
   assert(hiddenFallbackCatalogCards === 0, `post-render failure: ${hiddenFallbackCatalogCards} fallback cards were mutated by runtime filtering`);
-  assert(await run.page.locator('#static-catalog-fallback').isVisible(), 'post-render failure: complete fallback is not visible');
+  assert(await run.page.locator('#static-catalog-fallback').isVisible(), 'post-render failure: bounded fallback is not visible');
   assert(skipLinkHref === '/#static-catalog-fallback', `post-render failure: skip link targets ${skipLinkHref}`);
   assert(skipFocusId === 'static-catalog-fallback', `post-render failure: skip handler focused ${skipFocusId || 'nothing'} instead of recovery catalog`);
   assert(skipActivatedRecovery, 'post-render failure: skip handler did not reveal the recovery catalog');
