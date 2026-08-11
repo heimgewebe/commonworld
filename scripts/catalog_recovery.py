@@ -126,14 +126,17 @@ def _page_copy(locale: str) -> dict[str, str]:
     }
 
 
-def _document(*, locale: str, title: str, description: str, canonical_url: str, body: str, root: Path) -> str:
+def _document(
+    *,
+    locale: str,
+    title: str,
+    description: str,
+    canonical_url: str,
+    alternate_url: str,
+    body: str,
+    root: Path,
+) -> str:
     alternate_locale = "de" if locale == "en" else "en"
-    if canonical_url.startswith("/catalog/projects/"):
-        alternate_url = canonical_url.replace("/catalog/projects/", "/catalog/de/projects/")
-    elif canonical_url.startswith("/catalog/de/projects/"):
-        alternate_url = canonical_url.replace("/catalog/de/projects/", "/catalog/projects/")
-    else:
-        alternate_url = "/catalog/de/" if locale == "en" else "/catalog/"
     return f'''<!doctype html>
 <html lang="{locale}">
   <head>
@@ -192,6 +195,7 @@ def render_index(records: list[dict], locale: str, number: int, root: Path = ROO
         title=f'{copy_text["catalog"]} — {page_label}',
         description=copy_text["description"],
         canonical_url=index_url(locale, number),
+        alternate_url=index_url("de" if locale == "en" else "en", number),
         body=body,
         root=root,
     )
@@ -252,6 +256,7 @@ def render_project(record: dict, locale: str, root: Path = ROOT) -> str:
         title=f'{record["title"]} — Commonworld',
         description=record["summary"],
         canonical_url=canonical,
+        alternate_url=project_url("de" if locale == "en" else "en", identifier),
         body=body,
         root=root,
     )

@@ -27,6 +27,17 @@ class CatalogRecoveryTests(unittest.TestCase):
         self.assertEqual(Path("catalog/projects/debian.html"), project_relative_path("en", "debian"))
         self.assertEqual(Path("catalog/de/projects/debian.html"), project_relative_path("de", "debian"))
 
+    def test_paginated_index_canonical_and_hreflang_follow_same_page(self) -> None:
+        expectations = {
+            "en": (ROOT / "catalog/pages/2.html", "/catalog/pages/2.html", "de", "/catalog/de/pages/2.html"),
+            "de": (ROOT / "catalog/de/pages/2.html", "/catalog/de/pages/2.html", "en", "/catalog/pages/2.html"),
+        }
+        for locale, (path, canonical, alternate_locale, alternate) in expectations.items():
+            with self.subTest(locale=locale):
+                markup = path.read_text(encoding="utf-8")
+                self.assertIn(f'<link rel="canonical" href="{canonical}" />', markup)
+                self.assertIn(f'<link rel="alternate" hreflang="{alternate_locale}" href="{alternate}" />', markup)
+
     def test_landing_recovery_links_resolve_inside_the_selected_release(self) -> None:
         for page_name, locale_prefix in (("index.html", "catalog/"), ("de.html", "catalog/de/")):
             with self.subTest(page=page_name):

@@ -18,6 +18,7 @@ from scripts.catalog_recovery import (
     PAGE_SIZE,
     RECOVERY_LOCALES,
     index_relative_path,
+    index_url,
     load_records,
     page_count,
     project_relative_path,
@@ -146,6 +147,11 @@ def validate_catalog_recovery(root: Path = ROOT, *, verify_measurements: bool = 
                 errors.append(f"catalogue recovery page exceeds entry bound: {relative}")
             if f'data-recovery-page="{number}" data-recovery-page-size="{PAGE_SIZE}"' not in markup:
                 errors.append(f"catalogue recovery page metadata mismatch: {relative}")
+            alternate_locale = "de" if locale == "en" else "en"
+            if f'<link rel="canonical" href="{index_url(locale, number)}" />' not in markup:
+                errors.append(f"catalogue recovery page canonical locale mismatch: {relative}")
+            if f'<link rel="alternate" hreflang="{alternate_locale}" href="{index_url(alternate_locale, number)}" />' not in markup:
+                errors.append(f"catalogue recovery page alternate locale mismatch: {relative}")
             if GENERATED_MARKER not in markup or "<script" in markup.casefold() or "<form" in markup.casefold():
                 errors.append(f"catalogue recovery page is not a static read-only surface: {relative}")
         if seen != identifiers:
