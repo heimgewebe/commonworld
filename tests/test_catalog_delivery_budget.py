@@ -80,7 +80,11 @@ class CatalogDeliveryBudgetTests(unittest.TestCase):
         self.assertEqual(manifest['entry_count'], metrics['entry_count'])
         self.assertEqual(0, metrics['runtime_verification_fetch']['project_request_count'])
         self.assertEqual(0, metrics['runtime_verification_fetch']['duplicate_identity_payload_count'])
-        self.assertEqual(metrics['entry_count'], metrics['html']['catalog_card_instances'])
+        contract = json.loads((ROOT / 'contracts/commonworld/catalog-delivery-budget.contract.json').read_text())
+        self.assertEqual(
+            min(metrics['entry_count'], contract['budgets']['max_landing_recovery_entries']),
+            metrics['html']['catalog_card_instances'],
+        )
         self.assertEqual(1, metrics['html']['static_fallback_catalogs'])
         self.assertEqual(0, metrics['html']['noscript_elements'])
         _, bootstrap_records = load_bootstrap_records(

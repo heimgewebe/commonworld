@@ -250,6 +250,7 @@ def validate(root: Path = ROOT, warnings: list[str] | None = None) -> list[str]:
         'catalogue initial gzip bytes': (static['catalog_initial_delivery']['gzip_bytes'], budgets.get('max_catalog_initial_gzip_bytes')),
         'bootstrap raw bytes per record': (static['bootstrap']['raw_bytes_per_record'], budgets.get('max_bootstrap_raw_bytes_per_record')),
         'HTML start tags': (static['html']['start_tag_count'], budgets.get('max_html_start_tags')),
+        'landing recovery entries': (static['html']['catalog_card_instances'], budgets.get('max_landing_recovery_entries')),
     }
     for label, (actual, maximum) in deterministic_checks.items():
         if not is_number(maximum):
@@ -410,8 +411,9 @@ def validate(root: Path = ROOT, warnings: list[str] | None = None) -> list[str]:
         if smoke_scenarios.get(required_scenario, {}).get('verdict') != 'PASS':
             errors.append(f'public browser smoke missing PASS scenario: {required_scenario}')
     errors.extend(validate_blocked_catalog_requests(smoke_scenarios, 'public browser smoke'))
-    errors.extend(validate_bootstrap_asset_failure_fallback(smoke_scenarios, 'public browser smoke', static['entry_count']))
-    errors.extend(validate_post_render_failure_fallback(smoke_scenarios, 'public browser smoke', static['entry_count']))
+    expected_recovery_entries = min(static['entry_count'], budgets.get('max_landing_recovery_entries', -1))
+    errors.extend(validate_bootstrap_asset_failure_fallback(smoke_scenarios, 'public browser smoke', expected_recovery_entries))
+    errors.extend(validate_post_render_failure_fallback(smoke_scenarios, 'public browser smoke', expected_recovery_entries))
 
     browser = optimized.get('browser', {})
     if browser.get('cpu_throttle_rate') != 4:
@@ -466,10 +468,10 @@ def validate(root: Path = ROOT, warnings: list[str] | None = None) -> list[str]:
     if (
         static['html']['static_fallback_catalogs'] != 1
         or static['html']['noscript_elements'] != 0
-        or static['html']['catalog_card_instances'] != static['entry_count']
+        or static['html']['catalog_card_instances'] != min(static['entry_count'], budgets.get('max_landing_recovery_entries', -1))
         or static['html']['interactive_catalog_cards'] != 0
     ):
-        errors.append('generated static fallback catalogue must be complete exactly once in ordinary DOM, without a duplicate noscript catalogue or static interactive cards')
+        errors.append('generated static fallback catalogue must be bounded exactly once in ordinary DOM, without a duplicate noscript catalogue or static interactive cards')
     return errors
 
 

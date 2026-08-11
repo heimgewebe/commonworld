@@ -9,29 +9,29 @@
       "unmerged_path_count": 36
     }
   },
-  "current_release_id": "fe406402d577678606b8",
+  "current_release_id": "f13b9fb179499c0e52dc",
   "delivery_evidence": {
-    "docs/evidence/catalog-delivery-benchmark-v1.json": "fc1605a4c6adb9cd8c175a29332f45d64a1cc33154f3ad049c523beb4309e830",
-    "docs/evidence/catalog-delivery-public-browser-smoke-v1.json": "a7c14d9179fe814824cd0858813097f3c3e92230510dc573162e8dfee400afe7"
+    "docs/evidence/catalog-delivery-benchmark-v1.json": "e8986328dd36c3a98199e00eee5fe58c5a314ac8bec8032324c196d37d99bedb",
+    "docs/evidence/catalog-delivery-public-browser-smoke-v1.json": "a6ec92461e8ce865a0d9d80b1cdcd81c168be1999afc57627e88800b069f6f03"
   },
   "freshness_model": "digest-defined-proposed-head-scope",
   "kind": "commonworld.release_snapshot_lifecycle_evidence",
   "proposed_head_inputs": {
-    "Makefile": "7b5199665a4e1c5ad0de75fea444da2ed9a946a8140b801a64a4ad9bac46f4c6",
+    "Makefile": "b6e567c685d595fdd58609107afc645389fe53f6e27004de6969183ef95bbfae",
     "assets/commonworld-release-check.js": "b1b62be4dc1e2910cc0b1c878bded86d49140b1d67c9256c6f762c60e0675f26",
     "docs/architecture/release-snapshot-lifecycle.contract.json": "6fda74667864e8ca13ab8519b151e95e3d886428dca83b2f342b5f96b45b3e7b",
-    "package.json": "2cf87cdcfd58a1a75bd4af004eda9f37e583174637e8dbb730ae9d976a558085",
+    "package.json": "1db5ff4a577d2e8b2a01c8adc4cd6464acef1bebc8ceeb1c36baa08486c21b9f",
     "scripts/build_page_release_manifest.py": "173848a0794cafae03dd58c6d26f2b632f97ff7c76fa514b5d2e7d226d4e98ee",
     "scripts/measure_release_snapshot_lifecycle.py": "e57826aa7fe7c0999c15608d8a316d1c030f343b81ec646819728dbb0cba5277",
     "scripts/public_cache.py": "4da2bd6dd8267e644506ac7284090755e33ad3415c46b9c7caa1d0750e6f0cd7",
-    "scripts/render_public_shell.py": "649ea1d6caccc6c1d664f08895b8c93c71ede45381546f56c5d950657121b170",
+    "scripts/render_public_shell.py": "9b66a7ab6d378697e93f8aeb6b22b19aedc93f63347b0d2852490b75ce12cddc",
     "scripts/validate_cache_coherence.py": "50b924851facfad392b04e09cd8714cb9cba3d8c7855632cd01d45a0739d0fa6",
-    "scripts/validate_canonical_plan.py": "158f690c907d386d263e7c908f8b5ee74609675d783a588e5196a43734f0d807",
-    "scripts/validate_catalog_delivery_budget.py": "5ab956e1b60db5f4728ab1da2071f763dcf5776eb728afe000339f3efe2284f4",
+    "scripts/validate_canonical_plan.py": "1b3658c7c8cbe51b9d442aa7068f0e10dfb7d33235e42ad6d3ca15cf8d3ec69b",
+    "scripts/validate_catalog_delivery_budget.py": "4b991fdf70233ffee0733dc06b21c52853168585be845a9e4fd503eedf6871a0",
     "scripts/validate_release_snapshot_lifecycle.py": "13b2fb3f01192fd6057d295684406556dd3ba4b0e578de5504ad39130fd3869c",
     "tests/test_release_snapshot_lifecycle.py": "6cd44edbe32e10d17485b168ce547f0789a641a5ffdf1e47889bf6782b464f92"
   },
-  "proposed_head_scope_sha256": "fe3eaa6819ecdcec14c9c51815fd5a4042d21ddfa16bf64091c37d1d931a6ad3",
+  "proposed_head_scope_sha256": "0662cf6f2d599e522dacd419f80b8df8014ad1c8a3fb0f36c13c045b8ff9c21a",
   "schema_version": 1,
   "status": "fresh",
   "task_id": "COMMONWORLD-PUBLIC-GLOBE-V1-T040"

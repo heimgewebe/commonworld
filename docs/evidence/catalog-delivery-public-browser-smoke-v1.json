@@ -119,8 +119,8 @@
       "filterButtonHeight": 44,
       "ringAnimationName": "none",
       "ringTransform": "none",
-      "ringTextWidth": 671.1033935546875,
-      "ringTextHeight": 13.50592041015625,
+      "ringTextWidth": 671.1126098632812,
+      "ringTextHeight": 14.0108642578125,
       "ringTextFontSize": 22,
       "primaryRingCount": 3,
       "depthRingCount": 2,
@@ -129,20 +129,20 @@
       "representativePrimaryLabels": [
         {
           "text": "Knowledge, Learning and Culture · 11    LibriVox  MusicBrainz  Open Library  Peer 2 Peer Unive…  Safecast  Thailand Citizens…",
-          "width": 671.1033935546875,
-          "height": 13.50592041015625,
+          "width": 671.1126098632812,
+          "height": 14.0108642578125,
           "visible": true
         },
         {
           "text": "Communication and Networks · 11    BOSCO Uganda  Freifunk  Freifunk Hamburg  guifi.net  Mastodon  Meshtastic",
-          "width": 331.3607177734375,
-          "height": 518.69140625,
+          "width": 331.7405090332031,
+          "height": 518.4586181640625,
           "visible": true
         },
         {
           "text": "Cooperation and Self-Organization · 5    Bologna Urban Com…  Enspiral  g0v  National Communal…  Park Slope Food C…",
-          "width": 290.67181396484375,
-          "height": 578.9899291992188,
+          "width": 290.16424560546875,
+          "height": 579.2286987304688,
           "visible": true
         }
       ],
@@ -185,22 +185,22 @@
         "representativePrimaryLabels": [
           {
             "text": "Knowledge, Learning and Culture · 11    LibriVox  MusicBrainz  Open Library  Peer 2 Peer Unive…  Safecast  Thailand Citizens…",
-            "width": 932.1082153320312,
-            "height": 38.37108612060547,
+            "width": 932.1099243164062,
+            "height": 37.663482666015625,
             "fontSize": 23.77,
             "visible": true
           },
           {
             "text": "Communication and Networks · 11    BOSCO Uganda  Freifunk  Freifunk Hamburg  guifi.net  Mastodon  Meshtastic",
-            "width": 474.8562927246094,
-            "height": 711.11279296875,
+            "width": 474.33087158203125,
+            "height": 711.4505004882812,
             "fontSize": 23.77,
             "visible": true
           },
           {
             "text": "Cooperation and Self-Organization · 5    Bologna Urban Com…  Enspiral  g0v  National Communal…  Park Slope Food C…",
-            "width": 383.7820739746094,
-            "height": 813.2362060546875,
+            "width": 384.5025939941406,
+            "height": 812.9189453125,
             "fontSize": 23.77,
             "visible": true
           }
@@ -213,15 +213,15 @@
         "primaryStates": [
           {
             "animationName": "sphere-ring-orbit",
-            "transform": "matrix(0.999997, 0.00226149, -0.00226149, 0.999997, 0, 0)"
+            "transform": "matrix(0.999997, 0.00226109, -0.00226109, 0.999997, 0, 0)"
           },
           {
             "animationName": "sphere-ring-orbit",
-            "transform": "matrix(-0.531836, 0.846848, -0.846848, -0.531836, 0, 0)"
+            "transform": "matrix(-0.531835, 0.846848, -0.846848, -0.531835, 0, 0)"
           },
           {
             "animationName": "sphere-ring-orbit",
-            "transform": "matrix(-0.435954, -0.899969, 0.899969, -0.435954, 0, 0)"
+            "transform": "matrix(-0.435955, -0.899969, 0.899969, -0.435955, 0, 0)"
           }
         ],
         "depthStates": [
@@ -276,7 +276,7 @@
     {
       "id": "layer-journey-moveend-return",
       "verdict": "PASS",
-      "elapsedMs": 1358
+      "elapsedMs": 1582
     },
     {
       "id": "layer-journey-missing-moveend-fallback",
@@ -285,10 +285,10 @@
       "movementDiagnostics": [
         {
           "index": 0,
-          "geometryEvaluationDelta": 21,
+          "geometryEvaluationDelta": 19,
           "diagnosticPublishDelta": 6,
-          "sampledEvaluationCount": 20,
-          "maxDiagnosticPublishes": 7
+          "sampledEvaluationCount": 18,
+          "maxDiagnosticPublishes": 6
         },
         {
           "index": 1,
@@ -384,8 +384,8 @@
       "verdict": "PASS",
       "blockedCatalogRequests": 0,
       "observedCatalogRequests": [
-        "/releases/fe406402d577678606b8/catalog/runtime/aggregate.v1.json",
-        "/releases/fe406402d577678606b8/catalog/runtime/manifest.v1.json"
+        "/releases/f13b9fb179499c0e52dc/catalog/runtime/aggregate.v1.json",
+        "/releases/f13b9fb179499c0e52dc/catalog/runtime/manifest.v1.json"
       ]
     },
     {
@@ -407,7 +407,7 @@
       "id": "bootstrap-asset-failure-fallback",
       "verdict": "PASS",
       "blockedBootstrapRequests": 1,
-      "fallbackCatalogCards": 88,
+      "fallbackCatalogCards": 24,
       "hiddenFallbackCatalogCards": 0,
       "neutralRecoveryCopy": true,
       "skipLinkHref": "/#static-catalog-fallback",
@@ -418,7 +418,7 @@
     {
       "id": "post-render-failure-preserves-fallback",
       "verdict": "PASS",
-      "fallbackCatalogCards": 88,
+      "fallbackCatalogCards": 24,
       "hiddenFallbackCatalogCards": 0,
       "skipLinkHref": "/#static-catalog-fallback",
       "skipFocusId": "static-catalog-fallback",
@@ -443,10 +443,9 @@
     }
   ],
   "binding": {
-    "smoke_script_sha256": "8905e659270854527998093fdd7bea79898a0450c15f9dd8ca40ab0f4050102e",
+    "smoke_script_sha256": "f3e321d20599843fe3aad9d2888e9d7bcbee24f1c0222f772718ac31a859bf30",
     "smoke_runner_sha256": "522b99b70b1d0064b1d0a31a3a67fdc9a2e73b7408f37d1a4bb303bc360b7556",
     "smoke_plan_sha256": "8a068c3b573eb2ab95ed7c3f8477f607cba6de9353ab5250ba9abc09345b23a7",
-    "first_party_surface_sha256": "f959600c894a77de36fc65de96a00d668ef8a266e0b53d1cf1800a624e657706",
     "scenario_ids": [
       "startup-and-ring-orbits",
       "synthetic-cross-ring-collision-accessibility",
@@ -485,6 +484,7 @@
       "method-desktop",
       "method-mobile",
       "method-mobile-text-200"
-    ]
+    ],
+    "first_party_surface_sha256": "9335b46078c2062d9faf986c30aaa1a16890b556581a43f985b11d5645b86925"
   }
 }

@@ -79,14 +79,14 @@ class CanonicalPlanTests(unittest.TestCase):
             path = root / "docs" / "blueprints" / "commonworld-masterplan.md"
             path.write_text(
                 path.read_text(encoding="utf-8").replace(
-                    "Die lineare Liste liegt außerhalb der Bootstrap-Modulabhängigkeit",
-                    "Die lineare Liste hängt vom Bootstrap-Modul ab",
+                    "Die begrenzte lineare Einstiegsseite liegt außerhalb der Bootstrap-Modulabhängigkeit",
+                    "Die begrenzte lineare Einstiegsseite hängt vom Bootstrap-Modul ab",
                 ),
                 encoding="utf-8",
             )
             errors = validate_canonical_plan(root)
         self.assertIn(
-            "canonical globe plan missing required token: Die lineare Liste liegt außerhalb der Bootstrap-Modulabhängigkeit",
+            "canonical globe plan missing required token: Die begrenzte lineare Einstiegsseite liegt außerhalb der Bootstrap-Modulabhängigkeit",
             errors,
         )
 

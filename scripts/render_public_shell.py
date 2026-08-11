@@ -8,6 +8,7 @@ import json
 import re
 import sys
 from pathlib import Path
+from typing import Callable
 
 ROOT = Path(__file__).resolve().parents[1]
 if str(ROOT) not in sys.path:
@@ -42,6 +43,7 @@ LANGUAGE_NATIVE_NAMES = {
     "zh": "中文",
 }
 RTL_LANGUAGE_CODES = frozenset({"ar", "syr"})
+RECOVERY_PAGE_SIZE = 24
 
 
 def language_option_direction(code: str) -> str:
@@ -269,7 +271,14 @@ def load_records(root: Path = ROOT) -> list[dict]:
     return records
 
 
-def render_cards(records: list[dict], *, interactive: bool = True, locale: str = FALLBACK_LOCALE) -> str:
+def render_cards(
+    records: list[dict],
+    *,
+    interactive: bool = True,
+    locale: str = FALLBACK_LOCALE,
+    project_page_url: Callable[[str], str] | None = None,
+    project_json_url: Callable[[str], str] | None = None,
+) -> str:
     cards: list[str] = []
     for record in records:
         identifier = html.escape(record["id"], quote=True)
@@ -293,6 +302,18 @@ def render_cards(records: list[dict], *, interactive: bool = True, locale: str =
         notice = html.escape(activity_notice(record, locale))
         notice_html = f'            <p class="catalog-activity-notice">{notice}</p>\n' if notice else ""
         url = html.escape(homepage(record), quote=True)
+        project_page_link = ""
+        if project_page_url is not None:
+            project_page_label = "Project page" if normalize_locale(locale) == "en" else "Projektseite"
+            project_page_link = (
+                f'              <a href="{html.escape(project_page_url(record["id"]), quote=True)}">'
+                f'{project_page_label}</a>\n'
+            )
+        json_url = (
+            project_json_url(record["id"])
+            if project_json_url is not None
+            else f"./catalog/projects/{record['id']}.json"
+        )
         action_links = "\n".join(
             '              <a class="catalog-action-link" data-action-type="{}" href="{}" rel="external noreferrer">{} <span aria-hidden="true">↗</span></a>'.format(
                 html.escape(link["type"], quote=True),
@@ -318,7 +339,7 @@ def render_cards(records: list[dict], *, interactive: bool = True, locale: str =
             <p class="catalog-location">{place}</p>
 {notice_html}            <div class="catalog-actions">
 {action}{action_links}              <a href="{url}" rel="external noreferrer">{html.escape(interface_static(locale, "official_website", de="Offizielle Seite", en="Official website"))} <span aria-hidden="true">↗</span></a>
-              <a href="./catalog/projects/{identifier}.json" type="application/json">JSON</a>
+{project_page_link}              <a href="{html.escape(json_url, quote=True)}" type="application/json">JSON</a>
             </div>
           </article>'''
         )
@@ -353,10 +374,27 @@ def render_shell(root: Path = ROOT, locale: str = FALLBACK_LOCALE) -> str:
         f'              <ellipse id="sphere-path-{index}" cx="320" cy="320" rx="{rx}" ry="{ry}" transform="rotate({rotation} 320 320)" />'
         for index, (rx, ry, rotation) in enumerate(ORBIT_PROFILES, start=1)
     )
-    # JavaScript creates the interactive cards from the compact bootstrap. One complete
-    # static catalogue remains in ordinary DOM until a successful runtime boot removes it.
+    # JavaScript creates the interactive cards from the compact bootstrap. DE/EN keep a
+    # bounded recovery page in the landing DOM; other released locales retain their
+    # complete static projection until equivalent paginated recovery is proven.
     cards = ""
-    fallback_cards = render_cards(records, interactive=False, locale=locale)
+    bounded_recovery = normalized in {"de", "en"}
+    fallback_records = records[:RECOVERY_PAGE_SIZE] if bounded_recovery else records
+    recovery_index_url = "/catalog/de/" if normalized == "de" else "/catalog/"
+    recovery_project_prefix = "/catalog/de/projects/" if normalized == "de" else "/catalog/projects/"
+    fallback_cards = render_cards(
+        fallback_records,
+        interactive=False,
+        locale=locale,
+        project_page_url=(lambda identifier: f"{recovery_project_prefix}{identifier}.html") if bounded_recovery else None,
+        project_json_url=(lambda identifier: f"/catalog/projects/{identifier}.json") if bounded_recovery else None,
+    )
+    recovery_pagination = (
+        f'        <p class="recovery-pagination"><a href="{recovery_index_url}">'
+        f'Alle {len(records)} Commons in begrenzten Katalogseiten öffnen</a></p>'
+        if bounded_recovery
+        else ""
+    )
     markup = f'''<!doctype html>
 <html lang="de">
   <head>
@@ -613,10 +651,11 @@ def render_shell(root: Path = ROOT, locale: str = FALLBACK_LOCALE) -> str:
         </div>
       </section>
 
-      <section id="static-catalog-fallback" class="static-catalog-fallback" tabindex="-1" aria-labelledby="static-catalog-fallback-title" data-static-catalog-fallback>
+      <section id="static-catalog-fallback" class="static-catalog-fallback" tabindex="-1" aria-labelledby="static-catalog-fallback-title" data-static-catalog-fallback{f' data-recovery-page-size="{RECOVERY_PAGE_SIZE}"' if bounded_recovery else ''}>
         <p class="kicker">Textansicht</p>
         <h1 id="static-catalog-fallback-title">Commonworld-Katalog</h1>
         <p>Der vollständige lineare Katalog bleibt hier erreichbar, während die interaktive Ansicht lädt oder nicht verfügbar ist.</p>
+{recovery_pagination}
         <div class="catalog-grid">
 {fallback_cards}
         </div>
@@ -626,6 +665,19 @@ def render_shell(root: Path = ROOT, locale: str = FALLBACK_LOCALE) -> str:
 </html>
 '''
     markup = translate_shell(markup, locale)
+    if normalized == "de":
+        markup = markup.replace(
+            "Der vollständige lineare Katalog bleibt hier erreichbar, während die interaktive Ansicht lädt oder nicht verfügbar ist.",
+            f"Die ersten {len(fallback_records)} Einträge bleiben hier erreichbar, während die interaktive Ansicht lädt oder nicht verfügbar ist. Alle {len(records)} Einträge sind über begrenzte Katalogseiten und einzelne Projektseiten lesbar.",
+        )
+    elif normalized == "en":
+        markup = markup.replace(
+            "The complete linear catalog remains available here while the interactive view is loading or unavailable.",
+            f"The first {len(fallback_records)} entries remain available here while the interactive view is loading or unavailable. All {len(records)} entries are readable through bounded catalog pages and individual project pages.",
+        ).replace(
+            f">Alle {len(records)} Commons in begrenzten Katalogseiten öffnen</a>",
+            f">Open all {len(records)} Commons in bounded catalog pages</a>",
+        )
     commons_noun = interface_static(normalized, "commons", de="Commons", en="Commons", root=root)
     markup = markup.replace(f'>{len(records)} Commons</p>', f'>{len(records)} {html.escape(commons_noun)}</p>')
     markup = expand_language_filter_options(markup, records)

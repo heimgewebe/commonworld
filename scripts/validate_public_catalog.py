@@ -16,6 +16,7 @@ if str(ROOT) not in sys.path:
     sys.path.insert(0, str(ROOT))
 
 from scripts.render_public_shell import presentation_label, public_locations
+from scripts.catalog_recovery import RECOVERY_LOCALES, index_relative_path, page_count
 from scripts.catalog_summary_specificity import (
     SummarySpecificityContractError,
     load_contract as load_summary_specificity_contract,
@@ -114,6 +115,24 @@ def _parse_date(value: object) -> date | None:
         return date.fromisoformat(value)
     except ValueError:
         return None
+
+
+def _recovery_index_projection(
+    root: Path,
+    locale: str,
+    entry_count: int,
+    errors: list[str],
+) -> str:
+    """Read the complete bounded recovery projection for one locale."""
+    pages: list[str] = []
+    for number in range(1, page_count(entry_count) + 1):
+        relative = index_relative_path(locale, number)
+        path = root / relative
+        if not path.is_file():
+            errors.append(f"missing {locale} catalog recovery index page: {relative.as_posix()}")
+            continue
+        pages.append(path.read_text(encoding="utf-8"))
+    return "\n".join(pages)
 
 
 def validate_public_catalog(root: Path = ROOT) -> list[str]:
@@ -406,8 +425,14 @@ def validate_public_catalog(root: Path = ROOT) -> list[str]:
         if missing_seed:
             errors.append(f"public catalog is missing preserved seed identities: {missing_seed}")
 
-    english_shell = shell_path.read_text(encoding="utf-8")
-    german_shell = german_shell_path.read_text(encoding="utf-8") if german_shell_path.is_file() else None
+    landing_shells = {"en": shell_path.read_text(encoding="utf-8")}
+    if german_shell_path.is_file():
+        landing_shells["de"] = german_shell_path.read_text(encoding="utf-8")
+    for locale, shell in landing_shells.items():
+        if './catalog/catalog.json' not in shell:
+            errors.append(f"{locale} public shell must link to the canonical public catalog manifest")
+        if './contracts/commonworld/project.schema.json' not in shell:
+            errors.append(f"{locale} public shell must link to the CommonProject schema")
     localized_records_by_locale = {summary_locale: records}
     for locale in SUPPORTED_LOCALES:
         if locale == summary_locale:
@@ -443,21 +468,18 @@ def validate_public_catalog(root: Path = ROOT) -> list[str]:
     projections = []
     english_records = localized_records_by_locale.get("en")
     if english_records is not None:
-        projections.append(("en", english_shell, english_records))
-    if german_shell is not None:
-        projections.append(("de", german_shell, records))
-    for locale, shell, projected_records in projections:
-        cards = CARD_PATTERN.findall(shell)
+        projections.append(("en", english_records))
+    if "de" in RECOVERY_LOCALES:
+        projections.append(("de", records))
+    for locale, projected_records in projections:
+        projection = _recovery_index_projection(root, locale, len(records), errors)
+        cards = CARD_PATTERN.findall(projection)
         card_ids = [identifier for identifier, _body in cards]
         card_bodies: dict[str, list[str]] = {}
         for identifier, body in cards:
             card_bodies.setdefault(identifier, []).append(body)
         if sorted(card_ids) != sorted(identifiers) or any(card_ids.count(identifier) != 1 for identifier in identifiers):
-            errors.append('public shell card identities must match the public catalog exactly once in the no-JavaScript fallback' if locale == 'en' else 'German public shell card identities must match the public catalog exactly once in the no-JavaScript fallback')
-        if './catalog/catalog.json' not in shell:
-            errors.append(f"{locale} public shell must link to the canonical public catalog manifest")
-        if './contracts/commonworld/project.schema.json' not in shell:
-            errors.append(f"{locale} public shell must link to the CommonProject schema")
+            errors.append(f"{locale} catalog recovery index identities must match the public catalog exactly once")
         for record in projected_records:
             identifier = record.get("id")
             title = record.get("title")
@@ -474,7 +496,7 @@ def validate_public_catalog(root: Path = ROOT) -> list[str]:
             ]
             for value, label in expected_values:
                 if not bodies or any(value not in body for body in bodies):
-                    errors.append(f"public shell is missing {label} for {identifier} in the no-JavaScript projection" if locale == 'en' else f"German public shell is missing {label} for {identifier} in the no-JavaScript projection")
+                    errors.append(f"{locale} catalog recovery index is missing {label} for {identifier}")
 
     return errors
 
