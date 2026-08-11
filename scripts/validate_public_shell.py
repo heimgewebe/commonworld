@@ -74,7 +74,7 @@ REQUIRED_HTML = (
     'id="text-skip-link" class="skip-link" href="/#static-catalog-fallback"',
     'entries remain available here while the interactive view is loading or unavailable.',
     'data-recovery-page-size="24"',
-    'href="/catalog/"',
+    'href="catalog/"',
     'id="project-focus"',
     'href="./catalog/catalog.json"',
     'href="./contracts/commonworld/project.schema.json"',

@@ -380,14 +380,14 @@ def render_shell(root: Path = ROOT, locale: str = FALLBACK_LOCALE) -> str:
     cards = ""
     bounded_recovery = normalized in {"de", "en"}
     fallback_records = records[:RECOVERY_PAGE_SIZE] if bounded_recovery else records
-    recovery_index_url = "/catalog/de/" if normalized == "de" else "/catalog/"
-    recovery_project_prefix = "/catalog/de/projects/" if normalized == "de" else "/catalog/projects/"
+    recovery_index_url = "catalog/de/" if normalized == "de" else "catalog/"
+    recovery_project_prefix = "catalog/de/projects/" if normalized == "de" else "catalog/projects/"
     fallback_cards = render_cards(
         fallback_records,
         interactive=False,
         locale=locale,
         project_page_url=(lambda identifier: f"{recovery_project_prefix}{identifier}.html") if bounded_recovery else None,
-        project_json_url=(lambda identifier: f"/catalog/projects/{identifier}.json") if bounded_recovery else None,
+        project_json_url=(lambda identifier: f"catalog/projects/{identifier}.json") if bounded_recovery else None,
     )
     recovery_pagination = (
         f'        <p class="recovery-pagination"><a href="{recovery_index_url}">'

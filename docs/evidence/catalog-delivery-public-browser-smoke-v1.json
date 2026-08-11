@@ -120,7 +120,7 @@
       "ringAnimationName": "none",
       "ringTransform": "none",
       "ringTextWidth": 671.1126098632812,
-      "ringTextHeight": 14.0108642578125,
+      "ringTextHeight": 14.0111083984375,
       "ringTextFontSize": 22,
       "primaryRingCount": 3,
       "depthRingCount": 2,
@@ -130,18 +130,18 @@
         {
           "text": "Knowledge, Learning and Culture · 11    LibriVox  MusicBrainz  Open Library  Peer 2 Peer Unive…  Safecast  Thailand Citizens…",
           "width": 671.1126098632812,
-          "height": 14.0108642578125,
+          "height": 14.0111083984375,
           "visible": true
         },
         {
           "text": "Communication and Networks · 11    BOSCO Uganda  Freifunk  Freifunk Hamburg  guifi.net  Mastodon  Meshtastic",
-          "width": 331.7405090332031,
-          "height": 518.4586181640625,
+          "width": 331.74072265625,
+          "height": 518.45849609375,
           "visible": true
         },
         {
           "text": "Cooperation and Self-Organization · 5    Bologna Urban Com…  Enspiral  g0v  National Communal…  Park Slope Food C…",
-          "width": 290.16424560546875,
+          "width": 290.16400146484375,
           "height": 579.2286987304688,
           "visible": true
         }
@@ -185,22 +185,22 @@
         "representativePrimaryLabels": [
           {
             "text": "Knowledge, Learning and Culture · 11    LibriVox  MusicBrainz  Open Library  Peer 2 Peer Unive…  Safecast  Thailand Citizens…",
-            "width": 932.1099243164062,
-            "height": 37.663482666015625,
+            "width": 932.106201171875,
+            "height": 39.067970275878906,
             "fontSize": 23.77,
             "visible": true
           },
           {
             "text": "Communication and Networks · 11    BOSCO Uganda  Freifunk  Freifunk Hamburg  guifi.net  Mastodon  Meshtastic",
-            "width": 474.33087158203125,
-            "height": 711.4505004882812,
+            "width": 475.3735046386719,
+            "height": 710.77978515625,
             "fontSize": 23.77,
             "visible": true
           },
           {
             "text": "Cooperation and Self-Organization · 5    Bologna Urban Com…  Enspiral  g0v  National Communal…  Park Slope Food C…",
-            "width": 384.5025939941406,
-            "height": 812.9189453125,
+            "width": 383.0721740722656,
+            "height": 813.5479736328125,
             "fontSize": 23.77,
             "visible": true
           }
@@ -213,15 +213,15 @@
         "primaryStates": [
           {
             "animationName": "sphere-ring-orbit",
-            "transform": "matrix(0.999997, 0.00226109, -0.00226109, 0.999997, 0, 0)"
+            "transform": "matrix(0.999999, 0.00151163, -0.00151163, 0.999999, 0, 0)"
           },
           {
             "animationName": "sphere-ring-orbit",
-            "transform": "matrix(-0.531835, 0.846848, -0.846848, -0.531835, 0, 0)"
+            "transform": "matrix(-0.531201, 0.847246, -0.847246, -0.531201, 0, 0)"
           },
           {
             "animationName": "sphere-ring-orbit",
-            "transform": "matrix(-0.435955, -0.899969, 0.899969, -0.435955, 0, 0)"
+            "transform": "matrix(-0.436756, -0.89958, 0.89958, -0.436756, 0, 0)"
           }
         ],
         "depthStates": [
@@ -276,7 +276,7 @@
     {
       "id": "layer-journey-moveend-return",
       "verdict": "PASS",
-      "elapsedMs": 1582
+      "elapsedMs": 1336
     },
     {
       "id": "layer-journey-missing-moveend-fallback",
@@ -285,9 +285,9 @@
       "movementDiagnostics": [
         {
           "index": 0,
-          "geometryEvaluationDelta": 19,
+          "geometryEvaluationDelta": 20,
           "diagnosticPublishDelta": 6,
-          "sampledEvaluationCount": 18,
+          "sampledEvaluationCount": 19,
           "maxDiagnosticPublishes": 6
         },
         {
@@ -384,8 +384,8 @@
       "verdict": "PASS",
       "blockedCatalogRequests": 0,
       "observedCatalogRequests": [
-        "/releases/f13b9fb179499c0e52dc/catalog/runtime/aggregate.v1.json",
-        "/releases/f13b9fb179499c0e52dc/catalog/runtime/manifest.v1.json"
+        "/releases/a6e9efdca2fa66959cf8/catalog/runtime/aggregate.v1.json",
+        "/releases/a6e9efdca2fa66959cf8/catalog/runtime/manifest.v1.json"
       ]
     },
     {
@@ -485,6 +485,6 @@
       "method-mobile",
       "method-mobile-text-200"
     ],
-    "first_party_surface_sha256": "9335b46078c2062d9faf986c30aaa1a16890b556581a43f985b11d5645b86925"
+    "first_party_surface_sha256": "81d800cb33431a28cde3ffa288a1fc9e43a6785d00f5a07639d0a56b3f21b5ec"
   }
 }

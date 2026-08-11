@@ -21,6 +21,7 @@ from scripts.catalog_recovery import (
     load_records,
     page_count,
     project_relative_path,
+    project_url,
     render_index,
     render_project,
 )
@@ -161,6 +162,11 @@ def validate_catalog_recovery(root: Path = ROOT, *, verify_measurements: bool = 
                 errors.append(f"catalogue recovery project identity mismatch: {relative}")
             if f'/catalog/projects/{identifier}.json' not in markup:
                 errors.append(f"catalogue recovery project lacks canonical JSON link: {relative}")
+            alternate_locale = "de" if locale == "en" else "en"
+            if f'<link rel="canonical" href="{project_url(locale, identifier)}" />' not in markup:
+                errors.append(f"catalogue recovery project canonical locale mismatch: {relative}")
+            if f'<link rel="alternate" hreflang="{alternate_locale}" href="{project_url(alternate_locale, identifier)}" />' not in markup:
+                errors.append(f"catalogue recovery project alternate locale mismatch: {relative}")
             if '"coordinates"' in markup or "<script" in markup.casefold() or "<form" in markup.casefold():
                 errors.append(f"catalogue recovery project violates static privacy boundary: {relative}")
 
@@ -173,7 +179,7 @@ def validate_catalog_recovery(root: Path = ROOT, *, verify_measurements: bool = 
         fallback = markup.split('id="static-catalog-fallback"', 1)[-1]
         if len(CARD_ID_RE.findall(fallback)) != min(PAGE_SIZE, len(records)):
             errors.append(f"bounded landing recovery count mismatch: {page_name}")
-        expected_link = 'href="/catalog/"' if locale == "en" else 'href="/catalog/de/"'
+        expected_link = 'href="catalog/"' if locale == "en" else 'href="catalog/de/"'
         if expected_link not in fallback:
             errors.append(f"bounded landing recovery index link missing: {page_name}")
 

@@ -246,7 +246,7 @@ def render_project(record: dict, locale: str, root: Path = ROOT) -> str:
       <section><h2>{copy_text["sources"]}</h2><ul>{source_markup}</ul></section>
       <p><a href="/catalog/projects/{html.escape(identifier, quote=True)}.json" type="application/json">{copy_text["json"]}</a></p>
     </main>'''
-    canonical = f"/catalog/projects/{identifier}.html"
+    canonical = project_url(locale, identifier)
     return _document(
         locale=locale,
         title=f'{record["title"]} — Commonworld',

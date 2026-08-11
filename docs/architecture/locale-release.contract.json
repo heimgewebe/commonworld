@@ -102,7 +102,7 @@
       "translation_pack": "wave_1",
       "release_evidence": {
         "path": "docs/evidence/locale-releases/es.json",
-        "sha256": "a017b256a2601b44a215bacd7f296c201d745c8f6372dfc4f0ea820442c07bf0"
+        "sha256": "32a01e9ac6ab74627604ff2d55b8931c0eb79c6bfd2db51fefd4663a2afcce1e"
       }
     },
     "fr": {
@@ -118,7 +118,7 @@
       "translation_pack": "wave_1",
       "release_evidence": {
         "path": "docs/evidence/locale-releases/fr.json",
-        "sha256": "e4f0261097a2452c3bcaa52d9c6e9719dc95cd446614ac50c232458e70077211"
+        "sha256": "7981d3b92e14bb01a3a8e1c1e9a10ba63004f6063e448a9633a0de31e6c7e879"
       }
     },
     "pt-BR": {
@@ -134,7 +134,7 @@
       "translation_pack": "wave_1",
       "release_evidence": {
         "path": "docs/evidence/locale-releases/pt-BR.json",
-        "sha256": "47539e7d63aba0bb106299af9850ca9fa8420c2388c16add41a0dd47834733c1"
+        "sha256": "fb8b6f0561f39a624dc0311c712b82c0364c25a47796e6703de8ca55d9824403"
       }
     },
     "ar": {
@@ -150,7 +150,7 @@
       "translation_pack": "wave_1",
       "release_evidence": {
         "path": "docs/evidence/locale-releases/ar.json",
-        "sha256": "a1b2022d74450115e6d2298133dda97ead9173908d140d608ae30a2dfcabb857"
+        "sha256": "3944b597c005d57ef081981e7ac9abc815f4c469aaaeb83f02c60e35a80c6dff"
       }
     },
     "zh-Hans": {
@@ -166,7 +166,7 @@
       "translation_pack": "wave_1",
       "release_evidence": {
         "path": "docs/evidence/locale-releases/zh-Hans.json",
-        "sha256": "847a6ad396405870786aded269ed850d47eca81fdc6fb6e43ec04374aa9ca087"
+        "sha256": "569a3940405f4a35a82ae0a46a611fc28511dfde566c460479d07855d73f05db"
       }
     },
     "hi": {
