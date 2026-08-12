@@ -2,8 +2,8 @@
   "schema_version": 2,
   "kind": "commonworld.ui_locale_independent_language_review_receipt",
   "status": "passed",
-  "reviewed_revision": "1e7e9be4ca01d30a96f2516a36278e3dcd2c8a92",
-  "reviewed_source_pack_sha256": "c2bc4c17138b29e9d45a4a8a082a95aaa59c7e925b17b4020ac74c3690f29274",
+  "reviewed_revision": "d41899d572426824174b8333547714e903526eaa",
+  "reviewed_source_pack_sha256": "d449f5b6a564c859be9142d737ad768020a8ee472f18026e3d3cbb092ec54648",
   "locale_verdicts": {
     "es": {
       "status": "passed",
@@ -69,6 +69,41 @@
         "section_key": "static.candidate_notice",
         "problem": "The Arabic translation contains an extraneous translator's note about needing RTL and mixed-script review ('وإلى مراجعة اتجاه RTL والنصوص المختلطة.') which was added to the public-facing string. This must be removed.",
         "exact_replacement": "معاينة ترجمة. لم تُفعَّل هذه اللغة بعد؛ وما تزال تحتاج إلى مراجعة لغوية مستقلة."
+      },
+      {
+        "locale": "fr",
+        "severity": "major",
+        "section_key": "themes.care",
+        "problem": "Incremental care-theme review finding on Soins",
+        "resolution": "replaced; clinical/service-care narrowing removed"
+      },
+      {
+        "locale": "pt-BR",
+        "severity": "minor",
+        "section_key": "themes.care",
+        "problem": "Incremental care-theme review finding on Cuidado",
+        "resolution": "Cuidado e apoio; standalone caution ambiguity removed"
+      },
+      {
+        "locale": "zh-Hans",
+        "severity": "major",
+        "section_key": "themes.care",
+        "problem": "Incremental care-theme review finding on 照护",
+        "resolution": "关怀; nursing/long-term-care narrowing removed"
+      },
+      {
+        "locale": "fr",
+        "severity": "minor",
+        "section_key": "themes.care",
+        "problem": "Incremental care-theme review finding on Prendre soin",
+        "resolution": "replaced; verb-phrase/CTA taxonomy form removed"
+      },
+      {
+        "locale": "fr",
+        "severity": "minor",
+        "section_key": "themes.care",
+        "problem": "Incremental care-theme review finding on Attention et soin",
+        "resolution": "Soutien et bienveillance; attention ambiguity and soin/care-work overlap removed"
       }
     ],
     "final_findings": []
@@ -126,6 +161,25 @@
       ],
       "limitations": "Model-assisted review; does not constitute native or human language approval.",
       "confidence": "high"
+    },
+    "care-theme-2026-08-12": {
+      "review_class": "model_assisted_independent_language_review",
+      "reviewed_revision": "d41899d572426824174b8333547714e903526eaa",
+      "source_pack_sha256": "d449f5b6a564c859be9142d737ad768020a8ee472f18026e3d3cbb092ec54648",
+      "locale_verdicts": {
+        "es": "PASS",
+        "fr": "PASS",
+        "pt-BR": "PASS",
+        "ar": "PASS",
+        "zh-Hans": "PASS"
+      },
+      "findings": [],
+      "source_receipt": {
+        "path": "docs/evidence/locale-reviews/raw/care-theme-final-pass-2026-08-12.json",
+        "sha256": "6248ddd96923a0168e7723d51a468d90d0c903e09fc6bc546ee84ace97343d04"
+      },
+      "limitations": "Model-assisted review; does not constitute native or human approval.",
+      "confidence": "medium"
     }
   },
   "raw_sources": [
@@ -236,5 +290,18 @@
       "Model-assisted independent review; no native-speaker or human language approval is claimed.",
       "The prior 88 entries were carried forward by exact machine comparison, not re-reviewed linguistically in this batch."
     ]
+  },
+  "incremental_ui_review": {
+    "key": "themes.care",
+    "verdict": "pass",
+    "reviewed_revision": "d41899d572426824174b8333547714e903526eaa",
+    "review_binding_revision": "2907c13f1a4854c9b7f3960984dc7f27ec90ed84",
+    "reviewed_source_pack_sha256": "d449f5b6a564c859be9142d737ad768020a8ee472f18026e3d3cbb092ec54648",
+    "source_receipt": {
+      "path": "docs/evidence/locale-reviews/raw/care-theme-final-pass-2026-08-12.json",
+      "sha256": "6248ddd96923a0168e7723d51a468d90d0c903e09fc6bc546ee84ace97343d04"
+    },
+    "final_review_receipt_sha256": "6c450ab8a95beb0b69c17ef4ea100fd714fb31a1fd2b7624bc9e2a58fdae6add",
+    "claims_native_or_human_review": false
   }
 }
