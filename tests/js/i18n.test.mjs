@@ -142,6 +142,14 @@ test('every catalog theme has an explicit label in every rendered UI locale', ()
   }
 });
 
+test('broad care labels stay distinct from care-work labels in every released locale', () => {
+  for (const locale of RELEASED_LOCALES) {
+    assert.equal(hasThemeLabel('care', locale), true, `${locale}:care`);
+    assert.equal(hasThemeLabel('care-work', locale), true, `${locale}:care-work`);
+    assert.notEqual(themeLabel('care', locale), themeLabel('care-work', locale), locale);
+  }
+});
+
 test('Theme labels are localized in both public locales instead of leaking raw keys', () => {
   assert.equal(themeLabel('open-data', 'en'), 'Open data');
   assert.equal(themeLabel('open-data', 'de'), 'Offene Daten');
