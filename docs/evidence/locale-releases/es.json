@@ -3,14 +3,14 @@
   "kind": "commonworld.ui_locale_release_evidence",
   "locale": "es",
   "status": "released",
-  "source_revision": "5ddf6d62c197dee19aa3e174362bb9a538706d37",
+  "source_revision": "f5d9a7dddf1f2f8f8421d87c5147326e8353b27d",
   "source_pack_sha256": "50870199c595890466640f09f5767b01ff9f997ce65623f7fea300c6d3f39746",
   "reviewed_source_pack_sha256": "d449f5b6a564c859be9142d737ad768020a8ee472f18026e3d3cbb092ec54648",
   "catalog_overlay_sha256": "8d145707c3dfc55d1ca42206d73928445e42af5fa05db9065a0b7923811b0e87",
   "surface_sha256": {
-    "index": "7f5d9eec7bf8915153d2078f361069653c36479880c1618a04f9e361fb03b0a8",
-    "method": "1b5dabc618b184313fac41ebb75295cccc7b1d3097ae35dda5b1be92750e145f",
-    "proposal": "d21ae9843c4f1802b3ab484016c6eacc5df08293e4d2d62ccb61b7622da10223"
+    "index": "bb8a3a2fba7ee390d4e99803fef683d41c517bd774ae79883ed020d4b07d3169",
+    "method": "92332440619977cfd970dc1eef3d6a850683d22659ff897367271e158fad22fd",
+    "proposal": "183fb9f1f461a2694501d753e11ac9555a2eb48e2030d25fef1feeb3effa4b50"
   },
   "gate_results": {
     "required_surfaces_passed": [
@@ -22,7 +22,7 @@
       "runtime_labels",
       "text"
     ],
-    "translation_coverage_ratio": 1,
+    "translation_coverage_ratio": 1.0,
     "untranslated_ui_markers": 0,
     "missing_runtime_keys": 0,
     "machine_translation_only": false,
@@ -40,15 +40,15 @@
     },
     "keyboard_and_screen_reader_review": {
       "source": "docs/evidence/locale-releases/receipts/shared/keyboard-and-screen-reader-review.json",
-      "sha256": "e7a4e1581cd14af70a76b9c8a12f26c15602ac86e0e3a89c34873a1aa1de34fb"
+      "sha256": "3ac5cd5e9f3f9a614b2d90c682b895dd0cd307a08f6cf910c4a5622432b25f88"
     },
     "browser_smoke": {
       "source": "docs/evidence/locale-releases/receipts/shared/browser-smoke.json",
-      "sha256": "e4a20041b0f7863790516492a2638a790e601c5b07ba089641b8f9fdce341ff2"
+      "sha256": "90cc30e2490719fc48713b6ac7bebb46e212b92a530f5d646b03df95d760a5a2"
     },
     "state_preservation_smoke": {
       "source": "docs/evidence/locale-releases/receipts/shared/state-preservation-smoke.json",
-      "sha256": "28e6156c739180d201a6021b131c5504c65d162d9b2f4c546f4d530d28a110b6"
+      "sha256": "921432d11bdf41aa54573ade8fc1842b673d70c665f5d8c4ba65085611294465"
     }
   },
   "review_class": {
@@ -60,5 +60,5 @@
     "findings_based": true,
     "post_fix_review_required": true
   },
-  "notes": "91-entry release rebound to the final 2026-08-12 digest-bound language and browser review chain, including the distinct broad-care taxonomy label. Automated browser/accessibility/state/RTL evidence passed; model-assisted language review passed without claiming native-speaker, human language or full WCAG approval."
+  "notes": "91-entry compact release rebound to the final digest-bound language and 15-page browser/accessibility/state review chain. Bootstrap source links use localized host-based UI labels while full project evidence retains editorial source labels. Model-assisted language review passed; no native-speaker, human language or full WCAG approval is claimed."
 }
