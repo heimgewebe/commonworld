@@ -1,15 +1,26 @@
 {
-  "schema_version": 1,
+  "schema_version": 2,
   "kind": "commonworld_incremental_ui_language_review_input",
-  "source_revision": "aa8574fbe53f3d84d601361c0e1e86e11b7e4a3a",
+  "source_revision": "4c31df3ffc0714940ca74fd0a80a92ec91756d67",
   "writer": "GPT-5.6 Sol via ChatGPT",
-  "reviewed_source_pack_sha256": "7fbf4da049ad2a83efdc3586003a509b5f2ef8398256dc6b7aac9c08336ca66a",
+  "review_round": "post-fix",
+  "prior_review_receipt_sha256": "6783c615a69f6d2ba52ee54345db165cab1fd35bfe3c08f0b74ee5e88edc4cee",
+  "reviewed_source_pack_sha256": "07d19a34cdabd974f1c210f16bcdd3d2e70aee0fa20d230bbcbbd5df6a556472",
   "scope": {
     "key": "themes.care",
-    "semantic_distinction": "Broad care, social-support and caring activity; distinct from the existing narrower care-work theme.",
+    "recheck_locales": [
+      "fr",
+      "pt-BR",
+      "zh-Hans"
+    ],
+    "unchanged_pass_locales": [
+      "es",
+      "ar"
+    ],
+    "semantic_distinction": "Broad care, social-support and caring activity; distinct from the narrower care-work theme and not limited to clinical/health care.",
     "catalog_context": {
       "project_id": "green-coop-japan",
-      "evidence_context": "Member-led cooperative network with shared social-support, environmental and mutual-aid infrastructures; care is an additional social/caring axis, not a synonym for care-work and not limited to clinical healthcare."
+      "evidence_context": "Member-led cooperative network with shared social-support, environmental and mutual-aid infrastructures."
     },
     "canonical": {
       "en": "Care",
@@ -17,15 +28,32 @@
     },
     "targets": {
       "es": "Cuidados",
-      "fr": "Soins",
-      "pt-BR": "Cuidado",
+      "fr": "Prendre soin",
+      "pt-BR": "Cuidado e apoio",
       "ar": "الرعاية",
-      "zh-Hans": "照护"
+      "zh-Hans": "关怀"
+    },
+    "care_work_contrast": {
+      "es": "Trabajo de cuidados",
+      "fr": "Travail de soin",
+      "pt-BR": "Trabalho de cuidado",
+      "ar": "أعمال الرعاية",
+      "zh-Hans": "护理工作"
     }
   },
-  "carry_forward": {
-    "basis": "Wave-1 payloads are unchanged except the addition of themes.care; catalog overlay review evidence is separate and unchanged.",
-    "previous_reviewed_source_pack_sha256": "c2bc4c17138b29e9d45a4a8a082a95aaa59c7e925b17b4020ac74c3690f29274"
+  "changes_since_prior_review": {
+    "fr": {
+      "before": "Soins",
+      "after": "Prendre soin"
+    },
+    "pt-BR": {
+      "before": "Cuidado",
+      "after": "Cuidado e apoio"
+    },
+    "zh-Hans": {
+      "before": "照护",
+      "after": "关怀"
+    }
   },
   "review_contract": {
     "review_kind": "model_assisted_independent_language_review",
@@ -33,12 +61,11 @@
     "must_not_claim_native_speaker_or_human_review": true,
     "pass_requires_no_blocker_major_or_minor_findings": true,
     "check": [
+      "resolution of prior findings",
       "semantic fidelity to broad care",
-      "distinction from care-work",
-      "idiomatic standalone taxonomy label",
-      "consistency with each language register",
-      "Arabic script integrity",
-      "Simplified Chinese terminology"
+      "explicit distinction from care-work using supplied contrast labels",
+      "standalone taxonomy usability",
+      "Arabic and Simplified Chinese integrity where relevant"
     ]
   }
 }
