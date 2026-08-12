@@ -1,11 +1,14 @@
 {
-  "schema_version": 2,
+  "schema_version": 3,
   "kind": "commonworld_incremental_catalog_language_review_input",
-  "source_revision": "07439b3b6070fcfd21f1f2b497e7bcbc3feea952",
+  "source_revision": "8731b8618efb1c33c2c0998dc48cdf6c66fd14c7",
   "base_revision": "9dc98f9dabab9769bf4f4c43d885f229529d77c0",
   "writer": "GPT-5.6 Sol via ChatGPT",
-  "review_round": "post-fix",
-  "prior_review_receipt_sha256": "ffd20a4a52a9333788a4109601403146ea6fdfa7130d3cd94ae04e386186f409",
+  "review_round": "post-fix-2",
+  "prior_review_receipts_sha256": [
+    "ffd20a4a52a9333788a4109601403146ea6fdfa7130d3cd94ae04e386186f409",
+    "cffc9cc8f9751fc72561f34564884c977ae4dc142945481900d0c8900e69dde7"
+  ],
   "scope": {
     "new_project_ids": [
       "samoa-community-based-fisheries-management-program",
@@ -25,7 +28,10 @@
       "digital_label"
     ],
     "prior_reviewed_entries_carried_forward": 88,
-    "new_entries_to_review_per_locale": 3
+    "new_entries_to_review_per_locale": 3,
+    "recheck_locales": [
+      "pt-BR"
+    ]
   },
   "carry_forward_proof": {
     "es": {
@@ -44,7 +50,7 @@
       "prior_project_count": 88,
       "prior_objects_unchanged": true,
       "comparison_base_revision": "9dc98f9dabab9769bf4f4c43d885f229529d77c0",
-      "current_locale_file_sha256": "90b5019b6885718919690a9314a392635186f1da860388250daeb5c573f6ec38"
+      "current_locale_file_sha256": "78c63b96552ec3df7a92e2a7fbfe08c373ea99da20e1dac2268b10ef90564ba4"
     },
     "ar": {
       "prior_project_count": 88,
@@ -158,7 +164,7 @@
     },
     "pt-BR": {
       "samoa-community-based-fisheries-management-program": {
-        "summary": "Uma infraestrutura de bens comuns em Samoa na qual mais de 120 comunidades costeiras desenvolvem e executam seus próprios planos de gestão pesqueira, regulamentos comunitários e reservas de pesca administradas localmente, com apoio técnico da autoridade pesqueira nacional de Samoa.",
+        "summary": "Uma infraestrutura de bens comuns em Samoa na qual mais de 120 comunidades costeiras desenvolvem e executam seus próprios planos de gestão pesqueira e regulamentos comunitários, e administram reservas de pesca sob governança local, com apoio técnico da autoridade pesqueira nacional de Samoa.",
         "geographic_labels": {
           "samoa-cbfmp-villages": "Samoa — comunidades costeiras participantes"
         },
@@ -244,6 +250,5 @@
       "bangladesh-palli-bidyut-samities": "80 rural electricity cooperatives; consumer-members elect boards; local distribution infrastructure; binding Rural Electrification Board framework; official information is publicly available.",
       "green-coop-japan": "16 member-led consumer cooperatives; about 432,000 member households; shared supply/social/environment/mutual-aid infrastructure; participation and co-governance are membership-bound; members jointly develop and use the infrastructures."
     }
-  },
-  "binding_note": "source_revision is the frozen content/build commit; the review-packet commit changes only this review-input artifact."
+  }
 }
