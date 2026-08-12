@@ -99,6 +99,12 @@ class CatalogDeliveryBudgetTests(unittest.TestCase):
             all('handoff' not in record for record in bootstrap_records),
             'compact bootstrap must omit non-interactive handoff metadata',
         )
+        sources = [source for record in bootstrap_records for source in record.get('provenance', {}).get('sources', [])]
+        self.assertTrue(sources)
+        self.assertTrue(
+            all(set(source) == {'url'} and source['url'].startswith('https://') for source in sources),
+            'compact bootstrap must retain source links without editorial source-label text',
+        )
         relations = [relation for record in bootstrap_records for relation in record.get('relations', [])]
         self.assertGreater(len(relations), 0)
         self.assertTrue(all(set(relation) == {'target_id', 'type', 'evidenced'} for relation in relations))

@@ -500,7 +500,7 @@ function canonicalSearchAlias(record) {
     record?.presence?.digital?.label,
     ...locations.map((location) => location?.label),
     ...links.map((link) => link?.label),
-    ...sources.map((source) => source?.label)
+    ...sources.map((source) => source?.label ?? hostLabel(source?.url ?? ''))
   ].filter(Boolean).join(' ');
 }
 
@@ -533,14 +533,20 @@ function localizeLink(link, locale, contentLocale) {
 function localizeSource(source, contentLocale, index) {
   const host = hostLabel(source?.url ?? '');
   const canonicalLabel = String(source?.label ?? '').trim();
+  const normalized = normalizeLocale(contentLocale);
+  const hasLocalizedSourceNoun = normalized === 'de'
+    || normalized === 'en'
+    || typeof WAVE1_LOCALE_PACKS[normalized]?.ui?.source === 'string';
+  const generatedLabelLocale = hasLocalizedSourceNoun ? normalized : 'en';
+  const generatedLabel = `${text(generatedLabelLocale, 'source', 'Quelle')} ${index + 1} · ${host}`;
   return {
     ...source,
-    ...(contentLocale === 'en' ? {
-      label: canonicalLabel ? `${canonicalLabel} · ${host}` : `${text('en', 'source', 'Quelle')} ${index + 1} · ${host}`,
-    } : {}),
-    // Provenance labels are canonical source/original text. Their language is
-    // intentionally unknown unless the label itself is generated as interface text.
-    _label_locale: canonicalLabel ? null : (contentLocale === 'en' ? 'en' : null),
+    ...(canonicalLabel
+      ? (contentLocale === 'en' ? { label: `${canonicalLabel} · ${host}` } : {})
+      : { label: generatedLabel }),
+    // Canonical provenance labels remain original-source text. Compact-bootstrap
+    // labels are generated UI text and therefore carry their actual UI language.
+    _label_locale: canonicalLabel ? null : generatedLabelLocale,
   };
 }
 
@@ -564,7 +570,7 @@ export function localizeCatalogRecords(records, locale = DEFAULT_LOCALE) {
       provenance: record.provenance ? {
         ...record.provenance,
         sources: Array.isArray(record.provenance.sources)
-          ? record.provenance.sources.map((source) => ({ ...source, _label_locale: null }))
+          ? record.provenance.sources.map((source, index) => localizeSource(source, contentLocale, index))
           : record.provenance.sources,
       } : record.provenance,
     }));

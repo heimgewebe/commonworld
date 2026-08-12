@@ -7,7 +7,7 @@ import copy
 BOOTSTRAP_OMITTED_FIELDS = frozenset({"handoff"})
 CURATION_BOOTSTRAP_FIELDS = ("state", "catalogued_at", "reviewed_at", "next_review_at")
 ACTIVITY_BOOTSTRAP_FIELDS = ("status", "observed_at")
-SOURCE_BOOTSTRAP_FIELDS = ("label", "url")
+SOURCE_BOOTSTRAP_FIELDS = ("url",)
 LINK_BOOTSTRAP_FIELDS = ("type", "label", "url")
 RELATION_BOOTSTRAP_FIELDS = ("target_id", "type")
 
