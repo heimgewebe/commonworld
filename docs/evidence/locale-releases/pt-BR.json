@@ -3,14 +3,14 @@
   "kind": "commonworld.ui_locale_release_evidence",
   "locale": "pt-BR",
   "status": "released",
-  "source_revision": "8731b8618efb1c33c2c0998dc48cdf6c66fd14c7",
-  "source_pack_sha256": "8a2cdbb679bb4e6a35ac409d1368ec47724c3e39ebff740197619447f05655d4",
-  "reviewed_source_pack_sha256": "c2bc4c17138b29e9d45a4a8a082a95aaa59c7e925b17b4020ac74c3690f29274",
+  "source_revision": "5ddf6d62c197dee19aa3e174362bb9a538706d37",
+  "source_pack_sha256": "50870199c595890466640f09f5767b01ff9f997ce65623f7fea300c6d3f39746",
+  "reviewed_source_pack_sha256": "d449f5b6a564c859be9142d737ad768020a8ee472f18026e3d3cbb092ec54648",
   "catalog_overlay_sha256": "78c63b96552ec3df7a92e2a7fbfe08c373ea99da20e1dac2268b10ef90564ba4",
   "surface_sha256": {
-    "index": "a2ee1b36895b97314b7ca87ab99bfbde5090e4bd66bc5a193e6d6dcfd4860347",
-    "method": "a14e64abd3485d753a24f2283cf92ca4906b1074c50bb6fd4bbd718d9d2e3dee",
-    "proposal": "cc551e8348401452f19aacb4a204a68095e6aca48b7592ce402d8815cdc6f0a9"
+    "index": "9dc5be368f92ca072634e1c1b490780d6cea845c554b9c88d6cab4d68da7a632",
+    "method": "f8b1a34ae42f5f40245cd251291b711639bd221e311d201195d1b20933ca0ebf",
+    "proposal": "c4127f00b23e560d48757e85c9cf1ae925d39a8b8411dfe65a6ec2a8797f804b"
   },
   "gate_results": {
     "required_surfaces_passed": [
@@ -36,19 +36,19 @@
   "evidence_receipts": {
     "independent_language_review": {
       "source": "docs/evidence/locale-releases/receipts/shared/independent-language-review.json",
-      "sha256": "657e126db1955241856e6c8c7b8e9c8457ed646208eed4df5cb563c0225a6ab1"
+      "sha256": "c4330923d48bd07b23f68e906295d2be68aadb36afe11c7a1c3e4cbbdc7ef13b"
     },
     "keyboard_and_screen_reader_review": {
       "source": "docs/evidence/locale-releases/receipts/shared/keyboard-and-screen-reader-review.json",
-      "sha256": "1cc320802eb7a989b8bf19712e49a8bb8b25fa067af3bdedefd7dac64c5ed6fb"
+      "sha256": "e7a4e1581cd14af70a76b9c8a12f26c15602ac86e0e3a89c34873a1aa1de34fb"
     },
     "browser_smoke": {
       "source": "docs/evidence/locale-releases/receipts/shared/browser-smoke.json",
-      "sha256": "b06c63e9a4f11e1d3a4e6749b5f5ccbaea80f31560ace8bd61c2fba6dd18f7ab"
+      "sha256": "e4a20041b0f7863790516492a2638a790e601c5b07ba089641b8f9fdce341ff2"
     },
     "state_preservation_smoke": {
       "source": "docs/evidence/locale-releases/receipts/shared/state-preservation-smoke.json",
-      "sha256": "8957addacf0d106976f8a1e0bd5fe053665d3f4a53c30359aa4924fcc150b9fc"
+      "sha256": "28e6156c739180d201a6021b131c5504c65d162d9b2f4c546f4d530d28a110b6"
     }
   },
   "review_class": {
@@ -60,5 +60,5 @@
     "findings_based": true,
     "post_fix_review_required": true
   },
-  "notes": "91-entry catalog overlay rebound to the 2026-08-12 incremental independent review chain. Three new Commons per locale passed findings-based post-fix review; prior 88 objects were proven unchanged. Model-assisted independent review; native/human language approval is not claimed."
+  "notes": "91-entry release rebound to the final 2026-08-12 digest-bound language and browser review chain, including the distinct broad-care taxonomy label. Automated browser/accessibility/state/RTL evidence passed; model-assisted language review passed without claiming native-speaker, human language or full WCAG approval."
 }
