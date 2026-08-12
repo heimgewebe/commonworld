@@ -1,7 +1,7 @@
 {
   "schema_version": 2,
   "kind": "commonworld_incremental_catalog_language_review_input",
-  "source_revision": "d3539729fcd0b6c60da23eaff2c4cdaf74ce49aa",
+  "source_revision": "07439b3b6070fcfd21f1f2b497e7bcbc3feea952",
   "base_revision": "9dc98f9dabab9769bf4f4c43d885f229529d77c0",
   "writer": "GPT-5.6 Sol via ChatGPT",
   "review_round": "post-fix",
@@ -244,5 +244,6 @@
       "bangladesh-palli-bidyut-samities": "80 rural electricity cooperatives; consumer-members elect boards; local distribution infrastructure; binding Rural Electrification Board framework; official information is publicly available.",
       "green-coop-japan": "16 member-led consumer cooperatives; about 432,000 member households; shared supply/social/environment/mutual-aid infrastructure; participation and co-governance are membership-bound; members jointly develop and use the infrastructures."
     }
-  }
+  },
+  "binding_note": "source_revision is the frozen content/build commit; the review-packet commit changes only this review-input artifact."
 }
