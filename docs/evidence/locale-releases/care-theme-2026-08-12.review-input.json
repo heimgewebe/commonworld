@@ -1,34 +1,33 @@
 {
-  "schema_version": 2,
+  "schema_version": 3,
   "kind": "commonworld_incremental_ui_language_review_input",
-  "source_revision": "4c31df3ffc0714940ca74fd0a80a92ec91756d67",
+  "source_revision": "4b29d81e986dff9088b2e10966e4426e9a654081",
   "writer": "GPT-5.6 Sol via ChatGPT",
-  "review_round": "post-fix",
-  "prior_review_receipt_sha256": "6783c615a69f6d2ba52ee54345db165cab1fd35bfe3c08f0b74ee5e88edc4cee",
-  "reviewed_source_pack_sha256": "07d19a34cdabd974f1c210f16bcdd3d2e70aee0fa20d230bbcbbd5df6a556472",
+  "review_round": "fr-final",
+  "prior_review_receipts_sha256": [
+    "6783c615a69f6d2ba52ee54345db165cab1fd35bfe3c08f0b74ee5e88edc4cee",
+    "890ad3038fac3ef50802166ece9d1ffea2b6715b9a8fbe154bcc2768a3c57c42"
+  ],
+  "reviewed_source_pack_sha256": "41bf978f4c2fffaa6a0c6fbefcbd57b0816eb1c6e5488ba9d553c9ec31587f2e",
   "scope": {
     "key": "themes.care",
     "recheck_locales": [
-      "fr",
+      "fr"
+    ],
+    "carried_forward_pass_locales": [
+      "es",
       "pt-BR",
+      "ar",
       "zh-Hans"
     ],
-    "unchanged_pass_locales": [
-      "es",
-      "ar"
-    ],
-    "semantic_distinction": "Broad care, social-support and caring activity; distinct from the narrower care-work theme and not limited to clinical/health care.",
-    "catalog_context": {
-      "project_id": "green-coop-japan",
-      "evidence_context": "Member-led cooperative network with shared social-support, environmental and mutual-aid infrastructures."
-    },
+    "semantic_distinction": "Broad care, social-support and caring activity; distinct from narrower care-work and not limited to clinical/health care.",
     "canonical": {
       "en": "Care",
       "de": "Fürsorge"
     },
     "targets": {
       "es": "Cuidados",
-      "fr": "Prendre soin",
+      "fr": "Attention et soin",
       "pt-BR": "Cuidado e apoio",
       "ar": "الرعاية",
       "zh-Hans": "关怀"
@@ -43,16 +42,8 @@
   },
   "changes_since_prior_review": {
     "fr": {
-      "before": "Soins",
-      "after": "Prendre soin"
-    },
-    "pt-BR": {
-      "before": "Cuidado",
-      "after": "Cuidado e apoio"
-    },
-    "zh-Hans": {
-      "before": "照护",
-      "after": "关怀"
+      "before": "Prendre soin",
+      "after": "Attention et soin"
     }
   },
   "review_contract": {
@@ -61,11 +52,10 @@
     "must_not_claim_native_speaker_or_human_review": true,
     "pass_requires_no_blocker_major_or_minor_findings": true,
     "check": [
-      "resolution of prior findings",
-      "semantic fidelity to broad care",
-      "explicit distinction from care-work using supplied contrast labels",
-      "standalone taxonomy usability",
-      "Arabic and Simplified Chinese integrity where relevant"
+      "resolution of prior French standalone-label minor",
+      "broad nonclinical care meaning",
+      "nominal taxonomy usability",
+      "clear distinction from care-work"
     ]
   }
 }
