@@ -3,14 +3,14 @@
   "kind": "commonworld.ui_locale_release_evidence",
   "locale": "es",
   "status": "released",
-  "source_revision": "1e7e9be4ca01d30a96f2516a36278e3dcd2c8a92",
+  "source_revision": "8731b8618efb1c33c2c0998dc48cdf6c66fd14c7",
   "source_pack_sha256": "8a2cdbb679bb4e6a35ac409d1368ec47724c3e39ebff740197619447f05655d4",
   "reviewed_source_pack_sha256": "c2bc4c17138b29e9d45a4a8a082a95aaa59c7e925b17b4020ac74c3690f29274",
-  "catalog_overlay_sha256": "de1638df4c7f4b71aaab644c28e7739a699f3d914f49cfa09b205885a5f1ec36",
+  "catalog_overlay_sha256": "8d145707c3dfc55d1ca42206d73928445e42af5fa05db9065a0b7923811b0e87",
   "surface_sha256": {
-    "index": "81cfb50b62a719c9eb74ccec25d2ce0f7bd8725a60bf6e89c02dba4d37fd163e",
-    "method": "f876fb6d99a9b8d6f40cc980a0169a18a6d2ac25deb84fc1a276ba1925ef57a5",
-    "proposal": "97d1dc38053fa6ec7ec5f6e96600e830826de87876ac79a73a1fb30a7a54441e"
+    "index": "8fa097046e216973c02324b6b3739be9e7247de9a7ace9e53a76260b806b6bc5",
+    "method": "10de27e28a2c9778f26f0ce0c289b36d35f3f1d030d49164f47d4d398408af2b",
+    "proposal": "e2c62c1a21adbe7864334500805b26c9d47476c25b32ad2f36537f5d12788f62"
   },
   "gate_results": {
     "required_surfaces_passed": [
@@ -36,7 +36,7 @@
   "evidence_receipts": {
     "independent_language_review": {
       "source": "docs/evidence/locale-releases/receipts/shared/independent-language-review.json",
-      "sha256": "8ec8b8e2455d7c310235fe49911487f1c97a92916865ad9e6656cc9d98d4b4bb"
+      "sha256": "657e126db1955241856e6c8c7b8e9c8457ed646208eed4df5cb563c0225a6ab1"
     },
     "keyboard_and_screen_reader_review": {
       "source": "docs/evidence/locale-releases/receipts/shared/keyboard-and-screen-reader-review.json",
@@ -60,5 +60,5 @@
     "findings_based": true,
     "post_fix_review_required": true
   },
-  "notes": "Digest-bound PR #204 post-fix language review retained; surface digests rebound after the T028 recovery-only build. Reviewed translations, source pack and receipt claims are unchanged. Model-assisted independent review; native/human language approval and full WCAG conformance are not claimed."
+  "notes": "91-entry catalog overlay rebound to the 2026-08-12 incremental independent review chain. Three new Commons per locale passed findings-based post-fix review; prior 88 objects were proven unchanged. Model-assisted independent review; native/human language approval is not claimed."
 }

@@ -165,14 +165,16 @@
   ],
   "catalog_review": {
     "review_kind": "model_assisted_independent_language_review",
-    "reviewer": "GPT-5.6 Sol independent post-fix release review via ChatGPT",
-    "writer_independence": "independent_from_grok_4_5_writer",
+    "reviewer": "Claude Opus 5 via Grabowski independent review",
+    "writer": "GPT-5.6 Sol via ChatGPT",
+    "writer_independence": "independent_from_catalog_translation_writer",
+    "reviewed_revision": "8731b8618efb1c33c2c0998dc48cdf6c66fd14c7",
     "input_digests": {
-      "es": "de1638df4c7f4b71aaab644c28e7739a699f3d914f49cfa09b205885a5f1ec36",
-      "fr": "c58061ed7f34dce421898b2894026aeafec56c41c32cb488a2ceb6cbf9a0875b",
-      "pt-BR": "d016bbf890ad12d59ab9004c2b47e88595d76c9d426dfceec07a1e50f5042ddc",
-      "ar": "ee4d37a7f75174099408a5191863440a9c8bd40475a1f05e59537c25c44ccaf2",
-      "zh-Hans": "a9d7af6799f51c36c83dda3799ddf58fddd67af73da542b9d87e2aa8541638db"
+      "es": "8d145707c3dfc55d1ca42206d73928445e42af5fa05db9065a0b7923811b0e87",
+      "fr": "9ef30f1dc4da4a090dd77c257daf48b901183a703722710dfcc1fddd771faf22",
+      "pt-BR": "78c63b96552ec3df7a92e2a7fbfe08c373ea99da20e1dac2268b10ef90564ba4",
+      "ar": "1f912e9eb06d75f42a5606397a20bb4eec8b20f2d642cd5fe9bfaadb775f15cb",
+      "zh-Hans": "808cf1efa5e15aaf2de61a09082ba9b28615a50c1316700f9b8416fbe853e7cd"
     },
     "coverage": {
       "locales": [
@@ -182,53 +184,57 @@
         "ar",
         "zh-Hans"
       ],
-      "project_count_per_locale": 88,
+      "project_count_per_locale": 91,
       "all_entries_reviewed": true,
-      "basis": "prior_digest_bound_review_plus_zh_hans_pr204_post_fix_review",
-      "full_review_source": "docs/evidence/locale-reviews/raw/catalog-wave1-zh-hans-independent-final-pass-2026-08-10.json"
+      "basis": "prior_digest_bound_full-corpus review for 88 unchanged entries plus independent three-entry review chain with fail-closed post-fix closure",
+      "full_review_source": "docs/evidence/locale-reviews/raw/catalog-commons-batch-independent-final-pass-2026-08-12.json"
     },
     "verdict": "pass",
     "counts": {
       "blocker": 0,
       "major": 0,
       "minor": 0,
-      "note": 1
+      "note": 0
     },
     "findings": [],
     "review_notes": [
-      "The prior es/fr/pt-BR/ar review remains valid because all four catalog overlay digests are unchanged.",
-      "PR #204 found two Simplified Chinese terminology defects; both are fixed and regression-tested.",
-      "The full zh-Hans corpus received a post-fix review; no blocker, major, or minor findings remain. Native-speaker approval is not claimed."
+      "All five target overlays contain 91 projects. The prior 88 project objects are byte-semantically unchanged by exact JSON object comparison against origin/main.",
+      "Three new entries per locale were independently reviewed; zh-Hans and pt-BR findings were fixed and independently re-reviewed to PASS.",
+      "Model-assisted review only; native-speaker/human approval is not claimed."
     ],
     "source_receipts": [
       {
-        "path": "docs/evidence/locale-reviews/raw/catalog-wave1-independent-codex-final-pass-2026-08-08.json",
-        "sha256": "6756a78ad888e4c484fa89befb05113c62fe5044c3a8803cdfb7cbd83d5b3bd8",
-        "role": "prior_wave1_full_corpus_release_review"
-      },
-      {
-        "path": "docs/evidence/locale-reviews/raw/catalog-wave1-zh-hans-independent-final-pass-2026-08-10.json",
-        "sha256": "04a4fca1a3796de7cfb5dd2a68bb1d962070e1c3799fa0f4ffe0e133afb52f62",
-        "role": "zh_hans_pr204_post_fix_full_corpus_review"
+        "path": "docs/evidence/locale-reviews/raw/catalog-commons-batch-independent-final-pass-2026-08-12.json",
+        "sha256": "2e4dd8d88c4cd7fcf6ce1d1dfe753ed1f7505378ba2215f9369694ea04e3e448",
+        "role": "commons_batch_incremental_independent_review_chain"
       }
     ],
     "resolved_findings": [
       {
-        "severity": "P2",
-        "project": "open-food-network-australia",
+        "locale": "zh-Hans",
+        "project": "bangladesh-palli-bidyut-samities",
+        "severity": "minor",
         "field": "summary",
-        "before": "简短…供应链",
-        "after": "一个澳大利亚非营利社区和开源平台，使生产者和食品倡议能够组织短供应链，并确保供应链透明且由社区控制。",
-        "resolution": "corrected short/local supply-chain terminology; post-fix review passed"
+        "resolution": "cooperative board terminology corrected from 董事会 to 理事会 and post-fix review passed"
       },
       {
-        "severity": "P2",
-        "project": "the-things-network",
-        "field": "geographic_labels.the-things-network-global-communities",
-        "before": "门户",
-        "after": "当地社区和网关的全球网络",
-        "resolution": "corrected LoRaWAN gateway terminology; post-fix review passed"
+        "locale": "zh-Hans",
+        "project": "samoa-community-based-fisheries-management-program",
+        "severity": "minor",
+        "field": "summary",
+        "resolution": "fish-reserve clause received its own compatible verb phrase and post-fix review passed"
+      },
+      {
+        "locale": "pt-BR",
+        "project": "samoa-community-based-fisheries-management-program",
+        "severity": "minor",
+        "field": "summary",
+        "resolution": "fish reserves separated from executar coordination; final pt-BR re-review passed"
       }
+    ],
+    "limitations": [
+      "Model-assisted independent review; no native-speaker or human language approval is claimed.",
+      "The prior 88 entries were carried forward by exact machine comparison, not re-reviewed linguistically in this batch."
     ]
   }
 }
