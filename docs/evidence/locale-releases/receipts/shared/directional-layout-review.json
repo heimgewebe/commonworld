@@ -1,12 +1,12 @@
 {
   "schema_version": 1,
-  "source_revision": "5ddf6d62c197dee19aa3e174362bb9a538706d37",
+  "source_revision": "f5d9a7dddf1f2f8f8421d87c5147326e8353b27d",
   "source_pack_sha256": "50870199c595890466640f09f5767b01ff9f997ce65623f7fea300c6d3f39746",
   "reviewed_source_pack_sha256": "d449f5b6a564c859be9142d737ad768020a8ee472f18026e3d3cbb092ec54648",
-  "release_id": "0265540170f06c363c71",
+  "release_id": "3c318d27f5fc89ee3b7f",
   "raw_source": {
     "path": "docs/evidence/locale-reviews/raw/released-browser-lifecycle-smoke-2026-08-12.json",
-    "sha256": "50585fbbba5245825b459ea8c13d1fd6d3e28c4c4d7aebb074f13751e3555afc"
+    "sha256": "050253e5ee590f826945bf2ed64c13e9088f14a7aec0d27d71994c8e64039eb9"
   },
   "locales": [
     "es",
