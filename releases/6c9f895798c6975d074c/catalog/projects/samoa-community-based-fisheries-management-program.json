@@ -1,0 +1,95 @@
+{
+  "schema_version": 4,
+  "id": "samoa-community-based-fisheries-management-program",
+  "title": "Samoa Community-Based Fisheries Management Program",
+  "summary": "Ein von Samoas Fischereibehörde unterstützter Commons-Verbund, in dem mehr als 120 Küstendörfer eigene Fischereimanagementpläne, Dorfrechte und Fischreservate für lokal genutzte Meeresressourcen tragen.",
+  "themes": [
+    "fisheries",
+    "marine-conservation",
+    "commons-governance",
+    "customary-governance",
+    "community-ownership",
+    "biodiversity"
+  ],
+  "actions": [
+    "learn"
+  ],
+  "presence": {
+    "geographic": [
+      {
+        "id": "samoa-cbfmp-villages",
+        "mode": "hidden",
+        "label": "Samoa – teilnehmende Küstendörfer",
+        "privacy_note": "Das Programm umfasst zahlreiche dorfbezogene Fischerei- und Schutzräume. Commonworld rekonstruiert weder Dorflagen noch Reservatsgrenzen, Fanggründe oder Überwachungsräume aus Programmdaten.",
+        "source_ids": [
+          "samoa-cbfmp-maf"
+        ]
+      }
+    ],
+    "digital": {
+      "available": true,
+      "reach": "network",
+      "label": "Öffentliche Programminformationen und aktuelle Berichte zu dorfgetragenem Fischereimanagement",
+      "source_ids": [
+        "samoa-cbfmp-maf",
+        "samoa-cbfmp-sprep-2026"
+      ]
+    }
+  },
+  "activity": {
+    "status": "active",
+    "observed_at": "2026-08-12",
+    "source_ids": [
+      "samoa-cbfmp-maf",
+      "samoa-cbfmp-sprep-2026"
+    ],
+    "note": "Die offizielle Fischereiseite führt das CBFMP mit mehr als 120 teilnehmenden Küstendörfern; im Juni 2026 starteten weitere 15 Dörfer eigene Fischereimanagementpläne."
+  },
+  "provenance": {
+    "sources": [
+      {
+        "id": "samoa-cbfmp-maf",
+        "type": "official-source",
+        "label": "Samoa Ministry of Agriculture and Fisheries – Fisheries / CBFMP",
+        "url": "https://maf.gov.ws/fisheries/",
+        "retrieved_at": "2026-08-12",
+        "note": "Primärquelle für dorfgetragene Verantwortung, Managementpläne, village bylaws, Fischreservate und den Umfang von mehr als 120 teilnehmenden Küstendörfern."
+      },
+      {
+        "id": "samoa-cbfmp-sprep-2026",
+        "type": "official-source",
+        "label": "PIPAP / SPREP – Samoa: 15 villages launch fisheries plans",
+        "url": "https://pipap.sprep.org/news/samoa-15-villages-launch-fisheries-plans",
+        "retrieved_at": "2026-08-12",
+        "note": "Regional-offizieller aktueller Beleg vom 15. Juni 2026 für 15 neu gestartete Village Fisheries Management Plans und lokales Monitoring."
+      }
+    ],
+    "uncertainty_note": "Katalogisiert wird das Programm als Commons-Infrastruktur für viele eigenständige dorfgetragene Fischerei-Commons, nicht als Eigentümer eines einzigen landesweiten Ressourcenraums."
+  },
+  "curation": {
+    "state": "listed",
+    "catalogued_at": "2026-08-12",
+    "reviewed_by": "Commonworld editorial review",
+    "reviewed_at": "2026-08-12",
+    "next_review_at": "2026-11-12",
+    "notes": "Als Commons-Infrastruktur aufgenommen: Die eigentliche Regelsetzung und Verantwortung liegt laut Primärquelle bei den teilnehmenden Dorfgemeinschaften; die Fischereibehörde unterstützt technisch."
+  },
+  "links": [
+    {
+      "type": "homepage",
+      "label": "Samoa Fisheries – Community Based Fisheries Management Program",
+      "url": "https://maf.gov.ws/fisheries/"
+    },
+    {
+      "type": "learn",
+      "label": "Dorfgetragenes Fischereimanagement in Samoa kennenlernen",
+      "url": "https://maf.gov.ws/fisheries/",
+      "source_ids": [
+        "samoa-cbfmp-maf"
+      ]
+    }
+  ],
+  "handoff": {
+    "enabled": false
+  }
+}
