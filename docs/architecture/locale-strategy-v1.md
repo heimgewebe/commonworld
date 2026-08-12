@@ -83,6 +83,7 @@ A candidate locale becomes released and selectable only when all of the followin
 - right-to-left locales additionally pass directional layout and mixed-script review;
 - machine-only raw translation remains forbidden;
 - independent language review has passed; this review may be model-assisted only when it is labeled as such, kept independent of the writer, digest-bound, findings-based and followed by a fail-closed post-fix review;
+- review evidence must describe writer/reviewer independence generically; historical model names are evidence metadata, never a permanent release-policy requirement;
 - native or human polish may remain an explicit follow-up and must not be claimed by model-assisted review alone.
 
 A language is therefore either released, a hidden technical candidate, or planned. There is no publicly selectable “mostly translated” state. Promotion of every non-baseline locale requires a revision- and SHA-256-bound release-evidence artifact with independent receipts; candidate evidence alone can never satisfy that gate.

@@ -244,6 +244,39 @@ class LocaleReleaseContractTests(unittest.TestCase):
         self.assertTrue(any("fallback_locale must be released" == error for error in errors))
 
 
+
+    def test_catalog_review_writer_independence_is_identity_agnostic_and_fail_closed(self) -> None:
+        from scripts.validate_locale_release import _catalog_review_is_independent
+
+        self.assertTrue(
+            _catalog_review_is_independent(
+                {"writer_independence": "independent_from_grok_4_5_writer"}
+            )
+        )
+        self.assertTrue(
+            _catalog_review_is_independent(
+                {
+                    "writer_independence": "independent_from_catalog_translation_writer",
+                    "writer": "GPT-5.6 Sol via ChatGPT",
+                    "reviewer": "Claude Opus 5 via Claude Pro",
+                }
+            )
+        )
+        self.assertFalse(
+            _catalog_review_is_independent(
+                {
+                    "writer_independence": "independent_from_catalog_translation_writer",
+                    "writer": "same-agent",
+                    "reviewer": "same-agent",
+                }
+            )
+        )
+        self.assertFalse(
+            _catalog_review_is_independent(
+                {"writer_independence": "independent_from_catalog_translation_writer"}
+            )
+        )
+
     def test_release_evidence_scaffold_stays_pending_without_passed_receipts(self) -> None:
         from scripts.generate_locale_release_evidence import build_scaffold
 
