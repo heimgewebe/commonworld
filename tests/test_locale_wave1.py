@@ -216,7 +216,7 @@ class LocaleWave1PackTests(unittest.TestCase):
                         self.assertIsInstance(value, str)
                         self.assertTrue(value.strip())
                         self.assertIsNone(BIDI_CONTROL_RE.search(value))
-        for locale in (tag for tag in WAVE1_LOCALES if tag not in {"ar", "zh-Hans"}):
+        for locale in (tag for tag in WAVE1_LOCALES if tag not in {"ar", "zh-Hans", "hi"}):
             text = " ".join(
                 value
                 for section, values in self.packs[locale].items()
@@ -225,6 +225,14 @@ class LocaleWave1PackTests(unittest.TestCase):
             )
             self.assertNotRegex(text, r"[\u0600-\u06ff]", f"{locale} contains Arabic-script contamination")
             self.assertNotRegex(PLACEHOLDER_RE.sub("", text), r"(?i)\bnext\b", f"{locale} contains raw English UI leakage")
+        hindi_text = " ".join(
+            value
+            for section, values in self.packs["hi"].items()
+            if section != "meta"
+            for value in values.values()
+        )
+        self.assertRegex(hindi_text, r"[\u0900-\u097f]", "Hindi locale must contain Devanagari")
+        self.assertNotRegex(hindi_text, r"[\u0600-\u06ff]", "Hindi locale contains Arabic-script contamination")
         arabic_text = " ".join(
             value
             for section, values in self.packs["ar"].items()
@@ -271,6 +279,11 @@ class LocaleWave1PackTests(unittest.TestCase):
                                 self.assertTrue(
                                     "CJK UNIFIED IDEOGRAPH" in unicode_name or "LATIN" in unicode_name,
                                     f"unexpected script in Simplified Chinese locale: {unicode_name}",
+                                )
+                            elif locale == "hi":
+                                self.assertTrue(
+                                    "DEVANAGARI" in unicode_name or "LATIN" in unicode_name,
+                                    f"unexpected script in Hindi locale: {unicode_name}",
                                 )
                             else:
                                 self.assertFalse(
@@ -381,6 +394,13 @@ class LocaleWave1PackTests(unittest.TestCase):
         self.assertEqual(locales["zh-Hans"]["shell"]["shell_001"], '<html lang="zh-Hans">')
         self.assertEqual(locales["zh-Hans"]["method"]["method_001"], '<html lang="zh-Hans">')
         self.assertEqual(locales["zh-Hans"]["proposal"]["proposal_001"], '<html lang="zh-Hans">')
+        self.assertEqual(locales["hi"]["themes"]["energy"], "ऊर्जा")
+        self.assertEqual(locales["hi"]["static"]["effective_language"], "वर्तमान भाषा: हिन्दी")
+        self.assertEqual(locales["hi"]["shell"]["shell_001"], '<html lang="hi">')
+        self.assertEqual(locales["hi"]["method"]["method_001"], '<html lang="hi">')
+        self.assertEqual(locales["hi"]["method"]["method_011"], "प्रत्येक प्रविष्टि का एक स्थायी")
+        self.assertTrue(locales["hi"]["method"]["method_012"].startswith(" होता है, प्रथम कैटलॉग"))
+        self.assertEqual(locales["hi"]["proposal"]["proposal_001"], '<html lang="hi">')
         self.assertNotIn("الفلاتر", "\n".join(locales["ar"]["shell"].values()))
         self.assertNotIn("principal-proxima", locales["pt-BR"]["proposal"]["proposal_058"])
         self.assertNotIn("commoning", locales["pt-BR"]["method"]["method_014"])
@@ -405,6 +425,18 @@ class LocaleWave1PackTests(unittest.TestCase):
         self.assertIn("网关", gateway_label)
         self.assertNotIn("门户", gateway_label)
 
+    def test_hindi_catalog_terminology_regressions(self) -> None:
+        overlay = json.loads((ROOT / "catalog/locales/hi.json").read_text(encoding="utf-8"))
+        projects = overlay["projects"]
+        self.assertIn("कॉमन्स के रूप में", projects["guifi-net"]["summary"])
+        self.assertIn("सामुदायिक संरक्षण क्षेत्रों", projects["namibia-communal-conservancies-alliance"]["summary"])
+        self.assertIn("एसेकिया नहरें", projects["new-mexico-acequia-association"]["geographic_labels"]["nmaa-acequias"])
+        self.assertIn("गेटवे", projects["the-things-network"]["geographic_labels"]["the-things-network-global-communities"])
+        self.assertEqual(overlay["taxonomy_labels"]["open_knowledge_data"], "खुला ज्ञान और डेटा")
+        serialized = json.dumps(overlay, ensure_ascii=False)
+        for fragment in ("सांप्रदायिक रूढ़िवादिता", " लंगर", "डेटा खोलें"):
+            self.assertNotIn(fragment, serialized)
+
     def test_language_quality_regressions_and_action_parity(self) -> None:
         forbidden = {
             "es": (
@@ -426,6 +458,11 @@ class LocaleWave1PackTests(unittest.TestCase):
             "ar": (
                 ">تكرار</option>", "مسألة علنية على GitHub", "فهرس الكتالوج",
                 "الكرة الرقمية لـ Commonworld",
+            ),
+            "hi": (
+                "अस्तबल", "रिपॉजिटरी कमेटी", "अच्छा साझा किया", "भण्डारीपन",
+                ">कॉमन्स< खोजें", "इंच {label}", "हार्डवेयर खोलें", "मीडिया खोलें",
+                "सेवन पथ", "GitHub अंक", "मैक्रोरेगियन", "सुझाव रखें",
             ),
         }
         shell_actions = {

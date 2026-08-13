@@ -1,0 +1,64 @@
+{
+  "schema_version": 2,
+  "kind": "commonworld.ui_locale_release_evidence",
+  "locale": "hi",
+  "status": "released",
+  "source_revision": "582c33e9228e0d5ea70b7cef4222c74438d267d1",
+  "source_pack_sha256": "06e4c5c150bdf33e63d1becf47ef1f90f0b51a1d24b76725f44ff37ce07302f7",
+  "reviewed_source_pack_sha256": "cf57400b0a0fbf818baa88f33001e95bc4c7c39bd00caef3505f4d9ab6c0f405",
+  "catalog_overlay_sha256": "f7caff51645156ab365994a80d463f944e096d8608e4c9497addfbbe20fb8ea3",
+  "surface_sha256": {
+    "index": "4291b0d9b4e2242ca430a78421d4414177e70542bbf25e455a6fcf9269882f0d",
+    "method": "2bf7d241c05720c55d46bfa893ac4a8270b69e6e8f23f565a57586f0e285029f",
+    "proposal": "91b3d67b6de8c9a59247f65b24a8f10903fa0c610406a190b470b07d2ce7ecbc"
+  },
+  "gate_results": {
+    "required_surfaces_passed": [
+      "catalog_localization",
+      "globe",
+      "metadata_and_navigation",
+      "method",
+      "proposal",
+      "runtime_labels",
+      "text"
+    ],
+    "translation_coverage_ratio": 1.0,
+    "untranslated_ui_markers": 0,
+    "missing_runtime_keys": 0,
+    "machine_translation_only": false,
+    "independent_language_review_passed": true,
+    "keyboard_and_screen_reader_review_passed": true,
+    "browser_smoke_passed": true,
+    "state_preservation_smoke_passed": true,
+    "directional_layout_review": "not_required",
+    "mixed_script_review": "not_required"
+  },
+  "evidence_receipts": {
+    "independent_language_review": {
+      "source": "docs/evidence/locale-releases/receipts/shared/independent-language-review.json",
+      "sha256": "a0185b5507bf33d97ba45fff02aa5e4b1722cd8ca8563413aea7453502ac2517"
+    },
+    "keyboard_and_screen_reader_review": {
+      "source": "docs/evidence/locale-releases/receipts/shared/keyboard-and-screen-reader-review.json",
+      "sha256": "c42ee638fcb267cdf568b4335412e4949c730478d3e19546b48726181d3aa38e"
+    },
+    "browser_smoke": {
+      "source": "docs/evidence/locale-releases/receipts/shared/browser-smoke.json",
+      "sha256": "85c4061761ec99ce600da6ec6851144d4a4adf6ca76e1c6c9e0b5f8f78f3d040"
+    },
+    "state_preservation_smoke": {
+      "source": "docs/evidence/locale-releases/receipts/shared/state-preservation-smoke.json",
+      "sha256": "4de6e569f4ef5c1adaaf1f517244b3404f1628a479ba65a9b651c71f5ed59cf2"
+    }
+  },
+  "review_class": {
+    "machine_translation_only": false,
+    "independent_of_writer": true,
+    "model_assisted_editorial_review": true,
+    "claims_native_or_human_review": false,
+    "digest_bound": true,
+    "findings_based": true,
+    "post_fix_review_required": true
+  },
+  "notes": "91-entry catalog localization bound to the six-locale Wave-1 pack, public release 198fb9ef7729c615232c, and fresh 18-page browser/accessibility/state lifecycle evidence. Language review is model-assisted and digest-bound; no native-speaker, human language, manual screen-reader, manual visual or full WCAG approval is claimed."
+}

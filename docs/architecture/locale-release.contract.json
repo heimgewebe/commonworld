@@ -10,7 +10,8 @@
       "fr",
       "pt-BR",
       "ar",
-      "zh-Hans"
+      "zh-Hans",
+      "hi"
     ],
     "default_locale": "en",
     "fallback_locale": "de",
@@ -102,7 +103,7 @@
       "translation_pack": "wave_1",
       "release_evidence": {
         "path": "docs/evidence/locale-releases/es.json",
-        "sha256": "d6e2809f34a264f9b16cf3b380369d20d24e0d26e4273a0478642c7e8076d8b7"
+        "sha256": "b0a28bc4222e7aa12de5626a1626cabfd5c3fb475a7bdd6810a2b46c10724fe6"
       }
     },
     "fr": {
@@ -118,7 +119,7 @@
       "translation_pack": "wave_1",
       "release_evidence": {
         "path": "docs/evidence/locale-releases/fr.json",
-        "sha256": "cdc8cbdfe8cceefc59c216dd2bf07fb2cf5c035b4bc0ab745fc263b4a2f8a33e"
+        "sha256": "96b363f1a79e0cd628cbf600ababf1380bd50f87a51cbb162a3a549167e69550"
       }
     },
     "pt-BR": {
@@ -134,7 +135,7 @@
       "translation_pack": "wave_1",
       "release_evidence": {
         "path": "docs/evidence/locale-releases/pt-BR.json",
-        "sha256": "e96703f233898d2357468436e4b400674f342fd15e2427ca298c7d55ef283eae"
+        "sha256": "8a00fb61969e92a06cc7db568b91980596c62f9c2000275b8da45a7a23b3115a"
       }
     },
     "ar": {
@@ -150,7 +151,7 @@
       "translation_pack": "wave_1",
       "release_evidence": {
         "path": "docs/evidence/locale-releases/ar.json",
-        "sha256": "1075e7313b153238898cccff0c8bdd0488a3cef8d59509d13b25774c68744eb9"
+        "sha256": "2abf0d2e3892382e260bb9c81c86d974934d52c43a8721e668228ce459123a5c"
       }
     },
     "zh-Hans": {
@@ -166,14 +167,24 @@
       "translation_pack": "wave_1",
       "release_evidence": {
         "path": "docs/evidence/locale-releases/zh-Hans.json",
-        "sha256": "9cafc95d5c77accaad7fba8e14d9b1abebffea95256eee98c8cc3fc50cdd5a4c"
+        "sha256": "e7db4d71e58d999e8a59d80907a6a38232e3b4a3fb80525fa8a7cdb839da0617"
       }
     },
     "hi": {
-      "status": "planned",
+      "status": "released",
       "direction": "ltr",
       "native_name": "हिन्दी",
-      "english_name": "Hindi"
+      "english_name": "Hindi",
+      "surface_files": {
+        "index": "hi.html",
+        "method": "method.hi.html",
+        "proposal": "propose.hi.html"
+      },
+      "translation_pack": "wave_1",
+      "release_evidence": {
+        "path": "docs/evidence/locale-releases/hi.json",
+        "sha256": "94c9e5c39ee3440fe7689ca9eace00e0ce8b1a5beab82d421b39e27cf5510c1b"
+      }
     },
     "id": {
       "status": "planned",
@@ -194,10 +205,10 @@
       "fr",
       "pt-BR",
       "ar",
-      "zh-Hans"
+      "zh-Hans",
+      "hi"
     ],
     "wave_2": [
-      "hi",
       "id",
       "ja"
     ],

@@ -36,6 +36,8 @@ const WAVE1_LOCALES = Object.freeze(
 // Backward-compatible alias while callers migrate from candidate-only naming.
 const CANDIDATES = WAVE1_LOCALES;
 const CANDIDATE_SOURCE = WAVE1_SOURCE;
+const WAVE1_LOCALE_TAGS = Object.freeze(WAVE1_LOCALES.map(({ locale }) => locale));
+const BASELINE_LOCALE_TAGS = Object.freeze([...(LOCALE_RELEASE_CONTRACT.decision?.baseline_locales ?? ['en', 'de'])]);
 
 function assert(condition, message) {
   if (!condition) throw new Error(message);
@@ -431,7 +433,7 @@ try {
           }));
         }
       }
-      const state = await page.evaluate(() => ({
+      const state = await page.evaluate(({ wave1LocaleTags, baselineLocaleTags }) => ({
         lang: document.documentElement.lang,
         dir: document.documentElement.dir,
         robots: document.querySelector('meta[name="robots"]')?.content ?? '',
@@ -450,10 +452,10 @@ try {
           .filter(Boolean),
         candidateChoices: [...document.querySelectorAll('[data-locale-choice]')]
           .map((node) => node.getAttribute('data-locale-choice'))
-          .filter((value) => ['es', 'fr', 'pt-BR', 'ar'].includes(value)),
+          .filter((value) => wave1LocaleTags.includes(value)),
         releasedChoices: [...document.querySelectorAll('[data-locale-choice]')]
           .map((node) => node.getAttribute('data-locale-choice'))
-          .filter((value) => ['en', 'de'].includes(value)),
+          .filter((value) => baselineLocaleTags.includes(value)),
         documentWidth: document.documentElement.scrollWidth,
         viewportWidth: document.documentElement.clientWidth,
         englishContentBlocks: document.querySelectorAll('[lang="en"]').length,
@@ -468,7 +470,7 @@ try {
         naturalTextDirections: [...document.querySelectorAll('input[type="text"], input[type="search"], textarea')].map((node) => getComputedStyle(node).direction),
         structuredInputDirections: [...document.querySelectorAll('input[type="url"], input[type="email"], input[type="tel"], input[type="number"]')].map((node) => getComputedStyle(node).direction),
         rtlTextPluginStatus: document.querySelector('.globe-stage')?.dataset.rtlTextPlugin ?? '',
-      }));
+      }), { wave1LocaleTags: WAVE1_LOCALE_TAGS, baselineLocaleTags: BASELINE_LOCALE_TAGS });
       assert(state.lang === candidate.locale, `${pageName}: lang drifted to ${state.lang}`);
       assert(state.dir === candidate.direction, `${pageName}: dir drifted to ${state.dir}`);
       const isCandidate = candidate.status === 'candidate';
@@ -544,8 +546,8 @@ try {
         const releasedChoices = [...new Set(state.releasedChoices)].sort();
         if (isCandidate) {
           // Candidate previews expose Wave-1 links as technical previews, not public selection.
-          assert(JSON.stringify(wave1Choices) === JSON.stringify(['ar', 'es', 'fr', 'pt-BR']), `${pageName}: Wave-1 locale choices drifted`);
-          assert(JSON.stringify(releasedChoices) === JSON.stringify(['de', 'en']), `${pageName}: released locale choices drifted`);
+          assert(JSON.stringify(wave1Choices) === JSON.stringify([...WAVE1_LOCALE_TAGS].sort()), `${pageName}: Wave-1 locale choices drifted`);
+          assert(JSON.stringify(releasedChoices) === JSON.stringify([...BASELINE_LOCALE_TAGS].sort()), `${pageName}: released locale choices drifted`);
         } else {
           // After promotion, Wave-1 languages join released selection without preview status.
           const allChoices = [...new Set(state.allChoices)].sort();
