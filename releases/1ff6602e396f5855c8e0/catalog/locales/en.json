@@ -1,0 +1,651 @@
+{
+  "schema_version": 1,
+  "locale": "en",
+  "fallback_locale": "de",
+  "contract": {
+    "kind": "presentation_translation_overlay",
+    "rule": "Translations may replace presentation text only. Canonical ids, URLs, geometry, provenance, activity, curation and publication state remain authoritative in catalog/projects/*.json."
+  },
+  "taxonomy_labels": {
+    "sphere": "Digital Commons Sphere",
+    "knowledge_learning_culture": "Knowledge, Learning and Culture",
+    "software_tools_production": "Software, Tools and Production",
+    "communication_networks": "Communication and Networks",
+    "provision_land_ecology": "Provision, Land and Ecology",
+    "cooperation_self_organization": "Cooperation and Self-Organization",
+    "unclassified_future_theme": "Unclassified New Themes",
+    "open_knowledge_data": "Open Knowledge and Data",
+    "learning_education": "Learning and Education",
+    "media_culture": "Media, Archives and Culture",
+    "knowledge_learning_bridge": "Knowledge and Learning Bridge",
+    "free_software": "Free Software and Infrastructure",
+    "open_hardware_production": "Open Hardware and Production",
+    "shared_platforms_tools": "Platforms and Shared Tools",
+    "knowledge_software_bridge": "Data and Software Bridge",
+    "community_networks": "Community Networks",
+    "federated_protocols": "Federation and Protocols",
+    "network_coordination": "Networked Coordination",
+    "food_seed_agriculture": "Seeds, Food and Agriculture",
+    "water_irrigation": "Water and Irrigation",
+    "renewable_energy": "Renewable Energy",
+    "health_software": "Open Health Care",
+    "land_ecology": "Land, Urban Green and Ecology",
+    "food_distribution_platforms": "Food Platforms",
+    "energy_cooperatives": "Energy Cooperatives",
+    "watershed_food_systems": "Water and Food Systems",
+    "cooperative_governance": "Community Governance and Cooperatives",
+    "civic_technology": "Civic Tech and Self-Organization",
+    "mutual_local_self_help": "Neighbourhoods and Mutual Aid"
+  },
+  "projects": {
+    "acofop-peten-community-forests": {
+      "title": "ACOFOP – Community Forests of Petén",
+      "summary": "A network run by peasant and Indigenous organisations in Petén connecting community forest concessions in the Maya Biosphere Reserve through democratic representation, territorial protection, fire control, restoration and sustainable forest use.",
+      "geographic_labels": {
+        "acofop-peten-region": "Petén, Guatemala — broad regional anchor"
+      }
+    },
+    "aflaj-irrigation-systems-oman": {
+      "title": "Aflaj Irrigation Systems of Oman",
+      "summary": "Living community-managed irrigation systems in Oman that allocate water by time shares and are sustained through shared maintenance, rules and local financing.",
+      "geographic_labels": {
+        "aflaj-oman-serial-area": "Five aflaj areas in northern Oman"
+      },
+      "digital_label": "UNESCO documentation with descriptions, maps and management information"
+    },
+    "akiba-mashinani-trust": {
+      "summary": "A financing instrument run by settlement communities in Kenya that supports savings groups, loans and community-organized projects for housing, sanitation and basic infrastructure.",
+      "geographic_labels": {
+        "akiba-mashinani-trust-approximate-area": "Kenya"
+      }
+    },
+    "arvari-river-parliament": {
+      "summary": "A water institution formed by village communities in the Arvari River catchment to organize shared rules, responsibility and conflict resolution for restoring and using the river.",
+      "geographic_labels": {
+        "arvari-alwar-district-anchor": "Arvari catchment in Alwar district, Rajasthan — broad district anchor",
+        "arvari-water-infrastructure": "Villages, water structures and local use sites in the catchment"
+      }
+    },
+    "auroville": {
+      "summary": "An international township in Tamil Nadu experimenting since 1968 with communal living, ecological practice and alternative social organization; land and assets are legally held through the Auroville Foundation rather than owned individually by residents.",
+      "geographic_labels": {
+        "auroville-township-area": "Auroville near Puducherry, Tamil Nadu, India"
+      }
+    },
+    "bali-subak-system": {
+      "title": "Subak System in Bali",
+      "summary": "A system run by local irrigation communities that distributes water through temples, canals and rice fields and collectively maintains Bali's agricultural landscapes.",
+      "geographic_labels": {
+        "bali-subak-landscapes": "Subak landscapes in Bali, Indonesia"
+      }
+    },
+    "banco-palmas": {
+      "summary": "A community-owned development bank in Conjunto Palmeiras, Fortaleza, connecting solidarity finance, local production and consumption, and a community-managed social currency.",
+      "geographic_labels": {
+        "banco-palmas-fortaleza": "Conjunto Palmeiras in Fortaleza, Ceará, Brazil — approximate city anchor"
+      }
+    },
+    "bangladesh-palli-bidyut-samities": {
+      "summary": "A federation of 80 rural electricity cooperatives in Bangladesh whose consumer-members elect boards and operate local distribution infrastructure within the binding Rural Electrification Board framework.",
+      "geographic_labels": {
+        "bangladesh-pbs-network": "Bangladesh — 80 Palli Bidyut Samities in rural supply areas"
+      },
+      "digital_label": "Publicly available official REB information on the Palli Bidyut Samities, their cooperative structure and their ongoing operation"
+    },
+    "bioleft": {
+      "summary": "A community initiative in Argentina that shares seeds, agronomic knowledge and participatory plant breeding through open agreements among producers, researchers and other participants.",
+      "geographic_labels": {
+        "bioleft-argentina": "Argentina — nationwide context"
+      },
+      "digital_label": "Open seed agreements, knowledge and network communication"
+    },
+    "bologna-urban-commons": {
+      "title": "Bologna Urban Commons",
+      "summary": "A citywide shared-administration infrastructure in which civic groups and the Municipality of Bologna use collaboration pacts to care for, regenerate and use material, immaterial and digital commons for activities in the general interest.",
+      "geographic_labels": {
+        "bologna-citywide-pacts": "Collaboration pacts distributed across Bologna"
+      },
+      "digital_label": "Public dataset and interactive overview of collaboration pacts for urban commons"
+    },
+    "bosco-uganda": {
+      "summary": "A nonprofit community network in northern Uganda connecting rural internet access, community ICT centres, digital education and solar-powered infrastructure.",
+      "geographic_labels": {
+        "bosco-gulu-network-anchor": "Gulu City as a broad anchor for a network across Acholi, Lango and West Nile",
+        "bosco-network-sites": "ICT centres, radio links and local connection sites"
+      },
+      "digital_label": "Community network, ICT centres and digital education across northern Uganda"
+    },
+    "brisbane-tool-library": {
+      "summary": "A fully volunteer-run library of things in Brisbane that lends tools and everyday equipment and promotes repair, reuse and practical skills.",
+      "geographic_labels": {
+        "brisbane-tool-library-brisbane": "Brisbane, Queensland — approximate city anchor"
+      },
+      "digital_label": "Online inventory and reservations as part of the local lending service"
+    },
+    "cano-martin-pena-clt": {
+      "summary": "A community land trust run by eight communities in San Juan that holds public land collectively while residents own their homes and receive long-term protection from displacement.",
+      "geographic_labels": {
+        "cano-martin-pena-san-juan": "Eight communities along Caño Martín Peña, San Juan, Puerto Rico"
+      }
+    },
+    "cecosesola": {
+      "summary": "A Venezuelan network of more than 50 non-profit community organizations connecting food supply, health care, funeral services, finance and production without chains of command, through rotating tasks and consensus-oriented self-management.",
+      "geographic_labels": {
+        "cecosesola-venezuela-network": "Barquisimeto and a network across several Venezuelan states"
+      }
+    },
+    "cltb-le-nid": {
+      "summary": "A housing project by Community Land Trust Brussels with seven homes, a shared room and a semi-public garden in Anderlecht.",
+      "geographic_labels": {
+        "cltb-le-nid-entrance": "121 Rue Verheyden, Anderlecht",
+        "cltb-le-nid-building": "Le Nid building"
+      }
+    },
+    "common-voice": {
+      "title": "Common Voice",
+      "summary": "An open multilingual speech dataset in which language communities contribute recordings, sentences and validations to build freely available data for speech technology.",
+      "geographic_labels": {},
+      "digital_label": "Open speech, text and validation data plus tools for self-organized language communities"
+    },
+    "community-baboon-sanctuary": {
+      "summary": "A publicly registered protected area in Belize whose governance is recorded as local communities and whose management responsibility is held by local committees.",
+      "geographic_labels": {
+        "community-baboon-sanctuary-belize-area": "Belize River Valley, Belize"
+      }
+    },
+    "community-energy-network-new-zealand": {
+      "summary": "A New Zealand network of local citizen-led energy initiatives that connects knowledge, collaboration and community control of renewable-energy and efficiency projects.",
+      "geographic_labels": {
+        "cen-new-zealand": "Aotearoa New Zealand — nationwide network",
+        "cen-member-sites": "Local facilities and member locations"
+      },
+      "digital_label": "Network, knowledge exchange and participation information"
+    },
+    "cooperation-jackson": {
+      "title": "Cooperation Jackson",
+      "summary": "A solidarity-economy network in Jackson, Mississippi, developing worker cooperatives, democratically self-managed enterprises, community-held land, affordable housing and local production infrastructure together.",
+      "geographic_labels": {
+        "cooperation-jackson-west-jackson": "West Jackson, Mississippi, United States"
+      }
+    },
+    "cooperative-home-care-associates": {
+      "summary": "A worker-owned care cooperative in New York combining home care with free training, worker voice and an economic stake for caregivers.",
+      "geographic_labels": {
+        "chca-bronx-metro-anchor": "The Bronx and the New York metropolitan area — broad service-region anchor",
+        "chca-private-care-sites": "Private homes and care assignments"
+      }
+    },
+    "debian": {
+      "summary": "A free operating system with an open package archive, public documentation and worldwide participation.",
+      "geographic_labels": {},
+      "digital_label": "Free operating system and worldwide project infrastructure"
+    },
+    "deccan-development-society": {
+      "summary": "A federation of village associations of Dalit and Indigenous smallholder women in Telangana that collectively organize seeds, dryland farming, food, markets, media and traditional knowledge.",
+      "geographic_labels": {
+        "dds-telangana-region": "Sanghams in Telangana, India"
+      },
+      "digital_label": "Community media and the Sanghams' public video archive"
+    },
+    "edinburgh-tool-library": {
+      "summary": "A community-run and largely volunteer-operated tool library that lends tools, teaches repair and practical skills, and supports local community projects.",
+      "geographic_labels": {
+        "etl-meadowbank": "Meadowbank Tool Library Hub, Edinburgh",
+        "etl-portobello": "Portobello Tool Library, Edinburgh"
+      }
+    },
+    "ekuri-community-forest": {
+      "summary": "A forest collectively owned and managed by the Old and New Ekuri communities in Nigeria's Cross River State, with rules linking conservation, sustainable use and local infrastructure.",
+      "geographic_labels": {
+        "ekuri-cross-river-region": "Ekuri communities, Cross River State, Nigeria"
+      }
+    },
+    "enspiral": {
+      "summary": "A collaborative network originating in Aotearoa New Zealand that develops community-oriented forms of enterprise, shared resources and openly documented tools for decentralized collaboration.",
+      "geographic_labels": {},
+      "digital_label": "Open documentation and collaborative network"
+    },
+    "ethiopia-community-seed-bank-network": {
+      "summary": "A nationwide network of community-run seed banks that connects farmer-maintained varieties, organizes exchange of experience and strengthens farmers’ authority over seed diversity.",
+      "geographic_labels": {
+        "ethiopia-national-network": "Ethiopia — nationwide network"
+      },
+      "digital_label": "Public information from Ethiopia’s Ministry of Agriculture and the FAO Plant Treaty on the community seed bank network"
+    },
+    "fecofun-nepal": {
+      "title": "Federation of Community Forestry Users Nepal",
+      "summary": "A nationwide federation of community forest user groups in Nepal that strengthens local use rights, democratic self-organization, sustainable forest management, knowledge exchange and members' participation in policy.",
+      "geographic_labels": {
+        "fecofun-nepal-network": "Nationwide network of community forest user groups in Nepal"
+      }
+    },
+    "fordhall-organic-farm": {
+      "summary": "A community-owned organic farm in Shropshire whose land is held by a charitable community benefit society with thousands of shareholders and secured for ecological farming, education, public nature access and social programmes.",
+      "geographic_labels": {
+        "fordhall-market-drayton": "Market Drayton, Shropshire — broad locality anchor"
+      }
+    },
+    "freifunk": {
+      "summary": "A non-commercial initiative for free, community-built communication networks and open digital infrastructure.",
+      "geographic_labels": {},
+      "digital_label": "Free community networks and participation information"
+    },
+    "freifunk-hamburg": {
+      "summary": "A local Freifunk community that operates a community-supported digital network in Hamburg and connects participation, open infrastructure and free communication.",
+      "geographic_labels": {
+        "freifunk-hamburg-community-area": "Hamburg community",
+        "freifunk-hamburg-private-routers": "Private home routers"
+      },
+      "digital_label": "Hamburg Freifunk community network and participation information"
+    },
+    "fucvam": {
+      "summary": "Uruguay's federation of mutual-aid housing cooperatives combines collective land ownership, democratic self-management and mutual aid in building and maintaining housing.",
+      "geographic_labels": {
+        "fucvam-uruguay": "Uruguay — nationwide federation",
+        "fucvam-homes": "Individual homes and residents' addresses"
+      }
+    },
+    "g0v": {
+      "summary": "An open civic-tech community from Taiwan that works collaboratively on public problems and publishes results, source code and documentation as freely accessible digital commons.",
+      "geographic_labels": {},
+      "digital_label": "Open civic-tech projects, data and collaborative workspaces"
+    },
+    "gbif": {
+      "summary": "A globally federated biodiversity data infrastructure in which participating countries, organizations, nodes and data publishers jointly provide data, standards and technical services for open biodiversity access and coordinate them through formal governance bodies.",
+      "digital_label": "Federated infrastructure for publishing, discovering, searching and retrieving biodiversity data",
+      "geographic_labels": {}
+    },
+    "granby-four-streets-clt": {
+      "summary": "A resident-led community land trust in Liverpool that secures permanently affordable housing, community spaces, greening and local economic activity in the neighbourhood.",
+      "geographic_labels": {
+        "granby-four-streets-area": "Granby Four Streets, Liverpool"
+      }
+    },
+    "great-lakes-commons": {
+      "title": "Great Lakes Commons",
+      "summary": "An open bioregional network that treats the Great Lakes as a living commons and seeks to strengthen community and Indigenous governance, shared responsibility and long-term water stewardship across political borders.",
+      "geographic_labels": {
+        "great-lakes-bioregion": "Great Lakes bioregion in Canada and the United States"
+      },
+      "digital_label": "Bioregional learning, networking and participation for community water governance"
+    },
+    "green-coop-japan": {
+      "summary": "A member-led federation of 16 consumer cooperatives in Japan in which about 432,000 member households jointly develop and use supply, social-support, environmental and mutual-aid infrastructures; participation and co-governance are membership-bound.",
+      "geographic_labels": {
+        "green-coop-regions": "Japan — 16 regional Green Coop member cooperatives"
+      },
+      "digital_label": "Member information, cooperative principles and public reports on shared activities"
+    },
+    "guifi-net": {
+      "summary": "An open, free and neutral telecommunications network whose infrastructure is built and used collectively as a commons and can be developed further by different participants on equal terms.",
+      "geographic_labels": {
+        "guifi-catalonia-region": "Historic focus in Catalonia",
+        "guifi-private-nodes": "Private and not publicly verified network nodes"
+      },
+      "digital_label": "Digital network governance, documentation and community telecommunications infrastructure"
+    },
+    "hepburn-energy": {
+      "summary": "A member-owned energy cooperative in Australia's Hepburn Shire that operates community wind power and continues to develop its local generation capacity.",
+      "geographic_labels": {
+        "hepburn-energy-approximate-area": "Hepburn Shire, Victoria, Australia"
+      },
+      "digital_label": "Member portal for membership and cooperative shares"
+    },
+    "isle-of-eigg-heritage-trust": {
+      "title": "Isle of Eigg Heritage Trust",
+      "summary": "The Isle of Eigg Heritage Trust owns and manages the island for its residents; four directors elected by the Residents’ Association shape decisions on land, housing, infrastructure, natural heritage and the local electricity grid.",
+      "geographic_labels": {
+        "isle-of-eigg-island": "Isle of Eigg, Scotland — broad island anchor"
+      }
+    },
+    "kawawana": {
+      "title": "Kawawana",
+      "summary": "APCRM and residents from eight villages in central Casamance protect local fish stocks through colour-coded use zones, fishing restrictions, monitoring and patrols under coastal management rights devolved in 2010.",
+      "geographic_labels": {
+        "kawawana-central-casamance": "Central Casamance, Senegal — broad regional anchor"
+      }
+    },
+    "kibera-public-space-project": {
+      "summary": "A growing network of public spaces co-designed and operated with resident groups in Kibera, linking flood resilience, basic services, gathering places and local economic use.",
+      "geographic_labels": {
+        "kibera-public-space-network-area": "Kibera, Nairobi, Kenya"
+      }
+    },
+    "kobulu-community-micro-hydro": {
+      "summary": "A community-managed micro-hydropower system in Kampung Buayan, Sabah, whose local committee organizes consumption tariffs, operator pay, spare parts and future repairs.",
+      "geographic_labels": {
+        "kobulu-penampang-area": "Penampang area, Sabah, Malaysia"
+      },
+      "digital_label": "TONIBUNG project documentation on the technology and community management model"
+    },
+    "lasilo-naples": {
+      "summary": "A public cultural common in Naples whose rooms, artistic production facilities and urban garden are self-governed by an open community through assemblies, thematic working groups and a shared civic-use declaration.",
+      "geographic_labels": {
+        "lasilo-naples-site": "l’Asilo, Vico Giuseppe Maffei 4, Naples"
+      },
+      "digital_label": "Public documentation of shared spaces, self-governance, assemblies and civic use"
+    },
+    "libreoffice": {
+      "summary": "A free and open-source office suite developed, documented and translated by an international community.",
+      "geographic_labels": {},
+      "digital_label": "Free office suite and open participation paths"
+    },
+    "librivox": {
+      "summary": "A worldwide volunteer community that records public-domain texts as freely accessible audiobooks and publishes the recordings without commercial access barriers.",
+      "geographic_labels": {},
+      "digital_label": "Freely accessible audiobook collection produced by volunteers"
+    },
+    "masipag": {
+      "summary": "A farmer-led Philippine network connecting farmer-conserved seeds, agroecological practice, food sovereignty and community development of knowledge.",
+      "geographic_labels": {
+        "masipag-los-banos": "Los Baños, Laguna — public organizational reference"
+      }
+    },
+    "mastodon": {
+      "summary": "Free, open-source and federated social-networking software whose independent servers can communicate with one another.",
+      "geographic_labels": {},
+      "digital_label": "Federated social communication across independent servers"
+    },
+    "meshtastic": {
+      "summary": "An open-source ecosystem for decentralized communication without cellular service or an internet connection, using affordable low-power LoRa devices and providing firmware, protocols and documentation.",
+      "geographic_labels": {},
+      "digital_label": "Open-source off-grid mesh software, protocols, documentation and community collaboration"
+    },
+    "mietshaeuser-syndikat": {
+      "summary": "A network of self-organized housing projects that uses a shared corporate structure to remove properties permanently from speculative resale and a solidarity transfer to support new community housing projects.",
+      "geographic_labels": {
+        "mietshaeuser-network": "Decentralized project network in Germany and beyond",
+        "mietshaeuser-residences": "Residential buildings and residents’ addresses"
+      }
+    },
+    "mikoko-pamoja": {
+      "summary": "A community-owned mangrove initiative in Gazi Bay combining conservation, restoration and local monitoring with carbon-credit revenue for jointly chosen community-benefit projects.",
+      "geographic_labels": {
+        "mikoko-pamoja-gazi-bay": "Gazi Bay, Kwale County, Kenya — broad coastal anchor"
+      }
+    },
+    "mundraub": {
+      "title": "mundraub.org",
+      "summary": "A platform operated by Terra Concordia gGmbH with a publicly readable map where contributors record, share, use and care for locations of publicly accessible edible plants under published Mundräuber rules.",
+      "geographic_labels": {},
+      "digital_label": "Publicly readable map and contribution paths for edible-landscape locations in the German-speaking region"
+    },
+    "musicbrainz": {
+      "summary": "An open music encyclopedia maintained by a worldwide community, with metadata collaboratively added, reviewed and made available largely under open licenses.",
+      "geographic_labels": {},
+      "digital_label": "Community-maintained open music metadata database"
+    },
+    "namena-marine-reserve": {
+      "summary": "A marine reserve stewarded by the customary resource owners of Kubulau District in Fiji, where community rules, enforcement and financing protect fisheries and local livelihoods.",
+      "geographic_labels": {
+        "namena-kubulau-area": "Kubulau District and Namena Lagoon, Bua, Fiji"
+      },
+      "digital_label": "WCS documentation on community governance, protection and monitoring"
+    },
+    "namibia-communal-conservancies-alliance": {
+      "summary": "A Namibian umbrella alliance of communal conservancies, community forests and other local resource groups that represents shared interests and supports community-based natural-resource governance.",
+      "geographic_labels": {
+        "namibia-alliance-national": "Namibia — nationwide alliance"
+      },
+      "digital_label": "Public NACSO information on the national alliance and Namibia’s communal conservancies"
+    },
+    "nepal-wireless-networking-project": {
+      "summary": "Local communities and E-Networking Research and Development operate a rural communications network in Nepal, linking wireless infrastructure, education and local services.",
+      "geographic_labels": {
+        "nepal-wireless-country": "Nepal — nationwide context",
+        "nepal-wireless-nodes": "Wireless nodes, rooftops and household connections"
+      },
+      "digital_label": "Community network, project information and digital services"
+    },
+    "new-mexico-acequia-association": {
+      "summary": "An association in New Mexico that supports collectively managed irrigation canals, democratic water governance, traditional agriculture and the agency of local acequia communities.",
+      "geographic_labels": {
+        "nmaa-new-mexico": "New Mexico — statewide association context",
+        "nmaa-acequias": "Individual acequias, plots and private water infrastructure"
+      },
+      "digital_label": "Public education, organizational and participation information"
+    },
+    "north-east-syria-autonomous-administration": {
+      "title": "Democratic Autonomous Administration of North and East Syria",
+      "summary": "A regional self-administration structure developed since 2018 that organizes local councils, communes, civil institutions and services around stated principles of participatory democracy, social justice and equality.",
+      "geographic_labels": {
+        "daanes-dynamic-region": "North and East Syria — dynamic regional area"
+      }
+    },
+    "nyc-mesh": {
+      "summary": "A volunteer-run community network in New York City that connects affordable internet access, digital self-determination and jointly built local infrastructure.",
+      "geographic_labels": {
+        "nycmesh-city-area": "New York City",
+        "nycmesh-member-sites": "Private member and rooftop locations"
+      },
+      "digital_label": "Community network, open documentation and digital collaboration for New York City"
+    },
+    "open-food-facts": {
+      "title": "Open Food Facts",
+      "summary": "An open food database whose volunteers collect and review product data and images and publish them under the ODbL for free reuse.",
+      "geographic_labels": {},
+      "digital_label": "Open product database, API, data exports and open-source tools for food information"
+    },
+    "open-food-network-australia": {
+      "summary": "An Australian non-profit community and open-source platform that enables producers and food initiatives to organize short, transparent and community-controlled supply chains.",
+      "geographic_labels": {},
+      "digital_label": "Open-source platform for community food networks"
+    },
+    "open-library": {
+      "title": "Open Library",
+      "summary": "An open, collaboratively editable book catalog and digital public library of the Internet Archive whose software, data and documentation are open and expanded and maintained by volunteers.",
+      "geographic_labels": {},
+      "digital_label": "Open book catalog, digital library, open data and software, and collaborative metadata stewardship"
+    },
+    "open-source-ecology": {
+      "summary": "A global open-hardware project that develops freely usable designs for industrial tools and tests, documents and teaches them in practice at Factor e Farm in Missouri.",
+      "geographic_labels": {
+        "ose-factor-e-farm-region": "Factor e Farm near Maysville, Missouri"
+      },
+      "digital_label": "Freely accessible machine designs, documentation and global collaborative development"
+    },
+    "open-source-seed-initiative": {
+      "title": "Open Source Seed Initiative",
+      "summary": "A community-supported seed initiative whose pledge protects the freedom to use, grow, share, improve and pass on designated seed under the same openness commitment.",
+      "geographic_labels": {
+        "ossi-distributed-community": "Distributed network of breeders, seed companies, gardeners and farmers"
+      },
+      "digital_label": "Open seed pledge, variety catalog and participation paths for breeders and seed companies"
+    },
+    "openmrs": {
+      "summary": "An adaptable open-source medical information system for local health care, with public documentation and worldwide contribution paths.",
+      "geographic_labels": {},
+      "digital_label": "Free medical software, documentation and worldwide collaboration"
+    },
+    "openstreetmap": {
+      "summary": "A worldwide open map database whose roads, paths and other geodata are surveyed, corrected and freely reusable by contributors.",
+      "geographic_labels": {},
+      "digital_label": "Worldwide open map data and collaborative editing"
+    },
+    "orangi-low-cost-sanitation": {
+      "summary": "A community-organized sanitation practice from Orangi in Karachi in which neighbourhoods jointly finance, build, manage and maintain household connections, lane sewers and secondary sewers, while OPP-RTI provides technical guidance and public authorities remain responsible for trunk infrastructure.",
+      "geographic_labels": {
+        "orangi-sanitation-network": "Orangi, Karachi — community-managed sanitation infrastructure"
+      },
+      "digital_label": "Public OPP-RTI documentation of community-financed and maintained low-cost sanitation"
+    },
+    "p2pu": {
+      "summary": "A non-profit, community-supported learning network that connects free learning circles and open learning resources with libraries, facilitators and local communities worldwide.",
+      "geographic_labels": {},
+      "digital_label": "Open infrastructure and community for peer learning circles"
+    },
+    "pachgaon-community-forest": {
+      "title": "Pachgaon Community Forest",
+      "summary": "The Pachgaon Gram Sabha manages 1,006 hectares of forest through recognised Community Forest Resource rights, combining democratic decisions with forest protection and bamboo harvesting and sales for local livelihoods.",
+      "geographic_labels": {
+        "pachgaon-chandrapur-district": "Chandrapur district, Maharashtra, India — broad district anchor"
+      }
+    },
+    "park-slope-food-coop": {
+      "title": "Park Slope Food Coop",
+      "summary": "A member-owned grocery operation in Brooklyn whose roughly 17,000 members sustain purchasing, operations and rules through work shifts, capital shares and democratic procedures.",
+      "geographic_labels": {
+        "park-slope-food-coop-brooklyn": "Park Slope, Brooklyn — broad neighborhood anchor"
+      },
+      "digital_label": "Membership information, rules and digital shift coordination for the local cooperative operation"
+    },
+    "potato-park-peru": {
+      "summary": "An area near Písac stewarded by five Quechua communities where native potato varieties, agricultural knowledge, ecosystems and cultural practices are conserved collectively.",
+      "geographic_labels": {
+        "potato-park-pisac-region": "Potato Park communities near Písac, Cusco, Peru"
+      }
+    },
+    "prinzessinnengarten-kollektiv": {
+      "summary": "A publicly accessible community garden in Berlin-Neukölln where neighbours garden together, share knowledge and support urban biodiversity and ecological education.",
+      "geographic_labels": {
+        "prinzessinnengarten-neukoelln": "Community garden at Neuer St. Jacobi Cemetery"
+      }
+    },
+    "red-guardianes-semillas-ecuador": {
+      "summary": "An Ecuadorian network of families and seed guardians connecting agrobiodiversity, regenerative land management, seed knowledge and community learning.",
+      "geographic_labels": {},
+      "digital_label": "Digital learning, publishing and participation surface for a nationwide seed network"
+    },
+    "repair-cafe-international": {
+      "title": "Repair Café International",
+      "summary": "A worldwide network of volunteer-run, non-commercial repair meetings where people share tools, knowledge and time to repair everyday objects together and build local repair skills.",
+      "geographic_labels": {
+        "repair-cafe-worldwide-network": "Worldwide network of locally organized Repair Cafés"
+      },
+      "digital_label": "Location search, repair knowledge and starter materials for local Repair Cafés"
+    },
+    "reprap": {
+      "summary": "A global open-hardware project for freely documented 3D printers that can manufacture a significant share of their own parts and whose designs are collaboratively built, adapted and improved.",
+      "geographic_labels": {},
+      "digital_label": "Open design documentation and a community wiki for self-replicating manufacturing machines"
+    },
+    "restarters": {
+      "summary": "A global network for community repair that connects local repair groups, events, knowledge and open impact data through shared digital infrastructure.",
+      "geographic_labels": {},
+      "digital_label": "Global network and platform for community repair"
+    },
+    "root-access-hackerspace": {
+      "summary": "A non-profit, fully volunteer-operated hackerspace and makerspace in Fresno where members share tools and infrastructure and organize public classes and community events.",
+      "geographic_labels": {
+        "root-access-fresno": "Fresno, California — approximate city anchor"
+      },
+      "digital_label": "Community wiki and Discord as ongoing complements to the physical makerspace"
+    },
+    "safecast": {
+      "summary": "An international volunteer-led citizen-science community that collects open environmental measurements, develops tools for people to measure independently and releases its data into the public domain.",
+      "geographic_labels": {},
+      "digital_label": "Open environmental measurement data, maps, uploads and API access"
+    },
+    "samoa-community-based-fisheries-management-program": {
+      "summary": "A commons infrastructure across Samoa in which more than 120 coastal village communities develop and carry their own fisheries management plans, village bylaws and locally governed fish reserves with technical support from Samoa's national fisheries authority.",
+      "geographic_labels": {
+        "samoa-cbfmp-villages": "Samoa — participating coastal village communities"
+      },
+      "digital_label": "Public programme information and current reports on village-led fisheries management"
+    },
+    "sarantaporo-community-network": {
+      "summary": "A community-built and operated wireless network in rural villages of the Elassona region, connecting open connectivity, digital education and local self-organization.",
+      "geographic_labels": {
+        "sarantaporo-elassona-region": "Villages in the Elassona region, Thessaly",
+        "sarantaporo-household-nodes": "Private household nodes"
+      },
+      "digital_label": "Regional community network, open project information and digital education"
+    },
+    "som-energia": {
+      "summary": "A non-profit energy cooperative in Spain whose members democratically support and develop renewable-energy supply, community generation projects and local groups.",
+      "geographic_labels": {
+        "som-energia-spain": "Spain — nationwide cooperative context",
+        "som-energia-private-sites": "Private connections and facilities not individually verified"
+      },
+      "digital_label": "Member portal, project information and local groups"
+    },
+    "tetepare-descendants-association": {
+      "summary": "A large landowners’ association in the Solomon Islands that collectively protects and manages Tetepare Island and its terrestrial and marine resources for future generations.",
+      "geographic_labels": {
+        "tetepare-island-area": "Tetepare Island, Western Province, Solomon Islands"
+      },
+      "digital_label": "Public organizational, conservation and visitor information from the Tetepare Descendants’ Association"
+    },
+    "thailand-citizens-forest-database": {
+      "summary": "A collaboratively maintained digital knowledge infrastructure where communities, civil society and public institutions document Thailand’s community forests for cooperation and local management.",
+      "geographic_labels": {
+        "thailand-community-forests-national": "Thailand — nationwide community-forest network"
+      },
+      "digital_label": "Public Citizens’ Forest Database with community-maintained information on Thailand’s community forests"
+    },
+    "the-things-network": {
+      "title": "The Things Network",
+      "summary": "A global Internet of Things radio network built with local communities, combining community-operated LoRaWAN gateways, open software, learning resources and public community infrastructure.",
+      "geographic_labels": {
+        "the-things-network-global-communities": "Worldwide network of local communities and gateways"
+      },
+      "digital_label": "Community LoRaWAN network, open network software, forum and learning resources"
+    },
+    "tla-o-qui-aht-tribal-parks": {
+      "summary": "Indigenous-governed areas in Clayoquot Sound where the Tla-o-qui-aht First Nation combines traditional governance, Guardian work, ecological restoration and responsible regional participation.",
+      "geographic_labels": {
+        "tla-o-qui-aht-clayoquot-sound": "Clayoquot Sound, British Columbia, Canada"
+      },
+      "digital_label": "Public Tla-o-qui-aht Tribal Parks information on governance, Guardian work and responsible participation"
+    },
+    "tribunal-aguas-valencia": {
+      "summary": "A water court run by irrigation communities in Valencia that hears disputes over use publicly and regularly according to established practice.",
+      "geographic_labels": {
+        "tribunal-aguas-valencia-approximate-area": "Valencia, Spain"
+      }
+    },
+    "ujamaa-community-resource-team": {
+      "title": "Ujamaa Community Resource Team",
+      "summary": "A community-rights organization in northern Tanzania that supports pastoralist, agro-pastoralist and hunter-gatherer communities with collective land tenure, local governance and sustainable resource management.",
+      "geographic_labels": {
+        "ujamaa-northern-tanzania-communities": "Partner communities across several areas of northern Tanzania"
+      }
+    },
+    "velondriake-lmma": {
+      "summary": "A marine area jointly managed by coastal communities around Andavadoaka, connecting sustainable fishing, monitoring, protected zones, reefs and mangroves.",
+      "geographic_labels": {
+        "velondriake-andavadoaka-region": "Coastal area around Andavadoaka, south-west Madagascar"
+      }
+    },
+    "wikibooks": {
+      "summary": "An open collection of freely usable textbooks, manuals and non-fiction books written and improved collaboratively.",
+      "geographic_labels": {},
+      "digital_label": "Free textbooks and open learning materials"
+    },
+    "wikidata": {
+      "summary": "A free knowledge database for structured, machine-readable statements used and linked across Wikimedia projects and other applications.",
+      "geographic_labels": {},
+      "digital_label": "Free structured knowledge database"
+    },
+    "wikimedia-commons": {
+      "summary": "A free, collaboratively built collection of images, audio, video and other media files for reuse.",
+      "geographic_labels": {},
+      "digital_label": "Free media collection for worldwide reuse"
+    },
+    "wikipedia": {
+      "summary": "A collaboratively created, freely accessible encyclopedia in many languages whose content is written and maintained by volunteers.",
+      "geographic_labels": {},
+      "digital_label": "Free encyclopedia in many languages"
+    },
+    "wikiversity": {
+      "summary": "An open platform for free learning resources, courses and collaborative education projects in many languages.",
+      "geographic_labels": {},
+      "digital_label": "Free learning resources and collaborative education projects"
+    },
+    "zapatista-autonomy": {
+      "title": "Zapatista Autonomy",
+      "summary": "An autonomy structure maintained by Zapatista communities in Chiapas that since 2023 has replaced the former MAREZ and Good Government Councils with local autonomous governments, regional collectives and assembly-based coordination.",
+      "geographic_labels": {
+        "zapatista-communities-chiapas": "Zapatista communities in Chiapas, Mexico"
+      }
+    },
+    "zenzeleni-community-networks": {
+      "summary": "A community network run by local cooperatives in the rural Eastern Cape that provides affordable connectivity and keeps revenue and responsibility within the communities.",
+      "geographic_labels": {
+        "zenzeleni-mankosi-zithulele": "Mankosi and Zithulele, Eastern Cape",
+        "zenzeleni-private-links": "Private household and business connections"
+      },
+      "digital_label": "Cooperatively operated regional internet network and public knowledge for building further community networks"
+    }
+  }
+}

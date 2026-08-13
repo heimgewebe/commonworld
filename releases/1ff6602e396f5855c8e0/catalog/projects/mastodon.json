@@ -1,0 +1,94 @@
+{
+  "schema_version": 4,
+  "id": "mastodon",
+  "title": "Mastodon",
+  "summary": "Eine freie, quelloffene und föderierte Software für soziale Netzwerke, deren unabhängige Server miteinander kommunizieren können.",
+  "themes": [
+    "communication",
+    "federation",
+    "protocol"
+  ],
+  "actions": [
+    "use",
+    "learn",
+    "contribute"
+  ],
+  "presence": {
+    "geographic": [],
+    "digital": {
+      "available": true,
+      "reach": "network",
+      "label": "Föderierte soziale Kommunikation über unabhängige Server",
+      "source_ids": [
+        "mastodon-home"
+      ]
+    }
+  },
+  "activity": {
+    "status": "active",
+    "observed_at": "2026-07-12",
+    "source_ids": [
+      "mastodon-home"
+    ],
+    "note": "Die offizielle Projektseite war am Prüftag erreichbar und beschrieb aktuelle Nutzung oder Mitwirkung."
+  },
+  "provenance": {
+    "sources": [
+      {
+        "id": "mastodon-home",
+        "type": "official-source",
+        "label": "Mastodon",
+        "url": "https://joinmastodon.org/",
+        "retrieved_at": "2026-07-12",
+        "note": "Die offizielle Seite beschreibt Mastodon als freie, quelloffene, dezentrale und interoperable soziale Plattform."
+      }
+    ]
+  },
+  "curation": {
+    "state": "listed",
+    "catalogued_at": "2026-07-12",
+    "reviewed_by": "Commonworld editorial review",
+    "reviewed_at": "2026-07-12",
+    "next_review_at": "2026-10-12",
+    "notes": "Erster öffentlicher Commonworld-Startdatensatz; Identität, Zweck, digitale Präsenz und offizielle Quelle wurden redaktionell geprüft."
+  },
+  "links": [
+    {
+      "type": "homepage",
+      "label": "Mastodon – offizielle Seite",
+      "url": "https://joinmastodon.org/"
+    },
+    {
+      "type": "source",
+      "label": "Mastodon",
+      "url": "https://joinmastodon.org/"
+    },
+    {
+      "type": "use",
+      "label": "Mastodon-Server auswählen",
+      "url": "https://joinmastodon.org/servers",
+      "source_ids": [
+        "mastodon-home"
+      ]
+    },
+    {
+      "type": "learn",
+      "label": "Mastodon-Dokumentation",
+      "url": "https://docs.joinmastodon.org/",
+      "source_ids": [
+        "mastodon-home"
+      ]
+    },
+    {
+      "type": "contribute",
+      "label": "Mastodon-Quellcode und Beiträge",
+      "url": "https://github.com/mastodon/mastodon",
+      "source_ids": [
+        "mastodon-home"
+      ]
+    }
+  ],
+  "handoff": {
+    "enabled": false
+  }
+}
