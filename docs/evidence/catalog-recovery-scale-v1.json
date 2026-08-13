@@ -1,1 +1,202 @@
-{"current_catalog":{"entry_count":88,"identity_order_sha256":"431119af4b438192601e2a38adc10ddea9ce9cc77110bba546045cb827698746","locales":{"de":{"generated_inventory_sha256":"6d90ff33e56ab45d55003669061c4a8d29a01e245dac3d3b90be9c485a413e15","index_page_count":4,"index_page_max":{"catalog_cards":24,"gzip_bytes":6758,"raw_bytes":44227,"start_tags":441},"landing_page":{"catalog_cards":24,"gzip_bytes":6619,"raw_bytes":39492,"start_tags":395},"project_page_count":88,"project_page_sample_count":88,"project_page_sample_max":{"catalog_cards":0,"gzip_bytes":1409,"raw_bytes":4316,"start_tags":85},"project_page_sample_strategy":"one-per-canonical-seed-shape"},"en":{"generated_inventory_sha256":"88666d6837d765dd8d8444c7d2ea69234eba4fc2f05a97a9b4161d81485dce31","index_page_count":4,"index_page_max":{"catalog_cards":24,"gzip_bytes":5602,"raw_bytes":41386,"start_tags":441},"landing_page":{"catalog_cards":24,"gzip_bytes":5600,"raw_bytes":36894,"start_tags":395},"project_page_count":88,"project_page_sample_count":88,"project_page_sample_max":{"catalog_cards":0,"gzip_bytes":1334,"raw_bytes":4137,"start_tags":85},"project_page_sample_strategy":"one-per-canonical-seed-shape"}},"page_size":24},"decision":{"bounded_recovery_surface":"pass_de_en","does_not_establish":["scale-native visible search, map or digital navigation","physical-device parity","production deployment or readback","editorial publishability of generated fixtures"],"landing_embeds_complete_catalog":false,"runtime_catalogue_cutover_authorized":false},"kind":"commonworld.catalog_recovery_scale_evidence","locales":["de","en"],"measurements":[{"entry_count":1000,"fixture_sha256":"37bf4dd805649b2330c2dc8db5dc6458ea76035ec2c1797f3d6d9f53f21a79de","identity_order_sha256":"fd483d68c70208d16e8d66aa6cdd1cda35071ee1f41374867ecc6eb87ce70d01","locales":{"de":{"generated_inventory_sha256":"d4e170de062e5c161ee297d3aa909fcfbe6b52a8881826e5b749c36935870bee","index_page_count":42,"index_page_max":{"catalog_cards":24,"gzip_bytes":6737,"raw_bytes":44453,"start_tags":443},"landing_page":{"catalog_cards":24,"gzip_bytes":6509,"raw_bytes":39560,"start_tags":395},"project_page_count":1000,"project_page_sample_count":88,"project_page_sample_max":{"catalog_cards":0,"gzip_bytes":1425,"raw_bytes":4284,"start_tags":85},"project_page_sample_strategy":"one-per-canonical-seed-shape"},"en":{"generated_inventory_sha256":"45f6b269f309b92ebea9d6055dc55359dbdb3de4825cc12220ba5edf69bf1457","index_page_count":42,"index_page_max":{"catalog_cards":24,"gzip_bytes":5642,"raw_bytes":41232,"start_tags":443},"landing_page":{"catalog_cards":24,"gzip_bytes":5463,"raw_bytes":36644,"start_tags":395},"project_page_count":1000,"project_page_sample_count":88,"project_page_sample_max":{"catalog_cards":0,"gzip_bytes":1349,"raw_bytes":4105,"start_tags":85},"project_page_sample_strategy":"one-per-canonical-seed-shape"}},"page_size":24},{"entry_count":10000,"fixture_sha256":"2292b756791ca6e31dc4f2a1aefdbd65e92bcb2068732138cd0c0238b13911c9","identity_order_sha256":"4691b6d57d73985d4fe48fcada9e23da8a76c10eac6b49edd4b78bfee0ab1833","locales":{"de":{"generated_inventory_sha256":"0d6010e2c8ab7957446fa8002a2154abc96b9cdd3257a21121d9b63f697df97a","index_page_count":417,"index_page_max":{"catalog_cards":24,"gzip_bytes":6743,"raw_bytes":44468,"start_tags":443},"landing_page":{"catalog_cards":24,"gzip_bytes":6509,"raw_bytes":39564,"start_tags":395},"project_page_count":10000,"project_page_sample_count":88,"project_page_sample_max":{"catalog_cards":0,"gzip_bytes":1425,"raw_bytes":4284,"start_tags":85},"project_page_sample_strategy":"one-per-canonical-seed-shape"},"en":{"generated_inventory_sha256":"a9d6ad6307382026d499459823386a4419805677cd532ec4b8d21d04193c409e","index_page_count":417,"index_page_max":{"catalog_cards":24,"gzip_bytes":5648,"raw_bytes":41247,"start_tags":443},"landing_page":{"catalog_cards":24,"gzip_bytes":5463,"raw_bytes":36648,"start_tags":395},"project_page_count":10000,"project_page_sample_count":88,"project_page_sample_max":{"catalog_cards":0,"gzip_bytes":1349,"raw_bytes":4105,"start_tags":85},"project_page_sample_strategy":"one-per-canonical-seed-shape"}},"page_size":24}],"page_size":24,"scale_tiers":[1000,10000],"source_catalog_sha256":"8276ada30e852b2a0244753e266f752bf460fbb6ecf196e7821d900c46e143a0","source_english_overlay_sha256":"97d084727349070505fc19a3fb2463c1aa3241f227821270e7e60a2a6c32bb97","task_id":"COMMONWORLD-PUBLIC-GLOBE-V1-T028","version":"1.0"}
+{
+  "current_catalog": {
+    "entry_count": 91,
+    "identity_order_sha256": "62c84b78c30f4973ea619a23f95a57d10ae0a6358ef871a6846b822e15d2545c",
+    "locales": {
+      "de": {
+        "generated_inventory_sha256": "eec8151733458c9006ed34672f2f368f40fa5de13279d85970065b3869082935",
+        "index_page_count": 4,
+        "index_page_max": {
+          "catalog_cards": 24,
+          "gzip_bytes": 6786,
+          "raw_bytes": 43441,
+          "start_tags": 433
+        },
+        "landing_page": {
+          "catalog_cards": 24,
+          "gzip_bytes": 6702,
+          "raw_bytes": 39444,
+          "start_tags": 393
+        },
+        "project_page_count": 91,
+        "project_page_sample_count": 91,
+        "project_page_sample_max": {
+          "catalog_cards": 0,
+          "gzip_bytes": 1409,
+          "raw_bytes": 4316,
+          "start_tags": 85
+        },
+        "project_page_sample_strategy": "one-per-canonical-seed-shape"
+      },
+      "en": {
+        "generated_inventory_sha256": "67dfc38907bf1d00c296c6bc6e62fc6f8ca6f4937ae79583e39b812afe680507",
+        "index_page_count": 4,
+        "index_page_max": {
+          "catalog_cards": 24,
+          "gzip_bytes": 5679,
+          "raw_bytes": 40638,
+          "start_tags": 433
+        },
+        "landing_page": {
+          "catalog_cards": 24,
+          "gzip_bytes": 5679,
+          "raw_bytes": 36839,
+          "start_tags": 393
+        },
+        "project_page_count": 91,
+        "project_page_sample_count": 91,
+        "project_page_sample_max": {
+          "catalog_cards": 0,
+          "gzip_bytes": 1334,
+          "raw_bytes": 4137,
+          "start_tags": 85
+        },
+        "project_page_sample_strategy": "one-per-canonical-seed-shape"
+      }
+    },
+    "page_size": 24
+  },
+  "decision": {
+    "bounded_recovery_surface": "pass_de_en",
+    "does_not_establish": [
+      "scale-native visible search, map or digital navigation",
+      "physical-device parity",
+      "production deployment or readback",
+      "editorial publishability of generated fixtures"
+    ],
+    "landing_embeds_complete_catalog": false,
+    "runtime_catalogue_cutover_authorized": false
+  },
+  "kind": "commonworld.catalog_recovery_scale_evidence",
+  "locales": [
+    "de",
+    "en"
+  ],
+  "measurements": [
+    {
+      "entry_count": 1000,
+      "fixture_sha256": "ca847224e77af7e8f9366f8d2c5ee0717aadecf4797f10ebc7d4e796e0233006",
+      "identity_order_sha256": "fd483d68c70208d16e8d66aa6cdd1cda35071ee1f41374867ecc6eb87ce70d01",
+      "locales": {
+        "de": {
+          "generated_inventory_sha256": "d4e170de062e5c161ee297d3aa909fcfbe6b52a8881826e5b749c36935870bee",
+          "index_page_count": 42,
+          "index_page_max": {
+            "catalog_cards": 24,
+            "gzip_bytes": 6752,
+            "raw_bytes": 45141,
+            "start_tags": 451
+          },
+          "landing_page": {
+            "catalog_cards": 24,
+            "gzip_bytes": 6575,
+            "raw_bytes": 39416,
+            "start_tags": 393
+          },
+          "project_page_count": 1000,
+          "project_page_sample_count": 91,
+          "project_page_sample_max": {
+            "catalog_cards": 0,
+            "gzip_bytes": 1425,
+            "raw_bytes": 4284,
+            "start_tags": 85
+          },
+          "project_page_sample_strategy": "one-per-canonical-seed-shape"
+        },
+        "en": {
+          "generated_inventory_sha256": "45f6b269f309b92ebea9d6055dc55359dbdb3de4825cc12220ba5edf69bf1457",
+          "index_page_count": 42,
+          "index_page_max": {
+            "catalog_cards": 24,
+            "gzip_bytes": 5658,
+            "raw_bytes": 41886,
+            "start_tags": 451
+          },
+          "landing_page": {
+            "catalog_cards": 24,
+            "gzip_bytes": 5524,
+            "raw_bytes": 36493,
+            "start_tags": 393
+          },
+          "project_page_count": 1000,
+          "project_page_sample_count": 91,
+          "project_page_sample_max": {
+            "catalog_cards": 0,
+            "gzip_bytes": 1349,
+            "raw_bytes": 4105,
+            "start_tags": 85
+          },
+          "project_page_sample_strategy": "one-per-canonical-seed-shape"
+        }
+      },
+      "page_size": 24
+    },
+    {
+      "entry_count": 10000,
+      "fixture_sha256": "d13e0ef0f443d174d0b24aac4b38e7b2b44335fa3feda35b30ff05ad5538b218",
+      "identity_order_sha256": "4691b6d57d73985d4fe48fcada9e23da8a76c10eac6b49edd4b78bfee0ab1833",
+      "locales": {
+        "de": {
+          "generated_inventory_sha256": "0d6010e2c8ab7957446fa8002a2154abc96b9cdd3257a21121d9b63f697df97a",
+          "index_page_count": 417,
+          "index_page_max": {
+            "catalog_cards": 24,
+            "gzip_bytes": 6804,
+            "raw_bytes": 45167,
+            "start_tags": 451
+          },
+          "landing_page": {
+            "catalog_cards": 24,
+            "gzip_bytes": 6575,
+            "raw_bytes": 39420,
+            "start_tags": 393
+          },
+          "project_page_count": 10000,
+          "project_page_sample_count": 91,
+          "project_page_sample_max": {
+            "catalog_cards": 0,
+            "gzip_bytes": 1425,
+            "raw_bytes": 4284,
+            "start_tags": 85
+          },
+          "project_page_sample_strategy": "one-per-canonical-seed-shape"
+        },
+        "en": {
+          "generated_inventory_sha256": "a9d6ad6307382026d499459823386a4419805677cd532ec4b8d21d04193c409e",
+          "index_page_count": 417,
+          "index_page_max": {
+            "catalog_cards": 24,
+            "gzip_bytes": 5705,
+            "raw_bytes": 41933,
+            "start_tags": 451
+          },
+          "landing_page": {
+            "catalog_cards": 24,
+            "gzip_bytes": 5524,
+            "raw_bytes": 36497,
+            "start_tags": 393
+          },
+          "project_page_count": 10000,
+          "project_page_sample_count": 91,
+          "project_page_sample_max": {
+            "catalog_cards": 0,
+            "gzip_bytes": 1349,
+            "raw_bytes": 4105,
+            "start_tags": 85
+          },
+          "project_page_sample_strategy": "one-per-canonical-seed-shape"
+        }
+      },
+      "page_size": 24
+    }
+  ],
+  "page_size": 24,
+  "scale_tiers": [
+    1000,
+    10000
+  ],
+  "source_catalog_sha256": "98c1b655330298414499bf980127a93b962d8feed96f3eed2c07d8b3a9b0cfa1",
+  "source_english_overlay_sha256": "124c5880ae17ebd7c97dfa8cafb852507778290a30763db5f06efe07f3597446",
+  "task_id": "COMMONWORLD-PUBLIC-GLOBE-V1-T028",
+  "version": "1.0"
+}

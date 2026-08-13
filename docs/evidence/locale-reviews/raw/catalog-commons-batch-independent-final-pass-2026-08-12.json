@@ -1,0 +1,112 @@
+{
+  "schema_version": 1,
+  "kind": "commonworld.catalog_locale_incremental_independent_review_chain",
+  "status": "passed",
+  "review_kind": "model_assisted_independent_language_review",
+  "writer": "GPT-5.6 Sol via ChatGPT",
+  "reviewer": "Claude Opus 5 via Grabowski independent review",
+  "writer_independence": "independent_from_catalog_translation_writer",
+  "content_revision": "8731b8618efb1c33c2c0998dc48cdf6c66fd14c7",
+  "review_packet_revision": "0e56b2c96c52f1a02d50e1e070149105f4ad5e49",
+  "input_digests": {
+    "es": "8d145707c3dfc55d1ca42206d73928445e42af5fa05db9065a0b7923811b0e87",
+    "fr": "9ef30f1dc4da4a090dd77c257daf48b901183a703722710dfcc1fddd771faf22",
+    "pt-BR": "78c63b96552ec3df7a92e2a7fbfe08c373ea99da20e1dac2268b10ef90564ba4",
+    "ar": "1f912e9eb06d75f42a5606397a20bb4eec8b20f2d642cd5fe9bfaadb775f15cb",
+    "zh-Hans": "808cf1efa5e15aaf2de61a09082ba9b28615a50c1316700f9b8416fbe853e7cd"
+  },
+  "coverage": {
+    "locales": [
+      "es",
+      "fr",
+      "pt-BR",
+      "ar",
+      "zh-Hans"
+    ],
+    "prior_reviewed_entries_carried_forward": 88,
+    "new_entries_reviewed_per_locale": 3,
+    "project_count_per_locale": 91,
+    "all_entries_reviewed": true,
+    "carry_forward_basis": "exact object equality against origin/main for all prior 88 entries in every target locale"
+  },
+  "rounds": [
+    {
+      "stage": "initial",
+      "competition_id": "gac-claude-competitor-4d6ebacf58-e798c4ec2b",
+      "receipt_sha256": "ffd20a4a52a9333788a4109601403146ea6fdfa7130d3cd94ae04e386186f409",
+      "verdict": "fail",
+      "passed_locales": [
+        "es",
+        "fr",
+        "pt-BR",
+        "ar"
+      ],
+      "failed_locales": [
+        "zh-Hans"
+      ],
+      "findings": 2
+    },
+    {
+      "stage": "post-fix",
+      "competition_id": "gac-claude-competitor-80d958dd01-a808658cf4",
+      "receipt_sha256": "cffc9cc8f9751fc72561f34564884c977ae4dc142945481900d0c8900e69dde7",
+      "verdict": "fail",
+      "passed_locales": [
+        "es",
+        "fr",
+        "ar",
+        "zh-Hans"
+      ],
+      "failed_locales": [
+        "pt-BR"
+      ],
+      "findings": 1
+    },
+    {
+      "stage": "pt-BR-final",
+      "competition_id": "gac-claude-competitor-00a137e6ef-0a2bb80a44",
+      "receipt_sha256": "e4c4bd0079cd2a980ca5de80a7744b7b37bb13e68ae4271ea7742a3a2f5546b4",
+      "verdict": "pass",
+      "passed_locales": [
+        "pt-BR"
+      ],
+      "failed_locales": [],
+      "findings": 0
+    }
+  ],
+  "final_verdict": "pass",
+  "counts": {
+    "blocker": 0,
+    "major": 0,
+    "minor": 0,
+    "note": 0
+  },
+  "findings": [],
+  "resolved_findings": [
+    {
+      "locale": "zh-Hans",
+      "project": "bangladesh-palli-bidyut-samities",
+      "severity": "minor",
+      "field": "summary",
+      "resolution": "cooperative board terminology corrected from 董事会 to 理事会 and post-fix review passed"
+    },
+    {
+      "locale": "zh-Hans",
+      "project": "samoa-community-based-fisheries-management-program",
+      "severity": "minor",
+      "field": "summary",
+      "resolution": "fish-reserve clause received its own compatible verb phrase and post-fix review passed"
+    },
+    {
+      "locale": "pt-BR",
+      "project": "samoa-community-based-fisheries-management-program",
+      "severity": "minor",
+      "field": "summary",
+      "resolution": "fish reserves separated from executar coordination; final pt-BR re-review passed"
+    }
+  ],
+  "limitations": [
+    "Model-assisted independent review; no native-speaker or human language approval is claimed.",
+    "The prior 88 entries were carried forward by exact machine comparison, not re-reviewed linguistically in this batch."
+  ]
+}

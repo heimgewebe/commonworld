@@ -1,0 +1,120 @@
+{
+  "schema_version": 1,
+  "kind": "commonworld.ui_locale_incremental_language_review_chain",
+  "status": "passed",
+  "reviewed_revision": "d41899d572426824174b8333547714e903526eaa",
+  "review_binding_revision": "2907c13f1a4854c9b7f3960984dc7f27ec90ed84",
+  "reviewed_source_pack_sha256": "d449f5b6a564c859be9142d737ad768020a8ee472f18026e3d3cbb092ec54648",
+  "review_input": {
+    "path": "docs/evidence/locale-releases/care-theme-2026-08-12.review-input.json",
+    "sha256": "70f8223f6f6e2afe69a8a596750a24d35a2115458c5cff02260b21f317de38c8"
+  },
+  "scope": {
+    "key": "themes.care",
+    "locales": [
+      "es",
+      "fr",
+      "pt-BR",
+      "ar",
+      "zh-Hans"
+    ],
+    "final_values": {
+      "es": "Cuidados",
+      "fr": "Soutien et bienveillance",
+      "pt-BR": "Cuidado e apoio",
+      "ar": "الرعاية",
+      "zh-Hans": "关怀"
+    }
+  },
+  "review_chain": [
+    {
+      "stage": "initial",
+      "competition_id": "gac-claude-competitor-2f9cee6984-95b36d5ec8",
+      "receipt_sha256": "6783c615a69f6d2ba52ee54345db165cab1fd35bfe3c08f0b74ee5e88edc4cee",
+      "verdict": "fail",
+      "blocking_locales": [
+        "fr",
+        "pt-BR",
+        "zh-Hans"
+      ]
+    },
+    {
+      "stage": "postfix",
+      "competition_id": "gac-claude-competitor-6813e00d13-31201d60e9",
+      "receipt_sha256": "52b876ebe829834202d31986ca429d7485e801428875cd3256d339efe1d12386",
+      "verdict": "fail",
+      "blocking_locales": [
+        "fr"
+      ],
+      "passed_locales": [
+        "pt-BR",
+        "zh-Hans"
+      ]
+    },
+    {
+      "stage": "attention-et-soin",
+      "competition_id": "gac-opencode-competitor-663871d37c-969cb9973a",
+      "receipt_sha256": "e9d79faba2a9cb6619c0a1fdab4817edc57423a8c3b35b3701d1dfdb14bc609e",
+      "verdict": "fail",
+      "blocking_locales": [
+        "fr"
+      ]
+    },
+    {
+      "stage": "final",
+      "competition_id": "gac-opencode-competitor-2671f854da-5286fef8a5",
+      "receipt_sha256": "6c450ab8a95beb0b69c17ef4ea100fd714fb31a1fd2b7624bc9e2a58fdae6add",
+      "verdict": "pass",
+      "passed_locales": [
+        "fr"
+      ]
+    }
+  ],
+  "carried_forward_passes": {
+    "es": "initial review PASS",
+    "ar": "initial review PASS",
+    "pt-BR": "post-fix review PASS",
+    "zh-Hans": "post-fix review PASS"
+  },
+  "resolved_findings": [
+    {
+      "locale": "fr",
+      "before": "Soins",
+      "severity": "major",
+      "resolution": "replaced; clinical/service-care narrowing removed"
+    },
+    {
+      "locale": "pt-BR",
+      "before": "Cuidado",
+      "severity": "minor",
+      "resolution": "Cuidado e apoio; standalone caution ambiguity removed"
+    },
+    {
+      "locale": "zh-Hans",
+      "before": "照护",
+      "severity": "major",
+      "resolution": "关怀; nursing/long-term-care narrowing removed"
+    },
+    {
+      "locale": "fr",
+      "before": "Prendre soin",
+      "severity": "minor",
+      "resolution": "replaced; verb-phrase/CTA taxonomy form removed"
+    },
+    {
+      "locale": "fr",
+      "before": "Attention et soin",
+      "severity": "minor",
+      "resolution": "Soutien et bienveillance; attention ambiguity and soin/care-work overlap removed"
+    }
+  ],
+  "final_counts": {
+    "blocker": 0,
+    "major": 0,
+    "minor": 0
+  },
+  "limitations": [
+    "Model-assisted independent review only; no native-speaker or human language approval is claimed.",
+    "Provider failures without receipts were not treated as review evidence."
+  ]
+}

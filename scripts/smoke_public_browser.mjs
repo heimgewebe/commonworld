@@ -672,7 +672,11 @@ async function waitForSphereOpacitySettled(page) {
     const style = getComputedStyle(sphere);
     const visible = Number(style.opacity);
     const target = Number(style.getPropertyValue('--sphere-opacity'));
-    return Number.isFinite(visible) && Number.isFinite(target) && Math.abs(visible - target) <= 0.01;
+    // This helper gates invariance assertions, so do not treat the final 1% of
+    // the CSS opacity transition as settled. A looser threshold can capture a
+    // transient value (for example 0.991 -> 1) and falsely attribute the
+    // remaining transition to a subsequent map rotation.
+    return Number.isFinite(visible) && Number.isFinite(target) && Math.abs(visible - target) <= 0.001;
   });
 }
 

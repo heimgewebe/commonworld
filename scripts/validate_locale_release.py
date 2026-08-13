@@ -208,6 +208,24 @@ def _surface_errors(
     return errors
 
 
+def _catalog_review_is_independent(catalog_review: dict[str, Any]) -> bool:
+    marker = catalog_review.get("writer_independence")
+    if marker == "independent_from_grok_4_5_writer":
+        # Backward compatibility for the already released Wave-1 corpus.
+        return True
+    if marker != "independent_from_catalog_translation_writer":
+        return False
+    writer = catalog_review.get("writer")
+    reviewer = catalog_review.get("reviewer")
+    return (
+        isinstance(writer, str)
+        and bool(writer.strip())
+        and isinstance(reviewer, str)
+        and bool(reviewer.strip())
+        and writer.strip() != reviewer.strip()
+    )
+
+
 def _release_evidence_errors(
     tag: str,
     entry: dict[str, Any],
@@ -460,7 +478,7 @@ def _release_evidence_errors(
                     errors,
                     isinstance(catalog_review, dict)
                     and catalog_review.get("review_kind") == "model_assisted_independent_language_review"
-                    and catalog_review.get("writer_independence") == "independent_from_grok_4_5_writer"
+                    and _catalog_review_is_independent(catalog_review)
                     and catalog_review.get("verdict") == "pass",
                     f"independent language review receipt lacks a passing catalog review for {tag}",
                 )

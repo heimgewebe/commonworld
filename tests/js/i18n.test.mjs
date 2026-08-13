@@ -122,7 +122,10 @@ test('registry normalizes released and candidate locales', () => {
       const expected = ['homepage', 'visit', 'use', 'borrow', 'learn', 'contribute', 'volunteer', 'donate', 'contact', 'replicate'].includes(link.type) ? 'de' : null;
       assert.equal(link._label_locale, expected, `${record.id}:${link.type}`);
     }
-    for (const source of record.provenance?.sources ?? []) assert.equal(source._label_locale, null);
+    for (const source of record.provenance?.sources ?? []) {
+      assert.equal(source._label_locale, 'de');
+      assert.match(source.label, /^Quelle \d+ · /u);
+    }
   }
 });
 
@@ -139,6 +142,14 @@ test('every catalog theme has an explicit label in every rendered UI locale', ()
       assert.equal(hasThemeLabel(theme, locale), true, `${locale}:${theme}`);
       assert.ok(!themeLabel(theme, locale).startsWith('[missing:'), `${locale}:${theme}`);
     }
+  }
+});
+
+test('broad care labels stay distinct from care-work labels in every released locale', () => {
+  for (const locale of RELEASED_LOCALES) {
+    assert.equal(hasThemeLabel('care', locale), true, `${locale}:care`);
+    assert.equal(hasThemeLabel('care-work', locale), true, `${locale}:care-work`);
+    assert.notEqual(themeLabel('care', locale), themeLabel('care-work', locale), locale);
   }
 });
 
@@ -176,11 +187,29 @@ test('geographic translations stay bound to location ids when canonical order ch
   for (const location of localized.presence.geographic) assert.equal(location.label, expected.get(location.id));
 });
 
-test('English localization preserves meaningful canonical source labels', () => {
+test('compact bootstrap source links receive localized host-based labels', () => {
   const canonical = BOOTSTRAP_RECORDS.find((record) => record.id === 'debian');
   assert.ok(canonical);
+  assert.deepEqual(Object.keys(canonical.provenance.sources[0]).sort(), ['url']);
+  const english = localizeCatalogRecords([canonical], 'en').records[0];
+  assert.match(english.provenance.sources[0].label, /^Source 1 · debian\.org$/u);
+  assert.equal(english.provenance.sources[0]._label_locale, 'en');
+  for (const locale of WAVE1_LOCALES) {
+    const localized = localizeCatalogRecords([canonical], locale).records[0];
+    assert.equal(localized.provenance.sources[0]._label_locale, locale, locale);
+    assert.ok(localized.provenance.sources[0].label.includes(' · debian.org'), locale);
+    assert.ok(!localized.provenance.sources[0].label.startsWith('https://'), locale);
+  }
+});
+
+test('full canonical source labels remain meaningful original-source text', () => {
+  const bootstrap = BOOTSTRAP_RECORDS.find((record) => record.id === 'debian');
+  assert.ok(bootstrap);
+  const canonical = structuredClone(bootstrap);
+  canonical.provenance.sources[0].label = 'About Debian';
   const localized = localizeCatalogRecords([canonical], 'en').records[0];
-  assert.match(localized.provenance.sources[0].label, /^About Debian · /u);
+  assert.equal(localized.provenance.sources[0].label, 'About Debian · debian.org');
+  assert.equal(localized.provenance.sources[0]._label_locale, null);
 });
 
 test('English catalog search remains bilingual through canonical German aliases', () => {

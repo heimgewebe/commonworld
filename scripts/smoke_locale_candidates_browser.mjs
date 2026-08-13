@@ -577,8 +577,8 @@ try {
         assert((runtimeCatalogBoundary?.focusLinkLangs?.length ?? 0) > 0 && runtimeCatalogBoundary.focusLinkLangs.every((lang) => [candidate.locale, ''].includes(lang)), `${pageName}: focus link labels carry an unexpected language boundary: ${runtimeCatalogBoundary?.focusLinkLangs?.join(' | ')}`);
         assert(runtimeCatalogBoundary.focusLinkDirs.every((direction, index) => direction === (runtimeCatalogBoundary.focusLinkLangs[index] === 'en' ? 'ltr' : 'auto')), `${pageName}: focus link directions drifted: ${runtimeCatalogBoundary?.focusLinkDirs?.join(' | ')}`);
         assert(runtimeCatalogBoundary.focusLinkBidi.every((value) => value === 'isolate'), `${pageName}: focus link bidi isolation is missing: ${runtimeCatalogBoundary?.focusLinkBidi?.join(' | ')}`);
-        assert((runtimeCatalogBoundary?.focusSourceLangs?.length ?? 0) > 0 && runtimeCatalogBoundary.focusSourceLangs.every((lang) => lang === ''), `${pageName}: canonical source labels were falsely assigned a content language`);
-        assert(runtimeCatalogBoundary.focusSourceDirs.every((direction) => direction === 'auto'), `${pageName}: canonical source labels lack dir=auto boundaries`);
+        assert((runtimeCatalogBoundary?.focusSourceLangs?.length ?? 0) > 0 && runtimeCatalogBoundary.focusSourceLangs.every((lang) => lang === candidate.locale), `${pageName}: generated compact source labels lack the candidate language boundary`);
+        assert(runtimeCatalogBoundary.focusSourceDirs.every((direction) => direction === 'auto'), `${pageName}: generated compact source labels lack dir=auto boundaries`);
         assert(runtimeCatalogBoundary.focusSourceBidi.every((value) => value === 'isolate'), `${pageName}: focus source bidi isolation is missing`);
         assert((runtimeCatalogBoundary?.sphereNameLangs?.length ?? 0) > 0 && runtimeCatalogBoundary.sphereNameLangs.every((lang) => ['en', ''].includes(lang)), `${pageName}: sphere ring titles carry an unexpected language boundary`);
         assert(runtimeCatalogBoundary.sphereNameDirs.every((direction, index) => direction === (runtimeCatalogBoundary.sphereNameLangs[index] === 'en' ? 'ltr' : 'auto')), `${pageName}: sphere ring title directions drifted`);
@@ -673,16 +673,18 @@ try {
     const pendingCount = (await page.locator('#text-count').textContent()) ?? '';
     assert(pendingCount.includes('Commons'), `${pageName}: pending locale pack did not use the English runtime fallback: ${pendingCount}`);
     await page.waitForTimeout(2_800);
-    await heldLocalePackRoute.continue();
-    await page.waitForFunction(
-      () => document.querySelector('.globe-stage')?.dataset.localePack === 'ready',
-      null,
-      { timeout: 5_000 },
+    const localePackResponsePromise = page.waitForResponse(
+      (networkResponse) => networkResponse.url().includes('/assets/commonworld-wave1-locales.mjs'),
     );
+    await heldLocalePackRoute.continue();
+    const localePackResponse = await localePackResponsePromise;
+    assert(localePackResponse.status() === 200, `${pageName}: late locale pack HTTP ${localePackResponse.status()}`);
+    await localePackResponse.finished();
     await page.waitForFunction(
-      () => document.querySelector('#text-count')?.textContent?.includes('communs'),
+      () => document.querySelector('.globe-stage')?.dataset.localePack === 'ready'
+        && document.querySelector('#text-count')?.textContent?.includes('communs'),
       null,
-      { timeout: 5_000 },
+      { timeout: 30_000 },
     );
     assert(pageErrors.length === 0, `${pageName}: late-pack page errors: ${pageErrors.join(' | ')}`);
     const fallbackWarnings = warnings.filter((message) => message.includes('Wave-1 locale pack unavailable'));

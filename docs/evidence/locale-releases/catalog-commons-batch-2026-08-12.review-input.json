@@ -1,0 +1,254 @@
+{
+  "schema_version": 3,
+  "kind": "commonworld_incremental_catalog_language_review_input",
+  "source_revision": "8731b8618efb1c33c2c0998dc48cdf6c66fd14c7",
+  "base_revision": "9dc98f9dabab9769bf4f4c43d885f229529d77c0",
+  "writer": "GPT-5.6 Sol via ChatGPT",
+  "review_round": "post-fix-2",
+  "prior_review_receipts_sha256": [
+    "ffd20a4a52a9333788a4109601403146ea6fdfa7130d3cd94ae04e386186f409",
+    "cffc9cc8f9751fc72561f34564884c977ae4dc142945481900d0c8900e69dde7"
+  ],
+  "scope": {
+    "new_project_ids": [
+      "samoa-community-based-fisheries-management-program",
+      "bangladesh-palli-bidyut-samities",
+      "green-coop-japan"
+    ],
+    "target_locales": [
+      "es",
+      "fr",
+      "pt-BR",
+      "ar",
+      "zh-Hans"
+    ],
+    "fields": [
+      "summary",
+      "geographic_labels",
+      "digital_label"
+    ],
+    "prior_reviewed_entries_carried_forward": 88,
+    "new_entries_to_review_per_locale": 3,
+    "recheck_locales": [
+      "pt-BR"
+    ]
+  },
+  "carry_forward_proof": {
+    "es": {
+      "prior_project_count": 88,
+      "prior_objects_unchanged": true,
+      "comparison_base_revision": "9dc98f9dabab9769bf4f4c43d885f229529d77c0",
+      "current_locale_file_sha256": "8d145707c3dfc55d1ca42206d73928445e42af5fa05db9065a0b7923811b0e87"
+    },
+    "fr": {
+      "prior_project_count": 88,
+      "prior_objects_unchanged": true,
+      "comparison_base_revision": "9dc98f9dabab9769bf4f4c43d885f229529d77c0",
+      "current_locale_file_sha256": "9ef30f1dc4da4a090dd77c257daf48b901183a703722710dfcc1fddd771faf22"
+    },
+    "pt-BR": {
+      "prior_project_count": 88,
+      "prior_objects_unchanged": true,
+      "comparison_base_revision": "9dc98f9dabab9769bf4f4c43d885f229529d77c0",
+      "current_locale_file_sha256": "78c63b96552ec3df7a92e2a7fbfe08c373ea99da20e1dac2268b10ef90564ba4"
+    },
+    "ar": {
+      "prior_project_count": 88,
+      "prior_objects_unchanged": true,
+      "comparison_base_revision": "9dc98f9dabab9769bf4f4c43d885f229529d77c0",
+      "current_locale_file_sha256": "1f912e9eb06d75f42a5606397a20bb4eec8b20f2d642cd5fe9bfaadb775f15cb"
+    },
+    "zh-Hans": {
+      "prior_project_count": 88,
+      "prior_objects_unchanged": true,
+      "comparison_base_revision": "9dc98f9dabab9769bf4f4c43d885f229529d77c0",
+      "current_locale_file_sha256": "808cf1efa5e15aaf2de61a09082ba9b28615a50c1316700f9b8416fbe853e7cd"
+    }
+  },
+  "canonical": {
+    "samoa-community-based-fisheries-management-program": {
+      "de": {
+        "summary": "Eine Commons-Infrastruktur in Samoa, in der mehr als 120 Küstendörfer eigene Fischereimanagementpläne, Dorfregeln und lokal verwaltete Fischreservate mit technischer Unterstützung von Samoas Fischereibehörde tragen.",
+        "geographic_labels": {
+          "samoa-cbfmp-villages": "Samoa – teilnehmende Küstendörfer"
+        },
+        "digital_label": "Öffentliche Programminformationen und aktuelle Berichte zu dorfgetragenem Fischereimanagement"
+      },
+      "en": {
+        "summary": "A commons infrastructure across Samoa in which more than 120 coastal village communities develop and carry their own fisheries management plans, village bylaws and locally governed fish reserves with technical support from Samoa's national fisheries authority.",
+        "geographic_labels": {
+          "samoa-cbfmp-villages": "Samoa — participating coastal village communities"
+        },
+        "digital_label": "Public programme information and current reports on village-led fisheries management"
+      }
+    },
+    "bangladesh-palli-bidyut-samities": {
+      "de": {
+        "summary": "Ein Verbund von 80 ländlichen Elektrizitätsgenossenschaften in Bangladesch, deren Verbraucher-Mitglieder Verwaltungsräte wählen und lokale Verteilinfrastruktur innerhalb des verbindlichen Rahmens des Rural Electrification Board betreiben.",
+        "geographic_labels": {
+          "bangladesh-pbs-network": "Bangladesch – 80 Palli Bidyut Samities in ländlichen Versorgungsgebieten"
+        },
+        "digital_label": "Öffentlich zugängliche offizielle REB-Informationen zu den Palli Bidyut Samities, ihrer Genossenschaftsstruktur und ihrem laufenden Betrieb"
+      },
+      "en": {
+        "summary": "A federation of 80 rural electricity cooperatives in Bangladesh whose consumer-members elect boards and operate local distribution infrastructure within the binding Rural Electrification Board framework.",
+        "geographic_labels": {
+          "bangladesh-pbs-network": "Bangladesh — 80 Palli Bidyut Samities in rural supply areas"
+        },
+        "digital_label": "Publicly available official REB information on the Palli Bidyut Samities, their cooperative structure and their ongoing operation"
+      }
+    },
+    "green-coop-japan": {
+      "de": {
+        "summary": "Ein mitgliedergesteuerter Verbund von 16 Verbraucherkooperativen in Japan, in dem rund 432.000 Mitgliedshaushalte gemeinsame Versorgungs-, Sozial-, Umwelt- und Unterstützungsstrukturen entwickeln und nutzen; Teilhabe und Mitgestaltung sind mitgliedschaftsgebunden.",
+        "geographic_labels": {
+          "green-coop-regions": "Japan – 16 regionale Green-Coop-Mitgliedsgenossenschaften"
+        },
+        "digital_label": "Mitgliederinformationen, Genossenschaftsprinzipien und öffentliche Berichte zu gemeinsamen Aktivitäten"
+      },
+      "en": {
+        "summary": "A member-led federation of 16 consumer cooperatives in Japan in which about 432,000 member households jointly develop and use supply, social-support, environmental and mutual-aid infrastructures; participation and co-governance are membership-bound.",
+        "geographic_labels": {
+          "green-coop-regions": "Japan — 16 regional Green Coop member cooperatives"
+        },
+        "digital_label": "Member information, cooperative principles and public reports on shared activities"
+      }
+    }
+  },
+  "targets": {
+    "es": {
+      "samoa-community-based-fisheries-management-program": {
+        "summary": "Una infraestructura de Commons en Samoa en la que más de 120 aldeas costeras elaboran y aplican sus propios planes de gestión pesquera y ordenanzas de aldea, y gestionan reservas pesqueras gobernadas localmente con apoyo técnico de la autoridad pesquera nacional de Samoa.",
+        "geographic_labels": {
+          "samoa-cbfmp-villages": "Samoa — aldeas costeras participantes"
+        },
+        "digital_label": "Información pública del programa e informes actuales sobre gestión pesquera dirigida por las aldeas"
+      },
+      "bangladesh-palli-bidyut-samities": {
+        "summary": "Una federación de 80 cooperativas rurales de electricidad en Bangladés cuyos miembros consumidores eligen consejos de administración y operan infraestructura local de distribución dentro del marco vinculante del Rural Electrification Board (REB).",
+        "geographic_labels": {
+          "bangladesh-pbs-network": "Bangladés — 80 Palli Bidyut Samities en zonas rurales de suministro"
+        },
+        "digital_label": "Información oficial de REB disponible públicamente sobre las Palli Bidyut Samities, su estructura cooperativa y su funcionamiento continuo"
+      },
+      "green-coop-japan": {
+        "summary": "Una federación de 16 cooperativas de consumo en Japón dirigida por sus miembros, en la que unos 432.000 hogares miembros desarrollan y utilizan conjuntamente infraestructuras de suministro, apoyo social, ambientales y de ayuda mutua; la participación y la cogestión están vinculadas a la afiliación.",
+        "geographic_labels": {
+          "green-coop-regions": "Japón — 16 cooperativas regionales miembros de Green Coop"
+        },
+        "digital_label": "Información para miembros, principios cooperativos e informes públicos sobre actividades compartidas"
+      }
+    },
+    "fr": {
+      "samoa-community-based-fisheries-management-program": {
+        "summary": "Une infrastructure de communs aux Samoa dans laquelle plus de 120 villages côtiers élaborent et appliquent leurs propres plans de gestion des pêches et règlements villageois, et gèrent des réserves de pêche sous gouvernance locale avec l’appui technique de l’autorité nationale des pêches des Samoa.",
+        "geographic_labels": {
+          "samoa-cbfmp-villages": "Samoa — communautés villageoises côtières participantes"
+        },
+        "digital_label": "Informations publiques sur le programme et rapports à jour sur la gestion des pêches menée par les villages"
+      },
+      "bangladesh-palli-bidyut-samities": {
+        "summary": "Une fédération de 80 coopératives rurales d’électricité au Bangladesh dont les consommateurs membres élisent les conseils d’administration et exploitent des infrastructures locales de distribution dans le cadre contraignant du Rural Electrification Board.",
+        "geographic_labels": {
+          "bangladesh-pbs-network": "Bangladesh — 80 Palli Bidyut Samities dans des zones rurales de desserte"
+        },
+        "digital_label": "Informations officielles du REB accessibles au public sur les Palli Bidyut Samities, leur structure coopérative et leur fonctionnement continu"
+      },
+      "green-coop-japan": {
+        "summary": "Une fédération de 16 coopératives de consommation au Japon dirigée par ses membres, dans laquelle environ 432 000 ménages membres développent et utilisent ensemble des infrastructures d’approvisionnement, de soutien social, environnementales et d’entraide ; la participation et la cogouvernance sont liées à l’adhésion.",
+        "geographic_labels": {
+          "green-coop-regions": "Japon — 16 coopératives régionales membres de Green Coop"
+        },
+        "digital_label": "Informations pour les membres, principes coopératifs et rapports publics sur les activités communes"
+      }
+    },
+    "pt-BR": {
+      "samoa-community-based-fisheries-management-program": {
+        "summary": "Uma infraestrutura de bens comuns em Samoa na qual mais de 120 comunidades costeiras desenvolvem e executam seus próprios planos de gestão pesqueira e regulamentos comunitários, e administram reservas de pesca sob governança local, com apoio técnico da autoridade pesqueira nacional de Samoa.",
+        "geographic_labels": {
+          "samoa-cbfmp-villages": "Samoa — comunidades costeiras participantes"
+        },
+        "digital_label": "Informações públicas do programa e relatórios atuais sobre gestão pesqueira liderada pelas comunidades"
+      },
+      "bangladesh-palli-bidyut-samities": {
+        "summary": "Uma federação de 80 cooperativas rurais de eletricidade em Bangladesh cujos consumidores associados elegem conselhos de administração e operam infraestrutura local de distribuição sob o arcabouço vinculante do Rural Electrification Board (REB).",
+        "geographic_labels": {
+          "bangladesh-pbs-network": "Bangladesh — 80 Palli Bidyut Samities em áreas rurais de fornecimento"
+        },
+        "digital_label": "Informações oficiais do REB disponíveis publicamente sobre as Palli Bidyut Samities, sua estrutura cooperativa e seu funcionamento contínuo"
+      },
+      "green-coop-japan": {
+        "summary": "Uma federação de 16 cooperativas de consumo no Japão liderada por seus membros, na qual cerca de 432 mil domicílios associados desenvolvem e utilizam em conjunto infraestruturas de abastecimento, apoio social, ambientais e de ajuda mútua; a participação e a cogestão são vinculadas à associação.",
+        "geographic_labels": {
+          "green-coop-regions": "Japão — 16 cooperativas regionais integrantes da Green Coop"
+        },
+        "digital_label": "Informações para membros, princípios cooperativos e relatórios públicos sobre atividades compartilhadas"
+      }
+    },
+    "ar": {
+      "samoa-community-based-fisheries-management-program": {
+        "summary": "بنية تحتية للمشاعات في ساموا تضع فيها أكثر من 120 قرية ساحلية خططها الخاصة لإدارة مصايد الأسماك ولوائحها القروية وتنفذها، كما تدير محميات سمكية خاضعة للحوكمة المحلية، بدعم تقني من السلطة الوطنية لمصايد الأسماك في ساموا.",
+        "geographic_labels": {
+          "samoa-cbfmp-villages": "ساموا — القرى الساحلية المشاركة"
+        },
+        "digital_label": "معلومات عامة عن البرنامج وتقارير حديثة عن إدارة مصايد الأسماك بقيادة القرى"
+      },
+      "bangladesh-palli-bidyut-samities": {
+        "summary": "اتحاد يضم 80 تعاونية ريفية للكهرباء في بنغلاديش، ينتخب فيه المستهلكون الأعضاء مجالس الإدارة ويشغّلون بنية تحتية محلية للتوزيع ضمن الإطار الملزم لمجلس كهربة الريف (Rural Electrification Board – REB).",
+        "geographic_labels": {
+          "bangladesh-pbs-network": "بنغلاديش — 80 جمعية Palli Bidyut Samity في مناطق إمداد ريفية"
+        },
+        "digital_label": "معلومات رسمية متاحة للعامة من REB عن جمعيات Palli Bidyut Samity وبنيتها التعاونية وتشغيلها المستمر"
+      },
+      "green-coop-japan": {
+        "summary": "اتحاد يقوده الأعضاء ويضم 16 تعاونية استهلاكية في اليابان، تطوّر فيه نحو 432 ألف أسرة عضو وتستخدم معاً بنى مشتركة للإمداد والدعم الاجتماعي والبيئة والتكافل؛ والمشاركة والحوكمة المشتركة مرتبطتان بالعضوية.",
+        "geographic_labels": {
+          "green-coop-regions": "اليابان — 16 تعاونية إقليمية عضو في Green Coop"
+        },
+        "digital_label": "معلومات للأعضاء ومبادئ تعاونية وتقارير عامة عن الأنشطة المشتركة"
+      }
+    },
+    "zh-Hans": {
+      "samoa-community-based-fisheries-management-program": {
+        "summary": "萨摩亚各地的公地基础设施，120 多个沿海村社在萨摩亚国家渔业主管机构的技术支持下，自行制定并执行渔业管理计划和村规民约，并设立和管理由地方治理的鱼类保护区。",
+        "geographic_labels": {
+          "samoa-cbfmp-villages": "萨摩亚 — 参与项目的沿海村社"
+        },
+        "digital_label": "项目公开信息和村社主导渔业管理的最新报告"
+      },
+      "bangladesh-palli-bidyut-samities": {
+        "summary": "由孟加拉国 80 个农村电力合作社组成的联合网络，消费者社员选举理事会，并在农村电气化委员会（Rural Electrification Board，REB）的约束性框架下运营本地配电基础设施。",
+        "geographic_labels": {
+          "bangladesh-pbs-network": "孟加拉国 — 农村供电区域内的 80 个 Palli Bidyut Samity"
+        },
+        "digital_label": "REB 关于 Palli Bidyut Samities、合作社结构及其持续运营的公开官方信息"
+      },
+      "green-coop-japan": {
+        "summary": "日本由成员主导的 16 个消费者合作社联合网络，约 43.2 万个成员家庭共同开发并使用供应、社会支持、环境和互助基础设施；参与和共同治理以成员资格为前提。",
+        "geographic_labels": {
+          "green-coop-regions": "日本 — Green Coop 的 16 个地区成员合作社"
+        },
+        "digital_label": "成员信息、合作社原则和共同活动的公开报告"
+      }
+    }
+  },
+  "review_contract": {
+    "review_kind": "model_assisted_independent_language_review",
+    "must_be_independent_of_writer": true,
+    "must_not_claim_native_speaker_or_human_review": true,
+    "pass_requires_no_blocker_major_or_minor_findings": true,
+    "check": [
+      "semantic fidelity",
+      "preservation of governance and access qualifiers",
+      "idiomatic target language",
+      "terminology consistency",
+      "Arabic RTL/script integrity",
+      "Simplified Chinese terminology/script"
+    ],
+    "critical_qualifiers": {
+      "samoa-community-based-fisheries-management-program": "Commons infrastructure across Samoa for many village commons; not one single nationwide common; >120 coastal villages; local plans/bylaws/fish reserves; national fisheries authority provides technical support.",
+      "bangladesh-palli-bidyut-samities": "80 rural electricity cooperatives; consumer-members elect boards; local distribution infrastructure; binding Rural Electrification Board framework; official information is publicly available.",
+      "green-coop-japan": "16 member-led consumer cooperatives; about 432,000 member households; shared supply/social/environment/mutual-aid infrastructure; participation and co-governance are membership-bound; members jointly develop and use the infrastructures."
+    }
+  }
+}

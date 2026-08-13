@@ -2,8 +2,8 @@
   "schema_version": 2,
   "kind": "commonworld.ui_locale_independent_language_review_receipt",
   "status": "passed",
-  "reviewed_revision": "1e7e9be4ca01d30a96f2516a36278e3dcd2c8a92",
-  "reviewed_source_pack_sha256": "c2bc4c17138b29e9d45a4a8a082a95aaa59c7e925b17b4020ac74c3690f29274",
+  "reviewed_revision": "d41899d572426824174b8333547714e903526eaa",
+  "reviewed_source_pack_sha256": "d449f5b6a564c859be9142d737ad768020a8ee472f18026e3d3cbb092ec54648",
   "locale_verdicts": {
     "es": {
       "status": "passed",
@@ -69,6 +69,41 @@
         "section_key": "static.candidate_notice",
         "problem": "The Arabic translation contains an extraneous translator's note about needing RTL and mixed-script review ('وإلى مراجعة اتجاه RTL والنصوص المختلطة.') which was added to the public-facing string. This must be removed.",
         "exact_replacement": "معاينة ترجمة. لم تُفعَّل هذه اللغة بعد؛ وما تزال تحتاج إلى مراجعة لغوية مستقلة."
+      },
+      {
+        "locale": "fr",
+        "severity": "major",
+        "section_key": "themes.care",
+        "problem": "Incremental care-theme review finding on Soins",
+        "resolution": "replaced; clinical/service-care narrowing removed"
+      },
+      {
+        "locale": "pt-BR",
+        "severity": "minor",
+        "section_key": "themes.care",
+        "problem": "Incremental care-theme review finding on Cuidado",
+        "resolution": "Cuidado e apoio; standalone caution ambiguity removed"
+      },
+      {
+        "locale": "zh-Hans",
+        "severity": "major",
+        "section_key": "themes.care",
+        "problem": "Incremental care-theme review finding on 照护",
+        "resolution": "关怀; nursing/long-term-care narrowing removed"
+      },
+      {
+        "locale": "fr",
+        "severity": "minor",
+        "section_key": "themes.care",
+        "problem": "Incremental care-theme review finding on Prendre soin",
+        "resolution": "replaced; verb-phrase/CTA taxonomy form removed"
+      },
+      {
+        "locale": "fr",
+        "severity": "minor",
+        "section_key": "themes.care",
+        "problem": "Incremental care-theme review finding on Attention et soin",
+        "resolution": "Soutien et bienveillance; attention ambiguity and soin/care-work overlap removed"
       }
     ],
     "final_findings": []
@@ -126,6 +161,25 @@
       ],
       "limitations": "Model-assisted review; does not constitute native or human language approval.",
       "confidence": "high"
+    },
+    "care-theme-2026-08-12": {
+      "review_class": "model_assisted_independent_language_review",
+      "reviewed_revision": "d41899d572426824174b8333547714e903526eaa",
+      "source_pack_sha256": "d449f5b6a564c859be9142d737ad768020a8ee472f18026e3d3cbb092ec54648",
+      "locale_verdicts": {
+        "es": "PASS",
+        "fr": "PASS",
+        "pt-BR": "PASS",
+        "ar": "PASS",
+        "zh-Hans": "PASS"
+      },
+      "findings": [],
+      "source_receipt": {
+        "path": "docs/evidence/locale-reviews/raw/care-theme-final-pass-2026-08-12.json",
+        "sha256": "6248ddd96923a0168e7723d51a468d90d0c903e09fc6bc546ee84ace97343d04"
+      },
+      "limitations": "Model-assisted review; does not constitute native or human approval.",
+      "confidence": "medium"
     }
   },
   "raw_sources": [
@@ -165,14 +219,16 @@
   ],
   "catalog_review": {
     "review_kind": "model_assisted_independent_language_review",
-    "reviewer": "GPT-5.6 Sol independent post-fix release review via ChatGPT",
-    "writer_independence": "independent_from_grok_4_5_writer",
+    "reviewer": "Claude Opus 5 via Grabowski independent review",
+    "writer": "GPT-5.6 Sol via ChatGPT",
+    "writer_independence": "independent_from_catalog_translation_writer",
+    "reviewed_revision": "8731b8618efb1c33c2c0998dc48cdf6c66fd14c7",
     "input_digests": {
-      "es": "de1638df4c7f4b71aaab644c28e7739a699f3d914f49cfa09b205885a5f1ec36",
-      "fr": "c58061ed7f34dce421898b2894026aeafec56c41c32cb488a2ceb6cbf9a0875b",
-      "pt-BR": "d016bbf890ad12d59ab9004c2b47e88595d76c9d426dfceec07a1e50f5042ddc",
-      "ar": "ee4d37a7f75174099408a5191863440a9c8bd40475a1f05e59537c25c44ccaf2",
-      "zh-Hans": "a9d7af6799f51c36c83dda3799ddf58fddd67af73da542b9d87e2aa8541638db"
+      "es": "8d145707c3dfc55d1ca42206d73928445e42af5fa05db9065a0b7923811b0e87",
+      "fr": "9ef30f1dc4da4a090dd77c257daf48b901183a703722710dfcc1fddd771faf22",
+      "pt-BR": "78c63b96552ec3df7a92e2a7fbfe08c373ea99da20e1dac2268b10ef90564ba4",
+      "ar": "1f912e9eb06d75f42a5606397a20bb4eec8b20f2d642cd5fe9bfaadb775f15cb",
+      "zh-Hans": "808cf1efa5e15aaf2de61a09082ba9b28615a50c1316700f9b8416fbe853e7cd"
     },
     "coverage": {
       "locales": [
@@ -182,53 +238,70 @@
         "ar",
         "zh-Hans"
       ],
-      "project_count_per_locale": 88,
+      "project_count_per_locale": 91,
       "all_entries_reviewed": true,
-      "basis": "prior_digest_bound_review_plus_zh_hans_pr204_post_fix_review",
-      "full_review_source": "docs/evidence/locale-reviews/raw/catalog-wave1-zh-hans-independent-final-pass-2026-08-10.json"
+      "basis": "prior_digest_bound_full-corpus review for 88 unchanged entries plus independent three-entry review chain with fail-closed post-fix closure",
+      "full_review_source": "docs/evidence/locale-reviews/raw/catalog-commons-batch-independent-final-pass-2026-08-12.json"
     },
     "verdict": "pass",
     "counts": {
       "blocker": 0,
       "major": 0,
       "minor": 0,
-      "note": 1
+      "note": 0
     },
     "findings": [],
     "review_notes": [
-      "The prior es/fr/pt-BR/ar review remains valid because all four catalog overlay digests are unchanged.",
-      "PR #204 found two Simplified Chinese terminology defects; both are fixed and regression-tested.",
-      "The full zh-Hans corpus received a post-fix review; no blocker, major, or minor findings remain. Native-speaker approval is not claimed."
+      "All five target overlays contain 91 projects. The prior 88 project objects are byte-semantically unchanged by exact JSON object comparison against origin/main.",
+      "Three new entries per locale were independently reviewed; zh-Hans and pt-BR findings were fixed and independently re-reviewed to PASS.",
+      "Model-assisted review only; native-speaker/human approval is not claimed."
     ],
     "source_receipts": [
       {
-        "path": "docs/evidence/locale-reviews/raw/catalog-wave1-independent-codex-final-pass-2026-08-08.json",
-        "sha256": "6756a78ad888e4c484fa89befb05113c62fe5044c3a8803cdfb7cbd83d5b3bd8",
-        "role": "prior_wave1_full_corpus_release_review"
-      },
-      {
-        "path": "docs/evidence/locale-reviews/raw/catalog-wave1-zh-hans-independent-final-pass-2026-08-10.json",
-        "sha256": "04a4fca1a3796de7cfb5dd2a68bb1d962070e1c3799fa0f4ffe0e133afb52f62",
-        "role": "zh_hans_pr204_post_fix_full_corpus_review"
+        "path": "docs/evidence/locale-reviews/raw/catalog-commons-batch-independent-final-pass-2026-08-12.json",
+        "sha256": "2e4dd8d88c4cd7fcf6ce1d1dfe753ed1f7505378ba2215f9369694ea04e3e448",
+        "role": "commons_batch_incremental_independent_review_chain"
       }
     ],
     "resolved_findings": [
       {
-        "severity": "P2",
-        "project": "open-food-network-australia",
+        "locale": "zh-Hans",
+        "project": "bangladesh-palli-bidyut-samities",
+        "severity": "minor",
         "field": "summary",
-        "before": "简短…供应链",
-        "after": "一个澳大利亚非营利社区和开源平台，使生产者和食品倡议能够组织短供应链，并确保供应链透明且由社区控制。",
-        "resolution": "corrected short/local supply-chain terminology; post-fix review passed"
+        "resolution": "cooperative board terminology corrected from 董事会 to 理事会 and post-fix review passed"
       },
       {
-        "severity": "P2",
-        "project": "the-things-network",
-        "field": "geographic_labels.the-things-network-global-communities",
-        "before": "门户",
-        "after": "当地社区和网关的全球网络",
-        "resolution": "corrected LoRaWAN gateway terminology; post-fix review passed"
+        "locale": "zh-Hans",
+        "project": "samoa-community-based-fisheries-management-program",
+        "severity": "minor",
+        "field": "summary",
+        "resolution": "fish-reserve clause received its own compatible verb phrase and post-fix review passed"
+      },
+      {
+        "locale": "pt-BR",
+        "project": "samoa-community-based-fisheries-management-program",
+        "severity": "minor",
+        "field": "summary",
+        "resolution": "fish reserves separated from executar coordination; final pt-BR re-review passed"
       }
+    ],
+    "limitations": [
+      "Model-assisted independent review; no native-speaker or human language approval is claimed.",
+      "The prior 88 entries were carried forward by exact machine comparison, not re-reviewed linguistically in this batch."
     ]
+  },
+  "incremental_ui_review": {
+    "key": "themes.care",
+    "verdict": "pass",
+    "reviewed_revision": "d41899d572426824174b8333547714e903526eaa",
+    "review_binding_revision": "2907c13f1a4854c9b7f3960984dc7f27ec90ed84",
+    "reviewed_source_pack_sha256": "d449f5b6a564c859be9142d737ad768020a8ee472f18026e3d3cbb092ec54648",
+    "source_receipt": {
+      "path": "docs/evidence/locale-reviews/raw/care-theme-final-pass-2026-08-12.json",
+      "sha256": "6248ddd96923a0168e7723d51a468d90d0c903e09fc6bc546ee84ace97343d04"
+    },
+    "final_review_receipt_sha256": "6c450ab8a95beb0b69c17ef4ea100fd714fb31a1fd2b7624bc9e2a58fdae6add",
+    "claims_native_or_human_review": false
   }
 }

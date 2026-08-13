@@ -1,0 +1,75 @@
+{
+  "schema_version": 4,
+  "kind": "commonworld_incremental_ui_language_review_input",
+  "source_revision": "d41899d572426824174b8333547714e903526eaa",
+  "writer": "GPT-5.6 Sol via ChatGPT",
+  "review_round": "fr-postfix-final",
+  "reviewed_source_pack_sha256": "d449f5b6a564c859be9142d737ad768020a8ee472f18026e3d3cbb092ec54648",
+  "scope": {
+    "key": "themes.care",
+    "recheck_locales": [
+      "fr"
+    ],
+    "carried_forward_pass_locales": [
+      "es",
+      "pt-BR",
+      "ar",
+      "zh-Hans"
+    ],
+    "semantic_distinction": "Broad care, social-support and caring activity; distinct from narrower care-work and not limited to clinical/health care.",
+    "canonical": {
+      "en": "Care",
+      "de": "Fürsorge"
+    },
+    "targets": {
+      "es": "Cuidados",
+      "fr": "Soutien et bienveillance",
+      "pt-BR": "Cuidado e apoio",
+      "ar": "الرعاية",
+      "zh-Hans": "关怀"
+    },
+    "care_work_contrast": {
+      "es": "Trabajo de cuidados",
+      "fr": "Travail de soin",
+      "pt-BR": "Trabalho de cuidado",
+      "ar": "أعمال الرعاية",
+      "zh-Hans": "护理工作"
+    }
+  },
+  "review_history": {
+    "initial_receipt_sha256": "6783c615a69f6d2ba52ee54345db165cab1fd35bfe3c08f0b74ee5e88edc4cee",
+    "postfix_receipt_sha256": "52b876ebe829834202d31986ca429d7485e801428875cd3256d339efe1d12386",
+    "attention_et_soin_receipt_sha256": "e9d79faba2a9cb6619c0a1fdab4817edc57423a8c3b35b3701d1dfdb14bc609e",
+    "closed_before_this_round": [
+      "es",
+      "pt-BR",
+      "ar",
+      "zh-Hans"
+    ],
+    "french_sequence": [
+      "Soins",
+      "Prendre soin",
+      "Attention et soin",
+      "Soutien et bienveillance"
+    ]
+  },
+  "changes_since_prior_review": {
+    "fr": {
+      "before": "Attention et soin",
+      "after": "Soutien et bienveillance"
+    }
+  },
+  "review_contract": {
+    "review_kind": "model_assisted_independent_language_review",
+    "must_be_independent_of_writer": true,
+    "must_not_claim_native_speaker_or_human_review": true,
+    "pass_requires_no_blocker_major_or_minor_findings": true,
+    "check": [
+      "broad nonclinical care and social-support meaning",
+      "idiomatic French nominal taxonomy label",
+      "no warning/cognitive-attention ambiguity",
+      "clear lexical and semantic distinction from care-work Travail de soin",
+      "no clinical/nursing narrowing"
+    ]
+  }
+}
