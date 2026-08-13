@@ -1,11 +1,13 @@
 {
   "schema_version": 3,
   "kind": "commonworld_incremental_catalog_language_review_input",
-  "source_revision": "b4f9d2fefba6f6694dfb4e6269f57521e5e413c2",
+  "source_revision": "31cbd59744f80e41b358b55047af3678b75ceb02",
   "base_revision": "582c33e9228e0d5ea70b7cef4222c74438d267d1",
   "writer": "GPT-5.6 Sol via ChatGPT",
-  "review_round": "initial",
-  "prior_review_receipts_sha256": [],
+  "review_round": "post-fix-1",
+  "prior_review_receipts_sha256": [
+    "097d29b03bf254b24647b7952f292435f3439de2a78435c9f37c10d3643e1db2"
+  ],
   "scope": {
     "new_project_ids": [
       "lasilo-naples",
@@ -26,14 +28,16 @@
     ],
     "prior_reviewed_entries_carried_forward": 91,
     "new_entries_to_review_per_locale": 3,
-    "recheck_locales": []
+    "recheck_locales": [
+      "es"
+    ]
   },
   "carry_forward_proof": {
     "es": {
       "prior_project_count": 91,
       "prior_objects_unchanged": true,
       "comparison_base_revision": "582c33e9228e0d5ea70b7cef4222c74438d267d1",
-      "current_locale_file_sha256": "dd8df0749814bb47ffa4d833bd62a501de0f428120435f2901a478472ed4b32f"
+      "current_locale_file_sha256": "1b42a6240e821c62b3f63a3142a4cdca69737aa76f076d7faf8945db06d3b6c9"
     },
     "fr": {
       "prior_project_count": 91,
@@ -116,7 +120,7 @@
         "digital_label": "Documentación pública sobre espacios compartidos, autogobierno, asambleas y uso cívico"
       },
       "orangi-low-cost-sanitation": {
-        "summary": "Una práctica comunitaria de saneamiento de Orangi, Karachi, en la que los vecindarios financian, construyen, gestionan y mantienen conjuntamente conexiones domésticas, alcantarillas de calle y colectores secundarios, mientras OPP-RTI aporta asesoramiento técnico y las autoridades públicas asumen la infraestructura principal.",
+        "summary": "Una práctica comunitaria de saneamiento de Orangi, Karachi, en la que los vecindarios financian, construyen, gestionan y mantienen conjuntamente conexiones domésticas, alcantarillas de callejón y colectores secundarios, mientras OPP-RTI aporta asesoramiento técnico y las autoridades públicas asumen la infraestructura principal.",
         "geographic_labels": {
           "orangi-sanitation-network": "Orangi, Karachi — infraestructura de saneamiento gestionada por la comunidad"
         },
@@ -231,6 +235,7 @@
       "lasilo-naples": "Municipal ownership must not be turned into community ownership. The common is civic use/self-governance of a public cultural space through open assemblies and working groups. Do not imply August 2026 activity is freshly verified; canonical status is unknown/not timely verified. No coordinates are published or inferred.",
       "orangi-low-cost-sanitation": "The common is resident/neighbourhood-managed internal sanitation infrastructure and practice, not OPP-RTI itself. Households/neighbourhoods finance, build, manage and maintain internal household/lane/secondary infrastructure; OPP-RTI provides technical guidance; public authorities remain responsible for trunk sewers/treatment. Physical participation is resident-bound and household/lane locations must not be exposed.",
       "gbif": "GBIF is federated/institutional commons infrastructure, not equal individual-user governance. The Secretariat operates central infrastructure. Data access is open through publisher-contributed datasets under admissible licences; do not imply every dataset is universally unrestricted."
-    }
+    },
+    "post_fix_context": "Initial independent DeepSeek review receipt 097d29b03bf254b24647b7952f292435f3439de2a78435c9f37c10d3643e1db2 found one minor Spanish finding in orangi-low-cost-sanitation.summary: alcantarillas de calle was too broad for lane sewers. It was corrected to alcantarillas de callejón. The other four locales passed initial review. Recheck Spanish against canonical and confirm the fix introduces no new material issue; carry forward the four unchanged locale PASS results only if their current digests still match the initial reviewed inputs."
   }
 }
