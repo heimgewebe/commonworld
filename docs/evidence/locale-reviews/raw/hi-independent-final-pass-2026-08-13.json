@@ -1,0 +1,165 @@
+{
+  "schema_version": 1,
+  "kind": "commonworld.locale_independent_language_review",
+  "locale": "hi",
+  "status": "passed",
+  "review_kind": "model_assisted_independent_language_review",
+  "reviewer": "GPT-5.6 Sol via ChatGPT independent post-fix review",
+  "writer": "Google Translate web endpoint via structure-preserving Commonworld translation adapter",
+  "writer_independence": "independent_from_machine_translation_writer",
+  "reviewed_revision": "582c33e9228e0d5ea70b7cef4222c74438d267d1",
+  "reviewed_source_pack_sha256": "cf57400b0a0fbf818baa88f33001e95bc4c7c39bd00caef3505f4d9ab6c0f405",
+  "catalog_overlay_sha256": "f7caff51645156ab365994a80d463f944e096d8608e4c9497addfbbe20fb8ea3",
+  "coverage": {
+    "ui_runtime_values": 636,
+    "catalog_projects": 91,
+    "catalog_source_target_fields": 231,
+    "all_ui_source_target_pairs_reviewed": true,
+    "all_catalog_entries_reviewed": true,
+    "review_scope": [
+      "ui",
+      "themes",
+      "static",
+      "shell",
+      "method",
+      "proposal",
+      "taxonomy",
+      "actions",
+      "proposal_runtime",
+      "catalog taxonomy",
+      "all catalog project summaries",
+      "all geographic labels",
+      "all digital labels"
+    ]
+  },
+  "review_method": [
+    "complete English/Hindi source-target comparison across 636 UI/runtime values",
+    "complete English/Hindi source-target comparison across all 91 catalog projects and 231 localized catalog fields",
+    "explicit post-fix review of every identified semantic mistranslation",
+    "placeholder-order, HTML-token, critical-attribute, bidi-control, Devanagari-script and action-parity regression tests",
+    "untranslated-value and Latin-heavy leakage scan with proper-name and technical-token exceptions",
+    "catalog structural parity validation against the English overlay",
+    "final targeted post-fix review of the method stable-ID sentence across its inline-code boundary"
+  ],
+  "resolved_findings": [
+    {
+      "severity": "major",
+      "surface": "ui",
+      "key": "show_more_in_bundle",
+      "before": "दिखाओ {count} अधिक कॉमन्स इंच {label}",
+      "after": "{count} और कॉमन्स {label} में दिखाएँ",
+      "resolution": "corrected English preposition 'in' mistranslated as measurement unit 'inch'"
+    },
+    {
+      "severity": "major",
+      "surface": "shell",
+      "key": "shell_073 / shell_160",
+      "before": "अवधि",
+      "after": "क्यूरेशन",
+      "resolution": "corrected curation mistranslated as duration"
+    },
+    {
+      "severity": "major",
+      "surface": "method",
+      "key": "method_011",
+      "before": "प्रत्येक प्रविष्टि में एक अस्तबल है",
+      "after": "प्रत्येक प्रविष्टि का एक स्थायी CommonProject.id होता है",
+      "resolution": "corrected stable-as-adjective mistranslation and completed Hindi grammar across the inline CommonProject.id code boundary"
+    },
+    {
+      "severity": "major",
+      "surface": "proposal",
+      "key": "proposal_009",
+      "before": "रिपॉजिटरी कमेटी",
+      "after": "रिपॉजिटरी कमिट",
+      "resolution": "corrected repository commit mistranslated as committee"
+    },
+    {
+      "severity": "major",
+      "surface": "proposal/proposal_runtime",
+      "key": "Shared good / Stewardship",
+      "before": "अच्छा साझा किया / भण्डारीपन",
+      "after": "साझा संपदा / देखरेख",
+      "resolution": "restored Commons-basis dimension semantics"
+    },
+    {
+      "severity": "major",
+      "surface": "themes/taxonomy",
+      "key": "open-data, open-hardware, open-media, open_knowledge_data",
+      "before": "imperative forms equivalent to 'open the data/hardware/media'",
+      "after": "खुला डेटा / खुला हार्डवेयर / खुला मीडिया / खुला ज्ञान और डेटा",
+      "resolution": "restored 'open' as openness adjective rather than command"
+    },
+    {
+      "severity": "major",
+      "surface": "catalog",
+      "key": "namibia-communal-conservancies-alliance",
+      "before": "सांप्रदायिक रूढ़िवादिता",
+      "after": "सामुदायिक संरक्षण क्षेत्र",
+      "resolution": "corrected communal conservancies mistranslated as communal conservatism"
+    },
+    {
+      "severity": "major",
+      "surface": "catalog",
+      "key": "new-mexico-acequia-association / nmaa-acequias",
+      "before": "व्यक्तिगत सुविधाएं",
+      "after": "व्यक्तिगत एसेकिया नहरें",
+      "resolution": "restored acequia irrigation meaning"
+    },
+    {
+      "severity": "major",
+      "surface": "catalog",
+      "key": "guifi-net",
+      "before": "Commons role omitted from translated summary",
+      "after": "बुनियादी ढाँचा कॉमन्स के रूप में सामूहिक रूप से बनाया और उपयोग किया जाता है",
+      "resolution": "restored a source claim omitted by the machine translation"
+    },
+    {
+      "severity": "minor",
+      "surface": "catalog",
+      "key": "the-things-network-global-communities",
+      "before": "प्रवेश द्वार",
+      "after": "गेटवे",
+      "resolution": "restored LoRaWAN gateway terminology"
+    },
+    {
+      "severity": "major",
+      "surface": "catalog",
+      "key": "samoa-community-based-fisheries-management-program",
+      "before": "सामान्य बुनियादी ढाँचा",
+      "after": "कॉमन्स अवसंरचना",
+      "resolution": "restored Commons as the domain noun rather than ordinary 'common'"
+    }
+  ],
+  "post_fix_verdict": {
+    "status": "pass",
+    "blocker": 0,
+    "major": 0,
+    "minor": 0,
+    "note": 0,
+    "untranslated_equal_values": {
+      "ui_runtime": 1,
+      "expected_exceptions": [
+        "Creative Commons"
+      ],
+      "catalog": 0
+    },
+    "known_bad_fragments_remaining": 0,
+    "final_targeted_grammar_review": "pass",
+    "final_inline_whitespace_review": "pass"
+  },
+  "review_class": {
+    "machine_translation_only": false,
+    "independent_of_writer": true,
+    "model_assisted_editorial_review": true,
+    "claims_native_or_human_review": false,
+    "digest_bound": true,
+    "findings_based": true,
+    "post_fix_review_required": true,
+    "post_fix_review_completed": true
+  },
+  "limitations": [
+    "Model-assisted review only; no native-speaker or human language approval is claimed.",
+    "This review assesses localization meaning, terminology and release-contract integrity; it is not a full WCAG or assistive-technology certification."
+  ]
+}

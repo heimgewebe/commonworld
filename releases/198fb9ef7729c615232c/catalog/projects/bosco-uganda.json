@@ -1,0 +1,179 @@
+{
+  "schema_version": 4,
+  "id": "bosco-uganda",
+  "title": "BOSCO Uganda",
+  "summary": "Ein gemeinnützig getragenes Gemeinschaftsnetz in Norduganda, das ländliche Internetzugänge, gemeinschaftliche ICT-Zentren, digitale Bildung und solarbetriebene Infrastruktur miteinander verbindet.",
+  "themes": [
+    "community-network",
+    "communication",
+    "digital-equity",
+    "renewable-energy",
+    "rural-infrastructure",
+    "education"
+  ],
+  "actions": [
+    "use",
+    "learn",
+    "donate",
+    "contact"
+  ],
+  "presence": {
+    "geographic": [
+      {
+        "id": "bosco-gulu-network-anchor",
+        "mode": "approximate",
+        "label": "Gulu City als grober Anker eines Netzes in Acholi, Lango und West Nile",
+        "geometry": {
+          "type": "Point",
+          "coordinates": [
+            32.3056,
+            2.7667
+          ]
+        },
+        "uncertainty_meters_min": 180000,
+        "privacy_note": "Der Punkt bezeichnet nur den öffentlich beschriebenen regionalen Ausgangsraum. Einzelne Schulen, Gesundheitsorte, religiöse Einrichtungen, Türme und private Anschlüsse werden nicht rekonstruiert.",
+        "source_ids": [
+          "bosco-about",
+          "gulu-wikidata"
+        ]
+      },
+      {
+        "id": "bosco-network-sites",
+        "mode": "hidden",
+        "label": "ICT-Zentren, Funkstrecken und lokale Anschlussorte",
+        "privacy_note": "Konkrete Netz- und Anschlussstandorte werden nicht aus Karten, Bildern oder Organisationsangaben in Commonworld übernommen.",
+        "source_ids": [
+          "bosco-connectivity"
+        ]
+      }
+    ],
+    "digital": {
+      "available": true,
+      "reach": "regional",
+      "label": "Gemeinschaftsnetz, ICT-Zentren und digitale Bildungsangebote in Norduganda",
+      "source_ids": [
+        "bosco-about",
+        "bosco-connectivity"
+      ]
+    }
+  },
+  "activity": {
+    "status": "active",
+    "observed_at": "2026-07-30",
+    "source_ids": [
+      "bosco-home"
+    ],
+    "note": "Die offizielle Seite veröffentlicht aktuelle Beiträge aus Juni und Juli 2026 und beschreibt laufende Konnektivitäts-, Ausbildungs- und Solararbeit."
+  },
+  "provenance": {
+    "sources": [
+      {
+        "id": "bosco-home",
+        "type": "official-source",
+        "label": "BOSCO Uganda – offizielle Seite",
+        "url": "https://www.boscouganda.com/",
+        "retrieved_at": "2026-07-30",
+        "note": "Aktuelle offizielle Selbstbeschreibung und Nachrichten aus 2026 zu Konnektivität, erneuerbarer Energie, digitaler Inklusion und Gemeinschaftsarbeit."
+      },
+      {
+        "id": "bosco-about",
+        "type": "official-source",
+        "label": "BOSCO Uganda – About us",
+        "url": "https://www.boscouganda.com/about-us-2/",
+        "retrieved_at": "2026-07-30",
+        "note": "Offizielle Geschichte und Beschreibung des Gemeinschaftsnetzes sowie der 55 gemeinschaftlichen ICT- und Entwicklungszentren in Acholi, Lango und West Nile."
+      },
+      {
+        "id": "bosco-connectivity",
+        "type": "official-source",
+        "label": "BOSCO Uganda – Connectivity",
+        "url": "https://www.boscouganda.com/connectivity/",
+        "retrieved_at": "2026-07-30",
+        "note": "Offizielle Beschreibung der regionalen Community-Network-Infrastruktur und der gemeinschaftlichen ICT-Zentren."
+      },
+      {
+        "id": "bosco-contact",
+        "type": "official-source",
+        "label": "BOSCO Uganda – Contact",
+        "url": "https://www.boscouganda.com/contact/",
+        "retrieved_at": "2026-07-30",
+        "note": "Offizieller Kontakt- und Besuchsweg für die Organisation in Gulu City."
+      },
+      {
+        "id": "gulu-wikidata",
+        "type": "public-registry",
+        "label": "Wikidata – Gulu City",
+        "url": "https://www.wikidata.org/wiki/Q581379",
+        "retrieved_at": "2026-07-30",
+        "note": "CC0-Registereintrag für den groben öffentlichen Stadtanker; keine Netzstandorte werden daraus abgeleitet."
+      }
+    ],
+    "uncertainty_note": "Der Kartenpunkt repräsentiert nicht die Ausdehnung des Netzes. Die tatsächliche Infrastruktur ist verteilt und wird aus Sicherheits- und Genauigkeitsgründen nicht als Standortinventar veröffentlicht."
+  },
+  "curation": {
+    "state": "listed",
+    "catalogued_at": "2026-07-30",
+    "reviewed_by": "Commonworld editorial review",
+    "reviewed_at": "2026-07-30",
+    "next_review_at": "2026-10-30",
+    "notes": "Aufgenommen als konkretes regionales Gemeinschaftsnetz mit aktuell belegter Aktivität. Zahlen zu Zentren werden nur in der Quellenbeschreibung genannt und nicht als stabiler Datensatzwert behandelt."
+  },
+  "links": [
+    {
+      "type": "homepage",
+      "label": "BOSCO Uganda – offizielle Seite",
+      "url": "https://www.boscouganda.com/"
+    },
+    {
+      "type": "use",
+      "label": "Gemeinschaftsnetz und ICT-Zentren erkunden",
+      "url": "https://www.boscouganda.com/connectivity/",
+      "source_ids": [
+        "bosco-connectivity"
+      ]
+    },
+    {
+      "type": "learn",
+      "label": "Geschichte und Arbeitsweise von BOSCO kennenlernen",
+      "url": "https://www.boscouganda.com/about-us-2/",
+      "source_ids": [
+        "bosco-about"
+      ]
+    },
+    {
+      "type": "donate",
+      "label": "BOSCO Uganda unterstützen",
+      "url": "https://secure.givelively.org/donate/bosco-inc/uganda-2025-operating-campaign",
+      "source_ids": [
+        "bosco-home"
+      ]
+    },
+    {
+      "type": "contact",
+      "label": "BOSCO Uganda kontaktieren",
+      "url": "https://www.boscouganda.com/contact/",
+      "source_ids": [
+        "bosco-contact"
+      ]
+    }
+  ],
+  "handoff": {
+    "enabled": false
+  },
+  "languages": {
+    "codes": [
+      "en"
+    ],
+    "source_ids": [
+      "bosco-home"
+    ],
+    "note": "Die geprüften offiziellen Seiten sind auf Englisch verfügbar."
+  },
+  "access": {
+    "type": "public",
+    "source_ids": [
+      "bosco-connectivity"
+    ],
+    "note": "Die Organisation beschreibt gemeinschaftliche ICT-Zentren und öffentliche Kontaktwege; konkrete Zugangsbedingungen können lokal variieren."
+  }
+}

@@ -2,8 +2,8 @@
   "schema_version": 2,
   "kind": "commonworld.ui_locale_independent_language_review_receipt",
   "status": "passed",
-  "reviewed_revision": "d41899d572426824174b8333547714e903526eaa",
-  "reviewed_source_pack_sha256": "d449f5b6a564c859be9142d737ad768020a8ee472f18026e3d3cbb092ec54648",
+  "reviewed_revision": "582c33e9228e0d5ea70b7cef4222c74438d267d1",
+  "reviewed_source_pack_sha256": "cf57400b0a0fbf818baa88f33001e95bc4c7c39bd00caef3505f4d9ab6c0f405",
   "locale_verdicts": {
     "es": {
       "status": "passed",
@@ -22,6 +22,10 @@
       "blocking_findings": []
     },
     "zh-Hans": {
+      "status": "passed",
+      "blocking_findings": []
+    },
+    "hi": {
       "status": "passed",
       "blocking_findings": []
     }
@@ -180,6 +184,21 @@
       },
       "limitations": "Model-assisted review; does not constitute native or human approval.",
       "confidence": "medium"
+    },
+    "hi": {
+      "review_class": "model_assisted_independent_language_review",
+      "reviewed_revision": "582c33e9228e0d5ea70b7cef4222c74438d267d1",
+      "source_pack_sha256": "cf57400b0a0fbf818baa88f33001e95bc4c7c39bd00caef3505f4d9ab6c0f405",
+      "locale_verdicts": {
+        "hi": "PASS"
+      },
+      "findings": [],
+      "source_receipt": {
+        "path": "docs/evidence/locale-reviews/raw/hi-independent-final-pass-2026-08-13.json",
+        "sha256": "8fc4f18ea1be34b18e59e98ebe4a42e860b21bd9242b8e591878482e468c60b0"
+      },
+      "limitations": "Model-assisted review; does not constitute native or human language approval.",
+      "confidence": "medium"
     }
   },
   "raw_sources": [
@@ -202,6 +221,11 @@
       "label": "final-pt-ar-pass",
       "path": "docs/evidence/locale-reviews/raw/final-pt-ar-pass.txt",
       "sha256": "caa7abec3cbd1930cb6791957fbb3885449cd57efbbc03485d6a163ee116756b"
+    },
+    {
+      "label": "final-hi-pass",
+      "path": "docs/evidence/locale-reviews/raw/hi-independent-final-pass-2026-08-13.json",
+      "sha256": "8fc4f18ea1be34b18e59e98ebe4a42e860b21bd9242b8e591878482e468c60b0"
     }
   ],
   "review_class": {
@@ -219,16 +243,17 @@
   ],
   "catalog_review": {
     "review_kind": "model_assisted_independent_language_review",
-    "reviewer": "Claude Opus 5 via Grabowski independent review",
-    "writer": "GPT-5.6 Sol via ChatGPT",
+    "reviewer": "Independent reviewer chain: Claude Opus 5 for prior locales; GPT-5.6 Sol for Hindi",
+    "writer": "Independent writer chain: GPT-5.6 Sol for prior locales; structure-preserving Google Translate adapter for Hindi",
     "writer_independence": "independent_from_catalog_translation_writer",
-    "reviewed_revision": "8731b8618efb1c33c2c0998dc48cdf6c66fd14c7",
+    "reviewed_revision": "582c33e9228e0d5ea70b7cef4222c74438d267d1",
     "input_digests": {
       "es": "8d145707c3dfc55d1ca42206d73928445e42af5fa05db9065a0b7923811b0e87",
       "fr": "9ef30f1dc4da4a090dd77c257daf48b901183a703722710dfcc1fddd771faf22",
       "pt-BR": "78c63b96552ec3df7a92e2a7fbfe08c373ea99da20e1dac2268b10ef90564ba4",
       "ar": "1f912e9eb06d75f42a5606397a20bb4eec8b20f2d642cd5fe9bfaadb775f15cb",
-      "zh-Hans": "808cf1efa5e15aaf2de61a09082ba9b28615a50c1316700f9b8416fbe853e7cd"
+      "zh-Hans": "808cf1efa5e15aaf2de61a09082ba9b28615a50c1316700f9b8416fbe853e7cd",
+      "hi": "f7caff51645156ab365994a80d463f944e096d8608e4c9497addfbbe20fb8ea3"
     },
     "coverage": {
       "locales": [
@@ -236,11 +261,12 @@
         "fr",
         "pt-BR",
         "ar",
-        "zh-Hans"
+        "zh-Hans",
+        "hi"
       ],
       "project_count_per_locale": 91,
       "all_entries_reviewed": true,
-      "basis": "prior_digest_bound_full-corpus review for 88 unchanged entries plus independent three-entry review chain with fail-closed post-fix closure",
+      "basis": "Existing five locales retain their prior digest-bound review chain; Hindi received complete independent source-target review of all 91 projects and 231 localized fields with explicit post-fix closure.",
       "full_review_source": "docs/evidence/locale-reviews/raw/catalog-commons-batch-independent-final-pass-2026-08-12.json"
     },
     "verdict": "pass",
@@ -254,13 +280,19 @@
     "review_notes": [
       "All five target overlays contain 91 projects. The prior 88 project objects are byte-semantically unchanged by exact JSON object comparison against origin/main.",
       "Three new entries per locale were independently reviewed; zh-Hans and pt-BR findings were fixed and independently re-reviewed to PASS.",
-      "Model-assisted review only; native-speaker/human approval is not claimed."
+      "Model-assisted review only; native-speaker/human approval is not claimed.",
+      "Hindi: all 91 project overlays and 231 localized fields reviewed against English; semantic findings fixed and post-fix review passed. Model-assisted only; no native-speaker/human approval claimed."
     ],
     "source_receipts": [
       {
         "path": "docs/evidence/locale-reviews/raw/catalog-commons-batch-independent-final-pass-2026-08-12.json",
         "sha256": "2e4dd8d88c4cd7fcf6ce1d1dfe753ed1f7505378ba2215f9369694ea04e3e448",
         "role": "commons_batch_incremental_independent_review_chain"
+      },
+      {
+        "path": "docs/evidence/locale-reviews/raw/hi-independent-final-pass-2026-08-13.json",
+        "sha256": "8fc4f18ea1be34b18e59e98ebe4a42e860b21bd9242b8e591878482e468c60b0",
+        "role": "hindi_full_corpus_independent_post_fix_review"
       }
     ],
     "resolved_findings": [

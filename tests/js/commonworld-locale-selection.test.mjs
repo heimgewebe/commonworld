@@ -24,6 +24,7 @@ test('manual language choices include reviewed and preview locales', () => {
   assert.equal(normalizeLocalePreference('fr-FR'), 'fr');
   assert.equal(normalizeLocalePreference('pt-br'), 'pt-BR');
   assert.equal(normalizeLocalePreference('zh-Hans'), 'zh-Hans');
+  assert.equal(normalizeLocalePreference('hi-IN'), 'hi');
   assert.equal(normalizeLocalePreference('zh-Hant'), null);
 });
 
@@ -31,6 +32,7 @@ test('automatic language matching includes every released Wave-1 locale', () => 
   assert.equal(matchSupportedLocale(['fr-FR', 'de-DE']), 'fr');
   assert.equal(matchSupportedLocale(['ar', 'en-GB']), 'ar');
   assert.equal(matchSupportedLocale(['zh-CN', 'fr-FR']), 'zh-Hans');
+  assert.equal(matchSupportedLocale(['hi-IN', 'de-DE']), 'hi');
   assert.equal(matchSupportedLocale(['zh-Hant', 'fr-FR']), 'fr');
   assert.equal(matchSupportedLocale(['zh-TW', 'fr-FR']), 'fr');
 });
@@ -45,6 +47,8 @@ test('Wave-1 locale choices survive the same bounded storage path as baseline ch
   assert.equal(readStoredLocalePreference(storage), 'fr');
   assert.equal(writeStoredLocalePreference('zh-Hans', storage), true);
   assert.equal(readStoredLocalePreference(storage), 'zh-Hans');
+  assert.equal(writeStoredLocalePreference('hi', storage), true);
+  assert.equal(readStoredLocalePreference(storage), 'hi');
 });
 
 test('manual and direct Wave-1 locale navigation keeps the released choice', () => {

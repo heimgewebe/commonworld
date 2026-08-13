@@ -1,24 +1,25 @@
 {
   "schema_version": 1,
-  "source_revision": "f5d9a7dddf1f2f8f8421d87c5147326e8353b27d",
-  "source_pack_sha256": "50870199c595890466640f09f5767b01ff9f997ce65623f7fea300c6d3f39746",
-  "reviewed_source_pack_sha256": "d449f5b6a564c859be9142d737ad768020a8ee472f18026e3d3cbb092ec54648",
-  "release_id": "3c318d27f5fc89ee3b7f",
+  "source_revision": "582c33e9228e0d5ea70b7cef4222c74438d267d1",
+  "source_pack_sha256": "06e4c5c150bdf33e63d1becf47ef1f90f0b51a1d24b76725f44ff37ce07302f7",
+  "reviewed_source_pack_sha256": "cf57400b0a0fbf818baa88f33001e95bc4c7c39bd00caef3505f4d9ab6c0f405",
+  "release_id": "198fb9ef7729c615232c",
   "raw_source": {
-    "path": "docs/evidence/locale-reviews/raw/released-browser-lifecycle-smoke-2026-08-12.json",
-    "sha256": "050253e5ee590f826945bf2ed64c13e9088f14a7aec0d27d71994c8e64039eb9"
+    "path": "docs/evidence/locale-reviews/raw/released-browser-lifecycle-smoke-2026-08-13.json",
+    "sha256": "3b091614aa601651759ad89164b0decb3a97392f31bd15b8f2d34249e91a9c44"
   },
   "locales": [
     "es",
     "fr",
     "pt-BR",
     "ar",
-    "zh-Hans"
+    "zh-Hans",
+    "hi"
   ],
   "kind": "commonworld.ui_locale_browser_smoke_receipt",
   "status": "passed",
   "verdict": "PASS",
-  "page_count": 15,
+  "page_count": 18,
   "all_surfaces_released": true,
   "claims": {
     "full_wcag_conformance": false,

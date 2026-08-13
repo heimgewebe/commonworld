@@ -2,9 +2,15 @@
   "schema_version": 1,
   "kind": "commonworld.ui_locale_independent_review_input",
   "locale": "zh-Hans",
-  "source_revision": "d41899d572426824174b8333547714e903526eaa",
+  "source_revision": "8319f1541ea4f720feba3968d4b1df5220a784d9",
   "source_pack": "assets/locales/wave1-locales.json",
-  "source_pack_sha256": "d449f5b6a564c859be9142d737ad768020a8ee472f18026e3d3cbb092ec54648",
+  "source_pack_sha256": "cf57400b0a0fbf818baa88f33001e95bc4c7c39bd00caef3505f4d9ab6c0f405",
+  "claims": {
+    "derived_without_translation_changes": true,
+    "release_evidence": false,
+    "native_or_human_review": false
+  },
+  "reviewed_source_pack_sha256": "cf57400b0a0fbf818baa88f33001e95bc4c7c39bd00caef3505f4d9ab6c0f405",
   "payload": {
     "meta": {
       "draft_origin": "machine_translation_assisted",
@@ -666,11 +672,5 @@
       "### Optional Commons basis draft": "### 可选 Commons 基础草案",
       "> Editorial working material only. No score and no automatic admission decision.": "> 仅供编辑工作使用。不评分，也不作自动纳入决定。"
     }
-  },
-  "claims": {
-    "derived_without_translation_changes": true,
-    "release_evidence": false,
-    "native_or_human_review": false
-  },
-  "reviewed_source_pack_sha256": "d449f5b6a564c859be9142d737ad768020a8ee472f18026e3d3cbb092ec54648"
+  }
 }

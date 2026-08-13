@@ -56,7 +56,7 @@ class LocaleReleaseContractTests(unittest.TestCase):
         for source in receipt["raw_sources"]:
             path = ROOT / source["path"]
             self.assertEqual(hashlib.sha256(path.read_bytes()).hexdigest(), source["sha256"])
-            self.assertRegex(source["label"], r"^(?:initial|final)-(?:es-fr|pt-ar)-(?:findings|pass)$")
+            self.assertRegex(source["label"], r"^(?:(?:initial|final)-(?:es-fr|pt-ar)-(?:findings|pass)|final-hi-pass)$")
         self.assertEqual(receipt["finding_history"]["final_findings"], [])
         for source in receipt["catalog_review"]["source_receipts"]:
             path = ROOT / source["path"]
@@ -116,6 +116,16 @@ class LocaleReleaseContractTests(unittest.TestCase):
         self.assertEqual(
             match_registry_locale(["pt"], statuses=("released",), root=ROOT),
             "pt-BR",
+        )
+
+    def test_hindi_primary_and_region_tags_match_released_locale(self) -> None:
+        self.assertEqual(
+            match_registry_locale(["hi-IN", "de-DE"], statuses=("released",), root=ROOT),
+            "hi",
+        )
+        self.assertEqual(
+            match_registry_locale(["hi"], statuses=("released",), root=ROOT),
+            "hi",
         )
 
     def test_requested_chinese_script_mismatch_advances_to_next_preference(self) -> None:
@@ -237,7 +247,7 @@ class LocaleReleaseContractTests(unittest.TestCase):
 
     def test_default_and_fallback_locales_must_be_released(self) -> None:
         contract = copy.deepcopy(self.contract)
-        contract["decision"]["default_locale"] = "hi"
+        contract["decision"]["default_locale"] = "id"
         contract["decision"]["fallback_locale"] = "ja"
         errors = validate_contract(contract, ROOT)
         self.assertTrue(any("default_locale must be released" == error for error in errors))
