@@ -40,13 +40,13 @@
     }
   },
   "activity": {
-    "status": "active",
+    "status": "unknown",
     "observed_at": "2026-08-13",
     "source_ids": [
       "opp-home",
       "opp-programs"
     ],
-    "note": "Die aktuelle offizielle OPP-RTI-Seite führt das Low-Cost-Sanitation-Programm als laufendes Programm und beschreibt weiterhin seine gemeinschaftliche Umsetzung."
+    "note": "Aktueller Betriebszustand nicht zeitnah verifiziert: Die offizielle OPP-RTI-Website beschreibt das Programm und fortgesetzte Arbeit, bietet aber keinen ausreichend frischen datierten Aktivitätsbeleg für August 2026."
   },
   "provenance": {
     "sources": [
@@ -98,7 +98,7 @@
     "catalogued_at": "2026-08-13",
     "reviewed_by": "Commonworld editorial review",
     "reviewed_at": "2026-08-13",
-    "next_review_at": "2026-11-13",
+    "next_review_at": "2026-09-15",
     "notes": "Aufgenommen wird die nachbarschaftlich finanzierte, gebaute und gepflegte Sanitärinfrastruktur samt Commoning-Praxis; OPP-RTI wird nur als technische Unterstützungsinstitution beschrieben."
   },
   "links": [
