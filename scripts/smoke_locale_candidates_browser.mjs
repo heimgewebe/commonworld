@@ -673,16 +673,18 @@ try {
     const pendingCount = (await page.locator('#text-count').textContent()) ?? '';
     assert(pendingCount.includes('Commons'), `${pageName}: pending locale pack did not use the English runtime fallback: ${pendingCount}`);
     await page.waitForTimeout(2_800);
-    await heldLocalePackRoute.continue();
-    await page.waitForFunction(
-      () => document.querySelector('.globe-stage')?.dataset.localePack === 'ready',
-      null,
-      { timeout: 5_000 },
+    const localePackResponsePromise = page.waitForResponse(
+      (networkResponse) => networkResponse.url().includes('/assets/commonworld-wave1-locales.mjs'),
     );
+    await heldLocalePackRoute.continue();
+    const localePackResponse = await localePackResponsePromise;
+    assert(localePackResponse.status() === 200, `${pageName}: late locale pack HTTP ${localePackResponse.status()}`);
+    await localePackResponse.finished();
     await page.waitForFunction(
-      () => document.querySelector('#text-count')?.textContent?.includes('communs'),
+      () => document.querySelector('.globe-stage')?.dataset.localePack === 'ready'
+        && document.querySelector('#text-count')?.textContent?.includes('communs'),
       null,
-      { timeout: 5_000 },
+      { timeout: 30_000 },
     );
     assert(pageErrors.length === 0, `${pageName}: late-pack page errors: ${pageErrors.join(' | ')}`);
     const fallbackWarnings = warnings.filter((message) => message.includes('Wave-1 locale pack unavailable'));
