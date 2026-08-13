@@ -3,14 +3,14 @@
   "kind": "commonworld.ui_locale_release_evidence",
   "locale": "zh-Hans",
   "status": "released",
-  "source_revision": "f5d9a7dddf1f2f8f8421d87c5147326e8353b27d",
+  "source_revision": "3ba5d0ed03e9b083b9bd9675a226275b5746473f",
   "source_pack_sha256": "50870199c595890466640f09f5767b01ff9f997ce65623f7fea300c6d3f39746",
   "reviewed_source_pack_sha256": "d449f5b6a564c859be9142d737ad768020a8ee472f18026e3d3cbb092ec54648",
-  "catalog_overlay_sha256": "808cf1efa5e15aaf2de61a09082ba9b28615a50c1316700f9b8416fbe853e7cd",
+  "catalog_overlay_sha256": "47fb274bc5fbfd99e7c0f71877f7a550ecaccbc84996de4596017de3f75b5a78",
   "surface_sha256": {
-    "index": "ce4124a3e3a8762e7d92e90a0c33d6381dcd9f9312a8d18d46f958aaccdbaa07",
-    "method": "e21187eb7dfd1220edd3cad56834541ff7bd7813fdec2e24fd271b4bc9e2df7f",
-    "proposal": "97ffb9578bf4d097e2a5e97c1be9728b829cbee3de42dd81565bd1df73bc8313"
+    "index": "c92631ea8956dc73b3aa159058ae9bb35f168e87e1058adf72ffc9aa66d6e043",
+    "method": "dc49aa34f6129e4894c83928bdd1540f5520846ca10de96436ce0188ffa2bf21",
+    "proposal": "0b59666f8b55b46838e9865dccc4e0da4abc52e86be332d556fa5b70ff621527"
   },
   "gate_results": {
     "required_surfaces_passed": [
@@ -36,7 +36,7 @@
   "evidence_receipts": {
     "independent_language_review": {
       "source": "docs/evidence/locale-releases/receipts/shared/independent-language-review.json",
-      "sha256": "c4330923d48bd07b23f68e906295d2be68aadb36afe11c7a1c3e4cbbdc7ef13b"
+      "sha256": "1d56d28361d52d31ae754cd0c108b2665f359fd454a03c3ed05645131d9608fa"
     },
     "keyboard_and_screen_reader_review": {
       "source": "docs/evidence/locale-releases/receipts/shared/keyboard-and-screen-reader-review.json",
@@ -60,5 +60,5 @@
     "findings_based": true,
     "post_fix_review_required": true
   },
-  "notes": "91-entry compact release rebound to the final digest-bound language and 15-page browser/accessibility/state review chain. Bootstrap source links use localized host-based UI labels while full project evidence retains editorial source labels. Model-assisted language review passed; no native-speaker, human language or full WCAG approval is claimed."
+  "notes": "94-entry compact release rebound to current source, catalog and surface digests. Independent model-assisted language review passed after one Spanish post-fix; prior 91 entries were carried forward by exact object comparison. No native-speaker, human language or full WCAG approval is claimed."
 }

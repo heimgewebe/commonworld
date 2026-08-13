@@ -3,14 +3,14 @@
   "kind": "commonworld.ui_locale_release_evidence",
   "locale": "fr",
   "status": "released",
-  "source_revision": "f5d9a7dddf1f2f8f8421d87c5147326e8353b27d",
+  "source_revision": "3ba5d0ed03e9b083b9bd9675a226275b5746473f",
   "source_pack_sha256": "50870199c595890466640f09f5767b01ff9f997ce65623f7fea300c6d3f39746",
   "reviewed_source_pack_sha256": "d449f5b6a564c859be9142d737ad768020a8ee472f18026e3d3cbb092ec54648",
-  "catalog_overlay_sha256": "9ef30f1dc4da4a090dd77c257daf48b901183a703722710dfcc1fddd771faf22",
+  "catalog_overlay_sha256": "45d2a7e95798eecf108597859cdacc09bf74b48d6c238219e2b61ea8d93a8c03",
   "surface_sha256": {
-    "index": "8e390207cde498bc178a5848fe946ac9041e05bbd48f8da33058b5a6b924651e",
-    "method": "f07067d3cd9a4521cb27fe6112949243901d660696e85b996dd91359f3ff5be7",
-    "proposal": "220393e63745fa47cc9268625d2c20d06afbf4bbd2d758f8b24d10773ba45e4f"
+    "index": "e75dcf7b584860dab828f5acabd25b9be801698e7577da464b43f36c620da4f6",
+    "method": "d826441ba9956ce288d89d326c46f31c1ff6c3e4e47f7c8e48ad3fb944e7acf2",
+    "proposal": "208d8581365a52a0bb1de65afa3471310d3078efc9e856699947e6124271334c"
   },
   "gate_results": {
     "required_surfaces_passed": [
@@ -36,7 +36,7 @@
   "evidence_receipts": {
     "independent_language_review": {
       "source": "docs/evidence/locale-releases/receipts/shared/independent-language-review.json",
-      "sha256": "c4330923d48bd07b23f68e906295d2be68aadb36afe11c7a1c3e4cbbdc7ef13b"
+      "sha256": "1d56d28361d52d31ae754cd0c108b2665f359fd454a03c3ed05645131d9608fa"
     },
     "keyboard_and_screen_reader_review": {
       "source": "docs/evidence/locale-releases/receipts/shared/keyboard-and-screen-reader-review.json",
@@ -60,5 +60,5 @@
     "findings_based": true,
     "post_fix_review_required": true
   },
-  "notes": "91-entry compact release rebound to the final digest-bound language and 15-page browser/accessibility/state review chain. Bootstrap source links use localized host-based UI labels while full project evidence retains editorial source labels. Model-assisted language review passed; no native-speaker, human language or full WCAG approval is claimed."
+  "notes": "94-entry compact release rebound to current source, catalog and surface digests. Independent model-assisted language review passed after one Spanish post-fix; prior 91 entries were carried forward by exact object comparison. No native-speaker, human language or full WCAG approval is claimed."
 }

@@ -219,16 +219,16 @@
   ],
   "catalog_review": {
     "review_kind": "model_assisted_independent_language_review",
-    "reviewer": "Claude Opus 5 via Grabowski independent review",
+    "reviewer": "DeepSeek V4 Flash + GPT-5.6 Terra via Grabowski independent reviews",
     "writer": "GPT-5.6 Sol via ChatGPT",
     "writer_independence": "independent_from_catalog_translation_writer",
-    "reviewed_revision": "8731b8618efb1c33c2c0998dc48cdf6c66fd14c7",
+    "reviewed_revision": "31cbd59744f80e41b358b55047af3678b75ceb02",
     "input_digests": {
-      "es": "8d145707c3dfc55d1ca42206d73928445e42af5fa05db9065a0b7923811b0e87",
-      "fr": "9ef30f1dc4da4a090dd77c257daf48b901183a703722710dfcc1fddd771faf22",
-      "pt-BR": "78c63b96552ec3df7a92e2a7fbfe08c373ea99da20e1dac2268b10ef90564ba4",
-      "ar": "1f912e9eb06d75f42a5606397a20bb4eec8b20f2d642cd5fe9bfaadb775f15cb",
-      "zh-Hans": "808cf1efa5e15aaf2de61a09082ba9b28615a50c1316700f9b8416fbe853e7cd"
+      "es": "1b42a6240e821c62b3f63a3142a4cdca69737aa76f076d7faf8945db06d3b6c9",
+      "fr": "45d2a7e95798eecf108597859cdacc09bf74b48d6c238219e2b61ea8d93a8c03",
+      "pt-BR": "ae2d232fe6bbb827321b36125ffd667488057d2870eff5d4597c2ff3816b9412",
+      "ar": "1a46055cea38c6a5060b077d1e45ebd71c5cc925f8d71d7dd96fee2156e37659",
+      "zh-Hans": "47fb274bc5fbfd99e7c0f71877f7a550ecaccbc84996de4596017de3f75b5a78"
     },
     "coverage": {
       "locales": [
@@ -238,10 +238,10 @@
         "ar",
         "zh-Hans"
       ],
-      "project_count_per_locale": 91,
+      "project_count_per_locale": 94,
       "all_entries_reviewed": true,
-      "basis": "prior_digest_bound_full-corpus review for 88 unchanged entries plus independent three-entry review chain with fail-closed post-fix closure",
-      "full_review_source": "docs/evidence/locale-reviews/raw/catalog-commons-batch-independent-final-pass-2026-08-12.json"
+      "basis": "prior digest-bound review for 91 unchanged entries plus independent three-entry review and Spanish post-fix closure",
+      "full_review_source": "docs/evidence/locale-reviews/raw/catalog-commons-batch-independent-final-pass-2026-08-13.json"
     },
     "verdict": "pass",
     "counts": {
@@ -252,14 +252,14 @@
     },
     "findings": [],
     "review_notes": [
-      "All five target overlays contain 91 projects. The prior 88 project objects are byte-semantically unchanged by exact JSON object comparison against origin/main.",
-      "Three new entries per locale were independently reviewed; zh-Hans and pt-BR findings were fixed and independently re-reviewed to PASS.",
+      "All five target overlays contain 94 projects. The prior 91 project objects are JSON-object identical to base revision 582c33e9228e0d5ea70b7cef4222c74438d267d1.",
+      "Three new entries per locale were independently reviewed. The initial cross-provider DeepSeek review found one Spanish minor; the exact terminology fix was independently re-reviewed by a separate GPT-5.6 Terra run and passed.",
       "Model-assisted review only; native-speaker/human approval is not claimed."
     ],
     "source_receipts": [
       {
-        "path": "docs/evidence/locale-reviews/raw/catalog-commons-batch-independent-final-pass-2026-08-12.json",
-        "sha256": "2e4dd8d88c4cd7fcf6ce1d1dfe753ed1f7505378ba2215f9369694ea04e3e448",
+        "path": "docs/evidence/locale-reviews/raw/catalog-commons-batch-independent-final-pass-2026-08-13.json",
+        "sha256": "cf52d12e889ba2495f9598e5ae89718e5cdeda2d1b68bcf2e77e0cb9e898b8ca",
         "role": "commons_batch_incremental_independent_review_chain"
       }
     ],
@@ -284,11 +284,19 @@
         "severity": "minor",
         "field": "summary",
         "resolution": "fish reserves separated from executar coordination; final pt-BR re-review passed"
+      },
+      {
+        "locale": "es",
+        "project": "orangi-low-cost-sanitation",
+        "severity": "minor",
+        "field": "summary",
+        "resolution": "lane-sewer terminology corrected from alcantarillas de calle to alcantarillas de callejón; separate-model post-fix review passed"
       }
     ],
     "limitations": [
       "Model-assisted independent review; no native-speaker or human language approval is claimed.",
-      "The prior 88 entries were carried forward by exact machine comparison, not re-reviewed linguistically in this batch."
+      "The prior 91 entries were carried forward by exact machine comparison, not re-reviewed linguistically in this batch.",
+      "Initial current-batch review was cross-provider DeepSeek; post-fix confirmation used a separate GPT-5.6 Terra run from the GPT-5.6 Sol translation writer within the same OpenAI model family."
     ]
   },
   "incremental_ui_review": {
