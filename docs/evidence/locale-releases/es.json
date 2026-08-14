@@ -3,14 +3,14 @@
   "kind": "commonworld.ui_locale_release_evidence",
   "locale": "es",
   "status": "released",
-  "source_revision": "3ba5d0ed03e9b083b9bd9675a226275b5746473f",
-  "source_pack_sha256": "50870199c595890466640f09f5767b01ff9f997ce65623f7fea300c6d3f39746",
-  "reviewed_source_pack_sha256": "d449f5b6a564c859be9142d737ad768020a8ee472f18026e3d3cbb092ec54648",
+  "source_revision": "11464e83de5c2fdcb70dddd4c076ff54333cd9d7",
+  "source_pack_sha256": "06e4c5c150bdf33e63d1becf47ef1f90f0b51a1d24b76725f44ff37ce07302f7",
+  "reviewed_source_pack_sha256": "cf57400b0a0fbf818baa88f33001e95bc4c7c39bd00caef3505f4d9ab6c0f405",
   "catalog_overlay_sha256": "1b42a6240e821c62b3f63a3142a4cdca69737aa76f076d7faf8945db06d3b6c9",
   "surface_sha256": {
-    "index": "0046d9474277420d5f3c30f7586244251d5745944a5327a13796423983950259",
-    "method": "7951f2f978e693b0af4727da1ec9b6a937027947a571db1718a4ba2ffcd28f77",
-    "proposal": "c1beff809f833457f385d3db1143cb57c1a9fdcdbfe99295296cbfc1087b8da4"
+    "index": "928b6d0d62ef9949a3423b159c9bd37fd236edfc0cd958c63e7e48490780df0c",
+    "method": "f967e558bcf9edebdb969eec8cbabdf878acaf1fc3d60726f90e0741db598ec7",
+    "proposal": "447cf234f5865ec0e7f98c0e87356c17c32259f86730a1b569bae56563af29f8"
   },
   "gate_results": {
     "required_surfaces_passed": [
@@ -36,19 +36,19 @@
   "evidence_receipts": {
     "independent_language_review": {
       "source": "docs/evidence/locale-releases/receipts/shared/independent-language-review.json",
-      "sha256": "1d56d28361d52d31ae754cd0c108b2665f359fd454a03c3ed05645131d9608fa"
+      "sha256": "00ac9600fb916f6ccb441da04eccac891ae30fd7e657ee887b75070f70f8822b"
     },
     "keyboard_and_screen_reader_review": {
       "source": "docs/evidence/locale-releases/receipts/shared/keyboard-and-screen-reader-review.json",
-      "sha256": "3ac5cd5e9f3f9a614b2d90c682b895dd0cd307a08f6cf910c4a5622432b25f88"
+      "sha256": "325da8170d8ff99a49d9813cb2767f5fd75f543862b2266e3a2d336ac20bde73"
     },
     "browser_smoke": {
       "source": "docs/evidence/locale-releases/receipts/shared/browser-smoke.json",
-      "sha256": "90cc30e2490719fc48713b6ac7bebb46e212b92a530f5d646b03df95d760a5a2"
+      "sha256": "0b8785e0951af87cae69b01d82f4ab54acede125b3dd33be74942d4f88a11650"
     },
     "state_preservation_smoke": {
       "source": "docs/evidence/locale-releases/receipts/shared/state-preservation-smoke.json",
-      "sha256": "921432d11bdf41aa54573ade8fc1842b673d70c665f5d8c4ba65085611294465"
+      "sha256": "93ba977edb2b0a3b65e96cbb182ceb669811214382525c2acb4cfd4de47d62fb"
     }
   },
   "review_class": {
@@ -60,5 +60,5 @@
     "findings_based": true,
     "post_fix_review_required": true
   },
-  "notes": "94-entry compact release rebound to current source, catalog and surface digests. Independent model-assisted language review passed after one Spanish post-fix; prior 91 entries were carried forward by exact object comparison. No native-speaker, human language or full WCAG approval is claimed."
+  "notes": "94-entry compact release bound to release 8522aee1fa2a668d201f and current shared lifecycle/review evidence. Model-assisted language review; no native-speaker, human language or full WCAG approval is claimed."
 }

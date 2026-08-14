@@ -119,8 +119,8 @@
       "filterButtonHeight": 44,
       "ringAnimationName": "none",
       "ringTransform": "none",
-      "ringTextWidth": 671.1126098632812,
-      "ringTextHeight": 14.0140380859375,
+      "ringTextWidth": 671.1033935546875,
+      "ringTextHeight": 13.5062255859375,
       "ringTextFontSize": 22,
       "primaryRingCount": 3,
       "depthRingCount": 2,
@@ -129,20 +129,20 @@
       "representativePrimaryLabels": [
         {
           "text": "Knowledge, Learning and Culture · 11    LibriVox  MusicBrainz  Open Library  Peer 2 Peer Unive…  Safecast  Thailand Citizens…",
-          "width": 671.1126098632812,
-          "height": 14.0140380859375,
+          "width": 671.1033935546875,
+          "height": 13.5062255859375,
           "visible": true
         },
         {
           "text": "Communication and Networks · 11    BOSCO Uganda  Freifunk  Freifunk Hamburg  guifi.net  Mastodon  Meshtastic",
-          "width": 331.74285888671875,
-          "height": 518.45703125,
+          "width": 331.3609313964844,
+          "height": 518.6912841796875,
           "visible": true
         },
         {
           "text": "Cooperation and Self-Organization · 7    Bologna Urban Com…  Enspiral  g0v  Green Coop  l’Asilo  National Communal…",
-          "width": 287.60882568359375,
-          "height": 573.7833862304688,
+          "width": 288.0767822265625,
+          "height": 573.5632934570312,
           "visible": true
         }
       ],
@@ -185,22 +185,22 @@
         "representativePrimaryLabels": [
           {
             "text": "Knowledge, Learning and Culture · 11    LibriVox  MusicBrainz  Open Library  Peer 2 Peer Unive…  Safecast  Thailand Citizens…",
-            "width": 932.1097412109375,
-            "height": 37.668033599853516,
+            "width": 932.1005249023438,
+            "height": 40.47783660888672,
             "fontSize": 23.77,
             "visible": true
           },
           {
             "text": "Communication and Networks · 11    BOSCO Uganda  Freifunk  Freifunk Hamburg  guifi.net  Mastodon  Meshtastic",
-            "width": 474.33428955078125,
-            "height": 711.4483642578125,
+            "width": 476.4191589355469,
+            "height": 710.1048583984375,
             "fontSize": 23.77,
             "visible": true
           },
           {
             "text": "Cooperation and Self-Organization · 7    Bologna Urban Com…  Enspiral  g0v  Green Coop  l’Asilo  National Communal…",
-            "width": 382.48333740234375,
-            "height": 804.6387329101562,
+            "width": 379.86102294921875,
+            "height": 805.7949829101562,
             "fontSize": 23.77,
             "visible": true
           }
@@ -213,7 +213,7 @@
         "primaryStates": [
           {
             "animationName": "sphere-ring-orbit",
-            "transform": "matrix(0.999999, 0.00150679, -0.00150679, 0.999999, 0, 0)"
+            "transform": "matrix(0.999999, 0.00150624, -0.00150624, 0.999999, 0, 0)"
           },
           {
             "animationName": "sphere-ring-orbit",
@@ -221,7 +221,7 @@
           },
           {
             "animationName": "sphere-ring-orbit",
-            "transform": "matrix(-0.436881, -0.899519, 0.899519, -0.436881, 0, 0)"
+            "transform": "matrix(-0.436882, -0.899519, 0.899519, -0.436882, 0, 0)"
           }
         ],
         "depthStates": [
@@ -276,7 +276,7 @@
     {
       "id": "layer-journey-moveend-return",
       "verdict": "PASS",
-      "elapsedMs": 1361
+      "elapsedMs": 1439
     },
     {
       "id": "layer-journey-missing-moveend-fallback",
@@ -285,10 +285,10 @@
       "movementDiagnostics": [
         {
           "index": 0,
-          "geometryEvaluationDelta": 22,
-          "diagnosticPublishDelta": 7,
-          "sampledEvaluationCount": 21,
-          "maxDiagnosticPublishes": 7
+          "geometryEvaluationDelta": 19,
+          "diagnosticPublishDelta": 6,
+          "sampledEvaluationCount": 18,
+          "maxDiagnosticPublishes": 6
         },
         {
           "index": 1,
@@ -384,8 +384,8 @@
       "verdict": "PASS",
       "blockedCatalogRequests": 0,
       "observedCatalogRequests": [
-        "/releases/1ff6602e396f5855c8e0/catalog/runtime/aggregate.v1.json",
-        "/releases/1ff6602e396f5855c8e0/catalog/runtime/manifest.v1.json"
+        "/releases/8522aee1fa2a668d201f/catalog/runtime/aggregate.v1.json",
+        "/releases/8522aee1fa2a668d201f/catalog/runtime/manifest.v1.json"
       ]
     },
     {
@@ -485,6 +485,6 @@
       "method-mobile",
       "method-mobile-text-200"
     ],
-    "first_party_surface_sha256": "07127fc7e344d17b073f2701f390ae1d9a365736810b37283c364e1fe066b1a9"
+    "first_party_surface_sha256": "0b0587a6905adc3be5d176d6993f17daad51e877450feb47275affaa00dc346c"
   }
 }

@@ -1,0 +1,29 @@
+{
+  "schema_version": 1,
+  "kind": "commonworld_commons_basis_index",
+  "current_as_of": "2026-08-13",
+  "entry_count": 18,
+  "basis_files": [
+    "acofop-peten-community-forests.json",
+    "bangladesh-palli-bidyut-samities.json",
+    "common-voice.json",
+    "fordhall-organic-farm.json",
+    "gbif.json",
+    "green-coop-japan.json",
+    "isle-of-eigg-heritage-trust.json",
+    "kawawana.json",
+    "lasilo-naples.json",
+    "meshtastic.json",
+    "mikoko-pamoja.json",
+    "mundraub.json",
+    "open-food-facts.json",
+    "orangi-low-cost-sanitation.json",
+    "pachgaon-community-forest.json",
+    "park-slope-food-coop.json",
+    "samoa-community-based-fisheries-management-program.json",
+    "the-things-network.json"
+  ],
+  "definition_contract": "contracts/commonworld/commons-definition.contract.json",
+  "basis_schema": "contracts/commonworld/commons-basis.schema.json",
+  "retroreview_policy": "catalog/commons-bases/retroreview-policy.json"
+}
