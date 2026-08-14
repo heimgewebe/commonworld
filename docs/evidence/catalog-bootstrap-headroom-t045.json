@@ -1,0 +1,87 @@
+{
+  "schema_version": 1,
+  "kind": "commonworld_catalog_bootstrap_headroom_evidence",
+  "task_id": "COMMONWORLD-PUBLIC-GLOBE-V1-T045",
+  "status": "measured-and-implemented",
+  "catalog_entry_count": 94,
+  "baseline": {
+    "design": "compact bootstrap with every provenance source URL embedded",
+    "bootstrap_raw_bytes": 147823,
+    "bootstrap_gzip_bytes": 28572,
+    "warning_threshold_bytes": 28672,
+    "warning_headroom_bytes": 100,
+    "hard_limit_bytes": 32768,
+    "startup_project_json_requests": 0
+  },
+  "alternatives": [
+    {
+      "id": "zero-bootstrap-provenance",
+      "description": "Remove provenance from the bootstrap entirely and expose full provenance only from the selected identity's existing content-addressed detail record.",
+      "bootstrap_raw_bytes": 128018,
+      "bootstrap_gzip_bytes": 25733,
+      "warning_headroom_bytes": 2939,
+      "startup_project_json_requests": 0,
+      "runtime_tradeoff": "Smallest payload, but the focus view would have no source fallback when the catalog platform or selected detail is unavailable."
+    },
+    {
+      "id": "one-source-fallback-plus-verified-selected-detail",
+      "description": "Embed exactly one URL-only provenance source per project, retain activity.observed_at only for unknown-status notices, and upgrade the selected focus view to full canonical provenance only after existing generation-, byte- and SHA-256-bound detail verification.",
+      "bootstrap_raw_bytes": 135030,
+      "bootstrap_gzip_bytes": 26434,
+      "warning_headroom_bytes": 2238,
+      "startup_project_json_requests": 0,
+      "runtime_tradeoff": "Costs 701 gzip bytes versus zero-provenance, but preserves one meaningful source during catalog-platform degradation and requires no new request class or backend.",
+      "selected": true
+    }
+  ],
+  "selection_reason": "The selected hybrid clears the task's 2048-byte warning-headroom target while preserving a degraded-mode evidence link. It reuses the already deployed content-addressed selected-detail fetch instead of adding startup requests, segmented bootstrap fetches, a backend, or a second catalog truth.",
+  "runtime_memory": {
+    "decoded_verified_full_detail_records_retained": 1,
+    "policy": "Only the current focus identity retains a decoded verified full record; changing or clearing focus drops prior decoded detail while the existing transport cache remains separately bounded.",
+    "reason": "Full canonical records must not accumulate with catalogue growth during long browsing sessions."
+  },
+  "browser": {
+    "public_smoke_verdict": "PASS",
+    "public_smoke_scenarios": 38,
+    "provenance_upgrade": {
+      "fixture": "gbif",
+      "bootstrap_fallback_sources": 1,
+      "verified_sources": 6,
+      "detail_requests": 1,
+      "verdict": "PASS"
+    },
+    "fourfold_cpu_gate": {
+      "decision": "pass",
+      "attempt_count": 1,
+      "mobile_runtime_ready_ms": 844,
+      "desktop_runtime_ready_ms": 868,
+      "mobile_startup_task_duration_ms": 818,
+      "desktop_startup_task_duration_ms": 851.36,
+      "startup_project_json_requests": 0,
+      "first_party_surface_sha256": "be9eb8bb7b1013b65a9bd961a4f61ebfbcfc5d7e630eeb0e2db1fe4e95a3a210"
+    }
+  },
+  "recovery": {
+    "de_en_bounded_recovery_entries": 24,
+    "no_javascript_recovery_preserved": true,
+    "canonical_project_json_preserved": true,
+    "catalog_projects_remain_authoritative": true
+  },
+  "budgets": {
+    "warning_threshold_changed": false,
+    "hard_limit_changed": false,
+    "warning_threshold_bytes": 28672,
+    "hard_limit_bytes": 32768
+  },
+  "release": {
+    "id": "314cc54b38e2344c65cd",
+    "catalog_runtime_generation": "63462c96932139298c1b85fdc11b6edbb1188a45ad6f98fab120a129e3adb1fb"
+  },
+  "does_not_establish": [
+    "physical-device approval",
+    "that zero-provenance is unsafe in every future design",
+    "permission to raise delivery thresholds",
+    "permission to remove the DE/EN no-JavaScript recovery path",
+    "future performance after additional catalog growth"
+  ]
+}

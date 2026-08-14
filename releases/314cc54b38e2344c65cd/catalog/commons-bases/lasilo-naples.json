@@ -1,0 +1,58 @@
+{
+  "schema_version": 1,
+  "kind": "commonworld_commons_basis",
+  "project_id": "lasilo-naples",
+  "classification": "common",
+  "decision": "include",
+  "reviewed_at": "2026-08-13",
+  "reviewer": "Commonworld editorial review",
+  "criteria": {
+    "shared_resource": {
+      "status": "supported",
+      "statement": "Gemeinsam genutzt werden ein öffentlicher Kulturraum mit Theater, Kino, Bibliothek, Lern-, Kunst-, Werkstatt-, Bewegungs- und Gartenbereichen.",
+      "source_ids": [
+        "lasilo-organism",
+        "lasilo-civic-use"
+      ]
+    },
+    "community": {
+      "status": "supported",
+      "statement": "Eine offene plurale Gemeinschaft von Teilnehmenden trägt das l’Asilo und bildet sich über Nutzung, Pflege und Beteiligung an seinen Versammlungen.",
+      "source_ids": [
+        "lasilo-organism",
+        "lasilo-faq",
+        "lasilo-civic-use"
+      ]
+    },
+    "commoning_practice": {
+      "status": "supported",
+      "statement": "Teilnehmende organisieren Räume, kulturelle Produktion, Pflege und Nutzung gemeinsam über offene Versammlungen und thematische Arbeitsgruppen.",
+      "source_ids": [
+        "lasilo-organism",
+        "lasilo-civic-use"
+      ]
+    },
+    "rules_and_responsibility": {
+      "status": "supported",
+      "statement": "Die Erklärung zum zivilen Gebrauch und die offenen Versammlungs- und Arbeitsgruppenverfahren regeln Entscheidungsrechte, Nutzung, Verantwortung und Selbstverwaltung.",
+      "source_ids": [
+        "lasilo-civic-use",
+        "lasilo-faq"
+      ]
+    },
+    "common_benefit": {
+      "status": "supported",
+      "statement": "Die gemeinschaftlich getragenen Räume und Produktionsmittel dienen offen zugänglicher kultureller, künstlerischer und sozialer Nutzung und nicht einem externen Vertriebseigentümer.",
+      "source_ids": [
+        "lasilo-organism",
+        "lasilo-civic-use"
+      ]
+    }
+  },
+  "confidence": 0.95,
+  "limitations": [
+    "Das Gebäude ist kommunales Eigentum; die Commons-Eigenschaft beruht auf kollektivem zivilem Gebrauch und Selbstverwaltung, nicht auf Eigentumsübertragung.",
+    "Der Aktivitätsstatus wird mangels ausreichend frischem datiertem Ereignis konservativ als unbekannt geführt."
+  ],
+  "notes": "Explizit als bene comune und über eine gemeinschaftliche zivile Gebrauchserklärung organisierter, selbstverwalteter Kulturraum."
+}

@@ -3835,6 +3835,43 @@ async function catalogueNetworkBlockedScenario() {
   await run.context.close();
 }
 
+async function catalogueDetailProvenanceUpgradeScenario() {
+  process.stdout.write(`${JSON.stringify({ state: 'RUNNING', scenario: 'catalogue-detail-provenance-upgrade' })}\n`);
+  const canonical = JSON.parse(await readFile(path.join(ROOT, 'catalog/projects/gbif.json'), 'utf8'));
+  const expectedUrls = canonical?.provenance?.sources?.map(({ url }) => url) ?? [];
+  assert(expectedUrls.length > 1, `detail provenance: GBIF fixture no longer has multiple sources (${JSON.stringify(expectedUrls)})`);
+  const run = await newPage();
+  let detailRequests = 0;
+  await run.page.route('**/catalog/runtime/details/*.v1.json', async (route) => {
+    detailRequests += 1;
+    await new Promise((resolve) => setTimeout(resolve, 350));
+    await route.continue();
+  });
+  await run.page.goto(baseUrl, { waitUntil: 'domcontentloaded' });
+  await run.page.waitForSelector('html.runtime-ready');
+  await run.page.waitForFunction(() => document.querySelector('.globe-stage')?.dataset.catalogPlatform === 'ready');
+  await run.page.locator('#commons-search').fill('GBIF');
+  await run.page.waitForTimeout(220);
+  await run.page.locator('.discovery-result-main[data-commonproject-id="gbif"]').click();
+  await run.page.waitForFunction(() => {
+    const stage = document.querySelector('.globe-stage');
+    return stage?.dataset.catalogDetailShadow === 'loading' && stage.dataset.catalogDetailShadowId === 'gbif';
+  });
+  const fallbackUrls = await run.page.locator('#focus-sources a').evaluateAll((links) => links.map((link) => link.href));
+  assert(JSON.stringify(fallbackUrls) === JSON.stringify(expectedUrls.slice(0, 1)), `detail provenance: bootstrap fallback is not exactly the first source (${JSON.stringify(fallbackUrls)})`);
+  await run.page.waitForFunction(() => {
+    const stage = document.querySelector('.globe-stage');
+    return stage?.dataset.catalogDetailShadow === 'ready' && stage.dataset.catalogDetailShadowId === 'gbif';
+  });
+  const verifiedUrls = await run.page.locator('#focus-sources a').evaluateAll((links) => links.map((link) => link.href));
+  assert(JSON.stringify(verifiedUrls) === JSON.stringify(expectedUrls), `detail provenance: verified detail did not restore the full canonical source list (${JSON.stringify(verifiedUrls)})`);
+  assert(detailRequests === 1, `detail provenance: expected exactly one detail request, got ${detailRequests}`);
+  assert(run.pageErrors.length === 0, `detail provenance: page errors: ${run.pageErrors.join(' | ')}`);
+  assert(run.consoleErrors.length === 0, `detail provenance: console errors: ${run.consoleErrors.join(' | ')}`);
+  results.push({ id: 'catalogue-detail-provenance-upgrade', verdict: 'PASS', fallbackSources: fallbackUrls.length, verifiedSources: verifiedUrls.length, detailRequests });
+  await run.context.close();
+}
+
 async function catalogueDetailRetryScenario() {
   process.stdout.write(`${JSON.stringify({ state: 'RUNNING', scenario: 'catalogue-detail-retry' })}\n`);
   const run = await newPage();
@@ -4246,6 +4283,7 @@ try {
   await reducedMotionRingScenario();
   await syntheticDigitalPerformanceScenario();
   await normalScenario();
+  await catalogueDetailProvenanceUpgradeScenario();
   await germanLocaleScenario();
   await localePreferenceScenario();
   await intentSearchDiscoveryScenario();

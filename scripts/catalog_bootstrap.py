@@ -6,14 +6,13 @@ import copy
 
 BOOTSTRAP_OMITTED_FIELDS = frozenset({"handoff"})
 CURATION_BOOTSTRAP_FIELDS = ("state", "catalogued_at", "reviewed_at", "next_review_at")
-ACTIVITY_BOOTSTRAP_FIELDS = ("status", "observed_at")
 SOURCE_BOOTSTRAP_FIELDS = ("url",)
 LINK_BOOTSTRAP_FIELDS = ("type", "label", "url")
 RELATION_BOOTSTRAP_FIELDS = ("target_id", "type")
 
 
 def bootstrap_record(record: dict) -> dict:
-    """Keep user-visible discovery/evidence fields while omitting editorial transport weight."""
+    """Keep startup discovery fields plus one degraded-mode source while deferring full detail."""
     projected = copy.deepcopy(
         {key: value for key, value in record.items() if key not in BOOTSTRAP_OMITTED_FIELDS}
     )
@@ -21,7 +20,7 @@ def bootstrap_record(record: dict) -> dict:
         projected["provenance"] = {
             "sources": [
                 {key: source[key] for key in SOURCE_BOOTSTRAP_FIELDS if key in source}
-                for source in record["provenance"].get("sources", [])
+                for source in record["provenance"].get("sources", [])[:1]
             ]
         }
     if isinstance(record.get("curation"), dict):
@@ -31,11 +30,9 @@ def bootstrap_record(record: dict) -> dict:
             if key in record["curation"]
         }
     if isinstance(record.get("activity"), dict):
-        projected["activity"] = {
-            key: record["activity"][key]
-            for key in ACTIVITY_BOOTSTRAP_FIELDS
-            if key in record["activity"]
-        }
+        projected["activity"] = {"status": record["activity"].get("status")}
+        if record["activity"].get("status") == "unknown" and "observed_at" in record["activity"]:
+            projected["activity"]["observed_at"] = record["activity"]["observed_at"]
     for location in projected.get("presence", {}).get("geographic", []):
         location.pop("source_ids", None)
         location.pop("privacy_note", None)
