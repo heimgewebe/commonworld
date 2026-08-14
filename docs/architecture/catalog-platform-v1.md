@@ -89,7 +89,7 @@ Für die ausgewählte Identität veröffentlicht die Stage getrennte Shard- und 
 - `mismatch`
 - `degraded`
 
-Der Shardcache ist auf 8, der Detailcache auf 16 Einträge begrenzt. Beide verwenden deterministische LRU-Verdrängung. Fehlgeschlagene Promises werden entfernt und können erneut geladen werden. Ein Generationswechsel leert beide Caches. Ein gemeinsamer Auswahlzähler verhindert, dass verspätete Antworten eine neuere Auswahl überschreiben.
+Der Shardcache ist auf 8 Einträge begrenzt. Der Detail-Promise-Cache ist wie die dekodierte sichtbare Detail-Retention auf genau 1 Eintrag begrenzt, damit erfüllte Promises keine früher ausgewählten vollständigen Records festhalten. Die Caches verwenden deterministische LRU-Verdrängung; fehlgeschlagene Promises werden entfernt. Ein Generationswechsel leert beide Caches. Ein gemeinsamer Auswahlzähler verhindert, dass verspätete Antworten eine neuere Auswahl überschreiben.
 
 Bei einem Detailfehler bleiben Titel, Zusammenfassung, Links, Quellen, Karte, Suche und Textansicht aus dem kompakten Bootstrap nutzbar. Eine sichtbare, lokalisierte Wiederholungsaktion verwirft beide Shadow-Caches, lädt Manifest und Aggregat frisch und verifiziert danach Shard und Detail der weiterhin ausgewählten Identität erneut. Damit kann sie sowohl einen transienten Plattformausfall als auch einen gestaffelten Snapshot-Rollout überwinden. Nach erfolgreicher Wiederholung wird der Tastaturfokus auf einen sichtbaren Kontext zurückgeführt.
 
@@ -126,10 +126,10 @@ Die Messung belegt deterministische Rekonstruktion, Schema- und Integritätsgren
 3. Verborgene Orte bleiben ohne rekonstruierte Geometrie.
 4. Eine Manifestgeneration bindet Quellkatalog, Detailmenge und relevante Schemaverträge.
 5. Ein Manifest verweist nur auf Artefakte, deren Hash und Größe es oder ein generationsgebundener Sharddescriptor festlegt.
-6. Ein fehlgeschlagener Shadow-Leseweg lässt den kompakten buildgebundenen Datensatz und den begrenzten DE/EN-Recovery-Einstieg mit paginierten Indizes und kanonischen Projektseiten aktiv.
+6. Ein fehlgeschlagener Aggregate- oder Shard-Shadow-Leseweg lässt den kompakten buildgebundenen Datensatz und den begrenzten DE/EN-Recovery-Einstieg mit paginierten Indizes und kanonischen Projektseiten aktiv. Scheitert der ausgewählte Detailpfad, bleibt zusätzlich genau die eingebettete erste Quellen-URL als Fokus-Fallback sichtbar.
 7. Suche und Karte verwenden dieselbe zulässige Kandidatenmenge.
 8. Schnelle Auswahlwechsel dürfen keine ältere Antwort auf den aktuellen Fokus anwenden.
-9. Erfolgreiche Shadow-Parität autorisiert weder Bootstrap-Entfernung noch Deployment oder physischen Geräte-Cutover.
+9. Erfolgreiche Shard- oder Detailparität autorisiert keine Bootstrap-Entfernung und keinen vollständigen Runtime-Katalog-Cutover. T045 autorisiert ausschließlich den sichtbaren Upgrade von `provenance.sources` für die aktuelle Auswahl nach generation-, byte- und SHA-256-gebundener Detailprüfung.
 10. Kein generierter Shard darf das harte gzip-Budget erreichen; die Warnschwelle löst vorher eine kompatible Partitionierungsentscheidung aus.
 
 ## Cutover-Gate
@@ -158,4 +158,4 @@ Wird minimale Betriebsfläche höher gewichtet, kann Commonworld lange beim buil
 
 ## Nicht behauptet
 
-Dieser Stand belegt noch keinen PostGIS-, Outbox-, Axum- oder Weltgewebe-Produktionspfad. Er belegt noch keine Bootstrap-Entfernung und keine physische Gerätefreigabe. Er schafft den generationsgebundenen öffentlichen Liefervertrag, einen deterministischen Snapshot-Compiler, einen fehlertoleranten ausgewählten Detail-Shadow-Pfad und ein CI-gebundenes Skalierungs-Gate für den späteren 1.000er-/10.000er-Cutover.
+Dieser Stand belegt noch keinen PostGIS-, Outbox-, Axum- oder Weltgewebe-Produktionspfad. Er belegt noch keine Bootstrap-Entfernung und keine physische Gerätefreigabe. Er schafft den generationsgebundenen öffentlichen Liefervertrag, einen deterministischen Snapshot-Compiler, einen fehlertoleranten ausgewählten Detailpfad mit verifiziertem sichtbarem Provenienz-Upgrade und ein CI-gebundenes Skalierungs-Gate für den späteren 1.000er-/10.000er-Cutover.

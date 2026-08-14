@@ -1,0 +1,108 @@
+{
+  "schema_version": 1,
+  "kind": "commonworld_catalog_bootstrap_headroom_evidence",
+  "task_id": "COMMONWORLD-PUBLIC-GLOBE-V1-T045",
+  "status": "measured-and-implemented",
+  "catalog_entry_count": 94,
+  "baseline": {
+    "design": "compact bootstrap with every provenance source URL embedded",
+    "bootstrap_raw_bytes": 147823,
+    "bootstrap_gzip_bytes": 28572,
+    "warning_threshold_bytes": 28672,
+    "warning_headroom_bytes": 100,
+    "hard_limit_bytes": 32768,
+    "startup_project_json_requests": 0
+  },
+  "alternatives": [
+    {
+      "id": "zero-bootstrap-provenance",
+      "description": "Remove provenance from the bootstrap entirely and expose full provenance only from the selected identity's existing content-addressed detail record.",
+      "bootstrap_raw_bytes": 128018,
+      "bootstrap_gzip_bytes": 25733,
+      "warning_headroom_bytes": 2939,
+      "startup_project_json_requests": 0,
+      "runtime_tradeoff": "Smallest payload, but the focus view would have no source fallback when the catalog platform or selected detail is unavailable."
+    },
+    {
+      "id": "one-source-fallback-plus-verified-selected-detail",
+      "description": "Embed exactly one URL-only provenance source per project, retain activity.observed_at only for unknown-status notices, and upgrade the selected focus view to full canonical provenance only after existing generation-, byte- and SHA-256-bound detail verification.",
+      "bootstrap_raw_bytes": 135030,
+      "bootstrap_gzip_bytes": 26434,
+      "warning_headroom_bytes": 2238,
+      "startup_project_json_requests": 0,
+      "runtime_tradeoff": "Costs 701 gzip bytes versus zero-provenance, but preserves one meaningful source during catalog-platform degradation and requires no new request class or backend.",
+      "selected": true
+    }
+  ],
+  "selection_reason": "The selected hybrid clears the task's 2048-byte warning-headroom target while preserving a degraded-mode evidence link. It reuses the already deployed content-addressed selected-detail fetch instead of adding startup requests, segmented bootstrap fetches, a backend, or a second catalog truth.",
+  "runtime_memory": {
+    "detail_promise_cache_entries_retained": 1,
+    "decoded_verified_full_detail_records_retained": 1,
+    "shard_cache_entries_retained": 8,
+    "policy": "The selected-detail Promise cache and decoded verified full-record retention are both capped at one identity; changing focus evicts the prior detail promise/result, while compact shard transport remains separately bounded to eight.",
+    "reason": "Fulfilled detail promises retain decoded records, so both retention layers must share the one-identity bound rather than allowing hidden accumulation."
+  },
+  "browser": {
+    "public_smoke_verdict": "PASS",
+    "public_smoke_scenarios": 38,
+    "provenance_upgrade": {
+      "fixture": "gbif",
+      "bootstrap_fallback_sources": 1,
+      "verified_sources": 6,
+      "initial_detail_requests": 1,
+      "eviction_cycle": "gbif -> debian -> gbif",
+      "eviction_cycle_detail_requests": 3,
+      "verdict": "PASS"
+    },
+    "fourfold_cpu_gate": {
+      "decision": "pass",
+      "attempt_count": 1,
+      "mobile_runtime_ready_ms": 794,
+      "desktop_runtime_ready_ms": 810,
+      "mobile_startup_task_duration_ms": 766.54,
+      "desktop_startup_task_duration_ms": 793.17,
+      "startup_project_json_requests": 0,
+      "first_party_surface_sha256": "71c460b35c85331e7b429f0dfd2053ec711f9e43595ec2d115f6d5dbc3c326e9"
+    }
+  },
+  "recovery": {
+    "de_en_bounded_recovery_entries": 24,
+    "no_javascript_recovery_preserved": true,
+    "canonical_project_json_preserved": true,
+    "catalog_projects_remain_authoritative": true
+  },
+  "budgets": {
+    "warning_threshold_changed": false,
+    "hard_limit_changed": false,
+    "warning_threshold_bytes": 28672,
+    "hard_limit_bytes": 32768
+  },
+  "release": {
+    "id": "a5584bb82079f46d983b",
+    "catalog_runtime_generation": "63462c96932139298c1b85fdc11b6edbb1188a45ad6f98fab120a129e3adb1fb"
+  },
+  "does_not_establish": [
+    "physical-device approval",
+    "that zero-provenance is unsafe in every future design",
+    "permission to raise delivery thresholds",
+    "permission to remove the DE/EN no-JavaScript recovery path",
+    "future performance after additional catalog growth"
+  ],
+  "canonical_state": {
+    "catalog_delivery_design": "compact_build_bound_bootstrap_with_verified_selected_detail_provenance",
+    "visible_detail_upgrade_fields": [
+      "provenance.sources"
+    ],
+    "selected_detail_upgrade_authorized": true,
+    "aggregate_and_shard_runtime_observation": "shadow_only",
+    "full_runtime_catalogue_cutover_authorized": false,
+    "selected_detail_fallback": "first_bootstrap_source",
+    "detail_promise_cache_entries": 1,
+    "decoded_verified_detail_entries": 1,
+    "shard_cache_entries": 8
+  },
+  "review_fixes": {
+    "codex_p1": "canonical state now authorizes only verified selected provenance.sources while full runtime catalogue cutover remains false",
+    "codex_p2": "fulfilled detail promises can retain decoded records, so CATALOG_DETAIL_CACHE_LIMIT and both cache contracts are now one; browser eviction cycle proves reload after another identity"
+  }
+}

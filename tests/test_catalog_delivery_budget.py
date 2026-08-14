@@ -99,11 +99,31 @@ class CatalogDeliveryBudgetTests(unittest.TestCase):
             all('handoff' not in record for record in bootstrap_records),
             'compact bootstrap must omit non-interactive handoff metadata',
         )
+        self.assertTrue(
+            all(len(record.get('provenance', {}).get('sources', [])) == 1 for record in bootstrap_records),
+            'compact bootstrap must retain exactly one degraded-mode source fallback per project',
+        )
         sources = [source for record in bootstrap_records for source in record.get('provenance', {}).get('sources', [])]
         self.assertTrue(sources)
         self.assertTrue(
             all(set(source) == {'url'} and source['url'].startswith('https://') for source in sources),
-            'compact bootstrap must retain source links without editorial source-label text',
+            'compact bootstrap fallback sources must remain URL-only',
+        )
+        self.assertTrue(
+            all(
+                record.get('activity', {}).get('status') == 'unknown'
+                or 'observed_at' not in record.get('activity', {})
+                for record in bootstrap_records
+            ),
+            'activity observation dates are startup-relevant only for unknown-status notices',
+        )
+        self.assertTrue(
+            all(
+                record.get('activity', {}).get('status') != 'unknown'
+                or bool(record.get('activity', {}).get('observed_at'))
+                for record in bootstrap_records
+            ),
+            'unknown activity must retain its observed_at value for the runtime notice',
         )
         relations = [relation for record in bootstrap_records for relation in record.get('relations', [])]
         self.assertGreater(len(relations), 0)

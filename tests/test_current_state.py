@@ -119,16 +119,15 @@ class CurrentStateTests(unittest.TestCase):
         self.assertIn("current catalog-delivery truth mismatch", errors)
         self.assertIn("catalog platform and current state disagree on detail loading", errors)
 
-    def test_catalog_delivery_rejects_platform_shadow_drift(self) -> None:
+    def test_catalog_delivery_rejects_platform_selected_detail_upgrade_drift(self) -> None:
         with tempfile.TemporaryDirectory() as directory:
             root = self.copy_current_state(directory)
             path = root / "contracts/commonworld/catalog-platform.contract.json"
             value = json.loads(path.read_text(encoding="utf-8"))
-            value["browser_transition"]["shadow_runtime_observation"]["selected_identity_detail"] = False
+            value["browser_transition"]["selected_identity_detail"]["mode"] = "shadow_only"
             path.write_text(json.dumps(value), encoding="utf-8")
             errors = validate_current_state(root)
-        self.assertIn("catalog platform shadow-observation truth mismatch", errors)
-        self.assertIn("catalog platform and current state disagree on detail loading", errors)
+        self.assertIn("catalog platform selected-detail public-upgrade truth mismatch", errors)
 
     def test_catalog_delivery_rejects_incompatible_detail_parity_boundary(self) -> None:
         with tempfile.TemporaryDirectory() as directory:
@@ -157,6 +156,18 @@ class CurrentStateTests(unittest.TestCase):
             path.write_text(json.dumps(value), encoding="utf-8")
             errors = validate_current_state(root)
         self.assertIn("catalog platform and current state disagree on runtime catalogue cache limits", errors)
+
+    def test_catalog_delivery_rejects_runtime_detail_cache_retention_drift(self) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            root = self.copy_current_state(directory)
+            path = root / "assets/commonworld-app.js"
+            value = path.read_text(encoding="utf-8").replace(
+                "const CATALOG_DETAIL_CACHE_LIMIT = 1;",
+                "const CATALOG_DETAIL_CACHE_LIMIT = 16;",
+            )
+            path.write_text(value, encoding="utf-8")
+            errors = validate_current_state(root)
+        self.assertTrue(any("CATALOG_DETAIL_CACHE_LIMIT = 1" in error for error in errors))
 
 
     def test_catalog_delivery_rejects_retry_policy_drift(self) -> None:
