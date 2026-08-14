@@ -3,14 +3,14 @@
   "kind": "commonworld.ui_locale_release_evidence",
   "locale": "pt-BR",
   "status": "released",
-  "source_revision": "582c33e9228e0d5ea70b7cef4222c74438d267d1",
+  "source_revision": "11464e83de5c2fdcb70dddd4c076ff54333cd9d7",
   "source_pack_sha256": "06e4c5c150bdf33e63d1becf47ef1f90f0b51a1d24b76725f44ff37ce07302f7",
   "reviewed_source_pack_sha256": "cf57400b0a0fbf818baa88f33001e95bc4c7c39bd00caef3505f4d9ab6c0f405",
-  "catalog_overlay_sha256": "78c63b96552ec3df7a92e2a7fbfe08c373ea99da20e1dac2268b10ef90564ba4",
+  "catalog_overlay_sha256": "ae2d232fe6bbb827321b36125ffd667488057d2870eff5d4597c2ff3816b9412",
   "surface_sha256": {
-    "index": "b46511a143917e698d1c32d86e3a3e8ce7503ecc07e46317ecf091c44d6f448a",
-    "method": "3cda91821cd320ca824ea8d3e4f520426f91c21257d969ce00072b64fcf90b06",
-    "proposal": "8fc54e39f1c8a83f64298d7e0b4487d33e48d5b9704bd94fc2ad7df968505214"
+    "index": "996826ec1195e3ebe6df23a6dad2811112a5166f0cc7e2fa98f90ac5b1529451",
+    "method": "75d5c761d9656abae8f79f994dfa53eef9b776462c9b71f792d9719520073217",
+    "proposal": "573dd579876bbe4b0567f470dff12746ed9e20c6a67c6a3d2f8b2370b6a9124e"
   },
   "gate_results": {
     "required_surfaces_passed": [
@@ -36,19 +36,19 @@
   "evidence_receipts": {
     "independent_language_review": {
       "source": "docs/evidence/locale-releases/receipts/shared/independent-language-review.json",
-      "sha256": "a0185b5507bf33d97ba45fff02aa5e4b1722cd8ca8563413aea7453502ac2517"
+      "sha256": "00ac9600fb916f6ccb441da04eccac891ae30fd7e657ee887b75070f70f8822b"
     },
     "keyboard_and_screen_reader_review": {
       "source": "docs/evidence/locale-releases/receipts/shared/keyboard-and-screen-reader-review.json",
-      "sha256": "c42ee638fcb267cdf568b4335412e4949c730478d3e19546b48726181d3aa38e"
+      "sha256": "325da8170d8ff99a49d9813cb2767f5fd75f543862b2266e3a2d336ac20bde73"
     },
     "browser_smoke": {
       "source": "docs/evidence/locale-releases/receipts/shared/browser-smoke.json",
-      "sha256": "85c4061761ec99ce600da6ec6851144d4a4adf6ca76e1c6c9e0b5f8f78f3d040"
+      "sha256": "0b8785e0951af87cae69b01d82f4ab54acede125b3dd33be74942d4f88a11650"
     },
     "state_preservation_smoke": {
       "source": "docs/evidence/locale-releases/receipts/shared/state-preservation-smoke.json",
-      "sha256": "4de6e569f4ef5c1adaaf1f517244b3404f1628a479ba65a9b651c71f5ed59cf2"
+      "sha256": "93ba977edb2b0a3b65e96cbb182ceb669811214382525c2acb4cfd4de47d62fb"
     }
   },
   "review_class": {
@@ -60,5 +60,5 @@
     "findings_based": true,
     "post_fix_review_required": true
   },
-  "notes": "91-entry catalog localization bound to the six-locale Wave-1 pack, public release 198fb9ef7729c615232c, and fresh 18-page browser/accessibility/state lifecycle evidence. Language review is model-assisted and digest-bound; no native-speaker, human language, manual screen-reader, manual visual or full WCAG approval is claimed."
+  "notes": "94-entry compact release bound to release 8522aee1fa2a668d201f and current shared lifecycle/review evidence. Model-assisted language review; no native-speaker, human language or full WCAG approval is claimed."
 }

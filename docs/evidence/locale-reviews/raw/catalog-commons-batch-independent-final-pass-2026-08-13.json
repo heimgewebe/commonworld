@@ -1,0 +1,89 @@
+{
+  "schema_version": 1,
+  "kind": "commonworld.catalog_locale_incremental_independent_review_chain",
+  "status": "passed",
+  "review_kind": "model_assisted_independent_language_review",
+  "writer": "GPT-5.6 Sol via ChatGPT",
+  "reviewer": "DeepSeek V4 Flash and GPT-5.6 Terra via Grabowski independent reviews",
+  "writer_independence": "independent_from_catalog_translation_writer",
+  "content_revision": "31cbd59744f80e41b358b55047af3678b75ceb02",
+  "review_packet_revision": "3ba5d0ed03e9b083b9bd9675a226275b5746473f",
+  "input_digests": {
+    "es": "1b42a6240e821c62b3f63a3142a4cdca69737aa76f076d7faf8945db06d3b6c9",
+    "fr": "45d2a7e95798eecf108597859cdacc09bf74b48d6c238219e2b61ea8d93a8c03",
+    "pt-BR": "ae2d232fe6bbb827321b36125ffd667488057d2870eff5d4597c2ff3816b9412",
+    "ar": "1a46055cea38c6a5060b077d1e45ebd71c5cc925f8d71d7dd96fee2156e37659",
+    "zh-Hans": "47fb274bc5fbfd99e7c0f71877f7a550ecaccbc84996de4596017de3f75b5a78"
+  },
+  "coverage": {
+    "locales": [
+      "es",
+      "fr",
+      "pt-BR",
+      "ar",
+      "zh-Hans"
+    ],
+    "prior_reviewed_entries_carried_forward": 91,
+    "new_entries_reviewed_per_locale": 3,
+    "project_count_per_locale": 94,
+    "all_entries_reviewed": true,
+    "carry_forward_basis": "exact JSON object equality against base revision 582c33e9228e0d5ea70b7cef4222c74438d267d1 for all prior 91 entries in every target locale"
+  },
+  "rounds": [
+    {
+      "stage": "initial",
+      "competition_id": "gac-opencode-competitor-23cb9395f8-144a8080c9",
+      "receipt_sha256": "097d29b03bf254b24647b7952f292435f3439de2a78435c9f37c10d3643e1db2",
+      "reviewer": "DeepSeek V4 Flash via OpenCode/Grabowski",
+      "verdict": "fail",
+      "passed_locales": [
+        "fr",
+        "pt-BR",
+        "ar",
+        "zh-Hans"
+      ],
+      "failed_locales": [
+        "es"
+      ],
+      "findings": 1
+    },
+    {
+      "stage": "post-fix-es",
+      "competition_id": "gac-codex-competitor-579d42a77e-54c5ef0e06",
+      "receipt_sha256": "743a9d4f7b66d5226e89522247f5088990e5f2bb5f5f160913f5e4d177881963",
+      "reviewer": "GPT-5.6 Terra via Codex/Grabowski",
+      "verdict": "pass",
+      "passed_locales": [
+        "es",
+        "fr",
+        "pt-BR",
+        "ar",
+        "zh-Hans"
+      ],
+      "failed_locales": [],
+      "findings": 0
+    }
+  ],
+  "final_verdict": "pass",
+  "counts": {
+    "blocker": 0,
+    "major": 0,
+    "minor": 0,
+    "note": 0
+  },
+  "findings": [],
+  "resolved_findings": [
+    {
+      "locale": "es",
+      "project": "orangi-low-cost-sanitation",
+      "severity": "minor",
+      "field": "summary",
+      "resolution": "lane-sewer terminology corrected from alcantarillas de calle to alcantarillas de callejón; independent post-fix Terra review passed"
+    }
+  ],
+  "limitations": [
+    "Model-assisted independent review; no native-speaker or human language approval is claimed.",
+    "The prior 91 entries were carried forward by exact machine comparison, not re-reviewed linguistically in this batch.",
+    "Initial review was cross-provider DeepSeek; post-fix confirmation used a separate GPT-5.6 Terra run from the GPT-5.6 Sol translation writer, within the same OpenAI model family."
+  ]
+}

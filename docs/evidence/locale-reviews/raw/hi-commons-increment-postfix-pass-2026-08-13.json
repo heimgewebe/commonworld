@@ -1,0 +1,50 @@
+{
+  "schema_version": 1,
+  "kind": "commonworld.model_assisted_incremental_language_review",
+  "locale": "hi",
+  "status": "PASS",
+  "reviewer_model": "claude-opus-5",
+  "task_id": "06896d1389b44550a1e08489",
+  "reviewed_revision": "11464e83de5c2fdcb70dddd4c076ff54333cd9d7",
+  "input_digests": {
+    "catalog/locales/hi.json": "0774cff1d344963d0c0642651f927dd10706140c626eb70db32293f2392d4177",
+    "catalog/locales/en.json": "94d206cb638eacb00032e2cfa00ba000c35e16ab0979ea80df7c848311cab3f6"
+  },
+  "projects": {
+    "gbif": {
+      "verdict": "PASS",
+      "checked": [
+        "biodiversity scope is explicit in open access wording",
+        "global federation is preserved",
+        "formal governance is preserved",
+        "publish/discover/search/retrieve semantics are acceptably distinct"
+      ]
+    },
+    "lasilo-naples": {
+      "verdict": "PASS",
+      "checked": [
+        "public cultural commons meaning is preserved",
+        "self-governance through assemblies and thematic groups is preserved",
+        "shared civic-use declaration is preserved"
+      ]
+    },
+    "orangi-low-cost-sanitation": {
+      "verdict": "PASS",
+      "checked": [
+        "neighbourhood collective agency is explicit",
+        "community financing/building/management/maintenance is preserved",
+        "community internal sewers remain distinct from public-authority trunk infrastructure"
+      ]
+    }
+  },
+  "material_finding_count": 0,
+  "cosmetic_observations": [
+    "Minor hyphen and cross-entry terminology consistency remains editorial rather than semantic.",
+    "The GBIF open-access phrase is slightly narrower as access to biodiversity data but remains faithful.",
+    "Orangi retains mild stylistic redundancy around main/trunk terminology."
+  ],
+  "limitations": [
+    "Model-assisted independent review only; no native-speaker or human Hindi approval is claimed.",
+    "Scope was limited to the three newly added Hindi project overlays after the reviewed fixes."
+  ]
+}

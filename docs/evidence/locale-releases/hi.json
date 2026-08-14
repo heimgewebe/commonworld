@@ -3,14 +3,14 @@
   "kind": "commonworld.ui_locale_release_evidence",
   "locale": "hi",
   "status": "released",
-  "source_revision": "582c33e9228e0d5ea70b7cef4222c74438d267d1",
+  "source_revision": "11464e83de5c2fdcb70dddd4c076ff54333cd9d7",
   "source_pack_sha256": "06e4c5c150bdf33e63d1becf47ef1f90f0b51a1d24b76725f44ff37ce07302f7",
   "reviewed_source_pack_sha256": "cf57400b0a0fbf818baa88f33001e95bc4c7c39bd00caef3505f4d9ab6c0f405",
-  "catalog_overlay_sha256": "f7caff51645156ab365994a80d463f944e096d8608e4c9497addfbbe20fb8ea3",
+  "catalog_overlay_sha256": "0774cff1d344963d0c0642651f927dd10706140c626eb70db32293f2392d4177",
   "surface_sha256": {
-    "index": "4291b0d9b4e2242ca430a78421d4414177e70542bbf25e455a6fcf9269882f0d",
-    "method": "2bf7d241c05720c55d46bfa893ac4a8270b69e6e8f23f565a57586f0e285029f",
-    "proposal": "91b3d67b6de8c9a59247f65b24a8f10903fa0c610406a190b470b07d2ce7ecbc"
+    "index": "df10c354c32fd88cd1ebd70c7b99e947a23317d792e39d955f1a58c6f3364c1b",
+    "method": "e5cb64d4eda73427ced41f65fe7fc6bdc6b199574775a912e4444706c07a57e6",
+    "proposal": "dc3d4689a85471d7c6df450cbe8a332dcabc9fb630a1276b8ee14bbf63c70107"
   },
   "gate_results": {
     "required_surfaces_passed": [
@@ -36,19 +36,19 @@
   "evidence_receipts": {
     "independent_language_review": {
       "source": "docs/evidence/locale-releases/receipts/shared/independent-language-review.json",
-      "sha256": "a0185b5507bf33d97ba45fff02aa5e4b1722cd8ca8563413aea7453502ac2517"
+      "sha256": "00ac9600fb916f6ccb441da04eccac891ae30fd7e657ee887b75070f70f8822b"
     },
     "keyboard_and_screen_reader_review": {
       "source": "docs/evidence/locale-releases/receipts/shared/keyboard-and-screen-reader-review.json",
-      "sha256": "c42ee638fcb267cdf568b4335412e4949c730478d3e19546b48726181d3aa38e"
+      "sha256": "325da8170d8ff99a49d9813cb2767f5fd75f543862b2266e3a2d336ac20bde73"
     },
     "browser_smoke": {
       "source": "docs/evidence/locale-releases/receipts/shared/browser-smoke.json",
-      "sha256": "85c4061761ec99ce600da6ec6851144d4a4adf6ca76e1c6c9e0b5f8f78f3d040"
+      "sha256": "0b8785e0951af87cae69b01d82f4ab54acede125b3dd33be74942d4f88a11650"
     },
     "state_preservation_smoke": {
       "source": "docs/evidence/locale-releases/receipts/shared/state-preservation-smoke.json",
-      "sha256": "4de6e569f4ef5c1adaaf1f517244b3404f1628a479ba65a9b651c71f5ed59cf2"
+      "sha256": "93ba977edb2b0a3b65e96cbb182ceb669811214382525c2acb4cfd4de47d62fb"
     }
   },
   "review_class": {

@@ -2,8 +2,8 @@
   "schema_version": 2,
   "kind": "commonworld.ui_locale_independent_language_review_receipt",
   "status": "passed",
-  "reviewed_revision": "582c33e9228e0d5ea70b7cef4222c74438d267d1",
-  "reviewed_source_pack_sha256": "cf57400b0a0fbf818baa88f33001e95bc4c7c39bd00caef3505f4d9ab6c0f405",
+  "reviewed_revision": "11464e83de5c2fdcb70dddd4c076ff54333cd9d7",
+  "reviewed_source_pack_sha256": "d449f5b6a564c859be9142d737ad768020a8ee472f18026e3d3cbb092ec54648",
   "locale_verdicts": {
     "es": {
       "status": "passed",
@@ -187,17 +187,28 @@
     },
     "hi": {
       "review_class": "model_assisted_independent_language_review",
-      "reviewed_revision": "582c33e9228e0d5ea70b7cef4222c74438d267d1",
-      "source_pack_sha256": "cf57400b0a0fbf818baa88f33001e95bc4c7c39bd00caef3505f4d9ab6c0f405",
+      "reviewed_revision": "11464e83de5c2fdcb70dddd4c076ff54333cd9d7",
       "locale_verdicts": {
         "hi": "PASS"
       },
       "findings": [],
-      "source_receipt": {
+      "carried_forward_review": {
+        "project_count": 91,
         "path": "docs/evidence/locale-reviews/raw/hi-independent-final-pass-2026-08-13.json",
         "sha256": "8fc4f18ea1be34b18e59e98ebe4a42e860b21bd9242b8e591878482e468c60b0"
       },
-      "limitations": "Model-assisted review; does not constitute native or human language approval.",
+      "incremental_review": {
+        "project_count": 3,
+        "initial_findings": {
+          "path": "docs/evidence/locale-reviews/raw/hi-commons-increment-findings-2026-08-13.json",
+          "sha256": "5ac5de1b49a868c9347a40d20698a8aee96b59c6a928188cad8e2a9b8b4229c5"
+        },
+        "post_fix_pass": {
+          "path": "docs/evidence/locale-reviews/raw/hi-commons-increment-postfix-pass-2026-08-13.json",
+          "sha256": "435e91d943567a56310cdbd4c94c89f10b8c228bf6f1be591edecfa0c290ada9"
+        }
+      },
+      "limitations": "Model-assisted review; no native-speaker or human Hindi approval is claimed.",
       "confidence": "medium"
     }
   },
@@ -221,11 +232,6 @@
       "label": "final-pt-ar-pass",
       "path": "docs/evidence/locale-reviews/raw/final-pt-ar-pass.txt",
       "sha256": "caa7abec3cbd1930cb6791957fbb3885449cd57efbbc03485d6a163ee116756b"
-    },
-    {
-      "label": "final-hi-pass",
-      "path": "docs/evidence/locale-reviews/raw/hi-independent-final-pass-2026-08-13.json",
-      "sha256": "8fc4f18ea1be34b18e59e98ebe4a42e860b21bd9242b8e591878482e468c60b0"
     }
   ],
   "review_class": {
@@ -243,17 +249,17 @@
   ],
   "catalog_review": {
     "review_kind": "model_assisted_independent_language_review",
-    "reviewer": "Independent reviewer chain: Claude Opus 5 for prior locales; GPT-5.6 Sol for Hindi",
-    "writer": "Independent writer chain: GPT-5.6 Sol for prior locales; structure-preserving Google Translate adapter for Hindi",
+    "reviewer": "DeepSeek V4 Flash + GPT-5.6 Terra via Grabowski independent reviews",
+    "writer": "GPT-5.6 Sol via ChatGPT",
     "writer_independence": "independent_from_catalog_translation_writer",
-    "reviewed_revision": "582c33e9228e0d5ea70b7cef4222c74438d267d1",
+    "reviewed_revision": "11464e83de5c2fdcb70dddd4c076ff54333cd9d7",
     "input_digests": {
-      "es": "8d145707c3dfc55d1ca42206d73928445e42af5fa05db9065a0b7923811b0e87",
-      "fr": "9ef30f1dc4da4a090dd77c257daf48b901183a703722710dfcc1fddd771faf22",
-      "pt-BR": "78c63b96552ec3df7a92e2a7fbfe08c373ea99da20e1dac2268b10ef90564ba4",
-      "ar": "1f912e9eb06d75f42a5606397a20bb4eec8b20f2d642cd5fe9bfaadb775f15cb",
-      "zh-Hans": "808cf1efa5e15aaf2de61a09082ba9b28615a50c1316700f9b8416fbe853e7cd",
-      "hi": "f7caff51645156ab365994a80d463f944e096d8608e4c9497addfbbe20fb8ea3"
+      "es": "1b42a6240e821c62b3f63a3142a4cdca69737aa76f076d7faf8945db06d3b6c9",
+      "fr": "45d2a7e95798eecf108597859cdacc09bf74b48d6c238219e2b61ea8d93a8c03",
+      "pt-BR": "ae2d232fe6bbb827321b36125ffd667488057d2870eff5d4597c2ff3816b9412",
+      "ar": "1a46055cea38c6a5060b077d1e45ebd71c5cc925f8d71d7dd96fee2156e37659",
+      "zh-Hans": "47fb274bc5fbfd99e7c0f71877f7a550ecaccbc84996de4596017de3f75b5a78",
+      "hi": "0774cff1d344963d0c0642651f927dd10706140c626eb70db32293f2392d4177"
     },
     "coverage": {
       "locales": [
@@ -264,10 +270,9 @@
         "zh-Hans",
         "hi"
       ],
-      "project_count_per_locale": 91,
+      "project_count_per_locale": 94,
       "all_entries_reviewed": true,
-      "basis": "Existing five locales retain their prior digest-bound review chain; Hindi received complete independent source-target review of all 91 projects and 231 localized fields with explicit post-fix closure.",
-      "full_review_source": "docs/evidence/locale-reviews/raw/catalog-commons-batch-independent-final-pass-2026-08-12.json"
+      "basis": "Five locales retain their digest-bound 94-entry review. Hindi combines its digest-bound 91-entry review with an independent three-entry findings/fix/post-fix-PASS review."
     },
     "verdict": "pass",
     "counts": {
@@ -278,21 +283,30 @@
     },
     "findings": [],
     "review_notes": [
-      "All five target overlays contain 91 projects. The prior 88 project objects are byte-semantically unchanged by exact JSON object comparison against origin/main.",
-      "Three new entries per locale were independently reviewed; zh-Hans and pt-BR findings were fixed and independently re-reviewed to PASS.",
-      "Model-assisted review only; native-speaker/human approval is not claimed.",
-      "Hindi: all 91 project overlays and 231 localized fields reviewed against English; semantic findings fixed and post-fix review passed. Model-assisted only; no native-speaker/human approval claimed."
+      "All five target overlays contain 94 projects. The prior 91 project objects are JSON-object identical to base revision 582c33e9228e0d5ea70b7cef4222c74438d267d1.",
+      "Three new entries per locale were independently reviewed. The initial cross-provider DeepSeek review found one Spanish minor; the exact terminology fix was independently re-reviewed by a separate GPT-5.6 Terra run and passed.",
+      "Model-assisted review only; native-speaker/human approval is not claimed."
     ],
     "source_receipts": [
       {
-        "path": "docs/evidence/locale-reviews/raw/catalog-commons-batch-independent-final-pass-2026-08-12.json",
-        "sha256": "2e4dd8d88c4cd7fcf6ce1d1dfe753ed1f7505378ba2215f9369694ea04e3e448",
-        "role": "commons_batch_incremental_independent_review_chain"
+        "path": "docs/evidence/locale-reviews/raw/catalog-commons-batch-independent-final-pass-2026-08-13.json",
+        "sha256": "cf52d12e889ba2495f9598e5ae89718e5cdeda2d1b68bcf2e77e0cb9e898b8ca",
+        "role": "five_locale_94_entry_review"
       },
       {
         "path": "docs/evidence/locale-reviews/raw/hi-independent-final-pass-2026-08-13.json",
         "sha256": "8fc4f18ea1be34b18e59e98ebe4a42e860b21bd9242b8e591878482e468c60b0",
-        "role": "hindi_full_corpus_independent_post_fix_review"
+        "role": "hindi_prior_91_entry_review"
+      },
+      {
+        "path": "docs/evidence/locale-reviews/raw/hi-commons-increment-findings-2026-08-13.json",
+        "sha256": "5ac5de1b49a868c9347a40d20698a8aee96b59c6a928188cad8e2a9b8b4229c5",
+        "role": "hindi_three_entry_findings"
+      },
+      {
+        "path": "docs/evidence/locale-reviews/raw/hi-commons-increment-postfix-pass-2026-08-13.json",
+        "sha256": "435e91d943567a56310cdbd4c94c89f10b8c228bf6f1be591edecfa0c290ada9",
+        "role": "hindi_three_entry_post_fix_pass"
       }
     ],
     "resolved_findings": [
@@ -316,11 +330,25 @@
         "severity": "minor",
         "field": "summary",
         "resolution": "fish reserves separated from executar coordination; final pt-BR re-review passed"
+      },
+      {
+        "locale": "es",
+        "project": "orangi-low-cost-sanitation",
+        "severity": "minor",
+        "field": "summary",
+        "resolution": "lane-sewer terminology corrected from alcantarillas de calle to alcantarillas de callejón; separate-model post-fix review passed"
+      },
+      {
+        "locale": "hi",
+        "project": "gbif",
+        "severity": "material",
+        "field": "summary",
+        "resolution": "restored explicit biodiversity-data scope and passed post-fix review"
       }
     ],
     "limitations": [
       "Model-assisted independent review; no native-speaker or human language approval is claimed.",
-      "The prior 88 entries were carried forward by exact machine comparison, not re-reviewed linguistically in this batch."
+      "Previously reviewed entries were carried forward by digest/object identity rather than re-reviewed in this batch."
     ]
   },
   "incremental_ui_review": {

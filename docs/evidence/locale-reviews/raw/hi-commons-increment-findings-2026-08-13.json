@@ -1,0 +1,49 @@
+{
+  "schema_version": 1,
+  "kind": "commonworld.model_assisted_incremental_language_review",
+  "locale": "hi",
+  "status": "FINDINGS",
+  "reviewer_model": "claude-opus-5",
+  "task_id": "19728b2436154c37af92d516",
+  "reviewed_revision": "31a41598d520488d2deedc111c117b84ec802603",
+  "input_digests": {
+    "catalog/locales/hi.json": "a4a8a01be95425da7f8e347fcf81177933bcabc53408a5391c6eafc64ab627d5",
+    "catalog/locales/en.json": "94d206cb638eacb00032e2cfa00ba000c35e16ab0979ea80df7c848311cab3f6"
+  },
+  "projects": [
+    "gbif",
+    "lasilo-naples",
+    "orangi-low-cost-sanitation"
+  ],
+  "findings": [
+    {
+      "project": "gbif",
+      "field": "summary",
+      "severity": "material",
+      "problem": "The Hindi wording for open biodiversity access omitted the biodiversity qualifier and could be read as generic open access.",
+      "resolution_required": "Restore explicit biodiversity-data scope while preserving the federated and formal-governance meaning."
+    },
+    {
+      "project": "gbif",
+      "field": "summary,digital_label",
+      "severity": "minor",
+      "problem": "Global federation and discover/search wording could be made more explicit and less redundant."
+    },
+    {
+      "project": "lasilo-naples",
+      "field": "summary",
+      "severity": "minor",
+      "problem": "Commons and self-governance terminology could be made more natural and agentive in Hindi."
+    },
+    {
+      "project": "orangi-low-cost-sanitation",
+      "field": "summary",
+      "severity": "minor",
+      "problem": "Neighbourhood collective agency and the internal-sewer versus public trunk-infrastructure contrast could be expressed more directly."
+    }
+  ],
+  "limitations": [
+    "Model-assisted independent review only; no native-speaker or human Hindi approval is claimed.",
+    "Scope was limited to the three newly added Hindi project overlays and their canonical English/German meanings."
+  ]
+}

@@ -1,0 +1,241 @@
+{
+  "schema_version": 3,
+  "kind": "commonworld_incremental_catalog_language_review_input",
+  "source_revision": "31cbd59744f80e41b358b55047af3678b75ceb02",
+  "base_revision": "582c33e9228e0d5ea70b7cef4222c74438d267d1",
+  "writer": "GPT-5.6 Sol via ChatGPT",
+  "review_round": "post-fix-1",
+  "prior_review_receipts_sha256": [
+    "097d29b03bf254b24647b7952f292435f3439de2a78435c9f37c10d3643e1db2"
+  ],
+  "scope": {
+    "new_project_ids": [
+      "lasilo-naples",
+      "orangi-low-cost-sanitation",
+      "gbif"
+    ],
+    "target_locales": [
+      "es",
+      "fr",
+      "pt-BR",
+      "ar",
+      "zh-Hans"
+    ],
+    "fields": [
+      "summary",
+      "geographic_labels",
+      "digital_label"
+    ],
+    "prior_reviewed_entries_carried_forward": 91,
+    "new_entries_to_review_per_locale": 3,
+    "recheck_locales": [
+      "es"
+    ]
+  },
+  "carry_forward_proof": {
+    "es": {
+      "prior_project_count": 91,
+      "prior_objects_unchanged": true,
+      "comparison_base_revision": "582c33e9228e0d5ea70b7cef4222c74438d267d1",
+      "current_locale_file_sha256": "1b42a6240e821c62b3f63a3142a4cdca69737aa76f076d7faf8945db06d3b6c9"
+    },
+    "fr": {
+      "prior_project_count": 91,
+      "prior_objects_unchanged": true,
+      "comparison_base_revision": "582c33e9228e0d5ea70b7cef4222c74438d267d1",
+      "current_locale_file_sha256": "45d2a7e95798eecf108597859cdacc09bf74b48d6c238219e2b61ea8d93a8c03"
+    },
+    "pt-BR": {
+      "prior_project_count": 91,
+      "prior_objects_unchanged": true,
+      "comparison_base_revision": "582c33e9228e0d5ea70b7cef4222c74438d267d1",
+      "current_locale_file_sha256": "ae2d232fe6bbb827321b36125ffd667488057d2870eff5d4597c2ff3816b9412"
+    },
+    "ar": {
+      "prior_project_count": 91,
+      "prior_objects_unchanged": true,
+      "comparison_base_revision": "582c33e9228e0d5ea70b7cef4222c74438d267d1",
+      "current_locale_file_sha256": "1a46055cea38c6a5060b077d1e45ebd71c5cc925f8d71d7dd96fee2156e37659"
+    },
+    "zh-Hans": {
+      "prior_project_count": 91,
+      "prior_objects_unchanged": true,
+      "comparison_base_revision": "582c33e9228e0d5ea70b7cef4222c74438d267d1",
+      "current_locale_file_sha256": "47fb274bc5fbfd99e7c0f71877f7a550ecaccbc84996de4596017de3f75b5a78"
+    }
+  },
+  "canonical": {
+    "lasilo-naples": {
+      "de": {
+        "summary": "Ein öffentliches Kultur-Common in Neapel, dessen Räume, künstlerische Produktionsmittel und urbaner Garten von einer offenen Gemeinschaft über Versammlungen, thematische Arbeitsgruppen und eine gemeinsame Erklärung zum zivilen Gebrauch selbstverwaltet werden.",
+        "geographic_labels": {
+          "lasilo-naples-site": "l’Asilo, Vico Giuseppe Maffei 4, Neapel"
+        },
+        "digital_label": "Öffentliche Dokumentation zu Räumen, Selbstverwaltung, Versammlungen und zivilem Gebrauch"
+      },
+      "en": {
+        "summary": "A public cultural common in Naples whose rooms, artistic production facilities and urban garden are self-governed by an open community through assemblies, thematic working groups and a shared civic-use declaration.",
+        "geographic_labels": {
+          "lasilo-naples-site": "l’Asilo, Vico Giuseppe Maffei 4, Naples"
+        },
+        "digital_label": "Public documentation of shared spaces, self-governance, assemblies and civic use"
+      }
+    },
+    "orangi-low-cost-sanitation": {
+      "de": {
+        "summary": "Eine gemeinschaftlich organisierte Sanitärpraxis aus Orangi in Karachi, bei der Nachbarschaften ihre Hausanschlüsse sowie Gassen- und Sekundärkanäle gemeinsam finanzieren, bauen, verwalten und erhalten, während OPP-RTI technische Beratung leistet und öffentliche Stellen die Hauptinfrastruktur verantworten.",
+        "geographic_labels": {
+          "orangi-sanitation-network": "Orangi, Karachi – gemeinschaftlich verwaltete Sanitärinfrastruktur"
+        },
+        "digital_label": "Öffentliche OPP-RTI-Dokumentation zur gemeinschaftlich finanzierten und gepflegten Niedrigkosten-Sanitärversorgung"
+      },
+      "en": {
+        "summary": "A community-organized sanitation practice from Orangi in Karachi in which neighbourhoods jointly finance, build, manage and maintain household connections, lane sewers and secondary sewers, while OPP-RTI provides technical guidance and public authorities remain responsible for trunk infrastructure.",
+        "geographic_labels": {
+          "orangi-sanitation-network": "Orangi, Karachi — community-managed sanitation infrastructure"
+        },
+        "digital_label": "Public OPP-RTI documentation of community-financed and maintained low-cost sanitation"
+      }
+    },
+    "gbif": {
+      "de": {
+        "summary": "Eine global föderierte Biodiversitäts-Dateninfrastruktur, in der teilnehmende Länder, Organisationen, Knoten und Datenpublizierende Daten, Standards und technische Dienste für offenen Biodiversitätszugang gemeinsam bereitstellen und über formale Gremien koordinieren.",
+        "geographic_labels": {},
+        "digital_label": "Föderierte Infrastruktur zum Publizieren, Entdecken, Durchsuchen und Abrufen von Biodiversitätsdaten"
+      },
+      "en": {
+        "summary": "A globally federated biodiversity data infrastructure in which participating countries, organizations, nodes and data publishers jointly provide data, standards and technical services for open biodiversity access and coordinate them through formal governance bodies.",
+        "geographic_labels": {},
+        "digital_label": "Federated infrastructure for publishing, discovering, searching and retrieving biodiversity data"
+      }
+    }
+  },
+  "targets": {
+    "es": {
+      "lasilo-naples": {
+        "summary": "Un común cultural público en Nápoles cuyos espacios, medios de producción artística y huerto urbano son autogestionados por una comunidad abierta mediante asambleas, grupos de trabajo temáticos y una declaración compartida de uso cívico.",
+        "geographic_labels": {
+          "lasilo-naples-site": "l’Asilo, Vico Giuseppe Maffei 4, Nápoles"
+        },
+        "digital_label": "Documentación pública sobre espacios compartidos, autogobierno, asambleas y uso cívico"
+      },
+      "orangi-low-cost-sanitation": {
+        "summary": "Una práctica comunitaria de saneamiento de Orangi, Karachi, en la que los vecindarios financian, construyen, gestionan y mantienen conjuntamente conexiones domésticas, alcantarillas de callejón y colectores secundarios, mientras OPP-RTI aporta asesoramiento técnico y las autoridades públicas asumen la infraestructura principal.",
+        "geographic_labels": {
+          "orangi-sanitation-network": "Orangi, Karachi — infraestructura de saneamiento gestionada por la comunidad"
+        },
+        "digital_label": "Documentación pública de OPP-RTI sobre saneamiento de bajo coste financiado y mantenido por la comunidad"
+      },
+      "gbif": {
+        "summary": "Una infraestructura mundial y federada de datos sobre biodiversidad en la que países, organizaciones, nodos y publicadores participantes aportan conjuntamente datos, estándares y servicios técnicos para el acceso abierto y los coordinan mediante órganos formales de gobernanza.",
+        "geographic_labels": {},
+        "digital_label": "Infraestructura federada para publicar, descubrir, buscar y recuperar datos de biodiversidad"
+      }
+    },
+    "fr": {
+      "lasilo-naples": {
+        "summary": "Un commun culturel public à Naples dont les espaces, moyens de production artistique et jardin urbain sont autogérés par une communauté ouverte au moyen d’assemblées, de groupes de travail thématiques et d’une déclaration commune d’usage civique.",
+        "geographic_labels": {
+          "lasilo-naples-site": "l’Asilo, Vico Giuseppe Maffei 4, Naples"
+        },
+        "digital_label": "Documentation publique sur les espaces partagés, l’autogouvernance, les assemblées et l’usage civique"
+      },
+      "orangi-low-cost-sanitation": {
+        "summary": "Une pratique communautaire d’assainissement issue d’Orangi à Karachi, où les quartiers financent, construisent, gèrent et entretiennent ensemble branchements domestiques, égouts de ruelle et collecteurs secondaires, tandis qu’OPP-RTI apporte un appui technique et que les pouvoirs publics restent responsables des infrastructures principales.",
+        "geographic_labels": {
+          "orangi-sanitation-network": "Orangi, Karachi — infrastructure d’assainissement gérée par la communauté"
+        },
+        "digital_label": "Documentation publique d’OPP-RTI sur l’assainissement à bas coût financé et entretenu par les communautés"
+      },
+      "gbif": {
+        "summary": "Une infrastructure mondiale fédérée de données sur la biodiversité dans laquelle pays, organisations, nœuds et éditeurs participants fournissent ensemble données, normes et services techniques pour un accès ouvert, coordonnés par des organes formels de gouvernance.",
+        "geographic_labels": {},
+        "digital_label": "Infrastructure fédérée pour publier, découvrir, rechercher et récupérer des données sur la biodiversité"
+      }
+    },
+    "pt-BR": {
+      "lasilo-naples": {
+        "summary": "Um bem comum cultural público em Nápoles cujos espaços, meios de produção artística e horta urbana são autogeridos por uma comunidade aberta por meio de assembleias, grupos de trabalho temáticos e uma declaração compartilhada de uso cívico.",
+        "geographic_labels": {
+          "lasilo-naples-site": "l’Asilo, Vico Giuseppe Maffei 4, Nápoles"
+        },
+        "digital_label": "Documentação pública sobre espaços compartilhados, autogestão, assembleias e uso cívico"
+      },
+      "orangi-low-cost-sanitation": {
+        "summary": "Uma prática comunitária de saneamento de Orangi, Karachi, na qual bairros financiam, constroem, administram e mantêm em conjunto conexões domiciliares, redes de vielas e coletores secundários, enquanto a OPP-RTI oferece orientação técnica e o poder público responde pela infraestrutura principal.",
+        "geographic_labels": {
+          "orangi-sanitation-network": "Orangi, Karachi — infraestrutura de saneamento gerida pela comunidade"
+        },
+        "digital_label": "Documentação pública da OPP-RTI sobre saneamento de baixo custo financiado e mantido pela comunidade"
+      },
+      "gbif": {
+        "summary": "Uma infraestrutura global e federada de dados sobre biodiversidade na qual países, organizações, nós e publicadores participantes fornecem em conjunto dados, padrões e serviços técnicos para acesso aberto e os coordenam por meio de órgãos formais de governança.",
+        "geographic_labels": {},
+        "digital_label": "Infraestrutura federada para publicar, descobrir, pesquisar e recuperar dados de biodiversidade"
+      }
+    },
+    "ar": {
+      "lasilo-naples": {
+        "summary": "مورد ثقافي مشترك عام في نابولي تديره جماعة مفتوحة ذاتياً، بما يشمل المساحات ووسائل الإنتاج الفني والحديقة الحضرية، من خلال الجمعيات ومجموعات العمل الموضوعية وإعلان مشترك للاستخدام المدني.",
+        "geographic_labels": {
+          "lasilo-naples-site": "l’Asilo، فيكو جوزيبي مافي 4، نابولي"
+        },
+        "digital_label": "توثيق عام للمساحات المشتركة والإدارة الذاتية والجمعيات والاستخدام المدني"
+      },
+      "orangi-low-cost-sanitation": {
+        "summary": "ممارسة مجتمعية للصرف الصحي نشأت في أورانغي بكراتشي، تمول فيها الأحياء وتبني وتدير وتصون بصورة مشتركة وصلات المنازل ومجاري الأزقة والمجاري الثانوية، بينما تقدم OPP-RTI الإرشاد التقني وتتولى السلطات العامة البنية الرئيسية.",
+        "geographic_labels": {
+          "orangi-sanitation-network": "أورانغي، كراتشي — بنية صرف صحي تديرها المجتمعات"
+        },
+        "digital_label": "توثيق عام من OPP-RTI للصرف الصحي منخفض التكلفة الذي تموله المجتمعات وتصونه"
+      },
+      "gbif": {
+        "summary": "بنية عالمية اتحادية لبيانات التنوع الحيوي تشارك فيها البلدان والمنظمات والعُقد والجهات الناشرة للبيانات في توفير البيانات والمعايير والخدمات التقنية لإتاحة مفتوحة، وتنسقها عبر هيئات حوكمة رسمية.",
+        "geographic_labels": {},
+        "digital_label": "بنية اتحادية لنشر بيانات التنوع الحيوي واكتشافها والبحث فيها واسترجاعها"
+      }
+    },
+    "zh-Hans": {
+      "lasilo-naples": {
+        "summary": "那不勒斯的一项公共文化共益资源：开放社群通过大会、专题工作组和共同的公民使用声明，自主管理共享空间、艺术生产设施和城市花园。",
+        "geographic_labels": {
+          "lasilo-naples-site": "l’Asilo，Vico Giuseppe Maffei 4，那不勒斯"
+        },
+        "digital_label": "关于共享空间、自主管理、大会和公民使用的公开资料"
+      },
+      "orangi-low-cost-sanitation": {
+        "summary": "源自卡拉奇奥兰吉的社区卫生实践：邻里共同筹资、建设、管理和维护住户连接、巷道下水道及次级管网；OPP-RTI 提供技术指导，公共部门负责主干基础设施。",
+        "geographic_labels": {
+          "orangi-sanitation-network": "卡拉奇奥兰吉——社区管理的卫生基础设施"
+        },
+        "digital_label": "OPP-RTI 关于社区筹资和维护的低成本卫生系统的公开资料"
+      },
+      "gbif": {
+        "summary": "一个全球联邦式生物多样性数据基础设施，由参与国家、组织、节点和数据发布机构共同提供数据、标准和技术服务以支持开放获取，并通过正式治理机构进行协调。",
+        "geographic_labels": {},
+        "digital_label": "用于发布、发现、检索和获取生物多样性数据的联邦式基础设施"
+      }
+    }
+  },
+  "review_contract": {
+    "review_kind": "model_assisted_independent_language_review",
+    "must_be_independent_of_writer": true,
+    "must_not_claim_native_speaker_or_human_review": true,
+    "pass_requires_no_blocker_major_or_minor_findings": true,
+    "check": [
+      "semantic fidelity",
+      "preservation of governance, access, privacy, activity and licence qualifiers",
+      "no materially stronger claim than canonical",
+      "idiomatic target language",
+      "terminology consistency",
+      "Arabic RTL/mixed-script integrity",
+      "Simplified Chinese terminology/script"
+    ],
+    "critical_qualifiers": {
+      "lasilo-naples": "Municipal ownership must not be turned into community ownership. The common is civic use/self-governance of a public cultural space through open assemblies and working groups. Do not imply August 2026 activity is freshly verified; canonical status is unknown/not timely verified. No coordinates are published or inferred.",
+      "orangi-low-cost-sanitation": "The common is resident/neighbourhood-managed internal sanitation infrastructure and practice, not OPP-RTI itself. Households/neighbourhoods finance, build, manage and maintain internal household/lane/secondary infrastructure; OPP-RTI provides technical guidance; public authorities remain responsible for trunk sewers/treatment. Physical participation is resident-bound and household/lane locations must not be exposed.",
+      "gbif": "GBIF is federated/institutional commons infrastructure, not equal individual-user governance. The Secretariat operates central infrastructure. Data access is open through publisher-contributed datasets under admissible licences; do not imply every dataset is universally unrestricted."
+    },
+    "post_fix_context": "Initial independent DeepSeek review receipt 097d29b03bf254b24647b7952f292435f3439de2a78435c9f37c10d3643e1db2 found one minor Spanish finding in orangi-low-cost-sanitation.summary: alcantarillas de calle was too broad for lane sewers. It was corrected to alcantarillas de callejón. The other four locales passed initial review. Recheck Spanish against canonical and confirm the fix introduces no new material issue; carry forward the four unchanged locale PASS results only if their current digests still match the initial reviewed inputs."
+  }
+}
