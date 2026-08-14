@@ -53,12 +53,12 @@
     "fourfold_cpu_gate": {
       "decision": "pass",
       "attempt_count": 1,
-      "mobile_runtime_ready_ms": 844,
-      "desktop_runtime_ready_ms": 868,
-      "mobile_startup_task_duration_ms": 818,
-      "desktop_startup_task_duration_ms": 851.36,
+      "mobile_runtime_ready_ms": 903,
+      "desktop_runtime_ready_ms": 876,
+      "mobile_startup_task_duration_ms": 870.58,
+      "desktop_startup_task_duration_ms": 861.95,
       "startup_project_json_requests": 0,
-      "first_party_surface_sha256": "be9eb8bb7b1013b65a9bd961a4f61ebfbcfc5d7e630eeb0e2db1fe4e95a3a210"
+      "first_party_surface_sha256": "67df79c60f1f47029a8ffc60935ecc1b2e5f62e9afd4c6e31e9a4f0ed9ffb431"
     }
   },
   "recovery": {
@@ -74,7 +74,7 @@
     "hard_limit_bytes": 32768
   },
   "release": {
-    "id": "314cc54b38e2344c65cd",
+    "id": "5f427e000fd46d32d192",
     "catalog_runtime_generation": "63462c96932139298c1b85fdc11b6edbb1188a45ad6f98fab120a129e3adb1fb"
   },
   "does_not_establish": [
@@ -83,5 +83,15 @@
     "permission to raise delivery thresholds",
     "permission to remove the DE/EN no-JavaScript recovery path",
     "future performance after additional catalog growth"
-  ]
+  ],
+  "canonical_state": {
+    "catalog_delivery_design": "compact_build_bound_bootstrap_with_verified_selected_detail_provenance",
+    "visible_detail_upgrade_fields": [
+      "provenance.sources"
+    ],
+    "selected_detail_upgrade_authorized": true,
+    "aggregate_and_shard_runtime_observation": "shadow_only",
+    "full_runtime_catalogue_cutover_authorized": false,
+    "selected_detail_fallback": "first_bootstrap_source"
+  }
 }

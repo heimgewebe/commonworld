@@ -432,12 +432,14 @@ def validate_catalog_scale_gates(root: Path = ROOT, *, verify_measurements: bool
         errors.append("catalogue scale contract must not authorize cutover")
     if delivery.get("runtime_catalogue_cutover_authorized") is not False:
         errors.append("current state must not authorize catalogue cutover")
-    if delivery.get("runtime_catalogue_visible_source") != "compact_build_bound_bootstrap":
-        errors.append("current visible catalogue source changed before cutover proof")
+    if delivery.get("runtime_catalogue_visible_source") != "compact_build_bound_bootstrap_with_verified_selected_detail_provenance":
+        errors.append("current visible catalogue source does not match the T045 selected-detail provenance contract")
     if authorization.get("visible_catalogue_source") != delivery.get("runtime_catalogue_visible_source"):
         errors.append("scale contract and current state disagree on visible catalogue source")
-    if delivery.get("design") != "compact_build_bound_bootstrap_with_generation_bound_selected_detail_shadow":
-        errors.append("current catalogue delivery design changed before T028 cutover")
+    if delivery.get("design") != "compact_build_bound_bootstrap_with_verified_selected_detail_provenance":
+        errors.append("current catalogue delivery design does not match the T045 provenance upgrade")
+    if delivery.get("runtime_catalogue_selected_detail_provenance_upgrade_authorized") is not True:
+        errors.append("current state must authorize only the T045 selected-detail provenance upgrade")
 
     policy = contract.get("decision_policy", {})
     if policy.get("backend_by_default") is not False:

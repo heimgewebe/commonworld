@@ -103,7 +103,7 @@
       "translation_pack": "wave_1",
       "release_evidence": {
         "path": "docs/evidence/locale-releases/es.json",
-        "sha256": "289459b8f21572c1a69398d8f4f4289fa3ebcf7c63f6cece204d69259c3c0633"
+        "sha256": "e150e44371bde46eea0130dface8000e0d11c31c6e538f13c66939cb44acd0b4"
       }
     },
     "fr": {
@@ -119,7 +119,7 @@
       "translation_pack": "wave_1",
       "release_evidence": {
         "path": "docs/evidence/locale-releases/fr.json",
-        "sha256": "32ad9cfd5efcc3cd405af561b62310703a410ddf31840cc6da8881b736beefb0"
+        "sha256": "3e040ed614c3e5838feec5c4429bb154abca476936accb502775a327f731448f"
       }
     },
     "pt-BR": {
@@ -135,7 +135,7 @@
       "translation_pack": "wave_1",
       "release_evidence": {
         "path": "docs/evidence/locale-releases/pt-BR.json",
-        "sha256": "b5bdd441222004075ba7f6e6a46b6a83a247ff54c7318a2faff604d261e36107"
+        "sha256": "110e30d6e9a8c077e3e81c66a3357332b1e5bf4d24cebac4d626d8f20b59d26b"
       }
     },
     "ar": {
@@ -151,7 +151,7 @@
       "translation_pack": "wave_1",
       "release_evidence": {
         "path": "docs/evidence/locale-releases/ar.json",
-        "sha256": "729e82d6296d2ac1ba6e283c2ec0153214f02432964c97f84c66738a9d5e45e0"
+        "sha256": "cd864bf53443120121263f9ea5c65bdfb2b9b3abfd025926ddd9890180b5a04b"
       }
     },
     "zh-Hans": {
@@ -167,7 +167,7 @@
       "translation_pack": "wave_1",
       "release_evidence": {
         "path": "docs/evidence/locale-releases/zh-Hans.json",
-        "sha256": "31baf3c7d3e569d65edb898d7434b4f340cc76c4841365eb8e998bc833b95700"
+        "sha256": "1a0ce725ccc71a8d5077b8d11976cbba6a02195b347921f363b298f64de1f2d3"
       }
     },
     "hi": {
@@ -183,7 +183,7 @@
       "translation_pack": "wave_1",
       "release_evidence": {
         "path": "docs/evidence/locale-releases/hi.json",
-        "sha256": "564d154a0061f4bbf1a1bc384a7844364be9a1cae3959efa9e0ed71ff55cbc45"
+        "sha256": "ac83a6c0a79477f1e9b8fe601ad73bdbb7462e174d344c41da35bb47f3e3f0cc"
       }
     },
     "id": {

@@ -126,10 +126,10 @@ Die Messung belegt deterministische Rekonstruktion, Schema- und Integritätsgren
 3. Verborgene Orte bleiben ohne rekonstruierte Geometrie.
 4. Eine Manifestgeneration bindet Quellkatalog, Detailmenge und relevante Schemaverträge.
 5. Ein Manifest verweist nur auf Artefakte, deren Hash und Größe es oder ein generationsgebundener Sharddescriptor festlegt.
-6. Ein fehlgeschlagener Shadow-Leseweg lässt den kompakten buildgebundenen Datensatz und den begrenzten DE/EN-Recovery-Einstieg mit paginierten Indizes und kanonischen Projektseiten aktiv.
+6. Ein fehlgeschlagener Aggregate- oder Shard-Shadow-Leseweg lässt den kompakten buildgebundenen Datensatz und den begrenzten DE/EN-Recovery-Einstieg mit paginierten Indizes und kanonischen Projektseiten aktiv. Scheitert der ausgewählte Detailpfad, bleibt zusätzlich genau die eingebettete erste Quellen-URL als Fokus-Fallback sichtbar.
 7. Suche und Karte verwenden dieselbe zulässige Kandidatenmenge.
 8. Schnelle Auswahlwechsel dürfen keine ältere Antwort auf den aktuellen Fokus anwenden.
-9. Erfolgreiche Shadow-Parität autorisiert weder Bootstrap-Entfernung noch Deployment oder physischen Geräte-Cutover.
+9. Erfolgreiche Shard- oder Detailparität autorisiert keine Bootstrap-Entfernung und keinen vollständigen Runtime-Katalog-Cutover. T045 autorisiert ausschließlich den sichtbaren Upgrade von `provenance.sources` für die aktuelle Auswahl nach generation-, byte- und SHA-256-gebundener Detailprüfung.
 10. Kein generierter Shard darf das harte gzip-Budget erreichen; die Warnschwelle löst vorher eine kompatible Partitionierungsentscheidung aus.
 
 ## Cutover-Gate
@@ -158,4 +158,4 @@ Wird minimale Betriebsfläche höher gewichtet, kann Commonworld lange beim buil
 
 ## Nicht behauptet
 
-Dieser Stand belegt noch keinen PostGIS-, Outbox-, Axum- oder Weltgewebe-Produktionspfad. Er belegt noch keine Bootstrap-Entfernung und keine physische Gerätefreigabe. Er schafft den generationsgebundenen öffentlichen Liefervertrag, einen deterministischen Snapshot-Compiler, einen fehlertoleranten ausgewählten Detail-Shadow-Pfad und ein CI-gebundenes Skalierungs-Gate für den späteren 1.000er-/10.000er-Cutover.
+Dieser Stand belegt noch keinen PostGIS-, Outbox-, Axum- oder Weltgewebe-Produktionspfad. Er belegt noch keine Bootstrap-Entfernung und keine physische Gerätefreigabe. Er schafft den generationsgebundenen öffentlichen Liefervertrag, einen deterministischen Snapshot-Compiler, einen fehlertoleranten ausgewählten Detailpfad mit verifiziertem sichtbarem Provenienz-Upgrade und ein CI-gebundenes Skalierungs-Gate für den späteren 1.000er-/10.000er-Cutover.

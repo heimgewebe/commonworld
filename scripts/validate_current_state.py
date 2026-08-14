@@ -218,19 +218,23 @@ def validate_current_state(root: Path = ROOT) -> list[str]:
     catalog_delivery = state.get("catalog_delivery", {})
     expected_catalog_delivery = {
         "contract": "contracts/commonworld/catalog-delivery-budget.contract.json",
-        "design": "compact_build_bound_bootstrap_with_generation_bound_selected_detail_shadow",
+        "design": "compact_build_bound_bootstrap_with_verified_selected_detail_provenance",
         "canonical_records": "catalog/projects/*.json",
         "startup_project_json_requests": 0,
         "runtime_catalogue_parity_check": True,
-        "runtime_catalogue_parity_scope": "selected_identity_compact_shard_and_generation_bound_detail_shadow",
-        "runtime_catalogue_visible_source": "compact_build_bound_bootstrap",
+        "runtime_catalogue_parity_scope": "selected_identity_compact_shard_shadow_and_generation_bound_verified_detail_provenance",
+        "runtime_catalogue_visible_source": "compact_build_bound_bootstrap_with_verified_selected_detail_provenance",
+        "runtime_catalogue_selected_detail_source": "content_addressed_generation_byte_sha256_verified_detail",
+        "runtime_catalogue_selected_detail_visible_fields": ["provenance.sources"],
+        "runtime_catalogue_selected_detail_fallback": "first_bootstrap_source",
+        "runtime_catalogue_selected_detail_provenance_upgrade_authorized": True,
         "runtime_catalogue_detail_loading": True,
         "runtime_catalogue_detail_strategy": "content_addressed_shard_descriptor",
-        "runtime_catalogue_cache_limits": {"shards": 8, "details": 16},
+        "runtime_catalogue_cache_limits": {"shards": 8, "details": 16, "decoded_verified_details": 1},
         "runtime_catalogue_selection_states": ["idle", "loading", "retrying", "ready", "mismatch", "degraded"],
-        "runtime_catalogue_failure_policy": "keep_compact_bootstrap",
+        "runtime_catalogue_failure_policy": "keep_compact_bootstrap_with_first_source_fallback",
         "bootstrap_asset_failure_policy": "keep_bounded_de_en_recovery_and_paginated_catalogue",
-        "runtime_catalogue_retry_policy": "reload_platform_and_clear_shadow_caches",
+        "runtime_catalogue_retry_policy": "reload_platform_and_clear_shadow_and_selected_detail_caches",
         "runtime_catalogue_cutover_authorized": False,
         "build_and_ci_catalogue_parity_check": True,
         "no_javascript_projection": "generated_bounded_de_en_landing_with_paginated_indexes_and_project_pages_preserved_until_successful_interactive_start",
@@ -241,38 +245,50 @@ def validate_current_state(root: Path = ROOT) -> list[str]:
 
     transition = catalog_platform.get("browser_transition", {})
     shadow = transition.get("shadow_runtime_observation", {})
+    selected_detail = transition.get("selected_identity_detail", {})
     if transition.get("current_visible_catalog") != catalog_delivery.get("runtime_catalogue_visible_source"):
         errors.append("catalog platform and current state disagree on visible catalogue source")
     if shadow != {
         "aggregate_manifest": True,
         "selected_identity_shard": True,
-        "selected_identity_detail": True,
     }:
         errors.append("catalog platform shadow-observation truth mismatch")
     if shadow.get("selected_identity_shard") is not catalog_delivery.get("runtime_catalogue_parity_check"):
         errors.append("catalog platform and current state disagree on runtime catalogue parity")
-    if shadow.get("selected_identity_detail") is not catalog_delivery.get("runtime_catalogue_detail_loading"):
+    expected_selected_detail = {
+        "mode": "verified_visible_provenance_upgrade",
+        "source": catalog_delivery.get("runtime_catalogue_selected_detail_source"),
+        "visible_fields": catalog_delivery.get("runtime_catalogue_selected_detail_visible_fields"),
+        "fallback": catalog_delivery.get("runtime_catalogue_selected_detail_fallback"),
+        "decoded_record_retention_max": catalog_delivery.get("runtime_catalogue_cache_limits", {}).get("decoded_verified_details"),
+    }
+    if selected_detail != expected_selected_detail:
+        errors.append("catalog platform selected-detail public-upgrade truth mismatch")
+    if catalog_delivery.get("runtime_catalogue_detail_loading") is not True:
         errors.append("catalog platform and current state disagree on detail loading")
+    if transition.get("selected_detail_provenance_upgrade_authorized") is not catalog_delivery.get("runtime_catalogue_selected_detail_provenance_upgrade_authorized"):
+        errors.append("catalog platform and current state disagree on selected-detail provenance authorization")
     if transition.get("selection_states") != catalog_delivery.get("runtime_catalogue_selection_states"):
         errors.append("catalog platform and current state disagree on detail selection states")
     runtime_cache = catalog_platform.get("runtime_cache", {})
     if {
         "shards": runtime_cache.get("shards_max_entries"),
         "details": runtime_cache.get("details_max_entries"),
+        "decoded_verified_details": runtime_cache.get("decoded_verified_details_max_entries"),
     } != catalog_delivery.get("runtime_catalogue_cache_limits"):
         errors.append("catalog platform and current state disagree on runtime catalogue cache limits")
     if transition.get("cutover_authorized") is not catalog_delivery.get("runtime_catalogue_cutover_authorized"):
         errors.append("catalog platform and current state disagree on bootstrap cutover authorization")
     if (
         runtime_cache.get("explicit_retry_refresh") != "reload_manifest_aggregate_and_clear_shard_detail_caches"
-        or catalog_delivery.get("runtime_catalogue_retry_policy") != "reload_platform_and_clear_shadow_caches"
+        or catalog_delivery.get("runtime_catalogue_retry_policy") != "reload_platform_and_clear_shadow_and_selected_detail_caches"
     ):
         errors.append("catalog platform and current state disagree on fresh retry policy")
     if (
         transition.get("aggregate_failure_policy") != "keep_compact_bootstrap_and_mark_degraded"
         or transition.get("shard_failure_policy") != "keep_compact_bootstrap_and_mark_selected_identity_degraded"
-        or transition.get("detail_failure_policy") != "keep_compact_bootstrap_and_offer_selected_identity_fresh_platform_retry"
-        or catalog_delivery.get("runtime_catalogue_failure_policy") != "keep_compact_bootstrap"
+        or transition.get("detail_failure_policy") != "keep_compact_bootstrap_with_first_source_fallback_and_offer_selected_identity_fresh_platform_retry"
+        or catalog_delivery.get("runtime_catalogue_failure_policy") != "keep_compact_bootstrap_with_first_source_fallback"
     ):
         errors.append("catalog platform and current state disagree on runtime fallback policy")
 
@@ -286,8 +302,10 @@ def validate_current_state(root: Path = ROOT) -> list[str]:
     detail_boundary = catalog_platform.get("detail_validation_boundary", {})
     if detail_boundary.get("browser_reimplements_complete_json_schema") is not False:
         errors.append("catalog browser boundary must not claim a complete JSON Schema reimplementation")
-    if detail_boundary.get("visible_data_replacement") is not False:
-        errors.append("catalog detail shadow must not replace visible bootstrap data")
+    if detail_boundary.get("visible_bootstrap_record_replacement") is not False:
+        errors.append("catalog detail upgrade must not replace the visible bootstrap record")
+    if detail_boundary.get("visible_selected_detail_upgrade_fields") != catalog_delivery.get("runtime_catalogue_selected_detail_visible_fields"):
+        errors.append("catalog detail visible-upgrade boundary mismatch")
 
     required_runtime_tokens = (
         "createCatalogLoadCache",
@@ -296,6 +314,8 @@ def validate_current_state(root: Path = ROOT) -> list[str]:
         "function observeCatalogRecordShadow(",
         "function loadCatalogShardOnce(",
         "function loadCatalogDetailOnce(",
+        "function verifiedCatalogDetailRecord(",
+        "function focusSourceLinks(",
         "function retryCatalogDetailShadow(",
         "observeCatalogPlatform({ retryIdentifier: identifier, forceRefresh: true })",
         "dataset.catalogDelivery = 'build-bound-bootstrap'",

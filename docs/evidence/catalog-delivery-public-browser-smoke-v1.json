@@ -126,8 +126,8 @@
       "filterButtonHeight": 44,
       "ringAnimationName": "none",
       "ringTransform": "none",
-      "ringTextWidth": 671.1126098632812,
-      "ringTextHeight": 14.01202392578125,
+      "ringTextWidth": 671.1033935546875,
+      "ringTextHeight": 13.50775146484375,
       "ringTextFontSize": 22,
       "primaryRingCount": 3,
       "depthRingCount": 2,
@@ -136,20 +136,20 @@
       "representativePrimaryLabels": [
         {
           "text": "Knowledge, Learning and Culture · 11    LibriVox  MusicBrainz  Open Library  Peer 2 Peer Unive…  Safecast  Thailand Citizens…",
-          "width": 671.1126098632812,
-          "height": 14.01202392578125,
+          "width": 671.1033935546875,
+          "height": 13.50775146484375,
           "visible": true
         },
         {
           "text": "Communication and Networks · 11    BOSCO Uganda  Freifunk  Freifunk Hamburg  guifi.net  Mastodon  Meshtastic",
-          "width": 331.74139404296875,
-          "height": 518.4580688476562,
+          "width": 331.362060546875,
+          "height": 518.690673828125,
           "visible": true
         },
         {
           "text": "Cooperation and Self-Organization · 7    Bologna Urban Com…  Enspiral  g0v  Green Coop  l’Asilo  National Communal…",
-          "width": 287.61065673828125,
-          "height": 573.782470703125,
+          "width": 288.07537841796875,
+          "height": 573.56396484375,
           "visible": true
         }
       ],
@@ -192,22 +192,22 @@
         "representativePrimaryLabels": [
           {
             "text": "Knowledge, Learning and Culture · 11    LibriVox  MusicBrainz  Open Library  Peer 2 Peer Unive…  Safecast  Thailand Citizens…",
-            "width": 932.1004638671875,
-            "height": 40.47623825073242,
+            "width": 932.1109008789062,
+            "height": 36.964874267578125,
             "fontSize": 23.77,
             "visible": true
           },
           {
             "text": "Communication and Networks · 11    BOSCO Uganda  Freifunk  Freifunk Hamburg  guifi.net  Mastodon  Meshtastic",
-            "width": 476.4179382324219,
-            "height": 710.1055908203125,
+            "width": 473.8118591308594,
+            "height": 711.7835083007812,
             "fontSize": 23.77,
             "visible": true
           },
           {
             "text": "Cooperation and Self-Organization · 7    Bologna Urban Com…  Enspiral  g0v  Green Coop  l’Asilo  National Communal…",
-            "width": 379.8625183105469,
-            "height": 805.7943725585938,
+            "width": 383.1388854980469,
+            "height": 804.3480224609375,
             "fontSize": 23.77,
             "visible": true
           }
@@ -220,7 +220,7 @@
         "primaryStates": [
           {
             "animationName": "sphere-ring-orbit",
-            "transform": "matrix(0.999999, 0.00150964, -0.00150964, 0.999999, 0, 0)"
+            "transform": "matrix(0.999999, 0.00150959, -0.00150959, 0.999999, 0, 0)"
           },
           {
             "animationName": "sphere-ring-orbit",
@@ -283,7 +283,7 @@
     {
       "id": "layer-journey-moveend-return",
       "verdict": "PASS",
-      "elapsedMs": 1463
+      "elapsedMs": 2885
     },
     {
       "id": "layer-journey-missing-moveend-fallback",
@@ -391,8 +391,8 @@
       "verdict": "PASS",
       "blockedCatalogRequests": 0,
       "observedCatalogRequests": [
-        "/releases/314cc54b38e2344c65cd/catalog/runtime/aggregate.v1.json",
-        "/releases/314cc54b38e2344c65cd/catalog/runtime/manifest.v1.json"
+        "/releases/5f427e000fd46d32d192/catalog/runtime/aggregate.v1.json",
+        "/releases/5f427e000fd46d32d192/catalog/runtime/manifest.v1.json"
       ]
     },
     {
@@ -493,6 +493,6 @@
       "method-mobile",
       "method-mobile-text-200"
     ],
-    "first_party_surface_sha256": "be9eb8bb7b1013b65a9bd961a4f61ebfbcfc5d7e630eeb0e2db1fe4e95a3a210"
+    "first_party_surface_sha256": "67df79c60f1f47029a8ffc60935ecc1b2e5f62e9afd4c6e31e9a4f0ed9ffb431"
   }
 }
