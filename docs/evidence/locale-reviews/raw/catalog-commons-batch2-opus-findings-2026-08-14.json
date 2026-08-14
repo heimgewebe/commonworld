@@ -1,0 +1,55 @@
+{
+  "schema_version": 1,
+  "kind": "commonworld.incremental_catalog_locale_review_findings",
+  "status": "findings",
+  "reviewer": "Claude Opus 5 via Claude Code read-only review",
+  "writer": "GPT-5.6 Sol via ChatGPT",
+  "writer_independence": "independent_from_catalog_translation_writer",
+  "review_task_id": "d5c70b4eb5de40a28239dfa1",
+  "review_task_outcome_receipt_sha256": "7126582a1bea2ff666c12234202b9a5255e7bdb213ad1f57b488395555215a34",
+  "review_output_sha256": "aef05ace2ed632f53b5e563f646cc4a917f7d06100448ef6bd334fc7d85e18eb",
+  "review_input": {
+    "path": "docs/evidence/locale-reviews/raw/catalog-commons-batch2-review-input-2026-08-14.json",
+    "sha256": "56fc6f8baf7ae6642b10bf9fbf07a0654aa0e58a217528e07e92145ae2381e96"
+  },
+  "scope": {
+    "projects": ["b4rn", "berkshares", "sewa-sangini-childcare-cooperative"],
+    "locales": ["es", "fr", "pt-BR", "ar", "zh-Hans", "hi"],
+    "prior_entries_carried_forward_unchanged_per_locale": 94,
+    "new_entries_reviewed_per_locale": 3
+  },
+  "verdict": "FINDINGS",
+  "counts": {
+    "blocker": 0,
+    "major": 0,
+    "minor_finding_objects": 17,
+    "unique_minor_fields": 16,
+    "note_finding_objects": 8,
+    "reviewer_reported_minor_total": 13,
+    "reviewer_reported_note_total": 8,
+    "count_discrepancy_handling": "The structured finding list is treated as authoritative over the reviewer's inconsistent headline count. Every listed minor field is remediated before post-fix review."
+  },
+  "minor_remediation": [
+    {"locale":"es","project":"b4rn","field":"summary","action":"restore explicit infrastructure contribution and concrete actor wording"},
+    {"locale":"es","project":"sewa-sangini-childcare-cooperative","field":"summary","action":"restore parent participation rather than broader family participation"},
+    {"locale":"fr","project":"b4rn","field":"summary","action":"avoid Community Interest legal-form confusion; preserve broadband and explicit contribution"},
+    {"locale":"fr","project":"berkshares","field":"summary","action":"restore membership-as-governing-body nuance and board precision"},
+    {"locale":"fr","project":"sewa-sangini-childcare-cooperative","field":"summary","action":"restore women-led meaning and paid childcare-worker terminology"},
+    {"locale":"pt-BR","project":"b4rn","field":"summary","action":"restore explicit infrastructure contribution"},
+    {"locale":"pt-BR","project":"b4rn","field":"geographic_labels.b4rn-rural-communities","action":"replace expansion areas with build areas"},
+    {"locale":"pt-BR","project":"berkshares","field":"summary","action":"restore membership-as-governing-body nuance"},
+    {"locale":"pt-BR","project":"sewa-sangini-childcare-cooperative","field":"summary","action":"restore parent participation"},
+    {"locale":"ar","project":"b4rn","field":"summary","action":"restore broadband and explicit infrastructure contribution"},
+    {"locale":"ar","project":"b4rn","field":"geographic_labels.b4rn-rural-communities","action":"replace expansion areas with build areas"},
+    {"locale":"ar","project":"sewa-sangini-childcare-cooperative","field":"summary","action":"use idiomatic paid-work collocation"},
+    {"locale":"ar","project":"sewa-sangini-childcare-cooperative","field":"geographic_labels.sangini-gujarat-network","action":"add Arabic transliteration for Sangini while preserving Latin form"},
+    {"locale":"zh-Hans","project":"b4rn","field":"summary","action":"make Community Benefit Society legal form recoverable and complete"},
+    {"locale":"hi","project":"b4rn","field":"geographic_labels.b4rn-rural-communities","action":"replace expansion areas with build areas"},
+    {"locale":"hi","project":"berkshares","field":"summary","action":"replace colloquial support and biological-circulation calques"}
+  ],
+  "notes": [
+    "The reviewer stated that all six locales were materially faithful and found no invented facts, strengthened claims, removed governance/access limitations, or script/bidirectional defects.",
+    "This is model-assisted review only; no native-speaker or human approval is claimed.",
+    "A separate digest-bound post-fix independent review is required before release evidence may be marked passing."
+  ]
+}

@@ -2,7 +2,7 @@
   "schema_version": 2,
   "kind": "commonworld.ui_locale_independent_language_review_receipt",
   "status": "passed",
-  "reviewed_revision": "11464e83de5c2fdcb70dddd4c076ff54333cd9d7",
+  "reviewed_revision": "bae3229c2ff16305727650a21b64b791ab14a06e",
   "reviewed_source_pack_sha256": "d449f5b6a564c859be9142d737ad768020a8ee472f18026e3d3cbb092ec54648",
   "locale_verdicts": {
     "es": {
@@ -210,6 +210,39 @@
       },
       "limitations": "Model-assisted review; no native-speaker or human Hindi approval is claimed.",
       "confidence": "medium"
+    },
+    "catalog-commons-batch2-2026-08-14": {
+      "review_class": "model_assisted_independent_language_review",
+      "reviewed_revision": "bae3229c2ff16305727650a21b64b791ab14a06e",
+      "reviewer": "Claude Opus 5 via Claude Code read-only review",
+      "writer": "GPT-5.6 Sol via ChatGPT",
+      "writer_independence": "independent_from_catalog_translation_writer",
+      "locale_verdicts": {
+        "es": "PASS",
+        "fr": "PASS",
+        "pt-BR": "PASS",
+        "ar": "PASS",
+        "zh-Hans": "PASS",
+        "hi": "PASS"
+      },
+      "counts": {
+        "blocker": 0,
+        "major": 0,
+        "minor": 0,
+        "note": 8
+      },
+      "findings": [],
+      "prior_entries_carried_forward_per_locale": 94,
+      "new_entries_reviewed_per_locale": 3,
+      "initial_findings": {
+        "path": "docs/evidence/locale-reviews/raw/catalog-commons-batch2-opus-findings-2026-08-14.json",
+        "sha256": "c01ed42533cea956db9ea531f952de743f761c1d265a6540327f2089abbbbda7"
+      },
+      "post_fix_pass": {
+        "path": "docs/evidence/locale-reviews/raw/catalog-commons-batch2-opus-postfix-pass-2026-08-14.json",
+        "sha256": "4d1beaf4b3ce312466ebb4e5cfea4d5db6ba5d1276e91ae53339983811c22662"
+      },
+      "limitations": "Model-assisted review only; no native-speaker or human language approval is claimed."
     }
   },
   "raw_sources": [
@@ -249,17 +282,17 @@
   ],
   "catalog_review": {
     "review_kind": "model_assisted_independent_language_review",
-    "reviewer": "DeepSeek V4 Flash + GPT-5.6 Terra via Grabowski independent reviews",
+    "reviewer": "Claude Opus 5 via Claude Code read-only review",
     "writer": "GPT-5.6 Sol via ChatGPT",
     "writer_independence": "independent_from_catalog_translation_writer",
-    "reviewed_revision": "11464e83de5c2fdcb70dddd4c076ff54333cd9d7",
+    "reviewed_revision": "bae3229c2ff16305727650a21b64b791ab14a06e",
     "input_digests": {
-      "es": "1b42a6240e821c62b3f63a3142a4cdca69737aa76f076d7faf8945db06d3b6c9",
-      "fr": "45d2a7e95798eecf108597859cdacc09bf74b48d6c238219e2b61ea8d93a8c03",
-      "pt-BR": "ae2d232fe6bbb827321b36125ffd667488057d2870eff5d4597c2ff3816b9412",
-      "ar": "1a46055cea38c6a5060b077d1e45ebd71c5cc925f8d71d7dd96fee2156e37659",
-      "zh-Hans": "47fb274bc5fbfd99e7c0f71877f7a550ecaccbc84996de4596017de3f75b5a78",
-      "hi": "0774cff1d344963d0c0642651f927dd10706140c626eb70db32293f2392d4177"
+      "es": "71a1afb9b79ca42d2b9cfcd576d0f1a52e1245c4f2dee2e04411d6a5e424078a",
+      "fr": "df675b1a50103ff10d7f95694ddf36b8b6de37a4389d25ec8216564d09f22364",
+      "pt-BR": "13740e55bd5ad07d0464bac261aaf8be0832cc83d126a03e280d37a1817dd97a",
+      "ar": "a6727abeae8d8d1d901b45172be961a9996146bb65f8d8ccf50f1a881bda29db",
+      "zh-Hans": "d6b1b8ba3c35c30aaad14b51410fd73ea10f9f4bd0cabca151491f0d7a058b6f",
+      "hi": "0834e159b16b81841163dede097180973309d66e760cfd7bfd7b108b4707a143"
     },
     "coverage": {
       "locales": [
@@ -270,21 +303,22 @@
         "zh-Hans",
         "hi"
       ],
-      "project_count_per_locale": 94,
+      "project_count_per_locale": 97,
       "all_entries_reviewed": true,
-      "basis": "Five locales retain their digest-bound 94-entry review. Hindi combines its digest-bound 91-entry review with an independent three-entry findings/fix/post-fix-PASS review."
+      "basis": "The previously reviewed 94 project objects were independently compared against bae3229c and remained unchanged in every released non-baseline locale. The three new batch-2 entries per locale received an independent findings review, all 17 listed minor finding objects across 16 unique fields were remediated, and a digest-bound post-fix review passed with 0 blocker, 0 major and 0 minor findings."
     },
     "verdict": "pass",
     "counts": {
       "blocker": 0,
       "major": 0,
       "minor": 0,
-      "note": 0
+      "note": 8
     },
     "findings": [],
     "review_notes": [
-      "All five target overlays contain 94 projects. The prior 91 project objects are JSON-object identical to base revision 582c33e9228e0d5ea70b7cef4222c74438d267d1.",
-      "Three new entries per locale were independently reviewed. The initial cross-provider DeepSeek review found one Spanish minor; the exact terminology fix was independently re-reviewed by a separate GPT-5.6 Terra run and passed.",
+      "All six target overlays contain 97 projects; an independent local comparison proved the prior 94 project objects unchanged, exactly three batch-2 ids added, and no removals.",
+      "Claude Opus 5 independently reviewed the three new entries across es, fr, pt-BR, ar, zh-Hans and hi. The initial review listed 17 minor finding objects across 16 unique fields; every listed minor field was remediated.",
+      "The digest-bound post-fix review passed with 0 blocker, 0 major, 0 minor and 8 non-blocking terminology/house-style notes.",
       "Model-assisted review only; native-speaker/human approval is not claimed."
     ],
     "source_receipts": [
@@ -307,6 +341,26 @@
         "path": "docs/evidence/locale-reviews/raw/hi-commons-increment-postfix-pass-2026-08-13.json",
         "sha256": "435e91d943567a56310cdbd4c94c89f10b8c228bf6f1be591edecfa0c290ada9",
         "role": "hindi_three_entry_post_fix_pass"
+      },
+      {
+        "path": "docs/evidence/locale-reviews/raw/catalog-commons-batch2-review-input-2026-08-14.json",
+        "sha256": "56fc6f8baf7ae6642b10bf9fbf07a0654aa0e58a217528e07e92145ae2381e96",
+        "role": "batch2_initial_review_input"
+      },
+      {
+        "path": "docs/evidence/locale-reviews/raw/catalog-commons-batch2-opus-findings-2026-08-14.json",
+        "sha256": "c01ed42533cea956db9ea531f952de743f761c1d265a6540327f2089abbbbda7",
+        "role": "batch2_initial_findings"
+      },
+      {
+        "path": "docs/evidence/locale-reviews/raw/catalog-commons-batch2-postfix-review-input-2026-08-14.json",
+        "sha256": "d545aba8f8fdcb8d8fb3cedfd345d4754329630c839b52d22148080939e6d63b",
+        "role": "batch2_postfix_review_input"
+      },
+      {
+        "path": "docs/evidence/locale-reviews/raw/catalog-commons-batch2-opus-postfix-pass-2026-08-14.json",
+        "sha256": "4d1beaf4b3ce312466ebb4e5cfea4d5db6ba5d1276e91ae53339983811c22662",
+        "role": "batch2_postfix_pass"
       }
     ],
     "resolved_findings": [

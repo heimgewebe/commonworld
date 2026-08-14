@@ -60,6 +60,19 @@ def sha256(path: Path) -> str:
     return hashlib.sha256(path.read_bytes()).hexdigest()
 
 
+def has_public_geographic_presence(record: dict) -> bool:
+    """Match the runtime geographic presence axis without exposing hidden locations.
+
+    CommonProject schema validation owns geometry validity; T007 only needs to
+    distinguish public exact/approximate representations from hidden geography.
+    """
+    locations = record.get("presence", {}).get("geographic", [])
+    return isinstance(locations, list) and any(
+        isinstance(location, dict) and location.get("mode") in {"exact", "approximate"}
+        for location in locations
+    )
+
+
 def node_probe(root: Path) -> tuple[dict | None, str | None]:
     script = r"""
 import fs from 'node:fs';
@@ -260,7 +273,7 @@ def validate_intent_search_discovery(root: Path = ROOT) -> list[str]:
         expected_selected_presence_volunteer = sorted(
             record["id"]
             for record in records
-            if bool(record.get("presence", {}).get("geographic"))
+            if has_public_geographic_presence(record)
             and record.get("presence", {}).get("digital", {}).get("available") is True
             and "volunteer" in record.get("actions", [])
         )

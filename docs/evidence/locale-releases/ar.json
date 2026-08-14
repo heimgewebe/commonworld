@@ -3,14 +3,14 @@
   "kind": "commonworld.ui_locale_release_evidence",
   "locale": "ar",
   "status": "released",
-  "source_revision": "11464e83de5c2fdcb70dddd4c076ff54333cd9d7",
+  "source_revision": "bae3229c2ff16305727650a21b64b791ab14a06e",
   "source_pack_sha256": "06e4c5c150bdf33e63d1becf47ef1f90f0b51a1d24b76725f44ff37ce07302f7",
   "reviewed_source_pack_sha256": "cf57400b0a0fbf818baa88f33001e95bc4c7c39bd00caef3505f4d9ab6c0f405",
-  "catalog_overlay_sha256": "1a46055cea38c6a5060b077d1e45ebd71c5cc925f8d71d7dd96fee2156e37659",
+  "catalog_overlay_sha256": "a6727abeae8d8d1d901b45172be961a9996146bb65f8d8ccf50f1a881bda29db",
   "surface_sha256": {
-    "index": "652c7debbc635885091478de013ffa0234b1e2f028c7fd0c86de0dc9520420ee",
-    "method": "6e4d483364fb82836814517ae1fc7b388717b0241eec17060cd318026e008566",
-    "proposal": "74809d17d6fde25fe4cb8dea3ce96a7b5546a952a78210e53155f3f876e489fe"
+    "index": "732d227413ffa8b7e1f1cb32eeef9b0613e203a75f19eda76e817e269b5fa791",
+    "method": "1f2ad3d6958d2d19422aa430b13a941a19be03714d7954c6b46a93212d551e39",
+    "proposal": "420ea7118c03aeed0b253d196086155fd950c75d4292745adb45a93213aac7de"
   },
   "gate_results": {
     "required_surfaces_passed": [
@@ -36,27 +36,27 @@
   "evidence_receipts": {
     "independent_language_review": {
       "source": "docs/evidence/locale-releases/receipts/shared/independent-language-review.json",
-      "sha256": "00ac9600fb916f6ccb441da04eccac891ae30fd7e657ee887b75070f70f8822b"
+      "sha256": "cdc83b1632716eee4e814095d22982da7cd526cb3d5a8aee9d449dac78d305c7"
     },
     "keyboard_and_screen_reader_review": {
       "source": "docs/evidence/locale-releases/receipts/shared/keyboard-and-screen-reader-review.json",
-      "sha256": "325da8170d8ff99a49d9813cb2767f5fd75f543862b2266e3a2d336ac20bde73"
+      "sha256": "79f9c73154ab1023d9c1384f47831288d7097e843f51a3147bae5e46f5c6c30b"
     },
     "browser_smoke": {
       "source": "docs/evidence/locale-releases/receipts/shared/browser-smoke.json",
-      "sha256": "0b8785e0951af87cae69b01d82f4ab54acede125b3dd33be74942d4f88a11650"
+      "sha256": "be9b5d2972e8d1dfd6ac42c9e87fec9bb8ad17e57e45770b726dd4ff41b7ec8b"
     },
     "state_preservation_smoke": {
       "source": "docs/evidence/locale-releases/receipts/shared/state-preservation-smoke.json",
-      "sha256": "93ba977edb2b0a3b65e96cbb182ceb669811214382525c2acb4cfd4de47d62fb"
+      "sha256": "130b13619b9613c52e8dfa2b7164920dc4d21d0d017c490efe99b648a679b5b9"
     },
     "directional_layout_review": {
       "source": "docs/evidence/locale-releases/receipts/shared/directional-layout-review.json",
-      "sha256": "e7cabd7feefe24db04ca34790262d210b65ce4bcbf40bf8f4b857c30693c4f92"
+      "sha256": "ab4d560d72679e3075a942431bcdc72b79931d95a79842a6298362ce4398c542"
     },
     "mixed_script_review": {
       "source": "docs/evidence/locale-releases/receipts/shared/mixed-script-review.json",
-      "sha256": "06f6810aabb2e34338abdddd667101ec8c726a8483802a0d5f96d9314c5ecf4e"
+      "sha256": "9cb2630f5adca2ad98b60b8ea451fe2db5d658e2a6b30f53a18e5ef6106b5b93"
     }
   },
   "review_class": {
@@ -68,5 +68,5 @@
     "findings_based": true,
     "post_fix_review_required": true
   },
-  "notes": "94-entry compact release bound to release a5584bb82079f46d983b and current shared lifecycle/review evidence. Model-assisted language review; no native-speaker, human language or full WCAG approval is claimed."
+  "notes": "97-entry compact release bound to immutable release f3d2572d4895de706c36 and fresh shared lifecycle/review evidence. The three new batch-2 entries received independent model-assisted findings review and a digest-bound post-fix PASS with 0 blocker, 0 major and 0 minor findings. Automated locale lifecycle smoke passed 18/18 surfaces on the final release. No native-speaker, human language, manual screen-reader, manual visual or full WCAG approval is claimed."
 }
