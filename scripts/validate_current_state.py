@@ -230,7 +230,7 @@ def validate_current_state(root: Path = ROOT) -> list[str]:
         "runtime_catalogue_selected_detail_provenance_upgrade_authorized": True,
         "runtime_catalogue_detail_loading": True,
         "runtime_catalogue_detail_strategy": "content_addressed_shard_descriptor",
-        "runtime_catalogue_cache_limits": {"shards": 8, "details": 16, "decoded_verified_details": 1},
+        "runtime_catalogue_cache_limits": {"shards": 8, "details": 1, "decoded_verified_details": 1},
         "runtime_catalogue_selection_states": ["idle", "loading", "retrying", "ready", "mismatch", "degraded"],
         "runtime_catalogue_failure_policy": "keep_compact_bootstrap_with_first_source_fallback",
         "bootstrap_asset_failure_policy": "keep_bounded_de_en_recovery_and_paginated_catalogue",
@@ -309,6 +309,7 @@ def validate_current_state(root: Path = ROOT) -> list[str]:
 
     required_runtime_tokens = (
         "createCatalogLoadCache",
+        "const CATALOG_DETAIL_CACHE_LIMIT = 1;",
         "loadCatalogShard",
         "loadCatalogDetail",
         "function observeCatalogRecordShadow(",

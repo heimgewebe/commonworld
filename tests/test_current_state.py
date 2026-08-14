@@ -157,6 +157,18 @@ class CurrentStateTests(unittest.TestCase):
             errors = validate_current_state(root)
         self.assertIn("catalog platform and current state disagree on runtime catalogue cache limits", errors)
 
+    def test_catalog_delivery_rejects_runtime_detail_cache_retention_drift(self) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            root = self.copy_current_state(directory)
+            path = root / "assets/commonworld-app.js"
+            value = path.read_text(encoding="utf-8").replace(
+                "const CATALOG_DETAIL_CACHE_LIMIT = 1;",
+                "const CATALOG_DETAIL_CACHE_LIMIT = 16;",
+            )
+            path.write_text(value, encoding="utf-8")
+            errors = validate_current_state(root)
+        self.assertTrue(any("CATALOG_DETAIL_CACHE_LIMIT = 1" in error for error in errors))
+
 
     def test_catalog_delivery_rejects_retry_policy_drift(self) -> None:
         with tempfile.TemporaryDirectory() as directory:

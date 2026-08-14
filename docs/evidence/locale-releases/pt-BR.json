@@ -8,9 +8,9 @@
   "reviewed_source_pack_sha256": "cf57400b0a0fbf818baa88f33001e95bc4c7c39bd00caef3505f4d9ab6c0f405",
   "catalog_overlay_sha256": "ae2d232fe6bbb827321b36125ffd667488057d2870eff5d4597c2ff3816b9412",
   "surface_sha256": {
-    "index": "78212da9648f331143918f8de9fabfcb9d7677f3d75de96b5f9f96588e3773e6",
-    "method": "2294fe0b9ff17730394e8859c334b03034c53ec3d328e88ceb0e856683d99141",
-    "proposal": "0be9b3d93990744a6e768e80070505501d41ef6094ee00fe5cc46825c45d1793"
+    "index": "24d3b45e27d96e5ea15b86ca7d14a66532e126d46d7e4f364702544347d5d17c",
+    "method": "b1adccea7c9c829a369005bc4cb032e16986565512940970c6498685058a1c17",
+    "proposal": "2029a41651fd8286880fa8b5d3d4db7327da17de8f6cad814caf8b87cccefb9f"
   },
   "gate_results": {
     "required_surfaces_passed": [
@@ -60,5 +60,5 @@
     "findings_based": true,
     "post_fix_review_required": true
   },
-  "notes": "94-entry compact release bound to release 5f427e000fd46d32d192 and current shared lifecycle/review evidence. Model-assisted language review; no native-speaker, human language or full WCAG approval is claimed."
+  "notes": "94-entry compact release bound to release a5584bb82079f46d983b and current shared lifecycle/review evidence. Model-assisted language review; no native-speaker, human language or full WCAG approval is claimed."
 }

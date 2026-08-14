@@ -36,9 +36,11 @@
   ],
   "selection_reason": "The selected hybrid clears the task's 2048-byte warning-headroom target while preserving a degraded-mode evidence link. It reuses the already deployed content-addressed selected-detail fetch instead of adding startup requests, segmented bootstrap fetches, a backend, or a second catalog truth.",
   "runtime_memory": {
+    "detail_promise_cache_entries_retained": 1,
     "decoded_verified_full_detail_records_retained": 1,
-    "policy": "Only the current focus identity retains a decoded verified full record; changing or clearing focus drops prior decoded detail while the existing transport cache remains separately bounded.",
-    "reason": "Full canonical records must not accumulate with catalogue growth during long browsing sessions."
+    "shard_cache_entries_retained": 8,
+    "policy": "The selected-detail Promise cache and decoded verified full-record retention are both capped at one identity; changing focus evicts the prior detail promise/result, while compact shard transport remains separately bounded to eight.",
+    "reason": "Fulfilled detail promises retain decoded records, so both retention layers must share the one-identity bound rather than allowing hidden accumulation."
   },
   "browser": {
     "public_smoke_verdict": "PASS",
@@ -47,18 +49,20 @@
       "fixture": "gbif",
       "bootstrap_fallback_sources": 1,
       "verified_sources": 6,
-      "detail_requests": 1,
+      "initial_detail_requests": 1,
+      "eviction_cycle": "gbif -> debian -> gbif",
+      "eviction_cycle_detail_requests": 3,
       "verdict": "PASS"
     },
     "fourfold_cpu_gate": {
       "decision": "pass",
       "attempt_count": 1,
-      "mobile_runtime_ready_ms": 903,
-      "desktop_runtime_ready_ms": 876,
-      "mobile_startup_task_duration_ms": 870.58,
-      "desktop_startup_task_duration_ms": 861.95,
+      "mobile_runtime_ready_ms": 794,
+      "desktop_runtime_ready_ms": 810,
+      "mobile_startup_task_duration_ms": 766.54,
+      "desktop_startup_task_duration_ms": 793.17,
       "startup_project_json_requests": 0,
-      "first_party_surface_sha256": "67df79c60f1f47029a8ffc60935ecc1b2e5f62e9afd4c6e31e9a4f0ed9ffb431"
+      "first_party_surface_sha256": "71c460b35c85331e7b429f0dfd2053ec711f9e43595ec2d115f6d5dbc3c326e9"
     }
   },
   "recovery": {
@@ -74,7 +78,7 @@
     "hard_limit_bytes": 32768
   },
   "release": {
-    "id": "5f427e000fd46d32d192",
+    "id": "a5584bb82079f46d983b",
     "catalog_runtime_generation": "63462c96932139298c1b85fdc11b6edbb1188a45ad6f98fab120a129e3adb1fb"
   },
   "does_not_establish": [
@@ -92,6 +96,13 @@
     "selected_detail_upgrade_authorized": true,
     "aggregate_and_shard_runtime_observation": "shadow_only",
     "full_runtime_catalogue_cutover_authorized": false,
-    "selected_detail_fallback": "first_bootstrap_source"
+    "selected_detail_fallback": "first_bootstrap_source",
+    "detail_promise_cache_entries": 1,
+    "decoded_verified_detail_entries": 1,
+    "shard_cache_entries": 8
+  },
+  "review_fixes": {
+    "codex_p1": "canonical state now authorizes only verified selected provenance.sources while full runtime catalogue cutover remains false",
+    "codex_p2": "fulfilled detail promises can retain decoded records, so CATALOG_DETAIL_CACHE_LIMIT and both cache contracts are now one; browser eviction cycle proves reload after another identity"
   }
 }
