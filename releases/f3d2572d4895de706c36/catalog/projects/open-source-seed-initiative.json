@@ -1,0 +1,171 @@
+{
+  "schema_version": 4,
+  "id": "open-source-seed-initiative",
+  "title": "Open Source Seed Initiative",
+  "summary": "Eine gemeinschaftlich getragene Saatgutinitiative, deren Pledge die Freiheit schützt, gekennzeichnetes Saatgut zu verwenden, zu vermehren, zu teilen, weiterzuentwickeln und unter derselben Offenheitszusage weiterzugeben.",
+  "themes": [
+    "seeds",
+    "agrobiodiversity",
+    "agriculture",
+    "open-knowledge",
+    "commons-governance"
+  ],
+  "actions": [
+    "use",
+    "learn",
+    "contribute",
+    "donate"
+  ],
+  "presence": {
+    "geographic": [
+      {
+        "id": "ossi-distributed-community",
+        "mode": "hidden",
+        "label": "Dezentrales Netzwerk von Züchtern, Saatgutanbietern, Gärtnern und Landwirten",
+        "privacy_note": "Die Beteiligten und Bezugsquellen sind dezentral organisiert und werden in offiziellen Listen gepflegt; Commonworld leitet daraus keine eigene Standortkarte ab.",
+        "source_ids": [
+          "ossi-about",
+          "ossi-community"
+        ]
+      }
+    ],
+    "digital": {
+      "available": true,
+      "reach": "global",
+      "label": "Offene Saatgut-Zusage, Sortenkatalog und Beteiligungswege für Züchter und Anbieter",
+      "source_ids": [
+        "ossi-about",
+        "ossi-varieties",
+        "ossi-involved"
+      ]
+    }
+  },
+  "activity": {
+    "status": "active",
+    "observed_at": "2026-07-28",
+    "source_ids": [
+      "ossi-home",
+      "ossi-varieties",
+      "ossi-involved"
+    ],
+    "note": "Die offizielle Seite führt einen aktuellen Sortenkatalog, Partner und laufende Wege zum Pledgen weiterer Sorten."
+  },
+  "provenance": {
+    "sources": [
+      {
+        "id": "ossi-home",
+        "type": "official-source",
+        "label": "Open Source Seed Initiative – offizielle Seite",
+        "url": "https://osseeds.org/",
+        "retrieved_at": "2026-07-28",
+        "note": "Offizielle Übersicht zu Pledge, Sorten, Partnern und Beteiligung."
+      },
+      {
+        "id": "ossi-about",
+        "type": "official-source",
+        "label": "Open Source Seed Initiative – About",
+        "url": "https://osseeds.org/about/",
+        "retrieved_at": "2026-07-28",
+        "note": "Offizielle Mission und Erläuterung der Offenheitszusage für pflanzengenetische Ressourcen."
+      },
+      {
+        "id": "ossi-varieties",
+        "type": "official-source",
+        "label": "Open Source Seed Initiative – Sortenkatalog",
+        "url": "https://osseeds.org/ossi-varieties/",
+        "retrieved_at": "2026-07-28",
+        "note": "Offizieller Katalog der unter der OSSI-Zusage geführten Sorten."
+      },
+      {
+        "id": "ossi-involved",
+        "type": "official-source",
+        "label": "Open Source Seed Initiative – Get involved",
+        "url": "https://osseeds.org/actions-2/",
+        "retrieved_at": "2026-07-28",
+        "note": "Offizielle Wege für Züchter, Saatgutanbieter und Unterstützer, sich zu beteiligen."
+      },
+      {
+        "id": "ossi-community",
+        "type": "official-source",
+        "label": "Open Source Seed Initiative – Community",
+        "url": "https://osseeds.org/ossi-community/",
+        "retrieved_at": "2026-07-28",
+        "note": "Offizielle Übersicht beteiligter Züchter, Saatgutpartner und weiterer Community-Partner."
+      },
+      {
+        "id": "ossi-donate",
+        "type": "official-source",
+        "label": "Open Source Seed Initiative – Donate",
+        "url": "https://osseeds.org/donate/",
+        "retrieved_at": "2026-07-28",
+        "note": "Offizielle Unterstützungsseite für die Arbeit an offenen Saatgutressourcen."
+      }
+    ]
+  },
+  "curation": {
+    "state": "listed",
+    "catalogued_at": "2026-07-28",
+    "reviewed_by": "Commonworld editorial review",
+    "reviewed_at": "2026-07-28",
+    "next_review_at": "2026-10-28",
+    "notes": "Aufgenommen als Saatgut-Commons mit einer weitergabebindenden Offenheitszusage. 'Offen' bezeichnet Nutzungsfreiheit, nicht zwingend kostenlose Abgabe von Saatgut."
+  },
+  "links": [
+    {
+      "type": "homepage",
+      "label": "Open Source Seed Initiative – offizielle Seite",
+      "url": "https://osseeds.org/"
+    },
+    {
+      "type": "use",
+      "label": "OSSI-Sorten und Bezugsquellen erkunden",
+      "url": "https://osseeds.org/ossi-varieties/",
+      "source_ids": [
+        "ossi-varieties"
+      ]
+    },
+    {
+      "type": "learn",
+      "label": "OSSI-Pledge und Mission verstehen",
+      "url": "https://osseeds.org/about/",
+      "source_ids": [
+        "ossi-about"
+      ]
+    },
+    {
+      "type": "contribute",
+      "label": "Sorte pledgen oder Partner werden",
+      "url": "https://osseeds.org/actions-2/",
+      "source_ids": [
+        "ossi-involved"
+      ]
+    },
+    {
+      "type": "donate",
+      "label": "Offene Saatgutarbeit unterstützen",
+      "url": "https://osseeds.org/donate/",
+      "source_ids": [
+        "ossi-donate"
+      ]
+    }
+  ],
+  "handoff": {
+    "enabled": false
+  },
+  "languages": {
+    "codes": [
+      "en"
+    ],
+    "source_ids": [
+      "ossi-home"
+    ],
+    "note": "Die geprüften offiziellen Projektseiten sind auf Englisch verfügbar."
+  },
+  "access": {
+    "type": "public",
+    "source_ids": [
+      "ossi-about"
+    ],
+    "note": "OSSI-gebundenes Saatgut darf von allen genutzt werden, die die Weitergabe unter derselben Offenheitszusage respektieren."
+  }
+}

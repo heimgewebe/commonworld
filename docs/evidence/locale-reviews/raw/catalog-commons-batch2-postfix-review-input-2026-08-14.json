@@ -1,0 +1,262 @@
+{
+  "schema_version": 1,
+  "kind": "commonworld.incremental_catalog_locale_postfix_review_input",
+  "writer": "GPT-5.6 Sol via ChatGPT",
+  "independent_reviewer_required": true,
+  "base_reviewed_revision": "bae3229c2ff16305727650a21b64b791ab14a06e",
+  "initial_findings_receipt": {
+    "path": "docs/evidence/locale-reviews/raw/catalog-commons-batch2-opus-findings-2026-08-14.json",
+    "sha256": "c01ed42533cea956db9ea531f952de743f761c1d265a6540327f2089abbbbda7"
+  },
+  "review_scope": {
+    "project_ids": [
+      "b4rn",
+      "berkshares",
+      "sewa-sangini-childcare-cooperative"
+    ],
+    "target_locales": [
+      "es",
+      "fr",
+      "pt-BR",
+      "ar",
+      "zh-Hans",
+      "hi"
+    ],
+    "fields": [
+      "summary",
+      "geographic_labels",
+      "digital_label when present"
+    ],
+    "requirements": [
+      "verify every previously listed blocker/major/minor finding is resolved",
+      "preserve factual meaning and governance/access nuance from English reference",
+      "natural idiomatic target-language wording",
+      "no invented facts, stronger claims, or removed privacy/access limitations",
+      "consistent terminology and script direction",
+      "return counts for blocker, major, minor and note; PASS requires blocker=major=minor=0"
+    ]
+  },
+  "carry_forward_proof": {
+    "es": {
+      "prior_count": 94,
+      "current_count": 97,
+      "changed_existing": [],
+      "added": [
+        "b4rn",
+        "berkshares",
+        "sewa-sangini-childcare-cooperative"
+      ],
+      "removed": [],
+      "current_overlay_sha256": "71a1afb9b79ca42d2b9cfcd576d0f1a52e1245c4f2dee2e04411d6a5e424078a"
+    },
+    "fr": {
+      "prior_count": 94,
+      "current_count": 97,
+      "changed_existing": [],
+      "added": [
+        "b4rn",
+        "berkshares",
+        "sewa-sangini-childcare-cooperative"
+      ],
+      "removed": [],
+      "current_overlay_sha256": "df675b1a50103ff10d7f95694ddf36b8b6de37a4389d25ec8216564d09f22364"
+    },
+    "pt-BR": {
+      "prior_count": 94,
+      "current_count": 97,
+      "changed_existing": [],
+      "added": [
+        "b4rn",
+        "berkshares",
+        "sewa-sangini-childcare-cooperative"
+      ],
+      "removed": [],
+      "current_overlay_sha256": "13740e55bd5ad07d0464bac261aaf8be0832cc83d126a03e280d37a1817dd97a"
+    },
+    "ar": {
+      "prior_count": 94,
+      "current_count": 97,
+      "changed_existing": [],
+      "added": [
+        "b4rn",
+        "berkshares",
+        "sewa-sangini-childcare-cooperative"
+      ],
+      "removed": [],
+      "current_overlay_sha256": "a6727abeae8d8d1d901b45172be961a9996146bb65f8d8ccf50f1a881bda29db"
+    },
+    "zh-Hans": {
+      "prior_count": 94,
+      "current_count": 97,
+      "changed_existing": [],
+      "added": [
+        "b4rn",
+        "berkshares",
+        "sewa-sangini-childcare-cooperative"
+      ],
+      "removed": [],
+      "current_overlay_sha256": "d6b1b8ba3c35c30aaad14b51410fd73ea10f9f4bd0cabca151491f0d7a058b6f"
+    },
+    "hi": {
+      "prior_count": 94,
+      "current_count": 97,
+      "changed_existing": [],
+      "added": [
+        "b4rn",
+        "berkshares",
+        "sewa-sangini-childcare-cooperative"
+      ],
+      "removed": [],
+      "current_overlay_sha256": "0834e159b16b81841163dede097180973309d66e760cfd7bfd7b108b4707a143"
+    }
+  },
+  "english_reference": {
+    "b4rn": {
+      "summary": "A member-owned Community Benefit Society that works with rural communities in northern England to plan, finance, build and operate full-fibre broadband, with volunteers, landowners and community investors contributing to the infrastructure.",
+      "geographic_labels": {
+        "b4rn-rural-communities": "Northern England — rural B4RN communities and build areas"
+      },
+      "digital_label": "Member-owned full-fibre infrastructure built with rural B4RN communities"
+    },
+    "berkshares": {
+      "summary": "A local currency in the Berkshire region of Massachusetts, supported by community-focused nonprofits and governed through a membership that elects the board and votes on key changes while the currency strengthens local circulation.",
+      "geographic_labels": {
+        "berkshares-berkshire-region": "Berkshire region, Massachusetts — local currency area"
+      }
+    },
+    "sewa-sangini-childcare-cooperative": {
+      "summary": "A women-led childcare cooperative in Gujarat that combines collectively organized care with paid work for caregivers, parent participation and social protection for women in the informal economy.",
+      "geographic_labels": {
+        "sangini-gujarat-network": "Gujarat — community childcare structures of the Sangini cooperative"
+      }
+    }
+  },
+  "target_translations": {
+    "es": {
+      "b4rn": {
+        "summary": "Una sociedad de beneficio comunitario propiedad de sus miembros que trabaja con comunidades rurales del norte de Inglaterra para planificar, financiar, construir y operar banda ancha de fibra completa, con personas voluntarias, propietarios de tierras e inversores comunitarios que contribuyen a la infraestructura.",
+        "geographic_labels": {
+          "b4rn-rural-communities": "Norte de Inglaterra — comunidades rurales y zonas de despliegue de B4RN"
+        },
+        "digital_label": "Infraestructura de fibra completa propiedad de sus miembros y construida con comunidades rurales de B4RN"
+      },
+      "berkshares": {
+        "summary": "Una moneda local de la región de Berkshire, Massachusetts, sostenida por organizaciones comunitarias sin fines de lucro y gobernada mediante una membresía que elige la junta y vota cambios clave, mientras la moneda refuerza la circulación económica local.",
+        "geographic_labels": {
+          "berkshares-berkshire-region": "Región de Berkshire, Massachusetts — ámbito de la moneda local"
+        }
+      },
+      "sewa-sangini-childcare-cooperative": {
+        "summary": "Una cooperativa de cuidado infantil dirigida por mujeres en Gujarat que combina cuidados organizados colectivamente con trabajo remunerado para cuidadoras, participación de madres y padres y protección social para mujeres de la economía informal.",
+        "geographic_labels": {
+          "sangini-gujarat-network": "Gujarat — estructuras comunitarias de cuidado infantil de la cooperativa Sangini"
+        }
+      }
+    },
+    "fr": {
+      "b4rn": {
+        "summary": "Une société de bénéfice communautaire (Community Benefit Society) détenue par ses membres, qui travaille avec des communautés rurales du nord de l’Angleterre pour planifier, financer, construire et exploiter un réseau haut débit intégralement en fibre, avec des bénévoles, des propriétaires fonciers et des investisseurs communautaires qui contribuent à l’infrastructure.",
+        "geographic_labels": {
+          "b4rn-rural-communities": "Nord de l’Angleterre — communautés rurales et zones de déploiement B4RN"
+        },
+        "digital_label": "Infrastructure intégralement en fibre détenue par ses membres et construite avec les communautés rurales B4RN"
+      },
+      "berkshares": {
+        "summary": "Une monnaie locale de la région des Berkshires, dans le Massachusetts, portée par des organismes communautaires sans but lucratif et gouvernée par son sociétariat, qui élit le conseil d’administration et vote les changements essentiels, tandis que la monnaie renforce la circulation économique locale.",
+        "geographic_labels": {
+          "berkshares-berkshire-region": "Région des Berkshires, Massachusetts — aire de la monnaie locale"
+        }
+      },
+      "sewa-sangini-childcare-cooperative": {
+        "summary": "Une coopérative de garde d’enfants dirigée par des femmes au Gujarat, combinant une prise en charge organisée collectivement, un travail rémunéré pour les professionnelles de la garde, la participation des parents et une protection sociale pour les femmes de l’économie informelle.",
+        "geographic_labels": {
+          "sangini-gujarat-network": "Gujarat — structures communautaires de garde d’enfants de la coopérative Sangini"
+        }
+      }
+    },
+    "pt-BR": {
+      "b4rn": {
+        "summary": "Uma sociedade de benefício comunitário pertencente a seus membros que trabalha com comunidades rurais do norte da Inglaterra para planejar, financiar, construir e operar banda larga integralmente em fibra, com voluntários, proprietários de terras e investidores comunitários contribuindo para a infraestrutura.",
+        "geographic_labels": {
+          "b4rn-rural-communities": "Norte da Inglaterra — comunidades rurais e áreas de construção da B4RN"
+        },
+        "digital_label": "Infraestrutura integralmente em fibra pertencente aos membros e construída com comunidades rurais da B4RN"
+      },
+      "berkshares": {
+        "summary": "Uma moeda local da região de Berkshire, Massachusetts, mantida por organizações comunitárias sem fins lucrativos e governada por seu quadro de associados, que elege o conselho e vota mudanças importantes, enquanto a moeda fortalece a circulação econômica local.",
+        "geographic_labels": {
+          "berkshares-berkshire-region": "Região de Berkshire, Massachusetts — área da moeda local"
+        }
+      },
+      "sewa-sangini-childcare-cooperative": {
+        "summary": "Uma cooperativa de cuidado infantil liderada por mulheres em Gujarat que combina cuidado organizado coletivamente com trabalho remunerado para cuidadoras, participação de mães e pais e proteção social para mulheres na economia informal.",
+        "geographic_labels": {
+          "sangini-gujarat-network": "Gujarat — estruturas comunitárias de cuidado infantil da cooperativa Sangini"
+        }
+      }
+    },
+    "ar": {
+      "b4rn": {
+        "summary": "جمعية منفعة مجتمعية مملوكة لأعضائها تعمل مع المجتمعات الريفية في شمال إنجلترا على تخطيط وتمويل وبناء وتشغيل شبكة نطاق عريض بألياف ضوئية كاملة، بمساهمة المتطوعين وملاك الأراضي والمستثمرين المجتمعيين في البنية التحتية.",
+        "geographic_labels": {
+          "b4rn-rural-communities": "شمال إنجلترا — مجتمعات B4RN الريفية ومناطق البناء"
+        },
+        "digital_label": "بنية ألياف ضوئية كاملة مملوكة للأعضاء ومبنية بالتعاون مع مجتمعات B4RN الريفية"
+      },
+      "berkshares": {
+        "summary": "عملة محلية في منطقة بيركشاير بولاية ماساتشوستس تدعمها مؤسسات مجتمعية غير ربحية وتُدار عبر عضوية تنتخب مجلس الإدارة وتصوت على التغييرات الأساسية، فيما تعزز العملة دوران النشاط الاقتصادي محلياً.",
+        "geographic_labels": {
+          "berkshares-berkshire-region": "منطقة بيركشاير، ماساتشوستس — نطاق العملة المحلية"
+        }
+      },
+      "sewa-sangini-childcare-cooperative": {
+        "summary": "تعاونية لرعاية الأطفال تقودها نساء في غوجارات، تجمع بين الرعاية المنظمة جماعياً والعمل مدفوع الأجر لمقدمات الرعاية ومشاركة الوالدين والحماية الاجتماعية للنساء العاملات في الاقتصاد غير الرسمي.",
+        "geographic_labels": {
+          "sangini-gujarat-network": "غوجارات — هياكل رعاية أطفال مجتمعية تابعة لتعاونية سانغيني (Sangini)"
+        }
+      }
+    },
+    "zh-Hans": {
+      "b4rn": {
+        "summary": "一家由成员所有的社区受益社团（Community Benefit Society），与英格兰北部农村社区共同规划、融资、建设和运营全光纤宽带，志愿者、土地所有者和社区投资者共同为基础设施作出贡献。",
+        "geographic_labels": {
+          "b4rn-rural-communities": "英格兰北部——B4RN 农村社区及建设区域"
+        },
+        "digital_label": "由成员所有、与 B4RN 农村社区共同建设的全光纤基础设施"
+      },
+      "berkshares": {
+        "summary": "马萨诸塞州伯克希尔地区的一种地方货币，由社区导向的非营利机构支持，并通过会员治理：会员选举董事会并对关键变更投票，同时货币促进经济活动在本地循环。",
+        "geographic_labels": {
+          "berkshares-berkshire-region": "马萨诸塞州伯克希尔地区——地方货币使用区域"
+        }
+      },
+      "sewa-sangini-childcare-cooperative": {
+        "summary": "古吉拉特邦一家由女性主导的儿童照护合作社，把集体组织的照护、照护人员的有偿工作、家长参与以及非正规经济女性劳动者的社会保障结合起来。",
+        "geographic_labels": {
+          "sangini-gujarat-network": "古吉拉特邦——Sangini 合作社的社区儿童照护体系"
+        }
+      }
+    },
+    "hi": {
+      "b4rn": {
+        "summary": "सदस्यों के स्वामित्व वाली एक कम्युनिटी बेनिफिट सोसाइटी, जो उत्तरी इंग्लैंड के ग्रामीण समुदायों के साथ मिलकर पूर्ण-फाइबर ब्रॉडबैंड की योजना, वित्तपोषण, निर्माण और संचालन करती है; स्वयंसेवक, भूमि-मालिक और सामुदायिक निवेशक अवसंरचना में योगदान देते हैं।",
+        "geographic_labels": {
+          "b4rn-rural-communities": "उत्तरी इंग्लैंड — B4RN के ग्रामीण समुदाय और निर्माण क्षेत्र"
+        },
+        "digital_label": "सदस्यों के स्वामित्व वाली पूर्ण-फाइबर अवसंरचना, जिसे B4RN के ग्रामीण समुदायों के साथ मिलकर बनाया जाता है"
+      },
+      "berkshares": {
+        "summary": "मैसाचुसेट्स के बर्कशायर क्षेत्र की एक स्थानीय मुद्रा, जिसे समुदाय-केंद्रित गैर-लाभकारी संस्थाएँ समर्थन देती हैं और जिसकी सदस्यता बोर्ड का चुनाव करती तथा प्रमुख बदलावों पर मतदान करती है; यह मुद्रा स्थानीय अर्थव्यवस्था में धन के प्रवाह को मजबूत करती है।",
+        "geographic_labels": {
+          "berkshares-berkshire-region": "बर्कशायर क्षेत्र, मैसाचुसेट्स — स्थानीय मुद्रा का क्षेत्र"
+        }
+      },
+      "sewa-sangini-childcare-cooperative": {
+        "summary": "गुजरात में महिलाओं द्वारा संचालित बाल-देखभाल सहकारी संस्था, जो सामूहिक रूप से संगठित देखभाल को देखभाल कर्मियों के सवेतन काम, अभिभावक भागीदारी और अनौपचारिक अर्थव्यवस्था में काम करने वाली महिलाओं की सामाजिक सुरक्षा से जोड़ती है।",
+        "geographic_labels": {
+          "sangini-gujarat-network": "गुजरात — संगिनी सहकारी संस्था की सामुदायिक बाल-देखभाल संरचनाएँ"
+        }
+      }
+    }
+  }
+}

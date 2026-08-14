@@ -4,7 +4,11 @@ import tempfile
 import unittest
 from pathlib import Path
 
-from scripts.validate_intent_search_discovery import ROOT, validate_intent_search_discovery
+from scripts.validate_intent_search_discovery import (
+    ROOT,
+    has_public_geographic_presence,
+    validate_intent_search_discovery,
+)
 
 
 class IntentSearchDiscoveryTests(unittest.TestCase):
@@ -24,6 +28,18 @@ class IntentSearchDiscoveryTests(unittest.TestCase):
 
     def test_intent_search_discovery_validates(self) -> None:
         self.assertEqual([], validate_intent_search_discovery(ROOT))
+
+    def test_hidden_only_geography_is_not_a_public_presence_axis(self) -> None:
+        self.assertFalse(
+            has_public_geographic_presence(
+                {"presence": {"geographic": [{"id": "hidden", "mode": "hidden"}]}}
+            )
+        )
+        self.assertTrue(
+            has_public_geographic_presence(
+                {"presence": {"geographic": [{"id": "public", "mode": "exact"}]}}
+            )
+        )
 
     def test_missing_direct_action_link_is_rejected(self) -> None:
         with tempfile.TemporaryDirectory() as directory:

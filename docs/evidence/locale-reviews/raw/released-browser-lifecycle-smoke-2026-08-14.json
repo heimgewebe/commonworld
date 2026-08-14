@@ -1,0 +1,48 @@
+{
+  "schema_version": 1,
+  "kind": "commonworld.locale_lifecycle_browser_smoke_receipt",
+  "verdict": "PASS",
+  "release_id": "f3d2572d4895de706c36",
+  "task_id": "e6390283d0a3489a992dcf60",
+  "task_outcome_receipt_sha256": "2dacb6c557ed7d4c20bb5c70a85e4d9cc5f47810050d69aee766b6752d489f18",
+  "stdout_sha256": "53012ef96a5c6aec5cbf47004ce32065c0cd8a17bbf593fbdcc1e398c1de6753",
+  "page_count": 18,
+  "locales": ["es", "fr", "pt-BR", "ar", "zh-Hans", "hi"],
+  "surfaces_per_locale": ["globe", "method", "proposal"],
+  "all_pages_passed": true,
+  "released_isolation": {
+    "baseline_pages": ["index.html", "de.html"],
+    "wave1_pack_requests": 0,
+    "verdict": "PASS"
+  },
+  "locale_pack_resilience": {
+    "late_pack_non_blocking_and_relocalized": true,
+    "fallback_globe_and_proposal_paths_passed_for_all_wave1_locales": true,
+    "verdict": "PASS"
+  },
+  "checks": {
+    "state_preservation": true,
+    "keyboard_focus_paths": true,
+    "accessible_names": true,
+    "rtl_overflow_and_direction": true,
+    "mixed_script_boundaries": true,
+    "proposal_runtime_localization": true,
+    "no_missing_markers": true,
+    "no_page_errors": true
+  },
+  "proposal_digital_labels": {
+    "es": "Digital",
+    "fr": "Numérique",
+    "pt-BR": "Digital",
+    "ar": "رقمي",
+    "zh-Hans": "数字",
+    "hi": "डिजिटल"
+  },
+  "claims": {
+    "full_wcag_conformance": false,
+    "manual_screen_reader_acceptance": false,
+    "manual_visual_acceptance": false,
+    "native_language_approval": false,
+    "scope": "Automated lifecycle smoke for six released Wave-1 locales across globe, method and proposal surfaces; 18/18 pages passed."
+  }
+}

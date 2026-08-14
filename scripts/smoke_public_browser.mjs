@@ -2320,7 +2320,10 @@ async function intentSearchDiscoveryScenario() {
   assert(await run.page.locator('#discovery-panel').isVisible(), 'intent search: result panel did not open');
   const contributionResultIds = await resultIds();
   assertSameIds(contributionResultIds, discoveryPreviewIds(expectedDigitalProjection.contributionIds), 'intent search: German contribution preview differs from claimed catalog actions');
-  assert((await run.page.locator('#discovery-count').textContent()) === `${expectedDigitalProjection.contributionIds.length} Commons`, 'intent search: ranked count mismatch');
+  const expectedContributionCountText = expectedDigitalProjection.contributionIds.length > DISCOVERY_RESULT_PREVIEW_LIMIT
+    ? `${DISCOVERY_RESULT_PREVIEW_LIMIT} of ${expectedDigitalProjection.contributionIds.length} Commons previewed`
+    : `${expectedDigitalProjection.contributionIds.length} Commons`;
+  assert((await run.page.locator('#discovery-count').textContent()) === expectedContributionCountText, 'intent search: ranked count mismatch');
 
   await run.page.locator('#commons-search').focus();
   await run.page.keyboard.press('ArrowDown');

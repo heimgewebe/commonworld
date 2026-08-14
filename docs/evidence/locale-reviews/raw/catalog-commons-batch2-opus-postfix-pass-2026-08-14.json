@@ -1,0 +1,55 @@
+{
+  "schema_version": 1,
+  "kind": "commonworld.incremental_catalog_locale_postfix_review_receipt",
+  "status": "passed",
+  "verdict": "PASS",
+  "reviewer": "Claude Opus 5 via Claude Code read-only review",
+  "writer": "GPT-5.6 Sol via ChatGPT",
+  "writer_independence": "independent_from_catalog_translation_writer",
+  "review_task_id": "e52bdc3aa30e4674ac328fcd",
+  "review_task_outcome_receipt_sha256": "58192869fcad7094d84a8e18fcce5c4ec2050cf593aff1fbe4b3eb7bf49f112a",
+  "review_output_sha256": "a2dc52dcc43ca585c84cf7dd96bd0136a382fb33d296f76b7ef3075304fd7dae",
+  "review_input": {
+    "path": "docs/evidence/locale-reviews/raw/catalog-commons-batch2-postfix-review-input-2026-08-14.json",
+    "sha256": "d545aba8f8fdcb8d8fb3cedfd345d4754329630c839b52d22148080939e6d63b"
+  },
+  "initial_findings": {
+    "path": "docs/evidence/locale-reviews/raw/catalog-commons-batch2-opus-findings-2026-08-14.json",
+    "sha256": "c01ed42533cea956db9ea531f952de743f761c1d265a6540327f2089abbbbda7"
+  },
+  "coverage": {
+    "locales": ["es", "fr", "pt-BR", "ar", "zh-Hans", "hi"],
+    "project_ids": ["b4rn", "berkshares", "sewa-sangini-childcare-cooperative"],
+    "new_entries_reviewed_per_locale": 3,
+    "prior_entries_carried_forward_per_locale": 94,
+    "all_new_entries_reviewed": true,
+    "carry_forward_independently_verified": true
+  },
+  "counts": {
+    "blocker": 0,
+    "major": 0,
+    "minor": 0,
+    "note": 8
+  },
+  "remediation": {
+    "initial_minor_finding_objects": 17,
+    "unique_minor_fields": 16,
+    "resolved_finding_objects": 17,
+    "resolved_unique_fields": 16,
+    "post_fix_regressions": 0
+  },
+  "overlay_sha256": {
+    "es": "71a1afb9b79ca42d2b9cfcd576d0f1a52e1245c4f2dee2e04411d6a5e424078a",
+    "fr": "df675b1a50103ff10d7f95694ddf36b8b6de37a4389d25ec8216564d09f22364",
+    "pt-BR": "13740e55bd5ad07d0464bac261aaf8be0832cc83d126a03e280d37a1817dd97a",
+    "ar": "a6727abeae8d8d1d901b45172be961a9996146bb65f8d8ccf50f1a881bda29db",
+    "zh-Hans": "d6b1b8ba3c35c30aaad14b51410fd73ea10f9f4bd0cabca151491f0d7a058b6f",
+    "hi": "0834e159b16b81841163dede097180973309d66e760cfd7bfd7b108b4707a143"
+  },
+  "carry_forward_evidence": "For each locale, an independent local comparison against git HEAD bae3229c2ff16305727650a21b64b791ab14a06e verified all prior 94 project objects unchanged, exactly the three batch-2 ids added, and no removals.",
+  "limitations": [
+    "Model-assisted review only; no native-speaker or human language approval is claimed.",
+    "No full WCAG or manual assistive-technology approval is claimed by this language-review receipt.",
+    "Eight non-blocking terminology/house-style notes remain documented in the review output."
+  ]
+}
