@@ -2,7 +2,7 @@
   "schema_version": 2,
   "kind": "commonworld.ui_locale_independent_language_review_receipt",
   "status": "passed",
-  "reviewed_revision": "bae3229c2ff16305727650a21b64b791ab14a06e",
+  "reviewed_revision": "ed4138d7bac6a6d399605515b0f60bbe07365bf5",
   "reviewed_source_pack_sha256": "d449f5b6a564c859be9142d737ad768020a8ee472f18026e3d3cbb092ec54648",
   "locale_verdicts": {
     "es": {
@@ -243,6 +243,46 @@
         "sha256": "4d1beaf4b3ce312466ebb4e5cfea4d5db6ba5d1276e91ae53339983811c22662"
       },
       "limitations": "Model-assisted review only; no native-speaker or human language approval is claimed."
+    },
+    "catalog-commons-batch3-2026-08-14": {
+      "review_class": "model_assisted_independent_language_review",
+      "reviewed_revision": "ed4138d7bac6a6d399605515b0f60bbe07365bf5",
+      "reviewer": "Claude Opus 5 via Claude CLI read-only review (Claude Pro subscription)",
+      "writer": "GPT-5.6 Sol via ChatGPT",
+      "writer_independence": "independent_from_catalog_translation_writer",
+      "locale_verdicts": {
+        "es": "PASS",
+        "fr": "PASS",
+        "pt-BR": "PASS",
+        "ar": "PASS",
+        "zh-Hans": "PASS",
+        "hi": "PASS"
+      },
+      "counts": {
+        "blocker": 0,
+        "major": 0,
+        "minor": 0,
+        "note": 15
+      },
+      "findings": [],
+      "prior_entries_carried_forward_per_locale": 97,
+      "new_entries_reviewed_per_locale": 3,
+      "initial_findings": {
+        "path": "docs/evidence/locale-reviews/raw/catalog-commons-batch3-opus-findings-2026-08-14.json",
+        "sha256": "0c9dd867396a007aaa83654d87a4ed788537037646b7c2f47f36ea775fdf93de",
+        "role": "batch3_initial_findings"
+      },
+      "post_fix_findings": {
+        "path": "docs/evidence/locale-reviews/raw/catalog-commons-batch3-opus-postfix-findings-2026-08-14.json",
+        "sha256": "106d53e74a839d7d3b5413033386d0a156807aac549807c4890303e5a92bfe1b",
+        "role": "batch3_postfix_findings"
+      },
+      "final_pass": {
+        "path": "docs/evidence/locale-reviews/raw/catalog-commons-batch3-opus-final-pass-2026-08-14.json",
+        "sha256": "dbe72cff6401945c96c475f251bfde7d47979f91d19373302fb58fd93757b0f4",
+        "role": "batch3_final_pass"
+      },
+      "limitations": "Model-assisted review only; no native-speaker or human language approval is claimed."
     }
   },
   "raw_sources": [
@@ -282,17 +322,17 @@
   ],
   "catalog_review": {
     "review_kind": "model_assisted_independent_language_review",
-    "reviewer": "Claude Opus 5 via Claude Code read-only review",
+    "reviewer": "Claude Opus 5 via Claude CLI read-only review (Claude Pro subscription)",
     "writer": "GPT-5.6 Sol via ChatGPT",
     "writer_independence": "independent_from_catalog_translation_writer",
-    "reviewed_revision": "bae3229c2ff16305727650a21b64b791ab14a06e",
+    "reviewed_revision": "ed4138d7bac6a6d399605515b0f60bbe07365bf5",
     "input_digests": {
-      "es": "71a1afb9b79ca42d2b9cfcd576d0f1a52e1245c4f2dee2e04411d6a5e424078a",
-      "fr": "df675b1a50103ff10d7f95694ddf36b8b6de37a4389d25ec8216564d09f22364",
-      "pt-BR": "13740e55bd5ad07d0464bac261aaf8be0832cc83d126a03e280d37a1817dd97a",
-      "ar": "a6727abeae8d8d1d901b45172be961a9996146bb65f8d8ccf50f1a881bda29db",
-      "zh-Hans": "d6b1b8ba3c35c30aaad14b51410fd73ea10f9f4bd0cabca151491f0d7a058b6f",
-      "hi": "0834e159b16b81841163dede097180973309d66e760cfd7bfd7b108b4707a143"
+      "es": "f2aaa30377639a180d709fc180e5feefbee5fb67afbb5f249efadfaf8407d27e",
+      "fr": "91a128b7736af4fd67272950ee4cfcdedd32fa8b408d774adb71a97de261bab1",
+      "pt-BR": "e5c548f9ede7a44ba9181c5b6cd0c7e4f9e9083c73e4279902d27fe04ef9e6df",
+      "ar": "48feb693350e1800588c2376b9179ed5c27ead85948044dc05549436a5ddd15a",
+      "zh-Hans": "4268fc42da9cf80af9f8e6e4e9e04eddc6a0a970573197255f657c48d7e318ae",
+      "hi": "63731132bbce7bdd171ac7955d7a16c01edbf4217573a6e83e2b4619db5eb688"
     },
     "coverage": {
       "locales": [
@@ -303,23 +343,23 @@
         "zh-Hans",
         "hi"
       ],
-      "project_count_per_locale": 97,
+      "project_count_per_locale": 100,
       "all_entries_reviewed": true,
-      "basis": "The previously reviewed 94 project objects were independently compared against bae3229c and remained unchanged in every released non-baseline locale. The three new batch-2 entries per locale received an independent findings review, all 17 listed minor finding objects across 16 unique fields were remediated, and a digest-bound post-fix review passed with 0 blocker, 0 major and 0 minor findings."
+      "basis": "The previously reviewed 97 project objects were proven unchanged in each released non-baseline locale relative to the PR #210 base. Exactly three batch-3 objects were added per locale. Independent findings review identified and remediated 14 minor findings; a post-fix review found and remediated 2 further minor grammar findings; the final digest-bound review passed with 0 blocker, 0 major and 0 minor findings."
     },
     "verdict": "pass",
     "counts": {
       "blocker": 0,
       "major": 0,
       "minor": 0,
-      "note": 8
+      "note": 15
     },
     "findings": [],
     "review_notes": [
-      "All six target overlays contain 97 projects; an independent local comparison proved the prior 94 project objects unchanged, exactly three batch-2 ids added, and no removals.",
-      "Claude Opus 5 independently reviewed the three new entries across es, fr, pt-BR, ar, zh-Hans and hi. The initial review listed 17 minor finding objects across 16 unique fields; every listed minor field was remediated.",
-      "The digest-bound post-fix review passed with 0 blocker, 0 major, 0 minor and 8 non-blocking terminology/house-style notes.",
-      "Model-assisted review only; native-speaker/human approval is not claimed."
+      "All six target overlays contain 100 projects; digest/object comparison proved the prior 97 project objects unchanged, exactly three batch-3 ids added, and no removals.",
+      "Claude Opus 5 independently reviewed the 18 new translation objects across es, fr, pt-BR, ar, zh-Hans and hi. Fourteen initial minor findings and two post-fix minor findings were remediated.",
+      "The final digest-bound review passed with 0 blocker, 0 major, 0 minor and 15 non-blocking terminology/readability notes.",
+      "Model-assisted review only; native-speaker/human approval, manual screen-reader acceptance, manual visual acceptance and full WCAG conformance are not claimed."
     ],
     "source_receipts": [
       {
@@ -361,6 +401,36 @@
         "path": "docs/evidence/locale-reviews/raw/catalog-commons-batch2-opus-postfix-pass-2026-08-14.json",
         "sha256": "4d1beaf4b3ce312466ebb4e5cfea4d5db6ba5d1276e91ae53339983811c22662",
         "role": "batch2_postfix_pass"
+      },
+      {
+        "path": "docs/evidence/locale-reviews/raw/catalog-commons-batch3-review-input-2026-08-14.json",
+        "sha256": "3bc44882534ec84df747a2eb891b5bb14fd94e0280ddf859fa4068dcee1874eb",
+        "role": "batch3_initial_review_input"
+      },
+      {
+        "path": "docs/evidence/locale-reviews/raw/catalog-commons-batch3-opus-findings-2026-08-14.json",
+        "sha256": "0c9dd867396a007aaa83654d87a4ed788537037646b7c2f47f36ea775fdf93de",
+        "role": "batch3_initial_findings"
+      },
+      {
+        "path": "docs/evidence/locale-reviews/raw/catalog-commons-batch3-postfix-review-input-2026-08-14.json",
+        "sha256": "f391f624aa3aaf17ce75ffa049654d568dcebed4fe362166452123abdc9abc72",
+        "role": "batch3_postfix_review_input"
+      },
+      {
+        "path": "docs/evidence/locale-reviews/raw/catalog-commons-batch3-opus-postfix-findings-2026-08-14.json",
+        "sha256": "106d53e74a839d7d3b5413033386d0a156807aac549807c4890303e5a92bfe1b",
+        "role": "batch3_postfix_findings"
+      },
+      {
+        "path": "docs/evidence/locale-reviews/raw/catalog-commons-batch3-final-review-input-2026-08-14.json",
+        "sha256": "38e3753d72544a228b69b129c234472bf06298b93b7c28aa38ac799ccd32d747",
+        "role": "batch3_final_review_input"
+      },
+      {
+        "path": "docs/evidence/locale-reviews/raw/catalog-commons-batch3-opus-final-pass-2026-08-14.json",
+        "sha256": "dbe72cff6401945c96c475f251bfde7d47979f91d19373302fb58fd93757b0f4",
+        "role": "batch3_final_pass"
       }
     ],
     "resolved_findings": [
@@ -398,6 +468,111 @@
         "severity": "material",
         "field": "summary",
         "resolution": "restored explicit biodiversity-data scope and passed post-fix review"
+      },
+      {
+        "locale": "es",
+        "project": "fiji-locally-managed-marine-area-network",
+        "severity": "minor",
+        "field": "digital_label",
+        "resolution": "review finding corrected and final independent post-fix review passed"
+      },
+      {
+        "locale": "es",
+        "project": "kyrgyzstan-water-users-associations-union",
+        "severity": "minor",
+        "field": "geographic_labels.kyrgyzstan-wua-network",
+        "resolution": "review finding corrected and final independent post-fix review passed"
+      },
+      {
+        "locale": "es",
+        "project": "fiji-locally-managed-marine-area-network",
+        "severity": "minor",
+        "field": "summary",
+        "resolution": "review finding corrected and final independent post-fix review passed"
+      },
+      {
+        "locale": "fr",
+        "project": "lebanon-hima-network",
+        "severity": "minor",
+        "field": "summary",
+        "resolution": "review finding corrected and final independent post-fix review passed"
+      },
+      {
+        "locale": "pt-BR",
+        "project": "fiji-locally-managed-marine-area-network",
+        "severity": "minor",
+        "field": "digital_label",
+        "resolution": "review finding corrected and final independent post-fix review passed"
+      },
+      {
+        "locale": "pt-BR",
+        "project": "fiji-locally-managed-marine-area-network",
+        "severity": "minor",
+        "field": "summary",
+        "resolution": "review finding corrected and final independent post-fix review passed"
+      },
+      {
+        "locale": "ar",
+        "project": "fiji-locally-managed-marine-area-network",
+        "severity": "minor",
+        "field": "digital_label",
+        "resolution": "review finding corrected and final independent post-fix review passed"
+      },
+      {
+        "locale": "ar",
+        "project": "lebanon-hima-network",
+        "severity": "minor",
+        "field": "digital_label",
+        "resolution": "review finding corrected and final independent post-fix review passed"
+      },
+      {
+        "locale": "ar",
+        "project": "kyrgyzstan-water-users-associations-union",
+        "severity": "minor",
+        "field": "geographic_labels.kyrgyzstan-wua-network",
+        "resolution": "review finding corrected and final independent post-fix review passed"
+      },
+      {
+        "locale": "ar",
+        "project": "fiji-locally-managed-marine-area-network",
+        "severity": "minor",
+        "field": "geographic_labels.flmma-fiji-community-areas",
+        "resolution": "review finding corrected and final independent post-fix review passed"
+      },
+      {
+        "locale": "zh-Hans",
+        "project": "fiji-locally-managed-marine-area-network",
+        "severity": "minor",
+        "field": "digital_label",
+        "resolution": "review finding corrected and final independent post-fix review passed"
+      },
+      {
+        "locale": "zh-Hans",
+        "project": "lebanon-hima-network",
+        "severity": "minor",
+        "field": "digital_label",
+        "resolution": "review finding corrected and final independent post-fix review passed"
+      },
+      {
+        "locale": "zh-Hans",
+        "project": "lebanon-hima-network",
+        "severity": "minor",
+        "field": "summary",
+        "resolution": "review finding corrected and final independent post-fix review passed"
+      },
+      {
+        "locale": "hi",
+        "project": "fiji-locally-managed-marine-area-network",
+        "severity": "minor",
+        "field": "summary",
+        "resolution": "review finding corrected and final independent post-fix review passed"
+      },
+      {
+        "locale": "pt-BR",
+        "project": "lebanon-hima-network",
+        "severity": "minor",
+        "field": "summary",
+        "resolution": "review finding corrected and final independent post-fix review passed"
       }
     ],
     "limitations": [
