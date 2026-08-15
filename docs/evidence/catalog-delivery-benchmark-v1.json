@@ -681,11 +681,11 @@
   "validation": {
     "public_browser_smoke": {
       "verdict": "PASS",
-      "result_sha256": "cfbc0518c5ef35f4ef3ff0884ccc8c192bd4cda34fdf4a6a4534cb0372947f12",
-      "committed_evidence_sha256": "4b04a8974f932b78b006fb8d82a55bf16d79b8c009bebc54b1348f21d251d454",
-      "first_party_surface_sha256": "24e22d54b1a823f83f2f1caf05e591fb0c525a97ee02c7cca62b56e6bcb0746f",
+      "result_sha256": "c5a32571ec610879b803839597b025dd5b064f87df53f7b42fdd7649494ac1fc",
+      "committed_evidence_sha256": "3461f3b3f2690e40c251b4d45d4da9ae7d92f8f3a1c40f2b4a804fc85ac435db",
+      "first_party_surface_sha256": "094f38622cf970c06a1982ce6647642e5df481a38ce8176fa0290f9f2d2fecf9",
       "scenario_count": 38,
-      "scope": "local Chromium on immutable release f3d2572d4895de706c36",
+      "scope": "local Chromium on immutable release 52baadbd02e566416e16",
       "selected_detail_eviction_cycle": {
         "id": "catalogue-detail-provenance-upgrade",
         "verdict": "PASS",
@@ -700,21 +700,21 @@
       "decision": "pass",
       "attempt_count": 1,
       "attempt_measurement_sha256s": [
-        "93947b06dad9584ea649ae906e4e302d8d5785e6c35e4184dd2b53c6627c8e6c"
+        "93c39edaa0cb2075d630c3927885de3a643b130752dc65759f3eb975b6d038c0"
       ],
       "profiles": [
         "mobile-low-power",
         "desktop-low-power"
       ],
       "cpu_throttle_rate": 4,
-      "raw_measurement_sha256": "c78a2850f40400970dc616d883344154b030f2d0d375a61c6a7c68f6c546b9ef",
-      "decision_artifact_sha256": "fe5df7584ade722651e968ac5f2a95ec7d14ca9bbd87bd2106ba831f9f4f9f8a",
-      "repeatability_note": "The first fresh 97-entry release-f3d2572d attempt passed every startup timing and delivery budget."
+      "raw_measurement_sha256": "33b7d7f9f3b244b119370c4fb0cb338947c69863cefc6a830d7c17aee28be61e",
+      "decision_artifact_sha256": "59361e7717c6b5c2d6b7938ce618ab07cb419919b56bd3f2c88e6b59aac11253",
+      "repeatability_note": "The first fresh 100-entry release-52baadbd attempt passed every startup timing and delivery budget."
     },
     "catalog_delivery_static_measurement": {
       "verdict": "PASS",
-      "result_sha256": "0475a84647de5821a7002b8dbd9b8226076cc70eed1fd9eb2b01d510218a3b11",
-      "note": "Fresh deterministic static measurement for the optimized 97-entry release f3d2572d4895de706c36."
+      "result_sha256": "06844392925168deaa4ad1252de58ef5871415e1bc3b141a02db26c004d700cc",
+      "note": "Fresh deterministic static measurement for the optimized 100-entry release 52baadbd02e566416e16."
     },
     "limitations": [
       "Local Chromium evidence is not physical-device approval.",
@@ -726,58 +726,58 @@
     "warn_bootstrap_gzip_bytes": 28672,
     "max_bootstrap_gzip_bytes": 32768
   },
-  "current_surface_note": "Fresh exact-tree static, 38-scenario public Chromium smoke and fourfold-CPU browser evidence for immutable release f3d2572d4895de706c36; 97 Commons retain bounded recovery, zero startup project JSON requests and 1359 gzip bytes of warning headroom.",
+  "current_surface_note": "Fresh exact-tree static, 38-scenario public Chromium smoke and fourfold-CPU browser evidence for immutable release 52baadbd02e566416e16; 100 Commons retain bounded recovery, zero startup project JSON requests and 343 gzip bytes of warning headroom.",
   "browser_repeatability": {
     "run_count": 1,
     "cpu_throttle_rate": 4,
     "profiles": {
       "mobile-low-power": {
         "runtime_ready_ms": {
-          "min": 882,
-          "max": 882,
+          "min": 898,
+          "max": 898,
           "values": [
-            882
+            898
           ]
         },
         "script_duration_ms": {
-          "min": 482.54,
-          "max": 482.54,
+          "min": 482.87,
+          "max": 482.87,
           "values": [
-            482.54
+            482.87
           ]
         },
         "task_duration_ms": {
-          "min": 857.57,
-          "max": 857.57,
+          "min": 880.4,
+          "max": 880.4,
           "values": [
-            857.57
+            880.4
           ]
         }
       },
       "desktop-low-power": {
         "runtime_ready_ms": {
-          "min": 876,
-          "max": 876,
+          "min": 868,
+          "max": 868,
           "values": [
-            876
+            868
           ]
         },
         "script_duration_ms": {
-          "min": 496.1,
-          "max": 496.1,
+          "min": 484.23,
+          "max": 484.23,
           "values": [
-            496.1
+            484.23
           ]
         },
         "task_duration_ms": {
-          "min": 859.13,
-          "max": 859.13,
+          "min": 854.78,
+          "max": 854.78,
           "values": [
-            859.13
+            854.78
           ]
         }
       }
     },
-    "interpretation": "One fresh no-store measurement on the exact 97-entry release-f3d2572d first-party surface at fourfold CPU throttling passed every bound startup budget on the first attempt; post-ready work remains diagnostic only."
+    "interpretation": "One fresh no-store measurement on the exact 100-entry release-52baadbd first-party surface at fourfold CPU throttling passed every bound startup budget on the first attempt; post-ready work remains diagnostic only."
   }
 }
