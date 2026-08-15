@@ -1,0 +1,293 @@
+{
+  "kind": "commonworld.locale_lifecycle_browser_smoke",
+  "verdict": "PASS",
+  "pages": 18,
+  "claims": {
+    "full_wcag_conformance": false,
+    "manual_screen_reader_acceptance": false,
+    "native_language_approval": false,
+    "scope": "automated lifecycle smoke for Wave-1 locales: state preservation, keyboard focus paths, accessible names, RTL overflow/direction, mixed-script boundaries"
+  },
+  "releasedIsolation": [
+    {
+      "page": "index.html",
+      "wave1PackRequests": 0,
+      "verdict": "PASS"
+    },
+    {
+      "page": "de.html",
+      "wave1PackRequests": 0,
+      "verdict": "PASS"
+    }
+  ],
+  "localePackResilience": [
+    {
+      "page": "fr.html",
+      "locale": "fr",
+      "surface": "globe",
+      "pendingPackNonBlocking": true,
+      "latePackRelocalized": true,
+      "verdict": "PASS"
+    },
+    {
+      "page": "es.html",
+      "locale": "es",
+      "surface": "globe",
+      "mapRenders": 24,
+      "verdict": "PASS"
+    },
+    {
+      "page": "propose.es.html",
+      "locale": "es",
+      "surface": "proposal",
+      "verdict": "PASS"
+    },
+    {
+      "page": "fr.html",
+      "locale": "fr",
+      "surface": "globe",
+      "mapRenders": 24,
+      "verdict": "PASS"
+    },
+    {
+      "page": "propose.fr.html",
+      "locale": "fr",
+      "surface": "proposal",
+      "verdict": "PASS"
+    },
+    {
+      "page": "pt-BR.html",
+      "locale": "pt-BR",
+      "surface": "globe",
+      "mapRenders": 23,
+      "verdict": "PASS"
+    },
+    {
+      "page": "propose.pt-BR.html",
+      "locale": "pt-BR",
+      "surface": "proposal",
+      "verdict": "PASS"
+    },
+    {
+      "page": "ar.html",
+      "locale": "ar",
+      "surface": "globe",
+      "mapRenders": 25,
+      "verdict": "PASS"
+    },
+    {
+      "page": "propose.ar.html",
+      "locale": "ar",
+      "surface": "proposal",
+      "verdict": "PASS"
+    },
+    {
+      "page": "zh-Hans.html",
+      "locale": "zh-Hans",
+      "surface": "globe",
+      "mapRenders": 23,
+      "verdict": "PASS"
+    },
+    {
+      "page": "propose.zh-Hans.html",
+      "locale": "zh-Hans",
+      "surface": "proposal",
+      "verdict": "PASS"
+    },
+    {
+      "page": "hi.html",
+      "locale": "hi",
+      "surface": "globe",
+      "mapRenders": 23,
+      "verdict": "PASS"
+    },
+    {
+      "page": "propose.hi.html",
+      "locale": "hi",
+      "surface": "proposal",
+      "verdict": "PASS"
+    }
+  ],
+  "results": [
+    {
+      "page": "es.html",
+      "locale": "es",
+      "status": "released",
+      "direction": "ltr",
+      "proposalRuntimeLocalized": false,
+      "proposalDigitalLabel": "",
+      "proposalIssueBodyLocalized": false,
+      "verdict": "PASS"
+    },
+    {
+      "page": "method.es.html",
+      "locale": "es",
+      "status": "released",
+      "direction": "ltr",
+      "proposalRuntimeLocalized": false,
+      "proposalDigitalLabel": "",
+      "proposalIssueBodyLocalized": false,
+      "verdict": "PASS"
+    },
+    {
+      "page": "propose.es.html",
+      "locale": "es",
+      "status": "released",
+      "direction": "ltr",
+      "proposalRuntimeLocalized": true,
+      "proposalDigitalLabel": "Digital",
+      "proposalIssueBodyLocalized": true,
+      "verdict": "PASS"
+    },
+    {
+      "page": "fr.html",
+      "locale": "fr",
+      "status": "released",
+      "direction": "ltr",
+      "proposalRuntimeLocalized": false,
+      "proposalDigitalLabel": "",
+      "proposalIssueBodyLocalized": false,
+      "verdict": "PASS"
+    },
+    {
+      "page": "method.fr.html",
+      "locale": "fr",
+      "status": "released",
+      "direction": "ltr",
+      "proposalRuntimeLocalized": false,
+      "proposalDigitalLabel": "",
+      "proposalIssueBodyLocalized": false,
+      "verdict": "PASS"
+    },
+    {
+      "page": "propose.fr.html",
+      "locale": "fr",
+      "status": "released",
+      "direction": "ltr",
+      "proposalRuntimeLocalized": true,
+      "proposalDigitalLabel": "Numérique",
+      "proposalIssueBodyLocalized": true,
+      "verdict": "PASS"
+    },
+    {
+      "page": "pt-BR.html",
+      "locale": "pt-BR",
+      "status": "released",
+      "direction": "ltr",
+      "proposalRuntimeLocalized": false,
+      "proposalDigitalLabel": "",
+      "proposalIssueBodyLocalized": false,
+      "verdict": "PASS"
+    },
+    {
+      "page": "method.pt-BR.html",
+      "locale": "pt-BR",
+      "status": "released",
+      "direction": "ltr",
+      "proposalRuntimeLocalized": false,
+      "proposalDigitalLabel": "",
+      "proposalIssueBodyLocalized": false,
+      "verdict": "PASS"
+    },
+    {
+      "page": "propose.pt-BR.html",
+      "locale": "pt-BR",
+      "status": "released",
+      "direction": "ltr",
+      "proposalRuntimeLocalized": true,
+      "proposalDigitalLabel": "Digital",
+      "proposalIssueBodyLocalized": true,
+      "verdict": "PASS"
+    },
+    {
+      "page": "ar.html",
+      "locale": "ar",
+      "status": "released",
+      "direction": "rtl",
+      "proposalRuntimeLocalized": false,
+      "proposalDigitalLabel": "",
+      "proposalIssueBodyLocalized": false,
+      "verdict": "PASS"
+    },
+    {
+      "page": "method.ar.html",
+      "locale": "ar",
+      "status": "released",
+      "direction": "rtl",
+      "proposalRuntimeLocalized": false,
+      "proposalDigitalLabel": "",
+      "proposalIssueBodyLocalized": false,
+      "verdict": "PASS"
+    },
+    {
+      "page": "propose.ar.html",
+      "locale": "ar",
+      "status": "released",
+      "direction": "rtl",
+      "proposalRuntimeLocalized": true,
+      "proposalDigitalLabel": "رقمي",
+      "proposalIssueBodyLocalized": true,
+      "verdict": "PASS"
+    },
+    {
+      "page": "zh-Hans.html",
+      "locale": "zh-Hans",
+      "status": "released",
+      "direction": "ltr",
+      "proposalRuntimeLocalized": false,
+      "proposalDigitalLabel": "",
+      "proposalIssueBodyLocalized": false,
+      "verdict": "PASS"
+    },
+    {
+      "page": "method.zh-Hans.html",
+      "locale": "zh-Hans",
+      "status": "released",
+      "direction": "ltr",
+      "proposalRuntimeLocalized": false,
+      "proposalDigitalLabel": "",
+      "proposalIssueBodyLocalized": false,
+      "verdict": "PASS"
+    },
+    {
+      "page": "propose.zh-Hans.html",
+      "locale": "zh-Hans",
+      "status": "released",
+      "direction": "ltr",
+      "proposalRuntimeLocalized": true,
+      "proposalDigitalLabel": "数字",
+      "proposalIssueBodyLocalized": true,
+      "verdict": "PASS"
+    },
+    {
+      "page": "hi.html",
+      "locale": "hi",
+      "status": "released",
+      "direction": "ltr",
+      "proposalRuntimeLocalized": false,
+      "proposalDigitalLabel": "",
+      "proposalIssueBodyLocalized": false,
+      "verdict": "PASS"
+    },
+    {
+      "page": "method.hi.html",
+      "locale": "hi",
+      "status": "released",
+      "direction": "ltr",
+      "proposalRuntimeLocalized": false,
+      "proposalDigitalLabel": "",
+      "proposalIssueBodyLocalized": false,
+      "verdict": "PASS"
+    },
+    {
+      "page": "propose.hi.html",
+      "locale": "hi",
+      "status": "released",
+      "direction": "ltr",
+      "proposalRuntimeLocalized": true,
+      "proposalDigitalLabel": "डिजिटल",
+      "proposalIssueBodyLocalized": true,
+      "verdict": "PASS"
+    }
+  ]
+}

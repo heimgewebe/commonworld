@@ -1,16 +1,12 @@
 {
   "schema_version": 1,
   "kind": "commonworld.incremental_catalog_locale_review_findings",
-  "reviewer": "Claude Opus 5 via Claude Pro subscription",
+  "reviewer": "Claude Opus 5 via Claude CLI read-only review (Claude Pro subscription)",
   "review_task_id": "b4d360bc6400471fb8ce9e8e",
   "review_task_lifecycle_receipt_sha256": "8cb561ec2ec01a9b242ac2d7596e0791c66b12faadc7b6f736554286262681e1",
   "review_input": {
     "path": "docs/evidence/locale-reviews/raw/catalog-commons-batch3-review-input-2026-08-14.json",
     "sha256": "3bc44882534ec84df747a2eb891b5bb14fd94e0280ddf859fa4068dcee1874eb"
-  },
-  "review_stdout": {
-    "path": "/home/alex/.grabowski-task-output-b4d360bc6400471fb8ce9e8e-a1/stdout.log",
-    "sha256": "972c29fd704d197b5241dd1bddecfe2f0781908a3bfa43c0024e9b35a793c616"
   },
   "review": {
     "verdict": "FINDINGS",
@@ -376,5 +372,11 @@
     "native_speaker_or_human_approval": false,
     "manual_screen_reader_approval": false,
     "full_wcag_conformance_claimed": false
+  },
+  "review_execution": {
+    "task_id": "b4d360bc6400471fb8ce9e8e",
+    "lifecycle_receipt_sha256": "8cb561ec2ec01a9b242ac2d7596e0791c66b12faadc7b6f736554286262681e1",
+    "review_output_embedded": true,
+    "external_task_output_required": false
   }
 }

@@ -247,7 +247,7 @@
     "catalog-commons-batch3-2026-08-14": {
       "review_class": "model_assisted_independent_language_review",
       "reviewed_revision": "ed4138d7bac6a6d399605515b0f60bbe07365bf5",
-      "reviewer": "Claude Opus 5 via Claude Code read-only review",
+      "reviewer": "Claude Opus 5 via Claude CLI read-only review (Claude Pro subscription)",
       "writer": "GPT-5.6 Sol via ChatGPT",
       "writer_independence": "independent_from_catalog_translation_writer",
       "locale_verdicts": {
@@ -269,17 +269,17 @@
       "new_entries_reviewed_per_locale": 3,
       "initial_findings": {
         "path": "docs/evidence/locale-reviews/raw/catalog-commons-batch3-opus-findings-2026-08-14.json",
-        "sha256": "041a4e3a786e3c8df948df74ff6d67e39d48ec6073aeb38472f68c73827da341",
+        "sha256": "0c9dd867396a007aaa83654d87a4ed788537037646b7c2f47f36ea775fdf93de",
         "role": "batch3_initial_findings"
       },
       "post_fix_findings": {
         "path": "docs/evidence/locale-reviews/raw/catalog-commons-batch3-opus-postfix-findings-2026-08-14.json",
-        "sha256": "757d84b9d76a1c0c823e9611254ec2d79e16a8e32ef9dfdbe0e141e0a643f1b3",
+        "sha256": "106d53e74a839d7d3b5413033386d0a156807aac549807c4890303e5a92bfe1b",
         "role": "batch3_postfix_findings"
       },
       "final_pass": {
         "path": "docs/evidence/locale-reviews/raw/catalog-commons-batch3-opus-final-pass-2026-08-14.json",
-        "sha256": "fdd4bc2e3c28a4cfd945e328817a80a324578556125e2d7c8165779990d9e127",
+        "sha256": "dbe72cff6401945c96c475f251bfde7d47979f91d19373302fb58fd93757b0f4",
         "role": "batch3_final_pass"
       },
       "limitations": "Model-assisted review only; no native-speaker or human language approval is claimed."
@@ -322,7 +322,7 @@
   ],
   "catalog_review": {
     "review_kind": "model_assisted_independent_language_review",
-    "reviewer": "Claude Opus 5 via Claude Code read-only review",
+    "reviewer": "Claude Opus 5 via Claude CLI read-only review (Claude Pro subscription)",
     "writer": "GPT-5.6 Sol via ChatGPT",
     "writer_independence": "independent_from_catalog_translation_writer",
     "reviewed_revision": "ed4138d7bac6a6d399605515b0f60bbe07365bf5",
@@ -409,27 +409,27 @@
       },
       {
         "path": "docs/evidence/locale-reviews/raw/catalog-commons-batch3-opus-findings-2026-08-14.json",
-        "sha256": "041a4e3a786e3c8df948df74ff6d67e39d48ec6073aeb38472f68c73827da341",
+        "sha256": "0c9dd867396a007aaa83654d87a4ed788537037646b7c2f47f36ea775fdf93de",
         "role": "batch3_initial_findings"
       },
       {
         "path": "docs/evidence/locale-reviews/raw/catalog-commons-batch3-postfix-review-input-2026-08-14.json",
-        "sha256": "e6a860e2acd8aa8c52a5dcde9aee82a6825ec85a80d47417f2c42bbb870c8bb2",
+        "sha256": "f391f624aa3aaf17ce75ffa049654d568dcebed4fe362166452123abdc9abc72",
         "role": "batch3_postfix_review_input"
       },
       {
         "path": "docs/evidence/locale-reviews/raw/catalog-commons-batch3-opus-postfix-findings-2026-08-14.json",
-        "sha256": "757d84b9d76a1c0c823e9611254ec2d79e16a8e32ef9dfdbe0e141e0a643f1b3",
+        "sha256": "106d53e74a839d7d3b5413033386d0a156807aac549807c4890303e5a92bfe1b",
         "role": "batch3_postfix_findings"
       },
       {
         "path": "docs/evidence/locale-reviews/raw/catalog-commons-batch3-final-review-input-2026-08-14.json",
-        "sha256": "6ee2ae6f7fe5c12f13663d1b48d651ccd75635997f6de00636bbd1e3635d7fcc",
+        "sha256": "38e3753d72544a228b69b129c234472bf06298b93b7c28aa38ac799ccd32d747",
         "role": "batch3_final_review_input"
       },
       {
         "path": "docs/evidence/locale-reviews/raw/catalog-commons-batch3-opus-final-pass-2026-08-14.json",
-        "sha256": "fdd4bc2e3c28a4cfd945e328817a80a324578556125e2d7c8165779990d9e127",
+        "sha256": "dbe72cff6401945c96c475f251bfde7d47979f91d19373302fb58fd93757b0f4",
         "role": "batch3_final_pass"
       }
     ],

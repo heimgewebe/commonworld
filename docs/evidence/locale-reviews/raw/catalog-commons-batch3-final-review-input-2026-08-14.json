@@ -179,7 +179,7 @@
   },
   "previous_review": {
     "path": "docs/evidence/locale-reviews/raw/catalog-commons-batch3-opus-postfix-findings-2026-08-14.json",
-    "sha256": "757d84b9d76a1c0c823e9611254ec2d79e16a8e32ef9dfdbe0e141e0a643f1b3",
+    "sha256": "106d53e74a839d7d3b5413033386d0a156807aac549807c4890303e5a92bfe1b",
     "applied_minor_count": 2
   },
   "pass_condition": {

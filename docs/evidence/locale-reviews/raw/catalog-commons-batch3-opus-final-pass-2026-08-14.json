@@ -1,16 +1,12 @@
 {
   "schema_version": 1,
   "kind": "commonworld.incremental_catalog_locale_final_review",
-  "reviewer": "Claude Opus 5 via Claude Pro subscription",
+  "reviewer": "Claude Opus 5 via Claude CLI read-only review (Claude Pro subscription)",
   "review_task_id": "4ad11389552648a297ac2ffb",
   "review_task_lifecycle_receipt_sha256": "6b6c131c820335811fd1d9e6154ec5f517210b016810d5b6ead43999e52c8fa2",
   "review_input": {
     "path": "docs/evidence/locale-reviews/raw/catalog-commons-batch3-final-review-input-2026-08-14.json",
-    "sha256": "6ee2ae6f7fe5c12f13663d1b48d651ccd75635997f6de00636bbd1e3635d7fcc"
-  },
-  "review_stdout": {
-    "path": "/home/alex/.grabowski-task-output-4ad11389552648a297ac2ffb-a1/stdout.log",
-    "sha256": "67152f943cf0996f74b10b266b9f863b451fe1661405c45156f25428fa85367d"
+    "sha256": "38e3753d72544a228b69b129c234472bf06298b93b7c28aa38ac799ccd32d747"
   },
   "review": {
     "verdict": "PASS",
@@ -213,5 +209,11 @@
     "manual_screen_reader_approval": false,
     "manual_visual_approval": false,
     "full_wcag_conformance_claimed": false
+  },
+  "review_execution": {
+    "task_id": "4ad11389552648a297ac2ffb",
+    "lifecycle_receipt_sha256": "6b6c131c820335811fd1d9e6154ec5f517210b016810d5b6ead43999e52c8fa2",
+    "review_output_embedded": true,
+    "external_task_output_required": false
   }
 }

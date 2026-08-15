@@ -1,16 +1,12 @@
 {
   "schema_version": 1,
   "kind": "commonworld.incremental_catalog_locale_postfix_findings",
-  "reviewer": "Claude Opus 5 via Claude Pro subscription",
+  "reviewer": "Claude Opus 5 via Claude CLI read-only review (Claude Pro subscription)",
   "review_task_id": "00bb3746b90f4686b524cc4c",
   "review_task_lifecycle_receipt_sha256": "ce79f71818167a22b58383e45cdf24833ca0bcc7ae989cf2a702067b94cd8857",
   "review_input": {
     "path": "docs/evidence/locale-reviews/raw/catalog-commons-batch3-postfix-review-input-2026-08-14.json",
-    "sha256": "e6a860e2acd8aa8c52a5dcde9aee82a6825ec85a80d47417f2c42bbb870c8bb2"
-  },
-  "review_stdout": {
-    "path": "/home/alex/.grabowski-task-output-00bb3746b90f4686b524cc4c-a1/stdout.log",
-    "sha256": "15050193797d2ff032df088cca9643e252d52237942e0c2520a07887807b37d7"
+    "sha256": "f391f624aa3aaf17ce75ffa049654d568dcebed4fe362166452123abdc9abc72"
   },
   "review": {
     "verdict": "FINDINGS",
@@ -71,7 +67,7 @@
           "blocker": 0,
           "major": 0,
           "minor": 0,
-          "note": 4
+          "note": 3
         },
         "assessment": "The single prior minor is resolved: 'समुदाय' now uses the correct unchanged masculine plural with agreeing 'करते हैं', and 'समुद्री क्षेत्रों में' re-attaches the communities as acting within the marine areas rather than belonging to them, matching the English. No new regression in the rest of the sentence, whose instrument phrase and object chain are unchanged. hi remains the locale that most sharply separates 'नगरपालिका निर्णयों' from 'नगरपालिका घोषणाओं', keeps 'खेत-स्तरीय' for on-farm, and uses 'सार्वजनिक' in all three digital labels."
       }
@@ -226,7 +222,7 @@
       "blocker": 0,
       "major": 0,
       "minor": 2,
-      "note": 17
+      "note": 16
     },
     "model_assisted": true,
     "claims_native_or_human_review": false
@@ -252,5 +248,26 @@
     "native_speaker_or_human_approval": false,
     "manual_screen_reader_approval": false,
     "full_wcag_conformance_claimed": false
+  },
+  "review_execution": {
+    "task_id": "00bb3746b90f4686b524cc4c",
+    "lifecycle_receipt_sha256": "ce79f71818167a22b58383e45cdf24833ca0bcc7ae989cf2a702067b94cd8857",
+    "review_output_embedded": true,
+    "external_task_output_required": false
+  },
+  "review_normalization": {
+    "reason": "Reviewer summary count over-reported one Hindi note; authoritative counts are derived from the embedded findings array.",
+    "original_reported_counts": {
+      "blocker": 0,
+      "major": 0,
+      "minor": 2,
+      "note": 17
+    },
+    "normalized_counts": {
+      "blocker": 0,
+      "major": 0,
+      "minor": 2,
+      "note": 16
+    }
   }
 }

@@ -179,7 +179,7 @@
   },
   "prior_findings": {
     "path": "docs/evidence/locale-reviews/raw/catalog-commons-batch3-opus-findings-2026-08-14.json",
-    "sha256": "041a4e3a786e3c8df948df74ff6d67e39d48ec6073aeb38472f68c73827da341",
+    "sha256": "0c9dd867396a007aaa83654d87a4ed788537037646b7c2f47f36ea775fdf93de",
     "applied_minor_count": 14,
     "retained_note_count": 9
   },
