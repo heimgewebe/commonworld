@@ -59,7 +59,7 @@
       "page": "pt-BR.html",
       "locale": "pt-BR",
       "surface": "globe",
-      "mapRenders": 23,
+      "mapRenders": 25,
       "verdict": "PASS"
     },
     {
@@ -85,7 +85,7 @@
       "page": "zh-Hans.html",
       "locale": "zh-Hans",
       "surface": "globe",
-      "mapRenders": 23,
+      "mapRenders": 24,
       "verdict": "PASS"
     },
     {
@@ -98,7 +98,7 @@
       "page": "hi.html",
       "locale": "hi",
       "surface": "globe",
-      "mapRenders": 23,
+      "mapRenders": 25,
       "verdict": "PASS"
     },
     {

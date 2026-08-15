@@ -3,10 +3,10 @@
   "source_revision": "ed4138d7bac6a6d399605515b0f60bbe07365bf5",
   "source_pack_sha256": "06e4c5c150bdf33e63d1becf47ef1f90f0b51a1d24b76725f44ff37ce07302f7",
   "reviewed_source_pack_sha256": "cf57400b0a0fbf818baa88f33001e95bc4c7c39bd00caef3505f4d9ab6c0f405",
-  "release_id": "52baadbd02e566416e16",
+  "release_id": "5a19ef727796723bd73e",
   "raw_source": {
     "path": "docs/evidence/locale-reviews/raw/released-browser-lifecycle-smoke-2026-08-15.json",
-    "sha256": "df3ec5d694476b74deab427f4e5866bd7938786f9d7b4d6012273cadd1fa4bb6"
+    "sha256": "eac9f959ebbc1ae963ad9471ea27ebc3b4e1e69fe20c2301982d4a80b8a604dc"
   },
   "locales": [
     "es",
