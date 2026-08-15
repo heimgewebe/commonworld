@@ -1,0 +1,256 @@
+{
+  "schema_version": 1,
+  "kind": "commonworld.incremental_catalog_locale_postfix_findings",
+  "reviewer": "Claude Opus 5 via Claude Pro subscription",
+  "review_task_id": "00bb3746b90f4686b524cc4c",
+  "review_task_lifecycle_receipt_sha256": "ce79f71818167a22b58383e45cdf24833ca0bcc7ae989cf2a702067b94cd8857",
+  "review_input": {
+    "path": "docs/evidence/locale-reviews/raw/catalog-commons-batch3-postfix-review-input-2026-08-14.json",
+    "sha256": "e6a860e2acd8aa8c52a5dcde9aee82a6825ec85a80d47417f2c42bbb870c8bb2"
+  },
+  "review_stdout": {
+    "path": "/home/alex/.grabowski-task-output-00bb3746b90f4686b524cc4c-a1/stdout.log",
+    "sha256": "15050193797d2ff032df088cca9643e252d52237942e0c2520a07887807b37d7"
+  },
+  "review": {
+    "verdict": "FINDINGS",
+    "per_locale": {
+      "es": {
+        "verdict": "PASS",
+        "counts": {
+          "blocker": 0,
+          "major": 0,
+          "minor": 0,
+          "note": 2
+        },
+        "assessment": "All three prior minors are resolved: 'documentación de la red FLMMA' restores the network qualifier, the opaque 'WUA' token is expanded, and 'custodia compartida' now aligns with 'custodia comunitaria' so stewardship maps to one term across the batch. No new regressions: 'crean y cuidan áreas' is well-formed Spanish (cuidar takes a direct object), 'guardianía comunitaria' correctly keeps guardianship distinct from stewardship, 'declaraciones municipales' stays distinct from 'decisiones municipales', and the public/network/site-level qualifiers survive in all three digital labels."
+      },
+      "fr": {
+        "verdict": "FINDINGS",
+        "counts": {
+          "blocker": 0,
+          "major": 0,
+          "minor": 1,
+          "note": 2
+        },
+        "assessment": "The prior article-omission minor is resolved ('les municipalités et les communautés locales'). However, the corrected Lebanon summary still coordinates two verbs with incompatible complement constructions ('établissent et prennent soin d’espaces'), which the article fix left untouched; 'd’espaces' cannot serve as the direct object of 'établissent'. Everything else is accurate: 'irrigation à la parcelle', 'AUE membres' mirroring 'member WUAs', 'déclarations municipales' vs 'décisions municipales', and 'publique/publiques' preserved throughout."
+      },
+      "pt-BR": {
+        "verdict": "FINDINGS",
+        "counts": {
+          "blocker": 0,
+          "major": 0,
+          "minor": 1,
+          "note": 2
+        },
+        "assessment": "Both prior minors are resolved: 'documentação da rede FLMMA' restores the network qualifier and 'as comunidades' supplies the required definite article. The Lebanon summary, which was not part of the fix set, carries the same regência defect as fr ('estabelecem e cuidam de áreas' shares one complement between a direct-object verb and a 'de'-governed verb) and also keeps the bare generic plural subject that was corrected in the Fiji summary. Governance and access nuance is otherwise complete, including 'guarda comunitária' vs 'responsabilidade comunitária' and 'declarações municipais' vs 'decisões municipais'."
+      },
+      "ar": {
+        "verdict": "PASS",
+        "counts": {
+          "blocker": 0,
+          "major": 0,
+          "minor": 0,
+          "note": 3
+        },
+        "assessment": "All four prior minors are resolved: 'وثائق شبكة FLMMA' replaces the web-documentation reading via a proper idafa, 'إعلانات البلديات' restores the declarations/decisions distinction against 'قرارات بلدية' in the summary, 'مناطق محلية لاستخدام المياه' removes the adjective-attachment ambiguity, and 'مناطق القوليقولي (qoliqoli)' gives an Arabic-script anchor while keeping the source term recoverable. No RTL regression: the parenthesized Latin token and the FLMMA/SPNL/NUWUA acronyms sit at ordinary bidi boundaries, and 'الحِمى' keeps its diacritic. 'تنشئ ... وتتولى رعايتها' renders establish-and-steward cleanly."
+      },
+      "zh-Hans": {
+        "verdict": "PASS",
+        "counts": {
+          "blocker": 0,
+          "major": 0,
+          "minor": 0,
+          "note": 4
+        },
+        "assessment": "All three prior minors are resolved: '该网络的相关文档' no longer asserts a web delivery channel, '市政宣告' drops the invented '设立' and restores the declarations/decisions contrast against '市政决定', and '黎巴嫩由各 Hima 地点组成的网络' restores the site-level composition the geographic label depends on. The rewritten Lebanon summary keeps '扎根当地', the only locale to preserve 'locally rooted'. Sector terms ('田间灌溉系统', '近岸渔业') and the '公开' access qualifier are intact in all three projects."
+      },
+      "hi": {
+        "verdict": "PASS",
+        "counts": {
+          "blocker": 0,
+          "major": 0,
+          "minor": 0,
+          "note": 4
+        },
+        "assessment": "The single prior minor is resolved: 'समुदाय' now uses the correct unchanged masculine plural with agreeing 'करते हैं', and 'समुद्री क्षेत्रों में' re-attaches the communities as acting within the marine areas rather than belonging to them, matching the English. No new regression in the rest of the sentence, whose instrument phrase and object chain are unchanged. hi remains the locale that most sharply separates 'नगरपालिका निर्णयों' from 'नगरपालिका घोषणाओं', keeps 'खेत-स्तरीय' for on-farm, and uses 'सार्वजनिक' in all three digital labels."
+      }
+    },
+    "findings": [
+      {
+        "severity": "minor",
+        "locale": "fr",
+        "project": "lebanon-hima-network",
+        "field": "summary",
+        "problem": "The corrected string still coordinates 'établissent' (direct-object verb) with 'prennent soin' ('de'-governed) over a single shared complement: 'établissent et prennent soin d’espaces de ressources naturelles'. The elided 'd’' is required by 'prendre soin de' and cannot serve as the object of 'établir' — a partitive direct object would have to be 'des espaces' — so the first verb is left without a well-formed complement. The prior fix added the definite articles but did not touch this coordination. The replacement gives 'établir' its own object and resumes it with the pronoun 'en'.",
+        "suggested_replacement": "Un réseau libanais de sites Hima où les municipalités et les communautés locales établissent des espaces de ressources naturelles et en prennent soin au moyen de décisions municipales, d’une garde communautaire et de règles locales de conservation et d’usage."
+      },
+      {
+        "severity": "minor",
+        "locale": "pt-BR",
+        "project": "lebanon-hima-network",
+        "field": "summary",
+        "problem": "Same regência defect as fr: 'estabelecem e cuidam de áreas de recursos naturais' shares one complement between 'estabelecer' (direct object) and 'cuidar de' (prepositional), so the preposition demanded by the second verb is wrongly imposed on the first. Secondarily, 'em que municípios e comunidades locais' keeps the bare generic plural subject that was corrected to 'as comunidades' in this locale's Fiji summary, leaving the two pt-BR summaries inconsistent. The replacement fixes both without altering meaning or the governance chain.",
+        "suggested_replacement": "Uma rede libanesa de locais Hima em que os municípios e as comunidades locais estabelecem áreas de recursos naturais e cuidam delas por meio de decisões municipais, guarda comunitária e regras locais de conservação e uso."
+      },
+      {
+        "severity": "note",
+        "locale": "es",
+        "project": "lebanon-hima-network",
+        "field": "summary",
+        "problem": "Retained from the prior review: 'locally rooted conservation and use rules' remains flattened to 'normas locales de conservación y uso', asserting local scope rather than local origin. Non-blocking; shared with fr, pt-BR, ar and hi, and the governance meaning survives.",
+        "suggested_replacement": ""
+      },
+      {
+        "severity": "note",
+        "locale": "es",
+        "project": "kyrgyzstan-water-users-associations-union",
+        "field": "geographic_labels.kyrgyzstan-wua-network",
+        "problem": "The acronym expansion applied by the fix is correct but produces a long postmodified head, 'asociaciones de usuarios del agua miembros'. Number agreement makes the attachment of 'miembros' to 'asociaciones' unambiguous, so this is readability only; a fronted variant ('asociaciones miembros de usuarios del agua') would scan better. Non-blocking.",
+        "suggested_replacement": ""
+      },
+      {
+        "severity": "note",
+        "locale": "fr",
+        "project": "fiji-locally-managed-marine-area-network",
+        "field": "summary",
+        "problem": "Retained from the prior review: 'stewardship' maps to 'responsabilité' across the locale (also in the Lebanon geographic label and digital label). Internally consistent and non-blocking, though 'responsabilité' denotes accountability rather than active care.",
+        "suggested_replacement": ""
+      },
+      {
+        "severity": "note",
+        "locale": "fr",
+        "project": "lebanon-hima-network",
+        "field": "summary",
+        "problem": "Retained from the prior review: 'locally rooted' is flattened to 'règles locales'. The suggested replacement above preserves this wording unchanged so the note remains a note. Non-blocking.",
+        "suggested_replacement": ""
+      },
+      {
+        "severity": "note",
+        "locale": "pt-BR",
+        "project": "fiji-locally-managed-marine-area-network",
+        "field": "summary",
+        "problem": "Retained from the prior review: 'geridas'/'gerir' reads as European Portuguese register where pt-BR resource texts often prefer 'manejadas'/'manejar'. The corrected string kept this wording, and the other two pt-BR entries use 'gestão', so the batch stays internally consistent. Non-blocking.",
+        "suggested_replacement": ""
+      },
+      {
+        "severity": "note",
+        "locale": "pt-BR",
+        "project": "lebanon-hima-network",
+        "field": "summary",
+        "problem": "Retained from the prior review: 'locally rooted' is flattened to 'regras locais'. The suggested replacement above deliberately leaves this wording untouched. Non-blocking.",
+        "suggested_replacement": ""
+      },
+      {
+        "severity": "note",
+        "locale": "ar",
+        "project": "kyrgyzstan-water-users-associations-union",
+        "field": "summary",
+        "problem": "After the geographic label was changed to 'أنظمة الري', the single English term 'irrigation systems' is now rendered two ways within the locale: 'شبكات الري داخل المزارع' in the summary and 'أنظمة الري' in the label. Both are defensible Arabic — 'شبكات الري الحقلية' is standard for on-farm systems — so this is a uniformity observation, not a semantic defect, and the on-farm scoping is intact. Non-blocking.",
+        "suggested_replacement": ""
+      },
+      {
+        "severity": "note",
+        "locale": "ar",
+        "project": "kyrgyzstan-water-users-associations-union",
+        "field": "digital_label",
+        "problem": "Retained from the prior review: 'community-based' alternates between 'القائمة على المجتمع' and 'المجتمعية' across the locale. Both are correct Arabic; flagged only for cross-batch uniformity. Non-blocking.",
+        "suggested_replacement": ""
+      },
+      {
+        "severity": "note",
+        "locale": "ar",
+        "project": "lebanon-hima-network",
+        "field": "summary",
+        "problem": "Retained from the prior review: 'locally rooted' is flattened to 'قواعد محلية'. Separately, 'conservation' is rendered 'الحماية' (protection) rather than 'الصون/الحفظ'; both are accepted renderings in Arabic conservation usage and the use-rule pairing is preserved. Non-blocking.",
+        "suggested_replacement": ""
+      },
+      {
+        "severity": "note",
+        "locale": "zh-Hans",
+        "project": "fiji-locally-managed-marine-area-network",
+        "field": "summary",
+        "problem": "Retained from the prior review: '各地社区' adds '各地', an unsupported quantifier not present in the English 'communities', though arguably implied by 'Fiji-wide'. Non-blocking.",
+        "suggested_replacement": ""
+      },
+      {
+        "severity": "note",
+        "locale": "zh-Hans",
+        "project": "lebanon-hima-network",
+        "field": "digital_label",
+        "problem": "'市政宣告' correctly removes the invented '设立' and restores the declarations/decisions contrast, but '宣告' is more natural as a verb than as a noun in institutional Chinese, where '公告' is the usual nominal form. Meaning is clear and the fix achieves its purpose; also note the locale alternates '市镇' (summary) and '市政' (digital label) for 'municipal'. Non-blocking.",
+        "suggested_replacement": ""
+      },
+      {
+        "severity": "note",
+        "locale": "zh-Hans",
+        "project": "lebanon-hima-network",
+        "field": "summary",
+        "problem": "'community guardianship' (summary) and 'community stewardship' (geographic label and digital label) both surface as '社区守护', collapsing a distinction that es, fr, pt-BR and ar keep. The two English terms are near-synonymous and no governance or access claim is lost. Non-blocking; hi collapses the same pair.",
+        "suggested_replacement": ""
+      },
+      {
+        "severity": "note",
+        "locale": "zh-Hans",
+        "project": "kyrgyzstan-water-users-associations-union",
+        "field": "digital_label",
+        "problem": "Retained from the prior review: 'community-based' appears as '以社区为基础的', '社区海洋管理' and '社区灌溉管理' across the locale. The shortened forms are idiomatic; flagged only for uniformity. Non-blocking.",
+        "suggested_replacement": ""
+      },
+      {
+        "severity": "note",
+        "locale": "hi",
+        "project": "lebanon-hima-network",
+        "field": "summary",
+        "problem": "Retained from the prior review: 'locally rooted' is flattened to 'स्थानीय संरक्षण व उपयोग नियमों'. Additionally, 'community guardianship' here and 'community stewardship' in the geographic and digital labels both render as 'सामुदायिक संरक्षकता'; the terms are near-synonymous in the source and no governance claim is lost. Non-blocking.",
+        "suggested_replacement": ""
+      },
+      {
+        "severity": "note",
+        "locale": "hi",
+        "project": "kyrgyzstan-water-users-associations-union",
+        "field": "summary",
+        "problem": "'संघ' carries both 'union' ('राष्ट्रीय संघ') and 'associations' ('जल उपयोगकर्ता संघों') in one sentence. 'जल उपयोगकर्ता संघ' is the established Indian irrigation term for a WUA and the two levels stay distinguishable through 'राष्ट्रीय' and the semicolon-separated clause, but 'महासंघ' for the national body would make the tier explicit. Non-blocking.",
+        "suggested_replacement": ""
+      },
+      {
+        "severity": "note",
+        "locale": "hi",
+        "project": "fiji-locally-managed-marine-area-network",
+        "field": "geographic_labels.flmma-fiji-community-areas",
+        "problem": "'qoliqoli' is retained in bare Latin script inside a Devanagari string, where ar received a Devanagari-equivalent transliteration treatment. Devanagari is LTR so there is no bidi rendering risk, and the token is unchanged from the pre-fix string, so this is not a regression; a parenthetical transliteration would still aid readers. Non-blocking; zh-Hans retains the Latin form on the same basis.",
+        "suggested_replacement": ""
+      }
+    ],
+    "counts": {
+      "blocker": 0,
+      "major": 0,
+      "minor": 2,
+      "note": 17
+    },
+    "model_assisted": true,
+    "claims_native_or_human_review": false
+  },
+  "applied_minor_fixes": [
+    {
+      "locale": "fr",
+      "project": "lebanon-hima-network",
+      "field": "summary",
+      "before": "Un réseau libanais de sites Hima où les municipalités et les communautés locales établissent et prennent soin d’espaces de ressources naturelles au moyen de décisions municipales, d’une garde communautaire et de règles locales de conservation et d’usage.",
+      "after": "Un réseau libanais de sites Hima où les municipalités et les communautés locales établissent des espaces de ressources naturelles et en prennent soin au moyen de décisions municipales, d’une garde communautaire et de règles locales de conservation et d’usage."
+    },
+    {
+      "locale": "pt-BR",
+      "project": "lebanon-hima-network",
+      "field": "summary",
+      "before": "Uma rede libanesa de locais Hima em que municípios e comunidades locais estabelecem e cuidam de áreas de recursos naturais por meio de decisões municipais, guarda comunitária e regras locais de conservação e uso.",
+      "after": "Uma rede libanesa de locais Hima em que os municípios e as comunidades locais estabelecem áreas de recursos naturais e cuidam delas por meio de decisões municipais, guarda comunitária e regras locais de conservação e uso."
+    }
+  ],
+  "review_boundary": {
+    "model_assisted": true,
+    "native_speaker_or_human_approval": false,
+    "manual_screen_reader_approval": false,
+    "full_wcag_conformance_claimed": false
+  }
+}

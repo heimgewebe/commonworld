@@ -1,0 +1,380 @@
+{
+  "schema_version": 1,
+  "kind": "commonworld.incremental_catalog_locale_review_findings",
+  "reviewer": "Claude Opus 5 via Claude Pro subscription",
+  "review_task_id": "b4d360bc6400471fb8ce9e8e",
+  "review_task_lifecycle_receipt_sha256": "8cb561ec2ec01a9b242ac2d7596e0791c66b12faadc7b6f736554286262681e1",
+  "review_input": {
+    "path": "docs/evidence/locale-reviews/raw/catalog-commons-batch3-review-input-2026-08-14.json",
+    "sha256": "3bc44882534ec84df747a2eb891b5bb14fd94e0280ddf859fa4068dcee1874eb"
+  },
+  "review_stdout": {
+    "path": "/home/alex/.grabowski-task-output-b4d360bc6400471fb8ce9e8e-a1/stdout.log",
+    "sha256": "972c29fd704d197b5241dd1bddecfe2f0781908a3bfa43c0024e9b35a793c616"
+  },
+  "review": {
+    "verdict": "FINDINGS",
+    "per_locale": {
+      "es": {
+        "verdict": "FINDINGS",
+        "counts": {
+          "blocker": 0,
+          "major": 0,
+          "minor": 3,
+          "note": 1
+        },
+        "assessment": "Semantically faithful across all three projects; no invented facts and the 'public' access qualifier is preserved in all digital labels. Issues are terminology consistency ('stewardship' rendered two different ways within the same batch), one dropped 'network' qualifier, and an untranslated English acronym in a Spanish geographic label."
+      },
+      "fr": {
+        "verdict": "FINDINGS",
+        "counts": {
+          "blocker": 0,
+          "major": 0,
+          "minor": 1,
+          "note": 2
+        },
+        "assessment": "Strongest of the six overall: accurate, idiomatic, 'network'/'public' qualifiers preserved, and 'irrigation à la parcelle' is the correct sector term for on-farm irrigation. Using the established French acronym AUE in the Kyrgyzstan geographic label correctly mirrors the English 'WUAs'. One article-omission fluency defect."
+      },
+      "pt-BR": {
+        "verdict": "FINDINGS",
+        "counts": {
+          "blocker": 0,
+          "major": 0,
+          "minor": 2,
+          "note": 2
+        },
+        "assessment": "Accurate and complete on governance/access nuance; the Kyrgyzstan geographic label correctly expands the WUA acronym instead of carrying English. Defects are a dropped 'network' qualifier and a missing definite article; register leans European Portuguese in places."
+      },
+      "ar": {
+        "verdict": "FINDINGS",
+        "counts": {
+          "blocker": 0,
+          "major": 0,
+          "minor": 4,
+          "note": 1
+        },
+        "assessment": "Meaning and access limitations preserved; 'الحِمى' is correctly used with the diacritic and the on-farm irrigation nuance ('داخل المزارع') is retained. Defects are lexical ambiguity ('وثائق شبكية' reads as web documentation), collapse of the declarations/decisions distinction, an adjective-attachment ambiguity, and unmarked Latin script inside an RTL string."
+      },
+      "zh-Hans": {
+        "verdict": "FINDINGS",
+        "counts": {
+          "blocker": 0,
+          "major": 0,
+          "minor": 3,
+          "note": 2
+        },
+        "assessment": "Fluent and the only locale that preserves 'locally rooted' ('扎根当地'); '田间灌溉系统' and '近岸渔业' are correct sector terms. Defects are '网络文档' reading as web documentation, an added 'establishment' specificity not present in the English, and the dropped 'of Hima sites' scoping in the Lebanon summary."
+      },
+      "hi": {
+        "verdict": "FINDINGS",
+        "counts": {
+          "blocker": 0,
+          "major": 0,
+          "minor": 1,
+          "note": 1
+        },
+        "assessment": "Faithful and terminologically consistent ('समुदाय-आधारित' used uniformly); correctly distinguishes 'municipal declarations' (नगरपालिका घोषणाओं) from 'municipal decisions' (नगरपालिका निर्णयों), which ar and zh-Hans collapse. One ungrammatical plural form plus an associated clause-attachment shift."
+      }
+    },
+    "findings": [
+      {
+        "severity": "minor",
+        "locale": "es",
+        "project": "fiji-locally-managed-marine-area-network",
+        "field": "digital_label",
+        "problem": "The English reference names two distinct artifact types: 'learning material' and 'network documentation'. The Spanish collapses these into 'documentación de FLMMA', dropping the 'network' qualifier that identifies the documentation as the network's own records. fr and pt-BR retain it.",
+        "suggested_replacement": "Materiales públicos de aprendizaje y documentación de la red FLMMA sobre gestión marina comunitaria"
+      },
+      {
+        "severity": "minor",
+        "locale": "es",
+        "project": "kyrgyzstan-water-users-associations-union",
+        "field": "geographic_labels.kyrgyzstan-wua-network",
+        "problem": "The English acronym 'WUA' is carried untranslated into a Spanish string where it has no local currency and is never expanded in the Spanish summary or digital_label (both of which use 'asociaciones de usuarios del agua'). fr substitutes the established French acronym AUE and pt-BR expands the term; es leaves an opaque token.",
+        "suggested_replacement": "Kirguistán — asociaciones de usuarios del agua miembros, sistemas de riego y áreas locales de uso del agua"
+      },
+      {
+        "severity": "minor",
+        "locale": "es",
+        "project": "fiji-locally-managed-marine-area-network",
+        "field": "summary",
+        "problem": "'shared stewardship' is rendered as 'responsabilidad compartida' (shared responsibility), which loses the caretaking sense, while the same locale renders 'community stewardship' as 'custodia comunitaria' in lebanon-hima-network. Within one batch the same source concept maps to two unrelated Spanish terms.",
+        "suggested_replacement": "Una red de apoyo de alcance nacional en Fiyi para áreas marinas gestionadas localmente, donde las comunidades emplean normas consuetudinarias y acordadas colectivamente, monitoreo local y custodia compartida para gestionar pesquerías costeras y hábitats marinos."
+      },
+      {
+        "severity": "note",
+        "locale": "es",
+        "project": "lebanon-hima-network",
+        "field": "summary",
+        "problem": "'locally rooted conservation and use rules' is flattened to 'normas locales de conservación y uso'. 'Locally rooted' asserts origin/embeddedness, not merely local scope. Non-blocking: the governance meaning survives, and es, fr, pt-BR, ar and hi all flatten this identically (only zh-Hans preserves it as '扎根当地').",
+        "suggested_replacement": ""
+      },
+      {
+        "severity": "minor",
+        "locale": "fr",
+        "project": "lebanon-hima-network",
+        "field": "summary",
+        "problem": "'où municipalités et communautés locales établissent' omits the definite articles required in standard French prose. The bare-noun coordination is a headline/telegraphic register that does not match the surrounding sentences or the other fr entries.",
+        "suggested_replacement": "Un réseau libanais de sites Hima où les municipalités et les communautés locales établissent et prennent soin d’espaces de ressources naturelles au moyen de décisions municipales, d’une garde communautaire et de règles locales de conservation et d’usage."
+      },
+      {
+        "severity": "note",
+        "locale": "fr",
+        "project": "fiji-locally-managed-marine-area-network",
+        "field": "summary",
+        "problem": "'shared stewardship' becomes 'une responsabilité partagée', and the locale maps 'stewardship' to 'responsabilité' throughout (also in the lebanon geographic_labels and digital_label). This is internally consistent, so it is non-blocking, but 'responsabilité' denotes accountability rather than active care; 'gérance' or 'intendance' is closer.",
+        "suggested_replacement": ""
+      },
+      {
+        "severity": "note",
+        "locale": "fr",
+        "project": "lebanon-hima-network",
+        "field": "summary",
+        "problem": "'locally rooted conservation and use rules' is flattened to 'règles locales de conservation et d’usage', losing the embeddedness claim. Same shared flattening as es, pt-BR, ar and hi; non-blocking.",
+        "suggested_replacement": ""
+      },
+      {
+        "severity": "minor",
+        "locale": "pt-BR",
+        "project": "fiji-locally-managed-marine-area-network",
+        "field": "digital_label",
+        "problem": "'network documentation' loses its 'network' qualifier, becoming just 'documentação da FLMMA'. The English distinguishes learning material from the network's own documentation; fr preserves this ('documentation du réseau FLMMA').",
+        "suggested_replacement": "Materiais públicos de aprendizagem e documentação da rede FLMMA sobre gestão marinha comunitária"
+      },
+      {
+        "severity": "minor",
+        "locale": "pt-BR",
+        "project": "fiji-locally-managed-marine-area-network",
+        "field": "summary",
+        "problem": "'nas quais comunidades usam' omits the definite article. Brazilian Portuguese requires 'as comunidades' for a generic plural subject here; the bare noun reads as non-native.",
+        "suggested_replacement": "Uma rede de apoio em todo Fiji para áreas marinhas geridas localmente, nas quais as comunidades usam regras consuetudinárias e acordadas coletivamente, monitoramento local e responsabilidade compartilhada para gerir pescarias costeiras e habitats marinhos."
+      },
+      {
+        "severity": "note",
+        "locale": "pt-BR",
+        "project": "fiji-locally-managed-marine-area-network",
+        "field": "summary",
+        "problem": "'geridas'/'gerir' is correct but reads as European Portuguese register; pt-BR environmental and irrigation texts more commonly use 'manejadas'/'manejar' for resource management (and 'gerenciar' for organizational management). Non-blocking, but note that the other two pt-BR entries use 'gestão', so the batch is internally consistent.",
+        "suggested_replacement": ""
+      },
+      {
+        "severity": "note",
+        "locale": "pt-BR",
+        "project": "lebanon-hima-network",
+        "field": "summary",
+        "problem": "'locally rooted conservation and use rules' is flattened to 'regras locais de conservação e uso'. Shared with es, fr, ar and hi; non-blocking.",
+        "suggested_replacement": ""
+      },
+      {
+        "severity": "minor",
+        "locale": "ar",
+        "project": "fiji-locally-managed-marine-area-network",
+        "field": "digital_label",
+        "problem": "'وثائق شبكية' is ambiguous and most readily parses as 'web/online documents' (شبكي is the standard adjective for 'web/net'), not 'documentation of the network'. The intended reading requires an idafa construction binding the documents to the FLMMA network.",
+        "suggested_replacement": "مواد تعلّم عامة ووثائق شبكة FLMMA حول الإدارة البحرية القائمة على المجتمع"
+      },
+      {
+        "severity": "minor",
+        "locale": "ar",
+        "project": "lebanon-hima-network",
+        "field": "digital_label",
+        "problem": "'municipal declarations' is rendered 'القرارات البلدية', the identical phrase already used for 'municipal decisions' in the same project's summary ('قرارات بلدية'). The English deliberately distinguishes the deliberative act from the public declaration of a Hima; the Arabic collapses both. hi preserves the distinction (निर्णयों vs घोषणाओं).",
+        "suggested_replacement": "وثائق عامة من SPNL حول شبكة الحِمى وإعلانات البلديات والرعاية المجتمعية"
+      },
+      {
+        "severity": "minor",
+        "locale": "ar",
+        "project": "kyrgyzstan-water-users-associations-union",
+        "field": "geographic_labels.kyrgyzstan-wua-network",
+        "problem": "'مناطق استخدام المياه المحلية' is syntactically ambiguous: 'المحلية' attaches most naturally to the immediately preceding 'المياه', yielding 'areas of local-water use' rather than the intended 'local water-use areas'. Additionally 'شبكات الري' (irrigation networks) is used where the English says 'irrigation systems' and the ar summary already used شبكات for the on-farm case, blurring the two levels.",
+        "suggested_replacement": "قيرغيزستان — جمعيات مستخدمي المياه الأعضاء وأنظمة الري ومناطق محلية لاستخدام المياه"
+      },
+      {
+        "severity": "minor",
+        "locale": "ar",
+        "project": "fiji-locally-managed-marine-area-network",
+        "field": "geographic_labels.flmma-fiji-community-areas",
+        "problem": "The Fijian term 'qoliqoli' is embedded as bare Latin script inside an RTL Arabic string with no transliteration and no directional isolation. At the LTR/RTL boundary the adjacent Arabic conjunction and separators can render in unexpected order, and the token is unreadable to an Arabic-only reader. Retaining the Latin form alongside an Arabic transliteration keeps the source term recoverable while giving the reader a pronounceable anchor.",
+        "suggested_replacement": "فيجي — مناطق بحرية مُدارة محلياً ومناطق القوليقولي (qoliqoli) ومصايد مجتمعية"
+      },
+      {
+        "severity": "note",
+        "locale": "ar",
+        "project": "kyrgyzstan-water-users-associations-union",
+        "field": "digital_label",
+        "problem": "'community-based' is rendered 'القائمة على المجتمع' in the summary but 'المجتمعية' in the digital_label ('الإدارة المجتمعية للري'), and likewise 'القائمة على المجتمع' in the fiji digital_label. Both are correct Arabic; flagging only for cross-batch terminology uniformity. Non-blocking.",
+        "suggested_replacement": ""
+      },
+      {
+        "severity": "minor",
+        "locale": "zh-Hans",
+        "project": "fiji-locally-managed-marine-area-network",
+        "field": "digital_label",
+        "problem": "'网络文档' overwhelmingly reads as 'web/online documentation' in Chinese, not 'documentation produced by the network'. The English 'network documentation' refers to the FLMMA network's own records, so the current wording asserts a delivery channel that the English does not.",
+        "suggested_replacement": "FLMMA 关于社区海洋管理的公开学习资料和该网络的相关文档"
+      },
+      {
+        "severity": "minor",
+        "locale": "zh-Hans",
+        "project": "lebanon-hima-network",
+        "field": "digital_label",
+        "problem": "'市政设立决定' adds 'establishment' (设立), a specificity absent from the English 'municipal declarations', and simultaneously renders 'declarations' as 'decisions' — the same word already used in the summary ('市政决定'). This both invents detail and erases the decisions/declarations distinction.",
+        "suggested_replacement": "SPNL 关于 Hima 网络、市政宣告和社区守护的公开资料"
+      },
+      {
+        "severity": "minor",
+        "locale": "zh-Hans",
+        "project": "lebanon-hima-network",
+        "field": "summary",
+        "problem": "'A Lebanese network of Hima sites' becomes '黎巴嫩的 Hima 网络', dropping 'sites'. The English scopes the network as a network composed of individual Hima sites; the Chinese reads as a single undifferentiated 'Hima network', weakening the site-level governance structure that the geographic label ('Hima 地点') depends on.",
+        "suggested_replacement": "黎巴嫩由各 Hima 地点组成的网络。各市镇与当地社区通过市政决定、社区守护以及扎根当地的保护和使用规则，建立并共同维护自然资源区域。"
+      },
+      {
+        "severity": "note",
+        "locale": "zh-Hans",
+        "project": "fiji-locally-managed-marine-area-network",
+        "field": "summary",
+        "problem": "'各地社区' adds '各地' ('in various localities'), which is not in the English 'communities'. The addition is benign and arguably implied by 'Fiji-wide', so it is non-blocking, but it is an unsupported quantifier.",
+        "suggested_replacement": ""
+      },
+      {
+        "severity": "note",
+        "locale": "zh-Hans",
+        "project": "kyrgyzstan-water-users-associations-union",
+        "field": "digital_label",
+        "problem": "'community-based' is rendered three ways across the locale: '以社区为基础的' (kyrgyzstan summary), '社区海洋管理' (fiji digital_label) and '社区灌溉管理' (here). The shortened forms are idiomatic and not wrong; flagged only for terminology uniformity. Non-blocking.",
+        "suggested_replacement": ""
+      },
+      {
+        "severity": "minor",
+        "locale": "hi",
+        "project": "fiji-locally-managed-marine-area-network",
+        "field": "summary",
+        "problem": "'समुदायें' is an ungrammatical plural: समुदाय is masculine and its plural is unchanged (समुदाय); the feminine -एँ plural is misapplied. Separately, 'स्थानीय रूप से प्रबंधित समुद्री क्षेत्रों की समुदायें' re-attaches the communities as belonging to the marine areas, whereas the English has communities acting within those areas under the network. The replacement fixes both.",
+        "suggested_replacement": "फिजी-व्यापी सहायता नेटवर्क, जिसमें समुदाय स्थानीय रूप से प्रबंधित समुद्री क्षेत्रों में प्रथागत और सामूहिक रूप से सहमत नियमों, स्थानीय निगरानी और साझा संरक्षकता के माध्यम से तटीय मत्स्य संसाधनों और समुद्री आवासों का प्रबंधन करते हैं।"
+      },
+      {
+        "severity": "note",
+        "locale": "hi",
+        "project": "lebanon-hima-network",
+        "field": "summary",
+        "problem": "'locally rooted conservation and use rules' is flattened to 'स्थानीय संरक्षण व उपयोग नियमों'. Shared with es, fr, pt-BR and ar; non-blocking.",
+        "suggested_replacement": ""
+      }
+    ],
+    "counts": {
+      "blocker": 0,
+      "major": 0,
+      "minor": 14,
+      "note": 9
+    },
+    "model_assisted": true,
+    "claims_native_or_human_review": false
+  },
+  "applied_minor_fixes": [
+    {
+      "locale": "es",
+      "project": "fiji-locally-managed-marine-area-network",
+      "field": "digital_label",
+      "before": "Materiales públicos de aprendizaje y documentación de FLMMA sobre gestión marina comunitaria",
+      "after": "Materiales públicos de aprendizaje y documentación de la red FLMMA sobre gestión marina comunitaria"
+    },
+    {
+      "locale": "es",
+      "project": "kyrgyzstan-water-users-associations-union",
+      "field": "geographic_labels.kyrgyzstan-wua-network",
+      "before": "Kirguistán — WUA miembros, sistemas de riego y áreas locales de uso del agua",
+      "after": "Kirguistán — asociaciones de usuarios del agua miembros, sistemas de riego y áreas locales de uso del agua"
+    },
+    {
+      "locale": "es",
+      "project": "fiji-locally-managed-marine-area-network",
+      "field": "summary",
+      "before": "Una red de apoyo de alcance nacional en Fiyi para áreas marinas gestionadas localmente, donde las comunidades emplean normas consuetudinarias y acordadas colectivamente, monitoreo local y responsabilidad compartida para gestionar pesquerías costeras y hábitats marinos.",
+      "after": "Una red de apoyo de alcance nacional en Fiyi para áreas marinas gestionadas localmente, donde las comunidades emplean normas consuetudinarias y acordadas colectivamente, monitoreo local y custodia compartida para gestionar pesquerías costeras y hábitats marinos."
+    },
+    {
+      "locale": "fr",
+      "project": "lebanon-hima-network",
+      "field": "summary",
+      "before": "Un réseau libanais de sites Hima où municipalités et communautés locales établissent et prennent soin d’espaces de ressources naturelles au moyen de décisions municipales, d’une garde communautaire et de règles locales de conservation et d’usage.",
+      "after": "Un réseau libanais de sites Hima où les municipalités et les communautés locales établissent et prennent soin d’espaces de ressources naturelles au moyen de décisions municipales, d’une garde communautaire et de règles locales de conservation et d’usage."
+    },
+    {
+      "locale": "pt-BR",
+      "project": "fiji-locally-managed-marine-area-network",
+      "field": "digital_label",
+      "before": "Materiais públicos de aprendizagem e documentação da FLMMA sobre gestão marinha comunitária",
+      "after": "Materiais públicos de aprendizagem e documentação da rede FLMMA sobre gestão marinha comunitária"
+    },
+    {
+      "locale": "pt-BR",
+      "project": "fiji-locally-managed-marine-area-network",
+      "field": "summary",
+      "before": "Uma rede de apoio em todo Fiji para áreas marinhas geridas localmente, nas quais comunidades usam regras consuetudinárias e acordadas coletivamente, monitoramento local e responsabilidade compartilhada para gerir pescarias costeiras e habitats marinhos.",
+      "after": "Uma rede de apoio em todo Fiji para áreas marinhas geridas localmente, nas quais as comunidades usam regras consuetudinárias e acordadas coletivamente, monitoramento local e responsabilidade compartilhada para gerir pescarias costeiras e habitats marinhos."
+    },
+    {
+      "locale": "ar",
+      "project": "fiji-locally-managed-marine-area-network",
+      "field": "digital_label",
+      "before": "مواد تعلم عامة ووثائق شبكية من FLMMA حول الإدارة البحرية القائمة على المجتمع",
+      "after": "مواد تعلّم عامة ووثائق شبكة FLMMA حول الإدارة البحرية القائمة على المجتمع"
+    },
+    {
+      "locale": "ar",
+      "project": "lebanon-hima-network",
+      "field": "digital_label",
+      "before": "وثائق عامة من SPNL حول شبكة الحِمى والقرارات البلدية والرعاية المجتمعية",
+      "after": "وثائق عامة من SPNL حول شبكة الحِمى وإعلانات البلديات والرعاية المجتمعية"
+    },
+    {
+      "locale": "ar",
+      "project": "kyrgyzstan-water-users-associations-union",
+      "field": "geographic_labels.kyrgyzstan-wua-network",
+      "before": "قيرغيزستان — جمعيات مستخدمي المياه الأعضاء وشبكات الري ومناطق استخدام المياه المحلية",
+      "after": "قيرغيزستان — جمعيات مستخدمي المياه الأعضاء وأنظمة الري ومناطق محلية لاستخدام المياه"
+    },
+    {
+      "locale": "ar",
+      "project": "fiji-locally-managed-marine-area-network",
+      "field": "geographic_labels.flmma-fiji-community-areas",
+      "before": "فيجي — مناطق بحرية مُدارة محلياً ومناطق qoliqoli ومصايد مجتمعية",
+      "after": "فيجي — مناطق بحرية مُدارة محلياً ومناطق القوليقولي (qoliqoli) ومصايد مجتمعية"
+    },
+    {
+      "locale": "zh-Hans",
+      "project": "fiji-locally-managed-marine-area-network",
+      "field": "digital_label",
+      "before": "FLMMA 关于社区海洋管理的公开学习资料和网络文档",
+      "after": "FLMMA 关于社区海洋管理的公开学习资料和该网络的相关文档"
+    },
+    {
+      "locale": "zh-Hans",
+      "project": "lebanon-hima-network",
+      "field": "digital_label",
+      "before": "SPNL 关于 Hima 网络、市政设立决定和社区守护的公开资料",
+      "after": "SPNL 关于 Hima 网络、市政宣告和社区守护的公开资料"
+    },
+    {
+      "locale": "zh-Hans",
+      "project": "lebanon-hima-network",
+      "field": "summary",
+      "before": "黎巴嫩的 Hima 网络。各市镇与当地社区通过市政决定、社区守护以及扎根当地的保护和使用规则，建立并共同维护自然资源区域。",
+      "after": "黎巴嫩由各 Hima 地点组成的网络。各市镇与当地社区通过市政决定、社区守护以及扎根当地的保护和使用规则，建立并共同维护自然资源区域。"
+    },
+    {
+      "locale": "hi",
+      "project": "fiji-locally-managed-marine-area-network",
+      "field": "summary",
+      "before": "फिजी-व्यापी सहायता नेटवर्क, जिसमें स्थानीय रूप से प्रबंधित समुद्री क्षेत्रों की समुदायें प्रथागत और सामूहिक रूप से सहमत नियमों, स्थानीय निगरानी और साझा संरक्षकता के माध्यम से तटीय मत्स्य संसाधनों और समुद्री आवासों का प्रबंधन करती हैं।",
+      "after": "फिजी-व्यापी सहायता नेटवर्क, जिसमें समुदाय स्थानीय रूप से प्रबंधित समुद्री क्षेत्रों में प्रथागत और सामूहिक रूप से सहमत नियमों, स्थानीय निगरानी और साझा संरक्षकता के माध्यम से तटीय मत्स्य संसाधनों और समुद्री आवासों का प्रबंधन करते हैं।"
+    }
+  ],
+  "review_boundary": {
+    "model_assisted": true,
+    "native_speaker_or_human_approval": false,
+    "manual_screen_reader_approval": false,
+    "full_wcag_conformance_claimed": false
+  }
+}

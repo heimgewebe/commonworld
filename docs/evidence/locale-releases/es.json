@@ -3,14 +3,14 @@
   "kind": "commonworld.ui_locale_release_evidence",
   "locale": "es",
   "status": "released",
-  "source_revision": "bae3229c2ff16305727650a21b64b791ab14a06e",
+  "source_revision": "ed4138d7bac6a6d399605515b0f60bbe07365bf5",
   "source_pack_sha256": "06e4c5c150bdf33e63d1becf47ef1f90f0b51a1d24b76725f44ff37ce07302f7",
   "reviewed_source_pack_sha256": "cf57400b0a0fbf818baa88f33001e95bc4c7c39bd00caef3505f4d9ab6c0f405",
-  "catalog_overlay_sha256": "71a1afb9b79ca42d2b9cfcd576d0f1a52e1245c4f2dee2e04411d6a5e424078a",
+  "catalog_overlay_sha256": "f2aaa30377639a180d709fc180e5feefbee5fb67afbb5f249efadfaf8407d27e",
   "surface_sha256": {
-    "index": "a0257e194ed270af0c629d41d8da946186c96784ebae562623dc8e655bb359e3",
-    "method": "955aaa58e8cf06a4e59599d46f3b0fd44a133c458779fea644c4f51c0d7aada8",
-    "proposal": "98801cfe26d35a5fa2010d76f383811ec85680f072325616f6666f9fe2628f60"
+    "index": "ac23fd8e3630020b3f4ab59350faf77b7e3a5ee7b31c5e3d9d69708b2cf8feee",
+    "method": "2fe2c6600c0489ec68a0b943ebce7e010dee5bf2d771ba776d58764aa41a6bf1",
+    "proposal": "623c8ee0a2fc6083e88cc4a10d9c25be280006a092d1edfc8920884c03c92450"
   },
   "gate_results": {
     "required_surfaces_passed": [
@@ -36,7 +36,7 @@
   "evidence_receipts": {
     "independent_language_review": {
       "source": "docs/evidence/locale-releases/receipts/shared/independent-language-review.json",
-      "sha256": "cdc83b1632716eee4e814095d22982da7cd526cb3d5a8aee9d449dac78d305c7"
+      "sha256": "6579c21ee6507f1be9e97744d8c4fe4f5e90d1e61a88bd9c9ccea4a95d643f92"
     },
     "keyboard_and_screen_reader_review": {
       "source": "docs/evidence/locale-releases/receipts/shared/keyboard-and-screen-reader-review.json",
@@ -44,7 +44,7 @@
     },
     "browser_smoke": {
       "source": "docs/evidence/locale-releases/receipts/shared/browser-smoke.json",
-      "sha256": "be9b5d2972e8d1dfd6ac42c9e87fec9bb8ad17e57e45770b726dd4ff41b7ec8b"
+      "sha256": "c5d58856804b213ebbe20a29c6cee4d9b6a82a334b1d7245265bc782a196b70d"
     },
     "state_preservation_smoke": {
       "source": "docs/evidence/locale-releases/receipts/shared/state-preservation-smoke.json",
@@ -60,5 +60,5 @@
     "findings_based": true,
     "post_fix_review_required": true
   },
-  "notes": "97-entry compact release bound to immutable release f3d2572d4895de706c36 and fresh shared lifecycle/review evidence. The three new batch-2 entries received independent model-assisted findings review and a digest-bound post-fix PASS with 0 blocker, 0 major and 0 minor findings. Automated locale lifecycle smoke passed 18/18 surfaces on the final release. No native-speaker, human language, manual screen-reader, manual visual or full WCAG approval is claimed."
+  "notes": "100-entry compact release bound to immutable release ded4dfca14888d649600 and fresh digest-bound language/lifecycle evidence. The three batch-3 entries received independent model-assisted findings review; 16 minor findings across the review sequence were remediated, and the final review passed with 0 blocker, 0 major and 0 minor findings (15 non-blocking notes). Automated locale lifecycle smoke passed 18/18 released surfaces. No native-speaker, human language, manual screen-reader, manual visual or full WCAG approval is claimed."
 }

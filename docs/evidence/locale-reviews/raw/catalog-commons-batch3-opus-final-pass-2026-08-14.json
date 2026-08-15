@@ -1,0 +1,217 @@
+{
+  "schema_version": 1,
+  "kind": "commonworld.incremental_catalog_locale_final_review",
+  "reviewer": "Claude Opus 5 via Claude Pro subscription",
+  "review_task_id": "4ad11389552648a297ac2ffb",
+  "review_task_lifecycle_receipt_sha256": "6b6c131c820335811fd1d9e6154ec5f517210b016810d5b6ead43999e52c8fa2",
+  "review_input": {
+    "path": "docs/evidence/locale-reviews/raw/catalog-commons-batch3-final-review-input-2026-08-14.json",
+    "sha256": "6ee2ae6f7fe5c12f13663d1b48d651ccd75635997f6de00636bbd1e3635d7fcc"
+  },
+  "review_stdout": {
+    "path": "/home/alex/.grabowski-task-output-4ad11389552648a297ac2ffb-a1/stdout.log",
+    "sha256": "67152f943cf0996f74b10b266b9f863b451fe1661405c45156f25428fa85367d"
+  },
+  "review": {
+    "verdict": "PASS",
+    "per_locale": {
+      "es": {
+        "verdict": "PASS",
+        "counts": {
+          "blocker": 0,
+          "major": 0,
+          "minor": 0,
+          "note": 2
+        },
+        "assessment": "All three objects are semantically faithful and idiomatic. Governance chain is complete: 'normas consuetudinarias y acordadas colectivamente', 'guardianía comunitaria' kept distinct from 'custodia comunitaria/compartida', and 'declaraciones municipales' kept distinct from 'decisiones municipales'. Access qualifier ('públicos/pública/pública información') survives in all three digital labels; the FLMMA network qualifier and the expanded WUA term are both present. 'riego dentro de las explotaciones' correctly scopes on-farm, and 'Fiyi'/'Kirguistán' are the correct Spanish exonyms. Remaining items are readability and source-nuance observations only."
+      },
+      "fr": {
+        "verdict": "PASS",
+        "counts": {
+          "blocker": 0,
+          "major": 0,
+          "minor": 0,
+          "note": 2
+        },
+        "assessment": "The applied Lebanon correction is verified: 'établissent des espaces de ressources naturelles et en prennent soin' gives 'établir' a well-formed direct object and resumes it with 'en' for 'prendre soin de', resolving the prior coordination defect without disturbing the instrument chain ('décisions municipales, garde communautaire, règles locales'). No regression elsewhere: 'à l’échelle des Fidji' takes the correct feminine-plural form, 'irrigation à la parcelle' is the standard on-farm term, 'lesquelles' unambiguously attaches the relative clause to the associations, 'la NUWUA' carries the right gender, and 'déclarations municipales' stays distinct from 'décisions municipales'. 'publiques/publique/Informations publiques' preserve the access nuance in all three digital labels."
+      },
+      "pt-BR": {
+        "verdict": "PASS",
+        "counts": {
+          "blocker": 0,
+          "major": 0,
+          "minor": 0,
+          "note": 2
+        },
+        "assessment": "The applied Lebanon correction is verified: 'estabelecem áreas de recursos naturais e cuidam delas' fixes the regência clash by giving 'cuidar de' its own pronominal complement, and 'os municípios e as comunidades locais' now matches the definite-article treatment used in this locale's Fiji summary. Governance and access nuance is intact throughout: 'guarda comunitária' vs 'responsabilidade comunitária', 'declarações municipais' vs 'decisões municipais', 'irrigação dentro das propriedades' for on-farm, and 'públicos/pública/Informações públicas' in all three digital labels. Remaining items are register and attachment-clarity observations."
+      },
+      "ar": {
+        "verdict": "PASS",
+        "counts": {
+          "blocker": 0,
+          "major": 0,
+          "minor": 0,
+          "note": 3
+        },
+        "assessment": "All three objects are accurate and well-formed MSA. 'وثائق شبكة FLMMA' reads as network documentation via a correct idafa, 'إعلانات البلديات' preserves the declarations/decisions contrast against 'قرارات بلدية', 'تنشئ … وتتولى رعايتها' renders establish-and-steward cleanly, and 'شبكات الري داخل المزارع' keeps the on-farm scoping. No script or direction regression: the Latin acronyms FLMMA/SPNL/NUWUA and the parenthesized '(qoliqoli)' sit at ordinary bidi boundaries with Arabic text on both sides, the Arabic-script anchor 'القوليقولي' precedes the Latin token, and the 'الحِمى' diacritic is preserved consistently across summary, geographic label and digital label."
+      },
+      "zh-Hans": {
+        "verdict": "PASS",
+        "counts": {
+          "blocker": 0,
+          "major": 0,
+          "minor": 0,
+          "note": 3
+        },
+        "assessment": "All three objects are faithful and idiomatic. '该网络的相关文档' asserts no delivery channel, '市政宣告' preserves the declarations/decisions contrast against '市政决定', and '黎巴嫩由各 Hima 地点组成的网络' supports the site-level geographic label. This is the only locale that preserves 'locally rooted' ('扎根当地'). Sector terminology is correct throughout ('近岸渔业', '田间灌溉系统', '用水者协会'), and the access qualifier appears as '公开' in all three digital labels. Latin tokens (qoliqoli, Hima, FLMMA, SPNL, NUWUA) are spaced correctly inside the Han text and the em-dash separator '——' is used consistently in the geographic labels."
+      },
+      "hi": {
+        "verdict": "PASS",
+        "counts": {
+          "blocker": 0,
+          "major": 0,
+          "minor": 0,
+          "note": 3
+        },
+        "assessment": "All three objects are grammatical and semantically complete. Agreement is correct throughout ('समुदाय … करते हैं', 'ये संघ … करते हैं'), and hi keeps the sharpest governance distinctions in the batch: 'नगरपालिका निर्णयों' vs 'नगरपालिका घोषणाओं', 'खेत-स्तरीय' for on-farm, and 'सार्वजनिक' in all three digital labels. The semicolon in the Kyrgyzstan summary cleanly separates the national body from the member associations, and Devanagari is LTR so the embedded Latin tokens (qoliqoli, FLMMA, SPNL, NUWUA) carry no direction risk. Remaining items are terminology-granularity observations."
+      }
+    },
+    "findings": [
+      {
+        "severity": "note",
+        "locale": "es",
+        "project": "lebanon-hima-network",
+        "field": "summary",
+        "problem": "'locally rooted conservation and use rules' is flattened to 'normas locales de conservación y uso', which asserts local scope rather than local origin. Independently confirmed as shared with fr ('règles locales'), pt-BR ('regras locais'), ar ('قواعد محلية') and hi ('स्थानीय संरक्षण व उपयोग नियमों'); zh-Hans is the only locale that preserves the rootedness sense with '扎根当地'. The governance claim (community-authored rules) survives in every case, so this is non-blocking.",
+        "suggested_replacement": ""
+      },
+      {
+        "severity": "note",
+        "locale": "es",
+        "project": "kyrgyzstan-water-users-associations-union",
+        "field": "geographic_labels.kyrgyzstan-wua-network",
+        "problem": "'asociaciones de usuarios del agua miembros' expands the acronym correctly but produces a long postmodified head. Number agreement makes the attachment of 'miembros' unambiguous, so this is readability only; a fronted variant such as 'asociaciones miembros de usuarios del agua' would scan better. pt-BR carries the same shape ('associações de usuários de água membros'). Non-blocking.",
+        "suggested_replacement": ""
+      },
+      {
+        "severity": "note",
+        "locale": "fr",
+        "project": "fiji-locally-managed-marine-area-network",
+        "field": "summary",
+        "problem": "'stewardship' maps to 'responsabilité' across this locale ('responsabilité partagée' here, 'espaces associés de responsabilité communautaire' and 'la responsabilité communautaire' in the Lebanon label and digital label). The mapping is internally consistent and no access or governance claim is lost, but 'responsabilité' denotes accountability rather than the active care carried by 'intendance' or 'gestion attentionnée'. Non-blocking.",
+        "suggested_replacement": ""
+      },
+      {
+        "severity": "note",
+        "locale": "fr",
+        "project": "kyrgyzstan-water-users-associations-union",
+        "field": "geographic_labels.kyrgyzstan-wua-network",
+        "problem": "'AUE membres' keeps an unexpanded acronym where es expanded the same English token. This is not the defect that was corrected in es: the English label itself uses 'member WUAs' unexpanded, 'AUE' is the established French term in francophone water-governance literature (unlike an untranslated English 'WUA' inside Spanish text), and the locale's own summary supplies 'associations communautaires d’usagers de l’eau'. Flagged only because the batch now handles the acronym two ways. Non-blocking.",
+        "suggested_replacement": ""
+      },
+      {
+        "severity": "note",
+        "locale": "pt-BR",
+        "project": "fiji-locally-managed-marine-area-network",
+        "field": "summary",
+        "problem": "Two register observations, neither semantic: 'geridas'/'gerir' reads as European Portuguese where pt-BR resource-governance texts often prefer 'manejadas'/'manejar' (the other two entries use 'gestão', so the batch stays internally consistent), and 'em todo Fiji' omits the article that standard written pt-BR would often supply ('em todo o Fiji'), though the articleless treatment is consistent with the usual 'em Fiji'. Non-blocking.",
+        "suggested_replacement": ""
+      },
+      {
+        "severity": "note",
+        "locale": "pt-BR",
+        "project": "kyrgyzstan-water-users-associations-union",
+        "field": "summary",
+        "problem": "'associações comunitárias de usuários de água, que organizam os usuários' uses a bare 'que' whose antecedent is formally ambiguous between 'associações' and 'usuários', both plural. Semantics resolve it immediately (users do not organize users), and the English 'which' is equally structural, but 'as quais' would disambiguate as fr does with 'lesquelles'. Non-blocking.",
+        "suggested_replacement": ""
+      },
+      {
+        "severity": "note",
+        "locale": "ar",
+        "project": "fiji-locally-managed-marine-area-network",
+        "field": "digital_label",
+        "problem": "Two observations on 'مواد تعلّم عامة ووثائق شبكة FLMMA': 'مواد تعليمية' is the more established collocation for 'learning material' than 'مواد تعلّم', and the access adjective 'عامة' is formally attached only to the first conjunct, since the definite-by-annexation idafa 'وثائق شبكة FLMMA' cannot itself carry an indefinite adjective. Coordination makes the public scoping the natural reading and no contrary access claim is made; the same first-conjunct attachment occurs in es, fr and pt-BR ('públicos', 'publiques', 'públicos'). Non-blocking.",
+        "suggested_replacement": ""
+      },
+      {
+        "severity": "note",
+        "locale": "ar",
+        "project": "fiji-locally-managed-marine-area-network",
+        "field": "summary",
+        "problem": "'local monitoring' is rendered 'المراقبة المحلية'. 'المراقبة' leans toward surveillance/watching, where 'الرصد المحلي' is the standard term in Arabic environmental and fisheries-monitoring usage. The community-monitoring sense is still recoverable in context. Non-blocking.",
+        "suggested_replacement": ""
+      },
+      {
+        "severity": "note",
+        "locale": "ar",
+        "project": "kyrgyzstan-water-users-associations-union",
+        "field": "summary",
+        "problem": "The single English term 'irrigation systems' surfaces two ways inside this locale: 'شبكات الري داخل المزارع' in the summary and 'أنظمة الري' in the geographic label. Both are defensible Arabic and the on-farm scoping is intact in the summary; this is a uniformity observation only. Non-blocking.",
+        "suggested_replacement": ""
+      },
+      {
+        "severity": "note",
+        "locale": "zh-Hans",
+        "project": "fiji-locally-managed-marine-area-network",
+        "field": "summary",
+        "problem": "'各地社区' adds '各地', a distributive quantifier with no counterpart in the English 'communities', though it is arguably implied by 'Fiji-wide'. Separately, splitting the source sentence in two moves 'for locally managed marine areas' out of the network's own description and into the clause describing where communities act; hi does the same and the English attachment is itself ambiguous. Non-blocking.",
+        "suggested_replacement": ""
+      },
+      {
+        "severity": "note",
+        "locale": "zh-Hans",
+        "project": "lebanon-hima-network",
+        "field": "digital_label",
+        "problem": "'市政宣告' correctly restores the declarations/decisions contrast against '市政决定', but '宣告' is more natural as a verb than as a noun in institutional Chinese, where '公告' is the usual nominal form. The locale also alternates '市镇' (summary) and '市政' (digital label) for 'municipal'. Meaning is unambiguous in both cases. Non-blocking.",
+        "suggested_replacement": ""
+      },
+      {
+        "severity": "note",
+        "locale": "zh-Hans",
+        "project": "lebanon-hima-network",
+        "field": "summary",
+        "problem": "'community guardianship' (summary) and 'community stewardship' (geographic label, digital label) both surface as '社区守护', collapsing a distinction that es, fr, pt-BR and ar keep; hi collapses the same pair as 'सामुदायिक संरक्षकता'. Within the same sentence 'steward' as a verb is rendered '共同维护', so the locale uses two forms for one English root. The terms are near-synonymous in the source and no governance or access claim is lost. Non-blocking.",
+        "suggested_replacement": ""
+      },
+      {
+        "severity": "note",
+        "locale": "hi",
+        "project": "lebanon-hima-network",
+        "field": "summary",
+        "problem": "'लेबनान में हिमा स्थलों का एक नेटवर्क' renders 'a network of Hima sites in Lebanon' rather than the source's attributive 'A Lebanese network of Hima sites', which es, fr, pt-BR, ar and zh-Hans all preserve. The locational reading is materially equivalent for this catalog entry and no claim about the network's national character is contradicted. Non-blocking.",
+        "suggested_replacement": ""
+      },
+      {
+        "severity": "note",
+        "locale": "hi",
+        "project": "kyrgyzstan-water-users-associations-union",
+        "field": "summary",
+        "problem": "'संघ' carries both 'union' ('राष्ट्रीय संघ') and 'associations' ('जल उपयोगकर्ता संघों') in one sentence. 'जल उपयोगकर्ता संघ' is the established Indian irrigation term for a WUA, and the two tiers stay distinguishable through 'राष्ट्रीय' and the semicolon-separated clause, but 'महासंघ' for the national body would mark the tier explicitly. Non-blocking.",
+        "suggested_replacement": ""
+      },
+      {
+        "severity": "note",
+        "locale": "hi",
+        "project": "fiji-locally-managed-marine-area-network",
+        "field": "geographic_labels.flmma-fiji-community-areas",
+        "problem": "'qoliqoli' is retained in bare Latin script inside a Devanagari string, where ar received a script-anchored treatment ('مناطق القوليقولي (qoliqoli)'). Devanagari is LTR so there is no bidi rendering risk and the token is unchanged from earlier revisions, so this is not a regression; a parenthetical Devanagari transliteration would still aid readers. zh-Hans retains the Latin form on the same basis. Non-blocking.",
+        "suggested_replacement": ""
+      }
+    ],
+    "counts": {
+      "blocker": 0,
+      "major": 0,
+      "minor": 0,
+      "note": 15
+    },
+    "model_assisted": true,
+    "claims_native_or_human_review": false
+  },
+  "review_boundary": {
+    "model_assisted": true,
+    "native_speaker_or_human_approval": false,
+    "manual_screen_reader_approval": false,
+    "manual_visual_approval": false,
+    "full_wcag_conformance_claimed": false
+  }
+}

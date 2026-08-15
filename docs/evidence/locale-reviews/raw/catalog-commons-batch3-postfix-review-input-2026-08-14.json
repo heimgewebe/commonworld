@@ -1,0 +1,195 @@
+{
+  "schema_version": 1,
+  "kind": "commonworld.incremental_catalog_locale_postfix_review_input",
+  "project_ids": [
+    "fiji-locally-managed-marine-area-network",
+    "lebanon-hima-network",
+    "kyrgyzstan-water-users-associations-union"
+  ],
+  "target_locales": [
+    "es",
+    "fr",
+    "pt-BR",
+    "ar",
+    "zh-Hans",
+    "hi"
+  ],
+  "english_reference": {
+    "fiji-locally-managed-marine-area-network": {
+      "summary": "A Fiji-wide support network for locally managed marine areas in which communities use customary and collectively agreed rules, local monitoring and shared stewardship to manage inshore fisheries and marine habitats.",
+      "geographic_labels": {
+        "flmma-fiji-community-areas": "Fiji — locally managed marine areas, qoliqoli and community fishing grounds"
+      },
+      "digital_label": "Public FLMMA learning material and network documentation on community-based marine management"
+    },
+    "lebanon-hima-network": {
+      "summary": "A Lebanese network of Hima sites in which municipalities and local communities establish and steward natural-resource areas through municipal decisions, community guardianship and locally rooted conservation and use rules.",
+      "geographic_labels": {
+        "lebanon-hima-network-sites": "Lebanon — Hima sites and associated community stewardship areas"
+      },
+      "digital_label": "Public SPNL documentation on the Hima network, municipal declarations and community stewardship"
+    },
+    "kyrgyzstan-water-users-associations-union": {
+      "summary": "A national union in Kyrgyzstan that supports community-based water users’ associations which organize water users, collectively maintain on-farm irrigation systems, coordinate joint action and represent members’ water-management interests.",
+      "geographic_labels": {
+        "kyrgyzstan-wua-network": "Kyrgyzstan — member WUAs, irrigation systems and local water-use areas"
+      },
+      "digital_label": "Public information on NUWUA, water users’ associations and community-based irrigation management in Kyrgyzstan"
+    }
+  },
+  "target_translations": {
+    "es": {
+      "fiji-locally-managed-marine-area-network": {
+        "summary": "Una red de apoyo de alcance nacional en Fiyi para áreas marinas gestionadas localmente, donde las comunidades emplean normas consuetudinarias y acordadas colectivamente, monitoreo local y custodia compartida para gestionar pesquerías costeras y hábitats marinos.",
+        "geographic_labels": {
+          "flmma-fiji-community-areas": "Fiyi — áreas marinas gestionadas localmente, qoliqoli y zonas de pesca comunitarias"
+        },
+        "digital_label": "Materiales públicos de aprendizaje y documentación de la red FLMMA sobre gestión marina comunitaria"
+      },
+      "lebanon-hima-network": {
+        "summary": "Una red libanesa de sitios Hima en los que municipios y comunidades locales crean y cuidan áreas de recursos naturales mediante decisiones municipales, guardianía comunitaria y normas locales de conservación y uso.",
+        "geographic_labels": {
+          "lebanon-hima-network-sites": "Líbano — sitios Hima y áreas asociadas de custodia comunitaria"
+        },
+        "digital_label": "Documentación pública de SPNL sobre la red Hima, declaraciones municipales y custodia comunitaria"
+      },
+      "kyrgyzstan-water-users-associations-union": {
+        "summary": "Una unión nacional de Kirguistán que apoya asociaciones comunitarias de usuarios del agua, las cuales organizan a los usuarios, mantienen colectivamente sistemas de riego dentro de las explotaciones, coordinan acciones conjuntas y representan los intereses de sus miembros en la gestión del agua.",
+        "geographic_labels": {
+          "kyrgyzstan-wua-network": "Kirguistán — asociaciones de usuarios del agua miembros, sistemas de riego y áreas locales de uso del agua"
+        },
+        "digital_label": "Información pública sobre NUWUA, asociaciones de usuarios del agua y gestión comunitaria del riego en Kirguistán"
+      }
+    },
+    "fr": {
+      "fiji-locally-managed-marine-area-network": {
+        "summary": "Un réseau de soutien à l’échelle des Fidji pour des zones marines gérées localement, où les communautés s’appuient sur des règles coutumières et convenues collectivement, le suivi local et une responsabilité partagée pour gérer les pêcheries côtières et les habitats marins.",
+        "geographic_labels": {
+          "flmma-fiji-community-areas": "Fidji — zones marines gérées localement, qoliqoli et zones de pêche communautaires"
+        },
+        "digital_label": "Ressources publiques d’apprentissage et documentation du réseau FLMMA sur la gestion marine communautaire"
+      },
+      "lebanon-hima-network": {
+        "summary": "Un réseau libanais de sites Hima où les municipalités et les communautés locales établissent et prennent soin d’espaces de ressources naturelles au moyen de décisions municipales, d’une garde communautaire et de règles locales de conservation et d’usage.",
+        "geographic_labels": {
+          "lebanon-hima-network-sites": "Liban — sites Hima et espaces associés de responsabilité communautaire"
+        },
+        "digital_label": "Documentation publique de la SPNL sur le réseau Hima, les déclarations municipales et la responsabilité communautaire"
+      },
+      "kyrgyzstan-water-users-associations-union": {
+        "summary": "Une union nationale au Kirghizistan qui soutient des associations communautaires d’usagers de l’eau, lesquelles organisent les usagers, entretiennent collectivement les systèmes d’irrigation à la parcelle, coordonnent l’action commune et représentent les intérêts de leurs membres dans la gestion de l’eau.",
+        "geographic_labels": {
+          "kyrgyzstan-wua-network": "Kirghizistan — AUE membres, systèmes d’irrigation et zones locales d’usage de l’eau"
+        },
+        "digital_label": "Informations publiques sur la NUWUA, les associations d’usagers de l’eau et la gestion communautaire de l’irrigation au Kirghizistan"
+      }
+    },
+    "pt-BR": {
+      "fiji-locally-managed-marine-area-network": {
+        "summary": "Uma rede de apoio em todo Fiji para áreas marinhas geridas localmente, nas quais as comunidades usam regras consuetudinárias e acordadas coletivamente, monitoramento local e responsabilidade compartilhada para gerir pescarias costeiras e habitats marinhos.",
+        "geographic_labels": {
+          "flmma-fiji-community-areas": "Fiji — áreas marinhas geridas localmente, qoliqoli e zonas de pesca comunitárias"
+        },
+        "digital_label": "Materiais públicos de aprendizagem e documentação da rede FLMMA sobre gestão marinha comunitária"
+      },
+      "lebanon-hima-network": {
+        "summary": "Uma rede libanesa de locais Hima em que municípios e comunidades locais estabelecem e cuidam de áreas de recursos naturais por meio de decisões municipais, guarda comunitária e regras locais de conservação e uso.",
+        "geographic_labels": {
+          "lebanon-hima-network-sites": "Líbano — locais Hima e áreas associadas de responsabilidade comunitária"
+        },
+        "digital_label": "Documentação pública da SPNL sobre a rede Hima, declarações municipais e responsabilidade comunitária"
+      },
+      "kyrgyzstan-water-users-associations-union": {
+        "summary": "Uma união nacional no Quirguistão que apoia associações comunitárias de usuários de água, que organizam os usuários, mantêm coletivamente sistemas de irrigação dentro das propriedades, coordenam ações conjuntas e representam os interesses dos membros na gestão da água.",
+        "geographic_labels": {
+          "kyrgyzstan-wua-network": "Quirguistão — associações de usuários de água membros, sistemas de irrigação e áreas locais de uso da água"
+        },
+        "digital_label": "Informações públicas sobre a NUWUA, associações de usuários de água e gestão comunitária da irrigação no Quirguistão"
+      }
+    },
+    "ar": {
+      "fiji-locally-managed-marine-area-network": {
+        "summary": "شبكة دعم على مستوى فيجي للمناطق البحرية المُدارة محلياً، تستخدم فيها المجتمعات القواعد العرفية والمتفق عليها جماعياً والمراقبة المحلية والإشراف المشترك لإدارة مصايد الأسماك الساحلية والموائل البحرية.",
+        "geographic_labels": {
+          "flmma-fiji-community-areas": "فيجي — مناطق بحرية مُدارة محلياً ومناطق القوليقولي (qoliqoli) ومصايد مجتمعية"
+        },
+        "digital_label": "مواد تعلّم عامة ووثائق شبكة FLMMA حول الإدارة البحرية القائمة على المجتمع"
+      },
+      "lebanon-hima-network": {
+        "summary": "شبكة لبنانية من مواقع الحِمى، تنشئ فيها البلديات والمجتمعات المحلية مناطق للموارد الطبيعية وتتولى رعايتها عبر قرارات بلدية وحراسة مجتمعية وقواعد محلية للحماية والاستخدام.",
+        "geographic_labels": {
+          "lebanon-hima-network-sites": "لبنان — مواقع الحِمى ومناطق الرعاية المجتمعية المرتبطة بها"
+        },
+        "digital_label": "وثائق عامة من SPNL حول شبكة الحِمى وإعلانات البلديات والرعاية المجتمعية"
+      },
+      "kyrgyzstan-water-users-associations-union": {
+        "summary": "اتحاد وطني في قيرغيزستان يدعم جمعيات مستخدمي المياه القائمة على المجتمع، التي تنظّم المستخدمين وتتشارك صيانة شبكات الري داخل المزارع وتنسّق العمل المشترك وتمثل مصالح أعضائها في إدارة المياه.",
+        "geographic_labels": {
+          "kyrgyzstan-wua-network": "قيرغيزستان — جمعيات مستخدمي المياه الأعضاء وأنظمة الري ومناطق محلية لاستخدام المياه"
+        },
+        "digital_label": "معلومات عامة عن NUWUA وجمعيات مستخدمي المياه والإدارة المجتمعية للري في قيرغيزستان"
+      }
+    },
+    "zh-Hans": {
+      "fiji-locally-managed-marine-area-network": {
+        "summary": "一个覆盖斐济的支持网络。各地社区在本地管理的海洋区域中运用习惯规则和集体商定的规则、地方监测与共同守护，管理近岸渔业和海洋栖息地。",
+        "geographic_labels": {
+          "flmma-fiji-community-areas": "斐济——本地管理的海洋区域、qoliqoli 与社区渔场"
+        },
+        "digital_label": "FLMMA 关于社区海洋管理的公开学习资料和该网络的相关文档"
+      },
+      "lebanon-hima-network": {
+        "summary": "黎巴嫩由各 Hima 地点组成的网络。各市镇与当地社区通过市政决定、社区守护以及扎根当地的保护和使用规则，建立并共同维护自然资源区域。",
+        "geographic_labels": {
+          "lebanon-hima-network-sites": "黎巴嫩——Hima 地点及相关社区守护区域"
+        },
+        "digital_label": "SPNL 关于 Hima 网络、市政宣告和社区守护的公开资料"
+      },
+      "kyrgyzstan-water-users-associations-union": {
+        "summary": "吉尔吉斯斯坦的全国性联盟，支持以社区为基础的用水者协会。这些协会组织用水者，共同维护田间灌溉系统，协调联合行动，并代表成员在水资源管理中的利益。",
+        "geographic_labels": {
+          "kyrgyzstan-wua-network": "吉尔吉斯斯坦——成员用水者协会、灌溉系统及地方用水区域"
+        },
+        "digital_label": "关于 NUWUA、用水者协会以及吉尔吉斯斯坦社区灌溉管理的公开信息"
+      }
+    },
+    "hi": {
+      "fiji-locally-managed-marine-area-network": {
+        "summary": "फिजी-व्यापी सहायता नेटवर्क, जिसमें समुदाय स्थानीय रूप से प्रबंधित समुद्री क्षेत्रों में प्रथागत और सामूहिक रूप से सहमत नियमों, स्थानीय निगरानी और साझा संरक्षकता के माध्यम से तटीय मत्स्य संसाधनों और समुद्री आवासों का प्रबंधन करते हैं।",
+        "geographic_labels": {
+          "flmma-fiji-community-areas": "फिजी — स्थानीय रूप से प्रबंधित समुद्री क्षेत्र, qoliqoli और सामुदायिक मत्स्य क्षेत्र"
+        },
+        "digital_label": "समुदाय-आधारित समुद्री प्रबंधन पर FLMMA की सार्वजनिक शिक्षण सामग्री और नेटवर्क दस्तावेज़"
+      },
+      "lebanon-hima-network": {
+        "summary": "लेबनान में हिमा स्थलों का एक नेटवर्क, जहाँ नगरपालिकाएँ और स्थानीय समुदाय नगरपालिका निर्णयों, सामुदायिक संरक्षकता और स्थानीय संरक्षण व उपयोग नियमों के माध्यम से प्राकृतिक संसाधन क्षेत्रों की स्थापना और देखरेख करते हैं।",
+        "geographic_labels": {
+          "lebanon-hima-network-sites": "लेबनान — हिमा स्थल और उनसे जुड़े सामुदायिक संरक्षकता क्षेत्र"
+        },
+        "digital_label": "हिमा नेटवर्क, नगरपालिका घोषणाओं और सामुदायिक संरक्षकता पर SPNL के सार्वजनिक दस्तावेज़"
+      },
+      "kyrgyzstan-water-users-associations-union": {
+        "summary": "किर्गिज़स्तान का एक राष्ट्रीय संघ, जो समुदाय-आधारित जल उपयोगकर्ता संघों को समर्थन देता है; ये संघ जल उपयोगकर्ताओं को संगठित करते हैं, खेत-स्तरीय सिंचाई प्रणालियों का सामूहिक रखरखाव करते हैं, संयुक्त कार्रवाई का समन्वय करते हैं और जल प्रबंधन में सदस्यों के हितों का प्रतिनिधित्व करते हैं।",
+        "geographic_labels": {
+          "kyrgyzstan-wua-network": "किर्गिज़स्तान — सदस्य जल उपयोगकर्ता संघ, सिंचाई प्रणालियाँ और स्थानीय जल-उपयोग क्षेत्र"
+        },
+        "digital_label": "NUWUA, जल उपयोगकर्ता संघों और किर्गिज़स्तान में समुदाय-आधारित सिंचाई प्रबंधन पर सार्वजनिक जानकारी"
+      }
+    }
+  },
+  "prior_findings": {
+    "path": "docs/evidence/locale-reviews/raw/catalog-commons-batch3-opus-findings-2026-08-14.json",
+    "sha256": "041a4e3a786e3c8df948df74ff6d67e39d48ec6073aeb38472f68c73827da341",
+    "applied_minor_count": 14,
+    "retained_note_count": 9
+  },
+  "review_scope": {
+    "requirements": [
+      "verify all prior blocker/major/minor issues are resolved",
+      "check corrected strings for new semantic or fluency regressions",
+      "preserve public/network/site-level/governance qualifiers from English reference",
+      "notes may remain non-blocking when materially faithful"
+    ],
+    "output_requirement": "zero blocker/major/minor required for pass"
+  }
+}
