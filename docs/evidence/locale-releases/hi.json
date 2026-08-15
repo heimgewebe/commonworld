@@ -8,9 +8,9 @@
   "reviewed_source_pack_sha256": "cf57400b0a0fbf818baa88f33001e95bc4c7c39bd00caef3505f4d9ab6c0f405",
   "catalog_overlay_sha256": "63731132bbce7bdd171ac7955d7a16c01edbf4217573a6e83e2b4619db5eb688",
   "surface_sha256": {
-    "index": "c8da6ad1c64a95239a1e967f815c7803d42b5a8152861f9f453dbf6c73c5c3a0",
-    "method": "4a0e7ffb57a59943236ef18ccab88800af6db8132eb6b5cdf770a28ede9e16ef",
-    "proposal": "c1343b4a1204a1058477c43443938a9a92550bf9a1b6e82f52bc0254a78a7b3e"
+    "index": "219e3e3a5bfee6cc0dc58435f63f05800bedcd6841b9b8b39e6e886eaa71b990",
+    "method": "06ed24704942958befc29f9722c2de1712e39b459be256bc17672d3603a380a5",
+    "proposal": "f9148bacbef8b6d3792dfc1a09854800a6e1c465773f671802cf6119d97cfe49"
   },
   "gate_results": {
     "required_surfaces_passed": [
@@ -44,7 +44,7 @@
     },
     "browser_smoke": {
       "source": "docs/evidence/locale-releases/receipts/shared/browser-smoke.json",
-      "sha256": "1f07a88c6b820a2c734c19898a64e4432ebb4b8fe81850c406b2352ce1a43e0e"
+      "sha256": "488b0aa827fc0cc1886e624038c20946a88c836e58c0d34607238f62168c8a6e"
     },
     "state_preservation_smoke": {
       "source": "docs/evidence/locale-releases/receipts/shared/state-preservation-smoke.json",
@@ -60,5 +60,5 @@
     "findings_based": true,
     "post_fix_review_required": true
   },
-  "notes": "100-entry compact release bound to immutable release 5a19ef727796723bd73e and fresh digest-bound language/lifecycle evidence. The three batch-3 entries received independent model-assisted findings review; 16 minor findings across the review sequence were remediated, and the final review passed with 0 blocker, 0 major and 0 minor findings (15 non-blocking notes). Automated locale lifecycle smoke passed 18/18 released surfaces. No native-speaker, human language, manual screen-reader, manual visual or full WCAG approval is claimed."
+  "notes": "100-entry compact release bound to immutable release f536a374dd54a2103184 and fresh digest-bound language/lifecycle evidence. The three batch-3 entries received independent model-assisted findings review; 16 minor findings across the review sequence were remediated, and the final review passed with 0 blocker, 0 major and 0 minor findings (15 non-blocking notes). Automated locale lifecycle smoke passed 18/18 released surfaces. No native-speaker, human language, manual screen-reader, manual visual or full WCAG approval is claimed."
 }

@@ -33,7 +33,7 @@
       "page": "es.html",
       "locale": "es",
       "surface": "globe",
-      "mapRenders": 24,
+      "mapRenders": 26,
       "verdict": "PASS"
     },
     {
@@ -59,7 +59,7 @@
       "page": "pt-BR.html",
       "locale": "pt-BR",
       "surface": "globe",
-      "mapRenders": 25,
+      "mapRenders": 24,
       "verdict": "PASS"
     },
     {
@@ -72,7 +72,7 @@
       "page": "ar.html",
       "locale": "ar",
       "surface": "globe",
-      "mapRenders": 25,
+      "mapRenders": 24,
       "verdict": "PASS"
     },
     {
@@ -85,7 +85,7 @@
       "page": "zh-Hans.html",
       "locale": "zh-Hans",
       "surface": "globe",
-      "mapRenders": 24,
+      "mapRenders": 25,
       "verdict": "PASS"
     },
     {

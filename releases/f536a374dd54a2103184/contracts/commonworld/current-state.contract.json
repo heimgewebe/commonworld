@@ -1,7 +1,7 @@
 {
   "schema_version": 2,
   "kind": "commonworld_current_public_state",
-  "current_as_of": "2026-08-14",
+  "current_as_of": "2026-08-15",
   "precedence": {
     "current_operational_truth": "this contract",
     "catalog_truth": "catalog/catalog.json and the referenced CommonProject records",
