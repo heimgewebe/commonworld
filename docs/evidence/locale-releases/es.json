@@ -8,9 +8,9 @@
   "reviewed_source_pack_sha256": "cf57400b0a0fbf818baa88f33001e95bc4c7c39bd00caef3505f4d9ab6c0f405",
   "catalog_overlay_sha256": "f2aaa30377639a180d709fc180e5feefbee5fb67afbb5f249efadfaf8407d27e",
   "surface_sha256": {
-    "index": "29ab0db3cb8f29c1dc0bb38570dfe34db523a48087281b3e59ce7910e3058afa",
-    "method": "90ba96554863fcf7577f35826d17721acdc0d685c35ac2dc5337cb038209cea8",
-    "proposal": "fe475d99b8793b37da027591897a39eb82f03cf6e8bfc5c15b430c0f3e1c1434"
+    "index": "2928fbf7ac6f69c606ae454485006cd74667c98f4fef351123a3683c80be1978",
+    "method": "600d555f950a46dc558ec090c0f3752533b0071739d53b76108bc65c230a5d20",
+    "proposal": "bf66269bfd12c5fbb770b0d56f8189e72e68330bf843c886c554b48cbfe1874b"
   },
   "gate_results": {
     "required_surfaces_passed": [
@@ -60,5 +60,5 @@
     "findings_based": true,
     "post_fix_review_required": true
   },
-  "notes": "100-entry compact release bound to immutable release f536a374dd54a2103184 and fresh digest-bound language/lifecycle evidence. The three batch-3 entries received independent model-assisted findings review; 16 minor findings across the review sequence were remediated, and the final review passed with 0 blocker, 0 major and 0 minor findings (15 non-blocking notes). Automated locale lifecycle smoke passed 18/18 released surfaces. No native-speaker, human language, manual screen-reader, manual visual or full WCAG approval is claimed."
+  "notes": "The language/editorial and locale-specific accessibility/browser receipts remain bound to immutable release f536a374dd54a2103184. The current surface_sha256 values were rebound after a presentation-only digital-ring SVG/CSS fix; language packs, reviewed source packs and catalog overlays are unchanged. The earlier locale lifecycle smoke passed 18/18 released surfaces for that reviewed release. No fresh locale-specific visual/browser, native-speaker, human language, manual screen-reader, manual visual or full WCAG approval is claimed by this surface rebinding; current generic browser smoke covers shared runtime behavior only."
 }

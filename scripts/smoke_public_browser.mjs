@@ -840,6 +840,13 @@ async function startupAndRingOrbitScenario() {
   const rings = await run.page.evaluate(() => {
     return [...document.querySelectorAll('#sphere-rings .sphere-ring-plane')].map((plane) => {
       const style = getComputedStyle(plane);
+      const guideGroup = plane.querySelector('.sphere-ring-guides');
+      const guideStyle = guideGroup ? getComputedStyle(guideGroup) : null;
+      const text = plane.querySelector('.sphere-ring-text');
+      const textStyle = text ? getComputedStyle(text) : null;
+      const textRect = text?.getBoundingClientRect();
+      const sphereRect = document.querySelector('#digital-sphere')?.getBoundingClientRect();
+      const sphereScale = (sphereRect?.width ?? 0) / 640;
       const names = [...plane.querySelectorAll('.sphere-ring-name[data-commonproject-id]')].map((node) => ({
         id: node.dataset.commonprojectId,
         visibleText: node.dataset.visibleLabel ?? node.textContent.trim(),
@@ -851,10 +858,20 @@ async function startupAndRingOrbitScenario() {
         orbitDuration: Number(plane.dataset.orbitDuration),
         directionVariable: plane.style.getPropertyValue('--ring-orbit-direction').trim(),
         startAngleVariable: plane.style.getPropertyValue('--ring-orbit-start-angle').trim(),
-        animationName: style.animationName,
-        animationDurationSeconds: Number.parseFloat(style.animationDuration),
-        animationIterationCount: style.animationIterationCount,
-        animationPlayState: style.animationPlayState,
+        animationName: guideStyle?.animationName ?? 'none',
+        animationDurationSeconds: Number.parseFloat(guideStyle?.animationDuration ?? '0'),
+        animationIterationCount: guideStyle?.animationIterationCount ?? '0',
+        animationPlayState: guideStyle?.animationPlayState ?? 'idle',
+        planeAnimationName: style.animationName,
+        planeTransform: style.transform,
+        guideGroupCount: plane.querySelectorAll(':scope > .sphere-ring-guides').length,
+        textAnimationName: textStyle?.animationName ?? 'none',
+        textTransform: textStyle?.transform ?? 'none',
+        textInsideGuideGroup: Boolean(text?.closest('.sphere-ring-guides')),
+        textWidth: textRect?.width ?? 0,
+        textHeight: textRect?.height ?? 0,
+        textScreenFontSize: Number.parseFloat(textStyle?.fontSize ?? '0') * sphereScale,
+        textVisible: Boolean(text && textStyle?.display !== 'none' && textStyle?.visibility !== 'hidden' && Number(textStyle?.opacity ?? '1') > 0 && (textRect?.width ?? 0) > 0 && (textRect?.height ?? 0) > 0),
         hasGuide: plane.querySelector('use.sphere-layer-guide') !== null,
         mainRingCount: plane.querySelectorAll('use.sphere-bundle-main-ring').length,
         childRingIds: [...plane.querySelectorAll('use.sphere-bundle-child-ring')].map((node) => node.dataset.nodeId),
@@ -883,6 +900,9 @@ async function startupAndRingOrbitScenario() {
     const expectedLayer = expectedDigitalProjection.fields.find(({ id }) => id === ring.layer);
     assert(expectedLayer, `ring orbits: rendered unknown layer ${ring.layer}`);
     assert(ring.hasGuide, `ring orbits: ${ring.layer} lost its orbit guide`);
+    assert(ring.guideGroupCount === 1, `ring orbits: ${ring.layer} must expose exactly one animated guide bundle ${JSON.stringify(ring)}`);
+    assert(ring.planeAnimationName === 'none' && ring.planeTransform === 'none', `ring labels: ${ring.layer} retained a transformed/animated text ancestor ${JSON.stringify(ring)}`);
+    assert(!ring.textInsideGuideGroup && ring.textAnimationName === 'none' && ring.textTransform === 'none' && ring.textVisible && ring.textWidth > 80 && ring.textHeight > 0 && ring.textScreenFontSize >= 12.5, `ring labels: ${ring.layer} is not reliably isolated and visible in desktop screen space ${JSON.stringify(ring)}`);
     const expectedChildIds = [];
     const expectedVisibleChildCount = 0;
     assert(ring.mainRingCount === 1, `ring bundles: ${ring.layer} must retain exactly one main ring ${JSON.stringify(ring)}`);
@@ -962,16 +982,17 @@ async function startupAndRingOrbitScenario() {
   assert(new Set(rings.map(({ startAngleVariable }) => startAngleVariable)).size === rings.length, 'ring orbits: start angles must stay distinct');
 
   const ringMotionProbe = await run.page.evaluate(() => [...document.querySelectorAll('#sphere-rings .sphere-ring-plane')].map((plane) => {
-    const animation = plane.getAnimations().find((candidate) => candidate.animationName === 'sphere-ring-orbit') ?? null;
+    const guides = plane.querySelector('.sphere-ring-guides');
+    const animation = guides?.getAnimations().find((candidate) => candidate.animationName === 'sphere-ring-orbit') ?? null;
     if (!animation) return { layer: plane.dataset.layerId, animationFound: false };
     const originalCurrentTime = animation.currentTime;
     const originalPlayState = animation.playState;
     const duration = Number(animation.effect?.getComputedTiming?.().duration);
     animation.pause();
     animation.currentTime = 0;
-    const before = getComputedStyle(plane).transform;
+    const before = getComputedStyle(guides).transform;
     animation.currentTime = Number.isFinite(duration) && duration > 0 ? duration / 2 : 1;
-    const after = getComputedStyle(plane).transform;
+    const after = getComputedStyle(guides).transform;
     if (originalCurrentTime !== null) animation.currentTime = originalCurrentTime;
     if (originalPlayState === 'running') animation.play();
     else if (originalPlayState === 'paused') animation.pause();
@@ -1163,7 +1184,8 @@ async function reducedMotionRingScenario() {
   await run.page.waitForSelector('html.runtime-ready');
   const rings = await run.page.evaluate(() => (
     [...document.querySelectorAll('#sphere-rings .sphere-ring-plane')].map((plane) => {
-      const style = getComputedStyle(plane);
+      const guides = plane.querySelector('.sphere-ring-guides');
+      const style = getComputedStyle(guides ?? plane);
       return {
         layer: plane.dataset.layerId,
         entryCount: plane.dataset.entryCount,
@@ -1179,19 +1201,21 @@ async function reducedMotionRingScenario() {
     assert(stopped, `reduced motion rings: ${ring.layer} keeps orbiting (${JSON.stringify(ring)})`);
   }
   const matricesBefore = await run.page.evaluate(() => [...document.querySelectorAll('#sphere-rings .sphere-ring-plane')].map((plane) => {
-    const matrix = plane.getCTM?.();
+    const guides = plane.querySelector('.sphere-ring-guides');
+    const matrix = guides?.getCTM?.();
     return {
       layer: plane.dataset.layerId,
-      transform: getComputedStyle(plane).transform,
+      transform: getComputedStyle(guides ?? plane).transform,
       ctm: matrix ? [matrix.a, matrix.b, matrix.c, matrix.d, matrix.e, matrix.f].map((value) => value.toFixed(5)).join(',') : null,
     };
   }));
   await run.page.waitForTimeout(520);
   const matricesAfter = await run.page.evaluate(() => [...document.querySelectorAll('#sphere-rings .sphere-ring-plane')].map((plane) => {
-    const matrix = plane.getCTM?.();
+    const guides = plane.querySelector('.sphere-ring-guides');
+    const matrix = guides?.getCTM?.();
     return {
       layer: plane.dataset.layerId,
-      transform: getComputedStyle(plane).transform,
+      transform: getComputedStyle(guides ?? plane).transform,
       ctm: matrix ? [matrix.a, matrix.b, matrix.c, matrix.d, matrix.e, matrix.f].map((value) => value.toFixed(5)).join(',') : null,
     };
   }));
@@ -1562,7 +1586,7 @@ async function layerJourneyScenario({ mobile = false, viewportOverride = null, t
       panelVisible: panelNode?.hasAttribute('data-visible') ?? false,
       panelHidden: panelNode?.hidden ?? null,
       ringCount: document.querySelectorAll('.sphere-ring-plane').length,
-      ringsPaused: [...document.querySelectorAll('.sphere-ring-plane')].every((ring) => getComputedStyle(ring).animationPlayState === 'paused'),
+      ringsPaused: [...document.querySelectorAll('.sphere-ring-guides')].every((guides) => { const style = getComputedStyle(guides); return style.animationName === 'none' || style.animationPlayState === 'paused'; }),
       commandCount: window.__commonworldCameraCommands?.length ?? 0,
       geometryEvaluations: Number(stageNode.dataset.sphereGeometryEvaluations ?? 0),
       diagnosticPublishes: Number(stageNode.dataset.sphereGeometryDiagnosticPublishes ?? 0),
@@ -2746,10 +2770,10 @@ async function androidGlobeUiScenario() {
   await run.page.evaluate(() => document.querySelector('#sphere-edge-control')?.blur());
 
   await run.page.setViewportSize({ width: 844, height: 390 });
-  await run.page.waitForTimeout(100);
+  await run.page.waitForTimeout(650);
   const touchRingState = () => run.page.evaluate(() => [...document.querySelectorAll('.sphere-ring-plane')].map((plane) => {
     const label = plane.querySelector('.sphere-ring-text');
-    const ring = plane.querySelector('use');
+    const ring = plane.querySelector('.sphere-ring-guides');
     const labelStyle = label ? getComputedStyle(label) : null;
     const ringStyle = ring ? getComputedStyle(ring) : null;
     const labelTransform = labelStyle?.transform && labelStyle.transform !== 'none' ? new DOMMatrixReadOnly(labelStyle.transform) : null;
@@ -2807,13 +2831,13 @@ async function androidGlobeUiScenario() {
   });
   const movingTouchLabels = wideTouchMotionAfter.filter((after, index) => {
     const before = wideTouchMotionBefore[index];
-    if (after.labelAnimationName !== 'sphere-ring-orbit' || !after.labelBox || !before?.labelBox) return false;
+    if (!after.labelBox || !before?.labelBox) return false;
     return after.labelBox.some((value, boxIndex) => Math.abs(value - before.labelBox[boxIndex]) > 1e-3);
   });
   assert(wideTouchGeometry.viewportWidth > 768 && !wideTouchGeometry.mediaCompact && wideTouchGeometry.mediaCoarseTouch, scenarioId + ': wide touch viewport did not exercise the non-compact coarse-pointer path ' + JSON.stringify(wideTouchGeometry));
   assert(wideTouchGeometry.primaryRingsStatic && wideTouchGeometry.depthRingsStatic, scenarioId + ': wide touch ring group regained compositor animation or transform ' + JSON.stringify(wideTouchGeometry));
   assert(movingTouchRings.length >= 2, scenarioId + ': wide touch visible ring strokes did not advance ' + JSON.stringify({ before: wideTouchMotionBefore, after: wideTouchMotionAfter }));
-  assert(movingTouchLabels.length >= 2, scenarioId + ': wide touch visible ring labels did not move with their ring strokes ' + JSON.stringify({ before: wideTouchMotionBefore, after: wideTouchMotionAfter }));
+  assert(movingTouchLabels.length === 0, scenarioId + ': wide touch ring labels entered the compositor motion path ' + JSON.stringify({ before: wideTouchMotionBefore, after: wideTouchMotionAfter }));
   assert(wideTouchGeometry.representativePrimaryLabels.length >= 2 && wideTouchGeometry.representativePrimaryLabels.every(({ text, visible, width, height, fontSize }) => text.length > 0 && visible && width > 80 && height > 0 && fontSize >= 20), scenarioId + ': wide touch primary ring labels are absent or not visibly laid out ' + JSON.stringify(wideTouchGeometry));
 
   const movingLabelsBetween = (before, after, threshold = 1e-3) => after.filter((entry, index) => {
@@ -2821,10 +2845,15 @@ async function androidGlobeUiScenario() {
     if (!entry.labelBox || !previous?.labelBox) return false;
     return entry.labelBox.some((value, boxIndex) => Math.abs(value - previous.labelBox[boxIndex]) > threshold);
   });
-  const waitForMovingTouchLabels = async (before, minimum = 2, timeoutMs = 1500) => {
+  const movingRingsBetween = (before, after, threshold = 1e-5) => after.filter((entry, index) => {
+    const previous = before[index];
+    if (!entry.ringMatrix || !previous?.ringMatrix) return false;
+    return entry.ringMatrix.some((value, matrixIndex) => Math.abs(value - previous.ringMatrix[matrixIndex]) > threshold);
+  });
+  const waitForMovingTouchRings = async (before, minimum = 2, timeoutMs = 1500) => {
     const deadline = Date.now() + timeoutMs;
     let after = await touchRingState();
-    while (movingLabelsBetween(before, after).length < minimum && Date.now() < deadline) {
+    while (movingRingsBetween(before, after).length < minimum && Date.now() < deadline) {
       await run.page.waitForTimeout(50);
       after = await touchRingState();
     }
@@ -2835,27 +2864,31 @@ async function androidGlobeUiScenario() {
   const mapPausedBefore = await touchRingState();
   await run.page.waitForTimeout(350);
   const mapPausedAfter = await touchRingState();
-  assert(mapPausedAfter.filter(({ labelAnimationName, labelAnimationPlayState, ringAnimationName, ringAnimationPlayState }) => labelAnimationName === 'sphere-ring-orbit' && labelAnimationPlayState === 'paused' && ringAnimationName === 'sphere-ring-orbit' && ringAnimationPlayState === 'paused').length >= 2, scenarioId + ': wide touch ring children did not pause while map-moving state was active ' + JSON.stringify(mapPausedAfter));
+  assert(mapPausedAfter.filter(({ labelAnimationName, ringAnimationName, ringAnimationPlayState }) => labelAnimationName === 'none' && ringAnimationName === 'sphere-ring-orbit' && ringAnimationPlayState === 'paused').length >= 2, scenarioId + ': wide touch guide bundles did not pause while map-moving state was active ' + JSON.stringify(mapPausedAfter));
+  assert(movingRingsBetween(mapPausedBefore, mapPausedAfter).length === 0, scenarioId + ': wide touch guide bundles moved while map-moving state paused the orbit ' + JSON.stringify({ before: mapPausedBefore, after: mapPausedAfter }));
   assert(movingLabelsBetween(mapPausedBefore, mapPausedAfter).length === 0, scenarioId + ': wide touch labels moved while map-moving state paused the orbit ' + JSON.stringify({ before: mapPausedBefore, after: mapPausedAfter }));
   await run.page.evaluate(() => { delete document.querySelector('.globe-stage').dataset.mapMoving; });
   const mapResumedBefore = await touchRingState();
-  const mapResumedAfter = await waitForMovingTouchLabels(mapResumedBefore);
-  assert(mapResumedAfter.filter(({ labelAnimationName, labelAnimationPlayState, ringAnimationName, ringAnimationPlayState }) => labelAnimationName === 'sphere-ring-orbit' && labelAnimationPlayState === 'running' && ringAnimationName === 'sphere-ring-orbit' && ringAnimationPlayState === 'running').length >= 2, scenarioId + ': wide touch ring children did not return to running state after map-moving ended ' + JSON.stringify(mapResumedAfter));
-  assert(movingLabelsBetween(mapResumedBefore, mapResumedAfter).length >= 2, scenarioId + ': wide touch labels did not resume after map-moving ended ' + JSON.stringify({ before: mapResumedBefore, after: mapResumedAfter }));
+  const mapResumedAfter = await waitForMovingTouchRings(mapResumedBefore);
+  assert(mapResumedAfter.filter(({ labelAnimationName, ringAnimationName, ringAnimationPlayState }) => labelAnimationName === 'none' && ringAnimationName === 'sphere-ring-orbit' && ringAnimationPlayState === 'running').length >= 2, scenarioId + ': wide touch guide bundles did not return to running state after map-moving ended ' + JSON.stringify(mapResumedAfter));
+  assert(movingRingsBetween(mapResumedBefore, mapResumedAfter).length >= 2, scenarioId + ': wide touch guide bundles did not resume after map-moving ended ' + JSON.stringify({ before: mapResumedBefore, after: mapResumedAfter }));
+  assert(movingLabelsBetween(mapResumedBefore, mapResumedAfter).length === 0, scenarioId + ': wide touch labels moved when guide bundles resumed ' + JSON.stringify({ before: mapResumedBefore, after: mapResumedAfter }));
 
   await run.page.locator('#sphere-edge-control').focus();
   await run.page.waitForTimeout(80);
   const focusPausedBefore = await touchRingState();
   await run.page.waitForTimeout(350);
   const focusPausedAfter = await touchRingState();
-  assert(focusPausedAfter.filter(({ labelAnimationName, labelAnimationPlayState, ringAnimationName, ringAnimationPlayState }) => labelAnimationName === 'sphere-ring-orbit' && labelAnimationPlayState === 'paused' && ringAnimationName === 'sphere-ring-orbit' && ringAnimationPlayState === 'paused').length >= 2, scenarioId + ': wide touch ring children did not pause while sphere edge control was focused ' + JSON.stringify(focusPausedAfter));
+  assert(focusPausedAfter.filter(({ labelAnimationName, ringAnimationName, ringAnimationPlayState }) => labelAnimationName === 'none' && ringAnimationName === 'sphere-ring-orbit' && ringAnimationPlayState === 'paused').length >= 2, scenarioId + ': wide touch guide bundles did not pause while sphere edge control was focused ' + JSON.stringify(focusPausedAfter));
+  assert(movingRingsBetween(focusPausedBefore, focusPausedAfter).length === 0, scenarioId + ': wide touch guide bundles moved while sphere edge focus paused the orbit ' + JSON.stringify({ before: focusPausedBefore, after: focusPausedAfter }));
   assert(movingLabelsBetween(focusPausedBefore, focusPausedAfter).length === 0, scenarioId + ': wide touch labels moved while sphere edge focus paused the orbit ' + JSON.stringify({ before: focusPausedBefore, after: focusPausedAfter }));
   await run.page.evaluate(() => document.querySelector('#sphere-edge-control')?.blur());
   await run.page.waitForTimeout(80);
   const focusResumedBefore = await touchRingState();
-  const focusResumedAfter = await waitForMovingTouchLabels(focusResumedBefore);
-  assert(focusResumedAfter.filter(({ labelAnimationName, labelAnimationPlayState, ringAnimationName, ringAnimationPlayState }) => labelAnimationName === 'sphere-ring-orbit' && labelAnimationPlayState === 'running' && ringAnimationName === 'sphere-ring-orbit' && ringAnimationPlayState === 'running').length >= 2, scenarioId + ': wide touch ring children did not return to running state after sphere edge focus ended ' + JSON.stringify(focusResumedAfter));
-  assert(movingLabelsBetween(focusResumedBefore, focusResumedAfter).length >= 2, scenarioId + ': wide touch labels did not resume after sphere edge focus ended ' + JSON.stringify({ before: focusResumedBefore, after: focusResumedAfter }));
+  const focusResumedAfter = await waitForMovingTouchRings(focusResumedBefore);
+  assert(focusResumedAfter.filter(({ labelAnimationName, ringAnimationName, ringAnimationPlayState }) => labelAnimationName === 'none' && ringAnimationName === 'sphere-ring-orbit' && ringAnimationPlayState === 'running').length >= 2, scenarioId + ': wide touch guide bundles did not return to running state after sphere edge focus ended ' + JSON.stringify(focusResumedAfter));
+  assert(movingRingsBetween(focusResumedBefore, focusResumedAfter).length >= 2, scenarioId + ': wide touch guide bundles did not resume after sphere edge focus ended ' + JSON.stringify({ before: focusResumedBefore, after: focusResumedAfter }));
+  assert(movingLabelsBetween(focusResumedBefore, focusResumedAfter).length === 0, scenarioId + ': wide touch labels moved when guide bundles resumed after focus ' + JSON.stringify({ before: focusResumedBefore, after: focusResumedAfter }));
 
   const reducedTouchRun = await newPage({
     mobile: true,
@@ -2868,7 +2901,7 @@ async function androidGlobeUiScenario() {
   await reducedTouchRun.page.waitForFunction(() => document.querySelectorAll('.sphere-ring-plane .sphere-ring-text').length > 0);
   const reducedTouchState = () => reducedTouchRun.page.evaluate(() => [...document.querySelectorAll('.sphere-ring-plane')].map((plane) => {
     const label = plane.querySelector('.sphere-ring-text');
-    const ring = plane.querySelector('use');
+    const ring = plane.querySelector('.sphere-ring-guides');
     const labelStyle = label ? getComputedStyle(label) : null;
     const ringStyle = ring ? getComputedStyle(ring) : null;
     const labelRect = label?.getBoundingClientRect();
@@ -2913,8 +2946,21 @@ async function androidGlobeUiScenario() {
     const primaryPlanes = [...document.querySelectorAll('.sphere-ring-plane[data-emphasis="primary"]')];
     const depthPlanes = [...document.querySelectorAll('.sphere-ring-plane[data-emphasis="depth"]')];
     const states = (planes) => planes.map((plane) => {
-      const style = getComputedStyle(plane);
-      return { animationName: style.animationName, transform: style.transform };
+      const guide = plane.querySelector('.sphere-ring-guides');
+      const label = plane.querySelector('.sphere-ring-text');
+      const style = guide ? getComputedStyle(guide) : null;
+      const planeStyle = getComputedStyle(plane);
+      const labelStyle = label ? getComputedStyle(label) : null;
+      const rect = label?.getBoundingClientRect();
+      return {
+        animationName: style?.animationName ?? 'none',
+        transform: style?.transform ?? 'none',
+        planeAnimationName: planeStyle.animationName,
+        planeTransform: planeStyle.transform,
+        textAnimationName: labelStyle?.animationName ?? 'none',
+        textTransform: labelStyle?.transform ?? 'none',
+        textVisible: Boolean(label && labelStyle?.display !== 'none' && labelStyle?.visibility !== 'hidden' && Number(labelStyle?.opacity ?? '1') > 0 && (rect?.width ?? 0) > 0 && (rect?.height ?? 0) > 0),
+      };
     });
     return {
       viewportWidth: window.innerWidth,
@@ -2925,8 +2971,8 @@ async function androidGlobeUiScenario() {
     };
   });
   assert(compactDesktopGeometry.viewportWidth <= 768 && compactDesktopGeometry.mediaCompact && !compactDesktopGeometry.mediaCoarseTouch, scenarioId + ': compact desktop did not exercise the narrow fine-pointer path ' + JSON.stringify(compactDesktopGeometry));
-  assert(compactDesktopGeometry.primaryStates.length > 0 && compactDesktopGeometry.primaryStates.every(({ animationName, transform }) => animationName === 'sphere-ring-orbit' && transform !== 'none'), scenarioId + ': compact fine-pointer desktop lost primary ring motion ' + JSON.stringify(compactDesktopGeometry));
-  assert(compactDesktopGeometry.depthStates.length > 0 && compactDesktopGeometry.depthStates.every(({ animationName, transform }) => animationName === 'none' && transform !== 'none'), scenarioId + ': compact fine-pointer desktop lost bounded depth-ring orientation ' + JSON.stringify(compactDesktopGeometry));
+  assert(compactDesktopGeometry.primaryStates.length > 0 && compactDesktopGeometry.primaryStates.every(({ animationName, transform, planeAnimationName, planeTransform, textAnimationName, textTransform, textVisible }) => animationName === 'sphere-ring-orbit' && transform !== 'none' && planeAnimationName === 'none' && planeTransform === 'none' && textAnimationName === 'none' && textTransform === 'none' && textVisible), scenarioId + ': compact fine-pointer desktop lost primary guide motion or label isolation ' + JSON.stringify(compactDesktopGeometry));
+  assert(compactDesktopGeometry.depthStates.length > 0 && compactDesktopGeometry.depthStates.every(({ animationName, transform, planeAnimationName, planeTransform, textAnimationName, textTransform, textVisible }) => animationName === 'none' && transform !== 'none' && planeAnimationName === 'none' && planeTransform === 'none' && textAnimationName === 'none' && textTransform === 'none' && textVisible), scenarioId + ': compact fine-pointer desktop lost bounded depth orientation or label isolation ' + JSON.stringify(compactDesktopGeometry));
   assert(compactDesktopRun.pageErrors.length === 0, scenarioId + ': compact desktop page errors: ' + compactDesktopRun.pageErrors.join(' | '));
   await compactDesktopRun.context.close();
 
