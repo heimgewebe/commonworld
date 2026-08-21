@@ -221,7 +221,7 @@
         "primaryStates": [
           {
             "animationName": "sphere-ring-orbit",
-            "transform": "matrix(0.999999, 0.00150575, -0.00150575, 0.999999, 0, 0)",
+            "transform": "matrix(1, 0.000752354, -0.000752354, 1, 0, 0)",
             "planeAnimationName": "none",
             "planeTransform": "none",
             "textAnimationName": "none",
@@ -230,7 +230,7 @@
           },
           {
             "animationName": "sphere-ring-orbit",
-            "transform": "matrix(-0.531174, 0.847263, -0.847263, -0.531174, 0, 0)",
+            "transform": "matrix(-0.530546, 0.847656, -0.847656, -0.530546, 0, 0)",
             "planeAnimationName": "none",
             "planeTransform": "none",
             "textAnimationName": "none",
@@ -239,7 +239,7 @@
           },
           {
             "animationName": "sphere-ring-orbit",
-            "transform": "matrix(-0.436882, -0.899519, 0.899519, -0.436882, 0, 0)",
+            "transform": "matrix(-0.437627, -0.899156, 0.899156, -0.437627, 0, 0)",
             "planeAnimationName": "none",
             "planeTransform": "none",
             "textAnimationName": "none",
@@ -309,7 +309,7 @@
     {
       "id": "layer-journey-moveend-return",
       "verdict": "PASS",
-      "elapsedMs": 1362
+      "elapsedMs": 2879
     },
     {
       "id": "layer-journey-missing-moveend-fallback",
@@ -318,10 +318,10 @@
       "movementDiagnostics": [
         {
           "index": 0,
-          "geometryEvaluationDelta": 19,
+          "geometryEvaluationDelta": 21,
           "diagnosticPublishDelta": 6,
-          "sampledEvaluationCount": 18,
-          "maxDiagnosticPublishes": 6
+          "sampledEvaluationCount": 20,
+          "maxDiagnosticPublishes": 7
         },
         {
           "index": 1,
@@ -476,7 +476,7 @@
     }
   ],
   "binding": {
-    "smoke_script_sha256": "0b0ccc28e9fab69c7b89c4b9c1b3d960df4201c36693eb0c08e93c3269efa09a",
+    "smoke_script_sha256": "90b2fbc799ed7808798689f387114048f89a264d3650bcd5b58bc6884d7f110f",
     "smoke_runner_sha256": "522b99b70b1d0064b1d0a31a3a67fdc9a2e73b7408f37d1a4bb303bc360b7556",
     "smoke_plan_sha256": "8a068c3b573eb2ab95ed7c3f8477f607cba6de9353ab5250ba9abc09345b23a7",
     "scenario_ids": [

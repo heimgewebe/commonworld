@@ -681,8 +681,8 @@
   "validation": {
     "public_browser_smoke": {
       "verdict": "PASS",
-      "result_sha256": "80d51ec6ab5e8cb5505b1a4a692362e28425adc608a497e3945164717d2025ac",
-      "committed_evidence_sha256": "e1ec57f73eb348a5707284f7ba2c8261df0d52339f1b4be22ce81d41bf392e47",
+      "result_sha256": "f99d0d455a497e16f1a738ad4aeb179ffdbe145c1029dffbb986368d0281907e",
+      "committed_evidence_sha256": "288ea808c6ca736c6d187b31153dd278b798a1cd2c199b127ec321a90c7819ab",
       "first_party_surface_sha256": "cb4a6ef8ef4f09c694d7ec1198dd3bf73b61936f44ad910592fa3a1d67a51cc2",
       "scenario_count": 38,
       "scope": "local Chromium on deterministic release f5ac3b86537f942776d1",

@@ -2882,7 +2882,8 @@ async function androidGlobeUiScenario() {
   assert(focusPausedAfter.filter(({ labelAnimationName, ringAnimationName, ringAnimationPlayState }) => labelAnimationName === 'none' && ringAnimationName === 'sphere-ring-orbit' && ringAnimationPlayState === 'paused').length >= 2, scenarioId + ': wide touch guide bundles did not pause while sphere edge control was focused ' + JSON.stringify(focusPausedAfter));
   assert(movingRingsBetween(focusPausedBefore, focusPausedAfter).length === 0, scenarioId + ': wide touch guide bundles moved while sphere edge focus paused the orbit ' + JSON.stringify({ before: focusPausedBefore, after: focusPausedAfter }));
   assert(movingLabelsBetween(focusPausedBefore, focusPausedAfter).length === 0, scenarioId + ': wide touch labels moved while sphere edge focus paused the orbit ' + JSON.stringify({ before: focusPausedBefore, after: focusPausedAfter }));
-  await run.page.evaluate(() => document.querySelector('#sphere-edge-control')?.blur());
+  await run.page.locator('#filter-toggle').focus();
+  await run.page.waitForFunction(() => document.activeElement?.id === 'filter-toggle');
   await run.page.waitForTimeout(80);
   const focusResumedBefore = await touchRingState();
   const focusResumedAfter = await waitForMovingTouchRings(focusResumedBefore);
