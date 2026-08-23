@@ -195,28 +195,9 @@ async function captureRingLabelPaintEvidence(page, scenarioId) {
   const sphere = page.locator('#digital-sphere');
   const sphereBox = await sphere.boundingBox();
   assert(sphereBox && sphereBox.width > 0 && sphereBox.height > 0, `${scenarioId}: digital sphere screenshot clip is absent`);
+  assert(new Set(state.regions.map(({ layer }) => layer)).size === state.regions.length, `${scenarioId}: primary ring label ids are not unique (${JSON.stringify(state.regions)})`);
+  assert(state.labelVisibilities.every((visibility) => visibility === 'visible'), `${scenarioId}: ring labels were not visible before paint capture (${JSON.stringify(state.labelVisibilities)})`);
   const visible = await page.screenshot({ animations: 'allow', clip: sphereBox });
-  await page.evaluate(() => {
-    for (const label of document.querySelectorAll('#sphere-rings .sphere-ring-text')) {
-      label.style.setProperty('visibility', 'hidden', 'important');
-    }
-  });
-  await page.waitForTimeout(40);
-  const hidden = await page.screenshot({ animations: 'allow', clip: sphereBox });
-  const after = await page.evaluate(() => {
-    const transforms = [...document.querySelectorAll('#sphere-rings .sphere-ring-plane')].map((plane) => getComputedStyle(plane).transform);
-    const hiddenVisibilities = [...document.querySelectorAll('#sphere-rings .sphere-ring-text')].map((label) => getComputedStyle(label).visibility);
-    for (const label of document.querySelectorAll('#sphere-rings .sphere-ring-text')) label.style.removeProperty('visibility');
-    for (const { animation, currentTime, playState } of window.__commonworldRingPaintAnimationStates ?? []) {
-      if (currentTime !== null) animation.currentTime = currentTime;
-      if (playState === 'running') animation.play();
-      else if (playState === 'paused') animation.pause();
-    }
-    delete window.__commonworldRingPaintAnimationStates;
-    return { transforms, hiddenVisibilities };
-  });
-  assert(state.labelVisibilities.every((visibility) => visibility === 'visible') && after.hiddenVisibilities.every((visibility) => visibility === 'hidden'), `${scenarioId}: label visibility toggle did not bracket the paint screenshots (${JSON.stringify({ before: state.labelVisibilities, hidden: after.hiddenVisibilities })})`);
-  assert(JSON.stringify(after.transforms) === JSON.stringify(state.frozenTransforms), `${scenarioId}: ring animation did not remain frozen across paint screenshots`);
   const visiblePng = decodeScreenshotPng(visible);
   const xScale = visiblePng.width / state.sphereWidth;
   const yScale = visiblePng.height / state.sphereHeight;
@@ -227,18 +208,81 @@ async function captureRingLabelPaintEvidence(page, scenarioId) {
     width: region.width * xScale,
     height: region.height * yScale,
   }));
-  const differences = screenshotPixelDifferences(visible, hidden, scaledRegions);
   const artifactDirectory = process.env.COMMONWORLD_RING_PAINT_ARTIFACT_DIR;
-  if (artifactDirectory) {
-    const target = path.resolve(artifactDirectory);
-    await mkdir(target, { recursive: true });
-    await Promise.all([
-      writeFile(path.join(target, `${scenarioId}-labels.png`), visible),
-      writeFile(path.join(target, `${scenarioId}-no-labels.png`), hidden),
-      writeFile(path.join(target, `${scenarioId}-result.json`), `${JSON.stringify({ differences, frozenTransforms: state.frozenTransforms }, null, 2)}\n`, 'utf8'),
-    ]);
+  const artifactTarget = artifactDirectory ? path.resolve(artifactDirectory) : null;
+  if (artifactTarget) {
+    await mkdir(artifactTarget, { recursive: true });
+    await writeFile(path.join(artifactTarget, `${scenarioId}-labels.png`), visible);
   }
-  assert(differences.every(({ changedPixels }) => changedPixels >= 40), `${scenarioId}: one or more primary ring labels produced no relevant paint difference (${JSON.stringify(differences)})`);
+
+  const differences = [];
+  for (const [regionIndex, region] of scaledRegions.entries()) {
+    const hideState = await page.evaluate(({ layer }) => {
+      const labels = [...document.querySelectorAll('#sphere-rings .sphere-ring-text')];
+      const primaryLabels = [...document.querySelectorAll('.sphere-ring-plane[data-emphasis="primary"] .sphere-ring-text')];
+      const matches = primaryLabels.filter((label) => (label.dataset.layerId ?? '') === layer);
+      const before = labels.map((label) => ({ layer: label.dataset.layerId ?? '', visibility: getComputedStyle(label).visibility }));
+      if (matches.length === 1) matches[0].style.setProperty('visibility', 'hidden', 'important');
+      return {
+        matchCount: matches.length,
+        before,
+        hidden: labels.map((label) => ({ layer: label.dataset.layerId ?? '', visibility: getComputedStyle(label).visibility })),
+        transforms: [...document.querySelectorAll('#sphere-rings .sphere-ring-plane')].map((plane) => getComputedStyle(plane).transform),
+      };
+    }, { layer: region.layer });
+    const hiddenEntries = hideState.hidden.filter(({ visibility }) => visibility === 'hidden');
+    assert(hideState.matchCount === 1, `${scenarioId}: expected exactly one primary label for ${region.layer} (${JSON.stringify(hideState)})`);
+    assert(hideState.before.every(({ visibility }) => visibility === 'visible'), `${scenarioId}: labels were not fully restored before isolating ${region.layer} (${JSON.stringify(hideState.before)})`);
+    assert(hiddenEntries.length === 1 && hiddenEntries[0].layer === region.layer, `${scenarioId}: isolating ${region.layer} hid the wrong label set (${JSON.stringify(hideState.hidden)})`);
+    assert(JSON.stringify(hideState.transforms) === JSON.stringify(state.frozenTransforms), `${scenarioId}: ring animation moved before isolated paint capture for ${region.layer}`);
+
+    await page.waitForTimeout(40);
+    const hidden = await page.screenshot({ animations: 'allow', clip: sphereBox });
+    const restoreState = await page.evaluate(({ layer }) => {
+      const labels = [...document.querySelectorAll('#sphere-rings .sphere-ring-text')];
+      const primaryLabels = [...document.querySelectorAll('.sphere-ring-plane[data-emphasis="primary"] .sphere-ring-text')];
+      const matches = primaryLabels.filter((label) => (label.dataset.layerId ?? '') === layer);
+      const hidden = labels.map((label) => ({ layer: label.dataset.layerId ?? '', visibility: getComputedStyle(label).visibility }));
+      const transformsBefore = [...document.querySelectorAll('#sphere-rings .sphere-ring-plane')].map((plane) => getComputedStyle(plane).transform);
+      if (matches.length === 1) matches[0].style.removeProperty('visibility');
+      return {
+        matchCount: matches.length,
+        hidden,
+        restored: labels.map((label) => ({ layer: label.dataset.layerId ?? '', visibility: getComputedStyle(label).visibility })),
+        transformsBefore,
+        transformsAfter: [...document.querySelectorAll('#sphere-rings .sphere-ring-plane')].map((plane) => getComputedStyle(plane).transform),
+      };
+    }, { layer: region.layer });
+    const stillHidden = restoreState.hidden.filter(({ visibility }) => visibility === 'hidden');
+    assert(restoreState.matchCount === 1, `${scenarioId}: isolated label disappeared before restore for ${region.layer} (${JSON.stringify(restoreState)})`);
+    assert(stillHidden.length === 1 && stillHidden[0].layer === region.layer, `${scenarioId}: isolated screenshot did not keep only ${region.layer} hidden (${JSON.stringify(restoreState.hidden)})`);
+    assert(restoreState.restored.every(({ visibility }) => visibility === 'visible'), `${scenarioId}: labels were not fully restored after isolating ${region.layer} (${JSON.stringify(restoreState.restored)})`);
+    assert(JSON.stringify(restoreState.transformsBefore) === JSON.stringify(state.frozenTransforms) && JSON.stringify(restoreState.transformsAfter) === JSON.stringify(state.frozenTransforms), `${scenarioId}: ring animation moved during isolated paint capture for ${region.layer}`);
+
+    const [difference] = screenshotPixelDifferences(visible, hidden, [region]);
+    const safeLayer = String(region.layer || `label-${regionIndex + 1}`).replace(/[^A-Za-z0-9._-]+/g, '-').replace(/^-+|-+$/g, '') || `label-${regionIndex + 1}`;
+    const hiddenArtifact = `${scenarioId}-${String(regionIndex + 1).padStart(2, '0')}-${safeLayer}-no-label.png`;
+    differences.push({ ...difference, hiddenArtifact });
+    if (artifactTarget) await writeFile(path.join(artifactTarget, hiddenArtifact), hidden);
+  }
+
+  const after = await page.evaluate(() => {
+    const transforms = [...document.querySelectorAll('#sphere-rings .sphere-ring-plane')].map((plane) => getComputedStyle(plane).transform);
+    const visibilities = [...document.querySelectorAll('#sphere-rings .sphere-ring-text')].map((label) => getComputedStyle(label).visibility);
+    for (const { animation, currentTime, playState } of window.__commonworldRingPaintAnimationStates ?? []) {
+      if (currentTime !== null) animation.currentTime = currentTime;
+      if (playState === 'running') animation.play();
+      else if (playState === 'paused') animation.pause();
+    }
+    delete window.__commonworldRingPaintAnimationStates;
+    return { transforms, visibilities };
+  });
+  assert(after.visibilities.every((visibility) => visibility === 'visible'), `${scenarioId}: labels were not fully restored after isolated paint captures (${JSON.stringify(after.visibilities)})`);
+  assert(JSON.stringify(after.transforms) === JSON.stringify(state.frozenTransforms), `${scenarioId}: ring animation did not remain frozen across isolated paint screenshots`);
+  if (artifactTarget) {
+    await writeFile(path.join(artifactTarget, `${scenarioId}-result.json`), `${JSON.stringify({ differences, frozenTransforms: state.frozenTransforms }, null, 2)}\n`, 'utf8');
+  }
+  assert(differences.every(({ changedPixels }) => changedPixels >= 40), `${scenarioId}: one or more primary ring labels produced no isolated paint difference (${JSON.stringify(differences)})`);
   return { differences, frozenTransforms: state.frozenTransforms };
 }
 

@@ -12,7 +12,7 @@
   "current_release_id": "da119397a1aa1dc7d3ab",
   "delivery_evidence": {
     "docs/evidence/catalog-delivery-benchmark-v1.json": "5b5a8176cae0239e8152b045ec4e9324d5aca13961ee740a453449d15c157715",
-    "docs/evidence/catalog-delivery-public-browser-smoke-v1.json": "b14ab51c3e1523c15761116076ce67fbed564c01400b464d332faa58db8df754"
+    "docs/evidence/catalog-delivery-public-browser-smoke-v1.json": "47247079f36a2bf84ff196b6da127c88e4f76a9f3afbb095fda1a76ce7c8d824"
   },
   "freshness_model": "digest-defined-proposed-head-scope",
   "kind": "commonworld.release_snapshot_lifecycle_evidence",
