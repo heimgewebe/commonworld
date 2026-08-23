@@ -11,7 +11,7 @@
   },
   "current_release_id": "da119397a1aa1dc7d3ab",
   "delivery_evidence": {
-    "docs/evidence/catalog-delivery-benchmark-v1.json": "5b5a8176cae0239e8152b045ec4e9324d5aca13961ee740a453449d15c157715",
+    "docs/evidence/catalog-delivery-benchmark-v1.json": "2eb963dd4298dd80d5ec6d1a9db8905da911e8313e776f22acf9f6b9548784a0",
     "docs/evidence/catalog-delivery-public-browser-smoke-v1.json": "47247079f36a2bf84ff196b6da127c88e4f76a9f3afbb095fda1a76ce7c8d824"
   },
   "freshness_model": "digest-defined-proposed-head-scope",
@@ -27,11 +27,11 @@
     "scripts/render_public_shell.py": "5b7afea2f27389960a6b82cfae3a7c4c27088e72c6b7883a10a17d40736b1333",
     "scripts/validate_cache_coherence.py": "50b924851facfad392b04e09cd8714cb9cba3d8c7855632cd01d45a0739d0fa6",
     "scripts/validate_canonical_plan.py": "1b3658c7c8cbe51b9d442aa7068f0e10dfb7d33235e42ad6d3ca15cf8d3ec69b",
-    "scripts/validate_catalog_delivery_budget.py": "4b991fdf70233ffee0733dc06b21c52853168585be845a9e4fd503eedf6871a0",
+    "scripts/validate_catalog_delivery_budget.py": "da2f9301aa760419bd25ce38679c07643a670d7167820ca93f81e982b49f2382",
     "scripts/validate_release_snapshot_lifecycle.py": "13b2fb3f01192fd6057d295684406556dd3ba4b0e578de5504ad39130fd3869c",
     "tests/test_release_snapshot_lifecycle.py": "6cd44edbe32e10d17485b168ce547f0789a641a5ffdf1e47889bf6782b464f92"
   },
-  "proposed_head_scope_sha256": "94f634f63f3b8735b500ea49c6f754b66932649745a551c404ab2f39fbc8f4b1",
+  "proposed_head_scope_sha256": "c46fa11421f0a8f7024168e1ca3546de4a512a17c24443266afbfe1afe73793f",
   "schema_version": 1,
   "status": "fresh",
   "task_id": "COMMONWORLD-PUBLIC-GLOBE-V1-T040"

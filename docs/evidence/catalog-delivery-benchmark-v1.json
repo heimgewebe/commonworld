@@ -685,11 +685,11 @@
   "validation": {
     "public_browser_smoke": {
       "verdict": "PASS",
-      "result_sha256": "3119cc3f0542fccb2e6dd9d4fcedc1b000c9db21677e452b1e3aeb4ec6183744",
-      "committed_evidence_sha256": "11175e67a3bedbc35cf8a1f28a9c6c2ba46f1413f6d697ad9ad0215774b4ed0a",
-      "first_party_surface_sha256": "cb4a6ef8ef4f09c694d7ec1198dd3bf73b61936f44ad910592fa3a1d67a51cc2",
+      "committed_evidence_sha256": "47247079f36a2bf84ff196b6da127c88e4f76a9f3afbb095fda1a76ce7c8d824",
+      "first_party_surface_sha256": "d69a5c4ed0918f799826f564366dd8b9981d3792a5afaf76d6a3ca5e22e89b59",
       "scenario_count": 38,
-      "scope": "local Chromium on deterministic release f5ac3b86537f942776d1",
+      "release_id": "da119397a1aa1dc7d3ab",
+      "scope": "local Chromium on deterministic release da119397a1aa1dc7d3ab",
       "selected_detail_eviction_cycle": {
         "id": "catalogue-detail-provenance-upgrade",
         "verdict": "PASS",
@@ -704,21 +704,22 @@
       "decision": "pass",
       "attempt_count": 1,
       "attempt_measurement_sha256s": [
-        "65b0bda1a61d6e864c6fddbb964241bc94da421a3c5a433cde22361d8ca09a79"
+        "da21ece61daaa909e3608c30e525a2cbac697f7a2dcb92729cc73e9fce344dad"
       ],
       "profiles": [
         "mobile-low-power",
         "desktop-low-power"
       ],
       "cpu_throttle_rate": 4,
-      "raw_measurement_sha256": "00580086eccb555474e0b787a8d8dbf7ee77053bcd72a46a82f1010f36fac394",
-      "decision_artifact_sha256": "e788fc6bc0b3640b9a1e1ab6e72e18d6c76cae7f37142a80b1c6b3753b240046",
-      "repeatability_note": "The fresh 100-entry release-f5ac3b86537f942776d1 attempt passed every startup timing and delivery budget."
+      "first_party_surface_sha256": "d69a5c4ed0918f799826f564366dd8b9981d3792a5afaf76d6a3ca5e22e89b59",
+      "release_id": "da119397a1aa1dc7d3ab",
+      "repeatability_note": "The fresh 100-entry release-da119397a1aa1dc7d3ab attempt passed every startup timing and delivery budget."
     },
     "catalog_delivery_static_measurement": {
       "verdict": "PASS",
-      "result_sha256": "76a139545daa1da3f2c60407e0d2ef3233432692a33c7cf9ad5fbf84cd4918f8",
-      "note": "Fresh deterministic static measurement for the optimized 100-entry release f5ac3b86537f942776d1."
+      "result_sha256": "fe15db4b61a3a360c6dbef0bbf57ebe1a0fe658dcae844095329de15dfa06935",
+      "release_id": "da119397a1aa1dc7d3ab",
+      "note": "Fresh deterministic static measurement for the optimized 100-entry release da119397a1aa1dc7d3ab."
     },
     "limitations": [
       "Local Chromium evidence is not physical-device approval.",
@@ -730,58 +731,65 @@
     "warn_bootstrap_gzip_bytes": 28672,
     "max_bootstrap_gzip_bytes": 32768
   },
-  "current_surface_note": "Fresh exact-tree static, 38-scenario public Chromium smoke and fourfold-CPU browser evidence for deterministic release f5ac3b86537f942776d1; 100 Commons retain bounded recovery, zero startup project JSON requests and 343 gzip bytes of warning headroom.",
+  "current_surface_note": "Fresh exact-tree static, 38-scenario public Chromium smoke and fourfold-CPU browser evidence for deterministic release da119397a1aa1dc7d3ab; 100 Commons retain bounded recovery, zero startup project JSON requests and 343 gzip bytes of warning headroom.",
   "browser_repeatability": {
     "run_count": 1,
     "cpu_throttle_rate": 4,
     "profiles": {
       "mobile-low-power": {
         "runtime_ready_ms": {
-          "min": 1145,
-          "max": 1145,
+          "min": 876,
+          "max": 876,
           "values": [
-            1145
+            876
           ]
         },
         "script_duration_ms": {
-          "min": 679.3,
-          "max": 679.3,
+          "min": 472.37,
+          "max": 472.37,
           "values": [
-            679.3
+            472.37
           ]
         },
         "task_duration_ms": {
-          "min": 1115.53,
-          "max": 1115.53,
+          "min": 852.42,
+          "max": 852.42,
           "values": [
-            1115.53
+            852.42
           ]
         }
       },
       "desktop-low-power": {
         "runtime_ready_ms": {
-          "min": 680,
-          "max": 680,
+          "min": 966,
+          "max": 966,
           "values": [
-            680
+            966
           ]
         },
         "script_duration_ms": {
-          "min": 364.47,
-          "max": 364.47,
+          "min": 516.75,
+          "max": 516.75,
           "values": [
-            364.47
+            516.75
           ]
         },
         "task_duration_ms": {
-          "min": 661.75,
-          "max": 661.75,
+          "min": 950.32,
+          "max": 950.32,
           "values": [
-            661.75
+            950.32
           ]
         }
       }
     },
-    "interpretation": "One fresh no-store measurement on the exact 100-entry release-f536a374 first-party surface at fourfold CPU throttling passed every bound startup budget on the first attempt; post-ready work remains diagnostic only."
+    "interpretation": "One fresh no-store measurement on the exact 100-entry release-da119397a1aa1dc7d3ab first-party surface at fourfold CPU throttling passed every bound startup budget on the first attempt; post-ready work remains diagnostic only."
+  },
+  "current_surface_binding": {
+    "release_id": "da119397a1aa1dc7d3ab",
+    "first_party_surface_sha256": "d69a5c4ed0918f799826f564366dd8b9981d3792a5afaf76d6a3ca5e22e89b59",
+    "public_browser_smoke_evidence_sha256": "47247079f36a2bf84ff196b6da127c88e4f76a9f3afbb095fda1a76ce7c8d824",
+    "browser_measurement_decision_sha256": "0dfca595cd938351860e5009816f9575980910ea7e2414e0d81f956baa398ab8",
+    "static_measurement_sha256": "fe15db4b61a3a360c6dbef0bbf57ebe1a0fe658dcae844095329de15dfa06935"
   }
 }
