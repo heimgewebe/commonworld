@@ -1,0 +1,4 @@
+# Direct Python dependencies used only by Commonworld validation and tests.
+# Regenerate requirements-dev.txt with:
+#   python3 .github/validate_python_dependency_lock.py --regenerate
+jsonschema>=4.23,<5
