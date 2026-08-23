@@ -1,0 +1,97 @@
+<!doctype html>
+<html lang="en">
+<meta charset="utf-8">
+<title>SVG textPath paint probe</title>
+<style>
+  :root { color-scheme: dark; }
+  * { box-sizing: border-box; }
+  html, body { width: 900px; min-height: 1500px; margin: 0; background: #071315; }
+  body { position: relative; font-family: Arial, sans-serif; }
+  h1 { position: absolute; top: 8px; left: 16px; margin: 0; font-size: 20px; }
+  .case {
+    position: absolute;
+    width: 420px;
+    height: 280px;
+    border: 1px solid #315257;
+    background: #0b1d20;
+  }
+  .case h2 { height: 28px; margin: 0; padding: 6px 8px 0; font-size: 14px; }
+  svg { display: block; width: 400px; height: 240px; margin: 0 9px; background: #0d2426; }
+  .surface { filter: none; }
+  .surface.with-filter { filter: drop-shadow(0 0 7px rgba(72, 183, 166, 0.42)); }
+  .guide { fill: none; stroke: #5ee0c2; stroke-width: 2; vector-effect: non-scaling-stroke; }
+  text {
+    fill: #f4ffff;
+    stroke: #020c0a;
+    stroke-width: 2px;
+    paint-order: stroke;
+    font: 700 17px Arial, sans-serif;
+    letter-spacing: 0.04em;
+  }
+  .orbit {
+    transform-box: view-box;
+    transform-origin: 200px 120px;
+    animation: orbit 4s linear infinite;
+    animation-delay: -1.25s;
+    animation-play-state: paused;
+  }
+  @keyframes orbit {
+    from { transform: rotate(17deg); }
+    to { transform: rotate(377deg); }
+  }
+  html[data-hide-labels] text { visibility: hidden; }
+</style>
+<h1>Ellipse versus equivalent path: actual textPath paint</h1>
+<main id="cases"></main>
+<script>
+  const cases = [
+    ['ellipse-static', 'ellipse', false, false, false],
+    ['path-static', 'path', false, false, false],
+    ['ellipse-parent-transform', 'ellipse', true, false, false],
+    ['path-parent-transform', 'path', true, false, false],
+    ['ellipse-parent-mask', 'ellipse', true, true, false],
+    ['path-parent-mask', 'path', true, true, false],
+    ['ellipse-parent-filter', 'ellipse', true, false, true],
+    ['path-parent-filter', 'path', true, false, true],
+    ['ellipse-parent-mask-filter', 'ellipse', true, true, true],
+    ['path-parent-mask-filter', 'path', true, true, true],
+  ];
+  const root = document.querySelector('#cases');
+  for (const [id, primitive, animated, masked, filtered] of cases) {
+    const index = cases.findIndex(([candidate]) => candidate === id);
+    const article = document.createElement('article');
+    article.className = 'case';
+    article.id = id;
+    article.style.left = `${16 + (index % 2) * 438}px`;
+    article.style.top = `${52 + Math.floor(index / 2) * 288}px`;
+    const geometry = primitive === 'ellipse'
+      ? `<ellipse id="${id}-orbit" cx="200" cy="120" rx="178" ry="96" transform="rotate(-12 200 120)"/>`
+      : `<path id="${id}-orbit" d="M 22 120 A 178 96 0 1 1 378 120 A 178 96 0 1 1 22 120 Z" transform="rotate(-12 200 120)"/>`;
+    article.innerHTML = `
+      <h2>${id}</h2>
+      <svg viewBox="0 0 400 240" aria-label="${id}">
+        <defs>
+          <radialGradient id="${id}-fade">
+            <stop offset="0%" stop-color="black"/>
+            <stop offset="58%" stop-color="black"/>
+            <stop offset="78%" stop-color="white"/>
+            <stop offset="100%" stop-color="white"/>
+          </radialGradient>
+          <mask id="${id}-mask"><rect width="400" height="240" fill="url(#${id}-fade)"/></mask>
+          ${geometry}
+        </defs>
+        <g class="surface${filtered ? ' with-filter' : ''}"${masked ? ` mask="url(#${id}-mask)"` : ''}>
+          <g class="plane${animated ? ' orbit' : ''}">
+            <use class="guide" href="#${id}-orbit"/>
+            <text><textPath href="#${id}-orbit" startOffset="4%">${primitive.toUpperCase()} LABEL PAINT EVIDENCE</textPath></text>
+          </g>
+        </g>
+      </svg>`;
+    root.append(article);
+  }
+  if (new URL(location.href).searchParams.has('hide-labels')) {
+    document.documentElement.dataset.hideLabels = '';
+  }
+  document.documentElement.id = 'ready';
+</script>
+</html>

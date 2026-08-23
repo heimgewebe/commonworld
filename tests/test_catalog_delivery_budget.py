@@ -21,6 +21,7 @@ class CatalogDeliveryBudgetTests(unittest.TestCase):
         for relative in (
             'assets/commonworld-app.js',
             'assets/commonworld-bootstrap-catalog.mjs',
+            'assets/commonworld-page-builds.json',
             'catalog/catalog.json',
             'index.html',
             'contracts/commonworld/catalog-delivery-budget.contract.json',
@@ -328,6 +329,28 @@ class CatalogDeliveryBudgetTests(unittest.TestCase):
         self.assertTrue(
             any(error.startswith('evidence delta is stale for catalog_initial_gzip_bytes:') for error in errors)
         )
+
+    def test_validator_rejects_stale_current_surface_note(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            root = self.copy_delivery_tree(tmp)
+            benchmark_path = root / 'docs/evidence/catalog-delivery-benchmark-v1.json'
+            benchmark = json.loads(benchmark_path.read_text(encoding='utf-8'))
+            benchmark['current_surface_note'] = benchmark['current_surface_note'].replace(
+                benchmark['current_surface_binding']['release_id'], 'f5ac3b86537f942776d1'
+            )
+            benchmark_path.write_text(json.dumps(benchmark), encoding='utf-8')
+            errors = validate(root)
+        self.assertIn('current surface note is stale', errors)
+
+    def test_validator_rejects_stale_current_surface_binding(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            root = self.copy_delivery_tree(tmp)
+            benchmark_path = root / 'docs/evidence/catalog-delivery-benchmark-v1.json'
+            benchmark = json.loads(benchmark_path.read_text(encoding='utf-8'))
+            benchmark['current_surface_binding']['release_id'] = 'f5ac3b86537f942776d1'
+            benchmark_path.write_text(json.dumps(benchmark), encoding='utf-8')
+            errors = validate(root)
+        self.assertIn('current surface binding is stale', errors)
 
     def test_validator_rejects_runtime_catalogue_refetch(self) -> None:
         with tempfile.TemporaryDirectory() as tmp:

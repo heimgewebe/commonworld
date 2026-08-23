@@ -131,6 +131,13 @@ ORBIT_PROFILES = (
     (274, 284, -77),
 )
 
+
+def orbit_path_data(rx: int, ry: int, cx: int = 320, cy: int = 320) -> str:
+    """Return one deterministic closed SVG path for an ellipse-shaped orbit."""
+    left = cx - rx
+    right = cx + rx
+    return f"M {left} {cy} A {rx} {ry} 0 1 1 {right} {cy} A {rx} {ry} 0 1 1 {left} {cy} Z"
+
 def synchronize_module_import_versions(root: Path = ROOT) -> None:
     """Bind every local browser-module edge to the dependency bytes it loads."""
     for module_path, dependencies in MODULE_IMPORT_DEPENDENCIES:
@@ -371,7 +378,7 @@ def render_shell(root: Path = ROOT, locale: str = FALLBACK_LOCALE) -> str:
     static_skip_href = "/#static-catalog-fallback" if page_name == "index.html" else f"/{page_name}#static-catalog-fallback"
     records = localize_records(load_records(root), locale, root)
     paths = "\n".join(
-        f'              <ellipse id="sphere-path-{index}" cx="320" cy="320" rx="{rx}" ry="{ry}" transform="rotate({rotation} 320 320)" />'
+        f'              <path id="sphere-path-{index}" d="{orbit_path_data(rx, ry)}" transform="rotate({rotation} 320 320)" />'
         for index, (rx, ry, rotation) in enumerate(ORBIT_PROFILES, start=1)
     )
     # JavaScript creates the interactive cards from the compact bootstrap. DE/EN keep a

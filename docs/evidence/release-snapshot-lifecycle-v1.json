@@ -9,10 +9,10 @@
       "unmerged_path_count": 36
     }
   },
-  "current_release_id": "f5ac3b86537f942776d1",
+  "current_release_id": "cbdb678d890d882d040a",
   "delivery_evidence": {
-    "docs/evidence/catalog-delivery-benchmark-v1.json": "7d8bb784e779a8214f88b8a54dccfbda96de4026e3c16c601f6061a342fab389",
-    "docs/evidence/catalog-delivery-public-browser-smoke-v1.json": "11175e67a3bedbc35cf8a1f28a9c6c2ba46f1413f6d697ad9ad0215774b4ed0a"
+    "docs/evidence/catalog-delivery-benchmark-v1.json": "446601a3d5cd685fd6d2b5c980583bdcabe2c6e3c92973f0b6e15f7b9bdd3aa9",
+    "docs/evidence/catalog-delivery-public-browser-smoke-v1.json": "27a340194208023883d89fa8106697de20dfb5e3eda9ed26a637d5098ab28f25"
   },
   "freshness_model": "digest-defined-proposed-head-scope",
   "kind": "commonworld.release_snapshot_lifecycle_evidence",
@@ -24,14 +24,14 @@
     "scripts/build_page_release_manifest.py": "173848a0794cafae03dd58c6d26f2b632f97ff7c76fa514b5d2e7d226d4e98ee",
     "scripts/measure_release_snapshot_lifecycle.py": "e57826aa7fe7c0999c15608d8a316d1c030f343b81ec646819728dbb0cba5277",
     "scripts/public_cache.py": "4da2bd6dd8267e644506ac7284090755e33ad3415c46b9c7caa1d0750e6f0cd7",
-    "scripts/render_public_shell.py": "5224b88473da15a7790d3a7ec27d5558d66df5092f5d3068cc1af7f1d8117472",
+    "scripts/render_public_shell.py": "5b7afea2f27389960a6b82cfae3a7c4c27088e72c6b7883a10a17d40736b1333",
     "scripts/validate_cache_coherence.py": "50b924851facfad392b04e09cd8714cb9cba3d8c7855632cd01d45a0739d0fa6",
     "scripts/validate_canonical_plan.py": "1b3658c7c8cbe51b9d442aa7068f0e10dfb7d33235e42ad6d3ca15cf8d3ec69b",
-    "scripts/validate_catalog_delivery_budget.py": "4b991fdf70233ffee0733dc06b21c52853168585be845a9e4fd503eedf6871a0",
+    "scripts/validate_catalog_delivery_budget.py": "da2f9301aa760419bd25ce38679c07643a670d7167820ca93f81e982b49f2382",
     "scripts/validate_release_snapshot_lifecycle.py": "13b2fb3f01192fd6057d295684406556dd3ba4b0e578de5504ad39130fd3869c",
     "tests/test_release_snapshot_lifecycle.py": "6cd44edbe32e10d17485b168ce547f0789a641a5ffdf1e47889bf6782b464f92"
   },
-  "proposed_head_scope_sha256": "5de65db935989e65387099f6b11a1745c9ead917afbba7ec2a109219f8708f16",
+  "proposed_head_scope_sha256": "c46fa11421f0a8f7024168e1ca3546de4a512a17c24443266afbfe1afe73793f",
   "schema_version": 1,
   "status": "fresh",
   "task_id": "COMMONWORLD-PUBLIC-GLOBE-V1-T040"

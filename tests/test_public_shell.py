@@ -6,7 +6,7 @@ import unittest
 from pathlib import Path
 
 from scripts.render_public_shell import (
-    LANGUAGE_NATIVE_NAMES, MODULE_IMPORT_DEPENDENCIES, RECOVERY_PAGE_SIZE, activity_notice, catalog_language_codes, language_option_direction, load_records, render_bootstrap_catalog, render_cards, render_shell,
+    LANGUAGE_NATIVE_NAMES, MODULE_IMPORT_DEPENDENCIES, ORBIT_PROFILES, RECOVERY_PAGE_SIZE, activity_notice, catalog_language_codes, language_option_direction, load_records, orbit_path_data, render_bootstrap_catalog, render_cards, render_shell,
 )
 from scripts.static_surface_parser import (
     find_css_block,
@@ -293,6 +293,21 @@ class PublicShellTests(unittest.TestCase):
             errors = validate_public_shell(root)
 
         self.assertIn('public shell missing required token: class="digital-sphere"', errors)
+
+    def test_digital_sphere_orbits_are_deterministic_svg_paths(self) -> None:
+        markup = render_shell(locale="en")
+        self.assertNotIn('<ellipse id="sphere-path-', markup)
+        self.assertEqual(len(ORBIT_PROFILES), markup.count('<path id="sphere-path-'))
+        for index, (rx, ry, rotation) in enumerate(ORBIT_PROFILES, start=1):
+            expected = (
+                f'<path id="sphere-path-{index}" d="{orbit_path_data(rx, ry)}" '
+                f'transform="rotate({rotation} 320 320)" />'
+            )
+            self.assertEqual(1, markup.count(expected))
+        self.assertEqual(
+            "M 4 320 A 316 300 0 1 1 636 320 A 316 300 0 1 1 4 320 Z",
+            orbit_path_data(316, 300),
+        )
 
     def test_bootstrap_catalog_is_a_deterministic_module_not_dom_text(self) -> None:
         html = (ROOT / "index.html").read_text(encoding="utf-8")

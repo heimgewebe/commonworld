@@ -20,6 +20,7 @@ OPTIONS_PATH = ROOT / 'docs/catalog-delivery-options.md'
 SMOKE_SCRIPT_PATH = ROOT / 'scripts/smoke_public_browser.mjs'
 SMOKE_RUNNER_PATH = ROOT / 'scripts/run_browser_smoke.py'
 SMOKE_PLAN_PATH = ROOT / 'scripts/browser_smoke_plan.py'
+RELEASE_MANIFEST_PATH = ROOT / 'assets/commonworld-page-builds.json'
 CATALOGUE_NETWORK_BLOCKED_SCENARIO = 'catalogue-network-blocked'
 BOOTSTRAP_ASSET_FAILURE_SCENARIO = 'bootstrap-asset-failure-fallback'
 POST_RENDER_FAILURE_SCENARIO = 'post-render-failure-preserves-fallback'
@@ -31,6 +32,28 @@ def load_json(path: Path) -> dict:
 
 def file_sha256(path: Path) -> str:
     return hashlib.sha256(path.read_bytes()).hexdigest()
+
+
+def canonical_sha256(value: object) -> str:
+    encoded = json.dumps(
+        value,
+        ensure_ascii=False,
+        sort_keys=True,
+        separators=(',', ':'),
+    ).encode('utf-8')
+    return hashlib.sha256(encoded).hexdigest()
+
+
+def release_ids_from_requests(requests: list[str]) -> set[str]:
+    release_ids: set[str] = set()
+    prefix = '/releases/'
+    for request_path in requests:
+        if not isinstance(request_path, str) or not request_path.startswith(prefix):
+            continue
+        release_id = request_path[len(prefix):].split('/', 1)[0]
+        if release_id:
+            release_ids.add(release_id)
+    return release_ids
 
 
 def scenario_map(value: dict) -> tuple[list[str], dict[str, dict], list[str]]:
@@ -227,7 +250,8 @@ def validate(root: Path = ROOT, warnings: list[str] | None = None) -> list[str]:
     smoke_script_path = root / SMOKE_SCRIPT_PATH.relative_to(ROOT)
     smoke_runner_path = root / SMOKE_RUNNER_PATH.relative_to(ROOT)
     smoke_plan_path = root / SMOKE_PLAN_PATH.relative_to(ROOT)
-    for path in (contract_path, evidence_path, smoke_evidence_path, options_path, app_path, smoke_script_path, smoke_runner_path, smoke_plan_path):
+    release_manifest_path = root / RELEASE_MANIFEST_PATH.relative_to(ROOT)
+    for path in (contract_path, evidence_path, smoke_evidence_path, options_path, app_path, smoke_script_path, smoke_runner_path, smoke_plan_path, release_manifest_path):
         if not path.is_file():
             errors.append(f'missing catalogue delivery artifact: {path.relative_to(root)}')
     if errors:
@@ -236,6 +260,10 @@ def validate(root: Path = ROOT, warnings: list[str] | None = None) -> list[str]:
     contract = load_json(contract_path)
     evidence = load_json(evidence_path)
     smoke_evidence = load_json(smoke_evidence_path)
+    release_manifest = load_json(release_manifest_path)
+    current_release_id = release_manifest.get('release_id')
+    if not isinstance(current_release_id, str) or not current_release_id:
+        errors.append('current release manifest has no release_id')
     static = measure(root)
     budgets = contract.get('budgets', {})
 
@@ -405,6 +433,7 @@ def validate(root: Path = ROOT, warnings: list[str] | None = None) -> list[str]:
         for profile in optimized_profiles
         if isinstance(profile, dict) and isinstance(profile.get('first_party_surface_sha256'), str)
     }
+    current_surface_sha256 = next(iter(surface_hashes)) if len(surface_hashes) == 1 else None
     if len(surface_hashes) != 1 or binding.get('first_party_surface_sha256') not in surface_hashes:
         errors.append('public browser smoke evidence is stale for the first-party surface')
     for required_scenario in ('startup-and-ring-orbits', CATALOGUE_NETWORK_BLOCKED_SCENARIO, BOOTSTRAP_ASSET_FAILURE_SCENARIO, POST_RENDER_FAILURE_SCENARIO, 'provider-failure', 'method-mobile', 'method-desktop'):
@@ -449,6 +478,109 @@ def validate(root: Path = ROOT, warnings: list[str] | None = None) -> list[str]:
             else:
                 if profile.get('first_party_surface_sha256') != current_surface_sha256:
                     errors.append(f'{name}: browser evidence is stale for the current first-party surface')
+            request_release_ids = release_ids_from_requests(requests)
+            if current_release_id and request_release_ids != {current_release_id}:
+                errors.append(
+                    f'{name}: browser evidence release binding is stale: '
+                    f'expected {current_release_id}, got {sorted(request_release_ids)}'
+                )
+
+    validation = evidence.get('validation', {})
+    public_summary = validation.get('public_browser_smoke', {})
+    expected_public_summary = {
+        'verdict': 'PASS',
+        'committed_evidence_sha256': file_sha256(smoke_evidence_path),
+        'first_party_surface_sha256': binding.get('first_party_surface_sha256'),
+        'scenario_count': len(smoke_ids),
+        'release_id': current_release_id,
+        'scope': f'local Chromium on deterministic release {current_release_id}',
+    }
+    for key, expected_value in expected_public_summary.items():
+        if public_summary.get(key) != expected_value:
+            errors.append(f'current public browser smoke summary is stale for {key}')
+
+    measurement_summary = validation.get('catalog_delivery_browser_measurement', {})
+    expected_attempt_hashes = [
+        attempt.get('measurement_sha256')
+        for attempt in browser.get('attempts', [])
+        if isinstance(attempt, dict)
+    ]
+    expected_measurement_summary = {
+        'verdict': 'PASS' if browser.get('gate_verdict') == 'pass' else str(browser.get('gate_verdict', '')).upper(),
+        'decision': browser.get('decision'),
+        'attempt_count': browser.get('attempt_count'),
+        'attempt_measurement_sha256s': expected_attempt_hashes,
+        'profiles': [profile.get('profile') for profile in browser.get('profiles', [])],
+        'cpu_throttle_rate': browser.get('cpu_throttle_rate'),
+        'first_party_surface_sha256': browser.get('first_party_surface_sha256'),
+        'release_id': current_release_id,
+    }
+    for key, expected_value in expected_measurement_summary.items():
+        if measurement_summary.get(key) != expected_value:
+            errors.append(f'current browser measurement summary is stale for {key}')
+    measurement_note = measurement_summary.get('repeatability_note')
+    if not isinstance(measurement_note, str) or f'release-{current_release_id}' not in measurement_note:
+        errors.append('current browser measurement repeatability note is stale')
+
+    static_summary = validation.get('catalog_delivery_static_measurement', {})
+    if static_summary.get('verdict') != 'PASS':
+        errors.append('current static measurement summary is not PASS')
+    if static_summary.get('result_sha256') != canonical_sha256(optimized_static):
+        errors.append('current static measurement summary hash is stale')
+    if static_summary.get('release_id') != current_release_id:
+        errors.append('current static measurement summary release is stale')
+    static_note = static_summary.get('note')
+    if not isinstance(static_note, str) or f'release {current_release_id}' not in static_note:
+        errors.append('current static measurement summary note is stale')
+
+    expected_current_surface_binding = {
+        'release_id': current_release_id,
+        'first_party_surface_sha256': browser.get('first_party_surface_sha256'),
+        'public_browser_smoke_evidence_sha256': file_sha256(smoke_evidence_path),
+        'browser_measurement_decision_sha256': canonical_sha256(browser),
+        'static_measurement_sha256': canonical_sha256(optimized_static),
+    }
+    if evidence.get('current_surface_binding') != expected_current_surface_binding:
+        errors.append('current surface binding is stale')
+
+    current_surface_note = evidence.get('current_surface_note')
+    if not isinstance(current_surface_note, str) or f'deterministic release {current_release_id}' not in current_surface_note:
+        errors.append('current surface note is stale')
+
+    attempt_profiles: list[dict[str, dict]] = []
+    for attempt in browser.get('attempts', []):
+        measurement = attempt.get('measurement', {}) if isinstance(attempt, dict) else {}
+        attempt_profiles.append({
+            profile.get('profile'): profile
+            for profile in measurement.get('profiles', [])
+            if isinstance(profile, dict) and isinstance(profile.get('profile'), str)
+        })
+    expected_repeatability_profiles: dict[str, dict] = {}
+    for name in ('mobile-low-power', 'desktop-low-power'):
+        if not attempt_profiles or any(name not in attempt for attempt in attempt_profiles):
+            continue
+        expected_repeatability_profiles[name] = {}
+        for field in ('runtime_ready_ms', 'script_duration_ms', 'task_duration_ms'):
+            values = [attempt[name].get(field) for attempt in attempt_profiles]
+            if all(is_number(value) for value in values):
+                expected_repeatability_profiles[name][field] = {
+                    'min': min(values),
+                    'max': max(values),
+                    'values': values,
+                }
+    repeatability = evidence.get('browser_repeatability', {})
+    if repeatability.get('run_count') != browser.get('attempt_count'):
+        errors.append('browser repeatability run count is stale')
+    if repeatability.get('cpu_throttle_rate') != browser.get('cpu_throttle_rate'):
+        errors.append('browser repeatability CPU throttle binding is stale')
+    if repeatability.get('profiles') != expected_repeatability_profiles:
+        errors.append('browser repeatability metrics are stale')
+    repeatability_interpretation = repeatability.get('interpretation')
+    if (
+        not isinstance(repeatability_interpretation, str)
+        or f'release-{current_release_id}' not in repeatability_interpretation
+    ):
+        errors.append('browser repeatability interpretation is stale')
 
     options = options_path.read_text(encoding='utf-8')
     for token in (
