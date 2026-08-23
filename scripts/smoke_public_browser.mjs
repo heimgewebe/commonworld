@@ -1,7 +1,8 @@
 import { createServer } from 'node:http';
-import { readFile, rename, stat, writeFile } from 'node:fs/promises';
+import { mkdir, readFile, rename, stat, writeFile } from 'node:fs/promises';
 import path from 'node:path';
 import process from 'node:process';
+import { inflateSync } from 'node:zlib';
 import { chromium } from 'playwright';
 import {
   buildDigitalPresentationTree,
@@ -60,6 +61,185 @@ const MIME = new Map([
 
 function assert(condition, message) {
   if (!condition) throw new Error(message);
+}
+
+function paethPredictor(left, above, upperLeft) {
+  const estimate = left + above - upperLeft;
+  const leftDistance = Math.abs(estimate - left);
+  const aboveDistance = Math.abs(estimate - above);
+  const upperLeftDistance = Math.abs(estimate - upperLeft);
+  if (leftDistance <= aboveDistance && leftDistance <= upperLeftDistance) return left;
+  return aboveDistance <= upperLeftDistance ? above : upperLeft;
+}
+
+function decodeScreenshotPng(buffer) {
+  const signature = Buffer.from([137, 80, 78, 71, 13, 10, 26, 10]);
+  assert(buffer.subarray(0, 8).equals(signature), 'ring paint screenshot is not a PNG');
+  let width = 0;
+  let height = 0;
+  let bitDepth = 0;
+  let colorType = 0;
+  let interlace = 0;
+  const compressed = [];
+  for (let offset = 8; offset < buffer.length;) {
+    const length = buffer.readUInt32BE(offset);
+    const type = buffer.toString('ascii', offset + 4, offset + 8);
+    const data = buffer.subarray(offset + 8, offset + 8 + length);
+    if (type === 'IHDR') {
+      width = data.readUInt32BE(0);
+      height = data.readUInt32BE(4);
+      bitDepth = data[8];
+      colorType = data[9];
+      interlace = data[12];
+    } else if (type === 'IDAT') {
+      compressed.push(data);
+    } else if (type === 'IEND') {
+      break;
+    }
+    offset += length + 12;
+  }
+  assert(width > 0 && height > 0 && bitDepth === 8 && interlace === 0, `unsupported ring paint PNG header (${JSON.stringify({ width, height, bitDepth, colorType, interlace })})`);
+  const channels = colorType === 6 ? 4 : colorType === 2 ? 3 : 0;
+  assert(channels > 0, `unsupported ring paint PNG color type (${colorType})`);
+  const packed = inflateSync(Buffer.concat(compressed));
+  const rowSize = width * channels;
+  assert(packed.length === height * (rowSize + 1), `ring paint PNG data length drifted (${packed.length})`);
+  const pixels = Buffer.alloc(width * height * channels);
+  for (let row = 0; row < height; row += 1) {
+    const packedOffset = row * (rowSize + 1);
+    const filter = packed[packedOffset];
+    const outputOffset = row * rowSize;
+    for (let column = 0; column < rowSize; column += 1) {
+      const raw = packed[packedOffset + column + 1];
+      const left = column >= channels ? pixels[outputOffset + column - channels] : 0;
+      const above = row > 0 ? pixels[outputOffset + column - rowSize] : 0;
+      const upperLeft = row > 0 && column >= channels ? pixels[outputOffset + column - rowSize - channels] : 0;
+      let value;
+      if (filter === 0) value = raw;
+      else if (filter === 1) value = raw + left;
+      else if (filter === 2) value = raw + above;
+      else if (filter === 3) value = raw + Math.floor((left + above) / 2);
+      else if (filter === 4) value = raw + paethPredictor(left, above, upperLeft);
+      else throw new Error(`unsupported ring paint PNG row filter (${filter})`);
+      pixels[outputOffset + column] = value & 0xff;
+    }
+  }
+  return { width, height, channels, pixels };
+}
+
+function screenshotPixelDifferences(visibleBuffer, hiddenBuffer, regions, threshold = 12) {
+  const visible = decodeScreenshotPng(visibleBuffer);
+  const hidden = decodeScreenshotPng(hiddenBuffer);
+  assert(visible.width === hidden.width && visible.height === hidden.height && visible.channels === hidden.channels, 'ring paint screenshots have incompatible PNG geometry');
+  return regions.map((region) => {
+    const left = Math.max(0, Math.floor(region.x));
+    const top = Math.max(0, Math.floor(region.y));
+    const right = Math.min(visible.width, Math.ceil(region.x + region.width));
+    const bottom = Math.min(visible.height, Math.ceil(region.y + region.height));
+    let changedPixels = 0;
+    for (let y = top; y < bottom; y += 1) {
+      for (let x = left; x < right; x += 1) {
+        const offset = (y * visible.width + x) * visible.channels;
+        let maximumDifference = 0;
+        for (let channel = 0; channel < 3; channel += 1) {
+          maximumDifference = Math.max(maximumDifference, Math.abs(visible.pixels[offset + channel] - hidden.pixels[offset + channel]));
+        }
+        if (maximumDifference >= threshold) changedPixels += 1;
+      }
+    }
+    return { ...region, changedPixels };
+  });
+}
+
+async function captureRingLabelPaintEvidence(page, scenarioId) {
+  await page.waitForSelector('.globe-stage[data-visual-ready="true"]');
+  await waitForSphereGeometrySettled(page);
+  await waitForSphereOpacitySettled(page);
+  const state = await page.evaluate(() => {
+    const sphere = document.querySelector('#digital-sphere');
+    const sphereRect = sphere?.getBoundingClientRect();
+    if (!sphere || !sphereRect || sphereRect.width <= 0 || sphereRect.height <= 0) return null;
+    const animationStates = [];
+    for (const plane of document.querySelectorAll('#sphere-rings .sphere-ring-plane')) {
+      const animation = plane.getAnimations().find((candidate) => candidate.animationName === 'sphere-ring-orbit') ?? null;
+      if (!animation) continue;
+      const duration = Number(animation.effect?.getComputedTiming?.().duration);
+      animationStates.push({ animation, currentTime: animation.currentTime, playState: animation.playState });
+      animation.pause();
+      animation.currentTime = Number.isFinite(duration) && duration > 0 ? duration * 0.3125 : 1;
+    }
+    window.__commonworldRingPaintAnimationStates = animationStates;
+    return {
+      sphereWidth: sphereRect.width,
+      sphereHeight: sphereRect.height,
+      pathCount: document.querySelectorAll('#sphere-paths > path[id^="sphere-path-"]').length,
+      ellipseCount: document.querySelectorAll('#sphere-paths > ellipse[id^="sphere-path-"]').length,
+      labelVisibilities: [...document.querySelectorAll('#sphere-rings .sphere-ring-text')].map((label) => getComputedStyle(label).visibility),
+      regions: [...document.querySelectorAll('.sphere-ring-plane[data-emphasis="primary"] .sphere-ring-text')].map((label) => {
+        const rect = label.getBoundingClientRect();
+        return {
+          layer: label.dataset.layerId ?? '',
+          x: Math.max(0, rect.left - sphereRect.left - 2),
+          y: Math.max(0, rect.top - sphereRect.top - 2),
+          width: Math.min(sphereRect.width, rect.right - sphereRect.left + 2) - Math.max(0, rect.left - sphereRect.left - 2),
+          height: Math.min(sphereRect.height, rect.bottom - sphereRect.top + 2) - Math.max(0, rect.top - sphereRect.top - 2),
+        };
+      }).filter(({ width, height }) => width > 0 && height > 0),
+      frozenTransforms: [...document.querySelectorAll('#sphere-rings .sphere-ring-plane')].map((plane) => getComputedStyle(plane).transform),
+    };
+  });
+  assert(state && state.pathCount > 0 && state.ellipseCount === 0, `${scenarioId}: digital orbit definitions are not exclusively SVG paths (${JSON.stringify(state)})`);
+  assert(state.regions.length >= 2, `${scenarioId}: primary ring label paint regions are absent (${JSON.stringify(state)})`);
+  await page.waitForTimeout(80);
+  state.frozenTransforms = await page.evaluate(() => [...document.querySelectorAll('#sphere-rings .sphere-ring-plane')].map((plane) => getComputedStyle(plane).transform));
+  const sphere = page.locator('#digital-sphere');
+  const sphereBox = await sphere.boundingBox();
+  assert(sphereBox && sphereBox.width > 0 && sphereBox.height > 0, `${scenarioId}: digital sphere screenshot clip is absent`);
+  const visible = await page.screenshot({ animations: 'allow', clip: sphereBox });
+  await page.evaluate(() => {
+    for (const label of document.querySelectorAll('#sphere-rings .sphere-ring-text')) {
+      label.style.setProperty('visibility', 'hidden', 'important');
+    }
+  });
+  await page.waitForTimeout(40);
+  const hidden = await page.screenshot({ animations: 'allow', clip: sphereBox });
+  const after = await page.evaluate(() => {
+    const transforms = [...document.querySelectorAll('#sphere-rings .sphere-ring-plane')].map((plane) => getComputedStyle(plane).transform);
+    const hiddenVisibilities = [...document.querySelectorAll('#sphere-rings .sphere-ring-text')].map((label) => getComputedStyle(label).visibility);
+    for (const label of document.querySelectorAll('#sphere-rings .sphere-ring-text')) label.style.removeProperty('visibility');
+    for (const { animation, currentTime, playState } of window.__commonworldRingPaintAnimationStates ?? []) {
+      if (currentTime !== null) animation.currentTime = currentTime;
+      if (playState === 'running') animation.play();
+      else if (playState === 'paused') animation.pause();
+    }
+    delete window.__commonworldRingPaintAnimationStates;
+    return { transforms, hiddenVisibilities };
+  });
+  assert(state.labelVisibilities.every((visibility) => visibility === 'visible') && after.hiddenVisibilities.every((visibility) => visibility === 'hidden'), `${scenarioId}: label visibility toggle did not bracket the paint screenshots (${JSON.stringify({ before: state.labelVisibilities, hidden: after.hiddenVisibilities })})`);
+  assert(JSON.stringify(after.transforms) === JSON.stringify(state.frozenTransforms), `${scenarioId}: ring animation did not remain frozen across paint screenshots`);
+  const visiblePng = decodeScreenshotPng(visible);
+  const xScale = visiblePng.width / state.sphereWidth;
+  const yScale = visiblePng.height / state.sphereHeight;
+  const scaledRegions = state.regions.map((region) => ({
+    ...region,
+    x: region.x * xScale,
+    y: region.y * yScale,
+    width: region.width * xScale,
+    height: region.height * yScale,
+  }));
+  const differences = screenshotPixelDifferences(visible, hidden, scaledRegions);
+  const artifactDirectory = process.env.COMMONWORLD_RING_PAINT_ARTIFACT_DIR;
+  if (artifactDirectory) {
+    const target = path.resolve(artifactDirectory);
+    await mkdir(target, { recursive: true });
+    await Promise.all([
+      writeFile(path.join(target, `${scenarioId}-labels.png`), visible),
+      writeFile(path.join(target, `${scenarioId}-no-labels.png`), hidden),
+      writeFile(path.join(target, `${scenarioId}-result.json`), `${JSON.stringify({ differences, frozenTransforms: state.frozenTransforms }, null, 2)}\n`, 'utf8'),
+    ]);
+  }
+  assert(differences.every(({ changedPixels }) => changedPixels >= 40), `${scenarioId}: one or more primary ring labels produced no relevant paint difference (${JSON.stringify(differences)})`);
+  return { differences, frozenTransforms: state.frozenTransforms };
 }
 
 function validRecordedCameraTarget(target) {
@@ -840,9 +1020,9 @@ async function startupAndRingOrbitScenario() {
   const rings = await run.page.evaluate(() => {
     return [...document.querySelectorAll('#sphere-rings .sphere-ring-plane')].map((plane) => {
       const style = getComputedStyle(plane);
-      const guideGroup = plane.querySelector('.sphere-ring-guides');
-      const guideStyle = guideGroup ? getComputedStyle(guideGroup) : null;
+      const guide = plane.querySelector('use.sphere-bundle-main-ring');
       const text = plane.querySelector('.sphere-ring-text');
+      const textPath = text?.querySelector('textPath');
       const textStyle = text ? getComputedStyle(text) : null;
       const textRect = text?.getBoundingClientRect();
       const sphereRect = document.querySelector('#digital-sphere')?.getBoundingClientRect();
@@ -858,16 +1038,21 @@ async function startupAndRingOrbitScenario() {
         orbitDuration: Number(plane.dataset.orbitDuration),
         directionVariable: plane.style.getPropertyValue('--ring-orbit-direction').trim(),
         startAngleVariable: plane.style.getPropertyValue('--ring-orbit-start-angle').trim(),
-        animationName: guideStyle?.animationName ?? 'none',
-        animationDurationSeconds: Number.parseFloat(guideStyle?.animationDuration ?? '0'),
-        animationIterationCount: guideStyle?.animationIterationCount ?? '0',
-        animationPlayState: guideStyle?.animationPlayState ?? 'idle',
-        planeAnimationName: style.animationName,
+        animationName: style.animationName,
+        animationDurationSeconds: Number.parseFloat(style.animationDuration),
+        animationIterationCount: style.animationIterationCount,
+        animationPlayState: style.animationPlayState,
         planeTransform: style.transform,
-        guideGroupCount: plane.querySelectorAll(':scope > .sphere-ring-guides').length,
+        directUseCount: plane.querySelectorAll(':scope > use').length,
         textAnimationName: textStyle?.animationName ?? 'none',
         textTransform: textStyle?.transform ?? 'none',
-        textInsideGuideGroup: Boolean(text?.closest('.sphere-ring-guides')),
+        textParentIsPlane: text?.parentElement === plane,
+        guideParentIsPlane: guide?.parentElement === plane,
+        guideHref: guide?.getAttribute('href') ?? '',
+        textPathHref: textPath?.getAttribute('href') ?? '',
+        definitionTagName: guide?.correspondingElement?.tagName?.toLowerCase()
+          ?? document.querySelector(guide?.getAttribute('href') ?? '')?.tagName?.toLowerCase()
+          ?? '',
         textWidth: textRect?.width ?? 0,
         textHeight: textRect?.height ?? 0,
         textScreenFontSize: Number.parseFloat(textStyle?.fontSize ?? '0') * sphereScale,
@@ -900,12 +1085,14 @@ async function startupAndRingOrbitScenario() {
     const expectedLayer = expectedDigitalProjection.fields.find(({ id }) => id === ring.layer);
     assert(expectedLayer, `ring orbits: rendered unknown layer ${ring.layer}`);
     assert(ring.hasGuide, `ring orbits: ${ring.layer} lost its orbit guide`);
-    assert(ring.guideGroupCount === 1, `ring orbits: ${ring.layer} must expose exactly one animated guide bundle ${JSON.stringify(ring)}`);
-    assert(ring.planeAnimationName === 'none' && ring.planeTransform === 'none', `ring labels: ${ring.layer} retained a transformed/animated text ancestor ${JSON.stringify(ring)}`);
-    assert(!ring.textInsideGuideGroup && ring.textAnimationName === 'none' && ring.textTransform === 'none' && ring.textVisible && ring.textWidth > 80 && ring.textHeight > 0 && ring.textScreenFontSize >= 12.5, `ring labels: ${ring.layer} is not reliably isolated and visible in desktop screen space ${JSON.stringify(ring)}`);
+    assert(ring.planeTransform !== 'none', `ring orbits: ${ring.layer} has no shared plane transform ${JSON.stringify(ring)}`);
+    assert(ring.textParentIsPlane && ring.guideParentIsPlane && ring.textAnimationName === 'none' && ring.textTransform === 'none', `ring cohesion: ${ring.layer} line and label do not share exactly one animated parent ${JSON.stringify(ring)}`);
+    assert(ring.guideHref === ring.textPathHref && ring.definitionTagName === 'path', `ring geometry: ${ring.layer} line and text do not share one SVG path definition ${JSON.stringify(ring)}`);
+    assert(ring.textVisible && ring.textWidth > 80 && ring.textHeight > 0 && ring.textScreenFontSize >= 12.5, `ring labels: ${ring.layer} is not visibly laid out in desktop screen space ${JSON.stringify(ring)}`);
     const expectedChildIds = [];
     const expectedVisibleChildCount = 0;
     assert(ring.mainRingCount === 1, `ring bundles: ${ring.layer} must retain exactly one main ring ${JSON.stringify(ring)}`);
+    assert(ring.directUseCount === ring.bundleLineCount, `ring cohesion: ${ring.layer} lines escaped or duplicated the shared plane ${JSON.stringify(ring)}`);
     assertSameIds(ring.childRingIds, expectedChildIds, `ring bundles: ${ring.layer} subordinate ring set`);
     assertSameIds(ring.sublabelIds, expectedChildIds, `ring bundles: ${ring.layer} subordinate label set`);
     assert(ring.bundleChildCount === 0 && ring.bundleTotalChildCount === 0, `ring bundles: root overview descended beyond direct fields ${JSON.stringify({ ring, expectedLayer })}`);
@@ -982,17 +1169,16 @@ async function startupAndRingOrbitScenario() {
   assert(new Set(rings.map(({ startAngleVariable }) => startAngleVariable)).size === rings.length, 'ring orbits: start angles must stay distinct');
 
   const ringMotionProbe = await run.page.evaluate(() => [...document.querySelectorAll('#sphere-rings .sphere-ring-plane')].map((plane) => {
-    const guides = plane.querySelector('.sphere-ring-guides');
-    const animation = guides?.getAnimations().find((candidate) => candidate.animationName === 'sphere-ring-orbit') ?? null;
+    const animation = plane.getAnimations().find((candidate) => candidate.animationName === 'sphere-ring-orbit') ?? null;
     if (!animation) return { layer: plane.dataset.layerId, animationFound: false };
     const originalCurrentTime = animation.currentTime;
     const originalPlayState = animation.playState;
     const duration = Number(animation.effect?.getComputedTiming?.().duration);
     animation.pause();
     animation.currentTime = 0;
-    const before = getComputedStyle(guides).transform;
+    const before = getComputedStyle(plane).transform;
     animation.currentTime = Number.isFinite(duration) && duration > 0 ? duration / 2 : 1;
-    const after = getComputedStyle(guides).transform;
+    const after = getComputedStyle(plane).transform;
     if (originalCurrentTime !== null) animation.currentTime = originalCurrentTime;
     if (originalPlayState === 'running') animation.play();
     else if (originalPlayState === 'paused') animation.pause();
@@ -1007,6 +1193,7 @@ async function startupAndRingOrbitScenario() {
   assert(ringMotionProbe.every(({ animationFound }) => animationFound), `ring orbits: CSS animation object missing (${JSON.stringify(ringMotionProbe)})`);
   const movedRing = ringMotionProbe.some(({ before, after }) => before !== after);
   assert(movedRing, `ring orbits: orbit keyframes do not change the ring transform (${JSON.stringify(ringMotionProbe)})`);
+  const ringPaintEvidence = await captureRingLabelPaintEvidence(run.page, 'startup-ring-label-paint');
   const idleBefore = Number(await run.page.locator('.globe-stage').getAttribute('data-overlay-renders'));
   await run.page.waitForTimeout(650);
   const idleAfter = Number(await run.page.locator('.globe-stage').getAttribute('data-overlay-renders'));
@@ -1015,7 +1202,7 @@ async function startupAndRingOrbitScenario() {
   assert(run.consoleErrors.length === 0, 'startup: console errors: ' + run.consoleErrors.join(' | ') + '; HTTP: ' + run.httpErrors.join(' | '));
   assert(run.pageErrors.length === 0, 'startup: page errors: ' + run.pageErrors.join(' | '));
   const maximumVisibleRingLabelCharacters = Math.max(...rings.flatMap(({ names }) => names.map(({ visibleText }) => sphereRingLabelLength(visibleText))));
-  results.push({ id: 'startup-and-ring-orbits', verdict: 'PASS', directGlobeProjection: true, hiddenUntilCalibrated: true, outerHintRemoved: true, aggregateRingIdentities: aggregateCount, configuredRingPreviewLimit: SPHERE_RING_IDENTITY_PREVIEW_LIMIT, ringPreviewCounts, maxRingPreviewCount, orbitLabelMaxChars: SPHERE_RING_LABEL_MAX_CHARS, orbitLabelMeasurement: 'extended-grapheme-clusters', maximumVisibleRingLabelCharacters, adaptiveRingBundles: true, rootProgressiveDisclosure: true, renderedBundleLineCount, renderedChildRingCount, oneTextPathPerBundle: true, subordinateLinesIndependentlyStatic: true, accessibleBundleHierarchy: true, accessibleFullTitleParity: true, hiddenSvgAccessibilityNamesRemoved: true, graphemeSafeVisibleLabels: true, collisionSafeVisibleLabels: true, movingRingMatrix: movedRing, unchangedGeometryRepaintSkipped: true });
+  results.push({ id: 'startup-and-ring-orbits', verdict: 'PASS', directGlobeProjection: true, hiddenUntilCalibrated: true, outerHintRemoved: true, aggregateRingIdentities: aggregateCount, configuredRingPreviewLimit: SPHERE_RING_IDENTITY_PREVIEW_LIMIT, ringPreviewCounts, maxRingPreviewCount, orbitLabelMaxChars: SPHERE_RING_LABEL_MAX_CHARS, orbitLabelMeasurement: 'extended-grapheme-clusters', maximumVisibleRingLabelCharacters, adaptiveRingBundles: true, rootProgressiveDisclosure: true, renderedBundleLineCount, renderedChildRingCount, oneTextPathPerBundle: true, sharedPathGeometryPerBundle: true, coherentPlaneAnimation: true, paintedPrimaryLabels: ringPaintEvidence.differences.map(({ layer, changedPixels }) => ({ layer, changedPixels })), subordinateLinesIndependentlyStatic: true, accessibleBundleHierarchy: true, accessibleFullTitleParity: true, hiddenSvgAccessibilityNamesRemoved: true, graphemeSafeVisibleLabels: true, collisionSafeVisibleLabels: true, movingRingMatrix: movedRing, unchangedGeometryRepaintSkipped: true });
   await run.context.close();
 }
 
@@ -1184,8 +1371,7 @@ async function reducedMotionRingScenario() {
   await run.page.waitForSelector('html.runtime-ready');
   const rings = await run.page.evaluate(() => (
     [...document.querySelectorAll('#sphere-rings .sphere-ring-plane')].map((plane) => {
-      const guides = plane.querySelector('.sphere-ring-guides');
-      const style = getComputedStyle(guides ?? plane);
+      const style = getComputedStyle(plane);
       return {
         layer: plane.dataset.layerId,
         entryCount: plane.dataset.entryCount,
@@ -1201,21 +1387,19 @@ async function reducedMotionRingScenario() {
     assert(stopped, `reduced motion rings: ${ring.layer} keeps orbiting (${JSON.stringify(ring)})`);
   }
   const matricesBefore = await run.page.evaluate(() => [...document.querySelectorAll('#sphere-rings .sphere-ring-plane')].map((plane) => {
-    const guides = plane.querySelector('.sphere-ring-guides');
-    const matrix = guides?.getCTM?.();
+    const matrix = plane.getCTM?.();
     return {
       layer: plane.dataset.layerId,
-      transform: getComputedStyle(guides ?? plane).transform,
+      transform: getComputedStyle(plane).transform,
       ctm: matrix ? [matrix.a, matrix.b, matrix.c, matrix.d, matrix.e, matrix.f].map((value) => value.toFixed(5)).join(',') : null,
     };
   }));
   await run.page.waitForTimeout(520);
   const matricesAfter = await run.page.evaluate(() => [...document.querySelectorAll('#sphere-rings .sphere-ring-plane')].map((plane) => {
-    const guides = plane.querySelector('.sphere-ring-guides');
-    const matrix = guides?.getCTM?.();
+    const matrix = plane.getCTM?.();
     return {
       layer: plane.dataset.layerId,
-      transform: getComputedStyle(guides ?? plane).transform,
+      transform: getComputedStyle(plane).transform,
       ctm: matrix ? [matrix.a, matrix.b, matrix.c, matrix.d, matrix.e, matrix.f].map((value) => value.toFixed(5)).join(',') : null,
     };
   }));
@@ -1586,7 +1770,7 @@ async function layerJourneyScenario({ mobile = false, viewportOverride = null, t
       panelVisible: panelNode?.hasAttribute('data-visible') ?? false,
       panelHidden: panelNode?.hidden ?? null,
       ringCount: document.querySelectorAll('.sphere-ring-plane').length,
-      ringsPaused: [...document.querySelectorAll('.sphere-ring-guides')].every((guides) => { const style = getComputedStyle(guides); return style.animationName === 'none' || style.animationPlayState === 'paused'; }),
+      ringsPaused: [...document.querySelectorAll('.sphere-ring-plane')].every((plane) => { const style = getComputedStyle(plane); return style.animationName === 'none' || style.animationPlayState === 'paused'; }),
       commandCount: window.__commonworldCameraCommands?.length ?? 0,
       geometryEvaluations: Number(stageNode.dataset.sphereGeometryEvaluations ?? 0),
       diagnosticPublishes: Number(stageNode.dataset.sphereGeometryDiagnosticPublishes ?? 0),
@@ -2716,13 +2900,13 @@ async function androidGlobeUiScenario() {
       ringTextFontSize: Number.parseFloat(textStyle.fontSize),
       primaryRingCount: planes.filter((plane) => plane.dataset.emphasis === 'primary').length,
       depthRingCount: planes.filter((plane) => plane.dataset.emphasis === 'depth').length,
-      primaryRingsStatic: planes.filter((plane) => plane.dataset.emphasis === 'primary').every((plane) => {
+      primaryRingsAnimated: planes.filter((plane) => plane.dataset.emphasis === 'primary').every((plane) => {
         const style = getComputedStyle(plane);
-        return style.animationName === 'none' && style.transform === 'none';
+        return style.animationName === 'sphere-ring-orbit' && style.transform !== 'none';
       }),
       depthRingsStatic: planes.filter((plane) => plane.dataset.emphasis === 'depth').every((plane) => {
         const style = getComputedStyle(plane);
-        return style.animationName === 'none' && style.transform === 'none';
+        return style.animationName === 'none' && style.transform !== 'none';
       }),
       representativePrimaryLabels: planes
         .filter((plane) => plane.dataset.emphasis === 'primary')
@@ -2749,12 +2933,19 @@ async function androidGlobeUiScenario() {
   });
   assert(geometry.filterCenterDeltaX <= 1 && geometry.filterCenterDeltaY <= 1, scenarioId + ': filter icon is not centered ' + JSON.stringify(geometry));
   assert(geometry.filterButtonWidth >= 44 && geometry.filterButtonHeight >= 44, scenarioId + ': filter button is below mobile touch target ' + JSON.stringify(geometry));
-  assert(geometry.ringAnimationName === 'none' && geometry.ringTransform === 'none' && geometry.primaryRingsStatic, scenarioId + ': primary mobile ring retains CSS animation or transform that can hide Android textPath labels ' + JSON.stringify(geometry));
-  assert(geometry.primaryRingCount >= 2 && geometry.primaryRingCount <= 3 && geometry.depthRingCount > 0 && geometry.depthRingsStatic, scenarioId + ': mobile emphasis does not bound or fully freeze ring groups ' + JSON.stringify(geometry));
+  assert(geometry.ringAnimationName === 'sphere-ring-orbit' && geometry.ringTransform !== 'none' && geometry.primaryRingsAnimated, scenarioId + ': primary portrait ring plane lost coherent path-based motion ' + JSON.stringify(geometry));
+  assert(geometry.primaryRingCount >= 2 && geometry.primaryRingCount <= 3 && geometry.depthRingCount > 0 && geometry.depthRingsStatic, scenarioId + ': portrait emphasis does not bound depth-ring motion ' + JSON.stringify(geometry));
   assert(['micro', 'compact'].includes(geometry.ringDetailLevel), scenarioId + ': mobile detail level is not bounded ' + JSON.stringify(geometry));
   assert(geometry.bundleVisibleChildCounts.every(({ declared, rendered }) => declared === rendered && rendered <= 2), scenarioId + ': mobile bundle detail did not reduce subordinate lines ' + JSON.stringify(geometry));
   assert(geometry.ringTextWidth > 80 && geometry.ringTextHeight > 0 && geometry.ringTextFontSize >= 20, scenarioId + ': mobile ring text is not visibly sized ' + JSON.stringify(geometry));
   assert(geometry.representativePrimaryLabels.length >= 2 && geometry.representativePrimaryLabels.every(({ text, visible, width, height }) => text.length > 0 && visible && width > 80 && height > 0), scenarioId + ': representative primary mobile ring labels are absent or not visibly laid out ' + JSON.stringify(geometry));
+  const portraitPaintRun = await newPage({ mobile: true, touch: true, reducedMotion: 'no-preference' });
+  await portraitPaintRun.page.goto(baseUrl, { waitUntil: 'domcontentloaded' });
+  await portraitPaintRun.page.waitForSelector('html.runtime-ready');
+  await portraitPaintRun.page.waitForFunction(() => document.querySelectorAll('.sphere-ring-text').length > 0);
+  const portraitPaintEvidence = await captureRingLabelPaintEvidence(portraitPaintRun.page, `${scenarioId}-portrait-ring-label-paint`);
+  assert(portraitPaintRun.pageErrors.length === 0, scenarioId + ': portrait paint page errors: ' + portraitPaintRun.pageErrors.join(' | '));
+  await portraitPaintRun.context.close();
 
   await run.page.locator('#sphere-edge-control').focus();
   const focusedRingMotion = await run.page.evaluate(() => ({
@@ -2762,34 +2953,52 @@ async function androidGlobeUiScenario() {
     primaryStates: [...document.querySelectorAll('.sphere-ring-plane[data-emphasis="primary"]')]
       .map((plane) => {
         const style = getComputedStyle(plane);
-        return { animationName: style.animationName, transform: style.transform };
+        return { animationName: style.animationName, animationPlayState: style.animationPlayState, transform: style.transform };
       }),
   }));
   assert(focusedRingMotion.activeElement === 'sphere-edge-control', scenarioId + ': sphere edge control did not receive focus ' + JSON.stringify(focusedRingMotion));
-  assert(focusedRingMotion.primaryStates.length > 0 && focusedRingMotion.primaryStates.every(({ animationName, transform }) => animationName === 'none' && transform === 'none'), scenarioId + ': focused primary mobile rings retain CSS animation or transform ' + JSON.stringify(focusedRingMotion));
+  assert(focusedRingMotion.primaryStates.length > 0 && focusedRingMotion.primaryStates.every(({ animationName, animationPlayState, transform }) => animationName === 'sphere-ring-orbit' && animationPlayState === 'paused' && transform !== 'none'), scenarioId + ': focus did not pause coherent primary portrait ring planes ' + JSON.stringify(focusedRingMotion));
   await run.page.evaluate(() => document.querySelector('#sphere-edge-control')?.blur());
+  const activeClient = await run.context.newCDPSession(run.page);
+  const activeDocument = await activeClient.send('DOM.getDocument', { depth: -1 });
+  const activeControl = await activeClient.send('DOM.querySelector', { nodeId: activeDocument.root.nodeId, selector: '#sphere-edge-control' });
+  assert(activeControl.nodeId, scenarioId + ': sphere edge control has no CDP node');
+  await activeClient.send('CSS.enable');
+  await activeClient.send('CSS.forcePseudoState', { nodeId: activeControl.nodeId, forcedPseudoClasses: ['active'] });
+  const activeRingMotion = await run.page.evaluate(() => ({
+    primaryStates: [...document.querySelectorAll('.sphere-ring-plane[data-emphasis="primary"]')].map((plane) => {
+      const style = getComputedStyle(plane);
+      return { animationName: style.animationName, animationPlayState: style.animationPlayState, transform: style.transform };
+    }),
+  }));
+  assert(activeRingMotion.primaryStates.every(({ animationName, animationPlayState, transform }) => animationName === 'sphere-ring-orbit' && animationPlayState === 'paused' && transform !== 'none'), scenarioId + ': active sphere edge did not pause coherent primary portrait ring planes ' + JSON.stringify(activeRingMotion));
+  await activeClient.send('CSS.forcePseudoState', { nodeId: activeControl.nodeId, forcedPseudoClasses: [] });
+  await activeClient.detach();
 
   await run.page.setViewportSize({ width: 844, height: 390 });
   await run.page.waitForTimeout(650);
   const touchRingState = () => run.page.evaluate(() => [...document.querySelectorAll('.sphere-ring-plane')].map((plane) => {
     const label = plane.querySelector('.sphere-ring-text');
-    const ring = plane.querySelector('.sphere-ring-guides');
+    const ring = plane.querySelector(':scope > use.sphere-bundle-main-ring');
+    const textPath = label?.querySelector('textPath');
+    const planeStyle = getComputedStyle(plane);
     const labelStyle = label ? getComputedStyle(label) : null;
     const ringStyle = ring ? getComputedStyle(ring) : null;
-    const labelTransform = labelStyle?.transform && labelStyle.transform !== 'none' ? new DOMMatrixReadOnly(labelStyle.transform) : null;
-    const ringTransform = ringStyle?.transform && ringStyle.transform !== 'none' ? new DOMMatrixReadOnly(ringStyle.transform) : null;
+    const planeTransform = planeStyle.transform !== 'none' ? new DOMMatrixReadOnly(planeStyle.transform) : null;
     const labelRect = label?.getBoundingClientRect();
     const ringRect = ring?.getBoundingClientRect();
     return {
+      planeAnimationName: planeStyle.animationName,
+      planeAnimationPlayState: planeStyle.animationPlayState,
+      planeOrbitDirection: planeStyle.getPropertyValue('--ring-orbit-direction').trim(),
+      planeMatrix: planeTransform ? [planeTransform.a, planeTransform.b, planeTransform.c, planeTransform.d, planeTransform.e, planeTransform.f] : null,
       labelAnimationName: labelStyle?.animationName ?? 'none',
-      labelAnimationPlayState: labelStyle?.animationPlayState ?? 'running',
-      labelOrbitDirection: labelStyle?.getPropertyValue('--ring-orbit-direction').trim() ?? '',
       ringAnimationName: ringStyle?.animationName ?? 'none',
-      ringAnimationPlayState: ringStyle?.animationPlayState ?? 'running',
       documentTimelineTime: Number(document.timeline.currentTime ?? 0),
-      ringOrbitDirection: ringStyle?.getPropertyValue('--ring-orbit-direction').trim() ?? '',
-      labelMatrix: labelTransform ? [labelTransform.a, labelTransform.b, labelTransform.c, labelTransform.d, labelTransform.e, labelTransform.f] : null,
-      ringMatrix: ringTransform ? [ringTransform.a, ringTransform.b, ringTransform.c, ringTransform.d, ringTransform.e, ringTransform.f] : null,
+      labelTransform: labelStyle?.transform ?? 'none',
+      ringTransform: ringStyle?.transform ?? 'none',
+      sharedVisualParent: label?.parentElement === plane && ring?.parentElement === plane,
+      sharedPathReference: ring?.getAttribute('href') === textPath?.getAttribute('href'),
       labelBox: labelRect ? [labelRect.x, labelRect.y, labelRect.width, labelRect.height] : null,
       ringBox: ringRect ? [ringRect.x, ringRect.y, ringRect.width, ringRect.height] : null,
     };
@@ -2800,16 +3009,16 @@ async function androidGlobeUiScenario() {
     const planes = [...document.querySelectorAll('.sphere-ring-plane')];
     const primaryPlanes = planes.filter((plane) => plane.dataset.emphasis === 'primary');
     const depthPlanes = planes.filter((plane) => plane.dataset.emphasis === 'depth');
-    const groupsAreStatic = (items) => items.every((plane) => {
+    const groupsAreAnimated = (items) => items.every((plane) => {
       const style = getComputedStyle(plane);
-      return style.animationName === 'none' && style.transform === 'none';
+      return style.animationName === 'sphere-ring-orbit' && style.transform !== 'none';
     });
     return {
       viewportWidth: window.innerWidth,
       mediaCompact: window.matchMedia('(max-width: 48rem)').matches,
       mediaCoarseTouch: window.matchMedia('(hover: none) and (pointer: coarse)').matches,
-      primaryRingsStatic: groupsAreStatic(primaryPlanes),
-      depthRingsStatic: groupsAreStatic(depthPlanes),
+      primaryRingsAnimated: groupsAreAnimated(primaryPlanes),
+      depthRingsAnimated: groupsAreAnimated(depthPlanes),
       representativePrimaryLabels: primaryPlanes.map((plane) => {
         const label = plane.querySelector('.sphere-ring-text');
         const rect = label?.getBoundingClientRect();
@@ -2825,36 +3034,31 @@ async function androidGlobeUiScenario() {
     };
   });
   const wideTouchMotionAfter = await touchRingState();
-  const movingTouchRings = wideTouchMotionAfter.filter((after, index) => {
-    const before = wideTouchMotionBefore[index];
-    if (after.ringAnimationName !== 'sphere-ring-orbit' || !after.ringMatrix || !before?.ringMatrix) return false;
-    return after.ringMatrix.some((value, matrixIndex) => Math.abs(value - before.ringMatrix[matrixIndex]) > 1e-5);
+  const movingMatricesBetween = (before, after, threshold = 1e-5) => after.filter((entry, index) => {
+    const previous = before[index];
+    return entry.planeMatrix && previous?.planeMatrix
+      && entry.planeMatrix.some((value, matrixIndex) => Math.abs(value - previous.planeMatrix[matrixIndex]) > threshold);
   });
-  const movingTouchLabels = wideTouchMotionAfter.filter((after, index) => {
-    const before = wideTouchMotionBefore[index];
-    if (!after.labelBox || !before?.labelBox) return false;
-    return after.labelBox.some((value, boxIndex) => Math.abs(value - before.labelBox[boxIndex]) > 1e-3);
+  const movingBoxesBetween = (before, after, key, threshold = 1e-3) => after.filter((entry, index) => {
+    const previous = before[index];
+    return entry[key] && previous?.[key]
+      && entry[key].some((value, boxIndex) => Math.abs(value - previous[key][boxIndex]) > threshold);
   });
+  const coherentMovingIndices = (before, after) => after.map((_entry, index) => index).filter((index) => (
+    movingMatricesBetween([before[index]], [after[index]]).length === 1
+    && movingBoxesBetween([before[index]], [after[index]], 'ringBox').length === 1
+    && movingBoxesBetween([before[index]], [after[index]], 'labelBox').length === 1
+  ));
   assert(wideTouchGeometry.viewportWidth > 768 && !wideTouchGeometry.mediaCompact && wideTouchGeometry.mediaCoarseTouch, scenarioId + ': wide touch viewport did not exercise the non-compact coarse-pointer path ' + JSON.stringify(wideTouchGeometry));
-  assert(wideTouchGeometry.primaryRingsStatic && wideTouchGeometry.depthRingsStatic, scenarioId + ': wide touch ring group regained compositor animation or transform ' + JSON.stringify(wideTouchGeometry));
-  assert(movingTouchRings.length >= 2, scenarioId + ': wide touch visible ring strokes did not advance ' + JSON.stringify({ before: wideTouchMotionBefore, after: wideTouchMotionAfter }));
-  assert(movingTouchLabels.length === 0, scenarioId + ': wide touch ring labels entered the compositor motion path ' + JSON.stringify({ before: wideTouchMotionBefore, after: wideTouchMotionAfter }));
+  assert(wideTouchGeometry.primaryRingsAnimated && wideTouchGeometry.depthRingsAnimated, scenarioId + ': wide touch ring planes lost shared animation ' + JSON.stringify(wideTouchGeometry));
+  assert(wideTouchMotionAfter.every(({ planeAnimationName, labelAnimationName, ringAnimationName, labelTransform, ringTransform, sharedVisualParent, sharedPathReference }) => planeAnimationName === 'sphere-ring-orbit' && labelAnimationName === 'none' && ringAnimationName === 'none' && labelTransform === 'none' && ringTransform === 'none' && sharedVisualParent && sharedPathReference), scenarioId + ': wide touch line and label do not share one path-based animation parent ' + JSON.stringify(wideTouchMotionAfter));
+  assert(coherentMovingIndices(wideTouchMotionBefore, wideTouchMotionAfter).length >= 2, scenarioId + ': wide touch ring strokes and labels did not advance in their shared orbit phase ' + JSON.stringify({ before: wideTouchMotionBefore, after: wideTouchMotionAfter }));
   assert(wideTouchGeometry.representativePrimaryLabels.length >= 2 && wideTouchGeometry.representativePrimaryLabels.every(({ text, visible, width, height, fontSize }) => text.length > 0 && visible && width > 80 && height > 0 && fontSize >= 20), scenarioId + ': wide touch primary ring labels are absent or not visibly laid out ' + JSON.stringify(wideTouchGeometry));
 
-  const movingLabelsBetween = (before, after, threshold = 1e-3) => after.filter((entry, index) => {
-    const previous = before[index];
-    if (!entry.labelBox || !previous?.labelBox) return false;
-    return entry.labelBox.some((value, boxIndex) => Math.abs(value - previous.labelBox[boxIndex]) > threshold);
-  });
-  const movingRingsBetween = (before, after, threshold = 1e-5) => after.filter((entry, index) => {
-    const previous = before[index];
-    if (!entry.ringMatrix || !previous?.ringMatrix) return false;
-    return entry.ringMatrix.some((value, matrixIndex) => Math.abs(value - previous.ringMatrix[matrixIndex]) > threshold);
-  });
-  const waitForMovingTouchRings = async (before, minimum = 2, timeoutMs = 1500) => {
+  const waitForCoherentTouchMotion = async (before, minimum = 2, timeoutMs = 1500) => {
     const deadline = Date.now() + timeoutMs;
     let after = await touchRingState();
-    while (movingRingsBetween(before, after).length < minimum && Date.now() < deadline) {
+    while (coherentMovingIndices(before, after).length < minimum && Date.now() < deadline) {
       await run.page.waitForTimeout(50);
       after = await touchRingState();
     }
@@ -2865,36 +3069,28 @@ async function androidGlobeUiScenario() {
   const mapPausedBefore = await touchRingState();
   await run.page.waitForTimeout(350);
   const mapPausedAfter = await touchRingState();
-  assert(mapPausedAfter.filter(({ labelAnimationName, ringAnimationName, ringAnimationPlayState }) => labelAnimationName === 'none' && ringAnimationName === 'sphere-ring-orbit' && ringAnimationPlayState === 'paused').length >= 2, scenarioId + ': wide touch guide bundles did not pause while map-moving state was active ' + JSON.stringify(mapPausedAfter));
-  assert(movingRingsBetween(mapPausedBefore, mapPausedAfter).length === 0, scenarioId + ': wide touch guide bundles moved while map-moving state paused the orbit ' + JSON.stringify({ before: mapPausedBefore, after: mapPausedAfter }));
-  assert(movingLabelsBetween(mapPausedBefore, mapPausedAfter).length === 0, scenarioId + ': wide touch labels moved while map-moving state paused the orbit ' + JSON.stringify({ before: mapPausedBefore, after: mapPausedAfter }));
+  assert(mapPausedAfter.every(({ planeAnimationName, planeAnimationPlayState }) => planeAnimationName === 'sphere-ring-orbit' && planeAnimationPlayState === 'paused'), scenarioId + ': data-map-moving did not pause each shared ring plane ' + JSON.stringify(mapPausedAfter));
+  assert(movingMatricesBetween(mapPausedBefore, mapPausedAfter).length === 0 && movingBoxesBetween(mapPausedBefore, mapPausedAfter, 'ringBox').length === 0 && movingBoxesBetween(mapPausedBefore, mapPausedAfter, 'labelBox').length === 0, scenarioId + ': line or label moved while data-map-moving paused the shared orbit ' + JSON.stringify({ before: mapPausedBefore, after: mapPausedAfter }));
   await run.page.evaluate(() => { delete document.querySelector('.globe-stage').dataset.mapMoving; });
   const mapResumedBefore = await touchRingState();
-  const mapResumedAfter = await waitForMovingTouchRings(mapResumedBefore);
-  assert(mapResumedAfter.filter(({ labelAnimationName, ringAnimationName, ringAnimationPlayState }) => labelAnimationName === 'none' && ringAnimationName === 'sphere-ring-orbit' && ringAnimationPlayState === 'running').length >= 2, scenarioId + ': wide touch guide bundles did not return to running state after map-moving ended ' + JSON.stringify(mapResumedAfter));
-  assert(movingRingsBetween(mapResumedBefore, mapResumedAfter).length >= 2, scenarioId + ': wide touch guide bundles did not resume after map-moving ended ' + JSON.stringify({ before: mapResumedBefore, after: mapResumedAfter }));
-  assert(movingLabelsBetween(mapResumedBefore, mapResumedAfter).length === 0, scenarioId + ': wide touch labels moved when guide bundles resumed ' + JSON.stringify({ before: mapResumedBefore, after: mapResumedAfter }));
+  const mapResumedAfter = await waitForCoherentTouchMotion(mapResumedBefore);
+  assert(mapResumedAfter.every(({ planeAnimationName, planeAnimationPlayState }) => planeAnimationName === 'sphere-ring-orbit' && planeAnimationPlayState === 'running'), scenarioId + ': shared ring planes did not resume after data-map-moving ended ' + JSON.stringify(mapResumedAfter));
+  assert(coherentMovingIndices(mapResumedBefore, mapResumedAfter).length >= 2, scenarioId + ': line and label did not resume together after data-map-moving ended ' + JSON.stringify({ before: mapResumedBefore, after: mapResumedAfter }));
 
   await run.page.locator('#sphere-edge-control').focus();
   await run.page.waitForTimeout(80);
   const focusPausedBefore = await touchRingState();
   await run.page.waitForTimeout(350);
   const focusPausedAfter = await touchRingState();
-  assert(focusPausedAfter.filter(({ labelAnimationName, ringAnimationName, ringAnimationPlayState }) => labelAnimationName === 'none' && ringAnimationName === 'sphere-ring-orbit' && ringAnimationPlayState === 'paused').length >= 2, scenarioId + ': wide touch guide bundles did not pause while sphere edge control was focused ' + JSON.stringify(focusPausedAfter));
-  assert(movingRingsBetween(focusPausedBefore, focusPausedAfter).length === 0, scenarioId + ': wide touch guide bundles moved while sphere edge focus paused the orbit ' + JSON.stringify({ before: focusPausedBefore, after: focusPausedAfter }));
-  assert(movingLabelsBetween(focusPausedBefore, focusPausedAfter).length === 0, scenarioId + ': wide touch labels moved while sphere edge focus paused the orbit ' + JSON.stringify({ before: focusPausedBefore, after: focusPausedAfter }));
+  assert(focusPausedAfter.every(({ planeAnimationName, planeAnimationPlayState }) => planeAnimationName === 'sphere-ring-orbit' && planeAnimationPlayState === 'paused'), scenarioId + ': sphere-edge focus did not pause each shared ring plane ' + JSON.stringify(focusPausedAfter));
+  assert(movingMatricesBetween(focusPausedBefore, focusPausedAfter).length === 0 && movingBoxesBetween(focusPausedBefore, focusPausedAfter, 'ringBox').length === 0 && movingBoxesBetween(focusPausedBefore, focusPausedAfter, 'labelBox').length === 0, scenarioId + ': line or label moved while sphere-edge focus paused the shared orbit ' + JSON.stringify({ before: focusPausedBefore, after: focusPausedAfter }));
   await run.page.locator('#filter-toggle').focus();
   await run.page.waitForFunction(() => document.activeElement?.id === 'filter-toggle');
   await run.page.waitForTimeout(80);
   const focusResumedBefore = await touchRingState();
-  await run.page.waitForTimeout(250);
-  const focusResumedAfter = await touchRingState();
-  assert(focusResumedAfter.filter(({ labelAnimationName, ringAnimationName, ringAnimationPlayState }) => labelAnimationName === 'none' && ringAnimationName === 'sphere-ring-orbit' && ringAnimationPlayState === 'running').length >= 2, scenarioId + ': wide touch guide bundles did not return to running state after sphere edge focus ended ' + JSON.stringify(focusResumedAfter));
-  const focusResumedTimelineDelta = (focusResumedAfter[0]?.documentTimelineTime ?? 0) - (focusResumedBefore[0]?.documentTimelineTime ?? 0);
-  const focusResumedMovingRings = movingRingsBetween(focusResumedBefore, focusResumedAfter);
-  // Headless Chromium can freeze the document timeline while an SVG control holds focus and, on some CI images, briefly after focus transfer. If the document clock advances, the guide transforms must advance too; only a genuinely frozen clock is tolerated here. Actual guide motion is also required above before focus and after map-moving resumes.
-  assert(focusResumedTimelineDelta <= 1 || focusResumedMovingRings.length >= 2, scenarioId + ': document timeline advanced after sphere edge focus ended but guide bundles stayed frozen ' + JSON.stringify({ timelineDelta: focusResumedTimelineDelta, movingRings: focusResumedMovingRings.length, before: focusResumedBefore, after: focusResumedAfter }));
-  assert(movingLabelsBetween(focusResumedBefore, focusResumedAfter).length === 0, scenarioId + ': wide touch labels moved when guide bundles returned to running state after focus ' + JSON.stringify({ before: focusResumedBefore, after: focusResumedAfter }));
+  const focusResumedAfter = await waitForCoherentTouchMotion(focusResumedBefore);
+  assert(focusResumedAfter.every(({ planeAnimationName, planeAnimationPlayState }) => planeAnimationName === 'sphere-ring-orbit' && planeAnimationPlayState === 'running'), scenarioId + ': shared ring planes did not resume after sphere-edge focus ended ' + JSON.stringify(focusResumedAfter));
+  assert(coherentMovingIndices(focusResumedBefore, focusResumedAfter).length >= 2, scenarioId + ': line and label did not resume together after sphere-edge focus ended ' + JSON.stringify({ before: focusResumedBefore, after: focusResumedAfter }));
 
   const reducedTouchRun = await newPage({
     mobile: true,
@@ -2905,9 +3101,13 @@ async function androidGlobeUiScenario() {
   await reducedTouchRun.page.goto(baseUrl, { waitUntil: 'domcontentloaded' });
   await reducedTouchRun.page.waitForSelector('html.runtime-ready');
   await reducedTouchRun.page.waitForFunction(() => document.querySelectorAll('.sphere-ring-plane .sphere-ring-text').length > 0);
+  await reducedTouchRun.page.waitForSelector('.globe-stage[data-visual-ready="true"]');
+  await waitForSphereGeometrySettled(reducedTouchRun.page);
+  await waitForSphereOpacitySettled(reducedTouchRun.page);
   const reducedTouchState = () => reducedTouchRun.page.evaluate(() => [...document.querySelectorAll('.sphere-ring-plane')].map((plane) => {
     const label = plane.querySelector('.sphere-ring-text');
-    const ring = plane.querySelector('.sphere-ring-guides');
+    const ring = plane.querySelector(':scope > use.sphere-bundle-main-ring');
+    const planeStyle = getComputedStyle(plane);
     const labelStyle = label ? getComputedStyle(label) : null;
     const ringStyle = ring ? getComputedStyle(ring) : null;
     const labelRect = label?.getBoundingClientRect();
@@ -2915,12 +3115,15 @@ async function androidGlobeUiScenario() {
     return {
       coarse: window.matchMedia('(hover: none) and (pointer: coarse)').matches,
       reduced: window.matchMedia('(prefers-reduced-motion: reduce)').matches,
+      planeAnimationName: planeStyle.animationName,
+      planeTransform: planeStyle.transform,
       labelAnimationName: labelStyle?.animationName ?? 'none',
       labelAnimationDuration: labelStyle?.animationDuration ?? '',
       labelAnimationIterations: labelStyle?.animationIterationCount ?? '',
       ringAnimationName: ringStyle?.animationName ?? 'none',
       ringAnimationDuration: ringStyle?.animationDuration ?? '',
       ringAnimationIterations: ringStyle?.animationIterationCount ?? '',
+      sharedVisualParent: label?.parentElement === plane && ring?.parentElement === plane,
       labelBox: labelRect ? [labelRect.x, labelRect.y, labelRect.width, labelRect.height] : null,
       ringBox: ringRect ? [ringRect.x, ringRect.y, ringRect.width, ringRect.height] : null,
     };
@@ -2934,7 +3137,7 @@ async function androidGlobeUiScenario() {
     return entry[key].some((value, boxIndex) => Math.abs(value - previous[key][boxIndex]) > threshold);
   });
   assert(reducedTouchAfter.length >= 2 && reducedTouchAfter.every(({ coarse, reduced }) => coarse && reduced), scenarioId + ': reduced-motion touch context did not exercise the intended media path ' + JSON.stringify(reducedTouchAfter));
-  assert(reducedTouchAfter.filter(({ labelAnimationName, ringAnimationName }) => labelAnimationName === 'none' && ringAnimationName === 'none').length >= 2, scenarioId + ': reduced-motion touch ring children were not fully static ' + JSON.stringify(reducedTouchAfter));
+  assert(reducedTouchAfter.every(({ planeAnimationName, planeTransform, labelAnimationName, ringAnimationName, sharedVisualParent }) => planeAnimationName === 'none' && planeTransform !== 'none' && labelAnimationName === 'none' && ringAnimationName === 'none' && sharedVisualParent), scenarioId + ': reduced-motion touch ring plane did not stop as one coherent object ' + JSON.stringify(reducedTouchAfter));
   assert(visibleBoxesMoved(reducedTouchBefore, reducedTouchAfter, 'labelBox').length === 0, scenarioId + ': reduced-motion touch labels moved ' + JSON.stringify({ before: reducedTouchBefore, after: reducedTouchAfter }));
   assert(visibleBoxesMoved(reducedTouchBefore, reducedTouchAfter, 'ringBox').length === 0, scenarioId + ': reduced-motion touch ring strokes moved ' + JSON.stringify({ before: reducedTouchBefore, after: reducedTouchAfter }));
   await reducedTouchRun.context.close();
@@ -2952,19 +3155,20 @@ async function androidGlobeUiScenario() {
     const primaryPlanes = [...document.querySelectorAll('.sphere-ring-plane[data-emphasis="primary"]')];
     const depthPlanes = [...document.querySelectorAll('.sphere-ring-plane[data-emphasis="depth"]')];
     const states = (planes) => planes.map((plane) => {
-      const guide = plane.querySelector('.sphere-ring-guides');
+      const guide = plane.querySelector(':scope > use.sphere-bundle-main-ring');
       const label = plane.querySelector('.sphere-ring-text');
-      const style = guide ? getComputedStyle(guide) : null;
+      const guideStyle = guide ? getComputedStyle(guide) : null;
       const planeStyle = getComputedStyle(plane);
       const labelStyle = label ? getComputedStyle(label) : null;
       const rect = label?.getBoundingClientRect();
       return {
-        animationName: style?.animationName ?? 'none',
-        transform: style?.transform ?? 'none',
         planeAnimationName: planeStyle.animationName,
         planeTransform: planeStyle.transform,
+        guideAnimationName: guideStyle?.animationName ?? 'none',
+        guideTransform: guideStyle?.transform ?? 'none',
         textAnimationName: labelStyle?.animationName ?? 'none',
         textTransform: labelStyle?.transform ?? 'none',
+        sharedVisualParent: guide?.parentElement === plane && label?.parentElement === plane,
         textVisible: Boolean(label && labelStyle?.display !== 'none' && labelStyle?.visibility !== 'hidden' && Number(labelStyle?.opacity ?? '1') > 0 && (rect?.width ?? 0) > 0 && (rect?.height ?? 0) > 0),
       };
     });
@@ -2977,8 +3181,8 @@ async function androidGlobeUiScenario() {
     };
   });
   assert(compactDesktopGeometry.viewportWidth <= 768 && compactDesktopGeometry.mediaCompact && !compactDesktopGeometry.mediaCoarseTouch, scenarioId + ': compact desktop did not exercise the narrow fine-pointer path ' + JSON.stringify(compactDesktopGeometry));
-  assert(compactDesktopGeometry.primaryStates.length > 0 && compactDesktopGeometry.primaryStates.every(({ animationName, transform, planeAnimationName, planeTransform, textAnimationName, textTransform, textVisible }) => animationName === 'sphere-ring-orbit' && transform !== 'none' && planeAnimationName === 'none' && planeTransform === 'none' && textAnimationName === 'none' && textTransform === 'none' && textVisible), scenarioId + ': compact fine-pointer desktop lost primary guide motion or label isolation ' + JSON.stringify(compactDesktopGeometry));
-  assert(compactDesktopGeometry.depthStates.length > 0 && compactDesktopGeometry.depthStates.every(({ animationName, transform, planeAnimationName, planeTransform, textAnimationName, textTransform, textVisible }) => animationName === 'none' && transform !== 'none' && planeAnimationName === 'none' && planeTransform === 'none' && textAnimationName === 'none' && textTransform === 'none' && textVisible), scenarioId + ': compact fine-pointer desktop lost bounded depth orientation or label isolation ' + JSON.stringify(compactDesktopGeometry));
+  assert(compactDesktopGeometry.primaryStates.length > 0 && compactDesktopGeometry.primaryStates.every(({ planeAnimationName, planeTransform, guideAnimationName, guideTransform, textAnimationName, textTransform, sharedVisualParent, textVisible }) => planeAnimationName === 'sphere-ring-orbit' && planeTransform !== 'none' && guideAnimationName === 'none' && guideTransform === 'none' && textAnimationName === 'none' && textTransform === 'none' && sharedVisualParent && textVisible), scenarioId + ': compact fine-pointer desktop lost coherent primary plane motion ' + JSON.stringify(compactDesktopGeometry));
+  assert(compactDesktopGeometry.depthStates.length > 0 && compactDesktopGeometry.depthStates.every(({ planeAnimationName, planeTransform, guideAnimationName, guideTransform, textAnimationName, textTransform, sharedVisualParent, textVisible }) => planeAnimationName === 'none' && planeTransform !== 'none' && guideAnimationName === 'none' && guideTransform === 'none' && textAnimationName === 'none' && textTransform === 'none' && sharedVisualParent && textVisible), scenarioId + ': compact fine-pointer desktop lost bounded coherent depth orientation ' + JSON.stringify(compactDesktopGeometry));
   assert(compactDesktopRun.pageErrors.length === 0, scenarioId + ': compact desktop page errors: ' + compactDesktopRun.pageErrors.join(' | '));
   await compactDesktopRun.context.close();
 
@@ -3013,7 +3217,7 @@ async function androidGlobeUiScenario() {
   assert(JSON.stringify(country.opacity).includes('0.78'), scenarioId + ': overview country tint is not strong enough ' + JSON.stringify(country));
   assert(country.diagnosticsFeatures > 0 && country.rendered > 0, scenarioId + ': country composition is not rendered at mobile globe overview ' + JSON.stringify(country));
   assert(run.pageErrors.length === 0, scenarioId + ': page errors: ' + run.pageErrors.join(' | '));
-  results.push({ id: scenarioId, verdict: 'PASS', ...geometry, wideTouch: wideTouchGeometry, compactDesktop: compactDesktopGeometry, countryRendered: country.rendered });
+  results.push({ id: scenarioId, verdict: 'PASS', ...geometry, portraitPaintedPrimaryLabels: portraitPaintEvidence.differences.map(({ layer, changedPixels }) => ({ layer, changedPixels })), wideTouch: wideTouchGeometry, compactDesktop: compactDesktopGeometry, countryRendered: country.rendered });
   await run.context.close();
 }
 
