@@ -1,0 +1,55 @@
+{
+  "schema_version": 1,
+  "kind": "commonworld_commons_basis",
+  "project_id": "samoa-community-based-fisheries-management-program",
+  "classification": "commons-infrastructure",
+  "decision": "include",
+  "reviewed_at": "2026-08-12",
+  "reviewer": "Commonworld editorial review",
+  "criteria": {
+    "shared_resource": {
+      "status": "supported",
+      "statement": "Die teilnehmenden Dörfer bewirtschaften jeweils lokale Meeres- und Fischereiressourcen einschließlich dorfgetragener Fischreservate als geteilte Ressourcenräume.",
+      "source_ids": [
+        "samoa-cbfmp-maf"
+      ]
+    },
+    "community": {
+      "status": "supported",
+      "statement": "Mehr als 120 Küstendörfer nehmen am Programm teil; Dorfräte und weitere Gemeinschaftsgruppen entwickeln die lokalen Managementpläne.",
+      "source_ids": [
+        "samoa-cbfmp-maf"
+      ]
+    },
+    "commoning_practice": {
+      "status": "supported",
+      "statement": "Dorfgemeinschaften erstellen und führen Fischereimanagementpläne aus, betreiben Fischreservate, überwachen Ressourcen und tauschen Erfahrungen aus.",
+      "source_ids": [
+        "samoa-cbfmp-maf",
+        "samoa-cbfmp-sprep-2026"
+      ]
+    },
+    "rules_and_responsibility": {
+      "status": "supported",
+      "statement": "Dorfräte entwickeln Village Bylaws und Managementpläne; die Primärquelle weist den Gemeinschaften die Hauptverantwortung für Meeres- und Fischereiressourcen zu.",
+      "source_ids": [
+        "samoa-cbfmp-maf"
+      ]
+    },
+    "common_benefit": {
+      "status": "supported",
+      "statement": "Die dorfgetragenen Regeln dienen nachhaltigen Fischbeständen, Ernährungssicherheit, lokalen Lebensgrundlagen und dem Schutz mariner Lebensräume.",
+      "source_ids": [
+        "samoa-cbfmp-maf",
+        "samoa-cbfmp-sprep-2026"
+      ]
+    }
+  },
+  "confidence": 0.94,
+  "limitations": [
+    "Das CBFMP ist eine staatlich unterstützte Commons-Infrastruktur; die einzelnen dorfgetragenen Fischereigebiete sind eigenständige Commons und werden nicht zu einem einzigen landesweiten Common verschmolzen.",
+    "Nicht alle mehr als 120 Dörfer sind gleich aktiv; die offizielle Seite beziffert 80 Prozent als vollständig aktiv.",
+    "Commonworld veröffentlicht keine abgeleiteten Reservatsgrenzen, Fanggründe oder Dorfkoordinaten."
+  ],
+  "notes": "Aufgenommen als Commons-Infrastruktur, weil die Primärquelle lokale Verantwortung, Regeln und Ressourcenverwaltung ausdrücklich bei den Dorfgemeinschaften verankert."
+}
