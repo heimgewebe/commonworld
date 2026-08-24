@@ -814,6 +814,27 @@ class PublicShellTests(unittest.TestCase):
         self.assertIn("hyphens: manual", label_block[1])
         self.assertIn("word-break: normal", label_block[1])
 
+    def test_nonserialized_spatial_state_defers_release_navigation_without_persistence(self) -> None:
+        app = (ROOT / "assets/commonworld-app.js").read_text(encoding="utf-8")
+        self.assertNotIn("commonworld-release-check.js", app)
+        self.assertIn("const RELEASE_NAVIGATION_EVENT = 'commonworld:release-navigation';", app)
+        self.assertIn("const RELEASE_CHECK_REQUEST_EVENT = 'commonworld:release-check-request';", app)
+        self.assertIn("function nonSerializedSpatialStateActive()", app)
+        self.assertIn("Array.isArray(runtime.state.nearbyOrigin)", app)
+        self.assertIn("document.addEventListener(RELEASE_NAVIGATION_EVENT", app)
+        self.assertIn("event.preventDefault();", app)
+        self.assertIn("runtime.releaseNavigationDeferred = true;", app)
+        self.assertIn("elements.stage.dataset.releaseNavigationDeferred = 'spatial-filter';", app)
+        self.assertIn("function resumeDeferredReleaseCheck()", app)
+        self.assertIn("delete elements.stage.dataset.releaseNavigationDeferred;", app)
+        self.assertIn("document.dispatchEvent(new Event(RELEASE_CHECK_REQUEST_EVENT));", app)
+        release_check = (ROOT / "assets/commonworld-release-check.js").read_text(encoding="utf-8")
+        self.assertIn("export const RELEASE_CHECK_REQUEST_EVENT = 'commonworld:release-check-request';", release_check)
+        self.assertIn("documentImpl.addEventListener?.(RELEASE_CHECK_REQUEST_EVENT, runWhenVisible);", release_check)
+        self.assertIn("documentImpl.removeEventListener?.(RELEASE_CHECK_REQUEST_EVENT, runWhenVisible);", release_check)
+        self.assertGreaterEqual(app.count("resumeDeferredReleaseCheck();"), 5)
+        self.assertNotIn("parameters.set('nearby", (ROOT / "assets/commonworld-core.mjs").read_text(encoding="utf-8"))
+
     def test_filter_grid_keeps_action_and_location_controls_in_rhythm(self) -> None:
         render_source = (ROOT / "scripts/render_public_shell.py").read_text(encoding="utf-8")
         css = (ROOT / "index.css").read_text(encoding="utf-8")

@@ -142,9 +142,9 @@
       "filterButtonWidth": 44,
       "filterButtonHeight": 44,
       "ringAnimationName": "sphere-ring-orbit",
-      "ringTransform": "matrix(0.999999, 0.00150715, -0.00150715, 0.999999, 0, 0)",
-      "ringTextWidth": 320.30230712890625,
-      "ringTextHeight": 305.4393615722656,
+      "ringTransform": "matrix(1, 0.000753258, -0.000753258, 1, 0, 0)",
+      "ringTextWidth": 320.0726623535156,
+      "ringTextHeight": 305.19854736328125,
       "ringTextFontSize": 22,
       "primaryRingCount": 3,
       "depthRingCount": 2,
@@ -153,20 +153,20 @@
       "representativePrimaryLabels": [
         {
           "text": "Knowledge, Learning and Culture · 11    LibriVox  MusicBrainz  Open Library  Peer 2 Peer Unive…  Safecast  Thailand Citizens…",
-          "width": 320.30230712890625,
-          "height": 305.4393615722656,
+          "width": 320.0726623535156,
+          "height": 305.19854736328125,
           "visible": true
         },
         {
           "text": "Communication and Networks · 12    B4RN (Broadband f…  BOSCO Uganda  Freifunk  Freifunk Hamburg  guifi.net  Mastodon",
-          "width": 421.31182861328125,
-          "height": 419.5877685546875,
+          "width": 421.24310302734375,
+          "height": 419.51348876953125,
           "visible": true
         },
         {
           "text": "Cooperation and Self-Organization · 7    Bologna Urban Com…  Enspiral  g0v  Green Coop  l’Asilo  National Communal…",
-          "width": 386.1251220703125,
-          "height": 357.4624938964844,
+          "width": 386.1973876953125,
+          "height": 357.6034240722656,
           "visible": true
         }
       ],
@@ -203,7 +203,7 @@
       "portraitPaintedPrimaryLabels": [
         {
           "layer": "knowledge_learning_culture",
-          "changedPixels": 3760
+          "changedPixels": 13241
         },
         {
           "layer": "communication_networks",
@@ -223,22 +223,22 @@
         "representativePrimaryLabels": [
           {
             "text": "Knowledge, Learning and Culture · 11    LibriVox  MusicBrainz  Open Library  Peer 2 Peer Unive…  Safecast  Thailand Citizens…",
-            "width": 564.873046875,
-            "height": 568.1198120117188,
+            "width": 553.4266357421875,
+            "height": 559.29150390625,
             "fontSize": 23.77,
             "visible": true
           },
           {
             "text": "Communication and Networks · 12    B4RN (Broadband f…  BOSCO Uganda  Freifunk  Freifunk Hamburg  guifi.net  Mastodon",
-            "width": 435.689697265625,
-            "height": 440.68109130859375,
+            "width": 398.70623779296875,
+            "height": 404.3050842285156,
             "fontSize": 23.77,
             "visible": true
           },
           {
             "text": "Cooperation and Self-Organization · 7    Bologna Urban Com…  Enspiral  g0v  Green Coop  l’Asilo  National Communal…",
-            "width": 506.6498718261719,
-            "height": 479.7034912109375,
+            "width": 510.6720886230469,
+            "height": 496.28143310546875,
             "fontSize": 23.77,
             "visible": true
           }
@@ -251,7 +251,7 @@
         "primaryStates": [
           {
             "planeAnimationName": "sphere-ring-orbit",
-            "planeTransform": "matrix(0.999982, 0.00602712, -0.00602712, 0.999982, 0, 0)",
+            "planeTransform": "matrix(0.999997, 0.0022619, -0.0022619, 0.999997, 0, 0)",
             "guideAnimationName": "none",
             "guideTransform": "none",
             "textAnimationName": "none",
@@ -261,7 +261,7 @@
           },
           {
             "planeAnimationName": "sphere-ring-orbit",
-            "planeTransform": "matrix(-0.534934, 0.844894, -0.844894, -0.534934, 0, 0)",
+            "planeTransform": "matrix(-0.531803, 0.846868, -0.846868, -0.531803, 0, 0)",
             "guideAnimationName": "none",
             "guideTransform": "none",
             "textAnimationName": "none",
@@ -271,7 +271,7 @@
           },
           {
             "planeAnimationName": "sphere-ring-orbit",
-            "planeTransform": "matrix(-0.432403, -0.90168, 0.90168, -0.432403, 0, 0)",
+            "planeTransform": "matrix(-0.436134, -0.899882, 0.899882, -0.436134, 0, 0)",
             "guideAnimationName": "none",
             "guideTransform": "none",
             "textAnimationName": "none",
@@ -344,7 +344,7 @@
     {
       "id": "layer-journey-moveend-return",
       "verdict": "PASS",
-      "elapsedMs": 1496
+      "elapsedMs": 1559
     },
     {
       "id": "layer-journey-missing-moveend-fallback",
@@ -353,10 +353,10 @@
       "movementDiagnostics": [
         {
           "index": 0,
-          "geometryEvaluationDelta": 17,
+          "geometryEvaluationDelta": 16,
           "diagnosticPublishDelta": 5,
-          "sampledEvaluationCount": 16,
-          "maxDiagnosticPublishes": 6
+          "sampledEvaluationCount": 15,
+          "maxDiagnosticPublishes": 5
         },
         {
           "index": 1,
@@ -452,8 +452,8 @@
       "verdict": "PASS",
       "blockedCatalogRequests": 0,
       "observedCatalogRequests": [
-        "/releases/cbdb678d890d882d040a/catalog/runtime/aggregate.v1.json",
-        "/releases/cbdb678d890d882d040a/catalog/runtime/manifest.v1.json"
+        "/releases/dafecf2f798e03d575ae/catalog/runtime/aggregate.v1.json",
+        "/releases/dafecf2f798e03d575ae/catalog/runtime/manifest.v1.json"
       ]
     },
     {
@@ -511,9 +511,7 @@
     }
   ],
   "binding": {
-    "smoke_script_sha256": "96185b07d512065e749e8a674c31d44800ac205bbd78e00937c24b65e2cb923b",
-    "smoke_runner_sha256": "522b99b70b1d0064b1d0a31a3a67fdc9a2e73b7408f37d1a4bb303bc360b7556",
-    "smoke_plan_sha256": "8a068c3b573eb2ab95ed7c3f8477f607cba6de9353ab5250ba9abc09345b23a7",
+    "schema_version": 1,
     "scenario_ids": [
       "startup-and-ring-orbits",
       "synthetic-cross-ring-collision-accessibility",
@@ -554,6 +552,9 @@
       "method-mobile",
       "method-mobile-text-200"
     ],
-    "first_party_surface_sha256": "e90b104b3f84fb0fe23992295af8c56eec822056e0f3253e23a272e832454751"
+    "smoke_script_sha256": "74770c9e817f3c070ea7ceaba7bf5b8d22880c0aec1058b45e880c010cee1abb",
+    "smoke_runner_sha256": "522b99b70b1d0064b1d0a31a3a67fdc9a2e73b7408f37d1a4bb303bc360b7556",
+    "smoke_plan_sha256": "8a068c3b573eb2ab95ed7c3f8477f607cba6de9353ab5250ba9abc09345b23a7",
+    "first_party_surface_sha256": "6250e7957fcaa71097fcc13b4dfcafd7162ef7973a9b8f587ba07a7c28a2127d"
   }
 }
