@@ -3,6 +3,7 @@ import assert from 'node:assert/strict';
 
 import {
   checkForCurrentPage,
+  RELEASE_CHECK_REQUEST_EVENT,
   startCurrentPageChecks,
   cleanReleaseNavigationUrl,
   parseReleaseManifestDocument,
@@ -224,12 +225,15 @@ test('runtime watcher rechecks after foregrounding, pageshow, focus and the boun
   documentListeners.get('visibilitychange')();
   await settleReleaseChecks();
   assert.equal(checks, 3);
-  windowListeners.get('pageshow')();
+  documentListeners.get(RELEASE_CHECK_REQUEST_EVENT)();
   await settleReleaseChecks();
   assert.equal(checks, 4);
-  intervalCallback();
+  windowListeners.get('pageshow')();
   await settleReleaseChecks();
   assert.equal(checks, 5);
+  intervalCallback();
+  await settleReleaseChecks();
+  assert.equal(checks, 6);
 
   stop();
   assert.equal(clearedInterval, 17);

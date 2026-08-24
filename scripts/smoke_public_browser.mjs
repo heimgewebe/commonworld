@@ -2869,6 +2869,36 @@ async function spatialDiscoveryFiltersScenario() {
   assert(privacyState.country === '' && privacyState.radiusDisabled === false, `spatial discovery: proximity did not exclude country and enable radius (${JSON.stringify(privacyState)})`);
   assert(/(?:Nahe|Nearby) Commons/.test(privacyState.sortNote), `spatial discovery: recommended sort hint does not describe active proximity (${JSON.stringify(privacyState)})`);
 
+  let releaseProbeMode = 'stale';
+  let releaseProbeCount = 0;
+  let resolveResumedReleaseProbe;
+  const resumedReleaseProbe = new Promise((resolve) => { resolveResumedReleaseProbe = resolve; });
+  const simulatedReleaseId = publicReleaseManifest.release_id === 'f'.repeat(20) ? 'e'.repeat(20) : 'f'.repeat(20);
+  await run.context.route('**/__cw_probe/**/manifest', (route) => {
+    releaseProbeCount += 1;
+    const manifest = releaseProbeMode === 'stale'
+      ? { ...publicReleaseManifest, release_id: simulatedReleaseId }
+      : publicReleaseManifest;
+    if (releaseProbeMode === 'current') resolveResumedReleaseProbe();
+    return route.fulfill({
+      status: 404,
+      contentType: 'text/html',
+      body: `<!doctype html><html><body><!-- commonworld-release-manifest:${JSON.stringify(manifest)} --></body></html>`,
+    });
+  });
+  const preReleaseProbeUrl = run.page.url();
+  await run.page.evaluate(() => window.dispatchEvent(new Event('focus')));
+  await run.page.waitForFunction(() => document.querySelector('.globe-stage')?.dataset.releaseNavigationDeferred === 'spatial-filter');
+  const deferredReleaseState = await run.page.evaluate(() => ({
+    url: location.href,
+    chipCount: document.querySelectorAll('#active-filter-chips .active-filter-chip').length,
+    radiusDisabled: document.querySelector('#filter-nearby-radius')?.disabled ?? null,
+  }));
+  assert(deferredReleaseState.url === preReleaseProbeUrl, `spatial discovery: automatic release navigation discarded nonserialized proximity state (${JSON.stringify(deferredReleaseState)})`);
+  assert(deferredReleaseState.chipCount === 1 && deferredReleaseState.radiusDisabled === false, `spatial discovery: deferred release check damaged proximity controls (${JSON.stringify(deferredReleaseState)})`);
+  assert(releaseProbeCount >= 1, 'spatial discovery: simulated stale release probe did not run');
+  releaseProbeMode = 'current';
+
   const mapCanvas = run.page.locator('.maplibregl-canvas');
   const mapCanvasBox = await mapCanvas.boundingBox();
   assert(mapCanvasBox, 'spatial discovery: map canvas has no interaction bounds');
@@ -2892,6 +2922,13 @@ async function spatialDiscoveryFiltersScenario() {
   await run.page.locator('#discovery-panel').waitFor({ state: 'visible' });
   await run.page.locator('#filter-country').selectOption(firstCountry.id);
   await run.page.waitForFunction((countryId) => new URL(location.href).searchParams.get('country') === countryId, firstCountry.id);
+  await Promise.race([
+    resumedReleaseProbe,
+    new Promise((_, reject) => setTimeout(() => reject(new Error('spatial discovery: deferred release check did not resume after proximity state cleared')), 3_000)),
+  ]);
+  await run.page.waitForFunction(() => document.querySelector('.globe-stage')?.dataset.releaseNavigationDeferred === undefined);
+  assert(releaseProbeCount >= 2, `spatial discovery: deferred release probe did not rerun (${releaseProbeCount})`);
+  await run.context.unroute('**/__cw_probe/**/manifest');
   const exclusiveSpatialState = await run.page.evaluate(() => ({
     country: document.querySelector('#filter-country')?.value ?? null,
     radiusDisabled: document.querySelector('#filter-nearby-radius')?.disabled ?? null,
