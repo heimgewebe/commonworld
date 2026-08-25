@@ -103,7 +103,7 @@
       "translation_pack": "wave_1",
       "release_evidence": {
         "path": "docs/evidence/locale-releases/es.json",
-        "sha256": "57119a32a84c3f3f797d760531f85017ca650401e617daf5d4f44224352d02a5"
+        "sha256": "694f520fdbcdadbaab00716bac8b9ba66bd33aa208955d9909e33ac995260509"
       }
     },
     "fr": {
@@ -119,7 +119,7 @@
       "translation_pack": "wave_1",
       "release_evidence": {
         "path": "docs/evidence/locale-releases/fr.json",
-        "sha256": "1df2b5a90fc2dd4a4a30b6dd7ee468eaa5c043261893f7519d8335cbd3ae1310"
+        "sha256": "14c4c4f51ca6e14f5a37349e56c43c7ca6f0de23af6326c581fbe6b09d01a229"
       }
     },
     "pt-BR": {
@@ -135,7 +135,7 @@
       "translation_pack": "wave_1",
       "release_evidence": {
         "path": "docs/evidence/locale-releases/pt-BR.json",
-        "sha256": "6f60b8dcc8e8dfcfebcabb79f5722825b987eb992d11ce368d6a48018f75dea0"
+        "sha256": "d9b77561f336b9781253f62d37e48976296713cda6c0abd9ec31741772a3e74f"
       }
     },
     "ar": {
@@ -151,7 +151,7 @@
       "translation_pack": "wave_1",
       "release_evidence": {
         "path": "docs/evidence/locale-releases/ar.json",
-        "sha256": "8ed3b0e9ae4119387a8a4b1bdb22c0495959ca978fd1e2046486a641f3f2dbf1"
+        "sha256": "b7b377a8c256e6c8aa014425ecb03a203af2e93df503734f18f3fccbbb352400"
       }
     },
     "zh-Hans": {
@@ -167,7 +167,7 @@
       "translation_pack": "wave_1",
       "release_evidence": {
         "path": "docs/evidence/locale-releases/zh-Hans.json",
-        "sha256": "386e3256d100c8bf6863aee91e7a12b10958bb45036c9140fc267fc656af92d2"
+        "sha256": "42ad8720ab908d7e8e4fd72532cb9d1754afa64e97017181661fe0643630da00"
       }
     },
     "hi": {
@@ -183,7 +183,7 @@
       "translation_pack": "wave_1",
       "release_evidence": {
         "path": "docs/evidence/locale-releases/hi.json",
-        "sha256": "08cc2de9774a3517ec64aefb4ab50d476d64ddf2d6a0b52020deab2ded56b676"
+        "sha256": "f712230cdd9ddbcbc838fdca929bfd39888e974ae3807f2634f798231496a461"
       }
     },
     "id": {

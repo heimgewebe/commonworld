@@ -3,14 +3,14 @@
   "kind": "commonworld.ui_locale_release_evidence",
   "locale": "hi",
   "status": "released",
-  "source_revision": "ed4138d7bac6a6d399605515b0f60bbe07365bf5",
+  "source_revision": "942628d5439e89a867620610cbac38fda07609e3",
   "source_pack_sha256": "06e4c5c150bdf33e63d1becf47ef1f90f0b51a1d24b76725f44ff37ce07302f7",
   "reviewed_source_pack_sha256": "cf57400b0a0fbf818baa88f33001e95bc4c7c39bd00caef3505f4d9ab6c0f405",
   "catalog_overlay_sha256": "63731132bbce7bdd171ac7955d7a16c01edbf4217573a6e83e2b4619db5eb688",
   "surface_sha256": {
-    "index": "a5d958d010e49a1620e9ae329c6d51ac449b64aaeb992660611e587cfb84ed5e",
-    "method": "37f4da3df6328b0a33611fdee2f9f71cc7dbbac9d699e5f523bc1ff401f593f9",
-    "proposal": "3d8ac4e0059c02535948ceecf82611b07bc3d966ca37f3e817f623b564853da9"
+    "index": "3cebac23bb2182c5250a3bd8e4010e77b33b97ee137ff3773391c8e37f876652",
+    "method": "68c0e282d5b2964fcda1ddd5844ac7c5b691e8c257535ba8794b3ef6a71788eb",
+    "proposal": "e87ebb0b39f364a43d45b03c30a3ae7aeab3597334c899643215c2833cc92b01"
   },
   "gate_results": {
     "required_surfaces_passed": [
@@ -60,5 +60,5 @@
     "findings_based": true,
     "post_fix_review_required": true
   },
-  "notes": "The language/editorial and locale-specific accessibility/browser receipts remain bound to immutable release f536a374dd54a2103184. The current surface_sha256 values were rebound after a presentation-only digital-ring SVG/CSS fix; language packs, reviewed source packs and catalog overlays are unchanged. The earlier locale lifecycle smoke passed 18/18 released surfaces for that reviewed release. No fresh locale-specific visual/browser, native-speaker, human language, manual screen-reader, manual visual or full WCAG approval is claimed by this surface rebinding; current generic browser smoke covers shared runtime behavior only."
+  "notes": "Locale-specific language, accessibility and lifecycle receipts remain bound to their previously reviewed immutable releases. The current surface_sha256 values were rebound on 2026-08-24 after the catalog-only Open Food Network Australia Commons-basis/provenance review regenerated deterministic public surfaces. Locale packs, reviewed source packs and catalog overlays are unchanged. Fresh generic public browser smoke passes 38 scenarios on deterministic release 8c91da65f1c21fe44b4f, while the canonical locale lifecycle smoke also passed 18/18 released surfaces before this final catalog publication rebind. No fresh native-speaker, human language, manual screen-reader, manual visual or full WCAG approval is claimed."
 }
