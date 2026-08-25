@@ -1,7 +1,13 @@
-.PHONY: validate-catalog-recovery validate-catalog-hierarchy-v2 browser-smoke-catalog-hierarchy-v2 build validate validate-cache-coherence validate-release-snapshot-lifecycle validate-security-policy validate-proposal-path validate-current-state validate-platform-foundation validate-locale-release browser-smoke validate-canonical-plan validate-contracts validate-commons-admission validate-semantic-zoom validate-visual-semantics validate-renderer-spike validate-maplibre-phase2-proof validate-device-acceptance-pack validate-device-acceptance-rerun validate-digital-sphere validate-digital-ring-taxonomy validate-layered-digital-sphere-proof validate-digital-sphere-real-surface validate-device-acceptance-performance-v4 validate-physical-device-acceptance-v4-apple validate-public-catalog validate-public-seed-baseline validate-presence-axes validate-intent-search-discovery validate-renderer-selection validate-public-maplibre-vertical-slice validate-production-delivery-provider validate-public-shell validate-catalog-delivery-budget validate-catalog-browser-measurement-decision validate-catalog-scale-gates validate-catalog-hierarchy-v2 test-js test smoke-pages-live check-pages-dns-target
+.PHONY: refresh-catalog-evidence check-catalog-evidence validate-catalog-recovery validate-catalog-hierarchy-v2 browser-smoke-catalog-hierarchy-v2 build validate validate-cache-coherence validate-release-snapshot-lifecycle validate-security-policy validate-proposal-path validate-current-state validate-platform-foundation validate-locale-release browser-smoke validate-canonical-plan validate-contracts validate-commons-admission validate-semantic-zoom validate-visual-semantics validate-renderer-spike validate-maplibre-phase2-proof validate-device-acceptance-pack validate-device-acceptance-rerun validate-digital-sphere validate-digital-ring-taxonomy validate-layered-digital-sphere-proof validate-digital-sphere-real-surface validate-device-acceptance-performance-v4 validate-physical-device-acceptance-v4-apple validate-public-catalog validate-public-seed-baseline validate-presence-axes validate-intent-search-discovery validate-renderer-selection validate-public-maplibre-vertical-slice validate-production-delivery-provider validate-public-shell validate-catalog-delivery-budget validate-catalog-browser-measurement-decision validate-catalog-scale-gates validate-catalog-hierarchy-v2 test-js test smoke-pages-live check-pages-dns-target
 
 build:
 	npm run build
+
+refresh-catalog-evidence:
+	python3 scripts/refresh_catalog_evidence.py --refresh
+
+check-catalog-evidence:
+	python3 scripts/refresh_catalog_evidence.py --check
 
 validate-cache-coherence:
 	python3 scripts/validate_cache_coherence.py
