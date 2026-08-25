@@ -18,6 +18,17 @@ SPEC.loader.exec_module(refresh_catalog_evidence)
 
 
 class RefreshCatalogEvidenceTests(unittest.TestCase):
+    def _init_repo(self, root: Path, files: dict[str, str]) -> None:
+        subprocess.run(("git", "init", "-q"), cwd=root, check=True)
+        subprocess.run(("git", "config", "user.email", "tests@example.invalid"), cwd=root, check=True)
+        subprocess.run(("git", "config", "user.name", "Commonworld Tests"), cwd=root, check=True)
+        for relative, content in files.items():
+            path = root / relative
+            path.parent.mkdir(parents=True, exist_ok=True)
+            path.write_text(content, encoding="utf-8")
+        subprocess.run(("git", "add", "."), cwd=root, check=True)
+        subprocess.run(("git", "commit", "-qm", "fixture"), cwd=root, check=True)
+
     def test_cli_requires_exactly_one_mode(self) -> None:
         with self.assertRaises(SystemExit):
             refresh_catalog_evidence.parse_args([])
@@ -77,13 +88,10 @@ class RefreshCatalogEvidenceTests(unittest.TestCase):
     def test_workspace_snapshot_detects_tracked_and_untracked_content_changes(self) -> None:
         with tempfile.TemporaryDirectory() as directory:
             root = Path(directory)
-            subprocess.run(("git", "init", "-q"), cwd=root, check=True)
-            tracked = root / "tracked.txt"
-            tracked.write_text("one\n", encoding="utf-8")
-            subprocess.run(("git", "add", "tracked.txt"), cwd=root, check=True)
+            self._init_repo(root, {"tracked.txt": "one\n"})
             first = refresh_catalog_evidence.workspace_snapshot(root)
 
-            tracked.write_text("two\n", encoding="utf-8")
+            (root / "tracked.txt").write_text("two\n", encoding="utf-8")
             second = refresh_catalog_evidence.workspace_snapshot(root)
             self.assertNotEqual(first, second)
 
@@ -123,7 +131,7 @@ class RefreshCatalogEvidenceTests(unittest.TestCase):
             failures = refresh_catalog_evidence.check_deterministic_outputs(root, builders=builders)
             self.assertEqual(["catalog-hierarchy: deterministic evidence drift"], failures)
 
-    def test_refresh_refuses_unexpected_protected_evidence_mutation(self) -> None:
+    def test_refresh_in_place_refuses_protected_evidence_mutation(self) -> None:
         with tempfile.TemporaryDirectory() as directory:
             root = Path(directory)
             protected = root / "docs/evidence/catalog-delivery-benchmark-v1.json"
@@ -140,12 +148,12 @@ class RefreshCatalogEvidenceTests(unittest.TestCase):
 
             with (
                 mock.patch.object(refresh_catalog_evidence, "_run_step", side_effect=run_step),
-                mock.patch.object(refresh_catalog_evidence, "verify", return_value=0) as verify,
+                mock.patch.object(refresh_catalog_evidence, "_verify_in_place", return_value=0) as verify,
             ):
-                self.assertEqual(1, refresh_catalog_evidence.refresh(root, builders={}))
+                self.assertEqual(1, refresh_catalog_evidence._refresh_in_place(root, builders={}))
             verify.assert_not_called()
 
-    def test_refresh_runs_safe_steps_in_order_before_verification(self) -> None:
+    def test_refresh_in_place_runs_safe_steps_in_order_before_verification(self) -> None:
         seen: list[str] = []
 
         def run_step(step, *, root: Path) -> bool:
@@ -161,15 +169,164 @@ class RefreshCatalogEvidenceTests(unittest.TestCase):
                     "protected_snapshot",
                     return_value={"protected": "same"},
                 ),
-                mock.patch.object(refresh_catalog_evidence, "verify", return_value=0) as verify,
+                mock.patch.object(refresh_catalog_evidence, "_verify_in_place", return_value=0) as verify,
             ):
-                self.assertEqual(0, refresh_catalog_evidence.refresh(root, builders={}))
+                self.assertEqual(0, refresh_catalog_evidence._refresh_in_place(root, builders={}))
 
         self.assertEqual(
             [step.name for step in refresh_catalog_evidence.SAFE_REFRESH_STEPS],
             seen,
         )
         verify.assert_called_once_with(root, builders={})
+
+    def test_check_mutation_is_confined_to_isolated_workspace(self) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            self._init_repo(root, {"tracked.txt": "original\n"})
+
+            def mutate_isolated(isolated: Path, mode: str):
+                self.assertEqual("--check", mode)
+                (isolated / "tracked.txt").write_text("mutated\n", encoding="utf-8")
+                (isolated / "new.txt").write_text("new\n", encoding="utf-8")
+                return subprocess.CompletedProcess(["check"], 1, "", "simulated mutation\n")
+
+            with mock.patch.object(
+                refresh_catalog_evidence,
+                "_run_isolated_mode",
+                side_effect=mutate_isolated,
+            ):
+                self.assertEqual(1, refresh_catalog_evidence.verify(root))
+
+            self.assertEqual("original\n", (root / "tracked.txt").read_text(encoding="utf-8"))
+            self.assertFalse((root / "new.txt").exists())
+
+    def test_failed_refresh_cannot_publish_protected_mutation(self) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            protected_relative = "docs/evidence/catalog-delivery-benchmark-v1.json"
+            self._init_repo(root, {protected_relative: "{}\n"})
+
+            def mutate_isolated(isolated: Path, mode: str):
+                self.assertEqual("--refresh", mode)
+                (isolated / protected_relative).write_text('{"mutated":true}\n', encoding="utf-8")
+                return subprocess.CompletedProcess(["refresh"], 1, "", "protected mutation\n")
+
+            with mock.patch.object(
+                refresh_catalog_evidence,
+                "_run_isolated_mode",
+                side_effect=mutate_isolated,
+            ):
+                self.assertEqual(1, refresh_catalog_evidence.refresh(root))
+
+            self.assertEqual("{}\n", (root / protected_relative).read_text(encoding="utf-8"))
+
+    def test_successful_refresh_publishes_allowed_machine_outputs(self) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            evidence_relative = "docs/evidence/catalog-recovery-scale-v1.json"
+            self._init_repo(root, {evidence_relative: '{"value":1}\n'})
+
+            def mutate_isolated(isolated: Path, mode: str):
+                self.assertEqual("--refresh", mode)
+                (isolated / evidence_relative).write_text('{"value":2}\n', encoding="utf-8")
+                (isolated / "index.html").write_text("<main>generated</main>\n", encoding="utf-8")
+                return subprocess.CompletedProcess(["refresh"], 0, "ok\n", "")
+
+            with mock.patch.object(
+                refresh_catalog_evidence,
+                "_run_isolated_mode",
+                side_effect=mutate_isolated,
+            ):
+                self.assertEqual(0, refresh_catalog_evidence.refresh(root))
+
+            self.assertEqual('{"value":2}\n', (root / evidence_relative).read_text(encoding="utf-8"))
+            self.assertEqual("<main>generated</main>\n", (root / "index.html").read_text(encoding="utf-8"))
+
+    def test_refresh_refuses_unexpected_output_path_without_source_mutation(self) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            unexpected = "scripts/unexpected.py"
+            self._init_repo(root, {unexpected: "before\n"})
+
+            def mutate_isolated(isolated: Path, mode: str):
+                self.assertEqual("--refresh", mode)
+                (isolated / unexpected).write_text("after\n", encoding="utf-8")
+                return subprocess.CompletedProcess(["refresh"], 0, "", "")
+
+            with mock.patch.object(
+                refresh_catalog_evidence,
+                "_run_isolated_mode",
+                side_effect=mutate_isolated,
+            ):
+                self.assertEqual(1, refresh_catalog_evidence.refresh(root))
+
+            self.assertEqual("before\n", (root / unexpected).read_text(encoding="utf-8"))
+
+    def test_refresh_refuses_rewrite_of_preexisting_untracked_output(self) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            self._init_repo(root, {"tracked.txt": "base\n"})
+            untracked = root / "index.html"
+            untracked.write_text("mine\n", encoding="utf-8")
+
+            def mutate_isolated(isolated: Path, mode: str):
+                self.assertEqual("--refresh", mode)
+                (isolated / "index.html").write_text("generated\n", encoding="utf-8")
+                return subprocess.CompletedProcess(["refresh"], 0, "", "")
+
+            with mock.patch.object(
+                refresh_catalog_evidence,
+                "_run_isolated_mode",
+                side_effect=mutate_isolated,
+            ):
+                self.assertEqual(1, refresh_catalog_evidence.refresh(root))
+
+            self.assertEqual("mine\n", untracked.read_text(encoding="utf-8"))
+
+    def test_refresh_refuses_publication_after_concurrent_source_change(self) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            evidence_relative = "docs/evidence/catalog-recovery-scale-v1.json"
+            self._init_repo(root, {"tracked.txt": "before\n", evidence_relative: '{"value":1}\n'})
+
+            def mutate_isolated(isolated: Path, mode: str):
+                self.assertEqual("--refresh", mode)
+                (isolated / evidence_relative).write_text('{"value":2}\n', encoding="utf-8")
+                (root / "tracked.txt").write_text("concurrent\n", encoding="utf-8")
+                return subprocess.CompletedProcess(["refresh"], 0, "", "")
+
+            with mock.patch.object(
+                refresh_catalog_evidence,
+                "_run_isolated_mode",
+                side_effect=mutate_isolated,
+            ):
+                self.assertEqual(1, refresh_catalog_evidence.refresh(root))
+
+            self.assertEqual("concurrent\n", (root / "tracked.txt").read_text(encoding="utf-8"))
+            self.assertEqual('{"value":1}\n', (root / evidence_relative).read_text(encoding="utf-8"))
+
+    def test_refresh_output_allowlist_is_explicit(self) -> None:
+        self.assertTrue(refresh_catalog_evidence._is_allowed_refresh_output("index.html"))
+        self.assertTrue(refresh_catalog_evidence._is_allowed_refresh_output("catalog/pages/2.html"))
+        self.assertTrue(refresh_catalog_evidence._is_allowed_refresh_output("catalog/runtime/manifest.v2.json"))
+        self.assertTrue(refresh_catalog_evidence._is_allowed_refresh_output("releases/abc/index.html"))
+        self.assertTrue(
+            refresh_catalog_evidence._is_allowed_refresh_output(
+                "assets/map/commonworld-country-boundaries.geojson"
+            )
+        )
+        self.assertTrue(
+            refresh_catalog_evidence._is_allowed_refresh_output(
+                "docs/evidence/catalog-recovery-scale-v1.json"
+            )
+        )
+        self.assertFalse(refresh_catalog_evidence._is_allowed_refresh_output("catalog/projects/example.json"))
+        self.assertFalse(refresh_catalog_evidence._is_allowed_refresh_output("scripts/validate_catalog.py"))
+        self.assertFalse(
+            refresh_catalog_evidence._is_allowed_refresh_output(
+                "docs/evidence/catalog-delivery-benchmark-v1.json"
+            )
+        )
 
 
 if __name__ == "__main__":
