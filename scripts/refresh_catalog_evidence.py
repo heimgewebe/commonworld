@@ -2,9 +2,9 @@
 """Refresh or check Commonworld catalogue evidence in one fail-closed order.
 
 Public refresh/check operations execute in an isolated local clone of the caller's
-exact working-tree contents. Check never writes back. Refresh only copies explicitly
-allowed machine-derived outputs back after every protected-evidence and validation
-gate passes.
+exact working-tree contents. Check never writes back. Refresh publishes explicitly
+allowed machine-derived outputs after their protected-evidence gates pass, then checks
+observational and human-review evidence against that published machine state.
 """
 
 from __future__ import annotations
@@ -453,15 +453,37 @@ def _verify_in_place(
     return 1
 
 
-def _refresh_in_place(
+def _verify_machine_refresh_outputs_in_place(
     root: Path = ROOT,
     *,
     builders: dict[str, Builder] | None = None,
 ) -> int:
+    before_workspace = workspace_snapshot(root)
+    failures = check_deterministic_outputs(root, builders=builders)
+    for step in VERIFY_STEPS:
+        if step.evidence_class != "machine-derived":
+            continue
+        if not _run_step(step, root=root):
+            failures.append(f"{step.name}: validator failed ({step.evidence_class})")
+    after_workspace = workspace_snapshot(root)
+    if before_workspace != after_workspace:
+        failures.append("machine-derived check mutated isolated repository workspace")
+
+    if not failures:
+        print("catalog machine-derived pre-publication check passed")
+        return 0
+
+    print("catalog machine-derived pre-publication check failed:", file=sys.stderr)
+    for failure in failures:
+        print(f"- {failure}", file=sys.stderr)
+    return 1
+
+
+def _run_safe_refresh_steps(root: Path = ROOT) -> bool:
     before = protected_snapshot(root)
     for step in SAFE_REFRESH_STEPS:
         if not _run_step(step, root=root):
-            return 1
+            return False
     after = protected_snapshot(root)
     if before != after:
         changed = sorted(key for key in before if before[key] != after[key])
@@ -470,6 +492,16 @@ def _refresh_in_place(
             + ", ".join(changed),
             file=sys.stderr,
         )
+        return False
+    return True
+
+
+def _refresh_in_place(
+    root: Path = ROOT,
+    *,
+    builders: dict[str, Builder] | None = None,
+) -> int:
+    if not _run_safe_refresh_steps(root):
         return 1
     return _verify_in_place(root, builders=builders)
 
@@ -618,19 +650,26 @@ def refresh(root: Path = ROOT) -> int:
     source_before = workspace_entries(root)
     with isolated_workspace(root, source_entries=source_before) as isolated:
         isolated_before = workspace_entries(isolated)
-        result = _run_isolated_mode(isolated, "--refresh")
-        _forward_result(result)
-        if result.returncode != 0:
-            return result.returncode
+        if not _run_safe_refresh_steps(isolated):
+            return 1
+        machine_check = _run_isolated_mode(isolated, "--machine-check")
+        _forward_result(machine_check)
+        if machine_check.returncode != 0:
+            return machine_check.returncode
         isolated_after = workspace_entries(isolated)
-        return 0 if _publish_refresh_outputs(
+        if not _publish_refresh_outputs(
             root,
             isolated,
             source_before,
             isolated_before,
             isolated_after,
             source_workspace_sha256,
-        ) else 1
+        ):
+            return 1
+    print(
+        "catalog machine-derived refresh outputs published; checking observational/review evidence"
+    )
+    return verify(root)
 
 
 def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
@@ -639,12 +678,17 @@ def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
     mode.add_argument(
         "--refresh",
         action="store_true",
-        help="Regenerate safe machine-derived artefacts in isolation, verify them, then publish allowed outputs.",
+        help="Regenerate and publish safe machine-derived artefacts in isolation, then check observational/review evidence.",
     )
     mode.add_argument(
         "--check",
         action="store_true",
         help="Run deterministic drift and evidence validation in isolation without changing the caller workspace.",
+    )
+    mode.add_argument(
+        "--machine-check",
+        action="store_true",
+        help=argparse.SUPPRESS,
     )
     return parser.parse_args(argv)
 
@@ -654,6 +698,11 @@ def main(argv: list[str] | None = None) -> int:
     isolated = os.environ.get(ISOLATED_ENV) == "1"
     if args.refresh:
         return _refresh_in_place(ROOT) if isolated else refresh(ROOT)
+    if args.machine_check:
+        if not isolated:
+            print("--machine-check is internal-only", file=sys.stderr)
+            return 2
+        return _verify_machine_refresh_outputs_in_place(ROOT)
     return _verify_in_place(ROOT) if isolated else verify(ROOT)
 
 

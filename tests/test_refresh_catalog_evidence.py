@@ -200,47 +200,164 @@ class RefreshCatalogEvidenceTests(unittest.TestCase):
             self.assertEqual("original\n", (root / "tracked.txt").read_text(encoding="utf-8"))
             self.assertFalse((root / "new.txt").exists())
 
-    def test_failed_refresh_cannot_publish_protected_mutation(self) -> None:
-        with tempfile.TemporaryDirectory() as directory:
-            root = Path(directory)
-            protected_relative = "docs/evidence/catalog-delivery-benchmark-v1.json"
-            self._init_repo(root, {protected_relative: "{}\n"})
-
-            def mutate_isolated(isolated: Path, mode: str):
-                self.assertEqual("--refresh", mode)
-                (isolated / protected_relative).write_text('{"mutated":true}\n', encoding="utf-8")
-                return subprocess.CompletedProcess(["refresh"], 1, "", "protected mutation\n")
-
-            with mock.patch.object(
-                refresh_catalog_evidence,
-                "_run_isolated_mode",
-                side_effect=mutate_isolated,
-            ):
-                self.assertEqual(1, refresh_catalog_evidence.refresh(root))
-
-            self.assertEqual("{}\n", (root / protected_relative).read_text(encoding="utf-8"))
-
-    def test_successful_refresh_publishes_allowed_machine_outputs(self) -> None:
+    def test_public_refresh_does_not_publish_when_safe_steps_fail(self) -> None:
         with tempfile.TemporaryDirectory() as directory:
             root = Path(directory)
             evidence_relative = "docs/evidence/catalog-recovery-scale-v1.json"
             self._init_repo(root, {evidence_relative: '{"value":1}\n'})
 
-            def mutate_isolated(isolated: Path, mode: str):
-                self.assertEqual("--refresh", mode)
+            def fail_safe_steps(isolated: Path) -> bool:
+                (isolated / evidence_relative).write_text('{"value":2}\n', encoding="utf-8")
+                return False
+
+            with (
+                mock.patch.object(
+                    refresh_catalog_evidence,
+                    "_run_safe_refresh_steps",
+                    side_effect=fail_safe_steps,
+                ),
+                mock.patch.object(
+                    refresh_catalog_evidence,
+                    "_run_isolated_mode",
+                    return_value=subprocess.CompletedProcess(["machine-check"], 0, "", ""),
+                ),
+                mock.patch.object(refresh_catalog_evidence, "verify", return_value=0) as verify,
+            ):
+                self.assertEqual(1, refresh_catalog_evidence.refresh(root))
+
+            verify.assert_not_called()
+            self.assertEqual('{"value":1}\n', (root / evidence_relative).read_text(encoding="utf-8"))
+
+    def test_machine_refresh_check_runs_only_machine_derived_validators(self) -> None:
+        seen: list[str] = []
+
+        def run_step(step, *, root: Path) -> bool:
+            seen.append(step.name)
+            return True
+
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            with (
+                mock.patch.object(
+                    refresh_catalog_evidence,
+                    "workspace_snapshot",
+                    return_value="same",
+                ),
+                mock.patch.object(
+                    refresh_catalog_evidence,
+                    "check_deterministic_outputs",
+                    return_value=[],
+                ),
+                mock.patch.object(refresh_catalog_evidence, "_run_step", side_effect=run_step),
+            ):
+                self.assertEqual(
+                    0,
+                    refresh_catalog_evidence._verify_machine_refresh_outputs_in_place(root),
+                )
+
+        self.assertEqual(
+            [
+                step.name
+                for step in refresh_catalog_evidence.VERIFY_STEPS
+                if step.evidence_class == "machine-derived"
+            ],
+            seen,
+        )
+
+    def test_machine_refresh_check_failure_prevents_publication(self) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            evidence_relative = "docs/evidence/catalog-recovery-scale-v1.json"
+            self._init_repo(root, {evidence_relative: '{"value":1}\n'})
+
+            def mutate_isolated(isolated: Path) -> bool:
+                (isolated / evidence_relative).write_text('{"value":2}\n', encoding="utf-8")
+                return True
+
+            with (
+                mock.patch.object(
+                    refresh_catalog_evidence,
+                    "_run_safe_refresh_steps",
+                    side_effect=mutate_isolated,
+                ),
+                mock.patch.object(
+                    refresh_catalog_evidence,
+                    "_run_isolated_mode",
+                    return_value=subprocess.CompletedProcess(
+                        ["machine-check"], 1, "", "machine validation failed\n"
+                    ),
+                ),
+                mock.patch.object(refresh_catalog_evidence, "verify", return_value=0) as verify,
+            ):
+                self.assertEqual(1, refresh_catalog_evidence.refresh(root))
+
+            verify.assert_not_called()
+            self.assertEqual('{"value":1}\n', (root / evidence_relative).read_text(encoding="utf-8"))
+
+    def test_successful_refresh_publishes_allowed_machine_outputs_before_verify(self) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            evidence_relative = "docs/evidence/catalog-recovery-scale-v1.json"
+            self._init_repo(root, {evidence_relative: '{"value":1}\n'})
+
+            def mutate_isolated(isolated: Path) -> bool:
                 (isolated / evidence_relative).write_text('{"value":2}\n', encoding="utf-8")
                 (isolated / "index.html").write_text("<main>generated</main>\n", encoding="utf-8")
-                return subprocess.CompletedProcess(["refresh"], 0, "ok\n", "")
+                return True
 
-            with mock.patch.object(
-                refresh_catalog_evidence,
-                "_run_isolated_mode",
-                side_effect=mutate_isolated,
+            def verify_source(source: Path) -> int:
+                self.assertEqual('{"value":2}\n', (source / evidence_relative).read_text(encoding="utf-8"))
+                self.assertEqual("<main>generated</main>\n", (source / "index.html").read_text(encoding="utf-8"))
+                return 0
+
+            with (
+                mock.patch.object(
+                    refresh_catalog_evidence,
+                    "_run_safe_refresh_steps",
+                    side_effect=mutate_isolated,
+                ),
+                mock.patch.object(
+                    refresh_catalog_evidence,
+                    "_run_isolated_mode",
+                    return_value=subprocess.CompletedProcess(["machine-check"], 0, "", ""),
+                ),
+                mock.patch.object(
+                    refresh_catalog_evidence,
+                    "verify",
+                    side_effect=verify_source,
+                ) as verify,
             ):
                 self.assertEqual(0, refresh_catalog_evidence.refresh(root))
 
+            verify.assert_called_once_with(root)
+
+    def test_stale_observational_verify_keeps_published_machine_outputs_and_returns_nonzero(self) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            evidence_relative = "docs/evidence/catalog-recovery-scale-v1.json"
+            self._init_repo(root, {evidence_relative: '{"value":1}\n'})
+
+            def mutate_isolated(isolated: Path) -> bool:
+                (isolated / evidence_relative).write_text('{"value":2}\n', encoding="utf-8")
+                return True
+
+            with (
+                mock.patch.object(
+                    refresh_catalog_evidence,
+                    "_run_safe_refresh_steps",
+                    side_effect=mutate_isolated,
+                ),
+                mock.patch.object(
+                    refresh_catalog_evidence,
+                    "_run_isolated_mode",
+                    return_value=subprocess.CompletedProcess(["machine-check"], 0, "", ""),
+                ),
+                mock.patch.object(refresh_catalog_evidence, "verify", return_value=1) as verify,
+            ):
+                self.assertEqual(1, refresh_catalog_evidence.refresh(root))
+
+            verify.assert_called_once_with(root)
             self.assertEqual('{"value":2}\n', (root / evidence_relative).read_text(encoding="utf-8"))
-            self.assertEqual("<main>generated</main>\n", (root / "index.html").read_text(encoding="utf-8"))
 
     def test_refresh_refuses_unexpected_output_path_without_source_mutation(self) -> None:
         with tempfile.TemporaryDirectory() as directory:
@@ -248,18 +365,26 @@ class RefreshCatalogEvidenceTests(unittest.TestCase):
             unexpected = "scripts/unexpected.py"
             self._init_repo(root, {unexpected: "before\n"})
 
-            def mutate_isolated(isolated: Path, mode: str):
-                self.assertEqual("--refresh", mode)
+            def mutate_isolated(isolated: Path) -> bool:
                 (isolated / unexpected).write_text("after\n", encoding="utf-8")
-                return subprocess.CompletedProcess(["refresh"], 0, "", "")
+                return True
 
-            with mock.patch.object(
-                refresh_catalog_evidence,
-                "_run_isolated_mode",
-                side_effect=mutate_isolated,
+            with (
+                mock.patch.object(
+                    refresh_catalog_evidence,
+                    "_run_safe_refresh_steps",
+                    side_effect=mutate_isolated,
+                ),
+                mock.patch.object(
+                    refresh_catalog_evidence,
+                    "_run_isolated_mode",
+                    return_value=subprocess.CompletedProcess(["machine-check"], 0, "", ""),
+                ),
+                mock.patch.object(refresh_catalog_evidence, "verify", return_value=0) as verify,
             ):
                 self.assertEqual(1, refresh_catalog_evidence.refresh(root))
 
+            verify.assert_not_called()
             self.assertEqual("before\n", (root / unexpected).read_text(encoding="utf-8"))
 
     def test_refresh_refuses_rewrite_of_preexisting_untracked_output(self) -> None:
@@ -269,18 +394,26 @@ class RefreshCatalogEvidenceTests(unittest.TestCase):
             untracked = root / "index.html"
             untracked.write_text("mine\n", encoding="utf-8")
 
-            def mutate_isolated(isolated: Path, mode: str):
-                self.assertEqual("--refresh", mode)
+            def mutate_isolated(isolated: Path) -> bool:
                 (isolated / "index.html").write_text("generated\n", encoding="utf-8")
-                return subprocess.CompletedProcess(["refresh"], 0, "", "")
+                return True
 
-            with mock.patch.object(
-                refresh_catalog_evidence,
-                "_run_isolated_mode",
-                side_effect=mutate_isolated,
+            with (
+                mock.patch.object(
+                    refresh_catalog_evidence,
+                    "_run_safe_refresh_steps",
+                    side_effect=mutate_isolated,
+                ),
+                mock.patch.object(
+                    refresh_catalog_evidence,
+                    "_run_isolated_mode",
+                    return_value=subprocess.CompletedProcess(["machine-check"], 0, "", ""),
+                ),
+                mock.patch.object(refresh_catalog_evidence, "verify", return_value=0) as verify,
             ):
                 self.assertEqual(1, refresh_catalog_evidence.refresh(root))
 
+            verify.assert_not_called()
             self.assertEqual("mine\n", untracked.read_text(encoding="utf-8"))
 
     def test_refresh_refuses_publication_after_concurrent_source_change(self) -> None:
@@ -289,19 +422,27 @@ class RefreshCatalogEvidenceTests(unittest.TestCase):
             evidence_relative = "docs/evidence/catalog-recovery-scale-v1.json"
             self._init_repo(root, {"tracked.txt": "before\n", evidence_relative: '{"value":1}\n'})
 
-            def mutate_isolated(isolated: Path, mode: str):
-                self.assertEqual("--refresh", mode)
+            def mutate_isolated(isolated: Path) -> bool:
                 (isolated / evidence_relative).write_text('{"value":2}\n', encoding="utf-8")
                 (root / "tracked.txt").write_text("concurrent\n", encoding="utf-8")
-                return subprocess.CompletedProcess(["refresh"], 0, "", "")
+                return True
 
-            with mock.patch.object(
-                refresh_catalog_evidence,
-                "_run_isolated_mode",
-                side_effect=mutate_isolated,
+            with (
+                mock.patch.object(
+                    refresh_catalog_evidence,
+                    "_run_safe_refresh_steps",
+                    side_effect=mutate_isolated,
+                ),
+                mock.patch.object(
+                    refresh_catalog_evidence,
+                    "_run_isolated_mode",
+                    return_value=subprocess.CompletedProcess(["machine-check"], 0, "", ""),
+                ),
+                mock.patch.object(refresh_catalog_evidence, "verify", return_value=0) as verify,
             ):
                 self.assertEqual(1, refresh_catalog_evidence.refresh(root))
 
+            verify.assert_not_called()
             self.assertEqual("concurrent\n", (root / "tracked.txt").read_text(encoding="utf-8"))
             self.assertEqual('{"value":1}\n', (root / evidence_relative).read_text(encoding="utf-8"))
 
