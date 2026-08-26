@@ -3120,7 +3120,7 @@ async function androidGlobeUiScenario() {
       }),
     };
   });
-  const wideTouchMotionAfter = await touchRingState();
+  let wideTouchMotionAfter = await touchRingState();
   const movingMatricesBetween = (before, after, threshold = 1e-5) => after.filter((entry, index) => {
     const previous = before[index];
     return entry.planeMatrix && previous?.planeMatrix
@@ -3142,12 +3142,6 @@ async function androidGlobeUiScenario() {
       && Number.isFinite(previous?.planeAnimationCurrentTime)
       && entry.planeAnimationCurrentTime - previous.planeAnimationCurrentTime > threshold;
   });
-  assert(wideTouchGeometry.viewportWidth > 768 && !wideTouchGeometry.mediaCompact && wideTouchGeometry.mediaCoarseTouch, scenarioId + ': wide touch viewport did not exercise the non-compact coarse-pointer path ' + JSON.stringify(wideTouchGeometry));
-  assert(wideTouchGeometry.primaryRingsAnimated && wideTouchGeometry.depthRingsAnimated, scenarioId + ': wide touch ring planes lost shared animation ' + JSON.stringify(wideTouchGeometry));
-  assert(wideTouchMotionAfter.every(({ planeAnimationName, planeAnimationPlaybackRate, labelAnimationName, ringAnimationName, labelTransform, ringTransform, sharedVisualParent, sharedPathReference }) => planeAnimationName === 'sphere-ring-orbit' && planeAnimationPlaybackRate === 1 && labelAnimationName === 'none' && ringAnimationName === 'none' && labelTransform === 'none' && ringTransform === 'none' && sharedVisualParent && sharedPathReference), scenarioId + ': wide touch line and label do not share one path-based animation parent ' + JSON.stringify(wideTouchMotionAfter));
-  assert(coherentMovingIndices(wideTouchMotionBefore, wideTouchMotionAfter).length >= 2, scenarioId + ': wide touch ring strokes and labels did not advance in their shared orbit phase ' + JSON.stringify({ before: wideTouchMotionBefore, after: wideTouchMotionAfter }));
-  assert(wideTouchGeometry.representativePrimaryLabels.length >= 2 && wideTouchGeometry.representativePrimaryLabels.every(({ text, visible, width, height, fontSize }) => text.length > 0 && visible && width > 80 && height > 0 && fontSize >= 20), scenarioId + ': wide touch primary ring labels are absent or not visibly laid out ' + JSON.stringify(wideTouchGeometry));
-
   const waitForCoherentTouchMotion = async (before, minimum = 2, timeoutMs = 1500) => {
     const deadline = Date.now() + timeoutMs;
     let after = await touchRingState();
@@ -3157,6 +3151,13 @@ async function androidGlobeUiScenario() {
     }
     return after;
   };
+  wideTouchMotionAfter = await waitForCoherentTouchMotion(wideTouchMotionBefore);
+  assert(wideTouchGeometry.viewportWidth > 768 && !wideTouchGeometry.mediaCompact && wideTouchGeometry.mediaCoarseTouch, scenarioId + ': wide touch viewport did not exercise the non-compact coarse-pointer path ' + JSON.stringify(wideTouchGeometry));
+  assert(wideTouchGeometry.primaryRingsAnimated && wideTouchGeometry.depthRingsAnimated, scenarioId + ': wide touch ring planes lost shared animation ' + JSON.stringify(wideTouchGeometry));
+  assert(wideTouchMotionAfter.every(({ planeAnimationName, planeAnimationPlaybackRate, labelAnimationName, ringAnimationName, labelTransform, ringTransform, sharedVisualParent, sharedPathReference }) => planeAnimationName === 'sphere-ring-orbit' && planeAnimationPlaybackRate === 1 && labelAnimationName === 'none' && ringAnimationName === 'none' && labelTransform === 'none' && ringTransform === 'none' && sharedVisualParent && sharedPathReference), scenarioId + ': wide touch line and label do not share one path-based animation parent ' + JSON.stringify(wideTouchMotionAfter));
+  assert(coherentMovingIndices(wideTouchMotionBefore, wideTouchMotionAfter).length >= 2 && advancingAnimationTimesBetween(wideTouchMotionBefore, wideTouchMotionAfter).length >= 2, scenarioId + ': wide touch ring strokes, labels and WAAPI time did not advance in their shared orbit phase ' + JSON.stringify({ before: wideTouchMotionBefore, after: wideTouchMotionAfter }));
+  assert(wideTouchGeometry.representativePrimaryLabels.length >= 2 && wideTouchGeometry.representativePrimaryLabels.every(({ text, visible, width, height, fontSize }) => text.length > 0 && visible && width > 80 && height > 0 && fontSize >= 20), scenarioId + ': wide touch primary ring labels are absent or not visibly laid out ' + JSON.stringify(wideTouchGeometry));
+
   await run.page.evaluate(() => { document.querySelector('.globe-stage').dataset.mapMoving = 'true'; });
   await run.page.waitForTimeout(80);
   const mapPausedBefore = await touchRingState();
