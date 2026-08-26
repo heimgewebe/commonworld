@@ -3073,6 +3073,10 @@ async function androidGlobeUiScenario() {
       planeAnimationName: planeStyle.animationName,
       planeAnimationPlayState: planeStyle.animationPlayState,
       planeAnimationPlaybackRate: planeAnimation?.playbackRate ?? null,
+      planeAnimationApiPlayState: planeAnimation?.playState ?? null,
+      planeAnimationCurrentTime: planeAnimation?.currentTime ?? null,
+      planeAnimationStartTime: planeAnimation?.startTime ?? null,
+      planeAnimationPending: planeAnimation?.pending ?? null,
       planeOrbitDirection: planeStyle.getPropertyValue('--ring-orbit-direction').trim(),
       planeMatrix: planeTransform ? [planeTransform.a, planeTransform.b, planeTransform.c, planeTransform.d, planeTransform.e, planeTransform.f] : null,
       labelAnimationName: labelStyle?.animationName ?? 'none',
@@ -3132,6 +3136,12 @@ async function androidGlobeUiScenario() {
     && movingBoxesBetween([before[index]], [after[index]], 'ringBox').length === 1
     && movingBoxesBetween([before[index]], [after[index]], 'labelBox').length === 1
   ));
+  const advancingAnimationTimesBetween = (before, after, threshold = 1) => after.filter((entry, index) => {
+    const previous = before[index];
+    return Number.isFinite(entry.planeAnimationCurrentTime)
+      && Number.isFinite(previous?.planeAnimationCurrentTime)
+      && entry.planeAnimationCurrentTime - previous.planeAnimationCurrentTime > threshold;
+  });
   assert(wideTouchGeometry.viewportWidth > 768 && !wideTouchGeometry.mediaCompact && wideTouchGeometry.mediaCoarseTouch, scenarioId + ': wide touch viewport did not exercise the non-compact coarse-pointer path ' + JSON.stringify(wideTouchGeometry));
   assert(wideTouchGeometry.primaryRingsAnimated && wideTouchGeometry.depthRingsAnimated, scenarioId + ': wide touch ring planes lost shared animation ' + JSON.stringify(wideTouchGeometry));
   assert(wideTouchMotionAfter.every(({ planeAnimationName, planeAnimationPlaybackRate, labelAnimationName, ringAnimationName, labelTransform, ringTransform, sharedVisualParent, sharedPathReference }) => planeAnimationName === 'sphere-ring-orbit' && planeAnimationPlaybackRate === 1 && labelAnimationName === 'none' && ringAnimationName === 'none' && labelTransform === 'none' && ringTransform === 'none' && sharedVisualParent && sharedPathReference), scenarioId + ': wide touch line and label do not share one path-based animation parent ' + JSON.stringify(wideTouchMotionAfter));
@@ -3141,7 +3151,7 @@ async function androidGlobeUiScenario() {
   const waitForCoherentTouchMotion = async (before, minimum = 2, timeoutMs = 1500) => {
     const deadline = Date.now() + timeoutMs;
     let after = await touchRingState();
-    while (coherentMovingIndices(before, after).length < minimum && Date.now() < deadline) {
+    while ((coherentMovingIndices(before, after).length < minimum || advancingAnimationTimesBetween(before, after).length < minimum) && Date.now() < deadline) {
       await run.page.waitForTimeout(50);
       after = await touchRingState();
     }
@@ -3152,28 +3162,28 @@ async function androidGlobeUiScenario() {
   const mapPausedBefore = await touchRingState();
   await run.page.waitForTimeout(350);
   const mapPausedAfter = await touchRingState();
-  assert(mapPausedAfter.every(({ planeAnimationName, planeAnimationPlayState, planeAnimationPlaybackRate }) => planeAnimationName === 'sphere-ring-orbit' && planeAnimationPlayState === 'paused' && planeAnimationPlaybackRate === 0), scenarioId + ': data-map-moving did not deterministically freeze each shared ring plane ' + JSON.stringify(mapPausedAfter));
-  assert(movingMatricesBetween(mapPausedBefore, mapPausedAfter).length === 0 && movingBoxesBetween(mapPausedBefore, mapPausedAfter, 'ringBox').length === 0 && movingBoxesBetween(mapPausedBefore, mapPausedAfter, 'labelBox').length === 0, scenarioId + ': line or label moved while data-map-moving paused the shared orbit ' + JSON.stringify({ before: mapPausedBefore, after: mapPausedAfter }));
+  assert(mapPausedAfter.every(({ planeAnimationName, planeAnimationPlayState, planeAnimationPlaybackRate, planeAnimationApiPlayState, planeAnimationPending }) => planeAnimationName === 'sphere-ring-orbit' && planeAnimationPlayState === 'paused' && planeAnimationPlaybackRate === 0 && planeAnimationApiPlayState === 'paused' && planeAnimationPending === false), scenarioId + ': data-map-moving did not deterministically freeze each shared ring plane ' + JSON.stringify(mapPausedAfter));
+  assert(movingMatricesBetween(mapPausedBefore, mapPausedAfter).length === 0 && movingBoxesBetween(mapPausedBefore, mapPausedAfter, 'ringBox').length === 0 && movingBoxesBetween(mapPausedBefore, mapPausedAfter, 'labelBox').length === 0 && advancingAnimationTimesBetween(mapPausedBefore, mapPausedAfter).length === 0, scenarioId + ': line, label or WAAPI time moved while data-map-moving paused the shared orbit ' + JSON.stringify({ before: mapPausedBefore, after: mapPausedAfter }));
   await run.page.evaluate(() => { delete document.querySelector('.globe-stage').dataset.mapMoving; });
   const mapResumedBefore = await touchRingState();
   const mapResumedAfter = await waitForCoherentTouchMotion(mapResumedBefore);
-  assert(mapResumedAfter.every(({ planeAnimationName, planeAnimationPlayState, planeAnimationPlaybackRate }) => planeAnimationName === 'sphere-ring-orbit' && planeAnimationPlayState === 'running' && planeAnimationPlaybackRate === 1), scenarioId + ': shared ring planes did not resume at normal playback after data-map-moving ended ' + JSON.stringify(mapResumedAfter));
-  assert(coherentMovingIndices(mapResumedBefore, mapResumedAfter).length >= 2, scenarioId + ': line and label did not resume together after data-map-moving ended ' + JSON.stringify({ before: mapResumedBefore, after: mapResumedAfter }));
+  assert(mapResumedAfter.every(({ planeAnimationName, planeAnimationPlayState, planeAnimationPlaybackRate, planeAnimationApiPlayState, planeAnimationPending }) => planeAnimationName === 'sphere-ring-orbit' && planeAnimationPlayState === 'running' && planeAnimationPlaybackRate === 1 && planeAnimationApiPlayState === 'running' && planeAnimationPending === false), scenarioId + ': shared ring planes did not resume at normal playback after data-map-moving ended ' + JSON.stringify(mapResumedAfter));
+  assert(coherentMovingIndices(mapResumedBefore, mapResumedAfter).length >= 2 && advancingAnimationTimesBetween(mapResumedBefore, mapResumedAfter).length >= 2, scenarioId + ': line, label and WAAPI time did not resume together after data-map-moving ended ' + JSON.stringify({ before: mapResumedBefore, after: mapResumedAfter }));
 
   await run.page.locator('#sphere-edge-control').focus();
   await run.page.waitForTimeout(80);
   const focusPausedBefore = await touchRingState();
   await run.page.waitForTimeout(350);
   const focusPausedAfter = await touchRingState();
-  assert(focusPausedAfter.every(({ planeAnimationName, planeAnimationPlayState, planeAnimationPlaybackRate }) => planeAnimationName === 'sphere-ring-orbit' && planeAnimationPlayState === 'paused' && planeAnimationPlaybackRate === 0), scenarioId + ': sphere-edge focus did not deterministically freeze each shared ring plane ' + JSON.stringify(focusPausedAfter));
-  assert(movingMatricesBetween(focusPausedBefore, focusPausedAfter).length === 0 && movingBoxesBetween(focusPausedBefore, focusPausedAfter, 'ringBox').length === 0 && movingBoxesBetween(focusPausedBefore, focusPausedAfter, 'labelBox').length === 0, scenarioId + ': line or label moved while sphere-edge focus paused the shared orbit ' + JSON.stringify({ before: focusPausedBefore, after: focusPausedAfter }));
+  assert(focusPausedAfter.every(({ planeAnimationName, planeAnimationPlayState, planeAnimationPlaybackRate, planeAnimationApiPlayState, planeAnimationPending }) => planeAnimationName === 'sphere-ring-orbit' && planeAnimationPlayState === 'paused' && planeAnimationPlaybackRate === 0 && planeAnimationApiPlayState === 'paused' && planeAnimationPending === false), scenarioId + ': sphere-edge focus did not deterministically freeze each shared ring plane ' + JSON.stringify(focusPausedAfter));
+  assert(movingMatricesBetween(focusPausedBefore, focusPausedAfter).length === 0 && movingBoxesBetween(focusPausedBefore, focusPausedAfter, 'ringBox').length === 0 && movingBoxesBetween(focusPausedBefore, focusPausedAfter, 'labelBox').length === 0 && advancingAnimationTimesBetween(focusPausedBefore, focusPausedAfter).length === 0, scenarioId + ': line, label or WAAPI time moved while sphere-edge focus paused the shared orbit ' + JSON.stringify({ before: focusPausedBefore, after: focusPausedAfter }));
   await run.page.locator('#filter-toggle').focus();
   await run.page.waitForFunction(() => document.activeElement?.id === 'filter-toggle');
   await run.page.waitForTimeout(80);
   const focusResumedBefore = await touchRingState();
   const focusResumedAfter = await waitForCoherentTouchMotion(focusResumedBefore);
-  assert(focusResumedAfter.every(({ planeAnimationName, planeAnimationPlayState, planeAnimationPlaybackRate }) => planeAnimationName === 'sphere-ring-orbit' && planeAnimationPlayState === 'running' && planeAnimationPlaybackRate === 1), scenarioId + ': shared ring planes did not resume at normal playback after sphere-edge focus ended ' + JSON.stringify(focusResumedAfter));
-  assert(coherentMovingIndices(focusResumedBefore, focusResumedAfter).length >= 2, scenarioId + ': line and label did not resume together after sphere-edge focus ended ' + JSON.stringify({ before: focusResumedBefore, after: focusResumedAfter }));
+  assert(focusResumedAfter.every(({ planeAnimationName, planeAnimationPlayState, planeAnimationPlaybackRate, planeAnimationApiPlayState, planeAnimationPending }) => planeAnimationName === 'sphere-ring-orbit' && planeAnimationPlayState === 'running' && planeAnimationPlaybackRate === 1 && planeAnimationApiPlayState === 'running' && planeAnimationPending === false), scenarioId + ': shared ring planes did not resume at normal playback after sphere-edge focus ended ' + JSON.stringify(focusResumedAfter));
+  assert(coherentMovingIndices(focusResumedBefore, focusResumedAfter).length >= 2 && advancingAnimationTimesBetween(focusResumedBefore, focusResumedAfter).length >= 2, scenarioId + ': line, label and WAAPI time did not resume together after sphere-edge focus ended ' + JSON.stringify({ before: focusResumedBefore, after: focusResumedAfter }));
 
   const reducedTouchRun = await newPage({
     mobile: true,

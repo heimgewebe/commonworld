@@ -890,10 +890,10 @@ function syncSphereRingOrbitPlayback() {
   for (const plane of elements.sphereRings.querySelectorAll('.sphere-ring-plane')) {
     const animation = plane.getAnimations().find((candidate) => candidate.animationName === 'sphere-ring-orbit');
     if (!animation) continue;
-    // Chromium can expose animation-play-state: paused before the compositor has
-    // actually stopped sampling a CSS animation. A zero WAAPI playback rate makes
-    // the same CSS animation hold its current phase without introducing a JS loop.
-    animation.playbackRate = playbackRate;
+    // Chromium can expose animation-play-state before the compositor and main
+    // thread agree on the sampled CSS-animation phase. Synchronize the current
+    // playback position before changing speed so pause/resume remains phase-stable.
+    animation.updatePlaybackRate(playbackRate);
     if (playbackRate === 0) animation.pause();
     else animation.play();
   }
