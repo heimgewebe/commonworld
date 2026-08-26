@@ -17,7 +17,7 @@
   "freshness_model": "digest-defined-proposed-head-scope",
   "kind": "commonworld.release_snapshot_lifecycle_evidence",
   "proposed_head_inputs": {
-    "Makefile": "b6e567c685d595fdd58609107afc645389fe53f6e27004de6969183ef95bbfae",
+    "Makefile": "a7a5d0b6c2e868b818df31508af6b812ecc80132ad38c02a754738b166a12566",
     "assets/commonworld-release-check.js": "c1d99610167242f1838e9f8371d3328d20beef0e9bb0d5501c189da5f44ce460",
     "docs/architecture/release-snapshot-lifecycle.contract.json": "6fda74667864e8ca13ab8519b151e95e3d886428dca83b2f342b5f96b45b3e7b",
     "package.json": "1db5ff4a577d2e8b2a01c8adc4cd6464acef1bebc8ceeb1c36baa08486c21b9f",
@@ -26,12 +26,12 @@
     "scripts/public_cache.py": "4da2bd6dd8267e644506ac7284090755e33ad3415c46b9c7caa1d0750e6f0cd7",
     "scripts/render_public_shell.py": "5b7afea2f27389960a6b82cfae3a7c4c27088e72c6b7883a10a17d40736b1333",
     "scripts/validate_cache_coherence.py": "50b924851facfad392b04e09cd8714cb9cba3d8c7855632cd01d45a0739d0fa6",
-    "scripts/validate_canonical_plan.py": "1b3658c7c8cbe51b9d442aa7068f0e10dfb7d33235e42ad6d3ca15cf8d3ec69b",
+    "scripts/validate_canonical_plan.py": "0a3b2fe2a0d4d89df9d7877bbf39b1796494ccf342143b44d5d77be869587b7f",
     "scripts/validate_catalog_delivery_budget.py": "da2f9301aa760419bd25ce38679c07643a670d7167820ca93f81e982b49f2382",
     "scripts/validate_release_snapshot_lifecycle.py": "13b2fb3f01192fd6057d295684406556dd3ba4b0e578de5504ad39130fd3869c",
     "tests/test_release_snapshot_lifecycle.py": "6cd44edbe32e10d17485b168ce547f0789a641a5ffdf1e47889bf6782b464f92"
   },
-  "proposed_head_scope_sha256": "bc47cd564254900ad46311e1be4ae2bb9db93658785bcd4705b160e7bb755800",
+  "proposed_head_scope_sha256": "7179e5dbb476eaeb8f848a0f7531b0ad4a17fc2e03f65c0d30405ac8d0f6d302",
   "schema_version": 1,
   "status": "fresh",
   "task_id": "COMMONWORLD-PUBLIC-GLOBE-V1-T040"
