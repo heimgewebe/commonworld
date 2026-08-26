@@ -11,8 +11,8 @@
   },
   "current_release_id": "10c3deb0c7c2fb63a7a2",
   "delivery_evidence": {
-    "docs/evidence/catalog-delivery-benchmark-v1.json": "aa7cac5bddd980d8d037dc68a180cb7ed20bd2c0a3a5de54290851b5b88470be",
-    "docs/evidence/catalog-delivery-public-browser-smoke-v1.json": "eec4f88162e6b65af995e577d40d30489969eecea95176484ff6b863de6a6fa7"
+    "docs/evidence/catalog-delivery-benchmark-v1.json": "e05fdfbf4acfa16895a05026c02a806666fa322f9a3eae780d596c843b7e8e46",
+    "docs/evidence/catalog-delivery-public-browser-smoke-v1.json": "a5fd23a3fca20d8c6c6e3c1ac3bf47e7b45691889db55e757e02c13649532539"
   },
   "freshness_model": "digest-defined-proposed-head-scope",
   "kind": "commonworld.release_snapshot_lifecycle_evidence",
