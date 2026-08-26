@@ -8,9 +8,9 @@
   "reviewed_source_pack_sha256": "cf57400b0a0fbf818baa88f33001e95bc4c7c39bd00caef3505f4d9ab6c0f405",
   "catalog_overlay_sha256": "f2aaa30377639a180d709fc180e5feefbee5fb67afbb5f249efadfaf8407d27e",
   "surface_sha256": {
-    "index": "b8fff301ec1e929325a737a9beb721f170ca67b189b6fcdd244639302e3af075",
-    "method": "bb43cbd95039ec8af6ed6e91d3cc752fedc7b65f1ce5a1dfbc634ec01b19ad41",
-    "proposal": "ab47dd41d4f74e9fec35b44d6002cfa2ba257e24506399cf0a4ba86b6447646b"
+    "index": "32d030343f79cdfadc496f2fbabd85d164da8f8af8b581a6903c7faaca94af86",
+    "method": "0cd4edfc2c17c89e637f59183d70272b7c11a46f5d74752dac4c0f12ac4aef6b",
+    "proposal": "75d5a34dc316ccdf0febb412bb7693b78f653256532e0bd006688f7e8abda6d7"
   },
   "gate_results": {
     "required_surfaces_passed": [
@@ -60,5 +60,5 @@
     "findings_based": true,
     "post_fix_review_required": true
   },
-  "notes": "Locale-specific language, accessibility and lifecycle receipts remain bound to their previously reviewed immutable releases. The current surface_sha256 values were rebound on 2026-08-24 after the catalog-only Open Food Network Australia Commons-basis/provenance review regenerated deterministic public surfaces. Locale packs, reviewed source packs and catalog overlays are unchanged. Fresh generic public browser smoke passes 38 scenarios on deterministic release 8c91da65f1c21fe44b4f, while the canonical locale lifecycle smoke also passed 18/18 released surfaces before this final catalog publication rebind. No fresh native-speaker, human language, manual screen-reader, manual visual or full WCAG approval is claimed."
+  "notes": "Locale-specific language, accessibility and lifecycle receipts remain bound to their previously reviewed immutable releases. The current surface_sha256 values were mechanically rebound on 2026-08-26 after the global Chromium sphere-ring pause/resume runtime fix regenerated deterministic public surfaces as release 10c3deb0c7c2fb63a7a2. Locale packs, reviewed source packs, catalog overlays, gate results and review receipts are unchanged. Before this evidence-only rebind, four full Chromium public-browser suites on the product patch passed, including ring-orbits-reduced-motion and android-globe-ui-alignment with WAAPI-time plus visible-geometry resume assertions. This rebind changes no product runtime bytes and claims no fresh native-speaker, human language, manual screen-reader, manual visual or full WCAG approval."
 }
