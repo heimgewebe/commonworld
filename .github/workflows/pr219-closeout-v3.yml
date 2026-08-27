@@ -1,0 +1,348 @@
+name: pr219-closeout-v3
+
+on:
+  push:
+    branches:
+      - perf/catalog-bootstrap-headroom-v2-20260827
+
+permissions:
+  contents: write
+
+concurrency:
+  group: pr219-closeout-v3
+  cancel-in-progress: false
+
+jobs:
+  closeout:
+    if: github.repository == 'heimgewebe/commonworld'
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    env:
+      TARGET_BRANCH: perf/catalog-bootstrap-headroom-v2-20260827
+      GH_TOKEN: ${{ github.token }}
+    steps:
+      - name: Checkout exact triggering revision without third-party actions
+        shell: bash
+        run: |
+          set -euo pipefail
+          git init .
+          git remote add origin "https://x-access-token:${GH_TOKEN}@github.com/${GITHUB_REPOSITORY}.git"
+          git fetch --depth=1 origin "${GITHUB_SHA}"
+          git checkout --detach FETCH_HEAD
+          git config user.name "Commonworld Repair Bot"
+          git config user.email "commonworld-repair@users.noreply.github.com"
+
+      - name: Apply review and pause-contract fixes
+        shell: bash
+        run: |
+          set -euo pipefail
+          python3 - <<'PY'
+          from pathlib import Path
+
+          bootstrap = Path('scripts/catalog_bootstrap.py')
+          text = bootstrap.read_text(encoding='utf-8')
+          anchor = '    projected["links"] = [\n'
+          if text.count(anchor) != 1:
+              raise SystemExit(f'catalog bootstrap link anchor count drifted: {text.count(anchor)}')
+          i4 = ' ' * 4
+          i8 = ' ' * 8
+          alias_block = (
+              i4 + 'action_search_alias = " ".join(\n'
+              + i8 + 'link["label"].strip()\n'
+              + i8 + 'for link in record.get("links", [])\n'
+              + i8 + 'if isinstance(link, dict)\n'
+              + i8 + 'and link.get("type") in DERIVABLE_ACTION_LINK_TYPES\n'
+              + i8 + 'and isinstance(link.get("label"), str)\n'
+              + i8 + 'and link["label"].strip()\n'
+              + i4 + ')\n'
+              + i4 + 'if action_search_alias:\n'
+              + i8 + 'projected["_search_alias"] = action_search_alias\n'
+          )
+          bootstrap.write_text(text.replace(anchor, alias_block + anchor, 1), encoding='utf-8')
+
+          i18n = Path('assets/commonworld-i18n.mjs')
+          text = i18n.read_text(encoding='utf-8')
+          old = '    record?.title,\n    record?.summary,\n    record?.presence?.digital?.label,'
+          new = '    record?.title,\n    record?.summary,\n    record?._search_alias,\n    record?.presence?.digital?.label,'
+          if text.count(old) != 1:
+              raise SystemExit(f'i18n search alias anchor count drifted: {text.count(old)}')
+          i18n.write_text(text.replace(old, new, 1), encoding='utf-8')
+
+          app = Path('assets/commonworld-app.js')
+          text = app.read_text(encoding='utf-8')
+          old_comment = '\n'.join([
+              '    // Chromium can expose animation-play-state before the compositor and main',
+              '    // thread agree on the sampled CSS-animation phase. Synchronize the current',
+              '    // playback position before changing speed so pause/resume remains phase-stable.',
+              '    animation.updatePlaybackRate(playbackRate);',
+          ])
+          new_comment = '\n'.join([
+              '    // Chromium may leave updatePlaybackRate(0) pending for a frame after pause()',
+              '    // already reports playState="paused". Assign the rate synchronously so the',
+              '    // shared ring timeline cannot advance after the freeze signal.',
+              '    animation.playbackRate = playbackRate;',
+          ])
+          if text.count(old_comment) != 1:
+              raise SystemExit(f'sphere ring playback anchor count drifted: {text.count(old_comment)}')
+          app.write_text(text.replace(old_comment, new_comment, 1), encoding='utf-8')
+
+          tests = Path('tests/js/i18n.test.mjs')
+          text = tests.read_text(encoding='utf-8')
+          anchor = "test('full canonical source labels remain meaningful original-source text', () => {"
+          if text.count(anchor) != 1:
+              raise SystemExit(f'i18n regression-test anchor count drifted: {text.count(anchor)}')
+          regression = '\n'.join([
+              "test('compact bootstrap retains canonical action text only as a search alias', () => {",
+              "  const canonical = BOOTSTRAP_RECORDS.find((record) => record.id === 'acofop-peten-community-forests');",
+              '  assert.ok(canonical);',
+              "  const learn = canonical.links.find((link) => link.type === 'learn');",
+              '  assert.ok(learn);',
+              '  assert.equal(learn.label, undefined);',
+              '  assert.match(canonical._search_alias, /Waldverwaltung/u);',
+              '  for (const locale of RELEASED_LOCALES) {',
+              '    const localized = localizeCatalogRecords([canonical], locale);',
+              '    const index = prepareIntentSearchIndex(localized.records, { searchAliasesById: localized.searchAliasesById });',
+              "    assert.equal(index.search({ query: 'waldverwaltung', all: true })[0]?.id, canonical.id, locale);",
+              '  }',
+              '});',
+              '',
+              '',
+          ])
+          tests.write_text(text.replace(anchor, regression + anchor, 1), encoding='utf-8')
+          PY
+          python3 -m py_compile scripts/catalog_bootstrap.py
+          node --check assets/commonworld-app.js
+
+      - name: Install validation and browser dependencies
+        shell: bash
+        run: |
+          set -euo pipefail
+          npm ci --ignore-scripts --no-audit --no-fund
+          python3 -m pip install --require-hashes -r requirements-dev.txt
+          npx playwright install --with-deps chromium
+
+      - name: Build exact release
+        shell: bash
+        run: |
+          set -euo pipefail
+          npm run build
+
+      - name: Measure exact browser surface and run fresh public smoke
+        shell: bash
+        run: |
+          set -euo pipefail
+          node scripts/measure_catalog_delivery_browser.mjs --output /tmp/catalog-attempt-1.json >/tmp/catalog-attempt-1.stdout
+          set +e
+          python3 scripts/evaluate_catalog_browser_measurements.py \
+            --attempt /tmp/catalog-attempt-1.json \
+            --output /tmp/catalog-browser-decision.json
+          decision_rc=$?
+          set -e
+          if [ "${decision_rc}" -eq 2 ]; then
+            node scripts/measure_catalog_delivery_browser.mjs --output /tmp/catalog-attempt-2.json >/tmp/catalog-attempt-2.stdout
+            python3 scripts/evaluate_catalog_browser_measurements.py \
+              --attempt /tmp/catalog-attempt-1.json \
+              --attempt /tmp/catalog-attempt-2.json \
+              --output /tmp/catalog-browser-decision.json
+          elif [ "${decision_rc}" -ne 0 ]; then
+            exit "${decision_rc}"
+          fi
+          node scripts/smoke_public_browser.mjs --result /tmp/public-smoke.json
+
+      - name: Rebind exact-tree observational and locale evidence
+        shell: bash
+        run: |
+          set -euo pipefail
+          python3 - <<'PY'
+          from __future__ import annotations
+
+          import hashlib
+          import json
+          from pathlib import Path
+
+          from scripts.locale_registry import locale_entry
+          from scripts.measure_catalog_delivery import measure
+          from scripts.validate_catalog_delivery_budget import canonical_sha256
+
+          root = Path('.').resolve()
+          benchmark_path = root / 'docs/evidence/catalog-delivery-benchmark-v1.json'
+          smoke_path = root / 'docs/evidence/catalog-delivery-public-browser-smoke-v1.json'
+          contract_path = root / 'contracts/commonworld/catalog-delivery-budget.contract.json'
+          release_manifest_path = root / 'assets/commonworld-page-builds.json'
+
+          def load(path: Path):
+              return json.loads(path.read_text(encoding='utf-8'))
+
+          def write(path: Path, payload):
+              path.write_text(json.dumps(payload, ensure_ascii=False, indent=2) + '\n', encoding='utf-8')
+
+          def file_sha(path: Path) -> str:
+              return hashlib.sha256(path.read_bytes()).hexdigest()
+
+          release_id = load(release_manifest_path)['release_id']
+          browser = load(Path('/tmp/catalog-browser-decision.json'))
+          if browser.get('gate_verdict') != 'pass':
+              raise SystemExit(f"browser delivery gate is not pass: {browser.get('gate_verdict')}")
+          surface_sha = browser['first_party_surface_sha256']
+
+          actual_smoke = load(Path('/tmp/public-smoke.json'))
+          if actual_smoke.get('verdict') != 'PASS':
+              raise SystemExit('fresh public browser smoke is not PASS')
+          scenario_ids = [scenario['id'] for scenario in actual_smoke.get('scenarios', [])]
+          actual_smoke['binding'] = {
+              'schema_version': 1,
+              'scenario_ids': scenario_ids,
+              'smoke_script_sha256': file_sha(root / 'scripts/smoke_public_browser.mjs'),
+              'smoke_runner_sha256': file_sha(root / 'scripts/run_browser_smoke.py'),
+              'smoke_plan_sha256': file_sha(root / 'scripts/browser_smoke_plan.py'),
+              'first_party_surface_sha256': surface_sha,
+          }
+          write(smoke_path, actual_smoke)
+          smoke_evidence_sha = file_sha(smoke_path)
+
+          evidence = load(benchmark_path)
+          static = measure(root)
+          budgets = load(contract_path)['budgets']
+          evidence['optimized']['static'] = static
+          evidence['optimized']['browser'] = browser
+
+          baseline_static = evidence['baseline']['static']
+          baseline_runtime = baseline_static['runtime_verification_fetch']
+          baseline_initial = baseline_static['catalog_initial_delivery']
+          optimized_runtime = static['runtime_verification_fetch']
+          optimized_initial = static['catalog_initial_delivery']
+          delta = evidence.setdefault('delta', {})
+          delta['startup_project_json_requests'] = optimized_runtime['project_request_count'] - baseline_runtime['project_request_count']
+          delta['duplicate_identity_payload_count'] = optimized_runtime['duplicate_identity_payload_count'] - baseline_runtime['duplicate_identity_payload_count']
+          delta['catalog_initial_raw_bytes'] = optimized_initial['raw_bytes'] - baseline_initial['raw_bytes']
+          delta['catalog_initial_gzip_bytes'] = optimized_initial['gzip_bytes'] - baseline_initial['gzip_bytes']
+          delta['catalog_initial_raw_reduction_percent'] = round((-delta['catalog_initial_raw_bytes'] / baseline_initial['raw_bytes']) * 100, 1)
+          delta['catalog_initial_gzip_reduction_percent'] = round((-delta['catalog_initial_gzip_bytes'] / baseline_initial['gzip_bytes']) * 100, 1)
+          baseline_profiles = {p['profile']: p for p in evidence['baseline']['browser']['profiles']}
+          optimized_profiles = {p['profile']: p for p in browser['profiles']}
+          delta['first_party_request_count_by_profile'] = {
+              name: optimized_profiles[name]['first_party_request_count'] - profile['first_party_request_count']
+              for name, profile in baseline_profiles.items() if name in optimized_profiles
+          }
+          delta['browser_dom_nodes_by_profile'] = {
+              name: optimized_profiles[name]['dom_node_count'] - profile['dom_node_count']
+              for name, profile in baseline_profiles.items() if name in optimized_profiles
+          }
+
+          evidence['budget_binding'] = {
+              'bootstrap_gzip_bytes': static['bootstrap']['gzip_bytes'],
+              'warn_bootstrap_gzip_bytes': budgets['warn_bootstrap_gzip_bytes'],
+              'max_bootstrap_gzip_bytes': budgets['max_bootstrap_gzip_bytes'],
+          }
+          headroom = budgets['warn_bootstrap_gzip_bytes'] - static['bootstrap']['gzip_bytes']
+
+          validation = evidence.setdefault('validation', {})
+          public_summary = validation.setdefault('public_browser_smoke', {})
+          public_summary.update({
+              'verdict': 'PASS',
+              'scenario_count': len(scenario_ids),
+              'scope': f'local Chromium on deterministic release {release_id}',
+              'release_id': release_id,
+              'first_party_surface_sha256': surface_sha,
+              'committed_evidence_sha256': smoke_evidence_sha,
+          })
+          measurement_summary = validation.setdefault('catalog_delivery_browser_measurement', {})
+          measurement_summary.update({
+              'verdict': 'PASS',
+              'decision': browser['decision'],
+              'attempt_count': browser['attempt_count'],
+              'attempt_measurement_sha256s': [attempt['measurement_sha256'] for attempt in browser['attempts']],
+              'cpu_throttle_rate': browser['cpu_throttle_rate'],
+              'profiles': [profile['profile'] for profile in browser['profiles']],
+              'release_id': release_id,
+              'first_party_surface_sha256': surface_sha,
+              'repeatability_note': f'Fresh exact-tree release-{release_id} browser delivery evidence passed the bounded startup gate.',
+          })
+          static_sha = canonical_sha256(static)
+          validation['catalog_delivery_static_measurement'] = {
+              'verdict': 'PASS',
+              'release_id': release_id,
+              'result_sha256': static_sha,
+              'note': f'Fresh deterministic static measurement for the optimized 100-entry release {release_id}.',
+          }
+
+          repeatability_profiles = {}
+          attempts = [attempt['measurement'] for attempt in browser['attempts']]
+          for name in ('mobile-low-power', 'desktop-low-power'):
+              indexed = [{profile['profile']: profile for profile in attempt['profiles']} for attempt in attempts]
+              if not indexed or any(name not in attempt for attempt in indexed):
+                  continue
+              repeatability_profiles[name] = {}
+              for field in ('runtime_ready_ms', 'script_duration_ms', 'task_duration_ms'):
+                  values = [attempt[name][field] for attempt in indexed]
+                  repeatability_profiles[name][field] = {'min': min(values), 'max': max(values), 'values': values}
+          evidence['browser_repeatability'] = {
+              'run_count': browser['attempt_count'],
+              'cpu_throttle_rate': browser['cpu_throttle_rate'],
+              'profiles': repeatability_profiles,
+              'interpretation': f'Fresh exact-tree release-{release_id} browser observations at fourfold CPU throttling passed the bounded startup decision; post-ready work remains diagnostic only.',
+          }
+          evidence['current_surface_note'] = (
+              f'Fresh exact-tree static, {len(scenario_ids)}-scenario public Chromium smoke and fourfold-CPU browser evidence '
+              f'for deterministic release {release_id}; 100 Commons retain bounded recovery, zero startup project JSON requests '
+              f'and {headroom} gzip bytes of warning headroom while canonical action text remains searchable through a compact hidden alias.'
+          )
+          evidence['current_surface_binding'] = {
+              'release_id': release_id,
+              'first_party_surface_sha256': surface_sha,
+              'public_browser_smoke_evidence_sha256': smoke_evidence_sha,
+              'browser_measurement_decision_sha256': canonical_sha256(browser),
+              'static_measurement_sha256': static_sha,
+          }
+          write(benchmark_path, evidence)
+
+          locale_dir = root / 'docs/evidence/locale-releases'
+          for path in sorted(locale_dir.glob('*.json')):
+              locale_evidence = load(path)
+              if locale_evidence.get('status') != 'released':
+                  continue
+              locale = locale_evidence['locale']
+              entry = locale_entry(locale, root)
+              if not entry or not isinstance(entry.get('surface_files'), dict):
+                  raise SystemExit(f'missing surface registry for released locale {locale}')
+              locale_evidence['surface_sha256'] = {
+                  surface: file_sha(root / relative)
+                  for surface, relative in entry['surface_files'].items()
+              }
+              locale_evidence['notes'] = (
+                  'Locale-specific language, accessibility and lifecycle receipts remain bound to their previously reviewed immutable releases. '
+                  f'The current surface_sha256 values were mechanically rebound on 2026-08-27 after the compact search-alias and synchronous ring-pause fixes changed only the global deterministic bootstrap/runtime surface as release {release_id}. '
+                  'Locale packs, reviewed source packs, catalog overlays, gate results and review receipts are unchanged. '
+                  f'A fresh exact-tree Chromium public-browser suite passed {len(scenario_ids)}/{len(scenario_ids)} scenarios and fresh fourfold-CPU browser delivery evidence passed the bounded startup gate with zero project JSON requests. '
+                  'This rebind changes no locale pack or review receipt and claims no fresh native-speaker, human language, manual screen-reader, manual visual or full WCAG approval.'
+              )
+              write(path, locale_evidence)
+          PY
+
+      - name: Refresh deterministic machine evidence
+        shell: bash
+        run: |
+          set -euo pipefail
+          python3 scripts/refresh_catalog_evidence.py --refresh
+
+      - name: Validate exact tree
+        shell: bash
+        run: |
+          set -euo pipefail
+          npm run build
+          make validate
+          python3 scripts/run_browser_smoke.py
+          python3 scripts/refresh_catalog_evidence.py --check
+
+      - name: Commit exact validated tree and remove temporary workflow
+        shell: bash
+        run: |
+          set -euo pipefail
+          rm .github/workflows/pr219-closeout-v3.yml
+          git add -A
+          if git diff --cached --quiet; then
+            echo 'No closeout changes produced' >&2
+            exit 1
+          fi
+          git commit -m 'fix: preserve compact search semantics and ring pause'
+          git push origin "HEAD:refs/heads/${TARGET_BRANCH}"
