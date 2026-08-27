@@ -222,7 +222,7 @@ test('compact bootstrap retains canonical action text only as a search alias', (
   const learn = canonical.links.find((link) => link.type === 'learn');
   assert.ok(learn);
   assert.equal(learn.label, undefined);
-  assert.match(canonical._search_alias, /Waldverwaltung/u);
+  assert.match(canonical._search_alias, /waldverwaltung/u);
   for (const locale of RELEASED_LOCALES) {
     const localized = localizeCatalogRecords([canonical], locale);
     const index = prepareIntentSearchIndex(localized.records, { searchAliasesById: localized.searchAliasesById });

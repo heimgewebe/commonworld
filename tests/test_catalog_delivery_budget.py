@@ -4,6 +4,12 @@ import tempfile
 import unittest
 from pathlib import Path
 
+from scripts.catalog_bootstrap import (
+    DERIVABLE_ACTION_LINK_TYPES,
+    _normalize_search_tokens,
+    _projected_canonical_search_tokens,
+    bootstrap_record,
+)
 from scripts.measure_catalog_delivery import load_bootstrap_records, measure
 from scripts.validate_catalog_delivery_budget import (
     BOOTSTRAP_ASSET_FAILURE_SCENARIO,
@@ -123,6 +129,28 @@ class CatalogDeliveryBudgetTests(unittest.TestCase):
             all(set(link) == {'type', 'url'} for link in action_links),
             'bootstrap action-link labels must be derived by locale instead of duplicated per project',
         )
+        for relative in manifest['project_files']:
+            canonical = json.loads((ROOT / 'catalog' / relative).read_text(encoding='utf-8'))
+            projected = bootstrap_record(canonical)
+            alias_tokens = set(_normalize_search_tokens(projected.get('_search_alias')))
+            projected_without_alias = dict(projected)
+            projected_without_alias.pop('_search_alias', None)
+            base_tokens = _projected_canonical_search_tokens(projected_without_alias)
+            action_tokens = {
+                token
+                for link in canonical.get('links', [])
+                if isinstance(link, dict) and link.get('type') in DERIVABLE_ACTION_LINK_TYPES
+                for token in _normalize_search_tokens(link.get('label'))
+            }
+            self.assertLessEqual(
+                action_tokens,
+                base_tokens | alias_tokens,
+                f"compact search alias lost canonical action tokens for {canonical['id']}",
+            )
+            self.assertTrue(
+                base_tokens.isdisjoint(alias_tokens),
+                f"compact search alias duplicates already indexed tokens for {canonical['id']}",
+            )
         non_action_links = [
             link for record in bootstrap_records for link in record.get('links', [])
             if link.get('type') not in action_link_types

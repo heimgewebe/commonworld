@@ -8,9 +8,9 @@
   "reviewed_source_pack_sha256": "cf57400b0a0fbf818baa88f33001e95bc4c7c39bd00caef3505f4d9ab6c0f405",
   "catalog_overlay_sha256": "4268fc42da9cf80af9f8e6e4e9e04eddc6a0a970573197255f657c48d7e318ae",
   "surface_sha256": {
-    "index": "02aca27c78294d63316605ecece96c41270095a16819c11284595be437479cfa",
-    "method": "7277ac710ba3d2563edaa63e85d5b1ed37c3073d4e70b3bfc34aab613e683ebf",
-    "proposal": "2a76789aa87dd528e4943352d225ca7977c067898793f39c90ed278bfcc20968"
+    "index": "bb1ad31dc2aed3997169c0c3814d837db5235c496f1b7b25eaf14b13ec3d6cf5",
+    "method": "5340ac23be332d45f7e2d4b6ad41a2f8a2093cfb4ed5a8b5e2f1c5f49ff659bd",
+    "proposal": "0e85383eb085e2fb9617cc063d012ddbfaec465701a6cf79561303750b44b7cd"
   },
   "gate_results": {
     "required_surfaces_passed": [
@@ -60,5 +60,5 @@
     "findings_based": true,
     "post_fix_review_required": true
   },
-  "notes": "Locale-specific language, accessibility and lifecycle receipts remain bound to their previously reviewed immutable releases. The current surface_sha256 values were mechanically rebound on 2026-08-27 after the compact search-alias/search-index and synchronous ring-pause fixes changed only the global deterministic bootstrap/runtime surface as release 79702907a93b72933fe5. Locale packs, reviewed source packs, catalog overlays, gate results and review receipts are unchanged. A fresh exact-tree Chromium public-browser suite passed 38/38 scenarios and fresh fourfold-CPU browser delivery evidence passed the bounded startup gate with zero project JSON requests. This rebind changes no locale pack or review receipt and claims no fresh native-speaker, human language, manual screen-reader, manual visual or full WCAG approval."
+  "notes": "Locale-specific language, accessibility and lifecycle receipts remain bound to their previously reviewed immutable releases. The current surface_sha256 values were mechanically rebound on 2026-08-27 after token-deduplicated canonical action search aliases changed only the global deterministic bootstrap/runtime surface as release ef9b0c61c7cbfb3a25b0. Locale packs, reviewed source packs, catalog overlays, gate results and review receipts are unchanged. A fresh exact-tree Chromium public-browser suite passed 38/38 scenarios and fresh fourfold-CPU browser delivery evidence passed the bounded startup gate with zero project JSON requests. This rebind changes no locale pack or review receipt and claims no fresh native-speaker, human language, manual screen-reader, manual visual or full WCAG approval."
 }
