@@ -1,0 +1,56 @@
+{
+  "schema_version": 1,
+  "kind": "commonworld_commons_basis",
+  "project_id": "lebanon-hima-network",
+  "classification": "commons-infrastructure",
+  "decision": "include",
+  "reviewed_at": "2026-08-14",
+  "reviewer": "Commonworld editorial review",
+  "criteria": {
+    "shared_resource": {
+      "status": "supported",
+      "statement": "Einzelne Himas schützen und ordnen lokale Natur- und Ressourcenräume; Hima Baaloul wurde 2026 ausdrücklich auf kommunalem öffentlichem Land eingerichtet.",
+      "source_ids": [
+        "spnl-baaloul-2026"
+      ]
+    },
+    "community": {
+      "status": "supported",
+      "statement": "Kommunen, lokale Führung, Hima Guardians und weitere Gemeindemitglieder tragen die lokalen Hima-Strukturen.",
+      "source_ids": [
+        "spnl-hima-44-2026",
+        "spnl-homat-2026"
+      ]
+    },
+    "commoning_practice": {
+      "status": "supported",
+      "statement": "Hima Guardians und Gemeinden schützen natürliche und kulturelle Ressourcen, fördern nachhaltige Nutzung und tragen lokal verankerte Pflege- und Schutzpraxis.",
+      "source_ids": [
+        "spnl-homat-2026"
+      ]
+    },
+    "rules_and_responsibility": {
+      "status": "supported",
+      "statement": "Lokale Himas können durch formale kommunale Beschlüsse eingerichtet werden; gemeinschaftliche Hüterschaft trägt die laufende Verantwortung.",
+      "source_ids": [
+        "spnl-baaloul-2026",
+        "spnl-homat-2026"
+      ]
+    },
+    "common_benefit": {
+      "status": "supported",
+      "statement": "Die Hima-Praxis verbindet Biodiversitätsschutz, nachhaltige Ressourcennutzung, lokale Zugehörigkeit und generationenübergreifende Verantwortung.",
+      "source_ids": [
+        "spnl-hima-44-2026",
+        "spnl-homat-2026"
+      ]
+    }
+  },
+  "confidence": 0.93,
+  "limitations": [
+    "Das Hima-Netz umfasst eigenständige lokale Arrangements; nicht alle 44 Himas haben identische Regeln, Eigentumsformen oder Beteiligungsstrukturen.",
+    "SPNL ist Unterstützungs- und Netzwerkakteur, nicht Eigentümer sämtlicher Hima-Ressourcen.",
+    "Commonworld veröffentlicht keine aus verfügbaren Schutzgebietsdaten abgeleiteten exakten Grenzen oder lokalen Nutzungszonen."
+  ],
+  "notes": "Aufgenommen als Commons-Infrastruktur aufgrund aktueller kommunaler und gemeinschaftlicher Governance-Belege."
+}

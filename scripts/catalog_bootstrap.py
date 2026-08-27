@@ -43,6 +43,16 @@ def bootstrap_record(record: dict) -> dict:
     digital = projected.get("presence", {}).get("digital")
     if isinstance(digital, dict):
         digital.pop("source_ids", None)
+    action_search_alias = " ".join(
+        link["label"].strip()
+        for link in record.get("links", [])
+        if isinstance(link, dict)
+        and link.get("type") in DERIVABLE_ACTION_LINK_TYPES
+        and isinstance(link.get("label"), str)
+        and link["label"].strip()
+    )
+    if action_search_alias:
+        projected["_search_alias"] = action_search_alias
     projected["links"] = [
         {
             key: link[key]
