@@ -1,0 +1,159 @@
+{
+  "schema_version": 2,
+  "kind": "commonworld_current_public_state",
+  "current_as_of": "2026-08-15",
+  "precedence": {
+    "current_operational_truth": "this contract",
+    "catalog_truth": "catalog/catalog.json and the referenced CommonProject records",
+    "historical_evidence": "research results and decision-time contracts remain evidence for their original decision but do not override this current state"
+  },
+  "public_surface": {
+    "url": "https://commonworld.net/",
+    "default_presentation": "globe",
+    "equivalent_text_presentation": true,
+    "no_javascript_catalog": true,
+    "machine_surface": "static_read_only"
+  },
+  "activity_status_policy": {
+    "public_states": [
+      "active",
+      "paused",
+      "seasonal",
+      "unknown",
+      "ended"
+    ],
+    "unknown_semantics": "documented_practice_current_operation_not_timely_verified",
+    "unknown_review_max_days": 45,
+    "unknown_public_notice_required": true
+  },
+  "digital_ring_taxonomy": {
+    "contract": "contracts/commonworld/digital-ring-taxonomy.contract.json",
+    "version": "digital-ring-bundles-v1",
+    "canonical_url_parameter": "digital_path",
+    "main_field_count": 5,
+    "current_digital_identity_count": 66,
+    "current_known_theme_count": 65,
+    "legacy_layer_links": "preserved_as_filter_until_explicit_digital_path_selection",
+    "invalid_path_behavior": "fail_closed_to_sphere_root_without_partial_filter",
+    "catalog_presentation_fields_forbidden": true
+  },
+  "renderer": {
+    "selected": true,
+    "engine": "maplibre_gl_js",
+    "version": "5.24.0",
+    "public_runtime_uses_selected_engine": true
+  },
+  "production": {
+    "architecture_authorized": true,
+    "delivery": "github_pages_static",
+    "basemap_provider_selected": true,
+    "basemap_provider": "openfreemap_public_best_effort_noncritical",
+    "provider_sla_claimed": false,
+    "automatic_failover": false,
+    "backend": false,
+    "accounts": false,
+    "write_path": false
+  },
+  "security_disclosure": {
+    "confidential_channel": "github_private_vulnerability_reporting",
+    "private_vulnerability_reporting_enabled": true,
+    "contact": "https://github.com/heimgewebe/commonworld/security/advisories/new",
+    "repository_policy": "SECURITY.md",
+    "public_discovery": ".well-known/security.txt",
+    "public_discovery_url": "https://commonworld.net/.well-known/security.txt",
+    "public_issues_confidential": false,
+    "exact_production_readback": true,
+    "host_configuration": "_config.yml includes only .well-known",
+    "expiry_monitoring": "github_actions_weekly_best_effort",
+    "trust_boundary": "repository_review_and_github_settings_not_self_attested",
+    "scheduled_workflow_inactivity_boundary_days": 60,
+    "manual_reenable_required_after_automatic_disablement": true
+  },
+  "release_gates": {
+    "deterministic_build_and_tests": "pass",
+    "public_shell_and_catalog_validation": "pass",
+    "physical_android_chrome_current_globe_first_surface": "pass_operator_attestation",
+    "github_required_check": "pass",
+    "live_pages_smoke": "pass",
+    "android_reduced_motion": "not_claimed",
+    "screen_reader_product_support": "not_claimed"
+  },
+  "historical_evidence": [
+    {
+      "path": "contracts/commonworld/renderer-selection.contract.json",
+      "scope": "engine decision before production authorization",
+      "sha256": "15c76c0875d42e4f670f6513d97804cf0805a054057cf74c0f99798f6432fd8a"
+    },
+    {
+      "path": "docs/research/digital-sphere-v1.contract.json",
+      "scope": "digital-sphere proof before public production authorization",
+      "sha256": "f0aaab7c259880b8cffc849d0e305d35a64f59ee76638e06da33a843ec28af7c"
+    },
+    {
+      "path": "docs/research/public-maplibre-vertical-slice-v1.result.json",
+      "scope": "pre-merge vertical-slice evidence",
+      "sha256": "8f60b0baec90520a9e1b961c7d5453c0fe87da29f7ecf9132836475ff4cb95e6"
+    }
+  ],
+  "licensing": {
+    "code": "AGPL-3.0-only",
+    "catalogue_data_default": "CC0-1.0",
+    "catalogue_data_exceptions": [
+      {
+        "scope": "catalog/projects/cltb-le-nid.json#presence.geographic",
+        "source_ids": [
+          "osm-le-nid-address",
+          "osm-le-nid-building"
+        ],
+        "licence": "ODbL-1.0",
+        "attribution": "© OpenStreetMap contributors"
+      }
+    ],
+    "third_party_assets_retain_their_own_licences": true
+  },
+  "proposal_path": {
+    "public_url": "https://commonworld.net/propose.html",
+    "input": "public_github_issue_prefill_or_local_json_download",
+    "commonworld_storage": false,
+    "automatic_catalog_publication": false,
+    "editorial_contract": "contracts/commonworld/editorial-review.contract.json",
+    "proposal_schema": "contracts/commonworld/proposal.schema.json"
+  },
+  "catalog_delivery": {
+    "contract": "contracts/commonworld/catalog-delivery-budget.contract.json",
+    "design": "compact_build_bound_bootstrap_with_verified_selected_detail_provenance",
+    "canonical_records": "catalog/projects/*.json",
+    "startup_project_json_requests": 0,
+    "runtime_catalogue_parity_check": true,
+    "runtime_catalogue_parity_scope": "selected_identity_compact_shard_shadow_and_generation_bound_verified_detail_provenance",
+    "runtime_catalogue_visible_source": "compact_build_bound_bootstrap_with_verified_selected_detail_provenance",
+    "runtime_catalogue_detail_loading": true,
+    "runtime_catalogue_detail_strategy": "content_addressed_shard_descriptor",
+    "runtime_catalogue_cache_limits": {
+      "shards": 8,
+      "details": 1,
+      "decoded_verified_details": 1
+    },
+    "runtime_catalogue_selection_states": [
+      "idle",
+      "loading",
+      "retrying",
+      "ready",
+      "mismatch",
+      "degraded"
+    ],
+    "runtime_catalogue_failure_policy": "keep_compact_bootstrap_with_first_source_fallback",
+    "runtime_catalogue_cutover_authorized": false,
+    "build_and_ci_catalogue_parity_check": true,
+    "no_javascript_projection": "generated_bounded_de_en_landing_with_paginated_indexes_and_project_pages_preserved_until_successful_interactive_start",
+    "redesign_trigger": "measured_transfer_parse_or_dom_budget_not_entry_count_alone",
+    "runtime_catalogue_retry_policy": "reload_platform_and_clear_shadow_and_selected_detail_caches",
+    "bootstrap_asset_failure_policy": "keep_bounded_de_en_recovery_and_paginated_catalogue",
+    "runtime_catalogue_selected_detail_source": "content_addressed_generation_byte_sha256_verified_detail",
+    "runtime_catalogue_selected_detail_visible_fields": [
+      "provenance.sources"
+    ],
+    "runtime_catalogue_selected_detail_fallback": "first_bootstrap_source",
+    "runtime_catalogue_selected_detail_provenance_upgrade_authorized": true
+  }
+}

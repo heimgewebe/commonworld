@@ -34,6 +34,16 @@ Zwei bedarfsgeladene Varianten wurden auf demselben 94-Einträge-Bestand gemesse
 
 Gewählt wurde die zweite Variante. Sie kostet gegenüber der Null-Provenienz-Variante 701 gzip-Bytes, erhält dafür bei einem Ausfall der Catalog Platform eine sichtbare Quellenreferenz. Ein Browserbeleg mit GBIF zeigt den Übergang von einer eingebetteten Fallback-Quelle zu sechs vollständigen Quellen nach genau einem verifizierten Detailrequest. Beim Start bleiben Projekt-JSON-Anfragen bei 0.
 
+### Erneute Wachstumsreserve bei 100 Commons
+
+Mit 100 Commons war die T045-Reserve wieder auf 335 Bytes geschrumpft: 28.337 gzip-Bytes bei unverändert 0 Projekt-JSON-Anfragen am Start. Die Warn- und Hartgrenze bleiben unverändert. Auf demselben 100-Einträge-Bestand wurden drei Projektionen gegeneinander geprüft:
+
+- **digitale Beschriftungsmetadaten nur bedarfsgeladen:** etwa 1,65 KiB Einsparung; die resultierende Warnreserve läge nur knapp unter 2 KiB und die menschenlesbare digitale Präsenzbezeichnung fehlte im Degradationspfad.
+- **geografische IDs und Beschriftungen nur bedarfsgeladen:** etwa 2,47 KiB Einsparung; mehr Reserve, aber ein unnötig breiter Eingriff in Suche, Lokalisierung und räumliche Fokuspfade.
+- **Action-Linktexte aus dem Linktyp ableiten:** 381 redundante Bootstrap-Labels entfallen; URLs und Typen bleiben erhalten, 35 nicht ableitbare Dokumentations-/Quellenlabels bleiben unverändert. `commonworld-i18n` erzeugt die sichtbaren Aktionsnamen ohnehin deterministisch aus dem Typ und der UI-Sprache.
+
+Gewählt wurde die dritte Variante. Die echte erzeugte Startprojektion fällt damit von 28.337 auf **24.690 gzip-Bytes**; die Warnreserve steigt auf **3.982 Bytes**. Ein frischer Chromium-Smoke besteht 38/38 Szenarien, und die vierfach gedrosselte CPU-Messung erreicht `runtime-ready` nach 1.088 ms mobil und 956 ms auf dem Desktop bei weiterhin 0 Projekt-JSON-Anfragen. Diese Einzelmessung belegt Budgeteinhaltung, nicht eine allgemeine Geschwindigkeitssteigerung.
+
 ## Vergleich der statischen Entwürfe
 
 | Entwurf | Barrierefreiheit und No-JS | SEO | Datenschutz | Caching | Bewertung |

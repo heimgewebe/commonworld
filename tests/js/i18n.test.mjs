@@ -202,6 +202,34 @@ test('compact bootstrap source links receive localized host-based labels', () =>
   }
 });
 
+test('compact bootstrap action links derive localized labels without shipping canonical copies', () => {
+  const canonical = BOOTSTRAP_RECORDS.find((record) => record.id === 'debian');
+  assert.ok(canonical);
+  const homepage = canonical.links.find((link) => link.type === 'homepage');
+  assert.ok(homepage);
+  assert.equal(homepage.label, undefined);
+  for (const locale of RELEASED_LOCALES) {
+    const localized = localizeCatalogRecords([canonical], locale).records[0];
+    const localizedHomepage = localized.links.find((link) => link.type === 'homepage');
+    assert.equal(localizedHomepage.label, actionLabel('homepage', locale), locale);
+    assert.equal(localizedHomepage._label_locale, normalizeLocale(locale), locale);
+  }
+});
+
+test('compact bootstrap retains canonical action text only as a search alias', () => {
+  const canonical = BOOTSTRAP_RECORDS.find((record) => record.id === 'acofop-peten-community-forests');
+  assert.ok(canonical);
+  const learn = canonical.links.find((link) => link.type === 'learn');
+  assert.ok(learn);
+  assert.equal(learn.label, undefined);
+  assert.match(canonical._search_alias, /waldverwaltung/u);
+  for (const locale of RELEASED_LOCALES) {
+    const localized = localizeCatalogRecords([canonical], locale);
+    const index = prepareIntentSearchIndex(localized.records, { searchAliasesById: localized.searchAliasesById });
+    assert.equal(index.search({ query: 'waldverwaltung', all: true })[0]?.id, canonical.id, locale);
+  }
+});
+
 test('full canonical source labels remain meaningful original-source text', () => {
   const bootstrap = BOOTSTRAP_RECORDS.find((record) => record.id === 'debian');
   assert.ok(bootstrap);
