@@ -8,9 +8,9 @@
   "reviewed_source_pack_sha256": "cf57400b0a0fbf818baa88f33001e95bc4c7c39bd00caef3505f4d9ab6c0f405",
   "catalog_overlay_sha256": "4268fc42da9cf80af9f8e6e4e9e04eddc6a0a970573197255f657c48d7e318ae",
   "surface_sha256": {
-    "index": "d416a5d70d2e337b196142fe5edd418188a7ec78c37cdf4869ce7f77687f90f8",
-    "method": "774e2a81cf40f8f618acdb26cf488d62d0354927c9d8af3bbe58aea05c9c112c",
-    "proposal": "8ed1d1fcc8fafedf97fbb8ad027602926e492e614055b1d727a32e6cea5d8646"
+    "index": "ef50b332d27d2305a3743d53b59b0437d16048427752cf0d4d18161b835df60d",
+    "method": "d8e57cccac3fc7898654731e88ffe5e12dc22c70044c9d86c649c2c30c38867c",
+    "proposal": "68eab77a0825749d3aa1a4675a8d7406da448d126afcc691f3c5d11efe48c4fc"
   },
   "gate_results": {
     "required_surfaces_passed": [
@@ -60,5 +60,5 @@
     "findings_based": true,
     "post_fix_review_required": true
   },
-  "notes": "Locale-specific language, accessibility and lifecycle receipts remain bound to their previously reviewed immutable releases. The current surface_sha256 values were mechanically rebound on 2026-08-26 after the global Chromium sphere-ring pause/resume runtime fix regenerated deterministic public surfaces as release 10c3deb0c7c2fb63a7a2. Locale packs, reviewed source packs, catalog overlays, gate results and review receipts are unchanged. Before this evidence-only rebind, four full Chromium public-browser suites on the product patch passed, including ring-orbits-reduced-motion and android-globe-ui-alignment with WAAPI-time plus visible-geometry resume assertions. This rebind changes no product runtime bytes and claims no fresh native-speaker, human language, manual screen-reader, manual visual or full WCAG approval."
+  "notes": "Locale-specific language, accessibility and lifecycle receipts remain bound to their previously reviewed immutable releases. The current surface_sha256 values were mechanically rebound on 2026-08-27 after compact action-link labels changed only the global deterministic bootstrap/release surface as release e14a08ed28ab42bb76a8. Locale packs, reviewed source packs, catalog overlays, gate results and review receipts are unchanged. A fresh exact-tree Chromium public-browser suite passed 38/38 scenarios and a fresh fourfold-CPU browser measurement passed every startup budget with zero project JSON requests. This rebind changes no locale pack or review receipt and claims no fresh native-speaker, human language, manual screen-reader, manual visual or full WCAG approval."
 }

@@ -110,6 +110,27 @@ class CatalogDeliveryBudgetTests(unittest.TestCase):
             all(set(source) == {'url'} and source['url'].startswith('https://') for source in sources),
             'compact bootstrap fallback sources must remain URL-only',
         )
+        action_link_types = {
+            'homepage', 'visit', 'use', 'borrow', 'learn', 'contribute', 'volunteer',
+            'donate', 'contact', 'replicate',
+        }
+        action_links = [
+            link for record in bootstrap_records for link in record.get('links', [])
+            if link.get('type') in action_link_types
+        ]
+        self.assertTrue(action_links)
+        self.assertTrue(
+            all(set(link) == {'type', 'url'} for link in action_links),
+            'bootstrap action-link labels must be derived by locale instead of duplicated per project',
+        )
+        non_action_links = [
+            link for record in bootstrap_records for link in record.get('links', [])
+            if link.get('type') not in action_link_types
+        ]
+        self.assertTrue(
+            all(isinstance(link.get('label'), str) and link['label'] for link in non_action_links),
+            'non-action source/documentation labels must remain meaningful in degraded mode',
+        )
         self.assertTrue(
             all(
                 record.get('activity', {}).get('status') == 'unknown'

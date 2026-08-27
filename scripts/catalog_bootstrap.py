@@ -8,6 +8,10 @@ BOOTSTRAP_OMITTED_FIELDS = frozenset({"handoff"})
 CURATION_BOOTSTRAP_FIELDS = ("state", "catalogued_at", "reviewed_at", "next_review_at")
 SOURCE_BOOTSTRAP_FIELDS = ("url",)
 LINK_BOOTSTRAP_FIELDS = ("type", "label", "url")
+DERIVABLE_ACTION_LINK_TYPES = frozenset({
+    "homepage", "visit", "use", "borrow", "learn", "contribute", "volunteer",
+    "donate", "contact", "replicate",
+})
 RELATION_BOOTSTRAP_FIELDS = ("target_id", "type")
 
 
@@ -40,7 +44,11 @@ def bootstrap_record(record: dict) -> dict:
     if isinstance(digital, dict):
         digital.pop("source_ids", None)
     projected["links"] = [
-        {key: link[key] for key in LINK_BOOTSTRAP_FIELDS if key in link}
+        {
+            key: link[key]
+            for key in LINK_BOOTSTRAP_FIELDS
+            if key in link and not (key == "label" and link.get("type") in DERIVABLE_ACTION_LINK_TYPES)
+        }
         for link in projected.get("links", [])
     ]
     if isinstance(record.get("relations"), list):
