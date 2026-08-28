@@ -685,7 +685,7 @@
       "scope": "local Chromium on deterministic release ef9b0c61c7cbfb3a25b0",
       "release_id": "ef9b0c61c7cbfb3a25b0",
       "first_party_surface_sha256": "12029fd9e03e7e1836a84ad6dbeaf89c83093c1bf7349551959a13502f7e8e06",
-      "committed_evidence_sha256": "29eab6255773c82541fe8517b63186c4b4d84aab50e838530eebc9003b6c155c",
+      "committed_evidence_sha256": "1150dac5432d7b71c4879e2c522ab6e254a6ffa5be2052527ed5df3b376481bf",
       "selected_detail_eviction_cycle": {
         "id": "catalogue-detail-provenance-upgrade",
         "verdict": "PASS",
@@ -784,7 +784,7 @@
   "current_surface_binding": {
     "release_id": "ef9b0c61c7cbfb3a25b0",
     "first_party_surface_sha256": "12029fd9e03e7e1836a84ad6dbeaf89c83093c1bf7349551959a13502f7e8e06",
-    "public_browser_smoke_evidence_sha256": "29eab6255773c82541fe8517b63186c4b4d84aab50e838530eebc9003b6c155c",
+    "public_browser_smoke_evidence_sha256": "1150dac5432d7b71c4879e2c522ab6e254a6ffa5be2052527ed5df3b376481bf",
     "browser_measurement_decision_sha256": "bc32b73dbea519877c7f8d741ca66323d1e531c1de254901547326cf964ed7a9",
     "static_measurement_sha256": "21de3c2e5f9a0aee678fa657e944f879dbefbd114bfbc3f5e536ce2591966942"
   }
