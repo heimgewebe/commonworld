@@ -1,0 +1,42 @@
+{
+  "schema_version": 1,
+  "kind": "commonworld_commons_basis",
+  "project_id": "ekuri-community-forest",
+  "classification": "common",
+  "decision": "include",
+  "reviewed_at": "2026-07-19",
+  "reviewer": "Commonworld editorial review",
+  "criteria": {
+    "shared_resource": {
+      "status": "supported",
+      "statement": "Old und New Ekuri werden im ICCA-Register als gemeinschaftliche Eigentümer und Verwalter eines großflächigen Waldes in Cross River State beschrieben; der Wald und seine natürlichen Ressourcen sind damit eine eindeutig identifizierbare gemeinsame Ressource.",
+      "source_ids": ["ekuri-icca-registry"]
+    },
+    "community": {
+      "status": "supported",
+      "statement": "Die Gemeinschaften Old Ekuri und New Ekuri bilden die lokale Trägerschaft; Generalversammlung, Chiefs, Altersgruppen und weitere lokale Rollen sind als Bestandteile der gemeinschaftlichen Governance dokumentiert.",
+      "source_ids": ["ekuri-icca-registry"]
+    },
+    "commoning_practice": {
+      "status": "supported",
+      "statement": "Die Bewohner organisieren Waldschutz, nachhaltige Nutzung, lokale Kontrolle und gemeinschaftliche Entwicklung; Altersgruppen und Eco-Guards wirken an Überwachung und Durchsetzung mit, während Entscheidungen gemeinschaftlich vorbereitet und getragen werden.",
+      "source_ids": ["ekuri-icca-registry"]
+    },
+    "rules_and_responsibility": {
+      "status": "supported",
+      "statement": "Das ICCA-Register beschreibt Entscheidungen über Generalversammlung und Council of Chiefs sowie lokale By-laws und Regeln für Nutzung und Schutz; Verantwortlichkeiten für Überwachung und Durchsetzung sind innerhalb der Gemeinschaft benannt.",
+      "source_ids": ["ekuri-icca-registry"]
+    },
+    "common_benefit": {
+      "status": "supported",
+      "statement": "Die Waldverwaltung verbindet Biodiversitäts- und Ökosystemschutz mit gemeinschaftlichen Lebensgrundlagen und lokaler Infrastruktur; der gemeinsame Nutzen ist damit eigenständig und nicht auf einen externen kommerziellen Eigentümer ausgerichtet.",
+      "source_ids": ["ekuri-icca-registry"]
+    }
+  },
+  "confidence": 0.89,
+  "limitations": [
+    "Der ICCA-Registry-Eintrag weist ausdrücklich darauf hin, dass die Fallangaben von den Hütern selbst bereitgestellt und nicht als unabhängige Peer-Review-Evaluation geprüft wurden.",
+    "Die dokumentierte Gemeinschaftsverwaltung steht unter externem ökonomischem und infrastrukturellem Druck; die formale Commons-Basis bedeutet nicht, dass alle Konflikte oder Bedrohungen gemeinschaftsintern kontrollierbar sind."
+  ],
+  "notes": "Aufgenommen als Wald-Common wegen gemeinschaftlichem Eigentum, lokaler Entscheidungsstruktur, praktischer Hüterschaft und gemeinschaftlich gebundenem Nutzen; der Registereintrag wird mit seiner Selbstdeklarationsgrenze verwendet."
+}

@@ -1,0 +1,43 @@
+{
+  "schema_version": 1,
+  "kind": "commonworld_commons_basis",
+  "project_id": "north-east-syria-autonomous-administration",
+  "classification": "commons-infrastructure",
+  "decision": "include",
+  "reviewed_at": "2026-07-26",
+  "reviewer": "Commonworld editorial review",
+  "criteria": {
+    "shared_resource": {
+      "status": "supported",
+      "statement": "Die dokumentierte Selbstverwaltungsstruktur stellt eine gemeinsam genutzte Governance- und Dienstleistungsinfrastruktur aus lokalen Räten, Kommunen, zivilen Einrichtungen und öffentlichen Diensten dar; nach der Commonworld-Definition kann eine solche gemeinsam entwickelte Praxis und Infrastruktur selbst das Common bilden.",
+      "source_ids": ["daanes-about", "daanes-laws-2025", "daanes-statement-2026"]
+    },
+    "community": {
+      "status": "supported",
+      "statement": "Die offizielle Struktur beschreibt unterschiedliche lokale Gemeinschaften, Kommunen, Räte und zivile Körperschaften als Träger und Beteiligte der regionalen Selbstverwaltung und nicht lediglich als Empfänger einer extern angebotenen Dienstleistung.",
+      "source_ids": ["daanes-about", "daanes-laws-2025"]
+    },
+    "commoning_practice": {
+      "status": "supported",
+      "statement": "Direkte Beteiligung, lokale Räte, Kommunen und Vereinigungen sind als Wege beschrieben, über die Bewohner und organisierte Gemeinschaften Entscheidungen, soziale Einrichtungen und lokale Angelegenheiten mitgestalten und mitverantworten können.",
+      "source_ids": ["daanes-about", "daanes-laws-2025"]
+    },
+    "rules_and_responsibility": {
+      "status": "supported",
+      "statement": "Die Governance ist durch den Social-Contract-Rahmen sowie veröffentlichte Gesetze und institutionelle Zuständigkeiten geordnet; aktuelle offizielle Erklärungen binden das Modell ausdrücklich an demokratische, pluralistische und dezentrale Prinzipien.",
+      "source_ids": ["daanes-laws-2025", "daanes-statement-2026"]
+    },
+    "common_benefit": {
+      "status": "supported",
+      "statement": "Die Infrastruktur ist auf lokale Selbstorganisation, öffentliche Dienste, soziale Teilhabe und gemeinschaftliche Entscheidungsfähigkeit ausgerichtet; der dokumentierte Nutzen besteht eigenständig und nicht als Vertriebsweg zugunsten eines externen privaten Eigentümers.",
+      "source_ids": ["daanes-about", "daanes-laws-2025", "daanes-statement-2026"]
+    }
+  },
+  "confidence": 0.75,
+  "limitations": [
+    "Die für die Commons-Basis verwendeten Kernquellen sind offizielle Selbstdarstellungen der Administration; sie belegen den erklärten institutionellen Vertrag, nicht automatisch dessen gleichmäßige praktische Umsetzung in allen Orten und Bevölkerungsgruppen.",
+    "Die Struktur besitzt zugleich regionale, administrative und staatähnliche zentrale Ebenen; die Aufnahme behauptet deshalb keine vollständig horizontale oder überall gleich starke lokale Entscheidungsmacht.",
+    "Territoriale Kontrolle, Sicherheitslage und politische Anerkennung in Nord- und Ostsyrien sind konfliktbedingt veränderlich und umstritten. Die Aufnahme bewertet ausschließlich die dokumentierte partizipative Governance-Infrastruktur und ist keine Anerkennung politischer oder territorialer Ansprüche."
+  ],
+  "notes": "Aufgenommen als Commons-Infrastruktur wegen dokumentierter lokaler Räte, Kommunen, Beteiligungs- und Verantwortungsstrukturen. Die Einstufung ist bewusst enger als eine Bewertung der gesamten politischen Administration und bleibt wegen Konfliktlage und Primärquellenperspektive mit reduzierter Konfidenz versehen."
+}

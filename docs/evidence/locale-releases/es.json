@@ -8,9 +8,9 @@
   "reviewed_source_pack_sha256": "cf57400b0a0fbf818baa88f33001e95bc4c7c39bd00caef3505f4d9ab6c0f405",
   "catalog_overlay_sha256": "f2aaa30377639a180d709fc180e5feefbee5fb67afbb5f249efadfaf8407d27e",
   "surface_sha256": {
-    "index": "084d7164d88768f1447c2425f9a62c7574f6f026e922d8b178edf719c00552d7",
-    "method": "1c9bbefce3f33d4f88da287330952f46aef191d051c9a9398eb071d811c80668",
-    "proposal": "083ac10f7ea6ed8303d0552922fc2356f966ed3e3852f5ba143848c37c2e6885"
+    "index": "fef378ee899e0e5ddd9a2dfb3d67ef8c339f8781ddc034defb2d524ef10bea8c",
+    "method": "4a197cea5217ea3911c6e6793b9a19060b15f7ce4f6f81c7a0405cf61d1e98b2",
+    "proposal": "cc8fced820d2265277008f0920da8078cf1b624154ed67e18687ba7da9faee66"
   },
   "gate_results": {
     "required_surfaces_passed": [
@@ -60,5 +60,5 @@
     "findings_based": true,
     "post_fix_review_required": true
   },
-  "notes": "Locale-specific language, accessibility and lifecycle receipts remain bound to their previously reviewed immutable releases. The current surface_sha256 values were mechanically rebound on 2026-08-27 after token-deduplicated canonical action search aliases changed only the global deterministic bootstrap/runtime surface as release ef9b0c61c7cbfb3a25b0. Locale packs, reviewed source packs, catalog overlays, gate results and review receipts are unchanged. A fresh exact-tree Chromium public-browser suite passed 38/38 scenarios and fresh fourfold-CPU browser delivery evidence passed the bounded startup gate with zero project JSON requests. This rebind changes no locale pack or review receipt and claims no fresh native-speaker, human language, manual screen-reader, manual visual or full WCAG approval."
+  "notes": "Locale-specific language, accessibility and lifecycle receipts remain bound to their previously reviewed immutable releases. The current surface_sha256 values were mechanically rebound on 2026-09-01 after seven due legacy Commons basis retroreviews changed only release-bound catalogue evidence and regenerated deterministic public surfaces as release 1e92a262e2ca4fc166d5. Locale packs, reviewed source packs, catalog overlays, gate results and review receipts are unchanged. A fresh exact-tree Chromium public-browser suite passed 38/38 scenarios and fresh fourfold-CPU browser delivery evidence passed the bounded startup gate on its first representative attempt with zero project JSON requests. This rebind claims no fresh native-speaker, human language, manual screen-reader, manual visual or full WCAG approval."
 }
