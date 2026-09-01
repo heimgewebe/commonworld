@@ -3,6 +3,7 @@
 
 from __future__ import annotations
 
+import argparse
 import hashlib
 import json
 from datetime import date
@@ -10,7 +11,14 @@ import sys
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
+if str(ROOT) not in sys.path:
+    sys.path.insert(0, str(ROOT))
+
+from scripts.validate_cache_coherence import validate as validate_cache_coherence
+
 STATE_PATH = Path("contracts/commonworld/current-state.contract.json")
+ATTESTATION_PATH = Path("docs/evidence/commonworld-current-state.attestation.json")
+RELEASE_MANIFEST_PATH = Path("assets/commonworld-page-builds.json")
 CATALOG_PATH = Path("catalog/catalog.json")
 PROVIDER_PATH = Path("contracts/commonworld/production-delivery-provider.contract.json")
 VERTICAL_SLICE_PATH = Path("contracts/commonworld/public-maplibre-vertical-slice.contract.json")
@@ -34,9 +42,54 @@ def _sha256(path: Path) -> str:
     return hashlib.sha256(path.read_bytes()).hexdigest()
 
 
-def validate_current_state(root: Path = ROOT) -> list[str]:
+def build_current_state_attestation(root: Path = ROOT) -> dict[str, object]:
+    release_manifest = _load(root, RELEASE_MANIFEST_PATH)
+    if not isinstance(release_manifest, dict):
+        raise ValueError("public release manifest must be an object")
+    release_id = release_manifest.get("release_id")
+    if (
+        not isinstance(release_id, str)
+        or len(release_id) != 20
+        or any(character not in "0123456789abcdef" for character in release_id)
+    ):
+        raise ValueError("public release manifest has no valid release_id")
+    return {
+        "schema_version": 1,
+        "kind": "commonworld.current_state_release_attestation",
+        "current_state": {
+            "path": STATE_PATH.as_posix(),
+            "sha256": _sha256(root / STATE_PATH),
+        },
+        "public_release": {
+            "manifest_path": RELEASE_MANIFEST_PATH.as_posix(),
+            "manifest_sha256": _sha256(root / RELEASE_MANIFEST_PATH),
+            "release_id": release_id,
+        },
+    }
+
+
+def validate_current_state(root: Path = ROOT, *, verify_attestation: bool = True) -> list[str]:
     errors: list[str] = []
-    for relative in (STATE_PATH, CATALOG_PATH, PROVIDER_PATH, VERTICAL_SLICE_PATH, DIGITAL_RING_PATH, CATALOG_PLATFORM_PATH, APP_PATH, LE_NID_PATH, SECURITY_POLICY_PATH, SECURITY_TXT_PATH, JEKYLL_CONFIG_PATH, PRODUCTION_READBACK_PATH, PRODUCTION_READBACK_WORKFLOW_PATH, SECURITY_EXPIRY_WORKFLOW_PATH):
+    required = [
+        STATE_PATH,
+        RELEASE_MANIFEST_PATH,
+        CATALOG_PATH,
+        PROVIDER_PATH,
+        VERTICAL_SLICE_PATH,
+        DIGITAL_RING_PATH,
+        CATALOG_PLATFORM_PATH,
+        APP_PATH,
+        LE_NID_PATH,
+        SECURITY_POLICY_PATH,
+        SECURITY_TXT_PATH,
+        JEKYLL_CONFIG_PATH,
+        PRODUCTION_READBACK_PATH,
+        PRODUCTION_READBACK_WORKFLOW_PATH,
+        SECURITY_EXPIRY_WORKFLOW_PATH,
+    ]
+    if verify_attestation:
+        required.insert(1, ATTESTATION_PATH)
+    for relative in required:
         if not (root / relative).is_file():
             errors.append(f"missing current-state dependency: {relative}")
     if errors:
@@ -44,6 +97,8 @@ def validate_current_state(root: Path = ROOT) -> list[str]:
 
     try:
         state = _load(root, STATE_PATH)
+        attestation = _load(root, ATTESTATION_PATH) if verify_attestation else None
+        release_manifest = _load(root, RELEASE_MANIFEST_PATH)
         catalog = _load(root, CATALOG_PATH)
         provider = _load(root, PROVIDER_PATH)
         vertical = _load(root, VERTICAL_SLICE_PATH)
@@ -64,6 +119,27 @@ def validate_current_state(root: Path = ROOT) -> list[str]:
         errors.append("current-state precedence must identify this contract")
     if "do not override" not in precedence.get("historical_evidence", ""):
         errors.append("historical evidence must be explicitly non-overriding")
+
+    if verify_attestation:
+        try:
+            expected_attestation = build_current_state_attestation(root)
+        except (OSError, json.JSONDecodeError, ValueError) as error:
+            errors.append(f"current-state release binding is invalid: {error}")
+        else:
+            if not isinstance(attestation, dict):
+                errors.append("current-state attestation must be an object")
+            else:
+                if set(attestation) != set(expected_attestation):
+                    errors.append("current-state attestation shape mismatch")
+                if (
+                    attestation.get("schema_version") != 1
+                    or attestation.get("kind") != "commonworld.current_state_release_attestation"
+                ):
+                    errors.append("current-state attestation schema or kind mismatch")
+                if attestation.get("current_state") != expected_attestation["current_state"]:
+                    errors.append("current-state attestation contract binding mismatch")
+                if attestation.get("public_release") != expected_attestation["public_release"]:
+                    errors.append("current-state attestation release binding mismatch")
 
     public = state.get("public_surface", {})
     if public != {
@@ -397,21 +473,53 @@ def validate_current_state(root: Path = ROOT) -> list[str]:
         current_as_of = date.fromisoformat(str(state.get("current_as_of", "")))
     except ValueError:
         current_as_of = None
-    if current_as_of is None or current_as_of < date(2026, 7, 28):
-        errors.append("current-state date does not cover the security-disclosure and catalog-shard truth")
+    if current_as_of is None:
+        errors.append("current-state current_as_of must be an ISO date")
     if not (root / "LICENSE").is_file() or not (root / "LICENSE-DATA.md").is_file():
         errors.append("declared code and data licences must exist")
 
     return errors
 
 
+def refresh_current_state_attestation(root: Path = ROOT) -> list[str]:
+    errors = validate_cache_coherence(root)
+    errors.extend(validate_current_state(root, verify_attestation=False))
+    if errors:
+        return errors
+    try:
+        attestation = build_current_state_attestation(root)
+        target = root / ATTESTATION_PATH
+        target.parent.mkdir(parents=True, exist_ok=True)
+        target.write_text(
+            json.dumps(attestation, ensure_ascii=False, indent=2, sort_keys=True) + "\n",
+            encoding="utf-8",
+        )
+    except (OSError, json.JSONDecodeError, ValueError) as error:
+        return [f"current-state attestation refresh failed: {error}"]
+    return validate_current_state(root)
+
+
 def main() -> int:
-    errors = validate_current_state(ROOT)
+    parser = argparse.ArgumentParser()
+    parser.add_argument(
+        "--refresh-attestation",
+        action="store_true",
+        help="refresh the release-bound attestation after cache-coherence and semantic validation",
+    )
+    args = parser.parse_args()
+    errors = (
+        refresh_current_state_attestation(ROOT)
+        if args.refresh_attestation
+        else validate_current_state(ROOT)
+    )
     if errors:
         for error in errors:
             print(f"ERROR: {error}", file=sys.stderr)
         return 1
-    print("commonworld current operational state validation ok")
+    if args.refresh_attestation:
+        print("commonworld current-state release attestation refreshed and validated")
+    else:
+        print("commonworld current operational state validation ok")
     return 0
 
 

@@ -1,0 +1,13 @@
+{
+  "current_state": {
+    "path": "contracts/commonworld/current-state.contract.json",
+    "sha256": "3c034e45a1035c53f34d51043d898c165931890bb97c410db9a9c7c565763489"
+  },
+  "kind": "commonworld.current_state_release_attestation",
+  "public_release": {
+    "manifest_path": "assets/commonworld-page-builds.json",
+    "manifest_sha256": "369cfcd87bfdd6a406ef5d15addb42f09dbe4592bdd1dcaefdfdb88a8425edaa",
+    "release_id": "ef9b0c61c7cbfb3a25b0"
+  },
+  "schema_version": 1
+}

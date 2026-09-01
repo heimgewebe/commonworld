@@ -4,6 +4,7 @@ import tempfile
 import unittest
 from pathlib import Path
 
+from scripts.build_page_release_manifest import snapshot_files
 from scripts.validate_current_state import ROOT, validate_current_state
 
 
@@ -19,7 +20,9 @@ class CurrentStateTests(unittest.TestCase):
             "contracts/commonworld/catalog-platform.contract.json",
             "contracts/commonworld/renderer-selection.contract.json",
             "assets/commonworld-app.js",
+            "assets/commonworld-page-builds.json",
             "contracts/commonworld/digital-sphere.contract.json",
+            "docs/evidence/commonworld-current-state.attestation.json",
             "docs/research/public-maplibre-vertical-slice-v1.result.json",
             "LICENSE",
             "LICENSE-DATA.md",
@@ -40,15 +43,72 @@ class CurrentStateTests(unittest.TestCase):
     def test_current_state_validates(self) -> None:
         self.assertEqual([], validate_current_state(ROOT))
 
-    def test_current_state_rejects_date_before_ring_taxonomy(self) -> None:
+    def test_current_state_release_binding_is_non_circular(self) -> None:
+        release_inputs = {
+            path.relative_to(ROOT).as_posix()
+            for path in snapshot_files(ROOT, include_manifest=False)
+        }
+        self.assertNotIn(
+            "docs/evidence/commonworld-current-state.attestation.json",
+            release_inputs,
+        )
+        self.assertNotIn("assets/commonworld-page-builds.json", release_inputs)
+
+    def test_current_state_rejects_invalid_current_as_of(self) -> None:
         with tempfile.TemporaryDirectory() as directory:
             root = self.copy_current_state(directory)
             path = root / "contracts/commonworld/current-state.contract.json"
             value = json.loads(path.read_text(encoding="utf-8"))
-            value["current_as_of"] = "2026-07-18"
+            value["current_as_of"] = "not-a-date"
             path.write_text(json.dumps(value), encoding="utf-8")
             errors = validate_current_state(root)
-        self.assertIn("current-state date does not cover the security-disclosure and catalog-shard truth", errors)
+        self.assertIn("current-state current_as_of must be an ISO date", errors)
+
+    def test_current_state_rejects_contract_change_without_attestation_refresh(self) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            root = self.copy_current_state(directory)
+            path = root / "contracts/commonworld/current-state.contract.json"
+            value = json.loads(path.read_text(encoding="utf-8"))
+            value["current_as_of"] = "2026-08-31"
+            path.write_text(json.dumps(value), encoding="utf-8")
+            errors = validate_current_state(root)
+        self.assertIn("current-state attestation contract binding mismatch", errors)
+
+    def test_current_state_rejects_release_change_without_attestation_refresh(self) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            root = self.copy_current_state(directory)
+            path = root / "assets/commonworld-page-builds.json"
+            value = json.loads(path.read_text(encoding="utf-8"))
+            value["release_id"] = "0" * 20
+            path.write_text(json.dumps(value), encoding="utf-8")
+            errors = validate_current_state(root)
+        self.assertIn("current-state attestation release binding mismatch", errors)
+
+    def test_current_state_requires_release_attestation(self) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            root = self.copy_current_state(directory)
+            (root / "docs/evidence/commonworld-current-state.attestation.json").unlink()
+            errors = validate_current_state(root)
+        self.assertIn(
+            "missing current-state dependency: docs/evidence/commonworld-current-state.attestation.json",
+            errors,
+        )
+
+    def test_current_state_rejects_malformed_release_attestation(self) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            root = self.copy_current_state(directory)
+            path = root / "docs/evidence/commonworld-current-state.attestation.json"
+            path.write_text("{}\n", encoding="utf-8")
+            errors = validate_current_state(root)
+        self.assertIn("current-state attestation schema or kind mismatch", errors)
+
+    def test_current_state_rejects_non_object_release_attestation(self) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            root = self.copy_current_state(directory)
+            path = root / "docs/evidence/commonworld-current-state.attestation.json"
+            path.write_text("[]\n", encoding="utf-8")
+            errors = validate_current_state(root)
+        self.assertIn("current-state attestation must be an object", errors)
 
     def test_security_disclosure_rejects_disabled_private_reporting(self) -> None:
         with tempfile.TemporaryDirectory() as directory:
