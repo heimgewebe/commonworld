@@ -8,9 +8,9 @@
   "reviewed_source_pack_sha256": "cf57400b0a0fbf818baa88f33001e95bc4c7c39bd00caef3505f4d9ab6c0f405",
   "catalog_overlay_sha256": "63731132bbce7bdd171ac7955d7a16c01edbf4217573a6e83e2b4619db5eb688",
   "surface_sha256": {
-    "index": "368fa130e5b194f1c4ec1c76a5393fd8fe90b12597d468df3cb8cfd016a3ef6d",
-    "method": "aeee0a9c26fbb50f17513102ca855d81b0b489484da65e2ac45b7a7d5922f79d",
-    "proposal": "4fac40835f2d2793cee8b120cba453c56eea484c9babe3ba4a36d6dea8c1cc6a"
+    "index": "c7dfebdee8be8595316c58b095aed28b8e4460a238199e75fb1ed6ad1fa92bf2",
+    "method": "d39e802151fea13dfbe9ccbe91f5ea00b82e9c5af667176613b07c9de4921e93",
+    "proposal": "7e9de0eafe0146edad2cc6c0046dc09523880b093539698e8f0e65944cdefe81"
   },
   "gate_results": {
     "required_surfaces_passed": [
@@ -60,5 +60,5 @@
     "findings_based": true,
     "post_fix_review_required": true
   },
-  "notes": "Locale-specific language, accessibility and lifecycle receipts remain bound to their previously reviewed immutable releases. The current surface_sha256 values were mechanically rebound on 2026-09-01 after seven due legacy Commons basis retroreviews changed only release-bound catalogue evidence and regenerated deterministic public surfaces as release 1e92a262e2ca4fc166d5. Locale packs, reviewed source packs, catalog overlays, gate results and review receipts are unchanged. A fresh exact-tree Chromium public-browser suite passed 38/38 scenarios and fresh fourfold-CPU browser delivery evidence passed the bounded startup gate on its first representative attempt with zero project JSON requests. This rebind claims no fresh native-speaker, human language, manual screen-reader, manual visual or full WCAG approval."
+  "notes": "Locale-specific language, accessibility and lifecycle receipts remain bound to their previously reviewed immutable releases. The current surface_sha256 values were mechanically rebound on 2026-09-02 because seven due Commons basis re-reviews plus release-bound catalogue metadata regenerated deterministic public surfaces as release 91b0a75916373b68dab5. Locale packs, reviewed source packs, catalog overlays, gate results and review receipts are unchanged. This rebind claims no fresh native-speaker, human language, manual screen-reader, manual visual, fresh browser or full WCAG approval; exact-tree runtime validation for this PR is separate merge evidence."
 }

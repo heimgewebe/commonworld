@@ -214,6 +214,7 @@ def validate(root: Path = ROOT, *, today: date | None = None) -> list[str]:
                 errors.append(
                     f"{project_id}: non-include Commons decision cannot remain {curation.get('state')}"
                 )
+        public_state = curation.get("state") in {"listed", "verified", "featured"}
         if basis is None:
             try:
                 migration_grace_until = date.fromisoformat(
@@ -224,13 +225,14 @@ def validate(root: Path = ROOT, *, today: date | None = None) -> list[str]:
                 migration_grace_until = effective_from
             effective_deadline = max(next_review_at, migration_grace_until)
             queue.append((effective_deadline, project_id))
-            if (
-                today > effective_deadline
-                and curation.get("state") in {"listed", "verified", "featured"}
-            ):
+            if today > effective_deadline and public_state:
                 errors.append(
                     f"{project_id}: legacy Commons basis review overdue since {effective_deadline}"
                 )
+        elif today > next_review_at and public_state:
+            errors.append(
+                f"{project_id}: Commons basis re-review overdue since {next_review_at}"
+            )
 
     if policy.get("scope", {}).get("selection") != "all_catalog_records_without_commons_basis":
         errors.append("retro-review policy must dynamically select every record without a basis")

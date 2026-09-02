@@ -24,16 +24,16 @@
       },
       "canonical_projects": {
         "file_count": 100,
-        "raw_bytes": 432300,
-        "gzip_bytes_individual_files": 144358
+        "raw_bytes": 432667,
+        "gzip_bytes_individual_files": 144530
       },
       "manifest": {
         "raw_bytes": 5376,
-        "gzip_bytes": 1704
+        "gzip_bytes": 1703
       },
       "html": {
         "raw_bytes": 62858,
-        "gzip_bytes": 11859,
+        "gzip_bytes": 11852,
         "start_tag_count": 736,
         "catalog_card_instances": 24,
         "interactive_catalog_cards": 0,
@@ -44,12 +44,12 @@
         "enabled": true,
         "project_request_count": 100,
         "duplicate_identity_payload_count": 100,
-        "raw_bytes": 437676,
-        "gzip_bytes": 146062
+        "raw_bytes": 438043,
+        "gzip_bytes": 146233
       },
       "catalog_initial_delivery": {
-        "raw_bytes": 581450,
-        "gzip_bytes": 174399
+        "raw_bytes": 581817,
+        "gzip_bytes": 174570
       }
     },
     "browser": {
@@ -257,22 +257,22 @@
       "identity_order_sha256": "8bb03b25219f57717bcd44a8a881fcc61483c45c9ff45ea307b4a63ab8d818bd",
       "bootstrap": {
         "raw_bytes": 135644,
-        "gzip_bytes": 27006,
+        "gzip_bytes": 27005,
         "raw_bytes_per_record": 1356.44,
-        "gzip_bytes_per_record": 270.06
+        "gzip_bytes_per_record": 270.05
       },
       "canonical_projects": {
         "file_count": 100,
-        "raw_bytes": 432300,
-        "gzip_bytes_individual_files": 144358
+        "raw_bytes": 432667,
+        "gzip_bytes_individual_files": 144530
       },
       "manifest": {
         "raw_bytes": 5376,
-        "gzip_bytes": 1704
+        "gzip_bytes": 1703
       },
       "html": {
         "raw_bytes": 62858,
-        "gzip_bytes": 11856,
+        "gzip_bytes": 11852,
         "start_tag_count": 736,
         "catalog_card_instances": 24,
         "interactive_catalog_cards": 0,
@@ -288,7 +288,7 @@
       },
       "catalog_initial_delivery": {
         "raw_bytes": 135644,
-        "gzip_bytes": 27006
+        "gzip_bytes": 27005
       }
     },
     "browser": {
@@ -300,18 +300,18 @@
       "architecture_review_required": false,
       "cpu_throttle_rate": 4,
       "budget_contract_sha256": "953bc03c731ff8418336b57ff51e22029323eb2ea23d6b707be48ca69f4085d6",
-      "first_party_surface_sha256": "c241a5c02d232b7d3d35e4cf53b84281754324fe3e064499f4342d16e0140895",
+      "first_party_surface_sha256": "b420e0853c19367e26b5ca5bbdf466d769db134657f682c0edff233e0083cd86",
       "attempt_count": 1,
       "attempts": [
         {
           "attempt": 1,
           "verdict": "pass",
-          "measurement_sha256": "314f5e9a6bcbe08cf5d4d8090bd2c044e547e03eec66a606f6d5cd9972bd05b1",
+          "measurement_sha256": "e5e73f7bda1eaf97257143c159c5944543fcd39fe66cf198c77fbdefd1ba90c1",
           "breaches": [],
           "measurement": {
             "schema_version": 1,
             "kind": "commonworld_catalog_delivery_browser_metrics",
-            "measured_at": "2026-09-01T07:40:22.233Z",
+            "measured_at": "2026-09-02T04:35:58.614Z",
             "cpu_throttle_rate": 4,
             "profiles": [
               {
@@ -321,49 +321,49 @@
                   "height": 844
                 },
                 "cpu_throttle_rate": 4,
-                "runtime_ready_ms": 799,
+                "runtime_ready_ms": 717,
                 "dom_node_count": 1803,
                 "catalog_card_count": 48,
                 "interactive_catalog_card_count": 48,
                 "runtime_ready": true,
                 "runtime_failed": false,
-                "dom_content_loaded_ms": 653.2000000011176,
-                "load_event_ms": 678.2000000011176,
+                "dom_content_loaded_ms": 581.5,
+                "load_event_ms": 603.2000000001863,
                 "resource_count": 20,
-                "script_duration_ms": 386.49,
-                "task_duration_ms": 770.39,
+                "script_duration_ms": 348.68,
+                "task_duration_ms": 690.92,
                 "duration_scope": "navigation-start-to-runtime-ready",
                 "post_ready_observation_ms": 1250,
-                "observed_script_duration_ms": 398.72,
-                "observed_task_duration_ms": 812.98,
-                "post_ready_script_delta_ms": 12.23,
-                "post_ready_task_delta_ms": 42.59,
+                "observed_script_duration_ms": 360.7,
+                "observed_task_duration_ms": 732.49,
+                "post_ready_script_delta_ms": 12.02,
+                "post_ready_task_delta_ms": 41.57,
                 "post_ready_scope": "runtime-ready-through-networkidle-or-10s-timeout-plus-750ms",
                 "bootstrap_compile": {
-                  "median_ms": 0.599999999627471,
+                  "median_ms": 0.5,
                   "p95_ms": 1,
                   "samples_ms": [
                     0,
                     0,
                     0,
                     0,
-                    0.09999999962747097,
-                    0.09999999962747097,
-                    0.10000000149011612,
-                    0.19999999925494194,
-                    0.2000000011175871,
-                    0.40000000037252903,
-                    0.599999999627471,
-                    0.599999999627471,
-                    0.6000000014901161,
-                    0.6999999992549419,
-                    0.6999999992549419,
-                    0.6999999992549419,
-                    0.7000000011175871,
-                    0.7999999988824129,
-                    0.8000000007450581,
+                    0,
+                    0.10000000009313226,
+                    0.19999999995343387,
+                    0.30000000004656613,
+                    0.39999999990686774,
+                    0.39999999990686774,
+                    0.5,
+                    0.5999999998603016,
+                    0.6000000000931323,
+                    0.6000000000931323,
+                    0.6999999999534339,
+                    0.6999999999534339,
+                    0.8000000000465661,
+                    0.8000000000465661,
+                    0.8000000000465661,
                     1,
-                    2.400000000372529
+                    2.699999999953434
                   ]
                 },
                 "first_party_request_count": 19,
@@ -373,23 +373,23 @@
                   "/",
                   "/__cw_probe/<nonce>/manifest",
                   "/assets/commonworld-release-check.js",
-                  "/releases/1e92a262e2ca4fc166d5/assets/commonworld-app.js",
-                  "/releases/1e92a262e2ca4fc166d5/assets/commonworld-bootstrap-catalog.mjs",
-                  "/releases/1e92a262e2ca4fc166d5/assets/commonworld-catalog-runtime.mjs",
-                  "/releases/1e92a262e2ca4fc166d5/assets/commonworld-core.mjs",
-                  "/releases/1e92a262e2ca4fc166d5/assets/commonworld-en-locale.mjs",
-                  "/releases/1e92a262e2ca4fc166d5/assets/commonworld-i18n.mjs",
-                  "/releases/1e92a262e2ca4fc166d5/assets/commonworld-locale-registry.mjs",
-                  "/releases/1e92a262e2ca4fc166d5/assets/commonworld-locale.mjs",
-                  "/releases/1e92a262e2ca4fc166d5/assets/ipad-layout.css",
-                  "/releases/1e92a262e2ca4fc166d5/assets/map/commonworld-country-boundaries.geojson",
-                  "/releases/1e92a262e2ca4fc166d5/assets/vendor/maplibre-gl.css",
-                  "/releases/1e92a262e2ca4fc166d5/assets/vendor/maplibre-gl.js",
-                  "/releases/1e92a262e2ca4fc166d5/catalog/runtime/aggregate.v1.json",
-                  "/releases/1e92a262e2ca4fc166d5/catalog/runtime/manifest.v1.json",
-                  "/releases/1e92a262e2ca4fc166d5/index.css"
+                  "/releases/91b0a75916373b68dab5/assets/commonworld-app.js",
+                  "/releases/91b0a75916373b68dab5/assets/commonworld-bootstrap-catalog.mjs",
+                  "/releases/91b0a75916373b68dab5/assets/commonworld-catalog-runtime.mjs",
+                  "/releases/91b0a75916373b68dab5/assets/commonworld-core.mjs",
+                  "/releases/91b0a75916373b68dab5/assets/commonworld-en-locale.mjs",
+                  "/releases/91b0a75916373b68dab5/assets/commonworld-i18n.mjs",
+                  "/releases/91b0a75916373b68dab5/assets/commonworld-locale-registry.mjs",
+                  "/releases/91b0a75916373b68dab5/assets/commonworld-locale.mjs",
+                  "/releases/91b0a75916373b68dab5/assets/ipad-layout.css",
+                  "/releases/91b0a75916373b68dab5/assets/map/commonworld-country-boundaries.geojson",
+                  "/releases/91b0a75916373b68dab5/assets/vendor/maplibre-gl.css",
+                  "/releases/91b0a75916373b68dab5/assets/vendor/maplibre-gl.js",
+                  "/releases/91b0a75916373b68dab5/catalog/runtime/aggregate.v1.json",
+                  "/releases/91b0a75916373b68dab5/catalog/runtime/manifest.v1.json",
+                  "/releases/91b0a75916373b68dab5/index.css"
                 ],
-                "first_party_surface_sha256": "c241a5c02d232b7d3d35e4cf53b84281754324fe3e064499f4342d16e0140895",
+                "first_party_surface_sha256": "b420e0853c19367e26b5ca5bbdf466d769db134657f682c0edff233e0083cd86",
                 "project_json_request_count": 0,
                 "project_json_unique_request_count": 0,
                 "project_json_requests": []
@@ -401,49 +401,49 @@
                   "height": 768
                 },
                 "cpu_throttle_rate": 4,
-                "runtime_ready_ms": 812,
+                "runtime_ready_ms": 729,
                 "dom_node_count": 1803,
                 "catalog_card_count": 48,
                 "interactive_catalog_card_count": 48,
                 "runtime_ready": true,
                 "runtime_failed": false,
-                "dom_content_loaded_ms": 651.7000000011176,
-                "load_event_ms": 678.5,
+                "dom_content_loaded_ms": 582.8999999999069,
+                "load_event_ms": 612.3999999999069,
                 "resource_count": 20,
-                "script_duration_ms": 411.89,
-                "task_duration_ms": 795.14,
+                "script_duration_ms": 361.94,
+                "task_duration_ms": 714.57,
                 "duration_scope": "navigation-start-to-runtime-ready",
                 "post_ready_observation_ms": 1250,
-                "observed_script_duration_ms": 425.16,
-                "observed_task_duration_ms": 843.05,
-                "post_ready_script_delta_ms": 13.27,
-                "post_ready_task_delta_ms": 47.91,
+                "observed_script_duration_ms": 372.73,
+                "observed_task_duration_ms": 758.01,
+                "post_ready_script_delta_ms": 10.79,
+                "post_ready_task_delta_ms": 43.44,
                 "post_ready_scope": "runtime-ready-through-networkidle-or-10s-timeout-plus-750ms",
                 "bootstrap_compile": {
                   "median_ms": 0.5,
-                  "p95_ms": 0.900000000372529,
+                  "p95_ms": 1,
                   "samples_ms": [
                     0,
                     0,
                     0,
                     0,
                     0,
-                    0,
-                    0.09999999962747097,
-                    0.19999999925494194,
-                    0.19999999925494194,
-                    0.3999999985098839,
+                    0.09999999986030161,
+                    0.19999999995343387,
+                    0.30000000004656613,
+                    0.39999999990686774,
+                    0.39999999990686774,
                     0.5,
                     0.5,
-                    0.6000000014901161,
-                    0.6000000014901161,
-                    0.6999999992549419,
-                    0.6999999992549419,
-                    0.6999999992549419,
-                    0.7000000011175871,
-                    0.900000000372529,
-                    0.900000000372529,
-                    3
+                    0.6000000000931323,
+                    0.6999999999534339,
+                    0.6999999999534339,
+                    0.6999999999534339,
+                    0.6999999999534339,
+                    0.7000000001862645,
+                    0.9000000001396984,
+                    1,
+                    2.6000000000931323
                   ]
                 },
                 "first_party_request_count": 19,
@@ -453,23 +453,23 @@
                   "/",
                   "/__cw_probe/<nonce>/manifest",
                   "/assets/commonworld-release-check.js",
-                  "/releases/1e92a262e2ca4fc166d5/assets/commonworld-app.js",
-                  "/releases/1e92a262e2ca4fc166d5/assets/commonworld-bootstrap-catalog.mjs",
-                  "/releases/1e92a262e2ca4fc166d5/assets/commonworld-catalog-runtime.mjs",
-                  "/releases/1e92a262e2ca4fc166d5/assets/commonworld-core.mjs",
-                  "/releases/1e92a262e2ca4fc166d5/assets/commonworld-en-locale.mjs",
-                  "/releases/1e92a262e2ca4fc166d5/assets/commonworld-i18n.mjs",
-                  "/releases/1e92a262e2ca4fc166d5/assets/commonworld-locale-registry.mjs",
-                  "/releases/1e92a262e2ca4fc166d5/assets/commonworld-locale.mjs",
-                  "/releases/1e92a262e2ca4fc166d5/assets/ipad-layout.css",
-                  "/releases/1e92a262e2ca4fc166d5/assets/map/commonworld-country-boundaries.geojson",
-                  "/releases/1e92a262e2ca4fc166d5/assets/vendor/maplibre-gl.css",
-                  "/releases/1e92a262e2ca4fc166d5/assets/vendor/maplibre-gl.js",
-                  "/releases/1e92a262e2ca4fc166d5/catalog/runtime/aggregate.v1.json",
-                  "/releases/1e92a262e2ca4fc166d5/catalog/runtime/manifest.v1.json",
-                  "/releases/1e92a262e2ca4fc166d5/index.css"
+                  "/releases/91b0a75916373b68dab5/assets/commonworld-app.js",
+                  "/releases/91b0a75916373b68dab5/assets/commonworld-bootstrap-catalog.mjs",
+                  "/releases/91b0a75916373b68dab5/assets/commonworld-catalog-runtime.mjs",
+                  "/releases/91b0a75916373b68dab5/assets/commonworld-core.mjs",
+                  "/releases/91b0a75916373b68dab5/assets/commonworld-en-locale.mjs",
+                  "/releases/91b0a75916373b68dab5/assets/commonworld-i18n.mjs",
+                  "/releases/91b0a75916373b68dab5/assets/commonworld-locale-registry.mjs",
+                  "/releases/91b0a75916373b68dab5/assets/commonworld-locale.mjs",
+                  "/releases/91b0a75916373b68dab5/assets/ipad-layout.css",
+                  "/releases/91b0a75916373b68dab5/assets/map/commonworld-country-boundaries.geojson",
+                  "/releases/91b0a75916373b68dab5/assets/vendor/maplibre-gl.css",
+                  "/releases/91b0a75916373b68dab5/assets/vendor/maplibre-gl.js",
+                  "/releases/91b0a75916373b68dab5/catalog/runtime/aggregate.v1.json",
+                  "/releases/91b0a75916373b68dab5/catalog/runtime/manifest.v1.json",
+                  "/releases/91b0a75916373b68dab5/index.css"
                 ],
-                "first_party_surface_sha256": "c241a5c02d232b7d3d35e4cf53b84281754324fe3e064499f4342d16e0140895",
+                "first_party_surface_sha256": "b420e0853c19367e26b5ca5bbdf466d769db134657f682c0edff233e0083cd86",
                 "project_json_request_count": 0,
                 "project_json_unique_request_count": 0,
                 "project_json_requests": []
@@ -487,49 +487,49 @@
             "height": 844
           },
           "cpu_throttle_rate": 4,
-          "runtime_ready_ms": 799,
+          "runtime_ready_ms": 717,
           "dom_node_count": 1803,
           "catalog_card_count": 48,
           "interactive_catalog_card_count": 48,
           "runtime_ready": true,
           "runtime_failed": false,
-          "dom_content_loaded_ms": 653.2000000011176,
-          "load_event_ms": 678.2000000011176,
+          "dom_content_loaded_ms": 581.5,
+          "load_event_ms": 603.2000000001863,
           "resource_count": 20,
-          "script_duration_ms": 386.49,
-          "task_duration_ms": 770.39,
+          "script_duration_ms": 348.68,
+          "task_duration_ms": 690.92,
           "duration_scope": "navigation-start-to-runtime-ready",
           "post_ready_observation_ms": 1250,
-          "observed_script_duration_ms": 398.72,
-          "observed_task_duration_ms": 812.98,
-          "post_ready_script_delta_ms": 12.23,
-          "post_ready_task_delta_ms": 42.59,
+          "observed_script_duration_ms": 360.7,
+          "observed_task_duration_ms": 732.49,
+          "post_ready_script_delta_ms": 12.02,
+          "post_ready_task_delta_ms": 41.57,
           "post_ready_scope": "runtime-ready-through-networkidle-or-10s-timeout-plus-750ms",
           "bootstrap_compile": {
-            "median_ms": 0.599999999627471,
+            "median_ms": 0.5,
             "p95_ms": 1,
             "samples_ms": [
               0,
               0,
               0,
               0,
-              0.09999999962747097,
-              0.09999999962747097,
-              0.10000000149011612,
-              0.19999999925494194,
-              0.2000000011175871,
-              0.40000000037252903,
-              0.599999999627471,
-              0.599999999627471,
-              0.6000000014901161,
-              0.6999999992549419,
-              0.6999999992549419,
-              0.6999999992549419,
-              0.7000000011175871,
-              0.7999999988824129,
-              0.8000000007450581,
+              0,
+              0.10000000009313226,
+              0.19999999995343387,
+              0.30000000004656613,
+              0.39999999990686774,
+              0.39999999990686774,
+              0.5,
+              0.5999999998603016,
+              0.6000000000931323,
+              0.6000000000931323,
+              0.6999999999534339,
+              0.6999999999534339,
+              0.8000000000465661,
+              0.8000000000465661,
+              0.8000000000465661,
               1,
-              2.400000000372529
+              2.699999999953434
             ]
           },
           "first_party_request_count": 19,
@@ -539,23 +539,23 @@
             "/",
             "/__cw_probe/<nonce>/manifest",
             "/assets/commonworld-release-check.js",
-            "/releases/1e92a262e2ca4fc166d5/assets/commonworld-app.js",
-            "/releases/1e92a262e2ca4fc166d5/assets/commonworld-bootstrap-catalog.mjs",
-            "/releases/1e92a262e2ca4fc166d5/assets/commonworld-catalog-runtime.mjs",
-            "/releases/1e92a262e2ca4fc166d5/assets/commonworld-core.mjs",
-            "/releases/1e92a262e2ca4fc166d5/assets/commonworld-en-locale.mjs",
-            "/releases/1e92a262e2ca4fc166d5/assets/commonworld-i18n.mjs",
-            "/releases/1e92a262e2ca4fc166d5/assets/commonworld-locale-registry.mjs",
-            "/releases/1e92a262e2ca4fc166d5/assets/commonworld-locale.mjs",
-            "/releases/1e92a262e2ca4fc166d5/assets/ipad-layout.css",
-            "/releases/1e92a262e2ca4fc166d5/assets/map/commonworld-country-boundaries.geojson",
-            "/releases/1e92a262e2ca4fc166d5/assets/vendor/maplibre-gl.css",
-            "/releases/1e92a262e2ca4fc166d5/assets/vendor/maplibre-gl.js",
-            "/releases/1e92a262e2ca4fc166d5/catalog/runtime/aggregate.v1.json",
-            "/releases/1e92a262e2ca4fc166d5/catalog/runtime/manifest.v1.json",
-            "/releases/1e92a262e2ca4fc166d5/index.css"
+            "/releases/91b0a75916373b68dab5/assets/commonworld-app.js",
+            "/releases/91b0a75916373b68dab5/assets/commonworld-bootstrap-catalog.mjs",
+            "/releases/91b0a75916373b68dab5/assets/commonworld-catalog-runtime.mjs",
+            "/releases/91b0a75916373b68dab5/assets/commonworld-core.mjs",
+            "/releases/91b0a75916373b68dab5/assets/commonworld-en-locale.mjs",
+            "/releases/91b0a75916373b68dab5/assets/commonworld-i18n.mjs",
+            "/releases/91b0a75916373b68dab5/assets/commonworld-locale-registry.mjs",
+            "/releases/91b0a75916373b68dab5/assets/commonworld-locale.mjs",
+            "/releases/91b0a75916373b68dab5/assets/ipad-layout.css",
+            "/releases/91b0a75916373b68dab5/assets/map/commonworld-country-boundaries.geojson",
+            "/releases/91b0a75916373b68dab5/assets/vendor/maplibre-gl.css",
+            "/releases/91b0a75916373b68dab5/assets/vendor/maplibre-gl.js",
+            "/releases/91b0a75916373b68dab5/catalog/runtime/aggregate.v1.json",
+            "/releases/91b0a75916373b68dab5/catalog/runtime/manifest.v1.json",
+            "/releases/91b0a75916373b68dab5/index.css"
           ],
-          "first_party_surface_sha256": "c241a5c02d232b7d3d35e4cf53b84281754324fe3e064499f4342d16e0140895",
+          "first_party_surface_sha256": "b420e0853c19367e26b5ca5bbdf466d769db134657f682c0edff233e0083cd86",
           "project_json_request_count": 0,
           "project_json_unique_request_count": 0,
           "project_json_requests": []
@@ -567,49 +567,49 @@
             "height": 768
           },
           "cpu_throttle_rate": 4,
-          "runtime_ready_ms": 812,
+          "runtime_ready_ms": 729,
           "dom_node_count": 1803,
           "catalog_card_count": 48,
           "interactive_catalog_card_count": 48,
           "runtime_ready": true,
           "runtime_failed": false,
-          "dom_content_loaded_ms": 651.7000000011176,
-          "load_event_ms": 678.5,
+          "dom_content_loaded_ms": 582.8999999999069,
+          "load_event_ms": 612.3999999999069,
           "resource_count": 20,
-          "script_duration_ms": 411.89,
-          "task_duration_ms": 795.14,
+          "script_duration_ms": 361.94,
+          "task_duration_ms": 714.57,
           "duration_scope": "navigation-start-to-runtime-ready",
           "post_ready_observation_ms": 1250,
-          "observed_script_duration_ms": 425.16,
-          "observed_task_duration_ms": 843.05,
-          "post_ready_script_delta_ms": 13.27,
-          "post_ready_task_delta_ms": 47.91,
+          "observed_script_duration_ms": 372.73,
+          "observed_task_duration_ms": 758.01,
+          "post_ready_script_delta_ms": 10.79,
+          "post_ready_task_delta_ms": 43.44,
           "post_ready_scope": "runtime-ready-through-networkidle-or-10s-timeout-plus-750ms",
           "bootstrap_compile": {
             "median_ms": 0.5,
-            "p95_ms": 0.900000000372529,
+            "p95_ms": 1,
             "samples_ms": [
               0,
               0,
               0,
               0,
               0,
-              0,
-              0.09999999962747097,
-              0.19999999925494194,
-              0.19999999925494194,
-              0.3999999985098839,
+              0.09999999986030161,
+              0.19999999995343387,
+              0.30000000004656613,
+              0.39999999990686774,
+              0.39999999990686774,
               0.5,
               0.5,
-              0.6000000014901161,
-              0.6000000014901161,
-              0.6999999992549419,
-              0.6999999992549419,
-              0.6999999992549419,
-              0.7000000011175871,
-              0.900000000372529,
-              0.900000000372529,
-              3
+              0.6000000000931323,
+              0.6999999999534339,
+              0.6999999999534339,
+              0.6999999999534339,
+              0.6999999999534339,
+              0.7000000001862645,
+              0.9000000001396984,
+              1,
+              2.6000000000931323
             ]
           },
           "first_party_request_count": 19,
@@ -619,23 +619,23 @@
             "/",
             "/__cw_probe/<nonce>/manifest",
             "/assets/commonworld-release-check.js",
-            "/releases/1e92a262e2ca4fc166d5/assets/commonworld-app.js",
-            "/releases/1e92a262e2ca4fc166d5/assets/commonworld-bootstrap-catalog.mjs",
-            "/releases/1e92a262e2ca4fc166d5/assets/commonworld-catalog-runtime.mjs",
-            "/releases/1e92a262e2ca4fc166d5/assets/commonworld-core.mjs",
-            "/releases/1e92a262e2ca4fc166d5/assets/commonworld-en-locale.mjs",
-            "/releases/1e92a262e2ca4fc166d5/assets/commonworld-i18n.mjs",
-            "/releases/1e92a262e2ca4fc166d5/assets/commonworld-locale-registry.mjs",
-            "/releases/1e92a262e2ca4fc166d5/assets/commonworld-locale.mjs",
-            "/releases/1e92a262e2ca4fc166d5/assets/ipad-layout.css",
-            "/releases/1e92a262e2ca4fc166d5/assets/map/commonworld-country-boundaries.geojson",
-            "/releases/1e92a262e2ca4fc166d5/assets/vendor/maplibre-gl.css",
-            "/releases/1e92a262e2ca4fc166d5/assets/vendor/maplibre-gl.js",
-            "/releases/1e92a262e2ca4fc166d5/catalog/runtime/aggregate.v1.json",
-            "/releases/1e92a262e2ca4fc166d5/catalog/runtime/manifest.v1.json",
-            "/releases/1e92a262e2ca4fc166d5/index.css"
+            "/releases/91b0a75916373b68dab5/assets/commonworld-app.js",
+            "/releases/91b0a75916373b68dab5/assets/commonworld-bootstrap-catalog.mjs",
+            "/releases/91b0a75916373b68dab5/assets/commonworld-catalog-runtime.mjs",
+            "/releases/91b0a75916373b68dab5/assets/commonworld-core.mjs",
+            "/releases/91b0a75916373b68dab5/assets/commonworld-en-locale.mjs",
+            "/releases/91b0a75916373b68dab5/assets/commonworld-i18n.mjs",
+            "/releases/91b0a75916373b68dab5/assets/commonworld-locale-registry.mjs",
+            "/releases/91b0a75916373b68dab5/assets/commonworld-locale.mjs",
+            "/releases/91b0a75916373b68dab5/assets/ipad-layout.css",
+            "/releases/91b0a75916373b68dab5/assets/map/commonworld-country-boundaries.geojson",
+            "/releases/91b0a75916373b68dab5/assets/vendor/maplibre-gl.css",
+            "/releases/91b0a75916373b68dab5/assets/vendor/maplibre-gl.js",
+            "/releases/91b0a75916373b68dab5/catalog/runtime/aggregate.v1.json",
+            "/releases/91b0a75916373b68dab5/catalog/runtime/manifest.v1.json",
+            "/releases/91b0a75916373b68dab5/index.css"
           ],
-          "first_party_surface_sha256": "c241a5c02d232b7d3d35e4cf53b84281754324fe3e064499f4342d16e0140895",
+          "first_party_surface_sha256": "b420e0853c19367e26b5ca5bbdf466d769db134657f682c0edff233e0083cd86",
           "project_json_request_count": 0,
           "project_json_unique_request_count": 0,
           "project_json_requests": []
@@ -647,8 +647,8 @@
   "delta": {
     "startup_project_json_requests": -100,
     "duplicate_identity_payload_count": -100,
-    "catalog_initial_raw_bytes": -445806,
-    "catalog_initial_gzip_bytes": -147393,
+    "catalog_initial_raw_bytes": -446173,
+    "catalog_initial_gzip_bytes": -147565,
     "catalog_initial_raw_reduction_percent": 76.7,
     "catalog_initial_gzip_reduction_percent": 84.5,
     "first_party_request_count_by_profile": {
@@ -682,10 +682,10 @@
     "public_browser_smoke": {
       "verdict": "PASS",
       "scenario_count": 38,
-      "scope": "local Chromium on deterministic release 1e92a262e2ca4fc166d5",
-      "release_id": "1e92a262e2ca4fc166d5",
-      "first_party_surface_sha256": "c241a5c02d232b7d3d35e4cf53b84281754324fe3e064499f4342d16e0140895",
-      "committed_evidence_sha256": "30ba574c52b037abbf4d4c46c8ad0b045d2c362df1cb05e01706c0430e1b9952",
+      "scope": "local Chromium on deterministic release 91b0a75916373b68dab5",
+      "release_id": "91b0a75916373b68dab5",
+      "first_party_surface_sha256": "b420e0853c19367e26b5ca5bbdf466d769db134657f682c0edff233e0083cd86",
+      "committed_evidence_sha256": "1af14e66de7a7ef87429783df62c3ccfc1a6b3521518dcd8990e0afa36fae204",
       "selected_detail_eviction_cycle": {
         "id": "catalogue-detail-provenance-upgrade",
         "verdict": "PASS",
@@ -700,22 +700,22 @@
       "decision": "pass",
       "attempt_count": 1,
       "attempt_measurement_sha256s": [
-        "314f5e9a6bcbe08cf5d4d8090bd2c044e547e03eec66a606f6d5cd9972bd05b1"
+        "e5e73f7bda1eaf97257143c159c5944543fcd39fe66cf198c77fbdefd1ba90c1"
       ],
       "cpu_throttle_rate": 4,
       "profiles": [
         "mobile-low-power",
         "desktop-low-power"
       ],
-      "release_id": "1e92a262e2ca4fc166d5",
-      "first_party_surface_sha256": "c241a5c02d232b7d3d35e4cf53b84281754324fe3e064499f4342d16e0140895",
-      "repeatability_note": "Fresh exact-tree release-1e92a262e2ca4fc166d5 browser delivery evidence passed the bounded startup gate on the first representative attempt."
+      "release_id": "91b0a75916373b68dab5",
+      "first_party_surface_sha256": "b420e0853c19367e26b5ca5bbdf466d769db134657f682c0edff233e0083cd86",
+      "repeatability_note": "Fresh exact-tree release-91b0a75916373b68dab5 browser delivery evidence passed the bounded startup gate on the first representative attempt."
     },
     "catalog_delivery_static_measurement": {
       "verdict": "PASS",
-      "release_id": "1e92a262e2ca4fc166d5",
-      "result_sha256": "316749e338091b3687149753398e3a44f054413defd3a54114f090ce5a3cac7e",
-      "note": "Fresh deterministic static measurement for the optimized 100-entry release 1e92a262e2ca4fc166d5."
+      "release_id": "91b0a75916373b68dab5",
+      "result_sha256": "8666da36371bc1164371df1f3b2a47a6d45e89e3b7a20af8e80d95ffeeb6f858",
+      "note": "Fresh deterministic static measurement for the optimized 100-entry release 91b0a75916373b68dab5."
     },
     "limitations": [
       "Local Chromium evidence is not physical-device approval.",
@@ -723,69 +723,69 @@
     ]
   },
   "budget_binding": {
-    "bootstrap_gzip_bytes": 27006,
+    "bootstrap_gzip_bytes": 27005,
     "warn_bootstrap_gzip_bytes": 28672,
     "max_bootstrap_gzip_bytes": 32768
   },
-  "current_surface_note": "Fresh exact-tree static, 38-scenario public Chromium smoke and fourfold-CPU browser evidence for deterministic release 1e92a262e2ca4fc166d5; 100 Commons retain bounded recovery, zero startup project JSON requests and 1666 gzip bytes of warning headroom while canonical action search tokens remain discoverable without duplicate bootstrap text.",
+  "current_surface_note": "Fresh exact-tree catalogue delivery evidence for deterministic release 91b0a75916373b68dab5; request/byte budgets and browser startup behavior are bound to the current first-party surface.",
   "browser_repeatability": {
     "run_count": 1,
     "cpu_throttle_rate": 4,
     "profiles": {
       "mobile-low-power": {
         "runtime_ready_ms": {
-          "min": 799,
-          "max": 799,
+          "min": 717,
+          "max": 717,
           "values": [
-            799
+            717
           ]
         },
         "script_duration_ms": {
-          "min": 386.49,
-          "max": 386.49,
+          "min": 348.68,
+          "max": 348.68,
           "values": [
-            386.49
+            348.68
           ]
         },
         "task_duration_ms": {
-          "min": 770.39,
-          "max": 770.39,
+          "min": 690.92,
+          "max": 690.92,
           "values": [
-            770.39
+            690.92
           ]
         }
       },
       "desktop-low-power": {
         "runtime_ready_ms": {
-          "min": 812,
-          "max": 812,
+          "min": 729,
+          "max": 729,
           "values": [
-            812
+            729
           ]
         },
         "script_duration_ms": {
-          "min": 411.89,
-          "max": 411.89,
+          "min": 361.94,
+          "max": 361.94,
           "values": [
-            411.89
+            361.94
           ]
         },
         "task_duration_ms": {
-          "min": 795.14,
-          "max": 795.14,
+          "min": 714.57,
+          "max": 714.57,
           "values": [
-            795.14
+            714.57
           ]
         }
       }
     },
-    "interpretation": "Fresh exact-tree release-1e92a262e2ca4fc166d5 browser observations at fourfold CPU throttling passed the bounded startup decision on the first representative attempt; post-ready work remains diagnostic only."
+    "interpretation": "Fresh exact-tree release-91b0a75916373b68dab5 browser observations at fourfold CPU throttling passed the bounded startup decision on the first representative attempt; post-ready work remains diagnostic only."
   },
   "current_surface_binding": {
-    "release_id": "1e92a262e2ca4fc166d5",
-    "first_party_surface_sha256": "c241a5c02d232b7d3d35e4cf53b84281754324fe3e064499f4342d16e0140895",
-    "public_browser_smoke_evidence_sha256": "30ba574c52b037abbf4d4c46c8ad0b045d2c362df1cb05e01706c0430e1b9952",
-    "browser_measurement_decision_sha256": "ce237b40e057c6af3d56221a92fb372d7d9b42b2b4bb494036f25472c62be47d",
-    "static_measurement_sha256": "316749e338091b3687149753398e3a44f054413defd3a54114f090ce5a3cac7e"
+    "release_id": "91b0a75916373b68dab5",
+    "first_party_surface_sha256": "b420e0853c19367e26b5ca5bbdf466d769db134657f682c0edff233e0083cd86",
+    "public_browser_smoke_evidence_sha256": "1af14e66de7a7ef87429783df62c3ccfc1a6b3521518dcd8990e0afa36fae204",
+    "browser_measurement_decision_sha256": "9f07379992f94e702a2fe0b3dc5f5da67ae5e61974527193b8d72139c709e855",
+    "static_measurement_sha256": "8666da36371bc1164371df1f3b2a47a6d45e89e3b7a20af8e80d95ffeeb6f858"
   }
 }

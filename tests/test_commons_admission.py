@@ -210,6 +210,23 @@ class CommonsAdmissionValidationTests(unittest.TestCase):
         self.write_case([legacy], [])
         self.assertEqual(validate(self.root, today=date(2026, 8, 15)), [])
 
+    def test_existing_basis_still_fails_when_re_review_is_overdue(self) -> None:
+        project = self.project(
+            "reviewed-common",
+            catalogued_at="2026-07-12",
+            reviewed_at="2026-08-01",
+            next_review_at="2026-09-01",
+        )
+        basis = self.basis("reviewed-common", reviewed_at="2026-08-01")
+        self.write_case([project], [basis])
+        errors = validate(self.root, today=date(2026, 9, 2))
+        self.assertTrue(
+            any(
+                "Commons basis re-review overdue since 2026-09-01" in error
+                for error in errors
+            )
+        )
+
     def test_unknown_basis_source_fails(self) -> None:
         project = self.project("new-common")
         basis = self.basis("new-common")
