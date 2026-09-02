@@ -8,9 +8,9 @@
   "reviewed_source_pack_sha256": "cf57400b0a0fbf818baa88f33001e95bc4c7c39bd00caef3505f4d9ab6c0f405",
   "catalog_overlay_sha256": "4268fc42da9cf80af9f8e6e4e9e04eddc6a0a970573197255f657c48d7e318ae",
   "surface_sha256": {
-    "index": "a5c16efed270e4bae963c9fcb7f5e9e49ab4e381ea678ce28d9640b6570fb799",
-    "method": "d30a94f7a53213f2494a654c0792116fece218abd90f73adee07d775bef378e5",
-    "proposal": "47c130927ef6a969abceeb1c0e77103a3b08067ef874df22da1734f50a626384"
+    "index": "cc19fcf913969bf96ba1c279b02e71782439df99ed72e3e03e2c0d61235d7569",
+    "method": "425d0386e1c5578b9acf8b23a11642ed195cba7ee0ca4a5ec7f28a8ec1390ab3",
+    "proposal": "0846109cab5621407d96a3029d020b7682f3a5fb85475ed861b649ec1ccc8b9b"
   },
   "gate_results": {
     "required_surfaces_passed": [
@@ -60,5 +60,6 @@
     "findings_based": true,
     "post_fix_review_required": true
   },
-  "notes": "Locale-specific language, accessibility and lifecycle receipts remain bound to their previously reviewed immutable releases. The current surface_sha256 values were mechanically rebound on 2026-09-02 because seven due Commons basis re-reviews plus release-bound catalogue metadata regenerated deterministic public surfaces as release 91b0a75916373b68dab5. Locale packs, reviewed source packs, catalog overlays, gate results and review receipts are unchanged. This rebind claims no fresh native-speaker, human language, manual screen-reader, manual visual, fresh browser or full WCAG approval; exact-tree runtime validation for this PR is separate merge evidence."
+  "notes": "Locale-specific language, accessibility and lifecycle receipts remain bound to their previously reviewed immutable releases. The current surface_sha256 values were mechanically rebound on 2026-09-02 because seven due Commons basis re-reviews plus release-bound catalogue metadata regenerated deterministic public surfaces as release 91b0a75916373b68dab5. Locale packs, reviewed source packs, catalog overlays, gate results and review receipts are unchanged. This rebind claims no fresh native-speaker, human language, manual screen-reader, manual visual, fresh browser or full WCAG approval; exact-tree runtime validation for this PR is separate merge evidence.",
+  "note": "Locale-specific language, accessibility and lifecycle receipts remain bound to previously reviewed immutable releases. Current surface_sha256 values were mechanically rebound on 2026-09-02 after PR #222 Commons re-review consistency corrections regenerated deterministic public surfaces as release cc469b553bad17b55352. Locale packs, reviewed source packs, catalog overlays, gate results and review receipts are unchanged. Fresh canonical locale lifecycle browser smoke passed on the same tree. No fresh native-speaker, human-language, manual screen-reader, manual visual or full WCAG approval is claimed."
 }

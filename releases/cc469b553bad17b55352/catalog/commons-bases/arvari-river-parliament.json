@@ -1,0 +1,42 @@
+{
+  "schema_version": 1,
+  "kind": "commonworld_commons_basis",
+  "project_id": "arvari-river-parliament",
+  "classification": "common",
+  "decision": "include",
+  "reviewed_at": "2026-09-02",
+  "reviewer": "Commonworld editorial review",
+  "criteria": {
+    "shared_resource": {
+      "status": "supported",
+      "statement": "Der Arvari-Fluss, sein Einzugsgebiet und die von Dorfgemeinschaften mitgeschaffenen Wasserstrukturen bilden eine konkrete gemeinsam erhaltene Wasserressource; Tarun Bharat Sangh dokumentiert für das Arvari-Einzugsgebiet Hunderte gemeinschaftlich errichtete Wasserbauten.",
+      "source_ids": ["tbs-rivers", "tbs-impact"]
+    },
+    "community": {
+      "status": "supported",
+      "statement": "Dorfgemeinschaften im Einzugsgebiet sowie lokale Jal Yodhas tragen die Wiederbelebung und Verantwortung für Wasser und natürliche Ressourcen; der River-Parliament-Ansatz organisiert diese gemeinschaftliche Trägerschaft über einzelne Nutzer hinaus.",
+      "source_ids": ["tbs-rivers", "tbs-impact"]
+    },
+    "commoning_practice": {
+      "status": "supported",
+      "statement": "Gemeinschaften beteiligen sich praktisch am Bau und Erhalt dezentraler Wasserstrukturen und übernehmen kollektiv Verantwortung für die Regeneration und Nutzung der Wasserlandschaft; die Praxis geht damit deutlich über bloßen Wasserkonsum hinaus.",
+      "source_ids": ["tbs-rivers", "tbs-impact"]
+    },
+    "rules_and_responsibility": {
+      "status": "supported",
+      "statement": "River Parliaments sind als gemeinschaftliche Institutionen für die Verwaltung natürlicher Ressourcen dokumentiert und ordnen Verantwortung und gemeinsame Entscheidungen auf Einzugsgebietsebene; der Arvari-Fall wird innerhalb der offiziell dokumentierten Flusswiederbelebung geführt.",
+      "source_ids": ["tbs-rivers", "tbs-impact"]
+    },
+    "common_benefit": {
+      "status": "supported",
+      "statement": "Die gemeinschaftliche Arbeit dient der Wiederherstellung von Wasserverfügbarkeit, Flussökologie und lokaler Lebensgrundlage im Einzugsgebiet und besteht damit als gemeinsamer Nutzen unabhängig von einem Vertriebsinteresse eines externen Eigentümers.",
+      "source_ids": ["tbs-rivers", "tbs-impact"]
+    }
+  },
+  "confidence": 0.88,
+  "limitations": [
+    "Die maßgeblichen Nachweise stammen überwiegend von Tarun Bharat Sangh als beteiligter Organisation; sie belegen das gemeinschaftliche Modell, sind aber keine unabhängige Wirkungsevaluation.",
+    "Der aktuelle objektspezifische Betriebszustand des Arvari River Parliament ist nicht separat zeitnah verifiziert; deshalb bleibt die Aktivitätsangabe des Projektrecords bewusst auf unknown."
+  ],
+  "notes": "Aufgenommen als Wasser-Common, weil die gemeinsam regenerierte Ressource mit fortgesetzter Gemeinschaftsverantwortung und River-Parliament-Governance verbunden ist; der Unterstützungsverein selbst ist nicht das Common."
+}

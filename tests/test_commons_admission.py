@@ -113,7 +113,13 @@ class CommonsAdmissionValidationTests(unittest.TestCase):
                 json.dumps(basis),
                 encoding="utf-8",
             )
+        basis_review_dates = [
+            basis["reviewed_at"]
+            for basis in bases
+            if isinstance(basis.get("reviewed_at"), str)
+        ]
         index = {
+            "current_as_of": max(basis_review_dates, default="2026-07-31"),
             "entry_count": len(basis_files),
             "basis_files": sorted(basis_files),
         }
@@ -223,6 +229,28 @@ class CommonsAdmissionValidationTests(unittest.TestCase):
         self.assertTrue(
             any(
                 "Commons basis re-review overdue since 2026-09-01" in error
+                for error in errors
+            )
+        )
+
+    def test_basis_index_cannot_predate_latest_basis_review(self) -> None:
+        project = self.project(
+            "reviewed-common",
+            reviewed_at="2026-09-02",
+            next_review_at="2026-10-02",
+        )
+        basis = self.basis("reviewed-common", reviewed_at="2026-09-02")
+        self.write_case([project], [basis])
+        index_path = self.root / "catalog/commons-bases/index.json"
+        index = json.loads(index_path.read_text(encoding="utf-8"))
+        index["current_as_of"] = "2026-09-01"
+        index_path.write_text(json.dumps(index), encoding="utf-8")
+
+        errors = validate(self.root, today=date(2026, 9, 2))
+        self.assertTrue(
+            any(
+                "current_as_of must not predate the latest basis reviewed_at (2026-09-02)"
+                in error
                 for error in errors
             )
         )

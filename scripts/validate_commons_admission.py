@@ -104,6 +104,7 @@ def validate(root: Path = ROOT, *, today: date | None = None) -> list[str]:
         errors.append("Commons basis index entry_count mismatch")
 
     bases: dict[str, dict] = {}
+    basis_review_dates: list[date] = []
     for filename in basis_files:
         path = root / "catalog" / "commons-bases" / filename
         if not path.is_file():
@@ -185,12 +186,29 @@ def validate(root: Path = ROOT, *, today: date | None = None) -> list[str]:
         try:
             basis_reviewed_at = date.fromisoformat(basis["reviewed_at"])
             project_reviewed_at = date.fromisoformat(project["curation"]["reviewed_at"])
+            basis_review_dates.append(basis_reviewed_at)
             if basis_reviewed_at != project_reviewed_at:
                 errors.append(
                     f"{filename}: basis reviewed_at must equal project curation.reviewed_at"
                 )
         except (KeyError, TypeError, ValueError):
             pass
+
+    try:
+        index_current_as_of = date.fromisoformat(str(index["current_as_of"]))
+    except (KeyError, TypeError, ValueError):
+        errors.append("Commons basis index current_as_of must be a date")
+        index_current_as_of = None
+    latest_basis_reviewed_at = max(basis_review_dates, default=None)
+    if (
+        index_current_as_of is not None
+        and latest_basis_reviewed_at is not None
+        and index_current_as_of < latest_basis_reviewed_at
+    ):
+        errors.append(
+            "Commons basis index current_as_of must not predate the latest basis reviewed_at "
+            f"({latest_basis_reviewed_at.isoformat()})"
+        )
 
     queue: list[tuple[date, str]] = []
     for project_id, project in projects.items():
