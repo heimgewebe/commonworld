@@ -301,6 +301,29 @@ class LocaleReleaseContractTests(unittest.TestCase):
         self.assertTrue(scaffold["review_class"]["model_assisted_editorial_review"])
         self.assertTrue(scaffold["review_class"]["post_fix_review_required"])
 
+    def test_release_evidence_schema_rejects_unknown_root_field(self) -> None:
+        from scripts.validate_locale_release import _release_evidence_schema_errors
+
+        schema = json.loads(
+            (ROOT / "docs/architecture/locale-release-evidence.schema.json").read_text(
+                encoding="utf-8"
+            )
+        )
+        evidence = json.loads(
+            (ROOT / "docs/evidence/locale-releases/es.json").read_text(encoding="utf-8")
+        )
+        evidence["note"] = "schema typo must fail closed"
+
+        errors = _release_evidence_schema_errors("es", evidence, schema)
+        self.assertTrue(
+            any(
+                "Additional properties are not allowed" in error and "'note'" in error
+                for error in errors
+            ),
+            errors,
+        )
+
+
     def test_release_evidence_requires_current_pack_and_honest_review_class(self) -> None:
         import hashlib
         import tempfile

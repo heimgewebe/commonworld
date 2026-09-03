@@ -1,0 +1,1568 @@
+<!doctype html>
+<html lang="hi" dir="ltr">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="commonworld-page" content="hi.html" />
+    <meta name="commonworld-page-build" content="be9e42d6814fe0a6" />
+    <meta name="commonworld-release" content="1e92a262e2ca4fc166d5" />
+    <base href="/releases/1e92a262e2ca4fc166d5/" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <meta name="color-scheme" content="dark" />
+    <meta name="referrer" content="strict-origin-when-cross-origin" />
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'wasm-unsafe-eval'; style-src 'self'; img-src 'self' data: blob: https://tiles.openfreemap.org; connect-src 'self' https://tiles.openfreemap.org; font-src 'self' data: https://tiles.openfreemap.org; worker-src 'self' blob:; child-src blob:; object-src 'none'; base-uri 'self'; form-action 'none';" />
+    <meta name="description" content="Commonworld कॉमन्स को एक साझा ग्लोब पर दुनिया भर में, क्षेत्रीय, स्थानीय और डिजिटल रूप से खोजने योग्य बनाता है।" />
+    <title>commonworld — कॉमन्स खोजें</title>
+    <link rel="icon" href="./assets/commonworld-mark.svg?v=05905a6e42f8" type="image/svg+xml" />
+    <link rel="alternate" type="application/json" href="./catalog/catalog.json" title="Commonworld कैटलॉग" />
+    <link rel="alternate" type="application/schema+json" href="./contracts/commonworld/project.schema.json" title="CommonProject स्कीमा" />
+    <link rel="stylesheet" href="./assets/vendor/maplibre-gl.css?v=ab1e70d59ec4" />
+    <link rel="stylesheet" href="./index.css?v=3361bf4f7785" />
+    <link rel="stylesheet" href="./assets/ipad-layout.css?v=739d6b8460d4" />
+    <script type="module" src="/assets/commonworld-release-check.js?v=c1d996101672"></script>
+    <script src="./assets/vendor/maplibre-gl.js?v=45a9b07a9189" defer></script>
+    <script type="module" src="./assets/commonworld-locale.mjs?v=f33a847e2a77"></script>
+    <script type="module" src="./assets/commonworld-app.js?v=e31fbd1ce8df"></script>
+  </head>
+  <body data-presentation="globe">
+    <a id="text-skip-link" class="skip-link" href="/hi.html#static-catalog-fallback">पाठ दृश्य पर जाएँ</a>
+    <main class="app-shell">
+      <header class="topbar">
+        <a class="brand" href="./hi.html" aria-label="commonworld – ग्लोब रीसेट करें">
+          <span class="brand-mark" aria-hidden="true"></span>
+          <span>commonworld</span>
+        </a>
+        <div class="discovery-control">
+          <div class="search-control" role="search">
+            <label class="visually-hidden" for="commons-search">कॉमन्स खोजें</label>
+            <span class="search-symbol" aria-hidden="true">⌕</span>
+            <input id="commons-search" type="search" inputmode="search" autocomplete="off" placeholder="आप क्या करना या खोजना चाहेंगे?" aria-controls="discovery-list" aria-expanded="false" />
+            <button id="search-clear" class="search-clear" type="button" aria-label="खोज साफ़ करें" hidden>×</button>
+          </div>
+          <button id="filter-toggle" class="icon-button filter-toggle" type="button" aria-label="खोज परिणाम और फ़िल्टर खोलें" aria-controls="discovery-panel" aria-expanded="false"><span class="filter-toggle-icon" aria-hidden="true"></span><span class="filter-toggle-label">फ़िल्टर</span><span id="filter-toggle-count" class="filter-toggle-count" hidden>0</span></button>
+        </div>
+        <a class="proposal-link" href="./propose.hi.html"><span class="proposal-symbol" aria-hidden="true">+</span><span class="proposal-label">एक कॉमन्स का सुझाव दें</span></a>
+        <button id="settings-toggle" class="icon-button settings-toggle" type="button" aria-label="सेटिंग्स खोलें" aria-controls="settings-panel" aria-expanded="false"><span aria-hidden="true">⚙</span></button>
+      </header>
+
+      <section id="discovery-panel" class="discovery-panel" aria-labelledby="discovery-title" hidden>
+        <div class="discovery-heading">
+          <div><p class="kicker">खोजें</p><h2 id="discovery-title">मेल खाते कॉमन्स</h2></div>
+          <button id="discovery-close" class="icon-button" type="button" aria-label="खोज परिणाम बंद करें">×</button>
+        </div>
+        <div id="active-filter-chips" class="active-filter-chips" aria-label="सक्रिय फ़िल्टर"></div>
+        <button id="filter-sections-toggle" type="button" aria-controls="filter-sections" aria-expanded="true" aria-hidden="true" tabindex="-1" hidden><span>फ़िल्टर</span></button>
+        <div id="filter-sections" class="filter-sections">
+          <fieldset class="filter-group filter-group--purpose">
+            <legend>क्या?</legend>
+            <div class="filter-group-controls">
+              <label class="filter-commons-type"><span>कॉमन्स प्रकार</span><select id="filter-commons-type" data-intent-filter="commons_type"><option value="">सभी प्रकार</option><option value="knowledge">ज्ञान और डेटा</option><option value="software">सॉफ्टवेयर और इन्फ्रास्ट्रक्चर</option><option value="culture">संस्कृति और मीडिया</option><option value="food-seeds">बीज और भोजन</option><option value="water">जल एवं सिंचाई</option><option value="energy">ऊर्जा</option><option value="housing-land">भूमि एवं आवास</option><option value="health-care">देखभाल और स्वास्थ्य</option><option value="tools-repair">उपकरण, मरम्मत और निर्माण</option><option value="community-network">सामुदायिक नेटवर्क</option><option value="other">अन्य</option></select></label>
+              <label class="filter-action"><span>कार्रवाई</span><select id="filter-action" data-intent-filter="action"><option value="">सभी क्रियाएं</option><option value="use">उपयोग करें</option><option value="borrow">उधार लें</option><option value="learn">जानें</option><option value="contribute">योगदान करें</option><option value="volunteer">स्वयंसेवा करें</option><option value="donate">दान करें</option><option value="visit">जाएँ</option><option value="contact">संपर्क करें</option><option value="replicate">प्रतिरूप बनाएँ</option></select></label>
+            </div>
+          </fieldset>
+          <fieldset class="filter-group filter-group--location">
+            <legend>कहाँ?</legend>
+            <div class="location-filter-layout">
+              <fieldset class="filter-presence-group location-filter-block location-filter-block--presence"><legend>आवश्यक उपस्थिति</legend><div class="filter-presence-options"><label><input type="checkbox" id="filter-presence-geographic" name="presence" value="geographic" data-intent-filter="presence"> साइट पर</label><label><input type="checkbox" id="filter-presence-digital" name="presence" value="digital" data-intent-filter="presence"> डिजिटल</label></div><small class="filter-presence-note">एक साथ चुनी गई सभी विशेषताएँ मौजूद होनी चाहिए (AND)।</small></fieldset>
+              <div class="location-filter-block location-filter-block--destination">
+                <h3>स्थान का दायरा</h3>
+                <div class="spatial-destination-search">
+                  <label for="spatial-destination-search">स्थान या देश खोजें</label>
+                  <input id="spatial-destination-search" type="search" inputmode="search" autocomplete="off" placeholder="स्थान, क्षेत्र या देश" aria-controls="spatial-destination-results" aria-expanded="false" />
+                  <ul id="spatial-destination-results" class="spatial-destination-results" aria-label="स्थान सुझाव"></ul>
+                </div>
+                <label class="location-country-filter"><span>देश</span><select id="filter-country"><option value="">सभी देश</option></select></label>
+                <div class="location-proximity-controls">
+                  <label><span>त्रिज्या</span><select id="filter-nearby-radius" disabled><option value="">कोई त्रिज्या नहीं</option><option value="5000">5 km</option><option value="25000">25 km</option><option value="100000">100 km</option><option value="500000">500 km</option></select></label>
+                  <button id="use-current-location" class="quiet-button" type="button">मेरे स्थान का उपयोग करें</button>
+                </div>
+                <p id="geolocation-status" class="geolocation-status" role="status"></p>
+                <p class="spatial-search-note">देश और त्रिज्या परस्पर अनन्य हैं। किसी स्थान को चुनने के बाद ही त्रिज्या सक्रिय होती है। खोज में Commonworld के प्रकाशित स्थान और देश शामिल हैं।</p>
+              </div>
+            </div>
+          </fieldset>
+          <details id="advanced-filters" class="advanced-filters">
+            <summary>अधिक फ़िल्टर</summary>
+            <div class="filter-group-controls">
+              <label><span>पहुंच</span><select id="filter-access" data-intent-filter="access"><option value="">सभी पहुंच प्रकार</option><option value="public">सार्वजनिक</option><option value="membership">सदस्यता</option><option value="restricted">प्रतिबंधित</option><option value="unknown">निर्दिष्ट नहीं</option></select></label>
+              <label><span>भाषा</span><select id="filter-language" data-intent-filter="language"><option value="">सभी प्रविष्टियाँ</option><option value="ca" lang="ca" dir="ltr">Català</option><option value="de" lang="de" dir="ltr">Deutsch</option><option value="en" lang="en" dir="ltr">English</option><option value="es" lang="es" dir="ltr">Español</option><option value="it" lang="it" dir="ltr">Italiano</option><option value="ku" lang="ku" dir="ltr">Kurdî</option><option value="pt-BR" lang="pt-BR" dir="ltr">Português (Brasil)</option><option value="el" lang="el" dir="ltr">Ελληνικά</option><option value="ar" lang="ar" dir="rtl">العربية</option><option value="syr" lang="syr" dir="rtl">ܣܘܪܝܝܐ</option><option value="ne" lang="ne" dir="ltr">नेपाली</option><option value="zh" lang="zh" dir="ltr">中文</option><option value="unknown">निर्दिष्ट नहीं</option></select></label>
+              <label><span>ताजगी</span><select id="filter-freshness" data-intent-filter="freshness"><option value="">कोई ताजगी</option><option value="current">वर्तमान में समीक्षा की गई</option><option value="stale">समीक्षा देय है</option><option value="unknown">निर्दिष्ट नहीं</option></select></label>
+              <label><span>क्यूरेशन</span><select id="filter-curation" data-intent-filter="curation"><option value="">कोई भी स्थिति</option><option value="listed">सूचीबद्ध</option><option value="verified">सत्यापित</option><option value="featured">विशेष रूप से प्रदर्शित</option><option value="unknown">निर्दिष्ट नहीं</option></select></label>
+            </div>
+          </details>
+        </div>
+        <div class="discovery-summary-row">
+          <label class="discovery-sort"><span>क्रमबद्ध करें</span><select id="discovery-sort" aria-describedby="discovery-sort-note"><option value="auto">अनुशंसित</option><option value="catalogued">कैटलॉग में नया</option><option value="reviewed">हाल ही में समीक्षा की गई</option><option value="title">नाम A-Z</option></select></label>
+          <p id="discovery-sort-note" class="discovery-sort-note">संदर्भ के अनुसार अनुशंसित अनुकूलन: प्रासंगिकता के आधार पर खोजें, निकटता के आधार पर त्रिज्या, अन्यथा फ़िल्टर किए गए क्रम को बरकरार रखा जाता है।</p>
+          <p id="discovery-count" class="discovery-count" role="status">100 कॉमन्स</p>
+          <button id="filter-clear" class="quiet-button" type="button">फ़िल्टर रीसेट करें</button>
+        </div>
+        <p id="discovery-empty" class="discovery-empty" hidden>कोई कॉमन्स इस खोज और फ़िल्टर संयोजन से मेल नहीं खाता।</p>
+        <ol id="discovery-list" class="discovery-list" aria-label="क्रमबद्ध कॉमन्स खोज परिणाम"></ol>
+        <button id="discovery-show-text" class="quiet-button result-continuation" type="button" hidden>सभी परिणाम टेक्स्ट दृश्य में दिखाएं</button>
+      </section>
+
+      <section id="globe-surface" class="globe-surface" aria-label="Commonworld ग्लोब">
+        <figure class="globe-stage" aria-labelledby="globe-caption" data-runtime-state="loading" data-visual-ready="false" data-view-phase="overview" data-map-renders="0" data-overlay-renders="0">
+          <div id="map" class="globe-map" role="region" aria-label="इंटरएक्टिव Commonworld ग्लोब"></div>
+          <svg id="digital-sphere" class="digital-sphere" viewBox="0 0 640 640" role="group" aria-labelledby="sphere-title" aria-describedby="sphere-ring-accessible-summary">
+            <title id="sphere-title">डिजिटल कॉमन्स क्षेत्र नामों और श्रेणियों से निर्मित</title>
+            <defs>
+              <radialGradient id="sphere-center-fade">
+                <stop offset="0%" stop-color="black" />
+                <stop offset="58%" stop-color="black" />
+                <stop offset="78%" stop-color="white" />
+                <stop offset="100%" stop-color="white" />
+              </radialGradient>
+              <mask id="sphere-mask"><rect width="640" height="640" fill="url(#sphere-center-fade)" /></mask>
+              <g id="sphere-paths" fill="none">
+              <path id="sphere-path-1" d="M 4 320 A 316 300 0 1 1 636 320 A 316 300 0 1 1 4 320 Z" transform="rotate(-8 320 320)" />
+              <path id="sphere-path-2" d="M 10 320 A 310 282 0 1 1 630 320 A 310 282 0 1 1 10 320 Z" transform="rotate(20 320 320)" />
+              <path id="sphere-path-3" d="M 16 320 A 304 268 0 1 1 624 320 A 304 268 0 1 1 16 320 Z" transform="rotate(43 320 320)" />
+              <path id="sphere-path-4" d="M 22 320 A 298 288 0 1 1 618 320 A 298 288 0 1 1 22 320 Z" transform="rotate(-31 320 320)" />
+              <path id="sphere-path-5" d="M 28 320 A 292 274 0 1 1 612 320 A 292 274 0 1 1 28 320 Z" transform="rotate(63 320 320)" />
+              <path id="sphere-path-6" d="M 34 320 A 286 294 0 1 1 606 320 A 286 294 0 1 1 34 320 Z" transform="rotate(-62 320 320)" />
+              <path id="sphere-path-7" d="M 40 320 A 280 262 0 1 1 600 320 A 280 262 0 1 1 40 320 Z" transform="rotate(78 320 320)" />
+              <path id="sphere-path-8" d="M 46 320 A 274 284 0 1 1 594 320 A 274 284 0 1 1 46 320 Z" transform="rotate(-77 320 320)" />
+              </g>
+            </defs>
+            <g id="sphere-rings" mask="url(#sphere-mask)" aria-hidden="true"></g>
+            <circle id="sphere-edge-control" class="sphere-edge-control" cx="320" cy="320" r="309" fill="none" stroke="transparent" stroke-width="44" pointer-events="stroke" role="button" tabindex="0" aria-label="डिजिटल रिंग बंडल खोलें। टैप करें या Enter दबाएँ।"></circle>
+            <circle class="sphere-edge-focus" cx="320" cy="320" r="309" aria-hidden="true"></circle>
+          </svg>
+          <p id="sphere-ring-accessible-summary" class="visually-hidden"></p>
+          <div id="layer-stack-visual" class="layer-stack-visual" aria-hidden="true"></div>
+
+          <button id="layer-view-button" class="layer-view-button" type="button" aria-controls="layer-panel" aria-expanded="false">डिजिटल क्षेत्र</button>
+
+          <div id="country-navigation-context" class="country-navigation-context" role="region" aria-label="देश प्रसंग" hidden>
+            <p id="country-navigation-name" class="country-navigation-name"></p>
+            <div class="country-navigation-actions">
+              <button id="country-filter-action" class="quiet-button" type="button">इस देश में कॉमन्स दिखाएँ</button>
+              <button id="country-navigation-close" class="icon-button" type="button" aria-label="देश संदर्भ बंद करें">×</button>
+            </div>
+          </div>
+
+          <div class="orientation-bar" aria-label="ग्लोब ओरिएंटेशन">
+            <button id="globe-reset" type="button">पृथ्वी</button>
+            <span aria-hidden="true">›</span>
+            <span id="semantic-level">सिंहावलोकन</span>
+            <span id="semantic-summary" class="semantic-summary">कैटलॉग नमूना · कवरेज का मूल्यांकन नहीं किया गया</span>
+            <span id="semantic-breadcrumb-accessible" class="visually-hidden"></span>
+          </div>
+
+          <details class="map-legend">
+            <summary>मानचित्र संकेत</summary>
+            <div class="legend-body">
+              <p class="legend-note">रंग कॉमन्स प्रकार दिखाते हैं। विश्व दृष्टिकोण में, देशों को आनुपातिक रूप से कॉमन्स प्रकार के रंगों के साथ धारीदार बनाया गया है, जो प्रकाशित स्थान संदर्भों के माध्यम से प्रमाणित हैं। जैसे ही आप ज़ूम इन करते हैं, डिस्प्ले क्षेत्रीय और अंततः स्थान-विशिष्ट हो जाता है। कैटलॉग कवरेज का मूल्यांकन नहीं किया गया है; मानचित्र न तो घनत्व दर्शाता है और न ही साक्ष्ययुक्त अनुपस्थिति।</p>
+              <ul id="commons-type-legend" class="legend-list" aria-label="कॉमन्स प्रकार और मानचित्र प्रतीक"></ul>
+              <ul class="legend-semantics">
+                <li><span class="legend-semantic-mark legend-semantic-mark--coverage" aria-hidden="true"></span>देश की धारियाँ: प्रत्येक देश में प्रलेखित कॉमन्स प्रकारों का सापेक्ष वितरण</li>
+                <li><span class="legend-semantic-mark legend-semantic-mark--count" aria-hidden="true"></span>रंगीन वृत्त: ज़ूम इन करते समय व्यापक क्षेत्रीय समूहन</li>
+                <li><span class="legend-semantic-mark legend-semantic-mark--withheld" aria-hidden="true"></span>छिपे हुए स्थान संदर्भ स्थानिक प्रदर्शन में शामिल नहीं हैं</li>
+              </ul>
+              <p class="legend-precision"><strong>स्थान परिशुद्धता:</strong> बिंदु = सटीक, धराशायी क्षेत्र = अनुमानित, ठोस क्षेत्र = प्रकाशित सीमा।</p>
+            </div>
+          </details>
+
+          <p id="map-status" class="map-status" role="status">ग्लोब लोड हो रहा है. पाठ दृश्य उपलब्ध रहता है.</p>
+          <p id="globe-results" class="globe-results" role="status">100 वर्तमान कैटलॉग में कॉमन्स।</p>
+
+          <aside id="layer-panel" class="layer-panel" aria-labelledby="layer-title" hidden>
+            <h2 id="layer-title" class="visually-hidden">डिजिटल कॉमन्स करीब से</h2>
+            <p class="visually-hidden">वही डिजिटल कॉमन्स अपने प्रत्यक्ष मूल पथ और नामों के साथ पदानुक्रमित रिंग बंडलों के रूप में दिखाई देते हैं।</p>
+            <div class="layer-panel-controls">
+              <button id="layer-search-toggle" class="icon-button layer-search-toggle" type="button" aria-label="कॉमन्स खोजें और रिंग बंडल फ़िल्टर करें" aria-controls="layer-discovery" aria-expanded="false">⌕</button>
+              <button id="layer-close" class="icon-button layer-close" type="button" aria-label="ग्लोब दृश्य पर लौटें">×</button>
+            </div>
+            <nav id="layer-breadcrumb" class="digital-breadcrumb" aria-label="डिजिटल पथ"></nav>
+            <p id="layer-current" class="digital-current" role="status">डिजिटल कॉमन्स क्षेत्र</p>
+            <div id="layer-discovery" class="layer-discovery" hidden>
+              <label for="layer-search">डिजिटल रिंग बंडलों में कॉमन्स खोजें</label>
+              <div class="layer-search-field"><span aria-hidden="true">⌕</span><input id="layer-search" type="search" inputmode="search" autocomplete="off" placeholder="कॉमन्स खोजें" /></div>
+              <div id="layer-buttons" class="layer-buttons"></div>
+            </div>
+            <div id="layer-track-deck" class="layer-track-deck" aria-label="पदानुक्रमित डिजिटल कॉमन्स रिंग बंडल"></div>
+            <p id="layer-project-status" class="visually-hidden" role="status" aria-live="polite" aria-atomic="true"></p>
+            <div id="layer-projects" class="layer-projects" hidden></div>
+          </aside>
+
+          <figcaption id="globe-caption" class="visually-hidden">पृथ्वी → वृहद क्षेत्र → क्षेत्र → स्थानीय संदर्भ → कॉमन्स</figcaption>
+        </figure>
+      </section>
+
+      <section id="text-view" class="text-view" tabindex="-1" aria-labelledby="text-title" hidden>
+        <header class="text-header">
+          <p class="kicker">पाठ दृश्य</p>
+          <h1 id="text-title">कॉमन्स को सीधे ब्राउज़ करें</h1>
+          <p>ग्लोब पर समान पहचान, फ़िल्टर और चयन - स्थानिक प्रदर्शन के बिना।</p>
+          <p id="text-count" class="text-count">100 कॉमन्स</p>
+        </header>
+        <div class="text-layout">
+          <aside class="text-filters" aria-labelledby="text-filter-title">
+            <h2 id="text-filter-title">फ़िल्टर और डिजिटल रिंग बंडल</h2>
+            <button class="quiet-button text-discovery-open" type="button" data-open-discovery>खोज फ़िल्टर खोलें</button>
+            <nav id="text-layer-breadcrumb" class="digital-breadcrumb" aria-label="पाठ दृश्य में डिजिटल पथ"></nav>
+            <p id="text-layer-current" class="digital-current" role="status">डिजिटल कॉमन्स क्षेत्र</p>
+            <div id="text-layer-buttons" class="layer-buttons"></div>
+            <p class="machine-note">मशीन-पठनीय: <a href="./catalog/catalog.json" type="application/json">कैटलॉग मेनिफेस्ट</a> · <a href="./contracts/commonworld/project.schema.json" type="application/schema+json">डेटा स्कीमा</a></p>
+          </aside>
+          <div>
+            <p id="text-empty" class="text-empty" hidden>कोई कॉमन्स इस चयन से मेल नहीं खाता।</p>
+            <div id="catalog" class="catalog-grid" aria-live="polite">
+
+            </div>
+            <button id="text-show-more" class="quiet-button result-continuation" type="button" hidden>और कॉमन्स दिखाएँ</button>
+          </div>
+        </div>
+      </section>
+
+      <aside id="settings-panel" class="settings-panel" role="dialog" aria-modal="true" aria-labelledby="settings-title" aria-describedby="settings-description" hidden>
+        <p id="settings-description" class="visually-hidden">एक प्रस्तुति चुनें और डेटा, विधि और लाइसेंस के बारे में जानकारी खोलें।</p>
+        <div class="panel-heading">
+          <div><p class="kicker">सेटिंग्स</p><h2 id="settings-title">प्रस्तुति</h2></div>
+          <button id="settings-close" class="icon-button" type="button" aria-label="सेटिंग्स बंद करें">×</button>
+        </div>
+        <div class="presentation-choices" role="radiogroup" aria-label="प्रस्तुतिकरण चुनें">
+          <button type="button" role="radio" aria-checked="true" data-presentation-choice="globe"><strong>ग्लोब</strong><span>स्थानिक रूप से अन्वेषण करें और ज़ूम करें</span></button>
+          <button type="button" role="radio" aria-checked="false" data-presentation-choice="text"><strong>पाठ</strong><span>वही कॉमन्स सूची के रूप में</span></button>
+        </div>
+        <section class="settings-section language-settings"><h3>इंटरफ़ेस भाषा</h3><nav class="language-switch language-switch--settings" aria-label="इंटरफ़ेस भाषा चुनें" data-locale-surface="index"><a class="language-choice language-choice--auto" href="./?ui_lang=auto" data-locale-choice="auto" data-locale-surface="index"><span class="language-choice-name">स्वचालित — डिवाइस की भाषा</span></a><div class="language-choice-grid"><a class="language-choice" href="./?ui_lang=en" lang="en" dir="ltr" data-locale-choice="en" data-locale-surface="index" data-locale-status="released"><span class="language-choice-name">English</span></a><a class="language-choice" href="./de.html?ui_lang=de" lang="de" dir="ltr" data-locale-choice="de" data-locale-surface="index" data-locale-status="released"><span class="language-choice-name">Deutsch</span></a><a class="language-choice" href="./es.html?ui_lang=es" lang="es" dir="ltr" data-locale-choice="es" data-locale-surface="index" data-locale-status="released"><span class="language-choice-name">Español</span></a><a class="language-choice" href="./fr.html?ui_lang=fr" lang="fr" dir="ltr" data-locale-choice="fr" data-locale-surface="index" data-locale-status="released"><span class="language-choice-name">Français</span></a><a class="language-choice" href="./pt-BR.html?ui_lang=pt-BR" lang="pt-BR" dir="ltr" data-locale-choice="pt-BR" data-locale-surface="index" data-locale-status="released"><span class="language-choice-name">Português (Brasil)</span></a><a class="language-choice" href="./ar.html?ui_lang=ar" lang="ar" dir="rtl" data-locale-choice="ar" data-locale-surface="index" data-locale-status="released"><span class="language-choice-name">العربية</span></a><a class="language-choice" href="./zh-Hans.html?ui_lang=zh-Hans" lang="zh-Hans" dir="ltr" data-locale-choice="zh-Hans" data-locale-surface="index" data-locale-status="released"><span class="language-choice-name">简体中文</span></a><a class="language-choice" href="./hi.html?ui_lang=hi" lang="hi" dir="ltr" data-locale-choice="hi" data-locale-surface="index" data-locale-status="released" aria-current="page"><span class="language-choice-name">हिन्दी</span></a></div></nav><p class="language-effective visually-hidden" data-locale-effective aria-live="polite">वर्तमान भाषा: हिन्दी</p></section>
+        <section class="settings-section">
+          <h3>अंतर्क्रिया</h3>
+          <p>कम गति के लिए सिस्टम सेटिंग का स्वचालित रूप से सम्मान किया जाता है।</p>
+        </section>
+        <section class="settings-section">
+          <h3>डेटा और विधि</h3>
+          <ul>
+            <li><a href="./propose.hi.html">एक कॉमन्स का सुझाव दें</a></li>
+            <li><a href="./catalog/catalog.json" type="application/json">सार्वजनिक कैटलॉग मैनिफ़ेस्ट</a></li>
+            <li><a href="./contracts/commonworld/project.schema.json" type="application/schema+json">CommonProject स्कीमा</a></li>
+            <li><a href="./method.hi.html">विधि, कवरेज और गोपनीयता</a></li>
+            <li><a href="./contracts/commonworld/current-state.contract.json" type="application/json">वर्तमान परिचालन स्थिति</a></li>
+            <li><a href="./LICENSE">कोड लाइसेंस</a> · <a href="./LICENSE-DATA.md">डेटा लाइसेंस</a></li>
+          </ul>
+          <p>स्थिर, केवल पढ़ने योग्य JSON सतह। सुझाव प्रपत्र Commonworld पर कुछ भी संग्रहीत नहीं करता है और केवल एक सार्वजनिक GitHub उम्मीदवार या स्थानीय JSON डाउनलोड तैयार करता है। कोई API रनटाइम नहीं, कोई लेखन पथ नहीं और कोई स्टैंडअलोन CLI नहीं।</p>
+          <p class="legal-note">© 2026 Commonworld contributors. कोड AGPL-3.0-only के अंतर्गत बिना वारंटी के प्रदान किया जाता है। <a href="https://github.com/heimgewebe/commonworld" rel="external noreferrer">स्रोत कोड</a> · <a href="./LICENSE">लाइसेंस पाठ</a></p>
+        </section>
+      </aside>
+
+      <section id="project-focus" class="project-focus" tabindex="-1" aria-labelledby="focus-title" hidden>
+        <div class="panel-heading"><div><p id="focus-presence" class="kicker"></p><h2 id="focus-title"></h2></div><button id="focus-close" class="icon-button" type="button" aria-label="फोकस बंद करें">×</button></div>
+        <p id="focus-summary" class="focus-summary"></p>
+        <p id="focus-selection-status" class="focus-selection-status" role="status" hidden></p>
+        <div id="focus-catalog-detail-integrity" class="catalog-detail-integrity" hidden>
+          <p id="focus-catalog-detail-status" role="status" aria-live="polite" aria-atomic="true"></p>
+          <button id="focus-catalog-detail-retry" class="quiet-button catalog-detail-retry" type="button" hidden>पुनः सत्यापित करें</button>
+        </div>
+        <div class="focus-grid">
+          <section><h3>विषय</h3><ul id="focus-themes"></ul></section>
+          <section><h3>संलग्न होने के तरीके</h3><ul id="focus-actions"></ul></section>
+          <section><h3>स्थान</h3><ul id="focus-locations"></ul></section>
+          <section><h3>डिजिटल उपस्थिति</h3><p id="focus-digital"></p></section>
+          <section><h3>रिश्ते</h3><ul id="focus-relations"></ul></section>
+          <section><h3>आधिकारिक लिंक</h3><ul id="focus-links"></ul></section>
+          <section><h3>सूत्र</h3><ul id="focus-sources"></ul></section>
+          <section><h3>क्यूरेशन</h3><p id="focus-curation"></p></section>
+        </div>
+      </section>
+
+      <section id="static-catalog-fallback" class="static-catalog-fallback" tabindex="-1" aria-labelledby="static-catalog-fallback-title" data-static-catalog-fallback>
+        <p class="kicker">पाठ दृश्य</p>
+        <h1 id="static-catalog-fallback-title">Commonworld कैटलॉग</h1>
+        <p>इंटरैक्टिव दृश्य लोड होने या अनुपलब्ध होने पर संपूर्ण रैखिक कैटलॉग यहां उपलब्ध रहता है।</p>
+
+        <div class="catalog-grid">
+          <article class="catalog-card" id="project-acofop-peten-community-forests" data-commonproject-id="acofop-peten-community-forests">
+            <p class="catalog-kind">साइट पर</p>
+            <h2 lang="en" dir="ltr">ACOFOP – Community Forests of Petén</h2>
+            <p lang="hi" dir="auto">पेटेन में किसान और स्वदेशी संगठनों द्वारा चलाया जाने वाला एक नेटवर्क जो लोकतांत्रिक प्रतिनिधित्व, क्षेत्रीय सुरक्षा, अग्नि नियंत्रण, बहाली और टिकाऊ वन उपयोग के माध्यम से माया बायोस्फीयर रिजर्व में सामुदायिक वन रियायतों को जोड़ता है।</p>
+            <p class="catalog-location">1 सार्वजनिक स्थान</p>
+            <div class="catalog-actions">
+              <a class="catalog-action-link" data-action-type="learn" href="https://acofop.org/quienes-somos/" rel="external noreferrer">जानें <span aria-hidden="true">↗</span></a>
+              <a href="https://acofop.org/" rel="external noreferrer">आधिकारिक वेबसाइट <span aria-hidden="true">↗</span></a>
+              <a href="./catalog/projects/acofop-peten-community-forests.json" type="application/json">JSON</a>
+            </div>
+          </article>
+          <article class="catalog-card" id="project-aflaj-irrigation-systems-oman" data-commonproject-id="aflaj-irrigation-systems-oman">
+            <p class="catalog-kind">साइट पर · डिजिटल · आपूर्ति, भूमि और पारिस्थितिकी › जल एवं सिंचाई</p>
+            <h2 lang="en" dir="ltr">Aflaj Irrigation Systems of Oman</h2>
+            <p lang="hi" dir="auto">ओमान में जीवित समुदाय-प्रबंधित सिंचाई प्रणालियाँ जो समय-शेयरों द्वारा पानी आवंटित करती हैं और साझा रखरखाव, नियमों और स्थानीय वित्तपोषण के माध्यम से कायम रहती हैं।</p>
+            <p class="catalog-location">1 सार्वजनिक स्थान</p>
+            <div class="catalog-actions">
+              <a class="catalog-action-link" data-action-type="learn" href="https://whc.unesco.org/en/list/1207/" rel="external noreferrer">जानें <span aria-hidden="true">↗</span></a>
+              <a href="https://whc.unesco.org/en/list/1207/" rel="external noreferrer">आधिकारिक वेबसाइट <span aria-hidden="true">↗</span></a>
+              <a href="./catalog/projects/aflaj-irrigation-systems-oman.json" type="application/json">JSON</a>
+            </div>
+          </article>
+          <article class="catalog-card" id="project-akiba-mashinani-trust" data-commonproject-id="akiba-mashinani-trust">
+            <p class="catalog-kind">साइट पर</p>
+            <h2 dir="auto">Akiba Mashinani Trust</h2>
+            <p lang="hi" dir="auto">केन्या की बस्ती-समुदायों द्वारा संचालित एक वित्तीय साधन, जो बचत समूहों, ऋणों और आवास, स्वच्छता तथा बुनियादी ढाँचे के लिए समुदाय-संगठित परियोजनाओं का समर्थन करता है।</p>
+            <p class="catalog-location">1 सार्वजनिक स्थान</p>
+            <div class="catalog-actions">
+              <a class="catalog-action-link" data-action-type="learn" href="https://www.muungano.net/akibamashinanitrust" rel="external noreferrer">जानें <span aria-hidden="true">↗</span></a>
+              <a href="https://www.muungano.net/akibamashinanitrust" rel="external noreferrer">आधिकारिक वेबसाइट <span aria-hidden="true">↗</span></a>
+              <a href="./catalog/projects/akiba-mashinani-trust.json" type="application/json">JSON</a>
+            </div>
+          </article>
+          <article class="catalog-card" id="project-arvari-river-parliament" data-commonproject-id="arvari-river-parliament">
+            <p class="catalog-kind">साइट पर</p>
+            <h2 dir="auto">Arvari River Parliament</h2>
+            <p lang="hi" dir="auto">नदी को बहाल करने और उपयोग करने के लिए साझा नियम, जिम्मेदारी और संघर्ष समाधान को व्यवस्थित करने के लिए अरवरी नदी जलग्रहण क्षेत्र में ग्राम समुदायों द्वारा गठित एक जल संस्थान।</p>
+            <p class="catalog-location">1 सार्वजनिक स्थान · 1 छिपा हुआ स्थान</p>
+            <p class="catalog-activity-notice">वर्तमान परिचालन स्थिति को हाल ही में सत्यापित नहीं किया गया है। सूत्रों की समीक्षा की गई 2026-07-30; प्राथमिकता पुनः समीक्षा 2026-08-30.</p>
+            <div class="catalog-actions">
+              <a class="catalog-action-link" data-action-type="learn" href="https://tarunbharatsangh.in/rivers-rejuvenated/" rel="external noreferrer">जानें <span aria-hidden="true">↗</span></a>
+              <a class="catalog-action-link" data-action-type="contact" href="https://tarunbharatsangh.in/contact/" rel="external noreferrer">संपर्क करें <span aria-hidden="true">↗</span></a>
+              <a href="https://tarunbharatsangh.in/rivers-rejuvenated/" rel="external noreferrer">आधिकारिक वेबसाइट <span aria-hidden="true">↗</span></a>
+              <a href="./catalog/projects/arvari-river-parliament.json" type="application/json">JSON</a>
+            </div>
+          </article>
+          <article class="catalog-card" id="project-auroville" data-commonproject-id="auroville">
+            <p class="catalog-kind">साइट पर</p>
+            <h2 dir="auto">Auroville</h2>
+            <p lang="hi" dir="auto">तमिलनाडु में एक अंतरराष्ट्रीय टाउनशिप जो 1968 से सामुदायिक जीवन, पारिस्थितिक अभ्यास और वैकल्पिक सामाजिक संगठन का प्रयोग कर रही है; भूमि और संपत्तियाँ निवासियों के व्यक्तिगत स्वामित्व के बजाय कानूनी रूप से ऑरोविले फाउंडेशन के माध्यम से रखी गई हैं।</p>
+            <p class="catalog-location">1 सार्वजनिक स्थान</p>
+            <div class="catalog-actions">
+              <a class="catalog-action-link" data-action-type="visit" href="https://auroville.org/page/visiting-auroville" rel="external noreferrer">जाएँ <span aria-hidden="true">↗</span></a>
+              <a class="catalog-action-link" data-action-type="learn" href="https://auroville.org/page/legal-structure" rel="external noreferrer">जानें <span aria-hidden="true">↗</span></a>
+              <a class="catalog-action-link" data-action-type="contact" href="https://auroville.org/contact" rel="external noreferrer">संपर्क करें <span aria-hidden="true">↗</span></a>
+              <a href="https://auroville.org/" rel="external noreferrer">आधिकारिक वेबसाइट <span aria-hidden="true">↗</span></a>
+              <a href="./catalog/projects/auroville.json" type="application/json">JSON</a>
+            </div>
+          </article>
+          <article class="catalog-card" id="project-b4rn" data-commonproject-id="b4rn">
+            <p class="catalog-kind">डिजिटल · संचार और नेटवर्क › सामुदायिक नेटवर्क</p>
+            <h2 dir="auto">B4RN (Broadband for the Rural North)</h2>
+            <p lang="hi" dir="auto">सदस्यों के स्वामित्व वाली एक कम्युनिटी बेनिफिट सोसाइटी, जो उत्तरी इंग्लैंड के ग्रामीण समुदायों के साथ मिलकर पूर्ण-फाइबर ब्रॉडबैंड की योजना, वित्तपोषण, निर्माण और संचालन करती है; स्वयंसेवक, भूमि-मालिक और सामुदायिक निवेशक अवसंरचना में योगदान देते हैं।</p>
+            <p class="catalog-location">1 छिपा हुआ स्थान</p>
+            <div class="catalog-actions">
+              <a class="catalog-action-link" data-action-type="use" href="https://b4rn.org.uk/" rel="external noreferrer">उपयोग करें <span aria-hidden="true">↗</span></a>
+              <a class="catalog-action-link" data-action-type="learn" href="https://b4rn.org.uk/about-b4rn" rel="external noreferrer">जानें <span aria-hidden="true">↗</span></a>
+              <a class="catalog-action-link" data-action-type="contribute" href="https://b4rn.org.uk/working-with-us" rel="external noreferrer">योगदान करें <span aria-hidden="true">↗</span></a>
+              <a class="catalog-action-link" data-action-type="volunteer" href="https://b4rn.org.uk/working-with-us/volunteer" rel="external noreferrer">स्वयंसेवा करें <span aria-hidden="true">↗</span></a>
+              <a href="https://b4rn.org.uk/" rel="external noreferrer">आधिकारिक वेबसाइट <span aria-hidden="true">↗</span></a>
+              <a href="./catalog/projects/b4rn.json" type="application/json">JSON</a>
+            </div>
+          </article>
+          <article class="catalog-card" id="project-bali-subak-system" data-commonproject-id="bali-subak-system">
+            <p class="catalog-kind">साइट पर</p>
+            <h2 lang="en" dir="ltr">Subak System in Bali</h2>
+            <p lang="hi" dir="auto">स्थानीय सिंचाई समुदायों द्वारा संचालित एक प्रणाली जो मंदिरों, नहरों और चावल के खेतों के माध्यम से पानी वितरित करती है और सामूहिक रूप से बाली के कृषि परिदृश्य को बनाए रखती है।</p>
+            <p class="catalog-location">1 सार्वजनिक स्थान</p>
+            <div class="catalog-actions">
+              <a class="catalog-action-link" data-action-type="learn" href="https://whc.unesco.org/en/list/1194" rel="external noreferrer">जानें <span aria-hidden="true">↗</span></a>
+              <a href="https://whc.unesco.org/en/list/1194" rel="external noreferrer">आधिकारिक वेबसाइट <span aria-hidden="true">↗</span></a>
+              <a href="./catalog/projects/bali-subak-system.json" type="application/json">JSON</a>
+            </div>
+          </article>
+          <article class="catalog-card" id="project-banco-palmas" data-commonproject-id="banco-palmas">
+            <p class="catalog-kind">साइट पर</p>
+            <h2 dir="auto">Banco Palmas</h2>
+            <p lang="hi" dir="auto">कॉन्जुंटो पाल्मेरास, फोर्टालेज़ा में एक समुदाय-स्वामित्व वाला विकास बैंक, जो एकजुटता वित्त, स्थानीय उत्पादन और उपभोग और एक समुदाय-प्रबंधित सामाजिक मुद्रा को जोड़ता है।</p>
+            <p class="catalog-location">1 सार्वजनिक स्थान</p>
+            <div class="catalog-actions">
+              <a class="catalog-action-link" data-action-type="learn" href="https://bancopalmas.com/o-que-e/" rel="external noreferrer">जानें <span aria-hidden="true">↗</span></a>
+              <a href="https://bancopalmas.com/" rel="external noreferrer">आधिकारिक वेबसाइट <span aria-hidden="true">↗</span></a>
+              <a href="./catalog/projects/banco-palmas.json" type="application/json">JSON</a>
+            </div>
+          </article>
+          <article class="catalog-card" id="project-bangladesh-palli-bidyut-samities" data-commonproject-id="bangladesh-palli-bidyut-samities">
+            <p class="catalog-kind">डिजिटल · आपूर्ति, भूमि और पारिस्थितिकी › ऊर्जा सहकारी समितियाँ</p>
+            <h2 dir="auto">Bangladesh Palli Bidyut Samities</h2>
+            <p lang="hi" dir="auto">बांग्लादेश में 80 ग्रामीण बिजली सहकारी समितियों का एक संघ जिसके उपभोक्ता-सदस्य बोर्ड का चुनाव करते हैं और बाध्यकारी ग्रामीण विद्युतीकरण बोर्ड ढांचे के भीतर स्थानीय वितरण बुनियादी ढांचे का संचालन करते हैं।</p>
+            <p class="catalog-location">1 छिपा हुआ स्थान</p>
+            <div class="catalog-actions">
+              <a class="catalog-action-link" data-action-type="learn" href="https://reb.gov.bd/site/page/62acea25-71aa-4663-b56e-18f4817f6774/nolink/" rel="external noreferrer">जानें <span aria-hidden="true">↗</span></a>
+              <a href="https://reb.gov.bd/" rel="external noreferrer">आधिकारिक वेबसाइट <span aria-hidden="true">↗</span></a>
+              <a href="./catalog/projects/bangladesh-palli-bidyut-samities.json" type="application/json">JSON</a>
+            </div>
+          </article>
+          <article class="catalog-card" id="project-berkshares" data-commonproject-id="berkshares">
+            <p class="catalog-kind">कॉमन्स</p>
+            <h2 dir="auto">BerkShares</h2>
+            <p lang="hi" dir="auto">मैसाचुसेट्स के बर्कशायर क्षेत्र की एक स्थानीय मुद्रा, जिसे समुदाय-केंद्रित गैर-लाभकारी संस्थाएँ समर्थन देती हैं और जिसकी सदस्यता बोर्ड का चुनाव करती तथा प्रमुख बदलावों पर मतदान करती है; यह मुद्रा स्थानीय अर्थव्यवस्था में धन के प्रवाह को मजबूत करती है।</p>
+            <p class="catalog-location">1 छिपा हुआ स्थान</p>
+            <div class="catalog-actions">
+              <a class="catalog-action-link" data-action-type="use" href="https://berkshares.org/using-berkshares/" rel="external noreferrer">उपयोग करें <span aria-hidden="true">↗</span></a>
+              <a class="catalog-action-link" data-action-type="learn" href="https://berkshares.org/about/" rel="external noreferrer">जानें <span aria-hidden="true">↗</span></a>
+              <a class="catalog-action-link" data-action-type="contribute" href="https://berkshares.org/donate/" rel="external noreferrer">योगदान करें <span aria-hidden="true">↗</span></a>
+              <a href="https://berkshares.org/" rel="external noreferrer">आधिकारिक वेबसाइट <span aria-hidden="true">↗</span></a>
+              <a href="./catalog/projects/berkshares.json" type="application/json">JSON</a>
+            </div>
+          </article>
+          <article class="catalog-card" id="project-bioleft" data-commonproject-id="bioleft">
+            <p class="catalog-kind">डिजिटल · आपूर्ति, भूमि और पारिस्थितिकी › बीज, खाद्य और कृषि</p>
+            <h2 dir="auto">Bioleft</h2>
+            <p lang="hi" dir="auto">अर्जेंटीना में एक सामुदायिक पहल जो उत्पादकों, शोधकर्ताओं और अन्य प्रतिभागियों के बीच खुले समझौतों के माध्यम से बीज, कृषि संबंधी ज्ञान और सहभागी पौधा प्रजनन साझा करती है।</p>
+            <p class="catalog-location">1 छिपा हुआ स्थान</p>
+            <div class="catalog-actions">
+              <a class="catalog-action-link" data-action-type="learn" href="https://www.bioleft.org/es/acerca-de-bioleft/" rel="external noreferrer">जानें <span aria-hidden="true">↗</span></a>
+              <a class="catalog-action-link" data-action-type="contribute" href="https://www.bioleft.org/es/plataforma/" rel="external noreferrer">योगदान करें <span aria-hidden="true">↗</span></a>
+              <a href="https://www.bioleft.org/es/" rel="external noreferrer">आधिकारिक वेबसाइट <span aria-hidden="true">↗</span></a>
+              <a href="./catalog/projects/bioleft.json" type="application/json">JSON</a>
+            </div>
+          </article>
+          <article class="catalog-card" id="project-bologna-urban-commons" data-commonproject-id="bologna-urban-commons">
+            <p class="catalog-kind">डिजिटल · सहयोग और स्व-संगठन › सामुदायिक शासन और सहकारिता</p>
+            <h2 lang="en" dir="ltr">Bologna Urban Commons</h2>
+            <p lang="hi" dir="auto">शहर-व्यापी साझा-प्रशासन व्यवस्था, जिसमें नागरिक समूह और बोलोग्ना नगर पालिका सामान्य हित की गतिविधियों के लिए भौतिक, अभौतिक और डिजिटल कॉमन्स की देखभाल, पुनर्जीवन और उपयोग हेतु सहयोग समझौतों का इस्तेमाल करते हैं।</p>
+            <p class="catalog-location">1 छिपा हुआ स्थान</p>
+            <div class="catalog-actions">
+              <a class="catalog-action-link" data-action-type="use" href="https://opendata.comune.bologna.it/explore/dataset/patti-di-collaborazione/" rel="external noreferrer">उपयोग करें <span aria-hidden="true">↗</span></a>
+              <a class="catalog-action-link" data-action-type="learn" href="https://www.comune.bologna.it/novita/comunicati-stampa/consiglio-comunale-approvate-modifiche-allo-statuto-e-il-nuovo-regolamento-sulle-forme-di" rel="external noreferrer">जानें <span aria-hidden="true">↗</span></a>
+              <a href="https://opendata.comune.bologna.it/explore/dataset/patti-di-collaborazione/" rel="external noreferrer">आधिकारिक वेबसाइट <span aria-hidden="true">↗</span></a>
+              <a href="./catalog/projects/bologna-urban-commons.json" type="application/json">JSON</a>
+            </div>
+          </article>
+          <article class="catalog-card" id="project-bosco-uganda" data-commonproject-id="bosco-uganda">
+            <p class="catalog-kind">साइट पर · डिजिटल · संचार और नेटवर्क › सामुदायिक नेटवर्क</p>
+            <h2 dir="auto">BOSCO Uganda</h2>
+            <p lang="hi" dir="auto">उत्तरी युगांडा में एक गैर-लाभकारी सामुदायिक नेटवर्क जो ग्रामीण इंटरनेट पहुंच, सामुदायिक आईसीटी केंद्रों, डिजिटल शिक्षा और सौर ऊर्जा संचालित बुनियादी ढांचे को जोड़ता है।</p>
+            <p class="catalog-location">1 सार्वजनिक स्थान · 1 छिपा हुआ स्थान</p>
+            <div class="catalog-actions">
+              <a class="catalog-action-link" data-action-type="use" href="https://www.boscouganda.com/connectivity/" rel="external noreferrer">उपयोग करें <span aria-hidden="true">↗</span></a>
+              <a class="catalog-action-link" data-action-type="learn" href="https://www.boscouganda.com/about-us-2/" rel="external noreferrer">जानें <span aria-hidden="true">↗</span></a>
+              <a class="catalog-action-link" data-action-type="donate" href="https://secure.givelively.org/donate/bosco-inc/uganda-2025-operating-campaign" rel="external noreferrer">दान करें <span aria-hidden="true">↗</span></a>
+              <a class="catalog-action-link" data-action-type="contact" href="https://www.boscouganda.com/contact/" rel="external noreferrer">संपर्क करें <span aria-hidden="true">↗</span></a>
+              <a href="https://www.boscouganda.com/" rel="external noreferrer">आधिकारिक वेबसाइट <span aria-hidden="true">↗</span></a>
+              <a href="./catalog/projects/bosco-uganda.json" type="application/json">JSON</a>
+            </div>
+          </article>
+          <article class="catalog-card" id="project-brisbane-tool-library" data-commonproject-id="brisbane-tool-library">
+            <p class="catalog-kind">साइट पर · डिजिटल · सॉफ्टवेयर, उपकरण और उत्पादन › प्लेटफ़ॉर्म और साझा उपकरण</p>
+            <h2 dir="auto">Brisbane Tool Library</h2>
+            <p lang="hi" dir="auto">ब्रिस्बेन में चीजों की एक पूरी तरह से स्वयंसेवी-संचालित लाइब्रेरी जो उपकरण और रोजमर्रा के उपकरण उधार देती है और मरम्मत, पुन: उपयोग और व्यावहारिक कौशल को बढ़ावा देती है।</p>
+            <p class="catalog-location">1 सार्वजनिक स्थान</p>
+            <div class="catalog-actions">
+              <a class="catalog-action-link" data-action-type="visit" href="https://www.brisbanetoollibrary.org/find-us/location-and-contact" rel="external noreferrer">जाएँ <span aria-hidden="true">↗</span></a>
+              <a class="catalog-action-link" data-action-type="borrow" href="https://www.brisbanetoollibrary.org/memberships" rel="external noreferrer">उधार लें <span aria-hidden="true">↗</span></a>
+              <a class="catalog-action-link" data-action-type="learn" href="https://www.brisbanetoollibrary.org/about-us/who-we-are" rel="external noreferrer">जानें <span aria-hidden="true">↗</span></a>
+              <a class="catalog-action-link" data-action-type="volunteer" href="https://www.brisbanetoollibrary.org/get-involved/volunteering" rel="external noreferrer">स्वयंसेवा करें <span aria-hidden="true">↗</span></a>
+              <a class="catalog-action-link" data-action-type="donate" href="https://www.brisbanetoollibrary.org/get-involved/donate" rel="external noreferrer">दान करें <span aria-hidden="true">↗</span></a>
+              <a class="catalog-action-link" data-action-type="contact" href="https://www.brisbanetoollibrary.org/find-us/location-and-contact" rel="external noreferrer">संपर्क करें <span aria-hidden="true">↗</span></a>
+              <a href="https://www.brisbanetoollibrary.org/" rel="external noreferrer">आधिकारिक वेबसाइट <span aria-hidden="true">↗</span></a>
+              <a href="./catalog/projects/brisbane-tool-library.json" type="application/json">JSON</a>
+            </div>
+          </article>
+          <article class="catalog-card" id="project-cano-martin-pena-clt" data-commonproject-id="cano-martin-pena-clt">
+            <p class="catalog-kind">साइट पर</p>
+            <h2 dir="auto">Caño Martín Peña Community Land Trust</h2>
+            <p lang="hi" dir="auto">सैन जुआन में आठ समुदायों द्वारा संचालित एक सामुदायिक भूमि ट्रस्ट, जो सामूहिक रूप से सार्वजनिक भूमि रखता है, जबकि निवासी अपने घरों के मालिक होते हैं और विस्थापन से दीर्घकालिक सुरक्षा प्राप्त करते हैं।</p>
+            <p class="catalog-location">1 सार्वजनिक स्थान</p>
+            <p class="catalog-activity-notice">वर्तमान परिचालन स्थिति को हाल ही में सत्यापित नहीं किया गया है। सूत्रों की समीक्षा की गई 2026-07-19; प्राथमिकता पुनः समीक्षा 2026-08-19.</p>
+            <div class="catalog-actions">
+              <a class="catalog-action-link" data-action-type="learn" href="https://cano3punto7.org/index-english.html" rel="external noreferrer">जानें <span aria-hidden="true">↗</span></a>
+              <a href="https://cano3punto7.org/index-english.html" rel="external noreferrer">आधिकारिक वेबसाइट <span aria-hidden="true">↗</span></a>
+              <a href="./catalog/projects/cano-martin-pena-clt.json" type="application/json">JSON</a>
+            </div>
+          </article>
+          <article class="catalog-card" id="project-cecosesola" data-commonproject-id="cecosesola">
+            <p class="catalog-kind">कॉमन्स</p>
+            <h2 dir="auto">Cecosesola</h2>
+            <p lang="hi" dir="auto">50 से अधिक गैर-लाभकारी सामुदायिक संगठनों का एक वेनेजुएला नेटवर्क, जो खाद्य आपूर्ति, स्वास्थ्य देखभाल, अंतिम संस्कार सेवाओं, वित्त और उत्पादन को आदेश की श्रृंखला के बिना, घूर्णन कार्यों और सर्वसम्मति-उन्मुख स्व-प्रबंधन के माध्यम से जोड़ता है।</p>
+            <p class="catalog-location">1 छिपा हुआ स्थान</p>
+            <div class="catalog-actions">
+              <a class="catalog-action-link" data-action-type="learn" href="https://cecosesola.org/organizandonos-sin-lineas-de-mando/" rel="external noreferrer">जानें <span aria-hidden="true">↗</span></a>
+              <a class="catalog-action-link" data-action-type="contact" href="https://cecosesola.org/" rel="external noreferrer">संपर्क करें <span aria-hidden="true">↗</span></a>
+              <a href="https://cecosesola.org/" rel="external noreferrer">आधिकारिक वेबसाइट <span aria-hidden="true">↗</span></a>
+              <a href="./catalog/projects/cecosesola.json" type="application/json">JSON</a>
+            </div>
+          </article>
+          <article class="catalog-card" id="project-cltb-le-nid" data-commonproject-id="cltb-le-nid">
+            <p class="catalog-kind">साइट पर</p>
+            <h2 dir="auto">Le Nid</h2>
+            <p lang="hi" dir="auto">सामुदायिक भूमि ट्रस्ट ब्रुसेल्स द्वारा सात घरों, एक साझा कमरे और एंडरलेच में एक अर्ध-सार्वजनिक उद्यान के साथ एक आवास परियोजना।</p>
+            <p class="catalog-location">2 सार्वजनिक स्थान</p>
+            <div class="catalog-actions">
+              <a class="catalog-action-link" data-action-type="visit" href="https://www.openstreetmap.org/node/13966522352" rel="external noreferrer">जाएँ <span aria-hidden="true">↗</span></a>
+              <a class="catalog-action-link" data-action-type="learn" href="https://cltb.be/en/projet/verheyden-le-nid-2/" rel="external noreferrer">जानें <span aria-hidden="true">↗</span></a>
+              <a class="catalog-action-link" data-action-type="contact" href="https://cltb.be/contact/" rel="external noreferrer">संपर्क करें <span aria-hidden="true">↗</span></a>
+              <a href="https://cltb.be/en/projet/verheyden-le-nid-2/" rel="external noreferrer">आधिकारिक वेबसाइट <span aria-hidden="true">↗</span></a>
+              <a href="./catalog/projects/cltb-le-nid.json" type="application/json">JSON</a>
+            </div>
+          </article>
+          <article class="catalog-card" id="project-common-voice" data-commonproject-id="common-voice">
+            <p class="catalog-kind">डिजिटल · सॉफ्टवेयर, उपकरण और उत्पादन › डेटा और सॉफ़्टवेयर सेतु</p>
+            <h2 lang="en" dir="ltr">Common Voice</h2>
+            <p lang="hi" dir="auto">एक खुला बहुभाषी भाषण डेटासेट जिसमें भाषा समुदाय भाषण प्रौद्योगिकी के लिए स्वतंत्र रूप से उपलब्ध डेटा बनाने के लिए रिकॉर्डिंग, वाक्य और सत्यापन का योगदान करते हैं।</p>
+            <p class="catalog-location">स्थान-स्वतंत्र डिजिटल उपस्थिति</p>
+            <div class="catalog-actions">
+              <a class="catalog-action-link" data-action-type="use" href="https://commonvoice.mozilla.org/en/datasets" rel="external noreferrer">उपयोग करें <span aria-hidden="true">↗</span></a>
+              <a class="catalog-action-link" data-action-type="learn" href="https://github.com/common-voice/community-playbook" rel="external noreferrer">जानें <span aria-hidden="true">↗</span></a>
+              <a class="catalog-action-link" data-action-type="contribute" href="https://commonvoice.mozilla.org/" rel="external noreferrer">योगदान करें <span aria-hidden="true">↗</span></a>
+              <a class="catalog-action-link" data-action-type="replicate" href="https://github.com/common-voice/common-voice" rel="external noreferrer">प्रतिरूप बनाएँ <span aria-hidden="true">↗</span></a>
+              <a href="https://commonvoice.mozilla.org/" rel="external noreferrer">आधिकारिक वेबसाइट <span aria-hidden="true">↗</span></a>
+              <a href="./catalog/projects/common-voice.json" type="application/json">JSON</a>
+            </div>
+          </article>
+          <article class="catalog-card" id="project-community-baboon-sanctuary" data-commonproject-id="community-baboon-sanctuary">
+            <p class="catalog-kind">साइट पर</p>
+            <h2 dir="auto">Community Baboon Sanctuary</h2>
+            <p lang="hi" dir="auto">बेलीज़ में एक सार्वजनिक रूप से पंजीकृत संरक्षित क्षेत्र जिसका शासन स्थानीय समुदायों के रूप में दर्ज किया जाता है और जिसके प्रबंधन की ज़िम्मेदारी स्थानीय समितियों के पास होती है।</p>
+            <p class="catalog-location">1 सार्वजनिक स्थान</p>
+            <div class="catalog-actions">
+              <a class="catalog-action-link" data-action-type="learn" href="https://www.protectedplanet.net/19553" rel="external noreferrer">जानें <span aria-hidden="true">↗</span></a>
+              <a href="https://www.protectedplanet.net/19553" rel="external noreferrer">आधिकारिक वेबसाइट <span aria-hidden="true">↗</span></a>
+              <a href="./catalog/projects/community-baboon-sanctuary.json" type="application/json">JSON</a>
+            </div>
+          </article>
+          <article class="catalog-card" id="project-community-energy-network-new-zealand" data-commonproject-id="community-energy-network-new-zealand">
+            <p class="catalog-kind">डिजिटल · आपूर्ति, भूमि और पारिस्थितिकी › ऊर्जा सहकारी समितियाँ</p>
+            <h2 dir="auto">Community Energy Network New Zealand</h2>
+            <p lang="hi" dir="auto">स्थानीय नागरिकों के नेतृत्व वाली ऊर्जा पहलों का एक न्यूजीलैंड नेटवर्क जो नवीकरणीय-ऊर्जा और दक्षता परियोजनाओं के ज्ञान, सहयोग और सामुदायिक नियंत्रण को जोड़ता है।</p>
+            <p class="catalog-location">2 छुपे हुए स्थान</p>
+            <div class="catalog-actions">
+              <a class="catalog-action-link" data-action-type="learn" href="https://www.communityenergy.org.nz/about-us/" rel="external noreferrer">जानें <span aria-hidden="true">↗</span></a>
+              <a class="catalog-action-link" data-action-type="contribute" href="https://www.communityenergy.org.nz/about-us/join-us/" rel="external noreferrer">योगदान करें <span aria-hidden="true">↗</span></a>
+              <a class="catalog-action-link" data-action-type="contact" href="https://www.communityenergy.org.nz/" rel="external noreferrer">संपर्क करें <span aria-hidden="true">↗</span></a>
+              <a href="https://www.communityenergy.org.nz/" rel="external noreferrer">आधिकारिक वेबसाइट <span aria-hidden="true">↗</span></a>
+              <a href="./catalog/projects/community-energy-network-new-zealand.json" type="application/json">JSON</a>
+            </div>
+          </article>
+          <article class="catalog-card" id="project-cooperation-jackson" data-commonproject-id="cooperation-jackson">
+            <p class="catalog-kind">कॉमन्स</p>
+            <h2 lang="en" dir="ltr">Cooperation Jackson</h2>
+            <p lang="hi" dir="auto">जैक्सन, मिसिसिपी में एक एकजुटता-अर्थव्यवस्था नेटवर्क, श्रमिक सहकारी समितियों, लोकतांत्रिक रूप से स्व-प्रबंधित उद्यमों, समुदाय-धारित भूमि, किफायती आवास और स्थानीय उत्पादन बुनियादी ढांचे को एक साथ विकसित करना।</p>
+            <p class="catalog-location">1 छिपा हुआ स्थान</p>
+            <div class="catalog-actions">
+              <a class="catalog-action-link" data-action-type="visit" href="https://cooperationjackson.org/contact-us" rel="external noreferrer">जाएँ <span aria-hidden="true">↗</span></a>
+              <a class="catalog-action-link" data-action-type="learn" href="https://cooperationjackson.org/intro" rel="external noreferrer">जानें <span aria-hidden="true">↗</span></a>
+              <a class="catalog-action-link" data-action-type="contribute" href="https://cooperationjackson.org/contact-us" rel="external noreferrer">योगदान करें <span aria-hidden="true">↗</span></a>
+              <a class="catalog-action-link" data-action-type="donate" href="https://cooperationjackson.org/donate" rel="external noreferrer">दान करें <span aria-hidden="true">↗</span></a>
+              <a class="catalog-action-link" data-action-type="contact" href="https://cooperationjackson.org/contact-us" rel="external noreferrer">संपर्क करें <span aria-hidden="true">↗</span></a>
+              <a href="https://cooperationjackson.org/" rel="external noreferrer">आधिकारिक वेबसाइट <span aria-hidden="true">↗</span></a>
+              <a href="./catalog/projects/cooperation-jackson.json" type="application/json">JSON</a>
+            </div>
+          </article>
+          <article class="catalog-card" id="project-cooperative-home-care-associates" data-commonproject-id="cooperative-home-care-associates">
+            <p class="catalog-kind">साइट पर</p>
+            <h2 dir="auto">Cooperative Home Care Associates</h2>
+            <p lang="hi" dir="auto">न्यूयॉर्क में एक कार्यकर्ता-स्वामित्व वाली देखभाल सहकारी समिति, जो घर की देखभाल को मुफ्त प्रशिक्षण, कार्यकर्ता की आवाज़ और देखभाल करने वालों के लिए आर्थिक हिस्सेदारी के साथ जोड़ती है।</p>
+            <p class="catalog-location">1 सार्वजनिक स्थान · 1 छिपा हुआ स्थान</p>
+            <div class="catalog-actions">
+              <a class="catalog-action-link" data-action-type="use" href="https://chcany.org/how-to-access-care/" rel="external noreferrer">उपयोग करें <span aria-hidden="true">↗</span></a>
+              <a class="catalog-action-link" data-action-type="learn" href="https://chcany.org/about/" rel="external noreferrer">जानें <span aria-hidden="true">↗</span></a>
+              <a class="catalog-action-link" data-action-type="contribute" href="https://chcany.org/careers/" rel="external noreferrer">योगदान करें <span aria-hidden="true">↗</span></a>
+              <a class="catalog-action-link" data-action-type="contact" href="https://chcany.org/contact-us" rel="external noreferrer">संपर्क करें <span aria-hidden="true">↗</span></a>
+              <a href="https://chcany.org/" rel="external noreferrer">आधिकारिक वेबसाइट <span aria-hidden="true">↗</span></a>
+              <a href="./catalog/projects/cooperative-home-care-associates.json" type="application/json">JSON</a>
+            </div>
+          </article>
+          <article class="catalog-card" id="project-debian" data-commonproject-id="debian">
+            <p class="catalog-kind">डिजिटल · सॉफ्टवेयर, उपकरण और उत्पादन › मुक्त सॉफ़्टवेयर और अवसंरचना</p>
+            <h2 dir="auto">Debian</h2>
+            <p lang="hi" dir="auto">ओपन पैकेज संग्रह, सार्वजनिक दस्तावेज़ीकरण और विश्वव्यापी भागीदारी के साथ एक निःशुल्क ऑपरेटिंग सिस्टम।</p>
+            <p class="catalog-location">स्थान-स्वतंत्र डिजिटल उपस्थिति</p>
+            <div class="catalog-actions">
+              <a class="catalog-action-link" data-action-type="use" href="https://www.debian.org/distrib/" rel="external noreferrer">उपयोग करें <span aria-hidden="true">↗</span></a>
+              <a class="catalog-action-link" data-action-type="learn" href="https://www.debian.org/doc/" rel="external noreferrer">जानें <span aria-hidden="true">↗</span></a>
+              <a class="catalog-action-link" data-action-type="contribute" href="https://www.debian.org/intro/help" rel="external noreferrer">योगदान करें <span aria-hidden="true">↗</span></a>
+              <a class="catalog-action-link" data-action-type="donate" href="https://www.debian.org/donations" rel="external noreferrer">दान करें <span aria-hidden="true">↗</span></a>
+              <a href="https://www.debian.org/" rel="external noreferrer">आधिकारिक वेबसाइट <span aria-hidden="true">↗</span></a>
+              <a href="./catalog/projects/debian.json" type="application/json">JSON</a>
+            </div>
+          </article>
+          <article class="catalog-card" id="project-deccan-development-society" data-commonproject-id="deccan-development-society">
+            <p class="catalog-kind">साइट पर · डिजिटल · आपूर्ति, भूमि और पारिस्थितिकी › बीज, खाद्य और कृषि</p>
+            <h2 dir="auto">Deccan Development Society Sanghams</h2>
+            <p lang="hi" dir="auto">तेलंगाना में दलित और स्वदेशी लघु धारक महिलाओं के ग्राम संघों का एक संघ जो सामूहिक रूप से बीज, शुष्क भूमि खेती, भोजन, बाजार, मीडिया और पारंपरिक ज्ञान का आयोजन करता है।</p>
+            <p class="catalog-location">1 सार्वजनिक स्थान</p>
+            <div class="catalog-actions">
+              <a class="catalog-action-link" data-action-type="learn" href="https://www.ddsindia.org/" rel="external noreferrer">जानें <span aria-hidden="true">↗</span></a>
+              <a class="catalog-action-link" data-action-type="use" href="https://www.ddsindia.org/video-channel/" rel="external noreferrer">उपयोग करें <span aria-hidden="true">↗</span></a>
+              <a href="https://www.ddsindia.org/" rel="external noreferrer">आधिकारिक वेबसाइट <span aria-hidden="true">↗</span></a>
+              <a href="./catalog/projects/deccan-development-society.json" type="application/json">JSON</a>
+            </div>
+          </article>
+          <article class="catalog-card" id="project-edinburgh-tool-library" data-commonproject-id="edinburgh-tool-library">
+            <p class="catalog-kind">साइट पर</p>
+            <h2 dir="auto">Edinburgh Tool Library</h2>
+            <p lang="hi" dir="auto">एक समुदाय-संचालित और बड़े पैमाने पर स्वयंसेवक-संचालित टूल लाइब्रेरी जो उपकरण उधार देती है, मरम्मत और व्यावहारिक कौशल सिखाती है, और स्थानीय सामुदायिक परियोजनाओं का समर्थन करती है।</p>
+            <p class="catalog-location">2 सार्वजनिक स्थान</p>
+            <div class="catalog-actions">
+              <a class="catalog-action-link" data-action-type="visit" href="https://edinburghtoollibrary.org.uk/about/find-us/" rel="external noreferrer">जाएँ <span aria-hidden="true">↗</span></a>
+              <a class="catalog-action-link" data-action-type="borrow" href="https://edinburghtoollibrary.org.uk/join/" rel="external noreferrer">उधार लें <span aria-hidden="true">↗</span></a>
+              <a class="catalog-action-link" data-action-type="learn" href="https://edinburghtoollibrary.org.uk/about/" rel="external noreferrer">जानें <span aria-hidden="true">↗</span></a>
+              <a class="catalog-action-link" data-action-type="volunteer" href="https://edinburghtoollibrary.org.uk/volunteer/" rel="external noreferrer">स्वयंसेवा करें <span aria-hidden="true">↗</span></a>
+              <a class="catalog-action-link" data-action-type="donate" href="https://edinburghtoollibrary.org.uk/" rel="external noreferrer">दान करें <span aria-hidden="true">↗</span></a>
+              <a class="catalog-action-link" data-action-type="contact" href="https://edinburghtoollibrary.org.uk/about/find-us/" rel="external noreferrer">संपर्क करें <span aria-hidden="true">↗</span></a>
+              <a href="https://edinburghtoollibrary.org.uk/" rel="external noreferrer">आधिकारिक वेबसाइट <span aria-hidden="true">↗</span></a>
+              <a href="./catalog/projects/edinburgh-tool-library.json" type="application/json">JSON</a>
+            </div>
+          </article>
+          <article class="catalog-card" id="project-ekuri-community-forest" data-commonproject-id="ekuri-community-forest">
+            <p class="catalog-kind">साइट पर</p>
+            <h2 dir="auto">Ekuri Community Forest</h2>
+            <p lang="hi" dir="auto">नाइजीरिया के क्रॉस रिवर स्टेट में पुराने और नए एकुरी समुदायों द्वारा सामूहिक रूप से स्वामित्व और प्रबंधन किया जाने वाला एक जंगल, जिसमें संरक्षण, टिकाऊ उपयोग और स्थानीय बुनियादी ढांचे को जोड़ने वाले नियम हैं।</p>
+            <p class="catalog-location">1 सार्वजनिक स्थान</p>
+            <p class="catalog-activity-notice">वर्तमान परिचालन स्थिति को हाल ही में सत्यापित नहीं किया गया है। सूत्रों की समीक्षा की गई 2026-07-19; प्राथमिकता पुनः समीक्षा 2026-08-19.</p>
+            <div class="catalog-actions">
+              <a class="catalog-action-link" data-action-type="learn" href="https://www.iccaregistry.org/en/explore/nigeria/ekuri-icca" rel="external noreferrer">जानें <span aria-hidden="true">↗</span></a>
+              <a href="https://www.iccaregistry.org/en/explore/nigeria/ekuri-icca" rel="external noreferrer">आधिकारिक वेबसाइट <span aria-hidden="true">↗</span></a>
+              <a href="./catalog/projects/ekuri-community-forest.json" type="application/json">JSON</a>
+            </div>
+          </article>
+          <article class="catalog-card" id="project-enspiral" data-commonproject-id="enspiral">
+            <p class="catalog-kind">डिजिटल · सहयोग और स्व-संगठन › सामुदायिक शासन और सहकारिता</p>
+            <h2 dir="auto">Enspiral</h2>
+            <p lang="hi" dir="auto">Aotearoa न्यूज़ीलैंड में शुरू हुआ एक सहयोगी नेटवर्क जो उद्यम के समुदाय-उन्मुख रूपों, साझा संसाधनों और विकेंद्रीकृत सहयोग के लिए खुले तौर पर प्रलेखित उपकरण विकसित करता है।</p>
+            <p class="catalog-location">स्थान-स्वतंत्र डिजिटल उपस्थिति</p>
+            <div class="catalog-actions">
+              <a class="catalog-action-link" data-action-type="learn" href="https://www.enspiral.com/" rel="external noreferrer">जानें <span aria-hidden="true">↗</span></a>
+              <a class="catalog-action-link" data-action-type="contribute" href="https://www.enspiral.com/" rel="external noreferrer">योगदान करें <span aria-hidden="true">↗</span></a>
+              <a href="https://www.enspiral.com/" rel="external noreferrer">आधिकारिक वेबसाइट <span aria-hidden="true">↗</span></a>
+              <a href="./catalog/projects/enspiral.json" type="application/json">JSON</a>
+            </div>
+          </article>
+          <article class="catalog-card" id="project-ethiopia-community-seed-bank-network" data-commonproject-id="ethiopia-community-seed-bank-network">
+            <p class="catalog-kind">साइट पर · डिजिटल · आपूर्ति, भूमि और पारिस्थितिकी › बीज, खाद्य और कृषि</p>
+            <h2 dir="auto">Ethiopian Community Seed Bank Network</h2>
+            <p lang="hi" dir="auto">समुदाय द्वारा संचालित बीज बैंकों का एक राष्ट्रव्यापी नेटवर्क जो किसानों द्वारा तैयार की गई किस्मों को जोड़ता है, अनुभव के आदान-प्रदान का आयोजन करता है और बीज विविधता पर किसानों के अधिकार को मजबूत करता है।</p>
+            <p class="catalog-location">1 सार्वजनिक स्थान</p>
+            <div class="catalog-actions">
+              <a class="catalog-action-link" data-action-type="learn" href="https://www.fao.org/plant-treaty/areas-of-work/benefit-sharing-fund/projects/projects-detail/National-Community-Seed-Bank-Platform-for-Strengthening-Informal-Seed-System-in-Ethiopia/en" rel="external noreferrer">जानें <span aria-hidden="true">↗</span></a>
+              <a href="https://www.moa.gov.et/ethiopias-community-seed-bank-networkempowering-seed-authority/" rel="external noreferrer">आधिकारिक वेबसाइट <span aria-hidden="true">↗</span></a>
+              <a href="./catalog/projects/ethiopia-community-seed-bank-network.json" type="application/json">JSON</a>
+            </div>
+          </article>
+          <article class="catalog-card" id="project-fecofun-nepal" data-commonproject-id="fecofun-nepal">
+            <p class="catalog-kind">कॉमन्स</p>
+            <h2 lang="en" dir="ltr">Federation of Community Forestry Users Nepal</h2>
+            <p lang="hi" dir="auto">नेपाल में सामुदायिक वन उपयोगकर्ता समूहों का एक राष्ट्रव्यापी संघ जो स्थानीय उपयोग के अधिकार, लोकतांत्रिक स्व-संगठन, स्थायी वन प्रबंधन, ज्ञान विनिमय और नीति में सदस्यों की भागीदारी को मजबूत करता है।</p>
+            <p class="catalog-location">1 छिपा हुआ स्थान</p>
+            <div class="catalog-actions">
+              <a class="catalog-action-link" data-action-type="learn" href="https://fecofun.org.np/about/" rel="external noreferrer">जानें <span aria-hidden="true">↗</span></a>
+              <a class="catalog-action-link" data-action-type="contact" href="https://fecofun.org.np/contacts/" rel="external noreferrer">संपर्क करें <span aria-hidden="true">↗</span></a>
+              <a href="https://fecofun.org.np/" rel="external noreferrer">आधिकारिक वेबसाइट <span aria-hidden="true">↗</span></a>
+              <a href="./catalog/projects/fecofun-nepal.json" type="application/json">JSON</a>
+            </div>
+          </article>
+          <article class="catalog-card" id="project-fiji-locally-managed-marine-area-network" data-commonproject-id="fiji-locally-managed-marine-area-network">
+            <p class="catalog-kind">डिजिटल · आपूर्ति, भूमि और पारिस्थितिकी › भूमि, शहरी हरित और पारिस्थितिकी</p>
+            <h2 dir="auto">Fiji Locally Managed Marine Area Network (FLMMA)</h2>
+            <p lang="hi" dir="auto">फिजी-व्यापी सहायता नेटवर्क, जिसमें समुदाय स्थानीय रूप से प्रबंधित समुद्री क्षेत्रों में प्रथागत और सामूहिक रूप से सहमत नियमों, स्थानीय निगरानी और साझा संरक्षकता के माध्यम से तटीय मत्स्य संसाधनों और समुद्री आवासों का प्रबंधन करते हैं।</p>
+            <p class="catalog-location">1 छिपा हुआ स्थान</p>
+            <div class="catalog-actions">
+              <a class="catalog-action-link" data-action-type="learn" href="https://www.spc.int/digitallibrary/get/ogbzt" rel="external noreferrer">जानें <span aria-hidden="true">↗</span></a>
+              <a href="https://lmmanetwork.org/" rel="external noreferrer">आधिकारिक वेबसाइट <span aria-hidden="true">↗</span></a>
+              <a href="./catalog/projects/fiji-locally-managed-marine-area-network.json" type="application/json">JSON</a>
+            </div>
+          </article>
+          <article class="catalog-card" id="project-fordhall-organic-farm" data-commonproject-id="fordhall-organic-farm">
+            <p class="catalog-kind">साइट पर</p>
+            <h2 dir="auto">Fordhall Organic Farm</h2>
+            <p lang="hi" dir="auto">श्रॉपशायर में एक समुदाय के स्वामित्व वाला जैविक फार्म जिसकी भूमि हजारों शेयरधारकों के साथ एक धर्मार्थ सामुदायिक लाभ सोसायटी के पास है और पारिस्थितिक खेती, शिक्षा, सार्वजनिक प्रकृति पहुंच और सामाजिक कार्यक्रमों के लिए सुरक्षित है।</p>
+            <p class="catalog-location">1 सार्वजनिक स्थान</p>
+            <div class="catalog-actions">
+              <a class="catalog-action-link" data-action-type="visit" href="https://www.fordhallfarm.com/" rel="external noreferrer">जाएँ <span aria-hidden="true">↗</span></a>
+              <a class="catalog-action-link" data-action-type="use" href="https://www.fordhallfarm.com/our-impact" rel="external noreferrer">उपयोग करें <span aria-hidden="true">↗</span></a>
+              <a class="catalog-action-link" data-action-type="learn" href="https://www.fordhallfarm.com/fcli-story" rel="external noreferrer">जानें <span aria-hidden="true">↗</span></a>
+              <a class="catalog-action-link" data-action-type="contribute" href="https://www.fordhallfarm.com/buy-a-share" rel="external noreferrer">योगदान करें <span aria-hidden="true">↗</span></a>
+              <a href="https://www.fordhallfarm.com/" rel="external noreferrer">आधिकारिक वेबसाइट <span aria-hidden="true">↗</span></a>
+              <a href="./catalog/projects/fordhall-organic-farm.json" type="application/json">JSON</a>
+            </div>
+          </article>
+          <article class="catalog-card" id="project-freifunk-hamburg" data-commonproject-id="freifunk-hamburg">
+            <p class="catalog-kind">साइट पर · डिजिटल · संचार और नेटवर्क › सामुदायिक नेटवर्क</p>
+            <h2 dir="auto">Freifunk Hamburg</h2>
+            <p lang="hi" dir="auto">एक स्थानीय फ़्रीफ़ंक समुदाय जो हैम्बर्ग में एक समुदाय-समर्थित डिजिटल नेटवर्क संचालित करता है और भागीदारी, खुले बुनियादी ढांचे और मुफ्त संचार को जोड़ता है।</p>
+            <p class="catalog-location">1 सार्वजनिक स्थान · 1 छिपा हुआ स्थान</p>
+            <div class="catalog-actions">
+              <a class="catalog-action-link" data-action-type="use" href="https://map.hamburg.freifunk.net/" rel="external noreferrer">उपयोग करें <span aria-hidden="true">↗</span></a>
+              <a class="catalog-action-link" data-action-type="learn" href="https://hamburg.freifunk.net/" rel="external noreferrer">जानें <span aria-hidden="true">↗</span></a>
+              <a class="catalog-action-link" data-action-type="contribute" href="https://hamburg.freifunk.net/mitmachen" rel="external noreferrer">योगदान करें <span aria-hidden="true">↗</span></a>
+              <a class="catalog-action-link" data-action-type="volunteer" href="https://hamburg.freifunk.net/mitmachen" rel="external noreferrer">स्वयंसेवा करें <span aria-hidden="true">↗</span></a>
+              <a class="catalog-action-link" data-action-type="contact" href="https://hamburg.freifunk.net/kontakt" rel="external noreferrer">संपर्क करें <span aria-hidden="true">↗</span></a>
+              <a href="https://hamburg.freifunk.net/" rel="external noreferrer">आधिकारिक वेबसाइट <span aria-hidden="true">↗</span></a>
+              <a href="./catalog/projects/freifunk-hamburg.json" type="application/json">JSON</a>
+            </div>
+          </article>
+          <article class="catalog-card" id="project-freifunk" data-commonproject-id="freifunk">
+            <p class="catalog-kind">डिजिटल · संचार और नेटवर्क › सामुदायिक नेटवर्क</p>
+            <h2 dir="auto">Freifunk</h2>
+            <p lang="hi" dir="auto">मुफ़्त, समुदाय-निर्मित संचार नेटवर्क और खुले डिजिटल बुनियादी ढांचे के लिए एक गैर-व्यावसायिक पहल।</p>
+            <p class="catalog-location">स्थान-स्वतंत्र डिजिटल उपस्थिति</p>
+            <div class="catalog-actions">
+              <a class="catalog-action-link" data-action-type="use" href="https://freifunk.net/wie-mache-ich-mit/" rel="external noreferrer">उपयोग करें <span aria-hidden="true">↗</span></a>
+              <a class="catalog-action-link" data-action-type="learn" href="https://freifunk.net/worum-geht-es/" rel="external noreferrer">जानें <span aria-hidden="true">↗</span></a>
+              <a class="catalog-action-link" data-action-type="contribute" href="https://freifunk.net/wie-mache-ich-mit/" rel="external noreferrer">योगदान करें <span aria-hidden="true">↗</span></a>
+              <a class="catalog-action-link" data-action-type="volunteer" href="https://freifunk.net/wie-mache-ich-mit/" rel="external noreferrer">स्वयंसेवा करें <span aria-hidden="true">↗</span></a>
+              <a href="https://freifunk.net/" rel="external noreferrer">आधिकारिक वेबसाइट <span aria-hidden="true">↗</span></a>
+              <a href="./catalog/projects/freifunk.json" type="application/json">JSON</a>
+            </div>
+          </article>
+          <article class="catalog-card" id="project-fucvam" data-commonproject-id="fucvam">
+            <p class="catalog-kind">कॉमन्स</p>
+            <h2 dir="auto">FUCVAM</h2>
+            <p lang="hi" dir="auto">उरुग्वे का पारस्परिक सहायता आवास सहकारी समितियां सामूहिक भूमि स्वामित्व, लोकतांत्रिक स्व-प्रबंधन और आवास के निर्माण और रखरखाव में पारस्परिक सहायता को जोड़ती है।</p>
+            <p class="catalog-location">2 छुपे हुए स्थान</p>
+            <div class="catalog-actions">
+              <a class="catalog-action-link" data-action-type="learn" href="https://www.fucvam.org.uy/" rel="external noreferrer">जानें <span aria-hidden="true">↗</span></a>
+              <a class="catalog-action-link" data-action-type="contribute" href="https://www.fucvam.org.uy/afiliacion-de-nuevas-cooperativas/" rel="external noreferrer">योगदान करें <span aria-hidden="true">↗</span></a>
+              <a href="https://www.fucvam.org.uy/" rel="external noreferrer">आधिकारिक वेबसाइट <span aria-hidden="true">↗</span></a>
+              <a href="./catalog/projects/fucvam.json" type="application/json">JSON</a>
+            </div>
+          </article>
+          <article class="catalog-card" id="project-g0v" data-commonproject-id="g0v">
+            <p class="catalog-kind">डिजिटल · सहयोग और स्व-संगठन › सिविक टेक और स्व-संगठन</p>
+            <h2 dir="auto">g0v</h2>
+            <p lang="hi" dir="auto">ताइवान का एक खुला नागरिक-तकनीक समुदाय जो सार्वजनिक समस्याओं पर सहयोगात्मक रूप से काम करता है और परिणाम, स्रोत कोड और दस्तावेज़ीकरण को स्वतंत्र रूप से सुलभ डिजिटल कॉमन्स के रूप में प्रकाशित करता है।</p>
+            <p class="catalog-location">स्थान-स्वतंत्र डिजिटल उपस्थिति</p>
+            <div class="catalog-actions">
+              <a class="catalog-action-link" data-action-type="learn" href="https://g0v.tw/intl/en/manifesto/" rel="external noreferrer">जानें <span aria-hidden="true">↗</span></a>
+              <a class="catalog-action-link" data-action-type="contribute" href="https://g0v.tw/intl/en/" rel="external noreferrer">योगदान करें <span aria-hidden="true">↗</span></a>
+              <a href="https://g0v.tw/intl/en/" rel="external noreferrer">आधिकारिक वेबसाइट <span aria-hidden="true">↗</span></a>
+              <a href="./catalog/projects/g0v.json" type="application/json">JSON</a>
+            </div>
+          </article>
+          <article class="catalog-card" id="project-gbif" data-commonproject-id="gbif">
+            <p class="catalog-kind">डिजिटल · सॉफ्टवेयर, उपकरण और उत्पादन › डेटा और सॉफ़्टवेयर सेतु</p>
+            <h2 dir="auto">Global Biodiversity Information Facility (GBIF)</h2>
+            <p lang="hi" dir="auto">एक वैश्विक रूप से संघबद्ध जैव-विविधता डेटा अवसंरचना, जिसमें भाग लेने वाले देश, संगठन, नोड और डेटा प्रकाशक जैव-विविधता डेटा तक खुली पहुँच के लिए डेटा, मानक और तकनीकी सेवाएँ संयुक्त रूप से उपलब्ध कराते हैं तथा औपचारिक शासन निकायों के माध्यम से उनका समन्वय करते हैं।</p>
+            <p class="catalog-location">स्थान-स्वतंत्र डिजिटल उपस्थिति</p>
+            <div class="catalog-actions">
+              <a class="catalog-action-link" data-action-type="use" href="https://www.gbif.org/occurrence/search" rel="external noreferrer">उपयोग करें <span aria-hidden="true">↗</span></a>
+              <a class="catalog-action-link" data-action-type="learn" href="https://www.gbif.org/the-gbif-network" rel="external noreferrer">जानें <span aria-hidden="true">↗</span></a>
+              <a class="catalog-action-link" data-action-type="contribute" href="https://www.gbif.org/publishing-data" rel="external noreferrer">योगदान करें <span aria-hidden="true">↗</span></a>
+              <a href="https://www.gbif.org/" rel="external noreferrer">आधिकारिक वेबसाइट <span aria-hidden="true">↗</span></a>
+              <a href="./catalog/projects/gbif.json" type="application/json">JSON</a>
+            </div>
+          </article>
+          <article class="catalog-card" id="project-granby-four-streets-clt" data-commonproject-id="granby-four-streets-clt">
+            <p class="catalog-kind">साइट पर</p>
+            <h2 dir="auto">Granby Four Streets Community Land Trust</h2>
+            <p lang="hi" dir="auto">लिवरपूल में एक निवासी-नेतृत्व वाला सामुदायिक भूमि ट्रस्ट जो पड़ोस में स्थायी रूप से किफायती आवास, सामुदायिक स्थान, हरियाली और स्थानीय आर्थिक गतिविधि को सुरक्षित करता है।</p>
+            <p class="catalog-location">1 सार्वजनिक स्थान</p>
+            <div class="catalog-actions">
+              <a class="catalog-action-link" data-action-type="visit" href="https://www.granby4streetsclt.co.uk/about" rel="external noreferrer">जाएँ <span aria-hidden="true">↗</span></a>
+              <a class="catalog-action-link" data-action-type="learn" href="https://www.granby4streetsclt.co.uk/whats-a-clt" rel="external noreferrer">जानें <span aria-hidden="true">↗</span></a>
+              <a class="catalog-action-link" data-action-type="contribute" href="https://www.granby4streetsclt.co.uk/about" rel="external noreferrer">योगदान करें <span aria-hidden="true">↗</span></a>
+              <a class="catalog-action-link" data-action-type="contact" href="https://www.granby4streetsclt.co.uk/about" rel="external noreferrer">संपर्क करें <span aria-hidden="true">↗</span></a>
+              <a href="https://www.granby4streetsclt.co.uk/" rel="external noreferrer">आधिकारिक वेबसाइट <span aria-hidden="true">↗</span></a>
+              <a href="./catalog/projects/granby-four-streets-clt.json" type="application/json">JSON</a>
+            </div>
+          </article>
+          <article class="catalog-card" id="project-great-lakes-commons" data-commonproject-id="great-lakes-commons">
+            <p class="catalog-kind">डिजिटल · आपूर्ति, भूमि और पारिस्थितिकी › जल एवं सिंचाई</p>
+            <h2 lang="en" dir="ltr">Great Lakes Commons</h2>
+            <p lang="hi" dir="auto">एक खुला जैव-क्षेत्रीय नेटवर्क जो ग्रेट लेक्स को जीवित कॉमन्स के रूप में मानता है और राजनीतिक सीमाओं के पार समुदाय और स्वदेशी शासन, साझा जिम्मेदारी और दीर्घकालिक जल प्रबंधन को मजबूत करने का प्रयास करता है।</p>
+            <p class="catalog-location">1 छिपा हुआ स्थान</p>
+            <div class="catalog-actions">
+              <a class="catalog-action-link" data-action-type="learn" href="https://www.greatlakescommons.org/why" rel="external noreferrer">जानें <span aria-hidden="true">↗</span></a>
+              <a class="catalog-action-link" data-action-type="contribute" href="https://www.greatlakescommons.org/home-1" rel="external noreferrer">योगदान करें <span aria-hidden="true">↗</span></a>
+              <a href="https://www.greatlakescommons.org/" rel="external noreferrer">आधिकारिक वेबसाइट <span aria-hidden="true">↗</span></a>
+              <a href="./catalog/projects/great-lakes-commons.json" type="application/json">JSON</a>
+            </div>
+          </article>
+          <article class="catalog-card" id="project-green-coop-japan" data-commonproject-id="green-coop-japan">
+            <p class="catalog-kind">डिजिटल · सहयोग और स्व-संगठन › सामुदायिक शासन और सहकारिता</p>
+            <h2 dir="auto">Green Coop</h2>
+            <p lang="hi" dir="auto">जापान में 16 उपभोक्ता सहकारी समितियों का एक सदस्य-नेतृत्व वाला संघ जिसमें लगभग 432,000 सदस्य परिवार संयुक्त रूप से आपूर्ति, सामाजिक-समर्थन, पर्यावरण और पारस्परिक-सहायता बुनियादी ढांचे का विकास और उपयोग करते हैं; भागीदारी और सह-शासन सदस्यता से बंधे हैं।</p>
+            <p class="catalog-location">1 छिपा हुआ स्थान</p>
+            <div class="catalog-actions">
+              <a class="catalog-action-link" data-action-type="learn" href="https://www.greencoop.or.jp/about/" rel="external noreferrer">जानें <span aria-hidden="true">↗</span></a>
+              <a class="catalog-action-link" data-action-type="contribute" href="https://www.greencoop.or.jp/web-entry/join/join-terms-check.php" rel="external noreferrer">योगदान करें <span aria-hidden="true">↗</span></a>
+              <a href="https://www.greencoop.or.jp/" rel="external noreferrer">आधिकारिक वेबसाइट <span aria-hidden="true">↗</span></a>
+              <a href="./catalog/projects/green-coop-japan.json" type="application/json">JSON</a>
+            </div>
+          </article>
+          <article class="catalog-card" id="project-guifi-net" data-commonproject-id="guifi-net">
+            <p class="catalog-kind">साइट पर · डिजिटल · संचार और नेटवर्क › सामुदायिक नेटवर्क</p>
+            <h2 dir="auto">guifi.net</h2>
+            <p lang="hi" dir="auto">एक खुला, स्वतंत्र और तटस्थ दूरसंचार नेटवर्क, जिसका बुनियादी ढाँचा कॉमन्स के रूप में सामूहिक रूप से बनाया और उपयोग किया जाता है और जिसे अलग-अलग प्रतिभागी समान शर्तों पर आगे विकसित कर सकते हैं।</p>
+            <p class="catalog-location">1 सार्वजनिक स्थान · 1 छिपा हुआ स्थान</p>
+            <div class="catalog-actions">
+              <a class="catalog-action-link" data-action-type="use" href="https://network.guifi.net/en" rel="external noreferrer">उपयोग करें <span aria-hidden="true">↗</span></a>
+              <a class="catalog-action-link" data-action-type="learn" href="https://fundacio.guifi.net/page/red" rel="external noreferrer">जानें <span aria-hidden="true">↗</span></a>
+              <a class="catalog-action-link" data-action-type="contribute" href="https://network.guifi.net/en" rel="external noreferrer">योगदान करें <span aria-hidden="true">↗</span></a>
+              <a class="catalog-action-link" data-action-type="replicate" href="https://network.guifi.net/en/node/70380" rel="external noreferrer">प्रतिरूप बनाएँ <span aria-hidden="true">↗</span></a>
+              <a class="catalog-action-link" data-action-type="contact" href="https://landing.guifi.net/en/" rel="external noreferrer">संपर्क करें <span aria-hidden="true">↗</span></a>
+              <a href="https://landing.guifi.net/en/" rel="external noreferrer">आधिकारिक वेबसाइट <span aria-hidden="true">↗</span></a>
+              <a href="./catalog/projects/guifi-net.json" type="application/json">JSON</a>
+            </div>
+          </article>
+          <article class="catalog-card" id="project-hepburn-energy" data-commonproject-id="hepburn-energy">
+            <p class="catalog-kind">साइट पर · डिजिटल · आपूर्ति, भूमि और पारिस्थितिकी › ऊर्जा सहकारी समितियाँ</p>
+            <h2 dir="auto">Hepburn Energy</h2>
+            <p lang="hi" dir="auto">ऑस्ट्रेलिया के हेपबर्न शायर में एक सदस्य-स्वामित्व वाली ऊर्जा सहकारी समिति जो सामुदायिक पवन ऊर्जा संचालित करती है और अपनी स्थानीय उत्पादन क्षमता विकसित करना जारी रखती है।</p>
+            <p class="catalog-location">1 सार्वजनिक स्थान</p>
+            <div class="catalog-actions">
+              <a class="catalog-action-link" data-action-type="learn" href="https://www.hepburnenergy.coop/about/" rel="external noreferrer">जानें <span aria-hidden="true">↗</span></a>
+              <a class="catalog-action-link" data-action-type="use" href="https://www.hepburnenergy.coop/membership/" rel="external noreferrer">उपयोग करें <span aria-hidden="true">↗</span></a>
+              <a href="https://www.hepburnenergy.coop/about/" rel="external noreferrer">आधिकारिक वेबसाइट <span aria-hidden="true">↗</span></a>
+              <a href="./catalog/projects/hepburn-energy.json" type="application/json">JSON</a>
+            </div>
+          </article>
+          <article class="catalog-card" id="project-isle-of-eigg-heritage-trust" data-commonproject-id="isle-of-eigg-heritage-trust">
+            <p class="catalog-kind">साइट पर</p>
+            <h2 lang="en" dir="ltr">Isle of Eigg Heritage Trust</h2>
+            <p lang="hi" dir="auto">आइल ऑफ ईग हेरिटेज ट्रस्ट अपने निवासियों के लिए द्वीप का मालिक है और उसका प्रबंधन करता है; रेजिडेंट्स एसोसिएशन द्वारा चुने गए चार निदेशक भूमि, आवास, बुनियादी ढांचे, प्राकृतिक विरासत और स्थानीय बिजली ग्रिड पर निर्णय लेते हैं।</p>
+            <p class="catalog-location">1 सार्वजनिक स्थान</p>
+            <div class="catalog-actions">
+              <a class="catalog-action-link" data-action-type="learn" href="https://isleofeigg.org/ieht/community-buyout/" rel="external noreferrer">जानें <span aria-hidden="true">↗</span></a>
+              <a href="https://isleofeigg.org/ieht/" rel="external noreferrer">आधिकारिक वेबसाइट <span aria-hidden="true">↗</span></a>
+              <a href="./catalog/projects/isle-of-eigg-heritage-trust.json" type="application/json">JSON</a>
+            </div>
+          </article>
+          <article class="catalog-card" id="project-kawawana" data-commonproject-id="kawawana">
+            <p class="catalog-kind">साइट पर</p>
+            <h2 lang="en" dir="ltr">Kawawana</h2>
+            <p lang="hi" dir="auto">एपीसीआरएम और केंद्रीय कैसामांस के आठ गांवों के निवासी 2010 में हस्तांतरित तटीय प्रबंधन अधिकारों के तहत रंग-कोडित उपयोग क्षेत्रों, मछली पकड़ने के प्रतिबंध, निगरानी और गश्त के माध्यम से स्थानीय मछली स्टॉक की रक्षा करते हैं।</p>
+            <p class="catalog-location">1 सार्वजनिक स्थान</p>
+            <p class="catalog-activity-notice">वर्तमान परिचालन स्थिति को हाल ही में सत्यापित नहीं किया गया है। सूत्रों की समीक्षा की गई 2026-08-04; प्राथमिकता पुनः समीक्षा 2026-09-04.</p>
+            <div class="catalog-actions">
+              <a class="catalog-action-link" data-action-type="learn" href="https://www.iccaregistry.org/en/explore/Senegal/kawawana" rel="external noreferrer">जानें <span aria-hidden="true">↗</span></a>
+              <a href="https://www.iccaregistry.org/en/explore/Senegal/kawawana" rel="external noreferrer">आधिकारिक वेबसाइट <span aria-hidden="true">↗</span></a>
+              <a href="./catalog/projects/kawawana.json" type="application/json">JSON</a>
+            </div>
+          </article>
+          <article class="catalog-card" id="project-kibera-public-space-project" data-commonproject-id="kibera-public-space-project">
+            <p class="catalog-kind">साइट पर</p>
+            <h2 dir="auto">Kibera Public Space Project</h2>
+            <p lang="hi" dir="auto">किबेरा में निवासी समूहों के साथ सह-डिज़ाइन और संचालित सार्वजनिक स्थानों का एक बढ़ता हुआ नेटवर्क, बाढ़ लचीलापन, बुनियादी सेवाओं, सभा स्थानों और स्थानीय आर्थिक उपयोग को जोड़ता है।</p>
+            <p class="catalog-location">1 सार्वजनिक स्थान</p>
+            <div class="catalog-actions">
+              <a class="catalog-action-link" data-action-type="learn" href="https://www.kounkuey.org/projects/kibera_public_space_project_network" rel="external noreferrer">जानें <span aria-hidden="true">↗</span></a>
+              <a href="https://www.kounkuey.org/projects/kibera_public_space_project_network" rel="external noreferrer">आधिकारिक वेबसाइट <span aria-hidden="true">↗</span></a>
+              <a href="./catalog/projects/kibera-public-space-project.json" type="application/json">JSON</a>
+            </div>
+          </article>
+          <article class="catalog-card" id="project-kobulu-community-micro-hydro" data-commonproject-id="kobulu-community-micro-hydro">
+            <p class="catalog-kind">साइट पर · डिजिटल · आपूर्ति, भूमि और पारिस्थितिकी › ऊर्जा सहकारी समितियाँ</p>
+            <h2 dir="auto">Kobulu Community Micro Hydro</h2>
+            <p lang="hi" dir="auto">कम्पुंग बुयान, सबा में एक समुदाय-प्रबंधित सूक्ष्म-जलविद्युत प्रणाली, जिसकी स्थानीय समिति उपभोग शुल्क, ऑपरेटर वेतन, स्पेयर पार्ट्स और भविष्य की मरम्मत का आयोजन करती है।</p>
+            <p class="catalog-location">1 सार्वजनिक स्थान</p>
+            <div class="catalog-actions">
+              <a class="catalog-action-link" data-action-type="learn" href="https://tonibung.org/projects" rel="external noreferrer">जानें <span aria-hidden="true">↗</span></a>
+              <a href="https://tonibung.org/projects" rel="external noreferrer">आधिकारिक वेबसाइट <span aria-hidden="true">↗</span></a>
+              <a href="./catalog/projects/kobulu-community-micro-hydro.json" type="application/json">JSON</a>
+            </div>
+          </article>
+          <article class="catalog-card" id="project-kyrgyzstan-water-users-associations-union" data-commonproject-id="kyrgyzstan-water-users-associations-union">
+            <p class="catalog-kind">डिजिटल · आपूर्ति, भूमि और पारिस्थितिकी › जल एवं सिंचाई</p>
+            <h2 dir="auto">National Union of Water Users’ Associations of the Kyrgyz Republic</h2>
+            <p lang="hi" dir="auto">किर्गिज़स्तान का एक राष्ट्रीय संघ, जो समुदाय-आधारित जल उपयोगकर्ता संघों को समर्थन देता है; ये संघ जल उपयोगकर्ताओं को संगठित करते हैं, खेत-स्तरीय सिंचाई प्रणालियों का सामूहिक रखरखाव करते हैं, संयुक्त कार्रवाई का समन्वय करते हैं और जल प्रबंधन में सदस्यों के हितों का प्रतिनिधित्व करते हैं।</p>
+            <p class="catalog-location">1 छिपा हुआ स्थान</p>
+            <div class="catalog-actions">
+              <a class="catalog-action-link" data-action-type="learn" href="https://www.water.gov.kg/index.php?Itemid=1466&amp;catid=132&amp;id=399%3Aon-water-users-associations&amp;lang=en&amp;option=com_content&amp;view=article" rel="external noreferrer">जानें <span aria-hidden="true">↗</span></a>
+              <a href="https://www.facebook.com/WUAUnion/" rel="external noreferrer">आधिकारिक वेबसाइट <span aria-hidden="true">↗</span></a>
+              <a href="./catalog/projects/kyrgyzstan-water-users-associations-union.json" type="application/json">JSON</a>
+            </div>
+          </article>
+          <article class="catalog-card" id="project-lasilo-naples" data-commonproject-id="lasilo-naples">
+            <p class="catalog-kind">डिजिटल · सहयोग और स्व-संगठन › सामुदायिक शासन और सहकारिता</p>
+            <h2 dir="auto">l’Asilo</h2>
+            <p lang="hi" dir="auto">नेपल्स में एक सार्वजनिक सांस्कृतिक साझा-संपदा (कॉमन्स), जिसके स्थानों, कलात्मक उत्पादन साधनों और शहरी उद्यान का स्वशासन एक खुला समुदाय सभाओं, विषयगत कार्यसमूहों और नागरिक उपयोग की साझा घोषणा के माध्यम से करता है।</p>
+            <p class="catalog-location">1 छिपा हुआ स्थान</p>
+            <p class="catalog-activity-notice">वर्तमान परिचालन स्थिति को हाल ही में सत्यापित नहीं किया गया है। सूत्रों की समीक्षा की गई 2026-08-13; प्राथमिकता पुनः समीक्षा 2026-09-15.</p>
+            <div class="catalog-actions">
+              <a class="catalog-action-link" data-action-type="learn" href="https://www.exasilofilangieri.it/dichiarazione-duso-civico/" rel="external noreferrer">जानें <span aria-hidden="true">↗</span></a>
+              <a class="catalog-action-link" data-action-type="contact" href="https://www.exasilofilangieri.it/contatti/" rel="external noreferrer">संपर्क करें <span aria-hidden="true">↗</span></a>
+              <a href="https://www.exasilofilangieri.it/" rel="external noreferrer">आधिकारिक वेबसाइट <span aria-hidden="true">↗</span></a>
+              <a href="./catalog/projects/lasilo-naples.json" type="application/json">JSON</a>
+            </div>
+          </article>
+          <article class="catalog-card" id="project-lebanon-hima-network" data-commonproject-id="lebanon-hima-network">
+            <p class="catalog-kind">डिजिटल · आपूर्ति, भूमि और पारिस्थितिकी › भूमि, शहरी हरित और पारिस्थितिकी</p>
+            <h2 dir="auto">Lebanon Hima Network</h2>
+            <p lang="hi" dir="auto">लेबनान में हिमा स्थलों का एक नेटवर्क, जहाँ नगरपालिकाएँ और स्थानीय समुदाय नगरपालिका निर्णयों, सामुदायिक संरक्षकता और स्थानीय संरक्षण व उपयोग नियमों के माध्यम से प्राकृतिक संसाधन क्षेत्रों की स्थापना और देखरेख करते हैं।</p>
+            <p class="catalog-location">1 छिपा हुआ स्थान</p>
+            <div class="catalog-actions">
+              <a class="catalog-action-link" data-action-type="learn" href="https://www.spnl.org/homat-al-hima-the-heart-of-himas/" rel="external noreferrer">जानें <span aria-hidden="true">↗</span></a>
+              <a href="https://www.spnl.org/hima-a-sanctuary-for-birds-biodiversity-and-people/" rel="external noreferrer">आधिकारिक वेबसाइट <span aria-hidden="true">↗</span></a>
+              <a href="./catalog/projects/lebanon-hima-network.json" type="application/json">JSON</a>
+            </div>
+          </article>
+          <article class="catalog-card" id="project-libreoffice" data-commonproject-id="libreoffice">
+            <p class="catalog-kind">डिजिटल · सॉफ्टवेयर, उपकरण और उत्पादन › मुक्त सॉफ़्टवेयर और अवसंरचना</p>
+            <h2 dir="auto">LibreOffice</h2>
+            <p lang="hi" dir="auto">एक अंतरराष्ट्रीय समुदाय द्वारा विकसित, प्रलेखित और अनुवादित एक स्वतंत्र और खुला स्रोत कार्यालय सुइट।</p>
+            <p class="catalog-location">स्थान-स्वतंत्र डिजिटल उपस्थिति</p>
+            <div class="catalog-actions">
+              <a class="catalog-action-link" data-action-type="use" href="https://www.libreoffice.org/download/" rel="external noreferrer">उपयोग करें <span aria-hidden="true">↗</span></a>
+              <a class="catalog-action-link" data-action-type="learn" href="https://documentation.libreoffice.org/en/english-documentation/" rel="external noreferrer">जानें <span aria-hidden="true">↗</span></a>
+              <a class="catalog-action-link" data-action-type="contribute" href="https://www.libreoffice.org/improve-it/" rel="external noreferrer">योगदान करें <span aria-hidden="true">↗</span></a>
+              <a class="catalog-action-link" data-action-type="donate" href="https://www.libreoffice.org/donate/" rel="external noreferrer">दान करें <span aria-hidden="true">↗</span></a>
+              <a href="https://www.libreoffice.org/" rel="external noreferrer">आधिकारिक वेबसाइट <span aria-hidden="true">↗</span></a>
+              <a href="./catalog/projects/libreoffice.json" type="application/json">JSON</a>
+            </div>
+          </article>
+          <article class="catalog-card" id="project-librivox" data-commonproject-id="librivox">
+            <p class="catalog-kind">डिजिटल · ज्ञान, शिक्षा और संस्कृति › मीडिया, अभिलेखागार और संस्कृति</p>
+            <h2 dir="auto">LibriVox</h2>
+            <p lang="hi" dir="auto">एक विश्वव्यापी स्वयंसेवी समुदाय जो सार्वजनिक-डोमेन ग्रंथों को स्वतंत्र रूप से सुलभ ऑडियोबुक के रूप में रिकॉर्ड करता है और व्यावसायिक पहुंच बाधाओं के बिना रिकॉर्डिंग प्रकाशित करता है।</p>
+            <p class="catalog-location">स्थान-स्वतंत्र डिजिटल उपस्थिति</p>
+            <div class="catalog-actions">
+              <a class="catalog-action-link" data-action-type="use" href="https://librivox.org/" rel="external noreferrer">उपयोग करें <span aria-hidden="true">↗</span></a>
+              <a class="catalog-action-link" data-action-type="learn" href="https://librivox.org/pages/about-librivox/" rel="external noreferrer">जानें <span aria-hidden="true">↗</span></a>
+              <a class="catalog-action-link" data-action-type="contribute" href="https://librivox.org/pages/volunteer-for-librivox/" rel="external noreferrer">योगदान करें <span aria-hidden="true">↗</span></a>
+              <a class="catalog-action-link" data-action-type="volunteer" href="https://librivox.org/pages/volunteer-for-librivox/" rel="external noreferrer">स्वयंसेवा करें <span aria-hidden="true">↗</span></a>
+              <a href="https://librivox.org/" rel="external noreferrer">आधिकारिक वेबसाइट <span aria-hidden="true">↗</span></a>
+              <a href="./catalog/projects/librivox.json" type="application/json">JSON</a>
+            </div>
+          </article>
+          <article class="catalog-card" id="project-masipag" data-commonproject-id="masipag">
+            <p class="catalog-kind">साइट पर</p>
+            <h2 dir="auto">MASIPAG</h2>
+            <p lang="hi" dir="auto">एक किसान के नेतृत्व वाला फिलीपीन नेटवर्क जो किसान-संरक्षित बीज, कृषि पारिस्थितिकी अभ्यास, खाद्य संप्रभुता और ज्ञान के सामुदायिक विकास को जोड़ता है।</p>
+            <p class="catalog-location">1 सार्वजनिक स्थान</p>
+            <div class="catalog-actions">
+              <a class="catalog-action-link" data-action-type="learn" href="https://masipag.org/about-masipag/" rel="external noreferrer">जानें <span aria-hidden="true">↗</span></a>
+              <a class="catalog-action-link" data-action-type="contact" href="https://masipag.org/" rel="external noreferrer">संपर्क करें <span aria-hidden="true">↗</span></a>
+              <a class="catalog-action-link" data-action-type="contribute" href="https://masipag.org/" rel="external noreferrer">योगदान करें <span aria-hidden="true">↗</span></a>
+              <a href="https://masipag.org/" rel="external noreferrer">आधिकारिक वेबसाइट <span aria-hidden="true">↗</span></a>
+              <a href="./catalog/projects/masipag.json" type="application/json">JSON</a>
+            </div>
+          </article>
+          <article class="catalog-card" id="project-mastodon" data-commonproject-id="mastodon">
+            <p class="catalog-kind">डिजिटल · संचार और नेटवर्क › संघ और प्रोटोकॉल</p>
+            <h2 dir="auto">Mastodon</h2>
+            <p lang="hi" dir="auto">मुफ़्त, ओपन-सोर्स और फ़ेडरेटेड सोशल-नेटवर्किंग सॉफ़्टवेयर जिसके स्वतंत्र सर्वर एक दूसरे के साथ संचार कर सकते हैं।</p>
+            <p class="catalog-location">स्थान-स्वतंत्र डिजिटल उपस्थिति</p>
+            <div class="catalog-actions">
+              <a class="catalog-action-link" data-action-type="use" href="https://joinmastodon.org/servers" rel="external noreferrer">उपयोग करें <span aria-hidden="true">↗</span></a>
+              <a class="catalog-action-link" data-action-type="learn" href="https://docs.joinmastodon.org/" rel="external noreferrer">जानें <span aria-hidden="true">↗</span></a>
+              <a class="catalog-action-link" data-action-type="contribute" href="https://github.com/mastodon/mastodon" rel="external noreferrer">योगदान करें <span aria-hidden="true">↗</span></a>
+              <a href="https://joinmastodon.org/" rel="external noreferrer">आधिकारिक वेबसाइट <span aria-hidden="true">↗</span></a>
+              <a href="./catalog/projects/mastodon.json" type="application/json">JSON</a>
+            </div>
+          </article>
+          <article class="catalog-card" id="project-meshtastic" data-commonproject-id="meshtastic">
+            <p class="catalog-kind">डिजिटल · संचार और नेटवर्क › सामुदायिक नेटवर्क</p>
+            <h2 dir="auto">Meshtastic</h2>
+            <p lang="hi" dir="auto">सेलुलर सेवा या इंटरनेट कनेक्शन के बिना विकेन्द्रीकृत संचार के लिए एक ओपन-सोर्स पारिस्थितिकी तंत्र, किफायती कम-शक्ति वाले लोरा उपकरणों का उपयोग करना और फर्मवेयर, प्रोटोकॉल और दस्तावेज़ीकरण प्रदान करना।</p>
+            <p class="catalog-location">स्थान-स्वतंत्र डिजिटल उपस्थिति</p>
+            <div class="catalog-actions">
+              <a class="catalog-action-link" data-action-type="use" href="https://meshtastic.org/docs/getting-started/" rel="external noreferrer">उपयोग करें <span aria-hidden="true">↗</span></a>
+              <a class="catalog-action-link" data-action-type="learn" href="https://meshtastic.org/docs/introduction/" rel="external noreferrer">जानें <span aria-hidden="true">↗</span></a>
+              <a class="catalog-action-link" data-action-type="contribute" href="https://github.com/meshtastic/firmware" rel="external noreferrer">योगदान करें <span aria-hidden="true">↗</span></a>
+              <a class="catalog-action-link" data-action-type="replicate" href="https://meshtastic.org/docs/getting-started/" rel="external noreferrer">प्रतिरूप बनाएँ <span aria-hidden="true">↗</span></a>
+              <a href="https://meshtastic.org/" rel="external noreferrer">आधिकारिक वेबसाइट <span aria-hidden="true">↗</span></a>
+              <a href="./catalog/projects/meshtastic.json" type="application/json">JSON</a>
+            </div>
+          </article>
+          <article class="catalog-card" id="project-mietshaeuser-syndikat" data-commonproject-id="mietshaeuser-syndikat">
+            <p class="catalog-kind">कॉमन्स</p>
+            <h2 dir="auto">Mietshäuser Syndikat</h2>
+            <p lang="hi" dir="auto">स्व-संगठित आवास परियोजनाओं का एक नेटवर्क जो सट्टा पुनर्विक्रय से संपत्तियों को स्थायी रूप से हटाने के लिए एक साझा कॉर्पोरेट संरचना का उपयोग करता है और नई सामुदायिक आवास परियोजनाओं का समर्थन करने के लिए एकजुटता हस्तांतरण का उपयोग करता है।</p>
+            <p class="catalog-location">2 छुपे हुए स्थान</p>
+            <div class="catalog-actions">
+              <a class="catalog-action-link" data-action-type="learn" href="https://www.syndikat.org/en/the-syndikat-in-operation/" rel="external noreferrer">जानें <span aria-hidden="true">↗</span></a>
+              <a class="catalog-action-link" data-action-type="contribute" href="https://www.syndikat.org/solidartransfer/" rel="external noreferrer">योगदान करें <span aria-hidden="true">↗</span></a>
+              <a class="catalog-action-link" data-action-type="contact" href="https://www.syndikat.org/der-projektverbund/" rel="external noreferrer">संपर्क करें <span aria-hidden="true">↗</span></a>
+              <a href="https://www.syndikat.org/der-projektverbund/" rel="external noreferrer">आधिकारिक वेबसाइट <span aria-hidden="true">↗</span></a>
+              <a href="./catalog/projects/mietshaeuser-syndikat.json" type="application/json">JSON</a>
+            </div>
+          </article>
+          <article class="catalog-card" id="project-mikoko-pamoja" data-commonproject-id="mikoko-pamoja">
+            <p class="catalog-kind">साइट पर</p>
+            <h2 dir="auto">Mikoko Pamoja</h2>
+            <p lang="hi" dir="auto">संयुक्त रूप से चयनित सामुदायिक-लाभ परियोजनाओं के लिए कार्बन-क्रेडिट राजस्व के साथ संरक्षण, बहाली और स्थानीय निगरानी के संयोजन में गाज़ी खाड़ी में एक समुदाय-स्वामित्व वाली मैंग्रोव पहल।</p>
+            <p class="catalog-location">1 सार्वजनिक स्थान</p>
+            <div class="catalog-actions">
+              <a class="catalog-action-link" data-action-type="learn" href="https://www.planvivo.org/projects/mikoko-pamoja-kenya" rel="external noreferrer">जानें <span aria-hidden="true">↗</span></a>
+              <a href="https://mikokopamoja.org/" rel="external noreferrer">आधिकारिक वेबसाइट <span aria-hidden="true">↗</span></a>
+              <a href="./catalog/projects/mikoko-pamoja.json" type="application/json">JSON</a>
+            </div>
+          </article>
+          <article class="catalog-card" id="project-mundraub" data-commonproject-id="mundraub">
+            <p class="catalog-kind">डिजिटल · आपूर्ति, भूमि और पारिस्थितिकी › जल एवं खाद्य प्रणाली</p>
+            <h2 lang="en" dir="ltr">mundraub.org</h2>
+            <p lang="hi" dir="auto">सार्वजनिक रूप से पढ़ने योग्य मानचित्र के साथ टेरा कॉनकॉर्डिया जीजीएमबीएच द्वारा संचालित एक मंच जहां योगदानकर्ता प्रकाशित मुंद्राउबर नियमों के तहत सार्वजनिक रूप से सुलभ खाद्य पौधों के स्थानों को रिकॉर्ड, साझा, उपयोग और देखभाल करते हैं।</p>
+            <p class="catalog-location">स्थान-स्वतंत्र डिजिटल उपस्थिति</p>
+            <div class="catalog-actions">
+              <a class="catalog-action-link" data-action-type="use" href="https://mundraub.org/map" rel="external noreferrer">उपयोग करें <span aria-hidden="true">↗</span></a>
+              <a class="catalog-action-link" data-action-type="learn" href="https://mundraub.org/mundraeuber-regeln" rel="external noreferrer">जानें <span aria-hidden="true">↗</span></a>
+              <a class="catalog-action-link" data-action-type="contribute" href="https://mundraub.org/user/login" rel="external noreferrer">योगदान करें <span aria-hidden="true">↗</span></a>
+              <a class="catalog-action-link" data-action-type="donate" href="https://mundraub.org/spenden" rel="external noreferrer">दान करें <span aria-hidden="true">↗</span></a>
+              <a href="https://mundraub.org/" rel="external noreferrer">आधिकारिक वेबसाइट <span aria-hidden="true">↗</span></a>
+              <a href="./catalog/projects/mundraub.json" type="application/json">JSON</a>
+            </div>
+          </article>
+          <article class="catalog-card" id="project-musicbrainz" data-commonproject-id="musicbrainz">
+            <p class="catalog-kind">डिजिटल · ज्ञान, शिक्षा और संस्कृति › खुला ज्ञान और डेटा</p>
+            <h2 dir="auto">MusicBrainz</h2>
+            <p lang="hi" dir="auto">विश्वव्यापी समुदाय द्वारा प्रबंधित एक खुला संगीत विश्वकोश, जिसमें मेटाडेटा सहयोगात्मक रूप से जोड़ा जाता है, समीक्षा की जाती है और बड़े पैमाने पर खुले लाइसेंस के तहत उपलब्ध कराई जाती है।</p>
+            <p class="catalog-location">स्थान-स्वतंत्र डिजिटल उपस्थिति</p>
+            <div class="catalog-actions">
+              <a class="catalog-action-link" data-action-type="use" href="https://musicbrainz.org/" rel="external noreferrer">उपयोग करें <span aria-hidden="true">↗</span></a>
+              <a class="catalog-action-link" data-action-type="learn" href="https://musicbrainz.org/doc/About" rel="external noreferrer">जानें <span aria-hidden="true">↗</span></a>
+              <a class="catalog-action-link" data-action-type="contribute" href="https://musicbrainz.org/doc/How_to_Contribute" rel="external noreferrer">योगदान करें <span aria-hidden="true">↗</span></a>
+              <a href="https://musicbrainz.org/" rel="external noreferrer">आधिकारिक वेबसाइट <span aria-hidden="true">↗</span></a>
+              <a href="./catalog/projects/musicbrainz.json" type="application/json">JSON</a>
+            </div>
+          </article>
+          <article class="catalog-card" id="project-namena-marine-reserve" data-commonproject-id="namena-marine-reserve">
+            <p class="catalog-kind">साइट पर · डिजिटल · आपूर्ति, भूमि और पारिस्थितिकी › भूमि, शहरी हरित और पारिस्थितिकी</p>
+            <h2 dir="auto">Namena Marine Reserve</h2>
+            <p lang="hi" dir="auto">फिजी में कुबुलाऊ जिले के प्रथागत संसाधन मालिकों द्वारा प्रबंधित एक समुद्री रिजर्व, जहां सामुदायिक नियम, प्रवर्तन और वित्तपोषण मत्स्य पालन और स्थानीय आजीविका की रक्षा करते हैं।</p>
+            <p class="catalog-location">1 सार्वजनिक स्थान</p>
+            <div class="catalog-actions">
+              <a class="catalog-action-link" data-action-type="learn" href="https://fiji.wcs.org/Initiatives/Protected-Areas/Namena-Marine-Reserve.aspx" rel="external noreferrer">जानें <span aria-hidden="true">↗</span></a>
+              <a href="https://fiji.wcs.org/Initiatives/Protected-Areas/Namena-Marine-Reserve.aspx" rel="external noreferrer">आधिकारिक वेबसाइट <span aria-hidden="true">↗</span></a>
+              <a href="./catalog/projects/namena-marine-reserve.json" type="application/json">JSON</a>
+            </div>
+          </article>
+          <article class="catalog-card" id="project-namibia-communal-conservancies-alliance" data-commonproject-id="namibia-communal-conservancies-alliance">
+            <p class="catalog-kind">साइट पर · डिजिटल · सहयोग और स्व-संगठन › सामुदायिक शासन और सहकारिता</p>
+            <h2 dir="auto">National Communal Conservancies and Community Forest Alliance</h2>
+            <p lang="hi" dir="auto">नामीबिया के सामुदायिक संरक्षण क्षेत्रों, सामुदायिक वनों और अन्य स्थानीय संसाधन समूहों का एक छत्र गठबंधन, जो साझा हितों का प्रतिनिधित्व करता है और समुदाय-आधारित प्राकृतिक-संसाधन शासन का समर्थन करता है।</p>
+            <p class="catalog-location">1 सार्वजनिक स्थान</p>
+            <div class="catalog-actions">
+              <a class="catalog-action-link" data-action-type="learn" href="https://nacso.org.na/communal-conservancies/" rel="external noreferrer">जानें <span aria-hidden="true">↗</span></a>
+              <a href="https://nacso.org.na/" rel="external noreferrer">आधिकारिक वेबसाइट <span aria-hidden="true">↗</span></a>
+              <a href="./catalog/projects/namibia-communal-conservancies-alliance.json" type="application/json">JSON</a>
+            </div>
+          </article>
+          <article class="catalog-card" id="project-nepal-wireless-networking-project" data-commonproject-id="nepal-wireless-networking-project">
+            <p class="catalog-kind">डिजिटल · संचार और नेटवर्क › सामुदायिक नेटवर्क</p>
+            <h2 dir="auto">Nepal Wireless Networking Project</h2>
+            <p lang="hi" dir="auto">स्थानीय समुदाय और ई-नेटवर्किंग अनुसंधान और विकास नेपाल में एक ग्रामीण संचार नेटवर्क संचालित करते हैं, जो वायरलेस बुनियादी ढांचे, शिक्षा और स्थानीय सेवाओं को जोड़ता है।</p>
+            <p class="catalog-location">2 छुपे हुए स्थान</p>
+            <div class="catalog-actions">
+              <a class="catalog-action-link" data-action-type="learn" href="https://enrd.org.np/projects-2/project-3/" rel="external noreferrer">जानें <span aria-hidden="true">↗</span></a>
+              <a class="catalog-action-link" data-action-type="contribute" href="https://enrd.org.np/projects-2/empowering-mountain-community-to-maintain-and-build-wireless-network/" rel="external noreferrer">योगदान करें <span aria-hidden="true">↗</span></a>
+              <a class="catalog-action-link" data-action-type="contact" href="https://enrd.org.np/" rel="external noreferrer">संपर्क करें <span aria-hidden="true">↗</span></a>
+              <a href="https://enrd.org.np/" rel="external noreferrer">आधिकारिक वेबसाइट <span aria-hidden="true">↗</span></a>
+              <a href="./catalog/projects/nepal-wireless-networking-project.json" type="application/json">JSON</a>
+            </div>
+          </article>
+          <article class="catalog-card" id="project-new-mexico-acequia-association" data-commonproject-id="new-mexico-acequia-association">
+            <p class="catalog-kind">डिजिटल · आपूर्ति, भूमि और पारिस्थितिकी › जल एवं खाद्य प्रणाली</p>
+            <h2 dir="auto">New Mexico Acequia Association</h2>
+            <p lang="hi" dir="auto">न्यू मैक्सिको का एक संघ, जो सामूहिक रूप से प्रबंधित सिंचाई नहरों, लोकतांत्रिक जल शासन, पारंपरिक कृषि और स्थानीय एसेकिया समुदायों की स्वायत्त भूमिका का समर्थन करता है।</p>
+            <p class="catalog-location">2 छुपे हुए स्थान</p>
+            <div class="catalog-actions">
+              <a class="catalog-action-link" data-action-type="learn" href="https://lasacequias.org/about-us/" rel="external noreferrer">जानें <span aria-hidden="true">↗</span></a>
+              <a class="catalog-action-link" data-action-type="contribute" href="https://lasacequias.org/become-a-member/" rel="external noreferrer">योगदान करें <span aria-hidden="true">↗</span></a>
+              <a class="catalog-action-link" data-action-type="contact" href="https://lasacequias.org/" rel="external noreferrer">संपर्क करें <span aria-hidden="true">↗</span></a>
+              <a href="https://lasacequias.org/" rel="external noreferrer">आधिकारिक वेबसाइट <span aria-hidden="true">↗</span></a>
+              <a href="./catalog/projects/new-mexico-acequia-association.json" type="application/json">JSON</a>
+            </div>
+          </article>
+          <article class="catalog-card" id="project-north-east-syria-autonomous-administration" data-commonproject-id="north-east-syria-autonomous-administration">
+            <p class="catalog-kind">कॉमन्स</p>
+            <h2 lang="en" dir="ltr">Democratic Autonomous Administration of North and East Syria</h2>
+            <p lang="hi" dir="auto">2018 से एक क्षेत्रीय स्व-प्रशासन संरचना विकसित हुई है जो सहभागी लोकतंत्र, सामाजिक न्याय और समानता के घोषित सिद्धांतों के आसपास स्थानीय परिषदों, समुदायों, नागरिक संस्थानों और सेवाओं का आयोजन करती है।</p>
+            <p class="catalog-location">1 छिपा हुआ स्थान</p>
+            <div class="catalog-actions">
+              <a class="catalog-action-link" data-action-type="learn" href="https://daanes.org/en/about/" rel="external noreferrer">जानें <span aria-hidden="true">↗</span></a>
+              <a class="catalog-action-link" data-action-type="contact" href="https://daanes.org/en/contact/" rel="external noreferrer">संपर्क करें <span aria-hidden="true">↗</span></a>
+              <a href="https://daanes.org/en/" rel="external noreferrer">आधिकारिक वेबसाइट <span aria-hidden="true">↗</span></a>
+              <a href="./catalog/projects/north-east-syria-autonomous-administration.json" type="application/json">JSON</a>
+            </div>
+          </article>
+          <article class="catalog-card" id="project-nyc-mesh" data-commonproject-id="nyc-mesh">
+            <p class="catalog-kind">साइट पर · डिजिटल · संचार और नेटवर्क › सामुदायिक नेटवर्क</p>
+            <h2 dir="auto">NYC Mesh</h2>
+            <p lang="hi" dir="auto">न्यूयॉर्क शहर में एक स्वयंसेवक द्वारा संचालित सामुदायिक नेटवर्क जो किफायती इंटरनेट पहुंच, डिजिटल आत्मनिर्णय और संयुक्त रूप से निर्मित स्थानीय बुनियादी ढांचे को जोड़ता है।</p>
+            <p class="catalog-location">1 सार्वजनिक स्थान · 1 छिपा हुआ स्थान</p>
+            <div class="catalog-actions">
+              <a class="catalog-action-link" data-action-type="use" href="https://www.nycmesh.net/join" rel="external noreferrer">उपयोग करें <span aria-hidden="true">↗</span></a>
+              <a class="catalog-action-link" data-action-type="learn" href="https://wiki.nycmesh.net/books/1-introduction/page/nyc-mesh-overview" rel="external noreferrer">जानें <span aria-hidden="true">↗</span></a>
+              <a class="catalog-action-link" data-action-type="contribute" href="https://www.nycmesh.net/volunteer" rel="external noreferrer">योगदान करें <span aria-hidden="true">↗</span></a>
+              <a class="catalog-action-link" data-action-type="volunteer" href="https://www.nycmesh.net/volunteer" rel="external noreferrer">स्वयंसेवा करें <span aria-hidden="true">↗</span></a>
+              <a class="catalog-action-link" data-action-type="donate" href="https://www.nycmesh.net/donate" rel="external noreferrer">दान करें <span aria-hidden="true">↗</span></a>
+              <a class="catalog-action-link" data-action-type="contact" href="https://www.nycmesh.net/support" rel="external noreferrer">संपर्क करें <span aria-hidden="true">↗</span></a>
+              <a href="https://www.nycmesh.net/" rel="external noreferrer">आधिकारिक वेबसाइट <span aria-hidden="true">↗</span></a>
+              <a href="./catalog/projects/nyc-mesh.json" type="application/json">JSON</a>
+            </div>
+          </article>
+          <article class="catalog-card" id="project-open-food-facts" data-commonproject-id="open-food-facts">
+            <p class="catalog-kind">डिजिटल · आपूर्ति, भूमि और पारिस्थितिकी › खाद्य प्लेटफार्म</p>
+            <h2 lang="en" dir="ltr">Open Food Facts</h2>
+            <p lang="hi" dir="auto">एक खुला खाद्य डेटाबेस जिसके स्वयंसेवक उत्पाद डेटा और छवियों को एकत्र और समीक्षा करते हैं और उन्हें मुफ्त पुन: उपयोग के लिए ओडीबीएल के तहत प्रकाशित करते हैं।</p>
+            <p class="catalog-location">स्थान-स्वतंत्र डिजिटल उपस्थिति</p>
+            <div class="catalog-actions">
+              <a class="catalog-action-link" data-action-type="use" href="https://world.openfoodfacts.org/" rel="external noreferrer">उपयोग करें <span aria-hidden="true">↗</span></a>
+              <a class="catalog-action-link" data-action-type="learn" href="https://openfoodfacts.github.io/documentation/docs/" rel="external noreferrer">जानें <span aria-hidden="true">↗</span></a>
+              <a class="catalog-action-link" data-action-type="contribute" href="https://openfoodfacts.github.io/documentation/docs/" rel="external noreferrer">योगदान करें <span aria-hidden="true">↗</span></a>
+              <a href="https://world.openfoodfacts.org/" rel="external noreferrer">आधिकारिक वेबसाइट <span aria-hidden="true">↗</span></a>
+              <a href="./catalog/projects/open-food-facts.json" type="application/json">JSON</a>
+            </div>
+          </article>
+          <article class="catalog-card" id="project-open-food-network-australia" data-commonproject-id="open-food-network-australia">
+            <p class="catalog-kind">डिजिटल · आपूर्ति, भूमि और पारिस्थितिकी › खाद्य प्लेटफार्म</p>
+            <h2 dir="auto">Open Food Network Australia</h2>
+            <p lang="hi" dir="auto">एक ऑस्ट्रेलियाई गैर-लाभकारी समुदाय और ओपन-सोर्स प्लेटफ़ॉर्म जो उत्पादकों और खाद्य पहलों को छोटी, पारदर्शी और समुदाय-नियंत्रित आपूर्ति श्रृंखलाओं को व्यवस्थित करने में सक्षम बनाता है।</p>
+            <p class="catalog-location">स्थान-स्वतंत्र डिजिटल उपस्थिति</p>
+            <div class="catalog-actions">
+              <a class="catalog-action-link" data-action-type="use" href="https://openfoodnetwork.org.au/" rel="external noreferrer">उपयोग करें <span aria-hidden="true">↗</span></a>
+              <a class="catalog-action-link" data-action-type="learn" href="https://about.openfoodnetwork.org.au/about-us/" rel="external noreferrer">जानें <span aria-hidden="true">↗</span></a>
+              <a class="catalog-action-link" data-action-type="contribute" href="https://about.openfoodnetwork.org.au/join-us/" rel="external noreferrer">योगदान करें <span aria-hidden="true">↗</span></a>
+              <a href="https://openfoodnetwork.org.au/" rel="external noreferrer">आधिकारिक वेबसाइट <span aria-hidden="true">↗</span></a>
+              <a href="./catalog/projects/open-food-network-australia.json" type="application/json">JSON</a>
+            </div>
+          </article>
+          <article class="catalog-card" id="project-open-library" data-commonproject-id="open-library">
+            <p class="catalog-kind">डिजिटल · ज्ञान, शिक्षा और संस्कृति › खुला ज्ञान और डेटा</p>
+            <h2 lang="en" dir="ltr">Open Library</h2>
+            <p lang="hi" dir="auto">इंटरनेट आर्काइव की एक खुली, सहयोगात्मक रूप से संपादन योग्य पुस्तक सूची और डिजिटल सार्वजनिक लाइब्रेरी जिसका सॉफ्टवेयर, डेटा और दस्तावेज़ीकरण स्वयंसेवकों द्वारा खुला और विस्तारित और रखरखाव किया जाता है।</p>
+            <p class="catalog-location">स्थान-स्वतंत्र डिजिटल उपस्थिति</p>
+            <div class="catalog-actions">
+              <a class="catalog-action-link" data-action-type="use" href="https://openlibrary.org/search" rel="external noreferrer">उपयोग करें <span aria-hidden="true">↗</span></a>
+              <a class="catalog-action-link" data-action-type="learn" href="https://openlibrary.org/about" rel="external noreferrer">जानें <span aria-hidden="true">↗</span></a>
+              <a class="catalog-action-link" data-action-type="contribute" href="https://openlibrary.org/volunteer" rel="external noreferrer">योगदान करें <span aria-hidden="true">↗</span></a>
+              <a href="https://openlibrary.org/" rel="external noreferrer">आधिकारिक वेबसाइट <span aria-hidden="true">↗</span></a>
+              <a href="./catalog/projects/open-library.json" type="application/json">JSON</a>
+            </div>
+          </article>
+          <article class="catalog-card" id="project-open-source-ecology" data-commonproject-id="open-source-ecology">
+            <p class="catalog-kind">साइट पर · डिजिटल · सॉफ्टवेयर, उपकरण और उत्पादन › खुला हार्डवेयर और उत्पादन</p>
+            <h2 dir="auto">Open Source Ecology</h2>
+            <p lang="hi" dir="auto">एक वैश्विक ओपन-हार्डवेयर परियोजना, जो औद्योगिक उपकरणों के स्वतंत्र रूप से उपयोग योग्य डिज़ाइन विकसित करती है और मिसौरी के Factor e Farm में उन्हें व्यवहार में परखती, दस्तावेज़ित करती और सिखाती है।</p>
+            <p class="catalog-location">1 सार्वजनिक स्थान</p>
+            <div class="catalog-actions">
+              <a class="catalog-action-link" data-action-type="use" href="https://wiki.opensourceecology.org/" rel="external noreferrer">उपयोग करें <span aria-hidden="true">↗</span></a>
+              <a class="catalog-action-link" data-action-type="learn" href="https://www.opensourceecology.org/" rel="external noreferrer">जानें <span aria-hidden="true">↗</span></a>
+              <a class="catalog-action-link" data-action-type="contribute" href="https://www.opensourceecology.org/community/" rel="external noreferrer">योगदान करें <span aria-hidden="true">↗</span></a>
+              <a class="catalog-action-link" data-action-type="donate" href="https://wiki.opensourceecology.org/wiki/Support_OSE" rel="external noreferrer">दान करें <span aria-hidden="true">↗</span></a>
+              <a class="catalog-action-link" data-action-type="contact" href="https://www.opensourceecology.org/contact/" rel="external noreferrer">संपर्क करें <span aria-hidden="true">↗</span></a>
+              <a class="catalog-action-link" data-action-type="replicate" href="https://wiki.opensourceecology.org/" rel="external noreferrer">प्रतिरूप बनाएँ <span aria-hidden="true">↗</span></a>
+              <a href="https://www.opensourceecology.org/" rel="external noreferrer">आधिकारिक वेबसाइट <span aria-hidden="true">↗</span></a>
+              <a href="./catalog/projects/open-source-ecology.json" type="application/json">JSON</a>
+            </div>
+          </article>
+          <article class="catalog-card" id="project-open-source-seed-initiative" data-commonproject-id="open-source-seed-initiative">
+            <p class="catalog-kind">डिजिटल · आपूर्ति, भूमि और पारिस्थितिकी › बीज, खाद्य और कृषि</p>
+            <h2 lang="en" dir="ltr">Open Source Seed Initiative</h2>
+            <p lang="hi" dir="auto">एक समुदाय-समर्थित बीज पहल जिसकी प्रतिज्ञा समान खुलेपन प्रतिबद्धता के तहत निर्दिष्ट बीज के उपयोग, बढ़ने, साझा करने, सुधार करने और आगे बढ़ाने की स्वतंत्रता की रक्षा करती है।</p>
+            <p class="catalog-location">1 छिपा हुआ स्थान</p>
+            <div class="catalog-actions">
+              <a class="catalog-action-link" data-action-type="use" href="https://osseeds.org/ossi-varieties/" rel="external noreferrer">उपयोग करें <span aria-hidden="true">↗</span></a>
+              <a class="catalog-action-link" data-action-type="learn" href="https://osseeds.org/about/" rel="external noreferrer">जानें <span aria-hidden="true">↗</span></a>
+              <a class="catalog-action-link" data-action-type="contribute" href="https://osseeds.org/actions-2/" rel="external noreferrer">योगदान करें <span aria-hidden="true">↗</span></a>
+              <a class="catalog-action-link" data-action-type="donate" href="https://osseeds.org/donate/" rel="external noreferrer">दान करें <span aria-hidden="true">↗</span></a>
+              <a href="https://osseeds.org/" rel="external noreferrer">आधिकारिक वेबसाइट <span aria-hidden="true">↗</span></a>
+              <a href="./catalog/projects/open-source-seed-initiative.json" type="application/json">JSON</a>
+            </div>
+          </article>
+          <article class="catalog-card" id="project-openmrs" data-commonproject-id="openmrs">
+            <p class="catalog-kind">डिजिटल · आपूर्ति, भूमि और पारिस्थितिकी › खुली स्वास्थ्य-देखभाल</p>
+            <h2 dir="auto">OpenMRS</h2>
+            <p lang="hi" dir="auto">सार्वजनिक दस्तावेज़ीकरण और विश्वव्यापी योगदान पथों के साथ स्थानीय स्वास्थ्य देखभाल के लिए एक अनुकूलनीय ओपन-सोर्स चिकित्सा सूचना प्रणाली।</p>
+            <p class="catalog-location">स्थान-स्वतंत्र डिजिटल उपस्थिति</p>
+            <div class="catalog-actions">
+              <a class="catalog-action-link" data-action-type="use" href="https://openmrs.org/download/" rel="external noreferrer">उपयोग करें <span aria-hidden="true">↗</span></a>
+              <a class="catalog-action-link" data-action-type="learn" href="https://openmrs.org/about/" rel="external noreferrer">जानें <span aria-hidden="true">↗</span></a>
+              <a class="catalog-action-link" data-action-type="contribute" href="https://openmrs.org/get-involved/" rel="external noreferrer">योगदान करें <span aria-hidden="true">↗</span></a>
+              <a href="https://openmrs.org/" rel="external noreferrer">आधिकारिक वेबसाइट <span aria-hidden="true">↗</span></a>
+              <a href="./catalog/projects/openmrs.json" type="application/json">JSON</a>
+            </div>
+          </article>
+          <article class="catalog-card" id="project-openstreetmap" data-commonproject-id="openstreetmap">
+            <p class="catalog-kind">डिजिटल · सॉफ्टवेयर, उपकरण और उत्पादन › डेटा और सॉफ़्टवेयर सेतु</p>
+            <h2 dir="auto">OpenStreetMap</h2>
+            <p lang="hi" dir="auto">एक विश्वव्यापी खुला मानचित्र डेटाबेस जिसकी सड़कों, रास्तों और अन्य जियोडेटा का सर्वेक्षण, सुधार और योगदानकर्ताओं द्वारा स्वतंत्र रूप से पुन: उपयोग किया जाता है।</p>
+            <p class="catalog-location">स्थान-स्वतंत्र डिजिटल उपस्थिति</p>
+            <div class="catalog-actions">
+              <a class="catalog-action-link" data-action-type="use" href="https://www.openstreetmap.org/" rel="external noreferrer">उपयोग करें <span aria-hidden="true">↗</span></a>
+              <a class="catalog-action-link" data-action-type="learn" href="https://learnosm.org/en/" rel="external noreferrer">जानें <span aria-hidden="true">↗</span></a>
+              <a class="catalog-action-link" data-action-type="contribute" href="https://www.openstreetmap.org/fixthemap" rel="external noreferrer">योगदान करें <span aria-hidden="true">↗</span></a>
+              <a class="catalog-action-link" data-action-type="donate" href="https://supporting.openstreetmap.org/" rel="external noreferrer">दान करें <span aria-hidden="true">↗</span></a>
+              <a href="https://www.openstreetmap.org/" rel="external noreferrer">आधिकारिक वेबसाइट <span aria-hidden="true">↗</span></a>
+              <a href="./catalog/projects/openstreetmap.json" type="application/json">JSON</a>
+            </div>
+          </article>
+          <article class="catalog-card" id="project-orangi-low-cost-sanitation" data-commonproject-id="orangi-low-cost-sanitation">
+            <p class="catalog-kind">डिजिटल · आपूर्ति, भूमि और पारिस्थितिकी › जल एवं सिंचाई</p>
+            <h2 dir="auto">Orangi Low-Cost Sanitation</h2>
+            <p lang="hi" dir="auto">कराची के ओरांगी में एक समुदाय-संगठित स्वच्छता पद्धति, जिसमें पड़ोस-समुदाय (मोहल्ले) घरेलू कनेक्शन, गलियों की सीवर लाइनें और द्वितीयक सीवर संयुक्त रूप से वित्तपोषित करते हैं, बनाते हैं, प्रबंधित करते हैं और उनका रखरखाव करते हैं, जबकि OPP-RTI तकनीकी मार्गदर्शन देता है और मुख्य ट्रंक अवसंरचना की जिम्मेदारी सार्वजनिक प्राधिकरणों पर बनी रहती है।</p>
+            <p class="catalog-location">1 छिपा हुआ स्थान</p>
+            <p class="catalog-activity-notice">वर्तमान परिचालन स्थिति को हाल ही में सत्यापित नहीं किया गया है। सूत्रों की समीक्षा की गई 2026-08-13; प्राथमिकता पुनः समीक्षा 2026-09-15.</p>
+            <div class="catalog-actions">
+              <a class="catalog-action-link" data-action-type="learn" href="https://www.opp.org.pk/opp-rti/" rel="external noreferrer">जानें <span aria-hidden="true">↗</span></a>
+              <a class="catalog-action-link" data-action-type="contact" href="https://www.opp.org.pk/contact/" rel="external noreferrer">संपर्क करें <span aria-hidden="true">↗</span></a>
+              <a href="https://www.opp.org.pk/" rel="external noreferrer">आधिकारिक वेबसाइट <span aria-hidden="true">↗</span></a>
+              <a href="./catalog/projects/orangi-low-cost-sanitation.json" type="application/json">JSON</a>
+            </div>
+          </article>
+          <article class="catalog-card" id="project-p2pu" data-commonproject-id="p2pu">
+            <p class="catalog-kind">डिजिटल · ज्ञान, शिक्षा और संस्कृति › सीखना और शिक्षा</p>
+            <h2 dir="auto">Peer 2 Peer University (P2PU)</h2>
+            <p lang="hi" dir="auto">एक गैर-लाभकारी, समुदाय-समर्थित शिक्षण नेटवर्क जो निःशुल्क शिक्षण मंडलियों और मुक्त शिक्षण संसाधनों को दुनिया भर के पुस्तकालयों, सुविधाप्रदाताओं और स्थानीय समुदायों से जोड़ता है।</p>
+            <p class="catalog-location">स्थान-स्वतंत्र डिजिटल उपस्थिति</p>
+            <div class="catalog-actions">
+              <a class="catalog-action-link" data-action-type="use" href="https://www.p2pu.org/" rel="external noreferrer">उपयोग करें <span aria-hidden="true">↗</span></a>
+              <a class="catalog-action-link" data-action-type="learn" href="https://www.p2pu.org/en/about/" rel="external noreferrer">जानें <span aria-hidden="true">↗</span></a>
+              <a class="catalog-action-link" data-action-type="contribute" href="https://community.p2pu.org/" rel="external noreferrer">योगदान करें <span aria-hidden="true">↗</span></a>
+              <a class="catalog-action-link" data-action-type="volunteer" href="https://www.p2pu.org/" rel="external noreferrer">स्वयंसेवा करें <span aria-hidden="true">↗</span></a>
+              <a href="https://www.p2pu.org/" rel="external noreferrer">आधिकारिक वेबसाइट <span aria-hidden="true">↗</span></a>
+              <a href="./catalog/projects/p2pu.json" type="application/json">JSON</a>
+            </div>
+          </article>
+          <article class="catalog-card" id="project-pachgaon-community-forest" data-commonproject-id="pachgaon-community-forest">
+            <p class="catalog-kind">साइट पर</p>
+            <h2 lang="en" dir="ltr">Pachgaon Community Forest</h2>
+            <p lang="hi" dir="auto">पचगांव ग्राम सभा मान्यता प्राप्त सामुदायिक वन संसाधन अधिकारों के माध्यम से 1,006 हेक्टेयर जंगल का प्रबंधन करती है, जिसमें लोकतांत्रिक निर्णयों को वन संरक्षण और बांस की कटाई और स्थानीय आजीविका के लिए बिक्री के साथ जोड़ा जाता है।</p>
+            <p class="catalog-location">1 सार्वजनिक स्थान</p>
+            <p class="catalog-activity-notice">वर्तमान परिचालन स्थिति को हाल ही में सत्यापित नहीं किया गया है। सूत्रों की समीक्षा की गई 2026-08-04; प्राथमिकता पुनः समीक्षा 2026-09-04.</p>
+            <div class="catalog-actions">
+              <a class="catalog-action-link" data-action-type="learn" href="https://cfr.atree.org/portfolio/learning-from-and-carrying-forward-cfr-management-planning-in-central-india-2/" rel="external noreferrer">जानें <span aria-hidden="true">↗</span></a>
+              <a href="https://cfr.atree.org/portfolio/learning-from-and-carrying-forward-cfr-management-planning-in-central-india-2/" rel="external noreferrer">आधिकारिक वेबसाइट <span aria-hidden="true">↗</span></a>
+              <a href="./catalog/projects/pachgaon-community-forest.json" type="application/json">JSON</a>
+            </div>
+          </article>
+          <article class="catalog-card" id="project-park-slope-food-coop" data-commonproject-id="park-slope-food-coop">
+            <p class="catalog-kind">साइट पर · डिजिटल · सहयोग और स्व-संगठन › सामुदायिक शासन और सहकारिता</p>
+            <h2 lang="en" dir="ltr">Park Slope Food Coop</h2>
+            <p lang="hi" dir="auto">ब्रुकलिन में एक सदस्य-स्वामित्व वाला किराना व्यवसाय जिसके लगभग 17,000 सदस्य कार्य शिफ्ट, पूंजी शेयरों और लोकतांत्रिक प्रक्रियाओं के माध्यम से खरीदारी, संचालन और नियमों को बनाए रखते हैं।</p>
+            <p class="catalog-location">1 सार्वजनिक स्थान</p>
+            <div class="catalog-actions">
+              <a class="catalog-action-link" data-action-type="visit" href="https://www.foodcoop.com/ort-agreements/" rel="external noreferrer">जाएँ <span aria-hidden="true">↗</span></a>
+              <a class="catalog-action-link" data-action-type="use" href="https://www.foodcoop.com/ort-about/" rel="external noreferrer">उपयोग करें <span aria-hidden="true">↗</span></a>
+              <a class="catalog-action-link" data-action-type="learn" href="https://www.foodcoop.com/manual/" rel="external noreferrer">जानें <span aria-hidden="true">↗</span></a>
+              <a class="catalog-action-link" data-action-type="contribute" href="https://www.foodcoop.com/ort-about/" rel="external noreferrer">योगदान करें <span aria-hidden="true">↗</span></a>
+              <a href="https://www.foodcoop.com/" rel="external noreferrer">आधिकारिक वेबसाइट <span aria-hidden="true">↗</span></a>
+              <a href="./catalog/projects/park-slope-food-coop.json" type="application/json">JSON</a>
+            </div>
+          </article>
+          <article class="catalog-card" id="project-potato-park-peru" data-commonproject-id="potato-park-peru">
+            <p class="catalog-kind">साइट पर</p>
+            <h2 dir="auto">Parque de la Papa</h2>
+            <p lang="hi" dir="auto">पिसाक के पास का एक क्षेत्र पाँच क्वेशुआ समुदायों द्वारा संचालित है जहाँ देशी आलू की किस्में, कृषि ज्ञान, पारिस्थितिकी तंत्र और सांस्कृतिक प्रथाओं को सामूहिक रूप से संरक्षित किया जाता है।</p>
+            <p class="catalog-location">1 सार्वजनिक स्थान</p>
+            <div class="catalog-actions">
+              <a class="catalog-action-link" data-action-type="visit" href="https://parquedelapapa.org/" rel="external noreferrer">जाएँ <span aria-hidden="true">↗</span></a>
+              <a href="https://parquedelapapa.org/" rel="external noreferrer">आधिकारिक वेबसाइट <span aria-hidden="true">↗</span></a>
+              <a href="./catalog/projects/potato-park-peru.json" type="application/json">JSON</a>
+            </div>
+          </article>
+          <article class="catalog-card" id="project-prinzessinnengarten-kollektiv" data-commonproject-id="prinzessinnengarten-kollektiv">
+            <p class="catalog-kind">साइट पर</p>
+            <h2 dir="auto">Prinzessinnengarten Kollektiv Berlin</h2>
+            <p lang="hi" dir="auto">बर्लिन-न्यूकोलन में एक सार्वजनिक रूप से सुलभ सामुदायिक उद्यान जहां पड़ोसी एक साथ बागवानी करते हैं, ज्ञान साझा करते हैं और शहरी जैव विविधता और पारिस्थितिक शिक्षा का समर्थन करते हैं।</p>
+            <p class="catalog-location">1 सार्वजनिक स्थान</p>
+            <div class="catalog-actions">
+              <a class="catalog-action-link" data-action-type="visit" href="https://prinzessinnengarten-kollektiv.net/ueber-uns/" rel="external noreferrer">जाएँ <span aria-hidden="true">↗</span></a>
+              <a class="catalog-action-link" data-action-type="learn" href="https://prinzessinnengarten-kollektiv.net/ueber-uns/" rel="external noreferrer">जानें <span aria-hidden="true">↗</span></a>
+              <a class="catalog-action-link" data-action-type="contribute" href="https://prinzessinnengarten-kollektiv.net/ueber-uns/" rel="external noreferrer">योगदान करें <span aria-hidden="true">↗</span></a>
+              <a class="catalog-action-link" data-action-type="volunteer" href="https://prinzessinnengarten-kollektiv.net/ueber-uns/" rel="external noreferrer">स्वयंसेवा करें <span aria-hidden="true">↗</span></a>
+              <a class="catalog-action-link" data-action-type="contact" href="https://prinzessinnengarten-kollektiv.net/kontakt/" rel="external noreferrer">संपर्क करें <span aria-hidden="true">↗</span></a>
+              <a href="https://prinzessinnengarten-kollektiv.net/" rel="external noreferrer">आधिकारिक वेबसाइट <span aria-hidden="true">↗</span></a>
+              <a href="./catalog/projects/prinzessinnengarten-kollektiv.json" type="application/json">JSON</a>
+            </div>
+          </article>
+          <article class="catalog-card" id="project-red-guardianes-semillas-ecuador" data-commonproject-id="red-guardianes-semillas-ecuador">
+            <p class="catalog-kind">डिजिटल · आपूर्ति, भूमि और पारिस्थितिकी › बीज, खाद्य और कृषि</p>
+            <h2 dir="auto">Red de Guardianes de Semillas del Ecuador</h2>
+            <p lang="hi" dir="auto">कृषि जैव विविधता, पुनर्योजी भूमि प्रबंधन, बीज ज्ञान और सामुदायिक शिक्षा को जोड़ने वाले परिवारों और बीज अभिभावकों का एक इक्वाडोरियन नेटवर्क।</p>
+            <p class="catalog-location">स्थान-स्वतंत्र डिजिटल उपस्थिति</p>
+            <div class="catalog-actions">
+              <a class="catalog-action-link" data-action-type="learn" href="https://redsemillas.org/" rel="external noreferrer">जानें <span aria-hidden="true">↗</span></a>
+              <a class="catalog-action-link" data-action-type="contribute" href="https://redsemillas.org/" rel="external noreferrer">योगदान करें <span aria-hidden="true">↗</span></a>
+              <a class="catalog-action-link" data-action-type="volunteer" href="https://redsemillas.org/" rel="external noreferrer">स्वयंसेवा करें <span aria-hidden="true">↗</span></a>
+              <a class="catalog-action-link" data-action-type="contact" href="https://redsemillas.org/" rel="external noreferrer">संपर्क करें <span aria-hidden="true">↗</span></a>
+              <a href="https://redsemillas.org/" rel="external noreferrer">आधिकारिक वेबसाइट <span aria-hidden="true">↗</span></a>
+              <a href="./catalog/projects/red-guardianes-semillas-ecuador.json" type="application/json">JSON</a>
+            </div>
+          </article>
+          <article class="catalog-card" id="project-repair-cafe-international" data-commonproject-id="repair-cafe-international">
+            <p class="catalog-kind">डिजिटल · सॉफ्टवेयर, उपकरण और उत्पादन › प्लेटफ़ॉर्म और साझा उपकरण</p>
+            <h2 lang="en" dir="ltr">Repair Café International</h2>
+            <p lang="hi" dir="auto">स्वयंसेवी-संचालित, गैर-व्यावसायिक मरम्मत बैठकों का एक विश्वव्यापी नेटवर्क जहां लोग रोजमर्रा की वस्तुओं की मरम्मत के लिए उपकरण, ज्ञान और समय साझा करते हैं और स्थानीय मरम्मत कौशल विकसित करते हैं।</p>
+            <p class="catalog-location">1 छिपा हुआ स्थान</p>
+            <div class="catalog-actions">
+              <a class="catalog-action-link" data-action-type="visit" href="https://www.repaircafe.org/en/visit/" rel="external noreferrer">जाएँ <span aria-hidden="true">↗</span></a>
+              <a class="catalog-action-link" data-action-type="learn" href="https://www.repaircafe.org/en/about/" rel="external noreferrer">जानें <span aria-hidden="true">↗</span></a>
+              <a class="catalog-action-link" data-action-type="replicate" href="https://www.repaircafe.org/en/join/start-your-own/" rel="external noreferrer">प्रतिरूप बनाएँ <span aria-hidden="true">↗</span></a>
+              <a class="catalog-action-link" data-action-type="donate" href="https://www.repaircafe.org/en/donate/" rel="external noreferrer">दान करें <span aria-hidden="true">↗</span></a>
+              <a class="catalog-action-link" data-action-type="contact" href="https://www.repaircafe.org/en/contact/" rel="external noreferrer">संपर्क करें <span aria-hidden="true">↗</span></a>
+              <a href="https://www.repaircafe.org/en/" rel="external noreferrer">आधिकारिक वेबसाइट <span aria-hidden="true">↗</span></a>
+              <a href="./catalog/projects/repair-cafe-international.json" type="application/json">JSON</a>
+            </div>
+          </article>
+          <article class="catalog-card" id="project-reprap" data-commonproject-id="reprap">
+            <p class="catalog-kind">डिजिटल · सॉफ्टवेयर, उपकरण और उत्पादन › खुला हार्डवेयर और उत्पादन</p>
+            <h2 dir="auto">RepRap</h2>
+            <p lang="hi" dir="auto">स्वतंत्र रूप से प्रलेखित 3डी प्रिंटरों के लिए एक वैश्विक ओपन-हार्डवेयर प्रोजेक्ट जो अपने स्वयं के हिस्सों का एक महत्वपूर्ण हिस्सा बना सकता है और जिनके डिजाइन सहयोगात्मक रूप से निर्मित, अनुकूलित और बेहतर किए गए हैं।</p>
+            <p class="catalog-location">स्थान-स्वतंत्र डिजिटल उपस्थिति</p>
+            <div class="catalog-actions">
+              <a class="catalog-action-link" data-action-type="use" href="https://reprap.org/wiki/RepRap_Machines" rel="external noreferrer">उपयोग करें <span aria-hidden="true">↗</span></a>
+              <a class="catalog-action-link" data-action-type="learn" href="https://reprap.org/wiki/About" rel="external noreferrer">जानें <span aria-hidden="true">↗</span></a>
+              <a class="catalog-action-link" data-action-type="contribute" href="https://reprap.org/" rel="external noreferrer">योगदान करें <span aria-hidden="true">↗</span></a>
+              <a class="catalog-action-link" data-action-type="replicate" href="https://reprap.org/wiki/RepRap_Machines" rel="external noreferrer">प्रतिरूप बनाएँ <span aria-hidden="true">↗</span></a>
+              <a href="https://reprap.org/" rel="external noreferrer">आधिकारिक वेबसाइट <span aria-hidden="true">↗</span></a>
+              <a href="./catalog/projects/reprap.json" type="application/json">JSON</a>
+            </div>
+          </article>
+          <article class="catalog-card" id="project-restarters" data-commonproject-id="restarters">
+            <p class="catalog-kind">डिजिटल · सॉफ्टवेयर, उपकरण और उत्पादन › प्लेटफ़ॉर्म और साझा उपकरण</p>
+            <h2 dir="auto">Restarters</h2>
+            <p lang="hi" dir="auto">सामुदायिक मरम्मत के लिए एक वैश्विक नेटवर्क जो साझा डिजिटल बुनियादी ढांचे के माध्यम से स्थानीय मरम्मत समूहों, घटनाओं, ज्ञान और खुले प्रभाव डेटा को जोड़ता है।</p>
+            <p class="catalog-location">स्थान-स्वतंत्र डिजिटल उपस्थिति</p>
+            <div class="catalog-actions">
+              <a class="catalog-action-link" data-action-type="use" href="https://restarters.net/" rel="external noreferrer">उपयोग करें <span aria-hidden="true">↗</span></a>
+              <a class="catalog-action-link" data-action-type="learn" href="https://restarters.net/about" rel="external noreferrer">जानें <span aria-hidden="true">↗</span></a>
+              <a class="catalog-action-link" data-action-type="contribute" href="https://talk.restarters.net/" rel="external noreferrer">योगदान करें <span aria-hidden="true">↗</span></a>
+              <a class="catalog-action-link" data-action-type="volunteer" href="https://restarters.net/" rel="external noreferrer">स्वयंसेवा करें <span aria-hidden="true">↗</span></a>
+              <a href="https://restarters.net/" rel="external noreferrer">आधिकारिक वेबसाइट <span aria-hidden="true">↗</span></a>
+              <a href="./catalog/projects/restarters.json" type="application/json">JSON</a>
+            </div>
+          </article>
+          <article class="catalog-card" id="project-root-access-hackerspace" data-commonproject-id="root-access-hackerspace">
+            <p class="catalog-kind">साइट पर · डिजिटल · सॉफ्टवेयर, उपकरण और उत्पादन › प्लेटफ़ॉर्म और साझा उपकरण</p>
+            <h2 dir="auto">Root Access Hackerspace</h2>
+            <p lang="hi" dir="auto">फ्रेस्नो में एक गैर-लाभकारी, पूरी तरह से स्वयंसेवी संचालित हैकरस्पेस और मेकरस्पेस जहां सदस्य उपकरण और बुनियादी ढांचे को साझा करते हैं और सार्वजनिक कक्षाएं और सामुदायिक कार्यक्रम आयोजित करते हैं।</p>
+            <p class="catalog-location">1 सार्वजनिक स्थान</p>
+            <div class="catalog-actions">
+              <a class="catalog-action-link" data-action-type="visit" href="https://rootaccess.org/" rel="external noreferrer">जाएँ <span aria-hidden="true">↗</span></a>
+              <a class="catalog-action-link" data-action-type="learn" href="https://rootaccess.org/classes" rel="external noreferrer">जानें <span aria-hidden="true">↗</span></a>
+              <a class="catalog-action-link" data-action-type="contribute" href="https://rootaccess.org/wiki/Main_Page/" rel="external noreferrer">योगदान करें <span aria-hidden="true">↗</span></a>
+              <a class="catalog-action-link" data-action-type="volunteer" href="https://rootaccess.org/" rel="external noreferrer">स्वयंसेवा करें <span aria-hidden="true">↗</span></a>
+              <a class="catalog-action-link" data-action-type="donate" href="https://rootaccess.org/" rel="external noreferrer">दान करें <span aria-hidden="true">↗</span></a>
+              <a class="catalog-action-link" data-action-type="contact" href="https://rootaccess.org/" rel="external noreferrer">संपर्क करें <span aria-hidden="true">↗</span></a>
+              <a href="https://rootaccess.org/" rel="external noreferrer">आधिकारिक वेबसाइट <span aria-hidden="true">↗</span></a>
+              <a href="./catalog/projects/root-access-hackerspace.json" type="application/json">JSON</a>
+            </div>
+          </article>
+          <article class="catalog-card" id="project-safecast" data-commonproject-id="safecast">
+            <p class="catalog-kind">डिजिटल · ज्ञान, शिक्षा और संस्कृति › खुला ज्ञान और डेटा</p>
+            <h2 dir="auto">Safecast</h2>
+            <p lang="hi" dir="auto">एक अंतरराष्ट्रीय स्वयंसेवक के नेतृत्व वाला नागरिक-विज्ञान समुदाय जो खुले पर्यावरण माप एकत्र करता है, लोगों के लिए स्वतंत्र रूप से मापने के लिए उपकरण विकसित करता है और अपना डेटा सार्वजनिक डोमेन में जारी करता है।</p>
+            <p class="catalog-location">स्थान-स्वतंत्र डिजिटल उपस्थिति</p>
+            <div class="catalog-actions">
+              <a class="catalog-action-link" data-action-type="use" href="https://safecast.org/data/" rel="external noreferrer">उपयोग करें <span aria-hidden="true">↗</span></a>
+              <a class="catalog-action-link" data-action-type="learn" href="https://safecast.org/about/" rel="external noreferrer">जानें <span aria-hidden="true">↗</span></a>
+              <a class="catalog-action-link" data-action-type="contribute" href="https://api.safecast.org/" rel="external noreferrer">योगदान करें <span aria-hidden="true">↗</span></a>
+              <a class="catalog-action-link" data-action-type="volunteer" href="https://safecast.org/join-us/" rel="external noreferrer">स्वयंसेवा करें <span aria-hidden="true">↗</span></a>
+              <a class="catalog-action-link" data-action-type="donate" href="https://safecast.org/donate/" rel="external noreferrer">दान करें <span aria-hidden="true">↗</span></a>
+              <a href="https://safecast.org/" rel="external noreferrer">आधिकारिक वेबसाइट <span aria-hidden="true">↗</span></a>
+              <a href="./catalog/projects/safecast.json" type="application/json">JSON</a>
+            </div>
+          </article>
+          <article class="catalog-card" id="project-samoa-community-based-fisheries-management-program" data-commonproject-id="samoa-community-based-fisheries-management-program">
+            <p class="catalog-kind">डिजिटल · आपूर्ति, भूमि और पारिस्थितिकी › भूमि, शहरी हरित और पारिस्थितिकी</p>
+            <h2 dir="auto">Samoa Community-Based Fisheries Management Program</h2>
+            <p lang="hi" dir="auto">समोआ में एक कॉमन्स अवसंरचना, जिसमें 120 से अधिक तटीय गाँव समुदाय राष्ट्रीय मत्स्य प्राधिकरण के तकनीकी सहयोग से अपनी मत्स्य प्रबंधन योजनाएँ, गाँव के उपनियम और स्थानीय रूप से शासित मत्स्य आरक्षित क्षेत्र विकसित और संचालित करते हैं।</p>
+            <p class="catalog-location">1 छिपा हुआ स्थान</p>
+            <div class="catalog-actions">
+              <a class="catalog-action-link" data-action-type="learn" href="https://maf.gov.ws/fisheries/" rel="external noreferrer">जानें <span aria-hidden="true">↗</span></a>
+              <a href="https://maf.gov.ws/fisheries/" rel="external noreferrer">आधिकारिक वेबसाइट <span aria-hidden="true">↗</span></a>
+              <a href="./catalog/projects/samoa-community-based-fisheries-management-program.json" type="application/json">JSON</a>
+            </div>
+          </article>
+          <article class="catalog-card" id="project-sarantaporo-community-network" data-commonproject-id="sarantaporo-community-network">
+            <p class="catalog-kind">साइट पर · डिजिटल · संचार और नेटवर्क › सामुदायिक नेटवर्क</p>
+            <h2 dir="auto">Sarantaporo.gr Community Network</h2>
+            <p lang="hi" dir="auto">एलासोना क्षेत्र के ग्रामीण गांवों में एक समुदाय-निर्मित और संचालित वायरलेस नेटवर्क, जो खुली कनेक्टिविटी, डिजिटल शिक्षा और स्थानीय स्व-संगठन को जोड़ता है।</p>
+            <p class="catalog-location">1 सार्वजनिक स्थान · 1 छिपा हुआ स्थान</p>
+            <div class="catalog-actions">
+              <a class="catalog-action-link" data-action-type="use" href="https://www.sarantaporo.gr/en/community-network" rel="external noreferrer">उपयोग करें <span aria-hidden="true">↗</span></a>
+              <a class="catalog-action-link" data-action-type="learn" href="https://www.sarantaporo.gr/en/community-network" rel="external noreferrer">जानें <span aria-hidden="true">↗</span></a>
+              <a class="catalog-action-link" data-action-type="contribute" href="https://www.sarantaporo.gr/en/about-us" rel="external noreferrer">योगदान करें <span aria-hidden="true">↗</span></a>
+              <a class="catalog-action-link" data-action-type="volunteer" href="https://www.sarantaporo.gr/en/about-us" rel="external noreferrer">स्वयंसेवा करें <span aria-hidden="true">↗</span></a>
+              <a class="catalog-action-link" data-action-type="donate" href="https://www.sarantaporo.gr/en/about-us" rel="external noreferrer">दान करें <span aria-hidden="true">↗</span></a>
+              <a class="catalog-action-link" data-action-type="contact" href="https://www.sarantaporo.gr/en/contact-us" rel="external noreferrer">संपर्क करें <span aria-hidden="true">↗</span></a>
+              <a href="https://www.sarantaporo.gr/en/" rel="external noreferrer">आधिकारिक वेबसाइट <span aria-hidden="true">↗</span></a>
+              <a href="./catalog/projects/sarantaporo-community-network.json" type="application/json">JSON</a>
+            </div>
+          </article>
+          <article class="catalog-card" id="project-sewa-sangini-childcare-cooperative" data-commonproject-id="sewa-sangini-childcare-cooperative">
+            <p class="catalog-kind">कॉमन्स</p>
+            <h2 dir="auto">SEWA Sangini Childcare Cooperative</h2>
+            <p lang="hi" dir="auto">गुजरात में महिलाओं द्वारा संचालित बाल-देखभाल सहकारी संस्था, जो सामूहिक रूप से संगठित देखभाल को देखभाल कर्मियों के सवेतन काम, अभिभावक भागीदारी और अनौपचारिक अर्थव्यवस्था में काम करने वाली महिलाओं की सामाजिक सुरक्षा से जोड़ती है।</p>
+            <p class="catalog-location">1 छिपा हुआ स्थान</p>
+            <div class="catalog-actions">
+              <a class="catalog-action-link" data-action-type="learn" href="https://sewafederation.org/social-security-for-informal-women-workers-lessons-from-sewa/" rel="external noreferrer">जानें <span aria-hidden="true">↗</span></a>
+              <a href="https://sewafederation.org/" rel="external noreferrer">आधिकारिक वेबसाइट <span aria-hidden="true">↗</span></a>
+              <a href="./catalog/projects/sewa-sangini-childcare-cooperative.json" type="application/json">JSON</a>
+            </div>
+          </article>
+          <article class="catalog-card" id="project-som-energia" data-commonproject-id="som-energia">
+            <p class="catalog-kind">डिजिटल · आपूर्ति, भूमि और पारिस्थितिकी › ऊर्जा सहकारी समितियाँ</p>
+            <h2 dir="auto">Som Energia</h2>
+            <p lang="hi" dir="auto">स्पेन में एक गैर-लाभकारी ऊर्जा सहकारी समिति जिसके सदस्य लोकतांत्रिक रूप से नवीकरणीय-ऊर्जा आपूर्ति, सामुदायिक उत्पादन परियोजनाओं और स्थानीय समूहों का समर्थन और विकास करते हैं।</p>
+            <p class="catalog-location">2 छुपे हुए स्थान</p>
+            <div class="catalog-actions">
+              <a class="catalog-action-link" data-action-type="use" href="https://www.somenergia.coop/es/cooperativa/asociarse" rel="external noreferrer">उपयोग करें <span aria-hidden="true">↗</span></a>
+              <a class="catalog-action-link" data-action-type="learn" href="https://www.somenergia.coop/es/cooperativa/sobre-nosotros" rel="external noreferrer">जानें <span aria-hidden="true">↗</span></a>
+              <a class="catalog-action-link" data-action-type="contribute" href="https://www.somenergia.coop/es/cooperativa/grupos-locales/" rel="external noreferrer">योगदान करें <span aria-hidden="true">↗</span></a>
+              <a href="https://www.somenergia.coop/es" rel="external noreferrer">आधिकारिक वेबसाइट <span aria-hidden="true">↗</span></a>
+              <a href="./catalog/projects/som-energia.json" type="application/json">JSON</a>
+            </div>
+          </article>
+          <article class="catalog-card" id="project-tetepare-descendants-association" data-commonproject-id="tetepare-descendants-association">
+            <p class="catalog-kind">साइट पर · डिजिटल · आपूर्ति, भूमि और पारिस्थितिकी › भूमि, शहरी हरित और पारिस्थितिकी</p>
+            <h2 dir="auto">Tetepare Descendants’ Association</h2>
+            <p lang="hi" dir="auto">सोलोमन द्वीपसमूह में भूमि-मालिकों का एक बड़ा संघ, जो भविष्य की पीढ़ियों के लिए टेटेपारे द्वीप और उसके स्थलीय व समुद्री संसाधनों की सामूहिक रूप से रक्षा और प्रबंधन करता है।</p>
+            <p class="catalog-location">1 सार्वजनिक स्थान</p>
+            <div class="catalog-actions">
+              <a class="catalog-action-link" data-action-type="learn" href="https://tetepare.org/the-tetepare-descendants-association/" rel="external noreferrer">जानें <span aria-hidden="true">↗</span></a>
+              <a href="https://tetepare.org/the-tetepare-descendants-association/" rel="external noreferrer">आधिकारिक वेबसाइट <span aria-hidden="true">↗</span></a>
+              <a href="./catalog/projects/tetepare-descendants-association.json" type="application/json">JSON</a>
+            </div>
+          </article>
+          <article class="catalog-card" id="project-thailand-citizens-forest-database" data-commonproject-id="thailand-citizens-forest-database">
+            <p class="catalog-kind">साइट पर · डिजिटल · ज्ञान, शिक्षा और संस्कृति › खुला ज्ञान और डेटा</p>
+            <h2 dir="auto">Thailand Citizens’ Forest Database</h2>
+            <p lang="hi" dir="auto">एक सहयोगात्मक रूप से बनाए रखा गया डिजिटल ज्ञान बुनियादी ढांचा जहां समुदाय, नागरिक समाज और सार्वजनिक संस्थान सहयोग और स्थानीय प्रबंधन के लिए थाईलैंड के सामुदायिक वनों का दस्तावेजीकरण करते हैं।</p>
+            <p class="catalog-location">1 सार्वजनिक स्थान</p>
+            <div class="catalog-actions">
+              <a class="catalog-action-link" data-action-type="use" href="https://thaicfnet.org/" rel="external noreferrer">उपयोग करें <span aria-hidden="true">↗</span></a>
+              <a class="catalog-action-link" data-action-type="learn" href="https://www.recoftc.org/annual-report-2021-2022/data-and-forests-putting-community-forestry-digital-map-thailand" rel="external noreferrer">जानें <span aria-hidden="true">↗</span></a>
+              <a href="https://www.recoftc.org/th/publications/thaicfnet-factsheet" rel="external noreferrer">आधिकारिक वेबसाइट <span aria-hidden="true">↗</span></a>
+              <a href="./catalog/projects/thailand-citizens-forest-database.json" type="application/json">JSON</a>
+            </div>
+          </article>
+          <article class="catalog-card" id="project-the-things-network" data-commonproject-id="the-things-network">
+            <p class="catalog-kind">डिजिटल · संचार और नेटवर्क › सामुदायिक नेटवर्क</p>
+            <h2 lang="en" dir="ltr">The Things Network</h2>
+            <p lang="hi" dir="auto">स्थानीय समुदायों के साथ निर्मित एक वैश्विक इंटरनेट ऑफ थिंग्स रेडियो नेटवर्क, समुदाय-संचालित लोरावन गेटवे, ओपन सॉफ्टवेयर, सीखने के संसाधन और सार्वजनिक सामुदायिक बुनियादी ढांचे का संयोजन।</p>
+            <p class="catalog-location">1 छिपा हुआ स्थान</p>
+            <div class="catalog-actions">
+              <a class="catalog-action-link" data-action-type="use" href="https://www.thethingsnetwork.org/get-started" rel="external noreferrer">उपयोग करें <span aria-hidden="true">↗</span></a>
+              <a class="catalog-action-link" data-action-type="learn" href="https://www.thethingsnetwork.org/learn" rel="external noreferrer">जानें <span aria-hidden="true">↗</span></a>
+              <a class="catalog-action-link" data-action-type="contribute" href="https://www.thethingsnetwork.org/community" rel="external noreferrer">योगदान करें <span aria-hidden="true">↗</span></a>
+              <a class="catalog-action-link" data-action-type="replicate" href="https://www.thethingsnetwork.org/community" rel="external noreferrer">प्रतिरूप बनाएँ <span aria-hidden="true">↗</span></a>
+              <a href="https://www.thethingsnetwork.org/" rel="external noreferrer">आधिकारिक वेबसाइट <span aria-hidden="true">↗</span></a>
+              <a href="./catalog/projects/the-things-network.json" type="application/json">JSON</a>
+            </div>
+          </article>
+          <article class="catalog-card" id="project-tla-o-qui-aht-tribal-parks" data-commonproject-id="tla-o-qui-aht-tribal-parks">
+            <p class="catalog-kind">साइट पर · डिजिटल · आपूर्ति, भूमि और पारिस्थितिकी › भूमि, शहरी हरित और पारिस्थितिकी</p>
+            <h2 dir="auto">Tla-o-qui-aht Tribal Parks</h2>
+            <p lang="hi" dir="auto">क्लेओक्वॉट साउंड में स्वदेशी-शासित क्षेत्र जहां त्ला-ओ-क्वि-आहट फर्स्ट नेशन पारंपरिक शासन, संरक्षक कार्य, पारिस्थितिक बहाली और जिम्मेदार क्षेत्रीय भागीदारी को जोड़ता है।</p>
+            <p class="catalog-location">1 सार्वजनिक स्थान</p>
+            <div class="catalog-actions">
+              <a class="catalog-action-link" data-action-type="visit" href="https://www.tribalparks.com/visit-responsibly" rel="external noreferrer">जाएँ <span aria-hidden="true">↗</span></a>
+              <a class="catalog-action-link" data-action-type="learn" href="https://www.tribalparks.com/our-story" rel="external noreferrer">जानें <span aria-hidden="true">↗</span></a>
+              <a class="catalog-action-link" data-action-type="donate" href="https://www.tribalparks.com/get-involved" rel="external noreferrer">दान करें <span aria-hidden="true">↗</span></a>
+              <a href="https://www.tribalparks.com/" rel="external noreferrer">आधिकारिक वेबसाइट <span aria-hidden="true">↗</span></a>
+              <a href="./catalog/projects/tla-o-qui-aht-tribal-parks.json" type="application/json">JSON</a>
+            </div>
+          </article>
+          <article class="catalog-card" id="project-tribunal-aguas-valencia" data-commonproject-id="tribunal-aguas-valencia">
+            <p class="catalog-kind">साइट पर</p>
+            <h2 dir="auto">Tribunal de las Aguas de Valencia</h2>
+            <p lang="hi" dir="auto">वालेंसिया में सिंचाई समुदायों द्वारा संचालित एक जल अदालत जो स्थापित प्रथा के अनुसार सार्वजनिक रूप से और नियमित रूप से उपयोग पर विवादों की सुनवाई करती है।</p>
+            <p class="catalog-location">1 सार्वजनिक स्थान</p>
+            <div class="catalog-actions">
+              <a class="catalog-action-link" data-action-type="visit" href="https://tribunaldelasaguas.org/en/visits-to-the-tribunal/" rel="external noreferrer">जाएँ <span aria-hidden="true">↗</span></a>
+              <a href="https://tribunaldelasaguas.org/en/" rel="external noreferrer">आधिकारिक वेबसाइट <span aria-hidden="true">↗</span></a>
+              <a href="./catalog/projects/tribunal-aguas-valencia.json" type="application/json">JSON</a>
+            </div>
+          </article>
+          <article class="catalog-card" id="project-ujamaa-community-resource-team" data-commonproject-id="ujamaa-community-resource-team">
+            <p class="catalog-kind">कॉमन्स</p>
+            <h2 lang="en" dir="ltr">Ujamaa Community Resource Team</h2>
+            <p lang="hi" dir="auto">उत्तरी तंजानिया में एक सामुदायिक-अधिकार संगठन जो सामूहिक भूमि स्वामित्व, स्थानीय शासन और टिकाऊ संसाधन प्रबंधन के साथ चरवाहे, कृषि-पशुपालक और शिकारी-संग्रहकर्ता समुदायों का समर्थन करता है।</p>
+            <p class="catalog-location">1 छिपा हुआ स्थान</p>
+            <div class="catalog-actions">
+              <a class="catalog-action-link" data-action-type="learn" href="https://www.ujamaa-crt.or.tz/programmes.html" rel="external noreferrer">जानें <span aria-hidden="true">↗</span></a>
+              <a class="catalog-action-link" data-action-type="donate" href="https://www.ujamaa-crt.or.tz/donate.html" rel="external noreferrer">दान करें <span aria-hidden="true">↗</span></a>
+              <a class="catalog-action-link" data-action-type="contact" href="https://www.ujamaa-crt.or.tz/" rel="external noreferrer">संपर्क करें <span aria-hidden="true">↗</span></a>
+              <a href="https://www.ujamaa-crt.or.tz/" rel="external noreferrer">आधिकारिक वेबसाइट <span aria-hidden="true">↗</span></a>
+              <a href="./catalog/projects/ujamaa-community-resource-team.json" type="application/json">JSON</a>
+            </div>
+          </article>
+          <article class="catalog-card" id="project-velondriake-lmma" data-commonproject-id="velondriake-lmma">
+            <p class="catalog-kind">साइट पर</p>
+            <h2 dir="auto">Velondriake Locally Managed Marine Area</h2>
+            <p lang="hi" dir="auto">अंदावाडोका के आसपास तटीय समुदायों द्वारा संयुक्त रूप से प्रबंधित एक समुद्री क्षेत्र, जो स्थायी मछली पकड़ने, निगरानी, संरक्षित क्षेत्रों, चट्टानों और मैंग्रोव को जोड़ता है।</p>
+            <p class="catalog-location">1 सार्वजनिक स्थान</p>
+            <p class="catalog-activity-notice">वर्तमान परिचालन स्थिति को हाल ही में सत्यापित नहीं किया गया है। सूत्रों की समीक्षा की गई 2026-07-19; प्राथमिकता पुनः समीक्षा 2026-08-19.</p>
+            <div class="catalog-actions">
+              <a class="catalog-action-link" data-action-type="learn" href="https://blog.blueventures.org/en/locations/madagascar/velondriake-madagascar/" rel="external noreferrer">जानें <span aria-hidden="true">↗</span></a>
+              <a href="https://blog.blueventures.org/en/locations/madagascar/velondriake-madagascar/" rel="external noreferrer">आधिकारिक वेबसाइट <span aria-hidden="true">↗</span></a>
+              <a href="./catalog/projects/velondriake-lmma.json" type="application/json">JSON</a>
+            </div>
+          </article>
+          <article class="catalog-card" id="project-wikibooks" data-commonproject-id="wikibooks">
+            <p class="catalog-kind">डिजिटल · ज्ञान, शिक्षा और संस्कृति › सीखना और शिक्षा</p>
+            <h2 dir="auto">Wikibooks</h2>
+            <p lang="hi" dir="auto">स्वतंत्र रूप से प्रयोग करने योग्य पाठ्यपुस्तकों, मैनुअल और गैर-काल्पनिक पुस्तकों का एक खुला संग्रह, जो सहयोगात्मक रूप से लिखी और सुधारी गई हैं।</p>
+            <p class="catalog-location">स्थान-स्वतंत्र डिजिटल उपस्थिति</p>
+            <div class="catalog-actions">
+              <a class="catalog-action-link" data-action-type="use" href="https://www.wikibooks.org/" rel="external noreferrer">उपयोग करें <span aria-hidden="true">↗</span></a>
+              <a class="catalog-action-link" data-action-type="learn" href="https://www.wikibooks.org/" rel="external noreferrer">जानें <span aria-hidden="true">↗</span></a>
+              <a href="https://www.wikibooks.org/" rel="external noreferrer">आधिकारिक वेबसाइट <span aria-hidden="true">↗</span></a>
+              <a href="./catalog/projects/wikibooks.json" type="application/json">JSON</a>
+            </div>
+          </article>
+          <article class="catalog-card" id="project-wikidata" data-commonproject-id="wikidata">
+            <p class="catalog-kind">डिजिटल · ज्ञान, शिक्षा और संस्कृति › खुला ज्ञान और डेटा</p>
+            <h2 dir="auto">Wikidata</h2>
+            <p lang="hi" dir="auto">विकिमीडिया परियोजनाओं और अन्य अनुप्रयोगों में प्रयुक्त और लिंक किए गए संरचित, मशीन-पठनीय बयानों के लिए एक निःशुल्क ज्ञान डेटाबेस।</p>
+            <p class="catalog-location">स्थान-स्वतंत्र डिजिटल उपस्थिति</p>
+            <div class="catalog-actions">
+              <a class="catalog-action-link" data-action-type="use" href="https://www.wikidata.org/" rel="external noreferrer">उपयोग करें <span aria-hidden="true">↗</span></a>
+              <a class="catalog-action-link" data-action-type="learn" href="https://www.wikidata.org/wiki/Wikidata:Introduction" rel="external noreferrer">जानें <span aria-hidden="true">↗</span></a>
+              <a class="catalog-action-link" data-action-type="contribute" href="https://www.wikidata.org/wiki/Wikidata:Contribute" rel="external noreferrer">योगदान करें <span aria-hidden="true">↗</span></a>
+              <a class="catalog-action-link" data-action-type="donate" href="https://donate.wikimedia.org/" rel="external noreferrer">दान करें <span aria-hidden="true">↗</span></a>
+              <a href="https://www.wikidata.org/" rel="external noreferrer">आधिकारिक वेबसाइट <span aria-hidden="true">↗</span></a>
+              <a href="./catalog/projects/wikidata.json" type="application/json">JSON</a>
+            </div>
+          </article>
+          <article class="catalog-card" id="project-wikimedia-commons" data-commonproject-id="wikimedia-commons">
+            <p class="catalog-kind">डिजिटल · ज्ञान, शिक्षा और संस्कृति › मीडिया, अभिलेखागार और संस्कृति</p>
+            <h2 dir="auto">Wikimedia Commons</h2>
+            <p lang="hi" dir="auto">पुन: उपयोग के लिए छवियों, ऑडियो, वीडियो और अन्य मीडिया फ़ाइलों का एक मुफ़्त, सहयोगात्मक रूप से निर्मित संग्रह।</p>
+            <p class="catalog-location">स्थान-स्वतंत्र डिजिटल उपस्थिति</p>
+            <div class="catalog-actions">
+              <a class="catalog-action-link" data-action-type="use" href="https://commons.wikimedia.org/" rel="external noreferrer">उपयोग करें <span aria-hidden="true">↗</span></a>
+              <a class="catalog-action-link" data-action-type="learn" href="https://commons.wikimedia.org/wiki/Commons:Welcome" rel="external noreferrer">जानें <span aria-hidden="true">↗</span></a>
+              <a class="catalog-action-link" data-action-type="contribute" href="https://commons.wikimedia.org/wiki/Commons:First_steps" rel="external noreferrer">योगदान करें <span aria-hidden="true">↗</span></a>
+              <a class="catalog-action-link" data-action-type="donate" href="https://donate.wikimedia.org/" rel="external noreferrer">दान करें <span aria-hidden="true">↗</span></a>
+              <a href="https://commons.wikimedia.org/" rel="external noreferrer">आधिकारिक वेबसाइट <span aria-hidden="true">↗</span></a>
+              <a href="./catalog/projects/wikimedia-commons.json" type="application/json">JSON</a>
+            </div>
+          </article>
+          <article class="catalog-card" id="project-wikipedia" data-commonproject-id="wikipedia">
+            <p class="catalog-kind">डिजिटल · ज्ञान, शिक्षा और संस्कृति › खुला ज्ञान और डेटा</p>
+            <h2 dir="auto">Wikipedia</h2>
+            <p lang="hi" dir="auto">एक सहयोगात्मक रूप से निर्मित, कई भाषाओं में स्वतंत्र रूप से सुलभ विश्वकोश जिसकी सामग्री स्वयंसेवकों द्वारा लिखी और बनाए रखी जाती है।</p>
+            <p class="catalog-location">स्थान-स्वतंत्र डिजिटल उपस्थिति</p>
+            <div class="catalog-actions">
+              <a class="catalog-action-link" data-action-type="use" href="https://www.wikipedia.org/" rel="external noreferrer">उपयोग करें <span aria-hidden="true">↗</span></a>
+              <a class="catalog-action-link" data-action-type="learn" href="https://de.wikipedia.org/wiki/Wikipedia" rel="external noreferrer">जानें <span aria-hidden="true">↗</span></a>
+              <a class="catalog-action-link" data-action-type="contribute" href="https://de.wikipedia.org/wiki/Wikipedia:Starthilfe" rel="external noreferrer">योगदान करें <span aria-hidden="true">↗</span></a>
+              <a class="catalog-action-link" data-action-type="donate" href="https://donate.wikimedia.org/" rel="external noreferrer">दान करें <span aria-hidden="true">↗</span></a>
+              <a href="https://www.wikipedia.org/" rel="external noreferrer">आधिकारिक वेबसाइट <span aria-hidden="true">↗</span></a>
+              <a href="./catalog/projects/wikipedia.json" type="application/json">JSON</a>
+            </div>
+          </article>
+          <article class="catalog-card" id="project-wikiversity" data-commonproject-id="wikiversity">
+            <p class="catalog-kind">डिजिटल · ज्ञान, शिक्षा और संस्कृति › सीखना और शिक्षा</p>
+            <h2 dir="auto">Wikiversity</h2>
+            <p lang="hi" dir="auto">कई भाषाओं में मुफ़्त शिक्षण संसाधनों, पाठ्यक्रमों और सहयोगी शिक्षा परियोजनाओं के लिए एक खुला मंच।</p>
+            <p class="catalog-location">स्थान-स्वतंत्र डिजिटल उपस्थिति</p>
+            <div class="catalog-actions">
+              <a class="catalog-action-link" data-action-type="use" href="https://www.wikiversity.org/" rel="external noreferrer">उपयोग करें <span aria-hidden="true">↗</span></a>
+              <a class="catalog-action-link" data-action-type="learn" href="https://www.wikiversity.org/" rel="external noreferrer">जानें <span aria-hidden="true">↗</span></a>
+              <a href="https://www.wikiversity.org/" rel="external noreferrer">आधिकारिक वेबसाइट <span aria-hidden="true">↗</span></a>
+              <a href="./catalog/projects/wikiversity.json" type="application/json">JSON</a>
+            </div>
+          </article>
+          <article class="catalog-card" id="project-zapatista-autonomy" data-commonproject-id="zapatista-autonomy">
+            <p class="catalog-kind">कॉमन्स</p>
+            <h2 lang="en" dir="ltr">Zapatista Autonomy</h2>
+            <p lang="hi" dir="auto">चियापास के ज़ापतिस्ता समुदायों द्वारा कायम एक स्वायत्तता संरचना, जिसने 2023 से पूर्व MAREZ और Good Government Councils की जगह स्थानीय स्वायत्त सरकारों, क्षेत्रीय सामूहिकों और सभा-आधारित समन्वय को स्थापित किया है।</p>
+            <p class="catalog-location">1 छिपा हुआ स्थान</p>
+            <div class="catalog-actions">
+              <a class="catalog-action-link" data-action-type="learn" href="https://enlacezapatista.ezln.org.mx/2023/11/13/neunter-teil-die-neue-struktur-der-zapatistischen-autonomie/" rel="external noreferrer">जानें <span aria-hidden="true">↗</span></a>
+              <a href="https://enlacezapatista.ezln.org.mx/" rel="external noreferrer">आधिकारिक वेबसाइट <span aria-hidden="true">↗</span></a>
+              <a href="./catalog/projects/zapatista-autonomy.json" type="application/json">JSON</a>
+            </div>
+          </article>
+          <article class="catalog-card" id="project-zenzeleni-community-networks" data-commonproject-id="zenzeleni-community-networks">
+            <p class="catalog-kind">साइट पर · डिजिटल · संचार और नेटवर्क › सामुदायिक नेटवर्क</p>
+            <h2 dir="auto">Zenzeleni Community Networks</h2>
+            <p lang="hi" dir="auto">ग्रामीण पूर्वी केप में स्थानीय सहकारी समितियों द्वारा चलाया जाने वाला एक सामुदायिक नेटवर्क जो किफायती कनेक्टिविटी प्रदान करता है और समुदायों के भीतर राजस्व और जिम्मेदारी रखता है।</p>
+            <p class="catalog-location">1 सार्वजनिक स्थान · 1 छिपा हुआ स्थान</p>
+            <div class="catalog-actions">
+              <a class="catalog-action-link" data-action-type="use" href="https://zenzeleni.net/get-connected/" rel="external noreferrer">उपयोग करें <span aria-hidden="true">↗</span></a>
+              <a class="catalog-action-link" data-action-type="learn" href="https://zenzeleni.net/our-model/" rel="external noreferrer">जानें <span aria-hidden="true">↗</span></a>
+              <a class="catalog-action-link" data-action-type="contribute" href="https://zenzeleni.net/get-connected/" rel="external noreferrer">योगदान करें <span aria-hidden="true">↗</span></a>
+              <a class="catalog-action-link" data-action-type="replicate" href="https://zenzeleni.net/get-connected/" rel="external noreferrer">प्रतिरूप बनाएँ <span aria-hidden="true">↗</span></a>
+              <a class="catalog-action-link" data-action-type="contact" href="https://zenzeleni.net/get-connected/" rel="external noreferrer">संपर्क करें <span aria-hidden="true">↗</span></a>
+              <a href="https://zenzeleni.net/" rel="external noreferrer">आधिकारिक वेबसाइट <span aria-hidden="true">↗</span></a>
+              <a href="./catalog/projects/zenzeleni-community-networks.json" type="application/json">JSON</a>
+            </div>
+          </article>
+        </div>
+      </section>
+    </main>
+  </body>
+</html>

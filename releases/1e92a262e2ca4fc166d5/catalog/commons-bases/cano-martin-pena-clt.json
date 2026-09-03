@@ -1,0 +1,42 @@
+{
+  "schema_version": 1,
+  "kind": "commonworld_commons_basis",
+  "project_id": "cano-martin-pena-clt",
+  "classification": "common",
+  "decision": "include",
+  "reviewed_at": "2026-07-19",
+  "reviewer": "Commonworld editorial review",
+  "criteria": {
+    "shared_resource": {
+      "status": "supported",
+      "statement": "Der Community Land Trust hält und verwaltet Boden in den acht Gemeinschaften am Caño Martín Peña kollektiv und dauerhaft, während Bewohner ihre einzelnen Häuser besitzen; der gemeinschaftlich gebundene Boden ist damit eine klar benennbare gemeinsame Ressource.",
+      "source_ids": ["cano-enlace-g8"]
+    },
+    "community": {
+      "status": "supported",
+      "statement": "Die acht betroffenen Gemeinschaften sind über das G-8 und ihre lokalen Führungspersonen organisiert; die offizielle Projektdokumentation beschreibt gemeinschaftliche Versammlungen und eine dauerhafte Bewohnerbeteiligung an der Gebietsentwicklung.",
+      "source_ids": ["cano-enlace-g8"]
+    },
+    "commoning_practice": {
+      "status": "supported",
+      "statement": "Bewohner und Gemeinschaftsorganisationen wirken an Planung, Gebietsentwicklung, Schutz vor Verdrängung und der langfristigen Verwaltung des gemeinschaftlich gebundenen Bodens mit; ihre Rolle ist nicht auf die Nutzung einzelner Wohnungen beschränkt.",
+      "source_ids": ["cano-enlace-g8"]
+    },
+    "rules_and_responsibility": {
+      "status": "supported",
+      "statement": "Der Community-Land-Trust-Vertrag trennt gemeinschaftliches Bodeneigentum vom individuellen Hauseigentum und bindet die Landverwaltung an dauerhafte Gemeinwohlziele; G-8-Strukturen und Gemeinschaftsversammlungen schaffen zusätzliche repräsentative und partizipative Verantwortungswege.",
+      "source_ids": ["cano-enlace-g8"]
+    },
+    "common_benefit": {
+      "status": "supported",
+      "statement": "Der kollektiv gebundene Boden soll den Fortbestand der acht Gemeinschaften sichern, Verdrängung verhindern und eine langfristig bezahlbare, gemeinschaftsorientierte Gebietsentwicklung ermöglichen; dieser Nutzen ist nicht bloß ein Vertriebskanal für einen externen Bodeneigentümer.",
+      "source_ids": ["cano-enlace-g8"]
+    }
+  },
+  "confidence": 0.95,
+  "limitations": [
+    "Der Community Land Trust ist in eine öffentliche und gesetzlich geregelte ENLACE-Struktur eingebettet; gemeinschaftliche Kontrolle besteht daher innerhalb eines breiteren institutionellen Rahmens.",
+    "Die einzelnen Wohngebäude bleiben nicht automatisch Gemeinschaftseigentum; das hier bewertete Common ist insbesondere der kollektiv gebundene Boden und seine gemeinschaftsorientierte Governance."
+  ],
+  "notes": "Aufgenommen als Land-Common wegen kollektiv gebundenem Boden, institutionalisierter Bewohnerbeteiligung und dauerhaftem Anti-Verdrängungszweck; die übergeordnete ENLACE-Initiative wird nicht als eigenes Common behauptet."
+}

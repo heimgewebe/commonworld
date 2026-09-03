@@ -8,9 +8,9 @@
   "reviewed_source_pack_sha256": "cf57400b0a0fbf818baa88f33001e95bc4c7c39bd00caef3505f4d9ab6c0f405",
   "catalog_overlay_sha256": "f2aaa30377639a180d709fc180e5feefbee5fb67afbb5f249efadfaf8407d27e",
   "surface_sha256": {
-    "index": "084d7164d88768f1447c2425f9a62c7574f6f026e922d8b178edf719c00552d7",
-    "method": "1c9bbefce3f33d4f88da287330952f46aef191d051c9a9398eb071d811c80668",
-    "proposal": "083ac10f7ea6ed8303d0552922fc2356f966ed3e3852f5ba143848c37c2e6885"
+    "index": "57f6d71465ccd6723a57311092815f13fe69e9d6180a42bb6fe84227813e63d4",
+    "method": "d1efabd60c4a1bb557dd296f33a6ee4ec5b23f33e403f928d54b80e98d534cd0",
+    "proposal": "3c6fd3e30f70fb0d59e1f12c67190341307de649e679ea9c7e01c92f202d6ddc"
   },
   "gate_results": {
     "required_surfaces_passed": [
@@ -60,5 +60,5 @@
     "findings_based": true,
     "post_fix_review_required": true
   },
-  "notes": "Locale-specific language, accessibility and lifecycle receipts remain bound to their previously reviewed immutable releases. The current surface_sha256 values were mechanically rebound on 2026-08-27 after token-deduplicated canonical action search aliases changed only the global deterministic bootstrap/runtime surface as release ef9b0c61c7cbfb3a25b0. Locale packs, reviewed source packs, catalog overlays, gate results and review receipts are unchanged. A fresh exact-tree Chromium public-browser suite passed 38/38 scenarios and fresh fourfold-CPU browser delivery evidence passed the bounded startup gate with zero project JSON requests. This rebind changes no locale pack or review receipt and claims no fresh native-speaker, human language, manual screen-reader, manual visual or full WCAG approval."
+  "notes": "Locale-specific language, accessibility and lifecycle receipts remain bound to previously reviewed immutable releases. Current surface_sha256 values were mechanically rebound on 2026-09-02 after PR #222 Commons re-review consistency corrections regenerated deterministic public surfaces as release cc469b553bad17b55352. Locale packs, reviewed source packs, catalog overlays, gate results and review receipts are unchanged. Fresh canonical locale lifecycle browser smoke passed on the same tree. No fresh native-speaker, human-language, manual screen-reader, manual visual or full WCAG approval is claimed."
 }

@@ -226,6 +226,30 @@ def _catalog_review_is_independent(catalog_review: dict[str, Any]) -> bool:
     )
 
 
+def _release_evidence_schema_errors(
+    tag: str,
+    evidence: dict[str, Any],
+    schema: dict[str, Any],
+) -> list[str]:
+    try:
+        from jsonschema import Draft202012Validator
+        from jsonschema.exceptions import SchemaError
+    except ImportError as exc:
+        return [f"release evidence schema validator is unavailable for {tag}: {exc}"]
+    try:
+        Draft202012Validator.check_schema(schema)
+    except SchemaError as exc:
+        return [f"release evidence schema is invalid for {tag}: {exc.message}"]
+    validator = Draft202012Validator(schema)
+    return [
+        f"release evidence schema violation for {tag}: {error.message}"
+        for error in sorted(
+            validator.iter_errors(evidence),
+            key=lambda error: tuple(str(part) for part in error.absolute_path),
+        )
+    ]
+
+
 def _release_evidence_errors(
     tag: str,
     entry: dict[str, Any],
@@ -264,6 +288,32 @@ def _release_evidence_errors(
         return [f"release evidence artifact is invalid JSON for {tag}: {exc}"]
     if not isinstance(evidence, dict):
         return [f"release evidence artifact root must be an object for {tag}"]
+    evidence_contract = contract.get("release_evidence")
+    schema_relative = (
+        evidence_contract.get("schema_path")
+        if isinstance(evidence_contract, dict)
+        else None
+    )
+    if not isinstance(schema_relative, str):
+        errors.append(f"release evidence schema path is missing for {tag}")
+    else:
+        schema_path, schema_path_error = _safe_path(
+            root, schema_relative, f"release evidence schema for {tag}"
+        )
+        if schema_path_error:
+            errors.append(schema_path_error)
+        elif schema_path is None or not schema_path.is_file():
+            errors.append(f"release evidence schema is missing for {tag}")
+        else:
+            try:
+                schema = json.loads(schema_path.read_text(encoding="utf-8"))
+            except (OSError, json.JSONDecodeError) as exc:
+                errors.append(f"release evidence schema cannot be read for {tag}: {exc}")
+            else:
+                if not isinstance(schema, dict):
+                    errors.append(f"release evidence schema root must be an object for {tag}")
+                else:
+                    errors.extend(_release_evidence_schema_errors(tag, evidence, schema))
     _require(
         errors,
         evidence.get("schema_version") == 2,

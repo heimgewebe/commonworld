@@ -1,0 +1,42 @@
+{
+  "schema_version": 1,
+  "kind": "commonworld_commons_basis",
+  "project_id": "velondriake-lmma",
+  "classification": "common",
+  "decision": "include",
+  "reviewed_at": "2026-07-19",
+  "reviewer": "Commonworld editorial review",
+  "criteria": {
+    "shared_resource": {
+      "status": "supported",
+      "statement": "Velondriake ist als lokal verwaltetes Meeresgebiet dokumentiert, in dem Küstengemeinschaften Fischereiressourcen, Riffe, Mangroven und weitere marine Lebensräume als zusammenhängenden lokalen Ressourcenraum gemeinschaftlich bewirtschaften.",
+      "source_ids": ["velondriake-blue-ventures"]
+    },
+    "community": {
+      "status": "supported",
+      "statement": "Die Trägerschaft liegt bei einem Netzwerk von Küstendörfern und Fischern rund um Andavadoaka, das über die Velondriake Association gemeinschaftliche Interessen und lokale Meeresverwaltung organisiert.",
+      "source_ids": ["velondriake-blue-ventures"]
+    },
+    "commoning_practice": {
+      "status": "supported",
+      "statement": "Gemeinschaften beteiligen sich an lokaler Ressourcenverwaltung, Schutzmaßnahmen, Monitoring und nachhaltiger Fischerei; damit umfasst die Praxis aktive Hüterschaft und kollektive Organisation statt bloßer Nutzung des Meeresgebiets.",
+      "source_ids": ["velondriake-blue-ventures"]
+    },
+    "rules_and_responsibility": {
+      "status": "supported",
+      "statement": "Die lokale Verwaltung verbindet gemeinschaftlich vereinbarte Nutzungs- und Schutzregeln mit einer lokalen Association und gemeinschaftlicher Verantwortung für Fischerei und Schutzflächen; diese Struktur ordnet Zugang, Nutzung und Erhalt des Ressourcenraums.",
+      "source_ids": ["velondriake-blue-ventures"]
+    },
+    "common_benefit": {
+      "status": "supported",
+      "statement": "Die gemeinschaftliche Verwaltung soll langfristige Fischereigrundlagen, marine Ökosysteme und lokale Lebensgrundlagen sichern; der gemeinsame Nutzen besteht damit unabhängig von einem externen privaten Eigentümer oder reinen Vertriebsmodell.",
+      "source_ids": ["velondriake-blue-ventures"]
+    }
+  },
+  "confidence": 0.94,
+  "limitations": [
+    "Blue Ventures ist langjähriger externer Partner und zugleich eine wesentliche öffentliche Quelle; die belegte lokale Governance bedeutet deshalb nicht vollständige organisatorische oder finanzielle Unabhängigkeit der Velondriake Association.",
+    "Diese Basis bleibt bei Aussagen, die durch die im Projektrecord registrierte Blue-Ventures-Quelle gestützt werden; weitergehende Detailregeln aus zusätzlicher Literatur werden hier nicht als neue Projektsource eingeführt."
+  ],
+  "notes": "Aufgenommen als Meeres-Common wegen lokalem Ressourcenraum, dorfübergreifender Gemeinschaft, praktischer Hüterschaft und gemeinschaftlich geordneter Fischerei- und Schutzverantwortung; Blue Ventures ist Unterstützer, nicht das Common."
+}
