@@ -103,7 +103,7 @@
       "translation_pack": "wave_1",
       "release_evidence": {
         "path": "docs/evidence/locale-releases/es.json",
-        "sha256": "1aed4d4844c11e65835484e05bf2acddfa970e83d309f5e3e3a90a3ebd7890b3"
+        "sha256": "d0bada46172547c4201a43618ed88944db331444b6f83f325df9e402183130c8"
       }
     },
     "fr": {
@@ -119,7 +119,7 @@
       "translation_pack": "wave_1",
       "release_evidence": {
         "path": "docs/evidence/locale-releases/fr.json",
-        "sha256": "747747d7eb46aa8261256b6c79f8fef60540e2461ef76f20f1727c2d3b5bd0d0"
+        "sha256": "d5c968dc253d7c57bfdbdf81e4a2e2c2833fb51a235cd503bfc1ad150114698c"
       }
     },
     "pt-BR": {
@@ -135,7 +135,7 @@
       "translation_pack": "wave_1",
       "release_evidence": {
         "path": "docs/evidence/locale-releases/pt-BR.json",
-        "sha256": "dc9b9bdd0f2b4adb641e3c61310a6735f76ddf1381f195a1fe3c97daf700b448"
+        "sha256": "bf4774bf2e78c0df607797cd070b9408350225ce80f0901222c34e8bb4d37783"
       }
     },
     "ar": {
@@ -151,7 +151,7 @@
       "translation_pack": "wave_1",
       "release_evidence": {
         "path": "docs/evidence/locale-releases/ar.json",
-        "sha256": "d0aa974d759a52b80e3b54ef9685a71a4f0d621170d7bf262287869360aa90c2"
+        "sha256": "5cbecae59aa29e522e7a9c9c8103af29e87715f9d135f3b3ddd4b4d414679787"
       }
     },
     "zh-Hans": {
@@ -167,7 +167,7 @@
       "translation_pack": "wave_1",
       "release_evidence": {
         "path": "docs/evidence/locale-releases/zh-Hans.json",
-        "sha256": "d188a9e1881b27284529bcdebffcdc083ce236a67bd9bd76d2b6ab96c56076e9"
+        "sha256": "00ecae38de69f2e374e912fec43f0d823f9e94b650a68b3a5e3675cf3bfce711"
       }
     },
     "hi": {
@@ -183,7 +183,7 @@
       "translation_pack": "wave_1",
       "release_evidence": {
         "path": "docs/evidence/locale-releases/hi.json",
-        "sha256": "56b49872e1462dfa7a6f6cefeb08088bf86f164e87a8635ae8825a99ab586131"
+        "sha256": "a9e326b38ea35cc18a9aeea47f118d6dc9cc7fc644ce1e4b7c13750a40aaa6da"
       }
     },
     "id": {

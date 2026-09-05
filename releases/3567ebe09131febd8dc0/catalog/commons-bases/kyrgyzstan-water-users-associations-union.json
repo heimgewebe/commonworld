@@ -1,0 +1,55 @@
+{
+  "schema_version": 1,
+  "kind": "commonworld_commons_basis",
+  "project_id": "kyrgyzstan-water-users-associations-union",
+  "classification": "commons-infrastructure",
+  "decision": "include",
+  "reviewed_at": "2026-08-14",
+  "reviewer": "Commonworld editorial review",
+  "criteria": {
+    "shared_resource": {
+      "status": "supported",
+      "statement": "Lokale WUAs organisieren die Nutzung und den Unterhalt betrieblicher Bewässerungs- und Wassernutzungsinfrastruktur für ihre Wassernutzenden.",
+      "source_ids": [
+        "kyrgyz-water-wua"
+      ]
+    },
+    "community": {
+      "status": "supported",
+      "statement": "NUWUA arbeitet mit gemeinschaftsbasierten Wassernutzervereinigungen und vertritt deren Mitglieder und ländliche Gemeinschaften.",
+      "source_ids": [
+        "nuwua-ilc"
+      ]
+    },
+    "commoning_practice": {
+      "status": "supported",
+      "statement": "WUAs bündeln Beiträge und gemeinsames Handeln für Betrieb und Unterhalt von Bewässerungssystemen; NUWUA unterstützt Koordination und Kapazitätsaufbau.",
+      "source_ids": [
+        "nuwua-ilc",
+        "kyrgyz-water-wua"
+      ]
+    },
+    "rules_and_responsibility": {
+      "status": "supported",
+      "statement": "WUAs sind rechtlich organisierte Zusammenschlüsse von Wassernutzenden; NUWUA koordiniert gemeinsame Aktivitäten und vertritt WUA-Rechte gegenüber öffentlichen Stellen.",
+      "source_ids": [
+        "nuwua-ilc",
+        "kyrgyz-water-wua"
+      ]
+    },
+    "common_benefit": {
+      "status": "supported",
+      "statement": "Die Strukturen zielen auf verlässliche gemeinschaftliche Wasserbewirtschaftung, nachhaltige Landwirtschaft und die Lebensgrundlagen ländlicher Gemeinschaften.",
+      "source_ids": [
+        "nuwua-ilc"
+      ]
+    }
+  },
+  "confidence": 0.9,
+  "limitations": [
+    "NUWUA ist eine nationale Verbandsinfrastruktur; die konkreten Commons liegen bei den einzelnen WUAs und ihren Mitgliedern.",
+    "Die staatliche WUA-Grundlagenseite enthält teilweise ältere Bestandszahlen; aktuelle Aktivität wird deshalb zusätzlich über die heutige ILC-Mitgliedschaft und laufende staatliche WUA-Digitaloberflächen gebunden.",
+    "Commonworld veröffentlicht keine einzelnen Kanäle, Wasserbauwerke, Hof- oder Nutzungsflächen."
+  ],
+  "notes": "Aufgenommen als Commons-Infrastruktur mit klarer Trennung zwischen nationalem Verband und lokalen WUA-Commons."
+}

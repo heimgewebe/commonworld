@@ -732,6 +732,7 @@ async function newPage({
   geolocation = null,
   permissions = [],
   languages = ['en'],
+  deviceMemory = null,
 } = {}) {
   const context = await browser.newContext({
     viewport: viewportOverride ?? (mobile ? { width: 390, height: 844 } : { width: 1280, height: 800 }),
@@ -746,6 +747,11 @@ async function newPage({
     await context.addInitScript((values) => {
       Object.defineProperty(navigator, 'languages', { configurable: true, get: () => [...values] });
     }, languages);
+  }
+  if (Number.isFinite(deviceMemory)) {
+    await context.addInitScript((value) => {
+      Object.defineProperty(navigator, 'deviceMemory', { configurable: true, get: () => value });
+    }, deviceMemory);
   }
   await context.route('https://tiles.openfreemap.org/fonts/**', (route) => route.fulfill({
     status: 200,
@@ -952,6 +958,34 @@ async function waitForSphereHorizonCoupling(page, label, timeoutMs = 5_000) {
     await page.waitForTimeout(32);
   } while (Date.now() < deadline);
   throw new Error(`${label}: MapLibre horizon coupling did not settle (${last?.declared} vs ${last?.projected})`);
+}
+
+async function lowMemoryMapCachePolicyScenario() {
+  const scenarioId = 'low-memory-map-cache-policy';
+  process.stdout.write(`${JSON.stringify({ state: 'RUNNING', scenario: scenarioId })}\n`);
+  const observed = [];
+  for (const profile of [
+    { label: 'low-memory', deviceMemory: 2, expectedZoomLevels: 2 },
+    { label: 'high-memory', deviceMemory: 8, expectedZoomLevels: 5 },
+  ]) {
+    const run = await newPage({ deviceMemory: profile.deviceMemory });
+    try {
+      await run.page.goto(baseUrl, { waitUntil: 'domcontentloaded' });
+      await run.page.waitForSelector('html.runtime-ready');
+      await run.page.waitForFunction(() => Boolean(window.__commonworldTestMap));
+      const state = await run.page.evaluate(() => ({
+        deviceMemory: navigator.deviceMemory,
+        maxTileCacheZoomLevels: window.__commonworldTestMapOptions?.maxTileCacheZoomLevels ?? null,
+      }));
+      assert(state.deviceMemory === profile.deviceMemory, `${scenarioId}: ${profile.label} deviceMemory override was not applied ${JSON.stringify(state)}`);
+      assert(state.maxTileCacheZoomLevels === profile.expectedZoomLevels, `${scenarioId}: ${profile.label} cache retention policy mismatch ${JSON.stringify(state)}`);
+      assert(run.pageErrors.length === 0, `${scenarioId}: ${profile.label} page errors: ${run.pageErrors.join(' | ')}`);
+      observed.push({ ...profile, ...state });
+    } finally {
+      await run.context.close();
+    }
+  }
+  results.push({ id: scenarioId, verdict: 'PASS', profiles: observed });
 }
 
 async function startupAndRingOrbitScenario() {
@@ -4704,6 +4738,7 @@ html { font-size: ${profile.fontScale}% !important; }
 let scenarioFailure = null;
 try {
   await startupAndRingOrbitScenario();
+  await lowMemoryMapCachePolicyScenario();
   await syntheticCrossRingCollisionAccessibilityScenario();
   await reducedMotionRingScenario();
   await syntheticDigitalPerformanceScenario();

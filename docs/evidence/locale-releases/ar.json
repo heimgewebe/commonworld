@@ -8,9 +8,9 @@
   "reviewed_source_pack_sha256": "cf57400b0a0fbf818baa88f33001e95bc4c7c39bd00caef3505f4d9ab6c0f405",
   "catalog_overlay_sha256": "48feb693350e1800588c2376b9179ed5c27ead85948044dc05549436a5ddd15a",
   "surface_sha256": {
-    "index": "55c1a91278ef1983dc0417579a8ed442037516fd786573d2aa542af545db1cad",
-    "method": "584a4de7c90a7297a79a13fb50cf43c953d973167a91b5975c44e905a0de8839",
-    "proposal": "2db2f81876e77ed65d89182bf2a087b192a1422ee9d4e58c915874bb104c5ff7"
+    "index": "66279bff7832361bcf20e6c68488849d52d0cb160b5af744fc09cbbec64c7cec",
+    "method": "b5f002b573688e3e57e28123cd2f3b73083fc2ae1afaa508a4fa2d77b89165e9",
+    "proposal": "76cf3dddddbc3b9f32c04e2adefc70c92af3d27d785764e76a23093236a93f9a"
   },
   "gate_results": {
     "required_surfaces_passed": [
@@ -68,5 +68,5 @@
     "findings_based": true,
     "post_fix_review_required": true
   },
-  "notes": "Locale-specific language, accessibility and lifecycle receipts remain bound to previously reviewed immutable releases. Current surface_sha256 values were mechanically rebound on 2026-09-02 after PR #222 Commons re-review consistency corrections regenerated deterministic public surfaces as release cc469b553bad17b55352. Locale packs, reviewed source packs, catalog overlays, gate results and review receipts are unchanged. Fresh canonical locale lifecycle browser smoke passed on the same tree. No fresh native-speaker, human-language, manual screen-reader, manual visual or full WCAG approval is claimed."
+  "notes": "Locale-specific language, accessibility and lifecycle receipts remain bound to previously reviewed immutable releases. Current surface_sha256 values were mechanically rebound on 2026-09-05 after the low-memory globe runtime optimization regenerated deterministic public surfaces as release 3567ebe09131febd8dc0. Locale packs, reviewed source packs, catalog overlays, gate results and review receipts are unchanged. Fresh canonical public browser smoke passed on the same runtime surface before this evidence-only rebind. No fresh native-speaker, human-language, manual screen-reader, manual visual or full WCAG approval is claimed."
 }

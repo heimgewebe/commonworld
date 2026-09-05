@@ -845,6 +845,8 @@ def validate_public_maplibre_vertical_slice(root: Path = ROOT) -> list[str]:
 
     required_app = (
         "new window.maplibregl.Map",
+        "maxTileCacheZoomLevels: mapTileCacheZoomLevels(navigator.deviceMemory)",
+        "const compactSphereViewport = window.matchMedia('(max-width: 48rem)');",
         "configureRtlMapTextPlugin()",
         "setRTLTextPlugin",
         "setProjection({ type: 'globe' })",
