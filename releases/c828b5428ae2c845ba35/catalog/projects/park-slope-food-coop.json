@@ -1,0 +1,175 @@
+{
+  "schema_version": 4,
+  "id": "park-slope-food-coop",
+  "title": "Park Slope Food Coop",
+  "summary": "Ein mitgliedereigener Lebensmittelbetrieb in Brooklyn, dessen rund 17.000 Mitglieder durch Pflichtschichten, Kapitalanteile und demokratische Verfahren Einkauf, Betrieb und Regeln tragen.",
+  "themes": [
+    "food",
+    "cooperative",
+    "community-ownership"
+  ],
+  "actions": [
+    "visit",
+    "use",
+    "learn",
+    "contribute"
+  ],
+  "presence": {
+    "geographic": [
+      {
+        "id": "park-slope-food-coop-brooklyn",
+        "mode": "approximate",
+        "label": "Park Slope, Brooklyn – grober Stadtteilanker",
+        "geometry": {
+          "type": "Point",
+          "coordinates": [
+            -73.98,
+            40.67
+          ]
+        },
+        "uncertainty_meters_min": 3000,
+        "privacy_note": "Der Punkt bezeichnet nur Park Slope als grobe Orientierung; die offizielle Mitgliedschaftsseite veröffentlicht die reale Ladenadresse.",
+        "source_ids": [
+          "park-slope-membership",
+          "park-slope-agreements"
+        ]
+      }
+    ],
+    "digital": {
+      "available": true,
+      "reach": "regional",
+      "label": "Mitgliedschaftsinformationen, Regelwerk und digitale Schichtorganisation für den örtlichen Genossenschaftsbetrieb",
+      "source_ids": [
+        "park-slope-membership",
+        "park-slope-manual"
+      ]
+    }
+  },
+  "activity": {
+    "status": "active",
+    "observed_at": "2026-08-04",
+    "source_ids": [
+      "park-slope-membership",
+      "park-slope-manual",
+      "park-slope-agreements"
+    ],
+    "note": "Die offiziellen Seiten nennen aktuelle Mitgliederzahlen, Arbeitszyklen, Öffnungszeiten, Beitrittswege und laufende Betriebsregeln."
+  },
+  "provenance": {
+    "sources": [
+      {
+        "id": "park-slope-home",
+        "type": "official-source",
+        "label": "Park Slope Food Coop – offizielle Seite",
+        "url": "https://www.foodcoop.com/",
+        "retrieved_at": "2026-08-04",
+        "note": "Offizielle Projekt- und Betriebsoberfläche der Genossenschaft."
+      },
+      {
+        "id": "park-slope-membership",
+        "type": "official-source",
+        "label": "Park Slope Food Coop – Grundlagen der Mitgliedschaft",
+        "url": "https://www.foodcoop.com/ort-about/",
+        "retrieved_at": "2026-08-04",
+        "note": "Beschreibt offene Mitgliedschaft, Mitgliedereigentum, Pflichtschichten und den aktuellen lokalen Betrieb."
+      },
+      {
+        "id": "park-slope-manual",
+        "type": "official-source",
+        "label": "Park Slope Food Coop – Membership Manual",
+        "url": "https://www.foodcoop.com/manual/",
+        "retrieved_at": "2026-08-04",
+        "note": "Ausführliches Regelwerk zu Eigentum, Mitgliedsarbeit, Gremien, Verfahren und Sanktionen."
+      },
+      {
+        "id": "park-slope-bylaws",
+        "type": "official-source",
+        "label": "Park Slope Food Coop – Satzung",
+        "url": "https://www.foodcoop.com/by-laws/",
+        "retrieved_at": "2026-08-04",
+        "note": "Regelt Mitgliedereigentum, Kapital, Vorstand, Betrieb und Satzungsänderungen."
+      },
+      {
+        "id": "park-slope-agreements",
+        "type": "official-source",
+        "label": "Park Slope Food Coop – Beitrittsvereinbarungen",
+        "url": "https://www.foodcoop.com/ort-agreements/",
+        "retrieved_at": "2026-08-04",
+        "note": "Veröffentlicht Pflichten, Verfahrensbindung, mögliche Beendigung der Mitgliedschaft sowie Ladenadresse und Öffnungszeiten."
+      }
+    ],
+    "uncertainty_note": "Der Betrieb verbindet Commons-Praxis mit Einzelhandel, bezahlter Arbeit und rechtlich starker Vorstandsverantwortung; Mitgliedereigentum bedeutet keine vollständige informelle Selbstverwaltung."
+  },
+  "curation": {
+    "state": "listed",
+    "catalogued_at": "2026-08-04",
+    "reviewed_by": "Commonworld editorial review",
+    "reviewed_at": "2026-08-04",
+    "next_review_at": "2026-11-04",
+    "notes": "Als lokales Common aufgenommen: Mitglieder tragen Ressource, Arbeit, Kapital und Regeln. Der kommerzielle Warenverkauf wird als Spannung offengelegt, nicht als alleiniger Ausschlussgrund."
+  },
+  "links": [
+    {
+      "type": "homepage",
+      "label": "Park Slope Food Coop – offizielle Seite",
+      "url": "https://www.foodcoop.com/"
+    },
+    {
+      "type": "visit",
+      "label": "Adresse und Öffnungszeiten prüfen",
+      "url": "https://www.foodcoop.com/ort-agreements/",
+      "source_ids": [
+        "park-slope-agreements"
+      ]
+    },
+    {
+      "type": "use",
+      "label": "Mitgliedschaft und Nutzung verstehen",
+      "url": "https://www.foodcoop.com/ort-about/",
+      "source_ids": [
+        "park-slope-membership"
+      ]
+    },
+    {
+      "type": "learn",
+      "label": "Regeln und Arbeitsmodell lesen",
+      "url": "https://www.foodcoop.com/manual/",
+      "source_ids": [
+        "park-slope-manual",
+        "park-slope-bylaws"
+      ]
+    },
+    {
+      "type": "contribute",
+      "label": "Mitglied werden und Schichten übernehmen",
+      "url": "https://www.foodcoop.com/ort-about/",
+      "source_ids": [
+        "park-slope-membership",
+        "park-slope-manual",
+        "park-slope-agreements"
+      ]
+    }
+  ],
+  "handoff": {
+    "enabled": false
+  },
+  "languages": {
+    "codes": [
+      "en"
+    ],
+    "source_ids": [
+      "park-slope-home",
+      "park-slope-manual"
+    ],
+    "note": "Die geprüften offiziellen Betriebs-, Satzungs- und Mitgliedschaftsseiten sind auf Englisch verfügbar."
+  },
+  "access": {
+    "type": "membership",
+    "source_ids": [
+      "park-slope-membership",
+      "park-slope-manual",
+      "park-slope-agreements"
+    ],
+    "note": "Nur Mitglieder dürfen einkaufen; Beitritt ist offen, erfordert Kapitalbeitrag, Regelbindung und grundsätzlich eine Pflichtschicht je Arbeitszyklus."
+  }
+}
