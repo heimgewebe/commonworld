@@ -35,6 +35,7 @@ import {
   globeHorizonCoordinates,
   hasDigitalPresence,
   mapFailurePolicy,
+  mapTileCacheZoomLevels,
   projectedGlobeCircle,
   publicGeographicLocations,
   publicGeographicRepresentationKind,
@@ -713,6 +714,15 @@ test('projected globe circle uses the rendered horizon rather than MapLibre zoom
   assert.equal(projectedGlobeCircle({ center, horizon: horizon.slice(0, 3) }), null);
 });
 
+test('map tile cache retention scales down on memory-constrained or unknown devices', () => {
+  assert.equal(mapTileCacheZoomLevels(2), 2);
+  assert.equal(mapTileCacheZoomLevels(4), 2);
+  assert.equal(mapTileCacheZoomLevels(8), 5);
+  assert.equal(mapTileCacheZoomLevels(undefined), 3);
+  assert.equal(mapTileCacheZoomLevels(null), 3);
+  assert.equal(mapTileCacheZoomLevels('unknown'), 3);
+});
+
 test('sphere pixel quantization suppresses imperceptible subpixel churn', () => {
   assert.equal(quantizeSpherePixel(123.456789), 123.46);
   assert.equal(quantizeSpherePixel(123.461), 123.46);
@@ -755,7 +765,7 @@ test('sphere layout follows measured globe geometry and keeps stacked side track
 
 test('digital layer camera performs a bounded journey without changing identity', () => {
   assert.equal(MAP_GEOMETRY_SAMPLE_INTERVAL_MS, 32);
-  assert.equal(MAP_GEOMETRY_DIAGNOSTIC_SAMPLE_INTERVAL, 4);
+  assert.equal(MAP_GEOMETRY_DIAGNOSTIC_SAMPLE_INTERVAL, 8);
   assert.equal(DIGITAL_LAYER_TRANSITION_MS, 420);
   assert.deepEqual(digitalLayerCamera({ lng: 13.4, lat: 52.5, zoom: 1.2, bearing: 170, pitch: 0 }), {
     center: [13.4, 52.5],
