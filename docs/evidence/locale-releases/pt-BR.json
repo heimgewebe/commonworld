@@ -8,9 +8,9 @@
   "reviewed_source_pack_sha256": "cf57400b0a0fbf818baa88f33001e95bc4c7c39bd00caef3505f4d9ab6c0f405",
   "catalog_overlay_sha256": "e5c548f9ede7a44ba9181c5b6cd0c7e4f9e9083c73e4279902d27fe04ef9e6df",
   "surface_sha256": {
-    "index": "c71fb311d3a01b128d18ba74f144659cacf75210b25a4a462f5f49d65aa64296",
-    "method": "f73187fe4a1c7a1fac463d43dd982fd29b215943b8f64f880e7a6925719b53c0",
-    "proposal": "1811953e3c96f3ec1c896faab96862c007f9faa82fef1eb82f31174e9dad19ac"
+    "index": "0420c9ed124e598471c90be5ab6067dbcc771898d6e49f8b9a63f0b325877ca0",
+    "method": "c0b67198d9f95dbe8445a809546e2dcc858649e25e251341cd232cb722ef3039",
+    "proposal": "0e878cf26b2124d2f26bfd842296c454efed1bd78fcf850af54fdf8f9fe38695"
   },
   "gate_results": {
     "required_surfaces_passed": [
@@ -60,5 +60,5 @@
     "findings_based": true,
     "post_fix_review_required": true
   },
-  "notes": "Locale-specific language, accessibility and lifecycle receipts remain bound to previously reviewed immutable releases. Current surface_sha256 values were mechanically rebound on 2026-09-02 after PR #222 Commons re-review consistency corrections regenerated deterministic public surfaces as release cc469b553bad17b55352. Locale packs, reviewed source packs, catalog overlays, gate results and review receipts are unchanged. Fresh canonical locale lifecycle browser smoke passed on the same tree. No fresh native-speaker, human-language, manual screen-reader, manual visual or full WCAG approval is claimed."
+  "notes": "Surface digests mechanically rebound 2026-09-05 after the global MapLibre DPR cap changed deterministic release c828b5428ae2c845ba35; locale packs and review receipts are unchanged. Fresh exact-tree Chromium smoke passed. No new language, manual accessibility, visual or WCAG review is claimed."
 }

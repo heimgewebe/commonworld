@@ -728,6 +728,7 @@ async function newPage({
   mobile = false,
   viewportOverride = null,
   touch = mobile,
+  deviceScaleFactor = 1,
   reducedMotion = 'reduce',
   geolocation = null,
   permissions = [],
@@ -737,7 +738,7 @@ async function newPage({
     viewport: viewportOverride ?? (mobile ? { width: 390, height: 844 } : { width: 1280, height: 800 }),
     isMobile: mobile,
     hasTouch: touch,
-    deviceScaleFactor: 1,
+    deviceScaleFactor,
     reducedMotion,
     ...(geolocation ? { geolocation } : {}),
   });
@@ -4667,6 +4668,33 @@ async function localePreferenceScenario() {
   results.push({ id: 'locale-preference', verdict: 'PASS', browserOrder: true, explicitUrl: true, statePreserved: true, releasedWave1Choice: true });
 }
 
+async function mapPixelRatioScenario() {
+  const run = await newPage({ mobile: true, deviceScaleFactor: 3, reducedMotion: 'reduce' });
+  await run.page.goto(baseUrl, { waitUntil: 'domcontentloaded' });
+  await run.page.waitForSelector('html.runtime-ready');
+  await run.page.waitForFunction(() => Boolean(window.__commonworldTestMap));
+  const measurement = await run.page.evaluate(() => {
+    const map = window.__commonworldTestMap;
+    const canvas = map.getCanvas();
+    return {
+      devicePixelRatio: window.devicePixelRatio,
+      configuredPixelRatio: window.__commonworldTestMapOptions?.pixelRatio ?? null,
+      appliedPixelRatio: map.getPixelRatio(),
+      canvasWidth: canvas.width,
+      cssWidth: canvas.clientWidth,
+    };
+  });
+  const detail = JSON.stringify(measurement);
+  assert(measurement.devicePixelRatio === 3, 'map pixel ratio: harness DPR mismatch ' + detail);
+  assert(measurement.configuredPixelRatio === 2, 'map pixel ratio: constructor cap missing ' + detail);
+  assert(measurement.appliedPixelRatio === 2, 'map pixel ratio: MapLibre did not apply cap ' + detail);
+  assert(Math.abs(measurement.canvasWidth - measurement.cssWidth * 2) <= 1, 'map pixel ratio: canvas backing width is not capped ' + detail);
+  assert(run.consoleErrors.length === 0, 'map pixel ratio: console errors: ' + run.consoleErrors.join(' | '));
+  assert(run.pageErrors.length === 0, 'map pixel ratio: page errors: ' + run.pageErrors.join(' | '));
+  results.push({ id: 'map-pixel-ratio-cap', verdict: 'PASS', devicePixelRatio: 3, appliedPixelRatio: measurement.appliedPixelRatio });
+  await run.context.close();
+}
+
 async function methodScenario() {
   for (const profile of [
     { id: 'desktop', mobile: false, viewportOverride: { width: 1280, height: 800 }, fontScale: null },
@@ -4714,6 +4742,7 @@ try {
   await intentSearchDiscoveryScenario();
   await spatialDiscoveryFiltersScenario();
   await androidGlobeUiScenario();
+  await mapPixelRatioScenario();
   await intentSearchLayoutScenario({ viewportOverride: { width: 1024, height: 1366 }, scenarioId: 'intent-search-ipad-portrait' });
   await intentSearchLayoutScenario({ viewportOverride: { width: 1366, height: 1024 }, scenarioId: 'intent-search-ipad-landscape' });
   await dualPresenceAxesScenario();

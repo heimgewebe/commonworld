@@ -8,9 +8,9 @@
   "reviewed_source_pack_sha256": "cf57400b0a0fbf818baa88f33001e95bc4c7c39bd00caef3505f4d9ab6c0f405",
   "catalog_overlay_sha256": "91a128b7736af4fd67272950ee4cfcdedd32fa8b408d774adb71a97de261bab1",
   "surface_sha256": {
-    "index": "c685df5bd4aa001237dbe0c3bf6710edeae8e4f4edbe844f235b6aa90fe4dad7",
-    "method": "ce42a7d78410ce59b0b678bce184d95235d287d85114d201b705bef41723bbc1",
-    "proposal": "845ecc4c2cddfec8da40fddc6860bbbe46041fda444f5ace1ff9fb2ae69055a1"
+    "index": "6fb3fbc4585ff53d74668d75f9c6e8555473027e63035ac97bc23205264a58f8",
+    "method": "9c89aa02cf069ec6a1b827c523eb4d416fa40deb9b9c53d8fe80d715832a5067",
+    "proposal": "e1e9cf47fe1fb38def72cf4651658b001038d2f96dff21b664bc7112da2ab728"
   },
   "gate_results": {
     "required_surfaces_passed": [
@@ -60,5 +60,5 @@
     "findings_based": true,
     "post_fix_review_required": true
   },
-  "notes": "Locale-specific language, accessibility and lifecycle receipts remain bound to previously reviewed immutable releases. Current surface_sha256 values were mechanically rebound on 2026-09-02 after PR #222 Commons re-review consistency corrections regenerated deterministic public surfaces as release cc469b553bad17b55352. Locale packs, reviewed source packs, catalog overlays, gate results and review receipts are unchanged. Fresh canonical locale lifecycle browser smoke passed on the same tree. No fresh native-speaker, human-language, manual screen-reader, manual visual or full WCAG approval is claimed."
+  "notes": "Surface digests mechanically rebound 2026-09-05 for release c828b5428ae2c845ba35 after the global runtime change; locale pack and review receipt unchanged. No new language, manual accessibility, visual or WCAG review is claimed."
 }
