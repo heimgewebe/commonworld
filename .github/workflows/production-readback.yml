@@ -22,12 +22,12 @@ jobs:
     timeout-minutes: 30
     steps:
       - name: Check out exact commit
-        uses: actions/checkout@v7
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # actions/checkout@v7
         with:
           ref: ${{ github.sha }}
 
       - name: Set up Python
-        uses: actions/setup-python@v7
+        uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97 # actions/setup-python@v7
         with:
           python-version: "3.12"
 
@@ -101,7 +101,7 @@ jobs:
       - name: Upload Pages production readback receipt
         id: pages_artifact
         if: always()
-        uses: actions/upload-artifact@v7
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # actions/upload-artifact@v7
         with:
           name: commonworld-pages-production-readback-${{ github.sha }}
           path: artifacts/commonworld-pages-production-readback.json
@@ -111,7 +111,7 @@ jobs:
       - name: Upload complete release snapshot receipt
         id: snapshot_artifact
         if: always() && steps.release_snapshot.outcome != 'skipped'
-        uses: actions/upload-artifact@v7
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # actions/upload-artifact@v7
         with:
           name: commonworld-release-snapshot-readback-${{ github.sha }}
           path: artifacts/commonworld-release-snapshot-readback.json
@@ -121,7 +121,7 @@ jobs:
       - name: Upload private reporting readback receipt
         id: security_artifact
         if: always()
-        uses: actions/upload-artifact@v7
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # actions/upload-artifact@v7
         with:
           name: commonworld-private-vulnerability-reporting-${{ github.sha }}
           path: artifacts/commonworld-private-vulnerability-reporting.json

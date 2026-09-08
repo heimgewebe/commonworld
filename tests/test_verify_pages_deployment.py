@@ -639,5 +639,63 @@ class PagesDeploymentReadbackTests(unittest.TestCase):
             self.assertNotIn(deprecated_ref, combined)
 
 
+    def test_official_github_actions_are_sha_pinned_with_bounded_updates(self) -> None:
+        expected_majors = {
+            "actions/checkout": "v7",
+            "actions/setup-node": "v7",
+            "actions/setup-python": "v7",
+            "actions/upload-artifact": "v7",
+        }
+        seen: set[str] = set()
+        workflows = sorted(Path(".github/workflows").glob("*.y*ml"))
+        self.assertTrue(workflows, "no tracked GitHub Actions workflows found")
+
+        for workflow_path in workflows:
+            for line_number, line in enumerate(
+                workflow_path.read_text(encoding="utf-8").splitlines(), start=1
+            ):
+                stripped = line.strip()
+                if stripped.startswith("- "):
+                    stripped = stripped[2:].lstrip()
+                if not stripped.startswith("uses: actions/"):
+                    continue
+
+                invocation, separator, comment = stripped.partition(" # ")
+                self.assertTrue(
+                    separator,
+                    f"{workflow_path}:{line_number}: pinned official action must document reviewed major",
+                )
+                action_ref = invocation.removeprefix("uses: ")
+                action, ref = action_ref.rsplit("@", 1)
+                seen.add(action)
+                self.assertRegex(
+                    ref,
+                    r"^[0-9a-f]{40}$",
+                    f"{workflow_path}:{line_number}: {action} must use a full 40-hex commit SHA",
+                )
+                expected_major = expected_majors.get(action)
+                self.assertIsNotNone(
+                    expected_major,
+                    f"{workflow_path}:{line_number}: record the intended major for {action}",
+                )
+                self.assertIn(
+                    f"{action}@{expected_major}",
+                    comment,
+                    f"{workflow_path}:{line_number}: preserve the reviewed major-line intent next to the SHA pin",
+                )
+
+        self.assertEqual(set(expected_majors), seen)
+        self.assertEqual(
+            "version: 2\n"
+            "updates:\n"
+            "  - package-ecosystem: \"github-actions\"\n"
+            "    directory: \"/\"\n"
+            "    schedule:\n"
+            "      interval: \"weekly\"\n"
+            "    open-pull-requests-limit: 4\n",
+            Path(".github/dependabot.yml").read_text(encoding="utf-8"),
+        )
+
+
 if __name__ == "__main__":
     unittest.main()
