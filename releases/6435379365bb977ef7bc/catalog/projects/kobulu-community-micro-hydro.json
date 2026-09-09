@@ -1,0 +1,127 @@
+{
+  "schema_version": 4,
+  "id": "kobulu-community-micro-hydro",
+  "title": "Kobulu Community Micro Hydro",
+  "summary": "Ein gemeinschaftlich verwaltetes Mikrowasserkraftsystem in Kampung Buayan, Sabah, dessen lokales Komitee Verbrauchstarife, Betriebspersonal, Ersatzteile und künftige Reparaturen organisiert.",
+  "themes": [
+    "energy",
+    "renewable-energy",
+    "community-ownership",
+    "commons-governance",
+    "rural-infrastructure",
+    "appropriate-technology"
+  ],
+  "actions": [
+    "learn"
+  ],
+  "presence": {
+    "geographic": [
+      {
+        "id": "kobulu-penampang-area",
+        "mode": "approximate",
+        "label": "Raum Penampang, Sabah, Malaysia",
+        "geometry": {
+          "type": "Point",
+          "coordinates": [
+            116.25,
+            5.833333
+          ]
+        },
+        "uncertainty_meters_min": 30000,
+        "privacy_note": "Der Punkt bezeichnet nur den groben öffentlichen Verwaltungsbezug Penampang und nicht die Anlage, Leitungen, Haushalte oder private Grundstücke.",
+        "source_ids": [
+          "source-kobulu-tonibung",
+          "source-penampang-geonames"
+        ]
+      }
+    ],
+    "digital": {
+      "available": true,
+      "reach": "global",
+      "label": "Öffentliche Projektdokumentation von TONIBUNG zu Technik und gemeinschaftlicher Verwaltung",
+      "source_ids": [
+        "source-kobulu-tonibung"
+      ]
+    }
+  },
+  "activity": {
+    "status": "active",
+    "observed_at": "2026-09-02",
+    "source_ids": [
+      "source-kobulu-green-empowerment-2026",
+      "source-kobulu-sabah-re2"
+    ],
+    "note": "Zwei primärnahe Projektpartnerquellen beschreiben Buayan 2026 als weiterhin gemeinschaftlich betriebenes und gewartetes Mikrowasserkraftsystem sowie als aktiven Erprobungsort für Smart-Grid-Technik."
+  },
+  "provenance": {
+    "sources": [
+      {
+        "id": "source-kobulu-tonibung",
+        "type": "official-source",
+        "label": "Micro Hydro Project KOBULU — TONIBUNG",
+        "url": "https://tonibung.org/projects",
+        "retrieved_at": "2026-09-02",
+        "note": "Offizielle Projektquelle für Ort, Leistung, Haushaltsbezug, Fertigstellung sowie das lokale Komitee, Tarifregeln, Betriebspersonal und Reparaturfinanzierung."
+      },
+      {
+        "id": "source-penampang-geonames",
+        "type": "public-registry",
+        "label": "Penampang — GeoNames",
+        "url": "https://www.geonames.org/advanced-search.html?country=MY&q=Penampang",
+        "retrieved_at": "2026-07-24",
+        "note": "Öffentliches Georegister für einen groben Verwaltungsbezug; nicht als Anlagenstandort verwendet."
+      },
+      {
+        "id": "source-kobulu-green-empowerment-2026",
+        "type": "official-source",
+        "label": "Malaysia 2026 Trip — Green Empowerment",
+        "url": "https://greenempowerment.org/malaysia2026/",
+        "retrieved_at": "2026-09-02",
+        "note": "Primärnahe Quelle des langjährigen Projektpartners: Buayan habe das Mikrowasserkraftsystem seit mehr als zehn Jahren verwaltet und gewartet und erprobe als Partner im Programm Smart Grid for Small Grids weiterhin neue Technik."
+      },
+      {
+        "id": "source-kobulu-sabah-re2",
+        "type": "official-source",
+        "label": "Sabah RE2 Roadmap — Power to the People Part 6",
+        "url": "https://www.sabahre2roadmap.org/energy-roadmap",
+        "retrieved_at": "2026-09-02",
+        "note": "Offizielle Konsortialquelle: Kampung Buayan werde seit mehr als zehn Jahren durch Mikrowasserkraft versorgt und trage das System als gemeinschaftlich verwaltetes erneuerbares Mini-Netz."
+      }
+    ],
+    "uncertainty_note": "Der öffentliche Projekttext und das Georegister verwenden unterschiedliche räumliche Granularitäten. Deshalb zeigt Commonworld nur den groben Raum Penampang und keinen scheinpräzisen Anlagenpunkt. Neuere Quellen bestätigen den laufenden Betrieb, widersprechen sich aber teilweise bei Leistung und Ausbauzeitachse; diese Angaben bleiben bis zur separaten Nachprüfung unverändert."
+  },
+  "curation": {
+    "state": "listed",
+    "catalogued_at": "2026-07-25",
+    "reviewed_by": "Commonworld editorial review",
+    "reviewed_at": "2026-09-02",
+    "next_review_at": "2026-10-02",
+    "notes": "Der laufende gemeinschaftliche Betrieb wurde am 2026-09-02 anhand der primärnahen Partnerquellen erneut geprüft. Leistung und Ausbauzeitachse bleiben wegen widersprüchlicher Angaben bis zur separaten Nachprüfung unverändert; der Kartenpunkt bezeichnet weder Anlage noch Leitungen, Haushalte oder private Grundstücke."
+  },
+  "links": [
+    {
+      "type": "homepage",
+      "label": "Kobulu Micro Hydro — TONIBUNG",
+      "url": "https://tonibung.org/projects"
+    },
+    {
+      "type": "learn",
+      "label": "Gemeinschaftliches Betriebsmodell kennenlernen",
+      "url": "https://tonibung.org/projects",
+      "source_ids": [
+        "source-kobulu-tonibung"
+      ]
+    },
+    {
+      "type": "source",
+      "label": "Aktuellen Betriebsnachweis bei Green Empowerment lesen",
+      "url": "https://greenempowerment.org/malaysia2026/",
+      "source_ids": [
+        "source-kobulu-green-empowerment-2026"
+      ]
+    }
+  ],
+  "handoff": {
+    "enabled": false
+  }
+}
