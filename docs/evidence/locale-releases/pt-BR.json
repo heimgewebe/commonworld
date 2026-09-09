@@ -8,9 +8,9 @@
   "reviewed_source_pack_sha256": "cf57400b0a0fbf818baa88f33001e95bc4c7c39bd00caef3505f4d9ab6c0f405",
   "catalog_overlay_sha256": "e5c548f9ede7a44ba9181c5b6cd0c7e4f9e9083c73e4279902d27fe04ef9e6df",
   "surface_sha256": {
-    "index": "6f181d1e1ea7503666d8b01c27e737cf6500ce29aa0a3ed620e3ed0d012a5f69",
-    "method": "9e06e8e75834a07a89e5d6d893d0d3719f2bf161f082fa3edbb4d8ed72e07dc6",
-    "proposal": "26d5fcf339889095837a83593bcc4bf360c69d285df25b7eccba52354bd4330c"
+    "index": "1cb31c945320e795d04c50440b2affd767ba853fb5b98fdfce4009e0fce7e34f",
+    "method": "45f637901a6f7e7d758ec6e0a5ceb77df32104fa5a1e8185158616ea0519af48",
+    "proposal": "938862ef5aee82d1ae9f4901df853d08bc7d6553993c2d643b42d806c9dd0b82"
   },
   "gate_results": {
     "required_surfaces_passed": [
@@ -60,5 +60,5 @@
     "findings_based": true,
     "post_fix_review_required": true
   },
-  "notes": "Locale-specific language, accessibility and lifecycle receipts remain bound to previously reviewed immutable releases. Current surface_sha256 values were mechanically rebound on 2026-09-05 after the low-memory globe runtime optimization regenerated deterministic public surfaces as release 465e60d677a2566079a5. Locale packs, reviewed source packs, catalog overlays, gate results and review receipts are unchanged. Fresh canonical public browser smoke passed on the same runtime surface before this evidence-only rebind. No fresh native-speaker, human-language, manual screen-reader, manual visual or full WCAG approval is claimed."
+  "notes": "Locale-specific language, accessibility and lifecycle receipts remain bound to previously reviewed immutable releases. Current surface_sha256 values were mechanically rebound on 2026-09-09 after the globe geometry sampling optimization regenerated deterministic public surfaces as release 6435379365bb977ef7bc. Locale packs, reviewed source packs, catalog overlays, gate results and review receipts are unchanged. Fresh canonical public browser smoke passed on the same runtime surface before this evidence-only rebind. No fresh native-speaker, human-language, manual screen-reader, manual visual or full WCAG approval is claimed."
 }
