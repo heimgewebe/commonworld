@@ -1,0 +1,138 @@
+{
+  "schema_version": 4,
+  "id": "green-coop-japan",
+  "title": "Green Coop",
+  "summary": "Ein mitgliedergesteuerter Verbund von 16 Verbraucherkooperativen in Japan, in dem rund 432.000 Mitgliedshaushalte gemeinsame Versorgungs-, Sozial-, Umwelt- und Unterstützungsstrukturen entwickeln und nutzen; Teilhabe und Mitgestaltung sind mitgliedschaftsgebunden.",
+  "themes": [
+    "cooperative",
+    "food",
+    "care",
+    "community-ownership",
+    "commons-governance",
+    "environment",
+    "mutual-aid"
+  ],
+  "actions": [
+    "learn",
+    "contribute"
+  ],
+  "presence": {
+    "geographic": [
+      {
+        "id": "green-coop-regions",
+        "mode": "hidden",
+        "label": "Japan – 16 regionale Green-Coop-Mitgliedsgenossenschaften",
+        "privacy_note": "Der Verbund erstreckt sich über mehrere Regionen Japans. Commonworld kartiert keine Mitgliederadressen, Liefergebiete, Einrichtungen oder Arbeitsorte aus Verbundangaben.",
+        "source_ids": [
+          "green-coop-about",
+          "green-coop-community"
+        ]
+      }
+    ],
+    "digital": {
+      "available": true,
+      "reach": "network",
+      "label": "Mitgliederinformationen, Genossenschaftsprinzipien und öffentliche Berichte zu gemeinsamen Aktivitäten",
+      "source_ids": [
+        "green-coop-home",
+        "green-coop-about",
+        "green-coop-community"
+      ]
+    }
+  },
+  "activity": {
+    "status": "active",
+    "observed_at": "2026-08-12",
+    "source_ids": [
+      "green-coop-home",
+      "green-coop-2026-participation"
+    ],
+    "note": "Die offizielle Website veröffentlicht im Juli 2026 laufende Aktivitäten; ein Bericht vom Juli 2026 beschreibt aktuelle, von rund 430.000 Mitgliedern getragene Umweltaktionen."
+  },
+  "provenance": {
+    "sources": [
+      {
+        "id": "green-coop-home",
+        "type": "official-source",
+        "label": "Green Coop – offizielle Seite",
+        "url": "https://www.greencoop.or.jp/",
+        "retrieved_at": "2026-08-12",
+        "note": "Aktuelle offizielle Hauptseite mit laufenden Meldungen und Selbstbeschreibung des Verbunds."
+      },
+      {
+        "id": "green-coop-about",
+        "type": "official-source",
+        "label": "Green Coop – Grundprinzipien und Mitgliedersouveränität",
+        "url": "https://www.greencoop.or.jp/about/principle/",
+        "retrieved_at": "2026-08-12",
+        "note": "Offizielle Grundsatzseite: Mitglieder sind die handelnden Träger; Mitgliedersouveränität ist zentrales Prinzip, Delegierte bilden das höchste Beschlussorgan; außerdem werden 16 Mitgliedsgenossenschaften und 431.992 Mitgliedshaushalte für 2024 genannt."
+      },
+      {
+        "id": "green-coop-community",
+        "type": "official-source",
+        "label": "Green Coop – Organisationsstruktur und Kennzahlen",
+        "url": "https://www.greencoop.or.jp/cooperative/",
+        "retrieved_at": "2026-08-12",
+        "note": "Offizielle Organisationsseite: 16 Mitgliedsgenossenschaften, 431.992 Mitgliedshaushalte im Geschäftsjahr 2024 sowie gemeinsam getragene Sozial-, Umwelt- und Unterstützungsstrukturen."
+      },
+      {
+        "id": "green-coop-2026-participation",
+        "type": "official-source",
+        "label": "Green Coop – member-led environmental action, July 2026",
+        "url": "https://www.greencoop.or.jp/2026/07/07/news296/",
+        "retrieved_at": "2026-08-12",
+        "note": "Aktueller offizieller Beleg für gemeinsam organisierte, von Mitgliedern getragene Wiederverwendungs-, Recycling- und Umweltaktivitäten."
+      },
+      {
+        "id": "green-coop-join",
+        "type": "official-source",
+        "label": "Green Coop – Mitglied werden",
+        "url": "https://www.greencoop.or.jp/web-entry/join/join-terms-check.php",
+        "retrieved_at": "2026-08-12",
+        "note": "Offizieller Beitrittspfad mit regionaler Verfügbarkeitsprüfung und Mitgliedschaftsbedingungen."
+      }
+    ],
+    "uncertainty_note": "Green Coop vereint wirtschaftliche Genossenschaftstätigkeit und gemeinwohlorientierte Aktivitäten. Commonworld setzt den Verbund nicht mit einem frei zugänglichen öffentlichen Gut gleich; Teilhabe ist mitgliedschaftsgebunden."
+  },
+  "curation": {
+    "state": "listed",
+    "catalogued_at": "2026-08-12",
+    "reviewed_by": "Commonworld editorial review",
+    "reviewed_at": "2026-08-12",
+    "next_review_at": "2026-11-12",
+    "notes": "Aufgenommen als mitgliedergesteuertes Commons-Netzwerk mit geteilten Versorgungs-, Sozial- und Umweltpraktiken. Kommerzielle Austauschbeziehungen allein wären kein Aufnahmegrund; ausschlaggebend sind Mitgliederhoheit, gemeinsame Institutionen und belegte kollektive Praxis."
+  },
+  "links": [
+    {
+      "type": "homepage",
+      "label": "Green Coop – offizielle Seite",
+      "url": "https://www.greencoop.or.jp/"
+    },
+    {
+      "type": "learn",
+      "label": "Green Coops Mitgliederprinzipien kennenlernen",
+      "url": "https://www.greencoop.or.jp/about/",
+      "source_ids": [
+        "green-coop-about"
+      ]
+    },
+    {
+      "type": "contribute",
+      "label": "Green Coop beitreten und als Mitglied mitwirken",
+      "url": "https://www.greencoop.or.jp/web-entry/join/join-terms-check.php",
+      "source_ids": [
+        "green-coop-join"
+      ]
+    }
+  ],
+  "handoff": {
+    "enabled": false
+  },
+  "access": {
+    "type": "membership",
+    "source_ids": [
+      "green-coop-join"
+    ],
+    "note": "Nutzung und Mitgestaltung sind grundsätzlich an Mitgliedschaft in einer regionalen Green-Coop-Genossenschaft und deren jeweiliges Gebiet gebunden."
+  }
+}

@@ -1,0 +1,5 @@
+Contact: https://github.com/heimgewebe/commonworld/security/advisories/new
+Expires: 2027-06-30T00:00:00Z
+Preferred-Languages: en, de
+Canonical: https://commonworld.net/.well-known/security.txt
+Policy: https://github.com/heimgewebe/commonworld/security/policy

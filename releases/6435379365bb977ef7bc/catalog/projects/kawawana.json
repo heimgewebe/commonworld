@@ -1,0 +1,90 @@
+{
+  "schema_version": 4,
+  "id": "kawawana",
+  "title": "Kawawana",
+  "summary": "Die Fischervereinigung APCRM und Bewohner aus acht Dörfern der Zentral-Casamance schützen lokale Fischbestände durch farbcodierte Nutzungszonen, Fangbeschränkungen, Überwachung und Patrouillen unter 2010 übertragenen Küstenverwaltungsrechten.",
+  "themes": [
+    "marine-conservation",
+    "fisheries",
+    "biodiversity",
+    "mangroves",
+    "commons-governance"
+  ],
+  "actions": [
+    "learn"
+  ],
+  "presence": {
+    "geographic": [
+      {
+        "id": "kawawana-central-casamance",
+        "mode": "approximate",
+        "label": "Zentral-Casamance, Senegal — grober Regionalanker",
+        "geometry": {
+          "type": "Point",
+          "coordinates": [
+            -15.9,
+            12.6
+          ]
+        },
+        "uncertainty_meters_min": 120000,
+        "privacy_note": "Der Punkt bezeichnet nur die öffentlich genannte Zentral-Casamance und keine Dörfer, Bolongs, Fanggründe, Patrouillenwege oder Zonengrenzen.",
+        "source_ids": [
+          "kawawana-icca-registry"
+        ]
+      }
+    ],
+    "digital": {
+      "available": false,
+      "source_ids": [
+        "kawawana-icca-registry"
+      ]
+    }
+  },
+  "activity": {
+    "status": "unknown",
+    "observed_at": "2026-09-05",
+    "source_ids": [
+      "kawawana-icca-registry"
+    ],
+    "note": "Bei der Nachprüfung am 2026-09-05 führt das aktuelle ICCA-Register Kawawana weiterhin als senegalesischen ICCA-Fall; der zugrunde liegende Falltext ist jedoch historisch und belegt keinen hinreichend zeitnahen Betriebszustand. Der aktuelle Betriebszustand bleibt deshalb unbekannt."
+  },
+  "provenance": {
+    "sources": [
+      {
+        "id": "kawawana-icca-registry",
+        "type": "public-registry",
+        "label": "ICCA Registry – Kawawana, Senegal",
+        "url": "https://www.iccaregistry.org/en/explore/Senegal/kawawana",
+        "retrieved_at": "2026-09-05",
+        "note": "Öffentlicher, von den Hütern des Gebiets gespeister und peer-reviewter Registerfall zu APCRM, acht Dörfern, übertragenen Küstenverwaltungsrechten, Nutzungszonen, Fangregeln, Monitoring und Patrouillen; der Falltext stammt ursprünglich aus 2012."
+      }
+    ],
+    "uncertainty_note": "Commonworld veröffentlicht keine Zonengeometrie oder lokale Ressourcenorte; die Koordinate ist nur ein grober Regionalanker."
+  },
+  "curation": {
+    "state": "listed",
+    "catalogued_at": "2026-08-04",
+    "reviewed_by": "Commonworld editorial review",
+    "reviewed_at": "2026-09-05",
+    "next_review_at": "2026-10-05",
+    "notes": "Aktueller Betriebszustand nicht zeitnah verifiziert; bei der Nachprüfung am 2026-09-05 führt das aktuelle ICCA-Register Kawawana weiterhin, liefert aber keinen frischen objektspezifischen Aktivitätsbeleg. Priorisierte Nachprüfung bis 2026-10-05. Aufgenommen bleibt die konkrete von APCRM und acht Dörfern getragene Fischerei- und Küstenverwaltungsinstitution."
+  },
+  "links": [
+    {
+      "type": "homepage",
+      "label": "Kawawana im ICCA-Register",
+      "url": "https://www.iccaregistry.org/en/explore/Senegal/kawawana"
+    },
+    {
+      "type": "learn",
+      "label": "Kawawanas Regeln und Verwaltung kennenlernen",
+      "url": "https://www.iccaregistry.org/en/explore/Senegal/kawawana",
+      "source_ids": [
+        "kawawana-icca-registry"
+      ]
+    }
+  ],
+  "handoff": {
+    "enabled": false
+  }
+}

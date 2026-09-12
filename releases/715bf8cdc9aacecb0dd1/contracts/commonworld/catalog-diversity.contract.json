@@ -1,0 +1,70 @@
+{
+  "schema_version": 1,
+  "kind": "commonworld_catalog_diversity_contract",
+  "current_as_of": "2026-07-16",
+  "minimum_catalog_size": 30,
+  "growth_policy": "minimum_not_exact_ceiling",
+  "required_regions": {
+    "asia": [
+      "g0v",
+      "nepal-wireless-networking-project"
+    ],
+    "latin_america": [
+      "bioleft",
+      "fucvam"
+    ],
+    "oceania": [
+      "open-food-network-australia",
+      "enspiral",
+      "community-energy-network-new-zealand"
+    ],
+    "southern_hemisphere": [
+      "zenzeleni-community-networks",
+      "bioleft",
+      "fucvam",
+      "open-food-network-australia",
+      "community-energy-network-new-zealand"
+    ]
+  },
+  "required_domains": {
+    "water_irrigation": [
+      "new-mexico-acequia-association"
+    ],
+    "seeds_food": [
+      "bioleft",
+      "open-food-network-australia"
+    ],
+    "health_care": [
+      "openmrs"
+    ],
+    "energy": [
+      "som-energia",
+      "community-energy-network-new-zealand"
+    ],
+    "land_housing": [
+      "fucvam",
+      "cltb-le-nid",
+      "granby-four-streets-clt"
+    ],
+    "tools_repair_manufacturing": [
+      "edinburgh-tool-library",
+      "open-source-ecology"
+    ],
+    "knowledge_culture_beyond_wikimedia": [
+      "g0v",
+      "enspiral"
+    ],
+    "community_networks": [
+      "nepal-wireless-networking-project",
+      "zenzeleni-community-networks",
+      "nyc-mesh",
+      "sarantaporo-community-network",
+      "guifi-net"
+    ]
+  },
+  "privacy_assertions": {
+    "community_network_private_nodes_hidden": true,
+    "no_synthetic_geometry": true,
+    "country_or_region_points_are_not_coverage_claims": true
+  }
+}

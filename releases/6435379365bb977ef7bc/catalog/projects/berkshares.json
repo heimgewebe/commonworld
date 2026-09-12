@@ -1,0 +1,156 @@
+{
+  "schema_version": 4,
+  "id": "berkshares",
+  "title": "BerkShares",
+  "summary": "Eine lokale Währung in der Berkshire-Region von Massachusetts, die von gemeinschaftsorientierten Nonprofits getragen und über eine Mitgliedschaft mitgewählt wird; Mitglieder wählen den Vorstand und stimmen über zentrale Änderungen ab, während die Währung lokale Kreisläufe stärkt.",
+  "themes": [
+    "community-finance",
+    "local-currency",
+    "cooperative-economy",
+    "neighbourhood",
+    "commons-governance"
+  ],
+  "actions": [
+    "use",
+    "learn",
+    "contribute"
+  ],
+  "presence": {
+    "geographic": [
+      {
+        "id": "berkshares-berkshire-region",
+        "mode": "hidden",
+        "label": "Berkshire-Region, Massachusetts – lokaler Währungsraum",
+        "privacy_note": "Keine künstliche Geometrie: Commonworld kartiert weder einzelne Nutzer, Transaktionen noch aus Geschäfts- oder Bankverzeichnissen rekonstruierte Nutzungsorte als Projektabdeckung.",
+        "source_ids": [
+          "berkshares-about",
+          "berkshares-using"
+        ]
+      }
+    ],
+    "digital": {
+      "available": false,
+      "source_ids": [
+        "berkshares-about",
+        "berkshares-using"
+      ]
+    }
+  },
+  "activity": {
+    "status": "active",
+    "observed_at": "2026-08-14",
+    "source_ids": [
+      "berkshares-home",
+      "berkshares-annual-meeting-2026"
+    ],
+    "note": "Die offizielle Seite veröffentlicht 2026 laufende Währungs- und Community-Aktivitäten; im Januar 2026 fand eine Mitgliederversammlung mit Abstimmungen über Vorstandsmandate statt."
+  },
+  "provenance": {
+    "sources": [
+      {
+        "id": "berkshares-home",
+        "type": "official-source",
+        "label": "BerkShares – offizielle Seite",
+        "url": "https://berkshares.org/",
+        "retrieved_at": "2026-08-14",
+        "note": "Aktuelle Hauptseite mit laufenden Beiträgen aus 2026 und Informationen zur lokalen Währungsnutzung."
+      },
+      {
+        "id": "berkshares-about",
+        "type": "official-source",
+        "label": "BerkShares – About",
+        "url": "https://berkshares.org/about/",
+        "retrieved_at": "2026-08-14",
+        "note": "Beschreibt Funktionsweise, Nonprofit-Struktur und Governance: Die General Membership wählt den Vorstand, stimmt über zentrale Organisationsänderungen ab und gibt Input zur weiteren Entwicklung."
+      },
+      {
+        "id": "berkshares-using",
+        "type": "official-source",
+        "label": "BerkShares – Using BerkShares",
+        "url": "https://berkshares.org/using-berkshares/",
+        "retrieved_at": "2026-08-14",
+        "note": "Aktueller öffentlicher Nutzungsweg: BerkShares können bei teilnehmenden lokalen Banken getauscht und bei teilnehmenden lokalen Unternehmen verwendet werden."
+      },
+      {
+        "id": "berkshares-annual-meeting-2026",
+        "type": "official-source",
+        "label": "BerkShares – 2026 Annual Membership Meeting",
+        "url": "https://berkshares.org/annual-meeting-2025/",
+        "retrieved_at": "2026-08-14",
+        "note": "Dokumentiert die Mitgliederversammlung vom 14. Januar 2026, Stimmrechte der Mitglieder sowie Abstimmungen über Vorstandsmandate."
+      },
+      {
+        "id": "berkshares-membership",
+        "type": "official-source",
+        "label": "BerkShares – Membership",
+        "url": "https://berkshares.org/donate/",
+        "retrieved_at": "2026-08-14",
+        "note": "Offizieller Mitgliedschaftspfad: Einwohner der Berkshire-Region können Mitglied werden, an Mitgliederversammlungen teilnehmen und für den Vorstand kandidieren."
+      }
+    ],
+    "uncertainty_note": "BerkShares ist eine lokal gebundene Währungs- und Governance-Institution, kein allgemeines Zahlungsmittel und kein frei zugänglicher Geldbestand. Commonworld dupliziert keine volatilen Umlauf-, Umsatz- oder Teilnehmerzahlen als dauerhafte Katalogwahrheit."
+  },
+  "curation": {
+    "state": "listed",
+    "catalogued_at": "2026-08-14",
+    "reviewed_by": "Commonworld editorial review",
+    "reviewed_at": "2026-08-14",
+    "next_review_at": "2026-11-14",
+    "notes": "Aufgenommen als konkrete Community-Finance- und Lokalwährungspraxis. Ausschlaggebend sind lokale Zirkulationsregeln, Nonprofit-Trägerschaft und belegte Mitglieder-Governance; der bloße Einsatz eines alternativen Zahlungsmittels wäre kein Aufnahmegrund."
+  },
+  "links": [
+    {
+      "type": "homepage",
+      "label": "BerkShares – offizielle Seite",
+      "url": "https://berkshares.org/"
+    },
+    {
+      "type": "use",
+      "label": "BerkShares beziehen und lokal verwenden",
+      "url": "https://berkshares.org/using-berkshares/",
+      "source_ids": [
+        "berkshares-using",
+        "berkshares-about"
+      ]
+    },
+    {
+      "type": "learn",
+      "label": "Währungsmodell und Governance von BerkShares kennenlernen",
+      "url": "https://berkshares.org/about/",
+      "source_ids": [
+        "berkshares-about",
+        "berkshares-annual-meeting-2026"
+      ]
+    },
+    {
+      "type": "contribute",
+      "label": "BerkShares-Mitglied werden und an der Governance mitwirken",
+      "url": "https://berkshares.org/donate/",
+      "source_ids": [
+        "berkshares-membership",
+        "berkshares-about"
+      ]
+    }
+  ],
+  "handoff": {
+    "enabled": false
+  },
+  "languages": {
+    "codes": [
+      "en"
+    ],
+    "source_ids": [
+      "berkshares-home",
+      "berkshares-about"
+    ],
+    "note": "Die geprüften offiziellen Seiten sind auf Englisch verfügbar."
+  },
+  "access": {
+    "type": "public",
+    "source_ids": [
+      "berkshares-about",
+      "berkshares-using"
+    ],
+    "note": "Jede Person kann BerkShares beziehen, ausgeben und zurücktauschen; die Nutzung ist jedoch auf die Berkshire-Region und teilnehmende Banken und Unternehmen begrenzt. Governance-Rechte setzen eine Mitgliedschaft voraus."
+  }
+}

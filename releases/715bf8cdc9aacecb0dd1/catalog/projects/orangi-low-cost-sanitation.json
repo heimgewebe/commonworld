@@ -1,0 +1,139 @@
+{
+  "schema_version": 4,
+  "id": "orangi-low-cost-sanitation",
+  "title": "Orangi Low-Cost Sanitation",
+  "summary": "Eine gemeinschaftlich organisierte Sanitärpraxis aus Orangi in Karachi, bei der Nachbarschaften ihre Hausanschlüsse sowie Gassen- und Sekundärkanäle gemeinsam finanzieren, bauen, verwalten und erhalten, während OPP-RTI technische Beratung leistet und öffentliche Stellen die Hauptinfrastruktur verantworten.",
+  "themes": [
+    "infrastructure",
+    "community-maintenance",
+    "commons-governance",
+    "water",
+    "neighbourhood"
+  ],
+  "actions": [
+    "learn",
+    "contact"
+  ],
+  "presence": {
+    "geographic": [
+      {
+        "id": "orangi-sanitation-network",
+        "mode": "hidden",
+        "label": "Orangi, Karachi – gemeinschaftlich verwaltete Sanitärinfrastruktur",
+        "privacy_note": "Das Common besteht aus Haushalts-, Gassen- und Nachbarschaftsinfrastruktur. Commonworld veröffentlicht keine Haus-, Leitungs-, Schacht- oder Gassenkoordinaten und erzeugt keine Geometrie aus Ortsangaben.",
+        "source_ids": [
+          "opp-rti",
+          "opp-what-we-do"
+        ]
+      }
+    ],
+    "digital": {
+      "available": true,
+      "reach": "regional",
+      "label": "Öffentliche OPP-RTI-Dokumentation zur gemeinschaftlich finanzierten und gepflegten Niedrigkosten-Sanitärversorgung",
+      "source_ids": [
+        "opp-home",
+        "opp-what-we-do",
+        "opp-rti",
+        "opp-programs"
+      ]
+    }
+  },
+  "activity": {
+    "status": "unknown",
+    "observed_at": "2026-08-13",
+    "source_ids": [
+      "opp-home",
+      "opp-programs"
+    ],
+    "note": "Aktueller Betriebszustand nicht zeitnah verifiziert: Die offizielle OPP-RTI-Website beschreibt das Programm und fortgesetzte Arbeit, bietet aber keinen ausreichend frischen datierten Aktivitätsbeleg für August 2026."
+  },
+  "provenance": {
+    "sources": [
+      {
+        "id": "opp-home",
+        "type": "official-source",
+        "label": "Orangi Pilot Project – offizielle Website",
+        "url": "https://www.opp.org.pk/",
+        "retrieved_at": "2026-08-13",
+        "note": "Aktuelle offizielle Übersicht über OPP und die gemeinschaftlich getragenen Infrastrukturprogramme."
+      },
+      {
+        "id": "opp-what-we-do",
+        "type": "official-source",
+        "label": "OPP – gemeinschaftliche Niedrigkosten-Sanitärversorgung",
+        "url": "https://www.opp.org.pk/what-we-do/",
+        "retrieved_at": "2026-08-13",
+        "note": "Beschreibt, dass Bewohner Kanalisation und weitere Infrastruktur finanzieren, verwalten und erhalten können und OPP-RTI technische Unterstützung bietet."
+      },
+      {
+        "id": "opp-rti",
+        "type": "official-source",
+        "label": "OPP-RTI – Low Cost Sanitation Programme",
+        "url": "https://www.opp.org.pk/opp-rti/",
+        "retrieved_at": "2026-08-13",
+        "note": "Dokumentiert die Gasse als Organisationseinheit sowie gemeinschaftliche Finanzierung, Aushub, Leitungsverlegung, Schächte, Anschlüsse und langfristige Pflege."
+      },
+      {
+        "id": "opp-programs",
+        "type": "official-source",
+        "label": "OPP – laufende Programme",
+        "url": "https://www.opp.org.pk/our-programs/",
+        "retrieved_at": "2026-08-13",
+        "note": "Führt die Niedrigkosten-Sanitärversorgung als laufendes Programm."
+      },
+      {
+        "id": "opp-contact",
+        "type": "official-source",
+        "label": "OPP – Kontakt",
+        "url": "https://www.opp.org.pk/contact/",
+        "retrieved_at": "2026-08-13",
+        "note": "Offizieller Kontaktweg zur unterstützenden OPP-RTI-Organisation."
+      }
+    ],
+    "uncertainty_note": "OPP-RTI ist Unterstützungs- und Wissensinstitution, nicht Eigentümer des Commons. Die lokale Gemeinschaft verantwortet die interne Infrastruktur; Hauptkanäle und Behandlung bleiben Aufgabe öffentlicher Stellen."
+  },
+  "curation": {
+    "state": "listed",
+    "catalogued_at": "2026-08-13",
+    "reviewed_by": "Commonworld editorial review",
+    "reviewed_at": "2026-08-13",
+    "next_review_at": "2026-09-15",
+    "notes": "Aktueller Betriebszustand nicht zeitnah verifiziert. Aufgenommen wird die nachbarschaftlich finanzierte, gebaute und gepflegte Sanitärinfrastruktur samt Commoning-Praxis; OPP-RTI wird nur als technische Unterstützungsinstitution beschrieben."
+  },
+  "links": [
+    {
+      "type": "homepage",
+      "label": "Orangi Pilot Project – offizielle Website",
+      "url": "https://www.opp.org.pk/"
+    },
+    {
+      "type": "learn",
+      "label": "Low-Cost-Sanitation-Modell kennenlernen",
+      "url": "https://www.opp.org.pk/opp-rti/",
+      "source_ids": [
+        "opp-rti",
+        "opp-what-we-do"
+      ]
+    },
+    {
+      "type": "contact",
+      "label": "OPP-RTI kontaktieren",
+      "url": "https://www.opp.org.pk/contact/",
+      "source_ids": [
+        "opp-contact"
+      ]
+    }
+  ],
+  "handoff": {
+    "enabled": false
+  },
+  "access": {
+    "type": "restricted",
+    "source_ids": [
+      "opp-rti",
+      "opp-what-we-do"
+    ],
+    "note": "Nutzung, Finanzierung und Pflege der physischen Infrastruktur sind an die beteiligten Haushalte und Nachbarschaften gebunden; die Dokumentation ist öffentlich."
+  }
+}

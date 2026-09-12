@@ -3246,6 +3246,15 @@ async function androidGlobeUiScenario() {
   assert(mapPausedAfter.every(({ planeAnimationName, planeAnimationPlayState, planeAnimationPlaybackRate, planeAnimationApiPlayState, planeAnimationPending }) => planeAnimationName === 'sphere-ring-orbit' && planeAnimationPlayState === 'paused' && planeAnimationPlaybackRate === 0 && planeAnimationApiPlayState === 'paused' && planeAnimationPending === false), scenarioId + ': data-map-moving did not deterministically freeze each shared ring plane ' + JSON.stringify(mapPausedAfter));
   assert(movingMatricesBetween(mapPausedBefore, mapPausedAfter).length === 0 && movingBoxesBetween(mapPausedBefore, mapPausedAfter, 'ringBox').length === 0 && movingBoxesBetween(mapPausedBefore, mapPausedAfter, 'labelBox').length === 0 && advancingAnimationTimesBetween(mapPausedBefore, mapPausedAfter).length === 0, scenarioId + ': line, label or WAAPI time moved while data-map-moving paused the shared orbit ' + JSON.stringify({ before: mapPausedBefore, after: mapPausedAfter }));
   await run.page.evaluate(() => { delete document.querySelector('.globe-stage').dataset.mapMoving; });
+  await run.page.waitForTimeout(180);
+  const mapResumeGraceBeforeChurn = await touchRingState();
+  assert(mapResumeGraceBeforeChurn.every(({ planeAnimationPlayState, planeAnimationPlaybackRate }) => planeAnimationPlayState === 'paused' && planeAnimationPlaybackRate === 0), scenarioId + ': shared ring planes resumed before the post-move idle grace elapsed ' + JSON.stringify(mapResumeGraceBeforeChurn));
+  await run.page.evaluate(() => { document.querySelector('.globe-stage').dataset.mapMoving = 'true'; });
+  await run.page.waitForTimeout(80);
+  await run.page.evaluate(() => { delete document.querySelector('.globe-stage').dataset.mapMoving; });
+  await run.page.waitForTimeout(300);
+  const mapResumeGraceAfterChurn = await touchRingState();
+  assert(mapResumeGraceAfterChurn.every(({ planeAnimationPlayState, planeAnimationPlaybackRate }) => planeAnimationPlayState === 'paused' && planeAnimationPlaybackRate === 0), scenarioId + ': rapid moveend-to-movestart churn did not replace the pending ring resume grace ' + JSON.stringify(mapResumeGraceAfterChurn));
   const mapResumedBefore = await waitForTouchAnimationSettlement('running', 1);
   const mapResumedAfter = await waitForCoherentTouchMotion(mapResumedBefore);
   assert(mapResumedAfter.every(({ planeAnimationName, planeAnimationPlayState, planeAnimationPlaybackRate, planeAnimationApiPlayState, planeAnimationPending }) => planeAnimationName === 'sphere-ring-orbit' && planeAnimationPlayState === 'running' && planeAnimationPlaybackRate === 1 && planeAnimationApiPlayState === 'running' && planeAnimationPending === false), scenarioId + ': shared ring planes did not resume at normal playback after data-map-moving ended ' + JSON.stringify(mapResumedAfter));

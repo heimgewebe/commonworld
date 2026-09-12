@@ -1,0 +1,59 @@
+{
+  "schema_version": 1,
+  "kind": "commonworld_commons_basis",
+  "project_id": "open-food-network-australia",
+  "classification": "commons-infrastructure",
+  "decision": "include",
+  "reviewed_at": "2026-08-24",
+  "reviewer": "Commonworld editorial review",
+  "criteria": {
+    "shared_resource": {
+      "status": "supported",
+      "statement": "Gemeinsam gepflegte offene Software, Wissen und weitere Ressourcen bilden eine identifizierbare Infrastruktur für regionale Lebensmittelnetzwerke; die globale Community bezeichnet und organisiert diese ausdrücklich als Commons.",
+      "source_ids": [
+        "ofn-au-about",
+        "ofn-au-software-platform",
+        "ofn-au-community-pledge-v2"
+      ]
+    },
+    "community": {
+      "status": "supported",
+      "statement": "Open Food Network Australia ist Teil einer lokal geführten globalen Community aus Affiliates und weiteren beitragenden Organisationen; die Open Food Foundation ist im Governance-Vertrag als Affiliate aufgeführt.",
+      "source_ids": [
+        "ofn-au-about",
+        "ofn-au-community-pledge-v2"
+      ]
+    },
+    "commoning_practice": {
+      "status": "supported",
+      "statement": "Die Community teilt Entwicklungskosten, Wissen und Organisationspraxis und sieht Beiträge durch Zeit, Geld, Code, Dokumentation, Forschung, Unterstützung und gemeinsame Pflege der Kernressourcen vor.",
+      "source_ids": [
+        "ofn-au-software-platform",
+        "ofn-au-community-pledge-v2"
+      ]
+    },
+    "rules_and_responsibility": {
+      "status": "supported",
+      "statement": "Der Community-Pledge regelt Rollen, Rückbeiträge, Lizenz- und Transparenzpflichten, Affiliate-Aufnahme, subsidiäre Entscheidungen, offene Diskussion, Lazy Consent, Abstimmungen und Konfliktwege.",
+      "source_ids": [
+        "ofn-au-community-pledge-v2"
+      ]
+    },
+    "common_benefit": {
+      "status": "supported",
+      "statement": "Software und Ressourcen sollen gemeinschaftliche Lebensmittelunternehmen und kurze, transparente Versorgungsketten befähigen; Mitglieder müssen Wert in die gemeinsam entwickelte Infrastruktur zurückgeben und geteilte Ressourcen erhalten.",
+      "source_ids": [
+        "ofn-au-about",
+        "ofn-au-software-platform",
+        "ofn-au-community-pledge-v2"
+      ]
+    }
+  },
+  "confidence": 0.91,
+  "limitations": [
+    "Die australische Instanz wird von der Open Food Foundation mit Board-Aufsicht betrieben; zentrale Betreiber-, Marken- und Infrastrukturentscheidungen sind daher nicht vollständig gemeinschaftlich verteilt.",
+    "Die Plattform vermittelt reale Markttransaktionen und die Organisation umfasst mit Open Food Services auch eine Social-Enterprise-Beratung; kommerzielle Nutzung ist möglich und wird nur durch Lizenz-, Beitrags- und Governance-Regeln vom Commons-Kern abgegrenzt.",
+    "Die aktuelle australische About-Seite verlinkt weiterhin den Community-Pledge v1 von 2017, während im offiziellen Community-Forum eine neuere v2-Fassung von 2019/2020 vorliegt; diese Dokumentationsdrift begrenzt die Sicherheit über den heute maßgeblichen Detailprozess."
+  ],
+  "notes": "Die Aufnahme stützt sich auf die gemeinsam entwickelte Infrastruktur und die dokumentierten Beitrags- und Governance-Pflichten, nicht allein auf Gemeinnützigkeit, Open Source oder Plattformnutzung."
+}

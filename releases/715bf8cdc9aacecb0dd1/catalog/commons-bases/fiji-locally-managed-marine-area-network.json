@@ -1,0 +1,55 @@
+{
+  "schema_version": 1,
+  "kind": "commonworld_commons_basis",
+  "project_id": "fiji-locally-managed-marine-area-network",
+  "classification": "commons-infrastructure",
+  "decision": "include",
+  "reviewed_at": "2026-08-15",
+  "reviewer": "Commonworld editorial review",
+  "criteria": {
+    "shared_resource": {
+      "status": "supported",
+      "statement": "Die beteiligten lokalen Meeresgebiete beziehen sich auf küstennahe Fischerei- und Meeresressourcen, die von lokalen Gemeinschaften bewirtschaftet werden.",
+      "source_ids": [
+        "flmma-spc-2026",
+        "flmma-spc-exchange"
+      ]
+    },
+    "community": {
+      "status": "supported",
+      "statement": "FLMMA verbindet lokale Gemeinschaften mit weiteren Partnern rund um gemeinschaftsbasiertes Meeresressourcenmanagement.",
+      "source_ids": [
+        "flmma-spc-2026",
+        "flmma-spc-exchange"
+      ]
+    },
+    "commoning_practice": {
+      "status": "supported",
+      "statement": "Die Netzwerkpraxis umfasst lokal vereinbarte Bewirtschaftung, gemeinschaftliche Beobachtung und Lernen zwischen lokal verwalteten Meeresgebieten.",
+      "source_ids": [
+        "flmma-spc-2026"
+      ]
+    },
+    "rules_and_responsibility": {
+      "status": "supported",
+      "statement": "Die lokalen Gemeinschaften tragen die Bewirtschaftung ihrer Meeresgebiete; FLMMA unterstützt die Praxis, ohne die lokalen Regeln zu zentralisieren.",
+      "source_ids": [
+        "flmma-spc-exchange"
+      ]
+    },
+    "common_benefit": {
+      "status": "supported",
+      "statement": "Die lokale Meeresbewirtschaftung verbindet Lebensgrundlagen, Fischereiressourcen und Schutz mariner Biodiversität.",
+      "source_ids": [
+        "flmma-spc-2026"
+      ]
+    }
+  },
+  "confidence": 0.91,
+  "limitations": [
+    "FLMMA ist ein Unterstützungsnetz für viele lokale Meeres-Commons und kein Eigentümer eines einzigen landesweiten Ressourcenraums.",
+    "Die genaue Governance unterscheidet sich zwischen den lokalen Gebieten.",
+    "Commonworld veröffentlicht keine abgeleiteten Dorf-, qoliqoli-, Riff-, tabu- oder Fanggebietsgrenzen."
+  ],
+  "notes": "Aufgenommen als Commons-Infrastruktur mit aktuellem 2026-Beleg und konservativer räumlicher Darstellung."
+}

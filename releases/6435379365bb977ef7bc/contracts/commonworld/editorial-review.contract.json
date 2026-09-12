@@ -1,0 +1,102 @@
+{
+  "schema_version": 2,
+  "kind": "commonworld_editorial_review_contract",
+  "current_as_of": "2026-07-31",
+  "statuses": [
+    "submitted",
+    "needs_information",
+    "under_review",
+    "accepted",
+    "rejected",
+    "withdrawn",
+    "published",
+    "superseded"
+  ],
+  "transitions": {
+    "submitted": [
+      "needs_information",
+      "under_review",
+      "withdrawn"
+    ],
+    "needs_information": [
+      "submitted",
+      "under_review",
+      "rejected",
+      "withdrawn"
+    ],
+    "under_review": [
+      "needs_information",
+      "accepted",
+      "rejected",
+      "withdrawn"
+    ],
+    "accepted": [
+      "published",
+      "superseded"
+    ],
+    "published": [
+      "superseded"
+    ],
+    "rejected": [],
+    "withdrawn": [],
+    "superseded": []
+  },
+  "review_checks": [
+    "project_exists",
+    "official_or_primary_near_source",
+    "commons_basis_record_valid",
+    "commons_character_supported",
+    "action_links_are_real_paths",
+    "private_locations_not_reconstructable",
+    "location_precision_justified",
+    "identity_is_unique",
+    "publication_is_legally_and_privacy_acceptable",
+    "next_review_date_set",
+    "rejection_reason_structured_when_rejected"
+  ],
+  "commons_admission": {
+    "definition_contract": "contracts/commonworld/commons-definition.contract.json",
+    "basis_schema": "contracts/commonworld/commons-basis.schema.json",
+    "basis_index": "catalog/commons-bases/index.json",
+    "transition_effective_from": "2026-07-31",
+    "retroreview_policy": "catalog/commons-bases/retroreview-policy.json",
+    "include_requires_supported_dimensions": [
+      "shared_resource",
+      "community",
+      "commoning_practice",
+      "rules_and_responsibility",
+      "common_benefit"
+    ],
+    "open_source_or_free_of_charge_alone_is_sufficient": false,
+    "automatic_classification": false
+  },
+  "rejection_reason_codes": [
+    "not_a_commons",
+    "insufficient_sources",
+    "duplicate",
+    "private_location_risk",
+    "commercial_listing_only",
+    "project_inactive",
+    "action_claim_unverified",
+    "out_of_scope"
+  ],
+  "decision_record": {
+    "structured_reason_required_for_rejection": true,
+    "free_text_may_supplement": true,
+    "reviewer_and_reviewed_at_required": true
+  },
+  "publication_boundary": {
+    "proposal_is_not_catalog_record": true,
+    "automatic_publication": false,
+    "catalog_change_requires_reviewed_repository_commit": true,
+    "published_record_must_validate_against": "contracts/commonworld/project.schema.json",
+    "new_or_materially_rereviewed_record_must_have_commons_basis": true,
+    "catalogued_at_set_on_first_publication": true,
+    "catalogued_at_immutable_after_publication": true
+  },
+  "freshness": {
+    "next_review_at_required_for_acceptance": true,
+    "stale_entries_remain_explicit": true,
+    "legacy_basis_review_uses_existing_next_review_at_with_migration_grace": true
+  }
+}
