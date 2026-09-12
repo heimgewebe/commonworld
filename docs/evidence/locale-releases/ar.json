@@ -8,9 +8,9 @@
   "reviewed_source_pack_sha256": "cf57400b0a0fbf818baa88f33001e95bc4c7c39bd00caef3505f4d9ab6c0f405",
   "catalog_overlay_sha256": "48feb693350e1800588c2376b9179ed5c27ead85948044dc05549436a5ddd15a",
   "surface_sha256": {
-    "index": "1efbf79f2f2f2413b781dfe554677d646d52883572c1a500efc1d8afb881d03a",
-    "method": "0a6f29b5c82b04919582e5c61713e47183fe79f1013be9774185084d7d477740",
-    "proposal": "091ac2c97cc3607a4a45d5d1e6e2739675d0c4c73ed45cede8477b40a0a7de7a"
+    "index": "4b12776f5211b476431f6282e23eef75722753a4e1e31ca74f242701405f6805",
+    "method": "bd5c51e3eec2d70a8fd8794077b5ac72bd245add8af86fd3446f0b76db16f4a5",
+    "proposal": "1c31eaa6f27e36c36248aed50380e3fdb33ed7dbede4e521bf753e519243bf2e"
   },
   "gate_results": {
     "required_surfaces_passed": [
@@ -68,5 +68,5 @@
     "findings_based": true,
     "post_fix_review_required": true
   },
-  "notes": "Locale-specific language, accessibility and lifecycle receipts remain bound to previously reviewed immutable releases. Current surface_sha256 values were mechanically rebound on 2026-09-09 after the globe geometry sampling optimization regenerated deterministic public surfaces as release 6435379365bb977ef7bc. Locale packs, reviewed source packs, catalog overlays, gate results and review receipts are unchanged. Fresh canonical public browser smoke passed on the same runtime surface before this evidence-only rebind. No fresh native-speaker, human-language, manual screen-reader, manual visual or full WCAG approval is claimed."
+  "notes": "Mechanically rebound to deterministic release 715bf8cdc9aacecb0dd1 after the T047 ring-resume performance optimization and fresh browser smoke. Existing independent language, accessibility, and review receipts are preserved unchanged; this rebind makes no new human or native-review claim."
 }
