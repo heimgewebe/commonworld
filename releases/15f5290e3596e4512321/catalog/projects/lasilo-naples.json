@@ -1,0 +1,140 @@
+{
+  "schema_version": 4,
+  "id": "lasilo-naples",
+  "title": "l’Asilo",
+  "summary": "Ein öffentliches Kultur-Common in Neapel, dessen Räume, künstlerische Produktionsmittel und urbaner Garten von einer offenen Gemeinschaft über Versammlungen, thematische Arbeitsgruppen und eine gemeinsame Erklärung zum zivilen Gebrauch selbstverwaltet werden.",
+  "themes": [
+    "shared-space",
+    "commons-governance",
+    "community-maintenance",
+    "neighbourhood",
+    "cultural-heritage"
+  ],
+  "actions": [
+    "learn",
+    "contact"
+  ],
+  "presence": {
+    "geographic": [
+      {
+        "id": "lasilo-naples-site",
+        "mode": "hidden",
+        "label": "l’Asilo, Vico Giuseppe Maffei 4, Neapel",
+        "privacy_note": "Die offizielle Kontaktseite veröffentlicht die Anschrift. Commonworld erzeugt daraus dennoch keine Geometrie und übernimmt keine nicht ausdrücklich belegten Koordinaten.",
+        "source_ids": [
+          "lasilo-contact",
+          "lasilo-civic-use"
+        ]
+      }
+    ],
+    "digital": {
+      "available": true,
+      "reach": "regional",
+      "label": "Öffentliche Dokumentation zu Räumen, Selbstverwaltung, Versammlungen und zivilem Gebrauch",
+      "source_ids": [
+        "lasilo-home",
+        "lasilo-organism",
+        "lasilo-civic-use",
+        "lasilo-faq"
+      ]
+    }
+  },
+  "activity": {
+    "status": "unknown",
+    "observed_at": "2026-08-13",
+    "source_ids": [
+      "lasilo-home",
+      "lasilo-organism",
+      "lasilo-faq"
+    ],
+    "note": "Aktueller Betriebszustand nicht zeitnah verifiziert: Die offiziellen Seiten dokumentieren die selbstverwaltete Struktur und Beteiligungswege, liefern aber keinen ausreichend frischen datierten Aktivitätsbeleg für August 2026."
+  },
+  "provenance": {
+    "sources": [
+      {
+        "id": "lasilo-home",
+        "type": "official-source",
+        "label": "l’Asilo – offizielle Website",
+        "url": "https://www.exasilofilangieri.it/",
+        "retrieved_at": "2026-08-13",
+        "note": "Offizielle Projektseite des selbstverwalteten Kulturraums in Neapel."
+      },
+      {
+        "id": "lasilo-organism",
+        "type": "official-source",
+        "label": "l’Asilo – Organismus und gemeinsame Räume",
+        "url": "https://www.exasilofilangieri.it/organismo-asilo/",
+        "retrieved_at": "2026-08-13",
+        "note": "Beschreibt die plural getragene Selbstverwaltung, Versammlungen, thematische Tische und gemeinsam genutzte kulturelle Räume und Werkstätten."
+      },
+      {
+        "id": "lasilo-civic-use",
+        "type": "official-source",
+        "label": "l’Asilo – Erklärung zum zivilen Gebrauch",
+        "url": "https://www.exasilofilangieri.it/dichiarazione-duso-civico/",
+        "retrieved_at": "2026-08-13",
+        "note": "Dokumentiert die Anerkennung als Gemeingut, gemeinschaftliche Selbstverwaltung, kollektive Nutzungs- und Verwaltungsrechte sowie offene Entscheidungsverfahren."
+      },
+      {
+        "id": "lasilo-faq",
+        "type": "official-source",
+        "label": "l’Asilo – FAQ zu Teilnahme und Selbstverwaltung",
+        "url": "https://www.exasilofilangieri.it/faq/",
+        "retrieved_at": "2026-08-13",
+        "note": "Erläutert offenen Zugang zur Versammlung und die nicht-private, gemeinschaftliche Organisationsform."
+      },
+      {
+        "id": "lasilo-contact",
+        "type": "official-source",
+        "label": "l’Asilo – Kontakt",
+        "url": "https://www.exasilofilangieri.it/contatti/",
+        "retrieved_at": "2026-08-13",
+        "note": "Offizielle Kontaktseite mit der öffentlich genannten Anschrift in Neapel."
+      }
+    ],
+    "uncertainty_note": "Das Gebäude bleibt kommunales Eigentum; Commonworld beschreibt die belegte gemeinschaftliche zivile Nutzung und Selbstverwaltung, nicht ein Eigentum der offenen Gemeinschaft."
+  },
+  "curation": {
+    "state": "listed",
+    "catalogued_at": "2026-08-13",
+    "reviewed_by": "Commonworld editorial review",
+    "reviewed_at": "2026-08-13",
+    "next_review_at": "2026-09-15",
+    "notes": "Aktueller Betriebszustand nicht zeitnah verifiziert. Aufgenommen als urbanes Kultur-Common: entscheidend sind gemeinsam genutzte Ressourcen, offene Beteiligung, belegte Selbstverwaltung und die formalisierte zivile Gebrauchserklärung."
+  },
+  "links": [
+    {
+      "type": "homepage",
+      "label": "l’Asilo – offizielle Website",
+      "url": "https://www.exasilofilangieri.it/"
+    },
+    {
+      "type": "learn",
+      "label": "Selbstverwaltung und zivilen Gebrauch verstehen",
+      "url": "https://www.exasilofilangieri.it/dichiarazione-duso-civico/",
+      "source_ids": [
+        "lasilo-civic-use",
+        "lasilo-organism"
+      ]
+    },
+    {
+      "type": "contact",
+      "label": "l’Asilo kontaktieren",
+      "url": "https://www.exasilofilangieri.it/contatti/",
+      "source_ids": [
+        "lasilo-contact"
+      ]
+    }
+  ],
+  "handoff": {
+    "enabled": false
+  },
+  "access": {
+    "type": "public",
+    "source_ids": [
+      "lasilo-civic-use",
+      "lasilo-faq"
+    ],
+    "note": "Die gemeinsamen Räume und Versammlungen sind grundsätzlich offen; konkrete Nutzungen einzelner Räume folgen den gemeinschaftlichen Regeln und Kapazitäten."
+  }
+}

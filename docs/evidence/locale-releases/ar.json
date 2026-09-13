@@ -8,9 +8,9 @@
   "reviewed_source_pack_sha256": "cf57400b0a0fbf818baa88f33001e95bc4c7c39bd00caef3505f4d9ab6c0f405",
   "catalog_overlay_sha256": "48feb693350e1800588c2376b9179ed5c27ead85948044dc05549436a5ddd15a",
   "surface_sha256": {
-    "index": "4b12776f5211b476431f6282e23eef75722753a4e1e31ca74f242701405f6805",
-    "method": "bd5c51e3eec2d70a8fd8794077b5ac72bd245add8af86fd3446f0b76db16f4a5",
-    "proposal": "1c31eaa6f27e36c36248aed50380e3fdb33ed7dbede4e521bf753e519243bf2e"
+    "index": "d64bd8028b48cded51e355a48fca647f00059f48c046da774b51adc29de66953",
+    "method": "aabf054876323da5d0dedb7be70985fab2ae330054d5f2a2bc282ffeb58c0c2e",
+    "proposal": "26fc73fea4f48fb645395b7cff79e89acfe93bf11c7549741dc17b1a15a92e49"
   },
   "gate_results": {
     "required_surfaces_passed": [
