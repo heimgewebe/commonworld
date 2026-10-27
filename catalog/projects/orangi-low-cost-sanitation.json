@@ -94,7 +94,7 @@
     "uncertainty_note": "OPP-RTI ist Unterstützungs- und Wissensinstitution, nicht Eigentümer des Commons. Die lokale Gemeinschaft verantwortet die interne Infrastruktur; Hauptkanäle und Behandlung bleiben Aufgabe öffentlicher Stellen."
   },
   "curation": {
-    "state": "listed",
+    "state": "stale",
     "catalogued_at": "2026-08-13",
     "reviewed_by": "Commonworld editorial review",
     "reviewed_at": "2026-08-13",

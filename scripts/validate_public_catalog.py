@@ -30,7 +30,7 @@ from scripts.validate_contracts import validation_errors
 CATALOG_PATH = Path("catalog/catalog.json")
 PROJECT_DIRECTORY = Path("catalog/projects")
 DIGITAL_RING_CONTRACT_PATH = Path("contracts/commonworld/digital-ring-taxonomy.contract.json")
-PUBLIC_STATES = {"listed", "verified", "featured"}
+PUBLIC_STATES = {"listed", "verified", "featured", "stale"}
 PUBLIC_ACTIVITY_STATES = {"active", "paused", "seasonal", "unknown"}
 UNKNOWN_ACTIVITY_REVIEW_MAX_DAYS = 45
 UNKNOWN_ACTIVITY_DISCLOSURE = "Aktueller Betriebszustand nicht zeitnah verifiziert"
@@ -182,7 +182,7 @@ def validate_public_catalog(root: Path = ROOT) -> list[str]:
     expected_publication = {
         "public": True,
         "source_policy": "official-and-public-registry-sources",
-        "curation_state": "listed",
+        "curation_state": "listed-or-stale",
         "engine_selected": True,
         "production_architecture_authorized": True,
         "selected_engine": "maplibre_gl_js",

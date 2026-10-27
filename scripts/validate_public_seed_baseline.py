@@ -91,7 +91,7 @@ def validate_public_seed_baseline(root: Path = ROOT) -> list[str]:
             errors.append(f"public seed project {identifier} must not store presentation or zoom assignments")
 
         curation = record.get("curation", {}) if isinstance(record.get("curation"), dict) else {}
-        if curation.get("state") != "listed" or curation.get("reviewed_by") != "Commonworld editorial review":
+        if curation.get("state") not in {"listed", "stale"} or curation.get("reviewed_by") != "Commonworld editorial review":
             errors.append(f"public seed project {identifier} must retain its editorial listing")
         if _parsed(curation.get("reviewed_at")) != EXPECTED_SEED_DATE:
             errors.append(f"public seed project {identifier} review date drifted")

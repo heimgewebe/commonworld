@@ -73,7 +73,7 @@
     "uncertainty_note": "Die Struktur wird von ihren Trägern selbst als im Umbau beschrieben. Der Datensatz verwendet deshalb keine statische Caracol-, MAREZ- oder JBG-Karte und behauptet keine unveränderte Organisationsform seit 1994."
   },
   "curation": {
-    "state": "listed",
+    "state": "stale",
     "catalogued_at": "2026-07-26",
     "reviewed_by": "Commonworld editorial review",
     "reviewed_at": "2026-09-02",

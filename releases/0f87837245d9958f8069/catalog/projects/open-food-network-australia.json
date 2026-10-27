@@ -1,0 +1,151 @@
+{
+  "schema_version": 4,
+  "id": "open-food-network-australia",
+  "title": "Open Food Network Australia",
+  "summary": "Eine gemeinnützige australische Gemeinschaft und quelloffene Plattform, mit der Produzenten und Lebensmittelinitiativen kurze, transparente und gemeinschaftlich kontrollierte Versorgungsketten organisieren können.",
+  "themes": [
+    "food",
+    "platform",
+    "open-source",
+    "cooperative-economy"
+  ],
+  "actions": [
+    "use",
+    "learn",
+    "contribute"
+  ],
+  "presence": {
+    "geographic": [],
+    "digital": {
+      "available": true,
+      "reach": "regional",
+      "label": "Quelloffene Plattform für gemeinschaftliche Lebensmittelnetzwerke",
+      "source_ids": [
+        "ofn-au-home"
+      ]
+    }
+  },
+  "activity": {
+    "status": "active",
+    "observed_at": "2026-08-24",
+    "source_ids": [
+      "ofn-au-home"
+    ],
+    "note": "Die offizielle Projektseite war am Prüftag erreichbar und beschrieb laufende Arbeit sowie öffentliche Nutzungs- oder Beteiligungswege."
+  },
+  "provenance": {
+    "sources": [
+      {
+        "id": "ofn-au-home",
+        "type": "official-source",
+        "label": "Open Food Network Australia",
+        "url": "https://openfoodnetwork.org.au/",
+        "retrieved_at": "2026-08-24",
+        "note": "Offizielle australische Seite der gemeinnützigen, quelloffenen Lebensmittelplattform mit Nutzungs- und Mitwirkungswegen."
+      },
+      {
+        "id": "ofn-au-platform",
+        "type": "official-source",
+        "label": "Open Food Network Australia – Plattform",
+        "url": "https://openfoodnetwork.org.au/",
+        "retrieved_at": "2026-08-24",
+        "note": "Offizielle projektnahe Seite, die den verlinkten öffentlichen Handlungs- oder Informationsweg belegt."
+      },
+      {
+        "id": "ofn-au-about",
+        "type": "official-source",
+        "label": "Open Food Network Australia – über die Organisation",
+        "url": "https://about.openfoodnetwork.org.au/about-us/",
+        "retrieved_at": "2026-08-24",
+        "note": "Offizielle Projektseite zu Gemeinschaft, Organisationsstruktur, kollektivem Entscheidungsanspruch und offener Software."
+      },
+      {
+        "id": "ofn-au-software-platform",
+        "type": "official-source",
+        "label": "Open Food Network Australia – Software Platform",
+        "url": "https://about.openfoodnetwork.org.au/software-platform/",
+        "retrieved_at": "2026-08-24",
+        "note": "Offizielle Seite zur gemeinschaftlich getragenen Software, geteilten Entwicklungskosten und Nutzung durch Community Food Enterprises."
+      },
+      {
+        "id": "ofn-au-community-pledge-v2",
+        "type": "official-source",
+        "label": "Open Food Network Global Community Pledge v2",
+        "url": "https://community.openfoodnetwork.org/t/community-pledge-v2-january-2020/1847",
+        "retrieved_at": "2026-08-24",
+        "note": "Offizieller Governance-Vertrag der globalen Community zu Commons-Ressourcen, Mitgliedspflichten, Rückbeiträgen, Aufnahme, Entscheidungen und Konflikten; Open Food Foundation ist als Affiliate aufgeführt."
+      },
+      {
+        "id": "ofn-au-join",
+        "type": "official-source",
+        "label": "Open Food Network Australia – mitwirken",
+        "url": "https://about.openfoodnetwork.org.au/join-us/",
+        "retrieved_at": "2026-07-16",
+        "note": "Offizielle projektnahe Seite, die den verlinkten öffentlichen Handlungs- oder Informationsweg belegt."
+      }
+    ]
+  },
+  "curation": {
+    "state": "listed",
+    "catalogued_at": "2026-07-16",
+    "reviewed_by": "Commonworld editorial review",
+    "reviewed_at": "2026-08-24",
+    "next_review_at": "2026-11-24",
+    "notes": "Als digitale australische Commons-Infrastruktur ohne künstliche Ortsgeometrie veröffentlicht; organisatorische und kommerzielle Spannungen bleiben im Basisnachweis sichtbar."
+  },
+  "links": [
+    {
+      "type": "homepage",
+      "label": "Open Food Network Australia – offizielle Seite",
+      "url": "https://openfoodnetwork.org.au/"
+    },
+    {
+      "type": "source",
+      "label": "Open Food Network Australia",
+      "url": "https://openfoodnetwork.org.au/"
+    },
+    {
+      "type": "use",
+      "label": "Open Food Network Australia nutzen",
+      "url": "https://openfoodnetwork.org.au/",
+      "source_ids": [
+        "ofn-au-platform"
+      ]
+    },
+    {
+      "type": "learn",
+      "label": "Plattform und Gemeinschaft kennenlernen",
+      "url": "https://about.openfoodnetwork.org.au/about-us/",
+      "source_ids": [
+        "ofn-au-about"
+      ]
+    },
+    {
+      "type": "contribute",
+      "label": "Open Food Network Australia unterstützen",
+      "url": "https://about.openfoodnetwork.org.au/join-us/",
+      "source_ids": [
+        "ofn-au-join"
+      ]
+    }
+  ],
+  "handoff": {
+    "enabled": false
+  },
+  "languages": {
+    "codes": [
+      "en"
+    ],
+    "source_ids": [
+      "ofn-au-home"
+    ],
+    "note": "Die angegebenen Sprachen sind auf den geprüften offiziellen Projektseiten öffentlich verfügbar."
+  },
+  "access": {
+    "type": "public",
+    "source_ids": [
+      "ofn-au-home"
+    ],
+    "note": "Die Zugangsform wurde konservativ aus den veröffentlichten Nutzungs- und Beteiligungswegen abgeleitet."
+  }
+}

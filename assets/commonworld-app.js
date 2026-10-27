@@ -1,6 +1,6 @@
-import { BOOTSTRAP_RECORDS } from './commonworld-bootstrap-catalog.mjs?v=76e426915037';
+import { BOOTSTRAP_RECORDS } from './commonworld-bootstrap-catalog.mjs?v=2ab370beeff5';
 import { createCatalogLoadCache, loadCatalogAggregate, loadCatalogDetail, loadCatalogShard, shardKeyForIdentity } from './commonworld-catalog-runtime.mjs?v=25d37dcafe15';
-import { actionLabel, documentDirection, documentLocale, localizeCatalogRecords, text as i18nText, themeLabel, wave1LocalePackReady } from './commonworld-i18n.mjs?v=211786268508';
+import { actionLabel, documentDirection, documentLocale, localizeCatalogRecords, text as i18nText, themeLabel, wave1LocalePackReady } from './commonworld-i18n.mjs?v=4b7bf011503e';
 import {
   COMMONS_TYPE_COLOR_TOKENS,
   COMMONS_TYPE_VALUES,
@@ -63,7 +63,7 @@ import {
   sortRecords,
   stateFromSearch,
   visibleDigitalNodes,
-} from './commonworld-core.mjs?v=30359f094426';
+} from './commonworld-core.mjs?v=d4c32d46cf34';
 
 const LOCALE = documentLocale();
 const DOCUMENT_DIRECTION = documentDirection(LOCALE);
@@ -1149,8 +1149,12 @@ function digitalPresenceText(record) {
 }
 
 function curationTextForRecord(record) {
+  const due = record?.curation?.next_review_at;
+  const overdue = record?.curation?.state === 'stale'
+    || (typeof due === 'string' && /^\d{4}-\d{2}-\d{2}$/.test(due) && due < new Date().toISOString().slice(0, 10));
   return [
     recordActivityNotice(record, LOCALE),
+    overdue ? t('curation_stale', 'Aktuelle redaktionelle Bestätigung ausstehend; Wiedervorlage {next}. Historische Angaben sind nicht erneut überprüft.', { next: bidiIsolateForLocale(due ?? t('open_date', 'offen'), LOCALE) }) : '',
     t('curation_review', 'Redaktionell geprüft am {reviewed}; nächste Prüfung {next}.', {
       reviewed: bidiIsolateForLocale(record?.curation?.reviewed_at ?? t('unknown', 'unbekannt'), LOCALE),
       next: bidiIsolateForLocale(record?.curation?.next_review_at ?? t('open_date', 'offen'), LOCALE),
