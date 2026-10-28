@@ -3,14 +3,14 @@
   "kind": "commonworld.ui_locale_release_evidence",
   "locale": "es",
   "status": "released",
-  "source_revision": "942628d5439e89a867620610cbac38fda07609e3",
-  "source_pack_sha256": "06e4c5c150bdf33e63d1becf47ef1f90f0b51a1d24b76725f44ff37ce07302f7",
-  "reviewed_source_pack_sha256": "cf57400b0a0fbf818baa88f33001e95bc4c7c39bd00caef3505f4d9ab6c0f405",
+  "source_revision": "54b875517fc6a71c756b337833721308b24591dc",
+  "source_pack_sha256": "286197165c2e7ca7ef61dce7099ccdd1daa8c085b13d627d465b926ed6471866",
+  "reviewed_source_pack_sha256": "bb6cf859062deb1e6010f49267b7102fd10da2f4efb445b2ce4ee6625b099e46",
   "catalog_overlay_sha256": "f2aaa30377639a180d709fc180e5feefbee5fb67afbb5f249efadfaf8407d27e",
   "surface_sha256": {
-    "index": "98e8bf3ff15d41089c2abed834280988120b20c3b23bed7b02056eac88a31476",
-    "method": "cbe43c05c403d4be88043f880cda80e1c0cc1a148aa442569238550cf71e4f14",
-    "proposal": "4882fef07b5a47f2ba86948be98c8b85cb983b423e0f1ffe5c461faf548582bd"
+    "index": "4940707057f466e75e8d7579ac303d32f4b7d4caaece94cbc262e2ca7bb960a5",
+    "method": "a5223ac2a053bf8affeaac3afcdaf5406c2c109ef24607bde8d84220388d8e08",
+    "proposal": "afae58900b13bb57b84d1244e9d0d59636cd092c88bbad134611f7aa65ebb215"
   },
   "gate_results": {
     "required_surfaces_passed": [
@@ -60,5 +60,5 @@
     "findings_based": true,
     "post_fix_review_required": true
   },
-  "notes": "Mechanically rebound to deterministic release 715bf8cdc9aacecb0dd1 after the T047 ring-resume performance optimization and fresh browser smoke. Existing independent language, accessibility, and review receipts are preserved unchanged; this rebind makes no new human or native-review claim."
+  "notes": "Incremental digest-bound review of the only six new UI strings (ui.curation_stale); independent model-assisted review receipt docs/evidence/locale-releases/stale-ui-2026-10-27-model-assisted-review.json sha256 6aa8b7c0b0308b2b9f90ca9d0452c0723d8022eda7d11b114daf682fd9785b41; all earlier source-pack keys and catalog overlay text are byte-equivalent to the prior reviewed pack. Historical independent language, keyboard/accessibility and browser receipts remain unchanged; current source-pack and built page digests are mechanically rebound. No native/human approval is newly claimed."
 }
