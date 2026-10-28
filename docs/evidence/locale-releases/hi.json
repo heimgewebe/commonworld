@@ -3,14 +3,14 @@
   "kind": "commonworld.ui_locale_release_evidence",
   "locale": "hi",
   "status": "released",
-  "source_revision": "942628d5439e89a867620610cbac38fda07609e3",
-  "source_pack_sha256": "06e4c5c150bdf33e63d1becf47ef1f90f0b51a1d24b76725f44ff37ce07302f7",
-  "reviewed_source_pack_sha256": "cf57400b0a0fbf818baa88f33001e95bc4c7c39bd00caef3505f4d9ab6c0f405",
+  "source_revision": "54b875517fc6a71c756b337833721308b24591dc",
+  "source_pack_sha256": "286197165c2e7ca7ef61dce7099ccdd1daa8c085b13d627d465b926ed6471866",
+  "reviewed_source_pack_sha256": "bb6cf859062deb1e6010f49267b7102fd10da2f4efb445b2ce4ee6625b099e46",
   "catalog_overlay_sha256": "63731132bbce7bdd171ac7955d7a16c01edbf4217573a6e83e2b4619db5eb688",
   "surface_sha256": {
-    "index": "2bc8f74190d1558b6c7e6677402b8ade6411746ac8c60cdfadf399e2a8cefc04",
-    "method": "d2791ad40e34caabcc1b1dd1af519c679d51d3e5b1497acb74097ebf3d367bfb",
-    "proposal": "78914d6bf767f7c9a42b556edb1ba45b964a58bac1191e0774b6979795f7d66e"
+    "index": "3a197e59ea0819e6a29ce3888813374f63b025e84b9bb0cba5ff1ed53c8f1350",
+    "method": "49c4ba54573b0ca612d83d91e9f7e3071448b6856a39abf37268778241292b88",
+    "proposal": "91ad15a4c1165040adc0a4d48b57094a73582666a99faba1e97faef0e39c5bb0"
   },
   "gate_results": {
     "required_surfaces_passed": [
@@ -60,5 +60,5 @@
     "findings_based": true,
     "post_fix_review_required": true
   },
-  "notes": "Mechanically rebound to deterministic release 715bf8cdc9aacecb0dd1 after the T047 ring-resume performance optimization and fresh browser smoke. Existing independent language, accessibility, and review receipts are preserved unchanged; this rebind makes no new human or native-review claim."
+  "notes": "Incremental source-pack verification for deterministic release b8db99c89fdf0bdd7b3c: six ui.curation_stale values were independently model-assisted reviewed and remain unchanged; all older language-review and accessibility receipts retain historical contents, and this rebinding only binds generated source-pack and localized page bytes after a runtime Text-view stale-warning repair. No new native or human review is asserted."
 }

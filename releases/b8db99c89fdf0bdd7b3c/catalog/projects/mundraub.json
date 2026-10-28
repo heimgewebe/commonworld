@@ -1,0 +1,169 @@
+{
+  "schema_version": 4,
+  "id": "mundraub",
+  "title": "mundraub.org",
+  "summary": "Eine von der Terra Concordia gGmbH betriebene Plattform mit öffentlich lesbarer Karte, auf der Beitragende Fundorte öffentlich zugänglicher essbarer Pflanzen eintragen, teilen und nach veröffentlichten Mundräuber-Regeln nutzen und pflegen.",
+  "themes": [
+    "food",
+    "agriculture",
+    "biodiversity",
+    "knowledge",
+    "community-network",
+    "infrastructure",
+    "environment",
+    "community-maintenance"
+  ],
+  "actions": [
+    "use",
+    "learn",
+    "contribute",
+    "donate"
+  ],
+  "presence": {
+    "geographic": [],
+    "digital": {
+      "available": true,
+      "reach": "regional",
+      "label": "Öffentlich lesbare Karte und Beteiligungswege für Fundorte essbarer Landschaften im deutschsprachigen Raum",
+      "source_ids": [
+        "mundraub-home",
+        "mundraub-map",
+        "mundraub-rules"
+      ]
+    }
+  },
+  "activity": {
+    "status": "active",
+    "observed_at": "2026-08-05",
+    "source_ids": [
+      "mundraub-home",
+      "mundraub-map",
+      "mundraub-care"
+    ],
+    "note": "Startseite, Karte und Pflege-/Pflanzpfade waren am Prüftag erreichbar; Blog und Apps beschreiben laufende Kartierung und Nutzung."
+  },
+  "provenance": {
+    "sources": [
+      {
+        "id": "mundraub-home",
+        "type": "official-source",
+        "label": "mundraub.org – Startseite",
+        "url": "https://mundraub.org/",
+        "retrieved_at": "2026-08-05",
+        "note": "Beschreibt mundraub.org als größte deutschsprachige Plattform für Entdeckung und Nutzung essbarer Landschaften sowie die Mundräuber-Regeln und Karte."
+      },
+      {
+        "id": "mundraub-map",
+        "type": "official-source",
+        "label": "mundraub.org – Karte",
+        "url": "https://mundraub.org/map",
+        "retrieved_at": "2026-08-05",
+        "note": "Öffentlich lesbare Kartenoberfläche für Fundorte essbarer Pflanzen."
+      },
+      {
+        "id": "mundraub-rules",
+        "type": "official-source",
+        "label": "mundraub.org – Mundräuber-Regeln",
+        "url": "https://mundraub.org/mundraeuber-regeln",
+        "retrieved_at": "2026-08-05",
+        "note": "Verhaltens- und Nutzungsregeln zu Eigentum, Schutz, Ernte, Teilen und Pflege."
+      },
+      {
+        "id": "mundraub-impressum",
+        "type": "official-source",
+        "label": "mundraub.org – Impressum",
+        "url": "https://mundraub.org/impressum",
+        "retrieved_at": "2026-08-05",
+        "note": "Nennt Terra Concordia gGmbH als Betreiberin in Berlin und den gemeinnützigen Satzungszweck; nennt Drupal und Leaflet als Softwarekomponenten, ohne die Gesamtdatenbank als offene Allmende auszuweisen."
+      },
+      {
+        "id": "mundraub-care",
+        "type": "official-source",
+        "label": "mundraub.org – Pflanzen und Pflegen",
+        "url": "https://mundraub.org/aktivitaeten/pflanzen-und-pflegen",
+        "retrieved_at": "2026-08-05",
+        "note": "Dokumentiert Pflege, Pflanzung und fachliche Unterstützung rund um Streuobst und essbare Landschaften."
+      }
+    ],
+    "uncertainty_note": "Fundorte auf der Karte sind nicht automatisch frei nutzbares Eigentum. Nutzerinnen und Nutzer müssen vor Ort Eigentum, Schutzstatus und lokale Regeln prüfen. Gesamtdatenbank, Quellcode der Plattform und Betreiber-Governance sind nicht als vollständig offene oder gemeinschaftlich kontrollierte Allmende belegt."
+  },
+  "curation": {
+    "state": "listed",
+    "catalogued_at": "2026-08-05",
+    "reviewed_by": "Commonworld editorial review",
+    "reviewed_at": "2026-08-05",
+    "next_review_at": "2026-11-05",
+    "notes": "Als Commons-Infrastruktur für gemeinschaftliche Kartierung, Nutzung und Pflege essbarer Landschaften aufgenommen. Betreibergeführt mit Beiträgen und Regeln; keine Behauptung vollständiger Daten- oder Softwareoffenheit."
+  },
+  "links": [
+    {
+      "type": "homepage",
+      "label": "mundraub.org – offizielle Seite",
+      "url": "https://mundraub.org/"
+    },
+    {
+      "type": "use",
+      "label": "Mundraub-Karte öffnen",
+      "url": "https://mundraub.org/map",
+      "source_ids": [
+        "mundraub-map",
+        "mundraub-home"
+      ]
+    },
+    {
+      "type": "learn",
+      "label": "Mundräuber-Regeln lesen",
+      "url": "https://mundraub.org/mundraeuber-regeln",
+      "source_ids": [
+        "mundraub-rules",
+        "mundraub-home"
+      ]
+    },
+    {
+      "type": "contribute",
+      "label": "Anmelden und Fundorte beitragen",
+      "url": "https://mundraub.org/user/login",
+      "source_ids": [
+        "mundraub-home",
+        "mundraub-map"
+      ]
+    },
+    {
+      "type": "documentation",
+      "label": "Pflanzen und Pflegen",
+      "url": "https://mundraub.org/aktivitaeten/pflanzen-und-pflegen",
+      "source_ids": [
+        "mundraub-care"
+      ]
+    },
+    {
+      "type": "donate",
+      "label": "mundraub.org unterstützen",
+      "url": "https://mundraub.org/spenden",
+      "source_ids": [
+        "mundraub-home"
+      ]
+    }
+  ],
+  "handoff": {
+    "enabled": false
+  },
+  "languages": {
+    "codes": [
+      "de"
+    ],
+    "source_ids": [
+      "mundraub-home",
+      "mundraub-rules"
+    ],
+    "note": "Geprüft wurde die deutschsprachige Projekt- und Regeloberfläche."
+  },
+  "access": {
+    "type": "public",
+    "source_ids": [
+      "mundraub-map",
+      "mundraub-home"
+    ],
+    "note": "Die Karte ist öffentlich lesbar; Kartieren und weitere Beiträge folgen Konto- und Plattformregeln."
+  }
+}

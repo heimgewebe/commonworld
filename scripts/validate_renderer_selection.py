@@ -50,7 +50,7 @@ EXPECTED_DECISION = {
 EXPECTED_RENDERER_PUBLICATION = {
     "public": True,
     "source_policy": "official-and-public-registry-sources",
-    "curation_state": "listed",
+    "curation_state": "listed-or-stale",
     "engine_selected": True,
     "selected_engine": "maplibre_gl_js",
     "public_runtime_uses_selected_engine": True,

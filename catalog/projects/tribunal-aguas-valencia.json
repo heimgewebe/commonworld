@@ -80,7 +80,7 @@
     "uncertainty_note": "Die Punktgeometrie ist nur eine grobe Orientierung für den öffentlich belegten Wirkungsraum und keine exakte Standort- oder Flächenangabe."
   },
   "curation": {
-    "state": "listed",
+    "state": "stale",
     "catalogued_at": "2026-07-19",
     "reviewed_by": "Commonworld editorial review",
     "reviewed_at": "2026-07-19",

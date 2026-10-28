@@ -17,7 +17,7 @@ if str(ROOT) not in sys.path:
 from scripts.digital_taxonomy import derive_project_path, load_taxonomy, path_label
 from scripts.commonworld_i18n import (
     CANDIDATE_LOCALES, DEFAULT_LOCALE, FALLBACK_LOCALE, action_label, german_surface_links,
-    inject_locale_navigation, interface_static, load_locale, localize_records, normalize_locale,
+    inject_locale_navigation, interface_static, load_locale, locale_pack, localize_records, normalize_locale,
     taxonomy_label, translate_method, translate_shell,
 )
 from scripts.locale_registry import locale_entry, locales_with_status, surface_file
@@ -278,6 +278,24 @@ def load_records(root: Path = ROOT) -> list[dict]:
     return records
 
 
+def curation_stale_notice(record: dict, locale: str = FALLBACK_LOCALE) -> str:
+    if record.get("curation", {}).get("state") != "stale":
+        return ""
+    due = record.get("curation", {}).get("next_review_at", "")
+    normalized = normalize_locale(locale)
+    if normalized == "de":
+        template = "Aktuelle redaktionelle Bestätigung ausstehend; Wiedervorlage {next}. Historische Angaben sind nicht erneut überprüft."
+    elif normalized == "en":
+        template = "Current editorial verification pending; review due {next}. Historical information is not newly verified."
+    else:
+        try:
+            template = locale_pack(normalized)["ui"]["curation_stale"]
+        except ValueError:
+            # Unreleased locale candidates retain the explicitly English fallback.
+            template = "Current editorial verification pending; review due {next}. Historical information is not newly verified."
+    return template.replace("{next}", str(due))
+
+
 def render_cards(
     records: list[dict],
     *,
@@ -308,6 +326,9 @@ def render_cards(
         place = html.escape(location_summary(record, locale, geo_locations))
         notice = html.escape(activity_notice(record, locale))
         notice_html = f'            <p class="catalog-activity-notice">{notice}</p>\n' if notice else ""
+        stale = html.escape(curation_stale_notice(record, locale))
+        if stale:
+            notice_html += f'            <p class="catalog-activity-notice catalog-curation-stale-notice">{stale}</p>\n'
         url = html.escape(homepage(record), quote=True)
         project_page_link = ""
         if project_page_url is not None:
@@ -486,7 +507,7 @@ def render_shell(root: Path = ROOT, locale: str = FALLBACK_LOCALE) -> str:
               <label><span>Zugang</span><select id="filter-access" data-intent-filter="access"><option value="">Alle Zugänge</option><option value="public">Öffentlich</option><option value="membership">Mitgliedschaft</option><option value="restricted">Beschränkt</option><option value="unknown">Nicht angegeben</option></select></label>
               <label><span>Sprache</span><select id="filter-language" data-intent-filter="language"><option value="">Alle Angaben</option><option value="de">Deutsch</option><option value="unknown">Nicht angegeben</option></select></label>
               <label><span>Aktualität</span><select id="filter-freshness" data-intent-filter="freshness"><option value="">Jede Aktualität</option><option value="current">Aktuell geprüft</option><option value="stale">Prüfung fällig</option><option value="unknown">Nicht angegeben</option></select></label>
-              <label><span>Kuration</span><select id="filter-curation" data-intent-filter="curation"><option value="">Jeder Status</option><option value="listed">Gelistet</option><option value="verified">Verifiziert</option><option value="featured">Hervorgehoben</option><option value="unknown">Nicht angegeben</option></select></label>
+              <label><span>Kuration</span><select id="filter-curation" data-intent-filter="curation"><option value="">Jeder Status</option><option value="listed">Gelistet</option><option value="verified">Verifiziert</option><option value="featured">Hervorgehoben</option><option value="stale">Prüfung fällig</option><option value="unknown">Nicht angegeben</option></select></label>
             </div>
           </details>
         </div>

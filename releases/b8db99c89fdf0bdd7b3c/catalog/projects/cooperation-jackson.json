@@ -1,0 +1,162 @@
+{
+  "schema_version": 4,
+  "id": "cooperation-jackson",
+  "title": "Cooperation Jackson",
+  "summary": "Ein Solidarökonomie-Netzwerk in Jackson, Mississippi, das Arbeiterkooperativen, demokratisch selbstverwaltete Betriebe, gemeinschaftlich gebundenes Land, bezahlbares Wohnen und lokale Produktionsinfrastruktur miteinander entwickeln will.",
+  "themes": [
+    "cooperative",
+    "cooperative-economy",
+    "community-land",
+    "community-ownership",
+    "neighbourhood",
+    "commons-governance"
+  ],
+  "actions": [
+    "visit",
+    "learn",
+    "contribute",
+    "donate",
+    "contact"
+  ],
+  "presence": {
+    "geographic": [
+      {
+        "id": "cooperation-jackson-west-jackson",
+        "mode": "hidden",
+        "label": "West Jackson, Mississippi, Vereinigte Staaten",
+        "privacy_note": "Die Initiative arbeitet mit mehreren Grundstücken, Einrichtungen und Vorhaben; Commonworld bildet daraus ohne autoritative Gesamtgeometrie keinen künstlichen Projektumriss.",
+        "source_ids": [
+          "cooperation-jackson-home",
+          "cooperation-jackson-sci"
+        ]
+      }
+    ],
+    "digital": {
+      "available": false,
+      "source_ids": [
+        "cooperation-jackson-home"
+      ]
+    }
+  },
+  "activity": {
+    "status": "active",
+    "observed_at": "2026-07-28",
+    "source_ids": [
+      "cooperation-jackson-home",
+      "cooperation-jackson-sci",
+      "cooperation-jackson-donate"
+    ],
+    "note": "Die offiziellen Seiten führen laufende Programme, aktuelle Aufrufe und aktive Unterstützungswege für Kooperativen, Land- und Nachbarschaftsinfrastruktur."
+  },
+  "provenance": {
+    "sources": [
+      {
+        "id": "cooperation-jackson-home",
+        "type": "official-source",
+        "label": "Cooperation Jackson – offizielle Seite",
+        "url": "https://cooperationjackson.org/",
+        "retrieved_at": "2026-07-28",
+        "note": "Offizielle Mission, aktuelle Meldungen und Programmarbeit."
+      },
+      {
+        "id": "cooperation-jackson-intro",
+        "type": "official-source",
+        "label": "Cooperation Jackson – Who We Are",
+        "url": "https://cooperationjackson.org/intro",
+        "retrieved_at": "2026-07-28",
+        "note": "Offizielle Beschreibung von Solidarökonomie, Kooperativen und demokratischer Selbstverwaltung."
+      },
+      {
+        "id": "cooperation-jackson-sci",
+        "type": "official-source",
+        "label": "Cooperation Jackson – Sustainable Communities Initiative",
+        "url": "https://cooperationjackson.org/sustainable-communities-initiative",
+        "retrieved_at": "2026-07-28",
+        "note": "Offizielle Beschreibung von Community Land Trust, Wohnkooperativen, Eco-Village und verbundenen lokalen Infrastrukturen."
+      },
+      {
+        "id": "cooperation-jackson-donate",
+        "type": "official-source",
+        "label": "Cooperation Jackson – Donate",
+        "url": "https://cooperationjackson.org/donate",
+        "retrieved_at": "2026-07-28",
+        "note": "Offizielle Unterstützungsseite mit laufenden Vorhaben."
+      },
+      {
+        "id": "cooperation-jackson-contact",
+        "type": "official-source",
+        "label": "Cooperation Jackson – Contact",
+        "url": "https://cooperationjackson.org/contact-us",
+        "retrieved_at": "2026-07-28",
+        "note": "Offizielle Kontakt- und Beteiligungswege."
+      }
+    ]
+  },
+  "curation": {
+    "state": "listed",
+    "catalogued_at": "2026-07-28",
+    "reviewed_by": "Commonworld editorial review",
+    "reviewed_at": "2026-07-28",
+    "next_review_at": "2026-10-28",
+    "notes": "Aufgenommen als lokale, miteinander verzahnte Kooperations- und Land-Commons-Infrastruktur. Zukunftsziele werden als Entwicklungsrichtung und nicht als bereits vollständig realisierter Zustand formuliert."
+  },
+  "links": [
+    {
+      "type": "homepage",
+      "label": "Cooperation Jackson – offizielle Seite",
+      "url": "https://cooperationjackson.org/"
+    },
+    {
+      "type": "visit",
+      "label": "Standort und aktuelle Angebote prüfen",
+      "url": "https://cooperationjackson.org/contact-us",
+      "source_ids": [
+        "cooperation-jackson-contact"
+      ]
+    },
+    {
+      "type": "learn",
+      "label": "Mission und Solidarökonomie kennenlernen",
+      "url": "https://cooperationjackson.org/intro",
+      "source_ids": [
+        "cooperation-jackson-intro"
+      ]
+    },
+    {
+      "type": "contribute",
+      "label": "Kontakt aufnehmen und mitwirken",
+      "url": "https://cooperationjackson.org/contact-us",
+      "source_ids": [
+        "cooperation-jackson-contact"
+      ]
+    },
+    {
+      "type": "donate",
+      "label": "Cooperation Jackson unterstützen",
+      "url": "https://cooperationjackson.org/donate",
+      "source_ids": [
+        "cooperation-jackson-donate"
+      ]
+    },
+    {
+      "type": "contact",
+      "label": "Cooperation Jackson kontaktieren",
+      "url": "https://cooperationjackson.org/contact-us",
+      "source_ids": [
+        "cooperation-jackson-contact"
+      ]
+    }
+  ],
+  "handoff": {
+    "enabled": false
+  },
+  "languages": {
+    "codes": [
+      "en"
+    ],
+    "source_ids": [
+      "cooperation-jackson-home"
+    ],
+    "note": "Die geprüften offiziellen Projektseiten sind auf Englisch verfügbar."
+  }
+}

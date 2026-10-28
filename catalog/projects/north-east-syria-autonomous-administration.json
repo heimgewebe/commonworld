@@ -75,7 +75,7 @@
     "uncertainty_note": "Die Quellen sind offizielle Selbstbeschreibungen der Administration. Der Datensatz behauptet weder staatliche Anerkennung noch feste Souveränität, vollständige Commons-Verwaltung aller Ressourcen oder unveränderliche Grenzen."
   },
   "curation": {
-    "state": "listed",
+    "state": "stale",
     "catalogued_at": "2026-07-26",
     "reviewed_by": "Commonworld editorial review",
     "reviewed_at": "2026-09-02",

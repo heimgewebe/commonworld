@@ -78,7 +78,7 @@
     "uncertainty_note": "Die Kartenkoordinate dient nur als weiter Stadtanker; die veröffentlichte Adresse bleibt die maßgebliche Besuchsinformation."
   },
   "curation": {
-    "state": "listed",
+    "state": "stale",
     "catalogued_at": "2026-07-22",
     "reviewed_by": "Commonworld editorial review",
     "reviewed_at": "2026-07-22",

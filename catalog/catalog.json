@@ -109,7 +109,7 @@
   "publication": {
     "public": true,
     "source_policy": "official-and-public-registry-sources",
-    "curation_state": "listed",
+    "curation_state": "listed-or-stale",
     "engine_selected": true,
     "production_architecture_authorized": true,
     "selected_engine": "maplibre_gl_js",

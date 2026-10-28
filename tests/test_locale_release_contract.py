@@ -18,14 +18,47 @@ class LocaleReleaseContractTests(unittest.TestCase):
 
 
     def test_independent_review_inputs_match_the_exact_wave1_pack(self) -> None:
+        """Old independent review stays immutable; only the newly reviewed warning may differ."""
         import hashlib
+
+        from scripts.locale_review_evidence import (
+            normalized_review_source_bytes,
+            reviewed_source_pack_sha256,
+        )
 
         pack_path = ROOT / "assets/locales/wave1-locales.json"
         pack = json.loads(pack_path.read_text(encoding="utf-8"))
-        from scripts.locale_review_evidence import reviewed_source_pack_sha256
-
         reviewed_digest = reviewed_source_pack_sha256(pack_path)
-        for locale, payload in pack["locales"].items():
+        incremental_path = ROOT / "docs/evidence/locale-releases/stale-ui-2026-10-27-model-assisted-review.json"
+        incremental = json.loads(incremental_path.read_text(encoding="utf-8"))
+        review = incremental["review"]
+        current_digest = hashlib.sha256(pack_path.read_bytes()).hexdigest()
+        self.assertEqual(incremental["source_pack_sha256"], current_digest)
+        self.assertEqual(incremental["source_pack_path"], "assets/locales/wave1-locales.json")
+        self.assertEqual(incremental["reviewed_key"], "ui.curation_stale")
+        self.assertEqual(review["reviewed_source_sha256"], current_digest)
+        self.assertEqual(review["verdict"], "PASS")
+        self.assertEqual(review["blocking_findings"], [])
+        self.assertTrue(review["model_assisted"])
+        self.assertFalse(review["native_or_human_review_claimed"])
+        self.assertTrue(incremental["controller_recomputed_exact_source_sha256"])
+        self.assertIn("whole_locale_release_approval", incremental["does_not_establish"])
+        self.assertEqual(set(review["reviewed_locales"]), set(pack["locales"]))
+
+        # Remove only the additional, independently reviewed field. Everything
+        # else must exactly reconstruct the *historical* source pack and its
+        # immutable independent-review inputs. This must not relabel the old
+        # review as if it had reviewed the new warning as well.
+        historical_pack = copy.deepcopy(pack)
+        for payload in historical_pack["locales"].values():
+            self.assertIn("curation_stale", payload["ui"])
+            self.assertEqual(payload["ui"]["curation_stale"].count("{next}"), 1)
+            del payload["ui"]["curation_stale"]
+        historical_digest = hashlib.sha256(
+            normalized_review_source_bytes(historical_pack)
+        ).hexdigest()
+
+        for locale, payload in historical_pack["locales"].items():
             review_input = json.loads(
                 (ROOT / f"docs/evidence/locale-review-inputs/{locale}.json").read_text(
                     encoding="utf-8"
@@ -34,12 +67,13 @@ class LocaleReleaseContractTests(unittest.TestCase):
             reviewed_payload = copy.deepcopy(payload)
             reviewed_payload["meta"]["independent_language_review"] = "pending"
             self.assertEqual(review_input["locale"], locale)
-            self.assertEqual(review_input["source_pack_sha256"], reviewed_digest)
-            self.assertEqual(review_input["reviewed_source_pack_sha256"], reviewed_digest)
+            self.assertEqual(review_input["source_pack_sha256"], historical_digest)
+            self.assertEqual(review_input["reviewed_source_pack_sha256"], historical_digest)
             self.assertEqual(review_input["payload"], reviewed_payload)
             self.assertTrue(review_input["claims"]["derived_without_translation_changes"])
             self.assertFalse(review_input["claims"]["release_evidence"])
             self.assertFalse(review_input["claims"]["native_or_human_review"])
+        self.assertNotEqual(reviewed_digest, historical_digest)
 
     def test_independent_language_review_receipt_preserves_raw_evidence(self) -> None:
         import hashlib
