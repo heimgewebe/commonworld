@@ -8,9 +8,9 @@
   "reviewed_source_pack_sha256": "bb6cf859062deb1e6010f49267b7102fd10da2f4efb445b2ce4ee6625b099e46",
   "catalog_overlay_sha256": "91a128b7736af4fd67272950ee4cfcdedd32fa8b408d774adb71a97de261bab1",
   "surface_sha256": {
-    "index": "0c5001bd73f1734efabe92752a55992fe00b3e3365448a13ed92ab1901389c0b",
-    "method": "a8b0ea2ddf71603468d90eecdacefde643e388c20651d48038eabadc432478ef",
-    "proposal": "d05cc5f76b468d84d3220758904a72657d1c559e6c6e284e2bd87831df69f936"
+    "index": "37045721cca435657c4f3289cbb96b997162b6a45bdd936a1584aa869de566d2",
+    "method": "c1fa554fe1f379475cea54a119d8e367f8af12d2594b4317be6eb9b7bbbc7ccd",
+    "proposal": "af2886579c0d7527009ce8741c19b9545d667490bc7c257f94b4f6a116ee3017"
   },
   "gate_results": {
     "required_surfaces_passed": [
@@ -60,5 +60,5 @@
     "findings_based": true,
     "post_fix_review_required": true
   },
-  "notes": "Incremental digest-bound review of the only six new UI strings (ui.curation_stale); independent model-assisted review receipt docs/evidence/locale-releases/stale-ui-2026-10-27-model-assisted-review.json sha256 6aa8b7c0b0308b2b9f90ca9d0452c0723d8022eda7d11b114daf682fd9785b41; all earlier source-pack keys and catalog overlay text are byte-equivalent to the prior reviewed pack. Historical independent language, keyboard/accessibility and browser receipts remain unchanged; current source-pack and built page digests are mechanically rebound. No native/human approval is newly claimed."
+  "notes": "Incremental source-pack verification for deterministic release b8db99c89fdf0bdd7b3c: six ui.curation_stale values were independently model-assisted reviewed and remain unchanged; all older language-review and accessibility receipts retain historical contents, and this rebinding only binds generated source-pack and localized page bytes after a runtime Text-view stale-warning repair. No new native or human review is asserted."
 }

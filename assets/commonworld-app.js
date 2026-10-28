@@ -1148,13 +1148,21 @@ function digitalPresenceText(record) {
     : t('digital_presence_none', 'Keine digitale Präsenz veröffentlicht.');
 }
 
-function curationTextForRecord(record) {
+function curationStaleNoticeText(record) {
   const due = record?.curation?.next_review_at;
   const overdue = record?.curation?.state === 'stale'
     || (typeof due === 'string' && /^\d{4}-\d{2}-\d{2}$/.test(due) && due < new Date().toISOString().slice(0, 10));
+  return overdue
+    ? t('curation_stale', 'Aktuelle redaktionelle Bestätigung ausstehend; Wiedervorlage {next}. Historische Angaben sind nicht erneut überprüft.', {
+      next: bidiIsolateForLocale(due ?? t('open_date', 'offen'), LOCALE),
+    })
+    : '';
+}
+
+function curationTextForRecord(record) {
   return [
     recordActivityNotice(record, LOCALE),
-    overdue ? t('curation_stale', 'Aktuelle redaktionelle Bestätigung ausstehend; Wiedervorlage {next}. Historische Angaben sind nicht erneut überprüft.', { next: bidiIsolateForLocale(due ?? t('open_date', 'offen'), LOCALE) }) : '',
+    curationStaleNoticeText(record),
     t('curation_review', 'Redaktionell geprüft am {reviewed}; nächste Prüfung {next}.', {
       reviewed: bidiIsolateForLocale(record?.curation?.reviewed_at ?? t('unknown', 'unbekannt'), LOCALE),
       next: bidiIsolateForLocale(record?.curation?.next_review_at ?? t('open_date', 'offen'), LOCALE),
@@ -2658,6 +2666,13 @@ function createRuntimeCatalogCard(record) {
   }
   card.append(kind, title, summary, location);
   if (activityNotice) card.append(activityNotice);
+  const staleText = curationStaleNoticeText(record);
+  if (staleText) {
+    const staleNotice = document.createElement('p');
+    staleNotice.className = 'catalog-activity-notice catalog-curation-stale-notice';
+    staleNotice.textContent = staleText;
+    card.append(staleNotice);
+  }
   card.append(actions);
   return card;
 }
