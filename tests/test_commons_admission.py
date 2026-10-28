@@ -233,6 +233,16 @@ class CommonsAdmissionValidationTests(unittest.TestCase):
             )
         )
 
+    def test_overdue_legacy_stale_is_no_longer_currently_listed(self) -> None:
+        project = self.project("legacy-common", catalogued_at="2026-07-12", reviewed_at="2026-07-12", next_review_at="2026-08-15", state="stale")
+        self.write_case([project], [])
+        self.assertEqual(validate(self.root, today=date(2026, 10, 27)), [])
+
+    def test_overdue_basis_stale_retains_old_review_evidence(self) -> None:
+        project = self.project("reviewed-common", catalogued_at="2026-07-12", reviewed_at="2026-08-01", next_review_at="2026-09-01", state="stale")
+        self.write_case([project], [self.basis("reviewed-common", reviewed_at="2026-08-01")])
+        self.assertEqual(validate(self.root, today=date(2026, 10, 27)), [])
+
     def test_basis_index_cannot_predate_latest_basis_review(self) -> None:
         project = self.project(
             "reviewed-common",

@@ -1,0 +1,78 @@
+{
+  "schema_version": 1,
+  "kind": "commonworld_additional_model_assisted_stale_ui_review",
+  "source_pack_path": "assets/locales/wave1-locales.json",
+  "source_pack_sha256": "286197165c2e7ca7ef61dce7099ccdd1daa8c085b13d627d465b926ed6471866",
+  "reviewed_key": "ui.curation_stale",
+  "scope": "six newly added translations only, not whole catalog or full locale release",
+  "reviewer": "Claude Code external read-only text reviewer",
+  "reviewer_job_unit": "grabowski-job-fe2f375603b8",
+  "reviewer_job_stdout_sha256": "dbf65991f0ef967100d117cddde56b9c938d7513317ca9c7b082ab202284f841",
+  "reviewer_was_given_source_sha256": true,
+  "controller_recomputed_exact_source_sha256": true,
+  "review": {
+    "verdict": "PASS",
+    "reviewed_source_sha256": "286197165c2e7ca7ef61dce7099ccdd1daa8c085b13d627d465b926ed6471866",
+    "reviewed_locales": [
+      "es",
+      "fr",
+      "pt-BR",
+      "ar",
+      "zh-Hans",
+      "hi"
+    ],
+    "blocking_findings": [],
+    "minor_findings": [
+      {
+        "locale": "fr",
+        "issue": "typography",
+        "detail": "The space before ';' in 'en attente ; réexamen' looks like a plain U+0020 in the supplied text. French typography calls for a narrow no-break space (U+202F) or a no-break space (U+00A0) so the semicolon can't wrap onto its own line. I can't confirm the actual code point without seeing the bytes, so please check it in the file."
+      },
+      {
+        "locale": "fr",
+        "issue": "date-format coupling",
+        "detail": "'réexamen prévu le {next}' only reads correctly if the formatted date has no leading article or preposition, e.g. '12 mars 2026' or '12/03/2026'. That holds for the usual Intl date styles, so this isn't blocking. Check that the date format used for this key fits after 'le'."
+      },
+      {
+        "locale": "es",
+        "issue": "date-format coupling",
+        "detail": "'revisión prevista para {next}' is fine with numeric dates. With long-form dates, 'para el {next}' would read more naturally ('para el 12 de marzo de 2026'). Optional."
+      },
+      {
+        "locale": "pt-BR",
+        "issue": "date-format coupling",
+        "detail": "Same as es: 'prevista para {next}' works. With long-form dates, 'prevista para o dia {next}' or 'para {next}' are both acceptable. Optional."
+      },
+      {
+        "locale": "hi",
+        "issue": "register",
+        "detail": "'पुरानी जानकारी' ('old information') is understandable. 'पूर्व जानकारी' or 'ऐतिहासिक जानकारी' would be slightly closer to the source's 'Historical information' and a bit more formal. Optional."
+      },
+      {
+        "locale": "es",
+        "issue": "lexical",
+        "detail": "'Los datos anteriores' narrows 'information' to 'data'. 'La información anterior' would be closer to the source, but the meaning holds. Optional."
+      }
+    ],
+    "checks_performed": {
+      "placeholder": "All six strings contain {next} exactly once, with the original ASCII braces and lowercase name. Nothing is translated, escaped, duplicated or missing.",
+      "pending_vs_operation": "All six describe verification as not yet done or pending, not as something running now: es/pt-BR 'pendiente/pendente', fr 'en attente', ar 'لم يكتمل بعد' (not yet complete), zh '尚未完成' (not yet complete), hi 'लंबित' (pending). Arabic now keeps verification (التحقق) and review (المراجعة) as separate words, which fixes the first-pass issue.",
+      "review_due_semantics": "All six present {next} as the scheduled or due review date: es/pt-BR 'prevista para', fr 'prévu le', ar 'موعد المراجعة' (review date), zh '复核日期为' (review date is), hi 'पुनः समीक्षा की तिथि … है' (review date is).",
+      "history_not_reverified": "All six say the earlier information has not been checked again, and none implies it is wrong or was deleted: es 'no se han verificado nuevamente', fr 'n’ont pas été vérifiées à nouveau', pt-BR 'não foram verificadas novamente', ar 'لم يُعَد التحقق' (correct jussive passive of أعاد: 'was not re-verified'), zh '尚未重新核实' (not yet re-verified), hi 'दोबारा सत्यापन नहीं हुआ है' (has not been verified again).",
+      "grammar": "No grammar errors found. Gender and number agree in es, fr and pt-BR (verificación/vérification/verificação feminine, plural participles correct). fr uses the typographic apostrophe U+2019 in 'n’ont'.",
+      "rtl_ar": "Uses the Arabic semicolon '؛' and the Latin full stop, which is normal in modern UI Arabic. {next} sits mid-sentence after a noun phrase. Because the app wraps the date with bidiIsolateForLocale(date, LOCALE), a Latin-digit or LTR date won't reorder the text around it. The string contains no hard-coded directional control characters.",
+      "cjk_punctuation_zh": "Uses full-width '；' and '。'. The ASCII spaces around {next} are acceptable for an interpolated date.",
+      "hi_punctuation": "Uses the danda '।' for full stops and an ASCII ';', both acceptable in Hindi UI text."
+    },
+    "scope_note": "This review covers only the curation_stale value for the six listed locales, against the English source given in the request. It is not evidence about the rest of the locale file or the UI release. I didn't read the file, so I haven't independently recomputed the source digest; it is the one stated in the request.",
+    "model_assisted": true,
+    "native_or_human_review_claimed": false
+  },
+  "does_not_establish": [
+    "native_human_review",
+    "whole_locale_release_approval",
+    "browser_accessibility_review",
+    "current_catalog_review_freshness",
+    "merge_authority"
+  ]
+}

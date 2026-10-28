@@ -93,7 +93,7 @@
     "uncertainty_note": "Commonworld behauptet keine Vollständigkeit oder Eigentumsgrenzen. Maßgeblich bleiben die geprüften Einträge und Regeln der Fachplattform."
   },
   "curation": {
-    "state": "listed",
+    "state": "stale",
     "catalogued_at": "2026-07-25",
     "reviewed_by": "Commonworld editorial review",
     "reviewed_at": "2026-07-25",
