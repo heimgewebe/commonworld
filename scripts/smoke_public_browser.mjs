@@ -4267,6 +4267,17 @@ async function catalogueNetworkBlockedScenario() {
   await run.page.getByRole('radio', { name: /Text/ }).click();
   assert(await run.page.locator('#text-view').isVisible(), 'catalogue network blocked: text view unavailable');
   assert(await run.page.locator('#project-debian').isVisible(), 'catalogue network blocked: matching static card unavailable');
+  // Edinburgh is outside the bounded static fallback; the app can create
+  // its runtime card before selecting Text. Its stale notice must still show.
+  await run.page.locator('#commons-search').fill('Edinburgh Tool Library');
+  await run.page.waitForTimeout(220);
+  const edinburgh = run.page.locator('#project-edinburgh-tool-library');
+  assert(await edinburgh.isVisible(), 'catalogue network blocked: runtime Text card not created');
+  const staleWarning = await edinburgh.locator('.catalog-curation-stale-notice').textContent();
+  assert(staleWarning?.includes('2026-10-16') && staleWarning.includes('Current editorial verification pending'),
+    'catalogue network blocked: active but stale runtime Text card omits editorial warning');
+  assert(await edinburgh.locator('.catalog-actions .catalog-action-link').count() > 0,
+    'catalogue network blocked: stale runtime Text card lost direct action links');
   assert(run.pageErrors.length === 0, `catalogue network blocked: page errors: ${run.pageErrors.join(' | ')}`);
   assert(run.consoleErrors.length === 0, `catalogue network blocked: unexpected console errors: ${run.consoleErrors.join(' | ')}`);
   const appWarnings = run.consoleWarnings.filter((message) => message.includes('Commonworld'));

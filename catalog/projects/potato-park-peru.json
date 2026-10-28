@@ -72,7 +72,7 @@
     "uncertainty_note": "Die Punktgeometrie ist keine Grenze des Kartoffelparks und verrät keine einzelnen Saatgut- oder Anbauorte."
   },
   "curation": {
-    "state": "listed",
+    "state": "stale",
     "catalogued_at": "2026-07-19",
     "reviewed_by": "Commonworld editorial review",
     "reviewed_at": "2026-07-19",

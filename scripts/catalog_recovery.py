@@ -229,12 +229,15 @@ def render_project(record: dict, locale: str, root: Path = ROOT) -> str:
     )
     curation = record.get("curation", {})
     activity = record.get("activity", {})
+    from scripts.render_public_shell import curation_stale_notice
+    stale = curation_stale_notice(record, locale)
+    stale_html = f'      <p class="catalog-activity-notice catalog-curation-stale-notice">{html.escape(stale)}</p>\n' if stale else ""
     body = f'''    <main>
       <p class="kicker">Commonworld · {copy_text["project"]}</p>
       <h1>{html.escape(record["title"])}</h1>
       <p><a class="secondary-back-link" href="{index_url(locale, 1)}">← {copy_text["catalog"]}</a></p>
       <p>{html.escape(record["summary"])}</p>
-      <section>
+{stale_html}      <section>
         <h2>{copy_text["details"]}</h2>
         <dl>
           <dt>CommonProject.id</dt><dd><code>{html.escape(identifier)}</code></dd>

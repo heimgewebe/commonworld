@@ -42,7 +42,7 @@ export function shouldLoadWave1LocalePack(locale, isNodeRuntime = nodeRuntime) {
 export const WAVE1_LOCALE_PACK_TIMEOUT_MS = 2_500;
 
 export async function loadWave1LocalePacks({
-  importer = () => import('./commonworld-wave1-locales.mjs?v=577e159db602'),
+  importer = () => import('./commonworld-wave1-locales.mjs?v=bee8ad7ada1d'),
   timeoutMs = nodeRuntime ? 0 : WAVE1_LOCALE_PACK_TIMEOUT_MS,
 } = {}) {
   const importPromise = Promise.resolve().then(importer);
@@ -172,6 +172,7 @@ const UI_EN = Object.freeze({
   relation_chapter_of: 'Part of {title}',
   relation_none: 'No evidenced relationship published.',
   curation_review: 'Editorially reviewed on {reviewed}; next review {next}.',
+  curation_stale: 'Current editorial verification pending; review due {next}. Historical information is not newly verified.',
   unknown: 'unknown',
   open_date: 'open',
   no_matching_commons: 'No Commons match this search or filter selection.',

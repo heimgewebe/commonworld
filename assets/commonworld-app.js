@@ -1,6 +1,6 @@
-import { BOOTSTRAP_RECORDS } from './commonworld-bootstrap-catalog.mjs?v=76e426915037';
+import { BOOTSTRAP_RECORDS } from './commonworld-bootstrap-catalog.mjs?v=2ab370beeff5';
 import { createCatalogLoadCache, loadCatalogAggregate, loadCatalogDetail, loadCatalogShard, shardKeyForIdentity } from './commonworld-catalog-runtime.mjs?v=25d37dcafe15';
-import { actionLabel, documentDirection, documentLocale, localizeCatalogRecords, text as i18nText, themeLabel, wave1LocalePackReady } from './commonworld-i18n.mjs?v=211786268508';
+import { actionLabel, documentDirection, documentLocale, localizeCatalogRecords, text as i18nText, themeLabel, wave1LocalePackReady } from './commonworld-i18n.mjs?v=4b7bf011503e';
 import {
   COMMONS_TYPE_COLOR_TOKENS,
   COMMONS_TYPE_VALUES,
@@ -63,7 +63,7 @@ import {
   sortRecords,
   stateFromSearch,
   visibleDigitalNodes,
-} from './commonworld-core.mjs?v=30359f094426';
+} from './commonworld-core.mjs?v=d4c32d46cf34';
 
 const LOCALE = documentLocale();
 const DOCUMENT_DIRECTION = documentDirection(LOCALE);
@@ -1148,9 +1148,21 @@ function digitalPresenceText(record) {
     : t('digital_presence_none', 'Keine digitale Präsenz veröffentlicht.');
 }
 
+function curationStaleNoticeText(record) {
+  const due = record?.curation?.next_review_at;
+  const overdue = record?.curation?.state === 'stale'
+    || (typeof due === 'string' && /^\d{4}-\d{2}-\d{2}$/.test(due) && due < new Date().toISOString().slice(0, 10));
+  return overdue
+    ? t('curation_stale', 'Aktuelle redaktionelle Bestätigung ausstehend; Wiedervorlage {next}. Historische Angaben sind nicht erneut überprüft.', {
+      next: bidiIsolateForLocale(due ?? t('open_date', 'offen'), LOCALE),
+    })
+    : '';
+}
+
 function curationTextForRecord(record) {
   return [
     recordActivityNotice(record, LOCALE),
+    curationStaleNoticeText(record),
     t('curation_review', 'Redaktionell geprüft am {reviewed}; nächste Prüfung {next}.', {
       reviewed: bidiIsolateForLocale(record?.curation?.reviewed_at ?? t('unknown', 'unbekannt'), LOCALE),
       next: bidiIsolateForLocale(record?.curation?.next_review_at ?? t('open_date', 'offen'), LOCALE),
@@ -2654,6 +2666,13 @@ function createRuntimeCatalogCard(record) {
   }
   card.append(kind, title, summary, location);
   if (activityNotice) card.append(activityNotice);
+  const staleText = curationStaleNoticeText(record);
+  if (staleText) {
+    const staleNotice = document.createElement('p');
+    staleNotice.className = 'catalog-activity-notice catalog-curation-stale-notice';
+    staleNotice.textContent = staleText;
+    card.append(staleNotice);
+  }
   card.append(actions);
   return card;
 }
