@@ -1,0 +1,136 @@
+{
+  "schema_version": 4,
+  "id": "ujamaa-community-resource-team",
+  "title": "Ujamaa Community Resource Team",
+  "summary": "Eine von Gemeinschaftsrechten ausgehende Organisation in Nordtansania, die pastoralistische, agropastoralistische und Jäger-und-Sammler-Gemeinschaften beim kollektiven Landbesitz, bei lokaler Governance und nachhaltiger Ressourcenverwaltung unterstützt.",
+  "themes": [
+    "land-commons",
+    "community-land",
+    "commons-governance",
+    "customary-governance",
+    "biodiversity",
+    "climate-resilience"
+  ],
+  "actions": [
+    "learn",
+    "donate",
+    "contact"
+  ],
+  "presence": {
+    "geographic": [
+      {
+        "id": "ujamaa-northern-tanzania-communities",
+        "mode": "hidden",
+        "label": "Partnergemeinschaften in mehreren Gebieten Nordtansanias",
+        "privacy_note": "Die Arbeit betrifft zahlreiche ländliche Gemeinschaften und gemeinschaftliche Landtitel; Commonworld veröffentlicht daraus keine unvollständige oder sensible Detailkarte.",
+        "source_ids": [
+          "ujamaa-home",
+          "ujamaa-work"
+        ]
+      }
+    ],
+    "digital": {
+      "available": false,
+      "source_ids": [
+        "ujamaa-home"
+      ]
+    }
+  },
+  "activity": {
+    "status": "active",
+    "observed_at": "2026-07-28",
+    "source_ids": [
+      "ujamaa-home",
+      "ujamaa-work",
+      "ujamaa-programmes"
+    ],
+    "note": "Die offiziellen Seiten dokumentieren aktuelle Programme, Wirkungsangaben mit Aktualisierungen bis 2026 und laufende Beteiligungs- und Unterstützungswege."
+  },
+  "provenance": {
+    "sources": [
+      {
+        "id": "ujamaa-home",
+        "type": "official-source",
+        "label": "Ujamaa Community Resource Team – offizielle Seite",
+        "url": "https://www.ujamaa-crt.or.tz/",
+        "retrieved_at": "2026-07-28",
+        "note": "Offizielle Mission, Arbeitsfelder, Kontakt und aktuelle Wirkungsübersicht."
+      },
+      {
+        "id": "ujamaa-work",
+        "type": "official-source",
+        "label": "Ujamaa Community Resource Team – Our Work",
+        "url": "https://www.ujamaa-crt.or.tz/our-work.html",
+        "retrieved_at": "2026-07-28",
+        "note": "Offizielle Übersicht der Arbeit mit ländlichen Gemeinschaften und aktueller Programmaktivität."
+      },
+      {
+        "id": "ujamaa-programmes",
+        "type": "official-source",
+        "label": "Ujamaa Community Resource Team – Programmes",
+        "url": "https://www.ujamaa-crt.or.tz/programmes.html",
+        "retrieved_at": "2026-07-28",
+        "note": "Offizielle Beschreibung von Landrechten, Governance, Ressourcenmanagement, Lebensgrundlagen, Empowerment und Politikarbeit."
+      },
+      {
+        "id": "ujamaa-donate",
+        "type": "official-source",
+        "label": "Ujamaa Community Resource Team – Donate",
+        "url": "https://www.ujamaa-crt.or.tz/donate.html",
+        "retrieved_at": "2026-07-28",
+        "note": "Offizieller Spendenweg mit Zweckangaben und Weiterleitung über den Dorobo Fund for Tanzania."
+      }
+    ]
+  },
+  "curation": {
+    "state": "listed",
+    "catalogued_at": "2026-07-28",
+    "reviewed_by": "Commonworld editorial review",
+    "reviewed_at": "2026-07-28",
+    "next_review_at": "2026-10-28",
+    "notes": "Aufgenommen als unterstützende Infrastruktur für gemeinschaftliche Land- und Ressourcenrechte. UCRT selbst wird nicht mit den von ihm begleiteten Gemeinschaften gleichgesetzt."
+  },
+  "links": [
+    {
+      "type": "homepage",
+      "label": "Ujamaa Community Resource Team – offizielle Seite",
+      "url": "https://www.ujamaa-crt.or.tz/"
+    },
+    {
+      "type": "learn",
+      "label": "Programme und Arbeitsweise kennenlernen",
+      "url": "https://www.ujamaa-crt.or.tz/programmes.html",
+      "source_ids": [
+        "ujamaa-programmes"
+      ]
+    },
+    {
+      "type": "donate",
+      "label": "Gemeinschaftliche Landrechtsarbeit unterstützen",
+      "url": "https://www.ujamaa-crt.or.tz/donate.html",
+      "source_ids": [
+        "ujamaa-donate"
+      ]
+    },
+    {
+      "type": "contact",
+      "label": "Ujamaa Community Resource Team kontaktieren",
+      "url": "https://www.ujamaa-crt.or.tz/",
+      "source_ids": [
+        "ujamaa-home"
+      ]
+    }
+  ],
+  "handoff": {
+    "enabled": false
+  },
+  "languages": {
+    "codes": [
+      "en"
+    ],
+    "source_ids": [
+      "ujamaa-home"
+    ],
+    "note": "Die geprüften offiziellen Projektseiten sind auf Englisch verfügbar."
+  }
+}

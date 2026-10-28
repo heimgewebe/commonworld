@@ -1,0 +1,428 @@
+{
+  "schema_version": 1,
+  "kind": "commonworld_conservative_expiry_demotions",
+  "base_commit": "9da413e11db37d1b6a339ca38d8a2c8b361df2be",
+  "observed_on": "2026-10-27",
+  "status_change": "previously_public_to_stale_visible_without_current_density",
+  "editorial_reverification_performed": false,
+  "source_review_dates_updated": false,
+  "commons_basis_decisions_modified": false,
+  "publication_contract": "Stale remains visible but not current-density; source evidence and dates retain historical identity",
+  "record_count": 69,
+  "records": [
+    {
+      "id": "aflaj-irrigation-systems-oman",
+      "previous_state": "listed",
+      "next_review_at": "2026-10-24",
+      "commons_basis_existing": false
+    },
+    {
+      "id": "akiba-mashinani-trust",
+      "previous_state": "listed",
+      "next_review_at": "2026-10-19",
+      "commons_basis_existing": false
+    },
+    {
+      "id": "arvari-river-parliament",
+      "previous_state": "listed",
+      "next_review_at": "2026-10-02",
+      "commons_basis_existing": true
+    },
+    {
+      "id": "auroville",
+      "previous_state": "listed",
+      "next_review_at": "2026-09-26",
+      "commons_basis_existing": false
+    },
+    {
+      "id": "bali-subak-system",
+      "previous_state": "listed",
+      "next_review_at": "2026-10-19",
+      "commons_basis_existing": false
+    },
+    {
+      "id": "bioleft",
+      "previous_state": "listed",
+      "next_review_at": "2026-10-16",
+      "commons_basis_existing": false
+    },
+    {
+      "id": "bologna-urban-commons",
+      "previous_state": "listed",
+      "next_review_at": "2026-10-26",
+      "commons_basis_existing": false
+    },
+    {
+      "id": "brisbane-tool-library",
+      "previous_state": "listed",
+      "next_review_at": "2026-10-22",
+      "commons_basis_existing": false
+    },
+    {
+      "id": "cano-martin-pena-clt",
+      "previous_state": "listed",
+      "next_review_at": "2026-10-02",
+      "commons_basis_existing": true
+    },
+    {
+      "id": "cecosesola",
+      "previous_state": "listed",
+      "next_review_at": "2026-10-26",
+      "commons_basis_existing": false
+    },
+    {
+      "id": "cltb-le-nid",
+      "previous_state": "listed",
+      "next_review_at": "2026-10-15",
+      "commons_basis_existing": false
+    },
+    {
+      "id": "community-baboon-sanctuary",
+      "previous_state": "listed",
+      "next_review_at": "2026-10-19",
+      "commons_basis_existing": false
+    },
+    {
+      "id": "community-energy-network-new-zealand",
+      "previous_state": "listed",
+      "next_review_at": "2026-10-16",
+      "commons_basis_existing": false
+    },
+    {
+      "id": "debian",
+      "previous_state": "listed",
+      "next_review_at": "2026-10-12",
+      "commons_basis_existing": false
+    },
+    {
+      "id": "deccan-development-society",
+      "previous_state": "listed",
+      "next_review_at": "2026-10-19",
+      "commons_basis_existing": false
+    },
+    {
+      "id": "edinburgh-tool-library",
+      "previous_state": "listed",
+      "next_review_at": "2026-10-16",
+      "commons_basis_existing": false
+    },
+    {
+      "id": "ekuri-community-forest",
+      "previous_state": "listed",
+      "next_review_at": "2026-10-02",
+      "commons_basis_existing": true
+    },
+    {
+      "id": "enspiral",
+      "previous_state": "listed",
+      "next_review_at": "2026-10-16",
+      "commons_basis_existing": false
+    },
+    {
+      "id": "ethiopia-community-seed-bank-network",
+      "previous_state": "listed",
+      "next_review_at": "2026-10-25",
+      "commons_basis_existing": false
+    },
+    {
+      "id": "freifunk",
+      "previous_state": "listed",
+      "next_review_at": "2026-10-12",
+      "commons_basis_existing": false
+    },
+    {
+      "id": "freifunk-hamburg",
+      "previous_state": "listed",
+      "next_review_at": "2026-10-15",
+      "commons_basis_existing": false
+    },
+    {
+      "id": "fucvam",
+      "previous_state": "listed",
+      "next_review_at": "2026-10-16",
+      "commons_basis_existing": false
+    },
+    {
+      "id": "g0v",
+      "previous_state": "listed",
+      "next_review_at": "2026-10-16",
+      "commons_basis_existing": false
+    },
+    {
+      "id": "granby-four-streets-clt",
+      "previous_state": "listed",
+      "next_review_at": "2026-10-16",
+      "commons_basis_existing": false
+    },
+    {
+      "id": "guifi-net",
+      "previous_state": "listed",
+      "next_review_at": "2026-10-16",
+      "commons_basis_existing": false
+    },
+    {
+      "id": "hepburn-energy",
+      "previous_state": "listed",
+      "next_review_at": "2026-10-19",
+      "commons_basis_existing": false
+    },
+    {
+      "id": "kawawana",
+      "previous_state": "listed",
+      "next_review_at": "2026-10-05",
+      "commons_basis_existing": true
+    },
+    {
+      "id": "kibera-public-space-project",
+      "previous_state": "listed",
+      "next_review_at": "2026-10-19",
+      "commons_basis_existing": false
+    },
+    {
+      "id": "kobulu-community-micro-hydro",
+      "previous_state": "listed",
+      "next_review_at": "2026-10-02",
+      "commons_basis_existing": true
+    },
+    {
+      "id": "lasilo-naples",
+      "previous_state": "listed",
+      "next_review_at": "2026-09-15",
+      "commons_basis_existing": true
+    },
+    {
+      "id": "libreoffice",
+      "previous_state": "listed",
+      "next_review_at": "2026-10-12",
+      "commons_basis_existing": false
+    },
+    {
+      "id": "librivox",
+      "previous_state": "listed",
+      "next_review_at": "2026-10-22",
+      "commons_basis_existing": false
+    },
+    {
+      "id": "masipag",
+      "previous_state": "listed",
+      "next_review_at": "2026-10-22",
+      "commons_basis_existing": false
+    },
+    {
+      "id": "mastodon",
+      "previous_state": "listed",
+      "next_review_at": "2026-10-12",
+      "commons_basis_existing": false
+    },
+    {
+      "id": "mietshaeuser-syndikat",
+      "previous_state": "listed",
+      "next_review_at": "2026-10-26",
+      "commons_basis_existing": false
+    },
+    {
+      "id": "musicbrainz",
+      "previous_state": "listed",
+      "next_review_at": "2026-10-22",
+      "commons_basis_existing": false
+    },
+    {
+      "id": "namena-marine-reserve",
+      "previous_state": "listed",
+      "next_review_at": "2026-10-24",
+      "commons_basis_existing": false
+    },
+    {
+      "id": "namibia-communal-conservancies-alliance",
+      "previous_state": "listed",
+      "next_review_at": "2026-10-25",
+      "commons_basis_existing": false
+    },
+    {
+      "id": "nepal-wireless-networking-project",
+      "previous_state": "listed",
+      "next_review_at": "2026-10-16",
+      "commons_basis_existing": false
+    },
+    {
+      "id": "new-mexico-acequia-association",
+      "previous_state": "listed",
+      "next_review_at": "2026-10-16",
+      "commons_basis_existing": false
+    },
+    {
+      "id": "north-east-syria-autonomous-administration",
+      "previous_state": "listed",
+      "next_review_at": "2026-10-02",
+      "commons_basis_existing": true
+    },
+    {
+      "id": "nyc-mesh",
+      "previous_state": "listed",
+      "next_review_at": "2026-10-16",
+      "commons_basis_existing": false
+    },
+    {
+      "id": "open-source-ecology",
+      "previous_state": "listed",
+      "next_review_at": "2026-10-16",
+      "commons_basis_existing": false
+    },
+    {
+      "id": "openmrs",
+      "previous_state": "listed",
+      "next_review_at": "2026-10-16",
+      "commons_basis_existing": false
+    },
+    {
+      "id": "openstreetmap",
+      "previous_state": "listed",
+      "next_review_at": "2026-10-12",
+      "commons_basis_existing": false
+    },
+    {
+      "id": "orangi-low-cost-sanitation",
+      "previous_state": "listed",
+      "next_review_at": "2026-09-15",
+      "commons_basis_existing": true
+    },
+    {
+      "id": "p2pu",
+      "previous_state": "listed",
+      "next_review_at": "2026-10-22",
+      "commons_basis_existing": false
+    },
+    {
+      "id": "pachgaon-community-forest",
+      "previous_state": "listed",
+      "next_review_at": "2026-10-05",
+      "commons_basis_existing": true
+    },
+    {
+      "id": "potato-park-peru",
+      "previous_state": "listed",
+      "next_review_at": "2026-10-19",
+      "commons_basis_existing": false
+    },
+    {
+      "id": "prinzessinnengarten-kollektiv",
+      "previous_state": "listed",
+      "next_review_at": "2026-10-16",
+      "commons_basis_existing": false
+    },
+    {
+      "id": "red-guardianes-semillas-ecuador",
+      "previous_state": "listed",
+      "next_review_at": "2026-10-22",
+      "commons_basis_existing": false
+    },
+    {
+      "id": "reprap",
+      "previous_state": "listed",
+      "next_review_at": "2026-10-26",
+      "commons_basis_existing": false
+    },
+    {
+      "id": "restarters",
+      "previous_state": "listed",
+      "next_review_at": "2026-10-22",
+      "commons_basis_existing": false
+    },
+    {
+      "id": "root-access-hackerspace",
+      "previous_state": "listed",
+      "next_review_at": "2026-10-22",
+      "commons_basis_existing": false
+    },
+    {
+      "id": "safecast",
+      "previous_state": "listed",
+      "next_review_at": "2026-10-22",
+      "commons_basis_existing": false
+    },
+    {
+      "id": "sarantaporo-community-network",
+      "previous_state": "listed",
+      "next_review_at": "2026-10-16",
+      "commons_basis_existing": false
+    },
+    {
+      "id": "som-energia",
+      "previous_state": "listed",
+      "next_review_at": "2026-10-16",
+      "commons_basis_existing": false
+    },
+    {
+      "id": "tetepare-descendants-association",
+      "previous_state": "listed",
+      "next_review_at": "2026-10-24",
+      "commons_basis_existing": false
+    },
+    {
+      "id": "thailand-citizens-forest-database",
+      "previous_state": "listed",
+      "next_review_at": "2026-10-25",
+      "commons_basis_existing": false
+    },
+    {
+      "id": "tla-o-qui-aht-tribal-parks",
+      "previous_state": "listed",
+      "next_review_at": "2026-10-25",
+      "commons_basis_existing": false
+    },
+    {
+      "id": "tribunal-aguas-valencia",
+      "previous_state": "listed",
+      "next_review_at": "2026-10-19",
+      "commons_basis_existing": false
+    },
+    {
+      "id": "velondriake-lmma",
+      "previous_state": "listed",
+      "next_review_at": "2026-10-02",
+      "commons_basis_existing": true
+    },
+    {
+      "id": "wikibooks",
+      "previous_state": "listed",
+      "next_review_at": "2026-10-12",
+      "commons_basis_existing": false
+    },
+    {
+      "id": "wikidata",
+      "previous_state": "listed",
+      "next_review_at": "2026-10-12",
+      "commons_basis_existing": false
+    },
+    {
+      "id": "wikimedia-commons",
+      "previous_state": "listed",
+      "next_review_at": "2026-10-12",
+      "commons_basis_existing": false
+    },
+    {
+      "id": "wikipedia",
+      "previous_state": "listed",
+      "next_review_at": "2026-10-12",
+      "commons_basis_existing": false
+    },
+    {
+      "id": "wikiversity",
+      "previous_state": "listed",
+      "next_review_at": "2026-10-12",
+      "commons_basis_existing": false
+    },
+    {
+      "id": "zapatista-autonomy",
+      "previous_state": "listed",
+      "next_review_at": "2026-10-02",
+      "commons_basis_existing": true
+    },
+    {
+      "id": "zenzeleni-community-networks",
+      "previous_state": "listed",
+      "next_review_at": "2026-10-16",
+      "commons_basis_existing": false
+    }
+  ]
+}

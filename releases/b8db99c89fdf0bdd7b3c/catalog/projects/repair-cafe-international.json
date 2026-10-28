@@ -1,0 +1,180 @@
+{
+  "schema_version": 4,
+  "id": "repair-cafe-international",
+  "title": "Repair Café International",
+  "summary": "Ein weltweites Netz freiwillig organisierter, nicht kommerzieller Reparaturtreffen, in denen Menschen Werkzeuge, Wissen und Zeit teilen, um Alltagsgegenstände gemeinsam zu reparieren und lokale Reparaturfähigkeiten aufzubauen.",
+  "themes": [
+    "repair",
+    "circular-economy",
+    "skills",
+    "tool-sharing",
+    "community-maintenance",
+    "volunteer-community"
+  ],
+  "actions": [
+    "visit",
+    "learn",
+    "replicate",
+    "donate",
+    "contact"
+  ],
+  "presence": {
+    "geographic": [
+      {
+        "id": "repair-cafe-worldwide-network",
+        "mode": "hidden",
+        "label": "Weltweites Netz lokal organisierter Repair Cafés",
+        "privacy_note": "Die Standorte und Termine werden über die laufend aktualisierte offizielle Suche veröffentlicht; Commonworld rekonstruiert dieses dynamische Netz nicht als unvollständige Punktmenge.",
+        "source_ids": [
+          "repair-cafe-home",
+          "repair-cafe-visit"
+        ]
+      }
+    ],
+    "digital": {
+      "available": true,
+      "reach": "global",
+      "label": "Standortsuche, Reparaturwissen und Startermaterial für lokale Repair Cafés",
+      "source_ids": [
+        "repair-cafe-home",
+        "repair-cafe-start"
+      ]
+    }
+  },
+  "activity": {
+    "status": "active",
+    "observed_at": "2026-07-28",
+    "source_ids": [
+      "repair-cafe-home",
+      "repair-cafe-visit"
+    ],
+    "note": "Die offizielle Seite führt ein laufendes weltweites Netzwerk, aktuelle Meldungen, eine Standortsuche und Wege zum Aufbau neuer lokaler Repair Cafés."
+  },
+  "provenance": {
+    "sources": [
+      {
+        "id": "repair-cafe-home",
+        "type": "official-source",
+        "label": "Repair Café International – offizielle Seite",
+        "url": "https://www.repaircafe.org/en/",
+        "retrieved_at": "2026-07-28",
+        "note": "Offizielle Netzwerkseite mit aktuellen Meldungen, Reparaturwissen und Beteiligungswegen."
+      },
+      {
+        "id": "repair-cafe-about",
+        "type": "official-source",
+        "label": "Repair Café International – About",
+        "url": "https://www.repaircafe.org/en/about/",
+        "retrieved_at": "2026-07-28",
+        "note": "Offizielle Beschreibung der kostenlosen, freiwillig getragenen Reparaturtreffen und des gemeinsamen Lernens."
+      },
+      {
+        "id": "repair-cafe-visit",
+        "type": "official-source",
+        "label": "Repair Café International – Standortsuche",
+        "url": "https://www.repaircafe.org/en/visit/",
+        "retrieved_at": "2026-07-28",
+        "note": "Offizielle, dynamische Suche nach lokalen Repair Cafés."
+      },
+      {
+        "id": "repair-cafe-start",
+        "type": "official-source",
+        "label": "Repair Café International – eigenes Repair Café starten",
+        "url": "https://www.repaircafe.org/en/join/start-your-own/",
+        "retrieved_at": "2026-07-28",
+        "note": "Offizieller Starterpfad mit Organisationsmaterial und Bedingungen für freiwillige, nicht kommerzielle Initiativen."
+      },
+      {
+        "id": "repair-cafe-donate",
+        "type": "official-source",
+        "label": "Repair Café International – unterstützen",
+        "url": "https://www.repaircafe.org/en/donate/",
+        "retrieved_at": "2026-07-28",
+        "note": "Offizielle Unterstützungsseite der gemeinnützigen Stiftung."
+      },
+      {
+        "id": "repair-cafe-contact",
+        "type": "official-source",
+        "label": "Repair Café International – Kontakt",
+        "url": "https://www.repaircafe.org/en/contact/",
+        "retrieved_at": "2026-07-28",
+        "note": "Offizielle Kontakt- und Auskunftswege."
+      }
+    ]
+  },
+  "curation": {
+    "state": "listed",
+    "catalogued_at": "2026-07-28",
+    "reviewed_by": "Commonworld editorial review",
+    "reviewed_at": "2026-07-28",
+    "next_review_at": "2026-10-28",
+    "notes": "Aufgenommen als replizierbare lokale Reparatur-Commons mit gemeinsamem Wissen, Werkzeugen und freiwilliger Arbeit. Die dynamische Standortzahl wird nicht in den Katalogtext übernommen."
+  },
+  "links": [
+    {
+      "type": "homepage",
+      "label": "Repair Café International – offizielle Seite",
+      "url": "https://www.repaircafe.org/en/"
+    },
+    {
+      "type": "visit",
+      "label": "Repair Café in der Nähe suchen",
+      "url": "https://www.repaircafe.org/en/visit/",
+      "source_ids": [
+        "repair-cafe-visit"
+      ]
+    },
+    {
+      "type": "learn",
+      "label": "Prinzip und Ablauf kennenlernen",
+      "url": "https://www.repaircafe.org/en/about/",
+      "source_ids": [
+        "repair-cafe-about"
+      ]
+    },
+    {
+      "type": "replicate",
+      "label": "Eigenes Repair Café aufbauen",
+      "url": "https://www.repaircafe.org/en/join/start-your-own/",
+      "source_ids": [
+        "repair-cafe-start"
+      ]
+    },
+    {
+      "type": "donate",
+      "label": "Repair Café International unterstützen",
+      "url": "https://www.repaircafe.org/en/donate/",
+      "source_ids": [
+        "repair-cafe-donate"
+      ]
+    },
+    {
+      "type": "contact",
+      "label": "Repair Café International kontaktieren",
+      "url": "https://www.repaircafe.org/en/contact/",
+      "source_ids": [
+        "repair-cafe-contact"
+      ]
+    }
+  ],
+  "handoff": {
+    "enabled": false
+  },
+  "languages": {
+    "codes": [
+      "de",
+      "en"
+    ],
+    "source_ids": [
+      "repair-cafe-home"
+    ],
+    "note": "Die offizielle Netzwerkseite bietet unter anderem deutsche und englische Oberflächen."
+  },
+  "access": {
+    "type": "public",
+    "source_ids": [
+      "repair-cafe-about"
+    ],
+    "note": "Lokale Repair Cafés sind als kostenlose Treffen beschrieben; Termine und konkrete Regeln werden lokal veröffentlicht."
+  }
+}

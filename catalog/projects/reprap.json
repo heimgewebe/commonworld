@@ -67,7 +67,7 @@
     "uncertainty_note": "Der Anteil selbst herstellbarer Teile unterscheidet sich je nach Maschine und Dokumentationsstand. Deshalb wird keine einzelne Prozentzahl als allgemeine Projekteigenschaft übernommen."
   },
   "curation": {
-    "state": "listed",
+    "state": "stale",
     "catalogued_at": "2026-07-26",
     "reviewed_by": "Commonworld editorial review",
     "reviewed_at": "2026-07-26",

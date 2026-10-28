@@ -1,0 +1,53 @@
+{
+  "schema_version": 1,
+  "kind": "commonworld_commons_basis",
+  "project_id": "kawawana",
+  "classification": "common",
+  "decision": "include",
+  "reviewed_at": "2026-09-05",
+  "reviewer": "Commonworld editorial review",
+  "criteria": {
+    "shared_resource": {
+      "status": "supported",
+      "statement": "Fischbestände, Mangroven, Bolongs und die lokal genutzte Küstenzone bilden den geteilten Ressourcenraum von Kawawana.",
+      "source_ids": [
+        "kawawana-icca-registry"
+      ]
+    },
+    "community": {
+      "status": "supported",
+      "statement": "APCRM vereint Fischer und Bewohner aus acht Dörfern der Zentral-Casamance als klar benannte Trägergemeinschaft.",
+      "source_ids": [
+        "kawawana-icca-registry"
+      ]
+    },
+    "commoning_practice": {
+      "status": "supported",
+      "statement": "Mitglieder überwachen Bestände, führen Patrouillen durch, kommunizieren Regeln und finanzieren Schutzarbeit unter anderem über kollektive Fangfahrten.",
+      "source_ids": [
+        "kawawana-icca-registry"
+      ]
+    },
+    "rules_and_responsibility": {
+      "status": "supported",
+      "statement": "Rote, orange und gelbe Zonen ordnen Entnahmeverbote, lokale Versorgung und zulässige Fangmethoden; 2010 übertragene Verwaltungsrechte stützen die lokale Durchsetzung.",
+      "source_ids": [
+        "kawawana-icca-registry"
+      ]
+    },
+    "common_benefit": {
+      "status": "supported",
+      "statement": "Die Regeln zielen auf Nahrungssicherheit, stabile Fischbestände, Einkommen, Konfliktminderung und den Schutz aquatischer Lebensräume.",
+      "source_ids": [
+        "kawawana-icca-registry"
+      ]
+    }
+  },
+  "confidence": 0.88,
+  "limitations": [
+    "Der Registertext stammt ursprünglich aus 2012 und belegt keine ununterbrochene Aktivität bis September 2026.",
+    "Interne Wahl-, Sanktions- und Konfliktverfahren sind öffentlich nur teilweise dokumentiert.",
+    "Die lokal sensiblen Zonen, Dörfer und Fanggründe werden nicht kartiert."
+  ],
+  "notes": "Aufgenommen wird Kawawana als konkrete von APCRM und acht Dörfern getragene Küsten- und Fischereiinstitution, nicht das ICCA-Register oder eine unterstützende Organisation."
+}

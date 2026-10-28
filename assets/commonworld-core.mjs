@@ -1,4 +1,4 @@
-import { FALLBACK_LOCALE, documentDirection, normalizeLocale, taxonomyLabel, text as i18nText } from './commonworld-i18n.mjs?v=211786268508';
+import { FALLBACK_LOCALE, documentDirection, normalizeLocale, taxonomyLabel, text as i18nText } from './commonworld-i18n.mjs?v=4b7bf011503e';
 
 export const DEFAULT_CAMERA = Object.freeze({
   lng: 8,
@@ -1040,7 +1040,7 @@ export const INTENT_FILTER_VALUES = Object.freeze({
   action: Object.freeze(['visit', 'use', 'borrow', 'learn', 'contribute', 'volunteer', 'donate', 'contact', 'replicate']),
   access: Object.freeze(['public', 'membership', 'restricted', 'unknown']),
   freshness: Object.freeze(['current', 'stale', 'unknown']),
-  curation: Object.freeze(['listed', 'verified', 'featured', 'unknown']),
+  curation: Object.freeze(['listed', 'verified', 'featured', 'stale', 'unknown']),
 });
 
 export function normalizePresenceFilterValues(value) {
@@ -1489,6 +1489,7 @@ function recordAccessValue(record) {
 }
 
 function recordFreshness(record, today) {
+  if (record?.curation?.state === 'stale') return 'stale';
   const nextReview = record?.curation?.next_review_at;
   const activity = record?.activity?.status;
   if (typeof nextReview !== 'string' || typeof activity !== 'string') return 'unknown';

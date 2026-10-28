@@ -74,7 +74,7 @@
     "uncertainty_note": "Der Datensatz bildet ein serielles, räumlich verteiltes System als groben Orientierungspunkt ab. Einzelne Kanäle, Nutzungsrechte und private Flächen werden nicht dargestellt."
   },
   "curation": {
-    "state": "listed",
+    "state": "stale",
     "catalogued_at": "2026-07-25",
     "reviewed_by": "Commonworld editorial review",
     "reviewed_at": "2026-07-24",

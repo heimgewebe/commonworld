@@ -83,7 +83,7 @@
     "uncertainty_note": "Die Punktgeometrie ist nur eine grobe Orientierung im Kubulau-Gebiet. Die tatsächlichen customary fishing grounds und Schutzgebietsgrenzen werden nicht rekonstruiert."
   },
   "curation": {
-    "state": "listed",
+    "state": "stale",
     "catalogued_at": "2026-07-25",
     "reviewed_by": "Commonworld editorial review",
     "reviewed_at": "2026-07-24",
