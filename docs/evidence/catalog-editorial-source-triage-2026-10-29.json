@@ -1,0 +1,3074 @@
+{
+  "schema_version": 1,
+  "kind": "commonworld_editorial_source_triage",
+  "scope": "public_catalog_100_records",
+  "checked_at_utc": "2026-10-29T16:46:06.839211+00:00",
+  "catalog_source_commit": "122c3e909368ee10d899308ab3974c833117cc57",
+  "merged_main_commit": "578113f926649c24bf4283c9922cbe00c0ac1287",
+  "counts": {
+    "records": 100,
+    "documented_sources": 301,
+    "action_links": 416,
+    "unique_urls": 384,
+    "url_result_categories": {
+      "reachable": 349,
+      "http_error": 10,
+      "network_or_unknown": 14,
+      "restricted_or_bot": 11
+    }
+  },
+  "methods": [
+    "HTTPS GET with 12s timeout and limited concurrency, redirects followed",
+    "HTTP status and page title only, not a semantic editorial assertion",
+    "Bot false-positive correction: normal pages with content title count as HTTP 2xx",
+    "Sources and action URLs deduplicated across records"
+  ],
+  "limitations": [
+    "HTTP 200 does not prove the content or present-day project operation",
+    "HTTP 403/5xx or certificate failure does not prove the Commons ceased existing",
+    "Stale/overdue projects are not marked reviewed by this technical audit",
+    "Existing historical source records and retrieval timestamps remain unchanged"
+  ],
+  "changed_product_records": [
+    "cooperation-jackson",
+    "fecofun-nepal",
+    "great-lakes-commons",
+    "open-library",
+    "open-source-seed-initiative",
+    "repair-cafe-international",
+    "ujamaa-community-resource-team",
+    "park-slope-food-coop"
+  ],
+  "records": [
+    {
+      "id": "acofop-peten-community-forests",
+      "state_at_check": "listed",
+      "next_review_at": "2026-11-04",
+      "source_results": [
+        {
+          "id": "acofop-home",
+          "url": "https://acofop.org/",
+          "http_status": 200,
+          "result": "reachable"
+        },
+        {
+          "id": "acofop-about",
+          "url": "https://acofop.org/quienes-somos/",
+          "http_status": 404,
+          "result": "http_error"
+        },
+        {
+          "id": "acofop-territorial",
+          "url": "https://acofop.org/gestion-territorial/",
+          "http_status": 200,
+          "result": "reachable"
+        },
+        {
+          "id": "conap-extensions",
+          "url": "https://conap.gob.gt/prorrogas-y-nuevos-contratos-de-concesiones-forestales/",
+          "http_status": 403,
+          "result": "restricted_or_bot"
+        }
+      ],
+      "non_reachable_actions": [
+        {
+          "action": "learn",
+          "url": "https://acofop.org/quienes-somos/",
+          "http_status": 404,
+          "result": "http_error"
+        }
+      ],
+      "issues": [
+        "documented_source_http_error",
+        "action_link_http_error"
+      ]
+    },
+    {
+      "id": "aflaj-irrigation-systems-oman",
+      "state_at_check": "stale",
+      "next_review_at": "2026-10-24",
+      "source_results": [
+        {
+          "id": "source-aflaj-unesco",
+          "url": "https://whc.unesco.org/en/list/1207/",
+          "http_status": 200,
+          "result": "reachable"
+        },
+        {
+          "id": "source-aflaj-unesco-maps",
+          "url": "https://whc.unesco.org/en/list/1207/maps/",
+          "http_status": 200,
+          "result": "reachable"
+        }
+      ],
+      "non_reachable_actions": [],
+      "issues": [
+        "review_due"
+      ]
+    },
+    {
+      "id": "akiba-mashinani-trust",
+      "state_at_check": "stale",
+      "next_review_at": "2026-10-19",
+      "source_results": [
+        {
+          "id": "source-akiba-official",
+          "url": "https://www.muungano.net/akibamashinanitrust",
+          "http_status": 200,
+          "result": "reachable"
+        },
+        {
+          "id": "source-kenya-wikidata",
+          "url": "https://www.wikidata.org/wiki/Q114",
+          "http_status": 200,
+          "result": "reachable"
+        }
+      ],
+      "non_reachable_actions": [],
+      "issues": [
+        "review_due"
+      ]
+    },
+    {
+      "id": "arvari-river-parliament",
+      "state_at_check": "stale",
+      "next_review_at": "2026-10-02",
+      "source_results": [
+        {
+          "id": "tbs-rivers",
+          "url": "https://tarunbharatsangh.in/rivers-rejuvenated/",
+          "http_status": 200,
+          "result": "reachable"
+        },
+        {
+          "id": "tbs-impact",
+          "url": "https://tarunbharatsangh.in/impact/",
+          "http_status": 200,
+          "result": "reachable"
+        },
+        {
+          "id": "tbs-contact",
+          "url": "https://tarunbharatsangh.in/contact/",
+          "http_status": 200,
+          "result": "reachable"
+        },
+        {
+          "id": "alwar-wikidata",
+          "url": "https://www.wikidata.org/wiki/Q449690",
+          "http_status": 200,
+          "result": "reachable"
+        }
+      ],
+      "non_reachable_actions": [],
+      "issues": [
+        "review_due"
+      ]
+    },
+    {
+      "id": "auroville",
+      "state_at_check": "stale",
+      "next_review_at": "2026-09-26",
+      "source_results": [
+        {
+          "id": "auroville-home",
+          "url": "https://auroville.org/",
+          "http_status": 200,
+          "result": "reachable"
+        },
+        {
+          "id": "auroville-legal",
+          "url": "https://auroville.org/page/legal-structure",
+          "http_status": 200,
+          "result": "reachable"
+        },
+        {
+          "id": "auroville-location",
+          "url": "https://auroville.org/page/location",
+          "http_status": 500,
+          "result": "http_error"
+        },
+        {
+          "id": "auroville-visit",
+          "url": "https://auroville.org/page/visiting-auroville",
+          "http_status": 500,
+          "result": "http_error"
+        }
+      ],
+      "non_reachable_actions": [
+        {
+          "action": "visit",
+          "url": "https://auroville.org/page/visiting-auroville",
+          "http_status": 500,
+          "result": "http_error"
+        }
+      ],
+      "issues": [
+        "documented_source_http_error",
+        "action_link_http_error",
+        "review_due"
+      ]
+    },
+    {
+      "id": "b4rn",
+      "state_at_check": "listed",
+      "next_review_at": "2026-11-14",
+      "source_results": [
+        {
+          "id": "b4rn-home",
+          "url": "https://b4rn.org.uk/",
+          "http_status": 200,
+          "result": "reachable"
+        },
+        {
+          "id": "b4rn-about",
+          "url": "https://b4rn.org.uk/about-b4rn",
+          "http_status": 200,
+          "result": "reachable"
+        },
+        {
+          "id": "b4rn-working-with-us",
+          "url": "https://b4rn.org.uk/working-with-us",
+          "http_status": 200,
+          "result": "reachable"
+        },
+        {
+          "id": "b4rn-volunteer",
+          "url": "https://b4rn.org.uk/working-with-us/volunteer",
+          "http_status": 200,
+          "result": "reachable"
+        },
+        {
+          "id": "b4rn-investors",
+          "url": "https://b4rn.org.uk/working-with-us/investors",
+          "http_status": 200,
+          "result": "reachable"
+        }
+      ],
+      "non_reachable_actions": [],
+      "issues": []
+    },
+    {
+      "id": "bali-subak-system",
+      "state_at_check": "stale",
+      "next_review_at": "2026-10-19",
+      "source_results": [
+        {
+          "id": "subak-unesco",
+          "url": "https://whc.unesco.org/en/list/1194",
+          "http_status": 200,
+          "result": "reachable"
+        },
+        {
+          "id": "bali-wikidata",
+          "url": "https://www.wikidata.org/wiki/Q4648",
+          "http_status": 200,
+          "result": "reachable"
+        }
+      ],
+      "non_reachable_actions": [],
+      "issues": [
+        "review_due"
+      ]
+    },
+    {
+      "id": "banco-palmas",
+      "state_at_check": "listed",
+      "next_review_at": "2026-10-30",
+      "source_results": [
+        {
+          "id": "banco-palmas-about",
+          "url": "https://bancopalmas.com/o-que-e/",
+          "http_status": 502,
+          "result": "http_error"
+        },
+        {
+          "id": "banco-palmas-blog",
+          "url": "https://bancopalmas.com/blog/",
+          "http_status": null,
+          "result": "network_or_unknown"
+        },
+        {
+          "id": "fortaleza-wikidata",
+          "url": "https://www.wikidata.org/wiki/Q43463",
+          "http_status": 200,
+          "result": "reachable"
+        }
+      ],
+      "non_reachable_actions": [
+        {
+          "action": "homepage",
+          "url": "https://bancopalmas.com/",
+          "http_status": null,
+          "result": "network_or_unknown"
+        },
+        {
+          "action": "learn",
+          "url": "https://bancopalmas.com/o-que-e/",
+          "http_status": 502,
+          "result": "http_error"
+        }
+      ],
+      "issues": [
+        "documented_source_http_error",
+        "action_link_http_error"
+      ]
+    },
+    {
+      "id": "bangladesh-palli-bidyut-samities",
+      "state_at_check": "listed",
+      "next_review_at": "2026-11-12",
+      "source_results": [
+        {
+          "id": "pbs-history-governance",
+          "url": "https://reb.gov.bd/site/page/62acea25-71aa-4663-b56e-18f4817f6774/nolink/",
+          "http_status": null,
+          "result": "network_or_unknown"
+        },
+        {
+          "id": "pbs-at-a-glance",
+          "url": "https://reb.gov.bd/site/page/c08b56bd-c300-4d08-8ea2-c25eedffbfdb/-",
+          "http_status": null,
+          "result": "network_or_unknown"
+        }
+      ],
+      "non_reachable_actions": [
+        {
+          "action": "homepage",
+          "url": "https://reb.gov.bd/",
+          "http_status": null,
+          "result": "network_or_unknown"
+        },
+        {
+          "action": "learn",
+          "url": "https://reb.gov.bd/site/page/62acea25-71aa-4663-b56e-18f4817f6774/nolink/",
+          "http_status": null,
+          "result": "network_or_unknown"
+        }
+      ],
+      "issues": [
+        "no_reachable_documented_source"
+      ]
+    },
+    {
+      "id": "berkshares",
+      "state_at_check": "listed",
+      "next_review_at": "2026-11-14",
+      "source_results": [
+        {
+          "id": "berkshares-home",
+          "url": "https://berkshares.org/",
+          "http_status": 200,
+          "result": "reachable"
+        },
+        {
+          "id": "berkshares-about",
+          "url": "https://berkshares.org/about/",
+          "http_status": 200,
+          "result": "reachable"
+        },
+        {
+          "id": "berkshares-using",
+          "url": "https://berkshares.org/using-berkshares/",
+          "http_status": 200,
+          "result": "reachable"
+        },
+        {
+          "id": "berkshares-annual-meeting-2026",
+          "url": "https://berkshares.org/annual-meeting-2025/",
+          "http_status": 200,
+          "result": "reachable"
+        },
+        {
+          "id": "berkshares-membership",
+          "url": "https://berkshares.org/donate/",
+          "http_status": 200,
+          "result": "reachable"
+        }
+      ],
+      "non_reachable_actions": [],
+      "issues": []
+    },
+    {
+      "id": "bioleft",
+      "state_at_check": "stale",
+      "next_review_at": "2026-10-16",
+      "source_results": [
+        {
+          "id": "bioleft-home",
+          "url": "https://www.bioleft.org/es/",
+          "http_status": 200,
+          "result": "reachable"
+        },
+        {
+          "id": "bioleft-about",
+          "url": "https://www.bioleft.org/es/acerca-de-bioleft/",
+          "http_status": 200,
+          "result": "reachable"
+        },
+        {
+          "id": "bioleft-platform",
+          "url": "https://www.bioleft.org/es/plataforma/",
+          "http_status": 200,
+          "result": "reachable"
+        }
+      ],
+      "non_reachable_actions": [],
+      "issues": [
+        "review_due"
+      ]
+    },
+    {
+      "id": "bologna-urban-commons",
+      "state_at_check": "stale",
+      "next_review_at": "2026-10-26",
+      "source_results": [
+        {
+          "id": "bologna-regulation-2022",
+          "url": "https://www.comune.bologna.it/novita/comunicati-stampa/consiglio-comunale-approvate-modifiche-allo-statuto-e-il-nuovo-regolamento-sulle-forme-di",
+          "http_status": 200,
+          "result": "reachable"
+        },
+        {
+          "id": "bologna-pacts-data",
+          "url": "https://opendata.comune.bologna.it/explore/dataset/patti-di-collaborazione/",
+          "http_status": 200,
+          "result": "reachable"
+        },
+        {
+          "id": "bologna-collaborate",
+          "url": "https://collaborarebologna.comune.bologna.it/collaborare/",
+          "http_status": 200,
+          "result": "reachable"
+        }
+      ],
+      "non_reachable_actions": [],
+      "issues": [
+        "review_due"
+      ]
+    },
+    {
+      "id": "bosco-uganda",
+      "state_at_check": "listed",
+      "next_review_at": "2026-10-30",
+      "source_results": [
+        {
+          "id": "bosco-home",
+          "url": "https://www.boscouganda.com/",
+          "http_status": 200,
+          "result": "reachable"
+        },
+        {
+          "id": "bosco-about",
+          "url": "https://www.boscouganda.com/about-us-2/",
+          "http_status": 200,
+          "result": "reachable"
+        },
+        {
+          "id": "bosco-connectivity",
+          "url": "https://www.boscouganda.com/connectivity/",
+          "http_status": 200,
+          "result": "reachable"
+        },
+        {
+          "id": "bosco-contact",
+          "url": "https://www.boscouganda.com/contact/",
+          "http_status": 200,
+          "result": "reachable"
+        },
+        {
+          "id": "gulu-wikidata",
+          "url": "https://www.wikidata.org/wiki/Q581379",
+          "http_status": 200,
+          "result": "reachable"
+        }
+      ],
+      "non_reachable_actions": [
+        {
+          "action": "donate",
+          "url": "https://secure.givelively.org/donate/bosco-inc/uganda-2025-operating-campaign",
+          "http_status": 403,
+          "result": "restricted_or_bot"
+        }
+      ],
+      "issues": []
+    },
+    {
+      "id": "brisbane-tool-library",
+      "state_at_check": "stale",
+      "next_review_at": "2026-10-22",
+      "source_results": [
+        {
+          "id": "brisbane-home",
+          "url": "https://www.brisbanetoollibrary.org/",
+          "http_status": 200,
+          "result": "reachable"
+        },
+        {
+          "id": "brisbane-memberships",
+          "url": "https://www.brisbanetoollibrary.org/memberships",
+          "http_status": 200,
+          "result": "reachable"
+        },
+        {
+          "id": "brisbane-registry",
+          "url": "https://www.wikidata.org/wiki/Q34932",
+          "http_status": 200,
+          "result": "reachable"
+        }
+      ],
+      "non_reachable_actions": [],
+      "issues": [
+        "review_due"
+      ]
+    },
+    {
+      "id": "cano-martin-pena-clt",
+      "state_at_check": "stale",
+      "next_review_at": "2026-10-02",
+      "source_results": [
+        {
+          "id": "cano-enlace-g8",
+          "url": "https://cano3punto7.org/index-english.html",
+          "http_status": 200,
+          "result": "reachable"
+        },
+        {
+          "id": "san-juan-wikidata",
+          "url": "https://www.wikidata.org/wiki/Q41211",
+          "http_status": 200,
+          "result": "reachable"
+        }
+      ],
+      "non_reachable_actions": [],
+      "issues": [
+        "review_due"
+      ]
+    },
+    {
+      "id": "cecosesola",
+      "state_at_check": "stale",
+      "next_review_at": "2026-10-26",
+      "source_results": [
+        {
+          "id": "cecosesola-home",
+          "url": "https://cecosesola.org/",
+          "http_status": 200,
+          "result": "reachable"
+        },
+        {
+          "id": "cecosesola-food-network",
+          "url": "https://cecosesola.org/red-de-abastecimiento/",
+          "http_status": 200,
+          "result": "reachable"
+        },
+        {
+          "id": "cecosesola-governance",
+          "url": "https://cecosesola.org/organizandonos-sin-lineas-de-mando/",
+          "http_status": 200,
+          "result": "reachable"
+        },
+        {
+          "id": "cecosesola-right-livelihood",
+          "url": "https://rightlivelihood.org/the-change-makers/find-a-laureate/cecosesola/",
+          "http_status": 200,
+          "result": "reachable"
+        }
+      ],
+      "non_reachable_actions": [],
+      "issues": [
+        "review_due"
+      ]
+    },
+    {
+      "id": "cltb-le-nid",
+      "state_at_check": "stale",
+      "next_review_at": "2026-10-15",
+      "source_results": [
+        {
+          "id": "cltb-le-nid-official",
+          "url": "https://cltb.be/en/projet/verheyden-le-nid-2/",
+          "http_status": 200,
+          "result": "reachable"
+        },
+        {
+          "id": "osm-le-nid-address",
+          "url": "https://www.openstreetmap.org/node/13966522352",
+          "http_status": 200,
+          "result": "reachable"
+        },
+        {
+          "id": "osm-le-nid-building",
+          "url": "https://www.openstreetmap.org/way/260066697",
+          "http_status": 200,
+          "result": "reachable"
+        }
+      ],
+      "non_reachable_actions": [],
+      "issues": [
+        "review_due"
+      ]
+    },
+    {
+      "id": "common-voice",
+      "state_at_check": "listed",
+      "next_review_at": "2026-11-04",
+      "source_results": [
+        {
+          "id": "common-voice-home",
+          "url": "https://commonvoice.mozilla.org/",
+          "http_status": 200,
+          "result": "reachable"
+        },
+        {
+          "id": "common-voice-datasets",
+          "url": "https://commonvoice.mozilla.org/en/datasets",
+          "http_status": 200,
+          "result": "reachable"
+        },
+        {
+          "id": "common-voice-playbook",
+          "url": "https://github.com/common-voice/community-playbook",
+          "http_status": 200,
+          "result": "reachable"
+        },
+        {
+          "id": "common-voice-repository",
+          "url": "https://github.com/common-voice/common-voice",
+          "http_status": 200,
+          "result": "reachable"
+        },
+        {
+          "id": "common-voice-terms",
+          "url": "https://commonvoice.mozilla.org/terms",
+          "http_status": 200,
+          "result": "reachable"
+        }
+      ],
+      "non_reachable_actions": [],
+      "issues": []
+    },
+    {
+      "id": "community-baboon-sanctuary",
+      "state_at_check": "stale",
+      "next_review_at": "2026-10-19",
+      "source_results": [
+        {
+          "id": "community-baboon-protected-planet",
+          "url": "https://www.protectedplanet.net/19553",
+          "http_status": 200,
+          "result": "reachable"
+        },
+        {
+          "id": "belize-wikidata",
+          "url": "https://www.wikidata.org/wiki/Q242",
+          "http_status": 200,
+          "result": "reachable"
+        }
+      ],
+      "non_reachable_actions": [],
+      "issues": [
+        "review_due"
+      ]
+    },
+    {
+      "id": "community-energy-network-new-zealand",
+      "state_at_check": "stale",
+      "next_review_at": "2026-10-16",
+      "source_results": [
+        {
+          "id": "cen-nz-home",
+          "url": "https://www.communityenergy.org.nz/",
+          "http_status": 200,
+          "result": "reachable"
+        },
+        {
+          "id": "cen-about",
+          "url": "https://www.communityenergy.org.nz/about-us/",
+          "http_status": 200,
+          "result": "reachable"
+        },
+        {
+          "id": "cen-join",
+          "url": "https://www.communityenergy.org.nz/about-us/join-us/",
+          "http_status": 200,
+          "result": "reachable"
+        },
+        {
+          "id": "cen-home",
+          "url": "https://www.communityenergy.org.nz/",
+          "http_status": 200,
+          "result": "reachable"
+        }
+      ],
+      "non_reachable_actions": [],
+      "issues": [
+        "review_due"
+      ]
+    },
+    {
+      "id": "cooperation-jackson",
+      "state_at_check": "listed",
+      "next_review_at": "2026-10-28",
+      "source_results": [
+        {
+          "id": "cooperation-jackson-home",
+          "url": "https://cooperationjackson.org/",
+          "http_status": 200,
+          "result": "reachable"
+        },
+        {
+          "id": "cooperation-jackson-intro",
+          "url": "https://cooperationjackson.org/intro",
+          "http_status": 200,
+          "result": "reachable"
+        },
+        {
+          "id": "cooperation-jackson-sci",
+          "url": "https://cooperationjackson.org/sustainable-communities-initiative",
+          "http_status": 200,
+          "result": "reachable"
+        },
+        {
+          "id": "cooperation-jackson-donate",
+          "url": "https://cooperationjackson.org/donate",
+          "http_status": 200,
+          "result": "reachable"
+        },
+        {
+          "id": "cooperation-jackson-contact",
+          "url": "https://cooperationjackson.org/contact-us",
+          "http_status": 200,
+          "result": "reachable"
+        }
+      ],
+      "non_reachable_actions": [],
+      "issues": [
+        "overdue_state_not_stale",
+        "review_due"
+      ]
+    },
+    {
+      "id": "cooperative-home-care-associates",
+      "state_at_check": "listed",
+      "next_review_at": "2026-10-30",
+      "source_results": [
+        {
+          "id": "chca-about",
+          "url": "https://chcany.org/about/",
+          "http_status": 200,
+          "result": "reachable"
+        },
+        {
+          "id": "chca-care",
+          "url": "https://chcany.org/how-to-access-care/",
+          "http_status": 200,
+          "result": "reachable"
+        },
+        {
+          "id": "chca-careers",
+          "url": "https://chcany.org/careers/",
+          "http_status": 200,
+          "result": "reachable"
+        },
+        {
+          "id": "bronx-wikidata",
+          "url": "https://www.wikidata.org/wiki/Q18426",
+          "http_status": 200,
+          "result": "reachable"
+        }
+      ],
+      "non_reachable_actions": [],
+      "issues": []
+    },
+    {
+      "id": "debian",
+      "state_at_check": "stale",
+      "next_review_at": "2026-10-12",
+      "source_results": [
+        {
+          "id": "debian-about",
+          "url": "https://www.debian.org/intro/about",
+          "http_status": 200,
+          "result": "reachable"
+        }
+      ],
+      "non_reachable_actions": [],
+      "issues": [
+        "review_due"
+      ]
+    },
+    {
+      "id": "deccan-development-society",
+      "state_at_check": "stale",
+      "next_review_at": "2026-10-19",
+      "source_results": [
+        {
+          "id": "dds-home",
+          "url": "https://www.ddsindia.org/",
+          "http_status": 200,
+          "result": "reachable"
+        },
+        {
+          "id": "telangana-wikidata",
+          "url": "https://www.wikidata.org/wiki/Q677037",
+          "http_status": 200,
+          "result": "reachable"
+        },
+        {
+          "id": "dds-community-media",
+          "url": "https://www.ddsindia.org/community-media/",
+          "http_status": 200,
+          "result": "reachable"
+        },
+        {
+          "id": "dds-video-channel",
+          "url": "https://www.ddsindia.org/video-channel/",
+          "http_status": 200,
+          "result": "reachable"
+        }
+      ],
+      "non_reachable_actions": [],
+      "issues": [
+        "review_due"
+      ]
+    },
+    {
+      "id": "edinburgh-tool-library",
+      "state_at_check": "stale",
+      "next_review_at": "2026-10-16",
+      "source_results": [
+        {
+          "id": "etl-about",
+          "url": "https://edinburghtoollibrary.org.uk/about/",
+          "http_status": 200,
+          "result": "reachable"
+        },
+        {
+          "id": "etl-locations",
+          "url": "https://edinburghtoollibrary.org.uk/about/find-us/",
+          "http_status": 200,
+          "result": "reachable"
+        }
+      ],
+      "non_reachable_actions": [],
+      "issues": [
+        "review_due"
+      ]
+    },
+    {
+      "id": "ekuri-community-forest",
+      "state_at_check": "stale",
+      "next_review_at": "2026-10-02",
+      "source_results": [
+        {
+          "id": "ekuri-icca-registry",
+          "url": "https://www.iccaregistry.org/en/explore/nigeria/ekuri-icca",
+          "http_status": 200,
+          "result": "reachable"
+        },
+        {
+          "id": "cross-river-wikidata",
+          "url": "https://www.wikidata.org/wiki/Q739676",
+          "http_status": 200,
+          "result": "reachable"
+        }
+      ],
+      "non_reachable_actions": [],
+      "issues": [
+        "review_due"
+      ]
+    },
+    {
+      "id": "enspiral",
+      "state_at_check": "stale",
+      "next_review_at": "2026-10-16",
+      "source_results": [
+        {
+          "id": "enspiral-home",
+          "url": "https://www.enspiral.com/",
+          "http_status": 200,
+          "result": "reachable"
+        }
+      ],
+      "non_reachable_actions": [],
+      "issues": [
+        "review_due"
+      ]
+    },
+    {
+      "id": "ethiopia-community-seed-bank-network",
+      "state_at_check": "stale",
+      "next_review_at": "2026-10-25",
+      "source_results": [
+        {
+          "id": "source-ethiopia-csb-moa",
+          "url": "https://www.moa.gov.et/ethiopias-community-seed-bank-networkempowering-seed-authority/",
+          "http_status": null,
+          "result": "network_or_unknown"
+        },
+        {
+          "id": "source-ethiopia-csb-fao",
+          "url": "https://www.fao.org/plant-treaty/areas-of-work/benefit-sharing-fund/projects/projects-detail/National-Community-Seed-Bank-Platform-for-Strengthening-Informal-Seed-System-in-Ethiopia/en",
+          "http_status": 200,
+          "result": "reachable"
+        },
+        {
+          "id": "source-ethiopia-geonames",
+          "url": "https://www.geonames.org/337996/ethiopia.html",
+          "http_status": 200,
+          "result": "reachable"
+        }
+      ],
+      "non_reachable_actions": [
+        {
+          "action": "homepage",
+          "url": "https://www.moa.gov.et/ethiopias-community-seed-bank-networkempowering-seed-authority/",
+          "http_status": null,
+          "result": "network_or_unknown"
+        }
+      ],
+      "issues": [
+        "review_due"
+      ]
+    },
+    {
+      "id": "fecofun-nepal",
+      "state_at_check": "listed",
+      "next_review_at": "2026-10-28",
+      "source_results": [
+        {
+          "id": "fecofun-home",
+          "url": "https://fecofun.org.np/",
+          "http_status": 200,
+          "result": "reachable"
+        },
+        {
+          "id": "fecofun-about",
+          "url": "https://fecofun.org.np/about/",
+          "http_status": 200,
+          "result": "reachable"
+        },
+        {
+          "id": "fecofun-contact",
+          "url": "https://fecofun.org.np/contacts/",
+          "http_status": 200,
+          "result": "reachable"
+        }
+      ],
+      "non_reachable_actions": [],
+      "issues": [
+        "overdue_state_not_stale",
+        "review_due"
+      ]
+    },
+    {
+      "id": "fiji-locally-managed-marine-area-network",
+      "state_at_check": "listed",
+      "next_review_at": "2026-11-15",
+      "source_results": [
+        {
+          "id": "flmma-spc-2026",
+          "url": "https://www.spc.int/digitallibrary/get/ogbzt",
+          "http_status": 200,
+          "result": "reachable"
+        },
+        {
+          "id": "flmma-spc-exchange",
+          "url": "https://integre.spc.int/en/regional-actions/bilateral-exchanges",
+          "http_status": 200,
+          "result": "reachable"
+        },
+        {
+          "id": "flmma-lmma-network",
+          "url": "https://lmmanetwork.org/",
+          "http_status": 403,
+          "result": "restricted_or_bot"
+        }
+      ],
+      "non_reachable_actions": [
+        {
+          "action": "homepage",
+          "url": "https://lmmanetwork.org/",
+          "http_status": 403,
+          "result": "restricted_or_bot"
+        }
+      ],
+      "issues": []
+    },
+    {
+      "id": "fordhall-organic-farm",
+      "state_at_check": "listed",
+      "next_review_at": "2026-11-04",
+      "source_results": [
+        {
+          "id": "fordhall-home",
+          "url": "https://www.fordhallfarm.com/",
+          "http_status": 200,
+          "result": "reachable"
+        },
+        {
+          "id": "fordhall-shares",
+          "url": "https://www.fordhallfarm.com/buy-a-share",
+          "http_status": 200,
+          "result": "reachable"
+        },
+        {
+          "id": "fordhall-story",
+          "url": "https://www.fordhallfarm.com/fcli-story",
+          "http_status": 200,
+          "result": "reachable"
+        },
+        {
+          "id": "fordhall-impact",
+          "url": "https://www.fordhallfarm.com/our-impact",
+          "http_status": 200,
+          "result": "reachable"
+        }
+      ],
+      "non_reachable_actions": [],
+      "issues": []
+    },
+    {
+      "id": "freifunk-hamburg",
+      "state_at_check": "stale",
+      "next_review_at": "2026-10-15",
+      "source_results": [
+        {
+          "id": "freifunk-community-directory",
+          "url": "https://freifunk.net/wie-mache-ich-mit/community-finden/",
+          "http_status": 200,
+          "result": "reachable"
+        },
+        {
+          "id": "freifunk-hamburg-api",
+          "url": "https://api.freifunk.net/data/ffSummarizedDir.json",
+          "http_status": 200,
+          "result": "reachable"
+        },
+        {
+          "id": "freifunk-hamburg-homepage",
+          "url": "https://hamburg.freifunk.net/",
+          "http_status": 200,
+          "result": "reachable"
+        }
+      ],
+      "non_reachable_actions": [],
+      "issues": [
+        "review_due"
+      ]
+    },
+    {
+      "id": "freifunk",
+      "state_at_check": "stale",
+      "next_review_at": "2026-10-12",
+      "source_results": [
+        {
+          "id": "freifunk-overview",
+          "url": "https://freifunk.net/worum-geht-es/",
+          "http_status": 200,
+          "result": "reachable"
+        }
+      ],
+      "non_reachable_actions": [],
+      "issues": [
+        "review_due"
+      ]
+    },
+    {
+      "id": "fucvam",
+      "state_at_check": "stale",
+      "next_review_at": "2026-10-16",
+      "source_results": [
+        {
+          "id": "fucvam-home",
+          "url": "https://www.fucvam.org.uy/",
+          "http_status": 200,
+          "result": "reachable"
+        },
+        {
+          "id": "fucvam-affiliation",
+          "url": "https://www.fucvam.org.uy/afiliacion-de-nuevas-cooperativas/",
+          "http_status": 200,
+          "result": "reachable"
+        }
+      ],
+      "non_reachable_actions": [],
+      "issues": [
+        "review_due"
+      ]
+    },
+    {
+      "id": "g0v",
+      "state_at_check": "stale",
+      "next_review_at": "2026-10-16",
+      "source_results": [
+        {
+          "id": "g0v-home",
+          "url": "https://g0v.tw/intl/en/",
+          "http_status": 200,
+          "result": "reachable"
+        },
+        {
+          "id": "g0v-manifesto",
+          "url": "https://g0v.tw/intl/en/manifesto/",
+          "http_status": 200,
+          "result": "reachable"
+        }
+      ],
+      "non_reachable_actions": [],
+      "issues": [
+        "review_due"
+      ]
+    },
+    {
+      "id": "gbif",
+      "state_at_check": "listed",
+      "next_review_at": "2026-11-13",
+      "source_results": [
+        {
+          "id": "gbif-network",
+          "url": "https://www.gbif.org/the-gbif-network",
+          "http_status": 403,
+          "result": "restricted_or_bot"
+        },
+        {
+          "id": "gbif-governance",
+          "url": "https://www.gbif.org/governance",
+          "http_status": 200,
+          "result": "reachable"
+        },
+        {
+          "id": "gbif-nodes",
+          "url": "https://www.gbif.org/nodes",
+          "http_status": 403,
+          "result": "restricted_or_bot"
+        },
+        {
+          "id": "gbif-node-guidance",
+          "url": "https://www.gbif.org/article/247XkdmIRETnHgJHyPjln9/what-is-a-gbif-node",
+          "http_status": 403,
+          "result": "restricted_or_bot"
+        },
+        {
+          "id": "gbif-effective-nodes",
+          "url": "https://docs.gbif.org/effective-nodes-guidance/1.0/",
+          "http_status": 200,
+          "result": "reachable"
+        },
+        {
+          "id": "gbif-data-publishing",
+          "url": "https://www.gbif.org/data-publishing",
+          "http_status": 403,
+          "result": "restricted_or_bot"
+        }
+      ],
+      "non_reachable_actions": [
+        {
+          "action": "use",
+          "url": "https://www.gbif.org/occurrence/search",
+          "http_status": 403,
+          "result": "restricted_or_bot"
+        },
+        {
+          "action": "learn",
+          "url": "https://www.gbif.org/the-gbif-network",
+          "http_status": 403,
+          "result": "restricted_or_bot"
+        },
+        {
+          "action": "contribute",
+          "url": "https://www.gbif.org/publishing-data",
+          "http_status": 403,
+          "result": "restricted_or_bot"
+        }
+      ],
+      "issues": []
+    },
+    {
+      "id": "granby-four-streets-clt",
+      "state_at_check": "stale",
+      "next_review_at": "2026-10-16",
+      "source_results": [
+        {
+          "id": "granby-about",
+          "url": "https://www.granby4streetsclt.co.uk/about",
+          "http_status": 200,
+          "result": "reachable"
+        },
+        {
+          "id": "granby-clt",
+          "url": "https://www.granby4streetsclt.co.uk/whats-a-clt",
+          "http_status": 200,
+          "result": "reachable"
+        }
+      ],
+      "non_reachable_actions": [],
+      "issues": [
+        "review_due"
+      ]
+    },
+    {
+      "id": "great-lakes-commons",
+      "state_at_check": "listed",
+      "next_review_at": "2026-10-28",
+      "source_results": [
+        {
+          "id": "great-lakes-home",
+          "url": "https://www.greatlakescommons.org/home-1",
+          "http_status": 200,
+          "result": "reachable"
+        },
+        {
+          "id": "great-lakes-why",
+          "url": "https://www.greatlakescommons.org/why",
+          "http_status": 200,
+          "result": "reachable"
+        }
+      ],
+      "non_reachable_actions": [],
+      "issues": [
+        "overdue_state_not_stale",
+        "review_due"
+      ]
+    },
+    {
+      "id": "green-coop-japan",
+      "state_at_check": "listed",
+      "next_review_at": "2026-11-12",
+      "source_results": [
+        {
+          "id": "green-coop-home",
+          "url": "https://www.greencoop.or.jp/",
+          "http_status": 200,
+          "result": "reachable"
+        },
+        {
+          "id": "green-coop-about",
+          "url": "https://www.greencoop.or.jp/about/principle/",
+          "http_status": 200,
+          "result": "reachable"
+        },
+        {
+          "id": "green-coop-community",
+          "url": "https://www.greencoop.or.jp/cooperative/",
+          "http_status": 200,
+          "result": "reachable"
+        },
+        {
+          "id": "green-coop-2026-participation",
+          "url": "https://www.greencoop.or.jp/2026/07/07/news296/",
+          "http_status": 200,
+          "result": "reachable"
+        },
+        {
+          "id": "green-coop-join",
+          "url": "https://www.greencoop.or.jp/web-entry/join/join-terms-check.php",
+          "http_status": 200,
+          "result": "reachable"
+        }
+      ],
+      "non_reachable_actions": [],
+      "issues": []
+    },
+    {
+      "id": "guifi-net",
+      "state_at_check": "stale",
+      "next_review_at": "2026-10-16",
+      "source_results": [
+        {
+          "id": "guifi-commons",
+          "url": "https://fundacio.guifi.net/page/red",
+          "http_status": 200,
+          "result": "reachable"
+        },
+        {
+          "id": "guifi-network-guide",
+          "url": "https://network.guifi.net/en",
+          "http_status": 200,
+          "result": "reachable"
+        }
+      ],
+      "non_reachable_actions": [],
+      "issues": [
+        "review_due"
+      ]
+    },
+    {
+      "id": "hepburn-energy",
+      "state_at_check": "stale",
+      "next_review_at": "2026-10-19",
+      "source_results": [
+        {
+          "id": "source-hepburn-official",
+          "url": "https://www.hepburnenergy.coop/about/",
+          "http_status": 200,
+          "result": "reachable"
+        },
+        {
+          "id": "source-daylesford-wikidata",
+          "url": "https://www.wikidata.org/wiki/Q3019340",
+          "http_status": 200,
+          "result": "reachable"
+        },
+        {
+          "id": "source-hepburn-membership",
+          "url": "https://www.hepburnenergy.coop/membership/",
+          "http_status": 200,
+          "result": "reachable"
+        }
+      ],
+      "non_reachable_actions": [],
+      "issues": [
+        "review_due"
+      ]
+    },
+    {
+      "id": "isle-of-eigg-heritage-trust",
+      "state_at_check": "listed",
+      "next_review_at": "2027-02-04",
+      "source_results": [
+        {
+          "id": "eigg-heritage-trust",
+          "url": "https://isleofeigg.org/ieht/",
+          "http_status": 500,
+          "result": "http_error"
+        },
+        {
+          "id": "eigg-community-buyout",
+          "url": "https://isleofeigg.org/ieht/community-buyout/",
+          "http_status": 500,
+          "result": "http_error"
+        },
+        {
+          "id": "eigg-support",
+          "url": "https://isleofeigg.org/supporteigg/",
+          "http_status": 500,
+          "result": "http_error"
+        }
+      ],
+      "non_reachable_actions": [
+        {
+          "action": "homepage",
+          "url": "https://isleofeigg.org/ieht/",
+          "http_status": 500,
+          "result": "http_error"
+        },
+        {
+          "action": "learn",
+          "url": "https://isleofeigg.org/ieht/community-buyout/",
+          "http_status": 500,
+          "result": "http_error"
+        }
+      ],
+      "issues": [
+        "documented_source_http_error",
+        "action_link_http_error",
+        "no_reachable_documented_source"
+      ]
+    },
+    {
+      "id": "kawawana",
+      "state_at_check": "stale",
+      "next_review_at": "2026-10-05",
+      "source_results": [
+        {
+          "id": "kawawana-icca-registry",
+          "url": "https://www.iccaregistry.org/en/explore/Senegal/kawawana",
+          "http_status": 200,
+          "result": "reachable"
+        }
+      ],
+      "non_reachable_actions": [],
+      "issues": [
+        "review_due"
+      ]
+    },
+    {
+      "id": "kibera-public-space-project",
+      "state_at_check": "stale",
+      "next_review_at": "2026-10-19",
+      "source_results": [
+        {
+          "id": "kibera-kdi-official",
+          "url": "https://www.kounkuey.org/projects/kibera_public_space_project_network",
+          "http_status": 200,
+          "result": "reachable"
+        },
+        {
+          "id": "nairobi-wikidata",
+          "url": "https://www.wikidata.org/wiki/Q3870",
+          "http_status": 200,
+          "result": "reachable"
+        }
+      ],
+      "non_reachable_actions": [],
+      "issues": [
+        "review_due"
+      ]
+    },
+    {
+      "id": "kobulu-community-micro-hydro",
+      "state_at_check": "stale",
+      "next_review_at": "2026-10-02",
+      "source_results": [
+        {
+          "id": "source-kobulu-tonibung",
+          "url": "https://tonibung.org/projects",
+          "http_status": 200,
+          "result": "reachable"
+        },
+        {
+          "id": "source-penampang-geonames",
+          "url": "https://www.geonames.org/advanced-search.html?country=MY&q=Penampang",
+          "http_status": 200,
+          "result": "reachable"
+        },
+        {
+          "id": "source-kobulu-green-empowerment-2026",
+          "url": "https://greenempowerment.org/malaysia2026/",
+          "http_status": 200,
+          "result": "reachable"
+        },
+        {
+          "id": "source-kobulu-sabah-re2",
+          "url": "https://www.sabahre2roadmap.org/energy-roadmap",
+          "http_status": 200,
+          "result": "reachable"
+        }
+      ],
+      "non_reachable_actions": [],
+      "issues": [
+        "review_due"
+      ]
+    },
+    {
+      "id": "kyrgyzstan-water-users-associations-union",
+      "state_at_check": "listed",
+      "next_review_at": "2026-11-14",
+      "source_results": [
+        {
+          "id": "nuwua-ilc",
+          "url": "https://www.landcoalition.org/en/our-network/the-union-of-the-water-users-associations-of-the-kyrgyz-republic/",
+          "http_status": 200,
+          "result": "reachable"
+        },
+        {
+          "id": "kyrgyz-water-wua",
+          "url": "https://www.water.gov.kg/index.php?Itemid=1466&catid=132&id=399%3Aon-water-users-associations&lang=en&option=com_content&view=article",
+          "http_status": 200,
+          "result": "reachable"
+        },
+        {
+          "id": "kyrgyz-water-wua-app",
+          "url": "https://www.water.gov.kg/index.php?Itemid=1466&catid=99&id=436%3Adatabase-applications&lang=en&option=com_content&view=article",
+          "http_status": 200,
+          "result": "reachable"
+        }
+      ],
+      "non_reachable_actions": [],
+      "issues": []
+    },
+    {
+      "id": "lasilo-naples",
+      "state_at_check": "stale",
+      "next_review_at": "2026-09-15",
+      "source_results": [
+        {
+          "id": "lasilo-home",
+          "url": "https://www.exasilofilangieri.it/",
+          "http_status": 200,
+          "result": "reachable"
+        },
+        {
+          "id": "lasilo-organism",
+          "url": "https://www.exasilofilangieri.it/organismo-asilo/",
+          "http_status": 200,
+          "result": "reachable"
+        },
+        {
+          "id": "lasilo-civic-use",
+          "url": "https://www.exasilofilangieri.it/dichiarazione-duso-civico/",
+          "http_status": 200,
+          "result": "reachable"
+        },
+        {
+          "id": "lasilo-faq",
+          "url": "https://www.exasilofilangieri.it/faq/",
+          "http_status": 200,
+          "result": "reachable"
+        },
+        {
+          "id": "lasilo-contact",
+          "url": "https://www.exasilofilangieri.it/contatti/",
+          "http_status": 200,
+          "result": "reachable"
+        }
+      ],
+      "non_reachable_actions": [],
+      "issues": [
+        "review_due"
+      ]
+    },
+    {
+      "id": "lebanon-hima-network",
+      "state_at_check": "listed",
+      "next_review_at": "2026-11-14",
+      "source_results": [
+        {
+          "id": "spnl-hima-44-2026",
+          "url": "https://www.spnl.org/hima-a-sanctuary-for-birds-biodiversity-and-people/",
+          "http_status": 200,
+          "result": "reachable"
+        },
+        {
+          "id": "spnl-baaloul-2026",
+          "url": "https://www.spnl.org/lebanon-welcomes-its-44th-hima-baaloul-takes-a-stand-for-water-nature-and-future-generations/",
+          "http_status": 200,
+          "result": "reachable"
+        },
+        {
+          "id": "spnl-homat-2026",
+          "url": "https://www.spnl.org/homat-al-hima-the-heart-of-himas/",
+          "http_status": 200,
+          "result": "reachable"
+        }
+      ],
+      "non_reachable_actions": [],
+      "issues": []
+    },
+    {
+      "id": "libreoffice",
+      "state_at_check": "stale",
+      "next_review_at": "2026-10-12",
+      "source_results": [
+        {
+          "id": "libreoffice-home",
+          "url": "https://www.libreoffice.org/",
+          "http_status": 200,
+          "result": "reachable"
+        }
+      ],
+      "non_reachable_actions": [],
+      "issues": [
+        "review_due"
+      ]
+    },
+    {
+      "id": "librivox",
+      "state_at_check": "stale",
+      "next_review_at": "2026-10-22",
+      "source_results": [
+        {
+          "id": "librivox-about",
+          "url": "https://librivox.org/pages/about-librivox/",
+          "http_status": 200,
+          "result": "reachable"
+        },
+        {
+          "id": "librivox-volunteer",
+          "url": "https://librivox.org/pages/volunteer-for-librivox/",
+          "http_status": 200,
+          "result": "reachable"
+        }
+      ],
+      "non_reachable_actions": [],
+      "issues": [
+        "review_due"
+      ]
+    },
+    {
+      "id": "masipag",
+      "state_at_check": "stale",
+      "next_review_at": "2026-10-22",
+      "source_results": [
+        {
+          "id": "masipag-home",
+          "url": "https://masipag.org/",
+          "http_status": 200,
+          "result": "reachable"
+        },
+        {
+          "id": "masipag-about",
+          "url": "https://masipag.org/about-masipag/",
+          "http_status": 200,
+          "result": "reachable"
+        },
+        {
+          "id": "los-banos-registry",
+          "url": "https://www.wikidata.org/wiki/Q69793",
+          "http_status": 200,
+          "result": "reachable"
+        }
+      ],
+      "non_reachable_actions": [],
+      "issues": [
+        "review_due"
+      ]
+    },
+    {
+      "id": "mastodon",
+      "state_at_check": "stale",
+      "next_review_at": "2026-10-12",
+      "source_results": [
+        {
+          "id": "mastodon-home",
+          "url": "https://joinmastodon.org/",
+          "http_status": 200,
+          "result": "reachable"
+        }
+      ],
+      "non_reachable_actions": [],
+      "issues": [
+        "review_due"
+      ]
+    },
+    {
+      "id": "meshtastic",
+      "state_at_check": "listed",
+      "next_review_at": "2026-10-31",
+      "source_results": [
+        {
+          "id": "meshtastic-home",
+          "url": "https://meshtastic.org/",
+          "http_status": 200,
+          "result": "reachable"
+        },
+        {
+          "id": "meshtastic-introduction",
+          "url": "https://meshtastic.org/docs/introduction/",
+          "http_status": 200,
+          "result": "reachable"
+        },
+        {
+          "id": "meshtastic-getting-started",
+          "url": "https://meshtastic.org/docs/getting-started/",
+          "http_status": 200,
+          "result": "reachable"
+        },
+        {
+          "id": "meshtastic-firmware",
+          "url": "https://github.com/meshtastic/firmware",
+          "http_status": 200,
+          "result": "reachable"
+        },
+        {
+          "id": "meshtastic-legal",
+          "url": "https://meshtastic.org/docs/legal/",
+          "http_status": 200,
+          "result": "reachable"
+        }
+      ],
+      "non_reachable_actions": [],
+      "issues": []
+    },
+    {
+      "id": "mietshaeuser-syndikat",
+      "state_at_check": "stale",
+      "next_review_at": "2026-10-26",
+      "source_results": [
+        {
+          "id": "syndikat-network",
+          "url": "https://www.syndikat.org/der-projektverbund/",
+          "http_status": 200,
+          "result": "reachable"
+        },
+        {
+          "id": "syndikat-operation",
+          "url": "https://www.syndikat.org/en/the-syndikat-in-operation/",
+          "http_status": 200,
+          "result": "reachable"
+        },
+        {
+          "id": "syndikat-solidarity",
+          "url": "https://www.syndikat.org/solidartransfer/",
+          "http_status": 200,
+          "result": "reachable"
+        }
+      ],
+      "non_reachable_actions": [],
+      "issues": [
+        "review_due"
+      ]
+    },
+    {
+      "id": "mikoko-pamoja",
+      "state_at_check": "listed",
+      "next_review_at": "2026-11-04",
+      "source_results": [
+        {
+          "id": "mikoko-pamoja-home",
+          "url": "https://mikokopamoja.org/",
+          "http_status": 200,
+          "result": "reachable"
+        },
+        {
+          "id": "mikoko-pamoja-about",
+          "url": "https://mikokopamoja.org/about-us/",
+          "http_status": 200,
+          "result": "reachable"
+        },
+        {
+          "id": "mikoko-pamoja-plan-vivo",
+          "url": "https://www.planvivo.org/projects/mikoko-pamoja-kenya",
+          "http_status": 200,
+          "result": "reachable"
+        },
+        {
+          "id": "mikoko-pamoja-registry",
+          "url": "https://mer.markit.com/br-reg/public/project.jsp?project_id=103000000008881",
+          "http_status": 200,
+          "result": "reachable"
+        }
+      ],
+      "non_reachable_actions": [],
+      "issues": []
+    },
+    {
+      "id": "mundraub",
+      "state_at_check": "listed",
+      "next_review_at": "2026-11-05",
+      "source_results": [
+        {
+          "id": "mundraub-home",
+          "url": "https://mundraub.org/",
+          "http_status": 200,
+          "result": "reachable"
+        },
+        {
+          "id": "mundraub-map",
+          "url": "https://mundraub.org/map",
+          "http_status": 200,
+          "result": "reachable"
+        },
+        {
+          "id": "mundraub-rules",
+          "url": "https://mundraub.org/mundraeuber-regeln",
+          "http_status": 200,
+          "result": "reachable"
+        },
+        {
+          "id": "mundraub-impressum",
+          "url": "https://mundraub.org/impressum",
+          "http_status": 200,
+          "result": "reachable"
+        },
+        {
+          "id": "mundraub-care",
+          "url": "https://mundraub.org/aktivitaeten/pflanzen-und-pflegen",
+          "http_status": 200,
+          "result": "reachable"
+        }
+      ],
+      "non_reachable_actions": [],
+      "issues": []
+    },
+    {
+      "id": "musicbrainz",
+      "state_at_check": "stale",
+      "next_review_at": "2026-10-22",
+      "source_results": [
+        {
+          "id": "musicbrainz-home",
+          "url": "https://musicbrainz.org/",
+          "http_status": 200,
+          "result": "reachable"
+        },
+        {
+          "id": "musicbrainz-about",
+          "url": "https://musicbrainz.org/doc/About",
+          "http_status": 200,
+          "result": "reachable"
+        },
+        {
+          "id": "musicbrainz-editor-stats",
+          "url": "https://musicbrainz.org/statistics/editors",
+          "http_status": 200,
+          "result": "reachable"
+        }
+      ],
+      "non_reachable_actions": [],
+      "issues": [
+        "review_due"
+      ]
+    },
+    {
+      "id": "namena-marine-reserve",
+      "state_at_check": "stale",
+      "next_review_at": "2026-10-24",
+      "source_results": [
+        {
+          "id": "source-namena-wcs",
+          "url": "https://fiji.wcs.org/Initiatives/Protected-Areas/Namena-Marine-Reserve.aspx",
+          "http_status": 200,
+          "result": "reachable"
+        },
+        {
+          "id": "source-kubulau-enforcement-2025",
+          "url": "https://fiji.wcs.org/Blog/articleType/ArticleView/articleId/25677/WCS-Fiji-Hands-Over-New-Community-Enforcement-Vessel-to-Kubulau-and-Dama-Districts.aspx",
+          "http_status": 200,
+          "result": "reachable"
+        },
+        {
+          "id": "source-kubulau-geonames",
+          "url": "https://www.geonames.org/advanced-search.html?country=FJ&featureClass=H&q=Kubulau",
+          "http_status": 200,
+          "result": "reachable"
+        }
+      ],
+      "non_reachable_actions": [],
+      "issues": [
+        "review_due"
+      ]
+    },
+    {
+      "id": "namibia-communal-conservancies-alliance",
+      "state_at_check": "stale",
+      "next_review_at": "2026-10-25",
+      "source_results": [
+        {
+          "id": "source-namibia-nacso-alliance",
+          "url": "https://nacso.org.na/",
+          "http_status": 200,
+          "result": "reachable"
+        },
+        {
+          "id": "source-namibia-nacso-conservancies",
+          "url": "https://nacso.org.na/communal-conservancies/",
+          "http_status": 200,
+          "result": "reachable"
+        },
+        {
+          "id": "source-namibia-geonames",
+          "url": "https://www.geonames.org/3355338/namibia.html",
+          "http_status": 200,
+          "result": "reachable"
+        }
+      ],
+      "non_reachable_actions": [],
+      "issues": [
+        "review_due"
+      ]
+    },
+    {
+      "id": "nepal-wireless-networking-project",
+      "state_at_check": "stale",
+      "next_review_at": "2026-10-16",
+      "source_results": [
+        {
+          "id": "enrd-home",
+          "url": "https://enrd.org.np/",
+          "http_status": 200,
+          "result": "reachable"
+        },
+        {
+          "id": "enrd-nepal-wireless",
+          "url": "https://enrd.org.np/projects-2/project-3/",
+          "http_status": 200,
+          "result": "reachable"
+        },
+        {
+          "id": "enrd-community-training",
+          "url": "https://enrd.org.np/projects-2/empowering-mountain-community-to-maintain-and-build-wireless-network/",
+          "http_status": 200,
+          "result": "reachable"
+        }
+      ],
+      "non_reachable_actions": [],
+      "issues": [
+        "review_due"
+      ]
+    },
+    {
+      "id": "new-mexico-acequia-association",
+      "state_at_check": "stale",
+      "next_review_at": "2026-10-16",
+      "source_results": [
+        {
+          "id": "nmaa-home",
+          "url": "https://lasacequias.org/",
+          "http_status": 200,
+          "result": "reachable"
+        },
+        {
+          "id": "nmaa-about",
+          "url": "https://lasacequias.org/about-us/",
+          "http_status": 200,
+          "result": "reachable"
+        },
+        {
+          "id": "nmaa-membership",
+          "url": "https://lasacequias.org/become-a-member/",
+          "http_status": 200,
+          "result": "reachable"
+        }
+      ],
+      "non_reachable_actions": [],
+      "issues": [
+        "review_due"
+      ]
+    },
+    {
+      "id": "north-east-syria-autonomous-administration",
+      "state_at_check": "stale",
+      "next_review_at": "2026-10-02",
+      "source_results": [
+        {
+          "id": "daanes-about",
+          "url": "https://daanes.org/en/about/",
+          "http_status": 200,
+          "result": "reachable"
+        },
+        {
+          "id": "daanes-laws-2025",
+          "url": "https://daanes.org/en/several-laws-were-issued-by-the-democratic-peoples-council-during-the-first-half-of-2025/",
+          "http_status": 200,
+          "result": "reachable"
+        },
+        {
+          "id": "daanes-statement-2026",
+          "url": "https://daanes.org/en/statement-to-the-public-opinion-6/",
+          "http_status": 200,
+          "result": "reachable"
+        }
+      ],
+      "non_reachable_actions": [],
+      "issues": [
+        "review_due"
+      ]
+    },
+    {
+      "id": "nyc-mesh",
+      "state_at_check": "stale",
+      "next_review_at": "2026-10-16",
+      "source_results": [
+        {
+          "id": "nycmesh-home",
+          "url": "https://www.nycmesh.net/",
+          "http_status": 200,
+          "result": "reachable"
+        },
+        {
+          "id": "nycmesh-overview",
+          "url": "https://wiki.nycmesh.net/books/1-introduction/page/nyc-mesh-overview",
+          "http_status": 200,
+          "result": "reachable"
+        }
+      ],
+      "non_reachable_actions": [
+        {
+          "action": "use",
+          "url": "https://www.nycmesh.net/join",
+          "http_status": 307,
+          "result": "network_or_unknown"
+        }
+      ],
+      "issues": [
+        "review_due"
+      ]
+    },
+    {
+      "id": "open-food-facts",
+      "state_at_check": "listed",
+      "next_review_at": "2026-11-04",
+      "source_results": [
+        {
+          "id": "open-food-facts-overview",
+          "url": "https://openfoodfacts.github.io/",
+          "http_status": 200,
+          "result": "reachable"
+        },
+        {
+          "id": "open-food-facts-documentation",
+          "url": "https://openfoodfacts.github.io/documentation/docs/",
+          "http_status": 200,
+          "result": "reachable"
+        },
+        {
+          "id": "open-food-facts-economic-model",
+          "url": "https://support.openfoodfacts.org/help/en-gb/9-open-food-facts/26-what-is-open-food-facts-economic-model",
+          "http_status": null,
+          "result": "network_or_unknown"
+        },
+        {
+          "id": "open-food-facts-license",
+          "url": "https://support.openfoodfacts.org/help/en-gb/12-api-data-reuse/94-are-there-conditions-to-use-the-api",
+          "http_status": null,
+          "result": "network_or_unknown"
+        },
+        {
+          "id": "open-food-facts-quality",
+          "url": "https://support.openfoodfacts.org/help/en-gb/21-manage-my-products/2-how-can-we-be-sure-that-the-products-presented-on-open-food-facts-present-original-and-correct-data",
+          "http_status": null,
+          "result": "network_or_unknown"
+        }
+      ],
+      "non_reachable_actions": [
+        {
+          "action": "license",
+          "url": "https://support.openfoodfacts.org/help/en-gb/12-api-data-reuse/94-are-there-conditions-to-use-the-api",
+          "http_status": null,
+          "result": "network_or_unknown"
+        }
+      ],
+      "issues": []
+    },
+    {
+      "id": "open-food-network-australia",
+      "state_at_check": "listed",
+      "next_review_at": "2026-11-24",
+      "source_results": [
+        {
+          "id": "ofn-au-home",
+          "url": "https://openfoodnetwork.org.au/",
+          "http_status": 200,
+          "result": "reachable"
+        },
+        {
+          "id": "ofn-au-platform",
+          "url": "https://openfoodnetwork.org.au/",
+          "http_status": 200,
+          "result": "reachable"
+        },
+        {
+          "id": "ofn-au-about",
+          "url": "https://about.openfoodnetwork.org.au/about-us/",
+          "http_status": 200,
+          "result": "reachable"
+        },
+        {
+          "id": "ofn-au-software-platform",
+          "url": "https://about.openfoodnetwork.org.au/software-platform/",
+          "http_status": 200,
+          "result": "reachable"
+        },
+        {
+          "id": "ofn-au-community-pledge-v2",
+          "url": "https://community.openfoodnetwork.org/t/community-pledge-v2-january-2020/1847",
+          "http_status": 200,
+          "result": "reachable"
+        },
+        {
+          "id": "ofn-au-join",
+          "url": "https://about.openfoodnetwork.org.au/join-us/",
+          "http_status": 200,
+          "result": "reachable"
+        }
+      ],
+      "non_reachable_actions": [],
+      "issues": []
+    },
+    {
+      "id": "open-library",
+      "state_at_check": "listed",
+      "next_review_at": "2026-10-28",
+      "source_results": [
+        {
+          "id": "open-library-home",
+          "url": "https://openlibrary.org/",
+          "http_status": 200,
+          "result": "reachable"
+        },
+        {
+          "id": "open-library-about",
+          "url": "https://openlibrary.org/about",
+          "http_status": 200,
+          "result": "reachable"
+        },
+        {
+          "id": "open-library-faq",
+          "url": "https://openlibrary.org/about/faq",
+          "http_status": 200,
+          "result": "reachable"
+        },
+        {
+          "id": "open-library-volunteer",
+          "url": "https://openlibrary.org/volunteer",
+          "http_status": 200,
+          "result": "reachable"
+        }
+      ],
+      "non_reachable_actions": [],
+      "issues": [
+        "overdue_state_not_stale",
+        "review_due"
+      ]
+    },
+    {
+      "id": "open-source-ecology",
+      "state_at_check": "stale",
+      "next_review_at": "2026-10-16",
+      "source_results": [
+        {
+          "id": "ose-home",
+          "url": "https://www.opensourceecology.org/",
+          "http_status": 200,
+          "result": "reachable"
+        },
+        {
+          "id": "ose-factor-e-farm",
+          "url": "https://www.opensourceecology.org/about-factor-e-farm/",
+          "http_status": 200,
+          "result": "reachable"
+        }
+      ],
+      "non_reachable_actions": [],
+      "issues": [
+        "review_due"
+      ]
+    },
+    {
+      "id": "open-source-seed-initiative",
+      "state_at_check": "listed",
+      "next_review_at": "2026-10-28",
+      "source_results": [
+        {
+          "id": "ossi-home",
+          "url": "https://osseeds.org/",
+          "http_status": 200,
+          "result": "reachable"
+        },
+        {
+          "id": "ossi-about",
+          "url": "https://osseeds.org/about/",
+          "http_status": 200,
+          "result": "reachable"
+        },
+        {
+          "id": "ossi-varieties",
+          "url": "https://osseeds.org/ossi-varieties/",
+          "http_status": 200,
+          "result": "reachable"
+        },
+        {
+          "id": "ossi-involved",
+          "url": "https://osseeds.org/actions-2/",
+          "http_status": 200,
+          "result": "reachable"
+        },
+        {
+          "id": "ossi-community",
+          "url": "https://osseeds.org/ossi-community/",
+          "http_status": 200,
+          "result": "reachable"
+        },
+        {
+          "id": "ossi-donate",
+          "url": "https://osseeds.org/donate/",
+          "http_status": 200,
+          "result": "reachable"
+        }
+      ],
+      "non_reachable_actions": [],
+      "issues": [
+        "overdue_state_not_stale",
+        "review_due"
+      ]
+    },
+    {
+      "id": "openmrs",
+      "state_at_check": "stale",
+      "next_review_at": "2026-10-16",
+      "source_results": [
+        {
+          "id": "openmrs-home",
+          "url": "https://openmrs.org/",
+          "http_status": 200,
+          "result": "reachable"
+        },
+        {
+          "id": "openmrs-download",
+          "url": "https://openmrs.org/download/",
+          "http_status": 200,
+          "result": "reachable"
+        },
+        {
+          "id": "openmrs-about",
+          "url": "https://openmrs.org/about/",
+          "http_status": 200,
+          "result": "reachable"
+        },
+        {
+          "id": "openmrs-involved",
+          "url": "https://openmrs.org/get-involved/",
+          "http_status": 200,
+          "result": "reachable"
+        }
+      ],
+      "non_reachable_actions": [],
+      "issues": [
+        "review_due"
+      ]
+    },
+    {
+      "id": "openstreetmap",
+      "state_at_check": "stale",
+      "next_review_at": "2026-10-12",
+      "source_results": [
+        {
+          "id": "openstreetmap-about",
+          "url": "https://www.openstreetmap.org/about",
+          "http_status": 200,
+          "result": "reachable"
+        }
+      ],
+      "non_reachable_actions": [],
+      "issues": [
+        "review_due"
+      ]
+    },
+    {
+      "id": "orangi-low-cost-sanitation",
+      "state_at_check": "stale",
+      "next_review_at": "2026-09-15",
+      "source_results": [
+        {
+          "id": "opp-home",
+          "url": "https://www.opp.org.pk/",
+          "http_status": 200,
+          "result": "reachable"
+        },
+        {
+          "id": "opp-what-we-do",
+          "url": "https://www.opp.org.pk/what-we-do/",
+          "http_status": null,
+          "result": "network_or_unknown"
+        },
+        {
+          "id": "opp-rti",
+          "url": "https://www.opp.org.pk/opp-rti/",
+          "http_status": 500,
+          "result": "http_error"
+        },
+        {
+          "id": "opp-programs",
+          "url": "https://www.opp.org.pk/our-programs/",
+          "http_status": null,
+          "result": "network_or_unknown"
+        },
+        {
+          "id": "opp-contact",
+          "url": "https://www.opp.org.pk/contact/",
+          "http_status": null,
+          "result": "network_or_unknown"
+        }
+      ],
+      "non_reachable_actions": [
+        {
+          "action": "learn",
+          "url": "https://www.opp.org.pk/opp-rti/",
+          "http_status": 500,
+          "result": "http_error"
+        },
+        {
+          "action": "contact",
+          "url": "https://www.opp.org.pk/contact/",
+          "http_status": null,
+          "result": "network_or_unknown"
+        }
+      ],
+      "issues": [
+        "documented_source_http_error",
+        "action_link_http_error",
+        "review_due"
+      ]
+    },
+    {
+      "id": "p2pu",
+      "state_at_check": "stale",
+      "next_review_at": "2026-10-22",
+      "source_results": [
+        {
+          "id": "p2pu-about",
+          "url": "https://www.p2pu.org/en/about/",
+          "http_status": 200,
+          "result": "reachable"
+        },
+        {
+          "id": "p2pu-home",
+          "url": "https://www.p2pu.org/",
+          "http_status": 200,
+          "result": "reachable"
+        },
+        {
+          "id": "p2pu-community",
+          "url": "https://community.p2pu.org/",
+          "http_status": 200,
+          "result": "reachable"
+        }
+      ],
+      "non_reachable_actions": [],
+      "issues": [
+        "review_due"
+      ]
+    },
+    {
+      "id": "pachgaon-community-forest",
+      "state_at_check": "stale",
+      "next_review_at": "2026-10-05",
+      "source_results": [
+        {
+          "id": "pachgaon-atree-cfr",
+          "url": "https://cfr.atree.org/portfolio/learning-from-and-carrying-forward-cfr-management-planning-in-central-india-2/",
+          "http_status": 200,
+          "result": "reachable"
+        },
+        {
+          "id": "maharashtra-fra",
+          "url": "https://trti.maharashtra.gov.in/page/about-fra",
+          "http_status": null,
+          "result": "network_or_unknown"
+        }
+      ],
+      "non_reachable_actions": [],
+      "issues": [
+        "review_due"
+      ]
+    },
+    {
+      "id": "park-slope-food-coop",
+      "state_at_check": "listed",
+      "next_review_at": "2026-11-04",
+      "source_results": [
+        {
+          "id": "park-slope-home",
+          "url": "https://www.foodcoop.com/",
+          "http_status": 200,
+          "result": "reachable"
+        },
+        {
+          "id": "park-slope-membership",
+          "url": "https://www.foodcoop.com/ort-about/",
+          "http_status": 404,
+          "result": "http_error"
+        },
+        {
+          "id": "park-slope-manual",
+          "url": "https://www.foodcoop.com/manual/",
+          "http_status": 200,
+          "result": "reachable"
+        },
+        {
+          "id": "park-slope-bylaws",
+          "url": "https://www.foodcoop.com/by-laws/",
+          "http_status": 200,
+          "result": "reachable"
+        },
+        {
+          "id": "park-slope-agreements",
+          "url": "https://www.foodcoop.com/ort-agreements/",
+          "http_status": 404,
+          "result": "http_error"
+        }
+      ],
+      "non_reachable_actions": [
+        {
+          "action": "visit",
+          "url": "https://www.foodcoop.com/ort-agreements/",
+          "http_status": 404,
+          "result": "http_error"
+        },
+        {
+          "action": "use",
+          "url": "https://www.foodcoop.com/ort-about/",
+          "http_status": 404,
+          "result": "http_error"
+        },
+        {
+          "action": "contribute",
+          "url": "https://www.foodcoop.com/ort-about/",
+          "http_status": 404,
+          "result": "http_error"
+        }
+      ],
+      "issues": [
+        "documented_source_http_error",
+        "action_link_http_error"
+      ]
+    },
+    {
+      "id": "potato-park-peru",
+      "state_at_check": "stale",
+      "next_review_at": "2026-10-19",
+      "source_results": [
+        {
+          "id": "potato-park-home",
+          "url": "https://parquedelapapa.org/",
+          "http_status": 200,
+          "result": "reachable"
+        },
+        {
+          "id": "pisac-wikidata",
+          "url": "https://www.wikidata.org/wiki/Q950398",
+          "http_status": 200,
+          "result": "reachable"
+        }
+      ],
+      "non_reachable_actions": [],
+      "issues": [
+        "review_due"
+      ]
+    },
+    {
+      "id": "prinzessinnengarten-kollektiv",
+      "state_at_check": "stale",
+      "next_review_at": "2026-10-16",
+      "source_results": [
+        {
+          "id": "prinzessinnengarten-about",
+          "url": "https://prinzessinnengarten-kollektiv.net/ueber-uns/",
+          "http_status": 200,
+          "result": "reachable"
+        },
+        {
+          "id": "prinzessinnengarten-contact",
+          "url": "https://prinzessinnengarten-kollektiv.net/kontakt/",
+          "http_status": 200,
+          "result": "reachable"
+        }
+      ],
+      "non_reachable_actions": [],
+      "issues": [
+        "review_due"
+      ]
+    },
+    {
+      "id": "red-guardianes-semillas-ecuador",
+      "state_at_check": "stale",
+      "next_review_at": "2026-10-22",
+      "source_results": [
+        {
+          "id": "redsemillas-home",
+          "url": "https://redsemillas.org/",
+          "http_status": 200,
+          "result": "reachable"
+        }
+      ],
+      "non_reachable_actions": [],
+      "issues": [
+        "review_due"
+      ]
+    },
+    {
+      "id": "repair-cafe-international",
+      "state_at_check": "listed",
+      "next_review_at": "2026-10-28",
+      "source_results": [
+        {
+          "id": "repair-cafe-home",
+          "url": "https://www.repaircafe.org/en/",
+          "http_status": 200,
+          "result": "reachable"
+        },
+        {
+          "id": "repair-cafe-about",
+          "url": "https://www.repaircafe.org/en/about/",
+          "http_status": 200,
+          "result": "reachable"
+        },
+        {
+          "id": "repair-cafe-visit",
+          "url": "https://www.repaircafe.org/en/visit/",
+          "http_status": 200,
+          "result": "reachable"
+        },
+        {
+          "id": "repair-cafe-start",
+          "url": "https://www.repaircafe.org/en/join/start-your-own/",
+          "http_status": 200,
+          "result": "reachable"
+        },
+        {
+          "id": "repair-cafe-donate",
+          "url": "https://www.repaircafe.org/en/donate/",
+          "http_status": 200,
+          "result": "reachable"
+        },
+        {
+          "id": "repair-cafe-contact",
+          "url": "https://www.repaircafe.org/en/contact/",
+          "http_status": 200,
+          "result": "reachable"
+        }
+      ],
+      "non_reachable_actions": [],
+      "issues": [
+        "overdue_state_not_stale",
+        "review_due"
+      ]
+    },
+    {
+      "id": "reprap",
+      "state_at_check": "stale",
+      "next_review_at": "2026-10-26",
+      "source_results": [
+        {
+          "id": "reprap-home",
+          "url": "https://reprap.org/",
+          "http_status": 200,
+          "result": "reachable"
+        },
+        {
+          "id": "reprap-about",
+          "url": "https://reprap.org/wiki/About",
+          "http_status": 200,
+          "result": "reachable"
+        },
+        {
+          "id": "reprap-machines",
+          "url": "https://reprap.org/wiki/RepRap_Machines",
+          "http_status": 200,
+          "result": "reachable"
+        }
+      ],
+      "non_reachable_actions": [],
+      "issues": [
+        "review_due"
+      ]
+    },
+    {
+      "id": "restarters",
+      "state_at_check": "stale",
+      "next_review_at": "2026-10-22",
+      "source_results": [
+        {
+          "id": "restarters-about",
+          "url": "https://restarters.net/about",
+          "http_status": 200,
+          "result": "reachable"
+        },
+        {
+          "id": "restarters-community",
+          "url": "https://talk.restarters.net/",
+          "http_status": 200,
+          "result": "reachable"
+        }
+      ],
+      "non_reachable_actions": [],
+      "issues": [
+        "review_due"
+      ]
+    },
+    {
+      "id": "root-access-hackerspace",
+      "state_at_check": "stale",
+      "next_review_at": "2026-10-22",
+      "source_results": [
+        {
+          "id": "rootaccess-home",
+          "url": "https://rootaccess.org/",
+          "http_status": 200,
+          "result": "reachable"
+        },
+        {
+          "id": "fresno-registry",
+          "url": "https://www.wikidata.org/wiki/Q43301",
+          "http_status": 200,
+          "result": "reachable"
+        }
+      ],
+      "non_reachable_actions": [],
+      "issues": [
+        "review_due"
+      ]
+    },
+    {
+      "id": "safecast",
+      "state_at_check": "stale",
+      "next_review_at": "2026-10-22",
+      "source_results": [
+        {
+          "id": "safecast-about",
+          "url": "https://safecast.org/about/",
+          "http_status": 200,
+          "result": "reachable"
+        },
+        {
+          "id": "safecast-news",
+          "url": "https://safecast.org/news/",
+          "http_status": 200,
+          "result": "reachable"
+        }
+      ],
+      "non_reachable_actions": [],
+      "issues": [
+        "review_due"
+      ]
+    },
+    {
+      "id": "samoa-community-based-fisheries-management-program",
+      "state_at_check": "listed",
+      "next_review_at": "2026-11-12",
+      "source_results": [
+        {
+          "id": "samoa-cbfmp-maf",
+          "url": "https://maf.gov.ws/fisheries/",
+          "http_status": 200,
+          "result": "reachable"
+        },
+        {
+          "id": "samoa-cbfmp-sprep-2026",
+          "url": "https://pipap.sprep.org/news/samoa-15-villages-launch-fisheries-plans",
+          "http_status": 403,
+          "result": "restricted_or_bot"
+        }
+      ],
+      "non_reachable_actions": [],
+      "issues": []
+    },
+    {
+      "id": "sarantaporo-community-network",
+      "state_at_check": "stale",
+      "next_review_at": "2026-10-16",
+      "source_results": [
+        {
+          "id": "sarantaporo-about",
+          "url": "https://www.sarantaporo.gr/en/about-us",
+          "http_status": 200,
+          "result": "reachable"
+        },
+        {
+          "id": "sarantaporo-network",
+          "url": "https://www.sarantaporo.gr/en/community-network",
+          "http_status": 200,
+          "result": "reachable"
+        }
+      ],
+      "non_reachable_actions": [],
+      "issues": [
+        "review_due"
+      ]
+    },
+    {
+      "id": "sewa-sangini-childcare-cooperative",
+      "state_at_check": "listed",
+      "next_review_at": "2026-11-14",
+      "source_results": [
+        {
+          "id": "sangini-social-security-2026",
+          "url": "https://sewafederation.org/social-security-for-informal-women-workers-lessons-from-sewa/",
+          "http_status": 200,
+          "result": "reachable"
+        },
+        {
+          "id": "sangini-gadn-2026",
+          "url": "https://sewafederation.org/publication/report-gadn-achieving-gender-equality-and-womens-rights-through-public-services-and-social-protection/",
+          "http_status": 200,
+          "result": "reachable"
+        },
+        {
+          "id": "sangini-agm-2024",
+          "url": "https://sewafederation.org/annual-general-meetings-of-womens-cooperatives-from-the-informal-economy/",
+          "http_status": 200,
+          "result": "reachable"
+        },
+        {
+          "id": "sangini-childcare-2024",
+          "url": "https://sewafederation.org/from-sticky-floors-to-open-doors-childcare-access-as-a-key-to-decent-work/",
+          "http_status": 200,
+          "result": "reachable"
+        }
+      ],
+      "non_reachable_actions": [],
+      "issues": []
+    },
+    {
+      "id": "som-energia",
+      "state_at_check": "stale",
+      "next_review_at": "2026-10-16",
+      "source_results": [
+        {
+          "id": "som-energia-home",
+          "url": "https://www.somenergia.coop/es",
+          "http_status": 200,
+          "result": "reachable"
+        },
+        {
+          "id": "som-membership",
+          "url": "https://www.somenergia.coop/es/cooperativa/asociarse",
+          "http_status": 200,
+          "result": "reachable"
+        },
+        {
+          "id": "som-about",
+          "url": "https://www.somenergia.coop/es/cooperativa/sobre-nosotros",
+          "http_status": 200,
+          "result": "reachable"
+        },
+        {
+          "id": "som-local-groups",
+          "url": "https://www.somenergia.coop/es/cooperativa/grupos-locales/",
+          "http_status": 200,
+          "result": "reachable"
+        }
+      ],
+      "non_reachable_actions": [],
+      "issues": [
+        "review_due"
+      ]
+    },
+    {
+      "id": "tetepare-descendants-association",
+      "state_at_check": "stale",
+      "next_review_at": "2026-10-24",
+      "source_results": [
+        {
+          "id": "source-tetepare-tda",
+          "url": "https://tetepare.org/the-tetepare-descendants-association/",
+          "http_status": 200,
+          "result": "reachable"
+        },
+        {
+          "id": "source-tetepare-home",
+          "url": "https://tetepare.org/",
+          "http_status": 200,
+          "result": "reachable"
+        },
+        {
+          "id": "source-tetepare-geonames",
+          "url": "https://www.geonames.org/2102602/tetepare-island.html",
+          "http_status": 200,
+          "result": "reachable"
+        }
+      ],
+      "non_reachable_actions": [],
+      "issues": [
+        "review_due"
+      ]
+    },
+    {
+      "id": "thailand-citizens-forest-database",
+      "state_at_check": "stale",
+      "next_review_at": "2026-10-25",
+      "source_results": [
+        {
+          "id": "source-thaicfnet-factsheet",
+          "url": "https://www.recoftc.org/th/publications/thaicfnet-factsheet",
+          "http_status": 403,
+          "result": "restricted_or_bot"
+        },
+        {
+          "id": "source-thaicfnet-annual-report",
+          "url": "https://www.recoftc.org/annual-report-2021-2022/data-and-forests-putting-community-forestry-digital-map-thailand",
+          "http_status": 200,
+          "result": "reachable"
+        },
+        {
+          "id": "source-recoftc-thailand",
+          "url": "https://www.recoftc.org/thailand",
+          "http_status": 200,
+          "result": "reachable"
+        },
+        {
+          "id": "source-thailand-geonames",
+          "url": "https://www.geonames.org/1605651/thailand.html",
+          "http_status": 200,
+          "result": "reachable"
+        }
+      ],
+      "non_reachable_actions": [
+        {
+          "action": "homepage",
+          "url": "https://www.recoftc.org/th/publications/thaicfnet-factsheet",
+          "http_status": 403,
+          "result": "restricted_or_bot"
+        }
+      ],
+      "issues": [
+        "review_due"
+      ]
+    },
+    {
+      "id": "the-things-network",
+      "state_at_check": "listed",
+      "next_review_at": "2026-10-31",
+      "source_results": [
+        {
+          "id": "ttn-home",
+          "url": "https://www.thethingsnetwork.org/",
+          "http_status": 200,
+          "result": "reachable"
+        },
+        {
+          "id": "ttn-community",
+          "url": "https://www.thethingsnetwork.org/community",
+          "http_status": 200,
+          "result": "reachable"
+        },
+        {
+          "id": "ttn-learn",
+          "url": "https://www.thethingsnetwork.org/learn",
+          "http_status": 200,
+          "result": "reachable"
+        },
+        {
+          "id": "ttn-get-started",
+          "url": "https://www.thethingsnetwork.org/get-started",
+          "http_status": 200,
+          "result": "reachable"
+        }
+      ],
+      "non_reachable_actions": [],
+      "issues": []
+    },
+    {
+      "id": "tla-o-qui-aht-tribal-parks",
+      "state_at_check": "stale",
+      "next_review_at": "2026-10-25",
+      "source_results": [
+        {
+          "id": "source-tribal-parks-official",
+          "url": "https://www.tribalparks.com/",
+          "http_status": 200,
+          "result": "reachable"
+        },
+        {
+          "id": "source-tribal-parks-story",
+          "url": "https://www.tribalparks.com/our-story",
+          "http_status": 200,
+          "result": "reachable"
+        },
+        {
+          "id": "source-tla-o-qui-aht-natural-resources",
+          "url": "https://www.tla-o-qui-aht.org/natural-resources",
+          "http_status": 200,
+          "result": "reachable"
+        },
+        {
+          "id": "source-tofino-geonames",
+          "url": "https://www.geonames.org/6168882/tofino.html",
+          "http_status": 200,
+          "result": "reachable"
+        }
+      ],
+      "non_reachable_actions": [],
+      "issues": [
+        "review_due"
+      ]
+    },
+    {
+      "id": "tribunal-aguas-valencia",
+      "state_at_check": "stale",
+      "next_review_at": "2026-10-19",
+      "source_results": [
+        {
+          "id": "source-tribunal-official",
+          "url": "https://tribunaldelasaguas.org/en/",
+          "http_status": 200,
+          "result": "reachable"
+        },
+        {
+          "id": "source-tribunal-visits",
+          "url": "https://tribunaldelasaguas.org/en/visits-to-the-tribunal/",
+          "http_status": 200,
+          "result": "reachable"
+        },
+        {
+          "id": "source-valencia-wikidata",
+          "url": "https://www.wikidata.org/wiki/Q8818",
+          "http_status": 200,
+          "result": "reachable"
+        }
+      ],
+      "non_reachable_actions": [],
+      "issues": [
+        "review_due"
+      ]
+    },
+    {
+      "id": "ujamaa-community-resource-team",
+      "state_at_check": "listed",
+      "next_review_at": "2026-10-28",
+      "source_results": [
+        {
+          "id": "ujamaa-home",
+          "url": "https://www.ujamaa-crt.or.tz/",
+          "http_status": 200,
+          "result": "reachable"
+        },
+        {
+          "id": "ujamaa-work",
+          "url": "https://www.ujamaa-crt.or.tz/our-work.html",
+          "http_status": 200,
+          "result": "reachable"
+        },
+        {
+          "id": "ujamaa-programmes",
+          "url": "https://www.ujamaa-crt.or.tz/programmes.html",
+          "http_status": 200,
+          "result": "reachable"
+        },
+        {
+          "id": "ujamaa-donate",
+          "url": "https://www.ujamaa-crt.or.tz/donate.html",
+          "http_status": 200,
+          "result": "reachable"
+        }
+      ],
+      "non_reachable_actions": [],
+      "issues": [
+        "overdue_state_not_stale",
+        "review_due"
+      ]
+    },
+    {
+      "id": "velondriake-lmma",
+      "state_at_check": "stale",
+      "next_review_at": "2026-10-02",
+      "source_results": [
+        {
+          "id": "velondriake-blue-ventures",
+          "url": "https://blog.blueventures.org/en/locations/madagascar/velondriake-madagascar/",
+          "http_status": 200,
+          "result": "reachable"
+        },
+        {
+          "id": "andavadoaka-wikidata",
+          "url": "https://www.wikidata.org/wiki/Q4753631",
+          "http_status": 200,
+          "result": "reachable"
+        }
+      ],
+      "non_reachable_actions": [],
+      "issues": [
+        "review_due"
+      ]
+    },
+    {
+      "id": "wikibooks",
+      "state_at_check": "stale",
+      "next_review_at": "2026-10-12",
+      "source_results": [
+        {
+          "id": "wikimedia-projects",
+          "url": "https://www.wikimedia.org/",
+          "http_status": 200,
+          "result": "reachable"
+        }
+      ],
+      "non_reachable_actions": [],
+      "issues": [
+        "review_due"
+      ]
+    },
+    {
+      "id": "wikidata",
+      "state_at_check": "stale",
+      "next_review_at": "2026-10-12",
+      "source_results": [
+        {
+          "id": "wikimedia-projects",
+          "url": "https://www.wikimedia.org/",
+          "http_status": 200,
+          "result": "reachable"
+        }
+      ],
+      "non_reachable_actions": [],
+      "issues": [
+        "review_due"
+      ]
+    },
+    {
+      "id": "wikimedia-commons",
+      "state_at_check": "stale",
+      "next_review_at": "2026-10-12",
+      "source_results": [
+        {
+          "id": "wikimedia-projects",
+          "url": "https://www.wikimedia.org/",
+          "http_status": 200,
+          "result": "reachable"
+        }
+      ],
+      "non_reachable_actions": [],
+      "issues": [
+        "review_due"
+      ]
+    },
+    {
+      "id": "wikipedia",
+      "state_at_check": "stale",
+      "next_review_at": "2026-10-12",
+      "source_results": [
+        {
+          "id": "wikimedia-projects",
+          "url": "https://www.wikimedia.org/",
+          "http_status": 200,
+          "result": "reachable"
+        }
+      ],
+      "non_reachable_actions": [],
+      "issues": [
+        "review_due"
+      ]
+    },
+    {
+      "id": "wikiversity",
+      "state_at_check": "stale",
+      "next_review_at": "2026-10-12",
+      "source_results": [
+        {
+          "id": "wikimedia-projects",
+          "url": "https://www.wikimedia.org/",
+          "http_status": 200,
+          "result": "reachable"
+        }
+      ],
+      "non_reachable_actions": [],
+      "issues": [
+        "review_due"
+      ]
+    },
+    {
+      "id": "zapatista-autonomy",
+      "state_at_check": "stale",
+      "next_review_at": "2026-10-02",
+      "source_results": [
+        {
+          "id": "zapatista-reorganisation-2023",
+          "url": "https://enlacezapatista.ezln.org.mx/2023/11/13/neunter-teil-die-neue-struktur-der-zapatistischen-autonomie/",
+          "http_status": 200,
+          "result": "reachable"
+        },
+        {
+          "id": "zapatista-acgaz-2025",
+          "url": "https://enlacezapatista.ezln.org.mx/2025/10/05/denunciation-of-the-assembly-of-collectives-of-zapatista-autonomous-governments-a-c-g-a-z/",
+          "http_status": 200,
+          "result": "reachable"
+        },
+        {
+          "id": "zapatista-structure-2026",
+          "url": "https://enlacezapatista.ezln.org.mx/2026/03/22/der-verdammte-und-die-ameisen-liebe-und-lieblosigkeit-aus-sicht-eines-zapatistischen-kindes/",
+          "http_status": 200,
+          "result": "reachable"
+        }
+      ],
+      "non_reachable_actions": [],
+      "issues": [
+        "review_due"
+      ]
+    },
+    {
+      "id": "zenzeleni-community-networks",
+      "state_at_check": "stale",
+      "next_review_at": "2026-10-16",
+      "source_results": [
+        {
+          "id": "zenzeleni-home",
+          "url": "https://zenzeleni.net/",
+          "http_status": 200,
+          "result": "reachable"
+        },
+        {
+          "id": "zenzeleni-model",
+          "url": "https://zenzeleni.net/our-model/",
+          "http_status": 200,
+          "result": "reachable"
+        }
+      ],
+      "non_reachable_actions": [],
+      "issues": [
+        "review_due"
+      ]
+    }
+  ]
+}
