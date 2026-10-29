@@ -117,7 +117,7 @@
     {
       "type": "visit",
       "label": "Adresse und Öffnungszeiten prüfen",
-      "url": "https://www.foodcoop.com/ort-agreements/",
+      "url": "https://www.foodcoop.com/office/",
       "source_ids": [
         "park-slope-agreements"
       ]
@@ -125,7 +125,7 @@
     {
       "type": "use",
       "label": "Mitgliedschaft und Nutzung verstehen",
-      "url": "https://www.foodcoop.com/ort-about/",
+      "url": "https://www.foodcoop.com/manual/",
       "source_ids": [
         "park-slope-membership"
       ]
@@ -142,7 +142,7 @@
     {
       "type": "contribute",
       "label": "Mitglied werden und Schichten übernehmen",
-      "url": "https://www.foodcoop.com/ort-about/",
+      "url": "https://ort.foodcoop.com/home/",
       "source_ids": [
         "park-slope-membership",
         "park-slope-manual",

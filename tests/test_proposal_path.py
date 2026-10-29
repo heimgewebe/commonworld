@@ -23,7 +23,7 @@ class ProposalPathTests(unittest.TestCase):
     def copy_repo(self, tmp_dir: str) -> Path:
         """Return a full working-tree copy of the repo without .git/node_modules."""
         root = Path(tmp_dir) / "repo"
-        shutil.copytree(ROOT, root, ignore=shutil.ignore_patterns(".git", "node_modules"))
+        shutil.copytree(ROOT, root, ignore=shutil.ignore_patterns(".git", "node_modules", ".adler"))
         return root
 
     def setUp(self) -> None:
