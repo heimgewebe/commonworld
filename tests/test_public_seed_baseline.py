@@ -46,5 +46,50 @@ class PublicSeedBaselineTests(unittest.TestCase):
         self.assertEqual([], errors)
 
 
+    def test_later_official_sources_and_editorial_governance_review_are_allowed(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp_dir:
+            root = self.copy_catalog(tmp_dir)
+
+            def add_governance(record):
+                record["curation"]["reviewed_at"] = "2026-10-30"
+                record["curation"]["next_review_at"] = "2026-10-31"
+                record["provenance"]["sources"].append({
+                    "id": "debian-constitution",
+                    "type": "official-source",
+                    "label": "Debian Constitution",
+                    "url": "https://www.debian.org/devel/constitution",
+                    "retrieved_at": "2026-10-30",
+                    "note": "Later official governance evidence",
+                })
+
+            self.mutate(root, "debian", add_governance)
+            errors = validate_public_seed_baseline(root)
+        self.assertEqual([], errors)
+
+    def test_original_seed_source_observation_must_not_be_redated(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp_dir:
+            root = self.copy_catalog(tmp_dir)
+            self.mutate(
+                root, "debian",
+                lambda record: record["provenance"]["sources"][0].update({
+                    "retrieved_at": "2026-10-30",
+                }),
+            )
+            errors = validate_public_seed_baseline(root)
+        self.assertTrue(any("initial source retrieval date drifted" in error for error in errors))
+
+    def test_earlier_than_original_seed_review_is_rejected(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp_dir:
+            root = self.copy_catalog(tmp_dir)
+            self.mutate(
+                root, "debian",
+                lambda record: record["curation"].update({
+                    "reviewed_at": "2026-07-11",
+                }),
+            )
+            errors = validate_public_seed_baseline(root)
+        self.assertTrue(any("review predates seed baseline" in error for error in errors))
+
+
 if __name__ == "__main__":
     unittest.main()

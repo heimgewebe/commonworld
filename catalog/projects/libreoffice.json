@@ -41,6 +41,22 @@
         "url": "https://www.libreoffice.org/",
         "retrieved_at": "2026-07-12",
         "note": "Die offizielle Seite beschreibt LibreOffice als quelloffene Office-Suite, die von einer weltweiten Gemeinschaft entwickelt wird."
+      },
+      {
+        "id": "tdf-statutes",
+        "type": "official-source",
+        "label": "The Document Foundation – statutes",
+        "url": "https://www.documentfoundation.org/statutes/",
+        "retrieved_at": "2026-10-30",
+        "note": "Offizielle Stiftungssatzung zu freier Bürosoftware, gewähltem Board of Directors, Board of Trustees und Membership Committee."
+      },
+      {
+        "id": "tdf-membership",
+        "type": "official-source",
+        "label": "The Document Foundation – membership participation",
+        "url": "https://www.documentfoundation.org/why-be-a-member/",
+        "retrieved_at": "2026-10-30",
+        "note": "Offizielle Mitgliederinformation zu Beitragserfordernissen und Stimmrecht bei Vorstand und Membership Committee."
       }
     ]
   },
@@ -48,9 +64,9 @@
     "state": "stale",
     "catalogued_at": "2026-07-12",
     "reviewed_by": "Commonworld editorial review",
-    "reviewed_at": "2026-07-12",
-    "next_review_at": "2026-10-12",
-    "notes": "Erster öffentlicher Commonworld-Startdatensatz; Identität, Zweck, digitale Präsenz und offizielle Quelle wurden redaktionell geprüft."
+    "reviewed_at": "2026-10-30",
+    "next_review_at": "2026-10-31",
+    "notes": "Erster öffentlicher Commonworld-Startdatensatz; Identität, Zweck, digitale Präsenz und offizielle Quelle wurden redaktionell geprüft. Governance am 30.10.2026 gegen offizielle Quellen geprüft. Operative Aktivität bleibt trotz Basisreview ungeprüft, curation weiterhin stale; nächste Prüfung 31.10.2026."
   },
   "links": [
     {
