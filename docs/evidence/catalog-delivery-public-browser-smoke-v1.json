@@ -241,22 +241,22 @@
         "representativePrimaryLabels": [
           {
             "text": "Knowledge, Learning and Culture · 11    LibriVox  MusicBrainz  Open Library  Peer 2 Peer Unive…  Safecast  Thailand Citizens…",
-            "width": 505.1886291503906,
-            "height": 492.1036071777344,
+            "width": 507.8904724121094,
+            "height": 495.0268249511719,
             "fontSize": 23.77,
             "visible": true
           },
           {
             "text": "Communication and Networks · 12    B4RN (Broadband f…  BOSCO Uganda  Freifunk  Freifunk Hamburg  guifi.net  Mastodon",
-            "width": 561.9295654296875,
-            "height": 562.2265625,
+            "width": 561.7008666992188,
+            "height": 562.099853515625,
             "fontSize": 23.77,
             "visible": true
           },
           {
             "text": "Cooperation and Self-Organization · 7    Bologna Urban Com…  Enspiral  g0v  Green Coop  l’Asilo  National Communal…",
-            "width": 451.2435302734375,
-            "height": 383.34710693359375,
+            "width": 448.54449462890625,
+            "height": 379.620361328125,
             "fontSize": 23.77,
             "visible": true
           }
@@ -368,7 +368,7 @@
     {
       "id": "layer-journey-moveend-return",
       "verdict": "PASS",
-      "elapsedMs": 1729
+      "elapsedMs": 1937
     },
     {
       "id": "layer-journey-missing-moveend-fallback",
@@ -476,8 +476,8 @@
       "verdict": "PASS",
       "blockedCatalogRequests": 0,
       "observedCatalogRequests": [
-        "/releases/fac002ba76fb2ba29883/catalog/runtime/aggregate.v1.json",
-        "/releases/fac002ba76fb2ba29883/catalog/runtime/manifest.v1.json"
+        "/releases/c0552281932477e60e96/catalog/runtime/aggregate.v1.json",
+        "/releases/c0552281932477e60e96/catalog/runtime/manifest.v1.json"
       ]
     },
     {
@@ -580,6 +580,6 @@
       "method-mobile",
       "method-mobile-text-200"
     ],
-    "first_party_surface_sha256": "4d95f804623cc6844f16f217e9a532e8f88b18f3eeb3d8f41dcdaf08a53acd1c"
+    "first_party_surface_sha256": "5be845989f305f269a6b9d75738facb2df4e0e52391d848d3a952a57a1c22e73"
   }
 }
