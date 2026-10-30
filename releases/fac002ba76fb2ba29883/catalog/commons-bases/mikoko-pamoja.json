@@ -1,0 +1,63 @@
+{
+  "schema_version": 1,
+  "kind": "commonworld_commons_basis",
+  "project_id": "mikoko-pamoja",
+  "classification": "common",
+  "decision": "include",
+  "reviewed_at": "2026-08-04",
+  "reviewer": "Commonworld editorial review",
+  "criteria": {
+    "shared_resource": {
+      "status": "supported",
+      "statement": "Mangrovenbestände, Wiederherstellungsflächen, Kohlenstoffleistungen, lokales Monitoring und daraus finanzierte Gemeinschaftsvorhaben bilden einen gemeinsam gepflegten ökologischen Ressourcenverbund.",
+      "source_ids": [
+        "mikoko-pamoja-home",
+        "mikoko-pamoja-about",
+        "mikoko-pamoja-plan-vivo",
+        "mikoko-pamoja-registry"
+      ]
+    },
+    "community": {
+      "status": "supported",
+      "statement": "Die beteiligten Haushalte und die Mikoko Pamoja Community Organisation tragen das Projekt; Plan Vivo weist über tausend teilnehmende Haushalte und Gemeinschaftseigentum aus.",
+      "source_ids": [
+        "mikoko-pamoja-plan-vivo",
+        "mikoko-pamoja-registry"
+      ]
+    },
+    "commoning_practice": {
+      "status": "supported",
+      "statement": "Gemeinschaftsmitglieder pflanzen und überwachen Mangroven, vermeiden Degradation und bestimmen lokale Entwicklungs- und Naturschutzvorhaben aus den Projekterlösen.",
+      "source_ids": [
+        "mikoko-pamoja-home",
+        "mikoko-pamoja-plan-vivo",
+        "mikoko-pamoja-registry"
+      ]
+    },
+    "rules_and_responsibility": {
+      "status": "supported",
+      "statement": "Gemeinschaftseigentum, Projektplan, Plan-Vivo-Anforderungen, öffentliche Audits, Jahresberichte und registrierte Mittelverwendung ordnen Schutz, Monitoring, Kohlenstoffbilanzierung und Nutzenverteilung.",
+      "source_ids": [
+        "mikoko-pamoja-plan-vivo",
+        "mikoko-pamoja-registry"
+      ]
+    },
+    "common_benefit": {
+      "status": "supported",
+      "statement": "Mangrovenschutz stärkt Küstenschutz, Biodiversität und Kohlenstoffbindung; Einnahmen finanzieren von der lokalen Gemeinschaft bestimmte Wasser-, Bildungs-, Infrastruktur- und Naturschutzleistungen.",
+      "source_ids": [
+        "mikoko-pamoja-home",
+        "mikoko-pamoja-about",
+        "mikoko-pamoja-plan-vivo",
+        "mikoko-pamoja-registry"
+      ]
+    }
+  },
+  "confidence": 0.93,
+  "limitations": [
+    "Das Projekt ist von einem schwankenden freiwilligen Kohlenstoffmarkt sowie externen Zertifizierungs-, Prüf- und Registerinstitutionen abhängig.",
+    "Öffentliche Quellen bilden interne Wahl-, Konflikt- und Verteilungsregeln nicht vollständig ab.",
+    "Die Association for Coastal Ecosystem Services koordiniert fachliche und marktbezogene Teile; Gemeinschaftseigentum bedeutet keine alleinige Kontrolle über Standard, Register oder Käufer."
+  ],
+  "notes": "Aufgenommen wird die konkrete gemeinschaftseigene Mangroveninitiative in Gazi Bay, nicht das Plan-Vivo-System oder jeder mit ihr verbundene Kohlenstoffmarktakteur."
+}

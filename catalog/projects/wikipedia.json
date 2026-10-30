@@ -41,6 +41,22 @@
         "url": "https://www.wikimedia.org/",
         "retrieved_at": "2026-07-12",
         "note": "Die offizielle Wikimedia-Übersicht führt Wikipedia als freie Enzyklopädie."
+      },
+      {
+        "id": "wikipedia-wmf-governance",
+        "type": "official-source",
+        "label": "Wikimedia Foundation – project contributors and governance",
+        "url": "https://wikimediafoundation.org/who-we-are/",
+        "retrieved_at": "2026-10-30",
+        "note": "Stiftung stellt klar, dass Freiwillige Enzyklopädieinhalte und Regeln bearbeiten; die Stiftung übt keine redaktionelle Kontrolle aus."
+      },
+      {
+        "id": "wikipedia-foundation-principles",
+        "type": "official-source",
+        "label": "Wikimedia community founding principles",
+        "url": "https://meta.wikimedia.org/wiki/Founding_principles",
+        "retrieved_at": "2026-10-30",
+        "note": "Offizielle Community-Grundprinzipien: Wiki-Prozesse, freie Lizenzen, Neutralität und grundlegende Konfliktregeln."
       }
     ]
   },
@@ -48,9 +64,9 @@
     "state": "stale",
     "catalogued_at": "2026-07-12",
     "reviewed_by": "Commonworld editorial review",
-    "reviewed_at": "2026-07-12",
-    "next_review_at": "2026-10-12",
-    "notes": "Erster öffentlicher Commonworld-Startdatensatz; Identität, Zweck, digitale Präsenz und offizielle Quelle wurden redaktionell geprüft."
+    "reviewed_at": "2026-10-30",
+    "next_review_at": "2026-10-31",
+    "notes": "Erster öffentlicher Commonworld-Startdatensatz; Identität, Zweck, digitale Präsenz und offizielle Quelle wurden redaktionell geprüft. Governance am 30.10.2026 gegen offizielle Quellen geprüft. Operative Aktivität bleibt trotz Basisreview ungeprüft, curation weiterhin stale; nächste Prüfung 31.10.2026."
   },
   "links": [
     {

@@ -81,6 +81,14 @@
         "url": "https://wiki.nycmesh.net/books/1-introduction/page/nyc-mesh-overview",
         "retrieved_at": "2026-07-16",
         "note": "Offizielle Projektdokumentation zur gemeinschaftlichen Wartung und Erweiterung des Netzes."
+      },
+      {
+        "id": "nycmesh-culture",
+        "type": "official-source",
+        "label": "NYC Mesh official wiki – culture and decision-making",
+        "url": "https://wiki.nycmesh.net/books/4-organization-mission/page/culture",
+        "retrieved_at": "2026-10-30",
+        "note": "Offizielle Selbstbeschreibung zu Do-ocracy, gemeinschaftlicher Arbeit, Vertrauen und dem Risiko informeller Hierarchien."
       }
     ]
   },
@@ -88,9 +96,9 @@
     "state": "stale",
     "catalogued_at": "2026-07-16",
     "reviewed_by": "Commonworld editorial review",
-    "reviewed_at": "2026-07-16",
-    "next_review_at": "2026-10-16",
-    "notes": "Die Karte zeigt nur den groben Stadtbezug. Potenzielle oder aktive private Knoten werden nicht in Commonworld übernommen."
+    "reviewed_at": "2026-10-30",
+    "next_review_at": "2026-10-31",
+    "notes": "Die Karte zeigt nur den groben Stadtbezug. Potenzielle oder aktive private Knoten werden nicht in Commonworld übernommen. Governance am 30.10.2026 gegen offizielle Quellen geprüft. Operative Aktivität bleibt trotz Basisreview ungeprüft, curation weiterhin stale; nächste Prüfung 31.10.2026."
   },
   "links": [
     {

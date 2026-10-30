@@ -41,6 +41,30 @@
         "url": "https://www.openstreetmap.org/about",
         "retrieved_at": "2026-07-12",
         "note": "Die offizielle Seite beschreibt OpenStreetMap als gemeinschaftlich gepflegte, weltweit nutzbare offene Kartendatenbank."
+      },
+      {
+        "id": "osmf-membership",
+        "type": "official-source",
+        "label": "OSM Foundation – membership and voting",
+        "url": "https://osmfoundation.org/wiki/Membership",
+        "retrieved_at": "2026-10-30",
+        "note": "Mitgliederwahlrecht und Grenzen: Foundation-Votum ist nicht identisch mit inhaltlicher Kontrolle des OSM-Kartenprojekts."
+      },
+      {
+        "id": "osmf-organization",
+        "type": "official-source",
+        "label": "OSM community – role of Foundation",
+        "url": "https://welcome.openstreetmap.org/about-osm-community/osm-foundation/",
+        "retrieved_at": "2026-10-30",
+        "note": "Offizielle OSM-Community-Übersicht zu Foundation, lokalen Chapters, Board und gemeinschaftlichen Arbeitsgruppen."
+      },
+      {
+        "id": "osm-copyright",
+        "type": "official-source",
+        "label": "OpenStreetMap – copyright and licence",
+        "url": "https://www.openstreetmap.org/copyright",
+        "retrieved_at": "2026-10-30",
+        "note": "Offizielle Lizenz- und Nutzungsbedingungen für gemeinsam bereitgestellte OSM-Kartendaten."
       }
     ]
   },
@@ -48,9 +72,9 @@
     "state": "stale",
     "catalogued_at": "2026-07-12",
     "reviewed_by": "Commonworld editorial review",
-    "reviewed_at": "2026-07-12",
-    "next_review_at": "2026-10-12",
-    "notes": "Erster öffentlicher Commonworld-Startdatensatz; Identität, Zweck, digitale Präsenz und offizielle Quelle wurden redaktionell geprüft."
+    "reviewed_at": "2026-10-30",
+    "next_review_at": "2026-10-31",
+    "notes": "Erster öffentlicher Commonworld-Startdatensatz; Identität, Zweck, digitale Präsenz und offizielle Quelle wurden redaktionell geprüft. Governance am 30.10.2026 gegen offizielle Quellen geprüft. Operative Aktivität bleibt trotz Basisreview ungeprüft, curation weiterhin stale; nächste Prüfung 31.10.2026."
   },
   "links": [
     {

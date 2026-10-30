@@ -1,0 +1,58 @@
+{
+  "schema_version": 1,
+  "kind": "commonworld_commons_basis",
+  "project_id": "nyc-mesh",
+  "classification": "undetermined",
+  "decision": "needs_information",
+  "reviewed_at": "2026-10-30",
+  "reviewer": "Commonworld editorial desk review",
+  "criteria": {
+    "shared_resource": {
+      "status": "supported",
+      "statement": "Gemeinschaftlich aufgebaute Kommunikationsverbindungen, Knoten und zugehörige Netzwerkinfrastruktur bilden eine konkrete gemeinsame Ressource.",
+      "source_ids": [
+        "nycmesh-home",
+        "nycmesh-overview"
+      ]
+    },
+    "community": {
+      "status": "supported",
+      "statement": "Freiwillige Installateure, Infrastrukturpfleger und Mitglieder des New Yorker Gemeinschaftsnetzes bilden eine bestimmbare Mitwirkungsgemeinschaft.",
+      "source_ids": [
+        "nycmesh-home",
+        "nycmesh-culture"
+      ]
+    },
+    "commoning_practice": {
+      "status": "supported",
+      "statement": "Netzaufbau, gemeinsame Wartung, Organisation von Treffen und die Weitergabe technischer Fähigkeiten sind regelmäßig dokumentierte Gemeinschaftspraxis.",
+      "source_ids": [
+        "nycmesh-overview",
+        "nycmesh-culture"
+      ]
+    },
+    "rules_and_responsibility": {
+      "status": "partial",
+      "statement": "Die eigene Wiki beschreibt eine Do-ocracy, Vertrauen und faktische Entscheidungsmacht der aktiv Mitwirkenden, räumt jedoch informelle Hierarchien ein. Klare bindende Eigentums- und Konfliktregeln bleiben zu prüfen.",
+      "source_ids": [
+        "nycmesh-culture",
+        "nycmesh-overview"
+      ]
+    },
+    "common_benefit": {
+      "status": "supported",
+      "statement": "Die Infrastruktur dient erschwinglicher Verbindung, lokaler digitaler Selbstbestimmung und geteilter Netzkompetenz statt ausschließlich externen Kapitalinteressen.",
+      "source_ids": [
+        "nycmesh-home",
+        "nycmesh-overview"
+      ]
+    }
+  },
+  "confidence": 0.73,
+  "limitations": [
+    "Die veröffentlichten informellen Entscheidungspraktiken sind kein abschließender Nachweis der Eigentums-, Stimm- und Infrastrukturrechte sämtlicher Mitglieder.",
+    "Private Dach- und Wohnungsstandorte dürfen weder aus Mitgliederdaten noch aus Dokumentation rekonstruiert werden.",
+    "Das Projekt bleibt bis zur Klärung bindender Governance- und Konfliktregeln als needs_information eingestuft und weiterhin redaktionell stale."
+  ],
+  "notes": "Positives Netz-Commoning, aber durch offizielle Do-ocracy-Dokumentation noch nicht vollständig belegte formale Verantwortungsrechte."
+}
