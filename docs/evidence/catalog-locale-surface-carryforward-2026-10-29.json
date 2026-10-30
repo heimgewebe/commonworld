@@ -1,0 +1,174 @@
+{
+  "schema_version": 1,
+  "kind": "commonworld_locale_surface_carryforward",
+  "observed_at": "2026-10-29",
+  "base_commit": "677c2f92655a3c53d3d2483bc4236f81da5517fe",
+  "target_release": "e12576b13626ddea0308",
+  "review_scope": "Source-bound catalog changes only; the six unknown-activity and stale notices removed from 3 freshly reviewed Commons are generated source text, not translator-pack changes. No revised translated UI strings, review receipts or review assertions.",
+  "allowed_changed_line_signals": [
+    "name=\"commonworld-page-build\"",
+    "name=\"commonworld-release\"",
+    "<base href=",
+    "commonworld-app.js?v=",
+    "https://acofop.org/quienes-somos/",
+    "https://acofop.org/nuestra-historia/",
+    "class=\"catalog-activity-notice\"",
+    "class=\"catalog-activity-notice catalog-curation-stale-notice\""
+  ],
+  "surfaces": [
+    {
+      "locale": "es",
+      "surface": "index",
+      "old_sha256": "95cf7d69941daaaeeea1ce8c86d99b98c702e9763fca597dbdddd3dfa42f7932",
+      "new_sha256": "7dd0320c7054398748ae4a9f41f36ddb5e97fb500636dd1fa5bd57be3abb7491",
+      "changed_line_count": 16,
+      "allowed_changes_only": true
+    },
+    {
+      "locale": "es",
+      "surface": "method",
+      "old_sha256": "41737bae3e338ad5c6cbb8d3ae03d280e58e8b5c952d6bbb33258a4d8860c13e",
+      "new_sha256": "07a93fa340e527ac3f7218f0952b0e1b732bc59ca7828f3832d91593b02931e5",
+      "changed_line_count": 4,
+      "allowed_changes_only": true
+    },
+    {
+      "locale": "es",
+      "surface": "proposal",
+      "old_sha256": "d175bb25dbdcc6275e235770493b7755856fd191490ac44cb907fc6837e018d1",
+      "new_sha256": "3f9e60493cd955e0abcef95d939396a820e6956cf1a12912751b4c15617d82dc",
+      "changed_line_count": 4,
+      "allowed_changes_only": true
+    },
+    {
+      "locale": "fr",
+      "surface": "index",
+      "old_sha256": "1c925285229700c50a66952f3f9bab97886aa5d99bdd4a256c42acb40248bef0",
+      "new_sha256": "e145302545533769a67b48bc05a0327e6f610a35d98c60bed8e044a69b075602",
+      "changed_line_count": 16,
+      "allowed_changes_only": true
+    },
+    {
+      "locale": "fr",
+      "surface": "method",
+      "old_sha256": "10559affa8277aaf39a93ff38152cca26a9867fb3e54900ae9e19db33dbbd7d2",
+      "new_sha256": "6db73e40171ad83d0ac2a3827ef64367a9907f50a04bd1cd59813763d9a0c466",
+      "changed_line_count": 4,
+      "allowed_changes_only": true
+    },
+    {
+      "locale": "fr",
+      "surface": "proposal",
+      "old_sha256": "22832b3452b1e7c1deefd57f93c9b8174d2ea90fab556f30497f1bb1be5022b3",
+      "new_sha256": "2dcf24df18f7d0c1490d673ee884a584090fa26c7be83f2cc24429718c781007",
+      "changed_line_count": 4,
+      "allowed_changes_only": true
+    },
+    {
+      "locale": "pt-BR",
+      "surface": "index",
+      "old_sha256": "1c6acf63830b5005c728a399bb74eb75b73be5717173e58c56bcb737f6c669a9",
+      "new_sha256": "7a474597d606bad18ddddbc62e8ed1b140122f06b90f3d7090d793bcf48f329a",
+      "changed_line_count": 16,
+      "allowed_changes_only": true
+    },
+    {
+      "locale": "pt-BR",
+      "surface": "method",
+      "old_sha256": "2089120a04fdc700b3b9b2a1b08040470ab189edab5fc9809c1fa23357f91098",
+      "new_sha256": "8639fc7a6c9a6a2399f413632bdd1896d18e51919dd12220518bfd62ceae6f1f",
+      "changed_line_count": 4,
+      "allowed_changes_only": true
+    },
+    {
+      "locale": "pt-BR",
+      "surface": "proposal",
+      "old_sha256": "c185215c52d61d4896c0197b3d2cd6ca8945253b6af2261e7c0eaffe51f0344b",
+      "new_sha256": "fbecf983fd4b95466c6a47960df831b565ee1086cfdc6824648ece0e31c7c98c",
+      "changed_line_count": 4,
+      "allowed_changes_only": true
+    },
+    {
+      "locale": "ar",
+      "surface": "index",
+      "old_sha256": "2c5c86a5d3544039e67c881822c4de0b948e40c716f9dfd80649bdfa410bc94c",
+      "new_sha256": "9100a789b53ccff47c0d3c86f1f2953ae96f43bbae27f5ea1234e32079cfd47d",
+      "changed_line_count": 16,
+      "allowed_changes_only": true
+    },
+    {
+      "locale": "ar",
+      "surface": "method",
+      "old_sha256": "5241c2991a765b9fd19e4ec25d4cf607864ae3fe27283b71aa5a51e70211c035",
+      "new_sha256": "801a075c5c107f00089be118fc11812e9549f4b4467c4d5b5ebed0e424c193f3",
+      "changed_line_count": 4,
+      "allowed_changes_only": true
+    },
+    {
+      "locale": "ar",
+      "surface": "proposal",
+      "old_sha256": "9bdaab4e4a08186d935cd228644218de09515b528e0eb7fb9433e223dadfa4f7",
+      "new_sha256": "1fe67341461fe45514d95fca1339144684a0003c8066baa532e8e369e05cf770",
+      "changed_line_count": 4,
+      "allowed_changes_only": true
+    },
+    {
+      "locale": "zh-Hans",
+      "surface": "index",
+      "old_sha256": "c71437bd764c519600b9ac082d414729a4eaf1114b207af78709280134e5ae06",
+      "new_sha256": "fc017fb17e8c820a3bfc43b37d11f55359398f2c33e99fca84875a2fca6823dc",
+      "changed_line_count": 16,
+      "allowed_changes_only": true
+    },
+    {
+      "locale": "zh-Hans",
+      "surface": "method",
+      "old_sha256": "ac26da6b25cf03aaaf2ca1f1d9c8ce2fc1159475072ebead38e65451bffb6c7c",
+      "new_sha256": "9c5d06a1d02e670be15167459acf9018d0a8ce45937ec191aaa7903397d1eb7f",
+      "changed_line_count": 4,
+      "allowed_changes_only": true
+    },
+    {
+      "locale": "zh-Hans",
+      "surface": "proposal",
+      "old_sha256": "913af34fa0a3d8a56852f0ab4919181b949c9732d4c5d18f9f402b5e507064af",
+      "new_sha256": "3b9f44248653d8ac3aea5f30fd5b047ed9d686a89eecab0a76e36db1ec1286a8",
+      "changed_line_count": 4,
+      "allowed_changes_only": true
+    },
+    {
+      "locale": "hi",
+      "surface": "index",
+      "old_sha256": "83381d2a2ecd7fb6a28c471b02fc333aa88c21c5502248ff9d86fa3a3ccc1037",
+      "new_sha256": "5bf620f176287bbd807f4eca4e1414e3a2b0cb1d094c668dae57630976554000",
+      "changed_line_count": 16,
+      "allowed_changes_only": true
+    },
+    {
+      "locale": "hi",
+      "surface": "method",
+      "old_sha256": "0c257ab844fcc6d2a747bd7105b57bd6080aa6f1950728027d1290f05a23d069",
+      "new_sha256": "5453fe5021be2837cae0c4b263e464b54c10c4d07d9738a60ffe6a12bd440535",
+      "changed_line_count": 4,
+      "allowed_changes_only": true
+    },
+    {
+      "locale": "hi",
+      "surface": "proposal",
+      "old_sha256": "9e6fa91cca295bbf51e3f6b3751cd503ce37b420f6b66cdd92b3afff570b3921",
+      "new_sha256": "945a5a2c3705c410101d0ee6b83864377f15b6da60e90166a3d5c3cbccc17bee",
+      "changed_line_count": 4,
+      "allowed_changes_only": true
+    }
+  ],
+  "released_locales": [
+    "es",
+    "fr",
+    "pt-BR",
+    "ar",
+    "zh-Hans",
+    "hi"
+  ],
+  "claims_new_native_review": false,
+  "claims_new_independent_translation_review": false
+}

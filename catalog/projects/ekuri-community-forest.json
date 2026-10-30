@@ -42,12 +42,13 @@
     }
   },
   "activity": {
-    "status": "unknown",
-    "observed_at": "2026-09-02",
+    "status": "active",
+    "observed_at": "2026-10-29",
     "source_ids": [
-      "ekuri-icca-registry"
+      "ekuri-icca-registry",
+      "ekuri-partner-2026"
     ],
-    "note": "Der Registereintrag dokumentiert die gemeinschaftliche Waldverwaltung, liefert bei der Nachprüfung am 2026-09-02 aber keinen hinreichend zeitnahen Aktivitätsbeleg; der aktuelle Betriebszustand bleibt deshalb unbekannt."
+    "note": "Die Projektpartnerorganisation Rainforest Rescue berichtet am 09.03.2026 über den Waldschutz und die Einigung der Gemeinde New Ekuri. Eine unabhängige Berichterstattung von Global Witness vom 08.09.2026 bestätigt weiterhin aktive Waldhüter; die Detailquelle und ihr Status als Drittbericht sind im redaktionellen Nachweis dokumentiert. Die Konflikte und lokale Gefährdung gelten nicht als erledigt."
   },
   "provenance": {
     "sources": [
@@ -66,17 +67,25 @@
         "url": "https://www.wikidata.org/wiki/Q739676",
         "retrieved_at": "2026-07-19",
         "note": "CC0-Registereintrag mit grober Koordinate des Bundesstaats; nicht als Lage oder Grenze des Gemeinschaftswaldes zu lesen."
+      },
+      {
+        "id": "ekuri-partner-2026",
+        "type": "official-source",
+        "label": "Rainforest Rescue – offizieller Kooperationspartner von PADIC Africa, März 2026",
+        "url": "https://www.rainforest-rescue.org/updates/15099/timber-company-to-pay-nearly-10-000-euros-for-environmental-restoration",
+        "retrieved_at": "2026-10-29",
+        "note": "Die seit Jahren mit PADIC Africa zusammenarbeitende Förderorganisation berichtet am 09.03.2026 über einen Vergleich zu Rechten der lokalen Waldgemeinschaft und unterstützt deren Waldhüter. Ergänzender unabhängiger Bericht von Global Witness vom 08.09.2026 in der getrennten Quellenprüfung; keine Projektaussage über beendeten Holzeinschlagsdruck."
       }
     ],
     "uncertainty_note": "Mangels verifizierter öffentlicher Projektgeometrie wird nur der sehr grobe Bundesstaat-Bezug dargestellt."
   },
   "curation": {
-    "state": "stale",
+    "state": "listed",
     "catalogued_at": "2026-07-19",
     "reviewed_by": "Commonworld editorial review",
-    "reviewed_at": "2026-09-02",
-    "next_review_at": "2026-10-02",
-    "notes": "Aktueller Betriebszustand nicht zeitnah verifiziert; bei der Nachprüfung am 2026-09-02 blieb ein aktueller Betriebsbeleg offen. Priorisierte Nachprüfung bis 2026-10-02. Aufgenommen ist die konkrete gemeinschaftliche Waldverwaltung, nicht ein Naturschutz-Dachverband."
+    "reviewed_at": "2026-10-29",
+    "next_review_at": "2026-11-29",
+    "notes": "Am 29.10.2026 vollständig neu geprüft: ICCA-Register, 2026-Bericht des offiziellen Förderpartners und unabhängige Reportage vom September 2026 bestätigen die fortdauernde Schutzpraxis. Trotz aufgenommener aktiver Gemeinschaftsverwaltung bleiben Gefahren für Wald und Waldhüter ausdrücklich offen; Wiedervorlage 29.11.2026."
   },
   "links": [
     {
