@@ -70,7 +70,7 @@
         "label": "ACOFOP – Organisation und Mitglieder",
         "url": "https://acofop.org/quienes-somos/",
         "retrieved_at": "2026-08-04",
-        "note": "Benennt bäuerliche und indigene Mitgliedsorganisationen sowie Ziel, Mission und das Netzwerk der Waldkonzessionen und Gemeinschaftsorganisationen."
+        "note": "Benennt bäuerliche und indigene Mitgliedsorganisationen sowie Ziel, Mission und das Netzwerk der Waldkonzessionen und Gemeinschaftsorganisationen. Der historische Pfad antwortet bei der technischen Nachprüfung am 29.10.2026 mit HTTP 404; er wird nicht als aktueller Aktionslink verwendet."
       },
       {
         "id": "acofop-territorial",
@@ -87,6 +87,14 @@
         "url": "https://conap.gob.gt/prorrogas-y-nuevos-contratos-de-concesiones-forestales/",
         "retrieved_at": "2026-08-04",
         "note": "Staatliche Quelle zu geprüften und verlängerten Gemeinschaftskonzessionen, Zertifizierungen, Governance und sozialen, ökologischen sowie wirtschaftlichen Leistungen."
+      },
+      {
+        "id": "acofop-history-2026",
+        "type": "official-source",
+        "label": "ACOFOP – offizielle Organisationsgeschichte und Mitgliedschaft",
+        "url": "https://acofop.org/nuestra-historia/",
+        "retrieved_at": "2026-10-29",
+        "note": "Am 29.10.2026 HTTP 200: beschreibt den Aufbau der Vereinigung, 24 bäuerliche und indigene Mitgliedsorganisationen und den gemeinschaftlichen Schutz und Nutzen der Waldkonzessionen."
       }
     ],
     "uncertainty_note": "ACOFOP ist das gemeinschaftseigene Verbund- und Unterstützungsgefüge; die einzelnen Wälder bleiben staatliche Konzessionsflächen mit jeweils eigenen Organisationen, Verträgen und Regeln."
@@ -108,10 +116,10 @@
     {
       "type": "learn",
       "label": "Gemeinschaftliche Waldverwaltung und Mitgliedsorganisationen kennenlernen",
-      "url": "https://acofop.org/quienes-somos/",
+      "url": "https://acofop.org/nuestra-historia/",
       "source_ids": [
         "acofop-home",
-        "acofop-about",
+        "acofop-history-2026",
         "acofop-territorial",
         "conap-extensions"
       ]

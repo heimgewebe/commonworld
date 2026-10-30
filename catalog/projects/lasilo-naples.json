@@ -40,14 +40,14 @@
     }
   },
   "activity": {
-    "status": "unknown",
-    "observed_at": "2026-08-13",
+    "status": "active",
+    "observed_at": "2026-10-29",
     "source_ids": [
       "lasilo-home",
       "lasilo-organism",
-      "lasilo-faq"
+      "lasilo-civic-use"
     ],
-    "note": "Aktueller Betriebszustand nicht zeitnah verifiziert: Die offiziellen Seiten dokumentieren die selbstverwaltete Struktur und Beteiligungswege, liefern aber keinen ausreichend frischen datierten Aktivitätsbeleg für August 2026."
+    "note": "Der offizielle Veranstaltungskalender bewirbt am 29.10.2026 Workshops vom 26./27. Oktober, eine Veranstaltung am 31. Oktober und ein Gartenangebot am 12. November. Das belegt einen aktuell organisierten Kulturbetrieb, aber nicht unabhängig die Durchführung jedes Programmpunkts."
   },
   "provenance": {
     "sources": [
@@ -56,8 +56,8 @@
         "type": "official-source",
         "label": "l’Asilo – offizielle Website",
         "url": "https://www.exasilofilangieri.it/",
-        "retrieved_at": "2026-08-13",
-        "note": "Offizielle Projektseite des selbstverwalteten Kulturraums in Neapel."
+        "retrieved_at": "2026-10-29",
+        "note": "Offizielle Projektseite des selbstverwalteten Kulturraums; am 29.10.2026 mit Veranstaltungshinweisen für 26./27. Oktober, 31. Oktober und 12. November. Ein angekündigtes Programm belegt aktuelle Organisation, nicht die tatsächliche Durchführung jedes Termins."
       },
       {
         "id": "lasilo-organism",
@@ -95,12 +95,12 @@
     "uncertainty_note": "Das Gebäude bleibt kommunales Eigentum; Commonworld beschreibt die belegte gemeinschaftliche zivile Nutzung und Selbstverwaltung, nicht ein Eigentum der offenen Gemeinschaft."
   },
   "curation": {
-    "state": "stale",
+    "state": "listed",
     "catalogued_at": "2026-08-13",
     "reviewed_by": "Commonworld editorial review",
-    "reviewed_at": "2026-08-13",
-    "next_review_at": "2026-09-15",
-    "notes": "Aktueller Betriebszustand nicht zeitnah verifiziert. Aufgenommen als urbanes Kultur-Common: entscheidend sind gemeinsam genutzte Ressourcen, offene Beteiligung, belegte Selbstverwaltung und die formalisierte zivile Gebrauchserklärung."
+    "reviewed_at": "2026-10-29",
+    "next_review_at": "2026-11-29",
+    "notes": "Am 29.10.2026 neu geprüft: offizielle Nutzungs-, Governance- und Kontaktdokumentation sowie mehrere aktuell angekündigte Veranstaltungen Ende Oktober/November 2026 stützen die offene selbstverwaltete kulturelle Nutzung. Veranstaltungshinweise sind keine Belege einzelner Durchführung; Wiedervorlage 29.11.2026."
   },
   "links": [
     {

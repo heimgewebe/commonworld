@@ -8,9 +8,9 @@
   "reviewed_source_pack_sha256": "bb6cf859062deb1e6010f49267b7102fd10da2f4efb445b2ce4ee6625b099e46",
   "catalog_overlay_sha256": "4268fc42da9cf80af9f8e6e4e9e04eddc6a0a970573197255f657c48d7e318ae",
   "surface_sha256": {
-    "index": "c71437bd764c519600b9ac082d414729a4eaf1114b207af78709280134e5ae06",
-    "method": "ac26da6b25cf03aaaf2ca1f1d9c8ce2fc1159475072ebead38e65451bffb6c7c",
-    "proposal": "913af34fa0a3d8a56852f0ab4919181b949c9732d4c5d18f9f402b5e507064af"
+    "index": "fc017fb17e8c820a3bfc43b37d11f55359398f2c33e99fca84875a2fca6823dc",
+    "method": "9c5d06a1d02e670be15167459acf9018d0a8ce45937ec191aaa7903397d1eb7f",
+    "proposal": "3b9f44248653d8ac3aea5f30fd5b047ed9d686a89eecab0a76e36db1ec1286a8"
   },
   "gate_results": {
     "required_surfaces_passed": [
@@ -60,5 +60,5 @@
     "findings_based": true,
     "post_fix_review_required": true
   },
-  "notes": "Incremental source-pack verification for deterministic release b8db99c89fdf0bdd7b3c: six ui.curation_stale values were independently model-assisted reviewed and remain unchanged; all older language-review and accessibility receipts retain historical contents, and this rebinding only binds generated source-pack and localized page bytes after a runtime Text-view stale-warning repair. No new native or human review is asserted."
+  "notes": "Incremental source-pack verification for deterministic release b8db99c89fdf0bdd7b3c: six ui.curation_stale values were independently model-assisted reviewed and remain unchanged; all older language-review and accessibility receipts retain historical contents, and this rebinding only binds generated source-pack and localized page bytes after a runtime Text-view stale-warning repair. No new native or human review is asserted.\n\n2026-10-29: additional catalog-only source evidence was rebound to deterministic release e12576b13626ddea0308. The 18 released-locale page diffs were checked against the previous commit and contain only release/page-build metadata, the one repaired ACOFOP URL, and removal of three superseded unknown-activity notices; no translated interface text, locale packs, review-class assertions or independent review receipts were changed. Earlier language reviews remain historical, no new native review is claimed."
 }

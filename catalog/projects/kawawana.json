@@ -41,12 +41,13 @@
     }
   },
   "activity": {
-    "status": "unknown",
-    "observed_at": "2026-09-05",
+    "status": "active",
+    "observed_at": "2026-10-29",
     "source_ids": [
-      "kawawana-icca-registry"
+      "kawawana-icca-registry",
+      "kawawana-blue-parks-2026"
     ],
-    "note": "Bei der Nachprüfung am 2026-09-05 führt das aktuelle ICCA-Register Kawawana weiterhin als senegalesischen ICCA-Fall; der zugrunde liegende Falltext ist jedoch historisch und belegt keinen hinreichend zeitnahen Betriebszustand. Der aktuelle Betriebszustand bleibt deshalb unbekannt."
+    "note": "Das Marine Conservation Institute zeichnete Kawawana im Juni 2026 als Blue Park Silver aus und nennt die örtliche Fischervereinigung als gemeinschaftliche Trägerschaft; die 2025 dokumentierte Gebietserweiterung stützt die fortdauernde Verwaltung. Das ist ein jüngerer objektspezifischer Betriebsbeleg, jedoch keine unabhängige Tageskontrolle am 29.10.2026."
   },
   "provenance": {
     "sources": [
@@ -57,17 +58,25 @@
         "url": "https://www.iccaregistry.org/en/explore/Senegal/kawawana",
         "retrieved_at": "2026-09-05",
         "note": "Öffentlicher, von den Hütern des Gebiets gespeister und peer-reviewter Registerfall zu APCRM, acht Dörfern, übertragenen Küstenverwaltungsrechten, Nutzungszonen, Fangregeln, Monitoring und Patrouillen; der Falltext stammt ursprünglich aus 2012."
+      },
+      {
+        "id": "kawawana-blue-parks-2026",
+        "type": "official-source",
+        "label": "Marine Conservation Institute – Kawawana Blue Park Silver Award 2026",
+        "url": "https://marine-conservation.org/blueparks/awardees/kawawana/",
+        "retrieved_at": "2026-10-29",
+        "note": "Primärquelle der auszeichnenden Organisation: Blue Park Silver Award 2026 für Kawawana, gemeinschaftliche Verwaltung durch die Fischervereinigung von Mangagoulack und Erweiterung des Schutzgebiets im Mai 2025. Die Auszeichnung ist ein datierter Beleg für anerkanntes Management 2026, nicht für tägliche Betriebsbereitschaft."
       }
     ],
     "uncertainty_note": "Commonworld veröffentlicht keine Zonengeometrie oder lokale Ressourcenorte; die Koordinate ist nur ein grober Regionalanker."
   },
   "curation": {
-    "state": "stale",
+    "state": "listed",
     "catalogued_at": "2026-08-04",
     "reviewed_by": "Commonworld editorial review",
-    "reviewed_at": "2026-09-05",
-    "next_review_at": "2026-10-05",
-    "notes": "Aktueller Betriebszustand nicht zeitnah verifiziert; bei der Nachprüfung am 2026-09-05 führt das aktuelle ICCA-Register Kawawana weiterhin, liefert aber keinen frischen objektspezifischen Aktivitätsbeleg. Priorisierte Nachprüfung bis 2026-10-05. Aufgenommen bleibt die konkrete von APCRM und acht Dörfern getragene Fischerei- und Küstenverwaltungsinstitution."
+    "reviewed_at": "2026-10-29",
+    "next_review_at": "2026-11-29",
+    "notes": "Am 29.10.2026 erneut redaktionell bewertet: historischer ICCA-Registry-Beleg sowie aktuell belegte lokale Verwaltung mit Blue-Park-Auszeichnung Juni 2026. Die fünf Commons-Dimensionen sind unabhängig quellengebunden, genaue Fischereizonen bleiben unveröffentlicht. Wiedervorlage 29.11.2026 wegen fehlender unmittelbarer Vor-Ort-Kontrolle."
   },
   "links": [
     {

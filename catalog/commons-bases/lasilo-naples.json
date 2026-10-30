@@ -4,7 +4,7 @@
   "project_id": "lasilo-naples",
   "classification": "common",
   "decision": "include",
-  "reviewed_at": "2026-08-13",
+  "reviewed_at": "2026-10-29",
   "reviewer": "Commonworld editorial review",
   "criteria": {
     "shared_resource": {
@@ -52,7 +52,7 @@
   "confidence": 0.95,
   "limitations": [
     "Das Gebäude ist kommunales Eigentum; die Commons-Eigenschaft beruht auf kollektivem zivilem Gebrauch und Selbstverwaltung, nicht auf Eigentumsübertragung.",
-    "Der Aktivitätsstatus wird mangels ausreichend frischem datiertem Ereignis konservativ als unbekannt geführt."
+    "Die am 29.10.2026 öffentlich beworbenen Kulturveranstaltungen belegen einen aktiven Veranstaltungskalender, nicht die unabhängige Durchführung jedes Termins."
   ],
   "notes": "Explizit als bene comune und über eine gemeinschaftliche zivile Gebrauchserklärung organisierter, selbstverwalteter Kulturraum."
 }

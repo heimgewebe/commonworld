@@ -1,0 +1,104 @@
+{
+  "schema_version": 1,
+  "kind": "commonworld_primary_source_editorial_followup",
+  "observed_at": "2026-10-29",
+  "base_main_commit": "677c2f92655a3c53d3d2483bc4236f81da5517fe",
+  "method": "Targeted editorial correction after byte-exact public validation of all 100 project JSONs; live primary pages or first-hand publisher reports checked on 2026-10-29. No automatic certification of remaining Commons.",
+  "activity_upgrades": [
+    {
+      "project_id": "kawawana",
+      "old_status": "unknown",
+      "new_status": "active",
+      "source_url": "https://marine-conservation.org/blueparks/awardees/kawawana/",
+      "dated_evidence": "2026 Blue Park Silver Award and named local community management",
+      "limitation": "Award verifies 2026 recognition and management, not every-day operation"
+    },
+    {
+      "project_id": "ekuri-community-forest",
+      "old_status": "unknown",
+      "new_status": "active",
+      "source_url": "https://globalwitness.org/en/campaigns/land-and-environmental-defenders/illegal-loggers-forced-to-leave-ekuri-forest-after-arrested-defenders-walk-free/",
+      "dated_evidence": "Global Witness dated 2026-09-08 independently reports ongoing community forest protection",
+      "limitation": "No assurance of safety, completed litigation or forest-wide enforcement",
+      "official_partner_url": "https://www.rainforest-rescue.org/updates/15099/timber-company-to-pay-nearly-10-000-euros-for-environmental-restoration",
+      "source_url_note": "Global Witness ist als unabhängiger Drittbericht im Redaktionsbeleg dokumentiert, nicht als offizielle Projektquelle oder Register in der öffentlichen Provenienz ausgegeben."
+    },
+    {
+      "project_id": "lasilo-naples",
+      "old_status": "unknown",
+      "new_status": "active",
+      "source_url": "https://www.exasilofilangieri.it/",
+      "dated_evidence": "Official homepage on 2026-10-29 lists October and November 2026 events",
+      "limitation": "Public event listings are not independent proof that every event took place"
+    }
+  ],
+  "action_link_repair": {
+    "project_id": "acofop-peten-community-forests",
+    "type": "learn",
+    "old_url": "https://acofop.org/quienes-somos/",
+    "old_observed_http_status": 404,
+    "new_url": "https://acofop.org/nuestra-historia/",
+    "new_observed_http_status": 200,
+    "new_source_id": "acofop-history-2026"
+  },
+  "curation_dates_unchanged": false,
+  "curation_stale_preserved": false,
+  "remaining_unknown_activity": [
+    "arvari-river-parliament",
+    "cano-martin-pena-clt",
+    "orangi-low-cost-sanitation",
+    "pachgaon-community-forest",
+    "velondriake-lmma"
+  ],
+  "unreviewed_legacy_basis_records": 68,
+  "limitations": [
+    "Activity states rely on dated publisher or official programme evidence, not field visits.",
+    "Earlier full-review dates remain historically traceable in Git; the three freshly evaluated Commons were explicitly reviewed on 2026-10-29, and all others retain their prior curation dates.",
+    "No private or exact project geometry is added."
+  ],
+  "locale_surface_attestation_refresh": {
+    "reason": "Katalogdaten und Release-Asset-Pfade wurden neu generiert; freigegebene Sprachpakete und Katalogübersetzungsquellen blieben bytegenau unverändert.",
+    "action": "Ausschließlich die technischen Hashes der geänderten gerenderten index-, method- und proposal-Oberflächen erneuert.",
+    "locales": [
+      "es",
+      "fr",
+      "pt-BR",
+      "ar",
+      "zh-Hans",
+      "hi"
+    ],
+    "unchanged": "Keine unabhängigen Sprach-, Accessibility- oder Muttersprachler-Reviews als neu durchgeführt erklärt; bestehende signierte Reviews und ihre Quellpaket-Digests bleiben unverändert.",
+    "followup": "Fresh Browser-Smoke und lokale Release-Vertragsvalidierung sind vor Merge notwendig.",
+    "hash_pointer_update": "docs/architecture/locale-release.contract.json: six existing released evidence-file SHA256 pointers recomputed from byte-identical reviewed source pack and newly rendered pages; review receipts not modified."
+  },
+  "catalog_manifest_published_at_before": "2026-09-05",
+  "catalog_manifest_published_at_after": "2026-10-29",
+  "curation_disposition": "Die drei erneut in allen Commons-Dimensionen überprüften Einträge sind nach vollständiger Einzelprüfung als listed mit reviewed_at=2026-10-29 und next_review_at=2026-11-29 gekennzeichnet. ACOFOP ist lediglich bezüglich des gebrochenen Aktionslinks korrigiert worden; sein älterer Reviewtermin bleibt unverändert.",
+  "curation_after_source_review": {
+    "state_counts_expected": {
+      "listed": 27,
+      "stale": 73
+    },
+    "activity_counts_expected": {
+      "active": 95,
+      "unknown": 5
+    },
+    "changed_full_review_projects": [
+      "kawawana",
+      "ekuri-community-forest",
+      "lasilo-naples"
+    ],
+    "reviews_are_desk_reviews_not_field_visits": true,
+    "basis_index_current_as_of": "2026-10-29"
+  },
+  "browser_evidence_refresh": {
+    "release_id": "e12576b13626ddea0308",
+    "actual_public_scenarios": 40,
+    "browser_measurement_attempts": 1,
+    "cpu_throttle_rate": 4,
+    "first_party_surface_sha256": "6e546e9922b8427f1796c0212ab640134a440622285eef68aece03751f797fac",
+    "measurement_verdict": "pass",
+    "method": "Fresh local Chromium, not synthetic carry-forward; immutable release assets verified.",
+    "limits": "No physical-device approval or production evidence for unmerged branch."
+  }
+}

@@ -1,4 +1,4 @@
-import { BOOTSTRAP_RECORDS } from './commonworld-bootstrap-catalog.mjs?v=90462e53dc30';
+import { BOOTSTRAP_RECORDS } from './commonworld-bootstrap-catalog.mjs?v=8ff0d44f7aae';
 import { createCatalogLoadCache, loadCatalogAggregate, loadCatalogDetail, loadCatalogShard, shardKeyForIdentity } from './commonworld-catalog-runtime.mjs?v=25d37dcafe15';
 import { actionLabel, documentDirection, documentLocale, localizeCatalogRecords, text as i18nText, themeLabel, wave1LocalePackReady } from './commonworld-i18n.mjs?v=4b7bf011503e';
 import {
