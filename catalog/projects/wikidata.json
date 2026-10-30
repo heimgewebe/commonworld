@@ -41,6 +41,22 @@
         "url": "https://www.wikimedia.org/",
         "retrieved_at": "2026-07-12",
         "note": "Die offizielle Wikimedia-Übersicht führt Wikidata als freie Wissensdatenbank."
+      },
+      {
+        "id": "wikidata-introduction",
+        "type": "official-source",
+        "url": "https://www.wikidata.org/wiki/Wikidata:Introduction",
+        "label": "Wikidata – Introduction",
+        "retrieved_at": "2026-10-30",
+        "note": "Offizieller Projekttext: freie strukturierte Datenbank, gemeinschaftlich bearbeitet."
+      },
+      {
+        "id": "wikidata-licensing",
+        "type": "official-source",
+        "url": "https://www.wikidata.org/wiki/Wikidata:Licensing",
+        "label": "Wikidata – Licensing policy",
+        "retrieved_at": "2026-10-30",
+        "note": "Offizielle Richtlinie CC0 für Daten, CC BY-SA für andere Texte."
       }
     ]
   },
@@ -48,9 +64,9 @@
     "state": "stale",
     "catalogued_at": "2026-07-12",
     "reviewed_by": "Commonworld editorial review",
-    "reviewed_at": "2026-07-12",
-    "next_review_at": "2026-10-12",
-    "notes": "Erster öffentlicher Commonworld-Startdatensatz; Identität, Zweck, digitale Präsenz und offizielle Quelle wurden redaktionell geprüft."
+    "reviewed_at": "2026-10-30",
+    "next_review_at": "2026-10-31",
+    "notes": "Governance-Desk-Review vom 30.10.2026: siehe fünf Commons-Kriterien und amtliche Projektquellen. Die bisherige Aktivitätsbeobachtung bleibt unverändert; weiterhin stale."
   },
   "links": [
     {
