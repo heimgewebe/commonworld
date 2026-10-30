@@ -1,0 +1,84 @@
+{
+  "schema_version": 1,
+  "kind": "commonworld_editorial_basis_review_2026_10_30",
+  "checked_at_utc": "2026-10-30",
+  "base_commit": "2f14d42ddd7a10ad8b9cc6df63eb19f4095c1289",
+  "scope": "Targeted five-entity desk review of new or overdue governance evidence, after prior 100-record public hash validation. All statements are source-bound; no automatic admission from nominal labels.",
+  "new_basis_records": [
+    {
+      "id": "cooperative-home-care-associates",
+      "decision": "include",
+      "reason": "Worker-owned shared institution with member votes, majority worker governance and explicitly collective benefit, despite commercial healthcare tension",
+      "source_ids": [
+        "chca-about",
+        "chca-worker-governance-research",
+        "chca-union-2026"
+      ]
+    }
+  ],
+  "reviewed_existing_basis": [
+    {
+      "id": "cano-martin-pena-clt",
+      "activity": "active",
+      "source_id": "cano-joint-board-2026",
+      "limitation": "Actual joint institutional board meeting reported for July 2026, not every day of October operations"
+    },
+    {
+      "id": "pachgaon-community-forest",
+      "activity": "unknown",
+      "source_id": "pachgaon-atree-cfr",
+      "limitation": "ATREE verifies 2022 visit; third-party Jan 2026 overview offers history but not an October 2026 current operation report",
+      "supplemental_external_report": "https://vikalpsangam.org/article/a-living-constitution-pachgaon/"
+    }
+  ],
+  "project_state_after_review": {
+    "curation": {
+      "listed": 26,
+      "stale": 74
+    },
+    "activity": {
+      "active": 96,
+      "unknown": 4
+    },
+    "structured_basis_count": 33,
+    "legacy_missing_basis": 67
+  },
+  "unresolved_activity": [
+    "arvari-river-parliament",
+    "orangi-low-cost-sanitation",
+    "pachgaon-community-forest",
+    "velondriake-lmma"
+  ],
+  "source_truth_boundaries": [
+    "All source URLs were technically checked; HTTP success alone is not substantive proof.",
+    "The three new bases are source-bounded expert desk reviews, not on-site verification or independent human approval.",
+    "needs_information is a review result, not a rejection; such entries remain stale rather than listed.",
+    "No personal healthcare information, sensitive fisheries sites, individual homes or private land coordinates have been added.",
+    "Other legacy entries remain pending until five criteria have their own source-linked review.",
+    "Existing public summaries for Banco Palmas and BOSCO Uganda remain historically published text with a newly visible stale curation warning; source and translation recertification are deferred rather than invented.",
+    "The external Pachgaon article is kept in this dated editorial ledger instead of falsely labeling it an official project source.",
+    "NLM PubMed Central is classified as a public scholarly archive/registry, and 1199SEIU only as an official first-party union publication, not as CHCA first-party content."
+  ],
+  "deferred_governance_assessments": [
+    {
+      "id": "banco-palmas",
+      "public_action": "stale_without_new_review_date",
+      "proposal": "needs_information",
+      "verified_urls": [
+        "https://bancopalmas.com/sobre/",
+        "https://participedia.net/case/6662"
+      ],
+      "unresolved": "The published translated summaries assert community ownership; a full review requires verified current voting/ownership rules and independently reviewed updates to all released language overlays. No unsupported source update or direct review date has been published."
+    },
+    {
+      "id": "bosco-uganda",
+      "public_action": "stale_without_new_review_date",
+      "proposal": "needs_information",
+      "verified_urls": [
+        "https://www.boscouganda.com/about-us-2/",
+        "https://www.boscouganda.com/what-we-do/capacity-development/"
+      ],
+      "unresolved": "Local committees and church legal trusteeship are both documented, but exact current rights over infrastructure and conflict rules remain unproven. Source and language review must precede any new Commons certification."
+    }
+  ]
+}

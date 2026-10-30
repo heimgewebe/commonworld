@@ -1,0 +1,59 @@
+{
+  "schema_version": 1,
+  "kind": "commonworld_commons_basis",
+  "project_id": "cooperative-home-care-associates",
+  "classification": "common",
+  "decision": "include",
+  "reviewed_at": "2026-10-30",
+  "reviewer": "Commonworld editorial review",
+  "criteria": {
+    "shared_resource": {
+      "status": "supported",
+      "statement": "Das arbeitereigene Pflegeunternehmen, seine geteilte wirtschaftliche Trägerschaft, Ausbildung und die von Mitgliedern mitgestalteten Arbeits- und Versorgungsprozesse bilden eine konkrete gemeinsame Produktions- und Arbeitsressource.",
+      "source_ids": [
+        "chca-about",
+        "chca-worker-governance-research"
+      ]
+    },
+    "community": {
+      "status": "supported",
+      "statement": "Die Arbeitereigentümer und Pflegekräfte sind eine bestimmbar abgegrenzte Mitglieder- und Trägergemeinschaft; die Organisation beschäftigt mehr als 1.600 Mitarbeitende und ermöglicht Beteiligung an der Kooperative.",
+      "source_ids": [
+        "chca-about",
+        "chca-worker-governance-research"
+      ]
+    },
+    "commoning_practice": {
+      "status": "supported",
+      "statement": "Pflegekräfte beteiligen sich nicht nur durch Erwerbsarbeit, sondern durch Mitgliedschaft, Ausschüsse, gewählte Vertretung, Qualifizierung und betriebliche Mitverantwortung an der fortlaufenden Pflegepraxis.",
+      "source_ids": [
+        "chca-about",
+        "chca-worker-governance-research",
+        "chca-union-2026"
+      ]
+    },
+    "rules_and_responsibility": {
+      "status": "supported",
+      "statement": "Unabhängige Forschung beschreibt eine Mehrheit von Pflegekräften im Leitungsgremium sowie Mitgliedervoten und Arbeitsgruppen für operative und finanzielle Entscheidungen; CHCA dokumentiert außerdem institutionalisierte Mitwirkung im Verhältnis zur Gewerkschaft.",
+      "source_ids": [
+        "chca-worker-governance-research",
+        "chca-about"
+      ]
+    },
+    "common_benefit": {
+      "status": "supported",
+      "statement": "Der genossenschaftliche Nutzen besteht in gemeinsamer Teilhabe, stabileren Beschäftigungsverhältnissen, Qualifizierung und anteiligem wirtschaftlichen Erfolg sowie der Versorgung pflegebedürftiger Menschen; es handelt sich nicht ausschließlich um Vertrieb für Außeninvestoren.",
+      "source_ids": [
+        "chca-about",
+        "chca-worker-governance-research"
+      ]
+    }
+  },
+  "confidence": 0.88,
+  "limitations": [
+    "CHCA verkauft entgeltliche Pflegedienstleistungen; die Commons-Qualität ist am kollektiv getragenen Arbeits- und Unternehmensgefüge zu prüfen, nicht mit unentgeltlicher Patientenversorgung gleichzusetzen.",
+    "Mitgliedschafts- und Teilhabechancen können sich zwischen Beschäftigtengruppen unterscheiden; nicht jede beschäftigte Person muss automatisch stimmberechtigter Eigentümer sein.",
+    "Aus den Quellen dürfen weder personenbezogene Patientendaten noch individuelle Gesundheitszustände abgeleitet werden."
+  ],
+  "notes": "Aufnahme als konkretes, kollektiv mitverwaltetes Arbeits- und Unternehmens-Common, nicht als freier Pflege-Dienstleistungsanspruch."
+}

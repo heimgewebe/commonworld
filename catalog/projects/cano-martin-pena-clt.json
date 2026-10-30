@@ -42,12 +42,14 @@
     }
   },
   "activity": {
-    "status": "unknown",
-    "observed_at": "2026-09-02",
+    "status": "active",
+    "observed_at": "2026-10-30",
     "source_ids": [
-      "cano-enlace-g8"
+      "cano-enlace-g8",
+      "cano-joint-board-2026",
+      "cano-trust-current-home"
     ],
-    "note": "Die offizielle Seite dokumentiert die fortbestehende Struktur und Arbeitsweise; bei der Nachprüfung am 2026-09-02 wurde jedoch kein hinreichend zeitnah datierter Betriebsbeleg gefunden, daher wird der aktuelle Status nicht behauptet."
+    "note": "Die staatliche ENLACE-Stelle veröffentlichte für den 15. Juli 2026 eine gemeinsame Gremiensitzung mit dem Fideicomiso de la Tierra. Die eigenständige Website des Trusts ist abrufbar und beschreibt laufende Dienstleistungen. Das belegt eine 2026 tätige Institution, nicht den Tagesbetrieb aller Einzelmaßnahmen am 30.10.2026."
   },
   "provenance": {
     "sources": [
@@ -66,17 +68,33 @@
         "url": "https://www.wikidata.org/wiki/Q41211",
         "retrieved_at": "2026-07-19",
         "note": "CC0-Registereintrag mit grober Stadtkoordinate; bewusst keine Parzellen- oder Hausgeometrie."
+      },
+      {
+        "id": "cano-joint-board-2026",
+        "type": "official-source",
+        "label": "Proyecto ENLACE – Sitzung des ENLACE-Vorstands mit dem Fideicomiso de la Tierra am 15.07.2026",
+        "url": "https://martinpena.pr.gov/reunion-ordinaria-de-la-junta-de-directores-19/",
+        "retrieved_at": "2026-10-30",
+        "note": "Die offizielle Körperschaft veröffentlicht eine am 15.07.2026 abgehaltene beziehungsweise angekündigte gemeinsame Sitzung ihres Direktoriums mit dem Treuhändergremium des Fideicomiso de la Tierra. Das ist ein datierter institutioneller Betriebsbeleg, kein Beleg sämtlicher Projekte oder Land-Transaktionen."
+      },
+      {
+        "id": "cano-trust-current-home",
+        "type": "official-source",
+        "label": "Fideicomiso de la Tierra – offizielle Organisationsseite",
+        "url": "https://fideicomisomartinpena.org/",
+        "retrieved_at": "2026-10-30",
+        "note": "Offizielle Beschreibung der kollektiv verwalteten Landrechte, der gemeinnützigen Boden-Treuhandgesellschaft und ihrer Programme; ohne persönliche Parzellen- oder Wohnstandorte."
       }
     ],
     "uncertainty_note": "Die tatsächlichen Land-Trust-Flächen werden nicht kartiert; die Darstellung bleibt auf Stadtebene."
   },
   "curation": {
-    "state": "stale",
+    "state": "listed",
     "catalogued_at": "2026-07-19",
     "reviewed_by": "Commonworld editorial review",
-    "reviewed_at": "2026-09-02",
-    "next_review_at": "2026-10-02",
-    "notes": "Aktueller Betriebszustand nicht zeitnah verifiziert; bei der Nachprüfung am 2026-09-02 blieb ein aktueller Betriebsbeleg offen. Priorisierte Nachprüfung bis 2026-10-02. Der Community Land Trust ist als konkrete gemeinschaftliche Bodeninstitution belegt; die übergeordnete ENLACE-Initiative wird nicht als eigene Identität katalogisiert."
+    "reviewed_at": "2026-10-30",
+    "next_review_at": "2026-11-30",
+    "notes": "Am 30.10.2026 Quellen- und Commons-Basis erneut bewertet: kollektives Landtrusteigentum, lokale Trägerschaft und die offiziell dokumentierte gemeinsame Sitzung im Juli 2026 sind belegt; die ENLACE-Behörde ist nicht mit der Trust-Institution gleichzusetzen. Keine Haus- oder Parzellenkoordinaten; Wiedervorlage 30.11.2026."
   },
   "links": [
     {
