@@ -39,6 +39,14 @@
         "url": "https://www.wikimedia.org/",
         "retrieved_at": "2026-07-12",
         "note": "Die offizielle Wikimedia-Übersicht führt Wikibooks als Sammlung freier Lehrbücher."
+      },
+      {
+        "id": "wikibooks-policy-guidelines",
+        "type": "official-source",
+        "url": "https://en.wikibooks.org/wiki/Wikibooks:Policies_and_guidelines",
+        "label": "Wikibooks – Policies and guidelines",
+        "retrieved_at": "2026-10-30",
+        "note": "Offizielle Communityregeln zur offenen Lehrbucharbeit und Konsens."
       }
     ]
   },
@@ -46,9 +54,9 @@
     "state": "stale",
     "catalogued_at": "2026-07-12",
     "reviewed_by": "Commonworld editorial review",
-    "reviewed_at": "2026-07-12",
-    "next_review_at": "2026-10-12",
-    "notes": "Erster öffentlicher Commonworld-Startdatensatz; Identität, Zweck, digitale Präsenz und offizielle Quelle wurden redaktionell geprüft."
+    "reviewed_at": "2026-10-30",
+    "next_review_at": "2026-10-31",
+    "notes": "Governance-Desk-Review 30.10.2026: strukturierte Kriterien mit offiziellen Quellen geprüft. Operative Aktivität bleibt ungeprüft, weiterhin stale."
   },
   "links": [
     {

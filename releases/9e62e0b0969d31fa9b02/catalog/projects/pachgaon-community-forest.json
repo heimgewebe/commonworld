@@ -1,0 +1,101 @@
+{
+  "schema_version": 4,
+  "id": "pachgaon-community-forest",
+  "title": "Pachgaon Community Forest",
+  "summary": "Die Gram Sabha von Pachgaon verwaltet 1.006 Hektar Wald über anerkannte Community-Forest-Resource-Rechte und verbindet demokratische Beschlüsse mit Waldschutz sowie Bambusernte und -verkauf für lokale Einkommen.",
+  "themes": [
+    "forest",
+    "land-commons",
+    "community-land",
+    "commons-governance",
+    "biodiversity"
+  ],
+  "actions": [
+    "learn"
+  ],
+  "presence": {
+    "geographic": [
+      {
+        "id": "pachgaon-chandrapur-district",
+        "mode": "approximate",
+        "label": "Chandrapur-Distrikt, Maharashtra, Indien — grober Distriktanker",
+        "geometry": {
+          "type": "Point",
+          "coordinates": [
+            79.3,
+            20.0
+          ]
+        },
+        "uncertainty_meters_min": 100000,
+        "privacy_note": "Der Punkt zeigt nur den öffentlich genannten Distrikt und keine Dorf-, Wald-, Bambus-, Schutz- oder Nutzungsgrenze.",
+        "source_ids": [
+          "pachgaon-atree-cfr",
+          "maharashtra-fra"
+        ]
+      }
+    ],
+    "digital": {
+      "available": false,
+      "source_ids": [
+        "pachgaon-atree-cfr",
+        "maharashtra-fra"
+      ]
+    }
+  },
+  "activity": {
+    "status": "unknown",
+    "observed_at": "2026-10-30",
+    "source_ids": [
+      "pachgaon-atree-cfr"
+    ],
+    "note": "Aktueller Betriebszustand nicht zeitnah verifiziert: Die Projektpartner-Dokumentation von ATREE belegt die Gemeinschaftsverwaltung bei einer Sitzung im März 2022. Ein zusätzlich geprüfter externer Fallbericht erschien im Januar 2026, bestätigt aber keine objektspezifische aktuelle Versammlung im Oktober 2026."
+  },
+  "provenance": {
+    "sources": [
+      {
+        "id": "pachgaon-atree-cfr",
+        "type": "official-source",
+        "label": "ATREE CFR – Study visit to Pachgaon",
+        "url": "https://cfr.atree.org/portfolio/learning-from-and-carrying-forward-cfr-management-planning-in-central-india-2/",
+        "retrieved_at": "2026-09-05",
+        "note": "Offizielle Projektseite von ATREE mit Ortsbesuch 2022, 1.006 Hektar anerkannten CFR-Rechten, Gram-Sabha-Sitzung, Waldschutz sowie Bambusernte und -verkauf."
+      },
+      {
+        "id": "maharashtra-fra",
+        "type": "official-source",
+        "label": "Government of Maharashtra – About the Forest Rights Act",
+        "url": "https://trti.maharashtra.gov.in/page/about-fra",
+        "retrieved_at": "2026-08-04",
+        "note": "Aktuelle Regierungsseite zum Rechtsrahmen, der Waldrechte und gemeinschaftliche Rechte von Waldgemeinschaften anerkennt und überträgt; kein objektspezifischer Aktivitätsbeleg für Pachgaon."
+      }
+    ],
+    "uncertainty_note": "Die öffentliche Darstellung verwendet ausschließlich einen groben Distriktanker und rekonstruiert weder Waldfläche noch lokale Nutzungsorte."
+  },
+  "curation": {
+    "state": "stale",
+    "catalogued_at": "2026-08-04",
+    "reviewed_by": "Commonworld editorial review",
+    "reviewed_at": "2026-10-30",
+    "next_review_at": "2026-11-30",
+    "notes": "Aktueller Betriebszustand nicht zeitnah verifiziert. Bei der redaktionellen Nachprüfung am 30.10.2026 wurde ergänzend ein im Januar 2026 publizierter externer Fallbericht zu historischen Gram-Sabha-Regeln geprüft (separat im Quellenledger), kein aktueller Betriebsbeleg. Aufgenommen bleibt die konkrete Gram-Sabha-Verwaltung; der Eintrag bleibt stale. Nächste Prüfung 30.11.2026."
+  },
+  "links": [
+    {
+      "type": "homepage",
+      "label": "ATREE-Fallstudie zu Pachgaon",
+      "url": "https://cfr.atree.org/portfolio/learning-from-and-carrying-forward-cfr-management-planning-in-central-india-2/"
+    },
+    {
+      "type": "learn",
+      "label": "Pachgaons Waldverwaltung kennenlernen",
+      "url": "https://cfr.atree.org/portfolio/learning-from-and-carrying-forward-cfr-management-planning-in-central-india-2/",
+      "source_ids": [
+        "pachgaon-atree-cfr",
+        "maharashtra-fra"
+      ]
+    }
+  ],
+  "handoff": {
+    "enabled": false
+  }
+}

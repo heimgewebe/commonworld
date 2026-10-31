@@ -1,0 +1,56 @@
+{
+  "schema_version": 1,
+  "kind": "commonworld_commons_basis",
+  "project_id": "tribunal-aguas-valencia",
+  "classification": "commons-infrastructure",
+  "decision": "include",
+  "reviewed_at": "2026-10-31",
+  "reviewer": "Commonworld editorial desk review",
+  "criteria": {
+    "shared_resource": {
+      "status": "supported",
+      "statement": "Wasserzufuhr und die von Bewässerungsgemeinschaften gemeinsam genutzten historischen Kanäle sind regulierte gemeinschaftliche Ressourcensysteme.",
+      "source_ids": [
+        "source-tribunal-official",
+        "tribunal-operation"
+      ]
+    },
+    "community": {
+      "status": "supported",
+      "statement": "Die Bewässerungsgemeinschaften der acht Kanäle haben Vertreter am Wassergericht und regeln Konflikte beteiligter Bewirtschafter.",
+      "source_ids": [
+        "tribunal-operation"
+      ]
+    },
+    "commoning_practice": {
+      "status": "supported",
+      "statement": "Die Gemeinschaften verteilen Wasser und klären Wasserrechts- beziehungsweise Nutzungsverstöße in einem wiederkehrenden, öffentlich zugänglichen Verfahren.",
+      "source_ids": [
+        "source-tribunal-official",
+        "tribunal-operation"
+      ]
+    },
+    "rules_and_responsibility": {
+      "status": "supported",
+      "statement": "Syndici der acht Kanäle, Kanalwachen, Ladung, öffentliche Anhörung und Entscheidungsverfahren sind auf der offiziellen Operationsseite beschrieben.",
+      "source_ids": [
+        "tribunal-operation"
+      ]
+    },
+    "common_benefit": {
+      "status": "supported",
+      "statement": "Gemeinsame Wasserverteilung und transparente Streitschlichtung sichern verlässliche Bewässerung und fortdauernde Pflege historischer Nutzungsregeln.",
+      "source_ids": [
+        "tribunal-operation",
+        "source-tribunal-official"
+      ]
+    }
+  },
+  "confidence": 0.94,
+  "limitations": [
+    "Das Tribunal selbst ist ein gemeinschaftliches Streitbeilegungsorgan und nicht automatisch Eigentümer aller Bewässerungskanäle.",
+    "Die Rechte betreffen definierte Bewässerungsgemeinschaften und deren Mitglieder, nicht ein allgemeines Nutzungsrecht aller Einwohner.",
+    "Aus öffentlichen Sitzungsterminen lässt sich keine individuelle heutige Bewässerungsquote ableiten."
+  ],
+  "notes": "Commons-Governance-Infrastruktur mit öffentlichen, verfahrensgebundenen Konfliktentscheidungen lokaler Kanalnutzer."
+}

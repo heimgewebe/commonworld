@@ -1,0 +1,57 @@
+{
+  "schema_version": 1,
+  "kind": "commonworld_commons_basis",
+  "project_id": "p2pu",
+  "classification": "undetermined",
+  "decision": "needs_information",
+  "reviewed_at": "2026-10-31",
+  "reviewer": "Commonworld editorial desk review",
+  "criteria": {
+    "shared_resource": {
+      "status": "supported",
+      "statement": "Offene Lernressourcen und die gemeinsam nutzbare Lernkreis-Methode sind das teilbare digitale und soziale Bildungswissen.",
+      "source_ids": [
+        "p2pu-about",
+        "p2pu-home"
+      ]
+    },
+    "community": {
+      "status": "supported",
+      "statement": "Bibliotheken, Facilitatoren, Teilnehmende und ein kleines Kernteam organisieren offene Lerngruppen und Lernressourcen.",
+      "source_ids": [
+        "p2pu-about",
+        "p2pu-community"
+      ]
+    },
+    "commoning_practice": {
+      "status": "supported",
+      "statement": "Lernkreise ermöglichen gemeinsames Lernen, Rückmeldung, selbstorganisierte Diskussionen und die Weitergabe von moderierten Lernmethoden.",
+      "source_ids": [
+        "p2pu-about",
+        "p2pu-community"
+      ]
+    },
+    "rules_and_responsibility": {
+      "status": "partial",
+      "statement": "P2PU beschreibt Community-Zentrierung und gemeinsame Lerngruppen; rechtsverbindliche Entscheidungsrechte von Bibliotheken und Lerngruppen über Software, Budget und Organisationskonflikte sind damit nicht hinreichend belegt.",
+      "source_ids": [
+        "p2pu-about"
+      ]
+    },
+    "common_benefit": {
+      "status": "supported",
+      "statement": "Frei angebotene gemeinschaftliche Lernkreise und öffentlich nutzbare Methoden stärken niedrigschwellige Bildung und gegenseitige Unterstützung.",
+      "source_ids": [
+        "p2pu-about",
+        "p2pu-home"
+      ]
+    }
+  },
+  "confidence": 0.84,
+  "limitations": [
+    "Ein kleines P2PU-Kernteam und eigenständige Bibliotheken übernehmen verschiedene Verantwortungen; sie sind keine einheitliche Mitgliedergenossenschaft.",
+    "Die Governance des gemeinnützigen Trägers ist aus der allgemeinen Projektbeschreibung nicht bestimmt.",
+    "Die Zugänglichkeit einzelner Lernkreise variiert nach teilnehmender Bibliothek und Termin."
+  ],
+  "notes": "Geteiltes Lernwissen und Commoning belegt; verbindliche Governance über die zentrale Bildungsinfrastruktur weiterhin ungeklärt."
+}

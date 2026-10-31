@@ -70,9 +70,9 @@
     "state": "stale",
     "catalogued_at": "2026-07-26",
     "reviewed_by": "Commonworld editorial review",
-    "reviewed_at": "2026-07-26",
-    "next_review_at": "2026-10-26",
-    "notes": "Als eigenständiges Open-Hardware-Commons neben Open Source Ecology aufgenommen; RepRap konzentriert sich auf selbstreplizierende Maschinen und deren verteilte Entwurfs- und Baupraxis."
+    "reviewed_at": "2026-10-31",
+    "next_review_at": "2026-11-15",
+    "notes": "Als eigenständiges Open-Hardware-Commons neben Open Source Ecology aufgenommen; RepRap konzentriert sich auf selbstreplizierende Maschinen und deren verteilte Entwurfs- und Baupraxis. Fünfkriterien-Desk-Review vom 31.10.2026: Open-Hardware-Gut gesichert, aber Projekt-übergreifende Regel- und Konfliktverantwortung nicht ausreichend eindeutig. Aktivität nicht neu zertifiziert, state bleibt stale."
   },
   "links": [
     {

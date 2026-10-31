@@ -1,0 +1,54 @@
+{
+  "schema_version": 1,
+  "kind": "commonworld_commons_basis",
+  "project_id": "thailand-citizens-forest-database",
+  "classification": "undetermined",
+  "decision": "needs_information",
+  "reviewed_at": "2026-10-31",
+  "reviewer": "Commonworld editorial desk review",
+  "criteria": {
+    "shared_resource": {
+      "status": "supported",
+      "statement": "Gemeinschaftswald-Informationen und gemeinsam erstellte digitale Walddaten sind die kollektiv gepflegte Wissensressource.",
+      "source_ids": [
+        "source-thaicfnet-factsheet",
+        "source-recoftc-thailand"
+      ]
+    },
+    "community": {
+      "status": "supported",
+      "statement": "Dorfgruppen, NGOs, Zivilgesellschaft und Verwaltungsstellen wirken laut Projektbeschreibung an der Datenbasis mit.",
+      "source_ids": [
+        "source-thaicfnet-factsheet"
+      ]
+    },
+    "commoning_practice": {
+      "status": "supported",
+      "statement": "Gemeinden melden Waldinformationen, dokumentieren lokale Waldbewirtschaftung und benutzen gemeinsame Berichts- und Auswertungsinstrumente.",
+      "source_ids": [
+        "source-thaicfnet-factsheet"
+      ]
+    },
+    "rules_and_responsibility": {
+      "status": "partial",
+      "statement": "RECOFTC und ChangeFusion werden ausdrücklich als Co-Manager der technischen Datenplattform benannt; verbindliche Datenkontrolle, Lösch-, Mitentscheidungs- und Konfliktrechte der beitragenden Gemeinden fehlen in der 2025er Beschreibung.",
+      "source_ids": [
+        "source-thaicfnet-factsheet"
+      ]
+    },
+    "common_benefit": {
+      "status": "supported",
+      "statement": "Öffentliche Waldinformationen sollen lokale Waldbewirtschaftung sichtbar machen und Austausch zwischen Gemeinden und öffentlichen Stellen erleichtern.",
+      "source_ids": [
+        "source-thaicfnet-factsheet"
+      ]
+    }
+  },
+  "confidence": 0.85,
+  "limitations": [
+    "Die gemeinsame Datenerhebung gibt einzelnen Waldgemeinschaften nicht automatisch gemeinsame Eigentumsrechte an Servern oder Software.",
+    "Quellen von 2025 belegen keine neue laufende Plattform-Verfügbarkeit im Oktober 2026.",
+    "Keine aktuell verbindlichen Daten-Governance-/Sperrrechte der Waldnutzergemeinschaften nachgewiesen."
+  ],
+  "notes": "Partizipative öffentliche Wald-Dateninfrastruktur, deren formale Community-Steuerung der Betreiberplattform noch offen ist."
+}

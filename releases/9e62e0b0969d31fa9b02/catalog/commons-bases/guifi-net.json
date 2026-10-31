@@ -1,0 +1,56 @@
+{
+  "schema_version": 1,
+  "kind": "commonworld_commons_basis",
+  "project_id": "guifi-net",
+  "classification": "common",
+  "decision": "include",
+  "reviewed_at": "2026-10-31",
+  "reviewer": "Commonworld editorial desk review",
+  "criteria": {
+    "shared_resource": {
+      "status": "supported",
+      "statement": "Das gemeinsam ausgebaute offene, freie und neutrale Glasfaser- und Funknetz ist ausdrücklich als infrastrukturelles Gemeingut definiert.",
+      "source_ids": [
+        "guifi-commons",
+        "guifi-network-guide"
+      ]
+    },
+    "community": {
+      "status": "supported",
+      "statement": "Privatnutzer, Netzausbauer, Unternehmen, Initiativen und Verwaltungen können nach den publizierten gleichen Bedingungen gemeinsam am Netzwerk teilnehmen.",
+      "source_ids": [
+        "guifi-commons"
+      ]
+    },
+    "commoning_practice": {
+      "status": "supported",
+      "statement": "Beteiligte können Infrastruktur beisteuern, ausbauen, Anschlüsse bereitstellen, Netzwerkdaten pflegen und die gemeinsame Kommunikationsinfrastruktur nutzen.",
+      "source_ids": [
+        "guifi-commons",
+        "guifi-network-guide"
+      ]
+    },
+    "rules_and_responsibility": {
+      "status": "supported",
+      "statement": "Die Stiftung definiert Offenheit, gleichbehandelten Zugang und Neutralität; Netzbetrieb und Ausbauten sollen unter gemeinsamen, transparenten Bedingungen stattfinden.",
+      "source_ids": [
+        "guifi-commons",
+        "guifi-network-guide"
+      ]
+    },
+    "common_benefit": {
+      "status": "supported",
+      "statement": "Die technische Infrastruktur wird geteilt und soll Internetzugang, Beteiligung und regionale Konnektivität ohne diskriminierende Eintrittsbedingungen ermöglichen.",
+      "source_ids": [
+        "guifi-commons"
+      ]
+    }
+  },
+  "confidence": 0.94,
+  "limitations": [
+    "Offener Netzzugang bedeutet nicht, dass jeder Zugang kostenlos oder jede Leitung gemeinschaftlich im selben Rechtstitel steht.",
+    "Die Stiftung, lokale Betreiber und einzelne Leitungs-/Grundstückseigentümer sind nicht identisch.",
+    "Einzelne lokale Netzbereiche und aktuelle Dienstverfügbarkeit wurden nicht neu nachgemessen."
+  ],
+  "notes": "Expliziter Telekommunikations-Commons-Vertrag mit offener, neutraler gemeinsamer Betriebs- und Wachstumspraxis."
+}

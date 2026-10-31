@@ -2,7 +2,7 @@
   "schema_version": 4,
   "id": "potato-park-peru",
   "title": "Parque de la Papa",
-  "summary": "Ein von fünf Quechua-Gemeinschaften getragenes Gebiet bei Písac, in dem einheimische Kartoffelsorten, landwirtschaftliches Wissen, Ökosysteme und kulturelle Praxis gemeinsam erhalten werden.",
+  "summary": "Ein von Quechua-Gemeinschaften getragenes Gebiet bei Písac, in dem einheimische Kartoffelsorten, landwirtschaftliches Wissen, Ökosysteme und kulturelle Praxis gemeinsam erhalten werden.",
   "themes": [
     "seeds",
     "agriculture",
@@ -67,6 +67,30 @@
         "url": "https://www.wikidata.org/wiki/Q950398",
         "retrieved_at": "2026-07-19",
         "note": "CC0-Registereintrag für den öffentlich benannten Bezugsort; nur zur groben Orientierung des größeren Gemeinschaftsgebiets."
+      },
+      {
+        "id": "potato-park-intercommunity-report-2011",
+        "type": "official-source",
+        "label": "IIED und Asociación ANDES – Biokulturelles Gemeinschaftsprotokoll (2011)",
+        "url": "https://www.iied.org/g03168",
+        "retrieved_at": "2026-10-31",
+        "note": "2011 gemeinsam von IIED und ANDES veröffentlichter Bericht zu Gemeinderecht und Nutzenteilung; historischer Fünf-Gemeinden-Rahmen, keine aktuelle Mitgliederzählung."
+      },
+      {
+        "id": "potato-park-about",
+        "type": "official-source",
+        "label": "Asociación ANDES – Potato Park (aktuelle Partnerbeschreibung)",
+        "url": "https://andes.org.pe/potato-park/",
+        "retrieved_at": "2026-10-31",
+        "note": "Aktuelle Projektpartnerseite von Asociación ANDES mit sechs benannten Quechua-Gemeinschaften; von fünf Gemeinden im älteren Abkommen abzugrenzen."
+      },
+      {
+        "id": "potato-park-benefit-protocol",
+        "type": "official-source",
+        "label": "Potato Park Benefit Protocol",
+        "url": "https://biocultural.iied.org/methods-and-tools",
+        "retrieved_at": "2026-10-31",
+        "note": "IIED-Dokumentation zum gemeinschaftlichen Abkommen über Nutzenverteilung und lokale Entscheidungsregeln."
       }
     ],
     "uncertainty_note": "Die Punktgeometrie ist keine Grenze des Kartoffelparks und verrät keine einzelnen Saatgut- oder Anbauorte."
@@ -75,8 +99,8 @@
     "state": "stale",
     "catalogued_at": "2026-07-19",
     "reviewed_by": "Commonworld editorial review",
-    "reviewed_at": "2026-07-19",
-    "next_review_at": "2026-10-19",
+    "reviewed_at": "2026-10-31",
+    "next_review_at": "2026-11-15",
     "notes": "Die Auswahl stärkt eine konkrete indigene Saatgut-, Land- und Wissenspraxis in den Anden."
   },
   "links": [

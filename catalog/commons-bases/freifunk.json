@@ -1,0 +1,57 @@
+{
+  "schema_version": 1,
+  "kind": "commonworld_commons_basis",
+  "project_id": "freifunk",
+  "classification": "undetermined",
+  "decision": "needs_information",
+  "reviewed_at": "2026-10-30",
+  "reviewer": "Commonworld editorial desk review",
+  "criteria": {
+    "shared_resource": {
+      "status": "supported",
+      "statement": "Freiwillig bereitgestellte WLAN-Router, Verbindungen und gemeinsame Firmware bilden dezentrale nichtkommerzielle Kommunikationsinfrastruktur.",
+      "source_ids": [
+        "freifunk-overview"
+      ]
+    },
+    "community": {
+      "status": "supported",
+      "statement": "Netzbetreiber, Entwickler und lokale Gruppen arbeiten in einer verteilten Freifunk-Gemeinschaft.",
+      "source_ids": [
+        "freifunk-overview",
+        "freifunk-participation"
+      ]
+    },
+    "commoning_practice": {
+      "status": "supported",
+      "statement": "Beteiligte errichten und betreiben Router, entwickeln Firmware und pflegen offene Nachbarschaftsnetze.",
+      "source_ids": [
+        "freifunk-overview",
+        "freifunk-participation"
+      ]
+    },
+    "rules_and_responsibility": {
+      "status": "partial",
+      "statement": "Die Bewegung beschreibt lokale Selbstorganisation, jedoch keinen einheitlichen Eigentums-, Wahl- und Konfliktregelrahmen für alle lokalen Netze.",
+      "source_ids": [
+        "freifunk-overview",
+        "freifunk-participation"
+      ]
+    },
+    "common_benefit": {
+      "status": "supported",
+      "statement": "Nichtkommerzieller öffentlicher Netzzugang und die geteilte technische Infrastruktur dienen lokaler Kommunikation und Teilhabe.",
+      "source_ids": [
+        "freifunk-overview",
+        "freifunk-participation"
+      ]
+    }
+  },
+  "confidence": 0.84,
+  "limitations": [
+    "Eine Dachbewegung ist keine einzelne rechtsfähige Netzgenossenschaft.",
+    "Private Router bleiben nicht automatisch Eigentum aller Netznutzer.",
+    "Die aktuelle Aktivität lokaler Gruppen ist nicht mit dieser landesweiten Selbstbeschreibung belegt."
+  ],
+  "notes": "Freifunk zeigt verteiltes Commoning; die umfassende governance-Bewertung erfordert eine konkrete lokale Gemeinschaft als Bewertungseinheit."
+}

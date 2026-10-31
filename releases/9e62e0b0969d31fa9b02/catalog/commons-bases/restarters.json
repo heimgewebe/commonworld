@@ -1,0 +1,58 @@
+{
+  "schema_version": 1,
+  "kind": "commonworld_commons_basis",
+  "project_id": "restarters",
+  "classification": "commons-infrastructure",
+  "decision": "include",
+  "reviewed_at": "2026-10-31",
+  "reviewer": "Commonworld editorial desk review",
+  "criteria": {
+    "shared_resource": {
+      "status": "supported",
+      "statement": "Die gemeinsame Reparaturwissensdatenbank, organisatorische Event-Infrastruktur und offen teilbare Reparaturerfahrungen bilden die geteilte Ressource.",
+      "source_ids": [
+        "restarters-about",
+        "restarters-community"
+      ]
+    },
+    "community": {
+      "status": "supported",
+      "statement": "Lokale Reparaturgruppen, freiwillige Reparaturhelfer und Veranstalter organisieren Treffen und teilen Fachwissen über das Netzwerk.",
+      "source_ids": [
+        "restarters-about",
+        "restarters-community"
+      ]
+    },
+    "commoning_practice": {
+      "status": "supported",
+      "statement": "Gemeinschaftliche Reparaturtreffen, gegenseitige Hilfestellung und dokumentierte Reparaturdaten werden dezentral gesammelt und über die Plattform weitergegeben.",
+      "source_ids": [
+        "restarters-about",
+        "restarters-community"
+      ]
+    },
+    "rules_and_responsibility": {
+      "status": "supported",
+      "statement": "Die Plattform stellt registrierten Organisatoren Verwaltung von Gruppen und Veranstaltungen sowie den freiwilligen Helfern dokumentierte Rollen und Reparaturdatenpfade bereit.",
+      "source_ids": [
+        "restarters-about",
+        "restarters-community"
+      ]
+    },
+    "common_benefit": {
+      "status": "supported",
+      "statement": "Reparaturfähigkeiten werden verbreitet, Geräte weitergenutzt und Erfahrungen für andere Gruppen sichtbar gemacht.",
+      "source_ids": [
+        "restarters-about",
+        "restarters-community"
+      ]
+    }
+  },
+  "confidence": 0.89,
+  "limitations": [
+    "Ein Netzwerk lokaler Reparaturgruppen verleiht seinen Nutzern keine gemeinsamen Eigentumsrechte an sämtlichen Geräten oder der Trägerplattform.",
+    "Konkrete Sicherheits- und Veranstaltungsregeln können lokal abweichen.",
+    "Online ausgewiesene Impact-Zahlen wurden nicht als dauerhafte Datensatzzahl übernommen."
+  ],
+  "notes": "Globale organisatorische Commons-Infrastruktur für lokale Repair-Gruppen; deren autonome Rechte bleiben getrennt."
+}

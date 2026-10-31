@@ -1,0 +1,226 @@
+{
+  "schema_version": 1,
+  "kind": "commonworld_catalog_locale_technical_carryforward_wave6",
+  "source_head": "a779b9a969ea4fa53a0d26a0efe08a2d1a7415b5",
+  "target_release": "9e62e0b0969d31fa9b02",
+  "scope": "18 existing nonbaseline release UIs: release/build metadata and date-only stale notices",
+  "release_human_review": "unchanged_historical_receipts_not_newly_certified",
+  "locales": [
+    {
+      "locale": "es",
+      "surfaces": [
+        {
+          "surface": "index",
+          "path": "es.html",
+          "sha256": "d0273ca3f37682ccc95ac06f7566e8f816a7ad903c95f7b0c5e07467f7415766",
+          "changed_line_pairs": 50,
+          "change_types": [
+            "release_metadata",
+            "stale_date"
+          ]
+        },
+        {
+          "surface": "method",
+          "path": "method.es.html",
+          "sha256": "7b22cf4aa34ab7688e873a64f2a4e6dc722fe6db3f8a42f84948efc7c5ff0df4",
+          "changed_line_pairs": 2,
+          "change_types": [
+            "release_metadata"
+          ]
+        },
+        {
+          "surface": "proposal",
+          "path": "propose.es.html",
+          "sha256": "167329058dbde16d3315c6daf38635e3ef7bd7caeaf4c16dddc6daccb2c01135",
+          "changed_line_pairs": 2,
+          "change_types": [
+            "release_metadata"
+          ]
+        }
+      ],
+      "historical_receipts_preserved": true,
+      "new_human_review_claim": false
+    },
+    {
+      "locale": "fr",
+      "surfaces": [
+        {
+          "surface": "index",
+          "path": "fr.html",
+          "sha256": "225588b46697a43dcdd41dbeef256a136b6eb9e38e3d9483ec88eaf0dfdab9f8",
+          "changed_line_pairs": 50,
+          "change_types": [
+            "release_metadata",
+            "stale_date"
+          ]
+        },
+        {
+          "surface": "method",
+          "path": "method.fr.html",
+          "sha256": "c4b82de54fa6fc75f36d45ff5e1b3db58e61d8f1f8c7af310655fa7066fffa60",
+          "changed_line_pairs": 2,
+          "change_types": [
+            "release_metadata"
+          ]
+        },
+        {
+          "surface": "proposal",
+          "path": "propose.fr.html",
+          "sha256": "18f153634efe820db808650621511b0345f4426538f9afadd6cb3f804ef216f8",
+          "changed_line_pairs": 2,
+          "change_types": [
+            "release_metadata"
+          ]
+        }
+      ],
+      "historical_receipts_preserved": true,
+      "new_human_review_claim": false
+    },
+    {
+      "locale": "pt-BR",
+      "surfaces": [
+        {
+          "surface": "index",
+          "path": "pt-BR.html",
+          "sha256": "6389d44fa834592c59fdd3f0f000e2a2b984997357f5950ec1838267c59b6977",
+          "changed_line_pairs": 50,
+          "change_types": [
+            "release_metadata",
+            "stale_date"
+          ]
+        },
+        {
+          "surface": "method",
+          "path": "method.pt-BR.html",
+          "sha256": "74d1ae0bd39692f03accd9906dc108a6d209ce1fa8f19778daed9e1f36717e84",
+          "changed_line_pairs": 2,
+          "change_types": [
+            "release_metadata"
+          ]
+        },
+        {
+          "surface": "proposal",
+          "path": "propose.pt-BR.html",
+          "sha256": "fa926c21caac4aaae9305a29ad4add00089dd40413e1169a9828080fe315ccc9",
+          "changed_line_pairs": 2,
+          "change_types": [
+            "release_metadata"
+          ]
+        }
+      ],
+      "historical_receipts_preserved": true,
+      "new_human_review_claim": false
+    },
+    {
+      "locale": "ar",
+      "surfaces": [
+        {
+          "surface": "index",
+          "path": "ar.html",
+          "sha256": "708ad3b4f91059a94056d85dcbfcef7558b9809efb2c2395de21f996e4abd3e4",
+          "changed_line_pairs": 50,
+          "change_types": [
+            "release_metadata",
+            "stale_date"
+          ]
+        },
+        {
+          "surface": "method",
+          "path": "method.ar.html",
+          "sha256": "d33b9db4b4cde7478aaea785ffe9b8d43daf6fed963bb327ec66a85d2051d800",
+          "changed_line_pairs": 2,
+          "change_types": [
+            "release_metadata"
+          ]
+        },
+        {
+          "surface": "proposal",
+          "path": "propose.ar.html",
+          "sha256": "4759b3617e7f033d5edb863d1f8ad63ee73a4d888bfad53a3e6e192a443be419",
+          "changed_line_pairs": 2,
+          "change_types": [
+            "release_metadata"
+          ]
+        }
+      ],
+      "historical_receipts_preserved": true,
+      "new_human_review_claim": false
+    },
+    {
+      "locale": "zh-Hans",
+      "surfaces": [
+        {
+          "surface": "index",
+          "path": "zh-Hans.html",
+          "sha256": "b7db581d37e05c9062363e804f24680c7056596a2663b8014c44e51394b647dd",
+          "changed_line_pairs": 50,
+          "change_types": [
+            "release_metadata",
+            "stale_date"
+          ]
+        },
+        {
+          "surface": "method",
+          "path": "method.zh-Hans.html",
+          "sha256": "13925a052afc62ce25652fe313a58e792777d2d11469658c9a75bd7e77317a49",
+          "changed_line_pairs": 2,
+          "change_types": [
+            "release_metadata"
+          ]
+        },
+        {
+          "surface": "proposal",
+          "path": "propose.zh-Hans.html",
+          "sha256": "07738e123b4ff0762f405f02634fae02519847ec5ce710df0a19ffbf3bd4f4a5",
+          "changed_line_pairs": 2,
+          "change_types": [
+            "release_metadata"
+          ]
+        }
+      ],
+      "historical_receipts_preserved": true,
+      "new_human_review_claim": false
+    },
+    {
+      "locale": "hi",
+      "surfaces": [
+        {
+          "surface": "index",
+          "path": "hi.html",
+          "sha256": "bdfb20f04ae4712a18a6329c6a079d84101bebaf3e695d188742fc3a5d19da58",
+          "changed_line_pairs": 50,
+          "change_types": [
+            "release_metadata",
+            "stale_date"
+          ]
+        },
+        {
+          "surface": "method",
+          "path": "method.hi.html",
+          "sha256": "f8652a13754ef4f28a3260c53dc7744ee05e85018fc440532dd9a6d8c83282c7",
+          "changed_line_pairs": 2,
+          "change_types": [
+            "release_metadata"
+          ]
+        },
+        {
+          "surface": "proposal",
+          "path": "propose.hi.html",
+          "sha256": "067c6b69603680c2ef5664aeceae59e3ca098623a39315ca2ab750800fa0647f",
+          "changed_line_pairs": 2,
+          "change_types": [
+            "release_metadata"
+          ]
+        }
+      ],
+      "historical_receipts_preserved": true,
+      "new_human_review_claim": false
+    }
+  ],
+  "does_not_establish": [
+    "new_language_human_review",
+    "signed_5_axis_Git_review",
+    "production_readback",
+    "merge_authorization"
+  ]
+}

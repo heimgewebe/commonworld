@@ -1,0 +1,57 @@
+{
+  "schema_version": 1,
+  "kind": "commonworld_commons_basis",
+  "project_id": "cecosesola",
+  "classification": "commons-infrastructure",
+  "decision": "include",
+  "reviewed_at": "2026-10-30",
+  "reviewer": "Commonworld editorial desk review",
+  "criteria": {
+    "shared_resource": {
+      "status": "supported",
+      "statement": "Verflochtene gemeinschaftliche Lebensmittelverteilung, Produktions- und Versorgungsstrukturen sowie gegenseitige Hilfsfonds bilden den gemeinsam bewirtschafteten Infrastrukturverbund.",
+      "source_ids": [
+        "cecosesola-food-network",
+        "cecosesola-home"
+      ]
+    },
+    "community": {
+      "status": "supported",
+      "statement": "Produzentengruppen, Gemeinschaftsproduktion und Verbraucherorganisationen bilden ein Netz von direkt beteiligten Personen und selbstorganisierten Gruppen.",
+      "source_ids": [
+        "cecosesola-food-network",
+        "cecosesola-governance"
+      ]
+    },
+    "commoning_practice": {
+      "status": "supported",
+      "statement": "Produzenten und Verteilungsgruppen planen Anbau, vereinbaren Preise, verwalten Hilfsfonds, rotieren Aufgaben und organisieren die Versorgung in laufenden Versammlungen.",
+      "source_ids": [
+        "cecosesola-food-network"
+      ]
+    },
+    "rules_and_responsibility": {
+      "status": "supported",
+      "statement": "Offiziell beschrieben sind Entscheidungen im Konsens, Rotation von Funktionen, direkte Beteiligung und die Organisation ohne feste Befehlsketten.",
+      "source_ids": [
+        "cecosesola-food-network",
+        "cecosesola-governance"
+      ]
+    },
+    "common_benefit": {
+      "status": "supported",
+      "statement": "Kollektive Preis- und Versorgungsentscheidungen dienen Grundversorgung, gegenseitiger Unterstützung sowie gerechteren Austauschbeziehungen.",
+      "source_ids": [
+        "cecosesola-food-network",
+        "cecosesola-home"
+      ]
+    }
+  },
+  "confidence": 0.91,
+  "limitations": [
+    "Vereinbarter Konsens und Rotation stammen aus Selbstdarstellung; externe Prüfung jeder Einzelorganisation liegt nicht vor.",
+    "Die Netzwerk-Teilnahme und Einkaufsmöglichkeiten unterliegen realen lokalen Zugangsbedingungen.",
+    "Aktuelle Absatzmengen oder Mitgliederzahlen werden nicht als dauerhaft gültige Commons-Eigenschaft festgeschrieben."
+  ],
+  "notes": "Konsens- und Rotationsstruktur ist anhand der offiziellen Versorgungsdarstellung konkret belegt; keine fingierte zentrale Hierarchie."
+}

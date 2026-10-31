@@ -1,0 +1,442 @@
+{
+  "schema_version": 1,
+  "kind": "commonworld_commons_basis_retroreview_wave2",
+  "checked_at_utc": "2026-10-30",
+  "source_base_commit": "e1817ad2c4a97a9c02a7160a04d45cc1cd446135",
+  "scope": "Eight individually source-bound five-dimension project-level governance desk reviews with explicit gaps.",
+  "reviewer_provenance": "model-assisted editorial desk review, not independent human certification",
+  "outcomes": [
+    {
+      "project_id": "auroville",
+      "basis_decision": "needs_information",
+      "classification": "undetermined",
+      "criteria": {
+        "shared_resource": {
+          "verdict": "supported",
+          "cited_source_ids": [
+            "auroville-legal",
+            "auroville-governing-board"
+          ]
+        },
+        "community": {
+          "verdict": "supported",
+          "cited_source_ids": [
+            "auroville-residents-assembly",
+            "auroville-legal"
+          ]
+        },
+        "commoning_practice": {
+          "verdict": "supported",
+          "cited_source_ids": [
+            "auroville-home",
+            "auroville-legal"
+          ]
+        },
+        "rules_and_responsibility": {
+          "verdict": "partial",
+          "cited_source_ids": [
+            "auroville-residents-assembly",
+            "auroville-governing-board"
+          ]
+        },
+        "common_benefit": {
+          "verdict": "supported",
+          "cited_source_ids": [
+            "auroville-home",
+            "auroville-legal"
+          ]
+        }
+      },
+      "provenance_urls": {
+        "auroville-governing-board": "https://www.auroville.org/page/governing-board",
+        "auroville-home": "https://auroville.org/",
+        "auroville-legal": "https://auroville.org/page/legal-structure",
+        "auroville-residents-assembly": "https://auroville.org/page/the-residents-assembly-of-auroville"
+      },
+      "limitations": [
+        "Rechtliche Foundation-Trägerschaft ist nicht gleich demokratische Eigentümerstellung aller Bewohner.",
+        "Das staatlich eingesetzte Board behält wichtige Befugnisse; Community-Autonomie darf nicht behauptet werden.",
+        "Aktuelle Konfliktentscheidungen und verbindliche Mitbestimmungsergebnisse sind nicht unabhängig geprüft."
+      ],
+      "operational_activity_recatalogued": false,
+      "post_review_public_state": "stale"
+    },
+    {
+      "project_id": "freifunk",
+      "basis_decision": "needs_information",
+      "classification": "undetermined",
+      "criteria": {
+        "shared_resource": {
+          "verdict": "supported",
+          "cited_source_ids": [
+            "freifunk-overview"
+          ]
+        },
+        "community": {
+          "verdict": "supported",
+          "cited_source_ids": [
+            "freifunk-overview",
+            "freifunk-participation"
+          ]
+        },
+        "commoning_practice": {
+          "verdict": "supported",
+          "cited_source_ids": [
+            "freifunk-overview",
+            "freifunk-participation"
+          ]
+        },
+        "rules_and_responsibility": {
+          "verdict": "partial",
+          "cited_source_ids": [
+            "freifunk-overview",
+            "freifunk-participation"
+          ]
+        },
+        "common_benefit": {
+          "verdict": "supported",
+          "cited_source_ids": [
+            "freifunk-overview",
+            "freifunk-participation"
+          ]
+        }
+      },
+      "provenance_urls": {
+        "freifunk-overview": "https://freifunk.net/worum-geht-es/",
+        "freifunk-participation": "https://freifunk.net/wie-mache-ich-mit/"
+      },
+      "limitations": [
+        "Eine Dachbewegung ist keine einzelne rechtsfähige Netzgenossenschaft.",
+        "Private Router bleiben nicht automatisch Eigentum aller Netznutzer.",
+        "Die aktuelle Aktivität lokaler Gruppen ist nicht mit dieser landesweiten Selbstbeschreibung belegt."
+      ],
+      "operational_activity_recatalogued": false,
+      "post_review_public_state": "stale"
+    },
+    {
+      "project_id": "freifunk-hamburg",
+      "basis_decision": "needs_information",
+      "classification": "undetermined",
+      "criteria": {
+        "shared_resource": {
+          "verdict": "supported",
+          "cited_source_ids": [
+            "freifunk-hamburg-homepage",
+            "ffhh-wiki"
+          ]
+        },
+        "community": {
+          "verdict": "supported",
+          "cited_source_ids": [
+            "freifunk-hamburg-homepage",
+            "ffhh-wiki"
+          ]
+        },
+        "commoning_practice": {
+          "verdict": "supported",
+          "cited_source_ids": [
+            "freifunk-hamburg-homepage",
+            "ffhh-wiki"
+          ]
+        },
+        "rules_and_responsibility": {
+          "verdict": "partial",
+          "cited_source_ids": [
+            "freifunk-hamburg-homepage",
+            "ffhh-wiki"
+          ]
+        },
+        "common_benefit": {
+          "verdict": "supported",
+          "cited_source_ids": [
+            "freifunk-hamburg-homepage",
+            "ffhh-wiki"
+          ]
+        }
+      },
+      "provenance_urls": {
+        "ffhh-wiki": "https://wiki.freifunk.net/Hamburg",
+        "freifunk-hamburg-homepage": "https://hamburg.freifunk.net/"
+      },
+      "limitations": [
+        "Öffentliche Knotenstatistiken sind kein Nachweis eines zum Stichtag funktionsfähigen gesamten Netzes.",
+        "Private Knoten-, Wohnungs- oder Zugangsdaten werden nicht übernommen.",
+        "Hierarchielosigkeit als Selbstbeschreibung ersetzt keine prüfbaren Verantwortungsregeln."
+      ],
+      "operational_activity_recatalogued": false,
+      "post_review_public_state": "stale"
+    },
+    {
+      "project_id": "mastodon",
+      "basis_decision": "needs_information",
+      "classification": "undetermined",
+      "criteria": {
+        "shared_resource": {
+          "verdict": "supported",
+          "cited_source_ids": [
+            "mastodon-home",
+            "mastodon-about-governance"
+          ]
+        },
+        "community": {
+          "verdict": "supported",
+          "cited_source_ids": [
+            "mastodon-home",
+            "mastodon-about-governance"
+          ]
+        },
+        "commoning_practice": {
+          "verdict": "supported",
+          "cited_source_ids": [
+            "mastodon-about-governance",
+            "mastodon-home"
+          ]
+        },
+        "rules_and_responsibility": {
+          "verdict": "partial",
+          "cited_source_ids": [
+            "mastodon-about-governance",
+            "mastodon-2026-administration"
+          ]
+        },
+        "common_benefit": {
+          "verdict": "supported",
+          "cited_source_ids": [
+            "mastodon-home",
+            "mastodon-about-governance"
+          ]
+        }
+      },
+      "provenance_urls": {
+        "mastodon-2026-administration": "https://blog.joinmastodon.org/2026/02/administrative-updates/",
+        "mastodon-about-governance": "https://joinmastodon.org/about",
+        "mastodon-home": "https://joinmastodon.org/"
+      },
+      "limitations": [
+        "Eine offene Softwarelizenz erteilt nicht jedem Nutzer Stimmrechte im Kernentwicklungsteam.",
+        "Moderationsentscheidungen einzelner Instanzen sind nicht mit Foundation-Kontrolle gleichzusetzen.",
+        "Rechtsform- und Governance-Übergänge von 2026 müssen gesondert aktuell geprüft werden."
+      ],
+      "operational_activity_recatalogued": false,
+      "post_review_public_state": "stale"
+    },
+    {
+      "project_id": "wikibooks",
+      "basis_decision": "include",
+      "classification": "common",
+      "criteria": {
+        "shared_resource": {
+          "verdict": "supported",
+          "cited_source_ids": [
+            "wikimedia-projects",
+            "wikibooks-policy-guidelines"
+          ]
+        },
+        "community": {
+          "verdict": "supported",
+          "cited_source_ids": [
+            "wikibooks-policy-guidelines"
+          ]
+        },
+        "commoning_practice": {
+          "verdict": "supported",
+          "cited_source_ids": [
+            "wikibooks-policy-guidelines"
+          ]
+        },
+        "rules_and_responsibility": {
+          "verdict": "supported",
+          "cited_source_ids": [
+            "wikibooks-policy-guidelines"
+          ]
+        },
+        "common_benefit": {
+          "verdict": "supported",
+          "cited_source_ids": [
+            "wikimedia-projects",
+            "wikibooks-policy-guidelines"
+          ]
+        }
+      },
+      "provenance_urls": {
+        "wikibooks-policy-guidelines": "https://en.wikibooks.org/wiki/Wikibooks:Policies_and_guidelines",
+        "wikimedia-projects": "https://www.wikimedia.org/"
+      },
+      "limitations": [
+        "Die geprüften spezifischen Richtlinien betreffen das englische Wikibooks; andere Sprachversionen regeln manches anders.",
+        "Offene Mitwirkung enthält Moderation und inhaltliche Qualitätsregeln.",
+        "Kein Beleg für die aktuelle Qualität einzelner Lehrbuchartikel."
+      ],
+      "operational_activity_recatalogued": false,
+      "post_review_public_state": "stale"
+    },
+    {
+      "project_id": "wikidata",
+      "basis_decision": "include",
+      "classification": "common",
+      "criteria": {
+        "shared_resource": {
+          "verdict": "supported",
+          "cited_source_ids": [
+            "wikidata-introduction",
+            "wikimedia-projects"
+          ]
+        },
+        "community": {
+          "verdict": "supported",
+          "cited_source_ids": [
+            "wikidata-introduction"
+          ]
+        },
+        "commoning_practice": {
+          "verdict": "supported",
+          "cited_source_ids": [
+            "wikidata-introduction"
+          ]
+        },
+        "rules_and_responsibility": {
+          "verdict": "supported",
+          "cited_source_ids": [
+            "wikidata-introduction",
+            "wikidata-licensing"
+          ]
+        },
+        "common_benefit": {
+          "verdict": "supported",
+          "cited_source_ids": [
+            "wikidata-licensing"
+          ]
+        }
+      },
+      "provenance_urls": {
+        "wikidata-introduction": "https://www.wikidata.org/wiki/Wikidata:Introduction",
+        "wikidata-licensing": "https://www.wikidata.org/wiki/Wikidata:Licensing",
+        "wikimedia-projects": "https://www.wikimedia.org/"
+      },
+      "limitations": [
+        "Die Datensätze stehen unter CC0, andere textliche Namensräume häufig unter CC BY-SA.",
+        "Offene Beiträge erfordern Prüfung und bedeuten keine Gewähr für einzelne Fakten.",
+        "Keine erneute tagesaktuelle Prüfung sämtlicher Community-Aktivitäten."
+      ],
+      "operational_activity_recatalogued": false,
+      "post_review_public_state": "stale"
+    },
+    {
+      "project_id": "wikimedia-commons",
+      "basis_decision": "include",
+      "classification": "common",
+      "criteria": {
+        "shared_resource": {
+          "verdict": "supported",
+          "cited_source_ids": [
+            "commons-project-scope",
+            "wikimedia-projects"
+          ]
+        },
+        "community": {
+          "verdict": "supported",
+          "cited_source_ids": [
+            "commons-community-about"
+          ]
+        },
+        "commoning_practice": {
+          "verdict": "supported",
+          "cited_source_ids": [
+            "commons-project-scope",
+            "commons-community-about"
+          ]
+        },
+        "rules_and_responsibility": {
+          "verdict": "supported",
+          "cited_source_ids": [
+            "commons-project-scope"
+          ]
+        },
+        "common_benefit": {
+          "verdict": "supported",
+          "cited_source_ids": [
+            "commons-project-scope",
+            "commons-community-about"
+          ]
+        }
+      },
+      "provenance_urls": {
+        "commons-community-about": "https://commons.wikimedia.org/wiki/Commons:About",
+        "commons-project-scope": "https://commons.wikimedia.org/wiki/Commons:Project_scope",
+        "wikimedia-projects": "https://www.wikimedia.org/"
+      },
+      "limitations": [
+        "Nicht jede im Internet auffindbare Datei ist frei lizenzierbar oder Aufnahmegegenstand.",
+        "Offene Mitarbeit wird durch Lizenz- und Moderationsregeln begrenzt.",
+        "Einzelne Lizenzangaben sind nicht per se amtliche Gewähr."
+      ],
+      "operational_activity_recatalogued": false,
+      "post_review_public_state": "stale"
+    },
+    {
+      "project_id": "wikiversity",
+      "basis_decision": "include",
+      "classification": "common",
+      "criteria": {
+        "shared_resource": {
+          "verdict": "supported",
+          "cited_source_ids": [
+            "wikiversity-newcomers",
+            "wikimedia-projects"
+          ]
+        },
+        "community": {
+          "verdict": "supported",
+          "cited_source_ids": [
+            "wikiversity-newcomers"
+          ]
+        },
+        "commoning_practice": {
+          "verdict": "supported",
+          "cited_source_ids": [
+            "wikiversity-newcomers"
+          ]
+        },
+        "rules_and_responsibility": {
+          "verdict": "supported",
+          "cited_source_ids": [
+            "wikiversity-newcomers",
+            "wikiversity-basic-policies-de"
+          ]
+        },
+        "common_benefit": {
+          "verdict": "supported",
+          "cited_source_ids": [
+            "wikiversity-newcomers",
+            "wikimedia-projects"
+          ]
+        }
+      },
+      "provenance_urls": {
+        "wikimedia-projects": "https://www.wikimedia.org/",
+        "wikiversity-basic-policies-de": "https://de.wikiversity.org/wiki/Wikiversity:Grundlegende_Richtlinien",
+        "wikiversity-newcomers": "https://en.wikiversity.org/wiki/Wikiversity:Welcome,_newcomers"
+      },
+      "limitations": [
+        "Die deutschsprachigen Richtlinien dürfen nicht pauschal auf andere Wikimedia-Sprachprojekte übertragen werden.",
+        "Offene Lerninhalte bedeuten keinen akkreditierten Abschluss.",
+        "Die Aktualität aller Kurse wird nicht mit dem Governance-Review behauptet."
+      ],
+      "operational_activity_recatalogued": false,
+      "post_review_public_state": "stale"
+    }
+  ],
+  "scope_after": {
+    "catalog_records": 100,
+    "structured_commons_bases": 46,
+    "remaining_legacy_without_basis": 54,
+    "operational_state_renewed": false
+  },
+  "does_not_establish": [
+    "current live operation",
+    "human review or native translation approval",
+    "all 100 substantively reviewed",
+    "release production activation",
+    "reviewer first-party signed decision"
+  ]
+}

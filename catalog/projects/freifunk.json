@@ -41,6 +41,14 @@
         "url": "https://freifunk.net/worum-geht-es/",
         "retrieved_at": "2026-07-12",
         "note": "Die offizielle Seite beschreibt Freifunk als nicht-kommerzielle Initiative für freie Funknetzwerke und freie Infrastrukturen."
+      },
+      {
+        "id": "freifunk-participation",
+        "type": "official-source",
+        "label": "freifunk.net – Wie kann ich mitmachen?",
+        "url": "https://freifunk.net/wie-mache-ich-mit/",
+        "retrieved_at": "2026-10-30",
+        "note": "Offizielle Website zur selbst organisierten Teilnahme in lokalen Gruppen."
       }
     ]
   },
@@ -48,9 +56,9 @@
     "state": "stale",
     "catalogued_at": "2026-07-12",
     "reviewed_by": "Commonworld editorial review",
-    "reviewed_at": "2026-07-12",
-    "next_review_at": "2026-10-12",
-    "notes": "Erster öffentlicher Commonworld-Startdatensatz; Identität, Zweck, digitale Präsenz und offizielle Quelle wurden redaktionell geprüft."
+    "reviewed_at": "2026-10-30",
+    "next_review_at": "2026-10-31",
+    "notes": "Dezentrale Freifunk-Governance am 30.10.2026 geprüft; Eigentums- und Abstimmungsregeln nicht pauschalisierbar. Weiterhin stale."
   },
   "links": [
     {

@@ -1,0 +1,58 @@
+{
+  "schema_version": 1,
+  "kind": "commonworld_commons_basis",
+  "project_id": "nepal-wireless-networking-project",
+  "classification": "undetermined",
+  "decision": "needs_information",
+  "reviewed_at": "2026-10-31",
+  "reviewer": "Commonworld editorial desk review",
+  "criteria": {
+    "shared_resource": {
+      "status": "supported",
+      "statement": "Von Dörfern gemeinsam genutzte Funkverbindungen und digitale Dienste in nepalesischen Bergregionen bilden lokale Kommunikationsinfrastruktur.",
+      "source_ids": [
+        "enrd-nepal-wireless",
+        "enrd-community-training"
+      ]
+    },
+    "community": {
+      "status": "supported",
+      "statement": "Lokale Bewohner und Techniker werden für Betrieb, Wartung und Ausbau von Funkverbindungen ausgebildet.",
+      "source_ids": [
+        "enrd-community-training",
+        "enrd-home"
+      ]
+    },
+    "commoning_practice": {
+      "status": "supported",
+      "statement": "Die Community betreibt Funknetze im Alltag, behebt technische Fehler und erweitert Anschlüsse mit Unterstützung durch ENRD und Freiwillige.",
+      "source_ids": [
+        "enrd-community-training",
+        "enrd-nepal-wireless"
+      ]
+    },
+    "rules_and_responsibility": {
+      "status": "partial",
+      "statement": "ENRD beschreibt lokale Betriebsverantwortung für nicht hochspezialisierte Aufgaben, aber nicht durchgängig das Eigentum, finanzielle Mitentscheidung oder Konfliktverfahren der einzelnen Dorfgemeinschaften.",
+      "source_ids": [
+        "enrd-community-training",
+        "enrd-nepal-wireless"
+      ]
+    },
+    "common_benefit": {
+      "status": "supported",
+      "statement": "Der gemeinsame Zugang fördert Bildung, medizinische Kommunikation und lokale Selbstbestimmung durch erschwingliche Konnektivität.",
+      "source_ids": [
+        "enrd-nepal-wireless",
+        "enrd-home"
+      ]
+    }
+  },
+  "confidence": 0.85,
+  "limitations": [
+    "Aus technischer Wartung durch Dorfbewohner folgt nicht automatisch gemeinschaftliches Eigentum am Backbone oder an Frequenzrechten.",
+    "Der Förderverein ENRD und lokale Dorfnetzbetreiber besitzen unterschiedliche Rollen.",
+    "Aktuelle Netzverfügbarkeit und rechtliche Betriebszuständigkeit sind nicht für jeden Standort belegt."
+  ],
+  "notes": "Lokale Betriebs- und Ausbildungs-Praxis gut belegt, verbindliche gemeinschaftliche Eigentums- und Konfliktrechte weiterhin offen."
+}

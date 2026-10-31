@@ -1,0 +1,56 @@
+{
+  "schema_version": 1,
+  "kind": "commonworld_commons_basis",
+  "project_id": "bologna-urban-commons",
+  "classification": "commons-infrastructure",
+  "decision": "include",
+  "reviewed_at": "2026-10-31",
+  "reviewer": "Commonworld editorial desk review",
+  "criteria": {
+    "shared_resource": {
+      "status": "supported",
+      "statement": "Öffentliche Räume sowie materielle, immaterielle und digitale Stadtgüter werden in vertraglich vereinbarten Kooperationsprojekten gemeinschaftlich gepflegt.",
+      "source_ids": [
+        "bologna-collaborate",
+        "bologna-regulation-2022"
+      ]
+    },
+    "community": {
+      "status": "supported",
+      "statement": "Bürgergruppen und die Stadt Bologna bilden konkrete Projektpartnerschaften in Stadtteilen, statt eine einheitliche stadtweite Eigentümergruppe.",
+      "source_ids": [
+        "bologna-collaborate"
+      ]
+    },
+    "commoning_practice": {
+      "status": "supported",
+      "statement": "Lokale Initiativen vereinbaren mit der Stadt Pflege, Regeneration und gemeinschaftliche Nutzung von öffentlichen Flächen und weiteren Stadtgütern.",
+      "source_ids": [
+        "bologna-collaborate",
+        "bologna-regulation-2022"
+      ]
+    },
+    "rules_and_responsibility": {
+      "status": "supported",
+      "statement": "Das städtische Commons-Reglement definiert Kooperationen und Pacts of Collaboration mit festgelegtem Gegenstand sowie Modalitäten der öffentlichen Pflege.",
+      "source_ids": [
+        "bologna-collaborate",
+        "bologna-regulation-2022"
+      ]
+    },
+    "common_benefit": {
+      "status": "supported",
+      "statement": "Gemeinschaftliche Pflege und vertraglich geordnete Mitwirkung sollen zugängliche öffentliche Räume und sozialen Zusammenhalt dauerhaft verbessern.",
+      "source_ids": [
+        "bologna-collaborate"
+      ]
+    }
+  },
+  "confidence": 0.94,
+  "limitations": [
+    "Kooperationspakte begründen keine pauschale private Eigentümerschaft von Bürgergruppen am städtischen Grundbesitz.",
+    "Konkrete Rechte und Verantwortungen variieren je Zusammenarbeitspakt und Stadtteil.",
+    "Ein Reglement allein beweist keine aktuelle Umsetzung jedes historischen Einzelprojekts."
+  ],
+  "notes": "Formalisierte Kooperationspakte als städtische Commons-Infrastruktur; öffentliche Eigentums- und Bürgerpflegegrenzen bleiben deutlich."
+}

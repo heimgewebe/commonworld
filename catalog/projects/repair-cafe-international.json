@@ -99,6 +99,14 @@
         "url": "https://www.repaircafe.org/en/contact/",
         "retrieved_at": "2026-07-28",
         "note": "Offizielle Kontakt- und Auskunftswege."
+      },
+      {
+        "id": "repair-cafe-rules",
+        "type": "official-source",
+        "label": "Repair Cafe Rules",
+        "url": "https://www.repaircafe.org/en/house-rules/",
+        "retrieved_at": "2026-10-31",
+        "note": "Repair Café Foundation – Hausregeln zu freiwilliger Reparatur, Eigenarbeit und Verantwortung."
       }
     ]
   },
@@ -106,9 +114,9 @@
     "state": "stale",
     "catalogued_at": "2026-07-28",
     "reviewed_by": "Commonworld editorial review",
-    "reviewed_at": "2026-07-28",
-    "next_review_at": "2026-10-28",
-    "notes": "Aufgenommen als replizierbare lokale Reparatur-Commons mit gemeinsamem Wissen, Werkzeugen und freiwilliger Arbeit. Die dynamische Standortzahl wird nicht in den Katalogtext übernommen."
+    "reviewed_at": "2026-10-30",
+    "next_review_at": "2026-10-31",
+    "notes": "Aufgenommen als replizierbare lokale Reparatur-Commons mit gemeinsamem Wissen, Werkzeugen und freiwilliger Arbeit. Die dynamische Standortzahl wird nicht in den Katalogtext übernommen. Fünfkriterien-Desk-Review 30.10.2026: Einschluss als Infrastruktur für lokal organisierte Reparatur-Commons, nicht als globale Eigentumsgemeinschaft. Operative Aktivität nicht erneut bestätigt, weiterhin stale."
   },
   "links": [
     {
