@@ -1,0 +1,55 @@
+{
+  "schema_version": 1,
+  "kind": "commonworld_commons_basis",
+  "project_id": "sarantaporo-community-network",
+  "classification": "common",
+  "decision": "include",
+  "reviewed_at": "2026-10-31",
+  "reviewer": "Commonworld editorial desk review",
+  "criteria": {
+    "shared_resource": {
+      "status": "supported",
+      "statement": "Bürger- und Haushaltsfunkknoten bilden ein miteinander geteiltes Kommunikationsnetz in den ländlichen griechischen Dörfern.",
+      "source_ids": [
+        "sarantaporo-network"
+      ]
+    },
+    "community": {
+      "status": "supported",
+      "statement": "Beteiligte Haushalte, Dorfgemeinschaften und die unterstützende Sarantaporo-NGO betreiben und erweitern lokale Netze.",
+      "source_ids": [
+        "sarantaporo-about"
+      ]
+    },
+    "commoning_practice": {
+      "status": "supported",
+      "statement": "Mitglieder errichten Knoten, schließen Nachbarn an, entwickeln Netzkomponenten und vermitteln digitale Kompetenzen.",
+      "source_ids": [
+        "sarantaporo-network",
+        "sarantaporo-about"
+      ]
+    },
+    "rules_and_responsibility": {
+      "status": "supported",
+      "statement": "Die offizielle Network-Seite erklärt gemeinschaftliches Netzeigentum und Selbstverwaltung der Teilnehmer sowie eine dezentrale Knoten- und Beitragspraxis.",
+      "source_ids": [
+        "sarantaporo-network"
+      ]
+    },
+    "common_benefit": {
+      "status": "supported",
+      "statement": "Gemeinschaftlicher Netzausbau schafft Konnektivität und Zugänge zu Bildung, öffentlichen und medizinischen Diensten.",
+      "source_ids": [
+        "sarantaporo-about",
+        "sarantaporo-network"
+      ]
+    }
+  },
+  "confidence": 0.95,
+  "limitations": [
+    "Die unterstützende Non-Profit-Organisation ist nicht automatisch die einzige Eigentümerin aller privaten Haushaltsfunkknoten.",
+    "Gemeinschaftliches Eigentum beschreibt das Modell, nicht automatisch eine rechtliche Einzelbewertung jeder Funkantenne.",
+    "Live-Abdeckung und Übertragungsleistung wurden nicht neu gemessen."
+  ],
+  "notes": "Dezentraler Kommunikations-Commons mit ausdrücklich dokumentierter Selbstverwaltung und Netzbeiträgen."
+}

@@ -221,7 +221,7 @@
       "portraitPaintedPrimaryLabels": [
         {
           "layer": "knowledge_learning_culture",
-          "changedPixels": 10195
+          "changedPixels": 13029
         },
         {
           "layer": "communication_networks",
@@ -241,22 +241,22 @@
         "representativePrimaryLabels": [
           {
             "text": "Knowledge, Learning and Culture · 11    LibriVox  MusicBrainz  Open Library  Peer 2 Peer Unive…  Safecast  Thailand Citizens…",
-            "width": 503.07537841796875,
-            "height": 489.8207702636719,
+            "width": 501.79547119140625,
+            "height": 488.4396667480469,
             "fontSize": 23.77,
             "visible": true
           },
           {
             "text": "Communication and Networks · 12    B4RN (Broadband f…  BOSCO Uganda  Freifunk  Freifunk Hamburg  guifi.net  Mastodon",
-            "width": 562.0701904296875,
-            "height": 562.28857421875,
+            "width": 562.1395874023438,
+            "height": 562.3109130859375,
             "fontSize": 23.77,
             "visible": true
           },
           {
             "text": "Cooperation and Self-Organization · 7    Bologna Urban Com…  Enspiral  g0v  Green Coop  l’Asilo  National Communal…",
-            "width": 453.285888671875,
-            "height": 386.18609619140625,
+            "width": 454.4945983886719,
+            "height": 387.87432861328125,
             "fontSize": 23.77,
             "visible": true
           }
@@ -368,7 +368,7 @@
     {
       "id": "layer-journey-moveend-return",
       "verdict": "PASS",
-      "elapsedMs": 2737
+      "elapsedMs": 1606
     },
     {
       "id": "layer-journey-missing-moveend-fallback",
@@ -377,9 +377,9 @@
       "movementDiagnostics": [
         {
           "index": 0,
-          "geometryEvaluationDelta": 10,
+          "geometryEvaluationDelta": 13,
           "diagnosticPublishDelta": 3,
-          "sampledEvaluationCount": 9,
+          "sampledEvaluationCount": 12,
           "maxDiagnosticPublishes": 3
         },
         {
@@ -476,8 +476,8 @@
       "verdict": "PASS",
       "blockedCatalogRequests": 0,
       "observedCatalogRequests": [
-        "/releases/9e62e0b0969d31fa9b02/catalog/runtime/aggregate.v1.json",
-        "/releases/9e62e0b0969d31fa9b02/catalog/runtime/manifest.v1.json"
+        "/releases/ab3dc74fb6e87fc027dd/catalog/runtime/aggregate.v1.json",
+        "/releases/ab3dc74fb6e87fc027dd/catalog/runtime/manifest.v1.json"
       ]
     },
     {
@@ -580,6 +580,6 @@
       "method-mobile",
       "method-mobile-text-200"
     ],
-    "first_party_surface_sha256": "d09fda12d7543da56fb5f088f509ad44c0c5e375f62bdb0c4bc95eb5f6fcdcd6"
+    "first_party_surface_sha256": "0650f70d46707086e735a0244e66c8306a12d7438aca613c65d4d80bf58c318a"
   }
 }
