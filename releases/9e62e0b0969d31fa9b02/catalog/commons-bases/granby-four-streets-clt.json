@@ -1,0 +1,57 @@
+{
+  "schema_version": 1,
+  "kind": "commonworld_commons_basis",
+  "project_id": "granby-four-streets-clt",
+  "classification": "common",
+  "decision": "include",
+  "reviewed_at": "2026-10-31",
+  "reviewer": "Commonworld editorial desk review",
+  "criteria": {
+    "shared_resource": {
+      "status": "supported",
+      "statement": "Der Community Land Trust bindet Land, bezahlbare Häuser und Gemeinschaftsräume dauerhaft an Quartierszwecke, statt den Bodenwert privaten Weiterverkäufen zu überlassen.",
+      "source_ids": [
+        "granby-about",
+        "granby-clt"
+      ]
+    },
+    "community": {
+      "status": "supported",
+      "statement": "Lokale Bewohner gründeten den Trust und arbeiten zusammen mit freiwilligen Nachbarn und Partnern an der Quartiersgestaltung.",
+      "source_ids": [
+        "granby-about",
+        "granby-clt"
+      ]
+    },
+    "commoning_practice": {
+      "status": "supported",
+      "statement": "Der Trust organisiert Sanierung, sozialgebundene Wohnnutzung, Gemeinschaftsräume und gemeinschaftliche Nachbarschaftspflege.",
+      "source_ids": [
+        "granby-about"
+      ]
+    },
+    "rules_and_responsibility": {
+      "status": "supported",
+      "statement": "Das erklärte CLT-Prinzip trennt den Boden von langfristiger Wohnnutzung, begrenzt spätere Verkaufspreise und bindet Werte für die Gemeinschaft.",
+      "source_ids": [
+        "granby-clt",
+        "granby-about"
+      ]
+    },
+    "common_benefit": {
+      "status": "supported",
+      "statement": "Dauerhaft bezahlbarer Wohnraum, öffentliche Begegnungsorte und lokale wirtschaftliche Chancen sollen der Nachbarschaft zugutekommen.",
+      "source_ids": [
+        "granby-about",
+        "granby-clt"
+      ]
+    }
+  },
+  "confidence": 0.91,
+  "limitations": [
+    "Die CLT-Grundsätze erklären den strukturellen Bodenschutz, ersetzen aber keinen aktuellen Auszug der Granby-spezifischen Satzung.",
+    "Die veröffentlichten Objektzahlen können sich geändert haben; keine neue aktuelle Bestandszertifizierung.",
+    "Wohnraum wird nach lokalem Vergabe- und Mietrecht vergeben; er ist nicht allgemein frei verfügbar."
+  ],
+  "notes": "Anwohnergetragener Community Land Trust mit belegter langfristiger Landbindung und konkreter Quartierspraxis."
+}

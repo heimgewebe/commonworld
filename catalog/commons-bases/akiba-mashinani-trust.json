@@ -1,0 +1,53 @@
+{
+  "schema_version": 1,
+  "kind": "commonworld_commons_basis",
+  "project_id": "akiba-mashinani-trust",
+  "classification": "undetermined",
+  "decision": "needs_information",
+  "reviewed_at": "2026-10-31",
+  "reviewer": "Commonworld editorial desk review",
+  "criteria": {
+    "shared_resource": {
+      "status": "supported",
+      "statement": "Lokale Sparmittel und gemeinschaftlich orientierte Finanzierungen fördern Wohn- und Versorgungsinfrastruktur in informellen Siedlungen.",
+      "source_ids": [
+        "source-akiba-official"
+      ]
+    },
+    "community": {
+      "status": "supported",
+      "statement": "Spargruppen und Siedlungsgemeinschaften aus dem Umfeld von Muungano wa Wanavijiji tragen die organisierte Nutzerbasis.",
+      "source_ids": [
+        "source-akiba-official"
+      ]
+    },
+    "commoning_practice": {
+      "status": "supported",
+      "statement": "Bewohner sammeln Ersparnisse, entwickeln Infrastrukturvorhaben und finanzieren gemeinschaftliche Wohnprojekte über den Trust.",
+      "source_ids": [
+        "source-akiba-official"
+      ]
+    },
+    "rules_and_responsibility": {
+      "status": "partial",
+      "statement": "Die offizielle Darstellung belegt Gemeindeorientierung, aber keine aktuelle vollständige Trust-Satzung mit Stimmrechten, Kreditrisikoverteilung und Vetomöglichkeiten der Sparer.",
+      "source_ids": [
+        "source-akiba-official"
+      ]
+    },
+    "common_benefit": {
+      "status": "supported",
+      "statement": "Finanzierungs- und Sparverbünde erleichtern kommunale Bauprojekte und den Zugang zu grundlegender Infrastruktur.",
+      "source_ids": [
+        "source-akiba-official"
+      ]
+    }
+  },
+  "confidence": 0.83,
+  "limitations": [
+    "Rechtliche Trust-Kontrolle darf nicht mit direkter Eigentümerschaft jedes Sparers gleichgesetzt werden.",
+    "Aktuelle Kreditvergabe und Treuhandaufsicht sind aus der öffentlichen Projektbeschreibung nicht abschließend verifiziert.",
+    "Eine Liquiditäts- oder Solvenzprüfung der Finanzstruktur liegt nicht vor."
+  ],
+  "notes": "Von Spargemeinschaften genutzte Finanzinfrastruktur, deren verbindliche Entscheidungsrechte noch zu belegen sind."
+}

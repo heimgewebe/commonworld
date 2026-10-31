@@ -61,6 +61,14 @@
         "url": "https://musicbrainz.org/statistics/editors",
         "retrieved_at": "2026-07-22",
         "note": "Offizielle Aktivitätsstatistik der bearbeitenden Gemeinschaft."
+      },
+      {
+        "id": "metabrainz-social-contract",
+        "type": "official-source",
+        "label": "Metabrainz Social Contract",
+        "url": "https://metabrainz.org/social-contract",
+        "retrieved_at": "2026-10-31",
+        "note": "Öffentlicher, ausdrücklich nicht rechtsverbindlicher Sozialvertrag der Trägerstiftung zu Open Data, offenen Prozessen und Transparenz."
       }
     ]
   },
@@ -68,9 +76,9 @@
     "state": "stale",
     "catalogued_at": "2026-07-22",
     "reviewed_by": "Commonworld editorial review",
-    "reviewed_at": "2026-07-22",
-    "next_review_at": "2026-10-22",
-    "notes": "Digitale Commons-Praxis; Betreiberorganisation und Gemeinschaftsdatenbank werden nicht als geografischer Punkt vermischt."
+    "reviewed_at": "2026-10-31",
+    "next_review_at": "2026-11-15",
+    "notes": "Digitale Commons-Praxis; Betreiberorganisation und Gemeinschaftsdatenbank werden nicht als geografischer Punkt vermischt. Fünfkriterien-Desk-Review 31.10.2026: Offene Musikmetadaten mit überprüfbarer gemeinsamer Bearbeitung und organisatorischer Transparenz; Trägerkontrolle nicht mit Editorstimmen verwechseln. Das historische Aktivitätssignal wurde nicht neu zertifiziert, der öffentliche Kurationszustand bleibt stale."
   },
   "links": [
     {

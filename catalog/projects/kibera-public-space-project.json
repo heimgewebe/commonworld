@@ -67,6 +67,14 @@
         "url": "https://www.wikidata.org/wiki/Q3870",
         "retrieved_at": "2026-07-19",
         "note": "CC0-Registereintrag mit einer groben Stadtkoordinate; nur als weiter Orientierungsanker verwendet."
+      },
+      {
+        "id": "kpsp01-community-management",
+        "type": "official-source",
+        "label": "Kpsp01 Community Management",
+        "url": "https://www.kounkuey.org/projects/kpsp01",
+        "retrieved_at": "2026-10-31",
+        "note": "Offizielle Kibera-KPSP01-Fallstudie: Bewohnerkomitee NNDC verwaltet Betrieb, Programme und Pflege des Parks."
       }
     ],
     "uncertainty_note": "Das Netz besteht aus mehreren Räumen; die Punktgeometrie ist weder ein Standort noch eine Flächenabgrenzung."
@@ -75,8 +83,8 @@
     "state": "stale",
     "catalogued_at": "2026-07-19",
     "reviewed_by": "Commonworld editorial review",
-    "reviewed_at": "2026-07-19",
-    "next_review_at": "2026-10-19",
+    "reviewed_at": "2026-10-31",
+    "next_review_at": "2026-11-15",
     "notes": "Aufgenommen als von lokalen Gruppen mitgestaltetes und langfristig mitgetragenes Netz öffentlicher Räume, nicht als bloßes Planungsbüroprojekt."
   },
   "links": [

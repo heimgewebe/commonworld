@@ -63,6 +63,22 @@
         "url": "https://www.wikidata.org/wiki/Q242",
         "retrieved_at": "2026-07-19",
         "note": "CC0-Registereintrag mit einer groben Landeskoordinate; ausschließlich zur weiträumigen Orientierung verwendet."
+      },
+      {
+        "id": "cbs-women-governance",
+        "type": "official-source",
+        "label": "Cbs Women Governance",
+        "url": "https://howlermonkeybelize.org/about-us/community-baboon-sanctuary-womens-conservation-group/",
+        "retrieved_at": "2026-10-31",
+        "note": "Offizielle Frauenkonservationsgruppe: je Dorf gewählte Leitung, Schutz und Tourismus."
+      },
+      {
+        "id": "cbs-community",
+        "type": "official-source",
+        "label": "Cbs Community",
+        "url": "https://howlermonkeybelize.org/about-us/our-community/",
+        "retrieved_at": "2026-10-31",
+        "note": "Offizielle sieben Gemeinden und freiwillige private Grundstückseigentümer-Schutzvereinbarungen."
       }
     ],
     "uncertainty_note": "Es wird keine Schutzgebiets- oder Grundstücksgeometrie übernommen; der Punkt ist bewusst nur ein sehr grober Landesanker."
@@ -71,8 +87,8 @@
     "state": "stale",
     "catalogued_at": "2026-07-19",
     "reviewed_by": "Commonworld editorial review",
-    "reviewed_at": "2026-07-19",
-    "next_review_at": "2026-10-19",
+    "reviewed_at": "2026-10-31",
+    "next_review_at": "2026-11-15",
     "notes": "Aufgenommen ausschließlich mit den im öffentlichen Register belegten Aussagen zu Schutzstatus, lokaler Gemeinschafts-Governance und Managementverantwortung."
   },
   "links": [

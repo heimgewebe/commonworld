@@ -1,0 +1,54 @@
+{
+  "schema_version": 1,
+  "kind": "commonworld_commons_basis",
+  "project_id": "tla-o-qui-aht-tribal-parks",
+  "classification": "common",
+  "decision": "include",
+  "reviewed_at": "2026-10-31",
+  "reviewer": "Commonworld editorial desk review",
+  "criteria": {
+    "shared_resource": {
+      "status": "supported",
+      "statement": "Traditionelle Territorien und Wälder, Küsten- und Gewässerökosysteme stehen im Zentrum des von der Tla-o-qui-aht First Nation verantworteten Tribal-Park-Systems.",
+      "source_ids": [
+        "source-tribal-parks-story"
+      ]
+    },
+    "community": {
+      "status": "supported",
+      "statement": "Die Tla-o-qui-aht Nation und ihre von eigener Führung bestellten Guardians sind die zuständige Schutz- und Rechtsgemeinschaft.",
+      "source_ids": [
+        "source-tribal-parks-official",
+        "source-tribal-parks-story"
+      ]
+    },
+    "commoning_practice": {
+      "status": "supported",
+      "statement": "Guardian-Programme überwachen natürliche Ressourcen, schützen Lebensräume und führen Renaturierung, Monitoring und Besucherbildung durch.",
+      "source_ids": [
+        "source-tribal-parks-story"
+      ]
+    },
+    "rules_and_responsibility": {
+      "status": "supported",
+      "statement": "Eigene indigene Governance, Tribal-Park-Erklärungen und das Tribal-Park-Allies-Protokoll legen ökologische Pflichten und einen verantwortlichen Besucherbeitrag fest.",
+      "source_ids": [
+        "source-tribal-parks-story"
+      ]
+    },
+    "common_benefit": {
+      "status": "supported",
+      "statement": "Schutzprogramme, Wiederherstellung und gemeinschaftsbezogene Investitionen erhalten Kultur, Naturressourcen und Lebensgrundlagen für kommende Generationen.",
+      "source_ids": [
+        "source-tribal-parks-story"
+      ]
+    }
+  },
+  "confidence": 0.95,
+  "limitations": [
+    "Rechte und Titel der Tla-o-qui-aht Nation sind nicht gleichzusetzen mit allgemeinem touristischem oder staatlichem Gemeineigentum.",
+    "Indigene Rechte werden nicht durch eine fiktive externe Mitgliedschaft ersetzt.",
+    "Besucherbeiträge und die Allianz mit Unternehmen sind freiwillige beziehungsweise spezifische Verpflichtungen, keine Universalfreigabe aller Aktivitäten."
+  ],
+  "notes": "Indigen souverän geführte Land- und Meeres-Commons mit eigener Governance, Guardians und Schutzprotokollen."
+}

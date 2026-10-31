@@ -1,0 +1,56 @@
+{
+  "schema_version": 1,
+  "kind": "commonworld_commons_basis",
+  "project_id": "community-baboon-sanctuary",
+  "classification": "common",
+  "decision": "include",
+  "reviewed_at": "2026-10-31",
+  "reviewer": "Commonworld editorial desk review",
+  "criteria": {
+    "shared_resource": {
+      "status": "supported",
+      "statement": "Private Landbesitzer stellen über freiwillige Schutzvereinbarungen gemeinsam Lebensräume für Brüllaffen und lokale Umweltbildung bereit.",
+      "source_ids": [
+        "cbs-community"
+      ]
+    },
+    "community": {
+      "status": "supported",
+      "statement": "Eigentümerfamilien aus sieben Belize-River-Dörfern und die gewählte Frauenkonservationsgruppe tragen die Gemeinschaft.",
+      "source_ids": [
+        "cbs-community",
+        "cbs-women-governance"
+      ]
+    },
+    "commoning_practice": {
+      "status": "supported",
+      "statement": "Dorfbewohner schützen gemeinsam Lebensräume und organisieren gemeindenahe Umweltbildung, Forschung und Tourismus.",
+      "source_ids": [
+        "cbs-community",
+        "cbs-women-governance"
+      ]
+    },
+    "rules_and_responsibility": {
+      "status": "supported",
+      "statement": "Die Women's Conservation Group übernimmt das Management und wählt je Dorf Vertreterinnen; Landbesitzer übernehmen freiwillige Habitat-Verpflichtungen.",
+      "source_ids": [
+        "cbs-women-governance",
+        "cbs-community"
+      ]
+    },
+    "common_benefit": {
+      "status": "supported",
+      "statement": "Habitatpflege verbindet Naturschutz mit lokaleinkommensfördernder Besucherarbeit und Gemeinschaftsbildung.",
+      "source_ids": [
+        "cbs-women-governance"
+      ]
+    }
+  },
+  "confidence": 0.95,
+  "limitations": [
+    "Die Landflächen bleiben im privaten Eigentum beteiligter Besitzer, kein zentraler kommunaler Rechtstitel.",
+    "Historische Flächen- und Teilnehmerzahlen schwanken zwischen Quellen; kein exakter aktueller Bestand attestiert.",
+    "Die gewählte Frauengruppe ist keine gesetzliche Regierung aller Dörfer."
+  ],
+  "notes": "Dorfübergreifende ökologisch geteilte Verantwortung mit privaten Landrechten und eigenständig gewählter Managementgruppe."
+}

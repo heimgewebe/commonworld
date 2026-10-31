@@ -1,0 +1,56 @@
+{
+  "schema_version": 1,
+  "kind": "commonworld_commons_basis",
+  "project_id": "fecofun-nepal",
+  "classification": "commons-infrastructure",
+  "decision": "include",
+  "reviewed_at": "2026-10-31",
+  "reviewer": "Commonworld editorial desk review",
+  "criteria": {
+    "shared_resource": {
+      "status": "supported",
+      "statement": "Die an lokale Nutzergruppen gebundenen gemeinschaftlich bewirtschafteten Wälder sind über eine föderierte Interessen- und Wissensinfrastruktur miteinander vernetzt.",
+      "source_ids": [
+        "fecofun-about",
+        "fecofun-home"
+      ]
+    },
+    "community": {
+      "status": "supported",
+      "statement": "Community Forestry User Groups aus Nepals Regionen stellen die Mitgliedschaft; die offizielle Föderationsbeschreibung nennt inklusiv gewählte Repräsentanten.",
+      "source_ids": [
+        "fecofun-about"
+      ]
+    },
+    "commoning_practice": {
+      "status": "supported",
+      "statement": "Nutzergruppen pflegen lokale Waldressourcen, vertreten Rechte, tauschen Bewirtschaftungswissen aus und arbeiten über FECOFUN landesweit zusammen.",
+      "source_ids": [
+        "fecofun-about",
+        "fecofun-home"
+      ]
+    },
+    "rules_and_responsibility": {
+      "status": "supported",
+      "statement": "FECOFUN dokumentiert demokratische Vertretung über regionale und lokale Föderationsstrukturen mit inklusiven Wahlen sowie hohen Anteilen weiblicher Vertreter.",
+      "source_ids": [
+        "fecofun-about"
+      ]
+    },
+    "common_benefit": {
+      "status": "supported",
+      "statement": "Gesicherte Waldnutzungsrechte und gemeinsame fachliche sowie politische Vertretung fördern nachhaltige Ressourcennutzung und lokale Entwicklung.",
+      "source_ids": [
+        "fecofun-about",
+        "fecofun-home"
+      ]
+    }
+  },
+  "confidence": 0.94,
+  "limitations": [
+    "Die Dachföderation ist nicht Eigentümerin aller lokal verwalteten Wälder.",
+    "Offizielle Mitglieder- und Flächenzahlen verändern sich und sind keine dauerhafte Garantie für die Zugehörigkeit einzelner Nutzergruppen.",
+    "Lokale Satzungen und Nutzungsquoten sind je Waldnutzergruppe eigenständig."
+  ],
+  "notes": "Demokratisch organisierte Dachinfrastruktur lokaler Community-Waldgruppen statt einer fiktiven landesweiten Eigentumsgemeinschaft."
+}

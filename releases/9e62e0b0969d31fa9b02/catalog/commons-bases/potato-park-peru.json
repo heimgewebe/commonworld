@@ -1,0 +1,58 @@
+{
+  "schema_version": 1,
+  "kind": "commonworld_commons_basis",
+  "project_id": "potato-park-peru",
+  "classification": "common",
+  "decision": "include",
+  "reviewed_at": "2026-10-31",
+  "reviewer": "Commonworld editorial desk review",
+  "criteria": {
+    "shared_resource": {
+      "status": "supported",
+      "statement": "Indigene Kartoffelsorten, gemeinsames Wissen und Landnutzungspraktiken der Quechua-Gemeinden bilden das geschützte biokulturelle Gut.",
+      "source_ids": [
+        "potato-park-intercommunity-report-2011",
+        "potato-park-about"
+      ]
+    },
+    "community": {
+      "status": "supported",
+      "statement": "Die 2009 am gemeinschaftlichen Nutzenverteilungsabkommen beteiligten fünf Quechua-Gemeinden organisierten den Park über einen Verband; die aktuelle Asociación-ANDES-Seite benennt sechs Gebietsgruppen.",
+      "source_ids": [
+        "potato-park-intercommunity-report-2011",
+        "potato-park-about"
+      ]
+    },
+    "commoning_practice": {
+      "status": "supported",
+      "statement": "Bäuerliche Gruppen erhalten Sorten, organisieren Forschung, tauschen Saatgut und verwalten gemeinsame Verarbeitungs- und Besucherprojekte.",
+      "source_ids": [
+        "potato-park-about",
+        "potato-park-intercommunity-report-2011"
+      ]
+    },
+    "rules_and_responsibility": {
+      "status": "supported",
+      "statement": "Das 2009 vereinbarte interkommunale Abkommen dokumentiert gemeinsame Nutzenteilung, Gewohnheitsrecht und Entscheidungsregeln der damaligen fünf Gemeinschaften; heutige Organisationsgrenzen bleiben gesondert zu datieren.",
+      "source_ids": [
+        "potato-park-intercommunity-report-2011",
+        "potato-park-benefit-protocol"
+      ]
+    },
+    "common_benefit": {
+      "status": "supported",
+      "statement": "Gemeinsame Sortenerhaltung und gerechte Nutzenteilung stärken Ernährungssouveränität, kulturelle Rechte und kommende Generationen.",
+      "source_ids": [
+        "potato-park-intercommunity-report-2011",
+        "potato-park-benefit-protocol"
+      ]
+    }
+  },
+  "confidence": 0.95,
+  "limitations": [
+    "Offizielle und Partnerdarstellungen differieren historisch zwischen fünf und sechs Gemeinden; der beurteilte konkrete Gemeinschaftsverband ist gesondert zu datieren.",
+    "Gewohnheitsrechtliche lokale Titel dürfen nicht als allgemeines Recht außenstehender Personen an indigenem Saatgut behandelt werden.",
+    "Aktuelle einzelne Haushaltsquoten und Erntebestände wurden nicht geprüft."
+  ],
+  "notes": "Indigen geführte Saatgut- und Kulturlandschaft-Commons mit Gemeinschaftsverband, Gewohnheitsrecht und protokollierter Vorteilsverteilung."
+}

@@ -1,0 +1,55 @@
+{
+  "schema_version": 1,
+  "kind": "commonworld_commons_basis",
+  "project_id": "namibia-communal-conservancies-alliance",
+  "classification": "undetermined",
+  "decision": "needs_information",
+  "reviewed_at": "2026-10-31",
+  "reviewer": "Commonworld editorial desk review",
+  "criteria": {
+    "shared_resource": {
+      "status": "supported",
+      "statement": "Die unter lokaler Verfassung verwalteten Naturschutzressourcen und föderierten Beratungsstrukturen bilden den gemeinsamen Verbandsgegenstand.",
+      "source_ids": [
+        "source-namibia-nacso-conservancies",
+        "source-namibia-nacso-alliance"
+      ]
+    },
+    "community": {
+      "status": "supported",
+      "statement": "Regionale Community Conservancies, Gemeindewälder und weitere lokale Naturschutzorganisationen bilden die Basis der 2024 gestarteten Allianz.",
+      "source_ids": [
+        "source-namibia-nacso-alliance"
+      ]
+    },
+    "commoning_practice": {
+      "status": "supported",
+      "statement": "Die Allianz vertritt Mitgliedsgruppen, organisiert Governance-Unterstützung und vermittelt auf Antrag bei Konflikten.",
+      "source_ids": [
+        "source-namibia-nacso-alliance"
+      ]
+    },
+    "rules_and_responsibility": {
+      "status": "partial",
+      "statement": "Die offiziellen NACSO-Quellen belegen lokale Verfassungen und gewählte Gremien, nicht aber die gegenwärtige Satzung, Wahlordnung und verbindlichen Machtgrenzen der 2024 gegründeten neuen Dachallianz.",
+      "source_ids": [
+        "source-namibia-nacso-alliance",
+        "source-namibia-nacso-conservancies"
+      ]
+    },
+    "common_benefit": {
+      "status": "supported",
+      "statement": "Gemeinsame Vertretung und fachliche Unterstützung sollen lokale Nutzungsrechte und den gemeindegetragenen Ressourcenschutz stärken.",
+      "source_ids": [
+        "source-namibia-nacso-alliance"
+      ]
+    }
+  },
+  "confidence": 0.88,
+  "limitations": [
+    "Die Dachallianz besitzt nicht sämtliche Wildtier-, Wald- und Grundrechte ihrer unabhängigen Conservancies.",
+    "NACSO als Unterstützer und die neue NCCFA sind rechtlich nicht als dieselbe Körperschaft nachgewiesen.",
+    "Lokale demokratische Verfahren ersetzen keine geprüfte aktuelle Satzung der Dachallianz."
+  ],
+  "notes": "Netz gemeinschaftlicher Schutzgebiete belegt; die konkrete Machtordnung der neuen nationalen Dachallianz bleibt ungesichert."
+}

@@ -1,0 +1,56 @@
+{
+  "schema_version": 1,
+  "kind": "commonworld_commons_basis",
+  "project_id": "hepburn-energy",
+  "classification": "commons-infrastructure",
+  "decision": "include",
+  "reviewed_at": "2026-10-31",
+  "reviewer": "Commonworld editorial desk review",
+  "criteria": {
+    "shared_resource": {
+      "status": "supported",
+      "statement": "Windpark, genossenschaftliche Energieerzeugung und gemeinschaftsorientierte Investitionen sind geteilte Produktionsressourcen der Kooperative.",
+      "source_ids": [
+        "source-hepburn-official",
+        "source-hepburn-membership"
+      ]
+    },
+    "community": {
+      "status": "supported",
+      "statement": "Genossenschaftsmitglieder erwerben Anteile, übernehmen Pflichten und entscheiden unabhängig von der Anteilszahl mit jeweils einer Stimme.",
+      "source_ids": [
+        "source-hepburn-membership"
+      ]
+    },
+    "commoning_practice": {
+      "status": "supported",
+      "statement": "Mitglieder finanzieren erneuerbare Erzeugung, wählen den Vorstand, wirken in Generalversammlungen mit und unterstützen lokale Klima- und Energievorhaben.",
+      "source_ids": [
+        "source-hepburn-membership",
+        "source-hepburn-official"
+      ]
+    },
+    "rules_and_responsibility": {
+      "status": "supported",
+      "statement": "Die publizierten Kooperativenregeln, aktive Mitgliedschaft, Generalversammlung und Wahl von sieben Direktoren mit einer Stimme je Mitglied legen Verantwortung und Kontrolle fest.",
+      "source_ids": [
+        "source-hepburn-membership"
+      ]
+    },
+    "common_benefit": {
+      "status": "supported",
+      "statement": "Mitgliedereigentum trägt lokale erneuerbare Energieproduktion und gemeinschaftsbezogene Förderprojekte neben möglichen Mitgliederrückflüssen.",
+      "source_ids": [
+        "source-hepburn-membership",
+        "source-hepburn-official"
+      ]
+    }
+  },
+  "confidence": 0.95,
+  "limitations": [
+    "Mitgliedschaft erfordert Kapitalbeteiligung und Aktivitätsbedingungen; das Angebot ist nicht kostenfrei für alle.",
+    "Einzelne Projekte und geplante zusätzliche Anlagen dürfen nicht als fertig gebaut gelten.",
+    "Die Berechtigung zu finanziellen Rückflüssen wird durch Regeln und Finanzierung eingeschränkt."
+  ],
+  "notes": "Genossenschaftlich kontrollierte Energieinfrastruktur mit eindeutig dokumentiertem One-Member-One-Vote-Prinzip."
+}

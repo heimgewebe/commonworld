@@ -1,0 +1,53 @@
+{
+  "schema_version": 1,
+  "kind": "commonworld_commons_basis",
+  "project_id": "red-guardianes-semillas-ecuador",
+  "classification": "undetermined",
+  "decision": "needs_information",
+  "reviewed_at": "2026-10-31",
+  "reviewer": "Commonworld editorial desk review",
+  "criteria": {
+    "shared_resource": {
+      "status": "supported",
+      "statement": "Bäuerliche Saatgutbanken, lokale Sorten und übertragbares agroökologisches Wissen bilden gemeinschaftlich erhaltene Ressourcen.",
+      "source_ids": [
+        "redsemillas-home"
+      ]
+    },
+    "community": {
+      "status": "supported",
+      "statement": "Saatguthüterfamilien, bäuerliche Gruppen und lokale Permakultur-Netzwerke bilden die aktive soziale Gemeinschaft.",
+      "source_ids": [
+        "redsemillas-home"
+      ]
+    },
+    "commoning_practice": {
+      "status": "supported",
+      "statement": "Beteiligte erhalten traditionelle Saaten, unterstützen kommunale Samenbanken und organisieren Weitergabe, Kurse und partizipative Pflanzenarbeit.",
+      "source_ids": [
+        "redsemillas-home"
+      ]
+    },
+    "rules_and_responsibility": {
+      "status": "partial",
+      "statement": "Die offizielle Website belegt Saatgut- und Ausbildungsprogramme, jedoch nicht die aktuelle verbindliche Mitgliederabstimmung oder Budget- und Konfliktrechte der überregionalen Trägerorganisation.",
+      "source_ids": [
+        "redsemillas-home"
+      ]
+    },
+    "common_benefit": {
+      "status": "supported",
+      "statement": "Gemeinschaftliches Saatgutwissen und Unterstützung lokaler Seed-Banks sollen Agrobiodiversität und Ernährungssouveränität erhalten.",
+      "source_ids": [
+        "redsemillas-home"
+      ]
+    }
+  },
+  "confidence": 0.87,
+  "limitations": [
+    "Die Förderung lokaler Saatgutbanken begründet keine einheitliche Eigentümerschaft an allen Saaten.",
+    "Freiwillige Farmbesuche und Netzwerkmitarbeit sind nicht automatisch Organschaft oder Stimmrecht.",
+    "Einheitliche rechtlich bindende Netzwerkstatuten und aktueller Mitgliedschaftsstatus wurden nicht belegt."
+  ],
+  "notes": "Vernetzte lokale Saatgut-Commons; aktuelle rechtlich verbindliche Dachgovernance ausdrücklich offen."
+}

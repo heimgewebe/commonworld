@@ -72,6 +72,14 @@
         "url": "https://www.opensourceecology.org/about-factor-e-farm/",
         "retrieved_at": "2026-07-16",
         "note": "Offizielle Beschreibung des öffentlich benannten Entwicklungs- und Lernorts in Missouri."
+      },
+      {
+        "id": "ose-farm-roles",
+        "type": "official-source",
+        "label": "Ose Farm Roles",
+        "url": "https://wiki.opensourceecology.org/wiki/Factor_e_Farm_Roles_and_Responsibilities",
+        "retrieved_at": "2026-10-31",
+        "note": "Offizielles projektinternes Rollenmodell benennt Founder-Authority, delegierte Entscheidungsrollen und begrenzte gemeinsame Farmverantwortung."
       }
     ]
   },
@@ -79,8 +87,8 @@
     "state": "stale",
     "catalogued_at": "2026-07-16",
     "reviewed_by": "Commonworld editorial review",
-    "reviewed_at": "2026-07-16",
-    "next_review_at": "2026-10-16",
+    "reviewed_at": "2026-10-31",
+    "next_review_at": "2026-11-15",
     "notes": "Die digitale Wissensbasis ist global; der physische Ort wird nur regional angenähert und nicht als frei zugänglicher Besuchsort behauptet."
   },
   "links": [

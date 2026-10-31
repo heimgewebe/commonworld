@@ -1,0 +1,586 @@
+{
+  "schema_version": 1,
+  "kind": "commonworld_commons_basis_retroreview_wave6b",
+  "checked_at_utc": "2026-10-31",
+  "source_base_commit": "a779b9a969ea4fa53a0d26a0efe08a2d1a7415b5",
+  "reviewer_provenance": "model-assisted first-party source desk review without independent human certification",
+  "scope": "Eleven final previously missing Commonworld projects reviewed on all five dimensions, unresolved authority explicit",
+  "outcomes": [
+    {
+      "project_id": "masipag",
+      "basis_decision": "include",
+      "classification": "commons-infrastructure",
+      "criteria": {
+        "shared_resource": {
+          "verdict": "supported",
+          "cited_source_ids": [
+            "masipag-about",
+            "masipag-home"
+          ]
+        },
+        "community": {
+          "verdict": "supported",
+          "cited_source_ids": [
+            "masipag-about"
+          ]
+        },
+        "commoning_practice": {
+          "verdict": "supported",
+          "cited_source_ids": [
+            "masipag-home",
+            "masipag-collective-leadership"
+          ]
+        },
+        "rules_and_responsibility": {
+          "verdict": "supported",
+          "cited_source_ids": [
+            "masipag-collective-leadership"
+          ]
+        },
+        "common_benefit": {
+          "verdict": "supported",
+          "cited_source_ids": [
+            "masipag-about",
+            "masipag-home"
+          ]
+        }
+      },
+      "provenance_urls": {
+        "masipag-about": "https://masipag.org/about-masipag/",
+        "masipag-collective-leadership": "https://masipag.org/programs-old/organisational-development-and-network-strengthening/",
+        "masipag-home": "https://masipag.org/"
+      },
+      "limitations": [
+        "Jede örtliche Bauernorganisation besitzt eigene Mitgliedschafts- und Betriebsverantwortung.",
+        "Ältere Netzwerkzahlen sind nicht die geprüfte aktuelle Mitgliederliste.",
+        "Die Sortennutzung unterliegt lokalen landwirtschaftlichen Regeln; nicht jeder Samen ist universell frei."
+      ],
+      "post_review_public_state": "stale",
+      "operational_activity_recatalogued": false
+    },
+    {
+      "project_id": "namena-marine-reserve",
+      "basis_decision": "include",
+      "classification": "common",
+      "criteria": {
+        "shared_resource": {
+          "verdict": "supported",
+          "cited_source_ids": [
+            "source-namena-wcs"
+          ]
+        },
+        "community": {
+          "verdict": "supported",
+          "cited_source_ids": [
+            "source-namena-wcs"
+          ]
+        },
+        "commoning_practice": {
+          "verdict": "supported",
+          "cited_source_ids": [
+            "source-namena-wcs",
+            "source-kubulau-enforcement-2025"
+          ]
+        },
+        "rules_and_responsibility": {
+          "verdict": "supported",
+          "cited_source_ids": [
+            "source-namena-wcs",
+            "source-kubulau-enforcement-2025"
+          ]
+        },
+        "common_benefit": {
+          "verdict": "supported",
+          "cited_source_ids": [
+            "source-namena-wcs"
+          ]
+        }
+      },
+      "provenance_urls": {
+        "source-kubulau-enforcement-2025": "https://fiji.wcs.org/Blog/articleType/ArticleView/articleId/25677/WCS-Fiji-Hands-Over-New-Community-Enforcement-Vessel-to-Kubulau-and-Dama-Districts.aspx",
+        "source-namena-wcs": "https://fiji.wcs.org/Initiatives/Protected-Areas/Namena-Marine-Reserve.aspx"
+      },
+      "limitations": [
+        "Traditionelle Küstenrechte stehen bestimmten Gemeinden zu und sind keine allgemeine freie Fischereierlaubnis.",
+        "NGO-Unterstützung durch WCS bedeutet keine Eigentumsübertragung sämtlicher Riffe an WCS.",
+        "Eine aktuelle Bestandszählung und Konformitätsprüfung jeder Fangregel liegt nicht vor."
+      ],
+      "post_review_public_state": "stale",
+      "operational_activity_recatalogued": false
+    },
+    {
+      "project_id": "namibia-communal-conservancies-alliance",
+      "basis_decision": "needs_information",
+      "classification": "undetermined",
+      "criteria": {
+        "shared_resource": {
+          "verdict": "supported",
+          "cited_source_ids": [
+            "source-namibia-nacso-conservancies",
+            "source-namibia-nacso-alliance"
+          ]
+        },
+        "community": {
+          "verdict": "supported",
+          "cited_source_ids": [
+            "source-namibia-nacso-alliance"
+          ]
+        },
+        "commoning_practice": {
+          "verdict": "supported",
+          "cited_source_ids": [
+            "source-namibia-nacso-alliance"
+          ]
+        },
+        "rules_and_responsibility": {
+          "verdict": "partial",
+          "cited_source_ids": [
+            "source-namibia-nacso-alliance",
+            "source-namibia-nacso-conservancies"
+          ]
+        },
+        "common_benefit": {
+          "verdict": "supported",
+          "cited_source_ids": [
+            "source-namibia-nacso-alliance"
+          ]
+        }
+      },
+      "provenance_urls": {
+        "source-namibia-nacso-alliance": "https://nacso.org.na/",
+        "source-namibia-nacso-conservancies": "https://nacso.org.na/communal-conservancies/"
+      },
+      "limitations": [
+        "Die Dachallianz besitzt nicht sämtliche Wildtier-, Wald- und Grundrechte ihrer unabhängigen Conservancies.",
+        "NACSO als Unterstützer und die neue NCCFA sind rechtlich nicht als dieselbe Körperschaft nachgewiesen.",
+        "Lokale demokratische Verfahren ersetzen keine geprüfte aktuelle Satzung der Dachallianz."
+      ],
+      "post_review_public_state": "stale",
+      "operational_activity_recatalogued": false
+    },
+    {
+      "project_id": "open-source-ecology",
+      "basis_decision": "needs_information",
+      "classification": "undetermined",
+      "criteria": {
+        "shared_resource": {
+          "verdict": "supported",
+          "cited_source_ids": [
+            "ose-home",
+            "ose-factor-e-farm"
+          ]
+        },
+        "community": {
+          "verdict": "supported",
+          "cited_source_ids": [
+            "ose-home"
+          ]
+        },
+        "commoning_practice": {
+          "verdict": "supported",
+          "cited_source_ids": [
+            "ose-home",
+            "ose-factor-e-farm"
+          ]
+        },
+        "rules_and_responsibility": {
+          "verdict": "partial",
+          "cited_source_ids": [
+            "ose-farm-roles",
+            "ose-factor-e-farm"
+          ]
+        },
+        "common_benefit": {
+          "verdict": "supported",
+          "cited_source_ids": [
+            "ose-home"
+          ]
+        }
+      },
+      "provenance_urls": {
+        "ose-factor-e-farm": "https://www.opensourceecology.org/about-factor-e-farm/",
+        "ose-farm-roles": "https://wiki.opensourceecology.org/wiki/Factor_e_Farm_Roles_and_Responsibilities",
+        "ose-home": "https://www.opensourceecology.org/"
+      },
+      "limitations": [
+        "Die Farm wurde durch die Organisation erworben; sie ist nicht automatisch von allen Codebeitragenden kollektiv besessen.",
+        "Ein offen lizenziertes Maschinenmodell begründet keine demokratische Mitentscheidung über das Projektvermögen.",
+        "Visionen zu vollständiger Industrieautarkie dürfen nicht als bereits realisierter Zustand dargestellt werden."
+      ],
+      "post_review_public_state": "stale",
+      "operational_activity_recatalogued": false
+    },
+    {
+      "project_id": "potato-park-peru",
+      "basis_decision": "include",
+      "classification": "common",
+      "criteria": {
+        "shared_resource": {
+          "verdict": "supported",
+          "cited_source_ids": [
+            "potato-park-intercommunity-report-2011",
+            "potato-park-about"
+          ]
+        },
+        "community": {
+          "verdict": "supported",
+          "cited_source_ids": [
+            "potato-park-intercommunity-report-2011",
+            "potato-park-about"
+          ]
+        },
+        "commoning_practice": {
+          "verdict": "supported",
+          "cited_source_ids": [
+            "potato-park-about",
+            "potato-park-intercommunity-report-2011"
+          ]
+        },
+        "rules_and_responsibility": {
+          "verdict": "supported",
+          "cited_source_ids": [
+            "potato-park-intercommunity-report-2011",
+            "potato-park-benefit-protocol"
+          ]
+        },
+        "common_benefit": {
+          "verdict": "supported",
+          "cited_source_ids": [
+            "potato-park-intercommunity-report-2011",
+            "potato-park-benefit-protocol"
+          ]
+        }
+      },
+      "provenance_urls": {
+        "potato-park-about": "https://andes.org.pe/potato-park/",
+        "potato-park-benefit-protocol": "https://biocultural.iied.org/methods-and-tools",
+        "potato-park-intercommunity-report-2011": "https://www.iied.org/g03168"
+      },
+      "limitations": [
+        "Offizielle und Partnerdarstellungen differieren historisch zwischen fünf und sechs Gemeinden; der beurteilte konkrete Gemeinschaftsverband ist gesondert zu datieren.",
+        "Gewohnheitsrechtliche lokale Titel dürfen nicht als allgemeines Recht außenstehender Personen an indigenem Saatgut behandelt werden.",
+        "Aktuelle einzelne Haushaltsquoten und Erntebestände wurden nicht geprüft."
+      ],
+      "post_review_public_state": "stale",
+      "operational_activity_recatalogued": false
+    },
+    {
+      "project_id": "prinzessinnengarten-kollektiv",
+      "basis_decision": "needs_information",
+      "classification": "undetermined",
+      "criteria": {
+        "shared_resource": {
+          "verdict": "supported",
+          "cited_source_ids": [
+            "prinzessinnengarten-about"
+          ]
+        },
+        "community": {
+          "verdict": "supported",
+          "cited_source_ids": [
+            "prinzessinnengarten-about"
+          ]
+        },
+        "commoning_practice": {
+          "verdict": "supported",
+          "cited_source_ids": [
+            "prinzessinnengarten-about"
+          ]
+        },
+        "rules_and_responsibility": {
+          "verdict": "partial",
+          "cited_source_ids": [
+            "prinzessinnengarten-about",
+            "prinzessinnengarten-contact"
+          ]
+        },
+        "common_benefit": {
+          "verdict": "supported",
+          "cited_source_ids": [
+            "prinzessinnengarten-about"
+          ]
+        }
+      },
+      "provenance_urls": {
+        "prinzessinnengarten-about": "https://prinzessinnengarten-kollektiv.net/ueber-uns/",
+        "prinzessinnengarten-contact": "https://prinzessinnengarten-kollektiv.net/kontakt/"
+      },
+      "limitations": [
+        "Offene Teilnahme an Gartenarbeit bedeutet nicht, dass jeder Besucher Mitbesitzer oder stimmberechtigtes Vereinsmitglied ist.",
+        "Das Friedhofsgrundstück ist nicht automatisch Eigentum des Gartennetzwerks.",
+        "Dauerhaftigkeit der Standortnutzung und konkrete Vereinsstatuten bleiben gesondert zu belegen."
+      ],
+      "post_review_public_state": "stale",
+      "operational_activity_recatalogued": false
+    },
+    {
+      "project_id": "red-guardianes-semillas-ecuador",
+      "basis_decision": "needs_information",
+      "classification": "undetermined",
+      "criteria": {
+        "shared_resource": {
+          "verdict": "supported",
+          "cited_source_ids": [
+            "redsemillas-home"
+          ]
+        },
+        "community": {
+          "verdict": "supported",
+          "cited_source_ids": [
+            "redsemillas-home"
+          ]
+        },
+        "commoning_practice": {
+          "verdict": "supported",
+          "cited_source_ids": [
+            "redsemillas-home"
+          ]
+        },
+        "rules_and_responsibility": {
+          "verdict": "partial",
+          "cited_source_ids": [
+            "redsemillas-home"
+          ]
+        },
+        "common_benefit": {
+          "verdict": "supported",
+          "cited_source_ids": [
+            "redsemillas-home"
+          ]
+        }
+      },
+      "provenance_urls": {
+        "redsemillas-home": "https://redsemillas.org/"
+      },
+      "limitations": [
+        "Die Förderung lokaler Saatgutbanken begründet keine einheitliche Eigentümerschaft an allen Saaten.",
+        "Freiwillige Farmbesuche und Netzwerkmitarbeit sind nicht automatisch Organschaft oder Stimmrecht.",
+        "Einheitliche rechtlich bindende Netzwerkstatuten und aktueller Mitgliedschaftsstatus wurden nicht belegt."
+      ],
+      "post_review_public_state": "stale",
+      "operational_activity_recatalogued": false
+    },
+    {
+      "project_id": "root-access-hackerspace",
+      "basis_decision": "include",
+      "classification": "commons-infrastructure",
+      "criteria": {
+        "shared_resource": {
+          "verdict": "supported",
+          "cited_source_ids": [
+            "rootaccess-home",
+            "rootaccess-membership"
+          ]
+        },
+        "community": {
+          "verdict": "supported",
+          "cited_source_ids": [
+            "rootaccess-home"
+          ]
+        },
+        "commoning_practice": {
+          "verdict": "supported",
+          "cited_source_ids": [
+            "rootaccess-membership",
+            "rootaccess-home"
+          ]
+        },
+        "rules_and_responsibility": {
+          "verdict": "supported",
+          "cited_source_ids": [
+            "rootaccess-membership",
+            "rootaccess-conduct"
+          ]
+        },
+        "common_benefit": {
+          "verdict": "supported",
+          "cited_source_ids": [
+            "rootaccess-home"
+          ]
+        }
+      },
+      "provenance_urls": {
+        "rootaccess-conduct": "https://handbook.rootaccess.org/policies/conduct.html",
+        "rootaccess-home": "https://rootaccess.org/",
+        "rootaccess-membership": "https://rootaccess.org/membership/"
+      },
+      "limitations": [
+        "Gerätenutzung ist kostenpflichtig und auf bestimmte Mitgliedschaftsklassen beschränkt; Gäste besitzen keine allgemeine Nutzungsfreiheit.",
+        "Ein Mitgliedschaftsvertrag allein weist nicht automatisch Eigentumsanteile am Vereinsvermögen nach.",
+        "Die Existenz eines Beschwerdegremiums ist keine Zusicherung, dass alle Fälle ohne Konflikte gelöst werden."
+      ],
+      "post_review_public_state": "stale",
+      "operational_activity_recatalogued": false
+    },
+    {
+      "project_id": "sarantaporo-community-network",
+      "basis_decision": "include",
+      "classification": "common",
+      "criteria": {
+        "shared_resource": {
+          "verdict": "supported",
+          "cited_source_ids": [
+            "sarantaporo-network"
+          ]
+        },
+        "community": {
+          "verdict": "supported",
+          "cited_source_ids": [
+            "sarantaporo-about"
+          ]
+        },
+        "commoning_practice": {
+          "verdict": "supported",
+          "cited_source_ids": [
+            "sarantaporo-network",
+            "sarantaporo-about"
+          ]
+        },
+        "rules_and_responsibility": {
+          "verdict": "supported",
+          "cited_source_ids": [
+            "sarantaporo-network"
+          ]
+        },
+        "common_benefit": {
+          "verdict": "supported",
+          "cited_source_ids": [
+            "sarantaporo-about",
+            "sarantaporo-network"
+          ]
+        }
+      },
+      "provenance_urls": {
+        "sarantaporo-about": "https://www.sarantaporo.gr/en/about-us",
+        "sarantaporo-network": "https://www.sarantaporo.gr/en/community-network"
+      },
+      "limitations": [
+        "Die unterstützende Non-Profit-Organisation ist nicht automatisch die einzige Eigentümerin aller privaten Haushaltsfunkknoten.",
+        "Gemeinschaftliches Eigentum beschreibt das Modell, nicht automatisch eine rechtliche Einzelbewertung jeder Funkantenne.",
+        "Live-Abdeckung und Übertragungsleistung wurden nicht neu gemessen."
+      ],
+      "post_review_public_state": "stale",
+      "operational_activity_recatalogued": false
+    },
+    {
+      "project_id": "thailand-citizens-forest-database",
+      "basis_decision": "needs_information",
+      "classification": "undetermined",
+      "criteria": {
+        "shared_resource": {
+          "verdict": "supported",
+          "cited_source_ids": [
+            "source-thaicfnet-factsheet",
+            "source-recoftc-thailand"
+          ]
+        },
+        "community": {
+          "verdict": "supported",
+          "cited_source_ids": [
+            "source-thaicfnet-factsheet"
+          ]
+        },
+        "commoning_practice": {
+          "verdict": "supported",
+          "cited_source_ids": [
+            "source-thaicfnet-factsheet"
+          ]
+        },
+        "rules_and_responsibility": {
+          "verdict": "partial",
+          "cited_source_ids": [
+            "source-thaicfnet-factsheet"
+          ]
+        },
+        "common_benefit": {
+          "verdict": "supported",
+          "cited_source_ids": [
+            "source-thaicfnet-factsheet"
+          ]
+        }
+      },
+      "provenance_urls": {
+        "source-recoftc-thailand": "https://www.recoftc.org/thailand",
+        "source-thaicfnet-factsheet": "https://www.recoftc.org/th/publications/thaicfnet-factsheet"
+      },
+      "limitations": [
+        "Die gemeinsame Datenerhebung gibt einzelnen Waldgemeinschaften nicht automatisch gemeinsame Eigentumsrechte an Servern oder Software.",
+        "Quellen von 2025 belegen keine neue laufende Plattform-Verfügbarkeit im Oktober 2026.",
+        "Keine aktuell verbindlichen Daten-Governance-/Sperrrechte der Waldnutzergemeinschaften nachgewiesen."
+      ],
+      "post_review_public_state": "stale",
+      "operational_activity_recatalogued": false
+    },
+    {
+      "project_id": "tla-o-qui-aht-tribal-parks",
+      "basis_decision": "include",
+      "classification": "common",
+      "criteria": {
+        "shared_resource": {
+          "verdict": "supported",
+          "cited_source_ids": [
+            "source-tribal-parks-story"
+          ]
+        },
+        "community": {
+          "verdict": "supported",
+          "cited_source_ids": [
+            "source-tribal-parks-official",
+            "source-tribal-parks-story"
+          ]
+        },
+        "commoning_practice": {
+          "verdict": "supported",
+          "cited_source_ids": [
+            "source-tribal-parks-story"
+          ]
+        },
+        "rules_and_responsibility": {
+          "verdict": "supported",
+          "cited_source_ids": [
+            "source-tribal-parks-story"
+          ]
+        },
+        "common_benefit": {
+          "verdict": "supported",
+          "cited_source_ids": [
+            "source-tribal-parks-story"
+          ]
+        }
+      },
+      "provenance_urls": {
+        "source-tribal-parks-official": "https://www.tribalparks.com/",
+        "source-tribal-parks-story": "https://www.tribalparks.com/our-story"
+      },
+      "limitations": [
+        "Rechte und Titel der Tla-o-qui-aht Nation sind nicht gleichzusetzen mit allgemeinem touristischem oder staatlichem Gemeineigentum.",
+        "Indigene Rechte werden nicht durch eine fiktive externe Mitgliedschaft ersetzt.",
+        "Besucherbeiträge und die Allianz mit Unternehmen sind freiwillige beziehungsweise spezifische Verpflichtungen, keine Universalfreigabe aller Aktivitäten."
+      ],
+      "post_review_public_state": "stale",
+      "operational_activity_recatalogued": false
+    }
+  ],
+  "does_not_establish": [
+    "new_operational_activity",
+    "new_human_review",
+    "signed_first_party_five_axis_review",
+    "merge_authorization",
+    "production_deployment"
+  ],
+  "source_link_corrections": [
+    {
+      "project_id": "potato-park-peru",
+      "verified_at_utc": "2026-10-31",
+      "broken_urls": [
+        "https://parquedelapapa.org/1-hoja-informativa-del-parque-de-la-papa-del-ano-2025/",
+        "https://parquedelapapa.org/values/"
+      ],
+      "working_primary_substitutes": [
+        "https://www.iied.org/g03168",
+        "https://andes.org.pe/potato-park/"
+      ],
+      "assessment": "Historically five parties to the 2009 agreement; six communities now named by ANDES."
+    }
+  ]
+}

@@ -129,6 +129,14 @@
         "url": "https://www.openstreetmap.org/way/260066697",
         "retrieved_at": "2026-07-15",
         "note": "Benannte Gebäudefläche Le Nid mit sieben Wohnungen; OpenStreetMap-Daten unter ODbL 1.0."
+      },
+      {
+        "id": "cltb-governance",
+        "type": "official-source",
+        "label": "Cltb Governance",
+        "url": "https://cltb.be/en/about/",
+        "retrieved_at": "2026-10-31",
+        "note": "Offizielle aktuelle CLTB-Governance: Stiftung für Bodenbesitz, NPO für Verwaltung und Beteiligung verschiedener Stakeholder."
       }
     ]
   },
@@ -136,8 +144,8 @@
     "state": "stale",
     "catalogued_at": "2026-07-15",
     "reviewed_by": "Commonworld editorial review",
-    "reviewed_at": "2026-07-15",
-    "next_review_at": "2026-10-15",
+    "reviewed_at": "2026-10-31",
+    "next_review_at": "2026-11-15",
     "notes": "Identität, öffentlicher Adresseinstieg und Gebäudefläche wurden zwischen offizieller Projektseite und öffentlichem Register abgeglichen; benachbarte Flächen wurden nicht zugerechnet."
   },
   "links": [

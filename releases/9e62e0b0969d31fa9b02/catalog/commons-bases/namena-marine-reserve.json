@@ -1,0 +1,55 @@
+{
+  "schema_version": 1,
+  "kind": "commonworld_commons_basis",
+  "project_id": "namena-marine-reserve",
+  "classification": "common",
+  "decision": "include",
+  "reviewed_at": "2026-10-31",
+  "reviewer": "Commonworld editorial desk review",
+  "criteria": {
+    "shared_resource": {
+      "status": "supported",
+      "statement": "Das Namena-Meeresschutzgebiet umfasst gemeinsam regulierte Fischbestände, Riffe und Küstenökosysteme unter traditionellen lokalen Ressourcenrechten.",
+      "source_ids": [
+        "source-namena-wcs"
+      ]
+    },
+    "community": {
+      "status": "supported",
+      "statement": "Traditionelle Eigentümer und Dorfgemeinschaften des Kubulau-Distrikts bilden den entscheidenden lokalen Ressourcenverband.",
+      "source_ids": [
+        "source-namena-wcs"
+      ]
+    },
+    "commoning_practice": {
+      "status": "supported",
+      "statement": "Gemeindeverantwortliche organisieren Schutzregeln, Überwachung, Meeresmanagement und gemeinschaftlich getragene Kontrollen.",
+      "source_ids": [
+        "source-namena-wcs",
+        "source-kubulau-enforcement-2025"
+      ]
+    },
+    "rules_and_responsibility": {
+      "status": "supported",
+      "statement": "Traditionelle Ressourcenrechte, genehmigte Fischereiregeln und lokale Community-Enforcement-Strukturen sind auf offiziellen WCS-Fiji-Seiten dokumentiert.",
+      "source_ids": [
+        "source-namena-wcs",
+        "source-kubulau-enforcement-2025"
+      ]
+    },
+    "common_benefit": {
+      "status": "supported",
+      "statement": "Gemeinschaftlicher Meeresressourcenschutz erhält Fischbestände, Lebensgrundlagen und ökologische Integrität für beteiligte Bewohner.",
+      "source_ids": [
+        "source-namena-wcs"
+      ]
+    }
+  },
+  "confidence": 0.91,
+  "limitations": [
+    "Traditionelle Küstenrechte stehen bestimmten Gemeinden zu und sind keine allgemeine freie Fischereierlaubnis.",
+    "NGO-Unterstützung durch WCS bedeutet keine Eigentumsübertragung sämtlicher Riffe an WCS.",
+    "Eine aktuelle Bestandszählung und Konformitätsprüfung jeder Fangregel liegt nicht vor."
+  ],
+  "notes": "Traditionell lokal geregelte Meeres-Commons mit gemeinschaftlicher Überwachung und Nutzungsvorschriften."
+}

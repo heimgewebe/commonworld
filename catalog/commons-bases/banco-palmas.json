@@ -1,0 +1,54 @@
+{
+  "schema_version": 1,
+  "kind": "commonworld_commons_basis",
+  "project_id": "banco-palmas",
+  "classification": "commons-infrastructure",
+  "decision": "include",
+  "reviewed_at": "2026-10-31",
+  "reviewer": "Commonworld editorial desk review",
+  "criteria": {
+    "shared_resource": {
+      "status": "supported",
+      "statement": "Solidarische Kleinkreditangebote und die lokale Sozialwährung werden als gemeinschaftsbezogene Finanzressourcen organisiert.",
+      "source_ids": [
+        "banco-palmas-about"
+      ]
+    },
+    "community": {
+      "status": "supported",
+      "statement": "Lokale Bewohner und Organisationen des Conjunto Palmeiras bilden die soziale Basis der Entwicklungsbank.",
+      "source_ids": [
+        "banco-palmas-about"
+      ]
+    },
+    "commoning_practice": {
+      "status": "supported",
+      "statement": "Gemeinschaften nutzen lokale Kredite, Erzeugungsförderung und Zahlungskreisläufe zur Förderung örtlicher Produktion.",
+      "source_ids": [
+        "banco-palmas-about",
+        "banco-palmas-blog"
+      ]
+    },
+    "rules_and_responsibility": {
+      "status": "supported",
+      "statement": "Die offizielle Bankdarstellung ordnet Gründung und Verwaltung örtlichen Bewohnerorganisationen zu und beschreibt gemeinschaftsbezogene Verwendungszwecke.",
+      "source_ids": [
+        "banco-palmas-about"
+      ]
+    },
+    "common_benefit": {
+      "status": "supported",
+      "statement": "Die lokale Finanzierung soll Wertschöpfung und Versorgung im Viertel stärken statt Erträge aus der Nachbarschaft abzuziehen.",
+      "source_ids": [
+        "banco-palmas-about"
+      ]
+    }
+  },
+  "confidence": 0.87,
+  "limitations": [
+    "Die öffentliche Darstellung historischer Gemeinschaftssteuerung ist keine aktuelle Kreditaufsichts- oder Liquiditätsbescheinigung.",
+    "Bankkunden sind nicht zwangsläufig Träger gemeinschaftlicher Eigentumsrechte an der Bank.",
+    "Aktuelle Zinsen, Darlehensbedingungen oder rechtliche Zuständigkeiten wurden nicht eigens geprüft."
+  ],
+  "notes": "Nachbarschaftlich entwickelte Solidarfinanzierung als Commons-Infrastruktur, ohne behauptete kostenlose Bankdienste."
+}
