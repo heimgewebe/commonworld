@@ -123,6 +123,17 @@ const RELEASE_NAVIGATION_EVENT = 'commonworld:release-navigation';
 const RELEASE_CHECK_REQUEST_EVENT = 'commonworld:release-check-request';
 const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
 const compactSphereViewport = window.matchMedia('(max-width: 48rem)');
+
+// On a small viewport the historic desktop zoom clips the digital sphere
+// before visitors can discover its five rings. Keep explicitly shared camera
+// URLs untouched and use the smallest drag-stable default framing.
+function responsiveOverviewCamera() {
+  const shortSide = Math.max(1, Math.min(window.innerWidth, window.innerHeight));
+  const zoom = compactSphereViewport.matches
+    ? Math.min(DEFAULT_CAMERA.zoom, Math.max(0.9, 0.9 + Math.log2(shortSide / 390)))
+    : DEFAULT_CAMERA.zoom;
+  return { ...DEFAULT_CAMERA, zoom: Number(zoom.toFixed(2)) };
+}
 const elements = {
   body: document.body,
   skipLink: document.querySelector('.skip-link'),
@@ -3720,18 +3731,25 @@ function resetGlobe() {
   setViewPhase('overview');
   runtime.state.layer = null;
   runtime.state.digitalPath = DIGITAL_ROOT_PATH;
-  runtime.state.camera = { ...DEFAULT_CAMERA };
-  runtime.shareableCamera = { ...DEFAULT_CAMERA };
+  const overviewCamera = responsiveOverviewCamera();
+  runtime.state.camera = { ...overviewCamera };
+  runtime.shareableCamera = { ...overviewCamera };
   showLayerState();
   renderDiscoveryState();
-  if (runtime.mapReady) applyCamera(DEFAULT_CAMERA);
+  if (runtime.mapReady) applyCamera(overviewCamera);
   writeHistory('push');
 }
 
 function applyDeepLink(search, { initial = false } = {}) {
   const previousFocus = document.activeElement;
   const next = stateFromSearch(search, runtime.records.map(({ id }) => id));
-  if (initial && !new URLSearchParams(search).has('surface')) next.surface = storedPresentation();
+  const parameters = new URLSearchParams(search);
+  if (initial && !parameters.has('surface')) next.surface = storedPresentation();
+  // Respect externally shared positions and focus paths. Only an unaddressed
+  // overview gets the narrower, viewport-safe initial camera.
+  if (initial && !['lng', 'lat', 'z', 'b', 'p', 'project', 'digital_path', 'layer'].some((key) => parameters.has(key))) {
+    next.camera = responsiveOverviewCamera();
+  }
   runtime.applyingHistory = true;
   runtime.state = next;
   runtime.shareableCamera = { ...next.camera };
@@ -4126,6 +4144,16 @@ function createMap() {
     fadeDuration: reducedMotion.matches ? 0 : 120,
   });
   runtime.map.addControl(new window.maplibregl.NavigationControl({ visualizePitch: true, showCompass: true }), 'bottom-right');
+  // MapLibre's responsive compact attribution starts expanded until the first
+  // drag. Collapse its native details/summary once on small screens, without
+  // removing the attribution or disabling keyboard/touch disclosure.
+  if (compactSphereViewport.matches) {
+    const attribution = elements.map.querySelector('.maplibregl-ctrl-attrib.maplibregl-compact');
+    if (attribution) {
+      attribution.classList.remove('maplibregl-compact-show');
+      attribution.open = false;
+    }
+  }
   bindPublicMapInteractions();
   runtime.map.on('render', () => {
     runtime.mapRenderCount += 1;
