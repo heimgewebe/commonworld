@@ -1807,6 +1807,15 @@ html[data-input-modality="pointer"] :focus {
   font-weight: 720;
 }
 
+/* At the compact globe overview, show one concrete project example per ring.
+   Six titles per orbit overlap one another on phone-width screens; the full
+   project inventory remains in the accessible summary and digital drill-down. */
+.globe-stage[data-digital-path="sphere"]
+  .digital-sphere[data-ring-detail-level="compact"]
+  .sphere-ring-name ~ .sphere-ring-name {
+  display: none;
+}
+
 .sphere-ring-sublabel {
   font-size: 0.84em;
   font-weight: 650;

@@ -1,0 +1,108 @@
+{
+  "schema_version": 4,
+  "id": "ekuri-community-forest",
+  "title": "Ekuri Community Forest",
+  "summary": "Ein von den Gemeinden Old und New Ekuri gemeinschaftlich besessener und verwalteter Wald in Nigerias Cross River State, dessen Regeln Naturschutz, nachhaltige Nutzung und lokale Infrastruktur verbinden.",
+  "themes": [
+    "forest",
+    "biodiversity",
+    "community-land",
+    "commons-governance",
+    "restoration"
+  ],
+  "actions": [
+    "learn"
+  ],
+  "presence": {
+    "geographic": [
+      {
+        "id": "ekuri-cross-river-region",
+        "mode": "approximate",
+        "label": "Ekuri-Gemeinden, Cross River State, Nigeria",
+        "geometry": {
+          "type": "Point",
+          "coordinates": [
+            8.5,
+            5.75
+          ]
+        },
+        "uncertainty_meters_min": 250000,
+        "privacy_note": "Der Punkt zeigt nur Cross River State als öffentlich belegten groben Wirkungsraum und keine Waldgrenze, Siedlung oder Ressourcennutzung.",
+        "source_ids": [
+          "ekuri-icca-registry",
+          "cross-river-wikidata"
+        ]
+      }
+    ],
+    "digital": {
+      "available": false,
+      "source_ids": [
+        "ekuri-icca-registry"
+      ]
+    }
+  },
+  "activity": {
+    "status": "active",
+    "observed_at": "2026-10-29",
+    "source_ids": [
+      "ekuri-icca-registry",
+      "ekuri-partner-2026"
+    ],
+    "note": "Die Projektpartnerorganisation Rainforest Rescue berichtet am 09.03.2026 über den Waldschutz und die Einigung der Gemeinde New Ekuri. Eine unabhängige Berichterstattung von Global Witness vom 08.09.2026 bestätigt weiterhin aktive Waldhüter; die Detailquelle und ihr Status als Drittbericht sind im redaktionellen Nachweis dokumentiert. Die Konflikte und lokale Gefährdung gelten nicht als erledigt."
+  },
+  "provenance": {
+    "sources": [
+      {
+        "id": "ekuri-icca-registry",
+        "type": "public-registry",
+        "label": "ICCA Registry – Ekuri ICCA",
+        "url": "https://www.iccaregistry.org/en/explore/nigeria/ekuri-icca",
+        "retrieved_at": "2026-09-02",
+        "note": "Öffentlicher Registereintrag zu Eigentum, Fläche, Verwaltung und fortgesetzter gemeinschaftlicher Erhaltung des Ekuri-Waldes."
+      },
+      {
+        "id": "cross-river-wikidata",
+        "type": "public-registry",
+        "label": "Wikidata – Cross River State",
+        "url": "https://www.wikidata.org/wiki/Q739676",
+        "retrieved_at": "2026-07-19",
+        "note": "CC0-Registereintrag mit grober Koordinate des Bundesstaats; nicht als Lage oder Grenze des Gemeinschaftswaldes zu lesen."
+      },
+      {
+        "id": "ekuri-partner-2026",
+        "type": "official-source",
+        "label": "Rainforest Rescue – offizieller Kooperationspartner von PADIC Africa, März 2026",
+        "url": "https://www.rainforest-rescue.org/updates/15099/timber-company-to-pay-nearly-10-000-euros-for-environmental-restoration",
+        "retrieved_at": "2026-10-29",
+        "note": "Die seit Jahren mit PADIC Africa zusammenarbeitende Förderorganisation berichtet am 09.03.2026 über einen Vergleich zu Rechten der lokalen Waldgemeinschaft und unterstützt deren Waldhüter. Ergänzender unabhängiger Bericht von Global Witness vom 08.09.2026 in der getrennten Quellenprüfung; keine Projektaussage über beendeten Holzeinschlagsdruck."
+      }
+    ],
+    "uncertainty_note": "Mangels verifizierter öffentlicher Projektgeometrie wird nur der sehr grobe Bundesstaat-Bezug dargestellt."
+  },
+  "curation": {
+    "state": "listed",
+    "catalogued_at": "2026-07-19",
+    "reviewed_by": "Commonworld editorial review",
+    "reviewed_at": "2026-10-29",
+    "next_review_at": "2026-11-29",
+    "notes": "Am 29.10.2026 vollständig neu geprüft: ICCA-Register, 2026-Bericht des offiziellen Förderpartners und unabhängige Reportage vom September 2026 bestätigen die fortdauernde Schutzpraxis. Trotz aufgenommener aktiver Gemeinschaftsverwaltung bleiben Gefahren für Wald und Waldhüter ausdrücklich offen; Wiedervorlage 29.11.2026."
+  },
+  "links": [
+    {
+      "type": "homepage",
+      "label": "Ekuri Community Forest im ICCA-Register",
+      "url": "https://www.iccaregistry.org/en/explore/nigeria/ekuri-icca"
+    },
+    {
+      "type": "learn",
+      "label": "Die gemeinschaftliche Waldverwaltung von Ekuri kennenlernen",
+      "url": "https://www.iccaregistry.org/en/explore/nigeria/ekuri-icca",
+      "source_ids": [
+        "ekuri-icca-registry"
+      ]
+    }
+  ],
+  "handoff": {
+    "enabled": false
+  }
+}

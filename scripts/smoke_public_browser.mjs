@@ -4037,6 +4037,15 @@ async function liveUiHardeningScenario() {
       const sphereRect = document.querySelector('#digital-sphere').getBoundingClientRect();
       const statusRect = document.querySelector('#map-status').getBoundingClientRect();
       const summaryStyle = getComputedStyle(summary);
+      const compactRingNames = [...document.querySelectorAll('.sphere-ring-plane[data-emphasis="primary"]')]
+        .map((plane) => {
+          const names = [...plane.querySelectorAll('.sphere-ring-name')];
+          return {
+            all: names.length,
+            visible: names.filter((name) => getComputedStyle(name).display !== 'none').length,
+          };
+        });
+      const ringAccessibleSummaryLength = document.querySelector('#sphere-ring-accessible-summary')?.textContent?.trim().length ?? 0;
       const intersects = (one, other) => one.left < other.right && one.right > other.left
         && one.top < other.bottom && one.bottom > other.top;
       return {
@@ -4044,6 +4053,8 @@ async function liveUiHardeningScenario() {
         touchTargetWidth: summaryRect.width,
         touchTargetHeight: summaryRect.height,
         backgroundRepeat: summaryStyle.backgroundRepeat,
+        compactRingNames,
+        ringAccessibleSummaryLength,
         overlapStatus: intersects(attributionRect, statusRect),
         globeBounds: { left: sphereRect.left, right: sphereRect.right, top: sphereRect.top, bottom: sphereRect.bottom },
         viewport: { width: innerWidth, height: innerHeight },
@@ -4063,6 +4074,10 @@ async function liveUiHardeningScenario() {
       && initial.globeBounds.top >= -1 && initial.globeBounds.bottom <= initial.viewport.height + 1,
       `live UI ${profile.id}: initial ring exceeds drag-stable viewport budget (${JSON.stringify(initial)})`);
     assert(initial.initialZoom && Number(initial.initialZoom) < 1.15, `live UI ${profile.id}: camera did not adapt to narrow viewport (${JSON.stringify(initial)})`);
+    assert(initial.compactRingNames.length === 3
+      && initial.compactRingNames.every(({ all, visible }) => all > 1 && visible === 1)
+      && initial.ringAccessibleSummaryLength > 200,
+      `live UI ${profile.id}: compact globe must show one preview per primary ring while preserving the full accessible description (${JSON.stringify(initial)})`);
 
     // The native attribution disclosure must still expose every copyright
     // link when requested, and collapse again without obscuring other UI.
