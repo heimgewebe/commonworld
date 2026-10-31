@@ -8,9 +8,9 @@
   "reviewed_source_pack_sha256": "bb6cf859062deb1e6010f49267b7102fd10da2f4efb445b2ce4ee6625b099e46",
   "catalog_overlay_sha256": "f2aaa30377639a180d709fc180e5feefbee5fb67afbb5f249efadfaf8407d27e",
   "surface_sha256": {
-    "index": "7dd0320c7054398748ae4a9f41f36ddb5e97fb500636dd1fa5bd57be3abb7491",
-    "method": "07a93fa340e527ac3f7218f0952b0e1b732bc59ca7828f3832d91593b02931e5",
-    "proposal": "3f9e60493cd955e0abcef95d939396a820e6956cf1a12912751b4c15617d82dc"
+    "index": "c1eefae6508bb92b30c19a4320f7f12b35a0128b716ff97a5080560720e4640b",
+    "method": "1b18cfd177c7a4db145614556a84611ab62264cf84dec088877388b2a8d5577c",
+    "proposal": "3c4e3a1dd7b4729745a975e59014a6ccb18efaa116e90323915c6033c5ecbef6"
   },
   "gate_results": {
     "required_surfaces_passed": [
@@ -60,5 +60,5 @@
     "findings_based": true,
     "post_fix_review_required": true
   },
-  "notes": "Incremental source-pack verification for deterministic release b8db99c89fdf0bdd7b3c: six ui.curation_stale values were independently model-assisted reviewed and remain unchanged; all older language-review and accessibility receipts retain historical contents, and this rebinding only binds generated source-pack and localized page bytes after a runtime Text-view stale-warning repair. No new native or human review is asserted.\n\n2026-10-29: additional catalog-only source evidence was rebound to deterministic release e12576b13626ddea0308. The 18 released-locale page diffs were checked against the previous commit and contain only release/page-build metadata, the one repaired ACOFOP URL, and removal of three superseded unknown-activity notices; no translated interface text, locale packs, review-class assertions or independent review receipts were changed. Earlier language reviews remain historical, no new native review is claimed."
+  "notes": "Incremental source-pack verification for deterministic release b8db99c89fdf0bdd7b3c: six ui.curation_stale values were independently model-assisted reviewed and remain unchanged; all older language-review and accessibility receipts retain historical contents, and this rebinding only binds generated source-pack and localized page bytes after a runtime Text-view stale-warning repair. No new native or human review is asserted.\n\n2026-10-29: additional catalog-only source evidence was rebound to deterministic release e12576b13626ddea0308. The 18 released-locale page diffs were checked against the previous commit and contain only release/page-build metadata, the one repaired ACOFOP URL, and removal of three superseded unknown-activity notices; no translated interface text, locale packs, review-class assertions or independent review receipts were changed. Earlier language reviews remain historical, no new native review is claimed.\n\n2026-10-31: mechanical page-byte rebind to deterministic release fc924c8d3339b0565b8d after verified no-visible-copy-change ARIA semantics repair on the interactive index, generated app asset-token rotation, and release metadata changes on all three surfaces. Prior source packs, historic review attestations and receipts are unchanged. This is not a new independent language, screenreader or native-speaker review."
 }

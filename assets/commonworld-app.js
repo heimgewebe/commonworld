@@ -2059,7 +2059,6 @@ function renderPrimaryOverlayState(record = selectedProjectRecord()) {
   elements.discoveryPanel.hidden = !discoveryOpen;
   elements.settingsPanel.hidden = !settingsOpen;
   elements.filterToggle.setAttribute('aria-expanded', String(discoveryOpen));
-  elements.search.setAttribute('aria-expanded', String(discoveryOpen));
   elements.settingsToggle.setAttribute('aria-expanded', String(settingsOpen));
   elements.focus.hidden = !focusVisible;
   syncPrimaryOverlayInteractivity({ discoveryOpen, settingsOpen, focusVisible });

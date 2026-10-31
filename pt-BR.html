@@ -3,9 +3,9 @@
   <head>
     <meta charset="utf-8" />
     <meta name="commonworld-page" content="pt-BR.html" />
-    <meta name="commonworld-page-build" content="585bdf6197df2085" />
-    <meta name="commonworld-release" content="e12576b13626ddea0308" />
-    <base href="/releases/e12576b13626ddea0308/" />
+    <meta name="commonworld-page-build" content="69b2ba43d2756987" />
+    <meta name="commonworld-release" content="fc924c8d3339b0565b8d" />
+    <base href="/releases/fc924c8d3339b0565b8d/" />
     <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
     <meta name="color-scheme" content="dark" />
     <meta name="referrer" content="strict-origin-when-cross-origin" />
@@ -21,7 +21,7 @@
     <script type="module" src="/assets/commonworld-release-check.js?v=c1d996101672"></script>
     <script src="./assets/vendor/maplibre-gl.js?v=45a9b07a9189" defer></script>
     <script type="module" src="./assets/commonworld-locale.mjs?v=e5b3e0c0eb76"></script>
-    <script type="module" src="./assets/commonworld-app.js?v=1c2ff8e58f6a"></script>
+    <script type="module" src="./assets/commonworld-app.js?v=7764d9baa3cd"></script>
   </head>
   <body data-presentation="globe">
     <a id="text-skip-link" class="skip-link" href="/pt-BR.html#static-catalog-fallback">Pular para a visualização de texto</a>
@@ -35,7 +35,7 @@
           <div class="search-control" role="search">
             <label class="visually-hidden" for="commons-search">Procure por Comuns</label>
             <span class="search-symbol" aria-hidden="true">⌕</span>
-            <input id="commons-search" type="search" inputmode="search" autocomplete="off" placeholder="O que você gostaria de fazer ou encontrar?" aria-controls="discovery-list" aria-expanded="false" />
+            <input id="commons-search" type="search" inputmode="search" autocomplete="off" placeholder="O que você gostaria de fazer ou encontrar?" aria-controls="discovery-list" />
             <button id="search-clear" class="search-clear" type="button" aria-label="Limpar pesquisa" hidden>×</button>
           </div>
           <button id="filter-toggle" class="icon-button filter-toggle" type="button" aria-label="Abrir resultados da pesquisa e filtros" aria-controls="discovery-panel" aria-expanded="false"><span class="filter-toggle-icon" aria-hidden="true"></span><span class="filter-toggle-label">Filtros</span><span id="filter-toggle-count" class="filter-toggle-count" hidden>0</span></button>
@@ -142,11 +142,11 @@
             </div>
           </div>
 
-          <div class="orientation-bar" aria-label="Orientação do globo">
+          <div class="orientation-bar" role="group" aria-label="Orientação do globo">
             <button id="globe-reset" type="button">Terra</button>
             <span aria-hidden="true">›</span>
             <span id="semantic-level">Visão geral</span>
-            <span id="semantic-summary" class="semantic-summary">Amostra de catálogo · cobertura não avaliada</span>
+            <span id="semantic-summary" class="semantic-summary" role="group">Amostra de catálogo · cobertura não avaliada</span>
             <span id="semantic-breadcrumb-accessible" class="visually-hidden"></span>
           </div>
 
