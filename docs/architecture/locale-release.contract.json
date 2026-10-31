@@ -103,7 +103,7 @@
       "translation_pack": "wave_1",
       "release_evidence": {
         "path": "docs/evidence/locale-releases/es.json",
-        "sha256": "65c5f797c4ba2df84b9a5c9b5d9638d898365840cea26a1272a3159108b14544"
+        "sha256": "8d3b9a2549447165afb8558ecf451e15695eabd46698c1c1ffb7bda6a81485d5"
       }
     },
     "fr": {
@@ -119,7 +119,7 @@
       "translation_pack": "wave_1",
       "release_evidence": {
         "path": "docs/evidence/locale-releases/fr.json",
-        "sha256": "59bf6e08244565d4443a1c89d3f31f04a712616c693ba2184263911599e5bb49"
+        "sha256": "b3fcc0a34fc798755eeb3c12b4c69c84a7bda96cd26c84c871f91afa9d12f770"
       }
     },
     "pt-BR": {
@@ -135,7 +135,7 @@
       "translation_pack": "wave_1",
       "release_evidence": {
         "path": "docs/evidence/locale-releases/pt-BR.json",
-        "sha256": "96214f0fd179be9e6245a46d2911c14537dcbe89461e752720d5d93abbade725"
+        "sha256": "f5e69cf05f527b776148dd33138a233e3fcd39383308be83ab7075c970faa5f1"
       }
     },
     "ar": {
@@ -151,7 +151,7 @@
       "translation_pack": "wave_1",
       "release_evidence": {
         "path": "docs/evidence/locale-releases/ar.json",
-        "sha256": "ce707ef9e3ee1870f7c9a21015abba22a28c8de65a7cfa531efaefdd3c80fefd"
+        "sha256": "366ac345229a2c773e8d1b32d4d316479005663e3d1dfab453f3c6c5ce8785ea"
       }
     },
     "zh-Hans": {
@@ -167,7 +167,7 @@
       "translation_pack": "wave_1",
       "release_evidence": {
         "path": "docs/evidence/locale-releases/zh-Hans.json",
-        "sha256": "fde4143e97263a32280791000ee31aac8eb07b16af5365d0c6a96f7549db609b"
+        "sha256": "ffea5497eee2e389defda643ffc1041caa112f130c59060b7138eb23dcfa2f87"
       }
     },
     "hi": {
@@ -183,7 +183,7 @@
       "translation_pack": "wave_1",
       "release_evidence": {
         "path": "docs/evidence/locale-releases/hi.json",
-        "sha256": "5268b047fad48d1e45d8278099856e7eab57ff5d4f642e474b481c6c310e0244"
+        "sha256": "0f559168e98e0adf815da8f09cb3e7d513625b29cd828281bc4a0ba871482220"
       }
     },
     "id": {

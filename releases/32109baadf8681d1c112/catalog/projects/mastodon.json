@@ -1,0 +1,110 @@
+{
+  "schema_version": 4,
+  "id": "mastodon",
+  "title": "Mastodon",
+  "summary": "Eine freie, quelloffene und föderierte Software für soziale Netzwerke, deren unabhängige Server miteinander kommunizieren können.",
+  "themes": [
+    "communication",
+    "federation",
+    "protocol"
+  ],
+  "actions": [
+    "use",
+    "learn",
+    "contribute"
+  ],
+  "presence": {
+    "geographic": [],
+    "digital": {
+      "available": true,
+      "reach": "network",
+      "label": "Föderierte soziale Kommunikation über unabhängige Server",
+      "source_ids": [
+        "mastodon-home"
+      ]
+    }
+  },
+  "activity": {
+    "status": "active",
+    "observed_at": "2026-07-12",
+    "source_ids": [
+      "mastodon-home"
+    ],
+    "note": "Die offizielle Projektseite war am Prüftag erreichbar und beschrieb aktuelle Nutzung oder Mitwirkung."
+  },
+  "provenance": {
+    "sources": [
+      {
+        "id": "mastodon-home",
+        "type": "official-source",
+        "label": "Mastodon",
+        "url": "https://joinmastodon.org/",
+        "retrieved_at": "2026-07-12",
+        "note": "Die offizielle Seite beschreibt Mastodon als freie, quelloffene, dezentrale und interoperable soziale Plattform."
+      },
+      {
+        "id": "mastodon-about-governance",
+        "type": "official-source",
+        "url": "https://joinmastodon.org/about",
+        "label": "Mastodon – About and governance",
+        "retrieved_at": "2026-10-30",
+        "note": "Offizielle Projektbeschreibung zu offenem Quellcode, Foundation und dezentraler Community."
+      },
+      {
+        "id": "mastodon-2026-administration",
+        "type": "official-source",
+        "url": "https://blog.joinmastodon.org/2026/02/administrative-updates/",
+        "label": "Mastodon – Administrative updates 2026",
+        "retrieved_at": "2026-10-30",
+        "note": "Offizielle Verwaltungsmitteilung zu Rechtsformen und 2026 geplanten Organisationsänderungen."
+      }
+    ]
+  },
+  "curation": {
+    "state": "stale",
+    "catalogued_at": "2026-07-12",
+    "reviewed_by": "Commonworld editorial review",
+    "reviewed_at": "2026-10-30",
+    "next_review_at": "2026-10-31",
+    "notes": "Prüfung 30.10.2026: offene Software vom Foundation-Stimmrecht abgegrenzt. Der aktuelle Betrieb ist nicht neu überprüft, weiterhin stale."
+  },
+  "links": [
+    {
+      "type": "homepage",
+      "label": "Mastodon – offizielle Seite",
+      "url": "https://joinmastodon.org/"
+    },
+    {
+      "type": "source",
+      "label": "Mastodon",
+      "url": "https://joinmastodon.org/"
+    },
+    {
+      "type": "use",
+      "label": "Mastodon-Server auswählen",
+      "url": "https://joinmastodon.org/servers",
+      "source_ids": [
+        "mastodon-home"
+      ]
+    },
+    {
+      "type": "learn",
+      "label": "Mastodon-Dokumentation",
+      "url": "https://docs.joinmastodon.org/",
+      "source_ids": [
+        "mastodon-home"
+      ]
+    },
+    {
+      "type": "contribute",
+      "label": "Mastodon-Quellcode und Beiträge",
+      "url": "https://github.com/mastodon/mastodon",
+      "source_ids": [
+        "mastodon-home"
+      ]
+    }
+  ],
+  "handoff": {
+    "enabled": false
+  }
+}

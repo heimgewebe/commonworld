@@ -1,0 +1,58 @@
+{
+  "schema_version": 1,
+  "kind": "commonworld_commons_basis",
+  "project_id": "debian",
+  "classification": "common",
+  "decision": "include",
+  "reviewed_at": "2026-10-30",
+  "reviewer": "Commonworld editorial desk review",
+  "criteria": {
+    "shared_resource": {
+      "status": "supported",
+      "statement": "Debian entwickelt und pflegt ein für alle frei nutzbares Betriebssystem samt offenem Quellcode, gemeinsamem Paketarchiv und Dokumentation.",
+      "source_ids": [
+        "debian-about",
+        "debian-constitution"
+      ]
+    },
+    "community": {
+      "status": "supported",
+      "statement": "Ein internationaler Zusammenschluss von Entwicklern, Paketbetreuern und weiteren Beitragenden trägt das Projekt und seine gemeinsamen Arbeitsmittel.",
+      "source_ids": [
+        "debian-about",
+        "debian-constitution"
+      ]
+    },
+    "commoning_practice": {
+      "status": "supported",
+      "statement": "Beiträge zu Paketen und Infrastruktur sowie die kontinuierliche gemeinsame Pflege des Systems bilden eine wiederkehrende kollaborative Produktionspraxis.",
+      "source_ids": [
+        "debian-about",
+        "debian-constitution"
+      ]
+    },
+    "rules_and_responsibility": {
+      "status": "supported",
+      "statement": "Die Debian-Verfassung legt Entwicklerstimmrecht, Wahl der Projektleitung, allgemeine Beschlüsse, Delegationen und technische Entscheidungen ausdrücklich fest.",
+      "source_ids": [
+        "debian-constitution",
+        "debian-votes"
+      ]
+    },
+    "common_benefit": {
+      "status": "supported",
+      "statement": "Das Ergebnis dient als frei zugängliche Software- und Wissensinfrastruktur der Allgemeinheit; einzelne Firmen können profitieren, kontrollieren aber nicht allein die Projektregeln.",
+      "source_ids": [
+        "debian-about",
+        "debian-constitution"
+      ]
+    }
+  },
+  "confidence": 0.92,
+  "limitations": [
+    "Formales Wahl- und Beschlussrecht besitzen Debian Developers, nicht automatisch sämtliche Benutzer oder freiwilligen Beitragenden.",
+    "Aus der Verfassung ergibt sich kein Recht jedes Nutzers auf Aufnahme als Entwickler oder auf Stimmabgabe.",
+    "Die offizielle Dokumentation stützt Projektstruktur und Commoning; ein neuer Beleg der tagesaktuellen Softwareaktivität wurde nicht beansprucht."
+  ],
+  "notes": "Software-Common: gemeinsame Wartung, freie Nutzbarkeit und formale Entwickler-Selbstverwaltung; nicht mit Eigentum jedes Nutzers am Projekt gleichsetzen."
+}

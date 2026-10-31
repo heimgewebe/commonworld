@@ -1,0 +1,58 @@
+{
+  "schema_version": 1,
+  "kind": "commonworld_commons_basis",
+  "project_id": "cooperation-jackson",
+  "classification": "commons-infrastructure",
+  "decision": "include",
+  "reviewed_at": "2026-10-30",
+  "reviewer": "Commonworld editorial desk review",
+  "criteria": {
+    "shared_resource": {
+      "status": "supported",
+      "statement": "Gemeinsam aufzubauende Produktionskapazitäten, kooperative Betriebe und gemeinschaftlich ausgerichtete Entwicklungsinfrastruktur bilden den gemeinsamen Zweck und die materiellen Ansatzpunkte.",
+      "source_ids": [
+        "cooperation-jackson-intro",
+        "cooperation-jackson-sci"
+      ]
+    },
+    "community": {
+      "status": "supported",
+      "statement": "Organisierte Mitglieder und Worker-Coop-Beteiligte der lokalen Solidarökonomie in Jackson tragen das Netzwerk; Mitgliedschaft ist nach veröffentlichten Voraussetzungen zugänglich.",
+      "source_ids": [
+        "cooperation-jackson-intro",
+        "cooperation-jackson-membership"
+      ]
+    },
+    "commoning_practice": {
+      "status": "supported",
+      "statement": "Mitglieder organisieren genossenschaftliche Arbeit, Bildungs- und Produktionsinitiativen und streben gemeinschaftlich verwaltete Strukturen an.",
+      "source_ids": [
+        "cooperation-jackson-intro",
+        "cooperation-jackson-sci"
+      ]
+    },
+    "rules_and_responsibility": {
+      "status": "supported",
+      "statement": "Veröffentlichte Grundsätze nennen demokratische Mitgliedskontrolle, eine Stimme pro Person, Arbeiterselbstverwaltung und Autonomie; die Mitgliedschaftsseite beschreibt Beitrags- und Beteiligungspflichten.",
+      "source_ids": [
+        "cooperation-jackson-principles",
+        "cooperation-jackson-membership"
+      ]
+    },
+    "common_benefit": {
+      "status": "supported",
+      "statement": "Das Netzwerk will Arbeitsplätze, gemeinschaftlichen Wohlstand und wirtschaftliche Selbstbestimmung lokaler Mitglieder und Nachbarschaften durch kooperative Formen entwickeln.",
+      "source_ids": [
+        "cooperation-jackson-intro",
+        "cooperation-jackson-principles"
+      ]
+    }
+  },
+  "confidence": 0.82,
+  "limitations": [
+    "Langfristige Vision, Kooperativenföderation und Kooperativbank dürfen nicht als bereits vollständig realisierte Institutionen ausgegeben werden.",
+    "Die Einhaltung veröffentlichter Grundsätze in jeder angeschlossenen Organisation wurde nicht unabhängig geprüft.",
+    "Die Rechtstitel und konkrete Zugangsregeln einzelner Land- und Produktionsanlagen bleiben gesondert nachzuweisen."
+  ],
+  "notes": "Einschluss als fortlaufende lokale Kooperationsinfrastruktur; formale Programmansprüche bleiben von tatsächlich realisierten Einrichtungen getrennt."
+}
