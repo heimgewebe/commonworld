@@ -1,0 +1,62 @@
+{
+  "schema_version": 1,
+  "kind": "commonworld_commons_basis",
+  "project_id": "gbif",
+  "classification": "commons-infrastructure",
+  "decision": "include",
+  "reviewed_at": "2026-08-13",
+  "reviewer": "Commonworld editorial review",
+  "criteria": {
+    "shared_resource": {
+      "status": "supported",
+      "statement": "GBIF stellt gemeinsam gespeiste Biodiversitätsdaten, Standards, Publikationswerkzeuge, Indizes und Such-/Abrufdienste als föderierte Dateninfrastruktur bereit.",
+      "source_ids": [
+        "gbif-network",
+        "gbif-data-publishing",
+        "gbif-effective-nodes"
+      ]
+    },
+    "community": {
+      "status": "supported",
+      "statement": "Teilnehmende Länder, Volkswirtschaften und Organisationen, ihre Knoten und tausende Daten publizierende Institutionen bilden das Träger- und Beitragsnetzwerk.",
+      "source_ids": [
+        "gbif-network",
+        "gbif-nodes"
+      ]
+    },
+    "commoning_practice": {
+      "status": "supported",
+      "statement": "Knoten koordinieren Datenerzeugende, -verwaltende und -nutzende Institutionen; Daten werden dezentral publiziert und gemeinsame Standards, Werkzeuge und Unterstützungspraktiken weiterentwickelt.",
+      "source_ids": [
+        "gbif-node-guidance",
+        "gbif-effective-nodes",
+        "gbif-data-publishing"
+      ]
+    },
+    "rules_and_responsibility": {
+      "status": "supported",
+      "statement": "Teilnehmer-Memoranden, der Governing Board, Abstimmungsregeln, Ausschüsse, Knoten-Governance, Standards und Publikationsanforderungen ordnen Beiträge und Infrastrukturverantwortung.",
+      "source_ids": [
+        "gbif-governance",
+        "gbif-network",
+        "gbif-node-guidance",
+        "gbif-data-publishing"
+      ]
+    },
+    "common_benefit": {
+      "status": "supported",
+      "statement": "Die Infrastruktur dient freiem und offenem Zugang zu Biodiversitätsdaten für Forschung, Politik und Öffentlichkeit; Beiträge bleiben den jeweiligen Datenlizenzen und Regeln unterworfen.",
+      "source_ids": [
+        "gbif-network",
+        "gbif-data-publishing"
+      ]
+    }
+  },
+  "confidence": 0.94,
+  "limitations": [
+    "Governance ist institutionell und föderiert; nicht jeder Endnutzer besitzt ein gleiches formales Stimmrecht.",
+    "Der GBIF-Sekretariatsbetrieb ist ein zentraler Bestandteil innerhalb der föderierten Infrastruktur.",
+    "Einzelne Datensätze folgen den jeweils zulässigen Lizenzen und Bedingungen ihrer Publizierenden; offener Zugang bedeutet nicht bedingungslose Rechte an jedem Datensatz."
+  ],
+  "notes": "Aufgenommen als global föderierte Commons-Infrastruktur, nicht lediglich wegen offener Daten, sondern wegen belegter kollektiver Beiträge, Standards, Knoten und formaler Teilnehmer-Governance."
+}
