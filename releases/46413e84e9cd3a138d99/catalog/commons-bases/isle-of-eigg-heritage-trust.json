@@ -1,0 +1,58 @@
+{
+  "schema_version": 1,
+  "kind": "commonworld_commons_basis",
+  "project_id": "isle-of-eigg-heritage-trust",
+  "classification": "common",
+  "decision": "include",
+  "reviewed_at": "2026-08-04",
+  "reviewer": "Commonworld editorial review",
+  "criteria": {
+    "shared_resource": {
+      "status": "supported",
+      "statement": "Die Insel, Trust-Immobilien, Gemeinschaftsinfrastruktur, Natur- und Kulturerbe sowie das lokale Stromnetz bilden einen dauerhaft gemeinschaftsgebundenen Ressourcenverbund.",
+      "source_ids": [
+        "eigg-heritage-trust",
+        "eigg-community-buyout",
+        "eigg-support"
+      ]
+    },
+    "community": {
+      "status": "supported",
+      "statement": "Die Isle of Eigg Residents’ Association vertritt die Bewohner im Trust und wählt vier Direktoren; Highland Council und Scottish Wildlife Trust sind weitere Mitglieder.",
+      "source_ids": [
+        "eigg-heritage-trust"
+      ]
+    },
+    "commoning_practice": {
+      "status": "supported",
+      "statement": "Bewohner wirken über gewählte Direktoren, Konsultationen und lokale Tochtergesellschaften an Land-, Wohn-, Infrastruktur-, Energie- und Erbeprojekten mit.",
+      "source_ids": [
+        "eigg-heritage-trust",
+        "eigg-community-buyout",
+        "eigg-support"
+      ]
+    },
+    "rules_and_responsibility": {
+      "status": "supported",
+      "statement": "Die Trust-Verfassung, Mitgliedsstruktur, gewählte Bewohnerdirektoren, vierteljährliche Vorstandssitzungen und monatliche Insel-Direktorentreffen ordnen Verantwortung und Kontrolle.",
+      "source_ids": [
+        "eigg-heritage-trust"
+      ]
+    },
+    "common_benefit": {
+      "status": "supported",
+      "statement": "Der Inselbesitz dient bezahlbarem Wohnen, Infrastruktur, erneuerbarer Energie, wirtschaftlicher Entwicklung sowie dem Schutz von Natur- und Kulturerbe für heutige und künftige Bewohner.",
+      "source_ids": [
+        "eigg-heritage-trust",
+        "eigg-support"
+      ]
+    }
+  },
+  "confidence": 0.95,
+  "limitations": [
+    "Der Trust ist eine Partnerschaft aus Residents’ Association, Highland Council und Scottish Wildlife Trust; Bewohnerkontrolle ist stark, aber nicht alleinige institutionelle Kontrolle.",
+    "Öffentliche Seiten bilden interne Konflikte, Abstimmungen und Eigentumsdetails nicht vollständig ab.",
+    "Einzelne Grundstücke, Häuser und Energieanlagen werden nicht kartiert."
+  ],
+  "notes": "Aufgenommen wird der konkrete gemeinschaftsgebundene Inselbesitz des Isle of Eigg Heritage Trust mit seiner gemischten, aber bewohnergeprägten Governance."
+}

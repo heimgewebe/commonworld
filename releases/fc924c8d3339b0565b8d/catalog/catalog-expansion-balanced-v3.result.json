@@ -1,0 +1,1282 @@
+{
+  "schema_version": 1,
+  "kind": "commonworld_catalog_expansion_balanced_v3_result",
+  "bureau": "COMMONWORLD-PUBLIC-GLOBE-V1-T013",
+  "base_commit": "7817eca669d351baa6d8c9e841ebc5fa4b09ab19",
+  "checked_at": "2026-07-19",
+  "status": "validated",
+  "scope": {
+    "catalog_before": 30,
+    "catalog_after": 41,
+    "new_project_files": 11,
+    "allowed_paths": [
+      "catalog/catalog.json",
+      "catalog/projects/<new>.json",
+      "assets/commonworld-bootstrap-catalog.mjs",
+      "index.html",
+      "method.html",
+      "catalog/catalog-expansion-balanced-v3.result.json"
+    ],
+    "runtime_schema_test_architecture_changes": false,
+    "catalog_published_at": "2026-07-19",
+    "next_review_at": "2026-10-19"
+  },
+  "selection": [
+    {
+      "id": "akiba-mashinani-trust",
+      "title": "Akiba Mashinani Trust",
+      "selection_reason": "Stärkt gemeinschaftliche Finanzierung, Spargruppen, Wohnraum und Bodenpraxis mit einem konkreten kenianischen Träger.",
+      "regions": [
+        "Afrika",
+        "Ostafrika",
+        "Kenia"
+      ],
+      "presence": "geographic-only",
+      "themes": [
+        "community-finance",
+        "housing",
+        "community-land",
+        "savings-groups",
+        "basic-services",
+        "commons-governance"
+      ],
+      "checked_urls": [
+        {
+          "url": "https://www.muungano.net/akibamashinanitrust",
+          "used": true,
+          "source_type": "official-source",
+          "http_result": {
+            "status": 200,
+            "reason": "OK",
+            "content_type": "text/html",
+            "outcome": "retrieved",
+            "usable_evidence": true
+          },
+          "supports": "Offizielle Projektquelle für Beschreibung, Aktivität und den verknüpften direkten Zugang."
+        },
+        {
+          "url": "https://www.wikidata.org/wiki/Q114",
+          "used": true,
+          "source_type": "public-registry",
+          "http_result": {
+            "status": 200,
+            "reason": "OK",
+            "content_type": "text/html",
+            "outcome": "retrieved",
+            "usable_evidence": true
+          },
+          "supports": "CC0-Registereintrag für den groben öffentlich belegten Ortsbezug; nur zur ungefähren Orientierung verwendet."
+        }
+      ]
+    },
+    {
+      "id": "bali-subak-system",
+      "title": "Subak-System auf Bali",
+      "selection_reason": "Belegt eine fortlebende gemeinschaftliche Wasser-, Bewässerungs- und Ernährungspraxis in Südostasien.",
+      "regions": [
+        "Asien",
+        "Südostasien",
+        "Indonesien",
+        "südliche Hemisphäre"
+      ],
+      "presence": "geographic-only",
+      "themes": [
+        "water",
+        "irrigation",
+        "agriculture",
+        "food",
+        "commons-governance",
+        "cultural-heritage"
+      ],
+      "checked_urls": [
+        {
+          "url": "https://whc.unesco.org/en/list/1194",
+          "used": true,
+          "source_type": "public-registry",
+          "http_result": {
+            "status": 200,
+            "reason": "OK",
+            "content_type": "text/html",
+            "outcome": "retrieved",
+            "usable_evidence": true
+          },
+          "supports": "Öffentlicher UNESCO-Registereintrag zur demokratischen Bewässerungsverwaltung, den fünf Landschaften und ihrer fortdauernden gemeinschaftlichen Nutzung."
+        },
+        {
+          "url": "https://www.wikidata.org/wiki/Q4648",
+          "used": true,
+          "source_type": "public-registry",
+          "http_result": {
+            "status": 200,
+            "reason": "OK",
+            "content_type": "text/html",
+            "outcome": "retrieved",
+            "usable_evidence": true
+          },
+          "supports": "CC0-Registereintrag mit einer groben Koordinate der Insel Bali; nur als Mittelpunkt des weiten Wirkungsraums verwendet."
+        }
+      ]
+    },
+    {
+      "id": "cano-martin-pena-clt",
+      "title": "Caño Martín Peña Community Land Trust",
+      "selection_reason": "Stärkt gemeinschaftlichen Boden und Wohnraumsicherung in einer konkreten karibischen Nachbarschaft.",
+      "regions": [
+        "Lateinamerika/Karibik",
+        "Puerto Rico"
+      ],
+      "presence": "geographic-only",
+      "themes": [
+        "housing",
+        "community-land",
+        "neighbourhood",
+        "environmental-justice",
+        "commons-governance"
+      ],
+      "checked_urls": [
+        {
+          "url": "https://cano3punto7.org/index-english.html",
+          "used": true,
+          "source_type": "official-source",
+          "http_result": {
+            "status": 200,
+            "reason": "OK",
+            "content_type": "text/html",
+            "outcome": "retrieved",
+            "usable_evidence": true
+          },
+          "supports": "Offizielle Projektseite der beteiligten Gemeinschafts- und ENLACE-Strukturen mit Beschreibung des Community Land Trust und des kollektiven Bodeneigentums."
+        },
+        {
+          "url": "https://www.wikidata.org/wiki/Q41211",
+          "used": true,
+          "source_type": "public-registry",
+          "http_result": {
+            "status": 200,
+            "reason": "OK",
+            "content_type": "text/html",
+            "outcome": "retrieved",
+            "usable_evidence": true
+          },
+          "supports": "CC0-Registereintrag mit grober Stadtkoordinate; bewusst keine Parzellen- oder Hausgeometrie."
+        },
+        {
+          "url": "https://fideicomisomartinpena.org/",
+          "used": false,
+          "source_type": "official-source",
+          "http_result": {
+            "status": 200,
+            "reason": "OK",
+            "content_type": "text/html",
+            "outcome": "retrieved-verification-challenge",
+            "usable_evidence": false
+          },
+          "note": "Die eigenständige CLT-Seite lieferte nur eine Verifikationsseite; deshalb wurde stattdessen die abrufbare offizielle G-8/ENLACE-Projektseite verwendet."
+        }
+      ]
+    },
+    {
+      "id": "community-baboon-sanctuary",
+      "title": "Community Baboon Sanctuary",
+      "selection_reason": "Ergänzt ein öffentlich registriertes Schutzgebiet mit Governance durch lokale Gemeinschaften und Managementverantwortung lokaler Komitees in Belize.",
+      "regions": [
+        "Lateinamerika/Mittelamerika",
+        "Belize"
+      ],
+      "presence": "geographic-only",
+      "themes": [
+        "conservation",
+        "commons-governance"
+      ],
+      "checked_urls": [
+        {
+          "url": "https://www.protectedplanet.net/19553",
+          "used": true,
+          "source_type": "public-registry",
+          "http_result": {
+            "status": 200,
+            "reason": "OK",
+            "content_type": "text/html",
+            "outcome": "retrieved",
+            "usable_evidence": true
+          },
+          "supports": "WDPA-Registereintrag für Schutzstatus, Governance durch lokale Gemeinschaften und Managementverantwortung lokaler Komitees; weitergehende Eigentums-, Managementplan-, Wald- oder Artenaussagen werden nicht abgeleitet."
+        },
+        {
+          "url": "https://www.wikidata.org/wiki/Q242",
+          "used": true,
+          "source_type": "public-registry",
+          "http_result": {
+            "status": 200,
+            "reason": "OK",
+            "content_type": "text/html",
+            "outcome": "retrieved",
+            "usable_evidence": true
+          },
+          "supports": "CC0-Registereintrag mit einer groben Landeskoordinate; ausschließlich zur weiträumigen Orientierung verwendet."
+        },
+        {
+          "url": "https://howlermonkeybelize.org/about-us/",
+          "used": false,
+          "source_type": "official-source",
+          "http_result": {
+            "status": 200,
+            "reason": "OK",
+            "content_type": "text/html",
+            "outcome": "retrieved-verification-challenge",
+            "usable_evidence": false
+          },
+          "note": "Die offizielle Seite lieferte beim direkten Abruf nur eine Verifikationsseite; verwendet wurde der aktuelle öffentliche Protected-Planet-Registereintrag."
+        }
+      ]
+    },
+    {
+      "id": "deccan-development-society",
+      "title": "Deccan Development Society Sanghams",
+      "selection_reason": "Stärkt Saatgut, Ernährung und agrarökologische Selbstorganisation von Frauen in Südasien.",
+      "regions": [
+        "Asien",
+        "Südasien",
+        "Indien"
+      ],
+      "presence": "both",
+      "themes": [
+        "seeds",
+        "agriculture",
+        "food",
+        "agrobiodiversity",
+        "indigenous-knowledge",
+        "commons-governance"
+      ],
+      "checked_urls": [
+        {
+          "url": "https://www.ddsindia.org/",
+          "used": true,
+          "source_type": "official-source",
+          "http_result": {
+            "status": 200,
+            "reason": "OK",
+            "content_type": "text/html",
+            "outcome": "retrieved",
+            "usable_evidence": true
+          },
+          "supports": "Offizielle Beschreibung der dörflichen Frauen-Sanghams, ihrer Saatgut- und Ernährungsautonomie sowie aktueller Aktivitäten 2026."
+        },
+        {
+          "url": "https://www.wikidata.org/wiki/Q677037",
+          "used": true,
+          "source_type": "public-registry",
+          "http_result": {
+            "status": 200,
+            "reason": "OK",
+            "content_type": "text/html",
+            "outcome": "retrieved",
+            "usable_evidence": true
+          },
+          "supports": "CC0-Registereintrag für Telangana; die Koordinate dient ausschließlich als weiträumiger Bundesstaat-Anker."
+        }
+      ]
+    },
+    {
+      "id": "ekuri-community-forest",
+      "title": "Ekuri Community Forest",
+      "selection_reason": "Ergänzt einen öffentlich registrierten, gemeinschaftlich verwalteten Wald in Westafrika.",
+      "regions": [
+        "Afrika",
+        "Westafrika",
+        "Nigeria"
+      ],
+      "presence": "geographic-only",
+      "themes": [
+        "forest",
+        "biodiversity",
+        "community-land",
+        "commons-governance",
+        "restoration"
+      ],
+      "checked_urls": [
+        {
+          "url": "https://www.iccaregistry.org/en/explore/nigeria/ekuri-icca",
+          "used": true,
+          "source_type": "public-registry",
+          "http_result": {
+            "status": 200,
+            "reason": "OK",
+            "content_type": "text/html",
+            "outcome": "retrieved",
+            "usable_evidence": true
+          },
+          "supports": "Öffentlicher Registereintrag zu Eigentum, Fläche, Verwaltung und fortgesetzter gemeinschaftlicher Erhaltung des Ekuri-Waldes."
+        },
+        {
+          "url": "https://www.wikidata.org/wiki/Q739676",
+          "used": true,
+          "source_type": "public-registry",
+          "http_result": {
+            "status": 200,
+            "reason": "OK",
+            "content_type": "text/html",
+            "outcome": "retrieved",
+            "usable_evidence": true
+          },
+          "supports": "CC0-Registereintrag mit grober Koordinate des Bundesstaats; nicht als Lage oder Grenze des Gemeinschaftswaldes zu lesen."
+        }
+      ]
+    },
+    {
+      "id": "hepburn-energy",
+      "title": "Hepburn Energy",
+      "selection_reason": "Erweitert gemeinschaftliches Eigentum an erneuerbarer Energie in der südlichen Hemisphäre.",
+      "regions": [
+        "Ozeanien/Pazifik",
+        "Australien",
+        "südliche Hemisphäre"
+      ],
+      "presence": "both",
+      "themes": [
+        "energy",
+        "renewable-energy",
+        "community-ownership",
+        "cooperative",
+        "energy-democracy"
+      ],
+      "checked_urls": [
+        {
+          "url": "https://www.hepburnenergy.coop/about/",
+          "used": true,
+          "source_type": "official-source",
+          "http_result": {
+            "status": 200,
+            "reason": "OK",
+            "content_type": "text/html",
+            "outcome": "retrieved",
+            "usable_evidence": true
+          },
+          "supports": "Offizielle Projektquelle für Beschreibung, Aktivität und den verknüpften direkten Zugang."
+        },
+        {
+          "url": "https://www.wikidata.org/wiki/Q3019340",
+          "used": true,
+          "source_type": "public-registry",
+          "http_result": {
+            "status": 200,
+            "reason": "OK",
+            "content_type": "text/html",
+            "outcome": "retrieved",
+            "usable_evidence": true
+          },
+          "supports": "CC0-Registereintrag für den groben öffentlich belegten Ortsbezug; nur zur ungefähren Orientierung verwendet."
+        }
+      ]
+    },
+    {
+      "id": "kibera-public-space-project",
+      "title": "Kibera Public Space Project",
+      "selection_reason": "Verbindet gemeinschaftlich verwalteten öffentlichen Raum mit Wasser, Klimavorsorge und Grundversorgung in Ostafrika.",
+      "regions": [
+        "Afrika",
+        "Ostafrika",
+        "Kenia",
+        "südliche Hemisphäre"
+      ],
+      "presence": "geographic-only",
+      "themes": [
+        "shared-space",
+        "water",
+        "climate-resilience",
+        "neighbourhood",
+        "basic-services",
+        "commons-governance"
+      ],
+      "checked_urls": [
+        {
+          "url": "https://www.kounkuey.org/projects/kibera_public_space_project_network",
+          "used": true,
+          "source_type": "official-source",
+          "http_result": {
+            "status": 200,
+            "reason": "OK",
+            "content_type": "text/html",
+            "outcome": "retrieved",
+            "usable_evidence": true
+          },
+          "supports": "Offizielle Projektseite zu gemeinschaftlichem Entwurf, Partnergruppen, laufendem Netzwerk und Wirkungsfeldern."
+        },
+        {
+          "url": "https://www.wikidata.org/wiki/Q3870",
+          "used": true,
+          "source_type": "public-registry",
+          "http_result": {
+            "status": 200,
+            "reason": "OK",
+            "content_type": "text/html",
+            "outcome": "retrieved",
+            "usable_evidence": true
+          },
+          "supports": "CC0-Registereintrag mit einer groben Stadtkoordinate; nur als weiter Orientierungsanker verwendet."
+        }
+      ]
+    },
+    {
+      "id": "potato-park-peru",
+      "title": "Parque de la Papa",
+      "selection_reason": "Ergänzt indigene Saatgut-, Land- und Ernährungscommons in den Anden.",
+      "regions": [
+        "Lateinamerika",
+        "Anden",
+        "Peru",
+        "südliche Hemisphäre"
+      ],
+      "presence": "geographic-only",
+      "themes": [
+        "seeds",
+        "agriculture",
+        "food",
+        "biodiversity",
+        "indigenous-knowledge",
+        "community-land"
+      ],
+      "checked_urls": [
+        {
+          "url": "https://parquedelapapa.org/",
+          "used": true,
+          "source_type": "official-source",
+          "http_result": {
+            "status": 200,
+            "reason": "OK",
+            "content_type": "text/html",
+            "outcome": "retrieved",
+            "usable_evidence": true
+          },
+          "supports": "Offizielle Seite mit den fünf Gemeinschaften, gemeinschaftsgeführter Erhaltung und aktuellen Besuchsangeboten."
+        },
+        {
+          "url": "https://www.wikidata.org/wiki/Q950398",
+          "used": true,
+          "source_type": "public-registry",
+          "http_result": {
+            "status": 200,
+            "reason": "OK",
+            "content_type": "text/html",
+            "outcome": "retrieved",
+            "usable_evidence": true
+          },
+          "supports": "CC0-Registereintrag für den öffentlich benannten Bezugsort; nur zur groben Orientierung des größeren Gemeinschaftsgebiets."
+        }
+      ]
+    },
+    {
+      "id": "tribunal-aguas-valencia",
+      "title": "Tribunal de las Aguas de Valencia",
+      "selection_reason": "Erweitert Wasser- und Bewässerungsgovernance um eine aktive, öffentlich tagende Gemeinschaftsinstitution.",
+      "regions": [
+        "Europa",
+        "Südeuropa",
+        "Spanien"
+      ],
+      "presence": "geographic-only",
+      "themes": [
+        "water",
+        "irrigation",
+        "agriculture",
+        "commons-governance",
+        "customary-law",
+        "cultural-heritage"
+      ],
+      "checked_urls": [
+        {
+          "url": "https://tribunaldelasaguas.org/en/",
+          "used": true,
+          "source_type": "official-source",
+          "http_result": {
+            "status": 200,
+            "reason": "OK",
+            "content_type": "text/html",
+            "outcome": "retrieved",
+            "usable_evidence": true
+          },
+          "supports": "Offizielle Projektquelle für Beschreibung, Aktivität und den verknüpften direkten Zugang."
+        },
+        {
+          "url": "https://tribunaldelasaguas.org/en/visits-to-the-tribunal/",
+          "used": true,
+          "source_type": "official-source",
+          "http_result": {
+            "status": 200,
+            "reason": "OK",
+            "content_type": "text/html",
+            "outcome": "retrieved",
+            "usable_evidence": true
+          },
+          "supports": "Offizielle Projektquelle für Beschreibung, Aktivität und den verknüpften direkten Zugang."
+        },
+        {
+          "url": "https://www.wikidata.org/wiki/Q8818",
+          "used": true,
+          "source_type": "public-registry",
+          "http_result": {
+            "status": 200,
+            "reason": "OK",
+            "content_type": "text/html",
+            "outcome": "retrieved",
+            "usable_evidence": true
+          },
+          "supports": "CC0-Registereintrag für den groben öffentlich belegten Ortsbezug; nur zur ungefähren Orientierung verwendet."
+        }
+      ]
+    },
+    {
+      "id": "velondriake-lmma",
+      "title": "Velondriake Locally Managed Marine Area",
+      "selection_reason": "Ergänzt lokal verwaltete Meeres-, Fischerei- und Mangrovenpraxis in Madagaskar.",
+      "regions": [
+        "Afrika",
+        "Madagaskar",
+        "südliche Hemisphäre"
+      ],
+      "presence": "geographic-only",
+      "themes": [
+        "marine-conservation",
+        "fisheries",
+        "biodiversity",
+        "mangroves",
+        "commons-governance"
+      ],
+      "checked_urls": [
+        {
+          "url": "https://blog.blueventures.org/en/locations/madagascar/velondriake-madagascar/",
+          "used": true,
+          "source_type": "official-source",
+          "http_result": {
+            "status": 200,
+            "reason": "OK",
+            "content_type": "text/html",
+            "outcome": "retrieved",
+            "usable_evidence": true
+          },
+          "supports": "Partnerseite für lokal verwaltetes Meeresgebiet, gemeinschaftliche Führung, nachhaltige Fischerei, Monitoring, Schutzflächen, Riffe und Mangroven."
+        },
+        {
+          "url": "https://www.wikidata.org/wiki/Q4753631",
+          "used": true,
+          "source_type": "public-registry",
+          "http_result": {
+            "status": 200,
+            "reason": "OK",
+            "content_type": "text/html",
+            "outcome": "retrieved",
+            "usable_evidence": true
+          },
+          "supports": "CC0-Registereintrag für das öffentlich benannte Bezugsdorf; die Koordinate dient nur als grobe Mitte des wesentlich größeren Küstenraums."
+        }
+      ]
+    }
+  ],
+  "regional_distribution_new": {
+    "africa": 4,
+    "asia": 2,
+    "latin_america_and_caribbean": 3,
+    "oceania_and_pacific": 1,
+    "europe": 1,
+    "north_america": 0,
+    "southern_hemisphere_tagged": 5,
+    "counting_note": "Jedes Projekt ist genau einer Hauptregion zugeordnet; zusammengesetzte Tags wie Lateinamerika/Mittelamerika und Ozeanien/Pazifik werden ihrer Hauptregion zugerechnet. Südliche Hemisphäre ist eine zusätzliche Querschnittszählung."
+  },
+  "presence_mix": {
+    "before": {
+      "total": 30,
+      "geographic": 10,
+      "digital": 25,
+      "both": 6,
+      "geographic_only": 4,
+      "digital_only": 19,
+      "neither": 1
+    },
+    "after": {
+      "total": 41,
+      "geographic": 21,
+      "digital": 27,
+      "both": 8,
+      "geographic_only": 13,
+      "digital_only": 19,
+      "neither": 1
+    },
+    "counting_rule": "Geografisch zählt nur mindestens ein nicht verborgenes location-Objekt; digital zählt ausschließlich presence.digital.available=true.",
+    "constraint_note": "Digitale und hybride Commons werden aus der expliziten Präsenzwahrheit des Katalogs abgeleitet. Der Current-State-Vertrag dokumentiert den jeweiligen Snapshot, während Validatoren und Laufzeit keine feste Identitätenzahl voraussetzen."
+  },
+  "theme_distribution": {
+    "before": {
+      "agriculture": 2,
+      "biodiversity": 1,
+      "circular-economy": 1,
+      "civic-tech": 1,
+      "commons-governance": 7,
+      "communication": 8,
+      "community-land": 3,
+      "community-network": 7,
+      "community-ownership": 1,
+      "cooperative": 1,
+      "cooperative-economy": 3,
+      "creative-commons": 1,
+      "digital-equity": 2,
+      "digital-literacy": 1,
+      "distributed-manufacturing": 1,
+      "documentation": 1,
+      "education": 4,
+      "energy": 2,
+      "environmental-education": 1,
+      "federation": 1,
+      "food": 3,
+      "free-software": 2,
+      "health": 1,
+      "housing": 3,
+      "infrastructure": 5,
+      "irrigation": 1,
+      "knowledge": 2,
+      "learning": 1,
+      "mutual-aid": 1,
+      "neighbourhood": 1,
+      "network": 2,
+      "open-data": 3,
+      "open-educational-resources": 1,
+      "open-hardware": 1,
+      "open-knowledge": 3,
+      "open-media": 1,
+      "open-source": 5,
+      "platform": 1,
+      "protocol": 1,
+      "renewable-energy": 2,
+      "repair": 1,
+      "rural-infrastructure": 2,
+      "seeds": 1,
+      "shared-space": 3,
+      "skills": 1,
+      "software-infrastructure": 1,
+      "tool-sharing": 1,
+      "urban-gardening": 1,
+      "water": 1
+    },
+    "after": {
+      "agriculture": 6,
+      "agrobiodiversity": 1,
+      "basic-services": 2,
+      "biodiversity": 4,
+      "circular-economy": 1,
+      "civic-tech": 1,
+      "climate-resilience": 1,
+      "commons-governance": 16,
+      "communication": 8,
+      "community-finance": 1,
+      "community-land": 7,
+      "community-network": 7,
+      "community-ownership": 2,
+      "conservation": 1,
+      "cooperative": 2,
+      "cooperative-economy": 3,
+      "creative-commons": 1,
+      "cultural-heritage": 2,
+      "customary-law": 1,
+      "digital-equity": 2,
+      "digital-literacy": 1,
+      "distributed-manufacturing": 1,
+      "documentation": 1,
+      "education": 4,
+      "energy": 3,
+      "energy-democracy": 1,
+      "environmental-education": 1,
+      "environmental-justice": 1,
+      "federation": 1,
+      "fisheries": 1,
+      "food": 6,
+      "forest": 1,
+      "free-software": 2,
+      "health": 1,
+      "housing": 5,
+      "indigenous-knowledge": 2,
+      "infrastructure": 5,
+      "irrigation": 3,
+      "knowledge": 2,
+      "learning": 1,
+      "mangroves": 1,
+      "marine-conservation": 1,
+      "mutual-aid": 1,
+      "neighbourhood": 3,
+      "network": 2,
+      "open-data": 3,
+      "open-educational-resources": 1,
+      "open-hardware": 1,
+      "open-knowledge": 3,
+      "open-media": 1,
+      "open-source": 5,
+      "platform": 1,
+      "protocol": 1,
+      "renewable-energy": 3,
+      "repair": 1,
+      "restoration": 1,
+      "rural-infrastructure": 2,
+      "savings-groups": 1,
+      "seeds": 3,
+      "shared-space": 4,
+      "skills": 1,
+      "software-infrastructure": 1,
+      "tool-sharing": 1,
+      "urban-gardening": 1,
+      "water": 4
+    }
+  },
+  "rejected_candidates": [
+    {
+      "name": "Global Voices",
+      "reason": "Belastbare digitale Commons-Praxis, aber als neue digitale Identität mit dem unveränderlichen Current-State-/Taxonomievertrag unvereinbar.",
+      "checked_urls": [
+        {
+          "url": "https://globalvoices.org/about/",
+          "http_result": "200 OK; text/html; retrieved"
+        }
+      ]
+    },
+    {
+      "name": "LibriVox",
+      "reason": "Belastbare digitale Commons-Praxis, aber als neue digitale Identität innerhalb der vorgegebenen Vertrags- und Pfadgrenze nicht zulässig.",
+      "checked_urls": [
+        {
+          "url": "https://librivox.org/pages/about-librivox/",
+          "http_result": "200 OK; text/html; retrieved"
+        }
+      ]
+    },
+    {
+      "name": "MusicBrainz",
+      "reason": "Belastbare offene Musikdatenpraxis, aber sie würde eine 26. digitale Identität einführen und den unveränderlichen Vertrag brechen.",
+      "checked_urls": [
+        {
+          "url": "https://musicbrainz.org/doc/About",
+          "http_result": "200 OK; text/html; retrieved"
+        }
+      ]
+    },
+    {
+      "name": "Restarters",
+      "reason": "Belastbare globale Reparaturplattform, aber digital-only und daher mit der festgeschriebenen digitalen Identitätsmenge unvereinbar.",
+      "checked_urls": [
+        {
+          "url": "https://restarters.net/about",
+          "http_result": "200 OK; text/html; retrieved"
+        },
+        {
+          "url": "https://therestartproject.org/repair-economy/",
+          "http_result": "200 OK; text/html; verification challenge; unusable"
+        }
+      ]
+    },
+    {
+      "name": "MIHARI Network",
+      "reason": "Übergeordnetes Netzwerk statt einer einzelnen lokal verwalteten Meeres-Common; Velondriake ist die konkretere Praxis.",
+      "checked_urls": [
+        {
+          "url": "https://mihari-network.org/en/",
+          "http_result": "200 OK; text/html; retrieved"
+        }
+      ]
+    },
+    {
+      "name": "Repair Café International",
+      "reason": "Dachstruktur und inhaltlich zu nah an bereits vorhandenen und neu ausgewählten lokalen Reparatur-/Werkzeugpraxen.",
+      "checked_urls": [
+        {
+          "url": "https://www.repaircafe.org/en/visit/",
+          "http_result": "200 OK; text/html; retrieved"
+        }
+      ]
+    },
+    {
+      "name": "Svalbard Global Seed Vault",
+      "reason": "Öffentliches Saatgutdepot, aber keine gemeinschaftlich verwaltete lokale Commons-Praxis.",
+      "checked_urls": []
+    },
+    {
+      "name": "iFixit",
+      "reason": "Unternehmen; trotz Reparaturwissen keine passende gemeinschaftliche Trägerschaft für diese Auswahl.",
+      "checked_urls": []
+    },
+    {
+      "name": "Kiva",
+      "reason": "Finanzierungsplattform ohne hinreichenden Beleg gemeinschaftlichen Eigentums oder lokaler Selbstverwaltung.",
+      "checked_urls": []
+    },
+    {
+      "name": "Open Collective",
+      "reason": "Plattform-/Firmenstruktur statt einer konkreten gemeinschaftlichen Finanzierungspraxis.",
+      "checked_urls": []
+    },
+    {
+      "name": "banco-palmas",
+      "reason": "Die verwendete Seite belegt Banco Palmas nicht objektspezifisch und nicht als aktuell betriebene, gemeinschaftlich verwaltete Praxis.",
+      "checked_urls": [
+        {
+          "url": "https://bancopalmas.com/o-que-e/",
+          "used": true,
+          "source_type": "official-source",
+          "http_result": {
+            "status": 200,
+            "reason": "OK",
+            "content_type": "text/html",
+            "outcome": "retrieved",
+            "usable_evidence": true
+          },
+          "supports": "Offizielle Projektquelle für Beschreibung, Aktivität und den verknüpften direkten Zugang."
+        },
+        {
+          "url": "https://www.wikidata.org/wiki/Q32014941",
+          "used": true,
+          "source_type": "public-registry",
+          "http_result": {
+            "status": 200,
+            "reason": "OK",
+            "content_type": "text/html",
+            "outcome": "retrieved",
+            "usable_evidence": true
+          },
+          "supports": "CC0-Registereintrag für den groben öffentlich belegten Ortsbezug; nur zur ungefähren Orientierung verwendet."
+        }
+      ]
+    },
+    {
+      "name": "brisbane-tool-library",
+      "reason": "Die reale Ausleihe nutzt eine digitale MyTurn-Oberfläche; die aktuelle Plattformgrenze kann neue digitale Identitäten noch nicht ehrlich aufnehmen.",
+      "checked_urls": [
+        {
+          "url": "https://www.brisbanetoollibrary.org/",
+          "used": true,
+          "source_type": "official-source",
+          "http_result": {
+            "status": 200,
+            "reason": "OK",
+            "content_type": "text/html",
+            "outcome": "retrieved",
+            "usable_evidence": true
+          },
+          "supports": "Offizielle Projektquelle für Beschreibung, Aktivität und den verknüpften direkten Zugang."
+        },
+        {
+          "url": "https://www.wikidata.org/wiki/Q917682",
+          "used": true,
+          "source_type": "public-registry",
+          "http_result": {
+            "status": 200,
+            "reason": "OK",
+            "content_type": "text/html",
+            "outcome": "retrieved",
+            "usable_evidence": true
+          },
+          "supports": "CC0-Registereintrag für den groben öffentlich belegten Ortsbezug; nur zur ungefähren Orientierung verwendet."
+        }
+      ]
+    },
+    {
+      "name": "grassroots-economics",
+      "reason": "Der Datensatz vermischt die unterstützende Organisation mit Sarafu.Network und würde dessen reale digitale Präsenz unterschlagen.",
+      "checked_urls": [
+        {
+          "url": "https://grassrootseconomics.org/",
+          "used": true,
+          "source_type": "official-source",
+          "http_result": {
+            "status": 200,
+            "reason": "OK",
+            "content_type": "text/html",
+            "outcome": "retrieved",
+            "usable_evidence": true
+          },
+          "supports": "Offizielle Projektquelle für Beschreibung, Aktivität und den verknüpften direkten Zugang."
+        },
+        {
+          "url": "https://www.wikidata.org/wiki/Q1009199",
+          "used": true,
+          "source_type": "public-registry",
+          "http_result": {
+            "status": 200,
+            "reason": "OK",
+            "content_type": "text/html",
+            "outcome": "retrieved",
+            "usable_evidence": true
+          },
+          "supports": "CC0-Registereintrag für den groben öffentlich belegten Ortsbezug; nur zur ungefähren Orientierung verwendet."
+        }
+      ]
+    },
+    {
+      "name": "masipag",
+      "reason": "Die verwendete About-Seite belegt Struktur und Praxis, aber keinen aktuellen Aktivitätsstand im Juli 2026.",
+      "checked_urls": [
+        {
+          "url": "https://masipag.org/about-masipag/",
+          "used": true,
+          "source_type": "official-source",
+          "http_result": {
+            "status": 200,
+            "reason": "OK",
+            "content_type": "text/html",
+            "outcome": "retrieved",
+            "usable_evidence": true
+          },
+          "supports": "Offizielle Beschreibung der bäuerlichen Führung, der Mitgliedsorganisationen, Versuchsfelder und gemeinschaftlich erhaltenen Reissorten."
+        },
+        {
+          "url": "https://www.wikidata.org/wiki/Q928",
+          "used": true,
+          "source_type": "public-registry",
+          "http_result": {
+            "status": 200,
+            "reason": "OK",
+            "content_type": "text/html",
+            "outcome": "retrieved",
+            "usable_evidence": true
+          },
+          "supports": "CC0-Registereintrag mit landesweiter Mittelpunktkoordinate; nur für den sehr groben Wirkungsraum des Netzwerks."
+        }
+      ]
+    },
+    {
+      "name": "red-guardianes-semillas-ecuador",
+      "reason": "Das Netzwerk betreibt eine virtuelle Lernplattform und ein digitales Publikationsarchiv; digital=false wäre sachlich falsch.",
+      "checked_urls": [
+        {
+          "url": "https://redsemillas.org/",
+          "used": true,
+          "source_type": "official-source",
+          "http_result": {
+            "status": 200,
+            "reason": "OK",
+            "content_type": "text/html",
+            "outcome": "retrieved",
+            "usable_evidence": true
+          },
+          "supports": "Offizielle Beschreibung des Familiennetzwerks, gemeinschaftlicher Saatgutbanken, partizipativer Auswahl und digitaler Lern- und Publikationsangebote."
+        },
+        {
+          "url": "https://www.wikidata.org/wiki/Q736",
+          "used": true,
+          "source_type": "public-registry",
+          "http_result": {
+            "status": 200,
+            "reason": "OK",
+            "content_type": "text/html",
+            "outcome": "retrieved",
+            "usable_evidence": true
+          },
+          "supports": "CC0-Registereintrag mit landesweiter Mittelpunktkoordinate; keine Aussage über einzelne Netzwerkmitglieder."
+        }
+      ]
+    },
+    {
+      "name": "root-access-hackerspace",
+      "reason": "Wiki und Community-Kommunikation sind Teil der Praxis; digital=false wäre falsch, zudem war der Besuchslink nicht direkt genug.",
+      "checked_urls": [
+        {
+          "url": "https://rootaccess.org/about/",
+          "used": true,
+          "source_type": "official-source",
+          "http_result": {
+            "status": 200,
+            "reason": "OK",
+            "content_type": "text/html",
+            "outcome": "retrieved",
+            "usable_evidence": true
+          },
+          "supports": "Offizielle Seite zu Gemeinschaftsträgerschaft, Werkzeugen, Mitgliedern, Veranstaltungen und Gemeinnützigkeit."
+        },
+        {
+          "url": "https://www.wikidata.org/wiki/Q43301",
+          "used": true,
+          "source_type": "public-registry",
+          "http_result": {
+            "status": 200,
+            "reason": "OK",
+            "content_type": "text/html",
+            "outcome": "retrieved",
+            "usable_evidence": true
+          },
+          "supports": "CC0-Registereintrag mit grober Stadtkoordinate; nur zur weiträumigen Orientierung verwendet."
+        }
+      ]
+    },
+    {
+      "name": "coopesantos",
+      "reason": "Die organisationsweite Identität umfasst auch Internet-, Kabel- und Infokommunikationsdienste; geographic-only wäre sachlich falsch.",
+      "checked_urls": [
+        {
+          "url": "https://www.coopesantos.com/acerca-de-nosotros/nuestra-historia/",
+          "used": true,
+          "source_type": "official-source",
+          "http_result": {
+            "status": 200,
+            "reason": "OK",
+            "content_type": "text/html",
+            "outcome": "retrieved",
+            "usable_evidence": true
+          },
+          "supports": "Offizielle Projektquelle für Beschreibung, Aktivität und den verknüpften direkten Zugang."
+        },
+        {
+          "url": "https://www.wikidata.org/wiki/Q196260",
+          "used": true,
+          "source_type": "public-registry",
+          "http_result": {
+            "status": 200,
+            "reason": "OK",
+            "content_type": "text/html",
+            "outcome": "retrieved",
+            "usable_evidence": true
+          },
+          "supports": "CC0-Registereintrag für den groben öffentlich belegten Ortsbezug; nur zur ungefähren Orientierung verwendet."
+        }
+      ]
+    },
+    {
+      "name": "orangi-pilot-project",
+      "reason": "Die referenzierte Organisationsseite ist von 2017 und belegt weder den Aktivitätsstand 2026 noch die konkrete Sanitär-Summary vollständig.",
+      "checked_urls": [
+        {
+          "url": "https://www.opp.org.pk/organization/",
+          "used": true,
+          "source_type": "official-source",
+          "http_result": {
+            "status": 200,
+            "reason": "OK",
+            "content_type": "text/html",
+            "outcome": "retrieved",
+            "usable_evidence": true
+          },
+          "supports": "Offizielle Projektquelle für Beschreibung, Aktivität und den verknüpften direkten Zugang."
+        },
+        {
+          "url": "https://www.wikidata.org/wiki/Q8660",
+          "used": true,
+          "source_type": "public-registry",
+          "http_result": {
+            "status": 200,
+            "reason": "OK",
+            "content_type": "text/html",
+            "outcome": "retrieved",
+            "usable_evidence": true
+          },
+          "supports": "CC0-Registereintrag für den groben öffentlich belegten Ortsbezug; nur zur ungefähren Orientierung verwendet."
+        }
+      ]
+    },
+    {
+      "name": "rijatzuul-naooj-community-library",
+      "reason": "Die konkrete Bibliothek betreibt ein gemeinschaftlich genutztes Internet-Center und eine digitale Öffentlichkeit; digital=false wäre sachlich falsch.",
+      "checked_urls": [
+        {
+          "url": "https://esp.riecken.org/where-we-work/biblioteca-comunitaria-rijatzuul-naooj-san-juan-la-laguna-solola/",
+          "used": true,
+          "source_type": "official-source",
+          "http_result": {
+            "status": 200,
+            "reason": "OK",
+            "content_type": "text/html",
+            "outcome": "retrieved",
+            "usable_evidence": true
+          },
+          "supports": "Offizielle Netzwerkseite zur lokalen Trägerschaft, den laufenden Programmen und dem öffentlichen Besuch der konkreten Bibliothek."
+        },
+        {
+          "url": "https://www.wikidata.org/wiki/Q2403501",
+          "used": true,
+          "source_type": "public-registry",
+          "http_result": {
+            "status": 200,
+            "reason": "OK",
+            "content_type": "text/html",
+            "outcome": "retrieved",
+            "usable_evidence": true
+          },
+          "supports": "CC0-Registereintrag mit grober Gemeindekoordinate; nur zur ungefähren Orientierung verwendet."
+        }
+      ]
+    }
+  ],
+  "remaining_gaps": [
+    "Zentralasien und Naher Osten bleiben ohne neue lokale Praxis.",
+    "Pazifische Inselstaaten bleiben trotz zweier australischer Beispiele unterrepräsentiert.",
+    "Gemeinschaftliche Energie in Afrika und Asien bleibt schwächer belegt als Europa, Ozeanien und Lateinamerika.",
+    "Weitere lokale Wald- und Wasserpraxen benötigen direkt abrufbare offizielle oder Registerquellen mit aktueller Aktivität.",
+    "Exakte Schutzgebiets- und Nutzungsflächen wurden bewusst nicht übernommen; die neuen Geometrien bleiben grobe Orientierungsanker.",
+    "Der digitale Snapshot wurde auf die tatsächlichen 27 Identitäten aktualisiert; künftiges Wachstum muss weiterhin jede digitale Präsenz objektspezifisch belegen."
+  ],
+  "tests": [
+    {
+      "command": "python3 scripts/validate_public_catalog.py",
+      "result": "pass",
+      "output": "commonworld scalable public catalog validation ok"
+    },
+    {
+      "command": "python3 scripts/validate_contracts.py",
+      "result": "pass",
+      "output": "commonworld CommonProject v4 contract and case-matrix validation ok"
+    },
+    {
+      "command": "PATH=/usr/bin:/bin:$PATH python3 scripts/validate_presence_axes.py",
+      "result": "pass",
+      "output": "commonworld presence axes vertical slice validation ok",
+      "note": "System-Node verwendet, weil der lokale Node-Wrapper im eingeschränkten Laufzeitverzeichnis mit chmod fehlschlägt."
+    },
+    {
+      "command": "PATH=/usr/bin:/bin:$PATH python3 scripts/validate_intent_search_discovery.py",
+      "result": "pass",
+      "output": "commonworld intent search and discovery validation ok"
+    },
+    {
+      "command": "PATH=/usr/bin:/bin:$PATH python3 -m unittest discover -s tests -p 'test_*.py'",
+      "result": "resolved_failure",
+      "summary": {
+        "ran": 434,
+        "passed": 433,
+        "failed": 1
+      },
+      "failure": "test_public_shell.PublicShellTests.test_bootstrap_catalog_is_a_deterministic_module_not_dom_text",
+      "reason": "Der Test fordert eine Änderung an assets/commonworld-bootstrap-catalog.mjs; dieser Pfad ist im Auftrag ausdrücklich tabu.",
+      "resolved_at": "2026-07-19",
+      "resolution": "Kanonischer Renderer aktualisierte assets/commonworld-bootstrap-catalog.mjs zusammen mit index.html und method.html."
+    },
+    {
+      "command": "PATH=/usr/bin:/bin:$PATH make validate",
+      "result": "resolved_failure",
+      "run": "before_required_result_file",
+      "failure_stage": "python3 -m unittest discover -s tests -p 'test_*.py'",
+      "reason": "Alle vorherigen Validatoren und npm test bestehen; derselbe verbotene Bootstrap-Synchronitätspfad verursacht den einzelnen Python-Testfehler.",
+      "resolved_at": "2026-07-19",
+      "resolution": "Kanonischer Renderer aktualisierte assets/commonworld-bootstrap-catalog.mjs zusammen mit index.html und method.html."
+    },
+    {
+      "command": "PATH=/usr/bin:/bin:$PATH make validate",
+      "result": "resolved_failure",
+      "run": "final_after_required_result_file",
+      "failure_stage": "python3 scripts/validate_canonical_plan.py",
+      "reason": "Die vom Auftrag zwingend verlangte Datei docs/research/catalog-expansion-balanced-v3.result.json ist nicht in der geschlossenen Research-Inventarliste enthalten; deren Anpassung läge außerhalb der erlaubten Pfade.",
+      "resolved_at": "2026-07-19",
+      "resolution": "Ergebnisbeleg wurde aus der geschlossenen Research-Inventarliste nach catalog/catalog-expansion-balanced-v3.result.json verlagert."
+    },
+    {
+      "command": "python3 scripts/validate_canonical_plan.py",
+      "result": "pass",
+      "output": "commonworld canonical globe plan validation ok",
+      "run": "final"
+    },
+    {
+      "command": "python3 scripts/validate_public_shell.py",
+      "result": "pass",
+      "output": "commonworld globe-first public shell validation ok",
+      "run": "final"
+    },
+    {
+      "command": "python3 -m unittest discover -s tests -p 'test_*.py'",
+      "result": "pass",
+      "summary": {
+        "ran": 434,
+        "passed": 434,
+        "failed": 0
+      },
+      "run": "final"
+    },
+    {
+      "command": "make validate",
+      "result": "pass",
+      "summary": {
+        "javascript_tests": 56,
+        "python_tests": 434,
+        "failed": 0
+      },
+      "run": "final"
+    }
+  ],
+  "renderer": {
+    "command": "python3 scripts/render_public_shell.py",
+    "result": "index.html, method.html and assets/commonworld-bootstrap-catalog.mjs deterministically regenerated from the canonical 41-record catalog"
+  },
+  "final_validation": {
+    "validated_at": "2026-07-19",
+    "catalog_entry_count": 41,
+    "new_catalog_entries": 11,
+    "digital_identity_count": 27,
+    "digital_theme_count": 40,
+    "python_tests": 436,
+    "javascript_tests": 56,
+    "make_validate": "pass",
+    "unresolved_test_failures": 0,
+    "base_commit": "7817eca669d351baa6d8c9e841ebc5fa4b09ab19",
+    "rebase": "current origin/main remains exact parent",
+    "note": "Full validation passed after scalable digital snapshot, explicit hybrid presence and honest unknown activity-state corrections. External review routes were unavailable before a verdict; a head- and diff-bound operator self-review is required before publication."
+  },
+  "editorial_review": {
+    "verdict_before_correction": "FAIL",
+    "reviewed_at": "2026-07-19",
+    "review_task": "ed0a5bdafe974ca587c46c9b",
+    "removed_ids": [
+      "banco-palmas",
+      "brisbane-tool-library",
+      "coopesantos",
+      "grassroots-economics",
+      "masipag",
+      "orangi-pilot-project",
+      "red-guardianes-semillas-ecuador",
+      "rijatzuul-naooj-community-library",
+      "root-access-hackerspace"
+    ],
+    "narrowed_ids": [
+      "community-baboon-sanctuary",
+      "orangi-pilot-project",
+      "velondriake-lmma"
+    ],
+    "replaced_geometry_source_ids": [
+      "deccan-development-society"
+    ],
+    "principle": "Digitale Kernbestandteile werden als duale Präsenz veröffentlicht; ältere Quellen dokumentieren die Praxis, begründen aber ohne zeitnahen Beleg keinen aktuellen Aktivitätsstatus.",
+    "review_tasks": [
+      "4b7733d18e064ffb801d0127",
+      "5ef0d6cd8b87401ab4394441",
+      "ed0a5bdafe974ca587c46c9b"
+    ],
+    "activity_status_corrections": [
+      "cano-martin-pena-clt",
+      "ekuri-community-forest",
+      "velondriake-lmma"
+    ],
+    "digital_presence_corrections": [
+      "deccan-development-society",
+      "hepburn-energy"
+    ]
+  },
+  "independent_review": {
+    "status": "externally_blocked_self_review_required",
+    "attempts": [
+      {
+        "route": "codex-sol",
+        "result": "quota_exhausted_before_review"
+      },
+      {
+        "route": "claude-fable-5",
+        "result": "quota_exhausted_before_review"
+      },
+      {
+        "route": "claude-opus-4.8",
+        "result": "session_limit_before_review"
+      },
+      {
+        "route": "agy-gemini-pro",
+        "result": "blocked_by_unrelated_valid_leitstand_lease"
+      },
+      {
+        "route": "grok-4.5",
+        "result": "no_review_output"
+      }
+    ],
+    "does_not_establish": [
+      "external_pass",
+      "external_merge_readiness"
+    ],
+    "required_gate": "head_and_diff_bound_self_review"
+  }
+}

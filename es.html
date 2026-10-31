@@ -3,9 +3,9 @@
   <head>
     <meta charset="utf-8" />
     <meta name="commonworld-page" content="es.html" />
-    <meta name="commonworld-page-build" content="acdfbdd3360f7f4b" />
-    <meta name="commonworld-release" content="e12576b13626ddea0308" />
-    <base href="/releases/e12576b13626ddea0308/" />
+    <meta name="commonworld-page-build" content="7c129abad06f91ad" />
+    <meta name="commonworld-release" content="aff46f0706c0f215b9a6" />
+    <base href="/releases/aff46f0706c0f215b9a6/" />
     <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
     <meta name="color-scheme" content="dark" />
     <meta name="referrer" content="strict-origin-when-cross-origin" />
@@ -16,12 +16,12 @@
     <link rel="alternate" type="application/json" href="./catalog/catalog.json" title="Catálogo de Commonworld" />
     <link rel="alternate" type="application/schema+json" href="./contracts/commonworld/project.schema.json" title="Esquema de CommonProject" />
     <link rel="stylesheet" href="./assets/vendor/maplibre-gl.css?v=ab1e70d59ec4" />
-    <link rel="stylesheet" href="./index.css?v=ea75cfebc492" />
+    <link rel="stylesheet" href="./index.css?v=e13ec32fcc2e" />
     <link rel="stylesheet" href="./assets/ipad-layout.css?v=739d6b8460d4" />
     <script type="module" src="/assets/commonworld-release-check.js?v=c1d996101672"></script>
     <script src="./assets/vendor/maplibre-gl.js?v=45a9b07a9189" defer></script>
     <script type="module" src="./assets/commonworld-locale.mjs?v=e5b3e0c0eb76"></script>
-    <script type="module" src="./assets/commonworld-app.js?v=1c2ff8e58f6a"></script>
+    <script type="module" src="./assets/commonworld-app.js?v=50c918a3d702"></script>
   </head>
   <body data-presentation="globe">
     <a id="text-skip-link" class="skip-link" href="/es.html#static-catalog-fallback">Ir a la vista de texto</a>
@@ -35,7 +35,7 @@
           <div class="search-control" role="search">
             <label class="visually-hidden" for="commons-search">Buscar Commons</label>
             <span class="search-symbol" aria-hidden="true">⌕</span>
-            <input id="commons-search" type="search" inputmode="search" autocomplete="off" placeholder="¿Qué te gustaría hacer o encontrar?" aria-controls="discovery-list" aria-expanded="false" />
+            <input id="commons-search" type="search" inputmode="search" autocomplete="off" placeholder="¿Qué te gustaría hacer o encontrar?" aria-controls="discovery-list" />
             <button id="search-clear" class="search-clear" type="button" aria-label="Limpiar búsqueda" hidden>×</button>
           </div>
           <button id="filter-toggle" class="icon-button filter-toggle" type="button" aria-label="Abrir resultados de búsqueda y filtros" aria-controls="discovery-panel" aria-expanded="false"><span class="filter-toggle-icon" aria-hidden="true"></span><span class="filter-toggle-label">Filtros</span><span id="filter-toggle-count" class="filter-toggle-count" hidden>0</span></button>
@@ -142,11 +142,11 @@
             </div>
           </div>
 
-          <div class="orientation-bar" aria-label="Orientación del globo">
+          <div class="orientation-bar" role="group" aria-label="Orientación del globo">
             <button id="globe-reset" type="button">Tierra</button>
             <span aria-hidden="true">›</span>
             <span id="semantic-level">Resumen</span>
-            <span id="semantic-summary" class="semantic-summary">Muestra de catálogo · cobertura no evaluada</span>
+            <span id="semantic-summary" class="semantic-summary" role="group">Muestra de catálogo · cobertura no evaluada</span>
             <span id="semantic-breadcrumb-accessible" class="visually-hidden"></span>
           </div>
 
