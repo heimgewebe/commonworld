@@ -1,0 +1,58 @@
+{
+  "schema_version": 1,
+  "kind": "commonworld_commons_basis",
+  "project_id": "mastodon",
+  "classification": "undetermined",
+  "decision": "needs_information",
+  "reviewed_at": "2026-10-30",
+  "reviewer": "Commonworld editorial desk review",
+  "criteria": {
+    "shared_resource": {
+      "status": "supported",
+      "statement": "Der freie Mastodon-Code und ein offenes föderiertes Kommunikationsprotokoll sind gemeinschaftlich nutzbare digitale Ressourcen.",
+      "source_ids": [
+        "mastodon-home",
+        "mastodon-about-governance"
+      ]
+    },
+    "community": {
+      "status": "supported",
+      "statement": "Entwickler und eigenständige Serverbetreiber bilden zusammen mit Nutzern ein vielfältiges föderiertes Ökosystem.",
+      "source_ids": [
+        "mastodon-home",
+        "mastodon-about-governance"
+      ]
+    },
+    "commoning_practice": {
+      "status": "supported",
+      "statement": "Codebeiträge, gemeinschaftlich betreute Instanzen und die öffentliche Weitergabe von Betriebswissen ermöglichen kollektive digitale Praxis.",
+      "source_ids": [
+        "mastodon-about-governance",
+        "mastodon-home"
+      ]
+    },
+    "rules_and_responsibility": {
+      "status": "partial",
+      "statement": "Offizielle Mitteilungen dokumentieren eine neue Foundation-/Board-Struktur, aber keine nachgewiesene allgemeine demokratische Wahl- und Rechenschaftsordnung der Nutzerschaft über die zentrale Produktentwicklung.",
+      "source_ids": [
+        "mastodon-about-governance",
+        "mastodon-2026-administration"
+      ]
+    },
+    "common_benefit": {
+      "status": "supported",
+      "statement": "Freie Software und voneinander unabhängige Instanzen ermöglichen digitale Kommunikation ohne ausschließliche Plattformmacht eines Betreibers.",
+      "source_ids": [
+        "mastodon-home",
+        "mastodon-about-governance"
+      ]
+    }
+  },
+  "confidence": 0.86,
+  "limitations": [
+    "Eine offene Softwarelizenz erteilt nicht jedem Nutzer Stimmrechte im Kernentwicklungsteam.",
+    "Moderationsentscheidungen einzelner Instanzen sind nicht mit Foundation-Kontrolle gleichzusetzen.",
+    "Rechtsform- und Governance-Übergänge von 2026 müssen gesondert aktuell geprüft werden."
+  ],
+  "notes": "Föderierte Software und dezentrale Instanzen bilden Commoning; zentrale Produkt-Governance und Nutzerrechte bleiben offen."
+}

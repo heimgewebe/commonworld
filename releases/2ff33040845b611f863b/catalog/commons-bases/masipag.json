@@ -1,0 +1,56 @@
+{
+  "schema_version": 1,
+  "kind": "commonworld_commons_basis",
+  "project_id": "masipag",
+  "classification": "commons-infrastructure",
+  "decision": "include",
+  "reviewed_at": "2026-10-31",
+  "reviewer": "Commonworld editorial desk review",
+  "criteria": {
+    "shared_resource": {
+      "status": "supported",
+      "statement": "Von bäuerlichen Gruppen gepflegte Saatgutsorten, Zuchtwissen und gemeinsame Saatgutbanken bilden die geteilte genetische Ressource.",
+      "source_ids": [
+        "masipag-about",
+        "masipag-home"
+      ]
+    },
+    "community": {
+      "status": "supported",
+      "statement": "Lokale Bauernorganisationen, Saatguterhalter und kooperierende Wissenschaftler bilden ein bäuerlich geführtes Netzwerk.",
+      "source_ids": [
+        "masipag-about"
+      ]
+    },
+    "commoning_practice": {
+      "status": "supported",
+      "statement": "Teilnehmer erhalten, vermehren und tauschen Sorten, organisieren Versuchsflächen, Schulung und gegenseitige Hilfe.",
+      "source_ids": [
+        "masipag-home",
+        "masipag-collective-leadership"
+      ]
+    },
+    "rules_and_responsibility": {
+      "status": "supported",
+      "statement": "Die Netzwerkbeschreibung dokumentiert kollektive Leitung, Vereinsregeln, funktionierende lokale Ausschüsse und gemeinschaftliche Konfliktbehandlung.",
+      "source_ids": [
+        "masipag-collective-leadership"
+      ]
+    },
+    "common_benefit": {
+      "status": "supported",
+      "statement": "Gemeinsame genetische Vielfalt und Wissen fördern bäuerliche Selbstbestimmung und unabhängige Nahrungserzeugung.",
+      "source_ids": [
+        "masipag-about",
+        "masipag-home"
+      ]
+    }
+  },
+  "confidence": 0.94,
+  "limitations": [
+    "Jede örtliche Bauernorganisation besitzt eigene Mitgliedschafts- und Betriebsverantwortung.",
+    "Ältere Netzwerkzahlen sind nicht die geprüfte aktuelle Mitgliederliste.",
+    "Die Sortennutzung unterliegt lokalen landwirtschaftlichen Regeln; nicht jeder Samen ist universell frei."
+  ],
+  "notes": "Bauerngeführte Saatgut-Commons-Infrastruktur mit dokumentierten kollektiven Governance- und Konfliktregeln."
+}
