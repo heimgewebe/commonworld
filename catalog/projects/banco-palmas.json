@@ -80,12 +80,12 @@
     "uncertainty_note": "Der Datensatz bildet die gemeinschaftliche Institution ab. Er behauptet weder eine vollständige Abdeckung des Stadtteils noch konkrete Kredit-, Geschäfts- oder Währungsorte."
   },
   "curation": {
-    "state": "listed",
+    "state": "stale",
     "catalogued_at": "2026-07-30",
     "reviewed_by": "Commonworld editorial review",
     "reviewed_at": "2026-07-30",
     "next_review_at": "2026-10-30",
-    "notes": "Aufgenommen als konkrete Gemeinschaftsfinanz- und Sozialwährungspraxis. Zahlen zu Nutzern, Krediten oder Umlaufmenge werden nicht als dauerhaftes Katalogmerkmal dupliziert."
+    "notes": "Aufgenommen als konkrete Gemeinschaftsfinanz- und Sozialwährungspraxis. Zahlen zu Nutzern, Krediten oder Umlaufmenge werden nicht als dauerhaftes Katalogmerkmal dupliziert. Die zum 30.10.2026 fällige strukturelle Wiedervorlage bleibt offen: historische Bewohnerkontrolle ist dokumentiert, derzeitige formale Steuerung und Eigentumsrechte am Bankbetrieb aber noch nicht ausreichend neu belegt. Frühere Beschreibungen sind nicht als aktuelle Revalidierung zu lesen."
   },
   "links": [
     {

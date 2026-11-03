@@ -56,11 +56,12 @@
   },
   "activity": {
     "status": "active",
-    "observed_at": "2026-07-30",
+    "observed_at": "2026-10-30",
     "source_ids": [
-      "chca-about"
+      "chca-about",
+      "chca-union-2026"
     ],
-    "note": "Die offizielle Seite beschreibt ausdrücklich den Stand ab 2026, laufende Pflegeleistungen, mehr als 1.600 Beschäftigte und fortgesetzte Ausbildung."
+    "note": "Die offizielle CHCA-Seite beschreibt 2026 laufende Pflege- und Ausbildungsleistungen; die Gewerkschaft 1199SEIU dokumentierte am 14.09.2026 arbeitende Mitgliedseigentümer. Dieser Nachweis betrifft die Organisation und enthält keine privaten Gesundheitsdaten."
   },
   "provenance": {
     "sources": [
@@ -95,6 +96,22 @@
         "url": "https://www.wikidata.org/wiki/Q18426",
         "retrieved_at": "2026-07-30",
         "note": "CC0-Registereintrag für den groben Bezirksanker; keine privaten Pflegeorte werden daraus abgeleitet."
+      },
+      {
+        "id": "chca-worker-governance-research",
+        "type": "public-registry",
+        "label": "PubMed Central (NLM public research repository) – peer-reviewed CHCA worker governance study",
+        "url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC11909589/",
+        "retrieved_at": "2026-10-30",
+        "note": "Öffentlich archivierter wissenschaftlicher Artikel aus 2025 in der NLM-Forschungsbibliothek: benennt ausdrücklich eine Pflegekraft-Mehrheit im CHCA-Governing Board, gemeinsame Entscheidung über Löhne und Arbeitsschutz, Mitglieder-Abstimmungen und Ausschüsse. Archiv/Studie, keine eigene Unternehmensverlautbarung."
+      },
+      {
+        "id": "chca-union-2026",
+        "type": "official-source",
+        "label": "1199SEIU – offizielle Gewerkschaftspublikation zu CHCA-Mitgliedseigentümern, September 2026",
+        "url": "https://www.1199seiu.org/magazine/work-we-do-cooperative-home-care-associates",
+        "retrieved_at": "2026-10-30",
+        "note": "Offizielle Veröffentlichung der Gewerkschaft 1199SEIU vom 14.09.2026: Interviews mit Mitgliedseigentümern bei CHCA, konkrete Arbeitsbeteiligung, gewerkschaftliche Interessenvertretung. Es ist eine First-Party-Verlautbarung der Gewerkschaft, nicht die Firma selbst und kein Beleg aller Boardentscheidungen."
       }
     ],
     "uncertainty_note": "Der Datensatz bildet die Kooperative und ihren öffentlichen Wirkungsraum ab, nicht einzelne Pflegebeziehungen, Haushalte oder medizinische Situationen."
@@ -103,9 +120,9 @@
     "state": "listed",
     "catalogued_at": "2026-07-30",
     "reviewed_by": "Commonworld editorial review",
-    "reviewed_at": "2026-07-30",
-    "next_review_at": "2026-10-30",
-    "notes": "Aufgenommen als seltene Pflege- und Arbeitscommons mit klar belegtem Arbeitereigentum. Gesundheits- und Personendaten bleiben vollständig außerhalb des Katalogs."
+    "reviewed_at": "2026-10-30",
+    "next_review_at": "2026-11-30",
+    "notes": "Am 30.10.2026 fünf Commons-Kriterien anhand offizieller und unabhängiger Quellen neu geprüft: gemeinsames Arbeitereigentum, Mitgliedervertretung in einem mehrheitlich von Pflegekräften besetzten Board, Mitwirkung an Regeln, Ausbildungsangebote und geteilter wirtschaftlicher Nutzen. Bezahlte Pflege bleibt eine kommerzielle Spannung, die Mitbestimmung nicht aufhebt. Wiedervorlage 30.11.2026."
   },
   "links": [
     {

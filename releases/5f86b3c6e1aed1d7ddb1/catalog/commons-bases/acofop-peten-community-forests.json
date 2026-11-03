@@ -1,0 +1,65 @@
+{
+  "schema_version": 1,
+  "kind": "commonworld_commons_basis",
+  "project_id": "acofop-peten-community-forests",
+  "classification": "commons-infrastructure",
+  "decision": "include",
+  "reviewed_at": "2026-08-04",
+  "reviewer": "Commonworld editorial review",
+  "criteria": {
+    "shared_resource": {
+      "status": "supported",
+      "statement": "ACOFOP verbindet Wissen, Vertretung, Monitoring, Schutztechnik, Wiederherstellung und institutionelle Unterstützung für gemeinschaftlich bewirtschaftete Waldkonzessionen in Petén.",
+      "source_ids": [
+        "acofop-home",
+        "acofop-about",
+        "acofop-territorial",
+        "conap-extensions"
+      ]
+    },
+    "community": {
+      "status": "supported",
+      "statement": "Bäuerliche und indigene Gemeinschaftsorganisationen, Kooperativen und Vereinigungen bilden das Mitgliedernetz; die Generalversammlung ist die höchste Autorität und wählt Vorstand und Kontrollkommission.",
+      "source_ids": [
+        "acofop-home",
+        "acofop-about"
+      ]
+    },
+    "commoning_practice": {
+      "status": "supported",
+      "statement": "Mitgliedsorganisationen bewirtschaften, überwachen und schützen Wälder, verhindern Feuer und illegale Nutzung, stellen Landschaften wieder her und verbinden Waldprodukte, Tourismus und lokale Ernährung.",
+      "source_ids": [
+        "acofop-home",
+        "acofop-territorial",
+        "conap-extensions"
+      ]
+    },
+    "rules_and_responsibility": {
+      "status": "supported",
+      "statement": "Gewählte Organe, unabhängige Kontrolle, Gemeinschaftskommissionen, Konzessionsverträge, Gebietskonzepte, Zertifizierungen und staatliche Verlängerungsprüfungen ordnen Vertretung, Nutzung, Schutz und Rechenschaft.",
+      "source_ids": [
+        "acofop-home",
+        "acofop-about",
+        "acofop-territorial",
+        "conap-extensions"
+      ]
+    },
+    "common_benefit": {
+      "status": "supported",
+      "statement": "Die föderierte Infrastruktur soll natürliche Wälder erhalten, Biodiversität und Klimaresilienz stärken und zugleich Lebensgrundlagen, lokale Organisation und Armutsminderung in den Mitgliedsgemeinschaften sichern.",
+      "source_ids": [
+        "acofop-home",
+        "acofop-about",
+        "acofop-territorial",
+        "conap-extensions"
+      ]
+    }
+  },
+  "confidence": 0.94,
+  "limitations": [
+    "Die Waldflächen sind staatliche Konzessionen; ACOFOP und seine Mitglieder besitzen sie nicht frei und bleiben an Verträge und Schutzgebietsrecht gebunden.",
+    "Das Netzwerk bündelt viele rechtlich und praktisch eigenständige Organisationen; seine Aufnahme ersetzt keine Einzelprüfung der Mitgliedskonzessionen.",
+    "Zertifiziertes Holz, Tourismus, Kohlenstofffinanzierung und externe Förderung verbinden den Commons-Verbund mit Märkten und institutionellen Machtasymmetrien."
+  ],
+  "notes": "ACOFOP wird als regionale Commons-Infrastruktur aufgenommen, nicht als einheitlicher Eigentümer oder als Stellvertreter für jede konkrete Gemeinschaftswaldkonzession."
+}

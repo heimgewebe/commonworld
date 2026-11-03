@@ -8,9 +8,9 @@
   "reviewed_source_pack_sha256": "bb6cf859062deb1e6010f49267b7102fd10da2f4efb445b2ce4ee6625b099e46",
   "catalog_overlay_sha256": "63731132bbce7bdd171ac7955d7a16c01edbf4217573a6e83e2b4619db5eb688",
   "surface_sha256": {
-    "index": "5bf620f176287bbd807f4eca4e1414e3a2b0cb1d094c668dae57630976554000",
-    "method": "5453fe5021be2837cae0c4b263e464b54c10c4d07d9738a60ffe6a12bd440535",
-    "proposal": "945a5a2c3705c410101d0ee6b83864377f15b6da60e90166a3d5c3cbccc17bee"
+    "index": "21d136b377841efb91725e5d5e3526a5791101ddee044e7ddd142797730576b2",
+    "method": "81ab67e0225ca7f539067fe4ee4b68291fa9b1af1576f4f69144dee6da673de6",
+    "proposal": "c3f6d91227fd19389b8239c491e77357a8486c9f2da1d097cb5d991cd2d4a1f5"
   },
   "gate_results": {
     "required_surfaces_passed": [
@@ -22,7 +22,7 @@
       "runtime_labels",
       "text"
     ],
-    "translation_coverage_ratio": 1.0,
+    "translation_coverage_ratio": 1,
     "untranslated_ui_markers": 0,
     "missing_runtime_keys": 0,
     "machine_translation_only": false,
@@ -60,5 +60,5 @@
     "findings_based": true,
     "post_fix_review_required": true
   },
-  "notes": "Incremental source-pack verification for deterministic release b8db99c89fdf0bdd7b3c: six ui.curation_stale values were independently model-assisted reviewed and remain unchanged; all older language-review and accessibility receipts retain historical contents, and this rebinding only binds generated source-pack and localized page bytes after a runtime Text-view stale-warning repair. No new native or human review is asserted.\n\n2026-10-29: additional catalog-only source evidence was rebound to deterministic release e12576b13626ddea0308. The 18 released-locale page diffs were checked against the previous commit and contain only release/page-build metadata, the one repaired ACOFOP URL, and removal of three superseded unknown-activity notices; no translated interface text, locale packs, review-class assertions or independent review receipts were changed. Earlier language reviews remain historical, no new native review is claimed."
+  "notes": "Incremental source-pack verification for deterministic release b8db99c89fdf0bdd7b3c: six ui.curation_stale values were independently model-assisted reviewed and remain unchanged; all older language-review and accessibility receipts retain historical contents, and this rebinding only binds generated source-pack and localized page bytes after a runtime Text-view stale-warning repair. No new native or human review is asserted.\n\n2026-10-29: additional catalog-only source evidence was rebound to deterministic release e12576b13626ddea0308. The 18 released-locale page diffs were checked against the previous commit and contain only release/page-build metadata, the one repaired ACOFOP URL, and removal of three superseded unknown-activity notices; no translated interface text, locale packs, review-class assertions or independent review receipts were changed. Earlier language reviews remain historical, no new native review is claimed.\n\n2026-10-30: Technischer Digest-Abgleich für deterministisches Release 3ddc1fb26f970068c6d5. Sämtliche Änderungen an 18 gerenderten Sprach-Seiten betreffen nur Release-/Build-/Asset-Metadaten und übersetzte, datums- und zustandsabhängige Kataloghinweise. Die Übersetzungsquellen und vorhandenen unabhängigen Sprachreview-Receipts bleiben unverändert. Keine neue native/humane Sprachreview behauptet.\n\n2026-10-30 Nachtrag: Technische Neubindung auf Release 5f86b3c6e1aed1d7ddb1, nachdem die Caño-Martín-Peña-Quellenbeschreibung präzisiert wurde. Für diese Sprachseiten wurden gegenüber dem Original-PR-Head ausschließlich Release-/Page-Build-Metadaten geändert (jeweils vier Diffzeilen). Übersetzungsquellen, Sprachreview-Receipts und menschliche Freigaben blieben unverändert. Keine neue unabhängige Sprachprüfung behauptet.\n\n2026-10-31: Technische Neubindung auf das aus exakt einem präzisierten Caño-Martín-Peña-Governance-Basistext deterministisch erzeugte Release dd5a92f93629d7289ece. Gegen PR235-Head 7487c69 wurden alle 18 nicht-baseline Sprachseiten zeilengenau geprüft: je zwei ersetzte Release-/Base-URL-Metadatenzeilen, keine Text-, Übersetzungs-, Navigations- oder RTL-Änderung. Sprachreview-/Screenreader-/Browser-Receipts und source pack unverändert; keine neue unabhängige Sprachabnahme behauptet."
 }

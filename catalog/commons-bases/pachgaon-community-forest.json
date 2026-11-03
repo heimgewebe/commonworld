@@ -4,7 +4,7 @@
   "project_id": "pachgaon-community-forest",
   "classification": "common",
   "decision": "include",
-  "reviewed_at": "2026-09-05",
+  "reviewed_at": "2026-10-30",
   "reviewer": "Commonworld editorial review",
   "criteria": {
     "shared_resource": {
@@ -33,8 +33,8 @@
       "status": "supported",
       "statement": "Anerkannte CFR-Rechte und Gram-Sabha-Beschlüsse verbinden Nutzungsrechte mit Verantwortung für Schutz und Verwaltung des Waldes.",
       "source_ids": [
-        "pachgaon-atree-cfr",
-        "maharashtra-fra"
+        "maharashtra-fra",
+        "pachgaon-atree-cfr"
       ]
     },
     "common_benefit": {
@@ -47,9 +47,10 @@
   },
   "confidence": 0.87,
   "limitations": [
-    "Der jüngste objektspezifische Beleg beschreibt einen Ortsbesuch im März 2022; der Betriebszustand im September 2026 bleibt unbekannt.",
+    "Zusätzlich zur ATREE-Ortsbeobachtung von 2022 beschreibt ein Fallbeitrag vom Januar 2026 langjährig praktizierte Gram-Sabha-Verwaltung. Eine aktuell datierte Versammlung im Oktober 2026 und der jetzige vollständige Betriebszustand bleiben unbekannt.",
     "Der allgemeine FRA-Rechtsrahmen belegt nicht allein die konkrete Umsetzung in Pachgaon.",
-    "Waldgrenzen, Nutzungsorte und lokale Personen werden nicht veröffentlicht."
+    "Waldgrenzen, Nutzungsorte und lokale Personen werden nicht veröffentlicht.",
+    "Der im Januar 2026 veröffentlichte Drittbericht wird als zusätzlicher Editorial-Kontext außerhalb des öffentlichen Source-of-Truth-Provenienzvertrags dokumentiert; mangels datierter Sitzung zum aktuellen Betriebsstand bleibt activity=unknown."
   ],
-  "notes": "Aufgenommen wird die konkrete Gram-Sabha-basierte Verwaltung des Pachgaon-Gemeinschaftswaldes, nicht ATREE oder der allgemeine Forest Rights Act."
+  "notes": "Aufgenommen wird die konkrete Gram-Sabha-basierte Verwaltung des Pachgaon-Gemeinschaftswaldes, nicht ATREE oder der allgemeine Forest Rights Act. Die im Januar 2026 publizierten lokalen Erfahrungsberichte konkretisieren Governance und Nutzen, aber liefern keine tagesaktuelle institutionelle Bestätigung."
 }

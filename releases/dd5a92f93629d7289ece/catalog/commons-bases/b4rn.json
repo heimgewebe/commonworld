@@ -1,0 +1,43 @@
+{
+  "schema_version": 1,
+  "kind": "commonworld_commons_basis",
+  "project_id": "b4rn",
+  "classification": "commons-infrastructure",
+  "decision": "include",
+  "reviewed_at": "2026-08-14",
+  "reviewer": "Commonworld editorial review",
+  "criteria": {
+    "shared_resource": {
+      "status": "supported",
+      "statement": "B4RN errichtet und betreibt eine gemeinsam finanzierte und mitaufgebaute Vollfaser-Netzinfrastruktur für ländliche Gemeinden in Nordengland; die Infrastruktur ist an den Gemeinschaftszweck der Community Benefit Society gebunden.",
+      "source_ids": ["b4rn-about", "b4rn-working-with-us", "b4rn-investors"]
+    },
+    "community": {
+      "status": "supported",
+      "statement": "Mitglieder, lokale Community-Gruppen, Freiwillige, Landbesitzer und Gemeinschaftsinvestoren tragen das Netz gemeinsam mit Fachpersonal und Auftragnehmern.",
+      "source_ids": ["b4rn-about", "b4rn-working-with-us", "b4rn-volunteer", "b4rn-investors"]
+    },
+    "commoning_practice": {
+      "status": "supported",
+      "statement": "Lokale Gruppen und Freiwillige wirken an Planung, Wegerechten, Bau, Anschlussunterstützung, Finanzierung und lokaler Projektorganisation mit, während der professionelle Betrieb die gemeinsam geschaffene Infrastruktur dauerhaft nutzbar hält.",
+      "source_ids": ["b4rn-working-with-us", "b4rn-volunteer", "b4rn-investors"]
+    },
+    "rules_and_responsibility": {
+      "status": "supported",
+      "statement": "Die Community-Benefit- und Mitgliedsstruktur bindet Eigentum und Überschüsse an Gemeinschaftszwecke; Anteile begründen Mitgliedschaft, und Bau sowie Betrieb verteilen klar benannte Aufgaben auf Community-Gruppen, Freiwillige und professionelle Beteiligte.",
+      "source_ids": ["b4rn-about", "b4rn-investors", "b4rn-working-with-us"]
+    },
+    "common_benefit": {
+      "status": "supported",
+      "statement": "Das Modell soll unterversorgten ländlichen Gemeinden leistungsfähige Breitbandinfrastruktur bereitstellen und Mittel wieder in Netzausbau und Gemeinschaftsnutzen lenken, statt den gemeinsamen Vermögenswert auf individuelle Gewinnentnahme auszurichten.",
+      "source_ids": ["b4rn-home", "b4rn-about", "b4rn-investors"]
+    }
+  },
+  "confidence": 0.94,
+  "limitations": [
+    "B4RN ist zugleich ein professionell betriebener Internetdienstanbieter; gemeinschaftliche Trägerschaft bedeutet nicht, dass jeder Endnutzer unmittelbar über jede Betriebsentscheidung abstimmt.",
+    "Der Breitbanddienst ist nicht frei oder universal zugänglich, sondern setzt ein versorgbares Grundstück, einen Anschluss und einen kostenpflichtigen Tarif voraus.",
+    "Commonworld veröffentlicht keine aus Postcodes, Wegerechten, Leitungsverläufen oder privaten Anschlussdaten rekonstruierte Netzgeometrie."
+  ],
+  "notes": "Aufgenommen als Commons-Infrastruktur wegen Mitgliedseigentum, Community-Benefit-Bindung, lokalem Kapital und fortgesetztem Commoning beim Aufbau des Netzes; kommerzieller Internetzugang allein wäre kein Aufnahmegrund."
+}

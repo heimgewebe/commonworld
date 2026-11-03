@@ -1,0 +1,136 @@
+{
+  "schema_version": 1,
+  "kind": "commonworld_catalog_locale_surface_technical_carryforward_amendment",
+  "base_pr_head": "abd52d91a3f9a747fa79e5d56aa92c377e9014e5",
+  "target_release": "5f86b3c6e1aed1d7ddb1",
+  "scope": "18 generated non-baseline locale surfaces, release metadata changes only",
+  "translation_review_status": "historical_receipts_preserved_not_newly_approved",
+  "surfaces": [
+    {
+      "locale": "es",
+      "surface": "index",
+      "changed_lines": 4,
+      "current_sha256": "592f42782f865be379bfae5dbf5189a3df764974112316dfcda8490ab34e8e37",
+      "only_generated_release_metadata": true
+    },
+    {
+      "locale": "es",
+      "surface": "method",
+      "changed_lines": 4,
+      "current_sha256": "1304db3468de50f555dc93fedfdffa2bd3e995aa92d31f64446895448996606a",
+      "only_generated_release_metadata": true
+    },
+    {
+      "locale": "es",
+      "surface": "proposal",
+      "changed_lines": 4,
+      "current_sha256": "fc98a9df21f40c8c9354886aa79f4d50111080b6e5c7c9fe8adeb92ecabe9a31",
+      "only_generated_release_metadata": true
+    },
+    {
+      "locale": "fr",
+      "surface": "index",
+      "changed_lines": 4,
+      "current_sha256": "a803689bb90472ef91112c5fb4f4c3ebf4abf403c87baef79b87c8ef4cfefea8",
+      "only_generated_release_metadata": true
+    },
+    {
+      "locale": "fr",
+      "surface": "method",
+      "changed_lines": 4,
+      "current_sha256": "1e93d2d8486b4b8b07b173d8f540c82572ee5ec6079b4812719d5d225a29116b",
+      "only_generated_release_metadata": true
+    },
+    {
+      "locale": "fr",
+      "surface": "proposal",
+      "changed_lines": 4,
+      "current_sha256": "21007f7ca188fe6f018f6985abbe5d0d62ce65803d53f2fee657c5e52bdb3b10",
+      "only_generated_release_metadata": true
+    },
+    {
+      "locale": "pt-BR",
+      "surface": "index",
+      "changed_lines": 4,
+      "current_sha256": "8d800a6bff84f1031a086ad41a54cd85311412012f0151ff1280500629bc23a7",
+      "only_generated_release_metadata": true
+    },
+    {
+      "locale": "pt-BR",
+      "surface": "method",
+      "changed_lines": 4,
+      "current_sha256": "3d5ab208bfb436caab84abc2ac21bb51718d1293ff805d24bc9d214850468375",
+      "only_generated_release_metadata": true
+    },
+    {
+      "locale": "pt-BR",
+      "surface": "proposal",
+      "changed_lines": 4,
+      "current_sha256": "a7a8175c9258307e6af88b228480b3829b5385b376c8ff64f9a13633e6789d78",
+      "only_generated_release_metadata": true
+    },
+    {
+      "locale": "ar",
+      "surface": "index",
+      "changed_lines": 4,
+      "current_sha256": "523af391f7ae8e7d27bf4487c9190880538202c8e152916d122ed4b848dd6eec",
+      "only_generated_release_metadata": true
+    },
+    {
+      "locale": "ar",
+      "surface": "method",
+      "changed_lines": 4,
+      "current_sha256": "55eff2da27d345d4805f2a8d3420d8713bbc65ad6882b4fbfa1296175fe9961b",
+      "only_generated_release_metadata": true
+    },
+    {
+      "locale": "ar",
+      "surface": "proposal",
+      "changed_lines": 4,
+      "current_sha256": "245f868ca1d2c168d1237701cb992ed0876c5d908c418bccb30bab1ba6db65ba",
+      "only_generated_release_metadata": true
+    },
+    {
+      "locale": "zh-Hans",
+      "surface": "index",
+      "changed_lines": 4,
+      "current_sha256": "2744ebd9cae196d048d23c0838f41cf31e12c9bc5e58de62475bf4229698eeb5",
+      "only_generated_release_metadata": true
+    },
+    {
+      "locale": "zh-Hans",
+      "surface": "method",
+      "changed_lines": 4,
+      "current_sha256": "183a18d44292f4d2d9278254e2e100780404b9c1cbd80c37fd98188cbd0e6aed",
+      "only_generated_release_metadata": true
+    },
+    {
+      "locale": "zh-Hans",
+      "surface": "proposal",
+      "changed_lines": 4,
+      "current_sha256": "a45feb3187d6062ae3785d37a9d95eaa5fe2b62d8d0f222ce5c6f4252b613987",
+      "only_generated_release_metadata": true
+    },
+    {
+      "locale": "hi",
+      "surface": "index",
+      "changed_lines": 4,
+      "current_sha256": "946d9be77294e5380ee8af14c2ef8e89b2ee785814b0eca7b3766f88d25be54f",
+      "only_generated_release_metadata": true
+    },
+    {
+      "locale": "hi",
+      "surface": "method",
+      "changed_lines": 4,
+      "current_sha256": "c37245c03b3cccc6a137ed3dadc31fbbb872d5977150d71aa4912dc5778efa7e",
+      "only_generated_release_metadata": true
+    },
+    {
+      "locale": "hi",
+      "surface": "proposal",
+      "changed_lines": 4,
+      "current_sha256": "45cea718cdabc9e9484c280a9f8811e344283fb9436bcba3407d335d6ef1363e",
+      "only_generated_release_metadata": true
+    }
+  ]
+}
