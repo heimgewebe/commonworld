@@ -18,22 +18,22 @@
       "identity_order_sha256": "8bb03b25219f57717bcd44a8a881fcc61483c45c9ff45ea307b4a63ab8d818bd",
       "bootstrap": {
         "raw_bytes": 135439,
-        "gzip_bytes": 26943,
+        "gzip_bytes": 26944,
         "raw_bytes_per_record": 1354.39,
-        "gzip_bytes_per_record": 269.43
+        "gzip_bytes_per_record": 269.44
       },
       "canonical_projects": {
         "file_count": 100,
-        "raw_bytes": 469133,
-        "gzip_bytes_individual_files": 157352
+        "raw_bytes": 470169,
+        "gzip_bytes_individual_files": 158023
       },
       "manifest": {
         "raw_bytes": 5385,
-        "gzip_bytes": 1709
+        "gzip_bytes": 1708
       },
       "html": {
         "raw_bytes": 65961,
-        "gzip_bytes": 11964,
+        "gzip_bytes": 11962,
         "start_tag_count": 753,
         "catalog_card_instances": 24,
         "interactive_catalog_cards": 0,
@@ -44,12 +44,12 @@
         "enabled": true,
         "project_request_count": 100,
         "duplicate_identity_payload_count": 100,
-        "raw_bytes": 474518,
-        "gzip_bytes": 159061
+        "raw_bytes": 475554,
+        "gzip_bytes": 159731
       },
       "catalog_initial_delivery": {
-        "raw_bytes": 609957,
-        "gzip_bytes": 186004
+        "raw_bytes": 610993,
+        "gzip_bytes": 186675
       }
     },
     "browser": {
@@ -257,22 +257,22 @@
       "identity_order_sha256": "8bb03b25219f57717bcd44a8a881fcc61483c45c9ff45ea307b4a63ab8d818bd",
       "bootstrap": {
         "raw_bytes": 135439,
-        "gzip_bytes": 26943,
+        "gzip_bytes": 26944,
         "raw_bytes_per_record": 1354.39,
-        "gzip_bytes_per_record": 269.43
+        "gzip_bytes_per_record": 269.44
       },
       "canonical_projects": {
         "file_count": 100,
-        "raw_bytes": 469133,
-        "gzip_bytes_individual_files": 157352
+        "raw_bytes": 470169,
+        "gzip_bytes_individual_files": 158023
       },
       "manifest": {
         "raw_bytes": 5385,
-        "gzip_bytes": 1709
+        "gzip_bytes": 1708
       },
       "html": {
         "raw_bytes": 65961,
-        "gzip_bytes": 11964,
+        "gzip_bytes": 11962,
         "start_tag_count": 753,
         "catalog_card_instances": 24,
         "interactive_catalog_cards": 0,
@@ -288,7 +288,7 @@
       },
       "catalog_initial_delivery": {
         "raw_bytes": 135439,
-        "gzip_bytes": 26943
+        "gzip_bytes": 26944
       }
     },
     "browser": {
@@ -300,18 +300,18 @@
       "architecture_review_required": false,
       "cpu_throttle_rate": 4,
       "budget_contract_sha256": "953bc03c731ff8418336b57ff51e22029323eb2ea23d6b707be48ca69f4085d6",
-      "first_party_surface_sha256": "6cf1283691591f49e29b3dba3de175bcb147b3df0612cd03bb6acbbcc70c8f9b",
+      "first_party_surface_sha256": "8640ac751974744b4c3ffcaec9ca474a1463c09d7852828dc86c584884a80dbe",
       "attempt_count": 1,
       "attempts": [
         {
           "attempt": 1,
           "verdict": "pass",
-          "measurement_sha256": "4a2bc8fd5a1e7036961e9f4206a3e1f854ed6925ec2bd5885ef43812ebf7e938",
+          "measurement_sha256": "13bd4d5fb7d2c567140636e6e2e35cf0f29d61c75abb69cff6912b3718ceced1",
           "breaches": [],
           "measurement": {
             "schema_version": 1,
             "kind": "commonworld_catalog_delivery_browser_metrics",
-            "measured_at": "2026-11-03T11:38:26.855Z",
+            "measured_at": "2026-11-06T15:51:37.681Z",
             "cpu_throttle_rate": 4,
             "profiles": [
               {
@@ -321,49 +321,49 @@
                   "height": 844
                 },
                 "cpu_throttle_rate": 4,
-                "runtime_ready_ms": 1491,
+                "runtime_ready_ms": 1147,
                 "dom_node_count": 1832,
                 "catalog_card_count": 48,
                 "interactive_catalog_card_count": 48,
                 "runtime_ready": true,
                 "runtime_failed": false,
-                "dom_content_loaded_ms": 812.1999999992549,
-                "load_event_ms": 861.8999999985099,
+                "dom_content_loaded_ms": 665.5,
+                "load_event_ms": 699.8999999985099,
                 "resource_count": 21,
-                "script_duration_ms": 875.4,
-                "task_duration_ms": 1466.33,
+                "script_duration_ms": 681.74,
+                "task_duration_ms": 1129.84,
                 "duration_scope": "navigation-start-to-runtime-ready",
-                "post_ready_observation_ms": 1250,
-                "observed_script_duration_ms": 1350.17,
-                "observed_task_duration_ms": 3252.75,
-                "post_ready_script_delta_ms": 474.77,
-                "post_ready_task_delta_ms": 1786.42,
+                "post_ready_observation_ms": 1251,
+                "observed_script_duration_ms": 1060.5,
+                "observed_task_duration_ms": 2805.86,
+                "post_ready_script_delta_ms": 378.76,
+                "post_ready_task_delta_ms": 1676.02,
                 "post_ready_scope": "runtime-ready-through-networkidle-or-10s-timeout-plus-750ms",
                 "bootstrap_compile": {
-                  "median_ms": 0.6999999992549419,
-                  "p95_ms": 0.9000000022351742,
+                  "median_ms": 0.6000000014901161,
+                  "p95_ms": 1,
                   "samples_ms": [
+                    0,
+                    0,
                     0.09999999776482582,
-                    0.10000000149011612,
                     0.19999999925494194,
                     0.19999999925494194,
-                    0.19999999925494194,
-                    0.20000000298023224,
+                    0.3999999985098839,
+                    0.3999999985098839,
                     0.5,
-                    0.5,
-                    0.5,
+                    0.6000000014901161,
+                    0.6000000014901161,
                     0.6000000014901161,
                     0.6999999992549419,
                     0.6999999992549419,
                     0.6999999992549419,
-                    0.7000000029802322,
                     0.8000000007450581,
                     0.8000000007450581,
-                    0.8999999985098839,
-                    0.8999999985098839,
-                    0.9000000022351742,
-                    0.9000000022351742,
-                    1.199999999254942
+                    0.8000000007450581,
+                    0.8000000007450581,
+                    1,
+                    1,
+                    1
                   ]
                 },
                 "first_party_request_count": 20,
@@ -373,24 +373,24 @@
                   "/",
                   "/__cw_probe/<nonce>/manifest",
                   "/assets/commonworld-release-check.js",
-                  "/releases/2ff33040845b611f863b/assets/commonworld-app.js",
-                  "/releases/2ff33040845b611f863b/assets/commonworld-bootstrap-catalog.mjs",
-                  "/releases/2ff33040845b611f863b/assets/commonworld-catalog-runtime.mjs",
-                  "/releases/2ff33040845b611f863b/assets/commonworld-core.mjs",
-                  "/releases/2ff33040845b611f863b/assets/commonworld-en-locale.mjs",
-                  "/releases/2ff33040845b611f863b/assets/commonworld-i18n.mjs",
-                  "/releases/2ff33040845b611f863b/assets/commonworld-locale-registry.mjs",
-                  "/releases/2ff33040845b611f863b/assets/commonworld-locale.mjs",
-                  "/releases/2ff33040845b611f863b/assets/commonworld-mark.svg",
-                  "/releases/2ff33040845b611f863b/assets/ipad-layout.css",
-                  "/releases/2ff33040845b611f863b/assets/map/commonworld-country-boundaries.geojson",
-                  "/releases/2ff33040845b611f863b/assets/vendor/maplibre-gl.css",
-                  "/releases/2ff33040845b611f863b/assets/vendor/maplibre-gl.js",
-                  "/releases/2ff33040845b611f863b/catalog/runtime/aggregate.v1.json",
-                  "/releases/2ff33040845b611f863b/catalog/runtime/manifest.v1.json",
-                  "/releases/2ff33040845b611f863b/index.css"
+                  "/releases/e31f107aef094ea4e483/assets/commonworld-app.js",
+                  "/releases/e31f107aef094ea4e483/assets/commonworld-bootstrap-catalog.mjs",
+                  "/releases/e31f107aef094ea4e483/assets/commonworld-catalog-runtime.mjs",
+                  "/releases/e31f107aef094ea4e483/assets/commonworld-core.mjs",
+                  "/releases/e31f107aef094ea4e483/assets/commonworld-en-locale.mjs",
+                  "/releases/e31f107aef094ea4e483/assets/commonworld-i18n.mjs",
+                  "/releases/e31f107aef094ea4e483/assets/commonworld-locale-registry.mjs",
+                  "/releases/e31f107aef094ea4e483/assets/commonworld-locale.mjs",
+                  "/releases/e31f107aef094ea4e483/assets/commonworld-mark.svg",
+                  "/releases/e31f107aef094ea4e483/assets/ipad-layout.css",
+                  "/releases/e31f107aef094ea4e483/assets/map/commonworld-country-boundaries.geojson",
+                  "/releases/e31f107aef094ea4e483/assets/vendor/maplibre-gl.css",
+                  "/releases/e31f107aef094ea4e483/assets/vendor/maplibre-gl.js",
+                  "/releases/e31f107aef094ea4e483/catalog/runtime/aggregate.v1.json",
+                  "/releases/e31f107aef094ea4e483/catalog/runtime/manifest.v1.json",
+                  "/releases/e31f107aef094ea4e483/index.css"
                 ],
-                "first_party_surface_sha256": "6cf1283691591f49e29b3dba3de175bcb147b3df0612cd03bb6acbbcc70c8f9b",
+                "first_party_surface_sha256": "8640ac751974744b4c3ffcaec9ca474a1463c09d7852828dc86c584884a80dbe",
                 "project_json_request_count": 0,
                 "project_json_unique_request_count": 0,
                 "project_json_requests": []
@@ -402,49 +402,49 @@
                   "height": 768
                 },
                 "cpu_throttle_rate": 4,
-                "runtime_ready_ms": 1204,
+                "runtime_ready_ms": 1211,
                 "dom_node_count": 1832,
                 "catalog_card_count": 48,
                 "interactive_catalog_card_count": 48,
                 "runtime_ready": true,
                 "runtime_failed": false,
-                "dom_content_loaded_ms": 788,
-                "load_event_ms": 835.3000000007451,
+                "dom_content_loaded_ms": 725.5999999977648,
+                "load_event_ms": 764.8999999985099,
                 "resource_count": 21,
-                "script_duration_ms": 664.41,
-                "task_duration_ms": 1189.58,
+                "script_duration_ms": 726.36,
+                "task_duration_ms": 1196.45,
                 "duration_scope": "navigation-start-to-runtime-ready",
-                "post_ready_observation_ms": 1251,
-                "observed_script_duration_ms": 1247.27,
-                "observed_task_duration_ms": 2080.32,
-                "post_ready_script_delta_ms": 582.86,
-                "post_ready_task_delta_ms": 890.74,
+                "post_ready_observation_ms": 1279,
+                "observed_script_duration_ms": 1117.36,
+                "observed_task_duration_ms": 2664.49,
+                "post_ready_script_delta_ms": 391,
+                "post_ready_task_delta_ms": 1468.04,
                 "post_ready_scope": "runtime-ready-through-networkidle-or-10s-timeout-plus-750ms",
                 "bootstrap_compile": {
-                  "median_ms": 0.4000000022351742,
-                  "p95_ms": 0.8999999985098839,
+                  "median_ms": 0.6000000014901161,
+                  "p95_ms": 1,
                   "samples_ms": [
                     0.09999999776482582,
                     0.09999999776482582,
                     0.09999999776482582,
                     0.10000000149011612,
-                    0.10000000149011612,
                     0.19999999925494194,
-                    0.30000000074505806,
+                    0.19999999925494194,
                     0.3999999985098839,
-                    0.3999999985098839,
-                    0.4000000022351742,
-                    0.4000000022351742,
                     0.5,
                     0.5,
                     0.5999999977648258,
                     0.6000000014901161,
                     0.6000000014901161,
+                    0.6000000014901161,
                     0.6999999992549419,
-                    0.8000000007450581,
-                    0.8000000007450581,
-                    0.8999999985098839,
-                    1.1000000014901161
+                    0.6999999992549419,
+                    0.6999999992549419,
+                    0.7000000029802322,
+                    0.9000000022351742,
+                    0.9000000022351742,
+                    1,
+                    1.0999999977648258
                   ]
                 },
                 "first_party_request_count": 20,
@@ -454,24 +454,24 @@
                   "/",
                   "/__cw_probe/<nonce>/manifest",
                   "/assets/commonworld-release-check.js",
-                  "/releases/2ff33040845b611f863b/assets/commonworld-app.js",
-                  "/releases/2ff33040845b611f863b/assets/commonworld-bootstrap-catalog.mjs",
-                  "/releases/2ff33040845b611f863b/assets/commonworld-catalog-runtime.mjs",
-                  "/releases/2ff33040845b611f863b/assets/commonworld-core.mjs",
-                  "/releases/2ff33040845b611f863b/assets/commonworld-en-locale.mjs",
-                  "/releases/2ff33040845b611f863b/assets/commonworld-i18n.mjs",
-                  "/releases/2ff33040845b611f863b/assets/commonworld-locale-registry.mjs",
-                  "/releases/2ff33040845b611f863b/assets/commonworld-locale.mjs",
-                  "/releases/2ff33040845b611f863b/assets/commonworld-mark.svg",
-                  "/releases/2ff33040845b611f863b/assets/ipad-layout.css",
-                  "/releases/2ff33040845b611f863b/assets/map/commonworld-country-boundaries.geojson",
-                  "/releases/2ff33040845b611f863b/assets/vendor/maplibre-gl.css",
-                  "/releases/2ff33040845b611f863b/assets/vendor/maplibre-gl.js",
-                  "/releases/2ff33040845b611f863b/catalog/runtime/aggregate.v1.json",
-                  "/releases/2ff33040845b611f863b/catalog/runtime/manifest.v1.json",
-                  "/releases/2ff33040845b611f863b/index.css"
+                  "/releases/e31f107aef094ea4e483/assets/commonworld-app.js",
+                  "/releases/e31f107aef094ea4e483/assets/commonworld-bootstrap-catalog.mjs",
+                  "/releases/e31f107aef094ea4e483/assets/commonworld-catalog-runtime.mjs",
+                  "/releases/e31f107aef094ea4e483/assets/commonworld-core.mjs",
+                  "/releases/e31f107aef094ea4e483/assets/commonworld-en-locale.mjs",
+                  "/releases/e31f107aef094ea4e483/assets/commonworld-i18n.mjs",
+                  "/releases/e31f107aef094ea4e483/assets/commonworld-locale-registry.mjs",
+                  "/releases/e31f107aef094ea4e483/assets/commonworld-locale.mjs",
+                  "/releases/e31f107aef094ea4e483/assets/commonworld-mark.svg",
+                  "/releases/e31f107aef094ea4e483/assets/ipad-layout.css",
+                  "/releases/e31f107aef094ea4e483/assets/map/commonworld-country-boundaries.geojson",
+                  "/releases/e31f107aef094ea4e483/assets/vendor/maplibre-gl.css",
+                  "/releases/e31f107aef094ea4e483/assets/vendor/maplibre-gl.js",
+                  "/releases/e31f107aef094ea4e483/catalog/runtime/aggregate.v1.json",
+                  "/releases/e31f107aef094ea4e483/catalog/runtime/manifest.v1.json",
+                  "/releases/e31f107aef094ea4e483/index.css"
                 ],
-                "first_party_surface_sha256": "6cf1283691591f49e29b3dba3de175bcb147b3df0612cd03bb6acbbcc70c8f9b",
+                "first_party_surface_sha256": "8640ac751974744b4c3ffcaec9ca474a1463c09d7852828dc86c584884a80dbe",
                 "project_json_request_count": 0,
                 "project_json_unique_request_count": 0,
                 "project_json_requests": []
@@ -489,49 +489,49 @@
             "height": 844
           },
           "cpu_throttle_rate": 4,
-          "runtime_ready_ms": 1491,
+          "runtime_ready_ms": 1147,
           "dom_node_count": 1832,
           "catalog_card_count": 48,
           "interactive_catalog_card_count": 48,
           "runtime_ready": true,
           "runtime_failed": false,
-          "dom_content_loaded_ms": 812.1999999992549,
-          "load_event_ms": 861.8999999985099,
+          "dom_content_loaded_ms": 665.5,
+          "load_event_ms": 699.8999999985099,
           "resource_count": 21,
-          "script_duration_ms": 875.4,
-          "task_duration_ms": 1466.33,
+          "script_duration_ms": 681.74,
+          "task_duration_ms": 1129.84,
           "duration_scope": "navigation-start-to-runtime-ready",
-          "post_ready_observation_ms": 1250,
-          "observed_script_duration_ms": 1350.17,
-          "observed_task_duration_ms": 3252.75,
-          "post_ready_script_delta_ms": 474.77,
-          "post_ready_task_delta_ms": 1786.42,
+          "post_ready_observation_ms": 1251,
+          "observed_script_duration_ms": 1060.5,
+          "observed_task_duration_ms": 2805.86,
+          "post_ready_script_delta_ms": 378.76,
+          "post_ready_task_delta_ms": 1676.02,
           "post_ready_scope": "runtime-ready-through-networkidle-or-10s-timeout-plus-750ms",
           "bootstrap_compile": {
-            "median_ms": 0.6999999992549419,
-            "p95_ms": 0.9000000022351742,
+            "median_ms": 0.6000000014901161,
+            "p95_ms": 1,
             "samples_ms": [
+              0,
+              0,
               0.09999999776482582,
-              0.10000000149011612,
               0.19999999925494194,
               0.19999999925494194,
-              0.19999999925494194,
-              0.20000000298023224,
+              0.3999999985098839,
+              0.3999999985098839,
               0.5,
-              0.5,
-              0.5,
+              0.6000000014901161,
+              0.6000000014901161,
               0.6000000014901161,
               0.6999999992549419,
               0.6999999992549419,
               0.6999999992549419,
-              0.7000000029802322,
               0.8000000007450581,
               0.8000000007450581,
-              0.8999999985098839,
-              0.8999999985098839,
-              0.9000000022351742,
-              0.9000000022351742,
-              1.199999999254942
+              0.8000000007450581,
+              0.8000000007450581,
+              1,
+              1,
+              1
             ]
           },
           "first_party_request_count": 20,
@@ -541,24 +541,24 @@
             "/",
             "/__cw_probe/<nonce>/manifest",
             "/assets/commonworld-release-check.js",
-            "/releases/2ff33040845b611f863b/assets/commonworld-app.js",
-            "/releases/2ff33040845b611f863b/assets/commonworld-bootstrap-catalog.mjs",
-            "/releases/2ff33040845b611f863b/assets/commonworld-catalog-runtime.mjs",
-            "/releases/2ff33040845b611f863b/assets/commonworld-core.mjs",
-            "/releases/2ff33040845b611f863b/assets/commonworld-en-locale.mjs",
-            "/releases/2ff33040845b611f863b/assets/commonworld-i18n.mjs",
-            "/releases/2ff33040845b611f863b/assets/commonworld-locale-registry.mjs",
-            "/releases/2ff33040845b611f863b/assets/commonworld-locale.mjs",
-            "/releases/2ff33040845b611f863b/assets/commonworld-mark.svg",
-            "/releases/2ff33040845b611f863b/assets/ipad-layout.css",
-            "/releases/2ff33040845b611f863b/assets/map/commonworld-country-boundaries.geojson",
-            "/releases/2ff33040845b611f863b/assets/vendor/maplibre-gl.css",
-            "/releases/2ff33040845b611f863b/assets/vendor/maplibre-gl.js",
-            "/releases/2ff33040845b611f863b/catalog/runtime/aggregate.v1.json",
-            "/releases/2ff33040845b611f863b/catalog/runtime/manifest.v1.json",
-            "/releases/2ff33040845b611f863b/index.css"
+            "/releases/e31f107aef094ea4e483/assets/commonworld-app.js",
+            "/releases/e31f107aef094ea4e483/assets/commonworld-bootstrap-catalog.mjs",
+            "/releases/e31f107aef094ea4e483/assets/commonworld-catalog-runtime.mjs",
+            "/releases/e31f107aef094ea4e483/assets/commonworld-core.mjs",
+            "/releases/e31f107aef094ea4e483/assets/commonworld-en-locale.mjs",
+            "/releases/e31f107aef094ea4e483/assets/commonworld-i18n.mjs",
+            "/releases/e31f107aef094ea4e483/assets/commonworld-locale-registry.mjs",
+            "/releases/e31f107aef094ea4e483/assets/commonworld-locale.mjs",
+            "/releases/e31f107aef094ea4e483/assets/commonworld-mark.svg",
+            "/releases/e31f107aef094ea4e483/assets/ipad-layout.css",
+            "/releases/e31f107aef094ea4e483/assets/map/commonworld-country-boundaries.geojson",
+            "/releases/e31f107aef094ea4e483/assets/vendor/maplibre-gl.css",
+            "/releases/e31f107aef094ea4e483/assets/vendor/maplibre-gl.js",
+            "/releases/e31f107aef094ea4e483/catalog/runtime/aggregate.v1.json",
+            "/releases/e31f107aef094ea4e483/catalog/runtime/manifest.v1.json",
+            "/releases/e31f107aef094ea4e483/index.css"
           ],
-          "first_party_surface_sha256": "6cf1283691591f49e29b3dba3de175bcb147b3df0612cd03bb6acbbcc70c8f9b",
+          "first_party_surface_sha256": "8640ac751974744b4c3ffcaec9ca474a1463c09d7852828dc86c584884a80dbe",
           "project_json_request_count": 0,
           "project_json_unique_request_count": 0,
           "project_json_requests": []
@@ -570,49 +570,49 @@
             "height": 768
           },
           "cpu_throttle_rate": 4,
-          "runtime_ready_ms": 1204,
+          "runtime_ready_ms": 1211,
           "dom_node_count": 1832,
           "catalog_card_count": 48,
           "interactive_catalog_card_count": 48,
           "runtime_ready": true,
           "runtime_failed": false,
-          "dom_content_loaded_ms": 788,
-          "load_event_ms": 835.3000000007451,
+          "dom_content_loaded_ms": 725.5999999977648,
+          "load_event_ms": 764.8999999985099,
           "resource_count": 21,
-          "script_duration_ms": 664.41,
-          "task_duration_ms": 1189.58,
+          "script_duration_ms": 726.36,
+          "task_duration_ms": 1196.45,
           "duration_scope": "navigation-start-to-runtime-ready",
-          "post_ready_observation_ms": 1251,
-          "observed_script_duration_ms": 1247.27,
-          "observed_task_duration_ms": 2080.32,
-          "post_ready_script_delta_ms": 582.86,
-          "post_ready_task_delta_ms": 890.74,
+          "post_ready_observation_ms": 1279,
+          "observed_script_duration_ms": 1117.36,
+          "observed_task_duration_ms": 2664.49,
+          "post_ready_script_delta_ms": 391,
+          "post_ready_task_delta_ms": 1468.04,
           "post_ready_scope": "runtime-ready-through-networkidle-or-10s-timeout-plus-750ms",
           "bootstrap_compile": {
-            "median_ms": 0.4000000022351742,
-            "p95_ms": 0.8999999985098839,
+            "median_ms": 0.6000000014901161,
+            "p95_ms": 1,
             "samples_ms": [
               0.09999999776482582,
               0.09999999776482582,
               0.09999999776482582,
               0.10000000149011612,
-              0.10000000149011612,
               0.19999999925494194,
-              0.30000000074505806,
+              0.19999999925494194,
               0.3999999985098839,
-              0.3999999985098839,
-              0.4000000022351742,
-              0.4000000022351742,
               0.5,
               0.5,
               0.5999999977648258,
               0.6000000014901161,
               0.6000000014901161,
+              0.6000000014901161,
               0.6999999992549419,
-              0.8000000007450581,
-              0.8000000007450581,
-              0.8999999985098839,
-              1.1000000014901161
+              0.6999999992549419,
+              0.6999999992549419,
+              0.7000000029802322,
+              0.9000000022351742,
+              0.9000000022351742,
+              1,
+              1.0999999977648258
             ]
           },
           "first_party_request_count": 20,
@@ -622,24 +622,24 @@
             "/",
             "/__cw_probe/<nonce>/manifest",
             "/assets/commonworld-release-check.js",
-            "/releases/2ff33040845b611f863b/assets/commonworld-app.js",
-            "/releases/2ff33040845b611f863b/assets/commonworld-bootstrap-catalog.mjs",
-            "/releases/2ff33040845b611f863b/assets/commonworld-catalog-runtime.mjs",
-            "/releases/2ff33040845b611f863b/assets/commonworld-core.mjs",
-            "/releases/2ff33040845b611f863b/assets/commonworld-en-locale.mjs",
-            "/releases/2ff33040845b611f863b/assets/commonworld-i18n.mjs",
-            "/releases/2ff33040845b611f863b/assets/commonworld-locale-registry.mjs",
-            "/releases/2ff33040845b611f863b/assets/commonworld-locale.mjs",
-            "/releases/2ff33040845b611f863b/assets/commonworld-mark.svg",
-            "/releases/2ff33040845b611f863b/assets/ipad-layout.css",
-            "/releases/2ff33040845b611f863b/assets/map/commonworld-country-boundaries.geojson",
-            "/releases/2ff33040845b611f863b/assets/vendor/maplibre-gl.css",
-            "/releases/2ff33040845b611f863b/assets/vendor/maplibre-gl.js",
-            "/releases/2ff33040845b611f863b/catalog/runtime/aggregate.v1.json",
-            "/releases/2ff33040845b611f863b/catalog/runtime/manifest.v1.json",
-            "/releases/2ff33040845b611f863b/index.css"
+            "/releases/e31f107aef094ea4e483/assets/commonworld-app.js",
+            "/releases/e31f107aef094ea4e483/assets/commonworld-bootstrap-catalog.mjs",
+            "/releases/e31f107aef094ea4e483/assets/commonworld-catalog-runtime.mjs",
+            "/releases/e31f107aef094ea4e483/assets/commonworld-core.mjs",
+            "/releases/e31f107aef094ea4e483/assets/commonworld-en-locale.mjs",
+            "/releases/e31f107aef094ea4e483/assets/commonworld-i18n.mjs",
+            "/releases/e31f107aef094ea4e483/assets/commonworld-locale-registry.mjs",
+            "/releases/e31f107aef094ea4e483/assets/commonworld-locale.mjs",
+            "/releases/e31f107aef094ea4e483/assets/commonworld-mark.svg",
+            "/releases/e31f107aef094ea4e483/assets/ipad-layout.css",
+            "/releases/e31f107aef094ea4e483/assets/map/commonworld-country-boundaries.geojson",
+            "/releases/e31f107aef094ea4e483/assets/vendor/maplibre-gl.css",
+            "/releases/e31f107aef094ea4e483/assets/vendor/maplibre-gl.js",
+            "/releases/e31f107aef094ea4e483/catalog/runtime/aggregate.v1.json",
+            "/releases/e31f107aef094ea4e483/catalog/runtime/manifest.v1.json",
+            "/releases/e31f107aef094ea4e483/index.css"
           ],
-          "first_party_surface_sha256": "6cf1283691591f49e29b3dba3de175bcb147b3df0612cd03bb6acbbcc70c8f9b",
+          "first_party_surface_sha256": "8640ac751974744b4c3ffcaec9ca474a1463c09d7852828dc86c584884a80dbe",
           "project_json_request_count": 0,
           "project_json_unique_request_count": 0,
           "project_json_requests": []
@@ -651,8 +651,8 @@
   "delta": {
     "startup_project_json_requests": -100,
     "duplicate_identity_payload_count": -100,
-    "catalog_initial_raw_bytes": -474518,
-    "catalog_initial_gzip_bytes": -159061,
+    "catalog_initial_raw_bytes": -475554,
+    "catalog_initial_gzip_bytes": -159731,
     "first_party_request_count_by_profile": {
       "mobile-low-power": -31,
       "desktop-low-power": -31
@@ -662,7 +662,7 @@
       "desktop-low-power": 145
     },
     "catalog_initial_raw_reduction_percent": 77.8,
-    "catalog_initial_gzip_reduction_percent": 85.5
+    "catalog_initial_gzip_reduction_percent": 85.6
   },
   "selected_design": "compact-build-bound-bootstrap-with-verified-selected-detail-provenance",
   "preserved": [
@@ -685,33 +685,33 @@
   "validation": {
     "public_browser_smoke": {
       "verdict": "PASS",
-      "committed_evidence_sha256": "cf77c3250d19b19ac08066d3f1e6d7ea980dfa11ff7bb643420328c4263cb8d4",
-      "first_party_surface_sha256": "6cf1283691591f49e29b3dba3de175bcb147b3df0612cd03bb6acbbcc70c8f9b",
+      "committed_evidence_sha256": "42c88143fccfa44771979fcdd429a50d1e2e17ecb9592c80063047ecee5a1560",
+      "first_party_surface_sha256": "8640ac751974744b4c3ffcaec9ca474a1463c09d7852828dc86c584884a80dbe",
       "scenario_count": 40,
-      "release_id": "2ff33040845b611f863b",
-      "scope": "local Chromium on deterministic release 2ff33040845b611f863b"
+      "release_id": "e31f107aef094ea4e483",
+      "scope": "local Chromium on deterministic release e31f107aef094ea4e483"
     },
     "catalog_delivery_browser_measurement": {
       "verdict": "PASS",
       "decision": "pass",
       "attempt_count": 1,
       "attempt_measurement_sha256s": [
-        "4a2bc8fd5a1e7036961e9f4206a3e1f854ed6925ec2bd5885ef43812ebf7e938"
+        "13bd4d5fb7d2c567140636e6e2e35cf0f29d61c75abb69cff6912b3718ceced1"
       ],
       "profiles": [
         "mobile-low-power",
         "desktop-low-power"
       ],
       "cpu_throttle_rate": 4,
-      "first_party_surface_sha256": "6cf1283691591f49e29b3dba3de175bcb147b3df0612cd03bb6acbbcc70c8f9b",
-      "release_id": "2ff33040845b611f863b",
-      "repeatability_note": "One genuine Chromium 156 4x-CPU sample on release-2ff33040845b611f863b; no repeatability established."
+      "first_party_surface_sha256": "8640ac751974744b4c3ffcaec9ca474a1463c09d7852828dc86c584884a80dbe",
+      "release_id": "e31f107aef094ea4e483",
+      "repeatability_note": "One genuine Chromium 156 4x-CPU sample on release-e31f107aef094ea4e483; no repeatability established."
     },
     "catalog_delivery_static_measurement": {
       "verdict": "PASS",
-      "result_sha256": "94c5b5e1115f82622ebc5c2e06f8939392221747a6476607c66ef0048dc06a3a",
-      "release_id": "2ff33040845b611f863b",
-      "note": "Deterministic static measurement on release 2ff33040845b611f863b for 100 canonical Commons."
+      "result_sha256": "d82ea0d0bb989c72fc31a01ee39e8406b44ff31d6ead64db62715434e3095391",
+      "release_id": "e31f107aef094ea4e483",
+      "note": "Deterministic static measurement on release e31f107aef094ea4e483 for 100 canonical Commons."
     },
     "limitations": [
       "Local Chromium evidence is not physical-device approval.",
@@ -719,69 +719,69 @@
     ]
   },
   "budget_binding": {
-    "bootstrap_gzip_bytes": 26943,
+    "bootstrap_gzip_bytes": 26944,
     "warn_bootstrap_gzip_bytes": 28672,
     "max_bootstrap_gzip_bytes": 32768
   },
-  "current_surface_note": "Source-bound local Chromium and static budget acceptance for deterministic release 2ff33040845b611f863b; public deployment has not been established.",
+  "current_surface_note": "Source-bound local Chromium and static budget acceptance for deterministic release e31f107aef094ea4e483; public deployment has not been established.",
   "browser_repeatability": {
     "run_count": 1,
     "cpu_throttle_rate": 4,
     "profiles": {
       "mobile-low-power": {
         "runtime_ready_ms": {
-          "min": 1491,
-          "max": 1491,
+          "min": 1147,
+          "max": 1147,
           "values": [
-            1491
+            1147
           ]
         },
         "script_duration_ms": {
-          "min": 875.4,
-          "max": 875.4,
+          "min": 681.74,
+          "max": 681.74,
           "values": [
-            875.4
+            681.74
           ]
         },
         "task_duration_ms": {
-          "min": 1466.33,
-          "max": 1466.33,
+          "min": 1129.84,
+          "max": 1129.84,
           "values": [
-            1466.33
+            1129.84
           ]
         }
       },
       "desktop-low-power": {
         "runtime_ready_ms": {
-          "min": 1204,
-          "max": 1204,
+          "min": 1211,
+          "max": 1211,
           "values": [
-            1204
+            1211
           ]
         },
         "script_duration_ms": {
-          "min": 664.41,
-          "max": 664.41,
+          "min": 726.36,
+          "max": 726.36,
           "values": [
-            664.41
+            726.36
           ]
         },
         "task_duration_ms": {
-          "min": 1189.58,
-          "max": 1189.58,
+          "min": 1196.45,
+          "max": 1196.45,
           "values": [
-            1189.58
+            1196.45
           ]
         }
       }
     },
-    "interpretation": "One genuine Chromium 156 4x-CPU sample on release-2ff33040845b611f863b; no repeatability claimed."
+    "interpretation": "One genuine Chromium 156 4x-CPU sample on release-e31f107aef094ea4e483; no repeatability claimed."
   },
   "current_surface_binding": {
-    "release_id": "2ff33040845b611f863b",
-    "first_party_surface_sha256": "6cf1283691591f49e29b3dba3de175bcb147b3df0612cd03bb6acbbcc70c8f9b",
-    "public_browser_smoke_evidence_sha256": "cf77c3250d19b19ac08066d3f1e6d7ea980dfa11ff7bb643420328c4263cb8d4",
-    "browser_measurement_decision_sha256": "a4bbe27b6e740e127b053a1a227296b3e64a281a05fdce5797dd645084d941c8",
-    "static_measurement_sha256": "94c5b5e1115f82622ebc5c2e06f8939392221747a6476607c66ef0048dc06a3a"
+    "release_id": "e31f107aef094ea4e483",
+    "first_party_surface_sha256": "8640ac751974744b4c3ffcaec9ca474a1463c09d7852828dc86c584884a80dbe",
+    "public_browser_smoke_evidence_sha256": "42c88143fccfa44771979fcdd429a50d1e2e17ecb9592c80063047ecee5a1560",
+    "browser_measurement_decision_sha256": "7d8202e7485cdd23ecadf0c278b9f59915e098d12788e57b6ff8b30b440b6e2e",
+    "static_measurement_sha256": "d82ea0d0bb989c72fc31a01ee39e8406b44ff31d6ead64db62715434e3095391"
   }
 }

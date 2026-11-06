@@ -93,7 +93,7 @@
         "type": "official-source",
         "label": "ACOFOP – offizielle Organisationsgeschichte und Mitgliedschaft",
         "url": "https://acofop.org/nuestra-historia/",
-        "retrieved_at": "2026-10-29",
+        "retrieved_at": "2026-11-06",
         "note": "Am 29.10.2026 HTTP 200: beschreibt den Aufbau der Vereinigung, 24 bäuerliche und indigene Mitgliedsorganisationen und den gemeinschaftlichen Schutz und Nutzen der Waldkonzessionen."
       }
     ],
@@ -103,9 +103,9 @@
     "state": "listed",
     "catalogued_at": "2026-08-04",
     "reviewed_by": "Commonworld editorial review",
-    "reviewed_at": "2026-08-04",
-    "next_review_at": "2026-11-04",
-    "notes": "Als regionale Commons-Infrastruktur aufgenommen. ACOFOP wird nicht als Eigentümer sämtlicher Wälder dargestellt; katalogisiert sind die föderierte Selbstorganisation, Schutzarbeit und gemeinsame Befähigung der Mitgliedsorganisationen."
+    "reviewed_at": "2026-11-06",
+    "next_review_at": "2027-02-06",
+    "notes": "Als regionale Commons-Infrastruktur aufgenommen. ACOFOP wird nicht als Eigentümer sämtlicher Wälder dargestellt; katalogisiert sind die föderierte Selbstorganisation, Schutzarbeit und gemeinsame Befähigung der Mitgliedsorganisationen. Quellenrecheck 06.11.2026; Primärbelege und Grenzen: docs/evidence/commons-basis-source-recheck-2026-11-06.json. Kein neuer Live-Betriebsnachweis."
   },
   "links": [
     {
