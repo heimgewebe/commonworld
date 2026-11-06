@@ -4,7 +4,7 @@
   "project_id": "the-things-network",
   "classification": "commons-infrastructure",
   "decision": "include",
-  "reviewed_at": "2026-07-31",
+  "reviewed_at": "2026-11-03",
   "reviewer": "Commonworld editorial review",
   "criteria": {
     "shared_resource": {
@@ -20,7 +20,8 @@
       "status": "supported",
       "statement": "Die offizielle Community-Übersicht weist lokale Gruppen und einen Weg zum Aufbau weiterer Communities aus.",
       "source_ids": [
-        "ttn-community"
+        "ttn-community",
+        "ttn-forum-latest"
       ]
     },
     "commoning_practice": {
@@ -29,7 +30,8 @@
       "source_ids": [
         "ttn-community",
         "ttn-get-started",
-        "ttn-learn"
+        "ttn-learn",
+        "ttn-forum-latest"
       ]
     },
     "rules_and_responsibility": {
@@ -56,5 +58,5 @@
     "Öffentliche Community-Abdeckung ist Best Effort und keine garantierte Versorgungsinfrastruktur.",
     "Ein einzelnes privat betriebenes Gateway ist nicht automatisch ein eigenständiges Common."
   ],
-  "notes": "Rückwirkender strukturierter Basisnachweis für den bereits gelisteten Eintrag."
+  "notes": "Rückwirkender strukturierter Basisnachweis für den bereits gelisteten Eintrag. Am 03.11.2026 auf Grundlage der offiziellen Community-, Einstiegs- und Forumseiten erneut geprüft. Öffentliches Community-Netz und kommerzieller Stack bleiben getrennt; Gateway-Verfügbarkeit wurde nicht verifiziert."
 }

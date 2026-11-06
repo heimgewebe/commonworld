@@ -4,7 +4,7 @@
   "project_id": "mundraub",
   "classification": "commons-infrastructure",
   "decision": "include",
-  "reviewed_at": "2026-08-05",
+  "reviewed_at": "2026-11-06",
   "reviewer": "Commonworld editorial review",
   "criteria": {
     "shared_resource": {
@@ -59,5 +59,5 @@
     "Kartierte Fundorte sind nicht automatisch frei nutzbares Eigentum; Eigentum, Schutzstatus und lokale Regeln bleiben vor Ort zu prüfen.",
     "Beiträge und Kartierung setzen Konto- bzw. Plattformregeln voraus, auch wenn die Karte öffentlich lesbar ist."
   ],
-  "notes": "Katalogisiert als Commons-Infrastruktur für Kartierung, Nutzung und Pflege öffentlich zugänglicher essbarer Landschaften, nicht als offene Gesamt-Daten- oder Code-Allmende und nicht als gemeinschaftlich kontrollierte Betreiberorganisation."
+  "notes": "Katalogisiert als Commons-Infrastruktur für Kartierung, Nutzung und Pflege öffentlich zugänglicher essbarer Landschaften, nicht als offene Gesamt-Daten- oder Code-Allmende und nicht als gemeinschaftlich kontrollierte Betreiberorganisation. Wiedervorlage 06.11.2026: Die offiziellen Regeln belegen Eigentums-, Natur- und Pflegepflichten; das aktuelle Impressum weist die Terra Concordia gGmbH als Betreiberin aus. Eine gemeinschaftlich kontrollierte vollständige Datenbank wird nicht behauptet. Keine unabhängige menschliche Abnahme."
 }
