@@ -225,7 +225,7 @@
         },
         {
           "layer": "communication_networks",
-          "changedPixels": 3088
+          "changedPixels": 9517
         },
         {
           "layer": "cooperation_self_organization",
@@ -241,15 +241,15 @@
         "representativePrimaryLabels": [
           {
             "text": "Knowledge, Learning and Culture · 11    LibriVox  MusicBrainz  Open Library  Peer 2 Peer Unive…  Safecast  Thailand Citizens…",
-            "width": 449.52392578125,
-            "height": 438.68267822265625,
+            "width": 433.04498291015625,
+            "height": 420.88690185546875,
             "fontSize": 25.26,
             "visible": true
           },
           {
             "text": "Cooperation and Self-Organization · 7    Bologna Urban Com…  Enspiral  g0v  Green Coop  l’Asilo  National Communal…",
-            "width": 388.1485595703125,
-            "height": 326.298583984375,
+            "width": 404.07684326171875,
+            "height": 348.4042663574219,
             "fontSize": 25.26,
             "visible": true
           }
@@ -361,7 +361,7 @@
     {
       "id": "layer-journey-moveend-return",
       "verdict": "PASS",
-      "elapsedMs": 2405
+      "elapsedMs": 1756
     },
     {
       "id": "layer-journey-missing-moveend-fallback",
@@ -469,8 +469,8 @@
       "verdict": "PASS",
       "blockedCatalogRequests": 0,
       "observedCatalogRequests": [
-        "/releases/aff46f0706c0f215b9a6/catalog/runtime/aggregate.v1.json",
-        "/releases/aff46f0706c0f215b9a6/catalog/runtime/manifest.v1.json"
+        "/releases/38bd580a4667ffca2bae/catalog/runtime/aggregate.v1.json",
+        "/releases/38bd580a4667ffca2bae/catalog/runtime/manifest.v1.json"
       ]
     },
     {
@@ -528,7 +528,7 @@
     }
   ],
   "binding": {
-    "smoke_script_sha256": "0366775ca417ce5b8bfc2ae324b7fd0aea5194190f7b1bc517ac3ab5335f9dab",
+    "smoke_script_sha256": "164f9cd0b8e80326afcf2b1b1fb48ba97be6eff6c560a34f7db50fe8dfd35517",
     "smoke_runner_sha256": "522b99b70b1d0064b1d0a31a3a67fdc9a2e73b7408f37d1a4bb303bc360b7556",
     "smoke_plan_sha256": "8a068c3b573eb2ab95ed7c3f8477f607cba6de9353ab5250ba9abc09345b23a7",
     "scenario_ids": [
@@ -573,6 +573,6 @@
       "method-mobile",
       "method-mobile-text-200"
     ],
-    "first_party_surface_sha256": "ce6a73388b32943c554d6b1ee0d8c7eab43e4fc95059babec896cd2232606bf0"
+    "first_party_surface_sha256": "8377980f41d440e16816fab76c15d8948b2525bdd1c45ed4cdb2175b5d222278"
   }
 }

@@ -1,0 +1,569 @@
+{
+  "schema_version": 1,
+  "kind": "commonworld_commons_basis_retroreview_wave6a",
+  "checked_at_utc": "2026-10-31",
+  "source_base_commit": "a779b9a969ea4fa53a0d26a0efe08a2d1a7415b5",
+  "reviewer_provenance": "model-assisted official-source desk review, not independent human certification",
+  "scope": "Eleven individually reviewed Commons with five source-bound dimensions; doubtful authority explicitly pending",
+  "outcomes": [
+    {
+      "project_id": "aflaj-irrigation-systems-oman",
+      "basis_decision": "include",
+      "classification": "common",
+      "criteria": {
+        "shared_resource": {
+          "verdict": "supported",
+          "cited_source_ids": [
+            "source-aflaj-unesco"
+          ]
+        },
+        "community": {
+          "verdict": "supported",
+          "cited_source_ids": [
+            "source-aflaj-unesco"
+          ]
+        },
+        "commoning_practice": {
+          "verdict": "supported",
+          "cited_source_ids": [
+            "source-aflaj-unesco"
+          ]
+        },
+        "rules_and_responsibility": {
+          "verdict": "supported",
+          "cited_source_ids": [
+            "source-aflaj-unesco"
+          ]
+        },
+        "common_benefit": {
+          "verdict": "supported",
+          "cited_source_ids": [
+            "source-aflaj-unesco"
+          ]
+        }
+      },
+      "provenance_urls": {
+        "source-aflaj-unesco": "https://whc.unesco.org/en/list/1207/"
+      },
+      "limitations": [
+        "UNESCO dokumentiert fünf exemplarische Welterbe-Systeme, nicht alle aktuellen Aflaj oder Wasserrechte in Oman.",
+        "Wasserzeitanteile sind an lokale Nutzungsrechte gebunden; kein freier Zugang für beliebige Personen.",
+        "Aktuelle Wasserführung und technische Funktionsfähigkeit einzelner Kanäle wurden nicht neu geprüft."
+      ],
+      "post_review_public_state": "stale",
+      "operational_activity_recatalogued": false
+    },
+    {
+      "project_id": "akiba-mashinani-trust",
+      "basis_decision": "needs_information",
+      "classification": "undetermined",
+      "criteria": {
+        "shared_resource": {
+          "verdict": "supported",
+          "cited_source_ids": [
+            "source-akiba-official"
+          ]
+        },
+        "community": {
+          "verdict": "supported",
+          "cited_source_ids": [
+            "source-akiba-official"
+          ]
+        },
+        "commoning_practice": {
+          "verdict": "supported",
+          "cited_source_ids": [
+            "source-akiba-official"
+          ]
+        },
+        "rules_and_responsibility": {
+          "verdict": "partial",
+          "cited_source_ids": [
+            "source-akiba-official"
+          ]
+        },
+        "common_benefit": {
+          "verdict": "supported",
+          "cited_source_ids": [
+            "source-akiba-official"
+          ]
+        }
+      },
+      "provenance_urls": {
+        "source-akiba-official": "https://www.muungano.net/akibamashinanitrust"
+      },
+      "limitations": [
+        "Rechtliche Trust-Kontrolle darf nicht mit direkter Eigentümerschaft jedes Sparers gleichgesetzt werden.",
+        "Aktuelle Kreditvergabe und Treuhandaufsicht sind aus der öffentlichen Projektbeschreibung nicht abschließend verifiziert.",
+        "Eine Liquiditäts- oder Solvenzprüfung der Finanzstruktur liegt nicht vor."
+      ],
+      "post_review_public_state": "stale",
+      "operational_activity_recatalogued": false
+    },
+    {
+      "project_id": "bali-subak-system",
+      "basis_decision": "include",
+      "classification": "common",
+      "criteria": {
+        "shared_resource": {
+          "verdict": "supported",
+          "cited_source_ids": [
+            "subak-unesco"
+          ]
+        },
+        "community": {
+          "verdict": "supported",
+          "cited_source_ids": [
+            "subak-unesco"
+          ]
+        },
+        "commoning_practice": {
+          "verdict": "supported",
+          "cited_source_ids": [
+            "subak-unesco"
+          ]
+        },
+        "rules_and_responsibility": {
+          "verdict": "supported",
+          "cited_source_ids": [
+            "subak-unesco"
+          ]
+        },
+        "common_benefit": {
+          "verdict": "supported",
+          "cited_source_ids": [
+            "subak-unesco"
+          ]
+        }
+      },
+      "provenance_urls": {
+        "subak-unesco": "https://whc.unesco.org/en/list/1194"
+      },
+      "limitations": [
+        "Subak-Rechte gehören konkreten lokalen Bauerngruppen; nicht jeder Einwohner kann die Wasserquoten mitbestimmen.",
+        "UNESCO-Dokumentation ist kein aktueller Betriebsnachweis für jedes der vielen Subak-Systeme.",
+        "Die Insel bildet keine einzige rechtsfähige Wasser-Commons-Genossenschaft."
+      ],
+      "post_review_public_state": "stale",
+      "operational_activity_recatalogued": false
+    },
+    {
+      "project_id": "banco-palmas",
+      "basis_decision": "include",
+      "classification": "commons-infrastructure",
+      "criteria": {
+        "shared_resource": {
+          "verdict": "supported",
+          "cited_source_ids": [
+            "banco-palmas-about"
+          ]
+        },
+        "community": {
+          "verdict": "supported",
+          "cited_source_ids": [
+            "banco-palmas-about"
+          ]
+        },
+        "commoning_practice": {
+          "verdict": "supported",
+          "cited_source_ids": [
+            "banco-palmas-about",
+            "banco-palmas-blog"
+          ]
+        },
+        "rules_and_responsibility": {
+          "verdict": "supported",
+          "cited_source_ids": [
+            "banco-palmas-about"
+          ]
+        },
+        "common_benefit": {
+          "verdict": "supported",
+          "cited_source_ids": [
+            "banco-palmas-about"
+          ]
+        }
+      },
+      "provenance_urls": {
+        "banco-palmas-about": "https://bancopalmas.com/o-que-e/",
+        "banco-palmas-blog": "https://bancopalmas.com/blog/"
+      },
+      "limitations": [
+        "Die öffentliche Darstellung historischer Gemeinschaftssteuerung ist keine aktuelle Kreditaufsichts- oder Liquiditätsbescheinigung.",
+        "Bankkunden sind nicht zwangsläufig Träger gemeinschaftlicher Eigentumsrechte an der Bank.",
+        "Aktuelle Zinsen, Darlehensbedingungen oder rechtliche Zuständigkeiten wurden nicht eigens geprüft."
+      ],
+      "post_review_public_state": "stale",
+      "operational_activity_recatalogued": false
+    },
+    {
+      "project_id": "cltb-le-nid",
+      "basis_decision": "include",
+      "classification": "commons-infrastructure",
+      "criteria": {
+        "shared_resource": {
+          "verdict": "supported",
+          "cited_source_ids": [
+            "cltb-le-nid-official",
+            "cltb-governance"
+          ]
+        },
+        "community": {
+          "verdict": "supported",
+          "cited_source_ids": [
+            "cltb-governance"
+          ]
+        },
+        "commoning_practice": {
+          "verdict": "supported",
+          "cited_source_ids": [
+            "cltb-le-nid-official",
+            "cltb-governance"
+          ]
+        },
+        "rules_and_responsibility": {
+          "verdict": "supported",
+          "cited_source_ids": [
+            "cltb-governance"
+          ]
+        },
+        "common_benefit": {
+          "verdict": "supported",
+          "cited_source_ids": [
+            "cltb-governance",
+            "cltb-le-nid-official"
+          ]
+        }
+      },
+      "provenance_urls": {
+        "cltb-governance": "https://cltb.be/en/about/",
+        "cltb-le-nid-official": "https://cltb.be/en/projet/verheyden-le-nid-2/"
+      },
+      "limitations": [
+        "Bodenstiftung, Wohnungsberechtigte und NPO besitzen unterschiedliche, nicht austauschbare Rechte.",
+        "Die Zugangsvoraussetzungen schließen unbegrenzte freie Wohnnutzung aus.",
+        "Ein aktueller Nachweis jeder Bewohner- oder Wohnungsvergabeentscheidung liegt nicht vor."
+      ],
+      "post_review_public_state": "stale",
+      "operational_activity_recatalogued": false
+    },
+    {
+      "project_id": "community-baboon-sanctuary",
+      "basis_decision": "include",
+      "classification": "common",
+      "criteria": {
+        "shared_resource": {
+          "verdict": "supported",
+          "cited_source_ids": [
+            "cbs-community"
+          ]
+        },
+        "community": {
+          "verdict": "supported",
+          "cited_source_ids": [
+            "cbs-community",
+            "cbs-women-governance"
+          ]
+        },
+        "commoning_practice": {
+          "verdict": "supported",
+          "cited_source_ids": [
+            "cbs-community",
+            "cbs-women-governance"
+          ]
+        },
+        "rules_and_responsibility": {
+          "verdict": "supported",
+          "cited_source_ids": [
+            "cbs-women-governance",
+            "cbs-community"
+          ]
+        },
+        "common_benefit": {
+          "verdict": "supported",
+          "cited_source_ids": [
+            "cbs-women-governance"
+          ]
+        }
+      },
+      "provenance_urls": {
+        "cbs-community": "https://howlermonkeybelize.org/about-us/our-community/",
+        "cbs-women-governance": "https://howlermonkeybelize.org/about-us/community-baboon-sanctuary-womens-conservation-group/"
+      },
+      "limitations": [
+        "Die Landflächen bleiben im privaten Eigentum beteiligter Besitzer, kein zentraler kommunaler Rechtstitel.",
+        "Historische Flächen- und Teilnehmerzahlen schwanken zwischen Quellen; kein exakter aktueller Bestand attestiert.",
+        "Die gewählte Frauengruppe ist keine gesetzliche Regierung aller Dörfer."
+      ],
+      "post_review_public_state": "stale",
+      "operational_activity_recatalogued": false
+    },
+    {
+      "project_id": "community-energy-network-new-zealand",
+      "basis_decision": "include",
+      "classification": "commons-infrastructure",
+      "criteria": {
+        "shared_resource": {
+          "verdict": "supported",
+          "cited_source_ids": [
+            "cen-about",
+            "cen-nz-home"
+          ]
+        },
+        "community": {
+          "verdict": "supported",
+          "cited_source_ids": [
+            "cen-join",
+            "cen-board-governance"
+          ]
+        },
+        "commoning_practice": {
+          "verdict": "supported",
+          "cited_source_ids": [
+            "cen-about",
+            "cen-nz-home"
+          ]
+        },
+        "rules_and_responsibility": {
+          "verdict": "supported",
+          "cited_source_ids": [
+            "cen-board-governance",
+            "cen-join"
+          ]
+        },
+        "common_benefit": {
+          "verdict": "supported",
+          "cited_source_ids": [
+            "cen-nz-home",
+            "cen-about"
+          ]
+        }
+      },
+      "provenance_urls": {
+        "cen-about": "https://www.communityenergy.org.nz/about-us/",
+        "cen-board-governance": "https://www.communityenergy.org.nz/about-us/governance-board/",
+        "cen-join": "https://www.communityenergy.org.nz/about-us/join-us/",
+        "cen-nz-home": "https://www.communityenergy.org.nz/"
+      },
+      "limitations": [
+        "Der Verband ist nicht automatisch Eigentümer der Anlagen oder Gebäude seiner Mitgliedsorganisationen.",
+        "Vorstandsrepräsentanz bedeutet nicht, dass alle Bewohner eine direkte individuelle Stimme besitzen.",
+        "Geplante lokale Energieprojekte sind keine bereits errichtete Infrastruktur."
+      ],
+      "post_review_public_state": "stale",
+      "operational_activity_recatalogued": false
+    },
+    {
+      "project_id": "enspiral",
+      "basis_decision": "needs_information",
+      "classification": "undetermined",
+      "criteria": {
+        "shared_resource": {
+          "verdict": "supported",
+          "cited_source_ids": [
+            "enspiral-home",
+            "enspiral-decision-handbook"
+          ]
+        },
+        "community": {
+          "verdict": "supported",
+          "cited_source_ids": [
+            "enspiral-home"
+          ]
+        },
+        "commoning_practice": {
+          "verdict": "supported",
+          "cited_source_ids": [
+            "enspiral-decision-handbook"
+          ]
+        },
+        "rules_and_responsibility": {
+          "verdict": "partial",
+          "cited_source_ids": [
+            "enspiral-decision-handbook",
+            "enspiral-home"
+          ]
+        },
+        "common_benefit": {
+          "verdict": "supported",
+          "cited_source_ids": [
+            "enspiral-home",
+            "enspiral-decision-handbook"
+          ]
+        }
+      },
+      "provenance_urls": {
+        "enspiral-decision-handbook": "https://handbook.enspiral.com/agreements/decisions.html",
+        "enspiral-home": "https://www.enspiral.com/"
+      },
+      "limitations": [
+        "Ein historisches Netzwerkhandbuch kann heutige autonome Nodes nicht automatisch verbindlich regeln.",
+        "Foundation Shareholder, Board und lose Mitglieder besitzen unterschiedliche Rechtstitel.",
+        "Die aktuelle Abstimmungszuständigkeit aller selbstständigen Teilorganisationen ist nicht belegt."
+      ],
+      "post_review_public_state": "stale",
+      "operational_activity_recatalogued": false
+    },
+    {
+      "project_id": "ethiopia-community-seed-bank-network",
+      "basis_decision": "needs_information",
+      "classification": "undetermined",
+      "criteria": {
+        "shared_resource": {
+          "verdict": "supported",
+          "cited_source_ids": [
+            "source-ethiopia-csb-moa",
+            "source-ethiopia-csb-fao"
+          ]
+        },
+        "community": {
+          "verdict": "supported",
+          "cited_source_ids": [
+            "source-ethiopia-csb-fao"
+          ]
+        },
+        "commoning_practice": {
+          "verdict": "supported",
+          "cited_source_ids": [
+            "source-ethiopia-csb-moa",
+            "source-ethiopia-csb-fao"
+          ]
+        },
+        "rules_and_responsibility": {
+          "verdict": "partial",
+          "cited_source_ids": [
+            "ethiopia-ebc-community-rights",
+            "source-ethiopia-csb-moa"
+          ]
+        },
+        "common_benefit": {
+          "verdict": "supported",
+          "cited_source_ids": [
+            "source-ethiopia-csb-fao"
+          ]
+        }
+      },
+      "provenance_urls": {
+        "ethiopia-ebc-community-rights": "https://ebi.gov.et/am/gm-access/protection-of-community-rights/",
+        "source-ethiopia-csb-fao": "https://www.fao.org/plant-treaty/areas-of-work/benefit-sharing-fund/projects/projects-detail/National-Community-Seed-Bank-Platform-for-Strengthening-Informal-Seed-System-in-Ethiopia/en",
+        "source-ethiopia-csb-moa": "https://www.moa.gov.et/ethiopias-community-seed-bank-networkempowering-seed-authority/"
+      },
+      "limitations": [
+        "Nationales Saatgutrecht belegt nicht die demokratische Kontrolle der erst 2025 gestarteten Dachplattform.",
+        "Aktuelle Zahl und Mitgliedschaft lokaler Banken wurde nicht neu amtlich bescheinigt.",
+        "Die rechtlich selbstständigen lokalen Samenbanken dürfen nicht als einheitliches staatliches Eigentum dargestellt werden."
+      ],
+      "post_review_public_state": "stale",
+      "operational_activity_recatalogued": false
+    },
+    {
+      "project_id": "great-lakes-commons",
+      "basis_decision": "needs_information",
+      "classification": "undetermined",
+      "criteria": {
+        "shared_resource": {
+          "verdict": "supported",
+          "cited_source_ids": [
+            "great-lakes-why",
+            "glc-charter"
+          ]
+        },
+        "community": {
+          "verdict": "supported",
+          "cited_source_ids": [
+            "great-lakes-home",
+            "glc-charter"
+          ]
+        },
+        "commoning_practice": {
+          "verdict": "supported",
+          "cited_source_ids": [
+            "great-lakes-home",
+            "glc-charter"
+          ]
+        },
+        "rules_and_responsibility": {
+          "verdict": "partial",
+          "cited_source_ids": [
+            "glc-charter"
+          ]
+        },
+        "common_benefit": {
+          "verdict": "supported",
+          "cited_source_ids": [
+            "glc-charter"
+          ]
+        }
+      },
+      "provenance_urls": {
+        "glc-charter": "https://www.greatlakescommons.org/charter-declaration",
+        "great-lakes-home": "https://www.greatlakescommons.org/home-1",
+        "great-lakes-why": "https://www.greatlakescommons.org/why"
+      },
+      "limitations": [
+        "Die Charta verleiht dem Netzwerk keine tatsächliche Hoheit über Wassernutzungsrechte oder Staatsgrenzen.",
+        "Indigene Land-/Gewässerhoheit darf nicht einer fiktiven übergeordneten Commonsorganisation zugerechnet werden.",
+        "Aktuelle verbindliche Entscheidungs- und Konfliktinstitutionen sind noch zu belegen."
+      ],
+      "post_review_public_state": "stale",
+      "operational_activity_recatalogued": false
+    },
+    {
+      "project_id": "kibera-public-space-project",
+      "basis_decision": "include",
+      "classification": "commons-infrastructure",
+      "criteria": {
+        "shared_resource": {
+          "verdict": "supported",
+          "cited_source_ids": [
+            "kibera-kdi-official",
+            "kpsp01-community-management"
+          ]
+        },
+        "community": {
+          "verdict": "supported",
+          "cited_source_ids": [
+            "kibera-kdi-official",
+            "kpsp01-community-management"
+          ]
+        },
+        "commoning_practice": {
+          "verdict": "supported",
+          "cited_source_ids": [
+            "kibera-kdi-official"
+          ]
+        },
+        "rules_and_responsibility": {
+          "verdict": "supported",
+          "cited_source_ids": [
+            "kpsp01-community-management"
+          ]
+        },
+        "common_benefit": {
+          "verdict": "supported",
+          "cited_source_ids": [
+            "kibera-kdi-official"
+          ]
+        }
+      },
+      "provenance_urls": {
+        "kibera-kdi-official": "https://www.kounkuey.org/projects/kibera_public_space_project_network",
+        "kpsp01-community-management": "https://www.kounkuey.org/projects/kpsp01"
+      },
+      "limitations": [
+        "Gemeinschaftliche Verwaltung belegt nicht die durchgehend gleiche rechtliche Eigentümerschaft aller Flächen.",
+        "Jeder Projektstandort besitzt örtliche Strukturen und kann von Landkonflikten betroffen sein.",
+        "Aktuelle Nutzung, Baustand und Betreuung einzelner Standorte wurden nicht vor Ort geprüft."
+      ],
+      "post_review_public_state": "stale",
+      "operational_activity_recatalogued": false
+    }
+  ],
+  "does_not_establish": [
+    "independent_human_certification",
+    "current_operational_activity",
+    "signed_first_party_five_axis_review",
+    "merge_authorization",
+    "production_deployment"
+  ]
+}

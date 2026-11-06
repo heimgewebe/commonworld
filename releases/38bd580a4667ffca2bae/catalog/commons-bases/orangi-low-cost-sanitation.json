@@ -1,0 +1,57 @@
+{
+  "schema_version": 1,
+  "kind": "commonworld_commons_basis",
+  "project_id": "orangi-low-cost-sanitation",
+  "classification": "common",
+  "decision": "include",
+  "reviewed_at": "2026-08-13",
+  "reviewer": "Commonworld editorial review",
+  "criteria": {
+    "shared_resource": {
+      "status": "supported",
+      "statement": "Beteiligte Nachbarschaften teilen und erhalten Hausanschlüsse, Gassenkanäle und sekundäre Sanitärinfrastruktur als zusammenhängende lokale Grundversorgung.",
+      "source_ids": [
+        "opp-what-we-do",
+        "opp-rti"
+      ]
+    },
+    "community": {
+      "status": "supported",
+      "statement": "Haushalte organisieren sich gassenweise als lokale Einheit, sammeln Mittel und koordinieren Bau und Erhalt der gemeinsamen Infrastruktur.",
+      "source_ids": [
+        "opp-rti"
+      ]
+    },
+    "commoning_practice": {
+      "status": "supported",
+      "statement": "Bewohner finanzieren, graben, verlegen, bauen, verbinden, verwalten und erhalten die interne Sanitärinfrastruktur gemeinsam; OPP-RTI berät technisch.",
+      "source_ids": [
+        "opp-rti",
+        "opp-what-we-do"
+      ]
+    },
+    "rules_and_responsibility": {
+      "status": "supported",
+      "statement": "Das Modell trennt gemeinschaftliche Verantwortung für interne Haus-, Gassen- und Sekundärinfrastruktur von staatlicher Verantwortung für Hauptkanäle und Behandlung; die Gasse bildet eine klare Organisationseinheit.",
+      "source_ids": [
+        "opp-rti",
+        "opp-what-we-do"
+      ]
+    },
+    "common_benefit": {
+      "status": "supported",
+      "statement": "Die gemeinsam finanzierte und gepflegte Infrastruktur stellt lokale Sanitärgrundversorgung für die beteiligten Haushalte bereit und ist kein bloßer Verkaufskanal von OPP-RTI.",
+      "source_ids": [
+        "opp-rti",
+        "opp-home"
+      ]
+    }
+  },
+  "confidence": 0.92,
+  "limitations": [
+    "Die öffentliche Hauptkanalisation und Abwasserbehandlung liegen außerhalb des Commons und bleiben staatliche Verantwortung.",
+    "OPP-RTI unterstützt technisch und institutionell; aufgenommen wird die gemeinschaftlich getragene Infrastrukturpraxis, nicht die NGO als solche.",
+    "Physische Nutzung und Mitverantwortung sind an beteiligte Haushalte und Nachbarschaften gebunden."
+  ],
+  "notes": "Das Modell erfüllt die Commonworld-Kriterien durch reale kollektive Finanzierung, Bau-, Verwaltungs- und Pflegepraxis mit klarer Verantwortungsabgrenzung."
+}

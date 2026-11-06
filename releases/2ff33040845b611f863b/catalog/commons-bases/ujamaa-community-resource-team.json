@@ -1,0 +1,57 @@
+{
+  "schema_version": 1,
+  "kind": "commonworld_commons_basis",
+  "project_id": "ujamaa-community-resource-team",
+  "classification": "undetermined",
+  "decision": "needs_information",
+  "reviewed_at": "2026-10-31",
+  "reviewer": "Commonworld editorial desk review",
+  "criteria": {
+    "shared_resource": {
+      "status": "supported",
+      "statement": "Gemeinschaftliche Land- und Weiderechte, lokale Wissensbestände und natürliche Ressourcen werden durch UCRT bei der kollektiven Sicherung unterstützt.",
+      "source_ids": [
+        "ujamaa-work",
+        "ujamaa-programmes"
+      ]
+    },
+    "community": {
+      "status": "supported",
+      "statement": "Lokale indigene und pastoralistische Gemeinschaften und ihre gewählten sowie traditionellen Vertreter tragen die von UCRT unterstützten Landverwaltungsprozesse.",
+      "source_ids": [
+        "ujamaa-programmes",
+        "ujamaa-work"
+      ]
+    },
+    "commoning_practice": {
+      "status": "supported",
+      "statement": "UCRT begleitet kollektive Landtitel, Gemeindepläne, Konfliktvermittlung und gemeinsame Ressourcen- beziehungsweise Weidemanagementpraxis.",
+      "source_ids": [
+        "ujamaa-programmes",
+        "ujamaa-work"
+      ]
+    },
+    "rules_and_responsibility": {
+      "status": "partial",
+      "statement": "UCRT verweist auf kollektive Landtitel, Satzungen und lokale Führung; konkrete derzeitige Eigentums- und Entscheidungsrechte liegen bei vielen verschiedenen Dorfgemeinschaften und sind nicht projektübergreifend zu bestätigen.",
+      "source_ids": [
+        "ujamaa-programmes"
+      ]
+    },
+    "common_benefit": {
+      "status": "supported",
+      "statement": "Gesicherte gemeinschaftliche Landrechte und Mitsprache sollen lokale Lebensgrundlagen, Selbstverwaltung und ökologische Schutzpraxis stärken.",
+      "source_ids": [
+        "ujamaa-work",
+        "ujamaa-programmes"
+      ]
+    }
+  },
+  "confidence": 0.89,
+  "limitations": [
+    "UCRT ist ein unterstützender Verein und nicht identisch mit den Landrechtsinhabern der begleiteten Gemeinschaften.",
+    "Satzungen, Quoren und landrechtliche Titel müssen pro lokaler Gemeinschaft gesondert geprüft werden.",
+    "Die Angaben über den Projektumfang sind Selbstauskünfte und keine neue unabhängige Landregisterbescheinigung."
+  ],
+  "notes": "Kollektives Land-Commoning vieler Gemeinschaften plausibel, aber Träger-/Mitglieds- und Eigentumsgrenzen nicht in eine falsche Gesamtgemeinschaft zusammenziehen."
+}

@@ -1,0 +1,62 @@
+{
+  "schema_version": 1,
+  "kind": "commonworld_commons_basis",
+  "project_id": "park-slope-food-coop",
+  "classification": "common",
+  "decision": "include",
+  "reviewed_at": "2026-08-04",
+  "reviewer": "Commonworld editorial review",
+  "criteria": {
+    "shared_resource": {
+      "status": "supported",
+      "statement": "Laden, Warenbestand, Betriebsorganisation, Mitgliedskapital und soziale Infrastruktur bilden einen von Mitgliedern getragenen Lebensmittelbetrieb.",
+      "source_ids": [
+        "park-slope-membership",
+        "park-slope-manual",
+        "park-slope-bylaws"
+      ]
+    },
+    "community": {
+      "status": "supported",
+      "statement": "Die Genossenschaft besteht aus rund 17.000 Mitgliedseigentümern; Mitgliedschaft ist offen und verbindet Eigentum, Nutzung, Arbeit und Beteiligungsrechte.",
+      "source_ids": [
+        "park-slope-membership",
+        "park-slope-manual",
+        "park-slope-bylaws"
+      ]
+    },
+    "commoning_practice": {
+      "status": "supported",
+      "statement": "Mitglieder betreiben durch wiederkehrende Pflichtschichten Kasse, Warenannahme, Regale, Büro, Reinigung, Lebensmittelverarbeitung und weitere Ausschüsse.",
+      "source_ids": [
+        "park-slope-membership",
+        "park-slope-manual"
+      ]
+    },
+    "rules_and_responsibility": {
+      "status": "supported",
+      "statement": "Satzung, Membership Manual, Beitrittsvereinbarungen, Arbeitszyklen, General Meeting, Vorstand und Sanktionswege regeln Eigentum, Arbeit, Entscheidungen und Konflikte.",
+      "source_ids": [
+        "park-slope-manual",
+        "park-slope-bylaws",
+        "park-slope-agreements"
+      ]
+    },
+    "common_benefit": {
+      "status": "supported",
+      "statement": "Der Betrieb dient den Mitgliedseigentümern mit gemeinsam erbrachter Arbeit, gemeinsamer Infrastruktur und günstigeren Lebensmitteln; Überschüsse und Kapital unterliegen Genossenschaftsregeln.",
+      "source_ids": [
+        "park-slope-membership",
+        "park-slope-manual",
+        "park-slope-bylaws"
+      ]
+    }
+  },
+  "confidence": 0.94,
+  "limitations": [
+    "Der Lebensmitteleinzelhandel bleibt markt- und lieferkettenabhängig; Commonworld bewertet die mitgliedereigene Betriebs- und Arbeitsordnung, nicht jeden Warenfluss als Common.",
+    "Der Vorstand besitzt gesetzliche Leitungsbefugnisse, während die Generalversammlung beratende und satzungsmäßige Rollen wahrnimmt; formale Macht ist daher nicht vollständig horizontal verteilt.",
+    "Einkauf ist Mitgliedern vorbehalten und die Pflichtarbeit erzeugt eine reale Zugangs- und Zeitbelastung trotz offener Beitrittsregel."
+  ],
+  "notes": "Die Aufnahme gilt dem konkreten mitgliedereigenen Betrieb in Brooklyn. Andere Lebensmittelgenossenschaften benötigen eine eigene Begründungs- und Quellenakte."
+}

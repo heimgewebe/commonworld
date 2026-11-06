@@ -43,13 +43,14 @@
   },
   "activity": {
     "status": "active",
-    "observed_at": "2026-07-28",
+    "observed_at": "2026-11-03",
     "source_ids": [
       "ttn-home",
       "ttn-community",
-      "ttn-get-started"
+      "ttn-get-started",
+      "ttn-forum-latest"
     ],
-    "note": "Die offiziellen Seiten führen aktive lokale Communities, einen öffentlichen Einstieg in das Netz sowie laufende Lern- und Austauschangebote."
+    "note": "Die aktuelle offizielle Community-Übersicht und der öffentliche Einstieg dokumentieren ein gemeinschaftlich getragenes Netz; im offiziellen Forum erscheinen Diskussionen bis 02.11.2026. Die Gateway-Liveanzeige war bei der Prüfung nicht verfügbar, und die Website macht keine Hochverfügbarkeitszusage für das Community-Netz."
   },
   "provenance": {
     "sources": [
@@ -58,7 +59,7 @@
         "type": "official-source",
         "label": "The Things Network – offizielle Seite",
         "url": "https://www.thethingsnetwork.org/",
-        "retrieved_at": "2026-07-28",
+        "retrieved_at": "2026-11-03",
         "note": "Offizielle Selbstbeschreibung des offenen Community-Ökosystems rund um The Things Stack und LoRaWAN."
       },
       {
@@ -66,7 +67,7 @@
         "type": "official-source",
         "label": "The Things Network – Communities",
         "url": "https://www.thethingsnetwork.org/community",
-        "retrieved_at": "2026-07-28",
+        "retrieved_at": "2026-11-03",
         "note": "Offizielle Übersicht lokaler Communities sowie Einstieg zum Gründen einer neuen Community."
       },
       {
@@ -82,8 +83,16 @@
         "type": "official-source",
         "label": "The Things Network – Get started",
         "url": "https://www.thethingsnetwork.org/get-started",
-        "retrieved_at": "2026-07-28",
+        "retrieved_at": "2026-11-03",
         "note": "Offizieller Einstieg in das öffentliche Community-Netz und in selbst betriebene LoRaWAN-Infrastruktur."
+      },
+      {
+        "id": "ttn-forum-latest",
+        "type": "official-source",
+        "label": "The Things Network – aktuelle Community-Diskussionen",
+        "url": "https://www.thethingsnetwork.org/forum/latest",
+        "retrieved_at": "2026-11-03",
+        "note": "Offizielles Community-Forum mit datierten Diskussionen am 02.11.2026; belegt laufenden Austausch, nicht eine garantierte oder flächendeckende Funknetz-Verfügbarkeit."
       }
     ]
   },
@@ -91,9 +100,9 @@
     "state": "listed",
     "catalogued_at": "2026-07-28",
     "reviewed_by": "Commonworld editorial review",
-    "reviewed_at": "2026-07-31",
-    "next_review_at": "2026-10-31",
-    "notes": "Aufgenommen als digitale Commons-Infrastruktur. Kommerzielle Angebote von The Things Industries werden nicht mit dem Community-Netz gleichgesetzt; katalogisiert ist der offene Community-Pfad. Der strukturierte Commons-Basisnachweis wurde am 31. Juli 2026 rückwirkend ergänzt."
+    "reviewed_at": "2026-11-03",
+    "next_review_at": "2027-02-03",
+    "notes": "Aufgenommen als digitale Commons-Infrastruktur. Kommerzielle Angebote von The Things Industries werden nicht mit dem Community-Netz gleichgesetzt; katalogisiert ist der offene Community-Pfad. Der strukturierte Commons-Basisnachweis wurde am 31. Juli 2026 rückwirkend ergänzt. Am 03.11.2026 offizielle Hauptseite, Community-Übersicht, Einstieg und datierte Forumaktivität erneut geprüft. Gateway-Liveverfügbarkeit ausdrücklich nicht bestätigt; keine SLA-Annahme."
   },
   "links": [
     {

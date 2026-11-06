@@ -1,0 +1,56 @@
+{
+  "schema_version": 1,
+  "kind": "commonworld_commons_basis",
+  "project_id": "cltb-le-nid",
+  "classification": "commons-infrastructure",
+  "decision": "include",
+  "reviewed_at": "2026-10-31",
+  "reviewer": "Commonworld editorial desk review",
+  "criteria": {
+    "shared_resource": {
+      "status": "supported",
+      "statement": "CLTB bindet Grund und Wohnnutzung in Le Nid dauerhaft an erschwinglichen Wohnraum und Gemeinschaftsflächen.",
+      "source_ids": [
+        "cltb-le-nid-official",
+        "cltb-governance"
+      ]
+    },
+    "community": {
+      "status": "supported",
+      "statement": "Bewohner und Nachbarschaftsmitglieder sind über den Community Land Trust an Mitwirkung und Vertreterwahl beteiligt.",
+      "source_ids": [
+        "cltb-governance"
+      ]
+    },
+    "commoning_practice": {
+      "status": "supported",
+      "statement": "Die Nutzer pflegen gemeinschaftliche Wohn- und Garteninfrastruktur, während CLTB dauerhafte Bodenbindung organisiert.",
+      "source_ids": [
+        "cltb-le-nid-official",
+        "cltb-governance"
+      ]
+    },
+    "rules_and_responsibility": {
+      "status": "supported",
+      "statement": "CLTB beschreibt eine Stiftung als Bodenrechtsträger, eine verwaltende NPO und gewählte Bewohner-, Zivil- und Behördenvertreter.",
+      "source_ids": [
+        "cltb-governance"
+      ]
+    },
+    "common_benefit": {
+      "status": "supported",
+      "statement": "Das getrennte Grundeigentum verhindert spekulative Bodenwertabschöpfung und erhält Zugang zu begrenzt teurem Wohnen.",
+      "source_ids": [
+        "cltb-governance",
+        "cltb-le-nid-official"
+      ]
+    }
+  },
+  "confidence": 0.94,
+  "limitations": [
+    "Bodenstiftung, Wohnungsberechtigte und NPO besitzen unterschiedliche, nicht austauschbare Rechte.",
+    "Die Zugangsvoraussetzungen schließen unbegrenzte freie Wohnnutzung aus.",
+    "Ein aktueller Nachweis jeder Bewohner- oder Wohnungsvergabeentscheidung liegt nicht vor."
+  ],
+  "notes": "Dauerhafte Landbindung mit konkret belegter dreiseitiger CLTB-Mitglieder-Governance."
+}

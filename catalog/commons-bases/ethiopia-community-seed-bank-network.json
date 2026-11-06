@@ -1,0 +1,56 @@
+{
+  "schema_version": 1,
+  "kind": "commonworld_commons_basis",
+  "project_id": "ethiopia-community-seed-bank-network",
+  "classification": "undetermined",
+  "decision": "needs_information",
+  "reviewed_at": "2026-10-31",
+  "reviewer": "Commonworld editorial desk review",
+  "criteria": {
+    "shared_resource": {
+      "status": "supported",
+      "statement": "Lokale Saatgutbanken bewahren bäuerliche Sorten, Saatgutvorräte und Wissen gemeinschaftlich und tauschen es über eine nationale Plattform aus.",
+      "source_ids": [
+        "source-ethiopia-csb-moa",
+        "source-ethiopia-csb-fao"
+      ]
+    },
+    "community": {
+      "status": "supported",
+      "statement": "Farmer-Mitglieder der Community Seed Banks sowie ihre lokalen Gruppen sind die Nutzerbasis der neu gestarteten Vernetzung.",
+      "source_ids": [
+        "source-ethiopia-csb-fao"
+      ]
+    },
+    "commoning_practice": {
+      "status": "supported",
+      "statement": "Teilnehmer erhalten und vermehren Saatgut, tauschen Sortenwissen und stimmen sich mit Forschungs- und Gemeindestrukturen ab.",
+      "source_ids": [
+        "source-ethiopia-csb-moa",
+        "source-ethiopia-csb-fao"
+      ]
+    },
+    "rules_and_responsibility": {
+      "status": "partial",
+      "statement": "Gesetzlich geschützte Saatgut- und Wissensrechte sowie Bylaw-Beratungen sind dokumentiert; die im Dezember 2025 gestartete Dachplattform besitzt noch keinen hier nachgewiesenen Wahl- oder Vetorahmen.",
+      "source_ids": [
+        "ethiopia-ebc-community-rights",
+        "source-ethiopia-csb-moa"
+      ]
+    },
+    "common_benefit": {
+      "status": "supported",
+      "statement": "Erhaltung vielfältiger Sorten und gemeinschaftlicher Saatguttausch können Bauernrechte und Ernährungssicherheit stärken.",
+      "source_ids": [
+        "source-ethiopia-csb-fao"
+      ]
+    }
+  },
+  "confidence": 0.89,
+  "limitations": [
+    "Nationales Saatgutrecht belegt nicht die demokratische Kontrolle der erst 2025 gestarteten Dachplattform.",
+    "Aktuelle Zahl und Mitgliedschaft lokaler Banken wurde nicht neu amtlich bescheinigt.",
+    "Die rechtlich selbstständigen lokalen Samenbanken dürfen nicht als einheitliches staatliches Eigentum dargestellt werden."
+  ],
+  "notes": "Lokale Saatgut-Allmende belegt; verbindliche nationale Netzwerk-Governance noch ungeklärt."
+}

@@ -54,7 +54,7 @@
         "type": "official-source",
         "label": "Open Food Facts – Dokumentation",
         "url": "https://openfoodfacts.github.io/documentation/docs/",
-        "retrieved_at": "2026-08-04",
+        "retrieved_at": "2026-11-06",
         "note": "Offizielle Dokumentation zu Daten, APIs, Diensten, Infrastruktur und Softwarebeiträgen."
       },
       {
@@ -88,9 +88,9 @@
     "state": "listed",
     "catalogued_at": "2026-08-04",
     "reviewed_by": "Commonworld editorial review",
-    "reviewed_at": "2026-08-04",
-    "next_review_at": "2026-11-04",
-    "notes": "Als digitale Commons-Infrastruktur aufgenommen. Bewertet werden Datenbestand, offene Lizenz, Beteiligung und Pflege; einzelne Apps oder Herstellerportale sind keine eigenen Commons."
+    "reviewed_at": "2026-11-06",
+    "next_review_at": "2027-02-06",
+    "notes": "Als digitale Commons-Infrastruktur aufgenommen. Bewertet werden Datenbestand, offene Lizenz, Beteiligung und Pflege; einzelne Apps oder Herstellerportale sind keine eigenen Commons. Quellenrecheck 06.11.2026; Primärbelege und Grenzen: docs/evidence/commons-basis-source-recheck-2026-11-06.json. Kein neuer Live-Betriebsnachweis."
   },
   "links": [
     {

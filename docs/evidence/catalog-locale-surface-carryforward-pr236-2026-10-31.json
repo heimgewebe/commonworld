@@ -1,0 +1,165 @@
+{
+  "schema_version": 1,
+  "kind": "commonworld_catalog_locale_technical_carryforward_pr236",
+  "source_head": "e1817ad2c4a97a9c02a7160a04d45cc1cd446135",
+  "merged_base_head": "214314b020081603a283e3d094f448d4c5fb68b1",
+  "target_release": "726a0554c007a6099938",
+  "locales": [
+    {
+      "locale": "es",
+      "surfaces": [
+        {
+          "surface": "index",
+          "path": "es.html",
+          "sha256": "d15c82a0cf3fce0f85aa933936c09e08cd336c5dea17622600a352fbd62df3c9",
+          "technical_line_changes": 2
+        },
+        {
+          "surface": "method",
+          "path": "method.es.html",
+          "sha256": "e45a9f990a470642335e60a6e05f099ef610e2962f4e597eb4123dc4a987a9a5",
+          "technical_line_changes": 2
+        },
+        {
+          "surface": "proposal",
+          "path": "propose.es.html",
+          "sha256": "a4be8bc6eb9fb1ad7655de93dc91ed8986e11db23670f87160336bbbaa21bd3a",
+          "technical_line_changes": 2
+        }
+      ],
+      "historical_language_reviews_byte_identical": true,
+      "new_human_review": false
+    },
+    {
+      "locale": "fr",
+      "surfaces": [
+        {
+          "surface": "index",
+          "path": "fr.html",
+          "sha256": "f4b6d2793bc69d6c2e185e55fa47e978e82e7b5b82e6bfa375af4216b91e57ea",
+          "technical_line_changes": 2
+        },
+        {
+          "surface": "method",
+          "path": "method.fr.html",
+          "sha256": "7680c5b9ebd1bb0a69d0c971c1f5a0817c05e81927c6292ff2c38217fc2b3537",
+          "technical_line_changes": 2
+        },
+        {
+          "surface": "proposal",
+          "path": "propose.fr.html",
+          "sha256": "8eafa8004866c74e62113ef4dce90514cb4d3d32bfb232ef4c4e6f4e82161a79",
+          "technical_line_changes": 2
+        }
+      ],
+      "historical_language_reviews_byte_identical": true,
+      "new_human_review": false
+    },
+    {
+      "locale": "pt-BR",
+      "surfaces": [
+        {
+          "surface": "index",
+          "path": "pt-BR.html",
+          "sha256": "78fd9c74374cba0b5055f063aac8579e59e5d7f37a693817293cdc23b3aa820f",
+          "technical_line_changes": 2
+        },
+        {
+          "surface": "method",
+          "path": "method.pt-BR.html",
+          "sha256": "3ccb8b4d170f58cd985c95b59503ad5ab9019f49b184c257fed18352f417524d",
+          "technical_line_changes": 2
+        },
+        {
+          "surface": "proposal",
+          "path": "propose.pt-BR.html",
+          "sha256": "88dc578769f54c12064fd5b2a3afd2bd214b8728c34e890c8ce64260a95ebda7",
+          "technical_line_changes": 2
+        }
+      ],
+      "historical_language_reviews_byte_identical": true,
+      "new_human_review": false
+    },
+    {
+      "locale": "ar",
+      "surfaces": [
+        {
+          "surface": "index",
+          "path": "ar.html",
+          "sha256": "71966cc3b9b843ba76c023d81f2b8a3dd8f6c2bf84d4a2b203a648996152685b",
+          "technical_line_changes": 2
+        },
+        {
+          "surface": "method",
+          "path": "method.ar.html",
+          "sha256": "928c5809bc1d494a0aee119382f11377fb22b131dc04aabc13edee5271dd5316",
+          "technical_line_changes": 2
+        },
+        {
+          "surface": "proposal",
+          "path": "propose.ar.html",
+          "sha256": "83114ea530531ce07e84f0891972c86ca8c3104705c70e48e7fe6924094e06eb",
+          "technical_line_changes": 2
+        }
+      ],
+      "historical_language_reviews_byte_identical": true,
+      "new_human_review": false
+    },
+    {
+      "locale": "zh-Hans",
+      "surfaces": [
+        {
+          "surface": "index",
+          "path": "zh-Hans.html",
+          "sha256": "1e91c9ee3ee2779d7ee99371e115a35dd97654fe79babea8c9ac6a60d6bd7cdd",
+          "technical_line_changes": 2
+        },
+        {
+          "surface": "method",
+          "path": "method.zh-Hans.html",
+          "sha256": "00c0d4241da92b2ba1ff5a6bd0ca783b6438f41aa4879abf505968268ed43408",
+          "technical_line_changes": 2
+        },
+        {
+          "surface": "proposal",
+          "path": "propose.zh-Hans.html",
+          "sha256": "7ed3c831bdc0c0b8a2ce534ecb969609d791473a7cff46a750dec134a9b21799",
+          "technical_line_changes": 2
+        }
+      ],
+      "historical_language_reviews_byte_identical": true,
+      "new_human_review": false
+    },
+    {
+      "locale": "hi",
+      "surfaces": [
+        {
+          "surface": "index",
+          "path": "hi.html",
+          "sha256": "257ec9e963c2e5253b770b10d126e4b10a736f40c1c1d42a988f8e3d8366d914",
+          "technical_line_changes": 2
+        },
+        {
+          "surface": "method",
+          "path": "method.hi.html",
+          "sha256": "9ca37dcd2ab9cfa9d44613424d5fd74eda477b43892c9fdbd173b6635bb0ab3b",
+          "technical_line_changes": 2
+        },
+        {
+          "surface": "proposal",
+          "path": "propose.hi.html",
+          "sha256": "516922769e583d978486bed5e438d3bb99557d78a17c448cf6e857d312dbae94",
+          "technical_line_changes": 2
+        }
+      ],
+      "historical_language_reviews_byte_identical": true,
+      "new_human_review": false
+    }
+  ],
+  "no_new_human_signatures": true,
+  "does_not_establish": [
+    "signed_first_party_five_axis_review",
+    "merge_authorization",
+    "production_readback"
+  ]
+}

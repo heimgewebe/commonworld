@@ -84,6 +84,22 @@
         "url": "https://auroville.org/page/visiting-auroville",
         "retrieved_at": "2026-07-26",
         "note": "Offizielle Hinweise für Besuche; Auroville wird ausdrücklich als lebendes Experiment und nicht als gewöhnliches Touristenziel beschrieben."
+      },
+      {
+        "id": "auroville-residents-assembly",
+        "type": "official-source",
+        "label": "Auroville – Residents Assembly",
+        "url": "https://auroville.org/page/the-residents-assembly-of-auroville",
+        "retrieved_at": "2026-10-30",
+        "note": "Offizielle Beschreibung der registrierten Bewohnervertretung und ihrer gesetzlichen Zuständigkeiten."
+      },
+      {
+        "id": "auroville-governing-board",
+        "type": "official-source",
+        "label": "Auroville – Governing Board",
+        "url": "https://www.auroville.org/page/governing-board",
+        "retrieved_at": "2026-10-30",
+        "note": "Governing Board als gesetzlich von der indischen Regierung bestelltes Leitungsorgan."
       }
     ],
     "uncertainty_note": "Die Charter formuliert Auroville als der Menschheit zugehörig; die rechtlich belastbare Eigentums- und Organisationsform ist die Auroville Foundation. Der Datensatz trennt diese Vision von der geltenden Rechtsstruktur."
@@ -92,9 +108,9 @@
     "state": "stale",
     "catalogued_at": "2026-07-26",
     "reviewed_by": "Commonworld editorial review",
-    "reviewed_at": "2026-07-26",
-    "next_review_at": "2026-09-26",
-    "notes": "Aufgenommen als langfristiges Gemeinschafts- und Landexperiment. Wegen komplexer Governance und rechtlicher Trägerschaft erfolgt eine verkürzte Nachprüfung; der Kartenpunkt ist kein Eigentums- oder Siedlungsplan."
+    "reviewed_at": "2026-10-30",
+    "next_review_at": "2026-10-31",
+    "notes": "Fünfkriterien-Desk-Review 30.10.2026: staatliches Board und Residents Assembly getrennt. Verantwortungsrechte ungeklärt, weiterhin stale."
   },
   "links": [
     {

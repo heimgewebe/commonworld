@@ -1,0 +1,56 @@
+{
+  "schema_version": 1,
+  "kind": "commonworld_commons_basis",
+  "project_id": "librivox",
+  "classification": "common",
+  "decision": "include",
+  "reviewed_at": "2026-10-31",
+  "reviewer": "Commonworld editorial desk review",
+  "criteria": {
+    "shared_resource": {
+      "status": "supported",
+      "statement": "Von Freiwilligen eingesprochene gemeinfreie Hörbücher bilden ein dauerhaft frei kopier- und nachnutzbares Audio-Wissensgut.",
+      "source_ids": [
+        "librivox-about",
+        "librivox-volunteer"
+      ]
+    },
+    "community": {
+      "status": "supported",
+      "statement": "Eine offene internationale Freiwilligengemeinschaft aus Vorlesern, Koordinatoren, Korrekturhörern und Metadatenpflegern erstellt die Aufnahmen.",
+      "source_ids": [
+        "librivox-about",
+        "librivox-volunteer"
+      ]
+    },
+    "commoning_practice": {
+      "status": "supported",
+      "statement": "Mitglieder wählen gemeinfreie Bücher, teilen Kapitelaufnahmen auf, hören Korrektur, koordinieren Projekte und stellen abgeschlossene Hörbücher kostenlos bereit.",
+      "source_ids": [
+        "librivox-volunteer"
+      ]
+    },
+    "rules_and_responsibility": {
+      "status": "supported",
+      "statement": "Die öffentliche Freiwilligenanleitung beschreibt Rollen für Book Coordinators, Prooflisteners, Meta Coordinators und Moderatoren sowie Bearbeitungs- und Veröffentlichungsphasen.",
+      "source_ids": [
+        "librivox-volunteer"
+      ]
+    },
+    "common_benefit": {
+      "status": "supported",
+      "statement": "Hörbücher werden ohne Bezahlzugang und als gemeinfreie Tonaufnahmen für allgemeine Nutzung freigegeben.",
+      "source_ids": [
+        "librivox-about",
+        "librivox-volunteer"
+      ]
+    }
+  },
+  "confidence": 0.93,
+  "limitations": [
+    "Die zugrunde liegende Textvorlage muss nach dem jeweils geltenden Recht gemeinfrei sein; US-Regeln gelten nicht automatisch weltweit.",
+    "Offene Mitarbeit ist keine Zusage auf Veröffentlichung jeder eingesandten Tonaufnahme.",
+    "Die Freiwilligenrollen begründen keine kollektive Eigentümerschaft an einer zentralen Organisation."
+  ],
+  "notes": "Gemeinschaftlich erstelltes Audio-Allmendegut mit öffentlichem Produktions- und Qualitätsverfahren."
+}

@@ -1,0 +1,53 @@
+{
+  "schema_version": 1,
+  "kind": "commonworld_commons_basis",
+  "project_id": "aflaj-irrigation-systems-oman",
+  "classification": "common",
+  "decision": "include",
+  "reviewed_at": "2026-10-31",
+  "reviewer": "Commonworld editorial desk review",
+  "criteria": {
+    "shared_resource": {
+      "status": "supported",
+      "statement": "Bewässerungswasser und die historisch angelegten Kanäle werden von definierten lokalen Nutzergruppen nach gemeinschaftlichen Zeitanteilen eingesetzt.",
+      "source_ids": [
+        "source-aflaj-unesco"
+      ]
+    },
+    "community": {
+      "status": "supported",
+      "statement": "Die Bauern der einzelnen Falaj-Systeme bilden eigenständige Wasser- und Instandhaltungsgemeinschaften.",
+      "source_ids": [
+        "source-aflaj-unesco"
+      ]
+    },
+    "commoning_practice": {
+      "status": "supported",
+      "statement": "Beteiligte pflegen Kanäle, teilen das Wasser nach Zeitrechten auf und organisieren lokale Instandhaltung.",
+      "source_ids": [
+        "source-aflaj-unesco"
+      ]
+    },
+    "rules_and_responsibility": {
+      "status": "supported",
+      "statement": "Tradierte Wasserzeitanteile und lokale Zuständigkeiten für Kanäle, Verteilung und Bewässerung legen verbindliche Nutzungsregeln fest.",
+      "source_ids": [
+        "source-aflaj-unesco"
+      ]
+    },
+    "common_benefit": {
+      "status": "supported",
+      "statement": "Die koordinierte Wassernutzung erhält Feldbewässerung, Oasen und generationsübergreifende Lebensgrundlagen.",
+      "source_ids": [
+        "source-aflaj-unesco"
+      ]
+    }
+  },
+  "confidence": 0.91,
+  "limitations": [
+    "UNESCO dokumentiert fünf exemplarische Welterbe-Systeme, nicht alle aktuellen Aflaj oder Wasserrechte in Oman.",
+    "Wasserzeitanteile sind an lokale Nutzungsrechte gebunden; kein freier Zugang für beliebige Personen.",
+    "Aktuelle Wasserführung und technische Funktionsfähigkeit einzelner Kanäle wurden nicht neu geprüft."
+  ],
+  "notes": "Lokal geregelte historische Wasser-Commons, nicht eine landesweit einheitliche Eigentümergenossenschaft."
+}

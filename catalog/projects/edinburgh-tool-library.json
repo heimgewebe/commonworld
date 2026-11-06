@@ -86,6 +86,14 @@
         "url": "https://edinburghtoollibrary.org.uk/about/find-us/",
         "retrieved_at": "2026-07-16",
         "note": "Offizielle Liste der öffentlich angebotenen Standorte und Öffnungszeiten."
+      },
+      {
+        "id": "etl-membership",
+        "type": "official-source",
+        "label": "Etl Membership",
+        "url": "https://edinburghtoollibrary.org.uk/membership/",
+        "retrieved_at": "2026-10-31",
+        "note": "Offizielle Mitgliedschaftsbedingungen, Ausleihrecht, Altersgrenzen, Werkstattzugang und persönliche Aktivierung."
       }
     ]
   },
@@ -93,9 +101,9 @@
     "state": "stale",
     "catalogued_at": "2026-07-16",
     "reviewed_by": "Commonworld editorial review",
-    "reviewed_at": "2026-07-16",
-    "next_review_at": "2026-10-16",
-    "notes": "Nur öffentlich beworbene Hubs werden angenähert dargestellt; Ausleihe erfolgt nach den veröffentlichten Mitgliedschaftsregeln."
+    "reviewed_at": "2026-10-31",
+    "next_review_at": "2026-11-15",
+    "notes": "Nur öffentlich beworbene Hubs werden angenähert dargestellt; Ausleihe erfolgt nach den veröffentlichten Mitgliedschaftsregeln. Fünfkriterien-Desk-Review vom 31.10.2026: Gemeinschaftsgetragene Werkzeug- und Lerninfrastruktur mit konkreten Mitgliedschafts-, Nutzungs- und Haftungsgrenzen. Aktivität nicht neu zertifiziert, state bleibt stale."
   },
   "links": [
     {
