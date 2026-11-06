@@ -1,0 +1,43 @@
+{
+  "schema_version": 1,
+  "kind": "commonworld_commons_basis",
+  "project_id": "berkshares",
+  "classification": "common",
+  "decision": "include",
+  "reviewed_at": "2026-08-14",
+  "reviewer": "Commonworld editorial review",
+  "criteria": {
+    "shared_resource": {
+      "status": "supported",
+      "statement": "BerkShares stellt eine regional gebundene lokale Währung als gemeinsam nutzbare wirtschaftliche Infrastruktur bereit, die zwischen teilnehmenden lokalen Banken, Unternehmen und Nutzenden zirkuliert.",
+      "source_ids": ["berkshares-about", "berkshares-using"]
+    },
+    "community": {
+      "status": "supported",
+      "statement": "Die Berkshire-Region bildet den sozialen und wirtschaftlichen Bezugsraum; zusätzlich besteht eine formale Mitgliedschaft, über die Einwohner an der Governance der tragenden Organisation mitwirken können.",
+      "source_ids": ["berkshares-about", "berkshares-membership", "berkshares-annual-meeting-2026"]
+    },
+    "commoning_practice": {
+      "status": "supported",
+      "statement": "Nutzende, lokale Unternehmen, Banken, Mitgliedschaft und Nonprofit-Träger erhalten die Währung durch lokale Zirkulation, organisatorische Mitarbeit und wiederkehrende gemeinschaftliche Governance am Leben.",
+      "source_ids": ["berkshares-using", "berkshares-about", "berkshares-annual-meeting-2026"]
+    },
+    "rules_and_responsibility": {
+      "status": "supported",
+      "statement": "Die General Membership wählt den Vorstand, stimmt über zentrale Organisationsänderungen ab und kann über Mitgliederversammlungen sowie Kandidaturen Verantwortung übernehmen; Nutzung und Umtausch folgen den veröffentlichten regionalen Währungsregeln.",
+      "source_ids": ["berkshares-about", "berkshares-annual-meeting-2026", "berkshares-membership", "berkshares-using"]
+    },
+    "common_benefit": {
+      "status": "supported",
+      "statement": "Die lokale Währung ist darauf ausgerichtet, wirtschaftliche Aktivität und Beziehungen in der Berkshire-Region zu halten und lokale Unternehmen und Gemeinschaften zu stärken, statt lediglich ein alternatives Zahlungsmittel ohne gemeinsamen Zweck bereitzustellen.",
+      "source_ids": ["berkshares-about", "berkshares-using"]
+    }
+  },
+  "confidence": 0.92,
+  "limitations": [
+    "BerkShares ist eine regional begrenzte Währung und kein allgemeines Zahlungsmittel; Nutzbarkeit hängt von teilnehmenden Banken und Unternehmen ab.",
+    "Governance-Rechte setzen eine Mitgliedschaft voraus, während die Währung selbst auch von Nichtmitgliedern genutzt werden kann.",
+    "Commonworld behandelt weder einzelne Transaktionen noch aktuelle Umlauf-, Umsatz- oder Teilnehmerzahlen als dauerhafte Katalogwahrheit."
+  ],
+  "notes": "Aufgenommen als Community-Finance-Common wegen gemeinsamer lokaler Ressource, belegter Mitglieder-Governance, Nutzungsregeln und regionalem Gemeinwohlzweck; ein alternatives Zahlungsmittel allein würde die Commons-Kriterien nicht erfüllen."
+}

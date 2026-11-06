@@ -62,7 +62,7 @@
         "type": "official-source",
         "label": "Common Voice Community Playbook",
         "url": "https://github.com/common-voice/community-playbook",
-        "retrieved_at": "2026-08-04",
+        "retrieved_at": "2026-11-06",
         "note": "Offizielles Handbuch zu Sprachgemeinschaften, Rollen, Beteiligungsregeln und Projektsteuerung."
       },
       {
@@ -70,7 +70,7 @@
         "type": "official-source",
         "label": "Common Voice – offizielles Repository",
         "url": "https://github.com/common-voice/common-voice",
-        "retrieved_at": "2026-08-04",
+        "retrieved_at": "2026-11-06",
         "note": "Öffentliche Softwareentwicklung, Beitragswege, Sprach-Workflows, MPL-2.0 und Hinweise zu CC0-Inhalten."
       },
       {
@@ -88,9 +88,9 @@
     "state": "listed",
     "catalogued_at": "2026-08-04",
     "reviewed_by": "Commonworld editorial review",
-    "reviewed_at": "2026-08-04",
-    "next_review_at": "2026-11-04",
-    "notes": "Als digitale Commons-Infrastruktur aufgenommen. Katalogisiert sind die offenen Datensätze, Beteiligungsprozesse und Werkzeuge; Mozilla wird nicht mit vollständiger gemeinschaftlicher Kontrolle gleichgesetzt."
+    "reviewed_at": "2026-11-06",
+    "next_review_at": "2027-02-06",
+    "notes": "Als digitale Commons-Infrastruktur aufgenommen. Katalogisiert sind die offenen Datensätze, Beteiligungsprozesse und Werkzeuge; Mozilla wird nicht mit vollständiger gemeinschaftlicher Kontrolle gleichgesetzt. Quellenrecheck 06.11.2026; Primärbelege und Grenzen: docs/evidence/commons-basis-source-recheck-2026-11-06.json. Kein neuer Live-Betriebsnachweis."
   },
   "links": [
     {

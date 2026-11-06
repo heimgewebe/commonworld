@@ -4,7 +4,7 @@
   "project_id": "meshtastic",
   "classification": "commons-infrastructure",
   "decision": "include",
-  "reviewed_at": "2026-07-31",
+  "reviewed_at": "2026-11-03",
   "reviewer": "Commonworld editorial review",
   "criteria": {
     "shared_resource": {
@@ -28,7 +28,8 @@
       "source_ids": [
         "meshtastic-introduction",
         "meshtastic-getting-started",
-        "meshtastic-firmware"
+        "meshtastic-firmware",
+        "meshtastic-firmware-releases"
       ]
     },
     "rules_and_responsibility": {
@@ -54,5 +55,5 @@
     "Meshtastic Solutions ist ein separates kommerzielles Unternehmen; Commonworld setzt dessen Angebote nicht mit dem katalogisierten offenen Ökosystem gleich.",
     "Ein einzelnes privates oder bloß konsumiertes Mesh ist nicht automatisch ein eigenständiges Common."
   ],
-  "notes": "Die Aufnahme bewertet das globale offene Ökosystem. Lokale Meshtastic-Netze benötigen für eine separate Katalogidentität einen eigenen Beleg gemeinschaftlicher Trägerschaft, Praxis und Regeln."
+  "notes": "Die Aufnahme bewertet das globale offene Ökosystem. Lokale Meshtastic-Netze benötigen für eine separate Katalogidentität einen eigenen Beleg gemeinschaftlicher Trägerschaft, Praxis und Regeln. Am 03.11.2026 erneute Prüfung der fünf Dimensionen anhand aktueller offizieller Seiten und der Firmware-Veröffentlichung vom 02.11.2026; keine Vor-Ort- oder Netzverfügbarkeitsprüfung."
 }
