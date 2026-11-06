@@ -85,6 +85,22 @@
         "url": "https://www.somenergia.coop/es/cooperativa/grupos-locales/",
         "retrieved_at": "2026-07-16",
         "note": "Offizielle projektnahe Seite, die den verlinkten öffentlichen Handlungs- oder Informationsweg belegt."
+      },
+      {
+        "id": "som-assembly",
+        "type": "official-source",
+        "label": "Som Assembly",
+        "url": "https://www.somenergia.coop/es/cooperativa/asamblea-general",
+        "retrieved_at": "2026-10-31",
+        "note": "Offizielle Generalversammlung mit einer Stimme pro Mitglied; Entscheidung über Etat, Arbeitsplan und Satzung."
+      },
+      {
+        "id": "som-transparency",
+        "type": "official-source",
+        "label": "Som Transparency",
+        "url": "https://www.somenergia.coop/es/cooperativa/transparencia",
+        "retrieved_at": "2026-10-31",
+        "note": "Offizielle Jahresberichte, veröffentlichte Versammlungsprotokolle und Finanztransparenz."
       }
     ]
   },
@@ -92,9 +108,9 @@
     "state": "stale",
     "catalogued_at": "2026-07-16",
     "reviewed_by": "Commonworld editorial review",
-    "reviewed_at": "2026-07-16",
-    "next_review_at": "2026-10-16",
-    "notes": "Keine künstliche Geometrie; Länderbezug, Netzabdeckung und Anlagenstandorte werden nicht als Punkte behauptet."
+    "reviewed_at": "2026-10-30",
+    "next_review_at": "2026-10-31",
+    "notes": "Keine künstliche Geometrie; Länderbezug, Netzabdeckung und Anlagenstandorte werden nicht als Punkte behauptet. Fünfkriterien-Desk-Review 30.10.2026: Genossenschaftlich kontrollierte Energie-Commons-Infrastruktur mit überprüfbarem One-Member-One-Vote-Verfahren. Operative Aktivität nicht erneut bestätigt, weiterhin stale."
   },
   "links": [
     {

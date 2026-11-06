@@ -1,0 +1,56 @@
+{
+  "schema_version": 1,
+  "kind": "commonworld_commons_basis",
+  "project_id": "root-access-hackerspace",
+  "classification": "commons-infrastructure",
+  "decision": "include",
+  "reviewed_at": "2026-10-31",
+  "reviewer": "Commonworld editorial desk review",
+  "criteria": {
+    "shared_resource": {
+      "status": "supported",
+      "statement": "Geteilte Maschinen, digitale Werkzeuge und gemeinsame Werkstattflächen werden Mitgliedern gegen Vereinsbeiträge zur Verfügung gestellt.",
+      "source_ids": [
+        "rootaccess-home",
+        "rootaccess-membership"
+      ]
+    },
+    "community": {
+      "status": "supported",
+      "statement": "Ein freiwillig betriebener Makerspace vereint beitragende Mitglieder, Kursbesucher und ehrenamtliche Helfer.",
+      "source_ids": [
+        "rootaccess-home"
+      ]
+    },
+    "commoning_practice": {
+      "status": "supported",
+      "statement": "Mitglieder nutzen Geräte gemeinsam, pflegen Werkstattressourcen und organisieren Kurse sowie öffentliche Veranstaltungen.",
+      "source_ids": [
+        "rootaccess-membership",
+        "rootaccess-home"
+      ]
+    },
+    "rules_and_responsibility": {
+      "status": "supported",
+      "statement": "Mitgliedschaftsregeln begrenzen Gerätezugang und verlangen eine Vereinbarung; ein veröffentlichter Code of Conduct sieht Beschwerde-, Ausschuss- und Board-Einspruchsverfahren vor.",
+      "source_ids": [
+        "rootaccess-membership",
+        "rootaccess-conduct"
+      ]
+    },
+    "common_benefit": {
+      "status": "supported",
+      "statement": "Geteilte Maschinen und freiwillig vermitteltes Wissen ermöglichen lokale Reparatur-, Technik- und Kreativprojekte.",
+      "source_ids": [
+        "rootaccess-home"
+      ]
+    }
+  },
+  "confidence": 0.92,
+  "limitations": [
+    "Gerätenutzung ist kostenpflichtig und auf bestimmte Mitgliedschaftsklassen beschränkt; Gäste besitzen keine allgemeine Nutzungsfreiheit.",
+    "Ein Mitgliedschaftsvertrag allein weist nicht automatisch Eigentumsanteile am Vereinsvermögen nach.",
+    "Die Existenz eines Beschwerdegremiums ist keine Zusicherung, dass alle Fälle ohne Konflikte gelöst werden."
+  ],
+  "notes": "Freiwillig verwaltete Maker-Commons-Infrastruktur mit Mitglieds-, Werkzeug- und Beschwerderegeln."
+}

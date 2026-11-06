@@ -4273,8 +4273,14 @@ async function catalogueNetworkBlockedScenario() {
   await run.page.waitForTimeout(220);
   const edinburgh = run.page.locator('#project-edinburgh-tool-library');
   assert(await edinburgh.isVisible(), 'catalogue network blocked: runtime Text card not created');
+  const edinburghSource = JSON.parse(await readFile(path.join(ROOT, 'catalog/projects/edinburgh-tool-library.json'), 'utf8'));
+  assert(edinburghSource.activity?.status === 'active' && edinburghSource.curation?.state === 'stale',
+    'catalogue network blocked: Edinburgh source fixture no longer represents active-but-stale curation');
+  const expectedDue = edinburghSource.curation.next_review_at;
+  assert(/^\d{4}-\d{2}-\d{2}$/u.test(expectedDue),
+    'catalogue network blocked: Edinburgh source has no valid next review date');
   const staleWarning = await edinburgh.locator('.catalog-curation-stale-notice').textContent();
-  assert(staleWarning?.includes('2026-10-16') && staleWarning.includes('Current editorial verification pending'),
+  assert(staleWarning?.includes(expectedDue) && staleWarning.includes('Current editorial verification pending'),
     'catalogue network blocked: active but stale runtime Text card omits editorial warning');
   assert(await edinburgh.locator('.catalog-actions .catalog-action-link').count() > 0,
     'catalogue network blocked: stale runtime Text card lost direct action links');

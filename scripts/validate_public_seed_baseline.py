@@ -93,10 +93,14 @@ def validate_public_seed_baseline(root: Path = ROOT) -> list[str]:
         curation = record.get("curation", {}) if isinstance(record.get("curation"), dict) else {}
         if curation.get("state") not in {"listed", "stale"} or curation.get("reviewed_by") != "Commonworld editorial review":
             errors.append(f"public seed project {identifier} must retain its editorial listing")
-        if _parsed(curation.get("reviewed_at")) != EXPECTED_SEED_DATE:
-            errors.append(f"public seed project {identifier} review date drifted")
+        # The July 2026 seed is historical, not a freeze on later, source-bound
+        # editorial reviews. Keep its date as the lower bound; subsequent
+        # reviews still require a Commons basis under validate_commons_admission.
+        reviewed_at = _parsed(curation.get("reviewed_at"))
+        if reviewed_at is None or reviewed_at < EXPECTED_SEED_DATE:
+            errors.append(f"public seed project {identifier} review predates seed baseline")
         next_review = _parsed(curation.get("next_review_at"))
-        if next_review is None or next_review <= EXPECTED_SEED_DATE:
+        if next_review is None or next_review <= (reviewed_at or EXPECTED_SEED_DATE):
             errors.append(f"public seed project {identifier} next review is invalid")
 
         activity = record.get("activity", {}) if isinstance(record.get("activity"), dict) else {}
@@ -107,14 +111,17 @@ def validate_public_seed_baseline(root: Path = ROOT) -> list[str]:
         if not isinstance(sources, list) or not sources:
             errors.append(f"public seed project {identifier} must retain provenance")
         else:
-            for source in sources:
+            for source_index, source in enumerate(sources):
                 if not isinstance(source, dict) or source.get("type") != "official-source":
                     errors.append(f"public seed project {identifier} must retain official-source provenance")
                     continue
                 if not _is_https_url(source.get("url")):
                     errors.append(f"public seed project {identifier} source URL must remain HTTPS")
-                if _parsed(source.get("retrieved_at")) != EXPECTED_SEED_DATE:
-                    errors.append(f"public seed project {identifier} source retrieval date drifted")
+                source_date = _parsed(source.get("retrieved_at"))
+                if source_index == 0 and source_date != EXPECTED_SEED_DATE:
+                    errors.append(f"public seed project {identifier} initial source retrieval date drifted")
+                elif source_date is None or source_date < EXPECTED_SEED_DATE:
+                    errors.append(f"public seed project {identifier} source predates seed baseline")
 
         layer = derive_digital_layer(record, contract)
         if layer is None:

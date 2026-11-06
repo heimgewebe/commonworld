@@ -1,0 +1,56 @@
+{
+  "schema_version": 1,
+  "kind": "commonworld_commons_basis",
+  "project_id": "zenzeleni-community-networks",
+  "classification": "commons-infrastructure",
+  "decision": "include",
+  "reviewed_at": "2026-10-31",
+  "reviewer": "Commonworld editorial desk review",
+  "criteria": {
+    "shared_resource": {
+      "status": "supported",
+      "statement": "Lokale von Gemeinschaftsgenossenschaften besessene und betriebene Funknetze sind der gemeinsam gehaltene Kommunikationsbestand.",
+      "source_ids": [
+        "zenzeleni-model",
+        "zenzeleni-home"
+      ]
+    },
+    "community": {
+      "status": "supported",
+      "statement": "Jede lokale Gemeinschaft wählt Genossenschaftsmitglieder, die Betrieb und Nutzung der Netzwerke im Interesse der Gemeinde verantworten.",
+      "source_ids": [
+        "zenzeleni-model"
+      ]
+    },
+    "commoning_practice": {
+      "status": "supported",
+      "statement": "Die Genossenschaften betreiben, erweitern und warten eigene Netze und investieren Erträge erneut in lokale Konnektivität und Gemeinschaftsprogramme.",
+      "source_ids": [
+        "zenzeleni-model",
+        "zenzeleni-home"
+      ]
+    },
+    "rules_and_responsibility": {
+      "status": "supported",
+      "statement": "Die lokale Kooperative ist rechtlicher Internetanbieter, besitzt und steuert das Netz; die unterstützende Non-Profit-Gesellschaft übernimmt Schulung und gemeinsame technische Unterstützung.",
+      "source_ids": [
+        "zenzeleni-model"
+      ]
+    },
+    "common_benefit": {
+      "status": "supported",
+      "statement": "Erschwingliche Kommunikation und vor Ort reinvestierte Einnahmen sollen Schulen, Haushalten und sozialen Initiativen zugutekommen.",
+      "source_ids": [
+        "zenzeleni-model",
+        "zenzeleni-home"
+      ]
+    }
+  },
+  "confidence": 0.95,
+  "limitations": [
+    "Zenzeleni NPC ist nicht mit jeder lokal netzbesitzenden Kooperative identisch.",
+    "Mitgliederauswahl und konkrete Betriebsregeln unterscheiden sich nach Gemeinde.",
+    "Die gegenwärtige Leistung einzelner Funklinks wurde nicht live gemessen."
+  ],
+  "notes": "Belegte lokale Eigentums-, Wahl- und Betriebsrechte statt bloß einer überregionalen Gemeinnützigkeitsbehauptung."
+}

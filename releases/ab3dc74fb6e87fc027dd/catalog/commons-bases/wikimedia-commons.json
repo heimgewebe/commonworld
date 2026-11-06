@@ -1,0 +1,56 @@
+{
+  "schema_version": 1,
+  "kind": "commonworld_commons_basis",
+  "project_id": "wikimedia-commons",
+  "classification": "common",
+  "decision": "include",
+  "reviewed_at": "2026-10-30",
+  "reviewer": "Commonworld editorial desk review",
+  "criteria": {
+    "shared_resource": {
+      "status": "supported",
+      "statement": "Frei lizenzierte oder gemeinfreie Medien, einschließlich Bilder, Audio und Videos, bilden den gemeinsam nutzbaren Medienbestand.",
+      "source_ids": [
+        "commons-project-scope",
+        "wikimedia-projects"
+      ]
+    },
+    "community": {
+      "status": "supported",
+      "statement": "Freiwillige Beitragende, Uploadende und Moderatoren pflegen und organisieren das gemeinsame Wikimedia-Medienprojekt.",
+      "source_ids": [
+        "commons-community-about"
+      ]
+    },
+    "commoning_practice": {
+      "status": "supported",
+      "statement": "Hochladen, Kategorisieren, Metadatenprüfung, Lizenzprüfung und Korrekturen erfolgen in wiederkehrender öffentlicher Gemeinschaftsarbeit.",
+      "source_ids": [
+        "commons-project-scope",
+        "commons-community-about"
+      ]
+    },
+    "rules_and_responsibility": {
+      "status": "supported",
+      "statement": "Project-Scope-Regeln bestimmen freie Lizenzen, gemeinfreie Werke, zulässige Medien und pädagogischen Nutzen als verbindlichen Beitragsrahmen.",
+      "source_ids": [
+        "commons-project-scope"
+      ]
+    },
+    "common_benefit": {
+      "status": "supported",
+      "statement": "Die gemeinsamen Medien dürfen unter den jeweiligen freien Rechten auch von Dritten außerhalb des Wikimedia-Verbunds nachgenutzt werden.",
+      "source_ids": [
+        "commons-project-scope",
+        "commons-community-about"
+      ]
+    }
+  },
+  "confidence": 0.94,
+  "limitations": [
+    "Nicht jede im Internet auffindbare Datei ist frei lizenzierbar oder Aufnahmegegenstand.",
+    "Offene Mitarbeit wird durch Lizenz- und Moderationsregeln begrenzt.",
+    "Einzelne Lizenzangaben sind nicht per se amtliche Gewähr."
+  ],
+  "notes": "Freies Medien-Common mit öffentlicher kollektiver Arbeit und ausdrücklich verbindlicher Lizenzkontrolle."
+}

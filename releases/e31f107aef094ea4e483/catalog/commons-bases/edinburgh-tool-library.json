@@ -1,0 +1,57 @@
+{
+  "schema_version": 1,
+  "kind": "commonworld_commons_basis",
+  "project_id": "edinburgh-tool-library",
+  "classification": "commons-infrastructure",
+  "decision": "include",
+  "reviewed_at": "2026-10-31",
+  "reviewer": "Commonworld editorial desk review",
+  "criteria": {
+    "shared_resource": {
+      "status": "supported",
+      "statement": "Gemeinsam bereitgehaltene Werkzeuge und Werkstattinfrastruktur bilden einen lokal teilbaren Gerätebestand.",
+      "source_ids": [
+        "etl-about",
+        "etl-membership"
+      ]
+    },
+    "community": {
+      "status": "supported",
+      "statement": "Mitglieder, Freiwillige und Werkstattbesucher teilen Geräte, Wissen und Projekte der Edinburgh Tool Library.",
+      "source_ids": [
+        "etl-about",
+        "etl-membership"
+      ]
+    },
+    "commoning_practice": {
+      "status": "supported",
+      "statement": "Mitglieder leihen Werkzeuge aus, nutzen gemeinschaftliche Werkstätten und entwickeln praktische Fähigkeiten in lokalen Kursen.",
+      "source_ids": [
+        "etl-about",
+        "etl-membership"
+      ]
+    },
+    "rules_and_responsibility": {
+      "status": "supported",
+      "statement": "Die öffentlich dokumentierten Mitgliedschaftstypen regeln Gebühren, Zugangsberechtigungen, Ausweis-/Adressprüfung und Nutzung bestimmter Werkstätten.",
+      "source_ids": [
+        "etl-membership"
+      ]
+    },
+    "common_benefit": {
+      "status": "supported",
+      "statement": "Geteilte Werkzeugnutzung erleichtert Reparaturen, Weiterbildung und lokale Projekte mit geringerer Ressourcenverschwendung.",
+      "source_ids": [
+        "etl-about",
+        "etl-membership"
+      ]
+    }
+  },
+  "confidence": 0.91,
+  "limitations": [
+    "Gebühren und Altersregeln begrenzen die Nutzung; ein Jugendkonto erlaubt nicht dieselben Ausleihen.",
+    "Die Charity beziehungsweise Werkstatt ist nicht zwangsläufig rechtliches Gemeinschaftseigentum jedes Mitglieds.",
+    "Die genaue Ausstattung und Öffnungszeiten können sich ändern."
+  ],
+  "notes": "Gemeinschaftsgetragene Werkzeug- und Lerninfrastruktur mit konkreten Mitgliedschafts-, Nutzungs- und Haftungsgrenzen."
+}

@@ -1,0 +1,57 @@
+{
+  "schema_version": 1,
+  "kind": "commonworld_commons_basis",
+  "project_id": "open-source-seed-initiative",
+  "classification": "common",
+  "decision": "include",
+  "reviewed_at": "2026-10-30",
+  "reviewer": "Commonworld editorial desk review",
+  "criteria": {
+    "shared_resource": {
+      "status": "supported",
+      "statement": "OSSI-Pledge-Saatgut und seine weiterzüchtbaren Nachkommen bilden die durch wechselseitige Offenheitszusage zugängliche genetische Ressource.",
+      "source_ids": [
+        "ossi-about",
+        "ossi-varieties"
+      ]
+    },
+    "community": {
+      "status": "supported",
+      "statement": "Züchter, Landwirte, Gärtner und Partner tragen die Praxis des Kennzeichnens, Nutzens und Weitergebens von OSSI-Pledge-Sorten.",
+      "source_ids": [
+        "ossi-about",
+        "ossi-community"
+      ]
+    },
+    "commoning_practice": {
+      "status": "supported",
+      "statement": "Beteiligte sichern Saatgut, bauen es an, tauschen oder verkaufen es, erforschen Eigenschaften und entwickeln Sorten weiter; Nachkommen tragen die Weitergabeverpflichtung.",
+      "source_ids": [
+        "ossi-about",
+        "ossi-involved"
+      ]
+    },
+    "rules_and_responsibility": {
+      "status": "supported",
+      "statement": "Der OSSI-Pledge verbietet nachfolgende Nutzungsbeschränkungen durch Patente oder andere Mittel und verlangt seine Weitergabe mit Saatgut oder Derivaten.",
+      "source_ids": [
+        "ossi-about"
+      ]
+    },
+    "common_benefit": {
+      "status": "supported",
+      "statement": "Nutzungs-, Vermehrungs-, Austausch- und Weiterzüchtungsfreiheit bleibt für heutige und zukünftige Saatgutnutzer erhalten.",
+      "source_ids": [
+        "ossi-about",
+        "ossi-varieties"
+      ]
+    }
+  },
+  "confidence": 0.9,
+  "limitations": [
+    "Der Pledge garantiert keine kostenlose Abgabe oder Versorgung mit Saatgut und ersetzt keine separaten Biosicherheits- oder Pflanzenschutzregeln.",
+    "Die Stiftung steuert das Pledge-Programm; daraus folgt keine demokratische Mitgliedssteuerung der Stiftung selbst.",
+    "Nur als OSSI-pledged gekennzeichnete Sorten erhalten diese konkrete Offenheitsbindung."
+  ],
+  "notes": "Das Saatgut ist die gemeinsam geschützte Ressource; der Pledge und seine Downstream-Bindung sind der maßgebliche Commons-Regelrahmen."
+}

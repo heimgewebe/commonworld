@@ -1,0 +1,433 @@
+{
+  "schema_version": 1,
+  "kind": "commonworld_commons_basis_source_recheck",
+  "checked_at_utc": "2026-11-06",
+  "source_base_commit": "af7bd53b1e0a80b7cc64448940d34127f9c56d46",
+  "reviewer_provenance": "model-assisted first-party desk re-review of official websites, repositories and public certification registry; not independent human certification",
+  "scope": "Seven catalogue records whose prior quarterly basis review was due 2026-11-04 or 2026-11-05",
+  "outcomes": [
+    {
+      "project_id": "acofop-peten-community-forests",
+      "reviewed_at": "2026-11-06",
+      "next_review_at": "2027-02-06",
+      "basis_decision": "include",
+      "five_criteria": {
+        "shared_resource": {
+          "verdict": "supported",
+          "cited_source_ids": [
+            "acofop-home",
+            "acofop-about",
+            "acofop-territorial",
+            "conap-extensions"
+          ]
+        },
+        "community": {
+          "verdict": "supported",
+          "cited_source_ids": [
+            "acofop-home",
+            "acofop-about"
+          ]
+        },
+        "commoning_practice": {
+          "verdict": "supported",
+          "cited_source_ids": [
+            "acofop-home",
+            "acofop-territorial",
+            "conap-extensions"
+          ]
+        },
+        "rules_and_responsibility": {
+          "verdict": "supported",
+          "cited_source_ids": [
+            "acofop-home",
+            "acofop-about",
+            "acofop-territorial",
+            "conap-extensions"
+          ]
+        },
+        "common_benefit": {
+          "verdict": "supported",
+          "cited_source_ids": [
+            "acofop-home",
+            "acofop-about",
+            "acofop-territorial",
+            "conap-extensions"
+          ]
+        }
+      },
+      "refreshed_official_source_ids": [
+        "acofop-history-2026"
+      ],
+      "refreshed_official_urls": {
+        "acofop-history-2026": "https://acofop.org/nuestra-historia/"
+      },
+      "finding": "Die aktuelle offizielle Organisationsgeschichte beschreibt 24 bäuerliche und indigene Mitgliedsorganisationen und gemeinschaftliche Waldkonzessionen; die individuellen staatlichen Konzessionsrechte bleiben ausdrücklich getrennt.",
+      "activity_recatalogued": false
+    },
+    {
+      "project_id": "common-voice",
+      "reviewed_at": "2026-11-06",
+      "next_review_at": "2027-02-06",
+      "basis_decision": "include",
+      "five_criteria": {
+        "shared_resource": {
+          "verdict": "supported",
+          "cited_source_ids": [
+            "common-voice-home",
+            "common-voice-datasets",
+            "common-voice-repository"
+          ]
+        },
+        "community": {
+          "verdict": "supported",
+          "cited_source_ids": [
+            "common-voice-home",
+            "common-voice-playbook"
+          ]
+        },
+        "commoning_practice": {
+          "verdict": "supported",
+          "cited_source_ids": [
+            "common-voice-home",
+            "common-voice-playbook",
+            "common-voice-repository"
+          ]
+        },
+        "rules_and_responsibility": {
+          "verdict": "supported",
+          "cited_source_ids": [
+            "common-voice-datasets",
+            "common-voice-repository",
+            "common-voice-terms",
+            "common-voice-playbook"
+          ]
+        },
+        "common_benefit": {
+          "verdict": "supported",
+          "cited_source_ids": [
+            "common-voice-home",
+            "common-voice-datasets"
+          ]
+        }
+      },
+      "refreshed_official_source_ids": [
+        "common-voice-repository",
+        "common-voice-playbook"
+      ],
+      "refreshed_official_urls": {
+        "common-voice-repository": "https://github.com/common-voice/common-voice",
+        "common-voice-playbook": "https://github.com/common-voice/community-playbook"
+      },
+      "finding": "Offizielle Software- und Community-Repositories sind weiterhin dokumentiert; eine unabhängig demokratische Gesamtsteuerung der Mozilla-Plattform oder Liveverfügbarkeit jedes Sprachdatensatzes wird daraus nicht abgeleitet.",
+      "activity_recatalogued": false
+    },
+    {
+      "project_id": "fordhall-organic-farm",
+      "reviewed_at": "2026-11-06",
+      "next_review_at": "2027-02-06",
+      "basis_decision": "include",
+      "five_criteria": {
+        "shared_resource": {
+          "verdict": "supported",
+          "cited_source_ids": [
+            "fordhall-home",
+            "fordhall-shares",
+            "fordhall-story",
+            "fordhall-impact"
+          ]
+        },
+        "community": {
+          "verdict": "supported",
+          "cited_source_ids": [
+            "fordhall-home",
+            "fordhall-shares",
+            "fordhall-story"
+          ]
+        },
+        "commoning_practice": {
+          "verdict": "supported",
+          "cited_source_ids": [
+            "fordhall-shares",
+            "fordhall-story",
+            "fordhall-impact"
+          ]
+        },
+        "rules_and_responsibility": {
+          "verdict": "supported",
+          "cited_source_ids": [
+            "fordhall-shares",
+            "fordhall-story"
+          ]
+        },
+        "common_benefit": {
+          "verdict": "supported",
+          "cited_source_ids": [
+            "fordhall-home",
+            "fordhall-impact",
+            "fordhall-story"
+          ]
+        }
+      },
+      "refreshed_official_source_ids": [
+        "fordhall-shares",
+        "fordhall-story"
+      ],
+      "refreshed_official_urls": {
+        "fordhall-shares": "https://www.fordhallfarm.com/buy-a-share",
+        "fordhall-story": "https://www.fordhallfarm.com/fcli-story"
+      },
+      "finding": "Der offizielle Anteilspfad dokumentiert die Community Benefit Society, eine Stimme je Mitglied, die Regeln und die gemeinschaftliche Landbindung; der landwirtschaftliche Pachtbetrieb bleibt separat.",
+      "activity_recatalogued": false
+    },
+    {
+      "project_id": "mikoko-pamoja",
+      "reviewed_at": "2026-11-06",
+      "next_review_at": "2027-02-06",
+      "basis_decision": "include",
+      "five_criteria": {
+        "shared_resource": {
+          "verdict": "supported",
+          "cited_source_ids": [
+            "mikoko-pamoja-home",
+            "mikoko-pamoja-about",
+            "mikoko-pamoja-plan-vivo",
+            "mikoko-pamoja-registry"
+          ]
+        },
+        "community": {
+          "verdict": "supported",
+          "cited_source_ids": [
+            "mikoko-pamoja-plan-vivo",
+            "mikoko-pamoja-registry"
+          ]
+        },
+        "commoning_practice": {
+          "verdict": "supported",
+          "cited_source_ids": [
+            "mikoko-pamoja-home",
+            "mikoko-pamoja-plan-vivo",
+            "mikoko-pamoja-registry"
+          ]
+        },
+        "rules_and_responsibility": {
+          "verdict": "supported",
+          "cited_source_ids": [
+            "mikoko-pamoja-plan-vivo",
+            "mikoko-pamoja-registry"
+          ]
+        },
+        "common_benefit": {
+          "verdict": "supported",
+          "cited_source_ids": [
+            "mikoko-pamoja-home",
+            "mikoko-pamoja-about",
+            "mikoko-pamoja-plan-vivo",
+            "mikoko-pamoja-registry"
+          ]
+        }
+      },
+      "refreshed_official_source_ids": [
+        "mikoko-pamoja-plan-vivo"
+      ],
+      "refreshed_official_urls": {
+        "mikoko-pamoja-plan-vivo": "https://www.planvivo.org/projects/mikoko-pamoja-kenya"
+      },
+      "finding": "Das öffentliche Plan-Vivo-Zertifizierungsprofil benennt Community-Eigentum, Haushaltsbeteiligung, gemeinschaftliche Nutzenprojekte und Prüf-/Jahresberichtlinks; die Projekt-Homepage war für diesen Nachweis nicht erforderlich und aktuelle Naturwirkungen wurden nicht unabhängig gemessen.",
+      "activity_recatalogued": false
+    },
+    {
+      "project_id": "mundraub",
+      "reviewed_at": "2026-11-06",
+      "next_review_at": "2027-02-06",
+      "basis_decision": "include",
+      "five_criteria": {
+        "shared_resource": {
+          "verdict": "supported",
+          "cited_source_ids": [
+            "mundraub-home",
+            "mundraub-map",
+            "mundraub-rules"
+          ]
+        },
+        "community": {
+          "verdict": "supported",
+          "cited_source_ids": [
+            "mundraub-home",
+            "mundraub-rules",
+            "mundraub-care"
+          ]
+        },
+        "commoning_practice": {
+          "verdict": "supported",
+          "cited_source_ids": [
+            "mundraub-home",
+            "mundraub-rules",
+            "mundraub-care"
+          ]
+        },
+        "rules_and_responsibility": {
+          "verdict": "supported",
+          "cited_source_ids": [
+            "mundraub-rules",
+            "mundraub-home"
+          ]
+        },
+        "common_benefit": {
+          "verdict": "supported",
+          "cited_source_ids": [
+            "mundraub-home",
+            "mundraub-impressum",
+            "mundraub-care"
+          ]
+        }
+      },
+      "refreshed_official_source_ids": [
+        "mundraub-rules",
+        "mundraub-impressum"
+      ],
+      "refreshed_official_urls": {
+        "mundraub-rules": "https://mundraub.org/mundraeuber-regeln",
+        "mundraub-impressum": "https://mundraub.org/impressum"
+      },
+      "finding": "Die offiziellen Regeln belegen Eigentums-, Natur- und Pflegepflichten; das aktuelle Impressum weist die Terra Concordia gGmbH als Betreiberin aus. Eine gemeinschaftlich kontrollierte vollständige Datenbank wird nicht behauptet.",
+      "activity_recatalogued": false
+    },
+    {
+      "project_id": "open-food-facts",
+      "reviewed_at": "2026-11-06",
+      "next_review_at": "2027-02-06",
+      "basis_decision": "include",
+      "five_criteria": {
+        "shared_resource": {
+          "verdict": "supported",
+          "cited_source_ids": [
+            "open-food-facts-overview",
+            "open-food-facts-documentation",
+            "open-food-facts-quality"
+          ]
+        },
+        "community": {
+          "verdict": "supported",
+          "cited_source_ids": [
+            "open-food-facts-overview",
+            "open-food-facts-economic-model",
+            "open-food-facts-documentation"
+          ]
+        },
+        "commoning_practice": {
+          "verdict": "supported",
+          "cited_source_ids": [
+            "open-food-facts-overview",
+            "open-food-facts-documentation",
+            "open-food-facts-quality"
+          ]
+        },
+        "rules_and_responsibility": {
+          "verdict": "supported",
+          "cited_source_ids": [
+            "open-food-facts-license",
+            "open-food-facts-quality",
+            "open-food-facts-documentation"
+          ]
+        },
+        "common_benefit": {
+          "verdict": "supported",
+          "cited_source_ids": [
+            "open-food-facts-economic-model",
+            "open-food-facts-license",
+            "open-food-facts-overview"
+          ]
+        }
+      },
+      "refreshed_official_source_ids": [
+        "open-food-facts-documentation"
+      ],
+      "refreshed_official_urls": {
+        "open-food-facts-documentation": "https://openfoodfacts.github.io/documentation/docs/"
+      },
+      "finding": "Die offizielle technische Dokumentation beschreibt die gemeinschaftliche Lebensmitteldatenbank, Dokumentation, APIs und Dienste; daraus folgt keine gleichmäßige Kontrolle über Infrastruktur oder Moderation.",
+      "activity_recatalogued": false
+    },
+    {
+      "project_id": "park-slope-food-coop",
+      "reviewed_at": "2026-11-06",
+      "next_review_at": "2027-02-06",
+      "basis_decision": "include",
+      "five_criteria": {
+        "shared_resource": {
+          "verdict": "supported",
+          "cited_source_ids": [
+            "park-slope-membership",
+            "park-slope-manual",
+            "park-slope-bylaws"
+          ]
+        },
+        "community": {
+          "verdict": "supported",
+          "cited_source_ids": [
+            "park-slope-membership",
+            "park-slope-manual",
+            "park-slope-bylaws"
+          ]
+        },
+        "commoning_practice": {
+          "verdict": "supported",
+          "cited_source_ids": [
+            "park-slope-membership",
+            "park-slope-manual"
+          ]
+        },
+        "rules_and_responsibility": {
+          "verdict": "supported",
+          "cited_source_ids": [
+            "park-slope-manual",
+            "park-slope-bylaws",
+            "park-slope-agreements"
+          ]
+        },
+        "common_benefit": {
+          "verdict": "supported",
+          "cited_source_ids": [
+            "park-slope-membership",
+            "park-slope-manual",
+            "park-slope-bylaws"
+          ]
+        }
+      },
+      "refreshed_official_source_ids": [
+        "park-slope-manual"
+      ],
+      "refreshed_official_urls": {
+        "park-slope-manual": "https://www.foodcoop.com/manual/"
+      },
+      "finding": "Das offizielle Mitgliederhandbuch beschreibt arbeitende Mitglieder, die Schichtpflicht, Versammlungen, gewählte Gremien, Einkauf nur für Mitglieder sowie Mitarbeiterschichten; Warenverkauf und bezahltes Management bleiben als Grenze ausgewiesen.",
+      "activity_recatalogued": false
+    }
+  ],
+  "does_not_establish": [
+    "A reachable documentation page does not certify the real-time operational status of physical sites or every network participant.",
+    "Review timestamps do not substitute for independent governance audits or independent human reviews.",
+    "Earlier activity.observed_at dates remain unchanged.",
+    "Existing per-criterion source IDs, historical limitations and decisions are retained unless new official evidence contradicts them."
+  ],
+  "first_party_live_read": {
+    "method": "Direct inspection of official public web pages and public-project GitHub repositories on 2026-11-06; only the documented page content was assessed",
+    "limitations": [
+      "Accessible official documentation is not independent governance certification.",
+      "Source page reachability does not prove a physical site is currently operating.",
+      "No prior language review or physical device check was retroactively revalidated."
+    ],
+    "checked_source_urls": [
+      "https://acofop.org/nuestra-historia/",
+      "https://github.com/common-voice/common-voice",
+      "https://github.com/common-voice/community-playbook",
+      "https://mundraub.org/impressum",
+      "https://mundraub.org/mundraeuber-regeln",
+      "https://openfoodfacts.github.io/documentation/docs/",
+      "https://www.foodcoop.com/manual/",
+      "https://www.fordhallfarm.com/buy-a-share",
+      "https://www.fordhallfarm.com/fcli-story",
+      "https://www.planvivo.org/projects/mikoko-pamoja-kenya"
+    ]
+  }
+}

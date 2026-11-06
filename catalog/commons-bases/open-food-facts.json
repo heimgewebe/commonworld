@@ -4,7 +4,7 @@
   "project_id": "open-food-facts",
   "classification": "commons-infrastructure",
   "decision": "include",
-  "reviewed_at": "2026-08-04",
+  "reviewed_at": "2026-11-06",
   "reviewer": "Commonworld editorial review",
   "criteria": {
     "shared_resource": {
@@ -59,5 +59,5 @@
     "Hersteller können Massendaten einspeisen; die Quellen- und Machtasymmetrie zwischen Einzelbeitragenden und Produzenten bleibt ein Prüfpunkt.",
     "Offene Bearbeitung führt zu schwankender Datenqualität, die durch Bilder, Gemeinschaftskorrekturen, Regeln und maschinelle Prüfungen nur teilweise abgesichert wird."
   ],
-  "notes": "Katalogisiert ist die offene Daten- und Softwareinfrastruktur. Einzelne Nachnutzungs-Apps oder Herstellerangebote gelten dadurch nicht automatisch als Commons."
+  "notes": "Katalogisiert ist die offene Daten- und Softwareinfrastruktur. Einzelne Nachnutzungs-Apps oder Herstellerangebote gelten dadurch nicht automatisch als Commons. Wiedervorlage 06.11.2026: Die offizielle technische Dokumentation beschreibt die gemeinschaftliche Lebensmitteldatenbank, Dokumentation, APIs und Dienste; daraus folgt keine gleichmäßige Kontrolle über Infrastruktur oder Moderation. Keine unabhängige menschliche Abnahme."
 }

@@ -1,0 +1,476 @@
+{
+  "schema_version": 1,
+  "kind": "commonworld_commons_basis_retroreview_wave3",
+  "checked_at_utc": "2026-10-30",
+  "source_base_commit": "aa22c818c5b24e266c840e7fa72ecea265524a34",
+  "scope": "Eight source-bound five-dimension Commons basis desk reviews; two non-certifications preserve governance uncertainty.",
+  "reviewer_provenance": "model-assisted editorial desk review of live first-party organizational webpages, not independent human certification",
+  "outcomes": [
+    {
+      "project_id": "repair-cafe-international",
+      "basis_decision": "include",
+      "classification": "commons-infrastructure",
+      "criteria": {
+        "shared_resource": {
+          "verdict": "supported",
+          "cited_source_ids": [
+            "repair-cafe-about",
+            "repair-cafe-home"
+          ]
+        },
+        "community": {
+          "verdict": "supported",
+          "cited_source_ids": [
+            "repair-cafe-about",
+            "repair-cafe-start"
+          ]
+        },
+        "commoning_practice": {
+          "verdict": "supported",
+          "cited_source_ids": [
+            "repair-cafe-about",
+            "repair-cafe-visit"
+          ]
+        },
+        "rules_and_responsibility": {
+          "verdict": "supported",
+          "cited_source_ids": [
+            "repair-cafe-rules",
+            "repair-cafe-start"
+          ]
+        },
+        "common_benefit": {
+          "verdict": "supported",
+          "cited_source_ids": [
+            "repair-cafe-about",
+            "repair-cafe-home"
+          ]
+        }
+      },
+      "provenance_urls": {
+        "repair-cafe-about": "https://www.repaircafe.org/en/about/",
+        "repair-cafe-home": "https://www.repaircafe.org/en/",
+        "repair-cafe-rules": "https://www.repaircafe.org/en/house-rules/",
+        "repair-cafe-start": "https://www.repaircafe.org/en/join/start-your-own/",
+        "repair-cafe-visit": "https://www.repaircafe.org/en/visit/"
+      },
+      "limitations": [
+        "Die internationale Stiftung besitzt nicht automatisch alle lokalen Werkzeuge, Räume oder Reparaturgegenstände.",
+        "Freiwillige Reparaturhilfe ist kein Garantieservice; konkrete Termine und Sicherheitsentscheidungen liegen bei lokalen Organisatoren.",
+        "Die Aktivität einzelner lokaler Repair Cafés wurde nicht am Prüftag neu nachgewiesen."
+      ],
+      "operational_activity_recatalogued": false,
+      "post_review_public_state": "stale"
+    },
+    {
+      "project_id": "open-source-seed-initiative",
+      "basis_decision": "include",
+      "classification": "common",
+      "criteria": {
+        "shared_resource": {
+          "verdict": "supported",
+          "cited_source_ids": [
+            "ossi-about",
+            "ossi-varieties"
+          ]
+        },
+        "community": {
+          "verdict": "supported",
+          "cited_source_ids": [
+            "ossi-about",
+            "ossi-community"
+          ]
+        },
+        "commoning_practice": {
+          "verdict": "supported",
+          "cited_source_ids": [
+            "ossi-about",
+            "ossi-involved"
+          ]
+        },
+        "rules_and_responsibility": {
+          "verdict": "supported",
+          "cited_source_ids": [
+            "ossi-about"
+          ]
+        },
+        "common_benefit": {
+          "verdict": "supported",
+          "cited_source_ids": [
+            "ossi-about",
+            "ossi-varieties"
+          ]
+        }
+      },
+      "provenance_urls": {
+        "ossi-about": "https://osseeds.org/about/",
+        "ossi-community": "https://osseeds.org/ossi-community/",
+        "ossi-involved": "https://osseeds.org/actions-2/",
+        "ossi-varieties": "https://osseeds.org/ossi-varieties/"
+      },
+      "limitations": [
+        "Der Pledge garantiert keine kostenlose Abgabe oder Versorgung mit Saatgut und ersetzt keine separaten Biosicherheits- oder Pflanzenschutzregeln.",
+        "Die Stiftung steuert das Pledge-Programm; daraus folgt keine demokratische Mitgliedssteuerung der Stiftung selbst.",
+        "Nur als OSSI-pledged gekennzeichnete Sorten erhalten diese konkrete Offenheitsbindung."
+      ],
+      "operational_activity_recatalogued": false,
+      "post_review_public_state": "stale"
+    },
+    {
+      "project_id": "cooperation-jackson",
+      "basis_decision": "include",
+      "classification": "commons-infrastructure",
+      "criteria": {
+        "shared_resource": {
+          "verdict": "supported",
+          "cited_source_ids": [
+            "cooperation-jackson-intro",
+            "cooperation-jackson-sci"
+          ]
+        },
+        "community": {
+          "verdict": "supported",
+          "cited_source_ids": [
+            "cooperation-jackson-intro",
+            "cooperation-jackson-membership"
+          ]
+        },
+        "commoning_practice": {
+          "verdict": "supported",
+          "cited_source_ids": [
+            "cooperation-jackson-intro",
+            "cooperation-jackson-sci"
+          ]
+        },
+        "rules_and_responsibility": {
+          "verdict": "supported",
+          "cited_source_ids": [
+            "cooperation-jackson-principles",
+            "cooperation-jackson-membership"
+          ]
+        },
+        "common_benefit": {
+          "verdict": "supported",
+          "cited_source_ids": [
+            "cooperation-jackson-intro",
+            "cooperation-jackson-principles"
+          ]
+        }
+      },
+      "provenance_urls": {
+        "cooperation-jackson-intro": "https://cooperationjackson.org/intro",
+        "cooperation-jackson-membership": "https://cooperationjackson.org/become-a-member",
+        "cooperation-jackson-principles": "https://cooperationjackson.org/principles/",
+        "cooperation-jackson-sci": "https://cooperationjackson.org/sustainable-communities-initiative"
+      },
+      "limitations": [
+        "Langfristige Vision, Kooperativenföderation und Kooperativbank dürfen nicht als bereits vollständig realisierte Institutionen ausgegeben werden.",
+        "Die Einhaltung veröffentlichter Grundsätze in jeder angeschlossenen Organisation wurde nicht unabhängig geprüft.",
+        "Die Rechtstitel und konkrete Zugangsregeln einzelner Land- und Produktionsanlagen bleiben gesondert nachzuweisen."
+      ],
+      "operational_activity_recatalogued": false,
+      "post_review_public_state": "stale"
+    },
+    {
+      "project_id": "som-energia",
+      "basis_decision": "include",
+      "classification": "commons-infrastructure",
+      "criteria": {
+        "shared_resource": {
+          "verdict": "supported",
+          "cited_source_ids": [
+            "som-about",
+            "som-membership"
+          ]
+        },
+        "community": {
+          "verdict": "supported",
+          "cited_source_ids": [
+            "som-membership",
+            "som-assembly"
+          ]
+        },
+        "commoning_practice": {
+          "verdict": "supported",
+          "cited_source_ids": [
+            "som-about",
+            "som-local-groups"
+          ]
+        },
+        "rules_and_responsibility": {
+          "verdict": "supported",
+          "cited_source_ids": [
+            "som-assembly",
+            "som-transparency"
+          ]
+        },
+        "common_benefit": {
+          "verdict": "supported",
+          "cited_source_ids": [
+            "som-about",
+            "som-membership"
+          ]
+        }
+      },
+      "provenance_urls": {
+        "som-about": "https://www.somenergia.coop/es/cooperativa/sobre-nosotros",
+        "som-assembly": "https://www.somenergia.coop/es/cooperativa/asamblea-general",
+        "som-local-groups": "https://www.somenergia.coop/es/cooperativa/grupos-locales/",
+        "som-membership": "https://www.somenergia.coop/es/cooperativa/asociarse",
+        "som-transparency": "https://www.somenergia.coop/es/cooperativa/transparencia"
+      },
+      "limitations": [
+        "Genossenschaftlicher Eigentums- und Stimmrechtsnachweis bedeutet nicht, dass jede Kilowattstunde kostenlos oder frei zugänglich ist.",
+        "Die Genossenschaftsmitgliedschaft und ihre Rechtsverhältnisse gelten nicht automatisch für alle Stromkunden.",
+        "Einzelne Kraftwerksstandorte und die aktuelle Verfügbarkeit von Tarifen wurden hier nicht neu geprüft."
+      ],
+      "operational_activity_recatalogued": false,
+      "post_review_public_state": "stale"
+    },
+    {
+      "project_id": "mietshaeuser-syndikat",
+      "basis_decision": "include",
+      "classification": "commons-infrastructure",
+      "criteria": {
+        "shared_resource": {
+          "verdict": "supported",
+          "cited_source_ids": [
+            "syndikat-network",
+            "syndikat-operation"
+          ]
+        },
+        "community": {
+          "verdict": "supported",
+          "cited_source_ids": [
+            "syndikat-network",
+            "syndikat-operation"
+          ]
+        },
+        "commoning_practice": {
+          "verdict": "supported",
+          "cited_source_ids": [
+            "syndikat-operation",
+            "syndikat-solidarity"
+          ]
+        },
+        "rules_and_responsibility": {
+          "verdict": "supported",
+          "cited_source_ids": [
+            "syndikat-operation"
+          ]
+        },
+        "common_benefit": {
+          "verdict": "supported",
+          "cited_source_ids": [
+            "syndikat-network",
+            "syndikat-solidarity"
+          ]
+        }
+      },
+      "provenance_urls": {
+        "syndikat-network": "https://www.syndikat.org/der-projektverbund/",
+        "syndikat-operation": "https://www.syndikat.org/en/the-syndikat-in-operation/",
+        "syndikat-solidarity": "https://www.syndikat.org/solidartransfer/"
+      },
+      "limitations": [
+        "Hausprojekt-GmbHs sind juristisch eigenständige Eigentümer; der Dachverbund besitzt nicht schlicht sämtliche Wohnhäuser.",
+        "Wiederverkaufsschutz schließt Insolvenz- und Finanzierungsrisiken nicht aus.",
+        "Nicht jedes Projekt ist für beliebige Außenstehende bewohnbar; Vergabeentscheidungen verbleiben beim jeweiligen Projekt."
+      ],
+      "operational_activity_recatalogued": false,
+      "post_review_public_state": "stale"
+    },
+    {
+      "project_id": "cecosesola",
+      "basis_decision": "include",
+      "classification": "commons-infrastructure",
+      "criteria": {
+        "shared_resource": {
+          "verdict": "supported",
+          "cited_source_ids": [
+            "cecosesola-food-network",
+            "cecosesola-home"
+          ]
+        },
+        "community": {
+          "verdict": "supported",
+          "cited_source_ids": [
+            "cecosesola-food-network",
+            "cecosesola-governance"
+          ]
+        },
+        "commoning_practice": {
+          "verdict": "supported",
+          "cited_source_ids": [
+            "cecosesola-food-network"
+          ]
+        },
+        "rules_and_responsibility": {
+          "verdict": "supported",
+          "cited_source_ids": [
+            "cecosesola-food-network",
+            "cecosesola-governance"
+          ]
+        },
+        "common_benefit": {
+          "verdict": "supported",
+          "cited_source_ids": [
+            "cecosesola-food-network",
+            "cecosesola-home"
+          ]
+        }
+      },
+      "provenance_urls": {
+        "cecosesola-food-network": "https://cecosesola.org/red-de-abastecimiento/",
+        "cecosesola-governance": "https://cecosesola.org/organizandonos-sin-lineas-de-mando/",
+        "cecosesola-home": "https://cecosesola.org/"
+      },
+      "limitations": [
+        "Vereinbarter Konsens und Rotation stammen aus Selbstdarstellung; externe Prüfung jeder Einzelorganisation liegt nicht vor.",
+        "Die Netzwerk-Teilnahme und Einkaufsmöglichkeiten unterliegen realen lokalen Zugangsbedingungen.",
+        "Aktuelle Absatzmengen oder Mitgliederzahlen werden nicht als dauerhaft gültige Commons-Eigenschaft festgeschrieben."
+      ],
+      "operational_activity_recatalogued": false,
+      "post_review_public_state": "stale"
+    },
+    {
+      "project_id": "openmrs",
+      "basis_decision": "needs_information",
+      "classification": "undetermined",
+      "criteria": {
+        "shared_resource": {
+          "verdict": "supported",
+          "cited_source_ids": [
+            "openmrs-home",
+            "openmrs-about"
+          ]
+        },
+        "community": {
+          "verdict": "supported",
+          "cited_source_ids": [
+            "openmrs-about",
+            "openmrs-involved"
+          ]
+        },
+        "commoning_practice": {
+          "verdict": "supported",
+          "cited_source_ids": [
+            "openmrs-involved",
+            "openmrs-about"
+          ]
+        },
+        "rules_and_responsibility": {
+          "verdict": "partial",
+          "cited_source_ids": [
+            "openmrs-governance",
+            "openmrs-about"
+          ]
+        },
+        "common_benefit": {
+          "verdict": "supported",
+          "cited_source_ids": [
+            "openmrs-about",
+            "openmrs-involved"
+          ]
+        }
+      },
+      "provenance_urls": {
+        "openmrs-about": "https://openmrs.org/about/",
+        "openmrs-governance": "https://openmrs.atlassian.net/wiki/spaces/docs/pages/26260029/OpenMRS+Community+Governance+Model",
+        "openmrs-home": "https://openmrs.org/",
+        "openmrs-involved": "https://openmrs.org/get-involved/"
+      },
+      "limitations": [
+        "Open-Source-Code begründet nicht automatisch demokratische Mitsprache aller Anwender oder die Eigentümerschaft von OpenMRS Inc.",
+        "Die veröffentlichte Governance-Dokumentation kann historische Rollen beschreiben; aktuelle Verfahren müssen durch zeitnahe Primärquellen bestätigt werden.",
+        "Patientendaten, konkrete Kliniken oder medizinische Entscheidungen sind keine frei zugänglichen Commons-Ressourcen."
+      ],
+      "operational_activity_recatalogued": false,
+      "post_review_public_state": "stale"
+    },
+    {
+      "project_id": "open-library",
+      "basis_decision": "needs_information",
+      "classification": "undetermined",
+      "criteria": {
+        "shared_resource": {
+          "verdict": "supported",
+          "cited_source_ids": [
+            "open-library-about",
+            "open-library-faq"
+          ]
+        },
+        "community": {
+          "verdict": "supported",
+          "cited_source_ids": [
+            "open-library-volunteer",
+            "open-library-about"
+          ]
+        },
+        "commoning_practice": {
+          "verdict": "supported",
+          "cited_source_ids": [
+            "open-library-faq",
+            "open-library-volunteer"
+          ]
+        },
+        "rules_and_responsibility": {
+          "verdict": "partial",
+          "cited_source_ids": [
+            "open-library-about",
+            "open-library-faq"
+          ]
+        },
+        "common_benefit": {
+          "verdict": "supported",
+          "cited_source_ids": [
+            "open-library-about",
+            "open-library-faq"
+          ]
+        }
+      },
+      "provenance_urls": {
+        "open-library-about": "https://openlibrary.org/about",
+        "open-library-faq": "https://openlibrary.org/about/faq",
+        "open-library-volunteer": "https://openlibrary.org/volunteer"
+      },
+      "limitations": [
+        "Internet Archive ist rechtlicher und technischer Träger; freiwillige Mitarbeit begründet keine Mit-Eigentümerschaft an Plattform und Ausleihbeständen.",
+        "Daten-/Softwareoffenheit ist von den separaten Urheberrechts- und Ausleihregeln einzelner Bücher zu unterscheiden.",
+        "Verbindliche Mitbestimmungs- und Einspruchsrechte im laufenden Plattformbetrieb sind nicht unabhängig verifiziert."
+      ],
+      "operational_activity_recatalogued": false,
+      "post_review_public_state": "stale"
+    }
+  ],
+  "does_not_establish": [
+    "independent_human_governance_certification",
+    "new_operational_activity_verification",
+    "signed_Git_PR_self_review",
+    "merge_authorization",
+    "production_deployment"
+  ],
+  "source_reverification": {
+    "checked_at_utc": "2026-10-31",
+    "scope": "Six newly introduced governance-policy source pages checked at their public first-party URLs; no claim of a newly signed independent review.",
+    "primary_source_ids_by_project": {
+      "repair-cafe-international": {
+        "repair-cafe-rules": "https://www.repaircafe.org/en/house-rules/"
+      },
+      "cooperation-jackson": {
+        "cooperation-jackson-principles": "https://cooperationjackson.org/principles/",
+        "cooperation-jackson-membership": "https://cooperationjackson.org/become-a-member"
+      },
+      "som-energia": {
+        "som-assembly": "https://www.somenergia.coop/es/cooperativa/asamblea-general",
+        "som-transparency": "https://www.somenergia.coop/es/cooperativa/transparencia"
+      },
+      "openmrs": {
+        "openmrs-governance": "https://openmrs.atlassian.net/wiki/spaces/docs/pages/26260029/OpenMRS+Community+Governance+Model"
+      }
+    },
+    "observed_boundary": "OpenMRS governance document was last edited 2020 and describes a 2017 governance model; the current voting/authority model is NOT verified.",
+    "no_current_activity_attestation": true,
+    "no_new_human_certification": true
+  }
+}

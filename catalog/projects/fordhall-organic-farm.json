@@ -72,7 +72,7 @@
         "type": "official-source",
         "label": "Fordhall – Gemeinschaftsanteile und Regeln",
         "url": "https://www.fordhallfarm.com/buy-a-share",
-        "retrieved_at": "2026-08-04",
+        "retrieved_at": "2026-11-06",
         "note": "Beschreibt Community Benefit Society, nicht gewinnorientierte Anteile, eine Stimme je Mitglied, AGM, Vorstandsrolle, Vermögensbindung und die 2026 laufende Anteilsausgabe."
       },
       {
@@ -80,7 +80,7 @@
         "type": "official-source",
         "label": "Fordhall – Weg ins Gemeinschaftseigentum",
         "url": "https://www.fordhallfarm.com/fcli-story",
-        "retrieved_at": "2026-08-04",
+        "retrieved_at": "2026-11-06",
         "note": "Dokumentiert den gemeinschaftlichen Landerwerb, die Anteilseigentümer und ihre Beteiligung an Projekten und Zukunftsentscheidungen."
       },
       {
@@ -98,9 +98,9 @@
     "state": "listed",
     "catalogued_at": "2026-08-04",
     "reviewed_by": "Commonworld editorial review",
-    "reviewed_at": "2026-08-04",
-    "next_review_at": "2026-11-04",
-    "notes": "Als lokales Land- und Landwirtschaftscommon aufgenommen. Katalogisiert wird die gemeinschaftliche Eigentums- und Gemeinwohlbindung des Bodens samt Zugangs- und Beteiligungswegen, nicht jeder kommerzielle Hof-, Café- oder Ladenumsatz."
+    "reviewed_at": "2026-11-06",
+    "next_review_at": "2027-02-06",
+    "notes": "Als lokales Land- und Landwirtschaftscommon aufgenommen. Katalogisiert wird die gemeinschaftliche Eigentums- und Gemeinwohlbindung des Bodens samt Zugangs- und Beteiligungswegen, nicht jeder kommerzielle Hof-, Café- oder Ladenumsatz. Quellenrecheck 06.11.2026; Primärbelege und Grenzen: docs/evidence/commons-basis-source-recheck-2026-11-06.json. Kein neuer Live-Betriebsnachweis."
   },
   "links": [
     {

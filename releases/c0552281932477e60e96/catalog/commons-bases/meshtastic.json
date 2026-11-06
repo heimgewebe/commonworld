@@ -1,0 +1,58 @@
+{
+  "schema_version": 1,
+  "kind": "commonworld_commons_basis",
+  "project_id": "meshtastic",
+  "classification": "commons-infrastructure",
+  "decision": "include",
+  "reviewed_at": "2026-07-31",
+  "reviewer": "Commonworld editorial review",
+  "criteria": {
+    "shared_resource": {
+      "status": "supported",
+      "statement": "Gemeinsam gepflegt werden Firmware, Protokolle, Anwendungen, Dokumentation und ein interoperables Kommunikationsökosystem.",
+      "source_ids": [
+        "meshtastic-home",
+        "meshtastic-firmware"
+      ]
+    },
+    "community": {
+      "status": "supported",
+      "statement": "Die offizielle Dokumentation beschreibt das Projekt als vollständig gemeinschaftsgetrieben und von freiwilligen Beitragenden getragen.",
+      "source_ids": [
+        "meshtastic-introduction"
+      ]
+    },
+    "commoning_practice": {
+      "status": "supported",
+      "statement": "Menschen können Code, Dokumentation und Unterstützung beitragen, Fehler bearbeiten und unabhängig eigene interoperable Meshes betreiben.",
+      "source_ids": [
+        "meshtastic-introduction",
+        "meshtastic-getting-started",
+        "meshtastic-firmware"
+      ]
+    },
+    "rules_and_responsibility": {
+      "status": "supported",
+      "statement": "GPL-3.0, Beitragsregeln, Verhaltenskodex, Sicherheitsweg und technische Protokollregeln ordnen Nutzung, Beiträge und Pflege.",
+      "source_ids": [
+        "meshtastic-firmware",
+        "meshtastic-legal"
+      ]
+    },
+    "common_benefit": {
+      "status": "supported",
+      "statement": "Das offene Ökosystem ermöglicht unabhängig betreibbare Off-grid-Kommunikation und bleibt auch jenseits kommerzieller Angebote frei nutzbar und weiterentwickelbar.",
+      "source_ids": [
+        "meshtastic-home",
+        "meshtastic-legal"
+      ]
+    }
+  },
+  "confidence": 0.88,
+  "limitations": [
+    "Marke und Teile der strategischen Steuerung sind bei Kernbeitragenden beziehungsweise Organisationen konzentriert.",
+    "Meshtastic Solutions ist ein separates kommerzielles Unternehmen; Commonworld setzt dessen Angebote nicht mit dem katalogisierten offenen Ökosystem gleich.",
+    "Ein einzelnes privates oder bloß konsumiertes Mesh ist nicht automatisch ein eigenständiges Common."
+  ],
+  "notes": "Die Aufnahme bewertet das globale offene Ökosystem. Lokale Meshtastic-Netze benötigen für eine separate Katalogidentität einen eigenen Beleg gemeinschaftlicher Trägerschaft, Praxis und Regeln."
+}

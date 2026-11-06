@@ -1,0 +1,56 @@
+{
+  "schema_version": 1,
+  "kind": "commonworld_commons_basis",
+  "project_id": "wikiversity",
+  "classification": "common",
+  "decision": "include",
+  "reviewed_at": "2026-10-30",
+  "reviewer": "Commonworld editorial desk review",
+  "criteria": {
+    "shared_resource": {
+      "status": "supported",
+      "statement": "Freie, gemeinschaftlich erstellte Lernressourcen, Kurse und Lehrprojekte bilden das geteilte digitale Wissensgut.",
+      "source_ids": [
+        "wikiversity-newcomers",
+        "wikimedia-projects"
+      ]
+    },
+    "community": {
+      "status": "supported",
+      "statement": "Eine offene Lehr- und Lerngemeinschaft gestaltet Inhalte, Kurse und gemeinschaftliche Lernprojekte.",
+      "source_ids": [
+        "wikiversity-newcomers"
+      ]
+    },
+    "commoning_practice": {
+      "status": "supported",
+      "statement": "Teilnehmer erstellen, diskutieren, verbessern und begleiten gemeinschaftlich Lernmaterialien und Projekte.",
+      "source_ids": [
+        "wikiversity-newcomers"
+      ]
+    },
+    "rules_and_responsibility": {
+      "status": "supported",
+      "statement": "Das Projekt lädt zur Mitgestaltung von Regeln ein; die deutschsprachige Wikiversity legt eigene verbindliche Regeln und Lizenzbedingungen fest.",
+      "source_ids": [
+        "wikiversity-newcomers",
+        "wikiversity-basic-policies-de"
+      ]
+    },
+    "common_benefit": {
+      "status": "supported",
+      "statement": "Lern- und Bildungsinhalte sind ohne Hochschulzulassung öffentlich zugänglich und nach entsprechenden freien Lizenzen nachnutzbar.",
+      "source_ids": [
+        "wikiversity-newcomers",
+        "wikimedia-projects"
+      ]
+    }
+  },
+  "confidence": 0.88,
+  "limitations": [
+    "Die deutschsprachigen Richtlinien dürfen nicht pauschal auf andere Wikimedia-Sprachprojekte übertragen werden.",
+    "Offene Lerninhalte bedeuten keinen akkreditierten Abschluss.",
+    "Die Aktualität aller Kurse wird nicht mit dem Governance-Review behauptet."
+  ],
+  "notes": "Offenes Bildungs-Common mit dezentraler Autorenschaft und sprachprojektgebundenen verbindlichen Regeln."
+}

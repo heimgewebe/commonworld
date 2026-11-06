@@ -1,0 +1,58 @@
+{
+  "schema_version": 1,
+  "kind": "commonworld_commons_basis",
+  "project_id": "community-energy-network-new-zealand",
+  "classification": "commons-infrastructure",
+  "decision": "include",
+  "reviewed_at": "2026-10-31",
+  "reviewer": "Commonworld editorial desk review",
+  "criteria": {
+    "shared_resource": {
+      "status": "supported",
+      "statement": "Gemeinsam genutztes Energie- und Hausmodernisierungswissen wird im gemeindenahen Mitgliedernetzwerk verteilt.",
+      "source_ids": [
+        "cen-about",
+        "cen-nz-home"
+      ]
+    },
+    "community": {
+      "status": "supported",
+      "statement": "Gemeinnützige lokale Energieorganisationen bilden ein Netzwerk, dessen Aufsicht im Vorstand repräsentiert wird.",
+      "source_ids": [
+        "cen-join",
+        "cen-board-governance"
+      ]
+    },
+    "commoning_practice": {
+      "status": "supported",
+      "statement": "Mitgliedsgruppen teilen Verfahren zur effizienten Gebäudesanierung und zum Aufbau lokal getragener Energiedienste.",
+      "source_ids": [
+        "cen-about",
+        "cen-nz-home"
+      ]
+    },
+    "rules_and_responsibility": {
+      "status": "supported",
+      "statement": "Ein veröffentlichter Vorstand mit Vertretern der Mitgliedsorganisationen und unabhängigen Leitungsmitgliedern trägt die formale Netzverantwortung.",
+      "source_ids": [
+        "cen-board-governance",
+        "cen-join"
+      ]
+    },
+    "common_benefit": {
+      "status": "supported",
+      "statement": "Austausch und gemeinsame Programme unterstützen gesunde Häuser, lokale Resilienz und Mitwirkung an erneuerbarer Energie.",
+      "source_ids": [
+        "cen-nz-home",
+        "cen-about"
+      ]
+    }
+  },
+  "confidence": 0.89,
+  "limitations": [
+    "Der Verband ist nicht automatisch Eigentümer der Anlagen oder Gebäude seiner Mitgliedsorganisationen.",
+    "Vorstandsrepräsentanz bedeutet nicht, dass alle Bewohner eine direkte individuelle Stimme besitzen.",
+    "Geplante lokale Energieprojekte sind keine bereits errichtete Infrastruktur."
+  ],
+  "notes": "Kooperatives Infrastruktur- und Wissensnetzwerk, dessen Eigentum nicht mit dem seiner Mitglieder gleichgesetzt wird."
+}

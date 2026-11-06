@@ -1,0 +1,647 @@
+{
+  "schema_version": 1,
+  "kind": "commonworld_commons_basis_retroreview_wave4",
+  "checked_at_utc": "2026-10-31",
+  "source_base_commit": "a779b9a969ea4fa53a0d26a0efe08a2d1a7415b5",
+  "scope": "Twelve project-level first-party official-source five-criteria governance desk reviews; explicit unresolved decision rights remain pending.",
+  "reviewer_provenance": "model-assisted first-party documentation desk review; not independent human certification",
+  "source_verification": "Public organizational pages inspected 2026-10-31; recent site availability does not certify operational activity or updated historical constitutions.",
+  "outcomes": [
+    {
+      "project_id": "fucvam",
+      "basis_decision": "include",
+      "classification": "commons-infrastructure",
+      "criteria": {
+        "shared_resource": {
+          "verdict": "supported",
+          "cited_source_ids": [
+            "fucvam-home",
+            "fucvam-affiliation"
+          ]
+        },
+        "community": {
+          "verdict": "supported",
+          "cited_source_ids": [
+            "fucvam-affiliation",
+            "fucvam-statutes"
+          ]
+        },
+        "commoning_practice": {
+          "verdict": "supported",
+          "cited_source_ids": [
+            "fucvam-home",
+            "fucvam-affiliation"
+          ]
+        },
+        "rules_and_responsibility": {
+          "verdict": "supported",
+          "cited_source_ids": [
+            "fucvam-statutes",
+            "fucvam-affiliation"
+          ]
+        },
+        "common_benefit": {
+          "verdict": "supported",
+          "cited_source_ids": [
+            "fucvam-home",
+            "fucvam-affiliation"
+          ]
+        }
+      },
+      "provenance_urls": {
+        "fucvam-affiliation": "https://www.fucvam.org.uy/afiliacion-de-nuevas-cooperativas/",
+        "fucvam-home": "https://www.fucvam.org.uy/",
+        "fucvam-statutes": "https://www.fucvam.org.uy/quienes-somos/estatuto-social-de-fucvam"
+      },
+      "limitations": [
+        "Die Föderation besitzt nicht notwendig jede Wohnimmobilie der angeschlossenen rechtlich selbständigen Genossenschaften.",
+        "Wohnnutzungsrechte gelten für Mitglieder nach konkreten Statuten; kein beliebiger freier Zutritt zu Wohnungen.",
+        "Die aktuelle Bewohnbarkeit einzelner Objekte oder die Prüfung aller angeschlossenen Statuten ist nicht nachgewiesen."
+      ],
+      "operational_activity_recatalogued": false,
+      "post_review_public_state": "stale"
+    },
+    {
+      "project_id": "guifi-net",
+      "basis_decision": "include",
+      "classification": "common",
+      "criteria": {
+        "shared_resource": {
+          "verdict": "supported",
+          "cited_source_ids": [
+            "guifi-commons",
+            "guifi-network-guide"
+          ]
+        },
+        "community": {
+          "verdict": "supported",
+          "cited_source_ids": [
+            "guifi-commons"
+          ]
+        },
+        "commoning_practice": {
+          "verdict": "supported",
+          "cited_source_ids": [
+            "guifi-commons",
+            "guifi-network-guide"
+          ]
+        },
+        "rules_and_responsibility": {
+          "verdict": "supported",
+          "cited_source_ids": [
+            "guifi-commons",
+            "guifi-network-guide"
+          ]
+        },
+        "common_benefit": {
+          "verdict": "supported",
+          "cited_source_ids": [
+            "guifi-commons"
+          ]
+        }
+      },
+      "provenance_urls": {
+        "guifi-commons": "https://fundacio.guifi.net/page/red",
+        "guifi-network-guide": "https://network.guifi.net/en"
+      },
+      "limitations": [
+        "Offener Netzzugang bedeutet nicht, dass jeder Zugang kostenlos oder jede Leitung gemeinschaftlich im selben Rechtstitel steht.",
+        "Die Stiftung, lokale Betreiber und einzelne Leitungs-/Grundstückseigentümer sind nicht identisch.",
+        "Einzelne lokale Netzbereiche und aktuelle Dienstverfügbarkeit wurden nicht neu nachgemessen."
+      ],
+      "operational_activity_recatalogued": false,
+      "post_review_public_state": "stale"
+    },
+    {
+      "project_id": "hepburn-energy",
+      "basis_decision": "include",
+      "classification": "commons-infrastructure",
+      "criteria": {
+        "shared_resource": {
+          "verdict": "supported",
+          "cited_source_ids": [
+            "source-hepburn-official",
+            "source-hepburn-membership"
+          ]
+        },
+        "community": {
+          "verdict": "supported",
+          "cited_source_ids": [
+            "source-hepburn-membership"
+          ]
+        },
+        "commoning_practice": {
+          "verdict": "supported",
+          "cited_source_ids": [
+            "source-hepburn-membership",
+            "source-hepburn-official"
+          ]
+        },
+        "rules_and_responsibility": {
+          "verdict": "supported",
+          "cited_source_ids": [
+            "source-hepburn-membership"
+          ]
+        },
+        "common_benefit": {
+          "verdict": "supported",
+          "cited_source_ids": [
+            "source-hepburn-membership",
+            "source-hepburn-official"
+          ]
+        }
+      },
+      "provenance_urls": {
+        "source-hepburn-membership": "https://www.hepburnenergy.coop/membership/",
+        "source-hepburn-official": "https://www.hepburnenergy.coop/about/"
+      },
+      "limitations": [
+        "Mitgliedschaft erfordert Kapitalbeteiligung und Aktivitätsbedingungen; das Angebot ist nicht kostenfrei für alle.",
+        "Einzelne Projekte und geplante zusätzliche Anlagen dürfen nicht als fertig gebaut gelten.",
+        "Die Berechtigung zu finanziellen Rückflüssen wird durch Regeln und Finanzierung eingeschränkt."
+      ],
+      "operational_activity_recatalogued": false,
+      "post_review_public_state": "stale"
+    },
+    {
+      "project_id": "zenzeleni-community-networks",
+      "basis_decision": "include",
+      "classification": "commons-infrastructure",
+      "criteria": {
+        "shared_resource": {
+          "verdict": "supported",
+          "cited_source_ids": [
+            "zenzeleni-model",
+            "zenzeleni-home"
+          ]
+        },
+        "community": {
+          "verdict": "supported",
+          "cited_source_ids": [
+            "zenzeleni-model"
+          ]
+        },
+        "commoning_practice": {
+          "verdict": "supported",
+          "cited_source_ids": [
+            "zenzeleni-model",
+            "zenzeleni-home"
+          ]
+        },
+        "rules_and_responsibility": {
+          "verdict": "supported",
+          "cited_source_ids": [
+            "zenzeleni-model"
+          ]
+        },
+        "common_benefit": {
+          "verdict": "supported",
+          "cited_source_ids": [
+            "zenzeleni-model",
+            "zenzeleni-home"
+          ]
+        }
+      },
+      "provenance_urls": {
+        "zenzeleni-home": "https://zenzeleni.net/",
+        "zenzeleni-model": "https://zenzeleni.net/our-model/"
+      },
+      "limitations": [
+        "Zenzeleni NPC ist nicht mit jeder lokal netzbesitzenden Kooperative identisch.",
+        "Mitgliederauswahl und konkrete Betriebsregeln unterscheiden sich nach Gemeinde.",
+        "Die gegenwärtige Leistung einzelner Funklinks wurde nicht live gemessen."
+      ],
+      "operational_activity_recatalogued": false,
+      "post_review_public_state": "stale"
+    },
+    {
+      "project_id": "granby-four-streets-clt",
+      "basis_decision": "include",
+      "classification": "common",
+      "criteria": {
+        "shared_resource": {
+          "verdict": "supported",
+          "cited_source_ids": [
+            "granby-about",
+            "granby-clt"
+          ]
+        },
+        "community": {
+          "verdict": "supported",
+          "cited_source_ids": [
+            "granby-about",
+            "granby-clt"
+          ]
+        },
+        "commoning_practice": {
+          "verdict": "supported",
+          "cited_source_ids": [
+            "granby-about"
+          ]
+        },
+        "rules_and_responsibility": {
+          "verdict": "supported",
+          "cited_source_ids": [
+            "granby-clt",
+            "granby-about"
+          ]
+        },
+        "common_benefit": {
+          "verdict": "supported",
+          "cited_source_ids": [
+            "granby-about",
+            "granby-clt"
+          ]
+        }
+      },
+      "provenance_urls": {
+        "granby-about": "https://www.granby4streetsclt.co.uk/about",
+        "granby-clt": "https://www.granby4streetsclt.co.uk/whats-a-clt"
+      },
+      "limitations": [
+        "Die CLT-Grundsätze erklären den strukturellen Bodenschutz, ersetzen aber keinen aktuellen Auszug der Granby-spezifischen Satzung.",
+        "Die veröffentlichten Objektzahlen können sich geändert haben; keine neue aktuelle Bestandszertifizierung.",
+        "Wohnraum wird nach lokalem Vergabe- und Mietrecht vergeben; er ist nicht allgemein frei verfügbar."
+      ],
+      "operational_activity_recatalogued": false,
+      "post_review_public_state": "stale"
+    },
+    {
+      "project_id": "tribunal-aguas-valencia",
+      "basis_decision": "include",
+      "classification": "commons-infrastructure",
+      "criteria": {
+        "shared_resource": {
+          "verdict": "supported",
+          "cited_source_ids": [
+            "source-tribunal-official",
+            "tribunal-operation"
+          ]
+        },
+        "community": {
+          "verdict": "supported",
+          "cited_source_ids": [
+            "tribunal-operation"
+          ]
+        },
+        "commoning_practice": {
+          "verdict": "supported",
+          "cited_source_ids": [
+            "source-tribunal-official",
+            "tribunal-operation"
+          ]
+        },
+        "rules_and_responsibility": {
+          "verdict": "supported",
+          "cited_source_ids": [
+            "tribunal-operation"
+          ]
+        },
+        "common_benefit": {
+          "verdict": "supported",
+          "cited_source_ids": [
+            "tribunal-operation",
+            "source-tribunal-official"
+          ]
+        }
+      },
+      "provenance_urls": {
+        "source-tribunal-official": "https://tribunaldelasaguas.org/en/",
+        "tribunal-operation": "https://tribunaldelasaguas.org/en/operation/"
+      },
+      "limitations": [
+        "Das Tribunal selbst ist ein gemeinschaftliches Streitbeilegungsorgan und nicht automatisch Eigentümer aller Bewässerungskanäle.",
+        "Die Rechte betreffen definierte Bewässerungsgemeinschaften und deren Mitglieder, nicht ein allgemeines Nutzungsrecht aller Einwohner.",
+        "Aus öffentlichen Sitzungsterminen lässt sich keine individuelle heutige Bewässerungsquote ableiten."
+      ],
+      "operational_activity_recatalogued": false,
+      "post_review_public_state": "stale"
+    },
+    {
+      "project_id": "librivox",
+      "basis_decision": "include",
+      "classification": "common",
+      "criteria": {
+        "shared_resource": {
+          "verdict": "supported",
+          "cited_source_ids": [
+            "librivox-about",
+            "librivox-volunteer"
+          ]
+        },
+        "community": {
+          "verdict": "supported",
+          "cited_source_ids": [
+            "librivox-about",
+            "librivox-volunteer"
+          ]
+        },
+        "commoning_practice": {
+          "verdict": "supported",
+          "cited_source_ids": [
+            "librivox-volunteer"
+          ]
+        },
+        "rules_and_responsibility": {
+          "verdict": "supported",
+          "cited_source_ids": [
+            "librivox-volunteer"
+          ]
+        },
+        "common_benefit": {
+          "verdict": "supported",
+          "cited_source_ids": [
+            "librivox-about",
+            "librivox-volunteer"
+          ]
+        }
+      },
+      "provenance_urls": {
+        "librivox-about": "https://librivox.org/pages/about-librivox/",
+        "librivox-volunteer": "https://librivox.org/pages/volunteer-for-librivox/"
+      },
+      "limitations": [
+        "Die zugrunde liegende Textvorlage muss nach dem jeweils geltenden Recht gemeinfrei sein; US-Regeln gelten nicht automatisch weltweit.",
+        "Offene Mitarbeit ist keine Zusage auf Veröffentlichung jeder eingesandten Tonaufnahme.",
+        "Die Freiwilligenrollen begründen keine kollektive Eigentümerschaft an einer zentralen Organisation."
+      ],
+      "operational_activity_recatalogued": false,
+      "post_review_public_state": "stale"
+    },
+    {
+      "project_id": "musicbrainz",
+      "basis_decision": "include",
+      "classification": "common",
+      "criteria": {
+        "shared_resource": {
+          "verdict": "supported",
+          "cited_source_ids": [
+            "musicbrainz-about",
+            "metabrainz-social-contract"
+          ]
+        },
+        "community": {
+          "verdict": "supported",
+          "cited_source_ids": [
+            "musicbrainz-about",
+            "musicbrainz-editor-stats"
+          ]
+        },
+        "commoning_practice": {
+          "verdict": "supported",
+          "cited_source_ids": [
+            "musicbrainz-about",
+            "metabrainz-social-contract"
+          ]
+        },
+        "rules_and_responsibility": {
+          "verdict": "supported",
+          "cited_source_ids": [
+            "musicbrainz-about",
+            "metabrainz-social-contract"
+          ]
+        },
+        "common_benefit": {
+          "verdict": "supported",
+          "cited_source_ids": [
+            "metabrainz-social-contract",
+            "musicbrainz-about"
+          ]
+        }
+      },
+      "provenance_urls": {
+        "metabrainz-social-contract": "https://metabrainz.org/social-contract",
+        "musicbrainz-about": "https://musicbrainz.org/doc/About",
+        "musicbrainz-editor-stats": "https://musicbrainz.org/statistics/editors"
+      },
+      "limitations": [
+        "Der Sozialvertrag ist ausdrücklich nicht rechtsverbindlich; tatsächliche Lizenzen der verschiedenen Datenteile sind gesondert zu beachten.",
+        "Gemeinschaftliche Bearbeitungsrechte bedeuten kein Stimmrecht aller Nutzer bei Entscheidungen der Stiftung.",
+        "Das Katalogprojekt führt keine urheberrechtlich geschützten Audioaufnahmen als frei kopierbare Ressource."
+      ],
+      "operational_activity_recatalogued": false,
+      "post_review_public_state": "stale"
+    },
+    {
+      "project_id": "g0v",
+      "basis_decision": "include",
+      "classification": "commons-infrastructure",
+      "criteria": {
+        "shared_resource": {
+          "verdict": "supported",
+          "cited_source_ids": [
+            "g0v-english-manifesto",
+            "g0v-home"
+          ]
+        },
+        "community": {
+          "verdict": "supported",
+          "cited_source_ids": [
+            "g0v-english-manifesto",
+            "g0v-home"
+          ]
+        },
+        "commoning_practice": {
+          "verdict": "supported",
+          "cited_source_ids": [
+            "g0v-english-manifesto",
+            "g0v-home"
+          ]
+        },
+        "rules_and_responsibility": {
+          "verdict": "supported",
+          "cited_source_ids": [
+            "g0v-english-manifesto",
+            "g0v-community-governance"
+          ]
+        },
+        "common_benefit": {
+          "verdict": "supported",
+          "cited_source_ids": [
+            "g0v-english-manifesto"
+          ]
+        }
+      },
+      "provenance_urls": {
+        "g0v-community-governance": "https://g0v.tw/g0vernance/",
+        "g0v-english-manifesto": "https://g0v.tw/manifesto/en/",
+        "g0v-home": "https://g0v.tw/intl/en/"
+      },
+      "limitations": [
+        "g0v besitzt ausdrücklich keinen einheitlichen Repräsentanten oder eine zentrale Governance über alle Teilprojekte.",
+        "Das englische Manifest ist Stand 2019; die aktuelle lokale Ausgestaltung einzelner Gruppen wurde nicht gesondert verifiziert.",
+        "Nicht jedes g0v-Projekt hat dieselben Regeln für Datenhaltung, Moderation oder Mitbestimmung."
+      ],
+      "operational_activity_recatalogued": false,
+      "post_review_public_state": "stale"
+    },
+    {
+      "project_id": "safecast",
+      "basis_decision": "needs_information",
+      "classification": "undetermined",
+      "criteria": {
+        "shared_resource": {
+          "verdict": "supported",
+          "cited_source_ids": [
+            "safecast-about",
+            "safecast-license-policy"
+          ]
+        },
+        "community": {
+          "verdict": "supported",
+          "cited_source_ids": [
+            "safecast-about",
+            "safecast-news"
+          ]
+        },
+        "commoning_practice": {
+          "verdict": "supported",
+          "cited_source_ids": [
+            "safecast-about",
+            "safecast-license-policy"
+          ]
+        },
+        "rules_and_responsibility": {
+          "verdict": "partial",
+          "cited_source_ids": [
+            "safecast-license-policy",
+            "safecast-about"
+          ]
+        },
+        "common_benefit": {
+          "verdict": "supported",
+          "cited_source_ids": [
+            "safecast-about",
+            "safecast-license-policy"
+          ]
+        }
+      },
+      "provenance_urls": {
+        "safecast-about": "https://safecast.org/about/",
+        "safecast-license-policy": "https://safecast.org/about/licenses-we-use/",
+        "safecast-news": "https://safecast.org/news/"
+      },
+      "limitations": [
+        "CC0-Messdaten bedeuten nicht, dass Marken, Webseitentexte und sämtliche Hardware gleich frei lizenziert sind.",
+        "Die eingereichten Daten unterliegen der veröffentlichten Freigabepolitik; organisatorische Vetorechte der Freiwilligen sind nicht nachgewiesen.",
+        "Die Messgenauigkeit einzelner Sensoren oder aktuelle Verfügbarkeit aller Datenendpunkte wurde nicht neu überprüft."
+      ],
+      "operational_activity_recatalogued": false,
+      "post_review_public_state": "stale"
+    },
+    {
+      "project_id": "p2pu",
+      "basis_decision": "needs_information",
+      "classification": "undetermined",
+      "criteria": {
+        "shared_resource": {
+          "verdict": "supported",
+          "cited_source_ids": [
+            "p2pu-about",
+            "p2pu-home"
+          ]
+        },
+        "community": {
+          "verdict": "supported",
+          "cited_source_ids": [
+            "p2pu-about",
+            "p2pu-community"
+          ]
+        },
+        "commoning_practice": {
+          "verdict": "supported",
+          "cited_source_ids": [
+            "p2pu-about",
+            "p2pu-community"
+          ]
+        },
+        "rules_and_responsibility": {
+          "verdict": "partial",
+          "cited_source_ids": [
+            "p2pu-about"
+          ]
+        },
+        "common_benefit": {
+          "verdict": "supported",
+          "cited_source_ids": [
+            "p2pu-about",
+            "p2pu-home"
+          ]
+        }
+      },
+      "provenance_urls": {
+        "p2pu-about": "https://www.p2pu.org/en/about/",
+        "p2pu-community": "https://community.p2pu.org/",
+        "p2pu-home": "https://www.p2pu.org/"
+      },
+      "limitations": [
+        "Ein kleines P2PU-Kernteam und eigenständige Bibliotheken übernehmen verschiedene Verantwortungen; sie sind keine einheitliche Mitgliedergenossenschaft.",
+        "Die Governance des gemeinnützigen Trägers ist aus der allgemeinen Projektbeschreibung nicht bestimmt.",
+        "Die Zugänglichkeit einzelner Lernkreise variiert nach teilnehmender Bibliothek und Termin."
+      ],
+      "operational_activity_recatalogued": false,
+      "post_review_public_state": "stale"
+    },
+    {
+      "project_id": "new-mexico-acequia-association",
+      "basis_decision": "include",
+      "classification": "commons-infrastructure",
+      "criteria": {
+        "shared_resource": {
+          "verdict": "supported",
+          "cited_source_ids": [
+            "nmaa-about",
+            "nmaa-acequia-governance"
+          ]
+        },
+        "community": {
+          "verdict": "supported",
+          "cited_source_ids": [
+            "nmaa-membership",
+            "nmaa-about"
+          ]
+        },
+        "commoning_practice": {
+          "verdict": "supported",
+          "cited_source_ids": [
+            "nmaa-acequia-governance",
+            "nmaa-about"
+          ]
+        },
+        "rules_and_responsibility": {
+          "verdict": "supported",
+          "cited_source_ids": [
+            "nmaa-acequia-governance",
+            "nmaa-membership"
+          ]
+        },
+        "common_benefit": {
+          "verdict": "supported",
+          "cited_source_ids": [
+            "nmaa-about",
+            "nmaa-acequia-governance"
+          ]
+        }
+      },
+      "provenance_urls": {
+        "nmaa-about": "https://lasacequias.org/about-us/",
+        "nmaa-acequia-governance": "https://lasacequias.org/acequia-governance/",
+        "nmaa-membership": "https://lasacequias.org/become-a-member/"
+      },
+      "limitations": [
+        "NMAA ist Interessenvertretung und Governance-Hilfe; Eigentum und verbindliche Wasserverteilung bleiben bei den örtlichen Acequias.",
+        "Nicht jede lokale Acequia wird durch dieselben Satzungsregeln oder ein einziges NMAA-Gremium gesteuert.",
+        "Eine Aussage über aktuelle individuelle Nutzungsquoten oder Wasserverfügbarkeit ist hier nicht belegt."
+      ],
+      "operational_activity_recatalogued": false,
+      "post_review_public_state": "stale"
+    }
+  ],
+  "does_not_establish": [
+    "independent_human_governance_certification",
+    "current_operational_activity",
+    "signed_first_party_five_axis_git_review",
+    "merge_authorization",
+    "production_deployment"
+  ]
+}

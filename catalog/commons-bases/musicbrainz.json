@@ -1,0 +1,58 @@
+{
+  "schema_version": 1,
+  "kind": "commonworld_commons_basis",
+  "project_id": "musicbrainz",
+  "classification": "common",
+  "decision": "include",
+  "reviewed_at": "2026-10-31",
+  "reviewer": "Commonworld editorial desk review",
+  "criteria": {
+    "shared_resource": {
+      "status": "supported",
+      "statement": "Die gemeinschaftlich gepflegte Musikmetadatenbank und ihre allgemein zugänglichen Datensätze bilden die digitale Wissensressource.",
+      "source_ids": [
+        "musicbrainz-about",
+        "metabrainz-social-contract"
+      ]
+    },
+    "community": {
+      "status": "supported",
+      "statement": "Nutzer können als Editoren Musikdaten beitragen, prüfen, diskutieren und ein offenes gemeinsames Datenkorpus pflegen.",
+      "source_ids": [
+        "musicbrainz-about",
+        "musicbrainz-editor-stats"
+      ]
+    },
+    "commoning_practice": {
+      "status": "supported",
+      "statement": "Editoren ergänzen, korrigieren und kuratieren Aufnahmen, Künstler und Beziehungen in gemeinsam dokumentierten Bearbeitungsverfahren.",
+      "source_ids": [
+        "musicbrainz-about",
+        "metabrainz-social-contract"
+      ]
+    },
+    "rules_and_responsibility": {
+      "status": "supported",
+      "statement": "Die offene Editierpraxis unterliegt Stilrichtlinien und öffentlich diskutierbaren Regeln; der MetaBrainz-Sozialvertrag verpflichtet die Organisation programmatisch zu Transparenz und freien Daten.",
+      "source_ids": [
+        "musicbrainz-about",
+        "metabrainz-social-contract"
+      ]
+    },
+    "common_benefit": {
+      "status": "supported",
+      "statement": "Daten und offene Software können von Freiwilligen verbessert und für Forschungs-, Musik- und Informationszwecke weiterverwendet werden.",
+      "source_ids": [
+        "metabrainz-social-contract",
+        "musicbrainz-about"
+      ]
+    }
+  },
+  "confidence": 0.91,
+  "limitations": [
+    "Der Sozialvertrag ist ausdrücklich nicht rechtsverbindlich; tatsächliche Lizenzen der verschiedenen Datenteile sind gesondert zu beachten.",
+    "Gemeinschaftliche Bearbeitungsrechte bedeuten kein Stimmrecht aller Nutzer bei Entscheidungen der Stiftung.",
+    "Das Katalogprojekt führt keine urheberrechtlich geschützten Audioaufnahmen als frei kopierbare Ressource."
+  ],
+  "notes": "Offene Musikmetadaten mit überprüfbarer gemeinsamer Bearbeitung und organisatorischer Transparenz; Trägerkontrolle nicht mit Editorstimmen verwechseln."
+}

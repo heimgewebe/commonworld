@@ -1,0 +1,190 @@
+{
+  "schema_version": 1,
+  "kind": "commonworld_catalog_locale_surface_technical_carryforward_amendment",
+  "base_pr_head": "7487c69af9371afd3db2891a2d3dc8e022056772",
+  "target_release": "fac002ba76fb2ba29883",
+  "scope": "18 generated nonbaseline surfaces, metadata and unchanged localized stale-notice date tokens only",
+  "translation_review_status": "historical_receipts_preserved_not_newly_approved",
+  "surfaces": [
+    {
+      "locale": "es",
+      "surface": "index",
+      "file": "es.html",
+      "changed_lines": 18,
+      "release_metadata_pairs": 4,
+      "stale_date_notice_pairs": 5,
+      "current_sha256": "c5163a0e80c1cf57995572d11b6f07e29a162c7f9581275567137f666431f370",
+      "new_translation_review_claim": false
+    },
+    {
+      "locale": "es",
+      "surface": "method",
+      "file": "method.es.html",
+      "changed_lines": 4,
+      "release_metadata_pairs": 2,
+      "stale_date_notice_pairs": 0,
+      "current_sha256": "b5f2f39321e9e7027d9f5f0e9251aaa2cd179aaa64fe6012ab77159a57d59c44",
+      "new_translation_review_claim": false
+    },
+    {
+      "locale": "es",
+      "surface": "proposal",
+      "file": "propose.es.html",
+      "changed_lines": 4,
+      "release_metadata_pairs": 2,
+      "stale_date_notice_pairs": 0,
+      "current_sha256": "172d0ccada2ed8eb253c730ade69cb8e28999b69d001e08fb033395fb9e4c401",
+      "new_translation_review_claim": false
+    },
+    {
+      "locale": "fr",
+      "surface": "index",
+      "file": "fr.html",
+      "changed_lines": 18,
+      "release_metadata_pairs": 4,
+      "stale_date_notice_pairs": 5,
+      "current_sha256": "38dd8f73bc2ad3c10a81983785abd841dee18986a85d1cfae8e4555b7733bd16",
+      "new_translation_review_claim": false
+    },
+    {
+      "locale": "fr",
+      "surface": "method",
+      "file": "method.fr.html",
+      "changed_lines": 4,
+      "release_metadata_pairs": 2,
+      "stale_date_notice_pairs": 0,
+      "current_sha256": "8188a57547da8bb53746cd7e4fe163036a18ca152bed38f07f5ea3400b56da0b",
+      "new_translation_review_claim": false
+    },
+    {
+      "locale": "fr",
+      "surface": "proposal",
+      "file": "propose.fr.html",
+      "changed_lines": 4,
+      "release_metadata_pairs": 2,
+      "stale_date_notice_pairs": 0,
+      "current_sha256": "bdcf31e0fa40186adf390c73be5b07bfe60dbc9fdacbcff087fb89b35cfe77b2",
+      "new_translation_review_claim": false
+    },
+    {
+      "locale": "pt-BR",
+      "surface": "index",
+      "file": "pt-BR.html",
+      "changed_lines": 18,
+      "release_metadata_pairs": 4,
+      "stale_date_notice_pairs": 5,
+      "current_sha256": "fbc35d590d79cf76318783fcb9708dc6f6ce71aa6a232794d1a2c774888e2890",
+      "new_translation_review_claim": false
+    },
+    {
+      "locale": "pt-BR",
+      "surface": "method",
+      "file": "method.pt-BR.html",
+      "changed_lines": 4,
+      "release_metadata_pairs": 2,
+      "stale_date_notice_pairs": 0,
+      "current_sha256": "687feadf2ebf1de39a82a4bc98cb98d4910f9f46287f0a014b40a77666ca2fa4",
+      "new_translation_review_claim": false
+    },
+    {
+      "locale": "pt-BR",
+      "surface": "proposal",
+      "file": "propose.pt-BR.html",
+      "changed_lines": 4,
+      "release_metadata_pairs": 2,
+      "stale_date_notice_pairs": 0,
+      "current_sha256": "d4a23679876d6cfb16d199e0b1c23322c1aab62fab26e1723437e52335e83923",
+      "new_translation_review_claim": false
+    },
+    {
+      "locale": "ar",
+      "surface": "index",
+      "file": "ar.html",
+      "changed_lines": 18,
+      "release_metadata_pairs": 4,
+      "stale_date_notice_pairs": 5,
+      "current_sha256": "1f6e0de764feb09b7d4a0debe9d90518866b8759151f1e104c2f50ab2bab0fdd",
+      "new_translation_review_claim": false
+    },
+    {
+      "locale": "ar",
+      "surface": "method",
+      "file": "method.ar.html",
+      "changed_lines": 4,
+      "release_metadata_pairs": 2,
+      "stale_date_notice_pairs": 0,
+      "current_sha256": "04c2c2881df0d37452742a223362621591352fd329a757d1bd5d4907780c701e",
+      "new_translation_review_claim": false
+    },
+    {
+      "locale": "ar",
+      "surface": "proposal",
+      "file": "propose.ar.html",
+      "changed_lines": 4,
+      "release_metadata_pairs": 2,
+      "stale_date_notice_pairs": 0,
+      "current_sha256": "f9de4fc239708d9a72fb8b2cae09961166baa0a80361bab2b7b59f691289f0a1",
+      "new_translation_review_claim": false
+    },
+    {
+      "locale": "zh-Hans",
+      "surface": "index",
+      "file": "zh-Hans.html",
+      "changed_lines": 18,
+      "release_metadata_pairs": 4,
+      "stale_date_notice_pairs": 5,
+      "current_sha256": "34cd3fea895f4715bb4b9a7385b537e21d71ba6e31a53ca1cdd5998840d34e0e",
+      "new_translation_review_claim": false
+    },
+    {
+      "locale": "zh-Hans",
+      "surface": "method",
+      "file": "method.zh-Hans.html",
+      "changed_lines": 4,
+      "release_metadata_pairs": 2,
+      "stale_date_notice_pairs": 0,
+      "current_sha256": "68bb22a7f1cf38c912601be8f5c2cdeb2fa18bfb46b381733d60d9dfc8c887b2",
+      "new_translation_review_claim": false
+    },
+    {
+      "locale": "zh-Hans",
+      "surface": "proposal",
+      "file": "propose.zh-Hans.html",
+      "changed_lines": 4,
+      "release_metadata_pairs": 2,
+      "stale_date_notice_pairs": 0,
+      "current_sha256": "f0e9e2e6bcc639db25c78ca81aaa4ef6368c318b33de04dbf586ab1013f56aa4",
+      "new_translation_review_claim": false
+    },
+    {
+      "locale": "hi",
+      "surface": "index",
+      "file": "hi.html",
+      "changed_lines": 18,
+      "release_metadata_pairs": 4,
+      "stale_date_notice_pairs": 5,
+      "current_sha256": "ccafd6a44d75ae658af371737973dc2f3fad66f3b4f6a61afe3647df44645925",
+      "new_translation_review_claim": false
+    },
+    {
+      "locale": "hi",
+      "surface": "method",
+      "file": "method.hi.html",
+      "changed_lines": 4,
+      "release_metadata_pairs": 2,
+      "stale_date_notice_pairs": 0,
+      "current_sha256": "5d467f77065b1350fd427bf9f3c283351f5c5ddc9e3c40d9f0d007cbe3f07e2c",
+      "new_translation_review_claim": false
+    },
+    {
+      "locale": "hi",
+      "surface": "proposal",
+      "file": "propose.hi.html",
+      "changed_lines": 4,
+      "release_metadata_pairs": 2,
+      "stale_date_notice_pairs": 0,
+      "current_sha256": "4ce2ab681cfa0d1ae1ec8b1976b5251afd5197510ab356dd01fdb2ab002e54a3",
+      "new_translation_review_claim": false
+    }
+  ]
+}

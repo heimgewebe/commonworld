@@ -4,7 +4,7 @@
   "project_id": "common-voice",
   "classification": "commons-infrastructure",
   "decision": "include",
-  "reviewed_at": "2026-08-04",
+  "reviewed_at": "2026-11-06",
   "reviewer": "Commonworld editorial review",
   "criteria": {
     "shared_resource": {
@@ -58,5 +58,5 @@
     "Der Datensatz-Zugang ist in Mozilla Data Collective eingebettet; Commonworld setzt offene Lizenzierung nicht mit dezentraler Infrastrukturkontrolle gleich.",
     "Die tatsächliche Repräsentativität, Datenqualität und Beteiligungsstärke unterscheiden sich erheblich zwischen Sprachgemeinschaften."
   ],
-  "notes": "Die Aufnahme bewertet die offene Daten- und Beteiligungsinfrastruktur. Einzelne Sprachdatensätze oder lokale Gruppen sind nur bei eigener belegter Trägerschaft separate Commons."
+  "notes": "Die Aufnahme bewertet die offene Daten- und Beteiligungsinfrastruktur. Einzelne Sprachdatensätze oder lokale Gruppen sind nur bei eigener belegter Trägerschaft separate Commons. Wiedervorlage 06.11.2026: Offizielle Software- und Community-Repositories sind weiterhin dokumentiert; eine unabhängig demokratische Gesamtsteuerung der Mozilla-Plattform oder Liveverfügbarkeit jedes Sprachdatensatzes wird daraus nicht abgeleitet. Keine unabhängige menschliche Abnahme."
 }
