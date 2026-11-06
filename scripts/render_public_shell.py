@@ -456,7 +456,7 @@ def render_shell(root: Path = ROOT, locale: str = FALLBACK_LOCALE) -> str:
           <div class="search-control" role="search">
             <label class="visually-hidden" for="commons-search">Commons suchen</label>
             <span class="search-symbol" aria-hidden="true">⌕</span>
-            <input id="commons-search" type="search" inputmode="search" autocomplete="off" placeholder="Was möchtest du tun oder finden?" aria-controls="discovery-list" aria-expanded="false" />
+            <input id="commons-search" type="search" inputmode="search" autocomplete="off" placeholder="Was möchtest du tun oder finden?" aria-controls="discovery-list" />
             <button id="search-clear" class="search-clear" type="button" aria-label="Suche leeren" hidden>×</button>
           </div>
           <button id="filter-toggle" class="icon-button filter-toggle" type="button" aria-label="Suchergebnisse und Filter öffnen" aria-controls="discovery-panel" aria-expanded="false"><span class="filter-toggle-icon" aria-hidden="true"></span><span class="filter-toggle-label">Filter</span><span id="filter-toggle-count" class="filter-toggle-count" hidden>0</span></button>
@@ -556,11 +556,11 @@ def render_shell(root: Path = ROOT, locale: str = FALLBACK_LOCALE) -> str:
             </div>
           </div>
 
-          <div class="orientation-bar" aria-label="Globusorientierung">
+          <div class="orientation-bar" role="group" aria-label="Globusorientierung">
             <button id="globe-reset" type="button">Erde</button>
             <span aria-hidden="true">›</span>
             <span id="semantic-level">Gesamtansicht</span>
-            <span id="semantic-summary" class="semantic-summary">Katalogauszug · Abdeckung nicht bewertet</span>
+            <span id="semantic-summary" class="semantic-summary" role="group">Katalogauszug · Abdeckung nicht bewertet</span>
             <span id="semantic-breadcrumb-accessible" class="visually-hidden"></span>
           </div>
 
@@ -693,6 +693,13 @@ def render_shell(root: Path = ROOT, locale: str = FALLBACK_LOCALE) -> str:
 </html>
 '''
     markup = translate_shell(markup, locale)
+    # Wave-1 translated shell snippets contain historical presentation markup.
+    # Keep their reviewed text byte-identical while restoring the accessible
+    # group role after locale substitution, where it would otherwise be lost.
+    markup = markup.replace(
+        '<span id="semantic-summary" class="semantic-summary">',
+        '<span id="semantic-summary" class="semantic-summary" role="group">',
+    )
     if normalized == "de":
         markup = markup.replace(
             "Der vollständige lineare Katalog bleibt hier erreichbar, während die interaktive Ansicht lädt oder nicht verfügbar ist.",
