@@ -1,0 +1,96 @@
+{
+  "schema_version": 1,
+  "kind": "commonworld_commons_basis_retroreview_wave1",
+  "checked_at_utc": "2026-10-30",
+  "source_pr": "heimgewebe/commonworld#235",
+  "starting_pr_head": "7487c69af9371afd3db2891a2d3dc8e022056772",
+  "review_kind": "model_assisted_official_primary_source_desk_review",
+  "does_not_establish": [
+    "independent human certification",
+    "on-site activity or active governance at 2026-10-30",
+    "review of all 100 projects",
+    "new native translation approval",
+    "protected GitHub merge or production deployment"
+  ],
+  "selection": [
+    "debian",
+    "openstreetmap",
+    "wikipedia",
+    "libreoffice",
+    "nyc-mesh"
+  ],
+  "outcomes": [
+    {
+      "id": "debian",
+      "decision": "include",
+      "governance": "Debian Constitution v1.9 fixes leadership, votes, delegates and technical committee",
+      "checked_official_sources": [
+        "https://www.debian.org/devel/constitution",
+        "https://www.debian.org/vote/"
+      ],
+      "limits": "Formal general resolutions are developer votes; wider users do not inherit automatic votes."
+    },
+    {
+      "id": "openstreetmap",
+      "decision": "include",
+      "governance": "Foundation voters manage OSMF, while the open mapper community creates and revises the data",
+      "checked_official_sources": [
+        "https://osmfoundation.org/wiki/Membership",
+        "https://welcome.openstreetmap.org/about-osm-community/osm-foundation/",
+        "https://www.openstreetmap.org/copyright"
+      ],
+      "limits": "OSMF votes do not govern all edits or grant a privileged say over the map itself."
+    },
+    {
+      "id": "wikipedia",
+      "decision": "include",
+      "governance": "Volunteer editors create the content and content rules; Foundation is not the editorial decision maker",
+      "checked_official_sources": [
+        "https://wikimediafoundation.org/who-we-are/",
+        "https://meta.wikimedia.org/wiki/Founding_principles"
+      ],
+      "limits": "Wiki consensus and free content permit enforceable moderation and local article restrictions."
+    },
+    {
+      "id": "libreoffice",
+      "decision": "include",
+      "governance": "Trustees elect foundation bodies; Foundation statutes state free office software and member procedures",
+      "checked_official_sources": [
+        "https://www.documentfoundation.org/statutes/",
+        "https://www.documentfoundation.org/why-be-a-member/"
+      ],
+      "limits": "Trustee rights do not extend automatically to all end users; the 2022 statutes alone cannot certify the 2026 board roster."
+    },
+    {
+      "id": "nyc-mesh",
+      "decision": "needs_information",
+      "governance": "Official wiki describes do-ocracy, informal trusted decision makers and risk of implicit hierarchy",
+      "checked_official_sources": [
+        "https://wiki.nycmesh.net/books/4-organization-mission/page/culture"
+      ],
+      "limits": "Binding ownership, veto, membership vote and appeal rights over infrastructure remain insufficiently established; no publication upgrade."
+    }
+  ],
+  "evidence_scope": {
+    "catalog_records": 100,
+    "new_structured_basis": 5,
+    "total_structured_basis": 38,
+    "legacy_basis_missing": 62,
+    "projects_still_stale": [
+      "debian",
+      "openstreetmap",
+      "wikipedia",
+      "libreoffice",
+      "nyc-mesh"
+    ],
+    "operational_follow_up": "2026-10-31",
+    "activity_refresh_performed": false
+  },
+  "quality_notes": [
+    "URLs were opened and substantive governance passages inspected on 2026-10-30; a URL's HTTP response alone was not treated as proof.",
+    "For each new basis, all five criteria cite project provenance source IDs checked by validate_commons_admission.",
+    "Historical July 12 baseline observations were kept unchanged; later October source retrieval dates refer only to newly appended sources.",
+    "No exact private network node or individual installation locations were added.",
+    "All six non-baseline language sources and existing human/native review receipts were preserved as historical, not reissued."
+  ]
+}

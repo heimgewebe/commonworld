@@ -124,7 +124,7 @@ class PublicCatalogTests(unittest.TestCase):
             def mark_unknown(record: dict) -> None:
                 record["activity"].update({"status": "unknown"})
                 record["curation"].update({
-                    "next_review_at": "2026-10-12",
+                    "next_review_at": "2026-12-20",
                     "notes": "Aktueller Betriebszustand nicht zeitnah verifiziert; priorisierte Nachprüfung.",
                 })
             self.mutate_project(root, "debian", mark_unknown)

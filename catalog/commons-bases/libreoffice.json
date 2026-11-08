@@ -1,0 +1,58 @@
+{
+  "schema_version": 1,
+  "kind": "commonworld_commons_basis",
+  "project_id": "libreoffice",
+  "classification": "common",
+  "decision": "include",
+  "reviewed_at": "2026-10-30",
+  "reviewer": "Commonworld editorial desk review",
+  "criteria": {
+    "shared_resource": {
+      "status": "supported",
+      "statement": "Die frei lizenzierte Office-Suite LibreOffice, ihre Quellen und gemeinschaftlichen Übersetzungen sowie Dokumentationen bilden eine öffentlich nutzbare digitale Ressource.",
+      "source_ids": [
+        "libreoffice-home",
+        "tdf-statutes"
+      ]
+    },
+    "community": {
+      "status": "supported",
+      "statement": "Internationale Entwickler, Übersetzer, Dokumentations- und Unterstützungsgruppen bilden die Beitragsgemeinschaft; anerkannte Stiftungsmitglieder besitzen zusätzliche Mitwirkungsrechte.",
+      "source_ids": [
+        "libreoffice-home",
+        "tdf-membership"
+      ]
+    },
+    "commoning_practice": {
+      "status": "supported",
+      "statement": "Die Software und ihre Sprachfassungen, Handbücher und offenen Standards werden über dauerhaft gemeinschaftliche Entwicklungs- und Pflegebeiträge weiterentwickelt.",
+      "source_ids": [
+        "libreoffice-home",
+        "tdf-statutes"
+      ]
+    },
+    "rules_and_responsibility": {
+      "status": "supported",
+      "statement": "Die Satzung der Document Foundation ordnet Mitgliedschaft, Wahl des Board of Directors und des Membership Committee sowie Kontrolle und Beschwerdeverfahren.",
+      "source_ids": [
+        "tdf-statutes",
+        "tdf-membership"
+      ]
+    },
+    "common_benefit": {
+      "status": "supported",
+      "statement": "Freie Bürosoftware und offene Standards stehen Privatpersonen, Unternehmen und öffentlichen Stellen gleichermaßen zur Verfügung und unterstützen digitale Teilhabe.",
+      "source_ids": [
+        "libreoffice-home",
+        "tdf-statutes"
+      ]
+    }
+  },
+  "confidence": 0.93,
+  "limitations": [
+    "Die Mitbestimmungsrechte in der Foundation stehen anerkannten Trustees zu und nicht automatisch sämtlichen LibreOffice-Anwendern.",
+    "Das konkrete Produkt kann auch von bezahlten Firmenentwicklern mitgestaltet werden; diese wirtschaftliche Beteiligung hebt die freie Verfügbarkeit nicht auf.",
+    "Die Satzung stammt aus 2022 und belegt die Struktur, nicht die genaue derzeitige Zusammensetzung der Stiftungsorgane."
+  ],
+  "notes": "Freie Software als gemeinsam entwickelte Ressource mit eigenständiger rechtsfähiger Commons-Infrastruktur."
+}
