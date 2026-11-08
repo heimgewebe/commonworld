@@ -1,0 +1,43 @@
+{
+  "schema_version": 1,
+  "kind": "commonworld_commons_basis",
+  "project_id": "sewa-sangini-childcare-cooperative",
+  "classification": "common",
+  "decision": "include",
+  "reviewed_at": "2026-08-14",
+  "reviewer": "Commonworld editorial review",
+  "criteria": {
+    "shared_resource": {
+      "status": "supported",
+      "statement": "Sangini organisiert Kinderbetreuung als kollektiv getragene soziale Infrastruktur, die Betreuung für Familien mit bezahlter Care-Arbeit und sozialer Absicherung informell arbeitender Frauen verbindet.",
+      "source_ids": ["sangini-social-security-2026", "sangini-childcare-2024"]
+    },
+    "community": {
+      "status": "supported",
+      "statement": "Die Kooperative wird von Frauen aus der informellen Wirtschaft getragen; Betreuungskräfte, Eltern und Kooperativenmitglieder bilden den gemeinschaftlichen Bezugsrahmen der Kinderbetreuung.",
+      "source_ids": ["sangini-social-security-2026", "sangini-childcare-2024", "sangini-agm-2024"]
+    },
+    "commoning_practice": {
+      "status": "supported",
+      "statement": "Mitglieder organisieren Betreuung gemeinschaftlich, schaffen bezahlte Arbeit für Betreuungskräfte, beziehen Eltern ein und verbinden die lokale Care-Praxis mit kooperativer sozialer Absicherung.",
+      "source_ids": ["sangini-childcare-2024", "sangini-social-security-2026", "sangini-gadn-2026"]
+    },
+    "rules_and_responsibility": {
+      "status": "supported",
+      "statement": "Als Frauenkooperative nutzt Sangini demokratische Generalversammlungen mit Rechenschaft, Fragen an Vorstände und gemeinschaftlichen Entscheidungen; Verantwortung für Betreuung und Kooperativenbetrieb ist damit kollektiv institutionell gebunden.",
+      "source_ids": ["sangini-agm-2024", "sangini-childcare-2024"]
+    },
+    "common_benefit": {
+      "status": "supported",
+      "statement": "Die gemeinschaftlich organisierte Betreuung ermöglicht informell arbeitenden Frauen Erwerbsarbeit und soziale Absicherung, schafft zugleich Care-Arbeit und unterstützt Kinder und Familien im lokalen Umfeld.",
+      "source_ids": ["sangini-social-security-2026", "sangini-childcare-2024", "sangini-gadn-2026"]
+    }
+  },
+  "confidence": 0.92,
+  "limitations": [
+    "Die aktuellen offiziellen Quellen bestätigen das fortbestehende Modell, liefern aber kein zeitnah verifiziertes vollständiges Inventar aller Betreuungszentren.",
+    "Zugang zur tatsächlichen Kinderbetreuung ist lokal und kapazitätsgebunden; öffentliche Projektinformationen bedeuten keinen allgemein offenen Zugang zu jedem Zentrum.",
+    "Commonworld veröffentlicht keine Adressen einzelner Zentren und keine Aufenthalts-, Kinder-, Eltern- oder Familiendaten."
+  ],
+  "notes": "Aufgenommen als Care-Common wegen kollektiver Trägerschaft, demokratischer Kooperativenprozesse, gemeinschaftlich organisierter Betreuung und belegter gemeinsamer sozialer Nutzenstruktur; ein gewöhnlicher Betreuungsdienst ohne diese Commoning-Praxis würde nicht genügen."
+}
