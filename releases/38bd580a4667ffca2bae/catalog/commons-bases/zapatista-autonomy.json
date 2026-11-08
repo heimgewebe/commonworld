@@ -1,0 +1,43 @@
+{
+  "schema_version": 1,
+  "kind": "commonworld_commons_basis",
+  "project_id": "zapatista-autonomy",
+  "classification": "commons-infrastructure",
+  "decision": "include",
+  "reviewed_at": "2026-09-02",
+  "reviewer": "Commonworld editorial review",
+  "criteria": {
+    "shared_resource": {
+      "status": "supported",
+      "statement": "Die seit 2023 dokumentierte Autonomiestruktur verbindet lokale autonome Regierungen mit gemeinschaftlich getragenen Einrichtungen und Ressourcen für Bildung, Gesundheit, Landwirtschaft, Justiz und weitere lokale Aufgaben; diese gemeinsam entwickelte Governance-Infrastruktur und Praxis ist als Ressource klar benennbar.",
+      "source_ids": ["zapatista-reorganisation-2023", "zapatista-acgaz-2025", "zapatista-structure-2026"]
+    },
+    "community": {
+      "status": "supported",
+      "statement": "Zapatistische Dörfer und Gemeinden bilden die lokale Trägerschaft; Local Autonomous Governments werden an Gemeinschaftsversammlungen gebunden und über regionale Kollektive beziehungsweise Versammlungsstrukturen koordiniert.",
+      "source_ids": ["zapatista-reorganisation-2023", "zapatista-acgaz-2025"]
+    },
+    "commoning_practice": {
+      "status": "supported",
+      "statement": "Gemeinschaftsversammlungen beraten und entscheiden über gemeinsame Angelegenheiten, während lokale Regierungen und Kollektive gemeinschaftliche Arbeiten, Einrichtungen, Ressourcen und Aufgaben organisieren; Mitwirkung und Verantwortung sind damit konstitutiv und nicht auf passiven Konsum reduziert.",
+      "source_ids": ["zapatista-reorganisation-2023", "zapatista-acgaz-2025"]
+    },
+    "rules_and_responsibility": {
+      "status": "supported",
+      "statement": "Die 2023 beschriebene Struktur ordnet Zuständigkeiten zwischen Gemeinschaftsversammlung, Local Autonomous Government und überörtlichen Kollektiven und bindet höhere Koordination an Entscheidungen der Gemeinden; Quellen aus 2025 und 2026 zeigen die fortgesetzte Verwendung dieser Organisationsformen.",
+      "source_ids": ["zapatista-reorganisation-2023", "zapatista-acgaz-2025", "zapatista-structure-2026"]
+    },
+    "common_benefit": {
+      "status": "supported",
+      "statement": "Gemeinsame Land- und Produktionsarbeit sowie lokale Bildung, Gesundheit, ökologische Landwirtschaft, Justiz und weitere Gemeinschaftsaufgaben sind auf die kollektive Lebensfähigkeit der beteiligten Gemeinden ausgerichtet und nicht als Vertriebskanal eines externen privaten Eigentümers organisiert.",
+      "source_ids": ["zapatista-reorganisation-2023", "zapatista-acgaz-2025"]
+    }
+  },
+  "confidence": 0.86,
+  "limitations": [
+    "Die Kernquellen stammen von Enlace Zapatista und dokumentieren die eigene Organisationsperspektive; sie belegen die erklärte Struktur und ihre fortgesetzte Benennung, sind aber keine unabhängige Evaluation ihrer praktischen Umsetzung.",
+    "Territoriale, politische und sicherheitsbezogene Aussagen in Chiapas sind konflikt- und perspektivabhängig. Die Aufnahme betrifft ausschließlich die dokumentierte zivile gemeinschaftliche Governance-Infrastruktur und stellt keine politische Anerkennung territorialer oder staatlicher Ansprüche dar.",
+    "Die Autonomiestruktur wurde seit 2023 ausdrücklich umgebaut und kann sich weiter verändern; ältere MAREZ- und Junta-Strukturen werden deshalb nicht als unverändert fortbestehend vorausgesetzt."
+  ],
+  "notes": "Aufgenommen als Commons-Infrastruktur wegen versammlungsgebundener lokaler Governance, gemeinschaftlicher Einrichtungen und gemeinsamer Arbeiten. Militärische Strukturen oder politische Territorialansprüche sind ausdrücklich nicht Gegenstand der Commons-Klassifikation."
+}

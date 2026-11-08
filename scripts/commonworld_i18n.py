@@ -340,7 +340,7 @@ SHELL_REPLACEMENTS_EN = {
     'aria-label="Globusorientierung"': 'aria-label="Globe orientation"',
     '>Erde</button>': '>Earth</button>',
     '<span id="semantic-level">Gesamtansicht</span>': '<span id="semantic-level">Overview</span>',
-    '<span id="semantic-summary" class="semantic-summary">Katalogauszug · Abdeckung nicht bewertet</span>': '<span id="semantic-summary" class="semantic-summary">Catalog sample · coverage not assessed</span>',
+    '<span id="semantic-summary" class="semantic-summary" role="group">Katalogauszug · Abdeckung nicht bewertet</span>': '<span id="semantic-summary" class="semantic-summary" role="group">Catalog sample · coverage not assessed</span>',
     '<summary>Kartenlegende</summary>': '<summary>Map legend</summary>',
     'Farben zeigen die Commons-Art. In der Weltansicht werden Länder mit den Farben der dort über veröffentlichte Ortsbezüge belegten Commons-Arten anteilig gestreift. Beim Hineinzoomen wird die Darstellung regionaler und schließlich ortsgenau. Die Katalogabdeckung ist nicht bewertet; die Karte zeigt weder Dichte noch nachgewiesene Leere.': 'Colors show the Commons type. In the world view, countries are striped proportionally with the colors of Commons types evidenced there through published location references. As you zoom in, the display becomes regional and eventually location-specific. Catalog coverage is not assessed; the map shows neither density nor evidenced absence.',
     'aria-label="Commons-Arten und Kartenzeichen"': 'aria-label="Commons types and map symbols"',

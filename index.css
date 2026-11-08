@@ -319,6 +319,16 @@ html[data-input-modality="pointer"] :focus {
 .maplibregl-ctrl-attrib-button {
   width: 2.75rem !important;
   height: 2.75rem !important;
+  /* MapLibre's 24px info SVG otherwise repeats in a 44px touch target. */
+  background-position: center !important;
+  background-repeat: no-repeat !important;
+  background-size: 24px 24px !important;
+}
+
+.maplibregl-ctrl-attrib.maplibregl-compact:not(.maplibregl-compact-show) {
+  /* Keep the native disclosure button reachable after initial collapse. */
+  min-width: 2.75rem;
+  min-height: 2.75rem;
 }
 
 .digital-sphere {
@@ -1795,6 +1805,15 @@ html[data-input-modality="pointer"] :focus {
 
 .sphere-ring-name {
   font-weight: 720;
+}
+
+/* At the compact globe overview, show one concrete project example per ring.
+   Six titles per orbit overlap one another on phone-width screens; the full
+   project inventory remains in the accessible summary and digital drill-down. */
+.globe-stage[data-digital-path="sphere"]
+  .digital-sphere[data-ring-detail-level="compact"]
+  .sphere-ring-name ~ .sphere-ring-name {
+  display: none;
 }
 
 .sphere-ring-sublabel {
