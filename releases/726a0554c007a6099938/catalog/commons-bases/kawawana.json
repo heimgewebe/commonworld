@@ -1,0 +1,58 @@
+{
+  "schema_version": 1,
+  "kind": "commonworld_commons_basis",
+  "project_id": "kawawana",
+  "classification": "common",
+  "decision": "include",
+  "reviewed_at": "2026-10-29",
+  "reviewer": "Commonworld editorial review",
+  "criteria": {
+    "shared_resource": {
+      "status": "supported",
+      "statement": "Fischbestände, Mangroven, Bolongs und die lokal genutzte Küstenzone bilden den geteilten Ressourcenraum von Kawawana.",
+      "source_ids": [
+        "kawawana-icca-registry",
+        "kawawana-blue-parks-2026"
+      ]
+    },
+    "community": {
+      "status": "supported",
+      "statement": "APCRM vereint Fischer und Bewohner aus acht Dörfern der Zentral-Casamance als klar benannte Trägergemeinschaft.",
+      "source_ids": [
+        "kawawana-icca-registry",
+        "kawawana-blue-parks-2026"
+      ]
+    },
+    "commoning_practice": {
+      "status": "supported",
+      "statement": "Mitglieder überwachen Bestände, führen Patrouillen durch, kommunizieren Regeln und finanzieren Schutzarbeit unter anderem über kollektive Fangfahrten.",
+      "source_ids": [
+        "kawawana-icca-registry",
+        "kawawana-blue-parks-2026"
+      ]
+    },
+    "rules_and_responsibility": {
+      "status": "supported",
+      "statement": "Rote, orange und gelbe Zonen ordnen Entnahmeverbote, lokale Versorgung und zulässige Fangmethoden; 2010 übertragene Verwaltungsrechte stützen die lokale Durchsetzung.",
+      "source_ids": [
+        "kawawana-icca-registry",
+        "kawawana-blue-parks-2026"
+      ]
+    },
+    "common_benefit": {
+      "status": "supported",
+      "statement": "Die Regeln zielen auf Nahrungssicherheit, stabile Fischbestände, Einkommen, Konfliktminderung und den Schutz aquatischer Lebensräume.",
+      "source_ids": [
+        "kawawana-icca-registry",
+        "kawawana-blue-parks-2026"
+      ]
+    }
+  },
+  "confidence": 0.88,
+  "limitations": [
+    "Interne Wahl-, Sanktions- und Konfliktverfahren sind öffentlich nur teilweise dokumentiert.",
+    "Die lokal sensiblen Zonen, Dörfer und Fanggründe werden nicht kartiert.",
+    "Die 2026 vom Marine Conservation Institute vergebene Blue-Park-Auszeichnung bestätigt gemeinschaftlich getragenes Management, nicht jedes Ereignis vor Ort oder unverändert fortlaufende Schutzqualität."
+  ],
+  "notes": "Aufgenommen wird Kawawana als konkrete von APCRM und acht Dörfern getragene Küsten- und Fischereiinstitution, nicht das ICCA-Register oder eine unterstützende Organisation."
+}
