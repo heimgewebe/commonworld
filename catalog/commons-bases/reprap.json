@@ -1,0 +1,58 @@
+{
+  "schema_version": 1,
+  "kind": "commonworld_commons_basis",
+  "project_id": "reprap",
+  "classification": "undetermined",
+  "decision": "needs_information",
+  "reviewed_at": "2026-10-31",
+  "reviewer": "Commonworld editorial desk review",
+  "criteria": {
+    "shared_resource": {
+      "status": "supported",
+      "statement": "Gemeinschaftlich öffentlich dokumentierte Konstruktionspläne für replizierende 3D-Drucker bilden eine offene technische Wissensressource.",
+      "source_ids": [
+        "reprap-about",
+        "reprap-machines"
+      ]
+    },
+    "community": {
+      "status": "supported",
+      "statement": "Entwickler, Bastler, Hersteller und lokale Gruppen bilden ein loses Netzwerk zur Weiterentwicklung frei dokumentierter Maschinen.",
+      "source_ids": [
+        "reprap-home",
+        "reprap-about"
+      ]
+    },
+    "commoning_practice": {
+      "status": "supported",
+      "statement": "Beteiligte stellen Bauteile, Baupläne, Druckparameter und Reparaturwissen zusammen und entwickeln offene Druckerkonzepte weiter.",
+      "source_ids": [
+        "reprap-machines",
+        "reprap-about"
+      ]
+    },
+    "rules_and_responsibility": {
+      "status": "partial",
+      "statement": "Offene Wiki-Dokumentation und verbreitete Open-Hardware-Lizenzen regeln die Nachnutzung einzelner Projekte; ein verbindlicher übergreifender Governance-Rahmen aller RepRap-Varianten fehlt.",
+      "source_ids": [
+        "reprap-about",
+        "reprap-home"
+      ]
+    },
+    "common_benefit": {
+      "status": "supported",
+      "statement": "Offene Entwürfe ermöglichen selbstständigen Nachbau, Weiterentwicklung und kostengünstigere dezentrale Fertigung.",
+      "source_ids": [
+        "reprap-about",
+        "reprap-machines"
+      ]
+    }
+  },
+  "confidence": 0.83,
+  "limitations": [
+    "RepRap umfasst vielfältige selbständige Maschinen und Communities, keine einzige verbindliche zentrale Kooperative.",
+    "Lizenzen und technische Verfügbarkeit müssen pro Maschinenvariante und Software getrennt überprüft werden.",
+    "Offene Wissensweitergabe ist nicht gleichbedeutend mit kollektiver Eigentümerschaft aller 3D-Drucker."
+  ],
+  "notes": "Open-Hardware-Gut gesichert, aber Projekt-übergreifende Regel- und Konfliktverantwortung nicht ausreichend eindeutig."
+}

@@ -1,0 +1,57 @@
+{
+  "schema_version": 1,
+  "kind": "commonworld_commons_basis",
+  "project_id": "deccan-development-society",
+  "classification": "commons-infrastructure",
+  "decision": "include",
+  "reviewed_at": "2026-10-31",
+  "reviewer": "Commonworld editorial desk review",
+  "criteria": {
+    "shared_resource": {
+      "status": "supported",
+      "statement": "Gemeinsam bewahrtes Saatgut, Trockenlandbauwissen, lokale Lebensmittelversorgungsstrukturen und gemeinschaftlich produzierte Medien sind Ressourcen der Dorffrauen-Sanghams.",
+      "source_ids": [
+        "dds-home",
+        "dds-community-media"
+      ]
+    },
+    "community": {
+      "status": "supported",
+      "statement": "Dalit- und indigene Kleinbäuerinnen organisieren sich in freiwilligen Sanghams; DDS unterstützt die eigenständige Frauenorganisation.",
+      "source_ids": [
+        "dds-home"
+      ]
+    },
+    "commoning_practice": {
+      "status": "supported",
+      "statement": "Mitgliedsfrauen erhalten Sorten, führen Versuche durch, teilen landwirtschaftliche Praxis, gestalten lokale Versorgung und produzieren Gemeinschaftsmedien.",
+      "source_ids": [
+        "dds-home",
+        "dds-community-media"
+      ]
+    },
+    "rules_and_responsibility": {
+      "status": "supported",
+      "statement": "Die lokale Sangham-Autonomie ist auf der offiziellen DDS-Seite ausdrücklich genannt; der Community Media Trust gibt Dorffrauen redaktionelle Mitsprache und Produktionsmittel.",
+      "source_ids": [
+        "dds-home",
+        "dds-community-media"
+      ]
+    },
+    "common_benefit": {
+      "status": "supported",
+      "statement": "Das geteilte Saatgut- und Ernährungswissen sowie die Selbstrepräsentation stärken Ernährungssouveränität und die Mitbestimmung marginalisierter Landbewohnerinnen.",
+      "source_ids": [
+        "dds-home",
+        "dds-community-media"
+      ]
+    }
+  },
+  "confidence": 0.89,
+  "limitations": [
+    "DDS als überregionaler Unterstützer ist nicht mit jeder einzelnen autonomen Frauen-Sangham identisch.",
+    "Die Veröffentlichungen belegen lokale Selbstorganisation, aber nicht die genaue Satzung oder das Abstimmungsverfahren jeder Dorfgruppe.",
+    "Saatgutverfügbarkeit und landwirtschaftliche Saisonergebnisse wurden nicht unabhängig geprüft."
+  ],
+  "notes": "Unterstützende Infrastruktur autonomer Frauen-Sanghams mit materieller Saatgut- und Medienpraxis; lokale Entscheidungshoheit bleibt bei den Gruppen."
+}

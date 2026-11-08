@@ -31,13 +31,14 @@
   },
   "activity": {
     "status": "active",
-    "observed_at": "2026-07-31",
+    "observed_at": "2026-11-03",
     "source_ids": [
       "meshtastic-home",
       "meshtastic-introduction",
-      "meshtastic-firmware"
+      "meshtastic-firmware",
+      "meshtastic-firmware-releases"
     ],
-    "note": "Die offiziellen Seiten dokumentieren ein aktives, freiwillig getragenes Projekt, aktuelle Einstiegspfade und laufende öffentliche Entwicklung."
+    "note": "Die offizielle Einführung beschreibt freiwillige, gemeinschaftsgetragene Entwicklung; die Firmware-Release-Liste dokumentiert noch am 02.11.2026 eine aktuelle Veröffentlichung. Dies belegt Projektaktivität, nicht die Verfügbarkeit eines bestimmten Meshes."
   },
   "provenance": {
     "sources": [

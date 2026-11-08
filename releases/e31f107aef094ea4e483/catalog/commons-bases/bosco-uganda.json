@@ -1,0 +1,58 @@
+{
+  "schema_version": 1,
+  "kind": "commonworld_commons_basis",
+  "project_id": "bosco-uganda",
+  "classification": "undetermined",
+  "decision": "needs_information",
+  "reviewed_at": "2026-10-31",
+  "reviewer": "Commonworld editorial desk review",
+  "criteria": {
+    "shared_resource": {
+      "status": "supported",
+      "statement": "BOSCO stellt ländliche Solar- und ICT-Zentren mit gemeinsam zugänglichen Netzwerk-, Computer- und Ausbildungsressourcen bereit.",
+      "source_ids": [
+        "bosco-home",
+        "bosco-connectivity"
+      ]
+    },
+    "community": {
+      "status": "supported",
+      "statement": "Dörfer, Schulen, lokale Zentren und ehrenamtliche Fachleute tragen Nutzung und Ausbildung der regionalen Netzinfrastruktur.",
+      "source_ids": [
+        "bosco-home",
+        "bosco-about"
+      ]
+    },
+    "commoning_practice": {
+      "status": "supported",
+      "statement": "Community ICT Centres und Freiwillige nutzen und pflegen Konnektivität, technische Ausbildung und lokale Kommunikationsangebote zusammen.",
+      "source_ids": [
+        "bosco-connectivity",
+        "bosco-home"
+      ]
+    },
+    "rules_and_responsibility": {
+      "status": "partial",
+      "statement": "Die offizielle Connectivity-Seite nennt Eigentum der NGO an ICT-Zentren und Trusteeship des katholischen Erzbistums Gulu; verbindliche Eigentums- oder Mitentscheidungsrechte lokaler Nutzer sind nicht dokumentiert.",
+      "source_ids": [
+        "bosco-connectivity",
+        "bosco-about"
+      ]
+    },
+    "common_benefit": {
+      "status": "supported",
+      "statement": "Ländliche Konnektivität und digitale Bildungsangebote sollen Isolation verringern und Beteiligung ermöglichen.",
+      "source_ids": [
+        "bosco-about",
+        "bosco-home"
+      ]
+    }
+  },
+  "confidence": 0.87,
+  "limitations": [
+    "Ein gemeinnütziges Netzwerk im Besitz einer kirchlich getragenen NGO ist nicht automatisch kollektiv von Nutzern verwaltetes Eigentum.",
+    "Lokale Komitees können mitwirken, ihre formalen Vetos oder Budgetbefugnisse sind hier nicht belegt.",
+    "Aktuelle operative Verfügbarkeit einzelner ICT-Zentren wurde nicht technisch geprüft."
+  ],
+  "notes": "Gemeinschaftsnetz und lokale Teilhabe belegt, doch Eigentum und verbindliche Entscheidungskompetenz der Nutzer bleiben offen."
+}

@@ -1,0 +1,54 @@
+{
+  "schema_version": 1,
+  "kind": "commonworld_commons_basis",
+  "project_id": "prinzessinnengarten-kollektiv",
+  "classification": "undetermined",
+  "decision": "needs_information",
+  "reviewed_at": "2026-10-31",
+  "reviewer": "Commonworld editorial desk review",
+  "criteria": {
+    "shared_resource": {
+      "status": "supported",
+      "statement": "Ein öffentlicher Nachbarschaftsgarten mit gemeinsam nutzbaren Gartenflächen und geteilter Saatgut- und Umweltbildungsinfrastruktur ist der gesellschaftliche Ressourcenbestand.",
+      "source_ids": [
+        "prinzessinnengarten-about"
+      ]
+    },
+    "community": {
+      "status": "supported",
+      "statement": "Nachbarn, Freiwillige, Gärtner und die Trägerorganisation Nomadisch Grün beteiligen sich an urbaner Gartenarbeit.",
+      "source_ids": [
+        "prinzessinnengarten-about"
+      ]
+    },
+    "commoning_practice": {
+      "status": "supported",
+      "statement": "Offene Gartenarbeitstage, Saatgutvermehrung, Kompostierung und Veranstaltungen fördern gemeinsame Pflege und Wissensweitergabe.",
+      "source_ids": [
+        "prinzessinnengarten-about"
+      ]
+    },
+    "rules_and_responsibility": {
+      "status": "partial",
+      "statement": "Die Projektseite beschreibt Nomadisch Grün als Träger am Friedhofsstandort, aber keine verbindlichen Abstimmungs-, Veto- und Eigentumsrechte der offenen Mitgärtner gegenüber dem Verein und Grundstücksträger.",
+      "source_ids": [
+        "prinzessinnengarten-about",
+        "prinzessinnengarten-contact"
+      ]
+    },
+    "common_benefit": {
+      "status": "supported",
+      "statement": "Freies Mitgärtnern und Umweltbildung erhalten lokale Grünräume und fördern gemeinsame Nutzung stadtnaher Natur.",
+      "source_ids": [
+        "prinzessinnengarten-about"
+      ]
+    }
+  },
+  "confidence": 0.88,
+  "limitations": [
+    "Offene Teilnahme an Gartenarbeit bedeutet nicht, dass jeder Besucher Mitbesitzer oder stimmberechtigtes Vereinsmitglied ist.",
+    "Das Friedhofsgrundstück ist nicht automatisch Eigentum des Gartennetzwerks.",
+    "Dauerhaftigkeit der Standortnutzung und konkrete Vereinsstatuten bleiben gesondert zu belegen."
+  ],
+  "notes": "Offene Garten-Commons-Praxis, formale Eigentums- und Stimmverhältnisse der beteiligten Vereine noch ungesichert."
+}

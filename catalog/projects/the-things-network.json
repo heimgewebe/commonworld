@@ -43,13 +43,14 @@
   },
   "activity": {
     "status": "active",
-    "observed_at": "2026-07-28",
+    "observed_at": "2026-11-03",
     "source_ids": [
       "ttn-home",
       "ttn-community",
-      "ttn-get-started"
+      "ttn-get-started",
+      "ttn-forum-latest"
     ],
-    "note": "Die offiziellen Seiten führen aktive lokale Communities, einen öffentlichen Einstieg in das Netz sowie laufende Lern- und Austauschangebote."
+    "note": "Die aktuelle offizielle Community-Übersicht und der öffentliche Einstieg dokumentieren ein gemeinschaftlich getragenes Netz; im offiziellen Forum erscheinen Diskussionen bis 02.11.2026. Die Gateway-Liveanzeige war bei der Prüfung nicht verfügbar, und die Website macht keine Hochverfügbarkeitszusage für das Community-Netz."
   },
   "provenance": {
     "sources": [

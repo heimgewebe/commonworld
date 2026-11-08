@@ -64,6 +64,14 @@
         "url": "https://www.greatlakescommons.org/why",
         "retrieved_at": "2026-07-28",
         "note": "Offizielle Begründung des Commons-Ansatzes und der Verbindung gemeinschaftlicher mit indigener Governance."
+      },
+      {
+        "id": "glc-charter",
+        "type": "official-source",
+        "label": "Glc Charter",
+        "url": "https://www.greatlakescommons.org/charter-declaration",
+        "retrieved_at": "2026-10-31",
+        "note": "Offizielle programmatische Great-Lakes-Water-Commons-Charta und Leitprinzipien."
       }
     ]
   },
@@ -71,8 +79,8 @@
     "state": "stale",
     "catalogued_at": "2026-07-28",
     "reviewed_by": "Commonworld editorial review",
-    "reviewed_at": "2026-07-28",
-    "next_review_at": "2026-10-28",
+    "reviewed_at": "2026-10-31",
+    "next_review_at": "2026-11-15",
     "notes": "Aufgenommen als ausdrücklich commons-basierte Gewässer- und Governanceinitiative. Rechts- und Governanceziele werden nicht als bereits verbindlich verwirklichte Ordnung dargestellt."
   },
   "links": [

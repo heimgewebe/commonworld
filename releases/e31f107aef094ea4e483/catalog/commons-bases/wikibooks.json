@@ -1,0 +1,55 @@
+{
+  "schema_version": 1,
+  "kind": "commonworld_commons_basis",
+  "project_id": "wikibooks",
+  "classification": "common",
+  "decision": "include",
+  "reviewed_at": "2026-10-30",
+  "reviewer": "Commonworld editorial desk review",
+  "criteria": {
+    "shared_resource": {
+      "status": "supported",
+      "statement": "Gemeinschaftlich verfasste, frei nutzbare Lehrbücher und praktische Lerntexte sind das gemeinsame digitale Wissensgut.",
+      "source_ids": [
+        "wikimedia-projects",
+        "wikibooks-policy-guidelines"
+      ]
+    },
+    "community": {
+      "status": "supported",
+      "statement": "Offene Autoren- und Lektorengemeinschaft entwickelt die gemeinsamen Lehrwerke.",
+      "source_ids": [
+        "wikibooks-policy-guidelines"
+      ]
+    },
+    "commoning_practice": {
+      "status": "supported",
+      "statement": "Teilnehmer verfassen, überarbeiten, diskutieren und korrigieren Lehrbücher gemeinsam.",
+      "source_ids": [
+        "wikibooks-policy-guidelines"
+      ]
+    },
+    "rules_and_responsibility": {
+      "status": "supported",
+      "statement": "Die Wikibooks-Community beschreibt Richtlinien, gemeinschaftlichen Konsens und Regeln zu zulässigen Inhalten.",
+      "source_ids": [
+        "wikibooks-policy-guidelines"
+      ]
+    },
+    "common_benefit": {
+      "status": "supported",
+      "statement": "Frei lizenzierte Lehrmaterialien können von anderen gelesen, bearbeitet und unter ihren Lizenzbedingungen nachgenutzt werden.",
+      "source_ids": [
+        "wikimedia-projects",
+        "wikibooks-policy-guidelines"
+      ]
+    }
+  },
+  "confidence": 0.92,
+  "limitations": [
+    "Die geprüften spezifischen Richtlinien betreffen das englische Wikibooks; andere Sprachversionen regeln manches anders.",
+    "Offene Mitwirkung enthält Moderation und inhaltliche Qualitätsregeln.",
+    "Kein Beleg für die aktuelle Qualität einzelner Lehrbuchartikel."
+  ],
+  "notes": "Offene Lehrwerke mit durch die Autoren-Community geformten verbindlichen Regeln; Sprachprojektgrenzen bleiben deutlich."
+}

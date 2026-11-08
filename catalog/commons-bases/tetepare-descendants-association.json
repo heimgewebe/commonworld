@@ -1,0 +1,56 @@
+{
+  "schema_version": 1,
+  "kind": "commonworld_commons_basis",
+  "project_id": "tetepare-descendants-association",
+  "classification": "common",
+  "decision": "include",
+  "reviewed_at": "2026-10-31",
+  "reviewer": "Commonworld editorial desk review",
+  "criteria": {
+    "shared_resource": {
+      "status": "supported",
+      "statement": "Tetepare Island und zugehörige Meeresbereiche sind gemeinsam durch eine Nachfahren-Landbesitzervereinigung geschützt und bewirtschaftet.",
+      "source_ids": [
+        "source-tetepare-tda",
+        "source-tetepare-home"
+      ]
+    },
+    "community": {
+      "status": "supported",
+      "statement": "Nachfahren früherer Inselbewohner sind Mitglieder der Tetepare Descendants’ Association und tragen die gemeinsame Eigentümer- und Schutzorganisation.",
+      "source_ids": [
+        "source-tetepare-tda"
+      ]
+    },
+    "commoning_practice": {
+      "status": "supported",
+      "statement": "Die Vereinigung organisiert Ranger, Meeresüberwachung, Schutzgebiete, Forschungskooperationen, Beschäftigung und ein gemeinschaftsorientiertes Ecolodge.",
+      "source_ids": [
+        "source-tetepare-tda",
+        "source-tetepare-home"
+      ]
+    },
+    "rules_and_responsibility": {
+      "status": "supported",
+      "statement": "Die offizielle Seite nennt die TDA als rechtlich anerkannten Landeigentümer, eine Satzung zum Schutz für heutige und zukünftige Nachfahren sowie einen Vereinsvorstand.",
+      "source_ids": [
+        "source-tetepare-tda"
+      ]
+    },
+    "common_benefit": {
+      "status": "supported",
+      "statement": "Geschützte Inselökosysteme, Ausbildungsfonds, Beschäftigung und Meeresressourcen sollen den Landbesitzerfamilien und zukünftigen Generationen zugutekommen.",
+      "source_ids": [
+        "source-tetepare-tda",
+        "source-tetepare-home"
+      ]
+    }
+  },
+  "confidence": 0.95,
+  "limitations": [
+    "Rechtsinhaber sind die definierten Nachfahren und ihre Vereinigung; die Insel ist nicht allgemeines freies öffentliches Land.",
+    "Schutzgebiets- und Meeresnutzungsrechte bleiben lokal geregelt; kommerzieller Tourismus unterliegt Besuchsvorgaben.",
+    "Selbstdarstellungen belegen keine unabhängig auditierte Vollständigkeit der Mitgliederliste oder Rangerabdeckung."
+  ],
+  "notes": "Explizite Nachfahrenvereinigung mit formaler Landrechtsstellung, Vorstand und generationsübergreifenden Ressourcenschutzregeln."
+}

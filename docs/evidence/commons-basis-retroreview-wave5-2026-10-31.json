@@ -1,0 +1,648 @@
+{
+  "schema_version": 1,
+  "kind": "commonworld_commons_basis_retroreview_wave5",
+  "checked_at_utc": "2026-10-31",
+  "source_base_commit": "a779b9a969ea4fa53a0d26a0efe08a2d1a7415b5",
+  "scope": "Twelve individually first-party source-bound five-dimension Commons governance desk reviews with explicit rights and ownership uncertainty.",
+  "reviewer_provenance": "model-assisted editorial research from first-party organizational and governance documentation, not independent human certification.",
+  "outcomes": [
+    {
+      "project_id": "bosco-uganda",
+      "basis_decision": "needs_information",
+      "classification": "undetermined",
+      "criteria": {
+        "shared_resource": {
+          "verdict": "supported",
+          "cited_source_ids": [
+            "bosco-home",
+            "bosco-connectivity"
+          ]
+        },
+        "community": {
+          "verdict": "supported",
+          "cited_source_ids": [
+            "bosco-home",
+            "bosco-about"
+          ]
+        },
+        "commoning_practice": {
+          "verdict": "supported",
+          "cited_source_ids": [
+            "bosco-connectivity",
+            "bosco-home"
+          ]
+        },
+        "rules_and_responsibility": {
+          "verdict": "partial",
+          "cited_source_ids": [
+            "bosco-connectivity",
+            "bosco-about"
+          ]
+        },
+        "common_benefit": {
+          "verdict": "supported",
+          "cited_source_ids": [
+            "bosco-about",
+            "bosco-home"
+          ]
+        }
+      },
+      "provenance_urls": {
+        "bosco-about": "https://www.boscouganda.com/about-us-2/",
+        "bosco-connectivity": "https://www.boscouganda.com/connectivity/",
+        "bosco-home": "https://www.boscouganda.com/"
+      },
+      "limitations": [
+        "Ein gemeinnütziges Netzwerk im Besitz einer kirchlich getragenen NGO ist nicht automatisch kollektiv von Nutzern verwaltetes Eigentum.",
+        "Lokale Komitees können mitwirken, ihre formalen Vetos oder Budgetbefugnisse sind hier nicht belegt.",
+        "Aktuelle operative Verfügbarkeit einzelner ICT-Zentren wurde nicht technisch geprüft."
+      ],
+      "operational_activity_recatalogued": false,
+      "post_review_public_state": "stale"
+    },
+    {
+      "project_id": "ujamaa-community-resource-team",
+      "basis_decision": "needs_information",
+      "classification": "undetermined",
+      "criteria": {
+        "shared_resource": {
+          "verdict": "supported",
+          "cited_source_ids": [
+            "ujamaa-work",
+            "ujamaa-programmes"
+          ]
+        },
+        "community": {
+          "verdict": "supported",
+          "cited_source_ids": [
+            "ujamaa-programmes",
+            "ujamaa-work"
+          ]
+        },
+        "commoning_practice": {
+          "verdict": "supported",
+          "cited_source_ids": [
+            "ujamaa-programmes",
+            "ujamaa-work"
+          ]
+        },
+        "rules_and_responsibility": {
+          "verdict": "partial",
+          "cited_source_ids": [
+            "ujamaa-programmes"
+          ]
+        },
+        "common_benefit": {
+          "verdict": "supported",
+          "cited_source_ids": [
+            "ujamaa-work",
+            "ujamaa-programmes"
+          ]
+        }
+      },
+      "provenance_urls": {
+        "ujamaa-programmes": "https://www.ujamaa-crt.or.tz/programmes.html",
+        "ujamaa-work": "https://www.ujamaa-crt.or.tz/our-work.html"
+      },
+      "limitations": [
+        "UCRT ist ein unterstützender Verein und nicht identisch mit den Landrechtsinhabern der begleiteten Gemeinschaften.",
+        "Satzungen, Quoren und landrechtliche Titel müssen pro lokaler Gemeinschaft gesondert geprüft werden.",
+        "Die Angaben über den Projektumfang sind Selbstauskünfte und keine neue unabhängige Landregisterbescheinigung."
+      ],
+      "operational_activity_recatalogued": false,
+      "post_review_public_state": "stale"
+    },
+    {
+      "project_id": "fecofun-nepal",
+      "basis_decision": "include",
+      "classification": "commons-infrastructure",
+      "criteria": {
+        "shared_resource": {
+          "verdict": "supported",
+          "cited_source_ids": [
+            "fecofun-about",
+            "fecofun-home"
+          ]
+        },
+        "community": {
+          "verdict": "supported",
+          "cited_source_ids": [
+            "fecofun-about"
+          ]
+        },
+        "commoning_practice": {
+          "verdict": "supported",
+          "cited_source_ids": [
+            "fecofun-about",
+            "fecofun-home"
+          ]
+        },
+        "rules_and_responsibility": {
+          "verdict": "supported",
+          "cited_source_ids": [
+            "fecofun-about"
+          ]
+        },
+        "common_benefit": {
+          "verdict": "supported",
+          "cited_source_ids": [
+            "fecofun-about",
+            "fecofun-home"
+          ]
+        }
+      },
+      "provenance_urls": {
+        "fecofun-about": "https://fecofun.org.np/about/",
+        "fecofun-home": "https://fecofun.org.np/"
+      },
+      "limitations": [
+        "Die Dachföderation ist nicht Eigentümerin aller lokal verwalteten Wälder.",
+        "Offizielle Mitglieder- und Flächenzahlen verändern sich und sind keine dauerhafte Garantie für die Zugehörigkeit einzelner Nutzergruppen.",
+        "Lokale Satzungen und Nutzungsquoten sind je Waldnutzergruppe eigenständig."
+      ],
+      "operational_activity_recatalogued": false,
+      "post_review_public_state": "stale"
+    },
+    {
+      "project_id": "deccan-development-society",
+      "basis_decision": "include",
+      "classification": "commons-infrastructure",
+      "criteria": {
+        "shared_resource": {
+          "verdict": "supported",
+          "cited_source_ids": [
+            "dds-home",
+            "dds-community-media"
+          ]
+        },
+        "community": {
+          "verdict": "supported",
+          "cited_source_ids": [
+            "dds-home"
+          ]
+        },
+        "commoning_practice": {
+          "verdict": "supported",
+          "cited_source_ids": [
+            "dds-home",
+            "dds-community-media"
+          ]
+        },
+        "rules_and_responsibility": {
+          "verdict": "supported",
+          "cited_source_ids": [
+            "dds-home",
+            "dds-community-media"
+          ]
+        },
+        "common_benefit": {
+          "verdict": "supported",
+          "cited_source_ids": [
+            "dds-home",
+            "dds-community-media"
+          ]
+        }
+      },
+      "provenance_urls": {
+        "dds-community-media": "https://www.ddsindia.org/community-media/",
+        "dds-home": "https://www.ddsindia.org/"
+      },
+      "limitations": [
+        "DDS als überregionaler Unterstützer ist nicht mit jeder einzelnen autonomen Frauen-Sangham identisch.",
+        "Die Veröffentlichungen belegen lokale Selbstorganisation, aber nicht die genaue Satzung oder das Abstimmungsverfahren jeder Dorfgruppe.",
+        "Saatgutverfügbarkeit und landwirtschaftliche Saisonergebnisse wurden nicht unabhängig geprüft."
+      ],
+      "operational_activity_recatalogued": false,
+      "post_review_public_state": "stale"
+    },
+    {
+      "project_id": "bioleft",
+      "basis_decision": "include",
+      "classification": "common",
+      "criteria": {
+        "shared_resource": {
+          "verdict": "supported",
+          "cited_source_ids": [
+            "bioleft-about",
+            "bioleft-platform"
+          ]
+        },
+        "community": {
+          "verdict": "supported",
+          "cited_source_ids": [
+            "bioleft-about",
+            "bioleft-home"
+          ]
+        },
+        "commoning_practice": {
+          "verdict": "supported",
+          "cited_source_ids": [
+            "bioleft-platform",
+            "bioleft-about"
+          ]
+        },
+        "rules_and_responsibility": {
+          "verdict": "supported",
+          "cited_source_ids": [
+            "bioleft-platform",
+            "bioleft-about"
+          ]
+        },
+        "common_benefit": {
+          "verdict": "supported",
+          "cited_source_ids": [
+            "bioleft-about",
+            "bioleft-platform"
+          ]
+        }
+      },
+      "provenance_urls": {
+        "bioleft-about": "https://www.bioleft.org/es/acerca-de-bioleft/",
+        "bioleft-home": "https://www.bioleft.org/es/",
+        "bioleft-platform": "https://www.bioleft.org/es/plataforma/"
+      },
+      "limitations": [
+        "Offene Lizenzen gelten für konkret registrierte beziehungsweise vereinbarte Materialien, nicht für sämtliches Saatgut Argentiniens.",
+        "Der digitale Plattformbetreiber ist nicht automatisch gemeinschaftliches Eigentum aller Nutzer.",
+        "Saatguttausch kann phytosanitäre, züchtungsrechtliche und vertragliche Bedingungen erfordern."
+      ],
+      "operational_activity_recatalogued": false,
+      "post_review_public_state": "stale"
+    },
+    {
+      "project_id": "nepal-wireless-networking-project",
+      "basis_decision": "needs_information",
+      "classification": "undetermined",
+      "criteria": {
+        "shared_resource": {
+          "verdict": "supported",
+          "cited_source_ids": [
+            "enrd-nepal-wireless",
+            "enrd-community-training"
+          ]
+        },
+        "community": {
+          "verdict": "supported",
+          "cited_source_ids": [
+            "enrd-community-training",
+            "enrd-home"
+          ]
+        },
+        "commoning_practice": {
+          "verdict": "supported",
+          "cited_source_ids": [
+            "enrd-community-training",
+            "enrd-nepal-wireless"
+          ]
+        },
+        "rules_and_responsibility": {
+          "verdict": "partial",
+          "cited_source_ids": [
+            "enrd-community-training",
+            "enrd-nepal-wireless"
+          ]
+        },
+        "common_benefit": {
+          "verdict": "supported",
+          "cited_source_ids": [
+            "enrd-nepal-wireless",
+            "enrd-home"
+          ]
+        }
+      },
+      "provenance_urls": {
+        "enrd-community-training": "https://enrd.org.np/projects-2/empowering-mountain-community-to-maintain-and-build-wireless-network/",
+        "enrd-home": "https://enrd.org.np/",
+        "enrd-nepal-wireless": "https://enrd.org.np/projects-2/project-3/"
+      },
+      "limitations": [
+        "Aus technischer Wartung durch Dorfbewohner folgt nicht automatisch gemeinschaftliches Eigentum am Backbone oder an Frequenzrechten.",
+        "Der Förderverein ENRD und lokale Dorfnetzbetreiber besitzen unterschiedliche Rollen.",
+        "Aktuelle Netzverfügbarkeit und rechtliche Betriebszuständigkeit sind nicht für jeden Standort belegt."
+      ],
+      "operational_activity_recatalogued": false,
+      "post_review_public_state": "stale"
+    },
+    {
+      "project_id": "bologna-urban-commons",
+      "basis_decision": "include",
+      "classification": "commons-infrastructure",
+      "criteria": {
+        "shared_resource": {
+          "verdict": "supported",
+          "cited_source_ids": [
+            "bologna-collaborate",
+            "bologna-regulation-2022"
+          ]
+        },
+        "community": {
+          "verdict": "supported",
+          "cited_source_ids": [
+            "bologna-collaborate"
+          ]
+        },
+        "commoning_practice": {
+          "verdict": "supported",
+          "cited_source_ids": [
+            "bologna-collaborate",
+            "bologna-regulation-2022"
+          ]
+        },
+        "rules_and_responsibility": {
+          "verdict": "supported",
+          "cited_source_ids": [
+            "bologna-collaborate",
+            "bologna-regulation-2022"
+          ]
+        },
+        "common_benefit": {
+          "verdict": "supported",
+          "cited_source_ids": [
+            "bologna-collaborate"
+          ]
+        }
+      },
+      "provenance_urls": {
+        "bologna-collaborate": "https://collaborarebologna.comune.bologna.it/collaborare/",
+        "bologna-regulation-2022": "https://www.comune.bologna.it/novita/comunicati-stampa/consiglio-comunale-approvate-modifiche-allo-statuto-e-il-nuovo-regolamento-sulle-forme-di"
+      },
+      "limitations": [
+        "Kooperationspakte begründen keine pauschale private Eigentümerschaft von Bürgergruppen am städtischen Grundbesitz.",
+        "Konkrete Rechte und Verantwortungen variieren je Zusammenarbeitspakt und Stadtteil.",
+        "Ein Reglement allein beweist keine aktuelle Umsetzung jedes historischen Einzelprojekts."
+      ],
+      "operational_activity_recatalogued": false,
+      "post_review_public_state": "stale"
+    },
+    {
+      "project_id": "brisbane-tool-library",
+      "basis_decision": "include",
+      "classification": "commons-infrastructure",
+      "criteria": {
+        "shared_resource": {
+          "verdict": "supported",
+          "cited_source_ids": [
+            "brisbane-home",
+            "brisbane-memberships"
+          ]
+        },
+        "community": {
+          "verdict": "supported",
+          "cited_source_ids": [
+            "brisbane-home",
+            "brisbane-memberships"
+          ]
+        },
+        "commoning_practice": {
+          "verdict": "supported",
+          "cited_source_ids": [
+            "brisbane-home",
+            "brisbane-memberships"
+          ]
+        },
+        "rules_and_responsibility": {
+          "verdict": "supported",
+          "cited_source_ids": [
+            "brisbane-memberships",
+            "brisbane-home"
+          ]
+        },
+        "common_benefit": {
+          "verdict": "supported",
+          "cited_source_ids": [
+            "brisbane-home",
+            "brisbane-memberships"
+          ]
+        }
+      },
+      "provenance_urls": {
+        "brisbane-home": "https://www.brisbanetoollibrary.org/",
+        "brisbane-memberships": "https://www.brisbanetoollibrary.org/memberships"
+      },
+      "limitations": [
+        "Die Nutzung ist gebührenpflichtig und verlangt eine gültige Mitgliedschaft.",
+        "Mitgliedschaft verleiht nicht automatisch rechtliches Miteigentum an jedem Werkzeug oder Stimmrecht über den Verein.",
+        "Werkzeugbestand und Verfügbarkeit variieren; keine Echtzeitinventur erfolgt."
+      ],
+      "operational_activity_recatalogued": false,
+      "post_review_public_state": "stale"
+    },
+    {
+      "project_id": "edinburgh-tool-library",
+      "basis_decision": "include",
+      "classification": "commons-infrastructure",
+      "criteria": {
+        "shared_resource": {
+          "verdict": "supported",
+          "cited_source_ids": [
+            "etl-about",
+            "etl-membership"
+          ]
+        },
+        "community": {
+          "verdict": "supported",
+          "cited_source_ids": [
+            "etl-about",
+            "etl-membership"
+          ]
+        },
+        "commoning_practice": {
+          "verdict": "supported",
+          "cited_source_ids": [
+            "etl-about",
+            "etl-membership"
+          ]
+        },
+        "rules_and_responsibility": {
+          "verdict": "supported",
+          "cited_source_ids": [
+            "etl-membership"
+          ]
+        },
+        "common_benefit": {
+          "verdict": "supported",
+          "cited_source_ids": [
+            "etl-about",
+            "etl-membership"
+          ]
+        }
+      },
+      "provenance_urls": {
+        "etl-about": "https://edinburghtoollibrary.org.uk/about/",
+        "etl-membership": "https://edinburghtoollibrary.org.uk/membership/"
+      },
+      "limitations": [
+        "Gebühren und Altersregeln begrenzen die Nutzung; ein Jugendkonto erlaubt nicht dieselben Ausleihen.",
+        "Die Charity beziehungsweise Werkstatt ist nicht zwangsläufig rechtliches Gemeinschaftseigentum jedes Mitglieds.",
+        "Die genaue Ausstattung und Öffnungszeiten können sich ändern."
+      ],
+      "operational_activity_recatalogued": false,
+      "post_review_public_state": "stale"
+    },
+    {
+      "project_id": "reprap",
+      "basis_decision": "needs_information",
+      "classification": "undetermined",
+      "criteria": {
+        "shared_resource": {
+          "verdict": "supported",
+          "cited_source_ids": [
+            "reprap-about",
+            "reprap-machines"
+          ]
+        },
+        "community": {
+          "verdict": "supported",
+          "cited_source_ids": [
+            "reprap-home",
+            "reprap-about"
+          ]
+        },
+        "commoning_practice": {
+          "verdict": "supported",
+          "cited_source_ids": [
+            "reprap-machines",
+            "reprap-about"
+          ]
+        },
+        "rules_and_responsibility": {
+          "verdict": "partial",
+          "cited_source_ids": [
+            "reprap-about",
+            "reprap-home"
+          ]
+        },
+        "common_benefit": {
+          "verdict": "supported",
+          "cited_source_ids": [
+            "reprap-about",
+            "reprap-machines"
+          ]
+        }
+      },
+      "provenance_urls": {
+        "reprap-about": "https://reprap.org/wiki/About",
+        "reprap-home": "https://reprap.org/",
+        "reprap-machines": "https://reprap.org/wiki/RepRap_Machines"
+      },
+      "limitations": [
+        "RepRap umfasst vielfältige selbständige Maschinen und Communities, keine einzige verbindliche zentrale Kooperative.",
+        "Lizenzen und technische Verfügbarkeit müssen pro Maschinenvariante und Software getrennt überprüft werden.",
+        "Offene Wissensweitergabe ist nicht gleichbedeutend mit kollektiver Eigentümerschaft aller 3D-Drucker."
+      ],
+      "operational_activity_recatalogued": false,
+      "post_review_public_state": "stale"
+    },
+    {
+      "project_id": "restarters",
+      "basis_decision": "include",
+      "classification": "commons-infrastructure",
+      "criteria": {
+        "shared_resource": {
+          "verdict": "supported",
+          "cited_source_ids": [
+            "restarters-about",
+            "restarters-community"
+          ]
+        },
+        "community": {
+          "verdict": "supported",
+          "cited_source_ids": [
+            "restarters-about",
+            "restarters-community"
+          ]
+        },
+        "commoning_practice": {
+          "verdict": "supported",
+          "cited_source_ids": [
+            "restarters-about",
+            "restarters-community"
+          ]
+        },
+        "rules_and_responsibility": {
+          "verdict": "supported",
+          "cited_source_ids": [
+            "restarters-about",
+            "restarters-community"
+          ]
+        },
+        "common_benefit": {
+          "verdict": "supported",
+          "cited_source_ids": [
+            "restarters-about",
+            "restarters-community"
+          ]
+        }
+      },
+      "provenance_urls": {
+        "restarters-about": "https://restarters.net/about",
+        "restarters-community": "https://talk.restarters.net/"
+      },
+      "limitations": [
+        "Ein Netzwerk lokaler Reparaturgruppen verleiht seinen Nutzern keine gemeinsamen Eigentumsrechte an sämtlichen Geräten oder der Trägerplattform.",
+        "Konkrete Sicherheits- und Veranstaltungsregeln können lokal abweichen.",
+        "Online ausgewiesene Impact-Zahlen wurden nicht als dauerhafte Datensatzzahl übernommen."
+      ],
+      "operational_activity_recatalogued": false,
+      "post_review_public_state": "stale"
+    },
+    {
+      "project_id": "tetepare-descendants-association",
+      "basis_decision": "include",
+      "classification": "common",
+      "criteria": {
+        "shared_resource": {
+          "verdict": "supported",
+          "cited_source_ids": [
+            "source-tetepare-tda",
+            "source-tetepare-home"
+          ]
+        },
+        "community": {
+          "verdict": "supported",
+          "cited_source_ids": [
+            "source-tetepare-tda"
+          ]
+        },
+        "commoning_practice": {
+          "verdict": "supported",
+          "cited_source_ids": [
+            "source-tetepare-tda",
+            "source-tetepare-home"
+          ]
+        },
+        "rules_and_responsibility": {
+          "verdict": "supported",
+          "cited_source_ids": [
+            "source-tetepare-tda"
+          ]
+        },
+        "common_benefit": {
+          "verdict": "supported",
+          "cited_source_ids": [
+            "source-tetepare-tda",
+            "source-tetepare-home"
+          ]
+        }
+      },
+      "provenance_urls": {
+        "source-tetepare-home": "https://tetepare.org/",
+        "source-tetepare-tda": "https://tetepare.org/the-tetepare-descendants-association/"
+      },
+      "limitations": [
+        "Rechtsinhaber sind die definierten Nachfahren und ihre Vereinigung; die Insel ist nicht allgemeines freies öffentliches Land.",
+        "Schutzgebiets- und Meeresnutzungsrechte bleiben lokal geregelt; kommerzieller Tourismus unterliegt Besuchsvorgaben.",
+        "Selbstdarstellungen belegen keine unabhängig auditierte Vollständigkeit der Mitgliederliste oder Rangerabdeckung."
+      ],
+      "operational_activity_recatalogued": false,
+      "post_review_public_state": "stale"
+    }
+  ],
+  "does_not_establish": [
+    "current_independent_membership_certification",
+    "operational_availability",
+    "signed_first_party_five_axis_review",
+    "merge_approval",
+    "production_deployment"
+  ]
+}

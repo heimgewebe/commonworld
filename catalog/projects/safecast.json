@@ -54,6 +54,14 @@
         "url": "https://safecast.org/news/",
         "retrieved_at": "2026-07-22",
         "note": "Offizielle aktuelle Projektmeldungen aus 2026."
+      },
+      {
+        "id": "safecast-license-policy",
+        "type": "official-source",
+        "label": "Safecast License Policy",
+        "url": "https://safecast.org/about/licenses-we-use/",
+        "retrieved_at": "2026-10-31",
+        "note": "Offizielle Differenzierung von CC0-Messdaten, CC BY-NC-Seiteninhalt, offenen Hardwarelizenzen und Beitragsregeln."
       }
     ]
   },
@@ -61,9 +69,9 @@
     "state": "stale",
     "catalogued_at": "2026-07-22",
     "reviewed_by": "Commonworld editorial review",
-    "reviewed_at": "2026-07-22",
-    "next_review_at": "2026-10-22",
-    "notes": "Globale digitale und datenbezogene Commons-Praxis; Messorte werden nicht mit einer einzelnen Projektkoordinate verwechselt."
+    "reviewed_at": "2026-10-31",
+    "next_review_at": "2026-11-15",
+    "notes": "Globale digitale und datenbezogene Commons-Praxis; Messorte werden nicht mit einer einzelnen Projektkoordinate verwechselt. Fünfkriterien-Desk-Review 31.10.2026: Offenes Citizen-Science-Datengut gesichert, aber maßgebliche gemeinschaftliche Entscheidungsrechte der Freiwilligen bleiben vor einer definitiven Commons-Klassifikation offen. Das historische Aktivitätssignal wurde nicht neu zertifiziert, der öffentliche Kurationszustand bleibt stale."
   },
   "links": [
     {
