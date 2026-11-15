@@ -1,0 +1,94 @@
+{
+  "schema_version": 4,
+  "id": "bangladesh-palli-bidyut-samities",
+  "title": "Bangladesh Palli Bidyut Samities",
+  "summary": "Ein Verbund von 80 ländlichen Elektrizitätsgenossenschaften in Bangladesch, deren Verbraucher-Mitglieder Verwaltungsräte wählen und lokale Verteilinfrastruktur innerhalb des verbindlichen Rahmens des Rural Electrification Board betreiben.",
+  "themes": [
+    "energy",
+    "infrastructure",
+    "cooperative",
+    "community-ownership",
+    "commons-governance"
+  ],
+  "actions": [
+    "learn"
+  ],
+  "presence": {
+    "geographic": [
+      {
+        "id": "bangladesh-pbs-network",
+        "mode": "hidden",
+        "label": "Bangladesch – 80 Palli Bidyut Samities in ländlichen Versorgungsgebieten",
+        "privacy_note": "Die 80 Genossenschaften decken große ländliche Versorgungsgebiete ab. Commonworld veröffentlicht weder Haushaltsanschlüsse noch Anlagen-, Leitungs- oder Mitgliederstandorte als eigene Geometrie.",
+        "source_ids": [
+          "pbs-at-a-glance",
+          "pbs-history-governance"
+        ]
+      }
+    ],
+    "digital": {
+      "available": true,
+      "reach": "network",
+      "label": "Öffentlich zugängliche offizielle REB-Informationen zu den Palli Bidyut Samities, ihrer Genossenschaftsstruktur und ihrem laufenden Betrieb",
+      "source_ids": [
+        "pbs-at-a-glance",
+        "pbs-history-governance"
+      ]
+    }
+  },
+  "activity": {
+    "status": "active",
+    "observed_at": "2026-08-12",
+    "source_ids": [
+      "pbs-at-a-glance"
+    ],
+    "note": "Die offizielle, im März 2026 aktualisierte Übersicht führt weiterhin 80 Palli Bidyut Samities und laufende ländliche Versorgungsinfrastruktur."
+  },
+  "provenance": {
+    "sources": [
+      {
+        "id": "pbs-history-governance",
+        "type": "official-source",
+        "label": "Bangladesh Rural Electrification Board – PBS cooperative governance",
+        "url": "https://reb.gov.bd/site/page/62acea25-71aa-4663-b56e-18f4817f6774/nolink/",
+        "retrieved_at": "2026-08-12",
+        "note": "Offizielle Organisationsbeschreibung: PBS arbeiten eigenständig, beruhen auf dem Genossenschaftskonzept, haben von Verbraucher-Mitgliedern gewählte Boards und genossenschaftlich verpflichtende Bylaws."
+      },
+      {
+        "id": "pbs-at-a-glance",
+        "type": "official-source",
+        "label": "Bangladesh Rural Electrification Board – activities at a glance",
+        "url": "https://reb.gov.bd/site/page/c08b56bd-c300-4d08-8ea2-c25eedffbfdb/-",
+        "retrieved_at": "2026-08-12",
+        "note": "Offizielle, im März 2026 aktualisierte Übersicht mit 80 Palli Bidyut Samities, 61 Distrikten und 462 Upazilas."
+      }
+    ],
+    "uncertainty_note": "Die PBS unterliegen zugleich verbindlichen Richtlinien des staatlichen Rural Electrification Board. Commonworld beschreibt daher weder vollständige lokale Autonomie noch staatliche Eigentumsfreiheit."
+  },
+  "curation": {
+    "state": "listed",
+    "catalogued_at": "2026-08-12",
+    "reviewed_by": "Commonworld editorial review",
+    "reviewed_at": "2026-08-12",
+    "next_review_at": "2026-11-12",
+    "notes": "Aufgenommen wird der Verbund der 80 eigenständigen Verbraucher-Genossenschaften; REB selbst wird nicht als Common klassifiziert. Die staatliche Rahmensetzung wird ausdrücklich als Einschränkung dokumentiert."
+  },
+  "links": [
+    {
+      "type": "homepage",
+      "label": "Bangladesh Rural Electrification Board – Palli Bidyut Samities",
+      "url": "https://reb.gov.bd/"
+    },
+    {
+      "type": "learn",
+      "label": "Genossenschaftsstruktur der Palli Bidyut Samities kennenlernen",
+      "url": "https://reb.gov.bd/site/page/62acea25-71aa-4663-b56e-18f4817f6774/nolink/",
+      "source_ids": [
+        "pbs-history-governance"
+      ]
+    }
+  ],
+  "handoff": {
+    "enabled": false
+  }
+}

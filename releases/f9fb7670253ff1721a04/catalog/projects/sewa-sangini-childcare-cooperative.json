@@ -1,0 +1,128 @@
+{
+  "schema_version": 4,
+  "id": "sewa-sangini-childcare-cooperative",
+  "title": "SEWA Sangini Childcare Cooperative",
+  "summary": "Eine von Frauen getragene Kinderbetreuungskooperative in Gujarat, die gemeinschaftlich organisierte Betreuung mit Erwerbsarbeit für Betreuungskräfte, Elternbeteiligung und sozialer Absicherung für informell arbeitende Frauen verbindet.",
+  "themes": [
+    "care",
+    "care-work",
+    "cooperative",
+    "mutual-aid",
+    "community-ownership",
+    "commons-governance"
+  ],
+  "actions": [
+    "learn"
+  ],
+  "presence": {
+    "geographic": [
+      {
+        "id": "sangini-gujarat-network",
+        "mode": "hidden",
+        "label": "Gujarat – gemeinschaftliche Kinderbetreuungsstrukturen der Sangini-Kooperative",
+        "privacy_note": "Keine künstliche Geometrie: Commonworld rekonstruiert weder Adressen einzelner Betreuungszentren noch Aufenthaltsorte von Kindern, Eltern oder Betreuungskräften aus Projektberichten.",
+        "source_ids": [
+          "sangini-social-security-2026",
+          "sangini-childcare-2024"
+        ]
+      }
+    ],
+    "digital": {
+      "available": false,
+      "source_ids": [
+        "sangini-social-security-2026",
+        "sangini-gadn-2026"
+      ]
+    }
+  },
+  "activity": {
+    "status": "active",
+    "observed_at": "2026-08-14",
+    "source_ids": [
+      "sangini-social-security-2026",
+      "sangini-gadn-2026"
+    ],
+    "note": "Aktuelle offizielle SEWA-Federation-Beiträge vom Februar und März 2026 führen Sangini als bestehende, kollektiv getragene Kinderbetreuungskooperative und als Praxis sozialer Absicherung informell arbeitender Frauen."
+  },
+  "provenance": {
+    "sources": [
+      {
+        "id": "sangini-social-security-2026",
+        "type": "official-source",
+        "label": "SEWA Cooperative Federation – Social Security for Informal Women Workers",
+        "url": "https://sewafederation.org/social-security-for-informal-women-workers-lessons-from-sewa/",
+        "retrieved_at": "2026-08-14",
+        "note": "Aktueller offizieller Beitrag vom Februar 2026 nennt SEWA Sangini als Kinderbetreuungskooperative, die von informell arbeitenden Frauen kollektiv aufgebaute soziale Absicherung ermöglicht."
+      },
+      {
+        "id": "sangini-gadn-2026",
+        "type": "official-source",
+        "label": "SEWA Cooperative Federation – GADN report on public services and social protection",
+        "url": "https://sewafederation.org/publication/report-gadn-achieving-gender-equality-and-womens-rights-through-public-services-and-social-protection/",
+        "retrieved_at": "2026-08-14",
+        "note": "Offizielle Publikationsseite vom März 2026 führt Sangini als gemeinschaftsverwurzeltes Kinderbetreuungsmodell für informell arbeitende Frauen."
+      },
+      {
+        "id": "sangini-agm-2024",
+        "type": "official-source",
+        "label": "SEWA Cooperative Federation – Annual General Meetings of Women’s Cooperatives",
+        "url": "https://sewafederation.org/annual-general-meetings-of-womens-cooperatives-from-the-informal-economy/",
+        "retrieved_at": "2026-08-14",
+        "note": "Dokumentiert Sangini als Frauenkooperative und beschreibt das demokratische AGM-Verfahren mit Rechenschaft, Fragen an Vorstände und gemeinschaftlichen Entscheidungen."
+      },
+      {
+        "id": "sangini-childcare-2024",
+        "type": "official-source",
+        "label": "SEWA Cooperative Federation – Childcare Access as a Key to Decent Work",
+        "url": "https://sewafederation.org/from-sticky-floors-to-open-doors-childcare-access-as-a-key-to-decent-work/",
+        "retrieved_at": "2026-08-14",
+        "note": "Beschreibt das Sangini-Modell, lokale Betreuung, Elternbeteiligung, Beschäftigung von Kooperativenmitgliedern und die Bedeutung der Betreuung für die Erwerbsarbeit von Frauen."
+      }
+    ],
+    "uncertainty_note": "Die aktuellen offiziellen Quellen bestätigen Sangini als fortbestehende Kooperative, liefern aber kein zeitnah verifiziertes vollständiges Inventar aller Zentren. Commonworld veröffentlicht deshalb weder eine aktuelle Zentrenzahl noch einzelne Adressen, Kinder- oder Familiendaten."
+  },
+  "curation": {
+    "state": "listed",
+    "catalogued_at": "2026-08-14",
+    "reviewed_by": "Commonworld editorial review",
+    "reviewed_at": "2026-08-14",
+    "next_review_at": "2026-11-14",
+    "notes": "Aufgenommen als konkrete Care-Commons-Praxis: ausschlaggebend sind kollektive Trägerschaft, demokratische Kooperativenprozesse, gemeinschaftlich organisierte Betreuung und die Verbindung von Care-Arbeit mit sozialer Absicherung."
+  },
+  "links": [
+    {
+      "type": "homepage",
+      "label": "SEWA Cooperative Federation – offizielle Seite",
+      "url": "https://sewafederation.org/"
+    },
+    {
+      "type": "learn",
+      "label": "Sangini und kollektiv organisierte soziale Absicherung kennenlernen",
+      "url": "https://sewafederation.org/social-security-for-informal-women-workers-lessons-from-sewa/",
+      "source_ids": [
+        "sangini-social-security-2026",
+        "sangini-gadn-2026"
+      ]
+    }
+  ],
+  "handoff": {
+    "enabled": false
+  },
+  "languages": {
+    "codes": [
+      "en"
+    ],
+    "source_ids": [
+      "sangini-social-security-2026",
+      "sangini-gadn-2026"
+    ],
+    "note": "Die für diesen Eintrag geprüften offiziellen Projekt- und Publikationsseiten sind auf Englisch verfügbar."
+  },
+  "access": {
+    "type": "restricted",
+    "source_ids": [
+      "sangini-childcare-2024"
+    ],
+    "note": "Öffentliche Informationen sind frei zugänglich; die tatsächliche Kinderbetreuung ist lokal, kapazitätsgebunden und nicht als allgemein offener Zugang zu jedem Zentrum dokumentiert."
+  }
+}

@@ -1,0 +1,56 @@
+{
+  "schema_version": 1,
+  "kind": "commonworld_commons_basis",
+  "project_id": "green-coop-japan",
+  "classification": "common",
+  "decision": "include",
+  "reviewed_at": "2026-08-12",
+  "reviewer": "Commonworld editorial review",
+  "criteria": {
+    "shared_resource": {
+      "status": "supported",
+      "statement": "Mitglieder tragen gemeinsam genossenschaftliche Versorgungs-, Unterstützungs-, Sozial- und Umweltinfrastrukturen sowie das dafür gebündelte Kapital und Wissen.",
+      "source_ids": [
+        "green-coop-about",
+        "green-coop-community"
+      ]
+    },
+    "community": {
+      "status": "supported",
+      "statement": "Der Green-Coop-Verbund besteht aus 16 regionalen Verbraucherkooperativen mit 431.992 Mitgliedshaushalten im Geschäftsjahr 2024.",
+      "source_ids": [
+        "green-coop-community"
+      ]
+    },
+    "commoning_practice": {
+      "status": "supported",
+      "statement": "Mitglieder entwickeln Produkte und Aktivitäten, organisieren gegenseitige Unterstützung und führen gemeinsame Umwelt- und Wiederverwendungspraktiken durch.",
+      "source_ids": [
+        "green-coop-about",
+        "green-coop-2026-participation"
+      ]
+    },
+    "rules_and_responsibility": {
+      "status": "supported",
+      "statement": "Green Coop bezeichnet Mitgliedersouveränität als zentrales Prinzip und beschreibt Mitglieder ausdrücklich als handelnde Träger der Organisation und ihrer gemeinsamen Aktivitäten.",
+      "source_ids": [
+        "green-coop-about"
+      ]
+    },
+    "common_benefit": {
+      "status": "supported",
+      "statement": "Die gemeinsamen Strukturen zielen auf sichere Versorgung, soziale Unterstützung, Kinderbetreuung, Wohlfahrt, Umweltpraxis und eine von Mitgliedern mitgestaltete Lebensqualität.",
+      "source_ids": [
+        "green-coop-about",
+        "green-coop-2026-participation"
+      ]
+    }
+  },
+  "confidence": 0.9,
+  "limitations": [
+    "Teilhabe ist mitgliedschaftsgebunden und nicht mit freiem öffentlichem Zugang gleichzusetzen.",
+    "Der Verbund kombiniert genossenschaftliche Marktleistungen mit nichtkommerziellen Gemeinschaftsaktivitäten; nicht jede einzelne Transaktion ist Commoning.",
+    "Die Mitgliederzahl 431.992 bezieht sich auf das Geschäftsjahr 2024 und dient als aktuelle Größenordnung, nicht als tagesgenauer Stand."
+  ],
+  "notes": "Aufgenommen wird der mitgliedergesteuerte Genossenschaftsverbund; ausschlaggebend sind Mitgliederhoheit, gemeinsame Institutionen und belegte kollektive Praxis, nicht bloß der Verkauf von Waren."
+}

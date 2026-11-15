@@ -39,11 +39,12 @@
   },
   "activity": {
     "status": "active",
-    "observed_at": "2026-08-14",
+    "observed_at": "2026-11-15",
     "source_ids": [
-      "flmma-spc-2026"
+      "flmma-spc-2026",
+      "flmma-mecc-kadavu-2026"
     ],
-    "note": "Die Pacific Community führt 2026 von FLMMA veröffentlichte Materialien zu zwanzig Jahren lokal verwalteter Meeresgebiete in Fidschi."
+    "note": "Das fidschianische Umweltministerium dokumentiert im Juli 2026 die Bewilligung eines 2026–2030 angelegten Vorhabens zur Stärkung des Fiji-LMMA-Netzwerks. Dies belegt die aktuelle institutionelle Unterstützung, nicht bereits die vollständige Umsetzung."
   },
   "provenance": {
     "sources": [
@@ -64,6 +65,14 @@
         "note": "Regional-offizieller Beleg, dass das Fiji-LMMA-Netz aus Meeresschutzgebieten besteht, die von lokalen Gemeinschaften verwaltet werden."
       },
       {
+        "id": "flmma-mecc-kadavu-2026",
+        "type": "official-source",
+        "label": "Fiji Ministry of Environment and Climate Change – Kadavu LMMA project approval (20 July 2026)",
+        "url": "https://mecc.gov.fj/%F0%9D%90%8A%F0%9D%90%80%F0%9D%90%83%F0%9D%90%80%F0%9D%90%95%F0%9D%90%94-%F0%9D%90%82%F0%9D%90%8E%F0%9D%90%8C%F0%9D%90%8C%F0%9D%90%94%F0%9D%90%8D%F0%9D%90%88%F0%9D%90%93%F0%9D%90%88%F0%9D%90%84/",
+        "retrieved_at": "2026-11-15",
+        "note": "Offizielle Projektankündigung: UNDP/GEF-finanzierte Stärkung des Fiji-LMMA-Netzwerks 2026–2030; Entscheidungen bleiben bei Gemeinden und traditionellen Rechteinhabern. Eine bereits abgeschlossene Umsetzung wird nicht behauptet."
+      },
+      {
         "id": "flmma-lmma-network",
         "type": "official-source",
         "label": "LMMA Network International – official network website",
@@ -78,8 +87,8 @@
     "state": "listed",
     "catalogued_at": "2026-08-14",
     "reviewed_by": "Commonworld editorial review",
-    "reviewed_at": "2026-08-15",
-    "next_review_at": "2026-11-15",
+    "reviewed_at": "2026-11-15",
+    "next_review_at": "2027-02-15",
     "notes": "Als Commons-Infrastruktur aufgenommen; lokale Regeln und Ressourcenräume bleiben bei den beteiligten Gemeinschaften, nicht beim Netz als zentralem Eigentümer."
   },
   "links": [

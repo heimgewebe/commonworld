@@ -221,7 +221,7 @@
       "portraitPaintedPrimaryLabels": [
         {
           "layer": "knowledge_learning_culture",
-          "changedPixels": 2496
+          "changedPixels": 6933
         },
         {
           "layer": "communication_networks",
@@ -241,15 +241,15 @@
         "representativePrimaryLabels": [
           {
             "text": "Knowledge, Learning and Culture · 11    LibriVox  MusicBrainz  Open Library  Peer 2 Peer Unive…  Safecast  Thailand Citizens…",
-            "width": 433.04498291015625,
-            "height": 420.88690185546875,
+            "width": 436.92205810546875,
+            "height": 425.055419921875,
             "fontSize": 25.26,
             "visible": true
           },
           {
             "text": "Cooperation and Self-Organization · 7    Bologna Urban Com…  Enspiral  g0v  Green Coop  l’Asilo  National Communal…",
-            "width": 404.07684326171875,
-            "height": 348.4042663574219,
+            "width": 400.6849060058594,
+            "height": 343.5960693359375,
             "fontSize": 25.26,
             "visible": true
           }
@@ -361,7 +361,7 @@
     {
       "id": "layer-journey-moveend-return",
       "verdict": "PASS",
-      "elapsedMs": 1756
+      "elapsedMs": 1430
     },
     {
       "id": "layer-journey-missing-moveend-fallback",
@@ -370,9 +370,9 @@
       "movementDiagnostics": [
         {
           "index": 0,
-          "geometryEvaluationDelta": 11,
+          "geometryEvaluationDelta": 13,
           "diagnosticPublishDelta": 3,
-          "sampledEvaluationCount": 10,
+          "sampledEvaluationCount": 12,
           "maxDiagnosticPublishes": 3
         },
         {
@@ -469,8 +469,8 @@
       "verdict": "PASS",
       "blockedCatalogRequests": 0,
       "observedCatalogRequests": [
-        "/releases/38bd580a4667ffca2bae/catalog/runtime/aggregate.v1.json",
-        "/releases/38bd580a4667ffca2bae/catalog/runtime/manifest.v1.json"
+        "/releases/96e5498017b8a470ce43/catalog/runtime/aggregate.v1.json",
+        "/releases/96e5498017b8a470ce43/catalog/runtime/manifest.v1.json"
       ]
     },
     {
@@ -573,6 +573,6 @@
       "method-mobile",
       "method-mobile-text-200"
     ],
-    "first_party_surface_sha256": "8377980f41d440e16816fab76c15d8948b2525bdd1c45ed4cdb2175b5d222278"
+    "first_party_surface_sha256": "26eded927d79cbacec02c2d5e4f5b370966e7fb4fd0cb60b0a38fe526dcb3cab"
   }
 }

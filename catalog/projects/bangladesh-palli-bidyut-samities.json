@@ -38,14 +38,22 @@
   },
   "activity": {
     "status": "active",
-    "observed_at": "2026-08-12",
+    "observed_at": "2026-11-15",
     "source_ids": [
       "pbs-at-a-glance"
     ],
-    "note": "Die offizielle, im März 2026 aktualisierte Übersicht führt weiterhin 80 Palli Bidyut Samities und laufende ländliche Versorgungsinfrastruktur."
+    "note": "Die staatliche REB-Übersicht mit Stand März 2026 (aktualisiert Mai 2026) führt weiterhin 80 ländliche Elektrizitätsgesellschaften. Die zentrale Aufsicht durch REB darf nicht als volle Eigenverwaltung der Verbraucher dargestellt werden."
   },
   "provenance": {
     "sources": [
+      {
+        "id": "pbs-reb-at-a-glance-may-2026",
+        "type": "official-source",
+        "label": "Bangladesh Rural Electrification Board – Activities at a glance (March 2026 data, updated May 2026)",
+        "url": "https://reb.gov.bd/pages/static-pages/6922ded2933eb65569e1da23",
+        "retrieved_at": "2026-11-15",
+        "note": "REB official March 2026 activity snapshot, updated May 4, reports 80 registered rural electricity societies; centrally supervised structure remains a governance caveat."
+      },
       {
         "id": "pbs-history-governance",
         "type": "official-source",
@@ -69,9 +77,9 @@
     "state": "listed",
     "catalogued_at": "2026-08-12",
     "reviewed_by": "Commonworld editorial review",
-    "reviewed_at": "2026-08-12",
-    "next_review_at": "2026-11-12",
-    "notes": "Aufgenommen wird der Verbund der 80 eigenständigen Verbraucher-Genossenschaften; REB selbst wird nicht als Common klassifiziert. Die staatliche Rahmensetzung wird ausdrücklich als Einschränkung dokumentiert."
+    "reviewed_at": "2026-11-15",
+    "next_review_at": "2027-02-15",
+    "notes": "Aufgenommen wird der Verbund der 80 eigenständigen Verbraucher-Genossenschaften; REB selbst wird nicht als Common klassifiziert. Die staatliche Rahmensetzung wird ausdrücklich als Einschränkung dokumentiert. Re-Review am 15.11.2026 stützt die fortbestehende geteilte Netzinfrastruktur auf amtliche REB-Daten; zentralstaatliche Aufsicht und begrenzte lokale Autonomie ausdrücklich beachten."
   },
   "links": [
     {

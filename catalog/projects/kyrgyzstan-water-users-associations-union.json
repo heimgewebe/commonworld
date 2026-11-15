@@ -39,22 +39,30 @@
     }
   },
   "activity": {
-    "status": "active",
+    "status": "unknown",
     "observed_at": "2026-08-14",
     "source_ids": [
       "nuwua-ilc",
       "kyrgyz-water-wua-app"
     ],
-    "note": "Die International Land Coalition führt NUWUA aktuell als People’s Organisation; der staatliche Water Resources Service betreibt weiterhin WUA-Informations- und Datenoberflächen."
+    "note": "Die International Land Coalition führt NUWUA weiterhin als Mitglied und die staatliche Wasserressourcen-Programmseite beschreibt einen Aufbaupfad für Wasserverbände. Ein belastbarer, datierter Nachweis konkreter NUWUA-Aktivität im November 2026 liegt darin jedoch nicht vor; der Aktivitätsstatus bleibt ausdrücklich unbestätigt."
   },
   "provenance": {
     "sources": [
+      {
+        "id": "kyrgyz-nwrmp-wua-capacity",
+        "type": "official-source",
+        "label": "Kyrgyz water resources management programme – WUA capacity strengthening component",
+        "url": "https://nwrmp.water.gov.kg/?lang=ru_RU&page_id=231",
+        "retrieved_at": "2026-11-15",
+        "note": "Government programme description includes the national union of water-users associations, user associations and water councils as actors in irrigation capacity and planning; page does not certify dated Nov 2026 execution."
+      },
       {
         "id": "nuwua-ilc",
         "type": "public-registry",
         "label": "International Land Coalition – National Union of Water Users’ Associations of the Kyrgyz Republic",
         "url": "https://www.landcoalition.org/en/our-network/the-union-of-the-water-users-associations-of-the-kyrgyz-republic/",
-        "retrieved_at": "2026-08-14",
+        "retrieved_at": "2026-11-15",
         "note": "Aktueller Netzwerk-/Mitgliedschaftsbeleg für NUWUA als People’s Organisation, ihre Arbeit mit gemeinschaftsbasierten WUAs, Koordination, Interessenvertretung und Kapazitätsaufbau."
       },
       {
@@ -80,9 +88,9 @@
     "state": "listed",
     "catalogued_at": "2026-08-14",
     "reviewed_by": "Commonworld editorial review",
-    "reviewed_at": "2026-08-14",
-    "next_review_at": "2026-11-14",
-    "notes": "Als Commons-Infrastruktur aufgenommen, weil die Quellen gemeinschaftsbasierte WUAs, Selbstorganisation der Wassernutzenden, gemeinschaftlichen Systemunterhalt und verbandliche Koordination belegen."
+    "reviewed_at": "2026-11-15",
+    "next_review_at": "2026-12-15",
+    "notes": "Als Commons-Infrastruktur aufgenommen, weil die Quellen gemeinschaftsbasierte WUAs, Selbstorganisation der Wassernutzenden, gemeinschaftlichen Systemunterhalt und verbandliche Koordination belegen. Die offizielle Wasserprojektbeschreibung und die aktuelle ILC-Mitgliederseite stützen organisierte gemeinschaftliche Bewässerungsverwaltung. Ob die Union im November 2026 operativ aktiv ist, wird nicht behauptet. Aktueller Betriebszustand nicht zeitnah verifiziert."
   },
   "links": [
     {

@@ -39,15 +39,23 @@
   },
   "activity": {
     "status": "active",
-    "observed_at": "2026-08-14",
+    "observed_at": "2026-11-15",
     "source_ids": [
       "spnl-hima-44-2026",
       "spnl-baaloul-2026"
     ],
-    "note": "SPNL dokumentiert 2026 ein auf 44 Himas gewachsenes Netz; Hima Baaloul wurde am 26. Januar 2026 durch einstimmigen Gemeinderatsbeschluss auf kommunalem öffentlichem Land eingerichtet."
+    "note": "SPNL dokumentierte am 21.10.2026 fünf zusätzliche gemeinschaftlich und kommunal getragene Hima-Gebiete in der West-Bekaa-Projektregion. Das belegt lokale Beteiligung, jedoch keine automatisch identischen Nutzungsrechte oder Regeln in allen Himas."
   },
   "provenance": {
     "sources": [
+      {
+        "id": "spnl-west-bekaa-2026",
+        "type": "official-source",
+        "label": "SPNL – Five new Himas double the West Bekaa network (October 21, 2026)",
+        "url": "https://www.spnl.org/five-new-himas-double-the-network-in-spnls-west-bekaa-project-area/",
+        "retrieved_at": "2026-11-15",
+        "note": "First-party October 2026 report confirms five community and municipality-backed conservation areas and their responsibilities in West Bekaa."
+      },
       {
         "id": "spnl-hima-44-2026",
         "type": "official-source",
@@ -79,9 +87,9 @@
     "state": "listed",
     "catalogued_at": "2026-08-14",
     "reviewed_by": "Commonworld editorial review",
-    "reviewed_at": "2026-08-14",
-    "next_review_at": "2026-11-14",
-    "notes": "Als Commons-Infrastruktur aufgenommen. Der Beleg stützt kommunale Beschlüsse und gemeinschaftliche Hüterschaft; exakte Flächen und Nutzungszonen bleiben verborgen."
+    "reviewed_at": "2026-11-15",
+    "next_review_at": "2027-02-15",
+    "notes": "Als Commons-Infrastruktur aufgenommen. Der Beleg stützt kommunale Beschlüsse und gemeinschaftliche Hüterschaft; exakte Flächen und Nutzungszonen bleiben verborgen. SPNL-Originalbericht vom 21.10.2026 bestätigt lokale Hima-Beschlüsse, Gemeindebeteiligung und gemeinwohlbezogenen Naturschutz; Entscheidungsregeln bleiben ortsgebunden."
   },
   "links": [
     {

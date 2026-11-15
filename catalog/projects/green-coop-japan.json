@@ -42,21 +42,29 @@
   },
   "activity": {
     "status": "active",
-    "observed_at": "2026-08-12",
+    "observed_at": "2026-11-15",
     "source_ids": [
       "green-coop-home",
       "green-coop-2026-participation"
     ],
-    "note": "Die offizielle Website veröffentlicht im Juli 2026 laufende Aktivitäten; ein Bericht vom Juli 2026 beschreibt aktuelle, von rund 430.000 Mitgliedern getragene Umweltaktionen."
+    "note": "Das offizielle Green-Coop-Nachrichtenarchiv zeigt noch am 13.11.2026 Mitglieds- und Genossenschaftsaktivitäten. Die Organisation nennt aktuell rund 420.000 Mitglieder in 15 Genossenschaften; frühere Angaben von rund 430.000 gelten nicht als neue Momentaufnahme."
   },
   "provenance": {
     "sources": [
+      {
+        "id": "green-coop-news-nov-2026",
+        "type": "official-source",
+        "label": "Green Coop – official member activity and news archive, November 2026",
+        "url": "https://www.greencoop.or.jp/category/news/",
+        "retrieved_at": "2026-11-15",
+        "note": "First-party news archive shows member and cooperative activity on November 13 and community initiatives throughout October and November 2026."
+      },
       {
         "id": "green-coop-home",
         "type": "official-source",
         "label": "Green Coop – offizielle Seite",
         "url": "https://www.greencoop.or.jp/",
-        "retrieved_at": "2026-08-12",
+        "retrieved_at": "2026-11-15",
         "note": "Aktuelle offizielle Hauptseite mit laufenden Meldungen und Selbstbeschreibung des Verbunds."
       },
       {
@@ -98,9 +106,9 @@
     "state": "listed",
     "catalogued_at": "2026-08-12",
     "reviewed_by": "Commonworld editorial review",
-    "reviewed_at": "2026-08-12",
-    "next_review_at": "2026-11-12",
-    "notes": "Aufgenommen als mitgliedergesteuertes Commons-Netzwerk mit geteilten Versorgungs-, Sozial- und Umweltpraktiken. Kommerzielle Austauschbeziehungen allein wären kein Aufnahmegrund; ausschlaggebend sind Mitgliederhoheit, gemeinsame Institutionen und belegte kollektive Praxis."
+    "reviewed_at": "2026-11-15",
+    "next_review_at": "2027-02-15",
+    "notes": "Aufgenommen als mitgliedergesteuertes Commons-Netzwerk mit geteilten Versorgungs-, Sozial- und Umweltpraktiken. Kommerzielle Austauschbeziehungen allein wären kein Aufnahmegrund; ausschlaggebend sind Mitgliederhoheit, gemeinsame Institutionen und belegte kollektive Praxis. Aktuelle Green-Coop-Seiten und November-2026-Nachrichten bestätigen genossenschaftliches Handeln und Mitgliederbeteiligung, nicht einen unveränderlichen Mitgliederbestand."
   },
   "links": [
     {

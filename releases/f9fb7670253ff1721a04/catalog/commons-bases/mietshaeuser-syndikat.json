@@ -1,0 +1,57 @@
+{
+  "schema_version": 1,
+  "kind": "commonworld_commons_basis",
+  "project_id": "mietshaeuser-syndikat",
+  "classification": "commons-infrastructure",
+  "decision": "include",
+  "reviewed_at": "2026-10-30",
+  "reviewer": "Commonworld editorial desk review",
+  "criteria": {
+    "shared_resource": {
+      "status": "supported",
+      "statement": "Autonome Hausprojekt-GmbHs besitzen kollektiv verwaltete Immobilien, die über Syndikatsbeteiligung und Vetorecht vor spekulativem Wiederverkauf geschützt sind.",
+      "source_ids": [
+        "syndikat-network",
+        "syndikat-operation"
+      ]
+    },
+    "community": {
+      "status": "supported",
+      "statement": "Bewohnergruppen und Mitglieder des Syndikats bilden den Verbund eigenständiger Hausprojekte mit gegenseitiger Beratung und Solidarumlage.",
+      "source_ids": [
+        "syndikat-network",
+        "syndikat-operation"
+      ]
+    },
+    "commoning_practice": {
+      "status": "supported",
+      "statement": "Projektgruppen finanzieren, verwalten und pflegen Wohnhäuser selbst, beraten neue Initiativen und tragen solidarische Transfers für weitere Projekte.",
+      "source_ids": [
+        "syndikat-operation",
+        "syndikat-solidarity"
+      ]
+    },
+    "rules_and_responsibility": {
+      "status": "supported",
+      "statement": "Generalversammlung und Häuser-GmbHs besitzen definierte Entscheidungsrechte; Wiederverkaufsveto, Selbstorganisation und solidarischer Beitrag sind verbindliche Aufnahmekriterien.",
+      "source_ids": [
+        "syndikat-operation"
+      ]
+    },
+    "common_benefit": {
+      "status": "supported",
+      "statement": "Wohnraum wird dem spekulativen Verkauf entzogen; neue Hausgruppen erhalten Wissen, ehrenamtliche Beratung und solidarische Finanzierung.",
+      "source_ids": [
+        "syndikat-network",
+        "syndikat-solidarity"
+      ]
+    }
+  },
+  "confidence": 0.93,
+  "limitations": [
+    "Hausprojekt-GmbHs sind juristisch eigenständige Eigentümer; der Dachverbund besitzt nicht schlicht sämtliche Wohnhäuser.",
+    "Wiederverkaufsschutz schließt Insolvenz- und Finanzierungsrisiken nicht aus.",
+    "Nicht jedes Projekt ist für beliebige Außenstehende bewohnbar; Vergabeentscheidungen verbleiben beim jeweiligen Projekt."
+  ],
+  "notes": "Kollektiver Wohnraum mit zweistufiger GmbH-/Veto- und Solidargovernance, keine Behauptung universellen freien Wohnzugangs."
+}

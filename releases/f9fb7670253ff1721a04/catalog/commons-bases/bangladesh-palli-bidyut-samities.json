@@ -1,0 +1,56 @@
+{
+  "schema_version": 1,
+  "kind": "commonworld_commons_basis",
+  "project_id": "bangladesh-palli-bidyut-samities",
+  "classification": "common",
+  "decision": "include",
+  "reviewed_at": "2026-08-12",
+  "reviewer": "Commonworld editorial review",
+  "criteria": {
+    "shared_resource": {
+      "status": "supported",
+      "statement": "Die 80 Palli Bidyut Samities betreiben ländliche Elektrizitätsverteilinfrastruktur und Stromversorgung als gemeinsam organisierte Versorgungsressource ihrer Verbraucher-Mitglieder.",
+      "source_ids": [
+        "pbs-history-governance",
+        "pbs-at-a-glance"
+      ]
+    },
+    "community": {
+      "status": "supported",
+      "statement": "Jede Palli Bidyut Samity ist als lokale Elektrizitätsgenossenschaft organisiert; ihre Verbraucher sind Mitglieder und wählen den jeweiligen Verwaltungsrat.",
+      "source_ids": [
+        "pbs-history-governance"
+      ]
+    },
+    "commoning_practice": {
+      "status": "supported",
+      "statement": "Die Genossenschaften betreiben und entwickeln die lokale Verteilinfrastruktur eigenständig innerhalb eines gemeinsamen nationalen Rural-Electrification-Programms.",
+      "source_ids": [
+        "pbs-history-governance",
+        "pbs-at-a-glance"
+      ]
+    },
+    "rules_and_responsibility": {
+      "status": "supported",
+      "statement": "PBS-Bylaws verpflichten auf Genossenschaftsprinzipien und gewählte Boards tragen lokale Verantwortung, zugleich innerhalb verbindlicher REB-Richtlinien und staatlicher Regulierung.",
+      "source_ids": [
+        "pbs-history-governance"
+      ]
+    },
+    "common_benefit": {
+      "status": "supported",
+      "statement": "Zweck und laufende Praxis sind eine zuverlässige und erschwingliche ländliche Stromversorgung durch lokal organisierte Verbraucher-Genossenschaften.",
+      "source_ids": [
+        "pbs-at-a-glance",
+        "pbs-history-governance"
+      ]
+    }
+  },
+  "confidence": 0.84,
+  "limitations": [
+    "Die Palli Bidyut Samities sind nicht vollständig autonom: REB setzt umfassende Richtlinien und den regulatorischen Rahmen.",
+    "Der Eintrag bündelt 80 rechtlich und operativ eigenständige Genossenschaften; lokale Governance kann zwischen ihnen variieren.",
+    "Öffentliche Primärquellen dokumentieren die formale Verbraucher-Mitgliedschaft und Board-Wahl deutlicher als konkrete aktuelle Beteiligungsquoten."
+  ],
+  "notes": "Aufgenommen werden die 80 Palli Bidyut Samities als Verbraucher-Genossenschaften; das staatliche Rural Electrification Board selbst ist nicht der katalogisierte Common."
+}

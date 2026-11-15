@@ -1,0 +1,583 @@
+{
+  "schema_version": 1,
+  "kind": "commonworld_commons_basis_source_recheck",
+  "checked_at_utc": "2026-11-15",
+  "source_base_commit": "0f916c7fc9dd5a86da80112187456ce9b8faa092",
+  "reviewer_provenance": "model-assisted desk re-review against first-party official sites and identified federation or regional-programme sources; does not claim on-site, native, independently human-approved, or physically tested certification",
+  "scope": "Nine publicly listed Commons whose existing quarterly basis re-review was overdue on 2026-11-15; Fiji LMMA already handled separately in PR239",
+  "outcomes": [
+    {
+      "project_id": "b4rn",
+      "reviewed_at": "2026-11-15",
+      "next_review_at": "2027-02-15",
+      "basis_decision": "include",
+      "five_criteria": {
+        "shared_resource": {
+          "verdict": "supported_on_existing_basis_with_rechecked_sources",
+          "cited_source_ids": [
+            "b4rn-volunteer",
+            "b4rn-community-dig-2026"
+          ]
+        },
+        "community": {
+          "verdict": "supported_on_existing_basis_with_rechecked_sources",
+          "cited_source_ids": [
+            "b4rn-volunteer",
+            "b4rn-community-dig-2026"
+          ]
+        },
+        "commoning_practice": {
+          "verdict": "supported_on_existing_basis_with_rechecked_sources",
+          "cited_source_ids": [
+            "b4rn-volunteer",
+            "b4rn-community-dig-2026"
+          ]
+        },
+        "rules_and_responsibility": {
+          "verdict": "supported_on_existing_basis_with_rechecked_sources",
+          "cited_source_ids": [
+            "b4rn-volunteer",
+            "b4rn-community-dig-2026"
+          ]
+        },
+        "common_benefit": {
+          "verdict": "supported_on_existing_basis_with_rechecked_sources",
+          "cited_source_ids": [
+            "b4rn-volunteer",
+            "b4rn-community-dig-2026"
+          ]
+        }
+      },
+      "activity_status": "active",
+      "rechecked_sources": [
+        {
+          "source_id": "b4rn-volunteer",
+          "url": "https://b4rn.org.uk/working-with-us/volunteer",
+          "checked_at": "2026-11-15",
+          "evidence_class": "first-party-or-official-publication"
+        },
+        {
+          "source_id": "b4rn-community-dig-2026",
+          "url": "https://b4rn.org.uk/working-with-us/community-dig-team",
+          "checked_at": "2026-11-15",
+          "evidence_class": "first-party-or-official-publication"
+        }
+      ],
+      "finding": "B4RN volunteers remain involved in full-fibre construction, and community dig teams support locally governed funds; network access still requires paid service.",
+      "limitations": [
+        "Community benefit is not equal voting power for every subscriber."
+      ],
+      "automatic_publication_or_rejection": false
+    },
+    {
+      "project_id": "bangladesh-palli-bidyut-samities",
+      "reviewed_at": "2026-11-15",
+      "next_review_at": "2027-02-15",
+      "basis_decision": "include",
+      "five_criteria": {
+        "shared_resource": {
+          "verdict": "supported_on_existing_basis_with_rechecked_sources",
+          "cited_source_ids": [
+            "pbs-reb-at-a-glance-may-2026",
+            "pbs-history-governance"
+          ]
+        },
+        "community": {
+          "verdict": "supported_on_existing_basis_with_rechecked_sources",
+          "cited_source_ids": [
+            "pbs-reb-at-a-glance-may-2026",
+            "pbs-history-governance"
+          ]
+        },
+        "commoning_practice": {
+          "verdict": "supported_on_existing_basis_with_rechecked_sources",
+          "cited_source_ids": [
+            "pbs-reb-at-a-glance-may-2026",
+            "pbs-history-governance"
+          ]
+        },
+        "rules_and_responsibility": {
+          "verdict": "supported_on_existing_basis_with_rechecked_sources",
+          "cited_source_ids": [
+            "pbs-reb-at-a-glance-may-2026",
+            "pbs-history-governance"
+          ]
+        },
+        "common_benefit": {
+          "verdict": "supported_on_existing_basis_with_rechecked_sources",
+          "cited_source_ids": [
+            "pbs-reb-at-a-glance-may-2026",
+            "pbs-history-governance"
+          ]
+        }
+      },
+      "activity_status": "active",
+      "rechecked_sources": [
+        {
+          "source_id": "pbs-reb-at-a-glance-may-2026",
+          "url": "https://reb.gov.bd/pages/static-pages/6922ded2933eb65569e1da23",
+          "checked_at": "2026-11-15",
+          "evidence_class": "first-party-or-official-publication"
+        },
+        {
+          "source_id": "pbs-history-governance",
+          "url": "https://reb.gov.bd/site/page/62acea25-71aa-4663-b56e-18f4817f6774/nolink/",
+          "checked_at": "2026-11-15",
+          "evidence_class": "first-party-or-official-publication"
+        }
+      ],
+      "finding": "Bangladesh REB official March 2026 figures, updated May 2026, list 80 Palli Bidyut Samities; power distribution remains subject to central statutory oversight.",
+      "limitations": [
+        "Do not imply all consumers democratically control the statutory REB governance or its assets."
+      ],
+      "automatic_publication_or_rejection": false
+    },
+    {
+      "project_id": "berkshares",
+      "reviewed_at": "2026-11-15",
+      "next_review_at": "2027-02-15",
+      "basis_decision": "include",
+      "five_criteria": {
+        "shared_resource": {
+          "verdict": "supported_on_existing_basis_with_rechecked_sources",
+          "cited_source_ids": [
+            "berkshares-directory-oct-2026",
+            "berkshares-using",
+            "berkshares-membership"
+          ]
+        },
+        "community": {
+          "verdict": "supported_on_existing_basis_with_rechecked_sources",
+          "cited_source_ids": [
+            "berkshares-directory-oct-2026",
+            "berkshares-using",
+            "berkshares-membership"
+          ]
+        },
+        "commoning_practice": {
+          "verdict": "supported_on_existing_basis_with_rechecked_sources",
+          "cited_source_ids": [
+            "berkshares-directory-oct-2026",
+            "berkshares-using",
+            "berkshares-membership"
+          ]
+        },
+        "rules_and_responsibility": {
+          "verdict": "supported_on_existing_basis_with_rechecked_sources",
+          "cited_source_ids": [
+            "berkshares-directory-oct-2026",
+            "berkshares-using",
+            "berkshares-membership"
+          ]
+        },
+        "common_benefit": {
+          "verdict": "supported_on_existing_basis_with_rechecked_sources",
+          "cited_source_ids": [
+            "berkshares-directory-oct-2026",
+            "berkshares-using",
+            "berkshares-membership"
+          ]
+        }
+      },
+      "activity_status": "active",
+      "rechecked_sources": [
+        {
+          "source_id": "berkshares-directory-oct-2026",
+          "url": "https://berkshares.org/directory/",
+          "checked_at": "2026-11-15",
+          "evidence_class": "first-party-or-official-publication"
+        },
+        {
+          "source_id": "berkshares-using",
+          "url": "https://berkshares.org/using-berkshares/",
+          "checked_at": "2026-11-15",
+          "evidence_class": "first-party-or-official-publication"
+        },
+        {
+          "source_id": "berkshares-membership",
+          "url": "https://berkshares.org/donate/",
+          "checked_at": "2026-11-15",
+          "evidence_class": "first-party-or-official-publication"
+        }
+      ],
+      "finding": "BerkShares first-party business directory says last updated October 2026, confirms ongoing cash-like local acceptance at participating businesses and membership arrangements.",
+      "limitations": [
+        "Participating local-currency scheme is not legal tender or universally redeemable at par without conditions."
+      ],
+      "automatic_publication_or_rejection": false
+    },
+    {
+      "project_id": "gbif",
+      "reviewed_at": "2026-11-15",
+      "next_review_at": "2027-02-15",
+      "basis_decision": "include",
+      "five_criteria": {
+        "shared_resource": {
+          "verdict": "supported_on_existing_basis_with_rechecked_sources",
+          "cited_source_ids": [
+            "gbif-network",
+            "gbif-governance"
+          ]
+        },
+        "community": {
+          "verdict": "supported_on_existing_basis_with_rechecked_sources",
+          "cited_source_ids": [
+            "gbif-network",
+            "gbif-governance"
+          ]
+        },
+        "commoning_practice": {
+          "verdict": "supported_on_existing_basis_with_rechecked_sources",
+          "cited_source_ids": [
+            "gbif-network",
+            "gbif-governance"
+          ]
+        },
+        "rules_and_responsibility": {
+          "verdict": "supported_on_existing_basis_with_rechecked_sources",
+          "cited_source_ids": [
+            "gbif-network",
+            "gbif-governance"
+          ]
+        },
+        "common_benefit": {
+          "verdict": "supported_on_existing_basis_with_rechecked_sources",
+          "cited_source_ids": [
+            "gbif-network",
+            "gbif-governance"
+          ]
+        }
+      },
+      "activity_status": "active",
+      "rechecked_sources": [
+        {
+          "source_id": "gbif-network",
+          "url": "https://www.gbif.org/the-gbif-network",
+          "checked_at": "2026-11-15",
+          "evidence_class": "first-party-or-official-publication"
+        },
+        {
+          "source_id": "gbif-governance",
+          "url": "https://www.gbif.org/governance",
+          "checked_at": "2026-11-15",
+          "evidence_class": "first-party-or-official-publication"
+        }
+      ],
+      "finding": "Current GBIF participant network and governance pages describe formal MOU participants, distributed nodes, data publishers and Governing Board voting procedures.",
+      "limitations": [
+        "Voting rights differ for paying Voting Participants and Associate Participants, not a direct vote for every user."
+      ],
+      "automatic_publication_or_rejection": false
+    },
+    {
+      "project_id": "green-coop-japan",
+      "reviewed_at": "2026-11-15",
+      "next_review_at": "2027-02-15",
+      "basis_decision": "include",
+      "five_criteria": {
+        "shared_resource": {
+          "verdict": "supported_on_existing_basis_with_rechecked_sources",
+          "cited_source_ids": [
+            "green-coop-home",
+            "green-coop-news-nov-2026"
+          ]
+        },
+        "community": {
+          "verdict": "supported_on_existing_basis_with_rechecked_sources",
+          "cited_source_ids": [
+            "green-coop-home",
+            "green-coop-news-nov-2026"
+          ]
+        },
+        "commoning_practice": {
+          "verdict": "supported_on_existing_basis_with_rechecked_sources",
+          "cited_source_ids": [
+            "green-coop-home",
+            "green-coop-news-nov-2026"
+          ]
+        },
+        "rules_and_responsibility": {
+          "verdict": "supported_on_existing_basis_with_rechecked_sources",
+          "cited_source_ids": [
+            "green-coop-home",
+            "green-coop-news-nov-2026"
+          ]
+        },
+        "common_benefit": {
+          "verdict": "supported_on_existing_basis_with_rechecked_sources",
+          "cited_source_ids": [
+            "green-coop-home",
+            "green-coop-news-nov-2026"
+          ]
+        }
+      },
+      "activity_status": "active",
+      "rechecked_sources": [
+        {
+          "source_id": "green-coop-home",
+          "url": "https://www.greencoop.or.jp/",
+          "checked_at": "2026-11-15",
+          "evidence_class": "first-party-or-official-publication"
+        },
+        {
+          "source_id": "green-coop-news-nov-2026",
+          "url": "https://www.greencoop.or.jp/category/news/",
+          "checked_at": "2026-11-15",
+          "evidence_class": "first-party-or-official-publication"
+        }
+      ],
+      "finding": "First-party Green Coop November 2026 bulletin publishes continuing member/cooperative activities and support; homepage describes about 420000 members in 15 cooperatives.",
+      "limitations": [
+        "Membership figures change and should not be treated as permanent or all activities as member votes."
+      ],
+      "automatic_publication_or_rejection": false
+    },
+    {
+      "project_id": "kyrgyzstan-water-users-associations-union",
+      "reviewed_at": "2026-11-15",
+      "next_review_at": "2026-12-15",
+      "basis_decision": "include",
+      "five_criteria": {
+        "shared_resource": {
+          "verdict": "supported_on_existing_basis_with_rechecked_sources",
+          "cited_source_ids": [
+            "nuwua-ilc",
+            "kyrgyz-nwrmp-wua-capacity"
+          ]
+        },
+        "community": {
+          "verdict": "supported_on_existing_basis_with_rechecked_sources",
+          "cited_source_ids": [
+            "nuwua-ilc",
+            "kyrgyz-nwrmp-wua-capacity"
+          ]
+        },
+        "commoning_practice": {
+          "verdict": "supported_on_existing_basis_with_rechecked_sources",
+          "cited_source_ids": [
+            "nuwua-ilc",
+            "kyrgyz-nwrmp-wua-capacity"
+          ]
+        },
+        "rules_and_responsibility": {
+          "verdict": "supported_on_existing_basis_with_rechecked_sources",
+          "cited_source_ids": [
+            "nuwua-ilc",
+            "kyrgyz-nwrmp-wua-capacity"
+          ]
+        },
+        "common_benefit": {
+          "verdict": "supported_on_existing_basis_with_rechecked_sources",
+          "cited_source_ids": [
+            "nuwua-ilc",
+            "kyrgyz-nwrmp-wua-capacity"
+          ]
+        }
+      },
+      "activity_status": "unknown",
+      "rechecked_sources": [
+        {
+          "source_id": "nuwua-ilc",
+          "url": "https://www.landcoalition.org/en/our-network/the-union-of-the-water-users-associations-of-the-kyrgyz-republic/",
+          "checked_at": "2026-11-15",
+          "evidence_class": "named-network-or-regional-source"
+        },
+        {
+          "source_id": "kyrgyz-nwrmp-wua-capacity",
+          "url": "https://nwrmp.water.gov.kg/?lang=ru_RU&page_id=231",
+          "checked_at": "2026-11-15",
+          "evidence_class": "first-party-or-official-publication"
+        }
+      ],
+      "finding": "ILC still lists NUWUA as a national water-user-association representative, and a Kyrgyz government irrigation project describes capacity-strengthening roles for the union and water user councils.",
+      "limitations": [
+        "Neither available source dates a specific NUWUA operating event in November 2026. Current activity intentionally remains unknown."
+      ],
+      "automatic_publication_or_rejection": false
+    },
+    {
+      "project_id": "lebanon-hima-network",
+      "reviewed_at": "2026-11-15",
+      "next_review_at": "2027-02-15",
+      "basis_decision": "include",
+      "five_criteria": {
+        "shared_resource": {
+          "verdict": "supported_on_existing_basis_with_rechecked_sources",
+          "cited_source_ids": [
+            "spnl-west-bekaa-2026"
+          ]
+        },
+        "community": {
+          "verdict": "supported_on_existing_basis_with_rechecked_sources",
+          "cited_source_ids": [
+            "spnl-west-bekaa-2026"
+          ]
+        },
+        "commoning_practice": {
+          "verdict": "supported_on_existing_basis_with_rechecked_sources",
+          "cited_source_ids": [
+            "spnl-west-bekaa-2026"
+          ]
+        },
+        "rules_and_responsibility": {
+          "verdict": "supported_on_existing_basis_with_rechecked_sources",
+          "cited_source_ids": [
+            "spnl-west-bekaa-2026"
+          ]
+        },
+        "common_benefit": {
+          "verdict": "supported_on_existing_basis_with_rechecked_sources",
+          "cited_source_ids": [
+            "spnl-west-bekaa-2026"
+          ]
+        }
+      },
+      "activity_status": "active",
+      "rechecked_sources": [
+        {
+          "source_id": "spnl-west-bekaa-2026",
+          "url": "https://www.spnl.org/five-new-himas-double-the-network-in-spnls-west-bekaa-project-area/",
+          "checked_at": "2026-11-15",
+          "evidence_class": "first-party-or-official-publication"
+        }
+      ],
+      "finding": "SPNL documents on October 21 2026 five Himas established with municipality and community engagement in West Bekaa, building on local conservation rules.",
+      "limitations": [
+        "Do not infer private land rights, sensitive site coordinates, or identical governance across Himas."
+      ],
+      "automatic_publication_or_rejection": false
+    },
+    {
+      "project_id": "samoa-community-based-fisheries-management-program",
+      "reviewed_at": "2026-11-15",
+      "next_review_at": "2027-02-15",
+      "basis_decision": "include",
+      "five_criteria": {
+        "shared_resource": {
+          "verdict": "supported_on_existing_basis_with_rechecked_sources",
+          "cited_source_ids": [
+            "samoa-cbfmp-maf",
+            "samoa-cbfmp-sprep-2026"
+          ]
+        },
+        "community": {
+          "verdict": "supported_on_existing_basis_with_rechecked_sources",
+          "cited_source_ids": [
+            "samoa-cbfmp-maf",
+            "samoa-cbfmp-sprep-2026"
+          ]
+        },
+        "commoning_practice": {
+          "verdict": "supported_on_existing_basis_with_rechecked_sources",
+          "cited_source_ids": [
+            "samoa-cbfmp-maf",
+            "samoa-cbfmp-sprep-2026"
+          ]
+        },
+        "rules_and_responsibility": {
+          "verdict": "supported_on_existing_basis_with_rechecked_sources",
+          "cited_source_ids": [
+            "samoa-cbfmp-maf",
+            "samoa-cbfmp-sprep-2026"
+          ]
+        },
+        "common_benefit": {
+          "verdict": "supported_on_existing_basis_with_rechecked_sources",
+          "cited_source_ids": [
+            "samoa-cbfmp-maf",
+            "samoa-cbfmp-sprep-2026"
+          ]
+        }
+      },
+      "activity_status": "active",
+      "rechecked_sources": [
+        {
+          "source_id": "samoa-cbfmp-maf",
+          "url": "https://maf.gov.ws/fisheries/",
+          "checked_at": "2026-11-15",
+          "evidence_class": "first-party-or-official-publication"
+        },
+        {
+          "source_id": "samoa-cbfmp-sprep-2026",
+          "url": "https://pipap.sprep.org/news/samoa-15-villages-launch-fisheries-plans",
+          "checked_at": "2026-11-15",
+          "evidence_class": "named-network-or-regional-source"
+        }
+      ],
+      "finding": "Samoa MAF describes over 120 coastal villages and community responsibility in CBFMP; SPREP reports fifteen villages launching their own plans on June 15 2026.",
+      "limitations": [
+        "Launch of a management plan does not establish its outcomes or authorize publication of private fishing boundaries."
+      ],
+      "automatic_publication_or_rejection": false
+    },
+    {
+      "project_id": "sewa-sangini-childcare-cooperative",
+      "reviewed_at": "2026-11-15",
+      "next_review_at": "2026-12-15",
+      "basis_decision": "include",
+      "five_criteria": {
+        "shared_resource": {
+          "verdict": "supported_on_existing_basis_with_rechecked_sources",
+          "cited_source_ids": [
+            "sangini-gadn-2026",
+            "sangini-childcare-2024"
+          ]
+        },
+        "community": {
+          "verdict": "supported_on_existing_basis_with_rechecked_sources",
+          "cited_source_ids": [
+            "sangini-gadn-2026",
+            "sangini-childcare-2024"
+          ]
+        },
+        "commoning_practice": {
+          "verdict": "supported_on_existing_basis_with_rechecked_sources",
+          "cited_source_ids": [
+            "sangini-gadn-2026",
+            "sangini-childcare-2024"
+          ]
+        },
+        "rules_and_responsibility": {
+          "verdict": "supported_on_existing_basis_with_rechecked_sources",
+          "cited_source_ids": [
+            "sangini-gadn-2026",
+            "sangini-childcare-2024"
+          ]
+        },
+        "common_benefit": {
+          "verdict": "supported_on_existing_basis_with_rechecked_sources",
+          "cited_source_ids": [
+            "sangini-gadn-2026",
+            "sangini-childcare-2024"
+          ]
+        }
+      },
+      "activity_status": "unknown",
+      "rechecked_sources": [
+        {
+          "source_id": "sangini-gadn-2026",
+          "url": "https://sewafederation.org/publication/report-gadn-achieving-gender-equality-and-womens-rights-through-public-services-and-social-protection/",
+          "checked_at": "2026-11-15",
+          "evidence_class": "first-party-or-official-publication"
+        },
+        {
+          "source_id": "sangini-childcare-2024",
+          "url": "https://sewafederation.org/from-sticky-floors-to-open-doors-childcare-access-as-a-key-to-decent-work/",
+          "checked_at": "2026-11-15",
+          "evidence_class": "first-party-or-official-publication"
+        }
+      ],
+      "finding": "SEWA Cooperative Federation's March 27 2026 publication still uses Sangini as a community-based childcare cooperative example; older federation reporting describes the women-operated childcare facilities.",
+      "limitations": [
+        "No independently date-bound evidence of each childcare centre being open in November 2026; activity is unknown."
+      ],
+      "automatic_publication_or_rejection": false
+    }
+  ],
+  "review_boundaries": [
+    "The nine existing criteria explanations are retained; this re-review verifies new official material and records limitations, rather than asserting personal field inspection.",
+    "No human reviewer, native language quality or physical Safari acceptance is implied.",
+    "Operational status is unknown where recent individual operations cannot be substantiated.",
+    "No private homes, personally identifying welfare data, fishing sites or protected natural-resource boundaries were introduced."
+  ]
+}

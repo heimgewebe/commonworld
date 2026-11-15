@@ -44,16 +44,24 @@
   },
   "activity": {
     "status": "active",
-    "observed_at": "2026-08-14",
+    "observed_at": "2026-11-15",
     "source_ids": [
       "b4rn-home",
       "b4rn-working-with-us",
       "b4rn-volunteer"
     ],
-    "note": "Die aktuellen offiziellen Seiten dokumentieren laufenden Breitbandbetrieb, Ausbau, Freiwilligenarbeit und gemeinschaftliche Projektbeteiligung im B4RN-Netz."
+    "note": "Die am 15.11.2026 erneut aufgerufene offizielle Freiwilligenseite beschreibt fortdauernden Aufbau und Anschlussbetrieb des B4RN-Netzes; Community-Dig-Teams verwalten Einnahmen für lokale Gemeinschaftszwecke. Nutzer sind nicht automatisch in jede Betreiberentscheidung eingebunden."
   },
   "provenance": {
     "sources": [
+      {
+        "id": "b4rn-community-dig-2026",
+        "type": "official-source",
+        "label": "B4RN – Community Dig Team, community funds and voluntary governance",
+        "url": "https://b4rn.org.uk/working-with-us/community-dig-team",
+        "retrieved_at": "2026-11-15",
+        "note": "Current first-party explanation of voluntary community dig groups and democratically organized community funds."
+      },
       {
         "id": "b4rn-home",
         "type": "official-source",
@@ -83,7 +91,7 @@
         "type": "official-source",
         "label": "B4RN – Volunteer",
         "url": "https://b4rn.org.uk/working-with-us/volunteer",
-        "retrieved_at": "2026-08-14",
+        "retrieved_at": "2026-11-15",
         "note": "Aktueller öffentlicher Beteiligungsweg für Freiwillige bei Planung, Wegerechten, Bau, Anschlussunterstützung und lokaler Projektorganisation."
       },
       {
@@ -101,9 +109,9 @@
     "state": "listed",
     "catalogued_at": "2026-08-14",
     "reviewed_by": "Commonworld editorial review",
-    "reviewed_at": "2026-08-14",
-    "next_review_at": "2026-11-14",
-    "notes": "Aufgenommen als gemeinschaftsgetragene Netzinfrastruktur: ausschlaggebend sind Mitgliedseigentum, Community-Benefit-Bindung, lokales Kapital und fortgesetzte Freiwilligenbeteiligung; kommerzieller Internetzugang allein wäre kein Aufnahmegrund."
+    "reviewed_at": "2026-11-15",
+    "next_review_at": "2027-02-15",
+    "notes": "Aufgenommen als gemeinschaftsgetragene Netzinfrastruktur: ausschlaggebend sind Mitgliedseigentum, Community-Benefit-Bindung, lokales Kapital und fortgesetzte Freiwilligenbeteiligung; kommerzieller Internetzugang allein wäre kein Aufnahmegrund. Aktualisierte offizielle B4RN-Seiten belegen am 15.11.2026 weiter lokalen Aufbau, Gruppenfonds und professionellen ISP-Betrieb."
   },
   "links": [
     {

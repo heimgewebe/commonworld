@@ -1,0 +1,58 @@
+{
+  "schema_version": 1,
+  "kind": "commonworld_commons_basis_source_recheck",
+  "checked_at_utc": "2026-11-15",
+  "source_base_commit": "0f916c7fc9dd5a86da80112187456ce9b8faa092",
+  "reviewer_provenance": "model-assisted editorial desk re-review against published official material; not on-site verification or independent human certification",
+  "scope": "One still-listed record, Fiji LMMA Network, with scheduled editorial review due 2026-11-15; distinct from nine pre-existing overdue records",
+  "project_id": "fiji-locally-managed-marine-area-network",
+  "rechecked_official_sources": [
+    {
+      "source_id": "flmma-spc-2026",
+      "url": "https://www.spc.int/digitallibrary/get/ogbzt",
+      "finding": "SPC-hosted summary documents the earlier 2019–2020 multi-village study and effects of village participation; publication-host date alone does not establish 2026 implementation",
+      "status": "document accessible as PDF text; screenshot endpoint returned 403"
+    },
+    {
+      "source_id": "flmma-spc-exchange",
+      "url": "https://integre.spc.int/en/regional-actions/bilateral-exchanges",
+      "finding": "Historical SPC INTEGRE exchange record; site states no updates after June 2018",
+      "status": "historical source, not 2026 operational proof"
+    },
+    {
+      "source_id": "flmma-mecc-kadavu-2026",
+      "url": "https://mecc.gov.fj/%F0%9D%90%8A%F0%9D%90%80%F0%9D%90%83%F0%9D%90%80%F0%9D%90%95%F0%9D%90%94-%F0%9D%90%82%F0%9D%90%8E%F0%9D%90%8C%F0%9D%90%8C%F0%9D%90%94%F0%9D%90%8D%F0%9D%90%88%F0%9D%90%93%F0%9D%90%88%F0%9D%90%84/",
+      "finding": "20 July 2026 ministry announcement: UNDP/GEF-supported project strengthening Fiji LMMA network 2026–2030, community and customary right holders to guide decisions, support in Kadavu proposed",
+      "status": "current official source for institutional network programme; future implementation cannot be asserted"
+    }
+  ],
+  "five_criteria": {
+    "shared_resource": [
+      "flmma-spc-2026",
+      "flmma-spc-exchange"
+    ],
+    "community": [
+      "flmma-spc-2026",
+      "flmma-spc-exchange",
+      "flmma-mecc-kadavu-2026"
+    ],
+    "commoning_practice": [
+      "flmma-spc-2026"
+    ],
+    "rules_and_responsibility": [
+      "flmma-spc-exchange",
+      "flmma-mecc-kadavu-2026"
+    ],
+    "common_benefit": [
+      "flmma-spc-2026",
+      "flmma-mecc-kadavu-2026"
+    ]
+  },
+  "result": {
+    "basis_decision": "include",
+    "reviewed_at": "2026-11-15",
+    "next_review_at": "2027-02-15",
+    "activity_assessment": "Current official programme approval confirms the network is an ongoing institutional object, not that specific implementation milestones or ecological outcomes have occurred",
+    "spatial_privacy": "No village, reef, customary fishing-ground coordinates or boundaries disclosed"
+  }
+}

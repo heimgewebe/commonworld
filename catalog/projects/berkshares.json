@@ -38,15 +38,23 @@
   },
   "activity": {
     "status": "active",
-    "observed_at": "2026-08-14",
+    "observed_at": "2026-11-15",
     "source_ids": [
       "berkshares-home",
       "berkshares-annual-meeting-2026"
     ],
-    "note": "Die offizielle Seite veröffentlicht 2026 laufende Währungs- und Community-Aktivitäten; im Januar 2026 fand eine Mitgliederversammlung mit Abstimmungen über Vorstandsmandate statt."
+    "note": "Das offizielle BerkShares-Unternehmensverzeichnis ist im Oktober 2026 aktualisiert worden und zeigt fortgesetzte Akzeptanz der regionalen Papierwährung. Die gemeinnützige Mitgliedsstruktur und jährliche Board-Wahlmöglichkeiten bleiben beschrieben."
   },
   "provenance": {
     "sources": [
+      {
+        "id": "berkshares-directory-oct-2026",
+        "type": "official-source",
+        "label": "BerkShares – current business directory, updated October 2026",
+        "url": "https://berkshares.org/directory/",
+        "retrieved_at": "2026-11-15",
+        "note": "First-party directory visibly updated October 2026, evidencing continuing local-currency acceptance."
+      },
       {
         "id": "berkshares-home",
         "type": "official-source",
@@ -68,7 +76,7 @@
         "type": "official-source",
         "label": "BerkShares – Using BerkShares",
         "url": "https://berkshares.org/using-berkshares/",
-        "retrieved_at": "2026-08-14",
+        "retrieved_at": "2026-11-15",
         "note": "Aktueller öffentlicher Nutzungsweg: BerkShares können bei teilnehmenden lokalen Banken getauscht und bei teilnehmenden lokalen Unternehmen verwendet werden."
       },
       {
@@ -94,9 +102,9 @@
     "state": "listed",
     "catalogued_at": "2026-08-14",
     "reviewed_by": "Commonworld editorial review",
-    "reviewed_at": "2026-08-14",
-    "next_review_at": "2026-11-14",
-    "notes": "Aufgenommen als konkrete Community-Finance- und Lokalwährungspraxis. Ausschlaggebend sind lokale Zirkulationsregeln, Nonprofit-Trägerschaft und belegte Mitglieder-Governance; der bloße Einsatz eines alternativen Zahlungsmittels wäre kein Aufnahmegrund."
+    "reviewed_at": "2026-11-15",
+    "next_review_at": "2027-02-15",
+    "notes": "Aufgenommen als konkrete Community-Finance- und Lokalwährungspraxis. Ausschlaggebend sind lokale Zirkulationsregeln, Nonprofit-Trägerschaft und belegte Mitglieder-Governance; der bloße Einsatz eines alternativen Zahlungsmittels wäre kein Aufnahmegrund. Re-Review 15.11.2026 bestätigt aktuelle Händlerakzeptanz über das im Oktober 2026 aktualisierte Originalverzeichnis, ohne die Währung als staatliches Geld oder unbegrenzt nutzbar darzustellen."
   },
   "links": [
     {

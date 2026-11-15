@@ -29,12 +29,12 @@
   },
   "activity": {
     "status": "active",
-    "observed_at": "2026-08-13",
+    "observed_at": "2026-11-15",
     "source_ids": [
       "gbif-nodes",
       "gbif-data-publishing"
     ],
-    "note": "Die aktuellen offiziellen Netzwerk- und Publikationsseiten zeigen laufende Knotenaktivität, Support und fortgesetzte Datenpublikation im GBIF-Netzwerk."
+    "note": "Die am 15.11.2026 erreichbaren offiziellen GBIF-Netzwerk- und Governance-Seiten dokumentieren weiterhin föderierte Teilnehmer, nationale Knoten und formale gemeinschaftliche Entscheidungsstrukturen. Stimmberechtigungen sind je nach Teilnahmeart unterschiedlich."
   },
   "provenance": {
     "sources": [
@@ -43,7 +43,7 @@
         "type": "official-source",
         "label": "GBIF – das globale Teilnehmernetzwerk",
         "url": "https://www.gbif.org/the-gbif-network",
-        "retrieved_at": "2026-08-13",
+        "retrieved_at": "2026-11-15",
         "note": "Beschreibt freiwillig kooperierende Teilnehmer, nationale und organisatorische Knoten sowie das gemeinsame Ziel freien und offenen Biodiversitätsdatenzugangs."
       },
       {
@@ -51,7 +51,7 @@
         "type": "official-source",
         "label": "GBIF – Governance",
         "url": "https://www.gbif.org/governance",
-        "retrieved_at": "2026-08-13",
+        "retrieved_at": "2026-11-15",
         "note": "Dokumentiert den Governing Board als Verfahren kollektiver Teilnehmerentscheidungen, Repräsentation, Abstimmungsrechte und Ausschüsse."
       },
       {
@@ -93,9 +93,9 @@
     "state": "listed",
     "catalogued_at": "2026-08-13",
     "reviewed_by": "Commonworld editorial review",
-    "reviewed_at": "2026-08-13",
-    "next_review_at": "2026-11-13",
-    "notes": "Als Commons-Infrastruktur aufgenommen: ausschlaggebend sind föderierte Datenbeiträge, gemeinsam gepflegte Standards und Dienste, formalisierte Teilnehmer-Governance und öffentlicher Biodiversitätsdatenzugang."
+    "reviewed_at": "2026-11-15",
+    "next_review_at": "2027-02-15",
+    "notes": "Als Commons-Infrastruktur aufgenommen: ausschlaggebend sind föderierte Datenbeiträge, gemeinsam gepflegte Standards und Dienste, formalisierte Teilnehmer-Governance und öffentlicher Biodiversitätsdatenzugang. Am 15.11.2026 mit offiziellen GBIF-Netzwerk-/Governance-Seiten erneut belegt; die Struktur ist föderiert und nicht gleichberechtigt für alle Datenkonsumenten."
   },
   "links": [
     {

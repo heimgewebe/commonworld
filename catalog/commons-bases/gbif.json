@@ -4,7 +4,7 @@
   "project_id": "gbif",
   "classification": "commons-infrastructure",
   "decision": "include",
-  "reviewed_at": "2026-08-13",
+  "reviewed_at": "2026-11-15",
   "reviewer": "Commonworld editorial review",
   "criteria": {
     "shared_resource": {
@@ -58,5 +58,5 @@
     "Der GBIF-Sekretariatsbetrieb ist ein zentraler Bestandteil innerhalb der föderierten Infrastruktur.",
     "Einzelne Datensätze folgen den jeweils zulässigen Lizenzen und Bedingungen ihrer Publizierenden; offener Zugang bedeutet nicht bedingungslose Rechte an jedem Datensatz."
   ],
-  "notes": "Aufgenommen als global föderierte Commons-Infrastruktur, nicht lediglich wegen offener Daten, sondern wegen belegter kollektiver Beiträge, Standards, Knoten und formaler Teilnehmer-Governance."
+  "notes": "Aufgenommen als global föderierte Commons-Infrastruktur, nicht lediglich wegen offener Daten, sondern wegen belegter kollektiver Beiträge, Standards, Knoten und formaler Teilnehmer-Governance. Am 15.11.2026 mit offiziellen GBIF-Netzwerk-/Governance-Seiten erneut belegt; die Struktur ist föderiert und nicht gleichberechtigt für alle Datenkonsumenten."
 }
