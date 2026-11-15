@@ -272,6 +272,9 @@ async function forcedColorsPublicScenario() {
   await activateByKeyboard(page, '#filter-toggle', 'public discovery toggle');
   await page.locator('#discovery-panel').waitFor({ state: 'visible' });
   assert(await page.locator('#filter-toggle').getAttribute('aria-expanded') === 'true', 'public discovery: aria-expanded did not become true');
+  assert(await page.locator('#commons-search').getAttribute('aria-expanded') === null, 'public discovery: searchbox incorrectly exposes aria-expanded');
+  assert(await page.locator('.orientation-bar').getAttribute('role') === 'group', 'public orientation: accessible group role missing');
+  assert(await page.locator('#semantic-summary').getAttribute('role') === 'group', 'public orientation: labelled summary lacks supported group role');
   await tabThroughSurface(page, 'body', 'forced-public-discovery');
   await activateByKeyboard(page, '#filter-presence-geographic', 'public geographic presence checkbox', 'Space');
   assert(await page.locator('#filter-presence-geographic').isChecked(), 'public discovery: keyboard Space did not expose native checked state');

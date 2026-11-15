@@ -70,6 +70,19 @@ class PublicShellTests(unittest.TestCase):
     def test_public_shell_validates(self) -> None:
         self.assertEqual([], validate_public_shell(ROOT))
 
+    def test_search_and_orientation_have_supported_aria_roles(self) -> None:
+        for locale in ("de", "en", "es", "fr", "pt-BR", "ar", "zh-Hans", "hi"):
+            with self.subTest(locale=locale):
+                markup = render_shell(locale=locale)
+                self.assertRegex(markup, r'<input id="commons-search"[^>]*aria-controls="discovery-list"')
+                self.assertNotRegex(markup, r'<input id="commons-search"[^>]*aria-expanded=')
+                self.assertRegex(markup, r'<button id="filter-toggle"[^>]*aria-expanded="false"')
+                self.assertRegex(markup, r'<div class="orientation-bar" role="group" aria-label="[^"]+">')
+                self.assertIn('id="semantic-summary" class="semantic-summary" role="group"', markup)
+        app = (ROOT / "assets/commonworld-app.js").read_text(encoding="utf-8")
+        self.assertNotIn("elements.search.setAttribute('aria-expanded'", app)
+        self.assertIn("elements.filterToggle.setAttribute('aria-expanded'", app)
+
     def test_locale_index_brand_resets_within_the_current_surface(self) -> None:
         expected = {
             "en": "./",

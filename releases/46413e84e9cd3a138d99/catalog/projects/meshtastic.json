@@ -1,0 +1,154 @@
+{
+  "schema_version": 4,
+  "id": "meshtastic",
+  "title": "Meshtastic",
+  "summary": "Ein Open-Source-Ökosystem für dezentrale Kommunikation ohne Mobilfunk- oder Internetverbindung über günstige, stromsparende LoRa-Geräte; es umfasst Firmware, Protokolle und Dokumentation.",
+  "themes": [
+    "community-network",
+    "communication",
+    "open-source",
+    "infrastructure",
+    "open-hardware"
+  ],
+  "actions": [
+    "use",
+    "learn",
+    "contribute",
+    "replicate"
+  ],
+  "presence": {
+    "geographic": [],
+    "digital": {
+      "available": true,
+      "reach": "global",
+      "label": "Offene Mesh-Firmware, Protokolle, Dokumentation und weltweite Community-Zusammenarbeit",
+      "source_ids": [
+        "meshtastic-home",
+        "meshtastic-introduction",
+        "meshtastic-firmware"
+      ]
+    }
+  },
+  "activity": {
+    "status": "active",
+    "observed_at": "2026-07-31",
+    "source_ids": [
+      "meshtastic-home",
+      "meshtastic-introduction",
+      "meshtastic-firmware"
+    ],
+    "note": "Die offiziellen Seiten dokumentieren ein aktives, freiwillig getragenes Projekt, aktuelle Einstiegspfade und laufende öffentliche Entwicklung."
+  },
+  "provenance": {
+    "sources": [
+      {
+        "id": "meshtastic-home",
+        "type": "official-source",
+        "label": "Meshtastic – offizielle Seite",
+        "url": "https://meshtastic.org/",
+        "retrieved_at": "2026-07-31",
+        "note": "Offizielle Selbstbeschreibung als quelloffenes, dezentrales Off-grid-Mesh-Netz."
+      },
+      {
+        "id": "meshtastic-introduction",
+        "type": "official-source",
+        "label": "Meshtastic – Introduction",
+        "url": "https://meshtastic.org/docs/introduction/",
+        "retrieved_at": "2026-07-31",
+        "note": "Offizielle Beschreibung der gemeinschaftsgetragenen Entwicklung, Wartung und Beteiligungswege."
+      },
+      {
+        "id": "meshtastic-getting-started",
+        "type": "official-source",
+        "label": "Meshtastic – Getting started",
+        "url": "https://meshtastic.org/docs/getting-started/",
+        "retrieved_at": "2026-07-31",
+        "note": "Offizieller Einstieg in Nutzung und selbst betriebenes Mesh."
+      },
+      {
+        "id": "meshtastic-firmware",
+        "type": "official-source",
+        "label": "Meshtastic Firmware – offizielles Repository",
+        "url": "https://github.com/meshtastic/firmware",
+        "retrieved_at": "2026-07-31",
+        "note": "Öffentliche Firmware-Entwicklung mit GPL-3.0-Lizenz, Beitragsregeln und Verhaltenskodex."
+      },
+      {
+        "id": "meshtastic-legal",
+        "type": "official-source",
+        "label": "Meshtastic – Legal",
+        "url": "https://meshtastic.org/docs/legal/",
+        "retrieved_at": "2026-07-31",
+        "note": "Offizielle Angaben zu Open-Source-Verpflichtung, Marke und dem getrennten kommerziellen Unternehmen Meshtastic Solutions."
+      }
+    ],
+    "uncertainty_note": "Strategische und markenrechtliche Kontrolle ist teilweise bei Kernbeitragenden beziehungsweise Organisationen konzentriert; dies wird nicht mit gemeinschaftlicher Vollkontrolle gleichgesetzt."
+  },
+  "curation": {
+    "state": "listed",
+    "catalogued_at": "2026-07-31",
+    "reviewed_by": "Commonworld editorial review",
+    "reviewed_at": "2026-07-31",
+    "next_review_at": "2026-10-31",
+    "notes": "Als digitale Commons-Infrastruktur aufgenommen. Katalogisiert ist das gemeinschaftlich entwickelte offene Ökosystem; einzelne private Meshes gelten nicht automatisch als eigenständige Commons."
+  },
+  "links": [
+    {
+      "type": "homepage",
+      "label": "Meshtastic – offizielle Seite",
+      "url": "https://meshtastic.org/"
+    },
+    {
+      "type": "use",
+      "label": "Meshtastic einrichten und nutzen",
+      "url": "https://meshtastic.org/docs/getting-started/",
+      "source_ids": [
+        "meshtastic-getting-started"
+      ]
+    },
+    {
+      "type": "learn",
+      "label": "Projekt und Funktionsweise kennenlernen",
+      "url": "https://meshtastic.org/docs/introduction/",
+      "source_ids": [
+        "meshtastic-introduction"
+      ]
+    },
+    {
+      "type": "contribute",
+      "label": "Zur Entwicklung beitragen",
+      "url": "https://github.com/meshtastic/firmware",
+      "source_ids": [
+        "meshtastic-firmware"
+      ]
+    },
+    {
+      "type": "replicate",
+      "label": "Ein eigenes Mesh aufbauen",
+      "url": "https://meshtastic.org/docs/getting-started/",
+      "source_ids": [
+        "meshtastic-getting-started"
+      ]
+    },
+    {
+      "type": "license",
+      "label": "Firmware-Lizenz und Quellcode",
+      "url": "https://github.com/meshtastic/firmware",
+      "source_ids": [
+        "meshtastic-firmware"
+      ]
+    }
+  ],
+  "handoff": {
+    "enabled": false
+  },
+  "languages": {
+    "codes": [
+      "en"
+    ],
+    "source_ids": [
+      "meshtastic-home"
+    ],
+    "note": "Die geprüften globalen Hauptoberflächen und Dokumentationen sind auf Englisch verfügbar."
+  }
+}

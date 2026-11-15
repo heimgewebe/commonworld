@@ -4028,29 +4028,82 @@ async function liveUiHardeningScenario() {
     const run = await newPage({ mobile: true, viewportOverride: { width: profile.width, height: profile.height }, touch: true });
     await run.page.goto(baseUrl, { waitUntil: 'domcontentloaded' });
     await run.page.waitForSelector('html.runtime-ready');
-    await run.page.waitForSelector('.maplibregl-ctrl-attrib a');
+    await run.page.waitForSelector('.globe-stage[data-visual-ready="true"]');
+    const initial = await run.page.evaluate(() => {
+      const control = document.querySelector('.maplibregl-ctrl-attrib');
+      const summary = control.querySelector('summary');
+      const summaryRect = summary.getBoundingClientRect();
+      const attributionRect = control.getBoundingClientRect();
+      const sphereRect = document.querySelector('#digital-sphere').getBoundingClientRect();
+      const statusRect = document.querySelector('#map-status').getBoundingClientRect();
+      const summaryStyle = getComputedStyle(summary);
+      const compactRingNames = [...document.querySelectorAll('.sphere-ring-plane[data-emphasis="primary"]')]
+        .map((plane) => {
+          const names = [...plane.querySelectorAll('.sphere-ring-name')];
+          return {
+            all: names.length,
+            visible: names.filter((name) => getComputedStyle(name).display !== 'none').length,
+          };
+        });
+      const ringAccessibleSummaryLength = document.querySelector('#sphere-ring-accessible-summary')?.textContent?.trim().length ?? 0;
+      const intersects = (one, other) => one.left < other.right && one.right > other.left
+        && one.top < other.bottom && one.bottom > other.top;
+      return {
+        collapsed: !control.open && !control.classList.contains('maplibregl-compact-show'),
+        touchTargetWidth: summaryRect.width,
+        touchTargetHeight: summaryRect.height,
+        backgroundRepeat: summaryStyle.backgroundRepeat,
+        compactRingNames,
+        ringAccessibleSummaryLength,
+        overlapStatus: intersects(attributionRect, statusRect),
+        globeBounds: { left: sphereRect.left, right: sphereRect.right, top: sphereRect.top, bottom: sphereRect.bottom },
+        viewport: { width: innerWidth, height: innerHeight },
+        initialZoom: new URL(location.href).searchParams.get('z'),
+      };
+    });
+    assert(initial.collapsed, `live UI ${profile.id}: MapLibre attribution stays expanded on initial phone screen (${JSON.stringify(initial)})`);
+    assert(initial.touchTargetWidth >= 43.5 && initial.touchTargetHeight >= 43.5 && initial.backgroundRepeat === 'no-repeat',
+      `live UI ${profile.id}: collapsed attribution touch target or icon sizing invalid (${JSON.stringify(initial)})`);
+    assert(!initial.overlapStatus, `live UI ${profile.id}: initial attribution overlaps globe status (${JSON.stringify(initial)})`);
+    // Low globe zoom under 0.9 has a reproduced MapLibre drag-settlement
+    // defect. Prefer a functional map and permit at most 9% horizontal
+    // ring overhang on the narrowest 320px screen.
+    const allowableOverhang = profile.width <= 340 ? Math.ceil(profile.width * 0.09) : 2;
+    assert(initial.globeBounds.left >= -allowableOverhang
+      && initial.globeBounds.right <= initial.viewport.width + allowableOverhang
+      && initial.globeBounds.top >= -1 && initial.globeBounds.bottom <= initial.viewport.height + 1,
+      `live UI ${profile.id}: initial ring exceeds drag-stable viewport budget (${JSON.stringify(initial)})`);
+    assert(initial.initialZoom && Number(initial.initialZoom) < 1.15, `live UI ${profile.id}: camera did not adapt to narrow viewport (${JSON.stringify(initial)})`);
+    assert(initial.compactRingNames.length === 3
+      && initial.compactRingNames.every(({ all, visible }) => all > 1 && visible === 1)
+      && initial.ringAccessibleSummaryLength > 200,
+      `live UI ${profile.id}: compact globe must show one preview per primary ring while preserving the full accessible description (${JSON.stringify(initial)})`);
+
+    // The native attribution disclosure must still expose every copyright
+    // link when requested, and collapse again without obscuring other UI.
+    await run.page.locator('.maplibregl-ctrl-attrib-button').click();
     const geometry = await run.page.evaluate(() => {
       const orientation = document.querySelector('.orientation-bar').getBoundingClientRect();
-      const attribution = document.querySelector('.maplibregl-ctrl-attrib').getBoundingClientRect();
-      const links = [...document.querySelectorAll('.maplibregl-ctrl-attrib a')].map((link) => {
+      const control = document.querySelector('.maplibregl-ctrl-attrib');
+      const attribution = control.getBoundingClientRect();
+      const links = [...control.querySelectorAll('a')].map((link) => {
         const rect = link.getBoundingClientRect();
-        const x = rect.left + rect.width / 2;
-        const y = rect.top + rect.height / 2;
-        const hit = document.elementFromPoint(x, y);
-        return {
-          label: link.textContent.trim(),
-          rect: { left: rect.left, top: rect.top, right: rect.right, bottom: rect.bottom },
-          centerHitsLink: hit === link || link.contains(hit),
-        };
+        const hit = document.elementFromPoint(rect.left + rect.width / 2, rect.top + rect.height / 2);
+        return { label: link.textContent.trim(), centerHitsLink: hit === link || link.contains(hit) };
       });
       return {
+        expanded: control.open && control.classList.contains('maplibregl-compact-show'),
         orientation: { top: orientation.top, bottom: orientation.bottom },
         attribution: { top: attribution.top, bottom: attribution.bottom },
         links,
       };
     });
-    assert(geometry.attribution.bottom <= geometry.orientation.top - 1, `live UI ${profile.id}: attribution overlaps orientation bar (${JSON.stringify(geometry)})`);
+    assert(geometry.expanded, `live UI ${profile.id}: native attribution button did not expand (${JSON.stringify(geometry)})`);
+    assert(geometry.attribution.bottom <= geometry.orientation.top - 1, `live UI ${profile.id}: expanded attribution overlaps orientation bar (${JSON.stringify(geometry)})`);
     assert(geometry.links.length >= 4 && geometry.links.every(({ centerHitsLink }) => centerHitsLink), `live UI ${profile.id}: attribution link center is covered (${JSON.stringify(geometry.links)})`);
+    await run.page.locator('.maplibregl-ctrl-attrib-button').click();
+    assert(await run.page.locator('.maplibregl-ctrl-attrib').evaluate((el) => !el.open && !el.classList.contains('maplibregl-compact-show')),
+      `live UI ${profile.id}: native attribution button did not close`);
     assert(run.consoleErrors.length === 0, `live UI ${profile.id}: console errors: ${run.consoleErrors.join(' | ')}`);
     assert(run.pageErrors.length === 0, `live UI ${profile.id}: page errors: ${run.pageErrors.join(' | ')}`);
     await run.context.close();

@@ -1,0 +1,63 @@
+{
+  "schema_version": 1,
+  "kind": "commonworld_commons_basis",
+  "project_id": "fordhall-organic-farm",
+  "classification": "common",
+  "decision": "include",
+  "reviewed_at": "2026-08-04",
+  "reviewer": "Commonworld editorial review",
+  "criteria": {
+    "shared_resource": {
+      "status": "supported",
+      "statement": "Eine 128 Acres große Landfläche mit Gebäuden, ökologische Landwirtschaftsflächen, öffentliche Wege sowie Bildungs-, Natur- und Sozialräume sind dauerhaft in einer gemeinnützigen Community Benefit Society gebunden.",
+      "source_ids": [
+        "fordhall-home",
+        "fordhall-shares",
+        "fordhall-story",
+        "fordhall-impact"
+      ]
+    },
+    "community": {
+      "status": "supported",
+      "statement": "Mehr als 8.000 Anteilseigentümer bilden die Fordhall Community Land Initiative; eine Stimme je Mitglied, AGM und wählbare Vorstandsrollen verbinden Eigentum und formale Beteiligung.",
+      "source_ids": [
+        "fordhall-home",
+        "fordhall-shares",
+        "fordhall-story"
+      ]
+    },
+    "commoning_practice": {
+      "status": "supported",
+      "statement": "Mitglieder sichern Land gemeinschaftlich, bestimmen strategische Richtungen, unterstützen Projekte und Freiwilligenarbeit und halten den Hof als offenen Lern-, Natur- und Gemeinwohlort zugänglich.",
+      "source_ids": [
+        "fordhall-shares",
+        "fordhall-story",
+        "fordhall-impact"
+      ]
+    },
+    "rules_and_responsibility": {
+      "status": "supported",
+      "statement": "Gesellschaftsregeln, Vermögens- und Gewinnbindung, eine Stimme je Mitglied, AGM, Vorstand, Anteilskonditionen und ein langfristiger Pachtvertrag ordnen Eigentum, Nutzung und Verantwortung.",
+      "source_ids": [
+        "fordhall-shares",
+        "fordhall-story"
+      ]
+    },
+    "common_benefit": {
+      "status": "supported",
+      "statement": "Gemeinschaftseigentum schützt Boden und landwirtschaftliche Existenzen vor Entwicklung und verbindet ökologische Bewirtschaftung mit Naturzugang, Bildung, Betreuung, Ernährung und übertragbarem Wissen.",
+      "source_ids": [
+        "fordhall-home",
+        "fordhall-impact",
+        "fordhall-story"
+      ]
+    }
+  },
+  "confidence": 0.95,
+  "limitations": [
+    "Der landwirtschaftliche Betrieb ist familiengeführt und gepachtet; Gemeinschaftseigentum am Land ist nicht identisch mit kollektiver Alltagssteuerung des Hofbetriebs.",
+    "Der Vorstand besitzt gesetzliche und praktische Entscheidungsspielräume, unter anderem bei der Rückzahlung weiterer Anteile.",
+    "Die weltweite Mitgliedschaft verbreitert Kapital und Schutz, kann aber die lokale Beteiligung und tatsächliche Nutzungsmacht ungleich verteilen."
+  ],
+  "notes": "Aufgenommen wird die gemeinschaftliche Boden- und Gemeinwohlbindung der Fordhall Community Land Initiative. Verkauf, Gastronomie und einzelne Dienstleistungen gelten dadurch nicht jeweils selbst als Commons."
+}
