@@ -6,8 +6,8 @@
   "kind": "commonworld.current_state_release_attestation",
   "public_release": {
     "manifest_path": "assets/commonworld-page-builds.json",
-    "manifest_sha256": "2c873c62daabc119ff9f09cb234b5e1b97812757e4113a385b6be95be403c29b",
-    "release_id": "38bd580a4667ffca2bae"
+    "manifest_sha256": "22183b0d07bc596e9982c154b69a89ab63a00f52641d7118d42c5e8a784dc746",
+    "release_id": "f9fb7670253ff1721a04"
   },
   "schema_version": 1
 }
