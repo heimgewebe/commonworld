@@ -6,6 +6,7 @@ from __future__ import annotations
 import argparse
 import http.client
 import json
+import os
 import re
 import sys
 import unicodedata
@@ -233,14 +234,17 @@ def _decode_json_body(raw: bytes) -> object:
 
 def github_api_get_private_reporting(repository: str, timeout_seconds: int = 20) -> PrivateReportingFetch:
     endpoint = _private_reporting_endpoint(repository)
-    request = urllib.request.Request(
-        endpoint,
-        headers={
-            "Accept": "application/vnd.github+json",
-            "User-Agent": "commonworld-security-policy/1.0",
-            "X-GitHub-Api-Version": "2022-11-28",
-        },
-    )
+    headers = {
+        "Accept": "application/vnd.github+json",
+        "User-Agent": "commonworld-security-policy/1.0",
+        "X-GitHub-Api-Version": "2022-11-28",
+    }
+    # GitHub Actions' shared IPs can exhaust anonymous API quotas. Its
+    # repository-scoped token includes Metadata read; do not log its value.
+    token = os.environ.get("GITHUB_TOKEN", "").strip()
+    if token:
+        headers["Authorization"] = f"Bearer {token}"
+    request = urllib.request.Request(endpoint, headers=headers)
     try:
         with urllib.request.urlopen(request, timeout=timeout_seconds) as response:
             raw = response.read()
