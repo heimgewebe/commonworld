@@ -4,7 +4,7 @@
   "project_id": "fiji-locally-managed-marine-area-network",
   "classification": "commons-infrastructure",
   "decision": "include",
-  "reviewed_at": "2026-08-15",
+  "reviewed_at": "2026-11-15",
   "reviewer": "Commonworld editorial review",
   "criteria": {
     "shared_resource": {
@@ -20,7 +20,8 @@
       "statement": "FLMMA verbindet lokale Gemeinschaften mit weiteren Partnern rund um gemeinschaftsbasiertes Meeresressourcenmanagement.",
       "source_ids": [
         "flmma-spc-2026",
-        "flmma-spc-exchange"
+        "flmma-spc-exchange",
+        "flmma-mecc-kadavu-2026"
       ]
     },
     "commoning_practice": {
@@ -34,14 +35,16 @@
       "status": "supported",
       "statement": "Die lokalen Gemeinschaften tragen die Bewirtschaftung ihrer Meeresgebiete; FLMMA unterstützt die Praxis, ohne die lokalen Regeln zu zentralisieren.",
       "source_ids": [
-        "flmma-spc-exchange"
+        "flmma-spc-exchange",
+        "flmma-mecc-kadavu-2026"
       ]
     },
     "common_benefit": {
       "status": "supported",
       "statement": "Die lokale Meeresbewirtschaftung verbindet Lebensgrundlagen, Fischereiressourcen und Schutz mariner Biodiversität.",
       "source_ids": [
-        "flmma-spc-2026"
+        "flmma-spc-2026",
+        "flmma-mecc-kadavu-2026"
       ]
     }
   },
@@ -49,7 +52,8 @@
   "limitations": [
     "FLMMA ist ein Unterstützungsnetz für viele lokale Meeres-Commons und kein Eigentümer eines einzigen landesweiten Ressourcenraums.",
     "Die genaue Governance unterscheidet sich zwischen den lokalen Gebieten.",
+    "Die offizielle Bewilligung des Kadavu-Vorhabens im Juli 2026 belegt eine geplante Verstärkung, aber keine bereits abgeschlossene Implementierung in allen Gemeinschaften.",
     "Commonworld veröffentlicht keine abgeleiteten Dorf-, qoliqoli-, Riff-, tabu- oder Fanggebietsgrenzen."
   ],
-  "notes": "Aufgenommen als Commons-Infrastruktur mit aktuellem 2026-Beleg und konservativer räumlicher Darstellung."
+  "notes": "Quellengebundene erneute Prüfung am 15.11.2026: bestehende SPC-Belege und neue offizielle Fiji-MECC-Projektankündigung von Juli 2026. Die Netzwerkinfrastruktur wird nicht mit zentralem Eigentum an lokalen Meeresgebieten gleichgesetzt."
 }
