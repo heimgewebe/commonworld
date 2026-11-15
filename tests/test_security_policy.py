@@ -183,6 +183,41 @@ class SecurityPolicyTests(unittest.TestCase):
             write_json_receipt(path, receipt)
             self.assertEqual(receipt, json.loads(path.read_text()))
 
+    def test_authenticated_live_fetch_uses_actions_metadata_token(self) -> None:
+        endpoint = "https://api.github.com/repos/heimgewebe/commonworld/private-vulnerability-reporting"
+
+        class Response:
+            status = 200
+
+            def __enter__(self):
+                return self
+
+            def __exit__(self, *_args):
+                return False
+
+            def read(self):
+                return b'{"enabled":true}'
+
+            def geturl(self):
+                return endpoint
+
+        with patch.dict("os.environ", {"GITHUB_TOKEN": "opaque-test-token"}, clear=True):
+            with patch("urllib.request.urlopen", return_value=Response()) as opener:
+                fetch = github_api_get_private_reporting("heimgewebe/commonworld")
+        self.assertEqual(200, fetch.status)
+        self.assertEqual({"enabled": True}, fetch.payload)
+        request = opener.call_args.args[0]
+        self.assertEqual("Bearer opaque-test-token", request.get_header("Authorization"))
+
+    def test_no_token_keeps_unauthenticated_public_request(self) -> None:
+        endpoint = "https://api.github.com/repos/heimgewebe/commonworld/private-vulnerability-reporting"
+        error = urllib.error.HTTPError(endpoint, 429, "limited", {}, io.BytesIO(b'{"message":"limited"}'))
+        with patch.dict("os.environ", {}, clear=True):
+            with patch("urllib.request.urlopen", side_effect=error) as opener:
+                fetch = github_api_get_private_reporting("heimgewebe/commonworld")
+        self.assertEqual(429, fetch.status)
+        self.assertIsNone(opener.call_args.args[0].get_header("Authorization"))
+
     def test_http_error_preserves_status_without_exposing_body(self) -> None:
         endpoint = "https://api.github.com/repos/heimgewebe/commonworld/private-vulnerability-reporting"
         error = urllib.error.HTTPError(endpoint, 429, "limited", {}, io.BytesIO(b'{"message":"private detail"}'))
