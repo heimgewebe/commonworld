@@ -1,0 +1,58 @@
+{
+  "schema_version": 1,
+  "kind": "commonworld_commons_basis",
+  "project_id": "openmrs",
+  "classification": "undetermined",
+  "decision": "needs_information",
+  "reviewed_at": "2026-10-30",
+  "reviewer": "Commonworld editorial desk review",
+  "criteria": {
+    "shared_resource": {
+      "status": "supported",
+      "statement": "Offene elektronische Patientenakten-Software, Plattformmodule, Dokumentation und gemeinsame technische Infrastruktur sind das von vielen Entwicklern genutzte digitale Wissensgut.",
+      "source_ids": [
+        "openmrs-home",
+        "openmrs-about"
+      ]
+    },
+    "community": {
+      "status": "supported",
+      "statement": "Entwickler, Gesundheitsfachleute, Implementierer und Partnerorganisationen tragen offene Beiträge und Projektabstimmungen.",
+      "source_ids": [
+        "openmrs-about",
+        "openmrs-involved"
+      ]
+    },
+    "commoning_practice": {
+      "status": "supported",
+      "statement": "Beteiligte entwickeln gemeinsam Software, testen sie, teilen Anforderungen und pflegen technische Dokumentation und Releases.",
+      "source_ids": [
+        "openmrs-involved",
+        "openmrs-about"
+      ]
+    },
+    "rules_and_responsibility": {
+      "status": "partial",
+      "statement": "Ein dokumentiertes Governance-Modell beschreibt Leitung, Konsens- und Eskalationswege; aktuelle Verbindlichkeit, Änderungen und tatsächliche Mitbestimmungsrechte aller Beteiligten sind noch nicht überprüft.",
+      "source_ids": [
+        "openmrs-governance",
+        "openmrs-about"
+      ]
+    },
+    "common_benefit": {
+      "status": "supported",
+      "statement": "Offen weiterentwickelbare Software unterstützt medizinische Informationssysteme und gemeinschaftliche technische Lern- und Verbesserungsarbeit.",
+      "source_ids": [
+        "openmrs-about",
+        "openmrs-involved"
+      ]
+    }
+  },
+  "confidence": 0.84,
+  "limitations": [
+    "Open-Source-Code begründet nicht automatisch demokratische Mitsprache aller Anwender oder die Eigentümerschaft von OpenMRS Inc.",
+    "Die veröffentlichte Governance-Dokumentation kann historische Rollen beschreiben; aktuelle Verfahren müssen durch zeitnahe Primärquellen bestätigt werden.",
+    "Patientendaten, konkrete Kliniken oder medizinische Entscheidungen sind keine frei zugänglichen Commons-Ressourcen."
+  ],
+  "notes": "Digitale Commoning-Praxis gut belegt, formale gegenwärtige Entscheidungsmacht der Community noch offen; deshalb keine definitive Commons-Einstufung."
+}

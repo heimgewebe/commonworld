@@ -4,7 +4,7 @@
   "project_id": "b4rn",
   "classification": "commons-infrastructure",
   "decision": "include",
-  "reviewed_at": "2026-08-14",
+  "reviewed_at": "2026-11-15",
   "reviewer": "Commonworld editorial review",
   "criteria": {
     "shared_resource": {
@@ -39,5 +39,5 @@
     "Der Breitbanddienst ist nicht frei oder universal zugänglich, sondern setzt ein versorgbares Grundstück, einen Anschluss und einen kostenpflichtigen Tarif voraus.",
     "Commonworld veröffentlicht keine aus Postcodes, Wegerechten, Leitungsverläufen oder privaten Anschlussdaten rekonstruierte Netzgeometrie."
   ],
-  "notes": "Aufgenommen als Commons-Infrastruktur wegen Mitgliedseigentum, Community-Benefit-Bindung, lokalem Kapital und fortgesetztem Commoning beim Aufbau des Netzes; kommerzieller Internetzugang allein wäre kein Aufnahmegrund."
+  "notes": "Aufgenommen als Commons-Infrastruktur wegen Mitgliedseigentum, Community-Benefit-Bindung, lokalem Kapital und fortgesetztem Commoning beim Aufbau des Netzes; kommerzieller Internetzugang allein wäre kein Aufnahmegrund. Aktualisierte offizielle B4RN-Seiten belegen am 15.11.2026 weiter lokalen Aufbau, Gruppenfonds und professionellen ISP-Betrieb."
 }

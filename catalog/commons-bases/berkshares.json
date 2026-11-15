@@ -4,7 +4,7 @@
   "project_id": "berkshares",
   "classification": "common",
   "decision": "include",
-  "reviewed_at": "2026-08-14",
+  "reviewed_at": "2026-11-15",
   "reviewer": "Commonworld editorial review",
   "criteria": {
     "shared_resource": {
@@ -39,5 +39,5 @@
     "Governance-Rechte setzen eine Mitgliedschaft voraus, während die Währung selbst auch von Nichtmitgliedern genutzt werden kann.",
     "Commonworld behandelt weder einzelne Transaktionen noch aktuelle Umlauf-, Umsatz- oder Teilnehmerzahlen als dauerhafte Katalogwahrheit."
   ],
-  "notes": "Aufgenommen als Community-Finance-Common wegen gemeinsamer lokaler Ressource, belegter Mitglieder-Governance, Nutzungsregeln und regionalem Gemeinwohlzweck; ein alternatives Zahlungsmittel allein würde die Commons-Kriterien nicht erfüllen."
+  "notes": "Aufgenommen als Community-Finance-Common wegen gemeinsamer lokaler Ressource, belegter Mitglieder-Governance, Nutzungsregeln und regionalem Gemeinwohlzweck; ein alternatives Zahlungsmittel allein würde die Commons-Kriterien nicht erfüllen. Re-Review 15.11.2026 bestätigt aktuelle Händlerakzeptanz über das im Oktober 2026 aktualisierte Originalverzeichnis, ohne die Währung als staatliches Geld oder unbegrenzt nutzbar darzustellen."
 }
