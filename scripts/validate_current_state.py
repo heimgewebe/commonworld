@@ -397,7 +397,8 @@ def validate_current_state(root: Path = ROOT, *, verify_attestation: bool = True
         "observeCatalogPlatform({ retryIdentifier: identifier, forceRefresh: true })",
         "dataset.catalogDelivery = 'build-bound-bootstrap'",
         "catalogDetailShadow",
-        "document.querySelector('#text-skip-link')",
+        "function syncTextSkipLinkHref(",
+        "target.searchParams.set('surface', 'text')",
         "target.hash = 'text-view'",
         "document.querySelector('[data-static-catalog-fallback]')?.remove()",
     )

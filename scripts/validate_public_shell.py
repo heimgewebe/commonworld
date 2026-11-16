@@ -222,7 +222,8 @@ def validate_public_shell(root: Path = ROOT) -> list[str]:
         errors.append('runtime catalog filtering must not mutate the bootstrap recovery surface')
     for token in (
         "catalog?.querySelectorAll('.catalog-card[data-commonproject-id]')",
-        "document.querySelector('#text-skip-link')",
+        "function syncTextSkipLinkHref(",
+        "target.searchParams.set('surface', 'text')",
         "const recoveryCatalog = document.querySelector('[data-static-catalog-fallback]')",
         "recoveryCatalog.dataset.skipActivated = 'true'",
         "recoveryCatalog.focus({ preventScroll: true })",

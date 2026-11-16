@@ -299,6 +299,36 @@ async function verifyLayerCreatedSphereRestoration(browser, baseUrl) {
   }
 }
 
+
+async function verifyCopiedTextSkipLink(browser, baseUrl) {
+  const context = await browser.newContext({
+    viewport: { width: 390, height: 844 },
+    isMobile: true,
+    hasTouch: true,
+    reducedMotion: 'reduce',
+  });
+  try {
+    const page = await context.newPage();
+    await page.goto(`${baseUrl}/`, { waitUntil: 'domcontentloaded' });
+    await page.waitForSelector('html.runtime-ready');
+    await page.locator('#commons-search').fill('Fiji');
+    await page.waitForFunction(() => new URL(location.href).searchParams.get('q') === 'Fiji');
+    const href = await page.locator('#text-skip-link').getAttribute('href');
+    const target = new URL(href, page.url());
+    assert(target.searchParams.get('surface') === 'text', 'copied skip link does not select text view');
+    assert(target.searchParams.get('q') === 'Fiji', 'copied skip link lost search');
+
+    const copied = await context.newPage();
+    await copied.goto(target.href, { waitUntil: 'domcontentloaded' });
+    await copied.waitForSelector('html.runtime-ready');
+    assert(await copied.locator('#text-view').isVisible(), 'copied skip link opened hidden text view');
+    assert(await copied.locator('#commons-search').inputValue() === 'Fiji', 'copied skip link lost search on reload');
+    return { presentation: 'text', preservedQuery: 'Fiji' };
+  } finally {
+    await context.close();
+  }
+}
+
 const server = createServer();
 await new Promise((resolve) => server.listen(0, '127.0.0.1', resolve));
 const baseUrl = `http://127.0.0.1:${server.address().port}`;
@@ -331,6 +361,7 @@ try {
       await context.close();
     }
   }
+  results.push({ copiedTextSkipLink: await verifyCopiedTextSkipLink(browser, baseUrl) });
   results.push({ journeyOwnership: await verifyJourneyOwnership(browser, baseUrl) });
   results.push({ deferredSphereRestoration: await verifyDeferredSphereRestoration(browser, baseUrl) });
   results.push({ layerCreatedSphereRestoration: await verifyLayerCreatedSphereRestoration(browser, baseUrl) });

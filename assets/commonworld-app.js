@@ -2905,12 +2905,22 @@ function currentUrlState() {
   return { ...runtime.state, camera };
 }
 
+function syncTextSkipLinkHref() {
+  // Keep the static recovery fragment until runtime startup has fully succeeded.
+  if (document.querySelector('[data-static-catalog-fallback]')) return;
+  const target = new URL(location.href);
+  target.searchParams.set('surface', 'text');
+  target.hash = 'text-view';
+  elements.skipLink.setAttribute('href', `${target.pathname}${target.search}${target.hash}`);
+}
+
 function writeHistory(mode = 'replace') {
   if (runtime.applyingHistory) return;
   const state = currentUrlState();
   const url = `${location.pathname}${searchFromState(state)}${location.hash}`;
   const publicHistoryState = { ...state, nearbyOrigin: null, nearbyRadiusMeters: null };
   history[mode === 'push' ? 'pushState' : 'replaceState']({ commonworld: publicHistoryState }, '', url);
+  syncTextSkipLinkHref();
 }
 
 function scheduleCameraHistory() {
@@ -3778,6 +3788,7 @@ function applyDeepLink(search, { initial = false } = {}) {
   if ((next.query || hasIntentFilters() || hasSpatialFilters()) && !runtime.state.project) openDiscovery({ trigger: elements.search });
   else closeDiscovery({ restoreFocus: false });
   runtime.applyingHistory = false;
+  syncTextSkipLinkHref();
   if (initial) writeHistory('replace');
   else if (runtime.state.project) elements.focus.focus({ preventScroll: true });
   else if (!isVisibleHierarchyFocusTarget(previousFocus)) {
@@ -4349,13 +4360,8 @@ async function boot() {
     if (navigator.webdriver && ['127.0.0.1', 'localhost'].includes(location.hostname)) {
       window.__commonworldBeforeRecoveryRemovalForTest?.();
     }
-    const textSkipLink = document.querySelector('#text-skip-link');
-    if (textSkipLink) {
-      const target = new URL(location.href);
-      target.hash = 'text-view';
-      textSkipLink.setAttribute('href', `${target.pathname}${target.search}${target.hash}`);
-    }
     document.querySelector('[data-static-catalog-fallback]')?.remove();
+    syncTextSkipLinkHref();
     void loadCountryBoundaries().catch((error) => {
       elements.stage.dataset.countryMapState = 'failed';
       console.warn('Commonworld country composition layer unavailable', error);
