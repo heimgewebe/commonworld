@@ -384,7 +384,60 @@ async function increasedContrastScenario() {
   }
 }
 
+async function publicSearchContrastAndDialogScenario() {
+  const run = await newObservedPage({ viewport: { width: 390, height: 844 } });
+  const { page } = run;
+  await page.goto(baseUrl + '/index.html', { waitUntil: 'domcontentloaded' });
+  await page.waitForSelector('html.runtime-ready');
+
+  const searchSurfaces = await page.evaluate(() => {
+    const parseColor = (value) => {
+      const channels = value.match(/[\d.]+/g)?.map(Number) ?? [];
+      if (channels.length < 3) throw new Error('Invalid CSS color: ' + value);
+      return [channels.slice(0, 3), channels.length > 3 ? channels[3] : 1];
+    };
+    const luminance = (rgb) => rgb
+      .map((channel) => channel / 255)
+      .map((channel) => channel <= 0.04045 ? channel / 12.92 : ((channel + 0.055) / 1.055) ** 2.4)
+      .reduce((sum, channel, i) => sum + channel * [0.2126, 0.7152, 0.0722][i], 0);
+    const canvas = parseColor(getComputedStyle(document.body).backgroundColor)[0];
+    return ['commons-search', 'spatial-destination-search', 'layer-search'].map((id) => {
+      const input = document.getElementById(id);
+      if (!input) throw new Error('Missing public search input: ' + id);
+      const [foreground] = parseColor(getComputedStyle(input, '::placeholder').color);
+      const [background, alpha] = parseColor(getComputedStyle(input).backgroundColor);
+      const composited = background.map((channel, i) => channel * alpha + canvas[i] * (1 - alpha));
+      const hi = Math.max(luminance(foreground), luminance(composited));
+      const lo = Math.min(luminance(foreground), luminance(composited));
+      return { id, contrast: (hi + 0.05) / (lo + 0.05), opacity: getComputedStyle(input, '::placeholder').opacity };
+    });
+  });
+  for (const surface of searchSurfaces) {
+    assert(surface.contrast >= 4.5, surface.id + ' placeholder fails WCAG AA: ' + JSON.stringify(surface));
+    assert(surface.opacity === '1', surface.id + ' placeholder opacity drifted: ' + JSON.stringify(surface));
+  }
+
+  await page.locator('#settings-toggle').click();
+  await page.locator('#settings-panel').waitFor({ state: 'visible' });
+  const dialog = await page.locator('#settings-panel').evaluate((node) => ({
+    tagName: node.tagName,
+    role: node.getAttribute('role'),
+    modal: node.getAttribute('aria-modal'),
+    labelled: Boolean(document.getElementById(node.getAttribute('aria-labelledby'))),
+  }));
+  assert(dialog.tagName === 'DIV' && dialog.role === 'dialog' && dialog.modal === 'true' && dialog.labelled,
+    'Public settings HTML-ARIA semantics invalid: ' + JSON.stringify(dialog));
+  await page.keyboard.press('Escape');
+  await page.locator('#settings-panel').waitFor({ state: 'hidden' });
+  assert(await page.locator('#settings-toggle').evaluate((node) => node === document.activeElement),
+    'Public settings dialog did not restore keyboard focus');
+  assert(run.pageErrors.length === 0, 'Public search/dialog page errors: ' + run.pageErrors.join(' | '));
+  scenarios.push({ id: 'public-search-placeholder-wcag-and-dialog-semantics', verdict: 'PASS', searchSurfaces });
+  await run.context.close();
+}
+
 try {
+  await publicSearchContrastAndDialogScenario();
   await forcedColorsPublicScenario();
   await forcedColorsProposalScenario();
   await increasedContrastScenario();

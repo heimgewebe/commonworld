@@ -182,6 +182,12 @@ html[data-input-modality="pointer"] :focus {
   appearance: none;
 }
 
+/* Search hints need WCAG AA contrast on our dark surfaces, including Safari. */
+input[type="search"]::placeholder {
+  color: var(--muted);
+  opacity: 1;
+}
+
 .search-control input::-webkit-search-cancel-button {
   display: none;
 }

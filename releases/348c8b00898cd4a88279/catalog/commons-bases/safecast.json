@@ -1,0 +1,58 @@
+{
+  "schema_version": 1,
+  "kind": "commonworld_commons_basis",
+  "project_id": "safecast",
+  "classification": "undetermined",
+  "decision": "needs_information",
+  "reviewed_at": "2026-10-31",
+  "reviewer": "Commonworld editorial desk review",
+  "criteria": {
+    "shared_resource": {
+      "status": "supported",
+      "statement": "Gemeinschaftlich erhobene Umweltmessdaten einschließlich Strahlen- und Luftqualitätsmessungen werden unter CC0 allgemein nutzbar gemacht.",
+      "source_ids": [
+        "safecast-about",
+        "safecast-license-policy"
+      ]
+    },
+    "community": {
+      "status": "supported",
+      "statement": "Internationale ehrenamtliche Messende, Gerätebauer und Entwickler tragen Daten und Werkzeuge für offene Umweltinformationen zusammen.",
+      "source_ids": [
+        "safecast-about",
+        "safecast-news"
+      ]
+    },
+    "commoning_practice": {
+      "status": "supported",
+      "statement": "Beteiligte bauen und verbessern offene Messgeräte, erfassen Umweltwerte und geben Daten für öffentliche Karten und Forschung frei.",
+      "source_ids": [
+        "safecast-about",
+        "safecast-license-policy"
+      ]
+    },
+    "rules_and_responsibility": {
+      "status": "partial",
+      "statement": "Die publizierte Lizenzordnung regelt die Freigabe eingereichter Daten und Hardware deutlich; verbindliche laufende Mitentscheidung der Freiwilligen über Trägerorganisation und Datengovernance ist daraus nicht ersichtlich.",
+      "source_ids": [
+        "safecast-license-policy",
+        "safecast-about"
+      ]
+    },
+    "common_benefit": {
+      "status": "supported",
+      "statement": "Frei nachnutzbare CC0-Umweltdaten und frei dokumentierte Messgeräte fördern unabhängige Information und eigene Beteiligung.",
+      "source_ids": [
+        "safecast-about",
+        "safecast-license-policy"
+      ]
+    }
+  },
+  "confidence": 0.84,
+  "limitations": [
+    "CC0-Messdaten bedeuten nicht, dass Marken, Webseitentexte und sämtliche Hardware gleich frei lizenziert sind.",
+    "Die eingereichten Daten unterliegen der veröffentlichten Freigabepolitik; organisatorische Vetorechte der Freiwilligen sind nicht nachgewiesen.",
+    "Die Messgenauigkeit einzelner Sensoren oder aktuelle Verfügbarkeit aller Datenendpunkte wurde nicht neu überprüft."
+  ],
+  "notes": "Offenes Citizen-Science-Datengut gesichert, aber maßgebliche gemeinschaftliche Entscheidungsrechte der Freiwilligen bleiben vor einer definitiven Commons-Klassifikation offen."
+}
