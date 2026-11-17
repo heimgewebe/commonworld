@@ -1,0 +1,57 @@
+{
+  "schema_version": 1,
+  "kind": "commonworld_commons_basis",
+  "project_id": "g0v",
+  "classification": "commons-infrastructure",
+  "decision": "include",
+  "reviewed_at": "2026-10-31",
+  "reviewer": "Commonworld editorial desk review",
+  "criteria": {
+    "shared_resource": {
+      "status": "supported",
+      "statement": "Frei nachnutzbare Civic-Tech-Software, öffentliche Datenaufbereitung und gemeinsame Dokumentationen entstehen als offene digitale Ergebnisse vieler Initiativen.",
+      "source_ids": [
+        "g0v-english-manifesto",
+        "g0v-home"
+      ]
+    },
+    "community": {
+      "status": "supported",
+      "statement": "Die dezentral organisierte Gemeinschaft lädt Freiwillige unterschiedlicher Fähigkeiten zur Mitarbeit an selbst gewählten Projekten ein.",
+      "source_ids": [
+        "g0v-english-manifesto",
+        "g0v-home"
+      ]
+    },
+    "commoning_practice": {
+      "status": "supported",
+      "statement": "Selbstorganisierte Projektgruppen führen Hackathons, entwickeln öffentliche Werkzeuge und veröffentlichen Ergebnisse unter offenen Lizenzen.",
+      "source_ids": [
+        "g0v-english-manifesto",
+        "g0v-home"
+      ]
+    },
+    "rules_and_responsibility": {
+      "status": "supported",
+      "statement": "Das Manifest dient als gemeinsamer Konsens; jedes Projekt verantwortet seine eigene Governance, und die Community dokumentiert Verfahren gegen unzulässige Gesamtvertretung sowie für öffentliche Beiträge.",
+      "source_ids": [
+        "g0v-english-manifesto",
+        "g0v-community-governance"
+      ]
+    },
+    "common_benefit": {
+      "status": "supported",
+      "statement": "Offene Werkzeuge, Nachnutzbarkeit und niedrigschwellige Mitarbeit fördern die Beteiligung an gesellschaftlichen Angelegenheiten.",
+      "source_ids": [
+        "g0v-english-manifesto"
+      ]
+    }
+  },
+  "confidence": 0.91,
+  "limitations": [
+    "g0v besitzt ausdrücklich keinen einheitlichen Repräsentanten oder eine zentrale Governance über alle Teilprojekte.",
+    "Das englische Manifest ist Stand 2019; die aktuelle lokale Ausgestaltung einzelner Gruppen wurde nicht gesondert verifiziert.",
+    "Nicht jedes g0v-Projekt hat dieselben Regeln für Datenhaltung, Moderation oder Mitbestimmung."
+  ],
+  "notes": "Polyzentrierte Commons-Infrastruktur: gemeinsame offene Prinzipien und eigenständig verantwortete Projektgovernance statt erfundener zentraler Eigentümerschaft."
+}

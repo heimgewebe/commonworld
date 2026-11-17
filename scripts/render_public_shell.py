@@ -630,7 +630,7 @@ def render_shell(root: Path = ROOT, locale: str = FALLBACK_LOCALE) -> str:
         </div>
       </section>
 
-      <aside id="settings-panel" class="settings-panel" role="dialog" aria-modal="true" aria-labelledby="settings-title" aria-describedby="settings-description" hidden>
+      <div id="settings-panel" class="settings-panel" role="dialog" aria-modal="true" aria-labelledby="settings-title" aria-describedby="settings-description" hidden>
         <p id="settings-description" class="visually-hidden">Darstellung wählen und Informationen zu Daten, Methode und Lizenzen öffnen.</p>
         <div class="panel-heading">
           <div><p class="kicker">Einstellungen</p><h2 id="settings-title">Darstellung</h2></div>
@@ -657,7 +657,7 @@ def render_shell(root: Path = ROOT, locale: str = FALLBACK_LOCALE) -> str:
           <p>Statische, lesende JSON-Oberfläche. Das Vorschlagsformular speichert nichts bei Commonworld und bereitet nur einen öffentlichen GitHub-Kandidaten oder lokalen JSON-Download vor. Keine API-Laufzeit, kein Schreibweg und keine eigenständige CLI.</p>
           <p class="legal-note">© 2026 Commonworld contributors. Der Code wird ohne Gewährleistung unter AGPL-3.0-only weitergegeben. <a href="https://github.com/heimgewebe/commonworld" rel="external noreferrer">Quellcode</a> · <a href="./LICENSE">Lizenztext</a></p>
         </section>
-      </aside>
+      </div>
 
       <section id="project-focus" class="project-focus" tabindex="-1" aria-labelledby="focus-title" hidden>
         <div class="panel-heading"><div><p id="focus-presence" class="kicker"></p><h2 id="focus-title"></h2></div><button id="focus-close" class="icon-button" type="button" aria-label="Fokus schließen">×</button></div>
