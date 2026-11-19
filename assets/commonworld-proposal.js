@@ -523,7 +523,6 @@ function init() {
   const direct = document.getElementById("proposal-direct-link");
   const download = document.getElementById("proposal-download");
   const catalog = getCatalogIndex();
-  let lastProposal = null;
   const geographicToggle = form.elements.presence_geographic;
   const region = form.elements.region;
   const sensitiveLocation = form.elements.sensitive_location_risk;
@@ -588,7 +587,6 @@ function init() {
     if (errors.length) { renderErrors(errors, errorsNode); return; }
     const last = readLastPreparedAt();
     if (Date.now() - last < 60_000) { renderErrors([tr("Mehrfachvorbereitung begrenzt: bitte eine Minute warten oder den vorhandenen GitHub-Tab verwenden.", "Repeated preparation is rate-limited: wait one minute or use the existing GitHub tab.")], errorsNode); return; }
-    lastProposal = proposal;
     const issueUrl = buildIssueUrl(proposal);
     direct.href = issueUrl;
     storeLastPreparedAt(Date.now());
@@ -612,7 +610,7 @@ function init() {
   });
 
   download.addEventListener("click", () => {
-    const result = lastProposal ? { proposal: lastProposal, errors: [] } : validateCurrent();
+    const result = validateCurrent();
     if (result.errors.length) { renderErrors(result.errors, errorsNode); return; }
     downloadJson(result.proposal);
     statusNode.textContent = tr("Validierte JSON-Datei lokal erstellt. Commonworld hat den Inhalt nicht gespeichert.", "Validated JSON file created locally. Commonworld did not store its contents.");

@@ -216,3 +216,14 @@ test("release draft storage failure is explicit and non-mutating", () => {
   assert.equal(storeProposalReleaseDraft(form, storage, () => 1_000), false);
   assert.equal(form.elements.name.value, "Keep visible");
 });
+
+test("JSON download revalidates current visible form after GitHub preparation", () => {
+  const source = readFileSync(new URL("../../assets/commonworld-proposal.js", import.meta.url), "utf8");
+  const start = source.indexOf('download.addEventListener("click"');
+  assert.notEqual(start, -1);
+  const end = source.indexOf("\n  });", start);
+  assert.notEqual(end, -1);
+  const handler = source.slice(start, end);
+  assert.match(handler, /const result = validateCurrent\(\);/u);
+  assert.doesNotMatch(handler, /lastProposal/u);
+});

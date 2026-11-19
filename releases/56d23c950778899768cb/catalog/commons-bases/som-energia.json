@@ -1,0 +1,58 @@
+{
+  "schema_version": 1,
+  "kind": "commonworld_commons_basis",
+  "project_id": "som-energia",
+  "classification": "commons-infrastructure",
+  "decision": "include",
+  "reviewed_at": "2026-10-30",
+  "reviewer": "Commonworld editorial desk review",
+  "criteria": {
+    "shared_resource": {
+      "status": "supported",
+      "statement": "Genossenschaftlich finanzierte erneuerbare Erzeugungsprojekte und die gemeinsame Energieversorgung bilden die gemeinschaftlich getragene wirtschaftliche Infrastruktur.",
+      "source_ids": [
+        "som-about",
+        "som-membership"
+      ]
+    },
+    "community": {
+      "status": "supported",
+      "statement": "Mitglieder der Energiegenossenschaft einschließlich Personen und Organisationen bilden eine partizipierende Eigentümer- und Entscheidungsgemeinschaft.",
+      "source_ids": [
+        "som-membership",
+        "som-assembly"
+      ]
+    },
+    "commoning_practice": {
+      "status": "supported",
+      "statement": "Die Genossenschaft organisiert Versorgung, neue erneuerbare Anlagen, regionale Gruppen, Beiträge und kollektive Entscheidungen.",
+      "source_ids": [
+        "som-about",
+        "som-local-groups"
+      ]
+    },
+    "rules_and_responsibility": {
+      "status": "supported",
+      "statement": "Die Generalversammlung ist oberstes Entscheidungsorgan für Satzung, Haushalte und Arbeitspläne; Mitglieder verfügen dort jeweils über eine gleichgewichtige Stimme.",
+      "source_ids": [
+        "som-assembly",
+        "som-transparency"
+      ]
+    },
+    "common_benefit": {
+      "status": "supported",
+      "statement": "Mitglieder tragen die soziale und ökologische Energieversorgung gemeinschaftlich, statt Erträge vorrangig an außenstehende Kapitalgeber auszuschütten.",
+      "source_ids": [
+        "som-about",
+        "som-membership"
+      ]
+    }
+  },
+  "confidence": 0.94,
+  "limitations": [
+    "Genossenschaftlicher Eigentums- und Stimmrechtsnachweis bedeutet nicht, dass jede Kilowattstunde kostenlos oder frei zugänglich ist.",
+    "Die Genossenschaftsmitgliedschaft und ihre Rechtsverhältnisse gelten nicht automatisch für alle Stromkunden.",
+    "Einzelne Kraftwerksstandorte und die aktuelle Verfügbarkeit von Tarifen wurden hier nicht neu geprüft."
+  ],
+  "notes": "Genossenschaftlich kontrollierte Energie-Commons-Infrastruktur mit überprüfbarem One-Member-One-Vote-Verfahren."
+}

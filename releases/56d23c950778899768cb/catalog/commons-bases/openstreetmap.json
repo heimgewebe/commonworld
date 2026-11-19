@@ -1,0 +1,59 @@
+{
+  "schema_version": 1,
+  "kind": "commonworld_commons_basis",
+  "project_id": "openstreetmap",
+  "classification": "common",
+  "decision": "include",
+  "reviewed_at": "2026-10-30",
+  "reviewer": "Commonworld editorial desk review",
+  "criteria": {
+    "shared_resource": {
+      "status": "supported",
+      "statement": "Die gemeinschaftlich bearbeitete weltweite Geodatenbank und ihr öffentlich dokumentierter Datenbestand sind eine offen nachnutzbare gemeinsame Ressource.",
+      "source_ids": [
+        "openstreetmap-about",
+        "osm-copyright"
+      ]
+    },
+    "community": {
+      "status": "supported",
+      "statement": "Eine offene Mapper-Gemeinschaft und ihre lokalen Gruppen arbeiten am Datenbestand; die Stiftung bietet ergänzende organisatorische und rechtliche Infrastruktur.",
+      "source_ids": [
+        "openstreetmap-about",
+        "osmf-organization"
+      ]
+    },
+    "commoning_practice": {
+      "status": "supported",
+      "statement": "Menschen kartieren, prüfen und aktualisieren Geodaten kollaborativ; Arbeitsgruppen und lokale Initiativen halten Infrastruktur und Gemeinschaftspraxis aufrecht.",
+      "source_ids": [
+        "openstreetmap-about",
+        "osmf-organization"
+      ]
+    },
+    "rules_and_responsibility": {
+      "status": "supported",
+      "statement": "Datenlizenz und kollaborative Projektregeln begrenzen die Nachnutzung; die OSM Foundation verfügt zusätzlich über Mitgliederwahlen und ein gewähltes Leitungsorgan.",
+      "source_ids": [
+        "osm-copyright",
+        "osmf-membership",
+        "osmf-organization"
+      ]
+    },
+    "common_benefit": {
+      "status": "supported",
+      "statement": "Gemeinsam geschaffene Kartendaten stehen unter offenen Lizenzbedingungen auch Dritten zur Verfügung und unterstützen öffentliche Orientierung und vielfältige Anwendungen.",
+      "source_ids": [
+        "osm-copyright",
+        "openstreetmap-about"
+      ]
+    }
+  },
+  "confidence": 0.92,
+  "limitations": [
+    "Die Foundation-Mitgliedschaft gewährt Mitbestimmung über die Stiftung, aber kein besonderes Stimmrecht über jede OSM-Datenbearbeitung.",
+    "Offene Geodaten bedeuten nicht, dass jeder Datenbeitrag unmoderiert akzeptiert wird; Projektpraktiken und Lizenzen begrenzen Änderungen und Nachnutzung.",
+    "Die Quellenbelege beschreiben Governance und Lizenz, ersetzen aber keinen neuen tagesaktuellen Aktivitätsnachweis."
+  ],
+  "notes": "Digitales Daten-Common, organisatorische Stiftung klar von offener Mapper-Praxis unterschieden."
+}
