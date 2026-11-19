@@ -241,15 +241,15 @@
         "representativePrimaryLabels": [
           {
             "text": "Knowledge, Learning and Culture · 11    LibriVox  MusicBrainz  Open Library  Peer 2 Peer Unive…  Safecast  Thailand Citizens…",
-            "width": 439.76171875,
-            "height": 428.1152038574219,
+            "width": 434.9959411621094,
+            "height": 422.98321533203125,
             "fontSize": 25.26,
             "visible": true
           },
           {
             "text": "Cooperation and Self-Organization · 7    Bologna Urban Com…  Enspiral  g0v  Green Coop  l’Asilo  National Communal…",
-            "width": 398.07135009765625,
-            "height": 339.931640625,
+            "width": 402.39471435546875,
+            "height": 346.0120544433594,
             "fontSize": 25.26,
             "visible": true
           }
@@ -361,7 +361,7 @@
     {
       "id": "layer-journey-moveend-return",
       "verdict": "PASS",
-      "elapsedMs": 1591
+      "elapsedMs": 957
     },
     {
       "id": "layer-journey-missing-moveend-fallback",
@@ -469,8 +469,8 @@
       "verdict": "PASS",
       "blockedCatalogRequests": 0,
       "observedCatalogRequests": [
-        "/releases/348c8b00898cd4a88279/catalog/runtime/aggregate.v1.json",
-        "/releases/348c8b00898cd4a88279/catalog/runtime/manifest.v1.json"
+        "/releases/56d23c950778899768cb/catalog/runtime/aggregate.v1.json",
+        "/releases/56d23c950778899768cb/catalog/runtime/manifest.v1.json"
       ]
     },
     {
@@ -528,7 +528,7 @@
     }
   ],
   "binding": {
-    "first_party_surface_sha256": "9fefbc24ab719b9eec4a2d764fe4998232b7e908d517905b224d3db4b8954f69",
+    "first_party_surface_sha256": "ad9194538c128ed4418a6e0725f3462e726f29e54c7e9efaeffaf27eb28698e5",
     "scenario_ids": [
       "startup-and-ring-orbits",
       "low-memory-map-cache-policy",
