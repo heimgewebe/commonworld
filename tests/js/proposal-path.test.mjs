@@ -8,6 +8,7 @@ import {
   containsSensitiveLocation,
   isSafeHttpsUrl,
   proposalFromFields,
+  reusePreparedProposalIdentity,
   restoreProposalReleaseDraft,
   storeProposalReleaseDraft,
   validateProposal,
@@ -226,4 +227,18 @@ test("JSON download revalidates current visible form after GitHub preparation", 
   const handler = source.slice(start, end);
   assert.match(handler, /const result = validateCurrent\(\);/u);
   assert.doesNotMatch(handler, /lastProposal/u);
+  assert.match(handler, /reusePreparedProposalIdentity\(result\.proposal, preparedProposal\)/u);
+});
+
+test("GitHub prefill and JSON download keep the same identity only for unchanged proposal content", () => {
+  const prepared = proposalFromFields(fields, new Date("2026-11-20T05:00:00Z"));
+  const revalidated = proposalFromFields(fields, new Date("2026-11-20T05:00:01Z"));
+  assert.notDeepEqual(revalidated, prepared, "fresh validation creates a distinct identity");
+  assert.deepEqual(reusePreparedProposalIdentity(revalidated, prepared), prepared);
+  const edited = proposalFromFields(
+    { ...fields, name: "Edited Example Commons" },
+    new Date("2026-11-20T05:00:02Z"),
+  );
+  assert.deepEqual(reusePreparedProposalIdentity(edited, prepared), edited);
+  assert.deepEqual(reusePreparedProposalIdentity(revalidated, null), revalidated);
 });
