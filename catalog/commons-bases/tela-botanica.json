@@ -1,0 +1,57 @@
+{
+  "schema_version": 1,
+  "kind": "commonworld_commons_basis",
+  "project_id": "tela-botanica",
+  "classification": "commons-infrastructure",
+  "decision": "include",
+  "reviewed_at": "2026-11-20",
+  "reviewer": "Commonworld editorial desk review",
+  "criteria": {
+    "shared_resource": {
+      "status": "supported",
+      "statement": "Botanische Beobachtungen, gemeinsam gepflegte Bestimmungsinformationen und digitale Werkzeuge bilden die Ressource.",
+      "source_ids": [
+        "tela-botanica-home",
+        "tela-botanica-governance"
+      ]
+    },
+    "community": {
+      "status": "supported",
+      "statement": "Mitwirkende Botaniker, Ehrenamtliche und Netzwerkgruppen tragen das Wissensprojekt.",
+      "source_ids": [
+        "tela-botanica-home",
+        "tela-botanica-governance"
+      ]
+    },
+    "commoning_practice": {
+      "status": "supported",
+      "statement": "Teilnehmende dokumentieren Pflanzen, ergänzen Daten und teilen Expertise.",
+      "source_ids": [
+        "tela-botanica-home",
+        "tela-botanica-governance"
+      ]
+    },
+    "rules_and_responsibility": {
+      "status": "supported",
+      "statement": "Veröffentlichte Beitrags-, Daten- und Netzwerkregeln ordnen gemeinschaftliche Pflege und Nachnutzung.",
+      "source_ids": [
+        "tela-botanica-home",
+        "tela-botanica-governance"
+      ]
+    },
+    "common_benefit": {
+      "status": "supported",
+      "statement": "Gemeinsames Naturwissen unterstützt Bildung, Forschung und Schutz biologischer Vielfalt.",
+      "source_ids": [
+        "tela-botanica-home",
+        "tela-botanica-governance"
+      ]
+    }
+  },
+  "confidence": 0.85,
+  "limitations": [
+    "Offene Beobachtungsdaten sind nicht automatisch für alle Arten und Fundorte frei zugänglich.",
+    "Der Netzwerkverein koordiniert, ohne alle lokalen Beiträge selbst zu besitzen."
+  ],
+  "notes": "Eigenständige Aufnahme: begrenzte quellengebundene Fünfkriterien-Prüfung. Keine ungeprüften Mitglieds-, Eigentums- oder Betriebsrechte behauptet."
+}

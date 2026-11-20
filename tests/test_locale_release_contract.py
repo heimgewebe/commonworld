@@ -17,6 +17,56 @@ class LocaleReleaseContractTests(unittest.TestCase):
         self.assertEqual(validate_contract(self.contract, ROOT), [])
 
 
+    def test_catalog_growth_does_not_invalidate_ui_release_evidence(self) -> None:
+        from unittest.mock import patch
+        import scripts.validate_locale_release as validator
+        from scripts.locale_review_evidence import reviewed_source_pack_sha256
+
+        entry = self.contract["locale_registry"]["es"]
+        original = validator._sha256
+        surfaces = {ROOT / path for path in entry["surface_files"].values()}
+        # Simulate regenerated pages and a changed overlay with the historical
+        # evidence and UI pack intact; catalog validation runs independently.
+        def digest(path):
+            if path in surfaces or path == ROOT / "catalog/locales/es.json":
+                return "0" * 64
+            return original(path)
+        with patch.object(validator, "_sha256", side_effect=digest):
+            errors = validator._release_evidence_errors(
+                "es", entry, self.contract, ROOT,
+                set(self.contract["release_gate"]["required_surfaces"]),
+                original(ROOT / "assets/locales/wave1-locales.json"),
+                reviewed_source_pack_sha256(ROOT / "assets/locales/wave1-locales.json"),
+            )
+        self.assertEqual(errors, [])
+
+    def test_changed_ui_pack_and_review_receipt_are_rejected(self) -> None:
+        from unittest.mock import patch
+        import scripts.validate_locale_release as validator
+        from scripts.locale_review_evidence import reviewed_source_pack_sha256
+
+        entry = self.contract["locale_registry"]["es"]
+        original = validator._sha256
+        receipt = ROOT / "docs/evidence/locale-releases/receipts/shared/independent-language-review.json"
+        with patch.object(validator, "_sha256", side_effect=lambda path: "0" * 64 if path == receipt else original(path)):
+            errors = validator._release_evidence_errors(
+                "es", entry, self.contract, ROOT,
+                set(self.contract["release_gate"]["required_surfaces"]),
+                "0" * 64, reviewed_source_pack_sha256(ROOT / "assets/locales/wave1-locales.json"),
+            )
+        self.assertIn("release evidence pack digest is stale for es", errors)
+        self.assertIn("release evidence receipt source is stale for es/independent_language_review: sha256 mismatch", errors)
+
+    def test_changed_ui_template_is_rejected(self) -> None:
+        from unittest.mock import patch
+        import scripts.validate_locale_release as validator
+
+        original = validator._sha256
+        template = ROOT / "scripts/render_public_shell.py"
+        with patch.object(validator, "_sha256", side_effect=lambda path: "0" * 64 if path == template else original(path)):
+            errors = validator.validate_contract(self.contract, ROOT)
+        self.assertIn("release evidence UI source digest is stale: scripts/render_public_shell.py", errors)
+
     def test_independent_review_inputs_match_the_exact_wave1_pack(self) -> None:
         """Old independent review stays immutable; only the newly reviewed warning may differ."""
         import hashlib
@@ -420,7 +470,6 @@ class LocaleReleaseContractTests(unittest.TestCase):
                 set(contract["release_gate"]["required_surfaces"]),
                 "c" * 64,
                 "e" * 64,
-                "f" * 64,
             )
             self.assertIn("release evidence pack digest is stale for es", errors)
             self.assertIn("release evidence reviewed source pack digest is stale for es", errors)
@@ -511,7 +560,6 @@ class LocaleReleaseContractTests(unittest.TestCase):
                 set(contract["release_gate"]["required_surfaces"]),
                 "c" * 64,
                 "d" * 64,
-                "e" * 64,
             )
             self.assertTrue(any("receipt source is missing" in error or "stale" in error for error in errors))
 

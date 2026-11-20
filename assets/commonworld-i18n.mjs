@@ -1,4 +1,4 @@
-import { COMMONWORLD_EN_LOCALE } from './commonworld-en-locale.mjs?v=9b54031431a8';
+import { COMMONWORLD_EN_LOCALE } from './commonworld-en-locale.mjs?v=400adc76db64';
 import {
   CANDIDATE_LOCALES,
   DEFAULT_LOCALE,
@@ -42,7 +42,7 @@ export function shouldLoadWave1LocalePack(locale, isNodeRuntime = nodeRuntime) {
 export const WAVE1_LOCALE_PACK_TIMEOUT_MS = 2_500;
 
 export async function loadWave1LocalePacks({
-  importer = () => import('./commonworld-wave1-locales.mjs?v=bee8ad7ada1d'),
+  importer = () => import('./commonworld-wave1-locales.mjs?v=4ddc9b85b01b'),
   timeoutMs = nodeRuntime ? 0 : WAVE1_LOCALE_PACK_TIMEOUT_MS,
 } = {}) {
   const importPromise = Promise.resolve().then(importer);

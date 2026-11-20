@@ -44,6 +44,12 @@
         "acofop-peten-region": "危地马拉佩滕 — 广泛的区域锚"
       }
     },
+    "adjuntas-pueblo-solar": {
+      "summary": "在波多黎各阿德洪塔斯，当地社区团体与 ACESA 组织太阳能微电网的共享使用和照管，以支持有韧性的能源供应。",
+      "geographic_labels": {
+        "adjuntas-pueblo-solar-region": "波多黎各阿德洪塔斯：当地太阳能微电网"
+      }
+    },
     "aflaj-irrigation-systems-oman": {
       "summary": "阿曼的社区管理灌溉系统按时间份额分配水，并通过共享维护、规则和当地融资来维持。",
       "geographic_labels": {
@@ -169,6 +175,26 @@
       },
       "digital_label": "网络、知识交流和参与信息"
     },
+    "community-seed-bank-nepal": {
+      "summary": "尼泊尔由农民主导的社区种子库网络保存地方品种，并组织种子交换、维护及农作物生物多样性知识交流。",
+      "geographic_labels": {
+        "community-seed-bank-nepal-region": "尼泊尔：地方种子库网络"
+      }
+    },
+    "communs-paysans": {
+      "summary": "前身合作社 L’Atelier Paysan 清算后，继承其工作的协会继续照管共享农业设计、知识和实用自制技术。",
+      "geographic_labels": {
+        "communs-paysans-region": "法国：农民自制与知识网络"
+      },
+      "digital_label": "后继组织维护的共享农具设计与自制文档"
+    },
+    "coopcycle": {
+      "summary": "一个自行车信使合作社联合会共享共同开发的配送平台，以及为劳动者自主经营的配送服务制定的使用规则。",
+      "geographic_labels": {
+        "coopcycle-region": "国际信使合作社网络"
+      },
+      "digital_label": "共享配送软件与信使合作社联合会"
+    },
     "cooperation-jackson": {
       "summary": "密西西比州杰克逊市的团结经济网络，共同发展工人合作社、民主自治企业、社区拥有的土地、经济适用房和当地生产基础设施。",
       "geographic_labels": {
@@ -193,6 +219,18 @@
         "dds-telangana-region": "印度特伦甘纳邦的桑加姆"
       },
       "digital_label": "社区媒体和 Sanghams 的公共视频档案"
+    },
+    "dudley-neighbors-community-land-trust": {
+      "summary": "在波士顿，由社区治理的 Dudley Neighbors Inc. 以信托方式持有土地，支持长期可负担住房和社区管理。",
+      "geographic_labels": {
+        "dudley-neighbors-community-land-trust-region": "美国马萨诸塞州波士顿达德利街"
+      }
+    },
+    "ecopower": {
+      "summary": "比利时能源合作社 Ecopower 的成员为可再生能源项目提供资金并参与管理，按照一人一票的原则投票。",
+      "geographic_labels": {
+        "ecopower-region": "比利时：社区能源项目"
+      }
     },
     "edinburgh-tool-library": {
       "summary": "一个由社区运营且主要由志愿者运营的工具库，提供工具借用、教授维修和实用技能并支持当地社区项目。",
@@ -232,6 +270,13 @@
       },
       "digital_label": "FLMMA 关于社区海洋管理的公开学习资料和该网络的相关文档"
     },
+    "foodsharing": {
+      "summary": "德国志愿者抢救并分享可食用食品，维护公共分享点，并共同协调卫生和照管规则。",
+      "geographic_labels": {
+        "foodsharing-region": "德国：分布各地的分享点与地区团体"
+      },
+      "digital_label": "食品救援与公共分享点的共同协调"
+    },
     "fordhall-organic-farm": {
       "summary": "什罗普郡的一个社区拥有的有机农场，其土地由一个拥有数千名股东的慈善社区福利社会持有，并用于生态农业、教育、公共自然获取和社会项目。",
       "geographic_labels": {
@@ -258,10 +303,22 @@
         "fucvam-homes": "个人住宅和居民地址"
       }
     },
+    "fux-eg": {
+      "summary": "汉堡的 fux eG 合作社共同管理用于工作室、工坊、文化、教育和社区合作的空间。",
+      "geographic_labels": {
+        "fux-eg-region": "德国汉堡：合作使用的空间"
+      }
+    },
     "g0v": {
       "summary": "来自台湾的开放公民技术社区，致力于解决公共问题，并将结果、源代码和文档作为可免费访问的数字共享资源发布。",
       "geographic_labels": {},
       "digital_label": "开放的公民技术项目、数据和协作工作空间"
+    },
+    "gaengeviertel-genossenschaft": {
+      "summary": "汉堡 Gängeviertel 社区通过合作社自主管理和合同约定的使用权，组织共享的文化、居住和工作空间。",
+      "geographic_labels": {
+        "gaengeviertel-genossenschaft-region": "德国汉堡 Gängeviertel"
+      }
     },
     "gbif": {
       "summary": "一个全球联邦式生物多样性数据基础设施，由参与国家、组织、节点和数据发布机构共同提供数据、标准和技术服务以支持开放获取，并通过正式治理机构进行协调。",
@@ -315,6 +372,11 @@
         "kawawana-central-casamance": "塞内加尔卡萨芒斯中部 — 广泛的区域锚点"
       }
     },
+    "kde": {
+      "summary": "国际 KDE 社区共同开发自由桌面软件和数字工具，获得 KDE e.V. 及其正式成员治理机制的支持。",
+      "geographic_labels": {},
+      "digital_label": "协作开发的自由桌面软件与开发基础设施"
+    },
     "kibera-public-space-project": {
       "summary": "与基贝拉居民团体共同设计和运营的不断增长的公共空间网络，将防洪能力、基本服务、聚集场所和当地经济利用联系起来。",
       "geographic_labels": {
@@ -327,6 +389,12 @@
         "kobulu-penampang-area": "马来西亚, 沙巴州, 兵南邦地区"
       },
       "digital_label": "TONIBUNG 关于技术和社区管理模型的项目文档"
+    },
+    "kudumbashree-community-network": {
+      "summary": "喀拉拉邦的妇女邻里小组汇集储蓄，并通过民选的地方和联合组织共同开展经济与社会项目。",
+      "geographic_labels": {
+        "kudumbashree-community-network-region": "印度喀拉拉邦：地方邻里小组"
+      }
     },
     "kyrgyzstan-water-users-associations-union": {
       "summary": "吉尔吉斯斯坦的全国性联盟，支持以社区为基础的用水者协会。这些协会组织用水者，共同维护田间灌溉系统，协调联合行动，并代表成员在水资源管理中的利益。",
@@ -476,6 +544,11 @@
       "geographic_labels": {},
       "digital_label": "自由医疗软件、文档和全球协作"
     },
+    "openrefine": {
+      "summary": "国际贡献者共同维护开源数据清理和转换工具 OpenRefine，项目决策均有公开记录。",
+      "geographic_labels": {},
+      "digital_label": "协作维护的数据清理软件与文档"
+    },
     "openstreetmap": {
       "summary": "一个全球开放的地图数据库，其中的道路、路径和其他地理数据由贡献者进行勘测、修正和免费重复使用。",
       "geographic_labels": {},
@@ -506,6 +579,12 @@
       },
       "digital_label": "本地合作运营的会员信息、规则和数字化班次协调"
     },
+    "pingala-cooperative": {
+      "summary": "澳大利亚能源合作社 Pingala 汇集成员投资以支持当地太阳能项目，并实行成员民主治理。",
+      "geographic_labels": {
+        "pingala-cooperative-region": "澳大利亚：当地社区太阳能项目"
+      }
+    },
     "potato-park-peru": {
       "summary": "皮萨克附近的一个地区，由五个盖丘亚族社区管理，当地的马铃薯品种、农业知识、生态系统和文化习俗得到了共同保护。",
       "geographic_labels": {
@@ -517,6 +596,11 @@
       "geographic_labels": {
         "prinzessinnengarten-neukoelln": "Neuer St. Jacobi 公墓的社区花园"
       }
+    },
+    "qgis": {
+      "summary": "国际社区开发自由地理空间软件 QGIS，由民选机构和项目团队协调代码、文档与决策。",
+      "geographic_labels": {},
+      "digital_label": "社区开发的地理信息系统"
     },
     "red-guardianes-semillas-ecuador": {
       "summary": "厄瓜多尔家庭和种子监护人网络将农业生物多样性、再生土地管理、种子知识和社区学习联系起来。",
@@ -581,6 +665,33 @@
       },
       "digital_label": "会员门户、项目信息和本地团体"
     },
+    "sungai-utik-community-forest": {
+      "summary": "Sungai Utik 的达雅克伊班社区通过社区规则、可持续利用和长期生态管理维护其习惯法森林。",
+      "geographic_labels": {
+        "sungai-utik-community-forest-region": "印度尼西亚西加里曼丹省 Sungai Utik"
+      }
+    },
+    "te-hiku-media": {
+      "summary": "Te Hiku Media 与语言社区共同开发毛利语档案、数据集和技术，优先维护原住民数据主权，而非无限制地向公众开放。",
+      "geographic_labels": {
+        "te-hiku-media-region": "新西兰奥特亚罗瓦的特希库"
+      },
+      "digital_label": "原住民数据主权下的毛利语档案与工具"
+    },
+    "tela-botanica": {
+      "summary": "一个法语网络共同开发植物观察记录、植物知识和工具，支持公众可参与的公民科学。",
+      "geographic_labels": {
+        "tela-botanica-region": "法国及国际植物学网络"
+      },
+      "digital_label": "共享植物观察与知识平台"
+    },
+    "telecomunicaciones-indigenas-comunitarias": {
+      "summary": "墨西哥原住民社区组织并运营社区电信网络，其本地使用和维护与共同管理相联系。",
+      "geographic_labels": {
+        "telecomunicaciones-indigenas-comunitarias-region": "墨西哥原住民社区"
+      },
+      "digital_label": "原住民社区运营的电信网络"
+    },
     "tetepare-descendants-association": {
       "summary": "所罗门群岛的一个大型土地所有者协会，为子孙后代共同保护和管理特特帕雷岛及其陆地和海洋资源。",
       "geographic_labels": {
@@ -595,6 +706,13 @@
       },
       "digital_label": "公共公民森林数据库，包含社区维护的泰国社区森林信息"
     },
+    "the-bristol-cable": {
+      "summary": "布里斯托尔一家由成员拥有的本地新闻机构以民主合作社方式治理，通过集体筹资开展调查报道。",
+      "geographic_labels": {
+        "the-bristol-cable-region": "英国布里斯托尔"
+      },
+      "digital_label": "成员共有的地方新闻与集体筹资的调查报道"
+    },
     "the-things-network": {
       "summary": "与当地社区共同构建的全球物联网无线电网络，结合了社区运营的 LoRaWAN 网关、开放软件、学习资源和公共社区基础设施。",
       "geographic_labels": {
@@ -608,6 +726,12 @@
         "tla-o-qui-aht-clayoquot-sound": "加拿大不列颠哥伦比亚省 Clayoquot Sound"
       },
       "digital_label": "Tla-o-qui-aht 部落公园有关治理、监护人工作和负责任参与的公共信息"
+    },
+    "tosepan-titataniske": {
+      "summary": "普埃布拉州北部山区的原住民合作社共同组织生产、加工、融资、教育和地方供应。",
+      "geographic_labels": {
+        "tosepan-titataniske-region": "墨西哥普埃布拉州北部山区"
+      }
     },
     "tribunal-aguas-valencia": {
       "summary": "由巴伦西亚灌溉社区管理的水法庭，根据惯例定期公开审理有关使用的纠纷。",

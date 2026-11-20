@@ -1,0 +1,57 @@
+{
+  "schema_version": 1,
+  "kind": "commonworld_commons_basis",
+  "project_id": "dudley-neighbors-community-land-trust",
+  "classification": "common",
+  "decision": "include",
+  "reviewed_at": "2026-11-20",
+  "reviewer": "Commonworld editorial desk review",
+  "criteria": {
+    "shared_resource": {
+      "status": "supported",
+      "statement": "Grund und Boden im Community Land Trust bildet die langfristig gemeinschaftlich gebundene Ressource.",
+      "source_ids": [
+        "dudley-neighbors-community-land-trust-home",
+        "dudley-neighbors-community-land-trust-governance"
+      ]
+    },
+    "community": {
+      "status": "supported",
+      "statement": "Bewohnervertretungen und Nachbarschaftsorganisationen sind an der Landverwaltung beteiligt.",
+      "source_ids": [
+        "dudley-neighbors-community-land-trust-home",
+        "dudley-neighbors-community-land-trust-governance"
+      ]
+    },
+    "commoning_practice": {
+      "status": "supported",
+      "statement": "Lokale Gemeinschaften gestalten Planung, Erhalt und soziale Nutzung der Flächen mit.",
+      "source_ids": [
+        "dudley-neighbors-community-land-trust-home",
+        "dudley-neighbors-community-land-trust-governance"
+      ]
+    },
+    "rules_and_responsibility": {
+      "status": "supported",
+      "statement": "Land-Trust-Rechte und demokratische Vorstandsgremien sichern gemeinschaftlich verantwortete Entscheidungen.",
+      "source_ids": [
+        "dudley-neighbors-community-land-trust-home",
+        "dudley-neighbors-community-land-trust-governance"
+      ]
+    },
+    "common_benefit": {
+      "status": "supported",
+      "statement": "Dauerhaft bezahlbares Wohnen und Schutz vor Verdrängung dienen dem Stadtteil über einzelne Eigentümer hinaus.",
+      "source_ids": [
+        "dudley-neighbors-community-land-trust-home",
+        "dudley-neighbors-community-land-trust-governance"
+      ]
+    }
+  },
+  "confidence": 0.85,
+  "limitations": [
+    "Dudley Street Neighborhood Initiative und die landhaltende Gesellschaft Dudley Neighbors Inc. sind organisatorisch zu unterscheiden.",
+    "Die Rechte einzelner Bewohner und Grundeigentümer folgen den konkreten Land-Trust-Verträgen."
+  ],
+  "notes": "Eigenständige Aufnahme: begrenzte quellengebundene Fünfkriterien-Prüfung. Keine ungeprüften Mitglieds-, Eigentums- oder Betriebsrechte behauptet."
+}

@@ -1,4 +1,5 @@
 import json
+import re
 import shutil
 import tempfile
 import unittest
@@ -168,10 +169,10 @@ class PublicCatalogTests(unittest.TestCase):
         with tempfile.TemporaryDirectory() as tmp_dir:
             root = self.copy_public_catalog(tmp_dir)
             path = root / "catalog" / "index.html"
-            path.write_text(
-                path.read_text(encoding="utf-8").replace('data-commonproject-id="debian"', 'data-commonproject-id="debian-missing"'),
-                encoding="utf-8",
-            )
+            markup = path.read_text(encoding="utf-8")
+            identity = re.search(r'data-commonproject-id="([a-z0-9-]+)"', markup)
+            self.assertIsNotNone(identity)
+            path.write_text(markup.replace(identity.group(0), 'data-commonproject-id="missing-identity"', 1), encoding="utf-8")
 
             errors = validate_public_catalog(root)
 

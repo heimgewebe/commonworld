@@ -8,7 +8,7 @@ import {
   localeScriptForMatching,
   localeSwitchHref,
   normalizeLocale,
-} from './commonworld-i18n.mjs?v=4b7bf011503e';
+} from './commonworld-i18n.mjs?v=d1eda089f21d';
 
 export const UI_LOCALE_STORAGE_KEY = 'commonworld.ui-locale';
 export const UI_LOCALE_QUERY_PARAMETER = 'ui_lang';

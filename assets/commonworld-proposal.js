@@ -10,7 +10,7 @@ let wave1RuntimeFallbackToEnglish = false;
 if (WAVE1_LOCALES.includes(ACTIVE_LOCALE)) {
   let timeoutId = null;
   try {
-    const importPromise = import('./commonworld-wave1-locales.mjs?v=bee8ad7ada1d');
+    const importPromise = import('./commonworld-wave1-locales.mjs?v=4ddc9b85b01b');
     const { WAVE1_LOCALE_PACKS } = await Promise.race([
       importPromise,
       new Promise((_, reject) => {

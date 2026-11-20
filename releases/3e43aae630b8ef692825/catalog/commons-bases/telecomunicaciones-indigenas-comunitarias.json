@@ -1,0 +1,57 @@
+{
+  "schema_version": 1,
+  "kind": "commonworld_commons_basis",
+  "project_id": "telecomunicaciones-indigenas-comunitarias",
+  "classification": "common",
+  "decision": "include",
+  "reviewed_at": "2026-11-20",
+  "reviewer": "Commonworld editorial desk review",
+  "criteria": {
+    "shared_resource": {
+      "status": "supported",
+      "statement": "Lokale Mobilfunkinfrastruktur und gemeinschaftlich genutzte Kommunikationskapazität bilden die Ressource.",
+      "source_ids": [
+        "telecomunicaciones-indigenas-comunitarias-home",
+        "telecomunicaciones-indigenas-comunitarias-governance"
+      ]
+    },
+    "community": {
+      "status": "supported",
+      "statement": "Mitwirkende indigene Gemeinden und die Netzwerkorganisation bilden erkennbare Trägergemeinschaften.",
+      "source_ids": [
+        "telecomunicaciones-indigenas-comunitarias-home",
+        "telecomunicaciones-indigenas-comunitarias-governance"
+      ]
+    },
+    "commoning_practice": {
+      "status": "supported",
+      "statement": "Gemeinden beteiligen sich am Betrieb, an Reparatur, Finanzierung und gemeinsamer technischer Verwaltung.",
+      "source_ids": [
+        "telecomunicaciones-indigenas-comunitarias-home",
+        "telecomunicaciones-indigenas-comunitarias-governance"
+      ]
+    },
+    "rules_and_responsibility": {
+      "status": "supported",
+      "statement": "Lokale Absprachen sowie organisatorische Netz- und Zugangsregeln ordnen die Verantwortung.",
+      "source_ids": [
+        "telecomunicaciones-indigenas-comunitarias-home",
+        "telecomunicaciones-indigenas-comunitarias-governance"
+      ]
+    },
+    "common_benefit": {
+      "status": "supported",
+      "statement": "Die Infrastruktur dient eigener Kommunikation und größerer technischer Selbstbestimmung abgelegener Gemeinden.",
+      "source_ids": [
+        "telecomunicaciones-indigenas-comunitarias-home",
+        "telecomunicaciones-indigenas-comunitarias-governance"
+      ]
+    }
+  },
+  "confidence": 0.85,
+  "limitations": [
+    "Die Dachorganisation ist nicht identisch mit jeder lokalen Betreiberstruktur.",
+    "Einzelne Sendestandorte und persönliche Anschlussdaten werden nicht öffentlich kartiert."
+  ],
+  "notes": "Eigenständige Aufnahme: begrenzte quellengebundene Fünfkriterien-Prüfung. Keine ungeprüften Mitglieds-, Eigentums- oder Betriebsrechte behauptet."
+}
