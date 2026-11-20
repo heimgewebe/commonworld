@@ -52,7 +52,8 @@
       "additionalProperties": {
         "type": "string",
         "pattern": "^[0-9a-f]{64}$"
-      }
+      },
+      "description": "Historical rendered surfaces observed at release; catalog-dependent output is not a current UI source digest."
     },
     "gate_results": {
       "type": "object",
@@ -187,7 +188,8 @@
     },
     "catalog_overlay_sha256": {
       "type": "string",
-      "pattern": "^[0-9a-f]{64}$"
+      "pattern": "^[0-9a-f]{64}$",
+      "description": "Historical catalog overlay reviewed at release; current catalog content is validated independently."
     }
   }
 }

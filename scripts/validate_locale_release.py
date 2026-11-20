@@ -258,7 +258,6 @@ def _release_evidence_errors(
     required_surfaces: set[str],
     pack_digest: str | None,
     reviewed_pack_digest: str | None,
-    catalog_overlay_digest: str | None,
 ) -> list[str]:
     errors: list[str] = []
     pointer = entry.get("release_evidence")
@@ -346,12 +345,6 @@ def _release_evidence_errors(
         and evidence.get("reviewed_source_pack_sha256") == reviewed_pack_digest,
         f"release evidence reviewed source pack digest is stale for {tag}",
     )
-    _require(
-        errors,
-        catalog_overlay_digest is not None
-        and evidence.get("catalog_overlay_sha256") == catalog_overlay_digest,
-        f"release evidence catalog overlay digest is stale for {tag}",
-    )
     review_class = evidence.get("review_class")
     expected_review_fields = {
         "machine_translation_only",
@@ -419,17 +412,6 @@ def _release_evidence_errors(
         valid_hash_scope,
         f"release evidence surface hash scope mismatch for {tag}",
     )
-    if valid_hash_scope:
-        assert isinstance(hashes, dict) and isinstance(surfaces, dict)
-        for surface, relative_surface in surfaces.items():
-            surface_path = root / relative_surface
-            _require(
-                errors,
-                isinstance(hashes.get(surface), str)
-                and surface_path.is_file()
-                and _sha256(surface_path) == hashes[surface],
-                f"release evidence surface digest is stale for {tag}/{surface}",
-            )
     results = evidence.get("gate_results")
     _require(
         errors,
@@ -535,9 +517,8 @@ def _release_evidence_errors(
                 _require(
                     errors,
                     isinstance(input_digests, dict)
-                    and catalog_overlay_digest is not None
-                    and input_digests.get(tag) == catalog_overlay_digest,
-                    f"independent language review catalog digest is stale for {tag}",
+                    and input_digests.get(tag) == evidence.get("catalog_overlay_sha256"),
+                    f"independent language review historical catalog digest mismatch for {tag}",
                 )
                 _require(
                     errors,
@@ -836,6 +817,32 @@ def validate_contract(contract: dict[str, Any], root: Path = ROOT) -> list[str]:
         "matching order must preserve script-safe fallback and browser preference order",
     )
 
+    # Bind the current UI implementation separately from catalog-dependent HTML.
+    # Historical surface and overlay digests remain evidence of what was reviewed.
+    ui_sources = contract.get("release_evidence", {}).get("ui_source_sha256")
+    expected_ui_sources = {
+        "scripts/render_public_shell.py", "scripts/render_proposal_page.py",
+        "scripts/commonworld_i18n.py", "scripts/proposal_i18n.py",
+        "assets/commonworld-locale-registry.mjs", "assets/commonworld-locale.mjs",
+        "assets/commonworld-i18n.mjs", "index.css", "assets/proposal.css",
+    }
+    if not isinstance(ui_sources, dict) or set(ui_sources) != expected_ui_sources:
+        errors.append("release evidence UI source scope mismatch")
+    else:
+        for relative, digest in ui_sources.items():
+            path = root / relative
+            if not path.is_file():
+                errors.append(f"release evidence UI source digest is stale: {relative}")
+                continue
+            if relative in {"assets/commonworld-locale.mjs", "assets/commonworld-i18n.mjs"}:
+                # Cache-busting import versions follow catalog-generated assets.
+                source = re.sub(rb"\?v=[0-9a-f]{12}", b"?v=<asset>", path.read_bytes())
+                actual = hashlib.sha256(source).hexdigest()
+            else:
+                actual = _sha256(path)
+            if actual != digest:
+                errors.append(f"release evidence UI source digest is stale: {relative}")
+
     pack_errors, pack_digest = _pack_errors(contract, root)
     errors.extend(pack_errors)
     try:
@@ -891,9 +898,6 @@ def validate_contract(contract: dict[str, Any], root: Path = ROOT) -> list[str]:
                         set(gate.get("required_surfaces", [])),
                         pack_digest,
                         reviewed_pack_digest,
-                        _sha256(root / "catalog" / "locales" / f"{tag}.json")
-                        if (root / "catalog" / "locales" / f"{tag}.json").is_file()
-                        else None,
                     )
                 )
         elif status == "candidate":
@@ -1023,6 +1027,7 @@ def validate_contract(contract: dict[str, Any], root: Path = ROOT) -> list[str]:
         "schema_path": "docs/architecture/locale-release-evidence.schema.json",
         "receipt_sources_must_exist_and_match_sha256": True,
         "generator": "scripts/generate_locale_release_evidence.py",
+        "ui_source_sha256": ui_sources,
     }
     _require(
         errors,

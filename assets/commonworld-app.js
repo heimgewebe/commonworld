@@ -1,6 +1,6 @@
 import { BOOTSTRAP_RECORDS } from './commonworld-bootstrap-catalog.mjs?v=5174db80a8a5';
 import { createCatalogLoadCache, loadCatalogAggregate, loadCatalogDetail, loadCatalogShard, shardKeyForIdentity } from './commonworld-catalog-runtime.mjs?v=25d37dcafe15';
-import { actionLabel, documentDirection, documentLocale, localizeCatalogRecords, text as i18nText, themeLabel, wave1LocalePackReady } from './commonworld-i18n.mjs?v=1c24882de9f8';
+import { actionLabel, documentDirection, documentLocale, localizeCatalogRecords, text as i18nText, themeLabel, wave1LocalePackReady } from './commonworld-i18n.mjs?v=d1eda089f21d';
 import {
   COMMONS_TYPE_COLOR_TOKENS,
   COMMONS_TYPE_VALUES,
@@ -63,7 +63,7 @@ import {
   sortRecords,
   stateFromSearch,
   visibleDigitalNodes,
-} from './commonworld-core.mjs?v=992c6964f0b7';
+} from './commonworld-core.mjs?v=ebd34ecf15a9';
 
 const LOCALE = documentLocale();
 const DOCUMENT_DIRECTION = documentDirection(LOCALE);
@@ -2708,6 +2708,11 @@ function renderTextView() {
   const visible = orderedVisibleRecords();
   syncPresentationBudgets();
   const presented = visible.slice(0, runtime.textPresentationLimit);
+  // Keep a map-selected identity visible when it falls beyond the first page.
+  const selectedIndex = visible.findIndex(({ id }) => id === runtime.state.project);
+  if (selectedIndex >= presented.length && presented.length > 0) {
+    presented[presented.length - 1] = visible[selectedIndex];
+  }
   const visibleIds = new Set(presented.map(({ id }) => id));
   const catalog = document.querySelector('#catalog');
   for (const record of presented) {

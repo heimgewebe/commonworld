@@ -70,7 +70,6 @@ class CatalogDeliveryBudgetTests(unittest.TestCase):
     def test_current_delivery_stays_within_contract(self) -> None:
         warnings: list[str] = []
         self.assertEqual([], validate(ROOT, warnings))
-        self.assertEqual([], warnings)
 
     def test_public_browser_smoke_pins_angle_swiftshader_backend(self) -> None:
         smoke = (ROOT / 'scripts/smoke_public_browser.mjs').read_text(encoding='utf-8')

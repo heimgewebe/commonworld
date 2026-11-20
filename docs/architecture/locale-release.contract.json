@@ -275,6 +275,17 @@
     "registry_pointer_field": "release_evidence",
     "schema_path": "docs/architecture/locale-release-evidence.schema.json",
     "receipt_sources_must_exist_and_match_sha256": true,
-    "generator": "scripts/generate_locale_release_evidence.py"
+    "generator": "scripts/generate_locale_release_evidence.py",
+    "ui_source_sha256": {
+      "scripts/render_public_shell.py": "a4c9ca119bf90c0f0fae4207f5e56ef5596ba0d0a3237e85d0e9424e45519a38",
+      "scripts/render_proposal_page.py": "e41a14c721fc6c32cf47d63942cac7a885f351b38db74c26097b2499c6ba2d51",
+      "scripts/commonworld_i18n.py": "12ab5d94b587febe3ae5f7c570d5a9fb0764bc61c9db268453a758333167e51d",
+      "scripts/proposal_i18n.py": "5d7261e8f84f33afb5ac0bbb7dee05642d3b8ade9bba16ce1ef35180257d49a3",
+      "assets/commonworld-locale-registry.mjs": "9e658bb7faaae0a1e16e632a8484120b153fc9c219214ed9dd2d761546d7ac9f",
+      "index.css": "84952b6cc591028487b3750891e5fa96d35261382edf4d8638a3c5381cbfb22f",
+      "assets/proposal.css": "6d51fa6380250adcb14186277d6201fe0dd2512c8f44537380896914a161099c",
+      "assets/commonworld-locale.mjs": "b47c75d881ef421efbac0e14602b639d4f876eca03ddd642c2a7a8dfcd0a9db7",
+      "assets/commonworld-i18n.mjs": "fc9a0bbe904eeb27b93f2efd99c457dc96a9f07d98600cbcfb4a2def575a3fca"
+    }
   }
 }

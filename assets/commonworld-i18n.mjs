@@ -42,7 +42,7 @@ export function shouldLoadWave1LocalePack(locale, isNodeRuntime = nodeRuntime) {
 export const WAVE1_LOCALE_PACK_TIMEOUT_MS = 2_500;
 
 export async function loadWave1LocalePacks({
-  importer = () => import('./commonworld-wave1-locales.mjs?v=d845d5e168cb'),
+  importer = () => import('./commonworld-wave1-locales.mjs?v=4ddc9b85b01b'),
   timeoutMs = nodeRuntime ? 0 : WAVE1_LOCALE_PACK_TIMEOUT_MS,
 } = {}) {
   const importPromise = Promise.resolve().then(importer);

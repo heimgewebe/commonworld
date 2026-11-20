@@ -7,7 +7,7 @@
       "directGlobeProjection": true,
       "hiddenUntilCalibrated": true,
       "outerHintRemoved": true,
-      "aggregateRingIdentities": 66,
+      "aggregateRingIdentities": 76,
       "configuredRingPreviewLimit": 6,
       "ringPreviewCounts": [
         6,
@@ -30,15 +30,15 @@
       "paintedPrimaryLabels": [
         {
           "layer": "knowledge_learning_culture",
-          "changedPixels": 2392
+          "changedPixels": 2417
         },
         {
           "layer": "communication_networks",
-          "changedPixels": 3122
+          "changedPixels": 3118
         },
         {
           "layer": "cooperation_self_organization",
-          "changedPixels": 3655
+          "changedPixels": 3654
         }
       ],
       "subordinateLinesIndependentlyStatic": true,
@@ -139,7 +139,7 @@
     {
       "id": "intent-search-discovery",
       "verdict": "PASS",
-      "indexedRecords": 100,
+      "indexedRecords": 120,
       "rankedGermanIntentResults": 52,
       "filters": 7,
       "digitalCoordinateFree": true,
@@ -170,13 +170,13 @@
       "depthRingsStatic": true,
       "representativePrimaryLabels": [
         {
-          "text": "Knowledge, Learning and Culture · 11    LibriVox  MusicBrainz  Open Library  Peer 2 Peer Unive…  Safecast  Thailand Citizens…",
+          "text": "Knowledge, Learning and Culture · 15    LibriVox  MusicBrainz  Open Library  OpenRefine  Peer 2 Peer Unive…  Safecast",
           "width": 211.50271606445312,
           "height": 147.4327392578125,
           "visible": true
         },
         {
-          "text": "Communication and Networks · 12    B4RN (Broadband f…  BOSCO Uganda  Freifunk  Freifunk Hamburg  guifi.net  Mastodon",
+          "text": "Communication and Networks · 13    B4RN (Broadband f…  BOSCO Uganda  Freifunk  Freifunk Hamburg  guifi.net  Mastodon",
           "width": 283.3871154785156,
           "height": 248.55337524414062,
           "visible": true
@@ -221,11 +221,11 @@
       "portraitPaintedPrimaryLabels": [
         {
           "layer": "knowledge_learning_culture",
-          "changedPixels": 6933
+          "changedPixels": 6951
         },
         {
           "layer": "communication_networks",
-          "changedPixels": 9517
+          "changedPixels": 9524
         },
         {
           "layer": "cooperation_self_organization",
@@ -240,16 +240,16 @@
         "depthRingsAnimated": true,
         "representativePrimaryLabels": [
           {
-            "text": "Knowledge, Learning and Culture · 11    LibriVox  MusicBrainz  Open Library  Peer 2 Peer Unive…  Safecast  Thailand Citizens…",
-            "width": 439.76171875,
-            "height": 428.1152038574219,
+            "text": "Knowledge, Learning and Culture · 15    LibriVox  MusicBrainz  Open Library  OpenRefine  Peer 2 Peer Unive…  Safecast",
+            "width": 436.8320617675781,
+            "height": 424.9935302734375,
             "fontSize": 25.26,
             "visible": true
           },
           {
             "text": "Cooperation and Self-Organization · 7    Bologna Urban Com…  Enspiral  g0v  Green Coop  l’Asilo  National Communal…",
-            "width": 398.07135009765625,
-            "height": 339.931640625,
+            "width": 397.3632507324219,
+            "height": 338.944580078125,
             "fontSize": 25.26,
             "visible": true
           }
@@ -339,7 +339,7 @@
       "verdict": "PASS",
       "publicFeatures": 143,
       "publicIdentities": 44,
-      "digitalIdentities": 66,
+      "digitalIdentities": 76,
       "unchangedMapUpdatesSkipped": true
     },
     {
@@ -361,7 +361,7 @@
     {
       "id": "layer-journey-moveend-return",
       "verdict": "PASS",
-      "elapsedMs": 1591
+      "elapsedMs": 1264
     },
     {
       "id": "layer-journey-missing-moveend-fallback",
@@ -469,8 +469,8 @@
       "verdict": "PASS",
       "blockedCatalogRequests": 0,
       "observedCatalogRequests": [
-        "/releases/348c8b00898cd4a88279/catalog/runtime/aggregate.v1.json",
-        "/releases/348c8b00898cd4a88279/catalog/runtime/manifest.v1.json"
+        "/releases/3e43aae630b8ef692825/catalog/runtime/aggregate.v1.json",
+        "/releases/3e43aae630b8ef692825/catalog/runtime/manifest.v1.json"
       ]
     },
     {
@@ -528,7 +528,7 @@
     }
   ],
   "binding": {
-    "first_party_surface_sha256": "9fefbc24ab719b9eec4a2d764fe4998232b7e908d517905b224d3db4b8954f69",
+    "first_party_surface_sha256": "be8afc5abec33e0710bc4fa0b97e9e391af74e1f34e31d7fa3fb35ea0aefac1e",
     "scenario_ids": [
       "startup-and-ring-orbits",
       "low-memory-map-cache-policy",

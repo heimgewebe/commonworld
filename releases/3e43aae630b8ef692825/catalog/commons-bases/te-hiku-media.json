@@ -1,0 +1,57 @@
+{
+  "schema_version": 1,
+  "kind": "commonworld_commons_basis",
+  "project_id": "te-hiku-media",
+  "classification": "common",
+  "decision": "include",
+  "reviewed_at": "2026-11-20",
+  "reviewer": "Commonworld editorial desk review",
+  "criteria": {
+    "shared_resource": {
+      "status": "supported",
+      "statement": "Māori-Sprachaufnahmen, Archive und gemeinsam entwickelte Sprachtechnologie sind die Wissensressourcen.",
+      "source_ids": [
+        "te-hiku-media-home",
+        "te-hiku-media-governance"
+      ]
+    },
+    "community": {
+      "status": "supported",
+      "statement": "Māori-Gemeinschaften und ihre Medien- und Sprachorganisation tragen die Arbeit.",
+      "source_ids": [
+        "te-hiku-media-home",
+        "te-hiku-media-governance"
+      ]
+    },
+    "commoning_practice": {
+      "status": "supported",
+      "statement": "Gemeinschaftsmitglieder tragen Sprachaufnahmen, Wissen und die Entwicklung kulturell angemessener Technik bei.",
+      "source_ids": [
+        "te-hiku-media-home",
+        "te-hiku-media-governance"
+      ]
+    },
+    "rules_and_responsibility": {
+      "status": "supported",
+      "statement": "Kaitiakitanga und veröffentlichte Datenhoheitsprinzipien bestimmen Zugriff und verantwortliche Nutzung.",
+      "source_ids": [
+        "te-hiku-media-home",
+        "te-hiku-media-governance"
+      ]
+    },
+    "common_benefit": {
+      "status": "supported",
+      "statement": "Die Sprachressourcen unterstützen intergenerationale Weitergabe und Kontrolle über das eigene kulturelle Erbe.",
+      "source_ids": [
+        "te-hiku-media-home",
+        "te-hiku-media-governance"
+      ]
+    }
+  },
+  "confidence": 0.85,
+  "limitations": [
+    "Gemeinschaftliche Ressource bedeutet hier nicht automatisch offene oder frei lizenzierte Datensätze.",
+    "Aussagen zu Zustimmung und Rechten müssen das Māori-Prinzip der kulturellen Datensouveränität respektieren."
+  ],
+  "notes": "Eigenständige Aufnahme: begrenzte quellengebundene Fünfkriterien-Prüfung. Keine ungeprüften Mitglieds-, Eigentums- oder Betriebsrechte behauptet."
+}
