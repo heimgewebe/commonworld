@@ -3,9 +3,9 @@
   <head>
     <meta charset="utf-8" />
     <meta name="commonworld-page" content="zh-Hans.html" />
-    <meta name="commonworld-page-build" content="01ca16ffd744fcaf" />
-    <meta name="commonworld-release" content="348c8b00898cd4a88279" />
-    <base href="/releases/348c8b00898cd4a88279/" />
+    <meta name="commonworld-page-build" content="2a6a3480fc912903" />
+    <meta name="commonworld-release" content="212069821a1d4a8f631d" />
+    <base href="/releases/212069821a1d4a8f631d/" />
     <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
     <meta name="color-scheme" content="dark" />
     <meta name="referrer" content="strict-origin-when-cross-origin" />
@@ -20,8 +20,8 @@
     <link rel="stylesheet" href="./assets/ipad-layout.css?v=739d6b8460d4" />
     <script type="module" src="/assets/commonworld-release-check.js?v=c1d996101672"></script>
     <script src="./assets/vendor/maplibre-gl.js?v=45a9b07a9189" defer></script>
-    <script type="module" src="./assets/commonworld-locale.mjs?v=e5b3e0c0eb76"></script>
-    <script type="module" src="./assets/commonworld-app.js?v=5ee2ef6531c1"></script>
+    <script type="module" src="./assets/commonworld-locale.mjs?v=248be2d51d0a"></script>
+    <script type="module" src="./assets/commonworld-app.js?v=95dd3876bc4e"></script>
   </head>
   <body data-presentation="globe">
     <a id="text-skip-link" class="skip-link" href="/zh-Hans.html#static-catalog-fallback">跳至文本视图</a>
@@ -93,7 +93,7 @@
         <div class="discovery-summary-row">
           <label class="discovery-sort"><span>排序方式</span><select id="discovery-sort" aria-describedby="discovery-sort-note"><option value="auto">推荐</option><option value="catalogued">最新收录</option><option value="reviewed">最近审核</option><option value="title">名称 A-Z</option></select></label>
           <p id="discovery-sort-note" class="discovery-sort-note">推荐排序会根据上下文调整：搜索时按相关性，使用半径时按距离，否则保留筛选后的顺序。</p>
-          <p id="discovery-count" class="discovery-count" role="status">100 Commons</p>
+          <p id="discovery-count" class="discovery-count" role="status">120 Commons</p>
           <button id="filter-clear" class="quiet-button" type="button">重置过滤器</button>
         </div>
         <p id="discovery-empty" class="discovery-empty" hidden>没有 Commons 匹配此搜索和过滤器组合。</p>
@@ -165,7 +165,7 @@
           </details>
 
           <p id="map-status" class="map-status" role="status">正在加载地球仪。文本视图仍然可用。</p>
-          <p id="globe-results" class="globe-results" role="status">100 当前目录中的 Commons。</p>
+          <p id="globe-results" class="globe-results" role="status">120 当前目录中的 Commons。</p>
 
           <aside id="layer-panel" class="layer-panel" aria-labelledby="layer-title" hidden>
             <h2 id="layer-title" class="visually-hidden">数字 Commons 近景</h2>
@@ -195,7 +195,7 @@
           <p class="kicker">文本视图</p>
           <h1 id="text-title">直接浏览 Commons</h1>
           <p>与地球视图使用相同的身份、筛选器和选择——只是没有空间显示。</p>
-          <p id="text-count" class="text-count">100 Commons</p>
+          <p id="text-count" class="text-count">120 Commons</p>
         </header>
         <div class="text-layout">
           <aside class="text-filters" aria-labelledby="text-filter-title">
@@ -281,6 +281,18 @@
               <a class="catalog-action-link" data-action-type="learn" href="https://acofop.org/nuestra-historia/" rel="external noreferrer">学习 <span aria-hidden="true">↗</span></a>
               <a href="https://acofop.org/" rel="external noreferrer">官方网站 <span aria-hidden="true">↗</span></a>
               <a href="./catalog/projects/acofop-peten-community-forests.json" type="application/json">JSON</a>
+            </div>
+          </article>
+          <article class="catalog-card" id="project-adjuntas-pueblo-solar" data-commonproject-id="adjuntas-pueblo-solar">
+            <p class="catalog-kind">Commons</p>
+            <h2 dir="auto">Adjuntas Pueblo Solar / ACESA</h2>
+            <p lang="zh-Hans" dir="auto">在波多黎各阿德洪塔斯，当地社区团体与 ACESA 组织太阳能微电网的共享使用和照管，以支持有韧性的能源供应。</p>
+            <p class="catalog-location">1 隐藏位置</p>
+            <p class="catalog-activity-notice">当前运营状态近期尚未核实。来源审查日期：2026-11-20；优先复核日期：2027-01-03。</p>
+            <div class="catalog-actions">
+              <a class="catalog-action-link" data-action-type="learn" href="https://www.honnoldfoundation.org/partner/casa-pueblo" rel="external noreferrer">学习 <span aria-hidden="true">↗</span></a>
+              <a href="https://www.honnoldfoundation.org/adjuntas-a-solar-community" rel="external noreferrer">官方网站 <span aria-hidden="true">↗</span></a>
+              <a href="./catalog/projects/adjuntas-pueblo-solar.json" type="application/json">JSON</a>
             </div>
           </article>
           <article class="catalog-card" id="project-aflaj-irrigation-systems-oman" data-commonproject-id="aflaj-irrigation-systems-oman">
@@ -533,6 +545,42 @@
               <a href="./catalog/projects/community-energy-network-new-zealand.json" type="application/json">JSON</a>
             </div>
           </article>
+          <article class="catalog-card" id="project-community-seed-bank-nepal" data-commonproject-id="community-seed-bank-nepal">
+            <p class="catalog-kind">Commons</p>
+            <h2 dir="auto">Community Seed Bank Nepal</h2>
+            <p lang="zh-Hans" dir="auto">尼泊尔由农民主导的社区种子库网络保存地方品种，并组织种子交换、维护及农作物生物多样性知识交流。</p>
+            <p class="catalog-location">1 隐藏位置</p>
+            <p class="catalog-activity-notice">当前运营状态近期尚未核实。来源审查日期：2026-11-20；优先复核日期：2027-01-03。</p>
+            <div class="catalog-actions">
+              <a class="catalog-action-link" data-action-type="learn" href="https://csbnepal.org/" rel="external noreferrer">学习 <span aria-hidden="true">↗</span></a>
+              <a href="https://csbnepal.org/our-work/" rel="external noreferrer">官方网站 <span aria-hidden="true">↗</span></a>
+              <a href="./catalog/projects/community-seed-bank-nepal.json" type="application/json">JSON</a>
+            </div>
+          </article>
+          <article class="catalog-card" id="project-communs-paysans" data-commonproject-id="communs-paysans">
+            <p class="catalog-kind">数字 · 软件、工具和生产 › 开放硬件和生产</p>
+            <h2 dir="auto">Communs Paysans – gemeinsames Agrartechnikwissen</h2>
+            <p lang="zh-Hans" dir="auto">前身合作社 L’Atelier Paysan 清算后，继承其工作的协会继续照管共享农业设计、知识和实用自制技术。</p>
+            <p class="catalog-location">1 隐藏位置</p>
+            <p class="catalog-activity-notice">当前运营状态近期尚未核实。来源审查日期：2026-11-20；优先复核日期：2027-01-03。</p>
+            <div class="catalog-actions">
+              <a class="catalog-action-link" data-action-type="learn" href="https://www.latelierpaysan.org/L-Atelier-Paysan-face-a-la-liquidation-elargissons-le-mouvement" rel="external noreferrer">学习 <span aria-hidden="true">↗</span></a>
+              <a href="https://latelierpaysan.org/" rel="external noreferrer">官方网站 <span aria-hidden="true">↗</span></a>
+              <a href="./catalog/projects/communs-paysans.json" type="application/json">JSON</a>
+            </div>
+          </article>
+          <article class="catalog-card" id="project-coopcycle" data-commonproject-id="coopcycle">
+            <p class="catalog-kind">数字 · 软件、工具和生产 › 自由软件和基础设施</p>
+            <h2 dir="auto">CoopCycle</h2>
+            <p lang="zh-Hans" dir="auto">一个自行车信使合作社联合会共享共同开发的配送平台，以及为劳动者自主经营的配送服务制定的使用规则。</p>
+            <p class="catalog-location">1 隐藏位置</p>
+            <p class="catalog-activity-notice">当前运营状态近期尚未核实。来源审查日期：2026-11-20；优先复核日期：2027-01-03。</p>
+            <div class="catalog-actions">
+              <a class="catalog-action-link" data-action-type="learn" href="https://docs.coopcycle.org/en/admin/intro/" rel="external noreferrer">学习 <span aria-hidden="true">↗</span></a>
+              <a href="https://coopcycle.org/" rel="external noreferrer">官方网站 <span aria-hidden="true">↗</span></a>
+              <a href="./catalog/projects/coopcycle.json" type="application/json">JSON</a>
+            </div>
+          </article>
           <article class="catalog-card" id="project-cooperation-jackson" data-commonproject-id="cooperation-jackson">
             <p class="catalog-kind">Commons</p>
             <h2 lang="en" dir="ltr">Cooperation Jackson</h2>
@@ -589,6 +637,30 @@
               <a class="catalog-action-link" data-action-type="use" href="https://www.ddsindia.org/video-channel/" rel="external noreferrer">使用 <span aria-hidden="true">↗</span></a>
               <a href="https://www.ddsindia.org/" rel="external noreferrer">官方网站 <span aria-hidden="true">↗</span></a>
               <a href="./catalog/projects/deccan-development-society.json" type="application/json">JSON</a>
+            </div>
+          </article>
+          <article class="catalog-card" id="project-dudley-neighbors-community-land-trust" data-commonproject-id="dudley-neighbors-community-land-trust">
+            <p class="catalog-kind">Commons</p>
+            <h2 dir="auto">Dudley Neighbors Community Land Trust</h2>
+            <p lang="zh-Hans" dir="auto">在波士顿，由社区治理的 Dudley Neighbors Inc. 以信托方式持有土地，支持长期可负担住房和社区管理。</p>
+            <p class="catalog-location">1 隐藏位置</p>
+            <p class="catalog-activity-notice">当前运营状态近期尚未核实。来源审查日期：2026-11-20；优先复核日期：2027-01-03。</p>
+            <div class="catalog-actions">
+              <a class="catalog-action-link" data-action-type="learn" href="https://www.dsni.org/board" rel="external noreferrer">学习 <span aria-hidden="true">↗</span></a>
+              <a href="https://www.dsni.org/about-us" rel="external noreferrer">官方网站 <span aria-hidden="true">↗</span></a>
+              <a href="./catalog/projects/dudley-neighbors-community-land-trust.json" type="application/json">JSON</a>
+            </div>
+          </article>
+          <article class="catalog-card" id="project-ecopower" data-commonproject-id="ecopower">
+            <p class="catalog-kind">Commons</p>
+            <h2 dir="auto">Ecopower</h2>
+            <p lang="zh-Hans" dir="auto">比利时能源合作社 Ecopower 的成员为可再生能源项目提供资金并参与管理，按照一人一票的原则投票。</p>
+            <p class="catalog-location">1 隐藏位置</p>
+            <p class="catalog-activity-notice">当前运营状态近期尚未核实。来源审查日期：2026-11-20；优先复核日期：2027-01-03。</p>
+            <div class="catalog-actions">
+              <a class="catalog-action-link" data-action-type="learn" href="https://ecopower.be/statuten-en-intern-reglement" rel="external noreferrer">学习 <span aria-hidden="true">↗</span></a>
+              <a href="https://ecopower.be/" rel="external noreferrer">官方网站 <span aria-hidden="true">↗</span></a>
+              <a href="./catalog/projects/ecopower.json" type="application/json">JSON</a>
             </div>
           </article>
           <article class="catalog-card" id="project-edinburgh-tool-library" data-commonproject-id="edinburgh-tool-library">
@@ -668,6 +740,18 @@
               <a href="./catalog/projects/fiji-locally-managed-marine-area-network.json" type="application/json">JSON</a>
             </div>
           </article>
+          <article class="catalog-card" id="project-foodsharing" data-commonproject-id="foodsharing">
+            <p class="catalog-kind">数字 · 供给、土地和生态 › 食品平台</p>
+            <h2 dir="auto">foodsharing</h2>
+            <p lang="zh-Hans" dir="auto">德国志愿者抢救并分享可食用食品，维护公共分享点，并共同协调卫生和照管规则。</p>
+            <p class="catalog-location">1 隐藏位置</p>
+            <p class="catalog-activity-notice">当前运营状态近期尚未核实。来源审查日期：2026-11-20；优先复核日期：2027-01-03。</p>
+            <div class="catalog-actions">
+              <a class="catalog-action-link" data-action-type="learn" href="https://wiki.foodsharing.network/wiki/Fairteiler:Fairteiler_und_Abgabestellen" rel="external noreferrer">学习 <span aria-hidden="true">↗</span></a>
+              <a href="https://foodsharing.de/" rel="external noreferrer">官方网站 <span aria-hidden="true">↗</span></a>
+              <a href="./catalog/projects/foodsharing.json" type="application/json">JSON</a>
+            </div>
+          </article>
           <article class="catalog-card" id="project-fordhall-organic-farm" data-commonproject-id="fordhall-organic-farm">
             <p class="catalog-kind">现场</p>
             <h2 dir="auto">Fordhall Organic Farm</h2>
@@ -726,6 +810,18 @@
               <a href="./catalog/projects/fucvam.json" type="application/json">JSON</a>
             </div>
           </article>
+          <article class="catalog-card" id="project-fux-eg" data-commonproject-id="fux-eg">
+            <p class="catalog-kind">Commons</p>
+            <h2 dir="auto">fux eG</h2>
+            <p lang="zh-Hans" dir="auto">汉堡的 fux eG 合作社共同管理用于工作室、工坊、文化、教育和社区合作的空间。</p>
+            <p class="catalog-location">1 隐藏位置</p>
+            <p class="catalog-activity-notice">当前运营状态近期尚未核实。来源审查日期：2026-11-20；优先复核日期：2027-01-03。</p>
+            <div class="catalog-actions">
+              <a class="catalog-action-link" data-action-type="learn" href="https://www.fux-eg.org/mitmachen" rel="external noreferrer">学习 <span aria-hidden="true">↗</span></a>
+              <a href="https://www.fux-eg.org/" rel="external noreferrer">官方网站 <span aria-hidden="true">↗</span></a>
+              <a href="./catalog/projects/fux-eg.json" type="application/json">JSON</a>
+            </div>
+          </article>
           <article class="catalog-card" id="project-g0v" data-commonproject-id="g0v">
             <p class="catalog-kind">数字 · 合作与自组织 › 公民技术和自组织</p>
             <h2 dir="auto">g0v</h2>
@@ -737,6 +833,18 @@
               <a class="catalog-action-link" data-action-type="contribute" href="https://g0v.tw/intl/en/" rel="external noreferrer">贡献 <span aria-hidden="true">↗</span></a>
               <a href="https://g0v.tw/intl/en/" rel="external noreferrer">官方网站 <span aria-hidden="true">↗</span></a>
               <a href="./catalog/projects/g0v.json" type="application/json">JSON</a>
+            </div>
+          </article>
+          <article class="catalog-card" id="project-gaengeviertel-genossenschaft" data-commonproject-id="gaengeviertel-genossenschaft">
+            <p class="catalog-kind">Commons</p>
+            <h2 dir="auto">Gängeviertel Genossenschaft 2010 eG</h2>
+            <p lang="zh-Hans" dir="auto">汉堡 Gängeviertel 社区通过合作社自主管理和合同约定的使用权，组织共享的文化、居住和工作空间。</p>
+            <p class="catalog-location">1 隐藏位置</p>
+            <p class="catalog-activity-notice">当前运营状态近期尚未核实。来源审查日期：2026-11-20；优先复核日期：2027-01-03。</p>
+            <div class="catalog-actions">
+              <a class="catalog-action-link" data-action-type="learn" href="https://www.hamburg.de/politik-und-verwaltung/bezirke/mitte/themen/planen-bauen-wohnen/gaengeviertel/vertrag-268782" rel="external noreferrer">学习 <span aria-hidden="true">↗</span></a>
+              <a href="https://das-gaengeviertel.info/" rel="external noreferrer">官方网站 <span aria-hidden="true">↗</span></a>
+              <a href="./catalog/projects/gaengeviertel-genossenschaft.json" type="application/json">JSON</a>
             </div>
           </article>
           <article class="catalog-card" id="project-gbif" data-commonproject-id="gbif">
@@ -843,6 +951,18 @@
               <a href="./catalog/projects/kawawana.json" type="application/json">JSON</a>
             </div>
           </article>
+          <article class="catalog-card" id="project-kde" data-commonproject-id="kde">
+            <p class="catalog-kind">数字 · 软件、工具和生产 › 自由软件和基础设施</p>
+            <h2 dir="auto">KDE Community</h2>
+            <p lang="zh-Hans" dir="auto">国际 KDE 社区共同开发自由桌面软件和数字工具，获得 KDE e.V. 及其正式成员治理机制的支持。</p>
+            <p class="catalog-location">与位置无关的数字存在形式</p>
+            <p class="catalog-activity-notice">当前运营状态近期尚未核实。来源审查日期：2026-11-20；优先复核日期：2027-01-03。</p>
+            <div class="catalog-actions">
+              <a class="catalog-action-link" data-action-type="learn" href="https://ev.kde.org/generalassembly/" rel="external noreferrer">学习 <span aria-hidden="true">↗</span></a>
+              <a href="https://kde.org/community/" rel="external noreferrer">官方网站 <span aria-hidden="true">↗</span></a>
+              <a href="./catalog/projects/kde.json" type="application/json">JSON</a>
+            </div>
+          </article>
           <article class="catalog-card" id="project-kibera-public-space-project" data-commonproject-id="kibera-public-space-project">
             <p class="catalog-kind">现场</p>
             <h2 dir="auto">Kibera Public Space Project</h2>
@@ -865,6 +985,18 @@
               <a class="catalog-action-link" data-action-type="learn" href="https://tonibung.org/projects" rel="external noreferrer">学习 <span aria-hidden="true">↗</span></a>
               <a href="https://tonibung.org/projects" rel="external noreferrer">官方网站 <span aria-hidden="true">↗</span></a>
               <a href="./catalog/projects/kobulu-community-micro-hydro.json" type="application/json">JSON</a>
+            </div>
+          </article>
+          <article class="catalog-card" id="project-kudumbashree-community-network" data-commonproject-id="kudumbashree-community-network">
+            <p class="catalog-kind">Commons</p>
+            <h2 dir="auto">Kudumbashree – Nachbarschaftsnetzwerk</h2>
+            <p lang="zh-Hans" dir="auto">喀拉拉邦的妇女邻里小组汇集储蓄，并通过民选的地方和联合组织共同开展经济与社会项目。</p>
+            <p class="catalog-location">1 隐藏位置</p>
+            <p class="catalog-activity-notice">当前运营状态近期尚未核实。来源审查日期：2026-11-20；优先复核日期：2027-01-03。</p>
+            <div class="catalog-actions">
+              <a class="catalog-action-link" data-action-type="learn" href="https://muzhakkunnupanchayat.lsgkerala.gov.in/en/page/kudumbashree" rel="external noreferrer">学习 <span aria-hidden="true">↗</span></a>
+              <a href="https://lsgd.kerala.gov.in/en/waste-management/supporting-institutions/kudumbashree/" rel="external noreferrer">官方网站 <span aria-hidden="true">↗</span></a>
+              <a href="./catalog/projects/kudumbashree-community-network.json" type="application/json">JSON</a>
             </div>
           </article>
           <article class="catalog-card" id="project-kyrgyzstan-water-users-associations-union" data-commonproject-id="kyrgyzstan-water-users-associations-union">
@@ -1195,6 +1327,18 @@
               <a href="./catalog/projects/openmrs.json" type="application/json">JSON</a>
             </div>
           </article>
+          <article class="catalog-card" id="project-openrefine" data-commonproject-id="openrefine">
+            <p class="catalog-kind">数字 · 知识、学习和文化 › 开放知识和数据</p>
+            <h2 dir="auto">OpenRefine</h2>
+            <p lang="zh-Hans" dir="auto">国际贡献者共同维护开源数据清理和转换工具 OpenRefine，项目决策均有公开记录。</p>
+            <p class="catalog-location">与位置无关的数字存在形式</p>
+            <p class="catalog-activity-notice">当前运营状态近期尚未核实。来源审查日期：2026-11-20；优先复核日期：2027-01-03。</p>
+            <div class="catalog-actions">
+              <a class="catalog-action-link" data-action-type="learn" href="https://github.com/OpenRefine/OpenRefine/blob/master/GOVERNANCE.md" rel="external noreferrer">学习 <span aria-hidden="true">↗</span></a>
+              <a href="https://openrefine.org/" rel="external noreferrer">官方网站 <span aria-hidden="true">↗</span></a>
+              <a href="./catalog/projects/openrefine.json" type="application/json">JSON</a>
+            </div>
+          </article>
           <article class="catalog-card" id="project-openstreetmap" data-commonproject-id="openstreetmap">
             <p class="catalog-kind">数字 · 软件、工具和生产 › 数据和软件桥梁</p>
             <h2 dir="auto">OpenStreetMap</h2>
@@ -1266,6 +1410,18 @@
               <a href="./catalog/projects/park-slope-food-coop.json" type="application/json">JSON</a>
             </div>
           </article>
+          <article class="catalog-card" id="project-pingala-cooperative" data-commonproject-id="pingala-cooperative">
+            <p class="catalog-kind">Commons</p>
+            <h2 dir="auto">Pingala Co-operative</h2>
+            <p lang="zh-Hans" dir="auto">澳大利亚能源合作社 Pingala 汇集成员投资以支持当地太阳能项目，并实行成员民主治理。</p>
+            <p class="catalog-location">1 隐藏位置</p>
+            <p class="catalog-activity-notice">当前运营状态近期尚未核实。来源审查日期：2026-11-20；优先复核日期：2027-01-03。</p>
+            <div class="catalog-actions">
+              <a class="catalog-action-link" data-action-type="learn" href="https://www.pingala.org.au/get-involved" rel="external noreferrer">学习 <span aria-hidden="true">↗</span></a>
+              <a href="https://www.pingala.org.au/co-op" rel="external noreferrer">官方网站 <span aria-hidden="true">↗</span></a>
+              <a href="./catalog/projects/pingala-cooperative.json" type="application/json">JSON</a>
+            </div>
+          </article>
           <article class="catalog-card" id="project-potato-park-peru" data-commonproject-id="potato-park-peru">
             <p class="catalog-kind">现场</p>
             <h2 dir="auto">Parque de la Papa</h2>
@@ -1292,6 +1448,18 @@
               <a class="catalog-action-link" data-action-type="contact" href="https://prinzessinnengarten-kollektiv.net/kontakt/" rel="external noreferrer">联系 <span aria-hidden="true">↗</span></a>
               <a href="https://prinzessinnengarten-kollektiv.net/" rel="external noreferrer">官方网站 <span aria-hidden="true">↗</span></a>
               <a href="./catalog/projects/prinzessinnengarten-kollektiv.json" type="application/json">JSON</a>
+            </div>
+          </article>
+          <article class="catalog-card" id="project-qgis" data-commonproject-id="qgis">
+            <p class="catalog-kind">数字 · 软件、工具和生产 › 自由软件和基础设施</p>
+            <h2 dir="auto">QGIS</h2>
+            <p lang="zh-Hans" dir="auto">国际社区开发自由地理空间软件 QGIS，由民选机构和项目团队协调代码、文档与决策。</p>
+            <p class="catalog-location">与位置无关的数字存在形式</p>
+            <p class="catalog-activity-notice">当前运营状态近期尚未核实。来源审查日期：2026-11-20；优先复核日期：2027-01-03。</p>
+            <div class="catalog-actions">
+              <a class="catalog-action-link" data-action-type="learn" href="https://www.qgis.org/community/organisation/" rel="external noreferrer">学习 <span aria-hidden="true">↗</span></a>
+              <a href="https://qgis.org/" rel="external noreferrer">官方网站 <span aria-hidden="true">↗</span></a>
+              <a href="./catalog/projects/qgis.json" type="application/json">JSON</a>
             </div>
           </article>
           <article class="catalog-card" id="project-red-guardianes-semillas-ecuador" data-commonproject-id="red-guardianes-semillas-ecuador">
@@ -1442,6 +1610,54 @@
               <a href="./catalog/projects/som-energia.json" type="application/json">JSON</a>
             </div>
           </article>
+          <article class="catalog-card" id="project-sungai-utik-community-forest" data-commonproject-id="sungai-utik-community-forest">
+            <p class="catalog-kind">Commons</p>
+            <h2 dir="auto">Sungai Utik – Gemeinschaftswald</h2>
+            <p lang="zh-Hans" dir="auto">Sungai Utik 的达雅克伊班社区通过社区规则、可持续利用和长期生态管理维护其习惯法森林。</p>
+            <p class="catalog-location">1 隐藏位置</p>
+            <p class="catalog-activity-notice">当前运营状态近期尚未核实。来源审查日期：2026-11-20；优先复核日期：2027-01-03。</p>
+            <div class="catalog-actions">
+              <a class="catalog-action-link" data-action-type="learn" href="https://www.equatorinitiative.org/2019/10/15/dayak-iban-community-of-sungai-utik/" rel="external noreferrer">学习 <span aria-hidden="true">↗</span></a>
+              <a href="https://www.unep.org/championsofearth/laureates/2019/dayak-iban-community-sungai-utik" rel="external noreferrer">官方网站 <span aria-hidden="true">↗</span></a>
+              <a href="./catalog/projects/sungai-utik-community-forest.json" type="application/json">JSON</a>
+            </div>
+          </article>
+          <article class="catalog-card" id="project-te-hiku-media" data-commonproject-id="te-hiku-media">
+            <p class="catalog-kind">数字 · 知识、学习和文化 › 媒体、档案和文化</p>
+            <h2 dir="auto">Te Hiku Media</h2>
+            <p lang="zh-Hans" dir="auto">Te Hiku Media 与语言社区共同开发毛利语档案、数据集和技术，优先维护原住民数据主权，而非无限制地向公众开放。</p>
+            <p class="catalog-location">1 隐藏位置</p>
+            <p class="catalog-activity-notice">当前运营状态近期尚未核实。来源审查日期：2026-11-20；优先复核日期：2027-01-03。</p>
+            <div class="catalog-actions">
+              <a class="catalog-action-link" data-action-type="learn" href="https://docs.tehiku.media/article/42-data-sovereignty" rel="external noreferrer">学习 <span aria-hidden="true">↗</span></a>
+              <a href="https://tehiku.nz/" rel="external noreferrer">官方网站 <span aria-hidden="true">↗</span></a>
+              <a href="./catalog/projects/te-hiku-media.json" type="application/json">JSON</a>
+            </div>
+          </article>
+          <article class="catalog-card" id="project-tela-botanica" data-commonproject-id="tela-botanica">
+            <p class="catalog-kind">数字 · 知识、学习和文化 › 开放知识和数据</p>
+            <h2 dir="auto">Tela Botanica</h2>
+            <p lang="zh-Hans" dir="auto">一个法语网络共同开发植物观察记录、植物知识和工具，支持公众可参与的公民科学。</p>
+            <p class="catalog-location">1 隐藏位置</p>
+            <p class="catalog-activity-notice">当前运营状态近期尚未核实。来源审查日期：2026-11-20；优先复核日期：2027-01-03。</p>
+            <div class="catalog-actions">
+              <a class="catalog-action-link" data-action-type="learn" href="https://www.tela-botanica.org/wp-content/uploads/2025/06/Rapport-activite-2024_Tela-Botanica_compressed.pdf" rel="external noreferrer">学习 <span aria-hidden="true">↗</span></a>
+              <a href="https://www.tela-botanica.org/" rel="external noreferrer">官方网站 <span aria-hidden="true">↗</span></a>
+              <a href="./catalog/projects/tela-botanica.json" type="application/json">JSON</a>
+            </div>
+          </article>
+          <article class="catalog-card" id="project-telecomunicaciones-indigenas-comunitarias" data-commonproject-id="telecomunicaciones-indigenas-comunitarias">
+            <p class="catalog-kind">数字 · 通信与网络 › 社区网络</p>
+            <h2 dir="auto">Telecomunicaciones Indígenas Comunitarias</h2>
+            <p lang="zh-Hans" dir="auto">墨西哥原住民社区组织并运营社区电信网络，其本地使用和维护与共同管理相联系。</p>
+            <p class="catalog-location">1 隐藏位置</p>
+            <p class="catalog-activity-notice">当前运营状态近期尚未核实。来源审查日期：2026-11-20；优先复核日期：2027-01-03。</p>
+            <div class="catalog-actions">
+              <a class="catalog-action-link" data-action-type="learn" href="https://red.tic-ac.org/" rel="external noreferrer">学习 <span aria-hidden="true">↗</span></a>
+              <a href="https://tic-ac.org/" rel="external noreferrer">官方网站 <span aria-hidden="true">↗</span></a>
+              <a href="./catalog/projects/telecomunicaciones-indigenas-comunitarias.json" type="application/json">JSON</a>
+            </div>
+          </article>
           <article class="catalog-card" id="project-tetepare-descendants-association" data-commonproject-id="tetepare-descendants-association">
             <p class="catalog-kind">现场 · 数字 · 供给、土地和生态 › 土地、城市绿化与生态</p>
             <h2 dir="auto">Tetepare Descendants’ Association</h2>
@@ -1465,6 +1681,18 @@
               <a class="catalog-action-link" data-action-type="learn" href="https://www.recoftc.org/annual-report-2021-2022/data-and-forests-putting-community-forestry-digital-map-thailand" rel="external noreferrer">学习 <span aria-hidden="true">↗</span></a>
               <a href="https://www.recoftc.org/th/publications/thaicfnet-factsheet" rel="external noreferrer">官方网站 <span aria-hidden="true">↗</span></a>
               <a href="./catalog/projects/thailand-citizens-forest-database.json" type="application/json">JSON</a>
+            </div>
+          </article>
+          <article class="catalog-card" id="project-the-bristol-cable" data-commonproject-id="the-bristol-cable">
+            <p class="catalog-kind">数字 · 知识、学习和文化 › 媒体、档案和文化</p>
+            <h2 dir="auto">The Bristol Cable</h2>
+            <p lang="zh-Hans" dir="auto">布里斯托尔一家由成员拥有的本地新闻机构以民主合作社方式治理，通过集体筹资开展调查报道。</p>
+            <p class="catalog-location">1 隐藏位置</p>
+            <p class="catalog-activity-notice">当前运营状态近期尚未核实。来源审查日期：2026-11-20；优先复核日期：2027-01-03。</p>
+            <div class="catalog-actions">
+              <a class="catalog-action-link" data-action-type="learn" href="https://thebristolcable.org/transparency/" rel="external noreferrer">学习 <span aria-hidden="true">↗</span></a>
+              <a href="https://thebristolcable.org/" rel="external noreferrer">官方网站 <span aria-hidden="true">↗</span></a>
+              <a href="./catalog/projects/the-bristol-cable.json" type="application/json">JSON</a>
             </div>
           </article>
           <article class="catalog-card" id="project-the-things-network" data-commonproject-id="the-things-network">
@@ -1493,6 +1721,18 @@
               <a class="catalog-action-link" data-action-type="donate" href="https://www.tribalparks.com/get-involved" rel="external noreferrer">捐赠 <span aria-hidden="true">↗</span></a>
               <a href="https://www.tribalparks.com/" rel="external noreferrer">官方网站 <span aria-hidden="true">↗</span></a>
               <a href="./catalog/projects/tla-o-qui-aht-tribal-parks.json" type="application/json">JSON</a>
+            </div>
+          </article>
+          <article class="catalog-card" id="project-tosepan-titataniske" data-commonproject-id="tosepan-titataniske">
+            <p class="catalog-kind">Commons</p>
+            <h2 dir="auto">Tosepan Titataniske</h2>
+            <p lang="zh-Hans" dir="auto">普埃布拉州北部山区的原住民合作社共同组织生产、加工、融资、教育和地方供应。</p>
+            <p class="catalog-location">1 隐藏位置</p>
+            <p class="catalog-activity-notice">当前运营状态近期尚未核实。来源审查日期：2026-11-20；优先复核日期：2027-01-03。</p>
+            <div class="catalog-actions">
+              <a class="catalog-action-link" data-action-type="learn" href="https://tosepan.org.mx/content/4-sobre-nosotros.html" rel="external noreferrer">学习 <span aria-hidden="true">↗</span></a>
+              <a href="https://www.tosepan.coop/historia/" rel="external noreferrer">官方网站 <span aria-hidden="true">↗</span></a>
+              <a href="./catalog/projects/tosepan-titataniske.json" type="application/json">JSON</a>
             </div>
           </article>
           <article class="catalog-card" id="project-tribunal-aguas-valencia" data-commonproject-id="tribunal-aguas-valencia">

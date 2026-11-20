@@ -1,0 +1,87 @@
+{
+  "schema_version": 4,
+  "id": "te-hiku-media",
+  "title": "Te Hiku Media",
+  "summary": "Te Hiku Media baut zusammen mit Māori-Sprachgemeinschaften Archive, Sprachdaten und Technologien auf und stellt die kulturelle Datenhoheit und gemeinschaftliche Kontrolle ausdrücklich vor unbeschränkte Veröffentlichung.",
+  "themes": [
+    "cultural-heritage"
+  ],
+  "actions": [
+    "learn"
+  ],
+  "presence": {
+    "geographic": [
+      {
+        "id": "te-hiku-media-region",
+        "mode": "hidden",
+        "label": "Te Hiku, Aotearoa Neuseeland",
+        "privacy_note": "Region und gemeinschaftlicher Wirkungsraum sind belegt; ohne gesondert verifizierte öffentliche Geometrie wird kein künstlicher Ortsmarker gesetzt.",
+        "source_ids": [
+          "te-hiku-media-home"
+        ]
+      }
+    ],
+    "digital": {
+      "available": true,
+      "source_ids": [
+        "te-hiku-media-home"
+      ],
+      "reach": "restricted",
+      "label": "Unter Māori-Datenhoheit verwaltete Spracharchive und digitale Sprachwerkzeuge"
+    }
+  },
+  "activity": {
+    "status": "unknown",
+    "observed_at": "2026-11-20",
+    "source_ids": [
+      "te-hiku-media-home"
+    ],
+    "note": "Die dokumentierte Praxis ist belegt, ihr operativer Status wurde in dieser Aufnahme nicht als tagesaktuell verifiziert."
+  },
+  "provenance": {
+    "sources": [
+      {
+        "id": "te-hiku-media-home",
+        "type": "official-source",
+        "label": "Te Hiku Media – Projektinformation",
+        "url": "https://tehiku.nz/",
+        "retrieved_at": "2026-11-20",
+        "note": "Öffentliche projektnahe Information über die gemeinsame Ressource und die Beteiligten."
+      },
+      {
+        "id": "te-hiku-media-governance",
+        "type": "official-source",
+        "label": "Te Hiku Media – Organisation und Regeln",
+        "url": "https://docs.tehiku.media/article/42-data-sovereignty",
+        "retrieved_at": "2026-11-20",
+        "note": "Projektnahe Details zu gemeinsamen Praktiken, Organisation oder relevanten Grenzen."
+      }
+    ]
+  },
+  "curation": {
+    "state": "listed",
+    "catalogued_at": "2026-11-20",
+    "reviewed_by": "Commonworld editorial review",
+    "reviewed_at": "2026-11-20",
+    "next_review_at": "2027-01-03",
+    "notes": "Aktueller Betriebszustand nicht zeitnah verifiziert. Neue quellengebundene Commons-Aufnahme; Wiedervorlage innerhalb von 45 Tagen."
+  },
+  "links": [
+    {
+      "type": "homepage",
+      "label": "Te Hiku Media – offizielle Seite",
+      "url": "https://tehiku.nz/"
+    },
+    {
+      "type": "learn",
+      "label": "Gemeinsame Praxis und Verantwortung kennenlernen",
+      "url": "https://docs.tehiku.media/article/42-data-sovereignty",
+      "source_ids": [
+        "te-hiku-media-governance"
+      ]
+    }
+  ],
+  "handoff": {
+    "enabled": false
+  }
+}

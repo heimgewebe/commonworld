@@ -1,0 +1,57 @@
+{
+  "schema_version": 1,
+  "kind": "commonworld_commons_basis",
+  "project_id": "openrefine",
+  "classification": "common",
+  "decision": "include",
+  "reviewed_at": "2026-11-20",
+  "reviewer": "Commonworld editorial desk review",
+  "criteria": {
+    "shared_resource": {
+      "status": "supported",
+      "statement": "Der gemeinsam gepflegte Programmcode und die Nutzungsdokumentation bilden die frei nutzbare Ressource.",
+      "source_ids": [
+        "openrefine-home",
+        "openrefine-governance"
+      ]
+    },
+    "community": {
+      "status": "supported",
+      "statement": "Internationale Entwickler und Beitragende sind über Repository und Governance erkennbar.",
+      "source_ids": [
+        "openrefine-home",
+        "openrefine-governance"
+      ]
+    },
+    "commoning_practice": {
+      "status": "supported",
+      "statement": "Programmänderungen, Problembehandlung und Dokumentation entstehen über öffentliche Beiträge.",
+      "source_ids": [
+        "openrefine-home",
+        "openrefine-governance"
+      ]
+    },
+    "rules_and_responsibility": {
+      "status": "supported",
+      "statement": "Das veröffentlichte Governance-Dokument beschreibt Entscheidungsrollen und konsensorientierte Verfahren.",
+      "source_ids": [
+        "openrefine-home",
+        "openrefine-governance"
+      ]
+    },
+    "common_benefit": {
+      "status": "supported",
+      "statement": "Viele Organisationen können Daten lokal aufbereiten, ohne von einem einzelnen Diensteanbieter abhängig zu sein.",
+      "source_ids": [
+        "openrefine-home",
+        "openrefine-governance"
+      ]
+    }
+  },
+  "confidence": 0.85,
+  "limitations": [
+    "Die Projektgovernance gibt nicht allen Nutzern gleiche Entscheidungsrechte.",
+    "Die quelloffene Lizenz allein wäre kein ausreichender Commons-Nachweis."
+  ],
+  "notes": "Eigenständige Aufnahme: begrenzte quellengebundene Fünfkriterien-Prüfung. Keine ungeprüften Mitglieds-, Eigentums- oder Betriebsrechte behauptet."
+}

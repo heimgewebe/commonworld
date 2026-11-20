@@ -13,6 +13,12 @@
         "acofop-peten-region": "Petén, Guatemala — ancla regional amplia"
       }
     },
+    "adjuntas-pueblo-solar": {
+      "summary": "En Adjuntas, Puerto Rico, grupos comunitarios locales y ACESA organizan el uso compartido y el cuidado de una microrred solar que favorece un suministro energético resiliente.",
+      "geographic_labels": {
+        "adjuntas-pueblo-solar-region": "Adjuntas, Puerto Rico: microrred solar local"
+      }
+    },
     "aflaj-irrigation-systems-oman": {
       "summary": "Sistemas de riego vivos gestionados por comunidades en Omán que asignan el agua por turnos de tiempo y se sostienen mediante mantenimiento compartido, normas y financiación local.",
       "geographic_labels": {
@@ -138,6 +144,26 @@
       },
       "digital_label": "Información sobre la red, el intercambio de conocimiento y la participación"
     },
+    "community-seed-bank-nepal": {
+      "summary": "Una red de bancos comunitarios de semillas dirigidos por agricultores en Nepal conserva variedades locales y organiza el intercambio y mantenimiento de semillas y los conocimientos sobre biodiversidad agrícola.",
+      "geographic_labels": {
+        "community-seed-bank-nepal-region": "Nepal: red de bancos locales de semillas"
+      }
+    },
+    "communs-paysans": {
+      "summary": "Tras la liquidación de la antigua cooperativa L’Atelier Paysan, asociaciones sucesoras siguen cuidando diseños agrícolas compartidos, saberes y técnicas prácticas de autoconstrucción.",
+      "geographic_labels": {
+        "communs-paysans-region": "Francia: redes campesinas de autoconstrucción y conocimiento"
+      },
+      "digital_label": "Diseños compartidos de herramientas agrícolas y documentación de autoconstrucción a cargo de organizaciones sucesoras"
+    },
+    "coopcycle": {
+      "summary": "Una federación de cooperativas de reparto en bicicleta comparte una plataforma de reparto desarrollada colectivamente y normas de uso concebidas para servicios gestionados por sus trabajadores.",
+      "geographic_labels": {
+        "coopcycle-region": "Red internacional de cooperativas de mensajería"
+      },
+      "digital_label": "Software de reparto compartido y federación de cooperativas de mensajería"
+    },
     "cooperation-jackson": {
       "summary": "Una red de economía solidaria en Jackson, Mississippi, que desarrolla de forma conjunta cooperativas de trabajadores, empresas democráticamente autogestionadas, tierras de tenencia comunitaria, vivienda asequible e infraestructura de producción local.",
       "geographic_labels": {
@@ -162,6 +188,18 @@
         "dds-telangana-region": "Sanghams en Telangana, India"
       },
       "digital_label": "Medios comunitarios y el archivo público de vídeo de las Sanghams"
+    },
+    "dudley-neighbors-community-land-trust": {
+      "summary": "En Boston, Dudley Neighbors Inc., gobernada por la comunidad, mantiene tierras en fideicomiso para apoyar la vivienda asequible a largo plazo y la gestión del barrio.",
+      "geographic_labels": {
+        "dudley-neighbors-community-land-trust-region": "Dudley Street, Boston, Massachusetts, Estados Unidos"
+      }
+    },
+    "ecopower": {
+      "summary": "Los miembros de la cooperativa energética belga Ecopower financian y gestionan proyectos de energía renovable y votan según el principio de un voto por miembro.",
+      "geographic_labels": {
+        "ecopower-region": "Bélgica: proyectos comunitarios de energía"
+      }
     },
     "edinburgh-tool-library": {
       "summary": "Una biblioteca de herramientas de gestión comunitaria y en gran medida voluntaria que presta herramientas, enseña reparación y habilidades prácticas, y apoya proyectos comunitarios locales.",
@@ -201,6 +239,13 @@
       },
       "digital_label": "Materiales públicos de aprendizaje y documentación de la red FLMMA sobre gestión marina comunitaria"
     },
+    "foodsharing": {
+      "summary": "En Alemania, personas voluntarias rescatan y comparten alimentos aptos para el consumo, mantienen puntos públicos de reparto y coordinan normas comunes de higiene y cuidado.",
+      "geographic_labels": {
+        "foodsharing-region": "Alemania: puntos de reparto y grupos regionales distribuidos"
+      },
+      "digital_label": "Coordinación compartida del rescate de alimentos y de puntos públicos de reparto"
+    },
     "fordhall-organic-farm": {
       "summary": "Una granja orgánica de propiedad comunitaria en Shropshire cuya tierra está en manos de una sociedad benéfica de beneficio comunitario con miles de accionistas y asegurada para la agricultura ecológica, la educación, el acceso público a la naturaleza y programas sociales.",
       "geographic_labels": {
@@ -227,10 +272,22 @@
         "fucvam-homes": "Viviendas individuales y direcciones de residentes"
       }
     },
+    "fux-eg": {
+      "summary": "La cooperativa fux eG de Hamburgo gestiona colectivamente espacios para estudios, talleres, cultura, educación y colaboración orientada a la comunidad.",
+      "geographic_labels": {
+        "fux-eg-region": "Hamburgo, Alemania: espacios de uso cooperativo"
+      }
+    },
     "g0v": {
       "summary": "Una comunidad abierta de tecnología cívica de Taiwán que trabaja de forma colaborativa en problemas públicos y publica resultados, código fuente y documentación como bienes comunes digitales de libre acceso.",
       "geographic_labels": {},
       "digital_label": "Proyectos de tecnología cívica abiertos, datos y espacios de trabajo colaborativos"
+    },
+    "gaengeviertel-genossenschaft": {
+      "summary": "La comunidad de Gängeviertel en Hamburgo organiza espacios compartidos de cultura, vivienda y trabajo mediante la autogestión cooperativa y derechos de uso contractuales.",
+      "geographic_labels": {
+        "gaengeviertel-genossenschaft-region": "Gängeviertel, Hamburgo, Alemania"
+      }
     },
     "gbif": {
       "summary": "Una infraestructura mundial y federada de datos sobre biodiversidad en la que países, organizaciones, nodos y publicadores participantes aportan conjuntamente datos, estándares y servicios técnicos para el acceso abierto y los coordinan mediante órganos formales de gobernanza.",
@@ -284,6 +341,11 @@
         "kawawana-central-casamance": "Casamance central, Senegal — ancla regional amplia"
       }
     },
+    "kde": {
+      "summary": "La comunidad internacional de KDE desarrolla conjuntamente software de escritorio libre y herramientas digitales, con el apoyo de KDE e.V. y su gobernanza formal por miembros.",
+      "geographic_labels": {},
+      "digital_label": "Software de escritorio libre e infraestructura de desarrollo creados en colaboración"
+    },
     "kibera-public-space-project": {
       "summary": "Una red creciente de espacios públicos codiseñados y gestionados con grupos de residentes en Kibera, que vincula la resiliencia ante inundaciones, los servicios básicos, los lugares de encuentro y el uso económico local.",
       "geographic_labels": {
@@ -296,6 +358,12 @@
         "kobulu-penampang-area": "Zona de Penampang, Sabah, Malasia"
       },
       "digital_label": "Documentación del proyecto TONIBUNG sobre la tecnología y el modelo de gestión comunitaria"
+    },
+    "kudumbashree-community-network": {
+      "summary": "Grupos vecinales de mujeres en Kerala reúnen ahorros y organizan proyectos económicos y sociales compartidos mediante estructuras locales y federadas elegidas.",
+      "geographic_labels": {
+        "kudumbashree-community-network-region": "Kerala, India: grupos vecinales locales"
+      }
     },
     "kyrgyzstan-water-users-associations-union": {
       "summary": "Una unión nacional de Kirguistán que apoya asociaciones comunitarias de usuarios del agua, las cuales organizan a los usuarios, mantienen colectivamente sistemas de riego dentro de las explotaciones, coordinan acciones conjuntas y representan los intereses de sus miembros en la gestión del agua.",
@@ -445,6 +513,11 @@
       "geographic_labels": {},
       "digital_label": "Software médico libre, documentación y colaboración mundial"
     },
+    "openrefine": {
+      "summary": "Colaboradores internacionales mantienen conjuntamente OpenRefine, una herramienta de código abierto para limpiar y transformar datos, con decisiones del proyecto documentadas públicamente.",
+      "geographic_labels": {},
+      "digital_label": "Software y documentación de limpieza de datos mantenidos en colaboración"
+    },
     "openstreetmap": {
       "summary": "Una base de datos cartográfica abierta mundial cuyas carreteras, caminos y otros datos geográficos son cartografiados, corregidos y reutilizables libremente por los colaboradores.",
       "geographic_labels": {},
@@ -475,6 +548,12 @@
       },
       "digital_label": "Información de membresía, normas y coordinación digital de turnos para la operación cooperativa local"
     },
+    "pingala-cooperative": {
+      "summary": "La cooperativa energética australiana Pingala reúne inversiones de sus miembros para apoyar proyectos solares locales, con una gobernanza democrática de sus miembros.",
+      "geographic_labels": {
+        "pingala-cooperative-region": "Australia: proyectos solares comunitarios locales"
+      }
+    },
     "potato-park-peru": {
       "summary": "Un área cerca de Písac administrada por cinco comunidades quechuas donde se conservan de forma colectiva variedades nativas de papa, conocimientos agrícolas, ecosistemas y prácticas culturales.",
       "geographic_labels": {
@@ -486,6 +565,11 @@
       "geographic_labels": {
         "prinzessinnengarten-neukoelln": "Huerto comunitario en el cementerio Neuer St. Jacobi"
       }
+    },
+    "qgis": {
+      "summary": "Una comunidad internacional desarrolla QGIS, software geoespacial libre, con órganos elegidos y equipos que coordinan el código, la documentación y las decisiones.",
+      "geographic_labels": {},
+      "digital_label": "Sistema de información geográfica desarrollado por la comunidad"
     },
     "red-guardianes-semillas-ecuador": {
       "summary": "Una red ecuatoriana de familias y guardianes de semillas que conecta la agrobiodiversidad, la gestión regenerativa de la tierra, el conocimiento sobre semillas y el aprendizaje comunitario.",
@@ -550,6 +634,33 @@
       },
       "digital_label": "Portal de socios, información de proyectos y grupos locales"
     },
+    "sungai-utik-community-forest": {
+      "summary": "La comunidad dayak iban de Sungai Utik mantiene su bosque consuetudinario mediante normas comunitarias, uso sostenible y gestión ecológica a largo plazo.",
+      "geographic_labels": {
+        "sungai-utik-community-forest-region": "Sungai Utik, Kalimantan Occidental, Indonesia"
+      }
+    },
+    "te-hiku-media": {
+      "summary": "Te Hiku Media desarrolla archivos, conjuntos de datos y tecnologías de la lengua māori junto con las comunidades lingüísticas, priorizando la soberanía indígena sobre los datos frente a su publicación pública sin restricciones.",
+      "geographic_labels": {
+        "te-hiku-media-region": "Te Hiku, Aotearoa Nueva Zelanda"
+      },
+      "digital_label": "Archivos y herramientas de la lengua māori bajo soberanía indígena de datos"
+    },
+    "tela-botanica": {
+      "summary": "Una red francófona desarrolla conjuntamente observaciones botánicas, conocimientos sobre plantas y herramientas para la ciencia ciudadana accesible al público.",
+      "geographic_labels": {
+        "tela-botanica-region": "Francia y red botánica internacional"
+      },
+      "digital_label": "Plataforma compartida de observaciones y conocimientos botánicos"
+    },
+    "telecomunicaciones-indigenas-comunitarias": {
+      "summary": "Comunidades indígenas de México organizan y operan redes comunitarias de telecomunicaciones cuyo uso y mantenimiento locales están ligados a la gestión compartida.",
+      "geographic_labels": {
+        "telecomunicaciones-indigenas-comunitarias-region": "Comunidades indígenas de México"
+      },
+      "digital_label": "Redes de telecomunicaciones gestionadas por comunidades indígenas"
+    },
     "tetepare-descendants-association": {
       "summary": "Una gran asociación de propietarios de tierras en las Islas Salomón que protege y gestiona de forma colectiva la isla de Tetepare y sus recursos terrestres y marinos para las generaciones futuras.",
       "geographic_labels": {
@@ -564,6 +675,13 @@
       },
       "digital_label": "Base de datos pública Citizens’ Forest Database con información mantenida por las comunidades sobre los bosques comunitarios de Tailandia"
     },
+    "the-bristol-cable": {
+      "summary": "Una redacción local de Bristol, propiedad de sus miembros y gobernada democráticamente como cooperativa, produce periodismo de investigación financiado colectivamente.",
+      "geographic_labels": {
+        "the-bristol-cable-region": "Bristol, Reino Unido"
+      },
+      "digital_label": "Periodismo local de propiedad colectiva e investigación financiada por sus miembros"
+    },
     "the-things-network": {
       "summary": "Una red global de radio del Internet de las cosas construida con comunidades locales, que combina pasarelas LoRaWAN operadas por la comunidad, software abierto, recursos de aprendizaje e infraestructura comunitaria pública.",
       "geographic_labels": {
@@ -577,6 +695,12 @@
         "tla-o-qui-aht-clayoquot-sound": "Clayoquot Sound, Columbia Británica, Canadá"
       },
       "digital_label": "Información pública de los Tla-o-qui-aht Tribal Parks sobre gobernanza, trabajo de los Guardianes y participación responsable"
+    },
+    "tosepan-titataniske": {
+      "summary": "Cooperativas indígenas de la Sierra Norte de Puebla organizan la producción, transformación, financiación, educación y el abastecimiento local compartidos.",
+      "geographic_labels": {
+        "tosepan-titataniske-region": "Sierra Norte de Puebla, México"
+      }
     },
     "tribunal-aguas-valencia": {
       "summary": "Un tribunal de aguas gestionado por las comunidades de regantes de Valencia que resuelve en público y con regularidad los conflictos sobre el uso del agua conforme a la práctica establecida.",
