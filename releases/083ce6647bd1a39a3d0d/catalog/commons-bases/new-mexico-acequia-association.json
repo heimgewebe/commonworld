@@ -1,0 +1,58 @@
+{
+  "schema_version": 1,
+  "kind": "commonworld_commons_basis",
+  "project_id": "new-mexico-acequia-association",
+  "classification": "commons-infrastructure",
+  "decision": "include",
+  "reviewed_at": "2026-10-31",
+  "reviewer": "Commonworld editorial desk review",
+  "criteria": {
+    "shared_resource": {
+      "status": "supported",
+      "statement": "Wasserrechte, gemeinschaftliche Gräben und Kenntnisse zur gemeinschaftlichen Bewässerungssteuerung werden durch die lokalen Acequias als zusammenhängende Wasser-Commons gepflegt.",
+      "source_ids": [
+        "nmaa-about",
+        "nmaa-acequia-governance"
+      ]
+    },
+    "community": {
+      "status": "supported",
+      "statement": "Die landesweite Mitgliederorganisation verbindet Parciantes, Acequia-Gemeinschaften und Regionalverbände, ohne lokale Wasserrechte selbst zu übernehmen.",
+      "source_ids": [
+        "nmaa-membership",
+        "nmaa-about"
+      ]
+    },
+    "commoning_practice": {
+      "status": "supported",
+      "statement": "Der Verband schult Acequia-Verantwortliche, begleitet lokale Satzungen, organisiert gemeinschaftliche Interessenvertretung und stärkt Reparatur- und Wasserrechtswissen.",
+      "source_ids": [
+        "nmaa-acequia-governance",
+        "nmaa-about"
+      ]
+    },
+    "rules_and_responsibility": {
+      "status": "supported",
+      "statement": "Das Governance-Projekt unterstützt lokale gewählte Acequia-Amtsträger und Mitglieder beim Erlass von Satzungen, bei Wasserrechten und bei rechtlichen Streitfällen.",
+      "source_ids": [
+        "nmaa-acequia-governance",
+        "nmaa-membership"
+      ]
+    },
+    "common_benefit": {
+      "status": "supported",
+      "statement": "Gemeinsame Wissens- und Rechtsunterstützung soll lokale Bewässerungsrechte, Lebensmittelerzeugung, Kultur und Selbstverwaltung erhalten.",
+      "source_ids": [
+        "nmaa-about",
+        "nmaa-acequia-governance"
+      ]
+    }
+  },
+  "confidence": 0.91,
+  "limitations": [
+    "NMAA ist Interessenvertretung und Governance-Hilfe; Eigentum und verbindliche Wasserverteilung bleiben bei den örtlichen Acequias.",
+    "Nicht jede lokale Acequia wird durch dieselben Satzungsregeln oder ein einziges NMAA-Gremium gesteuert.",
+    "Eine Aussage über aktuelle individuelle Nutzungsquoten oder Wasserverfügbarkeit ist hier nicht belegt."
+  ],
+  "notes": "Föderierte Governance-Unterstützung lokaler Wasser-Commons mit Satzungs-, Amts- und Rechtsberatung; keine fiktive zentrale Wasserhoheit."
+}

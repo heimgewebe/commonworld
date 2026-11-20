@@ -1,0 +1,53 @@
+{
+  "schema_version": 1,
+  "kind": "commonworld_commons_basis",
+  "project_id": "bali-subak-system",
+  "classification": "common",
+  "decision": "include",
+  "reviewed_at": "2026-10-31",
+  "reviewer": "Commonworld editorial desk review",
+  "criteria": {
+    "shared_resource": {
+      "status": "supported",
+      "statement": "Wasser, Tempel- und Kanalstrukturen verbinden landwirtschaftliche Reisfelder in lokalen gemeinschaftlichen Bewässerungssystemen.",
+      "source_ids": [
+        "subak-unesco"
+      ]
+    },
+    "community": {
+      "status": "supported",
+      "statement": "Bäuerliche Subak-Gemeinschaften verwalten ihre jeweiligen Bewässerungssysteme im kulturellen Tri-Hita-Karana-Rahmen.",
+      "source_ids": [
+        "subak-unesco"
+      ]
+    },
+    "commoning_practice": {
+      "status": "supported",
+      "statement": "Mitglieder koordinieren Wasserzufuhr, landwirtschaftliche Zyklen, Tempelrituale und die Pflege von Kanälen.",
+      "source_ids": [
+        "subak-unesco"
+      ]
+    },
+    "rules_and_responsibility": {
+      "status": "supported",
+      "statement": "Die UNESCO-Dokumentation beschreibt demokratische, partizipative Verwaltung durch lokale Subak-Organisationen und institutionelle Wasserregelung.",
+      "source_ids": [
+        "subak-unesco"
+      ]
+    },
+    "common_benefit": {
+      "status": "supported",
+      "statement": "Gemeinsame Bewässerung trägt lokale Reisproduktion, Landschaftspflege und die Bewahrung regionalen Kulturwissens.",
+      "source_ids": [
+        "subak-unesco"
+      ]
+    }
+  },
+  "confidence": 0.92,
+  "limitations": [
+    "Subak-Rechte gehören konkreten lokalen Bauerngruppen; nicht jeder Einwohner kann die Wasserquoten mitbestimmen.",
+    "UNESCO-Dokumentation ist kein aktueller Betriebsnachweis für jedes der vielen Subak-Systeme.",
+    "Die Insel bildet keine einzige rechtsfähige Wasser-Commons-Genossenschaft."
+  ],
+  "notes": "Kulturell verwurzelte lokale Wasser-Commons mit institutionalisierten Subak-Regeln."
+}

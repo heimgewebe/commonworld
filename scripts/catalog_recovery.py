@@ -87,6 +87,8 @@ def _page_copy(locale: str) -> dict[str, str]:
             "description": "Begrenzte, statische Katalogseiten für den Zugriff ohne JavaScript.",
             "back": "← Zum Globus",
             "page": "Seite {number} von {count}",
+            "nav_top": "Katalogseiten oberhalb der Einträge",
+            "nav_bottom": "Katalogseiten unterhalb der Einträge",
             "previous": "← Vorherige Seite",
             "next": "Nächste Seite →",
             "project": "Projektseite",
@@ -108,6 +110,8 @@ def _page_copy(locale: str) -> dict[str, str]:
         "description": "Bounded static catalog pages for access without JavaScript.",
         "back": "← Back to the globe",
         "page": "Page {number} of {count}",
+        "nav_top": "Catalog pages above entries",
+        "nav_bottom": "Catalog pages below entries",
         "previous": "← Previous page",
         "next": "Next page →",
         "project": "Project page",
@@ -184,11 +188,11 @@ def render_index(records: list[dict], locale: str, number: int, root: Path = ROO
       <h1>{copy_text["catalog"]}</h1>
       <p><a class="secondary-back-link" href="{'/de.html' if locale == 'de' else '/'}">{copy_text["back"]}</a></p>
       <p>{copy_text["all_entries"]}</p>
-      <nav aria-label="{html.escape(page_label, quote=True)}"><p><strong>{html.escape(page_label)}</strong>{' · ' + navigation if navigation else ''}</p></nav>
+      <nav aria-label="{html.escape(copy_text["nav_top"], quote=True)}"><p><strong>{html.escape(page_label)}</strong>{' · ' + navigation if navigation else ''}</p></nav>
       <div class="catalog-grid" data-recovery-page="{number}" data-recovery-page-size="{PAGE_SIZE}">
 {cards}
       </div>
-      <nav aria-label="{html.escape(page_label, quote=True)}"><p>{navigation}</p></nav>
+      <nav aria-label="{html.escape(copy_text["nav_bottom"], quote=True)}"><p>{navigation}</p></nav>
     </main>'''
     return _document(
         locale=locale,
