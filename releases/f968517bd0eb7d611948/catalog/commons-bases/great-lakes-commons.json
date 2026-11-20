@@ -1,0 +1,56 @@
+{
+  "schema_version": 1,
+  "kind": "commonworld_commons_basis",
+  "project_id": "great-lakes-commons",
+  "classification": "undetermined",
+  "decision": "needs_information",
+  "reviewed_at": "2026-10-31",
+  "reviewer": "Commonworld editorial desk review",
+  "criteria": {
+    "shared_resource": {
+      "status": "supported",
+      "statement": "Gewässer, Ökosysteme und gemeinsame Verantwortung für die Großen Seen werden als bioregionales öffentliches Gut begriffen.",
+      "source_ids": [
+        "great-lakes-why",
+        "glc-charter"
+      ]
+    },
+    "community": {
+      "status": "supported",
+      "statement": "Verschiedene indigene und nichtindigene Gruppen bilden ein grenzüberschreitendes Wasserschutznetzwerk.",
+      "source_ids": [
+        "great-lakes-home",
+        "glc-charter"
+      ]
+    },
+    "commoning_practice": {
+      "status": "supported",
+      "statement": "Aktivisten und Gemeinschaften entwickeln gemeinsame Prinzipien, veranstalten Konsultationen und organisieren Wasserschutzarbeit.",
+      "source_ids": [
+        "great-lakes-home",
+        "glc-charter"
+      ]
+    },
+    "rules_and_responsibility": {
+      "status": "partial",
+      "statement": "Die Charta ist ausdrücklich aspirativ; ihr fehlen rechtlich bindende gemeinsame Vergaberechte, Mitgliedsvetos und Wasserstreitverfahren.",
+      "source_ids": [
+        "glc-charter"
+      ]
+    },
+    "common_benefit": {
+      "status": "supported",
+      "statement": "Die Principles sollen Gewässerschutz und Interessen künftiger Generationen in der gesamten Region stärken.",
+      "source_ids": [
+        "glc-charter"
+      ]
+    }
+  },
+  "confidence": 0.85,
+  "limitations": [
+    "Die Charta verleiht dem Netzwerk keine tatsächliche Hoheit über Wassernutzungsrechte oder Staatsgrenzen.",
+    "Indigene Land-/Gewässerhoheit darf nicht einer fiktiven übergeordneten Commonsorganisation zugerechnet werden.",
+    "Aktuelle verbindliche Entscheidungs- und Konfliktinstitutionen sind noch zu belegen."
+  ],
+  "notes": "Aspirative Wasser-Allmende-Idee mit praktischer Netzwerkbildung, jedoch ohne nachgewiesene gemeinsame Rechtsmacht."
+}

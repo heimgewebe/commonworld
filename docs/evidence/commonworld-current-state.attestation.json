@@ -1,13 +1,13 @@
 {
   "current_state": {
     "path": "contracts/commonworld/current-state.contract.json",
-    "sha256": "3c034e45a1035c53f34d51043d898c165931890bb97c410db9a9c7c565763489"
+    "sha256": "6f30c470f5545f9baf7a14abf7dabfb6d899e66aa8bad49af910e9841aa14c86"
   },
   "kind": "commonworld.current_state_release_attestation",
   "public_release": {
     "manifest_path": "assets/commonworld-page-builds.json",
-    "manifest_sha256": "56631e15986720dc4192987a0d325200fbd9650efa80a8d91498ad06356f5b5f",
-    "release_id": "348c8b00898cd4a88279"
+    "manifest_sha256": "096a8d7c093478bb30827cbbbeec372dbfc250ae0a0acb282ab0eab8bd6fd809",
+    "release_id": "f968517bd0eb7d611948"
   },
   "schema_version": 1
 }

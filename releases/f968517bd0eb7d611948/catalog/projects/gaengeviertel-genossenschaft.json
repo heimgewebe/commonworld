@@ -1,0 +1,88 @@
+{
+  "schema_version": 4,
+  "id": "gaengeviertel-genossenschaft",
+  "title": "Gängeviertel Genossenschaft 2010 eG",
+  "summary": "Die Hamburger Gängeviertel-Gemeinschaft organisiert gemeinschaftliche Kultur-, Wohn- und Arbeitsräume im Rahmen genossenschaftlicher Selbstverwaltung und vertraglich gesicherter Nutzungsrechte.",
+  "themes": [
+    "cultural-heritage",
+    "housing",
+    "community-land",
+    "commons-governance"
+  ],
+  "actions": [
+    "learn"
+  ],
+  "presence": {
+    "geographic": [
+      {
+        "id": "gaengeviertel-genossenschaft-region",
+        "mode": "hidden",
+        "label": "Gängeviertel, Hamburg, Deutschland",
+        "privacy_note": "Region und gemeinschaftlicher Wirkungsraum sind belegt; ohne gesondert verifizierte öffentliche Geometrie wird kein künstlicher Ortsmarker gesetzt.",
+        "source_ids": [
+          "gaengeviertel-genossenschaft-home"
+        ]
+      }
+    ],
+    "digital": {
+      "available": false,
+      "source_ids": [
+        "gaengeviertel-genossenschaft-home"
+      ]
+    }
+  },
+  "activity": {
+    "status": "unknown",
+    "observed_at": "2026-11-20",
+    "source_ids": [
+      "gaengeviertel-genossenschaft-home"
+    ],
+    "note": "Die dokumentierte Praxis ist belegt, ihr operativer Status wurde in dieser Aufnahme nicht als tagesaktuell verifiziert."
+  },
+  "provenance": {
+    "sources": [
+      {
+        "id": "gaengeviertel-genossenschaft-home",
+        "type": "official-source",
+        "label": "Gängeviertel Genossenschaft 2010 eG – Projektinformation",
+        "url": "https://das-gaengeviertel.info/",
+        "retrieved_at": "2026-11-20",
+        "note": "Öffentliche projektnahe Information über die gemeinsame Ressource und die Beteiligten."
+      },
+      {
+        "id": "gaengeviertel-genossenschaft-governance",
+        "type": "official-source",
+        "label": "Gängeviertel Genossenschaft 2010 eG – Organisation und Regeln",
+        "url": "https://www.hamburg.de/politik-und-verwaltung/bezirke/mitte/themen/planen-bauen-wohnen/gaengeviertel/vertrag-268782",
+        "retrieved_at": "2026-11-20",
+        "note": "Projektnahe Details zu gemeinsamen Praktiken, Organisation oder relevanten Grenzen."
+      }
+    ]
+  },
+  "curation": {
+    "state": "listed",
+    "catalogued_at": "2026-11-20",
+    "reviewed_by": "Commonworld editorial review",
+    "reviewed_at": "2026-11-20",
+    "next_review_at": "2027-01-03",
+    "notes": "Aktueller Betriebszustand nicht zeitnah verifiziert. Neue quellengebundene Commons-Aufnahme; Wiedervorlage innerhalb von 45 Tagen."
+  },
+  "links": [
+    {
+      "type": "homepage",
+      "label": "Gängeviertel Genossenschaft 2010 eG – offizielle Seite",
+      "url": "https://das-gaengeviertel.info/"
+    },
+    {
+      "type": "learn",
+      "label": "Gemeinsame Praxis und Verantwortung kennenlernen",
+      "url": "https://www.hamburg.de/politik-und-verwaltung/bezirke/mitte/themen/planen-bauen-wohnen/gaengeviertel/vertrag-268782",
+      "source_ids": [
+        "gaengeviertel-genossenschaft-governance"
+      ]
+    }
+  ],
+  "handoff": {
+    "enabled": false
+  }
+}
