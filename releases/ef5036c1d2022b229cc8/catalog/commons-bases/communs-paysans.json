@@ -1,0 +1,57 @@
+{
+  "schema_version": 1,
+  "kind": "commonworld_commons_basis",
+  "project_id": "communs-paysans",
+  "classification": "common",
+  "decision": "include",
+  "reviewed_at": "2026-11-20",
+  "reviewer": "Commonworld editorial desk review",
+  "criteria": {
+    "shared_resource": {
+      "status": "supported",
+      "statement": "Baupläne, Dokumentation und praktisches Wissen über selbstgebaute Agrarwerkzeuge bilden die gemeinsame Wissensressource.",
+      "source_ids": [
+        "communs-paysans-home",
+        "communs-paysans-governance"
+      ]
+    },
+    "community": {
+      "status": "supported",
+      "statement": "Bäuerliche Selbstbaugruppen und neue Vereine wie Communs Paysans und Soudons, fermes! erhalten die Praxis.",
+      "source_ids": [
+        "communs-paysans-home",
+        "communs-paysans-governance"
+      ]
+    },
+    "commoning_practice": {
+      "status": "supported",
+      "statement": "Menschen teilen Pläne, führen Werkstattlernen weiter und entwickeln gemeinschaftliche Werkzeuganpassungen.",
+      "source_ids": [
+        "communs-paysans-home",
+        "communs-paysans-governance"
+      ]
+    },
+    "rules_and_responsibility": {
+      "status": "supported",
+      "statement": "Vereinsstrukturen und dokumentierte Nutzungs- beziehungsweise Wissenspraktiken ordnen die Nachfolgearbeit.",
+      "source_ids": [
+        "communs-paysans-home",
+        "communs-paysans-governance"
+      ]
+    },
+    "common_benefit": {
+      "status": "supported",
+      "statement": "Bauern erhalten Zugang zu anpassbarem technischen Wissen jenseits ausschließlicher industrieller Herstellerkontrolle.",
+      "source_ids": [
+        "communs-paysans-home",
+        "communs-paysans-governance"
+      ]
+    }
+  },
+  "confidence": 0.77,
+  "limitations": [
+    "Die frühere SCIC L’Atelier Paysan wurde am 21. April 2026 liquidiert und darf nicht als aktive Betreiberin dargestellt werden.",
+    "Welche spezifischen alten Vermögenswerte auf welche Vereine übergingen, ist getrennt vom Fortbestand der Wissens-Commons zu prüfen."
+  ],
+  "notes": "Eigenständige Aufnahme: begrenzte quellengebundene Fünfkriterien-Prüfung. Keine ungeprüften Mitglieds-, Eigentums- oder Betriebsrechte behauptet."
+}

@@ -218,7 +218,29 @@ html { font-size: ${profile.fontScale}% !important; }
   await fillValid(page, 'Success Test Commons');
   await page.getByRole('button', { name: 'Prepare public GitHub issue' }).click();
   await page.getByText('GitHub was opened.').waitFor();
-  assert((await page.getByRole('link', { name: 'Open GitHub directly' }).getAttribute('href')).includes('body='), 'success: structured issue body missing');
+  const issueUrl = new URL(await page.getByRole('link', { name: 'Open GitHub directly' }).getAttribute('href'));
+  const issueId = issueUrl.searchParams.get('body')?.match(/\*\*Suggestion ID:\*\* `([^`]+)`/u)?.[1];
+  assert(issueId, 'success: structured issue identity missing');
+  async function downloadProposal() {
+    const pending = page.waitForEvent('download');
+    await page.getByRole('button', { name: 'Download validated JSON' }).click();
+    const stream = await (await pending).createReadStream();
+    const chunks = [];
+    for await (const chunk of stream) chunks.push(chunk);
+    return JSON.parse(Buffer.concat(chunks).toString('utf8'));
+  }
+  const unchanged = await downloadProposal();
+  assert(unchanged.proposal_id === issueId, 'success: unchanged download lost prepared identity');
+  const editedDescription = 'Updated communal resource with open rules, official sources, and a public participation path.';
+  await page.getByLabel('Short description').fill(editedDescription);
+  const edited = await downloadProposal();
+  assert(edited.project.description === editedDescription && edited.proposal_id !== issueId, 'success: edited download reused stale proposal');
+  await page.getByLabel('Name of the Commons').fill('');
+  let invalidDownload = false;
+  page.once('download', () => { invalidDownload = true; });
+  await page.getByRole('button', { name: 'Download validated JSON' }).click();
+  assert(await page.getByRole('alert').isVisible() && !invalidDownload, 'success: invalid edited form downloaded');
+  results.push('download-revalidates-prepared-form');
   results.push('success-message');
   await context.close();
 }

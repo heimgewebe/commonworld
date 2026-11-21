@@ -8,6 +8,7 @@ import {
   containsSensitiveLocation,
   isSafeHttpsUrl,
   proposalFromFields,
+  reusePreparedProposalIdentity,
   restoreProposalReleaseDraft,
   storeProposalReleaseDraft,
   validateProposal,
@@ -215,4 +216,52 @@ test("release draft storage failure is explicit and non-mutating", () => {
   };
   assert.equal(storeProposalReleaseDraft(form, storage, () => 1_000), false);
   assert.equal(form.elements.name.value, "Keep visible");
+});
+
+test("JSON download revalidates current visible form after GitHub preparation", () => {
+  const source = readFileSync(new URL("../../assets/commonworld-proposal.js", import.meta.url), "utf8");
+  const start = source.indexOf('download.addEventListener("click"');
+  assert.notEqual(start, -1);
+  const end = source.indexOf("\n  });", start);
+  assert.notEqual(end, -1);
+  const handler = source.slice(start, end);
+  assert.match(handler, /const result = validateCurrent\(\);/u);
+  assert.doesNotMatch(handler, /lastProposal/u);
+  assert.match(handler, /reusePreparedProposalIdentity\(result\.proposal, preparedProposal\)/u);
+  assert.match(handler, /validateProposal\(proposal, catalog\.titles, catalog\.hosts\)/u);
+});
+
+test("same-second content edits produce valid distinct identities for short and maximum slugs", () => {
+  const time = new Date("2026-11-20T05:00:00Z");
+  const pattern = /^cw-[0-9]{8}t[0-9]{6}z-[a-z0-9-]{3,48}$/u;
+  for (const name of ["Short", "a".repeat(48)]) {
+    const prepared = proposalFromFields({ ...fields, name }, time);
+    const edits = ["First edit.", "Second edit."].map((text) =>
+      reusePreparedProposalIdentity(proposalFromFields({ ...fields, name, description: `${fields.description} ${text}` }, time), prepared));
+    assert.notEqual(edits[0].proposal_id, edits[1].proposal_id);
+    for (const edit of edits) {
+      assert.notEqual(edit.proposal_id, prepared.proposal_id);
+      assert.match(edit.proposal_id, pattern);
+      assert.ok(edit.proposal_id.length <= 68);
+      assert.deepEqual(validateProposal(edit), []);
+    }
+    assert.deepEqual(reusePreparedProposalIdentity(proposalFromFields({ ...fields, name }, time), prepared), prepared);
+  }
+});
+
+test("GitHub prefill and JSON download keep the same identity only for unchanged proposal content", () => {
+  const prepared = proposalFromFields(fields, new Date("2026-11-20T05:00:00Z"));
+  const revalidated = proposalFromFields(fields, new Date("2026-11-20T05:00:01Z"));
+  assert.notDeepEqual(revalidated, prepared, "fresh validation creates a distinct identity");
+  assert.deepEqual(reusePreparedProposalIdentity(revalidated, prepared), prepared);
+  const edited = proposalFromFields(
+    { ...fields, name: "Edited Example Commons" },
+    new Date("2026-11-20T05:00:02Z"),
+  );
+  assert.deepEqual(reusePreparedProposalIdentity(edited, prepared), edited);
+  const sameSecondEdit = proposalFromFields({ ...fields, description: `${fields.description} Updated.` }, new Date("2026-11-20T05:00:00Z"));
+  const distinct = reusePreparedProposalIdentity(sameSecondEdit, prepared);
+  assert.notEqual(distinct.proposal_id, prepared.proposal_id);
+  assert.equal(distinct.project.description, sameSecondEdit.project.description);
+  assert.deepEqual(reusePreparedProposalIdentity(revalidated, null), revalidated);
 });

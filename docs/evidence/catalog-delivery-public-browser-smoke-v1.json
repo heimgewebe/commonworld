@@ -221,7 +221,7 @@
       "portraitPaintedPrimaryLabels": [
         {
           "layer": "knowledge_learning_culture",
-          "changedPixels": 6951
+          "changedPixels": 2514
         },
         {
           "layer": "communication_networks",
@@ -241,15 +241,15 @@
         "representativePrimaryLabels": [
           {
             "text": "Knowledge, Learning and Culture · 15    LibriVox  MusicBrainz  Open Library  OpenRefine  Peer 2 Peer Unive…  Safecast",
-            "width": 436.8320617675781,
-            "height": 424.9935302734375,
+            "width": 434.6533203125,
+            "height": 422.6504821777344,
             "fontSize": 25.26,
             "visible": true
           },
           {
             "text": "Cooperation and Self-Organization · 7    Bologna Urban Com…  Enspiral  g0v  Green Coop  l’Asilo  National Communal…",
-            "width": 397.3632507324219,
-            "height": 338.944580078125,
+            "width": 399.47357177734375,
+            "height": 341.8934326171875,
             "fontSize": 25.26,
             "visible": true
           }
@@ -361,7 +361,7 @@
     {
       "id": "layer-journey-moveend-return",
       "verdict": "PASS",
-      "elapsedMs": 1264
+      "elapsedMs": 1669
     },
     {
       "id": "layer-journey-missing-moveend-fallback",
@@ -469,8 +469,8 @@
       "verdict": "PASS",
       "blockedCatalogRequests": 0,
       "observedCatalogRequests": [
-        "/releases/3e43aae630b8ef692825/catalog/runtime/aggregate.v1.json",
-        "/releases/3e43aae630b8ef692825/catalog/runtime/manifest.v1.json"
+        "/releases/ef5036c1d2022b229cc8/catalog/runtime/aggregate.v1.json",
+        "/releases/ef5036c1d2022b229cc8/catalog/runtime/manifest.v1.json"
       ]
     },
     {
@@ -528,7 +528,7 @@
     }
   ],
   "binding": {
-    "first_party_surface_sha256": "be8afc5abec33e0710bc4fa0b97e9e391af74e1f34e31d7fa3fb35ea0aefac1e",
+    "first_party_surface_sha256": "17b8699c62bd998f3e92b2886b6d86271ed73c0dd3fa457d6c701d867bda044f",
     "scenario_ids": [
       "startup-and-ring-orbits",
       "low-memory-map-cache-policy",

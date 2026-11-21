@@ -1,0 +1,56 @@
+{
+  "schema_version": 1,
+  "kind": "commonworld_commons_basis",
+  "project_id": "open-source-ecology",
+  "classification": "undetermined",
+  "decision": "needs_information",
+  "reviewed_at": "2026-10-31",
+  "reviewer": "Commonworld editorial desk review",
+  "criteria": {
+    "shared_resource": {
+      "status": "supported",
+      "statement": "Öffentlich verfügbare offene Maschinenbauentwürfe, Dokumentationen und erprobte Hardwarekonzepte bilden die gemeinsam nutzbare Wissensressource.",
+      "source_ids": [
+        "ose-home",
+        "ose-factor-e-farm"
+      ]
+    },
+    "community": {
+      "status": "supported",
+      "statement": "Entwickler, Maker und Workshopteilnehmer tragen Dokumentation und Verbesserung offener Industrieentwürfe zusammen.",
+      "source_ids": [
+        "ose-home"
+      ]
+    },
+    "commoning_practice": {
+      "status": "supported",
+      "statement": "Beteiligte zeichnen Maschinenmodelle, fertigen Prototypen an, testen Konzepte und dokumentieren Kenntnisse gemeinsam.",
+      "source_ids": [
+        "ose-home",
+        "ose-factor-e-farm"
+      ]
+    },
+    "rules_and_responsibility": {
+      "status": "partial",
+      "statement": "OSE veröffentlicht Rollen und Delegation im Factor-e-Farm-Projekt, aber stark zentralisierte Gründerkompetenz und keine nachgewiesene gemeinsame Stimmhoheit der weltweiten Open-Hardware-Beitragenden.",
+      "source_ids": [
+        "ose-farm-roles",
+        "ose-factor-e-farm"
+      ]
+    },
+    "common_benefit": {
+      "status": "supported",
+      "statement": "Frei nachbaubare Entwürfe fördern Fertigungswissen, Reparierbarkeit und selbstständige produktive Fähigkeiten.",
+      "source_ids": [
+        "ose-home"
+      ]
+    }
+  },
+  "confidence": 0.88,
+  "limitations": [
+    "Die Farm wurde durch die Organisation erworben; sie ist nicht automatisch von allen Codebeitragenden kollektiv besessen.",
+    "Ein offen lizenziertes Maschinenmodell begründet keine demokratische Mitentscheidung über das Projektvermögen.",
+    "Visionen zu vollständiger Industrieautarkie dürfen nicht als bereits realisierter Zustand dargestellt werden."
+  ],
+  "notes": "Offenes technisches Wissensgut, aber keine hinreichend nachgewiesene kollektive Kontrolle der Organisation und Farm."
+}
