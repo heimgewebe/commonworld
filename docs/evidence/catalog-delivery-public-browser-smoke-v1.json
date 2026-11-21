@@ -241,15 +241,15 @@
         "representativePrimaryLabels": [
           {
             "text": "Knowledge, Learning and Culture · 15    LibriVox  MusicBrainz  Open Library  OpenRefine  Peer 2 Peer Unive…  Safecast",
-            "width": 434.4708251953125,
-            "height": 422.4543151855469,
+            "width": 434.6533203125,
+            "height": 422.6504821777344,
             "fontSize": 25.26,
             "visible": true
           },
           {
             "text": "Cooperation and Self-Organization · 7    Bologna Urban Com…  Enspiral  g0v  Green Coop  l’Asilo  National Communal…",
-            "width": 399.6471862792969,
-            "height": 342.1370544433594,
+            "width": 399.47357177734375,
+            "height": 341.8934326171875,
             "fontSize": 25.26,
             "visible": true
           }
@@ -361,7 +361,7 @@
     {
       "id": "layer-journey-moveend-return",
       "verdict": "PASS",
-      "elapsedMs": 1886
+      "elapsedMs": 1669
     },
     {
       "id": "layer-journey-missing-moveend-fallback",
@@ -370,9 +370,9 @@
       "movementDiagnostics": [
         {
           "index": 0,
-          "geometryEvaluationDelta": 14,
+          "geometryEvaluationDelta": 12,
           "diagnosticPublishDelta": 3,
-          "sampledEvaluationCount": 13,
+          "sampledEvaluationCount": 11,
           "maxDiagnosticPublishes": 3
         },
         {
@@ -469,8 +469,8 @@
       "verdict": "PASS",
       "blockedCatalogRequests": 0,
       "observedCatalogRequests": [
-        "/releases/6fcc5039fad774ba5ffd/catalog/runtime/aggregate.v1.json",
-        "/releases/6fcc5039fad774ba5ffd/catalog/runtime/manifest.v1.json"
+        "/releases/ef5036c1d2022b229cc8/catalog/runtime/aggregate.v1.json",
+        "/releases/ef5036c1d2022b229cc8/catalog/runtime/manifest.v1.json"
       ]
     },
     {
@@ -528,7 +528,7 @@
     }
   ],
   "binding": {
-    "first_party_surface_sha256": "bc875db49b1e0244ab2956f63ae08844c3b756c80157bb6667c5ea297f8f63ec",
+    "first_party_surface_sha256": "17b8699c62bd998f3e92b2886b6d86271ed73c0dd3fa457d6c701d867bda044f",
     "scenario_ids": [
       "startup-and-ring-orbits",
       "low-memory-map-cache-policy",

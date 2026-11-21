@@ -377,7 +377,13 @@ export function reusePreparedProposalIdentity(current, prepared) {
     return { ...current, proposal_id: prepared.proposal_id, submitted_at: prepared.submitted_at };
   }
   if (current.proposal_id === prepared.proposal_id) {
-    return { ...current, proposal_id: `${current.proposal_id.slice(0, 68).replace(/-+$/u, "")}-2` };
+    let hash = 0x811c9dc5;
+    const content = comparable(current);
+    for (let index = 0; index < content.length; index += 1) {
+      hash = Math.imul(hash ^ content.charCodeAt(index), 0x01000193);
+    }
+    const suffix = `-${(hash >>> 0).toString(36)}`;
+    return { ...current, proposal_id: `${current.proposal_id.slice(0, 68 - suffix.length).replace(/-+$/u, "")}${suffix}` };
   }
   return current;
 }
@@ -626,7 +632,10 @@ function init() {
   download.addEventListener("click", () => {
     const result = validateCurrent();
     if (result.errors.length) { renderErrors(result.errors, errorsNode); return; }
-    downloadJson(reusePreparedProposalIdentity(result.proposal, preparedProposal));
+    const proposal = reusePreparedProposalIdentity(result.proposal, preparedProposal);
+    const errors = validateProposal(proposal, catalog.titles, catalog.hosts);
+    if (errors.length) { renderErrors(errors, errorsNode); return; }
+    downloadJson(proposal);
     statusNode.textContent = tr("Validierte JSON-Datei lokal erstellt. Commonworld hat den Inhalt nicht gespeichert.", "Validated JSON file created locally. Commonworld did not store its contents.");
   });
 }

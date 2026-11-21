@@ -228,6 +228,25 @@ test("JSON download revalidates current visible form after GitHub preparation", 
   assert.match(handler, /const result = validateCurrent\(\);/u);
   assert.doesNotMatch(handler, /lastProposal/u);
   assert.match(handler, /reusePreparedProposalIdentity\(result\.proposal, preparedProposal\)/u);
+  assert.match(handler, /validateProposal\(proposal, catalog\.titles, catalog\.hosts\)/u);
+});
+
+test("same-second content edits produce valid distinct identities for short and maximum slugs", () => {
+  const time = new Date("2026-11-20T05:00:00Z");
+  const pattern = /^cw-[0-9]{8}t[0-9]{6}z-[a-z0-9-]{3,48}$/u;
+  for (const name of ["Short", "a".repeat(48)]) {
+    const prepared = proposalFromFields({ ...fields, name }, time);
+    const edits = ["First edit.", "Second edit."].map((text) =>
+      reusePreparedProposalIdentity(proposalFromFields({ ...fields, name, description: `${fields.description} ${text}` }, time), prepared));
+    assert.notEqual(edits[0].proposal_id, edits[1].proposal_id);
+    for (const edit of edits) {
+      assert.notEqual(edit.proposal_id, prepared.proposal_id);
+      assert.match(edit.proposal_id, pattern);
+      assert.ok(edit.proposal_id.length <= 68);
+      assert.deepEqual(validateProposal(edit), []);
+    }
+    assert.deepEqual(reusePreparedProposalIdentity(proposalFromFields({ ...fields, name }, time), prepared), prepared);
+  }
 });
 
 test("GitHub prefill and JSON download keep the same identity only for unchanged proposal content", () => {
