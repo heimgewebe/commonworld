@@ -1,0 +1,55 @@
+{
+  "schema_version": 1,
+  "kind": "commonworld_commons_basis",
+  "project_id": "wikidata",
+  "classification": "common",
+  "decision": "include",
+  "reviewed_at": "2026-10-30",
+  "reviewer": "Commonworld editorial desk review",
+  "criteria": {
+    "shared_resource": {
+      "status": "supported",
+      "statement": "Die offene mehrsprachige Wissensdatenbank aus gemeinsam erstellten Objekten und Aussagen ist die geteilte Ressource.",
+      "source_ids": [
+        "wikidata-introduction",
+        "wikimedia-projects"
+      ]
+    },
+    "community": {
+      "status": "supported",
+      "statement": "Die internationale Gemeinschaft von Datenbearbeitern entwickelt und pflegt Wikidata.",
+      "source_ids": [
+        "wikidata-introduction"
+      ]
+    },
+    "commoning_practice": {
+      "status": "supported",
+      "statement": "Menschen und regulierte Bots ergänzen und korrigieren Datenobjekte, Eigenschaften, Belege und Qualität gemeinsam.",
+      "source_ids": [
+        "wikidata-introduction"
+      ]
+    },
+    "rules_and_responsibility": {
+      "status": "supported",
+      "statement": "Die Community entwickelt Inhaltsregeln und bindende Lizenzbedingungen für strukturierte Daten und übrige Texte.",
+      "source_ids": [
+        "wikidata-introduction",
+        "wikidata-licensing"
+      ]
+    },
+    "common_benefit": {
+      "status": "supported",
+      "statement": "CC0-Daten können auch außerhalb des Projektverbunds frei verwendet und weiterentwickelt werden.",
+      "source_ids": [
+        "wikidata-licensing"
+      ]
+    }
+  },
+  "confidence": 0.94,
+  "limitations": [
+    "Die Datensätze stehen unter CC0, andere textliche Namensräume häufig unter CC BY-SA.",
+    "Offene Beiträge erfordern Prüfung und bedeuten keine Gewähr für einzelne Fakten.",
+    "Keine erneute tagesaktuelle Prüfung sämtlicher Community-Aktivitäten."
+  ],
+  "notes": "Digitales strukturiertes Wissens-Common mit konkreter gemeinschaftlicher Pflege und expliziten Lizenzregeln."
+}

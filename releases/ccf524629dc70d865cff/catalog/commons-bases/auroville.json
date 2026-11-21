@@ -1,0 +1,58 @@
+{
+  "schema_version": 1,
+  "kind": "commonworld_commons_basis",
+  "project_id": "auroville",
+  "classification": "undetermined",
+  "decision": "needs_information",
+  "reviewed_at": "2026-10-30",
+  "reviewer": "Commonworld editorial desk review",
+  "criteria": {
+    "shared_resource": {
+      "status": "supported",
+      "statement": "Land und gemeinschaftliche Einrichtungen sind Teil des Vermögens der Auroville Foundation und nicht individuellem Eigentum einzelner Bewohner zugeordnet.",
+      "source_ids": [
+        "auroville-legal",
+        "auroville-governing-board"
+      ]
+    },
+    "community": {
+      "status": "supported",
+      "statement": "Die registrierten erwachsenen Bewohner bilden eine gesetzlich definierte Residents' Assembly.",
+      "source_ids": [
+        "auroville-residents-assembly",
+        "auroville-legal"
+      ]
+    },
+    "commoning_practice": {
+      "status": "supported",
+      "statement": "Gemeinschaftsmitglieder betreiben Lern-, Stadt- und Versorgungsprojekte und organisieren lokale Arbeit.",
+      "source_ids": [
+        "auroville-home",
+        "auroville-legal"
+      ]
+    },
+    "rules_and_responsibility": {
+      "status": "partial",
+      "statement": "Die Residents' Assembly besitzt bestimmte Vorschlags- und Beteiligungsrechte; das staatlich bestellte Governing Board führt die übergeordneten Verwaltungs- und Vermögensbefugnisse. Die Durchsetzung kommunaler Kontrolle bleibt offen.",
+      "source_ids": [
+        "auroville-residents-assembly",
+        "auroville-governing-board"
+      ]
+    },
+    "common_benefit": {
+      "status": "supported",
+      "statement": "Die gemeinnützige Stadt- und Bildungsinfrastruktur ist auf gemeinschaftliche Entwicklung und internationale Kooperation gerichtet.",
+      "source_ids": [
+        "auroville-home",
+        "auroville-legal"
+      ]
+    }
+  },
+  "confidence": 0.8,
+  "limitations": [
+    "Rechtliche Foundation-Trägerschaft ist nicht gleich demokratische Eigentümerstellung aller Bewohner.",
+    "Das staatlich eingesetzte Board behält wichtige Befugnisse; Community-Autonomie darf nicht behauptet werden.",
+    "Aktuelle Konfliktentscheidungen und verbindliche Mitbestimmungsergebnisse sind nicht unabhängig geprüft."
+  ],
+  "notes": "Gemeinschaftliche Ressourcen und Arbeitspraxis klar; vollständige selbstverwaltete Verantwortungsrechte wegen Governing-Board-Asymmetrie offen."
+}

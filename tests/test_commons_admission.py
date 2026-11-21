@@ -132,6 +132,22 @@ class CommonsAdmissionValidationTests(unittest.TestCase):
         self.write_case([self.project("new-common")], [self.basis("new-common")])
         self.assertEqual(validate(self.root, today=date(2026, 7, 31)), [])
 
+    def test_later_project_geography_review_preserves_older_basis_review(self) -> None:
+        project = self.project(
+            "mapped-common",
+            catalogued_at="2026-07-31",
+            reviewed_at="2026-08-01",
+            next_review_at="2026-10-31",
+        )
+        self.write_case([project], [self.basis("mapped-common", reviewed_at="2026-07-31")])
+        self.assertEqual(validate(self.root, today=date(2026, 8, 1)), [])
+
+    def test_basis_review_cannot_postdate_project_curation(self) -> None:
+        project = self.project("mapped-common", reviewed_at="2026-07-31")
+        self.write_case([project], [self.basis("mapped-common", reviewed_at="2026-08-01")])
+        errors = validate(self.root, today=date(2026, 8, 1))
+        self.assertTrue(any("basis reviewed_at must not be after project" in x for x in errors))
+
     def test_new_record_without_basis_fails_closed(self) -> None:
         self.write_case([self.project("new-common")], [])
         errors = validate(self.root, today=date(2026, 7, 31))

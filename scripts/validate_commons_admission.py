@@ -187,9 +187,11 @@ def validate(root: Path = ROOT, *, today: date | None = None) -> list[str]:
             basis_reviewed_at = date.fromisoformat(basis["reviewed_at"])
             project_reviewed_at = date.fromisoformat(project["curation"]["reviewed_at"])
             basis_review_dates.append(basis_reviewed_at)
-            if basis_reviewed_at != project_reviewed_at:
+            # A later project review may update geography or links without
+            # re-reviewing the unchanged Commons admission criteria.
+            if basis_reviewed_at > project_reviewed_at:
                 errors.append(
-                    f"{filename}: basis reviewed_at must equal project curation.reviewed_at"
+                    f"{filename}: basis reviewed_at must not be after project curation.reviewed_at"
                 )
         except (KeyError, TypeError, ValueError):
             pass

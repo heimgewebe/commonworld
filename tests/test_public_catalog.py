@@ -23,6 +23,21 @@ class PublicCatalogTests(unittest.TestCase):
         mutation(record)
         path.write_text(json.dumps(record, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
 
+    def test_gaengeviertel_public_location(self) -> None:
+        """The documented public Gängeviertel is mapped approximately, not hidden."""
+        path = ROOT / "catalog" / "projects" / "gaengeviertel-genossenschaft.json"
+        record = json.loads(path.read_text(encoding="utf-8"))
+        location, = record["presence"]["geographic"]
+        self.assertEqual("approximate", location["mode"])
+        self.assertEqual("Point", location["geometry"]["type"])
+        longitude, latitude = location["geometry"]["coordinates"]
+        self.assertTrue(9.97 < longitude < 9.99)
+        self.assertTrue(53.54 < latitude < 53.57)
+        self.assertGreaterEqual(location["uncertainty_meters_min"], 100)
+        source_ids = {s["id"]: s for s in record["provenance"]["sources"]}
+        self.assertEqual("public-registry", source_ids["gaengeviertel-genossenschaft-map"]["type"])
+        self.assertIn("gaengeviertel-genossenschaft-map", location["source_ids"])
+
     def test_mundraub_listed_as_commons_infrastructure_without_open_claims(self) -> None:
         """mundraub.org is catalogued as operator-led commons infrastructure, not open data/software commons."""
         project_path = ROOT / "catalog" / "projects" / "mundraub.json"
