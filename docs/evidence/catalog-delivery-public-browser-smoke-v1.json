@@ -225,7 +225,7 @@
         },
         {
           "layer": "communication_networks",
-          "changedPixels": 9524
+          "changedPixels": 3095
         },
         {
           "layer": "cooperation_self_organization",
@@ -241,15 +241,15 @@
         "representativePrimaryLabels": [
           {
             "text": "Knowledge, Learning and Culture · 15    LibriVox  MusicBrainz  Open Library  OpenRefine  Peer 2 Peer Unive…  Safecast",
-            "width": 434.6533203125,
-            "height": 422.6504821777344,
+            "width": 431.326904296875,
+            "height": 419.07916259765625,
             "fontSize": 25.26,
             "visible": true
           },
           {
             "text": "Cooperation and Self-Organization · 7    Bologna Urban Com…  Enspiral  g0v  Green Coop  l’Asilo  National Communal…",
-            "width": 399.47357177734375,
-            "height": 341.8934326171875,
+            "width": 402.564208984375,
+            "height": 346.2523498535156,
             "fontSize": 25.26,
             "visible": true
           }
@@ -337,8 +337,8 @@
     {
       "id": "dual-presence-axes",
       "verdict": "PASS",
-      "publicFeatures": 143,
-      "publicIdentities": 44,
+      "publicFeatures": 144,
+      "publicIdentities": 45,
       "digitalIdentities": 76,
       "unchangedMapUpdatesSkipped": true
     },
@@ -361,7 +361,7 @@
     {
       "id": "layer-journey-moveend-return",
       "verdict": "PASS",
-      "elapsedMs": 1669
+      "elapsedMs": 1030
     },
     {
       "id": "layer-journey-missing-moveend-fallback",
@@ -370,9 +370,9 @@
       "movementDiagnostics": [
         {
           "index": 0,
-          "geometryEvaluationDelta": 12,
+          "geometryEvaluationDelta": 14,
           "diagnosticPublishDelta": 3,
-          "sampledEvaluationCount": 11,
+          "sampledEvaluationCount": 13,
           "maxDiagnosticPublishes": 3
         },
         {
@@ -469,8 +469,8 @@
       "verdict": "PASS",
       "blockedCatalogRequests": 0,
       "observedCatalogRequests": [
-        "/releases/ef5036c1d2022b229cc8/catalog/runtime/aggregate.v1.json",
-        "/releases/ef5036c1d2022b229cc8/catalog/runtime/manifest.v1.json"
+        "/releases/ccf524629dc70d865cff/catalog/runtime/aggregate.v1.json",
+        "/releases/ccf524629dc70d865cff/catalog/runtime/manifest.v1.json"
       ]
     },
     {
@@ -528,7 +528,7 @@
     }
   ],
   "binding": {
-    "first_party_surface_sha256": "17b8699c62bd998f3e92b2886b6d86271ed73c0dd3fa457d6c701d867bda044f",
+    "first_party_surface_sha256": "f0cf58fd85c2e6b4887619f0b466920c4e89a22c8b18c70200995dd84c75e444",
     "scenario_ids": [
       "startup-and-ring-orbits",
       "low-memory-map-cache-policy",
