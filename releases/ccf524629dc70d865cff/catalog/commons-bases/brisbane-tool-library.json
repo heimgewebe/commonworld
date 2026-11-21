@@ -1,0 +1,58 @@
+{
+  "schema_version": 1,
+  "kind": "commonworld_commons_basis",
+  "project_id": "brisbane-tool-library",
+  "classification": "commons-infrastructure",
+  "decision": "include",
+  "reviewed_at": "2026-10-31",
+  "reviewer": "Commonworld editorial desk review",
+  "criteria": {
+    "shared_resource": {
+      "status": "supported",
+      "statement": "Ein gemeinsamer Bestand aus Werkzeugen, Bau- und Campingausrüstung steht registrierten Mitgliedern zur zeitweisen Nutzung zur Verfügung.",
+      "source_ids": [
+        "brisbane-home",
+        "brisbane-memberships"
+      ]
+    },
+    "community": {
+      "status": "supported",
+      "statement": "Mitglieder, Freiwillige und lokale Partner unterstützen Ausleihe, Pflege und die Weitergabe praktischer Fähigkeiten.",
+      "source_ids": [
+        "brisbane-home",
+        "brisbane-memberships"
+      ]
+    },
+    "commoning_practice": {
+      "status": "supported",
+      "statement": "Mitglieder teilen statt einzeln zu kaufen, reservieren Gegenstände, leihen sie aus und bringen sie für nachfolgende Nutzer zurück.",
+      "source_ids": [
+        "brisbane-home",
+        "brisbane-memberships"
+      ]
+    },
+    "rules_and_responsibility": {
+      "status": "supported",
+      "statement": "Die offiziellen Mitgliedschaftsbedingungen begrenzen Ausleihmengen, Laufzeiten und Rückgaben; Freiwillige organisieren das Ausleihsystem.",
+      "source_ids": [
+        "brisbane-memberships",
+        "brisbane-home"
+      ]
+    },
+    "common_benefit": {
+      "status": "supported",
+      "statement": "Geteilte Geräte verringern Anschaffungshürden, Abfall und Einzelverbrauch und ermöglichen lokales Reparieren und Lernen.",
+      "source_ids": [
+        "brisbane-home",
+        "brisbane-memberships"
+      ]
+    }
+  },
+  "confidence": 0.89,
+  "limitations": [
+    "Die Nutzung ist gebührenpflichtig und verlangt eine gültige Mitgliedschaft.",
+    "Mitgliedschaft verleiht nicht automatisch rechtliches Miteigentum an jedem Werkzeug oder Stimmrecht über den Verein.",
+    "Werkzeugbestand und Verfügbarkeit variieren; keine Echtzeitinventur erfolgt."
+  ],
+  "notes": "Mitgliedsgetragene geteilte Werkzeugnutzung mit öffentlich dokumentierten Ausleih- und Rückgaberegeln."
+}
