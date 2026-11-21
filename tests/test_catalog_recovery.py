@@ -4,13 +4,23 @@ import unittest
 from pathlib import Path
 from urllib.parse import urljoin
 
-from scripts.catalog_recovery import PAGE_SIZE, index_relative_path, page_count, page_records, project_relative_path
+from scripts.catalog_recovery import PAGE_SIZE, index_relative_path, page_count, page_records, project_relative_path, render_index, load_records
 from scripts.validate_catalog_recovery import ROOT, validate_catalog_recovery
 
 
 class CatalogRecoveryTests(unittest.TestCase):
     def test_current_recovery_contract_and_artifacts_validate(self) -> None:
         self.assertEqual([], validate_catalog_recovery(ROOT, verify_measurements=False))
+
+    def test_pagination_landmarks_are_distinct_and_localized(self) -> None:
+        expected = {
+            "en": ["Catalog pages above entries", "Catalog pages below entries"],
+            "de": ["Katalogseiten oberhalb der Einträge", "Katalogseiten unterhalb der Einträge"],
+        }
+        for locale, labels in expected.items():
+            with self.subTest(locale=locale):
+                markup = render_index(load_records(ROOT), locale, 1)
+                self.assertEqual(labels, re.findall(r'<nav aria-label="([^"]+)">', markup))
 
     def test_pagination_is_bounded_and_complete(self) -> None:
         records = [{"id": f"project-{index:05d}"} for index in range(10_000)]

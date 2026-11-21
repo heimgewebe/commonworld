@@ -1,0 +1,57 @@
+{
+  "schema_version": 1,
+  "kind": "commonworld_commons_basis",
+  "project_id": "ecopower",
+  "classification": "common",
+  "decision": "include",
+  "reviewed_at": "2026-11-20",
+  "reviewer": "Commonworld editorial desk review",
+  "criteria": {
+    "shared_resource": {
+      "status": "supported",
+      "statement": "Genossenschaftlich finanzierte erneuerbare Erzeugungsanlagen und gemeinsames Investitionskapital bilden Ressourcen.",
+      "source_ids": [
+        "ecopower-home",
+        "ecopower-governance"
+      ]
+    },
+    "community": {
+      "status": "supported",
+      "statement": "Die Mitglieder der Energiegenossenschaft stellen die formal organisierte Gemeinschaft.",
+      "source_ids": [
+        "ecopower-home",
+        "ecopower-governance"
+      ]
+    },
+    "commoning_practice": {
+      "status": "supported",
+      "statement": "Mitglieder investieren, beteiligen sich an Genossenschaftsentscheidungen und tragen die Energieversorgung mit.",
+      "source_ids": [
+        "ecopower-home",
+        "ecopower-governance"
+      ]
+    },
+    "rules_and_responsibility": {
+      "status": "supported",
+      "statement": "Satzung und internes Reglement begründen Generalversammlung und gleiches Stimmrecht je Mitglied.",
+      "source_ids": [
+        "ecopower-home",
+        "ecopower-governance"
+      ]
+    },
+    "common_benefit": {
+      "status": "supported",
+      "statement": "Erneuerbare Energie und gemeinschaftliche Wertschöpfung stehen im Mittelpunkt der Genossenschaft.",
+      "source_ids": [
+        "ecopower-home",
+        "ecopower-governance"
+      ]
+    }
+  },
+  "confidence": 0.85,
+  "limitations": [
+    "Energiegenossenschaft bedeutet nicht, dass jeder Bürger Zugang zu allen Anlagen und Entscheidungen hat.",
+    "Externe Netze und Standorte gehören nicht automatisch der Genossenschaft."
+  ],
+  "notes": "Eigenständige Aufnahme: begrenzte quellengebundene Fünfkriterien-Prüfung. Keine ungeprüften Mitglieds-, Eigentums- oder Betriebsrechte behauptet."
+}

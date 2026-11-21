@@ -1,0 +1,58 @@
+{
+  "schema_version": 1,
+  "kind": "commonworld_commons_basis",
+  "project_id": "wikipedia",
+  "classification": "common",
+  "decision": "include",
+  "reviewed_at": "2026-10-30",
+  "reviewer": "Commonworld editorial desk review",
+  "criteria": {
+    "shared_resource": {
+      "status": "supported",
+      "statement": "Wikipedia ist eine gemeinschaftlich geschaffene und unter freien Lizenzen geteilte Enzyklopädie, die als digitales Wissensgut laufend bearbeitet wird.",
+      "source_ids": [
+        "wikimedia-projects",
+        "wikipedia-foundation-principles"
+      ]
+    },
+    "community": {
+      "status": "supported",
+      "statement": "Die weltweit verteilten freiwilligen Autoren, Prüfer und Regelmitgestalter bilden eine aktive Bearbeitungs- und Pflegegemeinschaft.",
+      "source_ids": [
+        "wikipedia-wmf-governance",
+        "wikipedia-foundation-principles"
+      ]
+    },
+    "commoning_practice": {
+      "status": "supported",
+      "statement": "Freiwillige schreiben, prüfen, belegen, korrigieren und diskutieren Beiträge dauerhaft nach gemeinsam ausgehandelten redaktionellen Praktiken.",
+      "source_ids": [
+        "wikipedia-wmf-governance",
+        "wikipedia-foundation-principles"
+      ]
+    },
+    "rules_and_responsibility": {
+      "status": "supported",
+      "statement": "Neutrale Darstellung, Quellenpflicht, Diskussion und Konsens sowie Regeln zu Lizenzen und Moderation werden innerhalb der Community getragen; die Stiftung hält Infrastruktur bereit.",
+      "source_ids": [
+        "wikipedia-foundation-principles",
+        "wikipedia-wmf-governance"
+      ]
+    },
+    "common_benefit": {
+      "status": "supported",
+      "statement": "Freie Bildung und offene Nachnutzung unter Lizenzbedingungen dienen dem Gemeinwohl; der Wissensbestand ist nicht für die alleinige private Verwertung bestimmt.",
+      "source_ids": [
+        "wikimedia-projects",
+        "wikipedia-foundation-principles"
+      ]
+    }
+  },
+  "confidence": 0.94,
+  "limitations": [
+    "Offene Editierbarkeit unterliegt lokalen Regeln, Schutzmaßnahmen und Moderationsrechten; nicht jede Bearbeitung bleibt erhalten.",
+    "Wikimedia Foundation und Wikipedia-Autorenkollektive besitzen unterschiedliche Organisations- und redaktionelle Befugnisse.",
+    "Die Belege sichern Governance und Commoning, nicht die Fehlerfreiheit einzelner Wikipedia-Artikel."
+  ],
+  "notes": "Kollektives Wissens-Common; technische und rechtliche Stiftungsträgerschaft ist nicht gleich redaktioneller Herrschaft."
+}

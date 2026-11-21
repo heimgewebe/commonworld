@@ -1,0 +1,43 @@
+{
+  "schema_version": 1,
+  "kind": "commonworld_commons_basis",
+  "project_id": "kobulu-community-micro-hydro",
+  "classification": "commons-infrastructure",
+  "decision": "include",
+  "reviewed_at": "2026-09-02",
+  "reviewer": "Commonworld editorial review",
+  "criteria": {
+    "shared_resource": {
+      "status": "supported",
+      "statement": "Das Mikrowasserkraftsystem in Kampung Buayan stellt gemeinschaftlich genutzte lokale Energieinfrastruktur bereit; TONIBUNG und aktuelle Partnerdokumentation beschreiben ein dauerhaft von der Dorfgemeinschaft getragenes System statt einzelner privater Erzeugungsanlagen.",
+      "source_ids": ["source-kobulu-tonibung", "source-kobulu-green-empowerment-2026", "source-kobulu-sabah-re2"]
+    },
+    "community": {
+      "status": "supported",
+      "statement": "Die Dorfgemeinschaft von Buayan bildet die lokale Trägerschaft; ein Village Energy Committee und ein gemeinschaftlich eingebundener Techniker beziehungsweise Operator übernehmen benannte Rollen für Betrieb und Verwaltung.",
+      "source_ids": ["source-kobulu-tonibung", "source-kobulu-green-empowerment-2026"]
+    },
+    "commoning_practice": {
+      "status": "supported",
+      "statement": "Die Gemeinschaft organisiert den laufenden Betrieb, lokale technische Verantwortung, Verbrauchsabrechnung, Wartungsreserven und künftige Reparaturen; aktuelle Partnerquellen beschreiben fortgesetzte lokale Pflege und nicht nur passiven Strombezug.",
+      "source_ids": ["source-kobulu-tonibung", "source-kobulu-green-empowerment-2026", "source-kobulu-sabah-re2"]
+    },
+    "rules_and_responsibility": {
+      "status": "supported",
+      "statement": "Das lokale Komitee legt einen Verbrauchstarif fest und verwendet Einnahmen für Operator, Ersatzteile und Reparaturen; damit sind Zugang, Betrieb, Kosten und Instandhaltungsverantwortung durch konkrete gemeinschaftliche Regeln und Rollen geordnet.",
+      "source_ids": ["source-kobulu-tonibung", "source-kobulu-green-empowerment-2026"]
+    },
+    "common_benefit": {
+      "status": "supported",
+      "statement": "Die Infrastruktur versorgt eine abgelegene Dorfgemeinschaft mit erneuerbarer Energie und finanziert ihren eigenen lokalen Betrieb und Erhalt; der Tarif dient damit der gemeinschaftlichen Infrastruktur und nicht lediglich der Gewinnentnahme eines externen Versorgers.",
+      "source_ids": ["source-kobulu-tonibung", "source-kobulu-green-empowerment-2026", "source-kobulu-sabah-re2"]
+    }
+  },
+  "confidence": 0.95,
+  "limitations": [
+    "Aufbau und technische Entwicklung wurden von externen Partnern unterstützt; gemeinschaftliche Verwaltung bedeutet daher nicht vollständige technische oder finanzielle Unabhängigkeit von Unterstützungsnetzwerken.",
+    "Ein lokaler Verbrauchstarif ist Bestandteil des Erhaltungsmodells; die Commons-Eigenschaft folgt aus gemeinschaftlicher Trägerschaft und Mitverantwortung, nicht aus kostenfreiem Zugang.",
+    "Quellen nennen teils unterschiedliche Leistungs- oder Zeitangaben; diese Basis stützt deshalb nur das übereinstimmend belegte gemeinschaftliche Betriebs- und Governance-Modell."
+  ],
+  "notes": "Aufgenommen als Commons-Infrastruktur, weil Energieanlage, Betriebskomitee, lokale Tarife und Wartungsverantwortung als gemeinschaftlich getragener Infrastrukturkreislauf zusammenwirken."
+}

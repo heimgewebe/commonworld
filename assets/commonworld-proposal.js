@@ -370,6 +370,18 @@ export function buildIssueUrl(proposal) {
   return `${ISSUE_BASE}?${params.toString()}`;
 }
 
+export function reusePreparedProposalIdentity(current, prepared) {
+  if (!current || !prepared) return current;
+  const comparable = (value) => JSON.stringify({ ...value, proposal_id: null, submitted_at: null });
+  if (comparable(current) === comparable(prepared)) {
+    return { ...current, proposal_id: prepared.proposal_id, submitted_at: prepared.submitted_at };
+  }
+  if (current.proposal_id === prepared.proposal_id) {
+    return { ...current, proposal_id: `${current.proposal_id.slice(0, 68).replace(/-+$/u, "")}-2` };
+  }
+  return current;
+}
+
 function downloadJson(proposal) {
   const blob = new Blob([`${JSON.stringify(proposal, null, 2)}\n`], { type: "application/json" });
   const href = URL.createObjectURL(blob);
@@ -523,7 +535,7 @@ function init() {
   const direct = document.getElementById("proposal-direct-link");
   const download = document.getElementById("proposal-download");
   const catalog = getCatalogIndex();
-  let lastProposal = null;
+  let preparedProposal = null;
   const geographicToggle = form.elements.presence_geographic;
   const region = form.elements.region;
   const sensitiveLocation = form.elements.sensitive_location_risk;
@@ -588,8 +600,8 @@ function init() {
     if (errors.length) { renderErrors(errors, errorsNode); return; }
     const last = readLastPreparedAt();
     if (Date.now() - last < 60_000) { renderErrors([tr("Mehrfachvorbereitung begrenzt: bitte eine Minute warten oder den vorhandenen GitHub-Tab verwenden.", "Repeated preparation is rate-limited: wait one minute or use the existing GitHub tab.")], errorsNode); return; }
-    lastProposal = proposal;
     const issueUrl = buildIssueUrl(proposal);
+    preparedProposal = proposal;
     direct.href = issueUrl;
     storeLastPreparedAt(Date.now());
     if (navigator.onLine === false) {
@@ -612,9 +624,9 @@ function init() {
   });
 
   download.addEventListener("click", () => {
-    const result = lastProposal ? { proposal: lastProposal, errors: [] } : validateCurrent();
+    const result = validateCurrent();
     if (result.errors.length) { renderErrors(result.errors, errorsNode); return; }
-    downloadJson(result.proposal);
+    downloadJson(reusePreparedProposalIdentity(result.proposal, preparedProposal));
     statusNode.textContent = tr("Validierte JSON-Datei lokal erstellt. Commonworld hat den Inhalt nicht gespeichert.", "Validated JSON file created locally. Commonworld did not store its contents.");
   });
 }
