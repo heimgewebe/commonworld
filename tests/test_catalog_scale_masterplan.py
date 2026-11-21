@@ -34,29 +34,22 @@ class CatalogScaleMasterplanValidationTests(unittest.TestCase):
     def test_current_masterplan_matches_executable_scale_gates(self):
         self.assertEqual(MODULE.validate_catalog_scale_masterplan(self.root), [])
 
-    def test_stale_100k_baseline_is_rejected(self):
+    def test_historical_masterplan_does_not_require_current_fixture_numbers(self):
+        path = self.root / "docs/evidence/catalog-platform-scaling-v1.json"
+        evidence = json.loads(path.read_text(encoding="utf-8"))
+        evidence["measurements"][0]["world_index"]["gzip_bytes"] += 1
+        path.write_text(json.dumps(evidence), encoding="utf-8")
+        self.assertEqual(MODULE.validate_catalog_scale_masterplan(self.root), [])
+
+    def test_missing_scale_plan_statement_is_rejected(self):
         path = self.root / "docs/blueprints/commonworld-masterplan.md"
-        evidence = json.loads(
-            (self.root / "docs/evidence/catalog-platform-scaling-v1.json").read_text(
-                encoding="utf-8"
-            )
-        )
-        stress = next(
-            item for item in evidence["measurements"] if item["entry_count"] == 100_000
-        )
-        current = MODULE.format_de(stress["world_index"]["gzip_bytes"])
-        text = path.read_text(encoding="utf-8")
-        text = text.replace(f"{current} Byte gzip", "1.541.423 Byte gzip", 1)
-        path.write_text(text, encoding="utf-8")
-        errors = MODULE.validate_catalog_scale_masterplan(self.root)
-        self.assertIn(
-            "canonical catalogue scale plan retains stale fragment: 1.541.423 Byte gzip",
-            errors,
-        )
-        self.assertIn(
-            f"canonical catalogue scale plan misses current fragment: {current} Byte gzip",
-            errors,
-        )
+        plan = path.read_text(encoding="utf-8")
+        assert "100.000-Einträge-Stresstest" in plan
+        path.write_text(plan.replace("100.000-Einträge-Stresstest", "Stresstest"), encoding="utf-8")
+        self.assertTrue(any(
+            "canonical catalogue scale plan misses required fragment: 100.000-Einträge-Stresstest" in error
+            for error in MODULE.validate_catalog_scale_masterplan(self.root)
+        ))
 
     def test_contract_cannot_point_to_an_ambient_plan(self):
         path = self.root / "contracts/commonworld/catalog-scale-gates.contract.json"
