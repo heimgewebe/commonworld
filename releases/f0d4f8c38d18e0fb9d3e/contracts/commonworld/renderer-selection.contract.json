@@ -1,0 +1,112 @@
+{
+  "schema_version": 1,
+  "kind": "commonworld_renderer_selection_contract",
+  "selected_at": "2026-07-12",
+  "selected_engine": {
+    "id": "maplibre_gl_js",
+    "package": "maplibre-gl",
+    "tested_version": "5.24.0",
+    "selection_scope": [
+      "primary_globe_renderer",
+      "camera_and_semantic_zoom_authority",
+      "geographic_style_and_vector_tile_pipeline"
+    ],
+    "not_catalog_truth": true,
+    "not_editorial_workflow": true,
+    "not_linear_fallback": true
+  },
+  "integration_model": {
+    "one_primary_globe_canvas": true,
+    "geographic_surface": "maplibre_style_layers_and_vector_sources",
+    "digital_sphere": "bounded_synchronized_svg_overlay",
+    "digital_sphere_identity_source": "CommonProject.id",
+    "digital_sphere_catalog_coordinates_forbidden": true,
+    "maplibre_custom_layer": "allowed_only_after_equivalent_contract_proof",
+    "three_js_runtime_dependency_authorized": false,
+    "second_independent_globe_authorized": false,
+    "same_focus_and_navigation_state_across_all_views": true
+  },
+  "decision_boundary": {
+    "engine_selected": true,
+    "selected_engine": "maplibre_gl_js",
+    "production_architecture_authorized": false,
+    "public_runtime_uses_selected_engine": false,
+    "next_proof": "public_maplibre_globe_vertical_slice_with_seed_catalog"
+  },
+  "selection_reasons": [
+    "highest_measured_frame_rate_on_both_standardized_candidate_profiles",
+    "native_globe_projection_and_camera_model",
+    "direct_vector_tile_and_geospatial_style_path",
+    "phase2_semantics_state_and_idle_gates_passed",
+    "physical_apple_hardware_performance_gate_passed",
+    "real_digital_surface_focus_camera_and_name_density_gates_passed",
+    "public_seed_catalog_covers_all_digital_layers_without_geographic_fabrication",
+    "single_primary_engine_avoids_three_js_runtime_and_second_webgl_context"
+  ],
+  "alternatives": {
+    "three_js": {
+      "status": "not_selected",
+      "reason": "high_manual_geospatial_burden_and_no_current_need_for_second_runtime",
+      "future_use": "bounded_reconsideration_only_if_selected_overlay_contract_cannot_be_met"
+    },
+    "cesium_js": {
+      "status": "rejected_for_current_product_scope",
+      "reason": "measured_delivery_and_runtime_cost_exceed_current_requirements"
+    },
+    "deck_gl": {
+      "status": "rejected_as_primary_globe",
+      "reason": "official_globe_view_remains_experimental_and_conflicts_with_local_focus_contract"
+    }
+  },
+  "version_policy": {
+    "selection_is_bound_to_tested_version": "5.24.0",
+    "first_runtime_dependency_must_be_exactly_pinned": true,
+    "lockfile_required_before_public_runtime_integration": true,
+    "upgrade_requires_contract_and_device_regression_suite": true,
+    "cdn_floating_version_forbidden": true
+  },
+  "remaining_release_gates": {
+    "physical_android_chrome_hardware": "open",
+    "public_seed_catalog_vertical_slice": "required_next",
+    "production_tile_and_basemap_provider_decision": "open",
+    "content_security_policy_and_worker_delivery": "open",
+    "public_accessibility_and_linear_parity": "required",
+    "screen_reader_product_support": "not_claimed"
+  },
+  "official_sources": [
+    {
+      "id": "maplibre_docs",
+      "url": "https://maplibre.org/maplibre-gl-js/docs/",
+      "checked_at": "2026-07-12",
+      "supports": [
+        "webgl_vector_tile_renderer",
+        "globe_projection",
+        "camera_and_interaction"
+      ]
+    },
+    {
+      "id": "maplibre_custom_layer",
+      "url": "https://maplibre.org/maplibre-gl-js/docs/API/interfaces/CustomLayerInterface/",
+      "checked_at": "2026-07-12",
+      "supports": [
+        "bounded_custom_render_layer_extension"
+      ]
+    },
+    {
+      "id": "maplibre_globe_custom_layer_example",
+      "url": "https://maplibre.org/maplibre-gl-js/docs/examples/add-a-simple-custom-layer-on-a-globe/",
+      "checked_at": "2026-07-12",
+      "supports": [
+        "custom_layer_on_globe"
+      ]
+    },
+    {
+      "id": "deck_gl_globe_view",
+      "url": "https://deck.gl/docs/api-reference/core/globe-view",
+      "checked_at": "2026-07-12",
+      "supports": [
+        "experimental_globe_view_boundary"
+      ]
+    }
+  ]
+}

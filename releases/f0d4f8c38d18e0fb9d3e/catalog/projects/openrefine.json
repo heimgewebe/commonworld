@@ -1,0 +1,80 @@
+{
+  "schema_version": 4,
+  "id": "openrefine",
+  "title": "OpenRefine",
+  "summary": "Internationale Beitragende entwickeln und pflegen gemeinsam das quelloffene Werkzeug OpenRefine zur Bereinigung und Umformung von Daten und organisieren wesentliche Projektentscheidungen öffentlich.",
+  "themes": [
+    "free-software",
+    "open-data",
+    "knowledge",
+    "commons-governance"
+  ],
+  "actions": [
+    "learn"
+  ],
+  "presence": {
+    "geographic": [],
+    "digital": {
+      "available": true,
+      "source_ids": [
+        "openrefine-home"
+      ],
+      "reach": "network",
+      "label": "Gemeinsam gepflegtes Datenbereinigungswerkzeug und Projektdokumentation"
+    }
+  },
+  "activity": {
+    "status": "unknown",
+    "observed_at": "2026-11-20",
+    "source_ids": [
+      "openrefine-home"
+    ],
+    "note": "Die dokumentierte Praxis ist belegt, ihr operativer Status wurde in dieser Aufnahme nicht als tagesaktuell verifiziert."
+  },
+  "provenance": {
+    "sources": [
+      {
+        "id": "openrefine-home",
+        "type": "official-source",
+        "label": "OpenRefine – Projektinformation",
+        "url": "https://openrefine.org/",
+        "retrieved_at": "2026-11-20",
+        "note": "Öffentliche projektnahe Information über die gemeinsame Ressource und die Beteiligten."
+      },
+      {
+        "id": "openrefine-governance",
+        "type": "official-source",
+        "label": "OpenRefine – Organisation und Regeln",
+        "url": "https://github.com/OpenRefine/OpenRefine/blob/master/GOVERNANCE.md",
+        "retrieved_at": "2026-11-20",
+        "note": "Projektnahe Details zu gemeinsamen Praktiken, Organisation oder relevanten Grenzen."
+      }
+    ]
+  },
+  "curation": {
+    "state": "listed",
+    "catalogued_at": "2026-11-20",
+    "reviewed_by": "Commonworld editorial review",
+    "reviewed_at": "2026-11-20",
+    "next_review_at": "2027-01-03",
+    "notes": "Aktueller Betriebszustand nicht zeitnah verifiziert. Neue quellengebundene Commons-Aufnahme; Wiedervorlage innerhalb von 45 Tagen."
+  },
+  "links": [
+    {
+      "type": "homepage",
+      "label": "OpenRefine – offizielle Seite",
+      "url": "https://openrefine.org/"
+    },
+    {
+      "type": "learn",
+      "label": "Gemeinsame Praxis und Verantwortung kennenlernen",
+      "url": "https://github.com/OpenRefine/OpenRefine/blob/master/GOVERNANCE.md",
+      "source_ids": [
+        "openrefine-governance"
+      ]
+    }
+  ],
+  "handoff": {
+    "enabled": false
+  }
+}

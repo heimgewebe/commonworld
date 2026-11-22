@@ -1,6 +1,6 @@
-import { BOOTSTRAP_RECORDS } from './commonworld-bootstrap-catalog.mjs?v=a6940000f6c7';
+import { BOOTSTRAP_RECORDS } from './commonworld-bootstrap-catalog.mjs?v=a6be76521fdd';
 import { createCatalogLoadCache, loadCatalogAggregate, loadCatalogDetail, loadCatalogShard, shardKeyForIdentity } from './commonworld-catalog-runtime.mjs?v=25d37dcafe15';
-import { actionLabel, documentDirection, documentLocale, localizeCatalogRecords, text as i18nText, themeLabel, wave1LocalePackReady } from './commonworld-i18n.mjs?v=d1eda089f21d';
+import { actionLabel, documentDirection, documentLocale, localizeCatalogRecords, text as i18nText, themeLabel, wave1LocalePackReady } from './commonworld-i18n.mjs?v=fa8bc07bff06';
 import {
   COMMONS_TYPE_COLOR_TOKENS,
   COMMONS_TYPE_VALUES,
@@ -63,7 +63,7 @@ import {
   sortRecords,
   stateFromSearch,
   visibleDigitalNodes,
-} from './commonworld-core.mjs?v=ebd34ecf15a9';
+} from './commonworld-core.mjs?v=4d289c3ed1b8';
 
 const LOCALE = documentLocale();
 const DOCUMENT_DIRECTION = documentDirection(LOCALE);
@@ -96,7 +96,7 @@ const PUBLIC_MAP_SOURCE_ID = 'commonworld-public-representations';
 const COUNTRY_MAP_SOURCE_ID = 'commonworld-country-compositions';
 const COUNTRY_HIT_SOURCE_ID = 'commonworld-country-navigation';
 const COUNTRY_HIT_LAYER_ID = 'commonworld-country-navigation-hit';
-const COUNTRY_BOUNDARIES_URL = './assets/map/commonworld-country-boundaries.geojson?v=373a5eff46a5';
+const COUNTRY_BOUNDARIES_URL = './assets/map/commonworld-country-boundaries.geojson?v=2942501543ea';
 const PUBLIC_MAP_INTERACTIVE_LAYER_IDS = Object.freeze(['commonworld-public-extents', 'commonworld-approximate-zones', 'commonworld-exact-anchor-hit-targets', 'commonworld-exact-anchors']);
 
 const COMMONS_TYPE_COLORS = [

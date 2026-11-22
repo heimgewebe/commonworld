@@ -16,12 +16,22 @@
     "geographic": [
       {
         "id": "ecopower-region",
-        "mode": "hidden",
-        "label": "Belgien – gemeinschaftliche Energieprojekte",
-        "privacy_note": "Region und gemeinschaftlicher Wirkungsraum sind belegt; ohne gesondert verifizierte öffentliche Geometrie wird kein künstlicher Ortsmarker gesetzt.",
+        "mode": "approximate",
+        "label": "Ecopower – öffentliches Genossenschaftsbüro Berchem",
+        "privacy_note": "Nur öffentliches Büro in Posthoflei 3, keine Kartierung der belgischen Erzeugungsanlagen, Mitglieder oder Anschlüsse.",
         "source_ids": [
-          "ecopower-home"
-        ]
+          "ecopower-home",
+          "ecopower-contact",
+          "osm-ecopower-berchem"
+        ],
+        "geometry": {
+          "type": "Point",
+          "coordinates": [
+            4.4313194,
+            51.1991351
+          ]
+        },
+        "uncertainty_meters_min": 300
       }
     ],
     "digital": {
@@ -56,6 +66,22 @@
         "url": "https://ecopower.be/statuten-en-intern-reglement",
         "retrieved_at": "2026-11-20",
         "note": "Projektnahe Details zu gemeinsamen Praktiken, Organisation oder relevanten Grenzen."
+      },
+      {
+        "id": "ecopower-contact",
+        "type": "official-source",
+        "label": "Ecopower – Kontakt und Büro in Berchem",
+        "url": "https://ecopower.be/contact",
+        "retrieved_at": "2026-11-22",
+        "note": "Die Genossenschaft veröffentlicht Posthoflei 3 bus 3, 2600 Berchem als Geschäftsadresse."
+      },
+      {
+        "id": "osm-ecopower-berchem",
+        "type": "public-registry",
+        "label": "OpenStreetMap – Ecopower, Posthoflei 3",
+        "url": "https://www.openstreetmap.org/node/11078724997",
+        "retrieved_at": "2026-11-22",
+        "note": "Namensgleicher öffentlich kartierter Genossenschaftsstandort. OpenStreetMap-Daten unter ODbL 1.0."
       }
     ]
   },

@@ -1,0 +1,58 @@
+{
+  "schema_version": 1,
+  "kind": "commonworld_commons_basis",
+  "project_id": "fucvam",
+  "classification": "commons-infrastructure",
+  "decision": "include",
+  "reviewed_at": "2026-10-31",
+  "reviewer": "Commonworld editorial desk review",
+  "criteria": {
+    "shared_resource": {
+      "status": "supported",
+      "statement": "Die von Wohnungsgenossenschaften gemeinschaftlich aufgebauten und gehaltenen Wohnungen sowie der föderierte Selbsthilfe- und Wissensaustausch sind die miteinander verbundenen Wohn-Commons-Ressourcen.",
+      "source_ids": [
+        "fucvam-home",
+        "fucvam-affiliation"
+      ]
+    },
+    "community": {
+      "status": "supported",
+      "statement": "Mitgliedsgenossenschaften der uruguayischen Selbsthilfe-Wohnungsbewegung bilden den Verband; der Beitritt verlangt eine Entscheidung der jeweiligen Genossenschaftsversammlung.",
+      "source_ids": [
+        "fucvam-affiliation",
+        "fucvam-statutes"
+      ]
+    },
+    "commoning_practice": {
+      "status": "supported",
+      "statement": "Die Mitgliedsgenossenschaften bauen, organisieren und verwalten Wohnraum durch gegenseitige Hilfe sowie gemeinsame Arbeit; FUCVAM koordiniert Beratung und Interessenvertretung.",
+      "source_ids": [
+        "fucvam-home",
+        "fucvam-affiliation"
+      ]
+    },
+    "rules_and_responsibility": {
+      "status": "supported",
+      "statement": "FUCVAM veröffentlicht eine Satzung und verlangt für den Beitritt einen Genossenschaftsbeschluss, Gründungsurkunde und Statuten; nationale Versammlung und regionale Gremien haben festgelegte Zuständigkeiten.",
+      "source_ids": [
+        "fucvam-statutes",
+        "fucvam-affiliation"
+      ]
+    },
+    "common_benefit": {
+      "status": "supported",
+      "statement": "Die kooperativen Wohnmodelle richten kollektiven Besitz und gegenseitige Unterstützung auf dauerhaft zugänglichen Wohnraum für beteiligte Haushalte aus.",
+      "source_ids": [
+        "fucvam-home",
+        "fucvam-affiliation"
+      ]
+    }
+  },
+  "confidence": 0.93,
+  "limitations": [
+    "Die Föderation besitzt nicht notwendig jede Wohnimmobilie der angeschlossenen rechtlich selbständigen Genossenschaften.",
+    "Wohnnutzungsrechte gelten für Mitglieder nach konkreten Statuten; kein beliebiger freier Zutritt zu Wohnungen.",
+    "Die aktuelle Bewohnbarkeit einzelner Objekte oder die Prüfung aller angeschlossenen Statuten ist nicht nachgewiesen."
+  ],
+  "notes": "Föderierte Selbsthilfe-Wohnungs-Commons mit belegter Satzungs- und Aufnahmegovernance; föderale und lokale Rechte bleiben getrennt."
+}

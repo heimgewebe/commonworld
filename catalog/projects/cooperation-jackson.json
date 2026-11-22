@@ -22,13 +22,23 @@
     "geographic": [
       {
         "id": "cooperation-jackson-west-jackson",
-        "mode": "hidden",
-        "label": "West Jackson, Mississippi, Vereinigte Staaten",
-        "privacy_note": "Die Initiative arbeitet mit mehreren Grundstücken, Einrichtungen und Vorhaben; Commonworld bildet daraus ohne autoritative Gesamtgeometrie keinen künstlichen Projektumriss.",
+        "mode": "approximate",
+        "label": "Cooperation Jackson – öffentlicher Kuwasi Balagoon Center, Jackson",
+        "privacy_note": "Öffentlich benannter Koordinations- und Veranstaltungsort 939 West Capitol Street, nicht die Gesamtheit der Farmen, Grundstücke, Kooperativen oder Privathäuser.",
         "source_ids": [
           "cooperation-jackson-home",
-          "cooperation-jackson-sci"
-        ]
+          "cooperation-jackson-sci",
+          "cooperation-jackson-bal-agenda",
+          "osm-cooperation-jackson-center"
+        ],
+        "geometry": {
+          "type": "Point",
+          "coordinates": [
+            -90.1992444,
+            32.3054879
+          ]
+        },
+        "uncertainty_meters_min": 300
       }
     ],
     "digital": {
@@ -105,6 +115,22 @@
         "url": "https://cooperationjackson.org/become-a-member",
         "retrieved_at": "2026-10-31",
         "note": "Mitgliedschaft mit Bedingungen, Anteilsbeitrag und einem Stimmrecht je Mitglied."
+      },
+      {
+        "id": "cooperation-jackson-bal-agenda",
+        "type": "official-source",
+        "label": "Kuwasi Balagoon Center – öffentliche Koordinationsbasis",
+        "url": "https://cooperationjackson.org/lumumba-center/",
+        "retrieved_at": "2026-11-22",
+        "note": "Die Organisation nennt 939 W. Capitol Street als öffentlichen Standort ihres Zentrums."
+      },
+      {
+        "id": "osm-cooperation-jackson-center",
+        "type": "public-registry",
+        "label": "OpenStreetMap – 939 West Capitol Street, Jackson",
+        "url": "https://www.openstreetmap.org/way/837075827",
+        "retrieved_at": "2026-11-22",
+        "note": "OSM-Adressobjekt zum benannten Zentrum, keine Projekt-Gesamtfläche. OpenStreetMap-Daten unter ODbL 1.0."
       }
     ]
   },

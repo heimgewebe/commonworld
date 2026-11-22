@@ -16,12 +16,22 @@
     "geographic": [
       {
         "id": "communs-paysans-region",
-        "mode": "hidden",
-        "label": "Frankreich – bäuerliche Selbstbau- und Wissensnetzwerke",
-        "privacy_note": "Region und gemeinschaftlicher Wirkungsraum sind belegt; ohne gesondert verifizierte öffentliche Geometrie wird kein künstlicher Ortsmarker gesetzt.",
+        "mode": "approximate",
+        "label": "Communs Paysans – öffentlicher L’Atelier Paysan-Standort Renage",
+        "privacy_note": "Nur die öffentlich besuchbare Werkstatt in Renage, nicht die dezentralen bäuerlichen Lernorte und privaten Mitgliedsbetriebe.",
         "source_ids": [
-          "communs-paysans-home"
-        ]
+          "communs-paysans-home",
+          "communs-paysans-contact",
+          "osm-atelier-paysan-renage"
+        ],
+        "geometry": {
+          "type": "Point",
+          "coordinates": [
+            5.4908555,
+            45.3251415
+          ]
+        },
+        "uncertainty_meters_min": 400
       }
     ],
     "digital": {
@@ -58,6 +68,22 @@
         "url": "https://www.latelierpaysan.org/L-Atelier-Paysan-face-a-la-liquidation-elargissons-le-mouvement",
         "retrieved_at": "2026-11-20",
         "note": "Projektnahe Details zu gemeinsamen Praktiken, Organisation oder relevanten Grenzen."
+      },
+      {
+        "id": "communs-paysans-contact",
+        "type": "official-source",
+        "label": "Communs Paysans / L’Atelier Paysan – öffentlicher Werkstattstandort",
+        "url": "https://www.latelierpaysan.org/Contact",
+        "retrieved_at": "2026-11-22",
+        "note": "Der Träger Communs Paysans nennt den öffentlichen Hauptstandort ZA des Papeteries, 38140 Renage."
+      },
+      {
+        "id": "osm-atelier-paysan-renage",
+        "type": "public-registry",
+        "label": "OpenStreetMap – L’Atelier Paysan, Renage",
+        "url": "https://www.openstreetmap.org/node/1166304397",
+        "retrieved_at": "2026-11-22",
+        "note": "Namensgleicher öffentlicher Werkstatt-/Organisationspunkt in Renage. OpenStreetMap-Daten unter ODbL 1.0."
       }
     ]
   },

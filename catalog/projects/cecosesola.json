@@ -19,13 +19,23 @@
     "geographic": [
       {
         "id": "cecosesola-venezuela-network",
-        "mode": "hidden",
-        "label": "Barquisimeto und Netzwerk in mehreren venezolanischen Bundesstaaten",
-        "privacy_note": "Versorgungsstellen, Gesundheitsorte, Produktionsstätten und beteiligte Gemeinschaften werden nicht aus Netzwerkangaben zu einer unvollständigen oder scheinpräzisen Karte rekonstruiert.",
+        "mode": "approximate",
+        "label": "Cecosesola – öffentlicher Bezug Barquisimeto (Stadtanker)",
+        "privacy_note": "Nur grober Barquisimeto-Stadtanker, nicht die genaue öffentliche Kontaktadresse, Versorgungs-, Gesundheits- oder Produktionsstätte und nicht das gesamte venezolanische Netzwerk.",
         "source_ids": [
           "cecosesola-home",
-          "cecosesola-food-network"
-        ]
+          "cecosesola-food-network",
+          "cecosesola-contact",
+          "osm-cecosesola-barquisimeto"
+        ],
+        "geometry": {
+          "type": "Point",
+          "coordinates": [
+            -69.3222293,
+            10.0774374
+          ]
+        },
+        "uncertainty_meters_min": 15000
       }
     ],
     "digital": {
@@ -77,6 +87,22 @@
         "url": "https://rightlivelihood.org/the-change-makers/find-a-laureate/cecosesola/",
         "retrieved_at": "2026-07-26",
         "note": "Offizielle Seite des Right Livelihood Award zur Auszeichnung von Cecosesola im Jahr 2022."
+      },
+      {
+        "id": "cecosesola-contact",
+        "type": "official-source",
+        "label": "Cecosesola – öffentliche Kontaktangabe in Barquisimeto",
+        "url": "https://cecosesola.org/contactanos/",
+        "retrieved_at": "2026-11-22",
+        "note": "Die Organisation nennt Carrera 4 entre calles 8 y 10, Zona Industrial I, Barquisimeto; die Adresse konnte nicht gebäudegenau geokodiert werden."
+      },
+      {
+        "id": "osm-cecosesola-barquisimeto",
+        "type": "public-registry",
+        "label": "OpenStreetMap – Stadt Barquisimeto",
+        "url": "https://www.openstreetmap.org/way/1449645988",
+        "retrieved_at": "2026-11-22",
+        "note": "Nur grobe Stadt-Orientierung, kein benannter Organisationsmittelpunkt. OpenStreetMap-Daten unter ODbL 1.0."
       }
     ]
   },

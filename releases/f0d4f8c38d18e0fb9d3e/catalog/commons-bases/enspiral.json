@@ -1,0 +1,56 @@
+{
+  "schema_version": 1,
+  "kind": "commonworld_commons_basis",
+  "project_id": "enspiral",
+  "classification": "undetermined",
+  "decision": "needs_information",
+  "reviewed_at": "2026-10-31",
+  "reviewer": "Commonworld editorial desk review",
+  "criteria": {
+    "shared_resource": {
+      "status": "supported",
+      "statement": "Offene Organisationshandbücher, gemeinsame Arbeitsmethoden und geteilte Netzwerkwerkzeuge sind eine verteilte Wissensressource.",
+      "source_ids": [
+        "enspiral-home",
+        "enspiral-decision-handbook"
+      ]
+    },
+    "community": {
+      "status": "supported",
+      "statement": "Ein Netzwerk aus selbstständigen Individuen, Teams und regionalen Nodes teilt gemeinsame Werte und Arbeitsprozesse.",
+      "source_ids": [
+        "enspiral-home"
+      ]
+    },
+    "commoning_practice": {
+      "status": "supported",
+      "statement": "Teilnehmer entwickeln gemeinsame Methoden und kooperative Projekte und dokumentieren Entscheidungen und Aufgaben.",
+      "source_ids": [
+        "enspiral-decision-handbook"
+      ]
+    },
+    "rules_and_responsibility": {
+      "status": "partial",
+      "statement": "Das Enspiral-Handbuch beschreibt Konsens-, Block- und Loomio-Regeln, deren aktuelle bindende Geltung für neu strukturierte selbstständige Nodes aber nicht bestätigt ist.",
+      "source_ids": [
+        "enspiral-decision-handbook",
+        "enspiral-home"
+      ]
+    },
+    "common_benefit": {
+      "status": "supported",
+      "statement": "Open-Source-Organisationsmethoden fördern kollektive Zusammenarbeit und überregionalen Wissensaustausch.",
+      "source_ids": [
+        "enspiral-home",
+        "enspiral-decision-handbook"
+      ]
+    }
+  },
+  "confidence": 0.85,
+  "limitations": [
+    "Ein historisches Netzwerkhandbuch kann heutige autonome Nodes nicht automatisch verbindlich regeln.",
+    "Foundation Shareholder, Board und lose Mitglieder besitzen unterschiedliche Rechtstitel.",
+    "Die aktuelle Abstimmungszuständigkeit aller selbstständigen Teilorganisationen ist nicht belegt."
+  ],
+  "notes": "Substanzielle historisch dokumentierte Konsensregeln, aber aktuell gültige Abstimmungsstruktur nach Reorganisation nicht eindeutig."
+}
