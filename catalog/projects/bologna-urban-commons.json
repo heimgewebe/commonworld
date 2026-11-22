@@ -18,13 +18,23 @@
     "geographic": [
       {
         "id": "bologna-citywide-pacts",
-        "mode": "hidden",
-        "label": "Stadtweit verteilte Kooperationspakte in Bologna",
-        "privacy_note": "Die vielen eigenständigen Pakte werden nicht zu einem künstlichen Mittelpunkt oder einer Gesamtfläche verdichtet; maßgeblich bleibt der öffentliche kommunale Datensatz.",
+        "mode": "approximate",
+        "label": "Bologna Urban Commons – stadtweite Zusammenarbeit (Stadtanker)",
+        "privacy_note": "Nur Bologna als Stadtbezug, kein vermeintlicher Mittelpunkt und keine vollständige Karte der einzelnen Kooperationspakte.",
         "source_ids": [
           "bologna-regulation-2022",
-          "bologna-pacts-data"
-        ]
+          "bologna-pacts-data",
+          "bologna-urban-commons-site-20261122",
+          "bologna-urban-commons-osm-20261122"
+        ],
+        "geometry": {
+          "type": "Point",
+          "coordinates": [
+            11.3426327,
+            44.4938203
+          ]
+        },
+        "uncertainty_meters_min": 16000
       }
     ],
     "digital": {
@@ -71,6 +81,22 @@
         "url": "https://collaborarebologna.comune.bologna.it/collaborare/",
         "retrieved_at": "2026-07-26",
         "note": "Offizielle kommunale Erläuterung des Instruments, der digitalen Plattform und der historischen Einführung des Gemeingüter-Regelwerks."
+      },
+      {
+        "id": "bologna-urban-commons-site-20261122",
+        "type": "official-source",
+        "label": "bologna-urban-commons – official public organisation/site",
+        "url": "https://collaborarebologna.comune.bologna.it/collaborare/",
+        "retrieved_at": "2026-11-22",
+        "note": "Die Kommune dokumentiert stadtweite Pakte und ihre gesonderte öffentliche Standortkarte."
+      },
+      {
+        "id": "bologna-urban-commons-osm-20261122",
+        "type": "public-registry",
+        "label": "Bologna city anchor",
+        "url": "https://www.openstreetmap.org/relation/43172",
+        "retrieved_at": "2026-11-22",
+        "note": "Öffentliche OpenStreetMap-Ortsreferenz; keine Geometrie des gesamten Commons-Netzwerks. Daten unter ODbL 1.0."
       }
     ],
     "uncertainty_note": "Der Datensatz katalogisiert die kommunale Commons-Infrastruktur und nicht jeden einzelnen, zeitlich veränderlichen Kooperationspakt als eigenes CommonProject."

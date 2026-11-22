@@ -1,0 +1,58 @@
+{
+  "schema_version": 1,
+  "kind": "commonworld_commons_basis",
+  "project_id": "bioleft",
+  "classification": "common",
+  "decision": "include",
+  "reviewed_at": "2026-10-31",
+  "reviewer": "Commonworld editorial desk review",
+  "criteria": {
+    "shared_resource": {
+      "status": "supported",
+      "statement": "Frei geteilte Nutzpflanzensorten, Saatgut und dokumentiertes Züchtungswissen bilden die gemeinsame genetische und digitale Ressource.",
+      "source_ids": [
+        "bioleft-about",
+        "bioleft-platform"
+      ]
+    },
+    "community": {
+      "status": "supported",
+      "statement": "Landwirte, Züchter, Forscher und Saatguterhaltende arbeiten an der Entwicklung offener Sorten und teilen Pflanzmaterial.",
+      "source_ids": [
+        "bioleft-about",
+        "bioleft-home"
+      ]
+    },
+    "commoning_practice": {
+      "status": "supported",
+      "statement": "Teilnehmer registrieren Saatgut, tauschen es anhand von Vereinbarungen und dokumentieren partizipative Züchtung und abgeleitete Sorten.",
+      "source_ids": [
+        "bioleft-platform",
+        "bioleft-about"
+      ]
+    },
+    "rules_and_responsibility": {
+      "status": "supported",
+      "statement": "Die Plattform beschreibt Open-Multiplication-Lizenzen, Eintragungsregeln, Austauschvereinbarungen und Prüftage für neue Saatgutangebote.",
+      "source_ids": [
+        "bioleft-platform",
+        "bioleft-about"
+      ]
+    },
+    "common_benefit": {
+      "status": "supported",
+      "statement": "Offene Saatgutweitergabe und kooperative Pflanzenzüchtung sollen Nutzungsfreiheit, Vielfalt und bäuerliche Unabhängigkeit erhalten.",
+      "source_ids": [
+        "bioleft-about",
+        "bioleft-platform"
+      ]
+    }
+  },
+  "confidence": 0.92,
+  "limitations": [
+    "Offene Lizenzen gelten für konkret registrierte beziehungsweise vereinbarte Materialien, nicht für sämtliches Saatgut Argentiniens.",
+    "Der digitale Plattformbetreiber ist nicht automatisch gemeinschaftliches Eigentum aller Nutzer.",
+    "Saatguttausch kann phytosanitäre, züchtungsrechtliche und vertragliche Bedingungen erfordern."
+  ],
+  "notes": "Gemeinsam dokumentierte Open-Seed-Lizenzen und verbindliche Austauschverfahren tragen die Ressourcengemeinschaft."
+}

@@ -1,0 +1,114 @@
+{
+  "schema_version": 4,
+  "id": "adjuntas-pueblo-solar",
+  "title": "Adjuntas Pueblo Solar / ACESA",
+  "summary": "In Adjuntas, Puerto Rico, organisieren lokale Gemeinschaften und die Energieorganisation ACESA die gemeinschaftliche Nutzung und Verantwortung für ein solares Mikronetz zur resilienten Versorgung.",
+  "themes": [
+    "renewable-energy",
+    "energy",
+    "infrastructure",
+    "climate-resilience"
+  ],
+  "actions": [
+    "learn"
+  ],
+  "presence": {
+    "geographic": [
+      {
+        "id": "adjuntas-pueblo-solar-region",
+        "mode": "approximate",
+        "label": "Adjuntas Pueblo Solar / ACESA – öffentliches Solarmikronetz am Ortskern",
+        "privacy_note": "Ungefähre Lage an der öffentlichen Plaza; keine Einzelmarkierungen von Solardächern, privaten Geschäften, Speichern oder Leitungen.",
+        "source_ids": [
+          "adjuntas-pueblo-solar-home",
+          "adjuntas-pueblo-solar-plaza",
+          "osm-adjuntas-independencia-energetica"
+        ],
+        "geometry": {
+          "type": "Point",
+          "coordinates": [
+            -66.7218006,
+            18.1610155
+          ]
+        },
+        "uncertainty_meters_min": 700
+      }
+    ],
+    "digital": {
+      "available": false,
+      "source_ids": [
+        "adjuntas-pueblo-solar-home"
+      ]
+    }
+  },
+  "activity": {
+    "status": "unknown",
+    "observed_at": "2026-11-20",
+    "source_ids": [
+      "adjuntas-pueblo-solar-home"
+    ],
+    "note": "Die dokumentierte Praxis ist belegt, ihr operativer Status wurde in dieser Aufnahme nicht als tagesaktuell verifiziert."
+  },
+  "provenance": {
+    "sources": [
+      {
+        "id": "adjuntas-pueblo-solar-home",
+        "type": "official-source",
+        "label": "Adjuntas Pueblo Solar / ACESA – Projektinformation",
+        "url": "https://www.honnoldfoundation.org/adjuntas-a-solar-community",
+        "retrieved_at": "2026-11-20",
+        "note": "Öffentliche projektnahe Information über die gemeinsame Ressource und die Beteiligten."
+      },
+      {
+        "id": "adjuntas-pueblo-solar-governance",
+        "type": "official-source",
+        "label": "Adjuntas Pueblo Solar / ACESA – Organisation und Regeln",
+        "url": "https://www.honnoldfoundation.org/partner/casa-pueblo",
+        "retrieved_at": "2026-11-20",
+        "note": "Projektnahe Details zu gemeinsamen Praktiken, Organisation oder relevanten Grenzen."
+      },
+      {
+        "id": "adjuntas-pueblo-solar-plaza",
+        "type": "official-source",
+        "label": "Honnold Foundation – ACESA und Casa Pueblo am Ortskern Adjuntas",
+        "url": "https://www.honnoldfoundation.org/news/press-release-casa-pueblo-and-small-business-owners-advance-their-vision-of-transforming-the-town-of-adjuntas-into-the-first-pueblo-solar",
+        "retrieved_at": "2026-11-22",
+        "note": "Das Solarmikronetz versorgt laut Projektmitteilung Geschäfte rund um die zentrale Plaza von Adjuntas."
+      },
+      {
+        "id": "osm-adjuntas-independencia-energetica",
+        "type": "public-registry",
+        "label": "OpenStreetMap – Plaza de la Independencia Energética, Adjuntas",
+        "url": "https://www.openstreetmap.org/way/1347765131",
+        "retrieved_at": "2026-11-22",
+        "note": "Öffentliche Plaza als Ortsanker, keine exakte Netzgeometrie. OpenStreetMap-Daten unter ODbL 1.0."
+      }
+    ]
+  },
+  "curation": {
+    "state": "listed",
+    "catalogued_at": "2026-11-20",
+    "reviewed_by": "Commonworld editorial review",
+    "reviewed_at": "2026-11-20",
+    "next_review_at": "2027-01-03",
+    "notes": "Aktueller Betriebszustand nicht zeitnah verifiziert. Neue quellengebundene Commons-Aufnahme; Wiedervorlage innerhalb von 45 Tagen."
+  },
+  "links": [
+    {
+      "type": "homepage",
+      "label": "Adjuntas Pueblo Solar / ACESA – offizielle Seite",
+      "url": "https://www.honnoldfoundation.org/adjuntas-a-solar-community"
+    },
+    {
+      "type": "learn",
+      "label": "Gemeinsame Praxis und Verantwortung kennenlernen",
+      "url": "https://www.honnoldfoundation.org/partner/casa-pueblo",
+      "source_ids": [
+        "adjuntas-pueblo-solar-governance"
+      ]
+    }
+  ],
+  "handoff": {
+    "enabled": false
+  }
+}

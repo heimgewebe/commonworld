@@ -81,7 +81,7 @@
     "b4rn": {
       "summary": "A member-owned Community Benefit Society that works with rural communities in northern England to plan, finance, build and operate full-fibre broadband, with volunteers, landowners and community investors contributing to the infrastructure.",
       "geographic_labels": {
-        "b4rn-rural-communities": "Northern England — rural B4RN communities and build areas"
+        "b4rn-rural-communities": "B4RN — public coordination office in Melling (village anchor)"
       },
       "digital_label": "Member-owned full-fibre infrastructure built with rural B4RN communities"
     },
@@ -122,7 +122,7 @@
       "title": "Bologna Urban Commons",
       "summary": "A citywide shared-administration infrastructure in which civic groups and the Municipality of Bologna use collaboration pacts to care for, regenerate and use material, immaterial and digital commons for activities in the general interest.",
       "geographic_labels": {
-        "bologna-citywide-pacts": "Collaboration pacts distributed across Bologna"
+        "bologna-citywide-pacts": "Bologna Urban Commons — citywide civic collaboration pacts (city anchor)"
       },
       "digital_label": "Public dataset and interactive overview of collaboration pacts for urban commons"
     },
@@ -183,7 +183,7 @@
     "community-seed-bank-nepal": {
       "summary": "A network of farmer-led community seed banks in Nepal preserves local varieties and organizes seed exchange, maintenance and knowledge about crop biodiversity.",
       "geographic_labels": {
-        "community-seed-bank-nepal-region": "Nepal – Netzwerk lokaler Saatgutbanken"
+        "community-seed-bank-nepal-region": "Community Seed Bank Nepal — Kawasoti secretariat (town anchor)"
       }
     },
     "communs-paysans": {
@@ -267,7 +267,7 @@
       "title": "Federation of Community Forestry Users Nepal",
       "summary": "A nationwide federation of community forest user groups in Nepal that strengthens local use rights, democratic self-organization, sustainable forest management, knowledge exchange and members' participation in policy.",
       "geographic_labels": {
-        "fecofun-nepal-network": "Nationwide network of community forest user groups in Nepal"
+        "fecofun-nepal-network": "FECOFUN — public federation secretariat in Duwakot (locality anchor)"
       }
     },
     "fiji-locally-managed-marine-area-network": {
@@ -280,7 +280,7 @@
     "foodsharing": {
       "summary": "Volunteers in Germany rescue and share edible food, maintain public sharing points and coordinate common hygiene and stewardship rules.",
       "geographic_labels": {
-        "foodsharing-region": "Deutschland – verteilte Fairteiler und regionale Gruppen"
+        "foodsharing-region": "foodsharing e. V. — Cologne registered association (city anchor)"
       },
       "digital_label": "Shared coordination of food rescue and public sharing points"
     },
@@ -306,7 +306,7 @@
     "fucvam": {
       "summary": "Uruguay's federation of mutual-aid housing cooperatives combines collective land ownership, democratic self-management and mutual aid in building and maintaining housing.",
       "geographic_labels": {
-        "fucvam-uruguay": "Uruguay — nationwide federation",
+        "fucvam-uruguay": "FUCVAM — public federation headquarters in Montevideo",
         "fucvam-homes": "Individual homes and residents' addresses"
       }
     },
@@ -349,7 +349,7 @@
     "green-coop-japan": {
       "summary": "A member-led federation of 16 consumer cooperatives in Japan in which about 432,000 member households jointly develop and use supply, social-support, environmental and mutual-aid infrastructures; participation and co-governance are membership-bound.",
       "geographic_labels": {
-        "green-coop-regions": "Japan — 16 regional Green Coop member cooperatives"
+        "green-coop-regions": "Green Coop — Fukuoka federation coordination (city anchor)"
       },
       "digital_label": "Member information, cooperative principles and public reports on shared activities"
     },
@@ -403,7 +403,7 @@
     "kudumbashree-community-network": {
       "summary": "Women's neighbourhood groups in Kerala pool savings and organize shared economic and social projects through elected local and federated structures.",
       "geographic_labels": {
-        "kudumbashree-community-network-region": "Kerala, Indien – lokale Nachbarschaftsgruppen"
+        "kudumbashree-community-network-region": "Kudumbashree — state mission in Thiruvananthapuram (city anchor)"
       }
     },
     "kyrgyzstan-water-users-associations-union": {
@@ -423,7 +423,7 @@
     "lebanon-hima-network": {
       "summary": "A Lebanese network of Hima sites in which municipalities and local communities establish and steward natural-resource areas through municipal decisions, community guardianship and locally rooted conservation and use rules.",
       "geographic_labels": {
-        "lebanon-hima-network-sites": "Lebanon — Hima sites and associated community stewardship areas"
+        "lebanon-hima-network-sites": "Lebanon Hima Network — public SPNL Hima Centre near Kayfoun (village anchor)"
       },
       "digital_label": "Public SPNL documentation on the Hima network, municipal declarations and community stewardship"
     },
@@ -456,7 +456,7 @@
     "mietshaeuser-syndikat": {
       "summary": "A network of self-organized housing projects that uses a shared corporate structure to remove properties permanently from speculative resale and a solidarity transfer to support new community housing projects.",
       "geographic_labels": {
-        "mietshaeuser-network": "Decentralized project network in Germany and beyond",
+        "mietshaeuser-network": "Mietshäuser Syndikat — public federation office in Freiburg",
         "mietshaeuser-residences": "Residential buildings and residents’ addresses"
       }
     },
@@ -502,7 +502,7 @@
     "new-mexico-acequia-association": {
       "summary": "An association in New Mexico that supports collectively managed irrigation canals, democratic water governance, traditional agriculture and the agency of local acequia communities.",
       "geographic_labels": {
-        "nmaa-new-mexico": "New Mexico — statewide association context",
+        "nmaa-new-mexico": "New Mexico Acequia Association — Santa Fe office (city anchor)",
         "nmaa-acequias": "Individual acequias, plots and private water infrastructure"
       },
       "digital_label": "Public education, organizational and participation information"
@@ -572,7 +572,7 @@
     "orangi-low-cost-sanitation": {
       "summary": "A community-organized sanitation practice from Orangi in Karachi in which neighbourhoods jointly finance, build, manage and maintain household connections, lane sewers and secondary sewers, while OPP-RTI provides technical guidance and public authorities remain responsible for trunk infrastructure.",
       "geographic_labels": {
-        "orangi-sanitation-network": "Orangi, Karachi — community-managed sanitation infrastructure"
+        "orangi-sanitation-network": "Orangi Low-Cost Sanitation — Orangi Town, Karachi (district anchor)"
       },
       "digital_label": "Public OPP-RTI documentation of community-financed and maintained low-cost sanitation"
     },
@@ -628,7 +628,7 @@
       "title": "Repair Café International",
       "summary": "A worldwide network of volunteer-run, non-commercial repair meetings where people share tools, knowledge and time to repair everyday objects together and build local repair skills.",
       "geographic_labels": {
-        "repair-cafe-worldwide-network": "Worldwide network of locally organized Repair Cafés"
+        "repair-cafe-worldwide-network": "Repair Café International — Amsterdam foundation (city anchor; not a café)"
       },
       "digital_label": "Location search, repair knowledge and starter materials for local Repair Cafés"
     },
@@ -678,7 +678,7 @@
     "som-energia": {
       "summary": "A non-profit energy cooperative in Spain whose members democratically support and develop renewable-energy supply, community generation projects and local groups.",
       "geographic_labels": {
-        "som-energia-spain": "Spain — nationwide cooperative context",
+        "som-energia-spain": "Som Energia — public cooperative office in Girona",
         "som-energia-private-sites": "Private connections and facilities not individually verified"
       },
       "digital_label": "Member portal, project information and local groups"
@@ -692,7 +692,7 @@
     "te-hiku-media": {
       "summary": "Te Hiku Media develops Māori language archives, datasets and technology with language communities while prioritizing Indigenous data sovereignty over unrestricted public release.",
       "geographic_labels": {
-        "te-hiku-media-region": "Te Hiku, Aotearoa Neuseeland"
+        "te-hiku-media-region": "Te Hiku Media — public media office in Kaitaia"
       },
       "digital_label": "Māori language archives and tools under Indigenous data sovereignty"
     },

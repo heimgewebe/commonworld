@@ -13,12 +13,22 @@
     "geographic": [
       {
         "id": "te-hiku-media-region",
-        "mode": "hidden",
-        "label": "Te Hiku, Aotearoa Neuseeland",
-        "privacy_note": "Region und gemeinschaftlicher Wirkungsraum sind belegt; ohne gesondert verifizierte öffentliche Geometrie wird kein künstlicher Ortsmarker gesetzt.",
+        "mode": "approximate",
+        "label": "Te Hiku Media – öffentliches Medienbüro Kaitaia",
+        "privacy_note": "Nur öffentliches Te-Hiku-Media-Büro in Kaitaia, keine indigenen Gemeinschaftsstandorte, Sprachdatenherkunft oder private Personen.",
         "source_ids": [
-          "te-hiku-media-home"
-        ]
+          "te-hiku-media-home",
+          "te-hiku-media-site-20261122",
+          "te-hiku-media-osm-20261122"
+        ],
+        "geometry": {
+          "type": "Point",
+          "coordinates": [
+            173.2642432,
+            -35.1138358
+          ]
+        },
+        "uncertainty_meters_min": 450
       }
     ],
     "digital": {
@@ -55,6 +65,22 @@
         "url": "https://docs.tehiku.media/article/42-data-sovereignty",
         "retrieved_at": "2026-11-20",
         "note": "Projektnahe Details zu gemeinsamen Praktiken, Organisation oder relevanten Grenzen."
+      },
+      {
+        "id": "te-hiku-media-site-20261122",
+        "type": "official-source",
+        "label": "te-hiku-media – official public organisation/site",
+        "url": "https://kaituhi.nz/terms-of-service",
+        "retrieved_at": "2026-11-22",
+        "note": "Die von Te Hiku Media betriebene offizielle Kaituhi-Website nennt Level 2, 1 Melba Street, Kaitaia als Organisationsanschrift."
+      },
+      {
+        "id": "te-hiku-media-osm-20261122",
+        "type": "public-registry",
+        "label": "Te Hiku Media named office",
+        "url": "https://www.openstreetmap.org/node/12311293211",
+        "retrieved_at": "2026-11-22",
+        "note": "Öffentliche OpenStreetMap-Ortsreferenz; keine Geometrie des gesamten Commons-Netzwerks. Daten unter ODbL 1.0."
       }
     ]
   },

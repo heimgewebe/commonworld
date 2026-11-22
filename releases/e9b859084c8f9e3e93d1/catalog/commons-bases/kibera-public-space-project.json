@@ -1,0 +1,55 @@
+{
+  "schema_version": 1,
+  "kind": "commonworld_commons_basis",
+  "project_id": "kibera-public-space-project",
+  "classification": "commons-infrastructure",
+  "decision": "include",
+  "reviewed_at": "2026-10-31",
+  "reviewer": "Commonworld editorial desk review",
+  "criteria": {
+    "shared_resource": {
+      "status": "supported",
+      "statement": "Nachbarschaftliche öffentliche Räume, Wasser- und Sanitäreinrichtungen sowie gemeinsam gepflegte Gärten werden zugänglich gemacht.",
+      "source_ids": [
+        "kibera-kdi-official",
+        "kpsp01-community-management"
+      ]
+    },
+    "community": {
+      "status": "supported",
+      "statement": "Nachbargruppen und lokale Betreiberkomitees gestalten und verwalten die jeweiligen Standorte mit Unterstützung durch KDI.",
+      "source_ids": [
+        "kibera-kdi-official",
+        "kpsp01-community-management"
+      ]
+    },
+    "commoning_practice": {
+      "status": "supported",
+      "statement": "Gemeinschaften gestalten Räume, betreiben Dienstleistungen, pflegen Anlagen und organisieren wiederkehrende Programme.",
+      "source_ids": [
+        "kibera-kdi-official"
+      ]
+    },
+    "rules_and_responsibility": {
+      "status": "supported",
+      "statement": "KDI dokumentiert ortsbezogene Bewohnerverwaltung; KPSP01 besitzt mit NNDC eine konkret gegründete Gruppe zur Betriebs- und Pflegeentscheidung.",
+      "source_ids": [
+        "kpsp01-community-management"
+      ]
+    },
+    "common_benefit": {
+      "status": "supported",
+      "statement": "Öffentliche Treffpunkte, Entwässerung und gemeinschaftliche Wirtschaftsangebote fördern Sicherheit und lokale Lebensgrundlagen.",
+      "source_ids": [
+        "kibera-kdi-official"
+      ]
+    }
+  },
+  "confidence": 0.91,
+  "limitations": [
+    "Gemeinschaftliche Verwaltung belegt nicht die durchgehend gleiche rechtliche Eigentümerschaft aller Flächen.",
+    "Jeder Projektstandort besitzt örtliche Strukturen und kann von Landkonflikten betroffen sein.",
+    "Aktuelle Nutzung, Baustand und Betreuung einzelner Standorte wurden nicht vor Ort geprüft."
+  ],
+  "notes": "Von Bewohnergruppen geführte öffentliche Rauminfrastruktur mit dokumentierter lokaler Betreiberzuständigkeit."
+}

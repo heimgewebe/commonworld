@@ -1,0 +1,114 @@
+{
+  "schema_version": 4,
+  "id": "ecopower",
+  "title": "Ecopower",
+  "summary": "Mitglieder der belgischen Energiegenossenschaft Ecopower finanzieren und verwalten gemeinsam erneuerbare Energieprojekte und bestimmen nach dem Prinzip einer Stimme pro Mitglied.",
+  "themes": [
+    "renewable-energy",
+    "energy",
+    "cooperative",
+    "commons-governance"
+  ],
+  "actions": [
+    "learn"
+  ],
+  "presence": {
+    "geographic": [
+      {
+        "id": "ecopower-region",
+        "mode": "approximate",
+        "label": "Ecopower – öffentliches Genossenschaftsbüro Berchem",
+        "privacy_note": "Nur öffentliches Büro in Posthoflei 3, keine Kartierung der belgischen Erzeugungsanlagen, Mitglieder oder Anschlüsse.",
+        "source_ids": [
+          "ecopower-home",
+          "ecopower-contact",
+          "osm-ecopower-berchem"
+        ],
+        "geometry": {
+          "type": "Point",
+          "coordinates": [
+            4.4313194,
+            51.1991351
+          ]
+        },
+        "uncertainty_meters_min": 300
+      }
+    ],
+    "digital": {
+      "available": false,
+      "source_ids": [
+        "ecopower-home"
+      ]
+    }
+  },
+  "activity": {
+    "status": "unknown",
+    "observed_at": "2026-11-20",
+    "source_ids": [
+      "ecopower-home"
+    ],
+    "note": "Die dokumentierte Praxis ist belegt, ihr operativer Status wurde in dieser Aufnahme nicht als tagesaktuell verifiziert."
+  },
+  "provenance": {
+    "sources": [
+      {
+        "id": "ecopower-home",
+        "type": "official-source",
+        "label": "Ecopower – Projektinformation",
+        "url": "https://ecopower.be/",
+        "retrieved_at": "2026-11-20",
+        "note": "Öffentliche projektnahe Information über die gemeinsame Ressource und die Beteiligten."
+      },
+      {
+        "id": "ecopower-governance",
+        "type": "official-source",
+        "label": "Ecopower – Organisation und Regeln",
+        "url": "https://ecopower.be/statuten-en-intern-reglement",
+        "retrieved_at": "2026-11-20",
+        "note": "Projektnahe Details zu gemeinsamen Praktiken, Organisation oder relevanten Grenzen."
+      },
+      {
+        "id": "ecopower-contact",
+        "type": "official-source",
+        "label": "Ecopower – Kontakt und Büro in Berchem",
+        "url": "https://ecopower.be/contact",
+        "retrieved_at": "2026-11-22",
+        "note": "Die Genossenschaft veröffentlicht Posthoflei 3 bus 3, 2600 Berchem als Geschäftsadresse."
+      },
+      {
+        "id": "osm-ecopower-berchem",
+        "type": "public-registry",
+        "label": "OpenStreetMap – Ecopower, Posthoflei 3",
+        "url": "https://www.openstreetmap.org/node/11078724997",
+        "retrieved_at": "2026-11-22",
+        "note": "Namensgleicher öffentlich kartierter Genossenschaftsstandort. OpenStreetMap-Daten unter ODbL 1.0."
+      }
+    ]
+  },
+  "curation": {
+    "state": "listed",
+    "catalogued_at": "2026-11-20",
+    "reviewed_by": "Commonworld editorial review",
+    "reviewed_at": "2026-11-20",
+    "next_review_at": "2027-01-03",
+    "notes": "Aktueller Betriebszustand nicht zeitnah verifiziert. Neue quellengebundene Commons-Aufnahme; Wiedervorlage innerhalb von 45 Tagen."
+  },
+  "links": [
+    {
+      "type": "homepage",
+      "label": "Ecopower – offizielle Seite",
+      "url": "https://ecopower.be/"
+    },
+    {
+      "type": "learn",
+      "label": "Gemeinsame Praxis und Verantwortung kennenlernen",
+      "url": "https://ecopower.be/statuten-en-intern-reglement",
+      "source_ids": [
+        "ecopower-governance"
+      ]
+    }
+  ],
+  "handoff": {
+    "enabled": false
+  }
+}

@@ -17,12 +17,22 @@
     "geographic": [
       {
         "id": "fucvam-uruguay",
-        "mode": "hidden",
-        "label": "Uruguay – landesweite Föderation",
-        "privacy_note": "Keine künstliche Projektgeometrie: Der landesweite Organisationsbezug bleibt ohne Punkt; Genossenschaften, Wohnungen und Bewohneradressen werden nicht rekonstruiert.",
+        "mode": "approximate",
+        "label": "FUCVAM – öffentliches Verbandszentrum Montevideo",
+        "privacy_note": "Nur die öffentliche FUCVAM-Geschäftsstelle, keine angeschlossenen Wohnungsbauprojekte, Grundstücke oder Bewohneradressen.",
         "source_ids": [
-          "fucvam-home"
-        ]
+          "fucvam-home",
+          "fucvam-site-20261122",
+          "fucvam-osm-20261122"
+        ],
+        "geometry": {
+          "type": "Point",
+          "coordinates": [
+            -56.1693479,
+            -34.89654
+          ]
+        },
+        "uncertainty_meters_min": 450
       },
       {
         "id": "fucvam-homes",
@@ -74,6 +84,22 @@
         "url": "https://www.fucvam.org.uy/quienes-somos/estatuto-social-de-fucvam",
         "retrieved_at": "2026-10-31",
         "note": "Offizielle Satzung mit nationaler Versammlung, regionalen Strukturen und innergenossenschaftlicher Ordnung."
+      },
+      {
+        "id": "fucvam-site-20261122",
+        "type": "official-source",
+        "label": "fucvam – official public organisation/site",
+        "url": "https://www.fucvam.org.uy/novedades/convocatoria-la-35-asamblea-nacional-ordinaria",
+        "retrieved_at": "2026-11-22",
+        "note": "2026 nennt FUCVAM seine öffentlich besuchbare Zentrale am Zugang Daniel Muñoz 2218, Montevideo; an Eduardo Víctor Haedo 2219 geokodiert."
+      },
+      {
+        "id": "fucvam-osm-20261122",
+        "type": "public-registry",
+        "label": "Named FUCVAM NGO headquarters",
+        "url": "https://www.openstreetmap.org/node/9885372237",
+        "retrieved_at": "2026-11-22",
+        "note": "Öffentliche OpenStreetMap-Ortsreferenz; keine Geometrie des gesamten Commons-Netzwerks. Daten unter ODbL 1.0."
       }
     ]
   },

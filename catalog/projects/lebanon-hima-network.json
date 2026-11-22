@@ -17,13 +17,23 @@
     "geographic": [
       {
         "id": "lebanon-hima-network-sites",
-        "mode": "hidden",
-        "label": "Libanon – Hima-Gebiete und zugehörige gemeinschaftliche Verantwortungsräume",
-        "privacy_note": "Commonworld veröffentlicht keine aus SPNL- oder WDPA-Unterlagen abgeleiteten Hima-Grenzen, Nutzungszonen oder kleinteiligen Ressourcenorte; sichtbar bleibt nur der landesweite Netzwerkbezug.",
+        "mode": "approximate",
+        "label": "Lebanon Hima Network – öffentliches SPNL-Hima-Zentrum bei Kayfoun (Ortsanker)",
+        "privacy_note": "Nur das öffentliche SPNL-Koordinationszentrum bei Kayfoun, keine Hima-Gebietsgrenzen, Schutzflächen oder sensible Ressourcenorte.",
         "source_ids": [
           "spnl-hima-44-2026",
-          "spnl-baaloul-2026"
-        ]
+          "spnl-baaloul-2026",
+          "lebanon-hima-network-site-20261122",
+          "lebanon-hima-network-osm-20261122"
+        ],
+        "geometry": {
+          "type": "Point",
+          "coordinates": [
+            35.5594447,
+            33.7784558
+          ]
+        },
+        "uncertainty_meters_min": 5000
       }
     ],
     "digital": {
@@ -79,6 +89,22 @@
         "url": "https://www.spnl.org/homat-al-hima-the-heart-of-himas/",
         "retrieved_at": "2026-08-14",
         "note": "Aktueller SPNL-Beleg für Hima Guardians als gemeinschaftliche Hüter natürlicher und kultureller Ressourcen und für nachhaltige Nutzung und geteilte Verantwortung."
+      },
+      {
+        "id": "lebanon-hima-network-site-20261122",
+        "type": "official-source",
+        "label": "lebanon-hima-network – official public organisation/site",
+        "url": "https://www.spnl.org/contact-us/",
+        "retrieved_at": "2026-11-22",
+        "note": "SPNL nennt das öffentlich kontaktierbare Luc Hoffmann Hima Center in Horsh Kayfoun; keine Gebäudegeometrie verifiziert."
+      },
+      {
+        "id": "lebanon-hima-network-osm-20261122",
+        "type": "public-registry",
+        "label": "Kayfoun village anchor",
+        "url": "https://www.openstreetmap.org/node/6245627498",
+        "retrieved_at": "2026-11-22",
+        "note": "Öffentliche OpenStreetMap-Ortsreferenz; keine Geometrie des gesamten Commons-Netzwerks. Daten unter ODbL 1.0."
       }
     ],
     "uncertainty_note": "Die 44 Himas sind eigenständige lokale Arrangements mit unterschiedlicher kommunaler und gemeinschaftlicher Ausgestaltung. Commonworld behandelt das Netz als Commons-Infrastruktur und nicht als Eigentümer eines einzigen landesweiten Common."

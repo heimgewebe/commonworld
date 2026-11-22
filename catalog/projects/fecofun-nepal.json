@@ -19,13 +19,23 @@
     "geographic": [
       {
         "id": "fecofun-nepal-network",
-        "mode": "hidden",
-        "label": "Landesweites Netz gemeinschaftlicher Waldnutzergruppen in Nepal",
-        "privacy_note": "Die Föderation umfasst zahlreiche lokale Gruppen und Ebenen; Commonworld rekonstruiert aus den Netzwerkangaben keine unvollständige oder scheinpräzise Geometrie.",
+        "mode": "approximate",
+        "label": "FECOFUN – öffentliches Föderationssekretariat Duwakot (Ortsteilanker)",
+        "privacy_note": "Nur Duwakot als öffentlich benannter Verbandsort; keine Waldnutzungsgebiete, Nutzergruppen und Forststandorte.",
         "source_ids": [
           "fecofun-home",
-          "fecofun-about"
-        ]
+          "fecofun-about",
+          "fecofun-nepal-site-20261122",
+          "fecofun-nepal-osm-20261122"
+        ],
+        "geometry": {
+          "type": "Point",
+          "coordinates": [
+            85.412682,
+            27.694099
+          ]
+        },
+        "uncertainty_meters_min": 4500
       }
     ],
     "digital": {
@@ -69,6 +79,22 @@
         "url": "https://fecofun.org.np/contacts/",
         "retrieved_at": "2026-07-28",
         "note": "Offizielle Kontakt- und Organisationsadresse."
+      },
+      {
+        "id": "fecofun-nepal-site-20261122",
+        "type": "official-source",
+        "label": "fecofun-nepal – official public organisation/site",
+        "url": "https://fecofun.org.np/contacts/",
+        "retrieved_at": "2026-11-22",
+        "note": "Die Föderation nennt Changunarayan Municipality-2, Duwakot, Bhaktapur; genaue Bürogeometrie unbekannt."
+      },
+      {
+        "id": "fecofun-nepal-osm-20261122",
+        "type": "public-registry",
+        "label": "Duwakot locality anchor",
+        "url": "https://www.openstreetmap.org/node/2148707722",
+        "retrieved_at": "2026-11-22",
+        "note": "Öffentliche OpenStreetMap-Ortsreferenz; keine Geometrie des gesamten Commons-Netzwerks. Daten unter ODbL 1.0."
       }
     ]
   },
