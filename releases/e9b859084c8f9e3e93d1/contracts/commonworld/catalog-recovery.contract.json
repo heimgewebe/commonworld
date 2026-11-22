@@ -1,0 +1,51 @@
+{
+  "schema_version": 1,
+  "kind": "commonworld_catalog_recovery_contract",
+  "task_id": "COMMONWORLD-PUBLIC-GLOBE-V1-T028",
+  "status": "de_en_bounded_recovery_proven",
+  "canonical_records": "catalog/projects/*.json",
+  "generator": "scripts/build_catalog_recovery.py",
+  "measurement": "scripts/measure_catalog_recovery.py",
+  "evidence": "docs/evidence/catalog-recovery-scale-v1.json",
+  "locales": [
+    "de",
+    "en"
+  ],
+  "scale_tiers": [
+    1000,
+    10000
+  ],
+  "routing": {
+    "english_index": "catalog/index.html",
+    "german_index": "catalog/de/index.html",
+    "english_projects": "catalog/projects/{CommonProject.id}.html",
+    "german_projects": "catalog/de/projects/{CommonProject.id}.html",
+    "canonical_json": "catalog/projects/{CommonProject.id}.json",
+    "ordering": "CommonProject.id ascending",
+    "page_size": 24
+  },
+  "budgets": {
+    "index_page_max_entries": 24,
+    "index_page_max_raw_bytes": 196608,
+    "index_page_max_gzip_bytes": 32768,
+    "index_page_max_start_tags": 640,
+    "project_page_max_raw_bytes": 32768,
+    "project_page_max_gzip_bytes": 8192,
+    "project_page_max_start_tags": 160,
+    "landing_recovery_max_entries": 24
+  },
+  "invariants": {
+    "javascript_required": false,
+    "runtime_write_path": false,
+    "account_required": false,
+    "telemetry_added": false,
+    "hidden_location_geometry_rendered": false,
+    "generated_fixture_is_public_catalog": false,
+    "every_catalog_identity_has_project_page": true,
+    "every_index_identity_appears_once_per_locale": true
+  },
+  "authorization": {
+    "runtime_catalogue_cutover_authorized": false,
+    "reason": "Bounded DE/EN no-JavaScript and bootstrap-failure recovery is proven at 1k and 10k. The visible interactive runtime still uses the compact build-bound bootstrap; scale-native search, map and digital navigation, remaining failure/device parity, deployment and exact production readback remain open."
+  }
+}

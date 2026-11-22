@@ -1,0 +1,114 @@
+{
+  "schema_version": 4,
+  "id": "community-seed-bank-nepal",
+  "title": "Community Seed Bank Nepal",
+  "summary": "Ein Netzwerk bäuerlich getragener Saatgutbanken in Nepal bewahrt lokale Sorten und organisiert Saatguttausch, Saatgutpflege sowie gemeinsames Wissen über Agrarbiodiversität.",
+  "themes": [
+    "seeds",
+    "agriculture",
+    "food",
+    "biodiversity"
+  ],
+  "actions": [
+    "learn"
+  ],
+  "presence": {
+    "geographic": [
+      {
+        "id": "community-seed-bank-nepal-region",
+        "mode": "approximate",
+        "label": "Community Seed Bank Nepal – öffentliches Sekretariat Kawasoti (Ortsanker)",
+        "privacy_note": "Nur der grobe Ort des Sekretariats Kawasoti-14/Agyauli; keine Saatgutbanken, Bauernhöfe oder Haushalte.",
+        "source_ids": [
+          "community-seed-bank-nepal-home",
+          "community-seed-bank-nepal-site-20261122",
+          "community-seed-bank-nepal-osm-20261122"
+        ],
+        "geometry": {
+          "type": "Point",
+          "coordinates": [
+            84.1251637,
+            27.6415327
+          ]
+        },
+        "uncertainty_meters_min": 20000
+      }
+    ],
+    "digital": {
+      "available": false,
+      "source_ids": [
+        "community-seed-bank-nepal-home"
+      ]
+    }
+  },
+  "activity": {
+    "status": "unknown",
+    "observed_at": "2026-11-20",
+    "source_ids": [
+      "community-seed-bank-nepal-home"
+    ],
+    "note": "Die dokumentierte Praxis ist belegt, ihr operativer Status wurde in dieser Aufnahme nicht als tagesaktuell verifiziert."
+  },
+  "provenance": {
+    "sources": [
+      {
+        "id": "community-seed-bank-nepal-home",
+        "type": "official-source",
+        "label": "Community Seed Bank Nepal – Projektinformation",
+        "url": "https://csbnepal.org/our-work/",
+        "retrieved_at": "2026-11-20",
+        "note": "Öffentliche projektnahe Information über die gemeinsame Ressource und die Beteiligten."
+      },
+      {
+        "id": "community-seed-bank-nepal-governance",
+        "type": "official-source",
+        "label": "Community Seed Bank Nepal – Organisation und Regeln",
+        "url": "https://csbnepal.org/",
+        "retrieved_at": "2026-11-20",
+        "note": "Projektnahe Details zu gemeinsamen Praktiken, Organisation oder relevanten Grenzen."
+      },
+      {
+        "id": "community-seed-bank-nepal-site-20261122",
+        "type": "official-source",
+        "label": "community-seed-bank-nepal – official public organisation/site",
+        "url": "https://csbnepal.org/contact/",
+        "retrieved_at": "2026-11-22",
+        "note": "Sekretariatsangabe Kawasoti Municipality-14, Agyauli, Nawalparasi; kein genauer Gebäudepunkt."
+      },
+      {
+        "id": "community-seed-bank-nepal-osm-20261122",
+        "type": "public-registry",
+        "label": "Kawasoti town anchor",
+        "url": "https://www.openstreetmap.org/node/2264286090",
+        "retrieved_at": "2026-11-22",
+        "note": "Öffentliche OpenStreetMap-Ortsreferenz; keine Geometrie des gesamten Commons-Netzwerks. Daten unter ODbL 1.0."
+      }
+    ]
+  },
+  "curation": {
+    "state": "listed",
+    "catalogued_at": "2026-11-20",
+    "reviewed_by": "Commonworld editorial review",
+    "reviewed_at": "2026-11-20",
+    "next_review_at": "2027-01-03",
+    "notes": "Aktueller Betriebszustand nicht zeitnah verifiziert. Neue quellengebundene Commons-Aufnahme; Wiedervorlage innerhalb von 45 Tagen."
+  },
+  "links": [
+    {
+      "type": "homepage",
+      "label": "Community Seed Bank Nepal – offizielle Seite",
+      "url": "https://csbnepal.org/our-work/"
+    },
+    {
+      "type": "learn",
+      "label": "Gemeinsame Praxis und Verantwortung kennenlernen",
+      "url": "https://csbnepal.org/",
+      "source_ids": [
+        "community-seed-bank-nepal-governance"
+      ]
+    }
+  ],
+  "handoff": {
+    "enabled": false
+  }
+}

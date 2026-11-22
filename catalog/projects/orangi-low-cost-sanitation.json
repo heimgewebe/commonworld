@@ -18,13 +18,23 @@
     "geographic": [
       {
         "id": "orangi-sanitation-network",
-        "mode": "hidden",
-        "label": "Orangi, Karachi – gemeinschaftlich verwaltete Sanitärinfrastruktur",
-        "privacy_note": "Das Common besteht aus Haushalts-, Gassen- und Nachbarschaftsinfrastruktur. Commonworld veröffentlicht keine Haus-, Leitungs-, Schacht- oder Gassenkoordinaten und erzeugt keine Geometrie aus Ortsangaben.",
+        "mode": "approximate",
+        "label": "Orangi Low-Cost Sanitation – Orangi Town, Karachi (Stadtteilanker)",
+        "privacy_note": "Nur Stadtteil Orangi als Wirkungsbereich; keinerlei Wohnhäuser, Abwasserleitungen, Gassen, Schächte, Anschlüsse oder technische Netzknoten.",
         "source_ids": [
           "opp-rti",
-          "opp-what-we-do"
-        ]
+          "opp-what-we-do",
+          "orangi-low-cost-sanitation-site-20261122",
+          "orangi-low-cost-sanitation-osm-20261122"
+        ],
+        "geometry": {
+          "type": "Point",
+          "coordinates": [
+            67.0128813,
+            24.9461056
+          ]
+        },
+        "uncertainty_meters_min": 16000
       }
     ],
     "digital": {
@@ -89,6 +99,22 @@
         "url": "https://www.opp.org.pk/contact/",
         "retrieved_at": "2026-08-13",
         "note": "Offizieller Kontaktweg zur unterstützenden OPP-RTI-Organisation."
+      },
+      {
+        "id": "orangi-low-cost-sanitation-site-20261122",
+        "type": "official-source",
+        "label": "orangi-low-cost-sanitation – official public organisation/site",
+        "url": "https://www.opp.org.pk/opp-rti/",
+        "retrieved_at": "2026-11-22",
+        "note": "Das Orangi Pilot Project dokumentiert das lokale Sanitärprogramm im Orangi-Viertel, ohne autoritative Gesamtgeometrie."
+      },
+      {
+        "id": "orangi-low-cost-sanitation-osm-20261122",
+        "type": "public-registry",
+        "label": "Orangi Town district anchor",
+        "url": "https://www.openstreetmap.org/relation/16347665",
+        "retrieved_at": "2026-11-22",
+        "note": "Öffentliche OpenStreetMap-Ortsreferenz; keine Geometrie des gesamten Commons-Netzwerks. Daten unter ODbL 1.0."
       }
     ],
     "uncertainty_note": "OPP-RTI ist Unterstützungs- und Wissensinstitution, nicht Eigentümer des Commons. Die lokale Gemeinschaft verantwortet die interne Infrastruktur; Hauptkanäle und Behandlung bleiben Aufgabe öffentlicher Stellen."

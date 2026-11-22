@@ -20,13 +20,23 @@
     "geographic": [
       {
         "id": "green-coop-regions",
-        "mode": "hidden",
-        "label": "Japan – 16 regionale Green-Coop-Mitgliedsgenossenschaften",
-        "privacy_note": "Der Verbund erstreckt sich über mehrere Regionen Japans. Commonworld kartiert keine Mitgliederadressen, Liefergebiete, Einrichtungen oder Arbeitsorte aus Verbundangaben.",
+        "mode": "approximate",
+        "label": "Green Coop – Föderationskoordinierung Fukuoka (Stadtanker)",
+        "privacy_note": "Nur die Organisationsstadt Fukuoka, keine regionalen Depots, Liefergebiete, 16 Genossenschaften oder Mitgliedsadressen.",
         "source_ids": [
           "green-coop-about",
-          "green-coop-community"
-        ]
+          "green-coop-community",
+          "green-coop-japan-site-20261122",
+          "green-coop-japan-osm-20261122"
+        ],
+        "geometry": {
+          "type": "Point",
+          "coordinates": [
+            130.4017509,
+            33.5898988
+          ]
+        },
+        "uncertainty_meters_min": 16000
       }
     ],
     "digital": {
@@ -98,6 +108,22 @@
         "url": "https://www.greencoop.or.jp/web-entry/join/join-terms-check.php",
         "retrieved_at": "2026-08-12",
         "note": "Offizieller Beitrittspfad mit regionaler Verfügbarkeitsprüfung und Mitgliedschaftsbedingungen."
+      },
+      {
+        "id": "green-coop-japan-site-20261122",
+        "type": "official-source",
+        "label": "green-coop-japan – official public organisation/site",
+        "url": "https://www.greencoop.or.jp/2024/03/14/news118/",
+        "retrieved_at": "2026-11-22",
+        "note": "Die Green-Coop-Gemeinschaft nennt ihre Verbandskoordination Hakataekimae 1-5-1, Fukuoka."
+      },
+      {
+        "id": "green-coop-japan-osm-20261122",
+        "type": "public-registry",
+        "label": "Fukuoka city anchor",
+        "url": "https://www.openstreetmap.org/relation/4008611",
+        "retrieved_at": "2026-11-22",
+        "note": "Öffentliche OpenStreetMap-Ortsreferenz; keine Geometrie des gesamten Commons-Netzwerks. Daten unter ODbL 1.0."
       }
     ],
     "uncertainty_note": "Green Coop vereint wirtschaftliche Genossenschaftstätigkeit und gemeinwohlorientierte Aktivitäten. Commonworld setzt den Verbund nicht mit einem frei zugänglichen öffentlichen Gut gleich; Teilhabe ist mitgliedschaftsgebunden."

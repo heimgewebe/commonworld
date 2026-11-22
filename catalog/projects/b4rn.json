@@ -22,13 +22,23 @@
     "geographic": [
       {
         "id": "b4rn-rural-communities",
-        "mode": "hidden",
-        "label": "Nordengland – ländliche B4RN-Gemeinden und Ausbaugebiete",
-        "privacy_note": "Keine künstliche Netzgeometrie: Commonworld rekonstruiert keine Haushaltsanschlüsse, Leitungsverläufe, Wayleaves, Schränke oder Grundstücksdaten aus Postcode-, Bau- oder Freiwilligeninformationen.",
+        "mode": "approximate",
+        "label": "B4RN – öffentliches Koordinationsbüro Melling (Ortsanker)",
+        "privacy_note": "Nur der Ortsbereich des B4RN-Büros Station Yard in Melling; keine Leitungen, Haushalte oder technische Netzinfrastruktur.",
         "source_ids": [
           "b4rn-about",
-          "b4rn-working-with-us"
-        ]
+          "b4rn-working-with-us",
+          "b4rn-site-20261122",
+          "b4rn-osm-20261122"
+        ],
+        "geometry": {
+          "type": "Point",
+          "coordinates": [
+            -2.6160336,
+            54.1350198
+          ]
+        },
+        "uncertainty_meters_min": 3000
       }
     ],
     "digital": {
@@ -101,6 +111,22 @@
         "url": "https://b4rn.org.uk/working-with-us/investors",
         "retrieved_at": "2026-08-14",
         "note": "Dokumentiert B4RN als mitgliedereigene Community Benefit Society, Mitgliedschaft über Anteile und die Reinvestition von Mitteln in den Netzausbau."
+      },
+      {
+        "id": "b4rn-site-20261122",
+        "type": "official-source",
+        "label": "b4rn – official public organisation/site",
+        "url": "https://b4rn.org.uk/support/contact",
+        "retrieved_at": "2026-11-22",
+        "note": "Offizieller öffentlicher Bürostandort Station Yard, Melling, LA6 2QY; Gebäudekoordinate nicht bestätigt."
+      },
+      {
+        "id": "b4rn-osm-20261122",
+        "type": "public-registry",
+        "label": "Melling village anchor",
+        "url": "https://www.openstreetmap.org/node/29914942",
+        "retrieved_at": "2026-11-22",
+        "note": "Öffentliche OpenStreetMap-Ortsreferenz; keine Geometrie des gesamten Commons-Netzwerks. Daten unter ODbL 1.0."
       }
     ],
     "uncertainty_note": "B4RN verbindet gemeinschaftliche Eigentums- und Beteiligungsstrukturen mit professionellem ISP-Betrieb. Commonworld setzt den Dienst nicht mit frei zugänglicher öffentlicher Infrastruktur gleich; Nutzung bleibt auf versorgte Gebiete, Anschlüsse und Tarife begrenzt."

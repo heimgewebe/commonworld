@@ -19,12 +19,22 @@
     "geographic": [
       {
         "id": "mietshaeuser-network",
-        "mode": "hidden",
-        "label": "Dezentraler Projektverbund in Deutschland und darüber hinaus",
-        "privacy_note": "Der Verbund besteht aus rechtlich eigenständigen Häusern und Initiativen; sie werden ohne Einzelprüfung weder als Gesamtfläche noch als vollständige Standortkarte übernommen.",
+        "mode": "approximate",
+        "label": "Mietshäuser Syndikat – öffentliches Verbandsbüro Freiburg",
+        "privacy_note": "Nur das veröffentlichte Syndikat-Büro im Grethergelände, nicht die Wohnprojekte, Immobilien oder Bewohneradressen. Besuch nur nach Vereinbarung.",
         "source_ids": [
-          "syndikat-network"
-        ]
+          "syndikat-network",
+          "mietshaeuser-syndikat-site-20261122",
+          "mietshaeuser-syndikat-osm-20261122"
+        ],
+        "geometry": {
+          "type": "Point",
+          "coordinates": [
+            7.8401466,
+            47.9931815
+          ]
+        },
+        "uncertainty_meters_min": 500
       },
       {
         "id": "mietshaeuser-residences",
@@ -77,6 +87,22 @@
         "url": "https://www.syndikat.org/solidartransfer/",
         "retrieved_at": "2026-07-26",
         "note": "Offizielle Beschreibung des Transfers aus bestehenden in neue Hausprojekte."
+      },
+      {
+        "id": "mietshaeuser-syndikat-site-20261122",
+        "type": "official-source",
+        "label": "mietshaeuser-syndikat – official public organisation/site",
+        "url": "https://www.syndikat.org/kontakt/",
+        "retrieved_at": "2026-11-22",
+        "note": "Das Syndikat benennt Adlerstraße 12, Freiburg als Verbandsbüro. Der OSM-Adressanker bezeichnet ein Gebäude mit mehreren Nutzern."
+      },
+      {
+        "id": "mietshaeuser-syndikat-osm-20261122",
+        "type": "public-registry",
+        "label": "Adlerstraße 12 building address",
+        "url": "https://www.openstreetmap.org/node/3932205392",
+        "retrieved_at": "2026-11-22",
+        "note": "Öffentliche OpenStreetMap-Ortsreferenz; keine Geometrie des gesamten Commons-Netzwerks. Daten unter ODbL 1.0."
       }
     ],
     "uncertainty_note": "Der Datensatz beschreibt den Projektverbund als Infrastruktur. Jedes Haus bleibt ein eigenständiges Projekt mit eigener Rechts-, Finanzierungs- und Zugangssituation."

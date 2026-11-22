@@ -19,12 +19,22 @@
     "geographic": [
       {
         "id": "nmaa-new-mexico",
-        "mode": "hidden",
-        "label": "New Mexico – landesweiter Verbandsbezug",
-        "privacy_note": "Keine künstliche Projektgeometrie: Der Bundesstaatbezug bleibt ohne Punkt; Kanäle, Parzellen und private Wasserinfrastruktur werden nicht rekonstruiert.",
+        "mode": "approximate",
+        "label": "New Mexico Acequia Association – Verbandsort Santa Fe (Stadtanker)",
+        "privacy_note": "Nur Santa Fe als Standort des Verbands, keine Kanäle, Grundstücke, Tore oder Wasserinfrastruktur. Die offizielle Kontaktseite nennt zwei unterschiedliche Büroanschriften.",
         "source_ids": [
-          "nmaa-home"
-        ]
+          "nmaa-home",
+          "new-mexico-acequia-association-site-20261122",
+          "new-mexico-acequia-association-osm-20261122"
+        ],
+        "geometry": {
+          "type": "Point",
+          "coordinates": [
+            -105.938456,
+            35.6876096
+          ]
+        },
+        "uncertainty_meters_min": 16000
       },
       {
         "id": "nmaa-acequias",
@@ -86,6 +96,22 @@
         "url": "https://lasacequias.org/acequia-governance/",
         "retrieved_at": "2026-10-31",
         "note": "Offizielles Beratungs- und Handbuchprogramm zu lokalen Acequia-Satzungen, Wasserrechten, gewählten Verantwortlichen und Konflikten."
+      },
+      {
+        "id": "new-mexico-acequia-association-site-20261122",
+        "type": "official-source",
+        "label": "new-mexico-acequia-association – official public organisation/site",
+        "url": "https://lasacequias.org/contact-us/",
+        "retrieved_at": "2026-11-22",
+        "note": "Offizielle Kontaktseite nennt Santa Fe, aber widersprüchliche Adressen (505 Don Gaspar und 805 Early St); deshalb nur Stadtanker."
+      },
+      {
+        "id": "new-mexico-acequia-association-osm-20261122",
+        "type": "public-registry",
+        "label": "Santa Fe city anchor",
+        "url": "https://www.openstreetmap.org/relation/171264",
+        "retrieved_at": "2026-11-22",
+        "note": "Öffentliche OpenStreetMap-Ortsreferenz; keine Geometrie des gesamten Commons-Netzwerks. Daten unter ODbL 1.0."
       }
     ]
   },
