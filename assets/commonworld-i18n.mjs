@@ -1,4 +1,4 @@
-import { COMMONWORLD_EN_LOCALE } from './commonworld-en-locale.mjs?v=400adc76db64';
+import { COMMONWORLD_EN_LOCALE } from './commonworld-en-locale.mjs?v=3c505b1bea35';
 import {
   CANDIDATE_LOCALES,
   DEFAULT_LOCALE,

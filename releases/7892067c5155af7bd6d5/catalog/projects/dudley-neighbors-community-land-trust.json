@@ -1,0 +1,114 @@
+{
+  "schema_version": 4,
+  "id": "dudley-neighbors-community-land-trust",
+  "title": "Dudley Neighbors Community Land Trust",
+  "summary": "In Boston sichern die nachbarschaftlich getragenen Strukturen von Dudley Neighbors Inc. Land langfristig für bezahlbares Wohnen und gemeinschaftliche Stadtentwicklung.",
+  "themes": [
+    "housing",
+    "community-land",
+    "commons-governance",
+    "neighbourhood"
+  ],
+  "actions": [
+    "learn"
+  ],
+  "presence": {
+    "geographic": [
+      {
+        "id": "dudley-neighbors-community-land-trust-region",
+        "mode": "approximate",
+        "label": "Dudley Neighbors – öffentliches DSNI-Büro in Roxbury",
+        "privacy_note": "DSNI ist die mit Dudley Neighbors eng verbundene Trägerorganisation. Der Marker bezeichnet nur ihr öffentliches Büro, nicht die Community-Land-Trust-Fläche, Häuser, Pachtgrundstücke oder Bewohner.",
+        "source_ids": [
+          "dudley-neighbors-community-land-trust-home",
+          "dudley-neighbors-dsni-contact",
+          "osm-dudley-neighbors-dsni-office"
+        ],
+        "geometry": {
+          "type": "Point",
+          "coordinates": [
+            -71.0721278,
+            42.3216974
+          ]
+        },
+        "uncertainty_meters_min": 350
+      }
+    ],
+    "digital": {
+      "available": false,
+      "source_ids": [
+        "dudley-neighbors-community-land-trust-home"
+      ]
+    }
+  },
+  "activity": {
+    "status": "unknown",
+    "observed_at": "2026-11-20",
+    "source_ids": [
+      "dudley-neighbors-community-land-trust-home"
+    ],
+    "note": "Die dokumentierte Praxis ist belegt, ihr operativer Status wurde in dieser Aufnahme nicht als tagesaktuell verifiziert."
+  },
+  "provenance": {
+    "sources": [
+      {
+        "id": "dudley-neighbors-community-land-trust-home",
+        "type": "official-source",
+        "label": "Dudley Neighbors Community Land Trust – Projektinformation",
+        "url": "https://www.dsni.org/about-us",
+        "retrieved_at": "2026-11-20",
+        "note": "Öffentliche projektnahe Information über die gemeinsame Ressource und die Beteiligten."
+      },
+      {
+        "id": "dudley-neighbors-community-land-trust-governance",
+        "type": "official-source",
+        "label": "Dudley Neighbors Community Land Trust – Organisation und Regeln",
+        "url": "https://www.dsni.org/board",
+        "retrieved_at": "2026-11-20",
+        "note": "Projektnahe Details zu gemeinsamen Praktiken, Organisation oder relevanten Grenzen."
+      },
+      {
+        "id": "dudley-neighbors-dsni-contact",
+        "type": "official-source",
+        "label": "DSNI – öffentliches Büro 550 Dudley Street",
+        "url": "https://www.dsni.org/contact",
+        "retrieved_at": "2026-11-22",
+        "note": "DSNI benennt 550 Dudley Street, Roxbury als öffentliche Kontaktadresse."
+      },
+      {
+        "id": "osm-dudley-neighbors-dsni-office",
+        "type": "public-registry",
+        "label": "OpenStreetMap – 550 Dudley Street",
+        "url": "https://www.openstreetmap.org/node/9301234003",
+        "retrieved_at": "2026-11-22",
+        "note": "Öffentlicher Adresspunkt, keine Land-Trust-Geometrie. OpenStreetMap-Daten unter ODbL 1.0."
+      }
+    ]
+  },
+  "curation": {
+    "state": "listed",
+    "catalogued_at": "2026-11-20",
+    "reviewed_by": "Commonworld editorial review",
+    "reviewed_at": "2026-11-20",
+    "next_review_at": "2027-01-03",
+    "notes": "Aktueller Betriebszustand nicht zeitnah verifiziert. Neue quellengebundene Commons-Aufnahme; Wiedervorlage innerhalb von 45 Tagen."
+  },
+  "links": [
+    {
+      "type": "homepage",
+      "label": "Dudley Neighbors Community Land Trust – offizielle Seite",
+      "url": "https://www.dsni.org/about-us"
+    },
+    {
+      "type": "learn",
+      "label": "Gemeinsame Praxis und Verantwortung kennenlernen",
+      "url": "https://www.dsni.org/board",
+      "source_ids": [
+        "dudley-neighbors-community-land-trust-governance"
+      ]
+    }
+  ],
+  "handoff": {
+    "enabled": false
+  }
+}

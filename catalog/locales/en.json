@@ -48,7 +48,7 @@
     "adjuntas-pueblo-solar": {
       "summary": "In Adjuntas, Puerto Rico, local community groups and ACESA organize shared use and stewardship of a solar microgrid supporting resilient energy supply.",
       "geographic_labels": {
-        "adjuntas-pueblo-solar-region": "Adjuntas, Puerto Rico – lokales Solarmikronetz"
+        "adjuntas-pueblo-solar-region": "Adjuntas Pueblo Solar / ACESA — approximate central-plaza microgrid area"
       }
     },
     "aflaj-irrigation-systems-oman": {
@@ -150,7 +150,7 @@
     "cecosesola": {
       "summary": "A Venezuelan network of more than 50 non-profit community organizations connecting food supply, health care, funeral services, finance and production without chains of command, through rotating tasks and consensus-oriented self-management.",
       "geographic_labels": {
-        "cecosesola-venezuela-network": "Barquisimeto and a network across several Venezuelan states"
+        "cecosesola-venezuela-network": "Cecosesola — approximate Barquisimeto city anchor, not the wider network"
       }
     },
     "cltb-le-nid": {
@@ -189,7 +189,7 @@
     "communs-paysans": {
       "summary": "After the former L’Atelier Paysan cooperative was liquidated, successor associations continue to steward shared agricultural designs, know-how and practical self-build techniques.",
       "geographic_labels": {
-        "communs-paysans-region": "Frankreich – bäuerliche Selbstbau- und Wissensnetzwerke"
+        "communs-paysans-region": "Communs Paysans — public L’Atelier Paysan workshop in Renage"
       },
       "digital_label": "Shared farm-tool designs and self-build documentation under successor organizations"
     },
@@ -204,7 +204,7 @@
       "title": "Cooperation Jackson",
       "summary": "A solidarity-economy network in Jackson, Mississippi, developing worker cooperatives, democratically self-managed enterprises, community-held land, affordable housing and local production infrastructure together.",
       "geographic_labels": {
-        "cooperation-jackson-west-jackson": "West Jackson, Mississippi, United States"
+        "cooperation-jackson-west-jackson": "Cooperation Jackson — public Kuwasi Balagoon Center in West Jackson"
       }
     },
     "cooperative-home-care-associates": {
@@ -229,13 +229,13 @@
     "dudley-neighbors-community-land-trust": {
       "summary": "In Boston, community-governed Dudley Neighbors Inc. holds land in trust to support long-term affordable housing and neighbourhood stewardship.",
       "geographic_labels": {
-        "dudley-neighbors-community-land-trust-region": "Dudley Street, Boston, Massachusetts, USA"
+        "dudley-neighbors-community-land-trust-region": "Dudley Neighbors — public DSNI office in Roxbury, not the land-trust area"
       }
     },
     "ecopower": {
       "summary": "Members of Belgian energy cooperative Ecopower finance and steward renewable-energy projects and vote on the basis of one member, one vote.",
       "geographic_labels": {
-        "ecopower-region": "Belgien – gemeinschaftliche Energieprojekte"
+        "ecopower-region": "Ecopower — public cooperative office in Berchem, Antwerp"
       }
     },
     "edinburgh-tool-library": {
@@ -749,7 +749,7 @@
     "tosepan-titataniske": {
       "summary": "Indigenous cooperatives in Puebla's Sierra Norte organize shared production, processing, finance, education and local provisioning.",
       "geographic_labels": {
-        "tosepan-titataniske-region": "Sierra Norte de Puebla, Mexiko"
+        "tosepan-titataniske-region": "Tosepan Titataniske — approximate Cuetzalan town anchor, not member communities"
       }
     },
     "tribunal-aguas-valencia": {
