@@ -1,0 +1,57 @@
+{
+  "schema_version": 1,
+  "kind": "commonworld_commons_basis",
+  "project_id": "qgis",
+  "classification": "common",
+  "decision": "include",
+  "reviewed_at": "2026-11-20",
+  "reviewer": "Commonworld editorial desk review",
+  "criteria": {
+    "shared_resource": {
+      "status": "supported",
+      "statement": "QGIS-Quellcode, Dokumentation und Plugin-Ökosystem bilden eine gemeinsame Softwarebasis.",
+      "source_ids": [
+        "qgis-home",
+        "qgis-governance"
+      ]
+    },
+    "community": {
+      "status": "supported",
+      "statement": "Entwickler, Übersetzer, Nutzergruppen und organisierte Vereinsmitglieder tragen das Projekt.",
+      "source_ids": [
+        "qgis-home",
+        "qgis-governance"
+      ]
+    },
+    "commoning_practice": {
+      "status": "supported",
+      "statement": "Beiträge zu Software, Übersetzung, Qualität und Lehre entwickeln das Werkzeug gemeinsam.",
+      "source_ids": [
+        "qgis-home",
+        "qgis-governance"
+      ]
+    },
+    "rules_and_responsibility": {
+      "status": "supported",
+      "statement": "Projektleitung und organisatorische Gremien besitzen dokumentierte Wahl- und Entscheidungsregeln.",
+      "source_ids": [
+        "qgis-home",
+        "qgis-governance"
+      ]
+    },
+    "common_benefit": {
+      "status": "supported",
+      "statement": "Frei verfügbare Geoinformationstechnik stärkt unabhängige Kartografie und Forschung weltweit.",
+      "source_ids": [
+        "qgis-home",
+        "qgis-governance"
+      ]
+    }
+  },
+  "confidence": 0.85,
+  "limitations": [
+    "Vereinsmitgliedschaft und formales Stimmrecht sind nicht identisch mit allgemeiner Software-Nutzung.",
+    "Entscheidungsrechte der Project Steering Committee sind von Nutzerbeiträgen zu unterscheiden."
+  ],
+  "notes": "Eigenständige Aufnahme: begrenzte quellengebundene Fünfkriterien-Prüfung. Keine ungeprüften Mitglieds-, Eigentums- oder Betriebsrechte behauptet."
+}

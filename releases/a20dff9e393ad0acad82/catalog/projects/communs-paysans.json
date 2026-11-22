@@ -1,0 +1,90 @@
+{
+  "schema_version": 4,
+  "id": "communs-paysans",
+  "title": "Communs Paysans – gemeinsames Agrartechnikwissen",
+  "summary": "Nach der Liquidation der früheren Genossenschaft L’Atelier Paysan führen neue Vereine gemeinschaftliches Wissen, Baupläne und praktische Selbstbau-Techniken für bäuerliche Werkzeuge weiter.",
+  "themes": [
+    "agriculture",
+    "open-hardware",
+    "appropriate-technology",
+    "knowledge"
+  ],
+  "actions": [
+    "learn"
+  ],
+  "presence": {
+    "geographic": [
+      {
+        "id": "communs-paysans-region",
+        "mode": "hidden",
+        "label": "Frankreich – bäuerliche Selbstbau- und Wissensnetzwerke",
+        "privacy_note": "Region und gemeinschaftlicher Wirkungsraum sind belegt; ohne gesondert verifizierte öffentliche Geometrie wird kein künstlicher Ortsmarker gesetzt.",
+        "source_ids": [
+          "communs-paysans-home"
+        ]
+      }
+    ],
+    "digital": {
+      "available": true,
+      "source_ids": [
+        "communs-paysans-home"
+      ],
+      "reach": "network",
+      "label": "Gemeinsam weitergeführte Baupläne und landwirtschaftliche Selbstbau-Dokumentation"
+    }
+  },
+  "activity": {
+    "status": "unknown",
+    "observed_at": "2026-11-20",
+    "source_ids": [
+      "communs-paysans-home"
+    ],
+    "note": "Die dokumentierte Praxis ist belegt, ihr operativer Status wurde in dieser Aufnahme nicht als tagesaktuell verifiziert."
+  },
+  "provenance": {
+    "sources": [
+      {
+        "id": "communs-paysans-home",
+        "type": "official-source",
+        "label": "Communs Paysans – gemeinsames Agrartechnikwissen – Projektinformation",
+        "url": "https://latelierpaysan.org/",
+        "retrieved_at": "2026-11-20",
+        "note": "Öffentliche projektnahe Information über die gemeinsame Ressource und die Beteiligten."
+      },
+      {
+        "id": "communs-paysans-governance",
+        "type": "official-source",
+        "label": "Communs Paysans – gemeinsames Agrartechnikwissen – Organisation und Regeln",
+        "url": "https://www.latelierpaysan.org/L-Atelier-Paysan-face-a-la-liquidation-elargissons-le-mouvement",
+        "retrieved_at": "2026-11-20",
+        "note": "Projektnahe Details zu gemeinsamen Praktiken, Organisation oder relevanten Grenzen."
+      }
+    ]
+  },
+  "curation": {
+    "state": "listed",
+    "catalogued_at": "2026-11-20",
+    "reviewed_by": "Commonworld editorial review",
+    "reviewed_at": "2026-11-20",
+    "next_review_at": "2027-01-03",
+    "notes": "Aktueller Betriebszustand nicht zeitnah verifiziert. Neue quellengebundene Commons-Aufnahme; Wiedervorlage innerhalb von 45 Tagen."
+  },
+  "links": [
+    {
+      "type": "homepage",
+      "label": "Communs Paysans – gemeinsames Agrartechnikwissen – offizielle Seite",
+      "url": "https://latelierpaysan.org/"
+    },
+    {
+      "type": "learn",
+      "label": "Gemeinsame Praxis und Verantwortung kennenlernen",
+      "url": "https://www.latelierpaysan.org/L-Atelier-Paysan-face-a-la-liquidation-elargissons-le-mouvement",
+      "source_ids": [
+        "communs-paysans-governance"
+      ]
+    }
+  ],
+  "handoff": {
+    "enabled": false
+  }
+}
