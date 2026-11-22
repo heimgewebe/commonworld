@@ -16,12 +16,22 @@
     "geographic": [
       {
         "id": "adjuntas-pueblo-solar-region",
-        "mode": "hidden",
-        "label": "Adjuntas, Puerto Rico – lokales Solarmikronetz",
-        "privacy_note": "Region und gemeinschaftlicher Wirkungsraum sind belegt; ohne gesondert verifizierte öffentliche Geometrie wird kein künstlicher Ortsmarker gesetzt.",
+        "mode": "approximate",
+        "label": "Adjuntas Pueblo Solar / ACESA – öffentliches Solarmikronetz am Ortskern",
+        "privacy_note": "Ungefähre Lage an der öffentlichen Plaza; keine Einzelmarkierungen von Solardächern, privaten Geschäften, Speichern oder Leitungen.",
         "source_ids": [
-          "adjuntas-pueblo-solar-home"
-        ]
+          "adjuntas-pueblo-solar-home",
+          "adjuntas-pueblo-solar-plaza",
+          "osm-adjuntas-independencia-energetica"
+        ],
+        "geometry": {
+          "type": "Point",
+          "coordinates": [
+            -66.7218006,
+            18.1610155
+          ]
+        },
+        "uncertainty_meters_min": 700
       }
     ],
     "digital": {
@@ -56,6 +66,22 @@
         "url": "https://www.honnoldfoundation.org/partner/casa-pueblo",
         "retrieved_at": "2026-11-20",
         "note": "Projektnahe Details zu gemeinsamen Praktiken, Organisation oder relevanten Grenzen."
+      },
+      {
+        "id": "adjuntas-pueblo-solar-plaza",
+        "type": "official-source",
+        "label": "Honnold Foundation – ACESA und Casa Pueblo am Ortskern Adjuntas",
+        "url": "https://www.honnoldfoundation.org/news/press-release-casa-pueblo-and-small-business-owners-advance-their-vision-of-transforming-the-town-of-adjuntas-into-the-first-pueblo-solar",
+        "retrieved_at": "2026-11-22",
+        "note": "Das Solarmikronetz versorgt laut Projektmitteilung Geschäfte rund um die zentrale Plaza von Adjuntas."
+      },
+      {
+        "id": "osm-adjuntas-independencia-energetica",
+        "type": "public-registry",
+        "label": "OpenStreetMap – Plaza de la Independencia Energética, Adjuntas",
+        "url": "https://www.openstreetmap.org/way/1347765131",
+        "retrieved_at": "2026-11-22",
+        "note": "Öffentliche Plaza als Ortsanker, keine exakte Netzgeometrie. OpenStreetMap-Daten unter ODbL 1.0."
       }
     ]
   },
