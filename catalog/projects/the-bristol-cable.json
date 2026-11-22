@@ -16,12 +16,22 @@
     "geographic": [
       {
         "id": "the-bristol-cable-region",
-        "mode": "hidden",
-        "label": "Bristol, Vereinigtes Königreich",
-        "privacy_note": "Region und gemeinschaftlicher Wirkungsraum sind belegt; ohne gesondert verifizierte öffentliche Geometrie wird kein künstlicher Ortsmarker gesetzt.",
+        "mode": "approximate",
+        "label": "Bristol – städtischer Wirkungsraum von The Bristol Cable",
+        "privacy_note": "Ausschließlich grober Stadtanker für das lokale Medium; kein Standortnachweis für Redaktion, Personal, Postadresse, Wohnorte oder Verteilstellen.",
         "source_ids": [
-          "the-bristol-cable-home"
-        ]
+          "the-bristol-cable-home",
+          "the-bristol-cable-contact",
+          "osm-bristol-city"
+        ],
+        "geometry": {
+          "type": "Point",
+          "coordinates": [
+            -2.5973,
+            51.4538
+          ]
+        },
+        "uncertainty_meters_min": 6000
       }
     ],
     "digital": {
@@ -58,6 +68,22 @@
         "url": "https://thebristolcable.org/transparency/",
         "retrieved_at": "2026-11-20",
         "note": "Projektnahe Details zu gemeinsamen Praktiken, Organisation oder relevanten Grenzen."
+      },
+      {
+        "id": "the-bristol-cable-contact",
+        "type": "official-source",
+        "label": "The Bristol Cable – Contact",
+        "url": "https://thebristolcable.org/contact/",
+        "retrieved_at": "2026-11-22",
+        "note": "Offizielle Kontaktseite nennt Bristol als lokalen Bezug und eine Postanschrift; diese wird ausdrücklich nicht als Redaktion oder Veranstaltungsort kartiert."
+      },
+      {
+        "id": "osm-bristol-city",
+        "type": "public-registry",
+        "label": "OpenStreetMap – Stadt Bristol",
+        "url": "https://www.openstreetmap.org/relation/5746665",
+        "retrieved_at": "2026-11-22",
+        "note": "Öffentlicher OSM-Stadteintrag, nur als grobe Ortsorientierung genutzt; keine Zuordnung einzelner Büros. OpenStreetMap-Daten unter ODbL 1.0."
       }
     ]
   },

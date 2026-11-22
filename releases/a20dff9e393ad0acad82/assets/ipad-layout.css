@@ -1,0 +1,48 @@
+/* iPad landscape corrections layered after index.css. Shared filter rules live in index.css. */
+/* Medium-sized landscape viewports including large iPads (e.g. 1024x768, 1180x820, 1194x834, 1366x1024).
+   We use CSS viewport geometry instead of device identity, User-Agent or DPR to target tablets and medium desktops. */
+@media (orientation: landscape) and (min-width: 48rem) and (max-width: 90rem) and (max-height: 65rem) {
+  .discovery-panel {
+    width: min(56rem, calc(100% - 1.5rem));
+    padding: 0;
+  }
+
+  .advanced-filters > .filter-group-controls {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 0.45rem;
+  }
+
+  .location-filter-layout {
+    grid-template-columns: minmax(12rem, 0.72fr) minmax(0, 1.28fr);
+  }
+  .layer-discovery {
+    top: calc(max(0.9rem, env(safe-area-inset-top)) + 3.35rem);
+    right: auto;
+    left: 50%;
+    width: min(85%, 42rem);
+    max-height: min(58vh, 28rem);
+    transform: translateX(-50%);
+  }
+
+  .layer-track-deck {
+    padding-block: 0;
+  }
+
+  .globe-stage[data-focused-path] .layer-track-deck {
+    grid-template-rows: minmax(0, 1fr);
+    align-content: stretch;
+    padding-block: 0;
+  }
+
+  .globe-stage[data-focused-path] .digital-lane.is-focused {
+    align-self: stretch;
+    min-height: 0;
+    max-height: none;
+    height: 100%;
+  }
+
+  .digital-lane-focus {
+    gap: 0.05rem;
+    padding: 0.4rem 0.65rem;
+  }
+}

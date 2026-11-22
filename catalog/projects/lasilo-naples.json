@@ -18,13 +18,21 @@
     "geographic": [
       {
         "id": "lasilo-naples-site",
-        "mode": "hidden",
-        "label": "l’Asilo, Vico Giuseppe Maffei 4, Neapel",
-        "privacy_note": "Die offizielle Kontaktseite veröffentlicht die Anschrift. Commonworld erzeugt daraus dennoch keine Geometrie und übernimmt keine nicht ausdrücklich belegten Koordinaten.",
+        "mode": "exact",
+        "label": "l’Asilo – Ex Asilo Filangieri, Vico Giuseppe Maffei 4, Napoli",
+        "privacy_note": "Der Punkt bezeichnet den öffentlich zugänglichen Kulturraum am auf der offiziellen Kontaktseite veröffentlichten Standort; keine privaten Räume oder Personenstandorte.",
         "source_ids": [
           "lasilo-contact",
-          "lasilo-civic-use"
-        ]
+          "lasilo-civic-use",
+          "osm-ex-asilo-filangieri"
+        ],
+        "geometry": {
+          "type": "Point",
+          "coordinates": [
+            14.2567408,
+            40.8501812
+          ]
+        }
       }
     ],
     "digital": {
@@ -90,6 +98,14 @@
         "url": "https://www.exasilofilangieri.it/contatti/",
         "retrieved_at": "2026-08-13",
         "note": "Offizielle Kontaktseite mit der öffentlich genannten Anschrift in Neapel."
+      },
+      {
+        "id": "osm-ex-asilo-filangieri",
+        "type": "public-registry",
+        "label": "OpenStreetMap – Ex Asilo Filangieri, Napoli",
+        "url": "https://www.openstreetmap.org/node/12866331782",
+        "retrieved_at": "2026-11-22",
+        "note": "Benannter öffentlicher Kulturraum mit derselben Hausnummer wie auf der offiziellen Kontaktseite; OpenStreetMap-Daten unter ODbL 1.0."
       }
     ],
     "uncertainty_note": "Das Gebäude bleibt kommunales Eigentum; Commonworld beschreibt die belegte gemeinschaftliche zivile Nutzung und Selbstverwaltung, nicht ein Eigentum der offenen Gemeinschaft."

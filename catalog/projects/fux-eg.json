@@ -16,12 +16,22 @@
     "geographic": [
       {
         "id": "fux-eg-region",
-        "mode": "hidden",
-        "label": "Hamburg, Deutschland – genossenschaftliche Nutzungsräume",
-        "privacy_note": "Region und gemeinschaftlicher Wirkungsraum sind belegt; ohne gesondert verifizierte öffentliche Geometrie wird kein künstlicher Ortsmarker gesetzt.",
+        "mode": "approximate",
+        "label": "fux eG – öffentliches Haupthaus Zeiseweg 9, Hamburg",
+        "privacy_note": "Ungefährer Anker des offiziell benannten Haupthauses mit Zugang am Zeiseweg; kein Umriss der gesamten Genossenschaft, der Berner Schulräume oder einzelner Nutzungsräume.",
         "source_ids": [
-          "fux-eg-home"
-        ]
+          "fux-eg-home",
+          "fux-eg-contact",
+          "osm-fux-zeiseweg"
+        ],
+        "geometry": {
+          "type": "Point",
+          "coordinates": [
+            9.9441,
+            53.5582
+          ]
+        },
+        "uncertainty_meters_min": 500
       }
     ],
     "digital": {
@@ -56,6 +66,22 @@
         "url": "https://www.fux-eg.org/mitmachen",
         "retrieved_at": "2026-11-20",
         "note": "Projektnahe Details zu gemeinsamen Praktiken, Organisation oder relevanten Grenzen."
+      },
+      {
+        "id": "fux-eg-contact",
+        "type": "official-source",
+        "label": "fux eG – Kontakt und Hausanschrift",
+        "url": "https://www.fux-eg.org/kontakt/",
+        "retrieved_at": "2026-11-22",
+        "note": "Die Genossenschaft nennt Zeiseweg 9, 22765 Hamburg als öffentlich erreichbare Adresse des Haupthauses."
+      },
+      {
+        "id": "osm-fux-zeiseweg",
+        "type": "public-registry",
+        "label": "OpenStreetMap – Kubus, Zeiseweg 9, Hamburg",
+        "url": "https://www.openstreetmap.org/way/1128087976",
+        "retrieved_at": "2026-11-22",
+        "note": "Öffentlicher OSM-Gebäudeeintrag am offiziell ausgewiesenen Eingang; keine Geometrie weiterer fux-Projekte. OpenStreetMap-Daten unter ODbL 1.0."
       }
     ]
   },
