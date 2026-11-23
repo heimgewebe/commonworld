@@ -1,0 +1,152 @@
+{
+  "schema_version": 4,
+  "id": "fecofun-nepal",
+  "title": "Federation of Community Forestry Users Nepal",
+  "summary": "Eine landesweite Föderation gemeinschaftlicher Waldnutzergruppen in Nepal, die lokale Nutzungsrechte, demokratische Selbstorganisation, nachhaltige Waldbewirtschaftung, Wissensaustausch und politische Mitsprache ihrer Mitglieder stärkt.",
+  "themes": [
+    "forest",
+    "forest-conservation",
+    "land-commons",
+    "commons-governance",
+    "community-ownership",
+    "customary-governance"
+  ],
+  "actions": [
+    "learn",
+    "contact"
+  ],
+  "presence": {
+    "geographic": [
+      {
+        "id": "fecofun-nepal-network",
+        "mode": "approximate",
+        "label": "FECOFUN – öffentliches Föderationssekretariat Duwakot (Ortsteilanker)",
+        "privacy_note": "Nur Duwakot als öffentlich benannter Verbandsort; keine Waldnutzungsgebiete, Nutzergruppen und Forststandorte.",
+        "source_ids": [
+          "fecofun-home",
+          "fecofun-about",
+          "fecofun-nepal-site-20261122",
+          "fecofun-nepal-osm-20261122"
+        ],
+        "geometry": {
+          "type": "Point",
+          "coordinates": [
+            85.412682,
+            27.694099
+          ]
+        },
+        "uncertainty_meters_min": 4500
+      }
+    ],
+    "digital": {
+      "available": false,
+      "source_ids": [
+        "fecofun-home"
+      ]
+    }
+  },
+  "activity": {
+    "status": "active",
+    "observed_at": "2026-07-28",
+    "source_ids": [
+      "fecofun-home",
+      "fecofun-about"
+    ],
+    "note": "Die offizielle Seite veröffentlicht aktuelle Aktivitäten aus dem Jahr 2026 und beschreibt eine fortbestehende föderale Organisationsstruktur."
+  },
+  "provenance": {
+    "sources": [
+      {
+        "id": "fecofun-home",
+        "type": "official-source",
+        "label": "FECOFUN – offizielle Seite",
+        "url": "https://fecofun.org.np/",
+        "retrieved_at": "2026-07-28",
+        "note": "Offizielle Netzwerkseite mit aktueller Tätigkeit, Organisationsangaben und öffentlichen Ressourcen."
+      },
+      {
+        "id": "fecofun-about",
+        "type": "official-source",
+        "label": "FECOFUN – About",
+        "url": "https://fecofun.org.np/about/",
+        "retrieved_at": "2026-07-28",
+        "note": "Offizielle Beschreibung der Föderation, ihrer Ziele, landesweiten Ebenen und gemeinschaftlichen Waldnutzung."
+      },
+      {
+        "id": "fecofun-contact",
+        "type": "official-source",
+        "label": "FECOFUN – Kontakt",
+        "url": "https://fecofun.org.np/contacts/",
+        "retrieved_at": "2026-07-28",
+        "note": "Offizielle Kontakt- und Organisationsadresse."
+      },
+      {
+        "id": "fecofun-nepal-site-20261122",
+        "type": "official-source",
+        "label": "fecofun-nepal – official public organisation/site",
+        "url": "https://fecofun.org.np/contacts/",
+        "retrieved_at": "2026-11-22",
+        "note": "Die Föderation nennt Changunarayan Municipality-2, Duwakot, Bhaktapur; genaue Bürogeometrie unbekannt."
+      },
+      {
+        "id": "fecofun-nepal-osm-20261122",
+        "type": "public-registry",
+        "label": "Duwakot locality anchor",
+        "url": "https://www.openstreetmap.org/node/2148707722",
+        "retrieved_at": "2026-11-22",
+        "note": "Öffentliche OpenStreetMap-Ortsreferenz; keine Geometrie des gesamten Commons-Netzwerks. Daten unter ODbL 1.0."
+      }
+    ]
+  },
+  "curation": {
+    "state": "stale",
+    "catalogued_at": "2026-07-28",
+    "reviewed_by": "Commonworld editorial review",
+    "reviewed_at": "2026-10-31",
+    "next_review_at": "2026-11-15",
+    "notes": "Aufgenommen als Föderation lokaler Wald-Commons. Stark veränderliche Größenangaben werden nicht in die Kurzbeschreibung übernommen; maßgeblich ist die belegte Organisations- und Governanceform. Fünfkriterien-Desk-Review vom 31.10.2026: Demokratisch organisierte Dachinfrastruktur lokaler Community-Waldgruppen statt einer fiktiven landesweiten Eigentumsgemeinschaft. Aktivität nicht neu zertifiziert, state bleibt stale."
+  },
+  "links": [
+    {
+      "type": "homepage",
+      "label": "FECOFUN – offizielle Seite",
+      "url": "https://fecofun.org.np/"
+    },
+    {
+      "type": "learn",
+      "label": "Föderation und Ziele kennenlernen",
+      "url": "https://fecofun.org.np/about/",
+      "source_ids": [
+        "fecofun-about"
+      ]
+    },
+    {
+      "type": "contact",
+      "label": "FECOFUN kontaktieren",
+      "url": "https://fecofun.org.np/contacts/",
+      "source_ids": [
+        "fecofun-contact"
+      ]
+    }
+  ],
+  "handoff": {
+    "enabled": false
+  },
+  "languages": {
+    "codes": [
+      "en",
+      "ne"
+    ],
+    "source_ids": [
+      "fecofun-home"
+    ],
+    "note": "Die offizielle Website bietet englische und nepalesische Inhalte."
+  },
+  "access": {
+    "type": "membership",
+    "source_ids": [
+      "fecofun-about"
+    ],
+    "note": "Organisierte Mitwirkung erfolgt über angeschlossene gemeinschaftliche Waldnutzergruppen und ihre föderalen Ebenen."
+  }
+}

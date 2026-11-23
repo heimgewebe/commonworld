@@ -138,7 +138,7 @@ EXPECTED_RESEARCH_FILES = {
     "renderer-selection-v1.md",
     "renderer-selection-v1.result.json",
 }
-EXPECTED_CONTRACT_FILES = {"catalog-recovery.contract.json", "catalog-hierarchy-v2.contract.json", "catalog-platform.contract.json", "catalog-delivery-budget.contract.json", "catalog-scale-gates.contract.json", "catalog-diversity.contract.json", "catalog-summary-specificity.contract.json", "commons-basis.schema.json", "commons-definition.contract.json", "editorial-review.contract.json", "proposal-path.contract.json", "proposal.schema.json", "current-state.contract.json", "aggregation-zoom.contract.json", "digital-ring-taxonomy.contract.json", "digital-sphere.contract.json", "production-delivery-provider.contract.json", "project.schema.json", "public-maplibre-vertical-slice.contract.json", "presence-axes.contract.json", "intent-search-discovery.contract.json", "platform-foundation-gate.contract.json", "renderer-selection.contract.json", "visual-semantics.contract.json"}
+EXPECTED_CONTRACT_FILES = {"catalog-recovery.contract.json", "catalog-hierarchy-v2.contract.json", "catalog-platform.contract.json", "catalog-delivery-budget.contract.json", "catalog-scale-gates.contract.json", "catalog-diversity.contract.json", "catalog-summary-specificity.contract.json", "commons-basis.schema.json", "commons-definition.contract.json", "editorial-review.contract.json", "proposal-path.contract.json", "proposal.schema.json", "current-state.contract.json", "aggregation-zoom.contract.json", "digital-ring-taxonomy.contract.json", "digital-sphere.contract.json", "production-delivery-provider.contract.json", "project.schema.json", "public-maplibre-vertical-slice.contract.json", "presence-axes.contract.json", "intent-search-discovery.contract.json", "platform-foundation-gate.contract.json", "renderer-selection.contract.json", "regional-context.schema.json", "visual-semantics.contract.json"}
 EXPECTED_SCRIPT_FILES = {
     "__init__.py",
     "browser_smoke_plan.py",
@@ -221,6 +221,7 @@ EXPECTED_SCRIPT_FILES = {
     "locale_review_evidence.py",
     "validate_semantic_zoom.py",
     "validate_visual_semantics.py",
+    "validate_regional_context.py",
 }
 EXPECTED_TEST_FILES = {
     "test_cache_coherence.py",
@@ -251,6 +252,7 @@ EXPECTED_TEST_FILES = {
     "test_public_maplibre_vertical_slice.py",
     "test_public_seed_baseline.py",
     "test_presence_axes.py",
+    "test_regional_context.py",
     "test_intent_search_discovery.py",
     "test_i18n.py",
     "test_locale_wave1.py",
