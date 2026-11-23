@@ -1,0 +1,57 @@
+{
+  "schema_version": 1,
+  "kind": "commonworld_commons_basis",
+  "project_id": "kudumbashree-community-network",
+  "classification": "common",
+  "decision": "include",
+  "reviewed_at": "2026-11-20",
+  "reviewer": "Commonworld editorial desk review",
+  "criteria": {
+    "shared_resource": {
+      "status": "supported",
+      "statement": "Gemeinschaftlich geführte Sparmittel und gemeinsam organisierte Vorhaben sind erkennbare Ressourcen.",
+      "source_ids": [
+        "kudumbashree-community-network-home",
+        "kudumbashree-community-network-governance"
+      ]
+    },
+    "community": {
+      "status": "supported",
+      "statement": "Frauennachbarschaftsgruppen und ihre föderierten Zusammenschlüsse bilden die Beteiligungsgemeinschaft.",
+      "source_ids": [
+        "kudumbashree-community-network-home",
+        "kudumbashree-community-network-governance"
+      ]
+    },
+    "commoning_practice": {
+      "status": "supported",
+      "statement": "Mitglieder sparen, vergeben bzw. verwalten Gruppenmittel und gestalten lokale Vorhaben mit.",
+      "source_ids": [
+        "kudumbashree-community-network-home",
+        "kudumbashree-community-network-governance"
+      ]
+    },
+    "rules_and_responsibility": {
+      "status": "supported",
+      "statement": "Gewählte Vertretungen sowie Regeln für Nachbarschaftsgruppen ordnen Beiträge und Entscheidungen.",
+      "source_ids": [
+        "kudumbashree-community-network-home",
+        "kudumbashree-community-network-governance"
+      ]
+    },
+    "common_benefit": {
+      "status": "supported",
+      "statement": "Geteilte Finanzierung und Kooperation stärken die Handlungsfähigkeit von Frauen und Nachbarschaften.",
+      "source_ids": [
+        "kudumbashree-community-network-home",
+        "kudumbashree-community-network-governance"
+      ]
+    }
+  },
+  "confidence": 0.85,
+  "limitations": [
+    "Aufgenommen ist das Nachbarschaftsnetzwerk, nicht pauschal die staatliche Kudumbashree Mission.",
+    "Nicht alle Projekte oder Gelder unter dem Namen Kudumbashree sind autonomes Gemeinschaftseigentum."
+  ],
+  "notes": "Eigenständige Aufnahme: begrenzte quellengebundene Fünfkriterien-Prüfung. Keine ungeprüften Mitglieds-, Eigentums- oder Betriebsrechte behauptet."
+}

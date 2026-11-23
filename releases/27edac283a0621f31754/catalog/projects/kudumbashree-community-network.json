@@ -1,0 +1,114 @@
+{
+  "schema_version": 4,
+  "id": "kudumbashree-community-network",
+  "title": "Kudumbashree – Nachbarschaftsnetzwerk",
+  "summary": "Frauennachbarschaftsgruppen in Kerala bündeln Ersparnisse und organisieren gemeinschaftliche wirtschaftliche sowie soziale Vorhaben über gewählte Gruppen- und Verbandsstrukturen.",
+  "themes": [
+    "mutual-aid",
+    "cooperative",
+    "savings-groups",
+    "cooperative-economy"
+  ],
+  "actions": [
+    "learn"
+  ],
+  "presence": {
+    "geographic": [
+      {
+        "id": "kudumbashree-community-network-region",
+        "mode": "approximate",
+        "label": "Kudumbashree – staatliche Koordinationsstelle Thiruvananthapuram (Stadtanker)",
+        "privacy_note": "Nur die Koordinationsstadt der staatlichen Mission, keine Nachbarschaftsgruppen, Haushalte, Teilnehmenden oder Standorte in Kerala.",
+        "source_ids": [
+          "kudumbashree-community-network-home",
+          "kudumbashree-community-network-site-20261122",
+          "kudumbashree-community-network-osm-20261122"
+        ],
+        "geometry": {
+          "type": "Point",
+          "coordinates": [
+            76.947551,
+            8.4882267
+          ]
+        },
+        "uncertainty_meters_min": 14000
+      }
+    ],
+    "digital": {
+      "available": false,
+      "source_ids": [
+        "kudumbashree-community-network-home"
+      ]
+    }
+  },
+  "activity": {
+    "status": "unknown",
+    "observed_at": "2026-11-20",
+    "source_ids": [
+      "kudumbashree-community-network-home"
+    ],
+    "note": "Die dokumentierte Praxis ist belegt, ihr operativer Status wurde in dieser Aufnahme nicht als tagesaktuell verifiziert."
+  },
+  "provenance": {
+    "sources": [
+      {
+        "id": "kudumbashree-community-network-home",
+        "type": "official-source",
+        "label": "Kudumbashree – Nachbarschaftsnetzwerk – Projektinformation",
+        "url": "https://lsgd.kerala.gov.in/en/waste-management/supporting-institutions/kudumbashree/",
+        "retrieved_at": "2026-11-20",
+        "note": "Öffentliche projektnahe Information über die gemeinsame Ressource und die Beteiligten."
+      },
+      {
+        "id": "kudumbashree-community-network-governance",
+        "type": "official-source",
+        "label": "Kudumbashree – Nachbarschaftsnetzwerk – Organisation und Regeln",
+        "url": "https://muzhakkunnupanchayat.lsgkerala.gov.in/en/page/kudumbashree",
+        "retrieved_at": "2026-11-20",
+        "note": "Projektnahe Details zu gemeinsamen Praktiken, Organisation oder relevanten Grenzen."
+      },
+      {
+        "id": "kudumbashree-community-network-site-20261122",
+        "type": "official-source",
+        "label": "kudumbashree-community-network – official public organisation/site",
+        "url": "https://lsgd.kerala.gov.in/en/contact/address/",
+        "retrieved_at": "2026-11-22",
+        "note": "Die Landesregierung nennt das Kudumbashree State Mission Office im TRIDA Rehabilitation Building, Thiruvananthapuram."
+      },
+      {
+        "id": "kudumbashree-community-network-osm-20261122",
+        "type": "public-registry",
+        "label": "Thiruvananthapuram city anchor",
+        "url": "https://www.openstreetmap.org/node/245581432",
+        "retrieved_at": "2026-11-22",
+        "note": "Öffentliche OpenStreetMap-Ortsreferenz; keine Geometrie des gesamten Commons-Netzwerks. Daten unter ODbL 1.0."
+      }
+    ]
+  },
+  "curation": {
+    "state": "listed",
+    "catalogued_at": "2026-11-20",
+    "reviewed_by": "Commonworld editorial review",
+    "reviewed_at": "2026-11-20",
+    "next_review_at": "2027-01-03",
+    "notes": "Aktueller Betriebszustand nicht zeitnah verifiziert. Neue quellengebundene Commons-Aufnahme; Wiedervorlage innerhalb von 45 Tagen."
+  },
+  "links": [
+    {
+      "type": "homepage",
+      "label": "Kudumbashree – Nachbarschaftsnetzwerk – offizielle Seite",
+      "url": "https://lsgd.kerala.gov.in/en/waste-management/supporting-institutions/kudumbashree/"
+    },
+    {
+      "type": "learn",
+      "label": "Gemeinsame Praxis und Verantwortung kennenlernen",
+      "url": "https://muzhakkunnupanchayat.lsgkerala.gov.in/en/page/kudumbashree",
+      "source_ids": [
+        "kudumbashree-community-network-governance"
+      ]
+    }
+  ],
+  "handoff": {
+    "enabled": false
+  }
+}

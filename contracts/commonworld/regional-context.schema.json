@@ -1,0 +1,195 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://commonworld.net/contracts/commonworld/regional-context.schema.json",
+  "title": "Non-geometric, source-bound public regional context for CommonProjects",
+  "description": "A versioned editorial context index, separate from canonical project geography. This schema intentionally has no geometry, coordinates, country membership, polygon or member-site fields.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "kind",
+    "schema_version",
+    "contexts"
+  ],
+  "properties": {
+    "kind": {
+      "const": "commonworld.public-regional-contexts"
+    },
+    "schema_version": {
+      "const": 1
+    },
+    "contexts": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "$ref": "#/$defs/context"
+      }
+    }
+  },
+  "$defs": {
+    "id": {
+      "type": "string",
+      "pattern": "^[a-z][a-z0-9-]{2,95}$"
+    },
+    "labels": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "de",
+        "en"
+      ],
+      "properties": {
+        "de": {
+          "type": "string",
+          "minLength": 8,
+          "maxLength": 200
+        },
+        "en": {
+          "type": "string",
+          "minLength": 8,
+          "maxLength": 200
+        }
+      }
+    },
+    "context": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "id",
+        "project_id",
+        "reference",
+        "relation",
+        "minimum_semantic_level",
+        "coverage_claim",
+        "source_ids",
+        "source_reviewed_at",
+        "public_notes"
+      ],
+      "properties": {
+        "id": {
+          "$ref": "#/$defs/id"
+        },
+        "project_id": {
+          "$ref": "#/$defs/id"
+        },
+        "reference": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "id",
+            "kind",
+            "labels"
+          ],
+          "properties": {
+            "id": {
+              "$ref": "#/$defs/id"
+            },
+            "kind": {
+              "enum": [
+                "named_region",
+                "bioregion",
+                "distributed_network"
+              ]
+            },
+            "labels": {
+              "$ref": "#/$defs/labels"
+            }
+          }
+        },
+        "relation": {
+          "enum": [
+            "currency-use-region",
+            "stewardship-bioregion",
+            "distributed-member-network"
+          ]
+        },
+        "minimum_semantic_level": {
+          "enum": [
+            "planet",
+            "macroregion",
+            "region"
+          ]
+        },
+        "coverage_claim": {
+          "const": "none"
+        },
+        "source_ids": {
+          "type": "array",
+          "minItems": 1,
+          "uniqueItems": true,
+          "items": {
+            "$ref": "#/$defs/id"
+          }
+        },
+        "source_reviewed_at": {
+          "type": "string",
+          "format": "date"
+        },
+        "public_notes": {
+          "$ref": "#/$defs/labels"
+        }
+      },
+      "allOf": [
+        {
+          "if": {
+            "properties": {
+              "reference": {
+                "properties": {
+                  "kind": {
+                    "const": "named_region"
+                  }
+                }
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "relation": {
+                "const": "currency-use-region"
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "reference": {
+                "properties": {
+                  "kind": {
+                    "const": "bioregion"
+                  }
+                }
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "relation": {
+                "const": "stewardship-bioregion"
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "reference": {
+                "properties": {
+                  "kind": {
+                    "const": "distributed_network"
+                  }
+                }
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "relation": {
+                "const": "distributed-member-network"
+              }
+            }
+          }
+        }
+      ]
+    }
+  }
+}
