@@ -3034,6 +3034,21 @@ async function spatialDiscoveryFiltersScenario() {
 async function androidGlobeUiScenario() {
   const scenarioId = 'android-globe-ui-alignment';
   process.stdout.write(JSON.stringify({ state: 'RUNNING', scenario: scenarioId }) + '\n');
+  // Keep the paint capture isolated from the subsequent interaction page.
+  // Concurrent SwiftShader-backed globes can compete for compositor frames on CI.
+  // This retains every isolated-label pixel assertion and the fresh interaction context.
+  const portraitPaintRun = await newPage({ mobile: true, touch: true, reducedMotion: 'no-preference' });
+  let portraitPaintEvidence;
+  try {
+    await portraitPaintRun.page.goto(baseUrl, { waitUntil: 'domcontentloaded' });
+    await portraitPaintRun.page.waitForSelector('html.runtime-ready');
+    await portraitPaintRun.page.waitForFunction(() => document.querySelectorAll('.sphere-ring-text').length > 0);
+    portraitPaintEvidence = await captureRingLabelPaintEvidence(portraitPaintRun.page, `${scenarioId}-portrait-ring-label-paint`);
+    assert(portraitPaintRun.pageErrors.length === 0, scenarioId + ': portrait paint page errors: ' + portraitPaintRun.pageErrors.join(' | '));
+  } finally {
+    await portraitPaintRun.context.close();
+  }
+
   const run = await newPage({ mobile: true, touch: true, reducedMotion: 'no-preference' });
   await run.page.goto(baseUrl, { waitUntil: 'domcontentloaded' });
   await run.page.waitForSelector('html.runtime-ready');
@@ -3101,13 +3116,6 @@ async function androidGlobeUiScenario() {
   assert(geometry.bundleVisibleChildCounts.every(({ declared, rendered }) => declared === rendered && rendered <= 2), scenarioId + ': mobile bundle detail did not reduce subordinate lines ' + JSON.stringify(geometry));
   assert(geometry.ringTextWidth > 80 && geometry.ringTextHeight > 0 && geometry.ringTextFontSize >= 20, scenarioId + ': mobile ring text is not visibly sized ' + JSON.stringify(geometry));
   assert(geometry.representativePrimaryLabels.length >= 2 && geometry.representativePrimaryLabels.every(({ text, visible, width, height }) => text.length > 0 && visible && width > 80 && height > 0), scenarioId + ': representative primary mobile ring labels are absent or not visibly laid out ' + JSON.stringify(geometry));
-  const portraitPaintRun = await newPage({ mobile: true, touch: true, reducedMotion: 'no-preference' });
-  await portraitPaintRun.page.goto(baseUrl, { waitUntil: 'domcontentloaded' });
-  await portraitPaintRun.page.waitForSelector('html.runtime-ready');
-  await portraitPaintRun.page.waitForFunction(() => document.querySelectorAll('.sphere-ring-text').length > 0);
-  const portraitPaintEvidence = await captureRingLabelPaintEvidence(portraitPaintRun.page, `${scenarioId}-portrait-ring-label-paint`);
-  assert(portraitPaintRun.pageErrors.length === 0, scenarioId + ': portrait paint page errors: ' + portraitPaintRun.pageErrors.join(' | '));
-  await portraitPaintRun.context.close();
 
   await run.page.locator('#sphere-edge-control').focus();
   const focusedRingMotion = await run.page.evaluate(() => ({
