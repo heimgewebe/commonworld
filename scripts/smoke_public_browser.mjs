@@ -3231,7 +3231,10 @@ async function androidGlobeUiScenario() {
       && Number.isFinite(previous?.planeAnimationCurrentTime)
       && entry.planeAnimationCurrentTime - previous.planeAnimationCurrentTime > threshold;
   });
-  const waitForCoherentTouchMotion = async (before, minimum = 2, timeoutMs = 1500) => {
+  // These bounds govern the browser observer, not the product's 500 ms
+  // post-movement grace. Software-rendered CI can defer compositor frames.
+  const touchObservationTimeoutMs = 10_000;
+  const waitForCoherentTouchMotion = async (before, minimum = 2, timeoutMs = touchObservationTimeoutMs) => {
     const deadline = Date.now() + timeoutMs;
     let after = await touchRingState();
     while ((coherentMovingIndices(before, after).length < minimum || advancingAnimationTimesBetween(before, after).length < minimum) && Date.now() < deadline) {
@@ -3240,7 +3243,7 @@ async function androidGlobeUiScenario() {
     }
     return after;
   };
-  const waitForTouchAnimationSettlement = async (expectedPlayState, expectedPlaybackRate, timeoutMs = 1500) => {
+  const waitForTouchAnimationSettlement = async (expectedPlayState, expectedPlaybackRate, timeoutMs = touchObservationTimeoutMs) => {
     const deadline = Date.now() + timeoutMs;
     const waitForState = (requireSettled) => run.page.waitForFunction(({ playState, playbackRate, requireSettled }) => {
       const planes = [...document.querySelectorAll('.sphere-ring-plane')];
@@ -3254,7 +3257,9 @@ async function androidGlobeUiScenario() {
           && (!requireSettled || animation?.pending === false);
       });
     }, { playState: expectedPlayState, playbackRate: expectedPlaybackRate, requireSettled }, {
-      polling: 'raf',
+      // Observe the actual animation state even if requestAnimationFrame
+      // callbacks are delayed; pending=false and visual motion remain required.
+      polling: 50,
       timeout: Math.max(1, deadline - Date.now()),
     });
     const waitOrFail = async (requireSettled, phase) => {
@@ -3327,6 +3332,41 @@ async function androidGlobeUiScenario() {
   assert(focusResumedAfter.every(({ planeAnimationName, planeAnimationPlayState, planeAnimationPlaybackRate, planeAnimationApiPlayState, planeAnimationPending }) => planeAnimationName === 'sphere-ring-orbit' && planeAnimationPlayState === 'running' && planeAnimationPlaybackRate === 1 && planeAnimationApiPlayState === 'running' && planeAnimationPending === false), scenarioId + ': shared ring planes did not resume at normal playback after sphere-edge focus ended ' + JSON.stringify(focusResumedAfter));
   assert(coherentMovingIndices(focusResumedBefore, focusResumedAfter).length >= 2 && advancingAnimationTimesBetween(focusResumedBefore, focusResumedAfter).length >= 2, scenarioId + ': line, label and WAAPI time did not resume together after sphere-edge focus ended ' + JSON.stringify({ before: focusResumedBefore, after: focusResumedAfter }));
 
+  await run.page.setViewportSize({ width: 390, height: 844 });
+  await run.page.waitForTimeout(100);
+
+  await run.page.evaluate(() => new Promise((resolve) => {
+    const map = window.__commonworldTestMap;
+    map.once('render', resolve);
+    map.jumpTo({ center: [10.2, 51.1], zoom: 1.2, bearing: 0, pitch: 0 });
+    map.triggerRepaint();
+  }));
+  await run.page.waitForFunction(() => {
+    const map = window.__commonworldTestMap;
+    const stage = document.querySelector('.globe-stage');
+    return Boolean(map && !map.isMoving() && stage?.dataset.countryMapState === 'ready' && map.getLayer('commonworld-country-compositions-base'));
+  });
+  await run.page.waitForFunction(() => {
+    const map = window.__commonworldTestMap;
+    if (!map || map.isMoving()) return false;
+    return map.queryRenderedFeatures(map.project([10.2, 51.1]), { layers: ['commonworld-country-compositions-base'] }).length > 0;
+  });
+  const country = await run.page.evaluate(() => {
+    const map = window.__commonworldTestMap;
+    const opacity = map.getPaintProperty('commonworld-country-compositions-base', 'fill-opacity');
+    const rendered = map.queryRenderedFeatures(map.project([10.2, 51.1]), { layers: ['commonworld-country-compositions-base'] }).length;
+    const sourceFeatures = map.querySourceFeatures('commonworld-country-compositions').length;
+    const diagnosticsFeatures = Number.parseInt(document.querySelector('.globe-stage')?.dataset.countryMapFeatures ?? '0', 10);
+    const visibility = map.getLayoutProperty('commonworld-country-compositions-base', 'visibility') ?? 'visible';
+    return { opacity, rendered, sourceFeatures, diagnosticsFeatures, visibility, zoom: map.getZoom() };
+  });
+  assert(JSON.stringify(country.opacity).includes('0.78'), scenarioId + ': overview country tint is not strong enough ' + JSON.stringify(country));
+  assert(country.diagnosticsFeatures > 0 && country.rendered > 0, scenarioId + ': country composition is not rendered at mobile globe overview ' + JSON.stringify(country));
+  assert(run.pageErrors.length === 0, scenarioId + ': page errors: ' + run.pageErrors.join(' | '));
+  await run.context.close();
+
+  // Independent media-profile checks start only after the interactive
+  // globe has closed; retain their real visibility and motion assertions.
   const reducedTouchRun = await newPage({
     mobile: true,
     touch: true,
@@ -3421,39 +3461,7 @@ async function androidGlobeUiScenario() {
   assert(compactDesktopRun.pageErrors.length === 0, scenarioId + ': compact desktop page errors: ' + compactDesktopRun.pageErrors.join(' | '));
   await compactDesktopRun.context.close();
 
-  await run.page.setViewportSize({ width: 390, height: 844 });
-  await run.page.waitForTimeout(100);
-
-  await run.page.evaluate(() => new Promise((resolve) => {
-    const map = window.__commonworldTestMap;
-    map.once('render', resolve);
-    map.jumpTo({ center: [10.2, 51.1], zoom: 1.2, bearing: 0, pitch: 0 });
-    map.triggerRepaint();
-  }));
-  await run.page.waitForFunction(() => {
-    const map = window.__commonworldTestMap;
-    const stage = document.querySelector('.globe-stage');
-    return Boolean(map && !map.isMoving() && stage?.dataset.countryMapState === 'ready' && map.getLayer('commonworld-country-compositions-base'));
-  });
-  await run.page.waitForFunction(() => {
-    const map = window.__commonworldTestMap;
-    if (!map || map.isMoving()) return false;
-    return map.queryRenderedFeatures(map.project([10.2, 51.1]), { layers: ['commonworld-country-compositions-base'] }).length > 0;
-  });
-  const country = await run.page.evaluate(() => {
-    const map = window.__commonworldTestMap;
-    const opacity = map.getPaintProperty('commonworld-country-compositions-base', 'fill-opacity');
-    const rendered = map.queryRenderedFeatures(map.project([10.2, 51.1]), { layers: ['commonworld-country-compositions-base'] }).length;
-    const sourceFeatures = map.querySourceFeatures('commonworld-country-compositions').length;
-    const diagnosticsFeatures = Number.parseInt(document.querySelector('.globe-stage')?.dataset.countryMapFeatures ?? '0', 10);
-    const visibility = map.getLayoutProperty('commonworld-country-compositions-base', 'visibility') ?? 'visible';
-    return { opacity, rendered, sourceFeatures, diagnosticsFeatures, visibility, zoom: map.getZoom() };
-  });
-  assert(JSON.stringify(country.opacity).includes('0.78'), scenarioId + ': overview country tint is not strong enough ' + JSON.stringify(country));
-  assert(country.diagnosticsFeatures > 0 && country.rendered > 0, scenarioId + ': country composition is not rendered at mobile globe overview ' + JSON.stringify(country));
-  assert(run.pageErrors.length === 0, scenarioId + ': page errors: ' + run.pageErrors.join(' | '));
   results.push({ id: scenarioId, verdict: 'PASS', ...geometry, portraitPaintedPrimaryLabels: portraitPaintEvidence.differences.map(({ layer, changedPixels }) => ({ layer, changedPixels })), wideTouch: wideTouchGeometry, compactDesktop: compactDesktopGeometry, countryRendered: country.rendered });
-  await run.context.close();
 }
 
 async function intentSearchLayoutScenario({ viewportOverride, scenarioId }) {

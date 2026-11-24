@@ -5,7 +5,7 @@
   "base_commit": "9598817071388018b9a96e5e742ace6d49e15cca",
   "measurement_method": {
     "static": "scripts/measure_catalog_delivery.py; deterministic raw and gzip sizes, generated/canonical identity parity, HTML tag counts and source-level startup fetch detection.",
-    "browser": "scripts/measure_catalog_delivery_browser.mjs; NixOS Chromium at 4x CPU, source-bound to release-46f1b7ba0f122735ce4c, one measured attempt and 40 public browser scenarios. Full public smoke subsequently repeated with pinned Playwright Chromium 149; portrait paint and interaction contexts run serially, surface unchanged.",
+    "browser": "scripts/measure_catalog_delivery_browser.mjs; NixOS Chromium at 4x CPU, source-bound to release-46f1b7ba0f122735ce4c, one measured attempt and 40 public browser scenarios. Full public smoke subsequently repeated with pinned Playwright Chromium 149; Android profile contexts run serially and animation settlement uses bounded timer polling, surface unchanged.",
     "timing_boundary": "Timing values are representative observations, not a claimed deterministic speedup. Request and byte reductions are the primary causal evidence.",
     "baseline_static_scope": "Same current 120-project catalog counterfactual: bootstrap plus 120 individual project JSON refetches and canonical manifest; not a newly executed historical browser.",
     "baseline_browser_scope": "Historical 41-entry pre-optimization browser observation retained for request and timing context only; it is not a same-catalogue performance counterfactual."
@@ -689,7 +689,7 @@
   "validation": {
     "public_browser_smoke": {
       "verdict": "PASS",
-      "committed_evidence_sha256": "c725e2b41a206348c398bb0a2ef0f2b05321201a9ba1e3483b07570ac187cc4b",
+      "committed_evidence_sha256": "7f90fb2680f11e0f9a25af364f327402be6f943104d5931452e63eb63353798a",
       "first_party_surface_sha256": "c44470adb6bbeb2b5d172fdfa9f88c688774c829e4825851767692c0a7448cda",
       "scenario_count": 40,
       "release_id": "46f1b7ba0f122735ce4c",
@@ -784,7 +784,7 @@
   "current_surface_binding": {
     "release_id": "46f1b7ba0f122735ce4c",
     "first_party_surface_sha256": "c44470adb6bbeb2b5d172fdfa9f88c688774c829e4825851767692c0a7448cda",
-    "public_browser_smoke_evidence_sha256": "c725e2b41a206348c398bb0a2ef0f2b05321201a9ba1e3483b07570ac187cc4b",
+    "public_browser_smoke_evidence_sha256": "7f90fb2680f11e0f9a25af364f327402be6f943104d5931452e63eb63353798a",
     "browser_measurement_decision_sha256": "77cc6df44a20ec5be7a8d3820de8ff8a5aca794870207b8af42eac32139b4034",
     "static_measurement_sha256": "2d30a42184e3db82f86d9e9b6365497e98db70147d53ab77be93a6c52f77453b"
   }
