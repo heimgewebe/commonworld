@@ -1,3 +1,4 @@
+import { PUBLIC_REGIONAL_CONTEXTS } from './commonworld-regional-contexts.mjs?v=08b88be317db';
 import { BOOTSTRAP_RECORDS } from './commonworld-bootstrap-catalog.mjs?v=c2bf88f5dd19';
 import { createCatalogLoadCache, loadCatalogAggregate, loadCatalogDetail, loadCatalogShard, shardKeyForIdentity } from './commonworld-catalog-runtime.mjs?v=25d37dcafe15';
 import { actionLabel, documentDirection, documentLocale, localizeCatalogRecords, text as i18nText, themeLabel, wave1LocalePackReady } from './commonworld-i18n.mjs?v=08a3cee2924d';
@@ -69,6 +70,178 @@ const LOCALE = documentLocale();
 const DOCUMENT_DIRECTION = documentDirection(LOCALE);
 const t = (key, germanFallback, variables = {}) => i18nText(LOCALE, key, germanFallback, variables);
 const commonsCount = (count) => t('commons_count', '{count} Commons', { count });
+
+function regionalContextLocale() {
+  return LOCALE === 'de' ? 'de' : 'en';
+}
+
+const regionalContextsById = new Map();
+for (const context of PUBLIC_REGIONAL_CONTEXTS) {
+  if (!regionalContextsById.has(context.project_id)) regionalContextsById.set(context.project_id, []);
+  regionalContextsById.get(context.project_id).push(context);
+}
+
+function regionalContexts(identifier) {
+  return regionalContextsById.get(identifier) ?? [];
+}
+
+function regionalContextCaption(context) {
+  const locale = regionalContextLocale();
+  const kind = context.reference.kind === 'distributed_network'
+    ? (locale === 'de' ? 'Verteiltes Netzwerk' : 'Distributed network')
+    : (locale === 'de' ? 'Regionaler Bezug' : 'Regional context');
+  return kind + ': ' + context.reference.labels[locale];
+}
+
+function contextSearchAliases(aliases) {
+  const result = new Map(aliases);
+  for (const context of PUBLIC_REGIONAL_CONTEXTS) {
+    const terms = Object.values(context.reference.labels);
+    for (const view of context.navigation_views ?? []) terms.push(...Object.values(view.labels));
+    result.set(context.project_id, [result.get(context.project_id), ...terms].filter(Boolean).join(' '));
+  }
+  return result;
+}
+
+function renderRegionalContextLegend(records) {
+  const container = document.querySelector('#regional-context-legend');
+  if (!container) return;
+  const visibleIds = new Set(records.map(record => record.id));
+  const hasContexts = PUBLIC_REGIONAL_CONTEXTS.some(context => visibleIds.has(context.project_id));
+  container.hidden = !hasContexts;
+  const locale = regionalContextLocale();
+  applyContentLanguage(container, locale);
+  container.textContent = locale === 'de'
+    ? 'Umrandete Schriftfelder: regionaler Bezug; bei ausgewählten Netzwerken auch öffentliche Beispiele. Die Beschriftung bezeichnet einen Referenzraum, keinen Standort und keine Gebietsgrenze.'
+    : 'Outlined text labels: regional context; public examples for a selected network. The label identifies a reference area, not a site or territory boundary.';
+}
+
+// Reference labels are a separate visual layer. Their screen anchor is only
+// a typographic placement derived from a reviewed camera reference. They
+// never enter project geometry, distance calculations, or country counts.
+function updateRegionalContextLabels(records = visibleRecords()) {
+  if (!runtime.mapReady || !window.maplibregl?.Marker) return;
+  const locale = regionalContextLocale();
+  const selected = runtime.state.project;
+  const zoom = runtime.map.getZoom();
+  const minimumZoom = { planet: 0, macroregion: 1.8, region: 3.4, local: 5.5 };
+  const byId = new Map(records.map(record => [record.id, record]));
+  const wanted = new Set();
+  if (runtime.state.surface === 'globe' && runtime.state.view === 'globe') {
+    for (const context of PUBLIC_REGIONAL_CONTEXTS) {
+      const record = byId.get(context.project_id);
+      if (!record) continue;
+      const network = context.reference.kind === 'distributed_network';
+      const threshold = network ? Math.max(4, minimumZoom[context.minimum_semantic_level] ?? 4)
+        : minimumZoom[context.minimum_semantic_level] ?? 3.4;
+      // Network examples appear with an explicit network selection. Otherwise
+      // large city-reference labels can cover the actual local Commons targets.
+      // Region labels in the overview yield to local geometry at detailed zoom.
+      if (selected !== record.id && (network || zoom < threshold || zoom >= 5.5)) continue;
+      for (const view of context.navigation_views ?? []) {
+        if (view.purpose !== 'camera_only') continue;
+        const key = context.id + ':' + view.id;
+        wanted.add(key);
+        let entry = runtime.regionalLabels.get(key);
+        if (!entry) {
+          const button = document.createElement('button');
+          button.type = 'button';
+          button.className = 'regional-reference-label';
+          button.dataset.regionalProjectId = record.id;
+          button.dataset.regionalMapViewId = view.id;
+          button.dataset.referenceKind = network ? 'network-example' : 'region';
+          const caption = document.createElement('span');
+          caption.className = 'regional-reference-kind';
+          caption.textContent = network
+            ? (locale === 'de' ? 'Netzwerkbeispiel' : 'Network example')
+            : (locale === 'de' ? 'Regionaler Bezug' : 'Regional context');
+          const title = document.createElement('span');
+          title.textContent = record.title;
+          const area = document.createElement('span');
+          area.className = 'regional-reference-area';
+          area.textContent = network ? view.labels[locale] : context.reference.labels[locale];
+          button.append(caption, title, area);
+          applyContentLanguage(button, locale);
+          button.title = locale === 'de'
+            ? 'Referenzraum, kein Commons-Standort und keine Gebietsgrenze'
+            : 'Reference area, not a Commons site or territory boundary';
+          button.addEventListener('click', event => {
+            event.stopPropagation();
+            selectProject(record.id, { trigger: button, historyMode: null });
+            performSpatialNavigation(record.id, view.id);
+            writeHistory('push');
+          });
+          const [west, south, east, north] = view.view_bounds;
+          const marker = new window.maplibregl.Marker({ element: button, anchor: 'center' })
+            .setLngLat([(west + east) / 2, (south + north) / 2])
+            .addTo(runtime.map);
+          entry = { marker, button };
+          runtime.regionalLabels.set(key, entry);
+        }
+        entry.button.classList.toggle('is-selected', selected === record.id);
+        entry.button.setAttribute('aria-pressed', String(selected === record.id));
+      }
+    }
+  }
+  for (const [key, entry] of runtime.regionalLabels) {
+    if (wanted.has(key)) continue;
+    entry.marker.remove();
+    runtime.regionalLabels.delete(key);
+  }
+}
+
+function renderFocusRegionalContexts(record) {
+  const container = document.querySelector('#focus-regional-context');
+  if (!container) return;
+  const contexts = regionalContexts(record?.id);
+  container.hidden = !contexts.length;
+  // Preserve keyboard focus on a navigation control across detail/source refreshes.
+  const activeView = container.contains(document.activeElement)
+    ? document.activeElement.dataset.regionalViewId : null;
+  container.replaceChildren();
+  if (!contexts.length) return;
+  const locale = regionalContextLocale();
+  applyContentLanguage(container, locale);
+  const heading = document.createElement('h4');
+  heading.textContent = locale === 'de' ? 'Öffentlicher Regions- oder Netzwerkbezug' : 'Public regional or network context';
+  container.append(heading);
+  for (const context of contexts) {
+    const label = document.createElement('strong');
+    label.textContent = regionalContextCaption(context);
+    const note = document.createElement('p');
+    note.textContent = context.public_notes[locale];
+    container.append(label, note);
+    if (!(context.navigation_views ?? []).length) continue;
+    const hint = document.createElement('p');
+    hint.textContent = locale === 'de'
+      ? 'Kartenausschnitte zur Orientierung (keine Commons-Standorte oder Gebietsgrenzen):'
+      : 'Map views for orientation (not Commons locations or territory boundaries):';
+    const list = document.createElement('ul');
+    for (const view of context.navigation_views) {
+      const item = document.createElement('li');
+      const button = document.createElement('button');
+      button.type = 'button';
+      button.className = 'quiet-button regional-context-view';
+      button.dataset.regionalViewId = view.id;
+      button.textContent = view.labels[locale];
+      button.addEventListener('click', () => {
+        if (runtime.state.project !== record.id) return;
+        performSpatialNavigation(record.id, view.id);
+        writeHistory('push');
+      });
+      const source = document.createElement('a');
+      source.href = view.source_url;
+      source.rel = 'external noreferrer';
+      source.textContent = view.source_label;
+      source.title = view.license;
+      item.append(button, document.createTextNode(' · '), source);
+      list.append(item);
+    }
+    container.append(hint, list);
+  }
+  if (activeView) container.querySelector('[data-regional-view-id="' + CSS.escape(activeView) + '"]')?.focus({ preventScroll: true });
+}
+
 
 function contentDirection(locale) {
   return String(locale ?? '').toLowerCase() === 'en' ? 'ltr' : 'auto';
@@ -228,6 +401,7 @@ const FOCUS_OVERLAP_SELECTOR = 'a[href], button:not([disabled]), input:not([disa
 const FOCUS_OVERLAP_MIN_RATIO = 0.5;
 const runtime = {
   map: null,
+  regionalLabels: new Map(),
   records: [],
   recordsById: new Map(),
   canonicalRecordsById: new Map(),
@@ -315,6 +489,7 @@ const runtime = {
   settingsReturnTarget: null,
   discoveryReturnTarget: null,
   pendingSpatialProject: null,
+  pendingRegionalView: null,
   pendingCountryNavigationId: null,
   pendingPrivateLocationOrigin: null,
   resizeObserver: null,
@@ -745,7 +920,7 @@ function installRecords(records) {
   runtime.catalogProjection = prepareCatalogProjection(records);
   runtime.digitalTree = buildDigitalPresentationTree(records, { locale: LOCALE });
   runtime.digitalTreeCache = new WeakMap();
-  runtime.searchIndex = prepareIntentSearchIndex(records, { searchAliasesById: runtime.searchAliasesById });
+  runtime.searchIndex = prepareIntentSearchIndex(records, { searchAliasesById: contextSearchAliases(runtime.searchAliasesById) });
   runtime.recordsById = runtime.catalogProjection.recordsById;
   elements.stage.dataset.searchIndexedRecords = String(runtime.searchIndex.indexedRecordCount);
   elements.stage.dataset.searchIndexedTerms = String(runtime.searchIndex.indexedTermCount);
@@ -2542,6 +2717,8 @@ function directActionLinks(record) {
 }
 
 function resultLocationLabel(record) {
+  const contexts = regionalContexts(record.id);
+  if (contexts.length && !publicGeographicLocations(record).length) return contexts.map(regionalContextCaption).join(' · ');
   const publicCount = publicGeographicLocations(record).length;
   if (publicCount > 0) return publicCount === 1 ? t('one_public_location', '1 öffentlicher Ort') : t('public_locations', '{count} öffentliche Orte', { count: publicCount });
   return hasDigitalPresence(record) ? t('location_independent_digital', 'Ortsunabhängige digitale Präsenz') : t('no_public_geometry', 'Keine öffentliche Geometrie');
@@ -2557,7 +2734,9 @@ function resultPresenceLabel(record) {
 }
 
 function resultMetaLabel(record) {
-  const parts = [commonsTypeLabel(record, LOCALE), resultPresenceLabel(record)];
+  const contexts = regionalContexts(record.id);
+  const parts = [commonsTypeLabel(record, LOCALE)];
+  if (publicGeographicLocations(record).length || hasDigitalPresence(record) || !contexts.length) parts.push(resultPresenceLabel(record));
   const publicCount = publicGeographicLocations(record).length;
   if (publicCount > 0) parts.push(publicCount === 1 ? t('one_public_location', '1 öffentlicher Ort') : t('public_locations', '{count} öffentliche Orte', { count: publicCount }));
   return parts.join(' · ');
@@ -2589,6 +2768,12 @@ function createDiscoveryResult(record, position) {
   const meta = document.createElement('span');
   meta.className = 'discovery-result-meta';
   meta.textContent = resultMetaLabel(record);
+  for (const context of regionalContexts(record.id)) {
+    const caption = document.createElement('span');
+    applyContentLanguage(caption, regionalContextLocale());
+    caption.textContent = regionalContextCaption(context);
+    meta.append(document.createTextNode(' · '), caption);
+  }
   const summary = document.createElement('span');
   summary.className = 'discovery-result-summary';
   summary.textContent = record.summary;
@@ -2637,7 +2822,15 @@ function createRuntimeCatalogCard(record) {
   card.dataset.commonprojectId = record.id;
   const kind = document.createElement('p');
   kind.className = 'catalog-kind';
-  kind.textContent = commonsTypeLabel(record, LOCALE) + ' · ' + resultPresenceLabel(record);
+  kind.textContent = commonsTypeLabel(record, LOCALE) + ' · ';
+  if (regionalContexts(record.id).length && !hasDigitalPresence(record) && !publicGeographicLocations(record).length) {
+    const presence = document.createElement('span');
+    applyContentLanguage(presence, regionalContextLocale());
+    presence.textContent = regionalContextLocale() === 'de' ? 'Regionaler Bezug' : 'Regional context';
+    kind.append(presence);
+  } else {
+    kind.append(document.createTextNode(resultPresenceLabel(record)));
+  }
   const title = document.createElement('h2');
   title.textContent = record.title;
   const summary = document.createElement('p');
@@ -2647,6 +2840,7 @@ function createRuntimeCatalogCard(record) {
   const location = document.createElement('p');
   location.className = 'catalog-location';
   location.textContent = resultLocationLabel(record);
+  if (regionalContexts(record.id).length && !publicGeographicLocations(record).length) applyContentLanguage(location, regionalContextLocale());
   const activityNoticeText = recordActivityNotice(record, LOCALE);
   const activityNotice = activityNoticeText ? document.createElement('p') : null;
   if (activityNotice) {
@@ -2818,7 +3012,7 @@ function replaceLinks(container, links) {
 function updateFocusPanel() {
   const record = selectedProjectRecord();
   renderPrimaryOverlayState(record);
-  if (!record) return;
+  if (!record) { renderFocusRegionalContexts(null); return; }
   elements.focusTitle.textContent = record.title;
   elements.focusSummary.textContent = record.summary;
   applyTitleLanguage(elements.focusTitle, record);
@@ -2839,6 +3033,7 @@ function updateFocusPanel() {
   replaceList(elements.focusThemes, (record.themes ?? []).map((theme) => themeLabel(theme, LOCALE)));
   replaceList(elements.focusActions, (record.actions ?? []).map((action) => actionLabel(action, LOCALE)));
   replaceLocationList(elements.focusLocations, record);
+  renderFocusRegionalContexts(record);
   elements.focusDigital.textContent = digitalPresenceText(record);
   const digitalContentLanguage = record?._content_locale && record?.presence?.digital?.available && record?.presence?.digital?.label
     ? record._content_locale
@@ -2860,6 +3055,7 @@ function updateSelectionMarks() {
     if (element.matches('.catalog-card')) element.toggleAttribute('data-selected', selected);
   });
   updateFocusPanel();
+  updateRegionalContextLabels();
   updateSemanticLocationLine();
 }
 
@@ -2885,10 +3081,20 @@ function renderDiscoveryState() {
   updateCountryMapData();
   updateSelectionMarks();
   const visible = visibleRecords();
+  renderRegionalContextLegend(visible);
   const count = visible.length;
   elements.globeResults.textContent = count === 0
     ? t('no_matching_commons', 'Keine Commons entsprechen dieser Suche oder Filterauswahl.')
     : t('current_selection', '{count} Commons in der aktuellen Auswahl. {summary}', { count, summary: geographicSelectionSummary(visible) });
+  const contextualCount = visible.filter(record => regionalContexts(record.id).length).length;
+  if (contextualCount) {
+    const contextCount = document.createElement('span');
+    applyContentLanguage(contextCount, regionalContextLocale());
+    contextCount.textContent = regionalContextLocale() === 'de'
+      ? contextualCount + ' belegte Regions-/Netzwerkbezüge'
+      : contextualCount + ' documented regional/network contexts';
+    elements.globeResults.append(document.createTextNode(' · '), contextCount);
+  }
   elements.globeResults.toggleAttribute('data-empty', count === 0);
   elements.search.value = runtime.state.query;
   elements.layerSearch.value = runtime.state.query;
@@ -2933,12 +3139,23 @@ function scheduleCameraHistory() {
   runtime.historyTimer = window.setTimeout(() => writeHistory('replace'), 180);
 }
 
-function performSpatialNavigation(identifier) {
+function performSpatialNavigation(identifier, viewId = null) {
   const publicMapData = runtime.catalogProjection?.publicMapFeatureCollection() ?? { type: 'FeatureCollection', features: [] };
-  const target = publicProjectNavigationTarget(publicMapData, identifier);
+  const contexts = regionalContexts(identifier);
+  const views = contexts.flatMap(context => context.navigation_views ?? []);
+  const view = viewId ? views.find(item => item.id === viewId) : (
+    contexts.length === 1 && contexts[0].reference.kind !== 'distributed_network' && views.length === 1 ? views[0] : null
+  );
+  if (viewId && !view) return false;
+  let target = viewId ? null : publicProjectNavigationTarget(publicMapData, identifier);
+  if (!target && view) {
+    const [west, south, east, north] = view.view_bounds;
+    target = { kind: 'regional-context', bounds: [[west, south], [east, north]], viewId: view.id };
+  }
   runtime.pendingSpatialProject = null;
+  runtime.pendingRegionalView = null;
   if (!target) {
-    elements.stage.dataset.lastSpatialResult = 'coordinate-free:' + identifier;
+    elements.stage.dataset.lastSpatialResult = (contexts.length ? 'regional-network:' : 'coordinate-free:') + identifier;
     return false;
   }
 
@@ -2951,6 +3168,7 @@ function performSpatialNavigation(identifier) {
   ensureMap();
   if (!runtime.mapReady) {
     runtime.pendingSpatialProject = identifier;
+    runtime.pendingRegionalView = target.viewId ?? null;
     elements.stage.dataset.lastSpatialResult = 'pending:' + identifier;
     return true;
   }
@@ -2969,12 +3187,14 @@ function performSpatialNavigation(identifier) {
     elements.stage.dataset.lastCameraDuration = String(duration);
     runtime.map.fitBounds(target.bounds, {
       padding: { top: 112, right: 72, bottom: 88, left: 72 },
-      maxZoom: 15,
+      maxZoom: target.kind === 'regional-context' ? 8 : 15,
       duration,
       essential: false,
     });
   }
   elements.stage.dataset.lastSpatialResult = target.kind + ':' + identifier;
+  if (target.kind === 'regional-context') elements.stage.dataset.lastRegionalView = target.viewId;
+  else delete elements.stage.dataset.lastRegionalView;
   return true;
 }
 
@@ -2982,6 +3202,8 @@ function selectProject(identifier, { historyMode = 'push', focus = true, trigger
   if (!runtime.recordsById.has(identifier)) return;
   if (trigger instanceof Element && !elements.focus.contains(trigger)) runtime.focusReturnTarget = trigger;
   if (!elements.discoveryPanel.hidden) closeDiscovery({ restoreFocus: false });
+  runtime.pendingSpatialProject = null;
+  runtime.pendingRegionalView = null;
   runtime.state.project = identifier;
   renderDiscoveryState();
   void observeCatalogRecordShadow(identifier);
@@ -3010,6 +3232,8 @@ function visibleProjectTrigger(identifier) {
 
 function clearProject({ historyMode = 'push', restoreFocus = true } = {}) {
   const closingIdentifier = runtime.state.project;
+  runtime.pendingSpatialProject = null;
+  runtime.pendingRegionalView = null;
   runtime.state.project = null;
   void observeCatalogRecordShadow(null);
   runtime.layerPreviewProject = null;
@@ -4185,6 +4409,7 @@ function createMap() {
     runtime.mapGeometrySampleCount = 0;
   });
   runtime.map.on('moveend', () => {
+    updateRegionalContextLabels();
     runtime.mapMoving = false;
     deferSphereRingOrbitResume();
     delete elements.stage.dataset.mapMoving;
@@ -4229,6 +4454,7 @@ function createMap() {
     runtime.mapReady = true;
     runtime.map.setProjection({ type: 'globe' });
     ensurePublicMapLayers();
+    updateRegionalContextLabels();
     if (runtime.state.view === 'layers') openLayerView({ historyMode: null, cameraState: runtime.state.camera, instant: true });
     else applyCamera(runtime.state.camera, { instant: true });
     flushSphereGeometry();
@@ -4240,7 +4466,7 @@ function createMap() {
       flushSphereGeometry();
       elements.stage.dataset.visualReady = 'true';
     }, 1200);
-    if (runtime.pendingSpatialProject) performSpatialNavigation(runtime.pendingSpatialProject);
+    if (runtime.pendingSpatialProject && runtime.pendingSpatialProject === runtime.state.project) performSpatialNavigation(runtime.pendingSpatialProject, runtime.pendingRegionalView);
     if (runtime.pendingCountryNavigationId) fitMapToCountry(runtime.countryEntries.get(runtime.pendingCountryNavigationId));
     if (runtime.pendingPrivateLocationOrigin) navigateToPrivateLocation(runtime.pendingPrivateLocationOrigin);
   });

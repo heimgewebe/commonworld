@@ -102,6 +102,7 @@ MODULE_IMPORT_DEPENDENCIES = (
         "assets/commonworld-app.js",
         (
             "assets/commonworld-bootstrap-catalog.mjs",
+            "assets/commonworld-regional-contexts.mjs",
             "assets/commonworld-catalog-runtime.mjs",
             "assets/commonworld-i18n.mjs",
             "assets/commonworld-core.mjs",
@@ -296,6 +297,69 @@ def curation_stale_notice(record: dict, locale: str = FALLBACK_LOCALE) -> str:
     return template.replace("{next}", str(due))
 
 
+
+def load_public_regional_contexts(root: Path = ROOT) -> list[dict]:
+    path = root / "catalog/regional-contexts.v1.json"
+    if not path.is_file():
+        return []
+    return json.loads(path.read_text(encoding="utf-8"))["contexts"]
+
+
+def regional_context_locale(locale: str) -> str:
+    return "de" if normalize_locale(locale) == "de" else "en"
+
+
+def regional_context_caption(context: dict, locale: str) -> str:
+    language = regional_context_locale(locale)
+    network = context["reference"]["kind"] == "distributed_network"
+    prefix = ("Verteiltes Netzwerk" if network else "Regionaler Bezug") if language == "de" else (
+        "Distributed network" if network else "Regional context"
+    )
+    return f'{prefix}: {context["reference"]["labels"][language]}'
+
+
+def render_regional_context_card(contexts: list[dict], locale: str) -> str:
+    language = regional_context_locale(locale)
+    return "".join(
+        f'<p class="catalog-location" data-public-regional-context lang="{language}" dir="ltr">'
+        f'{html.escape(regional_context_caption(context, locale))}</p>'
+        for context in contexts
+    )
+
+
+def render_regional_context_detail(record: dict, locale: str, root: Path = ROOT) -> str:
+    contexts = [context for context in load_public_regional_contexts(root) if context["project_id"] == record["id"]]
+    if not contexts:
+        return ""
+    language = regional_context_locale(locale)
+    heading = "Öffentlicher Regions- oder Netzwerkbezug" if language == "de" else "Public regional or network context"
+    view_heading = ("Kartenausschnitte zur Orientierung (keine Commons-Standorte oder Gebietsgrenzen):"
+                    if language == "de" else
+                    "Map views for orientation (not Commons locations or territory boundaries):")
+    details = []
+    for context in contexts:
+        caption = html.escape(regional_context_caption(context, locale))
+        note = html.escape(context["public_notes"][language])
+        details.append(f'<p><strong>{caption}</strong></p><p>{note}</p>')
+        if context.get("navigation_views"):
+            items = "".join(
+                f'<li>{html.escape(view["labels"][language])} · '
+                f'<a href="{html.escape(view["source_url"], quote=True)}" rel="external noreferrer">'
+                f'{html.escape(view["source_label"])}</a> · {html.escape(view["license"])}</li>'
+                for view in context["navigation_views"]
+            )
+            details.append(f'<p>{view_heading}</p><ul>{items}</ul>')
+    return (f'<section data-public-regional-context lang="{language}" dir="ltr">'
+            f'<h2>{heading}</h2>{"".join(details)}</section>')
+
+
+def render_regional_context_module(root: Path = ROOT) -> str:
+    payload = json.dumps(load_public_regional_contexts(root), ensure_ascii=False, separators=(",", ":"))
+    payload = payload.replace("\u2028", "\\u2028").replace("\u2029", "\\u2029")
+    return ("// Generated from catalog/regional-contexts.v1.json. Do not edit.\n"
+            f"export const PUBLIC_REGIONAL_CONTEXTS = {payload};\n")
+
+
 def render_cards(
     records: list[dict],
     *,
@@ -303,8 +367,12 @@ def render_cards(
     locale: str = FALLBACK_LOCALE,
     project_page_url: Callable[[str], str] | None = None,
     project_json_url: Callable[[str], str] | None = None,
+    root: Path = ROOT,
 ) -> str:
     cards: list[str] = []
+    context_by_id: dict[str, list[dict]] = {}
+    for context in load_public_regional_contexts(root):
+        context_by_id.setdefault(context["project_id"], []).append(context)
     for record in records:
         identifier = html.escape(record["id"], quote=True)
         title = html.escape(record["title"])
@@ -324,6 +392,7 @@ def render_cards(
         geo_locations = public_locations(record)
         label = html.escape(presentation_label(record, locale, geo_locations))
         place = html.escape(location_summary(record, locale, geo_locations))
+        regional_context = render_regional_context_card(context_by_id.get(record["id"], []), locale)
         notice = html.escape(activity_notice(record, locale))
         notice_html = f'            <p class="catalog-activity-notice">{notice}</p>\n' if notice else ""
         stale = html.escape(curation_stale_notice(record, locale))
@@ -365,7 +434,7 @@ def render_cards(
             <h2{title_boundary}>{title}</h2>
             <p{summary_boundary}>{summary}</p>
             <p class="catalog-location">{place}</p>
-{notice_html}            <div class="catalog-actions">
+{regional_context}{notice_html}            <div class="catalog-actions">
 {action}{action_links}              <a href="{url}" rel="external noreferrer">{html.escape(interface_static(locale, "official_website", de="Offizielle Seite", en="Official website"))} <span aria-hidden="true">↗</span></a>
 {project_page_link}              <a href="{html.escape(json_url, quote=True)}" type="application/json">JSON</a>
             </div>
@@ -416,6 +485,7 @@ def render_shell(root: Path = ROOT, locale: str = FALLBACK_LOCALE) -> str:
         locale=locale,
         project_page_url=(lambda identifier: f"{recovery_project_prefix}{identifier}.html") if bounded_recovery else None,
         project_json_url=(lambda identifier: f"catalog/projects/{identifier}.json") if bounded_recovery else None,
+        root=root,
     )
     recovery_pagination = (
         f'        <p class="recovery-pagination"><a href="{recovery_index_url}">'
@@ -575,6 +645,7 @@ def render_shell(root: Path = ROOT, locale: str = FALLBACK_LOCALE) -> str:
                 <li><span class="legend-semantic-mark legend-semantic-mark--withheld" aria-hidden="true"></span>Versteckte Ortsbezüge fließen nicht in die räumliche Darstellung ein</li>
               </ul>
               <p class="legend-precision"><strong>Ortsgenauigkeit:</strong> Punkt = exakt, gestrichelte Fläche = ungefähr, durchgezogene Fläche = veröffentlichte Ausdehnung.</p>
+              <div id="regional-context-legend" hidden></div>
             </div>
           </details>
 
@@ -670,7 +741,7 @@ def render_shell(root: Path = ROOT, locale: str = FALLBACK_LOCALE) -> str:
         <div class="focus-grid">
           <section><h3>Themen</h3><ul id="focus-themes"></ul></section>
           <section><h3>Möglichkeiten</h3><ul id="focus-actions"></ul></section>
-          <section><h3>Orte</h3><ul id="focus-locations"></ul></section>
+          <section><h3>Orte</h3><ul id="focus-locations"></ul><div id="focus-regional-context" hidden></div></section>
           <section><h3>Digitale Präsenz</h3><p id="focus-digital"></p></section>
           <section><h3>Beziehungen</h3><ul id="focus-relations"></ul></section>
           <section><h3>Offizielle Links</h3><ul id="focus-links"></ul></section>
@@ -767,6 +838,7 @@ def main() -> int:
     records = load_records(ROOT)
     (ROOT / "assets/commonworld-bootstrap-catalog.mjs").write_text(render_bootstrap_catalog(records), encoding="utf-8")
     (ROOT / "assets/commonworld-en-locale.mjs").write_text(render_locale_module("en", ROOT), encoding="utf-8")
+    (ROOT / "assets/commonworld-regional-contexts.mjs").write_text(render_regional_context_module(ROOT), encoding="utf-8")
     synchronize_module_import_versions(ROOT)
     synchronize_runtime_url_versions(ROOT)
     render_locales = locales_with_status("released", "candidate", root=ROOT)

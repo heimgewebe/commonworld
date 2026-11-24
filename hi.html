@@ -3,9 +3,9 @@
   <head>
     <meta charset="utf-8" />
     <meta name="commonworld-page" content="hi.html" />
-    <meta name="commonworld-page-build" content="2dbc5df459c68409" />
-    <meta name="commonworld-release" content="27edac283a0621f31754" />
-    <base href="/releases/27edac283a0621f31754/" />
+    <meta name="commonworld-page-build" content="629a7f58ac8209db" />
+    <meta name="commonworld-release" content="723334daf4aadddfad9a" />
+    <base href="/releases/723334daf4aadddfad9a/" />
     <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
     <meta name="color-scheme" content="dark" />
     <meta name="referrer" content="strict-origin-when-cross-origin" />
@@ -16,12 +16,12 @@
     <link rel="alternate" type="application/json" href="./catalog/catalog.json" title="Commonworld कैटलॉग" />
     <link rel="alternate" type="application/schema+json" href="./contracts/commonworld/project.schema.json" title="CommonProject स्कीमा" />
     <link rel="stylesheet" href="./assets/vendor/maplibre-gl.css?v=ab1e70d59ec4" />
-    <link rel="stylesheet" href="./index.css?v=84952b6cc591" />
+    <link rel="stylesheet" href="./index.css?v=ef2dd3c6004c" />
     <link rel="stylesheet" href="./assets/ipad-layout.css?v=739d6b8460d4" />
     <script type="module" src="/assets/commonworld-release-check.js?v=c1d996101672"></script>
     <script src="./assets/vendor/maplibre-gl.js?v=45a9b07a9189" defer></script>
     <script type="module" src="./assets/commonworld-locale.mjs?v=d92522e2dd93"></script>
-    <script type="module" src="./assets/commonworld-app.js?v=21dfe2d2fbf7"></script>
+    <script type="module" src="./assets/commonworld-app.js?v=0f0b7afb4aa4"></script>
   </head>
   <body data-presentation="globe">
     <a id="text-skip-link" class="skip-link" href="/hi.html#static-catalog-fallback">पाठ दृश्य पर जाएँ</a>
@@ -161,6 +161,7 @@
                 <li><span class="legend-semantic-mark legend-semantic-mark--withheld" aria-hidden="true"></span>छिपे हुए स्थान संदर्भ स्थानिक प्रदर्शन में शामिल नहीं हैं</li>
               </ul>
               <p class="legend-precision"><strong>स्थान परिशुद्धता:</strong> बिंदु = सटीक, धराशायी क्षेत्र = अनुमानित, ठोस क्षेत्र = प्रकाशित सीमा।</p>
+              <div id="regional-context-legend" hidden></div>
             </div>
           </details>
 
@@ -257,7 +258,7 @@
         <div class="focus-grid">
           <section><h3>विषय</h3><ul id="focus-themes"></ul></section>
           <section><h3>संलग्न होने के तरीके</h3><ul id="focus-actions"></ul></section>
-          <section><h3>स्थान</h3><ul id="focus-locations"></ul></section>
+          <section><h3>स्थान</h3><ul id="focus-locations"></ul><div id="focus-regional-context" hidden></div></section>
           <section><h3>डिजिटल उपस्थिति</h3><p id="focus-digital"></p></section>
           <section><h3>रिश्ते</h3><ul id="focus-relations"></ul></section>
           <section><h3>आधिकारिक लिंक</h3><ul id="focus-links"></ul></section>
@@ -401,7 +402,7 @@
             <h2 dir="auto">BerkShares</h2>
             <p lang="hi" dir="auto">मैसाचुसेट्स के बर्कशायर क्षेत्र की एक स्थानीय मुद्रा, जिसे समुदाय-केंद्रित गैर-लाभकारी संस्थाएँ समर्थन देती हैं और जिसकी सदस्यता बोर्ड का चुनाव करती तथा प्रमुख बदलावों पर मतदान करती है; यह मुद्रा स्थानीय अर्थव्यवस्था में धन के प्रवाह को मजबूत करती है।</p>
             <p class="catalog-location">1 छिपा हुआ स्थान</p>
-            <div class="catalog-actions">
+<p class="catalog-location" data-public-regional-context lang="en" dir="ltr">Regional context: Berkshire region, Massachusetts</p>            <div class="catalog-actions">
               <a class="catalog-action-link" data-action-type="use" href="https://berkshares.org/using-berkshares/" rel="external noreferrer">उपयोग करें <span aria-hidden="true">↗</span></a>
               <a class="catalog-action-link" data-action-type="learn" href="https://berkshares.org/about/" rel="external noreferrer">जानें <span aria-hidden="true">↗</span></a>
               <a class="catalog-action-link" data-action-type="contribute" href="https://berkshares.org/donate/" rel="external noreferrer">योगदान करें <span aria-hidden="true">↗</span></a>
@@ -574,7 +575,7 @@
             <h2 dir="auto">CoopCycle</h2>
             <p lang="hi" dir="auto">साइकिल कूरियर सहकारी समितियों का एक महासंघ सामूहिक रूप से विकसित डिलीवरी मंच और श्रमिकों द्वारा संचालित सेवाओं के लिए बनाए गए उपयोग नियम साझा करता है।</p>
             <p class="catalog-location">1 छिपा हुआ स्थान</p>
-            <p class="catalog-activity-notice">वर्तमान परिचालन स्थिति को हाल ही में सत्यापित नहीं किया गया है। सूत्रों की समीक्षा की गई 2026-11-20; प्राथमिकता पुनः समीक्षा 2027-01-03.</p>
+<p class="catalog-location" data-public-regional-context lang="en" dir="ltr">Distributed network: Cross-border network of independent courier cooperatives</p>            <p class="catalog-activity-notice">वर्तमान परिचालन स्थिति को हाल ही में सत्यापित नहीं किया गया है। सूत्रों की समीक्षा की गई 2026-11-20; प्राथमिकता पुनः समीक्षा 2027-01-03.</p>
             <div class="catalog-actions">
               <a class="catalog-action-link" data-action-type="learn" href="https://docs.coopcycle.org/en/admin/intro/" rel="external noreferrer">जानें <span aria-hidden="true">↗</span></a>
               <a href="https://coopcycle.org/" rel="external noreferrer">आधिकारिक वेबसाइट <span aria-hidden="true">↗</span></a>
@@ -880,7 +881,7 @@
             <h2 lang="en" dir="ltr">Great Lakes Commons</h2>
             <p lang="hi" dir="auto">एक खुला जैव-क्षेत्रीय नेटवर्क जो ग्रेट लेक्स को जीवित कॉमन्स के रूप में मानता है और राजनीतिक सीमाओं के पार समुदाय और स्वदेशी शासन, साझा जिम्मेदारी और दीर्घकालिक जल प्रबंधन को मजबूत करने का प्रयास करता है।</p>
             <p class="catalog-location">1 छिपा हुआ स्थान</p>
-            <p class="catalog-activity-notice catalog-curation-stale-notice">वर्तमान संपादकीय सत्यापन लंबित है; पुनः समीक्षा की तिथि 2026-11-15 है। पुरानी जानकारी का दोबारा सत्यापन नहीं हुआ है।</p>
+<p class="catalog-location" data-public-regional-context lang="en" dir="ltr">Regional context: Great Lakes bioregion (US and Canada)</p>            <p class="catalog-activity-notice catalog-curation-stale-notice">वर्तमान संपादकीय सत्यापन लंबित है; पुनः समीक्षा की तिथि 2026-11-15 है। पुरानी जानकारी का दोबारा सत्यापन नहीं हुआ है।</p>
             <div class="catalog-actions">
               <a class="catalog-action-link" data-action-type="learn" href="https://www.greatlakescommons.org/why" rel="external noreferrer">जानें <span aria-hidden="true">↗</span></a>
               <a class="catalog-action-link" data-action-type="contribute" href="https://www.greatlakescommons.org/home-1" rel="external noreferrer">योगदान करें <span aria-hidden="true">↗</span></a>

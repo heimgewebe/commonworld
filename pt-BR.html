@@ -3,9 +3,9 @@
   <head>
     <meta charset="utf-8" />
     <meta name="commonworld-page" content="pt-BR.html" />
-    <meta name="commonworld-page-build" content="ade53f158d62f0d2" />
-    <meta name="commonworld-release" content="27edac283a0621f31754" />
-    <base href="/releases/27edac283a0621f31754/" />
+    <meta name="commonworld-page-build" content="3b7acbf4f2c896f2" />
+    <meta name="commonworld-release" content="723334daf4aadddfad9a" />
+    <base href="/releases/723334daf4aadddfad9a/" />
     <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
     <meta name="color-scheme" content="dark" />
     <meta name="referrer" content="strict-origin-when-cross-origin" />
@@ -16,12 +16,12 @@
     <link rel="alternate" type="application/json" href="./catalog/catalog.json" title="Catálogo de Commonworld" />
     <link rel="alternate" type="application/schema+json" href="./contracts/commonworld/project.schema.json" title="Esquema CommonProject" />
     <link rel="stylesheet" href="./assets/vendor/maplibre-gl.css?v=ab1e70d59ec4" />
-    <link rel="stylesheet" href="./index.css?v=84952b6cc591" />
+    <link rel="stylesheet" href="./index.css?v=ef2dd3c6004c" />
     <link rel="stylesheet" href="./assets/ipad-layout.css?v=739d6b8460d4" />
     <script type="module" src="/assets/commonworld-release-check.js?v=c1d996101672"></script>
     <script src="./assets/vendor/maplibre-gl.js?v=45a9b07a9189" defer></script>
     <script type="module" src="./assets/commonworld-locale.mjs?v=d92522e2dd93"></script>
-    <script type="module" src="./assets/commonworld-app.js?v=21dfe2d2fbf7"></script>
+    <script type="module" src="./assets/commonworld-app.js?v=0f0b7afb4aa4"></script>
   </head>
   <body data-presentation="globe">
     <a id="text-skip-link" class="skip-link" href="/pt-BR.html#static-catalog-fallback">Pular para a visualização de texto</a>
@@ -161,6 +161,7 @@
                 <li><span class="legend-semantic-mark legend-semantic-mark--withheld" aria-hidden="true"></span>As referências locais ocultas não são incluídas na exibição espacial</li>
               </ul>
               <p class="legend-precision"><strong>Precisão da localização:</strong> ponto = exato, área tracejada = aproximado, área sólida = extensão publicada.</p>
+              <div id="regional-context-legend" hidden></div>
             </div>
           </details>
 
@@ -257,7 +258,7 @@
         <div class="focus-grid">
           <section><h3>Tópicos</h3><ul id="focus-themes"></ul></section>
           <section><h3>Formas de envolvimento</h3><ul id="focus-actions"></ul></section>
-          <section><h3>Localizações</h3><ul id="focus-locations"></ul></section>
+          <section><h3>Localizações</h3><ul id="focus-locations"></ul><div id="focus-regional-context" hidden></div></section>
           <section><h3>Presença digital</h3><p id="focus-digital"></p></section>
           <section><h3>Relacionamentos</h3><ul id="focus-relations"></ul></section>
           <section><h3>Links oficiais</h3><ul id="focus-links"></ul></section>
@@ -401,7 +402,7 @@
             <h2 dir="auto">BerkShares</h2>
             <p lang="pt-BR" dir="auto">Uma moeda local da região de Berkshire, Massachusetts, mantida por organizações comunitárias sem fins lucrativos e governada por seu quadro de associados, que elege o conselho e vota mudanças importantes, enquanto a moeda fortalece a circulação econômica local.</p>
             <p class="catalog-location">1 localização oculta</p>
-            <div class="catalog-actions">
+<p class="catalog-location" data-public-regional-context lang="en" dir="ltr">Regional context: Berkshire region, Massachusetts</p>            <div class="catalog-actions">
               <a class="catalog-action-link" data-action-type="use" href="https://berkshares.org/using-berkshares/" rel="external noreferrer">Usar <span aria-hidden="true">↗</span></a>
               <a class="catalog-action-link" data-action-type="learn" href="https://berkshares.org/about/" rel="external noreferrer">Aprender <span aria-hidden="true">↗</span></a>
               <a class="catalog-action-link" data-action-type="contribute" href="https://berkshares.org/donate/" rel="external noreferrer">Contribuir <span aria-hidden="true">↗</span></a>
@@ -574,7 +575,7 @@
             <h2 dir="auto">CoopCycle</h2>
             <p lang="pt-BR" dir="auto">Uma federação de cooperativas de entregadores de bicicleta compartilha uma plataforma de entregas desenvolvida coletivamente e regras de uso voltadas a serviços geridos pelos trabalhadores.</p>
             <p class="catalog-location">1 localização oculta</p>
-            <p class="catalog-activity-notice">O status atual não foi verificado recentemente. Fontes revisadas em 2026-11-20; reavaliação prioritária em 2027-01-03.</p>
+<p class="catalog-location" data-public-regional-context lang="en" dir="ltr">Distributed network: Cross-border network of independent courier cooperatives</p>            <p class="catalog-activity-notice">O status atual não foi verificado recentemente. Fontes revisadas em 2026-11-20; reavaliação prioritária em 2027-01-03.</p>
             <div class="catalog-actions">
               <a class="catalog-action-link" data-action-type="learn" href="https://docs.coopcycle.org/en/admin/intro/" rel="external noreferrer">Aprender <span aria-hidden="true">↗</span></a>
               <a href="https://coopcycle.org/" rel="external noreferrer">Site oficial <span aria-hidden="true">↗</span></a>
@@ -880,7 +881,7 @@
             <h2 lang="en" dir="ltr">Great Lakes Commons</h2>
             <p lang="pt-BR" dir="auto">Uma rede biorregional aberta que trata os Grandes Lagos como um bem comum vivo e busca fortalecer a governança comunitária e indígena, a responsabilidade compartilhada e a gestão de longo prazo da água além das fronteiras políticas.</p>
             <p class="catalog-location">1 localização oculta</p>
-            <p class="catalog-activity-notice catalog-curation-stale-notice">A verificação editorial atual está pendente; revisão prevista para 2026-11-15. As informações anteriores não foram verificadas novamente.</p>
+<p class="catalog-location" data-public-regional-context lang="en" dir="ltr">Regional context: Great Lakes bioregion (US and Canada)</p>            <p class="catalog-activity-notice catalog-curation-stale-notice">A verificação editorial atual está pendente; revisão prevista para 2026-11-15. As informações anteriores não foram verificadas novamente.</p>
             <div class="catalog-actions">
               <a class="catalog-action-link" data-action-type="learn" href="https://www.greatlakescommons.org/why" rel="external noreferrer">Aprender <span aria-hidden="true">↗</span></a>
               <a class="catalog-action-link" data-action-type="contribute" href="https://www.greatlakescommons.org/home-1" rel="external noreferrer">Contribuir <span aria-hidden="true">↗</span></a>

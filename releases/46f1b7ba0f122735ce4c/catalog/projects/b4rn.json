@@ -1,0 +1,204 @@
+{
+  "schema_version": 4,
+  "id": "b4rn",
+  "title": "B4RN (Broadband for the Rural North)",
+  "summary": "Eine mitgliedereigene Community Benefit Society, die gemeinsam mit ländlichen Gemeinden in Nordengland Vollfaser-Breitband plant, finanziert, baut und betreibt; Freiwillige, Landbesitzer und Gemeinschaftsinvestoren tragen zur Infrastruktur bei.",
+  "themes": [
+    "communication",
+    "community-network",
+    "rural-infrastructure",
+    "digital-equity",
+    "cooperative",
+    "community-ownership",
+    "commons-governance"
+  ],
+  "actions": [
+    "use",
+    "learn",
+    "contribute",
+    "volunteer"
+  ],
+  "presence": {
+    "geographic": [
+      {
+        "id": "b4rn-rural-communities",
+        "mode": "approximate",
+        "label": "B4RN – öffentliches Koordinationsbüro Melling (Ortsanker)",
+        "privacy_note": "Nur der Ortsbereich des B4RN-Büros Station Yard in Melling; keine Leitungen, Haushalte oder technische Netzinfrastruktur.",
+        "source_ids": [
+          "b4rn-about",
+          "b4rn-working-with-us",
+          "b4rn-site-20261122",
+          "b4rn-osm-20261122"
+        ],
+        "geometry": {
+          "type": "Point",
+          "coordinates": [
+            -2.6160336,
+            54.1350198
+          ]
+        },
+        "uncertainty_meters_min": 3000
+      }
+    ],
+    "digital": {
+      "available": true,
+      "reach": "regional",
+      "label": "Mitgliedereigene, gemeinschaftlich mitaufgebaute Vollfaser-Infrastruktur für ländliche B4RN-Gemeinden",
+      "source_ids": [
+        "b4rn-home",
+        "b4rn-about",
+        "b4rn-volunteer"
+      ]
+    }
+  },
+  "activity": {
+    "status": "active",
+    "observed_at": "2026-11-15",
+    "source_ids": [
+      "b4rn-home",
+      "b4rn-working-with-us",
+      "b4rn-volunteer"
+    ],
+    "note": "Die am 15.11.2026 erneut aufgerufene offizielle Freiwilligenseite beschreibt fortdauernden Aufbau und Anschlussbetrieb des B4RN-Netzes; Community-Dig-Teams verwalten Einnahmen für lokale Gemeinschaftszwecke. Nutzer sind nicht automatisch in jede Betreiberentscheidung eingebunden."
+  },
+  "provenance": {
+    "sources": [
+      {
+        "id": "b4rn-community-dig-2026",
+        "type": "official-source",
+        "label": "B4RN – Community Dig Team, community funds and voluntary governance",
+        "url": "https://b4rn.org.uk/working-with-us/community-dig-team",
+        "retrieved_at": "2026-11-15",
+        "note": "Current first-party explanation of voluntary community dig groups and democratically organized community funds."
+      },
+      {
+        "id": "b4rn-home",
+        "type": "official-source",
+        "label": "B4RN – offizielle Seite",
+        "url": "https://b4rn.org.uk/",
+        "retrieved_at": "2026-08-14",
+        "note": "Aktuelle Hauptseite mit laufendem Dienst, Postcode-Prüfung und Selbstbeschreibung als Community Benefit Society."
+      },
+      {
+        "id": "b4rn-about",
+        "type": "official-source",
+        "label": "B4RN – About Us",
+        "url": "https://b4rn.org.uk/about-b4rn",
+        "retrieved_at": "2026-08-14",
+        "note": "Beschreibt die Community-Benefit-Struktur, die Bindung von Überschüssen an Gemeinschaftszwecke und die fortbestehende Rolle lokaler Gruppen und Freiwilliger."
+      },
+      {
+        "id": "b4rn-working-with-us",
+        "type": "official-source",
+        "label": "B4RN – Working With Us",
+        "url": "https://b4rn.org.uk/working-with-us",
+        "retrieved_at": "2026-08-14",
+        "note": "Aktuelle Beschreibung des heutigen Bau- und Betriebsmodells: Fachpersonal und Auftragnehmer arbeiten weiter mit Community-Gruppen und Freiwilligen zusammen."
+      },
+      {
+        "id": "b4rn-volunteer",
+        "type": "official-source",
+        "label": "B4RN – Volunteer",
+        "url": "https://b4rn.org.uk/working-with-us/volunteer",
+        "retrieved_at": "2026-11-15",
+        "note": "Aktueller öffentlicher Beteiligungsweg für Freiwillige bei Planung, Wegerechten, Bau, Anschlussunterstützung und lokaler Projektorganisation."
+      },
+      {
+        "id": "b4rn-investors",
+        "type": "official-source",
+        "label": "B4RN – Investors",
+        "url": "https://b4rn.org.uk/working-with-us/investors",
+        "retrieved_at": "2026-08-14",
+        "note": "Dokumentiert B4RN als mitgliedereigene Community Benefit Society, Mitgliedschaft über Anteile und die Reinvestition von Mitteln in den Netzausbau."
+      },
+      {
+        "id": "b4rn-site-20261122",
+        "type": "official-source",
+        "label": "b4rn – official public organisation/site",
+        "url": "https://b4rn.org.uk/support/contact",
+        "retrieved_at": "2026-11-22",
+        "note": "Offizieller öffentlicher Bürostandort Station Yard, Melling, LA6 2QY; Gebäudekoordinate nicht bestätigt."
+      },
+      {
+        "id": "b4rn-osm-20261122",
+        "type": "public-registry",
+        "label": "Melling village anchor",
+        "url": "https://www.openstreetmap.org/node/29914942",
+        "retrieved_at": "2026-11-22",
+        "note": "Öffentliche OpenStreetMap-Ortsreferenz; keine Geometrie des gesamten Commons-Netzwerks. Daten unter ODbL 1.0."
+      }
+    ],
+    "uncertainty_note": "B4RN verbindet gemeinschaftliche Eigentums- und Beteiligungsstrukturen mit professionellem ISP-Betrieb. Commonworld setzt den Dienst nicht mit frei zugänglicher öffentlicher Infrastruktur gleich; Nutzung bleibt auf versorgte Gebiete, Anschlüsse und Tarife begrenzt."
+  },
+  "curation": {
+    "state": "listed",
+    "catalogued_at": "2026-08-14",
+    "reviewed_by": "Commonworld editorial review",
+    "reviewed_at": "2026-11-15",
+    "next_review_at": "2027-02-15",
+    "notes": "Aufgenommen als gemeinschaftsgetragene Netzinfrastruktur: ausschlaggebend sind Mitgliedseigentum, Community-Benefit-Bindung, lokales Kapital und fortgesetzte Freiwilligenbeteiligung; kommerzieller Internetzugang allein wäre kein Aufnahmegrund. Aktualisierte offizielle B4RN-Seiten belegen am 15.11.2026 weiter lokalen Aufbau, Gruppenfonds und professionellen ISP-Betrieb."
+  },
+  "links": [
+    {
+      "type": "homepage",
+      "label": "B4RN – offizielle Seite",
+      "url": "https://b4rn.org.uk/"
+    },
+    {
+      "type": "use",
+      "label": "B4RN-Verfügbarkeit für eine Region prüfen",
+      "url": "https://b4rn.org.uk/",
+      "source_ids": [
+        "b4rn-home"
+      ]
+    },
+    {
+      "type": "learn",
+      "label": "B4RNs Gemeinschafts- und Eigentumsmodell verstehen",
+      "url": "https://b4rn.org.uk/about-b4rn",
+      "source_ids": [
+        "b4rn-about",
+        "b4rn-investors"
+      ]
+    },
+    {
+      "type": "contribute",
+      "label": "Ein lokales B4RN-Projekt unterstützen",
+      "url": "https://b4rn.org.uk/working-with-us",
+      "source_ids": [
+        "b4rn-working-with-us",
+        "b4rn-investors"
+      ]
+    },
+    {
+      "type": "volunteer",
+      "label": "Bei einem B4RN-Projekt freiwillig mitarbeiten",
+      "url": "https://b4rn.org.uk/working-with-us/volunteer",
+      "source_ids": [
+        "b4rn-volunteer"
+      ]
+    }
+  ],
+  "handoff": {
+    "enabled": false
+  },
+  "languages": {
+    "codes": [
+      "en"
+    ],
+    "source_ids": [
+      "b4rn-home",
+      "b4rn-about"
+    ],
+    "note": "Die geprüften offiziellen Seiten sind auf Englisch verfügbar."
+  },
+  "access": {
+    "type": "restricted",
+    "source_ids": [
+      "b4rn-home",
+      "b4rn-about"
+    ],
+    "note": "Projektinformationen und Beteiligungswege sind öffentlich; der Breitbanddienst selbst setzt ein versorgbares Grundstück, einen Anschluss und einen kostenpflichtigen Tarif voraus."
+  }
+}

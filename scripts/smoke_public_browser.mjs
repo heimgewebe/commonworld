@@ -2731,6 +2731,62 @@ async function intentSearchDiscoveryScenario() {
   assert((await run.page.locator('#focus-title').textContent()) === 'Le Nid', 'intent spatial: geographic result focus mismatch');
   await run.page.locator('#focus-close').click();
 
+  // Public regional contexts are deliberately separate from project locations.
+  for (const [id, query, regionLabel, bounds] of [
+    ['berkshares', 'Berkshire', 'Berkshire region', [-73.51, 42.03, -72.94, 42.75]],
+    ['great-lakes-commons', 'Great Lakes', 'Great Lakes bioregion', [-93.3, 40.4, -74.4, 50.8]],
+  ]) {
+    await run.page.locator('#commons-search').fill(query);
+    const result = run.page.locator('.discovery-result[data-commonproject-id="' + id + '"]');
+    await result.waitFor({ state: 'visible' });
+    assert((await result.locator('.discovery-result-meta').textContent()).includes('Regional context'), 'regional search: missing distinct context label ' + id);
+    await result.locator('.discovery-result-main').click();
+    await run.page.waitForFunction(identifier => document.querySelector('.globe-stage')?.dataset.lastSpatialResult === 'regional-context:' + identifier, id);
+    const camera = await stableMapCamera();
+    assert(camera.lng >= bounds[0] - 0.05 && camera.lng <= bounds[2] + 0.05
+      && camera.lat >= bounds[1] - 0.05 && camera.lat <= bounds[3] + 0.05 && camera.zoom <= 8,
+      'regional navigation: camera left reference bounds ' + id + ' ' + JSON.stringify(camera));
+    assert((await run.page.locator('#focus-regional-context').textContent()).includes(regionLabel), 'regional focus missing ' + id);
+    const reference = run.page.locator('.regional-reference-label[data-regional-project-id="' + id + '"]');
+    assert(await reference.count() === 1, 'regional map: missing or duplicated label ' + id);
+    assert((await reference.textContent()).includes('Regional context'), 'regional map: missing role ' + id);
+    assert(await reference.getAttribute('aria-pressed') === 'true', 'regional map: missing selection ' + id);
+    assert((await run.page.locator('#focus-regional-context').textContent()).includes('not Commons locations'), 'regional focus misrepresents reference camera as project location');
+    await run.page.locator('#focus-close').click();
+    assert(await run.page.locator('.regional-reference-label[data-regional-project-id="' + id + '"][aria-pressed="true"], .regional-reference-label[data-regional-project-id="' + id + '"].is-selected').count() === 0, 'regional map: stale selection after closing focus ' + id);
+  }
+  await run.page.locator('#commons-search').fill('Mensakas');
+  const cooperative = run.page.locator('.discovery-result[data-commonproject-id="coopcycle"]');
+  await cooperative.waitFor({ state: 'visible' });
+  const beforeNetwork = await stableMapCamera();
+  await cooperative.locator('.discovery-result-main').click();
+  await run.page.waitForFunction(() => document.querySelector('.globe-stage')?.dataset.lastSpatialResult === 'regional-network:coopcycle');
+  assert(sameCamera(beforeNetwork, await stableMapCamera()), 'regional network: inferred a network center');
+  assert(await run.page.locator('#focus-regional-context [data-regional-view-id]').count() === 3, 'regional network: incomplete public orientation controls');
+  assert(await run.page.locator('.regional-reference-label[data-regional-project-id="coopcycle"][data-reference-kind="network-example"]').count() === 3, 'regional map: missing separate network examples');
+  await run.page.locator('[data-regional-view-id="barcelona-member-city-reference"]').click();
+  await run.page.waitForFunction(() => document.querySelector('.globe-stage')?.dataset.lastRegionalView === 'barcelona-member-city-reference');
+  const exampleCamera = await stableMapCamera();
+  assert(exampleCamera.lng > 2.04 && exampleCamera.lng < 2.24 && exampleCamera.lat > 41.30 && exampleCamera.lat < 41.49 && exampleCamera.zoom <= 8, 'regional network: explicit example navigation failed');
+  const networkMarkers = run.page.locator('.regional-reference-label[data-regional-project-id="coopcycle"][data-reference-kind="network-example"]');
+  await run.page.locator('#focus-close').click();
+  assert(await networkMarkers.count() === 0, 'regional network: stale examples after closing focus');
+  await run.page.locator('#commons-search').fill('CoopCycle');
+  await cooperative.waitFor({ state: 'visible' });
+  await cooperative.locator('.discovery-result-main').click();
+  await stableMapCamera();
+  assert(await networkMarkers.count() === 3, 'regional network: examples did not return after reselection');
+  await run.page.keyboard.press('Escape');
+  assert(await networkMarkers.count() === 0, 'regional network: stale examples after Escape');
+  if (await run.page.locator('#discovery-panel').isVisible()) await run.page.locator('#discovery-close').click();
+  await run.page.locator('#settings-toggle').click();
+  await run.page.getByRole('radio', { name: /Text/ }).click();
+  assert((await run.page.locator('#project-coopcycle .catalog-location').textContent()).includes('Distributed network'), 'regional network: text-view context absent');
+  await run.page.locator('#settings-toggle').click();
+  await run.page.getByRole('radio', { name: /Globe/ }).click();
+
+
+
   await run.page.locator('#commons-search').fill('');
   await run.page.waitForFunction((count) => document.querySelectorAll('.discovery-result').length === count, discoveryPreviewCount(expectedDigitalProjection.catalogIds));
   await run.page.locator('#filter-presence-geographic').check();
@@ -2748,7 +2804,7 @@ async function intentSearchDiscoveryScenario() {
 
   assert(run.consoleErrors.every((message) => message.includes('Failed to load resource')), 'intent search: unexpected console errors: ' + run.consoleErrors.join(' | '));
   assert(run.pageErrors.length === 0, 'intent search: page errors: ' + run.pageErrors.join(' | '));
-  results.push({ id: 'intent-search-discovery', verdict: 'PASS', indexedRecords: expectedDigitalProjection.catalogEntryCount, rankedGermanIntentResults: expectedDigitalProjection.contributionIds.length, filters: 7, digitalCoordinateFree: true, spatialNavigation: true });
+  results.push({ id: 'intent-search-discovery', verdict: 'PASS', indexedRecords: expectedDigitalProjection.catalogEntryCount, rankedGermanIntentResults: expectedDigitalProjection.contributionIds.length, filters: 7, digitalCoordinateFree: true, spatialNavigation: true, regionalReferenceNavigation: true, distributedNetworkNoCenter: true, regionalTextParity: true });
   await run.context.close();
 }
 
@@ -2988,6 +3044,21 @@ async function spatialDiscoveryFiltersScenario() {
 async function androidGlobeUiScenario() {
   const scenarioId = 'android-globe-ui-alignment';
   process.stdout.write(JSON.stringify({ state: 'RUNNING', scenario: scenarioId }) + '\n');
+  // Keep the paint capture isolated from the subsequent interaction page.
+  // Concurrent SwiftShader-backed globes can compete for compositor frames on CI.
+  // This retains every isolated-label pixel assertion and the fresh interaction context.
+  const portraitPaintRun = await newPage({ mobile: true, touch: true, reducedMotion: 'no-preference' });
+  let portraitPaintEvidence;
+  try {
+    await portraitPaintRun.page.goto(baseUrl, { waitUntil: 'domcontentloaded' });
+    await portraitPaintRun.page.waitForSelector('html.runtime-ready');
+    await portraitPaintRun.page.waitForFunction(() => document.querySelectorAll('.sphere-ring-text').length > 0);
+    portraitPaintEvidence = await captureRingLabelPaintEvidence(portraitPaintRun.page, `${scenarioId}-portrait-ring-label-paint`);
+    assert(portraitPaintRun.pageErrors.length === 0, scenarioId + ': portrait paint page errors: ' + portraitPaintRun.pageErrors.join(' | '));
+  } finally {
+    await portraitPaintRun.context.close();
+  }
+
   const run = await newPage({ mobile: true, touch: true, reducedMotion: 'no-preference' });
   await run.page.goto(baseUrl, { waitUntil: 'domcontentloaded' });
   await run.page.waitForSelector('html.runtime-ready');
@@ -3055,13 +3126,6 @@ async function androidGlobeUiScenario() {
   assert(geometry.bundleVisibleChildCounts.every(({ declared, rendered }) => declared === rendered && rendered <= 2), scenarioId + ': mobile bundle detail did not reduce subordinate lines ' + JSON.stringify(geometry));
   assert(geometry.ringTextWidth > 80 && geometry.ringTextHeight > 0 && geometry.ringTextFontSize >= 20, scenarioId + ': mobile ring text is not visibly sized ' + JSON.stringify(geometry));
   assert(geometry.representativePrimaryLabels.length >= 2 && geometry.representativePrimaryLabels.every(({ text, visible, width, height }) => text.length > 0 && visible && width > 80 && height > 0), scenarioId + ': representative primary mobile ring labels are absent or not visibly laid out ' + JSON.stringify(geometry));
-  const portraitPaintRun = await newPage({ mobile: true, touch: true, reducedMotion: 'no-preference' });
-  await portraitPaintRun.page.goto(baseUrl, { waitUntil: 'domcontentloaded' });
-  await portraitPaintRun.page.waitForSelector('html.runtime-ready');
-  await portraitPaintRun.page.waitForFunction(() => document.querySelectorAll('.sphere-ring-text').length > 0);
-  const portraitPaintEvidence = await captureRingLabelPaintEvidence(portraitPaintRun.page, `${scenarioId}-portrait-ring-label-paint`);
-  assert(portraitPaintRun.pageErrors.length === 0, scenarioId + ': portrait paint page errors: ' + portraitPaintRun.pageErrors.join(' | '));
-  await portraitPaintRun.context.close();
 
   await run.page.locator('#sphere-edge-control').focus();
   const focusedRingMotion = await run.page.evaluate(() => ({
@@ -3177,7 +3241,10 @@ async function androidGlobeUiScenario() {
       && Number.isFinite(previous?.planeAnimationCurrentTime)
       && entry.planeAnimationCurrentTime - previous.planeAnimationCurrentTime > threshold;
   });
-  const waitForCoherentTouchMotion = async (before, minimum = 2, timeoutMs = 1500) => {
+  // These bounds govern the browser observer, not the product's 500 ms
+  // post-movement grace. Software-rendered CI can defer compositor frames.
+  const touchObservationTimeoutMs = 10_000;
+  const waitForCoherentTouchMotion = async (before, minimum = 2, timeoutMs = touchObservationTimeoutMs) => {
     const deadline = Date.now() + timeoutMs;
     let after = await touchRingState();
     while ((coherentMovingIndices(before, after).length < minimum || advancingAnimationTimesBetween(before, after).length < minimum) && Date.now() < deadline) {
@@ -3186,7 +3253,7 @@ async function androidGlobeUiScenario() {
     }
     return after;
   };
-  const waitForTouchAnimationSettlement = async (expectedPlayState, expectedPlaybackRate, timeoutMs = 1500) => {
+  const waitForTouchAnimationSettlement = async (expectedPlayState, expectedPlaybackRate, timeoutMs = touchObservationTimeoutMs) => {
     const deadline = Date.now() + timeoutMs;
     const waitForState = (requireSettled) => run.page.waitForFunction(({ playState, playbackRate, requireSettled }) => {
       const planes = [...document.querySelectorAll('.sphere-ring-plane')];
@@ -3200,7 +3267,9 @@ async function androidGlobeUiScenario() {
           && (!requireSettled || animation?.pending === false);
       });
     }, { playState: expectedPlayState, playbackRate: expectedPlaybackRate, requireSettled }, {
-      polling: 'raf',
+      // Observe the actual animation state even if requestAnimationFrame
+      // callbacks are delayed; pending=false and visual motion remain required.
+      polling: 50,
       timeout: Math.max(1, deadline - Date.now()),
     });
     const waitOrFail = async (requireSettled, phase) => {
@@ -3273,6 +3342,41 @@ async function androidGlobeUiScenario() {
   assert(focusResumedAfter.every(({ planeAnimationName, planeAnimationPlayState, planeAnimationPlaybackRate, planeAnimationApiPlayState, planeAnimationPending }) => planeAnimationName === 'sphere-ring-orbit' && planeAnimationPlayState === 'running' && planeAnimationPlaybackRate === 1 && planeAnimationApiPlayState === 'running' && planeAnimationPending === false), scenarioId + ': shared ring planes did not resume at normal playback after sphere-edge focus ended ' + JSON.stringify(focusResumedAfter));
   assert(coherentMovingIndices(focusResumedBefore, focusResumedAfter).length >= 2 && advancingAnimationTimesBetween(focusResumedBefore, focusResumedAfter).length >= 2, scenarioId + ': line, label and WAAPI time did not resume together after sphere-edge focus ended ' + JSON.stringify({ before: focusResumedBefore, after: focusResumedAfter }));
 
+  await run.page.setViewportSize({ width: 390, height: 844 });
+  await run.page.waitForTimeout(100);
+
+  await run.page.evaluate(() => new Promise((resolve) => {
+    const map = window.__commonworldTestMap;
+    map.once('render', resolve);
+    map.jumpTo({ center: [10.2, 51.1], zoom: 1.2, bearing: 0, pitch: 0 });
+    map.triggerRepaint();
+  }));
+  await run.page.waitForFunction(() => {
+    const map = window.__commonworldTestMap;
+    const stage = document.querySelector('.globe-stage');
+    return Boolean(map && !map.isMoving() && stage?.dataset.countryMapState === 'ready' && map.getLayer('commonworld-country-compositions-base'));
+  });
+  await run.page.waitForFunction(() => {
+    const map = window.__commonworldTestMap;
+    if (!map || map.isMoving()) return false;
+    return map.queryRenderedFeatures(map.project([10.2, 51.1]), { layers: ['commonworld-country-compositions-base'] }).length > 0;
+  });
+  const country = await run.page.evaluate(() => {
+    const map = window.__commonworldTestMap;
+    const opacity = map.getPaintProperty('commonworld-country-compositions-base', 'fill-opacity');
+    const rendered = map.queryRenderedFeatures(map.project([10.2, 51.1]), { layers: ['commonworld-country-compositions-base'] }).length;
+    const sourceFeatures = map.querySourceFeatures('commonworld-country-compositions').length;
+    const diagnosticsFeatures = Number.parseInt(document.querySelector('.globe-stage')?.dataset.countryMapFeatures ?? '0', 10);
+    const visibility = map.getLayoutProperty('commonworld-country-compositions-base', 'visibility') ?? 'visible';
+    return { opacity, rendered, sourceFeatures, diagnosticsFeatures, visibility, zoom: map.getZoom() };
+  });
+  assert(JSON.stringify(country.opacity).includes('0.78'), scenarioId + ': overview country tint is not strong enough ' + JSON.stringify(country));
+  assert(country.diagnosticsFeatures > 0 && country.rendered > 0, scenarioId + ': country composition is not rendered at mobile globe overview ' + JSON.stringify(country));
+  assert(run.pageErrors.length === 0, scenarioId + ': page errors: ' + run.pageErrors.join(' | '));
+  await run.context.close();
+
+  // Independent media-profile checks start only after the interactive
+  // globe has closed; retain their real visibility and motion assertions.
   const reducedTouchRun = await newPage({
     mobile: true,
     touch: true,
@@ -3367,39 +3471,7 @@ async function androidGlobeUiScenario() {
   assert(compactDesktopRun.pageErrors.length === 0, scenarioId + ': compact desktop page errors: ' + compactDesktopRun.pageErrors.join(' | '));
   await compactDesktopRun.context.close();
 
-  await run.page.setViewportSize({ width: 390, height: 844 });
-  await run.page.waitForTimeout(100);
-
-  await run.page.evaluate(() => new Promise((resolve) => {
-    const map = window.__commonworldTestMap;
-    map.once('render', resolve);
-    map.jumpTo({ center: [10.2, 51.1], zoom: 1.2, bearing: 0, pitch: 0 });
-    map.triggerRepaint();
-  }));
-  await run.page.waitForFunction(() => {
-    const map = window.__commonworldTestMap;
-    const stage = document.querySelector('.globe-stage');
-    return Boolean(map && !map.isMoving() && stage?.dataset.countryMapState === 'ready' && map.getLayer('commonworld-country-compositions-base'));
-  });
-  await run.page.waitForFunction(() => {
-    const map = window.__commonworldTestMap;
-    if (!map || map.isMoving()) return false;
-    return map.queryRenderedFeatures(map.project([10.2, 51.1]), { layers: ['commonworld-country-compositions-base'] }).length > 0;
-  });
-  const country = await run.page.evaluate(() => {
-    const map = window.__commonworldTestMap;
-    const opacity = map.getPaintProperty('commonworld-country-compositions-base', 'fill-opacity');
-    const rendered = map.queryRenderedFeatures(map.project([10.2, 51.1]), { layers: ['commonworld-country-compositions-base'] }).length;
-    const sourceFeatures = map.querySourceFeatures('commonworld-country-compositions').length;
-    const diagnosticsFeatures = Number.parseInt(document.querySelector('.globe-stage')?.dataset.countryMapFeatures ?? '0', 10);
-    const visibility = map.getLayoutProperty('commonworld-country-compositions-base', 'visibility') ?? 'visible';
-    return { opacity, rendered, sourceFeatures, diagnosticsFeatures, visibility, zoom: map.getZoom() };
-  });
-  assert(JSON.stringify(country.opacity).includes('0.78'), scenarioId + ': overview country tint is not strong enough ' + JSON.stringify(country));
-  assert(country.diagnosticsFeatures > 0 && country.rendered > 0, scenarioId + ': country composition is not rendered at mobile globe overview ' + JSON.stringify(country));
-  assert(run.pageErrors.length === 0, scenarioId + ': page errors: ' + run.pageErrors.join(' | '));
   results.push({ id: scenarioId, verdict: 'PASS', ...geometry, portraitPaintedPrimaryLabels: portraitPaintEvidence.differences.map(({ layer, changedPixels }) => ({ layer, changedPixels })), wideTouch: wideTouchGeometry, compactDesktop: compactDesktopGeometry, countryRendered: country.rendered });
-  await run.context.close();
 }
 
 async function intentSearchLayoutScenario({ viewportOverride, scenarioId }) {

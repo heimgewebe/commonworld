@@ -3,9 +3,9 @@
   <head>
     <meta charset="utf-8" />
     <meta name="commonworld-page" content="de.html" />
-    <meta name="commonworld-page-build" content="f8c2be39436dd367" />
-    <meta name="commonworld-release" content="27edac283a0621f31754" />
-    <base href="/releases/27edac283a0621f31754/" />
+    <meta name="commonworld-page-build" content="e9efa4c17248fcf7" />
+    <meta name="commonworld-release" content="723334daf4aadddfad9a" />
+    <base href="/releases/723334daf4aadddfad9a/" />
     <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
     <meta name="color-scheme" content="dark" />
     <meta name="referrer" content="strict-origin-when-cross-origin" />
@@ -16,12 +16,12 @@
     <link rel="alternate" type="application/json" href="./catalog/catalog.json" title="Commonworld-Katalog" />
     <link rel="alternate" type="application/schema+json" href="./contracts/commonworld/project.schema.json" title="CommonProject-Schema" />
     <link rel="stylesheet" href="./assets/vendor/maplibre-gl.css?v=ab1e70d59ec4" />
-    <link rel="stylesheet" href="./index.css?v=84952b6cc591" />
+    <link rel="stylesheet" href="./index.css?v=ef2dd3c6004c" />
     <link rel="stylesheet" href="./assets/ipad-layout.css?v=739d6b8460d4" />
     <script type="module" src="/assets/commonworld-release-check.js?v=c1d996101672"></script>
     <script src="./assets/vendor/maplibre-gl.js?v=45a9b07a9189" defer></script>
     <script type="module" src="./assets/commonworld-locale.mjs?v=d92522e2dd93"></script>
-    <script type="module" src="./assets/commonworld-app.js?v=21dfe2d2fbf7"></script>
+    <script type="module" src="./assets/commonworld-app.js?v=0f0b7afb4aa4"></script>
   </head>
   <body data-presentation="globe">
     <a id="text-skip-link" class="skip-link" href="/de.html#static-catalog-fallback">Zur Textansicht springen</a>
@@ -161,6 +161,7 @@
                 <li><span class="legend-semantic-mark legend-semantic-mark--withheld" aria-hidden="true"></span>Versteckte Ortsbezüge fließen nicht in die räumliche Darstellung ein</li>
               </ul>
               <p class="legend-precision"><strong>Ortsgenauigkeit:</strong> Punkt = exakt, gestrichelte Fläche = ungefähr, durchgezogene Fläche = veröffentlichte Ausdehnung.</p>
+              <div id="regional-context-legend" hidden></div>
             </div>
           </details>
 
@@ -257,7 +258,7 @@
         <div class="focus-grid">
           <section><h3>Themen</h3><ul id="focus-themes"></ul></section>
           <section><h3>Möglichkeiten</h3><ul id="focus-actions"></ul></section>
-          <section><h3>Orte</h3><ul id="focus-locations"></ul></section>
+          <section><h3>Orte</h3><ul id="focus-locations"></ul><div id="focus-regional-context" hidden></div></section>
           <section><h3>Digitale Präsenz</h3><p id="focus-digital"></p></section>
           <section><h3>Beziehungen</h3><ul id="focus-relations"></ul></section>
           <section><h3>Offizielle Links</h3><ul id="focus-links"></ul></section>
@@ -411,7 +412,7 @@
             <h2 dir="auto">BerkShares</h2>
             <p dir="auto">Eine lokale Währung in der Berkshire-Region von Massachusetts, die von gemeinschaftsorientierten Nonprofits getragen und über eine Mitgliedschaft mitgewählt wird; Mitglieder wählen den Vorstand und stimmen über zentrale Änderungen ab, während die Währung lokale Kreisläufe stärkt.</p>
             <p class="catalog-location">1 verborgener Ort</p>
-            <div class="catalog-actions">
+<p class="catalog-location" data-public-regional-context lang="de" dir="ltr">Regionaler Bezug: Berkshire-Region, Massachusetts</p>            <div class="catalog-actions">
               <a class="catalog-action-link" data-action-type="use" href="https://berkshares.org/using-berkshares/" rel="external noreferrer">BerkShares beziehen und lokal verwenden <span aria-hidden="true">↗</span></a>
               <a class="catalog-action-link" data-action-type="learn" href="https://berkshares.org/about/" rel="external noreferrer">Währungsmodell und Governance von BerkShares kennenlernen <span aria-hidden="true">↗</span></a>
               <a class="catalog-action-link" data-action-type="contribute" href="https://berkshares.org/donate/" rel="external noreferrer">BerkShares-Mitglied werden und an der Governance mitwirken <span aria-hidden="true">↗</span></a>
@@ -597,7 +598,7 @@
             <h2 dir="auto">CoopCycle</h2>
             <p dir="auto">Ein föderiertes Netzwerk von Fahrradkurier-Kooperativen teilt eine von Kurierkollektiven gepflegte Lieferplattform und verbindliche Nutzungsregeln zugunsten selbstverwalteter Kurierbetriebe.</p>
             <p class="catalog-location">1 verborgener Ort</p>
-            <p class="catalog-activity-notice">Aktueller Betriebszustand nicht zeitnah verifiziert. Quellen geprüft am 2026-11-20; priorisierte Nachprüfung 2027-01-03.</p>
+<p class="catalog-location" data-public-regional-context lang="de" dir="ltr">Verteiltes Netzwerk: Länderübergreifendes Netzwerk unabhängiger Kurierkooperativen</p>            <p class="catalog-activity-notice">Aktueller Betriebszustand nicht zeitnah verifiziert. Quellen geprüft am 2026-11-20; priorisierte Nachprüfung 2027-01-03.</p>
             <div class="catalog-actions">
               <a class="catalog-action-link" data-action-type="learn" href="https://docs.coopcycle.org/en/admin/intro/" rel="external noreferrer">Gemeinsame Praxis und Verantwortung kennenlernen <span aria-hidden="true">↗</span></a>
               <a href="https://coopcycle.org/" rel="external noreferrer">Offizielle Seite <span aria-hidden="true">↗</span></a>

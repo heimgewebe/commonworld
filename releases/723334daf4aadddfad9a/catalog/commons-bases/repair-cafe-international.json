@@ -1,0 +1,58 @@
+{
+  "schema_version": 1,
+  "kind": "commonworld_commons_basis",
+  "project_id": "repair-cafe-international",
+  "classification": "commons-infrastructure",
+  "decision": "include",
+  "reviewed_at": "2026-10-30",
+  "reviewer": "Commonworld editorial desk review",
+  "criteria": {
+    "shared_resource": {
+      "status": "supported",
+      "statement": "In lokalen Repair Cafés werden Reparaturwerkzeuge, freiwillig geteiltes Fachwissen und zugängliche Reparaturtreffen gemeinsam nutzbar gemacht.",
+      "source_ids": [
+        "repair-cafe-about",
+        "repair-cafe-home"
+      ]
+    },
+    "community": {
+      "status": "supported",
+      "statement": "Lokale Organisatoren, ehrenamtliche Reparaturexperten und Besucher bilden situationsbezogene Nachbarschaftsgemeinschaften; das internationale Netzwerk ist kein einheitlicher Eigentümerverein.",
+      "source_ids": [
+        "repair-cafe-about",
+        "repair-cafe-start"
+      ]
+    },
+    "commoning_practice": {
+      "status": "supported",
+      "statement": "Besucher reparieren nach Möglichkeit selbst mit Unterstützung und Werkzeugen der Ehrenamtlichen; lokale Gruppen richten wiederkehrende Treffen eigenständig aus.",
+      "source_ids": [
+        "repair-cafe-about",
+        "repair-cafe-visit"
+      ]
+    },
+    "rules_and_responsibility": {
+      "status": "supported",
+      "statement": "Öffentliche Hausregeln bestimmen Freiwilligkeit, Verantwortung, Kostentragung von Ersatzteilen und die Möglichkeit, gefährliche Reparaturen abzulehnen; lokale Organisatoren übernehmen die Durchführung.",
+      "source_ids": [
+        "repair-cafe-rules",
+        "repair-cafe-start"
+      ]
+    },
+    "common_benefit": {
+      "status": "supported",
+      "statement": "Reparaturwissen wird geteilt, Gegenstände können länger genutzt und Nachbarn zu eigenständiger Pflege ihrer Geräte befähigt werden.",
+      "source_ids": [
+        "repair-cafe-about",
+        "repair-cafe-home"
+      ]
+    }
+  },
+  "confidence": 0.86,
+  "limitations": [
+    "Die internationale Stiftung besitzt nicht automatisch alle lokalen Werkzeuge, Räume oder Reparaturgegenstände.",
+    "Freiwillige Reparaturhilfe ist kein Garantieservice; konkrete Termine und Sicherheitsentscheidungen liegen bei lokalen Organisatoren.",
+    "Die Aktivität einzelner lokaler Repair Cafés wurde nicht am Prüftag neu nachgewiesen."
+  ],
+  "notes": "Einschluss als Infrastruktur für lokal organisierte Reparatur-Commons, nicht als globale Eigentumsgemeinschaft."
+}

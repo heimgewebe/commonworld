@@ -48,6 +48,7 @@ class PublicShellTests(unittest.TestCase):
         (root / "assets").mkdir()
         for asset in (
             "commonworld-bootstrap-catalog.mjs",
+            "commonworld-regional-contexts.mjs",
             "commonworld-catalog-runtime.mjs",
             "commonworld-i18n.mjs",
             "commonworld-en-locale.mjs",

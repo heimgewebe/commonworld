@@ -49,6 +49,7 @@ def validation_errors(
 
     seen_ids = set()
     seen_pairs = set()
+    seen_view_ids = set()
     for entry in contexts["contexts"]:
         context_id = entry["id"]
         project_id = entry["project_id"]
@@ -84,6 +85,21 @@ def validation_errors(
         else:
             if reviewed_at > current_date:
                 errors.append(f"{context_id}: source reviewed in the future")
+
+        for view in entry.get("navigation_views", []):
+            view_id = view["id"]
+            if view_id in seen_view_ids:
+                errors.append(f"{context_id}: duplicate orientation view id {view_id}")
+            seen_view_ids.add(view_id)
+            west, south, east, north = view["view_bounds"]
+            if not (west < east and south < north):
+                errors.append(f"{context_id}: invalid orientation viewport {view_id}")
+            if not set(view["association_source_ids"]).issubset(entry["source_ids"]):
+                errors.append(f"{context_id}: unbound orientation association source {view_id}")
+            if not urlsplit(view["source_url"]).netloc:
+                errors.append(f"{context_id}: invalid geographic reference URL {view_id}")
+            if date.fromisoformat(view["reviewed_at"]) > current_date:
+                errors.append(f"{context_id}: orientation reference reviewed in the future {view_id}")
 
         # No context can substitute a map representation for a hidden location.
         # We never read or export hidden geometry, members or endpoints here.

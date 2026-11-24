@@ -3,9 +3,9 @@
   <head>
     <meta charset="utf-8" />
     <meta name="commonworld-page" content="zh-Hans.html" />
-    <meta name="commonworld-page-build" content="a9a0cca59dec924e" />
-    <meta name="commonworld-release" content="27edac283a0621f31754" />
-    <base href="/releases/27edac283a0621f31754/" />
+    <meta name="commonworld-page-build" content="e90134078f293392" />
+    <meta name="commonworld-release" content="723334daf4aadddfad9a" />
+    <base href="/releases/723334daf4aadddfad9a/" />
     <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
     <meta name="color-scheme" content="dark" />
     <meta name="referrer" content="strict-origin-when-cross-origin" />
@@ -16,12 +16,12 @@
     <link rel="alternate" type="application/json" href="./catalog/catalog.json" title="Commonworld 目录" />
     <link rel="alternate" type="application/schema+json" href="./contracts/commonworld/project.schema.json" title="CommonProject 架构" />
     <link rel="stylesheet" href="./assets/vendor/maplibre-gl.css?v=ab1e70d59ec4" />
-    <link rel="stylesheet" href="./index.css?v=84952b6cc591" />
+    <link rel="stylesheet" href="./index.css?v=ef2dd3c6004c" />
     <link rel="stylesheet" href="./assets/ipad-layout.css?v=739d6b8460d4" />
     <script type="module" src="/assets/commonworld-release-check.js?v=c1d996101672"></script>
     <script src="./assets/vendor/maplibre-gl.js?v=45a9b07a9189" defer></script>
     <script type="module" src="./assets/commonworld-locale.mjs?v=d92522e2dd93"></script>
-    <script type="module" src="./assets/commonworld-app.js?v=21dfe2d2fbf7"></script>
+    <script type="module" src="./assets/commonworld-app.js?v=0f0b7afb4aa4"></script>
   </head>
   <body data-presentation="globe">
     <a id="text-skip-link" class="skip-link" href="/zh-Hans.html#static-catalog-fallback">跳至文本视图</a>
@@ -161,6 +161,7 @@
                 <li><span class="legend-semantic-mark legend-semantic-mark--withheld" aria-hidden="true"></span>隐藏位置参考不包含在空间显示中</li>
               </ul>
               <p class="legend-precision"><strong>定位精度：</strong>点=精确，虚线面积=近似，实线面积=公布的范围。</p>
+              <div id="regional-context-legend" hidden></div>
             </div>
           </details>
 
@@ -257,7 +258,7 @@
         <div class="focus-grid">
           <section><h3>主题</h3><ul id="focus-themes"></ul></section>
           <section><h3>参与方式</h3><ul id="focus-actions"></ul></section>
-          <section><h3>地点</h3><ul id="focus-locations"></ul></section>
+          <section><h3>地点</h3><ul id="focus-locations"></ul><div id="focus-regional-context" hidden></div></section>
           <section><h3>数字存在</h3><p id="focus-digital"></p></section>
           <section><h3>关系</h3><ul id="focus-relations"></ul></section>
           <section><h3>官方链接</h3><ul id="focus-links"></ul></section>
@@ -401,7 +402,7 @@
             <h2 dir="auto">BerkShares</h2>
             <p lang="zh-Hans" dir="auto">马萨诸塞州伯克希尔地区的一种地方货币，由社区导向的非营利机构支持，并通过会员治理：会员选举董事会并对关键变更投票，同时货币促进经济活动在本地循环。</p>
             <p class="catalog-location">1 隐藏位置</p>
-            <div class="catalog-actions">
+<p class="catalog-location" data-public-regional-context lang="en" dir="ltr">Regional context: Berkshire region, Massachusetts</p>            <div class="catalog-actions">
               <a class="catalog-action-link" data-action-type="use" href="https://berkshares.org/using-berkshares/" rel="external noreferrer">使用 <span aria-hidden="true">↗</span></a>
               <a class="catalog-action-link" data-action-type="learn" href="https://berkshares.org/about/" rel="external noreferrer">学习 <span aria-hidden="true">↗</span></a>
               <a class="catalog-action-link" data-action-type="contribute" href="https://berkshares.org/donate/" rel="external noreferrer">贡献 <span aria-hidden="true">↗</span></a>
@@ -574,7 +575,7 @@
             <h2 dir="auto">CoopCycle</h2>
             <p lang="zh-Hans" dir="auto">一个自行车信使合作社联合会共享共同开发的配送平台，以及为劳动者自主经营的配送服务制定的使用规则。</p>
             <p class="catalog-location">1 隐藏位置</p>
-            <p class="catalog-activity-notice">当前运营状态近期尚未核实。来源审查日期：2026-11-20；优先复核日期：2027-01-03。</p>
+<p class="catalog-location" data-public-regional-context lang="en" dir="ltr">Distributed network: Cross-border network of independent courier cooperatives</p>            <p class="catalog-activity-notice">当前运营状态近期尚未核实。来源审查日期：2026-11-20；优先复核日期：2027-01-03。</p>
             <div class="catalog-actions">
               <a class="catalog-action-link" data-action-type="learn" href="https://docs.coopcycle.org/en/admin/intro/" rel="external noreferrer">学习 <span aria-hidden="true">↗</span></a>
               <a href="https://coopcycle.org/" rel="external noreferrer">官方网站 <span aria-hidden="true">↗</span></a>
@@ -880,7 +881,7 @@
             <h2 lang="en" dir="ltr">Great Lakes Commons</h2>
             <p lang="zh-Hans" dir="auto">一个开放的生物区域网络，将五大湖视为一个共同的生存空间，并寻求加强社区和原住民治理、分担责任和跨政治边界的长期水资源管理。</p>
             <p class="catalog-location">1 隐藏位置</p>
-            <p class="catalog-activity-notice catalog-curation-stale-notice">当前编辑核验尚未完成；复核日期为 2026-11-15。此前的信息尚未重新核实。</p>
+<p class="catalog-location" data-public-regional-context lang="en" dir="ltr">Regional context: Great Lakes bioregion (US and Canada)</p>            <p class="catalog-activity-notice catalog-curation-stale-notice">当前编辑核验尚未完成；复核日期为 2026-11-15。此前的信息尚未重新核实。</p>
             <div class="catalog-actions">
               <a class="catalog-action-link" data-action-type="learn" href="https://www.greatlakescommons.org/why" rel="external noreferrer">学习 <span aria-hidden="true">↗</span></a>
               <a class="catalog-action-link" data-action-type="contribute" href="https://www.greatlakescommons.org/home-1" rel="external noreferrer">贡献 <span aria-hidden="true">↗</span></a>

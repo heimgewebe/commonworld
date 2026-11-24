@@ -1,0 +1,58 @@
+{
+  "schema_version": 1,
+  "kind": "commonworld_commons_basis",
+  "project_id": "open-library",
+  "classification": "undetermined",
+  "decision": "needs_information",
+  "reviewed_at": "2026-10-30",
+  "reviewer": "Commonworld editorial desk review",
+  "criteria": {
+    "shared_resource": {
+      "status": "supported",
+      "statement": "Offen bearbeitbare Buchmetadaten, freie Software und Projektdokumentation stellen gemeinschaftlich nutzbare Wissens- und Infrastrukturressourcen dar.",
+      "source_ids": [
+        "open-library-about",
+        "open-library-faq"
+      ]
+    },
+    "community": {
+      "status": "supported",
+      "statement": "Freiwillige, Bibliothekare, Entwickler und Nutzer tragen Beiträge und nehmen an öffentlichen Community-Gesprächen teil.",
+      "source_ids": [
+        "open-library-volunteer",
+        "open-library-about"
+      ]
+    },
+    "commoning_practice": {
+      "status": "supported",
+      "statement": "Teilnehmer ergänzen und verbessern Bucheinträge, entwickeln Quellcode und tauschen sich regelmäßig über Katalogarbeit aus.",
+      "source_ids": [
+        "open-library-faq",
+        "open-library-volunteer"
+      ]
+    },
+    "rules_and_responsibility": {
+      "status": "partial",
+      "statement": "Offene Bearbeitungsoberfläche und Versionshistorie belegen gemeinschaftliche Datenpflege; verbindliche Governance über Plattform, Archivstrategie und Konflikte verbleibt beim Internet Archive beziehungsweise ist nicht ausreichend offen dokumentiert.",
+      "source_ids": [
+        "open-library-about",
+        "open-library-faq"
+      ]
+    },
+    "common_benefit": {
+      "status": "supported",
+      "statement": "Offene Buchdaten und gemeinsame Katalogarbeit verbessern öffentliche Literaturerschließung, Weiterverwendung und Erreichbarkeit von Wissen.",
+      "source_ids": [
+        "open-library-about",
+        "open-library-faq"
+      ]
+    }
+  },
+  "confidence": 0.85,
+  "limitations": [
+    "Internet Archive ist rechtlicher und technischer Träger; freiwillige Mitarbeit begründet keine Mit-Eigentümerschaft an Plattform und Ausleihbeständen.",
+    "Daten-/Softwareoffenheit ist von den separaten Urheberrechts- und Ausleihregeln einzelner Bücher zu unterscheiden.",
+    "Verbindliche Mitbestimmungs- und Einspruchsrechte im laufenden Plattformbetrieb sind nicht unabhängig verifiziert."
+  ],
+  "notes": "Ein offen bearbeitbarer Katalog ist gut belegt; die aktuelle Autorität über Ressourcen und Konflikte bleibt als eigene Governance-Frage offen."
+}

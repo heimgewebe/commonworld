@@ -1,0 +1,58 @@
+{
+  "schema_version": 1,
+  "kind": "commonworld_commons_basis",
+  "project_id": "freifunk-hamburg",
+  "classification": "undetermined",
+  "decision": "needs_information",
+  "reviewed_at": "2026-10-30",
+  "reviewer": "Commonworld editorial desk review",
+  "criteria": {
+    "shared_resource": {
+      "status": "supported",
+      "statement": "Freiwillig bereitgestellte Hamburger Funkknoten, Mesh-Verbindungen und gemeinschaftlich gepflegte Firmware bilden lokale Netzressourcen.",
+      "source_ids": [
+        "freifunk-hamburg-homepage",
+        "ffhh-wiki"
+      ]
+    },
+    "community": {
+      "status": "supported",
+      "statement": "Lokale Hamburger Freiwillige organisieren und pflegen die Netzwerkinfrastruktur gemeinsam.",
+      "source_ids": [
+        "freifunk-hamburg-homepage",
+        "ffhh-wiki"
+      ]
+    },
+    "commoning_practice": {
+      "status": "supported",
+      "statement": "Knotenbereitstellung, Mesh-Konfiguration und Pflege gemeinsamer technischer Dienste erfolgen als laufende Gruppenarbeit.",
+      "source_ids": [
+        "freifunk-hamburg-homepage",
+        "ffhh-wiki"
+      ]
+    },
+    "rules_and_responsibility": {
+      "status": "partial",
+      "statement": "Die Gruppe nennt nichtkommerzielle und selbstorganisierte Prinzipien, aber in den überprüften Quellen keine abschließenden bindenden Eigentums-, Abstimmungs- oder Konfliktregeln.",
+      "source_ids": [
+        "freifunk-hamburg-homepage",
+        "ffhh-wiki"
+      ]
+    },
+    "common_benefit": {
+      "status": "supported",
+      "statement": "Offene drahtlose Verbindungen sollen lokale Kommunikation und digitale Teilhabe ohne kommerzielle Anbieterkontrolle ermöglichen.",
+      "source_ids": [
+        "freifunk-hamburg-homepage",
+        "ffhh-wiki"
+      ]
+    }
+  },
+  "confidence": 0.83,
+  "limitations": [
+    "Öffentliche Knotenstatistiken sind kein Nachweis eines zum Stichtag funktionsfähigen gesamten Netzes.",
+    "Private Knoten-, Wohnungs- oder Zugangsdaten werden nicht übernommen.",
+    "Hierarchielosigkeit als Selbstbeschreibung ersetzt keine prüfbaren Verantwortungsregeln."
+  ],
+  "notes": "Lokales gemeinschaftliches Bürgernetz mit nachprüfbarer Praxis; formale Rechte und Konfliktentscheidungen bleiben nachzufragen."
+}
