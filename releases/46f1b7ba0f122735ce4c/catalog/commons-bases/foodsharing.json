@@ -1,0 +1,57 @@
+{
+  "schema_version": 1,
+  "kind": "commonworld_commons_basis",
+  "project_id": "foodsharing",
+  "classification": "commons-infrastructure",
+  "decision": "include",
+  "reviewed_at": "2026-11-20",
+  "reviewer": "Commonworld editorial desk review",
+  "criteria": {
+    "shared_resource": {
+      "status": "supported",
+      "statement": "Gerettete Lebensmittel, Fairteiler und eine gemeinschaftliche Koordinationsplattform bilden Ressourcen.",
+      "source_ids": [
+        "foodsharing-home",
+        "foodsharing-governance"
+      ]
+    },
+    "community": {
+      "status": "supported",
+      "statement": "Freiwillige Foodsaver und lokale Gruppen bilden die beteiligte Gemeinschaft.",
+      "source_ids": [
+        "foodsharing-home",
+        "foodsharing-governance"
+      ]
+    },
+    "commoning_practice": {
+      "status": "supported",
+      "statement": "Beteiligte sammeln, sortieren, lagern und geben Lebensmittel weiter und pflegen Fairteiler.",
+      "source_ids": [
+        "foodsharing-home",
+        "foodsharing-governance"
+      ]
+    },
+    "rules_and_responsibility": {
+      "status": "supported",
+      "statement": "Veröffentlichte Hygiene-, Fairteiler- und Rechtsvereinbarungsregeln ordnen Abgabe und Verantwortung.",
+      "source_ids": [
+        "foodsharing-home",
+        "foodsharing-governance"
+      ]
+    },
+    "common_benefit": {
+      "status": "supported",
+      "statement": "Kostenfreie Weitergabe mindert Verschwendung und stärkt gegenseitige Unterstützung.",
+      "source_ids": [
+        "foodsharing-home",
+        "foodsharing-governance"
+      ]
+    }
+  },
+  "confidence": 0.85,
+  "limitations": [
+    "Nicht jeder Fairteiler ist dauerhaft zugänglich oder rund um die Uhr betreut.",
+    "Einzelstandorte werden ohne aktuelle offizielle Standortfreigabe nicht kartiert."
+  ],
+  "notes": "Eigenständige Aufnahme: begrenzte quellengebundene Fünfkriterien-Prüfung. Keine ungeprüften Mitglieds-, Eigentums- oder Betriebsrechte behauptet."
+}

@@ -175,6 +175,7 @@ def render_index(records: list[dict], locale: str, number: int, root: Path = ROO
         locale=locale,
         project_page_url=lambda identifier: project_url(locale, identifier),
         project_json_url=lambda identifier: f"/catalog/projects/{identifier}.json",
+        root=root,
     )
     nav_links = []
     if number > 1:
@@ -233,7 +234,8 @@ def render_project(record: dict, locale: str, root: Path = ROOT) -> str:
     )
     curation = record.get("curation", {})
     activity = record.get("activity", {})
-    from scripts.render_public_shell import curation_stale_notice
+    from scripts.render_public_shell import curation_stale_notice, render_regional_context_detail
+    regional_context = render_regional_context_detail(record, locale, root)
     stale = curation_stale_notice(record, locale)
     stale_html = f'      <p class="catalog-activity-notice catalog-curation-stale-notice">{html.escape(stale)}</p>\n' if stale else ""
     body = f'''    <main>
@@ -253,7 +255,7 @@ def render_project(record: dict, locale: str, root: Path = ROOT) -> str:
       <section><h2>{copy_text["themes"]}</h2><ul>{_list(record.get("themes", []))}</ul></section>
       <section><h2>{copy_text["actions"]}</h2><ul>{_list(record.get("actions", []))}</ul></section>
       <section><h2>{copy_text["locations"]}</h2><ul>{_list(location_items) if location_items else f'<li>{copy_text["no_public_location"]}</li>'}</ul></section>
-      <section><h2>{copy_text["official"]}</h2><ul>{link_markup}</ul></section>
+{regional_context}      <section><h2>{copy_text["official"]}</h2><ul>{link_markup}</ul></section>
       <section><h2>{copy_text["sources"]}</h2><ul>{source_markup}</ul></section>
       <p><a href="/catalog/projects/{html.escape(identifier, quote=True)}.json" type="application/json">{copy_text["json"]}</a></p>
     </main>'''

@@ -26,6 +26,8 @@ class PublicMapLibreVerticalSliceTests(unittest.TestCase):
             Path("scripts/__init__.py"),
             Path("scripts/public_cache.py"),
             Path("catalog/locales/en.json"),
+            Path("catalog/regional-contexts.v1.json"),
+            Path("assets/commonworld-regional-contexts.mjs"),
             Path("docs/architecture/locale-release.contract.json"),
             Path("assets/commonworld-mark.svg"),
             Path("assets/commonworld-locale.mjs"),

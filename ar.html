@@ -3,9 +3,9 @@
   <head>
     <meta charset="utf-8" />
     <meta name="commonworld-page" content="ar.html" />
-    <meta name="commonworld-page-build" content="43cac26e42f4feb6" />
-    <meta name="commonworld-release" content="27edac283a0621f31754" />
-    <base href="/releases/27edac283a0621f31754/" />
+    <meta name="commonworld-page-build" content="ae999f985888d364" />
+    <meta name="commonworld-release" content="46f1b7ba0f122735ce4c" />
+    <base href="/releases/46f1b7ba0f122735ce4c/" />
     <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
     <meta name="color-scheme" content="dark" />
     <meta name="referrer" content="strict-origin-when-cross-origin" />
@@ -16,12 +16,12 @@
     <link rel="alternate" type="application/json" href="./catalog/catalog.json" title="فهرس Commonworld" />
     <link rel="alternate" type="application/schema+json" href="./contracts/commonworld/project.schema.json" title="مخطط CommonProject" />
     <link rel="stylesheet" href="./assets/vendor/maplibre-gl.css?v=ab1e70d59ec4" />
-    <link rel="stylesheet" href="./index.css?v=84952b6cc591" />
+    <link rel="stylesheet" href="./index.css?v=ef2dd3c6004c" />
     <link rel="stylesheet" href="./assets/ipad-layout.css?v=739d6b8460d4" />
     <script type="module" src="/assets/commonworld-release-check.js?v=c1d996101672"></script>
     <script src="./assets/vendor/maplibre-gl.js?v=45a9b07a9189" defer></script>
     <script type="module" src="./assets/commonworld-locale.mjs?v=d92522e2dd93"></script>
-    <script type="module" src="./assets/commonworld-app.js?v=21dfe2d2fbf7"></script>
+    <script type="module" src="./assets/commonworld-app.js?v=1e557f0d4b24"></script>
   </head>
   <body data-presentation="globe">
     <a id="text-skip-link" class="skip-link" href="/ar.html#static-catalog-fallback">الانتقال إلى طريقة العرض النصي</a>
@@ -161,6 +161,7 @@
                 <li><span class="legend-semantic-mark legend-semantic-mark--withheld" aria-hidden="true"></span>لا تُدرج مراجع المواقع المخفية في العرض المكاني</li>
               </ul>
               <p class="legend-precision"><strong>دقة الموقع:</strong> نقطة = دقيق، مساحة متقطعة = تقريبي، مساحة مصمتة = نطاق منشور.</p>
+              <div id="regional-context-legend" hidden></div>
             </div>
           </details>
 
@@ -257,7 +258,7 @@
         <div class="focus-grid">
           <section><h3>الموضوعات</h3><ul id="focus-themes"></ul></section>
           <section><h3>سبل المشاركة</h3><ul id="focus-actions"></ul></section>
-          <section><h3>المواقع</h3><ul id="focus-locations"></ul></section>
+          <section><h3>المواقع</h3><ul id="focus-locations"></ul><div id="focus-regional-context" hidden></div></section>
           <section><h3>الحضور الرقمي</h3><p id="focus-digital"></p></section>
           <section><h3>العلاقات</h3><ul id="focus-relations"></ul></section>
           <section><h3>الروابط الرسمية</h3><ul id="focus-links"></ul></section>
@@ -401,7 +402,7 @@
             <h2 dir="auto">BerkShares</h2>
             <p lang="ar" dir="auto">عملة محلية في منطقة بيركشاير بولاية ماساتشوستس تدعمها مؤسسات مجتمعية غير ربحية وتُدار عبر عضوية تنتخب مجلس الإدارة وتصوت على التغييرات الأساسية، فيما تعزز العملة دوران النشاط الاقتصادي محلياً.</p>
             <p class="catalog-location">1 موقع مخفي</p>
-            <div class="catalog-actions">
+<p class="catalog-location" data-public-regional-context lang="en" dir="ltr">Regional context: Berkshire region, Massachusetts</p>            <div class="catalog-actions">
               <a class="catalog-action-link" data-action-type="use" href="https://berkshares.org/using-berkshares/" rel="external noreferrer">استخدام <span aria-hidden="true">↗</span></a>
               <a class="catalog-action-link" data-action-type="learn" href="https://berkshares.org/about/" rel="external noreferrer">تعلّم <span aria-hidden="true">↗</span></a>
               <a class="catalog-action-link" data-action-type="contribute" href="https://berkshares.org/donate/" rel="external noreferrer">ساهم <span aria-hidden="true">↗</span></a>
@@ -574,7 +575,7 @@
             <h2 dir="auto">CoopCycle</h2>
             <p lang="ar" dir="auto">يتشارك اتحاد تعاونيات توصيل بالدراجات منصة توصيل طُوّرت جماعياً وقواعد استخدام مصممة لخدمات توصيل يديرها العاملون فيها.</p>
             <p class="catalog-location">1 موقع مخفي</p>
-            <p class="catalog-activity-notice">لم يُتحقق مؤخرًا من حالة التشغيل الحالية. رُوجعت المصادر في ⁨2026-11-20⁩؛ وإعادة المراجعة ذات الأولوية في ⁨2027-01-03⁩.</p>
+<p class="catalog-location" data-public-regional-context lang="en" dir="ltr">Distributed network: Cross-border network of independent courier cooperatives</p>            <p class="catalog-activity-notice">لم يُتحقق مؤخرًا من حالة التشغيل الحالية. رُوجعت المصادر في ⁨2026-11-20⁩؛ وإعادة المراجعة ذات الأولوية في ⁨2027-01-03⁩.</p>
             <div class="catalog-actions">
               <a class="catalog-action-link" data-action-type="learn" href="https://docs.coopcycle.org/en/admin/intro/" rel="external noreferrer">تعلّم <span aria-hidden="true">↗</span></a>
               <a href="https://coopcycle.org/" rel="external noreferrer">الموقع الرسمي <span aria-hidden="true">↗</span></a>
@@ -880,7 +881,7 @@
             <h2 lang="en" dir="ltr">Great Lakes Commons</h2>
             <p lang="ar" dir="auto">شبكة مفتوحة على مستوى الإقليم الحيوي تعامل البحيرات العظمى كمشاع حيّ وتسعى إلى تعزيز الحوكمة المجتمعية وحوكمة السكان الأصليين والمسؤولية المشتركة والإشراف طويل الأمد على المياه عبر الحدود السياسية.</p>
             <p class="catalog-location">1 موقع مخفي</p>
-            <p class="catalog-activity-notice catalog-curation-stale-notice">التحقق التحريري الحالي لم يكتمل بعد؛ موعد المراجعة 2026-11-15. لم يُعَد التحقق من المعلومات السابقة.</p>
+<p class="catalog-location" data-public-regional-context lang="en" dir="ltr">Regional context: Great Lakes bioregion (US and Canada)</p>            <p class="catalog-activity-notice catalog-curation-stale-notice">التحقق التحريري الحالي لم يكتمل بعد؛ موعد المراجعة 2026-11-15. لم يُعَد التحقق من المعلومات السابقة.</p>
             <div class="catalog-actions">
               <a class="catalog-action-link" data-action-type="learn" href="https://www.greatlakescommons.org/why" rel="external noreferrer">تعلّم <span aria-hidden="true">↗</span></a>
               <a class="catalog-action-link" data-action-type="contribute" href="https://www.greatlakescommons.org/home-1" rel="external noreferrer">ساهم <span aria-hidden="true">↗</span></a>

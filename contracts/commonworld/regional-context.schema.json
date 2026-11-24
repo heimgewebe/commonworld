@@ -2,7 +2,7 @@
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "https://commonworld.net/contracts/commonworld/regional-context.schema.json",
   "title": "Non-geometric, source-bound public regional context for CommonProjects",
-  "description": "A versioned editorial context index, separate from canonical project geography. This schema intentionally has no geometry, coordinates, country membership, polygon or member-site fields.",
+  "description": "A versioned editorial context index separate from canonical project geography. Optional source-bound navigation views are camera extents only, never project geometry, locations, territory, member coordinates, coverage or inferred country membership.",
   "type": "object",
   "additionalProperties": false,
   "required": [
@@ -126,6 +126,13 @@
         },
         "public_notes": {
           "$ref": "#/$defs/labels"
+        },
+        "navigation_views": {
+          "type": "array",
+          "maxItems": 6,
+          "items": {
+            "$ref": "#/$defs/navigationView"
+          }
         }
       },
       "allOf": [
@@ -190,6 +197,88 @@
           }
         }
       ]
+    },
+    "navigationView": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "id",
+        "labels",
+        "view_bounds",
+        "source_label",
+        "source_url",
+        "license",
+        "association_source_ids",
+        "purpose",
+        "reviewed_at"
+      ],
+      "properties": {
+        "id": {
+          "$ref": "#/$defs/id"
+        },
+        "labels": {
+          "$ref": "#/$defs/labels"
+        },
+        "view_bounds": {
+          "description": "West, south, east, north; a public reference-map viewport only, not project geometry. No dateline wrap in this pilot.",
+          "type": "array",
+          "minItems": 4,
+          "maxItems": 4,
+          "prefixItems": [
+            {
+              "type": "number",
+              "minimum": -180,
+              "maximum": 180
+            },
+            {
+              "type": "number",
+              "minimum": -85,
+              "maximum": 85
+            },
+            {
+              "type": "number",
+              "minimum": -180,
+              "maximum": 180
+            },
+            {
+              "type": "number",
+              "minimum": -85,
+              "maximum": 85
+            }
+          ],
+          "items": false
+        },
+        "source_label": {
+          "type": "string",
+          "minLength": 3,
+          "maxLength": 200
+        },
+        "source_url": {
+          "type": "string",
+          "format": "uri",
+          "pattern": "^https://"
+        },
+        "license": {
+          "type": "string",
+          "minLength": 3,
+          "maxLength": 200
+        },
+        "association_source_ids": {
+          "type": "array",
+          "minItems": 1,
+          "uniqueItems": true,
+          "items": {
+            "$ref": "#/$defs/id"
+          }
+        },
+        "purpose": {
+          "const": "camera_only"
+        },
+        "reviewed_at": {
+          "type": "string",
+          "format": "date"
+        }
+      }
     }
   }
 }

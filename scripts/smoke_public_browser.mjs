@@ -2731,6 +2731,52 @@ async function intentSearchDiscoveryScenario() {
   assert((await run.page.locator('#focus-title').textContent()) === 'Le Nid', 'intent spatial: geographic result focus mismatch');
   await run.page.locator('#focus-close').click();
 
+  // Public regional contexts are deliberately separate from project locations.
+  for (const [id, query, regionLabel, bounds] of [
+    ['berkshares', 'Berkshire', 'Berkshire region', [-73.51, 42.03, -72.94, 42.75]],
+    ['great-lakes-commons', 'Great Lakes', 'Great Lakes bioregion', [-93.3, 40.4, -74.4, 50.8]],
+  ]) {
+    await run.page.locator('#commons-search').fill(query);
+    const result = run.page.locator('.discovery-result[data-commonproject-id="' + id + '"]');
+    await result.waitFor({ state: 'visible' });
+    assert((await result.locator('.discovery-result-meta').textContent()).includes('Regional context'), 'regional search: missing distinct context label ' + id);
+    await result.locator('.discovery-result-main').click();
+    await run.page.waitForFunction(identifier => document.querySelector('.globe-stage')?.dataset.lastSpatialResult === 'regional-context:' + identifier, id);
+    const camera = await stableMapCamera();
+    assert(camera.lng >= bounds[0] - 0.05 && camera.lng <= bounds[2] + 0.05
+      && camera.lat >= bounds[1] - 0.05 && camera.lat <= bounds[3] + 0.05 && camera.zoom <= 8,
+      'regional navigation: camera left reference bounds ' + id + ' ' + JSON.stringify(camera));
+    assert((await run.page.locator('#focus-regional-context').textContent()).includes(regionLabel), 'regional focus missing ' + id);
+    const reference = run.page.locator('.regional-reference-label[data-regional-project-id="' + id + '"]');
+    assert(await reference.count() === 1, 'regional map: missing or duplicated label ' + id);
+    assert((await reference.textContent()).includes('Regional context'), 'regional map: missing role ' + id);
+    assert(await reference.getAttribute('aria-pressed') === 'true', 'regional map: missing selection ' + id);
+    assert((await run.page.locator('#focus-regional-context').textContent()).includes('not Commons locations'), 'regional focus misrepresents reference camera as project location');
+    await run.page.locator('#focus-close').click();
+  }
+  await run.page.locator('#commons-search').fill('Mensakas');
+  const cooperative = run.page.locator('.discovery-result[data-commonproject-id="coopcycle"]');
+  await cooperative.waitFor({ state: 'visible' });
+  const beforeNetwork = await stableMapCamera();
+  await cooperative.locator('.discovery-result-main').click();
+  await run.page.waitForFunction(() => document.querySelector('.globe-stage')?.dataset.lastSpatialResult === 'regional-network:coopcycle');
+  assert(sameCamera(beforeNetwork, await stableMapCamera()), 'regional network: inferred a network center');
+  assert(await run.page.locator('#focus-regional-context [data-regional-view-id]').count() === 3, 'regional network: incomplete public orientation controls');
+  assert(await run.page.locator('.regional-reference-label[data-regional-project-id="coopcycle"][data-reference-kind="network-example"]').count() === 3, 'regional map: missing separate network examples');
+  await run.page.locator('[data-regional-view-id="barcelona-member-city-reference"]').click();
+  await run.page.waitForFunction(() => document.querySelector('.globe-stage')?.dataset.lastRegionalView === 'barcelona-member-city-reference');
+  const exampleCamera = await stableMapCamera();
+  assert(exampleCamera.lng > 2.04 && exampleCamera.lng < 2.24 && exampleCamera.lat > 41.30 && exampleCamera.lat < 41.49 && exampleCamera.zoom <= 8, 'regional network: explicit example navigation failed');
+  await run.page.locator('#focus-close').click();
+  if (await run.page.locator('#discovery-panel').isVisible()) await run.page.locator('#discovery-close').click();
+  await run.page.locator('#settings-toggle').click();
+  await run.page.getByRole('radio', { name: /Text/ }).click();
+  assert((await run.page.locator('#project-coopcycle .catalog-location').textContent()).includes('Distributed network'), 'regional network: text-view context absent');
+  await run.page.locator('#settings-toggle').click();
+  await run.page.getByRole('radio', { name: /Globe/ }).click();
+
+
+
   await run.page.locator('#commons-search').fill('');
   await run.page.waitForFunction((count) => document.querySelectorAll('.discovery-result').length === count, discoveryPreviewCount(expectedDigitalProjection.catalogIds));
   await run.page.locator('#filter-presence-geographic').check();
@@ -2748,7 +2794,7 @@ async function intentSearchDiscoveryScenario() {
 
   assert(run.consoleErrors.every((message) => message.includes('Failed to load resource')), 'intent search: unexpected console errors: ' + run.consoleErrors.join(' | '));
   assert(run.pageErrors.length === 0, 'intent search: page errors: ' + run.pageErrors.join(' | '));
-  results.push({ id: 'intent-search-discovery', verdict: 'PASS', indexedRecords: expectedDigitalProjection.catalogEntryCount, rankedGermanIntentResults: expectedDigitalProjection.contributionIds.length, filters: 7, digitalCoordinateFree: true, spatialNavigation: true });
+  results.push({ id: 'intent-search-discovery', verdict: 'PASS', indexedRecords: expectedDigitalProjection.catalogEntryCount, rankedGermanIntentResults: expectedDigitalProjection.contributionIds.length, filters: 7, digitalCoordinateFree: true, spatialNavigation: true, regionalReferenceNavigation: true, distributedNetworkNoCenter: true, regionalTextParity: true });
   await run.context.close();
 }
 

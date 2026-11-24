@@ -1,0 +1,57 @@
+{
+  "schema_version": 1,
+  "kind": "commonworld_commons_basis",
+  "project_id": "community-seed-bank-nepal",
+  "classification": "commons-infrastructure",
+  "decision": "include",
+  "reviewed_at": "2026-11-20",
+  "reviewer": "Commonworld editorial desk review",
+  "criteria": {
+    "shared_resource": {
+      "status": "supported",
+      "statement": "Lokal erhaltene Saatgutbestände und Sortenwissen bilden gemeinschaftliche Ressourcen.",
+      "source_ids": [
+        "community-seed-bank-nepal-home",
+        "community-seed-bank-nepal-governance"
+      ]
+    },
+    "community": {
+      "status": "supported",
+      "statement": "Lokale bäuerliche Saatgutbanken und ihre Netzwerkmitglieder sind die verantwortlichen Gemeinschaften.",
+      "source_ids": [
+        "community-seed-bank-nepal-home",
+        "community-seed-bank-nepal-governance"
+      ]
+    },
+    "commoning_practice": {
+      "status": "supported",
+      "statement": "Bauern sammeln, vermehren, dokumentieren und tauschen lokale Sorten gemeinschaftlich.",
+      "source_ids": [
+        "community-seed-bank-nepal-home",
+        "community-seed-bank-nepal-governance"
+      ]
+    },
+    "rules_and_responsibility": {
+      "status": "supported",
+      "statement": "Bankinterne Regeln für Aufbewahrung, Ausleihe und Rückgabe strukturieren Saatgutpflege und Zugang.",
+      "source_ids": [
+        "community-seed-bank-nepal-home",
+        "community-seed-bank-nepal-governance"
+      ]
+    },
+    "common_benefit": {
+      "status": "supported",
+      "statement": "Saatgutsicherheit und Sortenvielfalt bleiben als gemeinsamer Nutzen in den Dörfern verfügbar.",
+      "source_ids": [
+        "community-seed-bank-nepal-home",
+        "community-seed-bank-nepal-governance"
+      ]
+    }
+  },
+  "confidence": 0.77,
+  "limitations": [
+    "Die offizielle Netzwerkwebsite enthält an einigen Stellen erkennbar nicht projektspezifische Webdesign-Template-Texte; nur die Saatgutinformationen werden verwendet.",
+    "Ein landesweiter Verbandsname belegt keine einheitliche Eigentumsordnung sämtlicher örtlicher Banken."
+  ],
+  "notes": "Eigenständige Aufnahme: begrenzte quellengebundene Fünfkriterien-Prüfung. Keine ungeprüften Mitglieds-, Eigentums- oder Betriebsrechte behauptet."
+}

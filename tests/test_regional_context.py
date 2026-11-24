@@ -78,6 +78,37 @@ class RegionalContextTest(unittest.TestCase):
         item["contexts"][0]["coverage_claim"] = "full"
         self.assertTrue(self.errors(item))
 
+    def test_navigation_views_are_only_reference_map_bounds(self) -> None:
+        views = [v for c in self.manifest["contexts"] for v in c.get("navigation_views", [])]
+        self.assertEqual(len(views), 5)
+        self.assertEqual(len({v["id"] for v in views}), 5)
+        self.assertTrue(all(v["purpose"] == "camera_only" for v in views))
+        self.assertTrue(all(v["view_bounds"][0] < v["view_bounds"][2] and v["view_bounds"][1] < v["view_bounds"][3] for v in views))
+        item = copy.deepcopy(self.manifest)
+        item["contexts"][0]["navigation_views"][0]["view_bounds"] = [10, 10, 1, 1]
+        self.assertIn("invalid orientation viewport", " ".join(self.errors(item)))
+        item = copy.deepcopy(self.manifest)
+        item["contexts"][0]["navigation_views"][0]["association_source_ids"] = ["wrong-official-source"]
+        self.assertIn("unbound orientation association source", " ".join(self.errors(item)))
+        item = copy.deepcopy(self.manifest)
+        item["contexts"][0]["navigation_views"][0]["purpose"] = "project_extent"
+        self.assertTrue(self.errors(item))
+
+    def test_static_public_context_is_visible_without_project_geometry(self) -> None:
+        from scripts.render_public_shell import render_regional_context_detail, render_regional_context_module
+        module = render_regional_context_module(ROOT)
+        self.assertIn("PUBLIC_REGIONAL_CONTEXTS", module)
+        self.assertEqual((ROOT / "assets/commonworld-regional-contexts.mjs").read_text(), module)
+        for context in self.manifest["contexts"]:
+            for locale in ("de", "en"):
+                with self.subTest(project=context["project_id"], locale=locale):
+                    result = render_regional_context_detail(self.projects[context["project_id"]], locale, ROOT)
+                    self.assertIn("data-public-regional-context", result)
+                    self.assertIn(context["reference"]["labels"][locale], result)
+                    self.assertIn(context["public_notes"][locale], result)
+                    self.assertIn("Orientierung" if locale == "de" else "orientation", result)
+        self.assertEqual(render_regional_context_detail(self.projects["zapatista-autonomy"], "de", ROOT), "")
+
     def test_reference_has_no_geographic_centroid_or_inferred_membership(self) -> None:
         for entry in self.manifest["contexts"]:
             self.assertEqual(set(entry["reference"]), {"id", "kind", "labels"})
