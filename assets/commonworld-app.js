@@ -3055,6 +3055,7 @@ function updateSelectionMarks() {
     if (element.matches('.catalog-card')) element.toggleAttribute('data-selected', selected);
   });
   updateFocusPanel();
+  updateRegionalContextLabels();
   updateSemanticLocationLine();
 }
 
@@ -3081,7 +3082,6 @@ function renderDiscoveryState() {
   updateSelectionMarks();
   const visible = visibleRecords();
   renderRegionalContextLegend(visible);
-  updateRegionalContextLabels(visible);
   const count = visible.length;
   elements.globeResults.textContent = count === 0
     ? t('no_matching_commons', 'Keine Commons entsprechen dieser Suche oder Filterauswahl.')

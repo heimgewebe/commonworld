@@ -1,0 +1,116 @@
+{
+  "schema_version": 4,
+  "id": "communs-paysans",
+  "title": "Communs Paysans – gemeinsames Agrartechnikwissen",
+  "summary": "Nach der Liquidation der früheren Genossenschaft L’Atelier Paysan führen neue Vereine gemeinschaftliches Wissen, Baupläne und praktische Selbstbau-Techniken für bäuerliche Werkzeuge weiter.",
+  "themes": [
+    "agriculture",
+    "open-hardware",
+    "appropriate-technology",
+    "knowledge"
+  ],
+  "actions": [
+    "learn"
+  ],
+  "presence": {
+    "geographic": [
+      {
+        "id": "communs-paysans-region",
+        "mode": "approximate",
+        "label": "Communs Paysans – öffentlicher L’Atelier Paysan-Standort Renage",
+        "privacy_note": "Nur die öffentlich besuchbare Werkstatt in Renage, nicht die dezentralen bäuerlichen Lernorte und privaten Mitgliedsbetriebe.",
+        "source_ids": [
+          "communs-paysans-home",
+          "communs-paysans-contact",
+          "osm-atelier-paysan-renage"
+        ],
+        "geometry": {
+          "type": "Point",
+          "coordinates": [
+            5.4908555,
+            45.3251415
+          ]
+        },
+        "uncertainty_meters_min": 400
+      }
+    ],
+    "digital": {
+      "available": true,
+      "source_ids": [
+        "communs-paysans-home"
+      ],
+      "reach": "network",
+      "label": "Gemeinsam weitergeführte Baupläne und landwirtschaftliche Selbstbau-Dokumentation"
+    }
+  },
+  "activity": {
+    "status": "unknown",
+    "observed_at": "2026-11-20",
+    "source_ids": [
+      "communs-paysans-home"
+    ],
+    "note": "Die dokumentierte Praxis ist belegt, ihr operativer Status wurde in dieser Aufnahme nicht als tagesaktuell verifiziert."
+  },
+  "provenance": {
+    "sources": [
+      {
+        "id": "communs-paysans-home",
+        "type": "official-source",
+        "label": "Communs Paysans – gemeinsames Agrartechnikwissen – Projektinformation",
+        "url": "https://latelierpaysan.org/",
+        "retrieved_at": "2026-11-20",
+        "note": "Öffentliche projektnahe Information über die gemeinsame Ressource und die Beteiligten."
+      },
+      {
+        "id": "communs-paysans-governance",
+        "type": "official-source",
+        "label": "Communs Paysans – gemeinsames Agrartechnikwissen – Organisation und Regeln",
+        "url": "https://www.latelierpaysan.org/L-Atelier-Paysan-face-a-la-liquidation-elargissons-le-mouvement",
+        "retrieved_at": "2026-11-20",
+        "note": "Projektnahe Details zu gemeinsamen Praktiken, Organisation oder relevanten Grenzen."
+      },
+      {
+        "id": "communs-paysans-contact",
+        "type": "official-source",
+        "label": "Communs Paysans / L’Atelier Paysan – öffentlicher Werkstattstandort",
+        "url": "https://www.latelierpaysan.org/Contact",
+        "retrieved_at": "2026-11-22",
+        "note": "Der Träger Communs Paysans nennt den öffentlichen Hauptstandort ZA des Papeteries, 38140 Renage."
+      },
+      {
+        "id": "osm-atelier-paysan-renage",
+        "type": "public-registry",
+        "label": "OpenStreetMap – L’Atelier Paysan, Renage",
+        "url": "https://www.openstreetmap.org/node/1166304397",
+        "retrieved_at": "2026-11-22",
+        "note": "Namensgleicher öffentlicher Werkstatt-/Organisationspunkt in Renage. OpenStreetMap-Daten unter ODbL 1.0."
+      }
+    ]
+  },
+  "curation": {
+    "state": "listed",
+    "catalogued_at": "2026-11-20",
+    "reviewed_by": "Commonworld editorial review",
+    "reviewed_at": "2026-11-20",
+    "next_review_at": "2027-01-03",
+    "notes": "Aktueller Betriebszustand nicht zeitnah verifiziert. Neue quellengebundene Commons-Aufnahme; Wiedervorlage innerhalb von 45 Tagen."
+  },
+  "links": [
+    {
+      "type": "homepage",
+      "label": "Communs Paysans – gemeinsames Agrartechnikwissen – offizielle Seite",
+      "url": "https://latelierpaysan.org/"
+    },
+    {
+      "type": "learn",
+      "label": "Gemeinsame Praxis und Verantwortung kennenlernen",
+      "url": "https://www.latelierpaysan.org/L-Atelier-Paysan-face-a-la-liquidation-elargissons-le-mouvement",
+      "source_ids": [
+        "communs-paysans-governance"
+      ]
+    }
+  ],
+  "handoff": {
+    "enabled": false
+  }
+}

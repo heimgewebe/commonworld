@@ -2753,6 +2753,7 @@ async function intentSearchDiscoveryScenario() {
     assert(await reference.getAttribute('aria-pressed') === 'true', 'regional map: missing selection ' + id);
     assert((await run.page.locator('#focus-regional-context').textContent()).includes('not Commons locations'), 'regional focus misrepresents reference camera as project location');
     await run.page.locator('#focus-close').click();
+    assert(await run.page.locator('.regional-reference-label[data-regional-project-id="' + id + '"][aria-pressed="true"], .regional-reference-label[data-regional-project-id="' + id + '"].is-selected').count() === 0, 'regional map: stale selection after closing focus ' + id);
   }
   await run.page.locator('#commons-search').fill('Mensakas');
   const cooperative = run.page.locator('.discovery-result[data-commonproject-id="coopcycle"]');
@@ -2767,7 +2768,16 @@ async function intentSearchDiscoveryScenario() {
   await run.page.waitForFunction(() => document.querySelector('.globe-stage')?.dataset.lastRegionalView === 'barcelona-member-city-reference');
   const exampleCamera = await stableMapCamera();
   assert(exampleCamera.lng > 2.04 && exampleCamera.lng < 2.24 && exampleCamera.lat > 41.30 && exampleCamera.lat < 41.49 && exampleCamera.zoom <= 8, 'regional network: explicit example navigation failed');
+  const networkMarkers = run.page.locator('.regional-reference-label[data-regional-project-id="coopcycle"][data-reference-kind="network-example"]');
   await run.page.locator('#focus-close').click();
+  assert(await networkMarkers.count() === 0, 'regional network: stale examples after closing focus');
+  await run.page.locator('#commons-search').fill('CoopCycle');
+  await cooperative.waitFor({ state: 'visible' });
+  await cooperative.locator('.discovery-result-main').click();
+  await stableMapCamera();
+  assert(await networkMarkers.count() === 3, 'regional network: examples did not return after reselection');
+  await run.page.keyboard.press('Escape');
+  assert(await networkMarkers.count() === 0, 'regional network: stale examples after Escape');
   if (await run.page.locator('#discovery-panel').isVisible()) await run.page.locator('#discovery-close').click();
   await run.page.locator('#settings-toggle').click();
   await run.page.getByRole('radio', { name: /Text/ }).click();
